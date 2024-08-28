@@ -41,7 +41,7 @@ class Module extends AlaressModule\Module
         $pastoralWriteAndTypeHasSubTypes = new Rule\LazyCallback(function () use ($loggedInAndPastoralWritePerm) {
             return new Rule\All(
                 $loggedInAndPastoralWritePerm,
-                new Rule\Callback(function (array $params = []) {
+                new Rule\Callback(function (array $params = []): void {
                     if (!\array_key_exists('type', $params)) {
                         throw new InvalidArgumentException("No 'type' found in route params");
                     }

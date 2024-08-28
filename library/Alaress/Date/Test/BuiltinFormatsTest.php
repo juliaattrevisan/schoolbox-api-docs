@@ -23,37 +23,37 @@ class BuiltinFormatsTest extends TestCase
 
     public function testDatabaseFormat()
     {
-        $date = $this->buildDateObject('2015-03-25 00:00:00', Alaress_Date_Format::DATABASE_FORMAT);
+        $date = self::buildDateObject('2015-03-25 00:00:00', Alaress_Date_Format::DATABASE_FORMAT);
         $this->assertEquals('2015-03-25 00:00:00', $date->getDatabase());
     }
 
     public function testDatabaseDateFormat()
     {
-        $date = $this->buildDateObject('2015-03-25', Alaress_Date_Format::DATABASE_DATE_FORMAT);
+        $date = self::buildDateObject('2015-03-25', Alaress_Date_Format::DATABASE_DATE_FORMAT);
         $this->assertEquals('2015-03-25', $date->getDatabaseDate());
     }
 
     public function testDatabaseTimeFormat()
     {
-        $date = $this->buildDateObject('15:37:20', Alaress_Date_Format::DATABASE_TIME_FORMAT);
+        $date = self::buildDateObject('15:37:20', Alaress_Date_Format::DATABASE_TIME_FORMAT);
         $this->assertEquals('15:37:20', $date->getDatabaseTime());
     }
 
     public function testTimestampFormat()
     {
-        $date = $this->buildDateObject(1234567890, Alaress_Date_Format::TIMESTAMP, new DateTimeZone('UTC'));
+        $date = self::buildDateObject(1234567890, Alaress_Date_Format::TIMESTAMP, new DateTimeZone('UTC'));
         $this->assertEquals(1234567890, $date->getUnixTimeStamp());
     }
 
     public function testUrlFormat()
     {
-        $date = $this->buildDateObject('25-03-2015', Alaress_Date_Format::URL_FORMAT);
+        $date = self::buildDateObject('25-03-2015', Alaress_Date_Format::URL_FORMAT);
         $this->assertEquals('25-03-2015', $date->getURLDate());
     }
 
     public function testToStringFormat()
     {
-        $date = $this->buildDateObject(
+        $date = self::buildDateObject(
             '2015-03-25 12:34:56',
             Alaress_Date_Format::DATABASE_FORMAT,
             new DateTimeZone('UTC')
@@ -63,7 +63,7 @@ class BuiltinFormatsTest extends TestCase
 
     public function testDateTimeBuiltinFormats()
     {
-        $testDate = $this->buildDateObject(
+        $testDate = self::buildDateObject(
             '2015-03-25 12:34:56',
             Alaress_Date_Format::DATABASE_FORMAT,
             new DateTimeZone('UTC')

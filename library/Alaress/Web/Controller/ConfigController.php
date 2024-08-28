@@ -138,7 +138,7 @@ abstract class ConfigController extends Base
     protected function buildRebuildModuleCacheCallback(): Closure
     {
         return Closure::fromCallable(
-            function () {
+            function (): void {
                 $this->rebuilder->rebuild($this->getConfigLoader()->get(ConfigMapper::NAME_SITE_SCHOOL_CODE));
             }
         );

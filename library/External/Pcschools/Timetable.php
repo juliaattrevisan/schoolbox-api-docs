@@ -518,7 +518,7 @@ class External_Pcschools_Timetable implements External_TimetableInterface
     public function getRoomTimetable(array $roomCodes): array
     {
         // Split the requested room codes into a CSV string for use in the query
-        array_walk($roomCodes, function (&$value) {
+        array_walk($roomCodes, function (&$value): void {
             $value = $this->getDatabase()->legacyQuote($value);
         });
 

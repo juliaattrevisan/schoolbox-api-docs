@@ -25,7 +25,7 @@ class ColorTest extends TestCase
         $this->color = new Color(0, 0, 0);
     }
 
-    public function getAssertColorSuccessData(): array
+    public static function getAssertColorSuccessData(): array
     {
         return array(
             array(0, 0),
@@ -35,16 +35,14 @@ class ColorTest extends TestCase
         );
     }
 
-    /**
-     * @dataProvider getAssertColorSuccessData
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('getAssertColorSuccessData')]
     public function testAssertColorSuccess($value, $expectedValue): void
     {
         $this->color->setGreen($value);
         $this->assertEquals($expectedValue, $this->color->getGreen());
     }
 
-    public function getAssertColorFailureData()
+    public static function getAssertColorFailureData()
     {
         return array(
             array(-1),
@@ -55,17 +53,15 @@ class ColorTest extends TestCase
         );
     }
 
-    /**
-     * @dataProvider getAssertColorFailureData
-     *
-     */
+
+    #[\PHPUnit\Framework\Attributes\DataProvider('getAssertColorFailureData')]
     public function testAssertColorFailure($value)
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->color->setGreen($value);
     }
 
-    public function getAssertAlphaSuccessData()
+    public static function getAssertAlphaSuccessData()
     {
         return array(
             array(0, 0.0),
@@ -74,16 +70,14 @@ class ColorTest extends TestCase
         );
     }
 
-    /**
-     * @dataProvider getAssertAlphaSuccessData
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('getAssertAlphaSuccessData')]
     public function testAssertAlphaSuccess($value, $expectedValue)
     {
         $this->color->setAlpha($value);
         $this->assertEqualsWithDelta($expectedValue, $this->color->getAlpha(), 0.01);
     }
 
-    public function getAssertAlphaFailureData()
+    public static function getAssertAlphaFailureData()
     {
         return array(
             array(-1),
@@ -93,17 +87,15 @@ class ColorTest extends TestCase
         );
     }
 
-    /**
-     * @dataProvider getAssertAlphaFailureData
-     *
-     */
+
+    #[\PHPUnit\Framework\Attributes\DataProvider('getAssertAlphaFailureData')]
     public function testAssertAlphaFailure($value)
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->color->setAlpha($value);
     }
 
-    public function getGetAsHexData()
+    public static function getGetAsHexData()
     {
         return array(
             array(new Color(0xFF, 0X77, 0X00), 'FF7700'),
@@ -111,15 +103,13 @@ class ColorTest extends TestCase
         );
     }
 
-    /**
-     * @dataProvider getGetAsHexData
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('getGetAsHexData')]
     public function testGetAsHex(Color $color, $hex)
     {
         $this->assertEquals($hex, $color->getAsHex());
     }
 
-    public function getGetAsHexAlphaData()
+    public static function getGetAsHexAlphaData()
     {
         return array(
             array(new Color(0xFF, 0X77, 0X00, 0.5), 'FF77007F'),
@@ -127,16 +117,14 @@ class ColorTest extends TestCase
         );
     }
 
-    /**
-     * @dataProvider getGetAsHexAlphaData
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('getGetAsHexAlphaData')]
     public function testGetAsHexAlpha(Color $color, $hex)
     {
         $this->assertEquals($hex, $color->getAsHexAlpha());
     }
 
 
-    public function getGetAsRgbData()
+    public static function getGetAsRgbData()
     {
         return array(
             array(new Color(0xFF, 0X77, 0X00), 'rgb(255, 119, 0)'),
@@ -144,15 +132,13 @@ class ColorTest extends TestCase
         );
     }
 
-    /**
-     * @dataProvider getGetAsRgbData
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('getGetAsRgbData')]
     public function testGetAsRgb(Color $color, $rgb)
     {
         $this->assertEquals($rgb, $color->getAsRgb());
     }
 
-    public function getGetAsRgbAlphaData()
+    public static function getGetAsRgbAlphaData()
     {
         return array(
             array(new Color(0xFF, 0X77, 0X00, 0.5), 'rgba(255, 119, 0, 0.500)'),
@@ -160,17 +146,13 @@ class ColorTest extends TestCase
         );
     }
 
-    /**
-     * @dataProvider getGetAsRgbAlphaData
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('getGetAsRgbAlphaData')]
     public function testGetAsRgbAlpha(Color $color, $rgb)
     {
         $this->assertEquals($rgb, $color->getAsRgba());
     }
 
-    /**
-     * @dataProvider getGetAsRgbAlphaData
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('getGetAsRgbAlphaData')]
     public function testToString(Color $color, $rgb)
     {
         $this->assertEquals($rgb, "$color");

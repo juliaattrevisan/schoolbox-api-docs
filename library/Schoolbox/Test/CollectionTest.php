@@ -23,9 +23,9 @@ use Schoolbox\UserMapper;
 class CollectionTest extends TestCase
 {
     /**
-     * @dataProvider providerCollection
      * @param Collection $input
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerCollection')]
     public function testFromCollection(Collection $input)
     {
         $actual = $this->getUserMapper()->getModelAsCollection($input);
@@ -33,9 +33,9 @@ class CollectionTest extends TestCase
     }
 
     /**
-     * @dataProvider providerICollection
      * @param Collection $input
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerICollection')]
     public function testFromICollection(Collection $input)
     {
         $actual = $this->getUserMapper()->getModelAsCollection($input);
@@ -43,9 +43,9 @@ class CollectionTest extends TestCase
     }
 
     /**
-     * @dataProvider providerArray
      * @param array $input
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerArray')]
     public function testFromArray(array $input)
     {
         $collection = $this->getUserMapper()->getModelAsCollection($input);
@@ -53,9 +53,9 @@ class CollectionTest extends TestCase
     }
 
     /**
-     * @dataProvider providerScalar
      * @param mixed $input
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerScalar')]
     public function testFromScalar($input)
     {
         $collection = $this->getUserMapper()->getModelAsCollection($input);
@@ -63,9 +63,9 @@ class CollectionTest extends TestCase
     }
 
     /**
-     * @dataProvider providerObject
      * @param mixed $input
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerObject')]
     public function testFromObject($input)
     {
         $collection = $this->getUserMapper()->getModelAsCollection($input);
@@ -74,11 +74,11 @@ class CollectionTest extends TestCase
 
 
     /**
-     * @dataProvider providerSortNaturallyAscending
      * @param mixed $input
      * @param mixed $expectedNoIndex
      * @param mixed $expectedWithIndex
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerSortNaturallyAscending')]
     public function testSortNaturallyAscending($input, $expectedNoIndex, $expectedWithIndex)
     {
         $inputWithIndex = clone $input;
@@ -95,7 +95,7 @@ class CollectionTest extends TestCase
      *
      * @return array
      */
-    public function providerSortNaturallyAscending(): array
+    public static function providerSortNaturallyAscending(): array
     {
         return [
             'Firstnames 1, Ascending' => [
@@ -160,11 +160,11 @@ class CollectionTest extends TestCase
 
 
     /**
-     * @dataProvider providerSortNaturallyDescending
      * @param mixed $input
      * @param mixed $expectedNoIndex
      * @param mixed $expectedWithIndex
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerSortNaturallyDescending')]
     public function testSortNaturallyDescending($input, $expectedNoIndex, $expectedWithIndex)
     {
         $inputWithIndex = clone $input;
@@ -181,7 +181,7 @@ class CollectionTest extends TestCase
      *
      * @return array
      */
-    public function providerSortNaturallyDescending(): array
+    public static function providerSortNaturallyDescending(): array
     {
         return [
             'Firstnames 1, Descending' => [
@@ -246,9 +246,9 @@ class CollectionTest extends TestCase
 
 
     /**
-     * @dataProvider providerSortNaturallyInvalid
      * @param mixed $input
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerSortNaturallyInvalid')]
     public function testSortNaturallyInvalid($input)
     {
         $this->expectException(\InvalidArgumentException::class);
@@ -261,7 +261,7 @@ class CollectionTest extends TestCase
      *
      * @return array
      */
-    public function providerSortNaturallyInvalid(): array
+    public static function providerSortNaturallyInvalid(): array
     {
         return [
             'Invalid 1' => [
@@ -282,7 +282,7 @@ class CollectionTest extends TestCase
 
     // ============= Data Providers =============
 
-    public function providerCollection()
+    public static function providerCollection()
     {
         return [
             [new Collection()],
@@ -294,7 +294,7 @@ class CollectionTest extends TestCase
         ];
     }
 
-    public function providerICollection()
+    public static function providerICollection()
     {
         return [
             [new \Schoolbox\Calendar\EventLevelCollection(new Collection(), new Collection())],
@@ -306,7 +306,7 @@ class CollectionTest extends TestCase
         ];
     }
 
-    public function providerArray()
+    public static function providerArray()
     {
         return [
             [[]],
@@ -316,7 +316,7 @@ class CollectionTest extends TestCase
         ];
     }
 
-    public function providerScalar()
+    public static function providerScalar()
     {
         return [
             [null],
@@ -327,7 +327,7 @@ class CollectionTest extends TestCase
         ];
     }
 
-    public function providerObject()
+    public static function providerObject()
     {
         $resultCacheMapper = ResultCache\Mapper::getInstance();
 

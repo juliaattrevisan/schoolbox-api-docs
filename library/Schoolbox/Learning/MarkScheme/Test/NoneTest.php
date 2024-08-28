@@ -11,6 +11,7 @@ namespace Schoolbox\Learning\MarkScheme\Test;
 use PHPUnit\Framework\TestCase;
 use Schoolbox\Learning\MarkScheme\None;
 
+#[\PHPUnit\Framework\Attributes\CoversClass(\Schoolbox\Learning\MarkScheme\None::class)]
 class NoneTest extends TestCase
 {
     /**
@@ -30,9 +31,9 @@ class NoneTest extends TestCase
 
 
     /**
-     * @dataProvider providerNormalised
      * @param float $normalised
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerNormalised')]
     public function testGetHumanReadableValid($normalised)
     {
         $expected = null;
@@ -72,9 +73,9 @@ class NoneTest extends TestCase
     }
 
     /**
-     * @dataProvider providerHumanReadable
      * @param string $humanReadable
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerHumanReadable')]
     public function testGetNormalisedValid($humanReadable)
     {
         $expected = null;
@@ -85,12 +86,10 @@ class NoneTest extends TestCase
 
 
     /**
-     * @dataProvider getConvertFormInputToHumanReadableMarkData
-     * @covers \Schoolbox\Learning\MarkScheme\None::convertFormInputToHumanReadableMark
-     *
      * @param string|null $formInput
      * @param string|null $expected
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('getConvertFormInputToHumanReadableMarkData')]
     public function testConvertFormInputToHumanReadableMark(
         ?string $formInput,
         ?string $expected
@@ -101,12 +100,10 @@ class NoneTest extends TestCase
 
 
     /**
-     * @dataProvider getRetrieveHumanReadableMarkAsFormInputData
-     * @covers \Schoolbox\Learning\MarkScheme\None::convertHumanReadableMarkToFormInput
-     *
      * @param string|null $humanReadableMark
      * @param string|null $expected
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('getRetrieveHumanReadableMarkAsFormInputData')]
     public function testConvertHumanReadableMarkToFormInput(
         ?string $humanReadableMark,
         ?string $expected
@@ -121,7 +118,7 @@ class NoneTest extends TestCase
     /**
      * @return array
      */
-    public function providerNormalised(): array
+    public static function providerNormalised(): array
     {
         return [
             [0],
@@ -137,7 +134,7 @@ class NoneTest extends TestCase
     /**
      * @return array
      */
-    public function providerHumanReadable(): array
+    public static function providerHumanReadable(): array
     {
         return [
             [null],
@@ -153,7 +150,7 @@ class NoneTest extends TestCase
      *
      * @return iterable
      */
-    public function getConvertFormInputToHumanReadableMarkData(): iterable
+    public static function getConvertFormInputToHumanReadableMarkData(): iterable
     {
         yield 'null form input' => [null, null];
         yield 'string form input' => ['red', null];
@@ -166,7 +163,7 @@ class NoneTest extends TestCase
      *
      * @return iterable
      */
-    public function getRetrieveHumanReadableMarkAsFormInputData(): iterable
+    public static function getRetrieveHumanReadableMarkAsFormInputData(): iterable
     {
         yield 'null form input' => [null, null];
         yield 'string form input' => ['red', null];

@@ -13,20 +13,17 @@ use Alaress\Image\TransformFormat;
 use PHPUnit\Framework\TestCase;
 use UnexpectedValueException;
 
-/**
- * @covers \Alaress\Image\TransformFormat
- */
+#[\PHPUnit\Framework\Attributes\CoversClass(\Alaress\Image\TransformFormat::class)]
 class TransformFormatTest extends TestCase
 {
     /**
-     * @dataProvider getTestConstructData
-     * @covers \Alaress\Image\TransformFormat::__construct
      *
      * @param string $mime
      * @param string $expectedFormat
      * @param string $expectedMime
      * @return void
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('getTestConstructData')]
     public function testConstruct(string $mime, string $expectedFormat, string $expectedMime): void
     {
         $transformFormat = new TransformFormat($mime);
@@ -39,7 +36,7 @@ class TransformFormatTest extends TestCase
      *
      * @return iterable
      */
-    public function getTestConstructData(): iterable
+    public static function getTestConstructData(): iterable
     {
         // Supported mimetypes
         yield 'image/heif (transforms to jpg)' => [
@@ -243,12 +240,10 @@ class TransformFormatTest extends TestCase
     }
 
     /**
-     * @dataProvider getTestConstructInvalidMimetypeData
-     * @covers \Alaress\Image\TransformFormat::__construct
-     *
      * @param string $mime
      * @return void
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('getTestConstructInvalidMimetypeData')]
     public function testConstructInvalidMimetype(string $mime): void
     {
         $this->expectException(UnexpectedValueException::class);
@@ -260,7 +255,7 @@ class TransformFormatTest extends TestCase
      *
      * @return iterable
      */
-    public function getTestConstructInvalidMimetypeData(): iterable
+    public static function getTestConstructInvalidMimetypeData(): iterable
     {
         // PSD files are unsupported
         yield 'application/x-photoshop' => ['application/x-photoshop'];

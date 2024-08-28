@@ -16,7 +16,6 @@ use Alaress\Date\Interval as IntervalObject;
 
 class IntervalTest extends TestCase
 {
-
     /**
      * @var Interval
      */
@@ -33,7 +32,7 @@ class IntervalTest extends TestCase
     /**
      * @inheritdoc
      */
-    public function getTestHydrate()
+    public static function getTestHydrate()
     {
         $invertedInterval1 = new DateInterval('PT23H59M59S');
         $invertedInterval1->invert = 1;
@@ -61,7 +60,7 @@ class IntervalTest extends TestCase
     /**
      * @inheritdoc
      */
-    public function getTestDehydrate()
+    public static function getTestDehydrate()
     {
         $invertedInterval = new DateInterval('PT27H15M');
         $invertedInterval->invert = 1;
@@ -102,20 +101,20 @@ class IntervalTest extends TestCase
     }
 
     /**
-     * @dataProvider getTestHydrate
      * @param null|string $input
      * @param null|IntervalObject $expected_output
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('getTestHydrate')]
     public function testHydrate($input = null, $expected_output = null)
     {
         $this->assertEquals($expected_output, $this->object->hydrate($input));
     }
 
     /**
-     * @dataProvider getTestDehydrate
      * @param IntervalObject|DateInterval|int|string $input
      * @param null|int $expected_output
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('getTestDehydrate')]
     public function testDehydrate($input = null, $expected_output = null)
     {
         $this->assertEquals($expected_output, $this->object->dehydrate($input));

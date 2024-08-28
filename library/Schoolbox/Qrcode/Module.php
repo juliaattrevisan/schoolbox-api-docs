@@ -65,7 +65,7 @@ class Module extends BaseModule
                     ),
                     // Check whether QR code generation is enabled via folder year level
                     new Rule\Callback(
-                        function (array $params) {
+                        function (array $params): void {
                             try {
                                 if (($params['folder'] ?? null) instanceof Folder) {
                                     $folder = $params['folder'];

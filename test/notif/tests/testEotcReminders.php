@@ -1,7 +1,7 @@
 <?php
 
 use Schoolbox\Mapper;
-use Schoolbox\Realtime\Test\AbstractNotificationTest;
+use Schoolbox\Realtime\Test\AbstractNotificationTestCase;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
 
@@ -12,7 +12,7 @@ use Schoolbox\UserMapper;
  * @link        https://schoolbox.com.au/
  */
 
-class EotcReminders extends AbstractNotificationTest
+class EotcReminders extends AbstractNotificationTestCase
 {
     const GLENDA_SMITH  = 157;
     const JACKIE_BENSON = 247;

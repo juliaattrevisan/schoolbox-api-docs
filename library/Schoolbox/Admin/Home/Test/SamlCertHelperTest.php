@@ -17,9 +17,9 @@ use Schoolbox\Admin\Home\SamlCertHelper;
 /**
  * Tests SAML public cert expiry logic
  *
- * @covers \Schoolbox\Admin\Home\SamlCertHelper
  * @codeCoverageIgnore
  */
+#[\PHPUnit\Framework\Attributes\CoversClass(\Schoolbox\Admin\Home\SamlCertHelper::class)]
 class SamlCertHelperTest extends Framework\TestCase
 {
     // Expires 2027-04-26T00:51:48.000Z
@@ -200,9 +200,7 @@ class SamlCertHelperTest extends Framework\TestCase
         self::assertEquals('Metadata invalid', $widget->getMessage());
     }
 
-    /**
-     * @dataProvider providerIdpCertEmptyMetadataUrlOk
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerIdpCertEmptyMetadataUrlOk')]
     public function testIdpCertEmptyMetadataUrlOk(string $nowOverride, string $light, string $message): void
     {
         /* Testing:
@@ -218,7 +216,7 @@ class SamlCertHelperTest extends Framework\TestCase
         self::assertEquals($message, $widget->getMessage());
     }
 
-    public function providerIdpCertEmptyMetadataUrlOk(): array
+    public static function providerIdpCertEmptyMetadataUrlOk(): array
     {
         return [
             ["2027-03-20", SamlCertHelper::LIGHT_SUCCESS, 'Valid'],
@@ -270,9 +268,7 @@ class SamlCertHelperTest extends Framework\TestCase
     }
 
 
-    /**
-     * @dataProvider providerIdpCertUnparsableMetadataUrlOk
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerIdpCertUnparsableMetadataUrlOk')]
     public function testIdpCertUnparsableMetadataUrlOk(string $nowOverride, string $light, string $message): void
     {
         /* Testing:
@@ -289,7 +285,7 @@ class SamlCertHelperTest extends Framework\TestCase
         self::assertEquals($message, $widget->getMessage());
     }
 
-    public function providerIdpCertUnparsableMetadataUrlOk(): array
+    public static function providerIdpCertUnparsableMetadataUrlOk(): array
     {
         return [
             ["2027-03-20", SamlCertHelper::LIGHT_SUCCESS, "Valid"],
@@ -299,9 +295,7 @@ class SamlCertHelperTest extends Framework\TestCase
         ];
     }
 
-    /**
-     * @dataProvider providerIdpCertOkMetadataUrlEmpty
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerIdpCertOkMetadataUrlEmpty')]
     public function testIdpCertOkMetadataUrlEmpty(string $nowOverride, string $light, string $message): void
     {
         /* Testing:
@@ -317,7 +311,7 @@ class SamlCertHelperTest extends Framework\TestCase
         self::assertEquals($message, $widget->getMessage());
     }
 
-    public function providerIdpCertOkMetadataUrlEmpty(): array
+    public static function providerIdpCertOkMetadataUrlEmpty(): array
     {
         return [
             ["2027-03-20", SamlCertHelper::LIGHT_SUCCESS, "Valid"],
@@ -328,9 +322,7 @@ class SamlCertHelperTest extends Framework\TestCase
     }
 
 
-    /**
-     * @dataProvider providerIdpCertOkMetadataUrlOffline
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerIdpCertOkMetadataUrlOffline')]
     public function testIdpCertOkMetadataUrlOffline(string $nowOverride, string $light, string $message): void
     {
         /* Testing:
@@ -346,7 +338,7 @@ class SamlCertHelperTest extends Framework\TestCase
         self::assertEquals($message, $widget->getMessage());
     }
 
-    public function providerIdpCertOkMetadataUrlOffline(): array
+    public static function providerIdpCertOkMetadataUrlOffline(): array
     {
         return [
             ["2027-03-20", SamlCertHelper::LIGHT_SUCCESS, "Valid"],
@@ -356,9 +348,7 @@ class SamlCertHelperTest extends Framework\TestCase
         ];
     }
 
-    /**
-     * @dataProvider providerIdpCertOkMetadataUrlUnparsable
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerIdpCertOkMetadataUrlUnparsable')]
     public function testIdpCertOkMetadataUrlUnparsable(string $nowOverride, string $light, string $message): void
     {
         /* Testing:
@@ -374,7 +364,7 @@ class SamlCertHelperTest extends Framework\TestCase
         self::assertEquals($message, $widget->getMessage());
     }
 
-    public function providerIdpCertOkMetadataUrlUnparsable(): array
+    public static function providerIdpCertOkMetadataUrlUnparsable(): array
     {
         return [
             ["2027-03-20", SamlCertHelper::LIGHT_SUCCESS, "Valid"],
@@ -384,9 +374,7 @@ class SamlCertHelperTest extends Framework\TestCase
         ];
     }
 
-    /**
-     * @dataProvider providerIdpCertOkMetadataUrlOk
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerIdpCertOkMetadataUrlOk')]
     public function testIdpCertOkMetadataUrlOk(string $nowOverride, string $idpCert, string $light, string $message): void
     {
         /* Testing:
@@ -402,7 +390,7 @@ class SamlCertHelperTest extends Framework\TestCase
         self::assertEquals($message, $widget->getMessage());
     }
 
-    public function providerIdpCertOkMetadataUrlOk(): array
+    public static function providerIdpCertOkMetadataUrlOk(): array
     {
         return [
             ["2027-03-20", self::CERT_2022_09_08, SamlCertHelper::LIGHT_SUCCESS, 'Valid'],

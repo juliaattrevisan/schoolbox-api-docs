@@ -15,13 +15,12 @@ use PHPUnit\Framework\TestCase;
 
 class HumanReadableTest extends TestCase
 {
-
     /**
      * The second arg is returned as a closure so the ADF can be instantiated immediately prior to comparison
      *
      * @return array[]
      */
-    public function dataHumanReadable()
+    public static function dataHumanReadable()
     {
         return [
             [
@@ -71,12 +70,12 @@ class HumanReadableTest extends TestCase
 
 
     /**
-     * @dataProvider dataHumanReadable
      *
      * @param string $naturalLanguage
      * @param callable $callable
      * @throws InvalidArgumentException
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('dataHumanReadable')]
     public function testHumanReadable($naturalLanguage, $callable)
     {
         $adf = ADF::newNaturalDate($naturalLanguage);

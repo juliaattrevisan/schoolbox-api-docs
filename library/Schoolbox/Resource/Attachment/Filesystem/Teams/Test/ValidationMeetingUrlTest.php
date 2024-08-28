@@ -26,12 +26,11 @@ use Schoolbox\Resource\Attachment\Filesystem\Teams\ValidTeamsMeetingUrl;
  */
 class ValidationMeetingUrlTest extends TestCase
 {
-
     /**
-     * @dataProvider provider_validMeetingUrl
      * @param mixed $input
      * @param int   $expected
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('provider_validMeetingUrl')]
     public function testValidMeetingUrl($input, $expected)
     {
         $outcome = (new ValidTeamsMeetingUrl())->isSatisifiedBy($input);
@@ -44,7 +43,7 @@ class ValidationMeetingUrlTest extends TestCase
      *
      * @return array
      */
-    public function provider_validMeetingUrl(): array
+    public static function provider_validMeetingUrl(): array
     {
         return [
 

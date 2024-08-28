@@ -14,7 +14,6 @@ use React\EventLoop\TimerInterface;
 
 abstract class AbstractTransaction implements ITransaction
 {
-
     /** @var LoopInterface */
     private $loop;
 
@@ -38,7 +37,7 @@ abstract class AbstractTransaction implements ITransaction
      * @param int $size          - the max size of the cache, or 0 for no limit. If this limit is reached, the
      *                             transaction will execute prematurely
      */
-    function __construct($loop, $cacheInterval = 1, $size = 0)
+    public function __construct($loop, $cacheInterval = 1, $size = 0)
     {
         $this->loop = $loop;
         $this->cacheInterval = $cacheInterval;
@@ -104,7 +103,7 @@ abstract class AbstractTransaction implements ITransaction
         if (isset($this->timer)) {
             $this->loop->cancelTimer($this->timer);
         }
-        $this->timer = $this->loop->addTimer($this->cacheInterval, function (TimerInterface $timer) {
+        $this->timer = $this->loop->addTimer($this->cacheInterval, function (TimerInterface $timer): void {
             $this->execute($timer, $this->data);
             $this->timer = null;
             $this->data  = [];

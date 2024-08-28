@@ -32,7 +32,7 @@ class DateTest extends DatetimeTest
     /**
      * @inheritdoc
      */
-    public function getTestHydrate()
+    public static function getTestHydrate()
     {
         // Anything that can be parsed as Y-m-d will parse, even if there's
         // trailing characters.
@@ -50,7 +50,7 @@ class DateTest extends DatetimeTest
     /**
      * @inheritdoc
      */
-    public function getTestDehydrate()
+    public static function getTestDehydrate()
     {
         return [
             [null, null],
@@ -77,7 +77,7 @@ class DateTest extends DatetimeTest
     /**
      * @return array|array[]
      */
-    public function getTestHydrateWithTimeData()
+    public static function getTestHydrateWithTimeData()
     {
         return [
             // Date only
@@ -98,7 +98,7 @@ class DateTest extends DatetimeTest
     /**
      * @return array|array[]
      */
-    public function getTestDehydrateWithTimeData()
+    public static function getTestDehydrateWithTimeData()
     {
         return [
             // Without a time at all
@@ -116,12 +116,12 @@ class DateTest extends DatetimeTest
     }
 
     /**
-     * @dataProvider getTestHydrateWithTimeData
      *
      * @param Date   $column
      * @param string $input
      * @param string $expectedHydratedValue
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('getTestHydrateWithTimeData')]
     public function testHydrateWithTime(Date $column, $input, $expectedHydratedValue)
     {
         // Errors are squelched during hydration, as the date and time tests
@@ -135,12 +135,12 @@ class DateTest extends DatetimeTest
      * Dehydrate with time should work exactly the same as without time, but
      * let's verify that anyway.
      *
-     * @dataProvider getTestDehydrateWithTimeData
      *
      * @param Date   $column
      * @param string $input
      * @param string $expectedDehydratedValue
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('getTestDehydrateWithTimeData')]
     public function testDehydrateWithTime(Date $column, $input, $expectedDehydratedValue)
     {
         $this->assertEquals($expectedDehydratedValue, $column->dehydrate($input));

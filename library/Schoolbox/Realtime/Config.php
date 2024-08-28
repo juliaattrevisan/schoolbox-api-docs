@@ -423,7 +423,7 @@ class Config
         $result = [];
         $map = [];
 
-        array_walk($this->getPermissionList(), function ($v, $k) use (&$map) {
+        array_walk($this->getPermissionList(), function ($v, $k) use (&$map): void {
             $map[strtoupper(substr($v[1], 0, 2))] = $k;
         });
 

@@ -642,7 +642,7 @@ class Controller extends BaseController
 
         // Force download/
         if (file_exists($filename)) {
-            $this->postOutputCallbacks[] = function () use ($filename) {
+            $this->postOutputCallbacks[] = function () use ($filename): void {
                 /* Delete the temp file
                  */
                 unlink($filename);

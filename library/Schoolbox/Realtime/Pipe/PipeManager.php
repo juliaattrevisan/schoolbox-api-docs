@@ -490,7 +490,7 @@ class PipeManager implements MessageComponentInterface, TaskResponseHandlerInter
         if (empty($this->pushTransactions[$instanceId][$userId][$pipeId])) {
             $this->pushTransactions[$instanceId][$userId][$pipeId] = new Transaction(
                 $this->reactLoop,
-                function ($data) use ($pipe, $instanceId, $userId) {
+                function ($data) use ($pipe, $instanceId, $userId): void {
 
                     // the timer contains the data to be processed
                     $this->log->debug("Pushing cached messages to instance:user $instanceId:$userId", [ 'char' => '<' ]);
@@ -700,7 +700,7 @@ class PipeManager implements MessageComponentInterface, TaskResponseHandlerInter
 
         $this->userTimeouts[$instanceId][$userId] = $this->reactLoop->addTimer(
             self::INACTIVE_TIMEOUT,
-            function () use ($instanceId, $userId) {
+            function () use ($instanceId, $userId): void {
                 $this->onTimeout($instanceId, $userId);
             }
         );

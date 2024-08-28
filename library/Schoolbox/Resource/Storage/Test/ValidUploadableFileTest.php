@@ -16,9 +16,7 @@ use Schoolbox\File\Mimetype;
 use Schoolbox\Resource\Storage\Model;
 use Schoolbox\Resource\Storage\ValidUploadableFile;
 
-/**
- * @covers \Schoolbox\Resource\Storage\ValidUploadableFile
- */
+#[\PHPUnit\Framework\Attributes\CoversClass(\Schoolbox\Resource\Storage\ValidUploadableFile::class)]
 class ValidUploadableFileTest extends TestCase
 {
     /**
@@ -31,16 +29,15 @@ class ValidUploadableFileTest extends TestCase
     private static ?Alaress_Date_Format $baseTime = null;
 
     /**
-     * @dataProvider getTestIsSatisfiedByValidCaseData
-     * @covers \Schoolbox\Resource\Storage\ValidUploadableFile::isSatisfiedBy
      * @param Model $file
      * @return void
      * @noinspection PhpDocMissingThrowsInspection this should never throw
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('getTestIsSatisfiedByValidCaseData')]
     public function testIsSatisfiedByValidCase(Model $file)
     {
         /** @noinspection PhpUnhandledExceptionInspection this should never throw */
-        $this->assertTrue((new ValidUploadableFile($this->createBaseTime()))->isSatisfiedBy($file));
+        $this->assertTrue((new ValidUploadableFile(self::createBaseTime()))->isSatisfiedBy($file));
     }
 
     /**
@@ -48,7 +45,7 @@ class ValidUploadableFileTest extends TestCase
      *
      * @return iterable
      */
-    public function getTestIsSatisfiedByValidCaseData(): iterable
+    public static function getTestIsSatisfiedByValidCaseData(): iterable
     {
         $standardMimetype = (new Mimetype())
             ->setMime('text/plain')
@@ -66,34 +63,33 @@ class ValidUploadableFileTest extends TestCase
         yield 'file under size limit, expiry before latest temp date' => [
             (clone $standardFile)
                 ->setSize(1_000_000)
-                ->setExpiryAt($this->createBaseTime()->addDays(15)),
+                ->setExpiryAt(self::createBaseTime()->addDays(15)),
         ];
         yield 'file under size limit, expiry after latest temp date' => [
             (clone $standardFile)
                 ->setSize(1_000_000)
-                ->setExpiryAt($this->createBaseTime()->addDays(15)->addSeconds(1)),
+                ->setExpiryAt(self::createBaseTime()->addDays(15)->addSeconds(1)),
         ];
         yield 'file over size limit, expiry before latest temp date' => [
             (clone $standardFile)
                 ->setSize(1_000_001)
-                ->setExpiryAt($this->createBaseTime()->addDays(15)),
+                ->setExpiryAt(self::createBaseTime()->addDays(15)),
         ];
     }
 
     /**
-     * @dataProvider getTestIsSatisfiedByInvalidCaseData
-     * @covers \Schoolbox\Resource\Storage\ValidUploadableFile::isSatisfiedBy
      * @param Model  $file
      * @param string $errorPattern
      * @return void
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('getTestIsSatisfiedByInvalidCaseData')]
     public function testIsSatisfiedByInvalidCase(
         Model $file,
         string $errorPattern,
     ) {
         $this->expectException(FileException::class);
         $this->expectExceptionMessageMatches($errorPattern);
-        ((new ValidUploadableFile($this->createBaseTime()))->isSatisfiedBy($file));
+        ((new ValidUploadableFile(self::createBaseTime()))->isSatisfiedBy($file));
     }
 
     /**
@@ -101,7 +97,7 @@ class ValidUploadableFileTest extends TestCase
      *
      * @return iterable
      */
-    public function getTestIsSatisfiedByInvalidCaseData(): iterable
+    public static function getTestIsSatisfiedByInvalidCaseData(): iterable
     {
         $standardMimetype = (new Mimetype())
             ->setMime('text/plain')
@@ -136,7 +132,7 @@ class ValidUploadableFileTest extends TestCase
             (clone $standardFile)
                 ->setMimetype($standardMimetype)
                 ->setSize(1_000_001)
-                ->setExpiryAt($this->createBaseTime()->addDays(15)->addSeconds(1)),
+                ->setExpiryAt(self::createBaseTime()->addDays(15)->addSeconds(1)),
             '/^this file exceeds the file size restriction/i',
         ];
     }
@@ -146,7 +142,7 @@ class ValidUploadableFileTest extends TestCase
      *
      * @return Alaress_Date_Format
      */
-    private function createBaseTime(): Alaress_Date_Format
+    private static function createBaseTime(): Alaress_Date_Format
     {
         self::$baseTime ??= Alaress_Date_Format::now();
         return (clone self::$baseTime);

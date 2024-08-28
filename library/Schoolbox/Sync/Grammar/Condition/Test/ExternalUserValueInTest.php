@@ -15,11 +15,10 @@ use Schoolbox\External\Normalise\User\Common\Email;
 use Schoolbox\External\Normalise\User\Staff;
 use Schoolbox\Sync\Grammar\Condition\ExternalUserValueIn;
 
+#[\PHPUnit\Framework\Attributes\CoversClass(\Schoolbox\Sync\Grammar\Condition\ExternalUserValueIn::class)]
 class ExternalUserValueInTest extends TestCase
 {
     /**
-     * @dataProvider getTestAssertInData
-     * @covers \Schoolbox\Sync\Grammar\Condition\ExternalUserValueIn::assertIn
      *
      * @param string           $field
      * @param array|string|int $validValues
@@ -27,6 +26,7 @@ class ExternalUserValueInTest extends TestCase
      * @param bool             $expected
      * @return void
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('getTestAssertInData')]
     public function testAssertIn(
         string $field,
         array|string|int $validValues,
@@ -44,7 +44,7 @@ class ExternalUserValueInTest extends TestCase
      *
      * @return iterable
      */
-    public function getTestAssertInData(): iterable
+    public static function getTestAssertInData(): iterable
     {
         $staffUser = (new Staff())
             ->setGivenName('Jack')

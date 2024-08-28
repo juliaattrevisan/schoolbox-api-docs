@@ -13,29 +13,26 @@ use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Schoolbox\Admin\Settings\Exceptions\FieldTypeMismatchException;
 use Schoolbox\Admin\Settings\FieldStrategyFactory;
-use Schoolbox\Admin\Settings\FieldType;
 use Schoolbox\Config\Config;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\MapperFactory;
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
 
 /**
- * @covers \Schoolbox\Admin\Settings\FieldType\SelectKey\Renderer
  * @codeCoverageIgnore
  */
+#[\PHPUnit\Framework\Attributes\CoversClass(\Schoolbox\Admin\Settings\FieldType\SelectKey\Renderer::class)]
 class RendererTest extends TestCase
 {
-
     // Tests
-
     /**
      * Test the renderer provides expected data structure for the twig template
      *
-     * @dataProvider providerConfig
      * @param Config $config
      * @throws \PHPUnit\Framework\Exception
      * @throws FieldTypeMismatchException
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerConfig')]
     public function testTemplateData(Config $config): void
     {
         $renderer = $this->buildFieldStrategyFactory()->makeRenderer(ConfigMapper::FIELD_SELECT_KEY);
@@ -53,12 +50,12 @@ class RendererTest extends TestCase
     /**
      * Test the renderer provides expected data structure
      *
-     * @dataProvider providerConfigAndInvalidFieldId
      * @param Config $config
      * @param int    $invalidFieldId
      * @throws \PHPUnit\Framework\Exception
      * @throws FieldTypeMismatchException
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerConfigAndInvalidFieldId')]
     public function testInvalidField(Config $config, int $invalidFieldId): void
     {
         $this->expectException(FieldTypeMismatchException::class);
@@ -72,15 +69,15 @@ class RendererTest extends TestCase
      *
      * An invalid value is one that doesn't match one of the available options
      *
-     * @dataProvider providerTransformValue
-     * @param FieldType\Select\Renderer $renderer
-     * @param Config                    $config
-     * @param string|null               $value
-     * @param string|null               $expected
+     * @param Config      $config
+     * @param string|null $value
+     * @param string|null $expected
      * @throws FieldTypeMismatchException
      */
-    public function testTransformValue(FieldType\Select\Renderer $renderer, Config $config, ?string $value, ?string $expected): void
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerTransformValue')]
+    public function testTransformValue(Config $config, ?string $value, ?string $expected): void
     {
+        $renderer = $this->buildFieldStrategyFactory()->makeRenderer(ConfigMapper::FIELD_SELECT_KEY);
         $config->setValue($value);
         $this->assertSame($expected, $renderer->getTemplateAndData($config)['data']['value']);
     }
@@ -89,16 +86,16 @@ class RendererTest extends TestCase
     /**
      * Tests whether for a combination of $required and $value, the system should insert an empty select option
      *
-     * @dataProvider providerAddEmptyOption
-     * @param FieldType\Select\Renderer $renderer
-     * @param Config                    $config
-     * @param bool                      $required
-     * @param string|null               $value
-     * @param bool                      $expected
+     * @param Config      $config
+     * @param bool        $required
+     * @param string|null $value
+     * @param bool        $expected
      * @throws FieldTypeMismatchException
      */
-    public function testAddEmptyOption(FieldType\Select\Renderer $renderer, Config $config, bool $required, ?string $value, bool $expected): void
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerAddEmptyOption')]
+    public function testAddEmptyOption(Config $config, bool $required, ?string $value, bool $expected): void
     {
+        $renderer = $this->buildFieldStrategyFactory()->makeRenderer(ConfigMapper::FIELD_SELECT_KEY);
         $config
             ->setRequired($required)
             ->setValue($value);
@@ -110,10 +107,10 @@ class RendererTest extends TestCase
     /**
      * @return array
      */
-    public function providerConfig(): array
+    public static function providerConfig(): array
     {
         return [
-            'normal config' => [$this->buildConfig()],
+            'normal config' => [self::buildConfig()],
         ];
     }
 
@@ -121,34 +118,12 @@ class RendererTest extends TestCase
     /**
      * @return array
      */
-    public function providerConfigAndInvalidFieldId(): array
+    public static function providerConfigAndInvalidFieldId(): array
     {
         return [
-            'boolean'      => [$this->buildConfig(), ConfigMapper::FIELD_BOOLEAN],
-            'selectKey'    => [$this->buildConfig(), ConfigMapper::FIELD_SELECT],
-            'selectLookup' => [$this->buildConfig(), ConfigMapper::FIELD_SELECT_LOOKUP],
-        ];
-    }
-
-
-    /**
-     * @return array
-     * @throws \PHPUnit\Framework\Exception
-     */
-    public function providerTransformValue(): array
-    {
-        $renderer = $this->buildFieldStrategyFactory()->makeRenderer(ConfigMapper::FIELD_SELECT_KEY);
-        $config   = $this->buildConfig();
-
-        return [
-            "null"                 => [$renderer, $config, null,            null],
-            "empty ''"             => [$renderer, $config, '',              null],
-            "valid '0'"            => [$renderer, $config, '0',             '0'],
-            "valid '1'"            => [$renderer, $config, '1',             '1'],
-            "valid '2'"            => [$renderer, $config, '2',             '2'],
-            "value instead of key" => [$renderer, $config, 'Everyone',      null],
-            "unexploded"           => [$renderer, $config, '0;Everyone:1',  null],
-            "'invalid value'"      => [$renderer, $config, 'invalid value', null],
+            'boolean'      => [self::buildConfig(), ConfigMapper::FIELD_BOOLEAN],
+            'selectKey'    => [self::buildConfig(), ConfigMapper::FIELD_SELECT],
+            'selectLookup' => [self::buildConfig(), ConfigMapper::FIELD_SELECT_LOOKUP],
         ];
     }
 
@@ -157,22 +132,42 @@ class RendererTest extends TestCase
      * @return array
      * @throws \PHPUnit\Framework\Exception
      */
-    public function providerAddEmptyOption(): array
+    public static function providerTransformValue(): array
     {
-        $renderer = $this->buildFieldStrategyFactory()->makeRenderer(ConfigMapper::FIELD_SELECT_KEY);
-        $config   = $this->buildConfig();
+        $config = self::buildConfig();
 
         return [
-            "optional, null"                => [$renderer, $config, false, null,            true],
-            "optional, empty string "       => [$renderer, $config, false, '',              true],
-            "optional, valid value"         => [$renderer, $config, false, '0',             true],
-            "optional, invalid int value"   => [$renderer, $config, false, '9',             true],
-            "optional, invalid string value" => [$renderer, $config, false, 'invalid value', true],
-            "required, null"                => [$renderer, $config, true,  null,            true],
-            "required, empty string "       => [$renderer, $config, true,  '',              true],
-            "required, valid value"         => [$renderer, $config, true,  '0',             false],
-            "required, invalid int value"   => [$renderer, $config, true,  '9',             true],
-            "required, invalid string value" => [$renderer, $config, true,  'invalid value', true],
+            "null"                 => [$config, null, null],
+            "empty ''"             => [$config, '', null],
+            "valid '0'"            => [$config, '0', '0'],
+            "valid '1'"            => [$config, '1', '1'],
+            "valid '2'"            => [$config, '2', '2'],
+            "value instead of key" => [$config, 'Everyone', null],
+            "unexploded"           => [$config, '0;Everyone:1', null],
+            "'invalid value'"      => [$config, 'invalid value', null],
+        ];
+    }
+
+
+    /**
+     * @return array
+     * @throws \PHPUnit\Framework\Exception
+     */
+    public static function providerAddEmptyOption(): array
+    {
+        $config = self::buildConfig();
+
+        return [
+            "optional, null"                 => [$config, false, null, true],
+            "optional, empty string "        => [$config, false, '', true],
+            "optional, valid value"          => [$config, false, '0', true],
+            "optional, invalid int value"    => [$config, false, '9', true],
+            "optional, invalid string value" => [$config, false, 'invalid value', true],
+            "required, null"                 => [$config, true, null, true],
+            "required, empty string "        => [$config, true, '', true],
+            "required, valid value"          => [$config, true, '0', false],
+            "required, invalid int value"    => [$config, true, '9', true],
+            "required, invalid string value" => [$config, true, 'invalid value', true],
         ];
     }
 
@@ -194,7 +189,7 @@ class RendererTest extends TestCase
      *
      * @return Config
      */
-    protected function buildConfig(): Config
+    protected static function buildConfig(): Config
     {
         return (new Config())
             ->setId(71)

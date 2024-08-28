@@ -39,12 +39,12 @@ use Schoolbox\User;
 class FactoryTest extends TestCase
 {
     /**
-     * @dataProvider providerTaskMarkTypeInvalid
      * @param Task $task
      *
      * @throws InvalidArgumentException If assessment class not registered
      * @throws DomainException
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerTaskMarkTypeInvalid')]
     public function testTaskMarkTypeInvalid(Task $task)
     {
         $this->expectException(DomainException::class);
@@ -54,13 +54,13 @@ class FactoryTest extends TestCase
 
 
     /**
-     * @dataProvider providerTaskMarkTypeValid
      * @param Task   $task
      * @param string $expectedMarkScheme
      * @throws \PHPUnit\Framework\Exception
      * @throws DomainException If MarkType is invalid for the assessment
      * @throws InvalidArgumentException If assessment class not registered
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerTaskMarkTypeValid')]
     public function testTaskMarkTypeValid(Task $task, $expectedMarkScheme)
     {
         $factory    = new MarkSchemeFactory();
@@ -70,12 +70,12 @@ class FactoryTest extends TestCase
 
 
     /**
-     * @dataProvider providerQuizMarkTypeInvalid
      * @param Quiz $quiz
      *
      * @throws DomainException If MarkType is invalid for the assessment
      * @throws InvalidArgumentException If assessment class not registered
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerQuizMarkTypeInvalid')]
     public function testQuizMarkTypeInvalid(Quiz $quiz)
     {
         $this->expectException(DomainException::class);
@@ -85,13 +85,13 @@ class FactoryTest extends TestCase
 
 
     /**
-     * @dataProvider providerQuizMarkTypeValid
      * @param Quiz   $quiz
      * @param string $expectedMarkScheme
      * @throws DomainException If MarkType is invalid for the assessment
      * @throws InvalidArgumentException If assessment class not registered
      * @throws \PHPUnit\Framework\Exception
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerQuizMarkTypeValid')]
     public function testQuizMarkTypeValid(Quiz $quiz, $expectedMarkScheme)
     {
         $factory    = new MarkSchemeFactory();
@@ -101,12 +101,12 @@ class FactoryTest extends TestCase
 
 
     /**
-     * @dataProvider providerDueWOrkMarkTypeInvalid
      * @param DueWork $dueWork
      *
      * @throws DomainException If MarkType is invalid for the assessment
      * @throws InvalidArgumentException If assessment class not registered
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerDueWOrkMarkTypeInvalid')]
     public function testDueWorkMarkTypeInvalid(DueWork $dueWork)
     {
         $this->expectException(DomainException::class);
@@ -116,13 +116,13 @@ class FactoryTest extends TestCase
 
 
     /**
-     * @dataProvider providerDueWorkMarkTypeValid
      * @param DueWork $dueWork
      * @param string  $expectedMarkScheme
      * @throws DomainException If MarkType is invalid for the assessment
      * @throws InvalidArgumentException If assessment class not registered
      * @throws \PHPUnit\Framework\Exception
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerDueWorkMarkTypeValid')]
     public function testDueWorkMarkTypeValid(DueWork $dueWork, $expectedMarkScheme)
     {
         $factory    = new MarkSchemeFactory();
@@ -132,12 +132,12 @@ class FactoryTest extends TestCase
 
 
     /**
-     * @dataProvider providerProjectMarkTypeInvalid
      * @param Project $project
      *
      * @throws DomainException If MarkType is invalid for the assessment
      * @throws InvalidArgumentException If assessment class not registered
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerProjectMarkTypeInvalid')]
     public function testProjectMarkTypeInvalid($project)
     {
         $this->expectException(DomainException::class);
@@ -147,13 +147,13 @@ class FactoryTest extends TestCase
 
 
     /**
-     * @dataProvider providerProjectMarkTypeValid
      * @param Project $project
      * @param string  $expectedMarkScheme
      * @throws DomainException If MarkType is invalid for the assessment
      * @throws InvalidArgumentException If assessment class not registered
      * @throws \PHPUnit\Framework\Exception
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerProjectMarkTypeValid')]
     public function testProjectMarkTypeValid($project, $expectedMarkScheme)
     {
         $factory    = new MarkSchemeFactory();
@@ -168,15 +168,15 @@ class FactoryTest extends TestCase
      * @return Task[][]
      * @throws InvalidArgumentException If $slug is not recognised
      */
-    public function providerTaskMarkTypeInvalid(): array
+    public static function providerTaskMarkTypeInvalid(): array
     {
         return [
-            [(new Task())->setMarkType($this->getDummyMarkType(MarkType::TYPE_PERCENT))],
-            [(new Task())->setMarkType($this->getDummyMarkType(MarkType::TYPE_LETTER))],
-            [(new Task())->setMarkType($this->getDummyMarkType(MarkType::TYPE_TOTAL))],
-            [(new Task())->setMarkType($this->getDummyMarkType(MarkType::TYPE_FREE))],
-            [(new Task())->setMarkType($this->getDummyMarkType(MarkType::TYPE_RUBRIC))],
-            [(new Task())->setMarkType($this->getDummyMarkType(MarkType::TYPE_NONE))],
+            [(new Task())->setMarkType(self::getDummyMarkType(MarkType::TYPE_PERCENT))],
+            [(new Task())->setMarkType(self::getDummyMarkType(MarkType::TYPE_LETTER))],
+            [(new Task())->setMarkType(self::getDummyMarkType(MarkType::TYPE_TOTAL))],
+            [(new Task())->setMarkType(self::getDummyMarkType(MarkType::TYPE_FREE))],
+            [(new Task())->setMarkType(self::getDummyMarkType(MarkType::TYPE_RUBRIC))],
+            [(new Task())->setMarkType(self::getDummyMarkType(MarkType::TYPE_NONE))],
         ];
     }
 
@@ -185,10 +185,10 @@ class FactoryTest extends TestCase
      * @return array<array{0: Task, 1: class-string}>
      * @throws InvalidArgumentException If $slug is not recognised
      */
-    public function providerTaskMarkTypeValid(): array
+    public static function providerTaskMarkTypeValid(): array
     {
         return [
-            [(new Task())->setMarkType($this->getDummyMarkType(MarkType::TYPE_COMPLETION)), Completion::class],
+            [(new Task())->setMarkType(self::getDummyMarkType(MarkType::TYPE_COMPLETION)), Completion::class],
         ];
     }
 
@@ -197,13 +197,13 @@ class FactoryTest extends TestCase
      * @return Quiz[][]
      * @throws InvalidArgumentException If $slug is not recognised
      */
-    public function providerQuizMarkTypeInvalid(): array
+    public static function providerQuizMarkTypeInvalid(): array
     {
         return [
-            [$this->getDummyQuiz()->setMarkType($this->getDummyMarkType(MarkType::TYPE_FREE))],
-            [$this->getDummyQuiz()->setMarkType($this->getDummyMarkType(MarkType::TYPE_RUBRIC))],
-            [$this->getDummyQuiz()->setMarkType($this->getDummyMarkType(MarkType::TYPE_NONE))],
-            [$this->getDummyQuiz()->setMarkType($this->getDummyMarkType(MarkType::TYPE_COMPLETION))],
+            [self::getDummyQuiz()->setMarkType(self::getDummyMarkType(MarkType::TYPE_FREE))],
+            [self::getDummyQuiz()->setMarkType(self::getDummyMarkType(MarkType::TYPE_RUBRIC))],
+            [self::getDummyQuiz()->setMarkType(self::getDummyMarkType(MarkType::TYPE_NONE))],
+            [self::getDummyQuiz()->setMarkType(self::getDummyMarkType(MarkType::TYPE_COMPLETION))],
         ];
     }
 
@@ -212,10 +212,10 @@ class FactoryTest extends TestCase
      * @return array<array{0: Quiz, 1: class-string}>
      * @throws InvalidArgumentException If $slug is not recognised
      */
-    public function providerQuizMarkTypeValid(): array
+    public static function providerQuizMarkTypeValid(): array
     {
         return [
-            [$this->getDummyQuiz()->setMarkType($this->getDummyMarkType(MarkType::TYPE_TOTAL)), TotalMarkFractional::class],
+            [self::getDummyQuiz()->setMarkType(self::getDummyMarkType(MarkType::TYPE_TOTAL)), TotalMarkFractional::class],
         ];
     }
 
@@ -224,12 +224,12 @@ class FactoryTest extends TestCase
      * @return DueWork[][]
      * @throws InvalidArgumentException If $slug is not recognised
      */
-    public function providerDueWorkMarkTypeInvalid(): array
+    public static function providerDueWorkMarkTypeInvalid(): array
     {
         return [
-            [(new DueWork())->setMarkType($this->getDummyMarkType(MarkType::TYPE_FREE))],
-            [(new DueWork())->setMarkType($this->getDummyMarkType(MarkType::TYPE_RUBRIC))],
-            [(new DueWork())->setMarkType($this->getDummyMarkType(MarkType::TYPE_COMPLETION))],
+            [(new DueWork())->setMarkType(self::getDummyMarkType(MarkType::TYPE_FREE))],
+            [(new DueWork())->setMarkType(self::getDummyMarkType(MarkType::TYPE_RUBRIC))],
+            [(new DueWork())->setMarkType(self::getDummyMarkType(MarkType::TYPE_COMPLETION))],
         ];
     }
 
@@ -238,17 +238,17 @@ class FactoryTest extends TestCase
      * @return array<array{0: DueWork, 1: class-string}>
      * @throws InvalidArgumentException If $slug is not recognised
      */
-    public function providerDueWorkMarkTypeValid(): array
+    public static function providerDueWorkMarkTypeValid(): array
     {
         return [
-            [(new DueWork())->setMarkType($this->getDummyMarkType(MarkType::TYPE_PERCENT)), Percentage::class],
+            [(new DueWork())->setMarkType(self::getDummyMarkType(MarkType::TYPE_PERCENT)), Percentage::class],
             [
-                (new DueWork())->setMarkType($this->getDummyMarkType(MarkType::TYPE_LETTER))->setGradeGroup($this->getDummyLetterGradeGroup()),
+                (new DueWork())->setMarkType(self::getDummyMarkType(MarkType::TYPE_LETTER))->setGradeGroup(self::getDummyLetterGradeGroup()),
                 LetterGrade::class,
             ],
-            [(new DueWork())->setMarkType($this->getDummyMarkType(MarkType::TYPE_TOTAL))->setMaxMark(50), TotalMarkFractional::class],
-            [(new DueWork())->setMarkType($this->getDummyMarkType(MarkType::TYPE_TOTAL))->setMaxMark(49.99), TotalMarkFractional::class],
-            [(new DueWork())->setMarkType($this->getDummyMarkType(MarkType::TYPE_NONE)), None::class],
+            [(new DueWork())->setMarkType(self::getDummyMarkType(MarkType::TYPE_TOTAL))->setMaxMark(50), TotalMarkFractional::class],
+            [(new DueWork())->setMarkType(self::getDummyMarkType(MarkType::TYPE_TOTAL))->setMaxMark(49.99), TotalMarkFractional::class],
+            [(new DueWork())->setMarkType(self::getDummyMarkType(MarkType::TYPE_NONE)), None::class],
         ];
     }
 
@@ -257,14 +257,14 @@ class FactoryTest extends TestCase
      * @return Project[][]
      * @throws InvalidArgumentException If $slug is not recognised
      */
-    public function providerProjectMarkTypeInvalid(): array
+    public static function providerProjectMarkTypeInvalid(): array
     {
         $projects = [];
-        foreach ($this->getSummators() as $summator) {
-            $projects[] = [(new Project($summator))->setMarkType($this->getDummyMarkType(MarkType::TYPE_TOTAL))];
-            $projects[] = [(new Project($summator))->setMarkType($this->getDummyMarkType(MarkType::TYPE_FREE))];
-            $projects[] = [(new Project($summator))->setMarkType($this->getDummyMarkType(MarkType::TYPE_RUBRIC))];
-            $projects[] = [(new Project($summator))->setMarkType($this->getDummyMarkType(MarkType::TYPE_COMPLETION))];
+        foreach (self::getSummators() as $summator) {
+            $projects[] = [(new Project($summator))->setMarkType(self::getDummyMarkType(MarkType::TYPE_TOTAL))];
+            $projects[] = [(new Project($summator))->setMarkType(self::getDummyMarkType(MarkType::TYPE_FREE))];
+            $projects[] = [(new Project($summator))->setMarkType(self::getDummyMarkType(MarkType::TYPE_RUBRIC))];
+            $projects[] = [(new Project($summator))->setMarkType(self::getDummyMarkType(MarkType::TYPE_COMPLETION))];
         }
         return $projects;
     }
@@ -276,24 +276,24 @@ class FactoryTest extends TestCase
      * @var IMarkScheme $projects [][1]
      * @throws InvalidArgumentException If $slug is not recognised
      */
-    public function providerProjectMarkTypeValid(): array
+    public static function providerProjectMarkTypeValid(): array
     {
         $projects = [];
-        foreach ($this->getSummators() as $summator) {
+        foreach (self::getSummators() as $summator) {
             // Percentage
             $project = new Project($summator);
-            $project->setMarkType($this->getDummyMarkType(MarkType::TYPE_PERCENT));
+            $project->setMarkType(self::getDummyMarkType(MarkType::TYPE_PERCENT));
             $projects[] = [$project, Percentage::class];
 
             // Letter Grade
             $project = new Project($summator);
-            $project->setMarkType($this->getDummyMarkType(MarkType::TYPE_LETTER));
-            $project->setGradeGroup($this->getDummyLetterGradeGroup());
+            $project->setMarkType(self::getDummyMarkType(MarkType::TYPE_LETTER));
+            $project->setGradeGroup(self::getDummyLetterGradeGroup());
             $projects[] = [$project, LetterGrade::class];
 
             // Nonce
             $project = new Project($summator);
-            $project->setMarkType($this->getDummyMarkType(MarkType::TYPE_NONE));
+            $project->setMarkType(self::getDummyMarkType(MarkType::TYPE_NONE));
             $projects[] = [$project, None::class];
         }
         return $projects;
@@ -303,7 +303,7 @@ class FactoryTest extends TestCase
     /**
      * @return ISummator[]
      */
-    private function getSummators(): array
+    private static function getSummators(): array
     {
         return [
             new Average(),
@@ -319,7 +319,7 @@ class FactoryTest extends TestCase
      * @return MarkType
      * @throws InvalidArgumentException If $id is not recognised
      */
-    private function getDummyMarkType(int $id): MarkType
+    private static function getDummyMarkType(int $id): MarkType
     {
         $markType = new MarkType();
         $markType->setId($id);
@@ -376,7 +376,7 @@ class FactoryTest extends TestCase
     /**
      * @return GradeGroup
      */
-    private function getDummyLetterGradeGroup(): GradeGroup
+    private static function getDummyLetterGradeGroup(): GradeGroup
     {
         $gradeGroup = new GradeGroup();
         $gradeGroup->setId(3);
@@ -412,7 +412,7 @@ class FactoryTest extends TestCase
      * The quiz logically has 1 section with 3 questions worth 1 mark each.
      * The quiz has 1 attempt with 2 answers, 1 of which is correct (ie norm mark = 50.0)
      */
-    private function getDummyQuiz()
+    private static function getDummyQuiz()
     {
         $question1 = [
             'question_id' => 1,
@@ -467,7 +467,7 @@ class FactoryTest extends TestCase
 
         $linker      = new ParticipantLinker();
         $plan        = $linker->createAndLinkPlan($quiz);
-        $participant = $linker->createAndLinkParticipant($this->getDummyQuizAttempter(), $plan);
+        $participant = $linker->createAndLinkParticipant(self::getDummyQuizAttempter(), $plan);
         $participant->getAllResponses()->add($attempt);
         $participant->getAllFeedbacks()->add($feedback);
 
@@ -514,7 +514,7 @@ class FactoryTest extends TestCase
      *
      * @return mixed
      */
-    private function getDummyQuizAttempter()
+    private static function getDummyQuizAttempter()
     {
         return (new User())->setId(19);
     }

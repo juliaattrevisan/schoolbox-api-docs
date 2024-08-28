@@ -22,7 +22,7 @@ class BasicAddTest extends TestCase
 
     protected function getTestDateObject()
     {
-        return $this->buildDateObject('2015-03-25 08:01:13', Alaress_Date_Format::DATABASE_FORMAT);
+        return self::buildDateObject('2015-03-25 08:01:13', Alaress_Date_Format::DATABASE_FORMAT);
     }
 
     public function testAddSeconds()

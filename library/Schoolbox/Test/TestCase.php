@@ -49,7 +49,7 @@ abstract class TestCase extends BaseTestCase
         $mock_config
             ->expects($this->any())
             ->method('get')
-            ->will($this->returnValueMap($this->config_vars));
+            ->willReturnMap($this->config_vars);
         $this->mock_config = $mock_config;
     }
 }

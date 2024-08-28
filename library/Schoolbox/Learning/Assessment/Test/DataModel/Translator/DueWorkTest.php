@@ -58,7 +58,7 @@ class DueWorkTest extends TestCase
             // Generic fields
             ->setId(908)
             ->setContext((new Folder())->setId(1))
-            ->setCreator($this->teacher1)
+            ->setCreator(self::getTeacher1())
             ->setPublishAt(new Alaress_Date_Format('2016-10-14 12:00:00', Alaress_Date_Format::DATABASE_FORMAT))
             ->setOpenAt(new Alaress_Date_Format('2016-10-16 12:00:00', Alaress_Date_Format::DATABASE_FORMAT))
             ->setDueAt(new Alaress_Date_Format('2016-10-18 12:00:00', Alaress_Date_Format::DATABASE_FORMAT))
@@ -91,7 +91,7 @@ class DueWorkTest extends TestCase
         ;
 
         /** @var DueWorkModel $dueWorkModel */
-        $dueWorkModel = $this->translator->translateToDataModel($dueWork);
+        $dueWorkModel = self::getTranslator()->translateToDataModel($dueWork);
 
         // Test type
         $this->assertInstanceOf(DueWorkModel::class, $dueWorkModel);
@@ -142,8 +142,8 @@ class DueWorkTest extends TestCase
             ->setContext((new Folder())->setId(1))
         ;
 
-        $dueWorkDataModel               = $this->translator->translateToDataModel($dueWorkDomainModel);
-        $retranslatedDueWorkDomainModel = $this->translator->translateToDomainModel($dueWorkDataModel);
+        $dueWorkDataModel               = self::getTranslator()->translateToDataModel($dueWorkDomainModel);
+        $retranslatedDueWorkDomainModel = self::getTranslator()->translateToDomainModel($dueWorkDataModel);
         $this->assertSame($dueWorkDomainModel, $retranslatedDueWorkDomainModel);
     }
 
@@ -154,7 +154,7 @@ class DueWorkTest extends TestCase
     public function testTranslateNullDomainModelToDataModel()
     {
         $nullDueWorkDomainModel = (new DueWork())->setId(null);
-        $nullDueWorkDataModel   = $this->translator->translateToDataModel($nullDueWorkDomainModel);
+        $nullDueWorkDataModel   = self::getTranslator()->translateToDataModel($nullDueWorkDomainModel);
         $this->assertNull($nullDueWorkDataModel->getId());
     }
 
@@ -162,7 +162,7 @@ class DueWorkTest extends TestCase
     /**
      * Data provider for different due work response acceptance settings.
      */
-    public function getTestTranslateMarkSchemeToDataModelData()
+    public static function getTestTranslateMarkSchemeToDataModelData()
     {
         $context = (new Folder())->setId(1);
         return [
@@ -218,7 +218,6 @@ class DueWorkTest extends TestCase
      * /**
      * Test translation of mark scheme.
      *
-     * @dataProvider getTestTranslateMarkSchemeToDataModelData
      *
      * @param DueWork  $dueWork
      * @param int      $markTypeId
@@ -228,10 +227,11 @@ class DueWorkTest extends TestCase
      * @throws \PHPUnit\Framework\Exception
      * @throws \UnexpectedValueException
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('getTestTranslateMarkSchemeToDataModelData')]
     public function testTranslateMarkSchemeToDataModel(DueWork $dueWork, int $markTypeId, ?int $totalMark, ?int $gradeGroupId)
     {
         /** @var DueWorkModel $dueWorkModel */
-        $dueWorkModel = $this->translator->translateToDataModel($dueWork);
+        $dueWorkModel = self::getTranslator()->translateToDataModel($dueWork);
 
         // Test type
         $this->assertInstanceOf(DueWorkModel::class, $dueWorkModel);
@@ -253,7 +253,7 @@ class DueWorkTest extends TestCase
     /**
      * Data provider for different due work response acceptance settings.
      */
-    public function getTestTranslateResponseAcceptanceToDataModelData()
+    public static function getTestTranslateResponseAcceptanceToDataModelData()
     {
         $context = (new Folder())->setId(1);
         return [
@@ -290,16 +290,16 @@ class DueWorkTest extends TestCase
     /**
      * Test translation of acceptance response settings.
      *
-     * @dataProvider getTestTranslateResponseAcceptanceToDataModelData
      *
      * @param DueWork $dueWork
      * @param bool    $acceptsOnline
      * @param bool    $acceptsMultiple
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('getTestTranslateResponseAcceptanceToDataModelData')]
     public function testTranslateResponseAcceptanceToDataModel(DueWork $dueWork, $acceptsOnline, $acceptsMultiple)
     {
         /** @var DueWorkModel $dueWorkModel */
-        $dueWorkModel = $this->translator->translateToDataModel($dueWork);
+        $dueWorkModel = self::getTranslator()->translateToDataModel($dueWork);
 
         // Test type
         $this->assertInstanceOf(DueWorkModel::class, $dueWorkModel);
@@ -355,17 +355,17 @@ class DueWorkTest extends TestCase
             ->setAcceptOnline(true)
             ->setAcceptMultiple(true)
             ->setUseRubric(false)
-            ->setOwner($this->teacher2)
+            ->setOwner(self::getTeacher2())
             ->setAttachments((new GenericCollection(SubmissionBox\SingleFile\Model::class))
                 ->add($file1)
                 ->add($file2)
                 ->add($file3))
-            ->setMarkType($this->buildMarkType())
+            ->setMarkType(self::buildMarkType())
             ->setSelfReviewability(DueWorkModel::SELF_REVIEWABILITY_FULL)
         ;
 
         /** @var DueWork $dueWork */
-        $dueWork = $this->translator->translateToDomainModel($dueWorkModel);
+        $dueWork = self::getTranslator()->translateToDomainModel($dueWorkModel);
 
         $this->assertInstanceOf(DueWork::class, $dueWork);
         $this->assertEquals(33, $dueWork->getId());
@@ -415,8 +415,8 @@ class DueWorkTest extends TestCase
                         ->setName('A dumb type'))
             );
 
-        $dueWorkDomainModel           = $this->translator->translateToDomainModel($dueWorkDataModel);
-        $retranslatedDueWorkDataModel = $this->translator->translateToDataModel($dueWorkDomainModel);
+        $dueWorkDomainModel           = self::getTranslator()->translateToDomainModel($dueWorkDataModel);
+        $retranslatedDueWorkDataModel = self::getTranslator()->translateToDataModel($dueWorkDomainModel);
         $this->assertSame($dueWorkDataModel, $retranslatedDueWorkDataModel);
     }
 
@@ -427,7 +427,7 @@ class DueWorkTest extends TestCase
     public function testTranslateNullDataModelToDomainModel()
     {
         $nullDueWorkDataModel   = (new DueWorkModel())->setId(null)->setAssessmentModel(new AssessmentModel());
-        $nullDueWorkDomainModel = $this->translator->translateToDomainModel($nullDueWorkDataModel);
+        $nullDueWorkDomainModel = self::getTranslator()->translateToDomainModel($nullDueWorkDataModel);
         $this->assertNull($nullDueWorkDomainModel->getId());
     }
 
@@ -435,7 +435,7 @@ class DueWorkTest extends TestCase
     /**
      * Data provider for different due work response acceptance settings.
      */
-    public function getTestTranslateResponseAcceptanceToDomainModelData()
+    public static function getTestTranslateResponseAcceptanceToDomainModelData()
     {
         $assessmentModel = (new AssessmentModel())
             ->setAssessmentContext((new Folder())->setId(1));
@@ -445,7 +445,7 @@ class DueWorkTest extends TestCase
                     ->setAssessmentModel($assessmentModel)
                     ->setAcceptOnline(true)
                     ->setAcceptMultiple(true)
-                    ->setMarkType($this->buildMarkType())
+                    ->setMarkType(self::buildMarkType())
                     ->setSelfReviewability(DueWorkModel::SELF_REVIEWABILITY_FULL),
                 true,
                 true,
@@ -455,7 +455,7 @@ class DueWorkTest extends TestCase
                     ->setAssessmentModel($assessmentModel)
                     ->setAcceptOnline(true)
                     ->setAcceptMultiple(false)
-                    ->setMarkType($this->buildMarkType())
+                    ->setMarkType(self::buildMarkType())
                     ->setSelfReviewability(DueWorkModel::SELF_REVIEWABILITY_FULL),
                 true,
                 false,
@@ -465,7 +465,7 @@ class DueWorkTest extends TestCase
                     ->setAssessmentModel($assessmentModel)
                     ->setAcceptOnline(false)
                     ->setAcceptMultiple(false)
-                    ->setMarkType($this->buildMarkType())
+                    ->setMarkType(self::buildMarkType())
                     ->setSelfReviewability(DueWorkModel::SELF_REVIEWABILITY_FULL),
                 false,
                 false,
@@ -475,7 +475,7 @@ class DueWorkTest extends TestCase
                     ->setAssessmentModel($assessmentModel)
                     ->setAcceptOnline(false)
                     ->setAcceptMultiple(true)
-                    ->setMarkType($this->buildMarkType())
+                    ->setMarkType(self::buildMarkType())
                     ->setSelfReviewability(DueWorkModel::SELF_REVIEWABILITY_FULL),
                 false,
                 false,
@@ -486,16 +486,16 @@ class DueWorkTest extends TestCase
     /**
      * Test translation of acceptance response settings to domain model.
      *
-     * @dataProvider getTestTranslateResponseAcceptanceToDomainModelData
      *
      * @param DueWorkModel $dataModel
      * @param bool         $acceptsOnline
      * @param bool         $acceptsMultiple
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('getTestTranslateResponseAcceptanceToDomainModelData')]
     public function testTranslateResponseAcceptanceToDomainModel(DueWorkModel $dataModel, $acceptsOnline, $acceptsMultiple)
     {
         /** @var DueWork $dueWork */
-        $dueWork = $this->translator->translateToDomainModel($dataModel);
+        $dueWork = self::getTranslator()->translateToDomainModel($dataModel);
 
         // Test type
         $this->assertInstanceOf(DueWork::class, $dueWork);
@@ -509,7 +509,7 @@ class DueWorkTest extends TestCase
     /**
      * Data provider for different project mark scheme settings.
      */
-    public function getTestTranslateMarkSchemeToDomainModelData()
+    public static function getTestTranslateMarkSchemeToDomainModelData()
     {
         $assessmentModel = (new AssessmentModel())
             ->setAssessmentContext((new Folder())->setId(1));
@@ -517,7 +517,7 @@ class DueWorkTest extends TestCase
             [
                 (new DueWorkModel())
                     ->setAssessmentModel($assessmentModel)
-                    ->setMarkType($this->buildMarkType())
+                    ->setMarkType(self::buildMarkType())
                     ->setSelfReviewability(DueWorkModel::SELF_REVIEWABILITY_FULL),
                 None::class,
                 null,
@@ -526,7 +526,7 @@ class DueWorkTest extends TestCase
             [
                 (new DueWorkModel())
                     ->setAssessmentModel($assessmentModel)
-                    ->setMarkType($this->buildMarkType(DueWorkModel\MarkType::TYPE_PERCENT))
+                    ->setMarkType(self::buildMarkType(DueWorkModel\MarkType::TYPE_PERCENT))
                     ->setSelfReviewability(DueWorkModel::SELF_REVIEWABILITY_FULL),
                 Percentage::class,
                 null,
@@ -535,7 +535,7 @@ class DueWorkTest extends TestCase
             [
                 (new DueWorkModel())
                     ->setAssessmentModel($assessmentModel)
-                    ->setMarkType($this->buildMarkType(DueWorkModel\MarkType::TYPE_LETTER))
+                    ->setMarkType(self::buildMarkType(DueWorkModel\MarkType::TYPE_LETTER))
                     ->setGradeGroup((new DueWorkModel\GradeLevel\Group\Model())->setId(1)->setGradeLevels(
                         new GenericCollection(DueWorkModel\GradeLevel\Model::class, [new DueWorkModel\GradeLevel\Model()])
                     ))
@@ -547,7 +547,7 @@ class DueWorkTest extends TestCase
             [
                 (new DueWorkModel())
                     ->setAssessmentModel($assessmentModel)
-                    ->setMarkType($this->buildMarkType(DueWorkModel\MarkType::TYPE_TOTAL))
+                    ->setMarkType(self::buildMarkType(DueWorkModel\MarkType::TYPE_TOTAL))
                     ->setMaxMark(15)
                     ->setSelfReviewability(DueWorkModel::SELF_REVIEWABILITY_FULL),
                 TotalMarkFractional::class,
@@ -560,17 +560,17 @@ class DueWorkTest extends TestCase
     /**
      * Test translation of acceptance response settings.
      *
-     * @dataProvider getTestTranslateMarkSchemeToDomainModelData
      *
      * @param DueWorkModel $dataModel
      * @param string       $markSchemeClass
      * @param int          $totalMark
      * @param int          $gradeGroupId
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('getTestTranslateMarkSchemeToDomainModelData')]
     public function testTranslateMarkSchemeToDomainModel(DueWorkModel $dataModel, $markSchemeClass, $totalMark, $gradeGroupId)
     {
         /** @var DueWork $dueWork */
-        $dueWork = $this->translator->translateToDomainModel($dataModel);
+        $dueWork = self::getTranslator()->translateToDomainModel($dataModel);
 
         // Test type
         $this->assertInstanceOf(DueWork::class, $dueWork);

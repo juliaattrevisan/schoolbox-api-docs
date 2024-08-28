@@ -32,7 +32,7 @@ class TimeTest extends DatetimeTest
     /**
      * @inheritdoc
      */
-    public function getTestHydrate()
+    public static function getTestHydrate()
     {
         return array(
             array(null, false),
@@ -54,7 +54,7 @@ class TimeTest extends DatetimeTest
     /**
      * @inheritdoc
      */
-    public function getTestDehydrate()
+    public static function getTestDehydrate()
     {
         return array(
             array(null, null),

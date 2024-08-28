@@ -28,13 +28,12 @@ class SimpleTest extends TestCase
     /**
      * Test the token detection mechanism
      *
-     * @dataProvider providerBodyManifest
      *
      * @param string $input
      * @param array  $expected
      * @throws \PHPUnit\Framework\ExpectationFailedException
-     * @throws \SebastianBergmann\RecursionContext\InvalidArgumentException
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerBodyManifest')]
     public function testSimpleManifest(string $input, array $expected): void
     {
         $outcome = (new Simple())->manifest($input);
@@ -48,7 +47,7 @@ class SimpleTest extends TestCase
      *
      * @return array
      */
-    public function providerBodyManifest(): array
+    public static function providerBodyManifest(): array
     {
         return [
             'No Tokens' => [
@@ -111,14 +110,13 @@ class SimpleTest extends TestCase
 
 
     /**
-     * @dataProvider providerBody
      *
      * @param string $input
      * @param array  $replacements
      * @param string $expected
      * @throws \PHPUnit\Framework\ExpectationFailedException
-     * @throws \SebastianBergmann\RecursionContext\InvalidArgumentException
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerBody')]
     public function testSimple(string $input, array $replacements, string $expected): void
     {
         $outcome = (new Simple())->replace($input, $replacements);
@@ -131,7 +129,7 @@ class SimpleTest extends TestCase
      *
      * @return array
      */
-    public function providerBody(): array
+    public static function providerBody(): array
     {
         return [
             'Replacement: No Tokens' => [

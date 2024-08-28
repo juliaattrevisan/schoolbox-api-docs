@@ -32,7 +32,7 @@ class QuizTest extends TestCase
             // Generic fields
             ->setContext((new Folder())->setId(1))
             ->setId(61)
-            ->setCreator($this->teacher2)
+            ->setCreator(self::getTeacher2())
             ->setPublishAt(new Alaress_Date_Format('2016-10-14 12:00:00', Alaress_Date_Format::DATABASE_FORMAT))
             ->setOpenAt(new Alaress_Date_Format('2016-10-16 12:00:00', Alaress_Date_Format::DATABASE_FORMAT))
             ->setDueAt(new Alaress_Date_Format('2016-10-18 12:00:00', Alaress_Date_Format::DATABASE_FORMAT))
@@ -47,7 +47,7 @@ class QuizTest extends TestCase
         ;
 
         /** @var QuizModel $quizModel */
-        $quizModel = $this->translator->translateToDataModel($quiz);
+        $quizModel = self::getTranslator()->translateToDataModel($quiz);
 
         // Test type
         $this->assertInstanceOf(QuizModel::class, $quizModel);
@@ -70,8 +70,8 @@ class QuizTest extends TestCase
             ->setContext((new Folder())->setId(1))
         ;
 
-        $quizDataModel               = $this->translator->translateToDataModel($quizDomainModel);
-        $retranslatedQuizDomainModel = $this->translator->translateToDomainModel($quizDataModel);
+        $quizDataModel               = self::getTranslator()->translateToDataModel($quizDomainModel);
+        $retranslatedQuizDomainModel = self::getTranslator()->translateToDomainModel($quizDataModel);
         $this->assertSame($quizDomainModel, $retranslatedQuizDomainModel);
     }
 
@@ -81,7 +81,7 @@ class QuizTest extends TestCase
     public function testTranslateNullDomainModelToDataModel()
     {
         $nullQuizDomainModel = (new Quiz())->setId(null);
-        $nullQuizDataModel   = $this->translator->translateToDataModel($nullQuizDomainModel);
+        $nullQuizDataModel   = self::getTranslator()->translateToDataModel($nullQuizDomainModel);
         $this->assertNull($nullQuizDataModel->getId());
     }
 
@@ -100,11 +100,11 @@ class QuizTest extends TestCase
             ->setCompletionMessage('you done a quiz')
             ->setDuration(Quiz::DURATION_UNLIMITED)
             ->setMaxAttempts(Quiz::ATTEMPTS_UNLIMITED)
-            ->setUser($this->teacher1)
+            ->setUser(self::getTeacher1())
         ;
 
         /** @var Quiz $quiz */
-        $quiz = $this->translator->translateToDomainModel($quizModel);
+        $quiz = self::getTranslator()->translateToDomainModel($quizModel);
 
         $this->assertInstanceOf(Quiz::class, $quiz);
         $this->assertEquals(105, $quiz->getId());
@@ -128,8 +128,8 @@ class QuizTest extends TestCase
                     ->setId(33)
             );
 
-        $quizDomainModel           = $this->translator->translateToDomainModel($quizDataModel);
-        $retranslatedQuizDataModel = $this->translator->translateToDataModel($quizDomainModel);
+        $quizDomainModel           = self::getTranslator()->translateToDomainModel($quizDataModel);
+        $retranslatedQuizDataModel = self::getTranslator()->translateToDataModel($quizDomainModel);
         $this->assertSame($quizDataModel, $retranslatedQuizDataModel);
     }
 
@@ -139,7 +139,7 @@ class QuizTest extends TestCase
     public function testTranslateNullDataModelToDomainModel()
     {
         $nullQuizDataModel   = (new QuizModel())->setId(null)->setAssessmentModel(new AssessmentModel());
-        $nullQuizDomainModel = $this->translator->translateToDomainModel($nullQuizDataModel);
+        $nullQuizDomainModel = self::getTranslator()->translateToDomainModel($nullQuizDataModel);
         $this->assertNull($nullQuizDomainModel->getId());
     }
 }

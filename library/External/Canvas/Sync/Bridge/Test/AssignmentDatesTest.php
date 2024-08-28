@@ -17,13 +17,10 @@ use Psr\Log\NullLogger;
 use function array_push;
 use function strcmp;
 
-/**
- * @covers \External\Canvas\Sync\Bridge\AssignmentDates
- */
+#[\PHPUnit\Framework\Attributes\CoversClass(\External\Canvas\Sync\Bridge\AssignmentDates::class)]
 class AssignmentDatesTest extends TestCase
 {
     // Tests
-
     /**
      * Tests that no matter what permutation (including duplicates) of dates we get from Canvas,
      * we can transform them to a sequence that passes Schoolbox sequential date constraint
@@ -32,8 +29,8 @@ class AssignmentDatesTest extends TestCase
      * @param string $openDateIn
      * @param string $dueDateIn
      * @param string $closeDateIn
-     * @dataProvider providerNormaliseDatesDistinct
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerNormaliseDatesDistinct')]
     public function testNormaliseDates(string $publishDateIn, string $openDateIn, string $dueDateIn, string $closeDateIn): void
     {
         $assignmentDates = new AssignmentDates();
@@ -58,7 +55,7 @@ class AssignmentDatesTest extends TestCase
      * Provide all date permutations (including duplicates)
      * @return array
      */
-    public function providerNormaliseDatesDistinct(): array
+    public static function providerNormaliseDatesDistinct(): array
     {
         $one   = '2001-01-01 10:00:00';
         $two   = '2002-01-01 10:00:00';

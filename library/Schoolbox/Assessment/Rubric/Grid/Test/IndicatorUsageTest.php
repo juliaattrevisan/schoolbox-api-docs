@@ -14,9 +14,9 @@ use Schoolbox\Assessment\Rubric\Grid as RubricGrid;
 use Schoolbox\Assessment\Rubric\RowSet;
 
 /**
- * @covers \Schoolbox\Assessment\Rubric\Grid\IndicatorUsage
  * @codeCoverageIgnore
  */
+#[\PHPUnit\Framework\Attributes\CoversClass(\Schoolbox\Assessment\Rubric\Grid\IndicatorUsage::class)]
 class IndicatorUsageTest extends TestCase
 {
     /**
@@ -24,7 +24,7 @@ class IndicatorUsageTest extends TestCase
      *
      * @return iterable
      */
-    public function getTestRetrieveDescriptorData(): iterable
+    public static function getTestRetrieveDescriptorData(): iterable
     {
         $indicator      = (new RowSet\Indicator())->setId(1)->setName('Indicator 1');
         $indicatorUsage = new RubricGrid\IndicatorUsage($indicator);
@@ -56,13 +56,12 @@ class IndicatorUsageTest extends TestCase
 
 
     /**
-     * @dataProvider getTestRetrieveDescriptorData
-     * @covers       \Schoolbox\Assessment\Rubric\Grid\IndicatorUsage::retrieveDescriptor
      *
      * @param RubricGrid\IndicatorUsage  $indicatorUsage
      * @param int                        $levelIndex
      * @param null|RubricGrid\Descriptor $expected
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('getTestRetrieveDescriptorData')]
     public function testRetrieveDescriptor(
         RubricGrid\IndicatorUsage $indicatorUsage,
         int $levelIndex,
@@ -77,7 +76,7 @@ class IndicatorUsageTest extends TestCase
      *
      * @return iterable
      */
-    public function getTestCalculateMaxValueDataFromDescriptors(): iterable
+    public static function getTestCalculateMaxValueDataFromDescriptors(): iterable
     {
         $indicator1      = (new RowSet\Indicator())->setId(1)->setName('Indicator 1');
         $indicatorUsage1 = new RubricGrid\IndicatorUsage($indicator1);
@@ -123,12 +122,10 @@ class IndicatorUsageTest extends TestCase
 
 
     /**
-     * @dataProvider getTestCalculateMaxValueDataFromDescriptors
-     * @covers       \Schoolbox\Assessment\Rubric\Grid\IndicatorUsage::calculateMaxValueFromDescriptors
-     *
      * @param RubricGrid\IndicatorUsage $indicatorUsage
      * @param float|null                $expected
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('getTestCalculateMaxValueDataFromDescriptors')]
     public function testCalculateMaxValueFromDescriptors(
         RubricGrid\IndicatorUsage $indicatorUsage,
         ?float $expected
@@ -143,7 +140,7 @@ class IndicatorUsageTest extends TestCase
      *
      * @return iterable
      */
-    public function getTestContainsDescriptorsWithValueData(): iterable
+    public static function getTestContainsDescriptorsWithValueData(): iterable
     {
         $indicator1      = (new RowSet\Indicator())->setId(1)->setName('Indicator 1');
         $indicatorUsage1 = new RubricGrid\IndicatorUsage($indicator1);
@@ -189,12 +186,10 @@ class IndicatorUsageTest extends TestCase
 
 
     /**
-     * @dataProvider getTestContainsDescriptorsWithValueData
-     * @covers \Schoolbox\Assessment\Rubric\Grid\IndicatorUsage::containsDescriptorsWithValue
-     *
      * @param RubricGrid\IndicatorUsage $indicatorUsage
      * @param bool                      $expected
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('getTestContainsDescriptorsWithValueData')]
     public function testContainsDescriptorsWithValue(
         RubricGrid\IndicatorUsage $indicatorUsage,
         bool $expected
@@ -208,7 +203,7 @@ class IndicatorUsageTest extends TestCase
      *
      * @return iterable
      */
-    public function getTestApplyDescriptorMinValuesData(): iterable
+    public static function getTestApplyDescriptorMinValuesData(): iterable
     {
         // Ascending: [0, 2, 4, 6, 8] => [0, 1..2, 3..4, 5..6, 7..8]
         $indicator       = (new RowSet\Indicator())->setId(1)->setName('Indicator');
@@ -436,13 +431,12 @@ class IndicatorUsageTest extends TestCase
 
 
     /**
-     * @dataProvider getTestApplyDescriptorMinValuesData
-     * @covers       \Schoolbox\Assessment\Rubric\Grid\IndicatorUsage::applyDescriptorMinValues
      *
      * @param RubricGrid\IndicatorUsage $indicatorUsage
      * @param int                       $levelIndex
      * @param float|null                $expectedLeft
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('getTestApplyDescriptorMinValuesData')]
     public function testApplyDescriptorMinValuesLeft(
         RubricGrid\IndicatorUsage $indicatorUsage,
         int $levelIndex,
@@ -456,14 +450,13 @@ class IndicatorUsageTest extends TestCase
 
 
     /**
-     * @dataProvider getTestApplyDescriptorMinValuesData
-     * @covers       \Schoolbox\Assessment\Rubric\Grid\IndicatorUsage::applyDescriptorMinValues
      *
      * @param RubricGrid\IndicatorUsage $indicatorUsage
      * @param int                       $levelIndex
      * @param float|null                $_
      * @param float|null                $expectedRight
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('getTestApplyDescriptorMinValuesData')]
     public function testApplyDescriptorMinValuesRight(
         RubricGrid\IndicatorUsage $indicatorUsage,
         int $levelIndex,
@@ -482,7 +475,7 @@ class IndicatorUsageTest extends TestCase
      *
      * @return iterable
      */
-    public function getTestApplyDescriptorMinValuesWithoutValueRange(): iterable
+    public static function getTestApplyDescriptorMinValuesWithoutValueRange(): iterable
     {
         // Test using the Fibonacci sequence
         // Fibonacci: [1, 1, 2, 3, 5, 8] => [1, 1, 2, 3, 4..5, 6..8]
@@ -522,13 +515,12 @@ class IndicatorUsageTest extends TestCase
 
 
     /**
-     * @dataProvider getTestApplyDescriptorMinValuesWithoutValueRange
-     * @covers       \Schoolbox\Assessment\Rubric\Grid\IndicatorUsage::applyDescriptorMinValues
      *
      * @param RubricGrid\IndicatorUsage $indicatorUsage
      * @param int                       $levelIndex
      * @param float|null                $expected
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('getTestApplyDescriptorMinValuesWithoutValueRange')]
     public function testApplyDescriptorMinValuesWithoutValueRange(
         RubricGrid\IndicatorUsage $indicatorUsage,
         int $levelIndex,
@@ -546,7 +538,7 @@ class IndicatorUsageTest extends TestCase
      *
      * @return iterable
      */
-    public function getTestIsCompatibleWithData(): iterable
+    public static function getTestIsCompatibleWithData(): iterable
     {
         $generator = new Generator();
 
@@ -722,13 +714,12 @@ class IndicatorUsageTest extends TestCase
 
 
     /**
-     * @dataProvider getTestIsCompatibleWithData
      *
-     * @covers \Schoolbox\Assessment\Rubric\Grid\IndicatorUsage::isCompatibleWith
      * @param RubricGrid\IndicatorUsage $usage1
      * @param RubricGrid\IndicatorUsage $usage2
      * @param bool                      $expected
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('getTestIsCompatibleWithData')]
     public function testIsCompatibleWith(
         RubricGrid\IndicatorUsage $usage1,
         RubricGrid\IndicatorUsage $usage2,

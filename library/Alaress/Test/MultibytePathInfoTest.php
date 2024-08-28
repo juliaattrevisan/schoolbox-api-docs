@@ -29,7 +29,7 @@ class MultibytePathInfoTest extends TestCase
      *
      * @return array
      */
-    public function data()
+    public static function data()
     {
         // [input, path, basename, ext, filename]
         return [
@@ -90,10 +90,10 @@ class MultibytePathInfoTest extends TestCase
 
 
     /**
-     * @dataProvider data
      * @param string      $input
      * @param string|null $expectedDirname
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('data')]
     public function testMultiByteDirname(
         string $input,
         ?string $expectedDirname,
@@ -103,11 +103,11 @@ class MultibytePathInfoTest extends TestCase
     }
 
     /**
-     * @dataProvider data
      * @param string      $input
      * @param string|null $expectedDirname
      * @param string|null $expectedBasename
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('data')]
     public function testMultiByteBasename(
         string $input,
         ?string $expectedDirname,
@@ -118,12 +118,12 @@ class MultibytePathInfoTest extends TestCase
     }
 
     /**
-     * @dataProvider data
      * @param string      $input
      * @param string|null $expectedDirname
      * @param string|null $expectedBasename
      * @param string|null $expectedExtension
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('data')]
     public function testMultiByteExtension(
         string $input,
         ?string $expectedDirname,
@@ -135,13 +135,13 @@ class MultibytePathInfoTest extends TestCase
     }
 
     /**
-     * @dataProvider data
      * @param string      $input
      * @param string|null $expectedDirname
      * @param string|null $expectedBasename
      * @param string|null $expectedExtension
      * @param string|null $expectedFilename
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('data')]
     public function testMultiByteFilename(
         string $input,
         ?string $expectedDirname,

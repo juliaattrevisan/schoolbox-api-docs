@@ -20,11 +20,11 @@ use PHPUnit\Framework\TestCase;
 class SanitiseScoresTest extends TestCase
 {
     /**
-     * @dataProvider providerValidMark
      * @param mixed $mark
      * @param mixed $maxMark
      * @param int   $expected
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerValidMark')]
     public function testValidMark($mark, $maxMark, $expected)
     {
         /* Substitute this with a spec pattern or other conditional
@@ -41,7 +41,7 @@ class SanitiseScoresTest extends TestCase
      *
      * @return array
      */
-    public function providerValidMark(): array
+    public static function providerValidMark(): array
     {
         /* Our db schema is DECIMAL(15,2) so everything always
          * has two decimal places

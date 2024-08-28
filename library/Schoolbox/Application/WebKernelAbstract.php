@@ -260,7 +260,7 @@ abstract class WebKernelAbstract extends \Alaress\Application\Kernel
     protected function registerShutdownHandling(): void
     {
         $this->getShutdownHandler()->registerFunction(
-            new ResourceLimitExceededHandler(function () {
+            new ResourceLimitExceededHandler(function (): void {
                 $this->shutdownSafely(error_get_last(), debug_backtrace());
             })
         );
@@ -524,7 +524,7 @@ abstract class WebKernelAbstract extends \Alaress\Application\Kernel
         // Restore or destroy the session when all is done
         $authenticator = new \Authenticator();
         $this->getShutdownHandler()->registerFunction(
-            function () use ($authenticator, $currentSessionData) {
+            function () use ($authenticator, $currentSessionData): void {
                 if (isset($currentSessionData)) {
                     $_SESSION = $currentSessionData;
                 } else {

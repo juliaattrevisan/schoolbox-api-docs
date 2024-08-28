@@ -38,7 +38,7 @@ class Module extends BaseModule
         $perm = new All(
             new IsLoggedIn(),
             new IsConfigOn(ConfigMapper::NAME_MAIL_ENABLED, $this->getConfig()),
-            new Callback(static function (array $params, User $user) {
+            new Callback(static function (array $params, User $user): void {
                 if (!empty($user->getEmail())) {
                     return;
                 }

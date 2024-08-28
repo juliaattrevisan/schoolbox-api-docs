@@ -25,17 +25,15 @@ use Schoolbox\YearLevel;
  */
 class ValidUseCohortMarksTest extends TestCase
 {
-
     /**
      * Test valid enabling of LMS Cohort Comparison
      *
-     * @dataProvider provider_validLMSCohortComparison
      * @param bool         $configOption
      * @param Folder\Model $folder
      * @param bool         $expected
      * @throws \PHPUnit\Framework\ExpectationFailedException
-     * @throws \SebastianBergmann\RecursionContext\InvalidArgumentException
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('provider_validLMSCohortComparison')]
     public function testValidLMSCohortComparison(bool $configOption, Folder\Model $folder, bool $expected): void
     {
         $actual = (new Cohort\ValidUseCohortMarks())->isSatisfiedBy($configOption, $folder);
@@ -51,7 +49,7 @@ class ValidUseCohortMarksTest extends TestCase
      * @throws \Schoolbox\Mapper\Exception
      * @throws \UnexpectedValueException
      */
-    public function provider_validLMSCohortComparison(): array
+    public static function provider_validLMSCohortComparison(): array
     {
         $folderMapper = Folder\Mapper::getInstance();
         $yearLevelMapper = YearLevel\Mapper::getInstance();

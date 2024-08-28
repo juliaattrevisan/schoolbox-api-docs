@@ -312,7 +312,7 @@ class Processor
         $oldErrorLevel = error_reporting();
         error_reporting($oldErrorLevel | E_WARNING);
         $oldErrorHandler = set_error_handler(
-            static function (int $error_number, string $error_msg) {
+            static function (int $error_number, string $error_msg): void {
                 throw new CorruptImageException($error_msg);
             },
             E_WARNING

@@ -24,7 +24,6 @@ use Schoolbox\UserMapper;
 
 class UserRulesetTest extends TestCase
 {
-
     /** @var Sync\Grammar\UserRuleset */
     protected $ruleset;
 
@@ -48,7 +47,7 @@ class UserRulesetTest extends TestCase
     /**
      * @return array
      */
-    public function dataLogging()
+    public static function dataLogging()
     {
         return [
             [new ExternalStudent(), new InternalUser(),],
@@ -99,10 +98,10 @@ class UserRulesetTest extends TestCase
     }
 
     /**
-     * @dataProvider dataLogging
      * @param ExternalStudent $external
      * @param InternalUser    $internal
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('dataLogging')]
     public function testLoggingExisting($external, $internal)
     {
         $this->hydrate($external, $internal);
@@ -111,10 +110,10 @@ class UserRulesetTest extends TestCase
 
 
     /**
-     * @dataProvider dataLogging
      * @param ExternalStudent $external
      * @param InternalUser    $internal
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('dataLogging')]
     public function testLoggingNotExisting($external, $internal)
     {
         $this->hydrate($external);

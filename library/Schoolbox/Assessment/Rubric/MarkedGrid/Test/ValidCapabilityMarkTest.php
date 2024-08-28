@@ -20,9 +20,7 @@ use Schoolbox\Learning\MarkScheme\LetterGrade;
 use Schoolbox\Learning\MarkScheme\Percentage;
 use Schoolbox\Learning\MarkScheme\TotalMarkFractional;
 
-/**
- * @covers \Schoolbox\Assessment\Rubric\MarkedGrid\ValidCapabilityMark::isSatisfiedBy
- */
+#[\PHPUnit\Framework\Attributes\CoversClass(\Schoolbox\Assessment\Rubric\MarkedGrid\ValidCapabilityMark::class)]
 class ValidCapabilityMarkTest extends TestCase
 {
     /**
@@ -30,7 +28,7 @@ class ValidCapabilityMarkTest extends TestCase
      *
      * @return iterable
      */
-    public function getTestIsSatisfiedByData(): iterable
+    public static function getTestIsSatisfiedByData(): iterable
     {
         /* Mark types */
         $markSchemePercentage  = new Percentage();
@@ -192,13 +190,12 @@ class ValidCapabilityMarkTest extends TestCase
     }
 
     /**
-     * @dataProvider getTestIsSatisfiedByData
-     * @covers       \Schoolbox\Assessment\Rubric\MarkedGrid\ValidCapabilityMark::isSatisfiedBy
      *
      * @param IMarkScheme $markScheme
      * @param string|null $capabilityMark
      * @param bool        $expected Whether this test should assert true or false
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('getTestIsSatisfiedByData')]
     public function testIsSatisfiedBy(IMarkScheme $markScheme, ?string $capabilityMark, bool $expected)
     {
         $spec = new ValidCapabilityMark($markScheme);

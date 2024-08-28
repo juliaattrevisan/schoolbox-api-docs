@@ -105,7 +105,7 @@ class Module extends BaseModule
     {
         // Allow any user who owns either the blog or comment to do stuff
         $ownershipRule = new Rule\Callback(
-            function ($params, User $user) {
+            function ($params, User $user): void {
                 if (($params['blog'] ?? null) instanceof BlogModel) {
                     if ($params['blog']->getOwner()->getId() == $user->getId()) {
                         return;

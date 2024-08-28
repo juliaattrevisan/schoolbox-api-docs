@@ -21,20 +21,17 @@ use Schoolbox\Pastoral\Comment\Translator\ModelToArray;
 use Schoolbox\Pastoral\Model as PastoralModel;
 use Schoolbox\User;
 
-/**
- * @covers \Schoolbox\Pastoral\Comment\Translator\ModelToArray
- */
+#[\PHPUnit\Framework\Attributes\CoversClass(\Schoolbox\Pastoral\Comment\Translator\ModelToArray::class)]
 class ModelToArrayTest extends TestCase
 {
     /**
-     * @dataProvider getTestInvokeData
-     * @covers       \Schoolbox\Pastoral\Comment\Translator\ModelToArray::__invoke
      *
      * @param Model $input
      * @param bool  $allowDelete
      * @param array $expected
      * @return void
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('getTestInvokeData')]
     public function testInvoke(Model $input, bool $allowDelete, array $expected): void
     {
         self::assertSame(
@@ -43,7 +40,7 @@ class ModelToArrayTest extends TestCase
         );
     }
 
-    public function getTestInvokeData(): iterable
+    public static function getTestInvokeData(): iterable
     {
         $users = [
             (new User())

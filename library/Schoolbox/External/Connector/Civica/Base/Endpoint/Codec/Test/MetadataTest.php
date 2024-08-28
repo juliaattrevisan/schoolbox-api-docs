@@ -24,7 +24,7 @@ class MetadataTest extends TestCase
      *
      * @return array
      */
-    public function providerValidMetadataDecode(): array
+    public static function providerValidMetadataDecode(): array
     {
         return [
             'Valid Metadata 1' => [
@@ -42,11 +42,11 @@ class MetadataTest extends TestCase
     /**
      * Test valid metadata strings
      *
-     * @dataProvider providerValidMetadataDecode
      * @param string $metadata
      * @param array  $expected
      * @throws \JsonException
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerValidMetadataDecode')]
     public function testValidMetadataDecode(string $metadata, $expected): void
     {
         $codec = new Metadata();
@@ -60,7 +60,7 @@ class MetadataTest extends TestCase
      *
      * @return array
      */
-    public function providerValidMetadataDecodeEncode(): array
+    public static function providerValidMetadataDecodeEncode(): array
     {
         return [
             'Valid Metadata Re-encode 1' => [
@@ -74,11 +74,11 @@ class MetadataTest extends TestCase
     /**
      * Test valid metadata strings
      *
-     * @dataProvider providerValidMetadataDecodeEncode
      * @param string $metadata
      * @param string $expected
      * @throws \JsonException
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerValidMetadataDecodeEncode')]
     public function testValidMetadataDecodeEncode(string $metadata, string $expected): void
     {
         $codec = new Metadata();

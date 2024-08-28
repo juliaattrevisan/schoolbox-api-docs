@@ -15,12 +15,11 @@ use Schoolbox\Comms\News\Statistics;
 
 class ValidationTest extends TestCase
 {
-
     /**
-     * @dataProvider provider_validOpenReferrer
      * @param null|string $referrer
      * @param bool        $expected
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('provider_validOpenReferrer')]
     public function testValidOpenReferrer(?string $referrer, bool $expected)
     {
         $validation = new Statistics\ValidOpenReferrer();
@@ -33,7 +32,7 @@ class ValidationTest extends TestCase
      *
      * @return array
      */
-    public function provider_validOpenReferrer(): array
+    public static function provider_validOpenReferrer(): array
     {
         return [
             'Valid referrer: dashboard' => [

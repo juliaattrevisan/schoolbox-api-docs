@@ -61,7 +61,7 @@ class WrappedReadableResourceStream implements Listenable, ReadableStreamInterfa
 
         $this->streamObject->on(
             'data',
-            function ($data) use ($stream) {
+            function ($data) use ($stream): void {
                 /**
                  * @var string $data
                  */
@@ -94,7 +94,7 @@ class WrappedReadableResourceStream implements Listenable, ReadableStreamInterfa
 
         $this->streamObject->on(
             'close',
-            function () use ($stream) {
+            function () use ($stream): void {
                 foreach ($this->listenerStore as $listener) {
                     $listener->streamClosed(new StreamEvent($stream));
                 }
@@ -104,7 +104,7 @@ class WrappedReadableResourceStream implements Listenable, ReadableStreamInterfa
 
         $this->streamObject->on(
             'error',
-            function ($error) use ($stream) {
+            function ($error) use ($stream): void {
                 foreach ($this->listenerStore as $listener) {
                     $listener->errorOccurred(new StreamEvent($stream, $error));
                 }
@@ -114,7 +114,7 @@ class WrappedReadableResourceStream implements Listenable, ReadableStreamInterfa
 
         $this->streamObject->on(
             'drain',
-            function () {
+            function (): void {
                 foreach ($this->listenerStore as $listener) {
                     $listener->streamDrained(new StreamEvent(null));
                 }

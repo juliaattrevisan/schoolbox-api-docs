@@ -26,14 +26,13 @@ use Schoolbox\External\Connector\TassApi\Base\Endpoint\TimetableCalendar\ValidAc
 class ValidActiveEnrolmentTest extends TestCase
 {
     /**
-     * @dataProvider providerValidActiveEnrolment
      * @param string $now
      * @param string $from
      * @param string $to
      * @param bool   $expected
      * @throws \PHPUnit\Framework\ExpectationFailedException
-     * @throws \SebastianBergmann\RecursionContext\InvalidArgumentException
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerValidActiveEnrolment')]
     public function testValidActiveEnrolment(string $now, string $from, string $to, bool $expected)
     {
         $outcome = (new ValidActiveEnrolment(\Alaress_Date_Format::newDatabaseDate($now)))
@@ -47,7 +46,7 @@ class ValidActiveEnrolmentTest extends TestCase
      *
      * @return array
      */
-    public function providerValidActiveEnrolment(): array
+    public static function providerValidActiveEnrolment(): array
     {
         return [
             'Active Example 1' => [

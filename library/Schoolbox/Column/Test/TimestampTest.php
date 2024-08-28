@@ -16,7 +16,6 @@ use Alaress_Date_Format as DateWrapper;
 
 class TimestampTest extends DatetimeTest
 {
-
     /**
      * @var Timestamp
      */
@@ -33,7 +32,7 @@ class TimestampTest extends DatetimeTest
     /**
      * @inheritdoc
      */
-    public function getTestHydrate()
+    public static function getTestHydrate()
     {
         // Only Y-m-d format results are able to be hydrated.
         return array(
@@ -53,7 +52,7 @@ class TimestampTest extends DatetimeTest
     /**
      * @inheritdoc
      */
-    public function getTestDehydrate()
+    public static function getTestDehydrate()
     {
         // I think that most code that uses timestamps is timezone ignorant,
         // so preset timezone.

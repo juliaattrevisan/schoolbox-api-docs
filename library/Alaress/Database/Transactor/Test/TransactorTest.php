@@ -81,7 +81,7 @@ class TransactorTest extends TestCase
      */
     public function testOnPersistInsideCommittedTransaction(): void
     {
-        $this->transactor->transact(function () {
+        $this->transactor->transact(function (): void {
             $this->buildOnPersist();
         });
         $this->assertEquals(1, $this->count);
@@ -105,7 +105,7 @@ class TransactorTest extends TestCase
     public function testOnPersistInsideExceptionTransaction(): void
     {
         try {
-            $this->transactor->transact(function () {
+            $this->transactor->transact(function (): void {
                 $this->buildOnPersist();
                 throw new \Exception('blah');
             });
@@ -124,7 +124,7 @@ class TransactorTest extends TestCase
         $this->transactor->transact(function () {
             $this->buildOnPersist();
 
-            $this->transactor->transact(function () {
+            $this->transactor->transact(function (): void {
                 $this->buildOnPersist();
             });
 
@@ -139,7 +139,7 @@ class TransactorTest extends TestCase
      */
     public function testOnPersistNestRollbackInsideCommit(): void
     {
-        $this->transactor->transact(function () {
+        $this->transactor->transact(function (): void {
             $this->buildOnPersist();
 
             $this->transactor->transact(function () {
@@ -155,10 +155,10 @@ class TransactorTest extends TestCase
      */
     public function testOnPersistNestCommitInsideCommit(): void
     {
-        $this->transactor->transact(function () {
+        $this->transactor->transact(function (): void {
             $this->buildOnPersist();
 
-            $this->transactor->transact(function () {
+            $this->transactor->transact(function (): void {
                 $this->buildOnPersist();
             });
         });
@@ -170,8 +170,8 @@ class TransactorTest extends TestCase
      */
     public function testOnPersistCommitSiblingLevels(): void
     {
-        $this->transactor->transact(function () {
-            $this->transactor->transact(function () {
+        $this->transactor->transact(function (): void {
+            $this->transactor->transact(function (): void {
                 $this->buildOnPersist();
             });
 
@@ -185,7 +185,7 @@ class TransactorTest extends TestCase
                 return false;
             });
 
-            $this->transactor->transact(function () {
+            $this->transactor->transact(function (): void {
                 $this->buildOnPersist();
             });
         });
@@ -197,7 +197,7 @@ class TransactorTest extends TestCase
      */
     public function testOnPersistMultipleCallbacks(): void
     {
-        $this->transactor->transact(function () {
+        $this->transactor->transact(function (): void {
             $this->buildOnPersist();
             $this->buildOnPersist();
             $this->buildOnPersist();
@@ -210,7 +210,7 @@ class TransactorTest extends TestCase
      */
     public function testOnPersistOrdering(): void
     {
-        $this->transactor->transact(function () {
+        $this->transactor->transact(function (): void {
             $this->buildOnPersistForOrderedResults(1);
             $this->buildOnPersistForOrderedResults(2);
             $this->buildOnPersistForOrderedResults(3);
@@ -225,10 +225,10 @@ class TransactorTest extends TestCase
      */
     public function testOnPersistOrderingBetweenNestingLevels(): void
     {
-        $this->transactor->transact(function () {
+        $this->transactor->transact(function (): void {
             $this->buildOnPersistForOrderedResults(1);
 
-            $this->transactor->transact(function () {
+            $this->transactor->transact(function (): void {
                 $this->buildOnPersistForOrderedResults(2);
 
                 $this->transactor->transact(function () {
@@ -278,7 +278,7 @@ class TransactorTest extends TestCase
     public function testExceptionOnUnexpectedImplicitCommit(): void
     {
         $this->expectException(RuntimeException::class);
-        $this->transactor->transact(function () {
+        $this->transactor->transact(function (): void {
             $this->transactor->implicitCommit();
         });
     }
@@ -293,7 +293,7 @@ class TransactorTest extends TestCase
     public function testOnPersistBeforeUnexpectedImplicitCommitOnSameLevel(): void
     {
         try {
-            $this->transactor->transact(function () {
+            $this->transactor->transact(function (): void {
                 $this->buildOnPersist();
                 $this->transactor->implicitCommit();
             });
@@ -313,7 +313,7 @@ class TransactorTest extends TestCase
     public function testOnPersistAfterUnexpectedImplicitCommitOnSameLevel(): void
     {
         try {
-            $this->transactor->transact(function () {
+            $this->transactor->transact(function (): void {
                 $this->transactor->implicitCommit();
                 $this->buildOnPersist();
             });
@@ -333,9 +333,9 @@ class TransactorTest extends TestCase
     public function testOnPersistBeforeUnexpectedImplicitCommitOnInnerLevel(): void
     {
         try {
-            $this->transactor->transact(function () {
+            $this->transactor->transact(function (): void {
                 $this->buildOnPersist();
-                $this->transactor->transact(function () {
+                $this->transactor->transact(function (): void {
                     $this->transactor->implicitCommit();
                 });
             });
@@ -355,8 +355,8 @@ class TransactorTest extends TestCase
     public function testOnPersistAfterUnexpectedImplicitCommitOnInnerLevel(): void
     {
         try {
-            $this->transactor->transact(function () {
-                $this->transactor->transact(function () {
+            $this->transactor->transact(function (): void {
+                $this->transactor->transact(function (): void {
                     $this->transactor->implicitCommit();
                 });
                 $this->buildOnPersist();
@@ -377,8 +377,8 @@ class TransactorTest extends TestCase
     public function testOnPersistBeforeUnexpectedImplicitCommitOnOuterLevel(): void
     {
         try {
-            $this->transactor->transact(function () {
-                $this->transactor->transact(function () {
+            $this->transactor->transact(function (): void {
+                $this->transactor->transact(function (): void {
                     $this->buildOnPersist();
                 });
                 $this->transactor->implicitCommit();
@@ -399,9 +399,9 @@ class TransactorTest extends TestCase
     public function testOnPersistAfterUnexpectedImplicitCommitOnOuterLevel(): void
     {
         try {
-            $this->transactor->transact(function () {
+            $this->transactor->transact(function (): void {
                 $this->transactor->implicitCommit();
-                $this->transactor->transact(function () {
+                $this->transactor->transact(function (): void {
                     $this->buildOnPersist();
                 });
             });
@@ -420,11 +420,11 @@ class TransactorTest extends TestCase
     public function testOnPersistBeforeUnexpectedImplicitCommitOnSiblingLevel(): void
     {
         try {
-            $this->transactor->transact(function () {
-                $this->transactor->transact(function () {
+            $this->transactor->transact(function (): void {
+                $this->transactor->transact(function (): void {
                     $this->buildOnPersist();
                 });
-                $this->transactor->transact(function () {
+                $this->transactor->transact(function (): void {
                     $this->transactor->implicitCommit();
                 });
             });
@@ -444,11 +444,11 @@ class TransactorTest extends TestCase
     public function testOnPersistAfterUnexpectedImplicitCommitOnSiblingLevel(): void
     {
         try {
-            $this->transactor->transact(function () {
-                $this->transactor->transact(function () {
+            $this->transactor->transact(function (): void {
+                $this->transactor->transact(function (): void {
                     $this->transactor->implicitCommit();
                 });
-                $this->transactor->transact(function () {
+                $this->transactor->transact(function (): void {
                     $this->buildOnPersist();
                 });
             });
@@ -465,9 +465,9 @@ class TransactorTest extends TestCase
      */
     public function testOnPersistClearedAfterCommit(): void
     {
-        $this->transactor->transact(function () {
-            $this->transactor->onPersist(function () {
-                $this->transactor->transact(static function () {
+        $this->transactor->transact(function (): void {
+            $this->transactor->onPersist(function (): void {
+                $this->transactor->transact(static function (): void {
                     // noop
                 });
                 $this->incrementCount();
@@ -497,7 +497,7 @@ class TransactorTest extends TestCase
      */
     public function buildOnPersistForOrderedResults($value): void
     {
-        $this->transactor->onPersist(function () use ($value) {
+        $this->transactor->onPersist(function () use ($value): void {
             $this->orderedResults[] = $value;
         });
     }

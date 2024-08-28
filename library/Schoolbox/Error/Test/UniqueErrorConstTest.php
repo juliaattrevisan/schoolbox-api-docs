@@ -16,16 +16,15 @@ use Schoolbox\Error;
 
 class UniqueErrorConstTest extends TestCase
 {
-
     /**
      * Ensure that all errorId constant values are unique
      *
-     * @dataProvider providerErrorConstants
      * @param array  $errorConstants
      * @param string $errorName
      * @param int    $errorValue
      * @throws \PHPUnit\Framework\AssertionFailedError
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerErrorConstants')]
     public function testErrorIdUniqueness(array $errorConstants, string $errorName, int $errorValue): void
     {
         $collisions = [];
@@ -48,10 +47,10 @@ class UniqueErrorConstTest extends TestCase
      * @return array
      * @throws \ReflectionException
      */
-    public function providerErrorConstants(): array
+    public static function providerErrorConstants(): array
     {
         $data           = [];
-        $errorConstants = $this->getErrorConstants();
+        $errorConstants = self::getErrorConstants();
 
         foreach ($errorConstants as $name => $idValue) {
             $data[] = [$errorConstants, $name, $idValue];
@@ -66,14 +65,14 @@ class UniqueErrorConstTest extends TestCase
      * @return int[]
      * @throws \ReflectionException
      */
-    private function getErrorConstants(): array
+    private static function getErrorConstants(): array
     {
         $errorConstants = [];
         $reflection     = new ReflectionClass(Error\Mapper::class);
 
         foreach ($reflection->getConstants() as $name => $idValue) {
             // Ignore irrelevant constants
-            if ($this->isErrorIdConst($name)) {
+            if (self::isErrorIdConst($name)) {
                 $errorConstants[$name] = $idValue;
             }
         }
@@ -88,7 +87,7 @@ class UniqueErrorConstTest extends TestCase
      * @param string $constantName
      * @return bool
      */
-    private function isErrorIdConst(string $constantName): bool
+    private static function isErrorIdConst(string $constantName): bool
     {
         return 0 === strpos($constantName, 'ERROR_');
     }

@@ -16,19 +16,16 @@ use PHPUnit\Framework\TestCase;
 use Schoolbox\LTI\Custom\ClaimFactory;
 use Schoolbox\User;
 
-/**
- * @covers \Schoolbox\LTI\Custom\ClaimFactory
- */
+#[\PHPUnit\Framework\Attributes\CoversClass(\Schoolbox\LTI\Custom\ClaimFactory::class)]
 class ClaimFactoryTest extends TestCase
 {
     /**
-     * @dataProvider getTestBuildData
-     * @covers       \Schoolbox\LTI\Custom\ClaimFactory::build
      *
      * @param ClaimFactory $factory
      * @param array|null   $claims
      * @param array|null   $expected
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('getTestBuildData')]
     public function testBuild(ClaimFactory $factory, ?array $claims, ?array $expected): void
     {
         $actual = $factory->build($claims);
@@ -39,7 +36,7 @@ class ClaimFactoryTest extends TestCase
         }
     }
 
-    public function getTestBuildData(): iterable
+    public static function getTestBuildData(): iterable
     {
         $factory = new ClaimFactory();
 

@@ -140,7 +140,7 @@ class Controller extends Base
         $this->eportfolioImportMapper->save($eportfolioImport);
         $id = $eportfolioImport->getId();
 
-        $this->postOutputCallbacks[] = function () use ($post, $id) {
+        $this->postOutputCallbacks[] = function () use ($post, $id): void {
             $this->deployCallback($post, $id);
         };
         $this->response = $this->responseFromTemplate(

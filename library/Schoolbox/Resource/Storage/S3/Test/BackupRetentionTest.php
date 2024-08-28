@@ -18,16 +18,16 @@ use function array_map;
 
 /**
  * @codeCoverageIgnore
- * @covers \Schoolbox\Resource\Storage\S3\BackupRetention
  */
+#[\PHPUnit\Framework\Attributes\CoversClass(\Schoolbox\Resource\Storage\S3\BackupRetention::class)]
 class BackupRetentionTest extends TestCase
 {
     /**
      * @param array $input
      * @param array $expected
-     * @dataProvider providerOrderDates
      * @throws InvalidArgumentException
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerOrderDates')]
     public function testOrderDates(array $input, array $expected): void
     {
         $br = new BackupRetention();
@@ -45,8 +45,8 @@ class BackupRetentionTest extends TestCase
      * @param array           $backups
      * @param array           $toRetain
      * @throws InvalidArgumentException
-     * @dataProvider providerGetDatesToRetain
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerGetDatesToRetain')]
     public function testGetDatesToRetain(BackupRetention $br, array $backups, array $toRetain): void
     {
         $this->assertEquals($toRetain, $br->getDatesToRetain($backups));
@@ -59,7 +59,7 @@ class BackupRetentionTest extends TestCase
     /**
      * @return string[][][]
      */
-    public function providerOrderDates(): array
+    public static function providerOrderDates(): array
     {
         $unOrdered = [
             '2020-01-01',
@@ -87,7 +87,7 @@ class BackupRetentionTest extends TestCase
     /**
      * @return mixed[][]
      */
-    public function providerGetDatesToRetain(): array
+    public static function providerGetDatesToRetain(): array
     {
         $now = Alaress_Date_Format::newDatabaseDate('2020-06-01 00:03:00');
         $br  = new BackupRetention($now);

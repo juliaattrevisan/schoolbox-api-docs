@@ -507,7 +507,7 @@ class Component_InstanceMapper extends BaseMapper
         }
 
         // Delete everything related in a transaction.
-        $this->getDatabase()->transact(function () use ($instanceCollection) {
+        $this->getDatabase()->transact(function () use ($instanceCollection): void {
             // Delete related eportfolio items:
             // these are a hard delete, so they must be deleted before deleting
             // the instance.

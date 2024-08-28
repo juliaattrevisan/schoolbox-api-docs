@@ -26,12 +26,11 @@ use Schoolbox\Resource\Storage\Model as Storage;
 class ValidFileTest extends TestCase
 {
     /**
-     * @dataProvider providerValidExample
      * @param SubmissionFile $file
      * @param bool           $expected
      * @throws \PHPUnit\Framework\ExpectationFailedException
-     * @throws \SebastianBergmann\RecursionContext\InvalidArgumentException
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerValidExample')]
     public function testValidExample(SubmissionFile $file, bool $expected): void
     {
         $this->assertEquals($expected, (new ValidFile())->isSatisfiedBy($file));
@@ -43,7 +42,7 @@ class ValidFileTest extends TestCase
      *
      * @return array
      */
-    public function providerValidExample(): array
+    public static function providerValidExample(): array
     {
         $validTextFile = (new SubmissionFile())
             ->setStorage((new Storage())

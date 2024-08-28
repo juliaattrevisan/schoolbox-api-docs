@@ -66,7 +66,7 @@ class Phpfunc extends \Aura\Session\Phpfunc
         }
 
         // otherwise, this is a new session: set its expiry to a default value
-        register_shutdown_function(function () {
+        register_shutdown_function(function (): void {
             session_write_close();
             $this->sessionRedis->expire(PipeManager::REDIS_SESSION_PREFIX . session_id(), self::API_SESSION_EXPIRY);
         });

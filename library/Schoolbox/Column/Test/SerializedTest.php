@@ -14,7 +14,6 @@ use Schoolbox\Column\Serialized;
 
 class SerializedTest extends TestCase
 {
-
     /**
      * @var Serialized
      */
@@ -31,7 +30,7 @@ class SerializedTest extends TestCase
     /**
      * @inheritdoc
      */
-    public function getTestHydrate()
+    public static function getTestHydrate()
     {
         return array(
             array('b:1;', true),
@@ -44,7 +43,7 @@ class SerializedTest extends TestCase
     /**
      * @inheritdoc
      */
-    public function getTestDehydrate()
+    public static function getTestDehydrate()
     {
         return array(
             array(true, 'b:1;'),

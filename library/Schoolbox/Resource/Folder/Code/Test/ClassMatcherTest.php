@@ -18,6 +18,9 @@ use Schoolbox\Resource\Folder\Code\ClassCodeMatchFactory;
  * @see IClassMatcher
  * @codeCoverageIgnore
  */
+#[\PHPUnit\Framework\Attributes\CoversClass(\Schoolbox\Resource\Folder\Code\ClassMatcherBase::class)]
+#[\PHPUnit\Framework\Attributes\CoversClass(\External\Synergetic\ClassMatcher::class)]
+#[\PHPUnit\Framework\Attributes\CoversClass(\External\Pcschools\ClassMatcher::class)]
 class ClassMatcherTest extends TestCase
 {
     private static $factory;
@@ -29,13 +32,12 @@ class ClassMatcherTest extends TestCase
     }
 
     /**
-     * @covers       \Schoolbox\Resource\Folder\Code\ClassMatcherBase::isMatch
-     * @dataProvider providerDefault
      * @param string      $folderCode
      * @param string|null $sisCampus
      * @param string      $sisClass
      * @param bool        $isMatch
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerDefault')]
     public function testDefault(string $folderCode, ?string $sisCampus, string $sisClass, bool $isMatch): void
     {
         $matcher = self::$factory->build('');
@@ -44,13 +46,12 @@ class ClassMatcherTest extends TestCase
     }
 
     /**
-     * @covers       \External\Synergetic\ClassMatcher::isMatch
-     * @dataProvider providerSynergetic
      * @param string      $folderCode
      * @param string|null $sisCampus
      * @param string      $sisClass
      * @param bool        $isMatch
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerSynergetic')]
     public function testSynergetic(string $folderCode, ?string $sisCampus, string $sisClass, bool $isMatch): void
     {
         $matcher = self::$factory->build('synergetic');
@@ -59,13 +60,12 @@ class ClassMatcherTest extends TestCase
     }
 
     /**
-     * @covers       \External\Pcschools\ClassMatcher::isMatch
-     * @dataProvider providerPcschool
      * @param string      $folderCode
      * @param string|null $sisCampus
      * @param string      $sisClass
      * @param bool        $isMatch
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerPcschool')]
     public function testPcschool(string $folderCode, ?string $sisCampus, string $sisClass, bool $isMatch): void
     {
         $matcher = self::$factory->build('pcschools');
@@ -76,7 +76,7 @@ class ClassMatcherTest extends TestCase
 
     // Data Providers
 
-    public function providerDefault(): array
+    public static function providerDefault(): array
     {
         /** @noinspection DuplicatedCode */
         // string $folderCode, ?string $sisCampus, string $sisClass, bool $isMatch
@@ -132,7 +132,7 @@ class ClassMatcherTest extends TestCase
         ];
     }
 
-    public function providerSynergetic(): array
+    public static function providerSynergetic(): array
     {
         /** @noinspection DuplicatedCode */
         // string $folderCode, ?string $sisCampus, string $sisClass, bool $isMatch
@@ -188,7 +188,7 @@ class ClassMatcherTest extends TestCase
         ];
     }
 
-    public function providerPcschool(): array
+    public static function providerPcschool(): array
     {
         /** @noinspection DuplicatedCode */
         // string $folderCode, ?string $sisCampus, string $sisClass, bool $isMatch

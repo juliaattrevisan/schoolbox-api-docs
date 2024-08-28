@@ -20,10 +20,10 @@ use PHPUnit\Framework\TestCase;
 class ValidationTest extends TestCase
 {
     /**
-     * @dataProvider provider_validExample
      * @param mixed $input
      * @param int   $expected
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('provider_validExample')]
     public function testValidExample($input, $expected)
     {
         /* Substitute this with a spec pattern or other conditional
@@ -44,7 +44,7 @@ class ValidationTest extends TestCase
      *
      * @return array
      */
-    public function provider_validExample(): array
+    public static function provider_validExample(): array
     {
         return [
 
@@ -100,9 +100,9 @@ class ValidationTest extends TestCase
      * Use the `$this->expectException` to verify which exception class
      * you expect your code to raise.
      *
-     * @dataProvider getTestErrorRaisedData
      *
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('getTestErrorRaisedData')]
     public function testErrorRaised($input): void
     {
         $this->expectException(\TypeError::class);
@@ -120,7 +120,7 @@ class ValidationTest extends TestCase
      *
      * @return array
      */
-    public function getTestErrorRaisedData(): array
+    public static function getTestErrorRaisedData(): array
     {
         return [
             [1.5],

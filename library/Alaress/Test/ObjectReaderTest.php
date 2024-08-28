@@ -61,7 +61,7 @@ class ObjectReaderTest extends TestCase
      *
      * @return array
      */
-    public function stringCoercionDataToStringWithStringOutput()
+    public static function stringCoercionDataToStringWithStringOutput()
     {
         return [
             ['string', 'string'],
@@ -76,7 +76,7 @@ class ObjectReaderTest extends TestCase
      *
      * @return array
      */
-    public function stringCoercionDataToStringWithObjectOutput()
+    public static function stringCoercionDataToStringWithObjectOutput()
     {
         return [
             [new ObjectReaderStringableClass('helloWorld'), new ObjectReaderStringableClass('helloWorld'),],
@@ -88,7 +88,7 @@ class ObjectReaderTest extends TestCase
      *
      * @return array
      */
-    public function stringCoercionDataInvalid()
+    public static function stringCoercionDataInvalid()
     {
         return [
             [['a', 'b', 'c']],
@@ -99,10 +99,10 @@ class ObjectReaderTest extends TestCase
     /**
      * Test coercion of values to string
      *
-     * @dataProvider stringCoercionDataToStringWithStringOutput
      * @param mixed  $input
      * @param string $expected
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('stringCoercionDataToStringWithStringOutput')]
     public function testCoerceToStringWithStringOutput($input, $expected)
     {
         $reader = new ObjectReader();
@@ -114,10 +114,10 @@ class ObjectReaderTest extends TestCase
     /**
      * Test coercion of values to string
      *
-     * @dataProvider stringCoercionDataToStringWithObjectOutput
      * @param mixed  $input
      * @param object $expected
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('stringCoercionDataToStringWithObjectOutput')]
     public function testCoerceToStringWithObjectOutput($input, $expected)
     {
         $reader = new ObjectReader();
@@ -129,10 +129,10 @@ class ObjectReaderTest extends TestCase
     /**
      * Test coercion of values to string
      *
-     * @dataProvider stringCoercionDataInvalid
      * @param mixed $input
      *
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('stringCoercionDataInvalid')]
     public function testCoerceToStringInvalid($input)
     {
         $this->expectException(DomainException::class);

@@ -14,9 +14,7 @@ use Schoolbox\LTI\User\Codec;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
 
-/**
- * @covers \Schoolbox\LTI\User\Codec
- */
+#[\PHPUnit\Framework\Attributes\CoversClass(\Schoolbox\LTI\User\Codec::class)]
 class CodecTest extends TestCase
 {
     /**
@@ -47,12 +45,10 @@ class CodecTest extends TestCase
     }
 
     /**
-     * @dataProvider getTestEncodeData
-     * @covers \Schoolbox\LTI\User\Codec::encode
-     *
      * @param User|null   $user
      * @param string|null $expected
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('getTestEncodeData')]
     public function testEncode(?User $user, ?string $expected): void
     {
         $this->assertSame($expected, $this->userCodec->encode($user));
@@ -63,7 +59,7 @@ class CodecTest extends TestCase
      *
      * @return iterable
      */
-    public function getTestEncodeData(): iterable
+    public static function getTestEncodeData(): iterable
     {
         yield 'Null user' => [
             null,
@@ -80,12 +76,10 @@ class CodecTest extends TestCase
     }
 
     /**
-     * @dataProvider getTestDecodeData
-     * @covers \Schoolbox\LTI\User\Codec::decode
-     *
      * @param string|null $encoded
      * @param User|null   $expected
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('getTestDecodeData')]
     public function testDecode(?string $encoded, ?User $expected): void
     {
         $decoded = $this->userCodec->decode($encoded);
@@ -102,7 +96,7 @@ class CodecTest extends TestCase
      *
      * @return iterable
      */
-    public function getTestDecodeData(): iterable
+    public static function getTestDecodeData(): iterable
     {
         yield 'Null user' => [
             null,

@@ -15,11 +15,10 @@ use PHPUnit\Framework\TestCase;
 
 class SubscriptionDictionaryTest extends TestCase
 {
-
     /**
      * @return array
      */
-    public function dataInvalidConstruction()
+    public static function dataInvalidConstruction()
     {
         return [
             [ '' ],
@@ -32,9 +31,9 @@ class SubscriptionDictionaryTest extends TestCase
      * Test that a router cannot be constructed without a delimiter
      *
      *
-     * @dataProvider dataInvalidConstruction
      * @param string $delim
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('dataInvalidConstruction')]
     public function testInvalidConstruction($delim)
     {
         $this->expectException(InvalidArgumentException::class);
@@ -58,7 +57,7 @@ class SubscriptionDictionaryTest extends TestCase
     /**
      * @return array
      */
-    public function dataShardTranslation()
+    public static function dataShardTranslation()
     {
         return [
             [ '42',      '(\d+)' ],
@@ -70,11 +69,11 @@ class SubscriptionDictionaryTest extends TestCase
 
 
     /**
-     * @dataProvider dataShardTranslation
      *
      * @param string $shard
      * @param string $expected
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('dataShardTranslation')]
     public function testShardTranslation($shard, $expected)
     {
         $dic = new SubscriptionDictionary(' ');
@@ -86,7 +85,7 @@ class SubscriptionDictionaryTest extends TestCase
     /**
      * @return array
      */
-    public function dataWholeTranslation()
+    public static function dataWholeTranslation()
     {
         $word = '[^\:]+';
 
@@ -103,11 +102,11 @@ class SubscriptionDictionaryTest extends TestCase
 
 
     /**
-     * @dataProvider dataWholeTranslation
      *
      * @param string $whole
      * @param string $expected
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('dataWholeTranslation')]
     public function testWholeTranslation($whole, $expected)
     {
         $dic = new SubscriptionDictionary(':');

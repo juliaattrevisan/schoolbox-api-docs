@@ -26,17 +26,15 @@ use Schoolbox\Role;
  */
 class ValidStudentPhotosAvailableTest extends TestCase
 {
-
     /**
-     * @dataProvider provider_validStudentPhotosAvailable
      * @param null|string $apiKey
      * @param bool $featureFlag
      * @param \Schoolbox\User $viewer
      * @param \Schoolbox\User  $viewee
      * @param int $expected
      * @throws \PHPUnit\Framework\ExpectationFailedException
-     * @throws \SebastianBergmann\RecursionContext\InvalidArgumentException
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('provider_validStudentPhotosAvailable')]
     public function testValidStudentPhotosAvailable($apiKey, $featureFlag, $viewer, $viewee, $expected)
     {
 
@@ -53,7 +51,7 @@ class ValidStudentPhotosAvailableTest extends TestCase
      *
      * @return array
      */
-    public function provider_validStudentPhotosAvailable(): array
+    public static function provider_validStudentPhotosAvailable(): array
     {
 
         /* A classically-correct user

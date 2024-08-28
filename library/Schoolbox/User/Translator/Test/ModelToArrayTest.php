@@ -25,9 +25,8 @@ use Schoolbox\YearLevel\Model as YearLevel;
 
 /**
  * Test for the user model to array translator.
- *
- * @covers \Schoolbox\User\Translator\ModelToArray
  */
+#[\PHPUnit\Framework\Attributes\CoversClass(\Schoolbox\User\Translator\ModelToArray::class)]
 class ModelToArrayTest extends TestCase
 {
     /**
@@ -35,7 +34,7 @@ class ModelToArrayTest extends TestCase
      *
      * @return iterable
      */
-    public function getTestInvokeData(): iterable
+    public static function getTestInvokeData(): iterable
     {
         $configLoader = new ArrayLoader([
             ConfigMapper::NAME_MAIL_ADDRESS => 'test.schoolbox.com.au',
@@ -364,11 +363,10 @@ class ModelToArrayTest extends TestCase
     }
 
     /**
-     * @dataProvider getTestInvokeData
-     * @covers       \Schoolbox\User\Translator\ModelToArray::__invoke
      * @param User  $input
      * @param array $expected
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('getTestInvokeData')]
     public function testInvoke(User $input, array $expected): void
     {
         self::assertSame($expected, (new User\Translator\ModelToArray())($input));

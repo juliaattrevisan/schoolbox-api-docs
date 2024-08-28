@@ -21,7 +21,7 @@ class BasicGetSetTest extends TestCase
 
     protected function getTestDateObject(DateTimeZone $timezone = null)
     {
-        return $this->buildDateObject('2015-03-25 08:01:13', Alaress_Date_Format::DATABASE_FORMAT, $timezone);
+        return self::buildDateObject('2015-03-25 08:01:13', Alaress_Date_Format::DATABASE_FORMAT, $timezone);
     }
 
     public function testGetSetSecond()
@@ -90,7 +90,7 @@ class BasicGetSetTest extends TestCase
     public function testGetSetTimestamp()
     {
         // a timezone is required to test timestamps reliably
-        $date = $this->buildDateObject(time(), 'U', new DateTimeZone('UTC'));
+        $date = self::buildDateObject(time(), 'U', new DateTimeZone('UTC'));
         $date->setTimestamp(1);
         $this->assertEquals($date->getDatabase(), '1970-01-01 00:00:01');
     }

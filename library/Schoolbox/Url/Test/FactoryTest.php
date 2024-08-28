@@ -15,18 +15,14 @@ use Schoolbox\Url\Factory;
 use PHPUnit\Framework\TestCase;
 use Schoolbox\Url\Uri;
 
-/**
- * @covers \Schoolbox\Url\Factory
- */
+#[\PHPUnit\Framework\Attributes\CoversClass(\Schoolbox\Url\Factory::class)]
 class FactoryTest extends TestCase
 {
     /**
-     * @covers \Schoolbox\Url\Factory::buildFullyQualified
-     * @dataProvider getTestBuildFullyQualifiedData
-     *
      * @param UriInterface $expected
      * @param array        $config
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('getTestBuildFullyQualifiedData')]
     public function testBuildFullyQualified(UriInterface $expected, array $config): void
     {
         $configLoader = new ArrayLoader($config);
@@ -42,7 +38,7 @@ class FactoryTest extends TestCase
      *
      * @return iterable
      */
-    public function getTestBuildFullyQualifiedData(): iterable
+    public static function getTestBuildFullyQualifiedData(): iterable
     {
         return [
             'no site_hostname, no site_domain' => [

@@ -35,9 +35,7 @@ use Schoolbox\Learning\MarkScheme\Factory;
  */
 class CapabilityMarkTypeTest extends TestCase
 {
-
     /**
-     * @dataProvider providerValidCapabilityMarkType
      * @param MarkType                    $dueWorkMarkType
      * @param MarkType                    $capabilityMarkType
      * @param GradeLevel\Group\Model|null $capabilityGradeGroup
@@ -45,6 +43,7 @@ class CapabilityMarkTypeTest extends TestCase
      * @throws \DomainException
      * @throws \RangeException
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerValidCapabilityMarkType')]
     public function testValidCapabilityMarkType(MarkType $dueWorkMarkType, MarkType $capabilityMarkType, ?GradeLevel\Group\Model $capabilityGradeGroup, array $expected)
     {
         $generator        = new Generator();
@@ -88,7 +87,7 @@ class CapabilityMarkTypeTest extends TestCase
      *
      * @return array
      */
-    public function providerValidCapabilityMarkType(): array
+    public static function providerValidCapabilityMarkType(): array
     {
         $markTypeNone = (new MarkType())->setId(MarkType::TYPE_NONE)->setSlug(MarkType::SLUG_NONE);
         $markTypeTotal = (new MarkType())->setId(MarkType::TYPE_TOTAL)->setSlug(MarkType::SLUG_TOTAL);

@@ -35,8 +35,8 @@ use UnexpectedValueException;
  *     └-- id=3, inherit=1
  *
  * @codeCoverageIgnore
- * @covers \Schoolbox\Resource\Folder\NNIAN
  */
+#[\PHPUnit\Framework\Attributes\CoversClass(\Schoolbox\Resource\Folder\NNIAN::class)]
 class NNIANTest extends TestCase
 {
     // ===================================== Hard-coded state =====================================
@@ -133,7 +133,7 @@ class NNIANTest extends TestCase
     {
         $this->expectException(Mapper\Exception::class);
         $folderData = [[1, Folder\Model::ROOT_ID, true]];
-        $folders    = $this->getFolders($folderData);
+        $folders    = self::getFolders($folderData);
 
         $this->resetNnianInstance();
         $nnian = Folder\NNIAN::getInstance($this->getMockFolderMapper($folders, true));
@@ -161,7 +161,7 @@ class NNIANTest extends TestCase
             [2, 3, true],
             [3, 2, true],
         ];
-        $folders    = $this->getFolders($folderData);
+        $folders    = self::getFolders($folderData);
 
         $this->resetNnianInstance();
         $nnian = Folder\NNIAN::getInstance($this->getMockFolderMapper($folders, true));
@@ -174,8 +174,6 @@ class NNIANTest extends TestCase
     /**
      * Test non-inheriting folders
      *
-     * @dataProvider providerNnianAncestorsNotInheriting
-     * @param Folder\NNIAN $nnian
      * @param Folder\Model $nonInheritingFolder
      * @throws InsufficientHydrationException
      * @throws InvalidArgumentException
@@ -185,8 +183,10 @@ class NNIANTest extends TestCase
      * @throws Mapper\Exception\NotFound
      * @throws UnexpectedValueException
      */
-    public function testGetNnianAncestorsNotInheriting(Folder\NNIAN $nnian, Folder\Model $nonInheritingFolder): void
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerNnianAncestorsNotInheriting')]
+    public function testGetNnianAncestorsNotInheriting(Folder\Model $nonInheritingFolder): void
     {
+        $nnian = $this->newNnian();
         $this->assertEquals(
             $nonInheritingFolder->getId(),
             $nnian->findNearestNonInheritingAncestralNode($nonInheritingFolder)->getId()
@@ -197,8 +197,6 @@ class NNIANTest extends TestCase
     /**
      * Test inheriting folders
      *
-     * @dataProvider providerNnianAncestorsInheriting
-     * @param Folder\NNIAN $nnian
      * @param Folder\Model $inheritingFolder
      * @param Folder\Model $expectedNnian
      * @throws InsufficientHydrationException
@@ -209,11 +207,12 @@ class NNIANTest extends TestCase
      * @throws Mapper\DefinitionException
      * @throws UnexpectedValueException
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerNnianAncestorsInheriting')]
     public function testGetNnianAncestorsInheriting(
-        Folder\NNIAN $nnian,
         Folder\Model $inheritingFolder,
         Folder\Model $expectedNnian
     ): void {
+        $nnian = $this->newNnian();
         $this->assertEquals(
             $expectedNnian->getId(),
             $nnian->findNearestNonInheritingAncestralNode($inheritingFolder)->getId()
@@ -224,8 +223,6 @@ class NNIANTest extends TestCase
     /**
      * Tests a folder that does not have parent hydrated can be hydrated on the fly
      *
-     * @dataProvider providerNnianAncestorsNotInheriting
-     * @param Folder\NNIAN $nnian
      * @param Folder\Model $notInheritingFolder
      * @throws InsufficientHydrationException
      * @throws InvalidArgumentException
@@ -235,11 +232,12 @@ class NNIANTest extends TestCase
      * @throws Mapper\DefinitionException
      * @throws UnexpectedValueException
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerNnianAncestorsNotInheriting')]
     public function testFindNearestNonInheritingAncestralNodeParentNotHydrated(
-        Folder\NNIAN $nnian,
         Folder\Model $notInheritingFolder
     ): void {
-        $stub = (new Folder\Model())->setId($notInheritingFolder->getId());
+        $nnian = $this->newNnian();
+        $stub  = (new Folder\Model())->setId($notInheritingFolder->getId());
         $this->assertEquals(
             $stub->getId(),
             $nnian->findNearestNonInheritingAncestralNode($stub)->getId()
@@ -250,7 +248,6 @@ class NNIANTest extends TestCase
     /**
      * Tests that the code throws an appropriate exception if a circular inheritance graph is encountered.
      *
-     * @dataProvider providerDetectCycle
      * @param bool $beforeCycle Should we test a node prior to cycle, or inside cycle?
      * @param int  $n           Number of nodes in cycle. Must be >= 2
      * @throws Framework\Exception
@@ -261,6 +258,7 @@ class NNIANTest extends TestCase
      * @throws UnexpectedValueException
      *
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerDetectCycle')]
     public function testDetectCycle(bool $beforeCycle, int $n): void
     {
         $this->expectException(MapperException::class);
@@ -302,19 +300,17 @@ class NNIANTest extends TestCase
     /**
      * @return array
      * @throws Framework\Exception
-     * @throws ReflectionException
      * @throws UnexpectedValueException
      */
-    public function providerNnianAncestorsNotInheriting(): array
+    public static function providerNnianAncestorsNotInheriting(): array
     {
-        $nnian   = $this->newNnian();
-        $folders = $this->getFolders();
+        $folders = self::getFolders();
         return [
             // Double tap first test to invoke cache
-            [$nnian, $folders->getOffset(1)],
-            [$nnian, $folders->getOffset(1)],
-            [$nnian, $folders->getOffset(2)],
-            [$nnian, $folders->getOffset(4)],
+            [$folders->getOffset(1)],
+            [$folders->getOffset(1)],
+            [$folders->getOffset(2)],
+            [$folders->getOffset(4)],
         ];
     }
 
@@ -322,19 +318,17 @@ class NNIANTest extends TestCase
     /**
      * @return array
      * @throws Framework\Exception
-     * @throws ReflectionException
      * @throws UnexpectedValueException
      */
-    public function providerNnianAncestorsInheriting(): array
+    public static function providerNnianAncestorsInheriting(): array
     {
-        $nnian   = $this->newNnian();
-        $folders = $this->getFolders();
+        $folders = self::getFolders();
         return [
             // Double tap first test to invoke cache
-            [$nnian, $folders->getOffset(3), $folders->getOffset(1)],
-            [$nnian, $folders->getOffset(3), $folders->getOffset(1)],
-            [$nnian, $folders->getOffset(5), $folders->getOffset(4)],
-            [$nnian, $folders->getOffset(6), $folders->getOffset(4)],
+            [$folders->getOffset(3), $folders->getOffset(1)],
+            [$folders->getOffset(3), $folders->getOffset(1)],
+            [$folders->getOffset(5), $folders->getOffset(4)],
+            [$folders->getOffset(6), $folders->getOffset(4)],
         ];
     }
 
@@ -342,7 +336,7 @@ class NNIANTest extends TestCase
     /**
      * @return array
      */
-    public function providerDetectCycle(): array
+    public static function providerDetectCycle(): array
     {
         // bool $beforeCycle, int $n
         return [
@@ -371,7 +365,7 @@ class NNIANTest extends TestCase
         $this->resetNnianInstance();
 
         return Folder\NNIAN::getInstance(
-            $this->getMockFolderMapper($this->getFolders($folderData), $isCacheEnabled ?? true)
+            $this->getMockFolderMapper(self::getFolders($folderData), $isCacheEnabled ?? true)
         );
     }
 
@@ -396,7 +390,7 @@ class NNIANTest extends TestCase
      * @return GenericCollection
      * @throws UnexpectedValueException
      */
-    private function getFolders(array $folderData = null): GenericCollection
+    private static function getFolders(array $folderData = null): GenericCollection
     {
         $folderData = $folderData ?? self::FOLDER_DATA;
         $folders    = \Schoolbox\Resource\Folder\Mapper::getInstance()->createCollection();

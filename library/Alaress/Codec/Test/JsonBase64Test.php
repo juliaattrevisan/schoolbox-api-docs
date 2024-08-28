@@ -15,9 +15,8 @@ use TypeError;
 
 /**
  * Test class for the JSON-base64 codec.
- *
- * @covers \Alaress\Codec\Json\Base64
  */
+#[\PHPUnit\Framework\Attributes\CoversClass(\Alaress\Codec\Json\Base64::class)]
 class JsonBase64Test extends TestCase
 {
     /**
@@ -25,7 +24,7 @@ class JsonBase64Test extends TestCase
      *
      * @return iterable
      */
-    public function getTestEncodeData(): iterable
+    public static function getTestEncodeData(): iterable
     {
         // Integers
         yield '0'      => [0, 'MA=='];
@@ -57,7 +56,7 @@ class JsonBase64Test extends TestCase
      *
      * @return iterable
      */
-    public function getTestInvalidEncodedValueData(): iterable
+    public static function getTestInvalidEncodedValueData(): iterable
     {
         yield 'null'     => [null];
         yield 'int'      => [1];
@@ -70,11 +69,10 @@ class JsonBase64Test extends TestCase
 
 
     /**
-     * @covers       \Alaress\Codec\Json\Base64::encode
-     * @dataProvider getTestEncodeData
      * @param mixed  $rawValue
      * @param string $encodedValue
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('getTestEncodeData')]
     public function testEncode($rawValue, string $encodedValue): void
     {
         $codec = new Base64();
@@ -83,11 +81,10 @@ class JsonBase64Test extends TestCase
 
 
     /**
-     * @covers       \Alaress\Codec\Json\Base64::decode
-     * @dataProvider getTestEncodeData
      * @param mixed  $rawValue
      * @param string $encodedValue
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('getTestEncodeData')]
     public function testDecode($rawValue, string $encodedValue): void
     {
         $codec = new Base64();
@@ -98,11 +95,9 @@ class JsonBase64Test extends TestCase
     /**
      * Test that encoding then decoding a value results in the same value.
      *
-     * @covers       \Alaress\Codec\Json\Base64::encode
-     * @covers       \Alaress\Codec\Json\Base64::decode
-     * @dataProvider getTestEncodeData
      * @param mixed  $rawValue
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('getTestEncodeData')]
     public function testLosslessEncode($rawValue): void
     {
         $codec = new Base64();
@@ -114,12 +109,10 @@ class JsonBase64Test extends TestCase
      * Test that decoding then encoding a value results in the same encoded
      * value.
      *
-     * @covers       \Alaress\Codec\Json\Base64::encode
-     * @covers       \Alaress\Codec\Json\Base64::decode
-     * @dataProvider getTestEncodeData
      * @param int    $rawValue
      * @param string $encodedValue
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('getTestEncodeData')]
     public function testLosslessDecode($rawValue, string $encodedValue): void
     {
         $codec = new Base64();
@@ -130,11 +123,10 @@ class JsonBase64Test extends TestCase
     /**
      * Test that attempting to decode a non-string raises an error.
      *
-     * @covers            \Alaress\Codec\Json\Base64::decode
      *
-     * @dataProvider      getTestInvalidEncodedValueData
      * @param mixed $encodedValue
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('getTestInvalidEncodedValueData')]
     public function testInvalidEncodedValue($encodedValue): void
     {
         $this->expectException(TypeError::class);

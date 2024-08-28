@@ -30,7 +30,7 @@ class BooleanTest extends TestCase
     /**
      * @inheritdoc
      */
-    public function getTestHydrate()
+    public static function getTestHydrate()
     {
         return [
             [true, true],
@@ -51,7 +51,7 @@ class BooleanTest extends TestCase
     /**
      * @inheritdoc
      */
-    public function getTestDehydrate()
+    public static function getTestDehydrate()
     {
         return [
             [true, 1],

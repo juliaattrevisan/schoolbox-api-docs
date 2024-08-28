@@ -477,7 +477,7 @@ class Controller extends Base
             )
         );
         // Not the best place to put it but it will do for now
-        $this->postOutputCallbacks[] = function () use ($rulesetId, $provisioner) {
+        $this->postOutputCallbacks[] = function () use ($rulesetId, $provisioner): void {
             $this->syncCallback($rulesetId, $provisioner, false);
         };
     }
@@ -501,7 +501,7 @@ class Controller extends Base
             )
         );
         // Not the best place to put it but it will do for now
-        $this->postOutputCallbacks[] = function () use ($rulesetId, $provisioner) {
+        $this->postOutputCallbacks[] = function () use ($rulesetId, $provisioner): void {
             $this->syncCallback($rulesetId, $provisioner, true);
         };
     }

@@ -167,7 +167,7 @@ abstract class AbstractScheduler extends SignalEmitter implements TaskResponseHa
      */
     protected function timerCallback(TriggerInterface $trigger): callable
     {
-        return function () use ($trigger) {
+        return function () use ($trigger): void {
             $this->dispatchTrigger($trigger);
         };
     }

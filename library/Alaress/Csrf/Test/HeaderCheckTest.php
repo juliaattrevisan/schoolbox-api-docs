@@ -20,7 +20,7 @@ class HeaderCheckTest extends TestCase
      *
      * @return array
      */
-    public function providerForTestHeadersOnly()
+    public static function providerForTestHeadersOnly()
     {
         return [
             'validOriginAndHost' => [
@@ -131,11 +131,11 @@ class HeaderCheckTest extends TestCase
     }
 
     /**
-     * @dataProvider providerForTestHeadersOnly
      *
      * @param array $serverVars
      * @param bool  $expectedResult
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerForTestHeadersOnly')]
     public function testHeadersOnly(array $serverVars, bool $expectedResult)
     {
         $check = new HeaderCheck($serverVars);
@@ -147,7 +147,7 @@ class HeaderCheckTest extends TestCase
      *
      * @return array
      */
-    public function providerForHeadersAndValidHost()
+    public static function providerForHeadersAndValidHost()
     {
         return [
             'validOrigin' => [
@@ -195,12 +195,12 @@ class HeaderCheckTest extends TestCase
     }
 
     /**
-     * @dataProvider providerForHeadersAndValidHost
      *
      * @param array       $serverVars
      * @param null|string $validHost
      * @param bool        $expectedResult
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerForHeadersAndValidHost')]
     public function testHeadersAndValidHost(array $serverVars, ?string $validHost, bool $expectedResult)
     {
         $check = new HeaderCheck($serverVars, $validHost);

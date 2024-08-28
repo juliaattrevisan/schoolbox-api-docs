@@ -19,15 +19,15 @@ use Schoolbox\Learning\Moment\Evidence\Model;
 use Schoolbox\Learning\Moment\Evidence\Translator\ArrayToModel\AllFields;
 use Schoolbox\Resource\Attachment\Collector\Collector;
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
+use Schoolbox\Resource\Storage\IStorage;
 use Schoolbox\Resource\Storage\Model as Storage;
 use Schoolbox\User;
 
 /**
  * Tests for converting from an array to model representation of learning moment
  * evidence.
- *
- * @covers \Schoolbox\Learning\Moment\Evidence\Translator\ArrayToModel\AllFields
  */
+#[\PHPUnit\Framework\Attributes\CoversClass(\Schoolbox\Learning\Moment\Evidence\Translator\ArrayToModel\AllFields::class)]
 class AllFieldsTest extends TestCase
 {
     /**
@@ -35,7 +35,7 @@ class AllFieldsTest extends TestCase
      *
      * @return iterable
      */
-    public function getTestInvokeCreateData(): iterable
+    public static function getTestInvokeCreateData(): iterable
     {
         yield 'empty' => [[], new Model()];
 
@@ -91,16 +91,10 @@ class AllFieldsTest extends TestCase
                 ->setDiscussionThread((new DiscussionThread())->setId(14)),
         ];
 
-        // Storage file upload: require a mock here
-        $storage       = (new Storage())
+        // Storage file upload
+        $storage = (new Storage())
             ->setHash('1234567890123456789012345678901234567890')
             ->setBasename('test.gif');
-        $collectorMock = $this->createMock(Collector::class);
-        $collectorMock->method('getFirst')->willReturn($storage);
-
-        /** @var CollectorFactory|MockObject $collectorFactoryMock */
-        $collectorFactoryMock = $this->createMock(CollectorFactory::class);
-        $collectorFactoryMock->method('build')->willReturn($collectorMock);
 
         yield 'file upload' => [
             [
@@ -109,7 +103,7 @@ class AllFieldsTest extends TestCase
             (new Model())
                 ->setStorage($storage)
                 ->setFilename('test.gif'),
-            new AllFields($collectorFactoryMock),
+            $storage,
         ];
     }
 
@@ -119,7 +113,7 @@ class AllFieldsTest extends TestCase
      *
      * @return iterable
      */
-    public function getTestInvokeUpdateData(): iterable
+    public static function getTestInvokeUpdateData(): iterable
     {
         $oldDate   = '2020-01-01T00:00:00+00:00';
         $newDate   = '2020-02-01T00:00:00+00:00';
@@ -263,15 +257,9 @@ class AllFieldsTest extends TestCase
 
         // File is mutable, by either a file upload or a storage+filename
         // Will need to mock the collector factory though
-        $storage       = (new Storage())
+        $storage1 = (new Storage())
             ->setHash('9876543210987654321098765432109876543210')
             ->setBasename('test.png');
-        $collectorMock = $this->createMock(Collector::class);
-        $collectorMock->method('getFirst')->willReturn($storage);
-
-        /** @var CollectorFactory|MockObject $collectorFactoryMock */
-        $collectorFactoryMock = $this->createMock(CollectorFactory::class);
-        $collectorFactoryMock->method('build')->willReturn($collectorMock);
 
         yield 'update file' => [
             [
@@ -279,9 +267,9 @@ class AllFieldsTest extends TestCase
             ],
             (clone $baseModel),
             (clone $baseModel)
-                ->setStorage($storage)
+                ->setStorage($storage1)
                 ->setFilename('test.png'),
-            new AllFields($collectorFactoryMock),
+            $storage1,
         ];
 
         yield 'null file' => [
@@ -297,14 +285,14 @@ class AllFieldsTest extends TestCase
 
         // Storage and filename are mutable:
         // but will they ever be mutated via their individual fields?
+        $storage2 = (new Storage())->setHash('12345');
         yield 'update storage' => [
             [
                 'storage' => ['hash' => '12345'],
             ],
             (clone $baseModel),
-            (clone $baseModel)
-                ->setStorage((new Storage())->setHash('12345')),
-            new AllFields($collectorFactoryMock),
+            (clone $baseModel)->setStorage($storage2),
+            $storage2,
         ];
 
         yield 'null storage' => [
@@ -330,9 +318,7 @@ class AllFieldsTest extends TestCase
                 'filename' => 'test.png',
             ],
             (clone $baseModel),
-            (clone $baseModel)
-                ->setFilename('test.png'),
-            new AllFields($collectorFactoryMock),
+            (clone $baseModel)->setFilename('test.png'),
         ];
 
         yield 'null filename' => [
@@ -351,7 +337,7 @@ class AllFieldsTest extends TestCase
      *
      * @return iterable
      */
-    public function getTestInvokeUpdateInvalidValuesData(): iterable
+    public static function getTestInvokeUpdateInvalidValuesData(): iterable
     {
         $baseModel = (new Model())
             ->setCreator((new User())->setId(1))
@@ -377,18 +363,18 @@ class AllFieldsTest extends TestCase
     /**
      * Test that creation of a new model from an array works as expected.
      *
-     * @dataProvider getTestInvokeCreateData
-     * @covers       \Schoolbox\Learning\Moment\Evidence\Translator\ArrayToModel\AllFields::__invoke
      *
-     * @param array          $input
-     * @param Model          $expected
-     * @param AllFields|null $converter
+     * @param array         $input
+     * @param Model         $expected
+     * @param IStorage|null $storage   If provided: the storage object the
+     *                                 converter will return
      *
      * @noinspection PhpDocMissingThrowsInspection This ought not be thrown by the converter
      */
-    public function testInvokeCreate(array $input, Model $expected, AllFields $converter = null): void
+    #[\PHPUnit\Framework\Attributes\DataProvider('getTestInvokeCreateData')]
+    public function testInvokeCreate(array $input, Model $expected, ?IStorage $storage = null): void
     {
-        $converter = $this->createConverterIfNull($converter);
+        $converter = $this->createConverter($storage);
 
         /** @noinspection PhpUnhandledExceptionInspection */
         self::assertEquals($expected, $converter($input));
@@ -398,23 +384,23 @@ class AllFieldsTest extends TestCase
     /**
      * Test that update of an existing model from an array works as expected.
      *
-     * @dataProvider getTestInvokeUpdateData
-     * @covers       \Schoolbox\Learning\Moment\Evidence\Translator\ArrayToModel\AllFields::__invoke
      *
-     * @param array          $input
-     * @param Model          $existing
-     * @param Model          $expected
-     * @param AllFields|null $converter
+     * @param array         $input
+     * @param Model         $existing
+     * @param Model         $expected
+     * @param IStorage|null $storage    If provided: the storage object the
+     *                                  converter will return
      *
      * @noinspection PhpDocMissingThrowsInspection This ought not be thrown by the converter
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('getTestInvokeUpdateData')]
     public function testInvokeUpdate(
         array $input,
         Model $existing,
         Model $expected,
-        AllFields $converter = null
+        ?IStorage $storage = null,
     ): void {
-        $converter = $this->createConverterIfNull($converter);
+        $converter = $this->createConverter($storage);
 
         /** @noinspection PhpUnhandledExceptionInspection */
         self::assertEquals($expected, $converter($input, $existing));
@@ -426,8 +412,6 @@ class AllFieldsTest extends TestCase
      * set fields which would cause an error: these fields should raise a
      * warning message, and leave the value as is.
      *
-     * @dataProvider getTestInvokeUpdateInvalidValuesData
-     * @covers       \Schoolbox\Learning\Moment\Evidence\Translator\ArrayToModel\AllFields::__invoke
      *
      * @param array $input
      * @param Model $existing
@@ -435,10 +419,11 @@ class AllFieldsTest extends TestCase
      *
      * @noinspection PhpDocMissingThrowsInspection This ought not be thrown by the converter
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('getTestInvokeUpdateInvalidValuesData')]
     public function testInvokeUpdateInvalidValues(array $input, Model $existing, Model $expected): void
     {
         $this->expectException(InvalidArgumentException::class);
-        $converter = $this->createConverterIfNull();
+        $converter = $this->createConverter();
 
         /** @noinspection PhpUnhandledExceptionInspection */
         self::assertEquals($expected, $converter($input, $existing));
@@ -451,16 +436,23 @@ class AllFieldsTest extends TestCase
      * If it's null, it creates a converter which contains a mock of the storage
      * object collector factory.
      *
-     * @param AllFields|null $converter
+     * @param IStorage|null $storage
      * @return AllFields
      */
-    private function createConverterIfNull(?AllFields $converter = null): AllFields
+    private function createConverter(?IStorage $storage = null): AllFields
     {
-        if (!$converter) {
+        if ($storage) {
+            $collectorMock = $this->createMock(Collector::class);
+            $collectorMock->method('getFirst')->willReturn($storage);
+
             /** @var CollectorFactory|MockObject $collectorFactoryMock */
             $collectorFactoryMock = $this->createMock(CollectorFactory::class);
-            $converter            = new AllFields($collectorFactoryMock);
+            $collectorFactoryMock->method('build')->willReturn($collectorMock);
+            return new AllFields($collectorFactoryMock);
         }
-        return $converter;
+
+        /** @var CollectorFactory|MockObject $collectorFactoryMock */
+        $collectorFactoryMock = $this->createMock(CollectorFactory::class);
+        return new AllFields($collectorFactoryMock);
     }
 }

@@ -13,25 +13,23 @@ use PHPUnit\Framework as PHPUnitFramework;
 use PHPUnit\Framework\TestCase;
 use Schoolbox\External\Importer\Endpoint\Scheduler;
 use Schoolbox\External\Importer\Endpoint\ValidScheduleExecution;
-use SebastianBergmann\RecursionContext;
 
 /**
  * Class ScheduleTest
  *
  * @package Schoolbox\External\Importer\Endpoint\Test
  * @codeCoverageIgnore
- * @covers \Schoolbox\External\Importer\Endpoint\ValidScheduleExecution
  */
+#[\PHPUnit\Framework\Attributes\CoversClass(\Schoolbox\External\Importer\Endpoint\ValidScheduleExecution::class)]
 class ScheduleTest extends TestCase
 {
-
     /**
-     * @dataProvider providerValidHourlyScheduleFrequency
      *
      * @param string $frequency
      * @param int    $now
      * @param bool   $expected
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerValidHourlyScheduleFrequency')]
     public function testHourlyScheduleFrequency(string $frequency, int $now, bool $expected): void
     {
         $scheduler = new ValidScheduleExecution();
@@ -45,7 +43,7 @@ class ScheduleTest extends TestCase
      *
      * @return array
      */
-    public function providerValidHourlyScheduleFrequency(): array
+    public static function providerValidHourlyScheduleFrequency(): array
     {
         return [
             'Hourly 1' => [
@@ -70,12 +68,12 @@ class ScheduleTest extends TestCase
 
 
     /**
-     * @dataProvider providerValidTwiceDailyScheduleFrequency
      *
      * @param string $frequency
      * @param int    $now
      * @param bool   $expected
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerValidTwiceDailyScheduleFrequency')]
     public function testTwiceDailyScheduleFrequency(string $frequency, int $now, bool $expected): void
     {
         $scheduler = new ValidScheduleExecution();
@@ -89,7 +87,7 @@ class ScheduleTest extends TestCase
      *
      * @return array
      */
-    public function providerValidTwiceDailyScheduleFrequency(): array
+    public static function providerValidTwiceDailyScheduleFrequency(): array
     {
         return [
             'Twice Daily 1' => [
@@ -144,12 +142,12 @@ class ScheduleTest extends TestCase
 
 
     /**
-     * @dataProvider providerValidDailyScheduleFrequency
      *
      * @param string $frequency
      * @param int    $now
      * @param bool   $expected
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerValidDailyScheduleFrequency')]
     public function testDailyScheduleFrequency(string $frequency, int $now, bool $expected): void
     {
         $scheduler = new ValidScheduleExecution();
@@ -163,7 +161,7 @@ class ScheduleTest extends TestCase
      *
      * @return array
      */
-    public function providerValidDailyScheduleFrequency(): array
+    public static function providerValidDailyScheduleFrequency(): array
     {
         return [
             'Daily 1' => [
@@ -218,12 +216,12 @@ class ScheduleTest extends TestCase
 
 
     /**
-     * @dataProvider providerValidNoneScheduleFrequency
      *
      * @param string $frequency
      * @param int    $now
      * @param bool   $expected
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerValidNoneScheduleFrequency')]
     public function testNoneScheduleFrequency(string $frequency, int $now, bool $expected): void
     {
         $scheduler = new ValidScheduleExecution();
@@ -237,7 +235,7 @@ class ScheduleTest extends TestCase
      *
      * @return array
      */
-    public function providerValidNoneScheduleFrequency(): array
+    public static function providerValidNoneScheduleFrequency(): array
     {
         return [
             'No schedule 1' => [
@@ -281,14 +279,13 @@ class ScheduleTest extends TestCase
 
 
     /**
-     * @dataProvider providerSchoolboxManagedScheduleFrequency
      *
      * @param string[] $customHours
      * @param int      $now
      * @param bool     $expected
      * @throws PHPUnitFramework\ExpectationFailedException
-     * @throws RecursionContext\InvalidArgumentException
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerSchoolboxManagedScheduleFrequency')]
     public function testSchoolboxManagedScheduleFrequency(array $customHours, int $now, bool $expected): void
     {
         $scheduler = new ValidScheduleExecution();
@@ -302,7 +299,7 @@ class ScheduleTest extends TestCase
      *
      * @return array[]
      */
-    public function providerSchoolboxManagedScheduleFrequency(): array
+    public static function providerSchoolboxManagedScheduleFrequency(): array
     {
         return [
             'No hours'                 => [[], strtotime('2019-12-02 17:13:00'), false],

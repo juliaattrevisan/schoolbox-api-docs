@@ -4177,7 +4177,7 @@ abstract class Mapper implements IMapper
 
         // create a new event, and send it to the scheduler
         try {
-            $this->database->onPersist(function () use ($sessionUser, $verb, $object, $diff) {
+            $this->database->onPersist(function () use ($sessionUser, $verb, $object, $diff): void {
                 $this->getEventPropagator()->propagate($sessionUser, $verb, $object, $this, $diff);
             });
         } catch (\ErrorException $e) {

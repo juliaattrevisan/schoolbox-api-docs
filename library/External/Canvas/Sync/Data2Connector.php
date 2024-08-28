@@ -173,7 +173,7 @@ class Data2Connector
                         }
                     )->then(
                         null,
-                        function (RequestException $e) use ($fileName) {
+                        function (RequestException $e) use ($fileName): void {
                             // epic fail, just exit...
                             // If fallen through to here, there was an error
                             throw new \Schoolbox\Application\Exception\Exception(

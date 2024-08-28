@@ -20,7 +20,7 @@ class SummaryTest extends TestCase
      *
      * @return array
      */
-    public function providerForGetSummary()
+    public static function providerForGetSummary()
     {
         return [
             [
@@ -172,11 +172,11 @@ class SummaryTest extends TestCase
 
     /**
      *
-     * @dataProvider providerForGetSummary
      *
      * @param array $marks
      * @param array $expected
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerForGetSummary')]
     public function testGetSummary($marks, $expected)
     {
         $summary = new Summary($marks);
@@ -190,7 +190,7 @@ class SummaryTest extends TestCase
      *
      * @return array
      */
-    public function providerForGetSummaryWithOutliers()
+    public static function providerForGetSummaryWithOutliers()
     {
         return [
             [
@@ -331,11 +331,11 @@ class SummaryTest extends TestCase
 
     /**
      *
-     * @dataProvider providerForGetSummaryWithOutliers
      *
      * @param array $marks
      * @param array $expected
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerForGetSummaryWithOutliers')]
     public function testGetSummaryWithOutliers($marks, $expected)
     {
         $summary = new Summary($marks);

@@ -470,7 +470,7 @@ class Module extends BaseModule
                 new IsInteractionUnLocked(new LockedChecker($this->getTermMapper())),
                 /* Obey mark visibility setting
                  */
-                new Rule\Callback(function (array $params, User $currentUser) {
+                new Rule\Callback(function (array $params, User $currentUser): void {
                     if (!$params['assessment']->isFeedbackVisibleToUser($currentUser)) {
                         throw new \Alaress\Authorizer\Failure\Unauthorized('Feedback is not allowed by mark visibility.');
                     }

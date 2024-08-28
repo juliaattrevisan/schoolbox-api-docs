@@ -156,7 +156,7 @@ class WriteCache extends ReadCache implements WritableCache
      */
     private function buildSynchroniserCallback(string $routeStorageKey): callable
     {
-        return function ($userId) use ($routeStorageKey) {
+        return function ($userId) use ($routeStorageKey): void {
             // this closure will be called multiple times consecutively if there are concurrent requests
             try {
                 $router = $this->bindIndividual($userId, $routeStorageKey);
@@ -176,7 +176,7 @@ class WriteCache extends ReadCache implements WritableCache
      */
     private function buildSynchroniserDoneCallback(string $instanceId): callable
     {
-        return function () use ($instanceId) {
+        return function () use ($instanceId): void {
             $this->broadcastReload($instanceId);
         };
     }

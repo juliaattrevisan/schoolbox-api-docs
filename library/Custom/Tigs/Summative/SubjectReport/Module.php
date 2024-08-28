@@ -150,7 +150,7 @@ class Module extends Alaress\Module\Module
         return new Rule\LazyCallback(function () {
             return new Rule\All(
                 new Rule\IsLoggedIn(),
-                new Rule\Callback(function (array $params, User $currentUser) {
+                new Rule\Callback(function (array $params, User $currentUser): void {
                     // Because preload exceptions are not handled immediately, we can't fatal if the preload failed.
                     if (!($params['user'] ?? null) instanceof User) {
                         throw new InvalidPath("No user found in route params");
@@ -200,7 +200,7 @@ class Module extends Alaress\Module\Module
                     new Rule\IsSuperuser(),
                     new Rule\HasRole(Role::STAFF),
                     new Rule\All(
-                        new Rule\Callback(function () {
+                        new Rule\Callback(function (): void {
                             if (!$this->getConfig()->get(Config::_TIGS_SUBJECT_REPORT_ENABLED)) {
                                 throw new Alaress\Authorizer\Failure\Unauthorized("Subject Report is disabled");
                             }

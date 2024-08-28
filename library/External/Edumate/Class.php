@@ -18,7 +18,7 @@ class External_Edumate_Class extends External_Edumate_Connection implements Exte
     {
         // Setup handling multiple codes
         $codes = explode(',', $classCode);
-        array_walk($codes, function (&$n) {
+        array_walk($codes, function (&$n): void {
             $n = "'" . $this->quote($n) . "'";
         });
 
@@ -61,7 +61,7 @@ class External_Edumate_Class extends External_Edumate_Connection implements Exte
 
         // Setup handling multiple codes
         $codes = explode(',', $classCode);
-        array_walk($codes, function (&$n) {
+        array_walk($codes, function (&$n): void {
             $n = "'" . $this->quote($n) . "'";
         });
 

@@ -113,7 +113,7 @@ abstract class Module extends BaseModule
         $this->addRoutePermission(
             $authorizer,
             '.*',
-            new Auth\Rule\Callback(function (array $params) {
+            new Auth\Rule\Callback(function (array $params): void {
                 // Only if the thread exists
                 $thread = $params['thread'] ?? null;
                 if (!$thread) {

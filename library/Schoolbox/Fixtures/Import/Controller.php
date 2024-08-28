@@ -427,7 +427,7 @@ class Controller extends Base
 
             $this->updateLog(Controller::RESULT_SUCCESS, null, 0, 0, "Import started");
 
-            $this->postOutputCallbacks[] = function () use ($post) {
+            $this->postOutputCallbacks[] = function () use ($post): void {
                 // Get all uploaded files
 
                 $attachmentObjects = (new CollectorFactory())->build($post['attachment'])->getAll();

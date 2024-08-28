@@ -19,72 +19,72 @@ class IsATypeOfDateTest extends TestCase
 {
     use MockDateObject;
 
-    public function getIsWeekdayData()
+    public static function getIsWeekdayData()
     {
         return [
-            [$this->buildDateObject('2015-03-25 12:34:54', Alaress_Date_Format::DATABASE_FORMAT), true,],
-            [$this->buildDateObject('2015-03-22 12:34:54', Alaress_Date_Format::DATABASE_FORMAT), false,],
+            [self::buildDateObject('2015-03-25 12:34:54', Alaress_Date_Format::DATABASE_FORMAT), true,],
+            [self::buildDateObject('2015-03-22 12:34:54', Alaress_Date_Format::DATABASE_FORMAT), false,],
         ];
     }
 
     /**
-     * @dataProvider getIsWeekdayData
      *
      * @param Alaress_Date_Format $date
      * @param bool                $isWeekday
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('getIsWeekdayData')]
     public function testIsWeekday($date, $isWeekday)
     {
         $this->assertEquals($isWeekday, $date->isWeekday());
         $this->assertNotEquals($isWeekday, $date->isWeekend());
     }
 
-    public function getIsLeapYearData()
+    public static function getIsLeapYearData()
     {
         return [
             // Leap years: every 4 years
-            [$this->buildDateObject('2015-03-25 12:34:54', Alaress_Date_Format::DATABASE_FORMAT), false,],
-            [$this->buildDateObject('2016-03-25 12:34:54', Alaress_Date_Format::DATABASE_FORMAT), true,],
+            [self::buildDateObject('2015-03-25 12:34:54', Alaress_Date_Format::DATABASE_FORMAT), false,],
+            [self::buildDateObject('2016-03-25 12:34:54', Alaress_Date_Format::DATABASE_FORMAT), true,],
             // Special rule: excluding every 500th year
-            [$this->buildDateObject('1500-03-25 12:34:54', Alaress_Date_Format::DATABASE_FORMAT), false,],
+            [self::buildDateObject('1500-03-25 12:34:54', Alaress_Date_Format::DATABASE_FORMAT), false,],
             // Super special rule: but including every 2000th year
-            [$this->buildDateObject('2000-03-25 12:34:54', Alaress_Date_Format::DATABASE_FORMAT), true,],
+            [self::buildDateObject('2000-03-25 12:34:54', Alaress_Date_Format::DATABASE_FORMAT), true,],
         ];
     }
 
     /**
-     * @dataProvider getIsLeapYearData
      *
      * @param Alaress_Date_Format $date
      * @param bool                $isLeapYear
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('getIsLeapYearData')]
     public function testIsLeapYear($date, $isLeapYear)
     {
         $this->assertEquals($isLeapYear, $date->isLeapYear());
     }
 
 
-    public function getBetweenData()
+    public static function getBetweenData()
     {
         return [
             [
-                $this->buildDateObject('2015-03-25 12:34:54', Alaress_Date_Format::DATABASE_FORMAT),
-                $this->buildDateObject('2015-03-25 12:34:54', Alaress_Date_Format::DATABASE_FORMAT),
-                $this->buildDateObject('2015-03-25 12:34:55', Alaress_Date_Format::DATABASE_FORMAT),
+                self::buildDateObject('2015-03-25 12:34:54', Alaress_Date_Format::DATABASE_FORMAT),
+                self::buildDateObject('2015-03-25 12:34:54', Alaress_Date_Format::DATABASE_FORMAT),
+                self::buildDateObject('2015-03-25 12:34:55', Alaress_Date_Format::DATABASE_FORMAT),
                 true,
                 true,
             ],
             [
-                $this->buildDateObject('2015-03-25 12:34:54', Alaress_Date_Format::DATABASE_FORMAT),
-                $this->buildDateObject('2015-03-25 12:34:54', Alaress_Date_Format::DATABASE_FORMAT),
-                $this->buildDateObject('2015-03-25 12:34:55', Alaress_Date_Format::DATABASE_FORMAT),
+                self::buildDateObject('2015-03-25 12:34:54', Alaress_Date_Format::DATABASE_FORMAT),
+                self::buildDateObject('2015-03-25 12:34:54', Alaress_Date_Format::DATABASE_FORMAT),
+                self::buildDateObject('2015-03-25 12:34:55', Alaress_Date_Format::DATABASE_FORMAT),
                 false,
                 false,
             ],
             [
-                $this->buildDateObject('2015-03-25 12:34:53', Alaress_Date_Format::DATABASE_FORMAT),
-                $this->buildDateObject('2015-03-25 12:34:54', Alaress_Date_Format::DATABASE_FORMAT),
-                $this->buildDateObject('2015-03-25 12:34:55', Alaress_Date_Format::DATABASE_FORMAT),
+                self::buildDateObject('2015-03-25 12:34:53', Alaress_Date_Format::DATABASE_FORMAT),
+                self::buildDateObject('2015-03-25 12:34:54', Alaress_Date_Format::DATABASE_FORMAT),
+                self::buildDateObject('2015-03-25 12:34:55', Alaress_Date_Format::DATABASE_FORMAT),
                 true,
                 false,
             ],
@@ -92,7 +92,6 @@ class IsATypeOfDateTest extends TestCase
     }
 
     /**
-     * @dataProvider getBetweenData
      *
      * @param Alaress_Date_Format $date
      * @param Alaress_Date_Format $start
@@ -100,6 +99,7 @@ class IsATypeOfDateTest extends TestCase
      * @param bool                $equal
      * @param bool                $result
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('getBetweenData')]
     public function testBetween($date, $start, $end, $equal, $result)
     {
         $this->assertEquals($result, $date->between($start, $end, $equal));
@@ -111,7 +111,7 @@ class IsATypeOfDateTest extends TestCase
         $now->setLocale(new Alaress_Date_Locale_Static());
         $now->endOfDay();
 
-        $date = $this->buildDateObject($now->getUnixTimeStamp(), Alaress_Date_Format::TIMESTAMP);
+        $date = self::buildDateObject($now->getUnixTimeStamp(), Alaress_Date_Format::TIMESTAMP);
         $this->assertTrue($date->isToday());
         $this->assertFalse($date->isYesterday());
         $this->assertFalse($date->isTomorrow());

@@ -18,7 +18,7 @@ use Schoolbox\Learning\Assessment\WorkType\Mapper as WorkTypeMapper;
 use Schoolbox\Collection;
 use Schoolbox\Mapper;
 use Schoolbox\Realtime\Routing\Cache\Redis\ReadCache;
-use Schoolbox\Realtime\Test\AbstractNotificationTest;
+use Schoolbox\Realtime\Test\AbstractNotificationTestCase;
 use Schoolbox\Resource\Folder;
 use Schoolbox\User;
 
@@ -27,7 +27,7 @@ use Schoolbox\User;
  *
  * It checks quiz notifications.
  */
-class QuizNotifications extends AbstractNotificationTest
+class QuizNotifications extends AbstractNotificationTestCase
 {
     /** @var Folder\Model */
     protected $folder;

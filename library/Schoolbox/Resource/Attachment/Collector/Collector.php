@@ -164,7 +164,7 @@ class Collector
     private function parseKey(string $key): array
     {
         if (preg_match(self::KEY_FORMAT, $key, $matches)) {
-            return [$matches['id'], $matches['basename'] ?? null];
+            return [$matches['id'], $matches['basename']];
         }
 
         // This didn't match?

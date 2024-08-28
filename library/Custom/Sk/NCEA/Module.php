@@ -54,7 +54,7 @@ class Module extends BaseModule
                 new Rule\All(
                     new Rule\All(
                         new Rule\Callback(
-                            function ($params, User $user) {
+                            function ($params, User $user): void {
                                 try {
                                     /** @var \Schoolbox\User $user */
                                     $student = $this->getUserMapper()->findById($params['userId']);

@@ -161,7 +161,7 @@ class Module extends BaseModule
 
         // Associating a discussion thread with a comms article:
         // Use the authorizer the discussion thread uses.
-        $canAssociate = new Rule\Callback(function ($params, ?User $user) {
+        $canAssociate = new Rule\Callback(function ($params, ?User $user): void {
             $authorizer = $this->injector->get('authorizer');
             $rule       = new CanModerateThread($authorizer);
             if (!$rule->hasPermission($params['article'], $user)) {

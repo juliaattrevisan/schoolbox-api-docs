@@ -25,6 +25,7 @@ use Schoolbox\Learning\Assessment\DueWork\Feedback\Model as DueWorkFeedback;
 use Schoolbox\Learning\Assessment\DueWork\File as DueWorkFile;
 use Schoolbox\Learning\Assessment\WorkType\Model as WorkType;
 
+#[\PHPUnit\Framework\Attributes\CoversClass(\Schoolbox\Learning\Assessment\DueWork\Model::class)]
 class DueWorkTest extends TestCase
 {
     use Defaults;
@@ -1166,8 +1167,6 @@ class DueWorkTest extends TestCase
      * * due work accepts none: learner can never respond
      * * due work accepts multiple: learner can always respond, as long as due
      *   work is open
-     *
-     * @covers \Schoolbox\Learning\Assessment\DueWork\Model::canLearnerCreateResponse
      */
     public function testCanLearnerCreateResponseWhenFeedbackRequiresResubmission(): void
     {

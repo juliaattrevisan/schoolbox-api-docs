@@ -27,10 +27,10 @@ class ValidationTest extends TestCase
 
 
     /**
-     * @dataProvider provider_validCompleteDetails
      * @param Model $pd
      * @param int   $expected
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('provider_validCompleteDetails')]
     public function testValidCompleteDetails(Model $pd, $expected)
     {
         $validation = new ValidProfessionalDevelopment($this->states);
@@ -43,7 +43,7 @@ class ValidationTest extends TestCase
      *
      * @return array
      */
-    public function provider_validCompleteDetails(): array
+    public static function provider_validCompleteDetails(): array
     {
         return [
             'Valid Complete Details 1' => [
@@ -86,10 +86,10 @@ class ValidationTest extends TestCase
     }
 
     /**
-     * @dataProvider provider_validState
      * @param Model $pd
      * @param int   $expected
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('provider_validState')]
     public function testValidState(Model $pd, $expected)
     {
         $validation = new ValidProfessionalDevelopment($this->states);
@@ -102,7 +102,7 @@ class ValidationTest extends TestCase
      *
      * @return array
      */
-    public function provider_validState(): array
+    public static function provider_validState(): array
     {
         return [
             'Valid State 1' => [
@@ -145,10 +145,10 @@ class ValidationTest extends TestCase
     }
 
     /**
-     * @dataProvider provider_validNumber
      * @param Model $pd
      * @param int   $expected
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('provider_validNumber')]
     public function testValidNumber(Model $pd, $expected)
     {
         $validation = new ValidProfessionalDevelopment($this->states);
@@ -161,7 +161,7 @@ class ValidationTest extends TestCase
      *
      * @return array
      */
-    public function provider_validNumber(): array
+    public static function provider_validNumber(): array
     {
         return [
             'Valid Number 1' => [

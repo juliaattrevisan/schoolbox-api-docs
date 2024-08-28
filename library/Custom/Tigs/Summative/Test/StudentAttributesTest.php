@@ -20,9 +20,9 @@ use InvalidArgumentException;
 use UnexpectedValueException;
 
 /**
- * @covers \Custom\Tigs\Summative\StudentAttributes
  * @codeCoverageIgnore
  */
+#[\PHPUnit\Framework\Attributes\CoversClass(\Custom\Tigs\Summative\StudentAttributes::class)]
 class StudentAttributesTest extends TestCase
 {
     /**
@@ -45,11 +45,10 @@ class StudentAttributesTest extends TestCase
     /**
      * Tests the system can detect misconfigured term dates
      *
-     * @dataProvider providerInvalidTermDates
      * @param array $invalidTermDates
-     *
      * @throws UnexpectedValueException
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerInvalidTermDates')]
     public function testInvalidTermDates(array $invalidTermDates): void
     {
         $this->expectException(InvalidArgumentException::class);
@@ -74,13 +73,13 @@ class StudentAttributesTest extends TestCase
     /**
      * Tests that we can detect whether the report is current or historical
      *
-     * @dataProvider providerCurrentOrHistoricalReport
      * @param null|string $reportDate
      * @param null|string $now
      * @param bool   $isHistorical
      * @throws InvalidArgumentException
      * @throws UnexpectedValueException
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerCurrentOrHistoricalReport')]
     public function testCurrentOrHistoricalReport(?string $reportDate, ?string $now, bool $isHistorical): void
     {
         $user = (new User())->setYear(7);
@@ -94,7 +93,6 @@ class StudentAttributesTest extends TestCase
     /**
      * Test that we can derive a student year level for a current or historical report
      *
-     * @dataProvider providerValidYearLevel
      * @param int|string $currentYear
      * @param string     $reportDate
      * @param string     $now
@@ -102,6 +100,7 @@ class StudentAttributesTest extends TestCase
      * @throws InvalidArgumentException
      * @throws UnexpectedValueException
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerValidYearLevel')]
     public function testValidYearLevel($currentYear, string $reportDate, string $now, int $expected): void
     {
         $user       = (new User())->setYear($currentYear);
@@ -114,12 +113,12 @@ class StudentAttributesTest extends TestCase
     /**
      * Test that an exception is thrown if we supply invalid year level input
      *
-     * @dataProvider providerInvalidYearLevel
      * @param string $invalidYear
      * @throws InvalidArgumentException
      * @throws UnexpectedValueException
      *
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerInvalidYearLevel')]
     public function testInvalidYearLevel($invalidYear): void
     {
         $this->expectException(InvalidArgumentException::class);
@@ -131,13 +130,13 @@ class StudentAttributesTest extends TestCase
     /**
      * Test that we cannot generate a report for the future
      *
-     * @dataProvider providerInvalidFutureReport
      * @param string $reportDate
      * @param string $nowDate
      * @throws InvalidArgumentException
      * @throws UnexpectedValueException
      *
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerInvalidFutureReport')]
     public function testInvalidFutureReport(string $reportDate, string $nowDate): void
     {
         $this->expectException(InvalidArgumentException::class);
@@ -147,13 +146,13 @@ class StudentAttributesTest extends TestCase
 
 
     /**
-     * @dataProvider providerGetExplanationOfGradesType
      * @param string      $yearLevel
      * @param string|null $ibFlag
      * @param string      $expected
      * @throws InvalidArgumentException
      * @throws UnexpectedValueException
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerGetExplanationOfGradesType')]
     public function testGetExplanationOfGradesType(string $yearLevel, ?string $ibFlag, string $expected): void
     {
         $user       = (new User())->setYear($yearLevel);
@@ -164,13 +163,13 @@ class StudentAttributesTest extends TestCase
 
 
     /**
-     * @dataProvider providerGetReportDateCalendarYear
      * @param string $yearLevel
      * @param string $reportDate
      * @param int    $expected
      * @throws InvalidArgumentException
      * @throws UnexpectedValueException
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerGetReportDateCalendarYear')]
     public function testGetReportDateCalendarYear(string $yearLevel, string $reportDate, int $expected): void
     {
         $user       = (new User())->setYear($yearLevel);
@@ -183,12 +182,12 @@ class StudentAttributesTest extends TestCase
     /**
      * Tests the ibFlag input is interpreted as expected
      *
-     * @dataProvider providerIsIb
      * @param string|null $ibFlag
      * @param bool        $expected
      * @throws InvalidArgumentException
      * @throws UnexpectedValueException
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerIsIb')]
     public function testIsIb(?string $ibFlag, bool $expected): void
     {
         $user       = (new User())->setYear(10);
@@ -201,7 +200,6 @@ class StudentAttributesTest extends TestCase
     /**
      * Tests that we can detect current and historical MYP students
      *
-     * @dataProvider providerIsMyp
      * @param int    $currentYearLevel
      * @param string $ibFlag
      * @param string $reportDate
@@ -210,6 +208,7 @@ class StudentAttributesTest extends TestCase
      * @throws InvalidArgumentException
      * @throws UnexpectedValueException
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerIsMyp')]
     public function testIsMyp(int $currentYearLevel, string $ibFlag, string $reportDate, string $nowDate, bool $expected): void
     {
         $user       = (new User())->setYear($currentYearLevel);
@@ -222,7 +221,6 @@ class StudentAttributesTest extends TestCase
     /**
      * Tests that we can detect current and historical DP students
      *
-     * @dataProvider providerIsDp
      * @param int    $currentYearLevel
      * @param string $ibFlag
      * @param string $reportDate
@@ -231,6 +229,7 @@ class StudentAttributesTest extends TestCase
      * @throws InvalidArgumentException
      * @throws UnexpectedValueException
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerIsDp')]
     public function testDp(int $currentYearLevel, string $ibFlag, string $reportDate, string $nowDate, bool $expected): void
     {
         $user       = (new User())->setYear($currentYearLevel);
@@ -243,7 +242,6 @@ class StudentAttributesTest extends TestCase
     /**
      * Tests that we can detect current and historical HSC students
      *
-     * @dataProvider providerIsHsc
      * @param int    $currentYearLevel
      * @param string $ibFlag
      * @param string $reportDate
@@ -252,6 +250,7 @@ class StudentAttributesTest extends TestCase
      * @throws InvalidArgumentException
      * @throws UnexpectedValueException
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerIsHsc')]
     public function testHsc(int $currentYearLevel, string $ibFlag, string $reportDate, string $nowDate, bool $expected): void
     {
         $user       = (new User())->setYear($currentYearLevel);
@@ -266,10 +265,10 @@ class StudentAttributesTest extends TestCase
      *
      * @param string $reportDate
      * @param int    $expected
-     * @dataProvider providerTermDerivation
      * @throws InvalidArgumentException
      * @throws UnexpectedValueException
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerTermDerivation')]
     public function testTermDerivation(string $reportDate, int $expected): void
     {
         $user       = (new User())->setYear(10);
@@ -288,8 +287,8 @@ class StudentAttributesTest extends TestCase
      * @param int    $expected
      * @throws InvalidArgumentException
      * @throws UnexpectedValueException
-     * @dataProvider providerCurriculumYearLevel
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerCurriculumYearLevel')]
     public function testCurriculumYearLevel(string $currentYearLevel, string $reportDate, string $nowDate, int $expected): void
     {
         $user       = (new User())->setYear($currentYearLevel);
@@ -302,7 +301,6 @@ class StudentAttributesTest extends TestCase
     /**
      * Tests we can derive a student's current and historical curriculum semester
      *
-     * @dataProvider providerCurriculumSemester
      * @param string $currentYearLevel
      * @param string $reportDate
      * @param string $nowDate
@@ -310,6 +308,7 @@ class StudentAttributesTest extends TestCase
      * @throws InvalidArgumentException
      * @throws UnexpectedValueException
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerCurriculumSemester')]
     public function testCurriculumSemester(string $currentYearLevel, string $reportDate, string $nowDate, int $expected): void
     {
         $user       = (new User())->setYear($currentYearLevel);
@@ -327,8 +326,8 @@ class StudentAttributesTest extends TestCase
      * @param string $expected
      * @throws InvalidArgumentException
      * @throws UnexpectedValueException
-     * @dataProvider providerCurrentReportCurriculumSemesterStart
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerCurrentReportCurriculumSemesterStart')]
     public function testCurrentReportCurriculumSemesterStart(string $yearLevel, string $reportDate, string $expected): void
     {
         $user       = (new User())->setYear($yearLevel);
@@ -347,8 +346,8 @@ class StudentAttributesTest extends TestCase
      * @param string $expected
      * @throws InvalidArgumentException
      * @throws UnexpectedValueException
-     * @dataProvider providerHistoricalReportCurriculumSemesterStart
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerHistoricalReportCurriculumSemesterStart')]
     public function testHistoricalReportCurriculumSemesterStart(string $yearLevel, string $reportDate, string $nowDate, string $expected): void
     {
         $user       = (new User())->setYear($yearLevel);
@@ -366,8 +365,8 @@ class StudentAttributesTest extends TestCase
      * @param string $expected
      * @throws InvalidArgumentException
      * @throws UnexpectedValueException
-     * @dataProvider providerCurrentReportCurriculumSemesterFinish
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerCurrentReportCurriculumSemesterFinish')]
     public function testCurrentReportCurriculumSemesterFinish(string $yearLevel, string $reportDate, string $expected): void
     {
         $user       = (new User())->setYear($yearLevel);
@@ -383,8 +382,8 @@ class StudentAttributesTest extends TestCase
      * @param string $expected
      * @throws InvalidArgumentException
      * @throws UnexpectedValueException
-     * @dataProvider providerCurrentReportCurriculumYearStart
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerCurrentReportCurriculumYearStart')]
     public function testCurrentReportCurriculumYearStart(string $yearLevel, string $reportDate, string $expected): void
     {
         $user       = (new User())->setYear($yearLevel);
@@ -401,8 +400,8 @@ class StudentAttributesTest extends TestCase
      * @param string $expected
      * @throws InvalidArgumentException
      * @throws UnexpectedValueException
-     * @dataProvider providerHistoricalReportCurriculumYearStart
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerHistoricalReportCurriculumYearStart')]
     public function testHistoricalReportCurriculumYearStart(string $yearLevel, string $reportDate, string $nowDate, string $expected): void
     {
         $user       = (new User())->setYear($yearLevel);
@@ -418,8 +417,8 @@ class StudentAttributesTest extends TestCase
      * @param string $expected
      * @throws InvalidArgumentException
      * @throws UnexpectedValueException
-     * @dataProvider providerCurrentReportCurriculumYearFinish
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerCurrentReportCurriculumYearFinish')]
     public function testCurrentReportCurriculumYearFinish(string $yearLevel, string $reportDate, string $expected): void
     {
         $user       = (new User())->setYear($yearLevel);
@@ -430,7 +429,6 @@ class StudentAttributesTest extends TestCase
 
 
     /**
-     * @dataProvider providerCurriculumSemesters
      * @param string $yearLevel
      * @param string $reportDate
      * @param string $s1Start
@@ -440,6 +438,7 @@ class StudentAttributesTest extends TestCase
      * @throws InvalidArgumentException
      * @throws UnexpectedValueException
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerCurriculumSemesters')]
     public function testCurriculumSemesters(
         string $yearLevel,
         string $reportDate,
@@ -468,7 +467,7 @@ class StudentAttributesTest extends TestCase
     /**
      * @return array
      */
-    public function providerInvalidTermDates(): array
+    public static function providerInvalidTermDates(): array
     {
         return [
             // term 4 not defined
@@ -505,7 +504,7 @@ class StudentAttributesTest extends TestCase
     /**
      * @return array
      */
-    public function providerCurrentOrHistoricalReport(): array
+    public static function providerCurrentOrHistoricalReport(): array
     {
         // $reportDate, $now, bool $isHistorical
         return [
@@ -519,7 +518,7 @@ class StudentAttributesTest extends TestCase
     /**
      * @return array
      */
-    public function providerValidYearLevel(): array
+    public static function providerValidYearLevel(): array
     {
         // currentYearLevel, reportDate, nowDate, reportYearLevel
         return [
@@ -550,7 +549,7 @@ class StudentAttributesTest extends TestCase
     /**
      * @return array
      */
-    public function providerInvalidYearLevel(): array
+    public static function providerInvalidYearLevel(): array
     {
         // yearLevel
         return [
@@ -569,7 +568,7 @@ class StudentAttributesTest extends TestCase
      * @return array
      * @throws InvalidArgumentException
      */
-    public function providerInvalidFutureReport(): array
+    public static function providerInvalidFutureReport(): array
     {
         $data = [];
         foreach (['2010-01-15', '2010-02-15', '2010-05-15', '2010-08-15', '2010-11-15'] as $reportDate) {
@@ -586,7 +585,7 @@ class StudentAttributesTest extends TestCase
     /**
      * @return array
      */
-    public function providerGetExplanationOfGradesType(): array
+    public static function providerGetExplanationOfGradesType(): array
     {
         // string $yearLevel, ?bool $isIb, string $expected
         return [
@@ -613,7 +612,7 @@ class StudentAttributesTest extends TestCase
 
 
 
-    public function providerGetReportDateCalendarYear(): array
+    public static function providerGetReportDateCalendarYear(): array
     {
         // string $yearLevel, string $reportDate, int $expected
         return [
@@ -659,7 +658,7 @@ class StudentAttributesTest extends TestCase
     /**
      * @return array
      */
-    public function providerIsIb(): array
+    public static function providerIsIb(): array
     {
         // ibFlag, isIb
         return [
@@ -673,7 +672,7 @@ class StudentAttributesTest extends TestCase
     /**
      * @return array
      */
-    public function providerIsMyp(): array
+    public static function providerIsMyp(): array
     {
         // $currentYearLevel, $ibFlag, $reportDate, $nowDate, $expected
         return [
@@ -711,7 +710,7 @@ class StudentAttributesTest extends TestCase
     }
 
 
-    public function providerIsDp(): array
+    public static function providerIsDp(): array
     {
         // int $currentYearLevel, string $ibFlag, string $reportDate, string $nowDate, bool $expected
         return [
@@ -759,7 +758,7 @@ class StudentAttributesTest extends TestCase
         ];
     }
 
-    public function providerIsHsc(): array
+    public static function providerIsHsc(): array
     {
         // yearLevel, isIb, isHsc
         return [
@@ -810,7 +809,7 @@ class StudentAttributesTest extends TestCase
     /**
      * @return array
      */
-    public function providerTermDerivation(): array
+    public static function providerTermDerivation(): array
     {
         // now, term
         return [
@@ -826,7 +825,7 @@ class StudentAttributesTest extends TestCase
     /**
      * @return array
      */
-    public function providerCurriculumYearLevel(): array
+    public static function providerCurriculumYearLevel(): array
     {
         // $currentYearLevel, $reportDate, $nowDate, $expected
         return [
@@ -944,7 +943,7 @@ class StudentAttributesTest extends TestCase
     /**
      * @return array
      */
-    public function providerCurriculumSemester(): array
+    public static function providerCurriculumSemester(): array
     {
         // $currentYearLevel, $reportDate, $nowDate, $expected
         return [
@@ -1062,7 +1061,7 @@ class StudentAttributesTest extends TestCase
     /**
      * @return array
      */
-    public function providerCurrentReportCurriculumSemesterStart(): array
+    public static function providerCurrentReportCurriculumSemesterStart(): array
     {
         // $yearLevel, $reportDate, $expected
         return [
@@ -1109,7 +1108,7 @@ class StudentAttributesTest extends TestCase
     /**
      * @return array
      */
-    public function providerHistoricalReportCurriculumSemesterStart(): array
+    public static function providerHistoricalReportCurriculumSemesterStart(): array
     {
         // $yearLevel, $reportDate, $nowDate, $expected
         return [
@@ -1151,7 +1150,7 @@ class StudentAttributesTest extends TestCase
     /**
      * @return array
      */
-    public function providerCurrentReportCurriculumSemesterFinish(): array
+    public static function providerCurrentReportCurriculumSemesterFinish(): array
     {
         // yearLevel, now, curriculumSemesterFinish
         return [
@@ -1198,7 +1197,7 @@ class StudentAttributesTest extends TestCase
     /**
      * @return array
      */
-    public function providerCurrentReportCurriculumYearStart(): array
+    public static function providerCurrentReportCurriculumYearStart(): array
     {
         // yearLevel, now, curriculumYearStart
         return [
@@ -1245,7 +1244,7 @@ class StudentAttributesTest extends TestCase
     /**
      * @return array
      */
-    public function providerHistoricalReportCurriculumYearStart(): array
+    public static function providerHistoricalReportCurriculumYearStart(): array
     {
         // $yearLevel, $reportDate, $nowDate, $expected
         // 1 year + 1 term ago
@@ -1284,7 +1283,7 @@ class StudentAttributesTest extends TestCase
     /**
      * @return array
      */
-    public function providerCurrentReportCurriculumYearFinish(): array
+    public static function providerCurrentReportCurriculumYearFinish(): array
     {
         // yearLevel, now, curriculumYearFinish
         return [
@@ -1330,7 +1329,7 @@ class StudentAttributesTest extends TestCase
     /**
      * @return array
      */
-    public function providerCurriculumSemesters(): array
+    public static function providerCurriculumSemesters(): array
     {
         // $yearLevel, $date, $s1Start, $s1Finish, $s2Start, $s2Finish
         return [

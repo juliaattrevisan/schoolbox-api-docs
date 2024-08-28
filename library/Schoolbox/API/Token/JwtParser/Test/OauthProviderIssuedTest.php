@@ -20,25 +20,22 @@ use Schoolbox\Config\ArrayLoader;
 use Schoolbox\UserMapper;
 use SensitiveParameter;
 
-/**
- * @covers \Schoolbox\API\Token\JwtParser\OauthProviderIssued
- */
+#[\PHPUnit\Framework\Attributes\CoversClass(\Schoolbox\API\Token\JwtParser\OauthProviderIssued::class)]
 class OauthProviderIssuedTest extends TestCase
 {
     /**
-     * @dataProvider getTestAcceptsData
-     * @covers \Schoolbox\API\Token\JwtParser\OauthProviderIssued::accepts
-     * @param OauthProviderIssued $parser
-     * @param string              $jwt
-     * @param bool                $expected
+     * @param array $config
+     * @param array $claims
+     * @param bool  $expected
      * @return void
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('getTestAcceptsData')]
     public function testAccepts(
-        OauthProviderIssued $parser,
-        #[SensitiveParameter] string $jwt,
+        array $config,
+        array $claims,
         bool $expected,
     ): void {
-        $this->assertSame($expected, $parser->accepts($jwt));
+        $this->assertSame($expected, $this->createParser($config)->accepts($this->createJwt($claims)));
     }
 
     /**
@@ -46,7 +43,7 @@ class OauthProviderIssuedTest extends TestCase
      *
      * @return iterable
      */
-    public function getTestAcceptsData(): iterable
+    public static function getTestAcceptsData(): iterable
     {
         // Default configuration + audience:
         // the oAuth provider now requires that the JWT's audience matches the
@@ -56,186 +53,118 @@ class OauthProviderIssuedTest extends TestCase
         $defaultJwtAudience           = [IParser::CLAIM_AUD => $defaultAudience];
 
         yield 'no issuer configured, no issuer in JWT' => [
-            $this->createParser(
-                $defaultConfigurationClientId,
-            ),
-            $this->createJwt(
+            $defaultConfigurationClientId,
                 $defaultJwtAudience,
-            ),
             true,
         ];
         yield 'no issuer configured, null issuer in JWT' => [
-            $this->createParser(
-                $defaultConfigurationClientId,
-            ),
-            $this->createJwt(
+            $defaultConfigurationClientId,
                 $defaultJwtAudience + [ConfigMapper::NAME_OAUTH_ISSUER => null],
-            ),
             true,
         ];
         yield 'no issuer configured, issuer in JWT' => [
-            $this->createParser(
-                $defaultConfigurationClientId,
-            ),
-            $this->createJwt(
+            $defaultConfigurationClientId,
                 $defaultJwtAudience + [IParser::CLAIM_ISS => 'vagrant.dev.schoolbox.cloud'],
-            ),
             true,
         ];
         yield 'issuer configured, no issuer in JWT' => [
-            $this->createParser(
-                $defaultConfigurationClientId + [ConfigMapper::NAME_OAUTH_ISSUER => 'vagrant.dev.schoolbox.cloud'],
-            ),
-            $this->createJwt(
+            $defaultConfigurationClientId + [ConfigMapper::NAME_OAUTH_ISSUER => 'vagrant.dev.schoolbox.cloud'],
                 $defaultJwtAudience,
-            ),
             false,
         ];
         yield 'issuer configured, null issuer in JWT' => [
-            $this->createParser(
-                $defaultConfigurationClientId + [ConfigMapper::NAME_OAUTH_ISSUER => 'vagrant.dev.schoolbox.cloud'],
-            ),
-            $this->createJwt(
+            $defaultConfigurationClientId + [ConfigMapper::NAME_OAUTH_ISSUER => 'vagrant.dev.schoolbox.cloud'],
                 $defaultJwtAudience + [ConfigMapper::NAME_OAUTH_ISSUER => null],
-            ),
             false,
         ];
         yield 'issuer configured, matching issuer in JWT' => [
-            $this->createParser(
-                $defaultConfigurationClientId + [ConfigMapper::NAME_OAUTH_ISSUER => 'vagrant.dev.schoolbox.cloud'],
-            ),
-            $this->createJwt(
+            $defaultConfigurationClientId + [ConfigMapper::NAME_OAUTH_ISSUER => 'vagrant.dev.schoolbox.cloud'],
                 $defaultJwtAudience + [IParser::CLAIM_ISS => 'vagrant.dev.schoolbox.cloud'],
-            ),
             true,
         ];
         yield 'issuer configured, non-matching issuer in JWT' => [
-            $this->createParser(
-                $defaultConfigurationClientId + [ConfigMapper::NAME_OAUTH_ISSUER => 'vagrant.dev.schoolbox.cloud'],
-            ),
-            $this->createJwt(
+            $defaultConfigurationClientId + [ConfigMapper::NAME_OAUTH_ISSUER => 'vagrant.dev.schoolbox.cloud'],
                 $defaultJwtAudience + [IParser::CLAIM_ISS => 'vagrant.dev.schoolbox.cloudd'],
-            ),
             false,
         ];
 
         // null issuer configured: treat same as empty
         yield 'null issuer configured, no issuer in JWT' => [
-            $this->createParser(
-                $defaultConfigurationClientId + [ConfigMapper::NAME_OAUTH_ISSUER => null],
-            ),
-            $this->createJwt(
+            $defaultConfigurationClientId + [ConfigMapper::NAME_OAUTH_ISSUER => null],
                 $defaultJwtAudience,
-            ),
             true,
         ];
         yield 'null issuer configured, null issuer in JWT' => [
-            $this->createParser(
-                $defaultConfigurationClientId + [ConfigMapper::NAME_OAUTH_ISSUER => null],
-            ),
-            $this->createJwt(
+            $defaultConfigurationClientId + [ConfigMapper::NAME_OAUTH_ISSUER => null],
                 $defaultJwtAudience + [IParser::CLAIM_ISS => null],
-            ),
             true,
         ];
         yield 'null issuer configured, issuer in JWT' => [
-            $this->createParser(
-                $defaultConfigurationClientId,
-            ),
-            $this->createJwt(
+            $defaultConfigurationClientId,
                 $defaultJwtAudience + [IParser::CLAIM_ISS => 'vagrant.dev.schoolbox.cloud'],
-            ),
             true,
         ];
 
         // non-string issuer configured: cast to string
         yield 'non-string issuer configured, no issuer in JWT' => [
-            $this->createParser(
-                $defaultConfigurationClientId + [ConfigMapper::NAME_OAUTH_ISSUER => 1],
-            ),
-            $this->createJwt(
+            $defaultConfigurationClientId + [ConfigMapper::NAME_OAUTH_ISSUER => 1],
                 $defaultJwtAudience,
-            ),
             false,
         ];
         yield 'non-string issuer configured, matching issuer in JWT' => [
-            $this->createParser(
-                $defaultConfigurationClientId + [ConfigMapper::NAME_OAUTH_ISSUER => 1],
-            ),
-            $this->createJwt(
+            $defaultConfigurationClientId + [ConfigMapper::NAME_OAUTH_ISSUER => 1],
                 $defaultJwtAudience + [IParser::CLAIM_ISS => 1],
-            ),
             true,
         ];
         yield 'non-string issuer configured, semi-matching issuer in JWT' => [
-            $this->createParser(
-                $defaultConfigurationClientId + [ConfigMapper::NAME_OAUTH_ISSUER => 1],
-            ),
-            $this->createJwt(
+            $defaultConfigurationClientId + [ConfigMapper::NAME_OAUTH_ISSUER => 1],
                 $defaultJwtAudience + [IParser::CLAIM_ISS => '1'],
-            ),
             true,
         ];
         yield 'non-string issuer configured, non-matching issuer in JWT' => [
-            $this->createParser(
-                $defaultConfigurationClientId + [ConfigMapper::NAME_OAUTH_ISSUER => 1],
-            ),
-            $this->createJwt(
+            $defaultConfigurationClientId + [ConfigMapper::NAME_OAUTH_ISSUER => 1],
                 $defaultJwtAudience + [IParser::CLAIM_ISS => 2],
-            ),
             false,
         ];
 
         // non-string issuer in JWT: cast to string
         yield 'no issuer configured, non-string issuer in JWT' => [
-            $this->createParser(
-                $defaultConfigurationClientId,
-            ),
-            $this->createJwt(
+            $defaultConfigurationClientId,
                 $defaultJwtAudience + [IParser::CLAIM_ISS => 1],
-            ),
             true,
         ];
         yield 'issuer configured, semi-matching non-string issuer in JWT' => [
-            $this->createParser(
-                $defaultConfigurationClientId + [ConfigMapper::NAME_OAUTH_ISSUER => '1'],
-            ),
-            $this->createJwt(
+            $defaultConfigurationClientId + [ConfigMapper::NAME_OAUTH_ISSUER => '1'],
                 $defaultJwtAudience + [IParser::CLAIM_ISS => 1],
-            ),
             true,
         ];
         yield 'issuer configured, non-matching non-string issuer in JWT' => [
-            $this->createParser(
-                $defaultConfigurationClientId + [ConfigMapper::NAME_OAUTH_ISSUER => '2'],
-            ),
-            $this->createJwt(
+            $defaultConfigurationClientId + [ConfigMapper::NAME_OAUTH_ISSUER => '2'],
                 $defaultJwtAudience + [IParser::CLAIM_ISS => 1],
-            ),
             false,
         ];
 
         // No configured client ID, or no audience in JWT: reject
         yield 'no configured client ID, no audience in JWT' => [
-            $this->createParser([]),
-            $this->createJwt([]),
+            [],
+            [],
             false,
         ];
         yield 'no configured client ID' => [
-            $this->createParser([]),
-            $this->createJwt($defaultJwtAudience),
+            [],
+            $defaultJwtAudience,
             false,
         ];
         yield 'no audience in JWT' => [
-            $this->createParser($defaultConfigurationClientId),
-            $this->createJwt([]),
+            $defaultConfigurationClientId,
+            [],
             false,
         ];
 
         // non-matching client ID: reject
         yield 'configured client ID and audience in JWT do not match' => [
-            $this->createParser($defaultConfigurationClientId),
-            $this->createJwt([IParser::CLAIM_AUD => 'not-test']),
+            $defaultConfigurationClientId,
+            [IParser::CLAIM_AUD => 'not-test'],
             false,
         ];
 
@@ -243,13 +172,13 @@ class OauthProviderIssuedTest extends TestCase
         // (see https://www.rfc-editor.org/rfc/rfc7519#section-4.1.3):
         // if so, JWT is accepted if any match
         yield 'configured client ID matches array audience in JWT' => [
-            $this->createParser($defaultConfigurationClientId),
-            $this->createJwt([IParser::CLAIM_AUD => [$defaultAudience, 'not-test']]),
+            $defaultConfigurationClientId,
+            [IParser::CLAIM_AUD => [$defaultAudience, 'not-test']],
             true,
         ];
         yield 'configured client ID does not match array audience in JWT' => [
-            $this->createParser($defaultConfigurationClientId),
-            $this->createJwt([IParser::CLAIM_AUD => ['not-test', 'also-not-test']]),
+            $defaultConfigurationClientId,
+            [IParser::CLAIM_AUD => ['not-test', 'also-not-test']],
             false,
         ];
     }

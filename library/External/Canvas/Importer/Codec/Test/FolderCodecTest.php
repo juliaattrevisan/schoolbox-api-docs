@@ -21,14 +21,13 @@ use PHPUnit\Framework\TestCase;
 class FolderCodecTest extends TestCase
 {
     /**
-     * @dataProvider providerFolderCode
      * @param int         $currentYear
      * @param string      $canvasCourseCode
      * @param string|null $expected
      * @throws \DebugBar\DebugBarException
      * @throws \PHPUnit\Framework\ExpectationFailedException
-     * @throws \SebastianBergmann\RecursionContext\InvalidArgumentException
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerFolderCode')]
     public function testValidEFolderCode(int $currentYear, string $canvasCourseCode, ?string $expected)
     {
         $this->assertEquals($expected, (new FolderCode())->decode($currentYear, $canvasCourseCode));
@@ -40,7 +39,7 @@ class FolderCodecTest extends TestCase
      *
      * @return array
      */
-    public function providerFolderCode(): array
+    public static function providerFolderCode(): array
     {
         return [
 

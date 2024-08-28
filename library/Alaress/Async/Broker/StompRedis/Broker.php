@@ -66,7 +66,7 @@ class Broker implements IBroker
             $this->stomp->subscribeWithAck(
                 $this->queue,
                 IClient::ACK_MODE_CLIENT_INDIVIDUAL,
-                function (IFrame $frame, IAckResolver $resolver) use ($consumer) {
+                function (IFrame $frame, IAckResolver $resolver) use ($consumer): void {
                     $resolve = new Resolver($resolver);
 
                     try {

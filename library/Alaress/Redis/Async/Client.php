@@ -19,7 +19,6 @@ use stdClass;
 
 class Client
 {
-
     /** @var Predis\Async\Client */
     private $client;
 
@@ -89,7 +88,7 @@ class Client
         $arguments = (array)$arguments;
         $channels  = [ $type => $arguments ];
 
-        $this->client->pubSubLoop($channels, function (stdClass $event) use ($listener) {
+        $this->client->pubSubLoop($channels, function (stdClass $event) use ($listener): void {
             // cast this stdClass event object to a named class and push to the listener
             if ($e = $this->castEvent($event)) {
                 $listener->handle($e);

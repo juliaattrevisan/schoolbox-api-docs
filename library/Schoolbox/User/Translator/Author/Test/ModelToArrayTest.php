@@ -24,9 +24,8 @@ use Schoolbox\User\Pronoun\Model as Pronoun;
 
 /**
  * Test for the author variant of the user model to array translator.
- *
- * @covers \Schoolbox\User\Translator\Author\ModelToArray
  */
+#[\PHPUnit\Framework\Attributes\CoversClass(\Schoolbox\User\Translator\Author\ModelToArray::class)]
 class ModelToArrayTest extends TestCase
 {
     /**
@@ -34,7 +33,7 @@ class ModelToArrayTest extends TestCase
      *
      * @return iterable
      */
-    public function getTestInvokeData(): iterable
+    public static function getTestInvokeData(): iterable
     {
         $configLoader = new ArrayLoader([
             ConfigMapper::NAME_MAIL_ADDRESS => 'test.schoolbox.com.au',
@@ -139,11 +138,10 @@ class ModelToArrayTest extends TestCase
 
 
     /**
-     * @dataProvider getTestInvokeData
-     * @covers       \Schoolbox\User\Translator\Author\ModelToArray::__invoke
      * @param User  $input
      * @param array $expected
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('getTestInvokeData')]
     public function testInvoke(User $input, array $expected): void
     {
         self::assertSame($expected, (new ModelToArray())($input));

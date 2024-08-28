@@ -105,7 +105,7 @@ class Installer
     {
         $errorHandler = set_error_handler(null);
         set_error_handler(
-            static function ($errNum, $errStr, $errFile, $errLine) use ($errorHandler) {
+            static function ($errNum, $errStr, $errFile, $errLine) use ($errorHandler): void {
                 // Ignore this error if it isn't reported
                 if (!(error_reporting() & $errNum)) {
                     return;

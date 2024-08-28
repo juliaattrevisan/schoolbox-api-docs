@@ -26,9 +26,8 @@ use Schoolbox\User;
 /**
  * Tests for converting from a model to array representation of learning moment
  * evidence.
- *
- * @covers \Schoolbox\Learning\Moment\Evidence\Translator\ModelToArray\Base
  */
+#[\PHPUnit\Framework\Attributes\CoversClass(\Schoolbox\Learning\Moment\Evidence\Translator\ModelToArray\Base::class)]
 class BaseTest extends TestCase
 {
     /**
@@ -36,7 +35,7 @@ class BaseTest extends TestCase
      *
      * @return iterable
      */
-    public function getTestInvokeData(): iterable
+    public static function getTestInvokeData(): iterable
     {
         yield 'empty fields' => [
             new Model(),
@@ -93,12 +92,10 @@ class BaseTest extends TestCase
 
 
     /**
-     * @dataProvider getTestInvokeData
-     * @covers       \Schoolbox\Learning\Moment\Evidence\Translator\ModelToArray\Base::__invoke
-     *
      * @param Model $input
      * @param array $expected
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('getTestInvokeData')]
     public function testInvoke(Model $input, array $expected): void
     {
         // Test with a stripped-down user and storage translator

@@ -19,19 +19,17 @@ use Schoolbox\Resource\Textbox\Model;
 use Schoolbox\Resource\Textbox\Translator\ModelToArray;
 use Schoolbox\User;
 
-/**
- * @covers \Schoolbox\Resource\Textbox\Translator\ModelToArray::__invoke
- */
+#[\PHPUnit\Framework\Attributes\CoversClass(\Schoolbox\Resource\Textbox\Translator\ModelToArray::class)]
 class ModelToArrayTest extends TestCase
 {
     /**
-     * @dataProvider getTestInvokeData
      *
      * @param Model $textbox
      * @param bool  $allowUpdate
      * @param bool  $allowDelete
      * @param array $expected
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('getTestInvokeData')]
     public function testInvoke(Model $textbox, bool $allowUpdate, bool $allowDelete, array $expected): void
     {
         self::assertSame(
@@ -46,7 +44,7 @@ class ModelToArrayTest extends TestCase
      *
      * @return iterable
      */
-    public function getTestInvokeData(): iterable
+    public static function getTestInvokeData(): iterable
     {
         yield 'create authorized, delete authorized' => [
             (new Model())

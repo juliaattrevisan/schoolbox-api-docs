@@ -15,18 +15,15 @@ use Schoolbox\Calendar\Event;
 
 /**
  * Test for the event object.
- *
- * @covers \Schoolbox\Calendar\Event
  */
+#[\PHPUnit\Framework\Attributes\CoversClass(\Schoolbox\Calendar\Event::class)]
 class EventTest extends TestCase
 {
     /**
-     * @dataProvider getTestIsPersonalLevelData
-     * @covers       \Schoolbox\Calendar\Event::isPersonalLevel
-     *
      * @param Event $event
      * @param bool  $expected
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('getTestIsPersonalLevelData')]
     public function testIsPersonalLevel(Event $event, bool $expected): void
     {
         $this->assertSame($expected, $event->isPersonalLevel());
@@ -34,12 +31,10 @@ class EventTest extends TestCase
 
 
     /**
-     * @dataProvider getTestIsGroupLevelData
-     * @covers       \Schoolbox\Calendar\Event::isGroupLevel
-     *
      * @param Event $event
      * @param bool  $expected
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('getTestIsGroupLevelData')]
     public function testIsGroupLevel(Event $event, bool $expected): void
     {
         $this->assertSame($expected, $event->isGroupLevel());
@@ -47,12 +42,10 @@ class EventTest extends TestCase
 
 
     /**
-     * @dataProvider getTestIsCampusLevelData
-     * @covers       \Schoolbox\Calendar\Event::isCampusLevel
-     *
      * @param Event $event
      * @param bool  $expected
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('getTestIsCampusLevelData')]
     public function testIsCampusLevel(Event $event, bool $expected): void
     {
         $this->assertSame($expected, $event->isCampusLevel());
@@ -60,13 +53,12 @@ class EventTest extends TestCase
 
 
     /**
-     * @dataProvider getTestIsPublishedData
-     * @covers       \Schoolbox\Calendar\Event::isPublished
      *
      * @param Event                    $event
      * @param Alaress_Date_Format|null $date
      * @param bool                     $expected
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('getTestIsPublishedData')]
     public function testIsPublished(Event $event, ?Alaress_Date_Format $date, bool $expected): void
     {
         $this->assertSame($expected, $event->isPublished($date));
@@ -78,7 +70,7 @@ class EventTest extends TestCase
      *
      * @return array
      */
-    private function getTestLevelEvents(): array
+    private static function getTestLevelEvents(): array
     {
         return [
             Event::ACCESS_PERSONAL => (new Event())->setAccess(Event::ACCESS_PERSONAL),
@@ -93,9 +85,9 @@ class EventTest extends TestCase
      *
      * @return array
      */
-    public function getTestIsPersonalLevelData(): array
+    public static function getTestIsPersonalLevelData(): array
     {
-        $events = $this->getTestLevelEvents();
+        $events = self::getTestLevelEvents();
         return [
             Event::ACCESS_PERSONAL => [$events[Event::ACCESS_PERSONAL], true],
             Event::ACCESS_GROUP    => [$events[Event::ACCESS_GROUP], false],
@@ -109,9 +101,9 @@ class EventTest extends TestCase
      *
      * @return array
      */
-    public function getTestIsGroupLevelData(): array
+    public static function getTestIsGroupLevelData(): array
     {
-        $events = $this->getTestLevelEvents();
+        $events = self::getTestLevelEvents();
         return [
             Event::ACCESS_PERSONAL => [$events[Event::ACCESS_PERSONAL], false],
             Event::ACCESS_GROUP    => [$events[Event::ACCESS_GROUP], true],
@@ -125,9 +117,9 @@ class EventTest extends TestCase
      *
      * @return array
      */
-    public function getTestIsCampusLevelData(): array
+    public static function getTestIsCampusLevelData(): array
     {
-        $events = $this->getTestLevelEvents();
+        $events = self::getTestLevelEvents();
         return [
             Event::ACCESS_PERSONAL => [$events[Event::ACCESS_PERSONAL], false],
             Event::ACCESS_GROUP    => [$events[Event::ACCESS_GROUP], false],
@@ -141,7 +133,7 @@ class EventTest extends TestCase
      *
      * @return iterable
      */
-    public function getTestIsPublishedData(): iterable
+    public static function getTestIsPublishedData(): iterable
     {
         $now      = Alaress_Date_Format::now();
         $lastYear = Alaress_Date_Format::now()->addYears(-1);

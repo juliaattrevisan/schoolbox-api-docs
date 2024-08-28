@@ -14,9 +14,8 @@ use PHPUnit\Framework\TestCase;
 
 /**
  * Test class for the integer-base64 codec.
- *
- * @covers \Alaress\Codec\Integer\Base64
  */
+#[\PHPUnit\Framework\Attributes\CoversClass(\Alaress\Codec\Integer\Base64::class)]
 class IntegerBase64Test extends TestCase
 {
     /**
@@ -24,7 +23,7 @@ class IntegerBase64Test extends TestCase
      *
      * @return iterable
      */
-    public function getTestEncodeData(): iterable
+    public static function getTestEncodeData(): iterable
     {
         yield '0'      => [0,      'MA=='];
         yield '1'      => [1,      'MQ=='];
@@ -39,7 +38,7 @@ class IntegerBase64Test extends TestCase
      *
      * @return iterable
      */
-    public function getTestInvalidRawValueData(): iterable
+    public static function getTestInvalidRawValueData(): iterable
     {
         yield 'null'        => [null];
         yield 'emptyString' => [''];
@@ -57,7 +56,7 @@ class IntegerBase64Test extends TestCase
      *
      * @return iterable
      */
-    public function getTestInvalidEncodedValueData(): iterable
+    public static function getTestInvalidEncodedValueData(): iterable
     {
         yield 'null'     => [null];
         yield 'int'      => [1];
@@ -74,7 +73,7 @@ class IntegerBase64Test extends TestCase
      *
      * @return iterable
      */
-    public function getTestEncodedValueDecodesToNonIntegerErrorData(): iterable
+    public static function getTestEncodedValueDecodesToNonIntegerErrorData(): iterable
     {
         yield 'emptyString' => [''];
         yield 'float 4.5'   => ['NC41'];
@@ -84,11 +83,10 @@ class IntegerBase64Test extends TestCase
 
 
     /**
-     * @covers       \Alaress\Codec\Integer\Base64::encode
-     * @dataProvider getTestEncodeData
      * @param int|null    $rawValue
      * @param string|null $encodedValue
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('getTestEncodeData')]
     public function testEncode(?int $rawValue, ?string $encodedValue): void
     {
         $codec = new Base64();
@@ -97,11 +95,10 @@ class IntegerBase64Test extends TestCase
 
 
     /**
-     * @covers       \Alaress\Codec\Integer\Base64::decode
-     * @dataProvider getTestEncodeData
      * @param int|null    $rawValue
      * @param string|null $encodedValue
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('getTestEncodeData')]
     public function testDecode(?int $rawValue, ?string $encodedValue): void
     {
         $codec = new Base64();
@@ -112,11 +109,9 @@ class IntegerBase64Test extends TestCase
     /**
      * Test that encoding then decoding a value results in the same value.
      *
-     * @covers       \Alaress\Codec\Integer\Base64::encode
-     * @covers       \Alaress\Codec\Integer\Base64::decode
-     * @dataProvider getTestEncodeData
      * @param int|null $rawValue
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('getTestEncodeData')]
     public function testLosslessEncode(?int $rawValue): void
     {
         $codec = new Base64();
@@ -128,12 +123,10 @@ class IntegerBase64Test extends TestCase
      * Test that decoding then encoding a value results in the same encoded
      * value.
      *
-     * @covers       \Alaress\Codec\Integer\Base64::encode
-     * @covers       \Alaress\Codec\Integer\Base64::decode
-     * @dataProvider getTestEncodeData
      * @param int|null    $rawValue
      * @param string|null $encodedValue
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('getTestEncodeData')]
     public function testLosslessDecode(?int $rawValue, ?string $encodedValue): void
     {
         $codec = new Base64();
@@ -144,10 +137,9 @@ class IntegerBase64Test extends TestCase
     /**
      * Test that attempting to encode a non-integer raises an error.
      *
-     * @covers            \Alaress\Codec\Integer\Base64::encode
-     * @dataProvider      getTestInvalidRawValueData
      * @param mixed $rawValue
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('getTestInvalidRawValueData')]
     public function testInvalidRawValue($rawValue): void
     {
         $this->expectException(\TypeError::class);
@@ -159,11 +151,10 @@ class IntegerBase64Test extends TestCase
     /**
      * Test that attempting to decode a non-string raises an error.
      *
-     * @covers            \Alaress\Codec\Integer\Base64::decode
      *
-     * @dataProvider      getTestInvalidEncodedValueData
      * @param mixed $encodedValue
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('getTestInvalidEncodedValueData')]
     public function testInvalidEncodedValue($encodedValue): void
     {
         $this->expectException(\TypeError::class);
@@ -176,11 +167,10 @@ class IntegerBase64Test extends TestCase
      * Test that attempting to decode a value that decodes to a non-integer
      * raises an error.
      *
-     * @covers            \Alaress\Codec\Integer\Base64::decode
      *
-     * @dataProvider      getTestEncodedValueDecodesToNonIntegerErrorData
      * @param mixed $encodedValue
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('getTestEncodedValueDecodesToNonIntegerErrorData')]
     public function testEncodedValueDecodesToNonIntegerError($encodedValue): void
     {
         $this->expectException(\UnexpectedValueException::class);

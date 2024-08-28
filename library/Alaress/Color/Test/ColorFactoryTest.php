@@ -26,7 +26,7 @@ class ColorFactoryTest extends TestCase
         $this->colorFactory = new ColorFactory();
     }
 
-    public function getCreateHexData(): array
+    public static function getCreateHexData(): array
     {
         return array(
             array('#123456', new Color(0x12, 0x34, 0x56)),
@@ -34,9 +34,7 @@ class ColorFactoryTest extends TestCase
         );
     }
 
-    /**
-     * @dataProvider getCreateHexData
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('getCreateHexData')]
     public function testCreateHex($colorString, Color $expectedColor): void
     {
         $actualColor = $this->colorFactory->build($colorString);
@@ -45,7 +43,7 @@ class ColorFactoryTest extends TestCase
         $this->assertEquals($expectedColor->getBlue(), $actualColor->getBlue());
     }
 
-    public function getCreateHexAlphaData()
+    public static function getCreateHexAlphaData()
     {
         return array(
             array('#12345600', new Color(0x12, 0x34, 0x56, 0)),
@@ -54,9 +52,7 @@ class ColorFactoryTest extends TestCase
         );
     }
 
-    /**
-     * @dataProvider getCreateHexAlphaData
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('getCreateHexAlphaData')]
     public function testCreateHexAlpha($colorString, Color $expectedColor)
     {
         $actualColor = $this->colorFactory->build($colorString);
@@ -67,7 +63,7 @@ class ColorFactoryTest extends TestCase
         $this->assertEqualsWithDelta($expectedColor->getAlpha(), $actualColor->getAlpha(), 0.01);
     }
 
-    public function getCreateRgbData()
+    public static function getCreateRgbData()
     {
         return array(
             array('rgb(12, 77, 99)', new Color(12, 77, 99)),
@@ -75,9 +71,7 @@ class ColorFactoryTest extends TestCase
         );
     }
 
-    /**
-     * @dataProvider getCreateRgbData
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('getCreateRgbData')]
     public function testCreateRgbData($colorString, Color $expectedColor)
     {
         $actualColor = $this->colorFactory->build($colorString);
@@ -86,7 +80,7 @@ class ColorFactoryTest extends TestCase
         $this->assertEquals($expectedColor->getBlue(), $actualColor->getBlue());
     }
 
-    public function getCreateRgbaData()
+    public static function getCreateRgbaData()
     {
         return array(
             array('rgba(12, 77, 255, 0.4)', new Color(12, 77, 255, 0.4)),
@@ -94,9 +88,7 @@ class ColorFactoryTest extends TestCase
         );
     }
 
-    /**
-     * @dataProvider getCreateRgbaData
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('getCreateRgbaData')]
     public function testCreateRgbaData($colorString, Color $expectedColor)
     {
         $actualColor = $this->colorFactory->build($colorString);
@@ -107,7 +99,7 @@ class ColorFactoryTest extends TestCase
         $this->assertEqualsWithDelta($expectedColor->getAlpha(), $actualColor->getAlpha(), 0.01);
     }
 
-    public function getInvalidFormatData()
+    public static function getInvalidFormatData()
     {
         return array(
             array(''),
@@ -118,11 +110,8 @@ class ColorFactoryTest extends TestCase
         );
     }
 
-    /**
-     * @dataProvider getInvalidFormatData
-     *
-     *
-     */
+
+    #[\PHPUnit\Framework\Attributes\DataProvider('getInvalidFormatData')]
     public function testInvalidFormat($colorString)
     {
         $this->expectExceptionMessageMatches("/does not match expected format/");

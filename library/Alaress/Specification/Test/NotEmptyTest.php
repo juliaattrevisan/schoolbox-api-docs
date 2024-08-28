@@ -15,6 +15,7 @@ use Schoolbox\Collection;
 use stdClass;
 use TypeError;
 
+#[\PHPUnit\Framework\Attributes\CoversClass(\Alaress\Specification\NotEmpty::class)]
 class NotEmptyTest extends TestCase
 {
     /**
@@ -22,7 +23,7 @@ class NotEmptyTest extends TestCase
      *
      * @return iterable
      */
-    public function getTestIsSatisfiedByData(): iterable
+    public static function getTestIsSatisfiedByData(): iterable
     {
         yield 'empty array'            => [[], false];
         yield 'non-empty array(1)'     => [[1], true];
@@ -36,12 +37,11 @@ class NotEmptyTest extends TestCase
     /**
      * Test for valid cases for `NotEmpty`.
      *
-     * @covers       \Alaress\Specification\NotEmpty::isSatisfiedBy
-     * @dataProvider getTestIsSatisfiedByData
      *
      * @param mixed $candidate
      * @param bool  $expected
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('getTestIsSatisfiedByData')]
     public function testIsSatisfiedBy($candidate, bool $expected): void
     {
         $this->assertSame($expected, (new NotEmpty())->isSatisfiedBy($candidate));
@@ -53,7 +53,7 @@ class NotEmptyTest extends TestCase
      *
      * @return iterable
      */
-    public function getTestIsSatisfiedByInvalidCandidateData(): iterable
+    public static function getTestIsSatisfiedByInvalidCandidateData(): iterable
     {
         yield 'null'                 => [null];
         yield 'string'               => ['b'];
@@ -66,12 +66,11 @@ class NotEmptyTest extends TestCase
     /**
      * Test for invalid cases for `NotEmpty`.
      *
-     * @covers            \Alaress\Specification\NotEmpty::isSatisfiedBy
-     * @dataProvider      getTestIsSatisfiedByInvalidCandidateData
      *
      *
      * @param mixed $candidate
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('getTestIsSatisfiedByInvalidCandidateData')]
     public function testIsSatisfiedByInvalidCandidate($candidate): void
     {
         $this->expectException(TypeError::class);

@@ -1,34 +1,33 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
-<phpunit backupGlobals="false"
-         backupStaticAttributes="false"
+<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         backupGlobals="false"
          colors="true"
-         convertErrorsToExceptions="true"
-         convertNoticesToExceptions="true"
-         convertWarningsToExceptions="true"
          processIsolation="false"
          stopOnFailure="false"
          bootstrap="test/bootstrap/unit.php"
          defaultTestSuite="default"
+         xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/11.3/phpunit.xsd"
+         cacheDirectory=".phpunit.cache"
+         backupStaticProperties="false"
 >
   <testsuites>
     <testsuite name="default">
-      <directory suffix=".php">library/Proxy/</directory>
-      <directory suffix=".php">library/Alaress/</directory>
-      <directory suffix=".php">library/Schoolbox/</directory>
+      <directory suffix="Test.php">library/Proxy/</directory>
+      <directory suffix="Test.php">library/Alaress/</directory>
+      <directory suffix="Test.php">library/Schoolbox/</directory>
       <exclude>library/Alaress/Database/Test</exclude>
       <exclude>library/Schoolbox/Database/Test</exclude>
       <exclude>library/Schoolbox/Profile/Test/Generator.php</exclude>
     </testsuite>
   </testsuites>
-    <php>
-        <!--
+  <php>
+    <!--
             The standard test suite uses a fake instance ID, to ensure that
             there is no database connection.
             The Vagrant environment by default has a connection, even in tests:
             the CI environment does not, which can cause Vagrant and CI to
             report different errors.
         -->
-        <env name="INSTANCE_ID" value="null" force="true" />
-    </php>
+    <env name="INSTANCE_ID" value="null" force="true"/>
+  </php>
 </phpunit>

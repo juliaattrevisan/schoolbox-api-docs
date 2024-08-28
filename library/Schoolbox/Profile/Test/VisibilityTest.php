@@ -22,20 +22,14 @@ use External_UserInterface;
  */
 class VisibilityTest extends TestCase
 {
-
-    public function __construct($name = null, array $data = [], $dataName = '')
-    {
-        parent::__construct($name, $data, $dataName);
-    }
-
     /**
      * @param User $viewer
      * @param User $viewee
      * @param bool $reportStaffAccess
      * @param bool $restrictParentEmails
      * @param bool $expected
-     * @dataProvider provider_isDetailsVisible
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('provider_isDetailsVisible')]
     public function test_isDetailsVisible(
         User $viewer,
         User $viewee,
@@ -53,7 +47,7 @@ class VisibilityTest extends TestCase
     /**
      * @return array
      */
-    public function provider_isDetailsVisible(): array
+    public static function provider_isDetailsVisible(): array
     {
 
         // viewer, viewee, visibility
@@ -150,8 +144,8 @@ class VisibilityTest extends TestCase
      * @param bool $reportStaffAccess
      * @param bool $restrictParentEmails
      * @param bool $expected
-     * @dataProvider provider_isDetailsVisibleComprehensive
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('provider_isDetailsVisibleComprehensive')]
     public function test_isDetailsVisibleComprehensive(
         User $viewer,
         User $viewee,
@@ -175,7 +169,7 @@ class VisibilityTest extends TestCase
      *
      * @return array
      */
-    public function provider_isDetailsVisibleComprehensive(): array
+    public static function provider_isDetailsVisibleComprehensive(): array
     {
         // viewer, viewee, visibility
         $studentRole = (new Role())->setType(Role::STUDENT)->setViewStudentProfile(false)->setViewParentProfile(false);
@@ -700,8 +694,8 @@ class VisibilityTest extends TestCase
      * @param bool $reportStaffAccess
      * @param bool $restrictParentEmails
      * @param bool $expected
-     * @dataProvider provider_isEmailVisible
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('provider_isEmailVisible')]
     public function test_isEmailVisible(
         User $viewer,
         User $viewee,
@@ -720,7 +714,7 @@ class VisibilityTest extends TestCase
     /**
      * @return array
      */
-    public function provider_isEmailVisible(): array
+    public static function provider_isEmailVisible(): array
     {
         // viewer, viewee, visibility
         $studentRole = (new Role())->setType(Role::STUDENT)->setViewStudentProfile(false)->setViewParentProfile(false);
@@ -798,7 +792,6 @@ class VisibilityTest extends TestCase
     {
         return new Class () implements IConfigLoader
         {
-
             /** @var bool */
             private $reportStaffAccess;
             /** @var bool */

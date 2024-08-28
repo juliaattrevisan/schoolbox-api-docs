@@ -25,16 +25,14 @@ use Schoolbox\Geosnapshot\ValidEventPhotosAvailable;
  */
 class ValidEventPhotosAvailableTest extends TestCase
 {
-
     /**
-     * @dataProvider provider_validEventPhotosAvailable
      * @param null|string $apiKey
      * @param bool        $featureFlag
      * @param null|string $eventName
      * @param int         $expected
      * @throws \PHPUnit\Framework\ExpectationFailedException
-     * @throws \SebastianBergmann\RecursionContext\InvalidArgumentException
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('provider_validEventPhotosAvailable')]
     public function testValidEventPhotosAvailable($apiKey, $featureFlag, $eventName, $expected)
     {
         $outcome = (new ValidEventPhotosAvailable())
@@ -50,7 +48,7 @@ class ValidEventPhotosAvailableTest extends TestCase
      *
      * @return array
      */
-    public function provider_validEventPhotosAvailable(): array
+    public static function provider_validEventPhotosAvailable(): array
     {
         return [
 

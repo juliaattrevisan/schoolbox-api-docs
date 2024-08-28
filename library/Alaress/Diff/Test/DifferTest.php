@@ -17,13 +17,13 @@ class DifferTest extends TestCase
     /**
      * Test various diff cases
      *
-     * @dataProvider getTestDiffData
      * @param Differ $differ
      * @param array  $a
      * @param array  $b
      * @param array  $expected
      * @return void
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('getTestDiffData')]
     public function testDiff(Differ $differ, array $a, array $b, array $expected): void
     {
         $this->assertEquals($differ->diff($a, $b), $expected);
@@ -34,7 +34,7 @@ class DifferTest extends TestCase
      *
      * @return array
      */
-    public function getTestDiffData(): array
+    public static function getTestDiffData(): array
     {
         $standardDiffer  = new Differ();
         $stringKeyDiffer = new Differ('expected', 'actual');

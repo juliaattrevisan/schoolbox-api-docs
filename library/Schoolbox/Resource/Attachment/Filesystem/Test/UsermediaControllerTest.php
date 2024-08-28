@@ -15,25 +15,21 @@ use Schoolbox\Resource\Attachment\Filesystem\UsermediaController;
 
 class UsermediaControllerTest extends TestCase
 {
-    /**
-     * @dataProvider getTestValidData
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('getTestValidData')]
     public function testValid(?string $mimeFilter)
     {
         new UsermediaController(false, $mimeFilter);
         self::assertTrue(true);
     }
 
-    /**
-     * @dataProvider getTestInvalidData
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('getTestInvalidData')]
     public function testInvalid(?string $mimeFilter)
     {
         $this->expectException(OutOfRangeException::class);
         new UsermediaController(false, $mimeFilter);
     }
 
-    public function getTestValidData(): iterable
+    public static function getTestValidData(): iterable
     {
         return [
             'null'  => [null],
@@ -42,7 +38,7 @@ class UsermediaControllerTest extends TestCase
         ];
     }
 
-    public function getTestInvalidData(): iterable
+    public static function getTestInvalidData(): iterable
     {
         return [
             'image' => ['image/*'],

@@ -17,12 +17,11 @@ use Schoolbox\Filter\Filters\Assessment\RubricUsage\Codec;
 use UnexpectedValueException;
 
 /**
- * @covers \Schoolbox\Filter\Filters\Assessment\RubricUsage\Codec
  * @codeCoverageIgnore
  */
+#[\PHPUnit\Framework\Attributes\CoversClass(\Schoolbox\Filter\Filters\Assessment\RubricUsage\Codec::class)]
 class CodecTest extends TestCase
 {
-
     /** @var Codec */
     private static $codec;
 
@@ -36,13 +35,11 @@ class CodecTest extends TestCase
     }
 
     // ==================== Tests ====================
-
-
     /**
      * @param CapabilityModel $capability
-     * @dataProvider providerEncodeInvalidCapability
      *
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerEncodeInvalidCapability')]
     public function testEncodeInvalidCapability(CapabilityModel $capability): void
     {
         $this->expectException(InvalidArgumentException::class);
@@ -53,9 +50,9 @@ class CodecTest extends TestCase
     /**
      * @param CapabilityModel $capability
      * @param string          $expected
-     * @dataProvider providerEncodeCapability
      * @throws InvalidArgumentException
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerEncodeCapability')]
     public function testEncodeCapability(CapabilityModel $capability, string $expected): void
     {
         $this->assertSame($expected, self::$codec->encodeCapability($capability));
@@ -64,9 +61,9 @@ class CodecTest extends TestCase
 
     /**
      * @param IndicatorModel $indicator
-     * @dataProvider providerEncodeInvalidIndicator
      *
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerEncodeInvalidIndicator')]
     public function testEncodeInvalidIndicator(IndicatorModel $indicator): void
     {
         $this->expectException(InvalidArgumentException::class);
@@ -77,9 +74,9 @@ class CodecTest extends TestCase
     /**
      * @param IndicatorModel $indicator
      * @param string         $expected
-     * @dataProvider providerEncodeIndicator
      * @throws InvalidArgumentException
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerEncodeIndicator')]
     public function testEncodeIndicator(IndicatorModel $indicator, string $expected): void
     {
         $this->assertSame($expected, self::$codec->encodeIndicator($indicator));
@@ -88,9 +85,9 @@ class CodecTest extends TestCase
 
     /**
      * @param string $key
-     * @dataProvider providerInvalidDecode
      *
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerInvalidDecode')]
     public function testInvalidDecode(string $key): void
     {
         $this->expectException(UnexpectedValueException::class);
@@ -101,9 +98,9 @@ class CodecTest extends TestCase
     /**
      * @param string $key
      * @param int    $expectedCapability
-     * @dataProvider providerCapabilityDecode
      * @throws UnexpectedValueException
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerCapabilityDecode')]
     public function testCapabilityDecode(string $key, int $expectedCapability): void
     {
         [$capabilityId, $indicatorId] = self::$codec->decode($key);
@@ -116,9 +113,9 @@ class CodecTest extends TestCase
      * @param string $key
      * @param int    $expectedCapability
      * @param int    $expectedIndicator
-     * @dataProvider providerIndicatorDecode
      * @throws UnexpectedValueException
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerIndicatorDecode')]
     public function testIndicatorDecode(string $key, int $expectedCapability, int $expectedIndicator): void
     {
         [$capabilityId, $indicatorId] = self::$codec->decode($key);
@@ -131,10 +128,10 @@ class CodecTest extends TestCase
 
 
     /** @return array */
-    public function providerEncodeInvalidCapability(): array
+    public static function providerEncodeInvalidCapability(): array
     {
         $data = [];
-        foreach ($this->invalidCapabilities() as $capability) {
+        foreach (self::invalidCapabilities() as $capability) {
             $data[] = [$capability];
         }
         return $data;
@@ -142,7 +139,7 @@ class CodecTest extends TestCase
 
 
     /** @return array */
-    public function providerEncodeCapability(): array
+    public static function providerEncodeCapability(): array
     {
         return [
             [(new CapabilityModel())->setId(1), 'c1',],
@@ -153,14 +150,14 @@ class CodecTest extends TestCase
 
 
     /** @return array */
-    public function providerEncodeInvalidIndicator(): array
+    public static function providerEncodeInvalidIndicator(): array
     {
         $data = [];
 
         // Valid Cap + Invalid Ind
-        foreach ($this->validCapabilities() as $validCapability) {
+        foreach (self::validCapabilities() as $validCapability) {
             $capability = clone $validCapability;
-            foreach ($this->invalidIndicators() as $invalidIndicator) {
+            foreach (self::invalidIndicators() as $invalidIndicator) {
                 $indicator = clone $invalidIndicator;
                 $indicator->setCapability($capability);
                 $data[] = [$indicator];
@@ -168,9 +165,9 @@ class CodecTest extends TestCase
         }
 
         // Invalid Cap + Valid Ind
-        foreach ($this->invalidCapabilities() as $invalidCapability) {
+        foreach (self::invalidCapabilities() as $invalidCapability) {
             $capability = clone $invalidCapability;
-            foreach ($this->validIndicators() as $validIndicator) {
+            foreach (self::validIndicators() as $validIndicator) {
                 $indicator = clone $validIndicator;
                 $indicator->setCapability($capability);
                 $data[] = [$indicator];
@@ -181,7 +178,7 @@ class CodecTest extends TestCase
 
 
     /** @return array */
-    public function providerEncodeIndicator(): array
+    public static function providerEncodeIndicator(): array
     {
         return [
             [(new IndicatorModel())->setCapability((new CapabilityModel())->setId(1))->setId(1), 'c1i1',],
@@ -194,7 +191,7 @@ class CodecTest extends TestCase
 
 
     /** @return array */
-    public function providerInvalidDecode(): array
+    public static function providerInvalidDecode(): array
     {
         return [
             [''],
@@ -218,7 +215,7 @@ class CodecTest extends TestCase
 
 
     /** @return array */
-    public function providerCapabilityDecode(): array
+    public static function providerCapabilityDecode(): array
     {
         return [
             ['c1', 1],
@@ -229,7 +226,7 @@ class CodecTest extends TestCase
 
 
     /** @return array */
-    public function providerIndicatorDecode(): array
+    public static function providerIndicatorDecode(): array
     {
         return [
             ['c1i1', 1, 1,],
@@ -247,7 +244,7 @@ class CodecTest extends TestCase
     /**
      * @return CapabilityModel[]
      */
-    private function invalidCapabilities(): array
+    private static function invalidCapabilities(): array
     {
         return [
             new CapabilityModel(),
@@ -259,7 +256,7 @@ class CodecTest extends TestCase
     /**
      * @return CapabilityModel[]
      */
-    private function validCapabilities(): array
+    private static function validCapabilities(): array
     {
         return [
             (new CapabilityModel())->setId(1),
@@ -272,7 +269,7 @@ class CodecTest extends TestCase
     /**
      * @return IndicatorModel[]
      */
-    private function invalidIndicators(): array
+    private static function invalidIndicators(): array
     {
         return [
             new IndicatorModel(),
@@ -284,7 +281,7 @@ class CodecTest extends TestCase
     /**
      * @return IndicatorModel[]
      */
-    private function validIndicators(): array
+    private static function validIndicators(): array
     {
         return [
             (new IndicatorModel())->setId(1),

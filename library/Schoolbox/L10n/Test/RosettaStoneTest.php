@@ -37,7 +37,7 @@ class RosettaStoneTest extends TestCase
      *
      * @return array
      */
-    public function getTestTranslateData()
+    public static function getTestTranslateData()
     {
         return [
             // Calendar
@@ -66,7 +66,7 @@ class RosettaStoneTest extends TestCase
         ];
     }
 
-    public function getTestIndefiniteArticleData()
+    public static function getTestIndefiniteArticleData()
     {
         return [
             // Calendar
@@ -92,7 +92,7 @@ class RosettaStoneTest extends TestCase
      *
      * @return array
      */
-    public function getTestTranslateUnknownTermData()
+    public static function getTestTranslateUnknownTermData()
     {
         return [
             'nothing' => ['nothing'],
@@ -106,7 +106,7 @@ class RosettaStoneTest extends TestCase
      *
      * @return array
      */
-    public function getTestTranslateSentenceData()
+    public static function getTestTranslateSentenceData()
     {
         return [
             // Event is not capitalized...
@@ -125,45 +125,35 @@ class RosettaStoneTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider getTestTranslateData
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('getTestTranslateData')]
     public function testTranslate($term, $plural, $capital, $expected)
     {
         $this->assertEquals($expected, $this->stone->translate($term, $plural, $capital));
     }
 
-    /**
-     * @dataProvider getTestTranslateUnknownTermData
-     *
-     */
+
+    #[\PHPUnit\Framework\Attributes\DataProvider('getTestTranslateUnknownTermData')]
     public function testTranslateUnknownTerm($term)
     {
         $this->expectException(\OutOfBoundsException::class);
         $this->stone->translate($term, false, false);
     }
 
-    /**
-     * @dataProvider getTestIndefiniteArticleData
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('getTestIndefiniteArticleData')]
     public function testTranslateIndefiniteArticle($term, $plural, $expected)
     {
         $this->assertEquals($expected, $this->stone->indefiniteArticle($term, $plural));
     }
 
-    /**
-     * @dataProvider getTestTranslateUnknownTermData
-     *
-     */
+
+    #[\PHPUnit\Framework\Attributes\DataProvider('getTestTranslateUnknownTermData')]
     public function testTranslateIndefiniteArticleUnknownTerm($term)
     {
         $this->expectException(\OutOfBoundsException::class);
         $this->stone->indefiniteArticle($term, false);
     }
 
-    /**
-     * @dataProvider getTestTranslateSentenceData
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('getTestTranslateSentenceData')]
     public function testTranslateSentence($sentence, $expected)
     {
         $this->assertEquals($expected, $this->stone->translateSentence($sentence));

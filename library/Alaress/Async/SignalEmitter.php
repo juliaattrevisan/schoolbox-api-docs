@@ -25,7 +25,7 @@ abstract class SignalEmitter implements EventEmitterInterface
      */
     public function __construct($loop)
     {
-        $loop->addPeriodicTimer(0.1, function () {
+        $loop->addPeriodicTimer(0.1, function (): void {
             pcntl_signal_dispatch();
         });
     }

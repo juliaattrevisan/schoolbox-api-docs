@@ -25,17 +25,17 @@ class CollectionTest extends TestCase
     protected $object;
 
     /**
-     * @var TestMapper
+     * @var TestMapper|null
      */
-    private TestMapper $testMapper;
+    private static ?TestMapper $testMapper = null;
 
     /**
-     * @inheritdoc
+     * Get the test mapper
      */
-    public function __construct(?string $name = null, array $data = [], $dataName = '')
+    public static function getTestMapper(): TestMapper
     {
-        parent::__construct($name, $data, $dataName);
-        $this->testMapper = new TestMapper();
+        self::$testMapper ??= new TestMapper();
+        return self::$testMapper;
     }
 
     /**
@@ -49,24 +49,24 @@ class CollectionTest extends TestCase
     /**
      * @param mixed            $input
      * @param ICollection|null $expected_output
-     * @dataProvider getTestHydrate
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('getTestHydrate')]
     public function testHydrate($input = null, $expected_output = null)
     {
-        $actual = $this->object->hydrate($input, $this->testMapper);
+        $actual = $this->object->hydrate($input, self::$testMapper);
 
         self::assertInstanceOf(ICollection::class, $expected_output);
         self::assertInstanceOf(ICollection::class, $actual);
         self::assertSameSize($expected_output, $actual);
 
-        $identifier = $this->testMapper->getIdentifierProperty();
+        $identifier = self::getTestMapper()->getIdentifierProperty();
         foreach ($expected_output as $i => $expectedItem) {
             $actualItem = $actual[$i];
             self::assertInstanceOf(TestModel::class, $expectedItem);
             self::assertInstanceOf(TestModel::class, $actualItem);
             self::assertSame(
-                $this->testMapper->getModelProperty($actualItem, $identifier),
-                $this->testMapper->getModelProperty($expectedItem, $identifier),
+                self::getTestMapper()->getModelProperty($actualItem, $identifier),
+                self::getTestMapper()->getModelProperty($expectedItem, $identifier),
             );
         }
     }
@@ -74,8 +74,8 @@ class CollectionTest extends TestCase
     /**
      * @param mixed           $input
      * @param TestMapper|null $mapper
-     * @dataProvider getTestHydrateErrorCases
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('getTestHydrateErrorCases')]
     public function testHydrateErrorCases($input, TestMapper $mapper = null): void
     {
         $this->expectException(TypeError::class);
@@ -85,19 +85,19 @@ class CollectionTest extends TestCase
     /**
      * @param mixed      $input
      * @param array|null $expected_output
-     * @dataProvider getTestDehydrate
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('getTestDehydrate')]
     public function testDehydrate($input = null, $expected_output = null)
     {
-        $actual = $this->object->dehydrate($input, $this->testMapper);
+        $actual = $this->object->dehydrate($input, self::$testMapper);
         self::assertSame($expected_output, $actual);
     }
 
     /**
      * @param mixed           $input
      * @param TestMapper|null $mapper
-     * @dataProvider getTestDehydrateTypeErrorCases
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('getTestDehydrateTypeErrorCases')]
     public function testDehydrateTypeErrorCases($input, TestMapper $mapper = null): void
     {
         $this->expectException(TypeError::class);
@@ -107,8 +107,8 @@ class CollectionTest extends TestCase
     /**
      * @param mixed           $input
      * @param TestMapper|null $mapper
-     * @dataProvider getTestDehydrateGetterNotDefinedErrorCases
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('getTestDehydrateGetterNotDefinedErrorCases')]
     public function testDehydrateGetterNotDefinedErrorCases($input, TestMapper $mapper = null): void
     {
         $this->expectException(Error::class);
@@ -118,36 +118,36 @@ class CollectionTest extends TestCase
     /**
      * @inheritdoc
      */
-    public function getTestHydrate()
+    public static function getTestHydrate()
     {
         // I don't think that a collection can ever be dehydrated as `null`:
         // it will always be an array
         return [
             'null'          => [
                 null,
-                $this->testMapper->createCollection(),
+                self::getTestMapper()->createCollection(),
             ],
             'none'          => [
                 [],
-                $this->testMapper->createCollection(),
+                self::getTestMapper()->createCollection(),
             ],
             'one'           => [
                 [1],
-                $this->testMapper->createCollection([
-                    $this->testMapper->createModel()->setId(1),
+                self::getTestMapper()->createCollection([
+                    self::getTestMapper()->createModel()->setId(1),
                 ]),
             ],
             'two'           => [
                 [1, 3],
-                $this->testMapper->createCollection([
-                    $this->testMapper->createModel()->setId(1),
-                    $this->testMapper->createModel()->setId(3),
+                self::getTestMapper()->createCollection([
+                    self::getTestMapper()->createModel()->setId(1),
+                    self::getTestMapper()->createModel()->setId(3),
                 ]),
             ],
             'array of null' => [
                 [null],
-                $this->testMapper->createCollection([
-                    $this->testMapper->createModel(),
+                self::getTestMapper()->createCollection([
+                    self::getTestMapper()->createModel(),
                 ]),
             ],
         ];
@@ -156,13 +156,13 @@ class CollectionTest extends TestCase
     /**
      * @inheritdoc
      */
-    public function getTestHydrateErrorCases()
+    public static function getTestHydrateErrorCases()
     {
         // Error cases:
         // mapper isn't set
         // input is not an array
         return [
-            'not array' => ['', $this->testMapper],
+            'not array' => ['', self::$testMapper],
             'no mapper' => [[], null],
         ];
     }
@@ -170,29 +170,29 @@ class CollectionTest extends TestCase
     /**
      * @inheritdoc
      */
-    public function getTestDehydrate()
+    public static function getTestDehydrate()
     {
         return [
             'null'                  => [null, null],
             'empty array'           => [[], []],
-            'empty collection'      => [$this->testMapper->createCollection(), []],
+            'empty collection'      => [self::getTestMapper()->createCollection(), []],
             'collection of null'    => [new \Schoolbox\Collection([null]), [null]],
             'collection of IDs'     => [
                 new \Schoolbox\Collection([1, 2]),
                 [1, 2],
             ],
             'collection of objects' => [
-                $this->testMapper->createCollection([
-                    $this->testMapper->createModel()->setId(1),
-                    $this->testMapper->createModel()->setId(3),
+                self::getTestMapper()->createCollection([
+                    self::getTestMapper()->createModel()->setId(1),
+                    self::getTestMapper()->createModel()->setId(3),
                 ]),
                 [1, 3],
             ],
             'mixed collection'      => [
                 new \Schoolbox\Collection([
-                    $this->testMapper->createModel()->setId(1),
+                    self::getTestMapper()->createModel()->setId(1),
                     2,
-                    $this->testMapper->createModel()->setId(3),
+                    self::getTestMapper()->createModel()->setId(3),
                 ]),
                 [1, 2, 3],
             ],
@@ -203,16 +203,16 @@ class CollectionTest extends TestCase
             ],
             'array of objects'      => [
                 [
-                    $this->testMapper->createModel()->setId(1),
-                    $this->testMapper->createModel()->setId(3),
+                    self::getTestMapper()->createModel()->setId(1),
+                    self::getTestMapper()->createModel()->setId(3),
                 ],
                 [1, 3],
             ],
             'mixed array'           => [
                 [
-                    $this->testMapper->createModel()->setId(1),
+                    self::getTestMapper()->createModel()->setId(1),
                     2,
-                    $this->testMapper->createModel()->setId(3),
+                    self::getTestMapper()->createModel()->setId(3),
                 ],
                 [1, 2, 3],
             ],
@@ -222,18 +222,18 @@ class CollectionTest extends TestCase
     /**
      * Data provider for `testDehydrateTypeErrorCases`
      */
-    public function getTestDehydrateTypeErrorCases(): iterable
+    public static function getTestDehydrateTypeErrorCases(): iterable
     {
         return [
-            'no mapper' => [$this->testMapper->createCollection(), null],
-            'string'    => ['string', $this->testMapper],
+            'no mapper' => [self::getTestMapper()->createCollection(), null],
+            'string'    => ['string', self::$testMapper],
         ];
     }
 
     /**
      * Data provider for `testDehydrateGetterNotDefinedErrorCases`
      */
-    public function getTestDehydrateGetterNotDefinedErrorCases(): iterable
+    public static function getTestDehydrateGetterNotDefinedErrorCases(): iterable
     {
         $dummy = new class {
             public function getName()
@@ -242,7 +242,7 @@ class CollectionTest extends TestCase
             }
         };
         return [
-            'getter not defined' => [[$dummy], $this->testMapper],
+            'getter not defined' => [[$dummy], self::$testMapper],
         ];
     }
 }

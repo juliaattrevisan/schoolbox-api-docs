@@ -21,7 +21,7 @@ class BasicGetPartTest extends TestCase
 
     protected function getTestDateObject(DateTimeZone $timezone = null)
     {
-        return $this->buildDateObject('2015-03-05 08:01:03', Alaress_Date_Format::DATABASE_FORMAT, $timezone);
+        return self::buildDateObject('2015-03-05 08:01:03', Alaress_Date_Format::DATABASE_FORMAT, $timezone);
     }
 
     public function testGetSecond()

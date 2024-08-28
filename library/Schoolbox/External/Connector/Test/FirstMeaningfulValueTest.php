@@ -35,12 +35,11 @@ use Schoolbox\External\Connector\FirstMeaningfulValue;
  */
 class FirstMeaningfulValueTest extends TestCase
 {
-
     /**
-     * @dataProvider providerValidMeaningfulValue
      * @param array  $input
      * @param string $expected
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerValidMeaningfulValue')]
     public function testValidMeaningfulValue(array $input, string $expected)
     {
         $this->assertEquals($expected, (new FirstMeaningfulValue())->find($input));
@@ -52,7 +51,7 @@ class FirstMeaningfulValueTest extends TestCase
      *
      * @return array
      */
-    public function providerValidMeaningfulValue(): array
+    public static function providerValidMeaningfulValue(): array
     {
         return [
 

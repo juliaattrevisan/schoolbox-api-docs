@@ -156,7 +156,7 @@ class Controller extends Base
                 // Also, if this is the Digistorm provider:
                 // de-register all other registrations for this user
                 // (as the Digistorm provider is superseding the others)
-                $this->registryMapper->getDatabase()->transact(function () use ($token, $registry, $sessionUser, $deleteExistingToken) {
+                $this->registryMapper->getDatabase()->transact(function () use ($token, $registry, $sessionUser, $deleteExistingToken): void {
                     if ($deleteExistingToken) {
                         $this->registryMapper->deleteByColumn('app_token', $token);
                     }

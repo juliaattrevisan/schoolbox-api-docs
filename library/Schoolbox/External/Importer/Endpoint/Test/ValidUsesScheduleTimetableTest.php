@@ -14,19 +14,16 @@ use PHPUnit\Framework\TestCase;
 use Schoolbox\External\Importer\Endpoint\Factory;
 use Schoolbox\External\Importer\Endpoint\ValidUsesScheduleTimetable;
 
-/**
- * @covers \Schoolbox\External\Importer\Endpoint\ValidUsesScheduleTimetable
- */
+#[\PHPUnit\Framework\Attributes\CoversClass(\Schoolbox\External\Importer\Endpoint\ValidUsesScheduleTimetable::class)]
 class ValidUsesScheduleTimetableTest extends TestCase
 {
     /**
-     * @dataProvider getTestIsSatisfiedByData
-     * @covers \Schoolbox\External\Importer\Endpoint\ValidUsesScheduleTimetable::isSatisfiedBy
      * @param string|null $externalDb
      * @param string|null $dataSource
      * @param bool        $expected
      * @return void
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('getTestIsSatisfiedByData')]
     public function testIsSatisfiedBy(?string $externalDb, ?string $dataSource, string $timetableView, bool $expected): void
     {
         $this->assertSame($expected, (new ValidUsesScheduleTimetable())->isSatisfiedBy($externalDb, $dataSource, $timetableView));
@@ -37,7 +34,7 @@ class ValidUsesScheduleTimetableTest extends TestCase
      *
      * @return iterable
      */
-    public function getTestIsSatisfiedByData(): iterable
+    public static function getTestIsSatisfiedByData(): iterable
     {
         yield 'null external DB, null timetable' => [
             null, null, 'table', false,

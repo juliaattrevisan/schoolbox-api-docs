@@ -14,8 +14,8 @@ use Schoolbox\Resource\Folder;
 
 /**
  * @codeCoverageIgnore
- * @covers \Schoolbox\Resource\Folder\Model::getRolledOverCodes
  */
+#[\PHPUnit\Framework\Attributes\CoversClass(\Schoolbox\Resource\Folder\Model::class)]
 class RolledOverFolderCodeTest extends TestCase
 {
     /**
@@ -33,10 +33,10 @@ class RolledOverFolderCodeTest extends TestCase
     /**
      * Tests a folder name with a single rolled over code
      *
-     * @dataProvider providerSingle
      * @param string   $folderName
      * @param string[] $expected
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerSingle')]
     public function testSingle(string $folderName, array $expected): void
     {
         $folder = (new Folder\Model())
@@ -49,10 +49,10 @@ class RolledOverFolderCodeTest extends TestCase
     /**
      * Tests a folder name with multiple rolled over codes
      *
-     * @dataProvider providerMultiple
      * @param string   $folderName
      * @param string[] $expected
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerMultiple')]
     public function testMultiple(string $folderName, array $expected): void
     {
         $folder = (new Folder\Model())
@@ -62,7 +62,7 @@ class RolledOverFolderCodeTest extends TestCase
     }
 
 
-    public function providerSingle(): array
+    public static function providerSingle(): array
     {
         return [
             ['A folder [ABC]', ['ABC']],
@@ -80,7 +80,7 @@ class RolledOverFolderCodeTest extends TestCase
         ];
     }
 
-    public function providerMultiple(): array
+    public static function providerMultiple(): array
     {
         return [
             ['A folder [ABC,XYZ]', ['ABC', 'XYZ']],

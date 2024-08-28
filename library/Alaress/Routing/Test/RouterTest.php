@@ -84,7 +84,7 @@ class RouterTest extends TestCase
     /**
      * @return array
      */
-    public function dataPatternPathGet()
+    public static function dataPatternPathGet()
     {
         return [
             [ 'bing:foo:42:bar:baz', 'wordFooFortyTwoWordWord' ],
@@ -96,13 +96,13 @@ class RouterTest extends TestCase
 
 
     /**
-     * @dataProvider dataPatternPathGet
      *
      * @param string $path
      * @param string $expectedKey
      * @throws InvalidArgumentException
      * @throws PHPUnit_Framework_Exception
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('dataPatternPathGet')]
     public function testPatternPathGet($path, $expectedKey)
     {
         $result = array_keys(self::$testGet->get($path));
@@ -115,7 +115,7 @@ class RouterTest extends TestCase
     /**
      * @return array[]
      */
-    public function dataDropAll()
+    public static function dataDropAll()
     {
         return [
             'recursive'     => [ true ],
@@ -125,12 +125,12 @@ class RouterTest extends TestCase
 
 
     /**
-     * @dataProvider dataDropAll
      * @param bool $recursive
      * @throws InvalidArgumentException
      * @throws OutOfBoundsException
      * @throws PHPUnit_Framework_AssertionFailedError
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('dataDropAll')]
     public function testDropAll($recursive)
     {
         // don't use the global router, we need to mutate this one

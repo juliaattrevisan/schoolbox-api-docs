@@ -114,10 +114,10 @@ class CustomStyleExtractorTest extends TestCase
 
 
     /**
-     * @dataProvider providerValidCustomStyleExtraction
      * @param string $input
      * @param int   $expected
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerValidCustomStyleExtraction')]
     public function testValidCustomStyleExtraction(string $input, $expected)
     {
         $outcome = (new CustomStyleExtractor())->extract($input);
@@ -132,7 +132,7 @@ class CustomStyleExtractorTest extends TestCase
      *
      * @return array
      */
-    public function providerValidCustomStyleExtraction(): array
+    public static function providerValidCustomStyleExtraction(): array
     {
         return [
             /* Empty string in Skin Config

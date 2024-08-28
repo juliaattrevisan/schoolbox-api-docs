@@ -19,21 +19,20 @@ use PHPUnit\Framework;
 use PHPUnit\Framework\AssertionFailedError;
 
 /**
- * @covers \Schoolbox\Comms\News\Model
  * @codeCoverageIgnore
  */
+#[\PHPUnit\Framework\Attributes\CoversClass(\Schoolbox\Comms\News\Model::class)]
 class StateTransitionTest extends TestCase
 {
-
     /**
      * Test we can transition an article through valid transitions
      *
-     * @dataProvider providerStubArticleAndModerator
      * @param Model $article
      * @param User  $moderator
      * @throws AssertionFailedError
      * @throws InvalidTransitionException
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerStubArticleAndModerator')]
     public function testTransitionsNormal(Model $article, User $moderator): void
     {
         // New models are drafts
@@ -108,13 +107,13 @@ class StateTransitionTest extends TestCase
     /**
      * Tests the approved composite state
      *
-     * @dataProvider providerStubArticleAndModerator
      * @param Model $article
      * @param User  $moderator
      * @throws AssertionFailedError
      * @throws InvalidArgumentException
      * @throws InvalidTransitionException
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerStubArticleAndModerator')]
     public function testApprovedStates(Model $article, User $moderator): void
     {
         $article->approve($moderator);
@@ -145,12 +144,12 @@ class StateTransitionTest extends TestCase
     /**
      * Tests approval transitions
      *
-     * @dataProvider providerStubArticleAndModerator
      * @param Model $article
      * @param User  $moderator
      * @throws AssertionFailedError
      * @throws InvalidTransitionException
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerStubArticleAndModerator')]
     public function testApprovedTransitions(Model $article, User $moderator): void
     {
         $article->approve($moderator);
@@ -178,12 +177,12 @@ class StateTransitionTest extends TestCase
     /**
      * Tests we cannot reject a draft article
      *
-     * @dataProvider providerStubArticleAndModerator
      * @param Model $article
      * @param User  $moderator
      * @throws Framework\Exception
      * @throws InvalidTransitionException
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerStubArticleAndModerator')]
     public function testInvalidTransitionRejectDraft(Model $article, User $moderator): void
     {
         $this->expectException(InvalidTransitionException::class);
@@ -194,12 +193,12 @@ class StateTransitionTest extends TestCase
     /**
      * Tests we cannot reject an already-rejected article
      *
-     * @dataProvider providerStubArticleAndModerator
      * @param Model $article
      * @param User  $moderator
      * @throws Framework\Exception
      * @throws InvalidTransitionException
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerStubArticleAndModerator')]
     public function testInvalidTransitionRejectReject(Model $article, User $moderator): void
     {
         $article->submit();
@@ -213,11 +212,11 @@ class StateTransitionTest extends TestCase
     /**
      * Tests we cannot submit an article already awaiting moderation
      *
-     * @dataProvider providerStubArticleAndModerator
      * @param Model $article
      * @throws Framework\Exception
      * @throws InvalidTransitionException
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerStubArticleAndModerator')]
     public function testInvalidTransitionSubmitAwaitingModeration(Model $article): void
     {
         $article->submit();
@@ -229,15 +228,15 @@ class StateTransitionTest extends TestCase
     /**
      * Tests we cannot submit an article already awaiting moderation
      *
-     * @dataProvider providerStubArticleAndModerator
      * @param Model $article
      * @throws Framework\Exception
      * @throws InvalidTransitionException
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerStubArticleAndModerator')]
     public function testInvalidTransitionSubmitExpired(Model $article): void
     {
         $article->submit();
-        $article->approve($this->getModerator());
+        $article->approve(self::getModerator());
         $article->archive();
         $this->expectException(InvalidTransitionException::class);
         $article->submit();
@@ -265,11 +264,11 @@ class StateTransitionTest extends TestCase
     /**
      * Tests we cannot un-submit a draft
      *
-     * @dataProvider providerStubArticleAndModerator
      * @param Model $article
      * @throws Framework\Exception
      * @throws InvalidTransitionException
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerStubArticleAndModerator')]
     public function testInvalidTransitionUnSubmitDraft(Model $article): void
     {
         $this->expectException(InvalidTransitionException::class);
@@ -280,11 +279,11 @@ class StateTransitionTest extends TestCase
     /**
      * Tests we cannot archive a draft
      *
-     * @dataProvider providerStubArticleAndModerator
      * @param Model $article
      * @throws Framework\Exception
      * @throws InvalidTransitionException
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerStubArticleAndModerator')]
     public function testInvalidTransitionUnArchiveDraft(Model $article): void
     {
         $this->expectException(InvalidTransitionException::class);
@@ -295,11 +294,11 @@ class StateTransitionTest extends TestCase
     /**
      * Tests we cannot archive an article awaiting moderation
      *
-     * @dataProvider providerStubArticleAndModerator
      * @param Model $article
      * @throws Framework\Exception
      * @throws InvalidTransitionException
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerStubArticleAndModerator')]
     public function testInvalidTransitionUnArchiveAwaitingMod(Model $article): void
     {
         $article->submit();
@@ -311,12 +310,12 @@ class StateTransitionTest extends TestCase
     /**
      * Tests we cannot archive a rejected article
      *
-     * @dataProvider providerStubArticleAndModerator
      * @param Model $article
      * @param User  $moderator
      * @throws InvalidTransitionException
      * @throws Framework\Exception
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerStubArticleAndModerator')]
     public function testInvalidTransitionUnArchiveRejected(Model $article, User $moderator): void
     {
         $article->submit();
@@ -329,12 +328,12 @@ class StateTransitionTest extends TestCase
     /**
      * Tests we cannot archive an already-archived article
      *
-     * @dataProvider providerStubArticleAndModerator
      * @param Model $article
      * @param User  $moderator
      * @throws InvalidTransitionException
      * @throws Framework\Exception
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerStubArticleAndModerator')]
     public function testInvalidTransitionUnArchiveArchived(Model $article, User $moderator): void
     {
         $article->submit();
@@ -349,13 +348,13 @@ class StateTransitionTest extends TestCase
      * Tests that if we extend a publish date into the future, it automatically pushes out the expiry date
      * so that no invalid data occurs (cannot have expiry < publish)
      *
-     * @dataProvider providerStubArticleAndModerator
      * @param Model $article
      * @param User  $moderator
      * @throws InvalidTransitionException
      * @throws InvalidArgumentException
      * @throws AssertionFailedError
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerStubArticleAndModerator')]
     public function testPublishAfterExpiry(Model $article, User $moderator): void
     {
         $article->setPublishAt(Alaress_Date_Format::newNaturalDate('7 days'));
@@ -397,7 +396,7 @@ class StateTransitionTest extends TestCase
         $this->assertFalse($article->canBeArchived());
 
         // Rejected
-        $article->reject($this->getModerator());
+        $article->reject(self::getModerator());
         $this->assertTrue($article->canBeSubmitted());
         $this->assertTrue($article->canBeUnSubmitted());
         $this->assertTrue($article->canBeApproved());
@@ -413,7 +412,7 @@ class StateTransitionTest extends TestCase
         $this->assertFalse($article->canBeArchived());
 
         // Awaiting publication
-        $article->approve($this->getModerator());
+        $article->approve(self::getModerator());
         $this->assertFalse($article->canBeSubmitted());
         $this->assertTrue($article->canBeUnSubmitted());
         $this->assertFalse($article->canBeApproved());
@@ -446,14 +445,14 @@ class StateTransitionTest extends TestCase
      * @return array
      * @throws InvalidArgumentException
      */
-    public function providerStubArticleAndModerator(): array
+    public static function providerStubArticleAndModerator(): array
     {
         // Created now, publish in 7 days, expire in 14 days
         $article = (new Model())
             ->setPublishAt(Alaress_Date_Format::newNaturalDate('7 days'))
             ->setExpiresAt(Alaress_Date_Format::newNaturalDate('14 days'));
 
-        $moderator = $this->getModerator();
+        $moderator = self::getModerator();
 
         return [
             [$article, $moderator],
@@ -467,7 +466,7 @@ class StateTransitionTest extends TestCase
      *
      * @return User
      */
-    private function getModerator(): User
+    private static function getModerator(): User
     {
         return (new User())->setId(151);
     }

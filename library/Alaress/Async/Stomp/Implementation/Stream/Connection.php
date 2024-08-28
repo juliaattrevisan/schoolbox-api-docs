@@ -162,17 +162,17 @@ class Connection
         // If the connection is successful, $onConnect is called:
         // otherwise, $onError is called.
         // Either way, once I know the status remove both listeners.
-        $onConnect = static function () use ($deferred) {
+        $onConnect = static function () use ($deferred): void {
             $deferred->resolve();
         };
-        $onError   = static function (BaseFrame $frame) use ($deferred) {
+        $onError   = static function (BaseFrame $frame) use ($deferred): void {
             $deferred->reject($frame->getBody());
         };
-        $this->stream->once('connect', function () use ($onConnect, $onError) {
+        $this->stream->once('connect', function () use ($onConnect, $onError): void {
             $this->stream->removeListener('error', $onError);
             $onConnect();
         });
-        $this->stream->once('error', function (BaseFrame $frame) use ($onConnect, $onError) {
+        $this->stream->once('error', function (BaseFrame $frame) use ($onConnect, $onError): void {
             $this->stream->removeListener('connect', $onConnect);
             $onError($frame);
         });
@@ -210,7 +210,7 @@ class Connection
      */
     public function onMessage(string $subscriptionId, callable $callback): void
     {
-        $this->stream->on('message', function (BaseFrame $frame) use ($subscriptionId, $callback) {
+        $this->stream->on('message', function (BaseFrame $frame) use ($subscriptionId, $callback): void {
             if ($frame['subscription'] === $subscriptionId) {
                 $callback(
                     $frame,
@@ -238,7 +238,7 @@ class Connection
 
         // Create the stream, subscribe to its data event
         $this->stream = new Stream($socket, $this->loop);
-        $this->stream->on('data', function ($data) {
+        $this->stream->on('data', function ($data): void {
             $this->parser->addData($data);
             while ($frame = $this->parser->nextFrame()) {
                 if ($frame instanceof BaseFrame) {

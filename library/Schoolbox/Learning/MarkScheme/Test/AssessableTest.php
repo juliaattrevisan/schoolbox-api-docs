@@ -58,13 +58,13 @@ class AssessableTest extends TestCase
      *
      * @var User[]
      */
-    private $studentCache = [];
+    private static $studentCache = [];
 
     /** @var User[] */
-    private $teacherCache = [];
+    private static $teacherCache = [];
 
-    /** @var ParticipantLinker */
-    private $linker;
+    /** @var ParticipantLinker|null */
+    private static ?ParticipantLinker $linker = null;
 
     /**
      * For floating point comparisons
@@ -72,23 +72,11 @@ class AssessableTest extends TestCase
     protected float $delta = 0.000000001;
 
     /**
-     * @param null|string $name
-     * @param array       $data
-     * @param string      $dataName
-     */
-    public function __construct(?string $name = null, array $data = [], $dataName = '')
-    {
-        parent::__construct($name, $data, $dataName);
-        $this->linker = new ParticipantLinker();
-    }
-
-
-    /**
-     * @dataProvider providerTaskCompletionGetHR
      * @param Task $task
      * @param User $student
      * @param string $expected
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerTaskCompletionGetHR')]
     public function testTaskCompletionGetHumanReadable(Task $task, User $student, $expected)
     {
         $actual = $task->getHumanReadableMark($task->getParticipantIfExtant($student), false);
@@ -97,11 +85,11 @@ class AssessableTest extends TestCase
     }
 
     /**
-     * @dataProvider providerTaskCompletionGetHRPublishedOnly
      * @param Task $task
      * @param User $student
      * @param string $expected
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerTaskCompletionGetHRPublishedOnly')]
     public function testTaskCompletionGetHumanReadablePublishedOnly(Task $task, User $student, $expected)
     {
         // A student-assessed response is always published
@@ -113,11 +101,11 @@ class AssessableTest extends TestCase
     }
 
     /**
-     * @dataProvider providerQuiztotalMarkFractionGetHR
      * @param Quiz $quiz
      * @param User $student
      * @param string $expected
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerQuiztotalMarkFractionGetHR')]
     public function testQuizTotalMarkFractionGetHumanReadable(Quiz $quiz, User $student, $expected)
     {
         $actual = $quiz->getHumanReadableMark($quiz->getParticipantIfExtant($student), false);
@@ -127,11 +115,11 @@ class AssessableTest extends TestCase
     }
 
     /**
-     * @dataProvider providerQuiztotalMarkFractionGetHRPublishedOnly
      * @param Quiz $quiz
      * @param User $student
      * @param string $expected
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerQuiztotalMarkFractionGetHRPublishedOnly')]
     public function testQuizTotalMarkFractionGetHumanReadablePublishedOnly(Quiz $quiz, User $student, $expected)
     {
         $actual = $quiz->getHumanReadableMark($quiz->getParticipantIfExtant($student), true);
@@ -140,11 +128,11 @@ class AssessableTest extends TestCase
     }
 
     /**
-     * @dataProvider providerQuiztotalMarkFractionGetNorm
      * @param Quiz $quiz
      * @param User $student
      * @param string $expected
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerQuiztotalMarkFractionGetNorm')]
     public function testQuizTotalMarkFractionGetNormalised(Quiz $quiz, User $student, $expected)
     {
         $actual = $quiz->getNormalisedMark($quiz->getParticipantIfExtant($student), false);
@@ -153,11 +141,11 @@ class AssessableTest extends TestCase
     }
 
     /**
-     * @dataProvider providerQuiztotalMarkFractionGetNormPublishedOnly
      * @param Quiz $quiz
      * @param User $student
      * @param string $expected
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerQuiztotalMarkFractionGetNormPublishedOnly')]
     public function testQuizTotalMarkFractionGetNormalisedPublishedOnly(Quiz $quiz, User $student, $expected)
     {
         $actual = $quiz->getNormalisedMark($quiz->getParticipantIfExtant($student), true);
@@ -166,11 +154,11 @@ class AssessableTest extends TestCase
     }
 
     /**
-     * @dataProvider providerDueWorkNoneGetHR
      * @param DueWork $dueWork
      * @param User $student
      * @param string $expected
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerDueWorkNoneGetHR')]
     public function testDueWorkNoneGetHumanReadable(DueWork $dueWork, User $student, $expected)
     {
         $actual = $dueWork->getHumanReadableMark($dueWork->getParticipantIfExtant($student), false);
@@ -179,11 +167,11 @@ class AssessableTest extends TestCase
     }
 
     /**
-     * @dataProvider providerDueWorkNoneGetHRPublishedOnly
      * @param DueWork $dueWork
      * @param User $student
      * @param string $expected
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerDueWorkNoneGetHRPublishedOnly')]
     public function testDueWorkNoneGetHumanReadablePublishedOnly(DueWork $dueWork, User $student, $expected)
     {
         $actual = $dueWork->getHumanReadableMark($dueWork->getParticipantIfExtant($student), true);
@@ -192,11 +180,11 @@ class AssessableTest extends TestCase
     }
 
     /**
-     * @dataProvider providerDueWorkPercentGetHR
      * @param DueWork $dueWork
      * @param User $student
      * @param string $expected
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerDueWorkPercentGetHR')]
     public function testDueWorkPercentGetHumanReadable(DueWork $dueWork, User $student, $expected)
     {
         $actual = $dueWork->getHumanReadableMark($dueWork->getParticipantIfExtant($student), false);
@@ -205,11 +193,11 @@ class AssessableTest extends TestCase
     }
 
     /**
-     * @dataProvider providerDueWorkPercentGetHRPublishedOnly
      * @param DueWork $dueWork
      * @param User $student
      * @param string $expected
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerDueWorkPercentGetHRPublishedOnly')]
     public function testDueWorkPercentGetHumanReadablePublishedOnly(DueWork $dueWork, User $student, $expected)
     {
         $actual = $dueWork->getHumanReadableMark($dueWork->getParticipantIfExtant($student), true);
@@ -218,11 +206,11 @@ class AssessableTest extends TestCase
     }
 
     /**
-     * @dataProvider providerDueWorkTotalMarkGetHR
      * @param DueWork $dueWork
      * @param User $student
      * @param string $expected
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerDueWorkTotalMarkGetHR')]
     public function testDueWorkTotalMarkGetHumanReadable(DueWork $dueWork, User $student, $expected)
     {
         $actual = $dueWork->getHumanReadableMark($dueWork->getParticipantIfExtant($student), false);
@@ -231,11 +219,11 @@ class AssessableTest extends TestCase
     }
 
     /**
-     * @dataProvider providerDueWorkTotalMarkGetHRPublishedOnly
      * @param DueWork $dueWork
      * @param User $student
      * @param string $expected
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerDueWorkTotalMarkGetHRPublishedOnly')]
     public function testDueWorkTotalMarkGetHumanReadablePublishedOnly(DueWork $dueWork, User $student, $expected)
     {
         $actual = $dueWork->getHumanReadableMark($dueWork->getParticipantIfExtant($student), true);
@@ -244,11 +232,11 @@ class AssessableTest extends TestCase
     }
 
     /**
-     * @dataProvider providerDueWorkLetterGradeGetHR
      * @param DueWork $dueWork
      * @param User $student
      * @param string $expected
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerDueWorkLetterGradeGetHR')]
     public function testDueWorkLetterGradeGetHumanReadable(DueWork $dueWork, User $student, $expected)
     {
         $actual = $dueWork->getHumanReadableMark($dueWork->getParticipantIfExtant($student), false);
@@ -257,11 +245,11 @@ class AssessableTest extends TestCase
     }
 
     /**
-     * @dataProvider providerDueWorkLetterGradeGetHRPublishedOnly
      * @param DueWork $dueWork
      * @param User $student
      * @param string $expected
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerDueWorkLetterGradeGetHRPublishedOnly')]
     public function testDueWorkLetterGradeGetHumanReadablePublishedOnly(DueWork $dueWork, User $student, $expected)
     {
         $actual = $dueWork->getHumanReadableMark($dueWork->getParticipantIfExtant($student), true);
@@ -270,11 +258,11 @@ class AssessableTest extends TestCase
     }
 
     /**
-     * @dataProvider providerDueWorkNoneGetNorm
      * @param DueWork $dueWork
      * @param User $student
      * @param string $expected
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerDueWorkNoneGetNorm')]
     public function testDueWorkNoneGetNormalised(DueWork $dueWork, User $student, $expected)
     {
         $actual = $dueWork->getNormalisedMark($dueWork->getParticipantIfExtant($student), false);
@@ -283,11 +271,11 @@ class AssessableTest extends TestCase
     }
 
     /**
-     * @dataProvider providerDueWorkNoneGetNormPublishedOnly
      * @param DueWork $dueWork
      * @param User $student
      * @param string $expected
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerDueWorkNoneGetNormPublishedOnly')]
     public function testDueWorkNoneGetNormalisedPublishedOnly(DueWork $dueWork, User $student, $expected)
     {
         $actual = $dueWork->getNormalisedMark($dueWork->getParticipantIfExtant($student), true);
@@ -296,11 +284,11 @@ class AssessableTest extends TestCase
     }
 
     /**
-     * @dataProvider providerDueWorkPercentGetNorm
      * @param DueWork $dueWork
      * @param User $student
      * @param string $expected
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerDueWorkPercentGetNorm')]
     public function testDueWorkPercentGetNormalised(DueWork $dueWork, User $student, $expected)
     {
         $actual = $dueWork->getNormalisedMark($dueWork->getParticipantIfExtant($student), false);
@@ -309,11 +297,11 @@ class AssessableTest extends TestCase
     }
 
     /**
-     * @dataProvider providerDueWorkPercentGetNormPublishedOnly
      * @param DueWork $dueWork
      * @param User $student
      * @param string $expected
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerDueWorkPercentGetNormPublishedOnly')]
     public function testDueWorkPercentGetNormalisedPublishedOnly(DueWork $dueWork, User $student, $expected)
     {
         $actual = $dueWork->getNormalisedMark($dueWork->getParticipantIfExtant($student), true);
@@ -322,11 +310,11 @@ class AssessableTest extends TestCase
     }
 
     /**
-     * @dataProvider providerDueWorkTotalMarkGetNorm
      * @param DueWork $dueWork
      * @param User $student
      * @param string $expected
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerDueWorkTotalMarkGetNorm')]
     public function testDueWorkTotalMarkGetNormalised(DueWork $dueWork, User $student, $expected)
     {
         $actual = $dueWork->getNormalisedMark($dueWork->getParticipantIfExtant($student), false);
@@ -335,11 +323,11 @@ class AssessableTest extends TestCase
     }
 
     /**
-     * @dataProvider providerDueWorkTotalMarkGetNormPublishedOnly
      * @param DueWork $dueWork
      * @param User $student
      * @param string $expected
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerDueWorkTotalMarkGetNormPublishedOnly')]
     public function testDueWorkTotalMarkGetNormalisedPublishedOnly(DueWork $dueWork, User $student, $expected)
     {
         $actual = $dueWork->getNormalisedMark($dueWork->getParticipantIfExtant($student), true);
@@ -348,11 +336,11 @@ class AssessableTest extends TestCase
     }
 
     /**
-     * @dataProvider providerDueWorkLetterGradeGetNorm
      * @param DueWork $dueWork
      * @param User $student
      * @param string $expected
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerDueWorkLetterGradeGetNorm')]
     public function testDueWorkLetterGradeGetNormalised(DueWork $dueWork, User $student, $expected)
     {
         $actual = $dueWork->getNormalisedMark($dueWork->getParticipantIfExtant($student), false);
@@ -361,11 +349,11 @@ class AssessableTest extends TestCase
     }
 
     /**
-     * @dataProvider providerDueWorkLetterGradeGetNormPublishedOnly
      * @param DueWork $dueWork
      * @param User $student
      * @param string $expected
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerDueWorkLetterGradeGetNormPublishedOnly')]
     public function testDueWorkLetterGradeGetNormalisedPublishedOnly(DueWork $dueWork, User $student, $expected)
     {
         $actual = $dueWork->getNormalisedMark($dueWork->getParticipantIfExtant($student), true);
@@ -375,15 +363,15 @@ class AssessableTest extends TestCase
 
 
     /**
-     * @dataProvider providerProjectMinGetNorm
      * @param Project $project
      * @param User    $student
      * @param string  $expected
      * @throws InvalidArgumentException If an unrecognised user.id is passed
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerProjectMinGetNorm')]
     public function testProjectMinimumNoneGetNorm(Project $project, User $student, $expected)
     {
-        $project->setMarkType($this->getDummyMarkType(MarkType::SLUG_NONE));
+        $project->setMarkType(self::getDummyMarkType(MarkType::SLUG_NONE));
         $project->setMarkScheme(new None());
 
         $actual = $project->getNormalisedMark($project->getParticipantIfExtant($student), false);
@@ -393,16 +381,16 @@ class AssessableTest extends TestCase
 
 
     /**
-     * @dataProvider providerProjectMinGetNormPublishedOnly
      * @param Project $project
      * @param User    $student
      * @param string  $expected
      * @throws InvalidArgumentException If an unrecognised user.id is passed
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerProjectMinGetNormPublishedOnly')]
     public function testProjectMinimumNoneGetNormPublishedOnly(Project $project, User $student, $expected)
     {
         $project->setSummator(new Minimum());
-        $project->setMarkType($this->getDummyMarkType(MarkType::SLUG_NONE));
+        $project->setMarkType(self::getDummyMarkType(MarkType::SLUG_NONE));
         $project->setMarkScheme(new None());
 
         $actual = $project->getNormalisedMark($project->getParticipantIfExtant($student), true);
@@ -412,17 +400,17 @@ class AssessableTest extends TestCase
 
 
     /**
-     * @dataProvider providerProjectMinGetNorm
      * @param Project $project
      * @param User    $student
      * @param string  $expected
      * @throws InvalidArgumentException If an unrecognised user.id is passed
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerProjectMinGetNorm')]
     public function testProjectMinimumLetterGradeGetNorm(Project $project, User $student, $expected)
     {
         $project->setSummator(new Minimum());
-        $project->setMarkType($this->getDummyMarkType(MarkType::SLUG_LETTER));
-        $project->setMarkScheme(new LetterGrade($this->getDummyLetterGradeGroup()));
+        $project->setMarkType(self::getDummyMarkType(MarkType::SLUG_LETTER));
+        $project->setMarkScheme(new LetterGrade(self::getDummyLetterGradeGroup()));
 
         $actual = $project->getNormalisedMark($project->getParticipantIfExtant($student), false);
         $message = "User: {$student->getFirstname()}, Expected: '$expected', Actual: '$actual'";
@@ -430,17 +418,17 @@ class AssessableTest extends TestCase
     }
 
     /**
-     * @dataProvider providerProjectMinGetNormPublishedOnly
      * @param Project $project
      * @param User $student
      * @param string $expected
      * @throws InvalidArgumentException If an unrecognised user.id is passed
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerProjectMinGetNormPublishedOnly')]
     public function testProjectMinimumLetterGradeGetNormPublishedOnly(Project $project, User $student, $expected)
     {
         $project->setSummator(new Minimum());
-        $project->setMarkType($this->getDummyMarkType(MarkType::SLUG_LETTER));
-        $project->setMarkScheme(new LetterGrade($this->getDummyLetterGradeGroup()));
+        $project->setMarkType(self::getDummyMarkType(MarkType::SLUG_LETTER));
+        $project->setMarkScheme(new LetterGrade(self::getDummyLetterGradeGroup()));
 
         $actual = $project->getNormalisedMark($project->getParticipantIfExtant($student), true);
         $message = "User: {$student->getFirstname()}, Expected: '$expected', Actual: '$actual'";
@@ -448,16 +436,16 @@ class AssessableTest extends TestCase
     }
 
     /**
-     * @dataProvider providerProjectMinGetNorm
      * @param Project $project
      * @param User $student
      * @param string $expected
      * @throws InvalidArgumentException If an unrecognised user.id is passed
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerProjectMinGetNorm')]
     public function testProjectMinimumPercentGetNorm(Project $project, User $student, $expected)
     {
         $project->setSummator(new Minimum());
-        $project->setMarkType($this->getDummyMarkType(MarkType::SLUG_PERCENT));
+        $project->setMarkType(self::getDummyMarkType(MarkType::SLUG_PERCENT));
         $project->setMarkScheme(new Percentage());
 
         $actual = $project->getNormalisedMark($project->getParticipantIfExtant($student), false);
@@ -467,16 +455,16 @@ class AssessableTest extends TestCase
 
 
     /**
-     * @dataProvider providerProjectMinGetNormPublishedOnly
      * @param Project $project
      * @param User $student
      * @param string $expected
      * @throws InvalidArgumentException If an unrecognised user.id is passed
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerProjectMinGetNormPublishedOnly')]
     public function testProjectMinimumPercentGetNormPublishedOnly(Project $project, User $student, $expected)
     {
         $project->setSummator(new Minimum());
-        $project->setMarkType($this->getDummyMarkType(MarkType::SLUG_PERCENT));
+        $project->setMarkType(self::getDummyMarkType(MarkType::SLUG_PERCENT));
         $project->setMarkScheme(new Percentage());
 
         $actual = $project->getNormalisedMark($project->getParticipantIfExtant($student), true);
@@ -485,16 +473,16 @@ class AssessableTest extends TestCase
     }
 
     /**
-     * @dataProvider providerProjectMaxGetNorm
      * @param Project $project
      * @param User $student
      * @param string $expected
      * @throws InvalidArgumentException If an unrecognised user.id is passed
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerProjectMaxGetNorm')]
     public function testProjectMaximumNoneGetNorm(Project $project, User $student, $expected)
     {
         $project->setSummator(new Maximum());
-        $project->setMarkType($this->getDummyMarkType(MarkType::SLUG_NONE));
+        $project->setMarkType(self::getDummyMarkType(MarkType::SLUG_NONE));
         $project->setMarkScheme(new None());
 
         $actual = $project->getNormalisedMark($project->getParticipantIfExtant($student), false);
@@ -503,16 +491,16 @@ class AssessableTest extends TestCase
     }
 
     /**
-     * @dataProvider providerProjectMaxGetNormPublishedOnly
      * @param Project $project
      * @param User $student
      * @param string $expected
      * @throws InvalidArgumentException If an unrecognised user.id is passed
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerProjectMaxGetNormPublishedOnly')]
     public function testProjectMaximumNoneGetNormPublishedOnly(Project $project, User $student, $expected)
     {
         $project->setSummator(new Maximum());
-        $project->setMarkType($this->getDummyMarkType(MarkType::SLUG_NONE));
+        $project->setMarkType(self::getDummyMarkType(MarkType::SLUG_NONE));
         $project->setMarkScheme(new None());
 
         $actual = $project->getNormalisedMark($project->getParticipantIfExtant($student), true);
@@ -521,17 +509,17 @@ class AssessableTest extends TestCase
     }
 
     /**
-     * @dataProvider providerProjectMaxGetNorm
      * @param Project $project
      * @param User $student
      * @param string $expected
      * @throws InvalidArgumentException If an unrecognised user.id is passed
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerProjectMaxGetNorm')]
     public function testProjectMaximumLetterGradeGetNorm(Project $project, User $student, $expected)
     {
         $project->setSummator(new Maximum());
-        $project->setMarkType($this->getDummyMarkType(MarkType::SLUG_LETTER));
-        $project->setMarkScheme(new LetterGrade($this->getDummyLetterGradeGroup()));
+        $project->setMarkType(self::getDummyMarkType(MarkType::SLUG_LETTER));
+        $project->setMarkScheme(new LetterGrade(self::getDummyLetterGradeGroup()));
 
         $actual = $project->getNormalisedMark($project->getParticipantIfExtant($student), false);
         $message = "User: {$student->getFirstname()}, Expected: '$expected', Actual: '$actual'";
@@ -539,17 +527,17 @@ class AssessableTest extends TestCase
     }
 
     /**
-     * @dataProvider providerProjectMaxGetNormPublishedOnly
      * @param Project $project
      * @param User $student
      * @param string $expected
      * @throws InvalidArgumentException If an unrecognised user.id is passed
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerProjectMaxGetNormPublishedOnly')]
     public function testProjectMaximumLetterGradeGetNormPublishedOnly(Project $project, User $student, $expected)
     {
         $project->setSummator(new Maximum());
-        $project->setMarkType($this->getDummyMarkType(MarkType::SLUG_LETTER));
-        $project->setMarkScheme(new LetterGrade($this->getDummyLetterGradeGroup()));
+        $project->setMarkType(self::getDummyMarkType(MarkType::SLUG_LETTER));
+        $project->setMarkScheme(new LetterGrade(self::getDummyLetterGradeGroup()));
 
         $actual = $project->getNormalisedMark($project->getParticipantIfExtant($student), true);
         $message = "User: {$student->getFirstname()}, Expected: '$expected', Actual: '$actual'";
@@ -557,16 +545,16 @@ class AssessableTest extends TestCase
     }
 
     /**
-     * @dataProvider providerProjectMaxGetNorm
      * @param Project $project
      * @param User $student
      * @param string $expected
      * @throws InvalidArgumentException If an unrecognised user.id is passed
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerProjectMaxGetNorm')]
     public function testProjectMaximumPercentGetNorm(Project $project, User $student, $expected)
     {
         $project->setSummator(new Maximum());
-        $project->setMarkType($this->getDummyMarkType(MarkType::SLUG_PERCENT));
+        $project->setMarkType(self::getDummyMarkType(MarkType::SLUG_PERCENT));
         $project->setMarkScheme(new Percentage());
 
         $actual = $project->getNormalisedMark($project->getParticipantIfExtant($student), false);
@@ -575,16 +563,16 @@ class AssessableTest extends TestCase
     }
 
     /**
-     * @dataProvider providerProjectMaxGetNormPublishedOnly
      * @param Project $project
      * @param User $student
      * @param string $expected
      * @throws InvalidArgumentException If an unrecognised user.id is passed
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerProjectMaxGetNormPublishedOnly')]
     public function testProjectMaximumPercentGetNormPublishedOnly(Project $project, User $student, $expected)
     {
         $project->setSummator(new Maximum());
-        $project->setMarkType($this->getDummyMarkType(MarkType::SLUG_PERCENT));
+        $project->setMarkType(self::getDummyMarkType(MarkType::SLUG_PERCENT));
         $project->setMarkScheme(new Percentage());
 
         $actual = $project->getNormalisedMark($project->getParticipantIfExtant($student), true);
@@ -593,16 +581,16 @@ class AssessableTest extends TestCase
     }
 
     /**
-     * @dataProvider providerProjectAverageGetNorm
      * @param Project $project
      * @param User $student
      * @param string $expected
      * @throws InvalidArgumentException If an unrecognised user.id is passed
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerProjectAverageGetNorm')]
     public function testProjectAverageNoneGetNorm(Project $project, User $student, $expected)
     {
         $project->setSummator(new Average());
-        $project->setMarkType($this->getDummyMarkType(MarkType::SLUG_NONE));
+        $project->setMarkType(self::getDummyMarkType(MarkType::SLUG_NONE));
         $project->setMarkScheme(new None());
 
         $actual = $project->getNormalisedMark($project->getParticipantIfExtant($student), false);
@@ -611,16 +599,16 @@ class AssessableTest extends TestCase
     }
 
     /**
-     * @dataProvider providerProjectAverageGetNormPublishedOnly
      * @param Project $project
      * @param User $student
      * @param string $expected
      * @throws InvalidArgumentException If an unrecognised user.id is passed
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerProjectAverageGetNormPublishedOnly')]
     public function testProjectAverageNoneGetNormPublishedOnly(Project $project, User $student, $expected)
     {
         $project->setSummator(new Average());
-        $project->setMarkType($this->getDummyMarkType(MarkType::SLUG_NONE));
+        $project->setMarkType(self::getDummyMarkType(MarkType::SLUG_NONE));
         $project->setMarkScheme(new None());
 
         $actual = $project->getNormalisedMark($project->getParticipantIfExtant($student), true);
@@ -629,17 +617,17 @@ class AssessableTest extends TestCase
     }
 
     /**
-     * @dataProvider providerProjectAverageGetNorm
      * @param Project $project
      * @param User $student
      * @param string $expected
      * @throws InvalidArgumentException If an unrecognised user.id is passed
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerProjectAverageGetNorm')]
     public function testProjectAverageLetterGradeGetNorm(Project $project, User $student, $expected)
     {
         $project->setSummator(new Average());
-        $project->setMarkType($this->getDummyMarkType(MarkType::SLUG_LETTER));
-        $project->setMarkScheme(new LetterGrade($this->getDummyLetterGradeGroup()));
+        $project->setMarkType(self::getDummyMarkType(MarkType::SLUG_LETTER));
+        $project->setMarkScheme(new LetterGrade(self::getDummyLetterGradeGroup()));
 
         $actual = $project->getNormalisedMark($project->getParticipantIfExtant($student), false);
         $message = "User: {$student->getFirstname()}, Expected: '$expected', Actual: '$actual'";
@@ -647,17 +635,17 @@ class AssessableTest extends TestCase
     }
 
     /**
-     * @dataProvider providerProjectAverageGetNormPublishedOnly
      * @param Project $project
      * @param User $student
      * @param string $expected
      * @throws InvalidArgumentException If an unrecognised user.id is passed
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerProjectAverageGetNormPublishedOnly')]
     public function testProjectAverageLetterGradeGetNormPublishedOnly(Project $project, User $student, $expected)
     {
         $project->setSummator(new Average());
-        $project->setMarkType($this->getDummyMarkType(MarkType::SLUG_LETTER));
-        $project->setMarkScheme(new LetterGrade($this->getDummyLetterGradeGroup()));
+        $project->setMarkType(self::getDummyMarkType(MarkType::SLUG_LETTER));
+        $project->setMarkScheme(new LetterGrade(self::getDummyLetterGradeGroup()));
 
         $actual = $project->getNormalisedMark($project->getParticipantIfExtant($student), true);
         $message = "User: {$student->getFirstname()}, Expected: '$expected', Actual: '$actual'";
@@ -665,16 +653,16 @@ class AssessableTest extends TestCase
     }
 
     /**
-     * @dataProvider providerProjectAverageGetNorm
      * @param Project $project
      * @param User $student
      * @param string $expected
      * @throws InvalidArgumentException If an unrecognised user.id is passed
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerProjectAverageGetNorm')]
     public function testProjectAveragePercentGetNorm(Project $project, User $student, $expected)
     {
         $project->setSummator(new Average());
-        $project->setMarkType($this->getDummyMarkType(MarkType::SLUG_PERCENT));
+        $project->setMarkType(self::getDummyMarkType(MarkType::SLUG_PERCENT));
         $project->setMarkScheme(new Percentage());
 
         $actual = $project->getNormalisedMark($project->getParticipantIfExtant($student), false);
@@ -683,16 +671,16 @@ class AssessableTest extends TestCase
     }
 
     /**
-     * @dataProvider providerProjectAverageGetNormPublishedOnly
      * @param Project $project
      * @param User $student
      * @param string $expected
      * @throws InvalidArgumentException If an unrecognised user.id is passed
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerProjectAverageGetNormPublishedOnly')]
     public function testProjectAveragePercentGetNormPublishedOnly(Project $project, User $student, $expected)
     {
         $project->setSummator(new Average());
-        $project->setMarkType($this->getDummyMarkType(MarkType::SLUG_PERCENT));
+        $project->setMarkType(self::getDummyMarkType(MarkType::SLUG_PERCENT));
         $project->setMarkScheme(new Percentage());
 
         $actual = $project->getNormalisedMark($project->getParticipantIfExtant($student), true);
@@ -701,16 +689,16 @@ class AssessableTest extends TestCase
     }
 
     /**
-     * @dataProvider providerProjectWeightedAverageGetNorm
      * @param Project $project
      * @param User $student
      * @param string $expected
      * @throws InvalidArgumentException If an unrecognised user.id is passed
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerProjectWeightedAverageGetNorm')]
     public function testProjectWeightedAverageNoneGetNorm(Project $project, User $student, $expected)
     {
         $project->setSummator(new WeightedAverage());
-        $project->setMarkType($this->getDummyMarkType(MarkType::SLUG_NONE));
+        $project->setMarkType(self::getDummyMarkType(MarkType::SLUG_NONE));
         $project->setMarkScheme(new None());
 
         $actual = $project->getNormalisedMark($project->getParticipantIfExtant($student), false);
@@ -719,16 +707,16 @@ class AssessableTest extends TestCase
     }
 
     /**
-     * @dataProvider providerProjectWeightedAverageGetNormPublishedOnly
      * @param Project $project
      * @param User $student
      * @param string $expected
      * @throws InvalidArgumentException If an unrecognised user.id is passed
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerProjectWeightedAverageGetNormPublishedOnly')]
     public function testProjectWeightedAverageNoneGetNormPublishedOnly(Project $project, User $student, $expected)
     {
         $project->setSummator(new WeightedAverage());
-        $project->setMarkType($this->getDummyMarkType(MarkType::SLUG_NONE));
+        $project->setMarkType(self::getDummyMarkType(MarkType::SLUG_NONE));
         $project->setMarkScheme(new None());
 
         $actual = $project->getNormalisedMark($project->getParticipantIfExtant($student), true);
@@ -737,17 +725,17 @@ class AssessableTest extends TestCase
     }
 
     /**
-     * @dataProvider providerProjectWeightedAverageGetNorm
      * @param Project $project
      * @param User $student
      * @param string $expected
      * @throws InvalidArgumentException If an unrecognised user.id is passed
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerProjectWeightedAverageGetNorm')]
     public function testProjectWeightedAverageLetterGradeGetNorm(Project $project, User $student, $expected)
     {
         $project->setSummator(new WeightedAverage());
-        $project->setMarkType($this->getDummyMarkType(MarkType::SLUG_LETTER));
-        $project->setMarkScheme(new LetterGrade($this->getDummyLetterGradeGroup()));
+        $project->setMarkType(self::getDummyMarkType(MarkType::SLUG_LETTER));
+        $project->setMarkScheme(new LetterGrade(self::getDummyLetterGradeGroup()));
 
         $actual = $project->getNormalisedMark($project->getParticipantIfExtant($student), false);
         $message = "User: {$student->getFirstname()}, Expected: '$expected', Actual: '$actual'";
@@ -755,17 +743,17 @@ class AssessableTest extends TestCase
     }
 
     /**
-     * @dataProvider providerProjectWeightedAverageGetNormPublishedOnly
      * @param Project $project
      * @param User $student
      * @param string $expected
      * @throws InvalidArgumentException If an unrecognised user.id is passed
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerProjectWeightedAverageGetNormPublishedOnly')]
     public function testProjectWeightedAverageLetterGradeGetNormPublishedOnly(Project $project, User $student, $expected)
     {
         $project->setSummator(new WeightedAverage());
-        $project->setMarkType($this->getDummyMarkType(MarkType::SLUG_LETTER));
-        $project->setMarkScheme(new LetterGrade($this->getDummyLetterGradeGroup()));
+        $project->setMarkType(self::getDummyMarkType(MarkType::SLUG_LETTER));
+        $project->setMarkScheme(new LetterGrade(self::getDummyLetterGradeGroup()));
 
         $actual = $project->getNormalisedMark($project->getParticipantIfExtant($student), true);
         $message = "User: {$student->getFirstname()}, Expected: '$expected', Actual: '$actual'";
@@ -773,16 +761,16 @@ class AssessableTest extends TestCase
     }
 
     /**
-     * @dataProvider providerProjectWeightedAverageGetNorm
      * @param Project $project
      * @param User $student
      * @param string $expected
      * @throws InvalidArgumentException If an unrecognised user.id is passed
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerProjectWeightedAverageGetNorm')]
     public function testProjectWeightedAveragePercentGetNorm(Project $project, User $student, $expected)
     {
         $project->setSummator(new WeightedAverage());
-        $project->setMarkType($this->getDummyMarkType(MarkType::SLUG_PERCENT));
+        $project->setMarkType(self::getDummyMarkType(MarkType::SLUG_PERCENT));
         $project->setMarkScheme(new Percentage());
 
         $actual = $project->getNormalisedMark($project->getParticipantIfExtant($student), false);
@@ -791,16 +779,16 @@ class AssessableTest extends TestCase
     }
 
     /**
-     * @dataProvider providerProjectWeightedAverageGetNormPublishedOnly
      * @param Project $project
      * @param User $student
      * @param string $expected
      * @throws InvalidArgumentException If an unrecognised user.id is passed
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerProjectWeightedAverageGetNormPublishedOnly')]
     public function testProjectWeightedAveragePercentGetNormPublishedOnly(Project $project, User $student, $expected)
     {
         $project->setSummator(new WeightedAverage());
-        $project->setMarkType($this->getDummyMarkType(MarkType::SLUG_PERCENT));
+        $project->setMarkType(self::getDummyMarkType(MarkType::SLUG_PERCENT));
         $project->setMarkScheme(new Percentage());
 
         $actual = $project->getNormalisedMark($project->getParticipantIfExtant($student), true);
@@ -809,16 +797,16 @@ class AssessableTest extends TestCase
     }
 
     /**
-     * @dataProvider providerProjectNone
      * @param Project $project
      * @param User $student
      * @param string $expected
      * @throws InvalidArgumentException If an unrecognised user.id is passed
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerProjectNone')]
     public function testProjectMinimumNoneGetHR(Project $project, User $student, $expected)
     {
         $project->setSummator(new Minimum());
-        $project->setMarkType($this->getDummyMarkType(MarkType::SLUG_NONE));
+        $project->setMarkType(self::getDummyMarkType(MarkType::SLUG_NONE));
         $project->setMarkScheme(new None());
 
         $actual = $project->getHumanReadableMark($project->getParticipantIfExtant($student), false);
@@ -827,16 +815,16 @@ class AssessableTest extends TestCase
     }
 
     /**
-     * @dataProvider providerProjectNone
      * @param Project $project
      * @param User $student
      * @param string $expected
      * @throws InvalidArgumentException If an unrecognised user.id is passed
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerProjectNone')]
     public function testProjectMinimumNoneGetHRPublishedOnly(Project $project, User $student, $expected)
     {
         $project->setSummator(new Minimum());
-        $project->setMarkType($this->getDummyMarkType(MarkType::SLUG_NONE));
+        $project->setMarkType(self::getDummyMarkType(MarkType::SLUG_NONE));
         $project->setMarkScheme(new None());
 
         $actual = $project->getHumanReadableMark($project->getParticipantIfExtant($student), true);
@@ -845,11 +833,11 @@ class AssessableTest extends TestCase
     }
 
     /**
-     * @dataProvider providerProjectMinLetterGradeGetHR
      * @param Project $project
      * @param User $student
      * @param string $expected
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerProjectMinLetterGradeGetHR')]
     public function testProjectMinimumLetterGradeGetHR(Project $project, User $student, $expected)
     {
         $actual = $project->getHumanReadableMark($project->getParticipantIfExtant($student), false);
@@ -858,11 +846,11 @@ class AssessableTest extends TestCase
     }
 
     /**
-     * @dataProvider providerProjectMinLetterGradeGetHRPublishedOnly
      * @param Project $project
      * @param User $student
      * @param string $expected
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerProjectMinLetterGradeGetHRPublishedOnly')]
     public function testProjectMinimumLetterGradeGetHRPublishedOnly(Project $project, User $student, $expected)
     {
         $actual = $project->getHumanReadableMark($project->getParticipantIfExtant($student), true);
@@ -871,11 +859,11 @@ class AssessableTest extends TestCase
     }
 
     /**
-     * @dataProvider providerProjectMinPercentageGetHR
      * @param Project $project
      * @param User $student
      * @param string $expected
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerProjectMinPercentageGetHR')]
     public function testProjectMinimumPercentageGetHR(Project $project, User $student, $expected)
     {
         $actual = $project->getHumanReadableMark($project->getParticipantIfExtant($student), false);
@@ -884,11 +872,11 @@ class AssessableTest extends TestCase
     }
 
     /**
-     * @dataProvider providerProjectMinPercentageGetHRPublishedOnly
      * @param Project $project
      * @param User $student
      * @param string $expected
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerProjectMinPercentageGetHRPublishedOnly')]
     public function testProjectMinimumPercentageGetHRPublishedOnly(Project $project, User $student, $expected)
     {
         $actual = $project->getHumanReadableMark($project->getParticipantIfExtant($student), true);
@@ -897,16 +885,16 @@ class AssessableTest extends TestCase
     }
 
     /**
-     * @dataProvider providerProjectNone
      * @param Project $project
      * @param User $student
      * @param string $expected
      * @throws InvalidArgumentException If an unrecognised user.id is passed
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerProjectNone')]
     public function testProjectMaximumNoneGetHR(Project $project, User $student, $expected)
     {
         $project->setSummator(new Maximum());
-        $project->setMarkType($this->getDummyMarkType(MarkType::SLUG_NONE));
+        $project->setMarkType(self::getDummyMarkType(MarkType::SLUG_NONE));
         $project->setMarkScheme(new None());
 
         $actual = $project->getHumanReadableMark($project->getParticipantIfExtant($student), false);
@@ -915,16 +903,16 @@ class AssessableTest extends TestCase
     }
 
     /**
-     * @dataProvider providerProjectNone
      * @param Project $project
      * @param User $student
      * @param string $expected
      * @throws InvalidArgumentException If an unrecognised user.id is passed
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerProjectNone')]
     public function testProjectMaximumNoneGetHRPublishedOnly(Project $project, User $student, $expected)
     {
         $project->setSummator(new Maximum());
-        $project->setMarkType($this->getDummyMarkType(MarkType::SLUG_NONE));
+        $project->setMarkType(self::getDummyMarkType(MarkType::SLUG_NONE));
         $project->setMarkScheme(new None());
 
         $actual = $project->getHumanReadableMark($project->getParticipantIfExtant($student), true);
@@ -933,11 +921,11 @@ class AssessableTest extends TestCase
     }
 
     /**
-     * @dataProvider providerProjectMaxLetterGradeGetHR
      * @param Project $project
      * @param User $student
      * @param string $expected
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerProjectMaxLetterGradeGetHR')]
     public function testProjectMaximumLetterGradeGetHR(Project $project, User $student, $expected)
     {
         $actual = $project->getHumanReadableMark($project->getParticipantIfExtant($student), false);
@@ -946,11 +934,11 @@ class AssessableTest extends TestCase
     }
 
     /**
-     * @dataProvider providerProjectMaxLetterGradeGetHRPublishedOnly
      * @param Project $project
      * @param User $student
      * @param string $expected
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerProjectMaxLetterGradeGetHRPublishedOnly')]
     public function testProjectMaximumLetterGradeGetHRPublishedOnly(Project $project, User $student, $expected)
     {
         $actual = $project->getHumanReadableMark($project->getParticipantIfExtant($student), true);
@@ -959,11 +947,11 @@ class AssessableTest extends TestCase
     }
 
     /**
-     * @dataProvider providerProjectMaxPercentageGetHR
      * @param Project $project
      * @param User $student
      * @param string $expected
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerProjectMaxPercentageGetHR')]
     public function testProjectMaximumPercentageGetHR(Project $project, User $student, $expected)
     {
         $actual = $project->getHumanReadableMark($project->getParticipantIfExtant($student), false);
@@ -972,11 +960,11 @@ class AssessableTest extends TestCase
     }
 
     /**
-     * @dataProvider providerProjectMaxPercentageGetHRPublishedOnly
      * @param Project $project
      * @param User $student
      * @param string $expected
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerProjectMaxPercentageGetHRPublishedOnly')]
     public function testProjectMaximumPercentageGetHRPublishedOnly(Project $project, User $student, $expected)
     {
         $actual = $project->getHumanReadableMark($project->getParticipantIfExtant($student), true);
@@ -985,16 +973,16 @@ class AssessableTest extends TestCase
     }
 
     /**
-     * @dataProvider providerProjectNone
      * @param Project $project
      * @param User $student
      * @param string $expected
      * @throws InvalidArgumentException If an unrecognised user.id is passed
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerProjectNone')]
     public function testProjectAverageNoneGetHR(Project $project, User $student, $expected)
     {
         $project->setSummator(new Average());
-        $project->setMarkType($this->getDummyMarkType(MarkType::SLUG_NONE));
+        $project->setMarkType(self::getDummyMarkType(MarkType::SLUG_NONE));
         $project->setMarkScheme(new None());
 
         $actual = $project->getHumanReadableMark($project->getParticipantIfExtant($student), false);
@@ -1003,16 +991,16 @@ class AssessableTest extends TestCase
     }
 
     /**
-     * @dataProvider providerProjectNone
      * @param Project $project
      * @param User $student
      * @param string $expected
      * @throws InvalidArgumentException If an unrecognised user.id is passed
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerProjectNone')]
     public function testProjectAverageNoneGetHRPublishedOnly(Project $project, User $student, $expected)
     {
         $project->setSummator(new Average());
-        $project->setMarkType($this->getDummyMarkType(MarkType::SLUG_NONE));
+        $project->setMarkType(self::getDummyMarkType(MarkType::SLUG_NONE));
         $project->setMarkScheme(new None());
 
         $actual = $project->getHumanReadableMark($project->getParticipantIfExtant($student), true);
@@ -1021,11 +1009,11 @@ class AssessableTest extends TestCase
     }
 
     /**
-     * @dataProvider providerProjectAverageLetterGradeGetHR
      * @param Project $project
      * @param User $student
      * @param string $expected
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerProjectAverageLetterGradeGetHR')]
     public function testProjectAverageLetterGradeGetHR(Project $project, User $student, $expected)
     {
         $actual = $project->getHumanReadableMark($project->getParticipantIfExtant($student), false);
@@ -1034,11 +1022,11 @@ class AssessableTest extends TestCase
     }
 
     /**
-     * @dataProvider providerProjectAverageLetterGradeGetHRPublishedOnly
      * @param Project $project
      * @param User $student
      * @param string $expected
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerProjectAverageLetterGradeGetHRPublishedOnly')]
     public function testProjectAverageLetterGradeGetHRPublishedOnly(Project $project, User $student, $expected)
     {
         $actual = $project->getHumanReadableMark($project->getParticipantIfExtant($student), true);
@@ -1047,11 +1035,11 @@ class AssessableTest extends TestCase
     }
 
     /**
-     * @dataProvider providerProjectAveragePercentGetHR
      * @param Project $project
      * @param User $student
      * @param string $expected
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerProjectAveragePercentGetHR')]
     public function testProjectAveragePercentageGetHR(Project $project, User $student, $expected)
     {
         $actual = $project->getHumanReadableMark($project->getParticipantIfExtant($student), false);
@@ -1060,11 +1048,11 @@ class AssessableTest extends TestCase
     }
 
     /**
-     * @dataProvider providerProjectAveragePercentGetHRPublishedOnly
      * @param Project $project
      * @param User $student
      * @param string $expected
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerProjectAveragePercentGetHRPublishedOnly')]
     public function testProjectAveragePercentageGetHRPublishedOnly(Project $project, User $student, $expected)
     {
         $actual = $project->getHumanReadableMark($project->getParticipantIfExtant($student), true);
@@ -1073,16 +1061,16 @@ class AssessableTest extends TestCase
     }
 
     /**
-     * @dataProvider providerProjectNone
      * @param Project $project
      * @param User $student
      * @param string $expected
      * @throws InvalidArgumentException If an unrecognised user.id is passed
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerProjectNone')]
     public function testProjectWeightedAverageNoneGetHR(Project $project, User $student, $expected)
     {
         $project->setSummator(new WeightedAverage());
-        $project->setMarkType($this->getDummyMarkType(MarkType::SLUG_NONE));
+        $project->setMarkType(self::getDummyMarkType(MarkType::SLUG_NONE));
         $project->setMarkScheme(new None());
 
         $actual = $project->getHumanReadableMark($project->getParticipantIfExtant($student), false);
@@ -1091,16 +1079,16 @@ class AssessableTest extends TestCase
     }
 
     /**
-     * @dataProvider providerProjectNone
      * @param Project $project
      * @param User $student
      * @param string $expected
      * @throws InvalidArgumentException If an unrecognised user.id is passed
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerProjectNone')]
     public function testProjectWeightedAverageNoneGetHRPublishedOnly(Project $project, User $student, $expected)
     {
         $project->setSummator(new WeightedAverage());
-        $project->setMarkType($this->getDummyMarkType(MarkType::SLUG_NONE));
+        $project->setMarkType(self::getDummyMarkType(MarkType::SLUG_NONE));
         $project->setMarkScheme(new None());
 
         $actual = $project->getHumanReadableMark($project->getParticipantIfExtant($student), true);
@@ -1109,11 +1097,11 @@ class AssessableTest extends TestCase
     }
 
     /**
-     * @dataProvider providerProjectWeightedAverageLetterGradeGetHR
      * @param Project $project
      * @param User $student
      * @param string $expected
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerProjectWeightedAverageLetterGradeGetHR')]
     public function testProjectWeightedAverageLetterGradeGetHR(Project $project, User $student, $expected)
     {
         $actual = $project->getHumanReadableMark($project->getParticipantIfExtant($student), false);
@@ -1122,11 +1110,11 @@ class AssessableTest extends TestCase
     }
 
     /**
-     * @dataProvider providerProjectWeightedAverageLetterGradeGetHRPublishedOnly
      * @param Project $project
      * @param User $student
      * @param string $expected
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerProjectWeightedAverageLetterGradeGetHRPublishedOnly')]
     public function testProjectWeightedAverageLetterGradeGetHRPublishedOnly(Project $project, User $student, $expected)
     {
         $actual = $project->getHumanReadableMark($project->getParticipantIfExtant($student), true);
@@ -1135,11 +1123,11 @@ class AssessableTest extends TestCase
     }
 
     /**
-     * @dataProvider providerProjectWeightedAveragePercentGetHR
      * @param Project $project
      * @param User $student
      * @param string $expected
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerProjectWeightedAveragePercentGetHR')]
     public function testProjectWeightedAveragePercentageGetHR(Project $project, User $student, $expected)
     {
         $actual = $project->getHumanReadableMark($project->getParticipantIfExtant($student), false);
@@ -1148,11 +1136,11 @@ class AssessableTest extends TestCase
     }
 
     /**
-     * @dataProvider providerProjectWeightedAveragePercentGetHRPublishedOnly
      * @param Project $project
      * @param User $student
      * @param string $expected
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerProjectWeightedAveragePercentGetHRPublishedOnly')]
     public function testProjectWeightedAveragePercentageGetHRPublishedOnly(Project $project, User $student, $expected)
     {
         $actual = $project->getHumanReadableMark($project->getParticipantIfExtant($student), true);
@@ -1168,14 +1156,14 @@ class AssessableTest extends TestCase
      * @return array
      * @throws InvalidArgumentException If an unrecognised user.id is passed
      */
-    public function providerTaskCompletionGetHR(): array
+    public static function providerTaskCompletionGetHR(): array
     {
-        $task = $this->getDummyTask();
+        $task = self::getDummyTask();
         return [
-            [$task, $this->getDummyStudent(1), Completion::HUMAN_READABLE_INCOMPLETE],
-            [$task, $this->getDummyStudent(2), Completion::HUMAN_READABLE_COMPLETE],
-            [$task, $this->getDummyStudent(3), Completion::HUMAN_READABLE_COMPLETE],
-            [$task, $this->getDummyStudent(4), Completion::HUMAN_READABLE_COMPLETE],
+            [$task, self::getDummyStudent(1), Completion::HUMAN_READABLE_INCOMPLETE],
+            [$task, self::getDummyStudent(2), Completion::HUMAN_READABLE_COMPLETE],
+            [$task, self::getDummyStudent(3), Completion::HUMAN_READABLE_COMPLETE],
+            [$task, self::getDummyStudent(4), Completion::HUMAN_READABLE_COMPLETE],
         ];
     }
 
@@ -1184,14 +1172,14 @@ class AssessableTest extends TestCase
      * @return array
      * @throws InvalidArgumentException If an unrecognised user.id is passed
      */
-    public function providerTaskCompletionGetHRPublishedOnly(): array
+    public static function providerTaskCompletionGetHRPublishedOnly(): array
     {
-        $task = $this->getDummyTask();
+        $task = self::getDummyTask();
         return [
-            [$task, $this->getDummyStudent(1), Completion::HUMAN_READABLE_INCOMPLETE],
-            [$task, $this->getDummyStudent(2), Completion::HUMAN_READABLE_COMPLETE],
-            [$task, $this->getDummyStudent(3), Completion::HUMAN_READABLE_COMPLETE],
-            [$task, $this->getDummyStudent(4), Completion::HUMAN_READABLE_COMPLETE],
+            [$task, self::getDummyStudent(1), Completion::HUMAN_READABLE_INCOMPLETE],
+            [$task, self::getDummyStudent(2), Completion::HUMAN_READABLE_COMPLETE],
+            [$task, self::getDummyStudent(3), Completion::HUMAN_READABLE_COMPLETE],
+            [$task, self::getDummyStudent(4), Completion::HUMAN_READABLE_COMPLETE],
         ];
     }
 
@@ -1200,25 +1188,25 @@ class AssessableTest extends TestCase
      * @return array
      * @throws InvalidArgumentException If an unrecognised user.id is passed
      */
-    public function providerQuiztotalMarkFractionGetHR(): array
+    public static function providerQuiztotalMarkFractionGetHR(): array
     {
-        $quiz = $this->getDummyQuiz();
+        $quiz = self::getDummyQuiz();
         $quiz->setMarkScheme(new TotalMarkFractional());
         if (self::FAVOR_FLOATING) {
             return [
-                [$quiz, $this->getDummyStudent(1), null],
-                [$quiz, $this->getDummyStudent(2), '1 / 2'],
-                [$quiz, $this->getDummyStudent(3), '1 / 2'],
-                [$quiz, $this->getDummyStudent(4), '1 / 2'],
-                [$quiz, $this->getDummyStudent(5), '2 / 2'],
+                [$quiz, self::getDummyStudent(1), null],
+                [$quiz, self::getDummyStudent(2), '1 / 2'],
+                [$quiz, self::getDummyStudent(3), '1 / 2'],
+                [$quiz, self::getDummyStudent(4), '1 / 2'],
+                [$quiz, self::getDummyStudent(5), '2 / 2'],
             ];
         }
         return [
-            [$quiz, $this->getDummyStudent(1), null],
-            [$quiz, $this->getDummyStudent(2), '1 / 2'],
-            [$quiz, $this->getDummyStudent(3), '1 / 2'],
-            [$quiz, $this->getDummyStudent(4), '1 / 2'],
-            [$quiz, $this->getDummyStudent(5), '2 / 2'],
+            [$quiz, self::getDummyStudent(1), null],
+            [$quiz, self::getDummyStudent(2), '1 / 2'],
+            [$quiz, self::getDummyStudent(3), '1 / 2'],
+            [$quiz, self::getDummyStudent(4), '1 / 2'],
+            [$quiz, self::getDummyStudent(5), '2 / 2'],
         ];
     }
 
@@ -1227,16 +1215,16 @@ class AssessableTest extends TestCase
      * @return array
      * @throws InvalidArgumentException If an unrecognised user.id is passed
      */
-    public function providerQuiztotalMarkFractionGetHRPublishedOnly(): array
+    public static function providerQuiztotalMarkFractionGetHRPublishedOnly(): array
     {
-        $quiz = $this->getDummyQuiz();
+        $quiz = self::getDummyQuiz();
         $quiz->setMarkScheme(new TotalMarkFractional());
         return [
-            [$quiz, $this->getDummyStudent(1), null],
-            [$quiz, $this->getDummyStudent(2), '1 / 2'],
-            [$quiz, $this->getDummyStudent(3), null],
-            [$quiz, $this->getDummyStudent(4), '1 / 2'],
-            [$quiz, $this->getDummyStudent(5), '1 / 3'],
+            [$quiz, self::getDummyStudent(1), null],
+            [$quiz, self::getDummyStudent(2), '1 / 2'],
+            [$quiz, self::getDummyStudent(3), null],
+            [$quiz, self::getDummyStudent(4), '1 / 2'],
+            [$quiz, self::getDummyStudent(5), '1 / 3'],
         ];
     }
 
@@ -1245,26 +1233,26 @@ class AssessableTest extends TestCase
      * @return array
      * @throws InvalidArgumentException If an unrecognised user.id is passed
      */
-    public function providerQuiztotalMarkFractionGetNorm(): array
+    public static function providerQuiztotalMarkFractionGetNorm(): array
     {
-        $quiz = $this->getDummyQuiz();
+        $quiz = self::getDummyQuiz();
         $quiz->setMarkScheme(new TotalMarkFractional());
 
         if (self::FAVOR_FLOATING) {
             return [
-                [$quiz, $this->getDummyStudent(1), null],
-                [$quiz, $this->getDummyStudent(2), 50.0],
-                [$quiz, $this->getDummyStudent(3), 50.0],
-                [$quiz, $this->getDummyStudent(4), 100.0],
-                [$quiz, $this->getDummyStudent(5), 100.0],
+                [$quiz, self::getDummyStudent(1), null],
+                [$quiz, self::getDummyStudent(2), 50.0],
+                [$quiz, self::getDummyStudent(3), 50.0],
+                [$quiz, self::getDummyStudent(4), 100.0],
+                [$quiz, self::getDummyStudent(5), 100.0],
             ];
         }
         return [
-            [$quiz, $this->getDummyStudent(1), null],
-            [$quiz, $this->getDummyStudent(2), 50.0],
-            [$quiz, $this->getDummyStudent(3), 50.0],
-            [$quiz, $this->getDummyStudent(4), 100.0],
-            [$quiz, $this->getDummyStudent(5), 100.0],
+            [$quiz, self::getDummyStudent(1), null],
+            [$quiz, self::getDummyStudent(2), 50.0],
+            [$quiz, self::getDummyStudent(3), 50.0],
+            [$quiz, self::getDummyStudent(4), 100.0],
+            [$quiz, self::getDummyStudent(5), 100.0],
         ];
     }
 
@@ -1273,16 +1261,16 @@ class AssessableTest extends TestCase
      * @return array
      * @throws InvalidArgumentException If an unrecognised user.id is passed
      */
-    public function providerQuiztotalMarkFractionGetNormPublishedOnly(): array
+    public static function providerQuiztotalMarkFractionGetNormPublishedOnly(): array
     {
-        $quiz = $this->getDummyQuiz();
+        $quiz = self::getDummyQuiz();
         $quiz->setMarkScheme(new TotalMarkFractional());
         return [
-            [$quiz, $this->getDummyStudent(1), null],
-            [$quiz, $this->getDummyStudent(2), 50.0],
-            [$quiz, $this->getDummyStudent(3), null],
-            [$quiz, $this->getDummyStudent(4), 50.0],
-            [$quiz, $this->getDummyStudent(5), 33.3333333333333],
+            [$quiz, self::getDummyStudent(1), null],
+            [$quiz, self::getDummyStudent(2), 50.0],
+            [$quiz, self::getDummyStudent(3), null],
+            [$quiz, self::getDummyStudent(4), 50.0],
+            [$quiz, self::getDummyStudent(5), 33.3333333333333],
         ];
     }
 
@@ -1291,21 +1279,21 @@ class AssessableTest extends TestCase
      * @return array
      * @throws InvalidArgumentException If an unrecognised user.id is passed
      */
-    public function providerDueWorkNoneGetHR(): array
+    public static function providerDueWorkNoneGetHR(): array
     {
-        $dueWork = $this->getDummyDueWork();
-        $dueWork->setMarkType($this->getDummyMarkType(MarkType::SLUG_NONE));
+        $dueWork = self::getDummyDueWork();
+        $dueWork->setMarkType(self::getDummyMarkType(MarkType::SLUG_NONE));
         $dueWork->setMarkScheme(new TotalMarkFractional($dueWork->getMaxMark()));
         return [
-            [$dueWork, $this->getDummyStudent(1), null],
-            [$dueWork, $this->getDummyStudent(2), null],
-            [$dueWork, $this->getDummyStudent(3), '10 / 20'],
-            [$dueWork, $this->getDummyStudent(4), '10 / 20'],
-            [$dueWork, $this->getDummyStudent(5), '20 / 20'],
-            [$dueWork, $this->getDummyStudent(6), '10 / 20'],
-            [$dueWork, $this->getDummyStudent(7), '20 / 20'],
-            [$dueWork, $this->getDummyStudent(8), '10 / 20'],
-            [$dueWork, $this->getDummyStudent(9), '20 / 20'],
+            [$dueWork, self::getDummyStudent(1), null],
+            [$dueWork, self::getDummyStudent(2), null],
+            [$dueWork, self::getDummyStudent(3), '10 / 20'],
+            [$dueWork, self::getDummyStudent(4), '10 / 20'],
+            [$dueWork, self::getDummyStudent(5), '20 / 20'],
+            [$dueWork, self::getDummyStudent(6), '10 / 20'],
+            [$dueWork, self::getDummyStudent(7), '20 / 20'],
+            [$dueWork, self::getDummyStudent(8), '10 / 20'],
+            [$dueWork, self::getDummyStudent(9), '20 / 20'],
         ];
     }
 
@@ -1314,21 +1302,21 @@ class AssessableTest extends TestCase
      * @return array
      * @throws InvalidArgumentException If an unrecognised user.id is passed
      */
-    public function providerDueWorkNoneGetHRPublishedOnly(): array
+    public static function providerDueWorkNoneGetHRPublishedOnly(): array
     {
-        $dueWork = $this->getDummyDueWork();
-        $dueWork->setMarkType($this->getDummyMarkType(MarkType::SLUG_NONE));
+        $dueWork = self::getDummyDueWork();
+        $dueWork->setMarkType(self::getDummyMarkType(MarkType::SLUG_NONE));
         $dueWork->setMarkScheme(new TotalMarkFractional($dueWork->getMaxMark()));
         return [
-            [$dueWork, $this->getDummyStudent(1), null],
-            [$dueWork, $this->getDummyStudent(2), null],
-            [$dueWork, $this->getDummyStudent(3), '10 / 20'],
-            [$dueWork, $this->getDummyStudent(4), null],
-            [$dueWork, $this->getDummyStudent(5), '10 / 20'],
-            [$dueWork, $this->getDummyStudent(6), '10 / 20'],
-            [$dueWork, $this->getDummyStudent(7), '10 / 20'],
-            [$dueWork, $this->getDummyStudent(8), '10 / 20'],
-            [$dueWork, $this->getDummyStudent(9), '10 / 20'],
+            [$dueWork, self::getDummyStudent(1), null],
+            [$dueWork, self::getDummyStudent(2), null],
+            [$dueWork, self::getDummyStudent(3), '10 / 20'],
+            [$dueWork, self::getDummyStudent(4), null],
+            [$dueWork, self::getDummyStudent(5), '10 / 20'],
+            [$dueWork, self::getDummyStudent(6), '10 / 20'],
+            [$dueWork, self::getDummyStudent(7), '10 / 20'],
+            [$dueWork, self::getDummyStudent(8), '10 / 20'],
+            [$dueWork, self::getDummyStudent(9), '10 / 20'],
         ];
     }
 
@@ -1337,21 +1325,21 @@ class AssessableTest extends TestCase
      * @return array
      * @throws InvalidArgumentException If an unrecognised user.id is passed
      */
-    public function providerDueWorkPercentGetHR(): array
+    public static function providerDueWorkPercentGetHR(): array
     {
-        $dueWork = $this->getDummyDueWork();
-        $dueWork->setMarkType($this->getDummyMarkType(MarkType::SLUG_PERCENT));
+        $dueWork = self::getDummyDueWork();
+        $dueWork->setMarkType(self::getDummyMarkType(MarkType::SLUG_PERCENT));
         $dueWork->setMarkScheme(new Percentage());
         return [
-            [$dueWork, $this->getDummyStudent(1), null],
-            [$dueWork, $this->getDummyStudent(2), null],
-            [$dueWork, $this->getDummyStudent(3), '10 / 20'],
-            [$dueWork, $this->getDummyStudent(4), '10 / 20'],
-            [$dueWork, $this->getDummyStudent(5), '20 / 20'],
-            [$dueWork, $this->getDummyStudent(6), '10 / 20'],
-            [$dueWork, $this->getDummyStudent(7), '20 / 20'],
-            [$dueWork, $this->getDummyStudent(8), '10 / 20'],
-            [$dueWork, $this->getDummyStudent(9), '20 / 20'],
+            [$dueWork, self::getDummyStudent(1), null],
+            [$dueWork, self::getDummyStudent(2), null],
+            [$dueWork, self::getDummyStudent(3), '10 / 20'],
+            [$dueWork, self::getDummyStudent(4), '10 / 20'],
+            [$dueWork, self::getDummyStudent(5), '20 / 20'],
+            [$dueWork, self::getDummyStudent(6), '10 / 20'],
+            [$dueWork, self::getDummyStudent(7), '20 / 20'],
+            [$dueWork, self::getDummyStudent(8), '10 / 20'],
+            [$dueWork, self::getDummyStudent(9), '20 / 20'],
         ];
     }
 
@@ -1360,21 +1348,21 @@ class AssessableTest extends TestCase
      * @return array
      * @throws InvalidArgumentException If an unrecognised user.id is passed
      */
-    public function providerDueWorkPercentGetHRPublishedOnly(): array
+    public static function providerDueWorkPercentGetHRPublishedOnly(): array
     {
-        $dueWork = $this->getDummyDueWork();
-        $dueWork->setMarkType($this->getDummyMarkType(MarkType::SLUG_PERCENT));
+        $dueWork = self::getDummyDueWork();
+        $dueWork->setMarkType(self::getDummyMarkType(MarkType::SLUG_PERCENT));
         $dueWork->setMarkScheme(new Percentage());
         return [
-            [$dueWork, $this->getDummyStudent(1), null],
-            [$dueWork, $this->getDummyStudent(2), null],
-            [$dueWork, $this->getDummyStudent(3), '10 / 20'],
-            [$dueWork, $this->getDummyStudent(4), null],
-            [$dueWork, $this->getDummyStudent(5), '10 / 20'],
-            [$dueWork, $this->getDummyStudent(6), '10 / 20'],
-            [$dueWork, $this->getDummyStudent(7), '10 / 20'],
-            [$dueWork, $this->getDummyStudent(8), '10 / 20'],
-            [$dueWork, $this->getDummyStudent(9), '10 / 20'],
+            [$dueWork, self::getDummyStudent(1), null],
+            [$dueWork, self::getDummyStudent(2), null],
+            [$dueWork, self::getDummyStudent(3), '10 / 20'],
+            [$dueWork, self::getDummyStudent(4), null],
+            [$dueWork, self::getDummyStudent(5), '10 / 20'],
+            [$dueWork, self::getDummyStudent(6), '10 / 20'],
+            [$dueWork, self::getDummyStudent(7), '10 / 20'],
+            [$dueWork, self::getDummyStudent(8), '10 / 20'],
+            [$dueWork, self::getDummyStudent(9), '10 / 20'],
         ];
     }
 
@@ -1383,21 +1371,21 @@ class AssessableTest extends TestCase
      * @return array
      * @throws InvalidArgumentException If an unrecognised user.id is passed
      */
-    public function providerDueWorkTotalMarkGetHR(): array
+    public static function providerDueWorkTotalMarkGetHR(): array
     {
-        $dueWork = $this->getDummyDueWork();
-        $dueWork->setMarkType($this->getDummyMarkType(MarkType::SLUG_TOTAL));
+        $dueWork = self::getDummyDueWork();
+        $dueWork->setMarkType(self::getDummyMarkType(MarkType::SLUG_TOTAL));
         $dueWork->setMarkScheme(new TotalMarkFractional($dueWork->getMaxMark()));
         return [
-            [$dueWork, $this->getDummyStudent(1), null],
-            [$dueWork, $this->getDummyStudent(2), null],
-            [$dueWork, $this->getDummyStudent(3), '10 / 20'],
-            [$dueWork, $this->getDummyStudent(4), '10 / 20'],
-            [$dueWork, $this->getDummyStudent(5), '20 / 20'],
-            [$dueWork, $this->getDummyStudent(6), '10 / 20'],
-            [$dueWork, $this->getDummyStudent(7), '20 / 20'],
-            [$dueWork, $this->getDummyStudent(8), '10 / 20'],
-            [$dueWork, $this->getDummyStudent(9), '20 / 20'],
+            [$dueWork, self::getDummyStudent(1), null],
+            [$dueWork, self::getDummyStudent(2), null],
+            [$dueWork, self::getDummyStudent(3), '10 / 20'],
+            [$dueWork, self::getDummyStudent(4), '10 / 20'],
+            [$dueWork, self::getDummyStudent(5), '20 / 20'],
+            [$dueWork, self::getDummyStudent(6), '10 / 20'],
+            [$dueWork, self::getDummyStudent(7), '20 / 20'],
+            [$dueWork, self::getDummyStudent(8), '10 / 20'],
+            [$dueWork, self::getDummyStudent(9), '20 / 20'],
         ];
     }
 
@@ -1406,21 +1394,21 @@ class AssessableTest extends TestCase
      * @return array
      * @throws InvalidArgumentException If an unrecognised user.id is passed
      */
-    public function providerDueWorkTotalMarkGetHRPublishedOnly(): array
+    public static function providerDueWorkTotalMarkGetHRPublishedOnly(): array
     {
-        $dueWork = $this->getDummyDueWork();
-        $dueWork->setMarkType($this->getDummyMarkType(MarkType::SLUG_TOTAL));
+        $dueWork = self::getDummyDueWork();
+        $dueWork->setMarkType(self::getDummyMarkType(MarkType::SLUG_TOTAL));
         $dueWork->setMarkScheme(new TotalMarkFractional($dueWork->getMaxMark()));
         return [
-            [$dueWork, $this->getDummyStudent(1), null],
-            [$dueWork, $this->getDummyStudent(2), null],
-            [$dueWork, $this->getDummyStudent(3), '10 / 20'],
-            [$dueWork, $this->getDummyStudent(4), null],
-            [$dueWork, $this->getDummyStudent(5), '10 / 20'],
-            [$dueWork, $this->getDummyStudent(6), '10 / 20'],
-            [$dueWork, $this->getDummyStudent(7), '10 / 20'],
-            [$dueWork, $this->getDummyStudent(8), '10 / 20'],
-            [$dueWork, $this->getDummyStudent(9), '10 / 20'],
+            [$dueWork, self::getDummyStudent(1), null],
+            [$dueWork, self::getDummyStudent(2), null],
+            [$dueWork, self::getDummyStudent(3), '10 / 20'],
+            [$dueWork, self::getDummyStudent(4), null],
+            [$dueWork, self::getDummyStudent(5), '10 / 20'],
+            [$dueWork, self::getDummyStudent(6), '10 / 20'],
+            [$dueWork, self::getDummyStudent(7), '10 / 20'],
+            [$dueWork, self::getDummyStudent(8), '10 / 20'],
+            [$dueWork, self::getDummyStudent(9), '10 / 20'],
         ];
     }
 
@@ -1429,21 +1417,21 @@ class AssessableTest extends TestCase
      * @return array
      * @throws InvalidArgumentException If an unrecognised user.id is passed
      */
-    public function providerDueWorkLetterGradeGetHR(): array
+    public static function providerDueWorkLetterGradeGetHR(): array
     {
-        $dueWork = $this->getDummyDueWork();
-        $dueWork->setMarkType($this->getDummyMarkType(MarkType::SLUG_LETTER));
-        $dueWork->setMarkScheme(new LetterGrade($this->getDummyLetterGradeGroup()));
+        $dueWork = self::getDummyDueWork();
+        $dueWork->setMarkType(self::getDummyMarkType(MarkType::SLUG_LETTER));
+        $dueWork->setMarkScheme(new LetterGrade(self::getDummyLetterGradeGroup()));
         return [
-            [$dueWork, $this->getDummyStudent(1), null],
-            [$dueWork, $this->getDummyStudent(2), null],
-            [$dueWork, $this->getDummyStudent(3), '10 / 20'],
-            [$dueWork, $this->getDummyStudent(4), '10 / 20'],
-            [$dueWork, $this->getDummyStudent(5), '20 / 20'],
-            [$dueWork, $this->getDummyStudent(6), '10 / 20'],
-            [$dueWork, $this->getDummyStudent(7), '20 / 20'],
-            [$dueWork, $this->getDummyStudent(8), '10 / 20'],
-            [$dueWork, $this->getDummyStudent(9), '20 / 20'],
+            [$dueWork, self::getDummyStudent(1), null],
+            [$dueWork, self::getDummyStudent(2), null],
+            [$dueWork, self::getDummyStudent(3), '10 / 20'],
+            [$dueWork, self::getDummyStudent(4), '10 / 20'],
+            [$dueWork, self::getDummyStudent(5), '20 / 20'],
+            [$dueWork, self::getDummyStudent(6), '10 / 20'],
+            [$dueWork, self::getDummyStudent(7), '20 / 20'],
+            [$dueWork, self::getDummyStudent(8), '10 / 20'],
+            [$dueWork, self::getDummyStudent(9), '20 / 20'],
         ];
     }
 
@@ -1452,21 +1440,21 @@ class AssessableTest extends TestCase
      * @return array
      * @throws InvalidArgumentException If an unrecognised user.id is passed
      */
-    public function providerDueWorkLetterGradeGetHRPublishedOnly(): array
+    public static function providerDueWorkLetterGradeGetHRPublishedOnly(): array
     {
-        $dueWork = $this->getDummyDueWork();
-        $dueWork->setMarkType($this->getDummyMarkType(MarkType::SLUG_LETTER));
-        $dueWork->setMarkScheme(new LetterGrade($this->getDummyLetterGradeGroup()));
+        $dueWork = self::getDummyDueWork();
+        $dueWork->setMarkType(self::getDummyMarkType(MarkType::SLUG_LETTER));
+        $dueWork->setMarkScheme(new LetterGrade(self::getDummyLetterGradeGroup()));
         return [
-            [$dueWork, $this->getDummyStudent(1), null],
-            [$dueWork, $this->getDummyStudent(2), null],
-            [$dueWork, $this->getDummyStudent(3), '10 / 20'],
-            [$dueWork, $this->getDummyStudent(4), null],
-            [$dueWork, $this->getDummyStudent(5), '10 / 20'],
-            [$dueWork, $this->getDummyStudent(6), '10 / 20'],
-            [$dueWork, $this->getDummyStudent(7), '10 / 20'],
-            [$dueWork, $this->getDummyStudent(8), '10 / 20'],
-            [$dueWork, $this->getDummyStudent(9), '10 / 20'],
+            [$dueWork, self::getDummyStudent(1), null],
+            [$dueWork, self::getDummyStudent(2), null],
+            [$dueWork, self::getDummyStudent(3), '10 / 20'],
+            [$dueWork, self::getDummyStudent(4), null],
+            [$dueWork, self::getDummyStudent(5), '10 / 20'],
+            [$dueWork, self::getDummyStudent(6), '10 / 20'],
+            [$dueWork, self::getDummyStudent(7), '10 / 20'],
+            [$dueWork, self::getDummyStudent(8), '10 / 20'],
+            [$dueWork, self::getDummyStudent(9), '10 / 20'],
         ];
     }
 
@@ -1475,21 +1463,21 @@ class AssessableTest extends TestCase
      * @return array
      * @throws InvalidArgumentException If an unrecognised user.id is passed
      */
-    public function providerDueWorkNoneGetNorm(): array
+    public static function providerDueWorkNoneGetNorm(): array
     {
-        $dueWork = $this->getDummyDueWork();
-        $dueWork->setMarkType($this->getDummyMarkType(MarkType::SLUG_NONE));
+        $dueWork = self::getDummyDueWork();
+        $dueWork->setMarkType(self::getDummyMarkType(MarkType::SLUG_NONE));
         $dueWork->setMarkScheme(new None());
         return [
-            [$dueWork, $this->getDummyStudent(1), null],
-            [$dueWork, $this->getDummyStudent(2), null],
-            [$dueWork, $this->getDummyStudent(3), 50.0],
-            [$dueWork, $this->getDummyStudent(4), 50.0],
-            [$dueWork, $this->getDummyStudent(5), 100.0],
-            [$dueWork, $this->getDummyStudent(6), 50.0],
-            [$dueWork, $this->getDummyStudent(7), 100.0],
-            [$dueWork, $this->getDummyStudent(8), 50.0],
-            [$dueWork, $this->getDummyStudent(9), 100.0],
+            [$dueWork, self::getDummyStudent(1), null],
+            [$dueWork, self::getDummyStudent(2), null],
+            [$dueWork, self::getDummyStudent(3), 50.0],
+            [$dueWork, self::getDummyStudent(4), 50.0],
+            [$dueWork, self::getDummyStudent(5), 100.0],
+            [$dueWork, self::getDummyStudent(6), 50.0],
+            [$dueWork, self::getDummyStudent(7), 100.0],
+            [$dueWork, self::getDummyStudent(8), 50.0],
+            [$dueWork, self::getDummyStudent(9), 100.0],
         ];
     }
 
@@ -1498,21 +1486,21 @@ class AssessableTest extends TestCase
      * @return array
      * @throws InvalidArgumentException If an unrecognised user.id is passed
      */
-    public function providerDueWorkNoneGetNormPublishedOnly(): array
+    public static function providerDueWorkNoneGetNormPublishedOnly(): array
     {
-        $dueWork = $this->getDummyDueWork();
-        $dueWork->setMarkType($this->getDummyMarkType(MarkType::SLUG_NONE));
+        $dueWork = self::getDummyDueWork();
+        $dueWork->setMarkType(self::getDummyMarkType(MarkType::SLUG_NONE));
         $dueWork->setMarkScheme(new None());
         return [
-            [$dueWork, $this->getDummyStudent(1), null],
-            [$dueWork, $this->getDummyStudent(2), null],
-            [$dueWork, $this->getDummyStudent(3), 50.0],
-            [$dueWork, $this->getDummyStudent(4), null],
-            [$dueWork, $this->getDummyStudent(5), 50.0],
-            [$dueWork, $this->getDummyStudent(6), 50.0],
-            [$dueWork, $this->getDummyStudent(7), 50.0],
-            [$dueWork, $this->getDummyStudent(8), 50.0],
-            [$dueWork, $this->getDummyStudent(9), 50.0],
+            [$dueWork, self::getDummyStudent(1), null],
+            [$dueWork, self::getDummyStudent(2), null],
+            [$dueWork, self::getDummyStudent(3), 50.0],
+            [$dueWork, self::getDummyStudent(4), null],
+            [$dueWork, self::getDummyStudent(5), 50.0],
+            [$dueWork, self::getDummyStudent(6), 50.0],
+            [$dueWork, self::getDummyStudent(7), 50.0],
+            [$dueWork, self::getDummyStudent(8), 50.0],
+            [$dueWork, self::getDummyStudent(9), 50.0],
         ];
     }
 
@@ -1521,21 +1509,21 @@ class AssessableTest extends TestCase
      * @return array
      * @throws InvalidArgumentException If an unrecognised user.id is passed
      */
-    public function providerDueWorkPercentGetNorm(): array
+    public static function providerDueWorkPercentGetNorm(): array
     {
-        $dueWork = $this->getDummyDueWork();
-        $dueWork->setMarkType($this->getDummyMarkType(MarkType::SLUG_PERCENT));
+        $dueWork = self::getDummyDueWork();
+        $dueWork->setMarkType(self::getDummyMarkType(MarkType::SLUG_PERCENT));
         $dueWork->setMarkScheme(new Percentage());
         return [
-            [$dueWork, $this->getDummyStudent(1), null],
-            [$dueWork, $this->getDummyStudent(2), null],
-            [$dueWork, $this->getDummyStudent(3), 50.0],
-            [$dueWork, $this->getDummyStudent(4), 50.0],
-            [$dueWork, $this->getDummyStudent(5), 100.0],
-            [$dueWork, $this->getDummyStudent(6), 50.0],
-            [$dueWork, $this->getDummyStudent(7), 100.0],
-            [$dueWork, $this->getDummyStudent(8), 50.0],
-            [$dueWork, $this->getDummyStudent(9), 100.0],
+            [$dueWork, self::getDummyStudent(1), null],
+            [$dueWork, self::getDummyStudent(2), null],
+            [$dueWork, self::getDummyStudent(3), 50.0],
+            [$dueWork, self::getDummyStudent(4), 50.0],
+            [$dueWork, self::getDummyStudent(5), 100.0],
+            [$dueWork, self::getDummyStudent(6), 50.0],
+            [$dueWork, self::getDummyStudent(7), 100.0],
+            [$dueWork, self::getDummyStudent(8), 50.0],
+            [$dueWork, self::getDummyStudent(9), 100.0],
         ];
     }
 
@@ -1543,21 +1531,21 @@ class AssessableTest extends TestCase
      * @return array
      * @throws InvalidArgumentException If an unrecognised user.id is passed
      */
-    public function providerDueWorkPercentGetNormPublishedOnly(): array
+    public static function providerDueWorkPercentGetNormPublishedOnly(): array
     {
-        $dueWork = $this->getDummyDueWork();
-        $dueWork->setMarkType($this->getDummyMarkType(MarkType::SLUG_PERCENT));
+        $dueWork = self::getDummyDueWork();
+        $dueWork->setMarkType(self::getDummyMarkType(MarkType::SLUG_PERCENT));
         $dueWork->setMarkScheme(new Percentage());
         return [
-            [$dueWork, $this->getDummyStudent(1), null],
-            [$dueWork, $this->getDummyStudent(2), null],
-            [$dueWork, $this->getDummyStudent(3), 50.0],
-            [$dueWork, $this->getDummyStudent(4), null],
-            [$dueWork, $this->getDummyStudent(5), 50.0],
-            [$dueWork, $this->getDummyStudent(6), 50.0],
-            [$dueWork, $this->getDummyStudent(7), 50.0],
-            [$dueWork, $this->getDummyStudent(8), 50.0],
-            [$dueWork, $this->getDummyStudent(9), 50.0],
+            [$dueWork, self::getDummyStudent(1), null],
+            [$dueWork, self::getDummyStudent(2), null],
+            [$dueWork, self::getDummyStudent(3), 50.0],
+            [$dueWork, self::getDummyStudent(4), null],
+            [$dueWork, self::getDummyStudent(5), 50.0],
+            [$dueWork, self::getDummyStudent(6), 50.0],
+            [$dueWork, self::getDummyStudent(7), 50.0],
+            [$dueWork, self::getDummyStudent(8), 50.0],
+            [$dueWork, self::getDummyStudent(9), 50.0],
         ];
     }
 
@@ -1565,21 +1553,21 @@ class AssessableTest extends TestCase
      * @return array
      * @throws InvalidArgumentException If an unrecognised user.id is passed
      */
-    public function providerDueWorkTotalMarkGetNorm(): array
+    public static function providerDueWorkTotalMarkGetNorm(): array
     {
-        $dueWork = $this->getDummyDueWork();
-        $dueWork->setMarkType($this->getDummyMarkType(MarkType::SLUG_TOTAL));
+        $dueWork = self::getDummyDueWork();
+        $dueWork->setMarkType(self::getDummyMarkType(MarkType::SLUG_TOTAL));
         $dueWork->setMarkScheme(new TotalMarkFractional($dueWork->getMaxMark()));
         return [
-            [$dueWork, $this->getDummyStudent(1), null],
-            [$dueWork, $this->getDummyStudent(2), null],
-            [$dueWork, $this->getDummyStudent(3), 50.0],
-            [$dueWork, $this->getDummyStudent(4), 50.0],
-            [$dueWork, $this->getDummyStudent(5), 100.0],
-            [$dueWork, $this->getDummyStudent(6), 50.0],
-            [$dueWork, $this->getDummyStudent(7), 100.0],
-            [$dueWork, $this->getDummyStudent(8), 50.0],
-            [$dueWork, $this->getDummyStudent(9), 100.0],
+            [$dueWork, self::getDummyStudent(1), null],
+            [$dueWork, self::getDummyStudent(2), null],
+            [$dueWork, self::getDummyStudent(3), 50.0],
+            [$dueWork, self::getDummyStudent(4), 50.0],
+            [$dueWork, self::getDummyStudent(5), 100.0],
+            [$dueWork, self::getDummyStudent(6), 50.0],
+            [$dueWork, self::getDummyStudent(7), 100.0],
+            [$dueWork, self::getDummyStudent(8), 50.0],
+            [$dueWork, self::getDummyStudent(9), 100.0],
         ];
     }
 
@@ -1587,21 +1575,21 @@ class AssessableTest extends TestCase
      * @return array
      * @throws InvalidArgumentException If an unrecognised user.id is passed
      */
-    public function providerDueWorkTotalMarkGetNormPublishedOnly(): array
+    public static function providerDueWorkTotalMarkGetNormPublishedOnly(): array
     {
-        $dueWork = $this->getDummyDueWork();
-        $dueWork->setMarkType($this->getDummyMarkType(MarkType::SLUG_TOTAL));
+        $dueWork = self::getDummyDueWork();
+        $dueWork->setMarkType(self::getDummyMarkType(MarkType::SLUG_TOTAL));
         $dueWork->setMarkScheme(new TotalMarkFractional($dueWork->getMaxMark()));
         return [
-            [$dueWork, $this->getDummyStudent(1), null],
-            [$dueWork, $this->getDummyStudent(2), null],
-            [$dueWork, $this->getDummyStudent(3), 50.0],
-            [$dueWork, $this->getDummyStudent(4), null],
-            [$dueWork, $this->getDummyStudent(5), 50.0],
-            [$dueWork, $this->getDummyStudent(6), 50.0],
-            [$dueWork, $this->getDummyStudent(7), 50.0],
-            [$dueWork, $this->getDummyStudent(8), 50.0],
-            [$dueWork, $this->getDummyStudent(9), 50.0],
+            [$dueWork, self::getDummyStudent(1), null],
+            [$dueWork, self::getDummyStudent(2), null],
+            [$dueWork, self::getDummyStudent(3), 50.0],
+            [$dueWork, self::getDummyStudent(4), null],
+            [$dueWork, self::getDummyStudent(5), 50.0],
+            [$dueWork, self::getDummyStudent(6), 50.0],
+            [$dueWork, self::getDummyStudent(7), 50.0],
+            [$dueWork, self::getDummyStudent(8), 50.0],
+            [$dueWork, self::getDummyStudent(9), 50.0],
         ];
     }
 
@@ -1609,21 +1597,21 @@ class AssessableTest extends TestCase
      * @return array
      * @throws InvalidArgumentException If an unrecognised user.id is passed
      */
-    public function providerDueWorkLetterGradeGetNorm(): array
+    public static function providerDueWorkLetterGradeGetNorm(): array
     {
-        $dueWork = $this->getDummyDueWork();
-        $dueWork->setMarkType($this->getDummyMarkType(MarkType::SLUG_LETTER));
-        $dueWork->setMarkScheme(new LetterGrade($this->getDummyLetterGradeGroup()));
+        $dueWork = self::getDummyDueWork();
+        $dueWork->setMarkType(self::getDummyMarkType(MarkType::SLUG_LETTER));
+        $dueWork->setMarkScheme(new LetterGrade(self::getDummyLetterGradeGroup()));
         return [
-            [$dueWork, $this->getDummyStudent(1), null],
-            [$dueWork, $this->getDummyStudent(2), null],
-            [$dueWork, $this->getDummyStudent(3), 50.0],
-            [$dueWork, $this->getDummyStudent(4), 50.0],
-            [$dueWork, $this->getDummyStudent(5), 100.0],
-            [$dueWork, $this->getDummyStudent(6), 50.0],
-            [$dueWork, $this->getDummyStudent(7), 100.0],
-            [$dueWork, $this->getDummyStudent(8), 50.0],
-            [$dueWork, $this->getDummyStudent(9), 100.0],
+            [$dueWork, self::getDummyStudent(1), null],
+            [$dueWork, self::getDummyStudent(2), null],
+            [$dueWork, self::getDummyStudent(3), 50.0],
+            [$dueWork, self::getDummyStudent(4), 50.0],
+            [$dueWork, self::getDummyStudent(5), 100.0],
+            [$dueWork, self::getDummyStudent(6), 50.0],
+            [$dueWork, self::getDummyStudent(7), 100.0],
+            [$dueWork, self::getDummyStudent(8), 50.0],
+            [$dueWork, self::getDummyStudent(9), 100.0],
         ];
     }
 
@@ -1631,21 +1619,21 @@ class AssessableTest extends TestCase
      * @return array
      * @throws InvalidArgumentException If an unrecognised user.id is passed
      */
-    public function providerDueWorkLetterGradeGetNormPublishedOnly(): array
+    public static function providerDueWorkLetterGradeGetNormPublishedOnly(): array
     {
-        $dueWork = $this->getDummyDueWork();
-        $dueWork->setMarkType($this->getDummyMarkType(MarkType::SLUG_LETTER));
-        $dueWork->setMarkScheme(new LetterGrade($this->getDummyLetterGradeGroup()));
+        $dueWork = self::getDummyDueWork();
+        $dueWork->setMarkType(self::getDummyMarkType(MarkType::SLUG_LETTER));
+        $dueWork->setMarkScheme(new LetterGrade(self::getDummyLetterGradeGroup()));
         return [
-            [$dueWork, $this->getDummyStudent(1), null],
-            [$dueWork, $this->getDummyStudent(2), null],
-            [$dueWork, $this->getDummyStudent(3), 50.0],
-            [$dueWork, $this->getDummyStudent(4), null],
-            [$dueWork, $this->getDummyStudent(5), 50.0],
-            [$dueWork, $this->getDummyStudent(6), 50.0],
-            [$dueWork, $this->getDummyStudent(7), 50.0],
-            [$dueWork, $this->getDummyStudent(8), 50.0],
-            [$dueWork, $this->getDummyStudent(9), 50.0],
+            [$dueWork, self::getDummyStudent(1), null],
+            [$dueWork, self::getDummyStudent(2), null],
+            [$dueWork, self::getDummyStudent(3), 50.0],
+            [$dueWork, self::getDummyStudent(4), null],
+            [$dueWork, self::getDummyStudent(5), 50.0],
+            [$dueWork, self::getDummyStudent(6), 50.0],
+            [$dueWork, self::getDummyStudent(7), 50.0],
+            [$dueWork, self::getDummyStudent(8), 50.0],
+            [$dueWork, self::getDummyStudent(9), 50.0],
         ];
     }
 
@@ -1653,20 +1641,20 @@ class AssessableTest extends TestCase
      * @return array
      * @throws InvalidArgumentException If an unrecognised user.id is passed
      */
-    public function providerProjectMinGetNorm(): array
+    public static function providerProjectMinGetNorm(): array
     {
-        $project = $this->getDummyProject();
+        $project = self::getDummyProject();
         $project->setSummator(new Minimum());
         return [
-            [$project, $this->getDummyStudent(1), null],
-            [$project, $this->getDummyStudent(2), 50.0],
-            [$project, $this->getDummyStudent(3), 50.0],
-            [$project, $this->getDummyStudent(4), 50.0],
-            [$project, $this->getDummyStudent(5), 100],
-            [$project, $this->getDummyStudent(6), 50.0],
-            [$project, $this->getDummyStudent(7), 100.0],
-            [$project, $this->getDummyStudent(8), 50.0],
-            [$project, $this->getDummyStudent(9), 100.0],
+            [$project, self::getDummyStudent(1), null],
+            [$project, self::getDummyStudent(2), 50.0],
+            [$project, self::getDummyStudent(3), 50.0],
+            [$project, self::getDummyStudent(4), 50.0],
+            [$project, self::getDummyStudent(5), 100],
+            [$project, self::getDummyStudent(6), 50.0],
+            [$project, self::getDummyStudent(7), 100.0],
+            [$project, self::getDummyStudent(8), 50.0],
+            [$project, self::getDummyStudent(9), 100.0],
         ];
     }
 
@@ -1674,20 +1662,20 @@ class AssessableTest extends TestCase
      * @return array
      * @throws InvalidArgumentException If an unrecognised user.id is passed
      */
-    public function providerProjectMinGetNormPublishedOnly(): array
+    public static function providerProjectMinGetNormPublishedOnly(): array
     {
-        $project = $this->getDummyProject();
+        $project = self::getDummyProject();
         $project->setSummator(new Minimum());
         return [
-            [$project, $this->getDummyStudent(1), null],
-            [$project, $this->getDummyStudent(2), 50.0],
-            [$project, $this->getDummyStudent(3), 50.0],
-            [$project, $this->getDummyStudent(4), 50.0],
-            [$project, $this->getDummyStudent(5), 33.333333333333],
-            [$project, $this->getDummyStudent(6), 50.0],
-            [$project, $this->getDummyStudent(7), 50.0],
-            [$project, $this->getDummyStudent(8), 50.0],
-            [$project, $this->getDummyStudent(9), 50.0],
+            [$project, self::getDummyStudent(1), null],
+            [$project, self::getDummyStudent(2), 50.0],
+            [$project, self::getDummyStudent(3), 50.0],
+            [$project, self::getDummyStudent(4), 50.0],
+            [$project, self::getDummyStudent(5), 33.333333333333],
+            [$project, self::getDummyStudent(6), 50.0],
+            [$project, self::getDummyStudent(7), 50.0],
+            [$project, self::getDummyStudent(8), 50.0],
+            [$project, self::getDummyStudent(9), 50.0],
         ];
     }
 
@@ -1695,33 +1683,33 @@ class AssessableTest extends TestCase
      * @return array
      * @throws InvalidArgumentException If an unrecognised user.id is passed
      */
-    public function providerProjectMaxGetNorm(): array
+    public static function providerProjectMaxGetNorm(): array
     {
-        $project = $this->getDummyProject();
+        $project = self::getDummyProject();
         $project->setSummator(new Maximum());
         if (self::FAVOR_FLOATING) {
             return [
-                [$project, $this->getDummyStudent(1), null],
-                [$project, $this->getDummyStudent(2), 50.0],
-                [$project, $this->getDummyStudent(3), 100.0],
-                [$project, $this->getDummyStudent(4), 100.0],
-                [$project, $this->getDummyStudent(5), 100.0],
-                [$project, $this->getDummyStudent(6), 50.0],
-                [$project, $this->getDummyStudent(7), 100.0],
-                [$project, $this->getDummyStudent(8), 50.0],
-                [$project, $this->getDummyStudent(9), 100.0],
+                [$project, self::getDummyStudent(1), null],
+                [$project, self::getDummyStudent(2), 50.0],
+                [$project, self::getDummyStudent(3), 100.0],
+                [$project, self::getDummyStudent(4), 100.0],
+                [$project, self::getDummyStudent(5), 100.0],
+                [$project, self::getDummyStudent(6), 50.0],
+                [$project, self::getDummyStudent(7), 100.0],
+                [$project, self::getDummyStudent(8), 50.0],
+                [$project, self::getDummyStudent(9), 100.0],
             ];
         }
         return [
-            [$project, $this->getDummyStudent(1), null],
-            [$project, $this->getDummyStudent(2), 50.0],
-            [$project, $this->getDummyStudent(3), 100.0],
-            [$project, $this->getDummyStudent(4), 100.0],
-            [$project, $this->getDummyStudent(5), 100.0],
-            [$project, $this->getDummyStudent(6), 50.0],
-            [$project, $this->getDummyStudent(7), 100.0],
-            [$project, $this->getDummyStudent(8), 50.0],
-            [$project, $this->getDummyStudent(9), 100.0],
+            [$project, self::getDummyStudent(1), null],
+            [$project, self::getDummyStudent(2), 50.0],
+            [$project, self::getDummyStudent(3), 100.0],
+            [$project, self::getDummyStudent(4), 100.0],
+            [$project, self::getDummyStudent(5), 100.0],
+            [$project, self::getDummyStudent(6), 50.0],
+            [$project, self::getDummyStudent(7), 100.0],
+            [$project, self::getDummyStudent(8), 50.0],
+            [$project, self::getDummyStudent(9), 100.0],
         ];
     }
 
@@ -1729,20 +1717,20 @@ class AssessableTest extends TestCase
      * @return array
      * @throws InvalidArgumentException If an unrecognised user.id is passed
      */
-    public function providerProjectMaxGetNormPublishedOnly(): array
+    public static function providerProjectMaxGetNormPublishedOnly(): array
     {
-        $project = $this->getDummyProject();
+        $project = self::getDummyProject();
         $project->setSummator(new Maximum());
         return [
-            [$project, $this->getDummyStudent(1), null],
-            [$project, $this->getDummyStudent(2), 50.0],
-            [$project, $this->getDummyStudent(3), 100.0],
-            [$project, $this->getDummyStudent(4), 100.0],
-            [$project, $this->getDummyStudent(5), 50.0],
-            [$project, $this->getDummyStudent(6), 50.0],
-            [$project, $this->getDummyStudent(7), 50.0],
-            [$project, $this->getDummyStudent(8), 50.0],
-            [$project, $this->getDummyStudent(9), 50.0],
+            [$project, self::getDummyStudent(1), null],
+            [$project, self::getDummyStudent(2), 50.0],
+            [$project, self::getDummyStudent(3), 100.0],
+            [$project, self::getDummyStudent(4), 100.0],
+            [$project, self::getDummyStudent(5), 50.0],
+            [$project, self::getDummyStudent(6), 50.0],
+            [$project, self::getDummyStudent(7), 50.0],
+            [$project, self::getDummyStudent(8), 50.0],
+            [$project, self::getDummyStudent(9), 50.0],
         ];
     }
 
@@ -1750,33 +1738,33 @@ class AssessableTest extends TestCase
      * @return array
      * @throws InvalidArgumentException If an unrecognised user.id is passed
      */
-    public function providerProjectAverageGetNorm(): array
+    public static function providerProjectAverageGetNorm(): array
     {
-        $project = $this->getDummyProject();
+        $project = self::getDummyProject();
         $project->setSummator(new Average());
         if (self::FAVOR_FLOATING) {
             return [
-                [$project, $this->getDummyStudent(1), null],
-                [$project, $this->getDummyStudent(2), 50.0],
-                [$project, $this->getDummyStudent(3), 66.666666666667],
-                [$project, $this->getDummyStudent(4), 83.333333333333],
-                [$project, $this->getDummyStudent(5), 100.0],
-                [$project, $this->getDummyStudent(6), 50.0],
-                [$project, $this->getDummyStudent(7), 100.0],
-                [$project, $this->getDummyStudent(8), 50.0],
-                [$project, $this->getDummyStudent(9), 100.0],
+                [$project, self::getDummyStudent(1), null],
+                [$project, self::getDummyStudent(2), 50.0],
+                [$project, self::getDummyStudent(3), 66.666666666667],
+                [$project, self::getDummyStudent(4), 83.333333333333],
+                [$project, self::getDummyStudent(5), 100.0],
+                [$project, self::getDummyStudent(6), 50.0],
+                [$project, self::getDummyStudent(7), 100.0],
+                [$project, self::getDummyStudent(8), 50.0],
+                [$project, self::getDummyStudent(9), 100.0],
             ];
         }
         return [
-            [$project, $this->getDummyStudent(1), null],
-            [$project, $this->getDummyStudent(2), 50.0],
-            [$project, $this->getDummyStudent(3), 66.666666666667],
-            [$project, $this->getDummyStudent(4), 83.333333333333],
-            [$project, $this->getDummyStudent(5), 100.0],
-            [$project, $this->getDummyStudent(6), 50.0],
-            [$project, $this->getDummyStudent(7), 100.0],
-            [$project, $this->getDummyStudent(8), 50.0],
-            [$project, $this->getDummyStudent(9), 100.0],
+            [$project, self::getDummyStudent(1), null],
+            [$project, self::getDummyStudent(2), 50.0],
+            [$project, self::getDummyStudent(3), 66.666666666667],
+            [$project, self::getDummyStudent(4), 83.333333333333],
+            [$project, self::getDummyStudent(5), 100.0],
+            [$project, self::getDummyStudent(6), 50.0],
+            [$project, self::getDummyStudent(7), 100.0],
+            [$project, self::getDummyStudent(8), 50.0],
+            [$project, self::getDummyStudent(9), 100.0],
         ];
     }
 
@@ -1784,20 +1772,20 @@ class AssessableTest extends TestCase
      * @return array
      * @throws InvalidArgumentException If an unrecognised user.id is passed
      */
-    public function providerProjectAverageGetNormPublishedOnly(): array
+    public static function providerProjectAverageGetNormPublishedOnly(): array
     {
-        $project = $this->getDummyProject();
+        $project = self::getDummyProject();
         $project->setSummator(new Average());
         return [
-            [$project, $this->getDummyStudent(1), null],
-            [$project, $this->getDummyStudent(2), 50.0],
-            [$project, $this->getDummyStudent(3), 75.0],
-            [$project, $this->getDummyStudent(4), 75.0],
-            [$project, $this->getDummyStudent(5), 41.6666666666666],
-            [$project, $this->getDummyStudent(6), 50.0],
-            [$project, $this->getDummyStudent(7), 50.0],
-            [$project, $this->getDummyStudent(8), 50.0],
-            [$project, $this->getDummyStudent(9), 50.0],
+            [$project, self::getDummyStudent(1), null],
+            [$project, self::getDummyStudent(2), 50.0],
+            [$project, self::getDummyStudent(3), 75.0],
+            [$project, self::getDummyStudent(4), 75.0],
+            [$project, self::getDummyStudent(5), 41.6666666666666],
+            [$project, self::getDummyStudent(6), 50.0],
+            [$project, self::getDummyStudent(7), 50.0],
+            [$project, self::getDummyStudent(8), 50.0],
+            [$project, self::getDummyStudent(9), 50.0],
         ];
     }
 
@@ -1805,33 +1793,33 @@ class AssessableTest extends TestCase
      * @return array
      * @throws InvalidArgumentException If an unrecognised user.id is passed
      */
-    public function providerProjectWeightedAverageGetNorm(): array
+    public static function providerProjectWeightedAverageGetNorm(): array
     {
-        $project = $this->getDummyProject();
+        $project = self::getDummyProject();
         $project->setSummator(new WeightedAverage());
         if (self::FAVOR_FLOATING) {
             return [
-                [$project, $this->getDummyStudent(1), null],
-                [$project, $this->getDummyStudent(2), 50.0],
-                [$project, $this->getDummyStudent(3), 50.0],
-                [$project, $this->getDummyStudent(4), 60.0],
-                [$project, $this->getDummyStudent(5), 100.0],
-                [$project, $this->getDummyStudent(6), 50.0],
-                [$project, $this->getDummyStudent(7), 100.0],
-                [$project, $this->getDummyStudent(8), 50.0],
-                [$project, $this->getDummyStudent(9), 100.0],
+                [$project, self::getDummyStudent(1), null],
+                [$project, self::getDummyStudent(2), 50.0],
+                [$project, self::getDummyStudent(3), 50.0],
+                [$project, self::getDummyStudent(4), 60.0],
+                [$project, self::getDummyStudent(5), 100.0],
+                [$project, self::getDummyStudent(6), 50.0],
+                [$project, self::getDummyStudent(7), 100.0],
+                [$project, self::getDummyStudent(8), 50.0],
+                [$project, self::getDummyStudent(9), 100.0],
             ];
         }
         return [
-            [$project, $this->getDummyStudent(1), null],
-            [$project, $this->getDummyStudent(2), 50.0],
-            [$project, $this->getDummyStudent(3), 50.0],
-            [$project, $this->getDummyStudent(4), 60.0],
-            [$project, $this->getDummyStudent(5), 100.0],
-            [$project, $this->getDummyStudent(6), 50.0],
-            [$project, $this->getDummyStudent(7), 100.0],
-            [$project, $this->getDummyStudent(8), 50.0],
-            [$project, $this->getDummyStudent(9), 100.0],
+            [$project, self::getDummyStudent(1), null],
+            [$project, self::getDummyStudent(2), 50.0],
+            [$project, self::getDummyStudent(3), 50.0],
+            [$project, self::getDummyStudent(4), 60.0],
+            [$project, self::getDummyStudent(5), 100.0],
+            [$project, self::getDummyStudent(6), 50.0],
+            [$project, self::getDummyStudent(7), 100.0],
+            [$project, self::getDummyStudent(8), 50.0],
+            [$project, self::getDummyStudent(9), 100.0],
         ];
     }
 
@@ -1839,20 +1827,20 @@ class AssessableTest extends TestCase
      * @return array
      * @throws InvalidArgumentException If an unrecognised user.id is passed
      */
-    public function providerProjectWeightedAverageGetNormPublishedOnly(): array
+    public static function providerProjectWeightedAverageGetNormPublishedOnly(): array
     {
-        $project = $this->getDummyProject();
+        $project = self::getDummyProject();
         $project->setSummator(new WeightedAverage());
         return [
-            [$project, $this->getDummyStudent(1), null],
-            [$project, $this->getDummyStudent(2), 50.0],
-            [$project, $this->getDummyStudent(3), 50.0],
-            [$project, $this->getDummyStudent(4), 50.0],
-            [$project, $this->getDummyStudent(5), 46.666666666666666],
-            [$project, $this->getDummyStudent(6), 50.0],
-            [$project, $this->getDummyStudent(7), 50.0],
-            [$project, $this->getDummyStudent(8), 50.0],
-            [$project, $this->getDummyStudent(9), 50.0],
+            [$project, self::getDummyStudent(1), null],
+            [$project, self::getDummyStudent(2), 50.0],
+            [$project, self::getDummyStudent(3), 50.0],
+            [$project, self::getDummyStudent(4), 50.0],
+            [$project, self::getDummyStudent(5), 46.666666666666666],
+            [$project, self::getDummyStudent(6), 50.0],
+            [$project, self::getDummyStudent(7), 50.0],
+            [$project, self::getDummyStudent(8), 50.0],
+            [$project, self::getDummyStudent(9), 50.0],
         ];
     }
 
@@ -1861,19 +1849,19 @@ class AssessableTest extends TestCase
      * @return array
      * @throws InvalidArgumentException If an unrecognised user.id is passed
      */
-    public function providerProjectNone(): array
+    public static function providerProjectNone(): array
     {
-        $project = $this->getDummyProject();
+        $project = self::getDummyProject();
         return [
-            [$project, $this->getDummyStudent(1), null],
-            [$project, $this->getDummyStudent(2), null],
-            [$project, $this->getDummyStudent(3), null],
-            [$project, $this->getDummyStudent(4), null],
-            [$project, $this->getDummyStudent(5), null],
-            [$project, $this->getDummyStudent(6), null],
-            [$project, $this->getDummyStudent(7), null],
-            [$project, $this->getDummyStudent(8), null],
-            [$project, $this->getDummyStudent(9), null],
+            [$project, self::getDummyStudent(1), null],
+            [$project, self::getDummyStudent(2), null],
+            [$project, self::getDummyStudent(3), null],
+            [$project, self::getDummyStudent(4), null],
+            [$project, self::getDummyStudent(5), null],
+            [$project, self::getDummyStudent(6), null],
+            [$project, self::getDummyStudent(7), null],
+            [$project, self::getDummyStudent(8), null],
+            [$project, self::getDummyStudent(9), null],
         ];
     }
 
@@ -1881,22 +1869,22 @@ class AssessableTest extends TestCase
      * @return array
      * @throws InvalidArgumentException If an unrecognised user.id is passed
      */
-    public function providerProjectMinLetterGradeGetHR(): array
+    public static function providerProjectMinLetterGradeGetHR(): array
     {
-        $project = $this->getDummyProject();
+        $project = self::getDummyProject();
         $project->setSummator(new Minimum());
-        $project->setMarkType($this->getDummyMarkType(MarkType::SLUG_LETTER));
-        $project->setMarkScheme(new LetterGrade($this->getDummyLetterGradeGroup()));
+        $project->setMarkType(self::getDummyMarkType(MarkType::SLUG_LETTER));
+        $project->setMarkScheme(new LetterGrade(self::getDummyLetterGradeGroup()));
         return [
-            [$project, $this->getDummyStudent(1), null],
-            [$project, $this->getDummyStudent(2), 'Acceptable'],
-            [$project, $this->getDummyStudent(3), 'Acceptable'],
-            [$project, $this->getDummyStudent(4), 'Acceptable'],
-            [$project, $this->getDummyStudent(5), 'Excellent'],
-            [$project, $this->getDummyStudent(6), 'Acceptable'],
-            [$project, $this->getDummyStudent(7), 'Excellent'],
-            [$project, $this->getDummyStudent(8), 'Acceptable'],
-            [$project, $this->getDummyStudent(9), 'Excellent'],
+            [$project, self::getDummyStudent(1), null],
+            [$project, self::getDummyStudent(2), 'Acceptable'],
+            [$project, self::getDummyStudent(3), 'Acceptable'],
+            [$project, self::getDummyStudent(4), 'Acceptable'],
+            [$project, self::getDummyStudent(5), 'Excellent'],
+            [$project, self::getDummyStudent(6), 'Acceptable'],
+            [$project, self::getDummyStudent(7), 'Excellent'],
+            [$project, self::getDummyStudent(8), 'Acceptable'],
+            [$project, self::getDummyStudent(9), 'Excellent'],
         ];
     }
 
@@ -1904,22 +1892,22 @@ class AssessableTest extends TestCase
      * @return array
      * @throws InvalidArgumentException If an unrecognised user.id is passed
      */
-    public function providerProjectMinLetterGradeGetHRPublishedOnly(): array
+    public static function providerProjectMinLetterGradeGetHRPublishedOnly(): array
     {
-        $project = $this->getDummyProject();
+        $project = self::getDummyProject();
         $project->setSummator(new Minimum());
-        $project->setMarkType($this->getDummyMarkType(MarkType::SLUG_LETTER));
-        $project->setMarkScheme(new LetterGrade($this->getDummyLetterGradeGroup()));
+        $project->setMarkType(self::getDummyMarkType(MarkType::SLUG_LETTER));
+        $project->setMarkScheme(new LetterGrade(self::getDummyLetterGradeGroup()));
         return [
-            [$project, $this->getDummyStudent(1), null],
-            [$project, $this->getDummyStudent(2), 'Acceptable'],
-            [$project, $this->getDummyStudent(3), 'Acceptable'],
-            [$project, $this->getDummyStudent(4), 'Acceptable'],
-            [$project, $this->getDummyStudent(5), 'Needs Attention'],
-            [$project, $this->getDummyStudent(6), 'Acceptable'],
-            [$project, $this->getDummyStudent(7), 'Acceptable'],
-            [$project, $this->getDummyStudent(8), 'Acceptable'],
-            [$project, $this->getDummyStudent(9), 'Acceptable'],
+            [$project, self::getDummyStudent(1), null],
+            [$project, self::getDummyStudent(2), 'Acceptable'],
+            [$project, self::getDummyStudent(3), 'Acceptable'],
+            [$project, self::getDummyStudent(4), 'Acceptable'],
+            [$project, self::getDummyStudent(5), 'Needs Attention'],
+            [$project, self::getDummyStudent(6), 'Acceptable'],
+            [$project, self::getDummyStudent(7), 'Acceptable'],
+            [$project, self::getDummyStudent(8), 'Acceptable'],
+            [$project, self::getDummyStudent(9), 'Acceptable'],
         ];
     }
 
@@ -1927,22 +1915,22 @@ class AssessableTest extends TestCase
      * @return array
      * @throws InvalidArgumentException If an unrecognised user.id is passed
      */
-    public function providerProjectMinPercentageGetHR(): array
+    public static function providerProjectMinPercentageGetHR(): array
     {
-        $project = $this->getDummyProject();
+        $project = self::getDummyProject();
         $project->setSummator(new Minimum());
-        $project->setMarkType($this->getDummyMarkType(MarkType::SLUG_PERCENT));
+        $project->setMarkType(self::getDummyMarkType(MarkType::SLUG_PERCENT));
         $project->setMarkScheme(new Percentage());
         return [
-            [$project, $this->getDummyStudent(1), null],
-            [$project, $this->getDummyStudent(2), '50 %'],
-            [$project, $this->getDummyStudent(3), '50 %'],
-            [$project, $this->getDummyStudent(4), '50 %'],
-            [$project, $this->getDummyStudent(5), '100 %'],
-            [$project, $this->getDummyStudent(6), '50 %'],
-            [$project, $this->getDummyStudent(7), '100 %'],
-            [$project, $this->getDummyStudent(8), '50 %'],
-            [$project, $this->getDummyStudent(9), '100 %'],
+            [$project, self::getDummyStudent(1), null],
+            [$project, self::getDummyStudent(2), '50 %'],
+            [$project, self::getDummyStudent(3), '50 %'],
+            [$project, self::getDummyStudent(4), '50 %'],
+            [$project, self::getDummyStudent(5), '100 %'],
+            [$project, self::getDummyStudent(6), '50 %'],
+            [$project, self::getDummyStudent(7), '100 %'],
+            [$project, self::getDummyStudent(8), '50 %'],
+            [$project, self::getDummyStudent(9), '100 %'],
         ];
     }
 
@@ -1950,22 +1938,22 @@ class AssessableTest extends TestCase
      * @return array
      * @throws InvalidArgumentException If an unrecognised user.id is passed
      */
-    public function providerProjectMinPercentageGetHRPublishedOnly(): array
+    public static function providerProjectMinPercentageGetHRPublishedOnly(): array
     {
-        $project = $this->getDummyProject();
+        $project = self::getDummyProject();
         $project->setSummator(new Minimum());
-        $project->setMarkType($this->getDummyMarkType(MarkType::SLUG_PERCENT));
+        $project->setMarkType(self::getDummyMarkType(MarkType::SLUG_PERCENT));
         $project->setMarkScheme(new Percentage());
         return [
-            [$project, $this->getDummyStudent(1), null],
-            [$project, $this->getDummyStudent(2), '50 %'],
-            [$project, $this->getDummyStudent(3), '50 %'],
-            [$project, $this->getDummyStudent(4), '50 %'],
-            [$project, $this->getDummyStudent(5), '33.33 %'],
-            [$project, $this->getDummyStudent(6), '50 %'],
-            [$project, $this->getDummyStudent(7), '50 %'],
-            [$project, $this->getDummyStudent(8), '50 %'],
-            [$project, $this->getDummyStudent(9), '50 %'],
+            [$project, self::getDummyStudent(1), null],
+            [$project, self::getDummyStudent(2), '50 %'],
+            [$project, self::getDummyStudent(3), '50 %'],
+            [$project, self::getDummyStudent(4), '50 %'],
+            [$project, self::getDummyStudent(5), '33.33 %'],
+            [$project, self::getDummyStudent(6), '50 %'],
+            [$project, self::getDummyStudent(7), '50 %'],
+            [$project, self::getDummyStudent(8), '50 %'],
+            [$project, self::getDummyStudent(9), '50 %'],
         ];
     }
 
@@ -1973,35 +1961,35 @@ class AssessableTest extends TestCase
      * @return array
      * @throws InvalidArgumentException If an unrecognised user.id is passed
      */
-    public function providerProjectMaxLetterGradeGetHR(): array
+    public static function providerProjectMaxLetterGradeGetHR(): array
     {
-        $project = $this->getDummyProject();
+        $project = self::getDummyProject();
         $project->setSummator(new Maximum());
-        $project->setMarkType($this->getDummyMarkType(MarkType::SLUG_LETTER));
-        $project->setMarkScheme(new LetterGrade($this->getDummyLetterGradeGroup()));
+        $project->setMarkType(self::getDummyMarkType(MarkType::SLUG_LETTER));
+        $project->setMarkScheme(new LetterGrade(self::getDummyLetterGradeGroup()));
         if (self::FAVOR_FLOATING) {
             return [
-                [$project, $this->getDummyStudent(1), null],
-                [$project, $this->getDummyStudent(2), 'Acceptable'],
-                [$project, $this->getDummyStudent(3), 'Excellent'],
-                [$project, $this->getDummyStudent(4), 'Excellent'],
-                [$project, $this->getDummyStudent(5), 'Excellent'],
-                [$project, $this->getDummyStudent(6), 'Acceptable'],
-                [$project, $this->getDummyStudent(7), 'Excellent'],
-                [$project, $this->getDummyStudent(8), 'Acceptable'],
-                [$project, $this->getDummyStudent(9), 'Excellent'],
+                [$project, self::getDummyStudent(1), null],
+                [$project, self::getDummyStudent(2), 'Acceptable'],
+                [$project, self::getDummyStudent(3), 'Excellent'],
+                [$project, self::getDummyStudent(4), 'Excellent'],
+                [$project, self::getDummyStudent(5), 'Excellent'],
+                [$project, self::getDummyStudent(6), 'Acceptable'],
+                [$project, self::getDummyStudent(7), 'Excellent'],
+                [$project, self::getDummyStudent(8), 'Acceptable'],
+                [$project, self::getDummyStudent(9), 'Excellent'],
             ];
         }
         return [
-            [$project, $this->getDummyStudent(1), null],
-            [$project, $this->getDummyStudent(2), 'Acceptable'],
-            [$project, $this->getDummyStudent(3), 'Excellent'],
-            [$project, $this->getDummyStudent(4), 'Excellent'],
-            [$project, $this->getDummyStudent(5), 'Excellent'],
-            [$project, $this->getDummyStudent(6), 'Acceptable'],
-            [$project, $this->getDummyStudent(7), 'Excellent'],
-            [$project, $this->getDummyStudent(8), 'Acceptable'],
-            [$project, $this->getDummyStudent(9), 'Excellent'],
+            [$project, self::getDummyStudent(1), null],
+            [$project, self::getDummyStudent(2), 'Acceptable'],
+            [$project, self::getDummyStudent(3), 'Excellent'],
+            [$project, self::getDummyStudent(4), 'Excellent'],
+            [$project, self::getDummyStudent(5), 'Excellent'],
+            [$project, self::getDummyStudent(6), 'Acceptable'],
+            [$project, self::getDummyStudent(7), 'Excellent'],
+            [$project, self::getDummyStudent(8), 'Acceptable'],
+            [$project, self::getDummyStudent(9), 'Excellent'],
         ];
     }
 
@@ -2009,22 +1997,22 @@ class AssessableTest extends TestCase
      * @return array
      * @throws InvalidArgumentException If an unrecognised user.id is passed
      */
-    public function providerProjectMaxLetterGradeGetHRPublishedOnly(): array
+    public static function providerProjectMaxLetterGradeGetHRPublishedOnly(): array
     {
-        $project = $this->getDummyProject();
+        $project = self::getDummyProject();
         $project->setSummator(new Maximum());
-        $project->setMarkType($this->getDummyMarkType(MarkType::SLUG_LETTER));
-        $project->setMarkScheme(new LetterGrade($this->getDummyLetterGradeGroup()));
+        $project->setMarkType(self::getDummyMarkType(MarkType::SLUG_LETTER));
+        $project->setMarkScheme(new LetterGrade(self::getDummyLetterGradeGroup()));
         return [
-            [$project, $this->getDummyStudent(1), null],
-            [$project, $this->getDummyStudent(2), 'Acceptable'],
-            [$project, $this->getDummyStudent(3), 'Excellent'],
-            [$project, $this->getDummyStudent(4), 'Excellent'],
-            [$project, $this->getDummyStudent(5), 'Acceptable'],
-            [$project, $this->getDummyStudent(6), 'Acceptable'],
-            [$project, $this->getDummyStudent(7), 'Acceptable'],
-            [$project, $this->getDummyStudent(8), 'Acceptable'],
-            [$project, $this->getDummyStudent(9), 'Acceptable'],
+            [$project, self::getDummyStudent(1), null],
+            [$project, self::getDummyStudent(2), 'Acceptable'],
+            [$project, self::getDummyStudent(3), 'Excellent'],
+            [$project, self::getDummyStudent(4), 'Excellent'],
+            [$project, self::getDummyStudent(5), 'Acceptable'],
+            [$project, self::getDummyStudent(6), 'Acceptable'],
+            [$project, self::getDummyStudent(7), 'Acceptable'],
+            [$project, self::getDummyStudent(8), 'Acceptable'],
+            [$project, self::getDummyStudent(9), 'Acceptable'],
         ];
     }
 
@@ -2032,35 +2020,35 @@ class AssessableTest extends TestCase
      * @return array
      * @throws InvalidArgumentException If an unrecognised user.id is passed
      */
-    public function providerProjectMaxPercentageGetHR(): array
+    public static function providerProjectMaxPercentageGetHR(): array
     {
-        $project = $this->getDummyProject();
+        $project = self::getDummyProject();
         $project->setSummator(new Maximum());
-        $project->setMarkType($this->getDummyMarkType(MarkType::SLUG_PERCENT));
+        $project->setMarkType(self::getDummyMarkType(MarkType::SLUG_PERCENT));
         $project->setMarkScheme(new Percentage());
         if (self::FAVOR_FLOATING) {
             return [
-                [$project, $this->getDummyStudent(1), null],
-                [$project, $this->getDummyStudent(2), '50 %'],
-                [$project, $this->getDummyStudent(3), '100 %'],
-                [$project, $this->getDummyStudent(4), '100 %'],
-                [$project, $this->getDummyStudent(5), '100 %'],
-                [$project, $this->getDummyStudent(6), '50 %'],
-                [$project, $this->getDummyStudent(7), '100 %'],
-                [$project, $this->getDummyStudent(8), '50 %'],
-                [$project, $this->getDummyStudent(9), '100 %'],
+                [$project, self::getDummyStudent(1), null],
+                [$project, self::getDummyStudent(2), '50 %'],
+                [$project, self::getDummyStudent(3), '100 %'],
+                [$project, self::getDummyStudent(4), '100 %'],
+                [$project, self::getDummyStudent(5), '100 %'],
+                [$project, self::getDummyStudent(6), '50 %'],
+                [$project, self::getDummyStudent(7), '100 %'],
+                [$project, self::getDummyStudent(8), '50 %'],
+                [$project, self::getDummyStudent(9), '100 %'],
             ];
         }
         return [
-            [$project, $this->getDummyStudent(1), null],
-            [$project, $this->getDummyStudent(2), '50 %'],
-            [$project, $this->getDummyStudent(3), '100 %'],
-            [$project, $this->getDummyStudent(4), '100 %'],
-            [$project, $this->getDummyStudent(5), '100 %'],
-            [$project, $this->getDummyStudent(6), '50 %'],
-            [$project, $this->getDummyStudent(7), '100 %'],
-            [$project, $this->getDummyStudent(8), '50 %'],
-            [$project, $this->getDummyStudent(9), '100 %'],
+            [$project, self::getDummyStudent(1), null],
+            [$project, self::getDummyStudent(2), '50 %'],
+            [$project, self::getDummyStudent(3), '100 %'],
+            [$project, self::getDummyStudent(4), '100 %'],
+            [$project, self::getDummyStudent(5), '100 %'],
+            [$project, self::getDummyStudent(6), '50 %'],
+            [$project, self::getDummyStudent(7), '100 %'],
+            [$project, self::getDummyStudent(8), '50 %'],
+            [$project, self::getDummyStudent(9), '100 %'],
         ];
     }
 
@@ -2068,22 +2056,22 @@ class AssessableTest extends TestCase
      * @return array
      * @throws InvalidArgumentException If an unrecognised user.id is passed
      */
-    public function providerProjectMaxPercentageGetHRPublishedOnly(): array
+    public static function providerProjectMaxPercentageGetHRPublishedOnly(): array
     {
-        $project = $this->getDummyProject();
+        $project = self::getDummyProject();
         $project->setSummator(new Maximum());
-        $project->setMarkType($this->getDummyMarkType(MarkType::SLUG_PERCENT));
+        $project->setMarkType(self::getDummyMarkType(MarkType::SLUG_PERCENT));
         $project->setMarkScheme(new Percentage());
         return [
-            [$project, $this->getDummyStudent(1), null],
-            [$project, $this->getDummyStudent(2), '50 %'],
-            [$project, $this->getDummyStudent(3), '100 %'],
-            [$project, $this->getDummyStudent(4), '100 %'],
-            [$project, $this->getDummyStudent(5), '50 %'],
-            [$project, $this->getDummyStudent(6), '50 %'],
-            [$project, $this->getDummyStudent(7), '50 %'],
-            [$project, $this->getDummyStudent(8), '50 %'],
-            [$project, $this->getDummyStudent(9), '50 %'],
+            [$project, self::getDummyStudent(1), null],
+            [$project, self::getDummyStudent(2), '50 %'],
+            [$project, self::getDummyStudent(3), '100 %'],
+            [$project, self::getDummyStudent(4), '100 %'],
+            [$project, self::getDummyStudent(5), '50 %'],
+            [$project, self::getDummyStudent(6), '50 %'],
+            [$project, self::getDummyStudent(7), '50 %'],
+            [$project, self::getDummyStudent(8), '50 %'],
+            [$project, self::getDummyStudent(9), '50 %'],
         ];
     }
 
@@ -2091,35 +2079,35 @@ class AssessableTest extends TestCase
      * @return array
      * @throws InvalidArgumentException If an unrecognised user.id is passed
      */
-    public function providerProjectAverageLetterGradeGetHR(): array
+    public static function providerProjectAverageLetterGradeGetHR(): array
     {
-        $project = $this->getDummyProject();
+        $project = self::getDummyProject();
         $project->setSummator(new Average());
-        $project->setMarkType($this->getDummyMarkType(MarkType::SLUG_LETTER));
-        $project->setMarkScheme(new LetterGrade($this->getDummyLetterGradeGroup()));
+        $project->setMarkType(self::getDummyMarkType(MarkType::SLUG_LETTER));
+        $project->setMarkScheme(new LetterGrade(self::getDummyLetterGradeGroup()));
         if (self::FAVOR_FLOATING) {
             return [
-                [$project, $this->getDummyStudent(1), null],
-                [$project, $this->getDummyStudent(2), 'Acceptable'],
-                [$project, $this->getDummyStudent(3), 'Good'],
-                [$project, $this->getDummyStudent(4), 'Very Good'],
-                [$project, $this->getDummyStudent(5), 'Excellent'],
-                [$project, $this->getDummyStudent(6), 'Acceptable'],
-                [$project, $this->getDummyStudent(7), 'Excellent'],
-                [$project, $this->getDummyStudent(8), 'Acceptable'],
-                [$project, $this->getDummyStudent(9), 'Excellent'],
+                [$project, self::getDummyStudent(1), null],
+                [$project, self::getDummyStudent(2), 'Acceptable'],
+                [$project, self::getDummyStudent(3), 'Good'],
+                [$project, self::getDummyStudent(4), 'Very Good'],
+                [$project, self::getDummyStudent(5), 'Excellent'],
+                [$project, self::getDummyStudent(6), 'Acceptable'],
+                [$project, self::getDummyStudent(7), 'Excellent'],
+                [$project, self::getDummyStudent(8), 'Acceptable'],
+                [$project, self::getDummyStudent(9), 'Excellent'],
             ];
         }
         return [
-            [$project, $this->getDummyStudent(1), null],
-            [$project, $this->getDummyStudent(2), 'Acceptable'],
-            [$project, $this->getDummyStudent(3), 'Good'],
-            [$project, $this->getDummyStudent(4), 'Very Good'],
-            [$project, $this->getDummyStudent(5), 'Excellent'],
-            [$project, $this->getDummyStudent(6), 'Acceptable'],
-            [$project, $this->getDummyStudent(7), 'Excellent'],
-            [$project, $this->getDummyStudent(8), 'Acceptable'],
-            [$project, $this->getDummyStudent(9), 'Excellent'],
+            [$project, self::getDummyStudent(1), null],
+            [$project, self::getDummyStudent(2), 'Acceptable'],
+            [$project, self::getDummyStudent(3), 'Good'],
+            [$project, self::getDummyStudent(4), 'Very Good'],
+            [$project, self::getDummyStudent(5), 'Excellent'],
+            [$project, self::getDummyStudent(6), 'Acceptable'],
+            [$project, self::getDummyStudent(7), 'Excellent'],
+            [$project, self::getDummyStudent(8), 'Acceptable'],
+            [$project, self::getDummyStudent(9), 'Excellent'],
         ];
     }
 
@@ -2127,22 +2115,22 @@ class AssessableTest extends TestCase
      * @return array
      * @throws InvalidArgumentException If an unrecognised user.id is passed
      */
-    public function providerProjectAverageLetterGradeGetHRPublishedOnly(): array
+    public static function providerProjectAverageLetterGradeGetHRPublishedOnly(): array
     {
-        $project = $this->getDummyProject();
+        $project = self::getDummyProject();
         $project->setSummator(new Average());
-        $project->setMarkType($this->getDummyMarkType(MarkType::SLUG_LETTER));
-        $project->setMarkScheme(new LetterGrade($this->getDummyLetterGradeGroup()));
+        $project->setMarkType(self::getDummyMarkType(MarkType::SLUG_LETTER));
+        $project->setMarkScheme(new LetterGrade(self::getDummyLetterGradeGroup()));
         return [
-            [$project, $this->getDummyStudent(1), null],
-            [$project, $this->getDummyStudent(2), 'Acceptable'],
-            [$project, $this->getDummyStudent(3), 'Very Good'],
-            [$project, $this->getDummyStudent(4), 'Very Good'],
-            [$project, $this->getDummyStudent(5), 'Acceptable'],
-            [$project, $this->getDummyStudent(6), 'Acceptable'],
-            [$project, $this->getDummyStudent(7), 'Acceptable'],
-            [$project, $this->getDummyStudent(8), 'Acceptable'],
-            [$project, $this->getDummyStudent(9), 'Acceptable'],
+            [$project, self::getDummyStudent(1), null],
+            [$project, self::getDummyStudent(2), 'Acceptable'],
+            [$project, self::getDummyStudent(3), 'Very Good'],
+            [$project, self::getDummyStudent(4), 'Very Good'],
+            [$project, self::getDummyStudent(5), 'Acceptable'],
+            [$project, self::getDummyStudent(6), 'Acceptable'],
+            [$project, self::getDummyStudent(7), 'Acceptable'],
+            [$project, self::getDummyStudent(8), 'Acceptable'],
+            [$project, self::getDummyStudent(9), 'Acceptable'],
         ];
     }
 
@@ -2150,35 +2138,35 @@ class AssessableTest extends TestCase
      * @return array
      * @throws InvalidArgumentException If an unrecognised user.id is passed
      */
-    public function providerProjectAveragePercentGetHR(): array
+    public static function providerProjectAveragePercentGetHR(): array
     {
-        $project = $this->getDummyProject();
+        $project = self::getDummyProject();
         $project->setSummator(new Average());
-        $project->setMarkType($this->getDummyMarkType(MarkType::SLUG_PERCENT));
+        $project->setMarkType(self::getDummyMarkType(MarkType::SLUG_PERCENT));
         $project->setMarkScheme(new Percentage());
         if (self::FAVOR_FLOATING) {
             return [
-                [$project, $this->getDummyStudent(1), null],
-                [$project, $this->getDummyStudent(2), '50 %'],
-                [$project, $this->getDummyStudent(3), '66.67 %'],
-                [$project, $this->getDummyStudent(4), '83.33 %'],
-                [$project, $this->getDummyStudent(5), '100 %'],
-                [$project, $this->getDummyStudent(6), '50 %'],
-                [$project, $this->getDummyStudent(7), '100 %'],
-                [$project, $this->getDummyStudent(8), '50 %'],
-                [$project, $this->getDummyStudent(9), '100 %'],
+                [$project, self::getDummyStudent(1), null],
+                [$project, self::getDummyStudent(2), '50 %'],
+                [$project, self::getDummyStudent(3), '66.67 %'],
+                [$project, self::getDummyStudent(4), '83.33 %'],
+                [$project, self::getDummyStudent(5), '100 %'],
+                [$project, self::getDummyStudent(6), '50 %'],
+                [$project, self::getDummyStudent(7), '100 %'],
+                [$project, self::getDummyStudent(8), '50 %'],
+                [$project, self::getDummyStudent(9), '100 %'],
             ];
         }
         return [
-            [$project, $this->getDummyStudent(1), null],
-            [$project, $this->getDummyStudent(2), '50 %'],
-            [$project, $this->getDummyStudent(3), '66.67 %'],
-            [$project, $this->getDummyStudent(4), '83.33 %'],
-            [$project, $this->getDummyStudent(5), '100 %'],
-            [$project, $this->getDummyStudent(6), '50 %'],
-            [$project, $this->getDummyStudent(7), '100 %'],
-            [$project, $this->getDummyStudent(8), '50 %'],
-            [$project, $this->getDummyStudent(9), '100 %'],
+            [$project, self::getDummyStudent(1), null],
+            [$project, self::getDummyStudent(2), '50 %'],
+            [$project, self::getDummyStudent(3), '66.67 %'],
+            [$project, self::getDummyStudent(4), '83.33 %'],
+            [$project, self::getDummyStudent(5), '100 %'],
+            [$project, self::getDummyStudent(6), '50 %'],
+            [$project, self::getDummyStudent(7), '100 %'],
+            [$project, self::getDummyStudent(8), '50 %'],
+            [$project, self::getDummyStudent(9), '100 %'],
         ];
     }
 
@@ -2186,22 +2174,22 @@ class AssessableTest extends TestCase
      * @return array
      * @throws InvalidArgumentException If an unrecognised user.id is passed
      */
-    public function providerProjectAveragePercentGetHRPublishedOnly(): array
+    public static function providerProjectAveragePercentGetHRPublishedOnly(): array
     {
-        $project = $this->getDummyProject();
+        $project = self::getDummyProject();
         $project->setSummator(new Average());
-        $project->setMarkType($this->getDummyMarkType(MarkType::SLUG_PERCENT));
+        $project->setMarkType(self::getDummyMarkType(MarkType::SLUG_PERCENT));
         $project->setMarkScheme(new Percentage());
         return [
-            [$project, $this->getDummyStudent(1), null],
-            [$project, $this->getDummyStudent(2), '50 %'],
-            [$project, $this->getDummyStudent(3), '75 %'],
-            [$project, $this->getDummyStudent(4), '75 %'],
-            [$project, $this->getDummyStudent(5), '41.67 %'],
-            [$project, $this->getDummyStudent(6), '50 %'],
-            [$project, $this->getDummyStudent(7), '50 %'],
-            [$project, $this->getDummyStudent(8), '50 %'],
-            [$project, $this->getDummyStudent(9), '50 %'],
+            [$project, self::getDummyStudent(1), null],
+            [$project, self::getDummyStudent(2), '50 %'],
+            [$project, self::getDummyStudent(3), '75 %'],
+            [$project, self::getDummyStudent(4), '75 %'],
+            [$project, self::getDummyStudent(5), '41.67 %'],
+            [$project, self::getDummyStudent(6), '50 %'],
+            [$project, self::getDummyStudent(7), '50 %'],
+            [$project, self::getDummyStudent(8), '50 %'],
+            [$project, self::getDummyStudent(9), '50 %'],
         ];
     }
 
@@ -2209,35 +2197,35 @@ class AssessableTest extends TestCase
      * @return array
      * @throws InvalidArgumentException If an unrecognised user.id is passed
      */
-    public function providerProjectWeightedAverageLetterGradeGetHR(): array
+    public static function providerProjectWeightedAverageLetterGradeGetHR(): array
     {
-        $project = $this->getDummyProject();
+        $project = self::getDummyProject();
         $project->setSummator(new WeightedAverage());
-        $project->setMarkType($this->getDummyMarkType(MarkType::SLUG_LETTER));
-        $project->setMarkScheme(new LetterGrade($this->getDummyLetterGradeGroup()));
+        $project->setMarkType(self::getDummyMarkType(MarkType::SLUG_LETTER));
+        $project->setMarkScheme(new LetterGrade(self::getDummyLetterGradeGroup()));
         if (self::FAVOR_FLOATING) {
             return [
-                [$project, $this->getDummyStudent(1), null],
-                [$project, $this->getDummyStudent(2), 'Acceptable'],
-                [$project, $this->getDummyStudent(3), 'Acceptable'],
-                [$project, $this->getDummyStudent(4), 'Good'],
-                [$project, $this->getDummyStudent(5), 'Excellent'],
-                [$project, $this->getDummyStudent(6), 'Acceptable'],
-                [$project, $this->getDummyStudent(7), 'Excellent'],
-                [$project, $this->getDummyStudent(8), 'Acceptable'],
-                [$project, $this->getDummyStudent(9), 'Excellent'],
+                [$project, self::getDummyStudent(1), null],
+                [$project, self::getDummyStudent(2), 'Acceptable'],
+                [$project, self::getDummyStudent(3), 'Acceptable'],
+                [$project, self::getDummyStudent(4), 'Good'],
+                [$project, self::getDummyStudent(5), 'Excellent'],
+                [$project, self::getDummyStudent(6), 'Acceptable'],
+                [$project, self::getDummyStudent(7), 'Excellent'],
+                [$project, self::getDummyStudent(8), 'Acceptable'],
+                [$project, self::getDummyStudent(9), 'Excellent'],
             ];
         }
         return [
-            [$project, $this->getDummyStudent(1), null],
-            [$project, $this->getDummyStudent(2), 'Acceptable'],
-            [$project, $this->getDummyStudent(3), 'Acceptable'],
-            [$project, $this->getDummyStudent(4), 'Good'],
-            [$project, $this->getDummyStudent(5), 'Excellent'],
-            [$project, $this->getDummyStudent(6), 'Acceptable'],
-            [$project, $this->getDummyStudent(7), 'Excellent'],
-            [$project, $this->getDummyStudent(8), 'Acceptable'],
-            [$project, $this->getDummyStudent(9), 'Excellent'],
+            [$project, self::getDummyStudent(1), null],
+            [$project, self::getDummyStudent(2), 'Acceptable'],
+            [$project, self::getDummyStudent(3), 'Acceptable'],
+            [$project, self::getDummyStudent(4), 'Good'],
+            [$project, self::getDummyStudent(5), 'Excellent'],
+            [$project, self::getDummyStudent(6), 'Acceptable'],
+            [$project, self::getDummyStudent(7), 'Excellent'],
+            [$project, self::getDummyStudent(8), 'Acceptable'],
+            [$project, self::getDummyStudent(9), 'Excellent'],
         ];
     }
 
@@ -2245,22 +2233,22 @@ class AssessableTest extends TestCase
      * @return array
      * @throws InvalidArgumentException If an unrecognised user.id is passed
      */
-    public function providerProjectWeightedAverageLetterGradeGetHRPublishedOnly(): array
+    public static function providerProjectWeightedAverageLetterGradeGetHRPublishedOnly(): array
     {
-        $project = $this->getDummyProject();
+        $project = self::getDummyProject();
         $project->setSummator(new WeightedAverage());
-        $project->setMarkType($this->getDummyMarkType(MarkType::SLUG_LETTER));
-        $project->setMarkScheme(new LetterGrade($this->getDummyLetterGradeGroup()));
+        $project->setMarkType(self::getDummyMarkType(MarkType::SLUG_LETTER));
+        $project->setMarkScheme(new LetterGrade(self::getDummyLetterGradeGroup()));
         return [
-            [$project, $this->getDummyStudent(1), null],
-            [$project, $this->getDummyStudent(2), 'Acceptable'],
-            [$project, $this->getDummyStudent(3), 'Acceptable'],
-            [$project, $this->getDummyStudent(4), 'Acceptable'],
-            [$project, $this->getDummyStudent(5), 'Acceptable'],
-            [$project, $this->getDummyStudent(6), 'Acceptable'],
-            [$project, $this->getDummyStudent(7), 'Acceptable'],
-            [$project, $this->getDummyStudent(8), 'Acceptable'],
-            [$project, $this->getDummyStudent(9), 'Acceptable'],
+            [$project, self::getDummyStudent(1), null],
+            [$project, self::getDummyStudent(2), 'Acceptable'],
+            [$project, self::getDummyStudent(3), 'Acceptable'],
+            [$project, self::getDummyStudent(4), 'Acceptable'],
+            [$project, self::getDummyStudent(5), 'Acceptable'],
+            [$project, self::getDummyStudent(6), 'Acceptable'],
+            [$project, self::getDummyStudent(7), 'Acceptable'],
+            [$project, self::getDummyStudent(8), 'Acceptable'],
+            [$project, self::getDummyStudent(9), 'Acceptable'],
         ];
     }
 
@@ -2268,35 +2256,35 @@ class AssessableTest extends TestCase
      * @return array
      * @throws InvalidArgumentException If an unrecognised user.id is passed
      */
-    public function providerProjectWeightedAveragePercentGetHR(): array
+    public static function providerProjectWeightedAveragePercentGetHR(): array
     {
-        $project = $this->getDummyProject();
+        $project = self::getDummyProject();
         $project->setSummator(new WeightedAverage());
-        $project->setMarkType($this->getDummyMarkType(MarkType::SLUG_PERCENT));
+        $project->setMarkType(self::getDummyMarkType(MarkType::SLUG_PERCENT));
         $project->setMarkScheme(new Percentage());
         if (self::FAVOR_FLOATING) {
             return [
-                [$project, $this->getDummyStudent(1), null],
-                [$project, $this->getDummyStudent(2), '50 %'],
-                [$project, $this->getDummyStudent(3), '50 %'],
-                [$project, $this->getDummyStudent(4), '60 %'],
-                [$project, $this->getDummyStudent(5), '100 %'],
-                [$project, $this->getDummyStudent(6), '50 %'],
-                [$project, $this->getDummyStudent(7), '100 %'],
-                [$project, $this->getDummyStudent(8), '50 %'],
-                [$project, $this->getDummyStudent(9), '100 %'],
+                [$project, self::getDummyStudent(1), null],
+                [$project, self::getDummyStudent(2), '50 %'],
+                [$project, self::getDummyStudent(3), '50 %'],
+                [$project, self::getDummyStudent(4), '60 %'],
+                [$project, self::getDummyStudent(5), '100 %'],
+                [$project, self::getDummyStudent(6), '50 %'],
+                [$project, self::getDummyStudent(7), '100 %'],
+                [$project, self::getDummyStudent(8), '50 %'],
+                [$project, self::getDummyStudent(9), '100 %'],
             ];
         }
         return [
-            [$project, $this->getDummyStudent(1), null],
-            [$project, $this->getDummyStudent(2), '50 %'],
-            [$project, $this->getDummyStudent(3), '50 %'],
-            [$project, $this->getDummyStudent(4), '60 %'],
-            [$project, $this->getDummyStudent(5), '100 %'],
-            [$project, $this->getDummyStudent(6), '50 %'],
-            [$project, $this->getDummyStudent(7), '100 %'],
-            [$project, $this->getDummyStudent(8), '50 %'],
-            [$project, $this->getDummyStudent(9), '100 %'],
+            [$project, self::getDummyStudent(1), null],
+            [$project, self::getDummyStudent(2), '50 %'],
+            [$project, self::getDummyStudent(3), '50 %'],
+            [$project, self::getDummyStudent(4), '60 %'],
+            [$project, self::getDummyStudent(5), '100 %'],
+            [$project, self::getDummyStudent(6), '50 %'],
+            [$project, self::getDummyStudent(7), '100 %'],
+            [$project, self::getDummyStudent(8), '50 %'],
+            [$project, self::getDummyStudent(9), '100 %'],
         ];
     }
 
@@ -2304,22 +2292,22 @@ class AssessableTest extends TestCase
      * @return array
      * @throws InvalidArgumentException If an unrecognised user.id is passed
      */
-    public function providerProjectWeightedAveragePercentGetHRPublishedOnly(): array
+    public static function providerProjectWeightedAveragePercentGetHRPublishedOnly(): array
     {
-        $project = $this->getDummyProject();
+        $project = self::getDummyProject();
         $project->setSummator(new WeightedAverage());
-        $project->setMarkType($this->getDummyMarkType(MarkType::SLUG_PERCENT));
+        $project->setMarkType(self::getDummyMarkType(MarkType::SLUG_PERCENT));
         $project->setMarkScheme(new Percentage());
         return [
-            [$project, $this->getDummyStudent(1), null],
-            [$project, $this->getDummyStudent(2), '50 %'],
-            [$project, $this->getDummyStudent(3), '50 %'],
-            [$project, $this->getDummyStudent(4), '50 %'],
-            [$project, $this->getDummyStudent(5), '46.67 %'],
-            [$project, $this->getDummyStudent(6), '50 %'],
-            [$project, $this->getDummyStudent(7), '50 %'],
-            [$project, $this->getDummyStudent(8), '50 %'],
-            [$project, $this->getDummyStudent(9), '50 %'],
+            [$project, self::getDummyStudent(1), null],
+            [$project, self::getDummyStudent(2), '50 %'],
+            [$project, self::getDummyStudent(3), '50 %'],
+            [$project, self::getDummyStudent(4), '50 %'],
+            [$project, self::getDummyStudent(5), '46.67 %'],
+            [$project, self::getDummyStudent(6), '50 %'],
+            [$project, self::getDummyStudent(7), '50 %'],
+            [$project, self::getDummyStudent(8), '50 %'],
+            [$project, self::getDummyStudent(9), '50 %'],
         ];
     }
 
@@ -2337,25 +2325,25 @@ class AssessableTest extends TestCase
      * @throws InvalidArgumentException
      * @throws InvalidArgumentException
      */
-    private function getDummyTask(): Task
+    private static function getDummyTask(): Task
     {
         $task = (new Task())
             ->setId(1)
             ->setIsSelfAssessable(true)
             ->setMarkScheme(new Completion());
 
-        $student1 = $this->getDummyStudent(1);
-        $student2 = $this->getDummyStudent(2);
-        $student3 = $this->getDummyStudent(3);
-        $student4 = $this->getDummyStudent(4);
+        $student1 = self::getDummyStudent(1);
+        $student2 = self::getDummyStudent(2);
+        $student3 = self::getDummyStudent(3);
+        $student4 = self::getDummyStudent(4);
 
-        $teacher = $this->getDummyTeacher(101);
+        $teacher = self::getDummyTeacher(101);
 
-        $plan = $this->linker->createAndLinkPlan($task);
-        $participant1 = $this->getDummyParticipant($student1->getId(), $plan);
-        $participant2 = $this->getDummyParticipant($student2->getId(), $plan);
-        $participant3 = $this->getDummyParticipant($student3->getId(), $plan);
-        $participant4 = $this->getDummyParticipant($student4->getId(), $plan);
+        $plan = self::getDummyLinker()->createAndLinkPlan($task);
+        $participant1 = self::getDummyParticipant($student1->getId(), $plan);
+        $participant2 = self::getDummyParticipant($student2->getId(), $plan);
+        $participant3 = self::getDummyParticipant($student3->getId(), $plan);
+        $participant4 = self::getDummyParticipant($student4->getId(), $plan);
 
         $task->getAllParticipants()
             ->add($participant1)
@@ -2372,7 +2360,7 @@ class AssessableTest extends TestCase
         $response2->setSubmittedBy($student2);
         $response2->setSubmittedOnBehalfOf($student2);
         $response2->setMarkedComplete(true);
-        $response2->setUpdatedAt($this->getDummyDate('2016-08-08 21:03:19'));
+        $response2->setUpdatedAt(self::getDummyDate('2016-08-08 21:03:19'));
         $participant2->getAllResponses()->add($response2);
 
 
@@ -2383,7 +2371,7 @@ class AssessableTest extends TestCase
         $response3->setSubmittedBy($teacher);
         $response3->setSubmittedOnBehalfOf($student3);
         $response3->setMarkedComplete(true);
-        $response3->setUpdatedAt($this->getDummyDate('2016-08-08 21:03:19'));
+        $response3->setUpdatedAt(self::getDummyDate('2016-08-08 21:03:19'));
         $participant3->getAllResponses()->add($response3);
 
         $feedback3 = (new TaskFeedback())
@@ -2398,7 +2386,7 @@ class AssessableTest extends TestCase
         $response4a->setSubmittedBy($student4);
         $response4a->setSubmittedOnBehalfOf($student4);
         $response4a->setMarkedComplete(true);
-        $response4a->setUpdatedAt($this->getDummyDate('2016-08-08 21:03:19'));
+        $response4a->setUpdatedAt(self::getDummyDate('2016-08-08 21:03:19'));
         $participant4->getAllResponses()->add($response4a);
 
         $response4b = new TaskResponse();
@@ -2407,7 +2395,7 @@ class AssessableTest extends TestCase
         $response4b->setSubmittedBy($student4);
         $response4b->setSubmittedOnBehalfOf($teacher);
         $response4b->setMarkedComplete(true);
-        $response4b->setUpdatedAt($this->getDummyDate('2016-10-10 21:03:19'));
+        $response4b->setUpdatedAt(self::getDummyDate('2016-10-10 21:03:19'));
         $participant4->getAllResponses()->add($response4b);
 
         $feedback4b = (new TaskFeedback())
@@ -2436,25 +2424,25 @@ class AssessableTest extends TestCase
      * @return Quiz
      * @throws InvalidArgumentException If an unrecognised user.id is passed
      */
-    private function getDummyQuiz(): Quiz
+    private static function getDummyQuiz(): Quiz
     {
         // Create everything
         $quiz = (new Quiz())
             ->setId(2)
         ;
 
-        $student1 = $this->getDummyStudent(1);
-        $student2 = $this->getDummyStudent(2);
-        $student3 = $this->getDummyStudent(3);
-        $student4 = $this->getDummyStudent(4);
-        $student5 = $this->getDummyStudent(5);
+        $student1 = self::getDummyStudent(1);
+        $student2 = self::getDummyStudent(2);
+        $student3 = self::getDummyStudent(3);
+        $student4 = self::getDummyStudent(4);
+        $student5 = self::getDummyStudent(5);
 
-        $plan = $this->linker->createAndLinkPlan($quiz);
-        $participant1 = $this->getDummyParticipant($student1->getId(), $plan);
-        $participant2 = $this->getDummyParticipant($student2->getId(), $plan);
-        $participant3 = $this->getDummyParticipant($student3->getId(), $plan);
-        $participant4 = $this->getDummyParticipant($student4->getId(), $plan);
-        $participant5 = $this->getDummyParticipant($student5->getId(), $plan);
+        $plan = self::getDummyLinker()->createAndLinkPlan($quiz);
+        $participant1 = self::getDummyParticipant($student1->getId(), $plan);
+        $participant2 = self::getDummyParticipant($student2->getId(), $plan);
+        $participant3 = self::getDummyParticipant($student3->getId(), $plan);
+        $participant4 = self::getDummyParticipant($student4->getId(), $plan);
+        $participant5 = self::getDummyParticipant($student5->getId(), $plan);
 
         // student 1: no attempts
 
@@ -2468,13 +2456,13 @@ class AssessableTest extends TestCase
             ->setHumanReadableMark("1 / 2")
             ->setNormalisedMark(100 * 1.0 / 2.0)
             ->setMarksAvailable(2.0)
-            ->setSubmittedAt($this->getDummyDate('2016-08-08 21:03:19'))
-            ->setUpdatedAt($this->getDummyDate('2016-08-08 21:03:19'));
+            ->setSubmittedAt(self::getDummyDate('2016-08-08 21:03:19'))
+            ->setUpdatedAt(self::getDummyDate('2016-08-08 21:03:19'));
         $feedback2 = (new QuizFeedback())
             ->setId(2)
             ->setReviewee($student2)
-            ->setPublishedAt($this->getDummyDate('2016-08-08 21:03:19'))
-            ->setUpdatedAt($this->getDummyDate('2016-08-08 21:03:19'));
+            ->setPublishedAt(self::getDummyDate('2016-08-08 21:03:19'))
+            ->setUpdatedAt(self::getDummyDate('2016-08-08 21:03:19'));
 
         // student 3: 1 attempt + 1 unpublished feedback (1/2)
         $attempt3 = (new QuizAttempt())
@@ -2483,13 +2471,13 @@ class AssessableTest extends TestCase
             ->setHumanReadableMark("1 / 2")
             ->setNormalisedMark(100 * 1.0 / 2.0)
             ->setMarksAvailable(2.0)
-            ->setSubmittedAt($this->getDummyDate('2016-08-08 21:03:19'))
-            ->setUpdatedAt($this->getDummyDate('2016-08-08 21:03:19'));
+            ->setSubmittedAt(self::getDummyDate('2016-08-08 21:03:19'))
+            ->setUpdatedAt(self::getDummyDate('2016-08-08 21:03:19'));
         $feedback3 = (new QuizFeedback())
             ->setId(3)
             ->setReviewee($student3)
-            ->setPublishedAt($this->getDummyDate(null))
-            ->setUpdatedAt($this->getDummyDate('2016-08-08 21:03:19'));
+            ->setPublishedAt(self::getDummyDate(null))
+            ->setUpdatedAt(self::getDummyDate('2016-08-08 21:03:19'));
 
         // student 4: 2 attempt + 1 published feedback (1/2) + 1 unpublished feedback (2/2)
         $attempt4a = (new QuizAttempt())
@@ -2498,13 +2486,13 @@ class AssessableTest extends TestCase
             ->setHumanReadableMark("1 / 2")
             ->setNormalisedMark(100 * 1.0 / 2.0)
             ->setMarksAvailable(2.0)
-            ->setSubmittedAt($this->getDummyDate('2016-08-08 00:00:00'))
-            ->setUpdatedAt($this->getDummyDate('2016-08-08 00:00:00'));
+            ->setSubmittedAt(self::getDummyDate('2016-08-08 00:00:00'))
+            ->setUpdatedAt(self::getDummyDate('2016-08-08 00:00:00'));
         $feedback4a = (new QuizFeedback())
             ->setId(4)
             ->setReviewee($student4)
-            ->setPublishedAt($this->getDummyDate('2016-08-08 21:03:19'))
-            ->setUpdatedAt($this->getDummyDate('2016-08-10 21:03:19'));
+            ->setPublishedAt(self::getDummyDate('2016-08-08 21:03:19'))
+            ->setUpdatedAt(self::getDummyDate('2016-08-10 21:03:19'));
 
         $attempt4b = (new QuizAttempt())
             ->setId(5)
@@ -2512,13 +2500,13 @@ class AssessableTest extends TestCase
             ->setHumanReadableMark("2 / 2")
             ->setNormalisedMark(100 * 2.0 / 2.0)
             ->setMarksAvailable(2.0)
-            ->setSubmittedAt($this->getDummyDate('2016-08-09 00:00:00'))
-            ->setUpdatedAt($this->getDummyDate('2016-08-09 00:00:00'));
+            ->setSubmittedAt(self::getDummyDate('2016-08-09 00:00:00'))
+            ->setUpdatedAt(self::getDummyDate('2016-08-09 00:00:00'));
         $feedback4b = (new QuizFeedback())
             ->setId(5)
             ->setReviewee($student4)
-            ->setPublishedAt($this->getDummyDate(null))
-            ->setUpdatedAt($this->getDummyDate('2016-08-08 21:03:19'));
+            ->setPublishedAt(self::getDummyDate(null))
+            ->setUpdatedAt(self::getDummyDate('2016-08-08 21:03:19'));
 
         // student 5: 2 attempt + 1 published feedback (1/3) + 1 unpublished feedback (2/2)
         $attempt5a = (new QuizAttempt())
@@ -2527,13 +2515,13 @@ class AssessableTest extends TestCase
             ->setHumanReadableMark("1 / 3")
             ->setNormalisedMark(100 * 1.0 / 3.0)
             ->setMarksAvailable(3.0)
-            ->setSubmittedAt($this->getDummyDate('2016-08-08 21:03:19'))
-            ->setUpdatedAt($this->getDummyDate('2016-08-08 21:03:19'));
+            ->setSubmittedAt(self::getDummyDate('2016-08-08 21:03:19'))
+            ->setUpdatedAt(self::getDummyDate('2016-08-08 21:03:19'));
         $feedback5a = (new QuizFeedback())
             ->setId(6)
             ->setReviewee($student5)
-            ->setPublishedAt($this->getDummyDate('2016-08-08 21:03:19'))
-            ->setUpdatedAt($this->getDummyDate('2016-08-08 21:03:19'));
+            ->setPublishedAt(self::getDummyDate('2016-08-08 21:03:19'))
+            ->setUpdatedAt(self::getDummyDate('2016-08-08 21:03:19'));
 
         $attempt5b = (new QuizAttempt())
             ->setId(7)
@@ -2541,13 +2529,13 @@ class AssessableTest extends TestCase
             ->setHumanReadableMark("2 / 2")
             ->setNormalisedMark(100 * 2.0 / 2.0)
             ->setMarksAvailable(2.0)
-            ->setSubmittedAt($this->getDummyDate('2016-08-09 21:03:19'))
-            ->setUpdatedAt($this->getDummyDate('2016-08-09 21:03:19'));
+            ->setSubmittedAt(self::getDummyDate('2016-08-09 21:03:19'))
+            ->setUpdatedAt(self::getDummyDate('2016-08-09 21:03:19'));
         $feedback5b = (new QuizFeedback())
             ->setId(7)
             ->setReviewee($student5)
-            ->setPublishedAt($this->getDummyDate(null))
-            ->setUpdatedAt($this->getDummyDate('2016-08-10 21:03:19'));
+            ->setPublishedAt(self::getDummyDate(null))
+            ->setUpdatedAt(self::getDummyDate('2016-08-10 21:03:19'));
 
         // Link them all together
 
@@ -2629,35 +2617,35 @@ class AssessableTest extends TestCase
      * @return DueWork
      * @throws InvalidArgumentException If an unrecognised user.id is passed
      */
-    private function getDummyDueWork(): DueWork
+    private static function getDummyDueWork(): DueWork
     {
         // Create everything
         $dueWork = (new DueWork())
             ->setId(3)
             ->setMaxMark(20)
-            ->setGradeGroup($this->getDummyLetterGradeGroup())
+            ->setGradeGroup(self::getDummyLetterGradeGroup())
             ->setSelfReviewability(ReturnedWork::REVIEW_ROUTE_INSTRUCTOR);
 
-        $student1 = $this->getDummyStudent(1);
-        $student2 = $this->getDummyStudent(2);
-        $student3 = $this->getDummyStudent(3);
-        $student4 = $this->getDummyStudent(4);
-        $student5 = $this->getDummyStudent(5);
-        $student6 = $this->getDummyStudent(6);
-        $student7 = $this->getDummyStudent(7);
-        $student8 = $this->getDummyStudent(8);
-        $student9 = $this->getDummyStudent(9);
+        $student1 = self::getDummyStudent(1);
+        $student2 = self::getDummyStudent(2);
+        $student3 = self::getDummyStudent(3);
+        $student4 = self::getDummyStudent(4);
+        $student5 = self::getDummyStudent(5);
+        $student6 = self::getDummyStudent(6);
+        $student7 = self::getDummyStudent(7);
+        $student8 = self::getDummyStudent(8);
+        $student9 = self::getDummyStudent(9);
 
-        $plan = $this->linker->createAndLinkPlan($dueWork);
-        $participant1 = $this->getDummyParticipant($student1->getId(), $plan);
-        $participant2 = $this->getDummyParticipant($student2->getId(), $plan);
-        $participant3 = $this->getDummyParticipant($student3->getId(), $plan);
-        $participant4 = $this->getDummyParticipant($student4->getId(), $plan);
-        $participant5 = $this->getDummyParticipant($student5->getId(), $plan);
-        $participant6 = $this->getDummyParticipant($student6->getId(), $plan);
-        $participant7 = $this->getDummyParticipant($student7->getId(), $plan);
-        $participant8 = $this->getDummyParticipant($student8->getId(), $plan);
-        $participant9 = $this->getDummyParticipant($student9->getId(), $plan);
+        $plan = self::getDummyLinker()->createAndLinkPlan($dueWork);
+        $participant1 = self::getDummyParticipant($student1->getId(), $plan);
+        $participant2 = self::getDummyParticipant($student2->getId(), $plan);
+        $participant3 = self::getDummyParticipant($student3->getId(), $plan);
+        $participant4 = self::getDummyParticipant($student4->getId(), $plan);
+        $participant5 = self::getDummyParticipant($student5->getId(), $plan);
+        $participant6 = self::getDummyParticipant($student6->getId(), $plan);
+        $participant7 = self::getDummyParticipant($student7->getId(), $plan);
+        $participant8 = self::getDummyParticipant($student8->getId(), $plan);
+        $participant9 = self::getDummyParticipant($student9->getId(), $plan);
 
         // student 1: no attempts
 
@@ -2665,13 +2653,13 @@ class AssessableTest extends TestCase
         $submission2 = (new DueWorkSubmission())
             ->setId(2)
             ->setSubmittedOnBehalfOf($student2)
-            ->setUpdatedAt($this->getDummyDate('2016-08-08 21:03:19'));
+            ->setUpdatedAt(self::getDummyDate('2016-08-08 21:03:19'));
 
         // student 3: 1 submission + 1 published feedback (50.0)
         $submission3 = (new DueWorkSubmission())
             ->setId(3)
             ->setSubmittedOnBehalfOf($student3)
-            ->setUpdatedAt($this->getDummyDate('2016-08-08 21:03:19'));
+            ->setUpdatedAt(self::getDummyDate('2016-08-08 21:03:19'));
 
         $feedback3 = (new DueWorkFeedback())
             ->setId(3)
@@ -2679,14 +2667,14 @@ class AssessableTest extends TestCase
             ->setReviewRoute(ReturnedWork::REVIEW_ROUTE_INSTRUCTOR)
             ->setHumanReadableMark('10 / 20')
             ->setNormalisedMark(50.0)
-            ->setUpdatedAt($this->getDummyDate('2016-08-08 21:03:19'))
-            ->setPublishedAt($this->getDummyDate('2016-08-08 21:03:19'));
+            ->setUpdatedAt(self::getDummyDate('2016-08-08 21:03:19'))
+            ->setPublishedAt(self::getDummyDate('2016-08-08 21:03:19'));
 
         // student 4: 1 submission + 1 unpublished feedback (50.0)
         $submission4 = (new DueWorkSubmission())
             ->setId(4)
             ->setSubmittedOnBehalfOf($student4)
-            ->setUpdatedAt($this->getDummyDate('2016-08-08 21:03:19'));
+            ->setUpdatedAt(self::getDummyDate('2016-08-08 21:03:19'));
 
         $feedback4 = (new DueWorkFeedback())
             ->setId(4)
@@ -2694,14 +2682,14 @@ class AssessableTest extends TestCase
             ->setReviewRoute(ReturnedWork::REVIEW_ROUTE_INSTRUCTOR)
             ->setHumanReadableMark('10 / 20')
             ->setNormalisedMark(50.0)
-            ->setUpdatedAt($this->getDummyDate('2016-08-08 21:03:19'))
-            ->setPublishedAt($this->getDummyDate(null));
+            ->setUpdatedAt(self::getDummyDate('2016-08-08 21:03:19'))
+            ->setPublishedAt(self::getDummyDate(null));
 
         // student 5: 1 submission + 1 published feedback (50.0) + 1 later unpublished feedback (100.0)
         $submission5 = (new DueWorkSubmission())
             ->setId(5)
             ->setSubmittedOnBehalfOf($student5)
-            ->setUpdatedAt($this->getDummyDate('2016-08-08 21:03:19'));
+            ->setUpdatedAt(self::getDummyDate('2016-08-08 21:03:19'));
 
         $feedback5a = (new DueWorkFeedback())
             ->setId(5)
@@ -2709,26 +2697,26 @@ class AssessableTest extends TestCase
             ->setReviewRoute(ReturnedWork::REVIEW_ROUTE_INSTRUCTOR)
             ->setHumanReadableMark('10 / 20')
             ->setNormalisedMark(50.0)
-            ->setUpdatedAt($this->getDummyDate('2016-08-08 21:03:19'))
-            ->setPublishedAt($this->getDummyDate('2016-08-08 21:03:19'));
+            ->setUpdatedAt(self::getDummyDate('2016-08-08 21:03:19'))
+            ->setPublishedAt(self::getDummyDate('2016-08-08 21:03:19'));
         $feedback5b = (new DueWorkFeedback())
             ->setId(6)
             ->setReviewee($student5)
             ->setReviewRoute(ReturnedWork::REVIEW_ROUTE_INSTRUCTOR)
             ->setHumanReadableMark('20 / 20')
             ->setNormalisedMark(100.0)
-            ->setUpdatedAt($this->getDummyDate('2016-08-10 21:03:19'))
-            ->setPublishedAt($this->getDummyDate(null));
+            ->setUpdatedAt(self::getDummyDate('2016-08-10 21:03:19'))
+            ->setPublishedAt(self::getDummyDate(null));
 
         // student 6: 2 submission + 1 published floating feedback (50.0)
         $submission6a = (new DueWorkSubmission())
             ->setId(5)
             ->setSubmittedOnBehalfOf($student6)
-            ->setUpdatedAt($this->getDummyDate('2016-08-08 21:03:19'));
+            ->setUpdatedAt(self::getDummyDate('2016-08-08 21:03:19'));
         $submission6b = (new DueWorkSubmission())
             ->setId(6)
             ->setSubmittedOnBehalfOf($student6)
-            ->setUpdatedAt($this->getDummyDate('2016-08-08 21:03:19'));
+            ->setUpdatedAt(self::getDummyDate('2016-08-08 21:03:19'));
 
         $feedback6 = (new DueWorkFeedback())
             ->setId(7)
@@ -2736,18 +2724,18 @@ class AssessableTest extends TestCase
             ->setReviewRoute(ReturnedWork::REVIEW_ROUTE_INSTRUCTOR)
             ->setHumanReadableMark('10 / 20')
             ->setNormalisedMark(50.0)
-            ->setUpdatedAt($this->getDummyDate('2016-08-08 21:03:19'))
-            ->setPublishedAt($this->getDummyDate('2016-08-08 21:03:19'));
+            ->setUpdatedAt(self::getDummyDate('2016-08-08 21:03:19'))
+            ->setPublishedAt(self::getDummyDate('2016-08-08 21:03:19'));
 
         // student 7: 2 submission + 1 published floating feedback (50.0) + 1 later unpublished floating feedback (100.0)
         $submission7a = (new DueWorkSubmission())
             ->setId(7)
             ->setSubmittedOnBehalfOf($student7)
-            ->setUpdatedAt($this->getDummyDate('2016-08-08 21:03:19'));
+            ->setUpdatedAt(self::getDummyDate('2016-08-08 21:03:19'));
         $submission7b = (new DueWorkSubmission())
             ->setId(8)
             ->setSubmittedOnBehalfOf($student7)
-            ->setUpdatedAt($this->getDummyDate('2016-08-08 21:03:19'));
+            ->setUpdatedAt(self::getDummyDate('2016-08-08 21:03:19'));
 
         $feedback7a = (new DueWorkFeedback())
             ->setId(8)
@@ -2755,16 +2743,16 @@ class AssessableTest extends TestCase
             ->setReviewRoute(ReturnedWork::REVIEW_ROUTE_INSTRUCTOR)
             ->setHumanReadableMark('10 / 20')
             ->setNormalisedMark(50.0)
-            ->setUpdatedAt($this->getDummyDate('2016-08-08 21:03:19'))
-            ->setPublishedAt($this->getDummyDate('2016-08-08 21:03:19'));
+            ->setUpdatedAt(self::getDummyDate('2016-08-08 21:03:19'))
+            ->setPublishedAt(self::getDummyDate('2016-08-08 21:03:19'));
         $feedback7b = (new DueWorkFeedback())
             ->setId(9)
             ->setReviewee($student7)
             ->setReviewRoute(ReturnedWork::REVIEW_ROUTE_INSTRUCTOR)
             ->setHumanReadableMark('20 / 20')
             ->setNormalisedMark(100.0)
-            ->setUpdatedAt($this->getDummyDate('2016-08-10 21:03:19'))
-            ->setPublishedAt($this->getDummyDate(null));
+            ->setUpdatedAt(self::getDummyDate('2016-08-10 21:03:19'))
+            ->setPublishedAt(self::getDummyDate(null));
 
         // student 8: 0 submission + 1 published floating feedback (50.0)
         $feedback8 = (new DueWorkFeedback())
@@ -2773,8 +2761,8 @@ class AssessableTest extends TestCase
             ->setReviewRoute(ReturnedWork::REVIEW_ROUTE_INSTRUCTOR)
             ->setHumanReadableMark('10 / 20')
             ->setNormalisedMark(50.0)
-            ->setUpdatedAt($this->getDummyDate('2016-08-08 21:03:19'))
-            ->setPublishedAt($this->getDummyDate('2016-08-08 21:03:19'));
+            ->setUpdatedAt(self::getDummyDate('2016-08-08 21:03:19'))
+            ->setPublishedAt(self::getDummyDate('2016-08-08 21:03:19'));
 
         // student 9: 0 submission + 1 published floating feedback (50.0) + 1 later unpublished floating feedback (100.0)
         $feedback9a = (new DueWorkFeedback())
@@ -2783,16 +2771,16 @@ class AssessableTest extends TestCase
             ->setReviewRoute(ReturnedWork::REVIEW_ROUTE_INSTRUCTOR)
             ->setHumanReadableMark('10 / 20')
             ->setNormalisedMark(50.0)
-            ->setUpdatedAt($this->getDummyDate('2016-08-08 21:03:19'))
-            ->setPublishedAt($this->getDummyDate('2016-08-08 21:03:19'));
+            ->setUpdatedAt(self::getDummyDate('2016-08-08 21:03:19'))
+            ->setPublishedAt(self::getDummyDate('2016-08-08 21:03:19'));
         $feedback9b = (new DueWorkFeedback())
             ->setId(12)
             ->setReviewee($student9)
             ->setReviewRoute(ReturnedWork::REVIEW_ROUTE_INSTRUCTOR)
             ->setHumanReadableMark('20 / 20')
             ->setNormalisedMark(100.0)
-            ->setUpdatedAt($this->getDummyDate('2016-08-10 21:03:19'))
-            ->setPublishedAt($this->getDummyDate(null));
+            ->setUpdatedAt(self::getDummyDate('2016-08-10 21:03:19'))
+            ->setPublishedAt(self::getDummyDate(null));
 
         // Link them all together
 
@@ -2929,31 +2917,31 @@ class AssessableTest extends TestCase
      * @return Project
      * @throws InvalidArgumentException If an unrecognised user.id is passed
      */
-    public function getDummyProject(): Project
+    public static function getDummyProject(): Project
     {
         $project = (new Project())
             ->setId(4)
-            ->setGradeGroup($this->getDummyLetterGradeGroup());
+            ->setGradeGroup(self::getDummyLetterGradeGroup());
 
-        $task = $this->getDummyTask()->setWeight(0);
-        $dueWork = $this->getDummyDueWork()->setWeight(4);
-        $quiz = $this->getDummyQuiz()->setWeight(1);
+        $task = self::getDummyTask()->setWeight(0);
+        $dueWork = self::getDummyDueWork()->setWeight(4);
+        $quiz = self::getDummyQuiz()->setWeight(1);
 
         $project->getAssessables()
             ->add($task)
             ->add($dueWork)
             ->add($quiz);
 
-        $plan = $this->linker->createAndLinkPlan($project);
-        $this->linker->createAndLinkParticipant($this->getDummyStudent(1), $plan);
-        $this->linker->createAndLinkParticipant($this->getDummyStudent(2), $plan);
-        $this->linker->createAndLinkParticipant($this->getDummyStudent(3), $plan);
-        $this->linker->createAndLinkParticipant($this->getDummyStudent(4), $plan);
-        $this->linker->createAndLinkParticipant($this->getDummyStudent(5), $plan);
-        $this->linker->createAndLinkParticipant($this->getDummyStudent(6), $plan);
-        $this->linker->createAndLinkParticipant($this->getDummyStudent(7), $plan);
-        $this->linker->createAndLinkParticipant($this->getDummyStudent(8), $plan);
-        $this->linker->createAndLinkParticipant($this->getDummyStudent(9), $plan);
+        $plan = self::getDummyLinker()->createAndLinkPlan($project);
+        self::getDummyLinker()->createAndLinkParticipant(self::getDummyStudent(1), $plan);
+        self::getDummyLinker()->createAndLinkParticipant(self::getDummyStudent(2), $plan);
+        self::getDummyLinker()->createAndLinkParticipant(self::getDummyStudent(3), $plan);
+        self::getDummyLinker()->createAndLinkParticipant(self::getDummyStudent(4), $plan);
+        self::getDummyLinker()->createAndLinkParticipant(self::getDummyStudent(5), $plan);
+        self::getDummyLinker()->createAndLinkParticipant(self::getDummyStudent(6), $plan);
+        self::getDummyLinker()->createAndLinkParticipant(self::getDummyStudent(7), $plan);
+        self::getDummyLinker()->createAndLinkParticipant(self::getDummyStudent(8), $plan);
+        self::getDummyLinker()->createAndLinkParticipant(self::getDummyStudent(9), $plan);
 
         return $project;
     }
@@ -2964,7 +2952,7 @@ class AssessableTest extends TestCase
      * @return MarkType
      * @throws InvalidArgumentException If an unrecognised mark slug is passed
      */
-    private function getDummyMarkType(string $markSlug): MarkType
+    private static function getDummyMarkType(string $markSlug): MarkType
     {
         $data = [
             [MarkType::SLUG_PERCENT, 'Percentage (%)', 1, 'This should be a whole percentage between 0 and 100.', 1],
@@ -3000,7 +2988,7 @@ class AssessableTest extends TestCase
      *
      * @return GradeGroup
      */
-    private function getDummyLetterGradeGroup(): GradeGroup
+    private static function getDummyLetterGradeGroup(): GradeGroup
     {
         $data = [
             [
@@ -3064,9 +3052,9 @@ class AssessableTest extends TestCase
      * @return Participant
      * @throws InvalidArgumentException If an unrecognised user.id is passed
      */
-    private function getDummyParticipant($userId, Plan $plan): Participant
+    private static function getDummyParticipant($userId, Plan $plan): Participant
     {
-        return $this->linker->createAndLinkParticipant($this->getDummyStudent($userId), $plan);
+        return self::getDummyLinker()->createAndLinkParticipant(self::getDummyStudent($userId), $plan);
     }
 
 
@@ -3075,11 +3063,11 @@ class AssessableTest extends TestCase
      * @return User
      * @throws InvalidArgumentException If an unrecognised user.id is passed
      */
-    private function getDummyStudent($userId): User
+    private static function getDummyStudent($userId): User
     {
         // Use cache if possible
-        if (isset($this->studentCache[$userId]) && $this->studentCache[$userId] instanceof User) {
-            return $this->studentCache[$userId];
+        if (isset(self::$studentCache[$userId]) && self::$studentCache[$userId] instanceof User) {
+            return self::$studentCache[$userId];
         }
 
         $user = (new User())->setId($userId);
@@ -3123,7 +3111,7 @@ class AssessableTest extends TestCase
             default:
                 throw new InvalidArgumentException("Unknown userId: $userId");
         }
-        $this->studentCache[$userId] = $user;
+        self::$studentCache[$userId] = $user;
         return $user;
     }
 
@@ -3132,11 +3120,11 @@ class AssessableTest extends TestCase
      * @return User
      * @throws InvalidArgumentException If an unrecognised user.id is passed
      */
-    private function getDummyTeacher($userId): User
+    private static function getDummyTeacher($userId): User
     {
         // Use cache if possible
-        if (isset($this->teacherCache[$userId]) && $this->teacherCache[$userId] instanceof User) {
-            return $this->teacherCache[$userId];
+        if (isset(self::$teacherCache[$userId]) && self::$teacherCache[$userId] instanceof User) {
+            return self::$teacherCache[$userId];
         }
 
         $user = (new User())->setId($userId);
@@ -3152,7 +3140,7 @@ class AssessableTest extends TestCase
             default:
                 throw new InvalidArgumentException("Unknown userId: $userId");
         }
-        $this->teacherCache[$userId] = $user;
+        self::$teacherCache[$userId] = $user;
         return $user;
     }
 
@@ -3160,10 +3148,19 @@ class AssessableTest extends TestCase
      * @param string $dateString eg '2016-08-08 21:03:19'
      * @return \Alaress_Date_Format|null
      */
-    private function getDummyDate($dateString = null)
+    private static function getDummyDate($dateString = null)
     {
         return null === $dateString
             ? null
             : new Alaress_Date_Format($dateString, Alaress_Date_Format::DATABASE_FORMAT);
+    }
+
+    /**
+     * Get linker object
+     */
+    private static function getDummyLinker(): ParticipantLinker
+    {
+        self::$linker ??= new ParticipantLinker();
+        return self::$linker;
     }
 }

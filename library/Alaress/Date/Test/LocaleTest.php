@@ -34,25 +34,23 @@ class LocaleTest extends TestCase
         $mockConfig
             ->expects($this->any())
             ->method('get')
-            ->will(
-                $this->returnValueMap([
-                    ['date_database', 'Y-m-d H:i:s',],
-                    ['date_local', 'd/m/Y',],
-                    ['date_long', 'l F jS Y',],
-                    ['date_notime', 'jS M Y',],
-                    ['date_only', 'jS M',],
-                    ['date_short', 'jS M Y',],
-                    ['date_time', 'g:ia',],
-                    ['date_timezone', 'Australia/Victoria',],
-                ])
-            );
+            ->willReturnMap([
+                ['date_database', 'Y-m-d H:i:s',],
+                ['date_local', 'd/m/Y',],
+                ['date_long', 'l F jS Y',],
+                ['date_notime', 'jS M Y',],
+                ['date_only', 'jS M',],
+                ['date_short', 'jS M Y',],
+                ['date_time', 'g:ia',],
+                ['date_timezone', 'Australia/Victoria',],
+            ]);
         $this->dateLocale = new Alaress_Date_Locale_Config();
         $this->dateLocale->setConfig($mockConfig);
     }
 
     protected function getTestDateObject()
     {
-        return $this->buildDateObject(
+        return self::buildDateObject(
             '2015-03-25 08:01:13',
             Alaress_Date_Format::DATABASE_FORMAT,
             null,
