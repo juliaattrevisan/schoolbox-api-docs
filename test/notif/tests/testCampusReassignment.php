@@ -10,14 +10,14 @@
 use Schoolbox\CampusMapper;
 use Schoolbox\Comms\News;
 use Schoolbox\Database\Factory;
-use Schoolbox\Realtime\Test\AbstractNotificationTest;
+use Schoolbox\Realtime\Test\AbstractNotificationTestCase;
 use Schoolbox\Role;
 use Schoolbox\RoleMapper;
 
 /**
  * This class tests whether routed respects users moving from one campus to another.
  */
-class CampusReassignment extends AbstractNotificationTest
+class CampusReassignment extends AbstractNotificationTestCase
 {
     const CAMPUS_ONE = 1;
     const CAMPUS_TWO = 2;

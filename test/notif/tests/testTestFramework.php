@@ -6,14 +6,14 @@
  * @link      https://schoolbox.com.au/
  */
 
-use Schoolbox\Realtime\Test\AbstractNotificationTest;
+use Schoolbox\Realtime\Test\AbstractNotificationTestCase;
 
 /**
  * Test case for the test framework.
  *
  * It tests solely whether the test framework is able to listen to all daemons.
  */
-class TestFramework extends AbstractNotificationTest
+class TestFramework extends AbstractNotificationTestCase
 {
     /**
      * The test's completion is not handled by a task daemon expiring.

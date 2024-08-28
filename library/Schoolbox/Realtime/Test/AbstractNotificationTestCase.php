@@ -11,7 +11,7 @@ namespace Schoolbox\Realtime\Test;
 
 use Alaress\Async\Notification\Instance\Instance;
 use Alaress\Async\Notification\Notification;
-use Alaress\Async\Test\AbstractTest;
+use Alaress\Async\Test\AbstractTestCase;
 use Alaress\Redis;
 use OutOfBoundsException;
 use Predis\ClientInterface;
@@ -22,7 +22,7 @@ use Schoolbox\Realtime\Routing\Subscription;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
 
-abstract class AbstractNotificationTest extends AbstractTest
+abstract class AbstractNotificationTestCase extends AbstractTestCase
 {
     /* COMMON USERS*/
 

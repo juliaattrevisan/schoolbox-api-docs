@@ -12,7 +12,7 @@ namespace Alaress\Async\Test;
 use PHPUnit\Framework\TestCase as BaseTestCase;
 use Psr\Log\LoggerInterface;
 
-abstract class AbstractTest extends BaseTestCase implements TestCase
+abstract class AbstractTestCase extends BaseTestCase implements TestCase
 {
     /** @var LoggerInterface */
     protected $log;
