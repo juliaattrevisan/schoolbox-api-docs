@@ -29,9 +29,18 @@ use PHPUnit\Framework\TestCase;
  */
 class PhpUnitTestName implements Rule
 {
-    private const SUFFIX = 'Test.php';
+    private const ERROR_MESSAGE_PREFIX_MISMATCH = 'PHPUnit test case file name "%s" must start with "%s"';
+    private const ERROR_MESSAGE_SUFFIX_MISMATCH = 'PHPUnit test case file name "%s" must end with "%s"';
 
-    private const ERROR_MESSAGE = 'PHPUnit test case file name "%s" must end with "%s"';
+    /**
+     * Constructor
+     *
+     * @param string|null $prefix If provided, the file name must start with this value.
+     * @param string|null $suffix If provided, the file name must end with this value.
+     */
+    public function __construct(private ?string $prefix = null, private ?string $suffix = null)
+    {
+    }
 
     /**
      * @inheritdoc
@@ -46,6 +55,11 @@ class PhpUnitTestName implements Rule
      */
     public function processNode(Node $node, Scope $scope): array
     {
+        // No prefix or suffix: no rules to class name, thus cannot test
+        if (!isset($this->prefix) && !isset($this->suffix)) {
+            return [];
+        }
+
         // Not in class: this doesn't apply
         $reflectionClass = $scope->getClassReflection();
         if (!$reflectionClass) {
@@ -57,14 +71,31 @@ class PhpUnitTestName implements Rule
             return [];
         }
 
-        // Check the file name matches the suffix
+        // Extract basename from file
         $filename = $reflectionClass->getFileName();
-        if (str_ends_with($filename, self::SUFFIX)) {
+        if (!isset($filename)) {
             return [];
         }
+        $basename = basename($filename);
 
-        return [
-            RuleErrorBuilder::message(sprintf(self::ERROR_MESSAGE, $filename, self::SUFFIX))->build(),
-        ];
+        // Test prefix
+        if ($this->prefix && !str_starts_with($basename, $this->prefix)) {
+            return [
+                RuleErrorBuilder::message(
+                    sprintf(self::ERROR_MESSAGE_PREFIX_MISMATCH, $basename, $this->prefix)
+                )->build(),
+            ];
+        }
+
+        // Test suffix
+        if ($this->suffix && !str_ends_with($basename, $this->suffix)) {
+            return [
+                RuleErrorBuilder::message(
+                    sprintf(self::ERROR_MESSAGE_SUFFIX_MISMATCH, $basename, $this->suffix)
+                )->build(),
+            ];
+        }
+
+        return [];
     }
 }

@@ -16,6 +16,13 @@ parameters:
 
 rules:
     - Alaress\PhpStan\Rule\PhpUnitTestName
+services:
+    -
+        class: Alaress\PhpStan\Rule\PhpUnitTestName
+        arguments:
+            suffix: Test.php
+        tags:
+            - phpstan.rules.rule
 
 includes:
     - phpstan-baseline.neon
