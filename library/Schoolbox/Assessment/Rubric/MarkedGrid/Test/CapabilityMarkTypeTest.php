@@ -211,7 +211,7 @@ class CapabilityMarkTypeTest extends TestCase
      *
      * It got cloned out of another test and modified to suit what we're doing here
      *
-     * @param MarkedGridTest $markedGrid
+     * @param MarkedGrid $markedGrid
      * @return array
      * @throws \DomainException
      * @throws \RangeException

@@ -17,7 +17,6 @@ namespace Schoolbox\Learning\Turnitin\Group\Process\Test;
 
 use PHPUnit\Framework\TestCase;
 use Schoolbox\Learning\Turnitin\Group\Process\Differential;
-use SebastianBergmann\RecursionContext\InvalidArgumentException;
 
 class DifferentialTest extends TestCase
 {
@@ -26,7 +25,6 @@ class DifferentialTest extends TestCase
      * @param array $remoteIds
      * @param array $expected
      * @throws \PHPUnit\Framework\ExpectationFailedException
-     * @throws InvalidArgumentException
      */
     #[\PHPUnit\Framework\Attributes\DataProvider('providerValidDifferential')]
     public function testValidDifferential(array $localIds, array $remoteIds, array $expected)

@@ -135,10 +135,7 @@ class LogicTest extends TestCase
         // Ensure we got at least 1 sub-query back from builder
         $found = (bool)preg_match_all('/(\d) AS \'case\'/', $query, $matches);
         $this->assertTrue($found, "No sub-queries recognised: $message");
-
-        if ($found) {
-            $this->assertEquals($expected, $matches[1], $message);
-        }
+        $this->assertEquals($expected, $matches[1], $message);
     }
 
 
@@ -183,8 +180,8 @@ class LogicTest extends TestCase
     /**
      * Return a compact string representation of NULL or an int[] for debugging
      *
-     * @param Collection|mixed[]|int[]|null[] $var
-     * @param int                             $level
+     * @param Collection|array|int[]|null[]|null $var
+     * @param int                                $level
      * @return string
      */
     private function toStr($var, $level = 0): string
@@ -192,8 +189,8 @@ class LogicTest extends TestCase
         if (null === $var) {
             return 'NULL' . (!$level ? "\n" : '');
         }
-        if (!($var instanceof Collection || is_array($var))) {
-            return $var;
+        if (!is_iterable($var)) {
+            return (string)$var;
         }
         $string = '[';
         $first = true;
