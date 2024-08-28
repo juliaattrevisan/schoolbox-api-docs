@@ -8,11 +8,14 @@
 
 namespace Schoolbox\Video\Factory;
 
+use Component\Eportfolio\FileListMapper;
+use Schoolbox\Config\Loader;
 use Schoolbox\Mapper\DefinitionException;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Mapper\Exception\Deleted;
 use Schoolbox\Mapper\Exception\NotFound;
 use Schoolbox\Permission\Access\Access;
+use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\AbstractFile;
 use Schoolbox\Video\QueueMapper;
 use Schoolbox\Video\ResourceVideo;
@@ -103,10 +106,11 @@ abstract class Base
                 // For SBFS we must first load file, then resolve the hash
                 $file = $this->fileMapper->findById($this->id);
 
-                /* TODO Check Folder Perms prior to this PR
-                 *  (whatever that was - check that)
+                /* Check folder access perms
                  */
-                $this->permissionCheckFolder($file);
+                if (!$this->permissionCheckFolder($file)) {
+                    throw new NotFound('You do not have permission to view this video.');
+                }
 
                 return $this->videoMapper->findByStorageHash($file->getHash());
 
@@ -117,8 +121,9 @@ abstract class Base
                 /* Check owner perms
                  * Eportfolio access
                  */
-                $this->permissionCheckOwner($file);
-                $this->permissionCheckEportfolioAccess($file);
+                if (!$this->permissionCheckOwner($file) && !$this->permissionCheckEportfolioAccess($file)) {
+                    throw new NotFound('You do not have permission to view this video.');
+                }
 
                 /* If $file is a MyFile, then we need to have special treatment about myFile.parent = 0.
                  * This is inferred to be the root level node of the resource browzer which, in Access.php:443,
@@ -141,9 +146,28 @@ abstract class Base
      * normally by comparing ids
      *
      * @param AbstractFile $file
-     * @return void
+     * @return bool
      */
-    abstract protected function permissionCheckOwner(AbstractFile $file): void;
+    protected function permissionCheckOwner(AbstractFile $file): bool
+    {
+        /* If you are a superuser,
+         * then you can view the content
+         */
+        if ($this->user->isSuperuser()) {
+            return true;
+        }
+
+        /* If you are the owner
+         * then you can view the content
+         */
+        if ($file->getOwner()->getId() === $this->user->getId()) {
+            return true;
+        }
+
+        /* Every other use case: you get kicked out
+         */
+        return false;
+    }
 
 
     /**
@@ -151,16 +175,59 @@ abstract class Base
      * page via Eportfolio_Authenticator's existing methods
      *
      * @param AbstractFile $file
-     * @return void
+     * @return bool
      */
-    abstract protected function permissionCheckEportfolioAccess(AbstractFile $file): void;
+    protected function permissionCheckEportfolioAccess(AbstractFile $file): bool
+    {
+        /* If the eportfolio feature is globally enabled, dig a little deeper;
+         * maybe this lets you see stuff. If it's disabled, skip all this costly
+         * investigation entirely and keep going with other checks
+         */
+        $eportfolioEnabled = (bool)Loader::getInstance()->get('eportfolio_enabled');
+
+        /* Check eportfolio permissions; if you can see a page that shows the video
+         * (remembering that multiple eportfolio pages could show a given video)
+         * then you can view the content
+         */
+        if ($eportfolioEnabled) {
+            $fileListMapper = FileListMapper::getInstance();
+
+            $files = $fileListMapper->findByColumn('file_id', $file->getId());
+
+            /* If you can view one of the pages that this file is shared on,
+             * break out of here
+             */
+            foreach ($files as $currentFile) {
+                if ((new \Eportfolio_Authenticator($this->user, $file->getOwner(), $currentFile->getPageId()))->canView()) {
+                    return true;
+                }
+            }
+        }
+
+        /* Every other use case: you get kicked out
+         */
+        return false;
+    }
 
 
     /**
      * Check whether the current session user has read+ access to a folder
      *
      * @param AbstractFile $file
-     * @return void
+     * @return bool
+     * @throws MapperException
      */
-    abstract protected function permissionCheckFolder(AbstractFile $file): void;
+    protected function permissionCheckFolder(AbstractFile $file): bool
+    {
+        /* If the video was in a folder where you have read access,
+         * then you can view the content
+         */
+        if ($this->access->getFolderAccess($this->user, $file->getFolder()->getId()) >= UserAccess::ACCESS_READ) {
+            return true;
+        }
+
+        /* Every other use case: you get kicked out
+         */
+        return false;
+    }
 }
