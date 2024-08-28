@@ -33,5 +33,7 @@ class Thumbnail extends Base
         }
 
         \SitePage::redirectToBrokenImageOfSize(64, 64, 403);
+
+        return false;
     }
 }
