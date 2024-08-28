@@ -37,7 +37,7 @@ abstract class AbstractTransaction implements ITransaction
      * @param int $size          - the max size of the cache, or 0 for no limit. If this limit is reached, the
      *                             transaction will execute prematurely
      */
-    function __construct($loop, $cacheInterval = 1, $size = 0)
+    public function __construct($loop, $cacheInterval = 1, $size = 0)
     {
         $this->loop = $loop;
         $this->cacheInterval = $cacheInterval;
