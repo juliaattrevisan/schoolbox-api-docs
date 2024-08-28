@@ -306,6 +306,15 @@ class Transmit
                 ->setErrorCode((string)$e->getCode())
                 ->setErrorMessage($errorMessage)
                 ->setStatus(Turnitin\File\Model::STATUS_ERROR));
+        } catch (Turnitin\Exception\ConnectException $e) {
+            $this->logWarning($e->getMessage());
+
+            $this->turnitinMapper->save(
+                $model
+                    ->setErrorCode((string)$e->getCode())
+                    ->setErrorMessage($e->getMessage())
+                    ->setStatus(Turnitin\File\Model::STATUS_TRANSMIT_PENDING)
+            );
         } catch (Turnitin\Exception\Exception $e) {
             /* Potentially recoverable by running transmit forcibly
              * which is what the crontab does anyway
