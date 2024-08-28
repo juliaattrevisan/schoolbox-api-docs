@@ -63,8 +63,8 @@ class AssessableTest extends TestCase
     /** @var User[] */
     private static $teacherCache = [];
 
-    /** @var ParticipantLinker */
-    private static $linker;
+    /** @var ParticipantLinker|null */
+    private static ?ParticipantLinker $linker = null;
 
     /**
      * For floating point comparisons

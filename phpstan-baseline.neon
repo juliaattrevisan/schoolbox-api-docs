@@ -5181,11 +5181,6 @@ parameters:
 			path: library/Schoolbox/Realtime/Schedule/Trigger/TriggerFactory.php
 
 		-
-			message: "#^PHPDoc tag @var above a method has no effect\\.$#"
-			count: 1
-			path: library/Schoolbox/Realtime/Test/AbstractNotificationTest.php
-
-		-
 			message: "#^Method Schoolbox\\\\Realtime\\\\Timetable\\\\TimetableNotifier\\:\\:process\\(\\) should return string but returns int\\.$#"
 			count: 2
 			path: library/Schoolbox/Realtime/Timetable/TimetableNotifier.php

@@ -28,18 +28,18 @@ use Schoolbox\Permission\Access\Access as FolderAccess;
 class AccessTest extends TestCase
 {
     /** @var Role[] */
-    private static $roles;
+    private static array $roles = [];
 
     /**
      * @var array<User>
      */
-    private static $users;
+    private static array $users = [];
 
     /** @var Event[] */
-    private static $events;
+    private static array $events = [];
 
     /** @var UserAccess[] */
-    private static $userAccess;
+    private static array $userAccess = [];
 
     /**
      * @param string $key
@@ -150,42 +150,44 @@ class AccessTest extends TestCase
      */
     private static function getUserAccess($key)
     {
-        self::$userAccess ??= [
-            'campusModerate' => (new UserAccess())
-                ->setService(UserAccess::SERVICE_CALENDAR)
-                ->setAccessLevel(UserAccess::ACCESS_FULL)
-                ->setServiceIdentifier(1),
+        if (empty(self::$userAccess)) {
+            self::$userAccess = [
+                'campusModerate' => (new UserAccess())
+                    ->setService(UserAccess::SERVICE_CALENDAR)
+                    ->setAccessLevel(UserAccess::ACCESS_FULL)
+                    ->setServiceIdentifier(1),
 
-            'campusWrite' => (new UserAccess())
-                ->setService(UserAccess::SERVICE_CALENDAR)
-                ->setAccessLevel(UserAccess::ACCESS_WRITE)
-                ->setServiceIdentifier(1),
+                'campusWrite' => (new UserAccess())
+                    ->setService(UserAccess::SERVICE_CALENDAR)
+                    ->setAccessLevel(UserAccess::ACCESS_WRITE)
+                    ->setServiceIdentifier(1),
 
-            'campusRead' => (new UserAccess())
-                ->setService(UserAccess::SERVICE_CALENDAR)
-                ->setAccessLevel(UserAccess::ACCESS_READ)
-                ->setServiceIdentifier(1),
+                'campusRead' => (new UserAccess())
+                    ->setService(UserAccess::SERVICE_CALENDAR)
+                    ->setAccessLevel(UserAccess::ACCESS_READ)
+                    ->setServiceIdentifier(1),
 
-            'groupReadSuper' => (new UserAccess())
-                ->setService(UserAccess::SERVICE_HOMEPAGE)
-                ->setAccessLevel(UserAccess::ACCESS_READ)
-                ->setServiceIdentifier(1),
+                'groupReadSuper' => (new UserAccess())
+                    ->setService(UserAccess::SERVICE_HOMEPAGE)
+                    ->setAccessLevel(UserAccess::ACCESS_READ)
+                    ->setServiceIdentifier(1),
 
-            'groupAdmin' => (new UserAccess())
-                ->setService(UserAccess::SERVICE_HOMEPAGE)
-                ->setAccessLevel(UserAccess::ACCESS_FULL)
-                ->setServiceIdentifier(1),
+                'groupAdmin' => (new UserAccess())
+                    ->setService(UserAccess::SERVICE_HOMEPAGE)
+                    ->setAccessLevel(UserAccess::ACCESS_FULL)
+                    ->setServiceIdentifier(1),
 
-            'groupWrite' => (new UserAccess())
-                ->setService(UserAccess::SERVICE_HOMEPAGE)
-                ->setAccessLevel(UserAccess::ACCESS_WRITE)
-                ->setServiceIdentifier(1),
+                'groupWrite' => (new UserAccess())
+                    ->setService(UserAccess::SERVICE_HOMEPAGE)
+                    ->setAccessLevel(UserAccess::ACCESS_WRITE)
+                    ->setServiceIdentifier(1),
 
-            'groupRead' => (new UserAccess())
-                ->setService(UserAccess::SERVICE_HOMEPAGE)
-                ->setAccessLevel(UserAccess::ACCESS_READ)
-                ->setServiceIdentifier(1),
-        ];
+                'groupRead' => (new UserAccess())
+                    ->setService(UserAccess::SERVICE_HOMEPAGE)
+                    ->setAccessLevel(UserAccess::ACCESS_READ)
+                    ->setServiceIdentifier(1),
+            ];
+        }
 
         return self::$userAccess[$key];
     }

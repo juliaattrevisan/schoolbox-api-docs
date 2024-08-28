@@ -13,7 +13,6 @@ use PHPUnit\Framework as PHPUnitFramework;
 use PHPUnit\Framework\TestCase;
 use Schoolbox\External\Importer\Endpoint\Scheduler;
 use Schoolbox\External\Importer\Endpoint\ValidScheduleExecution;
-use SebastianBergmann\RecursionContext;
 
 /**
  * Class ScheduleTest
@@ -285,7 +284,6 @@ class ScheduleTest extends TestCase
      * @param int      $now
      * @param bool     $expected
      * @throws PHPUnitFramework\ExpectationFailedException
-     * @throws RecursionContext\InvalidArgumentException
      */
     #[\PHPUnit\Framework\Attributes\DataProvider('providerSchoolboxManagedScheduleFrequency')]
     public function testSchoolboxManagedScheduleFrequency(array $customHours, int $now, bool $expected): void

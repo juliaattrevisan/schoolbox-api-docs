@@ -96,12 +96,10 @@ abstract class AbstractNotificationTestCase extends AbstractTestCase
 
     /**
      * @param string $name
-     * @param array  $data
-     * @param string $dataName
      */
-    public function __construct($name = null, array $data = [], $dataName = '')
+    public function __construct($name = null)
     {
-        parent::__construct($name, $data, $dataName);
+        parent::__construct($name);
 
         // TODO should this be the cache or storage?
         $this->redis = Redis::getStorageClientInstance();
@@ -119,7 +117,7 @@ abstract class AbstractNotificationTestCase extends AbstractTestCase
     /**
      * Goes to a stage of the test.
      *
-     * @var int $stage
+     * @param int $stage
      */
     abstract protected function goToStage($stage);
 

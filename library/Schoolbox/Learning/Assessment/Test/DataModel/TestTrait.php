@@ -20,19 +20,19 @@ use Schoolbox\User;
 trait TestTrait
 {
     /**
-     * @var Translator
+     * @var Translator|null
      */
-    protected static $translator;
+    protected static ?Translator $translator = null;
 
     /**
-     * @var User
+     * @var User|null
      */
-    protected static $teacher1;
+    protected static ?User $teacher1 = null;
 
     /**
-     * @var User
+     * @var User|null
      */
-    protected static $teacher2;
+    protected static ?User $teacher2 = null;
 
 
     /**

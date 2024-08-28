@@ -334,11 +334,9 @@ class MutableFieldsOnlyTest extends TestCase
      * Test that creation of a new model from an array works as expected.
      *
      *
-     * @param array                  $input
-     * @param Model                  $expected
-     * @param MutableFieldsOnly|null $converter
-     *
-     * @noinspection PhpDocMissingThrowsInspection This ought not be thrown by the converter
+     * @param array         $input
+     * @param Model         $expected
+     * @param IStorage|null $storage
      */
     #[\PHPUnit\Framework\Attributes\DataProvider('getTestInvokeCreateData')]
     public function testInvokeCreate(array $input, Model $expected, ?Istorage $storage = null): void
@@ -354,10 +352,10 @@ class MutableFieldsOnlyTest extends TestCase
      * Test that update of an existing model from an array works as expected.
      *
      *
-     * @param array                  $input
-     * @param Model                  $existing
-     * @param Model                  $expected
-     * @param MutableFieldsOnly|null $converter
+     * @param array         $input
+     * @param Model         $existing
+     * @param Model         $expected
+     * @param IStorage|null $storage
      *
      * @noinspection PhpDocMissingThrowsInspection This ought not be thrown by the converter
      */

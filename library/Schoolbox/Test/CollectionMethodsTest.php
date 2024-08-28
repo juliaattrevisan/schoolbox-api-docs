@@ -51,7 +51,6 @@ class CollectionMethodsTest extends TestCase
      * @param int        $offset
      * @param int        $count
      * @param bool       $preserveKeys
-     * @throws \PHPUnit\Framework\SkippedTestError
      */
     #[\PHPUnit\Framework\Attributes\DataProvider('providerSliceOnce')]
     public function testSliceInvertKeyPreservation(

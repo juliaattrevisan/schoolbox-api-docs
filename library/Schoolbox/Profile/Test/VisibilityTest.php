@@ -22,11 +22,6 @@ use External_UserInterface;
  */
 class VisibilityTest extends TestCase
 {
-    public function __construct($name = null, array $data = [], $dataName = '')
-    {
-        parent::__construct($name, $data, $dataName);
-    }
-
     /**
      * @param User $viewer
      * @param User $viewee
