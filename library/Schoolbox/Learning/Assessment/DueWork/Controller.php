@@ -1458,15 +1458,15 @@ class Controller extends Assessment\Controller
         /** @var Model $assessment */
         if ($isFinal && $response->getId() && $assessment->getSimilarityCheckEnabled()) {
             /* Only one of these can be active at a time, but both universes can co-exist
-             * Specifically enable turnitin if its api key was set
-             */
+                 * Specifically enable turnitin if its api key was set
+                 */
             if ((new TurnitinHelper($this->getConfigLoader()))->isConfigured()) {
                 $turnitinMapper = Turnitin\File\Mapper::getInstance();
 
                 /* Set up a turnitin stub record
-                 * This allows it to be picked up and processed by an async script later
-                 * if it doesn't start processing via the $detachedFunction
-                 */
+                     * This allows it to be picked up and processed by an async script later
+                     * if it doesn't start processing via the $detachedFunction
+                     */
                 $models = [];
 
                 foreach ($response->getAllFiles() as $currentFile) {
