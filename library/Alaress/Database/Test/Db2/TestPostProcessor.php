@@ -12,11 +12,10 @@ namespace Alaress\Database\Test\Db2;
 
 use Alaress\Database\Factory;
 use Alaress\Database\Test\TestConnectorTrait;
+use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @requires extension ibm_db2
- */
+#[RequiresPhpExtension('ibm_db2')]
 class TestPostProcessor extends TestCase
 {
     use TestConnectorTrait;
@@ -50,9 +49,8 @@ class TestPostProcessor extends TestCase
 
     /**
      * Test plain old boring statements
-     *
-     * @requires extension ibm_db2
      */
+    #[RequiresPhpExtension('ibm_db2')]
     public function testPostProcessor()
     {
         $factory = new Factory();

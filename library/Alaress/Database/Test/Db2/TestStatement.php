@@ -12,11 +12,10 @@ namespace Alaress\Database\Test\Db2;
 
 use Alaress\Database\Test\TestConnectorTrait;
 use PDO;
+use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @requires extension ibm_db2
- */
+#[RequiresPhpExtension('ibm_db2')]
 class TestStatement extends TestCase
 {
     use TestConnectorTrait;
@@ -41,9 +40,8 @@ class TestStatement extends TestCase
 
     /**
      * Test with long-winded preparation and binding
-     *
-     * @requires extension ibm_db2
      */
+    #[RequiresPhpExtension('ibm_db2')]
     public function testStatementWithPreparationAndBinding()
     {
         $statement = $this->db2Test->prepareQuery('SELECT * FROM USERS WHERE NAME_LAST = :nameLast OR NAME_LAST = :nameLast2 ORDER BY NAME_LAST');
@@ -68,9 +66,8 @@ class TestStatement extends TestCase
 
     /**
      * Test fetch() method
-     *
-     * @requires extension ibm_db2
      */
+    #[RequiresPhpExtension('ibm_db2')]
     public function testFetch()
     {
         $statement = $this->db2Test->prepareQuery('SELECT * FROM USERS WHERE NAME_LAST = :nameLast OR NAME_LAST = :nameLast2 ORDER BY NAME_LAST');
@@ -103,9 +100,8 @@ class TestStatement extends TestCase
 
     /**
      * Test getIterator() method
-     *
-     * @requires extension ibm_db2
      */
+    #[RequiresPhpExtension('ibm_db2')]
     public function testGetIterator()
     {
         $iterator = $this->db2Test->getQueryIterator(
@@ -143,9 +139,8 @@ class TestStatement extends TestCase
 
     /**
      * Test fetchColumn() method
-     *
-     * @requires extension ibm_db2
      */
+    #[RequiresPhpExtension('ibm_db2')]
     public function testFetchColumn()
     {
         $statement = $this->db2Test->executeQuery(
@@ -160,9 +155,8 @@ class TestStatement extends TestCase
 
     /**
      * Test columnArray() method
-     *
-     * @requires extension ibm_db2
      */
+    #[RequiresPhpExtension('ibm_db2')]
     public function testColumnArray()
     {
         $statement = $this->db2Test->executeQuery(
@@ -181,9 +175,8 @@ class TestStatement extends TestCase
 
     /**
      * Test rowArray() method
-     *
-     * @requires extension ibm_db2
      */
+    #[RequiresPhpExtension('ibm_db2')]
     public function testRowArray()
     {
         $statement = $this->db2Test->executeQuery(

@@ -12,11 +12,10 @@ namespace Alaress\Database\Test\Db2;
 
 use Alaress\Database\Predicate\Builder as PredicateBuilder;
 use Alaress\Database\Test\TestConnectorTrait;
+use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @requires extension ibm_db2
- */
+#[RequiresPhpExtension('ibm_db2')]
 class TestPredicateBuilder extends TestCase
 {
     use TestConnectorTrait;
@@ -31,9 +30,8 @@ class TestPredicateBuilder extends TestCase
 
     /**
      * Test predicate builder quoting
-     *
-     * @requires extension ibm_db2
      */
+    #[RequiresPhpExtension('ibm_db2')]
     public function testPredicateBuilder()
     {
         $this->connectDb2Test();

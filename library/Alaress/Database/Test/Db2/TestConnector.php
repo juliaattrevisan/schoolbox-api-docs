@@ -12,11 +12,10 @@ namespace Alaress\Database\Test\Db2;
 
 use Alaress\Database\Connector\IConnector;
 use Alaress\Database\Factory;
+use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @requires extension ibm_db2
- */
+#[RequiresPhpExtension('ibm_db2')]
 class TestConnector extends TestCase
 {
     /**
@@ -29,9 +28,8 @@ class TestConnector extends TestCase
 
     /**
      * Ensure we can establish a connection to DB2 test database
-     *
-     * @requires extension ibm_db2
      */
+    #[RequiresPhpExtension('ibm_db2')]
     public function testConnect()
     {
         $factory = new Factory();
@@ -49,9 +47,8 @@ class TestConnector extends TestCase
 
     /**
      * Test serialization of MySQL database connection
-     *
-     * @requires extension ibm_db2
      */
+    #[RequiresPhpExtension('ibm_db2')]
     public function testSerialize()
     {
         $factory = new Factory();
