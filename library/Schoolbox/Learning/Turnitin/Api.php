@@ -12,7 +12,6 @@ namespace Schoolbox\Learning\Turnitin;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\ConnectException;
 use GuzzleHttp\Exception\GuzzleException;
-use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\RequestOptions;
 use Psr\Http\Message\ResponseInterface;
 use SensitiveParameter;
@@ -179,10 +178,6 @@ class Api
                     'headers'            => $headers,
                     RequestOptions::JSON => $params
                 ]);
-                throw new ConnectException(
-                    'Timed out.',
-                    new Request('post', $endpoint, $headers)
-                );
                 break;
         }
         return $result;
@@ -210,9 +205,20 @@ class Api
     {
         try {
             $result = $this->retrieveRawResponse($method, $endpoint, $params);
-        } catch (\Exception $e) {
-            throw new \Exception('Tony');
+        } catch (ConnectException $e) {
+            /* Server connection had timed out without a response hence the exception:
+             * "cURL error 28: Resolving timed out after 3000 millisecond"
+             * Catching the error and re-throw it to handle logging in upper layer
+             */
+            throw new Exception\ConnectException(
+                sprintf(
+                    'Turnitin: endpoint was unavailable; could not retrieve from %s',
+                    $endpoint
+                ),
+                $e->getCode()
+            );
         }
+
         /* Check errors; if anything went wrong throw special types of exceptions
          * according to what happened. I found that in suds, we kind of started to
          * exceed the default \RuntimeException namespace for certain categories
