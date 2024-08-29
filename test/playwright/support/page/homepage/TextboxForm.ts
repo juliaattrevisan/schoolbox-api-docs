@@ -18,7 +18,7 @@ export default class TextboxForm {
     }
 
     async fillHeading(heading: string) {
-        // await this.page.fill("heading", heading);
+        await this.page.waitForSelector('input[name="heading"]');
         await this.page.locator('input[name="heading"]').fill(heading);
 
         return this;

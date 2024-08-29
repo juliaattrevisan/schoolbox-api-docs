@@ -140,17 +140,17 @@ test.describe("Textbox Tests", () => {
         await searchPage.clickFilterType("textbox");
         await searchPage.clickApplyFilters();
         await page.waitForSelector("#search-page-container");
-        await expect(page.locator("#search-page-container")).toContainText("Jana Reed");
-        await expect(page.locator("#search-page-container")).toContainText("Third Text Box");
+        await expect(page.locator('div[class="l-flex-col l-gap-m"]')).toContainText("Jana Reed");
+        await expect(page.locator('div[class="l-flex-col l-gap-m"]')).toContainText("Third Text Box");
         await searchPage.inputKeyword("Test");
         await searchPage.clearFilters();
         await searchPage.clickFilterType("textbox");
         await searchPage.clickApplyFilters();
         await page.waitForSelector("#search-page-container");
-        await expect(page.locator("#search-page-container")).toContainText("Second Text Box");
-        await expect(page.locator("#search-page-container")).toContainText("Test");
-        await expect(page.locator("#search-page-container")).toContainText("Test Text Box Title");
-        await expect(page.locator("#search-page-container")).toContainText("I am textbox content");
+        await expect(page.locator('div[class="l-flex-col l-gap-m"]')).toContainText("Second Text Box");
+        await expect(page.locator('div[class="l-flex-col l-gap-m"]')).toContainText("Test");
+        await expect(page.locator('div[class="l-flex-col l-gap-m"]')).toContainText("Test Text Box Title");
+        await expect(page.locator('div[class="l-flex-col l-gap-m"]')).toContainText("I am textbox content");
 
         tester.isGoingTo(
             "As Jana Reed search for a  textbox and check whether it is presented in the search results grid or not",
@@ -161,22 +161,16 @@ test.describe("Textbox Tests", () => {
         await common.clickSearchTypeCheckbox("textbox");
         await searchPage.clickApplyFilters();
         await page.waitForSelector("#search-page-container");
-        await expect(page.locator("div.c-search-page__results.l-flex-col.l-gap-m")).not.toContainText("Jana Reed");
-        await expect(page.locator("div.c-search-page__results.l-flex-col.l-gap-m")).not.toContainText("Third Text Box");
+        await expect(page.locator('div[class="l-flex-col l-gap-m"]')).not.toContainText("Jana Reed");
+        await expect(page.locator('div[class="l-flex-col l-gap-m"]')).not.toContainText("Third Text Box");
         await searchPage.inputKeyword("Test");
         await searchPage.clearFilters();
         await searchPage.clickFilterType("textbox");
         await searchPage.clickApplyFilters();
         await page.waitForSelector("#search-page-container");
-        await expect(page.locator("div.c-search-page__results.l-flex-col.l-gap-m")).not.toContainText(
-            "Second Text Box",
-        );
-        await expect(page.locator("div.c-search-page__results.l-flex-col.l-gap-m")).toContainText(
-            "Test Text Box Title",
-        );
-        await expect(page.locator("div.c-search-page__results.l-flex-col.l-gap-m")).toContainText(
-            "I am textbox content",
-        );
+        await expect(page.locator('div[class="l-flex-col l-gap-m"]')).not.toContainText("Second Text Box");
+        await expect(page.locator('div[class="l-flex-col l-gap-m"]')).toContainText("Test Text Box Title");
+        await expect(page.locator('div[class="l-flex-col l-gap-m"]')).toContainText("I am textbox content");
 
         tester.isGoingTo("As Jack Coles navigate to the Test TextBox Homepage");
         await tester.impersonate("Jack Coles");
@@ -213,20 +207,14 @@ test.describe("Textbox Tests", () => {
         await searchPage.clearFilters();
         await common.clickSearchTypeCheckbox("textbox");
         await searchPage.clickApplyFilters();
-        await expect(page.locator("div.c-search-page__results.l-flex-col.l-gap-m")).toContainText(
-            "Jamal to be presented",
-        );
+        await expect(page.locator('div[class="l-flex-col l-gap-m"]')).toContainText("Jamal to be presented");
         await searchPage.inputKeyword("Jana");
         await searchPage.clearFilters();
         await searchPage.clickApplyFilters();
         await page.waitForSelector("#search-page-container");
-        await expect(page.locator("div.c-search-page__results.l-flex-col.l-gap-m")).toContainText(
-            "Jamal to be presented",
-        );
-        await expect(page.locator("div.c-search-page__results.l-flex-col.l-gap-m")).toContainText("Untitled textbox");
-        await expect(page.locator("div.c-search-page__results.l-flex-col.l-gap-m")).not.toContainText(
-            "Jana to be hidden",
-        );
+        await expect(page.locator('div[class="l-flex-col l-gap-m"]')).toContainText("Jamal to be presented");
+        await expect(page.locator('div[class="l-flex-col l-gap-m"]')).toContainText("Untitled textbox");
+        await expect(page.locator('div[class="l-flex-col l-gap-m"]')).not.toContainText("Jana to be hidden");
         tester.isGoingTo("Navigate to the Test TextBox Homepage to check whether the textbox is presented or not");
         await page.goto(`https://vagrant.dev.schoolbox.cloud/homepage/${homepageId}`);
         await expect(page.locator("#container")).toContainText("Jamal to be presented");
@@ -240,12 +228,11 @@ test.describe("Textbox Tests", () => {
     /**
      * Soft deleting data to not impact the tests
      */
-
-    // test.afterAll(async ({ tester, db }) => {
-    //     tester.isGoingTo("update delete_at for the data created in this test so it does impact next suite of tests");
-    //     await db.updateInDatabase("folder", { deleted_at: "2022-01-15 11:22:34" }, { name: "Test TextBox Homepage" });
-    //     await db.updateInDatabase("textBox", { deleted_at: "2022-01-15 11:22:34" }, { heading: "Test Text Box Title" });
-    //     await db.updateInDatabase("textBox", { deleted_at: "2022-01-15 11:22:34" }, { heading: "Second Text Box" });
-    //     await db.updateInDatabase("textBox", { deleted_at: "2022-01-15 11:22:34" }, { heading: "Third Text Box" });
-    // });
+    test.afterAll(async ({ tester, db }) => {
+        tester.isGoingTo("update delete_at for the data created in this test so it does impact next suite of tests");
+        await db.updateInDatabase("folder", { deleted_at: "2022-01-15 11:22:34" }, { name: "Test TextBox Homepage" });
+        await db.updateInDatabase("textBox", { deleted_at: "2022-01-15 11:22:34" }, { heading: "Test Text Box Title" });
+        await db.updateInDatabase("textBox", { deleted_at: "2022-01-15 11:22:34" }, { heading: "Second Text Box" });
+        await db.updateInDatabase("textBox", { deleted_at: "2022-01-15 11:22:34" }, { heading: "Third Text Box" });
+    });
 });

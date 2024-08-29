@@ -210,6 +210,7 @@ export default class Homepage {
      * @param {string} headingText - The text to type into the heading field.
      */
     async typeTextBoxHeading(headingText: string) {
+        await this.page.waitForSelector(Homepage.ELEMENT_COMPONENT_EDIT_HEADING);
         await this.page.fill(Homepage.ELEMENT_COMPONENT_EDIT_HEADING, headingText);
     }
 
@@ -219,7 +220,7 @@ export default class Homepage {
      * @param {string} componentElement - The checkbox element name.
      */
     async uncheckComponentCheckbox(id: number, componentElement: string) {
-        // await this.page.locator(`label[for="component${id}-showComponentTitle"]`).click();
+        await this.page.waitForSelector(`label[for="component${id}-${componentElement}"]`);
         await this.page.locator(`label[for="component${id}-${componentElement}"]`).click();
     }
 

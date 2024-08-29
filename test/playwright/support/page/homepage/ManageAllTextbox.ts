@@ -32,8 +32,8 @@ export default class ManageAllTextbox {
      * @param { string } headingText - The heading text
      */
     async typeTextBoxHeading(textBoxItem: number, headingText: string) {
+        await this.page.waitForSelector(`input[name="textbox[${textBoxItem}][heading]`);
         await this.page.locator(`input[name="textbox[${textBoxItem}][heading]"]`).fill(headingText);
-        // await this.page.fill(`input[name="textbox[${textBoxItem}][heading]"]`, headingText);
     }
 
     /**
@@ -42,14 +42,8 @@ export default class ManageAllTextbox {
      * @param { string } contentText - The content text
      */
     async typeTextBoxContent(textBoxItem: number, contentText: string) {
-        // await this.page.fill(`#textbox-${textBoxItem}-body`, contentText);
-        // await this.tester.fillCKEditorByLocator(`#textbox-${textBoxItem}-body`, contentText);
-
         const descriptionTextarea = this.page.locator(`#textbox-${textBoxItem}-body`);
         await this.tester.fillCKEditorByLocator(descriptionTextarea, contentText);
-
-        // const descriptionTextarea = this.page.getByTestId(`component-textbox-${textBoxItem}`);
-        // await this.tester.fillCKEditorByLocator(descriptionTextarea, description);
     }
 
     /**
