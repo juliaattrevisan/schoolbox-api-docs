@@ -8,8 +8,9 @@
 
 namespace Schoolbox\Video\Factory;
 
+use Schoolbox\Mapper\Exception;
 use Schoolbox\Permission\Access\UserAccess;
-use Schoolbox\Resource\File\Model;
+use Schoolbox\Resource\AbstractFile;
 
 /**
  * Class Thumbnail
@@ -18,17 +19,21 @@ use Schoolbox\Resource\File\Model;
  */
 class Thumbnail extends Base
 {
-
     /**
-     * Check perms
+     * @inheritDoc
      *
-     * @param Model $file
-     * @throws \Exception
+     * @param AbstractFile $file
+     * @return bool
+     * @throws Exception
      */
-    protected function permissionCheck($file)
+    protected function permissionCheckFolder(AbstractFile $file): bool
     {
-        if ($this->getAccess()->getFolderAccess($_SESSION['user'], $file->getFolder()->getId()) < UserAccess::ACCESS_READ) {
-            \SitePage::redirectToBrokenImageOfSize(64, 64, 403);
+        if ($this->access->getFolderAccess($this->user, $file->getFolder()->getId()) >= UserAccess::ACCESS_READ) {
+            return true;
         }
+
+        \SitePage::redirectToBrokenImageOfSize(64, 64, 403);
+
+        return false;
     }
 }
