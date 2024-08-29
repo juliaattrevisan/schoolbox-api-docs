@@ -215,7 +215,11 @@ class Zone
     public function setMimeFilter($filter)
     {
         if ($filter === 'image/*') {
-            $filter = 'image/*,.heic,.heics,.heif';
+            /* .eps files have an image/x-eps mimetype which is accepted, but unusable
+             * .svg files have an image/svg+xml mimetype (not image/svg)
+             * .jpg files have the variant .jpeg and .pjpeg (progressive jpeg)
+             */
+            $filter = 'image/jpg,image/jpeg,image/gif,image/png,image/svg+xml,image/pjpeg,.heic,.heics,.heif';
         }
         $this->mimeFilter = $filter;
         return $this;
