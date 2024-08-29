@@ -47,6 +47,7 @@ class LtiCest
         $returnedNonce = $nonceRepo->find($nonceValue);
 
         #THEN
+        $i->assertEquals($nonceValue, $nonce->getValue());
         $i->assertEquals($nonce->getValue(), $returnedNonce->getValue());
     }
 
@@ -66,6 +67,43 @@ class LtiCest
         $returnedNonce = $nonceRepo->find($nonceValue);
 
         #THEN
+        $i->assertEquals($nonceValue, $nonce->getValue());
         $i->assertEquals($nonce->getValue(), $returnedNonce->getValue());
+    }
+
+    /**
+     * @param IntegrationTester $i
+     * @throws InvalidArgumentException
+     */
+    public function saveAndFindPotentiallyCollidingNonces(IntegrationTester $i): void
+    {
+        #GIVEN
+        $nonceRepo = new NonceRepository(new ArrayCachePool());
+        $nonceValue1 = '(';            // Stored with key 'lti1p3-nonce-openbracket'.
+        $nonceValue2 = 'openbracket';  // Stored with key 'lti1p3-nonce-openbracket-'.
+        $nonceValue3 = 'openbracket-'; // Stored with key 'lti1p3-nonce-openbracket--'.
+        $nonce1 = new Nonce($nonceValue1);
+        $nonce2 = new Nonce($nonceValue2);
+        $nonce3 = new Nonce($nonceValue3);
+
+        #WHEN
+        $nonceRepo->save($nonce1);
+        $nonceRepo->save($nonce2);
+        $nonceRepo->save($nonce3);
+
+        #THEN
+        $i->assertEquals($nonceValue1, $nonce1->getValue());
+        $i->assertEquals($nonceValue2, $nonce2->getValue());
+        $i->assertEquals($nonceValue3, $nonce3->getValue());
+
+        #WHEN
+        $returnedNonce1 = $nonceRepo->find($nonceValue1);
+        $returnedNonce2 = $nonceRepo->find($nonceValue2);
+        $returnedNonce3 = $nonceRepo->find($nonceValue3);
+
+        #THEN
+        $i->assertEquals($nonceValue1, $returnedNonce1->getValue());
+        $i->assertEquals($nonceValue2, $returnedNonce2->getValue());
+        $i->assertEquals($nonceValue3, $returnedNonce3->getValue());
     }
 }
