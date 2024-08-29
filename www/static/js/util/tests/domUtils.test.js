@@ -111,4 +111,14 @@ describe("addMarks()", () => {
             "&lt;a onmouseover=&#39;alert(document.domain)&#39;&gt;Mouse over <mark>this</mark>&lt;/a&gt;",
         );
     });
+
+    test("mark used in search words", () => {
+        const marksAdded = addMarks("Ms Majorie Michael", ["michael", "mark"]);
+        expect(marksAdded).toBe("Ms Majorie <mark>Michael</mark>");
+    });
+
+    test("part of mark also used in search words", () => {
+        const marksAdded = addMarks("this is cafe del mar, isn't it nice", ["nice", "mar", "mark", "cafe"]);
+        expect(marksAdded).toBe("this is <mark>cafe</mark> del <mark>mar</mark>, isn&#39;t it <mark>nice</mark>");
+    });
 });

@@ -325,8 +325,10 @@ export async function injectScriptsIfNotLoaded(params: InjectScriptsParams) {
  */
 export function addMarks(toMark: string, wordList: string[]): string {
     let marked = escape(toMark);
-    wordList.forEach((wordInSearch) => {
-        marked = marked.replace(RegExp(`${escapeRegExp(wordInSearch)}(?![^mark>]*mark>)`, "ig"), (match) => {
+    const uniqueWorkList = [...new Set(wordList)]; // remove any duplicate search words
+    uniqueWorkList.forEach((wordInSearch) => {
+        const regex = new RegExp(`(?<!<[^>]*)\\b${escapeRegExp(wordInSearch)}\\b(?![^<]*>)`, "ig");
+        marked = marked.replace(regex, (match) => {
             return `<mark>${match}</mark>`;
         });
     });
