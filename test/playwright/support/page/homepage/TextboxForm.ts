@@ -46,6 +46,14 @@ export default class TextboxForm {
         return this;
     }
 
+    async modify() {
+        await this.page
+            .locator('div[class="component-container Schoolbox_Resource_Textbox_Component_Homepage_Controller"]')
+            .scrollIntoViewIfNeeded();
+        await this.page.locator('button[data-action="modify"]').click();
+        return this;
+    }
+
     async save() {
         await this.page
             .locator('div[class="component-container Schoolbox_Resource_Textbox_Component_Homepage_Controller"]')

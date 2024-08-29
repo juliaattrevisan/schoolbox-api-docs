@@ -219,7 +219,8 @@ export default class Homepage {
      * @param {string} componentElement - The checkbox element name.
      */
     async uncheckComponentCheckbox(id: number, componentElement: string) {
-        await this.page.uncheck(`#component${id}-${componentElement}`);
+        // await this.page.locator(`label[for="component${id}-showComponentTitle"]`).click();
+        await this.page.locator(`label[for="component${id}-${componentElement}"]`).click();
     }
 
     /**

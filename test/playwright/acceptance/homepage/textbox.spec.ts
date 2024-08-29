@@ -201,6 +201,7 @@ test.describe("Textbox Tests", () => {
         const textboxId = (await db.grabFromDatabase("component_instance", "id", {
             identifier: homepageId,
         })) as number;
+        await textbox.modify();
         await textbox.fillContent("Jamal to be presented", textboxId);
         await textbox.save();
 

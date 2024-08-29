@@ -97,5 +97,5 @@ define('SQL_dsn_read', 'mysql:host=' . SQL_host_read . ';dbname=' . SQL_db_read)
 
 define('TEMPLATE_body', $config['TEMPLATE_body']);
 define('TEMPLATE_content', $config['TEMPLATE_content']);
-define('SENTRY_TOKEN', $config['SENTRY_TOKEN']);
-define('SENTRY_PROJECT', $config['SENTRY_PROJECT']);
+define('SENTRY_TOKEN', 'b4ffc1a71b02495c9bb37d6e3029a33d');
+define('SENTRY_PROJECT', '231649');
