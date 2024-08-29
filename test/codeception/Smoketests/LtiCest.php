@@ -79,9 +79,9 @@ class LtiCest
     {
         #GIVEN
         $nonceRepo = new NonceRepository(new ArrayCachePool());
-        $nonceValue1 = '(';            // Stored with key 'lti1p3-nonce-openbracket'.
-        $nonceValue2 = 'openbracket';  // Stored with key 'lti1p3-nonce-openbracket-'.
-        $nonceValue3 = 'openbracket-'; // Stored with key 'lti1p3-nonce-openbracket--'.
+        $nonceValue1 = '(';
+        $nonceValue2 = 'openbracket';
+        $nonceValue3 = 'openbracket-';
         $nonce1 = new Nonce($nonceValue1);
         $nonce2 = new Nonce($nonceValue2);
         $nonce3 = new Nonce($nonceValue3);
