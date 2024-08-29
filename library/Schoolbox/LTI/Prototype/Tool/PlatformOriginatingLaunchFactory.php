@@ -13,7 +13,7 @@ use Cache\Adapter\PHPArray\ArrayCachePool;
 use OAT\Library\Lti1p3Core\Message\Launch\Validator\Result\LaunchValidationResultInterface;
 use OAT\Library\Lti1p3Core\Message\Launch\Validator\Tool\ToolLaunchValidator;
 use OAT\Library\Lti1p3Core\Registration\RegistrationRepositoryInterface;
-use OAT\Library\Lti1p3Core\Security\Nonce\NonceRepository;
+use Schoolbox\LTI\Security\Nonce\NonceRepository;
 use Psr\Http\Message\ServerRequestInterface;
 
 /**
