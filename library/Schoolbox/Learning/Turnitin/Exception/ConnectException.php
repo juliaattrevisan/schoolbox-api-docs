@@ -16,5 +16,4 @@ namespace Schoolbox\Learning\Turnitin\Exception;
  */
 class ConnectException extends \DomainException
 {
-
 }
