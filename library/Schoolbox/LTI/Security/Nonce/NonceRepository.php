@@ -16,6 +16,8 @@ declare(strict_types=1);
 
 namespace Schoolbox\LTI\Security\Nonce;
 
+use OAT\Library\Lti1p3Core\Security\Nonce\Nonce;
+use OAT\Library\Lti1p3Core\Security\Nonce\NonceInterface;
 use OAT\Library\Lti1p3Core\Security\Nonce\NonceRepositoryInterface;
 use Psr\Cache\CacheItemPoolInterface;
 use Psr\Cache\InvalidArgumentException;
