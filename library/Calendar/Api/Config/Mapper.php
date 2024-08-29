@@ -179,7 +179,6 @@ class Calendar_Api_Config_Mapper extends BaseMapper
                 // check vcal permission
                 if (
                     $config instanceof Calendar_Api_Config_Connector_Vcal
-                    && !$user->isSuperuser()
                     && !$config->hasPermissions(
                         $user->getCampusCollection()->getPropertyValues('id'),
                         $user->getRole()->getId()
