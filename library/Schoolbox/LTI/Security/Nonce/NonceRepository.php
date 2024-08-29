@@ -27,9 +27,20 @@ use Psr\Cache\InvalidArgumentException;
 class NonceRepository implements NonceRepositoryInterface
 {
     /**
-     * These characters have been reserved by LTI for future extension.
+     * These characters have been reserved by LTI for future extension: {}()/\@:
+     * This array provides a mapping from reserved character to replacement string.
      */
-    private const LTI_RESERVED_CHARACTERS = '{}()/\@:';
+    private const PHPCACHE_RESERVED_CHARACTERS_MAP = [
+        '{' => 'openbrace',
+        '}' => 'closedbrace',
+        '(' => 'openbracket',
+        ')' => 'closedbracket',
+        '/' => 'slash',
+        '\\' => 'backslash',
+        '@' => 'ampersand',
+        ':' => 'colon'
+    ];
+
     private const CACHE_PREFIX = 'lti1p3-nonce';
 
     /** @var CacheItemPoolInterface */
@@ -45,11 +56,10 @@ class NonceRepository implements NonceRepositoryInterface
      */
     public function find(string $value): ?NonceInterface
     {
-        // TODO: Transform cache key used for retrieval into one
-        //       guaranteed not to contain reserved characters {}()/\@.
-        $itemKey = sprintf('%s-%s', self::CACHE_PREFIX, $value);
+        $originalItemKey = sprintf('%s-%s', self::CACHE_PREFIX, $value);
+        $transformedItemKey = self::replaceReservedCharacters($originalItemKey);
 
-        $item = $this->cache->getItem($itemKey);
+        $item = $this->cache->getItem($transformedItemKey);
 
         return $item->isHit() ? new Nonce($item->get()) : null;
     }
@@ -59,14 +69,36 @@ class NonceRepository implements NonceRepositoryInterface
      */
     public function save(NonceInterface $nonce): void
     {
-        // TODO: Transform cache key used for storage into one
-        //       guaranteed not to contain reserved characters {}()/\@.
-        $itemKey = sprintf('%s-%s', self::CACHE_PREFIX, $nonce->getValue());
+        $originalItemKey = sprintf('%s-%s', self::CACHE_PREFIX, $nonce->getValue());
+        $transformedItemKey = self::replaceReservedCharacters($originalItemKey);
 
-        $item = $this->cache->getItem($itemKey);
+        $item = $this->cache->getItem($transformedItemKey);
 
         $this->cache->save(
             $item->set($nonce->getValue())->expiresAt($nonce->getExpiredAt())
+        );
+    }
+
+    /**
+     * Return a transformed version of the given string.
+     * The transformed version will have each reserved character found in the given string replaced with a string
+     * representation that does not include any reserved characters.
+     * This method guarantees that each item key will map to a single replacement key.
+     *
+     * Cache key validation rules from php-cache AbstractCachePool->validateKey():
+     *  - Cache key must be string.
+     *  - Cache key cannot be an empty string.
+     *  - The key contains one or more characters reserved for future extension: {}()/\@:.
+     *
+     * @param string $itemKey
+     * @return string
+     */
+    private static function replaceReservedCharacters(string $itemKey): string
+    {
+        return str_replace(
+            array_keys(self::PHPCACHE_RESERVED_CHARACTERS_MAP),
+            array_values(self::PHPCACHE_RESERVED_CHARACTERS_MAP),
+            $itemKey
         );
     }
 }
