@@ -273,7 +273,7 @@ class AssessmentForm
         $i->click('a#participant-customise');
         $i->waitForText('Create New Learning Plan');
         $i->fillField('input#plan-name', $planName);
-        $i->fillField('input#plan-due-date', $date);
+        $i->fillField('input#planDueDate', $date);
         $i->click(self::SELECTOR_BUTTON_SAVE);
         return $this;
     }
