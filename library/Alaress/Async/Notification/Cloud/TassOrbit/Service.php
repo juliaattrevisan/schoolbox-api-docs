@@ -60,6 +60,13 @@ class Service extends AbstractService
                 return false;
             }
 
+            /*
+             * Notes from Amri:
+             * External_Tass_Helper uses a static reference to a Config object for fetching the spouse prefix:
+             * this will probably cause issues when it's time to make the mobile daemon instance-agnostic,
+             * because the config which should be used will differ depending on which instance the message is sent from.
+             */
+            //TODO making sure that when mobile instance changed, this will need to be looked at again
             $tassHelper = new \External_Tass_Helper();
             /**
              * Parent/Spouse prefixes = P or S by default
