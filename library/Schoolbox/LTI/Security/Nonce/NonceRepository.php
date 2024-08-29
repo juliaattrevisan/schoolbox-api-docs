@@ -110,7 +110,8 @@ class NonceRepository implements NonceRepositoryInterface
      * Return a transformed version of the given string.
      * The transformed version will have each reserved character found in the given string replaced with a string
      * representation that does not include any reserved characters.
-     * This method guarantees that each item key will map to a single replacement key.
+     * This method (together with the extra replacement pairs defined in self::PHPCACHE_RESERVED_CHARACTERS_MAP),
+     * guarantees that each item key will map to a single replacement key.
      *
      * Cache key validation rules from php-cache AbstractCachePool->validateKey():
      *  - Cache key must be string.
