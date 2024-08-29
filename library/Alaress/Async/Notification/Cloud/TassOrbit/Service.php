@@ -50,12 +50,14 @@ class Service extends AbstractService
             }
 
             if (!$recipient->getExternalId()) {
-                throw new \InvalidArgumentException('User does not have a valid external id.');
+                $this->getLog()->warning('User does not have a valid external id.');
+                return false;
             }
 
             $tassParentIdLength = trim($this->configLoader->get('external_tass_parent_id_length'));
             if (!is_numeric($tassParentIdLength)) {
-                throw new \InvalidArgumentException('Tass Parent ID length must be a number.');
+                $this->getLog()->warning('Tass Parent ID length must be a number.');
+                return false;
             }
 
             $tassHelper = new \External_Tass_Helper();
@@ -82,7 +84,8 @@ class Service extends AbstractService
             //Parent Code should exist and be a non-falsey value
             //Parent code length should be a number
             if (!$parCode) {
-                throw new \InvalidArgumentException('Unable to derive Parent Code from the external id.');
+                $this->getLog()->warning('Unable to derive Parent Code from the external id.');
+                return false;
             }
 
             $key = json_decode($this->config, true);
@@ -145,7 +148,7 @@ class Service extends AbstractService
 
             $this->getLog()->info($response['message'] ?? 'No message received from response.');
             return true;
-        } catch (\InvalidArgumentException | \RuntimeException $e) {
+        } catch (\RuntimeException $e) {
             $this->getLog()->warning($e->getMessage());
             return false;
         } catch (\Exception $e) {
