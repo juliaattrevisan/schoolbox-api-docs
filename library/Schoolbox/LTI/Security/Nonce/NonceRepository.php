@@ -31,14 +31,33 @@ class NonceRepository implements NonceRepositoryInterface
      * This array provides a mapping from reserved character to replacement string.
      */
     private const PHPCACHE_RESERVED_CHARACTERS_MAP = [
-        '{' => 'openbrace',
-        '}' => 'closedbrace',
-        '(' => 'openbracket',
+        'openbrace'     => 'openbrace-'    ,
+        'closedbrace'   => 'closedbrace-'  ,
+        'openbracket'   => 'openbracket-'  ,
+        'closedbracket' => 'closedbracket-',
+        'slash'         => 'slash-'        ,
+        'backslash'     => 'backslash-'    ,
+        'ampersand'     => 'ampersand-'    ,
+        'colon'         => 'colon-'        ,
+
+        // The keys here are the actual reserved characters, and the values are the replacements.
+        // The extra keys above have been added to prevent collisions of this kind:
+        //    '('           (transform)=> 'openbracket'
+        //    'openbracket' (transform)=> 'openbracket' (collision with above row!)
+        //
+        // It is important that the extra keys are positioned before the actual keys in the array.
+        // The reason is to avoid two transformations being done as the string replaces are done in order.
+        // E.g.
+        //    We want:       '(' => 'openbracket'.
+        //    We don't want: '(' => 'openbracket' => 'openbracket-'.
+        '{' => 'openbrace'    ,
+        '}' => 'closedbrace'  ,
+        '(' => 'openbracket'  ,
         ')' => 'closedbracket',
-        '/' => 'slash',
-        '\\' => 'backslash',
-        '@' => 'ampersand',
-        ':' => 'colon'
+        '/' => 'slash'        ,
+        '\\' => 'backslash'   ,
+        '@' => 'ampersand'    ,
+        ':' => 'colon'        ,
     ];
 
     private const CACHE_PREFIX = 'lti1p3-nonce';
@@ -58,9 +77,11 @@ class NonceRepository implements NonceRepositoryInterface
     {
         $originalItemKey = sprintf('%s-%s', self::CACHE_PREFIX, $value);
         $transformedItemKey = self::replaceReservedCharacters($originalItemKey);
+    echo "Finding nonce with key '$transformedItemKey'...";
 
         $item = $this->cache->getItem($transformedItemKey);
 
+    echo "Found nonce '" . (new Nonce($item->get()))->getValue() . "'\n";
         return $item->isHit() ? new Nonce($item->get()) : null;
     }
 
@@ -72,6 +93,7 @@ class NonceRepository implements NonceRepositoryInterface
         $originalItemKey = sprintf('%s-%s', self::CACHE_PREFIX, $nonce->getValue());
         $transformedItemKey = self::replaceReservedCharacters($originalItemKey);
 
+    echo "Saving nonce with original key '$originalItemKey', transformed key '$transformedItemKey'\n";
         $item = $this->cache->getItem($transformedItemKey);
 
         $this->cache->save(
