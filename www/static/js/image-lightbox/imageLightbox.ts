@@ -5,13 +5,13 @@
  */
 
 import lightGallery from "lightgallery";
-import type { LightGallery } from "lightgallery/lightgallery";
 import type { LightGallerySettings } from "lightgallery/lg-settings";
 import type { GalleryItem } from "lightgallery/lg-utils";
 import type { VideoSource } from "lightgallery/plugins/video/types";
 import "lightgallery/css/lightgallery-bundle.min.css";
 import imageLightboxDefaults from "./imageLightboxDefaults";
 import "./imageLightbox.css";
+import { IMAGE_LIGHTBOX_CREATE } from "./imageLightboxEvent";
 
 /**
  * Initialize lightGallery using a elements with rel="lightbox" as the source
@@ -83,14 +83,6 @@ function initLightGallery(): void {
     });
 }
 
-interface ImageLightboxCreateEvent extends CustomEvent {
-    detail: {
-        targetKey: string;
-        options: LightGallerySettings;
-        onCreated?: (gallery: LightGallery) => void;
-    };
-}
-
 /**
  * Allow pages to create a lightbox dynamically using the IMAGE-LIGHTBOX__CREATE event
  * This is useful for pages which need create a new lightbox after the page has already loaded
@@ -100,8 +92,8 @@ interface ImageLightboxCreateEvent extends CustomEvent {
  * - targetKey: the rel key to distinguish the lightbox
  * - options: options to pass to lightGallery
  */
-document.addEventListener("IMAGE-LIGHTBOX__CREATE", (e) => {
-    const eventDetail = (e as ImageLightboxCreateEvent).detail;
+document.addEventListener(IMAGE_LIGHTBOX_CREATE, (e) => {
+    const eventDetail = e.detail;
     let targetElement = document.querySelector(`[data-image-lightbox='${eventDetail.targetKey}']`) as HTMLElement;
 
     // Create a new element for the lightbox, hidden on the page

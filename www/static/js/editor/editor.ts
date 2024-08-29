@@ -151,9 +151,9 @@ function onDelete(eventDetail: EditorDeleteEventInfo) {
 }
 
 document.addEventListener(EditorEvent.EDITOR__CREATE, (event) => {
-    const configWithDefaults = addDefaultConfig((event as CustomEvent<PartialSbxEditorConfig>).detail);
+    const configWithDefaults = addDefaultConfig(event.detail);
     void onCreate(configWithDefaults);
 });
 document.addEventListener(EditorEvent.EDITOR__DELETE, (event) => {
-    onDelete((event as CustomEvent<EditorDeleteEventInfo>).detail);
+    onDelete(event.detail);
 });

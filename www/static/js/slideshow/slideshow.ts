@@ -5,6 +5,7 @@ import type { SwiperOptions } from "node_modules/swiper/types/swiper-options";
 
 // import styles bundle
 import "swiper/css/bundle";
+import { SWIPER_INIT } from "./slideshowEvent";
 
 const swiperDefaults: SwiperOptions = {
     autoplay: true,
@@ -23,19 +24,12 @@ const swiperDefaults: SwiperOptions = {
     },
 };
 
-interface SwiperInitializeEvent extends CustomEvent {
-    detail: {
-        target: HTMLElement;
-        options: SwiperOptions;
-    };
-}
-
 // Prevent creating multiple event listeners
 if (window.sbProps.imageSlideshowListenerExists === undefined) {
     window.sbProps.imageSlideshowListenerExists = true;
 
-    document.addEventListener("swiperInitialize", (e) => {
-        const eventDetail = (e as SwiperInitializeEvent).detail;
+    document.addEventListener(SWIPER_INIT, (e) => {
+        const eventDetail = e.detail;
         const swiperEl = eventDetail.target;
 
         // Prevent multiple initializations

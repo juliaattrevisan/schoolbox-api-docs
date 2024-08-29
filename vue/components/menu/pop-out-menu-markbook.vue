@@ -18,6 +18,7 @@ import SmallCard from "../card/small-card.vue";
 import PopOutMenuItem from "./pop-out-menu-item.vue";
 import PopOutMenuDivider from "./pop-out-menu-divider.vue";
 import UserPhoto from "../userPhoto/user-photo.vue";
+import { EVENT_POP_OUT_MENU_MARKBOOK_SELECTED } from "./popOutMenuMarkbookEvent";
 import type { PopOutMenuMarkbookSelectedEvent, PopOutMenuMarkbookRoutes } from "./popOutMenuMarkbookEvent";
 
 /**
@@ -365,7 +366,7 @@ window.Vue.onMounted(() => {
      * Start listening for selection events
      * Currenty dispatched from library/Schoolbox/Learning/Markbook/templates/markbookOuter.twig
      */
-    document.addEventListener("pop-out-menu-markbook__selected", () => void onPopOutSelected);
+    document.addEventListener(EVENT_POP_OUT_MENU_MARKBOOK_SELECTED, onPopOutSelected);
     document.addEventListener("click", onMouseClick);
 });
 
@@ -373,7 +374,7 @@ window.Vue.onMounted(() => {
  * Remove the added listeners
  */
 window.Vue.onUnmounted(() => {
-    document.removeEventListener("pop-out-menu-markbook__selected", () => void onPopOutSelected);
+    document.removeEventListener(EVENT_POP_OUT_MENU_MARKBOOK_SELECTED, onPopOutSelected);
     document.removeEventListener("click", onMouseClick);
 });
 

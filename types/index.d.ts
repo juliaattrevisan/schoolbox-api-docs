@@ -13,6 +13,7 @@ import type { SbxEditor } from "@js/editor/types/editorTypes";
 import type { RosettaStone } from "@js/terminology/rosettaStone";
 import type { injectScriptsIfNotLoaded } from "@js/util/domUtils";
 import type { pwaConfig } from "@js/global/pwaConfig";
+import type { SbxGlobalDocumentEventHandlerMap, SbxGlobalElementEventHandlerMap } from "./sbxEvents";
 
 declare global {
     interface Window {
@@ -66,6 +67,12 @@ declare global {
         STORYBOOK_ENV: string;
         Vue: typeof Vue;
     }
+
+    // Add our custom events to the DocumentEventMap, so we can use them in event listeners
+    interface DocumentEventMap extends GlobalEventHandlersEventMap, SbxGlobalDocumentEventHandlerMap {}
+
+    // Add our custom events to the HTMLElementEventMap, so we can use them in event listeners
+    interface HTMLElementEventMap extends GlobalEventHandlersEventMap, SbxGlobalElementEventHandlerMap {}
 
     interface JQuery {
         // we can add any extra methods we have extended onto the JQuery object here

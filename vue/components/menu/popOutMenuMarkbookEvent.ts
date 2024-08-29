@@ -21,3 +21,9 @@ export interface PopOutMenuMarkbookSelectedEvent {
     isParticipant: boolean;
     assessmentType: ActivityType;
 }
+
+export const EVENT_POP_OUT_MENU_MARKBOOK_SELECTED = "pop-out-menu-markbook__selected";
+
+export interface PopOutMenuMarkbookDocumentEventHandlerMap {
+    [EVENT_POP_OUT_MENU_MARKBOOK_SELECTED]: CustomEvent<PopOutMenuMarkbookSelectedEvent>;
+}

@@ -392,8 +392,6 @@ export function insertWordCount(sourceElement: SbxEditorElement, editor: SbxEdit
         // NOTE: The below line may be called multiple times (if multiple editors are added to a page), but the repeated
         //       calls will not cause the event listener to be added multiple times.  This would be different if the
         //       function was defined inside the call below.
-        document.addEventListener(EditorEvent.EDITOR__DELETED, (e) =>
-            onEditorDeleted((e as CustomEvent<EditorDeletedEventInfo>).detail),
-        );
+        document.addEventListener(EditorEvent.EDITOR__DELETED, (e) => onEditorDeleted(e.detail));
     }
 }
