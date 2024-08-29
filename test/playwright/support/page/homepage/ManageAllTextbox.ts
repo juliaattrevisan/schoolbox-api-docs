@@ -32,7 +32,7 @@ export default class ManageAllTextbox {
      * @param { string } headingText - The heading text
      */
     async typeTextBoxHeading(textBoxItem: number, headingText: string) {
-        await this.page.waitForSelector(`input[name="textbox[${textBoxItem}][heading]`);
+        await this.page.waitForSelector(`input[name="textbox[${textBoxItem}][heading]"]`);
         await this.page.locator(`input[name="textbox[${textBoxItem}][heading]"]`).fill(headingText);
     }
 
