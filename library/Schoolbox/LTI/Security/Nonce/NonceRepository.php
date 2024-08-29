@@ -40,10 +40,15 @@ class NonceRepository implements NonceRepositoryInterface
         'ampersand'     => 'ampersand-'    ,
         'colon'         => 'colon-'        ,
 
-        // The keys here are the actual reserved characters, and the values are the replacements.
-        // The extra keys above have been added to prevent collisions of this kind:
+        // The key/value pairs below are the actual reserved characters and replacement strings.
+        // The extra key/value pairs above have been added to prevent collisions of this kind:
         //    '('           (transform)=> 'openbracket'
         //    'openbracket' (transform)=> 'openbracket' (collision with above row!)
+        //
+        // With the extra keys above the potential collisions are avoided as follows:
+        //    '('            (transform)=> 'openbracket'
+        //    'openbracket'  (transform)=> 'openbracket-'
+        //    'openbracket-' (transform)=> 'openbracket--'
         //
         // It is important that the extra keys are positioned before the actual keys in the array.
         // The reason is to avoid two transformations being done as the string replaces are done in order.
