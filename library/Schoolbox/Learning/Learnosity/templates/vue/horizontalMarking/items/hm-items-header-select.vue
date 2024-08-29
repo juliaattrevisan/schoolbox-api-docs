@@ -3,7 +3,6 @@
  * To move between the items
  */
 
-import type { Ref } from "vue";
 import { usePopOut } from "@schoolboxVue/composables/popOut/usePopOut";
 import { useStore } from "../store/horizontalMarkingStore";
 import { useItemsStore } from "../store/hmItemsStore";
@@ -13,9 +12,9 @@ const itemsStore = useItemsStore();
 
 const button = window.Vue.ref<HTMLButtonElement | null>(null); // The button that triggers the dropdown display
 const { currentLabel, isOpen, onButtonSelected, close } = usePopOut(
-    button as Ref<HTMLButtonElement>,
-    "Actions",
+    button,
     "item-list",
+    "Actions",
     "bottom-start",
     true,
 );
