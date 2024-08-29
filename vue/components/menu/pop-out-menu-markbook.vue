@@ -13,7 +13,6 @@ import {
 } from "@schoolboxAssessment/Types/assessmentTypes";
 import type { ActivityType } from "@schoolboxAssessment/Types/assessmentTypes";
 import RevealModal from "@schoolboxVue/components/reveal-modal.vue";
-import PopOut from "../popOut/pop-out.vue";
 import SmallCard from "../card/small-card.vue";
 import PopOutMenuItem from "./pop-out-menu-item.vue";
 import PopOutMenuDivider from "./pop-out-menu-divider.vue";
@@ -414,15 +413,7 @@ function onToggleSelected() {
 </script>
 
 <template>
-    <pop-out
-        v-if="showPopOut"
-        ref="popOutElement"
-        :style="{
-            position: strategy,
-            top: `${y ?? 0}px`,
-            left: `${x ?? 0}px`,
-        }"
-    >
+    <div ref="popOutElement" class="o-pop-out" style="display: none">
         <div v-if="hasLoadError">
             <pop-out-menu-item class="is-disabled">
                 <div class="s-warning-message">
@@ -574,6 +565,22 @@ function onToggleSelected() {
         &:first-child {
             display: flex;
         }
+    }
+}
+.o-pop-out {
+    background-color: #fff;
+    border-radius: 0.25rem;
+    box-shadow: 0px 0px 6px rgba(0, 0, 0, 0.2);
+    min-width: 2rem;
+    min-height: 2rem;
+    padding: 0.5rem 0;
+    position: absolute;
+    z-index: var(--sbx-depth-pop-over);
+
+    &__divider {
+        border: 1px solid rgba(255, 0, 0, 0.15);
+        margin-block-end: 0;
+        margin-block-start: 0.5rem;
     }
 }
 </style>
