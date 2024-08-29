@@ -32,14 +32,6 @@ use Tests\Support\IntegrationTester;
 class LtiCest
 {
     /**
-     * Hook method to execute prior to each test
-     * @param IntegrationTester $i
-     */
-    public function _before(IntegrationTester $i): void
-    {
-    }
-
-    /**
      * @param IntegrationTester $i
      * @throws InvalidArgumentException
      */
