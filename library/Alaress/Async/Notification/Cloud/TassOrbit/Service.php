@@ -136,7 +136,7 @@ class Service extends AbstractService
                     ->buildFullyQualified()
                     ->withPath($notification->getHref());
                 $notifRequest['detail_message'] =
-                    htmlspecialchars("<p>More Details: <a href='$detailMessage'>" . $this->configLoader->get('title') . "</a></p>");
+                    "<p>More Details: <a href='" . htmlspecialchars($detailMessage) . "'>" . htmlspecialchars($this->configLoader->get('title')) . "</a></p>";
             }
 
             $this->getLog()->info(json_encode($notifRequest));
