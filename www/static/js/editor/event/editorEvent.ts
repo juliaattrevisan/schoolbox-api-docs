@@ -1,4 +1,4 @@
-import type { SbxEditor } from "../types/editorTypes";
+import type { PartialSbxEditorConfig, SbxEditor } from "../types/editorTypes";
 
 /**
  * The different events that can be dispatched by the editor
@@ -51,3 +51,18 @@ export type EditorDeletedEventInfo = {
     containingFormId: string;
     submitButtons: Array<HTMLInputElement | HTMLButtonElement>;
 };
+
+// The map of event names to event objects that are dispatched on the document
+export interface EditorDocumentEventHandlerMap {
+    [EditorEvent.EDITOR__CREATE]: CustomEvent<PartialSbxEditorConfig>;
+    [EditorEvent.EDITOR__DELETE]: CustomEvent<EditorDeleteEventInfo>;
+    [EditorEvent.EDITOR__DELETED]: CustomEvent<EditorDeletedEventInfo>;
+}
+
+// The map of event names to event objects that are dispatched on elements
+export interface EditorElementEventHandlerMap {
+    [EditorEvent.EDITOR__CREATED]: CustomEvent<EditorCreatedEventInfo>; // Dispatched on the editor's sourceElement
+    [EditorEvent.EDITOR__CHECK_DATA]: CustomEvent; // Dispatched on the editor's sourceElement
+    [EditorEvent.EDITOR__MAX_CHAR_COUNT_EXCEEDED]: CustomEvent; // Dispatched on the editor's sourceElement
+    [EditorEvent.EDITOR__MAX_CHAR_COUNT_NO_LONGER_EXCEEDED]: CustomEvent; // Dispatched on the editor's sourceElement
+}

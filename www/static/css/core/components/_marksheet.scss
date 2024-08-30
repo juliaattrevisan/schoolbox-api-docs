@@ -193,6 +193,10 @@
             white-space: nowrap;
         }
 
+        .is-selected {
+            background-color: var(--content-ui-hover);
+        }
+
         [data-pop-out-menu] {
             cursor: pointer;
 

@@ -1,11 +1,10 @@
 <script setup lang="ts">
 /**
  * To display recent history on a selected mark book item as well
- * as provide quick links to futher actions
+ * as provide quick links to further actions
  */
 
 import type { Ref } from "vue";
-import { useFloating, autoUpdate, flip, shift, offset } from "@floating-ui/vue";
 import {
     ACTIVITY_TYPE_TASK,
     ACTIVITY_TYPE_PROJECT,
@@ -13,11 +12,12 @@ import {
 } from "@schoolboxAssessment/Types/assessmentTypes";
 import type { ActivityType } from "@schoolboxAssessment/Types/assessmentTypes";
 import RevealModal from "@schoolboxVue/components/reveal-modal.vue";
-import PopOut from "../popOut/pop-out.vue";
+import { usePopOut } from "@schoolboxVue/composables/popOut/usePopOut";
 import SmallCard from "../card/small-card.vue";
 import PopOutMenuItem from "./pop-out-menu-item.vue";
 import PopOutMenuDivider from "./pop-out-menu-divider.vue";
 import UserPhoto from "../userPhoto/user-photo.vue";
+import { EVENT_POP_OUT_MENU_MARKBOOK_SELECTED } from "./popOutMenuMarkbookEvent";
 import type { PopOutMenuMarkbookSelectedEvent, PopOutMenuMarkbookRoutes } from "./popOutMenuMarkbookEvent";
 
 /**
@@ -45,9 +45,7 @@ const referenceElement = window.Vue.ref<HTMLDivElement | null>(null);
 const assessmentType = window.Vue.ref<ActivityType>();
 
 const isLoading = window.Vue.ref(false);
-const isSelected = window.Vue.ref(false);
 const hasLoadError = window.Vue.ref(false);
-const showPopOut = window.Vue.computed(() => isSelected.value);
 const isExpanded = window.Vue.ref(false); // is recent activity expanded
 const activityItems: Ref<ActivityItem[]> = window.Vue.ref([]); // list of recent activity items to display
 // has an event of type 'response' and response.submitted === true;
@@ -80,24 +78,23 @@ const markbookElement = window.Vue.ref<HTMLDivElement | null>(null);
 const excludeModalEl = window.Vue.ref<InstanceType<typeof RevealModal> | null>(null);
 
 /**
- * Middleware are optional modifiers you can provide to floating-ui. Things that determine how
- * a floating item should flip, shift itself or rotate to prevent overflowing a parent container.
+ * When the pop out is closed, clear out the selected state
  */
-const { x, y, strategy } = useFloating(referenceElement, popOutElement, {
-    placement: "right-start",
-    middleware: [
-        offset({
-            mainAxis: 4,
-        }),
-        flip({
-            crossAxis: false,
-        }),
-        shift({
-            padding: 16,
-        }),
-    ],
-    whileElementsMounted: autoUpdate,
-});
+function onPopOutClosed() {
+    referenceElement.value?.classList.remove("is-selected");
+    referenceElement.value = null;
+}
+
+const { onButtonSelected } = usePopOut(
+    referenceElement,
+    popOutElement,
+    "",
+    "right-start",
+    undefined,
+    undefined,
+    undefined,
+    onPopOutClosed,
+);
 
 /**
  *  Used to determine the text shown on the "recent activity" menu
@@ -171,16 +168,6 @@ async function getActivity() {
 }
 
 /**
- * Close the pop out
- */
-function closePopOut() {
-    isSelected.value = false;
-    // Clear out any selected states.
-    referenceElement.value?.classList.remove("is-selected");
-    referenceElement.value = null;
-}
-
-/**
  * hack to refresh the markbook
  * clone from `library/Schoolbox/Filter/templates/panel.twig` to trigger the js on-click function
  *         // Listen for clicks on the submit button
@@ -192,7 +179,7 @@ function closePopOut() {
  *         });
  */
 function reloadMarkbook() {
-    closePopOut();
+    onPopOutClosed();
 
     // reload the markbook
     document.getElementById("submit_button")?.click();
@@ -305,14 +292,22 @@ async function exclude() {
 }
 
 /**
+ * Open the pop out modal, waits for a tick to ensure the element is available
+ * since we just changed it.
+ */
+async function openPopOut() {
+    await window.Vue.nextTick();
+    await onButtonSelected();
+}
+
+/**
  * A linked button has been selected so populate the pop out
  * @param { CustomEvent<PopOutMenuMarkbookSelectedEvent> } event - the event fired from the mark book
  */
-async function onPopOutSelected(event: CustomEvent<PopOutMenuMarkbookSelectedEvent>) {
+function onPopOutSelected(event: CustomEvent<PopOutMenuMarkbookSelectedEvent>) {
     // Make sure we're not reloading a menu we already have open.
     if (referenceElement.value !== event.detail.target) {
         routes.value = event.detail.routes;
-        isSelected.value = true;
         isExpanded.value = false;
         isExcluded.value = event.detail.isExcluded;
         isParticipant.value = event.detail.isParticipant;
@@ -325,56 +320,25 @@ async function onPopOutSelected(event: CustomEvent<PopOutMenuMarkbookSelectedEve
             activityItems.value = [];
             return;
         }
-        await getActivity();
+
+        void getActivity();
+        void openPopOut();
     }
 }
 
 /**
- * to be able to close the search results
- * when selection outside is made
- * @param { event } event - the mouse event
- */
-function onMouseClick(event: MouseEvent) {
-    const eventTarget = event.target;
-    const currentExcludeModalEl = excludeModalEl.value;
-
-    if (
-        showPopOut.value &&
-        markbookElement.value !== null &&
-        currentExcludeModalEl !== null &&
-        eventTarget instanceof Node &&
-        !markbookElement.value.contains(eventTarget) &&
-        referenceElement.value !== eventTarget
-    ) {
-        // Prevent the pop out from closing if the exclude modal is open and the click is within the modal.
-        const modalElement = (currentExcludeModalEl.modal[0] as HTMLElement) || undefined;
-        if (modalElement !== undefined && modalElement.contains(eventTarget)) {
-            return;
-        }
-
-        closePopOut();
-    }
-}
-
-/**
- * Listen for selections to display the pop out as well as
- * any mouse clicks so we can close the pop out when suitable
+ * Start listening for selection events
+ * Currently dispatched from library/Schoolbox/Learning/Markbook/templates/markbookOuter.twig
  */
 window.Vue.onMounted(() => {
-    /**
-     * Start listening for selection events
-     * Currenty dispatched from library/Schoolbox/Learning/Markbook/templates/markbookOuter.twig
-     */
-    document.addEventListener("pop-out-menu-markbook__selected", () => void onPopOutSelected);
-    document.addEventListener("click", onMouseClick);
+    document.addEventListener(EVENT_POP_OUT_MENU_MARKBOOK_SELECTED, onPopOutSelected);
 });
 
 /**
  * Remove the added listeners
  */
 window.Vue.onUnmounted(() => {
-    document.removeEventListener("pop-out-menu-markbook__selected", () => void onPopOutSelected);
-    document.removeEventListener("click", onMouseClick);
+    document.removeEventListener(EVENT_POP_OUT_MENU_MARKBOOK_SELECTED, onPopOutSelected);
 });
 
 /**
@@ -400,7 +364,7 @@ function getAction(item: ActivityItem): string {
         return `${item.published ? "published" : "drafted"} feedback`;
     }
 
-    // At least return blank as we're expeceted to return something
+    // At least return blank as we're expected to return something
     return "";
 }
 
@@ -413,29 +377,21 @@ function onToggleSelected() {
 </script>
 
 <template>
-    <pop-out
-        v-if="showPopOut"
-        ref="popOutElement"
-        :style="{
-            position: strategy,
-            top: `${y ?? 0}px`,
-            left: `${x ?? 0}px`,
-        }"
-    >
+    <div ref="popOutElement" class="pop-out" style="display: none">
         <div v-if="hasLoadError">
             <pop-out-menu-item class="is-disabled">
-                <div class="s-warning-message">
+                <div class="warning-message">
                     There was an error during data retrieval. Please
                     <a href="" title="refresh the page"> refresh the page </a>
                     to try again and contact your support if the problem persists
                 </div>
             </pop-out-menu-item>
         </div>
-        <div v-else-if="isLoading && !hasLoadError" class="c-pop-out-menu__loader">
+        <div v-else-if="isLoading && !hasLoadError" class="pop-out-menu__loader">
             <div class="loader"></div>
         </div>
-        <div v-else ref="markbookElement" class="c-pop-out-menu" :class="{ 'is-expanded': isExpanded }">
-            <div class="s-collapsible">
+        <div v-else ref="markbookElement" class="pop-out-menu" :class="{ 'is-expanded': isExpanded }">
+            <div class="collapsible">
                 <small-card v-for="(activityItem, index) in activityItems" :key="index">
                     <user-photo
                         :src="`/portrait.php?id=${activityItem.effector.id}&size=square32`"
@@ -447,7 +403,7 @@ function onToggleSelected() {
                     </div>
                 </small-card>
             </div>
-            <div class="c-pop-out-menu__options">
+            <div class="pop-out-menu__options">
                 <template v-if="assessmentType !== ACTIVITY_TYPE_PROJECT">
                     <pop-out-menu-item
                         :class="{ 'is-disabled': isExpansionDisabled || isActivityEmpty }"
@@ -523,11 +479,28 @@ function onToggleSelected() {
                 </li>
             </ul>
         </reveal-modal>
-    </pop-out>
+    </div>
 </template>
 
-<style lang="scss">
-.c-pop-out-menu {
+<style lang="scss" scoped>
+.pop-out {
+    background-color: #fff;
+    border-radius: 0.25rem;
+    box-shadow: 0px 0px 6px rgba(0, 0, 0, 0.2);
+    min-width: 16rem;
+    min-height: 8rem;
+    padding: 0.5rem 0;
+    position: absolute;
+    z-index: var(--sbx-depth-pop-over);
+
+    &__divider {
+        border: 1px solid rgba(255, 0, 0, 0.15);
+        margin-block-end: 0;
+        margin-block-start: 0.5rem;
+    }
+}
+
+.pop-out-menu {
     white-space: normal;
     width: 16rem;
 
@@ -537,7 +510,7 @@ function onToggleSelected() {
 }
 
 // Locally scoped class specifically for the error warning message
-.s-warning-message {
+.warning-message {
     max-width: 16rem;
 
     // Allow pointer events on a disabled parent container.
@@ -547,11 +520,11 @@ function onToggleSelected() {
 }
 
 .is-expanded {
-    .s-collapsible > .c-card {
+    .collapsible > .c-card {
         display: flex;
     }
 
-    .c-pop-out-menu__options {
+    .pop-out-menu__options {
         .c-menu-item,
         .c-menu-item__divider {
             display: none;
@@ -563,7 +536,7 @@ function onToggleSelected() {
     }
 }
 
-.s-collapsible {
+.collapsible {
     max-height: 20rem;
     overflow-y: auto;
 

@@ -47,7 +47,6 @@
         "@firebase/app": "^0.10.9",
         "@firebase/messaging": "^0.12.10",
         "@floating-ui/dom": "~1.6.10",
-        "@floating-ui/vue": "~1.0.6",
         "@fullcalendar/adaptive": "~6.1.15",
         "@fullcalendar/core": "~6.1.15",
         "@fullcalendar/daygrid": "~6.1.15",
@@ -4588,41 +4587,6 @@
       "version": "0.2.7",
       "resolved": "https://registry.npmjs.org/@floating-ui/utils/-/utils-0.2.7.tgz",
       "integrity": "sha512-X8R8Oj771YRl/w+c1HqAC1szL8zWQRwFvgDwT129k9ACdBoud/+/rX9V0qiMl6LWUdP9voC2nDVZYPMQQsb6eA=="
-    },
-    "node_modules/@floating-ui/vue": {
-      "version": "1.0.6",
-      "resolved": "https://registry.npmjs.org/@floating-ui/vue/-/vue-1.0.6.tgz",
-      "integrity": "sha512-EdrOljjkpkkqZnrpqUcPoz9NvHxuTjUtSInh6GMv3+Mcy+giY2cE2pHh9rpacRcZ2eMSCxel9jWkWXTjLmY55w==",
-      "dependencies": {
-        "@floating-ui/dom": "^1.6.1",
-        "@floating-ui/utils": "^0.2.1",
-        "vue-demi": ">=0.13.0"
-      }
-    },
-    "node_modules/@floating-ui/vue/node_modules/vue-demi": {
-      "version": "0.13.11",
-      "resolved": "https://registry.npmjs.org/vue-demi/-/vue-demi-0.13.11.tgz",
-      "integrity": "sha512-IR8HoEEGM65YY3ZJYAjMlKygDQn25D5ajNFNoKh9RSDMQtlzCxtfQjdQgv9jjK+m3377SsJXY8ysq8kLCZL25A==",
-      "hasInstallScript": true,
-      "bin": {
-        "vue-demi-fix": "bin/vue-demi-fix.js",
-        "vue-demi-switch": "bin/vue-demi-switch.js"
-      },
-      "engines": {
-        "node": ">=12"
-      },
-      "funding": {
-        "url": "https://github.com/sponsors/antfu"
-      },
-      "peerDependencies": {
-        "@vue/composition-api": "^1.0.0-rc.1",
-        "vue": "^3.0.0-0 || ^2.6.0"
-      },
-      "peerDependenciesMeta": {
-        "@vue/composition-api": {
-          "optional": true
-        }
-      }
     },
     "node_modules/@fullcalendar/adaptive": {
       "version": "6.1.15",
@@ -32025,24 +31989,6 @@
       "version": "0.2.7",
       "resolved": "https://registry.npmjs.org/@floating-ui/utils/-/utils-0.2.7.tgz",
       "integrity": "sha512-X8R8Oj771YRl/w+c1HqAC1szL8zWQRwFvgDwT129k9ACdBoud/+/rX9V0qiMl6LWUdP9voC2nDVZYPMQQsb6eA=="
-    },
-    "@floating-ui/vue": {
-      "version": "1.0.6",
-      "resolved": "https://registry.npmjs.org/@floating-ui/vue/-/vue-1.0.6.tgz",
-      "integrity": "sha512-EdrOljjkpkkqZnrpqUcPoz9NvHxuTjUtSInh6GMv3+Mcy+giY2cE2pHh9rpacRcZ2eMSCxel9jWkWXTjLmY55w==",
-      "requires": {
-        "@floating-ui/dom": "^1.6.1",
-        "@floating-ui/utils": "^0.2.1",
-        "vue-demi": ">=0.13.0"
-      },
-      "dependencies": {
-        "vue-demi": {
-          "version": "0.13.11",
-          "resolved": "https://registry.npmjs.org/vue-demi/-/vue-demi-0.13.11.tgz",
-          "integrity": "sha512-IR8HoEEGM65YY3ZJYAjMlKygDQn25D5ajNFNoKh9RSDMQtlzCxtfQjdQgv9jjK+m3377SsJXY8ysq8kLCZL25A==",
-          "requires": {}
-        }
-      }
     },
     "@fullcalendar/adaptive": {
       "version": "6.1.15",

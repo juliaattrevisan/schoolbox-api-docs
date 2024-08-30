@@ -11,3 +11,7 @@ export interface ColourPickerInitialiseEvent extends CustomEvent {
 export function initColourPicker(detail: ColourPickerInitialiseEvent["detail"]): void {
     document.dispatchEvent(new CustomEvent(colourPickerInitialiseEventName, { detail }));
 }
+
+export interface ColourPickerDocumentEventHandlerMap {
+    [colourPickerInitialiseEventName]: ColourPickerInitialiseEvent;
+}

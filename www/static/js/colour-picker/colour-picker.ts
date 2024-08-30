@@ -1,7 +1,7 @@
 import "@melloware/coloris/dist/coloris.css";
 import Coloris from "@melloware/coloris";
 import tinycolor from "tinycolor2";
-import { colourPickerInitialiseEventName, type ColourPickerInitialiseEvent } from "./colourPickerEvent";
+import { colourPickerInitialiseEventName } from "./colourPickerEvent";
 import "./colour-picker.css";
 
 const colorPickerDefaults = {
@@ -16,8 +16,7 @@ const colorPickerDefaults = {
 Coloris.init();
 
 document.addEventListener(colourPickerInitialiseEventName, (e) => {
-    const eventDetail = (e as ColourPickerInitialiseEvent).detail;
-    const colorisOptions: Coloris.ColorisOptions = Object.assign(colorPickerDefaults, eventDetail);
+    const colorisOptions: Coloris.ColorisOptions = Object.assign(colorPickerDefaults, e.detail);
 
     const targetEl =
         typeof colorisOptions.el === "string" ? document.querySelector(colorisOptions.el) : colorisOptions.el;
