@@ -1,7 +1,7 @@
 <script setup lang="ts">
 /**
  * To display recent history on a selected mark book item as well
- * as provide quick links to futher actions
+ * as provide quick links to further actions
  */
 
 import type { Ref } from "vue";
@@ -328,7 +328,7 @@ function onPopOutSelected(event: CustomEvent<PopOutMenuMarkbookSelectedEvent>) {
 
 /**
  * Start listening for selection events
- * Currenty dispatched from library/Schoolbox/Learning/Markbook/templates/markbookOuter.twig
+ * Currently dispatched from library/Schoolbox/Learning/Markbook/templates/markbookOuter.twig
  */
 window.Vue.onMounted(() => {
     document.addEventListener(EVENT_POP_OUT_MENU_MARKBOOK_SELECTED, onPopOutSelected);
@@ -364,7 +364,7 @@ function getAction(item: ActivityItem): string {
         return `${item.published ? "published" : "drafted"} feedback`;
     }
 
-    // At least return blank as we're expeceted to return something
+    // At least return blank as we're expected to return something
     return "";
 }
 
