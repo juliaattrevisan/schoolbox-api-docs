@@ -377,21 +377,21 @@ function onToggleSelected() {
 </script>
 
 <template>
-    <div ref="popOutElement" class="o-pop-out" style="display: none">
+    <div ref="popOutElement" class="pop-out" style="display: none">
         <div v-if="hasLoadError">
             <pop-out-menu-item class="is-disabled">
-                <div class="s-warning-message">
+                <div class="warning-message">
                     There was an error during data retrieval. Please
                     <a href="" title="refresh the page"> refresh the page </a>
                     to try again and contact your support if the problem persists
                 </div>
             </pop-out-menu-item>
         </div>
-        <div v-else-if="isLoading && !hasLoadError" class="c-pop-out-menu__loader">
+        <div v-else-if="isLoading && !hasLoadError" class="pop-out-menu__loader">
             <div class="loader"></div>
         </div>
-        <div v-else ref="markbookElement" class="c-pop-out-menu" :class="{ 'is-expanded': isExpanded }">
-            <div class="s-collapsible">
+        <div v-else ref="markbookElement" class="pop-out-menu" :class="{ 'is-expanded': isExpanded }">
+            <div class="collapsible">
                 <small-card v-for="(activityItem, index) in activityItems" :key="index">
                     <user-photo
                         :src="`/portrait.php?id=${activityItem.effector.id}&size=square32`"
@@ -403,7 +403,7 @@ function onToggleSelected() {
                     </div>
                 </small-card>
             </div>
-            <div class="c-pop-out-menu__options">
+            <div class="pop-out-menu__options">
                 <template v-if="assessmentType !== ACTIVITY_TYPE_PROJECT">
                     <pop-out-menu-item
                         :class="{ 'is-disabled': isExpansionDisabled || isActivityEmpty }"
@@ -483,7 +483,7 @@ function onToggleSelected() {
 </template>
 
 <style lang="scss" scoped>
-.o-pop-out {
+.pop-out {
     background-color: #fff;
     border-radius: 0.25rem;
     box-shadow: 0px 0px 6px rgba(0, 0, 0, 0.2);
@@ -500,7 +500,7 @@ function onToggleSelected() {
     }
 }
 
-.c-pop-out-menu {
+.pop-out-menu {
     white-space: normal;
     width: 16rem;
 
@@ -510,7 +510,7 @@ function onToggleSelected() {
 }
 
 // Locally scoped class specifically for the error warning message
-.s-warning-message {
+.warning-message {
     max-width: 16rem;
 
     // Allow pointer events on a disabled parent container.
@@ -520,11 +520,11 @@ function onToggleSelected() {
 }
 
 .is-expanded {
-    .s-collapsible > .c-card {
+    .collapsible > .c-card {
         display: flex;
     }
 
-    .c-pop-out-menu__options {
+    .pop-out-menu__options {
         .c-menu-item,
         .c-menu-item__divider {
             display: none;
@@ -536,7 +536,7 @@ function onToggleSelected() {
     }
 }
 
-.s-collapsible {
+.collapsible {
     max-height: 20rem;
     overflow-y: auto;
 
