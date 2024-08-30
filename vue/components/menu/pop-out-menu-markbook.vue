@@ -482,7 +482,24 @@ function onToggleSelected() {
     </div>
 </template>
 
-<style lang="scss">
+<style lang="scss" scoped>
+.o-pop-out {
+    background-color: #fff;
+    border-radius: 0.25rem;
+    box-shadow: 0px 0px 6px rgba(0, 0, 0, 0.2);
+    min-width: 16rem;
+    min-height: 8rem;
+    padding: 0.5rem 0;
+    position: absolute;
+    z-index: var(--sbx-depth-pop-over);
+
+    &__divider {
+        border: 1px solid rgba(255, 0, 0, 0.15);
+        margin-block-end: 0;
+        margin-block-start: 0.5rem;
+    }
+}
+
 .c-pop-out-menu {
     white-space: normal;
     width: 16rem;
@@ -529,22 +546,6 @@ function onToggleSelected() {
         &:first-child {
             display: flex;
         }
-    }
-}
-.o-pop-out {
-    background-color: #fff;
-    border-radius: 0.25rem;
-    box-shadow: 0px 0px 6px rgba(0, 0, 0, 0.2);
-    min-width: 16rem;
-    min-height: 8rem;
-    padding: 0.5rem 0;
-    position: absolute;
-    z-index: var(--sbx-depth-pop-over);
-
-    &__divider {
-        border: 1px solid rgba(255, 0, 0, 0.15);
-        margin-block-end: 0;
-        margin-block-start: 0.5rem;
     }
 }
 </style>
