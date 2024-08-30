@@ -26,6 +26,7 @@ class Service extends AbstractService
     private const PARENT_TASS_ORBIT_TYPE = 'tassapi';
     private const PARENT_TASS_ORBIT_MAX_PAR_CODE_LENGTH = 8;
     private const PARENT_TASS_ORBIT_MAX_SFA_NUM_LENGTH = 5;
+    private const PARENT_TASS_ORBIT_SPOUSE_DEFAULT_PREFIX = 'S';
     public const PARENT_TASS_ORBIT_STUDENT_EXTERNAL_ID = 'studentExternalId';
 
     public function __construct(
@@ -54,20 +55,12 @@ class Service extends AbstractService
                 return false;
             }
 
-            $tassParentIdLength = trim($this->configLoader->get('external_tass_parent_id_length'));
+            $tassParentIdLength = trim($this->configLoader?->get('external_tass_parent_id_length'));
             if (!is_numeric($tassParentIdLength)) {
                 $this->getLog()->warning('Tass Parent ID length must be a number.');
                 return false;
             }
 
-            /*
-             * Notes from Amri:
-             * External_Tass_Helper uses a static reference to a Config object for fetching the spouse prefix:
-             * this will probably cause issues when it's time to make the mobile daemon instance-agnostic,
-             * because the config which should be used will differ depending on which instance the message is sent from.
-             */
-            //TODO making sure that when mobile instance changed, this will need to be looked at again
-            $tassHelper = new \External_Tass_Helper();
             /**
              * Parent/Spouse prefixes = P or S by default
              * Parent Code = Number of characters specified by external_tass_parent_id_length
@@ -77,7 +70,7 @@ class Service extends AbstractService
             preg_match(
                 sprintf(
                     $regex,
-                    $tassHelper->getSpousePrefix(),
+                    $this->getSpousePrefix(),
                     min($tassParentIdLength, self::PARENT_TASS_ORBIT_MAX_PAR_CODE_LENGTH),
                     self::PARENT_TASS_ORBIT_MAX_SFA_NUM_LENGTH,
                 ),
@@ -170,5 +163,18 @@ class Service extends AbstractService
     public function getProviderName(): string
     {
         return Registry::PROVIDER_TASS_ORBIT;
+    }
+
+    /**
+     * A similar carbon copy of the getSpousePrefix() in External_Tass_Helper
+     * @return string
+     */
+    private function getSpousePrefix(): string
+    {
+        $spousePrefix = trim((string)$this->configLoader?->get('external_tass_spouse_prefix'));
+
+        return ('' !== $spousePrefix) ?
+            $spousePrefix :
+            self::PARENT_TASS_ORBIT_SPOUSE_DEFAULT_PREFIX;
     }
 }
