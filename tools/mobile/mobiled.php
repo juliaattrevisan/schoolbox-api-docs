@@ -149,6 +149,7 @@ HELP;
             $forceProduction
                 ? ServiceManager::SERVICE_TYPE_PRODUCTION
                 : ServiceManager::SERVICE_TYPE_BASED_ON_INSTANCE_TYPE,
+            $config,
         );
 
         // Dispatch to mobile queue

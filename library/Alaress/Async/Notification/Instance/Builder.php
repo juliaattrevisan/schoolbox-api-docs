@@ -11,6 +11,7 @@ declare(strict_types=1);
 
 namespace Alaress\Async\Notification\Instance;
 
+use Alaress\Async\Notification\Cloud\TassOrbit\Service;
 use Alaress\Async\Notification\Parameter\ParameterInterface;
 use Alaress\Html\ToText as Html2Text;
 use InvalidArgumentException;
@@ -335,6 +336,16 @@ class Builder implements BuilderInterface
     public function setFolderId(int $folderId): self
     {
         $this->folderId = $folderId;
+        return $this;
+    }
+
+    /**
+     * @param string|null $studentExternalId
+     * @return Builder
+     */
+    public function setStudentExternalIdMeta(?string $studentExternalId): self
+    {
+        $this->meta[Service::PARENT_TASS_ORBIT_STUDENT_EXTERNAL_ID] = $studentExternalId;
         return $this;
     }
 

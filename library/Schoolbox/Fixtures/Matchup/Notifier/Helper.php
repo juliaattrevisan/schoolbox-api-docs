@@ -29,7 +29,6 @@ use Monolog\Logger;
  */
 class Helper
 {
-
     /**
      * @var MatchupMapper
      */
@@ -198,6 +197,7 @@ class Helper
             $teamUser = $teamPlayer->getUser();
             if ($teamUser instanceof User) {
                 $bob->setParam('child', new UserParam($teamUser));
+                $bob->setStudentExternalIdMeta($teamPlayer->getUser()->getExternalId());
                 $envelope->targetToParent($teamUser, $bob->build());
             }
         }

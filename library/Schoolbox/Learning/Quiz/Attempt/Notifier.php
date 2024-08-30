@@ -318,6 +318,7 @@ class Notifier extends AbstractModuleNotifier
                 'quiz'  => new Param($assess->getTitle(), $href),
                 'cat'   => new CategoryParam($category),
             ])
+            ->setStudentExternalIdMeta($student->getExternalId())
             ->addTopic("assess.$assessId.marked");
 
         $envelope->targetToParent($attempt->getUser(), $bob->build());

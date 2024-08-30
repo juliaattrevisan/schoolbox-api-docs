@@ -213,6 +213,10 @@ class Controller extends BaseController
                     'template'    => '@adminNotifications/providers/Digistorm/entity.twig',
                     'description' => 'Digistorm',
                 ],
+                MobileApp\Registry::PROVIDER_TASS_ORBIT => [
+                    'template'    => '@adminNotifications/providers/TASS/entity.twig',
+                    'description' => 'TASS Orbit',
+                ],
             ],
         ];
 
@@ -245,6 +249,10 @@ class Controller extends BaseController
 
             case MobileApp\Registry::PROVIDER_FIREBASE:
                 $template = '@adminNotifications/providers/Firebase/create.twig';
+                break;
+
+            case MobileApp\Registry::PROVIDER_TASS_ORBIT:
+                $template = '@adminNotifications/providers/TASS/create.twig';
                 break;
 
             default:
@@ -310,7 +318,26 @@ class Controller extends BaseController
                 }
 
                 break;
+            case MobileApp\Registry::PROVIDER_TASS_ORBIT:
+                // require keys for TASS Orbit
+                $error = "Unable to setup TASS Orbit service,";
+                $host = trim($post->get('host', ''));
+                $companycode    = trim($post->get('companycode', ''));
 
+                if (empty($key) || empty($companycode) || empty($host)) {
+                    $this->sendError("$error please provide all configurations.");
+                    return;
+                }
+
+                $key = json_encode(
+                    [
+                        "token" => $key,
+                        "host" => $host,
+                        "companycode" => $companycode
+                    ]
+                );
+
+                break;
             default:
                 $this->sendError('Service does not exist');
                 return;
@@ -566,6 +593,8 @@ class Controller extends BaseController
             $liveMessage
                 ? MobileApp\ServiceManager::SERVICE_TYPE_PRODUCTION
                 : MobileApp\ServiceManager::SERVICE_TYPE_TEST,
+            //Getting length of par_code
+            $this->getConfigLoader(),
         );
 
         $content = [

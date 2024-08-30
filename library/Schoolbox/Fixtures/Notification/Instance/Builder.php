@@ -53,6 +53,16 @@ class Builder implements BuilderInterface
     }
 
     /**
+     * @param string $studentExternalId
+     * @return self
+     */
+    public function setStudentExternalIdMeta($studentExternalId)
+    {
+        $this->internalBuilder->setStudentExternalIdMeta($studentExternalId);
+        return $this;
+    }
+
+    /**
      * @param Matchup $matchup
      * @param Team $team
      * @return self

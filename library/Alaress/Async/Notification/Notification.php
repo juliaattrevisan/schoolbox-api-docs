@@ -17,7 +17,6 @@ use InvalidArgumentException;
 
 class Notification
 {
-
     /** @var string */
     protected $hash;
 

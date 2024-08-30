@@ -166,7 +166,10 @@ class Notifier extends AbstractModuleNotifier
             'team' => new Param($team->getName(), $team->getUrl() . '?' . microtime(), Param::STACKING_REPLACE)
         ];
 
-        $bob = $this->notifyRemovedFromTeam($effector, $teamPlayer, $team, $title, $params)->build();
+        $bob = $this
+            ->notifyRemovedFromTeam($effector, $teamPlayer, $team, $title, $params)
+            ->setStudentExternalIdMeta($teamPlayer->getUser()->getExternalId())
+            ->build();
 
         $envelope = new Envelope();
         $envelope->targetToParent($teamPlayer->getUser()->getId(), $bob);

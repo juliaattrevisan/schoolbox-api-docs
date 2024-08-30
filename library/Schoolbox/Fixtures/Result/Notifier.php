@@ -203,7 +203,8 @@ class Notifier extends AbstractModuleNotifier
                                     'child' => new UserParam($teamPlayer->getUser()),
                                     'sport' => new Param($sport->getName()),
                                     'match' => new Param($matchup->getName(), "{$href}?{$ts}", Param::STACKING_REPLACE)
-                                ]);
+                                ])
+                    ->setStudentExternalIdMeta($teamPlayer->getUser()->getExternalId());
                 $envelope->targetToParent($teamPlayer->getUser()->getId(), $bob->build());
             }
         }

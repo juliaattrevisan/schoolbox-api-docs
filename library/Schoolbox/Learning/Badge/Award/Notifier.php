@@ -184,7 +184,8 @@ class Notifier extends AbstractModuleNotifier
             ->setSeverity(Logger::INFO)
             ->addTopic("{$this->getSlug()}.{$award->getBadge()->getId()}." . self::TRIGGER_GOAL_SET)
             ->setTimestamp($award->getAwardedAt()->getUnixTimeStamp())
-            ->addFilter(RoletypeFilter::NAME, [$roleType]);
+            ->addFilter(RoletypeFilter::NAME, [$roleType])
+            ->setStudentExternalIdMeta($student->getExternalId());
 
         if ($effector->getRole()->isStaff()) {
             // a teacher set a goal for a student - to the student, the teachers of the student and parents of the student
@@ -278,7 +279,8 @@ class Notifier extends AbstractModuleNotifier
                         'student' => new UserParam($student),
                         'badge'   => new Param($award->getBadge()->getName(), $awardHref, Param::STACKING_APPEND),
                     ]
-                );
+                )
+                ->setStudentExternalIdMeta($student->getExternalId());
         } elseif ($effector->getRole()->isStudent() && $student->getId() === $effector->getId()) {
             // a student awarded self - to the parent and teachers of the student
             $bob->setTitle(self::PATTERN_STUDENT_AWARDED_TITLE)
@@ -287,7 +289,8 @@ class Notifier extends AbstractModuleNotifier
                         'student' => new UserParam($effector),
                         'badge'   => new Param($award->getBadge()->getName(), $awardHref, Param::STACKING_APPEND),
                     ]
-                );
+                )
+                ->setStudentExternalIdMeta($effector->getExternalId());
         } else {
             return $envelope;
         }

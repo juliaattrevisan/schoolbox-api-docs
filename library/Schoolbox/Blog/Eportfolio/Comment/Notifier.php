@@ -468,6 +468,10 @@ class Notifier extends AbstractModuleNotifier
             $bob = $this->createBuilder($post, $effector, $comment, $trigger);
             $bob->setTitle(":effector commented on {$ownerToken} eportfolio blog")
                 ->setParams(array_merge($ownerParam, ['effector' => $effectorParam]));
+            //Only add the student external id for the parent notification
+            if ($ownerParam['student'] instanceof ChildParam) {
+                $bob->setStudentExternalIdMeta($owner->getExternalId());
+            }
             $envelope->targetToUser($target->getId(), $bob->build());
         }
         return $envelope;

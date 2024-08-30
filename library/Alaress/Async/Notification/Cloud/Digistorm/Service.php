@@ -10,7 +10,7 @@ declare(strict_types=1);
 namespace Alaress\Async\Notification\Cloud\Digistorm;
 
 use Alaress\Async\Notification\Cloud\AbstractService;
-use Alaress\Async\Notification\Notification;
+use Alaress\Async\Notification\Instance\Instance;
 use Alaress\Async\Notification\Cloud\RateLimitException;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
@@ -20,6 +20,7 @@ use Monolog\Logger;
 use Psr\Http\Message\ResponseInterface;
 use Schoolbox\MobileApp\Registry;
 use Schoolbox\MobileApp\RegistryMapper;
+use Schoolbox\User;
 use SensitiveParameter;
 
 /**
@@ -85,7 +86,7 @@ class Service extends AbstractService
     /**
      * @inheritdoc
      */
-    protected function propagate(array $tokens, $id, $title, $unreadCount = 0, ?Notification $notification = null)
+    protected function propagate(array $tokens, $id, $title, $unreadCount = 0, ?Instance $instance = null, ?User $recipient = null): bool
     {
         $headers = [
             'X-Auth-Token' => $this->key,

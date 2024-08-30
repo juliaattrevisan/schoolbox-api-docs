@@ -15,6 +15,7 @@ use Monolog\Logger;
 use Psr\Log\LoggerInterface;
 use Schoolbox\MobileApp\RegistryMapper;
 use Schoolbox\Realtime\Notification\Decorator;
+use Schoolbox\User;
 
 abstract class AbstractService implements ServiceInterface
 {
@@ -89,7 +90,7 @@ abstract class AbstractService implements ServiceInterface
      * @throws \Exception
      * @return bool
      */
-    public function send(array $tokens, Instance $instance, $unreadCount = 0)
+    public function send(array $tokens, Instance $instance, $unreadCount = 0, ?User $recipient = null)
     {
         // it's like reconstituting orange juice... it's just not right *sigh*
         $n = new Notification([ $instance ]);
@@ -98,7 +99,7 @@ abstract class AbstractService implements ServiceInterface
 
         $title = $this->decorator->renderTitleAsPlaintext($n);
 
-        return $this->propagate($tokens, $id, $title, $unreadCount, $n);
+        return $this->propagate($tokens, $id, $title, $unreadCount, $instance, $recipient);
     }
 
 
@@ -138,8 +139,9 @@ abstract class AbstractService implements ServiceInterface
      * @param int               $id
      * @param string            $title
      * @param int               $unreadCount
-     * @param Notification|null $notification
+     * @param Instance|null     $instance
+     * @param User|null         $recipient
      * @return bool
      */
-    abstract protected function propagate(array $tokens, $id, $title, $unreadCount = 0, ?Notification $notification = null);
+    abstract protected function propagate(array $tokens, $id, $title, $unreadCount = 0, ?Instance $instance = null, ?User $recipient = null);
 }
