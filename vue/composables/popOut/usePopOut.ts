@@ -88,7 +88,7 @@ export function usePopOut(
         if (placement === "top-end") {
             return "bottom right";
         }
-        if (placement === "bottom-start") {
+        if (placement === "bottom-start" || placement === "right-start") {
             return "top left";
         }
         if (placement === "bottom-end") {
