@@ -535,8 +535,8 @@ function onToggleSelected() {
     background-color: #fff;
     border-radius: 0.25rem;
     box-shadow: 0px 0px 6px rgba(0, 0, 0, 0.2);
-    min-width: 2rem;
-    min-height: 2rem;
+    min-width: 16rem;
+    min-height: 8rem;
     padding: 0.5rem 0;
     position: absolute;
     z-index: var(--sbx-depth-pop-over);
