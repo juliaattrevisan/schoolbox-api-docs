@@ -82,11 +82,9 @@ class NonceRepository implements NonceRepositoryInterface
     {
         $originalItemKey = sprintf('%s-%s', self::CACHE_PREFIX, $value);
         $transformedItemKey = self::replaceReservedCharacters($originalItemKey);
-    echo "Finding nonce with key '$transformedItemKey'...";
 
         $item = $this->cache->getItem($transformedItemKey);
 
-    echo "Found nonce '" . (new Nonce($item->get()))->getValue() . "'\n";
         return $item->isHit() ? new Nonce($item->get()) : null;
     }
 
@@ -98,7 +96,6 @@ class NonceRepository implements NonceRepositoryInterface
         $originalItemKey = sprintf('%s-%s', self::CACHE_PREFIX, $nonce->getValue());
         $transformedItemKey = self::replaceReservedCharacters($originalItemKey);
 
-    echo "Saving nonce with original key '$originalItemKey', transformed key '$transformedItemKey'\n";
         $item = $this->cache->getItem($transformedItemKey);
 
         $this->cache->save(
