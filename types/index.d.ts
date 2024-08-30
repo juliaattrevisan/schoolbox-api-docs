@@ -69,9 +69,11 @@ declare global {
     }
 
     // Add our custom events to the DocumentEventMap, so we can use them in event listeners
+    // DocumentEventMap is a built in event map that defines all events available to Document
     interface DocumentEventMap extends GlobalEventHandlersEventMap, SbxGlobalDocumentEventHandlerMap {}
 
     // Add our custom events to the HTMLElementEventMap, so we can use them in event listeners
+    // HTMLElementEventMap is a built in event map that defines all events available to any HTML element
     interface HTMLElementEventMap extends GlobalEventHandlersEventMap, SbxGlobalElementEventHandlerMap {}
 
     interface JQuery {
