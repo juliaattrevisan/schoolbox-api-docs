@@ -23,6 +23,7 @@ export default class ManageAllTextbox {
      * click Create Text Box button
      */
     async clickCreateTextBox() {
+        await this.page.waitForSelector("a.icon-add.button");
         await this.page.click("a.icon-add.button");
     }
 

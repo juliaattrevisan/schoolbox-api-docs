@@ -6,7 +6,6 @@
  */
 
 import { test, expect } from "@schoolboxTest/playwright/support/integrations";
-// import Common from "@schoolboxTest/playwright/support/page/Common";
 import CreateFolder from "@schoolboxTest/playwright/support/page/folder/CreateFolder";
 import ManageAllTextbox from "@schoolboxTest/playwright/support/page/homepage/ManageAllTextbox";
 import Homepage from "@schoolboxTest/playwright/support/page/homepage/Homepage";
@@ -14,7 +13,6 @@ import Resources from "@schoolboxTest/playwright/support/page/resources/Resource
 import TextboxForm from "@schoolboxTest/playwright/support/page/homepage/TextboxForm";
 import Common from "@schoolboxTest/playwright/support/page/Common";
 import SearchPage from "@schoolboxTest/playwright/support/page/search/SearchPage";
-// import SearchPage from "@schoolboxTest/playwright/support/page/search/SearchPage";
 
 test.describe("Textbox Tests", () => {
     test.beforeEach(async ({ tester }) => {
