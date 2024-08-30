@@ -112,6 +112,8 @@
                     config.onAfterSelectAllUntick(allCheckboxes);
                 }
 
+                allCheckboxes.trigger('change');
+
                 config.onAfterSelectAllChange(allCheckboxes);
 
                 /* Remove indeterminate status if that was previously set
