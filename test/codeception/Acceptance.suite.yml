@@ -25,7 +25,6 @@ modules:
                   - "--use-fake-device-for-media-stream"
                   - "--use-fake-ui-for-media-stream"
                   - "--disable-search-engine-choice-screen"
-                  - "--port=9515"
                 binary: "/usr/bin/chromium-browser"
               acceptInsecureCerts: true
         - Tests\Support\Helper\Acceptance
@@ -41,5 +40,5 @@ modules:
 extensions:
     enabled:
       - Codeception\Extension\RunProcess:
-          0: '/usr/bin/chromedriver --url-base=/wd/hub'
+          0: '/usr/bin/chromedriver --url-base=/wd/hub --port=9515'
           sleep: 5
