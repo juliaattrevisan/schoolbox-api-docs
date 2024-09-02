@@ -55,7 +55,11 @@
 #month-view tbody {
 }
 #month-view thead {
-    font: bold 16px Verdana, Arial, Helvetica, sans-serif;
+    font:
+        bold 16px Verdana,
+        Arial,
+        Helvetica,
+        sans-serif;
     background-color: #ffffff;
 }
 #month-view thead td {
@@ -72,7 +76,11 @@
     border-bottom: 1px dotted #cccccc;
     border-right: 1px dotted #cccccc;
     vertical-align: top;
-    font: 11px Verdana, Arial, Helvetica, sans-serif;
+    font:
+        11px Verdana,
+        Arial,
+        Helvetica,
+        sans-serif;
 }
 .day-block .header_option {
     float: right;
@@ -84,7 +92,11 @@
     left: 0;
     padding: 0;
     margin: 0 !important;
-    font: 12px Verdana, Arial, Helvetica, sans-serif;
+    font:
+        12px Verdana,
+        Arial,
+        Helvetica,
+        sans-serif;
 }
 
 .otherMonth {
