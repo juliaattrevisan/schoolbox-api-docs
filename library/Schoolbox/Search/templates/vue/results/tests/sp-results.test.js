@@ -20,7 +20,7 @@ test("if there are no search results, no results should be displayed", async () 
 test("if there are search results, results should be displayed", async () => {
     const resultsStore = useResultsStore();
     await resultsStore.$patch({
-        allResults: [{ id: 1, name: "test", type: "user", typeTitle: "User", _links: [], context: [] }],
+        allResults: [{ id: 1, title: "test", type: "user", typeTitle: "User", _links: [], context: [] }],
     });
     expect(wrapper.get('[data-test^="sp-results-result"]').isVisible()).toBe(true);
 });
@@ -29,8 +29,8 @@ test("if there are two search results, two results should be shown", async () =>
     const resultsStore = useResultsStore();
     await resultsStore.$patch({
         allResults: [
-            { id: 1, name: "test", type: "user", typeTitle: "User", _links: [], context: [] },
-            { id: 2, name: "test", type: "user", typeTitle: "User", _links: [], context: [] },
+            { id: 1, title: "test", type: "user", typeTitle: "User", _links: [], context: [] },
+            { id: 2, title: "test", type: "user", typeTitle: "User", _links: [], context: [] },
         ],
     });
     expect(wrapper.findAll('[data-test^="sp-results-result"]')).toHaveLength(2);
