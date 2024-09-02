@@ -34,7 +34,11 @@ class Controller extends Base
      */
     public function getCoverage(): void
     {
-        $this->response = $this->responseFromTemplate('@curriculumreports/index.twig', ['var' => 'GET']);
+        $this->response = $this->responseFromTemplate('@curriculumreports/index.twig', [
+            'var' => 'GET',
+            'error' => $this->errorMapper,
+            'curric' => $this->curriculumMapper
+        ]);
     }
 
 
