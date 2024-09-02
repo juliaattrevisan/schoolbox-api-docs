@@ -19,7 +19,7 @@ modules:
                 args:
                   - "--headless=new"
                   - "--disable-gpu"
-                  - "--window-size=1920x9999"
+                  - "--window-size=1920,9999"
                   - "--disable-dev-shm-usage"
                   - "--ignore-certificate-errors"
                   - "--use-fake-device-for-media-stream"
