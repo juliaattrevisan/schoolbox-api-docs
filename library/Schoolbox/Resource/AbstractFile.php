@@ -28,8 +28,8 @@ abstract class AbstractFile implements IFile, ISoftDeletable
     use CreatedAtDate;
     use DeletedAtDate;
 
-    /** @var string $title */
-    protected $title;
+    /** @var string|null $title */
+    protected ?string $title;
 
     /** @var User $owner */
     protected $owner;
@@ -78,19 +78,19 @@ abstract class AbstractFile implements IFile, ISoftDeletable
     }
 
     /**
-     * @return string
+     * @return string|null
      */
-    public function getTitle()
+    public function getTitle(): ?string
     {
         return $this->title;
     }
 
     /**
-     * @param string $title
+     * @param string|null $title
      *
      * @return self
      */
-    public function setTitle($title)
+    public function setTitle(?string $title): self
     {
         $this->title = $title;
 
