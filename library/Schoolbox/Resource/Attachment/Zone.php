@@ -219,7 +219,7 @@ class Zone
              * .svg files have an image/svg+xml mimetype (not image/svg)
              * .jpg files have the variant .jpeg and .pjpeg (progressive jpeg)
              */
-            $filter = 'image/jpg,image/jpeg,image/gif,image/png,image/svg+xml,image/pjpeg,.heic,.heics,.heif';
+            $filter = 'image/jpg,image/jpeg,image/pjpeg,image/gif,image/png,image/svg+xml,.svg,.heic,.heics,.heif';
         }
         $this->mimeFilter = $filter;
         return $this;
