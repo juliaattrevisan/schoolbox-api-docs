@@ -27,7 +27,7 @@
                     "resize.fndtn.equalizer",
                     function (e) {
                         this.reflow();
-                    }.bind(this)
+                    }.bind(this),
                 );
         },
 

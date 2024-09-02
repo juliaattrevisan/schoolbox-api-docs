@@ -101,7 +101,7 @@
             config.element.on(
                 "success.attachzone removedfile.attachzone",
                 config.attachzones.join(", "),
-                checkForChanges
+                checkForChanges,
             );
 
             // Listen for changes to datepicker fields
@@ -146,7 +146,7 @@
                     if (doSave) {
                         save(deferred);
                     } else {
-                        config.toaster.toastActivate({text: "Saving...",});
+                        config.toaster.toastActivate({ text: "Saving..." });
                         config.toaster.toastTimeout({
                             text: "Save skipped because storage limit exceeded",
                             css: "alert",

@@ -57,10 +57,10 @@ export function initSortExistingComponents() {
  */
 function initListeners() {
     document.addEventListener(UpdateMasonryEvents.COMPONENT_ADDED, (event) =>
-        onComponentAddedOrUpdated(event.detail.component)
+        onComponentAddedOrUpdated(event.detail.component),
     ); //newly added components
     document.addEventListener(UpdateMasonryEvents.COMPONENT_UPDATED, (event) =>
-        onComponentAddedOrUpdated(event.detail.component)
+        onComponentAddedOrUpdated(event.detail.component),
     ); //updated components
     initOnComponentRemovedListener();
     initOnProcessingStartListener();
@@ -83,11 +83,11 @@ function onComponentAddedOrUpdated(component) {
 function initOnComponentRemovedListener() {
     document.addEventListener(UpdateMasonryEvents.COMPONENT_REMOVED, (event) => {
         const draggableToRemove = __draggablesList.find((draggable) =>
-            draggable.target.isEqualNode(event.detail.component)
+            draggable.target.isEqualNode(event.detail.component),
         );
         draggableToRemove.kill(); //disables the Draggable instance
         __draggablesList = __draggablesList.filter(
-            (draggable) => !draggable.target.isEqualNode(event.detail.component)
+            (draggable) => !draggable.target.isEqualNode(event.detail.component),
         ); //update the __draggablesList list, pullling out the removed component
         updateSortableElements(); //update the position of all elements due to the new element being added
     });
@@ -364,7 +364,7 @@ function canCheckForChange() {
     };
     const distance = Math.sqrt(
         Math.pow(__startDragPoint.left - currentDragPoint.left, 2) +
-            Math.pow(__startDragPoint.top - currentDragPoint.top, 2)
+            Math.pow(__startDragPoint.top - currentDragPoint.top, 2),
     );
     return distance > MIN_MOVEMENT && !__isScrolling && !__isChangingSize && !__isFlipping;
 }

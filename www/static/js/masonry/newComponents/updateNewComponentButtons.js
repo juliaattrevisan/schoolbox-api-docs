@@ -34,7 +34,7 @@ function initOnComponentRemovedListener() {
     document.addEventListener(UpdateMasonryEvents.COMPONENT_REMOVED, (event) => {
         const targetId = event.detail.component.dataset.componentDefinitionId;
         const counter = document.querySelector(
-            `[data-component-palette] [${getMasonryConfig().settings.formData.newComponentAddAttribute}="${targetId}"]`
+            `[data-component-palette] [${getMasonryConfig().settings.formData.newComponentAddAttribute}="${targetId}"]`,
         );
         const paletteElement = counter.parentElement;
 
@@ -88,7 +88,7 @@ export function updateAllComponentCounts() {
         const componentDefinitionId = paletteElement.querySelector("[data-component-definition-id]").dataset
             .componentDefinitionId;
         const componentCount = document.querySelectorAll(
-            `[data-component][data-component-definition-id="${componentDefinitionId}"]`
+            `[data-component][data-component-definition-id="${componentDefinitionId}"]`,
         ).length;
         const counterElement = paletteElement.querySelector('[data-relation="count"]');
         if (counterElement) {

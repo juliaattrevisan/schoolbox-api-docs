@@ -97,7 +97,7 @@ function broadcastPush(messages, seen) {
                 subscript,
                 JSON.stringify({
                     message: JSON.stringify(messages[msgId]),
-                })
+                }),
             );
 
             seen[msgId] = true;
@@ -122,7 +122,7 @@ function acknowledgePush(messages, seen, ackd) {
                 ws.send(
                     JSON.stringify({
                         ack: { msgId },
-                    })
+                    }),
                 );
 
                 ackd[msgId] = true;

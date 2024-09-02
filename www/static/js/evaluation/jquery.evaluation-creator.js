@@ -403,7 +403,7 @@
                             sequence: theForm.find("input[name=sequence]").val(),
                             allAnswers: JSON.stringify(answerCollection),
                             configuration: JSON.stringify(
-                                $(config.configuration).find("input, textarea, select").serializeArray()
+                                $(config.configuration).find("input, textarea, select").serializeArray(),
                             ),
                         };
 
@@ -562,7 +562,7 @@
                         addToToolbar: ["|", "blank"],
                         fileBrowserCategoryId: config.fileBrowserCategoryId,
                     },
-                })
+                }),
             );
 
             $("#createQuestionForm").shortCreate({

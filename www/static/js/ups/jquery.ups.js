@@ -275,7 +275,7 @@
                                 }
                             }
                         });
-                    })
+                    }),
                 );
             });
             return $.when.apply(null, ajaxes);
@@ -457,8 +457,8 @@
 
                             checkRemainingConditions($rule);
                         } else {
-                        /* Delete asynchronously if successful; ignore if unsuccessful
-                         */
+                            /* Delete asynchronously if successful; ignore if unsuccessful
+                             */
                             $.post(config.condition.delete.url, { conditionId: conditionId }, function (responseText) {
                                 if (responseText == config.success) {
                                     $("#condition-" + conditionId).remove();
@@ -671,8 +671,8 @@
 
                             checkRemainingEffects($rule);
                         } else {
-                        /* Delete asynchronously if successful; ignore if unsuccessful
-                         */
+                            /* Delete asynchronously if successful; ignore if unsuccessful
+                             */
                             $.post(config.effect.delete.url, { effectId: effectId }, function (responseText) {
                                 if (responseText == config.success) {
                                     $("#effect-" + effectId).remove();
@@ -881,7 +881,7 @@
                 var ruleId = rowContainer.parents("[data-rule]").attr("data-rule");
                 var effectId = rowContainer.parents("[data-effect-fragment]").attr("data-effect-fragment");
                 var userProperty = disabledVal(
-                    $("#effect-" + effectId).find("[data-effect-userfield=" + effectId + "]")
+                    $("#effect-" + effectId).find("[data-effect-userfield=" + effectId + "]"),
                 );
 
                 /* Find out if all inputs are filled

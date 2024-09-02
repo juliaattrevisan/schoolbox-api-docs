@@ -66,7 +66,7 @@
                 '<li><a href="#" class="button submit" data-action="retry">Retry</a></li>' +
                 '<li><a href="#" class="button" data-action="abort">Cancel</a></li>' +
                 "</ul>" +
-                "</div>"
+                "</div>",
         );
 
         modal.appendTo("body");
@@ -115,7 +115,7 @@
                     // Consider auto-retry w/ jitter?
                     form.trigger("fail.ajaxForm", [xhr, status, error]);
                     self.handleFailure();
-                }
+                },
             )
             .always(function (xhr, status) {
                 form.trigger("always.ajaxForm", [xhr, status]);

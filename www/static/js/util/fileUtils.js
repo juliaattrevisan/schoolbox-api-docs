@@ -98,7 +98,7 @@ export const blobToDataURL = async (blob) => {
  *                               False to use binary (IEC), aka powers of 1024.
  * @returns { String } - Formatted string.
  */
-export const humanFileSize = (bytes, dp = 2, si=false) => {
+export const humanFileSize = (bytes, dp = 2, si = false) => {
     const thresh = si ? 1000 : 1024;
 
     // Return input if it is not numeric
@@ -114,9 +114,9 @@ export const humanFileSize = (bytes, dp = 2, si=false) => {
         // Although usually when using factors of 1024 we would show "KiB", "MiB", etc.,
         // SchoolBox uses "kB", "MB", etc. for consistency with the rest of the site,
         // hence, we always use SI unit prefixes regardless of the value of si.
-        const units = ['kB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB']
+        const units = ["kB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB"];
         let u = -1;
-        const r = 10**dp;
+        const r = 10 ** dp;
 
         do {
             bytes /= thresh;

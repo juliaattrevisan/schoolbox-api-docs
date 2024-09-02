@@ -1,6 +1,6 @@
 /**
-* npm run test www/static/js/util/tests/fileUtils.test.js
-*/
+ * npm run test www/static/js/util/tests/fileUtils.test.js
+ */
 
 import { humanFileSize } from "../fileUtils";
 

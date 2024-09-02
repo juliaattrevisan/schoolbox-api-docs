@@ -104,7 +104,7 @@
                     function (e) {
                         e.preventDefault();
                         this.go_next();
-                    }.bind(this)
+                    }.bind(this),
                 )
                 .on(
                     "click.fndtn.joyride",
@@ -112,7 +112,7 @@
                     function (e) {
                         e.preventDefault();
                         this.go_prev();
-                    }.bind(this)
+                    }.bind(this),
                 )
 
                 .on(
@@ -121,7 +121,7 @@
                     function (e) {
                         e.preventDefault();
                         this.end(this.settings.abort_on_close);
-                    }.bind(this)
+                    }.bind(this),
                 )
 
                 .on(
@@ -146,7 +146,7 @@
                                 e.preventDefault();
                                 this.end(this.settings.abort_on_close);
                         }
-                    }.bind(this)
+                    }.bind(this),
                 );
 
             $(window)
@@ -175,7 +175,7 @@
                                 self.pos_default(false);
                             }
                         }
-                    }, 100)
+                    }, 100),
                 );
         },
 
@@ -316,7 +316,7 @@
                         button_text: buttonText,
                         prev_button_text: prevButtonText,
                         li: opts.$li,
-                    })
+                    }),
                 );
 
             $(this.settings.tip_container).append($tip_content);
@@ -393,10 +393,10 @@
                                             width: $timer.parent().width(),
                                         },
                                         this.settings.timer,
-                                        "linear"
+                                        "linear",
                                     );
                                 }.bind(this),
-                                this.settings.tip_animation_fade_speed
+                                this.settings.tip_animation_fade_speed,
                             );
                         } else {
                             this.settings.$next_tip.show();
@@ -414,10 +414,10 @@
                                             width: $timer.parent().width(),
                                         },
                                         this.settings.timer,
-                                        "linear"
+                                        "linear",
                                     );
                                 }.bind(this),
-                                this.settings.tip_animation_fade_speed
+                                this.settings.tip_animation_fade_speed,
                             );
                         } else {
                             this.settings.$next_tip.fadeIn(this.settings.tip_animation_fade_speed);
@@ -460,7 +460,7 @@
                     this.hide();
                     this.css("visibility", "visible");
                 }, this.settings.$current_tip),
-                0
+                0,
             );
             this.settings.post_step_callback(this.settings.$li.index(), this.settings.$current_tip);
         },
@@ -508,7 +508,7 @@
 
             window_half = $(window).height() / 2;
             tipOffset = Math.ceil(
-                this.settings.$target.offset().top - window_half + this.settings.$next_tip.outerHeight()
+                this.settings.$target.offset().top - window_half + this.settings.$next_tip.outerHeight(),
             );
 
             if (tipOffset != 0) {
@@ -517,7 +517,7 @@
                         scrollTop: tipOffset,
                     },
                     this.settings.scroll_speed,
-                    "swing"
+                    "swing",
                 );
             }
         },
@@ -906,7 +906,7 @@
                 window_half = w.height() / 2,
                 //using this to calculate since scroll may not have finished yet.
                 tipOffset = Math.ceil(
-                    this.settings.$target.offset().top - window_half + this.settings.$next_tip.outerHeight()
+                    this.settings.$target.offset().top - window_half + this.settings.$next_tip.outerHeight(),
                 ),
                 right = w.width() + w.scrollLeft(),
                 offsetBottom = w.height() + tipOffset,
@@ -961,7 +961,7 @@
                         this.show();
                         this.startTimer();
                     }.bind(this),
-                    this.settings.timer
+                    this.settings.timer,
                 );
             } else {
                 clearTimeout(this.settings.automate);

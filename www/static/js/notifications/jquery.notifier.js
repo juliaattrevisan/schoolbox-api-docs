@@ -85,9 +85,7 @@
 
                 if (attemptReconnect && backoff < settings.maxRetry) {
                     jitter = parseInt(
-                        Math.random() *
-                            settings.timeout *
-                            Math.min(settings.maxRetry, Math.pow(2, backoff++)),
+                        Math.random() * settings.timeout * Math.min(settings.maxRetry, Math.pow(2, backoff++)),
                     );
 
                     if (settings.debug) {
@@ -183,7 +181,7 @@
                 ii = setInterval(updateRelativeTimes, 9000);
 
                 // if we have badge support, then set the unread count of notifications
-                if ('setAppBadge' in navigator) {
+                if ("setAppBadge" in navigator) {
                     // Display the number of unread messages.
                     if (unreadTotal > 0) {
                         navigator.setAppBadge(unreadTotal);
@@ -381,7 +379,6 @@
                 // TODO use this somehow
             };
 
-
             this.autoUnread = function (data) {
                 if (settings.debug) {
                     console.log("auto unread called.");
@@ -395,23 +392,23 @@
                 document.querySelectorAll("[data-msgitem-href]").forEach((element) => {
                     if (!settings.autoReadNotif) {
                         // no page found yet, keep looping
-                        let elmHref = new URL(element.getAttribute('href'), window.location.href);
+                        let elmHref = new URL(element.getAttribute("href"), window.location.href);
                         if (elmHref.pathname === href) {
                             // get parent where we could mark as read
                             let message = element.closest("[data-msgitem]");
                             // if this is unread, mark as read, and exit
-                            if ('unread' === message.dataset.status) {
+                            if ("unread" === message.dataset.status) {
                                 if (settings.debug) {
                                     console.log("found message to mark as read.");
                                 }
-                                var msgId = message.getAttribute('id').split("-")[1];
-                                send({ack: msgId})
+                                var msgId = message.getAttribute("id").split("-")[1];
+                                send({ ack: msgId });
                                 settings.autoReadNotif = true;
                             }
                         }
                     }
                 });
-            }
+            };
 
             /**
              * Socket Event

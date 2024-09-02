@@ -18,10 +18,10 @@ export function initToggleLockComponents() {
             .forEach((component) => updateComponentDisplay(component));
     });
     document.addEventListener(UpdateMasonryEvents.COMPONENT_ADDED, (event) =>
-        updateComponentDisplay(event.detail.component)
+        updateComponentDisplay(event.detail.component),
     );
     document.addEventListener(UpdateMasonryEvents.COMPONENT_UPDATED, (event) =>
-        updateComponentDisplay(event.detail.component)
+        updateComponentDisplay(event.detail.component),
     );
 
     // Set the initial state of the toggle, in case the page is loaded with the toggle already checked

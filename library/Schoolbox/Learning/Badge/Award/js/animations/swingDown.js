@@ -108,6 +108,6 @@ function addStarAnimation(starsTimeline, star) {
                 velocity: "random(500, 700)",
             },
         },
-        0 //0 so there's no delay between the animations, otherwise each star would only animate after the previous is complete
+        0, //0 so there's no delay between the animations, otherwise each star would only animate after the previous is complete
     );
 }

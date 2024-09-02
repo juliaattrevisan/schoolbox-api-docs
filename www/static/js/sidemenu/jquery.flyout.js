@@ -7,7 +7,7 @@
                 attr: "data-menu",
                 element: "li",
             },
-            options
+            options,
         );
 
         return this.each(function () {

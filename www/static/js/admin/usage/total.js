@@ -126,7 +126,8 @@
                 method: "GET",
                 dataType: "json",
                 success: function (datasets) {
-                    var html = '\
+                    var html =
+                        '\
 						<div>\
 							<h3>{TITLE}</h3>\
 							<p class="amount">\

@@ -96,7 +96,7 @@ $j(function() {
                         config.target.empty().append(allOptions);
                     }
                 },
-                "json"
+                "json",
             );
         }
     };

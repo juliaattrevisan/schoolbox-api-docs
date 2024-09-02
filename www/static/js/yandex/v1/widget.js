@@ -24,7 +24,7 @@
                     this.removeEventListener("load", onLoad, false);
                     callback();
                 },
-                false
+                false,
             );
 
             parent.appendChild(script);
@@ -92,7 +92,7 @@
             function (event) {
                 self.onClick(event);
             },
-            false
+            false,
         );
 
         this._element = element;
@@ -121,7 +121,7 @@
                     self.onSelect(target.value);
                 }
             },
-            false
+            false,
         );
 
         form.addEventListener(
@@ -132,7 +132,7 @@
                     self.onChange(target.value);
                 }
             },
-            false
+            false,
         );
 
         this._form = form;
@@ -259,7 +259,7 @@
             function () {
                 select.setHidden(true);
             },
-            false
+            false,
         );
 
         element.addEventListener(
@@ -271,7 +271,7 @@
                         break;
                 }
             },
-            false
+            false,
         );
 
         translator.on("error", function () {
@@ -404,7 +404,7 @@
                     leftButton: new Button(element.querySelector(".yt-button_type_left")),
                     rightButton: new Button(
                         element.querySelector(".yt-button_type_right"),
-                        element.querySelector(".yt-button_type_right > .yt-button__text")
+                        element.querySelector(".yt-button_type_right > .yt-button__text"),
                     ),
                     closeButton: new Button(element.querySelector(".yt-button_type_close")),
                 });
@@ -422,5 +422,5 @@
     this.document,
     this.navigator,
     { widgetTheme: "", autoMode: "", pageLang: "", widgetId: "" },
-    (this.yt = this.yt || {})
+    (this.yt = this.yt || {}),
 );

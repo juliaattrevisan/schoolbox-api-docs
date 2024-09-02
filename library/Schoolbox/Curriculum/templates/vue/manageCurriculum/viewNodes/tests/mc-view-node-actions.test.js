@@ -19,7 +19,7 @@ beforeEach(() => {
             isViewing: false,
             isUpdating: false,
             isAdding: false,
-        }
+        },
     });
 });
 

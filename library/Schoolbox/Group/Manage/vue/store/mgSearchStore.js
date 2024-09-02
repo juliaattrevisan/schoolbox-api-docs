@@ -188,7 +188,7 @@ export const useSearchStore = defineStore("mgSearch", {
          */
         removeResult(searchResult) {
             this.selectedResults = this.selectedResults.filter(
-                (selectedResultsItem) => selectedResultsItem.id !== searchResult.id
+                (selectedResultsItem) => selectedResultsItem.id !== searchResult.id,
             );
         },
     },

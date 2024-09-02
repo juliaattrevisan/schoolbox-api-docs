@@ -213,8 +213,8 @@
         $("[data-actual-mark]").hide();
         $("[data-student-average]").each(function (idx, elem) {
             let $elem = $(elem);
-            $elem.removeClass($elem.attr('data-off-class'));
-            $elem.addClass($elem.attr('data-on-class'));
+            $elem.removeClass($elem.attr("data-off-class"));
+            $elem.addClass($elem.attr("data-on-class"));
         });
     };
 
@@ -226,8 +226,8 @@
         $("[data-actual-mark]").show();
         $("[data-student-average]").each(function (idx, elem) {
             let $elem = $(elem);
-            $elem.removeClass($elem.attr('data-on-class'));
-            $elem.addClass($elem.attr('data-off-class'));
+            $elem.removeClass($elem.attr("data-on-class"));
+            $elem.addClass($elem.attr("data-off-class"));
         });
     };
 
@@ -235,20 +235,18 @@
      * Change the download href in any download markbook links.
      */
     const changeDownloadHref = function (showDrafts) {
-        let downloadLinks = document.querySelectorAll('a[data-download-spreadsheet]');
-        downloadLinks.forEach(
-            function (downloadLink) {
-                if (downloadLink && 'href' in downloadLink) {
-                    let downloadUrl = new URL(downloadLink.href);
-                    if (showDrafts) {
-                        downloadUrl.searchParams.set('showDrafts', '1');
-                    } else {
-                        downloadUrl.searchParams.delete('showDrafts');
-                    }
-                    downloadLink.href = downloadUrl;
+        let downloadLinks = document.querySelectorAll("a[data-download-spreadsheet]");
+        downloadLinks.forEach(function (downloadLink) {
+            if (downloadLink && "href" in downloadLink) {
+                let downloadUrl = new URL(downloadLink.href);
+                if (showDrafts) {
+                    downloadUrl.searchParams.set("showDrafts", "1");
+                } else {
+                    downloadUrl.searchParams.delete("showDrafts");
                 }
+                downloadLink.href = downloadUrl;
             }
-        );
+        });
     };
 
     /**
@@ -261,7 +259,7 @@
      * @param selector
      */
     $.marksheetToggleDrafts = function (selector) {
-        $(document).on('change', selector, function () {
+        $(document).on("change", selector, function () {
             if ($(this).prop("checked")) {
                 showDrafts();
                 changeDownloadHref(true);

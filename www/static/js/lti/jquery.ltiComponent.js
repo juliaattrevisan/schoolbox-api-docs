@@ -124,7 +124,7 @@
         // Post and process the result
         $.post(
             postComponentProviderBaseUrl.replace(params.providerIdPlaceholder, providerId),
-            postComponentProviderParams
+            postComponentProviderParams,
         )
             .done(function (result) {
                 // Hide preloader
@@ -262,7 +262,7 @@
 
         $.post(
             postComponentProviderBaseUrl.replace(params.providerIdPlaceholder, String(providerId)),
-            postComponentProviderParams
+            postComponentProviderParams,
         ).done(function () {
             let launchUrl = params.lti1p3LaunchUrl.replace(params.providerIdPlaceholder, String(providerId));
             // TODO determine whether to update the link or iframe?
@@ -279,7 +279,7 @@
     LtiComponent.prototype.deepLinkCancel = function (providerId) {
         let deepLinkingUrl = this.params.lti1p3DeepLinkingUrl.replace(
             this.params.providerIdPlaceholder,
-            String(providerId)
+            String(providerId),
         );
         // TODO determine whether to update the link or iframe?
         this.params.$ltiIframe.attr("src", deepLinkingUrl);

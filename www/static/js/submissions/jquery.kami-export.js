@@ -71,7 +71,7 @@
             $downloadButton
                 .attr("href")
                 .replace(/token=\d+&*/, "")
-                .replace(/\?$/, "")
+                .replace(/\?$/, ""),
         );
     }
 

@@ -267,8 +267,8 @@
 
                     refreshEmptyStates();
                 } else {
-                /* Otherwise confirm deletion
-                 */
+                    /* Otherwise confirm deletion
+                     */
                     $.when(config.onDelete(element, container)).then(refreshEmptyStates);
                 }
             });

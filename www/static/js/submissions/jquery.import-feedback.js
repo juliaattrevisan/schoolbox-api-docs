@@ -206,7 +206,7 @@
                 if (id) {
                     selectAssignation()(
                         input,
-                        $('#assessment-status [data-participant-external-id="' + id + '"] [data-feedback-form]')
+                        $('#assessment-status [data-participant-external-id="' + id + '"] [data-feedback-form]'),
                     );
                 }
             }

@@ -137,7 +137,7 @@ export const ENDPOINTS = Object.freeze({
         return this.generateUrlFromConst(
             ENDPOINTS.URL_ATTENDANCE_RSVP_DECLINE,
             eventId,
-            btoa(window.location.pathname)
+            btoa(window.location.pathname),
         );
     },
 

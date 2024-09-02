@@ -81,7 +81,7 @@ $.fn.clipboardSelector = function (options) {
             $.fn.getExportCalendarLink(config.userToken, {
                 export: "group",
                 group: config.groupId,
-            })
+            }),
         );
 
         $(config.copy).show();

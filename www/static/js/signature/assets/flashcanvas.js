@@ -492,8 +492,8 @@ window.ActiveXObject &&
                         this.B.CallFunction(
                             '<invoke name="executeCommand" returntype="javascript"><arguments><string>' +
                                 a.join("&#0;") +
-                                "</string></arguments></invoke>"
-                        )
+                                "</string></arguments></invoke>",
+                        ),
                     );
             },
             I: function (a, b) {

@@ -16,7 +16,7 @@
         modifyButton,
         saveButton,
         deleteButton,
-        fileBrowserCategoryId
+        fileBrowserCategoryId,
     ) {
         var self = this;
         self.states = {
@@ -222,7 +222,7 @@
                     targetElements: ["#" + editorInstanceId],
                     fileBrowserCategoryId: self.fileBrowserCategoryId,
                 },
-            })
+            }),
         );
     };
 
@@ -268,7 +268,7 @@
                         <div class="alert-box alert">
                             Sorry, we are currently unable to load the text box content.
                             <a href="#${self.editorInstance.attr(
-                                "id"
+                                "id",
                             )}" onclick="location.reload()">Click here to refresh the page</a>
                             to try again and contact your support if the problem persists.
                         </div>`);
@@ -340,7 +340,7 @@
                     $modifyButton,
                     $saveButton,
                     $deleteButton,
-                    fileBrowserCategoryId
+                    fileBrowserCategoryId,
                 );
             $this.data("inlineTextboxEditor", inlineTextboxEditor);
         });

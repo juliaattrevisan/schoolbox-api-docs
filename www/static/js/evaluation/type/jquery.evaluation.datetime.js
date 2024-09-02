@@ -33,11 +33,12 @@
         function initChange() {
             // Wait for the datetime input conversion to apply, then save
             // Also: don't submit on pressing enter
-            config.questionForm.find("[data-datepicker]")
-                .on('datepickerChange', function () {
+            config.questionForm
+                .find("[data-datepicker]")
+                .on("datepickerChange", function () {
                     $.fn.evaluationDateTime.saveOne(config.questionForm);
                 })
-                .on('keydown', function (event) {
+                .on("keydown", function (event) {
                     if (event.keyCode === 13) {
                         event.preventDefault();
                     }

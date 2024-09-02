@@ -38,7 +38,7 @@
                                 y: Math.max(carry.y, current.ly, current.my),
                             };
                         },
-                        { x: 0, y: 0 }
+                        { x: 0, y: 0 },
                     );
                     xScale = Math.min(1, canvas.attr("width") / maxPoint.x);
                 }

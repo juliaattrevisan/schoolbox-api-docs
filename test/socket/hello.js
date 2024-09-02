@@ -123,7 +123,7 @@ function attach(client, sessionId, start) {
                     "|roundtrip=" +
                     (close - open) +
                     "|fetch=" +
-                    Object.keys(data).length
+                    Object.keys(data).length,
             );
         };
 

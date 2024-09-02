@@ -91,7 +91,7 @@
 
                         // the sortable into which the player has been dropped (one of three possibilities).
                         let to = player.closest(
-                            "[data-team-player-list], [data-team-player-list-proxy], [data-division-player-list]"
+                            "[data-team-player-list], [data-team-player-list-proxy], [data-division-player-list]",
                         );
 
                         let fromId; // Id of the 'to' HTML container element.
@@ -104,8 +104,8 @@
                         if (from.is(to)) {
                             saveSequenceAndUpdatePlayersList(from); // Update both 'from' and 'to' lists since they are the same.
                         } else if (isDivisionList(from) && isTeamPlayerList(to)) {
-                        /* Drag from division to team.
-                         */
+                            /* Drag from division to team.
+                             */
                             toId = to.parents("[data-team]").attr("data-team");
 
                             if (config.debugging) {
@@ -118,12 +118,15 @@
                                 to.data("addPlayersAction"),
                                 [{ name: "userId[]", value: player.data("player") }],
                                 null,
-                                "json"
+                                "json",
                             )
                                 .done(function (response) {
                                     if (config.debugging) {
                                         console.log(
-                                            "DB: adding " + player.data("player") + " to " + to.data("addPlayersAction")
+                                            "DB: adding " +
+                                                player.data("player") +
+                                                " to " +
+                                                to.data("addPlayersAction"),
                                         );
                                     }
 
@@ -137,8 +140,8 @@
                                     player.remove();
                                 });
                         } else if (isTeamPlayerList(from) && isDivisionList(to)) {
-                        /* Drag from team to division.
-                         */
+                            /* Drag from team to division.
+                             */
                             fromId = from.parents("[data-team]").attr("data-team");
 
                             if (config.debugging) {
@@ -155,7 +158,7 @@
                             //  2. Replace the just-dropped player element with the hidden player.
                             //  3. Reveal the hidden player.
                             let hiddenPlayer = $("[data-division-player-list]").find(
-                                "[data-player=" + player.attr("data-player") + "]:hidden"
+                                "[data-player=" + player.attr("data-player") + "]:hidden",
                             );
                             player.replaceWith(hiddenPlayer);
                             hiddenPlayer.show();
@@ -166,7 +169,7 @@
                                 from.data("removePlayersAction"),
                                 [{ name: "userId[]", value: player.data("player") }],
                                 null,
-                                "json"
+                                "json",
                             )
                                 .done(function (response) {
                                     if (config.debugging) {
@@ -174,7 +177,7 @@
                                             "DB: removing " +
                                                 player.data("player") +
                                                 " from " +
-                                                from.data("removePlayersAction")
+                                                from.data("removePlayersAction"),
                                         );
                                     }
 
@@ -186,8 +189,8 @@
                                     fromFeedback.toastTimeout({ text: "Remove failed", css: "alert" });
                                 });
                         } else if (isTeamPlayerList(from) && isTeamPlayerList(to)) {
-                        /* Drag from team to team
-                         */
+                            /* Drag from team to team
+                             */
                             fromId = from.parents("[data-team]").attr("data-team");
                             toId = to.parents("[data-team]").attr("data-team");
 
@@ -206,7 +209,7 @@
                                     function (response) {
                                         fromTeamConfiguration = response;
                                     },
-                                    "json"
+                                    "json",
                                 ),
 
                                 $.post(
@@ -215,8 +218,8 @@
                                     function (response) {
                                         // Do nothing.
                                     },
-                                    "json"
-                                )
+                                    "json",
+                                ),
                             )
                                 .done(function (response) {
                                     if (config.debugging) {
@@ -224,10 +227,13 @@
                                             "DB: removing " +
                                                 player.data("player") +
                                                 " from " +
-                                                from.data("removePlayersAction")
+                                                from.data("removePlayersAction"),
                                         );
                                         console.log(
-                                            "DB: adding " + player.data("player") + " to " + to.data("addPlayersAction")
+                                            "DB: adding " +
+                                                player.data("player") +
+                                                " to " +
+                                                to.data("addPlayersAction"),
                                         );
                                     }
 
@@ -358,7 +364,9 @@
             $(document).on("click", "[data-player-positions-user]", function () {
                 // Set the form data with the team/user IDs
                 $("#playerPositionName").html(
-                    $(this).attr("data-player-positions-team-name") + " - " + $(this).attr("data-player-positions-name")
+                    $(this).attr("data-player-positions-team-name") +
+                        " - " +
+                        $(this).attr("data-player-positions-name"),
                 );
                 $("#playerPositionUserId").val($(this).attr("data-player-positions-user"));
                 $("#playerPositionTeamId").val($(this).attr("data-player-positions-team"));
@@ -395,7 +403,7 @@
                             el.attr("href"),
                             [{ name: "userId[]", value: el.data("removeTeamPlayer") }],
                             null,
-                            "json"
+                            "json",
                         )
                             .done(function (response) {
                                 updateTeamPlayersList($("[data-team=" + el.attr("data-affected-team") + "]"), response);

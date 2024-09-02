@@ -402,7 +402,7 @@
     ResourceAttach.prototype.build = function (data) {
         this.attachmentBrowserFilesystemsInnerHTML = $(data).find("#attachment-browser-filesystems")[0].innerHTML;
         this.attachmentBrowserPanelContainerInnerHTML = $(data).find(
-            "#attachment-browser-panel-container"
+            "#attachment-browser-panel-container",
         )[0].innerHTML;
 
         if (singletonModal) {
@@ -599,7 +599,7 @@
                                 fileName +
                                 " failed: " +
                                 errorMessage +
-                                '</p></div></div><nav><a href="#" data-dz-remove="" title="Remove" class="icon-close"></a></nav></li>'
+                                '</p></div></div><nav><a href="#" data-dz-remove="" title="Remove" class="icon-close"></a></nav></li>',
                         );
                     this.element.querySelector(".az-error-list").appendChild(failedFileItem);
                 } else {

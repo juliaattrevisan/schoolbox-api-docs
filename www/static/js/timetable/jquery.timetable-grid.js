@@ -211,9 +211,9 @@
                     if (header.html() == activeDay && $(element).html() == activePeriod) {
                         clone.addClass("timetable-period-active");
                     } else {
-                    /* Due to reforging, clear the active class from this
-                     * particular instance of th
-                     */
+                        /* Due to reforging, clear the active class from this
+                         * particular instance of th
+                         */
                         clone.removeClass("timetable-period-active");
                     }
 

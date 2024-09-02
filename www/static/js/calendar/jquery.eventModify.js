@@ -107,7 +107,7 @@
                             }).done(function (response) {
                                 window.location.href = response.callbackUrl;
                             });
-                        }
+                        },
                     );
                 });
             } else {
@@ -274,7 +274,7 @@
                             function () {
                                 $("#efficacy").val("series");
                                 form.submit();
-                            }
+                            },
                         );
                     } else {
                         // single event - just submit

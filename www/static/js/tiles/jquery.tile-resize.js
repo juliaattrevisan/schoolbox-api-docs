@@ -13,7 +13,10 @@
             // To resolve we need to instead set a rounded height and remove the padding-bottom.
             // This line can be removed once the Chrome developers fix the display bug we found in SA-15725.
             // To test whether this code can be removed, follow the STR in SA-15725.
-            $tile.css({ height: (Math.round($tile.outerWidth() * getAspectRatioForTile(tile)) + 'px'), paddingBottom: 0 });
+            $tile.css({
+                height: Math.round($tile.outerWidth() * getAspectRatioForTile(tile)) + "px",
+                paddingBottom: 0,
+            });
 
             let fontSize = getFontSize(tile);
 
@@ -25,10 +28,10 @@
                 return;
             }
 
-            const $tileTitle = $tile.find('.title');
+            const $tileTitle = $tile.find(".title");
             $tileTitle.css({
-                fontSize: String(fontSize) + 'rem',
-                padding: String(fontSize / 4) + 'rem',
+                fontSize: String(fontSize) + "rem",
+                padding: String(fontSize / 4) + "rem",
             });
 
             // If the title is taller than the tile:
@@ -67,8 +70,8 @@
             // So if the default settings are used, the font-size returned by this function will typically be beyond the
             // max end of the range, and scaling of font will typically only happen at the narrowest tile widths.
             let fontSize = tileWidth / 120; // Units 'rem'.
-            let minFontSize = $tile.attr('data-min-font-size');
-            let maxFontSize = $tile.attr('data-max-font-size');
+            let minFontSize = $tile.attr("data-min-font-size");
+            let maxFontSize = $tile.attr("data-max-font-size");
 
             if (minFontSize === undefined) {
                 // This should never happen because minFontSize is a required field on the Modify Tile page.
@@ -96,8 +99,8 @@
          * @returns { Number } aspectRatio
          */
         function getAspectRatioForTile(tile) {
-            const $aspectRatioXInput = $('#aspect_ratio_x');
-            const $aspectRatioYInput = $('#aspect_ratio_y');
+            const $aspectRatioXInput = $("#aspect_ratio_x");
+            const $aspectRatioYInput = $("#aspect_ratio_y");
 
             let aspectRatio = null;
 
@@ -106,7 +109,7 @@
                 aspectRatio = $aspectRatioYInput.val() / $aspectRatioXInput.val();
             } else {
                 const $tileListUl = $(tile).parent();
-                aspectRatio = $tileListUl.attr('data-aspect-ratio');
+                aspectRatio = $tileListUl.attr("data-aspect-ratio");
             }
 
             return aspectRatio;
