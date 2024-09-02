@@ -153,9 +153,9 @@
         "postcss": "~8.4.34",
         "postcss-import": "~12.0.1",
         "postcss-loader": "~4.3.0",
-        "prettier": "^3.3.3",
+        "prettier": "~3.3.3",
         "raw-loader": "~4.0.2",
-        "sass": "~1.70.0",
+        "sass": "^1.77.6",
         "sass-loader": "~14.1.0",
         "storybook": "^8.2.9",
         "style-loader": "~3.3.4",
@@ -24699,9 +24699,9 @@
       }
     },
     "node_modules/sass": {
-      "version": "1.70.0",
-      "resolved": "https://registry.npmjs.org/sass/-/sass-1.70.0.tgz",
-      "integrity": "sha512-uUxNQ3zAHeAx5nRFskBnrWzDUJrrvpCPD5FNAoRvTi0WwremlheES3tg+56PaVtCs5QDRX5CBLxxKMDJMEa1WQ==",
+      "version": "1.77.6",
+      "resolved": "https://registry.npmjs.org/sass/-/sass-1.77.6.tgz",
+      "integrity": "sha512-ByXE1oLD79GVq9Ht1PeHWCPMPB8XHpBuz1r85oByKHjZY6qV6rWnQovQzXJXuQ/XyE1Oj3iPk3lo28uzaRA2/Q==",
       "dev": true,
       "dependencies": {
         "chokidar": ">=3.0.0 <4.0.0",
@@ -47091,9 +47091,9 @@
       }
     },
     "sass": {
-      "version": "1.70.0",
-      "resolved": "https://registry.npmjs.org/sass/-/sass-1.70.0.tgz",
-      "integrity": "sha512-uUxNQ3zAHeAx5nRFskBnrWzDUJrrvpCPD5FNAoRvTi0WwremlheES3tg+56PaVtCs5QDRX5CBLxxKMDJMEa1WQ==",
+      "version": "1.77.6",
+      "resolved": "https://registry.npmjs.org/sass/-/sass-1.77.6.tgz",
+      "integrity": "sha512-ByXE1oLD79GVq9Ht1PeHWCPMPB8XHpBuz1r85oByKHjZY6qV6rWnQovQzXJXuQ/XyE1Oj3iPk3lo28uzaRA2/Q==",
       "dev": true,
       "requires": {
         "chokidar": ">=3.0.0 <4.0.0",
