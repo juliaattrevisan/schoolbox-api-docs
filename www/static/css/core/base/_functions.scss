@@ -2,7 +2,7 @@
     Various handy functions that are referenced throughout the rest of the styles
 */
 
-@use 'sass:math'; //to use math.div()
+@use "sass:math"; //to use math.div()
 
 /**
  * Adds a percentage of white to a CSS color var.

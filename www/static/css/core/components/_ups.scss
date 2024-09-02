@@ -36,7 +36,9 @@ $ups-log-window-height: 30rem !default;
     }
 
     .information-list li {
-        transition: max-height 360ms ease, min-height 360ms ease !important;
+        transition:
+            max-height 360ms ease,
+            min-height 360ms ease !important;
     }
     .scroll-window {
         max-height: $ups-log-window-height;
