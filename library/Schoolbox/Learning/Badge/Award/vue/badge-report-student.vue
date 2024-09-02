@@ -25,12 +25,13 @@ export default {
         selectedStudents: {
             //to clear a students selection when cleared by badge-report
             type: Array,
-            required: true
+            required: true,
         },
-        hasAwardPermissions: { // does the current user have permissions to award badges?
+        hasAwardPermissions: {
+            // does the current user have permissions to award badges?
             type: Boolean,
-            required: true
-        }
+            required: true,
+        },
     },
 
     data() {
@@ -222,11 +223,7 @@ export default {
                         data-scroller-item
                         :data-title="award.badge.name"
                     >
-                        <a
-                            href="#open-award-modal"
-                            @click.prevent="badgeSelected(award)"
-                            :title="award.badge.name"
-                        >
+                        <a href="#open-award-modal" @click.prevent="badgeSelected(award)" :title="award.badge.name">
                             <div class="award__container">
                                 <div class="award__image-container">
                                     <badge-image
@@ -254,7 +251,7 @@ export default {
 </template>
 
 <style lang="scss" scoped>
-@import "www/static/css/core/base/_variables.scss";
+@import "@css/core/base/_variables.scss";
 
 $rowHeight: 80px;
 $collapseStudent: 1000px;

@@ -118,7 +118,7 @@ export default {
 </template>
 
 <style lang="scss">
-@import "www/static/css/core/base/_variables.scss";
+@import "@css/core/base/_variables.scss";
 
 .search-result {
     display: block;

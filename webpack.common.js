@@ -361,9 +361,6 @@ module.exports = {
                             },
                             {
                                 loader: "sass-loader",
-                                options: {
-                                    api: "legacy", // use legacy to avoid breaking changes: https://github.com/webpack-contrib/sass-loader/releases/tag/v16.0.0
-                                },
                             },
                         ],
                     },
@@ -387,7 +384,6 @@ module.exports = {
                             {
                                 loader: "sass-loader", // to load the sass and export it to css
                                 options: {
-                                    api: "legacy", // use legacy to avoid breaking changes: https://github.com/webpack-contrib/sass-loader/releases/tag/v16.0.0
                                     sassOptions: {
                                         indentWidth: 4,
                                         includePaths: ["../../css/core/"], // where our base css file is loaded
