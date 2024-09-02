@@ -55,7 +55,7 @@ export const useActivitiesListDeleteModalStore = defineStore("activitiesListDele
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
-                    "Accept": "application/json"
+                    Accept: "application/json",
                 },
             });
 

@@ -21,8 +21,8 @@ function getPaddingTop(element: HTMLElement) {
         setAndGetAttribute(
             element,
             PADDING_TOP_ATTRIBUTE,
-            parseFloat(getComputedStyle(element).paddingTop).toString()
-        ) as string
+            parseFloat(getComputedStyle(element).paddingTop).toString(),
+        ) as string,
     );
 }
 
@@ -39,8 +39,8 @@ function getPaddingBottom(element: HTMLElement) {
         setAndGetAttribute(
             element,
             PADDING_BOTTOM_ATTRIBUTE,
-            parseFloat(getComputedStyle(element).paddingBottom).toString()
-        ) as string
+            parseFloat(getComputedStyle(element).paddingBottom).toString(),
+        ) as string,
     );
 }
 

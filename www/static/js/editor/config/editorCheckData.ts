@@ -61,7 +61,7 @@ function runChecks(sourceElementHTML: HTMLElement, config: SbxEditorConfig): HTM
  */
 function onEditorCheckData(targetElement: HTMLElement) {
     const editorIdentifier = getSourceElementIdentifier(targetElement);
-    const editor = editorIdentifier ? window.sbProps.editors[editorIdentifier] ?? null : null;
+    const editor = editorIdentifier ? (window.sbProps.editors[editorIdentifier] ?? null) : null;
 
     if (editor === null) throw new Error("onEditorCheckData: Unable to find editor in window.sbProps.editors");
 

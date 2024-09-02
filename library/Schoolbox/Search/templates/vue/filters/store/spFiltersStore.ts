@@ -16,7 +16,7 @@ export const useFiltersStore = defineStore("spFilters", () => {
      * @returns {boolean}
      */
     const isActive = window.Vue.computed(
-        () => useFilterDateRangeStore().isActive || useFilterCreatorsStore().isActive || useFilterTypesStore().isActive
+        () => useFilterDateRangeStore().isActive || useFilterCreatorsStore().isActive || useFilterTypesStore().isActive,
     );
 
     /**
