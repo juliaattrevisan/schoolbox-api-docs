@@ -117,10 +117,10 @@
         "@storybook/theming": "^8.2.9",
         "@storybook/vue3": "^8.2.9",
         "@storybook/vue3-webpack5": "^8.2.9",
-        "@testing-library/jest-dom": "^6.5.0",
+        "@testing-library/jest-dom": "~6.5.0",
         "@types/canvas-confetti": "^1.6.4",
         "@types/jest": "~29.5.12",
-        "@types/jquery": "~3.5.29",
+        "@types/jquery": "^3.5.30",
         "@types/jqueryui": "~1.12.21",
         "@types/lodash": "^4.17.7",
         "@types/node": "~20.12.10",
@@ -8603,9 +8603,9 @@
       }
     },
     "node_modules/@types/jquery": {
-      "version": "3.5.29",
-      "resolved": "https://registry.npmjs.org/@types/jquery/-/jquery-3.5.29.tgz",
-      "integrity": "sha512-oXQQC9X9MOPRrMhPHHOsXqeQDnWeCDT3PelUIg/Oy8FAbzSZtFHRjc7IpbfFVmpLtJ+UOoywpRsuO5Jxjybyeg==",
+      "version": "3.5.30",
+      "resolved": "https://registry.npmjs.org/@types/jquery/-/jquery-3.5.30.tgz",
+      "integrity": "sha512-nbWKkkyb919DOUxjmRVk8vwtDb0/k8FKncmUKFi+NY+QXqWltooxTrswvz4LspQwxvLdvzBN1TImr6cw3aQx2A==",
       "dev": true,
       "dependencies": {
         "@types/sizzle": "*"
@@ -35046,9 +35046,9 @@
       }
     },
     "@types/jquery": {
-      "version": "3.5.29",
-      "resolved": "https://registry.npmjs.org/@types/jquery/-/jquery-3.5.29.tgz",
-      "integrity": "sha512-oXQQC9X9MOPRrMhPHHOsXqeQDnWeCDT3PelUIg/Oy8FAbzSZtFHRjc7IpbfFVmpLtJ+UOoywpRsuO5Jxjybyeg==",
+      "version": "3.5.30",
+      "resolved": "https://registry.npmjs.org/@types/jquery/-/jquery-3.5.30.tgz",
+      "integrity": "sha512-nbWKkkyb919DOUxjmRVk8vwtDb0/k8FKncmUKFi+NY+QXqWltooxTrswvz4LspQwxvLdvzBN1TImr6cw3aQx2A==",
       "dev": true,
       "requires": {
         "@types/sizzle": "*"
