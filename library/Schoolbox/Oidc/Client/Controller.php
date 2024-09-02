@@ -289,7 +289,7 @@ class Controller extends Base
         $jwks         = $this->retrieveJsonWebKeySet();
         $keySet       = JWK::parseKeySet($jwks, \Schoolbox\API\Token\Jwt::SIGNING_ALGORITHM);
         Jwt::$leeway  = $this->getConfigLoader()->get(ConfigMapper::NAME_JWT_LEEWAY);
-        return (array)(Jwt::decode($token, $keySet[\Schoolbox\API\Token\Jwt::KEY_ID]));
+        return (array)(Jwt::decode($token, $keySet));
     }
 
     /**
