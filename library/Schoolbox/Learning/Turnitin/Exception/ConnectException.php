@@ -14,6 +14,6 @@ namespace Schoolbox\Learning\Turnitin\Exception;
  * had died and the connection timed out because it couldn't
  * reach the service
  */
-class ConnectException extends \DomainException
+class ConnectException extends \RuntimeException
 {
 }
