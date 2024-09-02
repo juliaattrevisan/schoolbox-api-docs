@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace Schoolbox\Learning\Turnitin;
 
 use GuzzleHttp\Client;
+use GuzzleHttp\Exception\ConnectException;
 use GuzzleHttp\Exception\GuzzleException;
 use GuzzleHttp\RequestOptions;
 use Psr\Http\Message\ResponseInterface;
@@ -177,7 +178,6 @@ class Api
                     'headers'            => $headers,
                     RequestOptions::JSON => $params
                 ]);
-
                 break;
         }
         return $result;
@@ -203,7 +203,21 @@ class Api
      */
     public function retrieve(string $method, string $endpoint, array $params): ?array
     {
-        $result = $this->retrieveRawResponse($method, $endpoint, $params);
+        try {
+            $result = $this->retrieveRawResponse($method, $endpoint, $params);
+        } catch (ConnectException $e) {
+            /* Server connection had timed out without a response hence the exception:
+             * "cURL error 28: Resolving timed out after 3000 millisecond"
+             * Catching the error and re-throw it to handle logging in upper layer
+             */
+            throw new Exception\ConnectException(
+                sprintf(
+                    'Turnitin: endpoint was unavailable; could not retrieve from %s',
+                    $endpoint
+                ),
+                $e->getCode()
+            );
+        }
 
         /* Check errors; if anything went wrong throw special types of exceptions
          * according to what happened. I found that in suds, we kind of started to

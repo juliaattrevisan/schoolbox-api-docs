@@ -306,6 +306,18 @@ class Transmit
                 ->setErrorCode((string)$e->getCode())
                 ->setErrorMessage($errorMessage)
                 ->setStatus(Turnitin\File\Model::STATUS_ERROR));
+        } catch (Turnitin\Exception\ConnectException $e) {
+            /* Connection timed out, but could potentially be recovered by
+             * cron job, set it to pending whilst it tried to self-recover.
+             */
+            $this->logWarning($e->getMessage());
+
+            $this->turnitinMapper->save(
+                $model
+                    ->setErrorCode((string)$e->getCode())
+                    ->setErrorMessage($e->getMessage())
+                    ->setStatus(Turnitin\File\Model::STATUS_TRANSMIT_PENDING)
+            );
         } catch (Turnitin\Exception\Exception $e) {
             /* Potentially recoverable by running transmit forcibly
              * which is what the crontab does anyway
