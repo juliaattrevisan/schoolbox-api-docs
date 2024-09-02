@@ -250,14 +250,14 @@ module.exports = {
         // Birthday pop up
         birthdaySurprise: "./vue/components/birthday/birthdaySurprise.ts",
 
-        //Sass
-        core: "./www/static/css/core/core.scss",
-        schoolboxCkStyles: "./www/static/css/core/schoolbox-ck-content.scss",
-        learnosity: "./www/static/css/learnosity/learnosity.scss",
-
         // Firebase
         firebaseInit: "./www/static/js/firebase/firebase-init.ts",
         firebaseMessaging: "./www/static/js/firebase/firebase-messaging.ts",
+
+        //Sass (leave at the bottom)
+        core: "./www/static/css/core/core.scss",
+        schoolboxCkStyles: "./www/static/css/core/schoolbox-ck-content.scss",
+        learnosity: "./www/static/css/learnosity/learnosity.scss",
     },
     output: {
         path: path.resolve(__dirname, "www/static/js/bundle"),
