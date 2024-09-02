@@ -13,5 +13,5 @@ INNER JOIN curriculum_node cn4 ON cn3.curriculum_node_parent_id = cn4.id
 INNER JOIN curriculum_node cn5 ON cn4.curriculum_node_parent_id = cn5.id
 WHERE cn1.name = 'Analysing, interpreting and evaluating'
 AND cn5.name = 'Australian Curriculum (v9)'
-
+AND cn2.name = 'Literature'
 
