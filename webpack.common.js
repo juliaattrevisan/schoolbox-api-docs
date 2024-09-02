@@ -383,12 +383,6 @@ module.exports = {
                             },
                             {
                                 loader: "sass-loader", // to load the sass and export it to css
-                                options: {
-                                    sassOptions: {
-                                        indentWidth: 4,
-                                        includePaths: ["../../css/core/"], // where our base css file is loaded
-                                    },
-                                },
                             },
                         ],
                     },
