@@ -25,7 +25,7 @@ use Schoolbox\User;
 class Model extends AbstractFile
 {
     /** @var string|null */
-    protected $description;
+    protected ?string $description;
 
     /** @var bool */
     protected $hidden;
