@@ -149,11 +149,11 @@
         "jest-serializer-vue": "~3.1.0",
         "msw": "^2.3.5",
         "msw-storybook-addon": "^2.0.3",
-        "mysql2": "^3.11.0",
+        "mysql2": "~3.11.0",
         "postcss": "~8.4.34",
         "postcss-import": "~12.0.1",
         "postcss-loader": "~4.3.0",
-        "prettier": "~3.2.5",
+        "prettier": "^3.3.3",
         "raw-loader": "~4.0.2",
         "sass": "~1.70.0",
         "sass-loader": "~14.1.0",
@@ -23512,9 +23512,9 @@
       }
     },
     "node_modules/prettier": {
-      "version": "3.2.5",
-      "resolved": "https://registry.npmjs.org/prettier/-/prettier-3.2.5.tgz",
-      "integrity": "sha512-3/GWa9aOC0YeD7LUfvOG2NiDyhOWRvt1k+rcKhOuYnMY24iiCphgneUfJDyFXd6rZCAnuLBv6UeAULtrhT/F4A==",
+      "version": "3.3.3",
+      "resolved": "https://registry.npmjs.org/prettier/-/prettier-3.3.3.tgz",
+      "integrity": "sha512-i2tDNA0O5IrMO757lfrdQZCc2jPNDVntV0m/+4whiDfWaTKfMNgR7Qz0NAeGz/nRqF4m5/6CLzbP4/liHt12Ew==",
       "dev": true,
       "bin": {
         "prettier": "bin/prettier.cjs"
@@ -46185,9 +46185,9 @@
       "dev": true
     },
     "prettier": {
-      "version": "3.2.5",
-      "resolved": "https://registry.npmjs.org/prettier/-/prettier-3.2.5.tgz",
-      "integrity": "sha512-3/GWa9aOC0YeD7LUfvOG2NiDyhOWRvt1k+rcKhOuYnMY24iiCphgneUfJDyFXd6rZCAnuLBv6UeAULtrhT/F4A==",
+      "version": "3.3.3",
+      "resolved": "https://registry.npmjs.org/prettier/-/prettier-3.3.3.tgz",
+      "integrity": "sha512-i2tDNA0O5IrMO757lfrdQZCc2jPNDVntV0m/+4whiDfWaTKfMNgR7Qz0NAeGz/nRqF4m5/6CLzbP4/liHt12Ew==",
       "dev": true
     },
     "pretty": {
