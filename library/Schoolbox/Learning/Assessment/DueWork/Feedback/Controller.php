@@ -192,28 +192,30 @@ class Controller extends Base
                     // Find the Kami worksheet (if it exists)
                     if ($submissionReturn->getSubmission()) {
                         $responses = $this->responseDataSource->findForAssessment($assessment, $submissionReturn->getSubmission()->getOwner());
-                        $response = null;
-                        foreach ($responses as $responseCurrent) {
-                            if ($responseCurrent->getId() == $submissionReturn->getSubmission()->getId()) {
-                                $response = $responseCurrent;
-                                break;
+                        if (0 !== $responses->count()) {
+                            $response = null;
+                            foreach ($responses as $responseCurrent) {
+                                if ($responseCurrent->getId() == $submissionReturn->getSubmission()->getId()) {
+                                    $response = $responseCurrent;
+                                    break;
+                                }
                             }
-                        }
 
-                        // attempt to clean as we go
-                        unset($responses);
+                            // attempt to clean as we go
+                            unset($responses);
 
-                        /** @var ?DueWork\Response\Model $response */
-                        $kamiModel = $response->getAllFiles()->filter(function (SubmissionFile $file) {
-                            return $file->getIsWorksheet();
-                        })->first()?->getKami();
-                        if ($kamiModel) {
-                            // Save the kami doc to the feedback object
-                            $this->kamiConnector->initiatePollingForKamiDownload(
-                                $kamiModel,
-                                'feedback',
-                                $this->getUser(),
-                            );
+                            /** @var ?DueWork\Response\Model $response */
+                            $kamiModel = $response?->getAllFiles()->filter(function (SubmissionFile $file) {
+                                return $file->getIsWorksheet();
+                            })->first()?->getKami();
+                            if ($kamiModel) {
+                                // Save the kami doc to the feedback object
+                                $this->kamiConnector->initiatePollingForKamiDownload(
+                                    $kamiModel,
+                                    'feedback',
+                                    $this->getUser(),
+                                );
+                            }
                         }
                     }
 
