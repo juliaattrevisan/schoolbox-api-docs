@@ -116,7 +116,7 @@
     "@types/canvas-confetti": "^1.6.4",
     "@types/jest": "~29.5.12",
     "@types/jquery": "~3.5.30",
-    "@types/jqueryui": "~1.12.21",
+    "@types/jqueryui": "~1.12.23",
     "@types/lodash": "^4.17.7",
     "@types/node": "~20.12.10",
     "@types/sanitize-html": "^2.13.0",
