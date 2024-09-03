@@ -1,6 +1,7 @@
 # This workflow will do a clean installation of node dependencies, cache/restore them, run the build if available and run the tests
 # It will also run a full typecheck and ensure all linting rules are followed
 # Note it will only run when changes to js, ts or vue files are added to PRs
+# It will also run if changes are made to relevant config files (eslintignore, package.json, tsconfig.json, npm-shrinkwrap.json)
 # For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-nodejs
 
 name: Check JS
@@ -8,7 +9,7 @@ name: Check JS
 on:
   pull_request:
     branches: ["develop", "master"]
-    paths: ["**.js", "**.ts", "**.vue"]
+    paths: ["**.js", "**.ts", "**.vue", ".eslintignore", "package.json", "tsconfig.json", "npm-shrinkwrap.json"]
 
 jobs:
   build:
@@ -51,6 +52,5 @@ jobs:
     - name: Typecheck
       run: npm run typecheck
 
-    # No linting yet, will be added in a different PR (SA-18139)
-    # - name: Test Code Linting
-    #   run: npm run lint
+    - name: Check ESLint Compliance
+      run: npm run lint
