@@ -7,7 +7,7 @@
 
 declare(strict_types=1);
 
-namespace External\Connector\Isams\Base\Endpoint;
+namespace Schoolbox\External\Connector\Isams\Base\Endpoint;
 
 class Concattery
 {
@@ -22,6 +22,13 @@ class Concattery
     {
         $concat = $input;
 
+        /* Replace ' with a concat equivalent
+         * Just replace single quotes with an escaped version
+         */
+        if (str_contains($concat, "'")) {
+            $concat = str_replace("'", "'", $concat);
+        }
+
         /* Replace " with a concat equivalent
          */
         if (str_contains($concat, '"')) {
@@ -31,18 +38,16 @@ class Concattery
 
             /* Then implode on \'"\'
              */
-            $concat = implode('\'"\'', $bits);
+            $concat = '"' . implode("\", '\"', \"", $bits) . '"';
         }
 
-        /* Replace ' with a concat equivalent
-         * Just replace single quotes with an escaped version
-         */
-        if (str_contains($concat, "'")) {
-            $concat = str_replace("'", "\'", $concat);
-        }
 
         /* If it didn't contain any quotes, return the original string
          */
-        return $concat;
+        if ($concat === $input) {
+            return $input;
+        }
+
+        return "concat({$concat})";
     }
 }
