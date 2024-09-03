@@ -76,6 +76,13 @@ class UserAccess implements IModel
     public const SERVICE_SPORTS_ADMINISTRATOR = 10;
 
     /**
+     * Value for $this->service:
+     * $this->user has $this->accessLevel permission for the badge
+     * system.
+     */
+    public const SERVICE_BADGE = 11;
+
+    /**
      * Services that do not have have service identifiers (sid) use this value
      * (This is enforced at the DB level by not permitted nulls, and defaulting to '0)
      */
