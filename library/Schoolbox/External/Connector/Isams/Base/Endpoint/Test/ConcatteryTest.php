@@ -83,82 +83,56 @@ class ConcatteryTest extends TestCase
     }
 
 
-//
-//    /**
-//     * @dataProvider providerValidExample
-//     * @param mixed $input
-//     * @param int   $expected
-//     */
-//    public function testValidExample($input, $expected)
-//    {
-//        /* Substitute this with a spec pattern or other conditional
-//         */
-//        $concattery = new Concattery();
-//
-//        $outcome = false;
-//
-//        if (is_numeric($input)) {
-//            $outcome = true;
-//        }
-//
-//        /* There are other assertions that you can try (ctrl-click to follow)
-//         */
-//        $this->assertEquals($expected, $outcome);
-//    }
-//
-//    /**
-//     * Data provider for testValidExample
-//     *
-//     * @return array
-//     */
-//    public function providerValidExample(): array
-//    {
-//        return [
-//
-//            /* Add other cases that you expect to be valid
-//             */
-//            'Valid Example 1' => [
-//                0,    // goes into testValidExample() as $input
-//                true  // goes into testValidExample() as $expected
-//            ],
-//
-//            'Valid Example 2' => [
-//                1,
-//                true
-//            ],
-//
-//            'Valid Example 3' => [
-//                123456789,
-//                true
-//            ],
-//
-//            'Valid Example 4' => [
-//                '1e4',
-//                true
-//            ],
-//
-//            /* Add other cases that you expect to be invalid
-//             */
-//            'Invalid Example 1' => [
-//                false,
-//                false
-//            ],
-//
-//            'Invalid Example 2' => [
-//                'a',
-//                false
-//            ],
-//
-//            'Invalid Example 3' => [
-//                null,
-//                false
-//            ],
-//
-//            'Invalid Example 4' => [
-//                '',
-//                false
-//            ],
-//        ];
-//    }
+    /**
+     * @dataProvider providerConcatString
+     * @param mixed $input
+     * @param int   $expected
+     */
+    public function testConcatString($input, $expected)
+    {
+        $concat = (new Concattery())->generate($input);
 
+        $this->assertEquals($expected, $concat);
+
+    }
+
+    /**
+     * Data provider for testConcatString
+     *
+     * @return array
+     */
+    public function providerConcatString(): array
+    {
+        return [
+            'Single Quotes 1' => [
+                "Marty O'Donnell",
+                '"Marty O\'Donnell"'
+            ],
+
+            'Single Quotes 2' => [
+                "Jack O'Neill",
+                '"Jack O\'Neill"'
+            ],
+
+            'Single Quotes 3' => [
+                "McDonald's",
+                '"McDonald\'s"'
+            ],
+
+            'Lone double quote 1' => [
+                'Only one double-quote " lol',
+                'concat("Only one double-quote ", \'"\', " lol")'
+            ],
+
+            'Lone single quote 1' => [
+                "Only one single-quote ' lol",
+                '"Only one single-quote \' lol"'
+            ],
+
+            'Combined quotes 1' => [
+                "Colonel Jonathon \"Jack\" O'Neill",
+                'concat("Colonel Jonathon ", \'"\', "Jack", \'"\', " O\'Neill")'
+            ]
+        ];
+    }
 }
