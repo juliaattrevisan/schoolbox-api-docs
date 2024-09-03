@@ -111,9 +111,10 @@ class EventUsers
             SELECT DISTINCT
                 {$this->eventMapper->getColumnString('se')}
             FROM {$this->eventMapper->getTable()} se
-            LEFT JOIN {$this->campusMapper->getTable()} sec ON se.id = sec.event_id AND {$campusWhere}
-            LEFT JOIN {$this->roletypeMapper->getTable()} ser ON se.id = ser.event_id AND {$roleWhere}
-            WHERE se.classification = :classification
+            LEFT JOIN {$this->campusMapper->getTable()} sec ON se.id = sec.event_id
+            LEFT JOIN {$this->roletypeMapper->getTable()} ser ON se.id = ser.event_id
+            WHERE {$campusWhere} AND {$roleWhere}
+            AND se.classification = :classification
             AND se.start_at >= :startDatetime
             AND se.finish_at <= :finishDatetime
 
