@@ -36,7 +36,7 @@ class ConcatteryTest extends TestCase
     <Entry>
         <Code>Jack O'Neill</Code>
     </Entry>
-        <Entry>
+    <Entry>
         <Code>Colonel Jonathon \"Jack\" O'Neill</Code>
     </Entry>
     <Entry>
@@ -50,6 +50,9 @@ class ConcatteryTest extends TestCase
     </Entry>
     <Entry>
         <Code>Only one single-quote ' lol</Code>
+    </Entry>
+    <Entry>
+        <Code>The Lord of the Ring's, \"The Return of the King's Hobbits\"</Code>
     </Entry>
 </Stuff>
 ";
@@ -132,6 +135,11 @@ class ConcatteryTest extends TestCase
             'Combined quotes 1' => [
                 "Colonel Jonathon \"Jack\" O'Neill",
                 'concat("Colonel Jonathon ", \'"\', "Jack", \'"\', " O\'Neill")'
+            ],
+
+            'Combined quotes 2' => [
+                "The Lord of the Ring's, \"The Return of the King's Hobbits\"",
+                'concat("The Lord of the Ring\'s, ", \'"\', "The Return of the King\'s Hobbits", \'"\', "")'
             ]
         ];
     }
