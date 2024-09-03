@@ -1,5 +1,7 @@
 import { initializeApp } from "@firebase/app";
 import { getMessaging, getToken, deleteToken, onMessage } from "@firebase/messaging";
+import { PWA_NOTIFICATION_ALLOW, PWA_NOTIFICATION_DENY } from "./firebaseEvent";
+import type { FirebaseRequestNotifEvent } from "./firebaseEvent";
 
 // See /library/Alaress/Async/Notification/Cloud/Firebase/Service.php::propagate
 interface SbxFirebaseNotificationPayload {
@@ -72,20 +74,11 @@ window.sbProps.firebaseApps.forEach((app) => {
     }
 });
 
-interface RequestNotifEvent extends CustomEvent {
-    detail: {
-        debug: boolean;
-        deviceId: string;
-    };
-}
-
 /**
  * Respond to a request to allow notifications, send both to firebase, and schoolbox
- * @param { RequestNotifEvent } event - Information about the event.
+ * @param { FirebaseRequestNotifEvent } event - Information about the event.
  */
-async function requestNotif(event: RequestNotifEvent) {
-    const debug = event.detail.debug as boolean;
-
+async function requestNotif(event: FirebaseRequestNotifEvent) {
     /**
      * Currently there'll usually only be at most one Firebase app, but if we start supporting
      * multiple apps, then we may need to start indexing the pwaConfig by app.appIdentifier too...
@@ -140,12 +133,6 @@ async function requestNotif(event: RequestNotifEvent) {
 
                     window.sbProps.pwaConfig.user.notificationToken = currentToken;
 
-                    // Post this token to Schoolbox,
-                    // registering it for the current user.
-                    if (debug) {
-                        console.log(`Current token: ${currentToken}`);
-                    }
-
                     // The Firebase app may one day be a separate
                     // service to the other mobile apps: should that
                     // happen, the registration will be pushed to some
@@ -156,6 +143,8 @@ async function requestNotif(event: RequestNotifEvent) {
                     formData.append("token", currentToken);
                     formData.append("deviceId", event.detail.deviceId);
 
+                    // Post this token to Schoolbox,
+                    // registering it for the current user.
                     await fetch("/api/register/Firebase", {
                         method: "POST",
                         body: formData,
@@ -164,26 +153,16 @@ async function requestNotif(event: RequestNotifEvent) {
                     window.sbProps.pwaConfig.user.notificationState = "registered";
                 })
                 .catch((error) => {
-                    if (debug) {
-                        console.log(`Error on getting token: ${error}`);
-                    }
+                    console.error(`Error on getting token: ${error}`);
                 });
         }),
     );
 }
 
-interface DenyEvent extends CustomEvent {
-    detail: {
-        debug: boolean;
-    };
-}
-
 /**
  * Respond to a request to allow notifications, send both to firebase, and schoolbox
- * @param { DenyEvent } event - Information about the event.
  */
-function denyNotif(event: DenyEvent) {
-    const debug = event.detail.debug as boolean;
+function denyNotif() {
     window.sbProps.firebaseApps.forEach((app) => {
         if (app.publicConfiguration && app.webPushPublicKey && app.appIdentifier) {
             const firebaseApp = initializeApp(app.publicConfiguration);
@@ -200,17 +179,14 @@ function denyNotif(event: DenyEvent) {
                     // Set notificationState to "removing" so if the page is reloaded we can re-trigger the event
                     window.sbProps.pwaConfig.user.notificationState = "removing";
 
-                    // Post this token to Schoolbox,
-                    // registering it for the current user.
-                    if (debug) {
-                        console.log(`Current token: ${currentToken}`);
-                    }
-
                     // The Firebase app may one day be a separate
                     // service to the other mobile apps: should that
                     // happen, the registration will be pushed to some
                     // other place.
                     // For now, just push it to the Firebase app
+
+                    // Post this token to Schoolbox,
+                    // de-registering it for the current user.
                     await fetch("/api/register/Firebase", {
                         method: "DELETE",
                         body: JSON.stringify({
@@ -225,18 +201,14 @@ function denyNotif(event: DenyEvent) {
                     window.sbProps.pwaConfig.user.notificationState = null;
                 })
                 .catch((error) => {
-                    if (debug) {
-                        console.log(`Error on getting token: ${error}`);
-                    }
+                    console.error(`Error on getting token: ${error}`);
                 });
         }
     });
 }
 
-document.addEventListener("PWA_NOTIFICATION_ALLOW", (event) => {
-    void requestNotif(event as CustomEvent);
+document.addEventListener(PWA_NOTIFICATION_ALLOW, (event) => {
+    void requestNotif(event);
 });
 
-document.addEventListener("PWA_NOTIFICATION_DENY", (event) => {
-    denyNotif(event as CustomEvent);
-});
+document.addEventListener(PWA_NOTIFICATION_DENY, denyNotif);
