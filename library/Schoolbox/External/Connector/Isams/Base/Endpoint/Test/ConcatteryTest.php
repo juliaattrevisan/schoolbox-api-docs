@@ -57,6 +57,9 @@ class ConcatteryTest extends TestCase
     <Entry>
         <Code>just a regular text</Code>
     </Entry>
+    <Entry>
+        <Code>See Mr Huteson/Ms O'Donnel</Code>
+    </Entry>
 </Stuff>
 ";
 
@@ -112,6 +115,11 @@ class ConcatteryTest extends TestCase
     public function providerConcatString(): array
     {
         return [
+            'Real use case 1' => [
+                "See Mr Huteson/Ms O'Donnel",
+                '"See Mr Huteson/Ms O\'Donnel"'
+            ],
+
             'Single Quotes 1' => [
                 "Marty O'Donnell",
                 '"Marty O\'Donnell"'
