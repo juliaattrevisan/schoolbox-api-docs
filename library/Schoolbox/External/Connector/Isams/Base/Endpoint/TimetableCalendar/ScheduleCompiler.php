@@ -100,7 +100,7 @@ class ScheduleCompiler
          */
         $searchTerm = (new Concattery())->generate($setCode);
 
-        $node = $this->api[DSN::MODULE_BATCHXML]->fetchXml("/iSAMS/TeachingManager/Sets/Set[SetCode[text()={$searchTerm}]]")[0] ?? [];
+        $node = $this->api[DSN::MODULE_BATCHXML]->fetchXml("/iSAMS/TeachingManager/Sets/Set[SetCode[text()={$searchTerm}]]")[0] ?? null;
         //null coalesce fetchXml()[0] as that field might not exist... but don't throw warnings either
 
         /* TODO There is a <Teachers> node here, but there's always been
