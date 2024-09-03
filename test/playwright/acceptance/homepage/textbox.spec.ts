@@ -54,7 +54,7 @@ test.describe("Textbox Tests", () => {
     });
 
     //*
-    // as alaress I will navigate to a homepage,
+    // as alaress I will navigate to a homepage
     // add a textbox component with heading and content
     // and verify it is properly presented
     // */
