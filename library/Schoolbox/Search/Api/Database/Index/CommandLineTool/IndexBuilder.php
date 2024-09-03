@@ -15,7 +15,7 @@ use InvalidArgumentException;
 use Schoolbox\Application\CliKernelAbstract;
 use Schoolbox\Application\CliTool\App;
 use Schoolbox\Database\Factory as DatabaseFactory;
-use Schoolbox\Search\Api\Database\Index\IBuilder;
+use Schoolbox\Search\Api\Database\Index\CompositeBuilder;
 use Schoolbox\Search\Api\Database\ResultType;
 
 /**
@@ -109,7 +109,6 @@ class IndexBuilder extends App
         $dbFactory = $this->getDi()->get('databaseFactory');
         $dbi       = $dbFactory->getInternalWriteDatabase();
 
-        /** @var array<string, IBuilder> $indexBuilders */
         $indexBuilders = [
             ResultType\Assessment\Hydrator::BASE_TYPE => new ResultType\Assessment\IndexBuilder($dbi, $logger),
             ResultType\Badge\Hydrator::BASE_TYPE      => new ResultType\Badge\IndexBuilder($dbi, $logger),
@@ -127,8 +126,10 @@ class IndexBuilder extends App
         $types = $this->getOpt(self::OPT_LONG_TYPE);
         if (!isset($types)) {
             $logger->notice('Building search index for all result types');
+            $indexBuilder = new CompositeBuilder(...$indexBuilders);
         } else {
-            $types = is_array($types) ? $types : [$types];
+            $types                 = is_array($types) ? $types : [$types];
+            $includedIndexBuilders = [];
             foreach ($types as $type) {
                 if (!isset($indexBuilders[$type])) {
                     $logger->error(
@@ -140,6 +141,7 @@ class IndexBuilder extends App
                     );
                     exit(CliKernelAbstract::EXIT_STATUS_APP_ERROR);
                 }
+                $includedIndexBuilders[] = $indexBuilders[$type];
             }
             $logger->notice(
                 sprintf(
@@ -147,6 +149,7 @@ class IndexBuilder extends App
                     implode(', ', $types),
                 )
             );
+            $indexBuilder = new CompositeBuilder(...$includedIndexBuilders);
         }
 
         // Some queries run during the filling of the search_index table can take a long time to run.  It is crucial
@@ -219,57 +222,50 @@ class IndexBuilder extends App
 
         $time = microtime(true);
         try {
-            foreach ($indexBuilders as $indexBuilderType => $indexBuilder) {
-                // Not in the list of types to build? Skip
-                if (!empty($types) && !in_array($indexBuilderType, $types, true)) {
+            // Refresh lock before building list of updates
+            $logger->debug('Refreshing lock.');
+            $this->refreshLock($lock);
+
+            foreach ($indexBuilder->buildUpdates($fromDate, $toDate, null) as $updatedIndex) {
+                if (!$this->perform()) {
                     continue;
                 }
 
-                // Refresh lock before building list of updates
-                $logger->debug('Refreshing lock.');
+                // Refresh lock between each update
                 $this->refreshLock($lock);
 
-                foreach ($indexBuilder->buildUpdates($fromDate, $toDate, null) as $updatedIndex) {
-                    if (!$this->perform()) {
-                        continue;
-                    }
-
-                    // Refresh lock between each update
-                    $this->refreshLock($lock);
-
-                    try {
-                        $updateStatement->execute([
-                            'type'                    => $updatedIndex->getType(),
-                            'identifier'              => $updatedIndex->getIdentifier(),
-                            'title'                   => $updatedIndex->getTitle(),
-                            'date'                    => $updatedIndex->getDate()?->getDatabase(),
-                            'isRelevanceDateAffected' => $updatedIndex->getIsRelevanceDateAffected() ? 1 : 0,
-                            'createdBy'               => $updatedIndex->getCreatedBy(),
-                            'folderId'                => $updatedIndex->getFolderId(),
-                            'fulltextIndex'           => $updatedIndex->getFulltextIndex(),
-                        ]);
-                    } catch (Exception $e) {
-                        $logger->warning(
-                            sprintf(
-                                'Unexpected database error when index for "%s:%s" (%s): ignoring',
-                                $updatedIndex->getType(),
-                                $updatedIndex->getIdentifier(),
-                                $e->getMessage(),
-                            )
-                        );
-                        continue;
-                    }
-                }
-
-                foreach ($indexBuilder->buildDeletes($fromDate, $toDate, null) as $deletedIndex) {
-                    if (!$this->perform()) {
-                        continue;
-                    }
-                    $deleteStatement->execute([
-                        'identifier' => $deletedIndex->getIdentifier(),
-                        'type'       => $deletedIndex->getType(),
+                try {
+                    $updateStatement->execute([
+                        'type'                    => $updatedIndex->getType(),
+                        'identifier'              => $updatedIndex->getIdentifier(),
+                        'title'                   => $updatedIndex->getTitle(),
+                        'date'                    => $updatedIndex->getDate()?->getDatabase(),
+                        'isRelevanceDateAffected' => $updatedIndex->getIsRelevanceDateAffected() ? 1 : 0,
+                        'createdBy'               => $updatedIndex->getCreatedBy(),
+                        'folderId'                => $updatedIndex->getFolderId(),
+                        'fulltextIndex'           => $updatedIndex->getFulltextIndex(),
                     ]);
+                } catch (Exception $e) {
+                    $logger->warning(
+                        sprintf(
+                            'Unexpected database error when index for "%s:%s" (%s): ignoring',
+                            $updatedIndex->getType(),
+                            $updatedIndex->getIdentifier(),
+                            $e->getMessage(),
+                        )
+                    );
+                    continue;
                 }
+            }
+
+            foreach ($indexBuilder->buildDeletes($fromDate, $toDate, null) as $deletedIndex) {
+                if (!$this->perform()) {
+                    continue;
+                }
+                $deleteStatement->execute([
+                    'identifier' => $deletedIndex->getIdentifier(),
+                    'type'       => $deletedIndex->getType(),
+                ]);
             }
         } catch (LockRefreshException) {
             // Do not carry on: instead, exit politely
