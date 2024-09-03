@@ -33,10 +33,8 @@ These implementations are used by only a small number of schools, but are still
 supported:
 
 - DoubleFirst
-- Denbigh
 - Edumate
 - iSAMS (deprecated, replaced with a SUDS variant)
-- MAZE
 - Schooledge
 
 ## Writing

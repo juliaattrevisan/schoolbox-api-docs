@@ -227,16 +227,10 @@ class Factory
             case 'synergetic':
             case 'schoolpro':
             case 'pcschools':
-            case 'maze':
             case 'isams':
             case 'doublefirst':
             case 'schooledge':
                 $connectorExternal = $this->factory->createSqlsrv();
-                break;
-
-            // MySQL
-            case 'denbigh':
-                $connectorExternal = $this->factory->createMysql();
                 break;
 
             // IBM DB2
