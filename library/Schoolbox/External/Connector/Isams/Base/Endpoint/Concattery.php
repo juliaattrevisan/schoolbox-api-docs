@@ -20,28 +20,29 @@ class Concattery
      */
     public function generate(string $input): string
     {
+        $concat = $input;
+
         /* Replace " with a concat equivalent
          */
-        if (str_contains($input, '"')) {
+        if (str_contains($concat, '"')) {
             /* First, explode on double quotes
              */
+            $bits = explode('"', $concat);
 
             /* Then implode on \'"\'
              */
+            $concat = implode('\'"\'', $bits);
         }
 
         /* Replace ' with a concat equivalent
+         * Just replace single quotes with an escaped version
          */
-        if (str_contains($input, "'")) {
-            /* First, explode on double quotes
-             */
-
-            /* Then implode on \'"\'
-             */
+        if (str_contains($concat, "'")) {
+            $concat = str_replace("'", "\'", $concat);
         }
 
         /* If it didn't contain any quotes, return the original string
          */
-        return '';
+        return $concat;
     }
 }
