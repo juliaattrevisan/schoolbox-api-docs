@@ -18,7 +18,6 @@ const myself: Developer = {
 
 /**
  * Say hello
- *
  * @param {Developer} person - person to say hello to
  * @returns {string} say hello
  */
@@ -30,7 +29,6 @@ hello(myself);
 
 /**
  * Log name or age
- *
  * @param { number | string } nameOrAge - log either name or age
  * @returns { string } - to return name or age
  */
@@ -44,7 +42,6 @@ printNameOrAge(myself.age);
 
 /**
  * We can use optional parameters
- *
  * @param { string } name - name to greet
  * @returns { string } - say hello
  */

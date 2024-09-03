@@ -19,14 +19,12 @@ export const useActiveNodeStore = defineStore("mcActiveNode", () => {
 
     /**
      * To show further info on a selected node
-     *
      * @returns { boolean }
      */
     const isActive = window.Vue.computed(() => node.value.id !== UNSET_ID);
 
     /**
      * Add in the code if it's available otherwise just show the title
-     *
      * @returns { string }
      */
     const title = window.Vue.computed(() => {
@@ -41,7 +39,6 @@ export const useActiveNodeStore = defineStore("mcActiveNode", () => {
 
     /**
      * set the node to perform an action on
-     *
      * @param { Node } newNode - the new node
      */
     function set(newNode: Node) {
@@ -50,7 +47,6 @@ export const useActiveNodeStore = defineStore("mcActiveNode", () => {
 
     /**
      * Set newly saved values on the node
-     *
      * @param { NodeToUpdate } newNode - the new node
      */
     function update(newNode: NodeToUpdate) {
@@ -68,7 +64,6 @@ export const useActiveNodeStore = defineStore("mcActiveNode", () => {
 
     /**
      * Add in a new subsection to the active node
-     *
      * @param { Node } newNode - the new node to add in
      */
     async function addSubsection(newNode: Node) {

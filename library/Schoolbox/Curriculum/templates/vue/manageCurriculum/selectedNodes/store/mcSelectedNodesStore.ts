@@ -20,49 +20,42 @@ export const useSelectedNodesStore = defineStore("mcSelectedNodes", () => {
 
     /**
      * Do we have any selected nodes?
-     *
      * @returns { boolean }
      */
     const hasNoNodes = window.Vue.computed(() => nodes.value.length === 0);
 
     /**
      * Do we have any selected nodes?
-     *
      * @returns { boolean }
      */
     const hasNodes = window.Vue.computed(() => nodes.value.length > 0);
 
     /**
      * Number of nodes
-     *
      * @returns { number }
      */
     const count = window.Vue.computed(() => nodes.value.length);
 
     /**
      * Return the single or plural depending on node selection
-     *
      * @returns { string }
      */
     const singleOrPlural = window.Vue.computed(() => (count.value > 1 ? "outcomes" : "outcome"));
 
     /**
      * just return an array of ids, used to compare if a node is selected or not
-     *
      * @returns { number[] }
      */
     const nodesIds = window.Vue.computed(() => nodes.value.map((node) => node.id));
 
     /**
      * just return an array of ids, used to compare if a node is selected or not
-     *
      * @returns { number[] }
      */
     const childNodesIds = window.Vue.computed(() => childNodes.value.map((node) => node.id));
 
     /**
      * check if all nodes are enabled so we can just show the disable button
-     *
      * @returns { boolean }
      */
     const allNodesEnabled = window.Vue.computed(() => {
@@ -76,7 +69,6 @@ export const useSelectedNodesStore = defineStore("mcSelectedNodes", () => {
     /**
      * check if all nodes are disabled so we can just show the enable button
      * disabled child nodes cant be enabled - only the disabled parent can be enabled
-     *
      * @returns { boolean }
      */
     const allNodesDisabled = window.Vue.computed(() => {
@@ -100,7 +92,6 @@ export const useSelectedNodesStore = defineStore("mcSelectedNodes", () => {
 
     /**
      * To show further info on a selected node
-     *
      * @returns { boolean }
      */
     const hasActiveNode = window.Vue.computed(() => activeNode.value.id !== UNSET_ID);
@@ -108,7 +99,6 @@ export const useSelectedNodesStore = defineStore("mcSelectedNodes", () => {
     /**
      * we need to check if a new parent has been selected of any existing children,
      * if it has the children should be removed as the parent now takes precedence
-     *
      * @param { Node } nodeToAdd - the Node to add
      * @returns { Node[] } - no children of selected nodes
      */
@@ -127,7 +117,6 @@ export const useSelectedNodesStore = defineStore("mcSelectedNodes", () => {
 
     /**
      * remove any existing child nodes that don't have a .selectedParentId that is an id contained in nodes
-     *
      * @returns { Node[] } - the list of Nodes with children removed
      */
     function removeChildNodes(): Node[] {
@@ -140,7 +129,6 @@ export const useSelectedNodesStore = defineStore("mcSelectedNodes", () => {
      * recursively loop through and update the childNodes array
      * adding any loaded children when the parent node is selected
      * or removing any loaded children from the node just removed
-     *
      * @param { Node } node - the Node to update
      * @param { boolean } isSelected - whether the Node is selected or not
      * @param { number } selectedParentId - the id of the parent Node
@@ -165,7 +153,6 @@ export const useSelectedNodesStore = defineStore("mcSelectedNodes", () => {
 
     /**
      * add a node
-     *
      * @param { Node } nodeToAdd - the Node to add
      */
     function add(nodeToAdd: Node) {
@@ -177,7 +164,6 @@ export const useSelectedNodesStore = defineStore("mcSelectedNodes", () => {
 
     /**
      * remove a node
-     *
      * @param { Node } nodeToRemove - the Node to remove
      */
     function remove(nodeToRemove: Node) {
@@ -190,7 +176,6 @@ export const useSelectedNodesStore = defineStore("mcSelectedNodes", () => {
      * for each newly loaded node, we need to check whether its parent has been selected
      * to do this we check if the parent of the loaded node is already in the child nodes list
      * if it is we also need to add in this node
-     *
      * @param { Node } node - to determine whether the Node is already selected
      */
     function checkIfSelected(node: Node) {
@@ -217,7 +202,6 @@ export const useSelectedNodesStore = defineStore("mcSelectedNodes", () => {
 
     /**
      * to switch a nodes selection status
-     *
      * @param { Node } node - the node to add or remove
      * @param { boolean } isChecked - to determine whether to add or remove
      */
@@ -238,7 +222,6 @@ export const useSelectedNodesStore = defineStore("mcSelectedNodes", () => {
 
     /**
      * set the active node, which would prompt the selected-node-modal to open
-     *
      * @param { Node } node - the active Node
      */
     function setActiveNode(node: Node) {
@@ -248,7 +231,6 @@ export const useSelectedNodesStore = defineStore("mcSelectedNodes", () => {
     /**
      * Loop through recursively and update all
      * children to the parents updated enabled state
-     *
      * @param { Node } node - the Node to enable/disable all children of
      * @param { boolean } enabled - whether to enable or disable
      */

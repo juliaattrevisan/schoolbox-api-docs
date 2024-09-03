@@ -189,7 +189,6 @@ export const useNodesStore = defineStore("mcNodes", () => {
 
     /**
      * Load in another level of children of the target node id
-     *
      * @param { number } id - the id of the Node to children of
      */
     async function loadNextChildren(id: number) {

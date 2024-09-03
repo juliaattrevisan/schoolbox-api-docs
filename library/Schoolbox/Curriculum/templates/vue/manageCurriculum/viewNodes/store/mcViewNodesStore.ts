@@ -32,14 +32,12 @@ export const useViewNodesStore = defineStore("mcViewNodes", () => {
 
     /**
      * Can now use the search input when we have selected at least one node
-     *
      * @returns { boolean }
      */
     const isActive = window.Vue.computed(() => idList.value.length > 0);
 
     /**
      * to traverse back through the nodes via breadcrumbs
-     *
      * @returns { Array }
      */
     const breadcrumbs = window.Vue.computed(() => {
@@ -60,7 +58,6 @@ export const useViewNodesStore = defineStore("mcViewNodes", () => {
 
     /**
      * the current node selection
-     *
      * @returns { Node }
      */
     const current = window.Vue.computed(() => {
@@ -76,7 +73,6 @@ export const useViewNodesStore = defineStore("mcViewNodes", () => {
     /**
      * the current nodes to display, which are either just the current selection
      * or when the search is active the results found within the current selection
-     *
      * @returns { Node[] }
      */
     const nodes = window.Vue.computed<Node[]>(() => {
@@ -97,7 +93,6 @@ export const useViewNodesStore = defineStore("mcViewNodes", () => {
 
     /**
      * Add one more selection
-     *
      * @param { number } id - id of the Node to move to
      */
     function toNext(id: number) {
@@ -107,7 +102,6 @@ export const useViewNodesStore = defineStore("mcViewNodes", () => {
 
     /**
      * Move up to a previous node
-     *
      * @param { number } targetDepth - the depth to move back to
      */
     function toPrevious(targetDepth: number) {
@@ -142,7 +136,6 @@ export const useViewNodesStore = defineStore("mcViewNodes", () => {
     /**
      * There's been a change in node selection,
      * so update based on the change in depth
-     *
      * @param { number } depth - the depth to move to
      * @param { number } id - the id of the selected Node
      */
@@ -164,7 +157,6 @@ export const useViewNodesStore = defineStore("mcViewNodes", () => {
 
     /**
      * If the deleted node is currently the node visible, we need to move up one depth on the tree
-     *
      * @param { Node } node - node to check
      */
     function checkDeletedNode(node: Node) {
@@ -175,7 +167,6 @@ export const useViewNodesStore = defineStore("mcViewNodes", () => {
 
     /**
      * Move one depth down the tree
-     *
      * @param { number } id - id of the Node to select
      */
     async function setNextSelected(id: number) {
@@ -187,7 +178,6 @@ export const useViewNodesStore = defineStore("mcViewNodes", () => {
     /**
      * To traverse to a specified id, regardless of where it is
      * in the current tree structure
-     *
      * @param { number } id - id of the Node to move to
      */
     async function toId(id: number) {
@@ -196,7 +186,6 @@ export const useViewNodesStore = defineStore("mcViewNodes", () => {
 
     /**
      * To responsd to browser backward and forward button actions
-     *
      * @param { object } state -
      */
     async function updateOnPopState(state: PopState) {
