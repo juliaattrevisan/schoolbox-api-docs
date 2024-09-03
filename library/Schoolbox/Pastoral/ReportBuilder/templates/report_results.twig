@@ -31,7 +31,7 @@
                 <section>
                     <ul class="information-list threaded">
                         <li>
-                            <div class="small-12 card wrap-down">
+                            <div class="small-12 card wrap-down" id="record{{ record.id }}">
                                 {# Theres no need for the all the twig access checks like the list page, if the user got to this screen they can view everything #}
                                 <a href="{{ profile.link(record.student) }}">
                                     {{ profile.imageSquare64(record.student) }}
@@ -145,4 +145,19 @@
             window.print();
         });
     })
+</script>
+<script>
+    //Search for the record in the report to highlight
+    const checkForRecordHighlight = () => {
+        const hash = window.location.hash.substr(1);
+        const element = document.getElementById(hash);
+        if (element) {
+            element.parentElement.classList.add('highlight-selection');
+            setTimeout(() => {
+                element.parentElement.classList.remove('highlight-selection');
+            }, 5000);
+        }
+        return element;
+    }
+    let currentHighlightedElement = checkForRecordHighlight();
 </script>
