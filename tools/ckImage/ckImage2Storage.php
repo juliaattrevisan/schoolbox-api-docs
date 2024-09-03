@@ -237,7 +237,7 @@ HELP;
                 if ($this->perform()) {
                     $this->getLogger()->info(sprintf("Extracting image from %s.%s (%s: %s)", $table, $column, $primary, $row[$primary]));
                     try {
-                        $newValue = $this->inlineImageConverter->convert($value);
+                        $newValue = $this->inlineImageConverter->convert((string)$value);
                     } catch (RuntimeException $e) {
                         $this->getLogger()->error("Image Extraction Failed");
                         $this->getLogger()->error($e->getMessage());
