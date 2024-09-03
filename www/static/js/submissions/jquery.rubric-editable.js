@@ -142,7 +142,7 @@
                     .find(
                         '[name="' +
                             (opt.formField + "[" + [payload.rubricId, "group", groupIndex, "name"].join("][") + "]") +
-                            '"]'
+                            '"]',
                     )
                     .val();
             }
@@ -383,7 +383,7 @@
 
         // aaand meaningful-transition out
         $rb.find("td." + opt.hideHorizontalClass + ", th." + opt.hideHorizontalClass).removeClass(
-            opt.hideHorizontalClass
+            opt.hideHorizontalClass,
         );
 
         // focus on the newly-created level input
@@ -567,7 +567,7 @@
             this.style.height = "auto";
             h = Math.max(
                 h,
-                this.scrollHeight - parseInt($(this).css("paddingTop")) - parseInt($(this).css("paddingBottom"))
+                this.scrollHeight - parseInt($(this).css("paddingTop")) - parseInt($(this).css("paddingBottom")),
             );
         });
 
@@ -613,7 +613,7 @@
             return $(
                 $.map(rtn, function (el) {
                     return $.makeArray(el);
-                })
+                }),
             );
         }
     };

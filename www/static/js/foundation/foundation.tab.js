@@ -117,9 +117,9 @@
                             if (hash_tab_container_id != undefined) {
                                 self.toggle_active_tab(
                                     $(
-                                        "[" + self.attr_name() + "] > * > a[href=#" + hash_tab_container_id + "]"
+                                        "[" + self.attr_name() + "] > * > a[href=#" + hash_tab_container_id + "]",
                                     ).parent(),
-                                    hash
+                                    hash,
                                 );
                             }
                         }
@@ -128,8 +128,8 @@
                         for (var ind = 0; ind < self.default_tab_hashes.length; ind++) {
                             self.toggle_active_tab(
                                 $(
-                                    "[" + self.attr_name() + "] > * > a[href=" + self.default_tab_hashes[ind] + "]"
-                                ).parent()
+                                    "[" + self.attr_name() + "] > * > a[href=" + self.default_tab_hashes[ind] + "]",
+                                ).parent(),
                             );
                         }
                     }

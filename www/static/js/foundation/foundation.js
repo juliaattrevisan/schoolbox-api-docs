@@ -24,7 +24,7 @@
                 if (head.has("." + class_name).length === 0) {
                     return '<meta class="' + class_name + '" />';
                 }
-            })
+            }),
         );
     };
 
@@ -109,7 +109,7 @@
                     should_bind_events = !$this.data(self.attr_name(true) + "-init");
                 $this.data(
                     self.attr_name(true) + "-init",
-                    $.extend({}, self.settings, options || method, self.data_options($this))
+                    $.extend({}, self.settings, options || method, self.data_options($this)),
                 );
 
                 if (should_bind_events) {
@@ -612,7 +612,7 @@
                     if (query !== undefined) {
                         Foundation.stylesheet.insertRule(
                             "@media " + Foundation.media_queries[media] + "{ " + rule + " }",
-                            Foundation.stylesheet.cssRules.length
+                            Foundation.stylesheet.cssRules.length,
                         );
                     }
                 }

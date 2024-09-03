@@ -370,7 +370,7 @@ const isFirstUnit = window.Vue.computed(() => {
 </template>
 
 <style scoped lang="scss">
-@import "www/static/css/core/base/_variables.scss";
+@import "@css/core/base/_variables.scss";
 
 .unit-cell {
     overflow: clip; // Use clip to avoid focus scrolling the cell content

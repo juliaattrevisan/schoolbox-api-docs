@@ -89,7 +89,7 @@
                                                 gallery.openGallery();
                                             },
                                         },
-                                    })
+                                    }),
                                 );
                             } else if (response.type == "iframe") {
                                 document.dispatchEvent(
@@ -111,7 +111,7 @@
                                                 gallery.openGallery();
                                             },
                                         },
-                                    })
+                                    }),
                                 );
                             } else {
                                 document.dispatchEvent(
@@ -132,7 +132,7 @@
                                                 const fragmentDiv = document.createRange().createContextualFragment(
                                                     `<div class="lg-video-cont" style="width:80%;max-width:100%;max-height:100%;">
                                                     <div class="preview fragment">${response.fragment}</div>
-                                                </div>`
+                                                </div>`,
                                                 );
 
                                                 // This is a slight workaround to display the content properly, as LightGallery
@@ -159,7 +159,7 @@
                                                 gallery.openGallery();
                                             },
                                         },
-                                    })
+                                    }),
                                 );
                             }
                         }).fail(function () {

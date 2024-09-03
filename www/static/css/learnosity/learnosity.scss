@@ -3,8 +3,8 @@
   Used the Learnosity Styling API scoping to separate our SCSS files based on this reference "https://help.learnosity.com/hc/en-us/articles/360000754758-Tutorial-205-Styling-with-CSS", for tidying up the CSS to make easier future modifications.
 */
 
-@use "shared-styles";
-@use "assess";
-@use "author";
-@use "questions";
-@use "reports";
+@use "./shared-styles";
+@use "./assess";
+@use "./author";
+@use "./questions";
+@use "./reports";

@@ -225,7 +225,7 @@ String.prototype.format = function () {
                 last.find(".card").append('<p class="spaced">{0}</p>'.format(htmlEscapedMessage));
             } else {
                 var $message_el = $('<li data-user="{0}" class="row"></li>'.format($message.user_id)).addClass(
-                    "chat-message-" + $message.type
+                    "chat-message-" + $message.type,
                 );
 
                 /* If admin */
@@ -292,7 +292,7 @@ String.prototype.format = function () {
                         /* Mute/unmute buttons */
                         if ($self.options.user_perm > $user.perm && $user.user_id != $self.options.user_id) {
                             var $mute_el = $(
-                                '<nav><a href="#" class="icon-mute" title="Mute" data-interaction-mute></a></nav>'
+                                '<nav><a href="#" class="icon-mute" title="Mute" data-interaction-mute></a></nav>',
                             );
 
                             if (

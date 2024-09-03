@@ -245,7 +245,7 @@ $.fn.alaressDateTimePicker = function (optionsOverride) {
             pickerId +
             '" class="adtp reveal-modal no-pad ' +
             modalSize +
-            '" data-adtp></div></div>'
+            '" data-adtp></div></div>',
     );
 
     // On focus of the element- store the original value in a data var, so that we can compare before 'massaging' (strtotime)
@@ -398,10 +398,10 @@ $.fn.alaressDateTimePicker = function (optionsOverride) {
                                 var newTime = dayjs(
                                     $timetablePicker
                                         .find(
-                                            "[data-adtp-tt-period][data-campus=" + selectedCampus + "] option:selected"
+                                            "[data-adtp-tt-period][data-campus=" + selectedCampus + "] option:selected",
                                         )
                                         .attr("data-" + periodTime + "-time"),
-                                    "h:mma"
+                                    "h:mma",
                                 );
                                 newDate = newDate.hour(newTime.hour()).minute(newTime.minute()).second(0);
                             }
@@ -425,7 +425,7 @@ $.fn.alaressDateTimePicker = function (optionsOverride) {
                         // Close the modal
                         $modal.foundation("reveal", "close");
                     });
-                }
+                },
             );
         } else if ($modal.data("status") === "loaded") {
             $modal.foundation("reveal", "open");

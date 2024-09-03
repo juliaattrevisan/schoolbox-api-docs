@@ -146,7 +146,7 @@
                 ajaxes.push(
                     $.retryPromise(function () {
                         return $.fn[pluginName].saveOne($("#questionForm-" + id));
-                    })
+                    }),
                 );
             });
             return $.when.apply(null, ajaxes);

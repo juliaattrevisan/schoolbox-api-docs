@@ -48,8 +48,8 @@
                             Math.random() *
                                 Math.min(
                                     settings.timeout * settings.maxRetry,
-                                    Math.pow(2, attempts + 1) * settings.timeout
-                                )
+                                    Math.pow(2, attempts + 1) * settings.timeout,
+                                ),
                         );
                         return _retryPromise(internalPromise, settings, attempts + 1, jitter)
                             .done(function () {

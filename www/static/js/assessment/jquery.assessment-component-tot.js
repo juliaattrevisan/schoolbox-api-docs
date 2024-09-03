@@ -116,7 +116,7 @@
                 let $element = $(this),
                     $modal = $element.closest("[data-reveal]");
                 $modal.foundation("reveal", "close");
-            }
+            },
         );
         $(document).on(
             "click.assessmentTotInstance",
@@ -160,7 +160,7 @@
                             css: "pop alert",
                         });
                     });
-            }
+            },
         );
     };
 })(jQuery);

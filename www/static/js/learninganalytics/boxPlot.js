@@ -97,15 +97,15 @@
 
                                     tooltipContent = tooltipContent.replace(
                                         /{EXTERNAL_ID}/,
-                                        options.allData.input[this.x][i].externalId
+                                        options.allData.input[this.x][i].externalId,
                                     );
                                     tooltipContent = tooltipContent.replace(
                                         /{UID}/,
-                                        options.allData.input[this.x][i].uid
+                                        options.allData.input[this.x][i].uid,
                                     );
                                     tooltipContent = tooltipContent.replace(
                                         /{NAME}/,
-                                        options.allData.input[this.x][i].info
+                                        options.allData.input[this.x][i].info,
                                     );
                                     tooltipContent = tooltipContent.replace(/{VALUE}/, this.y);
 

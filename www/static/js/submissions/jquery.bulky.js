@@ -28,7 +28,7 @@
         /* Specify an arbitrary prefix to deconflict multiple sets of checkboxes in the same modal
          * It's optional; without it, checkboxes will have the id of the  user.
          */
-        checkboxPrefix: '',
+        checkboxPrefix: "",
         /* This callback fires immediately after the bulky checkbox list is injected
          */
         onAfterBuildList: $.noop,
@@ -151,7 +151,7 @@
 
                         /* Default checkbox states
                          */
-                        $chk.attr('checked', opt.defaultState);
+                        $chk.attr("checked", opt.defaultState);
 
                         // Add attribute 'data-bulky-checkbox' to allow selection of all checkboxes except
                         // the select-all checkbox (that will be added if opt.includeSelectAllCheckbox is true).
@@ -175,7 +175,7 @@
                         return html;
                     })
                     .get()
-                    .join("")
+                    .join(""),
             );
 
             /* A callback that fires immediately after the bulky checkbox list is built
@@ -220,24 +220,28 @@
             if (opt.includeSelectAllCheckbox) {
                 // Insert a 'select all' checkbox at the top of the other checkboxes, and use jquery.selectAllBasic()
                 // to control its behaviour.
-                let $selectAllCheckbox = $("#data-bulky-select-all-checkbox-" + opt.checkboxPrefix)
+                let $selectAllCheckbox = $("#data-bulky-select-all-checkbox-" + opt.checkboxPrefix);
 
                 // If the modal has been closed and then reopened, we may have already added the select-all checkbox.
                 /* Also, only apply a Select All checkbox if there are actually checkbkoxes in the list
                  * Otherwise you have nothing to select.
                  */
-                if (0 === $selectAllCheckbox.length && bulky.list.find('input').length > 0) {
+                if (0 === $selectAllCheckbox.length && bulky.list.find("input").length > 0) {
                     bulky.list.before(
                         "<div>" +
-                            "<input id='data-bulky-select-all-checkbox-" + opt.checkboxPrefix + "' type='checkbox' />" +
-                            "<label for='data-bulky-select-all-checkbox-" + opt.checkboxPrefix + "' class='checkbox-label'>Select All</label>" +
-                            "</div>"
+                            "<input id='data-bulky-select-all-checkbox-" +
+                            opt.checkboxPrefix +
+                            "' type='checkbox' />" +
+                            "<label for='data-bulky-select-all-checkbox-" +
+                            opt.checkboxPrefix +
+                            "' class='checkbox-label'>Select All</label>" +
+                            "</div>",
                     );
                 }
 
                 /* Reselect this, in case we spawned it
                  */
-                $selectAllCheckbox = $("#data-bulky-select-all-checkbox-" + opt.checkboxPrefix)
+                $selectAllCheckbox = $("#data-bulky-select-all-checkbox-" + opt.checkboxPrefix);
 
                 // We restrict to enabled here so that when all enabled checkboxes are checked (and there are some
                 // disabled checkboxes), jquery.selectAllBasic() will give the 'select all' checkbox the tick instead
@@ -287,7 +291,7 @@
                 bulky,
                 bulky.element.find(":checked").map(function () {
                     return opt.userList.find("[data-participant=" + this.id + "] [data-action-bar]").get();
-                })
+                }),
             );
         });
 

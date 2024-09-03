@@ -172,7 +172,7 @@ export const useNodesStore = defineStore(`csNodes`, {
                 { id: modalViewNodesStore.current.id, name: modalViewNodesStore.current.name },
             ];
             const onlyInactiveBreadcrumbs = breadcrumbs.filter((newBreadcrumb) =>
-                this.isActiveBreadcrumb(activeBreadcrumbs, newBreadcrumb)
+                this.isActiveBreadcrumb(activeBreadcrumbs, newBreadcrumb),
             );
             for (let i = 0; i < onlyInactiveBreadcrumbs.length; i += 1) {
                 // recursively load in each node and traverse down

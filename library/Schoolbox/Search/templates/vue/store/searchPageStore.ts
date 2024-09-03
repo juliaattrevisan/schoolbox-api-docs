@@ -32,7 +32,7 @@ export const useStore = defineStore("searchPage", () => {
         $selectedFilterDateRange: FilterDateRange,
         $creator: Creator | null,
         $filterTypesAvailable: FilterType[],
-        $filterTypesSelected: string[]
+        $filterTypesSelected: string[],
     ) {
         endpoint = $endpoint;
 

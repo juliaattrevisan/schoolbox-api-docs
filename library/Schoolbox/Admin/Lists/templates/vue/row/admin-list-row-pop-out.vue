@@ -51,7 +51,7 @@ export default {
         activeFields() {
             const fieldIdList = this.fields.map((field) => field.id); //a list of just field.id to get the relevant key/value in rowKeyValueList
             const popOutKeyValueList = this.rowKeyValueList.filter((row) =>
-                fieldIdList.some((fieldId) => fieldId === row.key)
+                fieldIdList.some((fieldId) => fieldId === row.key),
             ); //pull out those rowKeyValue object pairs that are part of the pop out
             return this.fields.filter((field, index) => popOutKeyValueList[index].value); //when the value is set to true, put in the list
         },
@@ -172,7 +172,7 @@ export default {
 </template>
 
 <style lang="scss" scoped>
-@import "www/static/css/core/base/_variables.scss";
+@import "@css/core/base/_variables.scss";
 
 .list-container {
     //to contain the .pop-out-list and the .update-button

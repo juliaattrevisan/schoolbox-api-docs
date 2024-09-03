@@ -96,8 +96,8 @@
                                 height: rowHeight + config.indicatorOffset + "px",
                             });
                     } else if (allSubjects.length == 1) {
-                    /* Only one subject - make it fill available space
-                     */
+                        /* Only one subject - make it fill available space
+                         */
                         if (hasActiveSubject && !$(cell).find(config.indicator).length) {
                             allSubjects.css({
                                 height: rowHeight + config.indicatorOffset + "px",
@@ -108,9 +108,9 @@
                             });
                         }
                     } else {
-                    /* Multiple classes in this period
-                     * Distribute difference equally
-                     */
+                        /* Multiple classes in this period
+                         * Distribute difference equally
+                         */
                         var subjectHeight = 0;
                         var diff = 0;
 

@@ -121,7 +121,7 @@
                         function () {
                             // Add series to href
                             location.href = deleteButton.attr("href") + "&efficacy=series";
-                        }
+                        },
                     );
                 });
             } else {
@@ -266,7 +266,7 @@
                                 $("#efficacy").val("series");
 
                                 form.submit();
-                            }
+                            },
                         );
                     } else {
                         // single event - just submit

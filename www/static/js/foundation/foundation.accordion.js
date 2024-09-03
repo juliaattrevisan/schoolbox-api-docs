@@ -50,7 +50,7 @@
                                     groupSelector +
                                     "] li > " +
                                     "." +
-                                    settings.content_class
+                                    settings.content_class,
                             );
                             aunts = aunts.add("[" + groupSelector + "] dd, [" + groupSelector + "] li");
                         }
@@ -78,7 +78,7 @@
                         target.triggerHandler("toggled", [accordion]);
                         accordion.triggerHandler("toggled", [target]);
                         S(this).attr("aria-expanded", "true");
-                    }
+                    },
                 );
         },
 

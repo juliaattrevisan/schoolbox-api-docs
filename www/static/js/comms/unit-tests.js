@@ -728,7 +728,7 @@ function TestSuite() {
             return;
         }
         throw new Error(
-            "Expected: '" + expected + "' (" + typeof expected + "), Actual: '" + actual + "' (" + typeof actual + ")"
+            "Expected: '" + expected + "' (" + typeof expected + "), Actual: '" + actual + "' (" + typeof actual + ")",
         );
     };
 }

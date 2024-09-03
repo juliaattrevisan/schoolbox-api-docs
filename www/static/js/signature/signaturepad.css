@@ -7,7 +7,9 @@
     /**
      * Should no longer need to define this twice (as IE no longer supported)
      */
-    cursor: url("./assets/pen.cur") 16 16, crosshair;
+    cursor:
+        url("./assets/pen.cur") 16 16,
+        crosshair;
 
     -ms-touch-action: none;
     -webkit-user-select: none;

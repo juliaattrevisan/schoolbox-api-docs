@@ -155,16 +155,13 @@ async function saveComponentSettings(component, form) {
         submitFormButton.value = "Updating...";
 
         // Set X-Requested-With header to allow for AJAX specific processing in the backend controller
-        const response = await fetch(
-            getMasonryConfig().settings.updateUrl,
-            {
-                method: "POST",
-                body: getSaveComponentSettingsParams(form),
-                headers: {
-                    "X-Requested-With": "XMLHttpRequest",
-                },
-            }
-        );
+        const response = await fetch(getMasonryConfig().settings.updateUrl, {
+            method: "POST",
+            body: getSaveComponentSettingsParams(form),
+            headers: {
+                "X-Requested-With": "XMLHttpRequest",
+            },
+        });
         const responseData = await response.text();
         await updateComponent(component, responseData);
     } catch (error) {
@@ -219,7 +216,7 @@ async function updateComponent(component, responseData) {
     document.dispatchEvent(
         new CustomEvent(UpdateMasonryEvents.COMPONENT_UPDATED, {
             detail: { component: newComponent },
-        })
+        }),
     );
 }
 

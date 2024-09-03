@@ -80,8 +80,8 @@
                     Array.prototype.slice.call(
                         elem.find("[data-" + hook + "]").map(function () {
                             return $(this).data(hook);
-                        })
-                    )
+                        }),
+                    ),
                 );
             }
 

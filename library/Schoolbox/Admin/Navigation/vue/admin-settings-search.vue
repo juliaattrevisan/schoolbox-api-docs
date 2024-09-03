@@ -406,7 +406,7 @@ export default window.Vue.defineComponent({
 </template>
 
 <style lang="scss" scoped>
-@import "www/static/css/core/base/_variables.scss";
+@import "@css/core/base/_variables.scss";
 
 .admin-search-container {
     position: relative;

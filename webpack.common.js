@@ -250,14 +250,14 @@ module.exports = {
         // Birthday pop up
         birthdaySurprise: "./vue/components/birthday/birthdaySurprise.ts",
 
-        //Sass
-        core: "./www/static/css/core/core.scss",
-        schoolboxCkStyles: "./www/static/css/core/schoolbox-ck-content.scss",
-        learnosity: "./www/static/css/learnosity/learnosity.scss",
-
         // Firebase
         firebaseInit: "./www/static/js/firebase/firebase-init.ts",
         firebaseMessaging: "./www/static/js/firebase/firebase-messaging.ts",
+
+        //Sass (leave at the bottom)
+        core: "./www/static/css/core/core.scss",
+        schoolboxCkStyles: "./www/static/css/core/schoolbox-ck-content.scss",
+        learnosity: "./www/static/css/learnosity/learnosity.scss",
     },
     output: {
         path: path.resolve(__dirname, "www/static/js/bundle"),
@@ -359,7 +359,9 @@ module.exports = {
                                     url: false, // don't validate image urls as they error, so we trust rely on checking in browser
                                 },
                             },
-                            { loader: "sass-loader" },
+                            {
+                                loader: "sass-loader",
+                            },
                         ],
                     },
                     {
@@ -381,12 +383,6 @@ module.exports = {
                             },
                             {
                                 loader: "sass-loader", // to load the sass and export it to css
-                                options: {
-                                    sassOptions: {
-                                        indentWidth: 4,
-                                        includePaths: ["../../css/core/"], // where our base css file is loaded
-                                    },
-                                },
                             },
                         ],
                     },

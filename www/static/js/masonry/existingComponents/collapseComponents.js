@@ -68,7 +68,7 @@ export async function open(component) {
         collapseButton,
         collapseButton.classList.contains("icon-up-arrow") ? ANIMATE_OPEN_POSITION : ANIMATE_CLOSED_POSITION,
         ANIMATE_ORIGIN,
-        ANIMATE_SPEED
+        ANIMATE_SPEED,
     );
     const collapsePanel = component.querySelector(PANEL_SELECTOR);
     collapsePanel.setAttribute("data-collapse-state", "uncollapsed");
@@ -88,7 +88,7 @@ export async function close(component) {
         collapseButton,
         collapseButton.classList.contains("icon-up-arrow") ? ANIMATE_CLOSED_POSITION : ANIMATE_OPEN_POSITION,
         ANIMATE_ORIGIN,
-        ANIMATE_SPEED
+        ANIMATE_SPEED,
     );
     const collapsePanel = component.querySelector(PANEL_SELECTOR);
     collapsePanel.setAttribute("data-collapse-state", "collapsed");

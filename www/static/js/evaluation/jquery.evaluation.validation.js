@@ -11,7 +11,7 @@
             function (value, element) {
                 return this.optional(element) || parseFloat(value) > 0;
             },
-            "Amount must be greater than zero"
+            "Amount must be greater than zero",
         );
     };
 
@@ -38,7 +38,7 @@
 
                 return fieldsAreFilled;
             },
-            "Please fill out all answers"
+            "Please fill out all answers",
         );
     };
 
@@ -53,7 +53,7 @@
             function (value, element) {
                 return $(config.answerCollectionList).find("[data-input] [data-answer-option]:checked").length > 0;
             },
-            "Please select at least one correct answer"
+            "Please select at least one correct answer",
         );
     };
 
@@ -78,7 +78,7 @@
 
                 return fieldsAreFilled;
             },
-            "Please fill out answer"
+            "Please fill out answer",
         );
     };
 
@@ -93,7 +93,7 @@
             function (value, element) {
                 return !isNaN(value);
             },
-            "Amount must be a number"
+            "Amount must be a number",
         );
     };
 
@@ -109,7 +109,7 @@
                 var text = $(element).val();
                 return $(text).find("." + param).length > 0;
             },
-            "Answer must contain at least 1 Cloze field"
+            "Answer must contain at least 1 Cloze field",
         );
     };
 
@@ -141,7 +141,7 @@
                 });
                 return $answerOptions.length === Object.keys(obj).length;
             },
-            "Each answer must be unique"
+            "Each answer must be unique",
         );
     };
 })(jQuery);

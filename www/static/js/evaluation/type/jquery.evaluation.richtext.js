@@ -49,7 +49,7 @@
                         targetElements: ["#" + config.editorSelector],
                         showWordCount: true,
                     },
-                })
+                }),
             );
         }
     };

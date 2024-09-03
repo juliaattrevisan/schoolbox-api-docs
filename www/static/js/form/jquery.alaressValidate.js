@@ -82,7 +82,7 @@
     /**
      * Custom email validation method: allow any non-ASCII character
      */
-    $.validator.methods.email = function( value, element ) {
+    $.validator.methods.email = function (value, element) {
         if (this.optional(element)) {
             return true;
         }
@@ -90,10 +90,10 @@
         // https://html.spec.whatwg.org/multipage/input.html#valid-e-mail-address,
         // extended to allow support for multibyte characters.
         // Basic matches: letters, numbers, any non-ASCII char
-        const letterClass = 'a-zA-Z0-9\\P{ASCII}';
+        const letterClass = "a-zA-Z0-9\\P{ASCII}";
         const emailRegexp = new RegExp(
             `^[${letterClass}.!#$%&'*+\\/=?^_\`{|}~-]+@[${letterClass}](?:[${letterClass}-]{0,61}[${letterClass}])?(?:\\.[${letterClass}](?:[${letterClass}-]{0,61}[${letterClass}])?)*$`,
-            'u'
+            "u",
         );
         return value.match(emailRegexp);
     };
@@ -118,7 +118,7 @@
 
             return datepickerMoment.isValid();
         },
-        "Please enter a valid date"
+        "Please enter a valid date",
     );
 
     /**
@@ -139,7 +139,7 @@
 
             return date.isValid() && date.isSameOrAfter(other_date);
         },
-        "Please enter a date that is <i>after</i> the previous date"
+        "Please enter a date that is <i>after</i> the previous date",
     );
 
     /**
@@ -150,7 +150,7 @@
         function (value, element) {
             return dayjs(value, "h:mma", true).isValid();
         },
-        "Please enter a valid time"
+        "Please enter a valid time",
     );
 
     /**
@@ -164,7 +164,7 @@
             var otherTime = dayjs(other_element_selector.val(), "h:mma", true);
             return time.isAfter(otherTime);
         },
-        "Please enter a valid time"
+        "Please enter a valid time",
     );
 
     /**
@@ -178,7 +178,7 @@
         function (value, element) {
             return getNormalizedDate(element).isValid();
         },
-        "Please enter a valid date"
+        "Please enter a valid date",
     );
 
     /**
@@ -191,7 +191,7 @@
             var form = $(element).closest("form");
             return getNormalizedDate(element).isAfter(getNormalizedDate(other_date_field, form));
         },
-        "Please enter a date that is after"
+        "Please enter a date that is after",
     );
 
     /**
@@ -208,7 +208,7 @@
                 $.validator.methods.range.call(this, value, element, [1, 12])
             );
         },
-        "Please enter a valid hour"
+        "Please enter a valid hour",
     );
     $.validator.addMethod(
         "24hour",
@@ -218,7 +218,7 @@
                 $.validator.methods.range.call(this, value, element, [0, 23])
             );
         },
-        "Please enter a valid hour"
+        "Please enter a valid hour",
     );
     $.validator.addMethod(
         "minute",
@@ -228,7 +228,7 @@
                 $.validator.methods.range.call(this, value, element, [0, 59])
             );
         },
-        "Please enter a valid minute"
+        "Please enter a valid minute",
     );
 
     /**
@@ -243,7 +243,7 @@
 
             return $(element).find(":selected[value]").length > 0;
         },
-        "Please select a value"
+        "Please select a value",
     );
 
     /**
@@ -260,12 +260,12 @@
             }
 
             var regExURL = new RegExp(
-                '^((((http)|(ftp))s?://[\\w-]+(\\.[\\w-]+)*(:[0-9]+)?(/\\S*)?)|([/#?]\\S*))$|^mailto:(([^<>()\\[\\]\\\\.,;:\\s@"]+(\\.[^<>()\\[\\]\\\\.,;:\\s@"]+)*)|(".+"))@((\\[[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}])|(([a-zA-Z\\-0-9]+\\.)+[a-zA-Z]{2,}))$'
+                '^((((http)|(ftp))s?://[\\w-]+(\\.[\\w-]+)*(:[0-9]+)?(/\\S*)?)|([/#?]\\S*))$|^mailto:(([^<>()\\[\\]\\\\.,;:\\s@"]+(\\.[^<>()\\[\\]\\\\.,;:\\s@"]+)*)|(".+"))@((\\[[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}])|(([a-zA-Z\\-0-9]+\\.)+[a-zA-Z]{2,}))$',
             );
 
             return regExURL.test(value.trim().toLowerCase());
         },
-        "Please enter a URL beginning with http://, https://, ftp://, mailto:, or a relative URL (beginning with '/', '#', or '?')"
+        "Please enter a URL beginning with http://, https://, ftp://, mailto:, or a relative URL (beginning with '/', '#', or '?')",
     );
 
     /**
@@ -276,7 +276,7 @@
         function (value, element, otherElement) {
             return $(element).val() == $(otherElement).val();
         },
-        "Values do not match"
+        "Values do not match",
     );
 
     /**
@@ -288,7 +288,7 @@
         function (value, element, checkboxGroup) {
             return $('input[data-checkbox-group="' + checkboxGroup + '"]:checked').length > 0;
         },
-        "You must select at least one option below"
+        "You must select at least one option below",
     );
 
     /**
@@ -301,7 +301,7 @@
             var textboxId = $(element).attr("id");
             return $.trim($(window.sbProps.editors[textboxId].getData())).length > 0;
         },
-        "This field is required"
+        "This field is required",
     );
 
     /**
@@ -320,7 +320,7 @@
 
             return $.trim(value).length;
         },
-        "This field cannot be blank"
+        "This field cannot be blank",
     );
 
     /**
@@ -331,7 +331,7 @@
         function (value, element) {
             return this.optional(element) || /^[a-z0-9]+$/i.test(value);
         },
-        "This field must only contain letters or numbers."
+        "This field must only contain letters or numbers.",
     );
 
     /**
@@ -342,7 +342,7 @@
         function (value, element) {
             return this.optional(element) || parseFloat(value) > 0;
         },
-        "Amount must be greater than zero"
+        "Amount must be greater than zero",
     );
 
     /**
@@ -357,7 +357,7 @@
             }
             return jQuery.validator.methods.email.call(this, $.trim(value), element);
         },
-        "Please enter a valid email address"
+        "Please enter a valid email address",
     );
 
     /**
@@ -375,7 +375,7 @@
 
             return list.indexOf($.trim(value)) < 0;
         },
-        "This heading is already in use - please choose another."
+        "This heading is already in use - please choose another.",
     );
 
     /**
@@ -403,7 +403,7 @@
 
             return list.indexOf($.trim(newValue)) < 0;
         },
-        "This heading is already in use - please choose another."
+        "This heading is already in use - please choose another.",
     );
 
     /**
@@ -416,7 +416,7 @@
 
             if ($("#useMarkRange").is(":checked")) {
                 var descriptorList = $.makeArray(
-                    $(indicatorCheckbox).closest("tr[data-group]").find("[data-descriptor-value]")
+                    $(indicatorCheckbox).closest("tr[data-group]").find("[data-descriptor-value]"),
                 );
 
                 var hasDescValue = function (descriptor) {
@@ -456,7 +456,7 @@
 
             return valid;
         },
-        "Descriptor values must be an ascending or descending sequence"
+        "Descriptor values must be an ascending or descending sequence",
     );
 
     /**

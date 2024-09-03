@@ -32,7 +32,7 @@ export function getFormData() {
     const formData = new FormData();
     formData.append(
         getMasonryConfig().settings.formData.pageInfo.type,
-        getMasonryConfig().settings.formData.pageInfo.id
+        getMasonryConfig().settings.formData.pageInfo.id,
     );
 
     // Admin templates require a context of the selected page type to be passed through, so we need to check if it's set

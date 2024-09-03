@@ -56,15 +56,18 @@ var validateOptions = {
         } else if ($element.is("#useRubric")) {
             // For validating if at least one indicator is selected
             error.insertAfter($element.closest("div.switch"));
-        } else if ($element.is('[data-type-group]')) {
-            error.insertAfter($('#submissionType').find('label').first());
+        } else if ($element.is("[data-type-group]")) {
+            error.insertAfter($("#submissionType").find("label").first());
 
             /* For some random reason it doesn't scroll to the error it just inserted;
              * you need to go there manually. Weird
              */
-            $('html, body').animate({
-                scrollTop: ($('.error:visible').offset().top - 60)
-            }, 500);
+            $("html, body").animate(
+                {
+                    scrollTop: $(".error:visible").offset().top - 60,
+                },
+                500,
+            );
         } else {
             $.alaressValidate.defaultErrorPlacement(error, element);
         }

@@ -219,12 +219,16 @@ $modules: () !default;
             #{$opposite-direction}: $topbar-link-padding;
         }
 
-        box-shadow: 0 0 0 $thickness $color, 0 $gap + $thickness 0 $thickness $color,
+        box-shadow:
+            0 0 0 $thickness $color,
+            0 $gap + $thickness 0 $thickness $color,
             0 (2 * $gap + 2 * $thickness) 0 $thickness $color;
         width: $width;
     }
     span:hover:after {
-        box-shadow: 0 0 0 $thickness $hover-color, 0 $gap + $thickness 0 $thickness $hover-color,
+        box-shadow:
+            0 0 0 $thickness $hover-color,
+            0 $gap + $thickness 0 $thickness $hover-color,
             0 (2 * $gap + 2 * $thickness) 0 $thickness $hover-color;
     }
 }
@@ -250,7 +254,9 @@ $modules: () !default;
     $fade-time: 300ms,
     $glowing-effect-color: fade-out($primary-color, 0.25)
 ) {
-    transition: box-shadow $fade-time, border-color $fade-time ease-in-out;
+    transition:
+        box-shadow $fade-time,
+        border-color $fade-time ease-in-out;
     &:#{$selector} {
         border-color: $glowing-effect-color;
         box-shadow: 0 0 5px $glowing-effect-color;

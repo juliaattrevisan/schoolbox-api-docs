@@ -6,7 +6,7 @@
                 nchars: "",
                 allow: "",
             },
-            p
+            p,
         );
 
         return this.each(function () {
@@ -43,7 +43,7 @@
             {
                 nchars: az,
             },
-            p
+            p,
         );
 
         return this.each(function () {
@@ -58,7 +58,7 @@
             {
                 nchars: nm,
             },
-            p
+            p,
         );
 
         return this.each(function () {

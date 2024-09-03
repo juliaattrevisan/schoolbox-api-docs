@@ -140,7 +140,7 @@ import { getLoadedHTML } from "@js/util/domUtils";
             return $(
                 $.map(rtn, function (el) {
                     return $.makeArray(el);
-                })
+                }),
             );
         }
     };
@@ -403,7 +403,7 @@ import { getLoadedHTML } from "@js/util/domUtils";
                 }
                 // Re-enable form and remove "loading" text if Promise is rejected
                 xhrAfter.call(self);
-            }
+            },
         );
     }
 

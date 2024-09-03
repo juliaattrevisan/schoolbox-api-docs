@@ -95,7 +95,7 @@ $.fn.alaressDateTimeModal = function (twigVars) {
             resetCycles(
                 $("#byTimetable-" + twigVars.id)
                     .find("[data-adtp-tt-submit]")
-                    .attr("data-timetable-value")
+                    .attr("data-timetable-value"),
             );
             revealTimetable();
             revealByCampus();
@@ -849,7 +849,7 @@ $.fn.alaressDateTimeModal = function (twigVars) {
             },
             function () {
                 $(this).removeAttr("data-date").addClass("disabled");
-            }
+            },
         );
 
         /**
@@ -882,7 +882,7 @@ $.fn.alaressDateTimeModal = function (twigVars) {
                 dayNumber in twigVars.timetableVars[selectedCampus].cycles[selectedTerm][cycleNumber]
             ) {
                 var dayMoment = dayjs(
-                    twigVars.timetableVars[selectedCampus].cycles[selectedTerm][cycleNumber][dayNumber]
+                    twigVars.timetableVars[selectedCampus].cycles[selectedTerm][cycleNumber][dayNumber],
                 );
 
                 if (ifDate) {
@@ -1085,7 +1085,7 @@ $.fn.alaressDateTimeModal = function (twigVars) {
                 twigVars.routeLookup.getHeat
                     .replace(/{folderId}/g, folderId)
                     .replace(/{year}/g, yr)
-                    .replace(/{month}/g, mo)
+                    .replace(/{month}/g, mo),
             );
 
             promise

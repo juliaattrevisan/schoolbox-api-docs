@@ -7,7 +7,7 @@ interface LightGalleryDefaults {
     plugins: any[];
     licenseKey: string;
     speed: number;
-  }
+}
 
 const imageLightboxDefaults: LightGalleryDefaults = {
     plugins: [lgAutoplay, lgFullScreen, lgVideo],

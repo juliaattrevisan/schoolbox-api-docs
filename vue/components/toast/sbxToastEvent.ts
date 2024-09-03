@@ -9,7 +9,7 @@ export enum ToastEvent {
 export type ToastLink = {
     text: string;
     href: string;
-}
+};
 
 /**
  * The details passed with a ACTIVATE event

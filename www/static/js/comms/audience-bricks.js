@@ -154,7 +154,7 @@ function Codec() {
                         modifier +
                         "', child:'" +
                         childSegment.getModifier() +
-                        "'"
+                        "'",
                 );
             }
             children.push(childSegment);
@@ -222,7 +222,7 @@ function Codec() {
             "Unable to distinguish composite segment children for sort. EntityType: " +
                 left.getEntityType() +
                 ", EntityValue: " +
-                left.getEntityValue()
+                left.getEntityValue(),
         );
     };
 }
@@ -274,7 +274,7 @@ function Segment(entityType, entityValue, modifier, children) {
             for (var j = i + 1; j < children.length; j++) {
                 if (children[i].equals(children[j])) {
                     errors.push(
-                        "Duplicate children detected at indexes [" + i + "," + j + "] '" + children[i].toString() + "'"
+                        "Duplicate children detected at indexes [" + i + "," + j + "] '" + children[i].toString() + "'",
                     );
                 }
             }
@@ -475,7 +475,7 @@ function Dimension(entityType, entityValue, modifier) {
                     other.getEntityType() +
                     "' is different to this Dimension's entityType '" +
                     this.entityType +
-                    "'"
+                    "'",
             );
         }
         if (other.getModifier() !== this.modifier) {
@@ -484,7 +484,7 @@ function Dimension(entityType, entityValue, modifier) {
                     other.getModifier() +
                     "' is different to this Dimension's modifier '" +
                     this.modifier +
-                    "'"
+                    "'",
             );
         }
         var valuesAdded = false,
@@ -554,7 +554,7 @@ function Brick(segment, typeLabelMap, valueLabelMap) {
         for (var i = 0; i < childSegments.length; ++i) {
             childSegment = childSegments[i];
             this.dimensions.push(
-                new Dimension(childSegment.getEntityType(), childSegment.getEntityValue(), childSegment.getModifier())
+                new Dimension(childSegment.getEntityType(), childSegment.getEntityValue(), childSegment.getModifier()),
             );
         }
     }

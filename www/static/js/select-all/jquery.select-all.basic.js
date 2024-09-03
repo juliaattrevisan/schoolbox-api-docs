@@ -99,7 +99,7 @@
 
             /* Assign default state
              */
-            selectAll.prop('checked', config.defaultState);
+            selectAll.prop("checked", config.defaultState);
 
             selectAll.on("click", function (event) {
                 if ($(this).is(":checked")) {

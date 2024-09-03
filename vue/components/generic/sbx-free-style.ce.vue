@@ -28,5 +28,5 @@
     box-sizing: border-box;
 }
 
-@import "stories/assets/styles/_form.scss";
+@import "../../../stories/assets/styles/_form.scss";
 </style>

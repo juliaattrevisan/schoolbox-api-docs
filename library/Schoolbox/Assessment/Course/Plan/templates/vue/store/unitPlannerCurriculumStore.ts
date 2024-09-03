@@ -142,12 +142,15 @@ export const useUnitPlannerCurriculumStore = defineStore(`unitPlannerCurriculum`
             configSearchParams.append("curriculumTreeFilter", treeFilter ? treeFilter.id.toString() : "");
 
             // Then create the component
-            const configResponse = await fetch(`${unit.curriculum._routes.createComponent}?${configSearchParams.toString()}`, {
-                method: "POST",
-                headers: {
-                    Accept: "application/json",
+            const configResponse = await fetch(
+                `${unit.curriculum._routes.createComponent}?${configSearchParams.toString()}`,
+                {
+                    method: "POST",
+                    headers: {
+                        Accept: "application/json",
+                    },
                 },
-            });
+            );
 
             if (!configResponse.ok) {
                 throw new Error(await extractErrorMessage(configResponse));

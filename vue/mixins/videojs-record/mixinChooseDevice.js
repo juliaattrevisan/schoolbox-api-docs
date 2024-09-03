@@ -36,12 +36,12 @@ export default {
             if (this.chooseDevice_currentVideoDeviceId !== this.chooseDevice_videoDeviceList[0].deviceId) {
                 //ensure the top device list is the currently active one, bit weird if the default active is lower down the list
                 const activeDeviceIndex = this.chooseDevice_videoDeviceList.findIndex(
-                    (videoDevice) => this.chooseDevice_currentVideoDeviceId === videoDevice.deviceId
+                    (videoDevice) => this.chooseDevice_currentVideoDeviceId === videoDevice.deviceId,
                 );
                 this.chooseDevice_videoDeviceList = moveArrayItem(
                     this.chooseDevice_videoDeviceList,
                     activeDeviceIndex,
-                    0
+                    0,
                 );
             }
         },

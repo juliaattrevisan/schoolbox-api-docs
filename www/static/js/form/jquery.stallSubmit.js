@@ -135,7 +135,7 @@
             return $(
                 $.map(rtn, function (el) {
                     return $.makeArray(el);
-                })
+                }),
             );
         }
     };

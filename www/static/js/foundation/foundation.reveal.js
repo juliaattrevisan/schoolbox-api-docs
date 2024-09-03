@@ -70,7 +70,7 @@
                                 self.open.call(self, element, { url: url }, { replaceContentSel: replaceContentSel });
                             }
                         }
-                    }
+                    },
                 );
 
             S(document).on("click.fndtn.reveal", this.close_targets(), function (e) {
@@ -93,7 +93,7 @@
                         self,
                         bg_clicked
                             ? S("[" + self.attr_name() + "].open:not(.toback)")
-                            : S(this).closest("[" + self.attr_name() + "]")
+                            : S(this).closest("[" + self.attr_name() + "]"),
                     );
                 }
             });

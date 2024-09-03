@@ -3,15 +3,15 @@
  *
  */
 
-import type Developer from './types/Developer'; // we add the 'type' key after import to inform that it's an interface
-import Feels from './types/Feels'; // we add the 'type' key after import to inform that it's an interface
+import type Developer from "./types/Developer"; // we add the 'type' key after import to inform that it's an interface
+import Feels from "./types/Feels"; // we add the 'type' key after import to inform that it's an interface
 
 const myself: Developer = {
-    firstName: 'Michael',
-    lastName: 'Heydon',
+    firstName: "Michael",
+    lastName: "Heydon",
     age: 36,
     // languages: 'TypeScript', // this would error and not build, as it expects an array - it should also highlight in your IDE?
-    languages: ['TypeScript'],
+    languages: ["TypeScript"],
     // feeling: 'COOL', // this would error as it expects something from the Feels enum
     feeling: Feels.COOL,
 };
@@ -52,7 +52,7 @@ function greet(name?: string): string {
     if (name) {
         return `Hello ${name}`;
     }
-    return 'Hello Stranger';
+    return "Hello Stranger";
 }
 
 greet();
@@ -64,6 +64,6 @@ greet();
 
 // but we know that it's actually going to be a HTMLParagraphElement
 // which will give us more confidence on the properties we can access/change
-const htmlParagraphElement = document.getElementById('add-to-me') as HTMLParagraphElement;
+const htmlParagraphElement = document.getElementById("add-to-me") as HTMLParagraphElement;
 // htmlParagraphElement.inerText += ' Yep, check the console!' //like this would error and highlights as such in the IDE
-htmlParagraphElement.innerText += ' Yep, check the console!';
+htmlParagraphElement.innerText += " Yep, check the console!";
