@@ -47,7 +47,7 @@ window.Vue.watch(
             //to hide a UI note, notifying of availability of shift-select
             shiftSelectNoteEl.value.remove();
         }
-    }
+    },
 );
 
 /**
@@ -77,7 +77,7 @@ function onClearMemberSelection() {
  */
 function onEmailMembersSelected() {
     window.location.href = `${Endpoints.SEND_EMAIL}?folderId=${store.id}&userIds=${membersStore.selectedMemberIds.join(
-        ","
+        ",",
     )}`;
 }
 

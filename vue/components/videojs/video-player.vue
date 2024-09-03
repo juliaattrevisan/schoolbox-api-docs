@@ -90,7 +90,7 @@ export default {
                     "/storage/checkVideoStatus.php?" +
                         new URLSearchParams({
                             hash: this.hash,
-                        })
+                        }),
                 );
                 const responseData = await response.json();
                 const videoStatus = responseData.status;

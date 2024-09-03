@@ -111,7 +111,7 @@ function updateSpanElement(statusElement: HTMLDivElement) {
  */
 function updateHiddenElement(statusElement: HTMLDivElement) {
     const hiddenElement = (statusElement?.parentElement as HTMLDivElement).querySelector(
-        ".visually-hidden"
+        ".visually-hidden",
     ) as HTMLSpanElement;
     // if the item contains only questions that don't have a max score, we don't want to show any score
     if (noScore.value) {
@@ -181,7 +181,7 @@ window.Vue.watch(
     () => {
         updateScoreDisplay();
     },
-    { deep: true }
+    { deep: true },
 );
 </script>
 

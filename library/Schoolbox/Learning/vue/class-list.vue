@@ -401,7 +401,7 @@ export default {
                 parts.push(
                     $("<a>")
                         .attr("href", "/search/user/" + student.id)
-                        .text(student.firstname + " " + student.lastname)
+                        .text(student.firstname + " " + student.lastname),
                 );
                 parts.push(", ");
             });

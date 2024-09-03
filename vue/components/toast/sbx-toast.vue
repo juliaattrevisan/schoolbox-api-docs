@@ -6,7 +6,7 @@
  * with a new way to call the toast using document.dispatchEvent.
  */
 
-import {ToastActivateEventDetail, ToastLink, ToastTimeoutEventDetail, ToastEvent} from "./sbxToastEvent";
+import { ToastActivateEventDetail, ToastLink, ToastTimeoutEventDetail, ToastEvent } from "./sbxToastEvent";
 
 const STATE_HIDDEN = "hidden";
 const STATE_PENDING = "pending";
@@ -101,7 +101,7 @@ window.Vue.onMounted(() => {
         :data-test-is-success="state === STATE_DONE"
     >
         {{ text }}
-      <a v-if="link !== null" :href="link.href">{{ link.text }}</a>
+        <a v-if="link !== null" :href="link.href">{{ link.text }}</a>
     </div>
 </template>
 

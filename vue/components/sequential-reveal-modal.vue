@@ -89,7 +89,7 @@ window.Vue.watch(
             sequenceIndex.value = 1;
             close();
         }
-    }
+    },
 );
 
 /**
@@ -101,7 +101,7 @@ window.Vue.watch(
         if (isNextSelected) {
             close();
         }
-    }
+    },
 );
 
 /**
@@ -113,7 +113,7 @@ window.Vue.watch(
         if (isPreviousSelected) {
             close();
         }
-    }
+    },
 );
 
 /**

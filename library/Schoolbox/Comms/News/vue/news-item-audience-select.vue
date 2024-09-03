@@ -315,7 +315,7 @@ export default {
                             key,
                             selectedItem.name,
                             $item,
-                            selectedItem.labels
+                            selectedItem.labels,
                         );
 
                         if (!audienceIsReadOnly) {

@@ -111,13 +111,13 @@ async function onLoaded() {
                     <template v-if="slot.component === 'image'">
                         <data-table-image
                             :row-data="tableData.row"
-                            :component-data="(slot.componentData as ImageComponentData)"
+                            :component-data="slot.componentData as ImageComponentData"
                         />
                     </template>
                     <template v-else-if="slot.component === 'link'">
                         <data-table-link
                             :row-data="tableData.row"
-                            :component-data="(slot.componentData as LinkComponentData)"
+                            :component-data="slot.componentData as LinkComponentData"
                         />
                     </template>
                 </template>

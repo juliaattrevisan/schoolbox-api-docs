@@ -17,7 +17,7 @@ window.Vue.watch(
     () => {
         containerHeight.value =
             studentsStore.allStudentsReviewed && !studentsStore.showReviewedAttempts ? "1fr" : "0fr";
-    }
+    },
 );
 </script>
 

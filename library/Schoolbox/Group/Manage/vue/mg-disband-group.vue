@@ -20,7 +20,7 @@ window.Vue.watch(
     () => disbandStore.isPromptOpen,
     (newIsOpen) => {
         newIsOpen ? removeModalEl.value.open() : removeModalEl.value.close();
-    }
+    },
 );
 
 /**

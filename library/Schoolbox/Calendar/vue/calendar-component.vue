@@ -274,9 +274,7 @@ export default {
         <div class="component-action" v-if="config.folderId && eventsLoaded && hasEvents">
             <section>
                 <a v-if="config.canCreateEvent" :href="config.createEventUrl" class="button">Add Event</a>
-                <a href="#" @click.prevent="$refs.exportModal.open" class="button"
-                    >Export Events</a
-                >
+                <a href="#" @click.prevent="$refs.exportModal.open" class="button">Export Events</a>
                 <a v-if="config.canCreateEvent" :href="config.importEventsUrl" class="button">Import Events</a>
             </section>
         </div>

@@ -200,7 +200,7 @@ export default {
                     callback(
                         response.data.filter((v) => {
                             return "start" in v;
-                        })
+                        }),
                     );
                 });
             // Fail callback: consider a message saying something failed

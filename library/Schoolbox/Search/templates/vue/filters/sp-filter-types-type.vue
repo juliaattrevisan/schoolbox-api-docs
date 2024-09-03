@@ -27,7 +27,7 @@ window.Vue.watch(
     () => filterTypesStore.isExpanded,
     (newValue) => {
         isOpen.value = newValue;
-    }
+    },
 );
 
 /**
@@ -70,7 +70,7 @@ window.Vue.watch(
         ) {
             filterTypesStore.removeType(props.type);
         }
-    }
+    },
 );
 
 /**

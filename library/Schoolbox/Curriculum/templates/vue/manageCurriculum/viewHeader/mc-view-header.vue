@@ -22,7 +22,7 @@ const nodesStore = useNodesStore();
  * @returns { boolean }
  */
 const isDisabled = window.Vue.computed(
-    () => nodeUsageStore.isOpen || updateNodeStore.isOpen || addSubsectionStore.isOpen || nodesStore.isLoading
+    () => nodeUsageStore.isOpen || updateNodeStore.isOpen || addSubsectionStore.isOpen || nodesStore.isLoading,
 );
 </script>
 

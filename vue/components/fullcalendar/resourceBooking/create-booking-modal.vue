@@ -27,7 +27,7 @@ export default {
         displayDate() {
             return this.event.date
                 ? dayjs(this.event.date).format(
-                      this.event.allDay ? this.dateFormats.displayDate : this.dateFormats.displayDatetime
+                      this.event.allDay ? this.dateFormats.displayDate : this.dateFormats.displayDatetime,
                   )
                 : "";
         },

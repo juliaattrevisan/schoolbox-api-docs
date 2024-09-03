@@ -34,7 +34,7 @@ window.Vue.watch(
             //may not always exists in the dom
             nodesContainerEl.value.scrollTop = 0;
         }
-    }
+    },
 );
 </script>
 

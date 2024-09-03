@@ -382,7 +382,7 @@ export default {
                         },
                         body: JSON.stringify(payload),
                     });
-                })
+                }),
             )
                 .then(() => {
                     this.toastSuccess(this.toastSuccessMessage);
@@ -443,12 +443,7 @@ export default {
             </div>
             <ul class="flex-list buttons">
                 <li>
-                    <button
-                        @click.prevent="onClearSelectedBadges"
-                        class="button-clear"
-                    >
-                        Clear selection
-                    </button>
+                    <button @click.prevent="onClearSelectedBadges" class="button-clear">Clear selection</button>
                 </li>
                 <li>
                     <button @click.prevent="onConfirmSelected" class="submit">
@@ -495,11 +490,7 @@ export default {
                     >
                         Award with Evidence
                     </a>
-                    <button
-                        :title="submitButtonText"
-                        :isProcessing="isProcessing"
-                        @click.prevent="onSubmit"
-                    >
+                    <button :title="submitButtonText" :isProcessing="isProcessing" @click.prevent="onSubmit">
                         {{ submitButtonText }}
                     </button>
                 </section>

@@ -208,7 +208,7 @@ export default {
                             targetElements: [`#${this.presetUniqueId}`],
                             toolbar: "comment",
                         },
-                    })
+                    }),
                 );
             } catch (error) {
                 console.warn(error);

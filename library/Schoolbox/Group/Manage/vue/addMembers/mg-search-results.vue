@@ -30,7 +30,7 @@ window.Vue.watch(
     () => searchStore.isLoading,
     () => {
         window.Vue.nextTick(() => animate());
-    }
+    },
 );
 
 /**
@@ -40,7 +40,7 @@ window.Vue.watch(
     () => searchStore.filteredResults,
     () => {
         window.Vue.nextTick(() => animate());
-    }
+    },
 );
 
 /**

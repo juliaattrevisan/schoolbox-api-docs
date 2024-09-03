@@ -78,9 +78,7 @@ async function onMapSelected() {
         <a @click.prevent="onMapSelected">Select the curriculum codes</a>
         that you intend to cover in this area of the curriculum
     </p>
-    <p v-else>
-        No curriculum codes have been added to this unit.
-    </p>
+    <p v-else>No curriculum codes have been added to this unit.</p>
 </template>
 
 <style scoped></style>

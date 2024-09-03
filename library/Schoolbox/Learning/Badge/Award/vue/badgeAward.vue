@@ -262,7 +262,7 @@ export default {
                         true,
                         Toast.DEFAULT_DISPLAY_DURATION_SUCCESSFUL,
                         Toast.DEFAULT_FADE_DURATION,
-                        () => this.$emit(EVENTS.done)
+                        () => this.$emit(EVENTS.done),
                     );
                 })
                 .catch(() => {

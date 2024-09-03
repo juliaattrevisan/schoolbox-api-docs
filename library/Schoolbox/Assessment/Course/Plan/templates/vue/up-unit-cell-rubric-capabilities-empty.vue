@@ -16,14 +16,13 @@ const props = defineProps<Props>();
 <template>
     <i class="icon-criteria"></i>
     <p v-if="props.unit.rubricCapabilities._routes.manageUnit || props.unit.rubricCapabilities._routes.manageCourse">
-        No rubric {{ locale.rubricGroup.plural() }} have been added to this course or {{ locale.unit.singular() }} yet,<br>
+        No rubric {{ locale.rubricGroup.plural() }} have been added to this course or
+        {{ locale.unit.singular() }} yet,<br />
         start by adding rubric {{ locale.rubricGroup.plural() }} to the
-      <a :href="getReturnUrl(`${props.unit.rubricCapabilities._routes.manageCourse}`)">
-             course
-        </a>
-      or to the
-      <a :href="getReturnUrl(`${props.unit.rubricCapabilities._routes.manageUnit}`)">
-          {{ locale.unit.singular() }}
+        <a :href="getReturnUrl(`${props.unit.rubricCapabilities._routes.manageCourse}`)"> course </a>
+        or to the
+        <a :href="getReturnUrl(`${props.unit.rubricCapabilities._routes.manageUnit}`)">
+            {{ locale.unit.singular() }}
         </a>
     </p>
     <p v-else>

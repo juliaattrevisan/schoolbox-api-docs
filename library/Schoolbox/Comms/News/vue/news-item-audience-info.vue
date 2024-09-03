@@ -34,7 +34,7 @@ export default {
                     segment.key,
                     segment.name,
                     segment,
-                    segment.labels
+                    segment.labels,
                 );
             }
         },

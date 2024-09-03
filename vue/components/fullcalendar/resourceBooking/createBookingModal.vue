@@ -84,7 +84,7 @@ export default {
         displayDate() {
             return this.event.date
                 ? this.toMoment(this.event.date).format(
-                      this.event.allDay ? this.dateFormats.displayDate : this.dateFormats.displayDatetime
+                      this.event.allDay ? this.dateFormats.displayDate : this.dateFormats.displayDatetime,
                   )
                 : "";
         },

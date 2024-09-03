@@ -173,7 +173,7 @@ export default {
         onStudentSelected(student) {
             if (this.isInSelectedStudents(student.id)) {
                 this.selectedStudents = this.selectedStudents.filter(
-                    (selectedStudent) => selectedStudent.id !== student.id
+                    (selectedStudent) => selectedStudent.id !== student.id,
                 ); //remove if in the list
             } else {
                 this.selectedStudents = [student, ...this.selectedStudents]; //otherwise add them in

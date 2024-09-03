@@ -229,11 +229,9 @@ export default {
                     detail: {
                         targetElements: ["#detail"],
                         toolbar: EditorToolbar.SIMPLE,
-                        removeFromToolbar: [
-                            'link',
-                        ]
+                        removeFromToolbar: ["link"],
                     },
-                })
+                }),
             );
         },
     },

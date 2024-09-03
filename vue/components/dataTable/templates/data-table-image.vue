@@ -15,10 +15,10 @@ const props = defineProps<Props>();
 
 <template>
     <template v-if="props.componentData.src && props.componentData.href && props.rowData[props.componentData.href]">
-        <a :href="(props.rowData[props.componentData.href] as string)" :title="props.componentData.title">
+        <a :href="props.rowData[props.componentData.href] as string" :title="props.componentData.title">
             <div :class="`c-img ${props.componentData.imgClass as string}`">
                 <div class="c-img__wrapper">
-                    <img :src="(props.rowData[props.componentData.src] as string)" :alt="props.componentData.alt" />
+                    <img :src="props.rowData[props.componentData.src] as string" :alt="props.componentData.alt" />
                 </div>
             </div>
         </a>
@@ -26,7 +26,7 @@ const props = defineProps<Props>();
     <template v-else-if="props.componentData.src">
         <div :class="`c-img ${props.componentData.imgClass as string}`">
             <div class="c-img__wrapper">
-                <img :src="(props.rowData[props.componentData.src] as string)" :alt="props.componentData.alt" />
+                <img :src="props.rowData[props.componentData.src] as string" :alt="props.componentData.alt" />
             </div>
         </div>
     </template>

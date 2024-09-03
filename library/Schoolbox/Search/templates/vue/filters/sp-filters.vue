@@ -87,7 +87,7 @@ window.Vue.watch(
         if (newValue !== oldValue && newValue === true) {
             isOpen.value = false;
         }
-    }
+    },
 );
 </script>
 

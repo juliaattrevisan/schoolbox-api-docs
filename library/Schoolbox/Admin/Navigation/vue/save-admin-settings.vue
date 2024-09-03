@@ -79,7 +79,7 @@ function initFormChangeListeners() {
                 //update the linked <textarea>, which doesn't update until form save otherwise
                 event.detail.sourceElement.textContent = editor.getData();
                 onFormDataChange();
-            }, 350)
+            }, 350),
         );
     }
     /**
@@ -94,7 +94,7 @@ function initFormChangeListeners() {
             "keyup",
             debounce(() => {
                 onFormDataChange();
-            }, 350)
+            }, 350),
         );
     }
 }

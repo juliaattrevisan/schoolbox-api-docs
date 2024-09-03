@@ -16,7 +16,7 @@ window.Vue.watch(
     () => studentStore.student.showMarked,
     () => {
         containerHeight.value = studentStore.student.isMarked && !studentStore.student.showMarked ? "1fr" : "0fr";
-    }
+    },
 );
 </script>
 

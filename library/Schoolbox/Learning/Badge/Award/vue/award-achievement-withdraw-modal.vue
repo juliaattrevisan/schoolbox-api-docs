@@ -115,7 +115,7 @@ export default {
                         /* Goal prevents achievement from being withdrawn
                          */
                         self.toastError(
-                            "Unable to withdraw achievement; a goal might exist and should be withdrawn first."
+                            "Unable to withdraw achievement; a goal might exist and should be withdrawn first.",
                         );
                     } else {
                         /* Generic error

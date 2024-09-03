@@ -31,7 +31,7 @@ window.Vue.watch(
             areAllSelectedOnWaitingList.value = false;
         }
     },
-    { deep: true }
+    { deep: true },
 );
 
 /**
