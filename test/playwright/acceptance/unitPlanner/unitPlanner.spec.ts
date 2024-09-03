@@ -52,7 +52,7 @@ test.describe("Unit Planner Tests", () => {
             const pageOrder = await page
                 .getByTestId(allUnitRowSelector)
                 .evaluateAll((unitRows) => unitRows.map((unitRow) => unitRow.getAttribute("data-test-unit-id")));
-            return pageOrder.filter((unitId) => unitId !== null) as string[];
+            return pageOrder.filter((unitId) => unitId !== null);
         }
 
         const initialUnitOrder = await getUnitOrder();
