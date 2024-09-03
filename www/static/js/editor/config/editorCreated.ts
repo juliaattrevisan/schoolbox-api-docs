@@ -9,10 +9,10 @@ import { getSourceElementIdentifier } from "./editorCheckData";
 /**
  * Add the editor to the global scope so it can be accessed
  * in other twig files etc
- * @param { SbxEditor } editor - the CKEditor instance
- * @param { SbxEditorElement } sourceElement - the sourceElement the CKEditor will replace
+ * @param editor - the CKEditor instance
+ * @param sourceElement - the sourceElement the CKEditor will replace
  */
-function addToGlobalScope(editor: SbxEditor, sourceElement: SbxEditorElement) {
+function addToGlobalScope(editor: SbxEditor, sourceElement: SbxEditorElement): void {
     const editorIdentifier = getSourceElementIdentifier(sourceElement);
     if (editorIdentifier === null)
         throw new Error("Editor must have an ID or name to be accessible in the global scope");
@@ -23,10 +23,10 @@ function addToGlobalScope(editor: SbxEditor, sourceElement: SbxEditorElement) {
 /**
  * For the simple editor, we need to disable the drag and drop
  * and the ability for the editor to auto embed media
- * @param { SbxEditor } editor - the CKEditor instance
- * @param { SbxEditorConfig } config - the CKEditor config object
+ * @param editor - the CKEditor instance
+ * @param config - the CKEditor config object
  */
-function disableAutoMedia(editor: SbxEditor, config: SbxEditorConfig) {
+function disableAutoMedia(editor: SbxEditor, config: SbxEditorConfig): void {
     if (config.toolbar === EditorToolbar.SIMPLE) {
         editor.plugins.get("DragDrop").forceDisabled("disableDragDrop");
         editor.plugins.get("AutoMediaEmbed").destroy();
@@ -38,7 +38,7 @@ function disableAutoMedia(editor: SbxEditor, config: SbxEditorConfig) {
  * as it throws an error on focus in / out
  * @todo - review this, there may be a better way to handle this
  */
-function removeValidation() {
+function removeValidation(): void {
     $("form").each(() => {
         // @ts-expect-error - ignore the error as we're using jquery
         if ($(this).data("validator")) {
@@ -51,9 +51,9 @@ function removeValidation() {
 
 /**
  * Once the iFramely script has loaded, we can add in the event listener
- * @param { SbxEditor } editor - the CKEditor instance
+ * @param editor - the CKEditor instance
  */
-function configureIframelyListener(editor: SbxEditor) {
+function configureIframelyListener(editor: SbxEditor): void {
     /**
      * Track copy/paste to add an extra undo step if the link fails to unfurl
      */
@@ -101,11 +101,11 @@ function configureIframelyListener(editor: SbxEditor) {
 
 /**
  * Add in any additional setup required and then dispatch that the editor is ready
- * @param { SbxEditorElement } sourceElement - the sourceElement the CKEditor will replace
- * @param { SbxEditor } editor - the CKEditor instance
- * @param { SbxEditorConfig } config - the CKEditor config object
+ * @param sourceElement - the sourceElement the CKEditor will replace
+ * @param editor - the CKEditor instance
+ * @param config - the CKEditor config object
  */
-export function modifyEditor(sourceElement: SbxEditorElement, editor: SbxEditor, config: SbxEditorConfig) {
+export function modifyEditor(sourceElement: SbxEditorElement, editor: SbxEditor, config: SbxEditorConfig): void {
     addToGlobalScope(editor, sourceElement);
     insertWordCount(sourceElement, editor, config);
     disableAutoMedia(editor, config);

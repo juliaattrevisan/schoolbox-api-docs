@@ -15,7 +15,7 @@ export const useNodeUsageStore = defineStore("mcNodeUsage", () => {
     /**
      * retrieve all the details of the nodes usage
      */
-    async function view() {
+    async function view(): Promise<void> {
         try {
             isProcessing.value = true;
             const activeNodeStore = useActiveNodeStore();
@@ -37,9 +37,9 @@ export const useNodeUsageStore = defineStore("mcNodeUsage", () => {
 
     /**
      * to display all the nodes usage details
-     * @param { Node } node - node to update
+     * @param node - node to update
      */
-    async function prompt(node: Node) {
+    async function prompt(node: Node): Promise<void> {
         useActiveNodeStore().set(node);
         isOpen.value = true;
         await view();
@@ -48,7 +48,7 @@ export const useNodeUsageStore = defineStore("mcNodeUsage", () => {
     /**
      * to hide the nodes usage details
      */
-    function cancel() {
+    function cancel(): void {
         useActiveNodeStore().unset();
         isOpen.value = false;
     }

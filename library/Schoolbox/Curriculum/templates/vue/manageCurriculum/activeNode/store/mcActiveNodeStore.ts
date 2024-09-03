@@ -41,17 +41,17 @@ export const useActiveNodeStore = defineStore("mcActiveNode", () => {
 
     /**
      * set the node to perform an action on
-     * @param { Node } newNode - the new node
+     * @param newNode - the new node
      */
-    function set(newNode: Node) {
+    function set(newNode: Node): void {
         node.value = newNode;
     }
 
     /**
      * Set newly saved values on the node
-     * @param { NodeToUpdate } newNode - the new node
+     * @param newNode - the new node
      */
-    function update(newNode: NodeToUpdate) {
+    function update(newNode: NodeToUpdate): void {
         if (newNode.name !== node.value.name) {
             node.value.name = newNode.name.trim();
         }
@@ -66,9 +66,9 @@ export const useActiveNodeStore = defineStore("mcActiveNode", () => {
 
     /**
      * Add in a new subsection to the active node
-     * @param { Node } newNode - the new node to add in
+     * @param newNode - the new node to add in
      */
-    async function addSubsection(newNode: Node) {
+    async function addSubsection(newNode: Node): Promise<void> {
         if (node.value.children === null) {
             // if the children aren't loaded, load them in - which will also return the newly added node
             await useNodesStore().loadNextChildren(node.value.id);
@@ -87,7 +87,7 @@ export const useActiveNodeStore = defineStore("mcActiveNode", () => {
     /**
      * unset ready for another use
      */
-    function unset() {
+    function unset(): void {
         node.value = getEmptyNode();
     }
 

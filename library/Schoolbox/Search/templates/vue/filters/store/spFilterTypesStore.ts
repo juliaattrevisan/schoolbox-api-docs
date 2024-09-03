@@ -25,9 +25,9 @@ export const useFilterTypesStore = defineStore("spFilterTypes", () => {
 
     /**
      * Add a parent type to the active types
-     * @param {FilterType} type - the parent type
+     * @param type - the parent type
      */
-    function addType(type: FilterType) {
+    function addType(type: FilterType): void {
         if (!selectedTypes.value.includes(type.value)) {
             selectedTypes.value.push(type.value);
         }
@@ -35,9 +35,9 @@ export const useFilterTypesStore = defineStore("spFilterTypes", () => {
 
     /**
      * Remove a parent type from the active types
-     * @param {FilterType} type - the parent type
+     * @param type - the parent type
      */
-    function removeType(type: FilterType) {
+    function removeType(type: FilterType): void {
         if (selectedTypes.value.includes(type.value)) {
             selectedTypes.value = selectedTypes.value.filter((activeType) => activeType !== type.value);
         }
@@ -45,9 +45,9 @@ export const useFilterTypesStore = defineStore("spFilterTypes", () => {
 
     /**
      * When a parent type is selected, add all the sub types as well
-     * @param {FilterType} type - the parent type
+     * @param type - the parent type
      */
-    function addSubTypes(type: FilterType) {
+    function addSubTypes(type: FilterType): void {
         type.subTypes?.forEach((subType) => {
             if (!selectedTypes.value.includes(subType.value)) {
                 selectedTypes.value.push(subType.value);
@@ -57,9 +57,9 @@ export const useFilterTypesStore = defineStore("spFilterTypes", () => {
 
     /**
      * When a parent type is unselected, remove all the sub types as well
-     * @param {FilterType} type - the parent type
+     * @param type - the parent type
      */
-    function removeSubTypes(type: FilterType) {
+    function removeSubTypes(type: FilterType): void {
         type.subTypes?.forEach((subType) => {
             selectedTypes.value = selectedTypes.value.filter((activeType) => activeType !== subType.value);
         });
@@ -67,9 +67,9 @@ export const useFilterTypesStore = defineStore("spFilterTypes", () => {
 
     /**
      * Get the types filter data
-     * @returns {FiltersFormData["types"]} - the filter types
+     * @returns - the filter types
      */
-    function getFormData() {
+    function getFormData(): Pick<FiltersFormData, "types"> {
         return {
             types: selectedTypes.value,
         };
@@ -78,7 +78,7 @@ export const useFilterTypesStore = defineStore("spFilterTypes", () => {
     /**
      * search has been triggered so set the active types filter
      */
-    function setActive() {
+    function setActive(): void {
         activeTypes.value = [...selectedTypes.value];
     }
 
@@ -93,7 +93,7 @@ export const useFilterTypesStore = defineStore("spFilterTypes", () => {
     /**
      * clear the current types
      */
-    function clear() {
+    function clear(): void {
         selectedTypes.value = [];
     }
 

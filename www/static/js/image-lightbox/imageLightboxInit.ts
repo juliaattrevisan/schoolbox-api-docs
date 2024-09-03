@@ -4,7 +4,7 @@ import { isScriptAdded, injectScript } from "@js/util/domUtils";
  * Overwrite the font and loading images used by lightGallery to ensure we use the CDN,
  * otherwise they will be loaded from the current domain
  */
-function overwriteStaticAssets() {
+function overwriteStaticAssets(): void {
     const newStyle = document.createElement("style");
     newStyle.appendChild(
         document.createTextNode(`
@@ -24,7 +24,7 @@ function overwriteStaticAssets() {
 /**
  * Initialise all lightboxes on the page
  */
-function initLightGallery() {
+function initLightGallery(): void {
     window.sbProps.lightGalleryInit();
     overwriteStaticAssets();
 }
@@ -32,7 +32,7 @@ function initLightGallery() {
 /**
  * Check if lightGallery is already loaded, if not, load it.
  */
-function checkForLightGallery() {
+function checkForLightGallery(): void {
     // We need to ensure that the license key is available before loading the plugin
     // If it's not, wait for the DOM to load and try again
     if (!window.sbProps?.imageLightboxLicenseKey) {

@@ -33,9 +33,9 @@ export type OAuthClient = {
 
 /**
  * Return an empty OAuth client object
- * @returns {OAuthClient} an empty OAuth client object
+ * @returns an empty OAuth client object
  */
-export function getEmptyOAuthClient() {
+export function getEmptyOAuthClient(): OAuthClient {
     return {
         name: "",
         redirectUri: "",

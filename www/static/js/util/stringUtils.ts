@@ -4,9 +4,9 @@
 
 /**
  * shorten a string if it's over the max length
- * @param {string} string - the string to shorten
- * @param {number} maxLength - the max length the string should be shortened to
- * @returns {string} shortened string
+ * @param string - the string to shorten
+ * @param maxLength - the max length the string should be shortened to
+ * @returns shortened string
  */
 export function shortenLength(string: string, maxLength: number): string {
     return string.length < maxLength ? string : `${string.substring(0, maxLength)}...`;
@@ -14,8 +14,8 @@ export function shortenLength(string: string, maxLength: number): string {
 
 /**
  * capitalize the first letter of a string
- * @param {string} string - the string to capitalize
- * @returns {string} string with first letter capitalized
+ * @param string - the string to capitalize
+ * @returns string with first letter capitalized
  */
 export function capitalizeFirstLetter(string: string): string {
     return string.charAt(0).toUpperCase() + string.slice(1);
@@ -31,11 +31,11 @@ export type StringSection = {
 
 /**
  * Replaces a section of a string with a replacement string and returns the updated string
- * @param { number } startIndex - the start index of the section to replace
- * @param { number } endIndex - the end index of the section to replace
- * @param { string } inputString - the string to replace the section in
- * @param { string } replacementString - the string to replace the section with
- * @returns { string } - the updated string
+ * @param startIndex - the start index of the section to replace
+ * @param endIndex - the end index of the section to replace
+ * @param inputString - the string to replace the section in
+ * @param replacementString - the string to replace the section with
+ * @returns - the updated string
  */
 export function replaceStringSection(
     startIndex: number,
@@ -50,10 +50,10 @@ export function replaceStringSection(
 
 /**
  * Replaces all the sections of a string with a replacement string and returns the updated string
- * @param { StringSection[] } sectionsToReplace - the sections to replace
- * @param { string } inputString - the string to replace sections in
- * @param { string } replacementString - the string to replace the sections with
- * @returns { string } - the updated string
+ * @param sectionsToReplace - the sections to replace
+ * @param inputString - the string to replace sections in
+ * @param replacementString - the string to replace the sections with
+ * @returns - the updated string
  */
 export function replaceAllStringSections(
     sectionsToReplace: StringSection[],

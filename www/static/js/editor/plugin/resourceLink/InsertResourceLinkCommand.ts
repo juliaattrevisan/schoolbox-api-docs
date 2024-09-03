@@ -19,7 +19,7 @@ export default class InsertResourceLinkCommand extends Command {
 
     /**
      * To open the Resource modal and insert the selected resource into the editor
-     * @param { Editor } editor - the editor instance
+     * @param editor - the editor instance
      */
     constructor(editor: Editor) {
         super(editor);
@@ -31,7 +31,7 @@ export default class InsertResourceLinkCommand extends Command {
     /**
      * display the resource modal and listen for if a resource is returned
      */
-    execute() {
+    execute(): void {
         this.displayModal();
     }
 
@@ -39,7 +39,7 @@ export default class InsertResourceLinkCommand extends Command {
      * is called on various events to determine if the command is enabled
      * we use the same method as the image command to determine
      */
-    refresh() {
+    refresh(): void {
         const linkCommand = this.editor.commands.get("link") as Command;
         this.isEnabled = linkCommand.isEnabled;
     }
@@ -47,7 +47,7 @@ export default class InsertResourceLinkCommand extends Command {
     /**
      * Display the resource modal to select a file from
      */
-    displayModal() {
+    displayModal(): void {
         /**
          * Ensure that selected files are not received by other event listeners made by other schoolboxResource functions on the page
          * For example, this prevents file drops from receiving the file selected in the editor.
@@ -80,7 +80,7 @@ export default class InsertResourceLinkCommand extends Command {
     /**
      * to close the resource modal and allow the LinkUI to be also closed again
      */
-    closeModal() {
+    closeModal(): void {
         // @ts-expect-error -- jquery plugin
         // eslint-disable-next-line @typescript-eslint/no-unsafe-call
         $("#file-picker").foundation("reveal", "close");
@@ -89,9 +89,9 @@ export default class InsertResourceLinkCommand extends Command {
 
     /**
      * Update the link in the LinkUI to the selected resource
-     * @param { string } value - the value to update the link to
+     * @param value - the value to update the link to
      */
-    updateLink(value: string) {
+    updateLink(value: string): void {
         const linkUI = this.editor.plugins.get("LinkUI") as LinkUI;
         const { formView } = linkUI;
         if (formView === null) return;
@@ -102,9 +102,9 @@ export default class InsertResourceLinkCommand extends Command {
     /**
      * Get the resource information from the server and
      * then insert the link into the editor
-     * @param { string } hash - the hash of the stored file
+     * @param hash - the hash of the stored file
      */
-    async getResourceInfo(hash: string) {
+    async getResourceInfo(hash: string): Promise<void> {
         try {
             const response = await fetch(`/editor/nodeInfo.php?identifier=${encodeURIComponent(hash)}`, {
                 headers: {
@@ -122,9 +122,9 @@ export default class InsertResourceLinkCommand extends Command {
 
     /**
      * Handle the returned resource from the resource modal
-     * @param { MessageEvent } event - the event
+     * @param event - the event
      */
-    onResourceReturned(event: MessageEvent) {
+    onResourceReturned(event: MessageEvent): void {
         // Disable eslint checks for this function, since it is integrating with jquery.modal.js and untyped
         /* eslint-disable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access */
         let message;

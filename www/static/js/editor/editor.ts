@@ -24,11 +24,11 @@ import "@js/editor/styles/editor.css"; // to overwrite some of the styles
 
 /**
  * Add in any additional setup required and then dispatch that the editor is ready
- * @param { SbxEditorElement } sourceElement - the sourceElement the CKEditor will replace
- * @param { SbxEditor } editor - the CKEditor instance
- * @param { SbxEditorConfig } config - the CKEditor config object
+ * @param sourceElement - the sourceElement the CKEditor will replace
+ * @param editor - the CKEditor instance
+ * @param config - the CKEditor config object
  */
-function onCreated(sourceElement: SbxEditorElement, editor: SbxEditor, config: SbxEditorConfig) {
+function onCreated(sourceElement: SbxEditorElement, editor: SbxEditor, config: SbxEditorConfig): void {
     modifyEditor(sourceElement, editor, config);
     sourceElement.dispatchEvent(
         new CustomEvent<EditorCreatedEventInfo>(EditorEvent.EDITOR__CREATED, {
@@ -42,8 +42,8 @@ function onCreated(sourceElement: SbxEditorElement, editor: SbxEditor, config: S
 
 /**
  * set up any default config when it's not been defined
- * @param { PartialSbxEditorConfig } config - the config to use when creating the editor
- * @returns { SbxEditorConfig } - the config with defaults added
+ * @param config - the config to use when creating the editor
+ * @returns - the config with defaults added
  */
 function addDefaultConfig(config: PartialSbxEditorConfig): SbxEditorConfig {
     const filledConfig: SbxEditorConfig = {
@@ -58,10 +58,10 @@ function addDefaultConfig(config: PartialSbxEditorConfig): SbxEditorConfig {
 
 /**
  * create the ckeditor instance
- * @param { SbxEditorElement } sourceElement - the sourceElement the CKEditor will replace
- * @param { SbxEditorConfig } config - the config to use when creating the editor
+ * @param sourceElement - the sourceElement the CKEditor will replace
+ * @param config - the config to use when creating the editor
  */
-async function create(sourceElement: SbxEditorElement, config: SbxEditorConfig) {
+async function create(sourceElement: SbxEditorElement, config: SbxEditorConfig): Promise<void> {
     const editorClassMap = {
         [EditorType.CLASSIC]: ClassicEditor,
         [EditorType.INLINE]: InlineEditor,
@@ -73,9 +73,9 @@ async function create(sourceElement: SbxEditorElement, config: SbxEditorConfig) 
 
 /**
  * Listen for init events to create any instances
- * @param { SbxEditorConfig } config - the config to use when creating the editor
+ * @param config - the config to use when creating the editor
  */
-async function onCreate(config: SbxEditorConfig) {
+async function onCreate(config: SbxEditorConfig): Promise<void> {
     let sourceElements: HTMLElement[] = [];
     config.targetElements.forEach((targetElement) => {
         // assume that each targetElement could contain multiple instances
@@ -112,9 +112,9 @@ async function onCreate(config: SbxEditorConfig) {
 /**
  * Respond to a request to delete an editor instance, by deleting the editor instance, and then firing another event
  * informing that an editor instance has been deleted.
- * @param { EditorDeleteEventInfo } eventDetail - Information about the event.
+ * @param eventDetail - Information about the event.
  */
-function onDelete(eventDetail: EditorDeleteEventInfo) {
+function onDelete(eventDetail: EditorDeleteEventInfo): void {
     const sourceElement = eventDetail.editor.sourceElement as HTMLTextAreaElement;
 
     let keyOfEditorToDelete = null;

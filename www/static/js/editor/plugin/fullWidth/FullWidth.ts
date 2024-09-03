@@ -7,7 +7,7 @@ import FullWidthUI from "./FullWidthUI";
 import FullWidthEditing from "./FullWidthEditing";
 
 export default class FullWidth extends Plugin {
-    static get requires() {
+    static get requires(): (typeof FullWidthUI | typeof FullWidthEditing)[] {
         return [FullWidthUI, FullWidthEditing];
     }
 }

@@ -21,15 +21,15 @@ import { onClickOutside } from "@vueuse/core";
 
 /**
  * To toggle the display of the content when the button is selected
- * @param {Ref<HTMLButtonElement | HTMLElement | null>} button - The pop out button, if a HTMLButtonElement is used it's styles will be changed
- * @param {string | Ref<HTMLElement | null>} contentId - The id of the pop out content, or a ref to the pop out content
- * @param {string} buttonLabel - The label to display on the button
- * @param {Placement} optimalPlacement - The optimal placement of the pop out content
- * @param {boolean} isFullWidth - whether to display the pop out content has full width
- * @param {boolean} isCloseOnContentClick - whether to close the pop out content when it's clicked
- * @param {HTMLElement | string | null} moveTo - An optional element to move the pop out content to
- * @param {() => void} onClose - An optional callback to run when the pop out is closed
- * @returns {object} - The isOpen ref
+ * @param button - The pop out button, if a HTMLButtonElement is used it's styles will be changed
+ * @param contentId - The id of the pop out content, or a ref to the pop out content
+ * @param buttonLabel - The label to display on the button
+ * @param optimalPlacement - The optimal placement of the pop out content
+ * @param isFullWidth - whether to display the pop out content has full width
+ * @param isCloseOnContentClick - whether to close the pop out content when it's clicked
+ * @param moveTo - An optional element to move the pop out content to
+ * @param onClose - An optional callback to run when the pop out is closed
+ * @returns - The isOpen ref
  */
 export function usePopOut(
     button: Ref<HTMLButtonElement | HTMLElement | null>,
@@ -39,8 +39,13 @@ export function usePopOut(
     isFullWidth: boolean = false,
     isCloseOnContentClick: boolean = false,
     moveTo: HTMLElement | string | null = null,
-    onClose: () => void = () => {},
-) {
+    onClose: () => void = (): void => {},
+): {
+    currentLabel: Ref<string>;
+    isOpen: Ref<boolean>;
+    onButtonSelected: () => Promise<void>;
+    close: () => void;
+} {
     const isOpen = window.Vue.ref(false); // Whether the button is open or not
     const contentInitParent = window.Vue.ref<HTMLElement | null>(null); // The initial parent of the content, if it was moved
     const content = window.Vue.ref<HTMLElement | null>(null); // The content to display when the button is selected
@@ -57,7 +62,7 @@ export function usePopOut(
     /**
      * Close the content if it's open
      */
-    function close() {
+    function close(): void {
         if (isOpen.value) {
             isOpen.value = false;
 
@@ -78,10 +83,10 @@ export function usePopOut(
 
     /**
      * To get the transform origin of the content, relative to where it's positioned
-     * @param {Placement} placement - The placement of the pop out content
-     * @returns {string} - The transform origin
+     * @param placement - The placement of the pop out content
+     * @returns - The transform origin
      */
-    function getTransformOrigin(placement: Placement) {
+    function getTransformOrigin(placement: Placement): string {
         if (placement === "top-start") {
             return "bottom left";
         }
@@ -99,9 +104,9 @@ export function usePopOut(
 
     /**
      * To animate the opening of the content, relative to where it's positioned
-     * @param {ComputePositionReturn} position - The position of the content
+     * @param position - The position of the content
      */
-    function animateOpen(position: ComputePositionReturn) {
+    function animateOpen(position: ComputePositionReturn): void {
         if (content.value === null) throw new Error("Unable to animate open - content element not found");
 
         // don't animate if the user prefers reduced motion
@@ -123,9 +128,9 @@ export function usePopOut(
 
     /**
      * To compute the position of the content relative to the button
-     * @param {ReferenceElement} buttonElement - The button element
-     * @param {FloatingElement} contentElement - The content element
-     * @returns {Promise<ComputePositionReturn>} - The position of the content
+     * @param buttonElement - The button element
+     * @param contentElement - The content element
+     * @returns - The position of the content
      */
     async function getPosition(
         buttonElement: ReferenceElement,
@@ -149,7 +154,7 @@ export function usePopOut(
      * To update the position of the content when the button
      * is selected or there's a layout shift
      */
-    async function updatePosition() {
+    async function updatePosition(): Promise<void> {
         const buttonElement = button.value;
         const contentElement = content.value;
         if (buttonElement === null || contentElement === null) return;
@@ -163,7 +168,7 @@ export function usePopOut(
      * Open the content using @floating-ui/dom to position it relative to the button
      * https://floating-ui.com/
      */
-    async function open() {
+    async function open(): Promise<void> {
         const buttonElement = button.value;
         const contentElement = content.value;
         if (buttonElement === null) throw new Error("Unable to open content - button element not found");
@@ -194,7 +199,7 @@ export function usePopOut(
      * otherwise open it using @floating-ui/dom to position it relative to the trigger
      * while also trying to keep it in the viewport
      */
-    async function onButtonSelected() {
+    async function onButtonSelected(): Promise<void> {
         if (content.value === null) throw new Error("Unable to open content - content element not found");
         if (isOpen.value) {
             close();
@@ -210,7 +215,7 @@ export function usePopOut(
      * clipped by an overflow:hidden parent, but placing it there initially is not possible or not practical
      * e.g. if the pop-out is in a iterated-over subcomponent
      */
-    function moveContentToNewParent() {
+    function moveContentToNewParent(): void {
         if (content.value === null || !moveTo) {
             return;
         }
@@ -226,7 +231,7 @@ export function usePopOut(
     /**
      * Returns the content back to its original parent, if it was moved
      */
-    function restoreContentParent() {
+    function restoreContentParent(): void {
         if (contentInitParent.value !== null && content.value !== null) {
             contentInitParent.value.appendChild(content.value);
         }
@@ -234,7 +239,7 @@ export function usePopOut(
 
     /**
      * Find the content element based on the value of contentId
-     * @returns {HTMLElement | null} - The content element, or null if it's not found
+     * @returns - The content element, or null if it's not found
      */
     function findContentElement(): HTMLElement | null {
         if (typeof contentId === "string") {
@@ -247,7 +252,7 @@ export function usePopOut(
     /**
      * Get the content, the element that's displayed when the button is selected
      */
-    async function getContent() {
+    async function getContent(): Promise<void> {
         let newContent = findContentElement();
 
         // If the content isn't found, and we are looking based on an ID, try waiting.

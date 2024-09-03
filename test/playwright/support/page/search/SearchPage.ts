@@ -42,23 +42,23 @@ export default class SearchPage {
 
     /**
      * Navigate to the search page
-     * @param { string= } queryParams - The query parameters to append to the URL [optional]
+     * @param queryParams - The query parameters to append to the URL [optional]
      */
-    async goto(queryParams?: string) {
+    async goto(queryParams?: string): Promise<void> {
         await this.page.goto(SearchPage.URL + (queryParams || ""));
     }
 
     /**
      * Click the search submit button
      */
-    async clickSearchButton() {
+    async clickSearchButton(): Promise<void> {
         await this.page.getByTestId(SearchPage.SUBMIT_BUTTON).click();
     }
 
     /**
      * Verify the contents of the search error message
      */
-    async verifySearchError() {
+    async verifySearchError(): Promise<void> {
         await expect(this.page.getByTestId(SearchPage.RESULTS_ERROR)).toHaveText(
             "Search keyword must be at least 2 characters",
         );
@@ -66,9 +66,9 @@ export default class SearchPage {
 
     /**
      * Verify the number of results displayed
-     * @param { number } expectedCount - The expected number of results
+     * @param expectedCount - The expected number of results
      */
-    async verifyResultsCount(expectedCount: number) {
+    async verifyResultsCount(expectedCount: number): Promise<void> {
         // match testId's that start with SearchPage.RESULTS_RESULT
         const testId = new RegExp(`^${SearchPage.RESULTS_RESULT}`);
         await expect(this.page.getByTestId(testId)).toHaveCount(expectedCount);
@@ -77,76 +77,76 @@ export default class SearchPage {
     /**
      * Verify that all results are loaded
      */
-    async verifyAllResultsLoaded() {
+    async verifyAllResultsLoaded(): Promise<void> {
         await expect(this.page.getByTestId(SearchPage.RESULTS_LOAD_MORE_ALL_LOADED)).toBeVisible();
     }
 
     /**
      * Verify that no results are displayed
      */
-    async verifyNoResults() {
+    async verifyNoResults(): Promise<void> {
         await expect(this.page.getByTestId(SearchPage.RESULTS_NONE)).toBeVisible();
     }
 
     /**
      * Input a keyword in the search field
-     * @param { string } keyword - The keyword to search for
+     * @param keyword - The keyword to search for
      */
-    async inputKeyword(keyword: string) {
+    async inputKeyword(keyword: string): Promise<void> {
         await this.page.getByTestId(SearchPage.SEARCH_FIELD).fill(keyword);
     }
 
     /**
      * Verify the contents of the search field
-     * @param { string } keyword - The keyword to verify
+     * @param keyword - The keyword to verify
      */
-    async verifyKeyword(keyword: string) {
+    async verifyKeyword(keyword: string): Promise<void> {
         await expect(this.page.getByTestId(SearchPage.SEARCH_FIELD)).toHaveValue(keyword);
     }
 
     /**
      * Clear all filters
      */
-    async clearFilters() {
+    async clearFilters(): Promise<void> {
         await this.page.getByTestId(SearchPage.FILTER_CLEAR_BUTTON).click();
     }
 
     /**
      * Click the apply filters button
      */
-    async clickApplyFilters() {
+    async clickApplyFilters(): Promise<void> {
         await this.page.getByTestId(SearchPage.FILTER_APPLY_BUTTON).click();
     }
 
     /**
      * Click a filter type (e.g., news)
-     * @param { string } filterType - The type of filter to click
+     * @param filterType - The type of filter to click
      */
-    async clickFilterType(filterType: string) {
+    async clickFilterType(filterType: string): Promise<void> {
         await this.page.getByTestId(`${SearchPage.FILTER_TYPE_LABEL}-${filterType}`).click();
     }
 
     /**
      * Click the load more results button
      */
-    async clickLoadMoreResults() {
+    async clickLoadMoreResults(): Promise<void> {
         await this.page.getByTestId(SearchPage.RESULTS_LOAD_MORE_BUTTON).click();
     }
 
     /**
      * Click the load more sub results button
-     * @param { number } resultId - The ID of the result to load more sub results for
+     * @param resultId - The ID of the result to load more sub results for
      */
-    async clickLoadMoreSubResults(resultId: number) {
+    async clickLoadMoreSubResults(resultId: number): Promise<void> {
         await this.page.getByTestId(`${SearchPage.RESULTS_SUB_RESULTS_LOAD_MORE}-${resultId}`).click();
     }
 
     /**
      * Verify the number of sub results displayed
-     * @param { number } resultId - The ID of the result to verify sub results for
-     * @param { number } expectedCount - The expected number of sub results
+     * @param resultId - The ID of the result to verify sub results for
+     * @param expectedCount - The expected number of sub results
      */
-    async verifySubResultsCount(resultId: number, expectedCount: number) {
+    async verifySubResultsCount(resultId: number, expectedCount: number): Promise<void> {
         // match testId's that start with SearchPage.RESULTS_SUB_RESULTS_RESULT-resultId
         const testId = new RegExp(`^${SearchPage.RESULTS_SUB_RESULTS_RESULT}-${resultId}`);
         await expect(this.page.getByTestId(testId)).toHaveCount(expectedCount);
@@ -154,25 +154,25 @@ export default class SearchPage {
 
     /**
      * Input a date in the end date field
-     * @param { string } date - The date to input
+     * @param date - The date to input
      */
-    async inputEndDate(date: string) {
+    async inputEndDate(date: string): Promise<void> {
         await this.page.getByTestId(SearchPage.FILTER_DATE_RANGE_END).fill(date);
     }
 
     /**
      * Input a keyword in the creator search field
-     * @param { string } keyword - The keyword to input
+     * @param keyword - The keyword to input
      */
-    async inputCreatorKeyword(keyword: string) {
+    async inputCreatorKeyword(keyword: string): Promise<void> {
         await this.page.getByTestId(SearchPage.CREATOR_SEARCH_SELECT_INPUT).fill(keyword);
     }
 
     /**
      * Select a creator result by ID
-     * @param { number } resultId - The ID of the result to select
+     * @param resultId - The ID of the result to select
      */
-    async selectCreatorResult(resultId: number) {
+    async selectCreatorResult(resultId: number): Promise<void> {
         await this.page.getByTestId(`${SearchPage.CREATOR_SEARCH_SELECT_RESULT}-${resultId}`).click();
     }
 }

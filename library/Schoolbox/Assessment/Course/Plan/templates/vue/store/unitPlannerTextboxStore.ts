@@ -25,11 +25,11 @@ export const useUnitPlannerTextboxStore = defineStore("unitPlannerTextboxStore",
 
     /**
      * Update the textbox content for a unit+column
-     * @param { number } unitId - the unit to update the textbox content for
-     * @param { Column } column - the column to update the textbox content for
-     * @param { string } content - the content to update
+     * @param unitId - the unit to update the textbox content for
+     * @param column - the column to update the textbox content for
+     * @param content - the content to update
      */
-    function updateTextboxContent(unitId: number, column: Column, content: string) {
+    function updateTextboxContent(unitId: number, column: Column, content: string): void {
         if (unsavedTextboxes.value[unitId] === undefined) {
             unsavedTextboxes.value[unitId] = {};
         }
@@ -45,10 +45,10 @@ export const useUnitPlannerTextboxStore = defineStore("unitPlannerTextboxStore",
 
     /**
      * Create a new textbox in the backend if it doesn't exist
-     * @param { number } unitId - the unit to create the textbox for
-     * @param { Column } column - the column to create the textbox for
+     * @param unitId - the unit to create the textbox for
+     * @param column - the column to create the textbox for
      */
-    async function createTextbox(unitId: number, column: Column) {
+    async function createTextbox(unitId: number, column: Column): Promise<void> {
         const storeUnit = unitPlannerStore.units.find((u) => u.id === unitId);
         const componentDefinition = unitPlannerStore.template?.textboxDefId ?? null;
 
@@ -144,10 +144,10 @@ export const useUnitPlannerTextboxStore = defineStore("unitPlannerTextboxStore",
 
     /**
      * Save the updated textbox content for a unit+column
-     * @param { number } unitId - the unit to save the textbox content for
-     * @param { Column } column - the column to save the textbox content for
+     * @param unitId - the unit to save the textbox content for
+     * @param column - the column to save the textbox content for
      */
-    async function saveTextboxContent(unitId: number, column: Column) {
+    async function saveTextboxContent(unitId: number, column: Column): Promise<void> {
         const storeUnit = unitPlannerStore.units.find((u) => u.id === unitId);
         if (!storeUnit) {
             throw new Error("Unit not found");
@@ -202,9 +202,9 @@ export const useUnitPlannerTextboxStore = defineStore("unitPlannerTextboxStore",
 
     /**
      * Determine for a given unit+column if the textbox exists in the backend
-     * @param { number } unitId - the unit to check the textbox for
-     * @param { Column } column - the column to check the textbox for
-     * @returns { boolean } true if the textbox and component exist, false otherwise
+     * @param unitId - the unit to check the textbox for
+     * @param column - the column to check the textbox for
+     * @returns true if the textbox and component exist, false otherwise
      */
     function textboxIsCreated(unitId: number, column: Column): boolean {
         const storeUnit = unitPlannerStore.units.find((u) => u.id === unitId);

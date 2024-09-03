@@ -11,7 +11,7 @@ export default class FullWidthUI extends Plugin {
     /**
      * Register the button in the editor's UI component factory.
      */
-    init() {
+    init(): void {
         this.editor.ui.componentFactory.add("fullWidth", () => {
             // Create the button and bind it to the command
             const icon =

@@ -24,11 +24,11 @@ countdownText.forEach((element) => {
     }
     targetElement.setAttribute("started", "true");
 
-    countdownTimer.onCountdownChange = (timeRemaining) => {
+    countdownTimer.onCountdownChange = (timeRemaining): void => {
         targetElement.dispatchEvent(new CustomEvent("countdownChange", { detail: timeRemaining }));
     };
 
-    countdownTimer.onCountdownFinished = () => {
+    countdownTimer.onCountdownFinished = (): void => {
         targetElement.dispatchEvent(new CustomEvent("countdownFinished"));
     };
 

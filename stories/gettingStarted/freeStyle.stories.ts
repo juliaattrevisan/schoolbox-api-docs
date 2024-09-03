@@ -20,7 +20,7 @@ import StorybookSlot from "../../vue/components/storybook-slot.vue";
 const meta: Meta<typeof StorybookSlot> = {
     component: StorybookSlot,
     decorators: [
-        () => ({
+        (): { template: string } => ({
             template: `
                 <div class="c-island" style="height: 500px;">
                     <story />

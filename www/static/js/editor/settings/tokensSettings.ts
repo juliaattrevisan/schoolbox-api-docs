@@ -23,8 +23,8 @@ const DEFAULT_TOKENS = [
 
 /**
  * If tokens are enabled, return the tokens settings
- * @param { SbxEditorConfig } config - the config to use when creating the editor
- * @returns { { mention: MentionConfig } | Record<PropertyKey, never> } - the tokens settings if enabled
+ * @param config - the config to use when creating the editor
+ * @returns - the tokens settings if enabled
  */
 export function getTokensSettings(config: SbxEditorConfig): { mention: MentionConfig } | Record<PropertyKey, never> {
     if (config.hasTokens) {
@@ -46,9 +46,9 @@ export function getTokensSettings(config: SbxEditorConfig): { mention: MentionCo
 
 /**
  * Wraps a token in a span element if it isn't already wrapped
- * @param { string } sourceElementContent - the sourceElement content as HTML
- * @param { string } token - the token to wrap
- * @returns { string } - the updated content with the token wrapped in a span element
+ * @param sourceElementContent - the sourceElement content as HTML
+ * @param token - the token to wrap
+ * @returns - the updated content with the token wrapped in a span element
  */
 function wrapToken(sourceElementContent: string, token: string): string {
     let currentIndex = sourceElementContent.indexOf(token);
@@ -103,9 +103,9 @@ function wrapToken(sourceElementContent: string, token: string): string {
  * CKEditor5 provides special formatting around tokens, previously with CKE4, tokens were not surrounded with any other element,
  * with CKE5, tokens are now surrounded by a span element with a data-mention attribute
  * this function was added to help migrate text from CKE4 to CKE5, it will surround any tokens that are not already surrounded by a data-mention attribute
- * @param { HTMLElement } sourceElementHTML - the sourceElement content as HTML
- * @param { SbxEditorConfig } config - the config to use when creating the editor
- * @returns { HTMLElement } - the html with the tokens surrounded by the span element
+ * @param sourceElementHTML - the sourceElement content as HTML
+ * @param config - the config to use when creating the editor
+ * @returns - the html with the tokens surrounded by the span element
  */
 export function wrapTokens(sourceElementHTML: HTMLElement, config: SbxEditorConfig): HTMLElement {
     const tokens = config.tokenList ? config.tokenList : DEFAULT_TOKENS;

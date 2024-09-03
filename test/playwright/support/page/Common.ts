@@ -125,8 +125,8 @@ export default class Common {
 
     /**
      * Generate a random string of text
-     * @param { number } length - the length of the string to generate
-     * @returns { string } - the generated string
+     * @param length - the length of the string to generate
+     * @returns - the generated string
      */
     static genText(length: number): string {
         const characters = "abcdefghijklmnopqrstuvwxyz.012345678!@#$%*&^()-+";
@@ -143,8 +143,8 @@ export default class Common {
 
     /**
      * Changes a full name to a surname-first format
-     * @param { string } fullname - the full name to change
-     * @returns { string } - the surname-first name
+     * @param fullname - the full name to change
+     * @returns - the surname-first name
      */
     static surnameFirst(fullname: string): string {
         const name = fullname.replace("Mr", "").replace("Mrs", "");
@@ -154,9 +154,9 @@ export default class Common {
 
     /**
      * search by typing a text in the search bar
-     * @param { string } text - the text to search
+     * @param text - the text to search
      */
-    async search(text: string) {
+    async search(text: string): Promise<void> {
         await this.page.getByTestId(Common.DATATEST_SEARCH_ICON).click();
         await this.page.locator(Common.SELECTOR_SEARCH).fill(text);
         await this.page.getByTestId(Common.DATATEST_SEARCH_ICON).click();
@@ -165,65 +165,65 @@ export default class Common {
     /**
      * click a checkbox in the search results:
      * all, file, folder, textbox
-     * @param { string } type - the type of search result to click
+     * @param type - the type of search result to click
      */
-    async clickSearchTypeCheckbox(type: string) {
+    async clickSearchTypeCheckbox(type: string): Promise<void> {
         await this.page.locator(`label[for="${type}"]`).click();
     }
 
     /**
      * clicks the submit button by locating the last element in the page
      */
-    async clickSubmitButton() {
+    async clickSubmitButton(): Promise<void> {
         await this.page.locator("a.button.submit").last().click();
     }
 
     /**
      * clicks the confirm button on the dialogs
      */
-    async clickConfirmButton() {
+    async clickConfirmButton(): Promise<void> {
         await this.page.locator(Common.SELECTOR_CONFIRM_DIALOG_BUTTON_CONFIRM).click();
     }
 
     /**
      * clicks the cancel button on the dialogs
      */
-    async clickCancelButton() {
+    async clickCancelButton(): Promise<void> {
         await this.page.locator(Common.SELECTOR_CONFIRM_DIALOG_BUTTON_CANCEL).click();
     }
 
     /**
      * clicks the close x button on the dialogs
      */
-    async closeModal() {
+    async closeModal(): Promise<void> {
         await this.page.locator(Common.SELECTOR_CLOSE_BUTTON_MODAL).last().click();
     }
 
     /**
      * click add a comment for learning moments, news, pastoral records etc
      */
-    async clickAddComment() {
+    async clickAddComment(): Promise<void> {
         await this.page.locator(Common.ADD_COMMENT_BUTTON).first().click();
     }
 
     /**
      * click post comment for learning moments, news, pastoral care records
      */
-    async clickSubmitComment() {
+    async clickSubmitComment(): Promise<void> {
         await this.page.locator(Common.COMMENT_SUBMIT_BUTTON).first().click();
     }
 
     /**
      * click the last element to confirm deletion in a modal dialog
      */
-    async clickModalDeleteButton() {
+    async clickModalDeleteButton(): Promise<void> {
         await this.page.locator(Common.MODAL_DELETE_BUTTON).last().click();
     }
 
     /**
      * click the icon modify page
      */
-    async clickIconModifyPage() {
+    async clickIconModifyPage(): Promise<void> {
         await this.page.locator(Common.ICON_MODIFY_PAGES).click();
     }
 }

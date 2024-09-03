@@ -69,16 +69,16 @@ export default class Homepage {
 
     /**
      * Go to a homepage for a given ID
-     * @param { number } id - The ID of the homepage
+     * @param id - The ID of the homepage
      */
-    async goto(id: number) {
+    async goto(id: number): Promise<void> {
         await this.page.goto(Homepage.generateRoute(id));
     }
 
     /**
      * Generates route for this page
-     * @param { number } id - The ID of the page
-     * @returns { string } - the URL for the page
+     * @param id - The ID of the page
+     * @returns - the URL for the page
      */
     public static generateRoute(id: number): string {
         return Homepage.URL.replace("{id}", id.toString());
@@ -86,10 +86,10 @@ export default class Homepage {
 
     /**
      * Adds the given component
-     * @param { string } componentSection - The section it's in: one of the `self::ELEMENT_ADD_COMPONENT_SECTION_*` constants
-     * @param { string } componentName - The name of the component, as seen in its link
+     * @param componentSection - The section it's in: one of the `self::ELEMENT_ADD_COMPONENT_SECTION_*` constants
+     * @param componentName - The name of the component, as seen in its link
      */
-    async addComponent(componentSection: string, componentName: string) {
+    async addComponent(componentSection: string, componentName: string): Promise<void> {
         // Open the component tab
         await this.openTabPanel(Homepage.ELEMENT_ADD_COMPONENT_TAB);
 
@@ -107,9 +107,9 @@ export default class Homepage {
 
     /**
      * Create a locator for a component in a layout for a given position
-     * @param { string } layout - The layout in which the component lives: one of the `self::ELEMENT_COMPONENT_LAYOUT_*` constants
-     * @param { number } position - The position of the component (1-indexed)
-     * @returns { string } - the locator for the component
+     * @param layout - The layout in which the component lives: one of the `self::ELEMENT_COMPONENT_LAYOUT_*` constants
+     * @param position - The position of the component (1-indexed)
+     * @returns - the locator for the component
      */
     public static locateComponent(layout: string, position: number): string {
         return `${layout} ${Homepage.ELEMENT_COMPONENT}:nth-child(${position})`;
@@ -117,11 +117,11 @@ export default class Homepage {
 
     /**
      * Verify that the component at the given position has the given heading
-     * @param { string } heading - The heading to verify
-     * @param { string } layout - The layout of the component
-     * @param { number } position - The position of the component (1-indexed)
+     * @param heading - The heading to verify
+     * @param layout - The layout of the component
+     * @param position - The position of the component (1-indexed)
      */
-    async seeInComponentHeading(heading: string, layout: string, position: number) {
+    async seeInComponentHeading(heading: string, layout: string, position: number): Promise<void> {
         const componentLocator = Homepage.locateComponent(layout, position);
         const componentHeadingEl = this.page.locator(`${componentLocator} ${Homepage.ELEMENT_COMPONENT_HEADING}`);
         await expect(componentHeadingEl).toHaveText(heading);
@@ -129,11 +129,11 @@ export default class Homepage {
 
     /**
      * Verify that the component at the given position contains the given content
-     * @param { string } content - The content to verify
-     * @param { string } layout - The layout of the component
-     * @param { number } position - The position of the component (1-indexed)
+     * @param content - The content to verify
+     * @param layout - The layout of the component
+     * @param position - The position of the component (1-indexed)
      */
-    async seeInComponentContent(content: string, layout: string, position: number) {
+    async seeInComponentContent(content: string, layout: string, position: number): Promise<void> {
         const componentLocator = Homepage.locateComponent(layout, position);
         const componentContentEl = this.page.locator(`${componentLocator} ${Homepage.ELEMENT_COMPONENT_CONTENT}`);
         await expect(componentContentEl).toHaveText(content);
@@ -141,102 +141,102 @@ export default class Homepage {
 
     /**
      * Clicks a component empty state link
-     * @param { string } layout - The layout of the component
-     * @param { number } position - The position of the component (1-indexed)
+     * @param layout - The layout of the component
+     * @param position - The position of the component (1-indexed)
      */
-    async clickComponentEmptyStateLink(layout: string, position: number) {
+    async clickComponentEmptyStateLink(layout: string, position: number): Promise<void> {
         const componentLocator = Homepage.locateComponent(layout, position);
         await this.page.locator(`${componentLocator} .empty-state a`).click();
     }
 
     /**
      * Clicks a component action bar button
-     * @param { string } button - The button to click (as a queryselector)
-     * @param { string } layout - The layout of the component
-     * @param { number } position - The position of the component (1-indexed)
+     * @param button - The button to click (as a queryselector)
+     * @param layout - The layout of the component
+     * @param position - The position of the component (1-indexed)
      */
-    async clickComponentActionBarButton(button: string, layout: string, position: number) {
+    async clickComponentActionBarButton(button: string, layout: string, position: number): Promise<void> {
         const componentLocator = Homepage.locateComponent(layout, position);
         await this.page.locator(`${componentLocator} ${Homepage.ELEMENT_COMPONENT_ACTION_BAR}`).locator(button).click();
     }
 
     /**
      * Open a tab panel
-     * @param { string } link - The link of the tab panel
+     * @param link - The link of the tab panel
      */
-    async openTabPanel(link: string) {
+    async openTabPanel(link: string): Promise<void> {
         await this.page.locator(`[href="${link}"]`).click();
     }
 
     /**
      * Click a tab to add components
-     * @param { string } tab - The tab to click
+     * @param tab - The tab to click
      */
-    async clickComponentsTab(tab: string) {
+    async clickComponentsTab(tab: string): Promise<void> {
         await this.page.click(tab);
     }
 
     /**
      * Check component icons
-     * @param { string } icon - The icon to check
+     * @param icon - The icon to check
      */
-    async checkComponentIcon(icon: string) {
+    async checkComponentIcon(icon: string): Promise<void> {
         await expect(this.page.locator(`span.size-32.icon-masonry.icon-masonry-${icon}`)).toBeVisible();
     }
 
     /**
      * Click the lock toggle
      */
-    async clickLockToggle() {
+    async clickLockToggle(): Promise<void> {
         await this.page.click(Homepage.ELEMENT_LOCK_TOGGLE);
     }
 
     /**
      * Click the component settings
      */
-    async clickComponentSettings() {
+    async clickComponentSettings(): Promise<void> {
         await this.page.click(Homepage.ELEMENT_COMPONENT_SETTINGS);
     }
 
     /**
      * Click the component remove icon
      */
-    async clickComponentRemoveIcon() {
+    async clickComponentRemoveIcon(): Promise<void> {
         await this.page.locator(Homepage.ELEMENT_REMOVE_ICON).first().click();
     }
 
     /**
      * Type a heading text into a component's heading field
-     * @param {string} headingText - The text to type into the heading field.
+     * @param headingText - The text to type into the heading field.
      */
-    async typeTextBoxHeading(headingText: string) {
+    async typeTextBoxHeading(headingText: string): Promise<void> {
         await this.page.waitForSelector(Homepage.ELEMENT_COMPONENT_EDIT_HEADING);
         await this.page.fill(Homepage.ELEMENT_COMPONENT_EDIT_HEADING, headingText);
     }
 
     /**
      * Uncheck a component's checkbox
-     * @param {number} id - The component ID.
-     * @param {string} componentElement - The checkbox element name.
+     * @param id - The component ID.
+     * @param componentElement - The checkbox element name.
      */
-    async uncheckComponentCheckbox(id: number, componentElement: string) {
+    async uncheckComponentCheckbox(id: number, componentElement: string): Promise<void> {
         await this.page.waitForSelector(`label[for="component${id}-${componentElement}"]`);
         await this.page.locator(`label[for="component${id}-${componentElement}"]`).click();
     }
 
     /**
      * Check a component's checkbox
-     * @param {number} id - The component ID.
-     * @param {string} componentElement - The checkbox element name.
+     * @param id - The component ID.
+     * @param componentElement - The checkbox element name.
      */
-    async checkComponentCheckbox(id: number, componentElement: string) {
+    async checkComponentCheckbox(id: number, componentElement: string): Promise<void> {
         await this.page.check(`#component${id}-${componentElement}`);
     }
 
     /**
      * Click the remove confirmation button
      */
-    async clickRemoveConfirmationMessage() {
+    async clickRemoveConfirmationMessage(): Promise<void> {
         await this.page.click(`text=${Homepage.REMOVE_BUTTON_CONFIRMATION_MESSAGE}`);
     }
 }

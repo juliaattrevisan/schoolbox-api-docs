@@ -43,8 +43,8 @@ import UITweaks from "@js/editor/plugin/ui/UITweaks";
 
 /**
  * Return the default configuration
- * @param { SbxEditorConfig } config - the default config
- * @returns { EditorConfig & { sbConfig: SbxEditorConfig } } - refer to https://ckeditor.com/docs/ckeditor5/latest/api/module_core_editor_editorconfig-EditorConfig.html
+ * @param config - the default config
+ * @returns - refer to https://ckeditor.com/docs/ckeditor5/latest/api/module_core_editor_editorconfig-EditorConfig.html
  */
 export function getConfig(config: SbxEditorConfig): EditorConfig & { sbConfig: SbxEditorConfig } {
     return {

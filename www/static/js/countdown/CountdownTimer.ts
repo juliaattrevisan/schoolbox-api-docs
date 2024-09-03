@@ -30,7 +30,7 @@ export default class CountdownTimer {
      */
     private onCountdownFinishedHandler: OnCountdownFinishedEvent | null = null;
 
-    constructor(targetDate: Date, interval = 1000) {
+    constructor(targetDate: Date, interval: number = 1000) {
         this.targetDate = targetDate;
         this.interval = interval;
     }
@@ -38,7 +38,7 @@ export default class CountdownTimer {
     /**
      * Updates the countdown and emits the onCountdownChange event
      */
-    private updateCountdown() {
+    private updateCountdown(): void {
         if (!this.timerId) return; // Timer has been stopped
 
         const timeRemaining = this.targetDate.getTime() - Date.now();
@@ -70,7 +70,7 @@ export default class CountdownTimer {
     /**
      * Starts the countdown
      */
-    start() {
+    start(): void {
         this.updateCountdown(); // Workaround to avoid a 1 second delay before the first update
         this.timerId = window.setInterval(() => {
             this.updateCountdown();
@@ -80,24 +80,24 @@ export default class CountdownTimer {
     /**
      * Stops the countdown
      */
-    stop() {
+    stop(): void {
         if (!this.timerId) return; // Timer has already been stopped
         window.clearInterval(this.timerId);
     }
 
     /**
      * Event to be emitted when the countdown finishes
-     * @param {OnCountdownFinishedEvent} handler - the event handler
+     * @param handler - the event handler
      */
-    public onCountdownChange(handler: (timeRemaining: TimeRemainingDetail) => void) {
+    public onCountdownChange(handler: (timeRemaining: TimeRemainingDetail) => void): void {
         this.onCountdownChangeHandler = handler;
     }
 
     /**
      * Event to be emitted when the countdown finishes
-     * @param {OnCountdownFinishedEvent} handler - the event handler
+     * @param handler - the event handler
      */
-    public onCountdownFinished(handler: () => void) {
+    public onCountdownFinished(handler: () => void): void {
         this.onCountdownFinishedHandler = handler;
     }
 }

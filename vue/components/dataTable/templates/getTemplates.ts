@@ -6,8 +6,8 @@ import type { ColumnConfig, TemplateConfig, ImageComponentData, LinkComponentDat
 
 /**
  * return all the templates used for any columns
- * @param {ColumnConfig[]} columnConfig - the configuration for the columns
- * @returns {TemplateConfig[]} the templates for the columns
+ * @param columnConfig - the configuration for the columns
+ * @returns the templates for the columns
  */
 export function getTemplates(columnConfig: ColumnConfig[]): TemplateConfig[] {
     const justTemplates = columnConfig.filter((column) => column.template);

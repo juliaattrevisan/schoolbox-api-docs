@@ -9,7 +9,7 @@ export default class ResourceLinkEditing extends Plugin {
     /**
      * Define the new command
      */
-    init() {
+    init(): void {
         this.editor.commands.add("insertResourceLink", new InsertResourceLinkCommand(this.editor));
     }
 }

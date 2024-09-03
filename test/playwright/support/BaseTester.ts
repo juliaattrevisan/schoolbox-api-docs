@@ -10,8 +10,8 @@ export default class BaseTester {
     /**
      * Executes a shell command and returns the result.
      * Looks for a /usr/share/schoolbox directory and if not found, attempts to run the command via `vagrant ssh -c '...'`
-     * @param { string } command - The command to execute.
-     * @returns { Promise<string> } The stdout from the command.
+     * @param command - The command to execute.
+     * @returns The stdout from the command.
      * @throws { Error } If the command fails.
      */
     // eslint-disable-next-line class-methods-use-this
@@ -56,10 +56,10 @@ export default class BaseTester {
 
     /**
      * Create an "I am going to " comment for debugging
-     * @param { string } argumentation - The message to log
+     * @param argumentation - The message to log
      */
     // eslint-disable-next-line class-methods-use-this
-    isGoingTo(argumentation: string) {
+    isGoingTo(argumentation: string): void {
         // eslint-disable-next-line no-console
         console.log("I am going to", argumentation);
     }

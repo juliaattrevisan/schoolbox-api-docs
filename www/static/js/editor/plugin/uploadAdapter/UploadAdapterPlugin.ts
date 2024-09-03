@@ -8,10 +8,10 @@ import UploadAdapter from "@js/editor/plugin/uploadAdapter/UploadAdapter";
 
 /**
  * Add our custom upload adapter
- * @param { Editor } editor - the CKEditor instance
+ * @param editor - the CKEditor instance
  */
-export default function UploadAdapterPlugin(editor: Editor) {
-    editor.plugins.get("FileRepository").createUploadAdapter = (loader) => {
+export default function UploadAdapterPlugin(editor: Editor): void {
+    editor.plugins.get("FileRepository").createUploadAdapter = (loader): UploadAdapter => {
         return new UploadAdapter(loader, editor);
     };
 }

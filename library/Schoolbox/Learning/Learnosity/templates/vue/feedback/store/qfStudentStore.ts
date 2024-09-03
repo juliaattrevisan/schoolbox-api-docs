@@ -46,11 +46,11 @@ export const useStudentStore = defineStore("qfStudent", () => {
 
     /**
      * store any passed through properties
-     * @param {Student} $student - the student
-     * @param {StudentItemQuestionResponse[]} $itemResponses - the item responses
-     * @param {StudentAttemptResponse} $attemptResponse - the attempt response
-     * @param {StudentUrls} $urls - the urls
-     * @param {boolean} $isReviewed - whether the attempt has been reviewed
+     * @param $student - the student
+     * @param $itemResponses - the item responses
+     * @param $attemptResponse - the attempt response
+     * @param $urls - the urls
+     * @param $isReviewed - whether the attempt has been reviewed
      */
     function init(
         $student: Student,
@@ -58,7 +58,7 @@ export const useStudentStore = defineStore("qfStudent", () => {
         $attemptResponse: StudentAttemptResponse,
         $urls?: StudentUrls,
         $isReviewed?: boolean,
-    ) {
+    ): void {
         student.value = {
             ...$student,
             isReportLoaded: false,
@@ -75,9 +75,9 @@ export const useStudentStore = defineStore("qfStudent", () => {
      * Add items to a student
      * Note that the items are stored per student to link them to their report
      * The itemsStore is used to reference all items within the quiz, and these are NOT linked to the student reports
-     * @param {StudentItem[]} $items - the items to add
+     * @param $items - the items to add
      */
-    function addItems($items: StudentItem[]) {
+    function addItems($items: StudentItem[]): void {
         const items = $items.filter((item) => item.questions.length > 0); // remove any items that don't have questions
         const studentItems: StudentItem[] = [];
         items.forEach((item) => {
@@ -100,27 +100,27 @@ export const useStudentStore = defineStore("qfStudent", () => {
     /**
      * To notify that a report linked to a student has been loaded
      */
-    function reportLoaded() {
+    function reportLoaded(): void {
         student.value.isReportLoaded = true;
         store.isLoaded = true;
     }
 
     /**
      * To update the isMarked property of an item and student
-     * @param {StudentItem} item - the item to update
+     * @param item - the item to update
      */
-    function updateIsMarked(item: StudentItem) {
+    function updateIsMarked(item: StudentItem): void {
         item.isMarked = getItemIsMarked(item);
         student.value.isMarked = getStudentIsMarked(student.value);
     }
 
     /**
      * To update the score of a question
-     * @param {StudentItem} item - the item that contains the question to update
-     * @param {StudentItemQuestion} question - the question to update
-     * @param {number} score - the score to update
+     * @param item - the item that contains the question to update
+     * @param question - the question to update
+     * @param score - the score to update
      */
-    function updateItemResponseScore(item: StudentItem, question: StudentItemQuestion, score: number) {
+    function updateItemResponseScore(item: StudentItem, question: StudentItemQuestion, score: number): void {
         (question.response as StudentItemQuestionResponse).score = score;
         (question.response as StudentItemQuestionResponse).isMarked = true;
         updateIsMarked(item);
@@ -128,11 +128,11 @@ export const useStudentStore = defineStore("qfStudent", () => {
 
     /**
      * To update the comment of an item
-     * @param {StudentItem} item - the item to update
-     * @param {StudentItemQuestion} question - the question to update
-     * @param {string} comment - the comment to update
+     * @param item - the item to update
+     * @param question - the question to update
+     * @param comment - the comment to update
      */
-    function updateItemComment(item: StudentItem, question: StudentItemQuestion, comment: string) {
+    function updateItemComment(item: StudentItem, question: StudentItemQuestion, comment: string): void {
         (question.response as StudentItemQuestionResponse).comment = comment;
         // set all questions responses that don't have a maxScore as marked
         const questionsWithoutMaxScore = item.questions.filter(
@@ -146,19 +146,19 @@ export const useStudentStore = defineStore("qfStudent", () => {
 
     /**
      * To update the overall comment response to an attempt
-     * @param {Student} $student - the student to update
-     * @param {string} comment - the comment to update
+     * @param $student - the student to update
+     * @param comment - the comment to update
      */
-    function updateAttemptComment($student: Student, comment: string) {
+    function updateAttemptComment($student: Student, comment: string): void {
         $student.attemptResponse.comment = comment;
     }
 
     /**
      * To update the overall mark response to an attempt
-     * @param {Student} $student - the student to update
-     * @param {string} mark - the mark to update
+     * @param $student - the student to update
+     * @param mark - the mark to update
      */
-    function updateAttemptMark($student: Student, mark: string) {
+    function updateAttemptMark($student: Student, mark: string): void {
         $student.attemptResponse.mark = mark;
     }
 

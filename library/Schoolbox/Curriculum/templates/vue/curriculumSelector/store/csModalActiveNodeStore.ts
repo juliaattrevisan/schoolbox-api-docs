@@ -16,16 +16,16 @@ export const useModalActiveNodeStore = defineStore("mcModalActiveNode", () => {
 
     /**
      * set the node to perform an action on
-     * @param { Node } newNode - the new node
+     * @param newNode - the new node
      */
-    function set(newNode: Node) {
+    function set(newNode: Node): void {
         node.value = newNode;
     }
 
     /**
      * unset ready for another use
      */
-    function unset() {
+    function unset(): void {
         node.value = getEmptyNode();
     }
 

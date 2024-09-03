@@ -10,7 +10,7 @@ import type { SbxEditorConfig } from "@js/editor/types/editorTypes";
 /**
  * Display the AI toolbar options based on the existence of an sbProp
  * created within templates/core/include/chrome.twig
- * @returns {string[]} - the toolbar display
+ * @returns - the toolbar display
  */
 function getToolbarAI(): string[] {
     if (window.sbProps.hasEditorAI) {
@@ -21,8 +21,8 @@ function getToolbarAI(): string[] {
 
 /**
  * Display the toolbar options based on config
- * @param { SbxEditorConfig } config - the config to use when creating the editor
- * @returns { ToolbarConfig } - the toolbar display
+ * @param config - the config to use when creating the editor
+ * @returns - the toolbar display
  */
 export function getToolbar(config: SbxEditorConfig): ToolbarConfig {
     // what displays in the default toolbar in order, are either single buttons or groups via objects

@@ -21,7 +21,7 @@ export default class AcceptanceTester extends BaseTester {
     /**
      * Logout the user and verify that the user is logged out
      */
-    async logout() {
+    async logout(): Promise<void> {
         const loginPage = new LoginPage(this.page);
         await loginPage.logout();
         await loginPage.verifyLogoutSuccess();
@@ -30,10 +30,10 @@ export default class AcceptanceTester extends BaseTester {
     /**
      * Login a user with a given username and password and verify that the login was successful
      * Skips the "What's New" tour if it appears
-     * @param { string } username - The username to login with
-     * @param { string } password - The password to login with
+     * @param username - The username to login with
+     * @param password - The password to login with
      */
-    async login(username: string, password: string) {
+    async login(username: string, password: string): Promise<void> {
         const loginPage = new LoginPage(this.page);
         await loginPage.login(username, password, true);
         await loginPage.verifyLoginSuccess();
@@ -44,15 +44,15 @@ export default class AcceptanceTester extends BaseTester {
     /**
      * Login as the Alaress user
      */
-    async loginAsAdmin() {
+    async loginAsAdmin(): Promise<void> {
         await this.login("alaress", "alaress");
     }
 
     /**
      * Impersonate a user via user profile drop when alaress is presented in the drop
-     * @param { string } fullname - The full name of the user to impersonate
+     * @param fullname - The full name of the user to impersonate
      */
-    async impersonate(fullname: string) {
+    async impersonate(fullname: string): Promise<void> {
         this.isGoingTo(`impersonate a user by the name of ${fullname}`);
         await this.logout();
         await this.loginAsAdmin();
@@ -71,15 +71,15 @@ export default class AcceptanceTester extends BaseTester {
     /**
      * Impersonate a teacher (Jack Coles) - sales data
      */
-    async impersonateTeacher() {
+    async impersonateTeacher(): Promise<void> {
         await this.impersonate("Jack Coles");
     }
 
     /**
      * Impersonate a user via the modify screen by passing their title and fullname
-     * @param { string } fullname - The full name of the user to impersonate
+     * @param fullname - The full name of the user to impersonate
      */
-    async impersonateViaModifyUserPage(fullname: string) {
+    async impersonateViaModifyUserPage(fullname: string): Promise<void> {
         this.isGoingTo(`impersonate a user by the name of ${fullname}`);
         await this.logout();
         await this.loginAsAdmin();
@@ -100,9 +100,9 @@ export default class AcceptanceTester extends BaseTester {
 
     /**
      * Search for a user using the search bar
-     * @param { string } fullname - The full name of the user to search for
+     * @param fullname - The full name of the user to search for
      */
-    async searchForUser(fullname: string) {
+    async searchForUser(fullname: string): Promise<void> {
         this.isGoingTo(`search for a user by the name of ${fullname}`);
         await this.page.getByTestId("search-input-button").click();
         await this.page.getByTestId("search-input-field").fill(fullname);
@@ -115,7 +115,7 @@ export default class AcceptanceTester extends BaseTester {
     /**
      * Skip the "What's New" tour if it exists
      */
-    async skipWhatsNewTour() {
+    async skipWhatsNewTour(): Promise<void> {
         const tourButtons = this.page.locator("div.introjs-tooltipbuttons a");
         const tourButtonCount = await tourButtons.count();
         if (tourButtonCount > 0) {
@@ -125,10 +125,10 @@ export default class AcceptanceTester extends BaseTester {
 
     /**
      * Fill in CKEditor5 based on its ID
-     * @param { string } editorId - The ID of the CKEditor5 instance
-     * @param { string } content - The content to fill the editor with
+     * @param editorId - The ID of the CKEditor5 instance
+     * @param content - The content to fill the editor with
      */
-    async fillCKEditorById(editorId: string, content: string) {
+    async fillCKEditorById(editorId: string, content: string): Promise<void> {
         // Wait for the editor to be ready
         await this.page.waitForFunction(
             ([_editorId]) => {
@@ -153,10 +153,10 @@ export default class AcceptanceTester extends BaseTester {
     /**
      * Fill in CKEditor5 based on a Locator
      * The relevant locator should have a ID set
-     * @param { Locator } locator - The locator representing the initial Textarea the editor was created from
-     * @param { string } content - The content to fill the editor with
+     * @param locator - The locator representing the initial Textarea the editor was created from
+     * @param content - The content to fill the editor with
      */
-    async fillCKEditorByLocator(locator: Locator, content: string) {
+    async fillCKEditorByLocator(locator: Locator, content: string): Promise<void> {
         await expect(locator).toHaveCount(1);
         const editorId = await locator.getAttribute("id");
         expect(editorId).not.toBeNull();

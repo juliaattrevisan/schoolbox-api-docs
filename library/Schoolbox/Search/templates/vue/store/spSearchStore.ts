@@ -36,9 +36,9 @@ export const useSearchStore = defineStore("spSearch", () => {
 
     /**
      * search for nodes that match
-     * @param {boolean} simulateRedirect - whether to simulate a redirect
+     * @param simulateRedirect - whether to simulate a redirect
      */
-    async function search(simulateRedirect: boolean) {
+    async function search(simulateRedirect: boolean): Promise<void> {
         useQueryStore().setActive();
         useFiltersStore().setActive();
         useResultsStore().clear();
@@ -80,7 +80,7 @@ export const useSearchStore = defineStore("spSearch", () => {
     /**
      * clear the filters and search
      */
-    async function clearFiltersAndSearch() {
+    async function clearFiltersAndSearch(): Promise<void> {
         useFiltersStore().clear();
         await search(true);
     }

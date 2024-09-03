@@ -64,9 +64,9 @@ const tabConfig: TabConfig[] = [
 /**
  * If there are no textboxes or curriculum components assigned to the unit template,
  * remove the relevant tabs
- * @param {TabConfig[]} $tabConfig - the current tab config
- * @param {UnitTemplate} template - The template for the unit
- * @returns {TabConfig[]} - The modified tab config
+ * @param $tabConfig - the current tab config
+ * @param template - The template for the unit
+ * @returns - The modified tab config
  */
 function modifyTabConfig($tabConfig: TabConfig[], template: UnitTemplate): TabConfig[] {
     let modifiedTabConfig = $tabConfig;
@@ -109,9 +109,9 @@ const columnConfig: Record<ColumnType, ColumnConfig> = {
 /**
  * If there are no textboxes or curriculum components assigned to the unit template,
  * remove the relevant columns
- * @param {TabConfig[]} $columnConfig - the current column config
- * @param {UnitTemplate} template - The template for the unit
- * @returns {Record<ColumnType, ColumnConfig>} - The modified column config
+ * @param $columnConfig - the current column config
+ * @param template - The template for the unit
+ * @returns - The modified column config
  */
 function modifyColumnConfig(
     $columnConfig: Record<ColumnType, ColumnConfig>,
@@ -130,17 +130,17 @@ function modifyColumnConfig(
 /**
  * Get all columns for a particular Column Type
  * For example a unit template could have multiple textboxes, so we need to add a column for each
- * @param {Tab["columns"]} tabColumns - The columns for the tab
- * @param {ColumnConfig} newColumnBase - The base configuration for the new columns
- * @param {ColumnType} columnTypeID - The type of column
- * @param {string[]} components - The heading to use for each column
+ * @param tabColumns - The columns for the tab
+ * @param newColumnBase - The base configuration for the new columns
+ * @param columnTypeID - The type of column
+ * @param components - The heading to use for each column
  */
 function getColumns(
     tabColumns: Tab["columns"],
     newColumnBase: ColumnConfig,
     columnTypeID: ColumnType,
     components: UnitTemplateComponent[],
-) {
+): void {
     let columnId = 0;
     components.forEach((component) => {
         columnId += 1;
@@ -155,10 +155,10 @@ function getColumns(
 
 /**
  * Create the tabs for the unit planner
- * @param {UnitTemplate[]} template - The template for the unit
- * @returns {Tab[]} - The tabs for the unit planner
+ * @param template - The template for the unit
+ * @returns - The tabs for the unit planner
  */
-export function createTabs(template: UnitTemplate) {
+export function createTabs(template: UnitTemplate): Tab[] {
     const modifiedTabConfig = modifyTabConfig(tabConfig, template);
     const modifiedColumnConfig = modifyColumnConfig(columnConfig, template);
     return modifiedTabConfig.map((tabInfo) => {

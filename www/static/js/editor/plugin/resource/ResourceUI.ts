@@ -14,7 +14,7 @@ export default class ResourceUI extends Plugin {
 
     /**
      * Get the plugin name, so can access with editor.plugins.get("ResourceUI")
-     * @returns { string } the plugin name
+     * @returns the plugin name
      */
     static get pluginName(): string {
         return "ResourceUI";
@@ -23,7 +23,7 @@ export default class ResourceUI extends Plugin {
     /**
      * Register the button in the editor's UI component factory.
      */
-    init() {
+    init(): void {
         this.createButton();
         this.addUploadContainer();
     }
@@ -31,7 +31,7 @@ export default class ResourceUI extends Plugin {
     /**
      * Create the button
      */
-    createButton() {
+    createButton(): void {
         this.editor.ui.componentFactory.add("resource", () => {
             // Create the button and bind it to the command
             const icon =
@@ -55,7 +55,7 @@ export default class ResourceUI extends Plugin {
      * To display the upload progress of each resource being added to the editor.
      * This sits below the bottom of the editor and shows the progress of each resource.
      */
-    addUploadContainer() {
+    addUploadContainer(): void {
         const uploadContainerAttribute = "data-resource-upload-container";
         const uploadContainer = (
             (this.editor as ClassicEditor).sourceElement?.parentElement as HTMLElement
@@ -74,15 +74,15 @@ export default class ResourceUI extends Plugin {
     /**
      * To hide/show the upload container based on if there are any uploads in progress
      */
-    checkUploadContainer() {
+    checkUploadContainer(): void {
         this.uploadContainer.style.display = this.uploadContainer.children.length ? "block" : "none";
     }
 
     /**
      * To display the progress of a resource being uploaded, based off the already
      * existing dropzone usages
-     * @param { File } file - the file being uploaded
-     * @returns { HTMLDivElement } the element to display the progress
+     * @param file - the file being uploaded
+     * @returns the element to display the progress
      */
     getUploadElement(file: File): HTMLDivElement {
         const container = document.createElement("div");
@@ -103,8 +103,8 @@ export default class ResourceUI extends Plugin {
 
     /**
      * To show the error state of a failed resource upload
-     * @param { HTMLDivElement } element - the element to display the error
-     * @param { string } error - the error message to display
+     * @param element - the element to display the error
+     * @param error - the error message to display
      */
     static showUploadErrorElement(element: HTMLDivElement, error: string): void {
         element.setAttribute("data-has-error", "");

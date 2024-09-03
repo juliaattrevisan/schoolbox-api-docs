@@ -9,10 +9,10 @@ import { useStudentStore } from "../store/qfStudentStore";
 
 /**
  * To load the reports data and pass it to the other stores
- * @param {LearnosityReportInitOptions} initOptions - the report init options
- * @param {boolean} hasMarkVisibility - whether the report has mark visibility
+ * @param initOptions - the report init options
+ * @param hasMarkVisibility - whether the report has mark visibility
  */
-export function loadReport(initOptions: LearnosityReportInitOptions, hasMarkVisibility: boolean) {
+export function loadReport(initOptions: LearnosityReportInitOptions, hasMarkVisibility: boolean): void {
     const reportId = initOptions.request.reports[0].id; // To link the report to the student
     const reportType = initOptions.request.reports[0].type;
 
@@ -27,7 +27,7 @@ export function loadReport(initOptions: LearnosityReportInitOptions, hasMarkVisi
     switch (reportType) {
         case "session-detail-by-item":
             reportCallback = {
-                readyListener: () => {
+                readyListener: (): void => {
                     // @ts-expect-error -- reportsApp is global but untyped, this should be investigated at some point to determine if we can get this from learnosity
                     // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-use-before-define
                     const attemptReport = (reportsApp as unknown).getReport(reportId);

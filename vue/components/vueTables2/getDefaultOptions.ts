@@ -3,7 +3,7 @@ import type { TableOptions } from "@schoolboxVue/components/vueTables2/types/vue
 /**
  * Returns the default options for vue-tables-2
  * https://matanya.gitbook.io/vue-tables-2/options-api
- * @returns {TableOptions} default options for vue-tables-2
+ * @returns default options for vue-tables-2
  */
 export default function getDefaultOptions(): TableOptions {
     return {

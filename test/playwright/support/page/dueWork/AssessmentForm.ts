@@ -97,9 +97,9 @@ export default class AssessmentForm {
 
     /**
      * Navigates to create duework form for a class ID
-     * @param { string } classId - The class ID to navigate to
+     * @param classId - The class ID to navigate to
      */
-    async goto(classId: string) {
+    async goto(classId: string): Promise<void> {
         await this.page.goto(AssessmentForm.URL.replace("{class_id}", classId));
     }
 
@@ -107,7 +107,7 @@ export default class AssessmentForm {
      * Submits this form to create a duework
      * Verifies that the homepage is visible after submission
      */
-    async create() {
+    async create(): Promise<void> {
         await this.page.getByTestId(AssessmentForm.SELECTOR_BUTTON_CREATE).click();
         await expect(this.page.getByTestId(AssessmentForm.SELECTOR_HOMEPAGE_TABS)).toHaveCount(1);
     }
@@ -115,102 +115,102 @@ export default class AssessmentForm {
     /**
      * Submits this form to update a duework
      */
-    async update() {
+    async update(): Promise<void> {
         await this.page.getByTestId(AssessmentForm.SELECTOR_BUTTON_UPDATE).click();
     }
 
     /**
      * Sets work type
-     * @param { number } workType - The work type to set
+     * @param workType - The work type to set
      */
-    async setWorkType(workType: number) {
+    async setWorkType(workType: number): Promise<void> {
         const workTypeSelectEl = this.page.getByTestId(AssessmentForm.SELECTOR_WORKTYPE);
         await workTypeSelectEl.selectOption({ value: workType.toString() });
     }
 
     /**
      * Sets mark type
-     * @param { number } markType - The mark type to set
+     * @param markType - The mark type to set
      */
-    async setMarkType(markType: number) {
+    async setMarkType(markType: number): Promise<void> {
         const markTypeSelectEl = this.page.getByTestId(AssessmentForm.SELECTOR_MARK_TYPE);
         await markTypeSelectEl.selectOption({ value: markType.toString() });
     }
 
     /**
      * Sets the weight of the assessment
-     * @param { number } weight - The weight to set
+     * @param weight - The weight to set
      */
-    async setWeight(weight: number) {
+    async setWeight(weight: number): Promise<void> {
         await this.page.getByTestId(AssessmentForm.SELECTOR_WEIGHT).fill(weight.toString());
     }
 
     /**
      * Sets visibility
-     * @param { number } visibility - The visibility to set
+     * @param visibility - The visibility to set
      */
-    async setVisibility(visibility: number) {
+    async setVisibility(visibility: number): Promise<void> {
         const visibilitySelectEl = this.page.getByTestId(AssessmentForm.SELECTOR_VISIBILITY);
         await visibilitySelectEl.selectOption({ value: visibility.toString() });
     }
 
     /**
      * Sets accepts online submissions
-     * @param { number } acceptSubmission - The accept submission to set
+     * @param acceptSubmission - The accept submission to set
      */
-    async setAcceptSubmission(acceptSubmission: number) {
+    async setAcceptSubmission(acceptSubmission: number): Promise<void> {
         const acceptSubmissionSelectEl = this.page.getByTestId(AssessmentForm.SELECTOR_ACCEPT_SUBMISSION);
         await acceptSubmissionSelectEl.selectOption({ value: acceptSubmission.toString() });
     }
 
     /**
      * Sets title
-     * @param { string } title - The title to set
+     * @param title - The title to set
      */
-    async setTitle(title: string) {
+    async setTitle(title: string): Promise<void> {
         await this.page.getByTestId(AssessmentForm.SELECTOR_TITLE).fill(title);
     }
 
     /**
      * Sets description
-     * @param { string } description - The description to set
+     * @param description - The description to set
      */
-    async setDescription(description: string) {
+    async setDescription(description: string): Promise<void> {
         const descriptionTextarea = this.page.getByTestId(AssessmentForm.SELECTOR_DESCRIPTION);
         await this.tester.fillCKEditorByLocator(descriptionTextarea, description);
     }
 
     /**
      * Sets publish date
-     * @param { string } publishDate - The publish date to set
+     * @param publishDate - The publish date to set
      */
-    async setPublishDate(publishDate: string) {
+    async setPublishDate(publishDate: string): Promise<void> {
         await this.page.getByTestId(AssessmentForm.SELECTOR_PUBLISH_DATE).fill(publishDate);
     }
 
     /**
      * Sets open date
-     * @param { string } openDate - The open date to set
+     * @param openDate - The open date to set
      */
-    async setOpenDate(openDate: string) {
+    async setOpenDate(openDate: string): Promise<void> {
         await this.page.getByTestId(AssessmentForm.SELECTOR_OPEN_DATE).fill(openDate);
     }
 
     /**
      * Sets due date
-     * @param { string } dueDate - The due date to set
+     * @param dueDate - The due date to set
      */
-    async setDueDate(dueDate: string) {
+    async setDueDate(dueDate: string): Promise<void> {
         await this.page.getByTestId(AssessmentForm.SELECTOR_DUE_DATE).fill(dueDate);
     }
 
     /**
      * Excludes a user from participants
-     * @param { number } userId - The user ID to exclude
-     * @param { boolean } confirm - Whether to confirm the exclusion
-     * @param { boolean } openSection - Whether to open the section
+     * @param userId - The user ID to exclude
+     * @param confirm - Whether to confirm the exclusion
+     * @param openSection - Whether to open the section
      */
-    async modifyParticipation(userId: number, confirm: boolean, openSection: boolean) {
+    async modifyParticipation(userId: number, confirm: boolean, openSection: boolean): Promise<void> {
         if (openSection) {
             await this.page.getByTestId(AssessmentForm.SELECTOR_PARTICIPATION_LEGEND).click();
         }
@@ -227,11 +227,11 @@ export default class AssessmentForm {
 
     /**
      * Creates a learning plan
-     * @param { number } userId - The user ID to create a learning plan for
-     * @param { string } planName - The plan name to set
-     * @param { string } date - The date to set
+     * @param userId - The user ID to create a learning plan for
+     * @param planName - The plan name to set
+     * @param date - The date to set
      */
-    async createLearningPlan(userId: number, planName: string, date: string) {
+    async createLearningPlan(userId: number, planName: string, date: string): Promise<void> {
         await this.page.getByTestId(AssessmentForm.SELECTOR_PARTICIPATION_LEGEND).click();
         await this.page.getByTestId(`${AssessmentForm.SELECTOR_PARTICIPATION_PARTICIPANT}-${userId}`).click();
 

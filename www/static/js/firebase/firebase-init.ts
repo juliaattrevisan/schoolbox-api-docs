@@ -61,7 +61,7 @@ window.sbProps.firebaseApps.forEach((app) => {
                 const notificationTitle: string = notificationPayload.title ?? "Notification";
 
                 const notif = new Notification(notificationTitle, notificationOptions);
-                notif.onclick = (event) => {
+                notif.onclick = (event): void => {
                     event.preventDefault(); // prevent the browser from focusing the Notification's tab
                     // some notifications have a href, some don't just load the dashboard for those missing hrefs.
                     const notifHref: string = notificationPayload.href ?? "/";
@@ -76,9 +76,9 @@ window.sbProps.firebaseApps.forEach((app) => {
 
 /**
  * Respond to a request to allow notifications, send both to firebase, and schoolbox
- * @param { FirebaseRequestNotifEvent } event - Information about the event.
+ * @param event - Information about the event.
  */
-async function requestNotif(event: FirebaseRequestNotifEvent) {
+async function requestNotif(event: FirebaseRequestNotifEvent): Promise<void> {
     /**
      * Currently there'll usually only be at most one Firebase app, but if we start supporting
      * multiple apps, then we may need to start indexing the pwaConfig by app.appIdentifier too...
@@ -162,7 +162,7 @@ async function requestNotif(event: FirebaseRequestNotifEvent) {
 /**
  * Respond to a request to allow notifications, send both to firebase, and schoolbox
  */
-function denyNotif() {
+function denyNotif(): void {
     window.sbProps.firebaseApps.forEach((app) => {
         if (app.publicConfiguration && app.webPushPublicKey && app.appIdentifier) {
             const firebaseApp = initializeApp(app.publicConfiguration);

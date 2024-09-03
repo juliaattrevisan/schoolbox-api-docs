@@ -20,17 +20,17 @@ export const useStore = defineStore("quizFeedback", () => {
 
     /**
      * store any passed through properties
-     * @param {boolean} $isReadOnly - whether is in feedback mode, where the teacher can provide feedback to the student
-     * @param {boolean} $hasMarkVisibility - whether marks and feedback are visible to the user
-     * @param {AssessmentMarkData} $markData - the mark type data linked to the assessment
-     * @param {string|undefined} $statusPage - the link to the status page
+     * @param $isReadOnly - whether is in feedback mode, where the teacher can provide feedback to the student
+     * @param $hasMarkVisibility - whether marks and feedback are visible to the user
+     * @param $markData - the mark type data linked to the assessment
+     * @param $statusPage - the link to the status page
      */
     function init(
         $isReadOnly: boolean,
         $hasMarkVisibility: boolean,
         $markData: AssessmentMarkData,
         $statusPage: string | undefined,
-    ) {
+    ): void {
         isReadOnly.value = $isReadOnly;
         hasMarkVisibility.value = $hasMarkVisibility;
         markData.value = $markData;

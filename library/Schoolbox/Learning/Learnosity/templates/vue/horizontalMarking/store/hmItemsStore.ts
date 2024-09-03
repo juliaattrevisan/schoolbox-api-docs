@@ -25,9 +25,9 @@ export const useItemsStore = defineStore("hmItems", () => {
 
     /**
      * store any passed through properties
-     * @param {Item[]} $items - the items to store
+     * @param $items - the items to store
      */
-    function init($items: Item[]) {
+    function init($items: Item[]): void {
         $items.forEach((item) => {
             items.value.push({
                 ...item,
@@ -48,10 +48,10 @@ export const useItemsStore = defineStore("hmItems", () => {
     /**
      * Add questions to the items, unlike the items initially loaded, the items linked to students loaded
      * via the reports api contain the questions, so we add them here
-     * @param {StudentItem[]} $studentItems - the items to reference
-     * @param {boolean} isLastAttempt - if this is the last attempt that will be loaded
+     * @param $studentItems - the items to reference
+     * @param isLastAttempt - if this is the last attempt that will be loaded
      */
-    function addQuestions($studentItems: StudentItem[], isLastAttempt: boolean) {
+    function addQuestions($studentItems: StudentItem[], isLastAttempt: boolean): void {
         // to only get student items that are also in the store items, as a quiz could have been modified after the student attempted the quiz
         const validStudentItems = $studentItems.filter((item) => itemReferenceList.value.includes(item.reference));
         if (validStudentItems.length !== itemReferenceList.value.length) {
@@ -81,9 +81,9 @@ export const useItemsStore = defineStore("hmItems", () => {
 
     /**
      * Set the active card
-     * @param {string} reference - the reference of the card to set as active
+     * @param reference - the reference of the card to set as active
      */
-    function setActiveItem(reference: string) {
+    function setActiveItem(reference: string): void {
         activeItem.value = items.value.find((card) => card.reference === reference) as Item;
         activeItemIndex.value = items.value.findIndex((card) => card.reference === reference);
     }
@@ -91,7 +91,7 @@ export const useItemsStore = defineStore("hmItems", () => {
     /**
      * Set the previous item
      */
-    function toPreviousItem() {
+    function toPreviousItem(): void {
         if (hasPreviousItem.value) {
             activeItemIndex.value -= 1;
             activeItem.value = items.value[activeItemIndex.value];
@@ -101,7 +101,7 @@ export const useItemsStore = defineStore("hmItems", () => {
     /**
      * Set the next item
      */
-    function toNextItem() {
+    function toNextItem(): void {
         if (hasNextItem.value) {
             activeItemIndex.value += 1;
             activeItem.value = items.value[activeItemIndex.value];

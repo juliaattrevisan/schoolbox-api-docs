@@ -31,7 +31,7 @@ export class L10n {
 
     /**
      * Initialise the L10n object
-     * @param {IL10n} l10n - The localisation object to use (from the backend)
+     * @param l10n - The localisation object to use (from the backend)
      */
     constructor(l10n: IL10n) {
         this.term = l10n.term;
@@ -44,7 +44,7 @@ export class L10n {
 
     /**
      * Get the term
-     * @returns {string} The term
+     * @returns The term
      */
     getTerm(): string {
         return this.term;
@@ -52,7 +52,7 @@ export class L10n {
 
     /**
      * Get the title
-     * @returns {string} The title
+     * @returns The title
      */
     getTitle(): string {
         return this.title;
@@ -60,7 +60,7 @@ export class L10n {
 
     /**
      * Get the singular form
-     * @returns {string} The singular form
+     * @returns The singular form
      */
     getSingularForm(): string {
         return this.singularForm;
@@ -68,7 +68,7 @@ export class L10n {
 
     /**
      * Get the plural form
-     * @returns {string} The plural form
+     * @returns The plural form
      */
     getPluralForm(): string {
         return this.pluralForm;
@@ -76,7 +76,7 @@ export class L10n {
 
     /**
      * Get whether to capitalise the first letter
-     * @returns {boolean} Whether to capitalise the first letter
+     * @returns Whether to capitalise the first letter
      */
     getCapitaliseFirst(): boolean {
         return this.capitaliseFirst;
@@ -84,7 +84,7 @@ export class L10n {
 
     /**
      * Get the indefinite article
-     * @returns {string} The indefinite article
+     * @returns The indefinite article
      */
     getIndefiniteArticle(): string {
         return this.indefiniteArticle;
@@ -92,9 +92,9 @@ export class L10n {
 
     /**
      * Helper function to pluralise/capitalise a term as required
-     * @param {boolean} plural - Whether to pluralise the term
-     * @param {boolean} capitalise - Whether to capitalise the term
-     * @returns {string} The new term
+     * @param plural - Whether to pluralise the term
+     * @param capitalise - Whether to capitalise the term
+     * @returns The new term
      */
     translate(plural: boolean, capitalise: boolean): string {
         let term = plural ? this.pluralForm : this.singularForm;
@@ -111,8 +111,8 @@ export class L10n {
 
     /**
      * Helper for translating an indefinite article
-     * @param {boolean} capitalise - Whether to capitalise the article
-     * @returns {string} The new article
+     * @param capitalise - Whether to capitalise the article
+     * @returns The new article
      */
     translateIndefiniteArticle(capitalise: boolean): string {
         let article = this.indefiniteArticle;
@@ -124,7 +124,7 @@ export class L10n {
 
     /**
      * Get the singular term (Default behaviour is singular, lowercase)
-     * @returns {string} The term, e.g. "attempt history"
+     * @returns The term, e.g. "attempt history"
      */
     singular(): string {
         return this.translate(false, false);
@@ -132,7 +132,7 @@ export class L10n {
 
     /**
      * Get the proper term
-     * @returns {string} The proper term, e.g. "Attempt History"
+     * @returns The proper term, e.g. "Attempt History"
      */
     proper(): string {
         return this.translate(false, true);
@@ -140,7 +140,7 @@ export class L10n {
 
     /**
      * Get the plural term
-     * @returns {string} The plural term, e.g. "attempt histories"
+     * @returns The plural term, e.g. "attempt histories"
      */
     plural(): string {
         return this.translate(true, false);
@@ -148,7 +148,7 @@ export class L10n {
 
     /**
      * Get the proper plural term
-     * @returns {string} The proper plural term e.g. "Attempt Histories"
+     * @returns The proper plural term e.g. "Attempt Histories"
      */
     properPlural(): string {
         return this.translate(true, true);

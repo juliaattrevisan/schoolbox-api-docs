@@ -8,8 +8,8 @@ import type { Student } from "@schoolboxLearnosity/js/types/Student";
  * This ensures the mark is the latest valid submission.
  * If the user is quick enough, they can update the mark and press submit before
  * the mark is submitted to the back end.
- * @param {Student} student - the student to get the mark from
- * @returns {string} - the mark to submit
+ * @param student - the student to get the mark from
+ * @returns - the mark to submit
  */
 export function getLatestMark(student: Student): string {
     const gradeContainer = document.getElementById(`grade-container-${student.id}`) as HTMLDivElement;
@@ -25,10 +25,10 @@ export function getLatestMark(student: Student): string {
 
 /**
  * To mark an attempt as reviewed
- * @param {Student} student - the student to mark
- * @returns {FormData} - the data to send through
+ * @param student - the student to mark
+ * @returns - the data to send through
  */
-export function getFinaliseReviewFormData(student: Student) {
+export function getFinaliseReviewFormData(student: Student): FormData {
     const formData = new FormData();
     formData.append("responseId", student.attemptResponse?.responseId ?? "");
     formData.append("maxMarks", student.attemptResponse?.maxMarks?.toString() ?? "");

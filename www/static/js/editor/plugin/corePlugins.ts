@@ -15,9 +15,21 @@ import Legacy from "@js/editor/plugin/legacy/Legacy";
 
 /**
  * All the core plugins
- * @returns { object } - the core plugins
+ * @returns - the core plugins
  */
-export function getCorePlugins() {
+export function getCorePlugins(): (
+    | typeof Essentials
+    | typeof Bold
+    | typeof Italic
+    | typeof Underline
+    | typeof Strikethrough
+    | typeof Link
+    | typeof DocumentList
+    | typeof BlockQuote
+    | typeof Legacy
+    | typeof Notification
+    | typeof PasteFromOfficeEnhanced
+)[] {
     return [
         Essentials,
         Bold,

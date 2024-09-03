@@ -24,9 +24,9 @@ export const useFilterCreatorsStore = defineStore("spFiltersCreator", () => {
 
     /**
      * Get the creator filter data
-     * @returns {FiltersFormData["creator"]} - the creator filter data
+     * @returns - the creator filter data
      */
-    function getFormData() {
+    function getFormData(): Pick<FiltersFormData, "creator"> {
         // only add creator filter if it is set
         return {
             creator: {
@@ -38,7 +38,7 @@ export const useFilterCreatorsStore = defineStore("spFiltersCreator", () => {
     /**
      * search has been triggered so set the active creator filter
      */
-    function setActive() {
+    function setActive(): void {
         activeCreator.value = [...creator.value];
     }
 
@@ -55,7 +55,7 @@ export const useFilterCreatorsStore = defineStore("spFiltersCreator", () => {
     /**
      * clear the creator filter
      */
-    function clear() {
+    function clear(): void {
         creator.value = [];
     }
 

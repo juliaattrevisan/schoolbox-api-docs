@@ -32,9 +32,9 @@ export type ToastTimeoutEventDetail = {
 
 /**
  * Activate the toast with the given text
- * @param {string} text - The text to display in the toast
+ * @param text - The text to display in the toast
  */
-export function activate(text: string) {
+export function activate(text: string): void {
     document.dispatchEvent(
         new CustomEvent(ToastEvent.ACTIVATE, {
             detail: { text } as ToastActivateEventDetail,
@@ -44,9 +44,9 @@ export function activate(text: string) {
 
 /**
  * Display the timeout toast with the given details
- * @param {ToastTimeoutEventDetail} eventDetail - The details of the timeout event
+ * @param eventDetail - The details of the timeout event
  */
-export function timeout(eventDetail: ToastTimeoutEventDetail) {
+export function timeout(eventDetail: ToastTimeoutEventDetail): void {
     document.dispatchEvent(
         new CustomEvent(ToastEvent.TIMEOUT, {
             detail: eventDetail,

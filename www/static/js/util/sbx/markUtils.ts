@@ -3,10 +3,10 @@ import { getPercentage } from "../mathUtils";
 
 /**
  * Calculate the letter grade of the value
- * @param {number} value - the value to calculate the letter grade of
- * @param {number} max - the maximum value
- * @param {LetterGradeItem[]} items - the letter grade items
- * @returns {string} - the letter grade or an "-" if invalid
+ * @param value - the value to calculate the letter grade of
+ * @param max - the maximum value
+ * @param items - the letter grade items
+ * @returns - the letter grade or an "-" if invalid
  */
 export function getLetterGrade(value: number, max: number, items: LetterGradeItem[]): string | undefined {
     const percentage = getPercentage(value, max);
@@ -38,11 +38,11 @@ export function getLetterGrade(value: number, max: number, items: LetterGradeIte
 
 /**
  * Get the lower bound of a letter grade, it's assumed that the caption is within the items
- * @param {string} caption - the caption of the letter grade
- * @param {LetterGradeItem[]} items - the letter grade items
- * @returns {number | undefined} - the lower bound or undefined if not found
+ * @param caption - the caption of the letter grade
+ * @param items - the letter grade items
+ * @returns - the lower bound or undefined if not found
  */
-export function getLowerBound(caption: string, items: LetterGradeItem[]) {
+export function getLowerBound(caption: string, items: LetterGradeItem[]): number | undefined {
     // ensure the caption is a string
     if (typeof caption !== "string") {
         return undefined;

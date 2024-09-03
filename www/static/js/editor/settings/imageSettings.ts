@@ -2,7 +2,7 @@ import type { ImageConfig } from "@ckeditor/ckeditor5-image";
 
 /**
  * Returns the settings for the Images
- * @returns {{ image: ImageConfig }} - the image settings
+ * @returns - the image settings
  */
 export function getImageSettings(): { image: ImageConfig } {
     return {
@@ -43,10 +43,10 @@ export function getImageSettings(): { image: ImageConfig } {
  * Add the data-schoolboxresource-fullwidth attribute to any images that have the class full-width
  * This is so any images marked full width in CKEditor 4 are also marked full width in CKEditor 5,
  * so the full width UI is accurate
- * @param { HTMLElement } sourceElementHTML - the sourceElement content as HTML
- * @returns { HTMLElement } - the sourceElement content as HTML with the data-schoolboxresource-fullwidth attribute added to any images that have the class full-width
+ * @param sourceElementHTML - the sourceElement content as HTML
+ * @returns - the sourceElement content as HTML with the data-schoolboxresource-fullwidth attribute added to any images that have the class full-width
  */
-export function addFullWidthAttributes(sourceElementHTML: HTMLElement) {
+export function addFullWidthAttributes(sourceElementHTML: HTMLElement): HTMLElement {
     const images = sourceElementHTML.querySelectorAll("img");
     images.forEach((image) => {
         if (image.classList.contains("full-width")) {
@@ -59,10 +59,10 @@ export function addFullWidthAttributes(sourceElementHTML: HTMLElement) {
 /**
  * The height style property was added to video thumbnails in CKEditor 4, however in CKEditor 5
  * it interferes with the resize widget and can create display issues if the thumbnail is resized.
- * @param { HTMLElement } sourceElementHTML - the sourceElement content as HTML
- * @returns { HTMLElement } - the sourceElement content as HTML with the height style property removed from any video thumbnails
+ * @param sourceElementHTML - the sourceElement content as HTML
+ * @returns - the sourceElement content as HTML with the height style property removed from any video thumbnails
  */
-export function removeHeightFromVideoThumbs(sourceElementHTML: HTMLElement) {
+export function removeHeightFromVideoThumbs(sourceElementHTML: HTMLElement): HTMLElement {
     const images = sourceElementHTML.querySelectorAll("img");
     images.forEach((image) => {
         if (

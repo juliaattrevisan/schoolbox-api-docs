@@ -8,11 +8,14 @@ import type { Results } from "../../../js/types/Results";
 
 /**
  * To show that whether there are more results that can be loaded
- * @param {Ref<boolean>} hasLoadedAllResults - whether all results have been loaded
- * @param {Ref<Results>} results - the current results
- * @returns {boolean} - whether there are more results that can be loaded
+ * @param hasLoadedAllResults - whether all results have been loaded
+ * @param results - the current results
+ * @returns - whether there are more results that can be loaded
  */
-export function useHasMoreResults(hasLoadedAllResults: Ref<boolean>, results: Ref<Results>) {
+export function useHasMoreResults(
+    hasLoadedAllResults: Ref<boolean>,
+    results: Ref<Results>,
+): { hasMoreResults: Ref<boolean> } {
     /**
      * To show that there are more results that can be loaded
      * @returns {boolean}

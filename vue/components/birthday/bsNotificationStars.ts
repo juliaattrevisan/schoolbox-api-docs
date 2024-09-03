@@ -15,10 +15,10 @@ let timeline: GSAPTimeline; // to be able to kill the timeline on destroy
 /**
  * Set up an array of Stars
  * Put them in the centre width of the Canvas and spread them along the vertical axis a bit so they can 'flick' out
- * @param { HTMLCanvasElement} canvas - the canvas element to draw the stars on
- * @returns {Star[]} - the stars to animate
+ * @param canvas - the canvas element to draw the stars on
+ * @returns - the stars to animate
  */
-function getStars(canvas: HTMLCanvasElement) {
+function getStars(canvas: HTMLCanvasElement): Star[] {
     const stars = [];
     const canvasDimensions = getCanvasDimensions(canvas);
     let star; // reuse reference in loop
@@ -35,11 +35,11 @@ function getStars(canvas: HTMLCanvasElement) {
 
 /**
  * Each star needs to be removed and redrawn each 'tick'
- * @param {Star[]} stars - the stars to redraw
- * @param {CanvasRenderingContext2D} context - the context to draw the stars on
- * @param {CanvasDimensions} canvasDimensions - the dimensions of the canvas
+ * @param stars - the stars to redraw
+ * @param context - the context to draw the stars on
+ * @param canvasDimensions - the dimensions of the canvas
  */
-function redrawStars(stars: Star[], context: CanvasRenderingContext2D, canvasDimensions: CanvasDimensions) {
+function redrawStars(stars: Star[], context: CanvasRenderingContext2D, canvasDimensions: CanvasDimensions): void {
     context.clearRect(0, 0, canvasDimensions.width, canvasDimensions.height);
     stars.forEach((star) => star.draw(context));
 }
@@ -47,9 +47,9 @@ function redrawStars(stars: Star[], context: CanvasRenderingContext2D, canvasDim
 /**
  * Each star has an animation, and the properties to animate are specified within
  * Through the onUpdate of the timeline, the properties are updated each tick
- * @param {Star} star - the star to animate
+ * @param star - the star to animate
  */
-function addStarAnimation(star: Star) {
+function addStarAnimation(star: Star): void {
     timeline.to(
         star,
         {
@@ -66,9 +66,9 @@ function addStarAnimation(star: Star) {
 
 /**
  * Get all the stars, add an animation to the gsap.timeline for each and ensure the Canvas is redrawn on each update.
- * @param {HTMLCanvasElement} canvas - the canvas element to draw the stars on
+ * @param canvas - the canvas element to draw the stars on
  */
-function animateStars(canvas: HTMLCanvasElement) {
+function animateStars(canvas: HTMLCanvasElement): void {
     const stars = getStars(canvas);
     const context = getContext(canvas) as CanvasRenderingContext2D;
     const canvasDimensions = getCanvasDimensions(canvas);
@@ -83,17 +83,17 @@ function animateStars(canvas: HTMLCanvasElement) {
 
 /**
  * Set up both the badge and the stars animations
- * @param {HTMLCanvasElement} canvas - the canvas element to draw the stars on
+ * @param canvas - the canvas element to draw the stars on
  */
-export function init(canvas: HTMLCanvasElement) {
+export function init(canvas: HTMLCanvasElement): void {
     animateStars(canvas);
 }
 
 /**
  * Set up both the badge and the stars animations
- * @param {HTMLCanvasElement} canvas - the canvas element to draw the stars on
+ * @param canvas - the canvas element to draw the stars on
  */
-export function destroy(canvas: HTMLCanvasElement) {
+export function destroy(canvas: HTMLCanvasElement): void {
     timeline.kill();
     const context = getContext(canvas) as CanvasRenderingContext2D;
     context.clearRect(0, 0, canvas.width, canvas.height);

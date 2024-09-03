@@ -7,8 +7,8 @@ import { wrapTokens } from "@js/editor/settings/tokensSettings";
 
 /**
  * Get the identifier for a given editor element (The ID, if it exists, otherwise the name if it's a textarea)
- * @param { HTMLElement } sourceElement - the element to get the identifier for
- * @returns { string | null } - the identifier for the element, or null if it doesn't have one
+ * @param sourceElement - the element to get the identifier for
+ * @returns - the identifier for the element, or null if it doesn't have one
  */
 export function getSourceElementIdentifier(sourceElement: HTMLElement): string | null {
     if (sourceElement instanceof HTMLElement && sourceElement.id) {
@@ -22,8 +22,8 @@ export function getSourceElementIdentifier(sourceElement: HTMLElement): string |
 
 /**
  * Parse the content as HTML so we can run .querySelectorAll etc on it
- * @param { SbxEditorElement } sourceElement - the sourceElement the CKEditor will replace
- * @returns { HTMLElement } - the sourceElement's inner HTML content
+ * @param sourceElement - the sourceElement the CKEditor will replace
+ * @returns - the sourceElement's inner HTML content
  */
 function getSourceElementHTML(sourceElement: HTMLElement): HTMLElement {
     // if the sourceElement is a textarea, use .sourceElementContent as .innerHTML will return HTML as escaped text
@@ -35,9 +35,9 @@ function getSourceElementHTML(sourceElement: HTMLElement): HTMLElement {
 
 /**
  * Run through any checks required on the data before it's loaded into the editor
- * @param { HTMLElement } sourceElementHTML - the contents of the editor as HTML, wrapped in any HTMLElement (e.g. a DOMparsed editor.getData())
- * @param { SbxEditorConfig } config - the config to use when creating the editor
- * @returns { HTMLElement } - the sourceElement content as HTML
+ * @param sourceElementHTML - the contents of the editor as HTML, wrapped in any HTMLElement (e.g. a DOMparsed editor.getData())
+ * @param config - the config to use when creating the editor
+ * @returns - the sourceElement content as HTML
  */
 function runChecks(sourceElementHTML: HTMLElement, config: SbxEditorConfig): HTMLElement {
     let newSourceElementHTML = addRelToNewTabLinks(sourceElementHTML);
@@ -57,11 +57,11 @@ function runChecks(sourceElementHTML: HTMLElement, config: SbxEditorConfig): HTM
  * this might happen if a page has changed the data in the form with .setData and needs to re-run the function
  * It's currently only called within the Add Pastoral Record page, where it only needs to check
  * for tokens when a pastoral type or sub-type change is triggered.
- * @param { HTMLElement } targetElement - the source element of the CKEditor to run checks for
+ * @param targetElement - the source element of the CKEditor to run checks for
  */
-function onEditorCheckData(targetElement: HTMLElement) {
+function onEditorCheckData(targetElement: HTMLElement): void {
     const editorIdentifier = getSourceElementIdentifier(targetElement);
-    const editor = editorIdentifier ? (window.sbProps.editors[editorIdentifier] ?? null) : null;
+    const editor = editorIdentifier ? window.sbProps.editors[editorIdentifier] ?? null : null;
 
     if (editor === null) throw new Error("onEditorCheckData: Unable to find editor in window.sbProps.editors");
 
@@ -75,10 +75,10 @@ function onEditorCheckData(targetElement: HTMLElement) {
 
 /**
  * This function is called when the editor is created, it checks the data and manipulates as required
- * @param { SbxEditorElement } sourceElement - the sourceElement the CKEditor will replace
- * @param { SbxEditorConfig } config - the config to use when creating the editor
+ * @param sourceElement - the sourceElement the CKEditor will replace
+ * @param config - the config to use when creating the editor
  */
-export function initCheckData(sourceElement: SbxEditorElement, config: SbxEditorConfig) {
+export function initCheckData(sourceElement: SbxEditorElement, config: SbxEditorConfig): void {
     const sourceElementHTML = getSourceElementHTML(sourceElement);
     const newSourceElementHTML = runChecks(sourceElementHTML, config);
     sourceElement.innerHTML = newSourceElementHTML.innerHTML;

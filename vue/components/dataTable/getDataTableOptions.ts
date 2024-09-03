@@ -10,10 +10,10 @@ import type { ColumnConfig } from "./types/dataTableTypes";
 
 /**
  * to return an object where each heading is the key and the value is the class if set
- * @param {ColumnConfig[]} columnConfig - the configuration for the columns
- * @returns {TableOptions} the columns that have custom classes linked
+ * @param columnConfig - the configuration for the columns
+ * @returns the columns that have custom classes linked
  */
-function getColumnsClasses(columnConfig: ColumnConfig[]) {
+function getColumnsClasses(columnConfig: ColumnConfig[]): { columnsClasses: Record<string, string> } {
     const columnsClasses = columnConfig.reduce((accumulator: Record<string, string>, column: ColumnConfig) => {
         accumulator[column.key] = column.class ?? "";
         return accumulator;
@@ -23,10 +23,10 @@ function getColumnsClasses(columnConfig: ColumnConfig[]) {
 
 /**
  * to return an object where each heading is the key and the value is the data
- * @param {ColumnConfig[]} columnConfig - the configuration for the columns
- * @returns {TableOptions} the columns that have custom classes linked
+ * @param columnConfig - the configuration for the columns
+ * @returns the columns that have custom classes linked
  */
-function getHeadings(columnConfig: ColumnConfig[]) {
+function getHeadings(columnConfig: ColumnConfig[]): { headings: Record<string, string> } {
     const headings = columnConfig.reduce((accumulator: Record<string, string>, column: ColumnConfig) => {
         accumulator[column.key] = column.heading;
         return accumulator;
@@ -36,10 +36,10 @@ function getHeadings(columnConfig: ColumnConfig[]) {
 
 /**
  * its assumed all columns are sortable unless isSortable is set to false
- * @param {ColumnConfig[]} columnConfig - the configuration for the columns
- * @returns {TableOptions} the columns that are sortable
+ * @param columnConfig - the configuration for the columns
+ * @returns the columns that are sortable
  */
-function getSortable(columnConfig: ColumnConfig[]) {
+function getSortable(columnConfig: ColumnConfig[]): { sortable: string[] } {
     const sortable: string[] = [];
     columnConfig.forEach((column) => {
         if (!Object.prototype.hasOwnProperty.call(column, "isSortable")) {
@@ -51,10 +51,10 @@ function getSortable(columnConfig: ColumnConfig[]) {
 
 /**
  * any hidden columns, typically used to add extra search data to the table
- * @param {ColumnConfig[]} columnConfig - the configuration for the columns
- * @returns {TableOptions} the columns that are hidden
+ * @param columnConfig - the configuration for the columns
+ * @returns the columns that are hidden
  */
-function getHiddenColumns(columnConfig: ColumnConfig[]) {
+function getHiddenColumns(columnConfig: ColumnConfig[]): { hiddenColumns: string[] } {
     const hiddenColumns: string[] = [];
     columnConfig.forEach((column) => {
         if (column.isHidden) {
@@ -66,11 +66,11 @@ function getHiddenColumns(columnConfig: ColumnConfig[]) {
 
 /**
  *
- * @param {ColumnConfig} columnConfig - the configuration for the columns
- * @param {tableOptions} tableOptions - the options passed to the vue-tables-2 component
- * @returns {TableOptions} the configuration for the vue-tables-2 component
+ * @param columnConfig - the configuration for the columns
+ * @param tableOptions - the options passed to the vue-tables-2 component
+ * @returns the configuration for the vue-tables-2 component
  */
-export function getOptions(columnConfig: ColumnConfig[], tableOptions: TableOptions) {
+export function getOptions(columnConfig: ColumnConfig[], tableOptions: TableOptions): TableOptions {
     return {
         ...getDefaultOptions(),
         ...getColumnsClasses(columnConfig),

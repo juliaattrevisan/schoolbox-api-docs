@@ -15,7 +15,7 @@ export const useModalNodeUsageStore = defineStore("csModalNodeUsage", () => {
     /**
      * retrieve all the details of the nodes usage
      */
-    async function view() {
+    async function view(): Promise<void> {
         try {
             isProcessing.value = true;
             const modalActiveNodeStore = useModalActiveNodeStore();
@@ -37,9 +37,9 @@ export const useModalNodeUsageStore = defineStore("csModalNodeUsage", () => {
 
     /**
      * to display all the nodes usage details
-     * @param { Node } node - node to update
+     * @param node - node to update
      */
-    async function prompt(node: Node) {
+    async function prompt(node: Node): Promise<void> {
         useModalActiveNodeStore().set(node);
         isOpen.value = true;
         await view();
@@ -48,7 +48,7 @@ export const useModalNodeUsageStore = defineStore("csModalNodeUsage", () => {
     /**
      * to hide the nodes usage details
      */
-    function cancel() {
+    function cancel(): void {
         useModalActiveNodeStore().unset();
         isOpen.value = false;
     }

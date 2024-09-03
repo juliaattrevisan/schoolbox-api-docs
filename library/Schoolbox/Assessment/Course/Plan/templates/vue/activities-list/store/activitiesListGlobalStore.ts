@@ -5,9 +5,9 @@ export const useActivitiesListGlobalStore = defineStore(`activitiesListGlobalSto
 
     /**
      * store any passed through properties
-     * @param { boolean } $ltiAssessmentsEnabled - whether LTI assessments are enabled
+     * @param $ltiAssessmentsEnabled - whether LTI assessments are enabled
      */
-    function init($ltiAssessmentsEnabled: boolean) {
+    function init($ltiAssessmentsEnabled: boolean): void {
         ltiAssessmentsEnabled.value = $ltiAssessmentsEnabled;
     }
 

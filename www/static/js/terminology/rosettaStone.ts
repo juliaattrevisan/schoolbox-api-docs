@@ -12,7 +12,7 @@ export class RosettaStone {
 
     /**
      * Initialise the RosettaStone object
-     * @param {IL10n[]} terms - The terms to add to the dictionary
+     * @param terms - The terms to add to the dictionary
      */
     constructor(terms: IL10n[] = []) {
         terms.forEach((term) => {
@@ -22,8 +22,8 @@ export class RosettaStone {
 
     /**
      * Add a term to the dictionary
-     * @param {IL10n} term - The term to add
-     * @returns {RosettaStone} The RosettaStone object
+     * @param term - The term to add
+     * @returns The RosettaStone object
      */
     addTerm(term: IL10n): RosettaStone {
         this.dictionary[term.term] = new L10n(term);
@@ -32,8 +32,8 @@ export class RosettaStone {
 
     /**
      * Add multiple terms to the dictionary
-     * @param {IL10n[]} terms - The terms to add
-     * @returns {RosettaStone} The RosettaStone object
+     * @param terms - The terms to add
+     * @returns The RosettaStone object
      */
     addTerms(terms: IL10n[]): RosettaStone {
         terms.forEach((term) => {
@@ -44,10 +44,10 @@ export class RosettaStone {
 
     /**
      * Translate a term
-     * @param {string} term - The term to translate
-     * @param {boolean} plural - Whether to pluralise the term
-     * @param {boolean} capital - Whether to capitalise the term
-     * @returns {string} The translated term
+     * @param term - The term to translate
+     * @param plural - Whether to pluralise the term
+     * @param capital - Whether to capitalise the term
+     * @returns The translated term
      */
     translate(term: string, plural: boolean = false, capital: boolean = false): string {
         return this.get(term).translate(plural, capital);
@@ -55,9 +55,9 @@ export class RosettaStone {
 
     /**
      * Get the indefinite article for a term
-     * @param {string} term - The term to get the article for
-     * @param {boolean} capital - Whether to capitalise the article
-     * @returns {string} The indefinite article
+     * @param term - The term to get the article for
+     * @param capital - Whether to capitalise the article
+     * @returns The indefinite article
      */
     indefiniteArticle(term: string, capital: boolean = false): string {
         return this.get(term).translateIndefiniteArticle(capital);
@@ -65,8 +65,8 @@ export class RosettaStone {
 
     /**
      * Find a term in the dictionary
-     * @param {string} term - The term to find
-     * @returns {L10n} The relevant L10n object
+     * @param term - The term to find
+     * @returns The relevant L10n object
      * @throws {Error} If the term is not loaded in the dictionary
      */
     get(term: string): L10n {

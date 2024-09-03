@@ -13,14 +13,14 @@ export const useDeleteNodesStore = defineStore("mcDeleteNodes", () => {
     /**
      * to display a prompt to confirm a node removal
      */
-    function prompt() {
+    function prompt(): void {
         isOpen.value = true;
     }
 
     /**
      * To delete all the marked nodes in parallel
      * https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise/all
-     * @returns { Promise<Response> } - list of fetch promises
+     * @returns - list of fetch promises
      */
     function getFetches(): Promise<Response>[] {
         const selectedNodesStore = useSelectedNodesStore();
@@ -37,7 +37,7 @@ export const useDeleteNodesStore = defineStore("mcDeleteNodes", () => {
 
     /**
      * To notify the user of success status
-     * @returns { string } - the success message
+     * @returns - the success message
      */
     function getSuccessMessage(): string {
         const nodeSingleOrPlural = capitalizeFirstLetter(useSelectedNodesStore().singleOrPlural);
@@ -47,7 +47,7 @@ export const useDeleteNodesStore = defineStore("mcDeleteNodes", () => {
     /**
      * to hide the confirmation prompt
      */
-    function cancel() {
+    function cancel(): void {
         isOpen.value = false;
     }
 
@@ -55,7 +55,7 @@ export const useDeleteNodesStore = defineStore("mcDeleteNodes", () => {
      * node removal has been confirmed so notify the backend
      * and then pull it out of the nodes if successful
      * @todo - more extensive error checking needs to occur
-     * @returns { Promise<string> } - the success message
+     * @returns - the success message
      */
     async function deleteNodes(): Promise<string> {
         try {

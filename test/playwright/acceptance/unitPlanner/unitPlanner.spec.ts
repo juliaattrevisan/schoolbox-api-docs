@@ -45,7 +45,7 @@ test.describe("Unit Planner Tests", () => {
 
         /**
          * Get the current order of units
-         * @returns { Promise<string[]> } - The order of unit IDs
+         * @returns - The order of unit IDs
          */
         async function getUnitOrder(): Promise<string[]> {
             const allUnitRowSelector = /^unit-row-/;

@@ -13,19 +13,19 @@ export const useActivitiesListStore = (activitiesListStoreId: string) =>
 
         /**
          * store any passed through properties
-         * @param { Activity[] } $activities - the initial set of activities, in sequence
-         * @param { ActivitiesListRoutes } $activitiesListRoutes - the routes relevant to actions on an activities list
+         * @param $activities - the initial set of activities, in sequence
+         * @param $activitiesListRoutes - the routes relevant to actions on an activities list
          */
-        function init($activities: Activity[], $activitiesListRoutes: ActivitiesListRoutes) {
+        function init($activities: Activity[], $activitiesListRoutes: ActivitiesListRoutes): void {
             activities.value = $activities;
             routes.value = $activitiesListRoutes;
         }
 
         /**
          * Save the sequence of the activities to the database
-         * @param { number[] } newActivityIDSequence - the new sequence of activity ids
+         * @param newActivityIDSequence - the new sequence of activity ids
          */
-        async function saveActivitySequence(newActivityIDSequence: number[]) {
+        async function saveActivitySequence(newActivityIDSequence: number[]): Promise<void> {
             if (!routes.value.reorder) {
                 return; // User does not have access to resequence
             }
@@ -57,9 +57,9 @@ export const useActivitiesListStore = (activitiesListStoreId: string) =>
 
         /**
          * Resequences and saves a new activity order
-         * @param { number[] } newActivityIDSequence - the new sequence of activity ids
+         * @param newActivityIDSequence - the new sequence of activity ids
          */
-        function resequenceActivities(newActivityIDSequence: number[]) {
+        function resequenceActivities(newActivityIDSequence: number[]): void {
             let hasChanged = false;
 
             const newActivitiesOrder = newActivityIDSequence.map((activityId) => {
@@ -82,9 +82,9 @@ export const useActivitiesListStore = (activitiesListStoreId: string) =>
 
         /**
          * Remove an activity from the store
-         * @param { number } activityId - the activity ID to remove
+         * @param activityId - the activity ID to remove
          */
-        function removeActivity(activityId: number) {
+        function removeActivity(activityId: number): void {
             activities.value = activities.value.filter((activity) => activity.id !== activityId);
         }
 

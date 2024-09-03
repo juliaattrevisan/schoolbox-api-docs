@@ -24,10 +24,10 @@ export default class DatabaseHelper {
 
     /**
      * Query the database
-     * @param { string } table - Table name
-     * @param { string= } columns - Columns to select [optional, default=*]
-     * @param { DataPairs= } criteria - Search criteria [optional, default={}]
-     * @returns { Promise<RowDataPacket[]> } - Query results
+     * @param table - Table name
+     * @param columns - Columns to select [optional, default=*]
+     * @param criteria - Search criteria [optional, default={}]
+     * @returns - Query results
      */
     private async queryDatabase(
         table: string,
@@ -66,9 +66,9 @@ export default class DatabaseHelper {
 
     /**
      * Count the number of rows in a table
-     * @param { string } table - Table name
-     * @param { DataPairs= } criteria - Search criteria [optional, default={}]
-     * @returns { Promise<number> } - Number of rows
+     * @param table - Table name
+     * @param criteria - Search criteria [optional, default={}]
+     * @returns - Number of rows
      */
     async countInDatabase(table: string, criteria: DataPairs = {}): Promise<number> {
         const results = await this.queryDatabase(table, "COUNT(*) as count", criteria);
@@ -77,9 +77,9 @@ export default class DatabaseHelper {
 
     /**
      * Inserts an SQL record into the database
-     * @param { string } table - Table name
-     * @param { DataPairs } data - Data to insert
-     * @returns { Promise<number> } - ID of the inserted record
+     * @param table - Table name
+     * @param data - Data to insert
+     * @returns - ID of the inserted record
      */
     async haveInDatabase(table: string, data: DataPairs): Promise<number> {
         const keys = Object.keys(data);
@@ -95,9 +95,9 @@ export default class DatabaseHelper {
 
     /**
      * Updates an SQL record in the database
-     * @param { string } table - Table name
-     * @param  { DataPairs } data - Data to update
-     * @param { DataPairs= } criteria - Search criteria [optional, default={}]
+     * @param table - Table name
+     * @param data - Data to update
+     * @param criteria - Search criteria [optional, default={}]
      */
     async updateInDatabase(table: string, data: DataPairs, criteria: DataPairs = {}): Promise<void> {
         const dataKeys = Object.keys(data).map((key) => `${key} = ?`);
@@ -127,10 +127,10 @@ export default class DatabaseHelper {
 
     /**
      * Fetches all values from a column in the database
-     * @param { string } table - Table name
-     * @param { string } column - Column name
-     * @param { DataPairs= } criteria - Search criteria [optional, default={}]
-     * @returns { Promise<unknown[]> } - Returns an array of values from the column
+     * @param table - Table name
+     * @param column - Column name
+     * @param criteria - Search criteria [optional, default={}]
+     * @returns - Returns an array of values from the column
      */
     async grabColumnFromDatabase(table: string, column: string, criteria: DataPairs = {}): Promise<unknown[]> {
         const results = await this.queryDatabase(table, column, criteria);
@@ -139,10 +139,10 @@ export default class DatabaseHelper {
 
     /**
      * Fetches a single column value from the database
-     * @param { string } table - Table name
-     * @param { string } column - Column name
-     * @param { DataPairs= } criteria - Search criteria [optional, default={}]
-     * @returns { Promise<unknown> } - Returns the value of the column, or null if not found
+     * @param table - Table name
+     * @param column - Column name
+     * @param criteria - Search criteria [optional, default={}]
+     * @returns - Returns the value of the column, or null if not found
      */
     async grabFromDatabase(table: string, column: string, criteria: DataPairs = {}): Promise<unknown> {
         const results = await this.grabColumnFromDatabase(table, column, criteria);
@@ -152,7 +152,7 @@ export default class DatabaseHelper {
     /**
      * Closes the database connection
      */
-    async closePool() {
+    async closePool(): Promise<void> {
         await this.pool.end();
     }
 }

@@ -13,7 +13,7 @@ export default class TableUpdates extends Plugin {
     /**
      * Run when the plugin is initialized
      */
-    init() {
+    init(): void {
         this.updateSchema();
         this.defineConverters();
         this.addCustomClass();
@@ -26,7 +26,7 @@ export default class TableUpdates extends Plugin {
      * https://ckeditor.com/docs/ckeditor5/latest/api/module_engine_model_schema-Schema.html
      * Otherwise the attributes will be stripped out when the editor is loaded
      */
-    updateSchema() {
+    updateSchema(): void {
         this.editor.model.schema.extend("table", {
             allowAttributes: [this.isCK5Attribute],
         });
@@ -36,7 +36,7 @@ export default class TableUpdates extends Plugin {
      * Define the converters for the extra attributes, so that they are translated from the model to the view (downcast) and vice versa (upcast)
      * https://ckeditor.com/docs/ckeditor5/latest/api/module_engine_conversion_conversion-Conversion.html
      */
-    defineConverters() {
+    defineConverters(): void {
         const { conversion } = this.editor;
         conversion.for("downcast").attributeToAttribute({
             model: {
@@ -70,7 +70,7 @@ export default class TableUpdates extends Plugin {
      * This solution is based on downcastTableResizedClass from:
      * https://github.com/ckeditor/ckeditor5/blob/92602e6fcf109c957cba2e764588906c726e2e6a/packages/ckeditor5-table/src/tablecolumnresize/converters.ts
      */
-    addCustomClass() {
+    addCustomClass(): void {
         this.editor.conversion.for("downcast").add((dispatcher) => {
             dispatcher.on<DowncastInsertEvent>(
                 "insert:table",
@@ -92,7 +92,7 @@ export default class TableUpdates extends Plugin {
 
     /**
      * Get the currently selected table
-     * @returns { Element | null | undefined } The currently selected table
+     * @returns The currently selected table
      */
     getSelectedTable(): Element | null | undefined {
         const { selection } = this.editor.model.document;
@@ -103,7 +103,7 @@ export default class TableUpdates extends Plugin {
     /**
      * Add the following properties as default to newly created tables, columns and rows
      */
-    addDefaultProperties() {
+    addDefaultProperties(): void {
         const insertTableCommand = this.editor.commands.get("insertTable") as InsertTableCommand;
         insertTableCommand.on("execute", () => {
             this.editor.execute("tableWidth", {
@@ -155,9 +155,9 @@ export default class TableUpdates extends Plugin {
     /**
      * Get all the cell elements from the table, first getting each row,
      * then each cell within each row
-     * @returns {Array} An array of all the cell elements in the table
+     * @returns An array of all the cell elements in the table
      */
-    getCellElements() {
+    getCellElements(): Element[] {
         const selectedTable = this.getSelectedTable();
         if (!selectedTable) return [];
         const cellElements = Array.from(selectedTable.getChildren())
@@ -175,7 +175,7 @@ export default class TableUpdates extends Plugin {
      * need to get the table element from the selection, then get all the cell
      * elements from the table, then set the attributes on each cell.
      */
-    setCellBorders() {
+    setCellBorders(): void {
         const cells = this.getCellElements();
         // @ts-expect-error -- accessing a private property is intentional here, for now...
         // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
@@ -193,7 +193,7 @@ export default class TableUpdates extends Plugin {
      * Add the isNew attribute to a table when the tableAlignment command is executed
      * This is so an old table created in CKEditor4 can still be centre aligned if desired
      */
-    markAlignedTables() {
+    markAlignedTables(): void {
         const tableAlignmentCommand = this.editor.commands.get("tableAlignment") as TableAlignmentCommand;
         tableAlignmentCommand.on("execute", () => {
             this.editor.model.change((writer) => {

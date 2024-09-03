@@ -5,9 +5,9 @@
 /**
  * To move the marks (which are in the title div) out of the response container
  * we need to add an attribute to each title div so it can be properly targeted, as they all just have the same class name
- * @param {string} reportId - the report id
+ * @param reportId - the report id
  */
-export function addTargetsToMarks(reportId: string) {
+export function addTargetsToMarks(reportId: string): void {
     const report = document.getElementById(reportId);
     const reportItemResponseIds: string[] = [];
     const reportItemResponses = report?.querySelectorAll("[data-reference]");
@@ -23,9 +23,9 @@ export function addTargetsToMarks(reportId: string) {
 /**
  * We should also set textareas to readonly so that they can't trigger browser save changes
  * even through they are already set as disabled
- * @param {string} reportId - the report id
+ * @param reportId - the report id
  */
-export function disableTextAreas(reportId: string) {
+export function disableTextAreas(reportId: string): void {
     const report = document.getElementById(reportId);
     const plainTextAreas = report?.querySelectorAll(".lrn_plaintextarea, .lrn_textinput");
     plainTextAreas?.forEach((textArea) => {

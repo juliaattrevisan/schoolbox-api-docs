@@ -16,7 +16,7 @@ export default class InsertResourceCommand extends Command {
     /**
      * display the resource modal and listen for if a resource is returned
      */
-    execute() {
+    execute(): void {
         this.displayModal();
     }
 
@@ -24,14 +24,14 @@ export default class InsertResourceCommand extends Command {
      * is called on various events to determine if the command is enabled
      * we use the same method the image plugin uses to determine if the command is enabled
      */
-    refresh() {
+    refresh(): void {
         this.isEnabled = this.editor.plugins.get("ImageUtils").isImageAllowed();
     }
 
     /**
      * Display the resource modal to select a file from
      */
-    displayModal() {
+    displayModal(): void {
         /**
          * Homepages have a hidden input field containing the homepage id
          * If that exists, use it; otherwise assume root node 0
@@ -73,9 +73,9 @@ export default class InsertResourceCommand extends Command {
      * audio/video will be used to display outside editing mode.
      *
      * See www/static/js/editor/jquery.proxy-replacement.js for how this occurs
-     * @param { string } hash - the hash of the stored file
+     * @param hash - the hash of the stored file
      */
-    async getResourceInfo(hash: string) {
+    async getResourceInfo(hash: string): Promise<void> {
         try {
             const response = await fetch(`/editor/nodeInfo.php?identifier=${encodeURIComponent(hash)}`, {
                 headers: {
@@ -95,9 +95,9 @@ export default class InsertResourceCommand extends Command {
 
     /**
      * Handle the returned resource from the resource modal
-     * @param { MessageEvent } event - the event
+     * @param event - the event
      */
-    onResourceReturned(event: MessageEvent) {
+    onResourceReturned(event: MessageEvent): void {
         // Disable eslint checks for this function, since it is integrating with jquery.modal.js and untyped
         /* eslint-disable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access */
         let message;
