@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace Schoolbox\Search\Api\Database\ResultType\File;
 
 use Alaress_Date_Format;
+use Schoolbox\Resource\File\Model;
 use Schoolbox\Search\Api\Database\Index\BaseBuilder;
 
 /**
@@ -53,7 +54,20 @@ class IndexBuilder extends BaseBuilder
     ";
 
     /**
-     * @param int|string|null $itemId
+     * This builder works with file objects.
+     *
+     * @param object $item
+     * @return int|string|null
+     */
+    public function extractItemId(object $item): int|string|null
+    {
+        if ($item instanceof Model) {
+            return $item->getId();
+        }
+        return null;
+    }
+
+    /**
      * @inheritdoc
      */
     public function buildUpdates(?Alaress_Date_Format $fromDate, ?Alaress_Date_Format $toDate, int|string|null $itemId): iterable
@@ -111,7 +125,7 @@ class IndexBuilder extends BaseBuilder
     /**
      * @inheritdoc
      */
-    public function buildDeletes(?Alaress_Date_Format $fromDate, ?Alaress_Date_Format $toDate): iterable
+    public function buildDeletes(?Alaress_Date_Format $fromDate, ?Alaress_Date_Format $toDate, int|string|null $itemId): iterable
     {
         $subtypeExpression = self::SUBTYPE_EXPRESSION;
         $joinStatement     = self::JOIN_STATEMENT;

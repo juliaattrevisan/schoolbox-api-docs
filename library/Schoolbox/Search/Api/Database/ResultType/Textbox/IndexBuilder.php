@@ -11,8 +11,7 @@ namespace Schoolbox\Search\Api\Database\ResultType\Textbox;
 
 use Alaress_Date_Format;
 use Component_Config_Componentname;
-use Schoolbox\Resource\Textbox\Component\Homepage\Controller as ComponentHomepageController;
-use Schoolbox\Resource\Textbox\Mapper as TextboxMapper;
+use Schoolbox\Resource\Textbox;
 use Schoolbox\Search\Api\Database\Index\BaseBuilder;
 
 /**
@@ -26,7 +25,23 @@ use Schoolbox\Search\Api\Database\Index\BaseBuilder;
 class IndexBuilder extends BaseBuilder
 {
     /**
-     * @param int|string|null $itemId
+     * This builder works with textbox objects.
+     *
+     * TODO It could also work with component objects, if the component links to
+     *      a textbox?
+     *
+     * @param object $item
+     * @return int|string|null
+     */
+    public function extractItemId(object $item): int|string|null
+    {
+        if ($item instanceof Textbox\Model) {
+            return $item->getId();
+        }
+        return null;
+    }
+
+    /**
      * @inheritdoc
      */
     public function buildUpdates(?Alaress_Date_Format $fromDate, ?Alaress_Date_Format $toDate, int|string|null $itemId): iterable
@@ -76,8 +91,8 @@ class IndexBuilder extends BaseBuilder
             AND tb.deleted_at IS NULL
         ";
         $params = [
-            'homepageDefaultComponentHeading' => ComponentHomepageController::DEFAULT_COMPONENT_HEADING,
-            'homepageComponentKey' => TextboxMapper::HOMEPAGE_COMPONENT_KEY,
+            'homepageDefaultComponentHeading' => Textbox\Component\Homepage\Controller::DEFAULT_COMPONENT_HEADING,
+            'homepageComponentKey'            => Textbox\Mapper::HOMEPAGE_COMPONENT_KEY,
             'componentConfigComponentNameKey' => Component_Config_Componentname::KEY
         ];
         if ($fromDate) {
@@ -127,7 +142,7 @@ class IndexBuilder extends BaseBuilder
             AND cci2.id IS NULL
         ";
         $params = [
-            'homepageComponentKey' => TextboxMapper::HOMEPAGE_COMPONENT_KEY,
+            'homepageComponentKey' => Textbox\Mapper::HOMEPAGE_COMPONENT_KEY,
         ];
         if ($fromDate) {
             $queryString .= ' AND tb2.updated_at >= :fromDate';
@@ -168,9 +183,10 @@ class IndexBuilder extends BaseBuilder
      *
      * @param Alaress_Date_Format|null $fromDate Ignored
      * @param Alaress_Date_Format|null $toDate   Ignored
+     * @param int|string|null          $itemId
      * @return iterable
      */
-    public function buildDeletes(?Alaress_Date_Format $fromDate, ?Alaress_Date_Format $toDate): iterable
+    public function buildDeletes(?Alaress_Date_Format $fromDate, ?Alaress_Date_Format $toDate, int|string|null $itemId): iterable
     {
         // Examine and clean up every search index for textboxes
         $searchIndexQuery = $this->connector->prepareQuery("
@@ -218,7 +234,7 @@ class IndexBuilder extends BaseBuilder
                 if (!isset($componentExistsCache[$textboxId])) {
                     $componentExistsQuery->execute([
                         'textboxId' => $textboxId,
-                        'key'       => TextboxMapper::HOMEPAGE_COMPONENT_KEY,
+                        'key'       => Textbox\Mapper::HOMEPAGE_COMPONENT_KEY,
                     ]);
                     $componentExistsCache[$textboxId] = $componentExistsQuery->fetchColumnArray('component_instance_id');
                 }

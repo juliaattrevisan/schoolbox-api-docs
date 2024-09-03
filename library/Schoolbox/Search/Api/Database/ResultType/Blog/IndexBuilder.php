@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace Schoolbox\Search\Api\Database\ResultType\Blog;
 
 use Alaress_Date_Format;
+use Schoolbox\Blog\Homepage\Post\Model;
 use Schoolbox\Search\Api\Database\Index\BaseBuilder;
 
 /**
@@ -18,7 +19,20 @@ use Schoolbox\Search\Api\Database\Index\BaseBuilder;
 class IndexBuilder extends BaseBuilder
 {
     /**
-     * @param int|string|null $itemId
+     * This builder works with blog objects.
+     *
+     * @param object $item
+     * @return int|string|null
+     */
+    public function extractItemId(object $item): int|string|null
+    {
+        if ($item instanceof Model) {
+            return $item->getId();
+        }
+        return null;
+    }
+
+    /**
      * @inheritdoc
      */
     public function buildUpdates(?Alaress_Date_Format $fromDate, ?Alaress_Date_Format $toDate, int|string|null $itemId): iterable
@@ -67,7 +81,7 @@ class IndexBuilder extends BaseBuilder
     /**
      * @inheritdoc
      */
-    public function buildDeletes(?Alaress_Date_Format $fromDate, ?Alaress_Date_Format $toDate): iterable
+    public function buildDeletes(?Alaress_Date_Format $fromDate, ?Alaress_Date_Format $toDate, int|string|null $itemId): iterable
     {
         $queryString = "SELECT
             b.id

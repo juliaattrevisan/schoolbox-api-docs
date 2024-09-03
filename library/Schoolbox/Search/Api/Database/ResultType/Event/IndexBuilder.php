@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace Schoolbox\Search\Api\Database\ResultType\Event;
 
 use Alaress_Date_Format;
+use Schoolbox\Calendar\Event;
 use Schoolbox\Search\Api\Database\Index\BaseBuilder;
 
 /**
@@ -18,7 +19,20 @@ use Schoolbox\Search\Api\Database\Index\BaseBuilder;
 class IndexBuilder extends BaseBuilder
 {
     /**
-     * @param int|string|null $itemId
+     * This builder works with calendar event objects.
+     *
+     * @param object $item
+     * @return int|string|null
+     */
+    public function extractItemId(object $item): int|string|null
+    {
+        if ($item instanceof Event) {
+            return $item->getId();
+        }
+        return null;
+    }
+
+    /**
      * @inheritdoc
      */
     public function buildUpdates(?Alaress_Date_Format $fromDate, ?Alaress_Date_Format $toDate, int|string|null $itemId): iterable
@@ -66,7 +80,7 @@ class IndexBuilder extends BaseBuilder
     /**
      * @inheritdoc
      */
-    public function buildDeletes(?Alaress_Date_Format $fromDate, ?Alaress_Date_Format $toDate): iterable
+    public function buildDeletes(?Alaress_Date_Format $fromDate, ?Alaress_Date_Format $toDate, int|string|null $itemId): iterable
     {
         $queryString = "SELECT
             e.id

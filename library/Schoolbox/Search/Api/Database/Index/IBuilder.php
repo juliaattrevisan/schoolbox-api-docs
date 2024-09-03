@@ -18,6 +18,15 @@ use Schoolbox\Search\Index\Model;
 interface IBuilder
 {
     /**
+     * Extract the item ID out of `$item`, for use in `buildUpdates` and
+     * `buildDeletes` if updating indices for a single item.
+     *
+     * @param object $item The item to update indices for.
+     * @return int|string|null The item ID, or `null` if this builder doesn't work with this type of item.
+     */
+    public function extractItemId(object $item): int|string|null;
+
+    /**
      * Build a collection of search indices which were updated between
      * `$fromDate` and `$toDate`.
      *
@@ -42,9 +51,9 @@ interface IBuilder
      *
      * This list is intended to delete any indices which match the identifiers.
      *
-     * @param Alaress_Date_Format|null $fromDate  If provided, only clear indices updated at or after this date.
-     * @param Alaress_Date_Format|null $toDate    If provided, only clear indices updated at or before this date.
-     * @param int|string|null          $itemId    If provided, only clear indices for this item ID.
+     * @param Alaress_Date_Format|null $fromDate If provided, only clear indices updated at or after this date.
+     * @param Alaress_Date_Format|null $toDate   If provided, only clear indices updated at or before this date.
+     * @param int|string|null          $itemId   If provided, only clear indices for this item ID.
      * @return iterable<Model> A collection of search indices to delete.
      */
     public function buildDeletes(

@@ -11,6 +11,7 @@ namespace Schoolbox\Search\Api\Database\ResultType\Tile;
 
 use Alaress_Date_Format;
 use Schoolbox\Search\Api\Database\Index\BaseBuilder;
+use Schoolbox\Tile\Model;
 
 /**
  * Index builder for tiles.
@@ -18,7 +19,22 @@ use Schoolbox\Search\Api\Database\Index\BaseBuilder;
 class IndexBuilder extends BaseBuilder
 {
     /**
-     * @param int|string|null $itemId
+     * This builder works with tile objects.
+     *
+     * TODO It could also work with tile layout objects?
+     *
+     * @param object $item
+     * @return int|string|null
+     */
+    public function extractItemId(object $item): int|string|null
+    {
+        if ($item instanceof Model) {
+            return $item->getId();
+        }
+        return null;
+    }
+
+    /**
      * @inheritdoc
      */
     public function buildUpdates(?Alaress_Date_Format $fromDate, ?Alaress_Date_Format $toDate, int|string|null $itemId): iterable
@@ -75,7 +91,7 @@ class IndexBuilder extends BaseBuilder
     /**
      * @inheritdoc
      */
-    public function buildDeletes(?Alaress_Date_Format $fromDate, ?Alaress_Date_Format $toDate): iterable
+    public function buildDeletes(?Alaress_Date_Format $fromDate, ?Alaress_Date_Format $toDate, int|string|null $itemId): iterable
     {
         // What database updates could cause a tile that was included
         // in the buildUpdates() query to be excluded from that query?

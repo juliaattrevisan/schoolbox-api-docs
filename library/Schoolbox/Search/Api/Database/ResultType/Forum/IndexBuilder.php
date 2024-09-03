@@ -10,15 +10,29 @@ declare(strict_types=1);
 namespace Schoolbox\Search\Api\Database\ResultType\Forum;
 
 use Alaress_Date_Format;
+use Schoolbox\Forum\Post;
 use Schoolbox\Search\Api\Database\Index\BaseBuilder;
 
 /**
- * Index builder for files.
+ * Index builder for forum threads and posts.
  */
 class IndexBuilder extends BaseBuilder
 {
     /**
-     * @param int|string|null $itemId
+     * This builder works with forum post objects.
+     *
+     * @param object $item
+     * @return int|string|null
+     */
+    public function extractItemId(object $item): int|string|null
+    {
+        if ($item instanceof Post) {
+            return $item->getId();
+        }
+        return null;
+    }
+
+    /**
      * @inheritdoc
      */
     public function buildUpdates(?Alaress_Date_Format $fromDate, ?Alaress_Date_Format $toDate, int|string|null $itemId): iterable
@@ -67,7 +81,7 @@ class IndexBuilder extends BaseBuilder
     /**
      * @inheritdoc
      */
-    public function buildDeletes(?Alaress_Date_Format $fromDate, ?Alaress_Date_Format $toDate): iterable
+    public function buildDeletes(?Alaress_Date_Format $fromDate, ?Alaress_Date_Format $toDate, int|string|null $itemId): iterable
     {
         // Ignore deleted forum posts for incremental updates to the search_index table
         // (e.g. on runs such as 'php tools/search/buildIndex.php -p --from="-10 min"').

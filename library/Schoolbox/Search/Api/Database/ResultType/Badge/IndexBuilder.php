@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace Schoolbox\Search\Api\Database\ResultType\Badge;
 
 use Alaress_Date_Format;
+use Schoolbox\Learning\Badge\Model;
 use Schoolbox\Search\Api\Database\Index\BaseBuilder;
 
 /**
@@ -18,8 +19,21 @@ use Schoolbox\Search\Api\Database\Index\BaseBuilder;
 class IndexBuilder extends BaseBuilder
 {
     /**
+     * This builder works with badge objects.
+     *
+     * @param object $item
+     * @return int|string|null
+     */
+    public function extractItemId(object $item): int|string|null
+    {
+        if ($item instanceof Model) {
+            return $item->getId();
+        }
+        return null;
+    }
+
+    /**
      * @param int|string|null $itemId
-     * @inheritdoc
      */
     public function buildUpdates(?Alaress_Date_Format $fromDate, ?Alaress_Date_Format $toDate, int|string|null $itemId): iterable
     {
@@ -64,7 +78,7 @@ class IndexBuilder extends BaseBuilder
     /**
      * @inheritdoc
      */
-    public function buildDeletes(?Alaress_Date_Format $fromDate, ?Alaress_Date_Format $toDate): iterable
+    public function buildDeletes(?Alaress_Date_Format $fromDate, ?Alaress_Date_Format $toDate, int|string|null $itemId): iterable
     {
         $queryString = "SELECT id FROM badge WHERE deleted_at IS NOT NULL";
         $params      = [];
