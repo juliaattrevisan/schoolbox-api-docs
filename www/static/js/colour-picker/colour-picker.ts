@@ -22,7 +22,7 @@ document.addEventListener(colourPickerInitialiseEventName, (e) => {
         typeof colorisOptions.el === "string" ? document.querySelector(colorisOptions.el) : colorisOptions.el;
 
     if (!(targetEl instanceof HTMLInputElement)) {
-        throw new Error(`colourPickerInitialise: target element ${colorisOptions.el} is not an input element`);
+        throw new Error(`colourPickerInitialise: target element is not an input element`);
     }
 
     // If value is of format "ffffff" then append "#" to correct HEX format, otherwise leave as is
