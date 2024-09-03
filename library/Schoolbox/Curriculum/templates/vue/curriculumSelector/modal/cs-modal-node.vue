@@ -85,19 +85,6 @@ function animateOn() {
 const marginLeft = window.Vue.computed(() => `calc(${props.depth * 2}rem)`);
 
 /**
- * To better highlight the current top level node from its children
- *
- * @returns { String }
- */
-const borderBottomColour = window.Vue.computed(() => {
-    if (modalSearchStore.isActive || props.depth !== 0) {
-        return `var(--body-background)`;
-    } else if (props.depth === 0) {
-        return `var(--body-foreground-h1)`;
-    }
-});
-
-/**
  * To determine whether we need to display further child nodes within this node
  *
  * @returns { Boolean }
@@ -176,7 +163,7 @@ const isViewing = window.Vue.computed(
 <style lang="scss" scoped>
 .buttons-container {
     align-items: center;
-    border-bottom: 1px solid v-bind(borderBottomColour);
+    border-bottom: 1px solid var(--body-background);
     display: flex;
     margin: 0 0 0 v-bind(marginLeft);
     min-height: 52px;

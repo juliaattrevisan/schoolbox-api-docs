@@ -131,18 +131,6 @@ useUpdateNodeStore().$onAction(({ name, after }) => {
 const marginLeft = window.Vue.computed(() => `calc(${props.depth * 2}rem)`);
 
 /**
- * To better highlight the current top level node from its children
- *
- * @returns { string }
- */
-const borderBottomColour = window.Vue.computed(() => {
-    if (searchStore.isActive || props.depth !== 0) {
-        return `var(--body-background)`;
-    }
-    return `var(--body-foreground-h1)`;
-});
-
-/**
  * If this is the active node being viewed
  *
  * @returns { boolean }
@@ -169,7 +157,7 @@ const isUpdating = window.Vue.computed(() => updateNodeStore.isOpen && activeNod
  * @returns { boolean }
  */
 const isUpdatingAnother = window.Vue.computed(
-    () => updateNodeStore.isOpen && activeNodeStore.node.id !== props.node.id
+    () => updateNodeStore.isOpen && activeNodeStore.node.id !== props.node.id,
 );
 
 /**
@@ -185,7 +173,7 @@ const isAdding = window.Vue.computed(() => addSubsectionStore.isOpen && activeNo
  * @returns { boolean }
  */
 const isAddingAnother = window.Vue.computed(
-    () => addSubsectionStore.isOpen && activeNodeStore.node.id !== props.node.id
+    () => addSubsectionStore.isOpen && activeNodeStore.node.id !== props.node.id,
 );
 
 /**
@@ -201,7 +189,7 @@ const isActive = window.Vue.computed(() => isViewing.value || isUpdating.value |
  * @returns { boolean }
  */
 const showChildren = window.Vue.computed(
-    () => props.node.children && props.node.children.length > 0 && props.depth + 1 < 2
+    () => props.node.children && props.node.children.length > 0 && props.depth + 1 < 2,
 );
 
 /**
@@ -217,7 +205,7 @@ const hasCode = window.Vue.computed(() => props.node.code && props.node.code !==
  * @returns { string }
  */
 const title = window.Vue.computed(() =>
-    hasCode.value ? `[${props.node.code as string}] ${props.node.name}` : `${props.node.name}`
+    hasCode.value ? `[${props.node.code as string}] ${props.node.name}` : `${props.node.name}`,
 );
 
 /**
@@ -301,7 +289,7 @@ const showUsage = window.Vue.computed(() => props.node.id !== UNSET_ID);
 <style lang="scss" scoped>
 .container {
     align-items: center;
-    border-bottom: 1px solid v-bind(borderBottomColour);
+    border-bottom: 1px solid var(--body-background);
     display: flex;
     margin: 0 0 0 v-bind(marginLeft);
     min-height: 52px;

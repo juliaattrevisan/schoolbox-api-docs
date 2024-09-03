@@ -168,7 +168,7 @@ function onNameSelected() {
 }
 
 .name {
-    color: var(--body-foreground-h1);
+    color: var(--header-font-color);
     opacity: 1;
     padding: 0.5rem 0;
     font-size: 1rem;
