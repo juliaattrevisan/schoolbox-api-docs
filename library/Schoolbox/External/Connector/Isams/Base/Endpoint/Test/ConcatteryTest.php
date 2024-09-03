@@ -54,6 +54,9 @@ class ConcatteryTest extends TestCase
     <Entry>
         <Code>The Lord of the Ring's, \"The Return of the King's Hobbits\"</Code>
     </Entry>
+    <Entry>
+        <Code>just a regular text</Code>
+    </Entry>
 </Stuff>
 ";
 
@@ -142,6 +145,21 @@ class ConcatteryTest extends TestCase
             'Combined quotes 2' => [
                 "The Lord of the Ring's, \"The Return of the King's Hobbits\"",
                 'concat("The Lord of the Ring\'s, ", \'"\', "The Return of the King\'s Hobbits", \'"\', "")'
+            ],
+
+            'Regular text 1' => [
+                'just a regular text',
+                '"just a regular text"'
+            ],
+
+            'Regular text 2' => [
+                'Learning and engagement made easy for K–12 schools',
+                '"Learning and engagement made easy for K–12 schools"'
+            ],
+
+            'Empty' => [
+                '',
+                '""'
             ]
         ];
     }

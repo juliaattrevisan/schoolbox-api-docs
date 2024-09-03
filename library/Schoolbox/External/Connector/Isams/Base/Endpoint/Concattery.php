@@ -22,20 +22,29 @@ class Concattery
     {
         $concat = $input;
 
+        $hasSingleQuotes = str_contains($concat, "'");
+        $hasDoubleQuotes = str_contains($concat, '"');
+
+        /* If it didn't contain any quotes, return the original string
+         */
+        if (!$hasSingleQuotes && !$hasDoubleQuotes) {
+            return '"' . $input . '"';
+        }
+
         /* Replace ' with a concat equivalent
          * Just replace single quotes with an escaped version
          *
          * This is used specifically when a string has single quotes,
          * but not a double quote.
          */
-        if (str_contains($concat, "'") && !str_contains($concat, '"')) {
+        if ($hasSingleQuotes && !$hasDoubleQuotes) {
             return '"' . str_replace("'", "'", $concat) . '"';
         }
 
         /* Replace " with a concat equivalent
          * This supports mixed usages e.g. a string containing both " and '
          */
-        if (str_contains($concat, '"')) {
+        if ($hasDoubleQuotes) {
             /* First, explode on double quotes
              */
             $bits = explode('"', $concat);
@@ -43,12 +52,6 @@ class Concattery
             /* Then implode on \'"\'
              */
             $concat = '"' . implode("\", '\"', \"", $bits) . '"';
-        }
-
-        /* If it didn't contain any quotes, return the original string
-         */
-        if ($concat === $input) {
-            return $input;
         }
 
         return "concat({$concat})";
