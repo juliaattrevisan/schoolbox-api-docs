@@ -14,13 +14,13 @@
 
 declare(strict_types=1);
 
-namespace Tests\Smoketests;
+namespace LTI\Security\Nonce\Test;
 
 use Cache\Adapter\PHPArray\ArrayCachePool;
 use OAT\Library\Lti1p3Core\Security\Nonce\Nonce;
+use PHPUnit\Framework\TestCase;
 use Psr\Cache\InvalidArgumentException;
 use Schoolbox\LTI\Security\Nonce\NonceRepository;
-use Tests\Support\IntegrationTester;
 
 /**
  * Tests:
@@ -29,13 +29,12 @@ use Tests\Support\IntegrationTester;
  *
  * @noinspection PhpUnused
  */
-class LtiCest
+final class NonceRepositoryTest extends TestCase
 {
     /**
-     * @param IntegrationTester $i
      * @throws InvalidArgumentException
      */
-    public function saveAndFindANonceWithoutReservedCharacters(IntegrationTester $i): void
+    public function testSaveAndFindANonceWithoutReservedCharacters(): void
     {
         #GIVEN
         $nonceRepo = new NonceRepository(new ArrayCachePool());
@@ -47,15 +46,14 @@ class LtiCest
         $returnedNonce = $nonceRepo->find($nonceValue);
 
         #THEN
-        $i->assertEquals($nonceValue, $nonce->getValue());
-        $i->assertEquals($nonce->getValue(), $returnedNonce->getValue());
+        $this->assertEquals($nonceValue, $nonce->getValue());
+        $this->assertEquals($nonce->getValue(), $returnedNonce->getValue());
     }
 
     /**
-     * @param IntegrationTester $i
      * @throws InvalidArgumentException
      */
-    public function saveAndFindANonceWithReservedCharacters(IntegrationTester $i): void
+    public function testSaveAndFindANonceWithReservedCharacters(): void
     {
         #GIVEN
         $nonceRepo = new NonceRepository(new ArrayCachePool());
@@ -67,15 +65,14 @@ class LtiCest
         $returnedNonce = $nonceRepo->find($nonceValue);
 
         #THEN
-        $i->assertEquals($nonceValue, $nonce->getValue());
-        $i->assertEquals($nonce->getValue(), $returnedNonce->getValue());
+        $this->assertEquals($nonceValue, $nonce->getValue());
+        $this->assertEquals($nonce->getValue(), $returnedNonce->getValue());
     }
 
     /**
-     * @param IntegrationTester $i
      * @throws InvalidArgumentException
      */
-    public function saveAndFindPotentiallyCollidingNonces(IntegrationTester $i): void
+    public function testSaveAndFindPotentiallyCollidingNonces(): void
     {
         #GIVEN
         $nonceRepo = new NonceRepository(new ArrayCachePool());
@@ -92,9 +89,9 @@ class LtiCest
         $nonceRepo->save($nonce3);
 
         #THEN
-        $i->assertEquals($nonceValue1, $nonce1->getValue());
-        $i->assertEquals($nonceValue2, $nonce2->getValue());
-        $i->assertEquals($nonceValue3, $nonce3->getValue());
+        $this->assertEquals($nonceValue1, $nonce1->getValue());
+        $this->assertEquals($nonceValue2, $nonce2->getValue());
+        $this->assertEquals($nonceValue3, $nonce3->getValue());
 
         #WHEN
         $returnedNonce1 = $nonceRepo->find($nonceValue1);
@@ -102,8 +99,8 @@ class LtiCest
         $returnedNonce3 = $nonceRepo->find($nonceValue3);
 
         #THEN
-        $i->assertEquals($nonceValue1, $returnedNonce1->getValue());
-        $i->assertEquals($nonceValue2, $returnedNonce2->getValue());
-        $i->assertEquals($nonceValue3, $returnedNonce3->getValue());
+        $this->assertEquals($nonceValue1, $returnedNonce1->getValue());
+        $this->assertEquals($nonceValue2, $returnedNonce2->getValue());
+        $this->assertEquals($nonceValue3, $returnedNonce3->getValue());
     }
 }
