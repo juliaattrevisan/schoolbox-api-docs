@@ -16,7 +16,15 @@ modules:
             window_size: false
             capabilities:
               goog:chromeOptions:
-                args: ["--headless", "--disable-gpu", "--window-size=1920x9999", "disable-dev-shm-usage", "--ignore-certificate-errors", "--use-fake-device-for-media-stream", "--use-fake-ui-for-media-stream"]
+                args:
+                  - "--headless=new"
+                  - "--disable-gpu"
+                  - "--window-size=1920,9999"
+                  - "--disable-dev-shm-usage"
+                  - "--ignore-certificate-errors"
+                  - "--use-fake-device-for-media-stream"
+                  - "--use-fake-ui-for-media-stream"
+                  - "--disable-search-engine-choice-screen"
                 binary: "/usr/bin/chromium-browser"
               acceptInsecureCerts: true
         - Tests\Support\Helper\Acceptance
@@ -32,5 +40,5 @@ modules:
 extensions:
     enabled:
       - Codeception\Extension\RunProcess:
-          0: '/usr/bin/chromedriver --url-base=/wd/hub'
+          0: '/usr/bin/chromedriver --url-base=/wd/hub --port=9515'
           sleep: 5
