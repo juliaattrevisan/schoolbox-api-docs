@@ -21,13 +21,13 @@ class IndexBuilder extends BaseBuilder
     /**
      * This builder works with user objects.
      *
-     * @param object $item
+     * @param object $subject
      * @return int|string|null
      */
-    public function extractItemId(object $item): int|string|null
+    public function extractItemId(object $subject): int|string|null
     {
-        if ($item instanceof User) {
-            return $item->getId();
+        if ($subject instanceof User) {
+            return $subject->getId();
         }
         return null;
     }

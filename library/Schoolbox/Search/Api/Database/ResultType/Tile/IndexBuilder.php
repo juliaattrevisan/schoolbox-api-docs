@@ -23,13 +23,13 @@ class IndexBuilder extends BaseBuilder
      *
      * TODO It could also work with tile layout objects?
      *
-     * @param object $item
+     * @param object $subject
      * @return int|string|null
      */
-    public function extractItemId(object $item): int|string|null
+    public function extractItemId(object $subject): int|string|null
     {
-        if ($item instanceof Model) {
-            return $item->getId();
+        if ($subject instanceof Model) {
+            return $subject->getId();
         }
         return null;
     }

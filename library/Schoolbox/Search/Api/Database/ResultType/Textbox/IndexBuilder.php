@@ -30,13 +30,13 @@ class IndexBuilder extends BaseBuilder
      * TODO It could also work with component objects, if the component links to
      *      a textbox?
      *
-     * @param object $item
+     * @param object $subject
      * @return int|string|null
      */
-    public function extractItemId(object $item): int|string|null
+    public function extractItemId(object $subject): int|string|null
     {
-        if ($item instanceof Textbox\Model) {
-            return $item->getId();
+        if ($subject instanceof Textbox\Model) {
+            return $subject->getId();
         }
         return null;
     }

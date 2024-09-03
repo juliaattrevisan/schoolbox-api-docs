@@ -22,13 +22,13 @@ class IndexBuilder extends BaseBuilder
     /**
      * This builder works with assessment objects.
      *
-     * @param object $item
+     * @param object $subject
      * @return int|string|null
      */
-    public function extractItemId(object $item): int|string|null
+    public function extractItemId(object $subject): int|string|null
     {
-        if ($item instanceof Model) {
-            return $item->getId();
+        if ($subject instanceof Model) {
+            return $subject->getId();
         }
         return null;
     }

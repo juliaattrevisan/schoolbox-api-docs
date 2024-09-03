@@ -18,15 +18,6 @@ use Schoolbox\Search\Index\Model;
 interface IBuilder
 {
     /**
-     * Extract the item ID out of `$item`, for use in `buildUpdates` and
-     * `buildDeletes` if updating indices for a single item.
-     *
-     * @param object $item The item to update indices for.
-     * @return int|string|null The item ID, or `null` if this builder doesn't work with this type of item.
-     */
-    public function extractItemId(object $item): int|string|null;
-
-    /**
      * Build a collection of search indices which were updated between
      * `$fromDate` and `$toDate`.
      *

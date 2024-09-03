@@ -21,13 +21,13 @@ class IndexBuilder extends BaseBuilder
     /**
      * This builder works with calendar event objects.
      *
-     * @param object $item
+     * @param object $subject
      * @return int|string|null
      */
-    public function extractItemId(object $item): int|string|null
+    public function extractItemId(object $subject): int|string|null
     {
-        if ($item instanceof Event) {
-            return $item->getId();
+        if ($subject instanceof Event) {
+            return $subject->getId();
         }
         return null;
     }
