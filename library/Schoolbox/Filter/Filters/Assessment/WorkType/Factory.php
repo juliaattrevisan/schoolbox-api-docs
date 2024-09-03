@@ -99,20 +99,17 @@ class Factory extends Filter\AbstractFactory
          * ...but there are numerous other contexts (such as markbooks) where SIVO assessments
          * need to be visible to $user based on their role type.
          */
-        $limitedAvailability = [
-            Filter\Page\Model::PAGE_UPCOMING_ASSESSMENTS => true,
-            Filter\Page\Model::PAGE_GRADES => true
-        ];
-
-        if (isset($limitedAvailability[$pageFilter->getPage()])) {
-            /* These shared pages need a roletype detection
+        if (Filter\Page\Model::PAGE_UPCOMING_ASSESSMENTS === $pageFilter->getPage()) {
+            /* Due Work calendar: never see a SIVO regardless if you're a staff or a student.
+             */
+            $workTypes = $this->workTypeMapper->findByPredicates($this->workTypeMapper->getPredicateBuilder()->equals('staff_or_instructor_visible_only', 0));
+        } elseif (Filter\Page\Model::PAGE_GRADES === $pageFilter->getPage()) {
+            /* Grades page: role dependent
              */
             if ($user->getRole()->isStaff()) {
                 $workTypes = $this->workTypeMapper->findAll();
             } else {
-                $pb = $this->workTypeMapper->getPredicateBuilder()->equals('staff_or_instructor_visible_only', 0);
-
-                $workTypes = $this->workTypeMapper->findByPredicates($pb);
+                $workTypes = $this->workTypeMapper->findByPredicates($this->workTypeMapper->getPredicateBuilder()->equals('staff_or_instructor_visible_only', 0));
             }
         } else {
             /* Everything else is a staff-only page
