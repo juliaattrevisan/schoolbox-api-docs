@@ -33,9 +33,9 @@ class IndexBuilder extends BaseBuilder
     }
 
     /**
-     * @param int|string|null $itemId
+     * @param object|null $subject
      */
-    public function buildUpdates(?Alaress_Date_Format $fromDate, ?Alaress_Date_Format $toDate, int|string|null $itemId): iterable
+    public function buildUpdates(?Alaress_Date_Format $fromDate, ?Alaress_Date_Format $toDate, ?object $subject): iterable
     {
         $queryString = "
             SELECT
@@ -78,7 +78,7 @@ class IndexBuilder extends BaseBuilder
     /**
      * @inheritdoc
      */
-    public function buildDeletes(?Alaress_Date_Format $fromDate, ?Alaress_Date_Format $toDate, int|string|null $itemId): iterable
+    public function buildDeletes(?Alaress_Date_Format $fromDate, ?Alaress_Date_Format $toDate, ?object $subject): iterable
     {
         $queryString = "SELECT id FROM badge WHERE deleted_at IS NOT NULL";
         $params      = [];

@@ -261,7 +261,7 @@ class IndexBuilder extends App
                     }
                 }
 
-                foreach ($indexBuilder->buildDeletes($fromDate, $toDate) as $deletedIndex) {
+                foreach ($indexBuilder->buildDeletes($fromDate, $toDate, null) as $deletedIndex) {
                     if (!$this->perform()) {
                         continue;
                     }

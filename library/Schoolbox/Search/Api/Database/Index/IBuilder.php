@@ -35,14 +35,16 @@ interface IBuilder
      *
      * @param Alaress_Date_Format|null $fromDate If provided, only build indices updated at or after this date.
      * @param Alaress_Date_Format|null $toDate   If provided, only build indices updated at or before this date.
-     * @param int|string|null          $itemId   If provided, only build indices for this item ID.
+     * @param object|null              $subject  If provided, only build indices for this item.
+     *                                           Each implementation should be able to tell whether it can build indices
+     *                                           for any given type of item, and return early if it cannot.
      *
      * @return iterable<Model> A collection of search indices to create.
      */
     public function buildUpdates(
         ?Alaress_Date_Format $fromDate,
         ?Alaress_Date_Format $toDate,
-        int|string|null $itemId,
+        ?object $subject,
     ): iterable;
 
     /**
@@ -53,12 +55,14 @@ interface IBuilder
      *
      * @param Alaress_Date_Format|null $fromDate If provided, only clear indices updated at or after this date.
      * @param Alaress_Date_Format|null $toDate   If provided, only clear indices updated at or before this date.
-     * @param int|string|null          $itemId   If provided, only clear indices for this item ID.
+     * @param object|null              $subject  If provided, only clear indices for this item.
+     *                                           Each implementation should be able to tell whether it can build indices
+     *                                           for any given type of item, and return early if it cannot.
      * @return iterable<Model> A collection of search indices to delete.
      */
     public function buildDeletes(
         ?Alaress_Date_Format $fromDate,
         ?Alaress_Date_Format $toDate,
-        int|string|null $itemId,
+        ?object $subject,
     ): iterable;
 }

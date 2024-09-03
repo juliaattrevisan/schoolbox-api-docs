@@ -52,10 +52,10 @@ class CompositeBuilder implements IBuilder
     public function buildUpdates(
         ?Alaress_Date_Format $fromDate,
         ?Alaress_Date_Format $toDate,
-        int|string|null $itemId,
+        ?object $subject,
     ): iterable {
         foreach ($this->builders as $builder) {
-            foreach ($builder->buildUpdates($fromDate, $toDate, $itemId) as $item) {
+            foreach ($builder->buildUpdates($fromDate, $toDate, $subject) as $item) {
                 yield $item;
             }
         }
@@ -67,10 +67,10 @@ class CompositeBuilder implements IBuilder
     public function buildDeletes(
         ?Alaress_Date_Format $fromDate,
         ?Alaress_Date_Format $toDate,
-        int|string|null $itemId,
+        ?object $subject,
     ): iterable {
         foreach ($this->builders as $builder) {
-            foreach ($builder->buildDeletes($fromDate, $toDate, $itemId) as $item) {
+            foreach ($builder->buildDeletes($fromDate, $toDate, $subject) as $item) {
                 yield $item;
             }
         }

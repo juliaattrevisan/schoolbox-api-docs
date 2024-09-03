@@ -44,7 +44,7 @@ class IndexBuilder extends BaseBuilder
     /**
      * @inheritdoc
      */
-    public function buildUpdates(?Alaress_Date_Format $fromDate, ?Alaress_Date_Format $toDate, int|string|null $itemId): iterable
+    public function buildUpdates(?Alaress_Date_Format $fromDate, ?Alaress_Date_Format $toDate, ?object $subject): iterable
     {
         // Pass 1: textboxes within a component
         //  * A similar query exists in library/Schoolbox/Assessment/Course/Plan/Controller.php.
@@ -183,10 +183,10 @@ class IndexBuilder extends BaseBuilder
      *
      * @param Alaress_Date_Format|null $fromDate Ignored
      * @param Alaress_Date_Format|null $toDate   Ignored
-     * @param int|string|null          $itemId
+     * @param object|null              $subject
      * @return iterable
      */
-    public function buildDeletes(?Alaress_Date_Format $fromDate, ?Alaress_Date_Format $toDate, int|string|null $itemId): iterable
+    public function buildDeletes(?Alaress_Date_Format $fromDate, ?Alaress_Date_Format $toDate, ?object $subject): iterable
     {
         // Examine and clean up every search index for textboxes
         $searchIndexQuery = $this->connector->prepareQuery("
