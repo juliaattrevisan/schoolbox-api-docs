@@ -22,6 +22,7 @@ type UpdateEventDetail = {
     updatedSelectedNodes: Node[];
 };
 
+// eslint-disable-next-line @typescript-eslint/explicit-function-return-type -- we want the inferred type from defineStore
 export const useStore = (folderId: number, componentInstanceId: number) =>
     defineStore(`folderNodes/${folderId}-${componentInstanceId}`, () => {
         const nodes = window.Vue.ref<Node[]>([]); // the current nodes to display the entire tree of

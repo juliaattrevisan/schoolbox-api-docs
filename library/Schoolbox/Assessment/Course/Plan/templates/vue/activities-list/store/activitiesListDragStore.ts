@@ -9,6 +9,7 @@ import { useActivitiesListStore } from "./activitiesListStore";
 gsap.registerPlugin(Draggable);
 gsap.registerPlugin(ScrollToPlugin);
 
+// eslint-disable-next-line @typescript-eslint/explicit-function-return-type -- we want the inferred type from defineStore
 export const useActivitiesListDragStore = (activitiesListStoreId: string) =>
     defineStore(`activitiesListDragStore/${activitiesListStoreId}`, () => {
         const activitiesListStore = useActivitiesListStore(activitiesListStoreId);

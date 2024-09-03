@@ -3,6 +3,7 @@ import { activate, timeout } from "@schoolboxVue/components/toast/sbxToastEvent"
 import { extractErrorMessage } from "@js/util/sbx/fetchUtils";
 import type { Activity, ActivitiesListRoutes } from "@schoolboxAssessment/Types/assessmentTypes";
 
+// eslint-disable-next-line @typescript-eslint/explicit-function-return-type -- we want the inferred type from defineStore
 export const useActivitiesListStore = (activitiesListStoreId: string) =>
     defineStore(`activitiesListStore/${activitiesListStoreId}`, () => {
         const routes = window.Vue.ref<ActivitiesListRoutes>({
