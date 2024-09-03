@@ -182,7 +182,9 @@
     "test": "jest",
     "watch-test": "jest --watch",
     "typecheck": "vue-tsc --noEmit",
-    "lint": "npx eslint ."
+    "lint": "npx eslint .",
+    "prettier:check": "npx prettier --check \"**/*.{js,ts,vue,mdx,css,scss,html,json}\"",
+    "prettier:write": "npx prettier --write \"**/*.{js,ts,vue,mdx,css,scss,html,json}\""
   },
   "msw": {
     "workerDirectory": "stories/assets"
