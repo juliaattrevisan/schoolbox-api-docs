@@ -24,13 +24,17 @@ interface IBuilder
      * This list is intended to override any existing indices with the same
      * identifier.
      *
-     * @param Alaress_Date_Format|null $fromDate If provided, only build indices
-     *                                           updated at or after this date.
-     * @param Alaress_Date_Format|null $toDate   If provided, only build indices
-     *                                           updated at or before this date.
+     * @param Alaress_Date_Format|null $fromDate If provided, only build indices updated at or after this date.
+     * @param Alaress_Date_Format|null $toDate   If provided, only build indices updated at or before this date.
+     * @param int|string|null          $itemId   If provided, only build indices for this item ID.
+     *
      * @return iterable<Model> A collection of search indices to create.
      */
-    public function buildUpdates(?Alaress_Date_Format $fromDate, ?Alaress_Date_Format $toDate): iterable;
+    public function buildUpdates(
+        ?Alaress_Date_Format $fromDate,
+        ?Alaress_Date_Format $toDate,
+        int|string|null $itemId,
+    ): iterable;
 
     /**
      * Build a collection of search indices which were deleted between
@@ -38,11 +42,14 @@ interface IBuilder
      *
      * This list is intended to delete any indices which match the identifiers.
      *
-     * @param Alaress_Date_Format|null $fromDate  If provided, only clear indices
-     *                                            updated at or after this date.
-     * @param Alaress_Date_Format|null $toDate    If provided, only clear indices
-     *                                            updated at or before this date.
+     * @param Alaress_Date_Format|null $fromDate  If provided, only clear indices updated at or after this date.
+     * @param Alaress_Date_Format|null $toDate    If provided, only clear indices updated at or before this date.
+     * @param int|string|null          $itemId    If provided, only clear indices for this item ID.
      * @return iterable<Model> A collection of search indices to delete.
      */
-    public function buildDeletes(?Alaress_Date_Format $fromDate, ?Alaress_Date_Format $toDate): iterable;
+    public function buildDeletes(
+        ?Alaress_Date_Format $fromDate,
+        ?Alaress_Date_Format $toDate,
+        int|string|null $itemId,
+    ): iterable;
 }

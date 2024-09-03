@@ -229,7 +229,7 @@ class IndexBuilder extends App
                 $logger->debug('Refreshing lock.');
                 $this->refreshLock($lock);
 
-                foreach ($indexBuilder->buildUpdates($fromDate, $toDate) as $updatedIndex) {
+                foreach ($indexBuilder->buildUpdates($fromDate, $toDate, null) as $updatedIndex) {
                     if (!$this->perform()) {
                         continue;
                     }

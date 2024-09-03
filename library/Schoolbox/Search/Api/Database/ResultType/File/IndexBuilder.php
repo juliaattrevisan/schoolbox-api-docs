@@ -53,9 +53,10 @@ class IndexBuilder extends BaseBuilder
     ";
 
     /**
+     * @param int|string|null $itemId
      * @inheritdoc
      */
-    public function buildUpdates(?Alaress_Date_Format $fromDate, ?Alaress_Date_Format $toDate): iterable
+    public function buildUpdates(?Alaress_Date_Format $fromDate, ?Alaress_Date_Format $toDate, int|string|null $itemId): iterable
     {
         $subtypeExpression = self::SUBTYPE_EXPRESSION;
         $joinStatement     = self::JOIN_STATEMENT;
