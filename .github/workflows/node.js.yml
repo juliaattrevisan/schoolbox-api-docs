@@ -54,3 +54,6 @@ jobs:
 
     - name: Check ESLint Compliance
       run: npm run lint
+
+    - name: Check Prettier Compliance
+      run: npm run prettier:check
