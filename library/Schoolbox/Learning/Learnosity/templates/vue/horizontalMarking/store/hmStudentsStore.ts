@@ -83,7 +83,9 @@ export const useStudentsStore = defineStore("hmStudents", () => {
                 item.isMarked = getItemIsMarked(item);
             });
             student.isMarked = getStudentIsMarked(student);
-            student.attemptResponse = getAttemptResponse(attemptResponses.value, student.id);
+            const attemptResponse = getAttemptResponse(attemptResponses.value, student.id);
+            if (attemptResponse === undefined) throw new Error(`Attempt response not found for student ${student.id}`);
+            student.attemptResponse = attemptResponse;
             student.urls = getUrls(urls.value, student.id);
         }
     }
