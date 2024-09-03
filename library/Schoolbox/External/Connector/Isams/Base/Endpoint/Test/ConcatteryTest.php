@@ -89,15 +89,17 @@ class ConcatteryTest extends TestCase
     /**
      * @dataProvider providerConcatString
      * @param mixed $input
-     * @param int   $expected
+     * @param int $expected
+     * @throws ExpectationFailedException
+     * @throws InvalidArgumentException
      */
     public function testConcatString($input, $expected)
     {
         $concat = (new Concattery())->generate($input);
 
         $this->assertEquals($expected, $concat);
-
     }
+
 
     /**
      * Data provider for testConcatString
