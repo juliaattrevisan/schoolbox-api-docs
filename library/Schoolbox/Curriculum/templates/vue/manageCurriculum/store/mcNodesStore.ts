@@ -2,6 +2,8 @@
  * Stores all the curriculum codes and determines display of nodes
  */
 
+/* eslint-disable import/no-cycle -- Disable dependency cycle warning temporarily [SA-18428] */
+
 import { defineStore } from "pinia";
 import {
     UNSET_ID,

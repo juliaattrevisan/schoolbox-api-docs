@@ -2,6 +2,8 @@
  * Handles the load of the curriculum data
  */
 
+/* eslint-disable import/no-cycle -- Disable dependency cycle warning temporarily [SA-18428] */
+
 import { defineStore } from "pinia";
 import { UNSET_ID, getIdHash, isValidHash } from "@schoolboxCurriculum/js/nodeUtils";
 import { useNodesStore } from "@schoolboxCurriculum/vue/manageCurriculum/store/mcNodesStore";
