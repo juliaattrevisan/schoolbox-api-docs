@@ -1,4 +1,6 @@
-// Ensure the google picker sits above the foundation modal effect
-div.picker-dialog {
-    z-index: var(--sbx-depth-modal-ui-overlay);
+.picker-dialog {
+    z-index: var(--sbx-depth-modal);
+}
+.picker-dialog-bg {
+    z-index: calc(var(--sbx-depth-modal) - 1); // Ensure the Google-added background is behind the modal.
 }
