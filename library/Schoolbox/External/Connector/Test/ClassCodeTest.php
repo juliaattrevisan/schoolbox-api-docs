@@ -98,44 +98,4 @@ class ClassCodeTest extends TestCase
             ],
         ];
     }
-
-
-    /**
-     * You should also test for error states that your code may raise.
-     * Use the `
-     * you expect your code to raise.
-     *
-     * @dataProvider getTestErrorRaisedData
-     *
-     */
-    public function testErrorRaised($input): void
-    {
-        $this->expectException(\TypeError::class);
-
-        // Substitute this with the method call that is supposed to fail.
-        $test = static function (int $b) {
-            return $b + 1;
-        };
-
-        $test($input);
-    }
-
-
-    /**
-     * Data provider for `testErrorRaised`.
-     *
-     * @return array
-     */
-    public function getTestErrorRaisedData(): array
-    {
-        return [
-            [1.5],
-            [null],
-            ['a string'],
-            ['1.5'],
-            [new \stdClass()],
-            [[]],
-            [STDOUT]
-        ];
-    }
 }
