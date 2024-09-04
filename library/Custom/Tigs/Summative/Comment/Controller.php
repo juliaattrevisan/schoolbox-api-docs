@@ -13,26 +13,26 @@ use Alaress\Web;
 
 class Controller extends Web\Controller\Base
 {
-    /**
-     * Displays a form where a Staff member (eg the Dean) can give comments across all
-     * users in a selected student role
-     *
-     * @api   GET /modules/custom/tigs/summative/comment/role/{roleId}/term/{termSlug}
-     * @since 18.1.0
-     * @param int    $roleId
-     * @param string $termSlug
-     */
-    public function getDeanComments(int $roleId, string $termSlug): void
-    {
-        $this->response = $this->responseFromTemplate(
-            '@tigsSummativeComment/yearLevel.twig',
-            [
-                'roleId'   => $roleId,
-                'termSlug' => $termSlug,
-            ],
-            "TIGS Summative Reporting  - Dean Comments"
-        );
-    }
+//    /**
+//     * Displays a form where a Staff member (eg the Dean) can give comments across all
+//     * users in a selected student role
+//     *
+//     * @api   GET /modules/custom/tigs/summative/comment/role/{roleId}/term/{termSlug}
+//     * @since 18.1.0
+//     * @param int    $roleId
+//     * @param string $termSlug
+//     */
+//    public function getDeanComments(int $roleId, string $termSlug): void
+//    {
+//        $this->response = $this->responseFromTemplate(
+//            '@tigsSummativeComment/yearLevel.twig',
+//            [
+//                'roleId'   => $roleId,
+//                'termSlug' => $termSlug,
+//            ],
+//            "TIGS Summative Reporting  - Dean Comments"
+//        );
+//    }
 
 
     /**
