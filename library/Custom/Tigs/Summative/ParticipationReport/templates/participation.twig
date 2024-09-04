@@ -13,13 +13,13 @@ Data:
     houseEvents:            HouseEvent[]
     houseEvents[idx].name
     houseEvents[idx].status
-    subjects                array
-    subjects[idx].name      string
-    subjects[idx].codes     string[]
-    subjects[idx].folderId  int
-    subjects[idx].teachers  User[]
-    reportDate              null|string
-    moreInfoID              string              - A homepage id from a config var, for a special page in TIGS instance
+    subjects                array                 DEPRECATED
+    subjects[idx].name      string                DEPRECATED
+    subjects[idx].codes     string[]              DEPRECATED
+    subjects[idx].folderId  int                   DEPRECATED
+    subjects[idx].teachers  User[]                DEPRECATED
+    reportDate              null|string           DEPRECATED
+    moreInfoID              string              - DEPRECATED A homepage id from a config var, for a special page in TIGS instance
 #}
 {% import '@tigsSubjectReport/student-attributes-macro.twig' as macro %}
 
@@ -165,15 +165,15 @@ Data:
             </table>
         </div>
     </div>
-    <div class="row subject-list-group">
-        <div class="small-12 island">
-            {% include '@tigsParticipationReport/fragments/academicTranscript.twig' with {
-                attributes: attributes,
-                student:    user,
-                subjects:   subjects,
-                data:       academicTranscript,
-                reportDate: reportDate
-            } only %}
-        </div>
-    </div>
+{#    <div class="row subject-list-group">#}
+{#        <div class="small-12 island">#}
+{#            {% include '@tigsParticipationReport/fragments/academicTranscript.twig' with {#}
+{#                attributes: attributes,#}
+{#                student:    user,#}
+{#                subjects:   subjects,#}
+{#                data:       academicTranscript,#}
+{#                reportDate: reportDate#}
+{#            } only %}#}
+{#        </div>#}
+{#    </div>#}
 </div>

@@ -161,8 +161,8 @@ class Controller extends Web\Controller\Base
         $awards        = $this->getAwardsData($user, $attributes);
         $houseEvents   = $this->getHouseEventsData($user, $attributes);
         $absences      = $this->getAbsenceData($user, $attributes);
-        $subjectList   = $this->getSubjectList($user, $attributes, $reportDate, $roleTypeOverride);
-        $academicTranscript = $this->getAcademicTranscript($user, $attributes, $subjectList, $roleTypeOverride);
+//        $subjectList   = $this->getSubjectList($user, $attributes, $reportDate, $roleTypeOverride);
+//        $academicTranscript = $this->getAcademicTranscript($user, $attributes, $subjectList, $roleTypeOverride);
 //        $deansComments = $this->getDeansComment($user, $attributes, $roleTypeOverride);
 
         $data = [
@@ -174,10 +174,10 @@ class Controller extends Web\Controller\Base
             'awards'             => $awards,
             'houseEvents'        => $houseEvents,
             'absences'           => $absences,
-            'academicTranscript' => $academicTranscript,
-            'subjects'           => $subjectList,
+//            'academicTranscript' => $academicTranscript,
+//            'subjects'           => $subjectList,
 //            'deansComments'      => $deansComments,
-            'reportDate'         => $reportDate,
+//            'reportDate'         => $reportDate,
             'dataAttributeError' => Config::ERROR_DATA_ATTRIBUTE,
             'showErrors'         => ($roleTypeOverride ?? $this->getUser()->getRole()->getType()) === Role::STAFF,
 //            'moreInfoId'         => $this->getExplanationOfGradesHomepageId($attributes),
@@ -401,80 +401,80 @@ class Controller extends Web\Controller\Base
     }
 
 
-    /**
-     * Returns data suitable for rendering the 'Academic Transcript' component
-     *
-     * @param User              $student
-     * @param StudentAttributes $attributes
-     * @param array             $subjectList
-     * @param string|null       $roleTypeOverride
-     * @return array
-     * @throws InvalidColumnException
-     * @throws Exception
-     * @throws InvalidArgumentException
-     * @throws UnexpectedValueException
-     * @throws RouteNotFound
-     * @throws DomainException
-     * @throws LogicException
-     * @throws DefinitionException
-     * @throws UnderflowException
-     * @throws Database\Exception
-     */
-    private function getAcademicTranscript(User $student, StudentAttributes $attributes, array $subjectList, ?string $roleTypeOverride): array
-    {
-        $at = new AcademicTranscript(
-            $this->getConfigLoader(),
-            $this->folderMapper,
-            $this->externalUser,
-            $this->externalClass,
-            $this->courseImplMapper,
-            $this->assessmentMapperProxy,
-            $this->rubricMapper,
-            $this->userMapper,
-            $this->assessmentMapper,
-            $this->textBoxMapper,
-            $this->access,
-            $this->database,
-            $this->getAuthorizer(),
-            $this->routeGenerator,
-        );
-
-        return $at->toContext($this->getUser(), $student, $attributes, $subjectList, $roleTypeOverride);
-    }
-
-
-    /**
-     * Returns subject list for report
-     *
-     * @param User              $user
-     * @param StudentAttributes $attributes
-     * @param null|string       $reportDate
-     * @param string|null       $roleTypeOverride
-     * @return array
-     * @throws UnexpectedValueException
-     * @throws \PDOException
-     */
-    private function getSubjectList(User $user, StudentAttributes $attributes, ?string $reportDate, ?string $roleTypeOverride): array
-    {
-        $fetcher    = new FolderFetcher($this->folderMapper, $this->externalUser);
-        $folders    = $fetcher->findForStudent($user, $attributes, $reportDate, $this->getConfigLoader()->get(Config::_TIGS_EXCLUDED_CLASS_CODES), $this->getUser(), $roleTypeOverride);
-
-        $previousClassIds = $fetcher->getPreviousClassIds();
-
-        $subjects = [];
-        foreach ($folders as $folder) {
-            $subjects[] = [
-                'name' => $folder->getName(),
-                'codes' => $folder->getCodes()->getPropertyValues('code'),
-                'folderId' => $folder->getId(),
-                'isPreviousClass' => \in_array($folder->getId(), $previousClassIds, false)
-            ];
-        }
-
-        return $subjects;
-    }
-
-
+//    /**
+//     * Returns data suitable for rendering the 'Academic Transcript' component
+//     *
+//     * @param User              $student
+//     * @param StudentAttributes $attributes
+//     * @param array             $subjectList
+//     * @param string|null       $roleTypeOverride
+//     * @return array
+//     * @throws InvalidColumnException
+//     * @throws Exception
+//     * @throws InvalidArgumentException
+//     * @throws UnexpectedValueException
+//     * @throws RouteNotFound
+//     * @throws DomainException
+//     * @throws LogicException
+//     * @throws DefinitionException
+//     * @throws UnderflowException
+//     * @throws Database\Exception
+//     */
+//    private function getAcademicTranscript(User $student, StudentAttributes $attributes, array $subjectList, ?string $roleTypeOverride): array
+//    {
+//        $at = new AcademicTranscript(
+//            $this->getConfigLoader(),
+//            $this->folderMapper,
+//            $this->externalUser,
+//            $this->externalClass,
+//            $this->courseImplMapper,
+//            $this->assessmentMapperProxy,
+//            $this->rubricMapper,
+//            $this->userMapper,
+//            $this->assessmentMapper,
+//            $this->textBoxMapper,
+//            $this->access,
+//            $this->database,
+//            $this->getAuthorizer(),
+//            $this->routeGenerator,
+//        );
+//
+//        return $at->toContext($this->getUser(), $student, $attributes, $subjectList, $roleTypeOverride);
+//    }
+//
+//
+//    /**
+//     * Returns subject list for report
+//     *
+//     * @param User              $user
+//     * @param StudentAttributes $attributes
+//     * @param null|string       $reportDate
+//     * @param string|null       $roleTypeOverride
+//     * @return array
+//     * @throws UnexpectedValueException
+//     * @throws \PDOException
+//     */
+//    private function getSubjectList(User $user, StudentAttributes $attributes, ?string $reportDate, ?string $roleTypeOverride): array
+//    {
+//        $fetcher    = new FolderFetcher($this->folderMapper, $this->externalUser);
+//        $folders    = $fetcher->findForStudent($user, $attributes, $reportDate, $this->getConfigLoader()->get(Config::_TIGS_EXCLUDED_CLASS_CODES), $this->getUser(), $roleTypeOverride);
+//
+//        $previousClassIds = $fetcher->getPreviousClassIds();
+//
+//        $subjects = [];
+//        foreach ($folders as $folder) {
+//            $subjects[] = [
+//                'name' => $folder->getName(),
+//                'codes' => $folder->getCodes()->getPropertyValues('code'),
+//                'folderId' => $folder->getId(),
+//                'isPreviousClass' => \in_array($folder->getId(), $previousClassIds, false)
+//            ];
+//        }
+//
+//        return $subjects;
+//    }
+//
+//
 //    /**
 //     * Returns general comment of pastoral records of given attributes.
 //     * @param User              $user
