@@ -231,7 +231,8 @@ HELP;
                 $type,
                 $file,
                 $this->getLogger(),
-                \Schoolbox\External\Connector\Log\Mapper::getInstance()
+                \Schoolbox\External\Connector\Log\Mapper::getInstance(),
+                $this->getDi()->get('sentry'),
             ))->run($time, $runId, Endpoint\Scheduler::MANUAL_SIS_SCRIPT_NAME . $subtitle);
         }
 
@@ -247,7 +248,8 @@ HELP;
             $type,
             $file,
             $this->getLogger(),
-            \Schoolbox\External\Connector\Log\Mapper::getInstance()
+            \Schoolbox\External\Connector\Log\Mapper::getInstance(),
+            $this->getDi()->get('sentry'),
         ))->run($time, $runId, Endpoint\Scheduler::MANUAL_CALENDAR_SCRIPT_NAME);
 
         /* Announce lock release

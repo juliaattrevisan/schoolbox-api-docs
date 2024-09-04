@@ -117,7 +117,8 @@ NULLTYPE;
             $type,
             $file,
             $this->getLogger(),
-            \Schoolbox\External\Connector\Log\Mapper::getInstance()
+            \Schoolbox\External\Connector\Log\Mapper::getInstance(),
+            $this->getDi()->get('sentry'),
         ))->run(time(), $runId, Endpoint\Scheduler::CALENDARIMPORTER_SCRIPT_NAME);
 
         /* Announce conclusion
