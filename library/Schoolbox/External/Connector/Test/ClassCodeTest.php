@@ -20,7 +20,6 @@ use PHPUnit\Framework\TestCase;
 
 class ClassCodeTest extends TestCase
 {
-
     /**
      * @dataProvider providerClassCode
      * @param mixed $input
