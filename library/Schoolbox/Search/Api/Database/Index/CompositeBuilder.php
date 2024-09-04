@@ -35,20 +35,6 @@ class CompositeBuilder implements IBuilder
     /**
      * @inheritdoc
      */
-    public function extractItemId(object $item): int|string|null
-    {
-        foreach ($this->builders as $builder) {
-            $itemId = $builder->extractItemId($item);
-            if (isset($itemId)) {
-                return $itemId;
-            }
-        }
-        return null;
-    }
-
-    /**
-     * @inheritdoc
-     */
     public function buildUpdates(
         ?Alaress_Date_Format $fromDate,
         ?Alaress_Date_Format $toDate,
