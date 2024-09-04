@@ -19,10 +19,10 @@ use DomainException;
 use External_ClassInterface;
 use LogicException;
 use Schoolbox\Assessment\Rubric\DataModel as RubricDataModel;
-use Schoolbox\Assessment\Term\Model as TermModel;
+//use Schoolbox\Assessment\Term\Model as TermModel;
 use Schoolbox\GenericCollection;
-use Schoolbox\Learning\Assessment\AssessmentType;
-use Schoolbox\Learning\Assessment\IAssessable;
+//use Schoolbox\Learning\Assessment\AssessmentType;
+//use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Mapper\DefinitionException;
 use Schoolbox\Mapper\Exception;
 use Schoolbox\Permission\Access\Access;
@@ -31,7 +31,7 @@ use Schoolbox\Role;
 use Schoolbox\User;
 use Schoolbox\Filter\Filters;
 use Schoolbox\Pastoral\Mapper as PastoralMapper;
-use Schoolbox\Pastoral\Model as Pastoral;
+//use Schoolbox\Pastoral\Model as Pastoral;
 use Schoolbox\Resource\Textbox;
 use Schoolbox\Learning\Assessment\DataModel as Assessment;
 use External_UserInterface;
@@ -163,7 +163,7 @@ class Controller extends Web\Controller\Base
         $absences      = $this->getAbsenceData($user, $attributes);
         $subjectList   = $this->getSubjectList($user, $attributes, $reportDate, $roleTypeOverride);
         $academicTranscript = $this->getAcademicTranscript($user, $attributes, $subjectList, $roleTypeOverride);
-        $deansComments = $this->getDeansComment($user, $attributes, $roleTypeOverride);
+//        $deansComments = $this->getDeansComment($user, $attributes, $roleTypeOverride);
 
         $data = [
             'user'               => $user,
@@ -176,7 +176,7 @@ class Controller extends Web\Controller\Base
             'absences'           => $absences,
             'academicTranscript' => $academicTranscript,
             'subjects'           => $subjectList,
-            'deansComments'      => $deansComments,
+//            'deansComments'      => $deansComments,
             'reportDate'         => $reportDate,
             'dataAttributeError' => Config::ERROR_DATA_ATTRIBUTE,
             'showErrors'         => ($roleTypeOverride ?? $this->getUser()->getRole()->getType()) === Role::STAFF,
@@ -475,21 +475,21 @@ class Controller extends Web\Controller\Base
     }
 
 
-    /**
-     * Returns general comment of pastoral records of given attributes.
-     * @param User              $user
-     * @param StudentAttributes $attributes
-     * @param string|null       $roleTypeOverride
-     * @return array semester numbers -> comments
-     * @throws InvalidColumnException
-     */
-    private function getDeansComment(User $user, StudentAttributes $attributes, ?string $roleTypeOverride): array
-    {
-        return $this->extractDeansCommentFromDueWork($user, $attributes, $roleTypeOverride)
-            ?? $this->extractDeansCommentFromPastoral($user, $attributes);
-    }
-
-
+//    /**
+//     * Returns general comment of pastoral records of given attributes.
+//     * @param User              $user
+//     * @param StudentAttributes $attributes
+//     * @param string|null       $roleTypeOverride
+//     * @return array semester numbers -> comments
+//     * @throws InvalidColumnException
+//     */
+//    private function getDeansComment(User $user, StudentAttributes $attributes, ?string $roleTypeOverride): array
+//    {
+//        return $this->extractDeansCommentFromDueWork($user, $attributes, $roleTypeOverride)
+//            ?? $this->extractDeansCommentFromPastoral($user, $attributes);
+//    }
+//
+//
 //    /**
 //     * Returns the configured 'explanation of grades' homepage id for the specified student
 //     *
@@ -513,141 +513,141 @@ class Controller extends Web\Controller\Base
 //                return $this->getConfigLoader()->get(Config::_TIGS_GRADES_INFO_YEAR_7_10);
 //        }
 //    }
-
-
-    /**
-     * Extract the dean's comment from due work.
-     *
-     * The due work:
-     * * will be in the student's year group folder
-     * * will have the "dean's comment" due work type
-     *
-     * If the year group folder and due work is found: the dean's comment is
-     * extracted from the most recent feedback for `$user`.
-     *
-     * If the due work was found but the student has no feedback, or it is not
-     * visible to the role: don't show any comment, and do not fall back.
-     *
-     * @param User              $user
-     * @param StudentAttributes $attributes
-     * @param string|null       $roleTypeOverride
-     * @return array<int, string>|null dean's comment, keyed by semester: null
-     *                                 if there's no due work found.
-     *                                 (In this case, fall back to the pastoral
-     *                                 record for the dean's comment.)
-     */
-    private function extractDeansCommentFromDueWork(
-        User $user,
-        StudentAttributes $attributes,
-        ?string $roleTypeOverride
-    ): ?array {
-        // Find the class code suffix and then the year group folder
-        $yearGroupClassCodeSuffix = $this->getConfigLoader()->get(Config::_TIGS_YEAR_GROUP_CLASS_CODE_SUFFIX);
-        if (!$yearGroupClassCodeSuffix) {
-            return null;
-        }
-
-        $fetcher         = new FolderFetcher($this->folderMapper, $this->externalUser);
-        $yearGroupFolder = $fetcher->findYearGroupFolder($user, $attributes, $yearGroupClassCodeSuffix);
-        if (!$yearGroupFolder) {
-            return null;
-        }
-
-        // We have a year group folder: find the due work(s) within there
-        $dueWorksFound = false;
-        $deansComment  = $this->buildDefaultDeansComment($attributes);
-        foreach ($attributes->getCurriculumSemesters() as $semester) {
-            $dueWorks = $this->assessmentMapperProxy->findAllByFolderIdForReview(
-                $yearGroupFolder->getId(),
-                $user,
-                [
-                    'type'      => AssessmentType::TYPE_DUE_WORK,
-                    'work_type' => $this->getConfigLoader()->get(Config::_TIGS_WORK_TYPE_DEANS_COMMENT),
-                    'term'      => (new TermModel())
-                        ->setStart($semester->getStart())
-                        ->setActualFinish($semester->getFinish()),
-                ],
-            );
-            /** @var IAssessable|null $dueWork */
-            $dueWork = $dueWorks->first();
-            if ($dueWork) {
-                $dueWorksFound = true;
-                $roleType      = $roleTypeOverride ?? $this->getUser()->getRole()->getType();
-                if ($dueWork->isFeedbackVisibleToRoleType($roleType)) {
-                    $participant = $dueWork->getParticipantIfExtant($user);
-                    if ($participant) {
-                        $feedback = $participant->getAuthoritativeFeedback(true);
-                        if ($feedback) {
-                            $deansComment[$semester->getOrdinal()] = $feedback->getComment();
-                        }
-                    }
-                }
-            }
-        }
-        return $dueWorksFound ? $deansComment : null;
-    }
-
-
-    /**
-     * Extract the dean's comment from pastoral.
-     *
-     * If the comment can't be extracted from a due work, it is extracted from
-     * pastoral.
-     *
-     * @param User              $user
-     * @param StudentAttributes $attributes
-     * @return array<int, string> dean's comment, keyed by semester.
-     */
-    private function extractDeansCommentFromPastoral(User $user, StudentAttributes $attributes): array
-    {
-        $deansComment = $this->buildDefaultDeansComment($attributes);
-
-        // No due works were found for this semester and student.
-        // Fall back to the pastoral-based comments.
-        $pastoralType = $this->getConfigLoader()->get(Config::_TIGS_PASTORAL_TYPE);
-        if (!$pastoralType) {
-            // no pastoral type configured
-            return $deansComment;
-        }
-
-        // get records in the curriculum year
-        $pb = $this->pastoralMapper->getPredicateBuilder()
-            ->equals('student_id', $user->getId())
-            ->equals('type_id', $pastoralType)
-            ->greaterThanOrEqualTo('created_at', $attributes->getCurriculumYearStart()->getDatabase())
-            ->lessThanOrEqualTo('created_at', $attributes->getCurriculumYearFinish()->getDatabase());
-        $records = $this->pastoralMapper->findByPredicates($pb, ['order' => ['created_at' => 'desc']]);
-
-        // get latest record in each semester
-        foreach ($attributes->getCurriculumSemesters() as $semester) {
-            $start  = $semester->getStart();
-            $finish = $semester->getFinish();
-
-            $firstRecord = $records->filter(
-                function (Pastoral $record) use ($start, $finish) {
-                    return $record->getCreatedAt()->gte($start) && $record->getCreatedAt()->lte($finish);
-                }
-            )->first();
-            if ($firstRecord) {
-                $deansComment[$semester->getOrdinal()] = $firstRecord->getBodyPublic();
-            }
-        }
-        return $deansComment;
-    }
-
-
-    /**
-     * Builds a default dean's comment array.
-     *
-     * @param StudentAttributes $attributes
-     * @return array<int, string> dean's comment, keyed by semester.
-     */
-    private function buildDefaultDeansComment(StudentAttributes $attributes): array
-    {
-        $deansComment = [];
-        foreach ($attributes->getCurriculumSemesters() as $semester) {
-            $deansComment[$semester->getOrdinal()] = '';
-        }
-        return $deansComment;
-    }
+//
+//
+//    /**
+//     * Extract the dean's comment from due work.
+//     *
+//     * The due work:
+//     * * will be in the student's year group folder
+//     * * will have the "dean's comment" due work type
+//     *
+//     * If the year group folder and due work is found: the dean's comment is
+//     * extracted from the most recent feedback for `$user`.
+//     *
+//     * If the due work was found but the student has no feedback, or it is not
+//     * visible to the role: don't show any comment, and do not fall back.
+//     *
+//     * @param User              $user
+//     * @param StudentAttributes $attributes
+//     * @param string|null       $roleTypeOverride
+//     * @return array<int, string>|null dean's comment, keyed by semester: null
+//     *                                 if there's no due work found.
+//     *                                 (In this case, fall back to the pastoral
+//     *                                 record for the dean's comment.)
+//     */
+//    private function extractDeansCommentFromDueWork(
+//        User $user,
+//        StudentAttributes $attributes,
+//        ?string $roleTypeOverride
+//    ): ?array {
+//        // Find the class code suffix and then the year group folder
+//        $yearGroupClassCodeSuffix = $this->getConfigLoader()->get(Config::_TIGS_YEAR_GROUP_CLASS_CODE_SUFFIX);
+//        if (!$yearGroupClassCodeSuffix) {
+//            return null;
+//        }
+//
+//        $fetcher         = new FolderFetcher($this->folderMapper, $this->externalUser);
+//        $yearGroupFolder = $fetcher->findYearGroupFolder($user, $attributes, $yearGroupClassCodeSuffix);
+//        if (!$yearGroupFolder) {
+//            return null;
+//        }
+//
+//        // We have a year group folder: find the due work(s) within there
+//        $dueWorksFound = false;
+//        $deansComment  = $this->buildDefaultDeansComment($attributes);
+//        foreach ($attributes->getCurriculumSemesters() as $semester) {
+//            $dueWorks = $this->assessmentMapperProxy->findAllByFolderIdForReview(
+//                $yearGroupFolder->getId(),
+//                $user,
+//                [
+//                    'type'      => AssessmentType::TYPE_DUE_WORK,
+//                    'work_type' => $this->getConfigLoader()->get(Config::_TIGS_WORK_TYPE_DEANS_COMMENT),
+//                    'term'      => (new TermModel())
+//                        ->setStart($semester->getStart())
+//                        ->setActualFinish($semester->getFinish()),
+//                ],
+//            );
+//            /** @var IAssessable|null $dueWork */
+//            $dueWork = $dueWorks->first();
+//            if ($dueWork) {
+//                $dueWorksFound = true;
+//                $roleType      = $roleTypeOverride ?? $this->getUser()->getRole()->getType();
+//                if ($dueWork->isFeedbackVisibleToRoleType($roleType)) {
+//                    $participant = $dueWork->getParticipantIfExtant($user);
+//                    if ($participant) {
+//                        $feedback = $participant->getAuthoritativeFeedback(true);
+//                        if ($feedback) {
+//                            $deansComment[$semester->getOrdinal()] = $feedback->getComment();
+//                        }
+//                    }
+//                }
+//            }
+//        }
+//        return $dueWorksFound ? $deansComment : null;
+//    }
+//
+//
+//    /**
+//     * Extract the dean's comment from pastoral.
+//     *
+//     * If the comment can't be extracted from a due work, it is extracted from
+//     * pastoral.
+//     *
+//     * @param User              $user
+//     * @param StudentAttributes $attributes
+//     * @return array<int, string> dean's comment, keyed by semester.
+//     */
+//    private function extractDeansCommentFromPastoral(User $user, StudentAttributes $attributes): array
+//    {
+//        $deansComment = $this->buildDefaultDeansComment($attributes);
+//
+//        // No due works were found for this semester and student.
+//        // Fall back to the pastoral-based comments.
+//        $pastoralType = $this->getConfigLoader()->get(Config::_TIGS_PASTORAL_TYPE);
+//        if (!$pastoralType) {
+//            // no pastoral type configured
+//            return $deansComment;
+//        }
+//
+//        // get records in the curriculum year
+//        $pb = $this->pastoralMapper->getPredicateBuilder()
+//            ->equals('student_id', $user->getId())
+//            ->equals('type_id', $pastoralType)
+//            ->greaterThanOrEqualTo('created_at', $attributes->getCurriculumYearStart()->getDatabase())
+//            ->lessThanOrEqualTo('created_at', $attributes->getCurriculumYearFinish()->getDatabase());
+//        $records = $this->pastoralMapper->findByPredicates($pb, ['order' => ['created_at' => 'desc']]);
+//
+//        // get latest record in each semester
+//        foreach ($attributes->getCurriculumSemesters() as $semester) {
+//            $start  = $semester->getStart();
+//            $finish = $semester->getFinish();
+//
+//            $firstRecord = $records->filter(
+//                function (Pastoral $record) use ($start, $finish) {
+//                    return $record->getCreatedAt()->gte($start) && $record->getCreatedAt()->lte($finish);
+//                }
+//            )->first();
+//            if ($firstRecord) {
+//                $deansComment[$semester->getOrdinal()] = $firstRecord->getBodyPublic();
+//            }
+//        }
+//        return $deansComment;
+//    }
+//
+//
+//    /**
+//     * Builds a default dean's comment array.
+//     *
+//     * @param StudentAttributes $attributes
+//     * @return array<int, string> dean's comment, keyed by semester.
+//     */
+//    private function buildDefaultDeansComment(StudentAttributes $attributes): array
+//    {
+//        $deansComment = [];
+//        foreach ($attributes->getCurriculumSemesters() as $semester) {
+//            $deansComment[$semester->getOrdinal()] = '';
+//        }
+//        return $deansComment;
+//    }
 }
