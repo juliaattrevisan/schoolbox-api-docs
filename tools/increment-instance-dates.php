@@ -116,7 +116,6 @@ $app = new class extends CliTool\App {
         'student_submission'                 => ['created_at', 'submitted_at', 'updated_at'],
         'student_submission_file'            => ['created_at', 'updated_at'],
         'student_submission_file_kami'       => ['kami_created_at', 'created_at', 'updated_at'],
-        'submission_box'                     => ['date', 'late_date', 'open_date', 'publish_date'],
         'submission_log'                     => ['datetime'],
         'submission_return'                  => ['created_at', 'published_at', 'updated_at'],
         'submission_return_file'             => ['created_at', 'updated_at'],
