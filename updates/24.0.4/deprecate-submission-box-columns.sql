@@ -1,0 +1,9 @@
+ALTER TABLE submission_box RENAME COLUMN category        TO _category;
+ALTER TABLE submission_box RENAME COLUMN type_deprecated TO _type_deprecated;
+ALTER TABLE submission_box RENAME COLUMN publish_date    TO _publish_date;
+ALTER TABLE submission_box RENAME COLUMN open_date       TO _open_date;
+ALTER TABLE submission_box RENAME COLUMN `date`          TO _date;
+ALTER TABLE submission_box RENAME COLUMN late_date       TO _late_date;
+ALTER TABLE submission_box RENAME COLUMN description     TO _description;
+ALTER TABLE submission_box RENAME COLUMN `name`          TO _name;
+ALTER TABLE submission_box RENAME COLUMN weight          TO _weight;
