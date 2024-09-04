@@ -38,7 +38,7 @@ class ClassCodeTest extends TestCase
      *
      * @return array
      */
-    public function providerClassCode(): array
+    public static function providerClassCode(): array
     {
         return [
             /* Meaningless class codes
