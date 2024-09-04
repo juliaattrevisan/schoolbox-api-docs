@@ -180,7 +180,7 @@ class Controller extends Web\Controller\Base
             'reportDate'         => $reportDate,
             'dataAttributeError' => Config::ERROR_DATA_ATTRIBUTE,
             'showErrors'         => ($roleTypeOverride ?? $this->getUser()->getRole()->getType()) === Role::STAFF,
-            'moreInfoId'         => $this->getExplanationOfGradesHomepageId($attributes),
+//            'moreInfoId'         => $this->getExplanationOfGradesHomepageId($attributes),
         ];
 
         $this->response = $this->responseFromTemplate(
@@ -490,29 +490,29 @@ class Controller extends Web\Controller\Base
     }
 
 
-    /**
-     * Returns the configured 'explanation of grades' homepage id for the specified student
-     *
-     * @param StudentAttributes $attributes
-     * @return string|null
-     */
-    private function getExplanationOfGradesHomepageId(StudentAttributes $attributes): ?string
-    {
-        switch ($attributes->getYearLevel()) {
-            case 12:
-                if ($attributes->isHsc()) {
-                    return $this->getConfigLoader()->get(Config::_TIGS_GRADES_INFO_YEAR_12_HSC);
-                }
-                return $this->getConfigLoader()->get(Config::_TIGS_GRADES_INFO_YEAR_12_IB);
-            case 11:
-                if ($attributes->isHsc()) {
-                    return $this->getConfigLoader()->get(Config::_TIGS_GRADES_INFO_YEAR_11_HSC);
-                }
-                return $this->getConfigLoader()->get(Config::_TIGS_GRADES_INFO_YEAR_11_IB);
-            default:
-                return $this->getConfigLoader()->get(Config::_TIGS_GRADES_INFO_YEAR_7_10);
-        }
-    }
+//    /**
+//     * Returns the configured 'explanation of grades' homepage id for the specified student
+//     *
+//     * @param StudentAttributes $attributes
+//     * @return string|null
+//     */
+//    private function getExplanationOfGradesHomepageId(StudentAttributes $attributes): ?string
+//    {
+//        switch ($attributes->getYearLevel()) {
+//            case 12:
+//                if ($attributes->isHsc()) {
+//                    return $this->getConfigLoader()->get(Config::_TIGS_GRADES_INFO_YEAR_12_HSC);
+//                }
+//                return $this->getConfigLoader()->get(Config::_TIGS_GRADES_INFO_YEAR_12_IB);
+//            case 11:
+//                if ($attributes->isHsc()) {
+//                    return $this->getConfigLoader()->get(Config::_TIGS_GRADES_INFO_YEAR_11_HSC);
+//                }
+//                return $this->getConfigLoader()->get(Config::_TIGS_GRADES_INFO_YEAR_11_IB);
+//            default:
+//                return $this->getConfigLoader()->get(Config::_TIGS_GRADES_INFO_YEAR_7_10);
+//        }
+//    }
 
 
     /**

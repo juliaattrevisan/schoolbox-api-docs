@@ -43,7 +43,7 @@ Data:
     </div>
 
     <div class="row student">
-        <div class="column small-12 medium-6">
+        <div class="column small-12">
             <h2 class="subheader">Student</h2>
             <div class="card small-12">
                 {% include 'include/portrait.twig' with {user: user} only %}
@@ -52,12 +52,12 @@ Data:
                 <p class="meta">Unapproved absences: Semester 1 <span class="label neutral">{{ absences[1] }}</span> Semester 2 <span class="label neutral">{{ absences[2] }}</span></p>
             </div>
         </div>
-        <div class="column small-12 medium-6">
-            <h2 class="subheader">Understanding your report</h2>
-            <p>
-                <a href="/homepage/{{ moreInfoId }}">Click here for more information</a>
-            </p>
-        </div>
+{#        <div class="column small-12 medium-6">#}
+{#            <h2 class="subheader">Understanding your report</h2>#}
+{#            <p>#}
+{#                <a href="/homepage/{{ moreInfoId }}">Click here for more information</a>#}
+{#            </p>#}
+{#        </div>#}
     </div>
 
     <div class="row dean-mentor">
