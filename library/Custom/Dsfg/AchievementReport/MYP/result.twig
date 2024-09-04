@@ -40,15 +40,17 @@
                     <tr>
                         <td colspan="{{ (headings[classCode].shortHeadings | length) + 1 }}" class="spacer"></td>
                     </tr>
-                    <tr>
-                        <th>Interim Achievement Level</th>
-                        {% for shortCode, shortHeading in headings[classCode].shortHeadings %}
-                            <td class="centered">{{ grades[classCode][2][shortCode]['AssessResultsResult'] ?? '' }}</td>
-                        {% endfor %}
-                    </tr>
-                    <tr>
-                        <td colspan="{{ (headings[classCode].shortHeadings | length) + 1 }}" class="spacer"></td>
-                    </tr>
+                    {% if not headings[classCode].isShortCourse %}
+                        <tr>
+                            <th>Interim Achievement Level</th>
+                            {% for shortCode, shortHeading in headings[classCode].shortHeadings %}
+                                <td class="centered">{{ grades[classCode][2][shortCode]['AssessResultsResult'] ?? '' }}</td>
+                            {% endfor %}
+                        </tr>
+                        <tr>
+                            <td colspan="{{ (headings[classCode].shortHeadings | length) + 1 }}" class="spacer"></td>
+                        </tr>
+                    {% endif %}
                     <tr>
                         <th>Final Achievement Level</th>
                         {% for shortCode, shortHeading in headings[classCode].shortHeadings %}
