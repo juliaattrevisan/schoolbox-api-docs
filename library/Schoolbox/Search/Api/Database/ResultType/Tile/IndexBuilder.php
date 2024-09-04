@@ -69,6 +69,14 @@ class IndexBuilder extends BaseBuilder
             $queryString .= ' AND t.modified_at <= :toDate';
             $params['toDate'] = $toDate->getDatabase();
         }
+        if ($subject) {
+            $itemId = $this->extractItemId($subject);
+            if (!isset($itemId)) {
+                return;
+            }
+            $queryString .= ' AND t.id = :id';
+            $params['id'] = $itemId;
+        }
         $query = $this->connector->prepareQuery($queryString);
         $this->logger->info('Finding tiles...');
         $query->execute($params);
@@ -139,6 +147,14 @@ class IndexBuilder extends BaseBuilder
                 )'
             );
             $params['toDate'] = $toDate->getDatabase();
+        }
+        if ($subject) {
+            $itemId = $this->extractItemId($subject);
+            if (!isset($itemId)) {
+                return;
+            }
+            $queryString .= ' AND t.id = :id';
+            $params['id'] = $itemId;
         }
         $query = $this->connector->prepareQuery($queryString);
         $query->execute($params);

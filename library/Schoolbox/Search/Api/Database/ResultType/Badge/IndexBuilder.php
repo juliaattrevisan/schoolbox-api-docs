@@ -33,7 +33,7 @@ class IndexBuilder extends BaseBuilder
     }
 
     /**
-     * @param object|null $subject
+     * @inheritdoc
      */
     public function buildUpdates(?Alaress_Date_Format $fromDate, ?Alaress_Date_Format $toDate, ?object $subject): iterable
     {
@@ -55,6 +55,14 @@ class IndexBuilder extends BaseBuilder
         if ($toDate) {
             $queryString .= ' AND b.updated_at <= :toDate';
             $params['toDate'] = $toDate->getDatabase();
+        }
+        if ($subject) {
+            $itemId = $this->extractItemId($subject);
+            if (!isset($itemId)) {
+                return;
+            }
+            $queryString .= ' AND b.id = :id';
+            $params['id'] = $itemId;
         }
         $query = $this->connector->prepareQuery($queryString);
         $this->logger->info('Finding badges...');
@@ -89,6 +97,14 @@ class IndexBuilder extends BaseBuilder
         if ($toDate) {
             $queryString      .= ' AND deleted_at <= :toDate';
             $params['toDate'] = $toDate->getDatabase();
+        }
+        if ($subject) {
+            $itemId = $this->extractItemId($subject);
+            if (!isset($itemId)) {
+                return;
+            }
+            $queryString .= ' AND b.id = :id';
+            $params['id'] = $itemId;
         }
         $query = $this->connector->prepareQuery($queryString);
         $query->execute($params);

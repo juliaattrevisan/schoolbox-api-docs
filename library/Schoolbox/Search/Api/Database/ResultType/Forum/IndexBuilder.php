@@ -37,6 +37,7 @@ class IndexBuilder extends BaseBuilder
      */
     public function buildUpdates(?Alaress_Date_Format $fromDate, ?Alaress_Date_Format $toDate, ?object $subject): iterable
     {
+        // TODO add proper deleted_at columns to forumPost and forumThread
         $queryString = "
             SELECT
                 fp.postID as id,
@@ -58,6 +59,14 @@ class IndexBuilder extends BaseBuilder
         if ($toDate) {
             $queryString .= ' AND fp.modified <= :toDate';
             $params['toDate'] = $toDate->getDatabase();
+        }
+        if ($subject) {
+            $itemId = $this->extractItemId($subject);
+            if (!isset($itemId)) {
+                return;
+            }
+            $queryString .= ' AND fp.postID = :id';
+            $params['id'] = $itemId;
         }
         $query = $this->connector->prepareQuery($queryString);
         $this->logger->info('Finding forum posts...');
@@ -90,7 +99,7 @@ class IndexBuilder extends BaseBuilder
         // An overnight full rebuild of the search_index table ensures that the search_index table will never be more
         // than a day out of date.
         if ($fromDate !== null || $toDate !== null) {
-            return [];
+            return;
         }
 
         // Forum posts or threads don't have deletion dates:
@@ -101,7 +110,16 @@ class IndexBuilder extends BaseBuilder
             LEFT JOIN forumPost fp ON fp.threadID = ft.threadID
             WHERE fp.deleted = 'true' OR ft.deleted = 'true'
         ";
-        $query = $this->connector->prepareQuery($queryString);
+        $params = [];
+        if ($subject) {
+            $itemId = $this->extractItemId($subject);
+            if (!isset($itemId)) {
+                return;
+            }
+            $queryString .= ' AND fp.postID = :id';
+            $params['id'] = $itemId;
+        }
+        $query = $this->connector->prepareQuery($queryString, $params);
         $query->execute();
         $this->logger->info(sprintf('Deleting search indices for %d forum posts', $query->rowCount()));
         foreach ($query as $row) {

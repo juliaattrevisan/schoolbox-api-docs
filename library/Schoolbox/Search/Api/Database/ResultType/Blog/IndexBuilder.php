@@ -59,6 +59,14 @@ class IndexBuilder extends BaseBuilder
             $queryString .= ' AND b.updated_at <= :toDate';
             $params['toDate'] = $toDate->getDatabase();
         }
+        if ($subject) {
+            $itemId = $this->extractItemId($subject);
+            if (!isset($itemId)) {
+                return;
+            }
+            $queryString .= ' AND b.id = :id';
+            $params['id'] = $itemId;
+        }
         $query = $this->connector->prepareQuery($queryString);
         $this->logger->info('Finding blog posts...');
         $query->execute($params);
@@ -97,6 +105,14 @@ class IndexBuilder extends BaseBuilder
         if ($toDate) {
             $queryString      .= ' AND COALESCE(b.deleted_at, f.deleted_at) <= :toDate';
             $params['toDate'] = $toDate->getDatabase();
+        }
+        if ($subject) {
+            $itemId = $this->extractItemId($subject);
+            if (!isset($itemId)) {
+                return;
+            }
+            $queryString .= ' AND b.id = :id';
+            $params['id'] = $itemId;
         }
         $query = $this->connector->prepareQuery($queryString);
         $query->execute($params);

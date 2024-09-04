@@ -58,6 +58,14 @@ class IndexBuilder extends BaseBuilder
             $queryString .= ' AND n.updated_at <= :toDate';
             $params['toDate'] = $toDate->getDatabase();
         }
+        if ($subject) {
+            $itemId = $this->extractItemId($subject);
+            if (!isset($itemId)) {
+                return;
+            }
+            $queryString .= ' AND n.id = :id';
+            $params['id'] = $itemId;
+        }
         $query = $this->connector->prepareQuery($queryString);
         $this->logger->info('Finding news articles...');
         $query->execute($params);
@@ -97,6 +105,14 @@ class IndexBuilder extends BaseBuilder
         if ($toDate) {
             $queryString .= ' AND n.deleted_at <= :toDate';
             $params['toDate'] = $toDate->getDatabase();
+        }
+        if ($subject) {
+            $itemId = $this->extractItemId($subject);
+            if (!isset($itemId)) {
+                return;
+            }
+            $queryString .= ' AND n.id = :id';
+            $params['id'] = $itemId;
         }
         $query = $this->connector->prepareQuery($queryString);
         $query->execute($params);

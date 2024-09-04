@@ -103,6 +103,14 @@ class IndexBuilder extends BaseBuilder
             $queryString .= ' AND tb.updated_at <= :toDate';
             $params['toDate'] = $toDate->getDatabase();
         }
+        if ($subject) {
+            $itemId = $this->extractItemId($subject);
+            if (!isset($itemId)) {
+                return;
+            }
+            $queryString .= ' AND tb.textBoxID = :id';
+            $params['id'] = $itemId;
+        }
         $query = $this->connector->prepareQuery($queryString);
         $this->logger->info('Finding text boxes (with components)...');
         $query->execute($params);
@@ -151,6 +159,14 @@ class IndexBuilder extends BaseBuilder
         if ($toDate) {
             $queryString .= ' AND tb2.updated_at <= :toDate';
             $params['toDate'] = $toDate->getDatabase();
+        }
+        if ($subject) {
+            $itemId = $this->extractItemId($subject);
+            if (!isset($itemId)) {
+                return;
+            }
+            $queryString .= ' AND tb.textBoxID = :id';
+            $params['id'] = $itemId;
         }
         $query = $this->connector->prepareQuery($queryString);
         $this->logger->info('Finding text boxes (without components)...');
