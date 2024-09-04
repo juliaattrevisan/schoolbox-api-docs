@@ -59,6 +59,15 @@ abstract class BaseBuilder implements IBuilder
     }
 
     /**
+     * @inheritdoc
+     */
+    public function setLogger(LoggerInterface $logger): self
+    {
+        $this->logger = $logger;
+        return $this;
+    }
+
+    /**
      * Helper function for building an index object.
      *
      * @param string      $identifier
@@ -185,5 +194,5 @@ abstract class BaseBuilder implements IBuilder
      * @param object $subject The item to update indices for.
      * @return int|string|null The item ID, or `null` if this builder doesn't work with this type of item.
      */
-    protected abstract function extractItemId(object $subject): int|string|null;
+    abstract protected function extractItemId(object $subject): int|string|null;
 }

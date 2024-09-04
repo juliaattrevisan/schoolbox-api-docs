@@ -58,6 +58,7 @@ use OAT\Library\Lti1p3Core\Security\Key\KeyChainRepositoryInterface;
 use OAT\Library\Lti1p3Core\Security\OAuth2\Repository\ClientRepository;
 use Predis;
 use Proxy\Server as ProxyServer;
+use Psr\Log\NullLogger;
 use Psr\SimpleCache\CacheInterface;
 use RuntimeException;
 use Schoolbox\Admin\Navigation\Renderer as AdminNavigationRenderer;
@@ -165,6 +166,8 @@ use Schoolbox\Resource\Storage\Mapper as StorageMapper;
 use Schoolbox\Resource\Storage\Receiver;
 use Schoolbox\Resource\Storage\Sanitizer;
 use Schoolbox\Role;
+use Schoolbox\Search\Api\Database\Index\CompositeBuilder;
+use Schoolbox\Search\Api\Database\ResultType;
 use Schoolbox\Sync\Grammar\Factory as SyncGrammarFactory;
 use Schoolbox\Sync\Log\Mapper as SyncLogMapper;
 use Schoolbox\Sync\Provisioner\Provisioner;
@@ -2196,6 +2199,39 @@ abstract class Kernel
                             session_get_cookie_params()
                         ),
                         new Remember\Redis(INSTANCE_ID, $redisStorage),
+                    );
+                }
+            )
+        );
+
+        // Search dependencies
+        $di->set(
+            'search.indexBuilder',
+            $di->lazy(
+                function () use ($di) {
+                    /** @var SchoolboxDatabaseFactory $dbFactory */
+                    $dbFactory = $di->get('databaseFactory');
+
+                    // Should this return write database always?
+                    $dbi = $dbFactory->getInternalDatabase();
+
+                    // What sort of logger should this use?
+                    // The CLI variant should use the kernel's logger:
+                    // otherwise, use a null logger.
+                    $logger = new NullLogger();
+                    return new CompositeBuilder(
+                        new ResultType\Assessment\IndexBuilder($dbi, $logger),
+                        new ResultType\Badge\IndexBuilder($dbi, $logger),
+                        new ResultType\Blog\IndexBuilder($dbi, $logger),
+                        new ResultType\Event\IndexBuilder($dbi, $logger),
+                        new ResultType\File\IndexBuilder($dbi, $logger),
+                        new ResultType\Forum\IndexBuilder($dbi, $logger),
+                        new ResultType\Link\IndexBuilder($dbi, $logger),
+                        new ResultType\News\IndexBuilder($dbi, $logger),
+                        new ResultType\Textbox\IndexBuilder($dbi, $logger),
+                        new ResultType\Page\IndexBuilder($dbi, $logger),
+                        new ResultType\Tile\IndexBuilder($dbi, $logger),
+                        new ResultType\User\IndexBuilder($dbi, $logger),
                     );
                 }
             )

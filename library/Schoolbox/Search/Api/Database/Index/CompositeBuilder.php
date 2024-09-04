@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace Schoolbox\Search\Api\Database\Index;
 
 use Alaress_Date_Format;
+use Psr\Log\LoggerInterface;
 
 /**
  * Composite index builder: builds indices from a list of builders.
@@ -33,7 +34,7 @@ class CompositeBuilder implements IBuilder
     }
 
     /**
-     * @inheritdoc
+     * Build updates for all builders in this composite.
      */
     public function buildUpdates(
         ?Alaress_Date_Format $fromDate,
@@ -48,7 +49,7 @@ class CompositeBuilder implements IBuilder
     }
 
     /**
-     * @inheritdoc
+     * Build deletes for all builders in this composite.
      */
     public function buildDeletes(
         ?Alaress_Date_Format $fromDate,
@@ -60,5 +61,16 @@ class CompositeBuilder implements IBuilder
                 yield $item;
             }
         }
+    }
+
+    /**
+     * Set logger for all builders in this composite.
+     */
+    public function setLogger(LoggerInterface $logger): self
+    {
+        foreach ($this->builders as $i => $builder) {
+            $this->builders[$i] = $builder->setLogger($logger);
+        }
+        return $this;
     }
 }

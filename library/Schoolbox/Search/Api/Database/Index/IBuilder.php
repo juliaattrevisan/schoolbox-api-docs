@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace Schoolbox\Search\Api\Database\Index;
 
 use Alaress_Date_Format;
+use Psr\Log\LoggerInterface;
 use Schoolbox\Search\Index\Model;
 
 /**
@@ -56,4 +57,13 @@ interface IBuilder
         ?Alaress_Date_Format $toDate,
         ?object $subject,
     ): iterable;
+
+    /**
+     * Install a logger into this search result builder: the default logger may
+     * need to be overwritten.
+     *
+     * @param LoggerInterface $logger
+     * @return self
+     */
+    public function setLogger(LoggerInterface $logger): self;
 }

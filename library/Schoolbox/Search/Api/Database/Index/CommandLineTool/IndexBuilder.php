@@ -16,6 +16,7 @@ use Schoolbox\Application\CliKernelAbstract;
 use Schoolbox\Application\CliTool\App;
 use Schoolbox\Database\Factory as DatabaseFactory;
 use Schoolbox\Search\Api\Database\Index\CompositeBuilder;
+use Schoolbox\Search\Api\Database\Index\IBuilder;
 use Schoolbox\Search\Api\Database\ResultType;
 
 /**
@@ -109,39 +110,42 @@ class IndexBuilder extends App
         $dbFactory = $this->getDi()->get('databaseFactory');
         $dbi       = $dbFactory->getInternalWriteDatabase();
 
-        $indexBuilders = [
-            ResultType\Assessment\Hydrator::BASE_TYPE => new ResultType\Assessment\IndexBuilder($dbi, $logger),
-            ResultType\Badge\Hydrator::BASE_TYPE      => new ResultType\Badge\IndexBuilder($dbi, $logger),
-            ResultType\Blog\Hydrator::BASE_TYPE       => new ResultType\Blog\IndexBuilder($dbi, $logger),
-            ResultType\Event\Hydrator::BASE_TYPE      => new ResultType\Event\IndexBuilder($dbi, $logger),
-            ResultType\File\Hydrator::BASE_TYPE       => new ResultType\File\IndexBuilder($dbi, $logger),
-            ResultType\Forum\Hydrator::BASE_TYPE      => new ResultType\Forum\IndexBuilder($dbi, $logger),
-            ResultType\Link\Hydrator::BASE_TYPE       => new ResultType\Link\IndexBuilder($dbi, $logger),
-            ResultType\News\Hydrator::BASE_TYPE       => new ResultType\News\IndexBuilder($dbi, $logger),
-            ResultType\Textbox\Hydrator::BASE_TYPE    => new ResultType\Textbox\IndexBuilder($dbi, $logger),
-            ResultType\Page\Hydrator::BASE_TYPE       => new ResultType\Page\IndexBuilder($dbi, $logger),
-            ResultType\Tile\Hydrator::BASE_TYPE       => new ResultType\Tile\IndexBuilder($dbi, $logger),
-            ResultType\User\Hydrator::BASE_TYPE       => new ResultType\User\IndexBuilder($dbi, $logger),
-        ];
         $types = $this->getOpt(self::OPT_LONG_TYPE);
         if (!isset($types)) {
             $logger->notice('Building search index for all result types');
-            $indexBuilder = new CompositeBuilder(...$indexBuilders);
+            /** @var IBuilder $indexBuilder */
+            $indexBuilder = $this->getDi()->get('search.indexBuilder');
+            $indexBuilder = $indexBuilder->setLogger($logger);
         } else {
-            $types                 = is_array($types) ? $types : [$types];
-            $includedIndexBuilders = [];
+            // Build index builders from a list of candidate types
+            $types                  = is_array($types) ? $types : [$types];
+            $includedIndexBuilders  = [];
+            $candidateIndexBuilders = [
+                ResultType\Assessment\Hydrator::BASE_TYPE => new ResultType\Assessment\IndexBuilder($dbi, $logger),
+                ResultType\Badge\Hydrator::BASE_TYPE      => new ResultType\Badge\IndexBuilder($dbi, $logger),
+                ResultType\Blog\Hydrator::BASE_TYPE       => new ResultType\Blog\IndexBuilder($dbi, $logger),
+                ResultType\Event\Hydrator::BASE_TYPE      => new ResultType\Event\IndexBuilder($dbi, $logger),
+                ResultType\File\Hydrator::BASE_TYPE       => new ResultType\File\IndexBuilder($dbi, $logger),
+                ResultType\Forum\Hydrator::BASE_TYPE      => new ResultType\Forum\IndexBuilder($dbi, $logger),
+                ResultType\Link\Hydrator::BASE_TYPE       => new ResultType\Link\IndexBuilder($dbi, $logger),
+                ResultType\News\Hydrator::BASE_TYPE       => new ResultType\News\IndexBuilder($dbi, $logger),
+                ResultType\Textbox\Hydrator::BASE_TYPE    => new ResultType\Textbox\IndexBuilder($dbi, $logger),
+                ResultType\Page\Hydrator::BASE_TYPE       => new ResultType\Page\IndexBuilder($dbi, $logger),
+                ResultType\Tile\Hydrator::BASE_TYPE       => new ResultType\Tile\IndexBuilder($dbi, $logger),
+                ResultType\User\Hydrator::BASE_TYPE       => new ResultType\User\IndexBuilder($dbi, $logger),
+            ];
             foreach ($types as $type) {
-                if (!isset($indexBuilders[$type])) {
+                if (!isset($candidateIndexBuilders[$type])) {
                     $logger->error(
                         sprintf(
                             'Result type "%s" is not recognised (recognised types: %s): exiting',
                             $type,
-                            implode(', ', array_keys($indexBuilders)),
+                            implode(', ', array_keys($candidateIndexBuilders)),
                         )
                     );
                     exit(CliKernelAbstract::EXIT_STATUS_APP_ERROR);
                 }
-                $includedIndexBuilders[] = $indexBuilders[$type];
+                $includedIndexBuilders[] = $candidateIndexBuilders[$type];
             }
             $logger->notice(
                 sprintf(
