@@ -21,10 +21,10 @@ use PHPUnit\Framework\TestCase;
 class ClassCodeTest extends TestCase
 {
     /**
-     * @dataProvider providerClassCode
      * @param mixed $input
      * @param string $expected
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerClassCode')]
     public function testClassCode($input, $expected)
     {
         $outcome = (new ClassCode(null))->generate($input);
