@@ -16,7 +16,7 @@ use Aura\Router\Exception\RouteNotFound;
 use Custom\Tigs\Summative\Config;
 use Custom\Tigs\Summative\StudentAttributes;
 use DomainException;
-use External_ClassInterface;
+//use External_ClassInterface;
 use LogicException;
 use Schoolbox\Assessment\Rubric\DataModel as RubricDataModel;
 //use Schoolbox\Assessment\Term\Model as TermModel;
@@ -25,15 +25,15 @@ use Schoolbox\GenericCollection;
 //use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Mapper\DefinitionException;
 use Schoolbox\Mapper\Exception;
-use Schoolbox\Permission\Access\Access;
-use Schoolbox\Resource\Folder;
+//use Schoolbox\Permission\Access\Access;
+//use Schoolbox\Resource\Folder;
 use Schoolbox\Role;
 use Schoolbox\User;
 use Schoolbox\Filter\Filters;
 use Schoolbox\Pastoral\Mapper as PastoralMapper;
 //use Schoolbox\Pastoral\Model as Pastoral;
-use Schoolbox\Resource\Textbox;
-use Schoolbox\Learning\Assessment\DataModel as Assessment;
+//use Schoolbox\Resource\Textbox;
+//use Schoolbox\Learning\Assessment\DataModel as Assessment;
 use External_UserInterface;
 use Schoolbox\UserMapper;
 use InvalidArgumentException;
@@ -41,23 +41,23 @@ use External_User;
 use UnderflowException;
 use UnexpectedValueException;
 use Alaress\Database;
-use Schoolbox\Learning\Course\DataModel\Implementation as CourseImpl;
+//use Schoolbox\Learning\Course\DataModel\Implementation as CourseImpl;
 
 use function implode;
 
 class Controller extends Web\Controller\Base
 {
-    /** @var IConnector */
-    private $database;
+//    /** @var IConnector */
+//    private $database;
 
     /** @var External_UserInterface|External_User */
     private $externalUser;
 
-    /** @var External_ClassInterface */
-    private $externalClass;
-
-    /** @var CourseImpl\Mapper */
-    private $courseImplMapper;
+//    /** @var External_ClassInterface */
+//    private $externalClass;
+//
+//    /** @var CourseImpl\Mapper */
+//    private $courseImplMapper;
 
     /** @var UserMapper */
     private $userMapper;
@@ -65,71 +65,71 @@ class Controller extends Web\Controller\Base
     /** IConnector $externalDatabase */
     private $externalDatabase;
 
-    /** @var PastoralMapper */
-    private $pastoralMapper;
-
-    /** @var Folder\Mapper */
-    private $folderMapper;
-
-    /** @var Textbox\Mapper */
-    private $textBoxMapper;
-
-    /** @var Access */
-    private $access;
-
-    /** @var Assessment\Mapper */
-    private $assessmentMapper;
-
-    /** @var Assessment\MapperProxy */
-    private $assessmentMapperProxy;
-
-    /** @var RubricDataModel\DataSource */
-    private $rubricMapper;
+//    /** @var PastoralMapper */
+//    private $pastoralMapper;
+//
+//    /** @var Folder\Mapper */
+//    private $folderMapper;
+//
+//    /** @var Textbox\Mapper */
+//    private $textBoxMapper;
+//
+//    /** @var Access */
+//    private $access;
+//
+//    /** @var Assessment\Mapper */
+//    private $assessmentMapper;
+//
+//    /** @var Assessment\MapperProxy */
+//    private $assessmentMapperProxy;
+//
+//    /** @var RubricDataModel\DataSource */
+//    private $rubricMapper;
 
 
     /**
-     * @param IConnector             $database
+//     * @param IConnector             $database
      * @param External_UserInterface $externalUser
-     * @param External_ClassInterface $externalClass
-     * @param CourseImpl\Mapper      $courseImplMapper
+//     * @param External_ClassInterface $externalClass
+//     * @param CourseImpl\Mapper      $courseImplMapper
      * @param UserMapper             $userMapper
-     * @param PastoralMapper         $pastoralMapper
-     * @param Folder\Mapper          $folderMapper
-     * @param Textbox\Mapper         $textBoxMapper
-     * @param Access                 $access
+//     * @param PastoralMapper         $pastoralMapper
+//     * @param Folder\Mapper          $folderMapper
+//     * @param Textbox\Mapper         $textBoxMapper
+//     * @param Access                 $access
      * @param IConnector             $externalDatabase
-     * @param Assessment\Mapper      $assessmentMapper
-     * @param Assessment\MapperProxy $assessmentMapperProxy
-     * @param RubricDataModel\DataSource $rubricMapper
+//     * @param Assessment\Mapper      $assessmentMapper
+//     * @param Assessment\MapperProxy $assessmentMapperProxy
+//     * @param RubricDataModel\DataSource $rubricMapper
      */
     public function __construct(
-        IConnector $database,
+//        IConnector $database,
         External_UserInterface $externalUser,
-        External_ClassInterface $externalClass,
-        CourseImpl\Mapper $courseImplMapper,
+//        External_ClassInterface $externalClass,
+//        CourseImpl\Mapper $courseImplMapper,
         UserMapper $userMapper,
-        PastoralMapper $pastoralMapper,
-        Folder\Mapper $folderMapper,
-        Textbox\Mapper $textBoxMapper,
-        Access $access,
-        IConnector $externalDatabase,
-        Assessment\Mapper $assessmentMapper,
-        Assessment\MapperProxy $assessmentMapperProxy,
-        RubricDataModel\DataSource $rubricMapper
+//        PastoralMapper $pastoralMapper,
+//        Folder\Mapper $folderMapper,
+//        Textbox\Mapper $textBoxMapper,
+//        Access $access,
+        IConnector $externalDatabase
+//        Assessment\Mapper $assessmentMapper,
+//        Assessment\MapperProxy $assessmentMapperProxy,
+//        RubricDataModel\DataSource $rubricMapper
     ) {
-        $this->database              = $database;
+//        $this->database              = $database;
         $this->externalUser          = $externalUser;
-        $this->externalClass         = $externalClass;
-        $this->courseImplMapper      = $courseImplMapper;
+//        $this->externalClass         = $externalClass;
+//        $this->courseImplMapper      = $courseImplMapper;
         $this->userMapper            = $userMapper;
         $this->externalDatabase      = $externalDatabase;
-        $this->pastoralMapper        = $pastoralMapper;
-        $this->folderMapper          = $folderMapper;
-        $this->textBoxMapper         = $textBoxMapper;
-        $this->access                = $access;
-        $this->assessmentMapper      = $assessmentMapper;
-        $this->assessmentMapperProxy = $assessmentMapperProxy;
-        $this->rubricMapper          = $rubricMapper;
+//        $this->pastoralMapper        = $pastoralMapper;
+//        $this->folderMapper          = $folderMapper;
+//        $this->textBoxMapper         = $textBoxMapper;
+//        $this->access                = $access;
+//        $this->assessmentMapper      = $assessmentMapper;
+//        $this->assessmentMapperProxy = $assessmentMapperProxy;
+//        $this->rubricMapper          = $rubricMapper;
     }
 
 
