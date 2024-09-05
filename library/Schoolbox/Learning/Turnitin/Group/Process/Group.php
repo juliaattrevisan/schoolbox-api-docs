@@ -206,7 +206,7 @@ class Group
             $assessment = $this->assessmentMapperProxy->findById($box->getAssessmentId());
 
             $group = $this->api->retrieve('PUT', "/api/v1/groups/{$groupId}", [
-                'name' => $box->getName(),
+                'name' => $box->getAssessmentModel()->getTitle(),
                 'type' => self::GROUP_TYPE,
                 'due_date' => $assessment->getDueAt()->getZuluTime(),
                 'report_generation' => Turnitin\File\Process\Transmit::REPORT_GENERATION_COLLUSION,

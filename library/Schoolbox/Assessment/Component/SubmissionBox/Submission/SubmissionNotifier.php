@@ -215,7 +215,10 @@ class SubmissionNotifier extends AbstractModuleNotifier
 
         $student = $submission->getOwner();
         $params = [
-            'boxname' => new Param($box->getName(), "/learning/assessments/{$box->getAssessmentId()}/{$student->getId()}"),
+            'boxname' => new Param(
+                $box->getAssessmentModel()->getTitle(),
+                "/learning/assessments/{$box->getAssessmentId()}/{$student->getId()}"
+            ),
             'catname' => new CategoryParam($folder),
             'type'    => new SimpleParam($type),
         ];
@@ -322,7 +325,10 @@ class SubmissionNotifier extends AbstractModuleNotifier
             ->setParams(
                 array(
                     'owner'   => new UserParam($user),
-                    'boxname' => new Param($box->getName(), "/learning/assessments/{$box->getAssessmentId()}/$studentId"),
+                    'boxname' => new Param(
+                        $box->getAssessmentModel()->getTitle(),
+                        "/learning/assessments/{$box->getAssessmentId()}/$studentId"
+                    ),
                     'catname' => new CategoryParam($folder)
                 )
             )

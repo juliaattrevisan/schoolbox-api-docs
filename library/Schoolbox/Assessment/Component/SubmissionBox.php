@@ -63,11 +63,6 @@ class SubmissionBox implements IAssessableDataModel, ISoftDeletable
     /**
      * @var string
      */
-    protected $name;
-
-    /**
-     * @var string
-     */
     protected $description;
 
     /**
@@ -369,25 +364,6 @@ class SubmissionBox implements IAssessableDataModel, ISoftDeletable
     {
         return $this->id;
     }
-
-    /**
-     * @param  string $name
-     * @return $this
-     */
-    public function setName($name)
-    {
-        $this->name = $name;
-        return $this;
-    }
-
-    /**
-     * @return string
-     */
-    public function getName()
-    {
-        return $this->name;
-    }
-
 
     /**
      * @return GenericCollection|SubmissionBox\SingleFile\Model[]
