@@ -13,7 +13,7 @@ import { getFinaliseReviewFormData } from "../../student/util/finaliseReviewUtil
 const store = useStore();
 const itemsStore = useItemsStore();
 const studentsStore = useStudentsStore();
-const modalEl = window.Vue.ref<typeof RevealModal | null>();
+const modalEl = window.Vue.ref<InstanceType<typeof RevealModal> | null>();
 const isFinalising = window.Vue.ref(false); // to show the finalising text on the button
 const buttonText = window.Vue.computed(() => {
     // to change the button text when finalising
