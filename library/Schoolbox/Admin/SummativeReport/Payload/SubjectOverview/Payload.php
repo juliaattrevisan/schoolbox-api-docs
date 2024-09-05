@@ -73,7 +73,7 @@ WHERE cd.`class` = 'Schoolbox\\\Resource\\\Textbox\\\Component\\\Homepage\\\Cont
 and COALESCE(
         IF(cci_componentname.value = '', NULL, cci_componentname.value),
         IF(tb.heading = '', NULL, tb.heading),
-        :homepageDefaultComponentHeading
+        :homepageDefaultComponentHeading2
     )  = :componentHeading
 ORDER BY tb.updated_at ASC"
         );
@@ -100,7 +100,7 @@ ORDER BY tb.updated_at ASC"
         while ($row = $courseQuery->fetch()) {
             // cache the course folderID
             if (!isset($courses[$row['specFolderId']])) {
-                $courses[$row['specFolderId']][] = $row['specFolderId'];
+                $courses[$row['specFolderId']] = $row['specFolderId'];
             }
             // cache the class page with course data
             if (!isset($homepages[$row['implFolderId']])) {
@@ -109,17 +109,33 @@ ORDER BY tb.updated_at ASC"
             $homepages[$row['implFolderId']][$row['specFolderId']] = [
                 'title' => $row['specFolderName']
                 ];
-
         }
-        return $homepages;
         // find any textboxes that match the search term
-//        $this->textboxStatement->execute([
-//            'homepageDefaultComponentHeading' => Textbox\Component\Homepage\Controller::DEFAULT_COMPONENT_HEADING,
-//            'homepageComponentKey' => 'textbox',
-//            'componentConfigComponentNameKey' => 'componentName',
-//            'folderId' => $folderIdsPredicate->getParams()
-//        ]);
+        foreach ($courses as $id => $courseFolderId) {
+            $this->textboxStatement->execute([
+                'homepageDefaultComponentHeading' => Textbox\Component\Homepage\Controller::DEFAULT_COMPONENT_HEADING,
+                'homepageDefaultComponentHeading2' => Textbox\Component\Homepage\Controller::DEFAULT_COMPONENT_HEADING,
+                'homepageComponentKey' => 'textbox',
+                'componentConfigComponentNameKey' => 'componentName',
+                'folderId' => $courseFolderId,
+                'componentHeading' => $searchTerm
+            ]);
+            $textboxlist = [];
+            while ($row = $this->textboxStatement->fetch()) {
+                $textboxlist[] = [
+                    'componentHeading' => $row['componentHeading'],
+                    'textboxBody' => $row['textboxBody'],
+                ];
+            }
+            // assign to all homepages that contain this course:
+            foreach ($homepages as $homepageId => $homepage) {
+                if (isset($homepage[$courseFolderId])) {
+                    $homepages[$homepageId][$courseFolderId]['textboxes'] = $textboxlist;
+                }
+            }
+        }
         // sort the textboxes by course title naturally
         // return the textboxes grouped by the folder Id
+        return $homepages;
     }
 }
