@@ -17,6 +17,7 @@ use Schoolbox\Application\CliTool\App;
 use Schoolbox\Database\Factory as DatabaseFactory;
 use Schoolbox\Search\Api\Database\Index\CompositeBuilder;
 use Schoolbox\Search\Api\Database\Index\IBuilder;
+use Schoolbox\Search\Api\Database\Index\Persistor;
 use Schoolbox\Search\Api\Database\ResultType;
 
 /**
@@ -199,32 +200,8 @@ class IndexBuilder extends App
         }
 
         // Actually create data
-        $updateStatement = $dbi->prepareQuery("
-            REPLACE INTO search_index (
-                type,
-                identifier,
-                title,
-                date,
-                is_relevance_date_affected,
-                created_by,
-                folder_id,
-                fulltext_index
-            ) VALUES (
-                :type,
-                :identifier,
-                :title,
-                :date,
-                :isRelevanceDateAffected,
-                :createdBy,
-                :folderId,
-                :fulltextIndex
-            )
-        ");
-        $deleteStatement = $dbi->prepareQuery("
-            DELETE FROM search_index WHERE type = :type AND identifier = :identifier
-        ");
-
-        $time = microtime(true);
+        $persistor = new Persistor($indexBuilder, $dbi);
+        $time      = microtime(true);
         try {
             // Refresh lock before building list of updates
             $logger->debug('Refreshing lock.');
@@ -239,16 +216,7 @@ class IndexBuilder extends App
                 $this->refreshLock($lock);
 
                 try {
-                    $updateStatement->execute([
-                        'type'                    => $updatedIndex->getType(),
-                        'identifier'              => $updatedIndex->getIdentifier(),
-                        'title'                   => $updatedIndex->getTitle(),
-                        'date'                    => $updatedIndex->getDate()?->getDatabase(),
-                        'isRelevanceDateAffected' => $updatedIndex->getIsRelevanceDateAffected() ? 1 : 0,
-                        'createdBy'               => $updatedIndex->getCreatedBy(),
-                        'folderId'                => $updatedIndex->getFolderId(),
-                        'fulltextIndex'           => $updatedIndex->getFulltextIndex(),
-                    ]);
+                    $persistor->updateIndex($updatedIndex);
                 } catch (Exception $e) {
                     $logger->warning(
                         sprintf(
@@ -266,10 +234,7 @@ class IndexBuilder extends App
                 if (!$this->perform()) {
                     continue;
                 }
-                $deleteStatement->execute([
-                    'identifier' => $deletedIndex->getIdentifier(),
-                    'type'       => $deletedIndex->getType(),
-                ]);
+                $persistor->deleteIndex($deletedIndex);
             }
         } catch (LockRefreshException) {
             // Do not carry on: instead, exit politely

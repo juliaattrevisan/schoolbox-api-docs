@@ -100,7 +100,7 @@ class Persistor
      * @param Index\Model $index
      * @return void
      */
-    private function updateIndex(Index\Model $index): void
+    public function updateIndex(Index\Model $index): void
     {
         $this->updateQuery ??= $this->dbConnection->prepareQuery(self::UPDATE_SQL);
         $this->updateQuery->execute([
@@ -121,7 +121,7 @@ class Persistor
      * @param Index\Model $index
      * @return void
      */
-    private function deleteIndex(Index\Model $index): void
+    public function deleteIndex(Index\Model $index): void
     {
         $this->deleteQuery ??= $this->dbConnection->prepareQuery(self::DELETE_SQL);
         $this->deleteQuery->execute([
