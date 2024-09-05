@@ -23,6 +23,7 @@ use Schoolbox\Learning\Assessment\DataModel\ExternalMarkbook\Adapter as Markbook
 use Schoolbox\Learning\Assessment\DataModel\Mapper as AssessmentMapper;
 use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\Resource\Storage;
+use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\User;
 
 /**
@@ -589,9 +590,7 @@ class SubmissionBoxMapper extends BaseMapper
 
         // Is the student involved in this group?
         // (Need much better checking than this, this abuses session variables)
-
-        /** @var Schoolbox\Resource\Folder\Mapper $catMap */
-        $folderIdsForUser = $catMap->findFolderIdsForUser($user, true);
+        $folderIdsForUser = FolderMapper::getInstance()->findFolderIdsForUser($user, true);
 
         if (!in_array($box->getAssessmentModel()->getContextFolder(), $folderIdsForUser)) {
             // 403 forbidden error
