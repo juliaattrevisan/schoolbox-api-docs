@@ -21,6 +21,7 @@ use Psr\SimpleCache\CacheInterface;
 use Schoolbox\Admin\Navigation\Subnav;
 use Schoolbox\Admin\Settings\FieldStrategyFactory;
 use Schoolbox\Admin\SummativeReport\Payload\VictorianProgression;
+use Schoolbox\Admin\SummativeReport\Payload\SubjectOverview;
 use Schoolbox\Application\Exception\Exception;
 use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Assessment\Rubric\DataModel\DataSource as RubricDataSource;
@@ -1030,9 +1031,22 @@ class Controller extends ConfigController
             }
         }
 
+        // Subject Overviews
+        /**
+         * get the search term.
+         * collect the courses the student is enrolled in.
+         * get the subject overview for each course.
+         * sort naturally on the title
+         */
+        $subjectOverviews = [];
+        if ($optionsPayload['class']['subjectOverview']['enable']) {
+            $subjectOverviews = (new SubjectOverview\Payload())->generate($folders, $optionsPayload['class']['subjectOverview']);
+        }
+
         /* Build it
          */
         $data = [
+            'subjectOverviews'           => $subjectOverviews,
             'student'                    => $student,
             'folders'                    => $folders,
             'markbooks'                  => $markbooks,
