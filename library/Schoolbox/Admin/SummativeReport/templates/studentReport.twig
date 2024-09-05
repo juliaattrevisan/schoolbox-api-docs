@@ -612,12 +612,17 @@
                     </div>
                 {% endif %}
             </div>
-            {% if subjectOverviews is not empty %}
+            {% if subjectOverviews[folder.id] is not empty %}
                 <div>
-                    {% for overview in subjectOverviews[folder.id] %}
-                        <p class="summary-subtitle">{{ overview.title }}</p>
-                        <p>{{ overview.content }}</p>
-                    {% endfor %}
+{#                    {% if subjectOverviews[folder.id].textboxes is not empty %}#}
+                        {% for course in subjectOverviews[folder.id] %}
+                            {% if course.textboxes is not empty %}
+                            {% for textbox in  course.textboxes %}
+                                <p class="summary-subtitle">{{ course.title }}</p>
+                                <p>{{ textbox.textboxBody | purify }}</p>
+                            {% endfor %}
+                            {% endif %}
+                        {% endfor %}
                 </div>
             {% endif %}
                 {% if allGraphs['class'][folder.id] is defined %}

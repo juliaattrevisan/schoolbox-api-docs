@@ -36,6 +36,7 @@ use Schoolbox\Learning\Assessment\DueWork\Feedback\Model as DueWorkFeedback;
 use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\WorkType\Mapper as WorkTypeMapper;
+use Schoolbox\Learning\Course\DataModel\Implementation\Mapper as ImplementationMapper;
 use Schoolbox\Learning\DueWork\StateMapper;
 use Schoolbox\Learning\Grades\AssessmentComparator;
 use Schoolbox\Learning\Grades\Cohort\ClassResults;
@@ -135,6 +136,7 @@ class Controller extends ConfigController
      * @param Rebuilder $rebuilder
      * @param CacheInterface $oidcCache
      * @param \Schoolbox\External\User $externalUser
+     * @param ImplementationMapper $implementationMapper
      */
     public function __construct(
         private \Schoolbox\Error\Mapper $errorMapper,
@@ -156,6 +158,7 @@ class Controller extends ConfigController
         Rebuilder $rebuilder,
         CacheInterface $oidcCache,
         private \Schoolbox\External\User $externalUser,
+        private ImplementationMapper $implementationMapper
     ) {
         parent::__construct($configMapper, $fieldStrategyFactory, $rebuilder, $oidcCache);
     }
@@ -1039,8 +1042,12 @@ class Controller extends ConfigController
          * sort naturally on the title
          */
         $subjectOverviews = [];
-        if ($optionsPayload['class']['subjectOverview']['enable']) {
-            $subjectOverviews = (new SubjectOverview\Payload($this->folderMapper))->generate($folders, $optionsPayload['class']['subjectOverview']);
+        if ('1' === $optionsPayload['class']['subjectOverview'] ?? '0') {
+            /** @var Collection|Folder\Model[] $folders */
+            $folderIds = $folders->getPropertyValues('id');
+            if (!empty($folderIds)) {
+                $subjectOverviews = (new SubjectOverview\Payload($this->implementationMapper))->generate($folderIds, $optionsPayload['class']['subjectOverviewSearch']);
+            }
         }
 
         /* Build it
