@@ -22,7 +22,6 @@ use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\DataModel\ExternalMarkbook\Adapter as MarkbookAdapter;
 use Schoolbox\Learning\Assessment\DataModel\Mapper as AssessmentMapper;
 use Schoolbox\Mapper as BaseMapper;
-use Schoolbox\Resource\Folder;
 use Schoolbox\Resource\Storage;
 use Schoolbox\User;
 
