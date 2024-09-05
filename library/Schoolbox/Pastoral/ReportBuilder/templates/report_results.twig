@@ -148,7 +148,8 @@
 </script>
 <script>
     //Search for the record in the report to highlight
-    const checkForRecordHighlight = () => {
+    function checkForRecordHighlight()
+    {
         const hash = window.location.hash.substr(1);
         const element = document.getElementById(hash);
         if (element) {
@@ -157,7 +158,7 @@
                 element.parentElement.classList.remove('highlight-selection');
             }, 5000);
         }
-        return element;
     }
-    let currentHighlightedElement = checkForRecordHighlight();
+
+    checkForRecordHighlight();
 </script>
