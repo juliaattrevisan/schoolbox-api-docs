@@ -22,8 +22,8 @@ test.describe("Textbox Tests", () => {
     /**
      * Soft deleting the homepage with certain name to not impact the test
      */
-    test.beforeAll(async ({ tester, db }) => {
-        tester.isGoingTo("update delete_at for the textbox (folder table) so it does not impact the news tests");
+    test.beforeAll(async ({ baseTester, db }) => {
+        baseTester.isGoingTo("update delete_at for the textbox (folder table) so it does not impact the news tests");
         await db.updateInDatabase("folder", { deleted_at: "2022-01-15 11:22:34" }, { name: "Test TextBox Homepage%" });
     });
 
@@ -226,8 +226,10 @@ test.describe("Textbox Tests", () => {
     /**
      * Soft deleting data to not impact the tests
      */
-    test.afterAll(async ({ tester, db }) => {
-        tester.isGoingTo("update delete_at for the data created in this test so it does impact next suite of tests");
+    test.afterAll(async ({ baseTester, db }) => {
+        baseTester.isGoingTo(
+            "update delete_at for the data created in this test so it does impact next suite of tests",
+        );
         await db.updateInDatabase("folder", { deleted_at: "2022-01-15 11:22:34" }, { name: "Test TextBox Homepage" });
         await db.updateInDatabase("textBox", { deleted_at: "2022-01-15 11:22:34" }, { heading: "Test Text Box Title" });
         await db.updateInDatabase("textBox", { deleted_at: "2022-01-15 11:22:34" }, { heading: "Second Text Box" });
