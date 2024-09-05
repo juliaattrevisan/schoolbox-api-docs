@@ -184,24 +184,24 @@ export default class AssessmentForm {
      * Sets publish date
      * @param publishDate - The publish date to set
      */
-    async setPublishDate(publishDate: string): Promise<void> {
-        await this.page.getByTestId(AssessmentForm.SELECTOR_PUBLISH_DATE).fill(publishDate);
+    async setPublishDate(publishDate: Date): Promise<void> {
+        await this.page.getByTestId(AssessmentForm.SELECTOR_PUBLISH_DATE).fill(Common.formatDate(publishDate, true));
     }
 
     /**
      * Sets open date
      * @param openDate - The open date to set
      */
-    async setOpenDate(openDate: string): Promise<void> {
-        await this.page.getByTestId(AssessmentForm.SELECTOR_OPEN_DATE).fill(openDate);
+    async setOpenDate(openDate: Date): Promise<void> {
+        await this.page.getByTestId(AssessmentForm.SELECTOR_OPEN_DATE).fill(Common.formatDate(openDate, true));
     }
 
     /**
      * Sets due date
      * @param dueDate - The due date to set
      */
-    async setDueDate(dueDate: string): Promise<void> {
-        await this.page.getByTestId(AssessmentForm.SELECTOR_DUE_DATE).fill(dueDate);
+    async setDueDate(dueDate: Date): Promise<void> {
+        await this.page.getByTestId(AssessmentForm.SELECTOR_DUE_DATE).fill(Common.formatDate(dueDate, true));
     }
 
     /**

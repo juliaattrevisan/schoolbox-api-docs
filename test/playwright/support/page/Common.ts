@@ -274,4 +274,42 @@ export default class Common {
         const notification = await this.findNotification(text, false);
         await expect(notification).toHaveCount(0);
     }
+
+    /**
+     * Get today's date at 11:59 PM
+     * @returns - the date object
+     */
+    static getTodayAtMidnight(): Date {
+        const today = new Date();
+        today.setHours(23, 59, 59, 999);
+        return today;
+    }
+
+    /**
+     * Convert a Date object to a string in the format "dd/mm/yyyy" or "dd/mm/yyyy hh:mm[am/pm]"
+     * This is the expected format for date inputs around schoolbox
+     * @param date - the date to convert
+     * @param includeTime - whether to include the time in the string
+     * @returns - the formatted date/datetime string
+     */
+    static formatDate(date: Date, includeTime: boolean): string {
+        const zeroPad = (num: number): string => num.toString().padStart(2, "0");
+
+        const day = zeroPad(date.getDate());
+        const month = zeroPad(date.getMonth() + 1); // getMonth() returns 0-11
+        const year = date.getFullYear();
+
+        let formattedDate = `${day}/${month}/${year}`;
+
+        if (includeTime) {
+            const hours = zeroPad(date.getHours() % 12 || 12);
+            const minutes = zeroPad(date.getMinutes());
+            const ampm = date.getHours() >= 12 ? "pm" : "am";
+
+            const formattedTime = `${hours}:${minutes}${ampm}`;
+            formattedDate += ` ${formattedTime}`;
+        }
+
+        return formattedDate;
+    }
 }
