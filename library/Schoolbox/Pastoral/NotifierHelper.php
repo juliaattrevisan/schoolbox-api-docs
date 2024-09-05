@@ -61,12 +61,13 @@ class NotifierHelper
     }
 
     /**
-     * @param Report $report
+     * @param Report        $report
+     * @param Model|null    $pastoral
      * @return string
      */
-    public static function getReportHref(Report $report): string
+    public static function getReportHref(Report $report, ?Model $pastoral): string
     {
-        return sprintf("/pastoral/report/results/%d", $report->getId());
+        return sprintf("/pastoral/report/results/%d#record%d", $report->getId(), $pastoral->getId());
     }
 
     /**

@@ -23,9 +23,9 @@
             const hash = window.location.hash.substr(1);
             const element = document.getElementById(hash);
             if (element) {
-                element.parentElement.classList.add('highlight-admin-search-selection');
+                element.parentElement.classList.add('highlight-selection');
                 setTimeout(() => {
-                    element.parentElement.classList.remove('highlight-admin-search-selection');
+                    element.parentElement.classList.remove('highlight-selection');
                 }, 5000);
             }
             return element;
@@ -38,7 +38,7 @@
          */
         document.addEventListener('admin-settings-search__on-result-selected', (event) => {
             if (currentHighlightedElement) {
-                currentHighlightedElement.parentElement.classList.remove('highlight-admin-search-selection');
+                currentHighlightedElement.parentElement.classList.remove('highlight-selection');
             }
             currentHighlightedElement = checkForAdminSearchHighlight();
         });
