@@ -9,7 +9,8 @@ declare(strict_types=1);
 
 namespace Schoolbox\Search\Api\Database\Index;
 
-use Schoolbox\Search\Index\Mapper;
+use Alaress\Database\Statement\Query\IQuery;
+use Schoolbox\Search\Index;
 
 /**
  * Helper class for persisting search index updates for a single subject.
@@ -17,12 +18,56 @@ use Schoolbox\Search\Index\Mapper;
 class Persistor
 {
     /**
+     * SQL for updating the search index.
+     */
+    private const UPDATE_SQL = <<<SQL
+        REPLACE INTO search_index (
+            type,
+            identifier,
+            title,
+            date,
+            is_relevance_date_affected,
+            created_by,
+            folder_id,
+            fulltext_index
+        ) VALUES (
+            :type,
+            :identifier,
+            :title,
+            :date,
+            :isRelevanceDateAffected,
+            :createdBy,
+            :folderId,
+            :fulltextIndex
+        )
+    SQL;
+
+    /**
+     * SQL for deleting a result from the search index.
+     */
+    private const DELETE_SQL = <<<SQL
+        DELETE FROM search_index
+        WHERE type = :type
+        AND identifier = :identifier
+    SQL;
+
+    /**
+     * Query for updating the search index, only created on demand.
+     */
+    private ?IQuery $updateQuery = null;
+
+    /**
+     * Query for deleting the search index, only created on demand.
+     */
+    private ?IQuery $deleteQuery = null;
+
+    /**
      * Constructor
      *
-     * @param IBuilder $builder The search index builder: used for building search indices for the subject.
-     * @param Mapper   $mapper  The search index mapper: used for persisting search indices.
+     * @param IBuilder     $builder The search index builder: used for building search indices for the subject.
+     * @param Index\Mapper $mapper  The search index mapper: used for persisting search indices.
      */
-    public function __construct(private IBuilder $builder, private Mapper $mapper)
+    public function __construct(private IBuilder $builder, private Index\Mapper $mapper)
     {
     }
 
@@ -37,15 +82,50 @@ class Persistor
      */
     public function persist(object $subject): void
     {
-        $this->mapper->save(
-            $this->mapper->createCollection(
-                iterator_to_array($this->builder->buildUpdates(null, null, $subject))
-            ),
-        );
-        $this->mapper->delete(
-            $this->mapper->createCollection(
-                iterator_to_array($this->builder->buildDeletes(null, null, $subject))
-            ),
-        );
+        foreach ($this->builder->buildUpdates(null, null, $subject) as $index) {
+            $this->updateIndex($index);
+        }
+        foreach ($this->builder->buildDeletes(null, null, $subject) as $index) {
+            $this->deleteIndex($index);
+        }
+    }
+
+    /**
+     * Updates an index created by `$this->builder`.
+     *
+     * Mapper saves will error if the index already exists:
+     * thus, use a direct `REPLACE` query.
+     *
+     * @param Index\Model $index
+     * @return void
+     */
+    private function updateIndex(Index\Model $index): void
+    {
+        $this->updateQuery ??= $this->mapper->getDatabase()->prepareQuery(self::UPDATE_SQL);
+        $this->updateQuery->execute([
+            'type'                    => $index->getType(),
+            'identifier'              => $index->getIdentifier(),
+            'title'                   => $index->getTitle(),
+            'date'                    => $index->getDate()?->getDatabase(),
+            'isRelevanceDateAffected' => $index->getIsRelevanceDateAffected() ? 1 : 0,
+            'createdBy'               => $index->getCreatedBy(),
+            'folderId'                => $index->getFolderId(),
+            'fulltextIndex'           => $index->getFulltextIndex(),
+        ]);
+    }
+
+    /**
+     * Deletes an index created by `$this->builder`.
+     *
+     * @param Index\Model $index
+     * @return void
+     */
+    private function deleteIndex(Index\Model $index): void
+    {
+        $this->deleteQuery ??= $this->mapper->getDatabase()->prepareQuery(self::DELETE_SQL);
+        $this->deleteQuery->execute([
+            'identifier' => $index->getIdentifier(),
+            'type'       => $index->getType(),
+        ]);
     }
 }
