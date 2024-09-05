@@ -2177,8 +2177,8 @@ abstract class Kernel
             $di->lazyNew(
                 Search\Api\Database\Index\Persistor::class,
                 [
-                    'mapper'  => $mapperFactory->getLazy(Search\Index\Mapper::class),
-                    'builder' => $di->lazyGet('search.indexBuilder'),
+                    'builder'      => $di->lazyGet('search.indexBuilder'),
+                    'dbConnection' => $di->lazyGet('databaseInternal'),
                 ]
             )
         );

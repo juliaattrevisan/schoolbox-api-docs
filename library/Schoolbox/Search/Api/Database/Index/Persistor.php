@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\Search\Api\Database\Index;
 
+use Alaress\Database\Connector\IConnector;
 use Alaress\Database\Statement\IStatement;
 use Schoolbox\Search\Index;
 
@@ -64,10 +65,10 @@ class Persistor
     /**
      * Constructor
      *
-     * @param IBuilder     $builder The search index builder: used for building search indices for the subject.
-     * @param Index\Mapper $mapper  The search index mapper: used for persisting search indices.
+     * @param IBuilder   $builder      The search index builder: used for building search indices for the subject.
+     * @param IConnector $dbConnection Database connection: used for persisting search indices.
      */
-    public function __construct(private IBuilder $builder, private Index\Mapper $mapper)
+    public function __construct(private IBuilder $builder, private IConnector $dbConnection)
     {
     }
 
@@ -101,7 +102,7 @@ class Persistor
      */
     private function updateIndex(Index\Model $index): void
     {
-        $this->updateQuery ??= $this->mapper->getDatabase()->prepareQuery(self::UPDATE_SQL);
+        $this->updateQuery ??= $this->dbConnection->prepareQuery(self::UPDATE_SQL);
         $this->updateQuery->execute([
             'type'                    => $index->getType(),
             'identifier'              => $index->getIdentifier(),
@@ -122,7 +123,7 @@ class Persistor
      */
     private function deleteIndex(Index\Model $index): void
     {
-        $this->deleteQuery ??= $this->mapper->getDatabase()->prepareQuery(self::DELETE_SQL);
+        $this->deleteQuery ??= $this->dbConnection->prepareQuery(self::DELETE_SQL);
         $this->deleteQuery->execute([
             'identifier' => $index->getIdentifier(),
             'type'       => $index->getType(),
