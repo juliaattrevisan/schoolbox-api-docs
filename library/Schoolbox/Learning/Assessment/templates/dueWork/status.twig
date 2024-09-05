@@ -488,7 +488,7 @@
                             if ($(this).is(':checked')) {
                                 let id = $(this).attr(thisName);
 
-                                modal.find('[' + otherName + '="' + id + '"]').prop('checked', false);
+                                modal.find('[' + otherName + '="' + id + '"]').prop('checked', false).trigger('change');
                             }
 
                             mutexSelectAll(modal, thisName, thisSelectAll, defaultState);
