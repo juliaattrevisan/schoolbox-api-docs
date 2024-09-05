@@ -599,7 +599,7 @@ class SubmissionBoxMapper extends BaseMapper
         }
 
         // Is the submission early (before open time)?
-        if ($box->getOpenDate()->getUnixTimeStamp() > $now->getTimestamp()) {
+        if ($box->getAssessmentModel()->getOpenDate()->getUnixTimeStamp() > $now->getTimestamp()) {
             throw new Schoolbox\Resource\Exception(
                 'This submission box does not accept submissions yet.',
                 Schoolbox\Resource\Exception::CODE_SUBMISSION_NOT_YET_OPEN
