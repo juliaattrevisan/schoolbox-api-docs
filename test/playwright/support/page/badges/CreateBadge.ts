@@ -108,7 +108,7 @@ export default class CreateBadge {
         await this.typeName(badgeName);
         await this.clickBrowseIconLibraryButton();
         await this.waitModalDialogPresented();
-        await this.clickVerticalTabItem("ffood");
+        await this.clickVerticalTabItem("food");
         await this.clickBadgeImage("food/1");
         await this.clickCategoryDropDown();
         await this.clickCategoryItem(category);

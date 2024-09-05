@@ -18,11 +18,11 @@ export default class Badges {
 
     static readonly LIST_BOX_AWARD = "input[aria-controls='vs1__listbox']";
 
-    static readonly USER_DROPDOWN = "ul[role='listbox']";
+    static readonly USER_DROPDOWN = "ul[class='vs__dropdown-menu']";
 
     static readonly SELECTED_STUDENT = "span.d-center";
 
-    static readonly MODAL_BUTTON_SET_GOAL_ACHIEVEMENT = "button";
+    static readonly DATA_TEST_MODAL_BUTTON_SET_GOAL_ACHIEVEMENT = "badge-award-confirm";
 
     constructor(tester: AcceptanceTester, page: Page) {
         this.tester = tester;
@@ -57,7 +57,7 @@ export default class Badges {
      */
 
     async verifyTextIsPresented(text: string) {
-        await expect(this.page.locator("content")).toHaveText(text);
+        await expect(this.page.locator("#container")).toContainText(text);
     }
 
     /**
@@ -118,6 +118,7 @@ export default class Badges {
         await this.page.waitForSelector(Badges.USER_DROPDOWN);
         await this.page.press(Badges.LIST_BOX_GOAL, "Enter");
         await this.page.click(Badges.SELECTED_STUDENT);
+        await this.page.keyboard.press("Tab");
     }
 
     /**
@@ -129,13 +130,21 @@ export default class Badges {
         await this.page.waitForSelector(Badges.USER_DROPDOWN);
         await this.page.press(Badges.LIST_BOX_AWARD, "Enter");
         await this.page.click(Badges.SELECTED_STUDENT);
+        await this.page.keyboard.press("Tab");
     }
 
     /**
      * click Set Goal on the modal
+     * @param { string } set - The set to click
      */
-    async clickSetGoalorAwardAchievement() {
-        await this.page.click(Badges.MODAL_BUTTON_SET_GOAL_ACHIEVEMENT);
+    async clickSetGoalorAwardAchievement(set: string) {
+        await expect(
+            this.page.getByTestId(Badges.DATA_TEST_MODAL_BUTTON_SET_GOAL_ACHIEVEMENT).filter({ hasText: set }),
+        ).toBeEnabled();
+        await this.page
+            .getByTestId(Badges.DATA_TEST_MODAL_BUTTON_SET_GOAL_ACHIEVEMENT)
+            .filter({ hasText: set })
+            .click();
     }
 
     /**

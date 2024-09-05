@@ -11,7 +11,7 @@ import CreateBadge from "@schoolboxTest/playwright/support/page/badges/CreateBad
 
 test.describe("Badges tests", () => {
     /**
-     * Deleting Bagdes when the test is about to start so it does not get impacted by other tests already executed
+     * Deleting Bagades when the test is about to start so it does not get impacted by other tests already executed
      */
     test.beforeAll(async ({ tester, db }) => {
         tester.isGoingTo("update delete_at for the news article so it does not impact the news tests");
@@ -62,7 +62,6 @@ test.describe("Badges tests", () => {
      * update the category
      * Click Modify Badge
      * Ensure the Badge title and category are properly presented in the /learning/badge screen
-     * @depends createBadge
      */
     test("Modify badge", async ({ tester, page, db }) => {
         const badges = new Badges(tester, page);
@@ -92,7 +91,6 @@ test.describe("Badges tests", () => {
      * on /learning/badge click the Badge dropdown
      * Click Delete and confirm it
      * Ensure the Badge is no longer presented in the /learning/badge screen
-     * @depends modifyBadge
      */
     test("Delete badge", async ({ tester, page, db }) => {
         const badges = new Badges(tester, page);
