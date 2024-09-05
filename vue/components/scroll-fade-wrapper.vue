@@ -3,19 +3,18 @@
  * Adds fading effects to the top and bottom of the scrollable content area
  * when there is more content available to scroll to
  */
-const props = defineProps({
+interface Props {
     // The tag that will be used to wrap the content
     // Defaults to div, but exists to provide flexibility in case a different tag is desired
-    wrapperTag: {
-        type: String,
-        default: "div",
-    },
+    wrapperTag?: string;
     // The selector for the scrollable content area (what is inserted to the slot)
     // This exists to allow you to use dynamic content in the slot that may not allow a ref to be placed on it
-    slottedElementSelector: {
-        type: String,
-        default: "ul",
-    },
+    slottedElementSelector?: string; // The selector for the scrollable content area
+}
+
+const props = withDefaults(defineProps<Props>(), {
+    wrapperTag: "div",
+    slottedElementSelector: "ul",
 });
 
 const scrollContainerRef = window.Vue.ref<HTMLElement | null>(null);
@@ -25,10 +24,11 @@ const showBottomFade = window.Vue.ref(false);
 
 window.Vue.onMounted(() => {
     if (!scrollContainerRef.value) return;
-    const scrollContainer = scrollContainerRef.value.querySelector(props.slottedElementSelector);
+    // "as string" is for some reason required here... can't figure out why eslint think its [any]
+    const scrollContainer = scrollContainerRef.value.querySelector(props.slottedElementSelector as string);
     if (!scrollContainer) return;
 
-    const checkScroll = () => {
+    const checkScroll = (): void => {
         if (!scrollContainer) return;
         showTopFade.value = scrollContainer.scrollTop > 0;
         showBottomFade.value = scrollContainer.scrollTop + scrollContainer.clientHeight < scrollContainer.scrollHeight;
