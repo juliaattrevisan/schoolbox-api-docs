@@ -490,8 +490,8 @@ class CourseAssignments extends CourseAssessmentAbstract
             ->setAcceptMultiple($acceptMultiple)
             ->setMarkVisibility($markVisibility)
             ->setSelfReviewability($selfReviewability)
-            ->setExternalId((string)$canvasId)
-            ->getAssessmentModel()
+            ->setExternalId((string)$canvasId);
+        $submissionBox->getAssessmentModel()
                 ->setContextFolder($unitSpecFolder)
                 ->setWeight($weight);
 
