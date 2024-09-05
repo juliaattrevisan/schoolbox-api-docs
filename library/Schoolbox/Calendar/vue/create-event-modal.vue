@@ -12,16 +12,16 @@ import { ENDPOINTS } from "@schoolboxCalendarEvent/endpoints";
 import vSelect from "vue-select";
 import "vue-select/dist/vue-select.css";
 
-/* Render custom template for SelectizeDeselect icon/button
+/* Render custom template for Deselect icon/button
  * It's not well documented, but you can trawl through closed PRs to figger out how
  * https://github.com/sagalbot/vue-select/issues/994
  */
-import SelectizeDeselect from "@schoolboxVue/components/selectize/selectize-deselect.vue";
+import Deselect from "@schoolboxVue/components/selectize/Deselect";
 import { injectScript, isScriptAdded } from "@js/util/domUtils";
 import { EditorEvent } from "@js/editor/event/editorEvent";
 import { EditorToolbar } from "@js/editor/types/editorTypes";
 
-vSelect.props.components.default = () => ({ SelectizeDeselect });
+vSelect.props.components.default = () => ({ Deselect });
 
 export default {
     name: "create-event-modal",
