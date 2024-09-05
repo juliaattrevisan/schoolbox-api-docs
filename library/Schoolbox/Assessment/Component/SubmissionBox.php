@@ -76,14 +76,6 @@ class SubmissionBox implements IAssessableDataModel, ISoftDeletable
     protected $owner;
 
     /**
-     * If this isn't null, the submission box won't be shown on student's
-     * calendars until this date.
-     *
-     * @var Alaress_Date_Format|null
-     */
-    protected ?Alaress_Date_Format $publish_date = null;
-
-    /**
      * @var Alaress_Date_Format|null
      */
     protected ?Alaress_Date_Format $open_date = null;
@@ -688,25 +680,6 @@ class SubmissionBox implements IAssessableDataModel, ISoftDeletable
     }
 
     /**
-     * @return Alaress_Date_Format|null
-     */
-    public function getPublishDate(): ?Alaress_Date_Format
-    {
-        return $this->publish_date;
-    }
-
-    /**
-     * @param Alaress_Date_Format|null $publish_date
-     *
-     * @return static
-     */
-    public function setPublishDate(?Alaress_Date_Format $publish_date): self
-    {
-        $this->publish_date = $publish_date;
-        return $this;
-    }
-
-    /**
      * Helper method for setting dates from a form.
      *
      * @param array $formDates
@@ -726,7 +699,7 @@ class SubmissionBox implements IAssessableDataModel, ISoftDeletable
         $late_date    = isset($formDates['late_date'])
             ? \Alaress_Date_Format::newLocalShort($formDates['late_date'])->endOfDay()
             : $due_date;
-        $this->setPublishDate($publish_date);
+        $this->getAssessmentModel()->setPublishDate($publish_date);
         $this->setOpenDate($open_date);
         $this->setDueDate($due_date);
         $this->setLateDate($late_date);
