@@ -16,8 +16,8 @@ import { generateAwardWithEvidenceUrl } from "../js/awardBadgeUtils";
 
 // Render a custom template for the deselect icon.
 // Partially documented on https://github.com/sagalbot/vue-select/issues/994
-import Deselect from "@schoolboxVue/components/selectize/Deselect";
-vSelect.props.components.default = () => ({ Deselect });
+import SelectizeDeselect from "@schoolboxVue/components/selectize/selectize-deselect.vue";
+vSelect.props.components.default = () => ({ SelectizeDeselect });
 
 import { calculateExpiryDate } from "../../vue/expiry-helper";
 

@@ -11,14 +11,14 @@ import { activate, timeout } from "@schoolboxVue/components/toast/sbxToastEvent"
 import RevealModal from "@schoolboxVue/components/reveal-modal.vue";
 import LoadingTable from "@schoolboxVue/components/loading/loading-table.vue";
 import DataLoadError from "@schoolboxVue/components/error/data-load-error.vue";
-import Deselect from "@schoolboxVue/components/selectize/Deselect.vue";
+import SelectizeDeselect from "@schoolboxVue/components/selectize/selectize-deselect.vue";
 import { extractErrorMessage } from "@js/util/sbx/fetchUtils";
 import { getEmptyOAuthClient } from "../js/types/OAuthClient";
 import { ActionType } from "../js/ActionType";
 import type { OAuthClient } from "../js/types/OAuthClient";
 
 // @ts-expect-error - This is expected as per https://vue-select.org/guide/components.html#vue-3x
-vSelect.props.components.default = (): void => ({ Deselect });
+vSelect.props.components.default = (): void => ({ SelectizeDeselect });
 
 type VueSelectData = {
     // the loaded user search results

@@ -13,12 +13,12 @@ import { getFormData, getSearchString } from "@js/util/queryUtils";
 import vSelect from "vue-select";
 import "vue-select/dist/vue-select.css";
 
-/* Render custom template for Deselect icon/button
+/* Render custom template for SelectizeDeselect icon/button
  * It's not well documented, but you can trawl through closed PRs to figger out how
  * https://github.com/sagalbot/vue-select/issues/994
  */
-import Deselect from "@schoolboxVue/components/selectize/Deselect";
-vSelect.props.components.default = () => ({ Deselect });
+import SelectizeDeselect from "@schoolboxVue/components/selectize/selectize-deselect.vue";
+vSelect.props.components.default = () => ({ SelectizeDeselect });
 
 /**
  * Modal for withdrawing a single goal from a single student.
