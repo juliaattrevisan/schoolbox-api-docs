@@ -83,6 +83,8 @@ module.exports = {
         "jsdoc/require-param-type": "off",
         "jsdoc/require-returns-type": "off",
         "jsdoc/no-types": "warn",
+        // change no-unused-vars to warn instead of error (to make it less misleading)
+        "@typescript-eslint/no-unused-vars": "warn",
     },
     settings: {
         "import/parsers": {
