@@ -1,4 +1,7 @@
 <script>
+// Ignore this file for ESLint checks for now (SA-18376)
+/* eslint-disable */
+/* eslint-enable vue/no-v-html */
 /**
  * To display content that appears when requested from the bottom of the window.
  * Usually contains actions in response to selections on the page, for example choosing some users to edit.

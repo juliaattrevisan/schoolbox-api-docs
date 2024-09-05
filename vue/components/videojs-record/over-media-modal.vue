@@ -1,4 +1,7 @@
 <script>
+// Ignore this file for ESLint checks for now (SA-18376)
+/* eslint-disable */
+/* eslint-enable vue/no-v-html */
 /*
  * To notify of various media events, like camera not available or video converting/uploading
  * Just a slot really, the parent puts whatever it needs in it

@@ -1,4 +1,7 @@
 <script>
+// Ignore this file for ESLint checks for now (SA-18376)
+/* eslint-disable */
+/* eslint-enable vue/no-v-html */
 /*
  * To record some media, sits within the SB modal window under 'Record'
  */

@@ -1,4 +1,7 @@
 <script>
+// Ignore this file for ESLint checks for now (SA-18376)
+/* eslint-disable */
+/* eslint-enable vue/no-v-html */
 /**
  * Displays various usage statistics via bar charts and tables display for the entire system
  * Can be accessed at /adminv2/usage
@@ -54,7 +57,7 @@ export default {
             you've technically got a scalable and unrestricted storage space that
             you can expand on demand - though you might want to change how that
             is represented visually inside the vue component itself
-         
+
             Also it's a kind of obscure notion so this brings it front and center
         -->
         <div class="small-12 island" v-if="isS3Adapter">

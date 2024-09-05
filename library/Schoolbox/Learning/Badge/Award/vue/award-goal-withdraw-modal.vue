@@ -1,4 +1,7 @@
 <script>
+// Ignore this file for ESLint checks for now (SA-18376)
+/* eslint-disable */
+/* eslint-enable vue/no-v-html */
 import RevealModal from "@schoolboxVue/components/reveal-modal.vue";
 import { getFormData } from "@js/util/queryUtils";
 import toastMixin from "@schoolboxVue/components/toast-mixin";

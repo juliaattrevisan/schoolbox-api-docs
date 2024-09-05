@@ -1,4 +1,7 @@
 <script>
+// Ignore this file for ESLint checks for now (SA-18376)
+/* eslint-disable */
+/* eslint-enable vue/no-v-html */
 /**
  * An individual student with a linked QR code.
  * Split to consider the QR code state when multiple re-generations have taken place.

@@ -1,4 +1,7 @@
 <script>
+// Ignore this file for ESLint checks for now (SA-18376)
+/* eslint-disable */
+/* eslint-enable vue/no-v-html */
 /**
  * When there's more than one, a device list will be presented for the user to choose which input device
  * they would like to record with

@@ -1,4 +1,7 @@
 <script>
+// Ignore this file for ESLint checks for now (SA-18376)
+/* eslint-disable */
+/* eslint-enable vue/no-v-html */
 import BadgeImage from "./badge-image";
 import CodesList from "@schoolboxCurriculum/vue/codes-list";
 import MediaArticle from "@schoolboxVue/components/media-article";

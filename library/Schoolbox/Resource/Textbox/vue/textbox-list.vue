@@ -1,4 +1,7 @@
 <script>
+// Ignore this file for ESLint checks for now (SA-18376)
+/* eslint-disable */
+/* eslint-enable vue/no-v-html */
 import axios from "axios";
 import Toast from "@schoolboxVue/components/toast";
 import RevealModal from "@schoolboxVue/components/reveal-modal";

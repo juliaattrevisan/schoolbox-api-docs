@@ -1,4 +1,7 @@
 <script>
+// Ignore this file for ESLint checks for now (SA-18376)
+/* eslint-disable */
+/* eslint-enable vue/no-v-html */
 /**
  * To be able to bulk delete users from the system
  * A sortable/searchable table is displayed to select the users to delete

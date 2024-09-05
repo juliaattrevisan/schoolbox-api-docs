@@ -38,6 +38,9 @@
 </template>
 
 <script>
+// Ignore this file for ESLint checks for now (SA-18376)
+/* eslint-disable */
+/* eslint-enable vue/no-v-html */
 import RevealModal from "@schoolboxVue/components/reveal-modal";
 
 export default {

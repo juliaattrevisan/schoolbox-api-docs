@@ -1,4 +1,7 @@
 <script>
+// Ignore this file for ESLint checks for now (SA-18376)
+/* eslint-disable */
+/* eslint-enable vue/no-v-html */
 import Toast from "@schoolboxVue/components/toast";
 import mixinFilter from "@schoolboxVue/mixins/filter";
 import { getSearchString } from "@js/util/queryUtils";

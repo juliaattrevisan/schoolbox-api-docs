@@ -126,7 +126,7 @@
             </div>
         </div>
     </div>
-    <div class="row" id="submissionType" style="display:none">
+    <div class="row" id="submissionType" style="display:none" data-test="assessment-form-submission-type-container">
         <div class="small-12 columns">
             <label class="required">Select the type of submission allowed:</label>
             <ul class="option-list">
@@ -152,17 +152,17 @@
                 {% endif %}
                 <li>
                     <input id="allow-offline" {% if courseManaged.isReadonly %} readonly {% endif %} type="checkbox" {{ assessment.getEnableOffline ? 'checked' : '' }} name="submissionOptions[]" value="enableOffline" data-type-group>
-                    <label for="allow-offline" class="checkbox-label">Submit in person</label>
+                    <label for="allow-offline" class="checkbox-label" data-test="assessment-form-submission-type-allow-offline">Submit in person</label>
                     <span class="hint has-tip tip-top" data-tooltip title="This will allow students who submit their due work in person to acknowledge that it has been completed.">?</span>
                 </li>
                 <li>
                     <input id="text-editor" {% if courseManaged.isReadonly %} readonly {% endif %} type="checkbox" {{ assessment.getEnableText ? 'checked' : '' }} name="submissionOptions[]" value="enableText" data-type-group>
-                    <label for="text-editor" class="checkbox-label">Text Editor</label>
+                    <label for="text-editor" class="checkbox-label" data-test="assessment-form-submission-type-text-editor">Text Editor</label>
                     <span class="hint has-tip tip-top" data-tooltip title="This will allow students to type or paste text directly into the text editor for their submission. An HTML file gets created, which you can download and also check for similarity across submissions.">?</span>
                 </li>
                 <li>
                     <input id="files" {% if courseManaged.isReadonly %} readonly {% endif %} type="checkbox" {{ assessment.getEnableFiles ? 'checked' : '' }} name="submissionOptions[]" value="enableFiles" data-type-group>
-                    <label for="files" class="checkbox-label">File Upload</label>
+                    <label for="files" class="checkbox-label" data-test="assessment-form-submission-type-files">File Upload</label>
                     <span class="hint has-tip tip-top" data-tooltip title="This will allow students to upload files as part of their due work submission.">?</span>
                 </li>
             </ul>
