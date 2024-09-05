@@ -39,7 +39,7 @@
 } only %}
 
 {# TODO: the badge will need have abilities to determine who can see and/or modify itself individually #}
-{% set createFormRoute = routeLookupIfAuthorized('learningBadge.getCreateForm') ? routeLookupIfAuthorized('learningBadge.getCreateForm')~'?'~RETURN_URL.name~'='~RETURN_URL.current : null %}
+{% set createFormRoute = routeLookupIfAuthorized('learningBadge.getUpdateForm') ? routeLookupIfAuthorized('learningBadge.getUpdateForm')~'?'~RETURN_URL.name~'='~RETURN_URL.current : null %}
 <div class="row">
     <div class="small-12 island">
         <div id="{{ reportContentId }}">
