@@ -1,6 +1,6 @@
-import ActivityFeed from "../../Moment/Evidence/vue/feed";
-import GoalFeed from "../../Badge/Award/vue/goal-feed";
-import AchievementFeed from "../../Badge/Award/vue/achievement-feed";
+import ActivityFeed from "../../Moment/Evidence/vue/activity-feed.vue";
+import GoalFeed from "../../Badge/Award/vue/goal-feed.vue";
+import AchievementFeed from "../../Badge/Award/vue/achievement-feed.vue";
 
 window.Vue.createApp({
     components: {

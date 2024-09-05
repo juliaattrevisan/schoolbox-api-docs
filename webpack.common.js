@@ -144,7 +144,7 @@ module.exports = {
         // Learning
         learningMomentsEvidenceDetail:
             "./library/Schoolbox/Learning/Moment/Evidence/vue/learningMomentsEvidenceDetail.js",
-        userProfileFeeds: "./library/Schoolbox/Learning/vue/user-profile/userProfileFeeds.js",
+        userProfileFeeds: "./library/Schoolbox/Learning/vue/user-profile/userProfileFeeds.ts",
         badgeList: "./library/Schoolbox/Learning/Badge/vue/badgeList.js",
         badgeListForm: "./library/Schoolbox/Learning/Badge/Award/vue/badgeListForm.js",
         badgeReport: "./library/Schoolbox/Learning/Badge/Award/vue/badgeReport.js",
