@@ -83,7 +83,7 @@ class Submission implements ISoftDeletable
     public function isLate()
     {
         $now = Alaress_Date_Format::now();
-        $dueDate = $this->submissionBox->getDueDate();
+        $dueDate = $this->submissionBox->getAssessmentModel()->getDueDate();
         $isSubmitted = ! $this->isDraft();
 
         // Submitted after due date ?

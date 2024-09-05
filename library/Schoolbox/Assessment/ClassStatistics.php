@@ -100,7 +100,7 @@ class ClassStatistics
         // I don't think that term can ever be null.
         // If it's found that it can, then I'll have to just add all boxes.
         foreach ($boxCollection as $box) {
-            if ($term->contains($box->getDueDate())) {
+            if ($term->contains($box->getAssessmentModel()->getDueDate())) {
                 $this->addWork($box);
             }
         }
@@ -143,7 +143,7 @@ class ClassStatistics
                 'calc_average' => true
             ));
         } elseif ($work instanceof SubmissionBox) {
-            $stamp = $work->getDueDate()->getUnixTimeStamp();
+            $stamp = $work->getAssessmentModel()->getDueDate()->getUnixTimeStamp();
             $marks = $this->getDueWorkMarks($work);
         } else {
             return false;

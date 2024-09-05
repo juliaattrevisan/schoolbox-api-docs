@@ -71,11 +71,6 @@ class SubmissionBox implements IAssessableDataModel, ISoftDeletable
     protected $owner;
 
     /**
-     * @var Alaress_Date_Format|null
-     */
-    protected ?Alaress_Date_Format $due_date = null;
-
-    /**
      * @var bool
      */
     protected $accept_online;
@@ -291,7 +286,7 @@ class SubmissionBox implements IAssessableDataModel, ISoftDeletable
      */
     public function getGradientIndex()
     {
-        $urgency = intval(($this->getDueDate()->getUnixTimestamp() - time()) / 86400);
+        $urgency = intval(($this->getAssessmentModel()->getDueDate()->getUnixTimestamp() - time()) / 86400);
 
         return max(0, min(10, $urgency));
     }
@@ -385,25 +380,6 @@ class SubmissionBox implements IAssessableDataModel, ISoftDeletable
     public function getAcceptOnline()
     {
         return $this->accept_online;
-    }
-
-    /**
-     * @return Alaress_Date_Format|null
-     */
-    public function getDueDate(): ?Alaress_Date_Format
-    {
-        return $this->due_date;
-    }
-
-    /**
-     * @param Alaress_Date_Format|null $due_date
-     *
-     * @return static
-     */
-    public function setDueDate(?Alaress_Date_Format $due_date): self
-    {
-        $this->due_date = $due_date;
-        return $this;
     }
 
     /**
@@ -626,10 +602,11 @@ class SubmissionBox implements IAssessableDataModel, ISoftDeletable
         $late_date    = isset($formDates['late_date'])
             ? \Alaress_Date_Format::newLocalShort($formDates['late_date'])->endOfDay()
             : $due_date;
-        $this->getAssessmentModel()->setPublishDate($publish_date);
-        $this->getAssessmentModel()->setOpenDate($open_date);
-        $this->setDueDate($due_date);
-        $this->getAssessmentModel()->setCloseDate($late_date);
+        $this->getAssessmentModel()
+            ->setPublishDate($publish_date)
+            ->setOpenDate($open_date)
+            ->setDueDate($due_date)
+            ->setCloseDate($late_date);
         return $this;
     }
 
