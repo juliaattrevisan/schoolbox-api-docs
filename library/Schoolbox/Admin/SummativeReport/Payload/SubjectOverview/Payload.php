@@ -135,6 +135,11 @@ ORDER BY tb.updated_at ASC"
             }
         }
         // sort the textboxes by course title naturally
+        foreach ($homepages as $homepageId => $homepage) {
+            usort($homepages[$homepageId], function ($a, $b) {
+                return strnatcmp($a['title'], $b['title']);
+            });
+        }
         // return the textboxes grouped by the folder Id
         return $homepages;
     }
