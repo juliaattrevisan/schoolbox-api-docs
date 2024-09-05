@@ -173,7 +173,7 @@ function onNameSelected() {
 }
 
 .name {
-    color: var(--body-foreground-h1);
+    color: var(--header-font-color);
     opacity: 1;
     font-size: 1rem;
     font-weight: v-bind(fontWeight);
