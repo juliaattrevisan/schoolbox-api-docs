@@ -1,4 +1,7 @@
 <script setup>
+// Ignore this file for ESLint checks for now (SA-18376)
+/* eslint-disable */
+/* eslint-enable vue/no-v-html */
 /**
  * A selected Curriculum code, it can be deleted and
  * further details revealed via a modal

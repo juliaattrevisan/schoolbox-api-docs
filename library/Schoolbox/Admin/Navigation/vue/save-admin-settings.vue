@@ -1,4 +1,7 @@
 <script setup>
+// Ignore this file for ESLint checks for now (SA-18376)
+/* eslint-disable */
+/* eslint-enable vue/no-v-html */
 /**
  * Quicker saving of admin settings on some pages with faster save action display
  * as the save button is presented as soon as any form data changes, so there's

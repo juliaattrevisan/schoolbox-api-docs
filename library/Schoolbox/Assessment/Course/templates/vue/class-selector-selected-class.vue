@@ -1,4 +1,7 @@
 <script setup>
+// Ignore this file for ESLint checks for now (SA-18376)
+/* eslint-disable */
+/* eslint-enable vue/no-v-html */
 /**
  * An individual search result that matches the search query with search result
  * highlighted within. Selecting will take the user to relevant page/setting

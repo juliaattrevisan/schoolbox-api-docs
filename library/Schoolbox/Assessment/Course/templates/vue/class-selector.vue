@@ -1,4 +1,7 @@
 <script setup>
+// Ignore this file for ESLint checks for now (SA-18376)
+/* eslint-disable */
+/* eslint-enable vue/no-v-html */
 /**
  * To help users add classes to a course faster
  * The search field is used to find classes, then they can be selected to add in
