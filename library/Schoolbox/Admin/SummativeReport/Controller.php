@@ -1040,7 +1040,7 @@ class Controller extends ConfigController
          */
         $subjectOverviews = [];
         if ($optionsPayload['class']['subjectOverview']['enable']) {
-            $subjectOverviews = (new SubjectOverview\Payload())->generate($folders, $optionsPayload['class']['subjectOverview']);
+            $subjectOverviews = (new SubjectOverview\Payload($this->folderMapper))->generate($folders, $optionsPayload['class']['subjectOverview']);
         }
 
         /* Build it
