@@ -65,10 +65,6 @@ export default class Badges {
      * @param { number } badgeNumber - The badge number
      */
     async clickBadgeDropdown(badgeNumber: number) {
-        // await this.page.clickElementInWebComponent(
-        //     `[data-test=sbx-pop-out-badge-${badgeNumber}-dropdown]`,
-        //     `[data-test=sbx-pop-out-badge-${badgeNumber}-dropdown-button]`,
-        // );
         await this.page.click(`[data-test=sbx-pop-out-badge-${badgeNumber}-dropdown]`);
     }
 

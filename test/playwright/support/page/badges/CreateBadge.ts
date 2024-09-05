@@ -70,7 +70,7 @@ export default class CreateBadge {
      */
 
     async clickCategoryDropDown() {
-        await this.page.keyboard.press("PageDown");
+        // await this.page.keyboard.press("PageDown");
         await expect(this.page.locator(CreateBadge.CKEDITOR_TOOL_BAR)).toBeVisible();
         await this.page.click(CreateBadge.CATEGORY_DROPDOWN);
     }
@@ -80,7 +80,10 @@ export default class CreateBadge {
      * @param { string } category - The category name
      */
     async clickCategoryItem(category: string) {
-        await this.page.locator(`option[label="${category}"]`).click();
+        // await this.page.locator(`option[label="${category}"]`).click();
+
+        await this.page.locator("#badge-category").selectOption({ label: category });
+        // await page.getByLabel("Category").selectOption("2");
     }
 
     /**
