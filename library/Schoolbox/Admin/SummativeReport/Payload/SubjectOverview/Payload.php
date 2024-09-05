@@ -11,20 +11,22 @@ declare(strict_types=1);
 namespace Schoolbox\Admin\SummativeReport\Payload\SubjectOverview;
 
 use Alaress\Database\Statement\Query\IQuery;
-use Schoolbox\Learning\Course\DataModel\Implementation\Mapper;
-use Schoolbox\Resource\Folder\Mapper as FolderMapper;
+use \Schoolbox\Learning\Course\DataModel\Implementation\Mapper as ImplementationMapper;
 use Schoolbox\Resource\Textbox;
 
 class Payload
 {
     private \Alaress\Database\Statement\Query\Base|IQuery $textboxStatement;
 
-
-    public function __construct(private $folderMapper)
+    /**
+     * Payload constructor.
+     * @param ImplementationMapper $implementationMapper
+     */
+    public function __construct(private readonly ImplementationMapper $implementationMapper)
     {
         /* Only prepare the textbox statement once
          */
-        $this->textboxStatement = $this->folderMapper->getDatabase()->prepareQuery(
+        $this->textboxStatement = $this->implementationMapper->getDatabase()->prepareQuery(
         // Notes:
         //  * A similar query exists in library/Schoolbox/Search/Api/Database/ResultType/Textbox/IndexBuilder.php.
         //  * A similar query exists in \Schoolbox\Assessment\Course\Plan\Controller.php.
@@ -78,15 +80,23 @@ and COALESCE(
 ORDER BY tb.updated_at ASC"
         );
     }
+
+    /**
+     * Generate the payload for the subject overview report
+     *
+     * @param array $folderId // which homepages to search through
+     * @param string $searchTerm // what is the subject overview that we are searching for
+     * @return array
+     */
     public function generate(array $folderId, string $searchTerm): array
     {
         $courses = []; // temp storage of courses and their textbox.
         $homepages = []; // temp storage of homepages, and their course textboxes
         // find the collection of courses imported onto the specified pages
-        $predicateBuilder = $this->folderMapper->getPredicateBuilder();
+        $predicateBuilder = $this->implementationMapper->getPredicateBuilder();
         $folderIdsPredicate = $predicateBuilder->in('folder_id', $folderId);
 
-        $courseQuery = $this->folderMapper->getDatabase()->prepareQuery("select
+        $courseQuery = $this->implementationMapper->getDatabase()->prepareQuery("select
     course_specification.folder_id as specFolderId,
     folder.name as specFolderName,
     course_implementation.folder_id as implFolderId
