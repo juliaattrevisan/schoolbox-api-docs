@@ -11,7 +11,7 @@ declare(strict_types=1);
 namespace Schoolbox\Admin\SummativeReport\Payload\SubjectOverview;
 
 use Alaress\Database\Statement\Query\IQuery;
-use \Schoolbox\Learning\Course\DataModel\Implementation\Mapper as ImplementationMapper;
+use Schoolbox\Learning\Course\DataModel\Implementation\Mapper as ImplementationMapper;
 use Schoolbox\Resource\Textbox;
 
 class Payload
