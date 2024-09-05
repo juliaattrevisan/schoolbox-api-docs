@@ -139,6 +139,9 @@ test.describe("Initial Due Work functionality tests", () => {
         await assessmentForm.setMarkType(AssessmentForm.MARK_TYPE_PERCENTAGE);
         await assessmentForm.setAcceptSubmission(AssessmentForm.ACCEPT_SUBMISSION_SINGLE);
         await assessmentForm.setWeight(5);
+        await assessmentForm.checkSubmissionAllowed(AssessmentForm.ALLOW_OFFLINE);
+        await assessmentForm.checkSubmissionAllowed(AssessmentForm.TEXT_EDITOR);
+        await assessmentForm.checkSubmissionAllowed(AssessmentForm.TYPE_FILES);
         await assessmentForm.create();
 
         tester.isGoingTo("expect to see only one assessment on the homepage, named 'Test Due Work'");
@@ -156,6 +159,9 @@ test.describe("Initial Due Work functionality tests", () => {
         await assessmentForm.setWorkType(AssessmentForm.WORKTYPE_ASSESSMENT_TASK);
         await assessmentForm.setAcceptSubmission(AssessmentForm.ACCEPT_SUBMISSION_SINGLE);
         await assessmentForm.setWeight(5);
+        await assessmentForm.checkSubmissionAllowed(AssessmentForm.ALLOW_OFFLINE);
+        await assessmentForm.checkSubmissionAllowed(AssessmentForm.TEXT_EDITOR);
+        await assessmentForm.checkSubmissionAllowed(AssessmentForm.TYPE_FILES);
         await assessmentForm.create();
 
         tester.isGoingTo("expect to see two assessments on the homepage, with at least one named 'Test Due Work2'");
