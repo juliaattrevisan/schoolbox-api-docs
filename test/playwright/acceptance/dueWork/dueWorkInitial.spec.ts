@@ -36,6 +36,7 @@ const SELECTOR_ASSESSMENT_SUMMARY_CREATE_BUTTON = "assessment-summary-create-but
 const SELECTOR_ASSESSMENT_SUBMISSION_CREATE_SUBMITTEDINPERSON = "assessment-submission-create-submittedInPerson";
 const SELECTOR_ASSESSMENT_SUBMISSION_CREATE_SUBMIT = "assessment-submission-create-submit";
 const SELECTOR_ASSESSMENT_SUBMISSION_HISTORY = "assessment-submission-history";
+const SELECTOR_ASSESSMENT_SUBMISSION_INPUT_BODY = "assessment-submission-input-body";
 const SELECTOR_ASSESSMENT_RESPONSE_META_TITLE = "assessment-response-meta-title";
 const SELECTOR_ASSESSMENT_FEEDBACK_PUBLISH_BUTTON = "assessment-feedback-publish-button";
 const SELECTOR_ASSESSMENT_FEEDBACK_COMMENT_TEXTAREA = "assessment-feedback-comment-textarea"; // Append "-[userId]"
@@ -319,7 +320,76 @@ test.describe("Initial Due Work functionality tests", () => {
         ).toHaveText("Reviewed");
     });
 
-    // TODO: Continue implementing the rest of the tests from codeception
+    test("View Marked Submission", async ({ tester, page }) => {
+        const student = "Eden Reed";
+        const studentId = 6;
+
+        tester.isGoingTo("as a student, view the marked submission for 'Test Due Work'");
+        await tester.impersonate(student);
+
+        await page.goto(`learning/grades/${studentId}`);
+
+        // Click on the grade to view the submission
+        await page.locator("a.flex-grade.link-row").filter({ hasText: folderName }).click();
+
+        // Find the relevant assessment
+        const testDueWorkRow = page.locator(".assessment").filter({ hasText: "Test Due Work" });
+        await testDueWorkRow.scrollIntoViewIfNeeded();
+
+        await expect(testDueWorkRow).toBeVisible();
+        await expect(testDueWorkRow.locator(".grade")).toHaveText("65 %");
+
+        await testDueWorkRow.getByText("Test Due Work").click();
+
+        await expect(page.getByText("Feedback by Mr Jack Coles").first()).toBeVisible();
+        await expect(page.getByText("Submitted in person by Ms Eden Reed").first()).toBeVisible();
+        await expect(page.getByText("65 %").first()).toBeVisible();
+    });
+
+    test("Submit Work Typing Something By Teacher", async ({ tester, page }) => {
+        const teacher = "Jack Coles";
+
+        tester.isGoingTo("as a teacher, submit a due work");
+        await tester.impersonate(teacher);
+
+        expect(homepageUrl).toBeDefined();
+        await page.goto(homepageUrl);
+
+        const allAssessmentSelector = new RegExp(`^${SELECTOR_COMPONENT_ASSESSMENT_TITLE}`);
+        const dueWorkLocator = page.getByTestId(allAssessmentSelector).getByText("Test Due Work");
+        await dueWorkLocator.click();
+        await page.getByTestId(SELECTOR_ASSESSMENT_SUMMARY_CREATE_BUTTON).click();
+
+        const submissionInputBody = page.getByTestId(SELECTOR_ASSESSMENT_SUBMISSION_INPUT_BODY);
+        await tester.fillCKEditorByLocator(submissionInputBody, "This is a due work submission by typing something!");
+
+        await page.getByTestId(SELECTOR_ASSESSMENT_SUBMISSION_CREATE_SUBMIT).click();
+
+        await expect(page.getByTestId(SELECTOR_ASSESSMENT_SUBMISSION_HISTORY)).toContainText(
+            "Submission by Mr Jack Coles",
+        );
+    });
+
+    test("Submit Work Typing Something By Admin", async ({ tester, page }) => {
+        tester.isGoingTo("as an admin, submit a due work");
+
+        expect(homepageUrl).toBeDefined();
+        await page.goto(homepageUrl);
+
+        const allAssessmentSelector = new RegExp(`^${SELECTOR_COMPONENT_ASSESSMENT_TITLE}`);
+        const dueWorkLocator = page.getByTestId(allAssessmentSelector).getByText("Test Due Work");
+        await dueWorkLocator.click();
+        await page.getByTestId(SELECTOR_ASSESSMENT_SUMMARY_CREATE_BUTTON).click();
+
+        const submissionInputBody = page.getByTestId(SELECTOR_ASSESSMENT_SUBMISSION_INPUT_BODY);
+        await tester.fillCKEditorByLocator(submissionInputBody, "This is a due work submission by typing something!");
+
+        await page.getByTestId(SELECTOR_ASSESSMENT_SUBMISSION_CREATE_SUBMIT).click();
+
+        await expect(page.getByTestId(SELECTOR_ASSESSMENT_SUBMISSION_HISTORY)).toContainText(
+            "Submission by Schoolbox Admin",
+        );
+    });
 
     test.afterEach(async ({ tester }) => {
         await tester.logout();
