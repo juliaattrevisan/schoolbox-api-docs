@@ -11,6 +11,7 @@ namespace Schoolbox\Search\Api\Database\Index;
 
 use Alaress\Database\Connector\IConnector;
 use Alaress\Database\Statement\IStatement;
+use Alaress_Date_Format;
 use Schoolbox\Search\Index;
 
 /**
@@ -53,6 +54,24 @@ class Persistor
     SQL;
 
     /**
+     * SQL for clearing all indices from the search index.
+     *
+     * Note from original implementation:
+     * > This used to TRUNCATE instead of DELETE:
+     * > whilst TRUNCATE should be faster, it is susceptible to
+     * > crashing the database server for reasons I haven't
+     * > been able to determine.
+     * > It must acquire a lock, as it deletes and recreates the
+     * > table: this lock isn't always acquirable.
+     */
+    private const CLEAR_ALL_INDICES_SQL = 'DELETE FROM search_index';
+
+    /**
+     * SQL for clearing indices of a given type from the search index.
+     */
+    private const CLEAR_INDICES_OF_TYPE_SQL = 'DELETE FROM search_index WHERE type = :type OR type LIKE :typeLike';
+
+    /**
      * Query for updating the search index, only created on demand.
      */
     private ?IStatement $updateQuery = null;
@@ -61,6 +80,16 @@ class Persistor
      * Query for deleting the search index, only created on demand.
      */
     private ?IStatement $deleteQuery = null;
+
+    /**
+     * Query for clearing all indices, only created on demand.
+     */
+    private ?IStatement $clearAllIndicesQuery = null;
+
+    /**
+     * Query for clearing indices of type, only created on demand.
+     */
+    private ?IStatement $clearIndicesOfTypeQuery = null;
 
     /**
      * Constructor
@@ -73,13 +102,48 @@ class Persistor
     }
 
     /**
+     * Build indices to update.
+     *
+     * @see IBuilder::buildUpdates()
+     *
+     * @param Alaress_Date_Format|null $fromDate
+     * @param Alaress_Date_Format|null $toDate
+     * @param object|null              $subject
+     * @return iterable
+     */
+    public function buildUpdates(
+        ?Alaress_Date_Format $fromDate,
+        ?Alaress_Date_Format $toDate,
+        ?object $subject,
+    ): iterable {
+        return $this->builder->buildUpdates($fromDate, $toDate, $subject);
+    }
+
+    /**
+     * Build indices to update.
+     *
+     * @see IBuilder::buildDeletes()
+     *
+     * @param Alaress_Date_Format|null $fromDate
+     * @param Alaress_Date_Format|null $toDate
+     * @param object|null              $subject
+     * @return iterable
+     */
+    public function buildDeletes(
+        ?Alaress_Date_Format $fromDate,
+        ?Alaress_Date_Format $toDate,
+        ?object $subject,
+    ): iterable {
+        return $this->builder->buildDeletes($fromDate, $toDate, $subject);
+    }
+
+    /**
      * Persist changes to the search index for `$subject`.
      *
      * This persists updates to the index first, then deletions.
      *
      * @param object $subject The object to persist updates for.
      * @return void
-     * @throws \Schoolbox\Mapper\Exception
      */
     public function persist(object $subject): void
     {
@@ -127,6 +191,36 @@ class Persistor
         $this->deleteQuery->execute([
             'identifier' => $index->getIdentifier(),
             'type'       => $index->getType(),
+        ]);
+    }
+
+    /**
+     * Clear all indices from the search index.
+     *
+     * @return void
+     */
+    public function clearAllIndices(): void
+    {
+        $this->clearAllIndicesQuery ??= $this->dbConnection->prepareQuery(self::CLEAR_ALL_INDICES_SQL);
+        $this->clearAllIndicesQuery->execute();
+    }
+
+    /**
+     * Clear all indices of a given type from the search index.
+     *
+     * An index's type may either be:
+     * * an exact match for `$type`
+     * * a value which is prefixed with `$type . '.'`
+     *
+     * @param string $type
+     * @return void
+     */
+    public function clearIndicesOfType(string $type): void
+    {
+        $this->clearIndicesOfTypeQuery ??= $this->dbConnection->prepareQuery(self::CLEAR_INDICES_OF_TYPE_SQL);
+        $this->clearIndicesOfTypeQuery->execute([
+            'type'     => $type,
+            'typeLike' => $this->dbConnection->getQuoter()->escapeForLike($type . '.') . '%',
         ]);
     }
 }

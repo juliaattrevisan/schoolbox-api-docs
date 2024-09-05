@@ -156,6 +156,7 @@ class IndexBuilder extends App
             );
             $indexBuilder = new CompositeBuilder(...$includedIndexBuilders);
         }
+        $persistor = new Persistor($indexBuilder, $dbi);
 
         // Some queries run during the filling of the search_index table can take a long time to run.  It is crucial
         // that these queries be allowed to finish, because if they are interrupted, the search_index table will not be
@@ -174,40 +175,27 @@ class IndexBuilder extends App
             if (empty($types)) {
                 $logger->notice('Clearing ALL existing indices before rebuilding!');
                 if ($this->perform()) {
-                    // This used to TRUNCATE instead of DELETE:
-                    // whilst TRUNCATE should be faster, it is susceptible to
-                    // crashing the database server for reasons I haven't
-                    // been able to determine.
-                    // Tt must acquire a lock, as it deletes and recreates the
-                    // table: this lock isn't always acquirable.
-                    $dbi->execute('DELETE FROM search_index');
+                    $persistor->clearAllIndices();
                 }
             } else {
                 $logger->notice('Clearing indices for provided types before rebuilding!');
-                $deleteIndexQuery = $dbi->prepareQuery(
-                    'DELETE FROM search_index WHERE type = :type OR type LIKE :typeLike',
-                );
                 foreach ($types as $type) {
                     $logger->notice(sprintf('Clearing indices for type: %s', $type));
                     if ($this->perform()) {
-                        $deleteIndexQuery->execute([
-                            'type'     => $type,
-                            'typeLike' => $dbi->getQuoter()->escapeForLike($type . '.') . '%',
-                        ]);
+                        $persistor->clearIndicesOfType($type);
                     }
                 }
             }
         }
 
         // Actually create data
-        $persistor = new Persistor($indexBuilder, $dbi);
-        $time      = microtime(true);
+        $time = microtime(true);
         try {
             // Refresh lock before building list of updates
             $logger->debug('Refreshing lock.');
             $this->refreshLock($lock);
 
-            foreach ($indexBuilder->buildUpdates($fromDate, $toDate, null) as $updatedIndex) {
+            foreach ($persistor->buildUpdates($fromDate, $toDate, null) as $updatedIndex) {
                 if (!$this->perform()) {
                     continue;
                 }
@@ -230,7 +218,7 @@ class IndexBuilder extends App
                 }
             }
 
-            foreach ($indexBuilder->buildDeletes($fromDate, $toDate, null) as $deletedIndex) {
+            foreach ($persistor->buildDeletes($fromDate, $toDate, null) as $deletedIndex) {
                 if (!$this->perform()) {
                     continue;
                 }
