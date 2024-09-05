@@ -10,12 +10,14 @@ declare(strict_types=1);
 namespace Schoolbox\Learning\Badge;
 
 use Alaress\Authorizer\Rule;
+use Alaress\Authorizer\Rule\HasServicePermission;
 use Alaress\Module\Module as BaseModule;
 use Alaress\Twig\Loader\IChainLoader;
 use Alaress\Web\Controller\Base;
 use Closure;
 use Schoolbox\Curriculum\Node\Mapper as CurriculumNodeMapper;
 use Schoolbox\Filter;
+use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\Storage\Mapper as StorageMapper;
 use Schoolbox\Role;
 use Schoolbox\YearLevel\Mapper as YearLevelMapper;
@@ -33,6 +35,26 @@ class Module extends BaseModule
      */
     public function registerRoutes(): void
     {
+        /*
+         * Users with `write` badge service user permission
+         */
+        $permissionBadgeModeratorWrite =
+            new HasServicePermission(
+                UserAccess::SERVICE_BADGE,
+                UserAccess::ACCESS_WRITE
+            );
+
+        /*
+         * Users with `moderate` badge service user permission
+         */
+        $permissionBadgeModeratorModerate =
+            new HasServicePermission(
+                UserAccess::SERVICE_BADGE,
+                UserAccess::ACCESS_FULL
+            );
+
+        //TODO: will need to change to allow users with 'Set Goal', 'Award' or 'Modify' badge permissions
+        //TODO: also include users with 'write' and 'moderate' badge service user permissions
         $viewBadgesRule = new Rule\All(
             new Rule\IsLoggedIn(),
             new Rule\Any(
@@ -41,6 +63,14 @@ class Module extends BaseModule
             ),
         );
 
+        $writeBadgesRule = new Rule\All(
+            new Rule\IsLoggedIn(),
+            new Rule\Any(
+                $permissionBadgeModeratorWrite
+            ),
+        );
+
+        //TODO: this will need to be changed to allow moderator, creator and users with moderate badge permissions
         $manageBadgesRule = new Rule\All(
             new Rule\IsLoggedIn(),
             new Rule\Any(
@@ -82,7 +112,7 @@ class Module extends BaseModule
             self::METHOD_GET,
             '/create',
             'getCreateForm',
-            $manageBadgesRule
+            $writeBadgesRule
         );
 
         /* The form that people use to Update a Badge
@@ -121,7 +151,7 @@ class Module extends BaseModule
             self::METHOD_POST,
             '',
             'postBadge',
-            $manageBadgesRule
+            $writeBadgesRule
         );
     }
 
