@@ -263,6 +263,8 @@ $allow-sidebar-stash: $large-up;
 
             img {
                 vertical-align: top;
+                object-fit: cover;
+                max-height: $tabbar-height;
             }
         }
     }
@@ -350,6 +352,8 @@ $allow-sidebar-stash: $large-up;
                 img {
                     display: table-cell;
                     vertical-align: middle;
+                    object-fit: cover;
+                    max-height: $tabbar-height;
                 }
 
                 span {
