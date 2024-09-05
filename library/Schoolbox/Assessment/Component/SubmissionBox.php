@@ -19,7 +19,6 @@ use Schoolbox\Learning\Assessment\DataModel\IAssessableDataModel;
 use Schoolbox\Learning\Assessment\DataModel\Model;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\InlineGrader\Kami\Model as KamiModel;
-use Schoolbox\Resource\Folder\Model as FolderModel;
 use Schoolbox\Assessment\Component\SubmissionBox\MarkType;
 use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel;
 use Schoolbox\Resource\Storage;
@@ -239,7 +238,6 @@ class SubmissionBox implements IAssessableDataModel, ISoftDeletable
      */
     public function __construct()
     {
-//        $this->setCategory(new FolderModel());
         $this->setAssessmentModel(new Model());
     }
 
