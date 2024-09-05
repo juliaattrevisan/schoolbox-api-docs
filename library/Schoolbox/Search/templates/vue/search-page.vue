@@ -46,7 +46,7 @@ const searchPageEl = window.Vue.ref<HTMLDivElement>();
  * Initialise the resize observer to check the width of the search page container
  * This is done so the search page moves to single column at a certain breakpoint
  */
-function initResizeObserver() {
+function initResizeObserver(): void {
     const resizeObserver = new ResizeObserver(() => {
         store.containerWidthChange((searchPageEl.value as HTMLDivElement).getBoundingClientRect().width);
     });
@@ -56,7 +56,7 @@ function initResizeObserver() {
 /**
  * When the back button is pressed, reload the page if there's a search query
  */
-window.onpopstate = () => {
+window.onpopstate = (): void => {
     const searchParams = new URLSearchParams(document.location.search);
     if (searchParams.has(SEARCH_PARAM)) {
         document.location.reload();
@@ -78,7 +78,7 @@ window.Vue.onMounted(async () => {
  * the badge modal is closed, so we should set the boolean to
  * false so we can open it again
  */
-function onBadgeModalClosed() {
+function onBadgeModalClosed(): void {
     badgeStore.isDetailModalOpen = false;
 }
 </script>

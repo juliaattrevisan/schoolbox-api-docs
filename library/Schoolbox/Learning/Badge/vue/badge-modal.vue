@@ -31,9 +31,9 @@ const selectedNodeId = window.Vue.ref<number | null>(null);
 
 /**
  * a code has been selected in the detail modal
- * @param { Node } node - the selected node
+ * @param node - the selected node
  */
-function onCodeSelected(node: Node) {
+function onCodeSelected(node: Node): void {
     selectedNodeId.value = node.id;
     isNextSelected.value = true;
 }
@@ -41,7 +41,7 @@ function onCodeSelected(node: Node) {
 /**
  * dispatch that the modal is closed
  */
-function onModalClosed() {
+function onModalClosed(): void {
     emit("closed");
 }
 </script>

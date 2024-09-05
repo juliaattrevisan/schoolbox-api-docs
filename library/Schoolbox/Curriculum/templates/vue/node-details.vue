@@ -24,9 +24,9 @@ const hasLoadError = window.Vue.ref(false);
 
 /**
  * load al the node details, retrieving the breadcrumbs by loading all the parents
- * @param {number} nodeId - the ID of the node to load
+ * @param nodeId - the ID of the node to load
  */
-async function load(nodeId: number) {
+async function load(nodeId: number): Promise<void> {
     try {
         isLoading.value = true;
         const response = await fetch(`/api/curriculum/${nodeId}?ancestors=99`); // just use 99 as hopefully there's no tree that deep...

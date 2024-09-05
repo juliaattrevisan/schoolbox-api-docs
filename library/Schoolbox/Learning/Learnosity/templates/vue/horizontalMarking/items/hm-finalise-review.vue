@@ -40,9 +40,9 @@ window.Vue.watch(
 
 /**
  * Get the list of all students to post feedback for
- * @returns {Promise<string>[]} - the list of fetches to make
+ * @returns - the list of fetches to make
  */
-function getFetches() {
+function getFetches(): Promise<Response>[] {
     const fetchList: Promise<Response>[] = [];
     studentsStore.students.forEach((student) => {
         fetchList.push(
@@ -61,7 +61,7 @@ function getFetches() {
 /**
  * Submit the feedback then redirect to the status page
  */
-async function submitFeedback() {
+async function submitFeedback(): Promise<void> {
     isFinalising.value = true;
     activate("Finalising review...");
     try {
@@ -90,7 +90,7 @@ async function submitFeedback() {
 /**
  * To finalise review, first notifying if there are any items that have not been marked
  */
-function onSelected() {
+function onSelected(): void {
     if (studentsStore.allStudentsMarked) {
         void submitFeedback();
     } else {
@@ -101,14 +101,14 @@ function onSelected() {
 /**
  * Submit the feedback
  */
-function onConfirmSelected() {
+function onConfirmSelected(): void {
     void submitFeedback();
 }
 
 /**
  * Close the modal
  */
-function onCancelSelected() {
+function onCancelSelected(): void {
     store.isFinaliseReviewModalOpen = false;
 }
 </script>

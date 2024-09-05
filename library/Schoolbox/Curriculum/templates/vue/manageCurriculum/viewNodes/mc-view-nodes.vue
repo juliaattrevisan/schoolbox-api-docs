@@ -19,7 +19,7 @@ const nodesContainerEl = window.Vue.ref<HTMLDivElement | null>(null); // to scro
 /**
  * Clear the current search query
  */
-function onClearSearchSelected() {
+function onClearSearchSelected(): void {
     searchStore.clear();
 }
 

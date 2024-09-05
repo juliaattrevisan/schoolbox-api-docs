@@ -18,7 +18,6 @@ const nodesStore = useNodesStore();
 /**
  * Can't select the breadcrumbs or search input while updating or adding a node
  * or while nodes are being loaded
- *
  * @returns { boolean }
  */
 const isDisabled = window.Vue.computed(

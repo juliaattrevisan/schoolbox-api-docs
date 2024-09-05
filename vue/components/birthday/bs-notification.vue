@@ -18,7 +18,7 @@ const duration = window.Vue.ref(1.5);
 /**
  * Append the birthday notification to the notifications list
  */
-function appendToNotifications() {
+function appendToNotifications(): void {
     const toggle = document.querySelector("#notifications") as HTMLAnchorElement;
     if (toggle) {
         toggle.appendChild(notificationEl.value as HTMLDivElement);
@@ -28,14 +28,14 @@ function appendToNotifications() {
 /**
  * Animate stars behind the birthday bell
  */
-function animateStars() {
+function animateStars(): void {
     init(canvasEl.value as HTMLCanvasElement);
 }
 
 /**
  * Animate the birthday bell, swinging it back and forth
  */
-function animateBell() {
+function animateBell(): void {
     const bell = document.querySelector("[data-birthday-bell]");
     gsap.set(bell, { rotate: 50 });
     gsap.to(bell, {
@@ -51,7 +51,7 @@ function animateBell() {
 /**
  * Emit so the birthday modal can be shown
  */
-function onSelected() {
+function onSelected(): void {
     destroy(canvasEl.value as HTMLCanvasElement); // destroy the canvas so it doesn't keep animating
     notificationEl.value?.remove(); // remove once it's pressed so the usual notifications can be shown
     emit("selected");

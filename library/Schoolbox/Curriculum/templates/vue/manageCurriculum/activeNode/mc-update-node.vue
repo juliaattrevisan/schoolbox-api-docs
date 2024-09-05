@@ -79,7 +79,7 @@ window.Vue.watch(descriptionField, (newValue) => {
 /**
  * submit save
  */
-async function onUpdateSelected() {
+async function onUpdateSelected(): Promise<void> {
     await updateNodeStore.update();
 }
 
@@ -102,7 +102,7 @@ updateNodeStore.$onAction(({ name, after, onError }) => {
 /**
  * close the update view
  */
-function onCancelSelected() {
+function onCancelSelected(): void {
     updateNodeStore.cancel();
 }
 </script>

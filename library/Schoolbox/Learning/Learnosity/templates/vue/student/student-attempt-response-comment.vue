@@ -50,9 +50,9 @@ const saveContainerHeight = window.Vue.computed(() => {
 
 /**
  * To notify the user that they're leaving the page while data is being saved
- * @param {BeforeUnloadEvent} event - the event to prevent
+ * @param event - the event to prevent
  */
-function beforeUnloadHandler(event: BeforeUnloadEvent) {
+function beforeUnloadHandler(event: BeforeUnloadEvent): void {
     event.preventDefault();
     event.returnValue = "";
 }
@@ -60,7 +60,7 @@ function beforeUnloadHandler(event: BeforeUnloadEvent) {
 /**
  * Save the comment if it's changed
  */
-async function saveComment() {
+async function saveComment(): Promise<void> {
     if (isSaving.value) {
         return;
     }

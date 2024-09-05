@@ -22,7 +22,7 @@ const showLoadMore = window.Vue.computed(() => {
 /**
  * Load more results
  */
-async function onLoadMoreSelected() {
+async function onLoadMoreSelected(): Promise<void> {
     if (loadMoreResultsStore.isLoading) {
         return;
     }

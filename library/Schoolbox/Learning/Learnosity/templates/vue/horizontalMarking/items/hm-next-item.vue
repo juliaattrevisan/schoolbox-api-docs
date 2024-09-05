@@ -19,7 +19,7 @@ const buttonTitle = window.Vue.computed(() => {
 /**
  * To move to next item
  */
-function onSelected() {
+function onSelected(): void {
     itemsStore.toNextItem();
 }
 </script>

@@ -47,7 +47,7 @@ const templates = getTemplates(props.columnsConfig); // any columns that use tem
 /**
  * load the staff data for display
  */
-async function loadData() {
+async function loadData(): Promise<void> {
     try {
         const response = await fetch(props.endpoint);
         data.value = (await response.json()) as unknown[];
@@ -72,7 +72,7 @@ let isFirstLoad = true;
  * On smaller screens, we want to avoid the table headings and sort icons wrapping,
  * so we wrap both elements in a div and set the div to display flex
  */
-function updateTableHeadings() {
+function updateTableHeadings(): void {
     const thElements = document.querySelectorAll(`#${props.id} table th`);
     thElements.forEach((thElement) => {
         const divElement = document.createElement("div");
@@ -91,7 +91,7 @@ function updateTableHeadings() {
 /**
  * To update the table to show the UI in the footer
  */
-async function onLoaded() {
+async function onLoaded(): Promise<void> {
     if (isFirstLoad) {
         // loaded gets called on every state change, and we only want to do the below once
         isFirstLoad = false;

@@ -4,13 +4,13 @@
  * on the members currently selected
  */
 
+import BottomDrawer from "@schoolboxVue/components/bottomDrawer/bottom-drawer.vue";
 import { useSelectedNodesStore } from "./store/mcSelectedNodesStore";
 import { useDeleteNodesStore } from "./store/mcDeleteNodesStore";
 import { useEnableNodesStore } from "./store/mcEnableNodesStore";
 import { useUpdateNodeStore } from "../activeNode/store/mcUpdateNodeStore";
 import { useAddSubsectionStore } from "../activeNode/store/mcAddSubsectionStore";
 import { useNodeUsageStore } from "../activeNode/store/mcNodeUsageStore";
-import BottomDrawer from "@schoolboxVue/components/bottomDrawer/bottom-drawer.vue";
 import McSelectedNode from "./mc-selected-node.vue";
 
 const selectedNodesStore = useSelectedNodesStore(); // to keep track of selected nodes
@@ -22,7 +22,6 @@ const nodeUsageStore = useNodeUsageStore(); // so the bottom-drawer is not visib
 
 /**
  * For proper count display, eg: 'No nodes / 1 Member' / '4 nodes'
- *
  * @returns { string }
  */
 const selectedNodesSummary = window.Vue.computed(() => {
@@ -34,17 +33,16 @@ const selectedNodesSummary = window.Vue.computed(() => {
 
 /**
  * So the selected nodes can be enabled / disabled
- *
- * @param { boolean } enabled - true to enable, false to disable
+ * @param enabled - true to enable, false to disable
  */
-function onEnableNodesSelected(enabled: boolean) {
+function onEnableNodesSelected(enabled: boolean): void {
     enableNodesStore.prompt(enabled);
 }
 
 /**
  * So the selected nodes can be removed
  */
-function onDeleteNodesSelected() {
+function onDeleteNodesSelected(): void {
     deleteNodesStore.prompt();
 }
 </script>

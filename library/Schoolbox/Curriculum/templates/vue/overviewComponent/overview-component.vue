@@ -69,7 +69,7 @@ window.Vue.onMounted(() => {
  * To open the curriculum code mapping modal,
  * ensuring the latest selected nodes are displayed
  */
-function onModifySelected() {
+function onModifySelected(): void {
     ignoreUpdates(() => {
         selectedNodesStore.update(store().selectedNodes); // update to latest selected nodes prior to opening the modal
     });
@@ -80,7 +80,7 @@ function onModifySelected() {
  * The modal has been closed, so reset the selected details node id
  * to allow it to be opened again on the same node if required
  */
-function onModalClosed() {
+function onModalClosed(): void {
     store().selectedDetailsNodeId = UNSET_ID;
 }
 </script>

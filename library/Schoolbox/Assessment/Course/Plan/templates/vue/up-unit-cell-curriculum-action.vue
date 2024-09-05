@@ -45,7 +45,7 @@ const createText = window.Vue.computed(() => {
  * ensuring the relevant selected nodes are displayed by
  * passing in the folderId and componentId to target the appropriate folderNodesStore
  */
-function onModifySelected() {
+function onModifySelected(): void {
     curriculumStore.openCurriculumSelectorModal(
         props.unit.folderId,
         (component.value as CurriculumOverviewComponent).componentId,
@@ -55,7 +55,7 @@ function onModifySelected() {
 /**
  * To create a new curriculum component, adding it to the relevant units homepage
  */
-async function onCreateSelected() {
+async function onCreateSelected(): Promise<void> {
     if (isCreating.value) {
         return;
     }

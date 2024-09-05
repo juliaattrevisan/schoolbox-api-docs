@@ -19,9 +19,9 @@ const emit = defineEmits<{
 
 /**
  * dispatch an emit to notify that a node has been selected
- * @param { Node } node - the selected node
+ * @param node - the selected node
  */
-function onCodeSelected(node: Node) {
+function onCodeSelected(node: Node): void {
     emit("selected", node);
 }
 </script>

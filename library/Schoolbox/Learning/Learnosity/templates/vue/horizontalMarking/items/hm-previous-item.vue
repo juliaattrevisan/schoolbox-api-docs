@@ -12,7 +12,7 @@ const itemsStore = useItemsStore();
 /**
  * To move to previous item
  */
-function onSelected() {
+function onSelected(): void {
     itemsStore.toPreviousItem();
 }
 </script>

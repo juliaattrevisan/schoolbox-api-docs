@@ -21,8 +21,8 @@ const store = useLinkedActivitiesStore();
 
 /**
  * Check if the unit is open (Between open and close date)
- * @param {Unit} unit The unit to check
- * @returns {boolean} True if the unit is open
+ * @param unit The unit to check
+ * @returns True if the unit is open
  */
 function isUnitOpen(unit: Unit): boolean {
     return window.dayjs().isBetween(window.dayjs(unit.openDate), window.dayjs(unit.closeDate));
@@ -30,8 +30,8 @@ function isUnitOpen(unit: Unit): boolean {
 
 /**
  * Check if the unit is open or if there are any linked activities inside the unit
- * @param {Unit} unit The unit to check
- * @returns {boolean} True if the unit is open or if there are any linked activities inside the unit
+ * @param unit The unit to check
+ * @returns True if the unit is open or if there are any linked activities inside the unit
  */
 function isUnitOpenOrHasLinked(unit: Unit): boolean {
     if (isUnitOpen(unit)) {
@@ -54,8 +54,8 @@ const returnUrl = window.Vue.computed(() => {
 
 /**
  * Get the urgency class for the unit
- * @param {Unit} unit The unit to get the urgency class for
- * @returns {string} The urgency class
+ * @param unit The unit to get the urgency class for
+ * @returns The urgency class
  */
 function getUnitUrgency(unit: Unit): string {
     if (window.dayjs().isBefore(window.dayjs(unit.openDate))) {
@@ -69,8 +69,8 @@ function getUnitUrgency(unit: Unit): string {
 
 /**
  * Get the completion message for the unit
- * @param {Unit} unit The unit to get the completion message for
- * @returns {string} The completion message
+ * @param unit The unit to get the completion message for
+ * @returns The completion message
  */
 function getUnitCompletion(unit: Unit): string {
     if (window.dayjs().isBefore(window.dayjs(unit.openDate))) {

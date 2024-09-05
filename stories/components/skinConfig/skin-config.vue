@@ -71,9 +71,9 @@ const buttonColors = [
 
 /**
  * Change the color of the element
- * @param {Event} event - The event that triggered the change
+ * @param event - The event that triggered the change
  */
-function onColorChange(event: Event) {
+function onColorChange(event: Event): void {
     const colorPicker = event.target as HTMLInputElement;
     const color = colorPicker.value;
     document.documentElement.style.setProperty(colorPicker.getAttribute("data-change") as string, color);

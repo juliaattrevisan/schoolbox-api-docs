@@ -32,9 +32,9 @@ const buttonText = window.Vue.computed(() => {
 
 /**
  * To change the active card
- * @param {string} reference The reference of the card to change to
+ * @param reference The reference of the card to change to
  */
-function onItemSelected(reference: string) {
+function onItemSelected(reference: string): void {
     close();
     itemsStore.setActiveItem(reference);
 }

@@ -25,7 +25,7 @@ const newRowAmount = window.Vue.ref(0);
 /**
  * Add a new row to the list
  */
-function onAddNewRow() {
+function onAddNewRow(): void {
     const firstValidTemplate = props.availableTemplates.filter((template) => !template.deleted)[0];
 
     newRowAmount.value += 1;
@@ -40,7 +40,7 @@ function onAddNewRow() {
 /**
  * Save the changes to the course builder
  */
-async function saveChanges() {
+async function saveChanges(): Promise<void> {
     await store.saveChanges();
 }
 

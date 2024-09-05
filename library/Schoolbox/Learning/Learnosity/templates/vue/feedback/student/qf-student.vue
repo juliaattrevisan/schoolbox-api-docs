@@ -22,17 +22,17 @@ const responseContentEl = window.Vue.ref<HTMLDivElement | null>(null); // the el
 
 /**
  * To notify of a change in the comment
- * @param {string} comment - the comment to save
+ * @param comment - the comment to save
  */
-function onAttemptCommentUpdated(comment: string) {
+function onAttemptCommentUpdated(comment: string): void {
     useStudentStore().updateAttemptComment(props.student, comment);
 }
 
 /**
  * To notify of a change in the mark
- * @param {string} mark - the mark to save
+ * @param mark - the mark to save
  */
-function onAttemptMarkUpdated(mark: string) {
+function onAttemptMarkUpdated(mark: string): void {
     useStudentStore().updateAttemptMark(props.student, mark);
 }
 </script>

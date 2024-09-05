@@ -22,10 +22,9 @@ const modalNodeUsageStore = useModalNodeUsageStore();
  * This will trigger the sequential reveal modal in cs-modal to
  * move to the next in sequence, hiding the curriculum browser
  * and showing the badge modal
- *
- * @param { Usage } usage - the selected usage
+ * @param usage - the selected usage
  */
-function onUsageSelected(usage: Usage) {
+function onUsageSelected(usage: Usage): void {
     modalStore.setSelectedBadge(usage.object as BadgeUsageObject);
 }
 </script>

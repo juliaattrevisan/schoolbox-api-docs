@@ -27,7 +27,7 @@ const studentsStore = useStudentsStore();
 /**
  * To show/hide the response when selected
  */
-function onToggleSelected() {
+function onToggleSelected(): void {
     studentsStore.toggleStudent(props.student);
 }
 
@@ -73,17 +73,17 @@ window.Vue.watch(
 
 /**
  * To notify of a change in the comment
- * @param {string} comment - the comment to save
+ * @param comment - the comment to save
  */
-function onAttemptCommentUpdated(comment: string) {
+function onAttemptCommentUpdated(comment: string): void {
     studentsStore.updateAttemptComment(props.student, comment);
 }
 
 /**
  * To notify of a change in the mark
- * @param {string} mark - the mark to save
+ * @param mark - the mark to save
  */
-function onAttemptMarkUpdated(mark: string) {
+function onAttemptMarkUpdated(mark: string): void {
     studentsStore.updateAttemptMark(props.student, mark);
 }
 </script>

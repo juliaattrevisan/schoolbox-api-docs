@@ -30,7 +30,7 @@ window.Vue.watch(
 /**
  * delete the node when confirmed
  */
-async function onDeleteSelected() {
+async function onDeleteSelected(): Promise<void> {
     await deleteNodesStore.deleteNodes();
 }
 
@@ -69,7 +69,7 @@ const isModalDisabled = window.Vue.computed(() => deleteNodesStore.isProcessing)
 /**
  * to close the modal
  */
-function onCancelSelected() {
+function onCancelSelected(): void {
     deleteNodesStore.cancel();
 }
 
@@ -77,7 +77,7 @@ function onCancelSelected() {
  * ensure the isOpen is kept up to date
  * as we can currently also use foundation to close the modal
  */
-function onModalClosed() {
+function onModalClosed(): void {
     deleteNodesStore.cancel();
 }
 </script>

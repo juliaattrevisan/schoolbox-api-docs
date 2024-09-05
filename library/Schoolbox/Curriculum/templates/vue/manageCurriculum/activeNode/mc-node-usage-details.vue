@@ -21,18 +21,18 @@ const currentBadge = window.Vue.ref<BadgeUsageObject | null>(null); // the badge
 
 /**
  * Opens a modal window for viewing this badge's full details.
- * @param { BadgeUsageObject } badge - the badge to display
+ * @param badge - the badge to display
  */
-function openDetailModal(badge: BadgeUsageObject) {
+function openDetailModal(badge: BadgeUsageObject): void {
     currentBadge.value = badge;
     isBadgeModalOpen.value = true;
 }
 
 /**
  * Open a new page or open the badge modal
- * @param { Usage } usage - the selected usage
+ * @param usage - the selected usage
  */
-function onUsageSelected(usage: Usage) {
+function onUsageSelected(usage: Usage): void {
     openDetailModal(usage.object as BadgeUsageObject);
 }
 
@@ -40,7 +40,7 @@ function onUsageSelected(usage: Usage) {
  * the badge modal is closed, so we should set the boolean to
  * false so we can open it again
  */
-function onDetailModalClosed() {
+function onDetailModalClosed(): void {
     isBadgeModalOpen.value = false;
 }
 </script>

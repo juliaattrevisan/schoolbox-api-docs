@@ -76,16 +76,16 @@ const allResults = window.Vue.computed(() => {
 
 /**
  * Input added
- * @param {string} value - The input value
+ * @param value - The input value
  */
-function onInput(value: string) {
+function onInput(value: string): void {
     keyword.value = value;
 }
 
 /**
  * Arrow pressed down, moving to next result
  */
-function onArrowDown() {
+function onArrowDown(): void {
     if (arrowCounter.value < allResults.value.length - 1) {
         arrowCounter.value += 1;
     }
@@ -94,7 +94,7 @@ function onArrowDown() {
 /**
  * Arrow pressed up, moving to previous result
  */
-function onArrowUp() {
+function onArrowUp(): void {
     if (arrowCounter.value > -1) {
         arrowCounter.value -= 1;
     }
@@ -135,7 +135,7 @@ window.Vue.watch(keyword, () => {
 /**
  * Navigate to the chosen result or submit the form to go to the search page
  */
-function onEnter() {
+function onEnter(): void {
     if (arrowCounter.value >= 0) {
         window.location.href = allResults.value[arrowCounter.value].url;
     } else {
@@ -146,7 +146,7 @@ function onEnter() {
 /**
  * Submit the form, heading to the search page
  */
-function onClicked() {
+function onClicked(): void {
     if (keyword.value.length === 0) {
         window.location.href = paths.searchPage;
     } else {
@@ -157,7 +157,7 @@ function onClicked() {
 /**
  * Only close the search results if the user clicks outside of the entire search component
  */
-function onClickOutside() {
+function onClickOutside(): void {
     isFocused.value = false;
     isActive.value = false;
     isSelected.value = false;
@@ -166,7 +166,7 @@ function onClickOutside() {
 /**
  * The search input has gained focus
  */
-function onFocusOver() {
+function onFocusOver(): void {
     isFocused.value = true;
     isSelected.value = true;
 }
@@ -176,7 +176,7 @@ function onFocusOver() {
  * we want to keep any search results open until the user clicks outside
  * of the header search component
  */
-function onFocusOut() {
+function onFocusOut(): void {
     if (keyword.value.length === 0) {
         isFocused.value = false;
     }
@@ -185,7 +185,7 @@ function onFocusOut() {
 /**
  * The user has hovered over the search bar
  */
-function onMouseOver() {
+function onMouseOver(): void {
     isActive.value = true;
     // If left nav is unpinned and currently open, close it
     const offCanvasWrap = document.getElementById("off-canvas-wrap") as HTMLDivElement;
@@ -212,7 +212,7 @@ function onMouseOver() {
  * The mouse has moved off the search bar, though we want to keep the search input 'active'
  * if focus is still on the search input
  */
-function onMouseOut() {
+function onMouseOut(): void {
     if (!isFocused.value) {
         isActive.value = false;
     }

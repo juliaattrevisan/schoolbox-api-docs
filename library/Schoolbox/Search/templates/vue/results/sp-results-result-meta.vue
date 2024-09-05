@@ -16,17 +16,17 @@ const props = withDefaults(defineProps<Props>(), {
 
 /**
  * To display the date in format
- * @returns {string} the formatted date
+ * @returns the formatted date
  */
-function getDateShort() {
+function getDateShort(): string {
     return window.dayjs(props.result.date).format("DD/MM/YYYY");
 }
 
 /**
  * To display the date in format
- * @returns {string} the formatted date
+ * @returns the formatted date
  */
-function getDateLong() {
+function getDateLong(): string {
     return window.dayjs(props.result.date).format("dddd, MMMM D, YYYY");
 }
 </script>

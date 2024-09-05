@@ -23,14 +23,14 @@ const store = useStore(props.folderId, props.componentInstanceId);
 /**
  * To open the curriculum code mapping modal
  */
-function onMapSelected() {
+function onMapSelected(): void {
     emit("mapSelected");
 }
 
 /**
  * To prompt the user to udpate the currently selected Curriculum Tree Filter
  */
-function onFilterSelected() {
+function onFilterSelected(): void {
     const component = document.getElementById(`component${props.componentInstanceId}`) as HTMLDivElement;
     const toggleButton = component.querySelector('[data-target="settings"]') as HTMLLinkElement;
     if (toggleButton.getAttribute("data-state") === "opened") {

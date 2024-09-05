@@ -16,7 +16,7 @@ const buttonText = window.Vue.computed(() => {
 /**
  * To move to previous item
  */
-function onSelected() {
+function onSelected(): void {
     studentsStore.toggleAllStudents();
 }
 </script>

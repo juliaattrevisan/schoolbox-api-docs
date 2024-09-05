@@ -40,9 +40,9 @@ window.Vue.watch(
  * passing in the node id to load within node-details
  * the id is the only property that's required, as the other
  * details will be loaded in
- * @param { Event } event - the click event
+ * @param event - the click event
  */
-function onNodeLinkSelected(event: Event) {
+function onNodeLinkSelected(event: Event): void {
     event.preventDefault();
     const { href } = event.currentTarget as HTMLAnchorElement;
     const selectedNodeId = parseInt(href.substring(href.indexOf("#") + 1, href.length), 10);
@@ -56,7 +56,7 @@ function onNodeLinkSelected(event: Event) {
 /**
  * find any links on the page that should open the details modal
  */
-function findNodeLinks() {
+function findNodeLinks(): void {
     const nodeLinks = document.querySelectorAll("[data-display-node]");
     nodeLinks.forEach((nodeLink) => {
         nodeLink.addEventListener("click", (event) => onNodeLinkSelected(event));
@@ -72,7 +72,7 @@ window.Vue.onMounted(() => {
 /**
  * The modal has been closed, so emit the closed event
  */
-function onModalClosed() {
+function onModalClosed(): void {
     emit("closed");
 }
 </script>

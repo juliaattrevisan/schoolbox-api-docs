@@ -34,9 +34,9 @@ const isChecked = window.Vue.computed(() => {
 
 /**
  * add or remove based on the current status
- * @param { boolean } isCheckedChange - whether the Node is selected or not
+ * @param isCheckedChange - whether the Node is selected or not
  */
-function onChange(isCheckedChange: boolean) {
+function onChange(isCheckedChange: boolean): void {
     selectedNodesStore.switchNode(props.node, isCheckedChange);
 }
 </script>

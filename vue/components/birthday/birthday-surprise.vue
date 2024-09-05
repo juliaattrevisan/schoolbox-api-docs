@@ -13,7 +13,7 @@ const isModalActive = window.Vue.ref(false); /*  */
 /**
  * To display the birthday modal
  */
-function onNotificationSelected() {
+function onNotificationSelected(): void {
     isModalActive.value = true;
     if (modalEl.value === null) return; // no modal yet
     modalEl.value.open();

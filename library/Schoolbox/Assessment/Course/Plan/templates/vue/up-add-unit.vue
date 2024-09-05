@@ -22,7 +22,7 @@ const addButtonText = window.Vue.computed(() => {
 /**
  * to close the add unit view
  */
-function onCancelSelected() {
+function onCancelSelected(): void {
     addUnitStore.cancel();
     hasNoName.value = false;
 }
@@ -30,7 +30,7 @@ function onCancelSelected() {
 /**
  * to add a new unit
  */
-function onAddSelected() {
+function onAddSelected(): void {
     if (addUnitStore.isProcessing) {
         return;
     }

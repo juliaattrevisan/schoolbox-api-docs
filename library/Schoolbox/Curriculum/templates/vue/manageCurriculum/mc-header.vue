@@ -14,7 +14,7 @@ const addCurriculumStore = useAddCurriculumStore();
 /**
  * To show / hide the add curriculum display
  */
-function onCreateNewSelected() {
+function onCreateNewSelected(): void {
     if (addCurriculumStore.isOpen) {
         addCurriculumStore.cancel();
     } else {

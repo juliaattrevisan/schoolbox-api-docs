@@ -8,7 +8,7 @@ const emit = defineEmits(["selected"]);
 /**
  * Dispatch to notify of selection
  */
-function onSelected() {
+function onSelected(): void {
     emit("selected");
 }
 </script>

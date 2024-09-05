@@ -12,7 +12,7 @@ const filtersStore = useFiltersStore();
 /**
  * Search again with all the filters cleared
  */
-async function onNoFiltersSelected() {
+async function onNoFiltersSelected(): Promise<void> {
     await searchStore.clearFiltersAndSearch();
 }
 </script>

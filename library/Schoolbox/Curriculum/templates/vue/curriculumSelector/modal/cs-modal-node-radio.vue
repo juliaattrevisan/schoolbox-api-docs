@@ -33,7 +33,7 @@ const isChecked = window.Vue.computed(() => modalSelectedNodesStore.isSelected(p
 /**
  * add a single node to the selected nodes store
  */
-function onChange() {
+function onChange(): void {
     modalSelectedNodesStore.addSingle(props.node);
 }
 </script>

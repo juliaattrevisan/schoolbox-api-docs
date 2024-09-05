@@ -22,17 +22,17 @@ const emit = defineEmits<{
 
 /**
  * To notify of a change in the mark
- * @param {string} mark - the mark to save
+ * @param mark - the mark to save
  */
-function onAttemptMarkUpdated(mark: string) {
+function onAttemptMarkUpdated(mark: string): void {
     emit("updatedMark", mark);
 }
 
 /**
  * To notify of a change in the comment
- * @param {string} comment - the comment to save
+ * @param comment - the comment to save
  */
-function onAttemptCommentUpdated(comment: string) {
+function onAttemptCommentUpdated(comment: string): void {
     emit("updatedComment", comment);
 }
 </script>

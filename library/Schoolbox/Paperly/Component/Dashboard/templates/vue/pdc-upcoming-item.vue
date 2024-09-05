@@ -12,9 +12,9 @@ const props = defineProps<Props>();
 
 /**
  * To display the formatted due date
- * @returns {string} - the formatted due date eg: Mon 01 Jan at 12:00pm
+ * @returns - the formatted due date eg: Mon 01 Jan at 12:00pm
  */
-function getDate() {
+function getDate(): string {
     return window.dayjs(props.item.due).format("ddd DD MMM [at] h:mma");
 }
 </script>

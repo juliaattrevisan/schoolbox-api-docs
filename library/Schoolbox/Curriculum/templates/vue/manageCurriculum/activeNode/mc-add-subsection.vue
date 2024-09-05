@@ -79,7 +79,7 @@ window.Vue.watch(descriptionField, (newValue) => {
 /**
  * submit save
  */
-async function onAddSubsectionSelected() {
+async function onAddSubsectionSelected(): Promise<void> {
     await addSubsectionStore.add();
 }
 
@@ -103,7 +103,7 @@ addSubsectionStore.$onAction(({ name, after, onError }) => {
 /**
  * close the addSubsection view
  */
-function onCancelSelected() {
+function onCancelSelected(): void {
     addSubsectionStore.cancel();
 }
 </script>

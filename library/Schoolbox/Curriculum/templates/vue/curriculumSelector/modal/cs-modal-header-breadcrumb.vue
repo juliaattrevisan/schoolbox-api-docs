@@ -5,8 +5,8 @@
  */
 
 import { shortenLength } from "@js/util/stringUtils";
-import { useModalViewNodesStore } from "../store/csModalViewNodesStore";
 import type { Breadcrumb } from "@schoolboxCurriculum/types/Breadcrumb";
+import { useModalViewNodesStore } from "../store/csModalViewNodesStore";
 
 interface Props {
     breadcrumb: Breadcrumb; // the relevant breadcrumb
@@ -21,7 +21,7 @@ const modalViewNodesStore = useModalViewNodesStore();
 /**
  * to display the just selected node
  */
-function onSelected() {
+function onSelected(): void {
     modalViewNodesStore.setSelected(props.breadcrumb.depth as number, props.breadcrumb.id);
 }
 </script>

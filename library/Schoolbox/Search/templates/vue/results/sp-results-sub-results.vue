@@ -40,9 +40,9 @@ const showLoadMore = window.Vue.computed(() => {
 
 /**
  * To collect all the params to send to the search api
- * @returns {string} - the query params
+ * @returns - the query params
  */
-function getEndpointWithParams() {
+function getEndpointWithParams(): string {
     const newQueryParams = useStore().getQueryParams();
     newQueryParams.append("cursor", props.result._subResults?.metadata?.cursor.next as string);
     const subResultsUrl = props.result._subResults?.metadata.url as string;
@@ -52,7 +52,7 @@ function getEndpointWithParams() {
 /**
  * load more sub results
  */
-async function loadMore() {
+async function loadMore(): Promise<void> {
     url.value = getEndpointWithParams();
     try {
         isLoading.value = true;
@@ -84,7 +84,7 @@ async function loadMore() {
 /**
  * Load more sub results when the button is selected
  */
-async function onLoadMoreSelected() {
+async function onLoadMoreSelected(): Promise<void> {
     if (isLoading.value) {
         return;
     }
@@ -93,11 +93,11 @@ async function onLoadMoreSelected() {
 
 /**
  * To determine whether the sub result is the last one
- * @param {number} index - the index of the sub result
- * @returns {boolean} - whether the sub result is the last one
+ * @param index - the index of the sub result
+ * @returns - whether the sub result is the last one
  */
-function isLast(index: number) {
-    if (!props.result._subResults) {
+function isLast(index: number): boolean {
+    if (props.result._subResults === undefined) {
         return false;
     }
     return index === props.result._subResults.data.length - 1;

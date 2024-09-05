@@ -31,7 +31,7 @@ const props = defineProps<Props>();
 /**
  * To show the print option under three dot menu
  */
-function onPrintSelected() {
+function onPrintSelected(): void {
     window.print();
 }
 </script>

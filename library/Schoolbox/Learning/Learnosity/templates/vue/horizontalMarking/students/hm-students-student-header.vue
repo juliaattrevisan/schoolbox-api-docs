@@ -24,7 +24,7 @@ const itemsStore = useItemsStore();
 /**
  * To show/hide the response when selected
  */
-function onToggleSelected() {
+function onToggleSelected(): void {
     emit("toggle", props.student);
 }
 </script>

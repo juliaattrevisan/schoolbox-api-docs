@@ -21,7 +21,7 @@ const viewNodesStore = useViewNodesStore();
 /**
  * to display the just selected node
  */
-function onSelected() {
+function onSelected(): void {
     viewNodesStore.setSelected(props.breadcrumb.depth as number, props.breadcrumb.id);
 }
 </script>

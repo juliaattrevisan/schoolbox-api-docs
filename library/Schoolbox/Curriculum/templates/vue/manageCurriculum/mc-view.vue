@@ -17,14 +17,14 @@ const addCurriculumStore = useAddCurriculumStore();
 /**
  * Reload the page to try loading again
  */
-function onRefreshSelected() {
+function onRefreshSelected(): void {
     window.location.reload();
 }
 
 /**
  * Display the prompt to create a new curriculum
  */
-function onCreateNewSelected() {
+function onCreateNewSelected(): void {
     addCurriculumStore.prompt();
 }
 </script>

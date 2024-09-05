@@ -7,6 +7,7 @@
 import { gsap, CustomEase, CustomBounce } from "gsap/all";
 import type GSAPTimeline from "gsap";
 
+// eslint-disable-next-line @typescript-eslint/no-unsafe-argument -- The plugins import as <any> so we need to ignore this
 gsap.registerPlugin(CustomEase, CustomBounce); // Register the custom plugins otherwise they won't work
 
 const emit = defineEmits<{
@@ -20,7 +21,7 @@ let afterCakeTimeline: GSAPTimeline; // the timeline triggered after (onComplete
  * Emit to start showing the stars in the background and pop up the happy birthday message,
  * also popping the modal and flicking the candles
  */
-function onCakeAnimated() {
+function onCakeAnimated(): void {
     emit("revealed"); // to start showing the stars in the background
     afterCakeTimeline = gsap.timeline();
     afterCakeTimeline.to("#happy-birthday", { duration: 2, scale: 1, ease: "elastic.out" });
@@ -78,8 +79,9 @@ function onCakeAnimated() {
  * Animate the cake
  * see https://gsap.com/docs/v3/GSAP/Timeline/ for more information on timelines
  */
-function animateCake() {
+function animateCake(): void {
     // create a custom bounce ease for the cake slices landing
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access -- The plugin is imported as <any> so we need to ignore this
     CustomBounce.create("myBounce", {
         strength: 0.1,
         squash: 0.3,

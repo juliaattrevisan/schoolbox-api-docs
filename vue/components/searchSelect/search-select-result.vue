@@ -32,7 +32,7 @@ const isSelected = window.Vue.computed(() => {
 /**
  * To toggle the selected state of the result
  */
-function onSelected() {
+function onSelected(): void {
     emit("select", props.result);
 }
 </script>

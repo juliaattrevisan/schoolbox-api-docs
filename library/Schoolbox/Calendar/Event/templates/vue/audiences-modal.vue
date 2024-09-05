@@ -2,7 +2,7 @@
     <div>
         <reveal-modal ref="modal">
             <template v-if="isGroupTemplate">
-                <div class="small-12 medium-6 columns no-pad" v-if="groups.length">
+                <div v-if="groups.length" class="small-12 medium-6 columns no-pad">
                     <p><strong>Groups</strong></p>
                     <ul>
                         <li v-for="group in groups" :key="group.id">
@@ -12,7 +12,7 @@
                 </div>
             </template>
             <template v-else>
-                <div class="small-12 medium-6 columns no-pad" v-if="campuses.length">
+                <div v-if="campuses.length" class="small-12 medium-6 columns no-pad">
                     <p>
                         <strong>{{ campusesLabel }}</strong>
                     </p>
@@ -22,7 +22,7 @@
                         </li>
                     </ul>
                 </div>
-                <div class="small-12 medium-6 columns no-pad" v-if="roles.length">
+                <div v-if="roles.length" class="small-12 medium-6 columns no-pad">
                     <p>
                         <strong>{{ rolesLabel }}</strong>
                     </p>

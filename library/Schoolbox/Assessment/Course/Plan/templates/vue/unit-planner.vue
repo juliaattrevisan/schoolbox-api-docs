@@ -52,7 +52,6 @@ const containerHeight = window.Vue.ref(window.innerHeight);
 
 /**
  * Updates the scroll position of the unit planner container to allow draggables to position themselves correctly
- * @returns {void}
  */
 function updateScrollPosition(): void {
     if (!unitPlannerContainerEl.value) return;
@@ -62,7 +61,6 @@ function updateScrollPosition(): void {
 /**
  * Updates the height of the scrollable area, such that no vertical scrollbar is shown for the whole page.
  * This is to ensure the horizontal scrollbar of the unit planner is always visible.
- * @returns {void}
  */
 function updateContainerHeight(): void {
     if (!tabsEl.value || !unitPlannerContainerEl.value) {

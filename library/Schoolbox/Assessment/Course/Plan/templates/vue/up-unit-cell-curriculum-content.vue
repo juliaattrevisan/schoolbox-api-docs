@@ -40,9 +40,9 @@ window.Vue.onMounted(() => {
 
 /**
  * Update the isEmpty value based on the filtered node state changing from a child component
- * @param {boolean} hasFilteredNodes Whether there are filtered nodes
+ * @param hasFilteredNodes Whether there are filtered nodes
  */
-function onHasFilteredNodeChange(hasFilteredNodes: boolean) {
+function onHasFilteredNodeChange(hasFilteredNodes: boolean): void {
     isEmpty.value = !hasFilteredNodes;
 }
 

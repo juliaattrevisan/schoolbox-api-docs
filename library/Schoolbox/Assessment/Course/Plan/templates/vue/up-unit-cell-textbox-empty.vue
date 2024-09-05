@@ -28,7 +28,7 @@ const emptyStateTemplateMessage = window.Vue.computed(() => {
 /**
  * When the modify button is clicked.
  */
-function onModifyClicked() {
+function onModifyClicked(): void {
     // Let the parent component know that the modify button was clicked,
     // so that it can handle the action. E.g. focus the ckeditor
 

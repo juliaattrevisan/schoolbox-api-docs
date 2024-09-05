@@ -30,14 +30,14 @@ const title = window.Vue.computed<string>(() => {
 /**
  * To open a modal that shows further info on the selected code
  */
-function onTitleSelected() {
+function onTitleSelected(): void {
     selectedNodesStore.setActiveNode(props.node);
 }
 
 /**
  * To remove from the selected list
  */
-function onRemoveSelected() {
+function onRemoveSelected(): void {
     selectedNodesStore.remove(props.node);
 }
 </script>

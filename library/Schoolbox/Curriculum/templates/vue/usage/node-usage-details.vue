@@ -22,7 +22,6 @@ const emit = defineEmits(["select"]);
 
 /**
  * to gradually and more marginLeft to indicate node level depth
- *
  * @returns { number }
  */
 const marginLeft = window.Vue.computed(() => `calc(${props.depth * 2}rem)`);
@@ -30,13 +29,12 @@ const marginLeft = window.Vue.computed(() => `calc(${props.depth * 2}rem)`);
 /**
  * Reload the page to try loading again
  */
-function onRefreshSelected() {
+function onRefreshSelected(): void {
     window.location.reload();
 }
 
 /**
  * Whether we should show the usage lists
- *
  * @returns { boolean }
  */
 const hasUsage = window.Vue.computed(() => {
@@ -54,7 +52,6 @@ type ActiveUsageType = {
 
 /**
  * Return the list of active usages, grouped by type
- *
  * @returns { Array }
  */
 const activeUsages = window.Vue.computed(() => {
@@ -109,7 +106,7 @@ const activeUsages = window.Vue.computed(() => {
             <fieldset class="content">
                 <node-usage-details-description :node="props.node" />
                 <div v-if="hasUsage" class="usage-list-container">
-                    <div v-for="activeUsage in activeUsages">
+                    <div v-for="activeUsage in activeUsages" :key="activeUsage.title">
                         <h4>{{ activeUsage.title }} ({{ activeUsage.count }})</h4>
                         <ul class="usage-list">
                             <node-usage-details-item

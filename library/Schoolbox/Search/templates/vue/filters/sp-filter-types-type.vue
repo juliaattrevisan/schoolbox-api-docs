@@ -16,7 +16,7 @@ const isOpen = window.Vue.ref(false); // whether the sub type are shown
 /**
  * To show/hide the sub types when selected
  */
-function onShowSubTypesSelected() {
+function onShowSubTypesSelected(): void {
     isOpen.value = !isOpen.value;
 }
 
