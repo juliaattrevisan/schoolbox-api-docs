@@ -41,7 +41,7 @@ export default class Star {
 
     /**
      * Store the properties for reference within draw
-     * @param {StarInitProps} init - the properties of the streamer
+     * @param init - the properties of the streamer
      */
     constructor(init: StarInitProps) {
         this.x = init.x;
@@ -53,17 +53,17 @@ export default class Star {
 
     /**
      * Get a random colour
-     * @returns {string} - the colour of the streamer
+     * @returns - the colour of the streamer
      */
-    static getRandomColour() {
+    static getRandomColour(): string {
         return colours[Math.floor(Math.random() * colours.length)];
     }
 
     /**
      * Draw the star as specified by the current properties
-     * @param {CanvasRenderingContext2D} context -see https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D
+     * @param context -see https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D
      */
-    draw(context: CanvasRenderingContext2D) {
+    draw(context: CanvasRenderingContext2D): void {
         context.save(); // save the default state prior to rotation
 
         context.translate(this.x, this.y); // to rotate the canvas

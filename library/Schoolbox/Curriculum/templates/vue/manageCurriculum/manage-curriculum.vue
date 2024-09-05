@@ -50,7 +50,7 @@ const selectedNodesStore = useSelectedNodesStore();
 /**
  * Display an error if we cant find the node id that we jump to straight on page load
  */
-function initErrorListener() {
+function initErrorListener(): void {
     useNodesStore().$onAction(({ name, onError }) => {
         if (name === "loadId") {
             onError((error) => {
@@ -67,7 +67,7 @@ function initErrorListener() {
  * So we can traverse the history when moving forward and back
  * through the node tree
  */
-function initHistoryListener() {
+function initHistoryListener(): void {
     window.addEventListener("popstate", (event) => {
         void useViewNodesStore().updateOnPopState(event.state as { nodeId: number });
     });
@@ -87,7 +87,7 @@ window.Vue.onMounted(async () => {
 /**
  * close the modal, setting the activeNode to null so we can allow another selection
  */
-function onSelectedNodeModalClosed() {
+function onSelectedNodeModalClosed(): void {
     selectedNodesStore.setActiveNode(getEmptyNode());
 }
 </script>

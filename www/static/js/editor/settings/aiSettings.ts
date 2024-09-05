@@ -15,8 +15,8 @@ interface SbxAIAssistantConfig {
 
 /**
  * Returns the settings for the AI assistant
- * @param { string | undefined } model - the model to use for the AI assistant
- * @returns { SbxAIAssistantConfig } - the AI Assistant settings
+ * @param model - the model to use for the AI assistant
+ * @returns - the AI Assistant settings
  */
 export function getAISettings(model: string | undefined): SbxAIAssistantConfig {
     return {

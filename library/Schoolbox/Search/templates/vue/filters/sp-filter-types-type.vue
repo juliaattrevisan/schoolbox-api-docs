@@ -16,7 +16,7 @@ const isOpen = window.Vue.ref(false); // whether the sub type are shown
 /**
  * To show/hide the sub types when selected
  */
-function onShowSubTypesSelected() {
+function onShowSubTypesSelected(): void {
     isOpen.value = !isOpen.value;
 }
 
@@ -27,7 +27,7 @@ window.Vue.watch(
     () => filterTypesStore.isExpanded,
     (newValue) => {
         isOpen.value = newValue;
-    }
+    },
 );
 
 /**
@@ -70,7 +70,7 @@ window.Vue.watch(
         ) {
             filterTypesStore.removeType(props.type);
         }
-    }
+    },
 );
 
 /**

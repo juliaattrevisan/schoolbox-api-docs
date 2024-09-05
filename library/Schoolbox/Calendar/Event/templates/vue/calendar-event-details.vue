@@ -1,4 +1,7 @@
 <script>
+// Ignore this file for ESLint checks for now (SA-18376)
+/* eslint-disable */
+/* eslint-enable vue/no-v-html */
 import AudiencesModal from "./audiences-modal";
 import MediaArticle from "@schoolboxVue/components/media-article";
 import debounce from "lodash/debounce";
@@ -15,12 +18,12 @@ import checks from "@schoolboxCalendarEvent/checks";
 import vSelect from "vue-select";
 import "vue-select/dist/vue-select.css";
 
-/* Render custom template for Deselect icon/button
+/* Render custom template for SelectizeDeselect icon/button
  * It's not well documented, but you can trawl through closed PRs to figger out how
  * https://github.com/sagalbot/vue-select/issues/994
  */
-import Deselect from "@schoolboxVue/components/selectize/Deselect";
-vSelect.props.components.default = () => ({ Deselect });
+import SelectizeDeselect from "@schoolboxVue/components/selectize/selectize-deselect.vue";
+vSelect.props.components.default = () => ({ SelectizeDeselect });
 
 const FORMAT_LONG_DATE = "dddd, MMMM DD, YYYY"; // Monday, October 01, 2019
 const FORMAT_LONG_DATE_WITH_TIME = "dddd, MMMM DD, YYYY h:mma"; // Monday, October 01, 2019 02:30pm

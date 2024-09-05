@@ -1,4 +1,7 @@
 <script setup>
+// Ignore this file for ESLint checks for now (SA-18376)
+/* eslint-disable */
+/* eslint-enable vue/no-v-html */
 /**
  * A curriculum node to select to traverse further down the tree,
  * will also highlight any matches in the current search query when search is active

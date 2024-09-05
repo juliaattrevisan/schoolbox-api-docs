@@ -1,4 +1,7 @@
 <script>
+// Ignore this file for ESLint checks for now (SA-18376)
+/* eslint-disable */
+/* eslint-enable vue/no-v-html */
 /**
  * To select who will be able to see the news item
  * Various options are presented within a modal to
@@ -315,7 +318,7 @@ export default {
                             key,
                             selectedItem.name,
                             $item,
-                            selectedItem.labels
+                            selectedItem.labels,
                         );
 
                         if (!audienceIsReadOnly) {

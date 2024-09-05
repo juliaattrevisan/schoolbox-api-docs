@@ -10,9 +10,9 @@ import { useStudentsStore } from "../store/hmStudentsStore";
 
 /**
  * store any passed through properties
- * @param {string} reportPayloads - the report payload
+ * @param reportPayloads - the report payload
  */
-export function loadReports(reportPayloads: string[]) {
+export function loadReports(reportPayloads: string[]): void {
     let reportsLoaded = 0;
     for (let i = 0; i < reportPayloads.length; i += 1) {
         const initOptions = JSON.parse(reportPayloads[i]) as LearnosityReportInitOptions;
@@ -26,7 +26,7 @@ export function loadReports(reportPayloads: string[]) {
          */
         const reportCallback = {
             // eslint-disable-next-line @typescript-eslint/no-loop-func
-            readyListener: () => {
+            readyListener: (): void => {
                 // @ts-expect-error -- reportsApp is global but untyped, this should be investigated at some point to determine if we can get this from learnosity
                 // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-use-before-define
                 const attemptReport = (reportsApp as unknown).getReport(reportId);

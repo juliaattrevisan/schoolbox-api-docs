@@ -1,4 +1,7 @@
 <script>
+// Ignore this file for ESLint checks for now (SA-18376)
+/* eslint-disable */
+/* eslint-enable vue/no-v-html */
 /**
  * To record, playback and upload a camera recording into SB
  * It currently always sits within a parent, currently #evidence-media-recording and #record-medida-modal

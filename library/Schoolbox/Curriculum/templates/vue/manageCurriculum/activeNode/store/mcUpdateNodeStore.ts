@@ -8,8 +8,8 @@ import type { Node, NodeToUpdate } from "@schoolboxCurriculum/types/Node";
 
 /**
  * Create a copy so the data is only updated once actually saved
- * @param { NodeToUpdate } node - the node to copy
- * @returns { Node } the copy of the node details
+ * @param node - the node to copy
+ * @returns the copy of the node details
  */
 function getActiveNodeCopy(node: NodeToUpdate): NodeToUpdate {
     return {
@@ -21,8 +21,8 @@ function getActiveNodeCopy(node: NodeToUpdate): NodeToUpdate {
 
 /**
  * Get the data to pass to the backend
- * @param { NodeToUpdate } node - the node details to pass to the backend
- * @returns { string } the JSON to pass
+ * @param node - the node details to pass to the backend
+ * @returns the JSON to pass
  */
 function getFormData(node: NodeToUpdate): string {
     return JSON.stringify({
@@ -39,9 +39,9 @@ export const useUpdateNodeStore = defineStore("mcUpdateNode", () => {
 
     /**
      * to display a prompt to update a nodes details
-     * @param { Node } node - node to update
+     * @param node - node to update
      */
-    function prompt(node: Node) {
+    function prompt(node: Node): void {
         useActiveNodeStore().set(node);
         activeNodeCopy.value = getActiveNodeCopy(node);
         isOpen.value = true;
@@ -50,14 +50,14 @@ export const useUpdateNodeStore = defineStore("mcUpdateNode", () => {
     /**
      * to hide the update details prompt
      */
-    function cancel() {
+    function cancel(): void {
         useActiveNodeStore().unset();
         isOpen.value = false;
     }
 
     /**
      * update the nodes details in the back end
-     * @returns { { id: number, message: string } } the id of the node and a message
+     * @returns the id of the node and a message
      */
     async function update(): Promise<{ id: number; message: string }> {
         try {

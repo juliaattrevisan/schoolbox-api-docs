@@ -17,7 +17,7 @@ export const useLoadMoreResultsStore = defineStore("spLoadMoreResults", () => {
     /**
      * load more results
      */
-    async function loadMore() {
+    async function loadMore(): Promise<void> {
         const resultsStore = useResultsStore();
         url.value = `${useStore().getEndpointWithParams()}&cursor=${resultsStore.latestResults.metadata.cursor.next}`;
         try {

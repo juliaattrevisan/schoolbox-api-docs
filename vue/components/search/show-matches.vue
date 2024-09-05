@@ -45,9 +45,9 @@ const emit = defineEmits<{
 
 /**
  * When the element is clicked, emit the click event
- * @param {Event} event the event that triggered the click
+ * @param event the event that triggered the click
  */
-function onClicked(event: Event) {
+function onClicked(event: Event): void {
     // to prevent the default action, which is to navigate to the href if the element is an anchor
     if (props.preventDefault) {
         event.preventDefault();

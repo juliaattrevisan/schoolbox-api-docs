@@ -22,48 +22,45 @@ const searchStore = useSearchStore();
 
 /**
  * Only enable search once a first node is selected
- *
- * @returns { Boolean }
+ * @returns {boolean}
  */
 const isDisabled = window.Vue.computed(() => !viewNodesStore.isActive || props.isDisabled);
 
 /**
  * Only enable search once a first node is selected
- *
- * @returns { String }
+ * @returns {string}
  */
 const placeholder = window.Vue.computed(() => {
     if (!viewNodesStore.isActive) {
         return "Expand a curriculum to enable search...";
-    } else {
-        return `Search for codes or keywords...`;
     }
+    return `Search for codes or keywords...`;
 });
+
+/**
+ * debounce to avoid constant polling while the user is typing
+ */
+const debounceSearch = debounce(async () => {
+    await searchStore.search();
+}, DEBOUNCE_AMOUNT);
 
 /**
  * start searching once the search is active, watching the query string for input
  */
 window.Vue.watch(
     () => searchStore.query,
-    () => {
+    async () => {
         if (searchStore.isActive) {
             searchStore.enableSearch();
-            debounceSearch();
+            await debounceSearch();
         }
     },
 );
 
 /**
- * debounce to avoid constant polling while the user is typing
- */
-const debounceSearch = debounce(() => {
-    searchStore.search();
-}, DEBOUNCE_AMOUNT);
-
-/**
  * Clear the current search query
  */
-function onClearSearchSelected() {
+function onClearSearchSelected(): void {
     searchStore.clear();
 }
 </script>
@@ -98,8 +95,8 @@ function onClearSearchSelected() {
         <div class="long switch">
             <input
                 id="show-only-enabled"
-                type="checkbox"
                 v-model="viewNodesStore.showDisabled"
+                type="checkbox"
                 data-test-show-only-enabled
                 :disabled="props.isDisabled"
             />

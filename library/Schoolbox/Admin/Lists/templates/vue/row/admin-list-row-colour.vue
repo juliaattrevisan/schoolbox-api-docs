@@ -1,4 +1,7 @@
 <script>
+// Ignore this file for ESLint checks for now (SA-18376)
+/* eslint-disable */
+/* eslint-enable vue/no-v-html */
 /**
  * To initiate the Coloris colour picker and keep track of the colour changes
  * Make use of v-model to keep track of <input> changes

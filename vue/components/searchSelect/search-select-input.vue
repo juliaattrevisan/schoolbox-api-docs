@@ -16,9 +16,9 @@ const currentInput = window.Vue.ref<string>("");
 
 /**
  * Input updated, update internaly and dispatch emit
- * @param {Event} event - The event object
+ * @param event - The event object
  */
-function onInput(event: Event) {
+function onInput(event: Event): void {
     currentInput.value = (event.target as HTMLInputElement).value;
     emit("input", currentInput.value);
 }

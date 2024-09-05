@@ -28,9 +28,9 @@ const ids = window.Vue.computed(() => {
 
 /**
  * To remove a selected search result
- * @param {Result} result - the result to remove
+ * @param result - the result to remove
  */
-function onRemoveItem(result: Result) {
+function onRemoveItem(result: Result): void {
     emit("remove", result);
 }
 </script>

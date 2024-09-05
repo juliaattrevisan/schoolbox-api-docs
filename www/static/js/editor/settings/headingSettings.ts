@@ -2,7 +2,7 @@ import type { HeadingConfig } from "@ckeditor/ckeditor5-heading";
 
 /**
  * Returns the settings for the headings dropdown
- * @returns {{ heading: HeadingConfig }} - the heading settings
+ * @returns - the heading settings
  */
 export function getHeadingSettings(): { heading: HeadingConfig } {
     return {

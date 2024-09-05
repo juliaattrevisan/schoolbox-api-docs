@@ -1,4 +1,7 @@
 <script>
+// Ignore this file for ESLint checks for now (SA-18376)
+/* eslint-disable */
+/* eslint-enable vue/no-v-html */
 /**
  * Show a badge report for a class / group of users which can be filtered,
  * and from where new goals / acheievements can be assigned

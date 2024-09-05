@@ -17,48 +17,42 @@ export default class TextboxForm {
         this.page = page;
     }
 
-    async fillHeading(heading: string) {
+    async fillHeading(heading: string): Promise<void> {
         await this.page.waitForSelector('input[name="heading"]');
         await this.page.locator('input[name="heading"]').fill(heading);
-
-        return this;
     }
 
-    async seeInHeading(heading: string) {
+    async seeInHeading(heading: string): Promise<void> {
         await expect(this.page.locator(`${TextboxForm.FORM} input[name="textBoxHeading"]`)).toHaveValue(heading);
-        return this;
     }
 
-    async fillContent(description: string, textBoxItem: number) {
+    async fillContent(description: string, textBoxItem: number): Promise<void> {
         const descriptionTextarea = this.page.getByTestId(`component-textbox-${textBoxItem}`);
         await this.tester.fillCKEditorByLocator(descriptionTextarea, description);
     }
 
-    async seeInContent(content: string) {
+    async seeInContent(content: string): Promise<this> {
         const id = await this.page.locator(`${TextboxForm.FORM} textarea[name^="textBoxBody"]`).getAttribute("id");
         await expect(this.page.locator(`#${id}`)).toHaveText(content);
         return this;
     }
 
-    async submit() {
+    async submit(): Promise<void> {
         await this.page.click('input[type=submit][value="Create Text Box"]');
         await this.page.waitForTimeout(2000);
-        return this;
     }
 
-    async modify() {
+    async modify(): Promise<void> {
         await this.page
             .locator('div[class="component-container Schoolbox_Resource_Textbox_Component_Homepage_Controller"]')
             .scrollIntoViewIfNeeded();
         await this.page.locator('button[data-action="modify"]').click();
-        return this;
     }
 
-    async save() {
+    async save(): Promise<void> {
         await this.page
             .locator('div[class="component-container Schoolbox_Resource_Textbox_Component_Homepage_Controller"]')
             .scrollIntoViewIfNeeded();
         await this.page.locator('button[data-action="save"]').click();
-        return this;
     }
 }

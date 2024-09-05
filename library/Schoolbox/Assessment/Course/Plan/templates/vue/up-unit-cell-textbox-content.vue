@@ -46,9 +46,9 @@ const isEmpty = window.Vue.computed(() => {
 
 /**
  * When a new editor is created
- * @param { EditorCreatedEventInfo } event - the editor created event data
+ * @param event - the editor created event data
  */
-function onEditorCreated(event: EditorCreatedEventInfo) {
+function onEditorCreated(event: EditorCreatedEventInfo): void {
     editor = event.editor as InlineEditor;
 
     editor.ui.focusTracker.on("change:isFocused", (_, __, isFocused: boolean) => {
@@ -90,7 +90,7 @@ function onEditorCreated(event: EditorCreatedEventInfo) {
 /**
  * Initialize the CKEditor instance
  */
-async function initEditor() {
+async function initEditor(): Promise<void> {
     if (!editorContentEl.value) return;
     if (editorInitialised.value) return;
 
@@ -117,7 +117,7 @@ async function initEditor() {
 /**
  * Focus the editor
  */
-async function focusEditor() {
+async function focusEditor(): Promise<void> {
     // Don't focus if the textbox hasn't been created yet
     if (!textboxStore.textboxIsCreated(props.unit.id, props.column)) return;
 

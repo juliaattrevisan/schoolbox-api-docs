@@ -1,4 +1,7 @@
 <script setup>
+// Ignore this file for ESLint checks for now (SA-18376)
+/* eslint-disable */
+/* eslint-enable vue/no-v-html */
 /**
  * Quicker saving of admin settings on some pages with faster save action display
  * as the save button is presented as soon as any form data changes, so there's
@@ -79,7 +82,7 @@ function initFormChangeListeners() {
                 //update the linked <textarea>, which doesn't update until form save otherwise
                 event.detail.sourceElement.textContent = editor.getData();
                 onFormDataChange();
-            }, 350)
+            }, 350),
         );
     }
     /**
@@ -94,7 +97,7 @@ function initFormChangeListeners() {
             "keyup",
             debounce(() => {
                 onFormDataChange();
-            }, 350)
+            }, 350),
         );
     }
 }

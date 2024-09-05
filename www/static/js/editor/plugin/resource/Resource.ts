@@ -10,7 +10,7 @@ import ResourceEditing from "./ResourceEditing";
 import AutoResource from "./AutoResource";
 
 export default class Resource extends Plugin {
-    static get requires() {
+    static get requires(): (typeof ResourceUI | typeof ResourceEditing | typeof AutoResource)[] {
         return [ResourceUI, ResourceEditing, AutoResource];
     }
 }

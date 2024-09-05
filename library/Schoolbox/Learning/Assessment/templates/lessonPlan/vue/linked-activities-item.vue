@@ -17,8 +17,8 @@ const store = useLinkedActivitiesStore();
 /**
  * Get the name of the unit that the activity belongs to
  * Will also include the project name if the activity is part of a project
- * @param { Activity } activity The activity to get the meta for
- * @returns { string } Unit name with project name if applicable
+ * @param activity The activity to get the meta for
+ * @returns Unit name with project name if applicable
  */
 function getActivityMeta(activity: Activity): string {
     return activity.unit + (activity.projectName ? ` | ${activity.projectName}` : "");
@@ -27,7 +27,7 @@ function getActivityMeta(activity: Activity): string {
 /**
  * Handle the unlink button click event
  */
-function handleUnlinkClick() {
+function handleUnlinkClick(): void {
     store.clearChanges();
     store.removeActivity(props.activity);
     store.isSingleUnlinkOpen = true;
@@ -36,9 +36,9 @@ function handleUnlinkClick() {
 /**
  * Get the colour gradient class for the activity, that helps indicate the
  * completion status of the current activity
- * @returns {string} The urgency class
+ * @returns The urgency class
  */
-function getUrgency() {
+function getUrgency(): string {
     return store.gradeGradientEnable
         ? getGradient(props.activity.completionCount, props.activity.studentCount)
         : "gradient-none";
@@ -46,10 +46,10 @@ function getUrgency() {
 
 /**
  * This is intended to match the behaviour in progressTick.twig.
- * @param { Activity } activity The activity whose progressTick we want to describe.
- * @returns { string } A description to be used as mouseover text.
+ * @param activity The activity whose progressTick we want to describe.
+ * @returns A description to be used as mouseover text.
  */
-function getProgressTickMouseoverTitle(activity: Activity) {
+function getProgressTickMouseoverTitle(activity: Activity): string {
     const { progressTick } = activity; // This syntax means the same as 'progressTick = activity.progressTick;'
 
     if (progressTick === null) {
@@ -74,10 +74,10 @@ function getProgressTickMouseoverTitle(activity: Activity) {
 
 /**
  * This is intended to match the behaviour in progressTick.twig.
- * @param { Activity } activity The relevant activity.
- * @returns { string } A string to be used as the value of the 'data-progress-tick-status' attribute.
+ * @param activity The relevant activity.
+ * @returns A string to be used as the value of the 'data-progress-tick-status' attribute.
  */
-function getDataProgressTickStatus(activity: Activity) {
+function getDataProgressTickStatus(activity: Activity): string {
     const { progressTick } = activity; // This syntax means the same as 'progressTick = activity.progressTick;'
 
     if (progressTick === null) {
@@ -98,10 +98,10 @@ function getDataProgressTickStatus(activity: Activity) {
 
 /**
  * This is intended to match the behaviour in progressTick.twig.
- * @param { Activity } activity The activity whose progressTick we want to describe
- * @returns { string } A description to be used as mouseover text
+ * @param activity The activity whose progressTick we want to describe
+ * @returns A description to be used as mouseover text
  */
-function getDataProgressTickForm(activity: Activity) {
+function getDataProgressTickForm(activity: Activity): string {
     return activity.isSelfAssessableTask ? "selfAssessed" : "teacherAssessed";
 }
 

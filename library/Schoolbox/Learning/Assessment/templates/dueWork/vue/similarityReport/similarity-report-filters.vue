@@ -1,4 +1,7 @@
 <script>
+// Ignore this file for ESLint checks for now (SA-18376)
+/* eslint-disable */
+/* eslint-enable vue/no-v-html */
 /**
  * Contains the similarity report filters, score and status
  */
@@ -47,7 +50,9 @@ export default {
             this.$nextTick(() => {
                 //to ensure the latest filtered rows are available, dispatched to similarity-report-row-similarity.vue and similarity-report.vue
                 document.dispatchEvent(
-                    new CustomEvent(FilterEvents.SIMILARITY_SCORE, { detail: { score: this.similarityScoreSelection } })
+                    new CustomEvent(FilterEvents.SIMILARITY_SCORE, {
+                        detail: { score: this.similarityScoreSelection },
+                    }),
                 );
             });
         },

@@ -16,9 +16,9 @@ const badgeStore = useBadgeStore();
 
 /**
  * Get the badge to award, adding the type and expiry to it
- * @param {BadgeAward["type"]} type - The type of badge to award
+ * @param type - The type of badge to award
  */
-async function awardBadge(type: BadgeAward["type"]) {
+async function awardBadge(type: BadgeAward["type"]): Promise<void> {
     const getBadge = await fetch(`learning/badge/${props.result.id}`);
     const badge = (await getBadge.json()) as Badge;
     const badgeAward: BadgeAward = {

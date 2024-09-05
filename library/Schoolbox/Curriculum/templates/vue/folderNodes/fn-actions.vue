@@ -20,7 +20,7 @@ const emit = defineEmits<{
 /**
  * To open the curriculum code mapping modal
  */
-function onModifySelected() {
+function onModifySelected(): void {
     emit("modifySelected");
 }
 </script>

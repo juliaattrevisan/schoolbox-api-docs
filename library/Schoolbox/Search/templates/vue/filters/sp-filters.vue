@@ -20,16 +20,16 @@ const isOpen = window.Vue.ref(true); // whether the filters are shown
 
 /**
  * Whenever the input is updated, update the query store
- * @param {string} value - The input value
+ * @param value - The input value
  */
-function onInput(value: string) {
+function onInput(value: string): void {
     queryStore.query = value;
 }
 
 /**
  * To show/hide the filters when selected
  */
-function onToggleSelected() {
+function onToggleSelected(): void {
     isOpen.value = !isOpen.value;
 }
 
@@ -52,14 +52,14 @@ const titleText = window.Vue.computed(() => {
 /**
  * clear all the selected filters
  */
-function onClearAllSelected() {
+function onClearAllSelected(): void {
     filtersStore.clear();
 }
 
 /**
  * apply the selected filters with the current search query
  */
-function onSearch() {
+function onSearch(): void {
     if (!searchStore.canSearch) {
         return;
     }
@@ -87,7 +87,7 @@ window.Vue.watch(
         if (newValue !== oldValue && newValue === true) {
             isOpen.value = false;
         }
-    }
+    },
 );
 </script>
 

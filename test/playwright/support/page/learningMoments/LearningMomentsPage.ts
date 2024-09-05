@@ -55,8 +55,8 @@ export default class LearningMomentsPage {
 
     /**
      * Gets url to create a learning moment for a student
-     * @param { number } studentId - The student ID
-     * @returns { string } - the URL
+     * @param studentId - The student ID
+     * @returns - the URL
      */
     public static getStudentProfilePage(studentId: number): string {
         return this.URL.replace("{student_id}", studentId.toString());
@@ -65,63 +65,63 @@ export default class LearningMomentsPage {
     /**
      * Click "Share a learning moment" link in the student profile page
      */
-    async clickShareLearningMomentLink() {
+    async clickShareLearningMomentLink(): Promise<void> {
         await this.page.getByTestId(LearningMomentsPage.SHARE_LEARNING_MOMENTS_LINK).click();
     }
 
     /**
      * Verify the "Share a learning moment" link exists in the student profile page
      */
-    async verifyShareLearningMomentLinkExists() {
+    async verifyShareLearningMomentLinkExists(): Promise<void> {
         await expect(this.page.getByTestId(LearningMomentsPage.SHARE_LEARNING_MOMENTS_LINK)).toBeVisible();
     }
 
     /**
      * Click "Take a photo" button on the modal
      */
-    async clickTakeAPhoto() {
+    async clickTakeAPhoto(): Promise<void> {
         await this.page.getByTestId(LearningMomentsPage.TAKE_A_PHOTO_BUTTON).click();
     }
 
     /**
      * Click "Write something" button on the modal
      */
-    async clickWriteSomething() {
+    async clickWriteSomething(): Promise<void> {
         await this.page.getByTestId(LearningMomentsPage.TAKE_WRITE_SOMETHING).click();
     }
 
     /**
      * Click "Take a photo" button on the create evidence page
      */
-    async clickTakeAPhotoEvidence() {
+    async clickTakeAPhotoEvidence(): Promise<void> {
         await this.page.locator(LearningMomentsPage.TAKE_A_PHOTO_BUTTON_EVIDENCE).click();
     }
 
     /**
      * Click "delete button to remove a photo already taken
      */
-    async deletePhotoEvidence() {
+    async deletePhotoEvidence(): Promise<void> {
         await this.page.getByTestId(LearningMomentsPage.DELETE_A_PHOTO).click();
     }
 
     /**
      * Click "delete button to remove a photo already taken
      */
-    async confirmDeletePhoto() {
+    async confirmDeletePhoto(): Promise<void> {
         await this.page.getByTestId(LearningMomentsPage.DELETE_A_PHOTO_CONFIRM_BUTTON).click();
     }
 
     /**
      * Click evidence submit button
      */
-    async clickSubmit() {
+    async clickSubmit(): Promise<void> {
         await this.page.getByTestId(LearningMomentsPage.SUBMIT_BUTTON).click();
     }
 
     /**
      * Typing a comment
      */
-    async typeComment() {
+    async typeComment(): Promise<void> {
         const commentTextarea = this.page.getByTestId(`${LearningMomentsPage.LEARNING_POST_COMMENT_TEXTAREA}-0`);
         await this.tester.fillCKEditorByLocator(
             commentTextarea,
@@ -131,34 +131,34 @@ export default class LearningMomentsPage {
 
     /**
      * Verify a specific comment exists
-     * @param { string } comment - The comment to verify
+     * @param comment - The comment to verify
      */
-    async verifyComment(comment: string) {
+    async verifyComment(comment: string): Promise<void> {
         await expect(this.page.getByTestId(LearningMomentsPage.COMMENT_THREAD_COMMENT)).toHaveText(comment);
     }
 
     /**
      * Verifies the quantity of comments visible in the page
-     * @param { number } expectedCount - The expected number of comments
+     * @param expectedCount - The expected number of comments
      */
-    async verifyCommentCount(expectedCount: number) {
+    async verifyCommentCount(expectedCount: number): Promise<void> {
         await expect(this.page.getByTestId(LearningMomentsPage.COMMENT_THREAD_COMMENT)).toHaveCount(expectedCount);
     }
 
     /**
      * Typing a description for the media evidence
-     * @param { string } description - The description to type
+     * @param description - The description to type
      */
-    async typeMediaEvidenceDescription(description: string) {
+    async typeMediaEvidenceDescription(description: string): Promise<void> {
         const descriptionTextarea = this.page.getByTestId(LearningMomentsPage.EVIDENCE_MEDIA_DESCRIPTION_TEXTAREA);
         await this.tester.fillCKEditorByLocator(descriptionTextarea, description);
     }
 
     /**
      * Click the 3-dot dropdown menu by passing its evidence
-     * @param { number } evidenceId - The evidence ID
+     * @param evidenceId - The evidence ID
      */
-    async clickDropdownMenu(evidenceId: number) {
+    async clickDropdownMenu(evidenceId: number): Promise<void> {
         await this.page
             .getByTestId(LearningMomentsPage.EVIDENCE_POPOUT_BUTTON.replace("{evidenceId}", evidenceId.toString()))
             .click();
@@ -166,68 +166,68 @@ export default class LearningMomentsPage {
 
     /**
      * Click Modify submenu
-     * @param { number } evidenceId - The evidence ID
+     * @param evidenceId - The evidence ID
      */
-    async clickModifySubmenu(evidenceId: number) {
+    async clickModifySubmenu(evidenceId: number): Promise<void> {
         await this.page.getByTestId(`${LearningMomentsPage.EVIDENCE_POPOUT_OPTION_MODIFY}-${evidenceId}`).click();
     }
 
     /**
      * Click learning moments comment Delete  button
      */
-    async clickCommentDeleteButton() {
+    async clickCommentDeleteButton(): Promise<void> {
         await this.page.getByTestId(LearningMomentsPage.COMMENT_DELETE_BUTTON).click();
     }
 
     /**
      * Click learning moments confirm Delete button on modal dialog
      */
-    async clickConfirmDeleteButton() {
+    async clickConfirmDeleteButton(): Promise<void> {
         await this.page.getByTestId(LearningMomentsPage.COMMENT_CONFIRM_DELETE_BUTTON).click();
     }
 
     /**
      * Click learning moment Delete button in the 3-dot menu
-     * @param { number } evidenceId - The evidence ID
+     * @param evidenceId - The evidence ID
      */
-    async clickLearningMomentDeleteButton(evidenceId: number) {
+    async clickLearningMomentDeleteButton(evidenceId: number): Promise<void> {
         await this.page.getByTestId(`${LearningMomentsPage.LEARNING_MOMENT_DELETE_BUTTON}-${evidenceId}`).click();
     }
 
     /**
      * Click learning moment confirm Delete button on modal dialog
      */
-    async clickLearningMomentConfirmDeleteButton() {
+    async clickLearningMomentConfirmDeleteButton(): Promise<void> {
         await this.page.getByTestId(LearningMomentsPage.LEARNING_MOMENT_DELETE_BUTTON_CONFIRM).click();
     }
 
     /**
      * Click post comment button
      */
-    async clickPostComment() {
+    async clickPostComment(): Promise<void> {
         await this.page.getByTestId(`${LearningMomentsPage.LEARNING_POST_COMMENT}-0`).click();
     }
 
     /**
      * Verify the evidence for a learning moment
-     * @param { string } body - The expected body of the evidence
+     * @param body - The expected body of the evidence
      */
-    async verifyEvidence(body: string) {
+    async verifyEvidence(body: string): Promise<void> {
         await expect(this.page.getByTestId(LearningMomentsPage.EVIDENCE_BODY).first()).toHaveText(body);
     }
 
     /**
      * Verifies that the evidence for a learning moment is not present
-     * @param { string } body - The expected body of the evidence that was deleted
+     * @param body - The expected body of the evidence that was deleted
      */
-    async verifyEvidenceNotPresent(body: string) {
+    async verifyEvidenceNotPresent(body: string): Promise<void> {
         await expect(this.page.getByTestId(LearningMomentsPage.EVIDENCE_BODY).first()).not.toHaveText(body);
     }
 
     /**
      * Verify a learning moment has an attached photo
      */
-    async verifyEvidenceHasPhoto() {
+    async verifyEvidenceHasPhoto(): Promise<void> {
         const mediaLocator = this.page.getByTestId(LearningMomentsPage.EVIDENCE_MEDIA);
         await expect(mediaLocator).toBeVisible();
         await expect(mediaLocator).toHaveAttribute("alt", "photo.jpeg");

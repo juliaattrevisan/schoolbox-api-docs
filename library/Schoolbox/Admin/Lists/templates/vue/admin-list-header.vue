@@ -1,4 +1,7 @@
 <script>
+// Ignore this file for ESLint checks for now (SA-18376)
+/* eslint-disable */
+/* eslint-enable vue/no-v-html */
 /**
  * The list header to display the record titles
  *
@@ -16,10 +19,10 @@ export default {
         }),
     },
 
-    mounted () {
+    mounted() {
         // As vue loads the template after foundation has been initialised, we need to reinitialise the tooltips
-        $(document).foundation('tooltip', 'reflow');
-    }
+        $(document).foundation("tooltip", "reflow");
+    },
 };
 </script>
 

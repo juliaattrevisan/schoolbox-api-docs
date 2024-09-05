@@ -1,4 +1,7 @@
 <script setup>
+// Ignore this file for ESLint checks for now (SA-18376)
+/* eslint-disable */
+/* eslint-enable vue/no-v-html */
 /**
  * Manage member selection and the various actions that can occur based
  * on the members currently selected
@@ -47,7 +50,7 @@ window.Vue.watch(
             //to hide a UI note, notifying of availability of shift-select
             shiftSelectNoteEl.value.remove();
         }
-    }
+    },
 );
 
 /**
@@ -77,7 +80,7 @@ function onClearMemberSelection() {
  */
 function onEmailMembersSelected() {
     window.location.href = `${Endpoints.SEND_EMAIL}?folderId=${store.id}&userIds=${membersStore.selectedMemberIds.join(
-        ","
+        ",",
     )}`;
 }
 

@@ -27,7 +27,7 @@ const collator = new Intl.Collator("en", { numeric: true, sensitivity: "base" })
 /**
  * return an empty node, usually used to indicate there's currently
  * nothing to display
- * @returns {Node} the empty Node
+ * @returns the empty Node
  */
 export function getEmptyNode(): Node {
     return {
@@ -59,9 +59,9 @@ export function getEmptyNode(): Node {
  * To just return the node containing the specified id
  * We recursively loop through the object until we find the
  * matched object or undefined if not found
- * @param {Node[]} array - an array of Node to loop through
- * @param {number} id - the id to find
- * @returns {Node | undefined} - the found Node
+ * @param array - an array of Node to loop through
+ * @param id - the id to find
+ * @returns - the found Node
  */
 export function findById(array: Node[], id: number): Node | undefined {
     let node: Node | undefined;
@@ -81,9 +81,9 @@ export function findById(array: Node[], id: number): Node | undefined {
 
 /**
  * Node with a code take priority, then followed by those without, the name is used
- * @param {Node} aNode - the first node to compare
- * @param {Node} bNode - the second node to compare
- * @returns {number} - the number to determine sorting
+ * @param aNode - the first node to compare
+ * @param bNode - the second node to compare
+ * @returns - the number to determine sorting
  */
 function sortNodesByCodeThenName(aNode: Node, bNode: Node): number {
     const aHasCode = aNode.code !== "";
@@ -108,8 +108,8 @@ function sortNodesByCodeThenName(aNode: Node, bNode: Node): number {
 
 /**
  * Return the nodes sorted first by order, then code, then name
- * @param {Node[]} nodes - the nodes to sort
- * @returns {Node[]} - the sorted nodes
+ * @param nodes - the nodes to sort
+ * @returns - the sorted nodes
  */
 export function sortNodes(nodes: Node[]): Node[] {
     const nodesWithOrder = nodes.filter((node) => node.order !== 0); // to prioritise nodes with order
@@ -128,9 +128,9 @@ export function sortNodes(nodes: Node[]): Node[] {
  * To return an array with any Nodes containing the specified id removed
  * we move through the object, looping recursively through .children and remove
  * any with the id that's being removed
- * @param {Node[]} children - all the Node children
- * @param {number} id - id of the Node to remove
- * @returns {Node[]} - list of children with the Node linked to id removed
+ * @param children - all the Node children
+ * @param id - id of the Node to remove
+ * @returns - list of children with the Node linked to id removed
  */
 export function removeId(children: Node[], id: number): Node[] {
     if (children !== null) {
@@ -147,9 +147,9 @@ export function removeId(children: Node[], id: number): Node[] {
 
 /**
  * Recursively loop through the parents adding in a breadcrumb for each
- * @param {Node} node - the Node to traverse for breadcrumbs
- * @param {Breadcrumb[]} currentBreadcrumbs - the current breadcrumbs
- * @returns {Breadcrumb[]} - the new breadcrumbs
+ * @param node - the Node to traverse for breadcrumbs
+ * @param currentBreadcrumbs - the current breadcrumbs
+ * @returns - the new breadcrumbs
  */
 export function getBreadcrumbs(node: Node, currentBreadcrumbs: Breadcrumb[]): Breadcrumb[] {
     if (node.parent !== null) {
@@ -164,8 +164,8 @@ export function getBreadcrumbs(node: Node, currentBreadcrumbs: Breadcrumb[]): Br
 
 /**
  * To determine if there's any usage assigned on the node
- * @param {Node} node - the node to check
- * @returns {boolean} - whether there's any usage assigned on the node
+ * @param node - the node to check
+ * @returns - whether there's any usage assigned on the node
  */
 export function hasUsage(node: Node): boolean {
     if (
@@ -181,8 +181,8 @@ export function hasUsage(node: Node): boolean {
 
 /**
  * Get the total usage linked to all activities
- * @param {Node} node - the node to check
- * @returns {number} - the total count
+ * @param node - the node to check
+ * @returns - the total count
  */
 export function getTotalUsage(node: Node): number {
     return node._usageCounts.course + node._usageCounts.unit + node._usageCounts.assessment + node._usageCounts.badge;
@@ -190,8 +190,8 @@ export function getTotalUsage(node: Node): number {
 
 /**
  * To distinguish the activity type
- * @param {ActivityTypes} type - the activity type
- * @returns {string} - the icon to return
+ * @param type - the activity type
+ * @returns - the icon to return
  */
 export function getUsageIcon(type: ActivityTypes): string {
     const icons = {
@@ -212,8 +212,8 @@ export function getUsageIcon(type: ActivityTypes): string {
 
 /**
  * To return the href based on the activity type
- * @param {Usage} usage - the usage
- * @returns {string} - the icon to return
+ * @param usage - the usage
+ * @returns - the icon to return
  */
 export function getUsageHref(usage: Usage): string {
     const icons = {
@@ -228,9 +228,9 @@ export function getUsageHref(usage: Usage): string {
 
 /**
  * To only return the usages of the specified type
- * @param {Usage[]} usages - the usages
- * @param {ActivityTypes} type - the activity type
- * @returns {Usage[]} - the usages of the specified type
+ * @param usages - the usages
+ * @param type - the activity type
+ * @returns - the usages of the specified type
  */
 export function getSpecificUsages(usages: Usage[], type: ActivityTypes): Usage[] {
     return usages.filter((usage) => usage.discriminator === type);
@@ -238,7 +238,7 @@ export function getSpecificUsages(usages: Usage[], type: ActivityTypes): Usage[]
 
 /**
  * To return the hash of the current url as a node id
- * @returns {number} - the node id
+ * @returns - the node id
  */
 export function getIdHash(): number {
     const documentURL = document.URL;
@@ -249,7 +249,7 @@ export function getIdHash(): number {
  * a node id could be passed into the page via the hash,
  * if so we need to traverse to this node on load if the hash
  * is a valid node id
- * @returns {boolean} - whether the hash is valid
+ * @returns - whether the hash is valid
  */
 export function isValidHash(): boolean {
     const documentURL = document.URL;

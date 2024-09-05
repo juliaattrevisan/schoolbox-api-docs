@@ -10,7 +10,7 @@ interface FontSettingsConfig {
 
 /**
  * Returns the settings for the font options
- * @returns { FontSettingsConfig } - the font settings
+ * @returns - the font settings
  */
 export function getFontSettings(): FontSettingsConfig {
     return {

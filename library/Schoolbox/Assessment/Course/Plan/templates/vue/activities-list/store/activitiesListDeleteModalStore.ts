@@ -15,10 +15,10 @@ export const useActivitiesListDeleteModalStore = defineStore("activitiesListDele
 
     /**
      * Display a prompt to confirm a node removal.
-     * @param {Activity} $activityToDelete The activity to delete
-     * @param { () => void } $callbackOnDeleted - callback function to be called on activity successful deletion
+     * @param $activityToDelete The activity to delete
+     * @param $callbackOnDeleted - callback function to be called on activity successful deletion
      */
-    function prompt($activityToDelete: Activity, $callbackOnDeleted: () => void) {
+    function prompt($activityToDelete: Activity, $callbackOnDeleted: () => void): void {
         isOpen.value = true;
         activityToDelete.value = $activityToDelete;
         callbackOnDeleted.value = $callbackOnDeleted;
@@ -27,18 +27,18 @@ export const useActivitiesListDeleteModalStore = defineStore("activitiesListDele
     /**
      * To hide the confirmation prompt
      */
-    function close() {
+    function close(): void {
         isOpen.value = false;
         isProcessing.value = false;
         activityToDelete.value = null;
-        callbackOnDeleted.value = () => {};
+        callbackOnDeleted.value = (): void => {};
     }
 
     /**
      * Activity removal has been confirmed so ask the server to delete the activity,
      * then call the callback function and close the modal.
      */
-    async function confirm() {
+    async function confirm(): Promise<void> {
         if (activityToDelete.value === null) {
             return; // nothing to do
         }

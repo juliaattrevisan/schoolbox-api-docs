@@ -12,7 +12,7 @@ const UNSET_ID = -1;
 
 /**
  * Pass empty fields to be added
- * @returns { Partial<Node> } - a new Node to add
+ * @returns - a new Node to add
  */
 function getCurriculum(): Partial<Node> {
     return {
@@ -24,8 +24,8 @@ function getCurriculum(): Partial<Node> {
 
 /**
  * Get the data to pass to the backend
- * @param { Node } node - the node with the fields to update
- * @returns { string } - the data to send to the backend
+ * @param node - the node with the fields to update
+ * @returns - the data to send to the backend
  */
 function getFormData(node: Partial<Node>): string {
     return JSON.stringify({
@@ -44,7 +44,7 @@ export const useAddCurriculumStore = defineStore("mcAddCurriculum", () => {
     /**
      * to display a prompt to add a curriculum
      */
-    function prompt() {
+    function prompt(): void {
         curriculum.value = getCurriculum();
         isOpen.value = true;
     }
@@ -52,13 +52,13 @@ export const useAddCurriculumStore = defineStore("mcAddCurriculum", () => {
     /**
      * to hide the add prompt
      */
-    function cancel() {
+    function cancel(): void {
         isOpen.value = false;
     }
 
     /**
      * pass the new curriculum details to the backend
-     * @returns { Promise<{ id: number; message: string }> } - the id of the new curriculum and a message
+     * @returns - the id of the new curriculum and a message
      */
     async function add(): Promise<{ id: number; message: string }> {
         isProcessing.value = true;
@@ -91,7 +91,7 @@ export const useAddCurriculumStore = defineStore("mcAddCurriculum", () => {
     /**
      * to unset the id, called when the toast has already been displayed once
      */
-    function unsetId() {
+    function unsetId(): void {
         id.value = UNSET_ID;
     }
 

@@ -8,8 +8,8 @@ type NestedObject = {
 
 /**
  * Checks if a value is a nested object
- * @param {unknown} value - The value to be checked
- * @returns {boolean} - Whether the value is a nested object
+ * @param value - The value to be checked
+ * @returns - Whether the value is a nested object
  */
 function isValueNestedObject(value: unknown): value is NestedObject {
     return typeof value === "object" && value !== null && !Array.isArray(value);
@@ -17,8 +17,8 @@ function isValueNestedObject(value: unknown): value is NestedObject {
 
 /**
  * Takes a value and converts it to a string
- * @param {unknown} value - The value to be converted to a string
- * @returns {string} - The value as a string
+ * @param value - The value to be converted to a string
+ * @returns - The value as a string
  */
 function setValue(value: unknown): string {
     if (typeof value === "string") {
@@ -33,15 +33,15 @@ function setValue(value: unknown): string {
 /**
  * Takes an object and converts it to a collection of key-value pairs,
  * with object depth represented by array bracket notation
- * @param {NestedObject} obj - The object to be converted to key-value pairs
- * @returns {Record<string, string>} - The key-value pairs
+ * @param obj - The object to be converted to key-value pairs
+ * @returns - The key-value pairs
  */
 export function getKeyValuePairs(obj: NestedObject): Record<string, string> {
     const result: Record<string, string> = {};
     /**
      * Recursively converts an object to a collection of key-value pairs
-     * @param {Record<string, string>} curr - The current object
-     * @param {string | undefined} [keyPath] - The path of the current key
+     * @param curr - The current object
+     * @param [keyPath] - The path of the current key
      */
     function recurse(curr: NestedObject, keyPath?: string): void {
         Object.keys(curr).forEach((key) => {
@@ -74,8 +74,8 @@ export function getKeyValuePairs(obj: NestedObject): Record<string, string> {
 
 /**
  * Takes an object and converts it to a search string
- * @param {NestedObject} obj - The object to be converted to a search param string
- * @returns {string} - the URLSearchParams object as a string
+ * @param obj - The object to be converted to a search param string
+ * @returns - the URLSearchParams object as a string
  */
 export function getSearchString(obj: NestedObject): string {
     // first convert the object to key-value pairs
@@ -92,8 +92,8 @@ export function getSearchString(obj: NestedObject): string {
 
 /**
  * Takes an object and converts it to a FormData
- * @param {NestedObject} obj - The object to be converted to a FormData
- * @returns {FormData} - the FormData object
+ * @param obj - The object to be converted to a FormData
+ * @returns - the FormData object
  */
 export function getFormData(obj: NestedObject): FormData {
     // first convert the object to key-value pairs

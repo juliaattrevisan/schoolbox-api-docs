@@ -21,11 +21,11 @@ export const useStore = defineStore("searchPage", () => {
 
     /**
      * store any passed through properties
-     * @param {string} $endpoint - the search api url
-     * @param {FilterDateRange} $selectedFilterDateRange - the selected date range filter
-     * @param {Creator|null} $creator - the selected creator
-     * @param {FilterType[]} $filterTypesAvailable - the available filter types
-     * @param {string[]} $filterTypesSelected - the selected filter types
+     * @param $endpoint - the search api url
+     * @param $selectedFilterDateRange - the selected date range filter
+     * @param $creator - the selected creator
+     * @param $filterTypesAvailable - the available filter types
+     * @param $filterTypesSelected - the selected filter types
      */
     function init(
         $endpoint: string,
@@ -33,7 +33,7 @@ export const useStore = defineStore("searchPage", () => {
         $creator: Creator | null,
         $filterTypesAvailable: FilterType[],
         $filterTypesSelected: string[],
-    ) {
+    ): void {
         endpoint = $endpoint;
 
         if ($creator !== null) {
@@ -58,9 +58,9 @@ export const useStore = defineStore("searchPage", () => {
 
     /**
      * To collect all the params to send to the search api
-     * @returns {string} - the query params
+     * @returns - the query params
      */
-    function getQueryParams() {
+    function getQueryParams(): URLSearchParams {
         const newQueryParams = new URLSearchParams();
         newQueryParams.append("keyword", useQueryStore().activeQuery);
         newQueryParams.append("filter", useFiltersStore().getFormData());
@@ -69,9 +69,9 @@ export const useStore = defineStore("searchPage", () => {
 
     /**
      * To update the url with the current query params
-     * @param {boolean} simulateRedirect - whether to simulate a redirect
+     * @param simulateRedirect - whether to simulate a redirect
      */
-    function setQueryParams(simulateRedirect: boolean) {
+    function setQueryParams(simulateRedirect: boolean): void {
         if (simulateRedirect) {
             window.history.pushState({}, "", window.location.href);
         }
@@ -82,18 +82,18 @@ export const useStore = defineStore("searchPage", () => {
 
     /**
      * To collect all the params to send to the search api
-     * @returns {string} - the query params
+     * @returns - the query params
      */
-    function getEndpointWithParams() {
+    function getEndpointWithParams(): string {
         const newQueryParams = getQueryParams();
         return `${endpoint}?${newQueryParams.toString()}`;
     }
 
     /**
      * To handle the container width changing
-     * @param {number} width - the width of the container
+     * @param width - the width of the container
      */
-    function containerWidthChange(width: number) {
+    function containerWidthChange(width: number): void {
         isSingleColumn.value = width < SINGLE_COLUMN_BREAKPOINT;
     }
 

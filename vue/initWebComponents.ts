@@ -11,7 +11,7 @@ import SbxIcon from "@schoolboxVue/components/icon/sbx-icon.ce.vue";
 /**
  * Register all web components here
  */
-export function register() {
+export function register(): void {
     const SbxFreeStyleCE = window.Vue.defineCustomElement(SbxFreeStyle);
     window.customElements.define("sbx-free-style", SbxFreeStyleCE);
     const SbxPopOutCE = window.Vue.defineCustomElement(SbxPopOut);

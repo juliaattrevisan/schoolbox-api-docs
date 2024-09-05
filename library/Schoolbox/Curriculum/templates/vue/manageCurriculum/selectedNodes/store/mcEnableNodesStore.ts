@@ -2,6 +2,8 @@
  * Enable/disable the currently selected nodes
  */
 
+/* eslint-disable import/no-cycle -- Disable dependency cycle warning temporarily [SA-18428] */
+
 import { defineStore } from "pinia";
 import { capitalizeFirstLetter } from "@js/util/stringUtils";
 import { useSelectedNodesStore } from "@schoolboxCurriculum/vue/manageCurriculum/selectedNodes/store/mcSelectedNodesStore";
@@ -13,9 +15,9 @@ export const useEnableNodesStore = defineStore("mcEnableNodes", () => {
 
     /**
      * to display a prompt to confirm a node enabled change
-     * @param { boolean } newEnabled - whether to enable or disable the selected nodes
+     * @param newEnabled - whether to enable or disable the selected nodes
      */
-    function prompt(newEnabled: boolean) {
+    function prompt(newEnabled: boolean): void {
         enabled.value = newEnabled;
         isOpen.value = true;
     }
@@ -23,14 +25,14 @@ export const useEnableNodesStore = defineStore("mcEnableNodes", () => {
     /**
      * to hide the confirmation prompt
      */
-    function cancel() {
+    function cancel(): void {
         isOpen.value = false;
     }
 
     /**
      * To delete all the marked nodes in parallel
      * https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise/all
-     * @returns { Promise<Response> } - to individually enable/disable each node
+     * @returns - to individually enable/disable each node
      */
     function getFetches(): Promise<Response>[] {
         const selectedNodesStore = useSelectedNodesStore();
@@ -50,7 +52,7 @@ export const useEnableNodesStore = defineStore("mcEnableNodes", () => {
 
     /**
      * To notify the user of success status
-     * @returns { string } the success message
+     * @returns the success message
      */
     function getSuccessMessage(): string {
         const selectedNodesStore = useSelectedNodesStore();
@@ -63,7 +65,7 @@ export const useEnableNodesStore = defineStore("mcEnableNodes", () => {
      * node enable/disable has been confirmed so notify the backend
      * and update the frontend to match
      * @todo - more extensive error checking needs to occur
-     * @returns { Promise<string> } the success message
+     * @returns the success message
      */
     async function enable(): Promise<string> {
         try {

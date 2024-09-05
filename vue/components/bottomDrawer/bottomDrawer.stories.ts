@@ -8,7 +8,7 @@ import BottomDrawer from "./bottom-drawer.vue";
 const meta: Meta<typeof BottomDrawer> = {
     component: BottomDrawer,
     decorators: [
-        () => ({
+        (): { template: string } => ({
             template: `
             <div style="width: 100%; height: 500px">
                 <div style="width: 80%; margin: 0 auto;">
@@ -22,7 +22,7 @@ const meta: Meta<typeof BottomDrawer> = {
         components: {
             BottomDrawer,
         },
-        setup() {
+        setup(): { args: typeof args } {
             return { args };
         },
         // @ts-expect-error -- For now, args.default doesn't match Meta<typeof BottomDrawer>, but we want to show it as a slot

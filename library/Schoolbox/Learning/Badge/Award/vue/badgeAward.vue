@@ -1,4 +1,7 @@
 <script>
+// Ignore this file for ESLint checks for now (SA-18376)
+/* eslint-disable */
+/* eslint-enable vue/no-v-html */
 import axios from "axios";
 import BadgeImage from "../../vue/badge-image";
 import Toast from "@schoolboxVue/components/toast";
@@ -13,8 +16,8 @@ import { generateAwardWithEvidenceUrl } from "../js/awardBadgeUtils";
 
 // Render a custom template for the deselect icon.
 // Partially documented on https://github.com/sagalbot/vue-select/issues/994
-import Deselect from "@schoolboxVue/components/selectize/Deselect";
-vSelect.props.components.default = () => ({ Deselect });
+import SelectizeDeselect from "@schoolboxVue/components/selectize/selectize-deselect.vue";
+vSelect.props.components.default = () => ({ SelectizeDeselect });
 
 import { calculateExpiryDate } from "../../vue/expiry-helper";
 
@@ -262,7 +265,7 @@ export default {
                         true,
                         Toast.DEFAULT_DISPLAY_DURATION_SUCCESSFUL,
                         Toast.DEFAULT_FADE_DURATION,
-                        () => this.$emit(EVENTS.done)
+                        () => this.$emit(EVENTS.done),
                     );
                 })
                 .catch(() => {

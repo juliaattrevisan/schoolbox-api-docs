@@ -8,7 +8,7 @@ export const NODES_STORED = "sb_rootNodesStored";
 
 /**
  * check if the nodes are in the global storage
- * @returns { boolean } - true if the nodes are in the global storage
+ * @returns - true if the nodes are in the global storage
  */
 export function hasStoredNodes(): boolean {
     return window.sbProps.storedNodes !== undefined;
@@ -16,7 +16,7 @@ export function hasStoredNodes(): boolean {
 
 /**
  * check if the nodes are being stored in the global storage
- * @returns { boolean } - true if the nodes are being stored in the global storage
+ * @returns - true if the nodes are being stored in the global storage
  */
 export function isStoringNodes(): boolean {
     return window.sbProps.isStoringNodes ?? false;
@@ -25,13 +25,13 @@ export function isStoringNodes(): boolean {
 /**
  * Set the nodes are being stored in the global storage
  */
-export function setIsStoringNodes() {
+export function setIsStoringNodes(): void {
     window.sbProps.isStoringNodes = true;
 }
 
 /**
  * Return the root curriculum nodes
- * @returns { Node[] } - the root nodes of the curriculum
+ * @returns - the root nodes of the curriculum
  */
 export function getStoredNodes(): Node[] {
     return JSON.parse(window.sbProps.storedNodes as string) as Node[]; // convert the saved string var back to JSON
@@ -39,9 +39,9 @@ export function getStoredNodes(): Node[] {
 
 /**
  * Set the root curriculum nodes
- * @param { Node[] } nodes - the root nodes of the curriculum
+ * @param nodes - the root nodes of the curriculum
  */
-export function setStoredNodes(nodes: Node[]) {
+export function setStoredNodes(nodes: Node[]): void {
     window.sbProps.storedNodes = JSON.stringify(nodes);
     document.dispatchEvent(new Event(NODES_STORED));
 }

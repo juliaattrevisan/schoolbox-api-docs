@@ -14,9 +14,9 @@ const endDateInputEl = window.Vue.ref<HTMLInputElement | null>(null);
 
 /**
  * Ensure the error message is hidden on clear filters
- * @param {string} selector - The selector for the error message
+ * @param selector - The selector for the error message
  */
-function clearErrorMessage(selector: string) {
+function clearErrorMessage(selector: string): void {
     const dateError = document.querySelector(selector) as HTMLDivElement;
     if (dateError) {
         dateError.style.display = "none";
@@ -71,10 +71,10 @@ window.Vue.watch(
 
 /**
  * Formats the date picker date to ISO8601 format
- * @param {string} date - The date to format
- * @returns {string} - The formatted date
+ * @param date - The date to format
+ * @returns - The formatted date
  */
-function getDateFormatted(date: string) {
+function getDateFormatted(date: string): string {
     return window.dayjs(date, window.dateDisplayFormats.dayjs).format();
 }
 
@@ -83,7 +83,7 @@ function getDateFormatted(date: string) {
  * www/static/js/alaress-datetime-picker/attacher.datepicker.js as it may be
  * called when the component is not mounted yet.
  */
-function initDatePickers() {
+function initDatePickers(): void {
     // For now, disable eslint as we need to use jQuery to attach the date picker
     /* eslint-disable @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access */
     $("[data-datepicker-vue]").each(function attachAlaressDatePicker() {

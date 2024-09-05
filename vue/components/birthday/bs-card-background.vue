@@ -14,7 +14,7 @@ let resizeObserver: ResizeObserver;
 /**
  * Set the canvas size to the size of the modal
  */
-function setCanvasSize() {
+function setCanvasSize(): void {
     const modalContainerDimensions = modalContainer.getBoundingClientRect();
     canvasWidth.value = Math.round(modalContainerDimensions.width);
     canvasHeight.value = Math.round(modalContainerDimensions.height);
@@ -23,14 +23,14 @@ function setCanvasSize() {
 /**
  * Animate stars behind the birthday cake and text
  */
-function animateStars() {
+function animateStars(): void {
     init(canvasEl.value as HTMLCanvasElement);
 }
 
 /**
  * To sync up the canvas size with the size of the modal
  */
-function initResizeObserver() {
+function initResizeObserver(): void {
     resizeObserver = new ResizeObserver(() => {
         setCanvasSize();
         animateStars();

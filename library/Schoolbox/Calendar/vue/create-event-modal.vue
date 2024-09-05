@@ -1,4 +1,7 @@
 <script>
+// Ignore this file for ESLint checks for now (SA-18376)
+/* eslint-disable */
+/* eslint-enable vue/no-v-html */
 import RevealModal from "@schoolboxVue/components/reveal-modal";
 import Toast from "@schoolboxVue/components/toast.vue";
 import debounce from "lodash/debounce";
@@ -9,16 +12,16 @@ import { ENDPOINTS } from "@schoolboxCalendarEvent/endpoints";
 import vSelect from "vue-select";
 import "vue-select/dist/vue-select.css";
 
-/* Render custom template for Deselect icon/button
+/* Render custom template for SelectizeDeselect icon/button
  * It's not well documented, but you can trawl through closed PRs to figger out how
  * https://github.com/sagalbot/vue-select/issues/994
  */
-import Deselect from "@schoolboxVue/components/selectize/Deselect";
+import SelectizeDeselect from "@schoolboxVue/components/selectize/selectize-deselect.vue";
 import { injectScript, isScriptAdded } from "@js/util/domUtils";
 import { EditorEvent } from "@js/editor/event/editorEvent";
 import { EditorToolbar } from "@js/editor/types/editorTypes";
 
-vSelect.props.components.default = () => ({ Deselect });
+vSelect.props.components.default = () => ({ SelectizeDeselect });
 
 export default {
     name: "create-event-modal",
@@ -229,11 +232,9 @@ export default {
                     detail: {
                         targetElements: ["#detail"],
                         toolbar: EditorToolbar.SIMPLE,
-                        removeFromToolbar: [
-                            'link',
-                        ]
+                        removeFromToolbar: ["link"],
                     },
-                })
+                }),
             );
         },
     },

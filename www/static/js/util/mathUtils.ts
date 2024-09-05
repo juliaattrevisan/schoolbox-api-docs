@@ -4,8 +4,8 @@
 
 /**
  * Check if a number is a whole number
- * @param {number} value - the number to check
- * @returns {boolean} - true if the number is a whole number
+ * @param value - the number to check
+ * @returns - true if the number is a whole number
  */
 export function isWholeNumber(value: number): boolean {
     if (typeof value !== "number") {
@@ -16,10 +16,10 @@ export function isWholeNumber(value: number): boolean {
 
 /**
  * Calculate the percentage (from 100%) of a value
- * @param {number} value - the value to calculate the percentage of
- * @param {number} max - the maximum value
- * @param {number} decimalPlaces - the number of decimal places to round to
- * @returns {string | undefined} - the percentage, for example 30% or 45.67%
+ * @param value - the value to calculate the percentage of
+ * @param max - the maximum value
+ * @param decimalPlaces - the number of decimal places to round to
+ * @returns - the percentage, for example 30% or 45.67%
  */
 export function getPercentage(value: number, max: number, decimalPlaces: number = 2): string | undefined {
     // check if both are numbers

@@ -2,6 +2,8 @@
  * Store the current search results when searcing from mc-view-header-search-input
  */
 
+/* eslint-disable import/no-cycle -- Disable dependency cycle warning temporarily [SA-18428] */
+
 import { defineStore } from "pinia";
 import { useStore } from "@schoolboxCurriculum/vue/manageCurriculum/store/manageCurriculumStore";
 import { useViewNodesStore } from "@schoolboxCurriculum/vue/manageCurriculum/viewNodes/store/mcViewNodesStore";
@@ -40,14 +42,14 @@ export const useSearchStore = defineStore(`mcSearch`, () => {
      * when the search isActive, we should display the loading prompt straight away,
      * but the debounce holds on calling search() until we assume the user has stopped typing
      */
-    function enableSearch() {
+    function enableSearch(): void {
         isLoading.value = true;
     }
 
     /**
      * search for nodes that match
      */
-    async function search() {
+    async function search(): Promise<void> {
         try {
             const viewNodesStore = useViewNodesStore();
             const enabled = viewNodesStore.showDisabled ? "" : "&enabled=1";
@@ -73,7 +75,7 @@ export const useSearchStore = defineStore(`mcSearch`, () => {
     /**
      * clear the current search
      */
-    function clear() {
+    function clear(): void {
         query.value = "";
         results.value = [];
         isLoading.value = false;

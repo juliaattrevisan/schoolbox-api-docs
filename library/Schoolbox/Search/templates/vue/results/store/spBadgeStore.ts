@@ -14,25 +14,25 @@ export const useBadgeStore = defineStore("spBadgeStore", () => {
 
     /**
      * Opens a modal window for viewing this badge's full details.
-     * @param { badge } badge - the badge to display
+     * @param badge - the badge to display
      */
-    function openDetailModal(badge: Badge) {
+    function openDetailModal(badge: Badge): void {
         detailBadge.value = badge;
         isDetailModalOpen.value = true;
     }
 
     /**
      * Set the badge to award
-     * @param {BadgeAward} $badgeAward - the badge to award
+     * @param $badgeAward - the badge to award
      */
-    function setAwardBadge($badgeAward: BadgeAward) {
+    function setAwardBadge($badgeAward: BadgeAward): void {
         awardBadge.value = $badgeAward;
     }
 
     /**
      * Unset the selected badge
      */
-    function unsetAwardBadge() {
+    function unsetAwardBadge(): void {
         awardBadge.value = null;
     }
 

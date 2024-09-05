@@ -21,7 +21,7 @@ window.Vue.onMounted(() => {
  * The modal has been closed, so reset the selected details node id
  * to allow it to be opened again on the same node if required
  */
-function onDetailsModalClosed() {
+function onDetailsModalClosed(): void {
     store.selectedDetailsNodeId = UNSET_ID;
 }
 </script>

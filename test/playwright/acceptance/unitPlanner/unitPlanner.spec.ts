@@ -45,14 +45,14 @@ test.describe("Unit Planner Tests", () => {
 
         /**
          * Get the current order of units
-         * @returns { Promise<string[]> } - The order of unit IDs
+         * @returns - The order of unit IDs
          */
         async function getUnitOrder(): Promise<string[]> {
             const allUnitRowSelector = /^unit-row-/;
             const pageOrder = await page
                 .getByTestId(allUnitRowSelector)
                 .evaluateAll((unitRows) => unitRows.map((unitRow) => unitRow.getAttribute("data-test-unit-id")));
-            return pageOrder.filter((unitId) => unitId !== null) as string[];
+            return pageOrder.filter((unitId) => unitId !== null);
         }
 
         const initialUnitOrder = await getUnitOrder();

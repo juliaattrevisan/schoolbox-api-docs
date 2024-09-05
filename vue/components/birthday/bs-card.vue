@@ -9,6 +9,7 @@ import { gsap, CustomEase, CustomBounce } from "gsap/all";
 import BsCardBackground from "./bs-card-background.vue";
 import BsCardForeground from "./bs-card-foreground.vue";
 
+// eslint-disable-next-line @typescript-eslint/no-unsafe-argument -- The plugins import as <any> so we need to ignore this
 gsap.registerPlugin(CustomEase, CustomBounce); // Register the custom plugins otherwise they won't work
 
 const hasRevealed = window.Vue.ref(false);

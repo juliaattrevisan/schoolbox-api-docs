@@ -9,10 +9,10 @@ export type CanvasDimensions = {
 
 /**
  * Get the dimensions of the canvas, which can change depending on screen dimensions
- * @param {HTMLCanvasElement} canvas = the canvas element to get the dimensions of
- * @returns {CanvasDimensions} - the width and height of the canvas
+ * @param canvas = the canvas element to get the dimensions of
+ * @returns - the width and height of the canvas
  */
-export function getCanvasDimensions(canvas: HTMLCanvasElement) {
+export function getCanvasDimensions(canvas: HTMLCanvasElement): CanvasDimensions {
     return {
         width: canvas.width,
         height: canvas.height,
@@ -22,18 +22,18 @@ export function getCanvasDimensions(canvas: HTMLCanvasElement) {
 /**
  * Get the context
  * https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D
- * @param {HTMLCanvasElement} canvas - the canvas element to get the context of
- * @returns {CanvasRenderingContext2D|null} - the context of the canvas
+ * @param canvas - the canvas element to get the context of
+ * @returns - the context of the canvas
  */
-export function getContext(canvas: HTMLCanvasElement) {
+export function getContext(canvas: HTMLCanvasElement): CanvasRenderingContext2D | null {
     return canvas.getContext("2d");
 }
 
 /**
  * Ensure there's no left over animation if user is moving through the new rewards quickly
- * @param {HTMLCanvasElement} canvas - the canvas element to clear
+ * @param canvas - the canvas element to clear
  */
-export function clearCanvas(canvas: HTMLCanvasElement) {
+export function clearCanvas(canvas: HTMLCanvasElement): void {
     const canvasDimensions = getCanvasDimensions(canvas);
     const context = getContext(canvas);
     context?.clearRect(0, 0, canvasDimensions.width, canvasDimensions.height);

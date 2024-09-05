@@ -36,7 +36,7 @@ const usageIcon = window.Vue.computed(() => {
  * dispatch to parent so can either navigate to another page
  * or open the badge modal
  */
-function onSelect() {
+function onSelect(): void {
     if (props.usage.discriminator === ActivityTypes.BADGE) {
         emit("select", props.usage);
     }

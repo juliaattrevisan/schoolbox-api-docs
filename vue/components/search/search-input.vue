@@ -35,9 +35,9 @@ const hasInputFocus = window.Vue.ref(false);
 
 /**
  * Input updated, update internally and dispatch emit
- * @param {Event} event - The event object
+ * @param event - The event object
  */
-function onInput(event: Event) {
+function onInput(event: Event): void {
     currentInput.value = (event.target as HTMLInputElement).value;
     emit("input", currentInput.value);
 }
@@ -45,28 +45,28 @@ function onInput(event: Event) {
 /**
  * Down key pressed
  */
-function onKeyDown() {
+function onKeyDown(): void {
     emit("keyDown");
 }
 
 /**
  * Up key pressed
  */
-function onKeyUp() {
+function onKeyUp(): void {
     emit("keyUp");
 }
 
 /**
  * Enter key pressed
  */
-function onKeyEnter() {
+function onKeyEnter(): void {
     emit("keyEnter");
 }
 
 /**
  * If the input is empty, focus over input, otherwise emit click
  */
-function onClicked() {
+function onClicked(): void {
     if (props.isActiveWhenEmpty) {
         emit("click");
         return;
@@ -84,34 +84,34 @@ function onClicked() {
 
 /**
  * Focus over input
- * @param {FocusEvent} event - The event object
+ * @param event - The event object
  */
-function onFocusOver(event: FocusEvent) {
+function onFocusOver(event: FocusEvent): void {
     hasInputFocus.value = true;
     emit("focusOver", event);
 }
 
 /**
  * Focus out input
- * @param {FocusEvent} event - The event object
+ * @param event - The event object
  */
-function onFocusOut(event: FocusEvent) {
+function onFocusOut(event: FocusEvent): void {
     emit("focusOut", event);
 }
 
 /**
  * Mouse over either the input or the search button
- * @param {MouseEvent} event - The event object
+ * @param event - The event object
  */
-function onMouseOver(event: MouseEvent) {
+function onMouseOver(event: MouseEvent): void {
     emit("mouseOver", event);
 }
 
 /**
  * Mouse out either the input or the search button
- * @param {Event} event - The event object
+ * @param event - The event object
  */
-function onMouseOut(event: MouseEvent) {
+function onMouseOut(event: MouseEvent): void {
     emit("mouseOut", event);
 }
 </script>

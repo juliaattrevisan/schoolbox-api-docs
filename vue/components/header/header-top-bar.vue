@@ -1,4 +1,7 @@
 <script setup>
+// Ignore this file for ESLint checks for now (SA-18376)
+/* eslint-disable */
+/* eslint-enable vue/no-v-html */
 /**
  * Top bar that contains most navigation elements and toggles the side menu and notifications
  */
@@ -22,7 +25,7 @@ window.Vue.onMounted(() => {
     primaryMenuItems = Array.from(primary.value.querySelectorAll("li")); //get all the list menu list items
     primaryMenuItems.splice(0, 2); //remove the side menu button and the logo
     primaryMenuItemsMaxXPos = primaryMenuItems.map(
-        (menuItem) => menuItem.getBoundingClientRect().x + menuItem.getBoundingClientRect().width
+        (menuItem) => menuItem.getBoundingClientRect().x + menuItem.getBoundingClientRect().width,
     );
     initResizeObserver();
 });

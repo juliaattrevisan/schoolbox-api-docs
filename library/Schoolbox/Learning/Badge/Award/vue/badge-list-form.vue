@@ -1,4 +1,7 @@
 <script>
+// Ignore this file for ESLint checks for now (SA-18376)
+/* eslint-disable */
+/* eslint-enable vue/no-v-html */
 import RevealModal from "@schoolboxVue/components/reveal-modal";
 import BadgeImage from "../../vue/badge-image";
 import BadgeList from "../../vue/badge-list";
@@ -382,7 +385,7 @@ export default {
                         },
                         body: JSON.stringify(payload),
                     });
-                })
+                }),
             )
                 .then(() => {
                     this.toastSuccess(this.toastSuccessMessage);
@@ -443,12 +446,7 @@ export default {
             </div>
             <ul class="flex-list buttons">
                 <li>
-                    <button
-                        @click.prevent="onClearSelectedBadges"
-                        class="button-clear"
-                    >
-                        Clear selection
-                    </button>
+                    <button @click.prevent="onClearSelectedBadges" class="button-clear">Clear selection</button>
                 </li>
                 <li>
                     <button @click.prevent="onConfirmSelected" class="submit">
@@ -495,11 +493,7 @@ export default {
                     >
                         Award with Evidence
                     </a>
-                    <button
-                        :title="submitButtonText"
-                        :isProcessing="isProcessing"
-                        @click.prevent="onSubmit"
-                    >
+                    <button :title="submitButtonText" :isProcessing="isProcessing" @click.prevent="onSubmit">
                         {{ submitButtonText }}
                     </button>
                 </section>

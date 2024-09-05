@@ -11,7 +11,7 @@ const UNSET_ID = -1;
 
 /**
  * Pass empty fields to be added
- * @returns { Partial<Node> } - a new Node to add
+ * @returns - a new Node to add
  */
 function getSubsection(): Partial<Node> {
     return {
@@ -23,11 +23,11 @@ function getSubsection(): Partial<Node> {
 
 /**
  * Pass through the subsection and whether the node is enabled
- * @param { Partial<Node> } subsection - the new subsection data
- * @param { Node } node - the parent Node
- * @returns { string } - the data to send to the backend
+ * @param subsection - the new subsection data
+ * @param node - the parent Node
+ * @returns - the data to send to the backend
  */
-function getFormData(subsection: Partial<Node>, node: Node) {
+function getFormData(subsection: Partial<Node>, node: Node): string {
     return JSON.stringify({
         name: subsection.name,
         code: subsection.code,
@@ -44,9 +44,9 @@ export const useAddSubsectionStore = defineStore("mcAddSubsection", () => {
 
     /**
      * to display a prompt to confirm adding a node to a subsection
-     * @param { Node } node - the node being added
+     * @param node - the node being added
      */
-    function prompt(node: Node) {
+    function prompt(node: Node): void {
         useActiveNodeStore().set(node);
         subsection.value = getSubsection();
         isOpen.value = true;
@@ -55,14 +55,14 @@ export const useAddSubsectionStore = defineStore("mcAddSubsection", () => {
     /**
      * to hide the confirmation prompt
      */
-    function cancel() {
+    function cancel(): void {
         useActiveNodeStore().unset();
         isOpen.value = false;
     }
 
     /**
      * pass the new subsections details to the backend
-     * @returns { Promise<{ id: number, message: string }> } - the id of the new node and a message to display
+     * @returns - the id of the new node and a message to display
      */
     async function add(): Promise<{ id: number; message: string }> {
         const activeNodeStore = useActiveNodeStore();
@@ -96,7 +96,7 @@ export const useAddSubsectionStore = defineStore("mcAddSubsection", () => {
     /**
      * to unset the id, called when the toast has already been displayed once
      */
-    function unsetId() {
+    function unsetId(): void {
         id.value = UNSET_ID;
     }
 

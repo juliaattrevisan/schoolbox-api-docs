@@ -2,6 +2,8 @@
  * Stores all the curriculum codes and determines display of nodes
  */
 
+/* eslint-disable import/no-cycle -- Disable dependency cycle warning temporarily [SA-18428] */
+
 import { defineStore } from "pinia";
 import {
     UNSET_ID,
@@ -38,9 +40,9 @@ export const useNodesStore = defineStore("mcNodes", () => {
 
     /**
      * Update the nodes when a change has occured, either from the initial load or adding or deleting them
-     * @param { Node[] } $nodes - the updated nodes
+     * @param $nodes - the updated nodes
      */
-    function updateNodes($nodes: Node[]) {
+    function updateNodes($nodes: Node[]): void {
         // we add them to .children so the top level structure is consistent with the levels below
         nodes.value = {
             children: $nodes,
@@ -71,7 +73,7 @@ export const useNodesStore = defineStore("mcNodes", () => {
     /**
      * load the single curriculum for display straight away
      */
-    async function loadSingleCurriculum() {
+    async function loadSingleCurriculum(): Promise<void> {
         if (nodes.value?.children !== null) {
             const singleCurriculumId: number = nodes.value?.children[0]?.id;
             await useViewNodesStore().setNextSelected(singleCurriculumId);
@@ -80,9 +82,9 @@ export const useNodesStore = defineStore("mcNodes", () => {
 
     /**
      * to only load the nodes that aren't already active
-     * @param { Breadcrumb[] } activeBreadcrumbs - the active breadcrumbs
-     * @param { Breadcrumb } newBreadcrumb - breadcrumb to add
-     * @returns { boolean } whether the breadcrumb is active
+     * @param activeBreadcrumbs - the active breadcrumbs
+     * @param newBreadcrumb - breadcrumb to add
+     * @returns whether the breadcrumb is active
      */
     function isActiveBreadcrumb(activeBreadcrumbs: Breadcrumb[], newBreadcrumb: Breadcrumb): boolean {
         return !activeBreadcrumbs.some((activeBreadcrumb) => newBreadcrumb.id === activeBreadcrumb.id);
@@ -91,9 +93,9 @@ export const useNodesStore = defineStore("mcNodes", () => {
     /**
      * load in all the children required to reach the depth of the node,
      * avoiding loading those nodes that are already loaded
-     * @param { Node } node - the Node to load all children of
+     * @param node - the Node to load all children of
      */
-    async function loadAllChildren(node: Node) {
+    async function loadAllChildren(node: Node): Promise<void> {
         isLoadingAllChildren.value = true;
         const breadcrumbs = getBreadcrumbs(node, []);
         breadcrumbs.push({ id: node.id, name: node.name }); // add in the actual node as the last
@@ -105,20 +107,21 @@ export const useNodesStore = defineStore("mcNodes", () => {
         const onlyInactiveBreadcrumbs = breadcrumbs.filter((newBreadcrumb: Breadcrumb) =>
             isActiveBreadcrumb(activeBreadcrumbs, newBreadcrumb),
         );
-        for (let i = 0; i < onlyInactiveBreadcrumbs.length; i += 1) {
-            // recursively load in each node and traverse down
-            if (i === onlyInactiveBreadcrumbs.length - 1) {
-                isLoadingAllChildren.value = false;
-            }
-            await useViewNodesStore().setNextSelected(onlyInactiveBreadcrumbs[i].id);
-        }
+
+        // recursively load in each node and traverse down
+        await onlyInactiveBreadcrumbs.reduce(async (prevPromise, breadcrumb) => {
+            await prevPromise;
+            return useViewNodesStore().setNextSelected(breadcrumb.id);
+        }, Promise.resolve());
+
+        isLoadingAllChildren.value = false;
     }
 
     /**
      * load the node, retrieving all its parents, so we can traverse directly to it
-     * @param { number } id - the id of the Node to load
+     * @param id - the id of the Node to load
      */
-    async function loadId(id: number) {
+    async function loadId(id: number): Promise<void> {
         try {
             isLoading.value = true;
             const response = await fetch(`${useStore().getApiEndpoint()}/${id}?ancestors=99`); // just use 99 as hopefully there's no tree that deep...
@@ -146,9 +149,9 @@ export const useNodesStore = defineStore("mcNodes", () => {
 
     /**
      * set the top level nodes, passed through from loading
-     * @param { Node[] } $nodes - the node to load
+     * @param $nodes - the node to load
      */
-    async function setTopLevel($nodes: Node[]) {
+    async function setTopLevel($nodes: Node[]): Promise<void> {
         updateNodes($nodes);
         const store = useStore();
         if (store.hasId) {
@@ -163,7 +166,7 @@ export const useNodesStore = defineStore("mcNodes", () => {
     /**
      * load in the top level nodes from the api
      */
-    async function load() {
+    async function load(): Promise<void> {
         const store = useStore();
         try {
             const response = await fetch(
@@ -189,10 +192,9 @@ export const useNodesStore = defineStore("mcNodes", () => {
 
     /**
      * Load in another level of children of the target node id
-     *
-     * @param { number } id - the id of the Node to children of
+     * @param id - the id of the Node to children of
      */
-    async function loadNextChildren(id: number) {
+    async function loadNextChildren(id: number): Promise<void> {
         try {
             isLoading.value = true;
             const response = await fetch(
@@ -222,18 +224,18 @@ export const useNodesStore = defineStore("mcNodes", () => {
 
     /**
      * A new curriculum has been added so add it to the nodes
-     * @param { Node } curriculum - the new root curriculum node
+     * @param curriculum - the new root curriculum node
      */
-    function addNewCurriculum(curriculum: Node) {
+    function addNewCurriculum(curriculum: Node): void {
         nodes.value?.children?.push(curriculum);
         nodes.value.children = sortNodes(nodes.value.children as Node[]);
     }
 
     /**
      * A node has been updated, so we should check if the name change would prompt a sort change
-     * @param { Node } node - the node that has been updated
+     * @param node - the node that has been updated
      */
-    function nodeUpdated(node: Node) {
+    function nodeUpdated(node: Node): void {
         if (node.parent) {
             // sort via the parent node
             const parentNode = findById(nodes.value?.children as Node[], node.parent.id) as Node;
@@ -246,9 +248,9 @@ export const useNodesStore = defineStore("mcNodes", () => {
 
     /**
      * Pull the node out of the list
-     * @param { Node } node - the node to delete
+     * @param node - the node to delete
      */
-    function deleteNode(node: Node) {
+    function deleteNode(node: Node): void {
         useViewNodesStore().checkDeletedNode(node); // check we aren't on the deleted node currently, if so we should traverse backwards one depth
         const nodeRemoved: Node[] = removeId(nodes.value.children as Node[], node.id);
         updateNodes(nodeRemoved);

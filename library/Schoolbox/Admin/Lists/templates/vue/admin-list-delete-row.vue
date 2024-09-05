@@ -1,4 +1,7 @@
 <script>
+// Ignore this file for ESLint checks for now (SA-18376)
+/* eslint-disable */
+/* eslint-enable vue/no-v-html */
 /**
  * Delete a row, either straight away when the row hasn't bee added to the DB,
  * or via a confirmation modal when the row is already in the DB
@@ -112,18 +115,10 @@ export default {
             </div>
             <ul class="flex-list buttons">
                 <li>
-                    <a
-                        @click.prevent="onConfirmDeleteRowSelected"
-                        class="button submit"
-                        >Yes</a
-                    >
+                    <a @click.prevent="onConfirmDeleteRowSelected" class="button submit">Yes</a>
                 </li>
                 <li>
-                    <a
-                        @click.prevent="onCancelDeleteRowSelected"
-                        class="button"
-                        >Cancel</a
-                    >
+                    <a @click.prevent="onCancelDeleteRowSelected" class="button">Cancel</a>
                 </li>
             </ul>
         </reveal-modal>

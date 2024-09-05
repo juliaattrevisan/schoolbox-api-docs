@@ -27,9 +27,9 @@ const searchResultsEl = window.Vue.ref<HTMLDivElement | null>(null);
 
 /**
  * to animate the height of the search results container
- * @param {number} targetHeight - the height to animate to
+ * @param targetHeight - the height to animate to
  */
-function animateHeight(targetHeight: number) {
+function animateHeight(targetHeight: number): void {
     gsap.to(searchResultsContainerEl.value, {
         duration: 0.3,
         height: targetHeight === 1 ? 0 : targetHeight,
@@ -77,9 +77,9 @@ const showSelectAll = window.Vue.computed(() => {
 
 /**
  * To toggle the selected state of the result
- * @param {Result} result - the result selected
+ * @param result - the result selected
  */
-function onSelected(result: Result) {
+function onSelected(result: Result): void {
     emit("select", result);
 }
 </script>

@@ -1,4 +1,7 @@
 <script>
+// Ignore this file for ESLint checks for now (SA-18376)
+/* eslint-disable */
+/* eslint-enable vue/no-v-html */
 import RevealModal from "@schoolboxVue/components/reveal-modal";
 import MetaList from "@schoolboxVue/components/meta/list";
 import MetaItem from "@schoolboxVue/components/meta/item";

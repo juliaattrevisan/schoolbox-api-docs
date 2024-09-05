@@ -45,9 +45,9 @@ export const useFilterDateRangeStore = defineStore("spFilterDateRange", () => {
 
     /**
      * Get the date range filter data
-     * @returns {FiltersFormData["date"]} - the date range filter data
+     * @returns - the date range filter data
      */
-    function getFormData() {
+    function getFormData(): Pick<FiltersFormData, "date"> {
         // Only add from and to if they are set.
         return {
             date: {
@@ -64,7 +64,7 @@ export const useFilterDateRangeStore = defineStore("spFilterDateRange", () => {
     /**
      * search has been triggered so set the active date range filter
      */
-    function setActive() {
+    function setActive(): void {
         activeStartDate.value = startDate.value;
         activeEndDate.value = endDate.value;
     }
@@ -80,7 +80,7 @@ export const useFilterDateRangeStore = defineStore("spFilterDateRange", () => {
     /**
      * clear the date filter
      */
-    function clear() {
+    function clear(): void {
         startDate.value = EMPTY_DATE;
         endDate.value = EMPTY_DATE;
     }

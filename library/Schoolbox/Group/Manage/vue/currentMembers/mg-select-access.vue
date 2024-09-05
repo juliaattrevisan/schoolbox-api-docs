@@ -1,4 +1,7 @@
 <script setup>
+// Ignore this file for ESLint checks for now (SA-18376)
+/* eslint-disable */
+/* eslint-enable vue/no-v-html */
 /**
  * Bulk update the currently selected members access rights
  */
@@ -31,7 +34,7 @@ window.Vue.watch(
             areAllSelectedOnWaitingList.value = false;
         }
     },
-    { deep: true }
+    { deep: true },
 );
 
 /**

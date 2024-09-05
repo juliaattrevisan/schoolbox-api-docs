@@ -36,9 +36,9 @@ const hasError = window.Vue.ref(false);
  * Here we retrieve the current mark by observing the relevant form field
  * As the input and validation are handled outside of Vue,
  * we need to observe the form field to update the mark
- * @param {HTMLElement} gradeContainer - the container to get the mark from
+ * @param gradeContainer - the container to get the mark from
  */
-function getMark(gradeContainer: HTMLElement) {
+function getMark(gradeContainer: HTMLElement): void {
     const formElement = gradeContainer.querySelector("input,select") as HTMLFormElement; // depending on the Mark Type, the mark field can either be an input or a select
     if (formElement !== null) {
         mark.value = formElement.value as string;
@@ -63,7 +63,7 @@ function getMark(gradeContainer: HTMLElement) {
  * See library/Schoolbox/Learning/Learnosity/templates/horizontal.twig and
  * library/Schoolbox/Learning/Learnosity/templates/feedback.twig for where the grade field is initially rendered.
  */
-function addGradeElement() {
+function addGradeElement(): void {
     const gradeContainer = document.getElementById(`grade-container-${props.student.id}`);
     if (gradeContainer !== null) {
         gradeEl.value?.append(gradeContainer);
@@ -77,7 +77,7 @@ function addGradeElement() {
  * To remove the grade field from the Vue component, to prevent it being destroyed when the component is unmounted
  * and to allow it to be re-appended when the component is potentially mounted again
  */
-function removeGradeElement() {
+function removeGradeElement(): void {
     const gradesContainer = document.getElementById("grades-container");
     const gradeContainer = document.getElementById(`grade-container-${props.student.id}`);
     if (gradesContainer !== null && gradeContainer !== null) {
@@ -112,9 +112,9 @@ const saveContainerHeight = window.Vue.computed(() => {
 
 /**
  * To notify the user that they're leaving the page while data is being saved
- * @param {BeforeUnloadEvent} event - the event to prevent
+ * @param event - the event to prevent
  */
-function beforeUnloadHandler(event: BeforeUnloadEvent) {
+function beforeUnloadHandler(event: BeforeUnloadEvent): void {
     event.preventDefault();
     event.returnValue = "";
 }
@@ -122,7 +122,7 @@ function beforeUnloadHandler(event: BeforeUnloadEvent) {
 /**
  * Save the mark if it's changed
  */
-async function saveMark() {
+async function saveMark(): Promise<void> {
     if (isSaving.value) {
         return;
     }
@@ -228,7 +228,7 @@ const showAssignButton = computedEager(() => {
  * Update the mark which will fire the
  * watchDebounced and save the mark
  */
-function assignMark() {
+function assignMark(): void {
     const formElement = (gradeEl.value as HTMLDivElement).querySelector("input,select") as HTMLFormElement; // depending on the Mark Type, the mark field can either be an input or a select
     formElement.value = actualMark.value;
     mark.value = actualMark.value;
@@ -237,7 +237,7 @@ function assignMark() {
 /**
  * Assign the mark when selected
  */
-function onAssignSelected() {
+function onAssignSelected(): void {
     assignMark();
 }
 

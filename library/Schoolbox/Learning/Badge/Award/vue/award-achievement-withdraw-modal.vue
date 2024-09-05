@@ -1,4 +1,7 @@
 <script>
+// Ignore this file for ESLint checks for now (SA-18376)
+/* eslint-disable */
+/* eslint-enable vue/no-v-html */
 import BadgeImage from "./../../vue/badge-image";
 import RevealModal from "@schoolboxVue/components/reveal-modal";
 import toastMixin from "@schoolboxVue/components/toast-mixin";
@@ -115,7 +118,7 @@ export default {
                         /* Goal prevents achievement from being withdrawn
                          */
                         self.toastError(
-                            "Unable to withdraw achievement; a goal might exist and should be withdrawn first."
+                            "Unable to withdraw achievement; a goal might exist and should be withdrawn first.",
                         );
                     } else {
                         /* Generic error

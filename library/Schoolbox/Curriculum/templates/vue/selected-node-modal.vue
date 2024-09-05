@@ -43,7 +43,7 @@ const selectedNodeId = window.Vue.computed(() => {
 /**
  * close the modal, setting the activeNode to null so we can allow another selection
  */
-function onModalClosed() {
+function onModalClosed(): void {
     emit("closed");
 }
 </script>

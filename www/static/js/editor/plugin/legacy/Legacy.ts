@@ -8,11 +8,11 @@ import type { AttributeElement, DowncastConversionApi, ViewElement } from "@cked
 
 /**
  * Referenced from: https://github.com/ckeditor/ckeditor5/blob/96d53e7cfca358d54d4a154dd9f6fd7f5f2cc524/packages/ckeditor5-link/src/utils.js
- * @param { string } id - the id to use as the anchor link
- * @param { DowncastConversionApi } downcast - the conversion api
- * @returns { AttributeElement } - the link element
+ * @param id - the id to use as the anchor link
+ * @param downcast - the conversion api
+ * @returns - the link element
  */
-export function createLinkElement(id: string, downcast: DowncastConversionApi) {
+export function createLinkElement(id: string, downcast: DowncastConversionApi): AttributeElement {
     const linkElement = downcast.writer.createAttributeElement("a", { id }, { priority: 5 });
     downcast.writer.setCustomProperty("link", true, linkElement);
     return linkElement;
@@ -23,9 +23,9 @@ export function createLinkElement(id: string, downcast: DowncastConversionApi) {
  * it set an <a> tag with an id attribute. So although this button is no longer available
  * in CKEditor 5, we can still allow the id attribute on <a> tags.
  * So any existing anchors will still work
- * @param { Editor } editor - the editor instance
+ * @param editor - the editor instance
  */
-function allowExistingAnchors(editor: Editor) {
+function allowExistingAnchors(editor: Editor): void {
     // Allow id attribute on all inline nodes.
     editor.model.schema.extend("$text", { allowAttributes: "id" });
     editor.conversion.for("dataDowncast").attributeToElement({
@@ -53,7 +53,7 @@ function allowExistingAnchors(editor: Editor) {
 }
 
 export default class Legacy extends Plugin {
-    init() {
+    init(): void {
         allowExistingAnchors(this.editor);
     }
 }

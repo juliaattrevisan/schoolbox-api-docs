@@ -60,14 +60,14 @@ const showRemove = window.Vue.computed(
 /**
  * When the code is selected, open the curriculum details modal
  */
-function onCodeSelected() {
+function onCodeSelected(): void {
     store().selectedDetailsNodeId = props.node.id;
 }
 
 /**
  * Remove the node from the selected nodes
  */
-function onRemoveSelected() {
+function onRemoveSelected(): void {
     if (store().isProcessing) return;
     void store().removeNode(props.node);
 }

@@ -1,4 +1,7 @@
 <script>
+// Ignore this file for ESLint checks for now (SA-18376)
+/* eslint-disable */
+/* eslint-enable vue/no-v-html */
 import PastoralCountBadge from "@schoolboxLibrary/Pastoral/Count/vue/pastoral-count-badge";
 
 export default {
@@ -401,7 +404,7 @@ export default {
                 parts.push(
                     $("<a>")
                         .attr("href", "/search/user/" + student.id)
-                        .text(student.firstname + " " + student.lastname)
+                        .text(student.firstname + " " + student.lastname),
                 );
                 parts.push(", ");
             });

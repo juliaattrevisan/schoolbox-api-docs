@@ -1,4 +1,7 @@
 <script>
+// Ignore this file for ESLint checks for now (SA-18376)
+/* eslint-disable */
+/* eslint-enable vue/no-v-html */
 /**
  * Generate a list of QR login codes for the current class / group.
  * Using the QR code, the student can login and be redirected to the specified URL.
@@ -173,7 +176,7 @@ export default {
         onStudentSelected(student) {
             if (this.isInSelectedStudents(student.id)) {
                 this.selectedStudents = this.selectedStudents.filter(
-                    (selectedStudent) => selectedStudent.id !== student.id
+                    (selectedStudent) => selectedStudent.id !== student.id,
                 ); //remove if in the list
             } else {
                 this.selectedStudents = [student, ...this.selectedStudents]; //otherwise add them in

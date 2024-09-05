@@ -1,4 +1,7 @@
 <script>
+// Ignore this file for ESLint checks for now (SA-18376)
+/* eslint-disable */
+/* eslint-enable vue/no-v-html */
 /**
  * To add and view/delete comments on an existing pastoral record
  * This component manages both 'public' and 'private' recordTypes

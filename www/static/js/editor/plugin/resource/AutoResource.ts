@@ -26,7 +26,7 @@ export default class ResourceEditing extends Plugin {
      * a file is dragged and dropped into the editor
      * When files are added, upload them and add them to the editor
      */
-    init() {
+    init(): void {
         const config = this.editor.config.get("sbConfig") as SbxEditorConfig;
         // prevent adding resources if the toolbar is set to simple
         if (config.toolbar === EditorToolbar.SIMPLE) {
@@ -83,11 +83,11 @@ export default class ResourceEditing extends Plugin {
      * Add an element to display the upload progress of the resource.
      * Once the resource is uploaded the upload element display is closed.
      * If there's an error the display will change to an error state.
-     * @param { FileRepository } fileRepository - the file repository
-     * @param { ResourceUI } resourceUI - the resource UI plugin
-     * @param { File } file - the file to upload
+     * @param fileRepository - the file repository
+     * @param resourceUI - the resource UI plugin
+     * @param file - the file to upload
      */
-    async loadResource(fileRepository: FileRepository, resourceUI: ResourceUI, file: File) {
+    async loadResource(fileRepository: FileRepository, resourceUI: ResourceUI, file: File): Promise<void> {
         const uploadElement = resourceUI.getUploadElement(file);
         resourceUI.checkUploadContainer();
         const progressMeter = uploadElement.querySelector("[data-progress-meter]") as HTMLDivElement;
@@ -121,9 +121,9 @@ export default class ResourceEditing extends Plugin {
     /**
      * To remove the upload progress element, removing the upload container if
      * there are no more uploads in progress
-     * @param { HTMLDivElement } uploadElement - the element to remove
+     * @param uploadElement - the element to remove
      */
-    async removeUploadProgress(uploadElement: HTMLDivElement) {
+    async removeUploadProgress(uploadElement: HTMLDivElement): Promise<void> {
         await slideUp(uploadElement);
         uploadElement.remove();
         (this.editor.plugins.get("ResourceUI") as ResourceUI).checkUploadContainer();

@@ -70,6 +70,21 @@ module.exports = {
                 allow: ["warn", "error"],
             },
         ],
+        // enforce consistent explicit return types on functions and class methods
+        "@typescript-eslint/explicit-function-return-type": "warn",
+        "@typescript-eslint/typedef": [
+            "warn",
+            {
+                parameter: true, // enforce parameters of functions to have explicit types
+                propertyDeclaration: true, // enforce properties of interfaces/types to have explicit types
+            },
+        ],
+        // due to the above rules enforcing explicit types, we prevent types from being included in the JSDoc
+        "jsdoc/require-param-type": "off",
+        "jsdoc/require-returns-type": "off",
+        "jsdoc/no-types": "warn",
+        // change no-unused-vars to warn instead of error (to make it less misleading)
+        "@typescript-eslint/no-unused-vars": "warn",
     },
     settings: {
         "import/parsers": {

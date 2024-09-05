@@ -72,7 +72,7 @@ let masonryConfig: MasonryConfig | null = null;
 
 /**
  * Returns the current Masonry configuration.
- * @returns { MasonryConfig } - The current Masonry configuration.
+ * @returns - The current Masonry configuration.
  */
 export function getMasonryConfig(): MasonryConfig | null {
     return masonryConfig;
@@ -80,8 +80,8 @@ export function getMasonryConfig(): MasonryConfig | null {
 
 /**
  * Sets the Masonry configuration.
- * @param { MasonryConfig } config - The configuration to set.
+ * @param config - The configuration to set.
  */
-export function setMasonryConfig(config: MasonryConfig) {
+export function setMasonryConfig(config: MasonryConfig): void {
     masonryConfig = config;
 }

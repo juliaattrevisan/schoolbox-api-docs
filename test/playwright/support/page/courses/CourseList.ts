@@ -14,31 +14,31 @@ export default class CourseList {
     /**
      * Navigates to course list page
      */
-    async goto() {
+    async goto(): Promise<void> {
         await this.page.goto(CourseList.URL);
     }
 
     /**
      * Clicks a course 3-dot menu
-     * @param { number } courseDropdownNumber - The course dropdown number to click
+     * @param courseDropdownNumber - The course dropdown number to click
      */
-    async clickCourseDotMenu(courseDropdownNumber: number) {
+    async clickCourseDotMenu(courseDropdownNumber: number): Promise<void> {
         await this.page.getByTestId(`${CourseList.DATATEST_COURSE_DOT_MENU}-${courseDropdownNumber}`).click();
     }
 
     /**
      * Clicks a course down arrow
-     * @param { number } courseId - The course ID to click
+     * @param courseId - The course ID to click
      */
-    async clickCourseDownArrow(courseId: number) {
+    async clickCourseDownArrow(courseId: number): Promise<void> {
         await this.page.click(`a.icon-down-arrow[data-collapser=course-${courseId}]`);
     }
 
     /**
      * Clicks import into class
-     * @param { number } courseDropdownNumber - The course dropdown number to click
+     * @param courseDropdownNumber - The course dropdown number to click
      */
-    async clickImportIntoClass(courseDropdownNumber: number) {
+    async clickImportIntoClass(courseDropdownNumber: number): Promise<void> {
         await this.page.click(`a[href="/course/import/${courseDropdownNumber}/folder/0/0?returnUrl=L2NvdXJzZS9saXN0"]`);
     }
 }

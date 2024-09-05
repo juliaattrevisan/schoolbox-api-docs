@@ -47,7 +47,6 @@ const justUpdated = window.Vue.ref(false); // to highlight if the node has just 
 /**
  * Consider whether we are currently only showing enabled nodes
  * and hide the node if we are are and the node is not enabled
- *
  * @returns { boolean }
  */
 const showNode = window.Vue.computed(() => {
@@ -61,7 +60,7 @@ const showNode = window.Vue.computed(() => {
  * animate to help show which direction we are currently moving through the tree
  * fade on the node and slide it from forwards/backwards depending on the currentDirection
  */
-function animateOn() {
+function animateOn(): void {
     const xStart = viewNodesStore.currentDirection === DIRECTION.FORWARDS ? -10 : 10;
     gsap.set(viewNodeEl.value, {
         opacity: 0,
@@ -78,10 +77,9 @@ function animateOn() {
 /**
  * show an animation when the node has been added or updated
  * we add the relevant boolean ref to show the animation then remove
- *
- * @param { Ref<boolean> } change - the boolean value to change, can be either isNew or justUpdated
+ * @param change - the boolean value to change, can be either isNew or justUpdated
  */
-async function displayAnimation(change: Ref<boolean>) {
+async function displayAnimation(change: Ref<boolean>): Promise<void> {
     change.value = true;
     await timeout(3000);
     change.value = false;
@@ -117,7 +115,7 @@ useUpdateNodeStore().$onAction(({ name, after }) => {
         after((result) => {
             if (props.node.id === result.id) {
                 // highlight the just updated node
-                displayAnimation(justUpdated);
+                void displayAnimation(justUpdated);
             }
         });
     }
@@ -125,35 +123,30 @@ useUpdateNodeStore().$onAction(({ name, after }) => {
 
 /**
  * to gradually add more marginLeft to indicate node level depth
- *
  * @returns { number }
  */
 const marginLeft = window.Vue.computed(() => `calc(${props.depth * 2}rem)`);
 
 /**
  * If this is the active node being viewed
- *
  * @returns { boolean }
  */
 const isViewing = window.Vue.computed(() => nodeUsageStore.isOpen && activeNodeStore.node.id === props.node.id);
 
 /**
  * If there's another node being viewed
- *
  * @returns { boolean }
  */
 const isViewingAnother = window.Vue.computed(() => nodeUsageStore.isOpen && activeNodeStore.node.id !== props.node.id);
 
 /**
  * If this is the active node being updated
- *
  * @returns { boolean }
  */
 const isUpdating = window.Vue.computed(() => updateNodeStore.isOpen && activeNodeStore.node.id === props.node.id);
 
 /**
  * If there's another node being updated
- *
  * @returns { boolean }
  */
 const isUpdatingAnother = window.Vue.computed(
@@ -162,14 +155,12 @@ const isUpdatingAnother = window.Vue.computed(
 
 /**
  * If this is the active node being added to
- *
  * @returns { boolean }
  */
 const isAdding = window.Vue.computed(() => addSubsectionStore.isOpen && activeNodeStore.node.id === props.node.id);
 
 /**
  * If there's another node being added to
- *
  * @returns { boolean }
  */
 const isAddingAnother = window.Vue.computed(
@@ -178,14 +169,12 @@ const isAddingAnother = window.Vue.computed(
 
 /**
  * If this is the active node being viewed, updated or added to
- *
  * @returns { boolean }
  */
 const isActive = window.Vue.computed(() => isViewing.value || isUpdating.value || isAdding.value);
 
 /**
  * To determine whether we need to display further child nodes within this node
- *
  * @returns { boolean }
  */
 const showChildren = window.Vue.computed(
@@ -194,14 +183,12 @@ const showChildren = window.Vue.computed(
 
 /**
  * If there's a code available, which means it can be added to the name
- *
  * @returns { boolean }
  */
 const hasCode = window.Vue.computed(() => props.node.code && props.node.code !== "");
 
 /**
  * Add in the code if it's available otherwise just show the title
- *
  * @returns { string }
  */
 const title = window.Vue.computed(() =>
@@ -211,7 +198,6 @@ const title = window.Vue.computed(() =>
 /**
  * Whether the checkbox and actions should be displayed, shouldn't be if the user is read only
  * or we are at the root level node, or if the search is active
- *
  * @returns { boolean }
  */
 const showActions = window.Vue.computed(() => !store.isReadOnly && props.node.id !== UNSET_ID && !searchStore.isActive);
@@ -219,7 +205,6 @@ const showActions = window.Vue.computed(() => !store.isReadOnly && props.node.id
 /**
  * Whether the usage should be displayed, shouldn't be if we are at the root level node,
  * or if the search is active
- *
  * @returns { boolean }
  */
 const showUsage = window.Vue.computed(() => props.node.id !== UNSET_ID);

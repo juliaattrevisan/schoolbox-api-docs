@@ -19,11 +19,11 @@ export const useUnitPlannerStore = defineStore("unitPlannerStore", () => {
 
     /**
      * store any passed through properties
-     * @param { number } $courseId - the course ID
-     * @param { Unit[] } $units - the units to store
-     * @param { UnitTemplate } $template - the unit template
+     * @param $courseId - the course ID
+     * @param $units - the units to store
+     * @param $template - the unit template
      */
-    function init($courseId: number, $units: Unit[], $template: UnitTemplate) {
+    function init($courseId: number, $units: Unit[], $template: UnitTemplate): void {
         courseId.value = $courseId;
         units.value = $units;
         template.value = $template;
@@ -64,11 +64,11 @@ export const useUnitPlannerStore = defineStore("unitPlannerStore", () => {
 
     /**
      * Updates the focus state of a unit+column
-     * @param { number } unitId - the unit to update the focus state for
-     * @param { Column } column - the column to update the focus state for
-     * @param { boolean } isFocused - whether the column is focused
+     * @param unitId - the unit to update the focus state for
+     * @param column - the column to update the focus state for
+     * @param isFocused - whether the column is focused
      */
-    function updateFocusedUnitCell(unitId: number, column: Column, isFocused: boolean) {
+    function updateFocusedUnitCell(unitId: number, column: Column, isFocused: boolean): void {
         if (isFocused) {
             if (focusedUnitCells.value[unitId] === undefined) {
                 focusedUnitCells.value[unitId] = [];
@@ -89,9 +89,9 @@ export const useUnitPlannerStore = defineStore("unitPlannerStore", () => {
 
     /**
      * toggle the view more (expanded) state of a unit
-     * @param { number } unitId - the id of the unit to toggle
+     * @param unitId - the id of the unit to toggle
      */
-    function toggleViewMore(unitId: Unit["id"]) {
+    function toggleViewMore(unitId: Unit["id"]): void {
         if (viewMoreUnitIDs.value.includes(unitId)) {
             viewMoreUnitIDs.value = viewMoreUnitIDs.value.filter((id) => id !== unitId);
         } else {
@@ -104,11 +104,11 @@ export const useUnitPlannerStore = defineStore("unitPlannerStore", () => {
     /**
      * As content is loaded, we need to keep track of the height so we can correctly
      * size other cells from that unit when it is expanded.
-     * @param { Unit } unit - the unit to set the content height for
-     * @param { Column } column - the column to set the content height for
-     * @param { number } height - the height to set
+     * @param unit - the unit to set the content height for
+     * @param column - the column to set the content height for
+     * @param height - the height to set
      */
-    function setUnitContentHeight(unit: Unit, column: Column, height: number) {
+    function setUnitContentHeight(unit: Unit, column: Column, height: number): void {
         if (unitContentHeights.value[unit.id] === undefined) {
             unitContentHeights.value[unit.id] = {};
         }
@@ -163,10 +163,10 @@ export const useUnitPlannerStore = defineStore("unitPlannerStore", () => {
 
     /**
      * Add a newly created curriculum component to a unit
-     * @param {number} unitId - to find the unit to add the component to
-     * @param {CurriculumOverviewComponent} component - the component to add
+     * @param unitId - to find the unit to add the component to
+     * @param component - the component to add
      */
-    function addCurriculumComponent(unitId: number, component: CurriculumOverviewComponent) {
+    function addCurriculumComponent(unitId: number, component: CurriculumOverviewComponent): void {
         const matchedUnit = units.value.find((unit) => unit.id === unitId);
         if (!matchedUnit) {
             return;

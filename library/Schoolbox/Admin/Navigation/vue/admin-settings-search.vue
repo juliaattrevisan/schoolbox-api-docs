@@ -47,7 +47,7 @@ export default window.Vue.defineComponent({
     computed: {
         /**
          * to notify whether still loading the results or not
-         * @returns {string} loading status
+         * @returns loading status
          */
         inputPlaceholder(): string {
             if (this.isLoaded) {
@@ -59,7 +59,7 @@ export default window.Vue.defineComponent({
 
         /**
          * only when started typing beyond minQueryLength count and there's actual results
-         * @returns {boolean} start displaying results or not
+         * @returns start displaying results or not
          */
         isActive(): boolean {
             return this.query.length >= this.minQueryLength && this.resultsList.length > 0;
@@ -67,7 +67,7 @@ export default window.Vue.defineComponent({
 
         /**
          * the search string broken into words, to search for each word
-         * @returns {string[]} the search string broken into single words
+         * @returns the search string broken into single words
          */
         queryWordList(): string[] {
             const allWords = this.query.match(/\b(\w+)\b/g);
@@ -80,7 +80,7 @@ export default window.Vue.defineComponent({
 
         /**
          * the settings relevant to the search input
-         * @returns {SBSettingsListItem[]} the list of search results
+         * @returns the list of search results
          */
         resultsList(): SBSettingsListItem[] {
             if (this.query.length < this.minQueryLength) {
@@ -96,8 +96,8 @@ export default window.Vue.defineComponent({
     watch: {
         /**
          * reset the active index when the list changes as the index may become out of range
-         * @param {SBSettingsListItem[]} newValue - the new list of results
-         * @param {SBSettingsListItem[]} oldValue - the old list of results
+         * @param newValue - the new list of results
+         * @param oldValue - the old list of results
          */
         resultsList(newValue: SBSettingsListItem[], oldValue: SBSettingsListItem[]) {
             if (newValue.length !== oldValue.length && this.activeIndex > 0) {
@@ -116,8 +116,8 @@ export default window.Vue.defineComponent({
         /**
          * find all those results that match EACH search word
          * within the the title field
-         * @param {SBSettingsListItem} setting - the setting to check
-         * @returns {boolean} true if found
+         * @param setting - the setting to check
+         * @returns true if found
          */
         searchForTitle(setting: SBSettingsListItem): boolean {
             let wordMatchCount = 0;
@@ -136,8 +136,8 @@ export default window.Vue.defineComponent({
         /**
          * find all those results that match EACH search word
          * within the name and description fields
-         * @param {SBSettingsListItem} setting - the setting to check
-         * @returns {boolean} true if found
+         * @param setting - the setting to check
+         * @returns true if found
          */
         searchForNameAndDescription(setting: SBSettingsListItem): boolean {
             let wordMatchCount = 0;
@@ -299,7 +299,7 @@ export default window.Vue.defineComponent({
          * animate settings to help context when filtering
          * refer to https://vuejs.org/v2/guide/transitions.html#Staggering-List-Transitions
          * what happens before shown
-         * @param {Element} element - the element that's animating
+         * @param element - the element that's animating
          */
         onBeforeOnEnter(element: Element) {
             gsap.set(element, { opacity: 0, y: 10, height: 0 });
@@ -307,8 +307,8 @@ export default window.Vue.defineComponent({
 
         /**
          * how it element animates on
-         * @param {Element} element - the element that's animating
-         * @param {() => void} done - to be called once animation is complete
+         * @param element - the element that's animating
+         * @param done - to be called once animation is complete
          */
         onEnter(element: Element, done: () => void) {
             const elementIndex = element.getAttribute("index") ?? "0";
@@ -318,8 +318,8 @@ export default window.Vue.defineComponent({
 
         /**
          * how the element animates off
-         * @param {Element} element - the element that's animating
-         * @param {() => void} done - to be called once animation is complete
+         * @param element - the element that's animating
+         * @param done - to be called once animation is complete
          */
         onLeave(element: Element, done: () => void) {
             gsap.to(element, 0.3, { opacity: 0, y: 10, height: 0, onComplete: done });
@@ -334,7 +334,7 @@ export default window.Vue.defineComponent({
 
         /**
          * a result has been selected via #admin-settings-search-result
-         * @param {string} url - the url to move to
+         * @param url - the url to move to
          */
         onSelectedResult(url: string) {
             this.selectResult(url);
@@ -343,7 +343,7 @@ export default window.Vue.defineComponent({
         /**
          * to move to the page the selected search result is on
          * which will have the result highlighted
-         * @param {string} url - the url to move to
+         * @param url - the url to move to
          */
         selectResult(url: string) {
             this.clearInput();

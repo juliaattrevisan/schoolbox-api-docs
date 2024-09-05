@@ -14,7 +14,7 @@ export default class ManageAllTextbox {
     /**
      * click Manage All button on the textbox component
      */
-    async clickManageAll() {
+    async clickManageAll(): Promise<void> {
         await this.page.locator("a.button").getByText("Manage All").click();
         await this.page.waitForSelector(`a[data-action="addTextbox"]`, { state: "visible" });
     }
@@ -22,27 +22,27 @@ export default class ManageAllTextbox {
     /**
      * click Create Text Box button
      */
-    async clickCreateTextBox() {
+    async clickCreateTextBox(): Promise<void> {
         await this.page.waitForSelector("a.icon-add.button");
         await this.page.click("a.icon-add.button");
     }
 
     /**
      * type a heading text
-     * @param { number } textBoxItem - The textbox item number
-     * @param { string } headingText - The heading text
+     * @param textBoxItem - The textbox item number
+     * @param headingText - The heading text
      */
-    async typeTextBoxHeading(textBoxItem: number, headingText: string) {
+    async typeTextBoxHeading(textBoxItem: number, headingText: string): Promise<void> {
         await this.page.waitForSelector(`input[name="textbox[${textBoxItem}][heading]"]`);
         await this.page.locator(`input[name="textbox[${textBoxItem}][heading]"]`).fill(headingText);
     }
 
     /**
      * enter a textbox content
-     * @param { number } textBoxItem - The textbox item number
-     * @param { string } contentText - The content text
+     * @param textBoxItem - The textbox item number
+     * @param contentText - The content text
      */
-    async typeTextBoxContent(textBoxItem: number, contentText: string) {
+    async typeTextBoxContent(textBoxItem: number, contentText: string): Promise<void> {
         const descriptionTextarea = this.page.locator(`#textbox-${textBoxItem}-body`);
         await this.tester.fillCKEditorByLocator(descriptionTextarea, contentText);
     }
@@ -50,7 +50,7 @@ export default class ManageAllTextbox {
     /**
      * click Save All button
      */
-    async clickSaveAll() {
+    async clickSaveAll(): Promise<void> {
         await this.page.click("input[type=submit]");
     }
 }

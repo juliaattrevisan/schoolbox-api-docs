@@ -21,8 +21,8 @@ export default class ManageGroup {
 
     /**
      * Gets url to create a group
-     * @param { number } groupId - The group ID
-     * @returns { string } - the URL
+     * @param groupId - The group ID
+     * @returns - the URL
      */
     public static getGroupModifyPage(groupId: number): string {
         return this.URL.replace("{group_id}", groupId.toString());
@@ -33,54 +33,54 @@ export default class ManageGroup {
      * free: type-3
      * moderated: type-2
      * restricted: type-1
-     * @param { string } accessPermission - The access permission to set
+     * @param accessPermission - The access permission to set
      */
-    async setAccessPermission(accessPermission: string) {
+    async setAccessPermission(accessPermission: string): Promise<void> {
         await this.page.locator(`label[for=${accessPermission}][class=radio-label]`).click();
     }
 
     /**
      * Click submit button
      */
-    async clickSubmitButton() {
+    async clickSubmitButton(): Promise<void> {
         await this.page.locator(ManageGroup.SUBMIT_BUTTON).click();
     }
 
     /**
      * Click update button
      */
-    async clickUpdateButton() {
+    async clickUpdateButton(): Promise<void> {
         await this.page.locator(ManageGroup.UPDATE_BUTTON).getByText("Update").click();
     }
 
     /**
      * Click an option on the radio button From: name, group, role, list
-     * @param { string } option - The option to click
+     * @param option - The option to click
      */
-    async clickFromRadioButton(option: string) {
+    async clickFromRadioButton(option: string): Promise<void> {
         await this.page.locator(`label[for=${option}]`).click();
     }
 
     /**
      * Search user, group, role by typing a text in the search bar
-     * @param { string } text - The text to type
+     * @param text - The text to type
      */
-    async search(text: string) {
+    async search(text: string): Promise<void> {
         await this.page.locator(ManageGroup.ELEMENT_SEARCH).fill(text);
     }
 
     /**
      * Select the user in the dropdown by passing user id
-     * @param { number } userId - The user ID
+     * @param userId - The user ID
      */
-    async selectUser(userId: number) {
+    async selectUser(userId: number): Promise<void> {
         await this.page.locator(`label[for=checkbox-${userId}]`).click();
     }
 
     /**
      * Clicks the Add Members button
      */
-    async clickAddMembers() {
+    async clickAddMembers(): Promise<void> {
         await this.page.getByTestId(ManageGroup.DATATEST_MANAGE_GROUP_ADD_MEMBERS).click();
     }
 }

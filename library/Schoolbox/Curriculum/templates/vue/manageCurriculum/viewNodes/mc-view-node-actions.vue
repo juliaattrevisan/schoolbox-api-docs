@@ -22,7 +22,7 @@ const updateNodeStore = useUpdateNodeStore();
 /**
  * to open up or close the add subsection modal
  */
-function onAddSubsectionToggleSelected() {
+function onAddSubsectionToggleSelected(): void {
     if (props.isAdding) {
         addSubsectionStore.cancel();
     } else {
@@ -33,7 +33,7 @@ function onAddSubsectionToggleSelected() {
 /**
  * to open up or close the update modal
  */
-function onUpdateToggleSelected() {
+function onUpdateToggleSelected(): void {
     if (props.isUpdating) {
         updateNodeStore.cancel();
     } else {

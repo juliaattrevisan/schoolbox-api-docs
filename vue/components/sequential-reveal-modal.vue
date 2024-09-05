@@ -1,4 +1,7 @@
 <script setup>
+// Ignore this file for ESLint checks for now (SA-18376)
+/* eslint-disable */
+/* eslint-enable vue/no-v-html */
 /**
  * A sequential modal reveal using Foundations reveal modal: https://get.foundation/sites/docs-v5/bundle/reveal.html
  * Being sequential, when the 1st modal is open and the 2nd is selected, the 1st is closed and then the 2nd is displayed.
@@ -89,7 +92,7 @@ window.Vue.watch(
             sequenceIndex.value = 1;
             close();
         }
-    }
+    },
 );
 
 /**
@@ -101,7 +104,7 @@ window.Vue.watch(
         if (isNextSelected) {
             close();
         }
-    }
+    },
 );
 
 /**
@@ -113,7 +116,7 @@ window.Vue.watch(
         if (isPreviousSelected) {
             close();
         }
-    }
+    },
 );
 
 /**

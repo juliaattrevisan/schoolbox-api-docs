@@ -1,4 +1,7 @@
 <script>
+// Ignore this file for ESLint checks for now (SA-18376)
+/* eslint-disable */
+/* eslint-enable vue/no-v-html */
 /**
  * Show a smiliarity report for a due work, showing a list of students latest submissions.
  * The list can be filtered by similarity score and submission status

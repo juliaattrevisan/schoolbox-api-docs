@@ -17,7 +17,7 @@ export default class PanelTweaks extends Plugin {
     /**
      * We need to ensure everything has been set up before we can start modifying the panels
      */
-    init() {
+    init(): void {
         (this.editor as ClassicEditor).sourceElement?.addEventListener(EditorEvent.EDITOR__CREATED, () => {
             this.updateDropdownPositions();
             this.checkForModal();
@@ -30,7 +30,7 @@ export default class PanelTweaks extends Plugin {
      * part of the dropdown may appear behind them. To resolve we pass in the #content element
      * into the getOptimalPosition method used.
      */
-    updateDropdownPositions() {
+    updateDropdownPositions(): void {
         const toolbarItems = (this.editor as ClassicEditor).ui.view.toolbar.items as ViewCollection<DropdownView>;
         const dropDownItems = toolbarItems.filter((item) => item.panelPosition !== null); // get only those toolbar items that are dropdowns
         dropDownItems.forEach((item) => {
@@ -44,9 +44,9 @@ export default class PanelTweaks extends Plugin {
      * after the listener assigned within the toolbar item.
      * We just replicate the logic used in https://ckeditor.com/docs/ckeditor5/latest/api/module_ui_dropdown_dropdownview-DropdownView.html#function-render
      * but add .limiter to the getOptimalPosition util method.
-     * @param {DropdownView} item - the dropdown item
+     * @param item - the dropdown item
      */
-    updateDropdownPosition(item: DropdownView) {
+    updateDropdownPosition(item: DropdownView): void {
         item.on("change:isOpen", (eventInfo, name, isOpen) => {
             if (!isOpen) {
                 return;
@@ -78,7 +78,7 @@ export default class PanelTweaks extends Plugin {
      * if the editor is inside a reveal modal, we need to make sure
      * the balloon is on top of the modal, otherwise it will be hidden underneath
      */
-    checkForModal() {
+    checkForModal(): void {
         const zIndex = "var(--sbx-depth-modal-ui-overlay)";
         if ((this.editor as ClassicEditor).sourceElement?.closest("[data-reveal]")) {
             const contextualBalloon = this.editor.plugins.get("ContextualBalloon");

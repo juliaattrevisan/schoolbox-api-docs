@@ -13,7 +13,7 @@ export default class ResourceEditing extends Plugin {
     /**
      * Runs on startup, defines the schema and converters
      */
-    init() {
+    init(): void {
         this.updateSchema();
         this.defineConverters();
         this.onImageResized();
@@ -25,7 +25,7 @@ export default class ResourceEditing extends Plugin {
      * https://ckeditor.com/docs/ckeditor5/latest/api/module_engine_model_schema-Schema.html
      * Otherwise the attributes will be stripped out when the editor is loaded
      */
-    updateSchema() {
+    updateSchema(): void {
         const { schema } = this.editor.model;
         schema.extend("imageInline", {
             allowAttributes: [...getExtraAttributes()],
@@ -36,7 +36,7 @@ export default class ResourceEditing extends Plugin {
      * Define the converters for the extra attributes, so that they are translated from the model to the view (downcast) and vice versa (upcast)
      * https://ckeditor.com/docs/ckeditor5/latest/api/module_engine_conversion_conversion-Conversion.html
      */
-    defineConverters() {
+    defineConverters(): void {
         const { conversion } = this.editor;
 
         const attributes = getExtraAttributes();
@@ -72,7 +72,7 @@ export default class ResourceEditing extends Plugin {
      * This is so when the video is actually displayed, it's width/height is what's been set in the editor.
      * (If the image has been marked as full-width, these attributes will be ignored)
      */
-    onImageResized() {
+    onImageResized(): void {
         const { editor } = this;
         const { model } = editor;
         const imageUtils = editor.plugins.get("ImageUtils");

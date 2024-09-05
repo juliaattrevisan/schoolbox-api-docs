@@ -63,7 +63,7 @@ const {
     error: hasError, // to notify of a search error
 } = useFetch(url, {
     immediate: false,
-    onFetchError(ctx) {
+    onFetchError(ctx: { response: Response | null; error: unknown; data: unknown }) {
         return ctx;
     },
 })
@@ -85,9 +85,9 @@ const search = useDebounceFn(async () => {
 
 /**
  * start searching once the keyword length is greater than the minimum
- * @param {string} value - The input value
+ * @param value - The input value
  */
-async function onInput(value: string) {
+async function onInput(value: string): Promise<void> {
     query.value = value;
     if (query.value.length < minKeywordLength) {
         canSearch.value = false;
@@ -100,17 +100,17 @@ async function onInput(value: string) {
 
 /**
  * To toggle the selected state of the result
- * @param {Result} result - the result selected
+ * @param result - the result selected
  */
-function onSelected(result: Result) {
+function onSelected(result: Result): void {
     emit("select", result);
 }
 
 /**
  * To remove a result
- * @param {Result} result - the result removed
+ * @param result - the result removed
  */
-function onRemoved(result: Result) {
+function onRemoved(result: Result): void {
     emit("remove", result);
 }
 </script>

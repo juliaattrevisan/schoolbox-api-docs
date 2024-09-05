@@ -42,18 +42,18 @@ window.Vue.watch(
 
 /**
  * To notify of a change in the score
- * @param {StudentItemQuestion} question - the question to update
- * @param {number} score - the score to save
+ * @param question - the question to update
+ * @param score - the score to save
  */
-function onScoreUpdated(question: StudentItemQuestion, score: number) {
+function onScoreUpdated(question: StudentItemQuestion, score: number): void {
     studentStore.updateItemResponseScore(props.item, question, score);
 }
 
 /**
  * To notify of a change in the comment
- * @param {string} comment - the comment to save
+ * @param comment - the comment to save
  */
-function onCommentUpdated(comment: string) {
+function onCommentUpdated(comment: string): void {
     studentStore.updateItemComment(props.item, props.item.questions[0], comment);
 }
 </script>

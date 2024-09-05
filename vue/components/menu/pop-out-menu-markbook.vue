@@ -80,7 +80,7 @@ const excludeModalEl = window.Vue.ref<InstanceType<typeof RevealModal> | null>(n
 /**
  * When the pop out is closed, clear out the selected state
  */
-function onPopOutClosed() {
+function onPopOutClosed(): void {
     referenceElement.value?.classList.remove("is-selected");
     referenceElement.value = null;
 }
@@ -144,7 +144,7 @@ const viewStatusText = window.Vue.computed(() => {
  *  Fetches an array from the dataEndpoint, which should return a
  *  an array of items corresponding to recent activity events.
  */
-async function getActivity() {
+async function getActivity(): Promise<void> {
     try {
         isLoading.value = true;
         const response = await fetch(routes.value.dataEndpoint, {
@@ -178,7 +178,7 @@ async function getActivity() {
  *             return false; // don't bubble
  *         });
  */
-function reloadMarkbook() {
+function reloadMarkbook(): void {
     onPopOutClosed();
 
     // reload the markbook
@@ -197,7 +197,7 @@ function reloadMarkbook() {
  * UI toggle student to exclusion display
  * are change from excluded included and visa-versa
  */
-function toggleExclusion() {
+function toggleExclusion(): void {
     // invert the excluded option that is currently the only post system
     isExcluded.value = !isExcluded.value;
     // update the data location in html, so if you click back in it doesn't break...
@@ -212,10 +212,10 @@ function toggleExclusion() {
 
 /**
  * Navigate to a new page
- * @param { string } target - The URL we want to navigate to.
- * @param { string } action - Should we redirect, or do a specific action? (exclude,publish)
+ * @param target - The URL we want to navigate to.
+ * @param action - Should we redirect, or do a specific action? (exclude,publish)
  */
-async function onMenuItemSelected(target: string, action: string | null = null) {
+async function onMenuItemSelected(target: string, action: string | null = null): Promise<void> {
     // No specific action, just redirect
     if (action === null) {
         // we should append the returnUrl, for all calls, so we can get back to the markbook on save.
@@ -264,7 +264,7 @@ async function onMenuItemSelected(target: string, action: string | null = null) 
  * Exclude route.
  * Checks if the student has any feedback or submissions, if they do not, then it just excludes. else will prompt
  */
-async function excludeCheck() {
+async function excludeCheck(): Promise<void> {
     // does the user have work?
     if (hasSubmissions.value || hasFeedback.value) {
         // has some kind of activity.. prompt for exclusion
@@ -278,7 +278,7 @@ async function excludeCheck() {
 /**
  * close the exclude modal function
  */
-function closeExclude() {
+function closeExclude(): void {
     if (excludeModalEl.value === null) return;
     excludeModalEl.value.close();
 }
@@ -286,7 +286,7 @@ function closeExclude() {
 /**
  * actually exclude the student from the assessment
  */
-async function exclude() {
+async function exclude(): Promise<void> {
     closeExclude();
     await onMenuItemSelected(routes.value.excludeRoute, "exclude");
 }
@@ -295,16 +295,16 @@ async function exclude() {
  * Open the pop out modal, waits for a tick to ensure the element is available
  * since we just changed it.
  */
-async function openPopOut() {
+async function openPopOut(): Promise<void> {
     await window.Vue.nextTick();
     await onButtonSelected();
 }
 
 /**
  * A linked button has been selected so populate the pop out
- * @param { CustomEvent<PopOutMenuMarkbookSelectedEvent> } event - the event fired from the mark book
+ * @param event - the event fired from the mark book
  */
-function onPopOutSelected(event: CustomEvent<PopOutMenuMarkbookSelectedEvent>) {
+function onPopOutSelected(event: CustomEvent<PopOutMenuMarkbookSelectedEvent>): void {
     // Make sure we're not reloading a menu we already have open.
     if (referenceElement.value !== event.detail.target) {
         routes.value = event.detail.routes;
@@ -343,8 +343,8 @@ window.Vue.onUnmounted(() => {
 
 /**
  * Translate types into more human-readable "action" format.
- * @param { object } item - the item to check the action on
- * @returns { string } - the string to return
+ * @param item - the item to check the action on
+ * @returns - the string to return
  */
 function getAction(item: ActivityItem): string {
     // If we have a response, we have to consider additional scenarios.
@@ -371,7 +371,7 @@ function getAction(item: ActivityItem): string {
 /**
  * When available show/hide the additional activity items
  */
-function onToggleSelected() {
+function onToggleSelected(): void {
     isExpanded.value = !isExpanded.value;
 }
 </script>

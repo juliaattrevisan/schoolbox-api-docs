@@ -1,4 +1,7 @@
 <script>
+// Ignore this file for ESLint checks for now (SA-18376)
+/* eslint-disable */
+/* eslint-enable vue/no-v-html */
 /*
  * To play a video
  *
@@ -90,7 +93,7 @@ export default {
                     "/storage/checkVideoStatus.php?" +
                         new URLSearchParams({
                             hash: this.hash,
-                        })
+                        }),
                 );
                 const responseData = await response.json();
                 const videoStatus = responseData.status;

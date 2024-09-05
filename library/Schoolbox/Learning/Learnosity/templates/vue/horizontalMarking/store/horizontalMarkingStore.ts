@@ -18,10 +18,10 @@ export const useStore = defineStore("horizontalMarking", () => {
 
     /**
      * store any passed through properties
-     * @param {AssessmentMarkData} $markData - the mark type data linked to the assessment
-     * @param { string } $statusPage - the link to the status page
+     * @param $markData - the mark type data linked to the assessment
+     * @param $statusPage - the link to the status page
      */
-    function init($markData: AssessmentMarkData, $statusPage: string) {
+    function init($markData: AssessmentMarkData, $statusPage: string): void {
         markData.value = $markData;
         statusPage.value = $statusPage;
     }

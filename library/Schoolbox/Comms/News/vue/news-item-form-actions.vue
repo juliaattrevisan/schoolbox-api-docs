@@ -1,4 +1,7 @@
 <script>
+// Ignore this file for ESLint checks for now (SA-18376)
+/* eslint-disable */
+/* eslint-enable vue/no-v-html */
 /**
  * The buttons at the bottom of the create news page
  * There can be 1 or 2 depending on the status of the news

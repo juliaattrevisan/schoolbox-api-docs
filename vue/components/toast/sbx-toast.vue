@@ -6,7 +6,7 @@
  * with a new way to call the toast using document.dispatchEvent.
  */
 
-import {ToastActivateEventDetail, ToastLink, ToastTimeoutEventDetail, ToastEvent} from "./sbxToastEvent";
+import { ToastActivateEventDetail, ToastLink, ToastTimeoutEventDetail, ToastEvent } from "./sbxToastEvent";
 
 const STATE_HIDDEN = "hidden";
 const STATE_PENDING = "pending";
@@ -25,10 +25,10 @@ const hidden = window.Vue.ref(true);
 
 /**
  * Activate this toast.
- * @param {string} $text - The text to put in it
- * @param {ToastLink | null} $link - The link object, what it should say, where it should go
+ * @param $text - The text to put in it
+ * @param $link - The link object, what it should say, where it should go
  */
-function activate($text: string, $link: ToastLink | null) {
+function activate($text: string, $link: ToastLink | null): void {
     link.value = $link;
     text.value = $text;
     state.value = STATE_PENDING;
@@ -37,11 +37,11 @@ function activate($text: string, $link: ToastLink | null) {
 
 /**
  * Display this toast with a timeout.
- * @param {string} $text - The text to put in it
- * @param {boolean} [isSuccess] -  Was the operation that displays this toast
- * @param {number} [$duration] - How long should the toast show?
- * @param {number} [$fadeDuration] - How long to wait before the toast disappears? (in ms)
- * @param {() => void} [timeoutCallback] If callable, call this
+ * @param $text - The text to put in it
+ * @param [isSuccess] -  Was the operation that displays this toast
+ * @param [$duration] - How long should the toast show?
+ * @param [$fadeDuration] - How long to wait before the toast disappears? (in ms)
+ * @param [timeoutCallback] If callable, call this
  *                        when the toast times out
  */
 function timeout(
@@ -50,7 +50,7 @@ function timeout(
     $duration?: number,
     $fadeDuration?: number,
     timeoutCallback?: () => void,
-) {
+): void {
     text.value = $text;
     state.value = isSuccess || isSuccess === undefined ? STATE_DONE : STATE_FAILED;
     let duration;
@@ -101,7 +101,7 @@ window.Vue.onMounted(() => {
         :data-test-is-success="state === STATE_DONE"
     >
         {{ text }}
-      <a v-if="link !== null" :href="link.href">{{ link.text }}</a>
+        <a v-if="link !== null" :href="link.href">{{ link.text }}</a>
     </div>
 </template>
 

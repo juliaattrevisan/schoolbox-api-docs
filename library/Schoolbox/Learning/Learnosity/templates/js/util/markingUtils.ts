@@ -11,21 +11,27 @@ import type { StudentUrls } from "@schoolboxLearnosity/js/types/StudentUrls";
 
 /**
  * Get the response for a student item question if available
- * @param {StudentItemQuestionResponse[]} itemResponses - the item responses to get the response from
- * @param {string} responseId - the response id to get the response for
- * @returns {StudentItemQuestionResponse} - the response
+ * @param itemResponses - the item responses to get the response from
+ * @param responseId - the response id to get the response for
+ * @returns - the response
  */
-function getItemResponse(itemResponses: StudentItemQuestionResponse[], responseId: string) {
+function getItemResponse(
+    itemResponses: StudentItemQuestionResponse[],
+    responseId: string,
+): StudentItemQuestionResponse | undefined {
     return itemResponses.find((itemResponse) => itemResponse.learnosityReference === responseId);
 }
 
 /**
  * Get the response for a student item linked to a question
- * @param {StudentItemQuestionResponse[]} itemResponses - the item responses to get the response from
- * @param {StudentItemQuestion} $questions - the questions to get the responses for
- * @returns {StudentItemQuestion[]} - the questions with linked responses
+ * @param itemResponses - the item responses to get the response from
+ * @param $questions - the questions to get the responses for
+ * @returns - the questions with linked responses
  */
-export function getItemQuestions(itemResponses: StudentItemQuestionResponse[], $questions: StudentItemQuestion[]) {
+export function getItemQuestions(
+    itemResponses: StudentItemQuestionResponse[],
+    $questions: StudentItemQuestion[],
+): StudentItemQuestion[] {
     // for each question, we also want to add in the relevant response
     const questions = $questions.map((question) => {
         const response = getItemResponse(itemResponses, question.response_id);
@@ -39,32 +45,34 @@ export function getItemQuestions(itemResponses: StudentItemQuestionResponse[], $
 
 /**
  * Get the response for a student attempt
- * @param {StudentAttemptResponse[]} attemptResponses - the attempt comments to get the response from
- * @param {number} studentId - the student id to get the response for
- * @returns {StudentAttemptResponse} - the response attempt
+ * @param attemptResponses - the attempt comments to get the response from
+ * @param studentId - the student id to get the response for
+ * @returns - the response attempt
  */
-export function getAttemptResponse(attemptResponses: StudentAttemptResponse[], studentId: number) {
-    return attemptResponses.find(
-        (attemptResponse) => attemptResponse.studentId === studentId,
-    ) as StudentAttemptResponse;
+export function getAttemptResponse(
+    attemptResponses: StudentAttemptResponse[],
+    studentId: number,
+): StudentAttemptResponse | undefined {
+    return attemptResponses.find((attemptResponse) => attemptResponse.studentId === studentId);
 }
 
 /**
  * Loop through each question in the item and check for a score to determine if the question is already marked.
  * If there is no maxScore, we assume that the question is considered marked if the first question contains a comment.
  * So the first question comment covers isMarked for any questions within the item that don't have a maxScore
- * @param { StudentItem } item - the item to check
+ * @param item - the item to check
  */
-export function setInitialQuestionIsMarked(item: StudentItem) {
+export function setInitialQuestionIsMarked(item: StudentItem): void {
     const firstQuestion = item.questions[0];
     item.questions.forEach((question) => {
         if (question.response) {
             const { response } = question;
             if (response?.maxScore === null) {
                 response.isMarked =
-                    (firstQuestion.response as StudentItemQuestionResponse).comment !== undefined &&
-                    (firstQuestion.response as StudentItemQuestionResponse).comment !== null &&
-                    (firstQuestion.response as StudentItemQuestionResponse).comment !== "";
+                    firstQuestion.response !== undefined &&
+                    firstQuestion.response.comment !== undefined &&
+                    firstQuestion.response.comment !== null &&
+                    firstQuestion.response.comment !== "";
             } else {
                 response.isMarked = response.score !== null;
             }
@@ -74,42 +82,42 @@ export function setInitialQuestionIsMarked(item: StudentItem) {
 
 /**
  * Whether the item is marked, loop through all questions and check if they are all marked
- * @param {StudentItem} item - the item to check
- * @returns {boolean} - whether the item is marked
+ * @param item - the item to check
+ * @returns - whether the item is marked
  */
-export function getItemIsMarked(item: StudentItem) {
+export function getItemIsMarked(item: StudentItem): boolean {
     // if any questions don't have a response, then the item is not marked
     if (item.questions.some(($question) => !$question.response)) {
         return false;
     }
-    return item.questions.every(($question) => ($question.response as StudentItemQuestionResponse).isMarked);
+    return item.questions.every(($question) => $question.response?.isMarked);
 }
 
 /**
  * Whether the student is marked, loop through all items and check if they are all marked
- * @param {Student} student - the student to check
- * @returns {boolean} - whether the student is marked
+ * @param student - the student to check
+ * @returns - whether the student is marked
  */
-export function getStudentIsMarked(student: Student) {
+export function getStudentIsMarked(student: Student): boolean {
     return student.items.every((item) => item.isMarked);
 }
 
 /**
  * Get the urls for the student
- * @param {StudentUrls[]} urls - the urls to get the response from
- * @param {number} studentId - the student id to get the response for
- * @returns {StudentUrls} - the urls
+ * @param urls - the urls to get the response from
+ * @param studentId - the student id to get the response for
+ * @returns - the urls
  */
-export function getUrls(urls: StudentUrls[], studentId: number) {
-    return urls.find((urlsItem) => urlsItem.studentId === studentId) as StudentUrls;
+export function getUrls(urls: StudentUrls[], studentId: number): StudentUrls | undefined {
+    return urls.find((urlsItem) => urlsItem.studentId === studentId);
 }
 
 /**
  * Get the total item score
- * @param {StudentItem} item - the item to get the score from
- * @returns {number} - the total item score
+ * @param item - the item to get the score from
+ * @returns - the total item score
  */
-export function getItemScore(item: StudentItem) {
+export function getItemScore(item: StudentItem): number {
     // loop through all questions and add up the score
     return item.questions.reduce((total, question) => {
         if (question.response && question.response.score) {
@@ -121,10 +129,10 @@ export function getItemScore(item: StudentItem) {
 
 /**
  * Get the total item max score
- * @param {StudentItem} item - the item to get the score from
- * @returns {number} - the total item max score
+ * @param item - the item to get the score from
+ * @returns - the total item max score
  */
-export function getItemMaxScore(item: StudentItem) {
+export function getItemMaxScore(item: StudentItem): number {
     // loop through all questions and add up the max score
     return item.questions.reduce((total, question) => {
         if (question.response && question.response?.maxScore) {
@@ -136,10 +144,10 @@ export function getItemMaxScore(item: StudentItem) {
 
 /**
  * Get the current total score for all items, so the total of all questions within each item
- * @param {Student} student - the student to get the score from
- * @returns {number} - the total attempt score
+ * @param student - the student to get the score from
+ * @returns - the total attempt score
  */
-export function getAttemptScore(student: Student) {
+export function getAttemptScore(student: Student): number {
     // loop through all student items and questions and add up the score
     return student.items.reduce((totalScoreAcc, item) => {
         const itemScore = item.questions.reduce((itemScoreAcc, question) => {
@@ -154,10 +162,10 @@ export function getAttemptScore(student: Student) {
 
 /**
  * Get the max score for all items
- * @param {Student} student - the student to get the max score from
- * @returns {number} - the total attempt max score
+ * @param student - the student to get the max score from
+ * @returns - the total attempt max score
  */
-export function getAttemptMaxScore(student: Student) {
+export function getAttemptMaxScore(student: Student): number {
     // loop through all student items and questions and add up the max score
     return student.items.reduce((maxScoreAcc, item) => {
         const itemMaxScore = item.questions.reduce((itemMaxScoreAcc, question) => {

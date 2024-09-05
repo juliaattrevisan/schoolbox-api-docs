@@ -33,7 +33,7 @@ const hasSubResults = window.Vue.computed(() => {
  * When a badge is selected, set it in the store which will prompt the
  * badge modal to open
  */
-async function onBadgeSelected() {
+async function onBadgeSelected(): Promise<void> {
     const getBadge = await fetch(`learning/badge/${props.result.id}`);
     const badge = (await getBadge.json()) as Badge;
     badgeStore.openDetailModal(badge);

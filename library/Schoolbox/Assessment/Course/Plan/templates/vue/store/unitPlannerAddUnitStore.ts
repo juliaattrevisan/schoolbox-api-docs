@@ -15,23 +15,23 @@ export const useAddUnitStore = defineStore("unitPlannerAddUnit", () => {
     /**
      * to display a prompt to add a unit
      */
-    function prompt() {
+    function prompt(): void {
         isOpen.value = true;
     }
 
     /**
      * to hide the add prompt
      */
-    function cancel() {
+    function cancel(): void {
         isOpen.value = false;
         name.value = "";
     }
 
     /**
      * Get the data to pass to the backend
-     * @returns {FormData} the form data
+     * @returns the form data
      */
-    function getFormData() {
+    function getFormData(): string {
         return JSON.stringify({
             name: name.value,
         });
@@ -40,7 +40,7 @@ export const useAddUnitStore = defineStore("unitPlannerAddUnit", () => {
     /**
      * pass the new unit details to the backend
      */
-    async function add() {
+    async function add(): Promise<void> {
         const unitPlannerStore = useUnitPlannerStore();
         try {
             activate("Adding...");

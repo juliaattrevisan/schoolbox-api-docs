@@ -21,25 +21,25 @@ export default class CourseModify {
 
     /**
      * Go to a course modify page for a given course ID
-     * @param { number } courseId - The course ID to go to
+     * @param courseId - The course ID to go to
      */
-    async goto(courseId: number) {
+    async goto(courseId: number): Promise<void> {
         await this.page.goto(CourseModify.URL.replace(CourseModify.URL_ID_FRAGMENT, courseId.toString()));
     }
 
     /**
      * Clicks a unit arrow
-     * @param { number } unitNumber - The unit number to click
+     * @param unitNumber - The unit number to click
      */
-    async clickUnitArrow(unitNumber: number) {
+    async clickUnitArrow(unitNumber: number): Promise<void> {
         await this.page.click(`a.icon-down-arrow[data-collapser=unit-${unitNumber}]`);
     }
 
     /**
      * Clicks an export icon
-     * @param { number } assessmentNumber - The assessment number to click
+     * @param assessmentNumber - The assessment number to click
      */
-    async clickExportIcon(assessmentNumber: number) {
+    async clickExportIcon(assessmentNumber: number): Promise<void> {
         await this.page.click(
             `a[href="/learning/export/assessment/${assessmentNumber}?returnUrl=L2NvdXJzZS9tb2RpZnkvNiMxNQ%3D%3D"]`,
         );
@@ -48,7 +48,7 @@ export default class CourseModify {
     /**
      * Clicks the new lesson plan button
      */
-    async clickNewLessonPlanButton() {
+    async clickNewLessonPlanButton(): Promise<void> {
         await this.page.click(CourseModify.NEW_LESSON_PLAN_BUTTON);
     }
 }

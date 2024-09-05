@@ -4,8 +4,8 @@
 
 /**
  * Extracts and formats an error message from a response.
- * @param { Response } response The fetch response object.
- * @returns { Promise<string> } The formatted error message.
+ * @param response The fetch response object.
+ * @returns The formatted error message.
  */
 export async function extractErrorMessage(response: Response): Promise<string> {
     let errorMessage = (await response.text()) || "An unexpected error occurred";

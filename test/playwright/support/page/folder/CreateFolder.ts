@@ -26,39 +26,39 @@ export default class CreateFolder {
     /**
      * Navigates to create folder page
      */
-    async goto() {
+    async goto(): Promise<void> {
         await this.page.goto(CreateFolder.URL);
     }
 
     /**
      * Go to resources page
      */
-    async gotoResources() {
+    async gotoResources(): Promise<void> {
         await this.page.goto(CreateFolder.URL_RESOURCES);
     }
 
     /**
      * Types a folder name
-     * @param { string } folderName - The folder name to type
+     * @param folderName - The folder name to type
      */
-    async typeName(folderName: string) {
+    async typeName(folderName: string): Promise<void> {
         await this.page.getByTestId(CreateFolder.DATATEST_FOLDER_FORM_INPUT_NAME).fill(folderName);
     }
 
     /**
      * Sets a homepage template
-     * @param { string } option - The option to set (by label - e.g. "Blog" or "Course")
+     * @param option - The option to set (by label - e.g. "Blog" or "Course")
      */
-    async setHomepageTemplate(option: string) {
+    async setHomepageTemplate(option: string): Promise<void> {
         await this.page.getByTestId(CreateFolder.DATATEST_FOLDER_FORM_SELECT_TEMPLATE).selectOption({ label: option });
     }
 
     /**
      * Sets access permission
-     * @param { string | number } groupId - The group ID to set
-     * @param { "none" | "read" | "write" } permissionLevel - The permission level to set
+     * @param groupId - The group ID to set
+     * @param permissionLevel - The permission level to set
      */
-    async setAccessPermission(groupId: string | number, permissionLevel: "none" | "read" | "write") {
+    async setAccessPermission(groupId: string | number, permissionLevel: "none" | "read" | "write"): Promise<void> {
         await this.page
             .getByTestId(`${CreateFolder.DATATEST_FOLDER_FORM_RADIO_ACCESS_GROUP}-${permissionLevel}-${groupId}`)
             .check();
@@ -67,16 +67,16 @@ export default class CreateFolder {
     /**
      * Clicks the create group toggle
      */
-    async clickCreateGroupToggle() {
+    async clickCreateGroupToggle(): Promise<void> {
         // TODO: Use data-test
         await this.page.click(CreateFolder.SELECTOR_CREATE_GROUP);
     }
 
     /**
      * Types a class code
-     * @param { string } code - The code to type
+     * @param code - The code to type
      */
-    async typeClassCode(code: string) {
+    async typeClassCode(code: string): Promise<void> {
         // TODO: Use data-test
         await this.page.fill(CreateFolder.SELECTOR_CLASS_CODE, code);
     }
@@ -84,7 +84,7 @@ export default class CreateFolder {
     /**
      * Clicks the create folder button
      */
-    async submit() {
+    async submit(): Promise<void> {
         await this.page.getByTestId(CreateFolder.DATATEST_FOLDER_FORM_SUBMIT).click();
     }
 }

@@ -12,11 +12,11 @@ import { isScriptAdded, injectScript } from "@js/util/domUtils";
 
 /**
  * Initialise the composable
- * @param { string } $initialValue - the initial string value to input into the ckeditor
- * @param { string } ckeditorSelector - the selector to target the CKEditor
- * @param { Ref<boolean> } isMaxCharCountExceeded - Vue reference to boolean
+ * @param $initialValue - the initial string value to input into the ckeditor
+ * @param ckeditorSelector - the selector to target the CKEditor
+ * @param isMaxCharCountExceeded - Vue reference to boolean
  *  - true if the CKEditor field content storage limit was found to have been exceeded at last check
- * @returns { Ref<string> } - the initial value
+ * @returns - the initial value
  */
 export function useDescriptionEditor(
     $initialValue: string,
@@ -27,9 +27,9 @@ export function useDescriptionEditor(
 
     /**
      * When a new editor is created
-     * @param { CustomEvent } event - Javascript event object
+     * @param event - Javascript event object
      */
-    function onEditorCreated(event: CustomEvent) {
+    function onEditorCreated(event: CustomEvent): void {
         const { editor } = event.detail as EditorCreatedEventInfo;
 
         if (initialValue.value !== null) {
@@ -56,7 +56,7 @@ export function useDescriptionEditor(
     /**
      * load the ckeditor into the browser
      */
-    async function loadCKEditor() {
+    async function loadCKEditor(): Promise<void> {
         try {
             const ckeditorScript = `${window.cdnPrefix}/js/bundle/editor.js?v=${window.siteVersion}`; // cdnPrefix and siteVersion are global vars from chrome.twig
             if (!isScriptAdded(ckeditorScript)) {

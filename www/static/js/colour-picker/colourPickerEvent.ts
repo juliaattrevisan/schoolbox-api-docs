@@ -6,7 +6,7 @@ export interface ColourPickerInitialiseEvent extends CustomEvent {
 
 /**
  * Trigger the colour picker initialise event
- * @param {ColourPickerInitialiseEvent["detail"]} detail The options to initialise the colour picker with
+ * @param detail The options to initialise the colour picker with
  */
 export function initColourPicker(detail: ColourPickerInitialiseEvent["detail"]): void {
     document.dispatchEvent(new CustomEvent(colourPickerInitialiseEventName, { detail }));

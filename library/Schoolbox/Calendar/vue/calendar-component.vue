@@ -1,4 +1,7 @@
 <script>
+// Ignore this file for ESLint checks for now (SA-18376)
+/* eslint-disable */
+/* eslint-enable vue/no-v-html */
 import FullCalendar from "@fullcalendar/vue3";
 import ViewEventModal from "@schoolboxVue/components/fullcalendar/view-event-modal";
 import ExportUrlModal from "./export-url-modal";
@@ -274,9 +277,7 @@ export default {
         <div class="component-action" v-if="config.folderId && eventsLoaded && hasEvents">
             <section>
                 <a v-if="config.canCreateEvent" :href="config.createEventUrl" class="button">Add Event</a>
-                <a href="#" @click.prevent="$refs.exportModal.open" class="button"
-                    >Export Events</a
-                >
+                <a href="#" @click.prevent="$refs.exportModal.open" class="button">Export Events</a>
                 <a v-if="config.canCreateEvent" :href="config.importEventsUrl" class="button">Import Events</a>
             </section>
         </div>

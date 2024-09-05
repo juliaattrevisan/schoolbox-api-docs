@@ -21,7 +21,7 @@ export const useLinkedActivitiesStore = defineStore("linkedActivitiesStore", () 
     /**
      * Listen for switches between student and staff view on the page
      */
-    function addListeners() {
+    function addListeners(): void {
         document.addEventListener(LessonPlanEvent.TO_STUDENT_VIEW, () => {
             isStudentView.value = true;
         });
@@ -32,11 +32,11 @@ export const useLinkedActivitiesStore = defineStore("linkedActivitiesStore", () 
 
     /**
      * store any passed through properties
-     * @param {number} $sourceId - the id of the source lesson plan
-     * @param {Activity[]} $linkedActivities - the linked activities
-     * @param {boolean} $gradeGradientEnable - whether the grade gradient is enabled
+     * @param $sourceId - the id of the source lesson plan
+     * @param $linkedActivities - the linked activities
+     * @param $gradeGradientEnable - whether the grade gradient is enabled
      */
-    function init($sourceId: number, $linkedActivities: Activity[], $gradeGradientEnable: boolean) {
+    function init($sourceId: number, $linkedActivities: Activity[], $gradeGradientEnable: boolean): void {
         sourceId.value = $sourceId;
         linkedActivities.value = $linkedActivities;
         gradeGradientEnable.value = $gradeGradientEnable;
@@ -46,7 +46,7 @@ export const useLinkedActivitiesStore = defineStore("linkedActivitiesStore", () 
 
     /**
      * Return the activities that have been added to the linked activities
-     * @returns {Activity[]} - the added activities
+     * @returns - the added activities
      */
     function getAddedActivities(): Activity[] {
         return selectedActivities.value.filter((selectedActivity) => {
@@ -58,7 +58,7 @@ export const useLinkedActivitiesStore = defineStore("linkedActivitiesStore", () 
 
     /**
      * Return the activities that have been removed from the linked activities
-     * @returns {Activity[]} - the removed activities
+     * @returns - the removed activities
      */
     function getRemovedActivities(): Activity[] {
         return linkedActivities.value.filter((linkedActivity) => {
@@ -71,9 +71,9 @@ export const useLinkedActivitiesStore = defineStore("linkedActivitiesStore", () 
     /**
      * Raise some sort of error if a request from `fetch` does not return a
      * success response.
-     * @param {Response} response - the response from `fetch`
+     * @param response - the response from `fetch`
      */
-    function throwErrorOnInvalidResponse(response: Response) {
+    function throwErrorOnInvalidResponse(response: Response): void {
         if (!response.ok) {
             throw new Error(`Something went wrong (response code: ${String(response.status)})`);
         }
@@ -81,9 +81,9 @@ export const useLinkedActivitiesStore = defineStore("linkedActivitiesStore", () 
 
     /**
      * Save the selected activities
-     * @param {boolean} confirmUnlinks - whether the user has confirmed they want to unlink activities
+     * @param confirmUnlinks - whether the user has confirmed they want to unlink activities
      */
-    async function saveSelectedActivities(confirmUnlinks: boolean = false) {
+    async function saveSelectedActivities(confirmUnlinks: boolean = false): Promise<void> {
         const addedActivities = getAddedActivities();
         const removedActivities = getRemovedActivities();
 
@@ -131,10 +131,10 @@ export const useLinkedActivitiesStore = defineStore("linkedActivitiesStore", () 
 
     /**
      * Add an activity to the selected activities
-     * @param {Activity} activity - the activity to add
-     * @param {boolean} save - whether to save the changes
+     * @param activity - the activity to add
+     * @param save - whether to save the changes
      */
-    function addActivity(activity: Activity, save: boolean = false) {
+    function addActivity(activity: Activity, save: boolean = false): void {
         selectedActivities.value.push(activity);
 
         if (save) {
@@ -146,10 +146,10 @@ export const useLinkedActivitiesStore = defineStore("linkedActivitiesStore", () 
 
     /**
      * Remove an activity from the selected activities
-     * @param {Activity} activity - the activity to remove
-     * @param {boolean} save - whether to save the changes
+     * @param activity - the activity to remove
+     * @param save - whether to save the changes
      */
-    function removeActivity(activity: Activity, save: boolean = false) {
+    function removeActivity(activity: Activity, save: boolean = false): void {
         selectedActivities.value = selectedActivities.value.filter((selectedActivity) => {
             return selectedActivity.id !== activity.id;
         });
@@ -164,7 +164,7 @@ export const useLinkedActivitiesStore = defineStore("linkedActivitiesStore", () 
     /**
      * Clear any changes
      */
-    function clearChanges() {
+    function clearChanges(): void {
         selectedActivities.value = [...linkedActivities.value];
     }
 

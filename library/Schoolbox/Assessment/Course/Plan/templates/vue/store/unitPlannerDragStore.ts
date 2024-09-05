@@ -22,17 +22,17 @@ export const useUnitPlannerDragStore = defineStore("unitPlannerDragStore", () =>
 
     /**
      * store any passed through properties
-     * @param { string|null } $routeFolderSequence - the route to use when resequencing, if the user has access to do so
-     * @param { Ref<HTMLElement> } $unitPlannerContainerEl - the unit planner scrollable container element
-     * @param { Ref<number> } $headerRowHeight - the height of the header row
-     * @param { Ref<number> } $unitPlannerContainerScrollTop - the scroll position of the unit planner container
+     * @param $routeFolderSequence - the route to use when resequencing, if the user has access to do so
+     * @param $unitPlannerContainerEl - the unit planner scrollable container element
+     * @param $headerRowHeight - the height of the header row
+     * @param $unitPlannerContainerScrollTop - the scroll position of the unit planner container
      */
     function init(
         $routeFolderSequence: string | null,
         $unitPlannerContainerEl: Ref<HTMLElement>,
         $headerRowHeight: Ref<number>,
         $unitPlannerContainerScrollTop: Ref<number>,
-    ) {
+    ): void {
         routeFolderSequence.value = $routeFolderSequence;
         unitPlannerContainerEl = $unitPlannerContainerEl;
         headerRowHeight = $headerRowHeight;
@@ -146,7 +146,7 @@ export const useUnitPlannerDragStore = defineStore("unitPlannerDragStore", () =>
     /**
      * Save the sequence of the units to the database
      */
-    async function saveUnitSequence() {
+    async function saveUnitSequence(): Promise<void> {
         if (!routeFolderSequence.value) {
             return; // User does not have access to resequence
         }
@@ -177,9 +177,9 @@ export const useUnitPlannerDragStore = defineStore("unitPlannerDragStore", () =>
 
     /**
      * Resequences and saves the units
-     * @param { number[] } unitIDs - the ids of the units to resequence
+     * @param unitIDs - the ids of the units to resequence
      */
-    function resequenceUnits(unitIDs: Unit["id"][]) {
+    function resequenceUnits(unitIDs: Unit["id"][]): void {
         let hasChanged = false;
 
         // As the sequence for units is largest to smallest, we need to reverse the array
@@ -200,18 +200,18 @@ export const useUnitPlannerDragStore = defineStore("unitPlannerDragStore", () =>
 
     /**
      * While the user is dragging a unit
-     * @param { Draggable } draggable - the draggable instance
+     * @param draggable - the draggable instance
      */
-    function onDragMove(draggable: Draggable) {
+    function onDragMove(draggable: Draggable): void {
         dragCurrentPointerY.value = draggable.pointerY;
     }
 
     /**
      * When the user starts dragging a unit
-     * @param { Draggable } draggable - the draggable instance
-     * @param { Unit } unit - the unit to start dragging
+     * @param draggable - the draggable instance
+     * @param unit - the unit to start dragging
      */
-    function onDragStart(draggable: Draggable, unit: Unit) {
+    function onDragStart(draggable: Draggable, unit: Unit): void {
         const pointerEvent = draggable.pointerEvent as PointerEvent;
         const pointerTarget = pointerEvent.target as HTMLElement;
 
@@ -232,9 +232,9 @@ export const useUnitPlannerDragStore = defineStore("unitPlannerDragStore", () =>
 
     /**
      * When the user stops dragging a unit
-     * @param { Draggable } draggable - the draggable instance
+     * @param draggable - the draggable instance
      */
-    function onDragEnd(draggable: Draggable) {
+    function onDragEnd(draggable: Draggable): void {
         if (dragInitial.value !== null) {
             // Move the drag handle back to its original position
             gsap.to(draggable.target, {

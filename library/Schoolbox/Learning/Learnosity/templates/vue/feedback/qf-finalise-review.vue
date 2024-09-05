@@ -11,7 +11,7 @@ import { getFinaliseReviewFormData } from "../student/util/finaliseReviewUtils";
 
 const store = useStore();
 const studentStore = useStudentStore();
-const modalEl = window.Vue.ref<typeof RevealModal | null>();
+const modalEl = window.Vue.ref<InstanceType<typeof RevealModal> | null>();
 const isFinalising = window.Vue.ref(false); // to show the finalising text on the button
 
 /**
@@ -52,7 +52,7 @@ window.Vue.watch(
 /**
  * Submit the feedback then redirect to the status page
  */
-async function submitFeedback() {
+async function submitFeedback(): Promise<void> {
     isFinalising.value = true;
     activate("Finalising review...");
     try {
@@ -85,7 +85,7 @@ async function submitFeedback() {
 /**
  * To finalise review, first notifying if there are any items that have not been marked
  */
-function onSelected() {
+function onSelected(): void {
     if (studentStore.student.isMarked) {
         void submitFeedback();
     } else {
@@ -96,14 +96,14 @@ function onSelected() {
 /**
  * Submit the feedback
  */
-function onConfirmSelected() {
+function onConfirmSelected(): void {
     void submitFeedback();
 }
 
 /**
  * Close the modal
  */
-function onCancelSelected() {
+function onCancelSelected(): void {
     store.isFinaliseReviewModalOpen = false;
 }
 </script>

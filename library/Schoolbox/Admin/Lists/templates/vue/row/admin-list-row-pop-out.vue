@@ -1,4 +1,7 @@
 <script>
+// Ignore this file for ESLint checks for now (SA-18376)
+/* eslint-disable */
+/* eslint-enable vue/no-v-html */
 /**
  * A 'pop out' for a row, it's a list of options that animate out from the right side
  * Providing a clearer focus on the list of options available to the current row.

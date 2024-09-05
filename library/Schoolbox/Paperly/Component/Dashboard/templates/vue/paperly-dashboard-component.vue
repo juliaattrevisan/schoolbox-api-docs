@@ -25,7 +25,7 @@ const hasLoadError = window.Vue.ref(false); // to show an error message if the p
 /**
  * Load the payload from paperly - currently a dummy payload
  */
-async function loadPayload() {
+async function loadPayload(): Promise<void> {
     try {
         isProcessing.value = true;
         const response = await fetch(props.getPaperlyViewEndpoint);

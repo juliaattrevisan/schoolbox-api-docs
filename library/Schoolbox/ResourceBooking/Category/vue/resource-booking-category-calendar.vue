@@ -1,4 +1,7 @@
 <script>
+// Ignore this file for ESLint checks for now (SA-18376)
+/* eslint-disable */
+/* eslint-enable vue/no-v-html */
 import FullCalendar from "@fullcalendar/vue3";
 import interactionPlugin from "@fullcalendar/interaction";
 import adaptivePlugin from "@fullcalendar/adaptive";
@@ -200,7 +203,7 @@ export default {
                     callback(
                         response.data.filter((v) => {
                             return "start" in v;
-                        })
+                        }),
                     );
                 });
             // Fail callback: consider a message saying something failed

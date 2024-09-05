@@ -1,4 +1,7 @@
 <script setup>
+// Ignore this file for ESLint checks for now (SA-18376)
+/* eslint-disable */
+/* eslint-enable vue/no-v-html */
 /**
  * The filtered results from using the <selects> or search <input>
  * From here curriclum nodes can be selected
@@ -34,7 +37,7 @@ window.Vue.watch(
             //may not always exists in the dom
             nodesContainerEl.value.scrollTop = 0;
         }
-    }
+    },
 );
 </script>
 

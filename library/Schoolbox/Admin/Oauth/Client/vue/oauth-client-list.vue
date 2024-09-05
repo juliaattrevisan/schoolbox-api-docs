@@ -11,14 +11,14 @@ import { activate, timeout } from "@schoolboxVue/components/toast/sbxToastEvent"
 import RevealModal from "@schoolboxVue/components/reveal-modal.vue";
 import LoadingTable from "@schoolboxVue/components/loading/loading-table.vue";
 import DataLoadError from "@schoolboxVue/components/error/data-load-error.vue";
-import Deselect from "@schoolboxVue/components/selectize/Deselect.vue";
+import SelectizeDeselect from "@schoolboxVue/components/selectize/selectize-deselect.vue";
 import { extractErrorMessage } from "@js/util/sbx/fetchUtils";
 import { getEmptyOAuthClient } from "../js/types/OAuthClient";
 import { ActionType } from "../js/ActionType";
 import type { OAuthClient } from "../js/types/OAuthClient";
 
 // @ts-expect-error - This is expected as per https://vue-select.org/guide/components.html#vue-3x
-vSelect.props.components.default = () => ({ Deselect });
+vSelect.props.components.default = (): void => ({ SelectizeDeselect });
 
 type VueSelectData = {
     // the loaded user search results
@@ -57,7 +57,7 @@ const hasNoRedirect = window.Vue.ref(false);
 /**
  * Fetch the current list of clients from the server.
  */
-async function getData() {
+async function getData(): Promise<void> {
     try {
         const response = await fetch(props.getListEndpoint);
         clientList.value = (await response.json()) as OAuthClient[];
@@ -71,7 +71,7 @@ async function getData() {
 /**
  * Show the add modal
  */
-function showAddModal() {
+function showAddModal(): void {
     saveError.value = null;
     addingClient.value = getEmptyOAuthClient();
     currentAction.value = ActionType.ADD;
@@ -84,7 +84,7 @@ function showAddModal() {
 /**
  * To hide any error messages that may be displayed
  */
-function resetValidationChecks() {
+function resetValidationChecks(): void {
     hasNoName.value = false;
     hasNoRedirect.value = false;
 }
@@ -92,7 +92,7 @@ function resetValidationChecks() {
 /**
  * Close the modal
  */
-function closeModal() {
+function closeModal(): void {
     if (modalEl.value) {
         // eslint-disable-next-line @typescript-eslint/no-unsafe-call -- RevealModal is untyped
         modalEl.value.close();
@@ -102,14 +102,14 @@ function closeModal() {
 /**
  * When the modal is closed
  */
-function onModalClosed() {
+function onModalClosed(): void {
     resetValidationChecks();
 }
 
 /**
  * Add another 0AuthClient
  */
-async function addClient() {
+async function addClient(): Promise<void> {
     resetValidationChecks();
     if (isProcessing.value) {
         return;
@@ -151,9 +151,9 @@ async function addClient() {
 
 /**
  * Show the modify modal
- * @param {OAuthClient} client - The client to modify
+ * @param client - The client to modify
  */
-function showModifyModal(client: OAuthClient) {
+function showModifyModal(client: OAuthClient): void {
     saveError.value = null;
     modifyingClient.value = { ...client };
     currentAction.value = ActionType.MODIFY;
@@ -165,9 +165,9 @@ function showModifyModal(client: OAuthClient) {
 
 /**
  * Modify an existing client
- * @param {OAuthClient} client - The client to modify
+ * @param client - The client to modify
  */
-async function modifyItem(client: OAuthClient) {
+async function modifyItem(client: OAuthClient): Promise<void> {
     resetValidationChecks();
     if (isProcessing.value) {
         return;
@@ -212,9 +212,9 @@ async function modifyItem(client: OAuthClient) {
 
 /**
  * Show the regenerate modal
- * @param {OAuthClient} client - The client to regenerate
+ * @param client - The client to regenerate
  */
-function showRegenerateModal(client: OAuthClient) {
+function showRegenerateModal(client: OAuthClient): void {
     saveError.value = null;
     regeneratingClient.value = { ...client };
     currentAction.value = ActionType.REGENERATE;
@@ -226,9 +226,9 @@ function showRegenerateModal(client: OAuthClient) {
 
 /**
  * Regenerate the client secret
- * @param {OAuthClient} client - The client to regenerate
+ * @param client - The client to regenerate
  */
-async function regenerateClient(client: OAuthClient) {
+async function regenerateClient(client: OAuthClient): Promise<void> {
     if (isProcessing.value) {
         return;
     }
@@ -258,9 +258,9 @@ async function regenerateClient(client: OAuthClient) {
 
 /**
  * Show the delete modal
- * @param {OAuthClient} client - The client to delete
+ * @param client - The client to delete
  */
-function showDeleteModal(client: OAuthClient) {
+function showDeleteModal(client: OAuthClient): void {
     deletingClient.value = { ...client };
     currentAction.value = ActionType.DELETE;
     if (modalEl.value) {
@@ -271,9 +271,9 @@ function showDeleteModal(client: OAuthClient) {
 
 /**
  * Delete a client
- * @param {OAuthClient} client - The client to delete
+ * @param client - The client to delete
  */
-async function deleteClient(client: OAuthClient) {
+async function deleteClient(client: OAuthClient): Promise<void> {
     if (isProcessing.value) {
         return;
     }

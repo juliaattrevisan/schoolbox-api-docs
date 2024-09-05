@@ -112,7 +112,7 @@
                     config.onAfterSelectAllUntick(allCheckboxes);
                 }
 
-                allCheckboxes.trigger('change');
+                allCheckboxes.trigger("change");
 
                 config.onAfterSelectAllChange(allCheckboxes);
 

@@ -93,9 +93,9 @@ const tooltip = window.Vue.computed(() => {
 
 /**
  * Update the span element with the current score
- * @param {HTMLDivElement} statusElement - the element to update
+ * @param statusElement - the element to update
  */
-function updateSpanElement(statusElement: HTMLDivElement) {
+function updateSpanElement(statusElement: HTMLDivElement): void {
     const spanElement = statusElement?.querySelector("span") as HTMLSpanElement;
     // if the item contains only questions that don't have a max score, we don't want to show any score
     if (noScore.value) {
@@ -107,11 +107,11 @@ function updateSpanElement(statusElement: HTMLDivElement) {
 
 /**
  * Update the hidden element which is used for accessibility
- * @param {HTMLDivElement} statusElement - the element to update
+ * @param statusElement - the element to update
  */
-function updateHiddenElement(statusElement: HTMLDivElement) {
+function updateHiddenElement(statusElement: HTMLDivElement): void {
     const hiddenElement = (statusElement?.parentElement as HTMLDivElement).querySelector(
-        ".visually-hidden"
+        ".visually-hidden",
     ) as HTMLSpanElement;
     // if the item contains only questions that don't have a max score, we don't want to show any score
     if (noScore.value) {
@@ -123,9 +123,9 @@ function updateHiddenElement(statusElement: HTMLDivElement) {
 
 /**
  * Get the current tooltip for the item
- * @returns {string} - the style to add a background colour that reflects the score
+ * @returns - the style to add a background colour that reflects the score
  */
-function getStatusStyles() {
+function getStatusStyles(): string {
     if (!props.item.isMarked) {
         return `lrn-circle-${StudentItemMarkTypes.NOT_MARKED}`;
     }
@@ -137,9 +137,9 @@ function getStatusStyles() {
 
 /**
  * Update the styles when the score changes
- * @param {HTMLDivElement} statusElement - the element to update
+ * @param statusElement - the element to update
  */
-function updateStyles(statusElement: HTMLDivElement) {
+function updateStyles(statusElement: HTMLDivElement): void {
     const classes = Array.from(statusElement.classList).filter((c) => c.includes("lrn-circle-") || c.includes("-bg")); // find any classes on statusElement that contain 'lrn-circle-*' or '*-bg'
     classes.forEach((c) => statusElement.classList.remove(c)); // remove all classes that contain 'lrn-circle-*'
     statusElement.classList.add(getStatusStyles()); // add the correct class
@@ -148,7 +148,7 @@ function updateStyles(statusElement: HTMLDivElement) {
 /**
  * Update the score display anytime the score is changed
  */
-function updateScoreDisplay() {
+function updateScoreDisplay(): void {
     const statusElement = markEl.value?.querySelector("[data-status]") as HTMLDivElement;
     statusElement.setAttribute("data-status", status.value);
     statusElement.setAttribute("data-original-title", tooltip.value);
@@ -181,7 +181,7 @@ window.Vue.watch(
     () => {
         updateScoreDisplay();
     },
-    { deep: true }
+    { deep: true },
 );
 </script>
 

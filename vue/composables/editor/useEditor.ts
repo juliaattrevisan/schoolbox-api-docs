@@ -10,12 +10,12 @@ import type { PartialSbxEditorConfig } from "@js/editor/types/editorTypes";
 
 /**
  * Initialise the composable
- * @param { string | Ref<string> } $currentValue - the initial string value to input into the ckeditor, or a ref to the value
- * @param { string | HTMLElement } ckeditorSelector - the selector to target the CKEditor, or the element itself
- * @param { PartialSbxEditorConfig } editorConfig - the config to use when creating the editor
- * @param { boolean } isMounted - whether or not we are already mounted, and to skip the onMounted hook
- * @param { Function } callback - a callback to run after the editor is created including EditorCreatedEventInfo
- * @returns { Ref<string> } - the current value of the editor input as a ref
+ * @param $currentValue - the initial string value to input into the ckeditor, or a ref to the value
+ * @param ckeditorSelector - the selector to target the CKEditor, or the element itself
+ * @param editorConfig - the config to use when creating the editor
+ * @param isMounted - whether or not we are already mounted, and to skip the onMounted hook
+ * @param callback - a callback to run after the editor is created including EditorCreatedEventInfo
+ * @returns - the current value of the editor input as a ref
  */
 export function useEditor(
     $currentValue: string | Ref<string>,
@@ -28,9 +28,9 @@ export function useEditor(
 
     /**
      * When a new editor is created
-     * @param { CustomEvent } event - the event that triggered the creation of the editor
+     * @param event - the event that triggered the creation of the editor
      */
-    function onEditorCreated(event: CustomEvent) {
+    function onEditorCreated(event: CustomEvent): void {
         const { editor } = event.detail as EditorCreatedEventInfo;
 
         if (currentValue.value !== null) {
@@ -49,7 +49,7 @@ export function useEditor(
      * load the ckeditor into the browser
      * Note that this doesn't currently handle the instantiation of multiple editors simultaneously unless the ckeditor script is already loaded
      */
-    async function loadCKEditor() {
+    async function loadCKEditor(): Promise<void> {
         try {
             const ckeditorScript = `${window.cdnPrefix}/js/bundle/editor.js?v=${window.siteVersion}`; // cdnPrefix and siteVersion are global vars from chrome.twig
             await injectScript(ckeditorScript);

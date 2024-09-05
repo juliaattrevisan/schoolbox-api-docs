@@ -58,7 +58,7 @@ const displayActionBar = window.Vue.computed(() => {
 /**
  * When the modify button is clicked.
  */
-function onModifyClicked() {
+function onModifyClicked(): void {
     // Let the parent component know that the modify button was clicked,
     // so that it can handle the action. E.g. focus the ckeditor
     emit("modifyClicked");
@@ -67,7 +67,7 @@ function onModifyClicked() {
 /**
  * When the create button is clicked.
  */
-async function onCreateClicked() {
+async function onCreateClicked(): Promise<void> {
     isCreatingTextbox.value = true;
     await textboxStore.createTextbox(props.unit.id, props.column);
     await window.Vue.nextTick();
@@ -81,7 +81,7 @@ defineExpose({ onCreateClicked });
 /**
  * When the save button is clicked.
  */
-function onSaveClicked() {
+function onSaveClicked(): void {
     if (props.column.type !== ColumnType.OVERVIEW) return; // Only applicable to the overview column
     isContentSaving.value = true;
 

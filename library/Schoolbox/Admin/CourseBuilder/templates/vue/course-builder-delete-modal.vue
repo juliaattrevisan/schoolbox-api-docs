@@ -7,7 +7,7 @@ const store = useCourseBuilderStore();
 /**
  * Trigger the deletetion of the selected course template
  */
-async function triggerDelete() {
+async function triggerDelete(): Promise<void> {
     if (store.courseTemplateToDelete !== null) {
         await store.deleteCourseTemplate(store.courseTemplateToDelete);
     }

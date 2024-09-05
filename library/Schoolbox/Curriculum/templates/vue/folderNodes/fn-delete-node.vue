@@ -36,7 +36,7 @@ window.Vue.watch(
 /**
  * delete the node when confirmed
  */
-function onDeleteSelected() {
+function onDeleteSelected(): void {
     void store().confirmRemoveNode();
 }
 
@@ -57,7 +57,7 @@ const isModalDisabled = window.Vue.computed(() => store().isProcessing);
 /**
  * to close the modal
  */
-function onModalClosed() {
+function onModalClosed(): void {
     store().cancelRemoveNode();
 }
 </script>

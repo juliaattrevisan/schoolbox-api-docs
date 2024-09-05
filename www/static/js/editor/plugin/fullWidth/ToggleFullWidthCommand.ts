@@ -22,7 +22,7 @@ export default class ToggleFullWidthCommand extends Command {
     /**
      * toggle the selected image to be full width
      */
-    execute() {
+    execute(): void {
         const { editor } = this;
         const { model } = editor;
         const imageUtils = editor.plugins.get("ImageUtils");
@@ -49,7 +49,7 @@ export default class ToggleFullWidthCommand extends Command {
      * selection we need to determine if the toggle button should be on or off
      * and whether the button should be enabled or disabled
      */
-    refresh() {
+    refresh(): void {
         this.isEnabled = this.editor.plugins.get("ImageUtils").isImageAllowed();
         const { editor } = this;
         const { model } = editor;

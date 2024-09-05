@@ -7,8 +7,8 @@ import { getLoadedHTML } from "@js/util/domUtils";
 
 /**
  * Load the selected layout and insert it into the page
- * @param {string} templateSelectURL - the URL to load the layout from
- * @returns {Promise<void>} Resolves and fires a MASONRY__LAYOUT_LOADED event when the layout is loaded
+ * @param templateSelectURL - the URL to load the layout from
+ * @returns Resolves and fires a MASONRY__LAYOUT_LOADED event when the layout is loaded
  */
 async function loadLayout(templateSelectURL: string): Promise<void> {
     // Include the X-Requested-With header so the server can detect this is an AJAX request

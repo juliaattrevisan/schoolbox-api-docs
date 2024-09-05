@@ -9,26 +9,26 @@ export default class Resources {
 
     /**
      * clicks a folder in the resources page by folder id
-     * @param { number } folderId - The folder ID
+     * @param folderId - The folder ID
      */
-    async clickFolder(folderId: number) {
+    async clickFolder(folderId: number): Promise<void> {
         await this.page.locator(`a#${folderId}_anchor`).click();
     }
 
     /**
      * clicks a folder in the resources page by folder name
-     * @param { string } folderName - The folder name
+     * @param folderName - The folder name
      */
-    async clickFolderName(folderName: string) {
+    async clickFolderName(folderName: string): Promise<void> {
         await this.page.locator(`a.jstree-anchor:has-text("${folderName}")`).click();
     }
 
     /**
      * clicks on the right side menu options to a folder:
      * home, modify, drop-box, files, folder, link, download, upload, delete
-     * @param { string } menuItem - The menu item to click
+     * @param menuItem - The menu item to click
      */
-    async clickMenuItem(menuItem: string) {
+    async clickMenuItem(menuItem: string): Promise<void> {
         await this.page.locator(`#meta a.icon-${menuItem}`).click();
     }
 }

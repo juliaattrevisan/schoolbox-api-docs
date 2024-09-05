@@ -1,4 +1,7 @@
 <script setup>
+// Ignore this file for ESLint checks for now (SA-18376)
+/* eslint-disable */
+/* eslint-enable vue/no-v-html */
 /**
  * To be able to remove selected members from the group
  */
@@ -32,7 +35,7 @@ window.Vue.watch(
     () => settingsStore.isPromptOpen,
     (newIsOpen) => {
         newIsOpen ? updateModalEl.value.open() : updateModalEl.value.close();
-    }
+    },
 );
 
 /**

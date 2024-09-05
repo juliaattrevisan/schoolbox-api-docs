@@ -9,6 +9,7 @@ import { useActivitiesListStore } from "./activitiesListStore";
 gsap.registerPlugin(Draggable);
 gsap.registerPlugin(ScrollToPlugin);
 
+// eslint-disable-next-line @typescript-eslint/explicit-function-return-type -- we want the inferred type from defineStore
 export const useActivitiesListDragStore = (activitiesListStoreId: string) =>
     defineStore(`activitiesListDragStore/${activitiesListStoreId}`, () => {
         const activitiesListStore = useActivitiesListStore(activitiesListStoreId);
@@ -38,9 +39,9 @@ export const useActivitiesListDragStore = (activitiesListStoreId: string) =>
 
         /**
          * store any passed through properties
-         * @param { Ref<HTMLElement> } $activitiesContainerEl - ref to the element containing the activities
+         * @param $activitiesContainerEl - ref to the element containing the activities
          */
-        function init($activitiesContainerEl: Ref<HTMLElement>) {
+        function init($activitiesContainerEl: Ref<HTMLElement>): void {
             activitiesContainerEl = $activitiesContainerEl;
         }
 
@@ -49,34 +50,34 @@ export const useActivitiesListDragStore = (activitiesListStoreId: string) =>
 
         /**
          * Set the callback function to be called on drag start
-         * @param { () => void } callback - the callback function
+         * @param callback - the callback function
          */
-        function setCallbackOnDragStart(callback: () => void) {
+        function setCallbackOnDragStart(callback: () => void): void {
             callbackOnDragStart = callback;
         }
 
         /**
          * Set the callback function to be called on drag end
-         * @param { () => void } callback - the callback function
+         * @param callback - the callback function
          */
-        function setCallbackOnDragEnd(callback: () => void) {
+        function setCallbackOnDragEnd(callback: () => void): void {
             callbackOnDragEnd = callback;
         }
 
         /**
          * Assign an element to a draggable activity
-         * @param { number } activityId - the activity id
-         * @param { HTMLElement } el - the element to add
+         * @param activityId - the activity id
+         * @param el - the element to add
          */
-        function setActivityEl(activityId: number, el: HTMLElement) {
+        function setActivityEl(activityId: number, el: HTMLElement): void {
             activityEls.value[activityId] = el;
         }
 
         /**
          * De-assign an element from a draggable activity
-         * @param { number } activityId - the activity id
+         * @param activityId - the activity id
          */
-        function unsetActivityEl(activityId: number) {
+        function unsetActivityEl(activityId: number): void {
             delete activityEls.value[activityId];
         }
 
@@ -168,19 +169,18 @@ export const useActivitiesListDragStore = (activitiesListStoreId: string) =>
 
         /**
          * While the user is dragging a unit
-         * @param { Draggable } draggable - the draggable instance
-         * @returns { void }
+         * @param draggable - the draggable instance
          */
-        function onDragMove(draggable: Draggable) {
+        function onDragMove(draggable: Draggable): void {
             dragCurrentPointerY.value = draggable.pointerY;
         }
 
         /**
          * When the user starts dragging a unit
-         * @param { Draggable } draggable - the draggable instance
-         * @param { Activity } activity - the activity to start dragging
+         * @param draggable - the draggable instance
+         * @param activity - the activity to start dragging
          */
-        function onDragStart(draggable: Draggable, activity: Activity) {
+        function onDragStart(draggable: Draggable, activity: Activity): void {
             const pointerEvent = draggable.pointerEvent as PointerEvent;
             const pointerTarget = pointerEvent.target as HTMLElement;
 
@@ -202,9 +202,9 @@ export const useActivitiesListDragStore = (activitiesListStoreId: string) =>
 
         /**
          * When the user stops dragging a unit
-         * @param { Draggable } draggable - the draggable instance
+         * @param draggable - the draggable instance
          */
-        function onDragEnd(draggable: Draggable) {
+        function onDragEnd(draggable: Draggable): void {
             if (dragInitial.value !== null) {
                 // Move the drag handle back to its original position
                 gsap.to(draggable.target, {

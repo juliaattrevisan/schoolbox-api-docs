@@ -9,9 +9,9 @@ export const SEARCH_PARAM = "keyword"; // the incoming param to check for initia
 export const useQueryStore = defineStore("spQuery", () => {
     /**
      * get the initial query from the url if it exists
-     * @returns {string} the initial query
+     * @returns the initial query
      */
-    function getInitialQuery() {
+    function getInitialQuery(): string {
         const searchParams = new URLSearchParams(document.location.search);
         return searchParams.get(SEARCH_PARAM) ?? "";
     }
@@ -22,7 +22,7 @@ export const useQueryStore = defineStore("spQuery", () => {
     /**
      * search has been triggered so set the active query
      */
-    function setActive() {
+    function setActive(): void {
         activeQuery.value = query.value;
     }
 
@@ -37,7 +37,7 @@ export const useQueryStore = defineStore("spQuery", () => {
     /**
      * clear the current search
      */
-    function clear() {
+    function clear(): void {
         query.value = "";
     }
 

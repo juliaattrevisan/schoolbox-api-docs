@@ -22,6 +22,7 @@ type UpdateEventDetail = {
     updatedSelectedNodes: Node[];
 };
 
+// eslint-disable-next-line @typescript-eslint/explicit-function-return-type -- we want the inferred type from defineStore
 export const useStore = (folderId: number, componentInstanceId: number) =>
     defineStore(`folderNodes/${folderId}-${componentInstanceId}`, () => {
         const nodes = window.Vue.ref<Node[]>([]); // the current nodes to display the entire tree of
@@ -37,7 +38,7 @@ export const useStore = (folderId: number, componentInstanceId: number) =>
         /**
          * To notify the backend of a change in the selected nodes
          */
-        async function pushChanges() {
+        async function pushChanges(): Promise<void> {
             try {
                 activate("Updating...");
                 isProcessing.value = true;
@@ -79,7 +80,7 @@ export const useStore = (folderId: number, componentInstanceId: number) =>
          * As such we need to ensure that when a change is made in one instance,
          * the other instances are updated to reflect the latest changes
          */
-        function initEventListener() {
+        function initEventListener(): void {
             document.addEventListener(FOLDER_NODES_UPDATED, (event) => {
                 const eventDetail = (event as CustomEvent).detail as UpdateEventDetail;
                 if (eventDetail.folderId === folderId && eventDetail.componentInstanceId !== componentInstanceId) {
@@ -91,12 +92,12 @@ export const useStore = (folderId: number, componentInstanceId: number) =>
 
         /**
          * Store a reference to the nodes to display
-         * @param {Node[]} $selectedNodes - the nodes with codes that have been selected
-         * @param {Node[]} $nodes - the node trees to display
-         * @param {Node|null} $filter - to only display nodes that are children of this node
-         * @param {boolean} $isReadOnly - whether the user can edit nodes or not
+         * @param $selectedNodes - the nodes with codes that have been selected
+         * @param $nodes - the node trees to display
+         * @param $filter - to only display nodes that are children of this node
+         * @param $isReadOnly - whether the user can edit nodes or not
          */
-        function init($selectedNodes: Node[], $nodes: Node[], $filter: Node | null, $isReadOnly: boolean) {
+        function init($selectedNodes: Node[], $nodes: Node[], $filter: Node | null, $isReadOnly: boolean): void {
             selectedNodes.value = $selectedNodes;
             nodes.value = $nodes;
             filter.value = $filter;
@@ -150,7 +151,7 @@ export const useStore = (folderId: number, componentInstanceId: number) =>
 
         /**
          * To remove a node from the selectedNodes, after which we'll notify the backend of the change
-         * @param {Node} node - the node to remove
+         * @param node - the node to remove
          */
         function removeNode(node: Node): void {
             nodeToRemove.value = node;
@@ -179,7 +180,7 @@ export const useStore = (folderId: number, componentInstanceId: number) =>
 
         /**
          * To update the selectedNodes with new nodes, after which we'll notify the backend of the change
-         * @param {Node[]} $nodes - the new nodes to update the selectedNodes with
+         * @param $nodes - the new nodes to update the selectedNodes with
          */
         async function updateNodes($nodes: Node[]): Promise<void> {
             selectedNodes.value = $nodes;

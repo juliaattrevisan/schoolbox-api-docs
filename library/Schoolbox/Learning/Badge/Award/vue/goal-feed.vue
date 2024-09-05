@@ -1,4 +1,7 @@
 <script>
+// Ignore this file for ESLint checks for now (SA-18376)
+/* eslint-disable */
+/* eslint-enable vue/no-v-html */
 import AwardDetailModal from "./award-detail-modal";
 import AchievementWithdrawModal from "./award-achievement-withdraw-modal";
 import BadgeImage from "./../../vue/badge-image";

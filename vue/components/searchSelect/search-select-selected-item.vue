@@ -26,14 +26,14 @@ const isDisabled = window.Vue.computed(() => false);
  * To trigger an action of the search result, such as opening a modal
  * containing further info on the selected search result
  */
-function onTitleSelected() {
+function onTitleSelected(): void {
     emit("select", props.result);
 }
 
 /**
  * To remove from the selected list
  */
-function onRemoveSelected() {
+function onRemoveSelected(): void {
     emit("remove", props.result);
 }
 </script>

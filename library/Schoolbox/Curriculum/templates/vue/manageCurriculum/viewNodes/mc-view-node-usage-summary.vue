@@ -22,11 +22,11 @@ const nodeUsageStore = useNodeUsageStore();
 /**
  * to open up or close the view modal
  */
-function onViewToggleSelected() {
+async function onViewToggleSelected(): Promise<void> {
     if (props.isViewing) {
         nodeUsageStore.cancel();
     } else {
-        nodeUsageStore.prompt(props.node);
+        await nodeUsageStore.prompt(props.node);
     }
 }
 </script>

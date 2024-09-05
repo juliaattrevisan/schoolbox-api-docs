@@ -1,4 +1,7 @@
 <script>
+// Ignore this file for ESLint checks for now (SA-18376)
+/* eslint-disable */
+/* eslint-enable vue/no-v-html */
 /**
  * Select option, also ensuring respects nullable option and
  * checks for options that have been deleted so they are no longer displayed

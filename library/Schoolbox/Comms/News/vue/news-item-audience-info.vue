@@ -1,4 +1,7 @@
 <script>
+// Ignore this file for ESLint checks for now (SA-18376)
+/* eslint-disable */
+/* eslint-enable vue/no-v-html */
 /*
  * To display the audience information for a news item, which when is a Composite Audience is summarised and then further detailed in a popup modal
  * or otherwise as an inline list, with those that have links provided
@@ -34,7 +37,7 @@ export default {
                     segment.key,
                     segment.name,
                     segment,
-                    segment.labels
+                    segment.labels,
                 );
             }
         },

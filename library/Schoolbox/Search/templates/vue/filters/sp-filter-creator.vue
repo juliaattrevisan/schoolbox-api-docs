@@ -19,9 +19,9 @@ const currentUser: Creator = {
  * We only allow one creator to be selected at a time,
  * so only select a result if there isn't one already selected
  * or unselect the current result if it's already selected
- * @param {Result} result - the result selected
+ * @param result - the result selected
  */
-function onSelected(result: Result) {
+function onSelected(result: Result): void {
     if (!filterCreatorsStore.isActive) {
         filterCreatorsStore.creator.push(result as Creator);
         return;
@@ -35,7 +35,7 @@ function onSelected(result: Result) {
  * Remove the result, as we only allow one creator to be selected at a time
  * we can simply just clear the store
  */
-function onRemoved() {
+function onRemoved(): void {
     filterCreatorsStore.clear();
 }
 </script>

@@ -52,8 +52,8 @@ export const useUnitPlannerCurriculumStore = defineStore(`unitPlannerCurriculum`
 
     /**
      * To open the curriculum selector modal, targeting the relevant folderNodesStore
-     * @param {number} folderId - the folderId to target
-     * @param {number} componentId - the componentId to target
+     * @param folderId - the folderId to target
+     * @param componentId - the componentId to target
      */
     function openCurriculumSelectorModal(folderId: number, componentId: number): void {
         const folderNodesStore = useFolderNodesStore(folderId, componentId);
@@ -78,11 +78,14 @@ export const useUnitPlannerCurriculumStore = defineStore(`unitPlannerCurriculum`
     /**
      * To retrieve the curriculum component id for the column if it's available,
      * so we can retrieve the correct folderNodesStore and load in the appropriate node tree
-     * @param {CurriculumOverviewComponent[]} components - the components on the unit
-     * @param {Column} column - the column to match
-     * @returns {CurriculumOverviewComponent|null} - the component found or null
+     * @param components - the components on the unit
+     * @param column - the column to match
+     * @returns - the component found or null
      */
-    function getComponent(components: CurriculumOverviewComponent[], column: Column) {
+    function getComponent(
+        components: CurriculumOverviewComponent[],
+        column: Column,
+    ): CurriculumOverviewComponent | null {
         // loop through the curriculum components on the unit, matching the component heading to the column label
         const matchedComponent = components.find(
             (component) => component.heading.trim() === column.label.trim(), // Ignore trailing or leading whitespace
@@ -96,10 +99,10 @@ export const useUnitPlannerCurriculumStore = defineStore(`unitPlannerCurriculum`
     /**
      * Create a new curriculum overview component for the unit,
      * placing the component on units homepage
-     * @param {Unit} unit - the unit to create the component for
-     * @param {Column} column - the column to create the component for
+     * @param unit - the unit to create the component for
+     * @param column - the column to create the component for
      */
-    async function createComponent(unit: Unit, column: Column) {
+    async function createComponent(unit: Unit, column: Column): Promise<void> {
         const unitPlannerStore = useUnitPlannerStore();
         const componentDefinition = unitPlannerStore.template?.curriculumDefId ?? null;
 

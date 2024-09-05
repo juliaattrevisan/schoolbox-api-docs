@@ -18,9 +18,8 @@ const myself: Developer = {
 
 /**
  * Say hello
- *
- * @param {Developer} person - person to say hello to
- * @returns {string} say hello
+ * @param person - person to say hello to
+ * @returns say hello
  */
 function hello(person: Developer): string {
     return `Hi there ${person.firstName.toUpperCase()}!`; // the IDE will allow better autocomplete on firstName as it knows it's a string
@@ -30,9 +29,8 @@ hello(myself);
 
 /**
  * Log name or age
- *
- * @param { number | string } nameOrAge - log either name or age
- * @returns { string } - to return name or age
+ * @param nameOrAge - log either name or age
+ * @returns - to return name or age
  */
 function printNameOrAge(nameOrAge: number | string): string {
     // union types can be used to declare multiple allowed property types
@@ -44,9 +42,8 @@ printNameOrAge(myself.age);
 
 /**
  * We can use optional parameters
- *
- * @param { string } name - name to greet
- * @returns { string } - say hello
+ * @param name - name to greet
+ * @returns - say hello
  */
 function greet(name?: string): string {
     if (name) {

@@ -5,46 +5,22 @@
  */
 
 import ShowMatches from "@schoolboxVue/components/search/show-matches.vue";
+import type { Node } from "@schoolboxCurriculum/types/Node";
 import { useNodesStore } from "../store/mcNodesStore";
 import { useViewNodesStore } from "./store/mcViewNodesStore";
 import { useSearchStore } from "../store/mcSearchStore";
 
-const props = defineProps({
-    /**
-     * the assigned node to display
-     */
-    node: {
-        type: Object,
-        required: true,
-        default() {
-            return {
-                id: "0",
-                name: "-",
-                children: [],
-            };
-        },
-    },
-    /**
-     * to gradually add more marginLeft to indicate node level depth
-     */
-    depth: {
-        type: Number,
-        required: true,
-    },
-    /**
-     * the already computed node title
-     */
-    title: {
-        type: String,
-        required: true,
-    },
-    /**
-     * to disable certain events when editing is taking place
-     */
-    isActive: {
-        type: Boolean,
-        required: true,
-    },
+interface Props {
+    node: Node; // the assigned node to display
+    depth: number; // to gradually add more marginLeft to indicate node level depth
+    title: string; // the already computed node title
+    isActive: boolean; // to disable certain events when editing is taking place
+}
+
+const props = withDefaults(defineProps<Props>(), {
+    depth: 0,
+    title: "-",
+    isActive: false,
 });
 
 const nodesStore = useNodesStore();
@@ -53,7 +29,6 @@ const searchStore = useSearchStore();
 
 /**
  * To disable selection on certain sitatuions
- *
  * @returns { boolean }
  */
 const isDisabled = window.Vue.computed(() => {
@@ -66,7 +41,6 @@ const isDisabled = window.Vue.computed(() => {
 
 /**
  * To distinguish the parent node
- *
  * @returns { boolean }
  */
 const isParentNode = window.Vue.computed(() => {
@@ -79,30 +53,30 @@ const isParentNode = window.Vue.computed(() => {
 /**
  * To help distinguish those nodes that aren't selectable,
  * we disable and remove the default button colour
- *
  * @returns { boolean }
  */
 const isButton = window.Vue.computed(() => {
     if (searchStore.isActive) {
-        //when search is active, we can jump to the selected node
-        return true;
-    } else if (isParentNode.value) {
-        //is the parent node, which we can't select
-        return false;
-    } else if (props.node.children === null) {
-        //the children haven't been loaded
-        return false;
-    } else if (props.node.children?.length === 0) {
-        //there's no children to display, so no point going further
-        return false;
-    } else {
+        // when search is active, we can jump to the selected node
         return true;
     }
+    if (isParentNode.value) {
+        // is the parent node, which we can't select
+        return false;
+    }
+    if (props.node.children === null) {
+        // the children haven't been loaded
+        return false;
+    }
+    if (props.node.children?.length === 0) {
+        // there's no children to display, so no point going further
+        return false;
+    }
+    return true;
 });
 
 /**
  * Only use bold on the title when
- *
  * @returns { string }
  */
 const fontWeight = window.Vue.computed(() => (isParentNode.value && !searchStore.isActive ? "bold" : "normal"));
@@ -110,13 +84,13 @@ const fontWeight = window.Vue.computed(() => (isParentNode.value && !searchStore
 /**
  * reset the structure to that node or traverse to the next node level
  */
-function onNameSelected() {
+async function onNameSelected(): Promise<void> {
     if (searchStore.isActive) {
         // reset the structure and move to the selected searched node
-        viewNodesStore.toId(props.node.id);
+        await viewNodesStore.toId(props.node.id);
     } else {
         // traverse to the next node level
-        viewNodesStore.setNextSelected(props.node.id);
+        await viewNodesStore.setNextSelected(props.node.id);
     }
 }
 </script>

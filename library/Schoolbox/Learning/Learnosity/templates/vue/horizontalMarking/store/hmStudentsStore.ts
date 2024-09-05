@@ -33,17 +33,17 @@ export const useStudentsStore = defineStore("hmStudents", () => {
 
     /**
      * store any passed through properties
-     * @param {object} $students - the students
-     * @param {StudentItemQuestionResponse[]} $itemResponses - the item responses
-     * @param {StudentAttemptResponse[]} $attemptResponses - the attempt responses
-     * @param {StudentUrls[]} $urls - the urls
+     * @param $students - the students
+     * @param $itemResponses - the item responses
+     * @param $attemptResponses - the attempt responses
+     * @param $urls - the urls
      */
     function init(
         $students: Student[],
         $itemResponses: StudentItemQuestionResponse[],
         $attemptResponses: StudentAttemptResponse[],
         $urls: StudentUrls[],
-    ) {
+    ): void {
         $students.forEach((student) => {
             students.value.push({
                 ...student,
@@ -61,10 +61,10 @@ export const useStudentsStore = defineStore("hmStudents", () => {
      * Add items to a student
      * Note that the items are stored per student to link them to their report
      * The itemsStore is used to reference all items within the quiz, and these are NOT linked to the student reports
-     * @param {string} reportId - the report id
-     * @param {StudentItem[]} $items - the items to add
+     * @param reportId - the report id
+     * @param $items - the items to add
      */
-    function addItems(reportId: string, $items: StudentItem[]) {
+    function addItems(reportId: string, $items: StudentItem[]): void {
         const items = $items.filter((item) => item.questions.length > 0); // remove any items that don't have questions
         const student = students.value.find(($student) => $student.elementId === reportId); // find the student that matches the report
         if (student) {
@@ -83,16 +83,18 @@ export const useStudentsStore = defineStore("hmStudents", () => {
                 item.isMarked = getItemIsMarked(item);
             });
             student.isMarked = getStudentIsMarked(student);
-            student.attemptResponse = getAttemptResponse(attemptResponses.value, student.id);
+            const attemptResponse = getAttemptResponse(attemptResponses.value, student.id);
+            if (attemptResponse === undefined) throw new Error(`Attempt response not found for student ${student.id}`);
+            student.attemptResponse = attemptResponse;
             student.urls = getUrls(urls.value, student.id);
         }
     }
 
     /**
      * To show/hide a student
-     * @param {Student} student - the student to change
+     * @param student - the student to change
      */
-    function toggleStudent(student: Student) {
+    function toggleStudent(student: Student): void {
         student.isExpanded = !student.isExpanded;
         // if all students are now expanded, set the overall toggle to true
         if (students.value.every(($student) => $student.isExpanded)) {
@@ -107,7 +109,7 @@ export const useStudentsStore = defineStore("hmStudents", () => {
     /**
      * To show/hide all students
      */
-    function toggleAllStudents() {
+    function toggleAllStudents(): void {
         isExpanded.value = !isExpanded.value;
         students.value.forEach((student) => {
             student.isExpanded = isExpanded.value;
@@ -117,7 +119,7 @@ export const useStudentsStore = defineStore("hmStudents", () => {
     /**
      * For each item within the store, check if all students have been marked for that item
      */
-    function updateItemsIsMarked() {
+    function updateItemsIsMarked(): void {
         useItemsStore().items.forEach((item) => {
             item.isMarked = students.value.every((student) => {
                 const studentItem = student.items.find(($item) => $item.reference === item.reference);
@@ -128,9 +130,9 @@ export const useStudentsStore = defineStore("hmStudents", () => {
 
     /**
      * To notify that a report linked to a student has been loaded
-     * @param {number} reportId - the report id
+     * @param reportId - the report id
      */
-    function reportLoaded(reportId: string) {
+    function reportLoaded(reportId: string): void {
         const studentLoaded = students.value.find((student) => student.elementId === reportId);
         if (studentLoaded) {
             studentLoaded.isReportLoaded = true;
@@ -144,10 +146,10 @@ export const useStudentsStore = defineStore("hmStudents", () => {
 
     /**
      * To update the isMarked property of an item and student
-     * @param {Student} student - the student to update
-     * @param {StudentItem} item - the item to update
+     * @param student - the student to update
+     * @param item - the item to update
      */
-    function updateIsMarked(student: Student, item: StudentItem) {
+    function updateIsMarked(student: Student, item: StudentItem): void {
         item.isMarked = getItemIsMarked(item);
         student.isMarked = getStudentIsMarked(student);
         updateItemsIsMarked();
@@ -155,17 +157,17 @@ export const useStudentsStore = defineStore("hmStudents", () => {
 
     /**
      * To update the score of a question
-     * @param {Student} student - the student to update
-     * @param {StudentItem} item - the item that contains the question to update
-     * @param {StudentItemQuestion} question - the question to update
-     * @param {number} score - the score to update
+     * @param student - the student to update
+     * @param item - the item that contains the question to update
+     * @param question - the question to update
+     * @param score - the score to update
      */
     function updateItemResponseScore(
         student: Student,
         item: StudentItem,
         question: StudentItemQuestion,
         score: number,
-    ) {
+    ): void {
         (question.response as StudentItemQuestionResponse).score = score;
         (question.response as StudentItemQuestionResponse).isMarked = true;
         updateIsMarked(student, item);
@@ -173,12 +175,17 @@ export const useStudentsStore = defineStore("hmStudents", () => {
 
     /**
      * To update the comment of an item
-     * @param {Student} student - the student to update
-     * @param {StudentItem} item - the item to update
-     * @param {StudentItemQuestion} question - the question to update
-     * @param {string} comment - the comment to update
+     * @param student - the student to update
+     * @param item - the item to update
+     * @param question - the question to update
+     * @param comment - the comment to update
      */
-    function updateItemComment(student: Student, item: StudentItem, question: StudentItemQuestion, comment: string) {
+    function updateItemComment(
+        student: Student,
+        item: StudentItem,
+        question: StudentItemQuestion,
+        comment: string,
+    ): void {
         (question.response as StudentItemQuestionResponse).comment = comment;
         // set all questions responses that don't have a maxScore as marked
         const questionsWithoutMaxScore = item.questions.filter(
@@ -192,19 +199,19 @@ export const useStudentsStore = defineStore("hmStudents", () => {
 
     /**
      * To update the overall comment response to an attempt
-     * @param {Student} student - the student to update
-     * @param {string} comment - the comment to update
+     * @param student - the student to update
+     * @param comment - the comment to update
      */
-    function updateAttemptComment(student: Student, comment: string) {
+    function updateAttemptComment(student: Student, comment: string): void {
         student.attemptResponse.comment = comment;
     }
 
     /**
      * To update the overall mark response to an attempt
-     * @param {Student} $student - the student to update
-     * @param {string} mark - the mark to update
+     * @param $student - the student to update
+     * @param mark - the mark to update
      */
-    function updateAttemptMark($student: Student, mark: string) {
+    function updateAttemptMark($student: Student, mark: string): void {
         $student.attemptResponse.mark = mark;
     }
 

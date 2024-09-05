@@ -24,9 +24,9 @@ const modalEl = window.Vue.ref<InstanceType<typeof RevealModal> | null>(null);
 
 /**
  * to open up the details modal
- * @param { Node } node - the selected node
+ * @param node - the selected node
  */
-function onCodeSelected(node: Node) {
+function onCodeSelected(node: Node): void {
     selectedNodeId.value = node.id;
 
     if (modalEl.value !== null) {

@@ -17,7 +17,7 @@ import {
 
 /**
  * All the emoji plugins
- * @returns { PluginConstructor[] } - the emoji plugins
+ * @returns - the emoji plugins
  */
 export function getEmojiPlugins(): PluginConstructor[] {
     return [

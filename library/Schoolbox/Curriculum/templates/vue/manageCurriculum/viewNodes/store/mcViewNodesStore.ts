@@ -3,6 +3,8 @@
  * those filtered by both <select> and also the search <input>
  */
 
+/* eslint-disable import/no-cycle -- Disable dependency cycle warning temporarily [SA-18428] */
+
 import { defineStore } from "pinia";
 import { useNodesStore } from "@schoolboxCurriculum/vue/manageCurriculum/store/mcNodesStore";
 import { useSearchStore } from "@schoolboxCurriculum/vue/manageCurriculum/store/mcSearchStore";
@@ -32,14 +34,12 @@ export const useViewNodesStore = defineStore("mcViewNodes", () => {
 
     /**
      * Can now use the search input when we have selected at least one node
-     *
      * @returns { boolean }
      */
     const isActive = window.Vue.computed(() => idList.value.length > 0);
 
     /**
      * to traverse back through the nodes via breadcrumbs
-     *
      * @returns { Array }
      */
     const breadcrumbs = window.Vue.computed(() => {
@@ -60,7 +60,6 @@ export const useViewNodesStore = defineStore("mcViewNodes", () => {
 
     /**
      * the current node selection
-     *
      * @returns { Node }
      */
     const current = window.Vue.computed(() => {
@@ -76,7 +75,6 @@ export const useViewNodesStore = defineStore("mcViewNodes", () => {
     /**
      * the current nodes to display, which are either just the current selection
      * or when the search is active the results found within the current selection
-     *
      * @returns { Node[] }
      */
     const nodes = window.Vue.computed<Node[]>(() => {
@@ -90,27 +88,25 @@ export const useViewNodesStore = defineStore("mcViewNodes", () => {
     /**
      * Reset to the original state, with no active selection at all
      */
-    function reset() {
+    function reset(): void {
         currentDirection.value = DIRECTION.BACKWARDS;
         idList.value = [];
     }
 
     /**
      * Add one more selection
-     *
-     * @param { number } id - id of the Node to move to
+     * @param id - id of the Node to move to
      */
-    function toNext(id: number) {
+    function toNext(id: number): void {
         currentDirection.value = DIRECTION.FORWARDS;
         idList.value = [...idList.value, id]; // add the new id in
     }
 
     /**
      * Move up to a previous node
-     *
-     * @param { number } targetDepth - the depth to move back to
+     * @param targetDepth - the depth to move back to
      */
-    function toPrevious(targetDepth: number) {
+    function toPrevious(targetDepth: number): void {
         currentDirection.value = DIRECTION.BACKWARDS;
         idList.value = idList.value.filter((id, index) => index < targetDepth); // shorten the list back to the new reduced depth
     }
@@ -119,7 +115,7 @@ export const useViewNodesStore = defineStore("mcViewNodes", () => {
      * So if the page is refreshed the current node view is maintained
      * and to allow for browser back and forward buttons
      */
-    function updateHash() {
+    function updateHash(): void {
         // we dont need to update the browser state if this is already a browser action
         if (isBrowserAction.value) {
             return;
@@ -142,11 +138,10 @@ export const useViewNodesStore = defineStore("mcViewNodes", () => {
     /**
      * There's been a change in node selection,
      * so update based on the change in depth
-     *
-     * @param { number } depth - the depth to move to
-     * @param { number } id - the id of the selected Node
+     * @param depth - the depth to move to
+     * @param id - the id of the selected Node
      */
-    function setSelected(depth: number, id: number = UNSET_ID) {
+    function setSelected(depth: number, id: number = UNSET_ID): void {
         useSearchStore().clear(); // clear the search results when traversing
         if (depth === 0) {
             // pulling back to no node selection at all, the root level
@@ -164,10 +159,9 @@ export const useViewNodesStore = defineStore("mcViewNodes", () => {
 
     /**
      * If the deleted node is currently the node visible, we need to move up one depth on the tree
-     *
-     * @param { Node } node - node to check
+     * @param node - node to check
      */
-    function checkDeletedNode(node: Node) {
+    function checkDeletedNode(node: Node): void {
         if (node.id === current.value.id) {
             setSelected(currentDepth.value - 1, idList.value[currentDepth.value - 2]);
         }
@@ -175,10 +169,9 @@ export const useViewNodesStore = defineStore("mcViewNodes", () => {
 
     /**
      * Move one depth down the tree
-     *
-     * @param { number } id - id of the Node to select
+     * @param id - id of the Node to select
      */
-    async function setNextSelected(id: number) {
+    async function setNextSelected(id: number): Promise<void> {
         const nodesStore = useNodesStore();
         await nodesStore.loadNextChildren(id);
         setSelected(currentDepth.value + 1, id);
@@ -187,19 +180,17 @@ export const useViewNodesStore = defineStore("mcViewNodes", () => {
     /**
      * To traverse to a specified id, regardless of where it is
      * in the current tree structure
-     *
-     * @param { number } id - id of the Node to move to
+     * @param id - id of the Node to move to
      */
-    async function toId(id: number) {
+    async function toId(id: number): Promise<void> {
         await useNodesStore().loadId(id);
     }
 
     /**
      * To responsd to browser backward and forward button actions
-     *
-     * @param { object } state -
+     * @param state -
      */
-    async function updateOnPopState(state: PopState) {
+    async function updateOnPopState(state: PopState): Promise<void> {
         // if the state contains a valid node id then move to that node id
         if (state && state.nodeId && Number.isInteger(state.nodeId) && state.nodeId !== UNSET_ID) {
             // check if the nodeId is currently in the idList, if so move backward to that index

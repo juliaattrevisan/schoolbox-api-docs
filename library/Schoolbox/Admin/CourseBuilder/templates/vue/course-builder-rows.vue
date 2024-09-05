@@ -13,29 +13,29 @@ const store = useCourseBuilderStore();
 
 /**
  * How the element animates on
- * @param {Element} element - the element that's animating
- * @param {Function} done - to be called once animation is complete
+ * @param element - the element that's animating
+ * @param done - to be called once animation is complete
  */
-async function onRowEnter(element: Element, done: () => void) {
+async function onRowEnter(element: Element, done: () => void): Promise<void> {
     await slideDown(element as HTMLElement);
     done();
 }
 
 /**
  * How the element animates off
- * @param {Element} element - the element that's animating
- * @param {Function} done - to be called once animation is complete
+ * @param element - the element that's animating
+ * @param done - to be called once animation is complete
  */
-async function onRowLeave(element: Element, done: () => void) {
+async function onRowLeave(element: Element, done: () => void): Promise<void> {
     await slideUp(element as HTMLElement);
     done();
 }
 
 /**
  * Trigger the deletetion process for a course template
- * @param {CourseTemplate} courseTemplate - the course template to delete
+ * @param courseTemplate - the course template to delete
  */
-async function onDeleteClicked(courseTemplate: CourseTemplate) {
+async function onDeleteClicked(courseTemplate: CourseTemplate): Promise<void> {
     if (courseTemplate.id >= 0) {
         store.courseTemplateToDelete = courseTemplate;
     } else {
@@ -45,9 +45,9 @@ async function onDeleteClicked(courseTemplate: CourseTemplate) {
 
 /**
  * Clear the validation error for a course
- * @param {CourseTemplate} courseTemplate - the course template to clear the validation error for
+ * @param courseTemplate - the course template to clear the validation error for
  */
-function clearNameValidationError(courseTemplate: CourseTemplate) {
+function clearNameValidationError(courseTemplate: CourseTemplate): void {
     courseTemplate.nameHasValidationError = undefined;
 }
 

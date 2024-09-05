@@ -16,11 +16,11 @@ export const useCourseBuilderStore = defineStore("courseBuilderStore", () => {
 
     /**
      * store any passed through properties
-     * @param { CourseTemplate[] } $courseTemplates - the course templates
-     * @param { Permissions } $coursePermissions - the course permissions
-     * @param { Permissions } $unitPermissions - the unit permissions
-     * @param { boolean } $courseInherit - the course inherit
-     * @param { boolean } $unitInherit - the unit inherit
+     * @param $courseTemplates - the course templates
+     * @param $coursePermissions - the course permissions
+     * @param $unitPermissions - the unit permissions
+     * @param $courseInherit - the course inherit
+     * @param $unitInherit - the unit inherit
      */
     function init(
         $courseTemplates: CourseTemplate[],
@@ -28,7 +28,7 @@ export const useCourseBuilderStore = defineStore("courseBuilderStore", () => {
         $unitPermissions: Permissions,
         $courseInherit: boolean,
         $unitInherit: boolean,
-    ) {
+    ): void {
         courseTemplates.value = $courseTemplates;
         coursePermissions.value = $coursePermissions;
         unitPermissions.value = $unitPermissions;
@@ -38,9 +38,9 @@ export const useCourseBuilderStore = defineStore("courseBuilderStore", () => {
 
     /**
      * Updates a specific course template in the store
-     * @param { CourseTemplate } updatedTemplate - the updated course template
+     * @param updatedTemplate - the updated course template
      */
-    function updateCourseTemplate(updatedTemplate: CourseTemplate) {
+    function updateCourseTemplate(updatedTemplate: CourseTemplate): void {
         const index = courseTemplates.value.findIndex((ct) => ct.id === updatedTemplate.id);
         if (index !== -1) {
             courseTemplates.value[index] = { ...updatedTemplate };
@@ -49,9 +49,9 @@ export const useCourseBuilderStore = defineStore("courseBuilderStore", () => {
 
     /**
      * Deletes the currently selected course template
-     * @param { CourseTemplate } courseTemplate - the course template to delete
+     * @param courseTemplate - the course template to delete
      */
-    async function deleteCourseTemplate(courseTemplate: CourseTemplate) {
+    async function deleteCourseTemplate(courseTemplate: CourseTemplate): Promise<void> {
         if (courseTemplate.id >= 0) {
             toast.activate("Deleting...");
             const response = await fetch(`/adminv2/course-builder/delete/${courseTemplate.id}`, { method: "DELETE" });
@@ -83,9 +83,9 @@ export const useCourseBuilderStore = defineStore("courseBuilderStore", () => {
 
     /**
      * Send through the data to save the whole list and permissions
-     * @returns { FormData } - the form data to send through
+     * @returns - the form data to send through
      */
-    function getSaveAllFormData() {
+    function getSaveAllFormData(): FormData {
         const formData = new FormData();
         formData.append("templates", JSON.stringify(courseTemplates.value));
         formData.append("unitInherit", unitInherit.value ? "1" : "0");
@@ -110,7 +110,7 @@ export const useCourseBuilderStore = defineStore("courseBuilderStore", () => {
     /**
      * Saves all changes
      */
-    async function saveChanges() {
+    async function saveChanges(): Promise<void> {
         try {
             // Ensure all course template names are not empty, otherwise set .hasNameValidationError on the courseTemplate
             let allTemplatesHaveNames = true;

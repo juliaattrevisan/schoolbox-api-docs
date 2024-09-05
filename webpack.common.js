@@ -43,7 +43,7 @@ module.exports = {
             "./www/static/js/editor/jquery.proxy-replacement.js",
 
             // DateTime
-            "./www/static/js/vendors/dayjs/dayjsWithPlugins.js",
+            "./www/static/js/vendors/dayjs/dayjsWithPlugins.ts",
 
             // Files And Resource Browser
             "./www/static/js/socialstream/browser/browser.js",
@@ -114,45 +114,45 @@ module.exports = {
         highchartsMore: "./www/static/js/vendors/highcharts/highchartsMore.js",
 
         // Search
-        headerSearch: "./templates/core/include/vue/headerSearch.js",
+        headerSearch: "./templates/core/include/vue/headerSearch.ts",
         searchPage: "./library/Schoolbox/Search/templates/vue/searchPage.ts",
 
         // Toast
         sbxToast: "./vue/components/toast/sbxToast.ts",
 
         // Calendars
-        sbFullCalendar: "./library/Schoolbox/Calendar/vue/sbFullCalendar.js",
-        timetableCalendar: "./library/Schoolbox/Calendar/vue/timetableCalendar.js",
-        assessmentCalendar: "./library/Schoolbox/Learning/Assessment/Calendar/vue/assessmentCalendar.js",
-        upcomingDueWorkCalendar: "./library/Schoolbox/Learning/Upcoming/vue/upcomingDueWorkCalendar.js",
-        resourceBookingItemCalendar: "./library/Schoolbox/ResourceBooking/Item/vue/resourceBookingItemCalendar.js",
+        sbFullCalendar: "./library/Schoolbox/Calendar/vue/sbFullCalendar.ts",
+        timetableCalendar: "./library/Schoolbox/Calendar/vue/timetableCalendar.ts",
+        assessmentCalendar: "./library/Schoolbox/Learning/Assessment/Calendar/vue/assessmentCalendar.ts",
+        upcomingDueWorkCalendar: "./library/Schoolbox/Learning/Upcoming/vue/upcomingDueWorkCalendar.ts",
+        resourceBookingItemCalendar: "./library/Schoolbox/ResourceBooking/Item/vue/resourceBookingItemCalendar.ts",
         resourceBookingCategoryCalendar:
-            "./library/Schoolbox/ResourceBooking/Category/vue/resourceBookingCategoryCalendar.js",
-        calendarComponent: "./library/Schoolbox/Calendar/vue/calendarComponent.js",
-        calendarEventDetails: "./library/Schoolbox/Calendar/Event/templates/vue/calendarEventDetails.js",
+            "./library/Schoolbox/ResourceBooking/Category/vue/resourceBookingCategoryCalendar.ts",
+        calendarComponent: "./library/Schoolbox/Calendar/vue/calendarComponent.ts",
+        calendarEventDetails: "./library/Schoolbox/Calendar/Event/templates/vue/calendarEventDetails.ts",
 
         // News related
-        visitationListFull: "./library/Schoolbox/Comms/News/Statistics/templates/visitation/visitationListFull.js",
-        articleList: "./library/Schoolbox/Comms/News/templates/vue/articleList.js",
-        articleThreads: "./library/Schoolbox/Comms/News/templates/vue/articleThreads.js",
-        newsAuthored: "./library/Schoolbox/Comms/News/vue/newsAuthored.js",
-        newsItemAudienceSelect: "./library/Schoolbox/Comms/News/vue/newsItemAudienceSelect.js",
-        newsItemAudienceInfo: "./library/Schoolbox/Comms/News/vue/newsItemAudienceInfo.js",
-        newsItemFormActions: "./library/Schoolbox/Comms/News/vue/newsItemFormActions.js",
-        newsRssLink: "./library/Schoolbox/Comms/News/vue/newsRssLink.js",
+        visitationListFull: "./library/Schoolbox/Comms/News/Statistics/templates/visitation/visitationListFull.ts",
+        articleList: "./library/Schoolbox/Comms/News/templates/vue/articleList.ts",
+        articleThreads: "./library/Schoolbox/Comms/News/templates/vue/articleThreads.ts",
+        newsAuthored: "./library/Schoolbox/Comms/News/vue/newsAuthored.ts",
+        newsItemAudienceSelect: "./library/Schoolbox/Comms/News/vue/newsItemAudienceSelect.ts",
+        newsItemAudienceInfo: "./library/Schoolbox/Comms/News/vue/newsItemAudienceInfo.ts",
+        newsItemFormActions: "./library/Schoolbox/Comms/News/vue/newsItemFormActions.ts",
+        newsRssLink: "./library/Schoolbox/Comms/News/vue/newsRssLink.ts",
 
         // Learning
         learningMomentsEvidenceDetail:
-            "./library/Schoolbox/Learning/Moment/Evidence/vue/learningMomentsEvidenceDetail.js",
-        userProfileFeeds: "./library/Schoolbox/Learning/vue/user-profile/userProfileFeeds.js",
-        badgeList: "./library/Schoolbox/Learning/Badge/vue/badgeList.js",
-        badgeListForm: "./library/Schoolbox/Learning/Badge/Award/vue/badgeListForm.js",
-        badgeReport: "./library/Schoolbox/Learning/Badge/Award/vue/badgeReport.js",
-        awardWithEvidenceBadgeList: "./library/Schoolbox/Learning/Badge/Award/vue/awardWithEvidenceBadgeList.js",
-        evidenceMediaRecording: "./library/Schoolbox/Learning/Moment/Evidence/vue/evidenceMediaRecording.js",
+            "./library/Schoolbox/Learning/Moment/Evidence/vue/learningMomentsEvidenceDetail.ts",
+        userProfileFeeds: "./library/Schoolbox/Learning/vue/user-profile/userProfileFeeds.ts",
+        badgeList: "./library/Schoolbox/Learning/Badge/vue/badgeList.ts",
+        badgeListForm: "./library/Schoolbox/Learning/Badge/Award/vue/badgeListForm.ts",
+        badgeReport: "./library/Schoolbox/Learning/Badge/Award/vue/badgeReport.ts",
+        awardWithEvidenceBadgeList: "./library/Schoolbox/Learning/Badge/Award/vue/awardWithEvidenceBadgeList.ts",
+        evidenceMediaRecording: "./library/Schoolbox/Learning/Moment/Evidence/vue/evidenceMediaRecording.ts",
         checkShareWorkButtons: "./library/Schoolbox/Learning/Moment/Evidence/templates/js/checkShareWorkButtons.js",
         similarityReport:
-            "./library/Schoolbox/Learning/Assessment/templates/dueWork/vue/similarityReport/similarityReport.js",
+            "./library/Schoolbox/Learning/Assessment/templates/dueWork/vue/similarityReport/similarityReport.ts",
         linkedActivities: "./library/Schoolbox/Learning/Assessment/templates/lessonPlan/vue/linkedActivities.ts",
 
         // Assessment
@@ -163,19 +163,19 @@ module.exports = {
         quizContent: "./library/Schoolbox/Learning/Learnosity/templates/js/quizContent.ts",
 
         // Textboxes
-        textboxList: "./library/Schoolbox/Resource/Textbox/vue/textboxList.js",
+        textboxList: "./library/Schoolbox/Resource/Textbox/vue/textboxList.ts",
 
         // Admin
-        adminGrades: "./library/Schoolbox/Admin/Grades/vue/adminGrades.js",
+        adminGrades: "./library/Schoolbox/Admin/Grades/vue/adminGrades.ts",
         adminSettingsSearch: "./library/Schoolbox/Admin/Navigation/vue/adminSettingsSearch.ts",
-        staleUsersReport: "./library/Schoolbox/Admin/User/vue/staleUsersReports/staleUsersReport.js",
-        userBulkModify: "./library/Schoolbox/Admin/User/vue/userBulkModify/userBulkModify.js",
-        adminList: "./library/Schoolbox/Admin/Lists/templates/vue/adminList.js",
-        saveAdminSettings: "./library/Schoolbox/Admin/Navigation/vue/saveAdminSettings.js",
-        shapsList: "./library/Schoolbox/Admin/SHAPS/vue/shapsList.js",
-        usageGlobal: "./library/Schoolbox/Admin/Usage/vue/global/usageGlobal.js",
-        usageSpecific: "./library/Schoolbox/Admin/Usage/vue/specific/usageSpecific.js",
-        emailDkim: "./library/Schoolbox/Admin/EmailDKIM/vue/emailDkim.js",
+        staleUsersReport: "./library/Schoolbox/Admin/User/vue/staleUsersReports/staleUsersReport.ts",
+        userBulkModify: "./library/Schoolbox/Admin/User/vue/userBulkModify/userBulkModify.ts",
+        adminList: "./library/Schoolbox/Admin/Lists/templates/vue/adminList.ts",
+        saveAdminSettings: "./library/Schoolbox/Admin/Navigation/vue/saveAdminSettings.ts",
+        shapsList: "./library/Schoolbox/Admin/SHAPS/vue/shapsList.ts",
+        usageGlobal: "./library/Schoolbox/Admin/Usage/vue/global/usageGlobal.ts",
+        usageSpecific: "./library/Schoolbox/Admin/Usage/vue/specific/usageSpecific.ts",
+        emailDkim: "./library/Schoolbox/Admin/EmailDKIM/vue/emailDkim.ts",
         loadLayout: "./www/static/js/masonry/layout/loadLayout.ts",
         courseBuilder: "./library/Schoolbox/Admin/CourseBuilder/templates/vue/courseBuilder.ts",
         oauthClientList: "./library/Schoolbox/Admin/Oauth/Client/vue/oauthClientList.ts",
@@ -184,36 +184,36 @@ module.exports = {
         dataTable: "./vue/components/dataTable/dataTable.ts",
 
         // Record Media Modal
-        recordMediaModal: "./templates/core/resources/filesystem/vue/recordMediaModal.js",
+        recordMediaModal: "./templates/core/resources/filesystem/vue/recordMediaModal.ts",
 
         // Class
-        classList: "./library/Schoolbox/Learning/vue/classList.js",
-        classSelector: "./library/Schoolbox/Assessment/Course/templates/vue/classSelector.js",
+        classList: "./library/Schoolbox/Learning/vue/classList.ts",
+        classSelector: "./library/Schoolbox/Assessment/Course/templates/vue/classSelector.ts",
 
         // Groups
-        manageGroups: "./library/Schoolbox/Group/vue/manageGroups.js",
-        manageGroup: "./library/Schoolbox/Group/Manage/vue/manageGroup.js",
+        manageGroups: "./library/Schoolbox/Group/vue/manageGroups.ts",
+        manageGroup: "./library/Schoolbox/Group/Manage/vue/manageGroup.ts",
 
         // Curriculum
-        manageCurriculum: "./library/Schoolbox/Curriculum/templates/vue/manageCurriculum/manageCurriculum.js",
-        curriculumSelector: "./library/Schoolbox/Curriculum/templates/vue/curriculumSelector/curriculumSelector.js",
-        assessmentCodes: "./library/Schoolbox/Curriculum/templates/vue/assessmentCodes/assessmentCodes.js",
-        overviewComponent: "./library/Schoolbox/Curriculum/templates/vue/overviewComponent/overviewComponent.js",
+        manageCurriculum: "./library/Schoolbox/Curriculum/templates/vue/manageCurriculum/manageCurriculum.ts",
+        curriculumSelector: "./library/Schoolbox/Curriculum/templates/vue/curriculumSelector/curriculumSelector.ts",
+        assessmentCodes: "./library/Schoolbox/Curriculum/templates/vue/assessmentCodes/assessmentCodes.ts",
+        overviewComponent: "./library/Schoolbox/Curriculum/templates/vue/overviewComponent/overviewComponent.ts",
 
         // QR codes
-        manageQrCodes: "./library/Schoolbox/Qrcode/vue/manageQrCodes.js",
+        manageQrCodes: "./library/Schoolbox/Qrcode/vue/manageQrCodes.ts",
 
         // Pastoral
-        pastoralRecordCommentsPublic: "./library/Schoolbox/Pastoral/templates/vue/pastoralRecordCommentsPublic.js",
-        pastoralRecordCommentsPrivate: "./library/Schoolbox/Pastoral/templates/vue/pastoralRecordCommentsPrivate.js",
-        pastoralClassReport: "./library/Schoolbox/Pastoral/ClassReport/vue/pastoralClassReport.js",
+        pastoralRecordCommentsPublic: "./library/Schoolbox/Pastoral/templates/vue/pastoralRecordCommentsPublic.ts",
+        pastoralRecordCommentsPrivate: "./library/Schoolbox/Pastoral/templates/vue/pastoralRecordCommentsPrivate.ts",
+        pastoralClassReport: "./library/Schoolbox/Pastoral/ClassReport/vue/pastoralClassReport.ts",
 
         // Resource
         googleFiles: "./library/Schoolbox/Resource/GoogleFile/templates/component/js/googleFiles.js",
-        viewAllFiles: "./library/Schoolbox/Resource/Browser/templates/vue/viewAllFiles.js",
+        viewAllFiles: "./library/Schoolbox/Resource/Browser/templates/vue/viewAllFiles.ts",
 
         // Canvas
-        canvasAssignments: "./library/Schoolbox/Canvas/templates/vue/canvasAssignments.js",
+        canvasAssignments: "./library/Schoolbox/Canvas/templates/vue/canvasAssignments.ts",
 
         // Temporary Typescript testing playground, to be deleted in future
         typescriptTest: "./library/Schoolbox/Greenhouse/templates/ts/typescriptTest.ts",
@@ -245,7 +245,7 @@ module.exports = {
         colourPicker: "./www/static/js/colour-picker/colour-picker.ts",
 
         // Markbook Pop Out
-        popOutMenuMarkbook: "./vue/components/menu/popOutMenuMarkbook.js",
+        popOutMenuMarkbook: "./vue/components/menu/popOutMenuMarkbook.ts",
 
         // Birthday pop up
         birthdaySurprise: "./vue/components/birthday/birthdaySurprise.ts",

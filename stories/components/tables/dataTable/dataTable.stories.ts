@@ -116,7 +116,7 @@ const meta: Meta<typeof DataTable> = {
     },
     component: DataTable,
     decorators: [
-        () => ({
+        (): { template: string } => ({
             template: `
                 <story />
             `,
@@ -138,7 +138,7 @@ type Story = StoryObj<typeof DataTable>;
 export const Default: Story = {
     render: (args: unknown) => ({
         components: { DataTable },
-        setup() {
+        setup(): { args: typeof args } {
             return { args };
         },
         template: `<data-table v-bind="args" />`,

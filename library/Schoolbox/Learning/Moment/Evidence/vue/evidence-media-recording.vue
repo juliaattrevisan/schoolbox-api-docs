@@ -1,4 +1,7 @@
 <script>
+// Ignore this file for ESLint checks for now (SA-18376)
+/* eslint-disable */
+/* eslint-enable vue/no-v-html */
 /**
  * To record a learning moment photo, audio, or video
  *
@@ -230,7 +233,7 @@ export default {
         checkErrorMessage(errorResponseData) {
             if (errorResponseData.hash?.includes("This file exceeds the file size restriction")) {
                 this.uploadErrorMessage = `Sorry, the recording of ${humanFileSize(
-                    this.recordedData.size
+                    this.recordedData.size,
                 )} is over the allowed file size limit. Please try a shorter recording or request your administrator(s) to increase the allowed file size limit.`;
             }
         },

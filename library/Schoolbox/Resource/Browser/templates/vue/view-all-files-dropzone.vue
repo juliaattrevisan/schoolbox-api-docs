@@ -1,4 +1,7 @@
 <script>
+// Ignore this file for ESLint checks for now (SA-18376)
+/* eslint-disable */
+/* eslint-enable vue/no-v-html */
 /**
  * Adds dropzone functionality to the table
  * References www/static/js/resource/jquery.fileDrop.js

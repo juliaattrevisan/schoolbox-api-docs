@@ -8,7 +8,7 @@ const store = useLinkedActivitiesStore();
 /**
  * Cancel the unlink modal
  */
-function cancelUnlink() {
+function cancelUnlink(): void {
     store.isSingleUnlinkOpen = false;
     if (store.isOpen) {
         store.isPreviousSelected = true;

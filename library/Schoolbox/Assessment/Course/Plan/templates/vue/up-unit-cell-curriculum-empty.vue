@@ -34,7 +34,7 @@ window.Vue.watch(
  * ensuring the relevant selected nodes are displayed by
  * passing in the folderId and componentId to target the appropriate folderNodesStore
  */
-function onModifySelected() {
+function onModifySelected(): void {
     if (component.value === null) {
         return;
     }
@@ -44,7 +44,7 @@ function onModifySelected() {
 /**
  * To create a new curriculum component, adding it to the relevant units homepage
  */
-async function onCreateSelected() {
+async function onCreateSelected(): Promise<void> {
     if (isCreating.value) {
         return;
     }
@@ -63,7 +63,7 @@ async function onCreateSelected() {
  * When the Map curriculum codes link is clicked
  * Pick the right edit type based on whether the component is created
  */
-async function onMapSelected() {
+async function onMapSelected(): Promise<void> {
     if (component.value === null) {
         await onCreateSelected();
     } else {
@@ -78,9 +78,7 @@ async function onMapSelected() {
         <a @click.prevent="onMapSelected">Select the curriculum codes</a>
         that you intend to cover in this area of the curriculum
     </p>
-    <p v-else>
-        No curriculum codes have been added to this unit.
-    </p>
+    <p v-else>No curriculum codes have been added to this unit.</p>
 </template>
 
 <style scoped></style>

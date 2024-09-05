@@ -2,6 +2,8 @@
  * Handles the load of the curriculum data
  */
 
+/* eslint-disable import/no-cycle -- Disable dependency cycle warning temporarily [SA-18428] */
+
 import { defineStore } from "pinia";
 import { UNSET_ID, getIdHash, isValidHash } from "@schoolboxCurriculum/js/nodeUtils";
 import { useNodesStore } from "@schoolboxCurriculum/vue/manageCurriculum/store/mcNodesStore";
@@ -26,7 +28,7 @@ export const useStore = defineStore("manageCurriculum", () => {
 
     /**
      * Get the url of the curriculum api
-     * @returns { string } the url of the curriculum api
+     * @returns the url of the curriculum api
      */
     function getApiEndpoint(): string {
         return apiEndpoint;
@@ -34,7 +36,7 @@ export const useStore = defineStore("manageCurriculum", () => {
 
     /**
      * Get default number of nodes to retrieve using the api
-     * @returns { number } the number of nodes to show
+     * @returns the number of nodes to show
      */
     function getUILimit(): number {
         return uiLimit;
@@ -44,7 +46,7 @@ export const useStore = defineStore("manageCurriculum", () => {
      * When switching between stories, we need to reset the data models
      * as they persist between the stories otherwise
      */
-    function checkForStorybook() {
+    function checkForStorybook(): void {
         if (typeof window.STORYBOOK_ENV !== "undefined") {
             // @ts-expect-error - this is available within a pinia store
             // eslint-disable-next-line @typescript-eslint/no-unsafe-call
@@ -56,9 +58,9 @@ export const useStore = defineStore("manageCurriculum", () => {
 
     /**
      * set up the passed properties and start loading the node data
-     * @param { string } dataEndpoint - the curriculum api url
-     * @param { boolean } $isReadOnly - whether the current user can edit the curriculum
-     * @param { number } dataUiLimit - the number of nodes to retrieve using the api
+     * @param dataEndpoint - the curriculum api url
+     * @param $isReadOnly - whether the current user can edit the curriculum
+     * @param dataUiLimit - the number of nodes to retrieve using the api
      */
     async function init(dataEndpoint: string, $isReadOnly: boolean, dataUiLimit: number): Promise<void> {
         if (isValidHash()) {

@@ -1,4 +1,7 @@
 <script>
+// Ignore this file for ESLint checks for now (SA-18376)
+/* eslint-disable */
+/* eslint-enable vue/no-v-html */
 import RevealModal from "@schoolboxVue/components/reveal-modal";
 
 export default {
@@ -27,7 +30,7 @@ export default {
         displayDate() {
             return this.event.date
                 ? dayjs(this.event.date).format(
-                      this.event.allDay ? this.dateFormats.displayDate : this.dateFormats.displayDatetime
+                      this.event.allDay ? this.dateFormats.displayDate : this.dateFormats.displayDatetime,
                   )
                 : "";
         },

@@ -1,4 +1,7 @@
 <script>
+// Ignore this file for ESLint checks for now (SA-18376)
+/* eslint-disable */
+/* eslint-enable vue/no-v-html */
 /**
  * Displays various usage statistics via bar charts and tables display for a specific user
  * Can be accessed for example at adminv2/usage/specific/1

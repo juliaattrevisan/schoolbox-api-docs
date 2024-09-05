@@ -13,7 +13,7 @@ const props = withDefaults(defineProps<Props>(), {
 /**
  * Reload the page to try loading again
  */
-function onRefreshSelected() {
+function onRefreshSelected(): void {
     window.location.reload();
 }
 </script>

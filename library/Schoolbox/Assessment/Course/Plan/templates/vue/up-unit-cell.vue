@@ -111,7 +111,7 @@ const contentIsEmpty = window.Vue.computed(() => {
 /**
  * Update the content height in the store when the content height changes
  */
-function updateContentHeight() {
+function updateContentHeight(): void {
     contentHeight.value = contentEl.value?.offsetHeight || 0;
     componentActionHeight.value = componentActionEl.value?.offsetHeight || 0;
 
@@ -145,9 +145,9 @@ let draggableInstance: ReturnType<typeof Draggable.create> | null = null;
 
 /**
  * When the content is clicked
- * @param {MouseEvent} event - the click event
+ * @param event - the click event
  */
-function onContentClicked(event: MouseEvent) {
+function onContentClicked(event: MouseEvent): void {
     if (contentEl.value === null || !event.target) return;
 
     // If the target is not the contentEl, a child of the contentEl, or its parent (the cell),
@@ -177,7 +177,7 @@ const extraCurriculumComponents = props.unit.curriculum.components.filter((compo
  * To detect when the dimensions of the cell changes,
  * like when a different tab is selected
  */
-function initResizeObserver() {
+function initResizeObserver(): void {
     const resizeObserver = new ResizeObserver(() => updateContentHeight());
     resizeObserver.observe(contentEl.value as HTMLElement);
 }

@@ -8,7 +8,6 @@ import { defineStore } from "pinia";
 import { useFilterDateRangeStore } from "./spFilterDateRangeStore";
 import { useFilterCreatorsStore } from "./spFilterCreatorsStore";
 import { useFilterTypesStore } from "./spFilterTypesStore";
-import type { FiltersFormData } from "../../../js/types/FiltersFormData";
 
 export const useFiltersStore = defineStore("spFilters", () => {
     /**
@@ -21,9 +20,9 @@ export const useFiltersStore = defineStore("spFilters", () => {
 
     /**
      * Get the filter data
-     * @returns {FiltersFormData} - the filter data
+     * @returns - the filter data
      */
-    function getFormData() {
+    function getFormData(): string {
         const filterData = {
             ...useFilterDateRangeStore().getFormData(),
             ...useFilterCreatorsStore().getFormData(),
@@ -35,7 +34,7 @@ export const useFiltersStore = defineStore("spFilters", () => {
     /**
      * search has been triggered so set the active filters
      */
-    function setActive() {
+    function setActive(): void {
         useFilterDateRangeStore().setActive();
         useFilterCreatorsStore().setActive();
         useFilterTypesStore().setActive();
@@ -54,7 +53,7 @@ export const useFiltersStore = defineStore("spFilters", () => {
     /**
      * clear all filters
      */
-    function clear() {
+    function clear(): void {
         useFilterDateRangeStore().clear();
         useFilterCreatorsStore().clear();
         useFilterTypesStore().clear();

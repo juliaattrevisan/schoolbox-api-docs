@@ -4,8 +4,8 @@
  *
  * Use the base64encoded version of the url's pathname, so it can work in
  * conjunction with Class Redirect in the back end
- * @param { string|undefined } url - the url to go to, or leave blank to retrieve just the returnUrl param
- * @returns { string } - the encoded returnUrl
+ * @param url - the url to go to, or leave blank to retrieve just the returnUrl param
+ * @returns - the encoded returnUrl
  */
 export function getReturnUrl(url?: string | undefined): string {
     const returnUrl = `returnUrl=${window.btoa(window.location.pathname)}`;

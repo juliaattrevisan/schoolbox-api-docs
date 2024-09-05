@@ -13,10 +13,13 @@ interface MediaElementPlayer {
  * Usage:
  *    import { getConfigForVideo } from "@js/mediaelementplayer/mepUtils";
  *    const player = new MediaElementPlayer(el, getConfigForVideo());
- * @param { object } overrideValueByKey - object containing key:value pairs that will override defaults.
- * @returns { object } - configuration object including overridden values.
+ * @param overrideValueByKey - object containing key:value pairs that will override defaults.
+ * @returns - configuration object including overridden values.
  */
-export function getConfigForVideo(overrideValueByKey?: object) {
+export function getConfigForVideo(overrideValueByKey?: object): {
+    stretching: string;
+    success: (media: HTMLElement, node: HTMLElement, instance: MediaElementPlayer) => void;
+} {
     let config = {
         /**
          * If 'stretching' is set to 'auto', the video will not resize as the window resizes.
@@ -32,12 +35,12 @@ export function getConfigForVideo(overrideValueByKey?: object) {
         stretching: "none",
 
         /**
-         * @param { HTMLElement } media - the <mediaelementwrapper> DOM node (contains the <video> node)
-         * @param { HTMLElement } node - the <video> DOM node
-         * @param { MediaElementPlayer } instance - the relevant instance of MediaElementPlayer
+         * @param media - the <mediaelementwrapper> DOM node (contains the <video> node)
+         * @param node - the <video> DOM node
+         * @param instance - the relevant instance of MediaElementPlayer
          * See: https://github.com/mediaelement/mediaelement/blob/master/docs/usage.md
          */
-        success(media: HTMLElement, node: HTMLElement, instance: MediaElementPlayer) {
+        success(media: HTMLElement, node: HTMLElement, instance: MediaElementPlayer): void {
             /**
              * somewhere between mediaelement.js 4.2.7 and 7 the media element changed from <mediaelementwrapper> to a <div>
              * which would cause videos to bleed out of their containers again. This code ensures that the media element is
@@ -100,7 +103,7 @@ export function getConfigForVideo(overrideValueByKey?: object) {
              *    space grows
              *  - The video content size will not change as the window grows/shrinks.
              */
-            function fixVideoPlayerDimensions() {
+            function fixVideoPlayerDimensions(): void {
                 if (replacementContainer !== null) {
                     // Set display to 'block' temporarily, so we can calculate dimensions.  This allows the container to
                     // grow if it is able to, when we set container.style.width to 'auto' below.

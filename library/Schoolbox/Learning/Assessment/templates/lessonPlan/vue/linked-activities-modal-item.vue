@@ -20,7 +20,7 @@ const activityIsSelected = window.Vue.computed(() => {
 /**
  * Toggle the selected state of an activity
  */
-function toggleActivitySelection() {
+function toggleActivitySelection(): void {
     const linked = activityIsSelected.value;
     if (linked) {
         store.removeActivity(props.activity);
