@@ -1042,7 +1042,7 @@ class Controller extends ConfigController
          * sort naturally on the title
          */
         $subjectOverviews = [];
-        if ('1' === $optionsPayload['class']['subjectOverview'] ?? '0') {
+        if ('1' === ($optionsPayload['class']['subjectOverview'] ?? '0')) {
             /** @var Collection|Folder\Model[] $folders */
             $folderIds = $folders->getPropertyValues('id');
             if (!empty($folderIds)) {
