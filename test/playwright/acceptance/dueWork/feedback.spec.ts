@@ -9,7 +9,7 @@ import Common from "@schoolboxTest/playwright/support/page/Common";
 
 const SELECTOR_ASSESSMENT_SUMMARY_CREATE_BUTTON = "assessment-summary-create-button";
 
-test.describe("FeedbackCest", () => {
+test.describe("Feedback Tests", () => {
     test.beforeEach(async ({ tester }) => {
         await tester.logout();
         await tester.loginAsAdmin();
