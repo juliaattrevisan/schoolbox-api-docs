@@ -11,6 +11,7 @@ declare(strict_types=1);
 namespace Schoolbox\Admin\SummativeReport\Payload\SubjectOverview;
 
 use Alaress\Database\Statement\Query\IQuery;
+use Schoolbox\Learning\Course\DataModel\Implementation\Mapper;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Resource\Textbox;
 
@@ -19,7 +20,7 @@ class Payload
     private \Alaress\Database\Statement\Query\Base|IQuery $textboxStatement;
 
 
-    public function __construct( private FolderMapper $folderMapper)
+    public function __construct(private $folderMapper)
     {
         /* Only prepare the textbox statement once
          */
@@ -82,20 +83,42 @@ ORDER BY tb.updated_at ASC"
         $courses = []; // temp storage of courses and their textbox.
         $homepages = []; // temp storage of homepages, and their course textboxes
         // find the collection of courses imported onto the specified pages
-        $query = "select course_specification.folder_id, folder.name, course_implementation.folder_id
+        $predicateBuilder = $this->folderMapper->getPredicateBuilder();
+        $folderIdsPredicate = $predicateBuilder->in('folder_id', $folderId);
+
+        $courseQuery = $this->folderMapper->getDatabase()->prepareQuery("select
+    course_specification.folder_id as specFolderId,
+    folder.name as specFolderName,
+    course_implementation.folder_id as implFolderId
                     from course_specification
                         join course_implementation on course_specification.id = course_implementation.course_specification_id
                         join folder on course_specification.folder_id = folder.id
                     where 
-                        course_implementation.deleted_at is null AND
-                        course_implementation.folder_id in (:folderIDs);"; // finding all courses that have been imported onto the specified class pages.
+                        course_implementation.deleted_at is null AND " .
+                        $folderIdsPredicate->getWhereIntersect()); // finding all courses that have been imported onto the specified class pages.
+        $courseQuery->execute($folderIdsPredicate->getParams());
+        while ($row = $courseQuery->fetch()) {
+            // cache the course folderID
+            if (!isset($courses[$row['specFolderId']])) {
+                $courses[$row['specFolderId']][] = $row['specFolderId'];
+            }
+            // cache the class page with course data
+            if (!isset($homepages[$row['implFolderId']])) {
+                $homepages[$row['implFolderId']] = [];
+            }
+            $homepages[$row['implFolderId']][$row['specFolderId']] = [
+                'title' => $row['specFolderName']
+                ];
+
+        }
+        return $homepages;
         // find any textboxes that match the search term
-        $this->textboxStatement->execute([
-            'homepageDefaultComponentHeading' => Textbox\Component\Homepage\Controller::DEFAULT_COMPONENT_HEADING,
-            'homepageComponentKey' => 'textbox',
-            'componentConfigComponentNameKey' => 'componentName',
-            'folderId' => $folderId
-        ]);
+//        $this->textboxStatement->execute([
+//            'homepageDefaultComponentHeading' => Textbox\Component\Homepage\Controller::DEFAULT_COMPONENT_HEADING,
+//            'homepageComponentKey' => 'textbox',
+//            'componentConfigComponentNameKey' => 'componentName',
+//            'folderId' => $folderIdsPredicate->getParams()
+//        ]);
         // sort the textboxes by course title naturally
         // return the textboxes grouped by the folder Id
     }
