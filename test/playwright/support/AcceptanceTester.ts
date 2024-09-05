@@ -1,3 +1,5 @@
+import path from "path";
+import { readFileSync } from "fs";
 import type { Page, Locator } from "@playwright/test";
 import { expect } from "@playwright/test";
 import LoginPage from "@schoolboxTest/playwright/support/page/LoginPage";
@@ -161,5 +163,27 @@ export default class AcceptanceTester extends BaseTester {
         const editorId = await locator.getAttribute("id");
         expect(editorId).not.toBeNull();
         await this.fillCKEditorById(editorId as string, content);
+    }
+
+    /**
+     * Attach a file to an attachzone, by simulating drag and drop
+     * @param locator - the locator of the attachzone (usually an element with class "attachzone")
+     * @param filePath - the path to the file to attach
+     */
+    async dragAndDropFile(locator: Locator, filePath: string): Promise<void> {
+        // Create a DataTransfer object with the file so we can simulate drag and drop
+        const buffer = readFileSync(filePath);
+        const dataTransfer = await this.page.evaluateHandle(
+            ({ data, fileName }) => {
+                const dt = new DataTransfer();
+                const file = new File([Uint8Array.from(atob(data), (c) => c.charCodeAt(0))], fileName);
+                dt.items.add(file);
+                return dt;
+            },
+            { data: buffer.toString("base64"), fileName: path.basename(filePath) },
+        );
+
+        // Then, dispatch a drop event on the dropzone element
+        await locator.dispatchEvent("drop", { dataTransfer });
     }
 }
