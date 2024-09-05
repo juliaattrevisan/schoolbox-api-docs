@@ -1381,7 +1381,7 @@ class DataSource
         }
 
         $dstBox    = $boxMapper->findOneByColumn('assessment_id', $destinationAssessmentId);
-        $dstFolder = $dstBox->getCategory();
+        $dstFolder = $dstBox->getAssessmentModel()->getContextFolder();
 
         // Cannot mutate identity of objects returned from mappers.
         // Index all these collections by source version ID, even though the object will be destination version.

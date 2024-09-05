@@ -57,13 +57,6 @@ class SubmissionBox implements IAssessableDataModel, ISoftDeletable
     protected $id;
 
     /**
-     * @deprecated this only works for legacy (pre 16.5) submission boxes - dependency on this value for boxes created 16.5+ will snap things
-     * @var FolderModel
-     */
-    protected $category;
-
-
-    /**
      * @var GradeLevel\Group\Model
      */
     protected $gradeGroup;
@@ -246,7 +239,7 @@ class SubmissionBox implements IAssessableDataModel, ISoftDeletable
      */
     public function __construct()
     {
-        $this->setCategory(new FolderModel());
+//        $this->setCategory(new FolderModel());
         $this->setAssessmentModel(new Model());
     }
 
@@ -340,26 +333,6 @@ class SubmissionBox implements IAssessableDataModel, ISoftDeletable
 
     /* Getters/Setters
      */
-
-    /**
-     * @deprecated this only works for legacy (pre 16.5) submission boxes - dependency on this value for boxes created 16.5+ will snap things
-     * @param  FolderModel $category
-     * @return $this
-     */
-    public function setCategory($category)
-    {
-        $this->category = $category;
-        return $this;
-    }
-
-    /**
-     * @deprecated this only works for legacy (pre 16.5) submission boxes - dependency on this value for boxes created 16.5+ will snap things
-     * @return FolderModel
-     */
-    public function getCategory()
-    {
-        return $this->category;
-    }
 
     /**
      * @param  string $description
@@ -837,7 +810,7 @@ class SubmissionBox implements IAssessableDataModel, ISoftDeletable
 
         /* Access level for $user on $submissionBox
          */
-        $boxLevel = $access->getFolderAccess($user, $this->getCategory()->getId());
+        $boxLevel = $access->getFolderAccess($user, $this->getAssessmentModel()->getContextFolder()->getId());
 
         if ($boxLevel >= $requiredAccessLevel) {
             return true;
