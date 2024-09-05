@@ -580,7 +580,7 @@ class SubmissionBoxMapper extends BaseMapper
 
         // Is the submission late (after overdue time)?
         $now = new \DateTime('now');
-        if ($box->getLateDate()->getUnixTimeStamp() < $now->getTimestamp()) {
+        if ($box->getAssessmentModel()->getCloseDate()->getUnixTimeStamp() < $now->getTimestamp()) {
             throw new Schoolbox\Resource\Exception(
                 'This submission box no longer accepts submissions.',
                 Schoolbox\Resource\Exception::CODE_SUBMISSION_CLOSED

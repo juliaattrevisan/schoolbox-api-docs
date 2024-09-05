@@ -76,11 +76,6 @@ class SubmissionBox implements IAssessableDataModel, ISoftDeletable
     protected ?Alaress_Date_Format $due_date = null;
 
     /**
-     * @var Alaress_Date_Format|null
-     */
-    protected ?Alaress_Date_Format $late_date = null;
-
-    /**
      * @var bool
      */
     protected $accept_online;
@@ -412,25 +407,6 @@ class SubmissionBox implements IAssessableDataModel, ISoftDeletable
     }
 
     /**
-     * @return Alaress_Date_Format|null
-     */
-    public function getLateDate(): ?Alaress_Date_Format
-    {
-        return $this->late_date;
-    }
-
-    /**
-     * @param Alaress_Date_Format|null $late_date
-     *
-     * @return static
-     */
-    public function setLateDate(?Alaress_Date_Format $late_date): self
-    {
-        $this->late_date = $late_date;
-        return $this;
-    }
-
-    /**
      * @param  MarkType $mark_type
      * @return $this
      */
@@ -653,7 +629,7 @@ class SubmissionBox implements IAssessableDataModel, ISoftDeletable
         $this->getAssessmentModel()->setPublishDate($publish_date);
         $this->getAssessmentModel()->setOpenDate($open_date);
         $this->setDueDate($due_date);
-        $this->setLateDate($late_date);
+        $this->getAssessmentModel()->setCloseDate($late_date);
         return $this;
     }
 
@@ -665,7 +641,10 @@ class SubmissionBox implements IAssessableDataModel, ISoftDeletable
      */
     public function isOpen()
     {
-        return Alaress_Date_Format::now()->between($this->getAssessmentModel()->getOpenDate(), $this->getLateDate());
+        return Alaress_Date_Format::now()->between(
+            $this->getAssessmentModel()->getOpenDate(),
+            $this->getAssessmentModel()->getCloseDate()
+        );
     }
 
     /**
