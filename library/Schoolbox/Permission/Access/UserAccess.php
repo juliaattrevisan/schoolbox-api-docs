@@ -181,6 +181,7 @@ class UserAccess implements IModel
             self::SERVICE_CURRICULUM,
             self::SERVICE_PASTORAL,
             self::SERVICE_SPORTS_ADMINISTRATOR,
+            self::SERVICE_BADGE,
         ];
     }
 
