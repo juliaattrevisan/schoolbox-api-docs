@@ -223,6 +223,12 @@
                 }
             })
         });
+
+        // if enabling the subject overview, we should allow the user to enter a title to search for
+        document.querySelector('#report-class-show-subject-overview').addEventListener('change', function(checkbox) {
+            let showSubjectOverview = checkbox.target.value === '1';
+            document.querySelector('#report-class-search-subject-overview').readonly = !showSubjectOverview;
+        });
     });
 </script>
 
@@ -492,6 +498,14 @@
                                         <input name="class[classCode]" type="hidden" value="0" />
                                         <input id="report-class-show-class-code" name="class[classCode]" type="checkbox" value="1" {% if options.class.classCode ?? true %}checked="checked"{% endif %} />
                                         <label for="report-class-show-class-code" class="checkbox-label">Show class code</label>
+                                    </li>
+                                    <li>
+                                        <input name="class[subjectOverview]" type="hidden" value="0" />
+                                        <input id="report-class-show-subject-overview" name="class[subjectOverview]" type="checkbox" value="1" {% if options.class.subjectOverview ?? true %}checked="checked"{% endif %} />
+                                        <label for="report-class-show-subject-overview" class="checkbox-label">Show Subject overview</label>
+                                        <label for="report-class-search-subject-overview" class="checkbox-label">Title of Subject overview:</label>
+                                        <p class="meta">Add a textbox heading to show associated subject overviews from imported courses.</p>
+                                        <input id="report-class-search-subject-overview" name="class[subjectOverviewSearch]" type="text" value="{{ options.class.subjectOverviewSearch ?? '' }}" placeholder="Title of Subject overview"/>
                                     </li>
                                 </ul>
                             </fieldset>
