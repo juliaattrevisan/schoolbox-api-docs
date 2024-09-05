@@ -9,7 +9,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\Search\Api\Database\Index;
 
-use Alaress\Database\Statement\Query\IQuery;
+use Alaress\Database\Statement\IStatement;
 use Schoolbox\Search\Index;
 
 /**
@@ -54,12 +54,12 @@ class Persistor
     /**
      * Query for updating the search index, only created on demand.
      */
-    private ?IQuery $updateQuery = null;
+    private ?IStatement $updateQuery = null;
 
     /**
      * Query for deleting the search index, only created on demand.
      */
-    private ?IQuery $deleteQuery = null;
+    private ?IStatement $deleteQuery = null;
 
     /**
      * Constructor
