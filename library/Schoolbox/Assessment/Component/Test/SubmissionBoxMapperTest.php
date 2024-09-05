@@ -54,7 +54,7 @@ class SubmissionBoxMapperTest extends TestCase
         $this->assertEquals(3, $box->getId());
         $this->assertEquals(11, $box->getAssessmentModel()->getContextFolder()->getId());
         $this->assertEquals('Some test', $box->getAssessmentModel()->getTitle());
-        $this->assertEquals('no description', $box->getDescription());
+        $this->assertEquals('no description', $box->getAssessmentModel()->getDescription());
         $this->assertEquals(15, $box->getOwner()->getId());
         $this->assertEquals(true, $box->getAcceptOnline());
         $this->assertEquals(false, $box->getAcceptMultiple());

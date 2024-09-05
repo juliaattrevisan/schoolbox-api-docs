@@ -61,11 +61,6 @@ class SubmissionBox implements IAssessableDataModel, ISoftDeletable
     protected $gradeGroup;
 
     /**
-     * @var string
-     */
-    protected $description;
-
-    /**
      * @var SubmissionBox\SingleFile\Model[]|GenericCollection
      */
     protected $attachments;
@@ -313,26 +308,6 @@ class SubmissionBox implements IAssessableDataModel, ISoftDeletable
 
     /* Getters/Setters
      */
-
-    /**
-     * @param  string $description
-     * @return $this
-     * @deprecated
-     * @see \Schoolbox\Learning\Assessment\DataModel\Model::$description
-     */
-    public function setDescription(?string $description)
-    {
-        $this->description = $description;
-        return $this;
-    }
-
-    /**
-     * @return string
-     */
-    public function getDescription()
-    {
-        return $this->description;
-    }
 
     /**
      * @param  int|null $id
