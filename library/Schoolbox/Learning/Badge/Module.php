@@ -53,7 +53,7 @@ class Module extends BaseModule
                 UserAccess::ACCESS_FULL
             );
 
-        //TODO: will need to change to allow users with 'Set Goal', 'Award' or 'Modify' badge permissions
+        //TODO: will need to change to allow users with 'Modify' badge service user permissions
         //TODO: also include users with 'write' and 'moderate' badge service user permissions
         $viewBadgesRule = new Rule\All(
             new Rule\IsLoggedIn(),
