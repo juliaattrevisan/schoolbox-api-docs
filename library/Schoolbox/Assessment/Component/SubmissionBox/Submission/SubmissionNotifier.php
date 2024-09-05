@@ -41,7 +41,6 @@ use Schoolbox\UserMapper;
  */
 class SubmissionNotifier extends AbstractModuleNotifier
 {
-
     const TRIGGER_SUBMITTED   = 'submitted';
     const TRIGGER_RESUBMITTED = 'resubmitted';
     const TRIGGER_DELETED     = 'deleted';
