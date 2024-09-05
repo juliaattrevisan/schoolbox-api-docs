@@ -126,11 +126,6 @@ class SubmissionBox implements IAssessableDataModel, ISoftDeletable
     protected $created;
 
     /**
-     * @var int
-     */
-    protected $weight = 0;
-
-    /**
      * @var float
      */
     protected $max_mark;
@@ -522,24 +517,6 @@ class SubmissionBox implements IAssessableDataModel, ISoftDeletable
     public function getMarkVisibility()
     {
         return $this->mark_visibility;
-    }
-
-    /**
-     * @return int
-     */
-    public function getWeight()
-    {
-        return $this->weight;
-    }
-
-    /**
-     * @param int $weight
-     * @return $this
-     */
-    public function setWeight($weight)
-    {
-        $this->weight = $weight;
-        return $this;
     }
 
     /**
