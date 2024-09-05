@@ -33,10 +33,6 @@ class SubmissionBoxMapperTest extends TestCase
     {
         $data = array(
             'id'                      => 3,
-            'assessment_id'           => 3,
-            'category'                => 11,
-            'name'                    => 'Some test',
-            'description'             => 'no description',
             'owner'                   => 15,
             'accept_submission'       => true,
             'multi_submission'        => false,
@@ -49,12 +45,10 @@ class SubmissionBoxMapperTest extends TestCase
             'max_mark'                => 100,
             'self_reviewability'      => SubmissionBox::SELF_REVIEWABILITY_NONE,
         );
+
         $box = $this->object->hydrate($data);
         $this->assertInstanceOf('Schoolbox\\Assessment\\Component\\SubmissionBox', $box);
         $this->assertEquals(3, $box->getId());
-        $this->assertEquals(11, $box->getAssessmentModel()->getContextFolder()->getId());
-        $this->assertEquals('Some test', $box->getAssessmentModel()->getTitle());
-        $this->assertEquals('no description', $box->getAssessmentModel()->getDescription());
         $this->assertEquals(15, $box->getOwner()->getId());
         $this->assertEquals(true, $box->getAcceptOnline());
         $this->assertEquals(false, $box->getAcceptMultiple());
