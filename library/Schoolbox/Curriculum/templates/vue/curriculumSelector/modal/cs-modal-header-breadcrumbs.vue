@@ -1,7 +1,4 @@
-<script setup>
-// Ignore this file for ESLint checks for now (SA-18376)
-/* eslint-disable */
-/* eslint-enable vue/no-v-html */
+<script setup lang="ts">
 /**
  * To indicate progress through the node tree and to be able to
  * move backwards through the tree
@@ -10,15 +7,10 @@
 import { useModalViewNodesStore } from "../store/csModalViewNodesStore";
 import CsModalHeaderBreadcrumb from "./cs-modal-header-breadcrumb.vue";
 
-const props = defineProps({
-    /**
-     * to disable certain events when editing is taking place
-     */
-    isDisabled: {
-        type: Boolean,
-        required: true,
-    },
-});
+interface Props {
+    isDisabled: boolean; // to disable certain events when editing is taking place
+}
+const props = defineProps<Props>();
 
 const modalViewNodesStore = useModalViewNodesStore();
 </script>
