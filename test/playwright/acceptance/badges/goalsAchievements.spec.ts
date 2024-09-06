@@ -15,10 +15,10 @@ test.describe("Goals and Achievements tests", () => {
     /**
      * Deleting Bagdes when the test is about to start so it does not get impacted by other tests already executed
      */
-    // test.beforeAll(async ({ tester, db }) => {
-    //     tester.isGoingTo("update delete_at for the badge so it does not impact the news tests");
-    //     await db.updateInDatabase("badge", { deleted_at: "2022-01-15 11:22:34" }, { "name like": "Automation Badge%" });
-    // });
+    test.beforeAll(async ({ tester, db }) => {
+        tester.isGoingTo("update delete_at for the badge so it does not impact the news tests");
+        await db.updateInDatabase("badge", { deleted_at: "2022-01-15 11:22:34" }, { "name like": "Automation Badge%" });
+    });
 
     test.beforeEach(async ({ tester }) => {
         await tester.loginAsAdmin();
@@ -61,7 +61,7 @@ test.describe("Goals and Achievements tests", () => {
         await badges.clickSetGoalorAwardAchievement("Set goal");
 
         tester.isGoingTo("check the goal is presented on Jana Reed profile page activity feed");
-        await profilePage.goto(studentId);
+        await profilePage.goto(studentId.toString());
         await expect(page.locator("#container")).toContainText(badgeName);
         tester.isGoingTo("check the goal is presented on Jana Reed profile page tab Goals");
         await profilePage.clickTab("goals");
@@ -75,9 +75,10 @@ test.describe("Goals and Achievements tests", () => {
     test("Award achievement", async ({ tester, page, db }) => {
         const createBadge = new CreateBadge(tester, page);
         const badges = new Badges(tester, page);
+        const profilePage = new ProfilePage(tester, page);
         const badgeName = "Automation Badge created for award achievement from Badges page";
         const student = "Jana Reed";
-        const studentProfilePage = "/search/user/25";
+        const studentId = 25;
         await badges.goto();
         let badgeId = (await db.grabFromDatabase("badge", "id", {
             deleted_at: null,
@@ -100,7 +101,7 @@ test.describe("Goals and Achievements tests", () => {
         tester.isGoingTo("click Award achievement button on the modal");
         await badges.clickSetGoalorAwardAchievement("Award");
         tester.isGoingTo("check the achievement is presented on Jana Reed activity feed");
-        await page.goto(studentProfilePage);
+        await profilePage.goto(studentId.toString());
         await expect(page.locator("#container")).toContainText(badgeName);
     });
 
@@ -114,9 +115,9 @@ test.describe("Goals and Achievements tests", () => {
         const profilePage = new ProfilePage(tester, page);
         const badgeNameGoal = "Automation Badge created to set goal from Badges page";
         const badgeNameAchievement = "Automation Badge created for award achievement from Badges page";
-        const studentProfilePage = "/search/user/25";
+        const studentId = 25;
         tester.isGoingTo("Navigate to Jana Reed profile page, click Goals tab and award the goal as achievement");
-        await page.goto(studentProfilePage);
+        await profilePage.goto(studentId.toString());
         await profilePage.clickTab("goals");
         await expect(page.locator("#goal-feed")).toContainText(badgeNameGoal);
         await profilePage.clickBadgeOrDropdownOption(badgeNameGoal);
@@ -132,7 +133,6 @@ test.describe("Goals and Achievements tests", () => {
         await profilePage.clickBadgeAchievementDropdown(badgeIdAchievement);
         await profilePage.clickBadgeOrDropdownOption("Withdraw achievement");
         await badges.clickConfirm();
-
         badgeIdAchievement = (await db.grabFromDatabase("badge", "id", {
             deleted_at: null,
             "name like": badgeNameGoal,
@@ -144,415 +144,120 @@ test.describe("Goals and Achievements tests", () => {
         await profilePage.clickTab("goals");
         await expect(page.locator("#container")).toContainText(badgeNameGoal);
         await expect(page.locator("#container")).not.toContainText(badgeNameAchievement);
+
         const badgeIdGoal = (await db.grabFromDatabase("badge", "id", {
             deleted_at: null,
             "name like": badgeNameGoal,
         })) as number;
-        await profilePage.clickBadgeAchievementDropdown(badgeIdGoal);
+        await profilePage.clickBadgeDropdown(badgeIdGoal);
         await badges.clickDropdownOptionLastElement("close");
         await badges.clickConfirm();
-        await expect(page.locator("#container")).not.toContainText(badgeNameGoal);
+        await expect(page.locator('[class="icon-goal"]')).toBeVisible();
         await profilePage.clickTab("activity");
-        await expect(page.locator("#container")).not.toContainText(badgeNameAchievement);
-        await expect(page.locator("#container")).not.toContainText(badgeNameGoal);
+        await expect(page.locator("#activity-feed")).not.toContainText(badgeNameAchievement);
+        await expect(page.locator("#activity-feed")).not.toContainText(badgeNameGoal);
+    });
+
+    /**
+     * set a goal, add an evidence, view the evidence, edit it, check it is updated, award it and check the evidence is presented
+     * withdraw the achievement, remove the evidence, award it again with evidence, check the evidence, update the evidence, check the evidence is presented properly
+     *
+     */
+
+    test("View evidence", async ({ tester, page, db }) => {
+        const badges = new Badges(tester, page);
+        const profilePage = new ProfilePage(tester, page);
+        const badgeNameGoal = "Automation Badge created to set goal from Badges page";
+        const student = "Jana Reed";
+        const studentId = 25;
+        tester.isGoingTo("Set a Goal to Jana Reed");
+        await badges.goto();
+        const badgeId = (await db.grabFromDatabase("badge", "id", {
+            deleted_at: null,
+            "name like": badgeNameGoal,
+        })) as number;
+        tester.isGoingTo("click the 3-dot menu and click Set Goal");
+        await badges.clickBadgeDropdown(badgeId);
+        await badges.clickDropdownOptionFirstElement(badgeId, "goal");
+        tester.isGoingTo("search and select Jana Reed on the modal");
+        await badges.selectStudentSetGoal(student);
+        tester.isGoingTo("click Set Goal button on the modal");
+        await badges.clickSetGoalorAwardAchievement("Set goal");
+
+        tester.isGoingTo("Navigate to Jana Reed profile page goals tab and add an evidence to the goal");
+        await profilePage.goto(studentId.toString());
+        await profilePage.clickTab("goals");
+        await expect(page.locator("#goal-feed")).toContainText(badgeNameGoal);
+        await profilePage.clickBadgeOrDropdownOption(badgeNameGoal);
+        await profilePage.clickBadgeOrDropdownOption("Add evidence");
+        await tester.fillCKEditorById("reason", "Great job, Jana!");
+        await badges.clickEvidenceSubmitButton();
+
+        tester.isGoingTo("Check the evidence is presented by navigating to view evidence");
+        await profilePage.goto(studentId.toString());
+        await profilePage.clickTab("goals");
+        await profilePage.clickBadgeOrDropdownOption(badgeNameGoal);
+        await profilePage.clickBadgeOrDropdownOption("View evidence");
+        await expect(page.locator("#container")).toContainText("Great job, Jana!");
+
+        tester.isGoingTo("Get the evidence updated");
+        await page.locator('[class="icon-modify"]').last().click();
+        await tester.fillCKEditorById("reason", "Well done, Jana!");
+        await badges.clickEvidenceSubmitButton();
+
+        tester.isGoingTo("Ensure the evidence text is updated");
+        await expect(page.locator("#container")).toContainText("Well done, Jana!");
+
+        tester.isGoingTo(
+            "Award the goal as achievement and check if it is presented on the achievements tab on the profile page",
+        );
+        await badges.clickConfirm();
+        await expect(page.locator('[class="icon-achievement"]')).toBeVisible();
+        await profilePage.goto(studentId.toString());
+        await profilePage.clickTab("achievements");
+        await expect(page.locator("#achievement-feed")).toContainText(badgeNameGoal);
+
+        tester.isGoingTo("Check the evidence is still presented");
+        await profilePage.clickBadgeOrDropdownOption(badgeNameGoal);
+        await profilePage.clickBadgeOrDropdownOption("View evidence");
+        await expect(page.locator("#container")).toContainText("Well done, Jana!");
+
+        tester.isGoingTo("Navigate to the profile page and withdraw the achievement");
+        await profilePage.goto(studentId.toString());
+        await profilePage.clickTab("achievements");
+        await profilePage.clickBadgeAchievementDropdown(badgeId);
+        await profilePage.clickBadgeOrDropdownOption("Withdraw achievement");
+        await badges.clickConfirm();
+
+        tester.isGoingTo("click the tab Goals and ensure the evidence is still presented to the goal");
+        await profilePage.clickTab("goals");
+        await profilePage.clickBadgeOrDropdownOption(badgeNameGoal);
+        await profilePage.clickBadgeOrDropdownOption("View evidence");
+        await expect(page.locator("#container")).toContainText("Well done, Jana!");
+
+        tester.isGoingTo("Remove the evidence and ensure it is no longer presented");
+        await badges.clickDropdownDelete();
+        await page.locator("a#confirm-dialog-confirm-button.button.submit").click();
+        await expect(page.locator("#container")).not.toContainText("Well done, Jana!");
+
+        tester.isGoingTo("Award the goal as achievement with evidence and check the evidence");
+        await profilePage.goto(studentId.toString());
+        await profilePage.clickTab("goals");
+        await profilePage.clickBadgeOrDropdownOption(badgeNameGoal);
+        await profilePage.clickBadgeOrDropdownOption("Award with evidence");
+        await tester.fillCKEditorById("reason", "Awarding this as achievement with evidence.");
+        await badges.clickEvidenceSubmitButton();
+        await profilePage.goto(studentId.toString());
+        await profilePage.clickTab("achievements");
+        await profilePage.clickBadgeOrDropdownOption(badgeNameGoal);
+        await profilePage.clickBadgeOrDropdownOption("View evidence");
+        await expect(page.locator("#container")).toContainText("Awarding this as achievement with evidence");
+
+        tester.isGoingTo("Get the evidence updated and ensure it is presented properly");
+        await page.locator('[class="icon-modify"]').last().click();
+        await tester.fillCKEditorById("reason", "This is updated");
+        await badges.clickEvidenceSubmitButton();
+        tester.isGoingTo("Ensure the evidence text is updated");
+        await expect(page.locator("#container")).toContainText("This is updated");
     });
 });
-
-// <?php
-
-// /**
-//  * @copyright   Copyright 2022, Schoolbox Pty Ltd
-//  * @link        https://schoolbox.com.au/
-//  */
-
-// declare(strict_types=1);
-
-// namespace Tests\Acceptance\Badges;
-
-// use Tests\Support\AcceptanceTester;
-// use Codeception\Util\Locator;
-// use Tests\Support\Page\Badges\Badges;
-// use Exception;
-// use Tests\Support\Page\Badges\CreateBadge;
-// use Tests\Support\Page\ProfilePage\ProfilePage;
-
-// /**
-//  * This test sets a goal, award an achievement, remove the goal, withdraw the achievement, adds an evidence
-//  * Steps:
-//  * 1. Provision sales.tar.gz data
-//  * 2. vagrant ssh
-//  * 3. Execute cd /usr/share/schoolbox && ./vendor/bin/codecept run --steps Acceptance Badges/GoalsAchievementsCest
-//  */
-// class GoalsAchievementsCest
-// {
-//     /**
-//      * Preparations
-//      *
-//      * @param AcceptanceTester $i
-//      * @throws Exception
-//      *
-//      * get logged in
-//      * navigate to https://vagrant.dev.schoolbox.cloud/learning/badge
-//      */
-//     public function _before(AcceptanceTester $i): void
-//     {
-//         $i->logout();
-//         $i->loginAsAdmin();
-//         $badges = new Badges($i);
-//         $i->amOnPage($badges::URL);
-//     }
-
-//     /**
-//      * Deleting Bagdes when the test is about to start so it does not get impacted by other tests already executed
-//      *
-//      * @param AcceptanceTester $i
-//      */
-//     public function beforeSuite(AcceptanceTester $i): void
-//     {
-//         $i->amGoingTo("update delete_at for the badge so it does not impact the news tests");
-//         $i->updateInDatabase('badge', ['deleted_at' => "2022-01-15 11:22:34"], ['name like' => "Automation Badge%"]);
-//     }
-
-//     /**
-//      * @param AcceptanceTester $i
-//      * @throws Exception
-//      *
-//      * on learning/badge page create a Badge
-//      * set it as a goal to Jana Reed
-//      * ensure the goal is presented on Jana Reed's activity feed
-//      */
-//     public function setGoals(AcceptanceTester $i): void
-//     {
-//         $createBadge = new CreateBadge($i);
-//         $badges = new Badges($i);
-//         $profilePage = new ProfilePage($i);
-//         $badgeName = 'Automation Badge created to set goal from Badges page';
-//         $student = 'Jana Reed';
-//         $studentId = 25;
-//         $badgeId = $i->grabFromDatabase('badge', 'id', ['deleted_at' => null,'name like' => $badgeName]);
-//         if (!$badgeId) {
-//             $i->amGoingTo('Create a Badge');
-//             $createBadge->createBadge($i, $badgeName);
-//             $badgeId = $i->grabFromDatabase('badge', 'id', ['deleted_at' => null,'name like' => $badgeName]);
-//         }
-//         $i->amGoingTo('Set a Goal to Jana Reed');
-//         $i->amGoingTo('click the 3-dot menu and click Set Goal');
-//         $badges->clickBadgeDropdown($badgeId);
-//         $badges->clickDropdownOptionFirstElement($badgeId, 'goal');
-//         $i->amGoingTo('search and select Jana Reed on the modal');
-//         $badges->selectStudentSetGoal($student);
-//         $i->amGoingTo('click Set Goal button on the modal');
-//         $badges->clickSetGoalorAwardAchievement();
-//         $i->amGoingTo('check the goal is presented on Jana Reed profile page activity feed');
-//         $i->amOnPage($profilePage->generateRoute($studentId));
-//         $i->canSee($badgeName);
-//         $i->amGoingTo('check the goal is presented on Jana Reed profile page tab Goals');
-//         $profilePage->clickTab('goals');
-//         $i->canSee($badgeName);
-//     }
-
-//     /**
-//      * @param AcceptanceTester $i
-//      * @throws Exception
-//      *
-//      *
-//      * award an achievement to Jana Reed from the Badges page
-//      * ensure the achievement is presented on Jana Reed's activity feed
-//      */
-//     public function awardAchievement(AcceptanceTester $i): void
-//     {
-//         $createBadge = new CreateBadge($i);
-//         $badges = new Badges($i);
-//         $badgeName = 'Automation Badge created for award achievement from Badges page';
-//         $student = 'Jana Reed';
-//         $studentProfilePage = '/search/user/25';
-//         $badgeId = $i->grabFromDatabase('badge', 'id', ['deleted_at' => null,'name like' => $badgeName]);
-//         if (!$badgeId) {
-//             $i->amGoingTo('Create a Badge');
-//             $createBadge->createBadge($i, $badgeName);
-//             $badgeId = $i->grabFromDatabase('badge', 'id', ['deleted_at' => null,'name like' => $badgeName]);
-//         }
-//         $i->amGoingTo('Award achievement to Jana Reed');
-//         $i->amGoingTo('click the 3-dot menu and click Award Achievement');
-//         $badges->clickBadgeDropdown($badgeId);
-//         $badges->clickDropdownOptionFirstElement($badgeId, 'achievement');
-//         $i->amGoingTo('search and select Jana Reed on the modal');
-//         $badges->selectStudentAwardAchievement($student);
-//         $i->amGoingTo('click Award achievement button on the modal');
-//         $badges->clickSetGoalorAwardAchievement();
-//         $i->amGoingTo('check the achievement is presented on Jana Reed activity feed');
-//         $i->amOnPage($studentProfilePage);
-//         $i->canSee($badgeName);
-//     }
-
-//     /**
-//      * @param AcceptanceTester $i
-//      * @throws Exception
-//      * @depends setGoals
-//      * @depends awardAchievement
-//      *
-//      *
-//      * remove the goal and withdraw the achievement from Jana Reed
-//      * ensure the goals and achievements are  no longer presented on Jana Reed's activity feed, goals and achievement tabs on profile page
-//      */
-//     public function removeGoalWithdrawAchievement(AcceptanceTester $i): void
-//     {
-//         $badges = new Badges($i);
-//         $profilePage = new ProfilePage($i);
-//         $badgeNameGoal = 'Automation Badge created to set goal from Badges page';
-//         $badgeNameAchievement = 'Automation Badge created for award achievement from Badges page';
-//         $studentProfilePage = '/search/user/25';
-//         $i->amGoingTo('Navigate to Jana Reed profile page, click Goals tab and award the goal as achievement');
-//         $i->amOnPage($studentProfilePage);
-//         $profilePage->clickTab('goals');
-//         $i->canSee($badgeNameGoal);
-//         $profilePage->clickBadgeOrDropdownOption($badgeNameGoal);
-//         $badges->clickSetGoalorAwardAchievement();
-//         $i->amGoingTo('Click the achievements tab, ensure the achievements are presented and withdraw them');
-//         $profilePage->clickTab('achievements');
-//         $i->canSee($badgeNameGoal);
-//         $badgeIdAchievement = $i->grabFromDatabase('badge', 'id', ['deleted_at' => null,'name like' => $badgeNameAchievement]);
-//         $profilePage->clickBadgeAchievementDropdown($badgeIdAchievement);
-//         $profilePage->clickBadgeOrDropdownOption('Withdraw achievement');
-//         $badges->clickConfirm();
-//         $badgeIdAchievement = $i->grabFromDatabase('badge', 'id', ['deleted_at' => null,'name like' => $badgeNameGoal]);
-//         $profilePage->clickBadgeAchievementDropdown($badgeIdAchievement);
-//         $profilePage->clickBadgeOrDropdownOption('Withdraw achievement');
-//         $badges->clickConfirm();
-//         $i->amGoingTo('Click the goals tab, ensure the goal is presented and remove it');
-//         $profilePage->clickTab('goals');
-//         $i->canSee($badgeNameGoal);
-//         $i->cantSee($badgeNameAchievement);
-//         $badgeIdGoal = $i->grabFromDatabase('badge', 'id', ['deleted_at' => null,'name like' => $badgeNameGoal]);
-//         $profilePage->clickBadgeGoalDropdown($badgeIdGoal);
-//         $badges->clickDropdownOptionLastElement('close');
-//         $badges->clickConfirm();
-//         $i->cantSee($badgeNameGoal);
-//         $profilePage->clickTab('activity');
-//         $i->cantSee($badgeNameAchievement);
-//         $i->cantSee($badgeNameGoal);
-//     }
-
-//     /**
-//      * @param AcceptanceTester $i
-//      * @throws Exception
-//      * @depends setGoals
-//      * set a goal, add an evidence, view the evidence, edit it, check it is updated, award it and check the evidence is presented
-//      * withdraw the achievement, remove the evidence, award it again with evidence, check the evidence, update the evidence, check the evidence is presented properly
-//      *
-//      */
-//     public function viewEvidence(AcceptanceTester $i): void
-//     {
-//         $badges = new Badges($i);
-//         $profilePage = new ProfilePage($i);
-//         $badgeNameGoal = 'Automation Badge created to set goal from Badges page';
-//         $student = 'Jana Reed';
-//         $studentId = 25;
-//         $i->amGoingTo('Set a Goal to Jana Reed');
-//         $badgeId = $i->grabFromDatabase('badge', 'id', ['deleted_at' => null,'name like' => $badgeNameGoal]);
-//         $i->amGoingTo('click the 3-dot menu and click Set Goal');
-//         $badges->clickBadgeDropdown($badgeId);
-//         $badges->clickDropdownOptionFirstElement($badgeId, 'goal');
-//         $i->amGoingTo('search and select Jana Reed on the modal');
-//         $badges->selectStudentSetGoal($student);
-//         $i->amGoingTo('click Set Goal button on the modal');
-//         $badges->clickSetGoalorAwardAchievement();
-//         $i->amGoingTo('Navigate to Jana Reed profile page goals tab and add an evidence to the goal');
-//         $i->amOnPage($profilePage->generateRoute($studentId));
-//         $profilePage->clickTab('goals');
-//         $i->canSee($badgeNameGoal);
-//         $profilePage->clickBadgeOrDropdownOption($badgeNameGoal);
-//         $profilePage->clickBadgeOrDropdownOption('Add evidence');
-//         $i->fillCkEditorById('reason', 'Great job, Jana!');
-//         $badges->clickEvidenceSubmitButton();
-//         $i->amGoingTo('Check the evidence is presented by navigating to view evidence');
-//         $i->amOnPage($profilePage->generateRoute($studentId));
-//         $profilePage->clickTab('goals');
-//         $profilePage->clickBadgeOrDropdownOption($badgeNameGoal);
-//         $profilePage->clickBadgeOrDropdownOption('View evidence');
-//         $i->canSee('Great job, Jana!');
-//         $i->amGoingTo('Get the evidence updated');
-//         $i->click(Locator::lastElement("a.icon-modify"));
-//         $i->fillCkEditorById('reason', 'Well done, Jana!');
-//         $badges->clickEvidenceSubmitButton();
-//         $i->amGoingTo('Ensure the evidence text is updated');
-//         $i->canSee('Well done, Jana!');
-//         $i->amGoingTo('Award the goal as achievement and check if it is presented on the achievements tab on the profile page');
-//         $badges->clickConfirm();
-//         $i->amOnPage($profilePage->generateRoute($studentId));
-//         $profilePage->clickTab('achievements');
-//         $i->canSee($badgeNameGoal);
-//         $i->amGoingTo("Check the evidence is still presented");
-//         $profilePage->clickBadgeOrDropdownOption($badgeNameGoal);
-//         $profilePage->clickBadgeOrDropdownOption('View evidence');
-//         $i->canSee('Well done, Jana!');
-//         $i->amGoingTo('Navigate to the profile page and withdraw the achievement');
-//         $i->amOnPage($profilePage->generateRoute($studentId));
-//         $profilePage->clickTab('achievements');
-//         $profilePage->clickBadgeAchievementDropdown($badgeId);
-//         $profilePage->clickBadgeOrDropdownOption('Withdraw achievement');
-//         $badges->clickConfirm();
-//         $i->amGoingTo('click the tab Goals and ensure the evidence is still presented to the goal');
-//         $profilePage->clickTab('goals');
-//         $profilePage->clickBadgeOrDropdownOption($badgeNameGoal);
-//         $profilePage->clickBadgeOrDropdownOption('View evidence');
-//         $i->canSee('Well done, Jana!');
-//         $i->amGoingTo('Remove the evidence and ensure it is no longer presented');
-//         $badges->clickDropdownDelete();
-//         $i->click("a#confirm-dialog-confirm-button.button.submit");
-//         $i->cantSee('Well done, Jana!');
-//         $i->amGoingTo('Award the goal as achievement with evidence and check the evidence is presented');
-//         $i->amOnPage($profilePage->generateRoute($studentId));
-//         $profilePage->clickTab('goals');
-//         $profilePage->clickBadgeOrDropdownOption($badgeNameGoal);
-//         $profilePage->clickBadgeOrDropdownOption('Award with evidence');
-//         $i->fillCkEditorById('reason', 'Awarding this as achievement with evidence.');
-//         $badges->clickEvidenceSubmitButton();
-//         $i->amOnPage($profilePage->generateRoute($studentId));
-//         $profilePage->clickTab('achievements');
-//         $profilePage->clickBadgeOrDropdownOption($badgeNameGoal);
-//         $profilePage->clickBadgeOrDropdownOption('View evidence');
-//         $i->canSee('Awarding this as achievement with evidence.');
-//         $i->amGoingTo('Get the evidence updated and ensure it is properly updated');
-//         $i->click(Locator::lastElement("a.icon-modify"));
-//         $i->fillCkEditorById('reason', 'This is updated');
-//         $badges->clickEvidenceSubmitButton();
-//         $i->amGoingTo('Ensure the evidence text is updated');
-//         $i->canSee('This is updated');
-//     }
-
-//     /**
-//      * Soft deleting data to not impact the tests
-//      *
-//      * @param AcceptanceTester $i
-//      */
-//     public function tearDown(AcceptanceTester $i): void
-//     {
-//         $i->amGoingTo("update delete_at for the data created in this test so it does impact next suite of tests");
-//         $i->updateInDatabase('badge', ['deleted_at' => "2022-01-15 11:22:34"], ['name like' => "Automation Badge%"]);
-//     }
-// }
-// /**
-//  * This test adds, updates and deletes a badge
-//  * Steps:
-//  * 1. Provision sales.tar.gz data
-//  * 2. Execute npx playwright test badges.spec.ts
-//  *  */
-
-// import { test, expect } from "@schoolboxTest/playwright/support/integrations";
-// import Badges from "@schoolboxTest/playwright/support/page/badges/Badges";
-// import CreateBadge from "@schoolboxTest/playwright/support/page/badges/CreateBadge";
-
-// test.describe("Badges tests", () => {
-//     /**
-//      * Deleting Bagdes when the test is about to start so it does not get impacted by other tests already executed
-//      */
-//     test.beforeAll(async ({ tester, db }) => {
-//         tester.isGoingTo("update delete_at for the news article so it does not impact the news tests");
-//         await db.updateInDatabase("badge", { deleted_at: "2022-01-15 11:22:34" }, { "name like": "Automation Badge%" });
-//     });
-
-//     test.beforeEach(async ({ tester }) => {
-//         await tester.loginAsAdmin();
-//     });
-
-//     /**
-//      * on learning/badge page click Create Badge button
-//      * Type a Name
-//      * Select a badge image via modal
-//      * Select a category
-//      * Click Create Badge
-//      * Ensure the Badge is presented in the /learning/badge screen
-//      */
-//     test("Create badge", async ({ tester, page }) => {
-//         const badges = new Badges(tester, page);
-//         const createBadge = new CreateBadge(tester, page);
-
-//         const badgeName = "Automation Badge";
-//         const category = "Learning";
-//         tester.isGoingTo("learning badges page");
-//         await badges.goto();
-
-//         tester.isGoingTo("click Create Badge button and create a badge");
-//         await badges.clickAddBadgeButton();
-//         await createBadge.typeName(badgeName);
-//         await createBadge.clickBrowseIconLibraryButton();
-//         await createBadge.waitModalDialogPresented();
-//         await createBadge.clickVerticalTabItem("food");
-//         await createBadge.clickBadgeImage("food/1");
-//         await createBadge.clickCategoryDropDown();
-//         await createBadge.clickCategoryItem(category);
-//         await createBadge.clickCreateBadgeButton();
-
-//         tester.isGoingTo("ensure the badge is presented");
-//         await badges.waitAddBadgeButtonToBePresented();
-//         await expect(page.locator("#container")).toContainText(badgeName);
-//         await expect(page.locator("#container")).toContainText(category);
-//     });
-
-//     /**
-//      * on /learning/badge select Modify badge
-//      * update the title
-//      * update the category
-//      * Click Modify Badge
-//      * Ensure the Badge title and category are properly presented in the /learning/badge screen
-//      */
-//     test("Modify badge", async ({ tester, page, db }) => {
-//         const badges = new Badges(tester, page);
-//         const createBadge = new CreateBadge(tester, page);
-
-//         const category = "Learning";
-//         tester.isGoingTo("click the badge dropdown and click Modify");
-//         await badges.goto();
-//         const badgeId = (await db.grabFromDatabase("badge", "id", {
-//             deleted_at: null,
-//             "name like": "Automation Badge",
-//         })) as number;
-//         await badges.clickBadgeDropdown(badgeId);
-//         await badges.clickDropdownModify(badgeId);
-
-//         tester.isGoingTo("get name and category updated and click Modify Badge button");
-//         await createBadge.typeName("Automation Badge Updated");
-//         await createBadge.clickCategoryDropDown();
-//         await createBadge.clickCategoryItem(category);
-//         await createBadge.clickCreateBadgeButton();
-//         await badges.waitAddBadgeButtonToBePresented();
-//         await expect(page.locator("#container")).toContainText("Automation Badge Updated");
-//         await expect(page.locator("#container")).toContainText(category);
-//     });
-
-//     /**
-//      * on /learning/badge click the Badge dropdown
-//      * Click Delete and confirm it
-//      * Ensure the Badge is no longer presented in the /learning/badge screen
-//      */
-//     test("Delete badge", async ({ tester, page, db }) => {
-//         const badges = new Badges(tester, page);
-
-//         tester.isGoingTo("click the badge dropdown and click Delete");
-//         await badges.goto();
-//         const badgeId = (await db.grabFromDatabase("badge", "id", {
-//             deleted_at: null,
-//             "name like": "Automation Badge Updated",
-//         })) as number;
-//         await badges.clickBadgeDropdown(badgeId);
-//         await badges.clickDropdownDelete();
-//         await badges.clickConfirm();
-//         await badges.goto();
-
-//         tester.isGoingTo("ensure the badge is no longer presented in the page");
-//         await expect(page.locator("#badge-list-container")).not.toContainText("Automation Badge Updated");
-
-//         tester.isGoingTo("reload the page to ensue the badge is not presented");
-//         await badges.goto();
-//         await expect(page.locator("#badge-list-container")).not.toContainText("Automation Badge Updated");
-//     });
-
-//     /**
-//      * Soft deleting data to not impact the tests
-//      */
-//     test.afterAll(async ({ tester, db }) => {
-//         tester.isGoingTo("update delete_at for the data created in this test so it does impact next suite of tests");
-//         await db.updateInDatabase("badge", { deleted_at: "2022-01-15 11:22:34" }, { "name like": "Automation Badge%" });
-//     });
-// });

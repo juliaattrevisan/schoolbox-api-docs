@@ -15,9 +15,9 @@ export default class ProfilePage {
 
     /**
      * Navigates to the profile page
-     * @param { number } id - The user id
+     * @param { string } id - The user id
      */
-    async goto(id: number) {
+    async goto(id: string) {
         await this.page.goto(ProfilePage.URL.replace("{id}", id.toString()));
     }
 
@@ -46,7 +46,7 @@ export default class ProfilePage {
      * @param { string } badgeNameOrDropdownOption - The badge name or dropdown option
      */
     async clickBadgeOrDropdownOption(badgeNameOrDropdownOption: string) {
-        await this.page.click(`a[title="${badgeNameOrDropdownOption}"]`);
+        await this.page.locator(`a[title="${badgeNameOrDropdownOption}"]`).last().click();
     }
 
     /**

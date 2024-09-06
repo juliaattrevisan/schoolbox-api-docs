@@ -106,7 +106,7 @@ export default class Badges {
      * click Delete button on confirmation dialog
      */
     async clickConfirm() {
-        await this.page.click(Badges.BUTTON_CONFIRM_DELETE);
+        await this.page.locator(Badges.BUTTON_CONFIRM_DELETE).last().click();
     }
 
     /**
