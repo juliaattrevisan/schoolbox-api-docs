@@ -618,8 +618,10 @@
                         {% for course in subjectOverviews[folder.id] %}
                             {% if course.textboxes is not empty %}
                             {% for textbox in  course.textboxes %}
-                                <p class="summary-subtitle">{{ course.title }}</p>
-                                <p>{{ textbox.textboxBody | purify }}</p>
+                                <div class="content">
+                                    <p class="summary-subtitle">{{ course.title }}</p>
+                                    <article id="textBoxBody{{ textbox.textboxID }}">{{ textbox.textboxBody | purify }}</article>
+                                </div>
                             {% endfor %}
                             {% endif %}
                         {% endfor %}

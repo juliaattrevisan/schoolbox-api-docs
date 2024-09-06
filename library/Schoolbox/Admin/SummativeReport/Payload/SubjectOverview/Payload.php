@@ -135,6 +135,7 @@ ORDER BY tb.updated_at ASC"
                 $textboxlist[] = [
                     'componentHeading' => $row['componentHeading'],
                     'textboxBody' => $row['textboxBody'],
+                    'textboxID' => $row['textboxID'],
                 ];
             }
             // assign to all homepages that contain this course:
