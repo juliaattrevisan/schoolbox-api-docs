@@ -22,7 +22,7 @@ $flags   = ' --no-lock' .
            ' --dir storage_dir' .
            ' --owner ' . escapeshellarg(App::WEB_PROCESS_USER) .
            ' --group ' . escapeshellarg(App::WEB_PROCESS_USER);
-$logFile = '/var/log/schoolbox/' . INSTANCE_ID . '/setStorageDirPerms.log';
+$logFile = '/var/log/schoolbox/' . INSTANCE_ID . '/set-storage-dir-perms.log';
 $command = $script . ' ' . $flags . ' 2>&1 > ' . escapeshellarg($logFile);
 
 // Run the whole thing in background
