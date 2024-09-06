@@ -1036,13 +1036,10 @@ class Controller extends ConfigController
 
         // Subject Overviews
         /**
-         * get the search term.
-         * collect the courses the student is enrolled in.
-         * get the subject overview for each course.
-         * sort naturally on the title
+         * only fetch subject overviews if the option is enabled and the search term is not empty
          */
         $subjectOverviews = [];
-        if ('1' === ($optionsPayload['class']['subjectOverview'] ?? '0')) {
+        if ('1' === ($optionsPayload['class']['subjectOverview'] ?? '0') and '' !== trim((string)$optionsPayload['class']['subjectOverviewSearch'])) {
             /** @var Collection|Folder\Model[] $folders */
             $folderIds = $folders->getPropertyValues('id');
             if (!empty($folderIds)) {
