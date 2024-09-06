@@ -1,7 +1,4 @@
-<script setup>
-// Ignore this file for ESLint checks for now (SA-18376)
-/* eslint-disable */
-/* eslint-enable vue/no-v-html */
+<script setup lang="ts">
 /**
  * The modal header, containing the title, select list and search input
  */
@@ -17,8 +14,7 @@ const nodesStore = useNodesStore();
 /**
  * Can't select the breadcrumbs or search input while updating or adding a node
  * or while nodes are being loaded
- *
- * @returns { boolean }
+ * @returns {boolean} - whether the input is disabled or not
  */
 const isDisabled = window.Vue.computed(() => modalNodeUsageStore.isOpen || nodesStore.isLoading);
 </script>
