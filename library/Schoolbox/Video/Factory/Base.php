@@ -67,10 +67,10 @@ abstract class Base
     /**
      * Constructor
      *
-     * @param int $id The identifier of the file (could be a hash or numeric index)
+     * @param int|string $id The identifier of the file (could be a hash or numeric index)
      * @param string $type The type of video (submission, sbfs, storage etc)
      */
-    public function __construct(protected int $id, protected string $type)
+    public function __construct(protected int|string $id, protected string $type)
     {
         /* TODO Dependency inject these at some point
          */
