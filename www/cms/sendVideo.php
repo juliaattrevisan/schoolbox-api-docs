@@ -66,7 +66,7 @@ if (isset($type) && isset($id)) {
     // ----------------------------------------------------------------------------------------------------------------
 
     try {
-        $videoFactory = new VideoFactory((int)$id, $type);
+        $videoFactory = new VideoFactory($id, $type);
         $video        = $videoFactory->produce();
     } catch (MapperException $e) {
         fail();

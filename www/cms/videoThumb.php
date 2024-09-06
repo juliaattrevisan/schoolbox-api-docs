@@ -63,7 +63,7 @@ if (isset($type, $id)) {
     $storageMapper = StorageMapper::getInstance();
     $videoQueue    = null;
     try {
-        $thumbnailFactory = new VideoThumbnailFactory((int)$id, $type);
+        $thumbnailFactory = new VideoThumbnailFactory($id, $type);
         $videoQueue       = $thumbnailFactory->produce();
     } catch (Exception $e) {
         // If anything goes wrong, fall through to sad mountain
