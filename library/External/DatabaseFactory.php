@@ -242,16 +242,10 @@ class External_DatabaseFactory
         switch ($externalType) {
             case IConnector::EXTERNAL_TYPE_SCHOOLBOX:
                 return new External_Schoolbox_Class();
-            case IConnector::EXTERNAL_TYPE_MAZE:
-                return $siteSchoolCode === 'LK'
-                    ? new External_Maze_Lk_Class()
-                    : new External_Maze_Class();
             case IConnector::EXTERNAL_TYPE_TASS:
                 return new External_Tass_Class();
             case IConnector::EXTERNAL_TYPE_ISAMS:
                 return new External_Isams_Class();
-            case IConnector::EXTERNAL_TYPE_DENBIGH:
-                return new External_Denbigh_Class();
             case IConnector::EXTERNAL_TYPE_EDUMATE:
                 return new External_Edumate_Class();
             case IConnector::EXTERNAL_TYPE_PCSCHOOLS:
@@ -284,14 +278,10 @@ class External_DatabaseFactory
     public function buildEnabledPingConnector(string $databaseName): External_PingInterface
     {
         switch ($databaseName) {
-            case IConnector::EXTERNAL_TYPE_MAZE:
-                return new External_Maze_Ping();
             case IConnector::EXTERNAL_TYPE_TASS:
                 return new External_Tass_Ping();
             case IConnector::EXTERNAL_TYPE_ISAMS:
                 return new External_Isams_Ping();
-            case IConnector::EXTERNAL_TYPE_DENBIGH:
-                return new External_Denbigh_Ping();
             case IConnector::EXTERNAL_TYPE_EDUMATE:
                 return new External_Edumate_Ping();
             case IConnector::EXTERNAL_TYPE_PCSCHOOLS:
@@ -329,14 +319,10 @@ class External_DatabaseFactory
                 return new External_Synergetic_Timetable();
             case IConnector::EXTERNAL_TYPE_SCHOOLEDGE:
                 return new External_Schooledge_Timetable();
-            case IConnector::EXTERNAL_TYPE_MAZE:
-                return new External_Maze_Timetable();
             case IConnector::EXTERNAL_TYPE_TASS:
                 return new External_Tass_Timetable();
             case IConnector::EXTERNAL_TYPE_ISAMS:
                 return new External_Isams_Timetable();
-            case IConnector::EXTERNAL_TYPE_DENBIGH:
-                return new External_Denbigh_Timetable();
             case IConnector::EXTERNAL_TYPE_EDUMATE:
                 return new External_Edumate_Timetable();
             case IConnector::EXTERNAL_TYPE_PCSCHOOLS:
@@ -368,8 +354,6 @@ class External_DatabaseFactory
         }
 
         switch ($externalType) {
-            case IConnector::EXTERNAL_TYPE_MAZE:
-                return new External_Maze_User();
             case IConnector::EXTERNAL_TYPE_TASS:
                 switch ($tassVersion) {
                     case 'V52':
@@ -380,8 +364,6 @@ class External_DatabaseFactory
                 return new External_Tass_User();
             case IConnector::EXTERNAL_TYPE_ISAMS:
                 return new External_Isams_User();
-            case IConnector::EXTERNAL_TYPE_DENBIGH:
-                return new External_Denbigh_User();
             case IConnector::EXTERNAL_TYPE_EDUMATE:
                 return new External_Edumate_User();
             case IConnector::EXTERNAL_TYPE_PCSCHOOLS:

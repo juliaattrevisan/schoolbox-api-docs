@@ -138,7 +138,7 @@ class Healthcheck
      */
     private function externalTest(): void
     {
-        if (in_array($this->externalType, ['schoolbox', 'denbigh'], true)) {
+        if ($this->externalType === 'schoolbox') {
             $this->errors[] = 'Sorry, no health check is currently available for this external connector.';
             return;
         }
@@ -157,9 +157,6 @@ class Healthcheck
                 break;
             case 'schoolpro':
                 $this->schoolproTest();
-                break;
-            case 'maze':
-                $this->mazeTest();
                 break;
             case 'pcschools':
                 $this->pcschoolsTest();
@@ -407,35 +404,6 @@ class Healthcheck
         ];
 
         $this->selectTest($db2inst1Tables, null, null, "SELECT * FROM :object FETCH FIRST 1 ROWS ONLY");
-    }
-
-    /**
-     * @throws PDOException If transactions not supported and we attempt to begin or rollback a transaction
-     */
-    private function mazeTest(): void
-    {
-        $tables = [
-            'DF',
-            'KCT',
-            'KCY',
-            'KGC',
-            'KGH',
-            'KSC',
-            'SF',
-            'ST',
-            'STMA',
-            'SU',
-            'TCTD',
-            'TCTQ',
-            'TH',
-            'THTQ',
-            'TT',
-            'TTTG',
-            'UM',
-        ];
-
-        $tables = array_merge($tables, $this->customUPSTest());
-        $this->selectTest($tables);
     }
 
     /**

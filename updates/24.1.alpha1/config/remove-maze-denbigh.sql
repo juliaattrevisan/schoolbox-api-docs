@@ -1,0 +1,1 @@
+UPDATE config SET options = 'synergetic:tass:edumate:schoolbox:schoolpro:pcschools:doublefirst:schooledge:isams' WHERE name = 'external_type'
