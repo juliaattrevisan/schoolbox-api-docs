@@ -1,53 +1,27 @@
-<script setup>
-// Ignore this file for ESLint checks for now (SA-18376)
-/* eslint-disable */
-/* eslint-enable vue/no-v-html */
+<script setup lang="ts">
 /**
  * A curriculum node to select to traverse further down the tree,
  * will also highlight any matches in the current search query when search is active
  */
 
+import type { Node } from "@schoolboxCurriculum/types/Node";
+import { getEmptyNode } from "@schoolboxCurriculum/js/nodeUtils";
 import ShowMatches from "@schoolboxVue/components/search/show-matches.vue";
 import { useNodesStore } from "../store/csNodesStore";
 import { useModalViewNodesStore } from "../store/csModalViewNodesStore";
 import { useModalSearchStore } from "../store/csModalSearchStore";
 
-const props = defineProps({
-    /**
-     * the assigned node to display
-     */
-    node: {
-        type: Object,
-        required: true,
-        default() {
-            return {
-                id: "0",
-                name: "-",
-                children: [],
-            };
-        },
-    },
-    /**
-     * to gradually add more marginLeft to indicate node level depth
-     */
-    depth: {
-        type: Number,
-        required: true,
-    },
-    /**
-     * the already computed node title
-     */
-    title: {
-        type: String,
-        required: true,
-    },
-    /**
-     * to disable certain events when editing is taking place
-     */
-    isActive: {
-        type: Boolean,
-        required: true,
-    },
+interface Props {
+    node: Node; // the assigned node to display
+    depth: number; // to gradually add more marginLeft to indicate node level depth
+    title: string; // the already computed node title
+    isActive: boolean; // to disable certain events when editing is taking place
+}
+const props = withDefaults(defineProps<Props>(), {
+    node: () => getEmptyNode(),
+    depth: 0,
+    title: "",
+    isActive: false,
 });
 
 const nodesStore = useNodesStore();
@@ -55,9 +29,8 @@ const modalViewNodesStore = useModalViewNodesStore();
 const modalSearchStore = useModalSearchStore();
 
 /**
- * To disable selection on certain sitatuions
- *
- * @returns { boolean }
+ * To disable selection on certain situations
+ * @returns {boolean} - whether the button is disabled or not
  */
 const isDisabled = window.Vue.computed(() => {
     if (props.isActive || nodesStore.isLoading) {
@@ -69,58 +42,56 @@ const isDisabled = window.Vue.computed(() => {
 
 /**
  * To distinguish the parent node
- *
- * @returns { Boolean }
+ * @returns {boolean} - whether the node is a parent or not
  */
 const isParentNode = window.Vue.computed(() => {
     if (props.depth === 0) {
         return true;
-    } else {
-        return false;
     }
+    return false;
 });
 
 /**
  * To help distinguish those nodes that aren't selectable,
  * we disable and remove the default button colour
- *
- * @returns { Boolean }
+ * @returns {boolean} - whether the button is visible or not
  */
 const isButton = window.Vue.computed(() => {
     if (modalSearchStore.isActive) {
-        //when search is active, we can jump to the selected node
-        return true;
-    } else if (isParentNode.value) {
-        //is the parent node, which we don't
-        return false;
-    } else if (props.node.children === null) {
-        //the children haven't been loaded
-        return false;
-    } else if (props.node.children?.length === 0) {
-        //there's no children to display, so no point going further
-        return false;
-    } else {
+        // when search is active, we can jump to the selected node
         return true;
     }
+    if (isParentNode.value) {
+        // is the parent node, which we don't
+        return false;
+    }
+    if (props.node.children === null) {
+        // the children haven't been loaded
+        return false;
+    }
+    if (props.node.children?.length === 0) {
+        // there's no children to display, so no point going further
+        return false;
+    }
+    return true;
 });
 
 /**
  * Only use bold on the title when
- *
- * @returns { string }
+ * @returns {string} - the font weight to use
  */
 const fontWeight = window.Vue.computed(() => (isParentNode.value && !modalSearchStore.isActive ? "bold" : "normal"));
 
 /**
- * traverse to the next nodel level
+ * traverse to the next Node level
  */
-function onNameSelected() {
+function onNameSelected(): void {
     if (modalSearchStore.isActive) {
         // reset the structure and move to the selected searched node
-        modalViewNodesStore.toId(props.node.id);
+        void modalViewNodesStore.toId(props.node.id);
     } else {
         // traverse to the next node level
-        modalViewNodesStore.setNextSelected(props.node.id);
+        void modalViewNodesStore.setNextSelected(props.node.id);
     }
 }
 </script>
