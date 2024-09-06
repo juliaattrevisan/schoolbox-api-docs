@@ -199,6 +199,7 @@ module.exports = {
         curriculumSelector: "./library/Schoolbox/Curriculum/templates/vue/curriculumSelector/curriculumSelector.ts",
         assessmentCodes: "./library/Schoolbox/Curriculum/templates/vue/assessmentCodes/assessmentCodes.ts",
         overviewComponent: "./library/Schoolbox/Curriculum/templates/vue/overviewComponent/overviewComponent.ts",
+        curriculumCoverage: "./library/Schoolbox/Curriculum/Reports/templates/vue/curriculumCoverage.ts",
 
         // QR codes
         manageQrCodes: "./library/Schoolbox/Qrcode/vue/manageQrCodes.ts",
