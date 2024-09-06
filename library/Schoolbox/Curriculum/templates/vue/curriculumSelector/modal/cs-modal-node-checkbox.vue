@@ -58,7 +58,7 @@ function onChange($isChecked: boolean): void {
             type="checkbox"
             :value="props.node.id"
             :checked="isChecked"
-            @change="onChange($event.target.checked)"
+            @change="onChange(($event.target as HTMLInputElement).checked)"
         />
         <label :for="`checkbox-${props.node.id}__${extraId}`"></label>
     </div>

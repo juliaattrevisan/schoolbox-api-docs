@@ -69,7 +69,9 @@ function onClearSearchSelected(): void {
             class="search-input"
             :disabled="isDisabled"
             :placeholder="placeholder"
-            @input="modalSearchStore.query = $event.target.value /* Fix Android events SA-12170 */"
+            @input="
+                modalSearchStore.query = ($event.target as HTMLInputElement).value /* Fix Android events SA-12170 */
+            "
         />
         <button
             v-if="modalSearchStore.query !== ''"
