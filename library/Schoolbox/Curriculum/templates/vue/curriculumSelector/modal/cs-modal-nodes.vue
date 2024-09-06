@@ -1,28 +1,26 @@
-<script setup>
-// Ignore this file for ESLint checks for now (SA-18376)
-/* eslint-disable */
-/* eslint-enable vue/no-v-html */
+<script setup lang="ts">
 /**
  * The filtered results from using the <selects> or search <input>
- * From here curriclum nodes can be selected
+ * From here curriculum nodes can be selected
  */
 
+import type { Node } from "@schoolboxCurriculum/types/Node";
+import LoadingTable from "@schoolboxVue/components/loading/loading-table.vue";
 import { useModalViewNodesStore } from "../store/csModalViewNodesStore";
 import { useNodesStore } from "../store/csNodesStore";
 import { useModalSearchStore } from "../store/csModalSearchStore";
-import LoadingTable from "@schoolboxVue/components/loading/loading-table.vue";
 import CsModalNode from "./cs-modal-node.vue";
 
 const modalViewNodesStore = useModalViewNodesStore();
 const modalSearchStore = useModalSearchStore();
 const nodesStore = useNodesStore();
-const depth = window.Vue.ref(0); //to increment each time we go down the node tree to visually indicate children
-const nodesContainerEl = window.Vue.ref(null); //to scroll back to top on any selection change
+const depth = window.Vue.ref(0); // to increment each time we go down the node tree to visually indicate children
+const nodesContainerEl = window.Vue.ref(null); // to scroll back to top on any selection change
 
 /**
  * Clear the current search query
  */
-function onClearSearchSelected() {
+function onClearSearchSelected(): void {
     modalSearchStore.clear();
 }
 
@@ -31,10 +29,10 @@ function onClearSearchSelected() {
  * scroll may be at the bottom on change, which is a bit odd
  */
 window.Vue.watch(
-    () => modalViewNodesStore.nodes,
+    () => modalViewNodesStore.nodes as Node[],
     () => {
         if (nodesContainerEl.value) {
-            //may not always exists in the dom
+            // may not always exists in the dom
             nodesContainerEl.value.scrollTop = 0;
         }
     },
@@ -52,7 +50,7 @@ window.Vue.watch(
     <div v-else-if="modalSearchStore.hasNoResults" class="empty-state-flex-centered">
         <i class="icon-curriculum"></i>
         <p>No Curriculum matches your current search.</p>
-        <button @click.prevent="onClearSearchSelected" title="Clear the current search">Clear search</button>
+        <button title="Clear the current search" @click.prevent="onClearSearchSelected">Clear search</button>
     </div>
     <ul v-else ref="nodesContainerEl">
         <cs-modal-node v-for="node in modalViewNodesStore.nodes" :key="node.id" :node="node" :depth="depth" />
