@@ -614,13 +614,13 @@
             </div>
             {% if subjectOverviews[folder.id] is not empty %}
                 <div>
-{#                    {% if subjectOverviews[folder.id].textboxes is not empty %}#}
+                    <p class="subject-overview">{{ classOptions.subjectOverviewSearch }}</p>
                         {% for course in subjectOverviews[folder.id] %}
                             {% if course.textboxes is not empty %}
                             {% for textbox in  course.textboxes %}
                                 <div class="content">
-                                    <p class="summary-subtitle">{{ course.title }}</p>
-                                    <article id="textBoxBody{{ textbox.textboxID }}">{{ textbox.textboxBody | purify }}</article>
+                                    <p class="subject-overview-course">{{ course.title }}</p>
+                                    <article class="course-overview-textbox" id="textBoxBody{{ textbox.textboxID }}">{{ textbox.textboxBody | purify }}</article>
                                 </div>
                             {% endfor %}
                             {% endif %}
