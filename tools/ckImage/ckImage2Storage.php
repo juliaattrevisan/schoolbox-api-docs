@@ -74,12 +74,21 @@ $app = new class extends CliTool\App {
     private const OPT_LONG_HELP = 'help';
 
     /**
+     * --stdout-stats
+     *
+     * If set, output the stats of what this script did (as a JSON string)
+     * to stdout, as well as to the log.
+     */
+    private const OPT_LONG_STDOUT_STATS = 'stdout-stats';
+
+    /**
      * @inheritdoc
      */
     public function getLongOpts(): array
     {
         return [
             self::OPT_LONG_HELP,
+            self::OPT_LONG_STDOUT_STATS,
         ];
     }
 
@@ -133,9 +142,13 @@ Verbosity
 ---------
 As usual, verbose mode tells you all the debugging-level info about what the algorithm does.
 
+Output stats to stdout
+---------
+The `--stdout-stats` flag will cause the stats to be output to STDOUT, as well as in the log.
+
 Example Usage
 -------------
-Usage: ckImage2Storage.php [--perform] [-vvv]
+Usage: ckImage2Storage.php [--perform] [-vvv] [--stdout-stats]
 
 HELP;
             return;
@@ -172,6 +185,9 @@ HELP;
                 'falsePositive' => $this->falsePositive
         ];
         $this->getLogger()->info(json_encode($stats));
+        if ($this->getOpt(self::OPT_LONG_STDOUT_STATS)) {
+            echo json_encode($stats);
+        }
     }
 
     /**
