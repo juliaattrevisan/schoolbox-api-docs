@@ -225,9 +225,12 @@
         });
 
         // if enabling the subject overview, we should allow the user to enter a title to search for
-        document.querySelector('#report-class-show-subject-overview').addEventListener('change', function(checkbox) {
-            let showSubjectOverview = checkbox.target.value === '1';
-            document.querySelector('#report-class-search-subject-overview').readonly = !showSubjectOverview;
+        document.querySelector('#report-class-show-subject-overview').addEventListener('change', function(event) {
+            if (event.target.checked) {
+                document.querySelector('#report-class-search-subject-overview').removeAttribute('readonly');
+            } else {
+                document.querySelector('#report-class-search-subject-overview').setAttribute('readonly', true);
+            }
         });
     });
 </script>
