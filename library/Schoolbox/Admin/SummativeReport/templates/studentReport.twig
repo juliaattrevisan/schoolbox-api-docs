@@ -612,7 +612,7 @@
                     </div>
                 {% endif %}
             </div>
-            {% if subjectOverviews[folder.id] is not empty %}
+            {% if subjectOverviews[folder.id] is defined and subjectOverviews[folder.id] is not empty %}
                 <div>
                     <h2 class="subject-overview">{{ classOptions.subjectOverviewSearch }}</h2>
                         {% for course in subjectOverviews[folder.id] %}

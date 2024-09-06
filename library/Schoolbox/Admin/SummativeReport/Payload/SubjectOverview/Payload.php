@@ -143,9 +143,17 @@ ORDER BY tb.updated_at ASC"
             }
             // assign to all homepages that contain this course:
             foreach ($homepages as $homepageId => $homepage) {
-                if (isset($homepage[$courseFolderId])) {
+                if (isset($homepage[$courseFolderId]) && 0 < count($textboxlist)) {
                     $homepages[$homepageId][$courseFolderId]['textboxes'] = $textboxlist;
+                } else {
+                    unset($homepages[$homepageId][$courseFolderId]);
                 }
+            }
+        }
+        // strip out homepages that have no courses:
+        foreach ($homepages as $homepageId => $homepage) {
+            if (0 === count($homepage)) {
+                unset($homepages[$homepageId]);
             }
         }
         // sort the textboxes by course title naturally
