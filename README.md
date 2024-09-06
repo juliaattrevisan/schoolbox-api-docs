@@ -118,7 +118,6 @@ For full information on the build process of making a APT package and deploying 
   * [ResourceBooking](./library/Schoolbox/ResourceBooking/README.md)
   * [Task Daemon](./library/Schoolbox/TaskDaemon/README.md)
 * Custom Modules
-  * [Loyola: Survey](library/Custom/Lc/Survey/README.md)
   * [Meriden: Pastoral](library/Custom/Ms/Pastoral/README.md)
 * Javascript
   * [Vue](./docs/vue/00-intro.md)
