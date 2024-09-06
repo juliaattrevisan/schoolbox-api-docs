@@ -132,11 +132,14 @@ ORDER BY tb.updated_at ASC"
             ]);
             $textboxlist = [];
             while ($row = $this->textboxStatement->fetch()) {
-                $textboxlist[] = [
-                    'componentHeading' => $row['componentHeading'],
-                    'textboxBody' => $row['textboxBody'],
-                    'textboxID' => $row['textboxID'],
-                ];
+                // only show the textbox if it has content
+                if ('' !== trim((string)$row['textboxBody'])) {
+                    $textboxlist[] = [
+                        'componentHeading' => $row['componentHeading'],
+                        'textboxBody' => $row['textboxBody'],
+                        'textboxID' => $row['textboxID'],
+                    ];
+                }
             }
             // assign to all homepages that contain this course:
             foreach ($homepages as $homepageId => $homepage) {
