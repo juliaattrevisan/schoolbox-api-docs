@@ -76,6 +76,14 @@ const props = defineProps({
         required: false,
         default: false,
     },
+    /**
+     * can select any nodes, not just those that have a code
+     */
+    isSelectAll: {
+        type: Boolean,
+        required: false,
+        default: false,
+    },
 });
 
 const store = useStore();

@@ -6,8 +6,10 @@
 import type { Node } from "@schoolboxCurriculum/types/Node";
 import { getEmptyNode, UNSET_ID } from "@schoolboxCurriculum/js/nodeUtils";
 import { generateUUID } from "@js/util/jsUtils";
+import { useStore } from "../store/curriculumSelectorStore";
 import { useModalSelectedNodesStore } from "../store/csModalSelectedNodesStore";
 
+const store = useStore();
 const modalSelectedNodesStore = useModalSelectedNodesStore();
 const extraId = generateUUID(); // to ensure the input/label id is unique
 
@@ -34,7 +36,7 @@ const hasCode = window.Vue.computed(() => props.node.code && props.node.code !==
  * Only show the checkbox if the node has an id and a code
  * @returns {boolean} - whether the checkbox is visible or not
  */
-const isVisible = window.Vue.computed(() => isIdSet.value && hasCode.value);
+const isVisible = window.Vue.computed(() => (store.isSelectAll as boolean) || (isIdSet.value && hasCode.value));
 
 /**
  * Update the status of the checkbox based on whether it's selected or not
