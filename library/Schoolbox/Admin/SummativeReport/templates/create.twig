@@ -175,6 +175,16 @@
                     $(selectizeControl).css('opacity', 1);
                     $(selectizeControl).siblings('select').data('selectize').unlock();
                 });
+
+                /* micro manage the subject overview
+                 * we should adhere to the subject overview checkbox, now that the class section is enabled
+                 */
+                if (document.querySelector('#report-class-show-subject-overview').checked) {
+                    document.querySelector('#report-class-search-subject-overview').removeAttribute('readonly');
+                } else {
+                    document.querySelector('#report-class-search-subject-overview').setAttribute('readonly', true);
+                }
+
             } else {
                 fieldsets.find('input:checkbox, input:text').each(function(index, checkbox) {
                     $(checkbox).prop('readonly', true);
@@ -186,6 +196,11 @@
                     $(selectizeControl).css('opacity', 0.5);
                     $(selectizeControl).siblings('select').data('selectize').lock();
                 });
+
+                /* micro manage the subject overview
+                 * always disable, as the class section is disabled
+                 */
+                document.querySelector('#report-class-search-subject-overview').setAttribute('readonly', true);
             }
         }
 
@@ -504,7 +519,7 @@
                                     </li>
                                     <li>
                                         <input name="class[subjectOverview]" type="hidden" value="0" />
-                                        <input id="report-class-show-subject-overview" name="class[subjectOverview]" type="checkbox" value="1" {% if options.class.subjectOverview ?? true %}checked="checked"{% endif %} />
+                                        <input id="report-class-show-subject-overview" name="class[subjectOverview]" type="checkbox" value="1" {% if options.class.subjectOverview ?? false %}checked="checked"{% endif %} />
                                         <label for="report-class-show-subject-overview" class="checkbox-label">Show Subject overview</label>
                                         <label for="report-class-search-subject-overview" class="checkbox-label">Title of Subject overview:</label>
                                         <p class="meta">Add a textbox heading to show associated subject overviews from imported courses.</p>
