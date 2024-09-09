@@ -31,19 +31,25 @@ export const useModalStore = defineStore(`csModal`, {
         },
 
         /**
-         * to close the modal, clearing any selected nodes in this modal session
+         * to close the modal
          */
         cancel() {
-            useModalSelectedNodesStore().empty();
             this.isOpen = false;
         },
 
         /**
          * close the modal, also updating the selected nodes to reflect the changes
-         * made in this modal session and then clear for another possible modal session
+         * made in this modal session
          */
         select() {
             useModalSelectedNodesStore().update();
+            this.isOpen = false;
+        },
+
+        /**
+         * clearing any selected nodes in this modal session
+         */
+        closed() {
             this.isOpen = false;
             useModalSelectedNodesStore().empty();
         },
