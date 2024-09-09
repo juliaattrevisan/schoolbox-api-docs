@@ -13,7 +13,7 @@
 // All new classes should use strict typing.
 declare(strict_types=1);
 
-namespace External\Connector\Isams\Base\Endpoint\Test;
+namespace Schoolbox\External\Connector\Isams\Base\Endpoint\Test;
 
 use PHPUnit\Framework\ExpectationFailedException;
 use PHPUnit\Framework\TestCase;
