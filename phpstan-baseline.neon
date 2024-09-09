@@ -906,11 +906,6 @@ parameters:
 			path: library/Custom/Help/Nesa/Selector.php
 
 		-
-			message: "#^Property Custom\\\\Lc\\\\Survey\\\\Controller\\:\\:\\$externalClass \\(External_Class\\) does not accept External_ClassInterface\\.$#"
-			count: 1
-			path: library/Custom/Lc/Survey/Controller.php
-
-		-
 			message: "#^Unreachable statement \\- code above always terminates\\.$#"
 			count: 1
 			path: library/Custom/Sk/NCEA/Availability.php

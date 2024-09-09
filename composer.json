@@ -86,7 +86,6 @@
         "ext-mbstring": "*",
         "ext-intl": "*",
         "guzzlehttp/guzzle": "^7.3",
-        "phpoffice/phpspreadsheet": "^1.17",
         "php-http/guzzle7-adapter": "^1.0",
         "ext-curl": "*",
         "rodneyrehm/plist": "^2.0",
