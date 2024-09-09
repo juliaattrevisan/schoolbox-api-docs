@@ -10,12 +10,14 @@ declare(strict_types=1);
 namespace Schoolbox\Learning\Badge;
 
 use Alaress\Authorizer\Rule;
+use Alaress\Authorizer\Rule\HasServicePermission;
 use Alaress\Module\Module as BaseModule;
 use Alaress\Twig\Loader\IChainLoader;
 use Alaress\Web\Controller\Base;
 use Closure;
 use Schoolbox\Curriculum\Node\Mapper as CurriculumNodeMapper;
 use Schoolbox\Filter;
+use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\Storage\Mapper as StorageMapper;
 use Schoolbox\Role;
 use Schoolbox\YearLevel\Mapper as YearLevelMapper;
@@ -33,17 +35,57 @@ class Module extends BaseModule
      */
     public function registerRoutes(): void
     {
+        /*
+         * Users with `write` badge service user permission
+         */
+        $permissionBadgeModeratorWrite =
+            new HasServicePermission(
+                UserAccess::SERVICE_BADGE,
+                UserAccess::ACCESS_WRITE
+            );
+
+        /*
+         * Users with `moderate` badge service user permission
+         */
+        $permissionBadgeModeratorModerate =
+            new HasServicePermission(
+                UserAccess::SERVICE_BADGE,
+                UserAccess::ACCESS_FULL
+            );
+
+        //TODO: will need to change to allow users with 'Modify' badge service user permissions
+        //TODO: also include users with 'write' and 'moderate' badge service user permissions
         $viewBadgesRule = new Rule\All(
             new Rule\IsLoggedIn(),
             new Rule\Any(
+                //This is a step towards moving the badge view to specific service/badge permissions
+                $permissionBadgeModeratorWrite,
                 new Rule\IsSuperuser(),
                 new Rule\HasRole(Role::STAFF),
             ),
         );
 
+        //TODO: will need to change to only allow users with 'write' or 'moderate' service user permissions
+        $writeBadgesRule = new Rule\All(
+            new Rule\IsLoggedIn(),
+            new Rule\Any(
+                $permissionBadgeModeratorWrite,
+                //This is to gap fill permission in the interim period until we've moved further down the track and
+                //have more specific badge permissions
+                new Rule\IsSuperuser(),
+                new Rule\HasRolePermission(Role::PERMISSION_CREATE_BADGES, Role::STAFF),
+            ),
+        );
+
+        /* Currently, this permission allow all staff to still have permission to update and delete all badges
+         * but the Role::PERMISSION_CREATE_BADGES and Superuser permission will be removed in the future iterations
+         */
+        //TODO: this will need to be changed to allow moderator, creator and users with moderate badge permissions
         $manageBadgesRule = new Rule\All(
             new Rule\IsLoggedIn(),
             new Rule\Any(
+                //This is a step towards moving the badge view to specific service/badge permissions
+                $permissionBadgeModeratorModerate,
                 new Rule\IsSuperuser(),
                 new Rule\HasRolePermission(Role::PERMISSION_CREATE_BADGES, Role::STAFF),
             ),
@@ -82,7 +124,7 @@ class Module extends BaseModule
             self::METHOD_GET,
             '/create',
             'getCreateForm',
-            $manageBadgesRule
+            $writeBadgesRule
         );
 
         /* The form that people use to Update a Badge
@@ -91,6 +133,9 @@ class Module extends BaseModule
             self::METHOD_GET,
             '/{badgeId}/update',
             'getUpdateForm',
+            /* All staff currently should still be able to update/delete on all badges, but the permission will be
+             * modified to only allow its creator, the badge moderators and badge service moderators to update/delete
+             */
             $manageBadgesRule,
             Closure::fromCallable([$this, 'preloadBadge']),
         );
@@ -121,7 +166,7 @@ class Module extends BaseModule
             self::METHOD_POST,
             '',
             'postBadge',
-            $manageBadgesRule
+            $writeBadgesRule
         );
     }
 

@@ -226,6 +226,15 @@ class Controller extends Base
                 'moderate' => true
             ]
         ],
+        UserAccess::SERVICE_BADGE => [
+            'name' => 'Badge',
+            'identifier' => self::IDENTIFIER_NONE,
+            'availability' => [
+                'read' => false,
+                'write' => true,
+                'moderate' => true
+            ]
+        ],
     ];
 
     /**
