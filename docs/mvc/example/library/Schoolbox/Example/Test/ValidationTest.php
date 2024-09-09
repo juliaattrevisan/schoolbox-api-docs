@@ -17,6 +17,9 @@ namespace Schoolbox\Example\Test;
 
 use PHPUnit\Framework\TestCase;
 
+/**
+ * TODO This format has changed in 24.1
+ */
 class ValidationTest extends TestCase
 {
 
