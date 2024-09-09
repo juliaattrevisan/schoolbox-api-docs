@@ -31,13 +31,6 @@ export const useModalSelectedNodesStore = defineStore(`csModalSelectedNodes`, ()
     const childNodesIds = window.Vue.computed(() => childNodes.value.map((node) => node.id));
 
     /**
-     * populate with the currently selected nodes
-     */
-    function refresh(): void {
-        nodes.value = useSelectedNodesStore().nodes; // ensure current selections are reflected in the new modal session
-    }
-
-    /**
      * we need to check if a new parent has been selected of any existing children,
      * if it has the children should be removed as the parent now takes precedence
      * @param nodeToAdd - the Node to add
@@ -121,6 +114,17 @@ export const useModalSelectedNodesStore = defineStore(`csModalSelectedNodes`, ()
     function remove(nodeToRemove: Node): void {
         updateChildNodes(nodeToRemove, false, nodeToRemove.id);
         nodes.value = nodes.value.filter((node) => node.id !== nodeToRemove.id);
+    }
+
+    /**
+     * populate with the currently selected nodes
+     */
+    function refresh(): void {
+        nodes.value = useSelectedNodesStore().nodes; // ensure current selections are reflected in the new modal session
+        childNodes.value = removeChildNodes();
+        nodes.value.forEach((node) => {
+            updateChildNodes(node, true, node.id);
+        });
     }
 
     /**
