@@ -18,7 +18,6 @@ namespace Schoolbox\External\Connector\Isams\Base\Endpoint\Test;
 use PHPUnit\Framework\ExpectationFailedException;
 use PHPUnit\Framework\TestCase;
 use Schoolbox\External\Connector\Isams\Base\Endpoint\Concattery;
-use SebastianBergmann\RecursionContext\InvalidArgumentException;
 
 class ConcatteryTest extends TestCase
 {
@@ -69,7 +68,6 @@ class ConcatteryTest extends TestCase
      *
      * @return void
      * @throws ExpectationFailedException
-     * @throws InvalidArgumentException
      */
     public function testXmlTraverse()
     {
@@ -97,8 +95,8 @@ class ConcatteryTest extends TestCase
      * @param mixed $input
      * @param int $expected
      * @throws ExpectationFailedException
-     * @throws InvalidArgumentException
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerConcatString')]
     public function testConcatString($input, $expected)
     {
         $concat = (new Concattery())->generate($input);
@@ -112,7 +110,7 @@ class ConcatteryTest extends TestCase
      *
      * @return array
      */
-    public function providerConcatString(): array
+    public static function providerConcatString(): array
     {
         return [
             'Real use case 1' => [
