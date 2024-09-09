@@ -11,6 +11,7 @@ namespace Schoolbox\External\Connector\Isams\Base\Endpoint\TimetableCalendar;
 
 use Psr\Log\LoggerInterface;
 use Schoolbox\External\Connector\Isams\Base\Endpoint\Codec\DSN;
+use Schoolbox\External\Connector\Isams\Base\Endpoint\Concattery;
 
 /**
  * Finds all the schedules that are relevant to the given $timetableDefinition
@@ -94,7 +95,12 @@ class ScheduleCompiler
      */
     public function findSubject(string $setCode, string $divisionId): array
     {
-        $node = $this->api[DSN::MODULE_BATCHXML]->fetchXml("/iSAMS/TeachingManager/Sets/Set[SetCode[text()='{$setCode}']]")[0] ?? [];
+        /* $setCode might contain single- or double-quotes
+         * Handle with special treatment
+         */
+        $searchTerm = (new Concattery())->generate($setCode);
+
+        $node = $this->api[DSN::MODULE_BATCHXML]->fetchXml("/iSAMS/TeachingManager/Sets/Set[SetCode[text()={$searchTerm}]]")[0] ?? null;
         //null coalesce fetchXml()[0] as that field might not exist... but don't throw warnings either
 
         /* TODO There is a <Teachers> node here, but there's always been
@@ -109,8 +115,9 @@ class ScheduleCompiler
          */
         if (empty($node)) {
             $this->log->debug(sprintf(
-                'SetCode "%s" does not have any Sets in it',
-                $setCode
+                'SetCode "%s" does not have any Sets in it; searched via: %s',
+                $setCode,
+                $searchTerm
             ));
 
             return [
@@ -340,7 +347,12 @@ class ScheduleCompiler
      */
     private function findSubjectStudents(string $setCode, string $divisionId): array
     {
-        $node = $this->api[DSN::MODULE_BATCHXML]->fetchXml("/iSAMS/TeachingManager/Sets/Set[SetCode[text()='{$setCode}']]");
+        /* $setCode might contain single- or double-quotes
+         * Handle with special treatment
+         */
+        $searchTerm = (new Concattery())->generate($setCode);
+
+        $node = $this->api[DSN::MODULE_BATCHXML]->fetchXml("/iSAMS/TeachingManager/Sets/Set[SetCode[text()={$searchTerm}]]");
 
         $students = [];
 
@@ -348,8 +360,9 @@ class ScheduleCompiler
          */
         if (empty($node)) {
             $this->log->debug(sprintf(
-                'SetCode %s as no students in it',
-                $setCode
+                'SetCode %s as no students in it; searched via: %s',
+                $setCode,
+                $searchTerm
             ));
 
             return $students;
