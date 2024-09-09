@@ -29,7 +29,7 @@ abstract class AbstractFile implements IFile, ISoftDeletable
     use DeletedAtDate;
 
     /** @var string|null $title */
-    protected ?string $title;
+    protected ?string $title = null;
 
     /** @var User $owner */
     protected $owner;
