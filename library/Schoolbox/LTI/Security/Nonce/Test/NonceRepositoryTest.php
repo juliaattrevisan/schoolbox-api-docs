@@ -14,7 +14,7 @@
 
 declare(strict_types=1);
 
-namespace LTI\Security\Nonce\Test;
+namespace Schoolbox\LTI\Security\Nonce\Test;
 
 use Cache\Adapter\PHPArray\ArrayCachePool;
 use OAT\Library\Lti1p3Core\Security\Nonce\Nonce;
