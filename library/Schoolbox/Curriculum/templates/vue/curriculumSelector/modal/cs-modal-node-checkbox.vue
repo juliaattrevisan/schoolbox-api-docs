@@ -39,10 +39,21 @@ const hasCode = window.Vue.computed(() => props.node.code && props.node.code !==
 const isVisible = window.Vue.computed(() => (store.isSelectAll as boolean) || (isIdSet.value && hasCode.value));
 
 /**
+ * if the node is a child of one that's selected it should be disabled
+ * @returns { boolean } whether the checkbox should be disabled
+ */
+const isDisabled = window.Vue.computed(() => {
+    return modalSelectedNodesStore.childNodesIds.includes(props.node.id);
+});
+
+/**
  * Update the status of the checkbox based on whether it's selected or not
  * @returns {boolean} - whether the checkbox is checked or not
  */
-const isChecked = window.Vue.computed(() => modalSelectedNodesStore.isSelected(props.node));
+const isChecked = window.Vue.computed(
+    () =>
+        modalSelectedNodesStore.isSelected(props.node) || modalSelectedNodesStore.childNodesIds.includes(props.node.id),
+);
 
 /**
  * add or remove based on the current status
@@ -59,6 +70,7 @@ function onChange($isChecked: boolean): void {
             :id="`checkbox-${props.node.id}__${extraId}`"
             type="checkbox"
             :value="props.node.id"
+            :disabled="isDisabled"
             :checked="isChecked"
             @change="onChange(($event.target as HTMLInputElement).checked)"
         />
