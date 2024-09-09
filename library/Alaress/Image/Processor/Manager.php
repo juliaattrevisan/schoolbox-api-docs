@@ -74,6 +74,7 @@ class Manager
         'maxsize',
         'square64',
         'square128',
+        'square192',
     ];
 
     // How long parent will sleep before checking children states again. 5 milli seconds
