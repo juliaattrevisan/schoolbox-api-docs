@@ -13,6 +13,7 @@ use Psr\Log\LoggerInterface;
 use Schoolbox\External\ClassEntry;
 use Schoolbox\External\ClassEntryMapper;
 use Schoolbox\External\ClassInvolvementMapper;
+use Schoolbox\External\Connector\ClassCode;
 use Schoolbox\External\Connector\Sentral\Base\Endpoint\IApi;
 use Schoolbox\External\Connector\Sentral\Base\Endpoint\Profile\Profile;
 use Schoolbox\External\Connector\Sentral\Base\Endpoint\Registry;
@@ -329,7 +330,7 @@ class Classes implements IStrategy
     {
         /* Fill in these vars as usual
          */
-        $classCode = trim((string)$classInstance['attributes']['className']);
+        $classCode = (new ClassCode($this->log))->generate($classInstance['attributes']['className']);
         $day = trim((string)$classInstance['attributes']['dayName']);
         $detail = null;
 
@@ -428,7 +429,7 @@ class Classes implements IStrategy
     private function createClassEntry(array $class, \Schoolbox\External\Event\Model $event): ClassEntry
     {
         $subjectName = trim((string)$class['attributes']['subject']);
-        $classCode = trim((string)$class['attributes']['className']);
+        $classCode = (new ClassCode($this->log))->generate($class['attributes']['className']);
 
         /* Constraints in the schema are case insensitive, unlike
          * these array keys - class codes sometimes appear like
