@@ -215,11 +215,23 @@ HELP;
                             $project->getTitle(),
                             $project->getId()
                         ));
+                    } elseif (null === $outcome->getHumanReadableMark()) {
+                        /* The project had its Mark Type set to None, which returns a
+                         * null upon aggregation of its parts. Project Result no longer
+                         * accepts nulls
+                         */
+                        $this->getLogger()->info(sprintf(
+                            'Null human-readable mark for %s (%s) in project "%s" (%s) - skipped. (The project Mark Type might have been set to None; its aggregator returned null.)',
+                            $user->getFullname(),
+                            $user->getId(),
+                            $project->getTitle(),
+                            $project->getId()
+                        ));
                     } elseif ($outcome->getNormalisedMark() && $outcome->getHumanReadableMark()) {
                         /* Participants with a feedback(s) for this project
                          */
                         $this->getLogger()->info(sprintf(
-                            'Persisting [%s, %s] for %s (%s) in project %s (%s)',
+                            'Persisting [%s, %s] for %s (%s) in project "%s" (%s)',
                             $outcome->getHumanReadableMark(),
                             $outcome->getNormalisedMark(),
                             $user->getFullname(),
@@ -232,7 +244,7 @@ HELP;
                          * Their normalised- and human-readable marks are null
                          */
                         $this->getLogger()->info(sprintf(
-                            'No marks found for %s (%s) in project %s (%s)',
+                            'No marks found for %s (%s) in project "%s" (%s)',
                             $user->getFullname(),
                             $user->getId(),
                             $project->getTitle(),

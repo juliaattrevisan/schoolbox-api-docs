@@ -190,7 +190,12 @@ class ResultCache
                 ->setNormalisedMark($normalisedMark);
 
             if ($this->perform) {
-                $this->mapper->save($model);
+                /* You can't save a null humanReadableMark which is what None.php
+                 * gives you, if you set the project's Mark Type to None.
+                 */
+                if (null !== $humanReadableMark) {
+                    $this->mapper->save($model);
+                }
             }
         }
 
