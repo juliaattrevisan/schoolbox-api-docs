@@ -58,10 +58,10 @@ class Module extends BaseModule
         $viewBadgesRule = new Rule\All(
             new Rule\IsLoggedIn(),
             new Rule\Any(
+                //This is a step towards moving the badge view to specific service/badge permissions
+                $permissionBadgeModeratorWrite,
                 new Rule\IsSuperuser(),
                 new Rule\HasRole(Role::STAFF),
-                //This is a step towards moving the badge view to specific service/badge permissions
-                $permissionBadgeModeratorWrite
             ),
         );
 
@@ -69,11 +69,11 @@ class Module extends BaseModule
         $writeBadgesRule = new Rule\All(
             new Rule\IsLoggedIn(),
             new Rule\Any(
+                $permissionBadgeModeratorWrite,
                 //This is to gap fill permission in the interim period until we've moved further down the track and
                 //have more specific badge permissions
                 new Rule\IsSuperuser(),
                 new Rule\HasRolePermission(Role::PERMISSION_CREATE_BADGES, Role::STAFF),
-                $permissionBadgeModeratorWrite
             ),
         );
 
@@ -84,10 +84,10 @@ class Module extends BaseModule
         $manageBadgesRule = new Rule\All(
             new Rule\IsLoggedIn(),
             new Rule\Any(
+                //This is a step towards moving the badge view to specific service/badge permissions
+                $permissionBadgeModeratorModerate,
                 new Rule\IsSuperuser(),
                 new Rule\HasRolePermission(Role::PERMISSION_CREATE_BADGES, Role::STAFF),
-                //This is a step towards moving the badge view to specific service/badge permissions
-                $permissionBadgeModeratorModerate
             ),
         );
 
