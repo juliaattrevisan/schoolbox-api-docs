@@ -84,6 +84,14 @@ const props = defineProps({
         required: false,
         default: false,
     },
+    /**
+     * is able to select children of an already selected node
+     */
+    canSelectChildren: {
+        type: Boolean,
+        required: false,
+        default: true,
+    },
 });
 
 const store = useStore();

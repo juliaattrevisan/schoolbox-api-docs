@@ -43,17 +43,19 @@ const isVisible = window.Vue.computed(() => (store.isSelectAll as boolean) || (i
  * @returns { boolean } whether the checkbox should be disabled
  */
 const isDisabled = window.Vue.computed(() => {
-    return modalSelectedNodesStore.childNodesIds.includes(props.node.id);
+    return !store.canSelectChildren && modalSelectedNodesStore.childNodesIds.includes(props.node.id);
 });
 
 /**
  * Update the status of the checkbox based on whether it's selected or not
  * @returns {boolean} - whether the checkbox is checked or not
  */
-const isChecked = window.Vue.computed(
-    () =>
-        modalSelectedNodesStore.isSelected(props.node) || modalSelectedNodesStore.childNodesIds.includes(props.node.id),
-);
+const isChecked = window.Vue.computed(() => {
+    return (
+        modalSelectedNodesStore.isSelected(props.node) ||
+        (!store.canSelectChildren && modalSelectedNodesStore.childNodesIds.includes(props.node.id))
+    );
+});
 
 /**
  * add or remove based on the current status
