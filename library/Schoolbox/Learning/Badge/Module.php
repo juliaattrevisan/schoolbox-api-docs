@@ -60,6 +60,8 @@ class Module extends BaseModule
             new Rule\Any(
                 new Rule\IsSuperuser(),
                 new Rule\HasRole(Role::STAFF),
+                //This is a step towards moving the badge view to specific service/badge permissions
+                $permissionBadgeModeratorWrite
             ),
         );
 
@@ -70,12 +72,17 @@ class Module extends BaseModule
             ),
         );
 
+        /* Currently, this permission allow all staff to still have permission to update and delete all badges
+         * but the Role::PERMISSION_CREATE_BADGES and Superuser permission will be removed in the future iterations
+         */
         //TODO: this will need to be changed to allow moderator, creator and users with moderate badge permissions
         $manageBadgesRule = new Rule\All(
             new Rule\IsLoggedIn(),
             new Rule\Any(
                 new Rule\IsSuperuser(),
                 new Rule\HasRolePermission(Role::PERMISSION_CREATE_BADGES, Role::STAFF),
+                //This is a step towards moving the badge view to specific service/badge permissions
+                $permissionBadgeModeratorModerate
             ),
         );
 
@@ -121,6 +128,9 @@ class Module extends BaseModule
             self::METHOD_GET,
             '/{badgeId}/update',
             'getUpdateForm',
+            /* All staff currently should still be able to update/delete on all badges, but the permission will be
+             * modified to only allow its creator, the badge moderators and badge service moderators to update/delete
+             */
             $manageBadgesRule,
             Closure::fromCallable([$this, 'preloadBadge']),
         );
