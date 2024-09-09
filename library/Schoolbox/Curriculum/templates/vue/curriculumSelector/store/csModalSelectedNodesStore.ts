@@ -1,5 +1,5 @@
 /**
- * Manages the currently selected nodes relevant to the curent modal session
+ * Manages the currently selected nodes relevant to the current modal session
  */
 
 import { defineStore } from "pinia";
