@@ -12,12 +12,16 @@ const props = defineProps<Props>();
 </script>
 
 <template>
-    <curriculum-selector
-        :is-read-only="false"
-        :data-endpoint="props.endpoint"
-        :is-select-all="true"
-        :can-select-children="false"
-    />
+    <div>
+        <label for="curriculum">Curriculum</label>
+        <curriculum-selector
+            :is-read-only="false"
+            :data-endpoint="props.endpoint"
+            :is-select-all="true"
+            :can-select-children="false"
+            input-id="curriculum"
+        />
+    </div>
 </template>
 
 <style scoped></style>
