@@ -49,7 +49,7 @@ const isChecked = window.Vue.computed(() => modalSelectedNodesStore.isSelected(p
  * @param $isChecked - whether the checkbox is checked or not
  */
 function onChange($isChecked: boolean): void {
-    modalSelectedNodesStore.switch(props.node, $isChecked);
+    modalSelectedNodesStore.switchNode(props.node, $isChecked);
 }
 </script>
 
