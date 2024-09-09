@@ -18,7 +18,7 @@ import {
 
 export const useNodesStore = defineStore(`csNodes`, {
     state: () => ({
-        nodes: [], //all the nodes currently loaded
+        nodes: {}, // the root node, containing all the children loaded
         isLoading: false, //to display loading note
         hasLoadError: false, //to display loading error
         isProcessing: false, //to notify that an action is taking place

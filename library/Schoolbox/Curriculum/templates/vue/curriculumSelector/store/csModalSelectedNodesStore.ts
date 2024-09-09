@@ -64,11 +64,11 @@ export const useModalSelectedNodesStore = defineStore(`csModalSelectedNodes`, ()
      * adding any loaded children when the parent node is selected
      * or removing any loaded children from the node just removed
      * @param node - the Node to update
-     * @param isSelected - whether the Node is selected or not
+     * @param $isSelected - whether the Node is selected or not
      * @param selectedParentId - the id of the parent Node
      */
-    function updateChildNodes(node: Node, isSelected: boolean, selectedParentId: number): void {
-        if (isSelected) {
+    function updateChildNodes(node: Node, $isSelected: boolean, selectedParentId: number): void {
+        if ($isSelected) {
             if (!nodesIds.value.includes(node.id) && !childNodesIds.value.includes(node.id)) {
                 // don't include the parent node and nodes already in the child list
                 node.selectedParentId = selectedParentId;
@@ -81,7 +81,7 @@ export const useModalSelectedNodesStore = defineStore(`csModalSelectedNodes`, ()
             );
         }
         node.children?.forEach((innerNode) => {
-            updateChildNodes(innerNode, isSelected, selectedParentId);
+            updateChildNodes(innerNode, $isSelected, selectedParentId);
         });
     }
 
@@ -136,7 +136,7 @@ export const useModalSelectedNodesStore = defineStore(`csModalSelectedNodes`, ()
      */
     function checkIfSelected(node: Node): void {
         const parentNode: Node | undefined = findById(
-            useNodesStore().nodes.children as Node[],
+            (useNodesStore().nodes as Node).children as Node[],
             node.parent?.id as number,
         );
         // no parent node, so it would be a root level node, already in the selected list, or already in the children of selected list
