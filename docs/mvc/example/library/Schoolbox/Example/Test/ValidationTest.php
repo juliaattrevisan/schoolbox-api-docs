@@ -22,7 +22,6 @@ use PHPUnit\Framework\TestCase;
  */
 class ValidationTest extends TestCase
 {
-
     /**
      * @dataProvider providerValidExample
      * @param mixed $input
