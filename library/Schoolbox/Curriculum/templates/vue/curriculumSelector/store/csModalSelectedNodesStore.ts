@@ -2,6 +2,8 @@
  * Manages the currently selected nodes relevant to the current modal session
  */
 
+/* eslint-disable import/no-cycle -- Disable dependency cycle warning temporarily [SA-18397] */
+
 import { defineStore } from "pinia";
 import type { Node } from "@schoolboxCurriculum/types/Node";
 import { findById } from "@schoolboxCurriculum/js/nodeUtils";
