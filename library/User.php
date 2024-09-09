@@ -292,18 +292,17 @@ class User extends DeprecatedModel
                         ( firstname like :firstname and lastname like :lastname )
                         or
                         ( preferred_name like :firstname and lastname like :lastname )
-                    )";
+                    ) or ";
                     $params['firstname'] = '%' . $this->db->getQuoter()->escapeForLike($name[1]) . '%';
                     $params['lastname'] = '%' . $this->db->getQuoter()->escapeForLike($name[2]) . '%';
-                } else {
-                    $query .= "(
-                        firstname like :name
-                        or preferred_name like :name
-                        or lastname like :name
-                        or username like :name
-                    ) ";
-                    $params['name'] = '%' . $this->db->getQuoter()->escapeForLike($keyword) . '%';
                 }
+                $query .= "(
+                    firstname like :name
+                    or preferred_name like :name
+                    or lastname like :name
+                    or username like :name
+                ) ";
+                $params['name'] = '%' . $this->db->getQuoter()->escapeForLike($keyword) . '%';
             }
             if (is_array($group)) {
                 // If group = [0]: return all matching users regardless of role
