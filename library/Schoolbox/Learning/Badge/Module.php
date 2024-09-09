@@ -65,9 +65,14 @@ class Module extends BaseModule
             ),
         );
 
+        //TODO: will need to change to only allow users with 'write' or 'moderate' service user permissions
         $writeBadgesRule = new Rule\All(
             new Rule\IsLoggedIn(),
             new Rule\Any(
+                //This is to gap fill permission in the interim period until we've moved further down the track and
+                //have more specific badge permissions
+                new Rule\IsSuperuser(),
+                new Rule\HasRolePermission(Role::PERMISSION_CREATE_BADGES, Role::STAFF),
                 $permissionBadgeModeratorWrite
             ),
         );
