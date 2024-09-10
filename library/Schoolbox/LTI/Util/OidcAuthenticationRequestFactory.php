@@ -10,10 +10,13 @@ declare(strict_types=1);
 namespace Schoolbox\LTI\Util;
 
 use OAT\Library\Lti1p3Core\Exception\LtiExceptionInterface;
+use OAT\Library\Lti1p3Core\Message\LtiMessage;
 use OAT\Library\Lti1p3Core\Message\LtiMessageInterface;
 use OAT\Library\Lti1p3Core\Message\Payload\Builder\MessagePayloadBuilder;
+use OAT\Library\Lti1p3Core\Message\Payload\MessagePayloadInterface;
 use OAT\Library\Lti1p3Core\Registration\RegistrationRepositoryInterface;
 use OAT\Library\Lti1p3Core\Security\Jwt\Builder\Builder as JwtBuilder;
+use OAT\Library\Lti1p3Core\Security\Jwt\Parser\Parser;
 use OAT\Library\Lti1p3Core\Security\Oidc\OidcAuthenticator;
 use OAT\Library\Lti1p3Core\Security\User\UserAuthenticatorInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -66,15 +69,27 @@ class OidcAuthenticationRequestFactory
             default => null,
         };
 
+        $configFactory         = new ConfigurationFactory();
         $messagePayloadBuilder = new MessagePayloadBuilder(
             isset($nonce) ? new NoncePassthrough((string)$nonce) : null,
-            new JwtBuilder(new ConfigurationFactory())
+            new JwtBuilder($configFactory)
         );
 
-        return (new OidcAuthenticator(
+        $parser  = new Parser($configFactory);
+        $message = (new OidcAuthenticator(
             $this->registrationRepository,
             $this->userAuthenticator,
-            $messagePayloadBuilder
+            $messagePayloadBuilder,
+            null,
+            $parser,
         ))->authenticate($request);
+
+        // Always return the launch URI
+        $token = $parser->parse(LtiMessage::fromServerRequest($request)->getParameters()->get('lti_message_hint'));
+
+        $registration = $this->registrationRepository->find(
+            $token->getClaims()->getMandatory(MessagePayloadInterface::CLAIM_REGISTRATION_ID)
+        );
+        return (new LtiMessage($registration->getTool()->getLaunchUrl(), $message->getParameters()->all()));
     }
 }
