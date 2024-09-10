@@ -21,7 +21,7 @@ const props = withDefaults(defineProps<Props>(), {
 });
 
 /**
- * Don't add a checklist on the very first level node
+ * Don't add a checkbox on the very first level node, as it represents the root
  * @returns {boolean} - whether the node has an id or not
  */
 const isIdSet = window.Vue.computed(() => props.node.id !== UNSET_ID);
@@ -36,7 +36,9 @@ const hasCode = window.Vue.computed(() => props.node.code && props.node.code !==
  * Only show the checkbox if the node has an id and a code
  * @returns {boolean} - whether the checkbox is visible or not
  */
-const isVisible = window.Vue.computed(() => (store.isSelectAll as boolean) || (isIdSet.value && hasCode.value));
+const isVisible = window.Vue.computed(() => {
+    return (isIdSet.value && (store.isSelectAll as boolean)) || (isIdSet.value && hasCode.value);
+});
 
 /**
  * if the node is a child of one that's selected it should be disabled
