@@ -87,10 +87,10 @@ function onCodeSelected(node) {
 }
 
 /**
- * close the modal, also closing the node usage if it's open
+ * the modal is closed, also closing the node usage if it's open
  */
 function onModalClosed() {
-    modalStore.cancel();
+    modalStore.closed();
     if (modalNodeUsageStore.isOpen) {
         modalNodeUsageStore.cancel();
     }

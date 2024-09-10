@@ -76,6 +76,30 @@ const props = defineProps({
         required: false,
         default: false,
     },
+    /**
+     * can select any nodes, not just those that have a code
+     */
+    isSelectAll: {
+        type: Boolean,
+        required: false,
+        default: false,
+    },
+    /**
+     * is able to select children of an already selected node
+     */
+    canSelectChildren: {
+        type: Boolean,
+        required: false,
+        default: true,
+    },
+    /**
+     * the id of the search input element
+     */
+    inputId: {
+        type: String,
+        required: false,
+        default: "",
+    },
 });
 
 const store = useStore();
@@ -118,7 +142,11 @@ function onSelectedNodeModalClosed() {
 <template>
     <div ref="curriculumSelectorEl">
         <cs-selected-nodes />
-        <cs-search-input :curriculum-selector-el="curriculumSelectorEl" :is-single-select="props.isSingleSelect" />
+        <cs-search-input
+            :curriculum-selector-el="curriculumSelectorEl"
+            :is-single-select="props.isSingleSelect"
+            :input-id="props.inputId"
+        />
         <cs-search-results :is-single-select="props.isSingleSelect" />
     </div>
     <cs-modal v-if="store.hasLoadedOk" :is-single-select="props.isSingleSelect" />

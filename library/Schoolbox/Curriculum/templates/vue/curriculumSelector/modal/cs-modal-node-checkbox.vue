@@ -1,70 +1,70 @@
-<script setup>
-// Ignore this file for ESLint checks for now (SA-18376)
-/* eslint-disable */
-/* eslint-enable vue/no-v-html */
+<script setup lang="ts">
 /**
  * to select a node within the current modal session
  */
 
+import type { Node } from "@schoolboxCurriculum/types/Node";
+import { getEmptyNode, UNSET_ID } from "@schoolboxCurriculum/js/nodeUtils";
 import { generateUUID } from "@js/util/jsUtils";
-import { UNSET_ID } from "@schoolboxCurriculum/js/nodeUtils";
+import { useStore } from "../store/curriculumSelectorStore";
 import { useModalSelectedNodesStore } from "../store/csModalSelectedNodesStore";
 
+const store = useStore();
 const modalSelectedNodesStore = useModalSelectedNodesStore();
-const extraId = generateUUID(); //to ensure the input/label id is unique
+const extraId = generateUUID(); // to ensure the input/label id is unique
 
-const props = defineProps({
-    /**
-     * the assigned node to display
-     */
-    node: {
-        type: Object,
-        required: true,
-        default() {
-            return {
-                id: "0",
-                name: "-",
-                children: [],
-            };
-        },
-    },
+interface Props {
+    node: Node; // to prefill the input
+}
+const props = withDefaults(defineProps<Props>(), {
+    node: () => getEmptyNode(),
 });
 
 /**
- * Dont add a checklist on the very first level node
- *
- * @returns { Boolean }
+ * Don't add a checkbox on the very first level node, as it represents the root
+ * @returns {boolean} - whether the node has an id or not
  */
 const isIdSet = window.Vue.computed(() => props.node.id !== UNSET_ID);
 
 /**
  * If there's a code available, which means it can be selected
- *
- * @returns { Boolean }
+ * @returns {boolean} - whether the node has a code or not
  */
 const hasCode = window.Vue.computed(() => props.node.code && props.node.code !== "");
 
 /**
  * Only show the checkbox if the node has an id and a code
- *
- * @returns { Boolean }
+ * @returns {boolean} - whether the checkbox is visible or not
  */
-const isVisible = window.Vue.computed(() => isIdSet.value && hasCode.value);
+const isVisible = window.Vue.computed(() => {
+    return (isIdSet.value && (store.isSelectAll as boolean)) || (isIdSet.value && hasCode.value);
+});
+
+/**
+ * if the node is a child of one that's selected it should be disabled
+ * @returns { boolean } whether the checkbox should be disabled
+ */
+const isDisabled = window.Vue.computed(() => {
+    return !store.canSelectChildren && modalSelectedNodesStore.childNodesIds.includes(props.node.id);
+});
 
 /**
  * Update the status of the checkbox based on whether it's selected or not
- *
- * @returns { Boolean }
+ * @returns {boolean} - whether the checkbox is checked or not
  */
-const isChecked = window.Vue.computed(() => modalSelectedNodesStore.isSelected(props.node));
+const isChecked = window.Vue.computed(() => {
+    return (
+        modalSelectedNodesStore.isSelected(props.node) ||
+        (!store.canSelectChildren && modalSelectedNodesStore.childNodesIds.includes(props.node.id))
+    );
+});
 
 /**
  * add or remove based on the current status
- *
- * @param { boolean }
+ * @param $isChecked - whether the checkbox is checked or not
  */
-function onChange(isChecked) {
-    modalSelectedNodesStore.switch(props.node, isChecked);
+function onChange($isChecked: boolean): void {
+    modalSelectedNodesStore.switchNode(props.node, $isChecked);
 }
 </script>
 
@@ -74,8 +74,9 @@ function onChange(isChecked) {
             :id="`checkbox-${props.node.id}__${extraId}`"
             type="checkbox"
             :value="props.node.id"
+            :disabled="isDisabled"
             :checked="isChecked"
-            @change="onChange($event.target.checked)"
+            @change="onChange(($event.target as HTMLInputElement).checked)"
         />
         <label :for="`checkbox-${props.node.id}__${extraId}`"></label>
     </div>

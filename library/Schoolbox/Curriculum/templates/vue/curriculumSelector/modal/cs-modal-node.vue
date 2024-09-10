@@ -1,72 +1,43 @@
-<script setup>
-// Ignore this file for ESLint checks for now (SA-18376)
-/* eslint-disable */
-/* eslint-enable vue/no-v-html */
+<script setup lang="ts">
 /**
  * A curriculum node to select to traverse further down the tree,
  * or to CRUD via the actions
  */
 
 import { gsap } from "gsap/all";
+import type { Node } from "@schoolboxCurriculum/types/Node";
+import { getEmptyNode, UNSET_ID } from "@schoolboxCurriculum/js/nodeUtils";
 import { slideDownOnEnter, slideUpOnLeave } from "@schoolboxVue/transitions/transitions";
 import { useModalViewNodesStore, DIRECTION } from "../store/csModalViewNodesStore";
 import { useModalStore } from "../store/csModalStore";
-import { useModalSearchStore } from "../store/csModalSearchStore";
 import { useModalNodeUsageStore } from "../store/csModalNodeUsageStore";
 import { useModalActiveNodeStore } from "../store/csModalActiveNodeStore";
-import { UNSET_ID } from "@schoolboxCurriculum/js/nodeUtils";
 import CsModalNodeRadio from "./cs-modal-node-radio.vue";
 import CsModalNodeCheckbox from "./cs-modal-node-checkbox.vue";
 import CsModalNodeName from "./cs-modal-node-name.vue";
 import CsModalNodeUsageSummary from "./cs-modal-node-usage-summary.vue";
 import CsModalNodeUsageDetails from "./cs-modal-node-usage-details.vue";
 
-const props = defineProps({
-    /**
-     * the assigned node to display
-     */
-    node: {
-        type: Object,
-        required: true,
-        default() {
-            return {
-                id: "0",
-                name: "-",
-                children: [],
-            };
-        },
-    },
-    /**
-     * to gradually add more marginLeft to indicate node level depth
-     */
-    depth: {
-        type: Number,
-        required: true,
-    },
-});
+interface Props {
+    node: Node; // to prefill the input
+    depth: number; // to gradually add more marginLeft to indicate node level depth
+}
 
+const props = withDefaults(defineProps<Props>(), {
+    node: () => getEmptyNode(),
+    depth: 0,
+});
 const modalStore = useModalStore();
 const modalViewNodesStore = useModalViewNodesStore();
 const modalActiveNodeStore = useModalActiveNodeStore();
-const modalSearchStore = useModalSearchStore();
 const modalNodeUsageStore = useModalNodeUsageStore();
-const viewNodeEl = window.Vue.ref(null); //to animate the node
-
-/**
- * to animate on the node
- */
-window.Vue.onMounted(() => {
-    if (props.depth === 0) {
-        //we only need to animate the first node, as the rest are contained within
-        animateOn();
-    }
-});
+const viewNodeEl = window.Vue.ref(null); // to animate the node
 
 /**
  * animate to help show which direction we are currently moving through the tree
  * fade on the node and slide it from forwards/backwards depending on the currentDirection
  */
-function animateOn() {
+function animateOn(): void {
     const xStart = modalViewNodesStore.currentDirection === DIRECTION.FORWARDS ? -10 : 10;
     gsap.set(viewNodeEl.value, {
         opacity: 0,
@@ -81,16 +52,24 @@ function animateOn() {
 }
 
 /**
+ * to animate on the node
+ */
+window.Vue.onMounted(() => {
+    if (props.depth === 0) {
+        // we only need to animate the first node, as the rest are contained within
+        animateOn();
+    }
+});
+
+/**
  * to gradually add more marginLeft to indicate node level depth
- *
- * @returns { Number }
+ * @returns {number} - the margin left to apply
  */
 const marginLeft = window.Vue.computed(() => `calc(${props.depth * 2}rem)`);
 
 /**
  * To determine whether we need to display further child nodes within this node
- *
- * @returns { Boolean }
+ * @returns {boolean} - whether the children should be displayed or not
  */
 const showChildren = window.Vue.computed(
     () => props.node.children && props.node.children.length > 0 && props.depth + 1 < 2,
@@ -98,15 +77,13 @@ const showChildren = window.Vue.computed(
 
 /**
  * If there's a code available, which means it can be added to the name
- *
- * @returns { Boolean }
+ * @returns {boolean} - whether the node has a code or not
  */
 const hasCode = window.Vue.computed(() => props.node.code && props.node.code !== "");
 
 /**
  * Add in the code if it's available otherwise just show the title
- *
- * @returns { String }
+ * @returns {string} - the title to display
  */
 const title = window.Vue.computed(() =>
     hasCode.value ? `[${props.node.code}] ${props.node.name}` : `${props.node.name}`,
@@ -114,8 +91,7 @@ const title = window.Vue.computed(() =>
 
 /**
  * If there's another node being viewed
- *
- * @returns { boolean }
+ * @returns {boolean} - whether another node is being viewed
  */
 const isViewingAnother = window.Vue.computed(
     () => modalNodeUsageStore.isOpen && modalActiveNodeStore.node.id !== props.node.id,
@@ -124,15 +100,13 @@ const isViewingAnother = window.Vue.computed(
 /**
  * Whether the usage should be displayed, shouldn't be if the modal is currently closed,
  * we are at the root level node or if the search is active
- *
- * @returns { boolean }
+ * @returns {boolean} - whether the usage should be displayed or not
  */
 const showUsage = window.Vue.computed(() => modalStore.isOpen && props.node.id !== UNSET_ID);
 
 /**
  * If this is the active node being viewed
- *
- * @returns { boolean }
+ * @returns {boolean} - whether this node is being viewed
  */
 const isViewing = window.Vue.computed(
     () => modalNodeUsageStore.isOpen && modalActiveNodeStore.node.id === props.node.id,
@@ -158,7 +132,12 @@ const isViewing = window.Vue.computed(
             <cs-modal-node-usage-details v-if="isViewing" :depth="props.depth" />
         </Transition>
         <ul v-if="showChildren">
-            <cs-modal-node v-for="node in props.node.children" :key="node.id" :node="node" :depth="props.depth + 1" />
+            <cs-modal-node
+                v-for="$node in props.node.children"
+                :key="$node.id"
+                :node="$node"
+                :depth="props.depth + 1"
+            />
         </ul>
     </li>
 </template>
@@ -182,7 +161,7 @@ const isViewing = window.Vue.computed(
 }
 
 ul {
-    list-style: none; //don't use any dots
-    margin: 0; //and spacing is controlled by props.depth
+    list-style: none; // don't use any dots
+    margin: 0; // and spacing is controlled by props.depth
 }
 </style>

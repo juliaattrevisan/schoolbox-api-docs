@@ -6,6 +6,7 @@ import { defineStore } from "pinia";
 import { UNSET_ID, findById, getBreadcrumbs } from "@schoolboxCurriculum/js/nodeUtils";
 import { useStore, apiEndpoint } from "./curriculumSelectorStore";
 import { useModalViewNodesStore } from "./csModalViewNodesStore";
+import { useModalSelectedNodesStore } from "./csModalSelectedNodesStore";
 import {
     hasStoredNodes,
     isStoringNodes,
@@ -17,7 +18,7 @@ import {
 
 export const useNodesStore = defineStore(`csNodes`, {
     state: () => ({
-        nodes: [], //all the nodes currenty loaded
+        nodes: {}, // the root node, containing all the children loaded
         isLoading: false, //to display loading note
         hasLoadError: false, //to display loading error
         isProcessing: false, //to notify that an action is taking place
@@ -206,8 +207,10 @@ export const useNodesStore = defineStore(`csNodes`, {
                 const response = await fetch(`${apiEndpoint}/${id}?descendants=2&limit=50`); //we go two levels deep so we can check for children on two levels
                 if (response.ok) {
                     const newNode = await response.json();
+                    newNode.children?.forEach((node) => useModalSelectedNodesStore().checkIfSelected(node));
                     const newNodeChildrenEnabled = newNode.children.filter((node) => node.enabled); //only show those nodes with children enabled, this can be handled with enabled=1 on just topLevelOnly
                     const oldNode = findById(this.nodes.children, id);
+                    useModalSelectedNodesStore().checkIfSelected(oldNode);
                     oldNode.children = newNodeChildrenEnabled; //we just grab the loaded children and overwrite the old property that was previously null
                 } else {
                     console.warn(response);
@@ -222,7 +225,7 @@ export const useNodesStore = defineStore(`csNodes`, {
         },
 
         /**
-         * Update the nodes when a change has occured, either from the initial load or adding or deleting them
+         * Update the nodes when a change has occurred, either from the initial load or adding or deleting them
          *
          * @param { Object }
          */
@@ -234,6 +237,7 @@ export const useNodesStore = defineStore(`csNodes`, {
                 children: nodes,
                 enabled: true,
             };
+            nodes.forEach((node) => useModalSelectedNodesStore().checkIfSelected(node)); // ensure isSelected is kept up to date
         },
     },
 });

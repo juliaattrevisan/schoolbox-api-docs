@@ -1,7 +1,4 @@
-<script setup>
-// Ignore this file for ESLint checks for now (SA-18376)
-/* eslint-disable */
-/* eslint-enable vue/no-v-html */
+<script setup lang="ts">
 /**
  * To cancel or confirm the current node selection
  */
@@ -17,7 +14,7 @@ const modalSelectedNodesStore = useModalSelectedNodesStore();
 /**
  * Close the modal
  */
-function onCancelled() {
+function onCancelled(): void {
     modalStore.cancel();
 }
 
@@ -25,32 +22,30 @@ function onCancelled() {
  * The selection has been confirmed, so close the modal
  * and insert into the current nodes
  */
-function onSelected() {
+function onSelected(): void {
     modalStore.select();
 }
 
 /**
  * If there's currently no selected nodes, we are Selecting nodes,
  * otherwise we are Updating
- *
- * @returns { String }
+ * @returns {string} - the text to display on the button
  */
 const saveText = window.Vue.computed(() => (selectedNodesStore.hasNoNodes ? "Select" : "Modify"));
 
 /**
  * If there's no nodes currently selected and we haven't selected any
  * yet, there's no need to have the save enabled
- *
- * @returns { String }
+ * @returns {string} - whether the button is disabled or not
  */
 const isSaveDisabled = window.Vue.computed(() => selectedNodesStore.hasNoNodes && modalSelectedNodesStore.hasNoNodes);
 </script>
 
 <template>
     <ul class="flex-list buttons">
-        <li><button type="button" @click.prevent="onCancelled" class="button" :disabled="false">Cancel</button></li>
+        <li><button type="button" class="button" :disabled="false" @click.prevent="onCancelled">Cancel</button></li>
         <li>
-            <button type="button" @click.prevent="onSelected" class="button submit" :disabled="isSaveDisabled">
+            <button type="button" class="button submit" :disabled="isSaveDisabled" @click.prevent="onSelected">
                 {{ saveText }}
             </button>
         </li>

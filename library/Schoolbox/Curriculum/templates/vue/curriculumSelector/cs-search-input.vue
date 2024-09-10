@@ -33,6 +33,14 @@ const props = defineProps({
         required: false,
         default: false,
     },
+    /**
+     * the id of the search input element
+     */
+    inputId: {
+        type: String,
+        required: false,
+        default: "",
+    },
 });
 
 /**
@@ -166,6 +174,7 @@ const isActive = window.Vue.computed(() => {
     <div v-if="isActive" class="input-group" :data-is-small-container="store.isSmallContainer">
         <input
             ref="queryInputEl"
+            :id="props.inputId"
             v-model="searchStore.query"
             type="text"
             class="search-input"

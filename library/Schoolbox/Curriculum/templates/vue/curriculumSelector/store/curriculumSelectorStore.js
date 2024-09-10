@@ -20,6 +20,8 @@ export const useStore = defineStore(`curriculumSelector`, {
         containerWidth: 0, //currently so can tweak the styling when the selector is small
         selectedOriginal: [], //an 'original' selection, saved by the user
         selectedDefault: [], //the default selection relevant to the current user role
+        isSelectAll: false, // to select any nodes, not just those that have a code
+        canSelectChildren: true, // is able to select children of an already selected node
     }),
 
     getters: {
@@ -52,6 +54,8 @@ export const useStore = defineStore(`curriculumSelector`, {
             this.checkForStorybook();
             this.isReadOnly = props.isReadOnly;
             this.formValueName = props.formValueName;
+            this.isSelectAll = props.isSelectAll;
+            this.canSelectChildren = props.canSelectChildren;
             if (!this.isReadOnly && props.dataEndpoint !== "") {
                 //only load when we need to
                 apiEndpoint = props.dataEndpoint;
