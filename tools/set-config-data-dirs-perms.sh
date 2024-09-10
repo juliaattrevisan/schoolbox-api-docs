@@ -24,6 +24,7 @@ readonly ARG_DIR='dir'
 readonly ARG_SKIP_DIR='skip'
 readonly ARG_VERBOSE_SHORT='v'
 readonly ARG_VERBOSE_LONG='verbose'
+readonly ARG_NO_LOCK='no-lock'
 readonly MODE_DIR=775
 readonly MODE_DIR_FILES=664
 
@@ -37,6 +38,7 @@ declare data_dir_include=();     # CLI args
 declare data_dir_skip=();        # CLI args
 declare data_dirs=();            # Data dirs we will actually modify
 declare lock_file;               # Contains PID of process executing this script. Used to prevent overlapping execution.
+declare no_lock='0';             # CLI arg. If provided, do not check for overlapping executions.
 declare instance_id;
 
 function debug(){
@@ -101,6 +103,7 @@ help(){
   echo "                If not specified, target all data dirs. Can be specified multiple times"
   echo "  --$ARG_SKIP_DIR        The name of a data dir to skip, eg 'storage_dir'."
   echo "                Only makes sense when no data dirs specified using --$ARG_DIR"
+  echo "  --$ARG_NO_LOCK     If set, do not create a lock file or check for its existence."
   echo ""
   echo "EXAMPLES"
   echo "  # Fix all file/dir permissions"
@@ -141,6 +144,9 @@ function parse_cli_args(){
       data_dir_skip+=("$2")
       shift # past argument
       shift # past value
+      ;;
+      --"$ARG_NO_LOCK")
+      no_lock="1"; shift;
       ;;
       *)    # unknown option
 
@@ -195,6 +201,10 @@ function parse_sql_credentials(){
 
 # Check if script is already running
 function check_script_overlap() {
+  if [[ $no_lock == '1' ]]; then
+    log "Bypassing lock: concurrent executions of this script will not be prevented.";
+    return;
+  fi
   stream_dir=$(mysql -h "$sql_host" -u "$sql_user" -p"$sql_pass" "$sql_schema" -ss -e "SELECT value from config WHERE name = 'stream_dir'");
   lock_file=$stream_dir/config-data-dirs.lock;
   if ! $LOCKFILE_INSPECTOR --lockfile "$lock_file" --include-args; then
@@ -320,7 +330,9 @@ function update_directories(){
       find "$dir_path" -type f -not -perm $MODE_DIR_FILES -exec chmod -c $MODE_DIR_FILES '{}' +
     fi
   done
-  $LOCKFILE_INSPECTOR --lockfile "$lock_file" --include-args --rm
+  if [[ $no_lock == '0' ]]; then
+    $LOCKFILE_INSPECTOR --lockfile "$lock_file" --include-args --rm
+  fi
 }
 
 

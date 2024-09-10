@@ -83,6 +83,10 @@ chmod 777 -R $instance_data_dir
 ## Push out a dns record to the hosts file to ensure all the linkage works properly
 echo '127.0.0.1 vagrant.dev.schoolbox.cloud' >> /etc/hosts
 
+## Temp workaround for nginx not being able to access www-data
+## (should be removed once caddy replaces nginx here)
+usermod -a -G www-data nginx
+
 ## Start the services!
 service $PHP_SERVICE start
 echo 'started php'
