@@ -32,7 +32,7 @@ $instance = \Component_InstanceMapper::getInstance()->findByInstanceId($instance
  */
 if ($instance) {
     // check if component instance is for the specified homepage
-    $comSource = $homepageId;
+    $comSource = $instance->getIdentifier();
     if ('' !== (string)$instance->getConfigByKey('src')->getValue()) {
         $comSource = (int)$instance->getConfigByKey('src')->getValue();
     }
