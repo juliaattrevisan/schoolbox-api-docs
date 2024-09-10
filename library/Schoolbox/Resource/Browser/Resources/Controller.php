@@ -155,7 +155,7 @@ class Controller extends AbstractController
 
         if ($componentID) {
             //lets get the config for the component
-            $componentConfig = $filesBuilder->getComponentConf($componentID, $sourceFolder->getId());
+            $componentConfig = $filesBuilder->getComponentConf($componentID);
 
             //build the filter object
             $filter        = \Component_Config_Filter::getSelectedFilters(
