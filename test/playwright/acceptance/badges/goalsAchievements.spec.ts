@@ -260,4 +260,18 @@ test.describe("Goals and Achievements tests", () => {
         tester.isGoingTo("Ensure the evidence text is updated");
         await expect(page.locator("#container")).toContainText("This is updated");
     });
+
+    /**
+     * Soft deleting data to not impact the tests
+     */
+    test.afterAll(async ({ tester, db }) => {
+        tester.isGoingTo("update delete_at for the data created in this test so it does impact next suite of tests");
+        await db.updateInDatabase(
+            "badge",
+            { deleted_at: "2022-01-15 11:22:34" },
+            {
+                "name like": "Automation Badge%",
+            },
+        );
+    });
 });
