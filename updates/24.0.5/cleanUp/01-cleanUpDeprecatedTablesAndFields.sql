@@ -7,3 +7,7 @@ DROP TABLE IF EXISTS `_lu_leave_reuqest_travel_type`;
 DROP TABLE IF EXISTS `_pastoral_report_groups`;
 DROP TABLE IF EXISTS `_video_queue`;
 
+-- Removing Deprecated Fields
+ALTER TABLE `calendar_connector` DROP COLUMN `_config`;
+ALTER TABLE `menu_top` DROP COLUMN `_webmail`;
+ALTER TABLE `pastoral_audit` DROP COLUMN `_search_result`;
