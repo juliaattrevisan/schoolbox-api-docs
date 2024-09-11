@@ -31,12 +31,7 @@ $instance = \Component_InstanceMapper::getInstance()->findByInstanceId($instance
 /* Sew thread if instance exists
  */
 if ($instance) {
-    // check if component instance is for the specified homepage
-    $comSource = $instance->getIdentifier();
-    if ('' !== (string)$instance->getConfigByKey('src')->getValue()) {
-        $comSource = (int)$instance->getConfigByKey('src')->getValue();
-    }
-    if ($comSource === $homepageId) {
+    if ($instance->isSourceValid($homepageId)) {
         $thread = new Threads($instance, $homepageId, $start, $offset);
         $output = $thread->generate($page)->render();
 

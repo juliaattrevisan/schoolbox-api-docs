@@ -371,4 +371,21 @@ class Component_Instance
     {
         return $this->instanceCount;
     }
+
+    /**
+     * Checks if this component actually belongs to the specified object (homepage, dashboard, etc), or its alt source destination
+     *
+     * @param int $sourceId (either the homepage this exists on, or its alt source destination)
+     * @return bool
+     */
+    public function isSourceValid(int $sourceId): bool
+    {
+        // grab the object ID where this component exists
+        $componentSource = $this->getIdentifier();
+        // grab the object id of where this component is pointing (if it is alt sourced)
+        if ('' !== (string)$this->getConfigByKey('src')->getValue()) {
+            $componentSource = (int)$this->getConfigByKey('src')->getValue();
+        }
+        return $componentSource === $sourceId;
+    }
 }
