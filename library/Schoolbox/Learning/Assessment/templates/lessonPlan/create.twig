@@ -186,12 +186,15 @@
             fileBrowserCategoryId: {{ context.baseContext.folder.id ?? 0 }},
         }
     }));
+
+    /* but why? See SA-18416
+     */
     window.dispatchEvent(new Event('resize'));
 </script>
 <style type="text/css">
-    /* but why?
+    /* but why? See SA-18416
      */
     span.image-inline.ck-widget.ck-widget_with-resizer {
-        display: block !important;
+        display: inline-block !important;
     }
 </style>
