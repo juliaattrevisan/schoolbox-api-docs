@@ -52,15 +52,12 @@ class FilesBuilder
     {
         $component = $this->componentInstanceMapper->findByInstanceId($componentId);
 
-        if ($component && $component->getDefinition()->getClass() === \Component_Homepage_FileListController::class) {
-            // check if component instance is for the specified homepage, or alt sourced
-            $componentSource = $component->getIdentifier();
-            if ('' !== (string)$component->getConfigByKey('src')->getValue()) {
-                $componentSource = (int)$component->getConfigByKey('src')->getValue();
-            }
-            if ($componentSource === $folderId) {
+        if (
+            $component &&
+            $component->isSourceValid($folderId) &&
+            $component->getDefinition()->getClass() === \Component_Homepage_FileListController::class
+        ) {
                 return $component->getIdentifier();
-            }
         }
         throw new Mapper\Exception\NotFound();
     }
