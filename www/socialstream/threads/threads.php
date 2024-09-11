@@ -22,13 +22,19 @@ $instanceId = intval($_GET['instanceId']);
 $homepageId = intval($_GET['homepageId']);
 $start = intval($_GET['start']);
 $offset = intval($_GET['offset']);
-$instance = \Component_InstanceMapper::getInstance()->findByInstanceId($instanceId, $homepageId);
+
+/* Get the component instance based on this instance id,
+ * we assume the user has access to the homepage where this instance exists
+ */
+$instance = \Component_InstanceMapper::getInstance()->findByInstanceId($instanceId);
 
 /* Sew thread if instance exists
  */
 if ($instance) {
-    $thread = new Threads($instance, $homepageId, $start, $offset);
-    $output = $thread->generate($page)->render();
+    if ($instance->isSourceValid($homepageId)) {
+        $thread = new Threads($instance, $homepageId, $start, $offset);
+        $output = $thread->generate($page)->render();
 
-    echo $output;
+        echo $output;
+    }
 }
