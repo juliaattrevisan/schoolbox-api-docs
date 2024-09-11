@@ -159,6 +159,8 @@
                             } else {
                                 lessonPlanStaffView($(this));
                             }
+
+                            window.dispatchEvent(new Event('resize'));
                         });
                     });
                 </script>
