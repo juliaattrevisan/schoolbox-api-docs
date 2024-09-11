@@ -76,6 +76,7 @@
                 <script>
                     $(function() {
                         $('#lessonPlan-staff').show();
+                        window.dispatchEvent(new Event('resize'));
                     });
                 </script>
             {% else %}
@@ -83,6 +84,7 @@
                 <script>
                     $(function() {
                         $('#lessonPlan-student').show();
+                        window.dispatchEvent(new Event('resize'));
                     });
                 </script>
             {% endif %}
