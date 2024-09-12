@@ -197,6 +197,12 @@ class User extends Base implements IUser
                     $filterSql[] = "({$nameSql})";
 
                     break;
+
+                case 'boarder':
+                    $filterSql[] = '(`user`.`boarding_status` LIKE :boardingStatus)';
+                    $filterBindings['boardingStatus'] = $value;
+
+                    break;
             }
         }
 
