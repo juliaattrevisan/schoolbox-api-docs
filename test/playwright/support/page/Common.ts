@@ -1,4 +1,5 @@
-import { Page } from "@playwright/test";
+import { Page, expect } from "@playwright/test";
+import type { Locator } from "@playwright/test";
 
 export default class Common {
     private page: Page;
@@ -225,5 +226,90 @@ export default class Common {
      */
     async clickIconModifyPage(): Promise<void> {
         await this.page.locator(Common.ICON_MODIFY_PAGES).click();
+    }
+
+    /**
+     * Find a specific notification on the notifications page
+     * Will change the page to /notifications
+     * @param text - the text to search for
+     * @param failIfNotFound - whether to fail if the notification is not found
+     * @param retries - the number of times to retry if the notification is not found, defaults to 60 - which is up to 1 minute of retries
+     * @returns - the notification locator
+     */
+    async findNotification(text: string, failIfNotFound: boolean, retries: number = 60): Promise<Locator> {
+        await this.page.goto("/notifications");
+
+        const notificationWithText = this.page
+            .getByTestId("notification-list-notification-body")
+            .filter({ hasText: text });
+
+        // If it can't be found, try again after a short delay and refresh the page
+        // Sometimes the notification takes a while to appear
+        if (retries > 0 && (await notificationWithText.count()) === 0) {
+            await this.page.waitForTimeout(1000);
+            await this.page.reload();
+            return this.findNotification(text, failIfNotFound, retries - 1);
+        }
+
+        if (failIfNotFound) {
+            await expect(notificationWithText).toBeVisible();
+        }
+
+        return notificationWithText;
+    }
+
+    /**
+     * Verifies that the notification exists
+     * @param text - the text to verify
+     */
+    async assertNotifExists(text: string): Promise<void> {
+        await this.findNotification(text, true);
+    }
+
+    /**
+     * Verifies that the notification does not exist
+     * @param text - the text to verify
+     */
+    async assertNotifNotExists(text: string): Promise<void> {
+        const notification = await this.findNotification(text, false);
+        await expect(notification).toHaveCount(0);
+    }
+
+    /**
+     * Get today's date at 11:59 PM
+     * @returns - the date object
+     */
+    static getTodayAtMidnight(): Date {
+        const today = new Date();
+        today.setHours(23, 59, 59, 999);
+        return today;
+    }
+
+    /**
+     * Convert a Date object to a string in the format "dd/mm/yyyy" or "dd/mm/yyyy hh:mm[am/pm]"
+     * This is the expected format for date inputs around schoolbox
+     * @param date - the date to convert
+     * @param includeTime - whether to include the time in the string
+     * @returns - the formatted date/datetime string
+     */
+    static formatDate(date: Date, includeTime: boolean): string {
+        const zeroPad = (num: number): string => num.toString().padStart(2, "0");
+
+        const day = zeroPad(date.getDate());
+        const month = zeroPad(date.getMonth() + 1); // getMonth() returns 0-11
+        const year = date.getFullYear();
+
+        let formattedDate = `${day}/${month}/${year}`;
+
+        if (includeTime) {
+            const hours = zeroPad(date.getHours() % 12 || 12);
+            const minutes = zeroPad(date.getMinutes());
+            const ampm = date.getHours() >= 12 ? "pm" : "am";
+
+            const formattedTime = `${hours}:${minutes}${ampm}`;
+            formattedDate += ` ${formattedTime}`;
+        }
+
+        return formattedDate;
     }
 }

@@ -1,5 +1,6 @@
 import { Page, expect } from "@playwright/test";
 import AcceptanceTester from "@schoolboxTest/playwright/support/AcceptanceTester";
+import Common from "@schoolboxTest/playwright/support/page/Common";
 
 export default class AssessmentForm {
     private tester: AcceptanceTester;
@@ -34,6 +35,10 @@ export default class AssessmentForm {
     static readonly SELECTOR_BUTTON_CREATE = "assessment-form-button-submit-Create";
 
     static readonly SELECTOR_BUTTON_UPDATE = "assessment-form-button-submit-Update";
+
+    static readonly DATATEST_SUBMISSION_TYPE_CONTAINER = "assessment-form-submission-type-container";
+
+    static readonly DATATEST_SUBMISSION_TYPE_LABEL = "assessment-form-submission-type"; // Append "-[submissionType]"
 
     static readonly SELECTOR_PARTICIPATION_BUTTON_SAVE = "participation-plan-form-button-save";
 
@@ -89,6 +94,13 @@ export default class AssessmentForm {
     static readonly ACCEPT_SUBMISSION_SINGLE = 1;
 
     static readonly ACCEPT_SUBMISSION_MULTIPLE = 2;
+
+    // Select the type of submission allowed
+    static readonly ALLOW_OFFLINE = "allow-offline";
+
+    static readonly TEXT_EDITOR = "text-editor";
+
+    static readonly TYPE_FILES = "files";
 
     constructor(tester: AcceptanceTester, page: Page) {
         this.tester = tester;
@@ -164,6 +176,21 @@ export default class AssessmentForm {
     }
 
     /**
+     * Check one of the options to allow submission
+     * @param submissionType - The submission type to check
+     */
+    async checkSubmissionAllowed(
+        submissionType:
+            | typeof AssessmentForm.ALLOW_OFFLINE
+            | typeof AssessmentForm.TEXT_EDITOR
+            | typeof AssessmentForm.TYPE_FILES,
+    ): Promise<void> {
+        const submissionTypeContainer = this.page.getByTestId(AssessmentForm.DATATEST_SUBMISSION_TYPE_CONTAINER);
+        await expect(submissionTypeContainer).toContainText("Select the type of submission allowed");
+        await this.page.getByTestId(`${AssessmentForm.DATATEST_SUBMISSION_TYPE_LABEL}-${submissionType}`).click();
+    }
+
+    /**
      * Sets title
      * @param title - The title to set
      */
@@ -184,24 +211,24 @@ export default class AssessmentForm {
      * Sets publish date
      * @param publishDate - The publish date to set
      */
-    async setPublishDate(publishDate: string): Promise<void> {
-        await this.page.getByTestId(AssessmentForm.SELECTOR_PUBLISH_DATE).fill(publishDate);
+    async setPublishDate(publishDate: Date): Promise<void> {
+        await this.page.getByTestId(AssessmentForm.SELECTOR_PUBLISH_DATE).fill(Common.formatDate(publishDate, true));
     }
 
     /**
      * Sets open date
      * @param openDate - The open date to set
      */
-    async setOpenDate(openDate: string): Promise<void> {
-        await this.page.getByTestId(AssessmentForm.SELECTOR_OPEN_DATE).fill(openDate);
+    async setOpenDate(openDate: Date): Promise<void> {
+        await this.page.getByTestId(AssessmentForm.SELECTOR_OPEN_DATE).fill(Common.formatDate(openDate, true));
     }
 
     /**
      * Sets due date
      * @param dueDate - The due date to set
      */
-    async setDueDate(dueDate: string): Promise<void> {
-        await this.page.getByTestId(AssessmentForm.SELECTOR_DUE_DATE).fill(dueDate);
+    async setDueDate(dueDate: Date): Promise<void> {
+        await this.page.getByTestId(AssessmentForm.SELECTOR_DUE_DATE).fill(Common.formatDate(dueDate, true));
     }
 
     /**

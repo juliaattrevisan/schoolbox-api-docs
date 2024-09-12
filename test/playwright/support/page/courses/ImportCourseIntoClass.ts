@@ -1,4 +1,5 @@
 import { Page } from "@playwright/test";
+import Common from "@schoolboxTest/playwright/support/page/Common";
 
 export default class ImportCourseIntoClass {
     private page: Page;
@@ -38,8 +39,7 @@ export default class ImportCourseIntoClass {
      * @param openDate - The open date to fill
      */
     async fillOpenDate(openDateIdNumber: number, openDate: Date): Promise<void> {
-        const formattedDate = `${openDate.getDate()}/${openDate.getMonth() + 1}/${openDate.getFullYear()}`;
-        await this.page.fill(`input#open_date-${openDateIdNumber}`, formattedDate);
+        await this.page.fill(`input#open_date-${openDateIdNumber}`, Common.formatDate(openDate, false));
     }
 
     /**
@@ -48,8 +48,7 @@ export default class ImportCourseIntoClass {
      * @param dueDate - The due date to insert
      */
     async insertDueDate(dueDateIdNumber: number, dueDate: Date): Promise<void> {
-        const formattedDate = `${dueDate.getDate()}/${dueDate.getMonth() + 1}/${dueDate.getFullYear()}`;
-        await this.page.fill(`input#due_date-${dueDateIdNumber}`, formattedDate);
+        await this.page.fill(`input#due_date-${dueDateIdNumber}`, Common.formatDate(dueDate, false));
     }
 
     /**

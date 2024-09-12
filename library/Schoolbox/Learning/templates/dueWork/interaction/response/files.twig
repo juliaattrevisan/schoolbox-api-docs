@@ -29,7 +29,7 @@
     {% endif %}
     <div class="list-item">
         <div class="card attachment small-12">
-            <a href="{{ previewHref }}" title="{{ currentFile.filename }}" data-plugin="preview">
+            <a href="{{ previewHref }}" title="{{ currentFile.filename }}" data-plugin="preview" data-test="assessment-summary-files-list-file">
                 <img src="/ajax/mime/{{ currentFile.mime }}" alt="Preview" />
                 <p>{{ currentFile.filename }}</p>
             </a>

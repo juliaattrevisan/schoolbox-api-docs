@@ -342,7 +342,7 @@ Usage:
                         {% block actionButtons %}
                             {% apply spaceless %}
                                 {% set buttons %}
-                                    <button class="button disabled" data-draft="drafted" title="You can discard this draft from the Grading Overview screen" {% if not isDraftFeedback %}style="display:none;"{% endif %}>Saved as Draft</button>
+                                    <button class="button disabled" data-draft="drafted" title="You can discard this draft from the Grading Overview screen" {% if not isDraftFeedback %}style="display:none;"{% endif %} data-test="assessment-response-info-saved-as-draft">Saved as Draft</button>
                                     {% if not readonly %}
                                         <a class="button" id="continue-button">Continue</a>
                                         <a class="button"
