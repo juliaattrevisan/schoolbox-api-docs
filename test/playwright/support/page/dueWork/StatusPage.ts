@@ -48,7 +48,8 @@ export default class StatusPage {
         await this.page
             .locator(StatusPage.getStatusSelector(studentId, StatusPage.SELECTOR_MARK))
             .fill(grade.toString());
-        await this.page.locator(StatusPage.getStatusSelector(studentId, StatusPage.SELECTOR_COMMENT)).fill(comment);
+        await this.page.locator(StatusPage.getStatusSelector(studentId, StatusPage.SELECTOR_COMMENT)).click();
+        await this.page.keyboard.type(comment);
 
         const publishButton = this.page.locator(
             StatusPage.getStatusSelector(studentId, StatusPage.SELECTOR_BUTTON_PUBLISH),

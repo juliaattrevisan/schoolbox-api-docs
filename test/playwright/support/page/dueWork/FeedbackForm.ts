@@ -1,6 +1,5 @@
 import { Page } from "@playwright/test";
 import AcceptanceTester from "@schoolboxTest/playwright/support/AcceptanceTester";
-import Common from "@schoolboxTest/playwright/support/page/Common";
 
 export default class FeedbackForm {
     private tester: AcceptanceTester;
@@ -50,12 +49,8 @@ export default class FeedbackForm {
      * @param comment - The comment to set
      */
     async setComment(comment: string): Promise<void> {
-        await this.page.fill(FeedbackForm.SELECTOR_COMMENT_TEXTAREA, Common.genText(200));
-        await this.page.waitForTimeout(Math.random() * 2000 + 1000);
-        await this.page.fill(FeedbackForm.SELECTOR_COMMENT_TEXTAREA, Common.genText(200));
-        await this.page.waitForTimeout(Math.random() * 2000 + 1000);
-        await this.page.fill(FeedbackForm.SELECTOR_COMMENT_TEXTAREA, comment);
-        await this.page.waitForTimeout(Math.random() * 2000 + 1000);
+        await this.page.locator(FeedbackForm.SELECTOR_COMMENT_TEXTAREA).click();
+        await this.page.keyboard.type(comment);
     }
 
     /**
