@@ -19,7 +19,7 @@ $app = new class extends CliTool\App {
         $log = $this->getLogger();
 
         // Iterate over the user database and find all users with the password 'donotchange', then change it to NULL
-        $rows = $dbc->executeQuery('SELECT `id`, `password` FROM user')->fetchAll();
+        $rows = $dbc->executeQuery('SELECT `id`, `password` FROM user WHERE `password` IS NOT NULL AND `password` != ""')->fetchAll();
         foreach ($rows as $row) {
             $userId = $row['id'];
 
