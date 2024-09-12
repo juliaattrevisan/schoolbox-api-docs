@@ -1326,21 +1326,21 @@ class External_Synergetic_User implements External_UserInterface
     /**
      * {@inheritdoc}
      */
-    public function getCurrentSemester(string $externalUserId = null): ?string
+    public function getCurrentSemester(string $externalUserId = null): string
     {
         $fileSemester = $this->findFileYearAndSemester($externalUserId)['semester'] ?? null;
 
-        return $fileSemester === null ? null : (string)$fileSemester;
+        return (string)$fileSemester;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getCurrentYear(string $externalUserId = null): ?string
+    public function getCurrentYear(string $externalUserId = null): string
     {
         $fileYear = $this->findFileYearAndSemester($externalUserId)['year'] ?? null;
 
-        return $fileYear === null ? null : (string)$fileYear;
+        return (string)$fileYear;
     }
 
     /**
