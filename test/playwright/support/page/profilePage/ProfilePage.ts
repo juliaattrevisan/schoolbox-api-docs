@@ -15,27 +15,27 @@ export default class ProfilePage {
 
     /**
      * Navigates to the profile page
-     * @param { string } id - The user id
+     * @param id - The user id
      */
-    async goto(id: string) {
+    async goto(id: string): Promise<void> {
         await this.page.goto(ProfilePage.URL.replace("{id}", id.toString()));
     }
 
     /**
      * click one of the buttons in the profile page
      * options: eportfolio, due-work, tick, pastoral, calendar, timetable, document
-     * @param { string } buttonName - The button name
+     * @param buttonName - The button name
      */
-    async clickButton(buttonName: string) {
+    async clickButton(buttonName: string): Promise<void> {
         await this.page.click(`a.icon-${buttonName}`);
     }
 
     /**
      * click one of the tabs in the profile page
      * options: activity, goals, achievements, classes, groups, contacts
-     * @param { string } tabName - The tab name
+     * @param tabName - The tab name
      */
-    async clickTab(tabName: string) {
+    async clickTab(tabName: string): Promise<void> {
         await this.page.click(`a[href="#tab-${tabName}"]`);
     }
 
@@ -43,27 +43,27 @@ export default class ProfilePage {
      * click a Badge by passing its name
      * or
      * click a dropdown option: Remove goal, Award achievement, Withdraw achievement
-     * @param { string } badgeNameOrDropdownOption - The badge name or dropdown option
+     * @param badgeNameOrDropdownOption - The badge name or dropdown option
      */
-    async clickBadgeOrDropdownOption(badgeNameOrDropdownOption: string) {
+    async clickBadgeOrDropdownOption(badgeNameOrDropdownOption: string): Promise<void> {
         await this.page.locator(`a[title="${badgeNameOrDropdownOption}"]`).last().click();
     }
 
     /**
      * click a button in the Badge modal dialog
      * options: Award
-     * @param { string } buttonName - The button name
+     * @param buttonName - The button name
      */
-    async clickButtonInModal(buttonName: string) {
+    async clickButtonInModal(buttonName: string): Promise<void> {
         await this.page.locator("button").filter({ hasText: buttonName }).click();
     }
 
     /**
      * Click a badge dropdown
-     * @param { number } badgeId - The badge number
+     * @param badgeId - The badge number
      */
-    async clickBadgeDropdown(badgeId: number) {
-        await this.page.click(`[data-test=sbx-pop-out-header-options-1-${badgeId}-goal]`);
+    async clickBadgeDropdown(badgeId: number): Promise<void> {
+        await this.page.getByTestId(`sbx-pop-out-header-options-1-${badgeId}-goal`).click();
     }
 
     /**
@@ -71,7 +71,7 @@ export default class ProfilePage {
      * @param { number } badgeId - The badge number
      */
 
-    async clickBadgeAchievementDropdown(badgeId: number) {
-        await this.page.click(`[data-test=sbx-pop-out-header-options-1-${badgeId}-achievement]`);
+    async clickBadgeAchievementDropdown(badgeId: number): Promise<void> {
+        await this.page.getByTestId(`sbx-pop-out-header-options-1-${badgeId}-achievement`).click();
     }
 }

@@ -8,7 +8,6 @@ import ProfilePage from "@schoolboxTest/playwright/support/page/profilePage/Prof
  * Steps:
  * 1. Provision sales.tar.gz data
  * 2. Execute npx playwright test goalsAchievements.spec.ts
- *
  */
 
 test.describe("Goals and Achievements tests", () => {

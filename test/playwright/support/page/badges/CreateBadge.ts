@@ -26,16 +26,16 @@ export default class CreateBadge {
 
     /**
      * click Create Badge button
-     * @param { string } badgeName - The badge name
+     * @param badgeName - The badge name
      */
-    async typeName(badgeName: string) {
+    async typeName(badgeName: string): Promise<void> {
         await this.page.fill(CreateBadge.BADGE_NAME, badgeName);
     }
 
     /**
      * click Browse icon library button
      */
-    async clickBrowseIconLibraryButton() {
+    async clickBrowseIconLibraryButton(): Promise<void> {
         await expect(this.page.locator(CreateBadge.CKEDITOR_TOOL_BAR)).toBeVisible();
         await this.page.locator(CreateBadge.BROWSE_ICON_BUTTON).click();
     }
@@ -45,23 +45,23 @@ export default class CreateBadge {
      * @throws \Exception
      */
 
-    async waitModalDialogPresented() {
+    async waitModalDialogPresented(): Promise<void> {
         await this.page.waitForSelector(CreateBadge.MODAL);
     }
 
     /**
      * click a vertical Tab
-     * @param { string } title - The title of the vertical tab
+     * @param title - The title of the vertical tab
      */
-    async clickVerticalTabItem(title: string) {
+    async clickVerticalTabItem(title: string): Promise<void> {
         await this.page.click(`li[data-icon-path=${title}]`);
     }
 
     /**
      * click one of the badges images
-     * @param { string } image - The image name
+     * @param image - The image name
      */
-    async clickBadgeImage(image: string) {
+    async clickBadgeImage(image: string): Promise<void> {
         await this.page.click(`img[src$="/images/badges/${image}.svg"]`);
     }
 
@@ -69,7 +69,7 @@ export default class CreateBadge {
      * click category
      */
 
-    async clickCategoryDropDown() {
+    async clickCategoryDropDown(): Promise<void> {
         // await this.page.keyboard.press("PageDown");
         await expect(this.page.locator(CreateBadge.CKEDITOR_TOOL_BAR)).toBeVisible();
         await this.page.click(CreateBadge.CATEGORY_DROPDOWN);
@@ -77,9 +77,9 @@ export default class CreateBadge {
 
     /**
      * click one of the categories
-     * @param { string } category - The category name
+     * @param category - The category name
      */
-    async clickCategoryItem(category: string) {
+    async clickCategoryItem(category: string): Promise<void> {
         // await this.page.locator(`option[label="${category}"]`).click();
 
         await this.page.locator("#badge-category").selectOption({ label: category });
@@ -90,17 +90,17 @@ export default class CreateBadge {
      * click Create Badge button
      */
 
-    async clickCreateBadgeButton() {
+    async clickCreateBadgeButton(): Promise<void> {
         await this.page.click(CreateBadge.CREATE_BADGE_BUTTON);
     }
 
     /**
      * create a Badge
-     * @param { AcceptanceTester } tester - The tester
-     * @param { Page } page - The page
-     * @param { string } badgeName - The badge name
+     * @param tester - The tester
+     * @param page - The page
+     * @param badgeName - The badge name
      */
-    async createBadge(tester: AcceptanceTester, page: Page, badgeName: string) {
+    async createBadge(tester: AcceptanceTester, page: Page, badgeName: string): Promise<void> {
         const badges = new Badges(tester, page);
 
         const category = "Learning";

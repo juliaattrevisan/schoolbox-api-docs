@@ -32,7 +32,7 @@ export default class Badges {
     /**
      * Navigates to the learning badges page
      */
-    async goto() {
+    async goto(): Promise<void> {
         await this.page.goto(Badges.URL);
     }
 
@@ -40,14 +40,14 @@ export default class Badges {
      * wait Create Badge button to be presented
      */
 
-    async waitAddBadgeButtonToBePresented() {
+    async waitAddBadgeButtonToBePresented(): Promise<void> {
         await this.page.waitForSelector(Badges.BUTTON_ADD);
     }
 
     /**
      * click Create Badge button
      */
-    async clickAddBadgeButton() {
+    async clickAddBadgeButton(): Promise<void> {
         await this.page.click(Badges.BUTTON_ADD);
     }
 
@@ -56,64 +56,64 @@ export default class Badges {
      * @param { string } text - The text to verify
      */
 
-    async verifyTextIsPresented(text: string) {
+    async verifyTextIsPresented(text: string): Promise<void> {
         await expect(this.page.locator("#container")).toContainText(text);
     }
 
     /**
      * Click a badge dropdown
-     * @param { number } badgeNumber - The badge number
+     * @param badgeNumber - The badge number
      */
-    async clickBadgeDropdown(badgeNumber: number) {
-        await this.page.click(`[data-test=sbx-pop-out-badge-${badgeNumber}-dropdown]`);
+    async clickBadgeDropdown(badgeNumber: number): Promise<void> {
+        await this.page.getByTestId(`sbx-pop-out-badge-${badgeNumber}-dropdown`).click();
     }
 
     /**
      * click an option in the dropdown (Award Achievement, Set Goal, etc)
      * options are: achievement, goal, withdraw-achievement, close, modify, delete
-     * @param { string } dropdownOption - The dropdown option
+     * @param dropdownOption - The dropdown option
      */
-    async clickDropdownOptionLastElement(dropdownOption: string) {
+    async clickDropdownOptionLastElement(dropdownOption: string): Promise<void> {
         await this.page.click(`a.icon-${dropdownOption}`);
     }
 
     /**
      * click an option in the dropdown (Award Achievement, Set Goal, etc)
      * options are: achievement, goal, withdraw-achievement, close, modify, delete
-     * @param { number } badgeId - The badge number
-     * @param { string } dropdownOption - The dropdown option
+     * @param badgeId - The badge number
+     * @param dropdownOption - The dropdown option
      */
-    async clickDropdownOptionFirstElement(badgeId: number, dropdownOption: string) {
+    async clickDropdownOptionFirstElement(badgeId: number, dropdownOption: string): Promise<void> {
         await this.page.click(`#badge-${badgeId}-dropdown a.icon-${dropdownOption}`);
     }
 
     /**
      * click an option Modify in the dropdown
-     * @param { number } badgeNumber - The badge number
+     * @param badgeNumber - The badge number
      */
-    async clickDropdownModify(badgeNumber: number) {
+    async clickDropdownModify(badgeNumber: number): Promise<void> {
         await this.page.click(`a[href="/learning/badge/${badgeNumber}/update"]`);
     }
 
     /**
      * click an option Delete in the dropdown
      */
-    async clickDropdownDelete() {
+    async clickDropdownDelete(): Promise<void> {
         await this.page.click(Badges.DROPDOWN_DELETE);
     }
 
     /**
      * click Delete button on confirmation dialog
      */
-    async clickConfirm() {
+    async clickConfirm(): Promise<void> {
         await this.page.locator(Badges.BUTTON_CONFIRM_DELETE).last().click();
     }
 
     /**
      * search and select a student on goal the modal
-     * @param { string } studentName - The student name
+     * @param studentName - The student name
      */
-    async selectStudentSetGoal(studentName: string) {
+    async selectStudentSetGoal(studentName: string): Promise<void> {
         await this.page.fill(Badges.LIST_BOX_GOAL, studentName);
         await this.page.waitForSelector(Badges.USER_DROPDOWN);
         await this.page.press(Badges.LIST_BOX_GOAL, "Enter");
@@ -123,9 +123,9 @@ export default class Badges {
 
     /**
      * search and select a student on goal the modal
-     * @param { string } studentName - The student name
+     * @param studentName - The student name
      */
-    async selectStudentAwardAchievement(studentName: string) {
+    async selectStudentAwardAchievement(studentName: string): Promise<void> {
         await this.page.fill(Badges.LIST_BOX_AWARD, studentName);
         await this.page.waitForSelector(Badges.USER_DROPDOWN);
         await this.page.press(Badges.LIST_BOX_AWARD, "Enter");
@@ -135,9 +135,9 @@ export default class Badges {
 
     /**
      * click Set Goal on the modal
-     * @param { string } set - The set to click
+     * @param set - The set to click
      */
-    async clickSetGoalorAwardAchievement(set: string) {
+    async clickSetGoalorAwardAchievement(set: string): Promise<void> {
         await expect(
             this.page.getByTestId(Badges.DATA_TEST_MODAL_BUTTON_SET_GOAL_ACHIEVEMENT).filter({ hasText: set }),
         ).toBeEnabled();
@@ -150,7 +150,7 @@ export default class Badges {
     /**
      * click submit button on the evidence page
      */
-    async clickEvidenceSubmitButton() {
+    async clickEvidenceSubmitButton(): Promise<void> {
         await this.page.click("input[type=submit]");
     }
 }

@@ -3,7 +3,7 @@
  * Steps:
  * 1. Provision sales.tar.gz data
  * 2. Execute npx playwright test badges.spec.ts
- *  */
+ */
 
 import { test, expect } from "@schoolboxTest/playwright/support/integrations";
 import Badges from "@schoolboxTest/playwright/support/page/badges/Badges";
