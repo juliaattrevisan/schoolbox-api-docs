@@ -1,7 +1,6 @@
 import path from "path";
 import { expect, Page } from "@playwright/test";
 import AcceptanceTester from "@schoolboxTest/playwright/support/AcceptanceTester";
-import Common from "@schoolboxTest/playwright/support/page/Common";
 
 export default class SubmitForm {
     private tester: AcceptanceTester;
@@ -41,12 +40,7 @@ export default class SubmitForm {
      * @param contents - The contents to set in the editor
      */
     async setContents(contents: string): Promise<void> {
-        await this.tester.fillCKEditorById("editor-body", Common.genText(300));
-        await this.page.waitForTimeout(Math.random() * 2000 + 1000);
-        await this.tester.fillCKEditorById("editor-body", Common.genText(300));
-        await this.page.waitForTimeout(Math.random() * 2000 + 1000);
         await this.tester.fillCKEditorById("editor-body", contents);
-        await this.page.waitForTimeout(Math.random() * 2000 + 1000);
         this.contents = contents;
     }
 
