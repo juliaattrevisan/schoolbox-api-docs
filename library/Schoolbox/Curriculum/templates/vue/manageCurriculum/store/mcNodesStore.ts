@@ -111,10 +111,12 @@ export const useNodesStore = defineStore("mcNodes", () => {
         // recursively load in each node and traverse down
         await onlyInactiveBreadcrumbs.reduce(async (prevPromise, breadcrumb) => {
             await prevPromise;
+            // if we are at the last breadcrumb, we are no longer loading all children
+            if (breadcrumb.id === node.id) {
+                isLoadingAllChildren.value = false;
+            }
             return useViewNodesStore().setNextSelected(breadcrumb.id);
         }, Promise.resolve());
-
-        isLoadingAllChildren.value = false;
     }
 
     /**
