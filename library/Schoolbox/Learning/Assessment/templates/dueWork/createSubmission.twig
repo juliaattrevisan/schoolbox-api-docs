@@ -438,7 +438,7 @@ Data:
                                 <p id="submit-warning" style="display:none" class="alert alert-box icon-alert">Any previously entered data or uploaded files will not be submitted.</p>
                                 <div id="submission-upload">
                                     {% if assessment.getEnableText %}
-                                    <textarea id="editor-body" name="body" rows="20">{{ editorContents }}</textarea>
+                                    <textarea id="editor-body" name="body" rows="20" data-test="assessment-submission-input-body">{{ editorContents }}</textarea>
                                     {% endif %}
                                     {% if assessment.getEnableFiles %}
                                         {% include 'sub/attachzone.twig' with {attachzone: attachzone} %}
