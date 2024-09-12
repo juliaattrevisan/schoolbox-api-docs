@@ -1,7 +1,8 @@
 // Countdown timer used on homepages
 
-import confetti from "canvas-confetti";
+// import confetti from "canvas-confetti";
 import CountdownTimer from "./CountdownTimer";
+import { play } from "./countdownAnimation";
 
 const countdownElements = document.querySelectorAll('[data-countdown="elements"]');
 countdownElements.forEach((element) => {
@@ -58,15 +59,7 @@ countdownElements.forEach((element) => {
                         if (entry.isIntersecting && !hasTriggered) {
                             hasTriggered = true;
                             const boundRect = targetElement.getBoundingClientRect();
-                            void confetti({
-                                particleCount: 300,
-                                spread: 360,
-                                ticks: 200,
-                                origin: {
-                                    x: (boundRect.left + boundRect.width / 2) / window.innerWidth,
-                                    y: (boundRect.top + boundRect.height / 2) / window.innerHeight,
-                                },
-                            });
+                            play(boundRect);
                         }
                     });
                 },
