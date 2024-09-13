@@ -25,7 +25,7 @@ done
 if [ -f "$SITE_ROOT/tools/notif/syscheck.php" ];
 then
     echo "[SB][`date +%Y-%m-%d\ %X`] Restarting daemons in background";
-    sleep 5 && service schoolbox-cloud-socketd@vagrantx restart &
+    sleep 5 && service schoolbox-cloud-socketd restart &
     sleep 5 && service schoolbox-cloud-digestd@vagrantx restart &
     sleep 5 && service schoolbox-cloud-scheduled@vagrantx restart &
 else
@@ -61,11 +61,8 @@ fi
 
 # Need to read the actual run-time value, rather than puppet-configured value, as it's possible to
 # `vagrant up` without a `vagrant provision` so the puppet value may not have yet been applied
-rabbitmq_management_port=$(rabbitmqctl status | grep -Eo "http,[0-9]+" | awk -F',' '{ print $2 }')
 # get port for newer rabbit versions
-if [[ -z $rabbitmq_management_port ]]; then
-  rabbitmq_management_port=$(rabbitmqctl status | grep -E "http" | awk -F',| ' '{print $5}')
-fi
+rabbitmq_management_port=$(rabbitmqctl status | grep -E "HTTP API" | awk -F',| ' '{print $5}')
 
 # This will fail to start when VM booted because /usr/share/schoolbox may not yet be mounted
 eval "service php${primary_php_majver}-fpm restart"
@@ -73,7 +70,6 @@ eval "service php${primary_php_majver}-fpm restart"
 for eth in `ip addr | grep inet | grep -v inet6 | grep global | grep -v eth0 | awk {'print $2'} | cut -d/ -f1`;
 do
   echo "[SB][`date +%Y-%m-%d\ %X`] Website URL             => https://$eth/";
-  echo "[SB][`date +%Y-%m-%d\ %X`] RabbitMQ Management URL => http://$eth:$rabbitmq_management_port/";
 done
 
 echo "[SB][`date +%Y-%m-%d\ %X`] Website URL             => https://vagrant.dev.schoolbox.cloud";

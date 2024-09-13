@@ -446,7 +446,7 @@ else
 fi
 
 echo "[SB][`date +%Y-%m-%d\ %X`] Ensure all services are running";
-service nginx restart;
+service caddy restart;
 
 echo "[SB][`date +%Y-%m-%d\ %X`] Removing system maintenance mode";
 if INSTANCE_ID=vagrantx "$SITE_ROOT"/tools/maintenance/site_up.sh -eq 0 ; then
