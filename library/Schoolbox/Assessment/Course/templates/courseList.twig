@@ -73,10 +73,6 @@ Usage:
     {% if hasAdd %}
         <nav>
             <a href="{{ routeLookup('course.newCourse') }}" class="icon-add"></a>
-            {% set atlasImportUrl = routeLookupIfAuthorized('courseImportAtlas.getImport') %}
-            {% if atlasImportUrl %}
-                <a href="{{ atlasImportUrl }}?{{ returnUrlKey }}={{ encodedReturnUrl }}" class="icon-curriculum" title="Import from Atlas"></a>
-            {% endif %}
             {# intellischool anlytics, hide if it is not setup, both routes, have the same perms (settings) #}
             {% set intellischoolCohortUrl = routeLookupIfAuthorized('intellischool.getCohortProfile') %}
             {% if intellischoolCohortUrl %}

@@ -36,9 +36,6 @@ class Course implements ModuleConfigInterface
 
             $exportModule = new Assessment\Course\Export\Module($di);
             $exportModule->registerModule('/course/export');
-
-            $atlasModule = new Assessment\Course\Import\Atlas\Module($di);
-            $atlasModule->registerModule('/course/import/atlas');
         }
     }
 }
