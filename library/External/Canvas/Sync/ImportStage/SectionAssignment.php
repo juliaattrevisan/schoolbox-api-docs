@@ -299,9 +299,9 @@ class SectionAssignment extends SectionAssessmentAbstract
             $assessableImpl->getMarkVisibility() === $assessableSpec->getMarkVisibility() &&
             $assessableImpl->getSelfReviewability() === $assessableSpec->getSelfReviewability() &&
             $assessableImpl->getOwner()->getId() === $owner->getId() &&
-            $assessableImpl->getCategory()->getId() === $unitImpl->getFolder()->getId() &&
+            $assessableImpl->getAssessmentModel()->getContextFolder()->getId() === $unitImpl->getFolder()->getId() &&
             $assessableImpl->getMarkType()->getId() === $assessableSpec->getMarkType()->getId() &&
-            $assessableImpl->getWeight() === $assessableSpec->getWeight() &&
+            $assessableImpl->getAssessmentModel()->getWeight() === $assessableSpec->getAssessmentModel()->getWeight() &&
             $assessableImpl->getGradeGroup()?->getId() === $assessableSpec->getGradeGroup()?->getId()
         ) {
             return false;
@@ -314,10 +314,11 @@ class SectionAssignment extends SectionAssessmentAbstract
             ->setMarkVisibility($assessableSpec->getMarkVisibility())
             ->setSelfReviewability($assessableSpec->getSelfReviewability())
             ->setOwner($owner)
-            ->setCategory($unitImpl->getFolder())
             ->setMarkType($assessableSpec->getMarkType())
-            ->setWeight($assessableSpec->getWeight())
-            ->setGradeGroup($assessableSpec->getGradeGroup());
+            ->setGradeGroup($assessableSpec->getGradeGroup())
+            ->getAssessmentModel()
+                ->setContextFolder($unitImpl->getFolder())
+                ->setWeight($assessableSpec->getAssessmentModel()->getWeight());
         $this->submissionBoxMapper->save($assessableImpl);
         return true;
     }
@@ -418,9 +419,9 @@ class SectionAssignment extends SectionAssessmentAbstract
         $submissionBoxImpl = $assessmentImpl->getDueWork();
         $submissionBoxImpl
             ->setAssessmentModel($assessmentImpl)            // TODO This line compensates for a core bug. Fix this properly in develop.
-            ->setCategory($unitImpl->getFolder())
             ->setOwner($owner)
             ->setExternalId(null);
+        $submissionBoxImpl->getAssessmentModel()->setContextFolder($unitImpl->getFolder());
 
         // Insert SubmissionBox Impl
         $this->submissionBoxMapper->save($submissionBoxImpl);

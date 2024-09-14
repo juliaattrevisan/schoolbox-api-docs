@@ -351,27 +351,28 @@ class CourseAssignments extends CourseAssessmentAbstract
         $isBoxUpdated = false;
         if (
             // Does any attribute no longer align?
-            (float)$submissionBox->getWeight() !== $weight ||
+            (float)$submissionBox->getAssessmentModel()->getWeight() !== $weight ||
             $submissionBox->getMaxMark() !== $maxMark ||
             $submissionBox->getAcceptOnline() !== $acceptOnline ||
             $submissionBox->getAcceptMultiple() !== $acceptMultiple ||
             $submissionBox->getMarkVisibility() !== $markVisibility ||
             $submissionBox->getSelfReviewability() !== $selfReviewability ||
-            $submissionBox->getCategory()->getId() !== $unitSpecFolder->getId() ||
+            $submissionBox->getAssessmentModel()->getContextFolder()->getId() !== $unitSpecFolder->getId() ||
             $submissionBox->getMarkType()->getId() !== $markType->getId() ||
             $submissionBox->getGradeGroup()?->getId() !== $gradeGroup?->getId()
         ) {
             // Update all attributes and update
             $submissionBox
-                ->setCategory($unitSpecFolder)
                 ->setMaxMark($maxMark)
                 ->setMarkType($markType)
                 ->setGradeGroup($gradeGroup)
                 ->setAcceptOnline($acceptOnline)
                 ->setAcceptMultiple($acceptMultiple)
-                ->setWeight($weight)
                 ->setMarkVisibility($markVisibility)
-                ->setSelfReviewability($selfReviewability);
+                ->setSelfReviewability($selfReviewability)
+                ->getAssessmentModel()
+                    ->setContextFolder($unitSpecFolder)
+                    ->setWeight($weight);
             $this->submissionBoxMapper->save($submissionBox);
             $isBoxUpdated = true;
         }
@@ -483,15 +484,16 @@ class CourseAssignments extends CourseAssessmentAbstract
             ->setAssessmentModel($assessment)
             ->setOwner((new User())->setId($boxOwnerId))
             ->setMaxMark($maxMark)
-            ->setCategory($unitSpecFolder)
             ->setMarkType($markType)
             ->setGradeGroup($gradeGroup)
             ->setAcceptOnline($acceptOnline)
             ->setAcceptMultiple($acceptMultiple)
-            ->setWeight($weight)
             ->setMarkVisibility($markVisibility)
             ->setSelfReviewability($selfReviewability)
             ->setExternalId((string)$canvasId);
+        $submissionBox->getAssessmentModel()
+                ->setContextFolder($unitSpecFolder)
+                ->setWeight($weight);
 
         $this->submissionBoxMapper->save($submissionBox);
 

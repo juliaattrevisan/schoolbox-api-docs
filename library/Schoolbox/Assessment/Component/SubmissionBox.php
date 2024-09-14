@@ -19,7 +19,6 @@ use Schoolbox\Learning\Assessment\DataModel\IAssessableDataModel;
 use Schoolbox\Learning\Assessment\DataModel\Model;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\InlineGrader\Kami\Model as KamiModel;
-use Schoolbox\Resource\Folder\Model as FolderModel;
 use Schoolbox\Assessment\Component\SubmissionBox\MarkType;
 use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel;
 use Schoolbox\Resource\Storage;
@@ -57,26 +56,9 @@ class SubmissionBox implements IAssessableDataModel, ISoftDeletable
     protected $id;
 
     /**
-     * @deprecated this only works for legacy (pre 16.5) submission boxes - dependency on this value for boxes created 16.5+ will snap things
-     * @var FolderModel
-     */
-    protected $category;
-
-
-    /**
      * @var GradeLevel\Group\Model
      */
     protected $gradeGroup;
-
-    /**
-     * @var string
-     */
-    protected $name;
-
-    /**
-     * @var string
-     */
-    protected $description;
 
     /**
      * @var SubmissionBox\SingleFile\Model[]|GenericCollection
@@ -87,29 +69,6 @@ class SubmissionBox implements IAssessableDataModel, ISoftDeletable
      * @var User
      */
     protected $owner;
-
-    /**
-     * If this isn't null, the submission box won't be shown on student's
-     * calendars until this date.
-     *
-     * @var Alaress_Date_Format|null
-     */
-    protected ?Alaress_Date_Format $publish_date = null;
-
-    /**
-     * @var Alaress_Date_Format|null
-     */
-    protected ?Alaress_Date_Format $open_date = null;
-
-    /**
-     * @var Alaress_Date_Format|null
-     */
-    protected ?Alaress_Date_Format $due_date = null;
-
-    /**
-     * @var Alaress_Date_Format|null
-     */
-    protected ?Alaress_Date_Format $late_date = null;
 
     /**
      * @var bool
@@ -165,11 +124,6 @@ class SubmissionBox implements IAssessableDataModel, ISoftDeletable
      * @var Alaress_Date_Format
      */
     protected $created;
-
-    /**
-     * @var int
-     */
-    protected $weight = 0;
 
     /**
      * @var float
@@ -246,7 +200,6 @@ class SubmissionBox implements IAssessableDataModel, ISoftDeletable
      */
     public function __construct()
     {
-        $this->setCategory(new FolderModel());
         $this->setAssessmentModel(new Model());
     }
 
@@ -328,7 +281,7 @@ class SubmissionBox implements IAssessableDataModel, ISoftDeletable
      */
     public function getGradientIndex()
     {
-        $urgency = intval(($this->getDueDate()->getUnixTimestamp() - time()) / 86400);
+        $urgency = intval(($this->getAssessmentModel()->getDueDate()->getUnixTimestamp() - time()) / 86400);
 
         return max(0, min(10, $urgency));
     }
@@ -340,46 +293,6 @@ class SubmissionBox implements IAssessableDataModel, ISoftDeletable
 
     /* Getters/Setters
      */
-
-    /**
-     * @deprecated this only works for legacy (pre 16.5) submission boxes - dependency on this value for boxes created 16.5+ will snap things
-     * @param  FolderModel $category
-     * @return $this
-     */
-    public function setCategory($category)
-    {
-        $this->category = $category;
-        return $this;
-    }
-
-    /**
-     * @deprecated this only works for legacy (pre 16.5) submission boxes - dependency on this value for boxes created 16.5+ will snap things
-     * @return FolderModel
-     */
-    public function getCategory()
-    {
-        return $this->category;
-    }
-
-    /**
-     * @param  string $description
-     * @return $this
-     * @deprecated
-     * @see \Schoolbox\Learning\Assessment\DataModel\Model::$description
-     */
-    public function setDescription(?string $description)
-    {
-        $this->description = $description;
-        return $this;
-    }
-
-    /**
-     * @return string
-     */
-    public function getDescription()
-    {
-        return $this->description;
-    }
 
     /**
      * @param  int|null $id
@@ -398,25 +311,6 @@ class SubmissionBox implements IAssessableDataModel, ISoftDeletable
     {
         return $this->id;
     }
-
-    /**
-     * @param  string $name
-     * @return $this
-     */
-    public function setName($name)
-    {
-        $this->name = $name;
-        return $this;
-    }
-
-    /**
-     * @return string
-     */
-    public function getName()
-    {
-        return $this->name;
-    }
-
 
     /**
      * @return GenericCollection|SubmissionBox\SingleFile\Model[]
@@ -484,44 +378,6 @@ class SubmissionBox implements IAssessableDataModel, ISoftDeletable
     }
 
     /**
-     * @return Alaress_Date_Format|null
-     */
-    public function getDueDate(): ?Alaress_Date_Format
-    {
-        return $this->due_date;
-    }
-
-    /**
-     * @param Alaress_Date_Format|null $due_date
-     *
-     * @return static
-     */
-    public function setDueDate(?Alaress_Date_Format $due_date): self
-    {
-        $this->due_date = $due_date;
-        return $this;
-    }
-
-    /**
-     * @return Alaress_Date_Format|null
-     */
-    public function getLateDate(): ?Alaress_Date_Format
-    {
-        return $this->late_date;
-    }
-
-    /**
-     * @param Alaress_Date_Format|null $late_date
-     *
-     * @return static
-     */
-    public function setLateDate(?Alaress_Date_Format $late_date): self
-    {
-        $this->late_date = $late_date;
-        return $this;
-    }
-
-    /**
      * @param  MarkType $mark_type
      * @return $this
      */
@@ -555,25 +411,6 @@ class SubmissionBox implements IAssessableDataModel, ISoftDeletable
     public function getMaxMark()
     {
         return $this->max_mark;
-    }
-
-    /**
-     * @return Alaress_Date_Format|null
-     */
-    public function getOpenDate(): ?Alaress_Date_Format
-    {
-        return $this->open_date;
-    }
-
-    /**
-     * @param Alaress_Date_Format|null $open_date
-     *
-     * @return static
-     */
-    public function setOpenDate(?Alaress_Date_Format $open_date): self
-    {
-        $this->open_date = $open_date;
-        return $this;
     }
 
     /**
@@ -683,24 +520,6 @@ class SubmissionBox implements IAssessableDataModel, ISoftDeletable
     }
 
     /**
-     * @return int
-     */
-    public function getWeight()
-    {
-        return $this->weight;
-    }
-
-    /**
-     * @param int $weight
-     * @return $this
-     */
-    public function setWeight($weight)
-    {
-        $this->weight = $weight;
-        return $this;
-    }
-
-    /**
      * Set skip unsubmitted
      *
      * @param int $skipUnsubmitted
@@ -741,25 +560,6 @@ class SubmissionBox implements IAssessableDataModel, ISoftDeletable
     }
 
     /**
-     * @return Alaress_Date_Format|null
-     */
-    public function getPublishDate(): ?Alaress_Date_Format
-    {
-        return $this->publish_date;
-    }
-
-    /**
-     * @param Alaress_Date_Format|null $publish_date
-     *
-     * @return static
-     */
-    public function setPublishDate(?Alaress_Date_Format $publish_date): self
-    {
-        $this->publish_date = $publish_date;
-        return $this;
-    }
-
-    /**
      * Helper method for setting dates from a form.
      *
      * @param array $formDates
@@ -779,10 +579,11 @@ class SubmissionBox implements IAssessableDataModel, ISoftDeletable
         $late_date    = isset($formDates['late_date'])
             ? \Alaress_Date_Format::newLocalShort($formDates['late_date'])->endOfDay()
             : $due_date;
-        $this->setPublishDate($publish_date);
-        $this->setOpenDate($open_date);
-        $this->setDueDate($due_date);
-        $this->setLateDate($late_date);
+        $this->getAssessmentModel()
+            ->setPublishDate($publish_date)
+            ->setOpenDate($open_date)
+            ->setDueDate($due_date)
+            ->setCloseDate($late_date);
         return $this;
     }
 
@@ -794,7 +595,10 @@ class SubmissionBox implements IAssessableDataModel, ISoftDeletable
      */
     public function isOpen()
     {
-        return Alaress_Date_Format::now()->between($this->getOpenDate(), $this->getLateDate());
+        return Alaress_Date_Format::now()->between(
+            $this->getAssessmentModel()->getOpenDate(),
+            $this->getAssessmentModel()->getCloseDate()
+        );
     }
 
     /**
@@ -837,7 +641,7 @@ class SubmissionBox implements IAssessableDataModel, ISoftDeletable
 
         /* Access level for $user on $submissionBox
          */
-        $boxLevel = $access->getFolderAccess($user, $this->getCategory()->getId());
+        $boxLevel = $access->getFolderAccess($user, $this->getAssessmentModel()->getContextFolder()->getId());
 
         if ($boxLevel >= $requiredAccessLevel) {
             return true;

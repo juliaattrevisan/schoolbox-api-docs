@@ -22,8 +22,8 @@ use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\DataModel\ExternalMarkbook\Adapter as MarkbookAdapter;
 use Schoolbox\Learning\Assessment\DataModel\Mapper as AssessmentMapper;
 use Schoolbox\Mapper as BaseMapper;
-use Schoolbox\Resource\Folder;
 use Schoolbox\Resource\Storage;
+use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\User;
 
 /**
@@ -52,12 +52,6 @@ class SubmissionBoxMapper extends BaseMapper
         $this->hasModel(SubmissionBox::class);
 
         $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
-        $this->uses('name', self::TYPE_STRING); // TODO deprecated, lives on `assessment` table now
-        $this->uses('description', self::TYPE_STRING); // TODO deprecated, lives on `assessment` table now
-        $this->uses('publish_date', self::TYPE_DATETIME); // TODO deprecated, lives on `assessment` table now
-        $this->uses('open_date', self::TYPE_DATETIME); // TODO deprecated, lives on `assessment` table now
-        $this->uses('date', self::TYPE_DATETIME, null, 'dueDate'); // TODO deprecated, lives on `assessment` table now
-        $this->uses('late_date', self::TYPE_DATETIME); // TODO deprecated, lives on `assessment` table now
         $this->uses('accept_submission', self::TYPE_BOOLEAN, null, 'acceptOnline');
         $this->uses('multi_submission', self::TYPE_BOOLEAN, null, 'acceptMultiple');
         $this->uses('enable_worksheet', self::TYPE_BOOLEAN, null, 'enableWorksheet');
@@ -83,7 +77,6 @@ class SubmissionBoxMapper extends BaseMapper
         $this->uses('enable_text', self::TYPE_BOOLEAN, null, 'enableText');
         $this->uses('enable_files', self::TYPE_BOOLEAN, null, 'enableFiles');
         $this->uses('enable_policy', self::TYPE_BOOLEAN, null, 'enablePolicy');
-        $this->uses('weight', self::TYPE_INTEGER); // TODO deprecated, lives on `assessment` table now
         $this->uses('max_mark', self::TYPE_DECIMAL);
         $this->uses('use_rubric', self::TYPE_BOOLEAN);
         $this->joins('rubric_capability_mark_type_id', SubmissionBox\MarkTypeMapper::class, 'mark_type_id', null, null, 'capabilityMarkType');
@@ -95,7 +88,6 @@ class SubmissionBoxMapper extends BaseMapper
         $this->uses('similarity_check_enabled', self::TYPE_BOOLEAN);
         $this->uses(self::COL_EXTERNAL_ID, self::TYPE_STRING);
 
-        $this->joins('category', Folder\Mapper::class); // TODO deprecated, retained for legacy compatibility only
         $this->joins('owner', Schoolbox\UserMapper::class);
         $this->joins('mark_type', SubmissionBox\MarkTypeMapper::class, 'mark_type_id');
         $this->joins('submission_grade_group_id', SubmissionBox\GradeLevel\Group\Mapper::class, 'id', null, null, 'gradeGroup', 'grade_group');
@@ -339,11 +331,9 @@ class SubmissionBoxMapper extends BaseMapper
         $query = "
 			SELECT
 				{$this->getColumnString('sb')},
-				{$marktype_mapper->getColumnString('mt')},
-				{$this->getJoinColumnString('category', 'cat')}
+				{$marktype_mapper->getColumnString('mt')}
 			FROM {$this->getTable()} sb
 			LEFT JOIN {$this->getJoinSql('mark_type', 'sb', 'mt')}
-			LEFT JOIN {$this->getJoinSql('category',  'sb', 'cat')}
 			WHERE sb.id=?
 		";
         $statement = $this->database->prepare($query);
@@ -355,7 +345,6 @@ class SubmissionBoxMapper extends BaseMapper
             if (!($submission_box instanceof SubmissionBox)) {
                 $submission_box = $this->hydrate($row, 'sb');
                 $submission_box->setMarkType($marktype_mapper->hydrate($row, 'mt'));
-                $submission_box->setCategory($this->hydrateJoin($row, 'category', 'cat'));
                 try {
                     $submission_box->setAssessmentModel($this->getJoinMapper('assessmentModel')->findById($row['sb.assessment_id'])); // I despise the necessity of this
                 } catch (Schoolbox\Mapper\Exception\Deleted $e) {
@@ -592,7 +581,7 @@ class SubmissionBoxMapper extends BaseMapper
 
         // Is the submission late (after overdue time)?
         $now = new \DateTime('now');
-        if ($box->getLateDate()->getUnixTimeStamp() < $now->getTimestamp()) {
+        if ($box->getAssessmentModel()->getCloseDate()->getUnixTimeStamp() < $now->getTimestamp()) {
             throw new Schoolbox\Resource\Exception(
                 'This submission box no longer accepts submissions.',
                 Schoolbox\Resource\Exception::CODE_SUBMISSION_CLOSED
@@ -601,19 +590,15 @@ class SubmissionBoxMapper extends BaseMapper
 
         // Is the student involved in this group?
         // (Need much better checking than this, this abuses session variables)
+        $folderIdsForUser = FolderMapper::getInstance()->findFolderIdsForUser($user, true);
 
-        /** @var Schoolbox\Resource\Folder\Mapper $catMap */
-        $catMap = $this->getJoinMapper('category');
-        $catMap->setExternalUser(new \External_User());
-        $categories = $catMap->findFolderIdsForUser($user, true);
-
-        if (!in_array($box->getCategory()->getId(), $categories)) {
+        if (!in_array($box->getAssessmentModel()->getContextFolder(), $folderIdsForUser)) {
             // 403 forbidden error
             throw new Schoolbox\Resource\Exception('Access denied', Schoolbox\Resource\Exception::CODE_ACCESS_DENIED);
         }
 
         // Is the submission early (before open time)?
-        if ($box->getOpenDate()->getUnixTimeStamp() > $now->getTimestamp()) {
+        if ($box->getAssessmentModel()->getOpenDate()->getUnixTimeStamp() > $now->getTimestamp()) {
             throw new Schoolbox\Resource\Exception(
                 'This submission box does not accept submissions yet.',
                 Schoolbox\Resource\Exception::CODE_SUBMISSION_NOT_YET_OPEN

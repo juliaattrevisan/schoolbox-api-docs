@@ -1323,8 +1323,6 @@ class MapperProxy
             $taskMapper->save($subObject);
             $taskMapper->saveFiles($subObject);
         } elseif ($subObject instanceof SubmissionBox) {
-            // Legacy DueWork SitePage Controllers require that we preserve this field
-            $subObject->setCategory($assessable->getBaseContext()->getFolder());
             $boxMapper = SubmissionBoxMapper::getInstance();
 
             /** @var DueWorkObject $dueWork */

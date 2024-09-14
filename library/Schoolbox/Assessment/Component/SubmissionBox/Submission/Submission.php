@@ -83,7 +83,7 @@ class Submission implements ISoftDeletable
     public function isLate()
     {
         $now = Alaress_Date_Format::now();
-        $dueDate = $this->submissionBox->getDueDate();
+        $dueDate = $this->submissionBox->getAssessmentModel()->getDueDate();
         $isSubmitted = ! $this->isDraft();
 
         // Submitted after due date ?
@@ -131,7 +131,7 @@ class Submission implements ISoftDeletable
 
             // Teaches the Class containing the Submission Box
             $teachers = $userAccessMapper->findUsersInCategory(
-                $this->getSubmissionBox()->getCategory(),
+                $this->getSubmissionBox()->getAssessmentModel()->getContextFolder(),
                 Role::STAFF,
                 UserAccess::ACCESS_WRITE,
                 true
@@ -145,7 +145,7 @@ class Submission implements ISoftDeletable
             // Folder permissions
             $accessLevel = Access::getInstance()->getFolderAccess(
                 $user,
-                $this->getSubmissionBox()->getCategory()->getId()
+                $this->getSubmissionBox()->getAssessmentModel()->getContextFolder()->getId(),
             );
             if ($accessLevel >= UserAccess::ACCESS_WRITE) {
                 return true;

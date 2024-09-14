@@ -71,16 +71,16 @@ class DueWork implements IAssessmentTypeTranslator
      * @param IAssessable|DueWorkObject         $domainObject
      * @param IAssessableDataModel|DueWorkModel $dataModel
      */
-    public function translateToDataModel(IAssessable $domainObject, IAssessableDataModel $dataModel): void
+    public function translateToDataModel(IAssessable|DueWorkObject $domainObject, IAssessableDataModel|DueWorkModel $dataModel): void
     {
         // For brevity, these setters are only called if the corresponding getter() returns non-null
-        null === $domainObject->getTitle()                  || $dataModel->setName($domainObject->getTitle());
-        null === $domainObject->getDescription()            || $dataModel->setDescription($domainObject->getDescription());
-        null === $domainObject->getPublishAt()              || $dataModel->setPublishDate($domainObject->getPublishAt());
-        null === $domainObject->getOpenAt()                 || $dataModel->setOpenDate($domainObject->getOpenAt());
-        null === $domainObject->getDueAt()                  || $dataModel->setDueDate($domainObject->getDueAt());
-        null === $domainObject->getCloseAt()                || $dataModel->setLateDate($domainObject->getCloseAt());
-        null === $domainObject->getWeight()                 || $dataModel->setWeight($domainObject->getWeight());
+        null === $domainObject->getTitle()                  || $dataModel->getAssessmentModel()->setTitle($domainObject->getTitle());
+        null === $domainObject->getDescription()            || $dataModel->getAssessmentModel()->setDescription($domainObject->getDescription());
+        null === $domainObject->getPublishAt()              || $dataModel->getAssessmentModel()->setPublishDate($domainObject->getPublishAt());
+        null === $domainObject->getOpenAt()                 || $dataModel->getAssessmentModel()->setOpenDate($domainObject->getOpenAt());
+        null === $domainObject->getDueAt()                  || $dataModel->getAssessmentModel()->setDueDate($domainObject->getDueAt());
+        null === $domainObject->getCloseAt()                || $dataModel->getAssessmentModel()->setCloseDate($domainObject->getCloseAt());
+        null === $domainObject->getWeight()                 || $dataModel->getAssessmentModel()->setWeight($domainObject->getWeight());
         null === $domainObject->getMarkVisibility()         || $dataModel->setMarkVisibility($domainObject->getMarkVisibility());
         null === $domainObject->getShowSubmittedOnly()      || $dataModel->setSkipUnsubmitted($domainObject->getShowSubmittedOnly());
         null === $domainObject->getCreator()                || $dataModel->setOwner($domainObject->getCreator());
