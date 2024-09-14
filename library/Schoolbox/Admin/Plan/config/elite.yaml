@@ -96,7 +96,6 @@ config:
   cyberhound_whitelist: { hide: false }
   clickview_school_id: {hide: false}
   kami_api_key: { hide: true }
-  rubicon_atlas_api_token: { hide: false }
   office365_tenant: { hide: false }
   office365_tenant_id: {hide: false}
   office365_immersive_reader_name: {hide: false}
