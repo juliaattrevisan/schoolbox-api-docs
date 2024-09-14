@@ -669,7 +669,7 @@ class Controller extends Base
 
             // Set password
 
-            if ($post['modpassword'] == '') {
+            if ($post['modpassword'] == '' || $post['modpassword'] == 'donotchange') {
                 $user->setRetrievablePassword(null)
                      ->setPassword(null);
             } else {
