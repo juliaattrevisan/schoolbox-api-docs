@@ -146,6 +146,7 @@ class GoalsAchievementsCest
         $i->amOnPage($studentProfilePage);
         $profilePage->clickTab('goals');
         $i->canSee($badgeNameGoal);
+
         $profilePage->clickBadgeOrDropdownOption($badgeNameGoal);
         $badges->clickSetGoalorAwardAchievement();
         $i->amGoingTo('Click the achievements tab, ensure the achievements are presented and withdraw them');

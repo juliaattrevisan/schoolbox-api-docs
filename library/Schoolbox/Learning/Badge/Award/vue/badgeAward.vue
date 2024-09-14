@@ -360,10 +360,11 @@ export default {
                     class="button"
                     :href="getEvidenceUrl()"
                     :class="[isSubmitButtonDisabled ? 'disabled' : '']"
+                    data-test="badge-award-evidence"
                 >
                     Award with Evidence
                 </a>
-                <button :disabled="isSubmitButtonDisabled" @click.prevent="onSubmit">
+                <button :disabled="isSubmitButtonDisabled" @click.prevent="onSubmit" data-test="badge-award-confirm">
                     <slot name="confirmButton">Award</slot>
                 </button>
             </section>
