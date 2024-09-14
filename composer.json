@@ -56,7 +56,6 @@
         "nesbot/carbon": "~2.0",
         "league/flysystem-ziparchive": "^3.3.0",
         "onelogin/php-saml": "^4.0.0",
-        "karriere/json-decoder": "^4.1.0",
         "crell/api-problem": "^3.0",
         "ext-redis": "*",
         "ext-readline": "*",
