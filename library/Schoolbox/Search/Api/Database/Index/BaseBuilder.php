@@ -213,11 +213,17 @@ abstract class BaseBuilder implements IBuilder
     abstract protected function accepts(object $subject): bool;
 
     /**
-     * Build the where part for the given subject.
+     * Augment `$baseQuery` and `$baseParams` to find results only for
+     * `$subject`.
+     *
+     * Presumes that `$this->accepts` has passed, but otherwise needs to craft
+     * a query which handles any type of subject the builder may find results
+     * for.
      *
      * @param object $subject
-     * @return array{string, array} 0: the additional WHERE part of the query
-     *                              1: any additional parameters
+     * @param string $baseQuery  The base query onto which to add conditions.
+     * @param array  $baseParams The base params onto which to add parameters.
+     * @return array{string, array} a tuple of the query and parameters
      */
-    abstract protected function buildWhere(object $subject): array;
+    abstract protected function augmentQueryParams(object $subject, string $baseQuery, array $baseParams): array;
 }
