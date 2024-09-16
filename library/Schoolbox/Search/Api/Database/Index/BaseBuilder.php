@@ -188,18 +188,6 @@ abstract class BaseBuilder implements IBuilder
     }
 
     /**
-     * Extract the item ID out of `$subject`, for use in `buildUpdates` and
-     * `buildDeletes` if updating indices for a single item.
-     *
-     * TODO expand this idea to build entire queries: e.g. for deleting all
-     *      blog records when a folder is deleted?
-     *
-     * @param object $subject The item to update indices for.
-     * @return int|string|null The item ID, or `null` if this builder doesn't work with this type of item.
-     */
-    abstract protected function extractItemId(object $subject): int|string|null;
-
-    /**
      * Does this builder rebuild search indices for this subject?
      *
      * This is not as clear-cut as just determining whether the subject is the

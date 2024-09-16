@@ -26,24 +26,6 @@ class IndexBuilder extends BaseBuilder
      *      return the folder ID?
      *
      * @param object $subject
-     * @return int|string|null
-     */
-    public function extractItemId(object $subject): int|string|null
-    {
-        if ($subject instanceof Model) {
-            return $subject->getId();
-        }
-        return null;
-    }
-
-    /**
-     * This builder works with folder objects.
-     *
-     * TODO It could also work on folder code, course specification, course
-     *      implementation, homepage config and user group objects, if they
-     *      return the folder ID?
-     *
-     * @param object $subject
      * @return bool
      */
     protected function accepts(object $subject): bool

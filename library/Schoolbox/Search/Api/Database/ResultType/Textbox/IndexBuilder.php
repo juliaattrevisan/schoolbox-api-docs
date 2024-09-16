@@ -31,23 +31,6 @@ class IndexBuilder extends BaseBuilder
      *      a textbox?
      *
      * @param object $subject
-     * @return int|string|null
-     */
-    public function extractItemId(object $subject): int|string|null
-    {
-        if ($subject instanceof Textbox\Model) {
-            return $subject->getId();
-        }
-        return null;
-    }
-
-    /**
-     * This builder works with textbox objects.
-     *
-     * TODO It could also work with component objects, if the component links to
-     *      a textbox?
-     *
-     * @param object $subject
      * @return bool
      */
     protected function accepts(object $subject): bool

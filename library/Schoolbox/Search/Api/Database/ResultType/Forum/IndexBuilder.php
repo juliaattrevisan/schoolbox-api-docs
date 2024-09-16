@@ -22,20 +22,6 @@ class IndexBuilder extends BaseBuilder
      * This builder works with forum post objects.
      *
      * @param object $subject
-     * @return int|string|null
-     */
-    public function extractItemId(object $subject): int|string|null
-    {
-        if ($subject instanceof Post) {
-            return $subject->getId();
-        }
-        return null;
-    }
-
-    /**
-     * This builder works with forum post objects.
-     *
-     * @param object $subject
      * @return bool
      */
     protected function accepts(object $subject): bool
