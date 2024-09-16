@@ -11,14 +11,14 @@ import Star from "../../../../library/Schoolbox/Learning/Badge/Award/js/animatio
 gsap.registerPlugin(Physics2DPlugin); // register the physics2D plugin, otherwise the physics2D property won't be recognised
 
 let timeline: GSAPTimeline; // to be able to kill the timeline on destroy
+let canvas: HTMLCanvasElement; // to be able to display the animation and destroy it on completion
 
 /**
  * Set up an array of Stars
  * Put them all in the middle of the canvas, so they can 'explode' out from the centre
- * @param canvas - the canvas element to draw the stars on
  * @returns - the stars to animate
  */
-function getStars(canvas: HTMLCanvasElement): Star[] {
+function getStars(): Star[] {
     const stars = [];
     const canvasDimensions = getCanvasDimensions(canvas);
     let star; // reuse reference in loop
@@ -74,20 +74,19 @@ function addStarAnimation(star: Star): void {
 
 /**
  * Set up both the badge and the stars animations
- * @param canvas - the canvas element to draw the stars on
  */
-function destroy(canvas: HTMLCanvasElement): void {
+function destroy(): void {
     timeline.kill();
     const context = getContext(canvas) as CanvasRenderingContext2D;
     context.clearRect(0, 0, canvas.width, canvas.height);
+    canvas.remove();
 }
 
 /**
  * Get all the stars, add an animation to the gsap.timeline for each and ensure the Canvas is redrawn on each update.
- * @param canvas - the canvas element to draw the stars on
  */
-function animateStars(canvas: HTMLCanvasElement): void {
-    const stars = getStars(canvas);
+function animateStars(): void {
+    const stars = getStars();
     const context = getContext(canvas);
     if (!context) {
         return;
@@ -97,7 +96,7 @@ function animateStars(canvas: HTMLCanvasElement): void {
         // https://greensock.com/docs/v3/GSAP/gsap.timeline()
         repeat: 0,
         onUpdate: () => redrawStars(stars, context, canvasDimensions), // to draw the new position of the stars each tick
-        onComplete: () => destroy(canvas),
+        onComplete: () => destroy(),
     });
     stars.forEach((star) => addStarAnimation(star));
 }
@@ -108,7 +107,7 @@ function animateStars(canvas: HTMLCanvasElement): void {
  */
 export function play(domRect: DOMRect): void {
     // create a canvas element to draw the stars on, using the position of the domRect
-    const canvas = document.createElement("canvas");
+    canvas = document.createElement("canvas");
     canvas.width = domRect.width;
     canvas.height = domRect.height;
     canvas.style.position = "absolute";
@@ -116,7 +115,7 @@ export function play(domRect: DOMRect): void {
     canvas.style.top = `${domRect.top}px`;
     canvas.style.zIndex = "var(--sbx-depth-pop-over)";
     document.body.appendChild(canvas);
-    animateStars(canvas);
+    animateStars();
     // origin: {
     //         x: (boundRect.left + boundRect.width / 2) / window.innerWidth,
     //         y: (boundRect.top + boundRect.height / 2) / window.innerHeight,
