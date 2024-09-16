@@ -4174,7 +4174,10 @@ abstract class Mapper implements IMapper
 
     /**
      * Hook upon saving, deleting or restoring a model: persist resultant
-     * changes to the search index.
+     * changes to the search index, after any transactions have been committed.
+     * This should only happen after transaction commit, because the search
+     * index build may rely on sub-objects which don't exist at the time the
+     * callback is triggered.
      *
      * This should be used as a post-change (save/delete/soft-delete/restore)
      * callback for any mapper whose changes modify the search index.
@@ -4184,9 +4187,13 @@ abstract class Mapper implements IMapper
      */
     public function persistSearchIndex(object $model): void
     {
+        // For now: manually trigger the search index rebuild in the proxy.
+        // Can't do it in the base mapper's post-save, because at the trigger
+        // point the sub-objects (due work, quiz, etc.) don't yet exist.
+
         /** @var Persistor $persistor */
         $persistor = self::getDi()->get('search.indexPersistor');
-        $persistor->persist($model);
+        $this->getDatabase()->onPersist(fn () => $persistor->persist($model));
     }
 
 
