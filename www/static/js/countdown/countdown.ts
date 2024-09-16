@@ -1,6 +1,5 @@
 // Countdown timer used on homepages
 
-// import confetti from "canvas-confetti";
 import CountdownTimer from "./CountdownTimer";
 import { play } from "./countdownAnimation";
 
