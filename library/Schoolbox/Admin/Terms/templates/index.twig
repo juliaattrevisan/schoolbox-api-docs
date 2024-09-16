@@ -104,6 +104,8 @@
                                     term.find('[data-term-dropdown]').replaceWith(newDom.find('[data-term-dropdown]'));
                                     break;
                             }
+                            // Reload the page so the jellytot is updated
+                            window.location.reload();
                         })
                         .fail(function() {
                             // ¯\_(ツ)_/¯
