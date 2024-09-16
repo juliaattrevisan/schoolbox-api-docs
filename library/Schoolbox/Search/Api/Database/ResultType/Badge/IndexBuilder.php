@@ -33,6 +33,28 @@ class IndexBuilder extends BaseBuilder
     }
 
     /**
+     * This builder works with badge objects.
+     *
+     * @param object $subject
+     * @return bool
+     */
+    protected function accepts(object $subject): bool
+    {
+        return $subject instanceof Model;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    protected function augmentQueryParams(object $subject, string $baseQuery, array $baseParams): array
+    {
+        return [
+            $baseQuery . ' AND b.id = :id',
+            [$baseParams + ['id' => $subject->getId()]],
+        ];
+    }
+
+    /**
      * @inheritdoc
      */
     public function buildUpdates(?Alaress_Date_Format $fromDate, ?Alaress_Date_Format $toDate, ?object $subject): iterable

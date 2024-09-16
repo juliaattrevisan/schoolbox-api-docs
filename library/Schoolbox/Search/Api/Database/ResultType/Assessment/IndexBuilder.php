@@ -220,12 +220,10 @@ class IndexBuilder extends BaseBuilder
             $params['toDate'] = $toDate->getDatabase();
         }
         if ($subject) {
-            $itemId = $this->extractItemId($subject);
-            if (!isset($itemId)) {
+            if (!$this->accepts($subject)) {
                 return;
             }
-            $queryString .= ' AND assessment.id = :id';
-            $params['id'] = $itemId;
+            [$queryString, $params] = $this->augmentQueryParams($subject, $queryString, $params);
         }
         $query = $this->connector->prepareQuery($queryString);
         $query->execute($params);
