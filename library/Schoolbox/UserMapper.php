@@ -186,7 +186,7 @@ class UserMapper extends Mapper
 
         $this->registerCallback(self::CALLBACK_POSTRESTORE, [$this, 'addUsernameToCache']);
 
-        // Persist search index changes on changing of a user
+        // Persist search index changes on changing of a user.
         $this->registerCallback(self::CALLBACK_POSTSAVE, $this->persistSearchIndex(...));
         $this->registerCallback(self::CALLBACK_POSTDELETE, $this->persistSearchIndex(...));
         $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, $this->persistSearchIndex(...));
@@ -284,21 +284,6 @@ class UserMapper extends Mapper
                 $model->getRetrievablePassword()
             );
         }
-    }
-
-
-    /**
-     * Hook upon saving, deleting or restoring a user: persist resultant changes
-     * to the search index.
-     *
-     * @param User $model
-     * @return void
-     */
-    public function persistSearchIndex(User $model): void
-    {
-        /** @var Schoolbox\Search\Api\Database\Index\Persistor $persistor */
-        $persistor = self::getDi()->get('search.indexPersistor');
-        $persistor->persist($model);
     }
 
 

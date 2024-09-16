@@ -44,6 +44,7 @@ use Schoolbox\Realtime\Schedule\Event\Splitter;
 use Schoolbox\Realtime\Schedule\Trigger\IPropagator;
 use Schoolbox\Realtime\Schedule\Trigger\Propagator;
 use Schoolbox\Realtime\Schedule\Trigger\Test\MockPropagator;
+use Schoolbox\Search\Api\Database\Index\Persistor;
 use Traversable;
 use TypeError;
 use UnderflowException;
@@ -4614,5 +4615,22 @@ abstract class Mapper implements IMapper
     {
         $this->selectCache->clear();
         $this->hydrateCache->clear();
+    }
+
+    /**
+     * Hook upon saving, deleting or restoring a model: persist resultant
+     * changes to the search index.
+     *
+     * This should be used as a post-change (save/delete/soft-delete/restore)
+     * callback for any mapper whose changes modify the search index.
+     *
+     * @param object $model
+     * @return void
+     */
+    public function persistSearchIndex(object $model): void
+    {
+        /** @var Persistor $persistor */
+        $persistor = self::getDi()->get('search.indexPersistor');
+        $persistor->persist($model);
     }
 }
