@@ -119,6 +119,8 @@ class Module extends BaseModule
             $this->getMapperFactory()->get(CampusMapper::class),
             $this->getMapperFactory()->get(UserMapper::class),
             $this->getMapperFactory()->get(Attendance\Mapper::class),
+            $this->getMapperFactory()->get(Access::class), // Not a mapper, but has getInstance, so does work.
+            new Validator(new \Alaress_Date_Locale_Config())
         );
     }
 

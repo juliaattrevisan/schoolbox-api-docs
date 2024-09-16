@@ -97,6 +97,18 @@ class Controller extends Base
 
 
     /**
+     * @var FolderAccess
+     */
+    private FolderAccess $folderAccess;
+
+
+    /**
+     * @var Validator
+     */
+    private Validator $validator;
+
+
+    /**
      * Controller constructor.
      *
      * @param Error\Mapper      $errorMapper
@@ -107,6 +119,8 @@ class Controller extends Base
      * @param CampusMapper      $campusMapper
      * @param UserMapper        $userMapper
      * @param Attendance\Mapper $attendanceMapper
+     * @param FolderAccess      $folderAccess
+     * @param Validator         $validator
      */
     public function __construct(
         Error\Mapper $errorMapper,
@@ -116,7 +130,9 @@ class Controller extends Base
         EventTypeMapper $eventTypeMapper,
         CampusMapper $campusMapper,
         UserMapper $userMapper,
-        Attendance\Mapper $attendanceMapper
+        Attendance\Mapper $attendanceMapper,
+        FolderAccess $folderAccess,
+        Validator $validator,
     ) {
         $this->errorMapper = $errorMapper;
         $this->roleMapper = $roleMapper;
@@ -126,6 +142,8 @@ class Controller extends Base
         $this->campusMapper = $campusMapper;
         $this->userMapper = $userMapper;
         $this->attendanceMapper = $attendanceMapper;
+        $this->folderAccess = $folderAccess;
+        $this->validator = $validator;
     }
 
 
@@ -539,10 +557,27 @@ class Controller extends Base
      */
     public function postCreate(): void
     {
-        $userId = (int)($this->requestPost['user']['id'] ?? $this->requestPost['userId']);
+        // This will throw a SchoolboxException with a helpful message if the request is invalid.
+        $this->validator->validateForPostCreate($this->requestPost);
+
+        $userId = (int)($this->requestPost['user']['id'] ?? $this->requestPost['userId'] ?? $this->user->getId());
+        $authorId = (
+            (
+                array_key_exists('author', (array)$this->requestPost) &&
+                array_key_exists('id', (array)$this->requestPost['author'])
+            )
+            ? (int)$this->requestPost['author']['id']
+            : (
+                // Key 'authorId' is posted by the create/modify event form.
+                (array_key_exists('authorId', (array)$this->requestPost))
+                ? (int)$this->requestPost['authorId']
+                : $userId
+            )
+        );
 
         $event = new Event();
         $event->setOwner($this->userMapper->createModel()->setId($userId));
+        $event->setAuthor($this->userMapper->createModel()->setId($authorId));
 
         $this->postModify($event);
     }
@@ -563,6 +598,12 @@ class Controller extends Base
      */
     public function postModify(Event $event): void
     {
+        // This will throw a SchoolboxException with a helpful message if the request is invalid,
+        // and return a possibly modified request with compatible strings converted to ints or bools for example.
+        // The $validRequestPost does not contain all possible fields, but all fields contained in the validRequestPost
+        // require no further validation.
+        $validRequestPost = $this->validator->validateForPostModify($event, $this->requestPost);
+
         /* Check owner still exists
          * If not - pass ownership to the author
          */
@@ -607,10 +648,8 @@ class Controller extends Base
 
         /* Check whether you have permissions to mutate $event into the vars provided
          */
-        $folderAccess = FolderAccess::getInstance();
-
         try {
-            if (!(new Event\Access($folderAccess))->checkDestination($this->getUser(), $accessLevel, $author, $owner, $folders, $campuses)) {
+            if (!(new Event\Access($this->folderAccess))->checkDestination($this->getUser(), $accessLevel, $author, $owner, $folders, $campuses)) {
                 throw $this->errorMapper->generateException(Error\Mapper::ERROR_PERM_EVENT_MODIFY);
             }
         } catch (InvalidArgumentException $e) {
