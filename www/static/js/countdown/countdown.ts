@@ -48,7 +48,8 @@ countdownElements.forEach((element) => {
             return; // Prevent multiple confetti explosions
         }
 
-        targetElement.innerHTML = '<li class="count">Countdown has been reached!</li>';
+        targetElement.innerHTML =
+            '<li class="count count--finished l-flex l-flex--center">Countdown has been reached!</li>';
         targetElementParent.classList.add("disabled");
 
         if (targetElement.getAttribute("data-finish-animation") === "1") {

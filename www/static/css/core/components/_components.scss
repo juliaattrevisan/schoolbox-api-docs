@@ -414,6 +414,9 @@ ul.tileList {
     .count {
         font-size: $h2-font-size;
     }
+    .count--finished {
+        min-height: 10rem;
+    }
     .labels {
         font-size: $paragraph-font-size;
         text-transform: uppercase;
