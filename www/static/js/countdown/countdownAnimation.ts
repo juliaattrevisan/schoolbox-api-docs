@@ -110,7 +110,7 @@ function createCanvas(domRect: DOMRect): void {
     canvas.height = domRect.height;
     canvas.style.position = "absolute";
     canvas.style.left = `${domRect.left}px`;
-    canvas.style.top = `${domRect.top}px`;
+    canvas.style.top = `${domRect.top + window.scrollY}px`;
     canvas.style.zIndex = "var(--sbx-depth-pop-over)";
     document.body.appendChild(canvas);
 }
