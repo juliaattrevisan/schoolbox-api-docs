@@ -1424,7 +1424,9 @@ class MapperProxy
         // For now: manually trigger the search index rebuild in the proxy.
         // Can't do it in the base mapper's post-save, because at the trigger
         // point the sub-objects (due work, quiz, etc.) don't yet exist.
-        $this->baseMapper->persistSearchIndex($dataModel);
+        $this->baseMapper->getDatabase()->onPersist(
+            fn () => $this->baseMapper->persistSearchIndex($dataModel)
+        );
     }
 
     /**
