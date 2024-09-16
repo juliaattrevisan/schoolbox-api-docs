@@ -61,8 +61,7 @@ countdownElements.forEach((element) => {
                     entries.forEach((entry) => {
                         if (entry.isIntersecting && !hasTriggered) {
                             hasTriggered = true;
-                            const boundRect = targetElement.getBoundingClientRect();
-                            play(boundRect);
+                            play(targetElement);
                         }
                     });
                 },

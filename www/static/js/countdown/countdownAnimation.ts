@@ -90,24 +90,23 @@ function animateStars(): void {
 
 /**
  * Create a canvas element to draw the stars on, using the position of the domRect
- * @param domRect - The bounding client rectangle of the target element
+ * @param targetElement - the element to play the animation on
  */
-function createCanvas(domRect: DOMRect): void {
+function createCanvas(targetElement: Element): void {
+    const domRect = targetElement.getBoundingClientRect();
     canvas = document.createElement("canvas");
     canvas.width = domRect.width;
     canvas.height = domRect.height;
     canvas.style.position = "absolute";
-    canvas.style.left = `${domRect.left}px`;
-    canvas.style.top = `${domRect.top + window.scrollY}px`;
     canvas.style.zIndex = "var(--sbx-depth-pop-over)";
-    document.body.appendChild(canvas);
+    targetElement.appendChild(canvas);
 }
 
 /**
  * Play the finishing animation of the countdown
- * @param  domRect - The bounding client rectangle of the target element
+ * @param targetElement - the element to play the animation on
  */
-export function play(domRect: DOMRect): void {
-    createCanvas(domRect);
+export function play(targetElement: Element): void {
+    createCanvas(targetElement);
     animateStars();
 }
