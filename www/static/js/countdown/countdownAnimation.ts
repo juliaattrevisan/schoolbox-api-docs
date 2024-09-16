@@ -54,7 +54,6 @@ function addStarAnimation(star: Star): void {
     timeline.to(
         star,
         {
-            delay: "random(0, 0.25)",
             duration: 3,
             radius: "random(0, 0.3)",
             rotation: "random(0, 360)",
