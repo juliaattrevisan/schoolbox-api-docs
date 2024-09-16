@@ -50,7 +50,7 @@ class CalendarEventCreateModifyMoveDeleteCest
         $eventTitle = "St Swivven's Day";
         $apiPathForCreate = '/calendar/event/create';
         $minimalRequiredParams = [
-            'allDay' => true, // TODO: Make this required.  If it is not required then we have to infer it from whether startDate and endDate specify times.  This is not straightforward because dates may be entered in a few different formats.
+            'allDay' => true,
             'endDate' => '24/09/2024',
             'level' => 1,
             'publishDate' => '25/09/2024 7:00pm', // Current configured timezone is assumed.
