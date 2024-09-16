@@ -121,6 +121,7 @@ class Mapper extends \Schoolbox\Mapper
         );
 
         $this->registerCallback(self::CALLBACK_PRESAVE, [$this, 'applyStickyStatus']);
+        $this->registerPersistSearchIndexCallbacks();
     }
 
 

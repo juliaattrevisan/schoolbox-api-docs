@@ -67,6 +67,7 @@ class Mapper extends BaseMapper implements FeedableMapperInterface, IHomepageCle
 
         $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, [$this, 'softDeleteComments']);
         $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, [$this, 'softDeleteImages']);
+        $this->registerPersistSearchIndexCallbacks();
     }
 
     /**

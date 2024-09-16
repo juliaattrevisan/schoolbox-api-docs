@@ -68,6 +68,7 @@ class Mapper extends BaseMapper
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
 
         $this->registerCallback('preSave', [$this, 'preSave']);
+        $this->registerPersistSearchIndexCallbacks();
     }
 
 

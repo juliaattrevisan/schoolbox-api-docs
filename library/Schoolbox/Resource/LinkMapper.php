@@ -124,6 +124,7 @@ class LinkMapper extends Mapper implements ILocator
         ]);
 
         $this->hasSoftDeleteDateField('deleted_at');
+        $this->registerPersistSearchIndexCallbacks();
     }
 
 

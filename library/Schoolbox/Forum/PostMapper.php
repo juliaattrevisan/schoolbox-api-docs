@@ -106,6 +106,8 @@ class PostMapper extends Mapper implements FeedableMapperInterface
             'this_key'  => 'threadID',
             'other_key' => 'threadID',
         ));
+
+        $this->registerPersistSearchIndexCallbacks();
     }
 
 
