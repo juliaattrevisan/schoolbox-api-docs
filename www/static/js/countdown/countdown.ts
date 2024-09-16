@@ -52,7 +52,10 @@ countdownElements.forEach((element) => {
             '<li class="count count--finished l-flex l-flex--center">Countdown has been reached!</li>';
         targetElementParent.classList.add("disabled");
 
-        if (targetElement.getAttribute("data-finish-animation") === "1") {
+        // don't play the animation if the user has reduced motion enabled
+        const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches ?? false;
+
+        if (targetElement.getAttribute("data-finish-animation") === "1" && !reduceMotion) {
             let hasTriggered = false;
             const observer = new IntersectionObserver(
                 (entries) => {
