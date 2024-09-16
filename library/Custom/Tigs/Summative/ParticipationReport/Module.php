@@ -25,6 +25,7 @@ use InvalidArgumentException;
 use UnexpectedValueException;
 use Schoolbox\Mapper;
 use Schoolbox\User;
+
 //use Schoolbox\Pastoral\Mapper as PastoralMapper;
 //use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 //use Schoolbox\Resource\Textbox;
@@ -58,19 +59,19 @@ class Module extends Alaress\Module\Module
     public function buildController(): Base
     {
         return new Controller(
-//            $this->injector->get('databaseInternal'),
+            //            $this->injector->get('databaseInternal'),
             $this->injector->get('externalUser'),
-//            $this->injector->get('externalClass'),
-//            $this->getMapperFactory()->get(CourseImpl\Mapper::class),
+            //            $this->injector->get('externalClass'),
+            //            $this->getMapperFactory()->get(CourseImpl\Mapper::class),
             $this->getMapperFactory()->get(UserMapper::class),
-//            $this->getMapperFactory()->get(PastoralMapper::class),
-//            $this->getMapperFactory()->get(FolderMapper::class),
-//            $this->getMapperFactory()->get(Textbox\Mapper::class),
-//            $this->getMapperFactory()->get(Access::class),
+            //            $this->getMapperFactory()->get(PastoralMapper::class),
+            //            $this->getMapperFactory()->get(FolderMapper::class),
+            //            $this->getMapperFactory()->get(Textbox\Mapper::class),
+            //            $this->getMapperFactory()->get(Access::class),
             $this->injector->get('databaseExternal'),
-//            $this->getMapperFactory()->get(Assessment\Mapper::class),
-//            $this->injector->get('assessmentDataSource'),
-//            $this->getMapperFactory()->get(RubricDataModel\DataSource::class)
+            //            $this->getMapperFactory()->get(Assessment\Mapper::class),
+            //            $this->injector->get('assessmentDataSource'),
+            //            $this->getMapperFactory()->get(RubricDataModel\DataSource::class)
         );
     }
 
