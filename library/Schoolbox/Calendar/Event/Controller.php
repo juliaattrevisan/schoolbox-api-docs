@@ -613,34 +613,46 @@ class Controller extends Base
             $owner = $this->getUser();
         }
 
-        $authorId = (int)($this->requestPost['author']['id'] ?? $this->requestPost['authorId'] ?? null);
+        $authorId = (int)($validRequestPost['author']['id'] ?? $validRequestPost['authorId'] ?? $event->getAuthor()->getId());
 
         /* Check if author still exists
          * If not - pass author to the author
          */
         try {
             $author = $this->userMapper->findById($authorId);
-        } catch (Exception $e) {
+        } catch (Exception) {
             $author = $this->getUser();
         }
 
         /* Enforce ints for primary identifiers (yes that's a thing)
          */
-        $accessLevel = (int)($this->requestPost['level'] ?? null);
-        $eventTypeId = (int)($this->requestPost['type']['id'] ?? $this->requestPost['type'] ?? null);
-        $title       = $this->requestPost['title'] ?? null;
-        $location    = $this->requestPost['location'] ?? null;
-        $detail      = $this->requestPost['detail'] ?? null;
-        $allDay      = (int)($this->requestPost['allDay'] ?? null);
+        $accessLevel = (int)($validRequestPost['level'] ?? $event->getAccess());
+        $eventTypeId = (int)($validRequestPost['type']['id'] ?? $validRequestPost['type'] ?? $event->getType()->getId());
+        $title       = $validRequestPost['title'] ?? $event->getTitle();
+        $location    = $validRequestPost['location'] ?? $event->getLocation();
+        $detail      = $validRequestPost['detail'] ?? $event->getDetail();
+        $allDay      = (int)($validRequestPost['allDay'] ?? $event->getAllDay());
 
-        $folders  = $this->getIdsFromDigitStringsOrKeyedArrays($this->requestPost['folders'] ?? []);
-        $campuses = $this->getIdsFromDigitStringsOrKeyedArrays($this->requestPost['campuses'] ?? []);
-        $roles    = $this->getIdsFromDigitStringsOrKeyedArrays($this->requestPost['roles'] ?? []);
+        $folders  = (
+            array_key_exists('folders', (array)$validRequestPost)
+            ? $this->getIdsFromDigitStringsOrKeyedArrays($validRequestPost['folders'])
+            : $this->translateFolderModelsToArrays($event->getFolderCollection())
+        );
+        $campuses = (
+            array_key_exists('campuses', (array)$validRequestPost)
+            ? $this->getIdsFromDigitStringsOrKeyedArrays($validRequestPost['campuses'])
+            : $this->translateCampusModelsToArrays($event->getCampusCollection())
+        );
+        $roles = (
+            array_key_exists('roles', (array)$validRequestPost)
+            ? $this->getIdsFromDigitStringsOrKeyedArrays($validRequestPost['roles'])
+            : $this->translateRoleModelsToArrays($event->getRoleCollection())
+        );
 
         /* Recurrence settings
          */
-        $efficacy = $this->requestPost['efficacy'] ?? null;
-        $repeat   = $this->requestPost['repeat'] ?? null;
+        $efficacy = $validRequestPost['efficacy'] ?? EventRecurrenceMapper::EFFICACY_SELF;
+        $repeat   = $validRequestPost['repeat'] ?? '';
 
         /* Redirects
          */
@@ -662,9 +674,9 @@ class Controller extends Base
 
         $publishDate = null;
 
-        if ('' !== ($this->requestPost['publishDate'] ?? '')) {
+        if ('' !== ($validRequestPost['publishDate'] ?? $event->getPublishDate())) { // TODO: Make this return a date string somehow.
             $publishDate = new Alaress_Date_Format(
-                $this->requestPost['publishDate'],
+                $validRequestPost['publishDate'],
                 [
                     $locale->localFormat(),
                     // API docs state we accept RFC3339 without qualification, so we must accept both variants.
@@ -681,8 +693,8 @@ class Controller extends Base
             DateTimeInterface::RFC3339,
             DateTimeInterface::RFC3339_EXTENDED
         ];
-        $startDate = new Alaress_Date_Format($this->requestPost['startDate'], $acceptedDateFormats);
-        $endDate = new Alaress_Date_Format($this->requestPost['endDate'], $acceptedDateFormats);
+        $startDate = new Alaress_Date_Format($validRequestPost['startDate'], $acceptedDateFormats);
+        $endDate = new Alaress_Date_Format($validRequestPost['endDate'], $acceptedDateFormats);
 
         /* Start and end dates
          */
@@ -703,7 +715,7 @@ class Controller extends Base
             // Unlike the other dates, until date is currently always a date and
             // not a date+time.
             $untilDate = (new Alaress_Date_Format(
-                $this->requestPost['repeat_until'],
+                $validRequestPost['repeat_until'] ?? $event->getEndDateTime(),
                 [$locale->localShortFormat(), Alaress_Date_Format::DATABASE_DATE_FORMAT],
             ))->endOfDay();
         } catch (InvalidArgumentException) {
@@ -725,11 +737,11 @@ class Controller extends Base
 
         /* Attendance settings
          */
-        $attendance    = (int)($this->requestPost['attendance'] ?? '');
-        $maxAttendees  = '' === ($this->requestPost['maxAttendees'] ?? '')
+        $attendance    = (int)($validRequestPost['attendance'] ?? $event->getAttendance());
+        $maxAttendees  = ('' == ($validRequestPost['maxAttendees'] ?? $event->getMaxAttendees())) // Deliberate double-equals.
             ? null
-            : (int)$this->requestPost['maxAttendees'];
-        $showAttendees = (bool)($this->requestPost['showAttendees'] ?? '');
+            : (int)$validRequestPost['maxAttendees'];
+        $showAttendees = (bool)($validRequestPost['showAttendees'] ?? $event->getShowAttendees());
 
         // As of SA-10697 attendances are not reset on changing event time.
         // Prior to that, they were reset if the start or end time of the event changed.
@@ -740,17 +752,18 @@ class Controller extends Base
         $guests = [];
 
         if ((new Event\Attendance\ValidCanInvite())->isSatisfiedBy($this->getUser(), $this->getConfigLoader()->get('calendar_student_can_invite'))) {
-            if (is_array($this->requestPost['guests'])) {
+            $eventGuests = ($event->getGuests() === null) ? [] : $this->translateUserModelsToArrays($event->getGuests());
+            if (is_array($validRequestPost['guests'] ?? $eventGuests)) {
                 // Guests can be supplied as an array of userIds, or an array of JSON objects.
                 // The array of userIds method is for similarity with 'roles', 'campus', and 'folder'.
                 // The object stub method is documented at api.schoolbox.com.au.
-                $guests = $this->getIdsFromDigitStringsOrKeyedArrays($this->requestPost['guests'] ?? []);
-            } elseif ('' !== (string)($this->requestPost['guests'] ?? '')) {
+                $guests = $this->getIdsFromDigitStringsOrKeyedArrays($validRequestPost['guests'] ?? $eventGuests);
+            } elseif ('' !== (string)($validRequestPost['guests'] ?? $eventGuests)) {
                 // Guests can also be supplied as a comma-separated string of userIds.
                 // This method is used by the form at route calendarEvent.getModify.
                 $guests = array_map(
                     fn($guestId) => (int)$guestId,
-                    explode(',', $this->requestPost['guests'])
+                    explode(',', $validRequestPost['guests'] ?? $eventGuests)
                 );
             }
         }
