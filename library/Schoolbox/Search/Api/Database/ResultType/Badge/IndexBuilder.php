@@ -79,12 +79,10 @@ class IndexBuilder extends BaseBuilder
             $params['toDate'] = $toDate->getDatabase();
         }
         if ($subject) {
-            $itemId = $this->extractItemId($subject);
-            if (!isset($itemId)) {
+            if (!$this->accepts($subject)) {
                 return;
             }
-            $queryString .= ' AND b.id = :id';
-            $params['id'] = $itemId;
+            [$queryString, $params] = $this->augmentQueryParams($subject, $queryString, $params);
         }
         $query = $this->connector->prepareQuery($queryString);
         $this->logger->info('Finding badges...');
@@ -110,23 +108,21 @@ class IndexBuilder extends BaseBuilder
      */
     public function buildDeletes(?Alaress_Date_Format $fromDate, ?Alaress_Date_Format $toDate, ?object $subject): iterable
     {
-        $queryString = "SELECT id FROM badge WHERE deleted_at IS NOT NULL";
+        $queryString = "SELECT b.id FROM badge b WHERE deleted_at IS NOT NULL";
         $params      = [];
         if ($fromDate) {
-            $queryString        .= ' AND deleted_at >= :fromDate';
+            $queryString        .= ' AND b.deleted_at >= :fromDate';
             $params['fromDate'] = $fromDate->getDatabase();
         }
         if ($toDate) {
-            $queryString      .= ' AND deleted_at <= :toDate';
+            $queryString      .= ' AND b.deleted_at <= :toDate';
             $params['toDate'] = $toDate->getDatabase();
         }
         if ($subject) {
-            $itemId = $this->extractItemId($subject);
-            if (!isset($itemId)) {
+            if (!$this->accepts($subject)) {
                 return;
             }
-            $queryString .= ' AND b.id = :id';
-            $params['id'] = $itemId;
+            [$queryString, $params] = $this->augmentQueryParams($subject, $queryString, $params);
         }
         $query = $this->connector->prepareQuery($queryString);
         $query->execute($params);

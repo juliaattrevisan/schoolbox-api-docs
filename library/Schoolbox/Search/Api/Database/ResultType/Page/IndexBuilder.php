@@ -37,6 +37,32 @@ class IndexBuilder extends BaseBuilder
     }
 
     /**
+     * This builder works with folder objects.
+     *
+     * TODO It could also work on folder code, course specification, course
+     *      implementation, homepage config and user group objects, if they
+     *      return the folder ID?
+     *
+     * @param object $subject
+     * @return bool
+     */
+    protected function accepts(object $subject): bool
+    {
+        return $subject instanceof Model;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    protected function augmentQueryParams(object $subject, string $baseQuery, array $baseParams): array
+    {
+        return [
+            $baseQuery . ' AND f.id = :id',
+            [$baseParams + ['id' => $subject->getId()]],
+        ];
+    }
+
+    /**
      * @inheritdoc
      */
     public function buildUpdates(?Alaress_Date_Format $fromDate, ?Alaress_Date_Format $toDate, ?object $subject): iterable
@@ -64,12 +90,10 @@ class IndexBuilder extends BaseBuilder
             $params['toDate'] = $toDate->getDatabase();
         }
         if ($subject) {
-            $itemId = $this->extractItemId($subject);
-            if (!isset($itemId)) {
+            if (!$this->accepts($subject)) {
                 return;
             }
-            $queryString .= ' AND f.id = :id';
-            $params['id'] = $itemId;
+            [$queryString, $params] = $this->augmentQueryParams($subject, $queryString, $params);
         }
         $query = $this->connector->prepareQuery($queryString);
         $this->logger->info('Finding pages/folders...');
@@ -113,12 +137,10 @@ class IndexBuilder extends BaseBuilder
             $params['toDate'] = $toDate->getDatabase();
         }
         if ($subject) {
-            $itemId = $this->extractItemId($subject);
-            if (!isset($itemId)) {
+            if (!$this->accepts($subject)) {
                 return;
             }
-            $queryString .= ' AND f.id = :id';
-            $params['id'] = $itemId;
+            [$queryString, $params] = $this->augmentQueryParams($subject, $queryString, $params);
         }
         $query = $this->connector->prepareQuery($queryString);
         $query->execute($params);

@@ -33,6 +33,28 @@ class IndexBuilder extends BaseBuilder
     }
 
     /**
+     * This builder works with blog objects.
+     *
+     * @param object $subject
+     * @return bool
+     */
+    protected function accepts(object $subject): bool
+    {
+        return $subject instanceof Model;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    protected function augmentQueryParams(object $subject, string $baseQuery, array $baseParams): array
+    {
+        return [
+            $baseQuery . ' AND b.id = :id',
+            [$baseParams + ['id' => $subject->getId()]],
+        ];
+    }
+
+    /**
      * @inheritdoc
      */
     public function buildUpdates(?Alaress_Date_Format $fromDate, ?Alaress_Date_Format $toDate, ?object $subject): iterable
@@ -60,12 +82,10 @@ class IndexBuilder extends BaseBuilder
             $params['toDate'] = $toDate->getDatabase();
         }
         if ($subject) {
-            $itemId = $this->extractItemId($subject);
-            if (!isset($itemId)) {
+            if (!$this->accepts($subject)) {
                 return;
             }
-            $queryString .= ' AND b.id = :id';
-            $params['id'] = $itemId;
+            [$queryString, $params] = $this->augmentQueryParams($subject, $queryString, $params);
         }
         $query = $this->connector->prepareQuery($queryString);
         $this->logger->info('Finding blog posts...');
@@ -107,12 +127,10 @@ class IndexBuilder extends BaseBuilder
             $params['toDate'] = $toDate->getDatabase();
         }
         if ($subject) {
-            $itemId = $this->extractItemId($subject);
-            if (!isset($itemId)) {
+            if (!$this->accepts($subject)) {
                 return;
             }
-            $queryString .= ' AND b.id = :id';
-            $params['id'] = $itemId;
+            [$queryString, $params] = $this->augmentQueryParams($subject, $queryString, $params);
         }
         $query = $this->connector->prepareQuery($queryString);
         $query->execute($params);
