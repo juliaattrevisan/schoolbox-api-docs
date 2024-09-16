@@ -198,4 +198,26 @@ abstract class BaseBuilder implements IBuilder
      * @return int|string|null The item ID, or `null` if this builder doesn't work with this type of item.
      */
     abstract protected function extractItemId(object $subject): int|string|null;
+
+    /**
+     * Does this builder rebuild search indices for this subject?
+     *
+     * This is not as clear-cut as just determining whether the subject is the
+     * same type as what the builder builds indices for (e.g. tiles for the tile
+     * builder): changes to related objects can re-trigger changes to the search
+     * index (e.g. tile layouts for the tile builder).
+     *
+     * @param object $subject
+     * @return bool
+     */
+    abstract protected function accepts(object $subject): bool;
+
+    /**
+     * Build the where part for the given subject.
+     *
+     * @param object $subject
+     * @return array{string, array} 0: the additional WHERE part of the query
+     *                              1: any additional parameters
+     */
+    abstract protected function buildWhere(object $subject): array;
 }
