@@ -16,20 +16,21 @@ use Alaress\Web\Controller\Base;
 use Alaress\Authorizer\Rule;
 use Custom\Tigs\Summative\Config;
 use Custom\Tigs\Summative\StudentAttributes;
-use Psr\Container\ContainerInterface;
-use Schoolbox\Assessment\Rubric\DataModel as RubricDataModel;
-use Schoolbox\Permission\Access\Access;
+//use Psr\Container\ContainerInterface;
+//use Schoolbox\Assessment\Rubric\DataModel as RubricDataModel;
+//use Schoolbox\Permission\Access\Access;
 use Schoolbox\Role;
 use Schoolbox\UserMapper;
 use InvalidArgumentException;
 use UnexpectedValueException;
 use Schoolbox\Mapper;
 use Schoolbox\User;
-use Schoolbox\Pastoral\Mapper as PastoralMapper;
-use Schoolbox\Resource\Folder\Mapper as FolderMapper;
-use Schoolbox\Resource\Textbox;
-use Schoolbox\Learning\Assessment\DataModel as Assessment;
-use Schoolbox\Learning\Course\DataModel\Implementation as CourseImpl;
+
+//use Schoolbox\Pastoral\Mapper as PastoralMapper;
+//use Schoolbox\Resource\Folder\Mapper as FolderMapper;
+//use Schoolbox\Resource\Textbox;
+//use Schoolbox\Learning\Assessment\DataModel as Assessment;
+//use Schoolbox\Learning\Course\DataModel\Implementation as CourseImpl;
 
 class Module extends Alaress\Module\Module
 {
@@ -58,19 +59,19 @@ class Module extends Alaress\Module\Module
     public function buildController(): Base
     {
         return new Controller(
-            $this->injector->get('databaseInternal'),
+            //            $this->injector->get('databaseInternal'),
             $this->injector->get('externalUser'),
-            $this->injector->get('externalClass'),
-            $this->getMapperFactory()->get(CourseImpl\Mapper::class),
+            //            $this->injector->get('externalClass'),
+            //            $this->getMapperFactory()->get(CourseImpl\Mapper::class),
             $this->getMapperFactory()->get(UserMapper::class),
-            $this->getMapperFactory()->get(PastoralMapper::class),
-            $this->getMapperFactory()->get(FolderMapper::class),
-            $this->getMapperFactory()->get(Textbox\Mapper::class),
-            $this->getMapperFactory()->get(Access::class),
+            //            $this->getMapperFactory()->get(PastoralMapper::class),
+            //            $this->getMapperFactory()->get(FolderMapper::class),
+            //            $this->getMapperFactory()->get(Textbox\Mapper::class),
+            //            $this->getMapperFactory()->get(Access::class),
             $this->injector->get('databaseExternal'),
-            $this->getMapperFactory()->get(Assessment\Mapper::class),
-            $this->injector->get('assessmentDataSource'),
-            $this->getMapperFactory()->get(RubricDataModel\DataSource::class)
+            //            $this->getMapperFactory()->get(Assessment\Mapper::class),
+            //            $this->injector->get('assessmentDataSource'),
+            //            $this->getMapperFactory()->get(RubricDataModel\DataSource::class)
         );
     }
 

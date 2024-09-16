@@ -13,13 +13,13 @@ Data:
     houseEvents:            HouseEvent[]
     houseEvents[idx].name
     houseEvents[idx].status
-    subjects                array
-    subjects[idx].name      string
-    subjects[idx].codes     string[]
-    subjects[idx].folderId  int
-    subjects[idx].teachers  User[]
-    reportDate              null|string
-    moreInfoID              string              - A homepage id from a config var, for a special page in TIGS instance
+    subjects                array                 DEPRECATED
+    subjects[idx].name      string                DEPRECATED
+    subjects[idx].codes     string[]              DEPRECATED
+    subjects[idx].folderId  int                   DEPRECATED
+    subjects[idx].teachers  User[]                DEPRECATED
+    reportDate              null|string           DEPRECATED
+    moreInfoID              string              - DEPRECATED A homepage id from a config var, for a special page in TIGS instance
 #}
 {% import '@tigsSubjectReport/student-attributes-macro.twig' as macro %}
 
@@ -43,7 +43,7 @@ Data:
     </div>
 
     <div class="row student">
-        <div class="column small-12 medium-6">
+        <div class="column small-12">
             <h2 class="subheader">Student</h2>
             <div class="card small-12">
                 {% include 'include/portrait.twig' with {user: user} only %}
@@ -52,12 +52,12 @@ Data:
                 <p class="meta">Unapproved absences: Semester 1 <span class="label neutral">{{ absences[1] }}</span> Semester 2 <span class="label neutral">{{ absences[2] }}</span></p>
             </div>
         </div>
-        <div class="column small-12 medium-6">
-            <h2 class="subheader">Understanding your report</h2>
-            <p>
-                <a href="/homepage/{{ moreInfoId }}">Click here for more information</a>
-            </p>
-        </div>
+{#        <div class="column small-12 medium-6">#}
+{#            <h2 class="subheader">Understanding your report</h2>#}
+{#            <p>#}
+{#                <a href="/homepage/{{ moreInfoId }}">Click here for more information</a>#}
+{#            </p>#}
+{#        </div>#}
     </div>
 
     <div class="row dean-mentor">
@@ -92,35 +92,35 @@ Data:
     </div>
 
     {# Do we have any deans' comments to display? #}
-    {% set hasDeansComments = false %}
-    {% for deansComment in deansComments %}
-        {% if deansComment %}
-            {% set hasDeansComments = true %}
-        {% endif %}
-    {% endfor %}
+{#    {% set hasDeansComments = false %}#}
+{#    {% for deansComment in deansComments %}#}
+{#        {% if deansComment %}#}
+{#            {% set hasDeansComments = true %}#}
+{#        {% endif %}#}
+{#    {% endfor %}#}
 
-    {% if hasDeansComments %}
-        <div class="row dean-comments">
+{#    {% if hasDeansComments %}#}
+{#        <div class="row dean-comments">#}
 
-            {# Render semester 2's comments if it exists
-             # Otherwise try falling back to semester 1's comments
-             #}
-            {% set break = false %}
+{#            #}{# Render semester 2's comments if it exists#}
+{#             # Otherwise try falling back to semester 1's comments#}
+{#             #}
+{#            {% set break = false %}#}
 
-            {% for i in 2..1 %}
-                {% if deansComments[i] and not break %}
-                    <div class="dean-comment semester-{{ i }} small-12 medium-6 island">
-                        <h2 class="subheader">Dean's Comment - Semester {{ i }}</h2>
-                        <section class="content">
-                            {{ deansComments[i] | purify }}
-                        </section>
-                    </div>
+{#            {% for i in 2..1 %}#}
+{#                {% if deansComments[i] and not break %}#}
+{#                    <div class="dean-comment semester-{{ i }} small-12 medium-6 island">#}
+{#                        <h2 class="subheader">Dean's Comment - Semester {{ i }}</h2>#}
+{#                        <section class="content">#}
+{#                            {{ deansComments[i] | purify }}#}
+{#                        </section>#}
+{#                    </div>#}
 
-                    {% set break = true %}
-                {% endif %}
-            {% endfor %}
-        </div>
-    {% endif %}
+{#                    {% set break = true %}#}
+{#                {% endif %}#}
+{#            {% endfor %}#}
+{#        </div>#}
+{#    {% endif %}#}
 
     <div class="row awards">
         <div class="column small-12">
@@ -165,15 +165,15 @@ Data:
             </table>
         </div>
     </div>
-    <div class="row subject-list-group">
-        <div class="small-12 island">
-            {% include '@tigsParticipationReport/fragments/academicTranscript.twig' with {
-                attributes: attributes,
-                student:    user,
-                subjects:   subjects,
-                data:       academicTranscript,
-                reportDate: reportDate
-            } only %}
-        </div>
-    </div>
+{#    <div class="row subject-list-group">#}
+{#        <div class="small-12 island">#}
+{#            {% include '@tigsParticipationReport/fragments/academicTranscript.twig' with {#}
+{#                attributes: attributes,#}
+{#                student:    user,#}
+{#                subjects:   subjects,#}
+{#                data:       academicTranscript,#}
+{#                reportDate: reportDate#}
+{#            } only %}#}
+{#        </div>#}
+{#    </div>#}
 </div>

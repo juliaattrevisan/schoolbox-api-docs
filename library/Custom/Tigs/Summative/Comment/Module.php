@@ -28,7 +28,7 @@ class Module extends Alaress\Module\Module
     {
         $isStaff = new Alaress\Authorizer\Rule\HasRole(Role::STAFF);
 
-        $this->register('GET', '/role/{roleId}/term/{termSlug}', 'getDeanComments', $isStaff);
+//        $this->register('GET', '/role/{roleId}/term/{termSlug}', 'getDeanComments', $isStaff);
         $this->register('GET', '/folder/{folderId}/term/{termSlug}', 'getTeacherComments', $isStaff);
     }
 
