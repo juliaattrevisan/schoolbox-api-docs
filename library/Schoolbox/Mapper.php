@@ -4159,6 +4159,38 @@ abstract class Mapper implements IMapper
 
 
     /**
+     * Register all callbacks required for persisting a search index change.
+     *
+     * @return void
+     */
+    public function registerPersistSearchIndexCallbacks(): void
+    {
+        $this->registerCallback(self::CALLBACK_POSTSAVE, $this->persistSearchIndex(...));
+        $this->registerCallback(self::CALLBACK_POSTDELETE, $this->persistSearchIndex(...));
+        $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, $this->persistSearchIndex(...));
+        $this->registerCallback(self::CALLBACK_POSTRESTORE, $this->persistSearchIndex(...));
+    }
+
+
+    /**
+     * Hook upon saving, deleting or restoring a model: persist resultant
+     * changes to the search index.
+     *
+     * This should be used as a post-change (save/delete/soft-delete/restore)
+     * callback for any mapper whose changes modify the search index.
+     *
+     * @param object $model
+     * @return void
+     */
+    public function persistSearchIndex(object $model): void
+    {
+        /** @var Persistor $persistor */
+        $persistor = self::getDi()->get('search.indexPersistor');
+        $persistor->persist($model);
+    }
+
+
+    /**
      * If possible, raise a notification
      *
      * @param object $object
@@ -4615,22 +4647,5 @@ abstract class Mapper implements IMapper
     {
         $this->selectCache->clear();
         $this->hydrateCache->clear();
-    }
-
-    /**
-     * Hook upon saving, deleting or restoring a model: persist resultant
-     * changes to the search index.
-     *
-     * This should be used as a post-change (save/delete/soft-delete/restore)
-     * callback for any mapper whose changes modify the search index.
-     *
-     * @param object $model
-     * @return void
-     */
-    public function persistSearchIndex(object $model): void
-    {
-        /** @var Persistor $persistor */
-        $persistor = self::getDi()->get('search.indexPersistor');
-        $persistor->persist($model);
     }
 }

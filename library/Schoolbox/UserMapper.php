@@ -187,10 +187,7 @@ class UserMapper extends Mapper
         $this->registerCallback(self::CALLBACK_POSTRESTORE, [$this, 'addUsernameToCache']);
 
         // Persist search index changes on changing of a user.
-        $this->registerCallback(self::CALLBACK_POSTSAVE, $this->persistSearchIndex(...));
-        $this->registerCallback(self::CALLBACK_POSTDELETE, $this->persistSearchIndex(...));
-        $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, $this->persistSearchIndex(...));
-        $this->registerCallback(self::CALLBACK_POSTRESTORE, $this->persistSearchIndex(...));
+        $this->registerPersistSearchIndexCallbacks();
     }
 
 
