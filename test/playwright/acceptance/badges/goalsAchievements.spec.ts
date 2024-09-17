@@ -14,8 +14,8 @@ test.describe("Goals and Achievements tests", () => {
     /**
      * Deleting Bagdes when the test is about to start so it does not get impacted by other tests already executed
      */
-    test.beforeAll(async ({ tester, db }) => {
-        tester.isGoingTo("update delete_at for the badge so it does not impact the news tests");
+    test.beforeAll(async ({ baseTester, db }) => {
+        baseTester.isGoingTo("update delete_at for the badge so it does not impact the news tests");
         await db.updateInDatabase("badge", { deleted_at: "2022-01-15 11:22:34" }, { "name like": "Automation Badge%" });
     });
 
@@ -260,11 +260,17 @@ test.describe("Goals and Achievements tests", () => {
         await expect(page.locator("#container")).toContainText("This is updated");
     });
 
+    test.afterEach(async ({ tester }) => {
+        await tester.logout();
+    });
+
     /**
      * Soft deleting data to not impact the tests
      */
-    test.afterAll(async ({ tester, db }) => {
-        tester.isGoingTo("update delete_at for the data created in this test so it does impact next suite of tests");
+    test.afterAll(async ({ baseTester, db }) => {
+        baseTester.isGoingTo(
+            "update delete_at for the data created in this test so it does impact next suite of tests",
+        );
         await db.updateInDatabase(
             "badge",
             { deleted_at: "2022-01-15 11:22:34" },
