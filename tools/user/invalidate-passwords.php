@@ -24,8 +24,8 @@ $app = new class extends CliTool\App {
         $rowCount = count($rows);
         $log->info(sprintf('Processing %d users', $rowCount));
         foreach ($rows as $i => $row) {
-            if (($i+1) % 50 === 0) {
-                $log->info(sprintf('Processing user %d/%d', $i+1, $rowCount));
+            if (($i + 1) % 50 === 0) {
+                $log->info(sprintf('Processing user %d/%d', $i + 1, $rowCount));
             }
             $userId = $row['id'];
 
