@@ -70,6 +70,15 @@ class Model
 
 
     /**
+     * Optionally corresponds to localisation.term - this could be null which means
+     * that there is no localisation for this field.
+     *
+     * @var string|null
+     */
+    private ?string $term = null;
+
+
+    /**
      * @return string|null
      */
     public function getRoleType(): ?string
@@ -80,11 +89,12 @@ class Model
 
     /**
      * @param string|null $roleType
-     * @return void
+     * @return $this
      */
-    public function setRoleType(?string $roleType): void
+    public function setRoleType(?string $roleType): self
     {
         $this->roleType = $roleType;
+        return $this;
     }
 
 
@@ -99,11 +109,12 @@ class Model
 
     /**
      * @param string|null $field
-     * @return void
+     * @return $this
      */
-    public function setField(?string $field): void
+    public function setField(?string $field): self
     {
         $this->field = $field;
+        return $this;
     }
 
 
@@ -118,11 +129,12 @@ class Model
 
     /**
      * @param string|null $displayAs
-     * @return void
+     * @return $this
      */
-    public function setDisplayAs(?string $displayAs): void
+    public function setDisplayAs(?string $displayAs): self
     {
         $this->displayAs = $displayAs;
+        return $this;
     }
 
 
@@ -137,11 +149,12 @@ class Model
 
     /**
      * @param int|null $sequence
-     * @return void
+     * @return $this
      */
-    public function setSequence(?int $sequence): void
+    public function setSequence(?int $sequence): self
     {
         $this->sequence = $sequence;
+        return $this;
     }
 
 
@@ -156,10 +169,31 @@ class Model
 
     /**
      * @param int|null $enabled
-     * @return void
+     * @return $this
      */
-    public function setEnabled(?int $enabled): void
+    public function setEnabled(?int $enabled): self
     {
         $this->enabled = $enabled;
+        return $this;
+    }
+
+
+    /**
+     * @return string|null
+     */
+    public function getTerm(): ?string
+    {
+        return $this->term;
+    }
+
+
+    /**
+     * @param string|null $term
+     * @return $this
+     */
+    public function setTerm(?string $term): self
+    {
+        $this->term = $term;
+        return $this;
     }
 }
