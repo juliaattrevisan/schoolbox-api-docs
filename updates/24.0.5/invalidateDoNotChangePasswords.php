@@ -12,11 +12,9 @@ declare(strict_types=1);
 
 require_once __DIR__ . '/../../conf/core/require.php';
 
-// Run the script on storage_dir only, with no lock
-// (so that existing crons do not raise warnings)
-$script  = __DIR__ . '/../../../tools/user/invalidate-passwords.php';
-$logFile = '/var/log/schoolbox/' . INSTANCE_ID . '/invalidate-passwords.log';
-$command = $script . ' 2>&1 > ' . escapeshellarg($logFile);
+$script  = __DIR__ . '/../../tools/user/invalidate-passwords.php';
+$logFile = '/var/log/schoolbox/' . INSTANCE_ID . '/update-invalidate-passwords.log';
+$command = $script . ' 2>&1 | tee -a ' . escapeshellarg($logFile) . ' > /dev/null';
 
 // Run the whole thing in background
 echo "Running invalidate passwords command in background process:\n" . $command . "\n";
