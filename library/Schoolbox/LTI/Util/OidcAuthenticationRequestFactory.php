@@ -13,10 +13,8 @@ use OAT\Library\Lti1p3Core\Exception\LtiExceptionInterface;
 use OAT\Library\Lti1p3Core\Message\LtiMessage;
 use OAT\Library\Lti1p3Core\Message\LtiMessageInterface;
 use OAT\Library\Lti1p3Core\Message\Payload\Builder\MessagePayloadBuilder;
-use OAT\Library\Lti1p3Core\Message\Payload\MessagePayloadInterface;
 use OAT\Library\Lti1p3Core\Registration\RegistrationRepositoryInterface;
 use OAT\Library\Lti1p3Core\Security\Jwt\Builder\Builder as JwtBuilder;
-use OAT\Library\Lti1p3Core\Security\Jwt\Parser\Parser;
 use OAT\Library\Lti1p3Core\Security\Oidc\OidcAuthenticator;
 use OAT\Library\Lti1p3Core\Security\User\UserAuthenticatorInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -70,19 +68,15 @@ class OidcAuthenticationRequestFactory
         };
         $nonce = $requestParams['nonce'] ?? null;
 
-        $configFactory         = new ConfigurationFactory();
         $messagePayloadBuilder = new MessagePayloadBuilder(
             isset($nonce) ? new NoncePassthrough((string)$nonce) : null,
-            new JwtBuilder($configFactory)
+            new JwtBuilder(new ConfigurationFactory()),
         );
 
-        $parser  = new Parser($configFactory);
         $message = (new OidcAuthenticator(
             $this->registrationRepository,
             $this->userAuthenticator,
             $messagePayloadBuilder,
-            null,
-            $parser,
         ))->authenticate($request);
 
         // Validate the redirect URI against the tool's launch URL.
@@ -93,10 +87,9 @@ class OidcAuthenticationRequestFactory
         // I'm just going to assume the launch and deep linking URLs are valid
         // redirects.
         $redirectUri  = $requestParams['redirect_uri'] ?? null;
-        $token        = $parser->parse(LtiMessage::fromServerRequest($request)->getParameters()->get('lti_message_hint'));
-        $registration = $this->registrationRepository->find(
-            $token->getClaims()->getMandatory(MessagePayloadInterface::CLAIM_REGISTRATION_ID)
-        );
+        $clientId     = $requestParams['client_id'] ?? null;
+
+        $registration = $this->registrationRepository->findByClientId($clientId);
         $tool = $registration->getTool();
         return (new LtiMessage($tool->getLaunchUrl(), $message->getParameters()->all()));
     }
