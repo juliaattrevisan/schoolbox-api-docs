@@ -31,6 +31,10 @@ class Module extends BaseModule
      */
     protected function registerRoutes(): void
     {
+        /* Keep an eye out on Granular Permissions epic SA-18424
+         * Hopefully there isn't a service permission that affects us here
+         * and we can continue to assume Superusers Only
+         */
         $perms = new Rule\All(
             new Rule\IsLoggedIn(),
             new Rule\IsSuperuser()
