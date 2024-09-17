@@ -1,13 +1,18 @@
 -- Add schema for knowing which fields are available for each role type's profile screen
 
 CREATE TABLE `profile_field` (
-    `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
-    `roletype` ENUM('staff', 'student', 'parent') NOT NULL,
-    `field` VARCHAR(255) NOT NULL,
-    `display_as` VARCHAR(255) NOT NULL,
-    `sequence` INT UNSIGNED NULL,
-    `enabled` TINYINT NOT NULL,
-PRIMARY KEY (`id`));
+    `id` int unsigned NOT NULL AUTO_INCREMENT,
+    `roletype` enum('staff','student','parent') NOT NULL,
+    `field` varchar(255) NOT NULL,
+    `display_as` varchar(255) NOT NULL,
+    `sequence` int(10) unsigned NOT NULL,
+    `enabled` tinyint(4) NOT NULL,
+    PRIMARY KEY (`id`),
+    UNIQUE KEY `roletype_field` (`roletype`,`field`),
+    KEY `roletype` (`roletype`),
+    KEY `field` (`field`),
+    KEY `sequence` (`sequence`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- This records which Campuses were selected, for each field,
 -- to determine which profile pages they "Appear On" (synonymous with "Availability")
@@ -23,7 +28,8 @@ CREATE TABLE `profile_field_campus_availability` (
     FOREIGN KEY (`campus_id`)
     REFERENCES `luCampus` (`id`)
     ON DELETE NO ACTION
-    ON UPDATE NO ACTION);
+    ON UPDATE NO ACTION
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- This records when Roletypes were selected, for each field,
 -- to determine which viewer Role Types can see a field
@@ -35,4 +41,5 @@ CREATE TABLE `profile_field_roletype_visibility` (
     PRIMARY KEY (`id`),
     INDEX `profile_field_profile_field_roletype_visibility` (`profile_field_id` ASC),
     INDEX `fk_profile_field_roletype_visibility_idx` (`roletype` ASC)
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;;
+
