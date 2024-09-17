@@ -1,6 +1,12 @@
 import { test, expect } from "@schoolboxTest/playwright/support/integrations";
 
 test.describe("Unit Planner Tests", () => {
+    const unitId = 15; // "Romeo and Juliet"
+    const overviewColumnId = "overview-1"; // "Unit Overview"
+    const overviewColumnLabel = "Unit Overview";
+    const romeoUnitId = 15; // "Romeo and Juliet"
+    const persuasionUnitId = 17; // "Persuasion and the Media"
+
     test.beforeEach(async ({ tester, page }) => {
         const teacher = "Jack Coles";
         await tester.impersonate(teacher);
@@ -10,10 +16,6 @@ test.describe("Unit Planner Tests", () => {
     // TODO: Split selectors into a UnitPlannerPage support file
 
     test("Create a Textbox", async ({ tester, page }) => {
-        const unitId = 15; // "Romeo and Juliet"
-        const overviewColumnId = "overview-1"; // "Unit Overview"
-        const overviewColumnLabel = "Unit Overview";
-
         const textBoxCell = page.getByTestId(`unit-planner-textbox-action-create-${unitId}-${overviewColumnId}`);
 
         tester.isGoingTo("create a Unit Overview textbox for Romeo and Juliet");
@@ -40,9 +42,6 @@ test.describe("Unit Planner Tests", () => {
     });
 
     test("Resequence Units", async ({ tester, page }) => {
-        const romeoUnitId = 15; // "Romeo and Juliet"
-        const persuasionUnitId = 17; // "Persuasion and the Media"
-
         /**
          * Get the current order of units
          * @returns - The order of unit IDs
@@ -52,7 +51,7 @@ test.describe("Unit Planner Tests", () => {
             const pageOrder = await page
                 .getByTestId(allUnitRowSelector)
                 .evaluateAll((unitRows) => unitRows.map((unitRow) => unitRow.getAttribute("data-test-unit-id")));
-            return pageOrder.filter((unitId) => unitId !== null);
+            return pageOrder.filter((id) => id !== null);
         }
 
         const initialUnitOrder = await getUnitOrder();
@@ -105,5 +104,58 @@ test.describe("Unit Planner Tests", () => {
         await tester.logout();
     });
 
-    // TODO: Use afterAll to reverse any changes we made
+    test.afterAll(async ({ baseTester, db }) => {
+        baseTester.isGoingTo("find the textbox that was created in this test so it can be deleted");
+
+        const romeoUnitFolderId = (await db.grabFromDatabase("course_unit_specification", "folder_id", {
+            id: romeoUnitId,
+        })) as number | null;
+        expect(romeoUnitFolderId).not.toBeNull();
+
+        const persuasionUnitFolderId = (await db.grabFromDatabase("course_unit_specification", "folder_id", {
+            id: persuasionUnitId,
+        })) as number | null;
+        expect(romeoUnitFolderId).not.toBeNull();
+
+        const textBoxID = (await db.grabFromDatabase("textBox", "textBoxID", {
+            categoryID: romeoUnitFolderId,
+            heading: overviewColumnLabel,
+        })) as number | null;
+
+        if (textBoxID !== null) {
+            const textboxComponentDefinitionId = (await db.grabFromDatabase("component_definition", "id", {
+                class: "Schoolbox\\Resource\\Textbox\\Component\\Homepage\\Controller",
+            })) as number | null;
+            expect(textboxComponentDefinitionId).not.toBeNull();
+
+            const textboxComponentInstanceId = (await db.grabFromDatabase("component_instance", "id", {
+                module: "homepage",
+                identifier: romeoUnitFolderId,
+                component_definition_id: textboxComponentDefinitionId,
+            })) as number | null;
+
+            if (textboxComponentInstanceId === null) {
+                baseTester.isGoingTo("skip deletion as the textbox component instance was not found");
+                return;
+            }
+
+            baseTester.isGoingTo(`delete the textbox with ID ${textBoxID}`);
+            await db.dontHaveInDatabase("textBox", {
+                textBoxID,
+            });
+
+            baseTester.isGoingTo(`delete the component instance with ID ${textboxComponentInstanceId}`);
+            await db.dontHaveInDatabase("component_config_instance", {
+                component_instance_id: textboxComponentInstanceId,
+            });
+
+            await db.dontHaveInDatabase("component_instance", {
+                id: textboxComponentInstanceId,
+            });
+        }
+
+        baseTester.isGoingTo("update the unit order back to the original order");
+        await db.updateInDatabase("folder", { sequence: 3 }, { id: romeoUnitFolderId });
+        await db.updateInDatabase("folder", { sequence: 2 }, { id: persuasionUnitFolderId });
+    });
 });

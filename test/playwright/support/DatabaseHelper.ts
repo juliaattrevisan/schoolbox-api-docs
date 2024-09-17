@@ -94,6 +94,38 @@ export default class DatabaseHelper {
     }
 
     /**
+     * Deletes an SQL record from the database
+     * @param table - Table name
+     * @param criteria - Search criteria [optional, default={}]
+     */
+    async dontHaveInDatabase(table: string, criteria: DataPairs = {}): Promise<void> {
+        const criteriaKeys = Object.keys(criteria);
+        const criteriaValues = Object.values(criteria);
+
+        const whereBinding = criteriaKeys
+            .map((key) => {
+                const value = criteria[key];
+                // Check for NULL specifically to handle IS NULL and IS NOT NULL
+                if (value === null) {
+                    return `${key} IS NULL`;
+                }
+                if (value === "NOT NULL") {
+                    return `${key} IS NOT NULL`;
+                }
+                // If key has a space, don't include = sign as we assume it's a custom assignment such as "column LIKE"
+                if (key.includes(" ")) return `${key} ?`;
+                return `${key} = ?`;
+            })
+            .join(" AND ");
+        const whereClause = criteriaKeys.length > 0 ? `WHERE ${whereBinding}` : "";
+
+        // Remove NULL and NOT NULL values from the criteria values, as we override them in the where clause
+        const valuesBinding = criteriaValues.filter((value) => value !== null && value !== "NOT NULL");
+
+        await this.pool.execute(`DELETE FROM ${table} ${whereClause}`, valuesBinding);
+    }
+
+    /**
      * Updates an SQL record in the database
      * @param table - Table name
      * @param data - Data to update
