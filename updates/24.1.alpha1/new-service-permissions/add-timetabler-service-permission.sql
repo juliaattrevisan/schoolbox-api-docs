@@ -1,1 +1,1 @@
-INSERT INTO lu_service SET id=12, name='Timetabler';
+INSERT INTO lu_service SET id=12, name='Timetable';
