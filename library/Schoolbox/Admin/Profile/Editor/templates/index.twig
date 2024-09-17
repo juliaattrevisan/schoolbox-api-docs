@@ -1,10 +1,17 @@
 <script>
     $(function() {
         let hash = window.location.hash.substring(1);
+        hash = hash.charAt(0).toUpperCase() + hash.slice(1);
 
-        console.log('You are in the ' + hash + ' profile editor');
+        $('#editor-name').text(hash);
     });
 </script>
+<div class="row">
+    <div class="small-12 columns">
+        <h1><span id="editor-name"></span> Profile Editor</h1>
+    </div>
+</div>
+
 <div class="row">
     <div class="small-12 island">
         <h2 class="subheader">postFieldAdd</h2>
