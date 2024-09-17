@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\LTI\Util;
 
+use OAT\Library\Lti1p3Core\Exception\LtiException;
 use OAT\Library\Lti1p3Core\Exception\LtiExceptionInterface;
 use OAT\Library\Lti1p3Core\Message\LtiMessage;
 use OAT\Library\Lti1p3Core\Message\LtiMessageInterface;
@@ -86,11 +87,49 @@ class OidcAuthenticationRequestFactory
         // for exposing redirect URIs.
         // I'm just going to assume the launch and deep linking URLs are valid
         // redirects.
-        $redirectUri  = $requestParams['redirect_uri'] ?? null;
-        $clientId     = $requestParams['client_id'] ?? null;
-
+        $redirectUri = $requestParams['redirect_uri'] ?? null;
+        if (!isset($redirectUri)) {
+            throw new LtiException('Mandatory request parameter "redirect_uri" missing');
+        }
+        $clientId = $requestParams['client_id'] ?? null;
+        if (!isset($clientId)) {
+            throw new LtiException('Mandatory request parameter "client_id" missing');
+        }
         $registration = $this->registrationRepository->findByClientId($clientId);
-        $tool = $registration->getTool();
-        return (new LtiMessage($tool->getLaunchUrl(), $message->getParameters()->all()));
+        if (!$registration) {
+            throw new LtiException('Request parameter "client_id" value does not match the client ID of an LTI tool');
+        }
+
+        // Validate redirect URI
+        $tool      = $registration->getTool();
+        $validUrls = array_filter([$tool->getLaunchUrl(), $tool->getDeepLinkingUrl()]);
+        $redirectUri = $this->normalizeUri($redirectUri);
+        $isRedirectUriValid = false;
+        foreach ($validUrls as $validUrl) {
+            $validUrl = $this->normalizeUri($validUrl);
+            if ($validUrl === $redirectUri) {
+                $isRedirectUriValid = true;
+                break;
+            }
+        }
+        if (!$isRedirectUriValid) {
+            throw new LtiException(
+                'Request parameter "redirect_uri" value does not match the LTI tool\'s launch or deep linking URL'
+            );
+        }
+
+        // If the redirect URI is valid: create a message which sends to it.
+        return (new LtiMessage($redirectUri, $message->getParameters()->all()));
+    }
+
+    /**
+     * Normalize a URI string, trimming space and / characters.
+     *
+     * @param string $uri
+     * @return string
+     */
+    private function normalizeUri(string $uri): string
+    {
+        return rtrim(trim($uri), '/');
     }
 }
