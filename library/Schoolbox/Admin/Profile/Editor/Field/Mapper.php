@@ -8,10 +8,9 @@
 
 declare(strict_types=1);
 
-namespace Schoolbox\Admin\Profile\Editor;
+namespace Schoolbox\Admin\Profile\Editor\Field;
 
 use Schoolbox\GenericCollection;
-use Schoolbox\UserMapper;
 
 /**
  * Class Mapper
@@ -21,6 +20,7 @@ use Schoolbox\UserMapper;
  * @method Model hydrate(array $row, $alias = '', $callback = null)
  * @method Model[]|GenericCollection findByColumn($columnName, $columnValue, $options = [])
  * @method Model[]|GenericCollection createCollection($contents = [])
+ * @method Model[]|GenericCollection findAll($contents = [])
  */
 class Mapper extends \Schoolbox\Mapper
 {
@@ -29,12 +29,13 @@ class Mapper extends \Schoolbox\Mapper
      */
     protected function mapping(): void
     {
-        $this->hasTable('example');
+        $this->hasTable('profile_field');
         $this->hasModel(Model::class);
         $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
-        $this->joins('user_id', UserMapper::class, 'id', null, null, 'userId', 'userId');
-        $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
-        $this->uses('updated_at', self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP);
-        $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
+        $this->uses('roletype', self::TYPE_STRING);
+        $this->uses('field', self::TYPE_STRING);
+        $this->uses('display_as', self::TYPE_STRING);
+        $this->uses('sequence', self::TYPE_INTEGER);
+        $this->uses('enabled', self::TYPE_INTEGER);
     }
 }
