@@ -182,6 +182,8 @@ class ConfigMapper extends Mapper
     public const NAME_GOTENBERG_API_VERSION = 'gotenberg_api_version';
     public const NAME_SUMMATIVE_REPORT_ENABLED = 'summative_report_enabled';
 
+    public const NAME_PWA_ENABLED = 'pwa_enable';
+
     public const NAME_SHOW_SCHOOLBOX_HELP_LINK = 'show_schoolbox_help_link';
 
     public const NAME_EPORTFOLIO_ENABLED = 'eportfolio_enabled';
