@@ -3,6 +3,8 @@
  * It's to be used within a <canvas></canvas> element
  */
 
+import type { CanvasDimensions } from "@js/util/canvasUtils";
+
 const colours = [
     "#ff7d00",
     "#ffd100",
@@ -27,6 +29,21 @@ export type StarInitProps = {
     x: number;
     radius: number;
 };
+
+/**
+ * Each star needs to be removed and redrawn each 'tick'
+ * @param stars - the stars to redraw
+ * @param context - the context to draw the stars on
+ * @param canvasDimensions - the dimensions of the canvas
+ */
+export function redrawStars(
+    stars: Star[],
+    context: CanvasRenderingContext2D,
+    canvasDimensions: CanvasDimensions,
+): void {
+    context.clearRect(0, 0, canvasDimensions.width, canvasDimensions.height);
+    stars.forEach((star) => star.draw(context));
+}
 
 export default class Star {
     x: number; // the current x position of the streamer

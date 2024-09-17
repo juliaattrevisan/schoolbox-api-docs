@@ -1,7 +1,7 @@
 // Countdown timer used on homepages
 
-import confetti from "canvas-confetti";
 import CountdownTimer from "./CountdownTimer";
+import { play } from "./countdownAnimation";
 
 const countdownElements = document.querySelectorAll('[data-countdown="elements"]');
 countdownElements.forEach((element) => {
@@ -47,26 +47,21 @@ countdownElements.forEach((element) => {
             return; // Prevent multiple confetti explosions
         }
 
-        targetElement.innerHTML = '<li class="count">Countdown has been reached!</li>';
+        targetElement.innerHTML =
+            '<li class="count count--finished l-flex l-flex--center">Countdown has been reached!</li>';
         targetElementParent.classList.add("disabled");
 
-        if (targetElement.getAttribute("data-finish-animation") === "1") {
+        // don't play the animation if the user has reduced motion enabled
+        const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches ?? false;
+
+        if (targetElement.getAttribute("data-finish-animation") === "1" && !reduceMotion) {
             let hasTriggered = false;
             const observer = new IntersectionObserver(
                 (entries) => {
                     entries.forEach((entry) => {
                         if (entry.isIntersecting && !hasTriggered) {
                             hasTriggered = true;
-                            const boundRect = targetElement.getBoundingClientRect();
-                            void confetti({
-                                particleCount: 300,
-                                spread: 360,
-                                ticks: 200,
-                                origin: {
-                                    x: (boundRect.left + boundRect.width / 2) / window.innerWidth,
-                                    y: (boundRect.top + boundRect.height / 2) / window.innerHeight,
-                                },
-                            });
+                            play(targetElement);
                         }
                     });
                 },

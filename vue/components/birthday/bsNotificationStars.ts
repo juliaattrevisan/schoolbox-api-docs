@@ -4,9 +4,8 @@
 
 import { gsap, Physics2DPlugin } from "gsap/all";
 import { getCanvasDimensions, getContext } from "@js/util/canvasUtils";
-import type { CanvasDimensions } from "@js/util/canvasUtils";
 import type GSAPTimeline from "gsap";
-import Star from "../../../library/Schoolbox/Learning/Badge/Award/js/animations/Star";
+import Star, { redrawStars } from "../../../library/Schoolbox/Learning/Badge/Award/js/animations/Star";
 
 gsap.registerPlugin(Physics2DPlugin); // register the physics2D plugin, otherwise the physics2D property won't be recognised
 
@@ -31,17 +30,6 @@ function getStars(canvas: HTMLCanvasElement): Star[] {
         stars.push(star);
     }
     return stars;
-}
-
-/**
- * Each star needs to be removed and redrawn each 'tick'
- * @param stars - the stars to redraw
- * @param context - the context to draw the stars on
- * @param canvasDimensions - the dimensions of the canvas
- */
-function redrawStars(stars: Star[], context: CanvasRenderingContext2D, canvasDimensions: CanvasDimensions): void {
-    context.clearRect(0, 0, canvasDimensions.width, canvasDimensions.height);
-    stars.forEach((star) => star.draw(context));
 }
 
 /**
