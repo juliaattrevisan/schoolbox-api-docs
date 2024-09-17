@@ -236,7 +236,7 @@ class Controller extends Base
             ]
         ],
         UserAccess::SERVICE_TIMETABLE => [
-            'name' => 'Badge',
+            'name' => 'Timetable',
             'identifier' => self::IDENTIFIER_NONE,
             'availability' => [
                 'read' => false,
