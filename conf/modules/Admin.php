@@ -131,5 +131,10 @@ class Admin extends ModuleLoader
 
         // Lesson Plan Template
         $this->loadModule($di, \Schoolbox\Admin\LessonPlan\Template\Module::class, '/adminv2/lesson-plan/template');
+
+        /* Profile Editor
+         * This lets you configure what appears on each role type's Profile screen
+         */
+        $this->loadModule($di, \Schoolbox\Admin\Profile\Editor\Module::class, '/adminv2/profile-editor');
     }
 }
