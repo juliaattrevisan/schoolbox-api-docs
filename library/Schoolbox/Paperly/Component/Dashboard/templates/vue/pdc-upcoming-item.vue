@@ -22,9 +22,10 @@ function getDate(): string {
 <template>
     <div class="item l-flex-col l-gap-xs l-pad-m--horiz l-pad-s--vert">
         <a :href="props.item.url" :title="`View ${props.item.title}`">{{ props.item.title }}</a>
-        <p v-if="props.item.due" class="meta f-no-margins">
-            <template v-if="props.item.status">{{ props.item.status }} - Due date: {{ getDate() }}</template>
-            <template v-else>Due date: {{ getDate() }}</template>
+        <p v-if="props.item.due || props.item.status" class="meta f-no-margins">
+            <template v-if="props.item.status && props.item.due">{{ props.item.status }} - Due date: {{ getDate() }}</template>
+            <template v-else-if="props.item.due && !props.item.status">Due date: {{ getDate() }}</template>
+            <template v-else>{{ props.item.status }}</template>
         </p>
     </div>
 </template>
