@@ -3,6 +3,12 @@
         <link rel="stylesheet" type="text/css" href="{{ CDN_PREFIX }}/css/core/core.css?v={{ config.site_version }}" />
         <link rel="stylesheet" type="text/css" href="/css/core/skin.css.php?v={{ config.site_version }}" />
     </head>
+    <style>
+        /* remove the background to allow the background it sits on to show through */
+        body {
+            background: none;
+        }
+    </style>
     <body>
         <div class="content">
             <article id="textBoxBody{{ textbox.id }}">{{ textbox.body | purify }}</article>
