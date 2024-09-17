@@ -15,7 +15,6 @@ const props = defineProps<Props>();
  * @returns - the formatted due date eg: Mon 01 Jan at 12:00pm
  */
 function getDate(): string {
-    console.log(window.dayjs(null).isValid())
     return window.dayjs(props.item.due).format("ddd DD MMM [at] h:mma");
 }
 </script>
