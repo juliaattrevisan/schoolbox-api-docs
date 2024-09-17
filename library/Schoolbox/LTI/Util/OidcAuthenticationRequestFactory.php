@@ -63,11 +63,12 @@ class OidcAuthenticationRequestFactory
     {
         // Nonce may be in either $_GET or $_POST
         // If it's not there: use the default nonce generator, I guess
-        $nonce = match (strtolower($request->getMethod())) {
-            'get'   => (new Uri($request->getUri()->__toString()))->getQueryAsArray()['nonce'] ?? null,
-            'post'  => $request->getParsedBody()['nonce'] ?? null,
-            default => null,
+        $requestParams = match (strtolower($request->getMethod())) {
+            'get'   => (new Uri($request->getUri()->__toString()))->getQueryAsArray(),
+            'post'  => $request->getParsedBody(),
+            default => [],
         };
+        $nonce = $requestParams['nonce'] ?? null;
 
         $configFactory         = new ConfigurationFactory();
         $messagePayloadBuilder = new MessagePayloadBuilder(
@@ -84,12 +85,19 @@ class OidcAuthenticationRequestFactory
             $parser,
         ))->authenticate($request);
 
-        // Always return the launch URI
-        $token = $parser->parse(LtiMessage::fromServerRequest($request)->getParameters()->get('lti_message_hint'));
-
+        // Validate the redirect URI against the tool's launch URL.
+        // According to https://www.imsglobal.org/spec/security/v1p0/#step-3-authentication-response,
+        // the redirect URI must be validated against one of the tool's redirect
+        // URIs: however, the LTI library doesn't provide an official method
+        // for exposing redirect URIs.
+        // I'm just going to assume the launch and deep linking URLs are valid
+        // redirects.
+        $redirectUri  = $requestParams['redirect_uri'] ?? null;
+        $token        = $parser->parse(LtiMessage::fromServerRequest($request)->getParameters()->get('lti_message_hint'));
         $registration = $this->registrationRepository->find(
             $token->getClaims()->getMandatory(MessagePayloadInterface::CLAIM_REGISTRATION_ID)
         );
-        return (new LtiMessage($registration->getTool()->getLaunchUrl(), $message->getParameters()->all()));
+        $tool = $registration->getTool();
+        return (new LtiMessage($tool->getLaunchUrl(), $message->getParameters()->all()));
     }
 }
