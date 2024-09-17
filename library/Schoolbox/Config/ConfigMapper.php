@@ -392,6 +392,7 @@ class ConfigMapper extends Mapper
         self::_CLOUDWORK_OAUTH_IDENTITY_PROVIDER,
         self::NAME_OAUTH_ENABLE_SSO,
         self::NAME_MAIL_ENABLED,
+        self::NAME_PWA_ENABLED,
     ];
 
     /**
