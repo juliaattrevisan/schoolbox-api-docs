@@ -357,10 +357,14 @@
                             <label id="notification-toggle-full">Notifications</label>
                             <a class="icon-settings settings-button" href="{{ routeLookup("notifications.configure") }}" aria-label="Modify notification settings" title="Modify notification settings"></a>
                         </li>
+                        {% set installGoogle = config.digistorm_google_play_store_link ?? '' %}
+                        {% set installApple = config.digistorm_apple_app_store_link ?? '' %}
+                        {% if config.pwa_enable or installGoogle is not empty or installApple is not empty %}
                         <li id="pwaPrompt" data-pwa="sidebarPrompt" class="content hide">
                             {% include '@notifications/pwa.twig' with { notifButton : 'notifOn', pwaPage: 'chrome' } %}
                             <a id="installDelayPrompt" data-pwa="sidebarPromptDelay" class="button load-more expand" href="#">Later</a>
                         </li>
+                        {% endif %}
                         <li>
                             <a id="msg-mar" class="mark-all-read button icon-approve" href="#">Mark all read</a>
                         </li>
