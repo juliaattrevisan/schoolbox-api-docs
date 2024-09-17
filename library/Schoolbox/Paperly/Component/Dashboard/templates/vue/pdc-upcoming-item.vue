@@ -15,6 +15,7 @@ const props = defineProps<Props>();
  * @returns - the formatted due date eg: Mon 01 Jan at 12:00pm
  */
 function getDate(): string {
+    console.log(window.dayjs(null).isValid())
     return window.dayjs(props.item.due).format("ddd DD MMM [at] h:mma");
 }
 </script>
@@ -22,7 +23,7 @@ function getDate(): string {
 <template>
     <div class="item l-flex-col l-gap-xs l-pad-m--horiz l-pad-s--vert">
         <a :href="props.item.url" :title="`View ${props.item.title}`">{{ props.item.title }}</a>
-        <p class="meta f-no-margins">
+        <p v-if="props.item.due" class="meta f-no-margins">
             <template v-if="props.item.status">{{ props.item.status }} - Due date: {{ getDate() }}</template>
             <template v-else>Due date: {{ getDate() }}</template>
         </p>
