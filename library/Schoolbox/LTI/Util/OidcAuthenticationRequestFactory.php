@@ -69,24 +69,22 @@ class OidcAuthenticationRequestFactory
         };
         $nonce = $requestParams['nonce'] ?? null;
 
+        // Create the base message, but work around the LTI library's setting of
+        // the message's URL as the LTI target link URI:
+        // instead, create a message whose URL is the redirect URI from the
+        // request.
         $messagePayloadBuilder = new MessagePayloadBuilder(
             isset($nonce) ? new NoncePassthrough((string)$nonce) : null,
             new JwtBuilder(new ConfigurationFactory()),
         );
-
-        $message = (new OidcAuthenticator(
+        $baseMessage = (new OidcAuthenticator(
             $this->registrationRepository,
             $this->userAuthenticator,
             $messagePayloadBuilder,
         ))->authenticate($request);
 
-        // Validate the redirect URI against the tool's launch URL.
-        // According to https://www.imsglobal.org/spec/security/v1p0/#step-3-authentication-response,
-        // the redirect URI must be validated against one of the tool's redirect
-        // URIs: however, the LTI library doesn't provide an official method
-        // for exposing redirect URIs.
-        // I'm just going to assume the launch and deep linking URLs are valid
-        // redirects.
+        // Verify that redirect URI and client ID are in the request, and also
+        // that the client ID matches a tool registration.
         $redirectUri = $requestParams['redirect_uri'] ?? null;
         if (!isset($redirectUri)) {
             throw new LtiException('Mandatory request parameter "redirect_uri" missing');
@@ -100,7 +98,13 @@ class OidcAuthenticationRequestFactory
             throw new LtiException('Request parameter "client_id" value does not match the client ID of an LTI tool');
         }
 
-        // Validate redirect URI
+        // Validate the redirect URI against the tool's launch URL.
+        // According to https://www.imsglobal.org/spec/security/v1p0/#step-3-authentication-response,
+        // the redirect URI must be validated against one of the tool's redirect
+        // URIs: however, the LTI library doesn't provide an official method
+        // for exposing redirect URIs.
+        // I'm just going to assume the launch and deep linking URLs are valid
+        // redirects.
         $tool      = $registration->getTool();
         $validUrls = array_filter([$tool->getLaunchUrl(), $tool->getDeepLinkingUrl()]);
         $redirectUri = $this->normalizeUri($redirectUri);
@@ -119,7 +123,7 @@ class OidcAuthenticationRequestFactory
         }
 
         // If the redirect URI is valid: create a message which sends to it.
-        return (new LtiMessage($redirectUri, $message->getParameters()->all()));
+        return new LtiMessage($redirectUri, $baseMessage->getParameters()->all());
     }
 
     /**
