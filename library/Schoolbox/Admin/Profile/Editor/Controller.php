@@ -12,9 +12,6 @@ namespace Schoolbox\Admin\Profile\Editor;
 
 use Alaress\Web\Controller\Base;
 use Schoolbox\Error\Mapper as ErrorMapper;
-use Schoolbox\Mapper\Exception as MapperException;
-use Schoolbox\User;
-use Schoolbox\UserMapper;
 
 class Controller extends Base
 {
@@ -22,44 +19,63 @@ class Controller extends Base
      * Controller constructor.
      *
      * @param ErrorMapper $errorMapper
-     * @param UserMapper  $userMapper
      */
-    public function __construct(
-        private ErrorMapper $errorMapper,
-        private UserMapper $userMapper
-    ) {
+    public function __construct(private ErrorMapper $errorMapper) {
     }
 
 
     /**
-     * Provide form
+     * Edit the layout of each profile page's fields, buttons, etc.
+     */
+    public function getIndex(): void
+    {
+        $this->response = $this->responseFromTemplate('@profileEditor/index.twig', [
+
+        ], 'Profile Editor');
+    }
+
+
+    /**
+     * This executes when the superuser adds a field to a profile screen.
      *
-     * @param User $user
+     * @return void
      */
-    public function getExample(User $user): void
+    public function postFieldAdd(): void
     {
-        $this->response = $this->responseFromTemplate('@example/index.twig', ['user' => $user], 'Example');
+        new \Alaress_Probe('postFieldAdd', $this->requestPost->getArrayCopy());
     }
 
 
     /**
-     * Process the form vars
+     * This executes when the superuser removes a field from a profile screen.
+     *
+     * @return void
      */
-    public function postExample(): void
+    public function postFieldRemove(): void
     {
-        try {
-            $user = $this->userMapper->findById($this->requestPost['id']);
-        } catch (MapperException $e) {
-            throw $this->errorMapper->generateException(ErrorMapper::ERROR_USER_NOT_FOUND);
-        }
+        new \Alaress_Probe('postFieldRemove', $this->requestPost->getArrayCopy());
+    }
 
-        $this->response = $this->responseFromTemplate(
-            '@example/submit.twig',
-            [
-                'user' => $user,
-                'var1' => $this->requestPost['var1'],
-            ],
-            'Example Form Output',
-        );
+
+    /**
+     * This executes when the superuser updates availability ("Appears On") and visibility
+     * ("Visible For") checkbox settings on a particular field.
+     *
+     * @return void
+     */
+    public function postFieldSettings(): void
+    {
+        new \Alaress_Probe('postFieldSettings', $this->requestPost->getArrayCopy());
+    }
+
+
+    /**
+     * This executes when the superuser reorders fields.
+     *
+     * @return void
+     */
+    public function postFieldSequence(): void
+    {
+        new \Alaress_Probe('postFieldSequence', $this->requestPost->getArrayCopy());
     }
 }

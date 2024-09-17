@@ -1,23 +1,61 @@
-{# Add your own javascript, validation etc. #}
-{# Use pantry for styling #}
-
 <div class="row">
     <div class="small-12 island">
-        <h2 class="subheader">{{ user.fullname }}</h2>
+        <h2 class="subheader">postFieldAdd</h2>
         <section class="content">
-        {% set formAction = routeLookupIfAuthorized('example.postExample') %}
+        {% set formAction = routeLookupIfAuthorized('profileEditor.postFieldAdd', {fieldId: 7}) %}
         {% if formAction %}
             <form action="{{ formAction }}" method="post">
-                <input type="hidden" name="id" value="{{ user.id }}" />
-
-                <label>var1</label>
-                <input type="text" name="var1" />
-
+                <input type="text" name="action" value="add" />
                 <input type="submit" />
             </form>
         {% else %}
             Not authorised to POST
         {% endif %}
+        </section>
+    </div>
+
+    <div class="small-12 island">
+        <h2 class="subheader">postFieldRemove</h2>
+        <section class="content">
+            {% set formAction = routeLookupIfAuthorized('profileEditor.postFieldRemove', {fieldId: 9}) %}
+            {% if formAction %}
+                <form action="{{ formAction }}" method="post">
+                    <input type="text" name="action" value="remove" />
+                    <input type="submit" />
+                </form>
+            {% else %}
+                Not authorised to POST
+            {% endif %}
+        </section>
+    </div>
+
+    <div class="small-12 island">
+        <h2 class="subheader">postFieldSettings</h2>
+        <section class="content">
+            {% set formAction = routeLookupIfAuthorized('profileEditor.postFieldSettings', {fieldId: 117}) %}
+            {% if formAction %}
+                <form action="{{ formAction }}" method="post">
+                    <input type="text" name="action" value="settings" />
+                    <input type="submit" />
+                </form>
+            {% else %}
+                Not authorised to POST
+            {% endif %}
+        </section>
+    </div>
+
+    <div class="small-12 island">
+        <h2 class="subheader">postFieldSequence</h2>
+        <section class="content">
+            {% set formAction = routeLookupIfAuthorized('profileEditor.postFieldSequence', {roletype: 'student'}) %}
+            {% if formAction %}
+                <form action="{{ formAction }}" method="post">
+                    <input type="text" name="action" value="sequence" />
+                    <input type="submit" />
+                </form>
+            {% else %}
+                Not authorised to POST
+            {% endif %}
         </section>
     </div>
 </div>
