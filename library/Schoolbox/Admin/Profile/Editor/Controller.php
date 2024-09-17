@@ -11,16 +11,13 @@ declare(strict_types=1);
 namespace Schoolbox\Admin\Profile\Editor;
 
 use Alaress\Web\Controller\Base;
-use Schoolbox\Error\Mapper as ErrorMapper;
 
 class Controller extends Base
 {
     /**
      * Controller constructor.
-     *
-     * @param ErrorMapper $errorMapper
      */
-    public function __construct(private ErrorMapper $errorMapper)
+    public function __construct()
     {
     }
 
