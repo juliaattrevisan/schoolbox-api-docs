@@ -176,7 +176,7 @@ class Event implements ISoftDeletable
      *
      * @var bool
      */
-    protected $showAttendees;
+    protected $showAttendees = false;
 
 
     /**

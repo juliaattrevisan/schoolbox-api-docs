@@ -292,6 +292,19 @@ class Validator
          * the event will be valid after the requested modification(s) have been performed.
          */
 
+        // TODO: Enable this rule once the form has been fixed.
+        // Check that values for 'attendance' and 'guests' do not contradict.
+        //if (
+        //    array_key_exists('attendance', (array)$requestPost) &&
+        //    array_key_exists('guests', (array)$requestPost) &&
+        //    $requestPost['attendance'] === EventAttendanceModel::LEVEL_NO_ATTENDANCE &&
+        //    count($requestPost['guests']) > 0
+        //) {
+        //    throw new SchoolboxException(
+        //        "If 'attendance' is " . EventAttendanceModel::LEVEL_NO_ATTENDANCE . ", 'guests' must be empty."
+        //    );
+        //}
+
         // Check the format of newly supplied dates, taking into account the new or existing value of 'allDay'.
         // Note existing dates can be assumed to have the correct format, since any format can be obtained from existing dates.
         $allDayBool = $requestPost['allDay'] ?? ($event->getAllDay() === Event::ALL_DAY);

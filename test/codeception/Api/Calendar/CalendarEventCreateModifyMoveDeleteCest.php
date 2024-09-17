@@ -45,7 +45,7 @@ class CalendarEventCreateModifyMoveDeleteCest
     public function testCreateEvent(ApiTester $i): void
     {
         // -----------------------------------------------------------------------------------------------------------//
-        // Create an event with the required parameters
+        // Create an event, setting the required parameters only
         // -----------------------------------------------------------------------------------------------------------//
         $eventTitle = "St Swivven's Day";
         $apiPathForCreate = '/calendar/event/create';
@@ -62,8 +62,11 @@ class CalendarEventCreateModifyMoveDeleteCest
         $i->sendPost($apiPathForCreate, $minimalRequiredParams);
         $createdEventJson = $i->grabResponse();
         $this->createdEvent = json_decode($createdEventJson, true);
+        if ($this->createdEvent === null) {
+            throw new UnexpectedValueException("Could not decode JSON '$createdEventJson'.'");
+        }
         if (array_key_exists('message', $this->createdEvent)) {
-            echo "Error message from server: '{$this->createdEvent['message']}'\n";
+            throw new UnexpectedValueException("Error message from server: '{$this->createdEvent['message']}'");
         }
 
         // In created event, check keys with non-array values.
@@ -107,6 +110,9 @@ class CalendarEventCreateModifyMoveDeleteCest
         $i->sendPost($apiPathForCreate, $minimalRequiredParamsMinusOne);
         $createdEventJson = $i->grabResponse();
         $createdEvent = json_decode($createdEventJson, true);
+        if ($createdEvent === null) {
+            throw new UnexpectedValueException("Could not decode JSON '$createdEventJson'.'");
+        }
         $i->assertTrue(str_starts_with($createdEvent['message'], 'Missing required key'));
     }
 
@@ -132,7 +138,6 @@ class CalendarEventCreateModifyMoveDeleteCest
             'maxAttendees'  => 5,
             'showAttendees' => true,
             'attendance'    => EventAttendanceModel::LEVEL_OPEN_ATTENDANCE,
-            'guests'        => [['id' => $userJackColes->getId()], ['id' => $userJanaReed->getId()]],
             'startDate'     => "2024-09-22T00:00:00$timezoneOffset", // Move startDate backwards, so endDate need not change.
             'endDate'       => "2024-09-24T23:59:59$timezoneOffset", // Move end date forwards, so startDate need not change.
         ];
@@ -153,6 +158,9 @@ class CalendarEventCreateModifyMoveDeleteCest
             $i->sendPost("/calendar/event/$localEventId/modify", [$key => $newValue]);
             $apiEventJson = $i->grabResponse();
             $apiEvent = json_decode($apiEventJson, true);
+            if ($apiEvent === null) {
+                throw new UnexpectedValueException("Could not decode JSON '$apiEventJson'.'");
+            }
             if (array_key_exists('message', $apiEvent)) {
                 throw new UnexpectedValueException("Error message from server: '{$apiEvent['message']}'");
             }
@@ -161,12 +169,65 @@ class CalendarEventCreateModifyMoveDeleteCest
         }
 
         // -----------------------------------------------------------------------------------------------------------//
+        // Test dependent fields: {attendance, guests} by inviting guests when attendance type is 'none'
+        // -----------------------------------------------------------------------------------------------------------//
+        // Note the current modify event form can make this contradictory request, so the request cannot be rejected
+        // first fixing that form.  For now, just make sure the server does not save the guests.
+        $i->amGoingTo("attempt to invite guests to the event when attendance type is 'none'.");
+        $newAttendance = EventAttendanceModel::LEVEL_NO_ATTENDANCE;
+        $newGuests = [['id' => $userJackColes->getId()], ['id' => $userJanaReed->getId()]];
+        $i->sendPost(
+            "/calendar/event/$localEventId/modify",
+            [
+                'attendance' => $newAttendance,
+                'guests' => $newGuests,
+            ]
+        );
+        $localEvent['attendance'] = $newAttendance;
+        $localEvent['guests'] = [];
+        $apiEventJson = $i->grabResponse();
+        $apiEvent = json_decode($apiEventJson, true);
+        if ($apiEvent === null) {
+            throw new UnexpectedValueException("Could not decode JSON '$apiEventJson'.'");
+        }
+        if (array_key_exists('message', $apiEvent)) {
+            throw new UnexpectedValueException("Error message from server: '{$apiEvent['message']}'");
+        }
+        $i->assertTrue($this->eventArraysAreEqual($localEvent, $apiEvent));
+
+        // -----------------------------------------------------------------------------------------------------------//
+        // Test dependent fields: {attendance, guests} by inviting guests when attendance type allows invitations
+        // -----------------------------------------------------------------------------------------------------------//
+        $i->amGoingTo('change attendance type and invite guests to the event.');
+        $newAttendance = EventAttendanceModel::LEVEL_INVITE_ONLY;
+        $newGuests = [['id' => $userJackColes->getId()], ['id' => $userJanaReed->getId()]];
+        $i->sendPost(
+            "/calendar/event/$localEventId/modify",
+            [
+                'attendance' => $newAttendance,
+                'guests' => $newGuests,
+            ]
+        );
+        $localEvent['attendance'] = $newAttendance;
+        $localEvent['guests'] = $newGuests;
+        $apiEventJson = $i->grabResponse();
+        $apiEvent = json_decode($apiEventJson, true);
+        if ($apiEvent === null) {
+            throw new UnexpectedValueException("Could not decode JSON '$apiEventJson'.'");
+        }
+        if (array_key_exists('message', $apiEvent)) {
+            throw new UnexpectedValueException("Error message from server: '{$apiEvent['message']}'");
+        }
+        $i->assertTrue($this->eventArraysAreEqual($localEvent, $apiEvent));
+
+        // -----------------------------------------------------------------------------------------------------------//
         // Test dependent fields: {allDay, startDate, endDate, repeat_until} by creating a personal-level event.
         // -----------------------------------------------------------------------------------------------------------//
         $i->amGoingTo('change from an all-day to a not all-day event.');
         $newAllDay = false;
         $newStartDate = "2024-09-24T08:00:00$timezoneOffset";
         $newEndDate = "2024-09-24T09:30:00$timezoneOffset"; // Move the old end date forwards.
+        $newEndDateEndOfDay = "2024-09-24T23:59:59$timezoneOffset"; // End of the day on the new end date.
         $i->sendPost(
             "/calendar/event/$localEventId/modify",
             [
@@ -178,9 +239,12 @@ class CalendarEventCreateModifyMoveDeleteCest
         $localEvent['allDay'] = $newAllDay;
         $localEvent['startDate'] = $newStartDate;
         $localEvent['endDate'] = $newEndDate;
-        $localEvent['repeat_until'] = $newEndDate; // +- Since the end date has moved forwards, the repeat_until date
-        $apiEventJson = $i->grabResponse();        //  \ in the $apiEvent will have moved forward to match.
+        $localEvent['repeat_until'] = $newEndDateEndOfDay; // +- Since the end date has moved forwards, the repeat_until date
+        $apiEventJson = $i->grabResponse();                //  \ in the $apiEvent will have moved forward to match.
         $apiEvent = json_decode($apiEventJson, true);
+        if ($apiEvent === null) {
+            throw new UnexpectedValueException("Could not decode JSON '$apiEventJson'.'");
+        }
         if (array_key_exists('message', $apiEvent)) {
             throw new UnexpectedValueException("Error message from server: '{$apiEvent['message']}'");
         }
@@ -212,6 +276,9 @@ class CalendarEventCreateModifyMoveDeleteCest
         $localEvent['roles'] = []; // These will be cleared because roles are irrelevant for group-level events.
         $apiEventJson = $i->grabResponse();
         $apiEvent = json_decode($apiEventJson, true);
+        if ($apiEvent === null) {
+            throw new UnexpectedValueException("Could not decode JSON '$apiEventJson'.'");
+        }
         if (array_key_exists('message', $apiEvent)) {
             throw new UnexpectedValueException("Error message from server: '{$apiEvent['message']}'");
         }
@@ -237,6 +304,9 @@ class CalendarEventCreateModifyMoveDeleteCest
         $localEvent['folders'] = []; // This will be cleared because folders are irrelevant for campus-level events.
         $apiEventJson = $i->grabResponse();
         $apiEvent = json_decode($apiEventJson, true);
+        if ($apiEvent === null) {
+            throw new UnexpectedValueException("Could not decode JSON '$apiEventJson'.'");
+        }
         if (array_key_exists('message', $apiEvent)) {
             throw new UnexpectedValueException("Error message from server: '{$apiEvent['message']}'");
         }
@@ -262,6 +332,9 @@ class CalendarEventCreateModifyMoveDeleteCest
         $localEvent['roles'] = []; // This will be cleared because roles are irrelevant for personal-level events.
         $apiEventJson = $i->grabResponse();
         $apiEvent = json_decode($apiEventJson, true);
+        if ($apiEvent === null) {
+            throw new UnexpectedValueException("Could not decode JSON '$apiEventJson'.'");
+        }
         if (array_key_exists('message', $apiEvent)) {
             throw new UnexpectedValueException("Error message from server: '{$apiEvent['message']}'");
         }
@@ -296,6 +369,10 @@ class CalendarEventCreateModifyMoveDeleteCest
                         }
                     } else {
                         // We are dealing with arrays of stubs.  Sort both arrays before comparing.
+                        if (count($aValue) !== count($bValue)) {
+                            return false;
+                        }
+
                         try {
                             usort($aValue, fn ($a, $b) => $a['id'] <=> $b['id']);
                             usort($bValue, fn ($a, $b) => $a['id'] <=> $b['id']);

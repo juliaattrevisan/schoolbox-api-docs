@@ -554,6 +554,7 @@ class Controller extends Base
     /**
      * Create an event for person specified by userId
      * (remember, you can create events for other people)
+     * @throws Exception
      */
     public function postCreate(): void
     {
@@ -608,7 +609,7 @@ class Controller extends Base
          * If not - pass ownership to the author
          */
         try {
-            $owner = $this->userMapper->findById($event->getOwner()->getId());
+            $owner = $this->userMapper->findById($validRequestPost['user']['id'] ?? $event->getOwner()->getId());
         } catch (Exception $e) {
             $owner = $this->getUser();
         }
@@ -633,20 +634,20 @@ class Controller extends Base
         $detail      = $validRequestPost['detail'] ?? $event->getDetail();
         $allDay      = (int)($validRequestPost['allDay'] ?? $event->getAllDay());
 
-        $folders  = (
+        $folderIds = (
             array_key_exists('folders', (array)$validRequestPost)
             ? $this->getIdsFromDigitStringsOrKeyedArrays($validRequestPost['folders'])
-            : $this->translateFolderModelsToArrays($event->getFolderCollection())
+            : $event->getFolderCollection()->map(fn ($folder) => $folder->getId())
         );
-        $campuses = (
+        $campusIds = (
             array_key_exists('campuses', (array)$validRequestPost)
             ? $this->getIdsFromDigitStringsOrKeyedArrays($validRequestPost['campuses'])
-            : $this->translateCampusModelsToArrays($event->getCampusCollection())
+            : $event->getCampusCollection()->map(fn ($campus) => $campus->getId())
         );
-        $roles = (
+        $roleIds = (
             array_key_exists('roles', (array)$validRequestPost)
             ? $this->getIdsFromDigitStringsOrKeyedArrays($validRequestPost['roles'])
-            : $this->translateRoleModelsToArrays($event->getRoleCollection())
+            : $event->getRoleCollection()->map(fn ($role) => $role->getId())
         );
 
         /* Recurrence settings
@@ -661,7 +662,7 @@ class Controller extends Base
         /* Check whether you have permissions to mutate $event into the vars provided
          */
         try {
-            if (!(new Event\Access($this->folderAccess))->checkDestination($this->getUser(), $accessLevel, $author, $owner, $folders, $campuses)) {
+            if (!(new Event\Access($this->folderAccess))->checkDestination($this->getUser(), $accessLevel, $author, $owner, $folderIds, $campusIds)) {
                 throw $this->errorMapper->generateException(Error\Mapper::ERROR_PERM_EVENT_MODIFY);
             }
         } catch (InvalidArgumentException $e) {
@@ -674,9 +675,10 @@ class Controller extends Base
 
         $publishDate = null;
 
-        if ('' !== ($validRequestPost['publishDate'] ?? $event->getPublishDate())) { // TODO: Make this return a date string somehow.
+        $eventPublishDateTime = $event->getPublishDateTime()?->getUsingFormat(DateTimeInterface::RFC3339);
+        if ('' !== ($validRequestPost['publishDate'] ?? $eventPublishDateTime)) {
             $publishDate = new Alaress_Date_Format(
-                $validRequestPost['publishDate'],
+                $validRequestPost['publishDate'] ?? $eventPublishDateTime,
                 [
                     $locale->localFormat(),
                     // API docs state we accept RFC3339 without qualification, so we must accept both variants.
@@ -693,8 +695,14 @@ class Controller extends Base
             DateTimeInterface::RFC3339,
             DateTimeInterface::RFC3339_EXTENDED
         ];
-        $startDate = new Alaress_Date_Format($validRequestPost['startDate'], $acceptedDateFormats);
-        $endDate = new Alaress_Date_Format($validRequestPost['endDate'], $acceptedDateFormats);
+        $startDate = new Alaress_Date_Format(
+            $validRequestPost['startDate'] ?? $event->getStartDateTime()->getUsingFormat(DateTimeInterface::RFC3339),
+            $acceptedDateFormats
+        );
+        $endDate = new Alaress_Date_Format(
+            $validRequestPost['endDate'] ?? $event->getEndDateTime()->getUsingFormat(DateTimeInterface::RFC3339),
+            $acceptedDateFormats
+        );
 
         /* Start and end dates
          */
@@ -737,10 +745,12 @@ class Controller extends Base
 
         /* Attendance settings
          */
-        $attendance    = (int)($validRequestPost['attendance'] ?? $event->getAttendance());
-        $maxAttendees  = ('' == ($validRequestPost['maxAttendees'] ?? $event->getMaxAttendees())) // Deliberate double-equals.
-            ? null
-            : (int)$validRequestPost['maxAttendees'];
+        $attendance = (int)($validRequestPost['attendance'] ?? $event->getAttendance());
+        $maxAttendees = (
+            array_key_exists('maxAttendees', (array)$validRequestPost)
+            ? $validRequestPost['maxAttendees']
+            : $event->getMaxAttendees()
+        );
         $showAttendees = (bool)($validRequestPost['showAttendees'] ?? $event->getShowAttendees());
 
         // As of SA-10697 attendances are not reset on changing event time.
@@ -749,22 +759,13 @@ class Controller extends Base
 
         /* Invited guests
          */
-        $guests = [];
-
+        $guestIds = [];
         if ((new Event\Attendance\ValidCanInvite())->isSatisfiedBy($this->getUser(), $this->getConfigLoader()->get('calendar_student_can_invite'))) {
-            $eventGuests = ($event->getGuests() === null) ? [] : $this->translateUserModelsToArrays($event->getGuests());
-            if (is_array($validRequestPost['guests'] ?? $eventGuests)) {
-                // Guests can be supplied as an array of userIds, or an array of JSON objects.
-                // The array of userIds method is for similarity with 'roles', 'campus', and 'folder'.
-                // The object stub method is documented at api.schoolbox.com.au.
-                $guests = $this->getIdsFromDigitStringsOrKeyedArrays($validRequestPost['guests'] ?? $eventGuests);
-            } elseif ('' !== (string)($validRequestPost['guests'] ?? $eventGuests)) {
-                // Guests can also be supplied as a comma-separated string of userIds.
-                // This method is used by the form at route calendarEvent.getModify.
-                $guests = array_map(
-                    fn($guestId) => (int)$guestId,
-                    explode(',', $validRequestPost['guests'] ?? $eventGuests)
-                );
+            if (array_key_exists('guests', (array)$validRequestPost)) {
+                $guestIds = $this->getIdsFromDigitStringsOrKeyedArrays($validRequestPost['guests']);
+            } else {
+                $this->eventMapper->populateGuests($event); // Hydrate guests in $event.
+                $guestIds = $event->getGuests()->getAll() ?? []; // Note getGuests() returns a Collection of ints.
             }
         }
 
@@ -782,10 +783,10 @@ class Controller extends Base
             ->setEndDateTime($endDate)
             ->setPublishDateTime($publishDate)
             ->setAllDay($allDay)
-            ->setRoleCollection(new Collection($roles))
-            ->setFolderCollection(new Collection($folders))
-            ->setCampusCollection(new Collection($campuses))
-            ->setGuests(new Collection($guests));
+            ->setRoleCollection(new Collection($roleIds))
+            ->setFolderCollection(new Collection($folderIds))
+            ->setCampusCollection(new Collection($campusIds))
+            ->setGuests(new Collection($guestIds));
 
         /* Attendance dirty bit should be set to true if the attendance
          * setting now differs from what it previously was
@@ -801,22 +802,24 @@ class Controller extends Base
          * For campus level events, at least one campus has been selected
          * For group level events, at least one group has been selected
          */
-        if ($event->isCampusLevel() && !count($campuses)) {
+        if ($event->isCampusLevel() && !count($campusIds)) {
             throw $this->errorMapper->generateException(Error\Mapper::ERROR_SELECT_CAMPUS);
-        } elseif ($event->isGroupLevel() && !count($folders)) {
+        } elseif ($event->isGroupLevel() && !count($folderIds)) {
             throw $this->errorMapper->generateException(Error\Mapper::ERROR_INFORMATION_MISSING);
         }
 
         /* Set up individual relations for each event in the series
          * Event object is provided within eventRecurrenceMapper
          */
-        $eventRelations = new EventRelations($accessLevel, $folders, $roles, $guests, $attendanceDirty);
+        $eventRelations = new EventRelations($accessLevel, $folderIds, $roleIds, $guestIds, $attendanceDirty);
 
         /* Save this event and any recurring incidents too
          */
         (new EventRecurrenceMapper($this->eventMapper))->save($event, $efficacy, $repeat, $untilDate, $startDate, $endDate, $accessLevel, $eventRelations);
 
         if ($this->isJsonRequest()) {
+            $this->eventMapper->populateGuests($event); // Reload guests to ensure the response matches the database representation.
+
             /**
              * @var eventType $eventType EventType
              */
