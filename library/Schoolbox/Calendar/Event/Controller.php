@@ -765,7 +765,7 @@ class Controller extends Base
                 $guestIds = $this->getIdsFromDigitStringsOrKeyedArrays($validRequestPost['guests']);
             } else {
                 $this->eventMapper->populateGuests($event); // Hydrate guests in $event.
-                $guestIds = $event->getGuests()->getAll() ?? []; // Note getGuests() returns a Collection of ints.
+                $guestIds = $event->getGuests()->getAll(); // Note getGuests() returns a Collection of ints.
             }
         }
 
