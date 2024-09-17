@@ -21,7 +21,12 @@ $app = new class extends CliTool\App {
 
         // Iterate over the user database and find all users with the password 'donotchange', then change it to NULL
         $rows = $dbc->executeQuery('SELECT `id`, `password` FROM user WHERE `password` IS NOT NULL AND `password` != ""')->fetchAll();
-        foreach ($rows as $row) {
+        $rowCount = count($rows);
+        $log->info(sprintf('Processing %d users', $rowCount));
+        foreach ($rows as $i => $row) {
+            if (($i+1) % 50 === 0) {
+                $log->info(sprintf('Processing user %d/%d', $i+1, $rowCount));
+            }
             $userId = $row['id'];
 
             if (password_verify('donotchange', $row['password'])) {
@@ -29,6 +34,7 @@ $app = new class extends CliTool\App {
                 $log->info("Changed password for user $userId");
             }
         }
+        $log->info('All users processed.');
     }
 };
 
