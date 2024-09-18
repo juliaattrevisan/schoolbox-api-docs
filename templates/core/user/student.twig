@@ -172,157 +172,163 @@
 
                         {% block details %}
                             <dl>
-                                {% if showTitle %}
-                                    <dt class="small-4 medium-3 columns">Position Title:</dt>
-                                    <dd class="small-8 medium-9 columns">
-                                        {{ user.positionTitle }}
-                                    </dd>
-                                {% endif %}
-
-                                {% if showEmail %}
-                                    {% block details_email %}
-                                        {% if user.email %}
-                                            <dt class="small-4 medium-3 columns">Email:</dt>
-                                            <dd class="small-8 medium-9 columns">
-                                                <a href="{{ session.mailhandle }}{{ user.email }}">{{ user.email }}</a>
-                                            </dd>
-                                        {% endif %}
-                                    {% endblock details_email %}
-                                {% endif %}
-
-                                {% if showDetails %}
-                                    {% block details_studentId %}
-                                        <dt class="small-4 medium-3 columns">Student ID:</dt>
-                                        <dd class="small-8 medium-9 columns">{{ user.externalId }}</dd>
-                                    {% endblock details_studentId %}
-
-                                    {% block details_dob %}
-                                        {% if externalUser.StudentBirthDate is defined and externalUser.StudentBirthDate %}
-                                            <dt class="small-4 medium-3 columns">Date of Birth:</dt>
-                                            <dd class="small-8 medium-9 columns">{{ externalUser.StudentBirthDate|date(dateFormats.shortDateOnlyFormat) }}</dd>
-                                        {% endif %}
-                                    {% endblock details_dob %}
-
-                                    {% block details_formTeacher %}
-                                        {% if showClasses %}
-                                            {% if formTeacher %}
-                                                <dt class="small-4 medium-3 columns">Class Teacher:</dt>
-                                                <dd class="small-8 medium-9 columns">
-                                                    {% if formTeacher.id %}
-                                                        <a href="{{ session.mailhandle }}{{ formTeacher.email }}">{{ formTeacher.formatName }}</a>
-                                                    {% else %}
-                                                        {{ formTeacher.formatName }}
-                                                    {% endif %}
-                                                </dd>
-                                            {% endif %}
-                                        {% endif %}
-                                    {% endblock details_formTeacher %}
-
-                                    {% block details_yearLevel %}
-                                        {% if externalUser.StudentYearLevel is defined %}
-                                            <dt class="small-4 medium-3 columns">{{ locale.yearLevel.proper }}:</dt>
-                                            <dd class="small-8 medium-9 columns">{{ externalUser.StudentYearLevel }}</dd>
-                                        {% endif %}
-                                    {% endblock details_yearLevel %}
-
-                                    {% block details_tutorTeacher %}
-                                        {% if showClasses %}
-                                            {% if tutorTeacher %}
-                                                <dt class="small-4 medium-3 columns">{{ locale.tutor.proper }}:</dt>
-                                                <dd class="small-8 medium-9 columns">
-                                                    {% if tutorTeacher.id %}
-                                                        <a href="{{ session.mailhandle }}{{ tutorTeacher.email }}">{{ tutorTeacher.formatName }}</a>
-                                                    {% else %}
-                                                        {{ tutorTeacher.formatName }}
-                                                    {% endif %}
-                                                </dd>
-                                            {% endif %}
-                                        {% endif %}
-                                    {% endblock details_tutorTeacher %}
-
-                                    {% block details_coordTeacher %}
-                                        {% if coordTeacher %}
-                                        <dt class="small-4 medium-3 columns">{{ locale.yearLevelCoordinator.proper }}:</dt>
-                                        <dd class="small-8 medium-9 columns">
-                                        {% if coordTeacher.id %}
-                                        <a href="{{ session.mailhandle }}{{ coordTeacher.email }}">{{ coordTeacher.formatName }}</a>
-                                        {% else %}
-                                        {{ coordTeacher.formatName }}
-                                        {% endif %}
-                                        </dd>
-                                        {% endif %}
-                                    {% endblock details_coordTeacher %}
-
-                                    {% block details_house %}
-                                        {% if externalUser.StudentHouseDescription ?? false %}
-                                            <dt class="small-4 medium-3 columns">House:</dt>
-                                            <dd class="small-8 medium-9 columns">{{ externalUser.StudentHouseDescription }}</dd>
-                                        {% endif %}
-                                    {% endblock details_house %}
-
-                                    {% block details_tutorGroup %}
-                                        {% if showClasses %}
-                                            {% if externalUser.StudentTutorDescription ?? false %}
-                                                <dt class="small-4 medium-3 columns">{{ locale.tutorGroup.proper }}:</dt>
-                                                <dd class="small-8 medium-9 columns">{{ externalUser.StudentTutorDescription }}</dd>
-                                            {% endif %}
-                                        {% endif %}
-                                    {% endblock details_tutorGroup %}
-
-                                    {% block details_hohTeacher %}
-                                        {% if showClasses %}
-                                            {% if hohTeacher %}
-                                                <dt class="small-4 medium-3 columns">{{ locale.headOfHouse.proper }}:</dt>
-                                                <dd class="small-8 medium-9 columns">
-                                                    {% if hohTeacher.id %}
-                                                        <a href="{{ session.mailhandle }}{{ hohTeacher.email }}">{{ hohTeacher.formatName }}</a>
-                                                    {% else %}
-                                                        {{ hohTeacher.formatName }}
-                                                    {% endif %}
-                                                </dd>
-                                            {% endif %}
-                                        {% endif %}
-                                    {% endblock details_hohTeacher %}
-
-                                    {% block details_studentForm %}
-                                        {% if showClasses %}
-                                            {% if externalUser.StudentForm ?? false %}
-                                                <dt class="small-4 medium-3 columns">Class:</dt>
-                                                <dd class="small-8 medium-9 columns">{{ externalUser.StudentForm }}</dd>
-                                            {% endif %}
-                                        {% endif %}
-                                    {% endblock details_studentForm %}
-
-                                    {% block details_studentType %}
-                                        {% if boarderType %}
-                                            <dt class="small-4 medium-3 columns">Student Type:</dt>
-                                            <dd class="small-8 medium-9 columns">{{ boarderType }}</dd>
-                                        {% endif %}
-                                    {% endblock details_studentType %}
-
-                                    {% block details_studentDates %}
-                                    {% endblock %}
-
-                                    {% block details_studiesCode %}
-                                        {% if externalUser.StudentStudiesCode ?? false %}
-                                        <dt class="no-margin small-4 medium-3">{{ locale.studies_code.proper }}:</dt>
-                                        <dd class="no-margin small-8 medium-9">{{ externalUser.StudentStudiesCode }}</dd>
-                                        {% endif %}
-                                    {% endblock details_studiesCode %}
-
-                                    {% block details_gender %}
-                                        {#<dt class="small-4 medium-3 columns">Gender:</dt>
-                                        <dd class="small-8 medium-9 columns">{{ externalUser.StudentGender }}</dd>#}
-                                    {% endblock details_gender %}
-
-                                    {% block details_coach %}
-                                    {% endblock details_coach %}
-                                {% endif %}
-
-                                {% block extraDetails %}
-                                    {# Schools can insert extra details here #}
-                                {% endblock extraDetails %}
+                                {% for field in externalUser.data.roleTypes.fields.selected %}
+                                    <dt class="small-4 medium-3 columns">{{ field.displayAs }}</dt>
+                                    <dd class="small-8 medium-9 columns">{{ field.value }}</dd>
+                                {% endfor %}
                             </dl>
+{#                            <dl>#}
+{#                                {% if showTitle %}#}
+{#                                    <dt class="small-4 medium-3 columns">Position Title:</dt>#}
+{#                                    <dd class="small-8 medium-9 columns">#}
+{#                                        {{ user.positionTitle }}#}
+{#                                    </dd>#}
+{#                                {% endif %}#}
+
+{#                                {% if showEmail %}#}
+{#                                    {% block details_email %}#}
+{#                                        {% if user.email %}#}
+{#                                            <dt class="small-4 medium-3 columns">Email:</dt>#}
+{#                                            <dd class="small-8 medium-9 columns">#}
+{#                                                <a href="{{ session.mailhandle }}{{ user.email }}">{{ user.email }}</a>#}
+{#                                            </dd>#}
+{#                                        {% endif %}#}
+{#                                    {% endblock details_email %}#}
+{#                                {% endif %}#}
+
+{#                                {% if showDetails %}#}
+{#                                    {% block details_studentId %}#}
+{#                                        <dt class="small-4 medium-3 columns">Student ID:</dt>#}
+{#                                        <dd class="small-8 medium-9 columns">{{ user.externalId }}</dd>#}
+{#                                    {% endblock details_studentId %}#}
+
+{#                                    {% block details_dob %}#}
+{#                                        {% if externalUser.StudentBirthDate is defined and externalUser.StudentBirthDate %}#}
+{#                                            <dt class="small-4 medium-3 columns">Date of Birth:</dt>#}
+{#                                            <dd class="small-8 medium-9 columns">{{ externalUser.StudentBirthDate|date(dateFormats.shortDateOnlyFormat) }}</dd>#}
+{#                                        {% endif %}#}
+{#                                    {% endblock details_dob %}#}
+
+{#                                    {% block details_formTeacher %}#}
+{#                                        {% if showClasses %}#}
+{#                                            {% if formTeacher %}#}
+{#                                                <dt class="small-4 medium-3 columns">Class Teacher:</dt>#}
+{#                                                <dd class="small-8 medium-9 columns">#}
+{#                                                    {% if formTeacher.id %}#}
+{#                                                        <a href="{{ session.mailhandle }}{{ formTeacher.email }}">{{ formTeacher.formatName }}</a>#}
+{#                                                    {% else %}#}
+{#                                                        {{ formTeacher.formatName }}#}
+{#                                                    {% endif %}#}
+{#                                                </dd>#}
+{#                                            {% endif %}#}
+{#                                        {% endif %}#}
+{#                                    {% endblock details_formTeacher %}#}
+
+{#                                    {% block details_yearLevel %}#}
+{#                                        {% if externalUser.StudentYearLevel is defined %}#}
+{#                                            <dt class="small-4 medium-3 columns">{{ locale.yearLevel.proper }}:</dt>#}
+{#                                            <dd class="small-8 medium-9 columns">{{ externalUser.StudentYearLevel }}</dd>#}
+{#                                        {% endif %}#}
+{#                                    {% endblock details_yearLevel %}#}
+
+{#                                    {% block details_tutorTeacher %}#}
+{#                                        {% if showClasses %}#}
+{#                                            {% if tutorTeacher %}#}
+{#                                                <dt class="small-4 medium-3 columns">{{ locale.tutor.proper }}:</dt>#}
+{#                                                <dd class="small-8 medium-9 columns">#}
+{#                                                    {% if tutorTeacher.id %}#}
+{#                                                        <a href="{{ session.mailhandle }}{{ tutorTeacher.email }}">{{ tutorTeacher.formatName }}</a>#}
+{#                                                    {% else %}#}
+{#                                                        {{ tutorTeacher.formatName }}#}
+{#                                                    {% endif %}#}
+{#                                                </dd>#}
+{#                                            {% endif %}#}
+{#                                        {% endif %}#}
+{#                                    {% endblock details_tutorTeacher %}#}
+
+{#                                    {% block details_coordTeacher %}#}
+{#                                        {% if coordTeacher %}#}
+{#                                        <dt class="small-4 medium-3 columns">{{ locale.yearLevelCoordinator.proper }}:</dt>#}
+{#                                        <dd class="small-8 medium-9 columns">#}
+{#                                        {% if coordTeacher.id %}#}
+{#                                        <a href="{{ session.mailhandle }}{{ coordTeacher.email }}">{{ coordTeacher.formatName }}</a>#}
+{#                                        {% else %}#}
+{#                                        {{ coordTeacher.formatName }}#}
+{#                                        {% endif %}#}
+{#                                        </dd>#}
+{#                                        {% endif %}#}
+{#                                    {% endblock details_coordTeacher %}#}
+
+{#                                    {% block details_house %}#}
+{#                                        {% if externalUser.StudentHouseDescription ?? false %}#}
+{#                                            <dt class="small-4 medium-3 columns">House:</dt>#}
+{#                                            <dd class="small-8 medium-9 columns">{{ externalUser.StudentHouseDescription }}</dd>#}
+{#                                        {% endif %}#}
+{#                                    {% endblock details_house %}#}
+
+{#                                    {% block details_tutorGroup %}#}
+{#                                        {% if showClasses %}#}
+{#                                            {% if externalUser.StudentTutorDescription ?? false %}#}
+{#                                                <dt class="small-4 medium-3 columns">{{ locale.tutorGroup.proper }}:</dt>#}
+{#                                                <dd class="small-8 medium-9 columns">{{ externalUser.StudentTutorDescription }}</dd>#}
+{#                                            {% endif %}#}
+{#                                        {% endif %}#}
+{#                                    {% endblock details_tutorGroup %}#}
+
+{#                                    {% block details_hohTeacher %}#}
+{#                                        {% if showClasses %}#}
+{#                                            {% if hohTeacher %}#}
+{#                                                <dt class="small-4 medium-3 columns">{{ locale.headOfHouse.proper }}:</dt>#}
+{#                                                <dd class="small-8 medium-9 columns">#}
+{#                                                    {% if hohTeacher.id %}#}
+{#                                                        <a href="{{ session.mailhandle }}{{ hohTeacher.email }}">{{ hohTeacher.formatName }}</a>#}
+{#                                                    {% else %}#}
+{#                                                        {{ hohTeacher.formatName }}#}
+{#                                                    {% endif %}#}
+{#                                                </dd>#}
+{#                                            {% endif %}#}
+{#                                        {% endif %}#}
+{#                                    {% endblock details_hohTeacher %}#}
+
+{#                                    {% block details_studentForm %}#}
+{#                                        {% if showClasses %}#}
+{#                                            {% if externalUser.StudentForm ?? false %}#}
+{#                                                <dt class="small-4 medium-3 columns">Class:</dt>#}
+{#                                                <dd class="small-8 medium-9 columns">{{ externalUser.StudentForm }}</dd>#}
+{#                                            {% endif %}#}
+{#                                        {% endif %}#}
+{#                                    {% endblock details_studentForm %}#}
+
+{#                                    {% block details_studentType %}#}
+{#                                        {% if boarderType %}#}
+{#                                            <dt class="small-4 medium-3 columns">Student Type:</dt>#}
+{#                                            <dd class="small-8 medium-9 columns">{{ boarderType }}</dd>#}
+{#                                        {% endif %}#}
+{#                                    {% endblock details_studentType %}#}
+
+{#                                    {% block details_studentDates %}#}
+{#                                    {% endblock %}#}
+
+{#                                    {% block details_studiesCode %}#}
+{#                                        {% if externalUser.StudentStudiesCode ?? false %}#}
+{#                                        <dt class="no-margin small-4 medium-3">{{ locale.studies_code.proper }}:</dt>#}
+{#                                        <dd class="no-margin small-8 medium-9">{{ externalUser.StudentStudiesCode }}</dd>#}
+{#                                        {% endif %}#}
+{#                                    {% endblock details_studiesCode %}#}
+
+{#                                    {% block details_gender %}#}
+{#                                        #}{#<dt class="small-4 medium-3 columns">Gender:</dt>#}
+{#                                        <dd class="small-8 medium-9 columns">{{ externalUser.StudentGender }}</dd>#}
+{#                                    {% endblock details_gender %}#}
+
+{#                                    {% block details_coach %}#}
+{#                                    {% endblock details_coach %}#}
+{#                                {% endif %}#}
+
+{#                                {% block extraDetails %}#}
+{#                                    #}{# Schools can insert extra details here #}
+{#                                {% endblock extraDetails %}#}
+{#                            </dl>#}
                         {% endblock details %}
                         {% if showPastoral and pastoralCounts|length > 0 %}
                             <div class="pastoral-flags">

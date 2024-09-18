@@ -11,22 +11,25 @@ namespace Schoolbox\Profile\Field;
 
 use Alaress\Database\Predicate\InvalidColumnException;
 use DebugBar\DebugBarException;
-use Schoolbox\Mapper\Exception;
+use Schoolbox\Admin\Profile\Editor\Field\Mapper;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Role;
 use Schoolbox\User;
+use Schoolbox\UserMapper;
 
 class Factory
 {
     /**
      * Constructor
      *
-     * @param \Schoolbox\Admin\Profile\Editor\Field\Mapper $fieldMapper
+     * @param Mapper $fieldMapper
+     * @param UserMapper $userMapper
+     * @param \External_UserInterface $externalUser
      */
     public function __construct(
         private \Schoolbox\Admin\Profile\Editor\Field\Mapper $fieldMapper,
         private \Schoolbox\UserMapper $userMapper,
-        private \External_User $externalUser
+        private \External_UserInterface $externalUser
     ) {
     }
 
@@ -40,7 +43,8 @@ class Factory
      * @param User $viewer
      * @return array
      * @throws DebugBarException
-     * @throws Exception
+     * @throws InvalidColumnException
+     * @throws MapperException
      * @throws \DomainException
      * @throws \PDOException
      * @throws \UnexpectedValueException
@@ -51,9 +55,8 @@ class Factory
             /* TODO add rosetta stone
              */
             'locale' => null,
-            'data' => [],
             'roleTypes' => [
-                'roletype' => $viewee->getRole()->getType(),
+                'roleType' => $viewee->getRole()->getType(),
                 'fields' => [
                     'selected' => []
                 ]
@@ -69,18 +72,18 @@ class Factory
         $renderableFields = $this->fieldMapper->findRenderableFields($viewee, $viewer);
 
         foreach ($renderableFields as $renderableField) {
-            $payload['data'][] = [
+            $payload['roleTypes']['fields']['selected'][] = [
                 'field' => $renderableField->getField(),
                 'displayAs' => $renderableField->getDisplayAs(),
                 'value' => $referenceFields[$renderableField->getField()] ?? null
             ];
         }
 
-        new \Alaress_Probe($referenceFields, $renderableFields, $payload);
-
         /* The preprocessed payload that frontend can just use
          */
-        return $payload;
+        return [
+            'data' => $payload
+        ];
     }
 
 
