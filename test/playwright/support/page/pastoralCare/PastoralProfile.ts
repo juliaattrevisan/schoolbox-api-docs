@@ -12,25 +12,26 @@ export default class PastoralProfile {
 
     static readonly PASTORAL_POST_COMMENT = "#submit-for-comment-public";
 
+    static readonly CREATE_PASTORAL_BUTTON = "a[title='Create Pastoral Record']";
+
     constructor(tester: AcceptanceTester, page: Page) {
         this.tester = tester;
         this.page = page;
     }
 
     /**
-     * Generates route for this page.
-     * @param id - The student id
-     * @returns string - The URL
+     * Navigates to the profile page
+     * @param id - The user id
      */
-    async generateRoute(id: number): string {
-        await this.page.goto(PastoralProfile.URL.replace("{id}", id.toString()));
+    async goto(id: string): Promise<void> {
+        await this.page.goto(PastoralProfile.URL.replace("{studentId}", id.toString()));
     }
 
     /**
      * click Create Pastoral Record button
      */
     async clickCreatePastoralRecord(): Promise<void> {
-        await this.page.click("Create Pastoral Record");
+        await this.page.click(PastoralProfile.CREATE_PASTORAL_BUTTON);
     }
 
     /**

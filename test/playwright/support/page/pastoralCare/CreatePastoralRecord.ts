@@ -48,8 +48,9 @@ export default class CreatePastoralRecord {
      * click one of the subtype by passing its int value: if type Academic then subtypes 1 for Award/Achievement, 2 for Learning Difficulties etc
      * @param type - The type of the pastoral record
      */
-    async selectTypeSubType(type: number): Promise<void> {
-        await this.page.click(`option[value="${type}"]`);
+    async selectTypeSubType(type: string): Promise<void> {
+        // await this.page.click(`option[value="${type}"]`);
+        await this.page.locator("#typeId").selectOption({ value: type });
     }
 
     /**
