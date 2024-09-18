@@ -140,6 +140,9 @@ class Controller extends Base
      */
     public function getPaperlyLinks(): void
     {
+//        $this->response = $this->responseAsJson($this->getPaperlyMockResponse());
+//        return;
+
         $paperlyLinks = [
             'features' => []
         ];
@@ -202,5 +205,58 @@ class Controller extends Base
                 $this->getPaperlyHostname() . $path['url']
             )
         ], "Paperly " . $path['pageTitle']);
+    }
+
+    /**
+     * Creating a mock response for testing the payload for front end
+     *
+     * @return array[]
+     */
+    private function getPaperlyMockResponse(): array
+    {
+        return [
+            "features" => [
+                [
+                    "title" => "Excursions",
+                    "url"   => "https://schoolboxtest.paperlyapp.com/excursion",
+                ],
+                [
+                    "title" => "Forms",
+                    "url"   => "https://schoolboxtest.paperlyapp.com/form-builder",
+                ],
+                [
+                    "title" => "Parent Teacher Interview",
+                    "url"   => "https://schoolboxtest.paperlyapp.com/parent-teacher-interview/event",
+                ],
+            ],
+            "upcoming" => [
+                [
+                    "title" => "Calendar Event Requests",
+                    "url"   => "https://schoolboxtest.paperlyapp.com/form/calendar-event-requests",
+                    "due"   => "2025-07-11T03:32:00.000000Z",
+                ],
+                [
+                    "title" => "Application for Staff Professional Development",
+                    "url"   => "https://schoolboxtest.paperlyapp.com/form/application-for-staff-professional-development",
+                    "due"   => "2025-07-11T03:42:00.000000Z",
+                ],
+                [
+                    "title" => "Maintenance Request",
+                    "url"   => "https://schoolboxtest.paperlyapp.com/form/maintenance-request",
+                ],
+                [
+                    "title"  => "Application for Staff Professional Development",
+                    "url"    => "https://schoolboxtest.paperlyapp.com/form-builder/submitted/8",
+                    "status" => "Pending Approval",
+                    "due"   => "2025-07-11T03:42:00.000000Z",
+                ],
+                [
+                    "title"  => "Application for Staff Professional Development",
+                    "url"    => "https://schoolboxtest.paperlyapp.com/form-builder/submitted/8",
+                    "status" => "Pending Approval",
+                ],
+            ],
+
+        ];
     }
 }
