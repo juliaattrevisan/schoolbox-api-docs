@@ -7,7 +7,7 @@
 
 declare(strict_types=1);
 
-namespace Schoolbox\Profile;
+namespace Schoolbox\Profile\Field;
 
 use DebugBar\DebugBarException;
 use Schoolbox\GenericCollection;
