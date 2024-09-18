@@ -548,4 +548,17 @@ class UserAccessMapper extends Mapper
         }
         return $userCollection;
     }
+
+    /**
+     * @inheritdoc
+     */
+    public function raiseNotification($object, $verb, $previous = null): bool
+    {
+        if ($verb === parent::METHOD_UPDATE) {
+            // no notifications for updates (favourite / un favourite)
+            return true;
+        }
+        // group join / leave, should still spawn notifications
+        return parent::raiseNotification($object, $verb, $previous);
+    }
 }
