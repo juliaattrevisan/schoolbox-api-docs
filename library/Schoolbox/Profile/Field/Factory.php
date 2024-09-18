@@ -45,15 +45,7 @@ class Factory
 
         /* Data about $viewee that we'll put through the $renderableFields list
          */
-        if ($viewee->getRole()->isStudent()) {
-            $referenceFields = $this->generateStudentReferenceFields($viewee);
-        } elseif ($viewee->getRole()->isParent()) {
-            $referenceFields = $this->generateParentReferenceFields($viewee);
-        } elseif ($viewee->getRole()->isStaff()) {
-            $referenceFields = $this->generateStaffReferenceFields($viewee);
-        } else {
-            throw new \DomainException('Viewee has an unknown role type');
-        }
+        $referenceFields = $this->generateReferenceFields($viewee);
 
         /* Fields that $viewer can actually see on screen
          */
@@ -74,25 +66,33 @@ class Factory
      *
      * @param User $viewee
      * @return array
+     * @throws \DomainException
      */
     public function generateReferenceFields(\Schoolbox\User $viewee): array
     {
+        if ($viewee->getRole()->isStudent()) {
+            return $this->generateStudentReferenceFields($viewee);
+        }
+
+        if ($viewee->getRole()->isParent()) {
+            return $this->generateParentReferenceFields($viewee);
+        }
+
+        if ($viewee->getRole()->isStaff()) {
+            return $this->generateStaffReferenceFields($viewee);
+        }
+
+        throw new \DomainException('Viewee has an unknown role type');
     }
 
 
     /**
      * Preprocesses $viewee (a student) and their corresponding External_UserInterface array
      *
-     * This is a hybrid data struct containing all the information about $viewee.
-     * This has schoolbox.user specific fields like pronoun and campus etc.
-     * combined with whatever the External_UserInterface fields contain. This method
-     * returns a loosely-typed array struct that you can map directly to the
-     * list of renderable fields as determined by admin.
-     *
      * @param User $viewee
      * @return array
      */
-    public function generateStudentReferenceFields(\Schoolbox\User $viewee): array
+    private function generateStudentReferenceFields(\Schoolbox\User $viewee): array
     {
     }
 
@@ -100,16 +100,10 @@ class Factory
     /**
      * Preprocesses $viewee (a parent) and their corresponding External_UserInterface array
      *
-     * This is a hybrid data struct containing all the information about $viewee.
-     * This has schoolbox.user specific fields like pronoun and campus etc.
-     * combined with whatever the External_UserInterface fields contain. This method
-     * returns a loosely-typed array struct that you can map directly to the
-     * list of renderable fields as determined by admin.
-     *
      * @param User $viewee
      * @return array
      */
-    public function generateParentReferenceFields(\Schoolbox\User $viewee): array
+    private function generateParentReferenceFields(\Schoolbox\User $viewee): array
     {
     }
 
@@ -117,16 +111,10 @@ class Factory
     /**
      * Preprocesses $viewee (a staff) and their corresponding External_UserInterface array
      *
-     * This is a hybrid data struct containing all the information about $viewee.
-     * This has schoolbox.user specific fields like pronoun and campus etc.
-     * combined with whatever the External_UserInterface fields contain. This method
-     * returns a loosely-typed array struct that you can map directly to the
-     * list of renderable fields as determined by admin.
-     *
      * @param User $viewee
      * @return array
      */
-    public function generateStaffReferenceFields(\Schoolbox\User $viewee): array
+    private function generateStaffReferenceFields(\Schoolbox\User $viewee): array
     {
     }
 }
