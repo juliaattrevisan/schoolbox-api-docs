@@ -82,6 +82,40 @@ test.describe("Pastoral Records", () => {
         // await expect(page.locator("#pastoralRecords")).toContainText("PASTORAL PROFILE");
         await expect(page.locator("#pastoralRecords")).toContainText(pastoralTitle);
     });
+
+    /**
+     * navigate to the student pastoral care page
+     * comment a pastoral record for the student
+     * ensure the comment is created with the proper details
+     * delete the comment
+     * ensure the comment is deleted
+     */
+
+    test("Comment Pastoral Record", async ({ tester, page, db }) => {
+        const pastoralProfile = new PastoralProfile(tester, page);
+        const common = new Common(page);
+        const studentId = "25";
+        const pastoralComment = "This is an automation pastoral comment";
+        tester.isGoingTo("navigate to the student pastoral profile page");
+        await pastoralProfile.goto(studentId);
+        tester.isGoingTo("click the pastoral record");
+        const recordId = (await db.grabFromDatabase("pastoral", "id", {
+            deleted_at: null,
+            "heading like": "Automation Test Pastoral Record%",
+        })) as number;
+        await pastoralProfile.clickPastoralRecord(25, recordId);
+        await common.clickAddComment();
+        await tester.fillCKEditorById("comment-public", pastoralComment);
+        await pastoralProfile.clickPostComment();
+        tester.isGoingTo("check the comment is presented");
+        // await tester.wait(2);
+        await expect(page.locator("#pastoral-record-comments-container-public")).toContainText(pastoralComment);
+        tester.isGoingTo("delete the pastoral comment");
+        await pastoralProfile.clickDeleteCommentIcon();
+        await common.clickModalDeleteButton();
+        // await tester.wait(2);
+        await expect(page.locator("#pastoral-record-comments-container-public")).not.toContainText(pastoralComment);
+    });
 });
 
 // <?php

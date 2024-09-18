@@ -57,7 +57,7 @@ export default class PastoralProfile {
      * @param recordId - The record id
      */
     async clickPastoralRecord(studentId: number, recordId: number): Promise<void> {
-        await this.page.click(`href="/pastoral/student/'${studentId}"/record/"${recordId}'"`);
+        await this.page.click(`a[href="/pastoral/student/${studentId}/record/${recordId}"]`);
     }
 
     /**
