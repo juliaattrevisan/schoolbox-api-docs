@@ -110,12 +110,10 @@ class Eportfolio_Page_Showcase extends Eportfolio_Page_Abstract
                 /** @var Feedback $return */
                 $return = $participant->findMostRecentInstructorGivenPublishedFeedback();
 
-                // Get the folder that ought to be available in $currentBox->getAssessmentModel()->getContextFolder(),
-                // but is not, because the context folder has not been hydrated in $currentBox->getAssessmentModel().
-                // Since we already have the $assessment, it is easier to get the context folder from the assessment.
-                $contextFolder = $assessment->getContext()->getFolder();
-                $contextFolderId = $contextFolder->getId();
-                $contextFolderName = $contextFolder->getName();
+                $currentBox->getAssessmentModel()->setContextFolder($assessment->getContext()->getFolder());
+                $currentBoxContextFolder = $currentBox->getAssessmentModel()->getContextFolder();
+                $contextFolderId = $currentBoxContextFolder->getId();
+                $contextFolderName = $currentBoxContextFolder->getName();
 
                 /* Set up subject info
                  */

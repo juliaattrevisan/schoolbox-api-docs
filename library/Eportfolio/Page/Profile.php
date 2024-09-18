@@ -230,15 +230,13 @@ class Eportfolio_Page_Profile extends Eportfolio_Page_Abstract
 
                 $workType = $assessment->getWorkType();
 
-                // Get the folder that ought to be available in $currentBox->getAssessmentModel()->getContextFolder(),
-                // but is not, because the context folder has not been hydrated in $currentBox->getAssessmentModel().
-                // Since we already have the $assessment, it is easier to get the context folder from the assessment.
                 $assessmentContextFolder = $assessment->getContext()->getFolder();
+                $currentBox->getAssessmentModel()->setContextFolder($assessmentContextFolder);
 
                 $this->getPage()->setVar(array(
                     'SHOWCASED_WORK_ITEM_ID' => $currentShowcasedItem->getId(),
-                    'SHOWCASED_WORK_BOX_CATEGORY_NAME' => $assessmentContextFolder->getName(),
-                    'SHOWCASED_WORK_BOX_CATEGORY_ID' => $assessmentContextFolder->getId(),
+                    'SHOWCASED_WORK_BOX_CATEGORY_NAME' => $currentBox->getAssessmentModel()->getContextFolder()->getName(),
+                    'SHOWCASED_WORK_BOX_CATEGORY_ID' => $currentBox->getAssessmentModel()->getContextFolder()->getId(),
                     'SHOWCASED_WORK_BOX_NAME' => $currentBox->getAssessmentModel()->getTitle(),
                     'SHOWCASED_WORK_ASSESSMENT_ID' => $currentBox->getAssessmentId(),
                     'SHOWCASED_WORK_BOX_TYPE' => $workType ? $workType->getName() : '',
