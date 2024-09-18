@@ -230,8 +230,8 @@ class Eportfolio_Page_Profile extends Eportfolio_Page_Abstract
 
                 $workType = $assessment->getWorkType();
 
-                $assessmentContextFolder = $assessment->getContext()->getFolder();
-                $currentBox->getAssessmentModel()->setContextFolder($assessmentContextFolder);
+                // Set the submission box's assessment context folder as this is not yet hydrated.
+                $currentBox->getAssessmentModel()->setContextFolder($assessment->getContext()->getFolder());
 
                 $this->getPage()->setVar(array(
                     'SHOWCASED_WORK_ITEM_ID' => $currentShowcasedItem->getId(),
