@@ -47,7 +47,18 @@ class Factory
      */
     public function produce(\Schoolbox\User $viewee, \Schoolbox\User $viewer): array
     {
-        $payload = [];
+        $payload = [
+            /* TODO add rosetta stone
+             */
+            'locale' => null,
+            'data' => [],
+            'roleTypes' => [
+                'roletype' => $viewee->getRole()->getType(),
+                'fields' => [
+                    'selected' => []
+                ]
+            ]
+        ];
 
         /* Data about $viewee that we'll put through the $renderableFields list
          */
@@ -56,6 +67,14 @@ class Factory
         /* Fields that $viewer can actually see on screen
          */
         $renderableFields = $this->fieldMapper->findRenderableFields($viewee, $viewer);
+
+        foreach ($renderableFields as $renderableField) {
+            $payload['data'][] = [
+                'field' => $renderableField->getField(),
+                'displayAs' => $renderableField->getDisplayAs(),
+                'value' => $referenceFields[$renderableField->getField()] ?? null
+            ];
+        }
 
         new \Alaress_Probe($referenceFields, $renderableFields, $payload);
 

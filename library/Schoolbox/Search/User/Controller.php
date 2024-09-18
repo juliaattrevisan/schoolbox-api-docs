@@ -188,6 +188,7 @@ class Controller extends BaseController
      */
     private function renderStudent(User $student): void
     {
+
 //        $externalUser = [];
 //        if ($student->getExternalId()) {
 //            $externalUser = $this->externalUser->getStudent($student->getExternalId());
