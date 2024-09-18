@@ -181,8 +181,10 @@
                  */
                 if (document.querySelector('#report-class-show-subject-overview').checked) {
                     document.querySelector('#report-class-search-subject-overview').removeAttribute('readonly');
+                    document.querySelector('#search-subject-overview').classList.remove('hidden');
                 } else {
                     document.querySelector('#report-class-search-subject-overview').setAttribute('readonly', true);
+                    document.querySelector('#search-subject-overview').classList.add('hidden');
                 }
 
             } else {
@@ -201,6 +203,7 @@
                  * always disable, as the class section is disabled
                  */
                 document.querySelector('#report-class-search-subject-overview').setAttribute('readonly', true);
+                document.querySelector('#search-subject-overview').classList.add('hidden');
             }
         }
 
@@ -243,8 +246,10 @@
         document.querySelector('#report-class-show-subject-overview').addEventListener('change', function(event) {
             if (event.target.checked) {
                 document.querySelector('#report-class-search-subject-overview').removeAttribute('readonly');
+                document.querySelector('#search-subject-overview').classList.remove('hidden');
             } else {
                 document.querySelector('#report-class-search-subject-overview').setAttribute('readonly', true);
+                document.querySelector('#search-subject-overview').classList.add('hidden');
             }
         });
     });
@@ -521,9 +526,11 @@
                                         <input name="class[subjectOverview]" type="hidden" value="0" />
                                         <input id="report-class-show-subject-overview" name="class[subjectOverview]" type="checkbox" value="1" {% if options.class.subjectOverview ?? false %}checked="checked"{% endif %} />
                                         <label for="report-class-show-subject-overview" class="checkbox-label">Show Subject overview</label>
-                                        <label for="report-class-search-subject-overview" class="checkbox-label">Title of Subject overview:</label>
-                                        <p class="meta">Add a textbox heading to show associated subject overviews from imported courses.</p>
-                                        <input id="report-class-search-subject-overview" name="class[subjectOverviewSearch]" type="text" value="{{ options.class.subjectOverviewSearch ?? '' }}" placeholder="Title of Subject overview"/>
+                                        <div id="search-subject-overview">
+                                            <label for="report-class-search-subject-overview" class="checkbox-label">Title of Subject overview:</label>
+                                            <p class="meta">Add a textbox heading to show associated subject overviews from imported courses.</p>
+                                            <input id="report-class-search-subject-overview" name="class[subjectOverviewSearch]" type="text" value="{{ options.class.subjectOverviewSearch ?? '' }}" placeholder="Title of Subject overview"/>
+                                        </div>
                                     </li>
                                 </ul>
                             </fieldset>
@@ -635,3 +642,9 @@
         </form>
     </div>
 </div>
+
+<style>
+    .hidden {
+        display: none;
+    }
+</style>
