@@ -614,17 +614,18 @@
             </div>
             {% if subjectOverviews[folder.id] is defined and subjectOverviews[folder.id] is not empty %}
                 <div>
-                    <h2 class="subject-overview">{{ classOptions.subjectOverviewSearch }}</h2>
-                        {% for course in subjectOverviews[folder.id] %}
-                            {% if course.textboxes is not empty %}
-                            {% for textbox in  course.textboxes %}
-                                <div class="content">
-                                    <h4 class="subject-overview-course">{{ course.title }}</h4>
-                                    <article class="course-overview-textbox" id="textBoxBody{{ textbox.textboxID }}">{{ textbox.textboxBody | purify }}</article>
-                                </div>
-                            {% endfor %}
-                            {% endif %}
+                    {% for course in subjectOverviews[folder.id] %}
+                        {% if course.textboxes is not empty %}
+                        {% for textbox in course.textboxes %}
+                            <div class="content">
+                                {% if course.textboxes | length > 1 %}
+                                    <h2 class="subject-overview-course">{{ course.title }}</h2>
+                                {% endif %}
+                                <article class="course-overview-textbox" id="textBoxBody{{ textbox.textboxID }}">{{ textbox.textboxBody | purify }}</article>
+                            </div>
                         {% endfor %}
+                        {% endif %}
+                    {% endfor %}
                 </div>
             {% endif %}
                 {% if allGraphs['class'][folder.id] is defined %}
