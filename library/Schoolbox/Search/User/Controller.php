@@ -188,11 +188,18 @@ class Controller extends BaseController
      */
     private function renderStudent(User $student): void
     {
-        $fieldMapper = \Schoolbox\Admin\Profile\Editor\Field\Mapper::getInstance();
-        $userMapper = \Schoolbox\UserMapper::getInstance();
-
-        $externalUser = (new \Schoolbox\Profile\Field\Factory($fieldMapper, $userMapper, $this->externalUser))
-            ->produce($student, $this->getUser());
+        $externalUser = [];
+        if ($student->getExternalId()) {
+            $externalUser = $this->externalUser->getStudent($student->getExternalId());
+            if (isset($externalUser['AlertMessage']) && is_array($externalUser['AlertMessage'])) {
+                $externalUser['AlertMessages'] = $externalUser['AlertMessage'];
+            } else {
+                $externalUser['AlertMessages'] = empty($externalUser['AlertMessage']) ? [] : [trim($externalUser['AlertMessage'])];
+            }
+            if (isset($externalUser['CourtOrderType']) && (trim($externalUser['CourtOrderType']) !== '')) {
+                $externalUser['AlertMessages'][] = 'Court Order - ' . trim($externalUser['CourtOrderType']);
+            }
+        }
 
         // Wrangle default colors
         $colors              = $this->timetableColourMapper->findAll()->reindex();
@@ -249,9 +256,9 @@ class Controller extends BaseController
                 }
             } elseif ($this->getConfigLoader()->get('show_all_subjects')) {
                 $subject['folder'] = $this->folderMapper->createModel()
-                                                        ->setName($subject['name'])
-                                                        ->setCodes(FolderCode::createCollection())
-                                                        ->addCode((new FolderCode())->setCode($codeMatcher::generateFolderCode($subject['campusCode'], $subject['code'])));
+                    ->setName($subject['name'])
+                    ->setCodes(FolderCode::createCollection())
+                    ->addCode((new FolderCode())->setCode($codeMatcher::generateFolderCode($subject['campusCode'], $subject['code'])));
                 $subject['perms']  = UserAccess::ACCESS_DENY;
                 $taughtFolderCodes = $subject['folder']->getCodeString();
             } else {
@@ -323,6 +330,85 @@ class Controller extends BaseController
             )->sortByCallback((new SortUsersByName())->getCallable());
 
             $groups[] = $group;
+        }
+
+        // Load users for form teacher, tutor, etc.
+        $formTeacher = null;
+        if (isset($externalUser['TeacherFormID']) && (string)$externalUser['TeacherFormID'] !== '') {
+            try {
+                $formTeacher = $this->userMapper->findByExternalId($externalUser['TeacherFormID'], Role::STAFF);
+            } catch (MapperException $e) {
+                // noop
+            }
+        }
+        if (!$formTeacher && isset($externalUser['StudentFormStaffName']) && (string)$externalUser['StudentFormStaffName'] !== '') {
+            $formTeacher = $this->userMapper->createModel();
+            $formTeacher->setLastname($externalUser['StudentFormStaffName']);
+        }
+
+        /* Display their name if you couldn't find them in the db
+         * via their id (some sis don't have the id)
+         */
+        $tutorTeacher = null;
+        if (isset($externalUser['TeacherTutorID']) && (string)$externalUser['TeacherTutorID'] !== '') {
+            try {
+                $tutorTeacher = $this->userMapper->findByExternalId($externalUser['TeacherTutorID'], Role::STAFF);
+            } catch (MapperException $e) {
+                // noop
+            }
+        }
+        if (!$tutorTeacher && isset($externalUser['StudentTutorName']) && (string)$externalUser['StudentTutorName'] !== '') {
+            $tutorTeacher = $this->userMapper->createModel();
+            $tutorTeacher->setLastname($externalUser['StudentTutorName']);
+        }
+
+        $hohTeacher = null;
+        if (isset($externalUser['StudentHeadOfHouse']) && (string)$externalUser['StudentHeadOfHouse'] !== '') {
+            if ($externalUser['HeadOfHouseID']) {
+                try {
+                    $hohTeacher = $this->userMapper->findByExternalId($externalUser['HeadOfHouseID'], Role::STAFF);
+                } catch (MapperException $e) {
+                    $hohTeacher = $this->userMapper->createModel();
+                    $hohTeacher->setLastname($externalUser['StudentHeadOfHouse']);
+                }
+            } else {
+                $hohTeacher = $this->userMapper->createModel();
+                $hohTeacher->setLastname($externalUser['StudentHeadOfHouse']);
+            }
+        }
+
+        /* Display their name if you couldn't find them in the db
+         * via their id (some sis don't have the id)
+         */
+        $coordTeacher = null;
+        if (!empty($externalUser['StudentYearLevelCoordinator'])) {
+            if (!empty($externalUser['YearLevelCoordID'])) {
+                try {
+                    $coordTeacher = $this->userMapper->findByExternalId($externalUser['YearLevelCoordID'], Role::STAFF);
+                } catch (MapperException $e) {
+                    $coordTeacher = $this->userMapper->createModel();
+                    $coordTeacher->setLastname($externalUser['StudentYearLevelCoordinator']);
+                }
+            } else {
+                $coordTeacher = $this->userMapper->createModel();
+                $coordTeacher->setLastname($externalUser['StudentYearLevelCoordinator']);
+            }
+        }
+
+        // Get coach
+        $studentCoach = null;
+        if (!empty($externalUser['StudentCoach'])) {
+            if (!empty($externalUser['CoachID'])) {
+                try {
+                    $studentCoach = $this->userMapper->findByExternalId($externalUser['CoachID']);
+                } catch (MapperException $e) {
+                    $studentCoach = $this->userMapper->createModel();
+                    $studentCoach->setLastname($externalUser['StudentCoach']);
+                }
+            } else {
+                $studentCoach = $this->userMapper->createModel();
+                $studentCoach->setLastname($externalUser['StudentCoach']);
+            }
         }
 
         // Load contact's user IDs
@@ -414,13 +500,7 @@ class Controller extends BaseController
             }
         }
 
-        $teacherEmails = array_filter([
-            $externalUser['formTeacher'] ?? null,
-            $externalUser['tutorTeacher'] ?? null,
-            $externalUser['hohTeacher'] ?? null,
-            $externalUser['coordTeacher'] ?? null,
-            $externalUser['studentCoach'] ?? null,
-        ]);
+        $teacherEmails = array_filter([$formTeacher, $tutorTeacher, $hohTeacher, $coordTeacher, $studentCoach]);
 
         foreach ($teacherEmails as $object) {
             if ($object instanceof User) {
@@ -530,11 +610,11 @@ class Controller extends BaseController
                 'subjects'                 => $subjects,
                 'customButtons'            => $customButtons,
                 'groups'                   => $groups,
-                'formTeacher'              => $externalUser['formTeacher'] ?? null,
-                'tutorTeacher'             => $externalUser['tutorTeacher'] ?? null,
-                'hohTeacher'               => $externalUser['hohTeacher'] ?? null,
-                'coordTeacher'             => $externalUser['coordTeacher'] ?? null,
-                'studentCoach'             => $externalUser['studentCoach'] ?? null,
+                'formTeacher'              => $formTeacher,
+                'tutorTeacher'             => $tutorTeacher,
+                'hohTeacher'               => $hohTeacher,
+                'coordTeacher'             => $coordTeacher,
+                'studentCoach'             => $studentCoach,
                 'isParentOfStudent'        => $isParentOfStudent,
                 'isPrimaryCarer'           => $isPrimaryCarer,
                 'allTeacherIds'            => implode(',', $allTeacherIds),
