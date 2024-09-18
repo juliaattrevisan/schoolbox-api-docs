@@ -58,8 +58,8 @@ test.describe("Pastoral Records", () => {
         const profilePage = new ProfilePage(tester, page);
         const pastoralProfile = new PastoralProfile(tester, page);
         const createPastoralRecord = new CreatePastoralRecord(tester, page);
-        const common = new Common(tester, page);
-        const studentId = 25;
+        const common = new Common(page);
+        const studentId = "25";
         const pastoralTitle = "Automation Test Pastoral Record";
         const pastoralDescription = "This is an automation pastoral record";
         tester.isGoingTo("navigate to the student profile page");
@@ -73,7 +73,9 @@ test.describe("Pastoral Records", () => {
         await createPastoralRecord.typeTitle(pastoralTitle);
         await createPastoralRecord.clickTypeDropdown();
         await createPastoralRecord.selectTypeSubType(1);
-        await createPastoralRecord.fillRichTextField("body_public", pastoralDescription);
+        const body = page.locator(`#body_public`);
+        await tester.fillCKEditorByLocator(body, pastoralDescription);
+        // await tester.fillCKEditorByLocator("body_public", pastoralDescription);
         await createPastoralRecord.clickVisibilityLink("Role");
         await createPastoralRecord.clickPastoralRole("Administration");
         await common.closeModal();
