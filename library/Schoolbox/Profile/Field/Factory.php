@@ -241,7 +241,7 @@ class Factory
         /* Hybrid Theory
          */
         $referenceFields = [
-            'pronoun' => $viewee->getPronoun(),
+            'pronoun' => (string)$viewee->getPronoun(),
             'email' => $viewee->getEmail(),
             'externalId' => $viewee->getExternalId(),
             'role' => $viewee->getRole()->getName(),
