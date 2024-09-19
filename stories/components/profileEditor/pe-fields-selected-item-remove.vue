@@ -8,10 +8,12 @@ import type { ProfileSelectedField } from "./types/profileTypes";
 
 interface Props {
     field: ProfileSelectedField;
+    isOpen: boolean;
 }
 
 const props = defineProps<Props>();
 const peStore = useProfileEditorStore();
+const emit = defineEmits(["close"]);
 
 /**
  * When the user clicks the remove button
@@ -26,13 +28,13 @@ function onRemoveClicked(): void {
 </script>
 
 <template>
-    <div class="editPanel small-12" style="display: block">
+    <div class="editPanel small-12" :style="{ display: props.isOpen ? 'block' : 'none' }">
         <section>
             <div>
                 <p>Are you sure you want to remove this field?</p>
                 <ul class="flex-list buttons">
                     <li><button class="button submit" @click="onRemoveClicked">Remove</button></li>
-                    <li><button class="button">Cancel</button></li>
+                    <li><button class="button" @click="emit('close')">Cancel</button></li>
                 </ul>
             </div>
         </section>
