@@ -11,12 +11,108 @@ export const mockData: ProfileEditorPayload = {
                     // the profile screen's palette
                     available: [
                         {
+                            field: "MedicalAlert",
+                            displayAs: "Medical Alert",
+                        },
+                        {
+                            field: "House",
+                            displayAs: "House",
+                        },
+                        {
+                            field: "StudentYearLevelCoordinator",
+                            displayAs: "Year Level Coordinator",
+                        },
+                        {
+                            field: "Pronoun",
+                            displayAs: "Pronoun",
+                        },
+                        {
+                            field: "EnrolmentDate",
+                            displayAs: "Enrolment Date",
+                        },
+                        {
+                            field: "LegalAlert",
+                            displayAs: "Legal Alert",
+                        },
+                        {
+                            field: "HeadOfHouse",
+                            displayAs: "Head of House",
+                        },
+                        {
+                            field: "Tutor",
+                            displayAs: "Tutor",
+                        },
+                        {
+                            field: "Gender",
+                            displayAs: "Gender",
+                        },
+                        {
+                            field: "IBFlag",
+                            displayAs: "IB Flag",
+                        },
+                        {
                             field: "Email",
                             displayAs: "Email Address",
                         },
                         {
-                            field: "StudentYearLevelCoordinator",
-                            displayAs: "Year Level Coorindator",
+                            field: "PastoralFlags",
+                            displayAs: "Pastoral Flags",
+                        },
+                        {
+                            field: "TutorGroup",
+                            displayAs: "Tutor Group",
+                        },
+                        {
+                            field: "Campus",
+                            displayAs: "Campus",
+                        },
+                        {
+                            field: "Role",
+                            displayAs: "Role",
+                        },
+                        {
+                            field: "ExternalID",
+                            displayAs: "External ID",
+                        },
+                        {
+                            field: "SpecialNeedsFlag",
+                            displayAs: "Special Needs Flag",
+                        },
+                        {
+                            field: "ILPFlag",
+                            displayAs: "ILP Flag",
+                        },
+                        {
+                            field: "StudiesCode",
+                            displayAs: "Studies Code",
+                        },
+                        {
+                            field: "ResidentialHouse",
+                            displayAs: "Residential House",
+                        },
+                        {
+                            field: "YearLevel",
+                            displayAs: "Year Level",
+                        },
+                        {
+                            field: "ESLFlag",
+                            displayAs: "ESL Flag",
+                        },
+                        {
+                            field: "StudentType",
+                            displayAs: "Student Type",
+                        },
+                        {
+                            field: "ClassTeacher",
+                            displayAs: "Class Teacher",
+                        },
+                        {
+                            field: "DateOfBirth",
+                            displayAs: "Date of Birth",
+                        },
+                        {
+                            field: "PositionTitle",
+                            displayAs: "Position Title",
                         },
                     ],
                     // These are implicitly ordered by sequence any time front- and back-end

@@ -5,7 +5,6 @@
 
 import PeFieldsSelectedItemEdit from "./pe-fields-selected-item-edit.vue";
 import PeFieldsSelectedItemRemove from "./pe-fields-selected-item-remove.vue";
-import { useProfileEditorStore } from "./store/profileEditorStore";
 import type { ProfileSelectedField } from "./types/profileTypes";
 
 interface Props {
@@ -13,7 +12,6 @@ interface Props {
 }
 
 const props = defineProps<Props>();
-const peStore = useProfileEditorStore();
 
 const isEditPanelOpen = window.Vue.ref<boolean>(false);
 const isRemovePanelOpen = window.Vue.ref<boolean>(false);
@@ -40,13 +38,19 @@ const isRemovePanelOpen = window.Vue.ref<boolean>(false);
                                 href="#"
                                 class="icon-settings settings edit"
                                 title="Settings"
-                                @click="isEditPanelOpen = !isEditPanelOpen"
+                                @click="
+                                    isEditPanelOpen = !isEditPanelOpen;
+                                    isRemovePanelOpen = false;
+                                "
                             />
                             <a
                                 href="#"
                                 class="icon-close"
                                 title="Close"
-                                @click="isRemovePanelOpen = !isRemovePanelOpen"
+                                @click="
+                                    isRemovePanelOpen = !isRemovePanelOpen;
+                                    isEditPanelOpen = false;
+                                "
                             />
                         </nav>
                     </div>
