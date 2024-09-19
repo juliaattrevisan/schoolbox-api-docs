@@ -36,12 +36,12 @@ test.describe("Search functionality tests", () => {
 
     test("Valid no-filter keyword search with sub-results allows loading more", async ({ tester }) => {
         tester.isGoingTo("input a valid keyword, clear all filters, and search");
-        await searchPage.inputKeyword("help");
+        await searchPage.inputKeyword("Reed");
         await searchPage.clearFilters();
         await searchPage.clickSearchButton();
 
-        tester.isGoingTo("expect to see 15 results");
-        await searchPage.verifyResultsCount(15);
+        tester.isGoingTo("expect to see 10 results");
+        await searchPage.verifyResultsCount(10);
 
         tester.isGoingTo("load more sub results under Admin Help and expect to see 6 sub results");
         await searchPage.inputKeyword("help");
