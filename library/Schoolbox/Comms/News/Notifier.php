@@ -52,6 +52,16 @@ class Notifier extends AbstractModuleNotifier
     private const PATTERN_SUBMITTED_TITLE = ':user submitted an article, :title';
     private const PATTERN_ARTICLE_HREF    = '/news/%d?ref=' . Statistics\Mapper::REFERRER_EMAIL;
 
+    /**
+     * When raising a posted notification: allow the event to be published this
+     * many seconds into the future when deciding whether to notify or not.
+     *
+     * The posted notification is supposed to be raised at the article's publish
+     * time, but somehow it is sometimes raised slightly earlier (usually < 1s):
+     * allow some leeway for that reason.
+     */
+    private const PUBLISH_TIME_LEEWAY = 5;
+
     /** @var IUserResolver */
     private $audienceResolver;
 
@@ -537,7 +547,7 @@ class Notifier extends AbstractModuleNotifier
     {
         $envelope = new Envelope();
 
-        if (!$article->isPublished()) {
+        if (!$article->isPublished(\Alaress_Date_Format::now()->addSeconds(self::PUBLISH_TIME_LEEWAY))) {
             $this->log->warning("Tried to send posted notification for an article {$article->getId()} which is not published.");
             return $envelope;
         }
