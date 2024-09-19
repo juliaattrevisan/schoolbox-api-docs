@@ -227,6 +227,24 @@ class CalendarEventCreateModifyCest
         $i->assertTrue($this->eventArraysAreEqual($localEvent, $apiEvent));
 
         // -----------------------------------------------------------------------------------------------------------//
+        // Test dependent fields: {attendance, guests} by changing an event with guests to not allow attendance
+        // -----------------------------------------------------------------------------------------------------------//
+        $i->amGoingTo("change attendance type to 'none', and check whether guests are removed.");
+        $newAttendance = EventAttendanceModel::LEVEL_NO_ATTENDANCE;
+        $i->sendPost("/calendar/event/$localEventId/modify", ['attendance' => $newAttendance]);
+        $localEvent['attendance'] = $newAttendance;
+        $localEvent['guests'] = []; // Expect that all guests have been removed.
+        $apiEventJson = $i->grabResponse();
+        $apiEvent = json_decode($apiEventJson, true);
+        if ($apiEvent === null) {
+            throw new UnexpectedValueException("Could not decode JSON '$apiEventJson'.'");
+        }
+        if (array_key_exists('message', $apiEvent)) {
+            throw new UnexpectedValueException("Error message from server: '{$apiEvent['message']}'");
+        }
+        $i->assertTrue($this->eventArraysAreEqual($localEvent, $apiEvent));
+
+        // -----------------------------------------------------------------------------------------------------------//
         // Test dependent fields: {allDay, startDate, endDate, repeat_until} by creating a personal-level event.
         // -----------------------------------------------------------------------------------------------------------//
         $i->amGoingTo('change from an all-day to a not all-day event.');
