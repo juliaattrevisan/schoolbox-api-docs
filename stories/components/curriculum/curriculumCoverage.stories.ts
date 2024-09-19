@@ -22,6 +22,6 @@ export const Default: Story = {
         setup(): { args: typeof args } {
             return { args };
         },
-        template: `<cc-report />`,
+        template: `<div class="l-pad-l"><cc-report /></div>`,
     }),
 };

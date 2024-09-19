@@ -58,12 +58,12 @@ function getNodeUsageCount(node: CurriculumCoverageNode): number {
 <template>
     <tr>
         <th scope="row" class="node__name">{{ props.node.name }}</th>
-        <td>{{ getNodeUsageCount(props.node) }}</td>
-        <template v-for="course in props.node.usage.courses" :key="course.id">
-            <td v-for="unit in course.units" :key="unit.id">
+        <td class="u-alt-bkg">{{ getNodeUsageCount(props.node) }}</td>
+        <template v-for="(course, index) in props.node.usage.courses" :key="course.id">
+            <td v-for="unit in course.units" :key="unit.id" :class="`${index % 2 ? 'u-alt-bkg' : ''}`">
                 {{ getUnitUsageCount(unit._usageCounts) }}
             </td>
-            <td>{{ getCourseUsageCount(course) }}</td>
+            <td :class="`${index % 2 ? 'u-alt-bkg' : ''}`">{{ getCourseUsageCount(course) }}</td>
         </template>
     </tr>
     <template v-if="props.node.children && props.node.children.length > 0">

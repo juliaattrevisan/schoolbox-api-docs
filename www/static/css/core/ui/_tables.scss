@@ -472,3 +472,12 @@ table.attempts-table {
         }
     }
 }
+
+.l-valign--bottom {
+    vertical-align: bottom;
+}
+
+.u-alt-bkg {
+    // to help distinguish between rows or column groups
+    background: rgb(246, 246, 246);
+}
