@@ -89,6 +89,10 @@ class SelfIssued extends Base
                 // could not find a token with user id and jwt id
                 throw new Exception\Rejected('The JWT ID provided does not match a token for the given user', 0, $e);
             }
+        } else {
+            throw new Exception\InvalidIdentity(
+                sprintf('JWT must contain a "%s"', self::CLAIM_JTI)
+            );
         }
         if (isset($claims[self::CUSTOM_CLAIM_TASKD]) && $claims[self::CUSTOM_CLAIM_TASKD] === 1) {
             $this->bypassIpTracking = true;
