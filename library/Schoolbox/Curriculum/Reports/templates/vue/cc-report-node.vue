@@ -18,6 +18,20 @@ const props = defineProps<Props>();
 const paddingStart = window.Vue.computed(() => `calc(${props.depth * 0.75}rem + 0.625rem)`);
 
 /**
+ * If there's a code available, which means it can be added to the name
+ * @returns { boolean }
+ */
+const hasCode = window.Vue.computed(() => props.node.code && props.node.code !== "");
+
+/**
+ * Add in the code if it's available otherwise just show the title
+ * @returns { string }
+ */
+const title = window.Vue.computed(() =>
+    hasCode.value ? `[${props.node.code as string}] ${props.node.name}` : `${props.node.name}`,
+);
+
+/**
  * Get the total usage count for a unit
  * @param usageCounts - the usage counts for the unit
  * @returns the total unit usage count
@@ -57,7 +71,7 @@ function getNodeUsageCount(node: CurriculumCoverageNode): number {
 
 <template>
     <tr>
-        <th scope="row" class="node__name">{{ props.node.name }}</th>
+        <th scope="row" class="node__name">{{ title }}</th>
         <td class="u-alt-bkg">{{ getNodeUsageCount(props.node) }}</td>
         <template v-for="(course, index) in props.node.usage.courses" :key="course.id">
             <td v-for="unit in course.units" :key="unit.id" :class="`${index % 2 ? 'u-alt-bkg' : ''}`">
