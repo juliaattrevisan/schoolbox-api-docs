@@ -160,6 +160,11 @@ class Controller extends Base
 
             // Allegedly OIDC must support the implicit grant type, but it is deprecated?
             'grant_types_supported' => ['authorization_code', 'refresh_token', 'implicit', 'client_credentials'],
+
+            // Schoolbox now supports back-channel logout:
+            // don't know about session support yet
+            'backchannel_logout_supported'         => true,
+            'backchannel_logout_session_supported' => false,
         ]);
     }
 
