@@ -11,6 +11,7 @@ const data = window.Vue.ref((mockReportData as CurriculumCoveragePayload).data);
 </script>
 
 <template>
+    <div></div>
     <table>
         <thead>
             <tr>

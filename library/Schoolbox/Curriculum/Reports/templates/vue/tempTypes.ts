@@ -24,7 +24,7 @@ export type UnitWithCurriculumNodeUsage = Pick<Unit, "id" | "name"> & {
     _usageCounts: {
         unit: number;
         activity: number;
-        lesson: number;
+        lessonPlan: number;
         rubric: number;
     };
 };

@@ -37,7 +37,7 @@ const title = window.Vue.computed(() =>
  * @returns the total unit usage count
  */
 function getUnitUsageCount(usageCounts: UnitWithCurriculumNodeUsage["_usageCounts"]): number {
-    return usageCounts.unit + usageCounts.activity + usageCounts.lesson + usageCounts.rubric;
+    return usageCounts.unit + usageCounts.activity + usageCounts.lessonPlan + usageCounts.rubric;
 }
 
 /**

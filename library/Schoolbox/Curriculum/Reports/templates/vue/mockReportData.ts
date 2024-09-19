@@ -59,7 +59,7 @@ export const mockReportData = {
                                     _usageCounts: {
                                         unit: 1,
                                         activity: 4,
-                                        lesson: 1,
+                                        lessonPlan: 1,
                                         rubric: 5,
                                     },
                                 },
@@ -69,7 +69,7 @@ export const mockReportData = {
                                     _usageCounts: {
                                         unit: 2,
                                         activity: 0,
-                                        lesson: 2,
+                                        lessonPlan: 2,
                                         rubric: 0,
                                     },
                                 },
@@ -79,7 +79,7 @@ export const mockReportData = {
                                     _usageCounts: {
                                         unit: 5,
                                         activity: 2,
-                                        lesson: 0,
+                                        lessonPlan: 0,
                                         rubric: 5,
                                     },
                                 },
@@ -95,7 +95,7 @@ export const mockReportData = {
                                     _usageCounts: {
                                         unit: 2,
                                         activity: 0,
-                                        lesson: 3,
+                                        lessonPlan: 3,
                                         rubric: 2,
                                     },
                                 },
@@ -105,7 +105,7 @@ export const mockReportData = {
                                     _usageCounts: {
                                         unit: 0,
                                         activity: 2,
-                                        lesson: 1,
+                                        lessonPlan: 1,
                                         rubric: 3,
                                     },
                                 },
@@ -115,7 +115,7 @@ export const mockReportData = {
                                     _usageCounts: {
                                         unit: 4,
                                         activity: 2,
-                                        lesson: 3,
+                                        lessonPlan: 3,
                                         rubric: 2,
                                     },
                                 },
@@ -125,7 +125,7 @@ export const mockReportData = {
                                     _usageCounts: {
                                         unit: 0,
                                         activity: 0,
-                                        lesson: 0,
+                                        lessonPlan: 0,
                                         rubric: 0,
                                     },
                                 },
@@ -150,7 +150,7 @@ export const mockReportData = {
                                             _usageCounts: {
                                                 unit: 1,
                                                 activity: 4,
-                                                lesson: 3,
+                                                lessonPlan: 3,
                                                 rubric: 2,
                                             },
                                         },
@@ -160,7 +160,7 @@ export const mockReportData = {
                                             _usageCounts: {
                                                 unit: 2,
                                                 activity: 4,
-                                                lesson: 0,
+                                                lessonPlan: 0,
                                                 rubric: 6,
                                             },
                                         },
@@ -170,7 +170,7 @@ export const mockReportData = {
                                             _usageCounts: {
                                                 unit: 5,
                                                 activity: 2,
-                                                lesson: 4,
+                                                lessonPlan: 4,
                                                 rubric: 5,
                                             },
                                         },
@@ -186,7 +186,7 @@ export const mockReportData = {
                                             _usageCounts: {
                                                 unit: 2,
                                                 activity: 0,
-                                                lesson: 3,
+                                                lessonPlan: 3,
                                                 rubric: 2,
                                             },
                                         },
@@ -196,7 +196,7 @@ export const mockReportData = {
                                             _usageCounts: {
                                                 unit: 0,
                                                 activity: 2,
-                                                lesson: 1,
+                                                lessonPlan: 1,
                                                 rubric: 3,
                                             },
                                         },
@@ -206,7 +206,7 @@ export const mockReportData = {
                                             _usageCounts: {
                                                 unit: 4,
                                                 activity: 2,
-                                                lesson: 3,
+                                                lessonPlan: 3,
                                                 rubric: 2,
                                             },
                                         },
@@ -216,7 +216,7 @@ export const mockReportData = {
                                             _usageCounts: {
                                                 unit: 0,
                                                 activity: 3,
-                                                lesson: 1,
+                                                lessonPlan: 1,
                                                 rubric: 1,
                                             },
                                         },
@@ -241,7 +241,7 @@ export const mockReportData = {
                                                     _usageCounts: {
                                                         unit: 0,
                                                         activity: 0,
-                                                        lesson: 0,
+                                                        lessonPlan: 0,
                                                         rubric: 0,
                                                     },
                                                 },
@@ -251,7 +251,7 @@ export const mockReportData = {
                                                     _usageCounts: {
                                                         unit: 0,
                                                         activity: 0,
-                                                        lesson: 0,
+                                                        lessonPlan: 0,
                                                         rubric: 0,
                                                     },
                                                 },
@@ -261,7 +261,7 @@ export const mockReportData = {
                                                     _usageCounts: {
                                                         unit: 0,
                                                         activity: 0,
-                                                        lesson: 0,
+                                                        lessonPlan: 0,
                                                         rubric: 0,
                                                     },
                                                 },
@@ -277,7 +277,7 @@ export const mockReportData = {
                                                     _usageCounts: {
                                                         unit: 2,
                                                         activity: 0,
-                                                        lesson: 1,
+                                                        lessonPlan: 1,
                                                         rubric: 0,
                                                     },
                                                 },
@@ -287,7 +287,7 @@ export const mockReportData = {
                                                     _usageCounts: {
                                                         unit: 0,
                                                         activity: 1,
-                                                        lesson: 0,
+                                                        lessonPlan: 0,
                                                         rubric: 1,
                                                     },
                                                 },
@@ -297,7 +297,7 @@ export const mockReportData = {
                                                     _usageCounts: {
                                                         unit: 4,
                                                         activity: 1,
-                                                        lesson: 1,
+                                                        lessonPlan: 1,
                                                         rubric: 0,
                                                     },
                                                 },
@@ -307,7 +307,7 @@ export const mockReportData = {
                                                     _usageCounts: {
                                                         unit: 0,
                                                         activity: 2,
-                                                        lesson: 0,
+                                                        lessonPlan: 0,
                                                         rubric: 0,
                                                     },
                                                 },
@@ -332,7 +332,7 @@ export const mockReportData = {
                                                     _usageCounts: {
                                                         unit: 1,
                                                         activity: 1,
-                                                        lesson: 2,
+                                                        lessonPlan: 2,
                                                         rubric: 2,
                                                     },
                                                 },
@@ -342,7 +342,7 @@ export const mockReportData = {
                                                     _usageCounts: {
                                                         unit: 2,
                                                         activity: 3,
-                                                        lesson: 0,
+                                                        lessonPlan: 0,
                                                         rubric: 4,
                                                     },
                                                 },
@@ -352,7 +352,7 @@ export const mockReportData = {
                                                     _usageCounts: {
                                                         unit: 5,
                                                         activity: 2,
-                                                        lesson: 2,
+                                                        lessonPlan: 2,
                                                         rubric: 4,
                                                     },
                                                 },
@@ -368,7 +368,7 @@ export const mockReportData = {
                                                     _usageCounts: {
                                                         unit: 2,
                                                         activity: 0,
-                                                        lesson: 2,
+                                                        lessonPlan: 2,
                                                         rubric: 2,
                                                     },
                                                 },
@@ -378,7 +378,7 @@ export const mockReportData = {
                                                     _usageCounts: {
                                                         unit: 0,
                                                         activity: 1,
-                                                        lesson: 1,
+                                                        lessonPlan: 1,
                                                         rubric: 2,
                                                     },
                                                 },
@@ -388,7 +388,7 @@ export const mockReportData = {
                                                     _usageCounts: {
                                                         unit: 4,
                                                         activity: 1,
-                                                        lesson: 2,
+                                                        lessonPlan: 2,
                                                         rubric: 2,
                                                     },
                                                 },
@@ -398,7 +398,7 @@ export const mockReportData = {
                                                     _usageCounts: {
                                                         unit: 0,
                                                         activity: 2,
-                                                        lesson: 1,
+                                                        lessonPlan: 1,
                                                         rubric: 1,
                                                     },
                                                 },
