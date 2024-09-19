@@ -103,7 +103,7 @@ export default class Common {
     /**
      * close x button on modal dialogs
      */
-    static readonly SELECTOR_CLOSE_BUTTON_MODAL = "a.close-reveal-modal";
+    static readonly SELECTOR_CLOSE_BUTTON_MODAL = "#modal-role";
 
     /**
      * add a comment element for learning moments, news, pastoral records
@@ -197,7 +197,7 @@ export default class Common {
      * clicks the close x button on the dialogs
      */
     async closeModal(): Promise<void> {
-        await this.page.locator(Common.SELECTOR_CLOSE_BUTTON_MODAL).last().click();
+        await this.page.locator(Common.SELECTOR_CLOSE_BUTTON_MODAL).getByLabel("Close").click();
     }
 
     /**
