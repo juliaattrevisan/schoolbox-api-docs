@@ -158,4 +158,31 @@ class MimetypeMapper extends Schoolbox\Mapper
 
         return parent::hydrate($row, $alias, $callback);
     }
+
+    /**
+     * Find the corresponding MimeType from the given list of file Extensions
+     *
+     * @param array $extensions
+     * @return array
+     */
+    public function findMimeTypesFromExtensions(array $extensions): array
+    {
+        $pb = $this->getPredicateBuilder()
+            ->in('afe.extension', $extensions)
+            ->isFalse('m.deleted')
+            ->equals('m.enable','true');
+
+        $where = implode(' AND ', $pb->getWhere());
+
+        $query = "
+            SELECT mime
+            FROM {$this->table} m
+            INNER JOIN allowedFileExtension afe ON m.fileTypeID = afe.fileTypeID
+            WHERE $where
+        ";
+
+        $result = $this->database->executeQuery($query, $pb->getParams())->fetchAll();
+
+        return array_column($result, 'mime');
+    }
 }
