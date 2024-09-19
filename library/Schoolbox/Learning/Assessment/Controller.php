@@ -22,6 +22,7 @@ use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Mapper as Grad
 use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Model as GradeScheme;
 use Schoolbox\Assessment\Term\Mapper;
 use Schoolbox\Config\ConfigMapper;
+use Schoolbox\File\MimetypeMapper;
 use Schoolbox\Learning\Assessment\DataModel\LessonPlan\Mapper as LessonPlanDataModelMapper;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy;
 use Schoolbox\Learning\Assessment\Feedback\Visibility as FeedbackVisibility;
@@ -101,7 +102,8 @@ abstract class Controller extends ListController implements IAssessmentControlle
         protected LatestViewMapper $latestViewMapper,
         protected Project\ResultCache\Mapper $projectResultCacheMapper,
         protected LessonPlanTemplateMapper $lessonPlanTemplateMapper,
-        protected LessonPlanDataModelMapper $lessonPlanDataModelMapper
+        protected LessonPlanDataModelMapper $lessonPlanDataModelMapper,
+        protected MimetypeMapper $mimetypeMapper,
     ) {
         parent::__construct($userMapper, $errorMapper, $assessmentMapper, $access, $transactor, $participantDataSource, $unitSpecificationMapper, $rosettaStone, $this->projectResultCacheMapper);
     }
@@ -265,8 +267,10 @@ abstract class Controller extends ListController implements IAssessmentControlle
             // To determine whether to display the interactive worksheet option
             $data['kami_enabled'] = $this->getConfigLoader()->get(ConfigMapper::NAME_KAMI_ENABLED);
 
-            $kamiFiles = array_map(fn($x) => '.' . $x, array_keys(KamiModel::ALLOWED_FILE_TYPES));
-
+            $kamiFiles = $this->mimetypeMapper
+                ->findMimeTypesFromExtensions(
+                    array_keys(KamiModel::ALLOWED_FILE_TYPES)
+                );
 
             // To be able to add a file to use as the worksheet
             $data['attachzoneWorksheet'] = (new Zone('worksheet'))
@@ -486,7 +490,11 @@ abstract class Controller extends ListController implements IAssessmentControlle
             // To determine whether to display the interactive worksheet option
             $data['kami_enabled'] = $this->getConfigLoader()->get(ConfigMapper::NAME_KAMI_ENABLED);
 
-            $kamiFiles = array_map(fn($x) => '.' . $x, array_keys(KamiModel::ALLOWED_FILE_TYPES));
+            $kamiFiles = $this->mimetypeMapper
+                ->findMimeTypesFromExtensions(
+                    array_keys(KamiModel::ALLOWED_FILE_TYPES)
+                );
+
 
             $zone = (new Zone('worksheet'))
                 ->setMulti(false)
