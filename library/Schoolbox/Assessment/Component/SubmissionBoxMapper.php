@@ -592,7 +592,7 @@ class SubmissionBoxMapper extends BaseMapper
         // (Need much better checking than this, this abuses session variables)
         $folderIdsForUser = FolderMapper::getInstance()->findFolderIdsForUser($user, true);
 
-        if (!in_array($box->getAssessmentModel()->getContextFolder(), $folderIdsForUser)) {
+        if (!in_array($box->getAssessmentModel()->getContextFolder()->getId(), $folderIdsForUser)) {
             // 403 forbidden error
             throw new Schoolbox\Resource\Exception('Access denied', Schoolbox\Resource\Exception::CODE_ACCESS_DENIED);
         }
