@@ -40,6 +40,9 @@ function getNodeUsageCount(node) {
             <td>{{ getCourseUsageCount(course) }}</td>
         </template>
     </tr>
+    <template v-if="props.node.children && props.node.children.length > 0">
+        <cc-report-node v-for="child in props.node.children" :key="child.id" :node="child" />
+    </template>
 </template>
 
 <style scoped></style>
