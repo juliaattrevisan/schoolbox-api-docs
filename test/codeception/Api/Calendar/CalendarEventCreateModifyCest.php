@@ -19,7 +19,7 @@ use Tests\Support\ApiTester;
  * calendar@event@attendance@{id}@create.yaml
  * /usr/share/schoolbox/vendor/bin/codecept run api CalendarEventAttendanceCreateCest
  */
-class CalendarEventCreateModifyMoveDeleteCest
+class CalendarEventCreateModifyCest
 {
     const ALARESS_USER_ID = 1;
 
