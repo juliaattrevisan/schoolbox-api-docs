@@ -3,18 +3,14 @@
  * To customise the fields displayed on a user profile page
  */
 
-import type { ProfileEditorRoleType } from "./types/profileEditorTypes";
+import { useProfileEditorStore } from "./store/profileEditorStore";
 
-interface Props {
-    fields: ProfileEditorRoleType["fields"];
-}
-
-const props = defineProps<Props>();
+const peStore = useProfileEditorStore();
 </script>
 
 <template>
-    <div>
-        <p v-for="field in props.fields.available" :key="field.field">{{ field.displayAs }}</p>
+    <div v-if="peStore.selectedRoleType">
+        <p v-for="field in peStore.selectedRoleType.fields.available" :key="field.field">{{ field.displayAs }}</p>
     </div>
 </template>
 

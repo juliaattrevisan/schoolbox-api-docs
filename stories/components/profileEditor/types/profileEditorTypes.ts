@@ -17,3 +17,7 @@ export type ProfileEditorRoleType = ProfileRoleType & {
         available: ProfileEditorAvailableField[];
     };
 };
+
+export type ProfileEditorEndpoints = {
+    profileEditorGet: string;
+};

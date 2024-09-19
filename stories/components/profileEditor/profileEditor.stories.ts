@@ -4,13 +4,17 @@ import type { Meta, StoryObj } from "@storybook/vue3";
 import { http, HttpResponse } from "msw";
 import ProfileEditor from "./profile-editor.vue";
 import { mockData } from "./peMockData";
+import type { ProfileEditorEndpoints } from "./types/profileEditorTypes";
 
 /**
  * Mock Service Worker handlers to load dummy data for testing
  */
-const endpoint = "/mock-data";
+const endpoints: ProfileEditorEndpoints = {
+    profileEditorGet: "/mock-data",
+};
+
 const mswHandlers = [
-    http.get(endpoint, () => {
+    http.get(endpoints.profileEditorGet, () => {
         return HttpResponse.json(mockData);
     }),
 ];
@@ -20,7 +24,7 @@ const mswHandlers = [
  */
 const meta: Meta<typeof ProfileEditor> = {
     args: {
-        endpoint,
+        endpoints,
     },
     component: ProfileEditor,
     parameters: {
