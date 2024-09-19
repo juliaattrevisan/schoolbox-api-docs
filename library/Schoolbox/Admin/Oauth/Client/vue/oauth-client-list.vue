@@ -426,6 +426,13 @@ window.Vue.onMounted(() => {
                     <label v-if="hasNoRedirect" class="error">Please enter a Redirect URI</label>
                 </div>
                 <div class="f-no-margins">
+                    <label for="addClient-backChannelLogoutUri">Back-channel Logout URI</label>
+                    <p class="meta">
+                        When the user logs out of Schoolbox: send a logout request to this URI.
+                    </p>
+                    <input id="modifyItem-addClient" v-model="addingClient.backChannelLogoutUri" />
+                </div>
+                <div class="f-no-margins">
                     <label for="addClient-clientCredentialsUser">Client Credentials User</label>
                     <p class="meta">
                         Any client credentials requests (i.e. requests made by the client backend to this Schoolbox
@@ -469,6 +476,8 @@ window.Vue.onMounted(() => {
             <input id="itemAdded-name" v-model="addingClient.name" readonly />
             <label for="itemAdded-redirectUri">Redirect URI</label>
             <input id="itemAdded-redirectUri" v-model="addingClient.redirectUri" readonly />
+            <label for="itemAdded-backChannelLogoutUri">Back-channel Logout URI</label>
+            <input id="itemAdded-backChannelLogoutUri" v-model="addingClient.backChannelLogoutUri" readonly />
             <label for="itemAdded-clientId">Client ID</label>
             <input id="itemAdded-clientId" v-model="addingClient.clientId" readonly />
             <label for="itemAdded-clientSecret" class="required">Client Secret</label>
@@ -507,6 +516,13 @@ window.Vue.onMounted(() => {
                     </p>
                     <input id="modifyItem-redirectUri" v-model="modifyingClient.redirectUri" required />
                     <label v-if="hasNoRedirect" class="error">Please enter a Redirect URI</label>
+                </div>
+                <div class="f-no-margins">
+                    <label for="modifyItem-backChannelLogoutUri">Back-channel Logout URI</label>
+                    <p class="meta">
+                        When the user logs out of Schoolbox: send a logout request to this URI.
+                    </p>
+                    <input id="modifyItem-backChannelLogoutUri" v-model="modifyingClient.backChannelLogoutUri" />
                 </div>
                 <div class="f-no-margins">
                     <label for="modifyItem-clientCredentialsUser">Client Credentials User</label>

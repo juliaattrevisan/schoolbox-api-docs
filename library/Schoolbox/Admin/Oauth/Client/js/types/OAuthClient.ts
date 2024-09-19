@@ -7,6 +7,7 @@ export type OAuthClient = {
     clientId?: string;
     clientSecret?: string;
     redirectUri: string; // When the user approves a request to share details, where should they be redirected to?
+    backChannelLogoutUri?: string; // On logging out of Schoolbox: send logout requests here
     clientCredentialsUser?: {
         // Any client credentials requests (i.e. requests made by the client backend to this Schoolbox instance, without interaction by an actual user) will be authenticated as this user;
         id: number;
