@@ -554,8 +554,13 @@ class UserAccessMapper extends Mapper
      */
     public function raiseNotification($object, $verb, $previous = null): bool
     {
-        if ($verb === parent::METHOD_UPDATE) {
-            // no notifications for updates (favourite / un favourite)
+        if (
+            $verb === parent::METHOD_UPDATE &&
+            $this->getSessionUser()?->getId() === $object->getUser()->getId()
+        ) {
+            /* if you are the user who's membership is being updated (favourite / un favourite)
+             * then do NOT send notifications
+             */
             return true;
         }
         // group join / leave, should still spawn notifications
