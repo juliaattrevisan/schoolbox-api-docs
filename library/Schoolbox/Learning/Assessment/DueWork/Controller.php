@@ -30,6 +30,7 @@ use Schoolbox\Application\Exception\Exception;
 use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Error\Mapper;
+use Schoolbox\File\MimetypeMapper;
 use Schoolbox\L10n\RosettaStone;
 use Schoolbox\Learning\Assessment\Breadcrumb\Factory;
 use Schoolbox\Learning\Assessment\DataModel\LessonPlan\Mapper as LessonPlanDataModelMapper;
@@ -187,6 +188,7 @@ class Controller extends Assessment\Controller
         protected Assessment\Project\ResultCache\Mapper $projectResultCacheMapper,
         protected LessonPlanTemplateMapper $lessonPlanTemplateMapper,
         protected LessonPlanDataModelMapper $lessonPlanDataModelMapper,
+        protected MimetypeMapper $mimeTypeMapper,
     ) {
         parent::__construct(
             $userMapper,
@@ -205,7 +207,8 @@ class Controller extends Assessment\Controller
             $latestViewMapper,
             $this->projectResultCacheMapper,
             $lessonPlanTemplateMapper,
-            $lessonPlanDataModelMapper
+            $lessonPlanDataModelMapper,
+            $this->mimeTypeMapper,
         );
     }
 
