@@ -248,7 +248,7 @@ class Factory
             'email' => $viewee->getEmail(),
             'externalId' => $viewee->getExternalId(),
             'role' => $viewee->getRole()->getName(),
-            'residentialHouse' => $viewee->getResidentialHouse()->getHouse(),
+            'residentialHouse' => $viewee->getResidentialHouse()?->getHouse(),
             'campus' => $viewee->getCampusCollection(),
             /* This is an arbitrary set of people associated with $viewee somehow
              * They might (or might not) have actual schoolbox user accounts
