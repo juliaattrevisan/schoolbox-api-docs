@@ -25,10 +25,6 @@ class CalendarEventCreateModifyCest
 
     private array $createdEvent;
 
-    private array $test = [
-        'test' => 1
-    ];
-
     private string $apiPathForCreate = '/calendar/event/create';
 
     private array $eventMinimalRequiredParams = [
@@ -113,7 +109,7 @@ class CalendarEventCreateModifyCest
      */
     public function testCreateEventWithOneFewerThanTheMinimalParameters(ApiTester $i): void
     {
-        $randomParamKeyToRemove = array_rand($this->eventMinimalRequiredParams, 1);
+        $randomParamKeyToRemove = array_rand($this->eventMinimalRequiredParams);
         $minimalRequiredParamsMinusOne = $this->eventMinimalRequiredParams;
         unset($minimalRequiredParamsMinusOne[$randomParamKeyToRemove]);
         $i->amGoingTo("create an event using the API, leaving out required key '$randomParamKeyToRemove' ($this->apiPathForCreate)...");
@@ -182,7 +178,7 @@ class CalendarEventCreateModifyCest
         // Test dependent fields: {attendance, guests} by inviting guests when attendance type is 'none'
         // -----------------------------------------------------------------------------------------------------------//
         // Note the current modify event form can make this contradictory request, so the request cannot be rejected
-        // first fixing that form.  For now, just make sure the server does not save the guests.
+        // without first fixing that form.  For now, just make sure the server does not save the guests.
         $i->amGoingTo("attempt to invite guests to the event when attendance type is 'none'.");
         $newAttendance = EventAttendanceModel::LEVEL_NO_ATTENDANCE;
         $newGuests = [['id' => $userJackColes->getId()], ['id' => $userJanaReed->getId()]];
@@ -210,7 +206,7 @@ class CalendarEventCreateModifyCest
         // -----------------------------------------------------------------------------------------------------------//
         $i->amGoingTo('change attendance type and invite guests to the event.');
         $newAttendance = EventAttendanceModel::LEVEL_INVITE_ONLY;
-        $newGuests = [['id' => $userJackColes->getId()], ['id' => $userJanaReed->getId()]];
+        $newGuests = [['id' => $userJanaReed->getId()], ['id' => $userJackColes->getId()]];
         $i->sendPost(
             "/calendar/event/$localEventId/modify",
             [
