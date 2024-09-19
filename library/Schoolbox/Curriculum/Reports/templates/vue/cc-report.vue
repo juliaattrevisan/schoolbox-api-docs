@@ -30,7 +30,7 @@ const data = window.Vue.ref((mockReportData as CurriculumCoveragePayload).data);
                 </tr>
             </thead>
             <tbody>
-                <cc-report-node v-for="node in data.nodes" :key="node.id" :node="node" />
+                <cc-report-node v-for="node in data.nodes" :key="node.id" :node="node" :depth="0" />
             </tbody>
         </table>
     </div>

@@ -7,8 +7,15 @@ import { CourseWithCurriculumNodeUsage, UnitWithCurriculumNodeUsage, CurriculumC
 
 interface Props {
     node: CurriculumCoverageNode;
+    depth: number; // The depth of the node in the tree
 }
 const props = defineProps<Props>();
+
+/**
+ * to gradually add more paddingStart to indicate node level depth
+ * @returns { number }
+ */
+const paddingStart = window.Vue.computed(() => `calc(${props.depth * 0.75}rem + 0.625rem)`);
 
 /**
  * Get the total usage count for a unit
@@ -50,7 +57,7 @@ function getNodeUsageCount(node: CurriculumCoverageNode): number {
 
 <template>
     <tr>
-        <th scope="row">{{ props.node.name }}</th>
+        <th scope="row" class="node__name">{{ props.node.name }}</th>
         <td>{{ getNodeUsageCount(props.node) }}</td>
         <template v-for="course in props.node.usage.courses" :key="course.id">
             <td v-for="unit in course.units" :key="unit.id">
@@ -60,8 +67,12 @@ function getNodeUsageCount(node: CurriculumCoverageNode): number {
         </template>
     </tr>
     <template v-if="props.node.children && props.node.children.length > 0">
-        <cc-report-node v-for="child in props.node.children" :key="child.id" :node="child" />
+        <cc-report-node v-for="child in props.node.children" :key="child.id" :node="child" :depth="props.depth + 1" />
     </template>
 </template>
 
-<style scoped></style>
+<style scoped>
+.node__name {
+    padding-inline-start: v-bind(paddingStart);
+}
+</style>
