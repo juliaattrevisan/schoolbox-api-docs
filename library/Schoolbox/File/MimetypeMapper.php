@@ -170,7 +170,7 @@ class MimetypeMapper extends Schoolbox\Mapper
         $pb = $this->getPredicateBuilder()
             ->in('afe.extension', $extensions)
             ->isFalse('m.deleted')
-            ->equals('m.enable','true');
+            ->equals('m.enable', 'true');
 
         $where = implode(' AND ', $pb->getWhere());
 
