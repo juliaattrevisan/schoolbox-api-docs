@@ -636,17 +636,17 @@ class Controller extends Base
 
         $folderIds = (
             array_key_exists('folders', (array)$validRequestPost)
-            ? $this->getIdsFromDigitStringsOrKeyedArrays($validRequestPost['folders'])
+            ? array_map(fn ($folder) => $folder['id'], $validRequestPost['folders'])
             : $event->getFolderCollection()->map(fn ($folder) => $folder->getId())
         );
         $campusIds = (
             array_key_exists('campuses', (array)$validRequestPost)
-            ? $this->getIdsFromDigitStringsOrKeyedArrays($validRequestPost['campuses'])
+            ? array_map(fn ($campus) => $campus['id'], $validRequestPost['campuses'])
             : $event->getCampusCollection()->map(fn ($campus) => $campus->getId())
         );
         $roleIds = (
             array_key_exists('roles', (array)$validRequestPost)
-            ? $this->getIdsFromDigitStringsOrKeyedArrays($validRequestPost['roles'])
+            ? array_map(fn ($role) => $role['id'], $validRequestPost['roles'])
             : $event->getRoleCollection()->map(fn ($role) => $role->getId())
         );
 
@@ -762,7 +762,7 @@ class Controller extends Base
         $guestIds = [];
         if ((new Event\Attendance\ValidCanInvite())->isSatisfiedBy($this->getUser(), $this->getConfigLoader()->get('calendar_student_can_invite'))) {
             if (array_key_exists('guests', (array)$validRequestPost)) {
-                $guestIds = $this->getIdsFromDigitStringsOrKeyedArrays($validRequestPost['guests']);
+                $guestIds = array_map(fn ($guest) => $guest['id'], $validRequestPost['guests']);
             } else {
                 $this->eventMapper->populateGuests($event); // Hydrate guests in $event.
                 $guestIds = $event->getGuests()->getAll(); // Note getGuests() returns a Collection of ints.
@@ -976,39 +976,6 @@ class Controller extends Base
                 $this->response = $this->redirectFound($redirect);
             }
         }
-    }
-
-    /**
-     * @param array $items of digit strings or (arrays containing an 'id' key (e.g. ["id" => 123])
-     * @return array of integers
-     */
-    private function getIdsFromDigitStringsOrKeyedArrays(array $items): array
-    {
-        $ids = [];
-
-        foreach ($items as $item) {
-            if (is_array($item)) {
-                if (!array_key_exists('id', $item)) {
-                    throw new InvalidArgumentException("No 'id' key supplied in object.");
-                }
-
-                $value = $item['id'];
-            } else {
-                $value = $item;
-            }
-
-            if (is_int($value)) {
-                $id = $value;
-            } elseif (is_string($value) && ctype_digit($value)) {
-                $id = (int)$value;
-            } else {
-                throw new InvalidArgumentException("Invalid 'id' value.  Expected integer or digit string.");
-            }
-
-            $ids[] = $id;
-        }
-
-        return $ids;
     }
 
     /**
