@@ -103,7 +103,7 @@ abstract class Controller extends ListController implements IAssessmentControlle
         protected Project\ResultCache\Mapper $projectResultCacheMapper,
         protected LessonPlanTemplateMapper $lessonPlanTemplateMapper,
         protected LessonPlanDataModelMapper $lessonPlanDataModelMapper,
-        protected MimetypeMapper $mimetypeMapper,
+        protected ?MimetypeMapper $mimetypeMapper = null,
     ) {
         parent::__construct($userMapper, $errorMapper, $assessmentMapper, $access, $transactor, $participantDataSource, $unitSpecificationMapper, $rosettaStone, $this->projectResultCacheMapper);
     }
