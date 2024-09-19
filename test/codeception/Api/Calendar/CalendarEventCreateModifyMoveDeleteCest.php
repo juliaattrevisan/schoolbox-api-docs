@@ -25,6 +25,22 @@ class CalendarEventCreateModifyMoveDeleteCest
 
     private array $createdEvent;
 
+    private array $test = [
+        'test' => 1
+    ];
+
+    private string $apiPathForCreate = '/calendar/event/create';
+
+    private array $eventMinimalRequiredParams = [
+        'allDay' => true,
+        'endDate' => '24/09/2024',
+        'level' => 1,
+        'publishDate' => '25/09/2024 7:00pm', // Current configured timezone is assumed.
+        'startDate' => '24/09/2024',
+        'title' => "St Swivven's Day",
+        'type' => 1,
+    ];
+
     /**
      * @throws ServiceNotFound
      */
@@ -42,24 +58,11 @@ class CalendarEventCreateModifyMoveDeleteCest
      *
      * @param ApiTester $i
      */
-    public function testCreateEvent(ApiTester $i): void
+    public function testCreateEventWithMinimalParameters(ApiTester $i): void
     {
-        // -----------------------------------------------------------------------------------------------------------//
         // Create an event, setting the required parameters only
-        // -----------------------------------------------------------------------------------------------------------//
-        $eventTitle = "St Swivven's Day";
-        $apiPathForCreate = '/calendar/event/create';
-        $minimalRequiredParams = [
-            'allDay' => true,
-            'endDate' => '24/09/2024',
-            'level' => 1,
-            'publishDate' => '25/09/2024 7:00pm', // Current configured timezone is assumed.
-            'startDate' => '24/09/2024',
-            'title' => $eventTitle,
-            'type' => 1,
-        ];
-        $i->amGoingTo("create an event using the API, with minimal required parameters ($apiPathForCreate)...");
-        $i->sendPost($apiPathForCreate, $minimalRequiredParams);
+        $i->amGoingTo("create an event using the API, with minimal required parameters ($this->apiPathForCreate)...");
+        $i->sendPost($this->apiPathForCreate, $this->eventMinimalRequiredParams);
         $createdEventJson = $i->grabResponse();
         $this->createdEvent = json_decode($createdEventJson, true);
         if ($this->createdEvent === null) {
@@ -74,7 +77,7 @@ class CalendarEventCreateModifyMoveDeleteCest
         $expectedValueByKey = [
             'allDay' => true,
             'efficacy' => 'self',
-            'title' => $eventTitle,
+            'title' => "St Swivven's Day",
             'startDate' => "2024-09-24T00:00:00$timezoneOffset",
             'endDate' => "2024-09-24T23:59:59$timezoneOffset",
             'repeat' => '', // TODO: This value ought to be a null instead of a blank string.
@@ -90,24 +93,31 @@ class CalendarEventCreateModifyMoveDeleteCest
         foreach ($expectedValueByKey as $key => $expectedValue) {
             $i->assertSame($this->createdEvent[$key], $expectedValue, "Testing key '$key'.");
         }
+
         // In created event, check keys whose values are expected to be arrays.
         $i->assertSame(count($this->createdEvent['roles']), 0, "Testing key 'roles'.");
         $i->assertSame(count($this->createdEvent['campuses']), 0, "Testing key 'campuses'.");
         $i->assertSame(count($this->createdEvent['folders']), 0, "Testing key 'folders'.");
         $i->assertSame(count($this->createdEvent['guests']), 0, "Testing key 'guests'.");
+
         // In created event, check keys whose values are expected to be stubs.
         $i->assertSame($this->createdEvent['user']['id'], self::ALARESS_USER_ID, "Testing key 'user'.");
         $i->assertSame($this->createdEvent['author']['id'], self::ALARESS_USER_ID, "Testing key 'author'.");
         $i->assertSame($this->createdEvent['type']['id'], 1, "Testing key 'type'.");
+    }
 
-        // -----------------------------------------------------------------------------------------------------------//
-        // Try again to create an event, but remove one of the required parameters (this attempt should fail)
-        // -----------------------------------------------------------------------------------------------------------//
-        $randomParamKeyToRemove = array_rand($minimalRequiredParams, 1);
-        $minimalRequiredParamsMinusOne = $minimalRequiredParams;
+    /**
+     * Attempt to create an event with fewer than the required parameters, and expect that attempt to fail.
+     *
+     * @param ApiTester $i
+     */
+    public function testCreateEventWithOneFewerThanTheMinimalParameters(ApiTester $i): void
+    {
+        $randomParamKeyToRemove = array_rand($this->eventMinimalRequiredParams, 1);
+        $minimalRequiredParamsMinusOne = $this->eventMinimalRequiredParams;
         unset($minimalRequiredParamsMinusOne[$randomParamKeyToRemove]);
-        $i->amGoingTo("create an event using the API, leaving out required key '$randomParamKeyToRemove' ($apiPathForCreate)...");
-        $i->sendPost($apiPathForCreate, $minimalRequiredParamsMinusOne);
+        $i->amGoingTo("create an event using the API, leaving out required key '$randomParamKeyToRemove' ($this->apiPathForCreate)...");
+        $i->sendPost($this->apiPathForCreate, $minimalRequiredParamsMinusOne);
         $createdEventJson = $i->grabResponse();
         $createdEvent = json_decode($createdEventJson, true);
         if ($createdEvent === null) {
