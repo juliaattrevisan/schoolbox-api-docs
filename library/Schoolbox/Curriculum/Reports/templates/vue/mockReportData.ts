@@ -59,8 +59,8 @@ export const mockReportData = {
                                     _usageCounts: {
                                         unit: 1,
                                         activity: 4,
-                                        lesson: 3,
-                                        rubric: 2,
+                                        lesson: 1,
+                                        rubric: 5,
                                     },
                                 },
                                 {
@@ -68,9 +68,9 @@ export const mockReportData = {
                                     name: "Persuasion and the Media",
                                     _usageCounts: {
                                         unit: 2,
-                                        activity: 4,
-                                        lesson: 0,
-                                        rubric: 6,
+                                        activity: 0,
+                                        lesson: 2,
+                                        rubric: 0,
                                     },
                                 },
                                 {
@@ -79,7 +79,7 @@ export const mockReportData = {
                                     _usageCounts: {
                                         unit: 5,
                                         activity: 2,
-                                        lesson: 4,
+                                        lesson: 0,
                                         rubric: 5,
                                     },
                                 },

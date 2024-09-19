@@ -3,24 +3,43 @@
  * A single node row in the curriculum coverage report.
  */
 
+import { CourseWithCurriculumNodeUsage, UnitWithCurriculumNodeUsage, CurriculumCoverageNode } from "./tempTypes";
+
 interface Props {
-    node: object; //
+    node: CurriculumCoverageNode;
 }
 const props = defineProps<Props>();
 
-function getUnitUsageCount(usageCounts) {
+/**
+ * Get the total usage count for a unit
+ * @param usageCounts - the usage counts for the unit
+ * @returns the total unit usage count
+ */
+function getUnitUsageCount(usageCounts: UnitWithCurriculumNodeUsage["_usageCounts"]): number {
     return usageCounts.unit + usageCounts.activity + usageCounts.lesson + usageCounts.rubric;
 }
 
-function getCourseUsageCount(course) {
+/**
+ * Get the total node usage count for a course(s)
+ * @param course - the course to get the usage count for
+ * @returns the total node usage count for all selected course(s)
+ */
+function getCourseUsageCount(course: CourseWithCurriculumNodeUsage): number {
     let count = 0;
-    course.units.forEach((unit) => {
-        count += getUnitUsageCount(unit._usageCounts);
-    });
+    if (course.units) {
+        course.units.forEach((unit) => {
+            count += getUnitUsageCount(unit._usageCounts);
+        });
+    }
     return count;
 }
 
-function getNodeUsageCount(node) {
+/**
+ * Get the total node usage count for a node
+ * @param node - the node to get the usage count for
+ * @returns the total node usage count
+ */
+function getNodeUsageCount(node: CurriculumCoverageNode): number {
     let count = 0;
     node.usage.courses.forEach((course) => {
         count += getCourseUsageCount(course);
