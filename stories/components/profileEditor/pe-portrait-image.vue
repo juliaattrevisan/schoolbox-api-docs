@@ -13,9 +13,6 @@
                         <div class="list-item">
                             <h2 title="Portrait Image">Portrait Image</h2>
                         </div>
-                        <nav>
-                            <a href="#" class="icon-settings settings edit" title="Settings" />
-                        </nav>
                     </div>
                 </div>
 
