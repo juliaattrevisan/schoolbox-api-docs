@@ -36,6 +36,7 @@ class Mapper extends BaseMapper
         $this->uses('client_id', self::TYPE_STRING);
         $this->uses('client_secret_hash', self::TYPE_STRING);
         $this->uses('redirect_uri', self::TYPE_STRING);
+        $this->uses('back_channel_logout_uri', self::TYPE_STRING);
         $this->joins(
             'client_credentials_user_id',
             UserMapper::class,

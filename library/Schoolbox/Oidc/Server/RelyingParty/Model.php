@@ -57,6 +57,13 @@ class Model implements ISoftDeletable
     private string $redirectUri;
 
     /**
+     * The relying party's back-channel logout URI, if supported: this is the
+     * location to where requests to log out from the RP will be sent after
+     * the user logs out from Schoolbox.
+     */
+    private ?string $backChannelLogoutUri = null;
+
+    /**
      * The user to impersonate when authorizing with the `client_credentials`
      * grant: if not set, then this relying party doesn't support the grant.
      */
@@ -131,6 +138,24 @@ class Model implements ISoftDeletable
     public function setRedirectUri(string $redirectUri): self
     {
         $this->redirectUri = $redirectUri;
+        return $this;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getBackChannelLogoutUri(): ?string
+    {
+        return $this->backChannelLogoutUri;
+    }
+
+    /**
+     * @param string|null $backChannelLogoutUri
+     * @return $this
+     */
+    public function setBackChannelLogoutUri(?string $backChannelLogoutUri): self
+    {
+        $this->backChannelLogoutUri = $backChannelLogoutUri;
         return $this;
     }
 
