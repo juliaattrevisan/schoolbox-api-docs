@@ -4,8 +4,18 @@
  */
 import { capitalizeFirstLetter } from "@js/util/stringUtils";
 import { useProfileEditorStore } from "./store/profileEditorStore";
+import type { ProfileEditorRoleType } from "./types/profileEditorTypes";
 
 const peStore = useProfileEditorStore();
+
+/**
+ * When the role type changes, change the url hash
+ * @param role The role type to set
+ */
+function setSelectedRoleType(role: ProfileEditorRoleType): void {
+    window.location.hash = role.name;
+    peStore.setSelectedRoleType(role);
+}
 </script>
 
 <template>
@@ -14,7 +24,7 @@ const peStore = useProfileEditorStore();
             <a
                 :aria-selected="role === peStore.selectedRoleType"
                 :tabindex="role === peStore.selectedRoleType ? 0 : -1"
-                @click="peStore.setSelectedRoleType(role)"
+                @click="setSelectedRoleType(role)"
             >
                 {{ capitalizeFirstLetter(role.name) }}
             </a>

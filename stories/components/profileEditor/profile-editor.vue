@@ -18,6 +18,14 @@ const peStore = useProfileEditorStore();
 
 window.Vue.onMounted(async () => {
     await peStore.init(props.endpoints);
+
+    // Is there the url hash a valid role type? select it if so or fall back to the first role type
+    const roleTypeViaHash = peStore.roleTypes.find((roleType) => roleType.name === window.location.hash.slice(1));
+    if (roleTypeViaHash) {
+        peStore.setSelectedRoleType(roleTypeViaHash);
+    } else if (peStore.roleTypes.length > 0) {
+        peStore.setSelectedRoleType(peStore.roleTypes[0]);
+    }
 });
 </script>
 
