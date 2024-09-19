@@ -14,6 +14,10 @@ export default class PastoralProfile {
 
     static readonly CREATE_PASTORAL_BUTTON = "a[title='Create Pastoral Record']";
 
+    static readonly PASTORAL_RECORD = "a[href='/pastoral/student/{studentId}/record/{recordId}']";
+
+    static readonly PASTORAL_RECORD_UPDATE = "a[href='/pastoral/student/{studentId}/record/{recordId}/update']";
+
     constructor(tester: AcceptanceTester, page: Page) {
         this.tester = tester;
         this.page = page;
@@ -39,8 +43,13 @@ export default class PastoralProfile {
      * @param studentId - The student id
      * @param recordId - The record id
      */
-    async clickModifyIcon(studentId: number, recordId: number): Promise<void> {
-        await this.page.click(`href="/pastoral/student/'${studentId}"/record/"${recordId}'/update"`);
+    async clickModifyIcon(studentId: string, recordId: number): Promise<void> {
+        await this.page.click(
+            PastoralProfile.PASTORAL_RECORD_UPDATE.replace("{studentId}", studentId.toString()).replace(
+                "{recordId}",
+                recordId.toString(),
+            ),
+        );
     }
 
     /**
@@ -56,8 +65,13 @@ export default class PastoralProfile {
      * @param studentId - The student id
      * @param recordId - The record id
      */
-    async clickPastoralRecord(studentId: number, recordId: number): Promise<void> {
-        await this.page.click(`a[href="/pastoral/student/${studentId}/record/${recordId}"]`);
+    async clickPastoralRecord(studentId: string, recordId: number): Promise<void> {
+        await this.page.click(
+            PastoralProfile.PASTORAL_RECORD.replace("{studentId}", studentId.toString()).replace(
+                "{recordId}",
+                recordId.toString(),
+            ),
+        );
     }
 
     /**

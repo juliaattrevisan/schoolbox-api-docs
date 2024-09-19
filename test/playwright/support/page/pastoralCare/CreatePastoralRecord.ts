@@ -73,6 +73,6 @@ export default class CreatePastoralRecord {
      * click Save button
      */
     async clickSave(): Promise<void> {
-        await this.page.click(CreatePastoralRecord.SAVE_BUTTON);
+        await this.page.locator(CreatePastoralRecord.SAVE_BUTTON).last().click();
     }
 }
