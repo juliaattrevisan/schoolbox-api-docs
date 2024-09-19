@@ -28,7 +28,9 @@ class Jwt
     public const SIGNING_ALGORITHM = 'RS256';
     public const KEY_ID            = 'schoolbox';
 
-
+    /* HELP instance ID
+     */
+    public const HELP_ID           = '3d844bfe';
     /**
      * Config settings are stored here.
      */

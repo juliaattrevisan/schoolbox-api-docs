@@ -74,20 +74,23 @@ class SelfIssued extends Base
         $user = $this->findUser($claims[self::CLAIM_SUB], self::CLAIM_SUB);
         if (isset($claims[self::CLAIM_JTI])) {
             // if issued by schoolbox and jti is provided, validate the jti
-            try {
-                /** @var User\Token\Model $token */
-                $token = $this->tokenMapper->findOneByColumnList(
-                    [
-                        'user_id' => $user->getId(),
-                        'jwt_id'  => $claims[self::CLAIM_JTI],
-                    ]
-                );
-                if ($token->getExpiry() && $token->getExpiry()->isPast()) {
-                    throw new Exception\Rejected('The JWT ID provided has expired');
+            if (Jwt::HELP_ID !== $claims[self::CLAIM_JTI]) {
+                // if not help instance, validate the jti
+                try {
+                    /** @var User\Token\Model $token */
+                    $token = $this->tokenMapper->findOneByColumnList(
+                        [
+                            'user_id' => $user->getId(),
+                            'jwt_id' => $claims[self::CLAIM_JTI],
+                        ]
+                    );
+                    if ($token->getExpiry() && $token->getExpiry()->isPast()) {
+                        throw new Exception\Rejected('The JWT ID provided has expired');
+                    }
+                } catch (MapperException $e) {
+                    // could not find a token with user id and jwt id
+                    throw new Exception\Rejected('The JWT ID provided does not match a token for the given user', 0, $e);
                 }
-            } catch (MapperException $e) {
-                // could not find a token with user id and jwt id
-                throw new Exception\Rejected('The JWT ID provided does not match a token for the given user', 0, $e);
             }
         } else {
             throw new Exception\InvalidIdentity(
