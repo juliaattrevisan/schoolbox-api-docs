@@ -3,6 +3,7 @@
  * To customise the fields displayed on a user profile page
  */
 
+import PeFieldsSelectedItem from "./pe-fields-selected-item.vue";
 import { useProfileEditorStore } from "./store/profileEditorStore";
 
 const peStore = useProfileEditorStore();
@@ -10,7 +11,11 @@ const peStore = useProfileEditorStore();
 
 <template>
     <div v-if="peStore.selectedRoleType">
-        <p v-for="field in peStore.selectedRoleType.fields.available" :key="field.field">{{ field.displayAs }}</p>
+        <pe-fields-selected-item
+            v-for="field in peStore.selectedRoleType.fields.selected"
+            :key="field.field"
+            :field="field"
+        />
     </div>
 </template>
 

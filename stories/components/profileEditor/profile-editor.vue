@@ -3,6 +3,7 @@
  * To be able to customise what's displayed on a user profile page
  */
 
+import PePortraitImage from "./pe-portrait-image.vue";
 import PeFields from "./pe-fields.vue";
 import PeRoleType from "./pe-role-type.vue";
 import { useProfileEditorStore } from "./store/profileEditorStore";
@@ -22,9 +23,16 @@ window.Vue.onMounted(async () => {
 
 <template>
     <p v-if="peStore.isLoading">Loading...</p>
-
     <pe-role-type />
-    <pe-fields />
+
+    <div class="l-grid l-grid--12 l-gap-m l-mar-m--top">
+        <div class="small-12 large-3">
+            <pe-portrait-image />
+        </div>
+        <div class="small-12 large-9">
+            <pe-fields />
+        </div>
+    </div>
 </template>
 
 <style scoped></style>

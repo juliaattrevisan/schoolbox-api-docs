@@ -23,6 +23,14 @@ export const mockData: ProfileEditorPayload = {
                     // exchange payload data
                     selected: [
                         {
+                            field: "Email",
+                            displayAs: "Email Address",
+                            fieldSettings: {
+                                appearsOn: [1, 2],
+                                visibleFor: ["student", "staff"],
+                            },
+                        },
+                        {
                             field: "StudentYearLevelCoordinator",
                             displayAs: "Year Level Coordinator",
                             fieldSettings: {
@@ -67,7 +75,7 @@ export const mockData: ProfileEditorPayload = {
         fieldSettings: [
             {
                 key: "appearsOn",
-                displayAs: "Appears on",
+                displayAs: "Appears On",
                 options: [
                     // A list of campus ids displayed as a list of checkboxes
                     {
@@ -89,7 +97,7 @@ export const mockData: ProfileEditorPayload = {
             },
             {
                 key: "visibleFor",
-                displayAs: "Visible for",
+                displayAs: "Visible For",
                 options: [
                     // These ids come from the hardcoded consts we already use in backend world
                     // displayed as a list of checkboxes
