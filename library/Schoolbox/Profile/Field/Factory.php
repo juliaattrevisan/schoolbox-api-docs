@@ -276,6 +276,7 @@ class Factory
      */
     private function generateParentReferenceFields(\Schoolbox\User $viewee): array
     {
+        return [];
     }
 
 
@@ -287,5 +288,6 @@ class Factory
      */
     private function generateStaffReferenceFields(\Schoolbox\User $viewee): array
     {
+        return [];
     }
 }
