@@ -13,8 +13,8 @@ test.describe("Badges tests", () => {
     /**
      * Deleting Bagades when the test is about to start so it does not get impacted by other tests already executed
      */
-    test.beforeAll(async ({ tester, db }) => {
-        tester.isGoingTo("update delete_at for the news article so it does not impact the news tests");
+    test.beforeAll(async ({ baseTester, db }) => {
+        baseTester.isGoingTo("update delete_at for the news article so it does not impact the news tests");
         await db.updateInDatabase("badge", { deleted_at: "2022-01-15 11:22:34" }, { "name like": "Automation Badge%" });
     });
 
@@ -114,11 +114,17 @@ test.describe("Badges tests", () => {
         await expect(page.locator("#badge-list-container")).not.toContainText("Automation Badge Updated");
     });
 
+    test.afterEach(async ({ tester }) => {
+        await tester.logout();
+    });
+
     /**
      * Soft deleting data to not impact the tests
      */
-    test.afterAll(async ({ tester, db }) => {
-        tester.isGoingTo("update delete_at for the data created in this test so it does impact next suite of tests");
+    test.afterAll(async ({ baseTester, db }) => {
+        baseTester.isGoingTo(
+            "update delete_at for the data created in this test so it does impact next suite of tests",
+        );
         await db.updateInDatabase("badge", { deleted_at: "2022-01-15 11:22:34" }, { "name like": "Automation Badge%" });
     });
 });
