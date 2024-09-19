@@ -3,8 +3,10 @@
  * To customise the fields displayed on a user profile page
  */
 
+import type { ProfileEditorRoleType } from "./types/profileEditorTypes";
+
 interface Props {
-    fields: object;
+    fields: ProfileEditorRoleType["fields"];
 }
 
 const props = defineProps<Props>();
@@ -12,7 +14,7 @@ const props = defineProps<Props>();
 
 <template>
     <div>
-        <p>{{ props.fields.available[0].name }}</p>
+        <p v-for="field in props.fields.available" :key="field.field">{{ field.displayAs }}</p>
     </div>
 </template>
 
