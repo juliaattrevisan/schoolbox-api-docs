@@ -87,6 +87,12 @@ class Validator
                         "  This is required because 'level' has value " . Event::ACCESS_CAMPUS . '.'
                     );
                 }
+                if (!array_key_exists('roles', (array)$originalRequestPost)) {
+                    throw new SchoolboxException(
+                        "Missing required key 'roles'." .
+                        "  This is required because 'level' has value " . Event::ACCESS_CAMPUS . '.'
+                    );
+                }
                 break;
             default:
                 throw new SchoolboxException("Unexpected value for key 'level'.");
