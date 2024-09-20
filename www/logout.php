@@ -22,6 +22,12 @@ session_destroy();
 $rememberer = $kernel->get('session.rememberer');
 $rememberer->forgetUsername();
 
+// Open back-channel logout requests
+foreach ($_SESSION[\Schoolbox\Oidc\Server\Controller::SESSION_OIDC_SERVER_CLIENTS] ?? [] as $client) {
+    // Does this client support logout?
+    // If so, craft a logout token and send it
+}
+
 $samlLogoutUrl = trim(Config::get('saml_logout_url'));
 
 // Replace some dynamic variables in the logout URL if set
