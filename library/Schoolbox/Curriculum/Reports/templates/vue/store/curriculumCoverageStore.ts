@@ -1,9 +1,18 @@
 /**
- *
+ * To manage the state of the curriculum coverage report, handling the load of
  */
 
 import { defineStore } from "pinia";
-import { ReportOptions } from "../tempTypes";
+
+/**
+ *
+ */
+export enum ReportOptions {
+    UNIT = "unit",
+    LEARNING_ACTIVITY = "activity",
+    LEARNING_ACTIVITY_LESSON_PLAN = "lessonPlan",
+    RUBRIC = "rubric",
+}
 
 export type ReportOption = {
     value: ReportOptions;
@@ -29,7 +38,7 @@ export const useStore = defineStore("curriculumCoverage", () => {
             label: "Rubric",
         },
     ]); // all report options available
-    const selectedReportOptions = window.Vue.ref<string[]>([]); // the currently selected report options, just the value list
+    const selectedReportOptions = window.Vue.ref<string[]>([...allReportOptions.value.map((option) => option.value)]); // the currently selected report options, just the value list
 
     /**
      * store any passed through properties
