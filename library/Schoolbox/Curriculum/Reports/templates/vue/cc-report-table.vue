@@ -4,7 +4,7 @@
  */
 
 import { mockReportData } from "./mockReportData";
-import { CurriculumCoveragePayload } from "./tempTypes";
+import type { CurriculumCoveragePayload } from "../js/types/curriculumCoverageTypes";
 import CcReportTableNode from "./cc-report-table-node.vue";
 
 const data = window.Vue.ref((mockReportData as CurriculumCoveragePayload).data);

@@ -13,10 +13,10 @@ const store = useStore();
         <div class="checklist">
             <label>Report on</label>
             <ul class="option-list">
-                <li v-for="reportOption in store.allReportOptions" :key="reportOption.value">
+                <li v-for="reportOption in store.allReportOptionValues" :key="reportOption.value">
                     <input
                         :id="reportOption.value"
-                        v-model="store.selectedReportOptions"
+                        v-model="store.selectedReportOptionValues"
                         :value="reportOption.value"
                         type="checkbox"
                     />

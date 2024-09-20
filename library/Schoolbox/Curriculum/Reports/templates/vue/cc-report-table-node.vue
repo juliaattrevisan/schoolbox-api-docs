@@ -3,7 +3,11 @@
  * A single node row in the curriculum coverage report.
  */
 
-import { CourseWithCurriculumNodeUsage, UnitWithCurriculumNodeUsage, CurriculumCoverageNode } from "./tempTypes";
+import type {
+    CourseWithCurriculumNodeUsage,
+    UnitWithCurriculumNodeUsage,
+    CurriculumCoverageNode,
+} from "../js/types/curriculumCoverageTypes";
 
 interface Props {
     node: CurriculumCoverageNode;
