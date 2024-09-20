@@ -2,27 +2,48 @@
 
 //small script to logout users
 
-use Lcobucci\JWT\Token\RegisteredClaims;
+use Http\Discovery\Psr17Factory;
 use Ramsey\Uuid\Uuid;
+use Schoolbox\API\Token\Jwt;
+use Schoolbox\API\Token\JwtParser\IParser;
 use Schoolbox\Auth\Remember;
-use Schoolbox\Url\Factory;
+use Schoolbox\Oidc\Server\RelyingParty\Mapper;
 
 require_once __DIR__ . '/../conf/core/require.php';
 $kernel = new \Schoolbox\Application\WebRequest\Kernel();
 
 // Begin back-channel logout requests
+/** @var Jwt $jwtBuilder */
+$jwtBuilder = $kernel->get('user.tokenBuilder');
 foreach ($_SESSION[\Schoolbox\Oidc\Server\Controller::SESSION_OIDC_SERVER_CLIENTS] ?? [] as $clientId) {
     // Does this client support logout?
     // If so, craft a logout token and send it
-    $token = [
-        RegisteredClaims::AUDIENCE        => $clientId,
-        RegisteredClaims::ISSUER          => (new Factory($kernel->get('config')))->buildFullyQualified(),
-        RegisteredClaims::SUBJECT         => $_SESSION['user']->getUsername(),
-        RegisteredClaims::ISSUED_AT       => Alaress_Date_Format::now()->getUnixTimeStamp(),
-        RegisteredClaims::EXPIRATION_TIME => Alaress_Date_Format::now()->addMinutes(5)->getUnixTimeStamp(),
-        RegisteredClaims::ID              => Uuid::uuid4()->toString(),
-        'events'                          => ['http://schemas.openid.net/event/backchannel-logout' => []],
-    ];
+    $client = Mapper::getInstance()->findByClientId($clientId);
+    if ($client?->getBackChannelLogoutUri()) {
+        $jwt = $jwtBuilder->generate(
+            $_SESSION['user'],
+            Alaress_Date_Format::now()->addMinutes(5),
+            Uuid::uuid4()->toString(),
+            [
+                IParser::CLAIM_AUD => $clientId,
+                IParser::CLAIM_ISS => Alaress_Date_Format::now()->getUnixTimeStamp(),
+                'events'           => ['http://schemas.openid.net/event/backchannel-logout' => []],
+            ]
+        );
+
+        // And send it
+        /** @var Psr17Factory $httpFactory */
+        $httpFactory = $kernel->get('httpFactory');
+        $request     = $httpFactory
+            ->createRequest('POST', $client->getBackChannelLogoutUri())
+            ->withBody($httpFactory->createStream(http_build_query(['logout_token' => $jwt])));
+
+        /** @var \GuzzleHttp\ClientInterface $httpClient */
+        $httpClient = $kernel->get('httpClient');
+
+        // Consider retry?
+        $httpClient->sendAsync($request);
+    }
 }
 
 if (Config::get('saml_slo_enabled') && isset($_SESSION['samlNameId'])) {
