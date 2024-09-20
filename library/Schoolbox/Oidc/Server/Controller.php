@@ -89,15 +89,17 @@ class Controller extends Base
         } else {
             $authRequest->setAuthorizationApproved($permission);
 
-            // At this point, if permission was granted:
-            // track the session?
-            // To do that, need to be able to determine the client.
-            $client           = $authRequest->getClient();
-            $currentClients   = $this->getSession()->get(self::SESSION_OIDC_SERVER_CLIENTS, []);
-            $currentClients[] = $client->getIdentifier();
-            $this->getSession()->set(self::SESSION_OIDC_SERVER_CLIENTS, $currentClients);
-
-            // There's no session ID here either; add one?
+            // At this point, if permission was granted: track that the server
+            // has granted a session to the client.
+            // Currently, only the client can be tracked, not a particular
+            // session ID (as that doesn't exist in the auth code, and I can't
+            // easily add it).
+            if ($permission) {
+                $client           = $authRequest->getClient();
+                $currentClients   = $this->getSession()->get(self::SESSION_OIDC_SERVER_CLIENTS, []);
+                $currentClients[] = $client->getIdentifier();
+                $this->getSession()->set(self::SESSION_OIDC_SERVER_CLIENTS, array_unique($currentClients));
+            }
 
             try {
                 $this->response = $this->authServer->completeAuthorizationRequest($authRequest, $this->responseEmpty());
@@ -179,7 +181,9 @@ class Controller extends Base
             'grant_types_supported' => ['authorization_code', 'refresh_token', 'implicit', 'client_credentials'],
 
             // Schoolbox now supports back-channel logout:
-            // don't know about session support yet
+            // it currently does not support sessions for back-channel logout,
+            // therefore logging out of the provider will log out any sessions
+            // for any relying parties.
             'backchannel_logout_supported'         => true,
             'backchannel_logout_session_supported' => false,
         ]);
