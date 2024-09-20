@@ -134,7 +134,6 @@ class CalendarEventCreateModifyCest
         $timezoneOffset     = date('P'); // E.g. '+10:00'.
         $eventModifications = [
             // Fields that can be modified without affecting other fields.
-            'user'          => ['id' => $userJackColes->getId()],
             'author'        => ['id' => $userJanaReed->getId()],
             'type'          => ['id' => 2],
             'title'         => 'Festivus',

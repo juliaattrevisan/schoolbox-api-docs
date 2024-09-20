@@ -607,9 +607,10 @@ class Controller extends Base
 
         /* Check owner still exists
          * If not - pass ownership to the author
+         * Event owner is deliberately not modifiable by API requests.
          */
         try {
-            $owner = $this->userMapper->findById($validRequestPost['user']['id'] ?? $event->getOwner()->getId());
+            $owner = $this->userMapper->findById($event->getOwner()->getId());
         } catch (Exception $e) {
             $owner = $this->getUser();
         }
