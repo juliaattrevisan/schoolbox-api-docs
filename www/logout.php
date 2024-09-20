@@ -31,6 +31,9 @@ foreach ($_SESSION[\Schoolbox\Oidc\Server\Controller::SESSION_OIDC_SERVER_CLIENT
             ]
         );
 
+        // Consider sending other claim values which may have been in the ID
+        // token? RPs might have used these claims to identify a user.
+
         // And send it
         /** @var Psr17Factory $httpFactory */
         $httpFactory = $kernel->get('httpFactory');
