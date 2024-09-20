@@ -3,9 +3,8 @@
  * A single node row in the curriculum coverage report.
  */
 
-import {
-    ReportOptionValues,
-    type CourseWithCurriculumNodeUsage,
+import type {
+    CourseWithCurriculumNodeUsage,
     UnitWithCurriculumNodeUsage,
     CurriculumCoverageNode,
 } from "../js/types/curriculumCoverageTypes";
@@ -56,13 +55,10 @@ function getUnitUsageCount(usageCounts: UnitWithCurriculumNodeUsage["_usageCount
  * @returns the total node usage count for all selected course(s)
  */
 function getCourseUsageCount(course: CourseWithCurriculumNodeUsage): number {
-    let count = 0;
-    if (course.units) {
-        course.units.forEach((unit) => {
-            count += getUnitUsageCount(unit._usageCounts);
-        });
-    }
-    return count;
+    if (course.units === undefined) return 0;
+    return course.units.reduce((acc, unit) => {
+        return acc + getUnitUsageCount(unit._usageCounts);
+    }, 0);
 }
 
 /**
@@ -71,11 +67,9 @@ function getCourseUsageCount(course: CourseWithCurriculumNodeUsage): number {
  * @returns the total node usage count
  */
 function getNodeUsageCount(node: CurriculumCoverageNode): number {
-    let count = 0;
-    node.usage.courses.forEach((course) => {
-        count += getCourseUsageCount(course);
-    });
-    return count;
+    return node.usage.courses.reduce((acc, course) => {
+        return acc + getCourseUsageCount(course);
+    }, 0);
 }
 </script>
 
