@@ -89,7 +89,12 @@ function getNodeUsageCount(node: CurriculumCoverageNode): number {
         </template>
     </tr>
     <template v-if="props.node.children && props.node.children.length > 0">
-        <cc-report-node v-for="child in props.node.children" :key="child.id" :node="child" :depth="props.depth + 1" />
+        <cc-report-table-node
+            v-for="child in props.node.children"
+            :key="child.id"
+            :node="child"
+            :depth="props.depth + 1"
+        />
     </template>
 </template>
 
