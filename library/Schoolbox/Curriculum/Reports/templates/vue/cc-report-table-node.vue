@@ -20,19 +20,19 @@ const store = useStore();
 
 /**
  * to gradually add more paddingStart to indicate node level depth
- * @returns { number }
+ * @returns - the paddingStart value
  */
 const paddingStart = window.Vue.computed(() => `calc(${props.depth * 0.75}rem + 0.625rem)`);
 
 /**
  * If there's a code available, which means it can be added to the name
- * @returns { boolean }
+ * @returns - whether the node has a code
  */
 const hasCode = window.Vue.computed(() => props.node.code && props.node.code !== "");
 
 /**
  * Add in the code if it's available otherwise just show the title
- * @returns { string }
+ * @returns - the title of the node
  */
 const title = window.Vue.computed(() =>
     hasCode.value ? `[${props.node.code as string}] ${props.node.name}` : `${props.node.name}`,
@@ -63,21 +63,46 @@ function getCourseUsageCount(course: CourseWithCurriculumNodeUsage): number {
 
 /**
  * Get the total node usage count for a node
- * @param node - the node to get the usage count for
  * @returns the total node usage count
  */
-function getNodeUsageCount(node: CurriculumCoverageNode): number {
-    return node.usage.courses.reduce((acc, course) => {
+const nodeUsageCount = window.Vue.computed(() => {
+    return props.node.usage.courses.reduce((acc, course) => {
         return acc + getCourseUsageCount(course);
     }, 0);
-}
+});
+
+/**
+ * Whether the node contains any unit usage counts that are 0
+ * for the currently selected report options
+ * @returns - whether the node has no usages
+ */
+const hasNoUsages = window.Vue.computed(() => {
+    return !props.node.usage.courses.every((course) => {
+        return course.units.every((unit) => {
+            return getUnitUsageCount(unit._usageCounts) !== 0;
+        });
+    });
+});
+
+/**
+ * If has a unit with no usage, and only show gaps is selected, show the node
+ * @returns - whether to show the node
+ */
+const showNode = window.Vue.computed(() => {
+    // always show the node when onlyShowGaps is false
+    if (!store.onlyShowGaps) {
+        return true;
+    }
+    // otherwise, only show the node if it has no usages
+    return hasNoUsages.value && store.onlyShowGaps;
+});
 </script>
 
 <template>
-    <tr>
+    <tr v-if="showNode">
         <th scope="row" class="node__name">{{ title }}</th>
-        <td :class="`u-alt-bkg ${getNodeUsageCount(props.node) === 0 ? 'u-highlight' : ''}`">
-            {{ getNodeUsageCount(props.node) }}
+        <td :class="`u-alt-bkg ${nodeUsageCount === 0 ? 'u-highlight' : ''}`">
+            {{ nodeUsageCount }}
         </td>
         <template v-for="(course, index) in props.node.usage.courses" :key="course.id">
             <td

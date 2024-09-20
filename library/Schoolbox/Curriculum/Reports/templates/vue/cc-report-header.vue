@@ -24,6 +24,16 @@ const store = useStore();
                 </li>
             </ul>
         </div>
+        <div>
+            <label>Only show gaps</label>
+            <div class="switch">
+                <input id="onlyShowGapsSwitch" v-model="store.onlyShowGaps" type="checkbox" />
+                <label for="onlyShowGapsSwitch">
+                    <span class="icon-approve"></span>
+                    <span class="icon-cancel"></span>
+                </label>
+            </div>
+        </div>
     </div>
 </template>
 

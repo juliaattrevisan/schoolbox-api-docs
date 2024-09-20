@@ -27,6 +27,7 @@ export const useStore = defineStore("curriculumCoverage", () => {
     const selectedReportOptionValues = window.Vue.ref<ReportOptionValues[]>([
         ...allReportOptionValues.value.map((option) => option.value),
     ]); // the currently selected report options, just the value list
+    const onlyShowGaps = window.Vue.ref<boolean>(false); // whether to only show nodes that contain 0 usage counts
 
     /**
      * store any passed through properties
@@ -37,5 +38,6 @@ export const useStore = defineStore("curriculumCoverage", () => {
         init,
         allReportOptionValues,
         selectedReportOptionValues,
+        onlyShowGaps,
     };
 });
