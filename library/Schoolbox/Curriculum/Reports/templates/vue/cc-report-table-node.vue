@@ -3,17 +3,21 @@
  * A single node row in the curriculum coverage report.
  */
 
-import type {
-    CourseWithCurriculumNodeUsage,
+import {
+    ReportOptionValues,
+    type CourseWithCurriculumNodeUsage,
     UnitWithCurriculumNodeUsage,
     CurriculumCoverageNode,
 } from "../js/types/curriculumCoverageTypes";
+import { useStore } from "./store/curriculumCoverageStore";
 
 interface Props {
     node: CurriculumCoverageNode;
     depth: number; // The depth of the node in the tree
 }
 const props = defineProps<Props>();
+
+const store = useStore();
 
 /**
  * to gradually add more paddingStart to indicate node level depth
@@ -41,7 +45,9 @@ const title = window.Vue.computed(() =>
  * @returns the total unit usage count
  */
 function getUnitUsageCount(usageCounts: UnitWithCurriculumNodeUsage["_usageCounts"]): number {
-    return usageCounts.unit + usageCounts.activity + usageCounts.lessonPlan + usageCounts.rubric;
+    return store.selectedReportOptionValues.reduce((acc, option) => {
+        return acc + usageCounts[option];
+    }, 0);
 }
 
 /**

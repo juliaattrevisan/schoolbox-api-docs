@@ -24,7 +24,7 @@ export const useStore = defineStore("curriculumCoverage", () => {
             label: "Rubric",
         },
     ]); // all report options available
-    const selectedReportOptionValues = window.Vue.ref<string[]>([
+    const selectedReportOptionValues = window.Vue.ref<ReportOptionValues[]>([
         ...allReportOptionValues.value.map((option) => option.value),
     ]); // the currently selected report options, just the value list
 
