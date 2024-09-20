@@ -3,6 +3,7 @@
  * A single node row in the curriculum coverage report.
  */
 
+import { useNodeTitle } from "@schoolboxCurriculum/vue/composables/useNodeTitle";
 import type {
     CourseWithCurriculumNodeUsage,
     UnitWithCurriculumNodeUsage,
@@ -17,26 +18,13 @@ interface Props {
 const props = defineProps<Props>();
 
 const store = useStore();
+const { title } = useNodeTitle(props.node);
 
 /**
  * to gradually add more paddingStart to indicate node level depth
  * @returns - the paddingStart value
  */
 const paddingStart = window.Vue.computed(() => `calc(${props.depth * 0.75}rem + 0.625rem)`);
-
-/**
- * If there's a code available, which means it can be added to the name
- * @returns - whether the node has a code
- */
-const hasCode = window.Vue.computed(() => props.node.code && props.node.code !== "");
-
-/**
- * Add in the code if it's available otherwise just show the title
- * @returns - the title of the node
- */
-const title = window.Vue.computed(() =>
-    hasCode.value ? `[${props.node.code as string}] ${props.node.name}` : `${props.node.name}`,
-);
 
 /**
  * Get the total usage count for a unit
