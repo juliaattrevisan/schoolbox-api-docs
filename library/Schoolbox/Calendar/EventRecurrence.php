@@ -21,7 +21,7 @@ class EventRecurrence
      *
      * @var array
      */
-    private $validRepeat = array(
+    private static $validRepeat = array(
         'daily' => '+1 day',
         'weekly' => '+1 week',
         'fortnightly' => '+2 weeks',
@@ -144,13 +144,21 @@ class EventRecurrence
     }
 
     /**
+     * @return array
+     */
+    public static function getValidRepeatKeys(): array
+    {
+        return array_keys(self::$validRepeat);
+    }
+
+    /**
      * Get a strtotime interval from a chosen setting
      *
      * @return mixed
      */
     private function intervalValue()
     {
-        return $this->validRepeat[$this->getRepeatSetting()];
+        return self::$validRepeat[$this->getRepeatSetting()];
     }
 
     /**
@@ -158,9 +166,9 @@ class EventRecurrence
      *
      * @return bool
      */
-    private function isValidInterval()
+    private function isValidInterval(): bool
     {
-        if (isset($this->validRepeat[$this->getRepeatSetting()])) {
+        if (isset(self::$validRepeat[$this->getRepeatSetting()])) {
             return true;
         }
 

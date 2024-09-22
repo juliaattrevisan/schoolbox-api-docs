@@ -97,6 +97,18 @@ class Controller extends Base
 
 
     /**
+     * @var FolderAccess
+     */
+    private FolderAccess $folderAccess;
+
+
+    /**
+     * @var Validator
+     */
+    private Validator $validator;
+
+
+    /**
      * Controller constructor.
      *
      * @param Error\Mapper      $errorMapper
@@ -107,6 +119,8 @@ class Controller extends Base
      * @param CampusMapper      $campusMapper
      * @param UserMapper        $userMapper
      * @param Attendance\Mapper $attendanceMapper
+     * @param FolderAccess      $folderAccess
+     * @param Validator         $validator
      */
     public function __construct(
         Error\Mapper $errorMapper,
@@ -116,7 +130,9 @@ class Controller extends Base
         EventTypeMapper $eventTypeMapper,
         CampusMapper $campusMapper,
         UserMapper $userMapper,
-        Attendance\Mapper $attendanceMapper
+        Attendance\Mapper $attendanceMapper,
+        FolderAccess $folderAccess,
+        Validator $validator,
     ) {
         $this->errorMapper = $errorMapper;
         $this->roleMapper = $roleMapper;
@@ -126,6 +142,8 @@ class Controller extends Base
         $this->campusMapper = $campusMapper;
         $this->userMapper = $userMapper;
         $this->attendanceMapper = $attendanceMapper;
+        $this->folderAccess = $folderAccess;
+        $this->validator = $validator;
     }
 
 
@@ -536,13 +554,31 @@ class Controller extends Base
     /**
      * Create an event for person specified by userId
      * (remember, you can create events for other people)
+     * @throws Exception
      */
     public function postCreate(): void
     {
-        $userId = (int)($this->requestPost['user']['id'] ?? $this->requestPost['userId']);
+        // This will throw a SchoolboxException with a helpful message if the request is invalid.
+        $this->validator->validateForPostCreate($this->requestPost);
+
+        $userId = (int)($this->requestPost['user']['id'] ?? $this->requestPost['userId'] ?? $this->user->getId());
+        $authorId = (
+            (
+                array_key_exists('author', (array)$this->requestPost) &&
+                array_key_exists('id', (array)$this->requestPost['author'])
+            )
+            ? (int)$this->requestPost['author']['id']
+            : (
+                // Key 'authorId' is posted by the create/modify event form.
+                (array_key_exists('authorId', (array)$this->requestPost))
+                ? (int)$this->requestPost['authorId']
+                : $userId
+            )
+        );
 
         $event = new Event();
         $event->setOwner($this->userMapper->createModel()->setId($userId));
+        $event->setAuthor($this->userMapper->createModel()->setId($authorId));
 
         $this->postModify($event);
     }
@@ -563,8 +599,15 @@ class Controller extends Base
      */
     public function postModify(Event $event): void
     {
+        // This will throw a SchoolboxException with a helpful message if the request is invalid,
+        // and return a possibly modified request with compatible strings converted to ints or bools for example.
+        // The $validRequestPost does not contain all possible fields, but all fields contained in the validRequestPost
+        // require no further validation.
+        $validRequestPost = $this->validator->validateForPostModify($event, $this->requestPost);
+
         /* Check owner still exists
          * If not - pass ownership to the author
+         * Event owner is deliberately not modifiable by API requests.
          */
         try {
             $owner = $this->userMapper->findById($event->getOwner()->getId());
@@ -572,34 +615,46 @@ class Controller extends Base
             $owner = $this->getUser();
         }
 
-        $authorId = (int)($this->requestPost['author']['id'] ?? $this->requestPost['authorId'] ?? null);
+        $authorId = (int)($validRequestPost['author']['id'] ?? $validRequestPost['authorId'] ?? $event->getAuthor()->getId());
 
         /* Check if author still exists
          * If not - pass author to the author
          */
         try {
             $author = $this->userMapper->findById($authorId);
-        } catch (Exception $e) {
+        } catch (Exception) {
             $author = $this->getUser();
         }
 
         /* Enforce ints for primary identifiers (yes that's a thing)
          */
-        $accessLevel = (int)($this->requestPost['level'] ?? null);
-        $eventTypeId = (int)($this->requestPost['type']['id'] ?? $this->requestPost['type'] ?? null);
-        $title       = $this->requestPost['title'] ?? null;
-        $location    = $this->requestPost['location'] ?? null;
-        $detail      = $this->requestPost['detail'] ?? null;
-        $allDay      = (int)($this->requestPost['allDay'] ?? null);
+        $accessLevel = (int)($validRequestPost['level'] ?? $event->getAccess());
+        $eventTypeId = (int)($validRequestPost['type']['id'] ?? $validRequestPost['type'] ?? $event->getType()->getId());
+        $title       = $validRequestPost['title'] ?? $event->getTitle();
+        $location    = $validRequestPost['location'] ?? $event->getLocation();
+        $detail      = $validRequestPost['detail'] ?? $event->getDetail();
+        $allDay      = (int)($validRequestPost['allDay'] ?? $event->getAllDay());
 
-        $folders  = $this->getIdsFromDigitStringsOrKeyedArrays($this->requestPost['folders'] ?? []);
-        $campuses = $this->getIdsFromDigitStringsOrKeyedArrays($this->requestPost['campuses'] ?? []);
-        $roles    = $this->getIdsFromDigitStringsOrKeyedArrays($this->requestPost['roles'] ?? []);
+        $folderIds = (
+            array_key_exists('folders', (array)$validRequestPost)
+            ? array_map(fn ($folder) => $folder['id'], $validRequestPost['folders'])
+            : $event->getFolderCollection()->map(fn ($folder) => $folder->getId())
+        );
+        $campusIds = (
+            array_key_exists('campuses', (array)$validRequestPost)
+            ? array_map(fn ($campus) => $campus['id'], $validRequestPost['campuses'])
+            : $event->getCampusCollection()->map(fn ($campus) => $campus->getId())
+        );
+        $roleIds = (
+            array_key_exists('roles', (array)$validRequestPost)
+            ? array_map(fn ($role) => $role['id'], $validRequestPost['roles'])
+            : $event->getRoleCollection()->map(fn ($role) => $role->getId())
+        );
 
         /* Recurrence settings
          */
-        $efficacy = $this->requestPost['efficacy'] ?? null;
-        $repeat   = $this->requestPost['repeat'] ?? null;
+        $efficacy = $validRequestPost['efficacy'] ?? EventRecurrenceMapper::EFFICACY_SELF;
+        $repeat   = $validRequestPost['repeat'] ?? '';
 
         /* Redirects
          */
@@ -607,10 +662,8 @@ class Controller extends Base
 
         /* Check whether you have permissions to mutate $event into the vars provided
          */
-        $folderAccess = FolderAccess::getInstance();
-
         try {
-            if (!(new Event\Access($folderAccess))->checkDestination($this->getUser(), $accessLevel, $author, $owner, $folders, $campuses)) {
+            if (!(new Event\Access($this->folderAccess))->checkDestination($this->getUser(), $accessLevel, $author, $owner, $folderIds, $campusIds)) {
                 throw $this->errorMapper->generateException(Error\Mapper::ERROR_PERM_EVENT_MODIFY);
             }
         } catch (InvalidArgumentException $e) {
@@ -623,9 +676,10 @@ class Controller extends Base
 
         $publishDate = null;
 
-        if ('' !== ($this->requestPost['publishDate'] ?? '')) {
+        $eventPublishDateTime = $event->getPublishDateTime()?->getUsingFormat(DateTimeInterface::RFC3339);
+        if ('' !== ($validRequestPost['publishDate'] ?? $eventPublishDateTime)) {
             $publishDate = new Alaress_Date_Format(
-                $this->requestPost['publishDate'],
+                $validRequestPost['publishDate'] ?? $eventPublishDateTime,
                 [
                     $locale->localFormat(),
                     // API docs state we accept RFC3339 without qualification, so we must accept both variants.
@@ -642,8 +696,14 @@ class Controller extends Base
             DateTimeInterface::RFC3339,
             DateTimeInterface::RFC3339_EXTENDED
         ];
-        $startDate = new Alaress_Date_Format($this->requestPost['startDate'], $acceptedDateFormats);
-        $endDate = new Alaress_Date_Format($this->requestPost['endDate'], $acceptedDateFormats);
+        $startDate = new Alaress_Date_Format(
+            $validRequestPost['startDate'] ?? $event->getStartDateTime()->getUsingFormat(DateTimeInterface::RFC3339),
+            $acceptedDateFormats
+        );
+        $endDate = new Alaress_Date_Format(
+            $validRequestPost['endDate'] ?? $event->getEndDateTime()->getUsingFormat(DateTimeInterface::RFC3339),
+            $acceptedDateFormats
+        );
 
         /* Start and end dates
          */
@@ -664,7 +724,7 @@ class Controller extends Base
             // Unlike the other dates, until date is currently always a date and
             // not a date+time.
             $untilDate = (new Alaress_Date_Format(
-                $this->requestPost['repeat_until'],
+                $validRequestPost['repeat_until'] ?? $event->getEndDateTime(),
                 [$locale->localShortFormat(), Alaress_Date_Format::DATABASE_DATE_FORMAT],
             ))->endOfDay();
         } catch (InvalidArgumentException) {
@@ -686,11 +746,13 @@ class Controller extends Base
 
         /* Attendance settings
          */
-        $attendance    = (int)($this->requestPost['attendance'] ?? '');
-        $maxAttendees  = '' === ($this->requestPost['maxAttendees'] ?? '')
-            ? null
-            : (int)$this->requestPost['maxAttendees'];
-        $showAttendees = (bool)($this->requestPost['showAttendees'] ?? '');
+        $attendance = (int)($validRequestPost['attendance'] ?? $event->getAttendance());
+        $maxAttendees = (
+            array_key_exists('maxAttendees', (array)$validRequestPost)
+            ? $validRequestPost['maxAttendees']
+            : $event->getMaxAttendees()
+        );
+        $showAttendees = (bool)($validRequestPost['showAttendees'] ?? $event->getShowAttendees());
 
         // As of SA-10697 attendances are not reset on changing event time.
         // Prior to that, they were reset if the start or end time of the event changed.
@@ -698,21 +760,13 @@ class Controller extends Base
 
         /* Invited guests
          */
-        $guests = [];
-
+        $guestIds = [];
         if ((new Event\Attendance\ValidCanInvite())->isSatisfiedBy($this->getUser(), $this->getConfigLoader()->get('calendar_student_can_invite'))) {
-            if (is_array($this->requestPost['guests'])) {
-                // Guests can be supplied as an array of userIds, or an array of JSON objects.
-                // The array of userIds method is for similarity with 'roles', 'campus', and 'folder'.
-                // The object stub method is documented at api.schoolbox.com.au.
-                $guests = $this->getIdsFromDigitStringsOrKeyedArrays($this->requestPost['guests'] ?? []);
-            } elseif ('' !== (string)($this->requestPost['guests'] ?? '')) {
-                // Guests can also be supplied as a comma-separated string of userIds.
-                // This method is used by the form at route calendarEvent.getModify.
-                $guests = array_map(
-                    fn($guestId) => (int)$guestId,
-                    explode(',', $this->requestPost['guests'])
-                );
+            if (array_key_exists('guests', (array)$validRequestPost)) {
+                $guestIds = array_map(fn ($guest) => $guest['id'], $validRequestPost['guests']);
+            } else {
+                $this->eventMapper->populateGuests($event); // Hydrate guests in $event.
+                $guestIds = $event->getGuests()->getAll(); // Note getGuests() returns a Collection of ints.
             }
         }
 
@@ -730,10 +784,10 @@ class Controller extends Base
             ->setEndDateTime($endDate)
             ->setPublishDateTime($publishDate)
             ->setAllDay($allDay)
-            ->setRoleCollection(new Collection($roles))
-            ->setFolderCollection(new Collection($folders))
-            ->setCampusCollection(new Collection($campuses))
-            ->setGuests(new Collection($guests));
+            ->setRoleCollection(new Collection($roleIds))
+            ->setFolderCollection(new Collection($folderIds))
+            ->setCampusCollection(new Collection($campusIds))
+            ->setGuests(new Collection($guestIds));
 
         /* Attendance dirty bit should be set to true if the attendance
          * setting now differs from what it previously was
@@ -749,22 +803,24 @@ class Controller extends Base
          * For campus level events, at least one campus has been selected
          * For group level events, at least one group has been selected
          */
-        if ($event->isCampusLevel() && !count($campuses)) {
+        if ($event->isCampusLevel() && !count($campusIds)) {
             throw $this->errorMapper->generateException(Error\Mapper::ERROR_SELECT_CAMPUS);
-        } elseif ($event->isGroupLevel() && !count($folders)) {
+        } elseif ($event->isGroupLevel() && !count($folderIds)) {
             throw $this->errorMapper->generateException(Error\Mapper::ERROR_INFORMATION_MISSING);
         }
 
         /* Set up individual relations for each event in the series
          * Event object is provided within eventRecurrenceMapper
          */
-        $eventRelations = new EventRelations($accessLevel, $folders, $roles, $guests, $attendanceDirty);
+        $eventRelations = new EventRelations($accessLevel, $folderIds, $roleIds, $guestIds, $attendanceDirty);
 
         /* Save this event and any recurring incidents too
          */
         (new EventRecurrenceMapper($this->eventMapper))->save($event, $efficacy, $repeat, $untilDate, $startDate, $endDate, $accessLevel, $eventRelations);
 
         if ($this->isJsonRequest()) {
+            $this->eventMapper->populateGuests($event); // Reload guests to ensure the response matches the database representation.
+
             /**
              * @var eventType $eventType EventType
              */
@@ -921,39 +977,6 @@ class Controller extends Base
                 $this->response = $this->redirectFound($redirect);
             }
         }
-    }
-
-    /**
-     * @param array $items of digit strings or (arrays containing an 'id' key (e.g. ["id" => 123])
-     * @return array of integers
-     */
-    private function getIdsFromDigitStringsOrKeyedArrays(array $items): array
-    {
-        $ids = [];
-
-        foreach ($items as $item) {
-            if (is_array($item)) {
-                if (!array_key_exists('id', $item)) {
-                    throw new InvalidArgumentException("No 'id' key supplied in object.");
-                }
-
-                $value = $item['id'];
-            } else {
-                $value = $item;
-            }
-
-            if (is_int($value)) {
-                $id = $value;
-            } elseif (is_string($value) && ctype_digit($value)) {
-                $id = (int)$value;
-            } else {
-                throw new InvalidArgumentException("Invalid 'id' value.  Expected integer or digit string.");
-            }
-
-            $ids[] = $id;
-        }
-
-        return $ids;
     }
 
     /**

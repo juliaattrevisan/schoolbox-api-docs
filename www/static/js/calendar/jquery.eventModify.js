@@ -199,7 +199,7 @@
 
             $(config.element).alaressValidate({
                 rules: {
-                    "campus[]": {
+                    "campuses[]": {
                         required: {
                             depends: validateCampusSelected,
                         },
@@ -217,7 +217,7 @@
                             depends: validateCampusSelected,
                         },
                     },
-                    "folder[]": {
+                    "folders[]": {
                         required: {
                             depends: validateFolderSelected,
                         },
