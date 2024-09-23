@@ -64,10 +64,6 @@ class Controller extends Base
         $userJwtId  = null;
         $showExisting = false;
         switch ($jwtIdToUse) {
-            case 'new':
-                $userJwtId = $this->tokenMapper->generateForUser($user, $this->getUser());
-                $showExisting = true;
-                break;
             case 'existing':
                 try {
                     $userJwtId = $this->tokenMapper->findOneByColumn('user_id', $user->getId());
@@ -77,6 +73,10 @@ class Controller extends Base
                 }
                 break;
             case 'no':
+            case 'new':
+                $userJwtId = $this->tokenMapper->generateForUser($user, $this->getUser());
+                $showExisting = true;
+                break;
             default:
         }
 
@@ -86,13 +86,13 @@ class Controller extends Base
             [
                 'token'        => $this->tokenBuilder->generate(
                     $user,
-                    $userJwtId?->getExpiry(),
-                    $userJwtId?->getJwtId()
+                    $userJwtId->getJwtId(),
+                    $userJwtId->getExpiry(),
                 ),
-                'createdAt'    => $userJwtId?->getCreatedAt()->getShort(),
-                'expiry'       => $userJwtId?->getExpiry()?->getShort(),
-                'createdBy'    => $userJwtId?->getCreatedBy()->getFullName(),
-                'jwtId'        => $userJwtId?->getJwtId(),
+                'createdAt'    => $userJwtId->getCreatedAt()?->getShort(),
+                'expiry'       => $userJwtId->getExpiry()?->getShort(),
+                'createdBy'    => $userJwtId->getCreatedBy()?->getFullName(),
+                'jwtId'        => $userJwtId->getJwtId(),
                 'showExisting' => $showExisting,
             ]
         );

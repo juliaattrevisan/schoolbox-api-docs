@@ -176,11 +176,12 @@ abstract class BaseMessageFactory
      */
     public function build(): Message
     {
+        $tokenUser = User\Token\Mapper::getInstance()->generateForUser($this->effector, $this->effector, $this->tokenExpiry);
         $token  = $this->effector
             ? $this->tokenBuilder->generate(
                 $this->effector,
+                $tokenUser->getJwtId(),
                 $this->tokenExpiry,
-                null,
                 [SelfIssued::CUSTOM_CLAIM_TASKD => 1],
             )
             : null;

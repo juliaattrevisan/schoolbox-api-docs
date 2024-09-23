@@ -32,8 +32,6 @@ class Jwt
      */
     public const HELP_ID           = '3d844bfe';
 
-    public const TASKD_ID          = 'taskd';
-
     public const API_JWT_TIMEOUT = 3600; // 1 hour
 
     /**

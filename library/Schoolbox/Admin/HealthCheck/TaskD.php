@@ -74,7 +74,7 @@ class TaskD
         $outfile = $escapedTitle !== ''
             ? ($date . '-' . $escapedTitle)
             : $date;
-        $token = User\Token\Mapper::getInstance()->generateForUser($user, $user, \Alaress_Date_Format::now()->addSeconds(JWT::API_JWT_TIMEOUT), Jwt::TASKD_ID);
+        $token = User\Token\Mapper::getInstance()->generateForUser($user, $user, \Alaress_Date_Format::now()->addSeconds(JWT::API_JWT_TIMEOUT));
         $message = $this->messageFactory->build(
             'download-pages',
             [
