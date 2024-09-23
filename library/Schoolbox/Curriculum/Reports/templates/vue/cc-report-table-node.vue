@@ -69,6 +69,7 @@ const nodeUsageCount = window.Vue.computed(() => {
  * @returns - whether the node has no usages
  */
 const hasNoUsages = window.Vue.computed(() => {
+    if (props.node.usage === undefined) return true;
     return !props.node.usage.courses.every((course) => {
         return course.units.every((unit) => {
             return getUnitUsageCount(unit._usageCounts) !== 0;
@@ -117,11 +118,9 @@ const showNode = window.Vue.computed(() => {
         <template v-else>
             <template v-for="(course, index) in store.courses" :key="course.id">
                 <td v-for="unit in course.units" :key="unit.id" :class="`${index % 2 ? 'u-alt-bkg' : ''} u-highlight`">
-                    {{ getUnitUsageCount(unit._usageCounts) }}
+                    0
                 </td>
-                <td :class="`${index % 2 ? 'u-alt-bkg' : ''} u-highlight`">
-                    {{ getCourseUsageCount(course) }}
-                </td>
+                <td :class="`${index % 2 ? 'u-alt-bkg' : ''} u-highlight`">0</td>
             </template>
         </template>
     </tr>
