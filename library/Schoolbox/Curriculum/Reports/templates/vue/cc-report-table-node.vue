@@ -31,8 +31,10 @@ const paddingStart = window.Vue.computed(() => `calc(${props.depth * 0.75}rem + 
  * @param usageCounts - the usage counts for the unit
  * @returns the total unit usage count
  */
-function getUnitUsageCount(usageCounts: UnitWithCurriculumNodeUsage["_usageCounts"]): number {
+function getUnitUsageCount(usageCounts: UnitWithCurriculumNodeUsage["_usageCounts"] | undefined): number {
+    if (usageCounts === undefined) return 0;
     return store.selectedReportOptionValues.reduce((acc, option) => {
+        if (usageCounts[option] === undefined) return acc;
         return acc + usageCounts[option];
     }, 0);
 }
@@ -45,6 +47,7 @@ function getUnitUsageCount(usageCounts: UnitWithCurriculumNodeUsage["_usageCount
 function getCourseUsageCount(course: CourseWithCurriculumNodeUsage): number {
     if (course.units === undefined) return 0;
     return course.units.reduce((acc, unit) => {
+        if (unit._usageCounts === undefined) return acc;
         return acc + getUnitUsageCount(unit._usageCounts);
     }, 0);
 }
@@ -54,6 +57,7 @@ function getCourseUsageCount(course: CourseWithCurriculumNodeUsage): number {
  * @returns the total node usage count
  */
 const nodeUsageCount = window.Vue.computed(() => {
+    if (props.node.usage === undefined) return 0;
     return props.node.usage.courses.reduce((acc, course) => {
         return acc + getCourseUsageCount(course);
     }, 0);
@@ -92,17 +96,33 @@ const showNode = window.Vue.computed(() => {
         <td :class="`u-alt-bkg ${nodeUsageCount === 0 ? 'u-highlight' : ''}`">
             {{ nodeUsageCount }}
         </td>
-        <template v-for="(course, index) in props.node.usage.courses" :key="course.id">
-            <td
-                v-for="unit in course.units"
-                :key="unit.id"
-                :class="`${index % 2 ? 'u-alt-bkg' : ''} ${getUnitUsageCount(unit._usageCounts) === 0 ? 'u-highlight' : ''}`"
-            >
-                {{ getUnitUsageCount(unit._usageCounts) }}
-            </td>
-            <td :class="`${index % 2 ? 'u-alt-bkg' : ''} ${getCourseUsageCount(course) === 0 ? 'u-highlight' : ''}`">
-                {{ getCourseUsageCount(course) }}
-            </td>
+        <!-- loop through and usage provided the node has usage set -->
+        <template v-if="props.node.usage">
+            <template v-for="(course, index) in props.node.usage.courses" :key="course.id">
+                <td
+                    v-for="unit in course.units"
+                    :key="unit.id"
+                    :class="`${index % 2 ? 'u-alt-bkg' : ''} ${getUnitUsageCount(unit._usageCounts) === 0 ? 'u-highlight' : ''}`"
+                >
+                    {{ getUnitUsageCount(unit._usageCounts) }}
+                </td>
+                <td
+                    :class="`${index % 2 ? 'u-alt-bkg' : ''} ${getCourseUsageCount(course) === 0 ? 'u-highlight' : ''}`"
+                >
+                    {{ getCourseUsageCount(course) }}
+                </td>
+            </template>
+        </template>
+        <!-- otherwise the node must have no usages set -->
+        <template v-else>
+            <template v-for="(course, index) in store.courses" :key="course.id">
+                <td v-for="unit in course.units" :key="unit.id" :class="`${index % 2 ? 'u-alt-bkg' : ''} u-highlight`">
+                    {{ getUnitUsageCount(unit._usageCounts) }}
+                </td>
+                <td :class="`${index % 2 ? 'u-alt-bkg' : ''} u-highlight`">
+                    {{ getCourseUsageCount(course) }}
+                </td>
+            </template>
         </template>
     </tr>
     <template v-if="props.node.children && props.node.children.length > 0">

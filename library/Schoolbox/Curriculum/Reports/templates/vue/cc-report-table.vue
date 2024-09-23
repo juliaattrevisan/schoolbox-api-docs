@@ -6,8 +6,14 @@
 import { mockReportData } from "./mockReportData";
 import type { CurriculumCoveragePayload } from "../js/types/curriculumCoverageTypes";
 import CcReportTableNode from "./cc-report-table-node.vue";
+import { useStore } from "./store/curriculumCoverageStore";
 
+const store = useStore();
 const data = window.Vue.ref((mockReportData as CurriculumCoveragePayload).data);
+/**
+ * @todo - Update to use the actual data from the API
+ */
+store.courses = data.value.courses; // Set the courses in the store (temporary while mock data is used)
 </script>
 
 <template>

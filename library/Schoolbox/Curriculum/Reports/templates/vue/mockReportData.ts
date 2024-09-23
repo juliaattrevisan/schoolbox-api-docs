@@ -70,7 +70,6 @@ export const mockReportData = {
                                         unit: 2,
                                         activity: 0,
                                         lessonPlan: 2,
-                                        rubric: 0,
                                     },
                                 },
                                 {
@@ -79,7 +78,6 @@ export const mockReportData = {
                                     _usageCounts: {
                                         unit: 5,
                                         activity: 2,
-                                        lessonPlan: 0,
                                         rubric: 5,
                                     },
                                 },
@@ -94,7 +92,6 @@ export const mockReportData = {
                                     name: "Geography",
                                     _usageCounts: {
                                         unit: 2,
-                                        activity: 0,
                                         lessonPlan: 3,
                                         rubric: 2,
                                     },
@@ -103,7 +100,6 @@ export const mockReportData = {
                                     id: 171,
                                     name: "History",
                                     _usageCounts: {
-                                        unit: 0,
                                         activity: 2,
                                         lessonPlan: 1,
                                         rubric: 3,
@@ -122,12 +118,6 @@ export const mockReportData = {
                                 {
                                     id: 173,
                                     name: "Economics and Business",
-                                    _usageCounts: {
-                                        unit: 0,
-                                        activity: 0,
-                                        lessonPlan: 0,
-                                        rubric: 0,
-                                    },
                                 },
                             ],
                         },
@@ -160,7 +150,6 @@ export const mockReportData = {
                                             _usageCounts: {
                                                 unit: 2,
                                                 activity: 4,
-                                                lessonPlan: 0,
                                                 rubric: 6,
                                             },
                                         },
@@ -185,7 +174,6 @@ export const mockReportData = {
                                             name: "Geography",
                                             _usageCounts: {
                                                 unit: 2,
-                                                activity: 0,
                                                 lessonPlan: 3,
                                                 rubric: 2,
                                             },
@@ -194,7 +182,6 @@ export const mockReportData = {
                                             id: 171,
                                             name: "History",
                                             _usageCounts: {
-                                                unit: 0,
                                                 activity: 2,
                                                 lessonPlan: 1,
                                                 rubric: 3,
@@ -214,7 +201,6 @@ export const mockReportData = {
                                             id: 173,
                                             name: "Economics and Business",
                                             _usageCounts: {
-                                                unit: 0,
                                                 activity: 3,
                                                 lessonPlan: 1,
                                                 rubric: 1,
@@ -238,32 +224,14 @@ export const mockReportData = {
                                                 {
                                                     id: 108,
                                                     name: "Romeo and Juliet",
-                                                    _usageCounts: {
-                                                        unit: 0,
-                                                        activity: 0,
-                                                        lessonPlan: 0,
-                                                        rubric: 0,
-                                                    },
                                                 },
                                                 {
                                                     id: 109,
                                                     name: "Persuasion and the Media",
-                                                    _usageCounts: {
-                                                        unit: 0,
-                                                        activity: 0,
-                                                        lessonPlan: 0,
-                                                        rubric: 0,
-                                                    },
                                                 },
                                                 {
                                                     id: 110,
                                                     name: "To Kill a Mockingbird",
-                                                    _usageCounts: {
-                                                        unit: 0,
-                                                        activity: 0,
-                                                        lessonPlan: 0,
-                                                        rubric: 0,
-                                                    },
                                                 },
                                             ],
                                         },
@@ -276,18 +244,14 @@ export const mockReportData = {
                                                     name: "Geography",
                                                     _usageCounts: {
                                                         unit: 2,
-                                                        activity: 0,
                                                         lessonPlan: 1,
-                                                        rubric: 0,
                                                     },
                                                 },
                                                 {
                                                     id: 171,
                                                     name: "History",
                                                     _usageCounts: {
-                                                        unit: 0,
                                                         activity: 1,
-                                                        lessonPlan: 0,
                                                         rubric: 1,
                                                     },
                                                 },
@@ -298,17 +262,13 @@ export const mockReportData = {
                                                         unit: 4,
                                                         activity: 1,
                                                         lessonPlan: 1,
-                                                        rubric: 0,
                                                     },
                                                 },
                                                 {
                                                     id: 173,
                                                     name: "Economics and Business",
                                                     _usageCounts: {
-                                                        unit: 0,
                                                         activity: 2,
-                                                        lessonPlan: 0,
-                                                        rubric: 0,
                                                     },
                                                 },
                                             ],
@@ -342,7 +302,6 @@ export const mockReportData = {
                                                     _usageCounts: {
                                                         unit: 2,
                                                         activity: 3,
-                                                        lessonPlan: 0,
                                                         rubric: 4,
                                                     },
                                                 },
@@ -367,7 +326,6 @@ export const mockReportData = {
                                                     name: "Geography",
                                                     _usageCounts: {
                                                         unit: 2,
-                                                        activity: 0,
                                                         lessonPlan: 2,
                                                         rubric: 2,
                                                     },
@@ -376,7 +334,6 @@ export const mockReportData = {
                                                     id: 171,
                                                     name: "History",
                                                     _usageCounts: {
-                                                        unit: 0,
                                                         activity: 1,
                                                         lessonPlan: 1,
                                                         rubric: 2,
@@ -396,7 +353,6 @@ export const mockReportData = {
                                                     id: 173,
                                                     name: "Economics and Business",
                                                     _usageCounts: {
-                                                        unit: 0,
                                                         activity: 2,
                                                         lessonPlan: 1,
                                                         rubric: 1,

@@ -3,9 +3,11 @@
  */
 
 import { defineStore } from "pinia";
+import type { Course } from "@schoolboxLibrary/types/Course";
 import { ReportOptionValues, type ReportOption } from "../../js/types/curriculumCoverageTypes";
 
 export const useStore = defineStore("curriculumCoverage", () => {
+    const courses = window.Vue.ref<Course[]>([]); // the courses to display in the report
     const allReportOptionValues = window.Vue.ref<ReportOption[]>([
         {
             value: ReportOptionValues.UNIT,
@@ -35,9 +37,10 @@ export const useStore = defineStore("curriculumCoverage", () => {
     function init(): void {}
 
     return {
-        init,
+        courses,
         allReportOptionValues,
         selectedReportOptionValues,
         onlyShowGaps,
+        init,
     };
 });

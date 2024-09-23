@@ -7,11 +7,11 @@ import type { Node } from "@schoolboxCurriculum/types/Node";
  * items a curriculum node can be assigned to
  */
 export type UnitWithCurriculumNodeUsage = Pick<Unit, "id" | "name"> & {
-    _usageCounts: {
-        unit: number;
-        activity: number;
-        lessonPlan: number;
-        rubric: number;
+    _usageCounts?: {
+        unit?: number;
+        activity?: number;
+        lessonPlan?: number;
+        rubric?: number;
     };
 };
 
@@ -46,7 +46,7 @@ export type ReportOption = {
  */
 export type CurriculumCoverageNode = Pick<Node, "id" | "name" | "code"> & {
     children: CurriculumCoverageNode[];
-    usage: {
+    usage?: {
         courses: CourseWithCurriculumNodeUsage[];
     };
 };
@@ -56,7 +56,7 @@ export type CurriculumCoverageNode = Pick<Node, "id" | "name" | "code"> & {
  */
 export type CurriculumCoveragePayload = {
     data: {
-        courses: CourseWithCurriculumNodeUsage[];
+        courses: Course[];
         nodes: CurriculumCoverageNode[];
     };
 };
