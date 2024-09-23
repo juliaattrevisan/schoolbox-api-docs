@@ -225,7 +225,7 @@ class ThreadMapper extends Mapper implements FeedableMapperInterface, IHomepageC
             FROM `{$this->getTable()}` t
             INNER JOIN {$this->getJoinSql('owner', 't', 'o', true)}
             LEFT JOIN {$this->getJoinSql('owner.pronoun', 'o', 'op')}
-            WHERE t.deleted = 'false'
+            WHERE t.deleted_at IS NULL
             AND t.categoryID = :cat
             AND t.date < :time
             LIMIT $offset, $limit
@@ -350,7 +350,7 @@ class ThreadMapper extends Mapper implements FeedableMapperInterface, IHomepageC
                   LEFT JOIN user u ON u.id = t.userID
                   LEFT JOIN `pronoun` ON u.pronoun = pronoun.id
                   WHERE t.categoryID = :categoryID
-                  AND t.deleted = 'false'
+                  AND t.deleted_at IS NULL
                   ORDER BY ";
 
         if ($config['sort'] == 'Posts') {
@@ -442,9 +442,7 @@ class ThreadMapper extends Mapper implements FeedableMapperInterface, IHomepageC
             SELECT threadID, count(*) -1 as count
             FROM forumPost
             WHERE threadID in (" . implode(',', $threads->getPropertyValues('id')) . ")
-                AND
-                deleted = 'false'
-            GROUP BY threadID
+            AND deleted_at IS NULL
         ");
         $statement->execute();
         $postCounts = [];

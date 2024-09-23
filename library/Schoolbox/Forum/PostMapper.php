@@ -170,7 +170,7 @@ class PostMapper extends Mapper implements FeedableMapperInterface
               INNER JOIN {$this->getJoinSql('owner', 'p', 'o', true)}
               LEFT JOIN {$this->getJoinSql('owner.pronoun', 'o', 'op')}
               INNER JOIN {$this->getJoinSql('thread', 'p', 't', true)}
-            WHERE p.deleted = 'false'
+            WHERE p.deleted_at IS NULL
             AND t.categoryID = :cat
             AND p.date < :time
             LIMIT $offset, $limit
@@ -300,7 +300,7 @@ class PostMapper extends Mapper implements FeedableMapperInterface
     {
         $stmt = $this->database->prepare("
             SELECT count(*) as postCount FROM forumPost
-            WHERE deleted = 'false'
+            WHERE deleted_at IS NULL
             AND threadID = :threadId
             AND postID <= :postId
         ");
