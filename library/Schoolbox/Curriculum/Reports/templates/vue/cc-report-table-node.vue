@@ -100,7 +100,7 @@ const showNode = window.Vue.computed(() => {
 
 <template>
     <tr v-if="showNode">
-        <th scope="row" class="node__name">{{ title }}</th>
+        <th scope="row" class="node__name" :style="{ paddingInlineStart: paddingStart }">{{ title }}</th>
         <td :class="`u-alt-bkg ${nodeUsageCount === 0 ? 'u-highlight' : ''}`">
             {{ nodeUsageCount }}
         </td>
@@ -141,8 +141,4 @@ const showNode = window.Vue.computed(() => {
     </template>
 </template>
 
-<style scoped>
-.node__name {
-    padding-inline-start: v-bind(paddingStart);
-}
-</style>
+<style scoped></style>
