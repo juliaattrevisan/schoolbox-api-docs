@@ -18,6 +18,7 @@ use Schoolbox\Learning\Assessment\Quiz\Model as Quiz;
 use Schoolbox\Learning\Learnosity\Api;
 use Schoolbox\Learning\Learnosity\Helper;
 use Schoolbox\Learning\Quiz\Mapper as QuizMapper;
+use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\TaskDaemon\Producer;
 use Schoolbox\TaskDaemon\Request\HttpRequest\MessageFactory;
 use Schoolbox\User;
@@ -232,13 +233,14 @@ class Overwriter
      * @param IAssessable $source
      * @param IAssessable $destination
      * @return void
+     * @throws MapperException
      */
     private function replicateDueWorkRubric(IAssessable $source, IAssessable $destination): void
     {
         if (!($source instanceof DueWork && $destination instanceof DueWork)) {
             return;
         }
-        $this->rubricMapper->copyRubric($source->getId(), $destination->getId());
+        $this->rubricMapper->copyRubric($source->getId(), $source->getContext(), $destination->getId());
     }
 
     /**
