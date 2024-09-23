@@ -106,7 +106,7 @@ class CalendarEventCreateModifyCest
      * Attempt to create an event with fewer than the required parameters, and expect that attempt to fail.
      *
      * @param ApiTester $i
-     */
+     *
     public function testCreateEventWithOneFewerThanTheMinimalParameters(ApiTester $i): void
     {
         $randomParamKeyToRemove = array_rand($this->eventMinimalRequiredParams);
@@ -126,7 +126,7 @@ class CalendarEventCreateModifyCest
      * @param ApiTester $i
      * @return void
      * @throws UnexpectedValueException
-     */
+     *
     public function testModifyEvent(ApiTester $i): void
     {
         $userJackColes      = $i->getUserByUsername('jcoles');
@@ -364,10 +364,148 @@ class CalendarEventCreateModifyCest
         $i->assertTrue($this->eventArraysAreEqual($localEvent, $apiEvent));
     }
 
+    /**
+     * This test was added after a bug was found that only occurred when modifications that did not include level or
+     * folders, were made to an event that already had linked folders.
+     *
+     * @param ApiTester $i
+     * @return void
+     * @throws UnexpectedValueException
+     */
+    public function testModifyTitleOfGroupLevelEvent(ApiTester $i): void
+    {
+        $localEvent = $this->createdEvent;
+        $localEventId = $localEvent['id'];
+
+        // -----------------------------------------------------------------------------------------------------------//
+        // First change the event into a group-level event.
+        // -----------------------------------------------------------------------------------------------------------//
+        $i->comment('First changing the event into a group-level event...');
+        $newLevel = Event::ACCESS_GROUP;
+        $newFolders = [['id' => $i->getFolder()->getId()]];
+
+        // Modify local event.
+        $localEvent['level'] = $newLevel;
+        $localEvent['folders'] = $newFolders;
+
+        // Modify API event.
+        $i->sendPost("/calendar/event/$localEventId/modify", ['level' => $newLevel, 'folders' => $newFolders]);
+        $apiEventJson = $i->grabResponse();
+        $apiEvent = json_decode($apiEventJson, true);
+        if ($apiEvent === null) {
+            throw new UnexpectedValueException("Could not decode JSON '$apiEventJson'.'");
+        }
+        if (array_key_exists('message', $apiEvent)) {
+            throw new UnexpectedValueException("Error message from server: '{$apiEvent['message']}'");
+        }
+
+        $i->assertTrue($this->eventArraysAreEqual($localEvent, $apiEvent));
+
+        // -----------------------------------------------------------------------------------------------------------//
+        // Next change the event's title.
+        // -----------------------------------------------------------------------------------------------------------//
+        $i->comment("Now changing the event's title...");
+        $newTitle = "Eve of St Swivven's Day";
+
+        // Modify local event.
+        $localEvent['title'] = $newTitle;
+
+        // Modify API event.
+        $i->sendPost("/calendar/event/$localEventId/modify", ['title' => $newTitle]);
+        $apiEventJson = $i->grabResponse();
+        $apiEvent = json_decode($apiEventJson, true);
+        if ($apiEvent === null) {
+            throw new UnexpectedValueException("Could not decode JSON '$apiEventJson'.'");
+        }
+        if (array_key_exists('message', $apiEvent)) {
+            throw new UnexpectedValueException("Error message from server: '{$apiEvent['message']}'");
+        }
+
+        $i->assertTrue($this->eventArraysAreEqual($localEvent, $apiEvent));
+    }
+
+    /**
+     * This test was added after a bug was found that only occurred when modifications that did not include level or
+     * campuses or roles, were made to an event that already had linked campuses and roles.
+     *
+     * @param ApiTester $i
+     * @return void
+     * @throws UnexpectedValueException
+     */
+    public function testModifyTitleOfCampusLevelEvent(ApiTester $i): void
+    {
+        $localEvent = $this->createdEvent;
+        $localEventId = $localEvent['id'];
+
+        // -----------------------------------------------------------------------------------------------------------//
+        // First change the event into a campus-level event.
+        // -----------------------------------------------------------------------------------------------------------//
+        $i->comment('First changing the event into a campus-level event...');
+        $campuses = $i->getCampuses();
+        $roleStudent = $i->getRole('student');
+        $roleStaff = $i->getRole('staff');
+        $newLevel = Event::ACCESS_CAMPUS;
+        $newCampuses = [['id' => $campuses[0]->getId()], ['id' => $campuses[1]->getId()]];
+        $newRoles = [['id' => $roleStudent->getId()], ['id' => $roleStaff->getId()]];
+        $newTitle = "St Swivven's Day";
+
+        // Modify local event.
+        $localEvent['level'] = $newLevel;
+        $localEvent['campuses'] = $newCampuses;
+        $localEvent['roles'] = $newRoles;
+        $localEvent['title'] = $newTitle; // Change title also because $apiEvent title has changed in previous test.
+
+        // Modify API event.
+        $i->sendPost(
+            "/calendar/event/$localEventId/modify",
+            [
+                'level' => $newLevel,
+                'campuses' => $newCampuses,
+                'roles' => $newRoles,
+                'title' => $newTitle,
+            ]
+        );
+        $apiEventJson = $i->grabResponse();
+        $apiEvent = json_decode($apiEventJson, true);
+        if ($apiEvent === null) {
+            throw new UnexpectedValueException("Could not decode JSON '$apiEventJson'.'");
+        }
+        if (array_key_exists('message', $apiEvent)) {
+            throw new UnexpectedValueException("Error message from server: '{$apiEvent['message']}'");
+        }
+
+        $i->assertTrue($this->eventArraysAreEqual($localEvent, $apiEvent));
+
+        // -----------------------------------------------------------------------------------------------------------//
+        // Next change the event's title.
+        // -----------------------------------------------------------------------------------------------------------//
+        $i->comment("Now changing the event's title...");
+        $newTitle = "Eve of St Swivven's Day";
+
+        // Modify local event.
+        $localEvent['title'] = $newTitle;
+
+        // Modify API event.
+        $i->sendPost("/calendar/event/$localEventId/modify", ['title' => $newTitle]);
+        $apiEventJson = $i->grabResponse();
+        $apiEvent = json_decode($apiEventJson, true);
+        if ($apiEvent === null) {
+            throw new UnexpectedValueException("Could not decode JSON '$apiEventJson'.'");
+        }
+        if (array_key_exists('message', $apiEvent)) {
+            throw new UnexpectedValueException("Error message from server: '{$apiEvent['message']}'");
+        }
+
+        $i->assertTrue($this->eventArraysAreEqual($localEvent, $apiEvent));
+    }
+
     // TODO: Maybe add another function to test event recurrence.
 
     /**
-     *
+     * Test that two event arrays (as returned by the calendar events API) are equal.
+     * @param array $a
+     * @param array $b
+     * @return bool
      */
     private function eventArraysAreEqual(array $a, array $b): bool
     {
