@@ -138,21 +138,21 @@ class IndexBuilder extends BaseBuilder
         // Pass 2: textboxes without a component
         $queryString = "
             SELECT
-                CONCAT(tb2.textBoxID, '--') AS id,
-                tb2.heading AS title,
-                tb2.updated_at AS date,
-                tb2.created_by AS created_by,
-                tb2.body AS fulltext_index
-            FROM textBox tb2
+                CONCAT(tb.textBoxID, '--') AS id,
+                tb.heading AS title,
+                tb.updated_at AS date,
+                tb.created_by AS created_by,
+                tb.body AS fulltext_index
+            FROM textBox tb
             LEFT JOIN component_config_instance cci2 ON (
                 cci2.component_config_definition_id = (
                     SELECT id
                     FROM component_config_definition ccd2
                     WHERE ccd2.key = :homepageComponentKey
                 ) AND
-                cci2.value = CAST(tb2.textBoxID AS NCHAR)
+                cci2.value = CAST(tb.textBoxID AS NCHAR)
             )
-            WHERE tb2.deleted_at IS NULL
+            WHERE tb.deleted_at IS NULL
             AND cci2.id IS NULL
         ";
         $params = [
