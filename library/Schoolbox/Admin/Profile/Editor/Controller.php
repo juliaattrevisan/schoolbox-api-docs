@@ -17,7 +17,7 @@ class Controller extends Base
     /**
      * Controller constructor.
      */
-    public function __construct()
+    public function __construct(private \Schoolbox\Admin\Profile\Editor\Field\Mapper $fieldMapper)
     {
     }
 
@@ -30,19 +30,57 @@ class Controller extends Base
         /* Figure out which roletype to display. By default, it loads teh Student
          * roletype as it tends to be the most heavily configured.
          */
-        $roletype = $this->requestQuery->get('roletype') ?? \Schoolbox\Role::STUDENT;
+        $roletype = (string)$this->requestQuery->get('roletype');
 
         /* Check that $roletype was valid; if not, default to Student
          */
+        if (!\in_array($roletype, \Schoolbox\Role::getRoleTypes(), true)) {
+            $roletype = \Schoolbox\Role::STUDENT;
+        }
 
         /* Load a set of fields for the prescribed roletype
          */
+        $fields = $this->fieldMapper->findByColumn('roletype', $roletype, [
+            'order' => [
+                'display_as' => 'asc'
+            ]
+        ]);
 
         /* Put it into the frontend payload format
          */
+        $payload = [
+            'data' => [
+                'fieldSettings' => [],
+                'roleTypes' => [
+                    'roleType' => $roletype,
+                    'fields' => [
+                        'available' => [],
+                        'selected' => []
+                    ]
+                ],
+            ]
+        ];
 
+        foreach ($fields as $field) {
+            /* Ones that you could choose
+             */
+            $payload['data']['roleTypes']['fields']['available'][] = [
+                'field' => $field->getField(),
+                'displayAs' => $field->getDisplayAs(),
+            ];
 
+            /* Ones that were previously chosen
+             */
+            if ($field->getEnabled()) {
+                $payload['data']['roleTypes']['fields']['selected'][] = [
+                    'field' => $field->getField(),
+                    'displayAs' => $field->getDisplayAs(),
+                    'fieldSettings' => []
+                ];
+            }
+        }
 
+        new \Alaress_Probe($fields, $payload);
 
         $this->response = $this->responseFromTemplate('@profileEditor/index.twig', [
 
