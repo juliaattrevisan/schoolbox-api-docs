@@ -68,7 +68,6 @@ export const mockReportData = {
                                     name: "Persuasion and the Media",
                                     _usageCounts: {
                                         unit: 2,
-                                        activity: 0,
                                         lessonPlan: 2,
                                     },
                                 },
@@ -109,7 +108,6 @@ export const mockReportData = {
                                     id: 172,
                                     name: "Civics and Citizenship",
                                     _usageCounts: {
-                                        unit: 4,
                                         activity: 2,
                                         lessonPlan: 3,
                                         rubric: 2,
@@ -146,17 +144,17 @@ export const mockReportData = {
                                             _usageCounts: {
                                                 unit: 2,
                                                 activity: 4,
-                                                rubric: 6,
+                                                rubric: 2,
                                             },
                                         },
                                         {
                                             id: 110,
                                             name: "To Kill a Mockingbird",
                                             _usageCounts: {
-                                                unit: 5,
+                                                unit: 2,
                                                 activity: 2,
-                                                lessonPlan: 4,
-                                                rubric: 5,
+                                                lessonPlan: 3,
+                                                rubric: 3,
                                             },
                                         },
                                     ],
@@ -180,7 +178,7 @@ export const mockReportData = {
                                             _usageCounts: {
                                                 activity: 2,
                                                 lessonPlan: 1,
-                                                rubric: 3,
+                                                rubric: 1,
                                             },
                                         },
                                         {
@@ -237,7 +235,7 @@ export const mockReportData = {
                                                     id: 172,
                                                     name: "Civics and Citizenship",
                                                     _usageCounts: {
-                                                        unit: 4,
+                                                        unit: 3,
                                                         activity: 1,
                                                         lessonPlan: 1,
                                                     },
@@ -287,10 +285,10 @@ export const mockReportData = {
                                                     id: 110,
                                                     name: "To Kill a Mockingbird",
                                                     _usageCounts: {
-                                                        unit: 5,
+                                                        unit: 1,
                                                         activity: 2,
                                                         lessonPlan: 2,
-                                                        rubric: 4,
+                                                        rubric: 3,
                                                     },
                                                 },
                                             ],
@@ -321,7 +319,7 @@ export const mockReportData = {
                                                     id: 172,
                                                     name: "Civics and Citizenship",
                                                     _usageCounts: {
-                                                        unit: 4,
+                                                        unit: 2,
                                                         activity: 1,
                                                         lessonPlan: 2,
                                                         rubric: 2,
