@@ -61,6 +61,7 @@ use Schoolbox\Resource\Textbox\Mapper as TextBoxMapper;
 use Schoolbox\Role;
 use Schoolbox\RoleMapper;
 use Schoolbox\User;
+use Schoolbox\User\Token\Mapper as TokenMapper;
 use Schoolbox\UserMapper;
 
 /**
@@ -98,6 +99,8 @@ class Api extends \Codeception\Module
     private EventTypeMapper $eventTypeMapper;
 
     private NewsMapper $newsMapper;
+
+    private TokenMapper $tokenMapper;
 
     /**
      * HOOK: executed after configuration is loaded
@@ -141,6 +144,7 @@ class Api extends \Codeception\Module
         $this->eventMapper          = EventMapper::getInstance();
         $this->eventTypeMapper      = EventTypeMapper::getInstance();
         $this->newsMapper           = NewsMapper::getInstance();
+        $this->tokenMapper          = TokenMapper::getInstance();
     }
 
     private array $users = [];
@@ -195,7 +199,7 @@ class Api extends \Codeception\Module
     public function getAdminToken(): string
     {
         $admin = $this->userMapper->findByUsername('alaress');
-        $token = User\Token\Mapper::getInstance()->generateForUser($admin, $admin, \Alaress_Date_Format::now()->addSeconds(JWT::API_JWT_TIMEOUT), User\Token\Model::TYPE_APITEST);
+        $token = $this->tokenMapper->generateForUser($admin, $admin, \Alaress_Date_Format::now()->addSeconds(JWT::API_JWT_TIMEOUT), User\Token\Model::TYPE_APITEST);
         /** @var Jwt $tokenBuilder */
         $tokenBuilder = $this->cliKernel->get('user.tokenBuilder');
         return $tokenBuilder->generate($admin, $token->getJwtId());
