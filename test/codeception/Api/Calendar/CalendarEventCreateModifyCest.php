@@ -151,16 +151,15 @@ class CalendarEventCreateModifyCest
         // Run each of the $eventModifications in sequence, locally and via the API.
         // After each modification, check that the local event matches the API event.
         // -----------------------------------------------------------------------------------------------------------//
-        $localEvent = $this->createdEvent;
-        $localEventId = $localEvent['id'];
+        $createdEventId = $this->createdEvent['id'];
         foreach ($eventModifications as $key => $newValue) {
             $i->comment("Testing modification of $key...");
 
             // Modify local event.
-            $localEvent[$key] = $newValue;
+            $this->createdEvent[$key] = $newValue;
 
             // Modify API event.
-            $i->sendPost("/calendar/event/$localEventId/modify", [$key => $newValue]);
+            $i->sendPost("/calendar/event/$createdEventId/modify", [$key => $newValue]);
             $apiEventJson = $i->grabResponse();
             $apiEvent = json_decode($apiEventJson, true);
             if ($apiEvent === null) {
@@ -170,7 +169,7 @@ class CalendarEventCreateModifyCest
                 throw new UnexpectedValueException("Error message from server: '{$apiEvent['message']}'");
             }
 
-            $i->assertTrue($this->eventArraysAreEqual($localEvent, $apiEvent));
+            $i->assertTrue($this->eventArraysAreEqual($this->createdEvent, $apiEvent));
         }
 
         // -----------------------------------------------------------------------------------------------------------//
@@ -182,14 +181,14 @@ class CalendarEventCreateModifyCest
         $newAttendance = EventAttendanceModel::LEVEL_NO_ATTENDANCE;
         $newGuests = [['id' => $userJackColes->getId()], ['id' => $userJanaReed->getId()]];
         $i->sendPost(
-            "/calendar/event/$localEventId/modify",
+            "/calendar/event/$createdEventId/modify",
             [
                 'attendance' => $newAttendance,
                 'guests' => $newGuests,
             ]
         );
-        $localEvent['attendance'] = $newAttendance;
-        $localEvent['guests'] = [];
+        $this->createdEvent['attendance'] = $newAttendance;
+        $this->createdEvent['guests'] = [];
         $apiEventJson = $i->grabResponse();
         $apiEvent = json_decode($apiEventJson, true);
         if ($apiEvent === null) {
@@ -198,7 +197,7 @@ class CalendarEventCreateModifyCest
         if (array_key_exists('message', $apiEvent)) {
             throw new UnexpectedValueException("Error message from server: '{$apiEvent['message']}'");
         }
-        $i->assertTrue($this->eventArraysAreEqual($localEvent, $apiEvent));
+        $i->assertTrue($this->eventArraysAreEqual($this->createdEvent, $apiEvent));
 
         // -----------------------------------------------------------------------------------------------------------//
         // Test dependent fields: {attendance, guests} by inviting guests when attendance type allows invitations
@@ -207,14 +206,14 @@ class CalendarEventCreateModifyCest
         $newAttendance = EventAttendanceModel::LEVEL_INVITE_ONLY;
         $newGuests = [['id' => $userJanaReed->getId()], ['id' => $userJackColes->getId()]];
         $i->sendPost(
-            "/calendar/event/$localEventId/modify",
+            "/calendar/event/$createdEventId/modify",
             [
                 'attendance' => $newAttendance,
                 'guests' => $newGuests,
             ]
         );
-        $localEvent['attendance'] = $newAttendance;
-        $localEvent['guests'] = $newGuests;
+        $this->createdEvent['attendance'] = $newAttendance;
+        $this->createdEvent['guests'] = $newGuests;
         $apiEventJson = $i->grabResponse();
         $apiEvent = json_decode($apiEventJson, true);
         if ($apiEvent === null) {
@@ -223,16 +222,16 @@ class CalendarEventCreateModifyCest
         if (array_key_exists('message', $apiEvent)) {
             throw new UnexpectedValueException("Error message from server: '{$apiEvent['message']}'");
         }
-        $i->assertTrue($this->eventArraysAreEqual($localEvent, $apiEvent));
+        $i->assertTrue($this->eventArraysAreEqual($this->createdEvent, $apiEvent));
 
         // -----------------------------------------------------------------------------------------------------------//
         // Test dependent fields: {attendance, guests} by changing an event with guests to not allow attendance
         // -----------------------------------------------------------------------------------------------------------//
         $i->amGoingTo("change attendance type to 'none', and check whether guests are removed.");
         $newAttendance = EventAttendanceModel::LEVEL_NO_ATTENDANCE;
-        $i->sendPost("/calendar/event/$localEventId/modify", ['attendance' => $newAttendance]);
-        $localEvent['attendance'] = $newAttendance;
-        $localEvent['guests'] = []; // Expect that all guests have been removed.
+        $i->sendPost("/calendar/event/$createdEventId/modify", ['attendance' => $newAttendance]);
+        $this->createdEvent['attendance'] = $newAttendance;
+        $this->createdEvent['guests'] = []; // Expect that all guests have been removed.
         $apiEventJson = $i->grabResponse();
         $apiEvent = json_decode($apiEventJson, true);
         if ($apiEvent === null) {
@@ -241,7 +240,7 @@ class CalendarEventCreateModifyCest
         if (array_key_exists('message', $apiEvent)) {
             throw new UnexpectedValueException("Error message from server: '{$apiEvent['message']}'");
         }
-        $i->assertTrue($this->eventArraysAreEqual($localEvent, $apiEvent));
+        $i->assertTrue($this->eventArraysAreEqual($this->createdEvent, $apiEvent));
 
         // -----------------------------------------------------------------------------------------------------------//
         // Test dependent fields: {allDay, startDate, endDate, repeat_until} by creating a personal-level event.
@@ -252,17 +251,17 @@ class CalendarEventCreateModifyCest
         $newEndDate = "2024-09-24T09:30:00$timezoneOffset"; // Move the old end date forwards.
         $newEndDateEndOfDay = "2024-09-24T23:59:59$timezoneOffset"; // End of the day on the new end date.
         $i->sendPost(
-            "/calendar/event/$localEventId/modify",
+            "/calendar/event/$createdEventId/modify",
             [
                 'allDay' => $newAllDay,
                 'startDate' => $newStartDate,
                 'endDate' => $newEndDate
             ]
         );
-        $localEvent['allDay'] = $newAllDay;
-        $localEvent['startDate'] = $newStartDate;
-        $localEvent['endDate'] = $newEndDate;
-        $localEvent['repeat_until'] = $newEndDateEndOfDay; // +- Since the end date has moved forwards, the repeat_until date
+        $this->createdEvent['allDay'] = $newAllDay;
+        $this->createdEvent['startDate'] = $newStartDate;
+        $this->createdEvent['endDate'] = $newEndDate;
+        $this->createdEvent['repeat_until'] = $newEndDateEndOfDay; // +- Since the end date has moved forwards, the repeat_until date
         $apiEventJson = $i->grabResponse();                //  \ in the $apiEvent will have moved forward to match.
         $apiEvent = json_decode($apiEventJson, true);
         if ($apiEvent === null) {
@@ -271,7 +270,7 @@ class CalendarEventCreateModifyCest
         if (array_key_exists('message', $apiEvent)) {
             throw new UnexpectedValueException("Error message from server: '{$apiEvent['message']}'");
         }
-        $i->assertTrue($this->eventArraysAreEqual($localEvent, $apiEvent));
+        $i->assertTrue($this->eventArraysAreEqual($this->createdEvent, $apiEvent));
 
         // -----------------------------------------------------------------------------------------------------------//
         // Test dependent fields: {level, campuses, folders, roles} by changing personal-level to group-level event
@@ -285,7 +284,7 @@ class CalendarEventCreateModifyCest
         $i->amGoingTo('change from a personal-level event to a group-level event.');
         $newLevel = Event::ACCESS_GROUP;
         $i->sendPost(
-            "/calendar/event/$localEventId/modify",
+            "/calendar/event/$createdEventId/modify",
             [
                 'level' => $newLevel,
                 'folders' => $groupStubs,
@@ -293,10 +292,10 @@ class CalendarEventCreateModifyCest
                 'roles' => $roleStubs, // Try adding irrelevant roles.  These should be ignored for group-level events.
             ]
         );
-        $localEvent['level'] = $newLevel;
-        $localEvent['folders'] = $groupStubs;
-        $localEvent['campuses'] = []; // These will be cleared because campuses are irrelevant for group-level events.
-        $localEvent['roles'] = []; // These will be cleared because roles are irrelevant for group-level events.
+        $this->createdEvent['level'] = $newLevel;
+        $this->createdEvent['folders'] = $groupStubs;
+        $this->createdEvent['campuses'] = []; // These will be cleared because campuses are irrelevant for group-level events.
+        $this->createdEvent['roles'] = []; // These will be cleared because roles are irrelevant for group-level events.
         $apiEventJson = $i->grabResponse();
         $apiEvent = json_decode($apiEventJson, true);
         if ($apiEvent === null) {
@@ -305,7 +304,7 @@ class CalendarEventCreateModifyCest
         if (array_key_exists('message', $apiEvent)) {
             throw new UnexpectedValueException("Error message from server: '{$apiEvent['message']}'");
         }
-        $i->assertTrue($this->eventArraysAreEqual($localEvent, $apiEvent));
+        $i->assertTrue($this->eventArraysAreEqual($this->createdEvent, $apiEvent));
 
         // -----------------------------------------------------------------------------------------------------------//
         // Test dependent fields: {level, campuses, folders, roles} by changing group-level to campus-level event
@@ -313,7 +312,7 @@ class CalendarEventCreateModifyCest
         $i->amGoingTo('change from a group-level event to a campus-level event.');
         $newLevel = Event::ACCESS_CAMPUS;
         $i->sendPost(
-            "/calendar/event/$localEventId/modify",
+            "/calendar/event/$createdEventId/modify",
             [
                 'level' => $newLevel,
                 'campuses' => $campusStubs,
@@ -321,10 +320,10 @@ class CalendarEventCreateModifyCest
                 'groups' => $groupStubs, // Try adding irrelevant groups.  These should be ignored for campus-level events.
             ]
         );
-        $localEvent['level'] = $newLevel;
-        $localEvent['campuses'] = $campusStubs;
-        $localEvent['roles'] = $roleStubs;
-        $localEvent['folders'] = []; // This will be cleared because folders are irrelevant for campus-level events.
+        $this->createdEvent['level'] = $newLevel;
+        $this->createdEvent['campuses'] = $campusStubs;
+        $this->createdEvent['roles'] = $roleStubs;
+        $this->createdEvent['folders'] = []; // This will be cleared because folders are irrelevant for campus-level events.
         $apiEventJson = $i->grabResponse();
         $apiEvent = json_decode($apiEventJson, true);
         if ($apiEvent === null) {
@@ -333,7 +332,7 @@ class CalendarEventCreateModifyCest
         if (array_key_exists('message', $apiEvent)) {
             throw new UnexpectedValueException("Error message from server: '{$apiEvent['message']}'");
         }
-        $i->assertTrue($this->eventArraysAreEqual($localEvent, $apiEvent));
+        $i->assertTrue($this->eventArraysAreEqual($this->createdEvent, $apiEvent));
 
         // -----------------------------------------------------------------------------------------------------------//
         // Test dependent fields: {level, campuses, folders, roles} by changing group-level to campus-level event
@@ -341,7 +340,7 @@ class CalendarEventCreateModifyCest
         $i->amGoingTo('change from a campus-level event to a personal-level event.');
         $newLevel = Event::ACCESS_PERSONAL;
         $i->sendPost(
-            "/calendar/event/$localEventId/modify",
+            "/calendar/event/$createdEventId/modify",
             [
                 'level' => $newLevel,
                 'campuses' => $campusStubs, // Try adding irrelevant campuses.  These should be ignored for personal-level events.
@@ -349,10 +348,10 @@ class CalendarEventCreateModifyCest
                 'groups' => $groupStubs, // Try adding irrelevant groups.  These should be ignored for personal-level events.
             ]
         );
-        $localEvent['level'] = $newLevel;
-        $localEvent['campuses'] = []; // This will be cleared because campuses are irrelevant for personal-level events.
-        $localEvent['folders'] = []; // This will be cleared because folders are irrelevant for personal-level events.
-        $localEvent['roles'] = []; // This will be cleared because roles are irrelevant for personal-level events.
+        $this->createdEvent['level'] = $newLevel;
+        $this->createdEvent['campuses'] = []; // This will be cleared because campuses are irrelevant for personal-level events.
+        $this->createdEvent['folders'] = []; // This will be cleared because folders are irrelevant for personal-level events.
+        $this->createdEvent['roles'] = []; // This will be cleared because roles are irrelevant for personal-level events.
         $apiEventJson = $i->grabResponse();
         $apiEvent = json_decode($apiEventJson, true);
         if ($apiEvent === null) {
@@ -361,7 +360,7 @@ class CalendarEventCreateModifyCest
         if (array_key_exists('message', $apiEvent)) {
             throw new UnexpectedValueException("Error message from server: '{$apiEvent['message']}'");
         }
-        $i->assertTrue($this->eventArraysAreEqual($localEvent, $apiEvent));
+        $i->assertTrue($this->eventArraysAreEqual($this->createdEvent, $apiEvent));
     }
 
     /**
@@ -374,8 +373,7 @@ class CalendarEventCreateModifyCest
      */
     public function testModifyTitleOfGroupLevelEvent(ApiTester $i): void
     {
-        $localEvent = $this->createdEvent;
-        $localEventId = $localEvent['id'];
+        $createdEventId = $this->createdEvent['id'];
 
         // -----------------------------------------------------------------------------------------------------------//
         // First change the event into a group-level event.
@@ -385,11 +383,11 @@ class CalendarEventCreateModifyCest
         $newFolders = [['id' => $i->getFolder()->getId()]];
 
         // Modify local event.
-        $localEvent['level'] = $newLevel;
-        $localEvent['folders'] = $newFolders;
+        $this->createdEvent['level'] = $newLevel;
+        $this->createdEvent['folders'] = $newFolders;
 
         // Modify API event.
-        $i->sendPost("/calendar/event/$localEventId/modify", ['level' => $newLevel, 'folders' => $newFolders]);
+        $i->sendPost("/calendar/event/$createdEventId/modify", ['level' => $newLevel, 'folders' => $newFolders]);
         $apiEventJson = $i->grabResponse();
         $apiEvent = json_decode($apiEventJson, true);
         if ($apiEvent === null) {
@@ -399,7 +397,7 @@ class CalendarEventCreateModifyCest
             throw new UnexpectedValueException("Error message from server: '{$apiEvent['message']}'");
         }
 
-        $i->assertTrue($this->eventArraysAreEqual($localEvent, $apiEvent));
+        $i->assertTrue($this->eventArraysAreEqual($this->createdEvent, $apiEvent));
 
         // -----------------------------------------------------------------------------------------------------------//
         // Next change the event's title.
@@ -408,10 +406,10 @@ class CalendarEventCreateModifyCest
         $newTitle = "Eve of St Swivven's Day";
 
         // Modify local event.
-        $localEvent['title'] = $newTitle;
+        $this->createdEvent['title'] = $newTitle;
 
         // Modify API event.
-        $i->sendPost("/calendar/event/$localEventId/modify", ['title' => $newTitle]);
+        $i->sendPost("/calendar/event/$createdEventId/modify", ['title' => $newTitle]);
         $apiEventJson = $i->grabResponse();
         $apiEvent = json_decode($apiEventJson, true);
         if ($apiEvent === null) {
@@ -421,7 +419,7 @@ class CalendarEventCreateModifyCest
             throw new UnexpectedValueException("Error message from server: '{$apiEvent['message']}'");
         }
 
-        $i->assertTrue($this->eventArraysAreEqual($localEvent, $apiEvent));
+        $i->assertTrue($this->eventArraysAreEqual($this->createdEvent, $apiEvent));
     }
 
     /**
@@ -434,8 +432,7 @@ class CalendarEventCreateModifyCest
      */
     public function testModifyTitleOfCampusLevelEvent(ApiTester $i): void
     {
-        $localEvent = $this->createdEvent;
-        $localEventId = $localEvent['id'];
+        $createdEventId = $this->createdEvent['id'];
 
         // -----------------------------------------------------------------------------------------------------------//
         // First change the event into a campus-level event.
@@ -447,22 +444,20 @@ class CalendarEventCreateModifyCest
         $newLevel = Event::ACCESS_CAMPUS;
         $newCampuses = [['id' => $campuses[0]->getId()], ['id' => $campuses[1]->getId()]];
         $newRoles = [['id' => $roleStudent->getId()], ['id' => $roleStaff->getId()]];
-        $newTitle = "St Swivven's Day";
 
         // Modify local event.
-        $localEvent['level'] = $newLevel;
-        $localEvent['campuses'] = $newCampuses;
-        $localEvent['roles'] = $newRoles;
-        $localEvent['title'] = $newTitle; // Change title also because $apiEvent title has changed in previous test.
+        $this->createdEvent['level'] = $newLevel;
+        $this->createdEvent['campuses'] = $newCampuses;
+        $this->createdEvent['roles'] = $newRoles;
+        $this->createdEvent['folders'] = []; // This will be cleared because folders are irrelevant for campus-level events.
 
         // Modify API event.
         $i->sendPost(
-            "/calendar/event/$localEventId/modify",
+            "/calendar/event/$createdEventId/modify",
             [
                 'level' => $newLevel,
                 'campuses' => $newCampuses,
                 'roles' => $newRoles,
-                'title' => $newTitle,
             ]
         );
         $apiEventJson = $i->grabResponse();
@@ -474,7 +469,7 @@ class CalendarEventCreateModifyCest
             throw new UnexpectedValueException("Error message from server: '{$apiEvent['message']}'");
         }
 
-        $i->assertTrue($this->eventArraysAreEqual($localEvent, $apiEvent));
+        $i->assertTrue($this->eventArraysAreEqual($this->createdEvent, $apiEvent));
 
         // -----------------------------------------------------------------------------------------------------------//
         // Next change the event's title.
@@ -483,10 +478,10 @@ class CalendarEventCreateModifyCest
         $newTitle = "Eve of St Swivven's Day";
 
         // Modify local event.
-        $localEvent['title'] = $newTitle;
+        $this->createdEvent['title'] = $newTitle;
 
         // Modify API event.
-        $i->sendPost("/calendar/event/$localEventId/modify", ['title' => $newTitle]);
+        $i->sendPost("/calendar/event/$createdEventId/modify", ['title' => $newTitle]);
         $apiEventJson = $i->grabResponse();
         $apiEvent = json_decode($apiEventJson, true);
         if ($apiEvent === null) {
@@ -496,7 +491,7 @@ class CalendarEventCreateModifyCest
             throw new UnexpectedValueException("Error message from server: '{$apiEvent['message']}'");
         }
 
-        $i->assertTrue($this->eventArraysAreEqual($localEvent, $apiEvent));
+        $i->assertTrue($this->eventArraysAreEqual($this->createdEvent, $apiEvent));
     }
 
     // TODO: Maybe add another function to test event recurrence.
