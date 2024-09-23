@@ -45,7 +45,7 @@ class IndexBuilder extends BaseBuilder
     {
         return [
             $baseQuery . ' AND tb.textBoxID = :id',
-            [$baseParams + ['id' => $subject->getId()]],
+            $baseParams + ['id' => $subject->getId()],
         ];
     }
 

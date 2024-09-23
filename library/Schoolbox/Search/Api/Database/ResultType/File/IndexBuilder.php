@@ -71,7 +71,7 @@ class IndexBuilder extends BaseBuilder
     {
         return [
             $baseQuery . ' AND f.id = :id',
-            [$baseParams + ['id' => $subject->getId()]],
+            $baseParams + ['id' => $subject->getId()],
         ];
     }
 

@@ -36,7 +36,7 @@ class IndexBuilder extends BaseBuilder
     {
         return [
             $baseQuery . ' AND b.id = :id',
-            [$baseParams + ['id' => $subject->getId()]],
+            $baseParams + ['id' => $subject->getId()],
         ];
     }
 
