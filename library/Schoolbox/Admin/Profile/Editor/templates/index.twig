@@ -52,7 +52,12 @@
             <section class="content">
                 <ul>
                     {% for field in payload.data.roleTypes.fields.available %}
-                        <li>{{ field.displayAs }} (<code>{{ field.field }}</code> in the backend)</li>
+                        <li>
+                            {{ field.displayAs }} (<code>{{ field.field }}</code> in the backend)
+                            {% if field.icon %}
+                                <span class="button {{ field.icon }} {{ field.css }}"></span>
+                            {% endif %}
+                        </li>
                     {% endfor %}
                 </ul>
             </section>
