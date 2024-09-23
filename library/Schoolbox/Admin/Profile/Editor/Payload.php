@@ -17,6 +17,15 @@ use Schoolbox\Role;
 class Payload
 {
     /**
+     * Common nodes and human-readable name equivalents
+     */
+    private const AVAILABILITY_NODE = 'appearsOn';
+    private const AVAILABILITY_NAME = 'Appears on';
+    private const VISIBILITY_NODE = 'visibleFor';
+    private const VISIBILITY_NAME = 'Visible for';
+
+
+    /**
      * @param Mapper $fieldMapper
      * @param CampusMapper $campusMapper
      */
@@ -68,8 +77,8 @@ class Payload
         $campuses = $this->campusMapper->findAll();
 
         $fieldSettingsCampus = [
-            'key' => 'appearsOn',
-            'displayAs' => 'Appears on',
+            'key' => self::AVAILABILITY_NODE,
+            'displayAs' => self::AVAILABILITY_NAME,
             'options' => []
         ];
 
@@ -84,8 +93,8 @@ class Payload
         /* Find the roletypes you can choose
          */
         $fieldSettingsRoleType = [
-            'key' => 'visibleFor',
-            'displayAs' => 'Visible for',
+            'key' => self::VISIBILITY_NODE,
+            'displayAs' => self::VISIBILITY_NAME,
             'options' => [
                 [
                     'type' => 'roleType',
@@ -142,7 +151,7 @@ class Payload
             }
 
             $availabilityCampus = [
-                'key' => 'appearsOn',
+                'key' => self::AVAILABILITY_NODE,
                 'id' => $availabilityCampusIds
             ];
 
@@ -155,7 +164,7 @@ class Payload
             }
 
             $visibilityRoleTypes = [
-                'key' => 'visibleFor',
+                'key' => self::VISIBILITY_NODE,
                 'id' => $visibilityRoleTypesIds
             ];
 
