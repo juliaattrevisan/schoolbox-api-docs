@@ -195,9 +195,10 @@ class Api extends \Codeception\Module
     public function getAdminToken(): string
     {
         $admin = $this->userMapper->findByUsername('alaress');
+        $token = User\Token\Mapper::getInstance()->generateForUser($admin, $admin, \Alaress_Date_Format::now()->addSeconds(JWT::API_JWT_TIMEOUT));
         /** @var Jwt $tokenBuilder */
         $tokenBuilder = $this->cliKernel->get('user.tokenBuilder');
-        return $tokenBuilder->generate($admin);
+        return $tokenBuilder->generate($admin, $token->getJwtId());
     }
 
     /**
