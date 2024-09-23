@@ -72,10 +72,41 @@ class Controller extends Base
             /* Ones that were previously chosen
              */
             if ($field->getEnabled()) {
+                /* Find the ids of the campuses for which this field might be available
+                 */
+                $availabilityCampusIds = [];
+
+                foreach ($field->getAvailabilityCampus() as $availabilityCampus) {
+                    $availabilityCampusIds[] = $availabilityCampus->getCampus()->getId();
+                }
+
+                $availabilityCampus = [
+                    'key' => 'appearsOn',
+                    'id' => $availabilityCampusIds
+                ];
+
+                /* Find the roletypes ("ids") for which this field might be visilble
+                 */
+                $visibilityRoleTypesIds = [];
+
+                foreach ($field->getVisibility() as $visibility) {
+                    $visibilityRoleTypesIds[] = $visibility->getRoleType();
+                }
+
+                $visibilityRoleTypes = [
+                    'key' => 'visibleFor',
+                    'id' => $visibilityRoleTypesIds
+                ];
+
+                /* Pile it into the stack
+                 */
                 $payload['data']['roleTypes']['fields']['selected'][] = [
                     'field' => $field->getField(),
                     'displayAs' => $field->getDisplayAs(),
-                    'fieldSettings' => []
+                    'fieldSettings' => [
+                        $availabilityCampus,
+                        $visibilityRoleTypes
+                    ]
                 ];
             }
         }

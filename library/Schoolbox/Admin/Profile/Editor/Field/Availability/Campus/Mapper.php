@@ -8,7 +8,7 @@
 
 declare(strict_types=1);
 
-namespace Schoolbox\Admin\Profile\Editor\Field\Availability;
+namespace Schoolbox\Admin\Profile\Editor\Field\Availability\Campus;
 
 use Schoolbox\GenericCollection;
 

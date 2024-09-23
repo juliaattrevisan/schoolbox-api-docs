@@ -45,10 +45,10 @@ class Mapper extends \Schoolbox\Mapper
         $this->uses('css', self::TYPE_STRING);
 
         $this->hasJoin(
-            'availability',
+            'availabilityCampus',
             [
                 'multiple'  => true,
-                'mapper'    => \Schoolbox\Admin\Profile\Editor\Field\Availability\Mapper::class,
+                'mapper'    => \Schoolbox\Admin\Profile\Editor\Field\Availability\Campus\Mapper::class,
                 'this_key'  => 'id',
                 'other_key' => 'profile_field_id',
             ]
@@ -75,7 +75,7 @@ class Mapper extends \Schoolbox\Mapper
     {
         return "
             SELECT {$this->getColumnString()},
-            {$this->getJoinColumnString('availability', 'availability')},
+            {$this->getJoinColumnString('availabilityCampus', 'availabilityCampus')},
             {$this->getJoinColumnString('visibility', 'visibility')}
         ";
     }
@@ -91,7 +91,7 @@ class Mapper extends \Schoolbox\Mapper
     {
         return "
             FROM {$this->getTable()}
-            LEFT JOIN {$this->getJoinSql('availability', null, 'availability')}
+            LEFT JOIN {$this->getJoinSql('availabilityCampus', null, 'availabilityCampus')}
             LEFT JOIN {$this->getJoinSql('visibility', null, 'visibility')}
         ";
     }
@@ -110,8 +110,8 @@ class Mapper extends \Schoolbox\Mapper
     {
         $idColumn = $this->getIdentifierColumn();
 
-        /** @var \Schoolbox\Admin\Profile\Editor\Field\Availability\Mapper $availabilityMapper */
-        $availabilityMapper = $this->getJoinMapper('availability');
+        /** @var \Schoolbox\Admin\Profile\Editor\Field\Availability\Campus\Mapper $availabilityMapper */
+        $availabilityMapper = $this->getJoinMapper('availabilityCampus');
 
         /** @var \Schoolbox\Admin\Profile\Editor\Field\Visibility\Mapper $visibilityMapper */
         $visibilityMapper = $this->getJoinMapper('visibility');
@@ -122,18 +122,18 @@ class Mapper extends \Schoolbox\Mapper
             if ($collection->offsetExists($row[$idColumn])) {
                 $field = $collection->getOffset($row[$idColumn]);
             } else {
-                $field = $this->hydrate($row, 'f');
+                $field = $this->hydrate($row);
 
-                $field->setAvailability($availabilityMapper->createCollection());
+                $field->setAvailabilityCampus($availabilityMapper->createCollection());
                 $field->setVisibility($visibilityMapper->createCollection());
 
                 $collection->setOffset($row[$idColumn], $field);
             }
 
-            $availability = $availabilityMapper->hydrate($row, 'availability');
+            $availabilityCampus = $availabilityMapper->hydrate($row, 'availabilityCampus');
 
-            if ($availability) {
-                $field->getAvailability()->setOffset($availability->getId(), $availability);
+            if ($availabilityCampus) {
+                $field->getAvailabilityCampus()->setOffset($availabilityCampus->getId(), $availabilityCampus);
             }
 
             $visibility = $visibilityMapper->hydrate($row, 'visibility');

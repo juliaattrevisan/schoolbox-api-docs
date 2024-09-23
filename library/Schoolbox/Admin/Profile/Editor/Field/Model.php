@@ -103,7 +103,7 @@ class Model
      *
      * @var GenericCollection|null
      */
-    private ?GenericCollection $availability = null;
+    private ?GenericCollection $availabilityCampus = null;
 
 
     /**
@@ -145,19 +145,19 @@ class Model
     /**
      * @return GenericCollection|null
      */
-    public function getAvailability(): ?GenericCollection
+    public function getavailabilityCampus(): ?GenericCollection
     {
-        return $this->availability;
+        return $this->availabilityCampus;
     }
 
 
     /**
-     * @param GenericCollection|null $availability
+     * @param GenericCollection|null $availabilityCampus
      * @return $this
      */
-    public function setAvailability(?GenericCollection $availability): self
+    public function setavailabilityCampus(?GenericCollection $availabilityCampus): self
     {
-        $this->availability = $availability;
+        $this->availabilityCampus = $availabilityCampus;
         return $this;
     }
 
