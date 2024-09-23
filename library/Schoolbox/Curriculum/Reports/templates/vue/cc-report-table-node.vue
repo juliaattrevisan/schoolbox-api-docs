@@ -104,31 +104,17 @@ const showNode = window.Vue.computed(() => {
         <td :class="`u-alt-bkg ${nodeUsageCount === 0 ? 'u-highlight' : ''}`">
             {{ nodeUsageCount }}
         </td>
-        <!-- loop through the usages provided if the node has usage set -->
-        <template v-if="props.node.usage">
-            <template v-for="(course, index) in store.courses" :key="course.id">
-                <td
-                    v-for="unit in course.units"
-                    :key="unit.id"
-                    :class="`${index % 2 ? 'u-alt-bkg' : ''} ${getUnitUsageCount(course, unit) === 0 ? 'u-highlight' : ''}`"
-                >
-                    {{ getUnitUsageCount(course, unit) }}
-                </td>
-                <td
-                    :class="`${index % 2 ? 'u-alt-bkg' : ''} ${getCourseUsageCount(course) === 0 ? 'u-highlight' : ''}`"
-                >
-                    {{ getCourseUsageCount(course) }}
-                </td>
-            </template>
-        </template>
-        <!-- otherwise the node must have no usages set, so they can all be set to 0 -->
-        <template v-else>
-            <template v-for="(course, index) in store.courses" :key="course.id">
-                <td v-for="unit in course.units" :key="unit.id" :class="`${index % 2 ? 'u-alt-bkg' : ''} u-highlight`">
-                    0
-                </td>
-                <td :class="`${index % 2 ? 'u-alt-bkg' : ''} u-highlight`">0</td>
-            </template>
+        <template v-for="(course, index) in store.courses" :key="course.id">
+            <td
+                v-for="unit in course.units"
+                :key="unit.id"
+                :class="`${index % 2 ? 'u-alt-bkg' : ''} ${getUnitUsageCount(course, unit) === 0 ? 'u-highlight' : ''}`"
+            >
+                {{ getUnitUsageCount(course, unit) }}
+            </td>
+            <td :class="`${index % 2 ? 'u-alt-bkg' : ''} ${getCourseUsageCount(course) === 0 ? 'u-highlight' : ''}`">
+                {{ getCourseUsageCount(course) }}
+            </td>
         </template>
     </tr>
     <template v-if="props.node.children && props.node.children.length > 0">
