@@ -74,10 +74,11 @@ class TaskD
         $outfile = $escapedTitle !== ''
             ? ($date . '-' . $escapedTitle)
             : $date;
+        $token = User\Token\Mapper::getInstance()->generateForUser($user, $user, \Alaress_Date_Format::now()->addSeconds(JWT::API_JWT_TIMEOUT), Jwt::TASKD_ID);
         $message = $this->messageFactory->build(
             'download-pages',
             [
-                'token'     => $this->tokenBuilder->generate($user),
+                'token'     => $this->tokenBuilder->generate($user, $token->getJwtId(), $token->getExpiry()),
                 'content'   => $sources,
                 'outfile'   => mb_substr($outfile, 0, self::FILENAME_MAX_LENGTH, 'UTF-8') . '.zip',
                 'gotenberg' => [
