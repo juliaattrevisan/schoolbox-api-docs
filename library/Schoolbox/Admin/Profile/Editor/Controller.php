@@ -27,9 +27,26 @@ class Controller extends Base
      */
     public function getIndex(): void
     {
+        /* Figure out which roletype to display. By default, it loads teh Student
+         * roletype as it tends to be the most heavily configured.
+         */
+        $roletype = $this->requestQuery->get('roletype') ?? \Schoolbox\Role::STUDENT;
+
+        /* Check that $roletype was valid; if not, default to Student
+         */
+
+        /* Load a set of fields for the prescribed roletype
+         */
+
+        /* Put it into the frontend payload format
+         */
+
+
+
+
         $this->response = $this->responseFromTemplate('@profileEditor/index.twig', [
 
-        ], 'Profile Editor');
+        ], 'Profile Editor - ' . ucwords($roletype));
     }
 
 
