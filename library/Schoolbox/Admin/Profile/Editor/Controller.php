@@ -11,6 +11,7 @@ declare(strict_types=1);
 namespace Schoolbox\Admin\Profile\Editor;
 
 use Alaress\Web\Controller\Base;
+use Schoolbox\Admin\Navigation\Subnav;
 
 class Controller extends Base
 {
@@ -40,7 +41,9 @@ class Controller extends Base
 
         $payload = (new Payload($this->fieldMapper))->generate($roleType);
 
-        $this->response = $this->responseFromTemplate('@profileEditor/index.twig', [
+        $this->response = $this->responseFromTemplate('@adminProfileEditor/index.twig', [
+            'pageCurrent' => $this->routeGenerator->generate('adminProfileEditor.getIndex'),
+            'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->routeGenerator->generate('adminProfileEditor.getIndex')),
             'payload' => $payload
         ], 'Profile Editor - ' . ucwords($roleType));
     }

@@ -14,14 +14,13 @@ use Alaress\Authorizer\Rule;
 use Alaress\Module\Module as BaseModule;
 use Alaress\Twig\Loader\IChainLoader;
 use Alaress\Web\Controller\Base;
-use Schoolbox\UserMapper;
 
 class Module extends BaseModule
 {
     /**
      * @inheritdoc
      */
-    protected $basename = 'profileEditor';
+    protected $basename = 'adminProfileEditor';
 
 
     /**
