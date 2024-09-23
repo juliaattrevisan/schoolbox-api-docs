@@ -79,6 +79,53 @@ class Model
 
 
     /**
+     * If meaningful, this will cause a field to render in a different manner -
+     * as a coloured box at the top of the profile screen
+     *
+     * @var string|null
+     */
+    private ?string $icon = null;
+
+
+    /**
+     * Decides what css will be applied to this field. Typically intended to be one of the
+     * coloured alert boxes, such as "alert-box alert icon-alert", that displays for
+     * Medical issues and Alerts.
+     *
+     * @var string|null
+     */
+    private ?string $css = null;
+
+
+    /**
+     * Decide whether the current row is indeed a (key, value) field tuple, or a flag
+     * (Alert) that needs special rendering format in a coloured box with an icon.
+     *
+     * Returns true if the row is a (key, value) tuple.
+     *
+     * See isFlag() for the converse check.
+     *
+     * @return bool
+     */
+    public function isField(): bool
+    {
+        return ('' !== $this->getIcon() && '' !== $this->getCss());
+    }
+
+
+    /**
+     * A convenience, if you fly inverted
+     *
+     * @return bool
+     */
+
+    public function isFlag(): bool
+    {
+        return !$this->isField();
+    }
+
+
+    /**
      * @return string|null
      */
     public function getRoleType(): ?string
@@ -194,6 +241,46 @@ class Model
     public function setTerm(?string $term): self
     {
         $this->term = $term;
+        return $this;
+    }
+
+
+    /**
+     * @return string|null
+     */
+    public function getIcon(): ?string
+    {
+        return $this->icon;
+    }
+
+
+    /**
+     * @param string|null $icon
+     * @return $this
+     */
+    public function setIcon(?string $icon): self
+    {
+        $this->icon = $icon;
+        return $this;
+    }
+
+
+    /**
+     * @return string|null
+     */
+    public function getCss(): ?string
+    {
+        return $this->css;
+    }
+
+
+    /**
+     * @param string|null $css
+     * @return $this
+     */
+    public function setCss(?string $css): self
+    {
+        $this->css = $css;
         return $this;
     }
 }

@@ -39,6 +39,8 @@ class Mapper extends \Schoolbox\Mapper
         $this->uses('sequence', self::TYPE_INTEGER);
         $this->uses('enabled', self::TYPE_INTEGER);
         $this->uses('term', self::TYPE_STRING);
+        $this->uses('icon', self::TYPE_STRING);
+        $this->uses('css', self::TYPE_STRING);
     }
 
 

@@ -10,6 +10,8 @@ CREATE TABLE `profile_field` (
     `sequence` int(10) unsigned NOT NULL,
     `enabled` tinyint(4) NOT NULL,
     `term` varchar(255) NULL,
+    `icon` varchar(255) NULL,
+    `css` varchar(255) NULL,
     PRIMARY KEY (`id`),
     UNIQUE KEY `roletype_field` (`roletype`,`field`),
     KEY `roletype` (`roletype`),
