@@ -9,6 +9,25 @@
 <div class="row">
     <div class="small-12 columns">
         <h1><span id="editor-name"></span> Profile Editor</h1>
+
+        <h2>Available Fields</h2>
+        <ul>
+            {% for field in payload.data.roleTypes.fields.available %}
+            <li>{{ field.displayAs }} (<code>{{ field.field }}</code> in the backend)</li>
+            {% endfor %}
+        </ul>
+
+        <h2>Selected Fields</h2>
+        <ul>
+            {% for field in payload.data.roleTypes.fields.selected %}
+                <li>
+                    {{ field.displayAs }} (<code>{{ field.field }}</code> in the backend)
+                    {% if field.icon %}
+                    <span class="button {{ field.icon }} {{ field.css }}"></span>
+                    {% endif %}
+                </li>
+            {% endfor %}
+        </ul>
     </div>
 </div>
 

@@ -52,12 +52,14 @@ class Payload
             ]
         ];
 
+        /* Ones that you could possibly choose
+         */
         foreach ($fields as $field) {
-            /* Ones that you could choose
-             */
             $payload['data']['roleTypes']['fields']['available'][] = [
                 'field' => $field->getField(),
                 'displayAs' => $field->getDisplayAs(),
+                'icon' => $field->getIcon(),
+                'css' => $field->getCss()
             ];
         }
 
@@ -66,47 +68,51 @@ class Payload
          */
         $fields->sortBy('sequence', 'asc');
 
+        /* We only care about the ones that were previously chosen (enabled == 1)
+         */
         foreach ($fields as $field) {
-            /* Ones that were previously chosen
-             */
-            if ($field->getEnabled()) {
-                /* Find the ids of the campuses for which this field might be available
-                 */
-                $availabilityCampusIds = [];
-
-                foreach ($field->getAvailabilityCampus() as $availabilityCampus) {
-                    $availabilityCampusIds[] = $availabilityCampus->getCampus()->getId();
-                }
-
-                $availabilityCampus = [
-                    'key' => 'appearsOn',
-                    'id' => $availabilityCampusIds
-                ];
-
-                /* Find the roletypes ("ids") for which this field might be visible
-                 */
-                $visibilityRoleTypesIds = [];
-
-                foreach ($field->getVisibility() as $visibility) {
-                    $visibilityRoleTypesIds[] = $visibility->getRoleType();
-                }
-
-                $visibilityRoleTypes = [
-                    'key' => 'visibleFor',
-                    'id' => $visibilityRoleTypesIds
-                ];
-
-                /* Pile it into the stack
-                 */
-                $payload['data']['roleTypes']['fields']['selected'][] = [
-                    'field' => $field->getField(),
-                    'displayAs' => $field->getDisplayAs(),
-                    'fieldSettings' => [
-                        $availabilityCampus,
-                        $visibilityRoleTypes
-                    ]
-                ];
+            if (!$field->getEnabled()) {
+                continue;
             }
+
+            /* Find the ids of the campuses for which this field might be available
+             */
+            $availabilityCampusIds = [];
+
+            foreach ($field->getAvailabilityCampus() as $availabilityCampus) {
+                $availabilityCampusIds[] = $availabilityCampus->getCampus()->getId();
+            }
+
+            $availabilityCampus = [
+                'key' => 'appearsOn',
+                'id' => $availabilityCampusIds
+            ];
+
+            /* Find the roletypes ("ids") for which this field might be visible
+             */
+            $visibilityRoleTypesIds = [];
+
+            foreach ($field->getVisibility() as $visibility) {
+                $visibilityRoleTypesIds[] = $visibility->getRoleType();
+            }
+
+            $visibilityRoleTypes = [
+                'key' => 'visibleFor',
+                'id' => $visibilityRoleTypesIds
+            ];
+
+            /* Pile it into the stack
+             */
+            $payload['data']['roleTypes']['fields']['selected'][] = [
+                'field' => $field->getField(),
+                'displayAs' => $field->getDisplayAs(),
+                'icon' => $field->getIcon(),
+                'css' => $field->getCss(),
+                'fieldSettings' => [
+                    $availabilityCampus,
+                    $visibilityRoleTypes
+                ]
+            ];
         }
 
         return $payload;
