@@ -106,7 +106,7 @@ class CalendarEventCreateModifyCest
      * Attempt to create an event with fewer than the required parameters, and expect that attempt to fail.
      *
      * @param ApiTester $i
-     *
+     */
     public function testCreateEventWithOneFewerThanTheMinimalParameters(ApiTester $i): void
     {
         $randomParamKeyToRemove = array_rand($this->eventMinimalRequiredParams);
@@ -126,7 +126,7 @@ class CalendarEventCreateModifyCest
      * @param ApiTester $i
      * @return void
      * @throws UnexpectedValueException
-     *
+     */
     public function testModifyEvent(ApiTester $i): void
     {
         $userJackColes      = $i->getUserByUsername('jcoles');
