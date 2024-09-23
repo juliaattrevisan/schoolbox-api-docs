@@ -67,8 +67,7 @@ class Csv extends Base
 
         while (($thisRow = fgetcsv($handle, 0, ",")) !== false) {
             // The CSV file will not contain character encoding info, so just assume a compatible encoding has been used.
-            // Previously we stripped extra bytes from multi-byte characters here (to convert non-ASCII to ASCII),
-            // but users complained about accented characters losing their accents.
+            // Previously we stripped non-ASCII characters here, but users complained about loss of data.
 
             [
                 $start_date,
