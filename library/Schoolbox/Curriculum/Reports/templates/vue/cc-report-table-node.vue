@@ -36,11 +36,11 @@ function getUnitUsageCount($course: Course, $unit: Unit): number {
     if (course === undefined) return 0;
     const unit = course.units.find((u) => u.id === $unit.id);
     if (unit === undefined) return 0;
-    const usageCounts = unit._usageCounts;
-    if (usageCounts === undefined) return 0;
+    const { usage } = unit;
+    if (usage === undefined) return 0;
     return store.selectedReportOptionValues.reduce((acc, option) => {
-        if (usageCounts[option] === undefined) return acc;
-        return acc + usageCounts[option];
+        if (usage[option] === undefined) return acc;
+        return acc + usage[option].count;
     }, 0);
 }
 
@@ -54,7 +54,7 @@ function getCourseUsageCount($course: Course): number {
     const course = props.node.usage.courses.find((c) => c.id === $course.id);
     if (course === undefined || course.units === undefined) return 0;
     return course.units.reduce((acc, unit) => {
-        if (unit._usageCounts === undefined) return acc;
+        if (unit.usage === undefined) return acc;
         return acc + getUnitUsageCount(course, unit);
     }, 0);
 }
@@ -104,7 +104,9 @@ const showNode = window.Vue.computed(() => {
         <td :class="`u-alt-bkg ${nodeUsageCount === 0 ? 'u-highlight' : ''}`">
             {{ nodeUsageCount }}
         </td>
+        <!-- loop through each course/unit, retrieving the node usage or returning 0 for undefined usages -->
         <template v-for="(course, index) in store.courses" :key="course.id">
+            <td :class="`${index % 2 ? 'u-alt-bkg' : ''}`">0</td>
             <td
                 v-for="unit in course.units"
                 :key="unit.id"

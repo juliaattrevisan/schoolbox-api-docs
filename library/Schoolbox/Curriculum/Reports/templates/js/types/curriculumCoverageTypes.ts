@@ -7,11 +7,19 @@ import type { Node } from "@schoolboxCurriculum/types/Node";
  * items a curriculum node can be assigned to
  */
 export type UnitWithCurriculumNodeUsage = Pick<Unit, "id" | "name"> & {
-    _usageCounts?: {
-        unit?: number;
-        activity?: number;
-        lessonPlan?: number;
-        rubric?: number;
+    usage?: {
+        unit?: {
+            count: number;
+        };
+        activity?: {
+            count: number;
+        };
+        lessonPlan?: {
+            count: number;
+        };
+        rubric?: {
+            count: number;
+        };
     };
 };
 

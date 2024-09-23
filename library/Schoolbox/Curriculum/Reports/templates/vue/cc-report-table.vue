@@ -27,7 +27,7 @@ store.courses = data.value.courses; // Set the courses in the store (temporary w
                 <th
                     v-for="(course, index) in data.courses"
                     :key="course.id"
-                    :colspan="`${course.units && course.units.length ? course.units.length + 1 : 0} `"
+                    :colspan="`${course.units && course.units.length ? course.units.length + 2 : 0} `"
                     :class="`${index % 2 ? 'u-alt-bkg' : ''}`"
                 >
                     {{ course.name }}
@@ -35,6 +35,7 @@ store.courses = data.value.courses; // Set the courses in the store (temporary w
             </tr>
             <tr>
                 <template v-for="(course, index) in data.courses" :key="course.id">
+                    <td :class="`${index % 2 ? 'u-alt-bkg' : ''}`"></td>
                     <th v-for="unit in course.units" :key="unit.id" :class="`${index % 2 ? 'u-alt-bkg' : ''}`">
                         {{ unit.name }}
                     </th>

@@ -56,28 +56,28 @@ export const mockReportData = {
                                 {
                                     id: 108,
                                     name: "Romeo and Juliet",
-                                    _usageCounts: {
-                                        unit: 1,
-                                        activity: 4,
-                                        lessonPlan: 1,
-                                        rubric: 5,
+                                    usage: {
+                                        unit: { count: 1 },
+                                        activity: { count: 4 },
+                                        lessonPlan: { count: 1 },
+                                        rubric: { count: 5 },
                                     },
                                 },
                                 {
                                     id: 109,
                                     name: "Persuasion and the Media",
-                                    _usageCounts: {
-                                        unit: 2,
-                                        lessonPlan: 2,
+                                    usage: {
+                                        unit: { count: 2 },
+                                        lessonPlan: { count: 2 },
                                     },
                                 },
                                 {
                                     id: 110,
                                     name: "To Kill a Mockingbird",
-                                    _usageCounts: {
-                                        unit: 5,
-                                        activity: 2,
-                                        rubric: 5,
+                                    usage: {
+                                        unit: { count: 5 },
+                                        activity: { count: 2 },
+                                        rubric: { count: 5 },
                                     },
                                 },
                             ],
@@ -89,28 +89,28 @@ export const mockReportData = {
                                 {
                                     id: 170,
                                     name: "Geography",
-                                    _usageCounts: {
-                                        unit: 2,
-                                        lessonPlan: 3,
-                                        rubric: 2,
+                                    usage: {
+                                        unit: { count: 2 },
+                                        lessonPlan: { count: 3 },
+                                        rubric: { count: 2 },
                                     },
                                 },
                                 {
                                     id: 171,
                                     name: "History",
-                                    _usageCounts: {
-                                        activity: 2,
-                                        lessonPlan: 1,
-                                        rubric: 3,
+                                    usage: {
+                                        activity: { count: 2 },
+                                        lessonPlan: { count: 1 },
+                                        rubric: { count: 3 },
                                     },
                                 },
                                 {
                                     id: 172,
                                     name: "Civics and Citizenship",
-                                    _usageCounts: {
-                                        activity: 2,
-                                        lessonPlan: 3,
-                                        rubric: 2,
+                                    usage: {
+                                        activity: { count: 2 },
+                                        lessonPlan: { count: 3 },
+                                        rubric: { count: 2 },
                                     },
                                 },
                             ],
@@ -131,30 +131,30 @@ export const mockReportData = {
                                         {
                                             id: 108,
                                             name: "Romeo and Juliet",
-                                            _usageCounts: {
-                                                unit: 1,
-                                                activity: 4,
-                                                lessonPlan: 3,
-                                                rubric: 2,
+                                            usage: {
+                                                unit: { count: 1 },
+                                                activity: { count: 4 },
+                                                lessonPlan: { count: 3 },
+                                                rubric: { count: 2 },
                                             },
                                         },
                                         {
                                             id: 109,
                                             name: "Persuasion and the Media",
-                                            _usageCounts: {
-                                                unit: 2,
-                                                activity: 4,
-                                                rubric: 2,
+                                            usage: {
+                                                unit: { count: 2 },
+                                                activity: { count: 4 },
+                                                rubric: { count: 2 },
                                             },
                                         },
                                         {
                                             id: 110,
                                             name: "To Kill a Mockingbird",
-                                            _usageCounts: {
-                                                unit: 2,
-                                                activity: 2,
-                                                lessonPlan: 3,
-                                                rubric: 3,
+                                            usage: {
+                                                unit: { count: 2 },
+                                                activity: { count: 2 },
+                                                lessonPlan: { count: 3 },
+                                                rubric: { count: 3 },
                                             },
                                         },
                                     ],
@@ -166,38 +166,38 @@ export const mockReportData = {
                                         {
                                             id: 170,
                                             name: "Geography",
-                                            _usageCounts: {
-                                                unit: 2,
-                                                lessonPlan: 3,
-                                                rubric: 2,
+                                            usage: {
+                                                unit: { count: 2 },
+                                                lessonPlan: { count: 3 },
+                                                rubric: { count: 2 },
                                             },
                                         },
                                         {
                                             id: 171,
                                             name: "History",
-                                            _usageCounts: {
-                                                activity: 2,
-                                                lessonPlan: 1,
-                                                rubric: 1,
+                                            usage: {
+                                                activity: { count: 2 },
+                                                lessonPlan: { count: 1 },
+                                                rubric: { count: 1 },
                                             },
                                         },
                                         {
                                             id: 172,
                                             name: "Civics and Citizenship",
-                                            _usageCounts: {
-                                                unit: 4,
-                                                activity: 2,
-                                                lessonPlan: 3,
-                                                rubric: 2,
+                                            usage: {
+                                                unit: { count: 4 },
+                                                activity: { count: 2 },
+                                                lessonPlan: { count: 3 },
+                                                rubric: { count: 2 },
                                             },
                                         },
                                         {
                                             id: 173,
                                             name: "Economics and Business",
-                                            _usageCounts: {
-                                                activity: 3,
-                                                lessonPlan: 1,
-                                                rubric: 1,
+                                            usage: {
+                                                activity: { count: 3 },
+                                                lessonPlan: { count: 1 },
+                                                rubric: { count: 1 },
                                             },
                                         },
                                     ],
@@ -218,33 +218,33 @@ export const mockReportData = {
                                                 {
                                                     id: 170,
                                                     name: "Geography",
-                                                    _usageCounts: {
-                                                        unit: 2,
-                                                        lessonPlan: 1,
+                                                    usage: {
+                                                        unit: { count: 2 },
+                                                        lessonPlan: { count: 1 },
                                                     },
                                                 },
                                                 {
                                                     id: 171,
                                                     name: "History",
-                                                    _usageCounts: {
-                                                        activity: 1,
-                                                        rubric: 1,
+                                                    usage: {
+                                                        activity: { count: 1 },
+                                                        rubric: { count: 1 },
                                                     },
                                                 },
                                                 {
                                                     id: 172,
                                                     name: "Civics and Citizenship",
-                                                    _usageCounts: {
-                                                        unit: 3,
-                                                        activity: 1,
-                                                        lessonPlan: 1,
+                                                    usage: {
+                                                        unit: { count: 3 },
+                                                        activity: { count: 1 },
+                                                        lessonPlan: { count: 1 },
                                                     },
                                                 },
                                                 {
                                                     id: 173,
                                                     name: "Economics and Business",
-                                                    _usageCounts: {
-                                                        activity: 2,
+                                                    usage: {
+                                                        activity: { count: 2 },
                                                     },
                                                 },
                                             ],
@@ -265,30 +265,30 @@ export const mockReportData = {
                                                 {
                                                     id: 108,
                                                     name: "Romeo and Juliet",
-                                                    _usageCounts: {
-                                                        unit: 1,
-                                                        activity: 1,
-                                                        lessonPlan: 2,
-                                                        rubric: 2,
+                                                    usage: {
+                                                        unit: { count: 1 },
+                                                        activity: { count: 1 },
+                                                        lessonPlan: { count: 2 },
+                                                        rubric: { count: 2 },
                                                     },
                                                 },
                                                 {
                                                     id: 109,
                                                     name: "Persuasion and the Media",
-                                                    _usageCounts: {
-                                                        unit: 2,
-                                                        activity: 3,
-                                                        rubric: 4,
+                                                    usage: {
+                                                        unit: { count: 2 },
+                                                        activity: { count: 3 },
+                                                        rubric: { count: 4 },
                                                     },
                                                 },
                                                 {
                                                     id: 110,
                                                     name: "To Kill a Mockingbird",
-                                                    _usageCounts: {
-                                                        unit: 1,
-                                                        activity: 2,
-                                                        lessonPlan: 2,
-                                                        rubric: 3,
+                                                    usage: {
+                                                        unit: { count: 1 },
+                                                        activity: { count: 2 },
+                                                        lessonPlan: { count: 2 },
+                                                        rubric: { count: 3 },
                                                     },
                                                 },
                                             ],
@@ -300,38 +300,38 @@ export const mockReportData = {
                                                 {
                                                     id: 170,
                                                     name: "Geography",
-                                                    _usageCounts: {
-                                                        unit: 2,
-                                                        lessonPlan: 2,
-                                                        rubric: 2,
+                                                    usage: {
+                                                        unit: { count: 2 },
+                                                        lessonPlan: { count: 2 },
+                                                        rubric: { count: 2 },
                                                     },
                                                 },
                                                 {
                                                     id: 171,
                                                     name: "History",
-                                                    _usageCounts: {
-                                                        activity: 1,
-                                                        lessonPlan: 1,
-                                                        rubric: 2,
+                                                    usage: {
+                                                        activity: { count: 1 },
+                                                        lessonPlan: { count: 1 },
+                                                        rubric: { count: 2 },
                                                     },
                                                 },
                                                 {
                                                     id: 172,
                                                     name: "Civics and Citizenship",
-                                                    _usageCounts: {
-                                                        unit: 2,
-                                                        activity: 1,
-                                                        lessonPlan: 2,
-                                                        rubric: 2,
+                                                    usage: {
+                                                        unit: { count: 2 },
+                                                        activity: { count: 1 },
+                                                        lessonPlan: { count: 2 },
+                                                        rubric: { count: 2 },
                                                     },
                                                 },
                                                 {
                                                     id: 173,
                                                     name: "Economics and Business",
-                                                    _usageCounts: {
-                                                        activity: 2,
-                                                        lessonPlan: 1,
-                                                        rubric: 1,
+                                                    usage: {
+                                                        activity: { count: 2 },
+                                                        lessonPlan: { count: 1 },
+                                                        rubric: { count: 1 },
                                                     },
                                                 },
                                             ],
