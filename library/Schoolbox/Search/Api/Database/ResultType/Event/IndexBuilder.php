@@ -21,6 +21,8 @@ class IndexBuilder extends BaseBuilder
     /**
      * This builder works with calendar event objects.
      *
+     * TODO should this trigger on deletion of folders?
+     *
      * @param object $subject
      * @return bool
      */

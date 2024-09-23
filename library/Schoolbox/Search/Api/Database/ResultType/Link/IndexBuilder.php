@@ -21,6 +21,8 @@ class IndexBuilder extends BaseBuilder
     /**
      * This builder works with link objects.
      *
+     * TODO deleting link's folder should delete indices
+     *
      * @param object $subject
      * @return bool
      */

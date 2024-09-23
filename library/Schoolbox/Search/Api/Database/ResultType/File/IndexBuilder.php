@@ -56,6 +56,8 @@ class IndexBuilder extends BaseBuilder
     /**
      * This builder works with file objects.
      *
+     * TODO should it work for deletion of folders/storage/fileExt/fileType?
+     *
      * @param object $subject
      * @return bool
      */

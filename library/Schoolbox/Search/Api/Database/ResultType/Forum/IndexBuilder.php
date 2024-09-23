@@ -21,6 +21,8 @@ class IndexBuilder extends BaseBuilder
     /**
      * This builder works with forum post objects.
      *
+     * TODO deletes should work on thread as well?
+     *
      * @param object $subject
      * @return bool
      */

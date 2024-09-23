@@ -21,7 +21,7 @@ class IndexBuilder extends BaseBuilder
     /**
      * This builder works with tile objects.
      *
-     * TODO It could also work with tile layout objects?
+     * TODO It could also work with tile layout and folders objects?
      *
      * @param object $subject
      * @return bool
