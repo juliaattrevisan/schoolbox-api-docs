@@ -16,7 +16,7 @@ export default class CreateLessonPlanTemplate {
 
     static readonly BUTTON_DELETE = "a.button.icon-delete";
 
-    static readonly CONFIRM_YES = "a#confirm-dialog-confirm-button.button.submit";
+    static readonly DATA_TEST_CONFIRM_YES = "confirm-dialog-confirm-button";
 
     constructor(page: Page, tester: AcceptanceTester) {
         this.page = page;
@@ -94,7 +94,7 @@ export default class CreateLessonPlanTemplate {
      * confirm to delete a field: click yes in the confirmation dialog
      */
     async clickConfirmDeleteButton(): Promise<void> {
-        await this.page.click(CreateLessonPlanTemplate.CONFIRM_YES);
+        await this.page.getByTestId(CreateLessonPlanTemplate.DATA_TEST_CONFIRM_YES).last().click();
     }
 
     /**

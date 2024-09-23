@@ -11,6 +11,8 @@ import UpdateLessonPlanTemplate from "@schoolboxTest/playwright/support/page/adm
  */
 
 test.describe("Lesson Plan Templates", () => {
+    // Run tests serially, as tests rely on prior tests to have been run
+    test.describe.configure({ mode: "serial" });
     /**
      * Preparations
      *
@@ -46,7 +48,7 @@ test.describe("Lesson Plan Templates", () => {
         await templates.fillBody(1, "Automation Body 1");
         await templates.clickSaveButton();
         tester.isGoingTo("Check the lesson pan template is presented in the template list");
-        await expect(page.locator("#container")).toContainText(templateName);
+        await expect(page.locator("div.admin-content")).toContainText(templateName);
     });
 
     /**
@@ -86,12 +88,11 @@ test.describe("Lesson Plan Templates", () => {
         await templates.clickSaveButton();
         tester.isGoingTo("Click the template title in the template list and check the fields are updated");
         await templateList.clickLessonPlanTemplateTitle(templateId);
-        await expect(page.locator("#container")).toContainText("Automation Template 1 Updated");
-        await expect(page.locator("#container")).toContainText("Automation Body 1 Updated");
-        await expect(page.locator("#container")).toContainText("Automation Field 2");
-        await expect(page.locator("#container")).toContainText("Automation Body 2");
-        tester.isGoingTo("Close the modal dialog");
-        await templateList.clickCloseModal();
+        await expect(page.locator(`#lpt-preview-${templateId}`)).toContainText("Automation Template 1 Updated");
+        await expect(page.locator(`#lpt-preview-${templateId}`)).toContainText("Automation Body 1 Updated");
+        await expect(page.locator(`#lpt-preview-${templateId}`)).toContainText("Automation Field 2");
+        await expect(page.locator(`#lpt-preview-${templateId}`)).toContainText("Automation Body 2");
+        await page.reload();
         tester.isGoingTo("Modify a lesson plan template, delete a field, save it");
         await templateList.clickModifyLessonPlanTemplateButton(templateId);
         await templates.clickDeleteButton();
@@ -99,12 +100,14 @@ test.describe("Lesson Plan Templates", () => {
         await templates.clickSaveButton();
         tester.isGoingTo("Click the template title in the template list and check the field deleted is not presented");
         await templateList.clickLessonPlanTemplateTitle(templateId);
-        await expect(page.locator("#container")).not.toContainText("Automation Template 1 Updated");
-        await expect(page.locator("#container")).not.toContainText("Automation Body 1 Updated");
-        await expect(page.locator("#container")).toContainText("Automation Field 2");
-        await expect(page.locator("#container")).toContainText("Automation Body 2");
-        await expect(page.locator("#container")).not.toContainText("This field is not visible to students");
-        await templateList.clickCloseModal();
+        await expect(page.locator(`#lpt-preview-${templateId}`)).not.toContainText("Automation Template 1 Updated");
+        await expect(page.locator(`#lpt-preview-${templateId}`)).not.toContainText("Automation Body 1 Updated");
+        await expect(page.locator(`#lpt-preview-${templateId}`)).toContainText("Automation Field 2");
+        await expect(page.locator(`#lpt-preview-${templateId}`)).toContainText("Automation Body 2");
+        await page.reload();
+        await expect(page.locator(`#lpt-preview-${templateId}`)).not.toContainText(
+            "This field is not visible to students",
+        );
         tester.isGoingTo("Modify a lesson plan template, uncheck the visible to students and save it");
         await templateList.clickModifyLessonPlanTemplateButton(templateId);
         const templateFieldId2 = (await db.grabFromDatabase("lesson_plan_template_field", "id", {
@@ -115,7 +118,7 @@ test.describe("Lesson Plan Templates", () => {
         await templates.clickSaveButton();
         tester.isGoingTo("Check the template is presenting the message invisible to students on the modal");
         await templateList.clickLessonPlanTemplateTitle(templateId);
-        await expect(page.locator("#container")).toContainText("This field is not visible to students");
+        await expect(page.locator(`#lpt-preview-${templateId}`)).toContainText("This field is not visible to students");
     });
 
     /**
@@ -135,19 +138,23 @@ test.describe("Lesson Plan Templates", () => {
         await templateList.clickLessonPlanTemplateMenu(templateId);
         await templateList.clickDisableEnableVisibility(templateId);
         await templateList.clickLessonPlanTemplateMenu(templateId);
-        await expect(page.locator("#container")).toContainText("Enable Visibility");
+        await expect(page.locator(`#lpt-${templateId}.f-dropdown`)).toContainText("Enable visibility");
         tester.isGoingTo("Enable a lesson plan template");
+        await templateList.clickLessonPlanTemplateMenu(templateId);
         await templateList.clickDisableEnableVisibility(templateId);
         await templateList.clickLessonPlanTemplateMenu(templateId);
-        await expect(page.locator("#container")).toContainText("Disable Visibility");
+        await expect(page.locator(`#lpt-${templateId}.f-dropdown`)).toContainText("Disable visibility");
         tester.isGoingTo("Delete a lesson plan template and check it is no longer presented in the list");
+        await page.reload();
+        await templateList.clickLessonPlanTemplateMenu(templateId);
         await templateList.clickDeleteTemplate(templateId);
         await templates.clickConfirmDeleteButton();
-        await expect(page.locator("#container")).not.toContainText("Automation Template 1");
+        await expect(page.locator(`#lpt-${templateId}.f-dropdown`)).not.toContainText("Automation Template 1");
     });
 
     /**
      * Soft deleting data to not impact the tests
+    //
      */
     test.afterAll(async ({ baseTester, db }) => {
         baseTester.isGoingTo(

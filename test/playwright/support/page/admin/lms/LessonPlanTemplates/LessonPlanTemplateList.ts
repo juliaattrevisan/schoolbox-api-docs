@@ -53,10 +53,6 @@ export default class LessonPlanTemplateList {
      * @param templateIdNumber - the number of the template
      */
     async clickLessonPlanTemplateMenu(templateIdNumber: number): Promise<void> {
-        // await this.page.clickElementInWebComponent(
-        //     `[data-test=sbx-pop-out-lpt-${templateIdNumber}]`,
-        //     `[data-test=sbx-pop-out-lpt-${templateIdNumber}-button]`,
-        // );
         await this.page.getByTestId(`sbx-pop-out-lpt-${templateIdNumber}-button`).click();
     }
 
@@ -70,7 +66,7 @@ export default class LessonPlanTemplateList {
 
     /**
      * click delete lesson plan on the 3-dot menu dropdown
-     * @param templateIdNumber - the number of the template
+     * @param templateIdNumber - the id of the template
      */
     async clickDeleteTemplate(templateIdNumber: number): Promise<void> {
         await this.page.click(`a[href="/adminv2/lesson-plan/template/delete/${templateIdNumber}"]`);
@@ -78,8 +74,9 @@ export default class LessonPlanTemplateList {
 
     /**
      * click the close button on the modal dialog
+     * @param templateIdNumber - the id of the template
      */
-    async clickCloseModal(): Promise<void> {
-        await this.page.locator(LessonPlanTemplateList.ICON_MODAL_CLOSE).waitFor({ state: "visible" });
+    async clickCloseModal(templateIdNumber: number): Promise<void> {
+        await this.page.getByTestId(`lpt-preview-${templateIdNumber}-template-list-modal-close`).click();
     }
 }
