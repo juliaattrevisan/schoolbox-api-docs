@@ -60,7 +60,6 @@ class IndexBuilder extends BaseBuilder
      */
     public function buildUpdates(?Alaress_Date_Format $fromDate, ?Alaress_Date_Format $toDate, ?object $subject): iterable
     {
-        // TODO add proper deleted_at columns to forumPost and forumThread
         $queryString = "
             SELECT
                 fp.postID as id,
@@ -71,8 +70,8 @@ class IndexBuilder extends BaseBuilder
                 fp.body AS fulltext_index
             FROM forumThread ft
             LEFT JOIN forumPost fp ON fp.threadID = ft.threadID
-            WHERE fp.deleted = 'false'
-            AND ft.deleted = 'false'
+            WHERE fp.deleted_at IS NULL
+            AND ft.deleted_at IS NULL
         ";
         $params = [];
         if ($fromDate) {
@@ -113,25 +112,21 @@ class IndexBuilder extends BaseBuilder
      */
     public function buildDeletes(?Alaress_Date_Format $fromDate, ?Alaress_Date_Format $toDate, ?object $subject): iterable
     {
-        // Ignore deleted forum posts for incremental updates to the search_index table
-        // (e.g. on runs such as 'php tools/search/buildIndex.php -p --from="-10 min"').
-        // This is done because searching for and attempting to remove from the search_index table all deleted forum
-        // posts is wasteful when we only need to remove ones deleted in the past 10 minutes.
-        // An overnight full rebuild of the search_index table ensures that the search_index table will never be more
-        // than a day out of date.
-        if ($fromDate !== null || $toDate !== null) {
-            return;
-        }
-
-        // Forum posts or threads don't have deletion dates:
-        // just delete all indices for deleted records regardless of date
         $queryString = "SELECT
             fp.postID as id
             FROM forumThread ft
             LEFT JOIN forumPost fp ON fp.threadID = ft.threadID
-            WHERE fp.deleted = 'true' OR ft.deleted = 'true'
+            WHERE TRUE
         ";
         $params = [];
+        if ($fromDate) {
+            $queryString .= ' AND COALESCE(fp.deleted_at, ft.deleted_at) >= :fromDate';
+            $params['fromDate'] = $fromDate->getDatabase();
+        }
+        if ($toDate) {
+            $queryString .= ' AND COALESCE(fp.deleted_at, ft.deleted_at) <= :toDate';
+            $params['toDate'] = $toDate->getDatabase();
+        }
         if ($subject) {
             if (!$this->accepts($subject, BuildType::DELETE)) {
                 return;
