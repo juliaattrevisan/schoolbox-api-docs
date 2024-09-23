@@ -12,6 +12,8 @@ namespace Schoolbox\Admin\Profile\Editor\Field;
 
 use Alaress\Database\Predicate\Builder;
 use Schoolbox\GenericCollection;
+use Schoolbox\Mapper\DefinitionException;
+use Schoolbox\Mapper\Exception;
 
 /**
  * Class Mapper
@@ -41,6 +43,107 @@ class Mapper extends \Schoolbox\Mapper
         $this->uses('term', self::TYPE_STRING);
         $this->uses('icon', self::TYPE_STRING);
         $this->uses('css', self::TYPE_STRING);
+
+        $this->hasJoin(
+            'availability',
+            [
+                'multiple'  => true,
+                'mapper'    => \Schoolbox\Admin\Profile\Editor\Field\Availability\Mapper::class,
+                'this_key'  => 'id',
+                'other_key' => 'profile_field_id',
+            ]
+        );
+
+        $this->hasJoin(
+            'visibility',
+            [
+                'multiple'  => true,
+                'mapper'    => \Schoolbox\Admin\Profile\Editor\Field\Visibility\Mapper::class,
+                'this_key'  => 'id',
+                'other_key' => 'profile_field_id',
+            ]
+        );
+    }
+
+
+    /**
+     * @inheritdoc
+     *
+     * @return string
+     */
+    protected function getSelectString(): string
+    {
+        return "
+            SELECT {$this->getColumnString()},
+            {$this->getJoinColumnString('availability', 'availability')},
+            {$this->getJoinColumnString('visibility', 'visibility')}
+        ";
+    }
+
+
+    /**
+     * @inheritdoc
+     *
+     * @return string
+     * @throws \Schoolbox\Mapper\DefinitionException
+     */
+    protected function getFromString(): string
+    {
+        return "
+            FROM {$this->getTable()}
+            LEFT JOIN {$this->getJoinSql('availability', null, 'availability')}
+            LEFT JOIN {$this->getJoinSql('visibility', null, 'visibility')}
+        ";
+    }
+
+
+    /**
+     * @inheritdoc
+     *
+     * @param \PDOStatement $statement
+     * @return GenericCollection
+     * @throws DefinitionException
+     * @throws Exception
+     * @throws \UnexpectedValueException
+     */
+    protected function hydrateSelect(\PDOStatement $statement): GenericCollection
+    {
+        $idColumn = $this->getIdentifierColumn();
+
+        /** @var \Schoolbox\Admin\Profile\Editor\Field\Availability\Mapper $availabilityMapper */
+        $availabilityMapper = $this->getJoinMapper('availability');
+
+        /** @var \Schoolbox\Admin\Profile\Editor\Field\Visibility\Mapper $visibilityMapper */
+        $visibilityMapper = $this->getJoinMapper('visibility');
+
+        $collection = $this->createCollection();
+
+        while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
+            if ($collection->offsetExists($row[$idColumn])) {
+                $field = $collection->getOffset($row[$idColumn]);
+            } else {
+                $field = $this->hydrate($row, 'f');
+
+                $field->setAvailability($availabilityMapper->createCollection());
+                $field->setVisibility($visibilityMapper->createCollection());
+
+                $collection->setOffset($row[$idColumn], $field);
+            }
+
+            $availability = $availabilityMapper->hydrate($row, 'availability');
+
+            if ($availability) {
+                $field->getAvailability()->setOffset($availability->getId(), $availability);
+            }
+
+            $visibility = $visibilityMapper->hydrate($row, 'visibility');
+
+            if ($visibility) {
+                $field->getVisibility()->setOffset($visibility->getId(), $visibility);
+            }
+        }
+
+        return $collection;
     }
 
 

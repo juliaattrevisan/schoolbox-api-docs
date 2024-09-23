@@ -10,6 +10,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\Admin\Profile\Editor\Field;
 
+use Schoolbox\GenericCollection;
 use Schoolbox\Mapper\Traits\Model as ModelTrait;
 
 class Model
@@ -98,6 +99,22 @@ class Model
 
 
     /**
+     * A list of Availability settings for this field
+     *
+     * @var GenericCollection|null
+     */
+    private ?GenericCollection $availability = null;
+
+
+    /**
+     * A list of Visibility settings for this field
+     *
+     * @var GenericCollection|null
+     */
+    private ?GenericCollection $visibility = null;
+
+
+    /**
      * Decide whether the current row is indeed a (key, value) field tuple, or a flag
      * (Alert) that needs special rendering format in a coloured box with an icon.
      *
@@ -122,6 +139,46 @@ class Model
     public function isFlag(): bool
     {
         return !$this->isField();
+    }
+
+
+    /**
+     * @return GenericCollection|null
+     */
+    public function getAvailability(): ?GenericCollection
+    {
+        return $this->availability;
+    }
+
+
+    /**
+     * @param GenericCollection|null $availability
+     * @return $this
+     */
+    public function setAvailability(?GenericCollection $availability): self
+    {
+        $this->availability = $availability;
+        return $this;
+    }
+
+
+    /**
+     * @return GenericCollection|null
+     */
+    public function getVisibility(): ?GenericCollection
+    {
+        return $this->visibility;
+    }
+
+
+    /**
+     * @param GenericCollection|null $visibility
+     * @return $this
+     */
+    public function setVisibility(?GenericCollection $visibility): self
+    {
+        $this->visibility = $visibility;
+        return $this;
     }
 
 
