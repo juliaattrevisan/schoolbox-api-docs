@@ -12,10 +12,13 @@ namespace Schoolbox\Forum;
 
 use Alaress_Date_Format;
 use Schoolbox\ISoftDeletable;
+use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
 use Schoolbox\User;
 
 class Post implements ISoftDeletable
 {
+    use DeletedAtDate;
+
     /** @var int */
     protected $id;
 
@@ -34,7 +37,10 @@ class Post implements ISoftDeletable
     /** @var string */
     protected $body;
 
-    /** @var string */
+    /**
+     * @var string
+     * @deprecated use `$deletedAt`
+     */
     protected $deleted = 'false';
 
     /** @var Alaress_Date_Format */
@@ -187,6 +193,8 @@ class Post implements ISoftDeletable
 
 
     /**
+     * @deprecated use `setDeletedAt`
+     *
      * @param string $deleted
      * @return self
      */
@@ -198,6 +206,8 @@ class Post implements ISoftDeletable
 
 
     /**
+     * @deprecated use `getDeletedAt`
+     *
      * @return string
      */
     public function getDeleted()

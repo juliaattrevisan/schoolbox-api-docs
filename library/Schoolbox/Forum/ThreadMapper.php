@@ -65,12 +65,13 @@ class ThreadMapper extends Mapper implements FeedableMapperInterface, IHomepageC
         ]);
 
 
-        $this->hasMap([
-            'column'   => 'deleted',
-            'property' => 'deleted',
-            'type'     => self::TYPE_STRING,
-        ]);
-        $this->hasSoftDeleteField('deleted', 'true', 'false');
+//        $this->hasMap([
+//            'column'   => 'deleted',
+//            'property' => 'deleted',
+//            'type'     => self::TYPE_STRING,
+//        ]);
+//        $this->hasSoftDeleteField('deleted', 'true', 'false');
+        $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
 
         $this->hasMap([
             'column'   => 'locked',
