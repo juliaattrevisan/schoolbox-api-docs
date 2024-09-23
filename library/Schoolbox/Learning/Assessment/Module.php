@@ -29,6 +29,7 @@ use Schoolbox\Assessment\Rubric\DataModel\Result\Mapper as RubricResultSetMapper
 use Schoolbox\Assessment\Term;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Error\Mapper as ErrorMapper;
+use Schoolbox\File\MimetypeMapper;
 use Schoolbox\Learning\Assessment;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
 use Schoolbox\Learning\Assessment\Participant\DataSource as ParticipantDataSource;
@@ -611,6 +612,7 @@ class Module extends BaseModule
                     $projectResultCacheMapper,
                     $lessonPlanTemplateMapper,
                     $lessonPlanDataModelMapper,
+                    MimetypeMapper::getInstance(),
                 );
 
             case Assessment\Project\Controller::class:
