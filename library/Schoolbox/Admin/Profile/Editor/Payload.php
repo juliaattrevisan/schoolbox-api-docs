@@ -182,7 +182,6 @@ class Payload
             ];
         }
 
-        new \Alaress_Probe($payload);
         return $payload;
     }
 }
