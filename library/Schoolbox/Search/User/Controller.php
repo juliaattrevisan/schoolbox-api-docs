@@ -256,9 +256,9 @@ class Controller extends BaseController
                 }
             } elseif ($this->getConfigLoader()->get('show_all_subjects')) {
                 $subject['folder'] = $this->folderMapper->createModel()
-                                                        ->setName($subject['name'])
-                                                        ->setCodes(FolderCode::createCollection())
-                                                        ->addCode((new FolderCode())->setCode($codeMatcher::generateFolderCode($subject['campusCode'], $subject['code'])));
+                    ->setName($subject['name'])
+                    ->setCodes(FolderCode::createCollection())
+                    ->addCode((new FolderCode())->setCode($codeMatcher::generateFolderCode($subject['campusCode'], $subject['code'])));
                 $subject['perms']  = UserAccess::ACCESS_DENY;
                 $taughtFolderCodes = $subject['folder']->getCodeString();
             } else {

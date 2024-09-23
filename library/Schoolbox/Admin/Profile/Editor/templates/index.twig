@@ -1,0 +1,76 @@
+<script>
+    $(function() {
+        let hash = window.location.hash.substring(1);
+        hash = hash.charAt(0).toUpperCase() + hash.slice(1);
+
+        $('#editor-name').text(hash);
+    });
+</script>
+<div class="row">
+    <div class="small-12 columns">
+        <h1><span id="editor-name"></span> Profile Editor</h1>
+    </div>
+</div>
+
+<div class="row">
+    <div class="small-12 island">
+        <h2 class="subheader">postFieldAdd</h2>
+        <section class="content">
+        {% set formAction = routeLookupIfAuthorized('profileEditor.postFieldAdd', {fieldId: 7}) %}
+        {% if formAction %}
+            <form action="{{ formAction }}" method="post">
+                <input type="text" name="action" value="add" />
+                <input type="submit" />
+            </form>
+        {% else %}
+            Not authorised to POST
+        {% endif %}
+        </section>
+    </div>
+
+    <div class="small-12 island">
+        <h2 class="subheader">postFieldRemove</h2>
+        <section class="content">
+            {% set formAction = routeLookupIfAuthorized('profileEditor.postFieldRemove', {fieldId: 9}) %}
+            {% if formAction %}
+                <form action="{{ formAction }}" method="post">
+                    <input type="text" name="action" value="remove" />
+                    <input type="submit" />
+                </form>
+            {% else %}
+                Not authorised to POST
+            {% endif %}
+        </section>
+    </div>
+
+    <div class="small-12 island">
+        <h2 class="subheader">postFieldSettings</h2>
+        <section class="content">
+            {% set formAction = routeLookupIfAuthorized('profileEditor.postFieldSettings', {fieldId: 117}) %}
+            {% if formAction %}
+                <form action="{{ formAction }}" method="post">
+                    <input type="text" name="action" value="settings" />
+                    <input type="submit" />
+                </form>
+            {% else %}
+                Not authorised to POST
+            {% endif %}
+        </section>
+    </div>
+
+    <div class="small-12 island">
+        <h2 class="subheader">postFieldSequence</h2>
+        <section class="content">
+            {% set formAction = routeLookupIfAuthorized('profileEditor.postFieldSequence', {roletype: 'student'}) %}
+            {% if formAction %}
+                <form action="{{ formAction }}" method="post">
+                    <input type="text" name="action" value="sequence" />
+                    <input type="submit" />
+                </form>
+            {% else %}
+                Not authorised to POST
+            {% endif %}
+        </section>
+    </div>
+</div>
+

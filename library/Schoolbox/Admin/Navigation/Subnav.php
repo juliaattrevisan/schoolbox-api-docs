@@ -658,6 +658,12 @@ class Subnav
                         'children'    => [],
                         'description' => 'Configure and setup the scaffolding templates that users can create homepages from.',
                     ],
+                    '/adminv2/profile-editor' => [
+                        'name'        => 'Profile Editor',
+                        'visible'     => true,
+                        'children'    => [],
+                        'description' => 'Customise the fields and buttons on the staff, student and parent profile screens.',
+                    ],
                     '/adminv2/profile-button'        => [
                         'name'        => 'Profile Buttons',
                         'visible'     => true,
