@@ -38,90 +38,10 @@ class Controller extends Base
             $roleType = \Schoolbox\Role::STUDENT;
         }
 
-        /* Load a set of fields for the prescribed roletype
-         */
-        $fields = $this->fieldMapper->findByColumn('roletype', $roleType, [
-            'order' => [
-                'display_as' => 'asc'
-            ]
-        ]);
-
-        /* Put it into the frontend payload format
-         */
-        $payload = [
-            'data' => [
-                'fieldSettings' => [],
-                'roleTypes' => [
-                    'roleType' => $roleType,
-                    'fields' => [
-                        'available' => [],
-                        'selected' => []
-                    ]
-                ],
-            ]
-        ];
-
-        foreach ($fields as $field) {
-            /* Ones that you could choose
-             */
-            $payload['data']['roleTypes']['fields']['available'][] = [
-                'field' => $field->getField(),
-                'displayAs' => $field->getDisplayAs(),
-            ];
-        }
-
-        /* Sort by sequence for further processing. Frontend needed this in sequential
-         * order, so I guess we can just do that here with a quick reindex
-         */
-        $fields->sortBy('sequence', 'asc');
-
-        foreach ($fields as $field) {
-            /* Ones that were previously chosen
-             */
-            if ($field->getEnabled()) {
-                /* Find the ids of the campuses for which this field might be available
-                 */
-                $availabilityCampusIds = [];
-
-                foreach ($field->getAvailabilityCampus() as $availabilityCampus) {
-                    $availabilityCampusIds[] = $availabilityCampus->getCampus()->getId();
-                }
-
-                $availabilityCampus = [
-                    'key' => 'appearsOn',
-                    'id' => $availabilityCampusIds
-                ];
-
-                /* Find the roletypes ("ids") for which this field might be visilble
-                 */
-                $visibilityRoleTypesIds = [];
-
-                foreach ($field->getVisibility() as $visibility) {
-                    $visibilityRoleTypesIds[] = $visibility->getRoleType();
-                }
-
-                $visibilityRoleTypes = [
-                    'key' => 'visibleFor',
-                    'id' => $visibilityRoleTypesIds
-                ];
-
-                /* Pile it into the stack
-                 */
-                $payload['data']['roleTypes']['fields']['selected'][] = [
-                    'field' => $field->getField(),
-                    'displayAs' => $field->getDisplayAs(),
-                    'fieldSettings' => [
-                        $availabilityCampus,
-                        $visibilityRoleTypes
-                    ]
-                ];
-            }
-        }
-
-        new \Alaress_Probe($fields, $payload);
+        $payload = (new Payload($this->fieldMapper))->generate($roleType);
 
         $this->response = $this->responseFromTemplate('@profileEditor/index.twig', [
-
+            'payload' => $payload
         ], 'Profile Editor - ' . ucwords($roleType));
     }
 
