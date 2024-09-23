@@ -30,17 +30,17 @@ class Controller extends Base
         /* Figure out which roletype to display. By default, it loads teh Student
          * roletype as it tends to be the most heavily configured.
          */
-        $roletype = (string)$this->requestQuery->get('roletype');
+        $roleType = (string)$this->requestQuery->get('roleType');
 
         /* Check that $roletype was valid; if not, default to Student
          */
-        if (!\in_array($roletype, \Schoolbox\Role::getRoleTypes(), true)) {
-            $roletype = \Schoolbox\Role::STUDENT;
+        if (!\in_array($roleType, \Schoolbox\Role::getRoleTypes(), true)) {
+            $roleType = \Schoolbox\Role::STUDENT;
         }
 
         /* Load a set of fields for the prescribed roletype
          */
-        $fields = $this->fieldMapper->findByColumn('roletype', $roletype, [
+        $fields = $this->fieldMapper->findByColumn('roletype', $roleType, [
             'order' => [
                 'display_as' => 'asc'
             ]
@@ -52,7 +52,7 @@ class Controller extends Base
             'data' => [
                 'fieldSettings' => [],
                 'roleTypes' => [
-                    'roleType' => $roletype,
+                    'roleType' => $roleType,
                     'fields' => [
                         'available' => [],
                         'selected' => []
@@ -122,7 +122,7 @@ class Controller extends Base
 
         $this->response = $this->responseFromTemplate('@profileEditor/index.twig', [
 
-        ], 'Profile Editor - ' . ucwords($roletype));
+        ], 'Profile Editor - ' . ucwords($roleType));
     }
 
 
