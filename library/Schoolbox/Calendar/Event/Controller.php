@@ -648,7 +648,7 @@ class Controller extends Base
         $roleIds = (
             array_key_exists('roles', (array)$validRequestPost)
             ? array_map(fn ($role) => $role['id'], $validRequestPost['roles'])
-            : $event->getRoleCollection()->map(fn ($role) => $role->getId())->getAll()
+            : $event->getRoleCollection()->map(fn ($role) => $role->getRoleId())->getAll() // Note $role is Calendar\Relation\Role, so getRoleId().
         );
 
         /* Recurrence settings
