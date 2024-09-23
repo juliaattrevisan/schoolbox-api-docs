@@ -68,7 +68,14 @@ class Controller extends Base
                 'field' => $field->getField(),
                 'displayAs' => $field->getDisplayAs(),
             ];
+        }
 
+        /* Sort by sequence for further processing. Frontend needed this in sequential
+         * order, so I guess we can just do that here with a quick reindex
+         */
+        $fields->sortBy('sequence', 'asc');
+
+        foreach ($fields as $field) {
             /* Ones that were previously chosen
              */
             if ($field->getEnabled()) {
