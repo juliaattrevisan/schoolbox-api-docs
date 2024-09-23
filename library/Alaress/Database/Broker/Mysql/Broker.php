@@ -83,6 +83,7 @@ class Broker extends Base
             PDO::MYSQL_ATTR_INIT_COMMAND => 'SET NAMES utf8mb4',
             PDO::ATTR_PERSISTENT         => false,
             PDO::ATTR_TIMEOUT            => self::LOGIN_TIMEOUT,
+            PDO::MYSQL_ATTR_LOCAL_INFILE => true,
         ];
 
         // After connecting: use the query timeout

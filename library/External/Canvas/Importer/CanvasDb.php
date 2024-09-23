@@ -87,6 +87,8 @@ class CanvasDb
                 PDO::ATTR_STRINGIFY_FETCHES  => false,
                 PDO::ATTR_PERSISTENT         => true,
                 PDO::MYSQL_ATTR_INIT_COMMAND => "SET NAMES utf8mb4; SET MAX_STATEMENT_TIME=0",
+                PDO::MYSQL_ATTR_LOCAL_INFILE => true,
+                PDO::MYSQL_ATTR_LOCAL_INFILE_DIRECTORY => true,
             ];
 
             $connector->connect(
