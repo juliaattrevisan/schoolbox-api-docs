@@ -115,10 +115,6 @@ export const mockReportData = {
                                         rubric: 2,
                                     },
                                 },
-                                {
-                                    id: 173,
-                                    name: "Economics and Business",
-                                },
                             ],
                         },
                     ],
@@ -217,24 +213,6 @@ export const mockReportData = {
                                 code: "E-ATL-COEX-a",
                                 usage: {
                                     courses: [
-                                        {
-                                            id: 5,
-                                            name: "Year 9 English",
-                                            units: [
-                                                {
-                                                    id: 108,
-                                                    name: "Romeo and Juliet",
-                                                },
-                                                {
-                                                    id: 109,
-                                                    name: "Persuasion and the Media",
-                                                },
-                                                {
-                                                    id: 110,
-                                                    name: "To Kill a Mockingbird",
-                                                },
-                                            ],
-                                        },
                                         {
                                             id: 13,
                                             name: "Year 9 Humanities",
