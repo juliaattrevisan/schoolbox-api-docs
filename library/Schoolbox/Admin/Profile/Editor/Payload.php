@@ -9,13 +9,21 @@ declare(strict_types=1);
 
 namespace Schoolbox\Admin\Profile\Editor;
 
+use DebugBar\DebugBarException;
+use Schoolbox\Admin\Profile\Editor\Field\Mapper;
+use Schoolbox\CampusMapper;
+use Schoolbox\Role;
+
 class Payload
 {
     /**
-     * @param Field\Mapper $fieldMapper
+     * @param Mapper $fieldMapper
+     * @param CampusMapper $campusMapper
      */
-    public function __construct(private \Schoolbox\Admin\Profile\Editor\Field\Mapper $fieldMapper)
-    {
+    public function __construct(
+        private \Schoolbox\Admin\Profile\Editor\Field\Mapper $fieldMapper,
+        private \Schoolbox\CampusMapper $campusMapper
+    ) {
     }
 
 
@@ -26,6 +34,7 @@ class Payload
      *
      * @param string $roleType
      * @return array
+     * @throws DebugBarException
      */
     public function generate(string $roleType): array
     {
@@ -50,6 +59,55 @@ class Payload
                     ]
                 ],
             ]
+        ];
+
+        /* Field settings (groups of checkboxes) that you can tick
+         *
+         * Find the campuses you can choose
+         */
+        $campuses = $this->campusMapper->findAll();
+
+        $fieldSettingsCampus = [
+            'key' => 'appearsOn',
+            'displayAs' => 'Appears on',
+            'options' => []
+        ];
+
+        foreach ($campuses as $campus) {
+            $fieldSettingsCampus['options'][] = [
+                'type' => 'campus',
+                'id' => $campus->getId(),
+                'name' => $campus->getName()
+            ];
+        }
+
+        /* Find the roletypes you can choose
+         */
+        $fieldSettingsRoleType = [
+            'key' => 'visibleFor',
+            'displayAs' => 'Visible for',
+            'options' => [
+                [
+                    'type' => 'roleType',
+                    'id' => Role::STUDENT,
+                    'name' => ucwords(Role::STUDENT),
+                ],
+                [
+                    'type' => 'roleType',
+                    'id' => Role::STAFF,
+                    'name' => ucwords(Role::STAFF),
+                ],
+                [
+                    'type' => 'roleType',
+                    'id' => Role::PARENT,
+                    'name' => ucwords(Role::PARENT),
+                ]
+            ]
+        ];
+
+        $payload['data']['fieldSettings'] = [
+            $fieldSettingsCampus,
+            $fieldSettingsRoleType
         ];
 
         /* Ones that you could possibly choose
@@ -115,6 +173,7 @@ class Payload
             ];
         }
 
+        new \Alaress_Probe($payload);
         return $payload;
     }
 }

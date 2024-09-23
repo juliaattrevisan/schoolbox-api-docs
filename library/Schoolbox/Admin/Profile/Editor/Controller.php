@@ -18,8 +18,10 @@ class Controller extends Base
     /**
      * Controller constructor.
      */
-    public function __construct(private \Schoolbox\Admin\Profile\Editor\Field\Mapper $fieldMapper)
-    {
+    public function __construct(
+        private \Schoolbox\Admin\Profile\Editor\Field\Mapper $fieldMapper,
+        private \Schoolbox\CampusMapper $campusMapper,
+    ) {
     }
 
 
@@ -39,7 +41,10 @@ class Controller extends Base
             $roleType = \Schoolbox\Role::STUDENT;
         }
 
-        $payload = (new Payload($this->fieldMapper))->generate($roleType);
+        $payload = (new Payload(
+            $this->fieldMapper,
+            $this->campusMapper
+        ))->generate($roleType);
 
         $this->response = $this->responseFromTemplate('@adminProfileEditor/index.twig', [
             'pageCurrent' => $this->routeGenerator->generate('adminProfileEditor.getIndex'),

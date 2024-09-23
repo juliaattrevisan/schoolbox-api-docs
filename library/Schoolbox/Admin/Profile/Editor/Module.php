@@ -53,7 +53,8 @@ class Module extends BaseModule
     public function buildController(): Base
     {
         return new Controller(
-            $this->getMapperFactory()->get(\Schoolbox\Admin\Profile\Editor\Field\Mapper::class)
+            $this->getMapperFactory()->get(\Schoolbox\Admin\Profile\Editor\Field\Mapper::class),
+            $this->getMapperFactory()->get(\Schoolbox\CampusMapper::class)
         );
     }
 
