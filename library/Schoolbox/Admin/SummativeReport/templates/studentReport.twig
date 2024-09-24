@@ -614,8 +614,9 @@
                 {% endif %}
             </div>
             {% if subjectOverviews[folder.id] is defined and subjectOverviews[folder.id] is not empty %}
-                <div>
+                <div data-subject-overview-homepage="{{ folder.id }}">
                     {% for course in subjectOverviews[folder.id] %}
+                        <div data-subject-overview-course="{{ course.title }}">
                         {% if course.textboxes is not empty %}
                             {% if course | length > 1 %}
                                 <h2 class="subject-overview-course">{{ course.title }}</h2>
@@ -626,6 +627,7 @@
                                 </div>
                             {% endfor %}
                         {% endif %}
+                        </div>
                     {% endfor %}
                 </div>
             {% endif %}
