@@ -12,6 +12,7 @@ namespace Schoolbox\Search\Api\Database\ResultType\Blog;
 use Alaress_Date_Format;
 use Schoolbox\Blog\Homepage\Post\Model;
 use Schoolbox\Search\Api\Database\Index\BaseBuilder;
+use Schoolbox\Search\Api\Database\Index\BuildType;
 
 /**
  * Index builder for blogs.
@@ -21,18 +22,20 @@ class IndexBuilder extends BaseBuilder
     /**
      * This builder works with blog objects.
      *
-     * @param object $subject
+     * @param object    $subject
+     * @param BuildType $buildType
      * @return bool
      */
-    protected function accepts(object $subject): bool
+    protected function accepts(object $subject, BuildType $buildType): bool
     {
         return $subject instanceof Model;
     }
 
     /**
+     * @param BuildType $buildType
      * @inheritdoc
      */
-    protected function augmentQueryParams(object $subject, string $baseQuery, array $baseParams): array
+    protected function augmentQueryParams(object $subject, BuildType $buildType, string $baseQuery, array $baseParams): array
     {
         return [
             $baseQuery . ' AND b.id = :id',
@@ -71,7 +74,7 @@ class IndexBuilder extends BaseBuilder
             if (!$this->accepts($subject)) {
                 return;
             }
-            [$queryString, $params] = $this->augmentQueryParams($subject, $queryString, $params);
+            [$queryString, $params] = $this->augmentQueryParams($subject, $queryString, $queryString, $params);
         }
         $query = $this->connector->prepareQuery($queryString);
         $this->logger->info('Finding blog posts...');
@@ -116,7 +119,7 @@ class IndexBuilder extends BaseBuilder
             if (!$this->accepts($subject)) {
                 return;
             }
-            [$queryString, $params] = $this->augmentQueryParams($subject, $queryString, $params);
+            [$queryString, $params] = $this->augmentQueryParams($subject, $queryString, $queryString, $params);
         }
         $query = $this->connector->prepareQuery($queryString);
         $query->execute($params);

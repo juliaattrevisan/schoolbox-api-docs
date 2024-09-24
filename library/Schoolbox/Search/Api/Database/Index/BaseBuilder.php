@@ -195,10 +195,11 @@ abstract class BaseBuilder implements IBuilder
      * builder): changes to related objects can re-trigger changes to the search
      * index (e.g. tile layouts for the tile builder).
      *
-     * @param object $subject
+     * @param object    $subject
+     * @param BuildType $buildType
      * @return bool
      */
-    abstract protected function accepts(object $subject): bool;
+    abstract protected function accepts(object $subject, BuildType $buildType): bool;
 
     /**
      * Augment `$baseQuery` and `$baseParams` to find results only for
@@ -208,10 +209,11 @@ abstract class BaseBuilder implements IBuilder
      * a query which handles any type of subject the builder may find results
      * for.
      *
-     * @param object $subject
-     * @param string $baseQuery  The base query onto which to add conditions.
-     * @param array  $baseParams The base params onto which to add parameters.
+     * @param object    $subject
+     * @param BuildType $buildType
+     * @param string    $baseQuery  The base query onto which to add conditions.
+     * @param array     $baseParams The base params onto which to add parameters.
      * @return array{string, array} a tuple of the query and parameters
      */
-    abstract protected function augmentQueryParams(object $subject, string $baseQuery, array $baseParams): array;
+    abstract protected function augmentQueryParams(object $subject, BuildType $buildType, string $baseQuery, array $baseParams): array;
 }

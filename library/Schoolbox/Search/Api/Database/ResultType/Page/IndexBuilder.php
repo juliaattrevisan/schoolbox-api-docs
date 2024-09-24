@@ -12,6 +12,7 @@ namespace Schoolbox\Search\Api\Database\ResultType\Page;
 use Alaress_Date_Format;
 use Schoolbox\Resource\Folder\Model;
 use Schoolbox\Search\Api\Database\Index\BaseBuilder;
+use Schoolbox\Search\Api\Database\Index\BuildType;
 
 /**
  * Index builder for pages/folders.
@@ -25,18 +26,20 @@ class IndexBuilder extends BaseBuilder
      *      implementation, homepage config and user group objects, if they
      *      return the folder ID?
      *
-     * @param object $subject
+     * @param object    $subject
+     * @param BuildType $buildType
      * @return bool
      */
-    protected function accepts(object $subject): bool
+    protected function accepts(object $subject, BuildType $buildType): bool
     {
         return $subject instanceof Model;
     }
 
     /**
+     * @param BuildType $buildType
      * @inheritdoc
      */
-    protected function augmentQueryParams(object $subject, string $baseQuery, array $baseParams): array
+    protected function augmentQueryParams(object $subject, BuildType $buildType, string $baseQuery, array $baseParams): array
     {
         return [
             $baseQuery . ' AND f.id = :id',
@@ -75,7 +78,7 @@ class IndexBuilder extends BaseBuilder
             if (!$this->accepts($subject)) {
                 return;
             }
-            [$queryString, $params] = $this->augmentQueryParams($subject, $queryString, $params);
+            [$queryString, $params] = $this->augmentQueryParams($subject, $queryString, $queryString, $params);
         }
         $query = $this->connector->prepareQuery($queryString);
         $this->logger->info('Finding pages/folders...');
@@ -122,7 +125,7 @@ class IndexBuilder extends BaseBuilder
             if (!$this->accepts($subject)) {
                 return;
             }
-            [$queryString, $params] = $this->augmentQueryParams($subject, $queryString, $params);
+            [$queryString, $params] = $this->augmentQueryParams($subject, $queryString, $queryString, $params);
         }
         $query = $this->connector->prepareQuery($queryString);
         $query->execute($params);

@@ -13,6 +13,7 @@ use Alaress_Date_Format;
 use Component_Config_Componentname;
 use Schoolbox\Resource\Textbox;
 use Schoolbox\Search\Api\Database\Index\BaseBuilder;
+use Schoolbox\Search\Api\Database\Index\BuildType;
 
 /**
  * Index builder for text boxes.
@@ -30,18 +31,20 @@ class IndexBuilder extends BaseBuilder
      * TODO It could also work with component objects, if the component links to
      *      a textbox?
      *
-     * @param object $subject
+     * @param object    $subject
+     * @param BuildType $buildType
      * @return bool
      */
-    protected function accepts(object $subject): bool
+    protected function accepts(object $subject, BuildType $buildType): bool
     {
         return $subject instanceof Textbox\Model;
     }
 
     /**
+     * @param BuildType $buildType
      * @inheritdoc
      */
-    protected function augmentQueryParams(object $subject, string $baseQuery, array $baseParams): array
+    protected function augmentQueryParams(object $subject, BuildType $buildType, string $baseQuery, array $baseParams): array
     {
         return [
             $baseQuery . ' AND tb.textBoxID = :id',
@@ -115,7 +118,7 @@ class IndexBuilder extends BaseBuilder
             if (!$this->accepts($subject)) {
                 return;
             }
-            [$queryString, $params] = $this->augmentQueryParams($subject, $queryString, $params);
+            [$queryString, $params] = $this->augmentQueryParams($subject, $queryString, $queryString, $params);
         }
         $query = $this->connector->prepareQuery($queryString);
         $this->logger->info('Finding text boxes (with components)...');
@@ -169,7 +172,7 @@ class IndexBuilder extends BaseBuilder
         if ($subject) {
             // Don't need to re-check if subject is accepted, as it was checked
             // in an earlier query.
-            [$queryString, $params] = $this->augmentQueryParams($subject, $queryString, $params);
+            [$queryString, $params] = $this->augmentQueryParams($subject, $queryString, $queryString, $params);
         }
         $query = $this->connector->prepareQuery($queryString);
         $this->logger->info('Finding text boxes (without components)...');
