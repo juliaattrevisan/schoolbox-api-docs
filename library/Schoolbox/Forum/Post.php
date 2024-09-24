@@ -254,13 +254,4 @@ class Post implements ISoftDeletable
     {
         return $this->censored;
     }
-
-    /**
-     * Is this object deleted?
-     * @return bool
-     */
-    public function isDeleted(): bool
-    {
-        return ($this->getDeleted() == 'true');
-    }
 }

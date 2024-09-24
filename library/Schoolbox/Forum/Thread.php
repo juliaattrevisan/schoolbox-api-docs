@@ -315,14 +315,6 @@ class Thread implements ISoftDeletable
         return $this->lastPostUser;
     }
 
-    /**
-     * Is this object deleted?
-     * @return bool
-     */
-    public function isDeleted(): bool
-    {
-        return ($this->getDeleted() == 'true');
-    }
 
     /**
      * Is this object locked?
