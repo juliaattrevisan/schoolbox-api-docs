@@ -16,18 +16,18 @@ $kernel = new \Schoolbox\Application\WebRequest\Kernel();
 foreach ($_SESSION[\Schoolbox\Oidc\Server\Controller::SESSION_OIDC_SERVER_CLIENTS] ?? [] as $clientId) {
     // Does this client support logout?
     // If so, craft a logout token and send it
-    $client = Mapper::getInstance()->findByClientId($clientId);
+    $client        = Mapper::getInstance()->findByClientId($clientId);
+    $jwtBuilder    = null;
+    $httpFactory   = null;
+    $logoutFactory = null;
     if ($client?->getBackChannelLogoutUri()) {
+        // Create logout factory on demand only
         /** @var Jwt $jwtBuilder */
-        $jwtBuilder ??= $kernel->get('user.tokenBuilder');
         /** @var Psr17Factory $httpFactory */
-        $httpFactory ??= $kernel->get('httpFactory');
+        $jwtBuilder    ??= $kernel->get('user.tokenBuilder');
+        $httpFactory   ??= $kernel->get('httpFactory');
         $logoutFactory ??= new LogoutFactory($jwtBuilder, $httpFactory);
-        $request = $logoutFactory->build(
-            $_SESSION['user'],
-            $client,
-            Uuid::uuid4()->toString(),
-        );
+        $request       = $logoutFactory->build($_SESSION['user'], $client, Uuid::uuid4()->toString());
 
         /** @var \GuzzleHttp\ClientInterface $httpClient */
         $httpClient = $kernel->get('httpClient');
