@@ -65,6 +65,11 @@ interface External_UserInterface extends External\IConnector
      * @internal string return['StudentTSIFlag']
      * @internal string return['countIndividualEducationPlans']
      *
+     * These are specially crafted due to synergetic:
+     *
+     * @internal string return['AlertMessages'] // Note that we fabricated this node out of nowhere; enforced as an array of strings.
+     * @internal string return['AlertLegal'] // Note that we fabricated this node out of nowhere; enforced as an array of strings.
+     *
      * @importance high - used on student profile page
      */
     public function getStudent(string $externalUserId): array;
