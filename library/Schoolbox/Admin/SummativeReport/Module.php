@@ -22,6 +22,7 @@ use Schoolbox\Assessment\Term\Mapper as TermMapper;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Learning\Assessment\WorkType\Mapper as WorkTypeMapper;
+use Schoolbox\Learning\Course\DataModel\Implementation\Mapper as ImplementationMapper;
 use Schoolbox\Learning\DueWork\StateMapper;
 use Schoolbox\Mapper\Exception\NotFound;
 use Schoolbox\Permission\Access\Access;
@@ -177,7 +178,8 @@ class Module extends BaseModule
                 new \External_Class(),
                 new \External_User(),
                 $this->getMapperFactory()->get(UserMapper::class)
-            )
+            ),
+            $this->getMapperFactory()->get(ImplementationMapper::class)
         );
     }
 

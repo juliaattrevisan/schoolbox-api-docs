@@ -275,6 +275,7 @@
         background: lightgrey;
         border: 1px solid black;
         padding: 0.75rem;
+        margin-bottom: 1rem;
     }
 
     /* Teachers in the Class Summary section have a more space-efficient style
@@ -612,6 +613,24 @@
                     </div>
                 {% endif %}
             </div>
+            {% if subjectOverviews[folder.id] is defined and subjectOverviews[folder.id] is not empty %}
+                <div data-subject-overview-homepage="{{ folder.id }}">
+                    {% for course in subjectOverviews[folder.id] %}
+                        <div data-subject-overview-course="{{ course.title }}">
+                        {% if course.textboxes is not empty %}
+                            {% if subjectOverviews[folder.id] |length > 1 %}
+                                <h2 class="subject-overview-course">{{ course.title }}</h2>
+                            {% endif %}
+                            {% for textbox in course.textboxes %}
+                                <div class="content">
+                                    <article class="course-overview-textbox" id="textBoxBody{{ textbox.textboxID }}">{{ textbox.textboxBody | purify }}</article>
+                                </div>
+                            {% endfor %}
+                        {% endif %}
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
                 {% if allGraphs['class'][folder.id] is defined %}
                     {% include '@learningGrades/fragments/summativeGraph.twig' with { graph: allGraphs['class'][folder.id].graph, graphId: 'class_' ~ folder.id, folderType: allGraphs['class'][folder.id].type, location: 'class' } only %}
                 {% endif %}

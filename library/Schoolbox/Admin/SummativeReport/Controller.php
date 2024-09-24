@@ -21,6 +21,7 @@ use Psr\SimpleCache\CacheInterface;
 use Schoolbox\Admin\Navigation\Subnav;
 use Schoolbox\Admin\Settings\FieldStrategyFactory;
 use Schoolbox\Admin\SummativeReport\Payload\VictorianProgression;
+use Schoolbox\Admin\SummativeReport\Payload\SubjectOverview;
 use Schoolbox\Application\Exception\Exception;
 use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Assessment\Rubric\DataModel\DataSource as RubricDataSource;
@@ -35,6 +36,7 @@ use Schoolbox\Learning\Assessment\DueWork\Feedback\Model as DueWorkFeedback;
 use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\WorkType\Mapper as WorkTypeMapper;
+use Schoolbox\Learning\Course\DataModel\Implementation\Mapper as ImplementationMapper;
 use Schoolbox\Learning\DueWork\StateMapper;
 use Schoolbox\Learning\Grades\AssessmentComparator;
 use Schoolbox\Learning\Grades\Cohort\ClassResults;
@@ -134,6 +136,7 @@ class Controller extends ConfigController
      * @param Rebuilder $rebuilder
      * @param CacheInterface $oidcCache
      * @param \Schoolbox\External\User $externalUser
+     * @param ImplementationMapper $implementationMapper
      */
     public function __construct(
         private \Schoolbox\Error\Mapper $errorMapper,
@@ -155,6 +158,7 @@ class Controller extends ConfigController
         Rebuilder $rebuilder,
         CacheInterface $oidcCache,
         private \Schoolbox\External\User $externalUser,
+        private ImplementationMapper $implementationMapper
     ) {
         parent::__construct($configMapper, $fieldStrategyFactory, $rebuilder, $oidcCache);
     }
@@ -1030,9 +1034,23 @@ class Controller extends ConfigController
             }
         }
 
+        // Subject Overviews
+        /**
+         * only fetch subject overviews if the option is enabled and the search term is not empty
+         */
+        $subjectOverviews = [];
+        if ('1' === ($optionsPayload['class']['subjectOverview'] ?? '0') and '' !== trim((string)$optionsPayload['class']['subjectOverviewSearch'])) {
+            /** @var Collection|Folder\Model[] $folders */
+            $folderIds = $folders->getPropertyValues('id');
+            if (!empty($folderIds)) {
+                $subjectOverviews = (new SubjectOverview\Payload($this->implementationMapper))->generate($folderIds, $optionsPayload['class']['subjectOverviewSearch']);
+            }
+        }
+
         /* Build it
          */
         $data = [
+            'subjectOverviews'           => $subjectOverviews,
             'student'                    => $student,
             'folders'                    => $folders,
             'markbooks'                  => $markbooks,
