@@ -28,7 +28,7 @@
         <div class="small-12 large-6 island">
             <h2 class="subheader">Selected Fields</h2>
 
-            {% if not payload.data.roleTypes.fields.selected %}
+            {% if not payload.data.roleTypes[0].fields.selected %}
                 <div class="empty-state">
                     <i class="icon-student"></i>
                     <p>You haven't chosen any fields yet. Drag some from the available fields over there.</p>
@@ -36,7 +36,7 @@
             {% else %}
                 <section class="content">
                     <ul>
-                        {% for field in payload.data.roleTypes.fields.selected %}
+                        {% for field in payload.data.roleTypes[0].fields.selected %}
                             <li>
                                 {{ field.displayAs }} (<code>{{ field.field }}</code> in the backend)
                                 {% if field.icon %}
@@ -54,7 +54,7 @@
 
             <section class="content">
                 <ul>
-                    {% for field in payload.data.roleTypes.fields.available %}
+                    {% for field in payload.data.roleTypes[0].fields.available %}
                         <li>
                             {{ field.displayAs }} (<code>{{ field.field }}</code> in the backend)
                             {% if field.icon %}
