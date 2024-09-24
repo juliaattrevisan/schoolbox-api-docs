@@ -45,28 +45,22 @@ class Payload
      * @return array
      * @throws DebugBarException
      */
-    public function generate(string $roleType): array
+    public function generateAll(): array
     {
-        /* Load a set of fields for the prescribed roletype
+        /* Ones that we support
          */
-        $fields = $this->fieldMapper->findByColumn('roletype', $roleType, [
-            'order' => [
-                'display_as' => 'asc'
-            ]
-        ]);
+        $availableRoleTypes = [
+            Role::STUDENT,
+            Role::STAFF,
+            Role::PARENT,
+        ];
 
         /* Put it into the frontend payload format
          */
         $payload = [
             'data' => [
                 'fieldSettings' => [],
-                'roleTypes' => [
-                    'roleType' => $roleType,
-                    'fields' => [
-                        'available' => [],
-                        'selected' => []
-                    ]
-                ],
+                'roleTypes' => [],
             ]
         ];
 
@@ -76,6 +70,8 @@ class Payload
          */
         $campuses = $this->campusMapper->findAll();
 
+        /* Find available campuses
+         */
         $fieldSettingsCampus = [
             'key' => self::AVAILABILITY_NODE,
             'displayAs' => self::AVAILABILITY_NAME,
@@ -95,93 +91,115 @@ class Payload
         $fieldSettingsRoleType = [
             'key' => self::VISIBILITY_NODE,
             'displayAs' => self::VISIBILITY_NAME,
-            'options' => [
-                [
-                    'type' => 'roleType',
-                    'id' => Role::STUDENT,
-                    'name' => ucwords(Role::STUDENT),
-                ],
-                [
-                    'type' => 'roleType',
-                    'id' => Role::STAFF,
-                    'name' => ucwords(Role::STAFF),
-                ],
-                [
-                    'type' => 'roleType',
-                    'id' => Role::PARENT,
-                    'name' => ucwords(Role::PARENT),
-                ]
-            ]
+            'options' => []
         ];
+
+        foreach ($availableRoleTypes as $roleType) {
+            $fieldSettingsRoleType['options'][] = [
+                'type' => 'roleType',
+                'id' => $roleType,
+                'name' => ucWords($roleType)
+            ];
+        }
 
         $payload['data']['fieldSettings'] = [
             $fieldSettingsCampus,
             $fieldSettingsRoleType
         ];
 
-        /* Ones that you could possibly choose
+        /* Start processing the roleTypes node
          */
-        foreach ($fields as $field) {
-            $payload['data']['roleTypes']['fields']['available'][] = [
-                'field' => $field->getField(),
-                'displayAs' => $field->getDisplayAs(),
-                'icon' => $field->getIcon(),
-                'css' => $field->getCss()
-            ];
-        }
-
-        /* Sort by sequence for further processing. Frontend needed this in sequential
-         * order, so I guess we can just do that here with a quick reindex
-         */
-        $fields->sortBy('sequence', 'asc');
-
-        /* We only care about the ones that were previously chosen (enabled == 1)
-         */
-        foreach ($fields as $field) {
-            if (!$field->getEnabled()) {
-                continue;
-            }
-
-            /* Find the ids of the campuses for which this field might be available
-             */
-            $availabilityCampusIds = [];
-
-            foreach ($field->getAvailabilityCampus() as $availabilityCampus) {
-                $availabilityCampusIds[] = $availabilityCampus->getCampus()->getId();
-            }
-
-            $availabilityCampus = [
-                'key' => self::AVAILABILITY_NODE,
-                'id' => $availabilityCampusIds
-            ];
-
-            /* Find the roletypes ("ids") for which this field might be visible
-             */
-            $visibilityRoleTypesIds = [];
-
-            foreach ($field->getVisibility() as $visibility) {
-                $visibilityRoleTypesIds[] = $visibility->getRoleType();
-            }
-
-            $visibilityRoleTypes = [
-                'key' => self::VISIBILITY_NODE,
-                'id' => $visibilityRoleTypesIds
-            ];
-
-            /* Pile it into the stack
-             */
-            $payload['data']['roleTypes']['fields']['selected'][] = [
-                'field' => $field->getField(),
-                'displayAs' => $field->getDisplayAs(),
-                'icon' => $field->getIcon(),
-                'css' => $field->getCss(),
-                'fieldSettings' => [
-                    $availabilityCampus,
-                    $visibilityRoleTypes
+        foreach ($availableRoleTypes as $roleType) {
+            $roleTypeSettings = [
+                'roleType' => $roleType,
+                'fields' => [
+                    'available' => [],
+                    'selected' => []
                 ]
             ];
+
+            /* Load a set of fields for the prescribed roletype
+             */
+            $fields = $this->fieldMapper->findByColumn('roletype', $roleType, [
+                'order' => [
+                    'display_as' => 'asc'
+                ]
+            ]);
+
+            /* Ones that you could possibly choose
+             */
+            foreach ($fields as $field) {
+                $roleTypeSettings['fields']['available'][] = [
+                    'field' => $field->getField(),
+                    'displayAs' => $field->getDisplayAs(),
+                    'icon' => $field->getIcon(),
+                    'css' => $field->getCss()
+                ];
+            }
+
+
+            /* Sort by sequence for further processing. Frontend needed this in sequential
+             * order, so I guess we can just do that here with a quick reindex
+             */
+            $fields->sortBy('sequence', 'asc');
+
+            /* We only care about the ones that were previously chosen (enabled == 1)
+             */
+            foreach ($fields as $field) {
+                if (!$field->getEnabled()) {
+                    continue;
+                }
+
+                /* Find the ids of the campuses for which this field might be available
+                 */
+                $availabilityCampusIds = [];
+
+                foreach ($field->getAvailabilityCampus() as $availabilityCampus) {
+                    $availabilityCampusIds[] = $availabilityCampus->getCampus()->getId();
+                }
+
+                $availabilityCampus = [
+                    'key' => self::AVAILABILITY_NODE,
+                    'id' => $availabilityCampusIds
+                ];
+
+                /* Find the roletypes ("ids") for which this field might be visible
+                 */
+                $visibilityRoleTypesIds = [];
+
+                foreach ($field->getVisibility() as $visibility) {
+                    $visibilityRoleTypesIds[] = $visibility->getRoleType();
+                }
+
+                $visibilityRoleTypes = [
+                    'key' => self::VISIBILITY_NODE,
+                    'id' => $visibilityRoleTypesIds
+                ];
+
+                /* Pile it into the stack
+                 */
+                $roleTypeSettings['fields']['selected'][] = [
+                    'field' => $field->getField(),
+                    'displayAs' => $field->getDisplayAs(),
+                    'icon' => $field->getIcon(),
+                    'css' => $field->getCss(),
+                    'fieldSettings' => [
+                        $availabilityCampus,
+                        $visibilityRoleTypes
+                    ]
+                ];
+            }
+
+            /* Pile it in
+             */
+            $payload['data']['roleTypes'][] = $roleTypeSettings;
         }
 
+
+
+
+
+        new \Alaress_Probe($payload);
         return $payload;
     }
 }

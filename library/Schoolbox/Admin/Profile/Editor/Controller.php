@@ -44,7 +44,7 @@ class Controller extends Base
         $payload = (new Payload(
             $this->fieldMapper,
             $this->campusMapper
-        ))->generate($roleType);
+        ))->generateAll();
 
         $this->response = $this->responseFromTemplate('@adminProfileEditor/index.twig', [
             'pageCurrent' => $this->routeGenerator->generate('adminProfileEditor.getIndex'),
