@@ -47,6 +47,43 @@ export const useProfileEditorStore = defineStore("profileEditorStore", () => {
         selectedRoleType.value = roleType;
     }
 
+    /**
+     * Whether a field can be selected or not
+     * @param field - The field to check
+     * @returns true if the field is disabled (and can't be selected), false otherwise
+     */
+    function isFieldDisabled(field: string): boolean {
+        if (selectedRoleType.value === null) return true;
+        if (selectedRoleType.value.fields.selected.some((selectedField) => selectedField.field === field)) {
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * Set the field as selected
+     * @param field - The key of the field to select
+     * @param index - The index to insert the field at (default 0)
+     */
+    function addSelectedField(field: string, index: number = 0): void {
+        if (selectedRoleType.value === null) return;
+        if (isFieldDisabled(field)) return;
+
+        const availableField = selectedRoleType.value.fields.available.find((f) => f.field === field);
+        if (availableField === undefined) throw new Error(`Field ${field} not found`);
+
+        const fieldSettingsKeys = fieldSettings.value.map((setting) => setting.key);
+        const emptyFieldSettings = Object.fromEntries(fieldSettingsKeys.map((key) => [key, []]));
+
+        selectedRoleType.value.fields.selected.splice(index, 0, {
+            field: availableField.field,
+            displayAs: availableField.displayAs,
+            icon: availableField.icon,
+            css: availableField.css,
+            fieldSettings: emptyFieldSettings,
+        });
+    }
+
     return {
         init,
         isLoading,
@@ -54,5 +91,7 @@ export const useProfileEditorStore = defineStore("profileEditorStore", () => {
         fieldSettings,
         selectedRoleType,
         setSelectedRoleType,
+        isFieldDisabled,
+        addSelectedField,
     };
 });

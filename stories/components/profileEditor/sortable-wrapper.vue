@@ -82,6 +82,9 @@ window.Vue.watch(containerRef, (newDraggable) => {
             },
             onUnchoose: (event): void => emit("unchoose", event),
             onStart: (event): void => {
+                // deselect any text that may have been selected
+                window.getSelection()?.removeAllRanges();
+
                 isDragging.value = true;
                 emit("start", event);
             },

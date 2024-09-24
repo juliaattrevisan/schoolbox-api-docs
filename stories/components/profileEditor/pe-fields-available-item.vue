@@ -13,37 +13,16 @@ interface Props {
 const props = defineProps<Props>();
 const peStore = useProfileEditorStore();
 
-const isDisabled = window.Vue.computed(() => {
-    if (peStore.selectedRoleType === null) return true;
-    return peStore.selectedRoleType.fields.selected.some((f) => f.field === props.field.field);
-});
-
-/**
- * Set the field as selected
- */
-function onSelected(): void {
-    if (isDisabled.value) return;
-    if (peStore.selectedRoleType === null) return;
-
-    const fieldSettingsKeys = peStore.fieldSettings.map((setting) => setting.key);
-    const emptyFieldSettings = Object.fromEntries(fieldSettingsKeys.map((key) => [key, []]));
-
-    peStore.selectedRoleType.fields.selected.unshift({
-        field: props.field.field,
-        displayAs: props.field.displayAs,
-        fieldSettings: emptyFieldSettings,
-    });
-}
+const disabled = window.Vue.computed(() => peStore.isFieldDisabled(props.field.field));
 </script>
 
 <template>
     <div
         class="large-2 medium-4 small-6 l-pad-s pe-palette-item"
-        :class="{
-            disabled: isDisabled,
-        }"
-        :title="isDisabled ? 'This field is already selected' : undefined"
-        @click="onSelected"
+        :class="{ disabled }"
+        :title="disabled ? 'This field is already selected' : undefined"
+        :data-pe-field="props.field.field"
+        @click="peStore.addSelectedField(props.field.field)"
     >
         {{ props.field.displayAs }}
     </div>

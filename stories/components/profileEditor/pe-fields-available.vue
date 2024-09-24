@@ -3,10 +3,24 @@
  * A component showing all available fields that can be added to the role type
  */
 
+import type Sortable from "sortablejs";
+import SortableWrapper from "./sortable-wrapper.vue";
 import PeFieldsAvailableItem from "./pe-fields-available-item.vue";
 import { useProfileEditorStore } from "./store/profileEditorStore";
 
 const peStore = useProfileEditorStore();
+
+const sortableOptions = window.Vue.computed<Sortable.Options>(() => ({
+    group: {
+        name: `fields-${peStore.selectedRoleType ? peStore.selectedRoleType.name : "-"}`,
+        pull: "clone",
+        put: false,
+    },
+    forceFallback: true,
+    fallbackClass: "dragged-item",
+    animation: 200,
+    sort: false,
+}));
 </script>
 
 <template>
@@ -21,14 +35,16 @@ const peStore = useProfileEditorStore();
         <div class="pe-fields-palette">
             <div class="small-12">
                 <section class="content">
-                    <!-- grid of all fields as rectangles -->
-                    <div class="l-grid l-grid--12">
-                        <pe-fields-available-item
-                            v-for="availableField in peStore.selectedRoleType.fields.available"
-                            :key="availableField.field"
-                            :field="availableField"
-                        />
-                    </div>
+                    <sortable-wrapper
+                        :list="peStore.selectedRoleType.fields.available"
+                        :item-key="(item) => item.field"
+                        :options="sortableOptions"
+                        class="l-grid l-grid--12"
+                    >
+                        <template #item="item">
+                            <pe-fields-available-item :field="item.element" :dragging="item.isDragging" />
+                        </template>
+                    </sortable-wrapper>
                 </section>
             </div>
         </div>

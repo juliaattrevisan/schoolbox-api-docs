@@ -12,8 +12,11 @@ import SortableWrapper from "./sortable-wrapper.vue";
 const peStore = useProfileEditorStore();
 
 const sortableOptions = window.Vue.computed(() => ({
-    group: `fields-${peStore.selectedRoleType ? peStore.selectedRoleType.name : "-"}`,
-    itemKey: "sequence",
+    group: {
+        name: `fields-${peStore.selectedRoleType ? peStore.selectedRoleType.name : "-"}`,
+        pull: false,
+        put: true,
+    },
     forceFallback: true,
     fallbackClass: "dragged-item",
     animation: 200,
@@ -34,6 +37,15 @@ function resequenceFields(event: Sortable.SortableEvent): void {
     newFields.splice(event.newIndex, 0, movedField);
     peStore.selectedRoleType.fields.selected = newFields;
 }
+
+/**
+ * When a field is added from the available fields
+ * @param event The event that triggered the add
+ */
+function onAddField(event: Sortable.SortableEvent): void {
+    peStore.addSelectedField(event.item.getAttribute("data-pe-field"), event.newIndex);
+    event.item.remove();
+}
 </script>
 
 <template>
@@ -43,6 +55,7 @@ function resequenceFields(event: Sortable.SortableEvent): void {
             :item-key="(item) => item.field"
             :options="sortableOptions"
             @end="resequenceFields"
+            @add="onAddField"
         >
             <template #item="item">
                 <Transition :key="peStore.selectedRoleType" @enter="slideDownOnEnter" @leave="slideUpOnLeave">

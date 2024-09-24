@@ -7,9 +7,11 @@ import { animateRotation } from "@js/util/animateUtils";
 import PeFieldsSelectedItemEdit from "./pe-fields-selected-item-edit.vue";
 import PeFieldsSelectedItemRemove from "./pe-fields-selected-item-remove.vue";
 import type { ProfileSelectedField } from "./types/profileTypes";
+import type { ProfileEditorAvailableField } from "./types/profileEditorTypes";
 
 interface Props {
-    field: ProfileSelectedField;
+    field: ProfileSelectedField | ProfileEditorAvailableField;
+    dragging: boolean;
 }
 
 const props = defineProps<Props>();
@@ -60,7 +62,7 @@ window.Vue.watch(isRemovePanelOpen, (isOpen) => {
 </script>
 
 <template>
-    <div class="component l-mar-m--bottom">
+    <div class="component l-mar-m--bottom" :data-sortable-item="props.field.field">
         <div class="row collapse">
             <div class="small-12 columns">
                 <div class="component-titlebar">
@@ -70,6 +72,7 @@ window.Vue.watch(isRemovePanelOpen, (isOpen) => {
                                 <a
                                     href="#"
                                     class="icon-grip"
+                                    data-pe-field-drag-handle
                                     style="user-select: none; touch-action: none; cursor: grab"
                                 />
                                 {{ props.field.displayAs }}
@@ -94,16 +97,18 @@ window.Vue.watch(isRemovePanelOpen, (isOpen) => {
                     </div>
                 </div>
 
-                <pe-fields-selected-item-edit
-                    :field="props.field"
-                    :is-open="isEditPanelOpen && !$props.dragging"
-                    @close="isEditPanelOpen = false"
-                />
-                <pe-fields-selected-item-remove
-                    :field="props.field"
-                    :is-open="isRemovePanelOpen && !$props.dragging"
-                    @close="isRemovePanelOpen = false"
-                />
+                <div v-if="'fieldSettings' in props.field" class="component-panel">
+                    <pe-fields-selected-item-edit
+                        :field="props.field"
+                        :is-open="isEditPanelOpen && !$props.dragging"
+                        @close="isEditPanelOpen = false"
+                    />
+                    <pe-fields-selected-item-remove
+                        :field="props.field"
+                        :is-open="isRemovePanelOpen && !$props.dragging"
+                        @close="isRemovePanelOpen = false"
+                    />
+                </div>
             </div>
         </div>
     </div>
@@ -113,5 +118,13 @@ window.Vue.watch(isRemovePanelOpen, (isOpen) => {
 /* To remove the hover background since they rotate */
 nav > a[class^="icon-"]:hover {
     background-color: transparent;
+}
+
+/*
+ * Hide any component panel when this is the item held by the mouse.
+ * This must be a style since the element handling the drag will not react to changes here
+ */
+.dragged-item .component-panel {
+    display: none;
 }
 </style>
