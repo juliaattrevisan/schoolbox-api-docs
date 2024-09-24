@@ -618,7 +618,7 @@
                     {% for course in subjectOverviews[folder.id] %}
                         <div data-subject-overview-course="{{ course.title }}">
                         {% if course.textboxes is not empty %}
-                            {% if course | length > 1 %}
+                            {% if subjectOverviews[folder.id] |length > 1 %}
                                 <h2 class="subject-overview-course">{{ course.title }}</h2>
                             {% endif %}
                             {% for textbox in course.textboxes %}
