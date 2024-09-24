@@ -116,7 +116,7 @@ class IndexBuilder extends BaseBuilder
             fp.postID as id
             FROM forumThread ft
             LEFT JOIN forumPost fp ON fp.threadID = ft.threadID
-            WHERE TRUE
+            WHERE COALESCE(fp.deleted_at, ft.deleted_at) IS NOT NULL
         ";
         $params = [];
         if ($fromDate) {
