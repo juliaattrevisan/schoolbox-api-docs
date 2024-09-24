@@ -12,6 +12,7 @@ namespace Schoolbox\TaskDaemon\Request\DownloadPages;
 use Schoolbox\API\Token\Jwt;
 use Schoolbox\Instance;
 use Schoolbox\TaskDaemon\Request\BaseMessageFactory;
+use Schoolbox\User\Token\Mapper as TokenMapper;
 
 /**
  * Factory for building download pages taskd requests.
@@ -61,6 +62,7 @@ class MessageFactory extends BaseMessageFactory
      * @param string|null $kamiApiKey                The API key used to authenticate with Kami.
      * @param string|null $turnitinApiKey            The API key used to authenticate with Turnitin.
      * @param string|null $turnitinApiHost           The host name of this instance's Turnitin instance.
+     * @param TokenMapper $tokenMapper               Used to generate a token for the effector
      */
     public function __construct(
         Instance $instance,
@@ -74,8 +76,9 @@ class MessageFactory extends BaseMessageFactory
         private ?string $kamiApiKey,
         private ?string $turnitinApiKey,
         private ?string $turnitinApiHost,
+        TokenMapper $tokenMapper
     ) {
-        parent::__construct($instance, $tokenBuilder);
+        parent::__construct($instance, $tokenBuilder, $tokenMapper);
     }
 
     /**
