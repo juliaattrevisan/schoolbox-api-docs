@@ -5,46 +5,34 @@
 use Http\Discovery\Psr17Factory;
 use Ramsey\Uuid\Uuid;
 use Schoolbox\API\Token\Jwt;
-use Schoolbox\API\Token\JwtParser\IParser;
 use Schoolbox\Auth\Remember;
 use Schoolbox\Oidc\Server\RelyingParty\Mapper;
+use Schoolbox\Oidc\Server\Request\LogoutFactory;
 
 require_once __DIR__ . '/../conf/core/require.php';
 $kernel = new \Schoolbox\Application\WebRequest\Kernel();
 
 // Begin back-channel logout requests
-/** @var Jwt $jwtBuilder */
-$jwtBuilder = $kernel->get('user.tokenBuilder');
 foreach ($_SESSION[\Schoolbox\Oidc\Server\Controller::SESSION_OIDC_SERVER_CLIENTS] ?? [] as $clientId) {
     // Does this client support logout?
     // If so, craft a logout token and send it
     $client = Mapper::getInstance()->findByClientId($clientId);
     if ($client?->getBackChannelLogoutUri()) {
-        $jwt = $jwtBuilder->generate(
-            $_SESSION['user'],
-            Alaress_Date_Format::now()->addMinutes(5),
-            Uuid::uuid4()->toString(),
-            [
-                IParser::CLAIM_AUD => $clientId,
-                IParser::CLAIM_ISS => Alaress_Date_Format::now()->getUnixTimeStamp(),
-                'events'           => ['http://schemas.openid.net/event/backchannel-logout' => []],
-            ]
-        );
-
-        // Consider sending other claim values which may have been in the ID
-        // token? RPs might have used these claims to identify a user.
-
-        // And send it
+        /** @var Jwt $jwtBuilder */
+        $jwtBuilder ??= $kernel->get('user.tokenBuilder');
         /** @var Psr17Factory $httpFactory */
-        $httpFactory = $kernel->get('httpFactory');
-        $request     = $httpFactory
-            ->createRequest('POST', $client->getBackChannelLogoutUri())
-            ->withBody($httpFactory->createStream(http_build_query(['logout_token' => $jwt])));
+        $httpFactory ??= $kernel->get('httpFactory');
+        $logoutFactory ??= new LogoutFactory($jwtBuilder, $httpFactory);
+        $request = $logoutFactory->build(
+            $_SESSION['user'],
+            $client,
+            Uuid::uuid4()->toString(),
+        );
 
         /** @var \GuzzleHttp\ClientInterface $httpClient */
         $httpClient = $kernel->get('httpClient');
 
-        // Consider retry?
+        // Consider retry if this fails?
         $httpClient->sendAsync($request);
     }
 }
