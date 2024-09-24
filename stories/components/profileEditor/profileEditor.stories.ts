@@ -2,9 +2,9 @@
 
 import type { Meta, StoryObj } from "@storybook/vue3";
 import { http, HttpResponse } from "msw";
-import ProfileEditor from "./profile-editor.vue";
-import { mockData } from "./peMockData";
-import type { ProfileEditorEndpoints } from "./types/profileEditorTypes";
+import ProfileEditor from "@schoolboxLibrary/Admin/Profile/Editor/vue/profile-editor.vue";
+import { mockData } from "@schoolboxLibrary/Admin/Profile/Editor/vue/peMockData";
+import type { ProfileEditorEndpoints } from "@schoolboxLibrary/Admin/Profile/Editor/vue/types/profileEditorTypes";
 
 /**
  * Mock Service Worker handlers to load dummy data for testing

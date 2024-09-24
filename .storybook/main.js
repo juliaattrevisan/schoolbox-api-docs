@@ -34,6 +34,7 @@ module.exports = {
         });
         config.resolve.alias["@js"] = path.resolve(__dirname, "../www/static/js");
         config.resolve.alias["@schoolboxVue"] = path.resolve(__dirname, "../vue");
+        config.resolve.alias["@schoolboxLibrary"] = path.resolve(__dirname, "../library/Schoolbox");
         config.resolve.alias["@schoolboxCurriculum"] = path.resolve(
             __dirname,
             "../library/Schoolbox/Curriculum/templates/",
