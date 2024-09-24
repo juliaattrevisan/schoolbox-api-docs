@@ -37,47 +37,47 @@ class Payload
         //    (see library/Schoolbox/Resource/Textbox/Component/Homepage/Controller.php)
         //    So that is the heading we must use for the search index.
             "SELECT
-    COALESCE(
-            IF(cci_componentname.value = '', NULL, cci_componentname.value),
-            IF(tb.heading = '', NULL, tb.heading),
-            :homepageDefaultComponentHeading
-    ) AS componentHeading,
-    cci_textbox.component_instance_id AS componentID,
-    tb.textBoxID AS textboxID,
-    tb.body AS textboxBody ,
-    tb.updated_at AS updated_at
-FROM component_definition cd
-         JOIN component_instance ci ON (ci.component_definition_id = cd.id AND ci.module = 'homepage')
-         JOIN folder f ON f.id = ci.identifier
-         JOIN component_config_definition ccd_textbox ON (
-    ccd_textbox.component_definition_id = cd.id AND
-    ccd_textbox.key = :homepageComponentKey
-    )
-         LEFT JOIN component_config_instance cci_textbox ON (
-    cci_textbox.component_config_definition_id = ccd_textbox.id AND
-    cci_textbox.component_instance_id = ci.id
-    )
-         LEFT JOIN textBox tb ON (
-    CAST(tb.textBoxID AS NCHAR)=cci_textbox.value AND
-    tb.deleted_at IS NULL
-    )
-         JOIN component_config_definition ccd_componentname ON (
-    ccd_componentname.component_definition_id = cd.id AND
-    ccd_componentname.key = :componentConfigComponentNameKey
-    )
-         LEFT JOIN component_config_instance cci_componentname ON (
-    cci_componentname.component_config_definition_id = ccd_componentname.id AND
-    cci_componentname.component_instance_id = ci.id
-    )
-WHERE cd.`class` = 'Schoolbox\\\Resource\\\Textbox\\\Component\\\Homepage\\\Controller'
-  AND f.deleted_at IS NULL
-  AND f.id = :folderId
-and COALESCE(
-        IF(cci_componentname.value = '', NULL, cci_componentname.value),
-        IF(tb.heading = '', NULL, tb.heading),
-        :homepageDefaultComponentHeading2
-    )  = :componentHeading
-ORDER BY tb.updated_at ASC"
+                        COALESCE(
+                                IF(cci_componentname.value = '', NULL, cci_componentname.value),
+                                IF(tb.heading = '', NULL, tb.heading),
+                                :homepageDefaultComponentHeading
+                        ) AS componentHeading,
+                        cci_textbox.component_instance_id AS componentID,
+                        tb.textBoxID AS textboxID,
+                        tb.body AS textboxBody ,
+                        tb.updated_at AS updated_at
+                    FROM component_definition cd
+                         JOIN component_instance ci ON (ci.component_definition_id = cd.id AND ci.module = 'homepage')
+                         JOIN folder f ON f.id = ci.identifier
+                         JOIN component_config_definition ccd_textbox ON (
+                                ccd_textbox.component_definition_id = cd.id AND
+                                ccd_textbox.key = :homepageComponentKey
+                            )
+                         LEFT JOIN component_config_instance cci_textbox ON (
+                                cci_textbox.component_config_definition_id = ccd_textbox.id AND
+                                cci_textbox.component_instance_id = ci.id
+                            )
+                         LEFT JOIN textBox tb ON (
+                                CAST(tb.textBoxID AS NCHAR)=cci_textbox.value AND
+                                tb.deleted_at IS NULL
+                            )
+                         JOIN component_config_definition ccd_componentname ON (
+                                ccd_componentname.component_definition_id = cd.id AND
+                                ccd_componentname.key = :componentConfigComponentNameKey
+                            )
+                         LEFT JOIN component_config_instance cci_componentname ON (
+                                cci_componentname.component_config_definition_id = ccd_componentname.id AND
+                                cci_componentname.component_instance_id = ci.id
+                            )
+                    WHERE cd.`class` = 'Schoolbox\\\Resource\\\Textbox\\\Component\\\Homepage\\\Controller'
+                        AND f.deleted_at IS NULL
+                        AND f.id = :folderId
+                        AND COALESCE(
+                            IF(cci_componentname.value = '', NULL, cci_componentname.value),
+                            IF(tb.heading = '', NULL, tb.heading),
+                            :homepageDefaultComponentHeading2
+                        )  = :componentHeading
+                    ORDER BY tb.updated_at ASC"
         );
     }
 
@@ -96,16 +96,17 @@ ORDER BY tb.updated_at ASC"
         $predicateBuilder = $this->implementationMapper->getPredicateBuilder();
         $folderIdsPredicate = $predicateBuilder->in('folder_id', $folderId);
 
-        $courseQuery = $this->implementationMapper->getDatabase()->prepareQuery("select
-    course_specification.folder_id as specFolderId,
-    folder.name as specFolderName,
-    course_implementation.folder_id as implFolderId
-                    from course_specification
-                        join course_implementation on course_specification.id = course_implementation.course_specification_id
-                        join folder on course_specification.folder_id = folder.id
-                    where 
-                        course_implementation.deleted_at is null AND " .
-                        $folderIdsPredicate->getWhereIntersect()); // finding all courses that have been imported onto the specified class pages.
+        $courseQuery = $this->implementationMapper->getDatabase()->prepareQuery("
+            SELECT
+                course_specification.folder_id AS specFolderId,
+                folder.name AS specFolderName,
+                course_implementation.folder_id AS implFolderId
+            FROM course_specification
+                JOIN course_implementation ON course_specification.id = course_implementation.course_specification_id
+                JOIN folder ON course_specification.folder_id = folder.id
+            WHERE
+                course_implementation.deleted_at IS NULL AND " .
+                $folderIdsPredicate->getWhereIntersect()); // finding all courses that have been imported onto the specified class pages.
         $courseQuery->execute($folderIdsPredicate->getParams());
         while ($row = $courseQuery->fetch()) {
             // cache the course folderID
