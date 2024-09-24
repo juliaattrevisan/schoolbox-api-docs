@@ -334,17 +334,17 @@ class IndexBuilder extends BaseBuilder
                         $removeIndex = true;
                     }
                 } else {
+                    // This index does have a component:
+                    // remove it if it is not associated with that component
                     if (!in_array($componentId, $componentExistsCache[$textboxId])) {
-                        if (!$componentExistsCache[$textboxId]) {
-                            $this->logger->debug(
-                                sprintf(
-                                    'Textbox %d is no longer associated with component %d: removing index',
-                                    $textboxId,
-                                    $componentId,
-                                ),
-                            );
-                            $removeIndex = true;
-                        }
+                        $this->logger->debug(
+                            sprintf(
+                                'Textbox %d is no longer associated with component %d: removing index',
+                                $textboxId,
+                                $componentId,
+                            ),
+                        );
+                        $removeIndex = true;
                     }
                 }
             }
