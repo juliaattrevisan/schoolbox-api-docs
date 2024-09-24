@@ -411,6 +411,11 @@ class External_Doublefirst_User implements External_UserInterface
             }
         }
 
+        /* Forcibly obey External_UserInterface
+         */
+        $student['AlertMessage'] = [$student['AlertMessage']];
+        $student['AlertLegal'] = [];
+
         return $student;
     }
 
