@@ -131,6 +131,13 @@ class External_Schoolbox_User implements External_UserInterface
             ['externalUserId' => $externalUserId]
         )->fetch();
 
+        /* Couldn't find this record via the $externalUserId
+         * Exit early
+         */
+        if (!$student) {
+            return [];
+        }
+
         /* Forcibly obey External_UserInterface
          */
         $student['AlertMessage'] = [$student['AlertMessage']];
@@ -139,7 +146,7 @@ class External_Schoolbox_User implements External_UserInterface
          * If that CourtOrderType node was meaningful, then it's a Legal Alert and gets special treatment.
          * Otherwise it's a generic alert.
          */
-        $courtOrderType = trim((string)($row['CourtOrderType'] ?? null));
+        $courtOrderType = trim((string)($student['CourtOrderType'] ?? null));
 
         if ('' !== $courtOrderType) {
             /* A specially-crafted AlertLegal message about legal matters.
@@ -153,7 +160,7 @@ class External_Schoolbox_User implements External_UserInterface
             $student['AlertLegal'] = [];
         }
 
-        return $student ?: [];
+        return $student;
     }
 
 
