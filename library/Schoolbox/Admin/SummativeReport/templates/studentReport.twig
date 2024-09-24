@@ -617,14 +617,14 @@
                 <div>
                     {% for course in subjectOverviews[folder.id] %}
                         {% if course.textboxes is not empty %}
-                        {% for textbox in course.textboxes %}
-                            <div class="content">
-                                {% if course.textboxes | length > 1 %}
-                                    <h2 class="subject-overview-course">{{ course.title }}</h2>
-                                {% endif %}
-                                <article class="course-overview-textbox" id="textBoxBody{{ textbox.textboxID }}">{{ textbox.textboxBody | purify }}</article>
-                            </div>
-                        {% endfor %}
+                            {% if course | length > 1 %}
+                                <h2 class="subject-overview-course">{{ course.title }}</h2>
+                            {% endif %}
+                            {% for textbox in course.textboxes %}
+                                <div class="content">
+                                    <article class="course-overview-textbox" id="textBoxBody{{ textbox.textboxID }}">{{ textbox.textboxBody | purify }}</article>
+                                </div>
+                            {% endfor %}
                         {% endif %}
                     {% endfor %}
                 </div>
