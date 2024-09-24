@@ -20,6 +20,12 @@ use Schoolbox\User;
  */
 class External_Schoolbox_User implements External_UserInterface
 {
+    /**
+     * A hardcoded prefix used before all AlertLegal messages.
+     */
+    private const COURT_ORDER_PREFIX = 'Court Order';
+
+
     /** @var IConnector $internalDatabase */
     private $internalDatabase;
 
@@ -124,6 +130,28 @@ class External_Schoolbox_User implements External_UserInterface
             ",
             ['externalUserId' => $externalUserId]
         )->fetch();
+
+        /* Forcibly obey External_UserInterface
+         */
+        $student['AlertMessage'] = [$student['AlertMessage']];
+
+        /* Legal Alerts are distinguished by their CourtOrderType node.
+         * If that CourtOrderType node was meaningful, then it's a Legal Alert and gets special treatment.
+         * Otherwise it's a generic alert.
+         */
+        $courtOrderType = trim((string)($row['CourtOrderType'] ?? null));
+
+        if ('' !== $courtOrderType) {
+            /* A specially-crafted AlertLegal message about legal matters.
+             */
+            $student['AlertLegal'] = [sprintf(
+                '%s - %s',
+                self::COURT_ORDER_PREFIX,
+                $courtOrderType
+            )];
+        } else {
+            $student['AlertLegal'] = [];
+        }
 
         return $student ?: [];
     }
