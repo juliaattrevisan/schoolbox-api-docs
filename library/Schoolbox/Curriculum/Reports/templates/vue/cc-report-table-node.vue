@@ -49,7 +49,7 @@ function getUnitUsageCount($course: Course, $unit: Unit): number {
  * @param $course - the course to get the usage count for
  * @returns the total node usage count for all selected course(s)
  */
-function getCourseUsageCount($course: Course): number {
+function getTotalUsageCount($course: Course): number {
     if (props.node.usage === undefined) return 0;
     const course = props.node.usage.courses.find((c) => c.id === $course.id);
     if (course === undefined || course.units === undefined) return 0;
@@ -66,7 +66,7 @@ function getCourseUsageCount($course: Course): number {
 const nodeUsageCount = window.Vue.computed(() => {
     if (props.node.usage === undefined) return 0;
     return props.node.usage.courses.reduce((acc, course) => {
-        return acc + getCourseUsageCount(course);
+        return acc + getTotalUsageCount(course);
     }, 0);
 });
 
@@ -114,8 +114,8 @@ const showNode = window.Vue.computed(() => {
             >
                 {{ getUnitUsageCount(course, unit) }}
             </td>
-            <td :class="`${index % 2 ? 'u-alt-bkg' : ''} ${getCourseUsageCount(course) === 0 ? 'u-highlight' : ''}`">
-                {{ getCourseUsageCount(course) }}
+            <td :class="`${index % 2 ? 'u-alt-bkg' : ''} ${getTotalUsageCount(course) === 0 ? 'u-highlight' : ''}`">
+                {{ getTotalUsageCount(course) }}
             </td>
         </template>
     </tr>

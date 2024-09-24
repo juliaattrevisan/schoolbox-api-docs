@@ -28,6 +28,14 @@ export type UnitWithCurriculumNodeUsage = Pick<Unit, "id" | "name"> & {
  */
 export type CourseWithCurriculumNodeUsage = Pick<Course, "id" | "name"> & {
     units: UnitWithCurriculumNodeUsage[];
+    usage?: {
+        course?: {
+            count: number;
+        };
+        rubric?: {
+            count: number;
+        };
+    };
 };
 
 /**

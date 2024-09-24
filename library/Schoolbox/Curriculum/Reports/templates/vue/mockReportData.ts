@@ -52,6 +52,10 @@ export const mockReportData = {
                         {
                             id: 5,
                             name: "Year 9 English",
+                            usage: {
+                                course: { count: 1 },
+                                rubric: { count: 2 },
+                            },
                             units: [
                                 {
                                     id: 108,
