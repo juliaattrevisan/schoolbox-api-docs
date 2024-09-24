@@ -11,7 +11,7 @@
 # @link        https://schoolbox.com.au/
 #
 # m h dom mon dow user command
-MAILTO="support@schoolbox.com.au"
+MAILTO="ist+cron@schoolbox.com.au"
 
 # Cleanup etherpad session storage (once a week on a Sunday)
 10 2 * * 0 www-data php /usr/share/schoolbox/tools/redis/removeEtherpadSession.php -p >> /var/log/schoolbox/purge-old-sessions.log 2>&1

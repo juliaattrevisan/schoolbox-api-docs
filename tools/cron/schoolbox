@@ -14,7 +14,7 @@
 # @link        https://schoolbox.com.au/
 #
 # m h dom mon dow user command
-MAILTO="support@schoolbox.com.au"
+MAILTO="ist+cron@schoolbox.com.au"
 
 # Image Processing - Every 5 minutes. Standard transforms + timed-out web request transforms
 */5 * * * *	www-data    /usr/share/schoolbox/tools/image/processor.php -vvv >> /var/log/schoolbox/image-processor.log 2>&1
