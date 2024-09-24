@@ -548,13 +548,4 @@ class UserAccessMapper extends Mapper
         }
         return $userCollection;
     }
-
-    /**
-     * @inheritdoc
-     */
-    public function raiseNotification($object, $verb, $previous = null): bool
-    {
-        // group join / leave, should still spawn notifications
-        return parent::raiseNotification($object, $verb, $previous);
-    }
 }
