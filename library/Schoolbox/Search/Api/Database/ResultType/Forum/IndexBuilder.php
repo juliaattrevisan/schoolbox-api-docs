@@ -11,6 +11,7 @@ namespace Schoolbox\Search\Api\Database\ResultType\Forum;
 
 use Alaress_Date_Format;
 use Schoolbox\Forum\Post;
+use Schoolbox\Forum\Thread;
 use Schoolbox\Search\Api\Database\Index\BaseBuilder;
 use Schoolbox\Search\Api\Database\Index\BuildType;
 
@@ -20,9 +21,7 @@ use Schoolbox\Search\Api\Database\Index\BuildType;
 class IndexBuilder extends BaseBuilder
 {
     /**
-     * This builder works with forum post objects.
-     *
-     * TODO deletes should work on thread as well?
+     * This builder works with forum post objects, and threads on deletion.
      *
      * @param object    $subject
      * @param BuildType $buildType
@@ -30,19 +29,30 @@ class IndexBuilder extends BaseBuilder
      */
     protected function accepts(object $subject, BuildType $buildType): bool
     {
-        return $subject instanceof Post;
+        return match ($buildType) {
+            BuildType::DELETE => $subject instanceof Post || $subject instanceof Thread,
+            default           => $subject instanceof Post,
+        };
     }
 
     /**
-     * @param BuildType $buildType
      * @inheritdoc
      */
     protected function augmentQueryParams(object $subject, BuildType $buildType, string $baseQuery, array $baseParams): array
     {
-        return [
-            $baseQuery . ' AND fp.postID = :id',
-            $baseParams + ['id' => $subject->getId()],
-        ];
+        if ($subject instanceof Post) {
+            return [
+                $baseQuery . ' AND fp.postID = :id',
+                $baseParams + ['id' => $subject->getId()],
+            ];
+        }
+        if ($subject instanceof Thread) {
+            return [
+                $baseQuery . ' AND ft.threadID = :id',
+                $baseParams + ['id' => $subject->getId()],
+            ];
+        }
+        return [$baseQuery, $baseParams];
     }
 
     /**
