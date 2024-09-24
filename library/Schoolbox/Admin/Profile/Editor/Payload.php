@@ -195,11 +195,6 @@ class Payload
             $payload['data']['roleTypes'][] = $roleTypeSettings;
         }
 
-
-
-
-
-        new \Alaress_Probe($payload);
         return $payload;
     }
 }
