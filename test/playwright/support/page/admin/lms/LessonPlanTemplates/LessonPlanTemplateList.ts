@@ -77,6 +77,7 @@ export default class LessonPlanTemplateList {
      * @param templateIdNumber - the id of the template
      */
     async clickCloseModal(templateIdNumber: number): Promise<void> {
+        await this.page.waitForTimeout(1000);
         await this.page.getByTestId(`lpt-preview-${templateIdNumber}-template-list-modal-close`).click();
     }
 }

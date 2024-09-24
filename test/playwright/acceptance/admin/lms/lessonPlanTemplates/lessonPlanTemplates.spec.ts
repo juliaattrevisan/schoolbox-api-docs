@@ -92,7 +92,7 @@ test.describe("Lesson Plan Templates", () => {
         await expect(page.locator(`#lpt-preview-${templateId}`)).toContainText("Automation Body 1 Updated");
         await expect(page.locator(`#lpt-preview-${templateId}`)).toContainText("Automation Field 2");
         await expect(page.locator(`#lpt-preview-${templateId}`)).toContainText("Automation Body 2");
-        await page.reload();
+        await templateList.clickCloseModal(templateId);
         tester.isGoingTo("Modify a lesson plan template, delete a field, save it");
         await templateList.clickModifyLessonPlanTemplateButton(templateId);
         await templates.clickDeleteButton();
@@ -104,7 +104,7 @@ test.describe("Lesson Plan Templates", () => {
         await expect(page.locator(`#lpt-preview-${templateId}`)).not.toContainText("Automation Body 1 Updated");
         await expect(page.locator(`#lpt-preview-${templateId}`)).toContainText("Automation Field 2");
         await expect(page.locator(`#lpt-preview-${templateId}`)).toContainText("Automation Body 2");
-        await page.reload();
+        await templateList.clickCloseModal(templateId);
         await expect(page.locator(`#lpt-preview-${templateId}`)).not.toContainText(
             "This field is not visible to students",
         );
