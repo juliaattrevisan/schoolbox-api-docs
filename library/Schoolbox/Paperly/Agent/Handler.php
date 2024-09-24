@@ -44,21 +44,21 @@ class Handler
             case 'allYearLevels':
                 return $this->handleAllYearLevelsRequest($data);
             case 'allClasses':
-                return $this->handleAllClassesRequest($data);
+                return $this->handleAllClassesRequest($data, 'uvPaperlyAllClasses');
             case 'allStaffs':
-                return $this->handleAllStaffsRequest($data);
+                return $this->handleAllStaffsRequest($data, 'uvPaperlyAllStaff');
             case 'allStudents':
-                return $this->handleAllStudentsRequest($data);
+                return $this->handleAllStudentsRequest($data, 'uvPaperlyAllStudents');
             case 'getStudentsAvatar':
-                return $this->handleGetStudentsAvatarRequest($data);
+                return $this->handleGetStudentsAvatarRequest($data, 'uvPaperlyPhotos');
             case 'getStudentsMedical':
-                return $this->handleGetStudentsMedicalRequest($data);
+                return $this->handleGetStudentsMedicalRequest($data, 'uvPaperlyMedicalConditions');
             case 'getStudentsFromParent':
-                return $this->handleGetStudentsFromParentRequest($data);
+                return $this->handleGetStudentsFromParentRequest($data, 'uvPaperlyAllStudents');
 //            case 'getParent':
 //                return $this->handleGetParentRequest($data);
             case 'allParents':
-                return $this->handleAllParentsRequest($data);
+                return $this->handleAllParentsRequest($data, 'uvPaperlyParentDetails');
             case 'allMedicalConditionTypes':
                 return $this->handleAllMedicalConditionTypesRequest();
             case 'allMedicalConditionSeverityTypes':
@@ -99,8 +99,8 @@ class Handler
         ];
 
         $stmt = $this->externalDb->executeQuery($sql, $params);
-//        return $stmt->fetchColumn() !== false;
-        return count($stmt) > 0;
+        return $stmt->fetchColumn() !== false;
+//        return count($stmt) > 0;
     }
 
     /**
@@ -145,25 +145,16 @@ class Handler
     {
         $yearLevelArr = [];
         $params       = [];
-        $sql          = "SELECT * FROM {$selectedView}";
-//        $sql          = "SELECT DISTINCT sc.ClassCode, sc.Description, scs.StaffID, CONCAT(c.Preferred, ' ', c.Surname) AS TeacherName, c.OccupEmail
-//        FROM SubjectClasses sc
-//        LEFT JOIN FileSemesters fs ON fs.fileyear = sc.FileYear AND fs.filesemester = sc.filesemester
-//        LEFT JOIN SubjectClassStaff scs ON scs.ClassCode = sc.ClassCode AND scs.FileYear = sc.FileYear AND scs.FileSemester = sc.FileSemester
-//        LEFT JOIN community c ON c.id = scs.StaffID
-//        WHERE fs.systemcurrentflag = 1
-//            AND sc.classcode <> ''
-//            AND sc.FileType = 'a'
-//            AND scs.staffid IS NOT NULL";
+        $sql          = "SELECT * FROM {$selectedView} WHERE 1=1";
 
         if (isset($data['code'])) {
             $codes        = is_array($data['code']) ? $data['code'] : explode(',', $data['code']);
             $placeholders = implode(',', array_fill(0, count($codes), '?'));
-            $sql          .= " AND sc.classcode IN ($placeholders)";
+            $sql          .= " AND classcode IN ($placeholders)";
             $params       = array_merge($params, $codes);
         }
 
-        $sql .= " ORDER BY sc.ClassCode";
+        $sql .= " ORDER BY ClassCode";
 
         $stmt = $this->externalDb->executeQuery($sql, $params);
         foreach ($stmt as $row) {
@@ -209,13 +200,13 @@ class Handler
         if (isset($data['id'])) {
             $ids          = is_array($data['id']) ? $data['id'] : explode(',', $data['id']);
             $placeholders = implode(',', array_fill(0, count($ids), '?'));
-            $sql          .= " AND c.StaffID IN ($placeholders)";
+            $sql          .= " AND StaffID IN ($placeholders)";
             $params       = array_merge($params, $ids);
             $sqlWhereSet  = true;
         }
 
         if (isset($data['email'])) {
-            $sql         .= " AND c.StaffOccupEmail = ?";
+            $sql         .= " AND StaffOccupEmail = ?";
             $params[]    = $data['email'];
             $sqlWhereSet = true;
         }
@@ -236,7 +227,7 @@ class Handler
 //        if (!$sqlWhereSet) {
 //            $sql .= $sqlWhere;
 //        }
-        $sql .= " ORDER BY c.StaffSurname";
+        $sql .= " ORDER BY StaffSurname";
 
         $stmt = $this->externalDb->executeQuery($sql, $params);
         foreach ($stmt as $row) {
@@ -306,19 +297,19 @@ class Handler
         if (isset($data['id'])) {
             $ids          = is_array($data['id']) ? $data['id'] : explode(',', $data['id']);
             $placeholders = implode(',', array_fill(0, count($ids), '?'));
-            $sql          .= " AND S.StudentID IN ($placeholders)";
+            $sql          .= " AND StudentID IN ($placeholders)";
             $params       = array_merge($params, $ids);
         }
 
         if (isset($data['email'])) {
-            $sql      .= " AND S.StudentEmail = ?";
+            $sql      .= " AND StudentEmail = ?";
             $params[] = $data['email'];
         }
 
         if (isset($data['year_level'])) {
             $yls          = is_array($data['year_level']) ? $data['year_level'] : explode(',', $data['year_level']);
             $placeholders = implode(',', array_fill(0, count($yls), '?'));
-            $sql          .= " AND S.StudentYearLevel IN ($placeholders)";
+            $sql          .= " AND StudentYearLevel IN ($placeholders)";
             $params       = array_merge($params, $yls);
         }
 
@@ -421,7 +412,7 @@ class Handler
         if (isset($data['id'])) {
             $ids          = is_array($data['id']) ? $data['id'] : explode(',', $data['id']);
             $placeholders = implode(',', array_fill(0, count($ids), '?'));
-            $sql          .= " AND smc.ID IN ($placeholders)";
+            $sql          .= " AND ID IN ($placeholders)";
             $params       = array_merge($params, $ids);
         }
 
