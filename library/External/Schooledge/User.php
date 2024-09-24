@@ -222,6 +222,12 @@ class External_Schooledge_User implements External_UserInterface
 
             $i++;
         }
+
+        /* Forcibly obey External_UserInterface
+         */
+        $result['AlertMessage'] = [];
+        $result['AlertLegal'] = [];
+
         return $result;
     }
 
