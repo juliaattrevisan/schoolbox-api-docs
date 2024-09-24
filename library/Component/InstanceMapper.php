@@ -71,6 +71,7 @@ class Component_InstanceMapper extends BaseMapper
         $this->uses('identifier', self::TYPE_INTEGER);
         $this->uses('position', self::TYPE_STRING);
         $this->uses('sequence', self::TYPE_INTEGER);
+        $this->registerPersistSearchIndexCallbacks();
     }
 
     /**'

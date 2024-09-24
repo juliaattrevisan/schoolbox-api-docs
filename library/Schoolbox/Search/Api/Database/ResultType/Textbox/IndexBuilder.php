@@ -11,6 +11,7 @@ namespace Schoolbox\Search\Api\Database\ResultType\Textbox;
 
 use Alaress_Date_Format;
 use Component_Config_Componentname;
+use Component_Instance;
 use Schoolbox\Resource\Textbox;
 use Schoolbox\Search\Api\Database\Index\BaseBuilder;
 use Schoolbox\Search\Api\Database\Index\BuildType;
@@ -26,10 +27,8 @@ use Schoolbox\Search\Api\Database\Index\BuildType;
 class IndexBuilder extends BaseBuilder
 {
     /**
-     * This builder works with textbox objects.
-     *
-     * TODO It could also work with component objects, if the component links to
-     *      a textbox?
+     * This builder works with textbox objects, and components which contain a
+     * textbox.
      *
      * @param object    $subject
      * @param BuildType $buildType
@@ -37,7 +36,11 @@ class IndexBuilder extends BaseBuilder
      */
     protected function accepts(object $subject, BuildType $buildType): bool
     {
-        return $subject instanceof Textbox\Model;
+        return $subject instanceof Textbox\Model
+            || (
+                $subject instanceof Component_Instance
+                && $subject->getDefinition()?->getClass() === self::getComponentClass()
+            );
     }
 
     /**
@@ -46,10 +49,19 @@ class IndexBuilder extends BaseBuilder
      */
     protected function augmentQueryParams(object $subject, BuildType $buildType, string $baseQuery, array $baseParams): array
     {
-        return [
-            $baseQuery . ' AND tb.textBoxID = :id',
-            $baseParams + ['id' => $subject->getId()],
-        ];
+        if ($subject instanceof Textbox\Model) {
+            return [
+                $baseQuery . ' AND tb.textBoxID = :id',
+                $baseParams + ['id' => $subject->getId()],
+            ];
+        }
+        if ($subject instanceof Component_Instance) {
+            return [
+                $baseQuery . ' AND ci.id = :id',
+                $baseParams + ['id' => $subject->getId()],
+            ];
+        }
+        return [$baseQuery, $baseParams];
     }
 
     /**
@@ -97,14 +109,15 @@ class IndexBuilder extends BaseBuilder
                 cci_componentname.component_config_definition_id = ccd_componentname.id AND
                 cci_componentname.component_instance_id = ci.id
             )
-            WHERE cd.`class` = 'Schoolbox\\\Resource\\\Textbox\\\Component\\\Homepage\\\Controller'
+            WHERE cd.`class` = :componentClass
             AND f.deleted_at IS NULL
             AND tb.deleted_at IS NULL
         ";
         $params = [
             'homepageDefaultComponentHeading' => Textbox\Component\Homepage\Controller::DEFAULT_COMPONENT_HEADING,
             'homepageComponentKey'            => Textbox\Mapper::HOMEPAGE_COMPONENT_KEY,
-            'componentConfigComponentNameKey' => Component_Config_Componentname::KEY
+            'componentConfigComponentNameKey' => Component_Config_Componentname::KEY,
+            'componentClass'                  => self::getComponentClass(),
         ];
         if ($fromDate) {
             $queryString .= ' AND tb.updated_at >= :fromDate';
@@ -172,6 +185,10 @@ class IndexBuilder extends BaseBuilder
         if ($subject) {
             // Don't need to re-check if subject is accepted, as it was checked
             // in an earlier query.
+            // However: need to exclude component search.
+            if ($subject instanceof Component_Instance) {
+                return;
+            }
             [$queryString, $params] = $this->augmentQueryParams($subject, BuildType::UPDATE, $queryString, $params);
         }
         $query = $this->connector->prepareQuery($queryString);
@@ -300,5 +317,15 @@ class IndexBuilder extends BaseBuilder
                 );
             }
         }
+    }
+
+    /**
+     * Retrieve and trim the homepage component class name, for use in queries.
+     *
+     * @return string
+     */
+    private static function getComponentClass(): string
+    {
+        return trim(Textbox\Component\Homepage\Controller::class, '\\');
     }
 }
