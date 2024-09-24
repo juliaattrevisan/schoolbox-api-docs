@@ -417,7 +417,7 @@ class Feed
             FROM forumThread f
             JOIN user u ON u.id = f.userID
             LEFT JOIN folder c ON c.id = f.categoryID
-            WHERE f.deleted = 'false' AND f.categoryID IN {$where}
+            WHERE f.deleted_at IS NULL AND f.categoryID IN {$where}
             ORDER BY `date` DESC LIMIT 0, :limit
         ");
 

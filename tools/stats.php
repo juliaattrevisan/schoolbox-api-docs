@@ -224,8 +224,8 @@ $app = new class extends CliTool\App {
             ",
 
             //Homepages
-            'forum_posts'       => 'SELECT count(*) FROM `forumPost` WHERE `deleted` <> "true"',
-            'forum_thread'      => 'SELECT count(*) FROM forumThread WHERE deleted = "false"',
+            'forum_posts'       => 'SELECT count(*) FROM `forumPost` WHERE `deleted_at` IS NULL',
+            'forum_thread'      => 'SELECT count(*) FROM forumThread WHERE `deleted_at` IS NULL',
             'social_stream_posts' => 'SELECT count(*) FROM `socialstream_post` WHERE `deleted_at` IS NULL',
             'surveys'           => 'SELECT count(*) FROM assess WHERE availability = "survey" AND deleted_at IS NULL',
             'polls'             => 'SELECT count(*) FROM poll',

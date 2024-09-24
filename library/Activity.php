@@ -117,7 +117,10 @@ class Activity
             "
                 SELECT COUNT(*) AS forumcount
                 FROM forumThread INNER JOIN forumPost ON forumThread.threadID = forumPost.threadID
-                WHERE forumThread.categoryID = ? AND forumThread.deleted != true AND forumPost.deleted != true AND forumPost.date >= ?
+                WHERE forumThread.categoryID = ?
+                AND   forumThread.deleted_at IS NULL
+                AND   forumPost.deleted_at IS NULL
+                AND   forumPost.date >= ?
             ",
             [$id, $lastcatvisit],
         );
