@@ -19,7 +19,7 @@ const peStore = useProfileEditorStore();
             </div>
         </div>
         <div class="pe-fields-palette">
-            <div class="small-12 island" style="display: block">
+            <div class="small-12">
                 <section class="content">
                     <!-- grid of all fields as rectangles -->
                     <div class="l-grid l-grid--12">
@@ -35,10 +35,8 @@ const peStore = useProfileEditorStore();
     </div>
 </template>
 
-<style scoped lang="scss">
-/* Undo the padding by .island */
+<style scoped>
 .pe-fields-palette {
-    margin-left: -1rem;
-    margin-right: -1rem;
+    background-color: white;
 }
 </style>

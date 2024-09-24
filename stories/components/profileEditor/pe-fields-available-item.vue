@@ -28,7 +28,7 @@ function onSelected(): void {
     const fieldSettingsKeys = peStore.fieldSettings.map((setting) => setting.key);
     const emptyFieldSettings = Object.fromEntries(fieldSettingsKeys.map((key) => [key, []]));
 
-    peStore.selectedRoleType.fields.selected.push({
+    peStore.selectedRoleType.fields.selected.unshift({
         field: props.field.field,
         displayAs: props.field.displayAs,
         fieldSettings: emptyFieldSettings,

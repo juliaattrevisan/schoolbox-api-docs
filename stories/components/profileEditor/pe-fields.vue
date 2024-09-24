@@ -4,21 +4,12 @@
  */
 
 import PeFieldsAvailable from "./pe-fields-available.vue";
-import PeFieldsSelectedItem from "./pe-fields-selected-item.vue";
-import { useProfileEditorStore } from "./store/profileEditorStore";
-
-const peStore = useProfileEditorStore();
+import PeFieldsSelected from "./pe-fields-selected.vue";
 </script>
 
 <template>
-    <div v-if="peStore.selectedRoleType">
-        <pe-fields-available />
-        <pe-fields-selected-item
-            v-for="field in peStore.selectedRoleType.fields.selected"
-            :key="field.field"
-            :field="field"
-        />
-    </div>
+    <pe-fields-available />
+    <pe-fields-selected />
 </template>
 
 <style scoped></style>

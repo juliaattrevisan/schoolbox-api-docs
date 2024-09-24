@@ -33,7 +33,7 @@ window.Vue.onMounted(async () => {
     <p v-if="peStore.isLoading">Loading...</p>
     <pe-role-type />
 
-    <div class="l-grid l-grid--12 l-gap-m l-mar-m--top">
+    <div v-if="peStore.selectedRoleType" class="l-grid l-grid--12 l-gap-m l-mar-m--top">
         <div class="small-12 large-3">
             <pe-portrait-image />
         </div>

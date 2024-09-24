@@ -3,6 +3,7 @@
  * The remove panel for a selected field
  */
 
+import { slideDownOnEnter, slideUpOnLeave } from "@schoolboxVue/transitions/transitions";
 import { useProfileEditorStore } from "./store/profileEditorStore";
 import type { ProfileSelectedField } from "./types/profileTypes";
 
@@ -28,17 +29,19 @@ function onRemoveClicked(): void {
 </script>
 
 <template>
-    <div class="editPanel small-12" :style="{ display: props.isOpen ? 'block' : 'none' }">
-        <section>
-            <div>
-                <p>Are you sure you want to remove this field?</p>
-                <ul class="flex-list buttons">
-                    <li><button class="button submit" @click="onRemoveClicked">Remove</button></li>
-                    <li><button class="button" @click="emit('close')">Cancel</button></li>
-                </ul>
-            </div>
-        </section>
-    </div>
+    <Transition @enter="slideDownOnEnter" @leave="slideUpOnLeave">
+        <div v-if="props.isOpen" class="editPanel small-12">
+            <section>
+                <div>
+                    <p>Are you sure you want to remove this field?</p>
+                    <ul class="flex-list buttons">
+                        <li><button class="button submit" @click="onRemoveClicked">Remove</button></li>
+                        <li><button class="button" @click="emit('close')">Cancel</button></li>
+                    </ul>
+                </div>
+            </section>
+        </div>
+    </Transition>
 </template>
 
 <style scoped></style>
