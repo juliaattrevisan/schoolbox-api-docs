@@ -21,8 +21,6 @@ class IndexBuilder extends BaseBuilder
     /**
      * This builder works with calendar event objects.
      *
-     * TODO should this trigger on deletion of folders?
-     *
      * @param object $subject
      * @return bool
      */
@@ -101,17 +99,15 @@ class IndexBuilder extends BaseBuilder
         $queryString = "SELECT
             e.id
             FROM event e
-            LEFT JOIN event_folder evf ON e.id = evf.event_id
-            LEFT JOIN folder f ON evf.folder_id = f.id
-            WHERE COALESCE(e.deleted_at, f.deleted_at) IS NOT NULL
+            WHERE e.deleted_at IS NOT NULL
         ";
-        $params      = [];
+        $params       = [];
         if ($fromDate) {
-            $queryString        .= ' AND COALESCE(e.deleted_at, f.deleted_at) >= :fromDate';
+            $queryString        .= ' AND e.deleted_at >= :fromDate';
             $params['fromDate'] = $fromDate->getDatabase();
         }
         if ($toDate) {
-            $queryString      .= ' AND COALESCE(e.deleted_at, f.deleted_at) <= :toDate';
+            $queryString      .= ' AND e.deleted_at <= :toDate';
             $params['toDate'] = $toDate->getDatabase();
         }
         if ($subject) {
