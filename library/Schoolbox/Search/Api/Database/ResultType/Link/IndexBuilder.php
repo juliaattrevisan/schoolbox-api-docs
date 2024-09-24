@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace Schoolbox\Search\Api\Database\ResultType\Link;
 
 use Alaress_Date_Format;
+use Schoolbox\Resource\Folder;
 use Schoolbox\Resource\Link;
 use Schoolbox\Search\Api\Database\Index\BaseBuilder;
 use Schoolbox\Search\Api\Database\Index\BuildType;
@@ -20,9 +21,7 @@ use Schoolbox\Search\Api\Database\Index\BuildType;
 class IndexBuilder extends BaseBuilder
 {
     /**
-     * This builder works with link objects.
-     *
-     * TODO deleting link's folder should delete indices
+     * This builder works with link objects, and folders on deletion.
      *
      * @param object    $subject
      * @param BuildType $buildType
@@ -30,19 +29,30 @@ class IndexBuilder extends BaseBuilder
      */
     protected function accepts(object $subject, BuildType $buildType): bool
     {
-        return $subject instanceof Link;
+        return match ($buildType) {
+            BuildType::DELETE => $subject instanceof Link || $subject instanceof Folder\Model,
+            default           => $subject instanceof Link,
+        };
     }
 
     /**
-     * @param BuildType $buildType
      * @inheritdoc
      */
     protected function augmentQueryParams(object $subject, BuildType $buildType, string $baseQuery, array $baseParams): array
     {
-        return [
-            $baseQuery . ' AND l.id = :id',
-            $baseParams + ['id' => $subject->getId()],
-        ];
+        if ($subject instanceof Link) {
+            return [
+                $baseQuery . ' AND l.id = :id',
+                $baseParams + ['id' => $subject->getId()],
+            ];
+        }
+        if ($subject instanceof Folder\Model) {
+            return [
+                $baseQuery . ' AND fo.id = :id',
+                $baseParams + ['id' => $subject->getId()],
+            ];
+        }
+        return [$baseQuery, $baseParams];
     }
 
     /**
