@@ -27,8 +27,9 @@ use Schoolbox\Search\Api\Database\Index\BuildType;
 class IndexBuilder extends BaseBuilder
 {
     /**
-     * This builder works with textbox objects, and components which contain a
-     * textbox.
+     * This builder works with:
+     * * textbox objects
+     * * textbox components
      *
      * @param object    $subject
      * @param BuildType $buildType
@@ -36,11 +37,19 @@ class IndexBuilder extends BaseBuilder
      */
     protected function accepts(object $subject, BuildType $buildType): bool
     {
-        return $subject instanceof Textbox\Model
-            || (
-                $subject instanceof Component_Instance
-                && $subject->getDefinition()?->getClass() === self::getComponentClass()
-            );
+        if ($subject instanceof Textbox\Model) {
+            return true;
+        }
+
+        if (
+            $subject instanceof Component_Instance
+            /** @phpstan-ignore-next-line - $subject->getDefinition can return null */
+            && $subject->getDefinition()?->getClass() === self::getComponentClass()
+        ) {
+            return true;
+        }
+
+        return false;
     }
 
     /**
@@ -228,11 +237,26 @@ class IndexBuilder extends BaseBuilder
     public function buildDeletes(?Alaress_Date_Format $fromDate, ?Alaress_Date_Format $toDate, ?object $subject): iterable
     {
         // Examine and clean up every search index for textboxes
-        $searchIndexQuery = $this->connector->prepareQuery("
+        $searchIndexQueryString = "
             SELECT identifier
             FROM search_index
             WHERE type = :type
-        ");
+        ";
+        $searchIndexParams = ['type' => Hydrator::BASE_TYPE];
+
+        // Also add subject filters here, in a convoluted way
+        if ($subject instanceof Textbox\Model) {
+            $searchIndexQueryString .= ' AND identifier LIKE :textboxIdentifier';
+            $searchIndexParams['textboxIdentifier'] = $subject->getId() . '-%';
+        } elseif ($subject instanceof Component_Instance) {
+            $searchIndexQueryString .= ' AND identifier LIKE :componentIdentifier';
+            $searchIndexParams['componentIdentifier'] = '%-' . $subject->getId() . '-%';
+        } else {
+            return;
+        }
+        $searchIndexQuery = $this->connector->prepareQuery($searchIndexQueryString);
+
+        // Set up textbox and component exists query
         $textboxExistsQueryString = "
             SELECT textBoxID
             FROM textBox
@@ -251,7 +275,7 @@ class IndexBuilder extends BaseBuilder
         ");
         $componentExistsCache = [];
 
-        $searchIndexQuery->execute(['type' => Hydrator::BASE_TYPE]);
+        $searchIndexQuery->execute($searchIndexParams);
         $this->logger->info(sprintf('Examining and cleaning up %d text box search indices', $searchIndexQuery->rowCount()));
         foreach ($searchIndexQuery->fetchColumnArray('identifier') as $identifier) {
             $removeIndex = false;
