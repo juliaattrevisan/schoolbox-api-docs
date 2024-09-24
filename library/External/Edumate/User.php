@@ -190,6 +190,11 @@ class External_Edumate_User extends External_Edumate_Connection implements Exter
         // normalise the birth date: change YYYY-mm-dd to timestamp
         $student['STUDENTBIRTHDATE'] = strtotime($student['STUDENTBIRTHDATE']);
 
+        /* Forcibly obey External_UserInterface
+         */
+        $student['AlertMessage'] = [$student['AlertMessage']];
+        $student['AlertLegal'] = [];
+
         return $this->normaliseFields($student, $caseSensitiveFields);
     }
 
