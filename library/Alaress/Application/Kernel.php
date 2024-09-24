@@ -498,14 +498,17 @@ abstract class Kernel
         $di->set(
             'taskd.httpRequestMessageFactory',
             $di->lazy(
-                function () use ($di) {
+                function () use ($di, $mapperFactory) {
                     /** @var Instance $instance */
                     $instance = $di->get('instance');
 
                     /** @var Jwt $tokenBuilder */
                     $tokenBuilder = $di->get('user.tokenBuilder');
 
-                    return (new HttpRequestMessageFactory($instance, $tokenBuilder))
+                    /** @var TokenMapper $tokenMapper */
+                    $tokenMapper = $mapperFactory->getLazy(TokenMapper::class);
+
+                    return (new HttpRequestMessageFactory($instance, $tokenBuilder, $tokenMapper))
                         ->setTokenExpiry(Alaress_Date_Format::now()->addDays(1));
                 }
             )
@@ -513,12 +516,15 @@ abstract class Kernel
         $di->set(
             'taskd.downloadPagesMessageFactory',
             $di->lazy(
-                function () use ($config, $di) {
+                function () use ($config, $di, $mapperFactory) {
                     /** @var Instance $instance */
                     $instance = $di->get('instance');
 
                     /** @var Jwt $tokenBuilder */
                     $tokenBuilder = $di->get('user.tokenBuilder');
+
+                    /** @var TokenMapper $tokenMapper */
+                    $tokenMapper = $mapperFactory->getLazy(TokenMapper::class);
 
                     // Build API key and version
                     $gotenbergApiKey = $config->get(ConfigMapper::NAME_GOTENBERG_API_KEY);
@@ -542,7 +548,7 @@ abstract class Kernel
                         $config->get(ConfigMapper::NAME_KAMI_API_KEY),
                         $config->get('turnitin_api_key'),
                         $config->get('turnitin_api_host'),
-                        $mapperFactory->getLazy(TokenMapper::class),
+                        $tokenMapper,
                     ))->setTokenExpiry(Alaress_Date_Format::now()->addDays(1));
                 }
             )
