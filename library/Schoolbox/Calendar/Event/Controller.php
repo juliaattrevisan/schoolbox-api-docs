@@ -638,17 +638,17 @@ class Controller extends Base
         $folderIds = (
             array_key_exists('folders', (array)$validRequestPost)
             ? array_map(fn ($folder) => $folder['id'], $validRequestPost['folders'])
-            : $event->getFolderCollection()->map(fn ($folder) => $folder->getId())
+            : $event->getFolderCollection()->map(fn ($folder) => $folder->getId())->getAll()
         );
         $campusIds = (
             array_key_exists('campuses', (array)$validRequestPost)
             ? array_map(fn ($campus) => $campus['id'], $validRequestPost['campuses'])
-            : $event->getCampusCollection()->map(fn ($campus) => $campus->getId())
+            : $event->getCampusCollection()->map(fn ($campus) => $campus->getId())->getAll()
         );
         $roleIds = (
             array_key_exists('roles', (array)$validRequestPost)
             ? array_map(fn ($role) => $role['id'], $validRequestPost['roles'])
-            : $event->getRoleCollection()->map(fn ($role) => $role->getId())
+            : $event->getRoleCollection()->map(fn ($role) => $role->getRoleId())->getAll() // Note $role is Calendar\Relation\Role, so getRoleId().
         );
 
         /* Recurrence settings
