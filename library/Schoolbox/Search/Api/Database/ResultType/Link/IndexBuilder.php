@@ -74,10 +74,10 @@ class IndexBuilder extends BaseBuilder
             $params['toDate'] = $toDate->getDatabase();
         }
         if ($subject) {
-            if (!$this->accepts($subject)) {
+            if (!$this->accepts($subject, BuildType::UPDATE)) {
                 return;
             }
-            [$queryString, $params] = $this->augmentQueryParams($subject, $queryString, $queryString, $params);
+            [$queryString, $params] = $this->augmentQueryParams($subject, BuildType::UPDATE, $queryString, $params);
         }
         $query = $this->connector->prepareQuery($queryString);
         $this->logger->info('Finding links...');
@@ -120,10 +120,10 @@ class IndexBuilder extends BaseBuilder
             $params['toDate'] = $toDate->getDatabase();
         }
         if ($subject) {
-            if (!$this->accepts($subject)) {
+            if (!$this->accepts($subject, BuildType::DELETE)) {
                 return;
             }
-            [$queryString, $params] = $this->augmentQueryParams($subject, $queryString, $queryString, $params);
+            [$queryString, $params] = $this->augmentQueryParams($subject, BuildType::DELETE, $queryString, $params);
         }
         $query = $this->connector->prepareQuery($queryString);
         $query->execute($params);

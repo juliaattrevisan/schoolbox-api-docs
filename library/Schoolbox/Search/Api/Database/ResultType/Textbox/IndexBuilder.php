@@ -115,10 +115,10 @@ class IndexBuilder extends BaseBuilder
             $params['toDate'] = $toDate->getDatabase();
         }
         if ($subject) {
-            if (!$this->accepts($subject)) {
+            if (!$this->accepts($subject, BuildType::UPDATE)) {
                 return;
             }
-            [$queryString, $params] = $this->augmentQueryParams($subject, $queryString, $queryString, $params);
+            [$queryString, $params] = $this->augmentQueryParams($subject, BuildType::UPDATE, $queryString, $params);
         }
         $query = $this->connector->prepareQuery($queryString);
         $this->logger->info('Finding text boxes (with components)...');
@@ -172,7 +172,7 @@ class IndexBuilder extends BaseBuilder
         if ($subject) {
             // Don't need to re-check if subject is accepted, as it was checked
             // in an earlier query.
-            [$queryString, $params] = $this->augmentQueryParams($subject, $queryString, $queryString, $params);
+            [$queryString, $params] = $this->augmentQueryParams($subject, BuildType::UPDATE, $queryString, $params);
         }
         $query = $this->connector->prepareQuery($queryString);
         $this->logger->info('Finding text boxes (without components)...');
