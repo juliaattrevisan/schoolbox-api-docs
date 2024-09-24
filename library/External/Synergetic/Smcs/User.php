@@ -16,6 +16,12 @@ use Alaress\Database\Predicate\Builder;
 class External_Synergetic_Smcs_User extends External_Synergetic_User
 {
     /**
+     * A hardcoded prefix used before all AlertLegal messages.
+     */
+    private const COURT_ORDER_PREFIX = 'Court Order';
+
+
+    /**
      * @inheritdoc
      */
     public function getStudent(string $externalUserId): array
@@ -120,21 +126,42 @@ class External_Synergetic_Smcs_User extends External_Synergetic_User
                     $student['StudentBirthDate'] = false;
                 }
 
-                $student['AlertMessage'] = [
-                    $student['AlertMessage']
-                ];
-            } else {
-                // Additional records will only different by their alert message, we just append these to the
-                // existing student record
+                /* Initialise stacks
+                 */
+                $student['AlertMessage'] = [];
+                $student['AlertLegal'] = [];
+            }
 
+            /* Legal Alerts are distinguished by their CourtOrderType node.
+             * If that CourtOrderType node was meaningful, then it's a Legal Alert and gets special treatment.
+             * Otherwise it's a generic alert.
+             */
+            $courtOrderType = trim((string)($row['CourtOrderType'] ?? null));
+
+            if ('' !== $courtOrderType) {
+                /* A specially-crafted AlertLegal message about legal matters.
+                 */
+                $student['AlertLegal'][] = sprintf(
+                    '%s - %s',
+                    self::COURT_ORDER_PREFIX,
+                    $courtOrderType
+                );
+            } else {
+                /* Some kind of generic alert message
+                 */
                 $student['AlertMessage'][] = $row['AlertMessage'];
             }
         }
 
-        // Implode all of the alert messages down to a single message seperate by line breaks
-
+        /* Uniquify both AlertMessage and AlertLegal nodes since they might dupe
+         * as a result of those left joins in the mega query
+         */
         if (!empty($student) && is_array($student['AlertMessage'])) {
             $student['AlertMessage'] = array_unique(array_filter($student['AlertMessage']));
+        }
+
+        if (!empty($student) && is_array($student['AlertLegal'])) {
+            $student['AlertLegal'] = array_unique(array_filter($student['AlertLegal']));
         }
 
         // Remove Synergetic's annoying 'Not Selected' default value for lookups
