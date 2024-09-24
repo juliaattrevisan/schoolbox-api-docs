@@ -10,7 +10,10 @@ declare(strict_types=1);
 namespace Schoolbox\Search\Api\Database\ResultType\Page;
 
 use Alaress_Date_Format;
-use Schoolbox\Resource\Folder\Model;
+use Schoolbox\Learning\Course\DataModel\Specification;
+use Schoolbox\Resource\Folder;
+use Schoolbox\Resource\Group;
+use Schoolbox\Resource\HomepageConfig;
 use Schoolbox\Search\Api\Database\Index\BaseBuilder;
 use Schoolbox\Search\Api\Database\Index\BuildType;
 
@@ -20,11 +23,13 @@ use Schoolbox\Search\Api\Database\Index\BuildType;
 class IndexBuilder extends BaseBuilder
 {
     /**
-     * This builder works with folder objects.
-     *
-     * TODO It could also work on folder code, course specification, course
-     *      implementation, homepage config and user group objects, if they
-     *      return the folder ID?
+     * This builder works with:
+     * * folders
+     * * folder codes
+     * * course specs
+     * * course unit specs
+     * * user groups
+     * * homepage configs
      *
      * @param object    $subject
      * @param BuildType $buildType
@@ -32,19 +37,58 @@ class IndexBuilder extends BaseBuilder
      */
     protected function accepts(object $subject, BuildType $buildType): bool
     {
-        return $subject instanceof Model;
+        return $subject instanceof Folder\Model
+            || $subject instanceof Folder\Code\Model
+            || $subject instanceof Specification\Model
+            || $subject instanceof Specification\Unit\Model
+            || $subject instanceof Group
+            || $subject instanceof HomepageConfig
+        ;
     }
 
     /**
-     * @param BuildType $buildType
      * @inheritdoc
      */
     protected function augmentQueryParams(object $subject, BuildType $buildType, string $baseQuery, array $baseParams): array
     {
-        return [
-            $baseQuery . ' AND f.id = :id',
-            $baseParams + ['id' => $subject->getId()],
-        ];
+        if ($subject instanceof Folder\Model) {
+            return [
+                $baseQuery . ' AND f.id = :id',
+                $baseParams + ['id' => $subject->getId()],
+            ];
+        }
+        if ($subject instanceof Folder\Code\Model) {
+            return [
+                $baseQuery . ' AND f.id = :id',
+                $baseParams + ['id' => $subject->getFolder()->getId()],
+            ];
+        }
+        if ($subject instanceof Specification\Model) {
+            return [
+                $baseQuery . ' AND f.id = :id',
+                $baseParams + ['id' => $subject->getFolder()->getId()],
+            ];
+        }
+        if ($subject instanceof Specification\Unit\Model) {
+            return [
+                $baseQuery . ' AND f.id = :id',
+                $baseParams + ['id' => $subject->getFolder()->getId()],
+            ];
+        }
+        if ($subject instanceof Group) {
+            return [
+                $baseQuery . ' AND f.id = :id',
+                $baseParams + ['id' => $subject->getFolder()->getId()],
+            ];
+        }
+        if ($subject instanceof HomepageConfig) {
+            return [
+                $baseQuery . ' AND f.id = :id',
+                $baseParams + ['id' => $subject->getCategory()->getId()],
+            ];
+        }
+
+        return [$baseQuery, $baseParams];
     }
 
     /**

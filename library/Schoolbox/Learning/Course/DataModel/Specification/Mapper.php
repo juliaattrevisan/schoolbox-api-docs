@@ -62,6 +62,8 @@ class Mapper extends AbstractCourseMapper
         /* Assign a uuid if it doesn't already exist
          */
         $this->registerCallback(self::CALLBACK_PRESAVE, [$this, 'assignUuid']);
+
+        $this->registerPersistSearchIndexCallbacks();
     }
 
 

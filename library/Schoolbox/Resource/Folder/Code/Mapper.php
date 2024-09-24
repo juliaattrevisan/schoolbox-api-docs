@@ -33,6 +33,8 @@ class Mapper extends \Schoolbox\Mapper
         $this->uses('code', self::TYPE_STRING);
         $this->joins('folder_id', FolderMapper::class, 'id', null, null, 'folder', 'folder');
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
+
+        $this->registerPersistSearchIndexCallbacks();
     }
 
     /**
