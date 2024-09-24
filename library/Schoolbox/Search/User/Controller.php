@@ -189,16 +189,12 @@ class Controller extends BaseController
     private function renderStudent(User $student): void
     {
         $externalUser = [];
+
+        /* Users might exist without a meaningful external identifier.
+         * If set, go find more info about this user.
+         */
         if ($student->getExternalId()) {
             $externalUser = $this->externalUser->getStudent($student->getExternalId());
-            if (isset($externalUser['AlertMessage']) && is_array($externalUser['AlertMessage'])) {
-                $externalUser['AlertMessages'] = $externalUser['AlertMessage'];
-            } else {
-                $externalUser['AlertMessages'] = empty($externalUser['AlertMessage']) ? [] : [trim($externalUser['AlertMessage'])];
-            }
-            if (isset($externalUser['CourtOrderType']) && (trim($externalUser['CourtOrderType']) !== '')) {
-                $externalUser['AlertMessages'][] = 'Court Order - ' . trim($externalUser['CourtOrderType']);
-            }
         }
 
         // Wrangle default colors
