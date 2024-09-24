@@ -7,7 +7,7 @@ import type Sortable from "sortablejs";
 import { slideDownOnEnter, slideUpOnLeave } from "@schoolboxVue/transitions/transitions";
 import PeFieldsSelectedItem from "./pe-fields-selected-item.vue";
 import { useProfileEditorStore } from "./store/profileEditorStore";
-import SortableWrapper from "./sortable-wrapper.vue";
+import SortableWrapper from "./gsap-sortable-wrapper.vue";
 
 const peStore = useProfileEditorStore();
 
@@ -45,9 +45,9 @@ function resequenceFields(event: Sortable.SortableEvent): void {
             @end="resequenceFields"
         >
             <template #item="item">
-                <Transition :key="peStore.selectedRoleType" @enter="slideDownOnEnter" @leave="slideUpOnLeave">
-                    <pe-fields-selected-item :field="item.element" :dragging="item.isDragging" />
-                </Transition>
+                <!-- <Transition :key="peStore.selectedRoleType" @enter="slideDownOnEnter" @leave="slideUpOnLeave"> -->
+                <pe-fields-selected-item :field="item.element" :dragging="false" />
+                <!-- </Transition> -->
             </template>
         </sortable-wrapper>
 
