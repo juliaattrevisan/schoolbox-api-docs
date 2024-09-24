@@ -8,6 +8,7 @@ import type { Course } from "@schoolboxLibrary/types/Course";
 import type { Unit } from "@schoolboxLibrary/types/Unit";
 import type { CurriculumCoverageNode } from "../js/types/curriculumCoverageTypes";
 import { useStore } from "./store/curriculumCoverageStore";
+import { ReportOptionValues } from "../js/types/curriculumCoverageTypes";
 
 interface Props {
     node: CurriculumCoverageNode;
@@ -25,7 +26,7 @@ const { title } = useNodeTitle(props.node);
 const paddingStart = window.Vue.computed(() => `calc(${props.depth * 0.75}rem + 0.625rem)`);
 
 /**
- * Get the total usage count for a unit
+ * Get the total usage count for a unit, with the selected report options considered
  * @param $course - the course to get the usage count for
  * @param $unit - the unit to get the usage count for
  * @returns the total unit usage count
@@ -39,13 +40,41 @@ function getUnitUsageCount($course: Course, $unit: Unit): number {
     const { usage } = unit;
     if (usage === undefined) return 0;
     return store.selectedReportOptionValues.reduce((acc, option) => {
+        // always skip course option as it can't be assigned within a unit
+        if (option === ReportOptionValues.COURSE) return acc;
         if (usage[option] === undefined) return acc;
         return acc + usage[option].count;
     }, 0);
 }
 
 /**
- * Get the total node usage count for a course(s)
+ * Get the total usage count for a course, which is the
+ * total usage count linked to the course, with the selected report options considered
+ * @param $course - the course to get the usage count for
+ * @returns the total course usage count
+ */
+function getCourseUsageCount($course: Course): number {
+    if (props.node.usage === undefined) return 0;
+    const course = props.node.usage.courses.find((c) => c.id === $course.id);
+    if (course === undefined) return 0;
+    const { usage } = course;
+    if (usage === undefined) return 0;
+    return store.selectedReportOptionValues.reduce((acc, option) => {
+        // always skip unit, learning activity and lesson plan options as they can't be assigned within a course
+        if (
+            option === ReportOptionValues.UNIT ||
+            option === ReportOptionValues.LEARNING_ACTIVITY ||
+            option === ReportOptionValues.LEARNING_ACTIVITY_LESSON_PLAN
+        )
+            return acc;
+        if (usage[option] === undefined) return acc;
+        return acc + usage[option].count;
+    }, 0);
+}
+
+/**
+ * Get the total node usage count for a course(s),
+ * which is the total usage count linked to the course, and all units within the course
  * @param $course - the course to get the usage count for
  * @returns the total node usage count for all selected course(s)
  */
@@ -53,14 +82,16 @@ function getTotalUsageCount($course: Course): number {
     if (props.node.usage === undefined) return 0;
     const course = props.node.usage.courses.find((c) => c.id === $course.id);
     if (course === undefined || course.units === undefined) return 0;
-    return course.units.reduce((acc, unit) => {
-        if (unit.usage === undefined) return acc;
+    const courseUsageCount = getCourseUsageCount($course);
+    const unitUsageCount = course.units.reduce((acc, unit) => {
         return acc + getUnitUsageCount(course, unit);
     }, 0);
+    return courseUsageCount + unitUsageCount;
 }
 
 /**
- * Get the total node usage count for a node
+ * Get the total node usage count for a node,
+ * which is the total usage count for all courses
  * @returns the total node usage count
  */
 const nodeUsageCount = window.Vue.computed(() => {
@@ -71,12 +102,26 @@ const nodeUsageCount = window.Vue.computed(() => {
 });
 
 /**
+ * Whether the node contains any course usage counts that are 0
+ * for the currently selected report options
+ * @returns - whether the node has no course usages
+ */
+const hasNoCourseUsages = window.Vue.computed(() => {
+    if (props.node.usage === undefined) return true;
+    // loop through every course, checking if any have a usage count of 0
+    return !store.courses.every((course) => {
+        return getCourseUsageCount(course) !== 0;
+    });
+});
+
+/**
  * Whether the node contains any unit usage counts that are 0
  * for the currently selected report options
- * @returns - whether the node has no usages
+ * @returns - whether the node has no unit usages
  */
-const hasNoUsages = window.Vue.computed(() => {
+const hasNoUnitUsages = window.Vue.computed(() => {
     if (props.node.usage === undefined) return true;
+    // loop through every unit in every course, checking if any have a usage count of 0
     return !store.courses.every((course) => {
         return course.units?.every((unit) => {
             return getUnitUsageCount(course, unit) !== 0;
@@ -94,7 +139,7 @@ const showNode = window.Vue.computed(() => {
         return true;
     }
     // otherwise, only show the node if it has no usages
-    return hasNoUsages.value && store.onlyShowGaps;
+    return (hasNoCourseUsages.value || hasNoUnitUsages.value) && store.onlyShowGaps;
 });
 </script>
 
@@ -106,7 +151,9 @@ const showNode = window.Vue.computed(() => {
         </td>
         <!-- loop through each course/unit, retrieving the node usage or returning 0 for undefined usages -->
         <template v-for="(course, index) in store.courses" :key="course.id">
-            <td :class="`${index % 2 ? 'u-alt-bkg' : ''}`">0</td>
+            <td :class="`${index % 2 ? 'u-alt-bkg' : ''}  ${getCourseUsageCount(course) === 0 ? 'u-highlight' : ''}`">
+                {{ getCourseUsageCount(course) }}
+            </td>
             <td
                 v-for="unit in course.units"
                 :key="unit.id"

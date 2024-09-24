@@ -10,6 +10,10 @@ export const useStore = defineStore("curriculumCoverage", () => {
     const courses = window.Vue.ref<Course[]>([]); // the courses to display in the report
     const allReportOptionValues = window.Vue.ref<ReportOption[]>([
         {
+            value: ReportOptionValues.COURSE,
+            label: "Course",
+        },
+        {
             value: ReportOptionValues.UNIT,
             label: "Unit",
         },

@@ -43,6 +43,7 @@ export type CourseWithCurriculumNodeUsage = Pick<Course, "id" | "name"> & {
  * available that can be filtered
  */
 export enum ReportOptionValues {
+    COURSE = "course",
     UNIT = "unit",
     LEARNING_ACTIVITY = "activity",
     LEARNING_ACTIVITY_LESSON_PLAN = "lessonPlan",

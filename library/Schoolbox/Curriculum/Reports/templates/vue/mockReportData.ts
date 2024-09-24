@@ -64,14 +64,14 @@ export const mockReportData = {
                                         unit: { count: 1 },
                                         activity: { count: 4 },
                                         lessonPlan: { count: 1 },
-                                        rubric: { count: 5 },
+                                        rubric: { count: 2 },
                                     },
                                 },
                                 {
                                     id: 109,
                                     name: "Persuasion and the Media",
                                     usage: {
-                                        unit: { count: 2 },
+                                        unit: { count: 1 },
                                         lessonPlan: { count: 2 },
                                     },
                                 },
@@ -79,9 +79,9 @@ export const mockReportData = {
                                     id: 110,
                                     name: "To Kill a Mockingbird",
                                     usage: {
-                                        unit: { count: 5 },
-                                        activity: { count: 2 },
-                                        rubric: { count: 5 },
+                                        unit: { count: 1 },
+                                        activity: { count: 3 },
+                                        rubric: { count: 1 },
                                     },
                                 },
                             ],
@@ -89,12 +89,16 @@ export const mockReportData = {
                         {
                             id: 13,
                             name: "Year 9 Humanities",
+                            usage: {
+                                course: { count: 1 },
+                                rubric: { count: 1 },
+                            },
                             units: [
                                 {
                                     id: 170,
                                     name: "Geography",
                                     usage: {
-                                        unit: { count: 2 },
+                                        unit: { count: 1 },
                                         lessonPlan: { count: 3 },
                                         rubric: { count: 2 },
                                     },
@@ -117,6 +121,14 @@ export const mockReportData = {
                                         rubric: { count: 2 },
                                     },
                                 },
+                                {
+                                    id: 173,
+                                    name: "Economics and Business",
+                                    usage: {
+                                        activity: { count: 5 },
+                                        lessonPlan: { count: 1 },
+                                    },
+                                },
                             ],
                         },
                     ],
@@ -131,6 +143,10 @@ export const mockReportData = {
                                 {
                                     id: 5,
                                     name: "Year 9 English",
+                                    usage: {
+                                        course: { count: 1 },
+                                        rubric: { count: 2 },
+                                    },
                                     units: [
                                         {
                                             id: 108,
@@ -139,23 +155,23 @@ export const mockReportData = {
                                                 unit: { count: 1 },
                                                 activity: { count: 4 },
                                                 lessonPlan: { count: 3 },
-                                                rubric: { count: 2 },
+                                                rubric: { count: 1 },
                                             },
                                         },
                                         {
                                             id: 109,
                                             name: "Persuasion and the Media",
                                             usage: {
-                                                unit: { count: 2 },
+                                                unit: { count: 1 },
                                                 activity: { count: 4 },
-                                                rubric: { count: 2 },
+                                                rubric: { count: 1 },
                                             },
                                         },
                                         {
                                             id: 110,
                                             name: "To Kill a Mockingbird",
                                             usage: {
-                                                unit: { count: 2 },
+                                                unit: { count: 1 },
                                                 activity: { count: 2 },
                                                 lessonPlan: { count: 3 },
                                                 rubric: { count: 3 },
@@ -166,12 +182,16 @@ export const mockReportData = {
                                 {
                                     id: 13,
                                     name: "Year 9 Humanities",
+                                    usage: {
+                                        course: { count: 1 },
+                                        rubric: { count: 3 },
+                                    },
                                     units: [
                                         {
                                             id: 170,
                                             name: "Geography",
                                             usage: {
-                                                unit: { count: 2 },
+                                                unit: { count: 1 },
                                                 lessonPlan: { count: 3 },
                                                 rubric: { count: 2 },
                                             },
@@ -189,7 +209,7 @@ export const mockReportData = {
                                             id: 172,
                                             name: "Civics and Citizenship",
                                             usage: {
-                                                unit: { count: 4 },
+                                                unit: { count: 1 },
                                                 activity: { count: 2 },
                                                 lessonPlan: { count: 3 },
                                                 rubric: { count: 2 },
@@ -218,12 +238,16 @@ export const mockReportData = {
                                         {
                                             id: 13,
                                             name: "Year 9 Humanities",
+                                            usage: {
+                                                course: { count: 1 },
+                                                rubric: { count: 1 },
+                                            },
                                             units: [
                                                 {
                                                     id: 170,
                                                     name: "Geography",
                                                     usage: {
-                                                        unit: { count: 2 },
+                                                        unit: { count: 1 },
                                                         lessonPlan: { count: 1 },
                                                     },
                                                 },
@@ -239,7 +263,7 @@ export const mockReportData = {
                                                     id: 172,
                                                     name: "Civics and Citizenship",
                                                     usage: {
-                                                        unit: { count: 3 },
+                                                        unit: { count: 1 },
                                                         activity: { count: 1 },
                                                         lessonPlan: { count: 1 },
                                                     },
@@ -280,7 +304,7 @@ export const mockReportData = {
                                                     id: 109,
                                                     name: "Persuasion and the Media",
                                                     usage: {
-                                                        unit: { count: 2 },
+                                                        unit: { count: 1 },
                                                         activity: { count: 3 },
                                                         rubric: { count: 4 },
                                                     },
@@ -300,12 +324,15 @@ export const mockReportData = {
                                         {
                                             id: 13,
                                             name: "Year 9 Humanities",
+                                            usage: {
+                                                rubric: { count: 2 },
+                                            },
                                             units: [
                                                 {
                                                     id: 170,
                                                     name: "Geography",
                                                     usage: {
-                                                        unit: { count: 2 },
+                                                        unit: { count: 1 },
                                                         lessonPlan: { count: 2 },
                                                         rubric: { count: 2 },
                                                     },
