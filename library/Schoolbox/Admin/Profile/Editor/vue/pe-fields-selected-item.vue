@@ -70,7 +70,6 @@ window.Vue.watch(isRemovePanelOpen, (isOpen) => {
                         <div class="list-item">
                             <h2 :title="props.field.displayAs">
                                 <a
-                                    href="#"
                                     class="icon-grip"
                                     data-pe-field-drag-handle
                                     style="user-select: none; touch-action: none; cursor: grab"
@@ -81,14 +80,12 @@ window.Vue.watch(isRemovePanelOpen, (isOpen) => {
                         <nav>
                             <a
                                 ref="editBtn"
-                                href="#"
                                 class="icon-settings"
                                 title="Settings"
                                 @click="isEditPanelOpen = !isEditPanelOpen"
                             />
                             <a
                                 ref="removeBtn"
-                                href="#"
                                 class="icon-close"
                                 title="Close"
                                 @click="isRemovePanelOpen = !isRemovePanelOpen"
