@@ -11,6 +11,7 @@ namespace Schoolbox\Search\Api\Database\ResultType\File;
 
 use Alaress_Date_Format;
 use Schoolbox\Resource\File\Model;
+use Schoolbox\Resource\Folder\Model as FolderModel;
 use Schoolbox\Search\Api\Database\Index\BaseBuilder;
 use Schoolbox\Search\Api\Database\Index\BuildType;
 
@@ -55,9 +56,7 @@ class IndexBuilder extends BaseBuilder
     ";
 
     /**
-     * This builder works with file objects.
-     *
-     * TODO should it work for deletion of folders/storage/fileExt/fileType?
+     * This builder works with file objects, and with folders on delete.
      *
      * @param object    $subject
      * @param BuildType $buildType
@@ -65,19 +64,30 @@ class IndexBuilder extends BaseBuilder
      */
     protected function accepts(object $subject, BuildType $buildType): bool
     {
-        return $subject instanceof Model;
+        return match ($buildType) {
+            BuildType::DELETE => $subject instanceof Model || $subject instanceof FolderModel,
+            default           => $subject instanceof Model,
+        };
     }
 
     /**
-     * @param BuildType $buildType
      * @inheritdoc
      */
     protected function augmentQueryParams(object $subject, BuildType $buildType, string $baseQuery, array $baseParams): array
     {
-        return [
-            $baseQuery . ' AND f.id = :id',
-            $baseParams + ['id' => $subject->getId()],
-        ];
+        if ($subject instanceof Model) {
+            return [
+                $baseQuery . ' AND f.id = :id',
+                $baseParams + ['id' => $subject->getId()],
+            ];
+        }
+        if ($subject instanceof FolderModel) {
+            return [
+                $baseQuery . ' AND fo.id = :id',
+                $baseParams + ['id' => $subject->getId()],
+            ];
+        }
+        return [$baseQuery, $baseParams];
     }
 
     /**
