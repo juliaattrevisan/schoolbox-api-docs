@@ -158,11 +158,6 @@ class Payload
                     $availabilityCampusIds[] = $availabilityCampus->getCampus()->getId();
                 }
 
-                $availabilityCampus = [
-                    'key' => self::AVAILABILITY_NODE,
-                    'id' => $availabilityCampusIds
-                ];
-
                 /* Find the roletypes ("ids") for which this field might be visible
                  */
                 $visibilityRoleTypesIds = [];
@@ -170,11 +165,6 @@ class Payload
                 foreach ($field->getVisibility() as $visibility) {
                     $visibilityRoleTypesIds[] = $visibility->getRoleType();
                 }
-
-                $visibilityRoleTypes = [
-                    'key' => self::VISIBILITY_NODE,
-                    'id' => $visibilityRoleTypesIds
-                ];
 
                 /* Pile it into the stack
                  */
@@ -184,8 +174,8 @@ class Payload
                     'icon' => $field->getIcon(),
                     'css' => $field->getCss(),
                     'fieldSettings' => [
-                        $availabilityCampus,
-                        $visibilityRoleTypes
+                        self::AVAILABILITY_NODE => $availabilityCampusIds,
+                        self::VISIBILITY_NODE => $visibilityRoleTypesIds
                     ]
                 ];
             }
