@@ -41,7 +41,6 @@ class Payload
      * and also a list of ones they've previously chosen,
      * to appear on the given $roleType's profile screen
      *
-     * @param string $roleType
      * @return array
      * @throws DebugBarException
      */
