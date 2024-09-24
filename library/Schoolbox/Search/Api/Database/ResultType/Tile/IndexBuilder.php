@@ -10,9 +10,10 @@ declare(strict_types=1);
 namespace Schoolbox\Search\Api\Database\ResultType\Tile;
 
 use Alaress_Date_Format;
+use Schoolbox\Resource\Folder;
 use Schoolbox\Search\Api\Database\Index\BaseBuilder;
 use Schoolbox\Search\Api\Database\Index\BuildType;
-use Schoolbox\Tile\Model;
+use Schoolbox\Tile;
 
 /**
  * Index builder for tiles.
@@ -20,9 +21,10 @@ use Schoolbox\Tile\Model;
 class IndexBuilder extends BaseBuilder
 {
     /**
-     * This builder works with tile objects.
-     *
-     * TODO It could also work with tile layout and folders objects?
+     * This builder works with:
+     * * tile objects
+     * * tile layouts
+     * * folders, when they are deleted
      *
      * @param object    $subject
      * @param BuildType $buildType
@@ -30,19 +32,39 @@ class IndexBuilder extends BaseBuilder
      */
     protected function accepts(object $subject, BuildType $buildType): bool
     {
-        return $subject instanceof Model;
+        if ($subject instanceof Tile\Model || $subject instanceof Tile\Layout\Model) {
+            return true;
+        }
+        if ($buildType === BuildType::DELETE && $subject instanceof Folder\Model) {
+            return true;
+        }
+        return false;
     }
 
     /**
-     * @param BuildType $buildType
      * @inheritdoc
      */
     protected function augmentQueryParams(object $subject, BuildType $buildType, string $baseQuery, array $baseParams): array
     {
-        return [
-            $baseQuery . ' AND t.id = :id',
-            $baseParams + ['id' => $subject->getId()],
-        ];
+        if ($subject instanceof Tile\Model) {
+            return [
+                $baseQuery . ' AND t.id = :id',
+                $baseParams + ['id' => $subject->getId()],
+            ];
+        }
+        if ($subject instanceof Tile\Layout\Model) {
+            return [
+                $baseQuery . ' AND tl.id = :id',
+                $baseParams + ['id' => $subject->getId()],
+            ];
+        }
+        if ($subject instanceof Folder\Model) {
+            return [
+                $baseQuery . ' AND f.id = :id',
+                $baseParams + ['id' => $subject->getId()],
+            ];
+        }
+        return [$baseQuery, $baseParams];
     }
 
     /**
