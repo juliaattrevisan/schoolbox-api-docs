@@ -1,0 +1,40 @@
+<script setup lang="ts">
+/**
+ * To be able to filter the report and control any other settings
+ */
+
+import { useStore } from "./store/curriculumCoverageStore";
+
+const store = useStore();
+</script>
+
+<template>
+    <div class="c-island">
+        <div class="checklist">
+            <label>Report on</label>
+            <ul class="option-list">
+                <li v-for="reportOption in store.allReportOptionValues" :key="reportOption.value">
+                    <input
+                        :id="reportOption.value"
+                        v-model="store.selectedReportOptionValues"
+                        :value="reportOption.value"
+                        type="checkbox"
+                    />
+                    <label :for="reportOption.value">{{ reportOption.label }}</label>
+                </li>
+            </ul>
+        </div>
+        <div>
+            <label>Only show gaps</label>
+            <div class="switch">
+                <input id="onlyShowGapsSwitch" v-model="store.onlyShowGaps" type="checkbox" />
+                <label for="onlyShowGapsSwitch">
+                    <span class="icon-approve"></span>
+                    <span class="icon-cancel"></span>
+                </label>
+            </div>
+        </div>
+    </div>
+</template>
+
+<style scoped></style>
