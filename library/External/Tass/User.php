@@ -208,6 +208,12 @@ class External_Tass_User implements External_UserInterface
         } else {
             $student['StudentBirthDate'] = false;
         }
+
+        /* Forcibly obey External_UserInterface
+         */
+        $student['AlertMessage'] = [];
+        $student['AlertLegal'] = [];
+
         return $student;
     }
 
