@@ -356,7 +356,7 @@ class External_Synergetic_User implements External_UserInterface
 
                 /* Initialise stacks
                  */
-                $student['AlertMessages'] = [];
+                $student['AlertMessage'] = [];
                 $student['AlertLegal'] = [];
             }
 
@@ -377,15 +377,15 @@ class External_Synergetic_User implements External_UserInterface
             } else {
                 /* Some kind of generic alert message
                  */
-                $student['AlertMessages'][] = $row['AlertMessage'];
+                $student['AlertMessage'][] = $row['AlertMessage'];
             }
         }
 
         /* Uniquify both AlertMessage and AlertLegal nodes since they might dupe
          * as a result of those left joins in the mega query
          */
-        if (!empty($student) && is_array($student['AlertMessages'])) {
-            $student['AlertMessages'] = array_unique(array_filter($student['AlertMessages']));
+        if (!empty($student) && is_array($student['AlertMessage'])) {
+            $student['AlertMessage'] = array_unique(array_filter($student['AlertMessage']));
         }
 
         if (!empty($student) && is_array($student['AlertLegal'])) {
