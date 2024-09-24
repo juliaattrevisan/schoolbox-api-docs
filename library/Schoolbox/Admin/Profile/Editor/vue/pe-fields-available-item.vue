@@ -18,10 +18,9 @@ const disabled = window.Vue.computed(() => peStore.isFieldDisabled(props.field.f
 
 <template>
     <div
-        class="large-2 medium-4 small-6 l-pad-s pe-palette-item"
+        class="pe-palette-item l-pad-s"
         :class="{ disabled }"
         :title="disabled ? 'This field is already selected' : undefined"
-        :data-pe-field="props.field.field"
         @click="peStore.addSelectedField(props.field.field)"
     >
         {{ props.field.displayAs }}
@@ -30,6 +29,8 @@ const disabled = window.Vue.computed(() => peStore.isFieldDisabled(props.field.f
 
 <style scoped lang="scss">
 .pe-palette-item {
+    background-color: #ffffff;
+
     &.disabled {
         cursor: not-allowed;
         opacity: 0.5;

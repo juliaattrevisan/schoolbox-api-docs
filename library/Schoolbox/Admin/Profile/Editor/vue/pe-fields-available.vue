@@ -6,6 +6,7 @@
 import type Sortable from "sortablejs";
 import SortableWrapper from "./sortable-wrapper.vue";
 import PeFieldsAvailableItem from "./pe-fields-available-item.vue";
+import PeFieldsSelectedItem from "./pe-fields-selected-item.vue";
 import { useProfileEditorStore } from "./store/profileEditorStore";
 
 const peStore = useProfileEditorStore();
@@ -20,6 +21,7 @@ const sortableOptions = window.Vue.computed<Sortable.Options>(() => ({
     fallbackClass: "dragged-item",
     animation: 200,
     sort: false,
+    removeCloneOnHide: true,
 }));
 </script>
 
@@ -39,10 +41,18 @@ const sortableOptions = window.Vue.computed<Sortable.Options>(() => ({
                         :list="peStore.selectedRoleType.fields.available"
                         :item-key="(item) => item.field"
                         :options="sortableOptions"
-                        class="l-grid l-grid--12"
+                        class="l-grid l-grid--4-col"
                     >
                         <template #item="item">
-                            <pe-fields-available-item :field="item.element" :dragging="item.isDragging" />
+                            <div :data-pe-field="item.element.field">
+                                <pe-fields-available-item :field="item.element" class="pe-fields-available-item" />
+                                <pe-fields-selected-item
+                                    v-if="item.isDragging"
+                                    :field="item.element"
+                                    :dragging="true"
+                                    class="pe-dragged-selected-item"
+                                />
+                            </div>
                         </template>
                     </sortable-wrapper>
                 </section>
@@ -53,6 +63,11 @@ const sortableOptions = window.Vue.computed<Sortable.Options>(() => ({
 
 <style scoped>
 .pe-fields-palette {
-    background-color: white;
+    background-color: #ffffff;
+}
+
+/* Hide the selected preview while we are still in the palette area */
+.pe-fields-palette .pe-dragged-selected-item {
+    display: none !important;
 }
 </style>

@@ -7,6 +7,8 @@ import type { ProfileRoleType } from "./profileTypes";
 export type ProfileEditorAvailableField = {
     field: string;
     displayAs: string;
+    icon: string | null;
+    css: string | null;
 };
 
 export type ProfileEditorRoleType = ProfileRoleType & {

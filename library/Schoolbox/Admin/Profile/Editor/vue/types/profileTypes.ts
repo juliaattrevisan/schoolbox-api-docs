@@ -17,11 +17,13 @@ export type ProfileFieldSetting = {
 export type ProfileSelectedField = {
     field: string;
     displayAs: string;
+    icon: string | null;
+    css: string | null;
     fieldSettings: Record<ProfileFieldSetting["key"], ProfileFieldSettingOption["id"][]>;
 };
 
 export type ProfileRoleType = {
-    name: string; // only ever "student", "staff", or "parent" at the moment... for display purposes make Title Case if required
+    roleType: string; // only ever "student", "staff", or "parent" at the moment... for display purposes make Title Case if required
     fields: {
         // Selected Fields
         // These are implicitly ordered by sequence any time

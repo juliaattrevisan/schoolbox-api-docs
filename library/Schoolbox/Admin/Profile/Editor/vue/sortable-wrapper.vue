@@ -38,11 +38,21 @@ interface Props {
     itemKey: (item: T) => string | number | symbol;
     /** The element type to render as. */
     tag?: string;
+    /**
+     * Whether items should transition when they are entirely added or removed from the list
+     * Note: it's contained in here instead of up a level since the <slot> would otherwise break a <Transition>
+     */
+    transitionKey?: string;
+    transitionEnter?: (el: HTMLElement, done: () => void) => void;
+    transitionLeave?: (el: HTMLElement, done: () => void) => void;
 }
 
 const props = withDefaults(defineProps<Props>(), {
     options: null,
     tag: "div",
+    transitionKey: undefined,
+    transitionEnter: undefined,
+    transitionLeave: undefined,
 });
 
 const emit = defineEmits<{
@@ -136,13 +146,27 @@ window.Vue.onUnmounted(() => {
 
 <template>
     <component :is="props.tag" ref="containerRef">
-        <slot
-            v-for="(item, index) of list"
-            :key="props.itemKey(item)"
-            :element="item"
-            :index="index"
-            :is-dragging="isDragging && draggingIndex === index"
-            name="item"
-        ></slot>
+        <template v-if="props.transitionKey">
+            <TransitionGroup :key="props.transitionKey" @enter="props.transitionEnter" @leave="props.transitionLeave">
+                <slot
+                    v-for="(item, index) of props.list"
+                    :key="props.itemKey(item)"
+                    :element="item"
+                    :index="index"
+                    :is-dragging="isDragging && draggingIndex === index"
+                    name="item"
+                ></slot>
+            </TransitionGroup>
+        </template>
+        <template v-else>
+            <slot
+                v-for="(item, index) of props.list"
+                :key="props.itemKey(item)"
+                :element="item"
+                :index="index"
+                :is-dragging="isDragging && draggingIndex === index"
+                name="item"
+            ></slot>
+        </template>
     </component>
 </template>
