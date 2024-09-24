@@ -13,12 +13,6 @@ declare(strict_types=1);
 class External_Synergetic_Sk_User extends External_Synergetic_User
 {
     /**
-     * A hardcoded prefix used before all AlertLegal messages.
-     */
-    private const COURT_ORDER_PREFIX = 'Court Order';
-
-
-    /**
      * @inheritdoc
      */
     public function getStudent(string $externalUserId): array
@@ -144,7 +138,7 @@ class External_Synergetic_Sk_User extends External_Synergetic_User
                  */
                 $student['AlertLegal'][] = sprintf(
                     '%s - %s',
-                    self::COURT_ORDER_PREFIX,
+                    \External_UserInterface::COURT_ORDER_PREFIX,
                     $courtOrderType
                 );
             } else {

@@ -20,11 +20,6 @@ use Schoolbox\User;
  */
 class External_Schoolbox_User implements External_UserInterface
 {
-    /**
-     * A hardcoded prefix used before all AlertLegal messages.
-     */
-    private const COURT_ORDER_PREFIX = 'Court Order';
-
 
     /** @var IConnector $internalDatabase */
     private $internalDatabase;
@@ -153,7 +148,7 @@ class External_Schoolbox_User implements External_UserInterface
              */
             $student['AlertLegal'] = [sprintf(
                 '%s - %s',
-                self::COURT_ORDER_PREFIX,
+                \External_UserInterface::COURT_ORDER_PREFIX,
                 $courtOrderType
             )];
         } else {

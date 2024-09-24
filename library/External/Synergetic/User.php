@@ -27,12 +27,6 @@ class External_Synergetic_User implements External_UserInterface
 
 
     /**
-     * A hardcoded prefix used before all AlertLegal messages.
-     */
-    private const COURT_ORDER_PREFIX = 'Court Order';
-
-
-    /**
      * Constructor
      */
     public function __construct()
@@ -371,7 +365,7 @@ class External_Synergetic_User implements External_UserInterface
                  */
                 $student['AlertLegal'][] = sprintf(
                     '%s - %s',
-                    self::COURT_ORDER_PREFIX,
+                    \External_UserInterface::COURT_ORDER_PREFIX,
                     $courtOrderType
                 );
             } else {
