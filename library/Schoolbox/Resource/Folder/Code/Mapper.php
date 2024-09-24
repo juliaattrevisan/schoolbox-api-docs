@@ -24,7 +24,6 @@ use function array_unique;
  */
 class Mapper extends \Schoolbox\Mapper
 {
-
     protected function mapping()
     {
         $this->hasModel(Model::class);
