@@ -19,10 +19,10 @@ class Payload
     /**
      * Common nodes and human-readable name equivalents
      */
-    private const AVAILABILITY_NODE = 'appearsOn';
-    private const AVAILABILITY_NAME = 'Appears on';
-    private const VISIBILITY_NODE = 'visibleFor';
-    private const VISIBILITY_NAME = 'Visible for';
+    private const AVAILABILITY_NODE = 'availability';
+    private const AVAILABILITY_NAME = 'Availability';
+    private const VISIBILITY_NODE = 'visibility';
+    private const VISIBILITY_NAME = 'Visibility';
 
 
     /**
