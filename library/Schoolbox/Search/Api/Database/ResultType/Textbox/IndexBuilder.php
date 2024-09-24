@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace Schoolbox\Search\Api\Database\ResultType\Textbox;
 
 use Alaress_Date_Format;
+use Component_Config;
 use Component_Config_Componentname;
 use Component_Instance;
 use Schoolbox\Resource\Textbox;
@@ -26,10 +27,13 @@ use Schoolbox\Search\Api\Database\Index\BuildType;
  */
 class IndexBuilder extends BaseBuilder
 {
+    private ?int $textboxComponentConfigDefinitionId = null;
+
     /**
      * This builder works with:
      * * textbox objects
      * * textbox components
+     * * component configs, if it is for a textbox
      *
      * @param object    $subject
      * @param BuildType $buildType
@@ -47,6 +51,13 @@ class IndexBuilder extends BaseBuilder
             && $subject->getDefinition()?->getClass() === self::getComponentClass()
         ) {
             return true;
+        }
+
+        if ($subject instanceof Component_Config) {
+            // Need to lookup component config definition,
+            // to determine if it is actually a textbox.
+            $this->textboxComponentConfigDefinitionId ??= $this->getTextboxComponentConfigDefinitionId();
+            return $this->textboxComponentConfigDefinitionId === $subject->getConfigDefinitionId();
         }
 
         return false;
@@ -68,6 +79,12 @@ class IndexBuilder extends BaseBuilder
             return [
                 $baseQuery . ' AND ci.id = :id',
                 $baseParams + ['id' => $subject->getId()],
+            ];
+        }
+        if ($subject instanceof Component_Config) {
+            return [
+                $baseQuery . ' AND ci.id = :id',
+                $baseParams + ['id' => $subject->getInstanceId()],
             ];
         }
         return [$baseQuery, $baseParams];
@@ -195,7 +212,7 @@ class IndexBuilder extends BaseBuilder
             // Don't need to re-check if subject is accepted, as it was checked
             // in an earlier query.
             // However: need to exclude component search.
-            if ($subject instanceof Component_Instance) {
+            if ($subject instanceof Component_Instance || $subject instanceof Component_Config) {
                 return;
             }
             [$queryString, $params] = $this->augmentQueryParams($subject, BuildType::UPDATE, $queryString, $params);
@@ -251,6 +268,9 @@ class IndexBuilder extends BaseBuilder
         } elseif ($subject instanceof Component_Instance) {
             $searchIndexQueryString .= ' AND identifier LIKE :componentIdentifier';
             $searchIndexParams['componentIdentifier'] = '%-' . $subject->getId() . '-%';
+        } elseif ($subject instanceof Component_Config) {
+            $searchIndexQueryString .= ' AND identifier LIKE :componentIdentifier';
+            $searchIndexParams['componentIdentifier'] = '%-' . $subject->getInstanceId() . '-%';
         } else {
             return;
         }
@@ -341,6 +361,25 @@ class IndexBuilder extends BaseBuilder
                 );
             }
         }
+    }
+
+    /**
+     * Find the config definition ID for textboxes.
+     *
+     * @return int|null
+     */
+    private function getTextboxComponentConfigDefinitionId(): ?int
+    {
+        // Look it up if not yet set
+        $query = $this->connector->prepareQuery("
+            SELECT ccd.id
+            FROM component_config_definition ccd
+            INNER JOIN component_definition cd ON ccd.component_definition_id = cd.id
+            WHERE ccd.key = 'textbox'
+            AND   cd.class = :class
+        ");
+        $query->execute(['class' => self::getComponentClass()]);
+        return filter_var($query->fetchColumn(), FILTER_VALIDATE_INT, FILTER_NULL_ON_FAILURE);
     }
 
     /**
