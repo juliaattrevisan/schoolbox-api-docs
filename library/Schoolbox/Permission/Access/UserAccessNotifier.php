@@ -33,6 +33,7 @@ class UserAccessNotifier extends AbstractModuleNotifier
     const TRIGGER_LEFT      = 'left';
     const TRIGGER_REQUESTED = 'requested';
     const TRIGGER_APPROVED  = 'approved';
+    const TRIGGER_UPDATED  = 'updated';
 
     const USER_JOINED                   = ':user joined :groupname';
     const USER_REQUESTED                = ":user asked to join :groupname";
@@ -109,9 +110,14 @@ class UserAccessNotifier extends AbstractModuleNotifier
         } elseif ($method == Mapper::METHOD_DELETE) {
             // useraccess revoked
             $bundle->attach(self::TRIGGER_LEFT, self::IMMEDIATELY);
-        } elseif ($method == Mapper::METHOD_UPDATE) {
-            // access level changed (usually moderation)
-            $bundle->attach(self::TRIGGER_APPROVED, self::IMMEDIATELY);
+        } elseif ($method === Mapper::METHOD_UPDATE) {
+            if ($userAccess->getUser()->getId() === $bundle->getEvent()->getEffector()->getId()) {
+                // user changed their own access level
+                $bundle->attach(self::TRIGGER_UPDATED, self::IMMEDIATELY);
+            } else {
+                // access level changed (usually moderation)
+                $bundle->attach(self::TRIGGER_APPROVED, self::IMMEDIATELY);
+            }
         }
     }
 
@@ -391,6 +397,46 @@ class UserAccessNotifier extends AbstractModuleNotifier
     public function notifyParentApproved(UserAccess $userAccess, User $effector, ?array $diff = null): Envelope
     {
         return $this->notifyApproved($userAccess, $effector, $diff);
+    }
+
+    /**
+     * @param UserAccess $userAccess
+     * @param User $effector
+     * @return Envelope
+     */
+    protected function notifyUpdated(UserAccess $userAccess, User $effector): Envelope
+    {
+        return new Envelope();
+    }
+
+    /**
+     * @param UserAccess $userAccess
+     * @param User $effector
+     * @return Envelope
+     */
+    public function notifyParentUpdated(UserAccess $userAccess, User $effector): Envelope
+    {
+        return $this->notifyUpdated($userAccess, $effector);
+    }
+
+    /**
+     * @param UserAccess $userAccess
+     * @param User $effector
+     * @return Envelope
+     */
+    public function notifyStudentUpdated(UserAccess $userAccess, User $effector): Envelope
+    {
+        return $this->notifyUpdated($userAccess, $effector);
+    }
+
+    /**
+     * @param UserAccess $userAccess
+     * @param User $effector
+     * @return Envelope
+     */
+    public function notifyStaffUpdated(UserAccess $userAccess, User $effector): Envelope
+    {
+        return $this->notifyUpdated($userAccess, $effector);
     }
 
     /**
