@@ -83,6 +83,13 @@ class UserAccess implements IModel
     public const SERVICE_BADGE = 11;
 
     /**
+     * Value for $this->service:
+     * $this->user has $this->accessLevel permission for the timetable system.
+     * system.
+     */
+    public const SERVICE_TIMETABLE = 12;
+
+    /**
      * Services that do not have have service identifiers (sid) use this value
      * (This is enforced at the DB level by not permitted nulls, and defaulting to '0)
      */
@@ -182,6 +189,7 @@ class UserAccess implements IModel
             self::SERVICE_PASTORAL,
             self::SERVICE_SPORTS_ADMINISTRATOR,
             self::SERVICE_BADGE,
+            self::SERVICE_TIMETABLE,
         ];
     }
 

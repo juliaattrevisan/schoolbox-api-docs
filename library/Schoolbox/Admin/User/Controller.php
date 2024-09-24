@@ -235,6 +235,15 @@ class Controller extends Base
                 'moderate' => true
             ]
         ],
+        UserAccess::SERVICE_TIMETABLE => [
+            'name' => 'Timetable',
+            'identifier' => self::IDENTIFIER_NONE,
+            'availability' => [
+                'read' => false,
+                'write' => false,
+                'moderate' => true
+            ]
+        ],
     ];
 
     /**
