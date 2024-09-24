@@ -55,7 +55,6 @@ interface External_UserInterface extends External\IConnector
      * @internal string return['EnglishSecondFlag]               '0' => false, '1' => true, '' => unknown
      * @internal string return['StudentStudiesCode']
      * @internal string return['CourtOrderType']
-     * @internal string return['AlertMessage']
      * @internal string return['StudentBoarder']
      * @internal string return['Comment']
      * @internal string return['StudentEnrolmentDate']
@@ -67,8 +66,8 @@ interface External_UserInterface extends External\IConnector
      *
      * These are specially crafted due to synergetic:
      *
-     * @internal string return['AlertMessages'] // Note that we fabricated this node out of nowhere; enforced as an array of strings.
-     * @internal string return['AlertLegal'] // Note that we fabricated this node out of nowhere; enforced as an array of strings.
+     * @internal string return['AlertMessage'][] // Note that we fabricated this node out of nowhere; enforced as an array of strings.
+     * @internal string return['AlertLegal'][]   // Note that we fabricated this node out of nowhere; enforced as an array of strings.
      *
      * @importance high - used on student profile page
      */
