@@ -33,10 +33,18 @@ export const useProfileEditorStore = defineStore("profileEditorStore", () => {
      * initialise the store with the relevant endpoints
      * and load the initial data for the profile editor
      * @param $endpoints the endpoints required for the profile editor
+     * @param $roleTypes the current role types
+     * @param $fieldSettings the current field settings
      */
-    async function init($endpoints: ProfileEditorEndpoints): Promise<void> {
+    function init(
+        $endpoints: ProfileEditorEndpoints,
+        $roleTypes: ProfileEditorRoleType[],
+        $fieldSettings: ProfileFieldSetting[],
+    ): void {
         endpoints.value = $endpoints;
-        await fetchProfileEditorData();
+        roleTypes.value = $roleTypes;
+        fieldSettings.value = $fieldSettings;
+        // await fetchProfileEditorData();
     }
 
     /**

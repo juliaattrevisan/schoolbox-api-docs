@@ -25,6 +25,7 @@ const mswHandlers = [
 const meta: Meta<typeof ProfileEditor> = {
     args: {
         endpoints,
+        payload: mockData,
     },
     component: ProfileEditor,
     parameters: {

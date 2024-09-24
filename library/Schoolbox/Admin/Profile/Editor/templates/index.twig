@@ -6,6 +6,15 @@
     {{ renderAdminNavigation(pageCurrent) }}
 
     <div class="admin-content">
+        <div id="profile-editor-container">
+            <profile-editor
+                :endpoints="[]"
+                :payload="{{ payload |json_encode }}"
+            />
+        </div>
+        <script src="{{ CDN_PREFIX }}/js/bundle/profileEditor.js?v={{ config.site_version }}"></script>
+
+
         <script>
             $(function() {
                 let hash = window.location.hash.substring(1);
@@ -127,9 +136,3 @@
         </div>
     </div>
 </div>
-
-
-
-
-
-

@@ -13,20 +13,24 @@ const peStore = useProfileEditorStore();
  * @param role The role type to set
  */
 function setSelectedRoleType(role: ProfileEditorRoleType): void {
-    window.location.hash = role.name;
+    window.location.hash = role.roleType;
     peStore.setSelectedRoleType(role);
 }
 </script>
 
 <template>
-    <dl v-if="!peStore.isLoading" class="tabs">
-        <dd v-for="role in peStore.roleTypes" :key="role.name" :class="{ active: role === peStore.selectedRoleType }">
+    <dl class="tabs">
+        <dd
+            v-for="role in peStore.roleTypes"
+            :key="role.roleType"
+            :class="{ active: role === peStore.selectedRoleType }"
+        >
             <a
                 :aria-selected="role === peStore.selectedRoleType"
                 :tabindex="role === peStore.selectedRoleType ? 0 : -1"
                 @click="setSelectedRoleType(role)"
             >
-                {{ capitalizeFirstLetter(role.name) }}
+                {{ capitalizeFirstLetter(role.roleType) }}
             </a>
         </dd>
     </dl>
