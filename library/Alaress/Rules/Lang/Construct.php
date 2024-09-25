@@ -40,6 +40,9 @@ interface Construct
      *
      * @param array $inputValue will be an array of strings
      * @return mixed
+     * @throws NoMatchingMapException if no input values to a map rule matched its mapping: this construct should not
+     *                                apply any changes to this field
+     * @throws SkipException          if this error is raised, no changes should be applied to any fields
      */
     public function apply($inputValue);
 }
