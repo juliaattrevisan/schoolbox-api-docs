@@ -72,7 +72,6 @@ class CalendarEventCreateModifyCest
         }
 
         // In created event, check keys with non-array values.
-        $todayYmd = date('Y-m-d');
         $timezoneOffset = date('P'); // E.g. '+10:00'.
         $expectedValueByKey = [
             'allDay' => true,
@@ -81,7 +80,7 @@ class CalendarEventCreateModifyCest
             'startDate' => "2024-09-24T00:00:00$timezoneOffset",
             'endDate' => "2024-09-24T23:59:59$timezoneOffset",
             'repeat' => '', // TODO: This value ought to be a null instead of a blank string.
-            'repeat_until' => "{$todayYmd}T23:59:59$timezoneOffset",
+            'repeat_until' => "2024-09-24T23:59:59$timezoneOffset",
             'location' => '',
             'detail' => '',
             'publishDate' => "2024-09-25T19:00:00$timezoneOffset",
@@ -150,11 +149,6 @@ class CalendarEventCreateModifyCest
             'startDate'     => "2024-09-22T00:00:00$timezoneOffset", // Move startDate backwards, so endDate need not change.
             'endDate'       => "2024-09-24T23:59:59$timezoneOffset", // Move end date forwards, so startDate need not change.
         ];
-
-        // Each modify request will cause the repeat_until date to be set to match the event's endDate.
-        // (Unless a new value for repeat_until is supplied in the 'modify' request).
-        // See Calendar/Event/Controller->postModify().
-        $this->localEvent['repeat_until'] = $this->localEvent['endDate'];
 
         // -----------------------------------------------------------------------------------------------------------//
         // Run each of the $eventModifications in sequence, locally and via the API.
