@@ -413,7 +413,7 @@ class MapperProxy
            SELECT
                 'dueWork' AS assessment_type,
                 sb.assessment_id AS assessment_id,
-                sb.weight AS weight,
+                a.weight AS weight,
                 sb.mark_type AS mark_type,
                 sr.owner AS user_id,
                 sr.norm_mark AS mark,
@@ -421,6 +421,7 @@ class MapperProxy
                 sr.published_at AS published_at
            FROM submission_box sb
                 JOIN participant_plan pp ON pp.assessment_id = sb.assessment_id AND pp.deleted_at IS NULL
+                JOIN assessment a ON a.id = sb.assessment_id
                 LEFT JOIN participant pc ON pp.id = pc.participant_plan_id AND pc.excluded_at IS NULL
                 LEFT JOIN submission_return sr ON sb.id = sr.box_id AND pc.user_id = sr.owner AND sr.deleted_at IS NULL AND sr.review_route = 'instructor'
            WHERE
