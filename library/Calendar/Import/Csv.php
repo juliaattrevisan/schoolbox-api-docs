@@ -66,14 +66,9 @@ class Csv extends Base
         $eventTypeMapper = new EventTypeMapper();
 
         while (($thisRow = fgetcsv($handle, 0, ",")) !== false) {
-            //
-            // We cannot determine encoding, so strip everything not ascii
-            $thisRow = array_map(
-                function ($field) {
-                    return preg_replace('/[\\x80-\\xFF]/', '', $field);
-                },
-                $thisRow
-            );
+            // The CSV file will not contain character encoding info, so just assume a compatible encoding has been used.
+            // Previously we stripped non-ASCII characters here, but users complained about loss of data.
+
             [
                 $start_date,
                 $start_time,
