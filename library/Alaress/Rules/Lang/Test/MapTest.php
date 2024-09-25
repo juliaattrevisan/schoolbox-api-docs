@@ -30,13 +30,11 @@ class MapTest extends TestCase
     }
 
     /**
-     * @dataProvider getTestApplyNoMatchData
-     * @covers       \Alaress\Rules\Lang\Map::apply
-     *
      * @param array $map
      * @param array $inputValue
      * @return void
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('getTestApplyNoMatchData')]
     public function testApplyNoMatch(array $map, array $inputValue): void
     {
         $this->expectException(NoMatchingMapException::class);
@@ -278,7 +276,7 @@ class MapTest extends TestCase
      *
      * @return iterable
      */
-    public function getTestApplyNoMatchData(): iterable
+    public static function getTestApplyNoMatchData(): iterable
     {
         yield 'Empty map, empty input' => [
             [],
