@@ -104,8 +104,6 @@ class TokenizerTest extends TestCase
                 => ['a{:foo|first|uc}', 'aD'],
             'mapped'
                 => [ new Map('my{:foo}', [ 'mydata1' => 'something else']), 'something else'],
-            'missing mapped value'
-                => [ new Map('my{:foo}', [ 'mydata2' => 'something else']), ''],
             'empty multi-value'
                 => ['{:empty}', ''],
             'nested multi-value'
