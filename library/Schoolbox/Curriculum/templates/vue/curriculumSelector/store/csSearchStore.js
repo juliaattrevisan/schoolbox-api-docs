@@ -12,6 +12,7 @@ export const DEBOUNCE_AMOUNT = 350; //the amount in ms to hold off on searching,
 export const useSearchStore = defineStore(`csSearch`, {
     state: () => ({
         isLoading: false, //to notify that an action is taking place,
+        includeWithoutCode: false, //set to true to include nodes with blank codes in search results
         query: "", //current search term to filter the active nodes
         results: [], //nodes returned in the current search results
     }),
@@ -62,11 +63,11 @@ export const useSearchStore = defineStore(`csSearch`, {
         /**
          * search for nodes that match
          */
-        async search(includeWithoutCode) {
+        async search() {
             try {
                 const response = await fetch(
                     `${apiEndpoint}?query=${this.query}&enabled=1&limit=50` +
-                        (includeWithoutCode ? "&includeWithoutCode=1" : ""),
+                        (this.includeWithoutCode ? "&includeWithoutCode=1" : ""),
                     {
                         method: "GET",
                         headers: {

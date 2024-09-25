@@ -152,7 +152,8 @@ window.Vue.watch(
  * debounce to avoid constant polling while the user is typing
  */
 const debounceSearch = debounce(() => {
-    searchStore.search(props.includeWithoutCode);
+    searchStore.includeWithoutCode = props.includeWithoutCode;
+    searchStore.search();
 }, DEBOUNCE_AMOUNT);
 
 /**
