@@ -997,7 +997,12 @@ export default {
                         <div class="actions">
                             <!-- Various buttons -->
                             <span v-if="eventExtendedProps.links.path">
-                                <a class="button" :href="eventExtendedProps.links.path" data-test="view-event-modal-view-details-button">View details</a>
+                                <a
+                                    class="button"
+                                    :href="eventExtendedProps.links.path"
+                                    data-test="view-event-modal-view-details-button"
+                                    >View details</a
+                                >
                             </span>
                             <span v-if="eventExtendedProps.folder.id">
                                 <a class="button" :href="'/homepage/' + String(eventExtendedProps.folder.id)"
@@ -1005,7 +1010,12 @@ export default {
                                 >
                             </span>
                             <span v-if="eventExtendedProps.links.view">
-                                <a class="button" :href="eventExtendedProps.links.view" data-test="view-event-modal-view-more-details-button">View More Details</a>
+                                <a
+                                    class="button"
+                                    :href="eventExtendedProps.links.view"
+                                    data-test="view-event-modal-view-more-details-button"
+                                    >View More Details</a
+                                >
                             </span>
                             <span v-if="eventExtendedProps.classAttendance.url">
                                 <a
@@ -1016,7 +1026,12 @@ export default {
                                 >
                             </span>
                             <span v-if="eventExtendedProps.links.modify">
-                                <a class="button" :href="eventExtendedProps.links.modify" data-test="view-event-modal-modify-button">Modify</a>
+                                <a
+                                    class="button"
+                                    :href="eventExtendedProps.links.modify"
+                                    data-test="view-event-modal-modify-button"
+                                    >Modify</a
+                                >
                             </span>
                             <span v-if="eventExtendedProps.links.delete">
                                 <a
@@ -1076,8 +1091,24 @@ export default {
                 <h2>Please confirm</h2>
                 <p>Are you sure you wish to delete this event?</p>
                 <ul class="flex-list buttons">
-                    <li><a href="#" class="button submit" @click.prevent="confirmEventDeleteSelf" data-test="event-delete-modal-confirm-delete-button">Delete</a></li>
-                    <li><a href="#" class="button" @click.prevent="$refs.eventDeleteModal.close" data-test="event-delete-modal-cancel-button">Cancel</a></li>
+                    <li>
+                        <a
+                            href="#"
+                            class="button submit"
+                            @click.prevent="confirmEventDeleteSelf"
+                            data-test="event-delete-modal-confirm-delete-button"
+                            >Delete</a
+                        >
+                    </li>
+                    <li>
+                        <a
+                            href="#"
+                            class="button"
+                            @click.prevent="$refs.eventDeleteModal.close"
+                            data-test="event-delete-modal-cancel-button"
+                            >Cancel</a
+                        >
+                    </li>
                 </ul>
             </template>
         </reveal-modal>

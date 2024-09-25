@@ -320,7 +320,14 @@ export default {
                     </section>
                     <ul class="flex-list buttons">
                         <li><button @click.prevent="redirectToEventForm($event)">Edit Event</button></li>
-                        <li><input type="submit" :disabled="!isFormSubmittable" value="Create Event" data-test="create-event-modal-create-button" /></li>
+                        <li>
+                            <input
+                                type="submit"
+                                :disabled="!isFormSubmittable"
+                                value="Create Event"
+                                data-test="create-event-modal-create-button"
+                            />
+                        </li>
                     </ul>
                 </form>
             </div>
