@@ -9,7 +9,6 @@ declare(strict_types=1);
 
 namespace Schoolbox\Admin\Profile\Editor;
 
-use DebugBar\DebugBarException;
 use Schoolbox\Admin\Profile\Editor\Field\Mapper;
 use Schoolbox\CampusMapper;
 use Schoolbox\Role;
