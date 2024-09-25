@@ -17,8 +17,7 @@ use OutOfBoundsException;
  */
 class Handler
 {
-
-    private $viewSelector;
+    private ViewSelector $viewSelector;
     /**
      * Constructor
      *
