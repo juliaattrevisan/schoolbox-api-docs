@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace Alaress\Rules\Lang\Test;
 
 use Alaress\Rules\Lang\Map;
+use Alaress\Rules\Lang\NoMatchingMapException;
 use PHPUnit\Framework\TestCase;
 
 #[\PHPUnit\Framework\Attributes\CoversClass(\Alaress\Rules\Lang\Map::class)]
@@ -29,36 +30,26 @@ class MapTest extends TestCase
     }
 
     /**
+     * @dataProvider getTestApplyNoMatchData
+     * @covers       \Alaress\Rules\Lang\Map::apply
+     *
+     * @param array $map
+     * @param array $inputValue
+     * @return void
+     */
+    public function testApplyNoMatch(array $map, array $inputValue): void
+    {
+        $this->expectException(NoMatchingMapException::class);
+        (new Map('', $map))->apply($inputValue);
+    }
+
+    /**
      * Data provider for `testApply`.
      *
      * @return iterable
      */
     public static function getTestApplyData(): iterable
     {
-        yield 'Empty map, empty input' => [
-            [],
-            [],
-            [],
-        ];
-
-        yield 'Empty map, non-empty input' => [
-            [],
-            ['input'],
-            [],
-        ];
-
-        yield 'Non-empty map, empty input' => [
-            ['match' => 'output'],
-            [],
-            [],
-        ];
-
-        yield 'No matching mappings' => [
-            ['match' => 'output'],
-            ['input', 'input2'],
-            [],
-        ];
-
         yield 'One matching exact mapping' => [
             ['match' => '1', 'nomatch' => '2'],
             ['match', 'match2'],
@@ -179,47 +170,16 @@ class MapTest extends TestCase
             ['1'],
         ];
 
-        yield '[! escaped, no match' => [
-            ['match\\[!1]' => '1'],
-            ['match\\2'],
-            [],
-        ];
-
         yield '[! double-escaped' => [
             ['match\\\\[!1]' => '1'],
             ['match\\2'],
             ['1'],
         ];
 
-        yield '[! double-escaped, no match' => [
-            ['match\\\\[!1]' => '1'],
-            ['match\\1'],
-            [],
-        ];
-
-        // Vagaries of fnmatch
-        yield 'leading period in input does not match' => [
-            ['test' => '1'],
-            ['.test'],
-            [],
-        ];
-
-        yield 'leading period in map does not match' => [
-            ['.test' => '1'],
-            ['test'],
-            [],
-        ];
-
         yield 'backslashes escape' => [
             ['test\\*' => '1'],
             ['test*'],
             ['1'],
-        ];
-
-        yield 'backslashes escape: not a match' => [
-            ['test\\*' => '1'],
-            ['test?'],
-            [],
         ];
 
         // The patterns which Jez wants to match on:
@@ -264,46 +224,6 @@ class MapTest extends TestCase
             ['zero'],
             ['1'],
         ];
-        yield 'comma-separated list: multiple patterns, partial match at start of input' => [
-            [
-                'zero'     => '1',
-                '*,zero'   => '1',
-                'zero,*'   => '1',
-                '*,zero,*' => '1',
-            ],
-            ['zeroo,match,one'],
-            [],
-        ];
-        yield 'comma-separated list: multiple patterns, partial match in middle of input' => [
-            [
-                'zero'     => '1',
-                '*,zero'   => '1',
-                'zero,*'   => '1',
-                '*,zero,*' => '1',
-            ],
-            ['match,zeroo,one'],
-            [],
-        ];
-        yield 'comma-separated list: multiple patterns, partial match at end of input' => [
-            [
-                'zero'     => '1',
-                '*,zero'   => '1',
-                'zero,*'   => '1',
-                '*,zero,*' => '1',
-            ],
-            ['match,one,zeroo'],
-            [],
-        ];
-        yield 'comma-separated list: multiple patterns, partial match equals input' => [
-            [
-                'zero'     => '1',
-                '*,zero'   => '1',
-                'zero,*'   => '1',
-                '*,zero,*' => '1',
-            ],
-            ['zeroo'],
-            [],
-        ];
 
         // Extended matches not supported by fnmatch
         yield 'comma-separated list: single pattern, match at start of input' => [
@@ -326,26 +246,6 @@ class MapTest extends TestCase
             ['zero'],
             ['1'],
         ];
-        yield 'comma-separated list: single pattern, partial match at start of input' => [
-            ['{zero,*\,zero,zero\,*,*\,zero\,*}' => '1'],
-            ['zeroo,match,one'],
-            [],
-        ];
-        yield 'comma-separated list: single pattern, partial match in middle of input' => [
-            ['{zero,*\,zero,zero\,*,*\,zero\,*}' => '1'],
-            ['match,zeroo,one'],
-            [],
-        ];
-        yield 'comma-separated list: single pattern, partial match at end of input' => [
-            ['{zero,*\,zero,zero\,*,*\,zero\,*}' => '1'],
-            ['match,one,zeroo'],
-            [],
-        ];
-        yield 'comma-separated list: single pattern, partial match equals input' => [
-            ['{zero,*\,zero,zero\,*,*\,zero\,*}' => '1'],
-            ['zeroo'],
-            [],
-        ];
 
         // The (=foo) and (!foo) patterns are lookaheads:
         // I haven't found a use for them, but I can't ignore them
@@ -354,20 +254,10 @@ class MapTest extends TestCase
             ['zero0'],
             ['1'],
         ];
-        yield 'positive lookahead: no match' => [
-            ['zero(=[a-z])*' => '1'],
-            ['zero0'],
-            [],
-        ];
         yield 'negative lookahead: match' => [
             ['zero(![a-z])*' => '1'],
             ['zero0'],
             ['1'],
-        ];
-        yield 'negative lookahead: no match' => [
-            ['zero(![0-9])*' => '1'],
-            ['zero0'],
-            [],
         ];
 
         // Invalid patterns:
@@ -376,15 +266,140 @@ class MapTest extends TestCase
         // uses the daemon kernel, which throws errors on warning trigger.
         // (Of course this class shouldn't have any dependency on which kernel
         //  creates it: undoing said dependency is another problem though.)
-        yield 'invalid pattern' => [
-            ['{zero' => '1'],
-            ['zero'],
-            [],
-        ];
         yield 'valid and invalid patterns: valid patterns still match' => [
             ['{zero' => '1', 'zero' => '2', 'zero0' => '3'],
             ['zero'],
             ['2'],
+        ];
+    }
+
+    /**
+     * Data provider for `testApplyNoMatch`.
+     *
+     * @return iterable
+     */
+    public function getTestApplyNoMatchData(): iterable
+    {
+        yield 'Empty map, empty input' => [
+            [],
+            [],
+        ];
+
+        yield 'Empty map, non-empty input' => [
+            [],
+            ['input'],
+        ];
+
+        yield 'Non-empty map, empty input' => [
+            ['match' => 'output'],
+            [],
+        ];
+
+        yield 'No matching mappings' => [
+            ['match' => 'output'],
+            ['input', 'input2'],
+        ];
+
+        yield '[! escaped, no match' => [
+            ['match\\[!1]' => '1'],
+            ['match\\2'],
+        ];
+
+        yield '[! double-escaped, no match' => [
+            ['match\\\\[!1]' => '1'],
+            ['match\\1'],
+        ];
+
+        // Vagaries of fnmatch
+        yield 'leading period in input does not match' => [
+            ['test' => '1'],
+            ['.test'],
+        ];
+
+        yield 'leading period in map does not match' => [
+            ['.test' => '1'],
+            ['test'],
+        ];
+
+        yield 'backslashes escape: not a match' => [
+            ['test\\*' => '1'],
+            ['test?'],
+        ];
+
+        yield 'comma-separated list: multiple patterns, partial match at start of input' => [
+            [
+                'zero'     => '1',
+                '*,zero'   => '1',
+                'zero,*'   => '1',
+                '*,zero,*' => '1',
+            ],
+            ['zeroo,match,one'],
+        ];
+
+        yield 'comma-separated list: multiple patterns, partial match in middle of input' => [
+            [
+                'zero'     => '1',
+                '*,zero'   => '1',
+                'zero,*'   => '1',
+                '*,zero,*' => '1',
+            ],
+            ['match,zeroo,one'],
+        ];
+
+        yield 'comma-separated list: multiple patterns, partial match at end of input' => [
+            [
+                'zero'     => '1',
+                '*,zero'   => '1',
+                'zero,*'   => '1',
+                '*,zero,*' => '1',
+            ],
+            ['match,one,zeroo'],
+        ];
+
+        yield 'comma-separated list: multiple patterns, partial match equals input' => [
+            [
+                'zero'     => '1',
+                '*,zero'   => '1',
+                'zero,*'   => '1',
+                '*,zero,*' => '1',
+            ],
+            ['zeroo'],
+        ];
+
+        yield 'comma-separated list: single pattern, partial match at start of input' => [
+            ['{zero,*\,zero,zero\,*,*\,zero\,*}' => '1'],
+            ['zeroo,match,one'],
+        ];
+
+        yield 'comma-separated list: single pattern, partial match in middle of input' => [
+            ['{zero,*\,zero,zero\,*,*\,zero\,*}' => '1'],
+            ['match,zeroo,one'],
+        ];
+
+        yield 'comma-separated list: single pattern, partial match at end of input' => [
+            ['{zero,*\,zero,zero\,*,*\,zero\,*}' => '1'],
+            ['match,one,zeroo'],
+        ];
+
+        yield 'comma-separated list: single pattern, partial match equals input' => [
+            ['{zero,*\,zero,zero\,*,*\,zero\,*}' => '1'],
+            ['zeroo'],
+        ];
+
+        yield 'positive lookahead: no match' => [
+            ['zero(=[a-z])*' => '1'],
+            ['zero0'],
+        ];
+
+        yield 'negative lookahead: no match' => [
+            ['zero(![0-9])*' => '1'],
+            ['zero0'],
+        ];
+
+        // Only invalid patterns: raise a no match
+        yield 'invalid pattern' => [
+            ['{zero' => '1'],
+            ['zero'],
         ];
     }
 }
