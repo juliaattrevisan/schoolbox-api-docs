@@ -18,7 +18,6 @@ namespace Alaress\Rules\Lang;
  */
 interface Construct
 {
-
     /**
      * Return a summary text describing the state of this construct. Essentially __toString
      *
