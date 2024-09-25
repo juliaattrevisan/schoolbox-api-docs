@@ -86,9 +86,10 @@ class Folder
      */
     public function sendZip(): void
     {
-        $zipOptions = new ZipStream\Option\Archive();
-        $zipOptions->setSendHttpHeaders(true);
-        $zipStream = new ZipStream\ZipStream($this->folder->getName() . '.zip', $zipOptions);
+        $zipStream = new ZipStream\ZipStream(
+            sendHttpHeaders: true,
+            outputName: $this->folder->getName() . '.zip',
+        );
 
         // Iterate the folder, its sub-folders and its files
         $this->iterateFolder($zipStream, $this->folder, []);

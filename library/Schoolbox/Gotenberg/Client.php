@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace Schoolbox\Gotenberg;
 
 use Gotenberg\Modules\Chromium;
+use Gotenberg\Modules\ChromiumPdf;
 use Gotenberg\Modules\PdfEngines;
 use Psr\Http\Client\ClientExceptionInterface;
 use Psr\Http\Client\ClientInterface;
@@ -78,15 +79,16 @@ class Client
      *                                 with the request.
      *                                 May contain an authenticated Schoolbox
      *                                 user?
-     * @return Chromium
+     * @return ChromiumPdf
      */
-    public function buildHtmlToPdfConverter(?string $sessionHash): Chromium
+    public function buildHtmlToPdfConverter(?string $sessionHash): ChromiumPdf
     {
         $params    = [];
-        $converter = new Chromium($this->apiHost);
+        $converter = (new Chromium($this->apiHost))->pdf();
         if (isset($sessionHash)) {
             $params['Cookie'] = sprintf('%s=%s', session_name(), $sessionHash);
-            return $converter->extraHttpHeaders($params);
+            $converter->extraHttpHeaders($params);
+            return $converter;
         }
         return $converter;
     }
