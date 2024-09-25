@@ -28,6 +28,7 @@ const selectedNodes = window.Vue.ref<Pick<Node, "id" | "name" | "code" | "descri
 </script>
 
 <template>
+    <<<<<<< HEAD
     <h1>Curriculum Coverage Report</h1>
     <div class="l-flex-col l-gap-m">
         <div class="c-island l-flex-col l-pad-m l-gap-m">
@@ -98,6 +99,7 @@ const selectedNodes = window.Vue.ref<Pick<Node, "id" | "name" | "code" | "descri
                     :is-read-only="false"
                     :data-endpoint="props.endpoint"
                     :is-select-all="true"
+                    :include-without-code="true"
                     :can-select-children="false"
                     :selected-nodes="selectedNodes"
                     input-id="curriculum"

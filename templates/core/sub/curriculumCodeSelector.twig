@@ -9,7 +9,6 @@
 <div data-cs-container>
     <curriculum-selector
         :is-read-only="{{ courseManagedReadonly ? 'true' : 'false' }}"
-        :include-without-code="false"
         :selected-nodes="{{ codeList|json_encode }}"
         data-endpoint="{{ routeLookup('curriculumApi.searchNode') }}"
     />
