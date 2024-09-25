@@ -9,22 +9,22 @@
 
 namespace Alaress\Lumberjack;
 
-class MicrotimeProcessor
-{
+use Monolog\LogRecord;
+use Monolog\Processor\ProcessorInterface;
 
+class MicrotimeProcessor implements ProcessorInterface
+{
     /**
-     * @param array $record
-     * @return array
+     * @param LogRecord $record
+     * @return LogRecord
      */
-    function __invoke(array $record)
+    public function __invoke(LogRecord $record): LogRecord
     {
         $t = microtime(true);
 
-        $record['extra'] = array_merge(
-            $record['extra'],
-            array(
-                'microtime' => $t - (int)$t,
-            )
+        $record->extra = array_merge(
+            $record->extra ?? [],
+            ['microtime' => $t - (int)$t,]
         );
 
         return $record;
