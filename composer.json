@@ -46,7 +46,7 @@
         "tijsverkoyen/css-to-inline-styles": "~2.2",
         "html2text/html2text": "~4.3.1",
         "wolfcast/browser-detection": "~2.9.0",
-        "aura/di": "^4.2.1",
+        "aura/di": "^5.0",
         "aura/router": "^3.3.0",
         "aura/session": "~2.1.0",
         "0x46616c6b/etherpad-lite-client": "~0.6",

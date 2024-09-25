@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "399df170566fb63979adb37bb00bd41a",
+    "content-hash": "97a1515b9bd18e753a18975a8b3bd1e5",
     "packages": [
         {
             "name": "0x46616c6b/etherpad-lite-client",
@@ -123,30 +123,37 @@
         },
         {
             "name": "aura/di",
-            "version": "4.2.1",
+            "version": "5.0.8",
             "source": {
                 "type": "git",
                 "url": "https://github.com/auraphp/Aura.Di.git",
-                "reference": "faf49669dae6b422f298803f25ef12997906f2e9"
+                "reference": "73000f88657bd1109fa6519a88d0622b0a9591f8"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/auraphp/Aura.Di/zipball/faf49669dae6b422f298803f25ef12997906f2e9",
-                "reference": "faf49669dae6b422f298803f25ef12997906f2e9",
+                "url": "https://api.github.com/repos/auraphp/Aura.Di/zipball/73000f88657bd1109fa6519a88d0622b0a9591f8",
+                "reference": "73000f88657bd1109fa6519a88d0622b0a9591f8",
                 "shasum": ""
             },
             "require": {
-                "php": "^7.4 || ^8.0",
-                "psr/container": "^1.1.1 || ^2.0.2"
+                "php": "^8.0",
+                "psr/container": "^2.0.2"
             },
             "provide": {
                 "psr/container-implementation": "^1.0"
             },
             "require-dev": {
-                "phpunit/phpunit": "^9.5",
-                "producer/producer": "^2.3",
-                "roave/security-advisories": "dev-master"
+                "composer/class-map-generator": "^1.1",
+                "phpstan/phpstan": "^1.11.1",
+                "phpunit/phpunit": "^9.0 || ^10.0",
+                "producer/producer": "^2.3"
             },
+            "suggest": {
+                "composer/class-map-generator": "Required for scanning classes and annotations"
+            },
+            "bin": [
+                "bin/auradi"
+            ],
             "type": "library",
             "autoload": {
                 "psr-4": {
@@ -174,9 +181,9 @@
             ],
             "support": {
                 "issues": "https://github.com/auraphp/Aura.Di/issues",
-                "source": "https://github.com/auraphp/Aura.Di/tree/4.2.1"
+                "source": "https://github.com/auraphp/Aura.Di/tree/5.0.8"
             },
-            "time": "2022-01-04T21:37:03+00:00"
+            "time": "2024-09-17T20:35:03+00:00"
         },
         {
             "name": "aura/router",
