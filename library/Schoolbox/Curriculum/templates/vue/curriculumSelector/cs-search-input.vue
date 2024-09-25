@@ -34,6 +34,14 @@ const props = defineProps({
         default: false,
     },
     /**
+     * set to true if curriculum nodes with blank codes need to be selectable
+     */
+    includeWithoutCode: {
+        type: Boolean,
+        required: false,
+        default: false,
+    },
+    /**
      * the id of the search input element
      */
     inputId: {
@@ -144,7 +152,7 @@ window.Vue.watch(
  * debounce to avoid constant polling while the user is typing
  */
 const debounceSearch = debounce(() => {
-    searchStore.search();
+    searchStore.search(props.includeWithoutCode);
 }, DEBOUNCE_AMOUNT);
 
 /**

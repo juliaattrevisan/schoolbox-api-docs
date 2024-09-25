@@ -41,6 +41,14 @@ const props = defineProps({
         default: true,
     },
     /**
+     * set to true if curriculum nodes with blank codes need to be selectable
+     */
+    includeWithoutCode: {
+        type: Boolean,
+        required: false,
+        default: true,
+    },
+    /**
      * input name, to allow custom form structure
      */
     formValueName: {
@@ -145,6 +153,7 @@ function onSelectedNodeModalClosed() {
         <cs-search-input
             :curriculum-selector-el="curriculumSelectorEl"
             :is-single-select="props.isSingleSelect"
+            :include-without-code="props.includeWithoutCode"
             :input-id="props.inputId"
         />
         <cs-search-results :is-single-select="props.isSingleSelect" />
