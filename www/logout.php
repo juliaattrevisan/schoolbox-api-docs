@@ -2,7 +2,10 @@
 
 //small script to logout users
 
+use GuzzleHttp\HandlerStack;
+use GuzzleHttp\Middleware;
 use Http\Discovery\Psr17Factory;
+use Psr\Http\Message\ResponseInterface;
 use Ramsey\Uuid\Uuid;
 use Schoolbox\API\Token\Jwt;
 use Schoolbox\Auth\Remember;
@@ -12,14 +15,24 @@ use Schoolbox\Oidc\Server\Request\LogoutFactory;
 require_once __DIR__ . '/../conf/core/require.php';
 $kernel = new \Schoolbox\Application\WebRequest\Kernel();
 
-// Begin back-channel logout requests
+// Begin back-channel logout requests:
+// Retry requests up to 3 times I guess?
+$stack = HandlerStack::create();
+$stack->push(
+    Middleware::retry(
+        fn ($retries, $request, ResponseInterface $response) => $response->getStatusCode() >= 400 && $retries <= 3,
+        fn () => 2000,
+    ),
+);
+$jwtBuilder    = null;
+$httpFactory   = null;
+$logoutFactory = null;
+$httpClient    = null;
+$backChannelRequests = [];
 foreach ($_SESSION[\Schoolbox\Oidc\Server\Controller::SESSION_OIDC_SERVER_CLIENTS] ?? [] as $clientId) {
     // Does this client support logout?
     // If so, craft a logout token and send it
-    $client        = Mapper::getInstance()->findByClientId($clientId);
-    $jwtBuilder    = null;
-    $httpFactory   = null;
-    $logoutFactory = null;
+    $client = Mapper::getInstance()->findByClientId($clientId);
     if ($client?->getBackChannelLogoutUri()) {
         // Create logout factory on demand only
         /** @var Jwt $jwtBuilder */
@@ -30,11 +43,14 @@ foreach ($_SESSION[\Schoolbox\Oidc\Server\Controller::SESSION_OIDC_SERVER_CLIENT
         $request       = $logoutFactory->build($_SESSION['user'], $client, Uuid::uuid4()->toString());
 
         /** @var \GuzzleHttp\ClientInterface $httpClient */
-        $httpClient = $kernel->get('httpClient');
-
-        // Consider retry if this fails?
-        $httpClient->sendAsync($request);
+        $httpClient ??= $kernel->get('httpClient');
+        $backChannelRequests[$clientId] = $httpClient->sendAsync($request, ['handler' => $stack]);
     }
+}
+
+// Wait for any back-channel requests to complete
+if (!empty($backChannelRequests)) {
+    \GuzzleHttp\Promise\Utils::settle($backChannelRequests)->wait();
 }
 
 if (Config::get('saml_slo_enabled') && isset($_SESSION['samlNameId'])) {
