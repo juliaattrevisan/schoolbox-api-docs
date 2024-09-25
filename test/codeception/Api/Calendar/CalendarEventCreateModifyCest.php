@@ -69,6 +69,7 @@ class CalendarEventCreateModifyCest
         }
 
         // In created event, check keys with non-array values.
+        $todayYmd = date('Y-m-d');
         $timezoneOffset = date('P'); // E.g. '+10:00'.
         $expectedValueByKey = [
             'allDay' => true,
@@ -77,7 +78,7 @@ class CalendarEventCreateModifyCest
             'startDate' => "2024-09-24T00:00:00$timezoneOffset",
             'endDate' => "2024-09-24T23:59:59$timezoneOffset",
             'repeat' => '', // TODO: This value ought to be a null instead of a blank string.
-            'repeat_until' => "2024-09-24T23:59:59$timezoneOffset",
+            'repeat_until' => "{$todayYmd}T23:59:59$timezoneOffset",
             'location' => '',
             'detail' => '',
             'publishDate' => "2024-09-25T19:00:00$timezoneOffset",
