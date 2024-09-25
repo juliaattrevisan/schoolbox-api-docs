@@ -8,18 +8,6 @@ import Calendar from "@schoolboxTest/playwright/support/page/calendar/Calendar";
 import CreateEvent from "@schoolboxTest/playwright/support/page/calendar/CreateEvent";
 
 test.describe("Calendar tests", () => {
-    /**
-     * Deleting Events when the test is about to start so it does not get impacted by other tests already executed
-     */
-    test.beforeAll(async ({ baseTester, db }) => {
-        baseTester.isGoingTo("update delete_at for the news article so it does not impact the news tests");
-        await db.updateInDatabase(
-            "event",
-            { deleted_at: "2022-01-15 11:22:34" },
-            { "title like": "Automation Event%" },
-        );
-    });
-
     test.beforeEach(async ({ tester, page }) => {
         await tester.logout();
         await tester.loginAsAdmin();
@@ -159,5 +147,23 @@ test.describe("Calendar tests", () => {
 
         tester.isGoingTo("delete the event so it does not impact in the next test");
         await db.updateInDatabase("event", { deleted_at: "2022-01-15 11:22:34" }, { "title like": eventTitleSchool });
+    });
+
+    /**
+     * Soft deleting data to not impact the tests
+     */
+    test.afterAll(async ({ baseTester, db }) => {
+        baseTester.isGoingTo(
+            "update delete_at for the data created in this test so it does impact next suite of tests",
+        );
+        const eventTitlePersonal = "My Personal Test Event";
+        const eventTitleGroup = "My Group Test Event";
+        const eventTitleSchool = "My School Test Event";
+        const eventTitle = "My Test Event";
+        await db.updateInDatabase("event", { deleted_at: "2022-01-15 11:22:34" }, { "title like": eventTitlePersonal });
+        await db.updateInDatabase("event", { deleted_at: "2022-01-15 11:22:34" }, { "title like": eventTitleGroup });
+        await db.updateInDatabase("event", { deleted_at: "2022-01-15 11:22:34" }, { "title like": eventTitleSchool });
+        await db.updateInDatabase("event", { deleted_at: "2022-01-15 11:22:34" }, { "title like": eventTitle });
+        await db.dontHaveInDatabase("userAccess", { uid: 22, service: 2, sid: 2, type: 3 });
     });
 });
