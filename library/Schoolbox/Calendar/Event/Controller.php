@@ -724,7 +724,7 @@ class Controller extends Base
             // Unlike the other dates, until date is currently always a date and
             // not a date+time.
             $untilDate = (new Alaress_Date_Format(
-                $validRequestPost['repeat_until'] ?? $event->getEndDateTime(),
+                $validRequestPost['repeat_until'] ?? $endDate->getDatabaseDate(),
                 [$locale->localShortFormat(), Alaress_Date_Format::DATABASE_DATE_FORMAT],
             ))->endOfDay();
         } catch (InvalidArgumentException) {
