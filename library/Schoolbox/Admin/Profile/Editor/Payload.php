@@ -152,7 +152,6 @@ class Payload
                 ];
             }
 
-
             /* Sort by sequence for further processing. Frontend needed this in sequential
              * order, so I guess we can just do that here with a quick reindex
              */
@@ -165,22 +164,6 @@ class Payload
                     continue;
                 }
 
-                /* Find the ids of the campuses for which this field might be available
-                 */
-                $availabilityCampusIds = [];
-
-                foreach ($field->getAvailabilityCampus() as $availabilityCampus) {
-                    $availabilityCampusIds[] = $availabilityCampus->getCampus()->getId();
-                }
-
-                /* Find the roletypes ("ids") for which this field might be visible
-                 */
-                $visibilityRoleTypesIds = [];
-
-                foreach ($field->getVisibility() as $visibility) {
-                    $visibilityRoleTypesIds[] = $visibility->getRoleType();
-                }
-
                 /* Pile it into the stack
                  */
                 $roleTypeSettings['fields']['selected'][] = [
@@ -189,8 +172,14 @@ class Payload
                     'icon' => $field->getIcon(),
                     'css' => $field->getCss(),
                     'fieldSettings' => [
-                        self::AVAILABILITY_NODE => $availabilityCampusIds,
-                        self::VISIBILITY_NODE => $visibilityRoleTypesIds
+                        /* Find the ids of the campuses for which this field might be available
+                         */
+                        self::AVAILABILITY_NODE => $field->getAvailabilityCampus()?->indexByCallback(static function (\Schoolbox\Admin\Profile\Editor\Field\Availability\Campus\Model $campus) {
+                            return $campus->getCampus()?->getId();
+                        })->keys(),
+                        /* Find the roletypes ("ids") for which this field might be visible
+                         */
+                        self::VISIBILITY_NODE => $field->getVisibility()?->indexBy('roleType')->keys()
                     ]
                 ];
             }
