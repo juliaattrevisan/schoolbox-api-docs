@@ -89,20 +89,20 @@ class CliFormatter extends NormalizerFormatter
     /**
      * Formats a log record.
      *
-     * @param  array $record A record to format
+     * @param  Monolog\LogRecord $record A record to format
      * @return mixed The formatted record
      */
-    public function format(array $record)
+    public function format(Monolog\LogRecord $record)
     {
         return $this->decorate($this->generateRecord($record), $record['level'], $record['context']);
     }
 
 
     /**
-     * @param array $record
+     * @param Monolog\LogRecord $record
      * @return mixed|string
      */
-    protected function generateRecord(array $record)
+    protected function generateRecord(Monolog\LogRecord $record)
     {
         $map = [
             'memory_usage'      => 'mem',
@@ -111,16 +111,15 @@ class CliFormatter extends NormalizerFormatter
         ];
 
         // if this is already formatted like a log, don't reformat it
-        if (preg_match("`\[.\].* => `", $record['message'])) {
-            return $record['message'];
+        if (preg_match("`\[.\].* => `", $record->message)) {
+            return $record->message;
         }
 
-        /** @var \DateTime $datetime */
-        $datetime = $record['datetime'];
+        $datetime = $record->datetime;
         $date = $datetime->format('Y-m-d H:i:s');
-        if (isset($record['extra']['microtime'])) {
-            $date .= substr($record['extra']['microtime'], 1, self::TIME_RESOLUTION + 1);
-            unset($record['extra']['microtime']);
+        if (isset($record->extra['microtime'])) {
+            $date .= substr($record->extra['microtime'], 1, self::TIME_RESOLUTION + 1);
+            unset($record->extra['microtime']);
         }
 
         $pieces = array("[$date]");
@@ -136,10 +135,10 @@ class CliFormatter extends NormalizerFormatter
             }
         }
 
-        $pieces[] = " => {$record['message']}";
+        $pieces[] = " => {$record->message}";
 
         if ($this->contextualise) {
-            $context = $record['context'];
+            $context = $record->context;
             unset($context['char']);
             foreach ($context as $key => $value) {
                 $pieces[] = "\n   $key => $value";

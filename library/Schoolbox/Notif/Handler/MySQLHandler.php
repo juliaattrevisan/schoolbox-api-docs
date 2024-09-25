@@ -11,6 +11,7 @@ namespace Schoolbox\Notif\Handler;
 
 use Monolog\Handler\AbstractProcessingHandler;
 use Monolog\Logger;
+use Monolog\LogRecord;
 use Schoolbox\Database\Factory;
 use Schoolbox\Notif\NotifException;
 
@@ -31,11 +32,11 @@ class MySQLHandler extends AbstractProcessingHandler
     /**
      * Writes the record down to the log of the implementing handler
      *
-     * @param  array $record
+     * @param  LogRecord $record
      * @throws \Schoolbox\Notif\NotifException
      * @return void
      */
-    protected function write(array $record): void
+    protected function write(LogRecord $record): void
     {
         if (empty($this->sql)) {
             throw new NotifException("No query provided for MySQL handler");
@@ -45,7 +46,7 @@ class MySQLHandler extends AbstractProcessingHandler
         $stmt = Factory::getInstanceInternal()->prepare($this->sql);
 
         try {
-            $stmt->execute($record['context']);
+            $stmt->execute($record->context);
         } catch (\PDOException $e) {
             throw new NotifException("Could not log to database.", 0, $e);
         }
