@@ -7,7 +7,7 @@
 
 declare(strict_types=1);
 
-namespace Schoolbox\Oidc\Server\Request;
+namespace Schoolbox\Oidc\Server\BackChannelLogout;
 
 use Alaress_Date_Format;
 use Http\Discovery\Psr17Factory;
@@ -23,7 +23,7 @@ use Schoolbox\User;
  *
  * @see https://openid.net/specs/openid-connect-backchannel-1_0.html
  */
-class LogoutFactory
+class RequestFactory
 {
     /**
      * Default expiry for logout token JWTs: 300 seconds.

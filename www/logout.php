@@ -2,49 +2,31 @@
 
 //small script to logout users
 
-use GuzzleHttp\HandlerStack;
-use GuzzleHttp\Middleware;
-use Http\Discovery\Psr17Factory;
-use Psr\Http\Message\ResponseInterface;
 use Ramsey\Uuid\Uuid;
-use Schoolbox\API\Token\Jwt;
 use Schoolbox\Auth\Remember;
+use Schoolbox\Oidc\Server\BackChannelLogout;
 use Schoolbox\Oidc\Server\RelyingParty\Mapper;
-use Schoolbox\Oidc\Server\Request\LogoutFactory;
 
 require_once __DIR__ . '/../conf/core/require.php';
 $kernel = new \Schoolbox\Application\WebRequest\Kernel();
 
-// Begin back-channel logout requests:
-// Retry requests up to 3 times I guess?
-$stack = HandlerStack::create();
-$stack->push(
-    Middleware::retry(
-        fn ($retries, $request, ResponseInterface $response) => $response->getStatusCode() >= 400 && $retries <= 3,
-        fn () => 2000,
-    ),
-);
-$jwtBuilder    = null;
-$httpFactory   = null;
-$logoutFactory = null;
-$httpClient    = null;
+$logoutFactory       = null;
+$logoutClient        = null;
 $backChannelRequests = [];
 foreach ($_SESSION[\Schoolbox\Oidc\Server\Controller::SESSION_OIDC_SERVER_CLIENTS] ?? [] as $clientId) {
     // Does this client support logout?
     // If so, craft a logout token and send it
     $client = Mapper::getInstance()->findByClientId($clientId);
     if ($client?->getBackChannelLogoutUri()) {
-        // Create logout factory on demand only
-        /** @var Jwt $jwtBuilder */
-        /** @var Psr17Factory $httpFactory */
-        $jwtBuilder    ??= $kernel->get('user.tokenBuilder');
-        $httpFactory   ??= $kernel->get('httpFactory');
-        $logoutFactory ??= new LogoutFactory($jwtBuilder, $httpFactory);
-        $request       = $logoutFactory->build($_SESSION['user'], $client, Uuid::uuid4()->toString());
+        // Create logout factory and client on demand only
+        $logoutFactory ??= new BackChannelLogout\RequestFactory(
+            $kernel->get('user.tokenBuilder'),
+            $kernel->get('httpFactory'),
+        );
+        $request = $logoutFactory->build($_SESSION['user'], $client, Uuid::uuid4()->toString());
 
-        /** @var \GuzzleHttp\ClientInterface $httpClient */
-        $httpClient ??= $kernel->get('httpClient');
-        $backChannelRequests[$clientId] = $httpClient->sendAsync($request, ['handler' => $stack]);
+        $logoutClient                   ??= new BackChannelLogout\Client($kernel->get('httpClient'));
+        $backChannelRequests[$clientId] = $logoutClient->send($request);
     }
 }
 
