@@ -139,6 +139,7 @@ test.describe("Lesson Plan Templates", () => {
         await templateList.clickDisableEnableVisibility(templateId);
         await templateList.clickLessonPlanTemplateMenu(templateId);
         await expect(page.locator(`#lpt-${templateId}.f-dropdown`)).toContainText("Enable visibility");
+        await page.reload();
         tester.isGoingTo("Enable a lesson plan template");
         await templateList.clickLessonPlanTemplateMenu(templateId);
         await templateList.clickDisableEnableVisibility(templateId);
