@@ -60,6 +60,9 @@ class CalendarEventCreateModifyCest
         $i->amGoingTo("create an event using the API, with minimal required parameters ($this->apiPathForCreate)...");
         $i->sendPost($this->apiPathForCreate, $this->eventMinimalRequiredParams);
         $localEventJson = $i->grabResponse();
+        // NOTE: The event returned from the 'create' request will become the $this->localEvent.
+        //       This event is so named because in tests to follow, it will be modified locally and then compared with
+        //       the event returned from the API when identical modifications are requested via the API.
         $this->localEvent = json_decode($localEventJson, true);
         if ($this->localEvent === null) {
             throw new UnexpectedValueException("Could not decode JSON '$localEventJson'.'");
@@ -147,6 +150,11 @@ class CalendarEventCreateModifyCest
             'startDate'     => "2024-09-22T00:00:00$timezoneOffset", // Move startDate backwards, so endDate need not change.
             'endDate'       => "2024-09-24T23:59:59$timezoneOffset", // Move end date forwards, so startDate need not change.
         ];
+
+        // Each modify request will cause the repeat_until date to be set to match the event's endDate.
+        // (Unless a new value for repeat_until is supplied in the 'modify' request).
+        // See Calendar/Event/Controller->postModify().
+        $this->localEvent['repeat_until'] = $this->localEvent['endDate'];
 
         // -----------------------------------------------------------------------------------------------------------//
         // Run each of the $eventModifications in sequence, locally and via the API.
