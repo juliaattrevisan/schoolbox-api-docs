@@ -41,12 +41,17 @@ class ModelToArray
             'id'          => $courseSpec->getId(),
             'title'       => $courseSpec->getTitle(),
             'subjectCode' => $courseSpec->getSubjectCode(),
+            'frameWorkId' => $courseSpec->getTemplate()->getId(),
             'folder'      => call_user_func($this->folderTranslator, $courseSpec->getFolder()),
             '_links'      => [
                 'view' => $this->getRouteIfAuthorized(
                     'course.modifyCourse',
                     ['courseSpec' => $courseSpec, 'id' => $courseSpec->getId()],
                 ),
+                'delete' => $this->getRouteIfAuthorized(
+                    'course.deleteCourseSpecification',
+                    ['courseSpec' => $courseSpec, 'id' => $courseSpec->getId()],
+                )
             ],
         ];
     }
