@@ -37,22 +37,38 @@ class Payload
 
 
     /**
+     * Make a payload containing data for all the roletypes we support
+     *
+     * @return array|array[]
+     */
+    public function generateAll(): array
+    {
+        return $this->generate([
+            Role::STUDENT,
+            Role::STAFF,
+            Role::PARENT,
+        ]);
+    }
+
+
+    /**
      * Generates a payload for rendering a list of fields for the super to choose,
      * and also a list of ones they've previously chosen,
      * to appear on the given $roleType's profile screen
      *
+     * $roleTypes lets you specify the roletype whose payloads you want to
+     * construct: you can specify all of them, or a one-element array, etc
+     *
+     * @param array $roleTypes
      * @return array
-     * @throws DebugBarException
      */
-    public function generateAll(): array
+    public function generate(array $roleTypes): array
     {
-        /* Ones that we support
+        /* Exit early when you didn't specify any roletypes by accident
          */
-        $availableRoleTypes = [
-            Role::STUDENT,
-            Role::STAFF,
-            Role::PARENT,
-        ];
+        if (!\count($roleTypes)) {
+            return [];
+        }
 
         /* Put it into the frontend payload format
          */
@@ -93,7 +109,7 @@ class Payload
             'options' => []
         ];
 
-        foreach ($availableRoleTypes as $roleType) {
+        foreach ($roleTypes as $roleType) {
             $fieldSettingsRoleType['options'][] = [
                 'type' => 'roleType',
                 'id' => $roleType,
@@ -108,7 +124,7 @@ class Payload
 
         /* Start processing the roleTypes node
          */
-        foreach ($availableRoleTypes as $roleType) {
+        foreach ($roleTypes as $roleType) {
             $roleTypeSettings = [
                 'roleType' => $roleType,
                 'fields' => [
