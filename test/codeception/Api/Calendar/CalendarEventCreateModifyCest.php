@@ -60,6 +60,9 @@ class CalendarEventCreateModifyCest
         $i->amGoingTo("create an event using the API, with minimal required parameters ($this->apiPathForCreate)...");
         $i->sendPost($this->apiPathForCreate, $this->eventMinimalRequiredParams);
         $localEventJson = $i->grabResponse();
+        // NOTE: The event returned from the 'create' request will become the $this->localEvent.
+        //       This event is so named because in tests to follow, it will be modified locally and then compared with
+        //       the event returned from the API when identical modifications are requested via the API.
         $this->localEvent = json_decode($localEventJson, true);
         if ($this->localEvent === null) {
             throw new UnexpectedValueException("Could not decode JSON '$localEventJson'.'");
