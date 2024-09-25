@@ -427,9 +427,7 @@ window.Vue.onMounted(() => {
                 </div>
                 <div class="f-no-margins">
                     <label for="addClient-backChannelLogoutUri">Back-channel Logout URI</label>
-                    <p class="meta">
-                        When the user logs out of Schoolbox: send a logout request to this URI.
-                    </p>
+                    <p class="meta">When the user logs out of Schoolbox: send a logout request to this URI.</p>
                     <input id="modifyItem-addClient" v-model="addingClient.backChannelLogoutUri" />
                 </div>
                 <div class="f-no-margins">
@@ -519,9 +517,7 @@ window.Vue.onMounted(() => {
                 </div>
                 <div class="f-no-margins">
                     <label for="modifyItem-backChannelLogoutUri">Back-channel Logout URI</label>
-                    <p class="meta">
-                        When the user logs out of Schoolbox: send a logout request to this URI.
-                    </p>
+                    <p class="meta">When the user logs out of Schoolbox: send a logout request to this URI.</p>
                     <input id="modifyItem-backChannelLogoutUri" v-model="modifyingClient.backChannelLogoutUri" />
                 </div>
                 <div class="f-no-margins">
