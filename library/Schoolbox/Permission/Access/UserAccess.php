@@ -85,9 +85,14 @@ class UserAccess implements IModel
     /**
      * Value for $this->service:
      * $this->user has $this->accessLevel permission for the timetable system.
-     * system.
      */
     public const SERVICE_TIMETABLE = 12;
+
+    /**
+     * Value for $this->service:
+     * $this->user has $this->accessLevel permission for the design system.
+     */
+    public const SERVICE_DESIGN = 13;
 
     /**
      * Services that do not have have service identifiers (sid) use this value
@@ -190,6 +195,7 @@ class UserAccess implements IModel
             self::SERVICE_SPORTS_ADMINISTRATOR,
             self::SERVICE_BADGE,
             self::SERVICE_TIMETABLE,
+            self::SERVICE_DESIGN,
         ];
     }
 
