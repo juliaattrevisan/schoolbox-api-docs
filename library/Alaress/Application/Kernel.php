@@ -25,7 +25,6 @@ use Alaress\Redis\Cache\ItemPool;
 use Alaress\Redis\Cache\KeyGenerator;
 use Alaress\Session\Factory;
 use Alaress\Session\Session;
-use Alaress\Twig\Filter as AlaressFilter;
 use Alaress\Twig\Loader\ChainLoader;
 use Alaress\Twig\Method as TwigMethod;
 use Alaress\Web\Output;
