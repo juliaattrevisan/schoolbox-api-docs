@@ -34,7 +34,7 @@ const tooltipText = window.Vue.computed<string | undefined>(() => {
 <template>
     <span
         v-if="props.field.icon"
-        :data-tooltip="tooltipText !== undefined ? true : undefined"
+        :data-tooltip="tooltipText !== undefined ? `pe-fields-icon-tip-${props.field.css}` : undefined"
         :title="tooltipText"
         class="pe-fields-icon"
         :class="`${props.field.icon} ${props.field.css || ''}`"
