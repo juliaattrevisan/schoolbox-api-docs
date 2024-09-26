@@ -33,7 +33,8 @@ class Payload
     public function __construct(
         private \Schoolbox\Admin\Profile\Editor\Field\Mapper $fieldMapper,
         private \Schoolbox\CampusMapper $campusMapper
-    ) {}
+    ) {
+    }
 
 
     /**
