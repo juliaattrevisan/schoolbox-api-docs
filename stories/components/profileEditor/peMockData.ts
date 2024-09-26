@@ -1,4 +1,4 @@
-import type { ProfileEditorPayload } from "./types/profilePayloadTypes";
+import type { ProfileEditorPayload } from "../../../library/Schoolbox/Admin/Profile/Editor/vue/types/profilePayloadTypes";
 
 export const mockData: ProfileEditorPayload = {
     data: {
