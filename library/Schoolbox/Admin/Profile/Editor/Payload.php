@@ -87,7 +87,6 @@ class Payload
         /* Find available campuses
          */
         $fieldSettingsCampus = [
-            'key' => self::AVAILABILITY_NODE,
             'displayAs' => self::AVAILABILITY_NAME,
             'options' => []
         ];
@@ -103,7 +102,6 @@ class Payload
         /* Find the roletypes you can choose
          */
         $fieldSettingsRoleType = [
-            'key' => self::VISIBILITY_NODE,
             'displayAs' => self::VISIBILITY_NAME,
             'options' => []
         ];
@@ -117,8 +115,8 @@ class Payload
         }
 
         $payload['data']['fieldSettings'] = [
-            $fieldSettingsCampus,
-            $fieldSettingsRoleType
+            self::AVAILABILITY_NODE => $fieldSettingsCampus,
+            self::VISIBILITY_NODE => $fieldSettingsRoleType
         ];
 
         /* Start processing the roleTypes node
