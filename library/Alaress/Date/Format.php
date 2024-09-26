@@ -1855,7 +1855,7 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface, ICo
      */
     public function diffInWeekdays(Alaress_Date_Format $diff, $absolute = true)
     {
-        return (int)$this->getDateTimeObject()->diffInWeekdays($diff->getDateTimeObject(), $absolute);
+        return $this->getDateTimeObject()->diffInWeekdays($diff->getDateTimeObject(), $absolute);
     }
 
 
@@ -1866,7 +1866,7 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface, ICo
      */
     public function diffInWeekendDays(Alaress_Date_Format $diff, $absolute = true)
     {
-        return (int)$this->getDateTimeObject()->diffInWeekendDays($diff->getDateTimeObject(), $absolute);
+        return $this->getDateTimeObject()->diffInWeekendDays($diff->getDateTimeObject(), $absolute);
     }
 
 
