@@ -54,11 +54,20 @@ function onFieldSettingOptionChange(fieldSettingOption: ProfileFieldSettingOptio
         storeField.fieldSettings[props.fieldSettingKey] = filteredSettings;
     }
 }
+
+window.Vue.onMounted(() => {
+    // @ts-expect-error -- When a setting is added after the page is loaded, we need to tell foundation to fix the tooltips
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-call
+    $(document).foundation("tooltip", "reflow");
+});
 </script>
 
 <template>
     <div class="small-12 medium-6">
-        <label>{{ fieldSettingDefinition.displayAs }}:</label>
+        <label>
+            {{ fieldSettingDefinition.displayAs }}:
+            <span data-tooltip class="has-tip tip-top hint" :title="fieldSettingDefinition.tooltip"> ? </span>
+        </label>
         <div class="checklist">
             <ul class="option-list">
                 <li v-for="fieldSettingOption in fieldSettingDefinition.options" :key="fieldSettingOption.id">
