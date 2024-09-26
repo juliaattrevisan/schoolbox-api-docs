@@ -1,12 +1,11 @@
 import { defineStore } from "pinia";
-import type { ProfileFieldSetting } from "../types/profileTypes";
 import type { ProfileEditorRoleType, ProfileEditorEndpoints } from "../types/profileEditorTypes";
 import type { ProfileEditorPayload } from "../types/profilePayloadTypes";
 
 export const useProfileEditorStore = defineStore("profileEditorStore", () => {
     const isLoading = window.Vue.ref<boolean>(true);
-    const roleTypes = window.Vue.ref<ProfileEditorRoleType[]>([]);
-    const fieldSettings = window.Vue.ref<ProfileFieldSetting[]>([]);
+    const roleTypes = window.Vue.ref<ProfileEditorPayload["data"]["roleTypes"]>([]);
+    const fieldSettings = window.Vue.ref<ProfileEditorPayload["data"]["fieldSettings"]>({});
 
     const selectedRoleType = window.Vue.ref<ProfileEditorRoleType | null>(null);
 
@@ -38,8 +37,8 @@ export const useProfileEditorStore = defineStore("profileEditorStore", () => {
      */
     function init(
         $endpoints: ProfileEditorEndpoints,
-        $roleTypes: ProfileEditorRoleType[],
-        $fieldSettings: ProfileFieldSetting[],
+        $roleTypes: ProfileEditorPayload["data"]["roleTypes"],
+        $fieldSettings: ProfileEditorPayload["data"]["fieldSettings"],
     ): void {
         endpoints.value = $endpoints;
         roleTypes.value = $roleTypes;
@@ -80,8 +79,8 @@ export const useProfileEditorStore = defineStore("profileEditorStore", () => {
         const availableField = selectedRoleType.value.fields.available.find((f) => f.field === field);
         if (availableField === undefined) throw new Error(`Field ${field} not found`);
 
-        const fieldSettingsKeys = fieldSettings.value.map((setting) => setting.key);
-        const emptyFieldSettings = Object.fromEntries(fieldSettingsKeys.map((key) => [key, []]));
+        // a map of each field setting key to an empty array to start with (all settings are deselected)
+        const emptyFieldSettings = Object.fromEntries(Object.keys(fieldSettings.value).map((key) => [key, []]));
 
         selectedRoleType.value.fields.selected.splice(index, 0, {
             field: availableField.field,

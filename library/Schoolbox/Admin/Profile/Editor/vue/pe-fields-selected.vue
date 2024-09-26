@@ -13,7 +13,7 @@ const peStore = useProfileEditorStore();
 
 const sortableOptions = window.Vue.computed(() => ({
     group: {
-        name: `fields-${peStore.selectedRoleType ? peStore.selectedRoleType.name : "-"}`,
+        name: `fields-${peStore.selectedRoleType ? peStore.selectedRoleType.roleType : "-"}`,
         pull: false,
         put: true,
     },
@@ -59,7 +59,7 @@ function onAddField(event: Sortable.SortableEvent): void {
             :list="peStore.selectedRoleType.fields.selected"
             :item-key="(item) => item.field"
             :options="sortableOptions"
-            :transition-key="peStore.selectedRoleType.name"
+            :transition-key="peStore.selectedRoleType.roleType"
             :transition-enter="slideDownOnEnter"
             :transition-leave="slideUpOnLeave"
             @end="resequenceFields"

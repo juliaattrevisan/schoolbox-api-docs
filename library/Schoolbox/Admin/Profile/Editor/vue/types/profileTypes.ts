@@ -8,8 +8,8 @@ export type ProfileFieldSettingOption = {
     type: string; // currently unused, e.g. "campus" or "role"
 };
 
+export type ProfileFieldSettingKey = string;
 export type ProfileFieldSetting = {
-    key: string;
     displayAs: string;
     options: ProfileFieldSettingOption[];
 };
@@ -19,7 +19,7 @@ export type ProfileSelectedField = {
     displayAs: string;
     icon: string | null;
     css: string | null;
-    fieldSettings: Record<ProfileFieldSetting["key"], ProfileFieldSettingOption["id"][]>;
+    fieldSettings: Record<ProfileFieldSettingKey, ProfileFieldSettingOption["id"][]>;
 };
 
 export type ProfileRoleType = {

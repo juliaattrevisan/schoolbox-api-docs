@@ -17,9 +17,12 @@ const props = defineProps<Props>();
 const peStore = useProfileEditorStore();
 const emit = defineEmits(["close"]);
 
-const fieldSettings = window.Vue.computed(() => {
+/**
+ * A list of all the field setting keys that are valid for the current field
+ */
+const validFieldSettingKeys = window.Vue.computed(() => {
     const validKeysForField = Object.keys(props.field.fieldSettings);
-    return peStore.fieldSettings.filter((fieldSetting) => validKeysForField.includes(fieldSetting.key));
+    return Object.keys(peStore.fieldSettings).filter((fieldSettingKey) => validKeysForField.includes(fieldSettingKey));
 });
 
 /**
@@ -36,10 +39,10 @@ function onUpdateClicked(): void {
             <section>
                 <div class="l-grid l-grid--12 l-gap-m">
                     <pe-fields-selected-item-edit-setting
-                        v-for="fieldSetting in fieldSettings"
-                        :key="fieldSetting.key"
+                        v-for="fieldSettingKey in validFieldSettingKeys"
+                        :key="fieldSettingKey"
                         :field="props.field"
-                        :field-setting="fieldSetting"
+                        :field-setting-key="fieldSettingKey"
                     />
                 </div>
                 <input type="submit" value="Update" @click="onUpdateClicked" />

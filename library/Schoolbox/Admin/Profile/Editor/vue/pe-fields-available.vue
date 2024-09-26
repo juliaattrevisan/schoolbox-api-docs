@@ -13,7 +13,7 @@ const peStore = useProfileEditorStore();
 
 const sortableOptions = window.Vue.computed<Sortable.Options>(() => ({
     group: {
-        name: `fields-${peStore.selectedRoleType ? peStore.selectedRoleType.name : "-"}`,
+        name: `fields-${peStore.selectedRoleType ? peStore.selectedRoleType.roleType : "-"}`,
         pull: "clone",
         put: false,
     },

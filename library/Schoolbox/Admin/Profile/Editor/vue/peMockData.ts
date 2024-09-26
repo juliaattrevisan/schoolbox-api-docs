@@ -173,6 +173,8 @@ export const mockData: ProfileEditorPayload = {
                         {
                             field: "Email",
                             displayAs: "Email Address",
+                            icon: null,
+                            css: null,
                             fieldSettings: {
                                 appearsOn: [1, 2],
                                 visibleFor: ["student", "staff"],
@@ -181,6 +183,8 @@ export const mockData: ProfileEditorPayload = {
                         {
                             field: "StudentYearLevelCoordinator",
                             displayAs: "Year Level Coordinator",
+                            icon: null,
+                            css: null,
                             fieldSettings: {
                                 appearsOn: [2],
                                 visibleFor: ["student", "staff", "parent"],
@@ -215,6 +219,8 @@ export const mockData: ProfileEditorPayload = {
                         {
                             field: "PositionTitle",
                             displayAs: "Position Title",
+                            icon: null,
+                            css: null,
                             fieldSettings: {
                                 appearsOn: [2],
                                 visibleFor: ["student", "staff", "parent"],
@@ -224,9 +230,8 @@ export const mockData: ProfileEditorPayload = {
                 },
             },
         ],
-        fieldSettings: [
-            {
-                key: "appearsOn",
+        fieldSettings: {
+            appearsOn: {
                 displayAs: "Appears On",
                 options: [
                     // A list of campus ids displayed as a list of checkboxes
@@ -247,8 +252,7 @@ export const mockData: ProfileEditorPayload = {
                     },
                 ],
             },
-            {
-                key: "visibleFor",
+            visibleFor: {
                 displayAs: "Visible For",
                 options: [
                     // These ids come from the hardcoded consts we already use in backend world
@@ -270,6 +274,6 @@ export const mockData: ProfileEditorPayload = {
                     },
                 ],
             },
-        ],
+        },
     },
 };

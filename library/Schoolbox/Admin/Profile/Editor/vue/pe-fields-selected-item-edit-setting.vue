@@ -4,11 +4,11 @@
  */
 
 import { useProfileEditorStore } from "./store/profileEditorStore";
-import type { ProfileFieldSetting, ProfileFieldSettingOption, ProfileSelectedField } from "./types/profileTypes";
+import type { ProfileFieldSettingKey, ProfileFieldSettingOption, ProfileSelectedField } from "./types/profileTypes";
 
 interface Props {
     field: ProfileSelectedField;
-    fieldSetting: ProfileFieldSetting;
+    fieldSettingKey: ProfileFieldSettingKey;
 }
 
 const props = defineProps<Props>();
@@ -21,10 +21,17 @@ const peStore = useProfileEditorStore();
  */
 function getLabelKeyForOption(fieldSettingOption: ProfileFieldSettingOption): string {
     return (
-        `pe-${peStore.selectedRoleType?.name || "-"}-fields-selected-item` +
-        `-${props.field.field}-setting-${props.fieldSetting.key}-option-${fieldSettingOption.id}`
+        `pe-${peStore.selectedRoleType?.roleType || "-"}-fields-selected-item` +
+        `-${props.field.field}-setting-${props.fieldSettingKey}-option-${fieldSettingOption.id}`
     );
 }
+
+/**
+ * The field setting definition for the current field and field setting key
+ */
+const fieldSettingDefinition = window.Vue.computed(() => {
+    return peStore.fieldSettings[props.fieldSettingKey];
+});
 
 /**
  * When a field setting option is changed
@@ -37,28 +44,28 @@ function onFieldSettingOptionChange(fieldSettingOption: ProfileFieldSettingOptio
     const storeField = peStore.selectedRoleType.fields.selected.find((field) => field.field === props.field.field);
     if (storeField === undefined) throw new Error("Field not found in store");
 
-    const filteredSettings = storeField.fieldSettings[props.fieldSetting.key].filter(
+    const filteredSettings = storeField.fieldSettings[props.fieldSettingKey].filter(
         (id) => id !== fieldSettingOption.id,
     );
 
     if (isChecked) {
-        storeField.fieldSettings[props.fieldSetting.key] = [...filteredSettings, fieldSettingOption.id];
+        storeField.fieldSettings[props.fieldSettingKey] = [...filteredSettings, fieldSettingOption.id];
     } else {
-        storeField.fieldSettings[props.fieldSetting.key] = filteredSettings;
+        storeField.fieldSettings[props.fieldSettingKey] = filteredSettings;
     }
 }
 </script>
 
 <template>
     <div class="small-12 medium-6">
-        <label>{{ fieldSetting.displayAs }}:</label>
+        <label>{{ fieldSettingDefinition.displayAs }}:</label>
         <div class="checklist">
             <ul class="option-list">
-                <li v-for="fieldSettingOption in fieldSetting.options" :key="fieldSettingOption.id">
+                <li v-for="fieldSettingOption in fieldSettingDefinition.options" :key="fieldSettingOption.id">
                     <input
                         :id="getLabelKeyForOption(fieldSettingOption)"
                         type="checkbox"
-                        :checked="props.field.fieldSettings[props.fieldSetting.key].includes(fieldSettingOption.id)"
+                        :checked="props.field.fieldSettings[props.fieldSettingKey].includes(fieldSettingOption.id)"
                         @change="
                             onFieldSettingOptionChange(fieldSettingOption, ($event.target as HTMLInputElement).checked)
                         "
