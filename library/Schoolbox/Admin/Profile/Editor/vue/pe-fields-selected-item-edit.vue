@@ -25,10 +25,20 @@ const validFieldSettingKeys = window.Vue.computed(() => {
     return Object.keys(peStore.fieldSettings).filter((fieldSettingKey) => validKeysForField.includes(fieldSettingKey));
 });
 
+const isUpdating = window.Vue.ref(false);
+
 /**
  * When the user clicks the update button
  */
-function onUpdateClicked(): void {
+async function onUpdateClicked(): Promise<void> {
+    isUpdating.value = true;
+
+    await new Promise((resolve) => {
+        setTimeout(resolve, 500);
+    });
+
+    isUpdating.value = false;
+
     emit("close");
 }
 </script>
@@ -45,7 +55,12 @@ function onUpdateClicked(): void {
                         :field-setting-key="fieldSettingKey"
                     />
                 </div>
-                <input type="submit" value="Update" @click="onUpdateClicked" />
+                <input
+                    type="submit"
+                    :value="isUpdating ? 'Updating...' : 'Update'"
+                    :disabled="isUpdating"
+                    @click="onUpdateClicked"
+                />
             </section>
         </div>
     </Transition>
