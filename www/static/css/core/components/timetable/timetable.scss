@@ -5,6 +5,7 @@ $timetable-cell-border: $body-bg;
     td,
     th {
         border: 1px solid $timetable-cell-border;
+        max-width: 0; // Prevents cells from expanding
     }
 
     /* Remove padding on cells containing classes
@@ -44,7 +45,13 @@ $timetable-cell-border: $body-bg;
             color-adjust: exact;
             -webkit-print-color-adjust: exact;
             padding: 1rem;
-
+            /* Ensure the subject divs only fill the cell
+             */
+            div {
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+            }
             /* override global icon colour.
             *  make it normal icon size.
             */
