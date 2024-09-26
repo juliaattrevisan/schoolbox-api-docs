@@ -12,14 +12,19 @@ import { useProfileEditorStore } from "./store/profileEditorStore";
 const peStore = useProfileEditorStore();
 
 const sortableOptions = window.Vue.computed(() => ({
+    // Link the selected fields sortable to the available fields sortable so that we can drag between them
     group: {
         name: `fields-${peStore.selectedRoleType ? peStore.selectedRoleType.roleType : "-"}`,
-        pull: false,
-        put: true,
+        pull: false, // can't drag out of the selected fields
+        put: true, // can drag into the selected fields
     },
+    // We use this to force the html5 drag and drop logic to be ignored and use the fallback so we can style it
     forceFallback: true,
+    // The class to apply to the clone when dragging
     fallbackClass: "dragged-item",
+    // How long the animation should take when items shift
     animation: 200,
+    // The handle to use to drag the field around
     handle: "[data-pe-field-drag-handle]",
 }));
 
