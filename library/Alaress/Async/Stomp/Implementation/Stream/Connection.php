@@ -164,7 +164,7 @@ class Connection
         // otherwise, $onError is called.
         // Either way, once I know the status remove both listeners.
         $onConnect = static function () use ($deferred): void {
-            $deferred->resolve(true);
+            $deferred->resolve(null);
         };
         $onError   = static function (BaseFrame $frame) use ($deferred): void {
             $deferred->reject(new ConnectionException($frame->getBody() ?? ''));
