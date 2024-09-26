@@ -521,6 +521,7 @@ $allow-sidebar-stash: $large-up;
                 color: css-scale-color($off-canvas-foreground, $alpha: -65%);
                 a {
                     color: inherit;
+                    text-overflow: ellipsis;
                     &:hover {
                         color: $anchor-font-color-hover;
                     }
