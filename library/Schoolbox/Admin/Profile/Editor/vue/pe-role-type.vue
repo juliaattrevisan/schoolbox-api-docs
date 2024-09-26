@@ -4,7 +4,7 @@
  */
 import { capitalizeFirstLetter } from "@js/util/stringUtils";
 import { useProfileEditorStore } from "./store/profileEditorStore";
-import type { ProfileEditorRoleType } from "./types/profileEditorTypes";
+import type { ProfileEditorRoleType } from "./profileEditorTypes";
 
 const peStore = useProfileEditorStore();
 
@@ -41,3 +41,4 @@ function setSelectedRoleType(role: ProfileEditorRoleType): void {
 </template>
 
 <style scoped></style>
+./profileEditorTypes

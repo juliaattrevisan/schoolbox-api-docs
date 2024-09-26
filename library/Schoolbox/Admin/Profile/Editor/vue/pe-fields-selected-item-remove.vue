@@ -5,10 +5,10 @@
 
 import { slideDownOnEnter, slideUpOnLeave } from "@schoolboxVue/transitions/transitions";
 import { useProfileEditorStore } from "./store/profileEditorStore";
-import type { ProfileSelectedField } from "./types/profileTypes";
+import type { ProfileEditorSelectedField } from "./profileEditorTypes";
 
 interface Props {
-    field: ProfileSelectedField;
+    field: ProfileEditorSelectedField;
     isOpen: boolean;
 }
 
@@ -57,3 +57,4 @@ async function onRemoveClicked(): Promise<void> {
 </template>
 
 <style scoped></style>
+./types/profileEditorTypes

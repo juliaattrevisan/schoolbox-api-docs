@@ -4,11 +4,15 @@
  */
 
 import { useProfileEditorStore } from "./store/profileEditorStore";
-import type { ProfileFieldSettingKey, ProfileFieldSettingOption, ProfileSelectedField } from "./types/profileTypes";
+import type {
+    ProfileEditorFieldSettingKey,
+    ProfileEditorFieldSettingOption,
+    ProfileEditorSelectedField,
+} from "./profileEditorTypes";
 
 interface Props {
-    field: ProfileSelectedField;
-    fieldSettingKey: ProfileFieldSettingKey;
+    field: ProfileEditorSelectedField;
+    fieldSettingKey: ProfileEditorFieldSettingKey;
 }
 
 const props = defineProps<Props>();
@@ -19,7 +23,7 @@ const peStore = useProfileEditorStore();
  * @param fieldSettingOption - the field setting option
  * @returns the identifier
  */
-function getLabelKeyForOption(fieldSettingOption: ProfileFieldSettingOption): string {
+function getLabelKeyForOption(fieldSettingOption: ProfileEditorFieldSettingOption): string {
     return (
         `pe-${peStore.selectedRoleType?.roleType || "-"}-fields-selected-item` +
         `-${props.field.field}-setting-${props.fieldSettingKey}-option-${fieldSettingOption.id}`
@@ -38,7 +42,7 @@ const fieldSettingDefinition = window.Vue.computed(() => {
  * @param fieldSettingOption - the field setting option
  * @param isChecked - whether the option is checked
  */
-function onFieldSettingOptionChange(fieldSettingOption: ProfileFieldSettingOption, isChecked: boolean): void {
+function onFieldSettingOptionChange(fieldSettingOption: ProfileEditorFieldSettingOption, isChecked: boolean): void {
     if (peStore.selectedRoleType === null) return;
 
     const storeField = peStore.selectedRoleType.fields.selected.find((field) => field.field === props.field.field);
@@ -89,3 +93,4 @@ window.Vue.onMounted(() => {
 </template>
 
 <style scoped></style>
+./types/profileEditorTypes

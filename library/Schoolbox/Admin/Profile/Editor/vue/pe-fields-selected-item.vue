@@ -6,12 +6,12 @@
 import { animateRotation } from "@js/util/animateUtils";
 import PeFieldsSelectedItemEdit from "./pe-fields-selected-item-edit.vue";
 import PeFieldsSelectedItemRemove from "./pe-fields-selected-item-remove.vue";
-import type { ProfileSelectedField } from "./types/profileTypes";
-import type { ProfileEditorAvailableField } from "./types/profileEditorTypes";
 import PeFieldsIcon from "./pe-fields-icon.vue";
+import type { ProfileEditorAvailableField, ProfileEditorSelectedField } from "./profileEditorTypes";
 
 interface Props {
-    field: ProfileSelectedField | ProfileEditorAvailableField;
+    // Allow an available field to be passed in as well so we can use this component to also render the drag preview
+    field: ProfileEditorSelectedField | ProfileEditorAvailableField;
     dragging: boolean;
 }
 
@@ -127,3 +127,4 @@ nav > a[class^="icon-"]:hover {
     display: none;
 }
 </style>
+./types/profileEditorTypes ./profileEditorTypes

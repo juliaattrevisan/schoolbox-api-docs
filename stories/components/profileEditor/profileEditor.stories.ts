@@ -1,23 +1,26 @@
 /* eslint-disable import/no-extraneous-dependencies -- storybook is a dev dependency, so it's okay */
 
 import type { Meta, StoryObj } from "@storybook/vue3";
-import { http, HttpResponse } from "msw";
+// import { http, HttpResponse } from "msw";
 import ProfileEditor from "@schoolboxLibrary/Admin/Profile/Editor/vue/profile-editor.vue";
-import type { ProfileEditorEndpoints } from "@schoolboxLibrary/Admin/Profile/Editor/vue/types/profileEditorTypes";
-import { mockData } from "stories/components/profileEditor/peMockData";
+import type { ProfileEditorEndpoints } from "@schoolboxLibrary/Admin/Profile/Editor/vue/profileEditorTypes";
+import { mockData } from "./peMockData";
 
 /**
  * Mock Service Worker handlers to load dummy data for testing
  */
 const endpoints: ProfileEditorEndpoints = {
-    profileEditorGet: "/mock-data",
+    adminProfileEditorPostFieldAdd: "nothing here for now...",
+    adminProfileEditorPostFieldRemove: "nothing here for now...",
+    adminProfileEditorPostFieldSettings: "nothing here for now...",
+    adminProfileEditorPostFieldSequence: "nothing here for now...",
 };
 
-const mswHandlers = [
-    http.get(endpoints.profileEditorGet, () => {
-        return HttpResponse.json(mockData);
-    }),
-];
+// const mswHandlers = [
+//     http.get(endpoints.profileEditorGet, () => {
+//         return HttpResponse.json(mockData);
+//     }),
+// ];
 
 /**
  * Storybook meta information for the `<profile-editor />` component
@@ -28,11 +31,11 @@ const meta: Meta<typeof ProfileEditor> = {
         payload: mockData,
     },
     component: ProfileEditor,
-    parameters: {
-        msw: {
-            handlers: mswHandlers,
-        },
-    },
+    // parameters: {
+    //     msw: {
+    //         handlers: mswHandlers,
+    //     },
+    // },
     title: "Draft/Profile Editor",
 };
 export default meta;

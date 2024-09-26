@@ -1,6 +1,5 @@
 import { defineStore } from "pinia";
-import type { ProfileEditorRoleType, ProfileEditorEndpoints } from "../types/profileEditorTypes";
-import type { ProfileEditorPayload } from "../types/profilePayloadTypes";
+import type { ProfileEditorRoleType, ProfileEditorEndpoints, ProfileEditorPayload } from "../profileEditorTypes";
 
 export const useProfileEditorStore = defineStore("profileEditorStore", () => {
     const isLoading = window.Vue.ref<boolean>(true);
@@ -12,25 +11,7 @@ export const useProfileEditorStore = defineStore("profileEditorStore", () => {
     const endpoints = window.Vue.ref<ProfileEditorEndpoints>();
 
     /**
-     * Fetch the data required for the profile editor
-     */
-    async function fetchProfileEditorData(): Promise<void> {
-        if (endpoints.value === undefined) throw new Error("Endpoints not set");
-
-        isLoading.value = true;
-
-        const response = await fetch(endpoints.value.profileEditorGet);
-        const responseJson = (await response.json()) as unknown as ProfileEditorPayload;
-
-        roleTypes.value = responseJson.data.roleTypes;
-        fieldSettings.value = responseJson.data.fieldSettings;
-
-        isLoading.value = false;
-    }
-
-    /**
-     * initialise the store with the relevant endpoints
-     * and load the initial data for the profile editor
+     * initialise the store with the relevant endpoints and data
      * @param $endpoints the endpoints required for the profile editor
      * @param $roleTypes the current role types
      * @param $fieldSettings the current field settings
@@ -43,7 +24,6 @@ export const useProfileEditorStore = defineStore("profileEditorStore", () => {
         endpoints.value = $endpoints;
         roleTypes.value = $roleTypes;
         fieldSettings.value = $fieldSettings;
-        // await fetchProfileEditorData();
     }
 
     /**

@@ -1,4 +1,4 @@
-import type { ProfileEditorPayload } from "../../../library/Schoolbox/Admin/Profile/Editor/vue/types/profilePayloadTypes";
+import type { ProfileEditorPayload } from "../../../library/Schoolbox/Admin/Profile/Editor/vue/profileEditorTypes";
 
 export const mockData: ProfileEditorPayload = {
     data: {
@@ -233,6 +233,7 @@ export const mockData: ProfileEditorPayload = {
         fieldSettings: {
             appearsOn: {
                 displayAs: "Appears On",
+                tooltip: "Will appear on the selected campuses",
                 options: [
                     // A list of campus ids displayed as a list of checkboxes
                     {
@@ -254,6 +255,7 @@ export const mockData: ProfileEditorPayload = {
             },
             visibleFor: {
                 displayAs: "Visible For",
+                tooltip: "Will appear for profile viewers in the selected role types",
                 options: [
                     // These ids come from the hardcoded consts we already use in backend world
                     // displayed as a list of checkboxes

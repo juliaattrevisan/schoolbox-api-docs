@@ -6,10 +6,10 @@
 import { slideDownOnEnter, slideUpOnLeave } from "@schoolboxVue/transitions/transitions";
 import PeFieldsSelectedItemEditSetting from "./pe-fields-selected-item-edit-setting.vue";
 import { useProfileEditorStore } from "./store/profileEditorStore";
-import type { ProfileSelectedField } from "./types/profileTypes";
+import type { ProfileEditorSelectedField } from "./profileEditorTypes";
 
 interface Props {
-    field: ProfileSelectedField;
+    field: ProfileEditorSelectedField;
     isOpen: boolean;
 }
 
@@ -67,3 +67,4 @@ async function onUpdateClicked(): Promise<void> {
 </template>
 
 <style scoped></style>
+./types/profileEditorTypes

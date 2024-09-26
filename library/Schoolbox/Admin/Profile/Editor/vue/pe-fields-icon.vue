@@ -4,7 +4,7 @@
  * This represents a different way the field may show on the actual profile itself
  */
 
-import type { ProfileEditorAvailableField } from "./types/profileEditorTypes";
+import type { ProfileEditorAvailableField } from "./profileEditorTypes";
 
 interface Props {
     field: ProfileEditorAvailableField;
@@ -53,3 +53,4 @@ const tooltipText = window.Vue.computed<string | undefined>(() => {
     }
 }
 </style>
+./profileEditorTypes

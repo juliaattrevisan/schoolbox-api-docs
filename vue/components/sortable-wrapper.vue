@@ -43,8 +43,8 @@ interface Props {
      * Note: it's contained in here instead of up a level since the <slot> would otherwise break a <Transition>
      */
     transitionKey?: string;
-    transitionEnter?: (el: HTMLElement, done: () => void) => void;
-    transitionLeave?: (el: HTMLElement, done: () => void) => void;
+    transitionEnter?: (el: Element, done: () => void) => void;
+    transitionLeave?: (el: Element, done: () => void) => void;
 }
 
 const props = withDefaults(defineProps<Props>(), {
