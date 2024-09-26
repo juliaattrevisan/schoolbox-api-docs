@@ -134,8 +134,9 @@ class Connection
     /**
      * Attempt to connect to the STOMP server.
      *
-     * @return PromiseInterface Resolves (no parameters) when the connection is successful,
-     *                          rejects with a reason when it is not.
+     * @return PromiseInterface Resolves (unused parameter) if the connection is
+     *                          successful:
+     *                          Rejects with `ConnectionException` if it is not.
      */
     public function connect(): PromiseInterface
     {
@@ -152,7 +153,7 @@ class Connection
         try {
             $this->setupStream();
         } catch (ConnectionException $e) {
-            $deferred->reject($e->getMessage());
+            $deferred->reject($e);
         }
 
         // Now attempt to connect, waiting for a response.
@@ -163,10 +164,10 @@ class Connection
         // otherwise, $onError is called.
         // Either way, once I know the status remove both listeners.
         $onConnect = static function () use ($deferred): void {
-            $deferred->resolve();
+            $deferred->resolve(true);
         };
         $onError   = static function (BaseFrame $frame) use ($deferred): void {
-            $deferred->reject($frame->getBody());
+            $deferred->reject(new ConnectionException($frame->getBody() ?? ''));
         };
         $this->stream->once('connect', function () use ($onConnect, $onError): void {
             $this->stream->removeListener('error', $onError);
