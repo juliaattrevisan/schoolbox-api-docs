@@ -11,14 +11,17 @@ declare(strict_types=1);
 namespace Schoolbox\Admin\Profile\Editor;
 
 use Alaress\Web\Controller\Base;
+use Schoolbox\Admin\Navigation\Subnav;
 
 class Controller extends Base
 {
     /**
      * Controller constructor.
      */
-    public function __construct()
-    {
+    public function __construct(
+        private \Schoolbox\Admin\Profile\Editor\Field\Mapper $fieldMapper,
+        private \Schoolbox\CampusMapper $campusMapper,
+    ) {
     }
 
 
@@ -27,9 +30,27 @@ class Controller extends Base
      */
     public function getIndex(): void
     {
-        $this->response = $this->responseFromTemplate('@profileEditor/index.twig', [
+        /* Figure out which roletype to display. By default, it loads teh Student
+         * roletype as it tends to be the most heavily configured.
+         */
+        $roleType = (string)$this->requestQuery->get('roleType');
 
-        ], 'Profile Editor');
+        /* Check that $roletype was valid; if not, default to Student
+         */
+        if (!\in_array($roleType, \Schoolbox\Role::getRoleTypes(), true)) {
+            $roleType = \Schoolbox\Role::STUDENT;
+        }
+
+        $payload = (new Payload(
+            $this->fieldMapper,
+            $this->campusMapper
+        ))->generateAll();
+
+        $this->response = $this->responseFromTemplate('@adminProfileEditor/index.twig', [
+            'pageCurrent' => $this->routeGenerator->generate('adminProfileEditor.getIndex'),
+            'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->routeGenerator->generate('adminProfileEditor.getIndex')),
+            'payload' => $payload
+        ], 'Profile Editor - ' . ucwords($roleType));
     }
 
 
