@@ -16,31 +16,31 @@ class CliFormatter extends NormalizerFormatter
 {
     // fg colourings
     private const BLACK        = '0;30';
-    private const DARK_GRAY    = '1;30';
+//    private const DARK_GRAY    = '1;30';
     private const BLUE         = '0;34';
-    private const LIGHT_BLUE   = '1;34';
+//    private const LIGHT_BLUE   = '1;34';
     private const GREEN        = '0;32';
-    private const LIGHT_GREEN  = '1;32';
+//    private const LIGHT_GREEN  = '1;32';
     private const CYAN         = '0;36';
-    private const LIGHT_CYAN   = '1;36';
+//    private const LIGHT_CYAN   = '1;36';
     private const RED          = '0;31';
     private const LIGHT_RED    = '1;31';
-    private const PURPLE       = '0;35';
-    private const LIGHT_PURPLE = '1;35';
+//    private const PURPLE       = '0;35';
+//    private const LIGHT_PURPLE = '1;35';
     private const BROWN        = '0;33';
     private const YELLOW       = '1;33';
-    private const LIGHT_GRAY   = '0;37';
+//    private const LIGHT_GRAY   = '0;37';
     private const WHITE        = '1;37';
 
     // bg colourings
-    private const BG_BLACK      = '40';
+//    private const BG_BLACK      = '40';
     private const BG_RED        = '41';
-    private const BG_GREEN      = '42';
+//    private const BG_GREEN      = '42';
     private const BG_YELLOW     = '43';
-    private const BG_BLUE       = '44';
+//    private const BG_BLUE       = '44';
     private const BG_MAGENTA    = '45';
-    private const BG_CYAN       = '46';
-    private const BG_LIGHT_GRAY = '47';
+//    private const BG_CYAN       = '46';
+//    private const BG_LIGHT_GRAY = '47';
 
     /** @const int how many decimals of time you want */
     public const TIME_RESOLUTION = 5;
