@@ -8,6 +8,7 @@ import PeFieldsSelectedItemEdit from "./pe-fields-selected-item-edit.vue";
 import PeFieldsSelectedItemRemove from "./pe-fields-selected-item-remove.vue";
 import type { ProfileSelectedField } from "./types/profileTypes";
 import type { ProfileEditorAvailableField } from "./types/profileEditorTypes";
+import PeFieldsIcon from "./pe-fields-icon.vue";
 
 interface Props {
     field: ProfileSelectedField | ProfileEditorAvailableField;
@@ -74,6 +75,7 @@ window.Vue.watch(isRemovePanelOpen, (isOpen) => {
                                     data-pe-field-drag-handle
                                     style="user-select: none; touch-action: none; cursor: grab"
                                 />
+                                <pe-fields-icon :field="props.field" />
                                 {{ props.field.displayAs }}
                             </h2>
                         </div>

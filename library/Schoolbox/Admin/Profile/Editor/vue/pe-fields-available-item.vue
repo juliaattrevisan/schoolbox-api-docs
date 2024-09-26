@@ -5,6 +5,7 @@
 
 import { useProfileEditorStore } from "./store/profileEditorStore";
 import type { ProfileEditorAvailableField } from "./types/profileEditorTypes";
+import PeFieldsIcon from "./pe-fields-icon.vue";
 
 interface Props {
     field: ProfileEditorAvailableField;
@@ -24,6 +25,7 @@ const disabled = window.Vue.computed(() => peStore.isFieldDisabled(props.field.f
         :data-pe-prevent-drag="disabled ? true : undefined"
         @click="peStore.addSelectedField(props.field.field)"
     >
+        <pe-fields-icon :field="props.field" />
         {{ props.field.displayAs }}
     </div>
 </template>

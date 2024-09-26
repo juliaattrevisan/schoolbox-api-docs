@@ -73,8 +73,6 @@ function onAddField(event: Sortable.SortableEvent): void {
         <div v-if="peStore.selectedRoleType.fields.selected.length === 0" class="masonry-placeholder">
             You can drag fields into this space
         </div>
-
-        {{ peStore.selectedRoleType.fields.selected }}
     </div>
 </template>
 
