@@ -74,7 +74,7 @@ class Cursor implements ICursor
 
     public function retrieveResults(?string $encodedCursor): Collection
     {
-        $data = $this->getCourseDate($this->search);
+        $data = $this->getCourseDate($encodedCursor);
 
 //        $data = Helper::getCourseData(
 //            $this->courseSpecificationMapper,
@@ -105,7 +105,7 @@ class Cursor implements ICursor
         if (null === $this->search) {
             $counts = $this->courseSpecificationMapper->countAll();
         } else {
-//            $counts = $this->courseSpecificationMapper->countAllByName($this->search);
+            $counts = $this->courseSpecificationMapper->countAllByName($this->search);
         }
 
         return $counts;
@@ -122,26 +122,55 @@ class Cursor implements ICursor
             return null;
         }
 
-        $id = 1;
+        $id = $collection->last()->getId();
 
-        return $this->codec->encode(['id' => $id]);
+        return $this->codec->encode(
+            [
+                'id' => $id,
+                'search' => $this->search,
+                'limit' => $this->limit,
+            ]
+        );
     }
 
-    public function getCourseDate(string $searchParam = null): array
+    public function getCourseDate(?string $encodedCursor = null): array
     {
-        //Use the new mapper to get the list of courses
-        $findOptions = ['order' => ['f.name' => 'asc']];
-        if (null === $searchParam) {
-            $allCourses = $this->courseSpecificationMapper->findAll($findOptions);
-        } else {
-            $allCourses = $this->courseSpecificationMapper->findAllByName($searchParam, $findOptions);
+        if (null !== $encodedCursor) {
+            $cursor = $this->codec->decode($encodedCursor);
+            $this->search = $cursor['search'];
+            $this->limit = $cursor['limit'];
         }
+        $pb = $this->courseSpecificationMapper->getPredicateBuilder();
+        $findOptions = [
+            'order' => [
+                "{$this->courseSpecificationMapper->getTable()}.{$this->courseSpecificationMapper->getIdentifierColumn()}" => 'asc',
+            ],
+            'limit' => $this->limit,
+        ];
+
+        if (strlen((string)$this->search) > 0) {
+            $pb->like(
+                'f.name',
+                "%{$this->courseSpecificationMapper->getDatabase()->getQuoter()->escapeForLike(
+                        $this->search
+                    )}%"
+            );
+        }
+
+        if (null !== $encodedCursor) {
+            $pb->greaterThan(
+                "{$this->courseSpecificationMapper->getTable()}.{$this->courseSpecificationMapper->getIdentifierColumn()}",
+                $cursor['id']
+            );
+        }
+
+        $allCourses = $this->courseSpecificationMapper->findByPredicates($pb, $findOptions) ?? [];
 
         $data = [];
 
         foreach ($allCourses as $currentCourse) {
             // general search ignores Courses outside Faculty
-            if (null === $searchParam) {
+            if (null === $this->search) {
                 try {
                     if (!$this->folderMapper->isDescendant($currentCourse->getFolder(), $this->courseSpecificationMapper->getFacultyRootFolder())) {
                         continue;
@@ -175,7 +204,6 @@ class Cursor implements ICursor
             /* Also store the path to this Course
              */
             try {
-//                $data['lineage'][$currentCourse->getId()] = $this->getLineage($currentCourse->getFolder());
                 $lineage = $this->getLineage($currentCourse->getFolder());
                 $currentCourse->setFolder(
                     $this->getParent($currentCourse->getFolder(), $lineage)

@@ -41,7 +41,7 @@ class Controller extends Base
 
         $search = $query->get('query');
         $folder = $query->get('folder');
-        $limit = $query->getInt('limit', Cursor::LIMIT_MIN);
+        $limit = $query->getInt('limit', Cursor::LIMIT_DEFAULT);
         $encodedCursor = $query->get('cursor');
 
         $cursor = new Cursor(
@@ -58,15 +58,26 @@ class Controller extends Base
         $data = $cursor->retrieveResults($encodedCursor);
 
         $folderTranslator = new Folder\Translator\ModelToArray\LinkOnly(99);
-        $test = new \Schoolbox\Learning\Course\DataModel\Specification\Translator\ModelToArray(
+        $translator = new \Schoolbox\Learning\Course\DataModel\Specification\Translator\ModelToArray(
             $this->routeGenerator,
             $this->authorizer,
             $this->getUser(),
             $folderTranslator,
         );
 
-        $result = array_map($test, $data['courses']);
+        $courses = new Collection($data['courses'] ?? []);
 
-        $this->response = $this->responseAsJson($result);
+        $result = $courses->map($translator);
+
+        $this->response = $this->responseAsJson([
+            'data' => $result,
+            'metadata' => [
+                'count' => $cursor->retrieveResultCount(),
+                'cursor' => [
+                    'current' => $encodedCursor ?? $cursor->current($courses),
+                    'next' => (count($result) < $limit) ? null : $cursor->next($courses),
+                ]
+            ]
+        ]);
     }
 }
