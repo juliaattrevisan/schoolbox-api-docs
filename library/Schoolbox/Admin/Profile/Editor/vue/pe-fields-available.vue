@@ -19,6 +19,7 @@ const sortableOptions = window.Vue.computed<Sortable.Options>(() => ({
     },
     forceFallback: true,
     fallbackClass: "dragged-item",
+    filter: "[data-pe-prevent-drag]",
     animation: 200,
     sort: false,
     removeCloneOnHide: true,

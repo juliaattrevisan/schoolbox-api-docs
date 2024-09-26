@@ -21,6 +21,7 @@ const disabled = window.Vue.computed(() => peStore.isFieldDisabled(props.field.f
         class="pe-palette-item l-pad-s"
         :class="{ disabled }"
         :title="disabled ? 'This field is already selected' : undefined"
+        :data-pe-prevent-drag="disabled ? true : undefined"
         @click="peStore.addSelectedField(props.field.field)"
     >
         {{ props.field.displayAs }}
