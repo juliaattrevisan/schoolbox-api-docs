@@ -20,8 +20,10 @@ class Payload
      */
     private const AVAILABILITY_NODE = 'availability';
     private const AVAILABILITY_NAME = 'Availability';
+    private const AVAILABILITY_TOOLTIP = 'Will appear on the selected campuses';
     private const VISIBILITY_NODE = 'visibility';
     private const VISIBILITY_NAME = 'Visibility';
+    private const VISIBILITY_TOOLTIP = 'Will appear for profile viewers in the selected role types';
 
 
     /**
@@ -88,6 +90,7 @@ class Payload
          */
         $fieldSettingsCampus = [
             'displayAs' => self::AVAILABILITY_NAME,
+            'tooltip' => self::AVAILABILITY_TOOLTIP,
             'options' => []
         ];
 
@@ -103,6 +106,7 @@ class Payload
          */
         $fieldSettingsRoleType = [
             'displayAs' => self::VISIBILITY_NAME,
+            'tooltip' => self::VISIBILITY_TOOLTIP,
             'options' => []
         ];
 
