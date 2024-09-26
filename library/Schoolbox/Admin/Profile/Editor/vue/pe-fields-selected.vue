@@ -4,10 +4,10 @@
  */
 
 import type Sortable from "sortablejs";
+import SortableWrapper from "@schoolboxVue/components/sortable-wrapper.vue";
 import { slideDownOnEnter, slideUpOnLeave } from "@schoolboxVue/transitions/transitions";
 import PeFieldsSelectedItem from "./pe-fields-selected-item.vue";
 import { useProfileEditorStore } from "./store/profileEditorStore";
-import SortableWrapper from "./sortable-wrapper.vue";
 
 const peStore = useProfileEditorStore();
 
