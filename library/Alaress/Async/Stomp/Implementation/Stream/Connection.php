@@ -167,7 +167,7 @@ class Connection
             $deferred->resolve(null);
         };
         $onError   = static function (BaseFrame $frame) use ($deferred): void {
-            $deferred->reject(new ConnectionException($frame->getBody() ?? ''));
+            $deferred->reject(new ConnectionException((string)$frame->getBody()));
         };
         $this->stream->once('connect', function () use ($onConnect, $onError): void {
             $this->stream->removeListener('error', $onError);
