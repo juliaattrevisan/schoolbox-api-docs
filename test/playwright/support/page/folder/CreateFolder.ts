@@ -54,7 +54,7 @@ export default class CreateFolder {
     }
 
     /**
-     * Sets access permission
+     * Sets access permission eg: 1, "none" ; 2, "read" ; 3, "write"
      * @param groupId - The group ID to set
      * @param permissionLevel - The permission level to set
      */

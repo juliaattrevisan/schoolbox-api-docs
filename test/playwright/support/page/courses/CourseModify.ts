@@ -13,8 +13,6 @@ export default class CourseModify {
 
     static readonly SELECTOR_SAVE_COURSE = "#update-course-form [type=submit][value='Save Course']";
 
-    static readonly NEW_LESSON_PLAN_BUTTON = "New Lesson Plan";
-
     constructor(page: Page) {
         this.page = page;
     }
@@ -46,9 +44,10 @@ export default class CourseModify {
     }
 
     /**
-     * Clicks the new lesson plan button
+     * Clicks the new lesson plan button by passing the button name: lesson-plan,quz,due-work,task,project
+     * @param buttonName - The name of the button to click
      */
-    async clickNewLessonPlanButton(): Promise<void> {
-        await this.page.click(CourseModify.NEW_LESSON_PLAN_BUTTON);
+    async clickNewLessonPlanButton(buttonName: string): Promise<void> {
+        await this.page.click(`a.button.icon-${buttonName}`);
     }
 }
