@@ -251,8 +251,10 @@ test.describe("Initial Due Work functionality tests", () => {
 
         tester.isGoingTo("select 'View Status' of the 'Test Due Work' assessment");
         await page.goto(homepageUrl);
+        await page.waitForTimeout(2000);
         await page.getByTestId(`${SELECTOR_COMPONENT_DUEWORK_POPOUT_BUTTON}${assessmentID}`).click();
         await page.getByTestId(`${SELECTOR_COMPONENT_ASSESSMENT_ACTIONS_VIEWSTATUS}-${assessmentID}`).click();
+        await page.waitForTimeout(2000);
 
         tester.isGoingTo(`navigate to the due work status page for ${student}`);
         await page.getByTestId(`${SELECTOR_ASSESSMENT_STATUS_FEEDBACK_POPOUT_BUTTON}-${studentId}`).click();
@@ -280,6 +282,7 @@ test.describe("Initial Due Work functionality tests", () => {
 
         tester.isGoingTo("navigate to the due work status page for Eden Reed");
         await page.goto(homepageUrl);
+        await page.waitForTimeout(3000);
         await page.getByTestId(`${SELECTOR_COMPONENT_DUEWORK_POPOUT_BUTTON}${assessmentID}`).click();
         await page.getByTestId(`${SELECTOR_COMPONENT_ASSESSMENT_ACTIONS_VIEWSTATUS}-${assessmentID}`).click();
 
@@ -302,6 +305,7 @@ test.describe("Initial Due Work functionality tests", () => {
 
         tester.isGoingTo("navigate back to the feedback page");
         await page.goto(studentWeAreMarkingUrl);
+        await page.waitForTimeout(3000);
 
         // this if-clause is due to an intermittent issue SA-14676
         if (await page.getByTestId(SELECTOR_ASSESSMENT_FEEDBACK_PUBLISH_BUTTON).isVisible()) {
@@ -315,6 +319,7 @@ test.describe("Initial Due Work functionality tests", () => {
         }
 
         tester.isGoingTo("check if the assessment status is reviewed");
+        await page.waitForTimeout(3000);
         await expect(
             page.getByTestId(`${SELECTOR_ASSESSMENT_STUDENT_CAROUSEL_STATUSLABEL}-${studentId}`).first(),
         ).toHaveText("Reviewed");

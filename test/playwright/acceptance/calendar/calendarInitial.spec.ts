@@ -41,13 +41,11 @@ test.describe("Calendar tests", () => {
         const eventTitle = "My Test Event";
         const student = "Eden Reed";
         tester.isGoingTo("as alaress check if I can view the personal event I have created");
-        await calendar.clickPreviousButton();
         await expect(page.locator("table.fc-scrollgrid-sync-table")).toContainText(eventTitle);
         tester.isGoingTo("as Eden Reed check if I cannot view alaress admin personal event");
         await tester.impersonate(student);
         await calendar.goto();
         await expect(page.locator("table.fc-scrollgrid-sync-table")).not.toContainText(eventTitle);
-        await calendar.clickPreviousButton();
         await expect(page.locator("table.fc-scrollgrid-sync-table")).not.toContainText(eventTitle);
     });
 
@@ -59,7 +57,6 @@ test.describe("Calendar tests", () => {
 
         const eventTitle = "My Test Event";
         tester.isGoingTo("delete the personal event");
-        await calendar.clickPreviousButton();
         await calendar.clickCalendarEvent(eventTitle);
         await calendar.clickDeleteDialogButton();
         await calendar.clickConfirmDelete();

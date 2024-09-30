@@ -262,7 +262,8 @@ test.describe("Group Permission Tests", () => {
             "name LIKE": folderName,
         })) as number;
         expect(folderId).not.toBe(null);
-        await db.updateInDatabase("userAccess", { type: 3 }, { sid: folderId });
+        await page.waitForTimeout(3000);
+        await db.updateInDatabase("userAccess", { type: 3 }, { sid: folderId, uid: "22" });
 
         tester.isGoingTo("create a sub folder to the group");
         await createFolder.gotoResources();

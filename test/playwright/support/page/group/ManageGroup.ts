@@ -66,6 +66,7 @@ export default class ManageGroup {
      * @param text - The text to type
      */
     async search(text: string): Promise<void> {
+        await this.page.locator(ManageGroup.ELEMENT_SEARCH).click();
         await this.page.locator(ManageGroup.ELEMENT_SEARCH).fill(text);
     }
 
