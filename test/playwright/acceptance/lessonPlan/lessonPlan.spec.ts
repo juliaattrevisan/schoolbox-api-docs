@@ -9,12 +9,11 @@ import CreateFolder from "@schoolboxTest/playwright/support/page/folder/CreateFo
 import ManageGroup from "@schoolboxTest/playwright/support/page/group/ManageGroup";
 import CreateLessonPlan from "@schoolboxTest/playwright/support/page/lessonPlan/CreateLessonPlan";
 import TemplateList from "@schoolboxTest/playwright/support/page/lessonPlan/TemplateList";
-import { create } from "lodash";
 import AcceptanceTester from "@schoolboxTest/playwright/support/AcceptanceTester";
 import { Page } from "@playwright/test";
 import DatabaseHelper from "@schoolboxTest/playwright/support/DatabaseHelper";
 import Resources from "@schoolboxTest/playwright/support/page/resources/Resources";
-import { log } from "console";
+import { time } from "console";
 
 /**
  * create a lesson plan, check if the teacher and student can view the fields as per its visibility configuration
@@ -234,7 +233,6 @@ test.describe("Lesson Plan Activity", () => {
         await importCourseIntoClass.fillOpenDate(1, openDate);
         await importCourseIntoClass.insertDueDate(1, dueDate);
         await importCourseIntoClass.clickSubmit("Next");
-        await importCourseIntoClass.clickSubmit("Next");
         tester.isGoingTo("untick Romeo and Juliet Key Quote Activity in the step 3 Coursework");
         await importCourseIntoClass.tickAssessmentCheckbox(52);
         tester.isGoingTo("untick Present a scene of Romeo and Juliet in the step 3 Coursework");
@@ -248,16 +246,19 @@ test.describe("Lesson Plan Activity", () => {
 
         tester.isGoingTo("check if the lesson plan is presented in the homepage");
         const folderId = (await db.grabFromDatabase("folder", "id", { name: folderName, deleted_at: null })) as number;
+        await page.waitForTimeout(3000);
         await page.goto(`/homepage/${folderId}`);
-        await expect(page.locator("information-list")).toContainText("Romeo and Juliet");
-        await expect(page.locator("ul.action-list.sortable-card.ui-sortable.task-list")).toContainText(lessonPlanName);
+        await expect(page.locator('ul[class="information-list"]')).toContainText("Romeo and Juliet");
+        await expect(page.locator('ul[class="information-list"]')).toContainText(lessonPlanName);
         tester.isGoingTo("as a student view the lesson plan");
         await tester.impersonateViaModifyUserPage(student);
         await page.goto(`/homepage/${folderId}`);
-        await page.click(lessonPlanName);
+        await page.waitForTimeout(3000);
+        await page.click("a[title='Lesson Plan']");
         tester.isGoingTo(
             "check if student can view the visible field and cannot view the not visible fields to students",
         );
+        await page.waitForTimeout(3000);
         await expect(page.locator("#lessonPlan-student")).toContainText("Automation Field 1");
         await expect(page.locator("#lessonPlan-student")).not.toContainText(
             "Automation Field 2 not visible to students",
@@ -265,7 +266,8 @@ test.describe("Lesson Plan Activity", () => {
         tester.isGoingTo("as a teacher view the lesson plan");
         await tester.impersonateViaModifyUserPage(teacher);
         await page.goto(`/homepage/${folderId}`);
-        await page.click(lessonPlanName);
+        await page.waitForTimeout(3000);
+        await page.click("a[title='Lesson Plan']");
         tester.isGoingTo("check if teacher can view all the lesson plan fields");
         await expect(page.locator("#lessonPlan-staff")).toContainText("Automation Field 1");
         await expect(page.locator("#lessonPlan-staff")).toContainText("Automation Field 2 not visible to students");
