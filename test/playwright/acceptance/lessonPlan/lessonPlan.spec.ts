@@ -272,4 +272,38 @@ test.describe("Lesson Plan Activity", () => {
         await expect(page.locator("#lessonPlan-staff")).toContainText("Automation Field 1");
         await expect(page.locator("#lessonPlan-staff")).toContainText("Automation Field 2 not visible to students");
     });
+
+    /**
+     * Soft deleting data to not impact the tests
+     */
+
+    test.afterAll(async ({ baseTester, db }) => {
+        baseTester.isGoingTo("update delete_at for the folder and lesson plan table so it does not impact the tests");
+        await db.updateInDatabase(
+            "lesson_plan_template_field",
+            { deleted_at: "2022-01-15 11:22:34" },
+            { "title like": "Automation Field%" },
+        );
+        await db.updateInDatabase(
+            "lesson_plan_template",
+            { deleted_at: "2022-01-15 11:22:34" },
+            { "title like": "Automation Template%" },
+        );
+        await db.updateInDatabase(
+            "lesson_plan_field",
+            { deleted_at: "2022-01-15 11:22:34" },
+            { "title like": "Automation Field%" },
+        );
+        await db.updateInDatabase("lesson_plan", { deleted_at: "2022-01-15 11:22:34" }, { created_by: "1" });
+        await db.updateInDatabase(
+            "assessment",
+            { deleted_at: "2022-01-15 11:22:34" },
+            { "title like": "Lesson Plan Automation Test%" },
+        );
+        await db.updateInDatabase(
+            "folder",
+            { deleted_at: "2022-01-15 11:22:34" },
+            { "name like": "Test Class Homepage Lesson Plan%" },
+        );
+    });
 });
