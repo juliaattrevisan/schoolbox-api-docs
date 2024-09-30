@@ -41,7 +41,7 @@ class ModelToArray
             'id'          => $courseSpec->getId(),
             'title'       => $courseSpec->getTitle(),
             'subjectCode' => $courseSpec->getSubjectCode(),
-            'frameWorkId' => $courseSpec->getTemplate()->getId(),
+            'frameWorkId' => $courseSpec->getTemplate()?->getId(),
             'folder'      => call_user_func($this->folderTranslator, $courseSpec->getFolder()),
             '_links'      => [
                 'view' => $this->getRouteIfAuthorized(
