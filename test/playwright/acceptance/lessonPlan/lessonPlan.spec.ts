@@ -127,8 +127,8 @@ test.describe("Lesson Plan Activity", () => {
      * Soft deleting data to not impact the tests
      */
 
-    test.beforeAll(async ({ tester, db }) => {
-        tester.isGoingTo("update delete_at for the folder and lesson plan table so it does not impact the tests");
+    test.beforeAll(async ({ baseTester, db }) => {
+        baseTester.isGoingTo("update delete_at for the folder and lesson plan table so it does not impact the tests");
         await db.updateInDatabase(
             "lesson_plan_template_field",
             { deleted_at: "2022-01-15 11:22:34" },
