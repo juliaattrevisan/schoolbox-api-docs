@@ -24,6 +24,7 @@ use React\EventLoop\Loop;
 use React\EventLoop\LoopInterface;
 use RuntimeException;
 use Schoolbox\Application\CliKernelAbstract;
+use Schoolbox\Application\WebRequest\ShutdownHandler;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Config\DataSource;
 use Schoolbox\IConfigLoader;
@@ -115,6 +116,18 @@ class Kernel extends CliKernelAbstract
         }
     }
 
+    /**
+     * Daemon-specific shutdown handling: stop the React loop manually.
+     *
+     * The loop has been added to the DI container and thus never goes out of
+     * scope: this means its destructor is never called, which would stop the
+     * loop.
+     */
+    public function registerShutdownHandling(): void
+    {
+        parent::registerShutdownHandling();
+        $this->getShutdownHandler()->registerFunction(Loop::stop(...), ShutdownHandler::PRIORITY_HIGHEST);
+    }
 
     /**
      * @inheritdoc
