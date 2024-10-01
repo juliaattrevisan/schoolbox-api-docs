@@ -237,6 +237,6 @@ export default class Homepage {
      * Click the remove confirmation button
      */
     async clickRemoveConfirmationMessage(): Promise<void> {
-        await this.page.click(`text=${Homepage.REMOVE_BUTTON_CONFIRMATION_MESSAGE}`);
+        await this.page.locator(`a:text("${Homepage.REMOVE_BUTTON_CONFIRMATION_MESSAGE}")`).first().click();
     }
 }

@@ -13,7 +13,6 @@ import AcceptanceTester from "@schoolboxTest/playwright/support/AcceptanceTester
 import { Page } from "@playwright/test";
 import DatabaseHelper from "@schoolboxTest/playwright/support/DatabaseHelper";
 import Resources from "@schoolboxTest/playwright/support/page/resources/Resources";
-import { time } from "console";
 
 /**
  * create a lesson plan, check if the teacher and student can view the fields as per its visibility configuration
