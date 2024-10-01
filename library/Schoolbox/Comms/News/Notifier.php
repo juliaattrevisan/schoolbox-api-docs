@@ -213,7 +213,7 @@ class Notifier extends AbstractModuleNotifier
         // Invalid state transition. Article has been created in a non-draft state
         if (!$previous && !$article->isDraft()) {
             // Don't even attempt to process as it will likely cause fatal NPEs
-            $this->log->error(sprintf("Invalid transition. Article: %d has been created in a '%s' state.", $article->getId(), $article->getStatus()));
+            $this->log->error(sprintf("Invalid transition. news.%d has been created in a '%s' state.", $article->getId(), $article->getStatus()));
             return;
         }
 
@@ -548,7 +548,7 @@ class Notifier extends AbstractModuleNotifier
         $envelope = new Envelope();
 
         if (!$article->isPublished(\Alaress_Date_Format::now()->addSeconds(self::PUBLISH_TIME_LEEWAY))) {
-            $this->log->warning("Tried to send posted notification for an article {$article->getId()} which is not published.");
+            $this->log->warning("Tried to send posted notification for news.{$article->getId()} which is not published.");
             return $envelope;
         }
 
