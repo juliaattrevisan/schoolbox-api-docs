@@ -3,6 +3,13 @@ import { Page } from "@playwright/test";
 export default class Resources {
     private page: Page;
 
+    /**
+     * cancel button on modal dialogs
+     */
+    static readonly MODAL_CANCEL_BUTTON = "a#confirm-dialog-cancel-button.button";
+
+    static readonly MODAL_DELETE_BUTTON = "a#confirm-dialog-confirm-button.button";
+
     constructor(page: Page) {
         this.page = page;
     }
@@ -30,5 +37,19 @@ export default class Resources {
      */
     async clickMenuItem(menuItem: string): Promise<void> {
         await this.page.locator(`#meta a.icon-${menuItem}`).click();
+    }
+
+    /**
+     * click the last element to confirm deletion in a modal dialog
+     */
+    async clickModalDeleteButton(): Promise<void> {
+        await this.page.locator(Resources.MODAL_DELETE_BUTTON).last().click();
+    }
+
+    /**
+     * click the last element to Cancel confirm deletion in a modal dialog
+     */
+    async clickModalCancelButton(): Promise<void> {
+        await this.page.locator(Resources.MODAL_CANCEL_BUTTON).last().click();
     }
 }
