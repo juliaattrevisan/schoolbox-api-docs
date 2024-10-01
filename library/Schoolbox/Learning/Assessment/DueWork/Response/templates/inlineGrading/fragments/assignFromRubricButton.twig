@@ -69,16 +69,18 @@
          * Update the Grade based on the grid summation and existence of a
          * customised human-provided value
          *
-         * Update the mark input field with current rubric total if the total is different from the input val
-         * but ONLY if we haven't already customised the mark - don't clobber!
+         * Update the mark input field with current rubric total only if:
+         *  - the current rubric total is non-blank (it will be blank if no points have been set on rubric values) AND
+         *  - the total is different from the input val AND
+         *  - we haven't already customised the mark - don't clobber!
          *
          * @param rubricSum string
          * @return void
          */
         function updateGrade(rubricSum) {
-            var currentMarkInput = $status.find(markInputSelector).val();
+            var currentMarkInputValue = $status.find(markInputSelector).val();
 
-            if (rubricSum !== currentMarkInput && (!wasCustomised()) ) {
+            if (rubricSum !== '' && rubricSum !== currentMarkInputValue && (!wasCustomised()) ) {
                 $status.find(markInputSelector).val(rubricSum);
             }
         }
