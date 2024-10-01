@@ -59,7 +59,7 @@ class Module extends BaseModule
         );
 
         $connection = (new ConnectionFactory(new Factory(), $this->getConfig()))->build();
-        $handler    = new Handler($connection);
+        $handler    = new Handler($connection, new ViewSelector($connection));
 
         return new Controller(
             $ipWhitelist,
