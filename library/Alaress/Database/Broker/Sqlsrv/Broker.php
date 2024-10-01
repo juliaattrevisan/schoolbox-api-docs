@@ -141,6 +141,7 @@ class Broker extends Base
         return
             "sqlsrv:Server={$this->connector->getHostname()}{$portString};" .
             "Database={$this->connector->getDatabase()};" .
+            "TrustServerCertificate=True;" .
             "Encrypt={$this->options['Encrypt']};" .                        // Encrypt the connection
             "LoginTimeout=" . self::LOGIN_TIMEOUT . ";" .                // Give the connector 5 seconds to login- so we can default back to Offline connector
             "MultipleActiveResultSets={$multipleActiveResultsSets};";    // Disable Multiple Active Result Sets (aka. MARS) for performance reasons
