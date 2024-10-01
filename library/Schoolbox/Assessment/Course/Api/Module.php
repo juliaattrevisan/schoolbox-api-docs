@@ -10,6 +10,7 @@ use Schoolbox\Learning\Course\DataModel\Specification\Mapper as CourseSpecificat
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Mapper as UnitSpecificationMapper;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Permission\Access\Access;
+use Schoolbox\Role;
 
 class Module extends BaseModule
 {
@@ -25,25 +26,19 @@ class Module extends BaseModule
      */
     protected function registerRoutes(): void
     {
-        /* Anyone can see the form
+        /* Only superuser should have access to the data
          */
         $getPerms = new Rule\All(
-            new Rule\IsLoggedIn()
-        );
-
-        /* Only superusers can receive data from the form
-         */
-        $postPerms = new Rule\All(
             new Rule\IsLoggedIn(),
-            new Rule\IsSuperuser()
+            new Rule\Any(
+                //Staff and Superusers will have access to the endpoint
+                //It might change once the granular permission is implemented
+                new Rule\IsSuperuser(),
+                new Rule\HasRole(Role::STAFF),
+            )
         );
-
-//        $preloadUser = function ($params) {
-//            return $this->preloadUser($params);
-//        };
 
         $this->register('GET', '', 'searchCourses', $getPerms);
-//        $this->register('POST', '', 'postExample', $postPerms, null);
     }
 
 
