@@ -11,13 +11,12 @@ declare(strict_types=1);
 namespace Schoolbox\Assessment\Course\Api;
 
 use Alaress\Web\Controller\Base;
-use Schoolbox\Assessment\Course\Api\Translator\ModelToArray;
+use Crell\ApiProblem\ApiProblem;
 use Schoolbox\Collection;
 use Schoolbox\Learning\Course\DataModel\Specification\Mapper as CourseSpecificationMapper;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Mapper as UnitSpecificationMapper;
+use Schoolbox\Learning\Course\DataModel\Specification\Translator as CourseTranslator;
 use Schoolbox\Permission\Access\Access;
-use Schoolbox\Resource\Folder\Ancestry;
-use Schoolbox\Resource\Folder\Model as FolderModel;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Resource\Folder;
 
@@ -35,6 +34,11 @@ class Controller extends Base
     ) {
     }
 
+    /**
+     * Searching for courses depending on the search term
+     *
+     * @return void
+     */
     public function searchCourses(): void
     {
         $query = $this->requestQuery;
@@ -55,10 +59,21 @@ class Controller extends Base
             $limit
         );
 
-        $data = $cursor->retrieveResults($encodedCursor);
+        try {
+            $data = $cursor->retrieveResults($encodedCursor);
+        } catch (\Exception $e) {
+            $problem = (new ApiProblem($e->getMessage()))
+                ->setStatus(400)
+                ->asArray();
+            $this->response = $this->responseAsJson($problem)->withStatus(400);
+            return;
+        }
 
-        $folderTranslator = new Folder\Translator\ModelToArray\LinkOnly(99);
-        $translator = new \Schoolbox\Learning\Course\DataModel\Specification\Translator\ModelToArray(
+        /* Set the maximum parent lookup to 10 should be reasonable to reach all the
+         * ancestors
+         */
+        $folderTranslator = new Folder\Translator\ModelToArray\LinkOnly(10);
+        $translator = new CourseTranslator\ModelToArray(
             $this->routeGenerator,
             $this->authorizer,
             $this->getUser(),
@@ -66,11 +81,16 @@ class Controller extends Base
         );
 
         $courses = new Collection($data['courses'] ?? []);
-
         $result = $courses->map($translator);
 
+        $suggestions = $data['suggestions'] ?? new Collection();
+        $suggests = $suggestions->map($translator);
+
         $this->response = $this->responseAsJson([
-            'data' => $result,
+            'data' => [
+                'courses' => $result,
+                'suggestions' => $suggests,
+            ],
             'metadata' => [
                 'count' => $cursor->retrieveResultCount(),
                 'cursor' => [

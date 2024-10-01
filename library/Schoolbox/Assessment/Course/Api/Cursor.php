@@ -4,16 +4,10 @@ namespace Schoolbox\Assessment\Course\Api;
 
 use Alaress\Codec\ICodec;
 use Alaress\Codec\Json\Base64;
-use Alaress\Database\Connector\IConnector;
 use Schoolbox\API\Cursor\ICursor;
-//use Schoolbox\Assessment\Course\Helper;
 use Schoolbox\Collection;
-use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecification;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Permission\Access\Access;
-use Schoolbox\Permission\Access\UserAccess;
-use Schoolbox\Resource\Folder\Ancestry;
-use Schoolbox\Resource\Folder\Model as Folder;
 use Schoolbox\User;
 use ValueError;
 use Schoolbox\Learning\Course\DataModel\Specification\Mapper as CourseSpecificationMapper;
@@ -72,34 +66,39 @@ class Cursor implements ICursor
         }
     }
 
+    /**
+     * @inheritdoc
+     * @throws MapperException
+     */
     public function retrieveResults(?string $encodedCursor): Collection
     {
-        $data = $this->getCourseDate($encodedCursor);
+        $helper = new Helper(
+            $this->courseSpecificationMapper,
+            $this->folderMapper,
+            $this->unitSpecificationMapper,
+            $this->access,
+            $this->user,
+            $this->search,
+            $this->limit,
+            $this->codec
+        );
 
-//        $data = Helper::getCourseData(
-//            $this->courseSpecificationMapper,
-//            $this->folderMapper,
-//            $this->access,
-//            $this->user,
-//            $this->unitSpecificationMapper,
-//            $this->limit,
-//            $encodedCursor ? $this->codec->decode($encodedCursor) : null,
-//            $this->search
-//        );
-//
-//        // only offer suggestions if you're not searching
-//        if ($this->folder && !$this->search) {
-//            $folderModel = $this->folderMapper->findById($this->folder);
-//            $data['suggestions'] = Helper::getLinkSuggestions(
-//                $folderModel,
-//                $this->folderMapper,
-//                $this->courseSpecificationMapper,
-//            );
-//        }
-//
+        $data = $helper->getCourseDate($encodedCursor);
+
+        // only offer suggestions if you're not searching
+        if ($this->folder && !$this->search) {
+            $folderModel = $this->folderMapper->findById($this->folder);
+            $data['suggestions'] = $helper->getLinkSuggestions(
+                $folderModel,
+            );
+        }
+
         return new Collection($data);
     }
 
+    /**
+     * @inheritdoc
+     */
     public function retrieveResultCount(): ?int
     {
         if (null === $this->search) {
@@ -111,11 +110,17 @@ class Cursor implements ICursor
         return $counts;
     }
 
+    /**
+     * @inheritdoc
+     */
     public function current(Collection $collection): ?string
     {
             return null;
     }
 
+    /**
+     * @inheritdoc
+     */
     public function next(Collection $collection): ?string
     {
         if ($collection->count() === 0) {
@@ -123,141 +128,14 @@ class Cursor implements ICursor
         }
 
         $id = $collection->last()->getId();
+        $name = $collection->last()->getFolder()->getName();
 
         return $this->codec->encode(
             [
                 'id' => $id,
+                'name' => $name,
                 'search' => $this->search,
-                'limit' => $this->limit,
             ]
         );
     }
-
-    public function getCourseDate(?string $encodedCursor = null): array
-    {
-        if (null !== $encodedCursor) {
-            $cursor = $this->codec->decode($encodedCursor);
-            $this->search = $cursor['search'];
-            $this->limit = $cursor['limit'];
-        }
-        $pb = $this->courseSpecificationMapper->getPredicateBuilder();
-        $findOptions = [
-            'order' => [
-                "{$this->courseSpecificationMapper->getTable()}.{$this->courseSpecificationMapper->getIdentifierColumn()}" => 'asc',
-            ],
-            'limit' => $this->limit,
-        ];
-
-        if (strlen((string)$this->search) > 0) {
-            $pb->like(
-                'f.name',
-                "%{$this->courseSpecificationMapper->getDatabase()->getQuoter()->escapeForLike(
-                        $this->search
-                    )}%"
-            );
-        }
-
-        if (null !== $encodedCursor) {
-            $pb->greaterThan(
-                "{$this->courseSpecificationMapper->getTable()}.{$this->courseSpecificationMapper->getIdentifierColumn()}",
-                $cursor['id']
-            );
-        }
-
-        $allCourses = $this->courseSpecificationMapper->findByPredicates($pb, $findOptions) ?? [];
-
-        $data = [];
-
-        foreach ($allCourses as $currentCourse) {
-            // general search ignores Courses outside Faculty
-            if (null === $this->search) {
-                try {
-                    if (!$this->folderMapper->isDescendant($currentCourse->getFolder(), $this->courseSpecificationMapper->getFacultyRootFolder())) {
-                        continue;
-                    }
-                } catch (MapperException $e) {
-                    // can't detect if it's in faculty area because an ancestor is deleted. For our purposes, consider this deleted / irrelevant
-                    continue;
-                }
-            }
-
-            /* For each of the courses found in $data['courses'], decide if it's a courseSpec
-             * (it should already be, but we're specifically editing courseSpecs only
-             * in this usage - if you pollute the data, don't get sick from it)
-             *
-             * Then look at its folder instance and find out if you have WRITE+ access to it
-             * If you have write access to the courseSpec's folder context, you can modify
-             * the course - otherwise, deny the link but show it in the index anyway I guess
-             *
-             * (Staff members who don't have permissions to edit might still find it useful
-             * to see what's in here)
-             */
-            $courseFolderAccess = $this->access->getFolderAccess($this->user, $currentCourse->getFolder()->getId());
-            if ($courseFolderAccess > UserAccess::ACCESS_READ) {
-                $data['folderAccess'][$currentCourse->getFolder()->getId()] = true;
-            } elseif ($courseFolderAccess === UserAccess::ACCESS_READ) {
-                $data['folderAccess'][$currentCourse->getFolder()->getId()] = false;
-            } else {
-                continue;
-            }
-
-            /* Also store the path to this Course
-             */
-            try {
-                $lineage = $this->getLineage($currentCourse->getFolder());
-                $currentCourse->setFolder(
-                    $this->getParent($currentCourse->getFolder(), $lineage)
-                );
-            } catch (MapperException $e) {
-                // somehow, against all odds, one of my ancestors has been deleted: show nothing
-                continue;
-            }
-
-            // Get units for a course
-            $units = $this->unitSpecificationMapper->findAllByCourseId($currentCourse->getId());
-
-            // Remove units whose folders aren't accessible by this user
-            $currentCourse->setUnits($units->filter(function ($unit) {
-                /** @var UnitSpecification $unit */
-                return self::confirmAccess($unit->getFolder()->getId(), $this->access, $this->user);
-            }));
-
-            // Add course directly into $data
-            $data['courses'][] = $currentCourse;
-        }
-
-        return $data;
-    }
-
-    private function getLineage(Folder $course): Collection
-    {
-        return Ancestry::getInstance($this->folderMapper)->findParentsCheaply($course, $this->courseSpecificationMapper->getFacultyRootFolder());
-    }
-
-    private function getParent(Folder $folder, Collection $lineage): Folder
-    {
-        $return = $folder;
-
-        foreach (array_reverse($lineage->getAll()) as $parent) {
-            $return->setParent($parent);
-            $return = $return->getParent();
-        }
-
-        return $folder;
-    }
-
-    /**
-     * @param int $folderId
-     * @param int $min
-     * @return bool
-     */
-    private static function confirmAccess(
-        $folderId,
-        Access $access,
-        User $user,
-        $min = UserAccess::ACCESS_READ
-    ): bool {
-        return $access->getFolderAccess($user, $folderId) >= $min;
-    }
 }
-
