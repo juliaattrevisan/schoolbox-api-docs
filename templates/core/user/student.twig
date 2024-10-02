@@ -144,13 +144,22 @@
                         {% endblock medicalAlert %}
 
                         {% if showContactsAlert %}
-                            {% for message in externalUser.AlertMessages ?? [] %}
+                            {% for message in externalUser.AlertMessage ?? [] %}
                                 {% block contacts_alert %}
                                     {# Only staff may view contact alerts #}
                                     <div class="alert-box alert icon-alert">
                                         {{ message | nl2br }}
                                     </div>
                                 {% endblock contacts_alert %}
+                            {% endfor %}
+
+                            {% for message in externalUser.AlertLegal ?? [] %}
+                                {% block alert_legal %}
+                                    {# Only staff may view legal matters #}
+                                    <div class="alert-box alert icon-alert">
+                                        {{ message | nl2br }}
+                                    </div>
+                                {% endblock alert_legal %}
                             {% endfor %}
                         {% endif %}
 

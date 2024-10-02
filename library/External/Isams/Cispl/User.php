@@ -109,6 +109,21 @@ class External_Isams_Cispl_User extends External_Isams_User
             WHERE       StudentID = :external_user_id
         ";
 
-        return $this->getConnector()->executeQuery($query, ['external_user_id' => $externalUserId])->fetch() ?: [];
+        /* Forcibly obey External_UserInterface
+         */
+        $student = $this->getConnector()->executeQuery($query, ['external_user_id' => $externalUserId])->fetch();
+
+        /* Not sure if this was ever able to return null _and_ empty array
+         * under some weird circumstances, but whatever...init it as an empty
+         * array regardless
+         */
+        if (empty($student)) {
+            $student = [];
+        }
+
+        $student['AlertMessage'] = [];
+        $student['AlertLegal'] = [];
+
+        return $student;
     }
 }

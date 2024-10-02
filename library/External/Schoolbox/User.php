@@ -125,7 +125,36 @@ class External_Schoolbox_User implements External_UserInterface
             ['externalUserId' => $externalUserId]
         )->fetch();
 
-        return $student ?: [];
+        /* Couldn't find this record via the $externalUserId
+         * Exit early
+         */
+        if (!$student) {
+            return [];
+        }
+
+        /* Forcibly obey External_UserInterface
+         */
+        $student['AlertMessage'] = array_unique(array_filter([$student['AlertMessage']]));
+
+        /* Legal Alerts are distinguished by their CourtOrderType node.
+         * If that CourtOrderType node was meaningful, then it's a Legal Alert and gets special treatment.
+         * Otherwise it's a generic alert.
+         */
+        $courtOrderType = trim((string)($student['CourtOrderType'] ?? null));
+
+        if ('' !== $courtOrderType) {
+            /* A specially-crafted AlertLegal message about legal matters.
+             */
+            $student['AlertLegal'] = [sprintf(
+                '%s - %s',
+                \External_UserInterface::COURT_ORDER_PREFIX,
+                $courtOrderType
+            )];
+        } else {
+            $student['AlertLegal'] = [];
+        }
+
+        return $student;
     }
 
 

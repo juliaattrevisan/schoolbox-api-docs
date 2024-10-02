@@ -85,6 +85,12 @@ class External_Pcschools_User implements External_UserInterface
             );
             $row['StudentBoarder'] = in_array($row['StudentBoarder'], $boarderCodes) ? 'Y' : 'N';
         }
+
+        /* Forcibly obey External_UserInterface
+         */
+        $row['AlertMessage'] = [$row['AlertMessage']];
+        $row['AlertLegal'] = [];
+
         return $row;
     }
 

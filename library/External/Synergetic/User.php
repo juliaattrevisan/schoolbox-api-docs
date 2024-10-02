@@ -25,6 +25,7 @@ class External_Synergetic_User implements External_UserInterface
      */
     protected const FORMAT_ISO8601 = 126;
 
+
     /**
      * Constructor
      */
@@ -256,8 +257,12 @@ class External_Synergetic_User implements External_UserInterface
             $learningPlanQuery = "0 AS countIndividualEducationPlans";
         }
 
-        $query =
-        "
+        /* Using this query may return multiple rows for a user.
+         * That's because one row is slightly different than other rows, such as by its Alert Messages
+         * or other parts of the join. Whatever result set we obtain, we collate all the data here
+         * and uniquify it all later.
+         */
+        $query = "
             SELECT      vStudentsAll.StudentID,
                         vStudentsAll.StudentGiven1,
                         vStudentsAll.StudentSurname,
@@ -343,19 +348,42 @@ class External_Synergetic_User implements External_UserInterface
                     $student['StudentBirthDate'] = false;
                 }
 
-                $student['AlertMessage'] = [
-                    $student['AlertMessage']
-                ];
-            } else {
-                // Additional records will only different by their alert message, we just append these to the
-                // existing student record
+                /* Initialise stacks
+                 */
+                $student['AlertMessage'] = [];
+                $student['AlertLegal'] = [];
+            }
 
+            /* Legal Alerts are distinguished by their CourtOrderType node.
+             * If that CourtOrderType node was meaningful, then it's a Legal Alert and gets special treatment.
+             * Otherwise it's a generic alert.
+             */
+            $courtOrderType = trim((string)($row['CourtOrderType'] ?? null));
+
+            if ('' !== $courtOrderType) {
+                /* A specially-crafted AlertLegal message about legal matters.
+                 */
+                $student['AlertLegal'][] = sprintf(
+                    '%s - %s',
+                    \External_UserInterface::COURT_ORDER_PREFIX,
+                    $courtOrderType
+                );
+            } else {
+                /* Some kind of generic alert message
+                 */
                 $student['AlertMessage'][] = $row['AlertMessage'];
             }
         }
 
+        /* Uniquify both AlertMessage and AlertLegal nodes since they might dupe
+         * as a result of those left joins in the mega query
+         */
         if (!empty($student) && is_array($student['AlertMessage'])) {
             $student['AlertMessage'] = array_unique(array_filter($student['AlertMessage']));
+        }
+
+        if (!empty($student) && is_array($student['AlertLegal'])) {
+            $student['AlertLegal'] = array_unique(array_filter($student['AlertLegal']));
         }
 
         // Remove Synergetic's annoying 'Not Selected' default value for lookups
