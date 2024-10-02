@@ -118,4 +118,22 @@ class ColorFactoryTest extends TestCase
         $this->expectException(\InvalidArgumentException::class);
         $this->colorFactory->build($colorString);
     }
+
+    public function getInvalidNullData()
+    {
+        return array(
+            array(null)
+        );
+    }
+
+    /**
+     * @dataProvider getInvalidNullData
+     */
+    public function testInvalidNull($colorString)
+    {
+        //TODO this should be updated to check for different error if we are forcing string later
+        $this->expectExceptionMessageMatches("/does not match expected format/");
+        $this->expectException(\InvalidArgumentException::class);
+        $this->colorFactory->build($colorString);
+    }
 }
