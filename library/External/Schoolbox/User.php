@@ -134,7 +134,7 @@ class External_Schoolbox_User implements External_UserInterface
 
         /* Forcibly obey External_UserInterface
          */
-        $student['AlertMessage'] = [$student['AlertMessage']];
+        $student['AlertMessage'] = array_unique(array_filter([$student['AlertMessage']]));
 
         /* Legal Alerts are distinguished by their CourtOrderType node.
          * If that CourtOrderType node was meaningful, then it's a Legal Alert and gets special treatment.
