@@ -594,3 +594,14 @@ $block-grid-media-queries: true !default;
 [data-component] {
     @include top-content-alignment();
 }
+
+// Text will be truncated with ellipsis if it's too long to fit on a single line.
+#content {
+    > .row {
+        h1 {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+    }
+}
