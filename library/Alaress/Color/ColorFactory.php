@@ -15,15 +15,15 @@ class ColorFactory
     /**
      * Creates a color from a color string.
      *
-     * @param string $colorString A string in one of these formats:
-     *                            * RRGGBB (optional leading #)
-     *                            * RRGGBBAA (optional leading #)
-     *                            * rgb(int, int, int)
-     *                            * rgba(int, int, int, float)
+     * @param string|null $colorString A string in one of these formats:
+     *                                 * RRGGBB (optional leading #)
+     *                                 * RRGGBBAA (optional leading #)
+     *                                 * rgb(int, int, int)
+     *                                 * rgba(int, int, int, float)
      * @return Color
      * @throws \InvalidArgumentException
      */
-    public function build($colorString): Color
+    public function build(?string $colorString): Color
     {
         // Formats:
         // RRGGBB
@@ -31,7 +31,7 @@ class ColorFactory
         // rgb(r,g,b)
         // rgba(r,g,b,a)
         // Remove all spaces for comparison
-        //TODO to investigate why the $colorString was null, and force string on input
+        //TODO might force the $colorString to be string only, but for now it's nullable
         $colorString = preg_replace('/\\s/', '', (string)$colorString);
         if (
             preg_match(
