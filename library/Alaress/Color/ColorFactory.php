@@ -23,7 +23,7 @@ class ColorFactory
      * @return Color
      * @throws \InvalidArgumentException
      */
-    public function build($colorString)
+    public function build($colorString): Color
     {
         // Formats:
         // RRGGBB
@@ -31,7 +31,8 @@ class ColorFactory
         // rgb(r,g,b)
         // rgba(r,g,b,a)
         // Remove all spaces for comparison
-        $colorString = preg_replace('/\\s/', '', $colorString);
+        //TODO to investigate why the $colorString was null, and force string on input
+        $colorString = preg_replace('/\\s/', '', (string)$colorString);
         if (
             preg_match(
                 '/^#?(?P<r>[0-9a-f]{2})(?P<g>[0-9a-f]{2})(?P<b>[0-9a-f]{2})$/i',
