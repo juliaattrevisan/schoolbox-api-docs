@@ -5,6 +5,7 @@
 
 import { animateRotation } from "@js/util/animateUtils";
 import { useProfileEditorStore } from "./store/profileEditorStore";
+import { useProfileEditorFieldsStore } from "./store/profileEditorFieldsStore";
 import PeFieldsSelectedItemEdit from "./pe-fields-selected-item-edit.vue";
 import PeFieldsSelectedItemRemove from "./pe-fields-selected-item-remove.vue";
 import PeFieldsIcon from "./pe-fields-icon.vue";
@@ -18,6 +19,7 @@ interface Props {
 
 const props = defineProps<Props>();
 const peStore = useProfileEditorStore();
+const peFieldsStore = useProfileEditorFieldsStore();
 
 const editBtn = window.Vue.ref<HTMLElement | null>(null);
 const removeBtn = window.Vue.ref<HTMLElement | null>(null);
@@ -115,7 +117,7 @@ const isSaving = window.Vue.computed(() => {
     if (!isFieldOnServer.value) return true;
 
     // Finally, determine the loading state based on if this field is currently in the action queue or not
-    return peStore.actionQueue.some((action) => {
+    return peFieldsStore.actionQueue.some((action) => {
         if (action.field === props.field.field) return true;
         return false;
     });

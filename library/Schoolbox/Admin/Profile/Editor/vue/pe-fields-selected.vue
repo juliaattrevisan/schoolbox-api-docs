@@ -8,8 +8,10 @@ import SortableWrapper from "@schoolboxVue/components/sortable-wrapper.vue";
 import { slideDownOnEnter, slideUpOnLeave } from "@schoolboxVue/transitions/transitions";
 import PeFieldsSelectedItem from "./pe-fields-selected-item.vue";
 import { useProfileEditorStore } from "./store/profileEditorStore";
+import { useProfileEditorFieldsStore } from "./store/profileEditorFieldsStore";
 
 const peStore = useProfileEditorStore();
+const peFieldsStore = useProfileEditorFieldsStore();
 
 const sortableOptions = window.Vue.computed(() => ({
     // Link the selected fields sortable to the available fields sortable so that we can drag between them
@@ -54,7 +56,7 @@ async function onAddField(event: Sortable.SortableEvent): Promise<void> {
     // Send the actual item (controlled by vue) back into the palette to keep its reactivity
     event.clone.replaceWith(event.item);
 
-    await peStore.enableField(field, event.newIndex);
+    await peFieldsStore.enableField(field, event.newIndex);
 }
 </script>
 

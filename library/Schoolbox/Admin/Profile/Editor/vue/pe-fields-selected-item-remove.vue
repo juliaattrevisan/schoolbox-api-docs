@@ -4,7 +4,7 @@
  */
 
 import { slideDownOnEnter, slideUpOnLeave } from "@schoolboxVue/transitions/transitions";
-import { useProfileEditorStore } from "./store/profileEditorStore";
+import { useProfileEditorFieldsStore } from "./store/profileEditorFieldsStore";
 import type { ProfileEditorSelectedField } from "./profileEditorTypes";
 
 interface Props {
@@ -13,7 +13,7 @@ interface Props {
 }
 
 const props = defineProps<Props>();
-const peStore = useProfileEditorStore();
+const peFieldsStore = useProfileEditorFieldsStore();
 const emit = defineEmits(["close"]);
 
 const isRemoving = window.Vue.ref(false);
@@ -23,7 +23,7 @@ const isRemoving = window.Vue.ref(false);
  */
 async function onRemoveClicked(): Promise<void> {
     isRemoving.value = true;
-    await peStore.disableField(props.field.field);
+    await peFieldsStore.disableField(props.field.field);
     isRemoving.value = false;
 }
 </script>
