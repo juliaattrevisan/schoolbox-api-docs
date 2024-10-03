@@ -21,6 +21,8 @@ use Schoolbox;
 use Schoolbox\Collection;
 use Schoolbox\GenericCollection;
 use Schoolbox\Mapper;
+use Schoolbox\Mapper\Exception;
+use Schoolbox\Mapper\Exception\Deleted;
 use Schoolbox\Realtime\Subscription\Redis\UnreadRetriever;
 use Schoolbox\Resource\Storage;
 
@@ -74,8 +76,11 @@ class ServiceManager implements IServiceManager
 
 
     /**
-     * @param int      $userId
+     * @param int $userId
      * @param Instance $instance
+     * @throws FilesystemException
+     * @throws Exception
+     * @throws Deleted // when the recipient (user) is deleted
      */
     public function push($userId, Instance $instance)
     {

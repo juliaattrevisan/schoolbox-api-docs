@@ -22,6 +22,7 @@ use DateTime;
 use DateTimeInterface;
 use Psr\Log\LoggerInterface;
 use React\EventLoop\LoopInterface;
+use Schoolbox\Mapper\Exception\Deleted;
 use Schoolbox\MobileApp\ServiceManager;
 
 /**
@@ -214,6 +215,20 @@ class Scheduler extends AbstractScheduler implements IConsumer
                 $wait / 1000,
                 fn () => $this->attemptPush($instanceId, $userId, $payload, $resolver, $attemptNum + 1),
             );
+        } catch (Deleted $e) {
+            $this->log->warning(
+                sprintf(
+                    'Delivery of message %s:%s to instance:user %s:%d: User is deleted',
+                    $payload->getBaseHash(),
+                    $payload->getParamHash(),
+                    $instanceId,
+                    $userId
+                )
+            );
+            // Acknowledge the message, the user is deleted,
+            // we should be able to discard the message, it will never be sent again.
+            $resolver->acknowledge();
+            return;
         }
     }
 }
