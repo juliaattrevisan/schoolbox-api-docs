@@ -30,9 +30,63 @@ type QueuedFieldAction = FieldAction & {
     isProcessing: boolean;
 };
 
+type ProfileEditorFetchResponse = {
+    success: boolean;
+    message?: string;
+};
+
+/**
+ * Fetch a given endpoint for the profile editor and process the response for errors
+ * @param endpoint - The endpoint to fetch
+ * @param options - The fetch options to use
+ * @returns The response from the fetch
+ */
+async function fetchProfileEditorEndpoint(endpoint: string, options: RequestInit): Promise<ProfileEditorFetchResponse> {
+    const responseData: ProfileEditorFetchResponse = { success: false, message: "An unknown error occured" }; // Default error case
+
+    try {
+        const response = await fetch(endpoint, options);
+        const responseText = await response.text();
+
+        // If we got some form of response, set the initial message to that
+        responseData.message = responseText;
+
+        // Safely parse the response as JSON, we don't necessarily know what it will be in advance
+        let responseJson: unknown = null;
+        try {
+            responseJson = JSON.parse(responseText);
+        } catch {
+            // If it fails to parse, we'll just leave it as null
+        }
+
+        if (typeof responseJson === "object" && responseJson !== null) {
+            if ("success" in responseJson && typeof responseJson.success === "boolean") {
+                responseData.success = responseJson.success;
+            }
+
+            if ("message" in responseJson && typeof responseJson.message === "string") {
+                responseData.message = responseJson.message;
+            } else if (responseData.success === true) {
+                // Remove the default error message if the response was successful but had no message
+                delete responseData.message;
+            }
+        }
+    } catch (e) {
+        responseData.success = false;
+        responseData.message = (e as Error).message;
+    }
+
+    return responseData;
+}
+
 export const useProfileEditorFieldsStore = defineStore("profileEditorFieldsStore", () => {
     const peStore = useProfileEditorStore();
+
+    // The current queue of actions to be processed
     const actionQueue = window.Vue.ref<QueuedFieldAction[]>([]);
+
+    // A map of field keys to any errors that occurred while processing actions for that field
+    const actionErrors = window.Vue.ref<{ [key: string]: string }>({});
 
     /**
      * Whether a field can be selected or not
@@ -63,16 +117,18 @@ export const useProfileEditorFieldsStore = defineStore("profileEditorFieldsStore
             .replace("{roleType}", peStore.selectedRoleType.roleType)
             .replace("{fieldId}", field);
 
-        try {
-            await fetch(endpoint, {
-                method: "POST",
-                body: JSON.stringify({ index }),
-                headers: { "Content-Type": "application/json" },
-            });
-            peStore.savedSelectedRoleType.fields.selected.splice(index, 0, cloneDeep(selectedField));
-        } catch {
-            // TODO: Handle failure
+        const response = await fetchProfileEditorEndpoint(endpoint, {
+            method: "POST",
+            body: JSON.stringify({ index }),
+            headers: { "Content-Type": "application/json" },
+        });
+
+        if (!response.success) {
+            actionErrors.value[field] = response.message ?? "An unknown error occurred";
+            return;
         }
+
+        peStore.savedSelectedRoleType.fields.selected.splice(index, 0, cloneDeep(selectedField));
     }
 
     /**
@@ -87,23 +143,26 @@ export const useProfileEditorFieldsStore = defineStore("profileEditorFieldsStore
             .replace("{roleType}", peStore.selectedRoleType.roleType)
             .replace("{fieldId}", field);
 
-        try {
-            await fetch(endpoint, { method: "POST" });
-            peStore.selectedRoleType.fields.selected = peStore.selectedRoleType.fields.selected.filter(
-                (f) => f.field !== field,
-            );
-            peStore.savedSelectedRoleType.fields.selected = peStore.savedSelectedRoleType.fields.selected.filter(
-                (f) => f.field !== field,
-            );
-        } catch {
-            // TODO: Handle failure
+        const response = await fetchProfileEditorEndpoint(endpoint, { method: "POST" });
+
+        if (!response.success) {
+            actionErrors.value[field] = response.message ?? "An unknown error occurred";
+            return;
         }
+
+        peStore.selectedRoleType.fields.selected = peStore.selectedRoleType.fields.selected.filter(
+            (f) => f.field !== field,
+        );
+        peStore.savedSelectedRoleType.fields.selected = peStore.savedSelectedRoleType.fields.selected.filter(
+            (f) => f.field !== field,
+        );
     }
 
     /**
      * Process resequencing fields after ensuring all prior actions are completed
+     * @param fields - The fields relevant to the resequence action (for error reporting purposes, not used to resequence)
      */
-    async function processResequenceFields(): Promise<void> {
+    async function processResequenceFields(fields: string[]): Promise<void> {
         if (!peStore.selectedRoleType) throw new Error("No role type selected");
         if (!peStore.savedSelectedRoleType) throw new Error("No role type selected");
 
@@ -113,16 +172,20 @@ export const useProfileEditorFieldsStore = defineStore("profileEditorFieldsStore
         );
         const sequence = peStore.selectedRoleType.fields.selected.map((f) => f.field);
 
-        try {
-            await fetch(endpoint, {
-                method: "POST",
-                body: JSON.stringify({ sequence }),
-                headers: { "Content-Type": "application/json" },
+        const response = await fetchProfileEditorEndpoint(endpoint, {
+            method: "POST",
+            body: JSON.stringify({ sequence }),
+            headers: { "Content-Type": "application/json" },
+        });
+
+        if (!response.success) {
+            fields.forEach((field) => {
+                actionErrors.value[field] = response.message ?? "An unknown error occurred";
             });
-            peStore.savedSelectedRoleType.fields.selected = cloneDeep(peStore.selectedRoleType.fields.selected);
-        } catch {
-            // TODO: Handle failure
+            return;
         }
+
+        peStore.savedSelectedRoleType.fields.selected = cloneDeep(peStore.selectedRoleType.fields.selected);
     }
 
     /**
@@ -143,7 +206,7 @@ export const useProfileEditorFieldsStore = defineStore("profileEditorFieldsStore
                 await processDisableField(action.field);
                 break;
             case "RESEQUENCE_FIELDS":
-                await processResequenceFields();
+                await processResequenceFields(action.fields);
                 break;
             default:
                 ((a: never): Error => new Error(a))(action); // Assert exhaustive switch
@@ -166,6 +229,14 @@ export const useProfileEditorFieldsStore = defineStore("profileEditorFieldsStore
     async function queueAction(action: FieldAction): Promise<void> {
         const actionId = Math.floor(Math.random() * 1000000); // Generate a random action ID for tracking
         const queuedAction: QueuedFieldAction = { ...action, actionId, isProcessing: false };
+
+        // Remove any errors for the field(s) since it's being reprocessed
+        if ("field" in action) {
+            delete actionErrors.value[action.field];
+        }
+        if ("fields" in action) {
+            action.fields.forEach((field) => delete actionErrors.value[field]);
+        }
 
         if (queuedAction.type === "RESEQUENCE_FIELDS") {
             // Remove any other resequence actions from the queue that are still pending, as they are redundant
@@ -265,8 +336,9 @@ export const useProfileEditorFieldsStore = defineStore("profileEditorFieldsStore
     }
 
     return {
-        isFieldDisabled,
         actionQueue,
+        actionErrors,
+        isFieldDisabled,
         enableField,
         disableField,
         resequenceField,

@@ -4,10 +4,12 @@
  */
 
 import { animateRotation } from "@js/util/animateUtils";
+import { slideDownOnEnter, slideUpOnLeave } from "@schoolboxVue/transitions/transitions";
 import { useProfileEditorStore } from "./store/profileEditorStore";
 import { useProfileEditorFieldsStore } from "./store/profileEditorFieldsStore";
 import PeFieldsSelectedItemEdit from "./pe-fields-selected-item-edit.vue";
 import PeFieldsSelectedItemRemove from "./pe-fields-selected-item-remove.vue";
+import PeFieldsSelectedItemError from "./pe-fields-selected-item-error.vue";
 import PeFieldsIcon from "./pe-fields-icon.vue";
 import type { ProfileEditorAvailableField, ProfileEditorSelectedField } from "./profileEditorTypes";
 
@@ -101,6 +103,13 @@ const showPanels = window.Vue.computed(() => {
 });
 
 /**
+ * The error message to display if there was a problem saving this field
+ */
+const fieldSaveError = window.Vue.computed(() => {
+    return peFieldsStore.actionErrors[props.field.field];
+});
+
+/**
  * Whether the current field is in a "saving" state
  * This is used to disable the grip handle and show a loading spinner instead
  * to ensure the user can't interact with the field while it is saving or loading
@@ -109,6 +118,9 @@ const showPanels = window.Vue.computed(() => {
  * @returns whether the field is in a saving state
  */
 const isSaving = window.Vue.computed(() => {
+    // If there was an error, we are not saving
+    if (fieldSaveError.value) return false;
+
     // Always show the grip for available fields, the user won't be able to interact with them
     // but this makes the drag preview look more like an actual saved field rather than having a spinner
     if (!isSelectedField(props.field)) return false;
@@ -162,6 +174,12 @@ const isSaving = window.Vue.computed(() => {
                         </nav>
                     </div>
                 </div>
+
+                <Transition @enter="slideDownOnEnter" @leave="slideUpOnLeave">
+                    <div v-if="fieldSaveError" class="component-panel">
+                        <pe-fields-selected-item-error :message="fieldSaveError" />
+                    </div>
+                </Transition>
 
                 <div v-if="isSelectedField(props.field) && showPanels" class="component-panel">
                     <pe-fields-selected-item-edit

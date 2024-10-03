@@ -73,9 +73,16 @@ class Controller extends Base
                 'field' => $fieldId,
             ]);
 
-            // TODO: Resequence.
+            /** @var int|null $index - The index at which to insert the field */
+            $index = $this->requestPost->get('index');
+            if ($index === null) {
+                throw new \Exception("No index provided");
+            }
+
+            // TODO: Resequence the others.
 
             $fieldModel->setEnabled(1);
+            $fieldModel->setSequence($index);
             $this->fieldMapper->save($fieldModel);
 
             $this->response = $this->responseAsJson(['success' => true]);
