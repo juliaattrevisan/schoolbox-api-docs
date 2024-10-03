@@ -36,7 +36,7 @@ class HomepageConfig
     /**
      * Width of the left column as a percentage
      *
-     * @var float
+     * @var float|null
      */
     protected $leftColumnWidth;
 
@@ -44,90 +44,90 @@ class HomepageConfig
     /**
      * Width of the right column as a percentage
      *
-     * @var float
+     * @var float|null
      */
     protected $rightColumnWidth;
 
     /**
      * Font colour
      *
-     * @var string
+     * @var string|null
      */
     protected $left_head_font;
 
     /**
      * Background colour
      *
-     * @var string
+     * @var string|null
      */
     protected $left_head_bg;
 
     /**
      * Font color
-     * @var string
+     * @var string|null
      */
     protected $left_font;
 
     /**
      * Background colour
      *
-     * @var string
+     * @var string|null
      */
     protected $left_bg_primary;
 
     /**
      * Font colour
      *
-     * @var string
+     * @var string|null
      */
     protected $right_head_font;
 
     /**
      * Background colour
      *
-     * @var string
+     * @var string|null
      */
     protected $right_head_bg;
 
     /**
      * Font color
      *
-     * @var string
+     * @var string|null
      */
     protected $right_font;
 
     /**
      * Background colour
      *
-     * @var string
+     * @var string|null
      */
     protected $right_bg_primary;
 
     /**
      * Font colour
      *
-     * @var string
+     * @var string|null
      */
     protected $top_head_font;
 
     /**
      * Background colour
      *
-     * @var string
+     * @var string|null
      */
     protected $top_head_bg;
 
     /**
      * Font color
      *
-     * @var string
+     * @var string|null
      */
     protected $top_font;
 
     /**
      * Background colour
      *
-     * @var string
+     * @var string|null
      */
     protected $top_bg_primary;
 
@@ -168,7 +168,7 @@ class HomepageConfig
     }
 
     /**
-     * @param string $left_bg_primary
+     * @param string|null $left_bg_primary
      * @return $this
      */
     public function setLeftBgPrimary($left_bg_primary)
@@ -178,7 +178,7 @@ class HomepageConfig
     }
 
     /**
-     * @return string
+     * @return string|null
      */
     public function getLeftBgPrimary()
     {
@@ -187,7 +187,7 @@ class HomepageConfig
 
 
     /**
-     * @param string $left_font
+     * @param string|null $left_font
      * @return $this
      */
     public function setLeftFont($left_font)
@@ -197,7 +197,7 @@ class HomepageConfig
     }
 
     /**
-     * @return string
+     * @return string|null
      */
     public function getLeftFont()
     {
@@ -205,7 +205,7 @@ class HomepageConfig
     }
 
     /**
-     * @param string $left_head_bg
+     * @param string|null $left_head_bg
      * @return $this
      */
     public function setLeftHeadBg($left_head_bg)
@@ -215,7 +215,7 @@ class HomepageConfig
     }
 
     /**
-     * @return string
+     * @return string|null
      */
     public function getLeftHeadBg()
     {
@@ -223,7 +223,7 @@ class HomepageConfig
     }
 
     /**
-     * @param string $left_head_font
+     * @param string|null $left_head_font
      * @return $this
      */
     public function setLeftHeadFont($left_head_font)
@@ -233,7 +233,7 @@ class HomepageConfig
     }
 
     /**
-     * @return string
+     * @return string|null
      */
     public function getLeftHeadFont()
     {
@@ -259,7 +259,7 @@ class HomepageConfig
     }
 
     /**
-     * @param string $right_bg_primary
+     * @param string|null $right_bg_primary
      * @return $this
      */
     public function setRightBgPrimary($right_bg_primary)
@@ -269,7 +269,7 @@ class HomepageConfig
     }
 
     /**
-     * @return string
+     * @return string|null
      */
     public function getRightBgPrimary()
     {
@@ -277,7 +277,7 @@ class HomepageConfig
     }
 
     /**
-     * @param string $right_font
+     * @param string|null $right_font
      * @return $this
      */
     public function setRightFont($right_font)
@@ -287,7 +287,7 @@ class HomepageConfig
     }
 
     /**
-     * @return string
+     * @return string|null
      */
     public function getRightFont()
     {
@@ -295,7 +295,7 @@ class HomepageConfig
     }
 
     /**
-     * @param string $right_head_bg
+     * @param string|null $right_head_bg
      * @return $this
      */
     public function setRightHeadBg($right_head_bg)
@@ -305,7 +305,7 @@ class HomepageConfig
     }
 
     /**
-     * @return string
+     * @return string|null
      */
     public function getRightHeadBg()
     {
@@ -313,7 +313,7 @@ class HomepageConfig
     }
 
     /**
-     * @param string $right_head_font
+     * @param string|null $right_head_font
      * @return $this
      */
     public function setRightHeadFont($right_head_font)
@@ -323,7 +323,7 @@ class HomepageConfig
     }
 
     /**
-     * @return string
+     * @return string|null
      */
     public function getRightHeadFont()
     {
@@ -349,7 +349,7 @@ class HomepageConfig
     }
 
     /**
-     * @param string $top_bg_primary
+     * @param string|null $top_bg_primary
      * @return $this
      */
     public function setTopBgPrimary($top_bg_primary)
@@ -359,7 +359,7 @@ class HomepageConfig
     }
 
     /**
-     * @return string
+     * @return string|null
      */
     public function getTopBgPrimary()
     {
@@ -367,7 +367,7 @@ class HomepageConfig
     }
 
     /**
-     * @param string $top_font
+     * @param string|null $top_font
      * @return $this
      */
     public function setTopFont($top_font)
@@ -377,7 +377,7 @@ class HomepageConfig
     }
 
     /**
-     * @return string
+     * @return string|null
      */
     public function getTopFont()
     {
@@ -385,7 +385,7 @@ class HomepageConfig
     }
 
     /**
-     * @param string $top_head_bg
+     * @param string|null $top_head_bg
      * @return $this
      */
     public function setTopHeadBg($top_head_bg)
@@ -395,7 +395,7 @@ class HomepageConfig
     }
 
     /**
-     * @return string
+     * @return string|null
      */
     public function getTopHeadBg()
     {
@@ -403,7 +403,7 @@ class HomepageConfig
     }
 
     /**
-     * @param string $top_head_font
+     * @param string|null $top_head_font
      * @return $this
      */
     public function setTopHeadFont($top_head_font)
@@ -413,7 +413,7 @@ class HomepageConfig
     }
 
     /**
-     * @return string
+     * @return string|null
      */
     public function getTopHeadFont()
     {

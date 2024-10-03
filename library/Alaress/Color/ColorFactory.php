@@ -23,7 +23,7 @@ class ColorFactory
      * @return Color
      * @throws \InvalidArgumentException
      */
-    public function build($colorString)
+    public function build($colorString): Color
     {
         // Formats:
         // RRGGBB
@@ -31,6 +31,7 @@ class ColorFactory
         // rgb(r,g,b)
         // rgba(r,g,b,a)
         // Remove all spaces for comparison
+        //TODO might force the $colorString to be string only, but for now it's nullable
         $colorString = preg_replace('/\\s/', '', $colorString);
         if (
             preg_match(
