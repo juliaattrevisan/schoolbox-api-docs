@@ -23,7 +23,7 @@ const disabled = window.Vue.computed(() => peStore.isFieldDisabled(props.field.f
         :class="{ disabled }"
         :title="disabled ? 'This field is already selected' : undefined"
         :data-pe-prevent-drag="disabled ? true : undefined"
-        @click="peStore.addSelectedField(props.field.field)"
+        @click="peStore.enableField(props.field.field)"
     >
         <pe-fields-icon :field="props.field" />
         {{ props.field.displayAs }}
@@ -51,4 +51,3 @@ const disabled = window.Vue.computed(() => peStore.isFieldDisabled(props.field.f
     }
 }
 </style>
-./profileEditorTypes

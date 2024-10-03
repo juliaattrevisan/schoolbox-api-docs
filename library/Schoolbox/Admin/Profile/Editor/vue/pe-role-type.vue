@@ -41,4 +41,3 @@ function setSelectedRoleType(role: ProfileEditorRoleType): void {
 </template>
 
 <style scoped></style>
-./profileEditorTypes

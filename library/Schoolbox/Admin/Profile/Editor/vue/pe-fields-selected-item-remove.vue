@@ -22,17 +22,9 @@ const isRemoving = window.Vue.ref(false);
  * When the user clicks the remove button
  */
 async function onRemoveClicked(): Promise<void> {
-    if (peStore.selectedRoleType === null) return;
-
     isRemoving.value = true;
-
-    await new Promise((resolve) => {
-        setTimeout(resolve, 500);
-    });
-
-    peStore.selectedRoleType.fields.selected = peStore.selectedRoleType.fields.selected.filter(
-        (field) => field.field !== props.field.field,
-    );
+    await peStore.disableField(props.field.field);
+    isRemoving.value = false;
 }
 </script>
 
@@ -57,4 +49,3 @@ async function onRemoveClicked(): Promise<void> {
 </template>
 
 <style scoped></style>
-./types/profileEditorTypes

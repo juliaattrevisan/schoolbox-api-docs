@@ -53,4 +53,3 @@ const tooltipText = window.Vue.computed<string | undefined>(() => {
     }
 }
 </style>
-./profileEditorTypes

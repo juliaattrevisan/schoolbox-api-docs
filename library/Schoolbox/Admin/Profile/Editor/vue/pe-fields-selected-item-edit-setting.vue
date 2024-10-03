@@ -93,4 +93,3 @@ window.Vue.onMounted(() => {
 </template>
 
 <style scoped></style>
-./types/profileEditorTypes

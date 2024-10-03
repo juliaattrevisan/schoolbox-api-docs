@@ -47,14 +47,14 @@ function resequenceFields(event: Sortable.SortableEvent): void {
  * When a field is added from the available fields
  * @param event The event that triggered the add
  */
-function onAddField(event: Sortable.SortableEvent): void {
+async function onAddField(event: Sortable.SortableEvent): Promise<void> {
     const field = event.item.getAttribute("data-pe-field");
     if (field === null) throw new Error("dragged item is missing a data-pe-field attribute");
 
-    peStore.addSelectedField(field, event.newIndex);
-
     // Send the actual item (controlled by vue) back into the palette to keep its reactivity
     event.clone.replaceWith(event.item);
+
+    await peStore.enableField(field, event.newIndex);
 }
 </script>
 
