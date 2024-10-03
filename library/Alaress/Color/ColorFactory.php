@@ -15,15 +15,15 @@ class ColorFactory
     /**
      * Creates a color from a color string.
      *
-     * @param string|null $colorString A string in one of these formats:
-     *                                 * RRGGBB (optional leading #)
-     *                                 * RRGGBBAA (optional leading #)
-     *                                 * rgb(int, int, int)
-     *                                 * rgba(int, int, int, float)
+     * @param string $colorString A string in one of these formats:
+     *                            * RRGGBB (optional leading #)
+     *                            * RRGGBBAA (optional leading #)
+     *                            * rgb(int, int, int)
+     *                            * rgba(int, int, int, float)
      * @return Color
      * @throws \InvalidArgumentException
      */
-    public function build(?string $colorString): Color
+    public function build($colorString): Color
     {
         // Formats:
         // RRGGBB
@@ -32,7 +32,7 @@ class ColorFactory
         // rgba(r,g,b,a)
         // Remove all spaces for comparison
         //TODO might force the $colorString to be string only, but for now it's nullable
-        $colorString = preg_replace('/\\s/', '', (string)$colorString);
+        $colorString = preg_replace('/\\s/', '', $colorString);
         if (
             preg_match(
                 '/^#?(?P<r>[0-9a-f]{2})(?P<g>[0-9a-f]{2})(?P<b>[0-9a-f]{2})$/i',
