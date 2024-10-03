@@ -40,10 +40,10 @@ class Module extends BaseModule
         );
 
         $this->register('GET', '', 'getIndex', $perms);
-        $this->register('POST', '/field/{fieldId}/add', 'postFieldAdd', $perms);
-        $this->register('POST', '/field/{fieldId}/remove', 'postFieldRemove', $perms);
-        $this->register('POST', '/field/{fieldId}/settings', 'postFieldSettings', $perms);
-        $this->register('POST', '/field/{roletype}/sequence', 'postFieldSequence', $perms);
+        $this->register('POST', '/field/{roleType}/{fieldId}/remove', 'postFieldRemove', $perms);
+        $this->register('POST', '/field/{roleType}/{fieldId}/add', 'postFieldAdd', $perms);
+        $this->register('POST', '/field/{roleType}/{fieldId}/settings', 'postFieldSettings', $perms);
+        $this->register('POST', '/field/{roleType}/sequence', 'postFieldSequence', $perms);
     }
 
 

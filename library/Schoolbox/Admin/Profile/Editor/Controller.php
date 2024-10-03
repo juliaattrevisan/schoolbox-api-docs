@@ -55,46 +55,141 @@ class Controller extends Base
 
 
     /**
-     * This executes when the superuser adds a field to a profile screen.
+     * POST Enable a field so it is visible on a role type's profile screen
+     *
+     * @api   POST /adminv2/profileEditor/field/{roleType}/{fieldId}/add
+     * @since 24.1
+     *
+     * @param string $roleType The relevant role type
+     * @param string $fieldId  The field to enable
      *
      * @return void
      */
-    public function postFieldAdd(): void
+    public function postFieldAdd(string $roleType, string $fieldId): void
     {
-        new \Alaress_Probe('postFieldAdd', $this->requestPost->getArrayCopy());
+        try {
+            $fieldModel = $this->fieldMapper->findOneByColumnList([
+                'roleType' => $roleType,
+                'field' => $fieldId,
+            ]);
+
+            // TODO: Resequence.
+
+            $fieldModel->setEnabled(1);
+            $this->fieldMapper->save($fieldModel);
+
+            $this->response = $this->responseAsJson(['success' => true]);
+        } catch (\Exception $e) {
+            $this->response = $this->responseAsJson(
+                ['success' => false, 'message' => $e->getMessage()]
+            )->withStatus(500);
+        }
     }
 
 
     /**
-     * This executes when the superuser removes a field from a profile screen.
+     * POST Remove (disable) a field so that is not visible a role type's profile screen
      *
-     * @return void
+     * @api   POST /adminv2/profileEditor/field/{roleType}/{fieldId}/remove
+     * @since 24.1
+     *
+     * @param string $roleType The relevant role type
+     * @param string $fieldId  The field to remove
      */
-    public function postFieldRemove(): void
+    public function postFieldRemove(string $roleType, string $fieldId): void
     {
-        new \Alaress_Probe('postFieldRemove', $this->requestPost->getArrayCopy());
+        try {
+            $fieldModel = $this->fieldMapper->findOneByColumnList([
+                'roleType' => $roleType,
+                'field' => $fieldId,
+            ]);
+
+            // TODO: Resequence.
+
+            $fieldModel->setEnabled(0);
+            $this->fieldMapper->save($fieldModel);
+
+            $this->response = $this->responseAsJson(['success' => true]);
+        } catch (\Exception $e) {
+            $this->response = $this->responseAsJson(
+                ['success' => false, 'message' => $e->getMessage()]
+            )->withStatus(500);
+        }
     }
 
 
     /**
-     * This executes when the superuser updates availability ("Appears On") and visibility
-     * ("Visible For") checkbox settings on a particular field.
+     * POST Update field settings for a particular field
      *
-     * @return void
+     * @api   POST /adminv2/profileEditor/field/{roleType}/{fieldId}/settings
+     * @since 24.1
+     *
+     * @param string $roleType The roletype to update
+     * @param string $fieldId  The field to update
      */
-    public function postFieldSettings(): void
+    public function postFieldSettings(string $roleType, string $fieldId): void
     {
-        new \Alaress_Probe('postFieldSettings', $this->requestPost->getArrayCopy());
+        try {
+            $settings = $this->requestPost->get('fieldSettings');
+            if ($settings === null) {
+                throw new \Exception("No field settings provided");
+            }
+
+            $fieldModel = $this->fieldMapper->findOneByColumnList([
+                'roleType' => $roleType,
+                'field' => $fieldId,
+            ]);
+
+            /** @var string[] $requestedAvailabilityCampuses */
+            $requestedAvailabilityCampuses = $settings['availability'] ?? [];
+
+            /** @var string[] $requestedVisibilityRoleTypes */
+            $requestedVisibilityRoleTypes = $settings['visibility'] ?? [];
+
+            // TODO
+
+            $this->fieldMapper->save($fieldModel);
+
+            $this->response = $this->responseAsJson(['success' => true]);
+        } catch (\Exception $e) {
+            $this->response = $this->responseAsJson(
+                ['success' => false, 'message' => $e->getMessage()]
+            )->withStatus(500);
+        }
     }
 
-
     /**
-     * This executes when the superuser reorders fields.
+     * POST Resequence fields for a particular role type
      *
-     * @return void
+     * @api   POST /adminv2/profileEditor/field/{roleType}/sequence
+     * @since 24.1
+     *
+     * @param string $roleType The roletype for which the sequence is updated
      */
-    public function postFieldSequence(): void
+    public function postFieldSequence(string $roleType): void
     {
-        new \Alaress_Probe('postFieldSequence', $this->requestPost->getArrayCopy());
+        try {
+            /** @var string[]|null $sequence - The new sequence of field IDs, in order */
+            $sequence = $this->requestPost->get('sequence', null);
+            if ($sequence === null || !\is_array($sequence)) {
+                throw new \Exception("Invalid sequence provided");
+            }
+
+            foreach ($sequence as $index => $fieldId) {
+                $fieldModel = $this->fieldMapper->findOneByColumnList([
+                    'roleType' => $roleType,
+                    'field' => $fieldId,
+                ]);
+
+                $fieldModel->setSequence($index);
+                $this->fieldMapper->save($fieldModel);
+            }
+
+            $this->response = $this->responseAsJson(['success' => true]);
+        } catch (\Exception $e) {
+            $this->response = $this->responseAsJson(
+                ['success' => false, 'message' => $e->getMessage()]
+            )->withStatus(500);
+        }
     }
 }
