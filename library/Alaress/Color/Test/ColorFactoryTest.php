@@ -119,16 +119,14 @@ class ColorFactoryTest extends TestCase
         $this->colorFactory->build($colorString);
     }
 
-    public function getInvalidNullData()
+    public static function getInvalidNullData()
     {
         return array(
             array(null)
         );
     }
 
-    /**
-     * @dataProvider getInvalidNullData
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('getInvalidNullData')]
     public function testInvalidNull($colorString)
     {
         //TODO this should be updated to check for different error if we are forcing string later
