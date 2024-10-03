@@ -29,7 +29,7 @@ class HomepageConfig
     /**
      * The template originally used to create the page
      *
-     * @var HomepageTemplate|null
+     * @var HomepageTemplate
      */
     protected $template;
 
