@@ -23,7 +23,7 @@ export default class SummaryPage {
      * @returns - the URL for the page
      */
     public static generateRoute(assessId: number): string {
-        return SummaryPage.URL.replace("{assessId}", assessId.toString());
+        return SummaryPage.URL.replace("{assess_id}", assessId.toString());
     }
 
     /**
@@ -36,7 +36,7 @@ export default class SummaryPage {
         await this.page.waitForSelector("#question-bank");
         await this.page.click(`#node_${categoryId}_anchor`);
         await this.page.click('input[type=submit][value="Add To Question Bank"]');
-        await this.page.waitForSelector("Question added to the Questionbank");
+        await this.page.waitForSelector("#bank-success");
         await this.page.reload();
     }
 
@@ -47,7 +47,7 @@ export default class SummaryPage {
     async clickAddFromQuestionBank(sectionId: number): Promise<void> {
         await this.page.click(`[data-test=sbx-pop-out-section${sectionId}-options]`);
         await this.page.click(`#section${sectionId}-options a.icon-download`);
-        await this.page.waitForSelector("CATEGORIES");
+        await this.page.locator(`h2.subheader:has-text("Categories")`).isVisible();
     }
 
     /**
@@ -57,6 +57,6 @@ export default class SummaryPage {
     async clickNewQuestion(sectionId: number): Promise<void> {
         await this.page.click(`[data-test=sbx-pop-out-section${sectionId}-options]`);
         await this.page.click(`#section${sectionId}-options a.icon-add`);
-        await this.page.waitForSelector("CREATE QUESTION");
+        await this.page.locator(`h2.subheader:has-text("Create Question")`).isVisible();
     }
 }

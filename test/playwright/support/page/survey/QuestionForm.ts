@@ -13,11 +13,11 @@ export default class QuestionForm {
 
     static readonly FORM = "#createQuestionForm";
 
-    static readonly SELECTOR_TITLE = `${QuestionForm.FORM} input[name="title"]`;
+    static readonly SELECTOR_TITLE = `input[name="title"]`;
 
-    static readonly SELECTOR_BUTTON_CREATE = `${QuestionForm.FORM} [type=submit][value="Add Question"]`;
+    static readonly SELECTOR_BUTTON_CREATE = `[type=submit][value="Add Question"]`;
 
-    static readonly SELECTOR_BUTTON_MODIFY = `${QuestionForm.FORM} [type=submit][value="Modify"]`;
+    static readonly SELECTOR_BUTTON_MODIFY = `[type=submit][value="Modify"]`;
 
     static readonly SELECTOR_TYPE_ID = 'select[name="type_id"]';
 
@@ -69,7 +69,6 @@ export default class QuestionForm {
      */
     async modify(): Promise<void> {
         await this.page.click(QuestionForm.SELECTOR_BUTTON_MODIFY);
-        await this.page.waitForSelector("Question Bank'");
         await this.page.locator(`h2.subheader:has-text("Question Bank")`).isVisible();
     }
 
@@ -89,12 +88,12 @@ export default class QuestionForm {
      * @param question - The question
      * @returns - The question ID
      * */
-    async getQuestionId(type: number, question: string): Promise<number> {
-        const questionIdsString = await this.databaseHelper.grabColumnFromDatabase("assess_question", "question_id", {
+    async getQuestionId(type: number, sectionId: number): Promise<number> {
+        const questionIdString = await this.databaseHelper.grabColumnFromDatabase("assess_question", "question_id", {
             type_id: type,
-            "question like": `% ${question} %`,
+            section_id: sectionId,
         });
-        const questionIds = Number(questionIdsString);
-        return questionIds;
+        const questionId = Number(questionIdString);
+        return questionId;
     }
 }
