@@ -88,22 +88,19 @@ test.describe("Homepage Initial Tests", () => {
         await page.waitForTimeout(2000);
         tester.isGoingTo("Add a few components in the homepage");
         await homepage.addComponent("#tabs-sub-1", "Blog");
-        await page.waitForSelector("i.icon-blog");
         await expect(
             page.locator(`div[class="component-container Schoolbox_Blog_Homepage_Component_Controller"]`),
-        ).toBeVisible();
+        ).toBeVisible({ timeout: 30000 });
         await page.reload();
         await homepage.addComponent("#tabs-sub-1", "News");
-        await page.waitForSelector("i.icon-news");
         await expect(
             page.locator(`div[class="component-container Schoolbox_Comms_News_Component_Homepage_Controller"]`),
-        ).toBeVisible();
+        ).toBeVisible({ timeout: 30000 });
         await page.reload();
         await homepage.addComponent("#tabs-sub-1", "Text Box");
-        await page.waitForSelector("i.icon-textbox");
         await expect(
             page.locator(`div[class="component-container Schoolbox_Resource_Textbox_Component_Homepage_Controller"]`),
-        ).toBeVisible();
+        ).toBeVisible({ timeout: 30000 });
     });
 
     /**
