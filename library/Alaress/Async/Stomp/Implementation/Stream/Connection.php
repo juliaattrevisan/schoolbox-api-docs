@@ -172,9 +172,13 @@ class Connection
             $this->stream->removeListener('error', $onError);
             $onConnect();
         });
-        $this->stream->once('error', function (BaseFrame $frame) use ($onConnect, $onError): void {
-            $this->stream->removeListener('connect', $onConnect);
-            $onError($frame);
+        $this->stream->once('error', function ($frame) use ($onConnect, $onError): void {
+            if ($frame instanceof BaseFrame) {
+                $this->stream->removeListener('connect', $onConnect);
+                $onError($frame);
+            } elseif ($frame instanceof \Throwable) {
+                throw $frame;
+            }
         });
 
         return $this->connectionPromise;
