@@ -118,7 +118,8 @@ const isSaving = window.Vue.computed(() => {
 
     // Finally, determine the loading state based on if this field is currently in the action queue or not
     return peFieldsStore.actionQueue.some((action) => {
-        if (action.field === props.field.field) return true;
+        if ("field" in action && action.field === props.field.field) return true;
+        if ("fields" in action && action.fields.includes(props.field.field)) return true;
         return false;
     });
 });

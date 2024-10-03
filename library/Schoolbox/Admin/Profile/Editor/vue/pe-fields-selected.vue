@@ -34,15 +34,12 @@ const sortableOptions = window.Vue.computed(() => ({
  * When the user resequences the fields
  * @param event The event that triggered the resequence
  */
-function resequenceFields(event: Sortable.SortableEvent): void {
+async function onResequenceField(event: Sortable.SortableEvent): Promise<void> {
     if (peStore.selectedRoleType === null) return;
     if (event.oldIndex === event.newIndex) return;
     if (event.oldIndex === undefined || event.newIndex === undefined) return;
 
-    const newFields = [...peStore.selectedRoleType.fields.selected];
-    const movedField = newFields.splice(event.oldIndex, 1)[0];
-    newFields.splice(event.newIndex, 0, movedField);
-    peStore.selectedRoleType.fields.selected = newFields;
+    await peFieldsStore.resequenceField(event.oldIndex, event.newIndex);
 }
 
 /**
@@ -69,7 +66,7 @@ async function onAddField(event: Sortable.SortableEvent): Promise<void> {
             :transition-key="peStore.selectedRoleType.roleType"
             :transition-enter="slideDownOnEnter"
             :transition-leave="slideUpOnLeave"
-            @end="resequenceFields"
+            @end="onResequenceField"
             @add="onAddField"
         >
             <template #item="item">

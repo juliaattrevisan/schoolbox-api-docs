@@ -14,8 +14,15 @@ type DisableFieldAction = {
     field: string; // The field to disable
 };
 
+type ResequenceFieldsAction = {
+    type: "RESEQUENCE_FIELDS";
+    // The fields that are "targeted" by the resequence action
+    // - this is entirely for tracking purposes and is not used to actually resequence
+    fields: string[];
+};
+
 // A type of action that can be queued
-type FieldAction = EnableFieldAction | DisableFieldAction;
+type FieldAction = EnableFieldAction | DisableFieldAction | ResequenceFieldsAction;
 
 // An action that is currently in the queue, with additional metadata to keep track of it
 type QueuedFieldAction = FieldAction & {
@@ -94,6 +101,31 @@ export const useProfileEditorFieldsStore = defineStore("profileEditorFieldsStore
     }
 
     /**
+     * Process resequencing fields after ensuring all prior actions are completed
+     */
+    async function processResequenceFields(): Promise<void> {
+        if (!peStore.selectedRoleType) throw new Error("No role type selected");
+        if (!peStore.savedSelectedRoleType) throw new Error("No role type selected");
+
+        const endpoint = peStore.endpoints.adminProfileEditorPostFieldSequence.replace(
+            "{roleType}",
+            peStore.selectedRoleType.roleType,
+        );
+        const sequence = peStore.selectedRoleType.fields.selected.map((f) => f.field);
+
+        try {
+            await fetch(endpoint, {
+                method: "POST",
+                body: JSON.stringify({ sequence }),
+                headers: { "Content-Type": "application/json" },
+            });
+            peStore.savedSelectedRoleType.fields.selected = cloneDeep(peStore.selectedRoleType.fields.selected);
+        } catch {
+            // TODO: Handle failure
+        }
+    }
+
+    /**
      * Process the action queue in sequence
      */
     async function processQueue(): Promise<void> {
@@ -109,6 +141,9 @@ export const useProfileEditorFieldsStore = defineStore("profileEditorFieldsStore
                 break;
             case "DISABLE_FIELD":
                 await processDisableField(action.field);
+                break;
+            case "RESEQUENCE_FIELDS":
+                await processResequenceFields();
                 break;
             default:
                 ((a: never): Error => new Error(a))(action); // Assert exhaustive switch
@@ -132,6 +167,24 @@ export const useProfileEditorFieldsStore = defineStore("profileEditorFieldsStore
         const actionId = Math.floor(Math.random() * 1000000); // Generate a random action ID for tracking
         const queuedAction: QueuedFieldAction = { ...action, actionId, isProcessing: false };
 
+        if (queuedAction.type === "RESEQUENCE_FIELDS") {
+            // Remove any other resequence actions from the queue that are still pending, as they are redundant
+            // If any do exist, add their field list to the current action so whatever is tracking it can still know
+            const resequenceActions = actionQueue.value.filter((a) => a.type === "RESEQUENCE_FIELDS");
+            if (resequenceActions.length > 0) {
+                queuedAction.fields.push(...resequenceActions.flatMap((a) => a.fields));
+            }
+            actionQueue.value = actionQueue.value.filter((a) => a.type !== "RESEQUENCE_FIELDS");
+        } else {
+            // Otherwise, if there's a resequence action in the queue, move it to the very end so it's processed last
+            const resequenceActionIndex = actionQueue.value.findIndex((a) => a.type === "RESEQUENCE_FIELDS");
+            if (resequenceActionIndex !== -1) {
+                const resequenceAction = actionQueue.value[resequenceActionIndex];
+                actionQueue.value.splice(resequenceActionIndex, 1);
+                actionQueue.value.push(resequenceAction);
+            }
+        }
+
         actionQueue.value.push(queuedAction);
 
         // Start processing the queue if not already doing so
@@ -139,7 +192,16 @@ export const useProfileEditorFieldsStore = defineStore("profileEditorFieldsStore
             void processQueue();
         }
 
-        await until(() => actionQueue.value.some((a) => a.actionId === actionId)).toBe(false);
+        // Wait until the action has been processed before continuing
+        await until(() =>
+            actionQueue.value.some((a) => {
+                // If the action is a resequence, check if there is any resequence action in the queue
+                if (action.type === "RESEQUENCE_FIELDS") return a.type === "RESEQUENCE_FIELDS";
+
+                // Otherwise, check if the action has been processed by matching the action ID
+                return a.actionId === actionId;
+            }),
+        ).toBe(false);
     }
 
     /**
@@ -167,6 +229,11 @@ export const useProfileEditorFieldsStore = defineStore("profileEditorFieldsStore
             fieldSettings: emptyFieldSettings,
         });
 
+        // Timeout so the loading state renders nicely and the user can see the change
+        await new Promise((resolve) => {
+            setTimeout(resolve, 300);
+        });
+
         // Queue action
         await queueAction({ type: "ENABLE_FIELD", field, index });
     }
@@ -182,10 +249,26 @@ export const useProfileEditorFieldsStore = defineStore("profileEditorFieldsStore
         await queueAction({ type: "DISABLE_FIELD", field });
     }
 
+    /**
+     * Resequence a field to a new index
+     * @param oldIndex - The original index of the field
+     * @param newIndex - The new index of the field
+     */
+    async function resequenceField(oldIndex: number, newIndex: number): Promise<void> {
+        if (!peStore.selectedRoleType) throw new Error("No role type selected");
+
+        // Update UI immediately
+        const [movedField] = peStore.selectedRoleType.fields.selected.splice(oldIndex, 1);
+        peStore.selectedRoleType.fields.selected.splice(newIndex, 0, movedField);
+
+        await queueAction({ type: "RESEQUENCE_FIELDS", fields: [movedField.field] });
+    }
+
     return {
         isFieldDisabled,
         actionQueue,
         enableField,
         disableField,
+        resequenceField,
     };
 });
