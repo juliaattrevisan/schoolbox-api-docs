@@ -6,9 +6,9 @@ export default class Calendar {
 
     private page: Page;
 
-    static readonly URL = "/calendar/week";
+    static readonly URL = "/calendar/month";
 
-    static readonly DAY_PANEL = "td.fc-day";
+    static readonly DAY_PANEL = "td.fc-day-today";
 
     static readonly CALENDAR_EVENT = "a.fc-daygrid-event";
 

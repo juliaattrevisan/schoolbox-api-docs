@@ -8,6 +8,16 @@ import Calendar from "@schoolboxTest/playwright/support/page/calendar/Calendar";
 import CreateEvent from "@schoolboxTest/playwright/support/page/calendar/CreateEvent";
 
 test.describe("Calendar tests", () => {
+    // Run tests serially, as tests rely on prior tests to have been run
+    test.describe.configure({ mode: "serial" });
+
+    test.beforeAll(async ({ baseTester, db }) => {
+        baseTester.isGoingTo("set calendar view to month view");
+        await db.updateInDatabase("user", { calendar_view: "month" }, { id: 22 });
+        await db.updateInDatabase("user", { calendar_view: "month" }, { id: 1 });
+        await db.updateInDatabase("user", { calendar_view: "month" }, { id: 6 });
+    });
+
     test.beforeEach(async ({ tester, page }) => {
         await tester.logout();
         await tester.loginAsAdmin();
@@ -149,7 +159,7 @@ test.describe("Calendar tests", () => {
     /**
      * Soft deleting data to not impact the tests
      */
-    test.afterAll(async ({ baseTester, db }) => {
+    test.afterAll("Tear Down", async ({ baseTester, db }) => {
         baseTester.isGoingTo(
             "update delete_at for the data created in this test so it does impact next suite of tests",
         );

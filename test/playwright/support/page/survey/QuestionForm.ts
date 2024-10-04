@@ -61,15 +61,17 @@ export default class QuestionForm {
      */
     async create(): Promise<void> {
         await this.page.click(QuestionForm.SELECTOR_BUTTON_CREATE);
-        await this.page.locator(`h2.subheader:has-text("CREATE QUESTION")`).isVisible();
+        await this.page.locator(`h2.subheader:has-text("CREATE QUESTION")`).isVisible({ timeout: 30000 });
     }
 
     /*
      * Submits this form to modify a question bank
      */
     async modify(): Promise<void> {
+        await this.page.locator(QuestionForm.SELECTOR_BUTTON_MODIFY).isEnabled({ timeout: 30000 });
         await this.page.click(QuestionForm.SELECTOR_BUTTON_MODIFY);
-        await this.page.locator(`h2.subheader:has-text("Question Bank")`).isVisible();
+        await this.page.locator(`h2.subheader:has-text("Question Bank")`).isVisible({ timeout: 30000 });
+        await this.page.waitForTimeout(2000);
     }
 
     /*

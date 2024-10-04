@@ -14,6 +14,9 @@ import Common from "@schoolboxTest/playwright/support/page/Common";
  */
 
 test.describe("Question Bank tests", () => {
+    // Run tests serially, as tests rely on prior tests to have been run
+    test.describe.configure({ mode: "serial" });
+
     test.beforeEach(async ({ tester }) => {
         await tester.loginAsAdmin();
     });
@@ -75,6 +78,7 @@ test.describe("Question Bank tests", () => {
 
         tester.isGoingTo("back to survey summary page");
         await summaryPage.goto(assessId);
+        await expect(page.locator(`h1:has-text("${surveyTitle}")`)).toBeVisible({ timeout: 30000 });
 
         tester.isGoingTo("create another question");
         await summaryPage.clickNewQuestion(sectionId);
@@ -89,6 +93,7 @@ test.describe("Question Bank tests", () => {
 
         tester.isGoingTo("back to survey summary page");
         await summaryPage.goto(assessId);
+        await expect(page.locator(`h1:has-text("${surveyTitle}")`)).toBeVisible({ timeout: 30000 });
 
         tester.isGoingTo("add the question to question bank");
         await summaryPage.addToQuestionBank(question2Id, categoryId);
@@ -103,6 +108,7 @@ test.describe("Question Bank tests", () => {
 
         tester.isGoingTo("back to survey summary page");
         await summaryPage.goto(assessId);
+        await expect(page.locator(`h1:has-text("${surveyTitle}")`)).toBeVisible({ timeout: 30000 });
 
         tester.isGoingTo("create one more question");
         await summaryPage.clickNewQuestion(sectionId);
@@ -117,6 +123,7 @@ test.describe("Question Bank tests", () => {
 
         tester.isGoingTo("back to survey summary page");
         await summaryPage.goto(assessId);
+        await expect(page.locator(`h1:has-text("${surveyTitle}")`)).toBeVisible({ timeout: 30000 });
 
         tester.isGoingTo("add the question to question bank");
         await summaryPage.addToQuestionBank(question3Id, categoryId);
@@ -135,7 +142,9 @@ test.describe("Question Bank tests", () => {
      */
 
     test.afterAll(async ({ baseTester, db }) => {
-        baseTester.isGoingTo("update delete_at for the folder and lesson plan table so it does not impact the tests");
+        baseTester.isGoingTo(
+            "update delete_at for the assess, assess_question_bank and assess_question table so it does not impact the tests",
+        );
         await db.updateInDatabase(
             "assess",
             { deleted_at: "2022-01-15 11:22:34" },

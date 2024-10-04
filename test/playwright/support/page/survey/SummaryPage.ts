@@ -47,7 +47,7 @@ export default class SummaryPage {
     async clickAddFromQuestionBank(sectionId: number): Promise<void> {
         await this.page.click(`[data-test=sbx-pop-out-section${sectionId}-options]`);
         await this.page.click(`#section${sectionId}-options a.icon-download`);
-        await this.page.locator(`h2.subheader:has-text("Categories")`).isVisible();
+        await this.page.locator(`h2.subheader:has-text("Categories")`).isVisible({ timeout: 30000 });
     }
 
     /**
@@ -57,6 +57,6 @@ export default class SummaryPage {
     async clickNewQuestion(sectionId: number): Promise<void> {
         await this.page.click(`[data-test=sbx-pop-out-section${sectionId}-options]`);
         await this.page.click(`#section${sectionId}-options a.icon-add`);
-        await this.page.locator(`h2.subheader:has-text("Create Question")`).isVisible();
+        await this.page.locator(`h2.subheader:has-text("Create Question")`).isVisible({ timeout: 30000 });
     }
 }
