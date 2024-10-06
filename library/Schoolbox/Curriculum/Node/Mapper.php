@@ -218,6 +218,7 @@ class Mapper extends BaseMapper
         bool $topLevelOnly,
         ?int $parentId,
         ?bool $enabled,
+        bool $includeWithoutCode = false,
     ): Collection {
         $filteredIds = null;
         if (isset($parentId)) {
@@ -237,9 +238,16 @@ class Mapper extends BaseMapper
         $pb = $this->getPredicateBuilder()
             ->isNull('n.deleted_at');
         if ($keyword !== '') {
-            $pb = $pb->any(
-                $this->getPredicateBuilder()
-                    ->like('n.code', $quotedLike . '%')
+            if ($includeWithoutCode) {
+                $pb = $pb->any(
+                    $this->getPredicateBuilder()
+                        ->like('n.code', $quotedLike . '%')       // Code starts with keyword
+                        ->like('n.name', '%' . $quotedLike . '%') // Name contains keyword
+                );
+            } else {
+                $pb = $pb->any(
+                    $this->getPredicateBuilder()
+                    ->like('n.code', $quotedLike . '%') // Code starts with keyword
                     ->all(
                         $this->getPredicateBuilder()
                             ->notEquals('n.code', '')
