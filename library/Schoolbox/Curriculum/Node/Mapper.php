@@ -253,7 +253,8 @@ class Mapper extends BaseMapper
                             ->notEquals('n.code', '')
                             ->like('n.name', '%' . $quotedLike . '%')
                     )
-            );
+                );
+            }
         }
         if ($topLevelOnly) {
             $pb = $pb->isNull('n.curriculum_node_parent_id');
