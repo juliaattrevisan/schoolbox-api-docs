@@ -42,13 +42,7 @@ function onSelected(): void {
         <show-matches v-if="props.isSingleSelect" tag="span" :text="props.result.name" :query="props.query" />
         <div v-else class="checklist">
             <input :id="`checkbox-${result.id}`" type="checkbox" :checked="isSelected" />
-            <show-matches
-                v-if="props.isSingleSelect"
-                tag="label"
-                :for="`checkbox-${result.id}`"
-                :text="props.result.name"
-                :query="props.query"
-            />
+            <show-matches tag="label" :for="`checkbox-${result.id}`" :text="props.result.name" :query="props.query" />
         </div>
     </button>
 </template>

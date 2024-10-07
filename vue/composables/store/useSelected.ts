@@ -6,6 +6,7 @@ import type { Ref, ComputedRef } from "vue";
 
 type Item = {
     id: number;
+    name: string;
 };
 
 /**
