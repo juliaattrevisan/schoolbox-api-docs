@@ -114,7 +114,13 @@ class Payload
         $fieldSettingsRoleType = [
             'displayAs' => self::VISIBILITY_NAME,
             'tooltip' => self::VISIBILITY_TOOLTIP,
-            'options' => []
+            'options' => [
+                [
+                    'type' => 'roleType',
+                    'id' => 'self',
+                    'name' => 'Self'
+                ]
+            ]
         ];
 
         foreach ($roleTypes as $roleType) {
