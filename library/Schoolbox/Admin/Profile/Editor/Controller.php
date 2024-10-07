@@ -342,4 +342,19 @@ class Controller extends Base
             )->withStatus(500);
         }
     }
+
+
+    /**
+     * Update the name format for users' names on their profile screens.
+     *
+     * This only applies to student roletype for now, because of EIM's custom work,
+     * but it could potentially spread to other roletypes once people get wind of it.
+     *
+     * @param string $roleType
+     * @return void
+     */
+    public function postNameFormat(string $roleType): void
+    {
+        
+    }
 }

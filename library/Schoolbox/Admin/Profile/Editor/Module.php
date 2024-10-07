@@ -51,6 +51,7 @@ class Module extends BaseModule
         $this->register('POST', '/field/{roleType}/{fieldId}/add', 'postFieldAdd', $perms, $preloadField);
         $this->register('POST', '/field/{roleType}/{fieldId}/settings', 'postFieldSettings', $perms, $preloadField);
         $this->register('POST', '/field/{roleType}/sequence', 'postFieldSequence', $perms);
+        $this->register('POST', '/field/{roleType}/nameformat', 'postNameFormat', $perms);
     }
 
 
