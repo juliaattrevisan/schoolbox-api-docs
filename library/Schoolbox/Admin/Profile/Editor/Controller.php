@@ -232,13 +232,33 @@ class Controller extends Base
                 throw new \RuntimeException('Invalid sequence provided');
             }
 
-            foreach ($sequence as $index => $fieldId) {
-                $fieldModel = $this->fieldMapper->findOneByColumnList([
-                    'roleType' => $roleType,
-                    'field' => $fieldId,
-                ]);
+            /* When we resequence fields, we aren't adding or removing them
+             * which means we can presume to obtain all the necessary fields
+             * in one database call
+             */
+            $fields = $this->fieldMapper->findByColumnList([
+                'roleType' => $roleType,
+                'enabled' => true,
+            ])->indexBy('field');
 
+            /* Sequence is actually a (int, string) tuple that represents
+             * (index, field name), not its primary key in profile_field.
+             */
+            foreach ($sequence as $index => $field) {
+                $fieldModel = $fields->getOffset($field);
+
+                /* For some edge-casey reason, the model doesn't exist anymore;
+                 * someone else might have deleted it at the same moment we were
+                 * trying to resequence it
+                 */
+                if (null === $fieldModel) {
+                    continue;
+                }
+
+                /* Assign new sequence
+                 */
                 $fieldModel->setSequence($index);
+
                 $this->fieldMapper->save($fieldModel);
             }
 
