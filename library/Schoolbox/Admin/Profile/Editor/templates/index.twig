@@ -1,3 +1,10 @@
+{##
+ # Profile Editor
+ #
+ # @param string $pageCurrent  The current page we're on
+ # @param array $allBreadcrumbs  A set of breadcrumb nodes, as defined by Admin Subnav
+ # @param array $payload  A structured array of each roletype's payloads in one big bag
+ #}
 {% import 'sub/breadcrumbs.twig' as bread %}
 {{ bread.crumbsArray(allBreadcrumbs) }}
 
