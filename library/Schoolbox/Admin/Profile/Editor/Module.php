@@ -14,6 +14,8 @@ use Alaress\Authorizer\Rule;
 use Alaress\Module\Module as BaseModule;
 use Alaress\Twig\Loader\IChainLoader;
 use Alaress\Web\Controller\Base;
+use Schoolbox\Application\Exception\NotFound;
+use Schoolbox\Mapper\Exception as MapperException;
 
 class Module extends BaseModule
 {
@@ -39,11 +41,52 @@ class Module extends BaseModule
             new Rule\IsSuperuser()
         );
 
+        $preloadField = function ($params) {
+            return $this->preloadField($params);
+        };
+
+
         $this->register('GET', '', 'getIndex', $perms);
-        $this->register('POST', '/field/{roleType}/{fieldId}/remove', 'postFieldRemove', $perms);
-        $this->register('POST', '/field/{roleType}/{fieldId}/add', 'postFieldAdd', $perms);
-        $this->register('POST', '/field/{roleType}/{fieldId}/settings', 'postFieldSettings', $perms);
+        $this->register('POST', '/field/{roleType}/{fieldId}/remove', 'postFieldRemove', $perms, $preloadField);
+        $this->register('POST', '/field/{roleType}/{fieldId}/add', 'postFieldAdd', $perms, $preloadField);
+        $this->register('POST', '/field/{roleType}/{fieldId}/settings', 'postFieldSettings', $perms, $preloadField);
         $this->register('POST', '/field/{roleType}/sequence', 'postFieldSequence', $perms);
+    }
+
+
+    /**
+     * Preload the profile field
+     *
+     * @param array $params
+     * @return array
+     * @throws \Schoolbox\Application\Exception\NotFound
+     * @throws NotFound
+     */
+    private function preloadField(array $params): array
+    {
+        try {
+            $field = $this->getFieldMapper()->findOneByColumnList([
+                'roleType' => $params['roleType'],
+                'field' => $params['fieldId'],
+            ]);
+        } catch (MapperException $e) {
+            throw new NotFound(sprintf(
+                'Unknown profile field %s in roletype %s',
+                $params['fieldId'],
+                $params['roleType']
+            ), 400, $e);
+        }
+
+        return [
+            'roleType' => $params['roleType'],
+            'field' => $field,
+        ];
+    }
+
+
+    public function getFieldMapper(): \Schoolbox\Admin\Profile\Editor\Field\Mapper
+    {
+        return $this->getMapperFactory()->get(\Schoolbox\Admin\Profile\Editor\Field\Mapper::class);
     }
 
 

@@ -64,11 +64,11 @@ class Controller extends Base
      * @since 24.1
      *
      * @param string $roleType The relevant role type
-     * @param string $fieldId The field to enable
+     * @param Field\Model $field The field to enable
      * @return void
      * @throws \InvalidArgumentException
      */
-    public function postFieldAdd(string $roleType, string $fieldId): void
+    public function postFieldAdd(string $roleType, Field\Model $field): void
     {
         try {
             /* New fields are spawned at the top of the list, forcing other
@@ -82,37 +82,32 @@ class Controller extends Base
 
             /* ...then increment their sequences by one:
              */
-            foreach ($fields as $field) {
-                if (Payload::FIELD_PORTRAIT_IMAGE === $field->getField()) {
+            foreach ($fields as $currentField) {
+                if (Payload::FIELD_PORTRAIT_IMAGE === $currentField->getField()) {
                     /* Portrait Image is always sequence zero
                      */
-                    $field->setSequence(0);
+                    $currentField->setSequence(0);
                 } else {
                     /* Assign new sequence
                      */
-                    $field->setSequence($field->getSequence() + 1);
+                    $currentField->setSequence($currentField->getSequence() + 1);
                 }
 
-                $this->fieldMapper->save($field);
+                $this->fieldMapper->save($currentField);
             }
 
-            /* ...then inject our new field at sequence 0.
+            /* ...then inject our new field at sequence 1.
              */
-            $fieldModel = $this->fieldMapper->findOneByColumnList([
-                'roleType' => $roleType,
-                'field' => $fieldId,
-            ]);
-
             /** @var int|null $index - The index at which to insert the field */
             $index = (int)($this->requestPost->get('index')) + 1;
 
             /* New fields are spawned with sequence 1, since $index is always
              * given to us as 0 in this usage from frontend.
              */
-            $fieldModel->setSequence($index);
-            $fieldModel->setEnabled(1);
+            $field->setSequence($index);
+            $field->setEnabled(1);
 
-            $this->fieldMapper->save($fieldModel);
+            $this->fieldMapper->save($field);
 
             $this->response = $this->responseAsJson(['success' => true]);
         } catch (\Exception $e) {
@@ -130,19 +125,14 @@ class Controller extends Base
      * @since 24.1
      *
      * @param string $roleType The relevant role type
-     * @param string $fieldId The field to remove
+     * @param Field\Model $field The field to remove
      * @throws \InvalidArgumentException
      */
-    public function postFieldRemove(string $roleType, string $fieldId): void
+    public function postFieldRemove(string $roleType, Field\Model $field): void
     {
         try {
-            $fieldModel = $this->fieldMapper->findOneByColumnList([
-                'roleType' => $roleType,
-                'field' => $fieldId,
-            ]);
-
-            $fieldModel->setEnabled(0);
-            $this->fieldMapper->save($fieldModel);
+            $field->setEnabled(0);
+            $this->fieldMapper->save($field);
 
             /* Removed fields will leave a hole in the sequencing.
              * To make sequencing contiguous, we need to fetch all
@@ -161,8 +151,8 @@ class Controller extends Base
              */
             $i = 1;
 
-            foreach ($fields as $field) {
-                if (Payload::FIELD_PORTRAIT_IMAGE === $field->getField()) {
+            foreach ($fields as $currentField) {
+                if (Payload::FIELD_PORTRAIT_IMAGE === $currentField->getField()) {
                     /* Portrait Image is always sequence zero
                      */
                     $field->setSequence(0);
@@ -172,7 +162,7 @@ class Controller extends Base
                     $field->setSequence($i++);
                 }
 
-                $this->fieldMapper->save($field);
+                $this->fieldMapper->save($currentField);
             }
 
             $this->response = $this->responseAsJson(['success' => true]);
@@ -191,10 +181,10 @@ class Controller extends Base
      * @since 24.1
      *
      * @param string $roleType The roletype to update
-     * @param string $fieldId  The field to update
+     * @param Field\Model $field  The field to update
      * @throws \InvalidArgumentException
      */
-    public function postFieldSettings(string $roleType, string $fieldId): void
+    public function postFieldSettings(string $roleType, Field\Model $field): void
     {
         try {
             $settings = $this->requestPost->get('fieldSettings');
@@ -202,11 +192,6 @@ class Controller extends Base
             if (null === $settings) {
                 throw new \RuntimeException('No field settings provided');
             }
-
-            $fieldModel = $this->fieldMapper->findOneByColumnList([
-                'roleType' => $roleType,
-                'field' => $fieldId,
-            ]);
 
             /** @var string[] $requestedAvailabilityCampuses */
             $requestedAvailabilityCampuses = $settings['availability'] ?? [];
@@ -216,7 +201,7 @@ class Controller extends Base
 
             // TODO
 
-            $this->fieldMapper->save($fieldModel);
+            $this->fieldMapper->save($field);
 
             $this->response = $this->responseAsJson(['success' => true]);
         } catch (\Exception $e) {
