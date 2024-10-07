@@ -9,6 +9,7 @@ import { useModalViewNodesStore } from "../store/csModalViewNodesStore";
 
 interface Props {
     isDisabled: boolean; // to disable certain events when editing is taking place
+    includeWithoutCode: boolean; // set to true if curriculum nodes with blank codes need to be selectable
 }
 const props = defineProps<Props>();
 
@@ -36,6 +37,7 @@ const placeholder = window.Vue.computed(() => {
  * debounce to avoid constant polling while the user is typing
  */
 const debounceSearch = debounce(() => {
+    modalSearchStore.includeWithoutCode = props.includeWithoutCode;
     void modalSearchStore.search();
 }, DEBOUNCE_AMOUNT);
 

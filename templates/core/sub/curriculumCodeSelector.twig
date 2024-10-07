@@ -11,6 +11,7 @@
         :is-read-only="{{ courseManagedReadonly ? 'true' : 'false' }}"
         :selected-nodes="{{ codeList|json_encode }}"
         data-endpoint="{{ routeLookup('curriculumApi.searchNode') }}"
+        :include-without-code="false"
     />
 </div>
 <script src="{{ CDN_PREFIX }}/js/bundle/curriculumSelector.js?v={{ config.site_version }}"></script>

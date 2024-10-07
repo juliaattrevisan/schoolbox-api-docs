@@ -13,6 +13,7 @@ export const DEBOUNCE_AMOUNT = 350; //the amount in ms to hold off on searching,
 export const useModalSearchStore = defineStore(`csModalSearch`, {
     state: () => ({
         isLoading: false, //to notify that an action is taking place,
+        includeWithoutCode: false, //set to true to include nodes with blank codes in search results
         query: "", //current search term to filter the active nodes
         results: [], //nodes returned in the current search results
     }),
@@ -68,8 +69,8 @@ export const useModalSearchStore = defineStore(`csModalSearch`, {
             try {
                 const modalViewNodesStore = useModalViewNodesStore();
                 const response = await fetch(
-                    `${apiEndpoint}?parentId=${modalViewNodesStore.current.id}&query=${this.query}&enabled=1` +
-                        `&includeWithoutCode=1&limit=50`,
+                    `${apiEndpoint}?parentId=${modalViewNodesStore.current.id}&query=${this.query}&enabled=1&limit=50` +
+                        (this.includeWithoutCode ? "&includeWithoutCode=1" : ""),
                     {
                         method: "GET",
                         headers: {

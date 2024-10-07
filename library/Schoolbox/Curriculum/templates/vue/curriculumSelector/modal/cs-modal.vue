@@ -35,6 +35,14 @@ const props = defineProps({
         required: false,
         default: UNSET_ID,
     },
+    /**
+     * set to true if curriculum nodes with blank codes need to be selectable
+     */
+    includeWithoutCode: {
+        type: Boolean,
+        required: false,
+        default: false,
+    },
 });
 
 const modalStore = useModalStore();
@@ -109,7 +117,7 @@ function onModalClosed() {
         @closed="onModalClosed"
     >
         <template #sequence-1>
-            <cs-modal-header />
+            <cs-modal-header :include-without-code="props.includeWithoutCode" />
             <cs-modal-nodes />
             <cs-modal-footer />
         </template>
