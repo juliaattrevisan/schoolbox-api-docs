@@ -219,6 +219,7 @@ new \Alaress_Probe($payload);
             /** @var int[] $newCampusIds */
             $newCampusIds = $settings['availability'] ?? [];
 
+
             /* First purge existing relations
              */
 
