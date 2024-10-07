@@ -68,7 +68,8 @@ export const useModalSearchStore = defineStore(`csModalSearch`, {
             try {
                 const modalViewNodesStore = useModalViewNodesStore();
                 const response = await fetch(
-                    `${apiEndpoint}?parentId=${modalViewNodesStore.current.id}&query=${this.query}&enabled=1&limit=50`,
+                    `${apiEndpoint}?parentId=${modalViewNodesStore.current.id}&query=${this.query}&enabled=1` +
+                        `&includeWithoutCode=1&limit=50`,
                     {
                         method: "GET",
                         headers: {
