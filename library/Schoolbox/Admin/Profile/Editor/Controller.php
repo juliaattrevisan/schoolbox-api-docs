@@ -83,7 +83,7 @@ class Controller extends Base
             /* ...then increment their sequences by one:
              */
             foreach ($fields as $field) {
-                if ('portrait' === $field->getField()) {
+                if (Payload::FIELD_PORTRAIT_IMAGE === $field->getField()) {
                     /* Portrait Image is always sequence zero
                      */
                     $field->setSequence(0);
@@ -162,7 +162,7 @@ class Controller extends Base
             $i = 1;
 
             foreach ($fields as $field) {
-                if ('portrait' === $field->getField()) {
+                if (Payload::FIELD_PORTRAIT_IMAGE === $field->getField()) {
                     /* Portrait Image is always sequence zero
                      */
                     $field->setSequence(0);
@@ -274,7 +274,7 @@ class Controller extends Base
                 /* Portrait Image should never appear in this $sequence array
                  * But if it does one day, is always sequence zero
                  *
-                 * if ('portrait' === $field) {
+                 * if (Payload::FIELD_PORTRAIT_IMAGE === $field) {
                  *     $fieldModel->setSequence(0);
                  * }
                  */

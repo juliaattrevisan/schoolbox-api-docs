@@ -16,6 +16,13 @@ use Schoolbox\Role;
 class Payload
 {
     /**
+     * A special case field - it's mandatory and always appears in everyone's
+     * profile screen when administering
+     */
+    public const FIELD_PORTRAIT_IMAGE = 'portrait';
+
+
+    /**
      * Common nodes and human-readable name equivalents
      */
     private const AVAILABILITY_NODE = 'availability';
