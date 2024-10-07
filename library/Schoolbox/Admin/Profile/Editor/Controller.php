@@ -133,10 +133,31 @@ class Controller extends Base
                 'field' => $fieldId,
             ]);
 
-            // TODO: Resequence.
-
             $fieldModel->setEnabled(0);
             $this->fieldMapper->save($fieldModel);
+
+            /* Removed fields will leave a hole in the sequencing.
+             * To make sequencing contiguous, we need to fetch all
+             * the fields ordered by their sequence:
+             */
+            $fields = $this->fieldMapper->findByColumnList([
+                'roleType' => $roleType,
+                'enabled' => true,
+            ], [
+                'order' => [
+                    'sequence' => 'asc'
+                ]
+            ]);
+
+            /* ...then reassign them in zero-indexed order.
+             */
+            $i = 0;
+
+            foreach ($fields as $field) {
+                $field->setSequence($i++);
+
+                $this->fieldMapper->save($field);
+            }
 
             $this->response = $this->responseAsJson(['success' => true]);
         } catch (\Exception $e) {
