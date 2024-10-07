@@ -100,6 +100,13 @@ class Map implements Construct
                 }
             }
         }
+
+        // Did nothing match?
+        // Return a special value if so: that is a prompt to leave the existing
+        // value as is.
+        if (empty($output)) {
+            throw new NoMatchingMapException();
+        }
         return array_values(array_unique($output));
     }
 

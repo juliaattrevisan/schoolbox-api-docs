@@ -8,6 +8,7 @@
 
 namespace Schoolbox\Sync\Grammar;
 
+use Alaress\Rules\Lang\NoMatchingMapException;
 use Alaress\Rules\TokenizedRuleset;
 use Psr\Log\LoggerInterface;
 use Schoolbox\External\Normalise\User\Base as ExternalUser;
@@ -146,7 +147,28 @@ class Ruleset extends TokenizedRuleset implements HydratorInterface
                 foreach ($data as $property => $token) {
                     // Apply tokenization to returned value. The value returned should be a primitive,
                     // which will then by hydrated into the model by the mapper
-                    $value = $this->tokenizer->parseToken($input, $token, false);
+                    try {
+                        $value = $this->tokenizer->parseToken($input, $token, false);
+                    } catch (NoMatchingMapException) {
+                        $this->log->notice(
+                            sprintf(
+                                'Rule "%s" effect "%s" is a mapping which matches no value for user "%s" (%s): leaving property as is',
+                                $rule->getLabel(),
+                                $property,
+                                trim(
+                                    sprintf(
+                                        '%s %s %s',
+                                        $input->getTitle(),
+                                        $input->getPreferredName() ?: $input->getGivenName(),
+                                        $input->getLastname(),
+                                    ),
+                                ),
+                                $input->getId(),
+                            ),
+                            $context,
+                        );
+                        continue;
+                    }
 
                     /* Group Modifiers
                      */
@@ -214,7 +236,7 @@ class Ruleset extends TokenizedRuleset implements HydratorInterface
                                         sprintf(
                                             '%s %s %s',
                                             $input->getTitle(),
-                                            $input->getPreferredName(),
+                                            $input->getPreferredName() ?: $input->getGivenName(),
                                             $input->getLastname(),
                                         ),
                                     ),
