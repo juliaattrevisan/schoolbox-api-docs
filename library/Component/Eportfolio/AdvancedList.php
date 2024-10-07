@@ -12,7 +12,6 @@ namespace Component\Eportfolio;
 
 class AdvancedList extends ListItem
 {
-
     /**
      * Title of the list item
      *
@@ -23,9 +22,9 @@ class AdvancedList extends ListItem
     /**
      * Storage hash for an arbitrarily uploaded image
      *
-     * @var string
+     * @var string|null
      */
-    public $imagehash = '';
+    public $imagehash = null;
 
     /* Getters/Setters
      */
@@ -33,7 +32,7 @@ class AdvancedList extends ListItem
     /**
      * Set image hash
      *
-     * @param string $imagehash
+     * @param string|null $imagehash
      */
     public function setImagehash($imagehash)
     {
@@ -43,7 +42,7 @@ class AdvancedList extends ListItem
     /**
      * Get image hash
      *
-     * @return string
+     * @return string|null
      */
     public function getImagehash()
     {
