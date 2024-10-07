@@ -260,8 +260,8 @@ class Mapper extends BaseMapper
                     ->like('n.code', $quotedLike . '%') // Code starts with keyword
                     ->all(
                         $this->getPredicateBuilder()
-                            ->notEquals('n.code', '')
-                            ->like('n.name', '%' . $quotedLike . '%')
+                            ->notEquals('n.code', '')                 // Code not blank
+                            ->like('n.name', '%' . $quotedLike . '%') // Name contains keyword
                     )
                 );
             }
