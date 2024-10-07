@@ -214,6 +214,7 @@ class Controller extends Base
                                 [0] => parent
                                 [1] => student
                                 [2] => staff
+                                [3] => self
                             )
 
                     )
