@@ -161,11 +161,6 @@ parameters:
 			path: library/Alaress/Date/Format.php
 
 		-
-			message: "#^Dead catch \\- InvalidArgumentException is never thrown in the try block\\.$#"
-			count: 1
-			path: library/Alaress/Date/Format.php
-
-		-
 			message: "#^Method Alaress_Date_Format\\:\\:get12Hour\\(\\) should return int but returns string\\.$#"
 			count: 1
 			path: library/Alaress/Date/Format.php
