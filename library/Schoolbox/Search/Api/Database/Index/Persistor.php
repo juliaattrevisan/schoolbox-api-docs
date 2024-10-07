@@ -23,7 +23,7 @@ class Persistor
      * SQL for updating the search index.
      */
     private const UPDATE_SQL = <<<SQL
-        REPLACE INTO search_index (
+        INSERT INTO search_index (
             type,
             identifier,
             title,
@@ -41,7 +41,13 @@ class Persistor
             :createdBy,
             :folderId,
             :fulltextIndex
-        )
+        ) ON DUPLICATE KEY UPDATE
+            title                      = :title,
+            date                       = :date,
+            is_relevance_date_affected = :isRelevanceDateAffected,
+            created_by                 = :createdBy,
+            folder_id                  = :folderId,
+            fulltext_index             = :fulltextIndex
     SQL;
 
     /**
