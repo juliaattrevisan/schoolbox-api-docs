@@ -19,7 +19,9 @@ class Controller extends Base
      * Controller constructor.
      */
     public function __construct(
-        private \Schoolbox\Admin\Profile\Editor\Field\Mapper $fieldMapper,
+        private Field\Mapper $fieldMapper,
+        private Field\Availability\Campus\Mapper $availabilityCampusMapper,
+        private Field\Visibility\Mapper $visibilityMapper,
         private \Schoolbox\CampusMapper $campusMapper,
     ) {
     }
@@ -48,7 +50,7 @@ class Controller extends Base
             $this->fieldMapper,
             $this->campusMapper
         ))->generateAll();
-new \Alaress_Probe($payload);
+
         $this->response = $this->responseFromTemplate('@adminProfileEditor/index.twig', [
             'pageCurrent' => $this->routeGenerator->generate('adminProfileEditor.getIndex'),
             'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->routeGenerator->generate('adminProfileEditor.getIndex')),
@@ -216,28 +218,48 @@ new \Alaress_Probe($payload);
 
                     )
              */
-            /** @var int[] $newCampusIds */
-            $newCampusIds = $settings['availability'] ?? [];
-
 
             /* First purge existing relations
              */
+            $this->availabilityCampusMapper->truncate();
 
             /* Then, if there are any campus ids chosen, reinsert these new ones
              * Otherwise leave it empty (this is a legitimate use case)
              */
+            /** @var int[] $newCampusIds */
+            $newCampusIds = $settings['availability'] ?? [];
 
-            /** @var string[] $newRoleTypes */
-            $newRoleTypes = $settings['visibility'] ?? [];
+            if (\count($newCampusIds)) {
+                $campuses = $this->campusMapper->findByColumn('id', $newCampusIds);
+
+                foreach ($campuses as $campus) {
+                    $relation = $this->availabilityCampusMapper->createModel()
+                        ->setField($field)
+                        ->setCampus($campus);
+
+                    $this->availabilityCampusMapper->save($relation);
+                }
+            }
 
             /* First purge existing relations
              */
+            $this->visibilityMapper->truncate();
 
             /* Then, if there are any roletypes chosen, reinsert these new ones
              * Otherwise leave it empty (this is a legitimate use case)
              */
+            /** @var string[] $newRoleTypes */
+            $newRoleTypes = $settings['visibility'] ?? [];
 
-            $this->fieldMapper->save($field);
+            if (\count($newRoleTypes)) {
+                foreach ($newRoleTypes as $newRoleType) {
+                    $relation = $this->visibilityMapper->createModel()
+                        ->setField($field)
+                        ->setRoleType($newRoleType);
+
+                    $this->visibilityMapper->save($relation);
+                }
+            }
 
             $this->response = $this->responseAsJson(['success' => true]);
         } catch (\Exception $e) {

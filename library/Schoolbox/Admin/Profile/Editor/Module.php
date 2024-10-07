@@ -97,6 +97,8 @@ class Module extends BaseModule
     {
         return new Controller(
             $this->getMapperFactory()->get(\Schoolbox\Admin\Profile\Editor\Field\Mapper::class),
+            $this->getMapperFactory()->get(\Schoolbox\Admin\Profile\Editor\Field\Availability\Campus\Mapper::class),
+            $this->getMapperFactory()->get(\Schoolbox\Admin\Profile\Editor\Field\Visibility\Mapper::class),
             $this->getMapperFactory()->get(\Schoolbox\CampusMapper::class)
         );
     }
