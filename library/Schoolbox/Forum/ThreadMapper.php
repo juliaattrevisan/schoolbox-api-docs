@@ -443,6 +443,7 @@ class ThreadMapper extends Mapper implements FeedableMapperInterface, IHomepageC
             FROM forumPost
             WHERE threadID in (" . implode(',', $threads->getPropertyValues('id')) . ")
             AND deleted_at IS NULL
+            GROUP BY threadID
         ");
         $statement->execute();
         $postCounts = [];
