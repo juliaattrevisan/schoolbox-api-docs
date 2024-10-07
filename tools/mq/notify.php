@@ -8,6 +8,8 @@
  * @link        https://schoolbox.com.au/
  */
 
+use Monolog\Level;
+use Monolog\Logger;
 use Schoolbox\Config\Loader as ConfigLoader;
 
 $helptext = <<<EOF
@@ -38,7 +40,7 @@ if ($argc < 3) {
 require_once __DIR__ . '/../../conf/core/require.php';
 $kernel = new Schoolbox\Application\Daemon\Kernel(__FILE__);
 
-$levels = Monolog\Logger::getLevels();
+$levels = array_combine(Level::NAMES, Level::VALUES);
 
 $map = array(
     'i' => 'icon',

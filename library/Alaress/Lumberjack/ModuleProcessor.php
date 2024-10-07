@@ -8,28 +8,32 @@
 
 namespace Alaress\Lumberjack;
 
+use Monolog\LogRecord;
+use Monolog\Processor\ProcessorInterface;
+
 /**
  * Append module name in the log
  */
-class ModuleProcessor
+class ModuleProcessor implements ProcessorInterface
 {
     /**
+     * Constructor
+     *
+     * @param string $moduleName The name of the module to log.
      */
     public function __construct(private string $moduleName)
     {
     }
 
     /**
-     * @param array $record
-     * @return array
+     * @param LogRecord $record
+     * @return LogRecord
      */
-    public function __invoke(array $record): array
+    public function __invoke(LogRecord $record): LogRecord
     {
-        $record['extra'] = array_merge(
-            $record['extra'],
-            [
-                'module' => $this->moduleName,
-            ]
+        $record->extra = array_merge(
+            $record->extra ?? [],
+            ['module' => $this->moduleName,],
         );
 
         return $record;

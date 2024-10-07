@@ -12,18 +12,19 @@ namespace Schoolbox\Notif\Formatter;
 use Alaress\Async\Queue\RedisQueue;
 use ErrorException;
 use Monolog\Formatter\FormatterInterface;
+use Monolog\LogRecord;
 
 class CompressedFormatter implements FormatterInterface
 {
     /**
      * Formats a log record.
      *
-     * @param  array $record A record to format
+     * @param  LogRecord $record A record to format
      * @return mixed The formatted record
      */
-    public function format(array $record)
+    public function format(LogRecord $record)
     {
-        return self::compress($record);
+        return self::compress($record->toArray());
     }
 
     /**
@@ -34,7 +35,7 @@ class CompressedFormatter implements FormatterInterface
      */
     public function formatBatch(array $records)
     {
-        return $this->format($records);
+        return array_map($this->format(...), $records);
     }
 
 

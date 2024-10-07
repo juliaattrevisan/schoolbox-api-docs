@@ -14,58 +14,57 @@ use Monolog;
 
 class CliFormatter extends NormalizerFormatter
 {
-
     // fg colourings
-    const black        = '0;30';
-    const dark_gray    = '1;30';
-    const blue         = '0;34';
-    const light_blue   = '1;34';
-    const green        = '0;32';
-    const light_green  = '1;32';
-    const cyan         = '0;36';
-    const light_cyan   = '1;36';
-    const red          = '0;31';
-    const light_red    = '1;31';
-    const purple       = '0;35';
-    const light_purple = '1;35';
-    const brown        = '0;33';
-    const yellow       = '1;33';
-    const light_gray   = '0;37';
-    const white        = '1;37';
+    private const BLACK        = '0;30';
+//    private const DARK_GRAY    = '1;30';
+    private const BLUE         = '0;34';
+//    private const LIGHT_BLUE   = '1;34';
+    private const GREEN        = '0;32';
+//    private const LIGHT_GREEN  = '1;32';
+    private const CYAN         = '0;36';
+//    private const LIGHT_CYAN   = '1;36';
+    private const RED          = '0;31';
+    private const LIGHT_RED    = '1;31';
+//    private const PURPLE       = '0;35';
+//    private const LIGHT_PURPLE = '1;35';
+    private const BROWN        = '0;33';
+    private const YELLOW       = '1;33';
+//    private const LIGHT_GRAY   = '0;37';
+    private const WHITE        = '1;37';
 
     // bg colourings
-    const bg_black      = '40';
-    const bg_red        = '41';
-    const bg_green      = '42';
-    const bg_yellow     = '43';
-    const bg_blue       = '44';
-    const bg_magenta    = '45';
-    const bg_cyan       = '46';
-    const bg_light_gray = '47';
+//    private const BG_BLACK      = '40';
+    private const BG_RED        = '41';
+//    private const BG_GREEN      = '42';
+    private const BG_YELLOW     = '43';
+//    private const BG_BLUE       = '44';
+    private const BG_MAGENTA    = '45';
+//    private const BG_CYAN       = '46';
+//    private const BG_LIGHT_GRAY = '47';
 
     /** @const int how many decimals of time you want */
-    const TIME_RESOLUTION = 5;
+    public const TIME_RESOLUTION = 5;
 
     /** @var array */
     protected static $formats = [
         // regular colours
-        Monolog\Logger::DEBUG     => [ 'd', self::cyan, '' ],
+        Monolog\Logger::DEBUG     => ['d', self::CYAN, '' ],
         Monolog\Logger::INFO      => [ ' ', '', '' ],
-        Monolog\Logger::NOTICE    => [ ' ', self::brown, '' ],
-        Monolog\Logger::WARNING   => [ '*', self::black, self::bg_yellow ],
-        Monolog\Logger::ERROR     => [ '*', self::red, '' ],
-        Monolog\Logger::CRITICAL  => [ '!', self::light_red, '' ],
-        Monolog\Logger::ALERT     => [ '!', self::white, self::bg_red ],
-        Monolog\Logger::EMERGENCY => [ '!', self::white, self::bg_magenta ],
+        Monolog\Logger::NOTICE    => [' ', self::BROWN, '' ],
+        Monolog\Logger::WARNING   => ['*', self::BLACK, self::BG_YELLOW ],
+        Monolog\Logger::ERROR     => ['*', self::RED, '' ],
+        Monolog\Logger::CRITICAL  => ['!', self::LIGHT_RED, '' ],
+        Monolog\Logger::ALERT     => ['!', self::WHITE, self::BG_RED ],
+        Monolog\Logger::EMERGENCY => ['!', self::WHITE, self::BG_MAGENTA ],
 
         // custom character colours
-        '>' => [ '>', self::white, '' ],
-        '<' => [ '<', self::white, '' ],
-        '-' => [ '-', self::blue, '' ],
-        '+' => [ '+', self::green, '' ],
-        '?' => [ '?', self::yellow, '' ],
-        'e' => [ 'e', self::yellow, '' ],
-        '~' => [ '~', self::light_red, '' ]
+        '>' => ['>', self::WHITE, '' ],
+        '<' => ['<', self::WHITE, '' ],
+        '-' => ['-', self::BLUE, '' ],
+        '+' => ['+', self::GREEN, '' ],
+        '?' => ['?', self::YELLOW, '' ],
+        'e' => ['e', self::YELLOW, '' ],
+        '~' => ['~', self::LIGHT_RED, '' ]
     ];
 
 
@@ -89,20 +88,20 @@ class CliFormatter extends NormalizerFormatter
     /**
      * Formats a log record.
      *
-     * @param  array $record A record to format
+     * @param  Monolog\LogRecord $record A record to format
      * @return mixed The formatted record
      */
-    public function format(array $record)
+    public function format(Monolog\LogRecord $record)
     {
         return $this->decorate($this->generateRecord($record), $record['level'], $record['context']);
     }
 
 
     /**
-     * @param array $record
+     * @param Monolog\LogRecord $record
      * @return mixed|string
      */
-    protected function generateRecord(array $record)
+    protected function generateRecord(Monolog\LogRecord $record)
     {
         $map = [
             'memory_usage'      => 'mem',
@@ -111,16 +110,15 @@ class CliFormatter extends NormalizerFormatter
         ];
 
         // if this is already formatted like a log, don't reformat it
-        if (preg_match("`\[.\].* => `", $record['message'])) {
-            return $record['message'];
+        if (preg_match("`\[.\].* => `", $record->message)) {
+            return $record->message;
         }
 
-        /** @var \DateTime $datetime */
-        $datetime = $record['datetime'];
+        $datetime = $record->datetime;
         $date = $datetime->format('Y-m-d H:i:s');
-        if (isset($record['extra']['microtime'])) {
-            $date .= substr($record['extra']['microtime'], 1, self::TIME_RESOLUTION + 1);
-            unset($record['extra']['microtime']);
+        if (isset($record->extra['microtime'])) {
+            $date .= substr($record->extra['microtime'], 1, self::TIME_RESOLUTION + 1);
+            unset($record->extra['microtime']);
         }
 
         $pieces = array("[$date]");
@@ -136,10 +134,10 @@ class CliFormatter extends NormalizerFormatter
             }
         }
 
-        $pieces[] = " => {$record['message']}";
+        $pieces[] = " => {$record->message}";
 
         if ($this->contextualise) {
-            $context = $record['context'];
+            $context = $record->context;
             unset($context['char']);
             foreach ($context as $key => $value) {
                 $pieces[] = "\n   $key => $value";

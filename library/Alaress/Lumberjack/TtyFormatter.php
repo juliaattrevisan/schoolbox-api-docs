@@ -9,6 +9,8 @@
 
 namespace Alaress\Lumberjack;
 
+use Monolog\LogRecord;
+
 class TtyFormatter extends CliFormatter
 {
     const P_PATTERN = "%s  %s  %s\n";
@@ -43,10 +45,10 @@ class TtyFormatter extends CliFormatter
 
 
     /**
-     * @param array $record
+     * @param LogRecord $record
      * @return mixed|string
      */
-    protected function generateRecord(array $record)
+    protected function generateRecord(LogRecord $record)
     {
         if ($this->tty === 0) {
             // non-interactive, just generate a plain log
@@ -60,23 +62,22 @@ class TtyFormatter extends CliFormatter
         ];
 
         // if this is already formatted like a log, don't reformat it
-        if (preg_match('`^\d+-\d+-\d+ \d+:\d+:\d+`', $record['message'])) {
-            return rtrim($record['message']);
+        if (preg_match('`^\d+-\d+-\d+ \d+:\d+:\d+`', $record->message)) {
+            return rtrim($record->message);
         }
 
-        /** @var \DateTime $datetime */
-        $datetime = $record['datetime'];
+        $datetime = $record->datetime;
         $date = $datetime->format('Y-m-d H:i:s');
 
-        if (isset($record['extra']['microtime'])) {
-            $date .= substr($record['extra']['microtime'], 1, self::TIME_RESOLUTION + 1);
-            unset($record['extra']['microtime']);
+        if (isset($record->extra['microtime'])) {
+            $date .= substr($record->extra['microtime'], 1, self::TIME_RESOLUTION + 1);
+            unset($record->extra['microtime']);
         }
 
         $left = [ $date ];
 
-        if (is_array($record['extra'])) {
-            foreach ($record['extra'] as $key => $value) {
+        if (is_array($record->extra)) {
+            foreach ($record->extra as $key => $value) {
                 if (isset($map[$key])) {
                     $value = sprintf($map[$key][1], $value);
                     $key = $map[$key][0];
@@ -92,17 +93,17 @@ class TtyFormatter extends CliFormatter
             }
         }
 
-        if (preg_match('`\[.\]\[`', $record['message'])) {
+        if (preg_match('`\[.\]\[`', $record->message)) {
             $c = '';
         } else {
-            $c = '[ ' . (isset($record['context']['char']) ? $record['context']['char'] : ' ') . ' ]';
+            $c = '[ ' . ($record->context['char'] ?? ' ') . ' ]';
         }
 
-        $pieces = [ rtrim($record['message']) ];
+        $pieces = [ rtrim($record->message, $c) ];
 
         // include context?
         if ($this->contextualise) {
-            $context = $record['context'];
+            $context = $record->context;
             unset($context['char']);
             foreach ($context as $key => $value) {
                 $pieces[] = "\n   $key => $value";
