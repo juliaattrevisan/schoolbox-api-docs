@@ -29,10 +29,10 @@ class CalendarEventCreateModifyCest
 
     private array $eventMinimalRequiredParams = [
         'allDay' => true,
-        'endDate' => '24/09/2024',
+        'endDate' => null, // Will be set in _before().
         'level' => 1,
-        'publishDate' => '25/09/2024 7:00pm', // Current configured timezone is assumed.
-        'startDate' => '24/09/2024',
+        'publishDate' => null, // Will be set in _before().
+        'startDate' => null, // Will be set in _before().
         'title' => "St Swivven's Day",
         'type' => 1,
     ];
@@ -43,6 +43,16 @@ class CalendarEventCreateModifyCest
     public function _before(ApiTester $i): void
     {
         $i->getToken(self::ALARESS_USER_ID);
+
+        // Overwrite eventMinimalRequiredParams with today's date.
+        // Today's date is used so that the event's timezone offset will always be the current timezone offset
+        // (even during daylight savings time).
+
+        $currentDateDmY = date('d/m/Y');
+        $tomorrowDateDmY = date('d/m/Y', strtotime('+1 day'));
+        $this->eventMinimalRequiredParams['endDate'] = $currentDateDmY;
+        $this->eventMinimalRequiredParams['startDate'] = $currentDateDmY;
+        $this->eventMinimalRequiredParams['publishDate'] = "$tomorrowDateDmY 7:00pm";
     }
 
     /**
@@ -72,18 +82,20 @@ class CalendarEventCreateModifyCest
         }
 
         // In created event, check keys with non-array values.
+        $currentDateYmd = date('Y-m-d');
+        $tomorrowDateYmd = date('Y-m-d', strtotime('+1 day'));
         $timezoneOffset = date('P'); // E.g. '+10:00'.
         $expectedValueByKey = [
             'allDay' => true,
             'efficacy' => 'self',
             'title' => "St Swivven's Day",
-            'startDate' => "2024-09-24T00:00:00$timezoneOffset",
-            'endDate' => "2024-09-24T23:59:59$timezoneOffset",
+            'startDate' => "{$currentDateYmd}T00:00:00$timezoneOffset",
+            'endDate' => "{$currentDateYmd}T23:59:59$timezoneOffset",
             'repeat' => '', // TODO: This value ought to be a null instead of a blank string.
-            'repeat_until' => "2024-09-24T23:59:59$timezoneOffset",
+            'repeat_until' => "{$currentDateYmd}T23:59:59$timezoneOffset",
             'location' => '',
             'detail' => '',
-            'publishDate' => "2024-09-25T19:00:00$timezoneOffset",
+            'publishDate' => "{$tomorrowDateYmd}T19:00:00$timezoneOffset",
             'level' => Event::ACCESS_PERSONAL,
             'attendance' => EventAttendanceModel::LEVEL_NO_ATTENDANCE,
             'maxAttendees' => null,
@@ -132,6 +144,7 @@ class CalendarEventCreateModifyCest
      */
     public function testModifyEvent(ApiTester $i): void
     {
+        $twoDaysAheadDateYmd = date('Y-m-d', strtotime('+2 day'));
         $userJackColes      = $i->getUserByUsername('jcoles');
         $userJanaReed       = $i->getUserByUsername('jreed');
         $timezoneOffset     = date('P'); // E.g. '+10:00'.
@@ -142,12 +155,13 @@ class CalendarEventCreateModifyCest
             'title'         => 'Festivus',
             'location'      => 'This is where it all happens.',
             'detail'        => 'These are the details.',
-            'publishDate'   => "2024-09-28T00:00:00$timezoneOffset",
+            'publishDate'   => "{$twoDaysAheadDateYmd}T00:00:00$timezoneOffset",
             'maxAttendees'  => 5,
             'showAttendees' => true,
             'attendance'    => EventAttendanceModel::LEVEL_OPEN_ATTENDANCE,
-            'startDate'     => "2024-09-22T00:00:00$timezoneOffset", // Move startDate backwards, so endDate need not change.
-            'endDate'       => "2024-09-24T23:59:59$timezoneOffset", // Move end date forwards, so startDate need not change.
+            // NOTE: startDate and endDate are not tested here for all-day events due to daylight savings complications.
+            //       Any date other than today could require a different timezone offset due to daylight savings time.
+            //       These two fields are tested instead below during tests for non-all-day events.
         ];
 
         // -----------------------------------------------------------------------------------------------------------//
@@ -250,9 +264,10 @@ class CalendarEventCreateModifyCest
         // -----------------------------------------------------------------------------------------------------------//
         $i->amGoingTo('change from an all-day to a not all-day event.');
         $newAllDay = false;
-        $newStartDate = "2024-09-24T08:00:00$timezoneOffset";
-        $newEndDate = "2024-09-24T09:30:00$timezoneOffset"; // Move the old end date forwards.
-        $newEndDateEndOfDay = "2024-09-24T23:59:59$timezoneOffset"; // End of the day on the new end date.
+        $currentDateYmd = date('Y-m-d');
+        $newStartDate = "{$currentDateYmd}T08:00:00$timezoneOffset";
+        $newEndDate = "{$currentDateYmd}T09:30:00$timezoneOffset"; // Move the old end date forwards.
+        $newEndDateEndOfDay = "{$currentDateYmd}T23:59:59$timezoneOffset"; // End of the day on the new end date.
         $i->sendPost(
             "/calendar/event/$localEventId/modify",
             [
