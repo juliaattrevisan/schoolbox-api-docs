@@ -64,39 +64,46 @@ class Controller extends Base
      * @since 24.1
      *
      * @param string $roleType The relevant role type
-     * @param string $fieldId  The field to enable
-     *
+     * @param string $fieldId The field to enable
      * @return void
+     * @throws \InvalidArgumentException
      */
     public function postFieldAdd(string $roleType, string $fieldId): void
     {
-        /* New fields are spawned at the top of the list, forcing other
-         * fields down the screen. This means we need to first obtain the
-         * current set of enabled fields:
-         */
-
-        /* ...then increment their sequences by one:
-         */
-
-        /* ...then inject our new field at sequence 1.
-         */
-
         try {
+            /* New fields are spawned at the top of the list, forcing other
+             * fields down the screen. This means we need to first obtain the
+             * current set of enabled fields:
+             */
+            $fields = $this->fieldMapper->findByColumnList([
+                'roleType' => $roleType,
+                'enabled' => true,
+            ]);
+
+            /* ...then increment their sequences by one:
+             */
+            foreach ($fields as $field) {
+                $field->setSequence($field->getSequence() + 1);
+
+                $this->fieldMapper->save($field);
+            }
+
+            /* ...then inject our new field at sequence 0.
+             */
             $fieldModel = $this->fieldMapper->findOneByColumnList([
                 'roleType' => $roleType,
                 'field' => $fieldId,
             ]);
 
             /** @var int|null $index - The index at which to insert the field */
-            $index = $this->requestPost->get('index');
-            if ($index === null) {
-                throw new \Exception("No index provided");
-            }
+            $index = (int)$this->requestPost->get('index');
 
-            // TODO: Resequence the others.
-print_r($index);
-            $fieldModel->setEnabled(1);
+            /* New fields are spawned with sequence 1, since $index is always
+             * given to us as 0 in this usage from frontend.
+             */
             $fieldModel->setSequence($index);
+            $fieldModel->setEnabled(1);
+
             $this->fieldMapper->save($fieldModel);
 
             $this->response = $this->responseAsJson(['success' => true]);
@@ -115,7 +122,8 @@ print_r($index);
      * @since 24.1
      *
      * @param string $roleType The relevant role type
-     * @param string $fieldId  The field to remove
+     * @param string $fieldId The field to remove
+     * @throws \InvalidArgumentException
      */
     public function postFieldRemove(string $roleType, string $fieldId): void
     {
