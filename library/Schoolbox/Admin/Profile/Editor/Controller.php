@@ -48,7 +48,7 @@ class Controller extends Base
             $this->fieldMapper,
             $this->campusMapper
         ))->generateAll();
-
+new \Alaress_Probe($payload);
         $this->response = $this->responseFromTemplate('@adminProfileEditor/index.twig', [
             'pageCurrent' => $this->routeGenerator->generate('adminProfileEditor.getIndex'),
             'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->routeGenerator->generate('adminProfileEditor.getIndex')),
