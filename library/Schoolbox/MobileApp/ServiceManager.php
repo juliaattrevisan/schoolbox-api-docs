@@ -80,13 +80,25 @@ class ServiceManager implements IServiceManager
      * @param Instance $instance
      * @throws FilesystemException
      * @throws Exception
-     * @throws Deleted // when the recipient (user) is deleted
      */
     public function push($userId, Instance $instance)
     {
         $registrations = $this->registryMapper->countByColumn('user_id', $userId);
 
-        $recipient = (new Schoolbox\UserMapper())->findById($userId);
+        try {
+            $recipient = (new Schoolbox\UserMapper())->findById($userId);
+        } catch (Deleted $e) {
+            $this->log->warning(
+                sprintf(
+                    'Delivery of message %s:%s to instance:user instance:%d: User is deleted',
+                    $instance->getBaseHash(),
+                    $instance->getParamHash(),
+                    $userId
+                )
+            );
+            // we should be able to discard the message, it will never be sent again.
+            return;
+        }
 
         $isRecipientParent = $recipient->getRole()->isParent();
         //Check to see if TASS Orbit is set up as a delivery provider
