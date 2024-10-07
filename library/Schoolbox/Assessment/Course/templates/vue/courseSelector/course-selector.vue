@@ -17,18 +17,21 @@ const props = defineProps<Props>();
 const selectedStore = useSelectedStore();
 
 /**
- * We only allow one creator to be selected at a time,
- * so only select a result if there isn't one already selected
- * or unselect the current result if it's already selected
+ * When a result is selected, add it to the selected store
+ * or remove it if it already exists
  * @param result - the result selected
  */
 function onSelected(result: Result): void {
-    selectedStore.add(result);
+    const exists = selectedStore.selected.find((item) => item.id === result.id);
+    if (exists) {
+        selectedStore.remove(result);
+    } else {
+        selectedStore.add(result);
+    }
 }
 
 /**
- * Remove the result, as we only allow one creator to be selected at a time
- * we can simply just clear the store
+ * Remove the result from the selected store
  * @param result - the result removed
  */
 function onRemoved(result: Result): void {
