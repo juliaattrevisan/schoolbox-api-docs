@@ -33,21 +33,21 @@ class Persistor
             folder_id,
             fulltext_index
         ) VALUES (
-            :type,
-            :identifier,
-            :title,
-            :date,
-            :isRelevanceDateAffected,
-            :createdBy,
-            :folderId,
-            :fulltextIndex
+            :insType,
+            :insIdentifier,
+            :insTitle,
+            :insDate,
+            :insIsRelevanceDateAffected,
+            :insCreatedBy,
+            :insFolderId,
+            :insFulltextIndex
         ) ON DUPLICATE KEY UPDATE
-            title                      = :title,
-            date                       = :date,
-            is_relevance_date_affected = :isRelevanceDateAffected,
-            created_by                 = :createdBy,
-            folder_id                  = :folderId,
-            fulltext_index             = :fulltextIndex
+            title                      = :updTitle,
+            date                       = :updDate,
+            is_relevance_date_affected = :updIsRelevanceDateAffected,
+            created_by                 = :updCreatedBy,
+            folder_id                  = :updFolderId,
+            fulltext_index             = :updFulltextIndex
     SQL;
 
     /**
@@ -174,14 +174,20 @@ class Persistor
     {
         $this->updateQuery ??= $this->dbConnection->prepareQuery(self::UPDATE_SQL);
         $this->updateQuery->execute([
-            'type'                    => $index->getType(),
-            'identifier'              => $index->getIdentifier(),
-            'title'                   => $index->getTitle(),
-            'date'                    => $index->getDate()?->getDatabase(),
-            'isRelevanceDateAffected' => $index->getIsRelevanceDateAffected() ? 1 : 0,
-            'createdBy'               => $index->getCreatedBy(),
-            'folderId'                => $index->getFolderId(),
-            'fulltextIndex'           => $index->getFulltextIndex(),
+            'insType'                    => $index->getType(),
+            'insIdentifier'              => $index->getIdentifier(),
+            'insTitle'                   => $index->getTitle(),
+            'insDate'                    => $index->getDate()?->getDatabase(),
+            'insIsRelevanceDateAffected' => $index->getIsRelevanceDateAffected() ? 1 : 0,
+            'insCreatedBy'               => $index->getCreatedBy(),
+            'insFolderId'                => $index->getFolderId(),
+            'insFulltextIndex'           => $index->getFulltextIndex(),
+            'updTitle'                   => $index->getTitle(),
+            'updDate'                    => $index->getDate()?->getDatabase(),
+            'updIsRelevanceDateAffected' => $index->getIsRelevanceDateAffected() ? 1 : 0,
+            'updCreatedBy'               => $index->getCreatedBy(),
+            'updFolderId'                => $index->getFolderId(),
+            'updFulltextIndex'           => $index->getFulltextIndex(),
         ]);
     }
 
