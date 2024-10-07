@@ -48,7 +48,7 @@ class Controller extends Base
             $this->fieldMapper,
             $this->campusMapper
         ))->generateAll();
-
+new \Alaress_Probe($payload);
         $this->response = $this->responseFromTemplate('@adminProfileEditor/index.twig', [
             'pageCurrent' => $this->routeGenerator->generate('adminProfileEditor.getIndex'),
             'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->routeGenerator->generate('adminProfileEditor.getIndex')),
@@ -193,13 +193,48 @@ class Controller extends Base
                 throw new \RuntimeException('No field settings provided');
             }
 
-            /** @var string[] $requestedAvailabilityCampuses */
-            $requestedAvailabilityCampuses = $settings['availability'] ?? [];
+            /* The updated availabilities and visibilities are in this array struct
+             * where availability is *presumed* to be campus ids only (for now)
+             * and visibility is *presumed* to be roletype strings only (for now)
+             * imho it'd be better served seeing a campus node in here and also a
+             * roletype node, so you know conclusively what these represent.
+             *
+                [fieldSettings] => Array
+                    (
+                        [availability] => Array
+                            (
+                                [0] => 1
+                                [1] => 2
+                            )
 
-            /** @var string[] $requestedVisibilityRoleTypes */
-            $requestedVisibilityRoleTypes = $settings['visibility'] ?? [];
+                        [visibility] => Array
+                            (
+                                [0] => parent
+                                [1] => student
+                                [2] => staff
+                            )
 
-            // TODO
+                    )
+             */
+            /** @var int[] $newCampusIds */
+            $newCampusIds = $settings['availability'] ?? [];
+
+            /* First purge existing relations
+             */
+
+            /* Then, if there are any campus ids chosen, reinsert these new ones
+             * Otherwise leave it empty (this is a legitimate use case)
+             */
+
+            /** @var string[] $newRoleTypes */
+            $newRoleTypes = $settings['visibility'] ?? [];
+
+            /* First purge existing relations
+             */
+
+            /* Then, if there are any roletypes chosen, reinsert these new ones
+             * Otherwise leave it empty (this is a legitimate use case)
+             */
 
             $this->fieldMapper->save($field);
 
