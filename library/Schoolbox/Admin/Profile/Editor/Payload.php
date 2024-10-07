@@ -130,7 +130,8 @@ class Payload
                 'roleType' => $roleType,
                 'fields' => [
                     'available' => [],
-                    'selected' => []
+                    'selected' => [],
+                    'mandatory' => []
                 ]
             ];
 
@@ -145,7 +146,15 @@ class Payload
             /* Ones that you could possibly choose
              */
             foreach ($fields as $field) {
-                $roleTypeSettings['fields']['available'][] = [
+                $node = 'available';
+
+                /* Portrait Image can never be chosen; it's mandatory
+                 */
+                if ('portrait' === $field->getField()) {
+                    $node = 'mandatory';
+                }
+
+                $roleTypeSettings['fields'][$node][] = [
                     'field' => $field->getField(),
                     'displayAs' => $field->getDisplayAs(),
                     'icon' => $field->getIcon(),
@@ -165,9 +174,17 @@ class Payload
                     continue;
                 }
 
+                $node = 'selected';
+
+                /* Portrait Image can never be disabled; it's mandatory
+                 */
+                if ('portrait' === $field->getField()) {
+                    $node = 'mandatory';
+                }
+
                 /* Pile it into the stack
                  */
-                $roleTypeSettings['fields']['selected'][] = [
+                $roleTypeSettings['fields'][$node][] = [
                     'field' => $field->getField(),
                     'displayAs' => $field->getDisplayAs(),
                     'icon' => $field->getIcon(),

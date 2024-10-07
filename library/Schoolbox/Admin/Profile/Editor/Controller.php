@@ -83,7 +83,15 @@ class Controller extends Base
             /* ...then increment their sequences by one:
              */
             foreach ($fields as $field) {
-                $field->setSequence($field->getSequence() + 1);
+                if ('portrait' === $field->getField()) {
+                    /* Portrait Image is always sequence zero
+                     */
+                    $field->setSequence(0);
+                } else {
+                    /* Assign new sequence
+                     */
+                    $field->setSequence($field->getSequence() + 1);
+                }
 
                 $this->fieldMapper->save($field);
             }
@@ -96,7 +104,7 @@ class Controller extends Base
             ]);
 
             /** @var int|null $index - The index at which to insert the field */
-            $index = (int)$this->requestPost->get('index');
+            $index = (int)($this->requestPost->get('index')) + 1;
 
             /* New fields are spawned with sequence 1, since $index is always
              * given to us as 0 in this usage from frontend.
@@ -149,12 +157,20 @@ class Controller extends Base
                 ]
             ]);
 
-            /* ...then reassign them in zero-indexed order.
+            /* ...then reassign them in 1-indexed order.
              */
-            $i = 0;
+            $i = 1;
 
             foreach ($fields as $field) {
-                $field->setSequence($i++);
+                if ('portrait' === $field->getField()) {
+                    /* Portrait Image is always sequence zero
+                     */
+                    $field->setSequence(0);
+                } else {
+                    /* Assign new sequence
+                     */
+                    $field->setSequence($i++);
+                }
 
                 $this->fieldMapper->save($field);
             }
@@ -214,7 +230,7 @@ class Controller extends Base
     /**
      * POST Resequence fields for a particular role type
      *
-     * Note that sequences are zero-indexed.
+     * Note that sequences are 1-indexed.
      *
      * @api   POST /adminv2/profileEditor/field/{roleType}/sequence
      * @since 24.1
@@ -255,9 +271,14 @@ class Controller extends Base
                     continue;
                 }
 
-                /* Assign new sequence
+                /* Portrait Image should never appear in this $sequence array
+                 * But if it does one day, is always sequence zero
+                 *
+                 * if ('portrait' === $field) {
+                 *     $fieldModel->setSequence(0);
+                 * }
                  */
-                $fieldModel->setSequence($index);
+                $fieldModel->setSequence($index + 1);
 
                 $this->fieldMapper->save($fieldModel);
             }
