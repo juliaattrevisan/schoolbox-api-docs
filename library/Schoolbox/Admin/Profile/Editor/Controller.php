@@ -176,13 +176,15 @@ class Controller extends Base
      *
      * @param string $roleType The roletype to update
      * @param string $fieldId  The field to update
+     * @throws \InvalidArgumentException
      */
     public function postFieldSettings(string $roleType, string $fieldId): void
     {
         try {
             $settings = $this->requestPost->get('fieldSettings');
-            if ($settings === null) {
-                throw new \Exception("No field settings provided");
+
+            if (null === $settings) {
+                throw new \RuntimeException('No field settings provided');
             }
 
             $fieldModel = $this->fieldMapper->findOneByColumnList([
@@ -208,21 +210,26 @@ class Controller extends Base
         }
     }
 
+
     /**
      * POST Resequence fields for a particular role type
+     *
+     * Note that sequences are zero-indexed.
      *
      * @api   POST /adminv2/profileEditor/field/{roleType}/sequence
      * @since 24.1
      *
      * @param string $roleType The roletype for which the sequence is updated
+     * @throws \InvalidArgumentException
      */
     public function postFieldSequence(string $roleType): void
     {
         try {
             /** @var string[]|null $sequence - The new sequence of field IDs, in order */
             $sequence = $this->requestPost->get('sequence', null);
-            if ($sequence === null || !\is_array($sequence)) {
-                throw new \Exception("Invalid sequence provided");
+
+            if (!\is_array($sequence)) {
+                throw new \RuntimeException('Invalid sequence provided');
             }
 
             foreach ($sequence as $index => $fieldId) {
