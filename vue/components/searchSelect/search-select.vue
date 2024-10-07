@@ -9,6 +9,7 @@ import type { Result } from "./types/Result";
 import SearchSelectSelected from "./search-select-selected.vue";
 import SearchSelectInput from "./search-select-input.vue";
 import SearchSelectResults from "./search-select-results.vue";
+import { onClickOutside } from "@vueuse/core";
 
 interface Props {
     endpoint: string; // the search api endpoint
@@ -34,6 +35,7 @@ const query = window.Vue.ref<string>("");
 const searchResults = window.Vue.ref<Result[]>([]);
 const canSearch = window.Vue.ref<boolean>(false);
 const minKeywordLength = 2;
+const searchSelectEl = window.Vue.ref<HTMLDivElement | null>(null);
 
 const url = window.Vue.computed(() => {
     return `${props.endpoint}${query.value}`;
@@ -61,6 +63,7 @@ const {
     data, // the search searchResults
     isFetching, // to notify of searching
     error: hasError, // to notify of a search error
+    abort,
 } = useFetch(url, {
     immediate: false,
     onFetchError(ctx: { response: Response | null; error: unknown; data: unknown }) {
@@ -113,10 +116,18 @@ function onSelected(result: Result): void {
 function onRemoved(result: Result): void {
     emit("remove", result);
 }
+
+/**
+ * To close the search results when clicking outside
+ */
+onClickOutside(searchSelectEl, () => {
+    abort();
+    searchResults.value = [];
+});
 </script>
 
 <template>
-    <div class="c-search-select">
+    <div ref="searchSelectEl" class="c-search-select">
         <search-select-selected
             :selected="props.selected"
             :form-value-name="props.formValueName"
