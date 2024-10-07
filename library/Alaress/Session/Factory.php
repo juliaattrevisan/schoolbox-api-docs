@@ -48,9 +48,7 @@ class Factory
     {
         $func             = new Phpfunc($this->config, $this->rememberer, $this->sessionRedis);
         $segmentFactory   = new SegmentFactory();
-        $csrfTokenFactory = new SessionLibrary\CsrfTokenFactory(
-            new SessionLibrary\Randval($func)
-        );
+        $csrfTokenFactory = new SessionLibrary\CsrfTokenFactory(new SessionLibrary\Randval());
         return new Session(
             $segmentFactory,
             $csrfTokenFactory,
