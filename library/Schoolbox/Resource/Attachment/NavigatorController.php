@@ -41,7 +41,6 @@ abstract class NavigatorController extends AbstractController
      */
     protected function pparse(SitePage $page)
     {
-
         /* socialstreambrowser has an explicit use case for explicitly being false
          * in browser.js::149 loadNode(). The only way to have folders-only is to
          * specify an empty mimeFilter using (bool)false; null is the default case
@@ -56,7 +55,7 @@ abstract class NavigatorController extends AbstractController
         } elseif (false === $this->mimeFilter || '' === $this->mimeFilter) {
             $mimeFilter = 'false';
         } else {
-            $mimeFilter = "'" . Scrub::text(urldecode($this->mimeFilter)) . "'";
+            $mimeFilter = "'" . Scrub::text(rawurldecode($this->mimeFilter)) . "'";
         }
 
         /* Enable a Use This Folder button in the component action bar, but only
