@@ -259,7 +259,6 @@ class Controller extends Base
                         ->setRoleType($newRoleType);
 
                     $this->visibilityMapper->save($relation);
-
                 }
             }
 
