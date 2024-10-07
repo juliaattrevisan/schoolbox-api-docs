@@ -599,9 +599,12 @@ $block-grid-media-queries: true !default;
 #content {
     > .row {
         h1 {
+            display: -webkit-box;
             overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
+            line-clamp: 2; // standard property
+            -webkit-line-clamp: 2; // WebKit-specific property
+            -webkit-box-orient: vertical;
+            white-space: normal;
         }
     }
 }
