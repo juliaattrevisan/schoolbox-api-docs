@@ -190,7 +190,17 @@ class Mapper extends BaseMapper
         $sortDirection = 'DESC'
     ) {
         // Load all ancestors, no descendants
-        return $this->findByKeyword($keyword, $limit, $offset, 50, 0, false, null, null);
+        return $this->findByKeyword(
+            $keyword,
+            $limit,
+            $offset,
+            50,
+            0,
+            false,
+            null,
+            null,
+            false
+        );
     }
 
     /**

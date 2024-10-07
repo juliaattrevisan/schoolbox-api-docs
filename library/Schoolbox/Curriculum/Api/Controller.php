@@ -83,6 +83,7 @@ class Controller extends Base
                 $this->requestQuery->getBool('topLevelOnly', false),
                 $this->requestQuery->getInt('parentId'),
                 $this->requestQuery->getBool('enabled'),
+                $this->requestQuery->getBool('includeWithoutCode'),
             );
 
             $resultsForAllKeywords = $resultsForAllKeywords->mergeUnique($resultsForKeyword, 'id');
