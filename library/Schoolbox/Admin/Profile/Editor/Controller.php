@@ -70,6 +70,17 @@ class Controller extends Base
      */
     public function postFieldAdd(string $roleType, string $fieldId): void
     {
+        /* New fields are spawned at the top of the list, forcing other
+         * fields down the screen. This means we need to first obtain the
+         * current set of enabled fields:
+         */
+
+        /* ...then increment their sequences by one:
+         */
+
+        /* ...then inject our new field at sequence 1.
+         */
+
         try {
             $fieldModel = $this->fieldMapper->findOneByColumnList([
                 'roleType' => $roleType,
@@ -83,7 +94,7 @@ class Controller extends Base
             }
 
             // TODO: Resequence the others.
-
+print_r($index);
             $fieldModel->setEnabled(1);
             $fieldModel->setSequence($index);
             $this->fieldMapper->save($fieldModel);
