@@ -226,7 +226,7 @@ class Controller extends Base
     {
         try {
             /** @var string[]|null $sequence - The new sequence of field IDs, in order */
-            $sequence = $this->requestPost->get('sequence', null);
+            $sequence = $this->requestPost->get('sequence');
 
             if (!\is_array($sequence)) {
                 throw new \RuntimeException('Invalid sequence provided');
