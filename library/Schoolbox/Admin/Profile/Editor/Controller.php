@@ -222,7 +222,7 @@ class Controller extends Base
 
             /* First purge existing relations
              */
-            $this->availabilityCampusMapper->truncate();
+            $this->availabilityCampusMapper->deleteByColumn('profile_field_id', $field->getId());
 
             /* Then, if there are any campus ids chosen, reinsert these new ones
              * Otherwise leave it empty (this is a legitimate use case)
@@ -244,7 +244,7 @@ class Controller extends Base
 
             /* First purge existing relations
              */
-            $this->visibilityMapper->truncate();
+            $this->visibilityMapper->deleteByColumn('profile_field_id', $field->getId());
 
             /* Then, if there are any roletypes chosen, reinsert these new ones
              * Otherwise leave it empty (this is a legitimate use case)
