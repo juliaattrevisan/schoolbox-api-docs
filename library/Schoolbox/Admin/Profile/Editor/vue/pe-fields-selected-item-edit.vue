@@ -67,4 +67,3 @@ async function onUpdateClicked(): Promise<void> {
 </template>
 
 <style scoped></style>
-./types/profileEditorTypes

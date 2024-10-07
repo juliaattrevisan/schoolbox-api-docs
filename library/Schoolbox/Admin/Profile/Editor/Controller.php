@@ -41,6 +41,9 @@ class Controller extends Base
             $roleType = \Schoolbox\Role::STUDENT;
         }
 
+        /* Frontend wanted the full payload for all roletypes when we arrive at
+         * the index screen, rather than have the $roleType's payload specifically.
+         */
         $payload = (new Payload(
             $this->fieldMapper,
             $this->campusMapper
@@ -55,46 +58,215 @@ class Controller extends Base
 
 
     /**
-     * This executes when the superuser adds a field to a profile screen.
+     * POST Enable a field so it is visible on a role type's profile screen
      *
+     * @api   POST /adminv2/profileEditor/field/{roleType}/{fieldId}/add
+     * @since 24.1
+     *
+     * @param string $roleType The relevant role type
+     * @param string $fieldId The field to enable
      * @return void
+     * @throws \InvalidArgumentException
      */
-    public function postFieldAdd(): void
+    public function postFieldAdd(string $roleType, string $fieldId): void
     {
-        new \Alaress_Probe('postFieldAdd', $this->requestPost->getArrayCopy());
+        try {
+            /* New fields are spawned at the top of the list, forcing other
+             * fields down the screen. This means we need to first obtain the
+             * current set of enabled fields:
+             */
+            $fields = $this->fieldMapper->findByColumnList([
+                'roleType' => $roleType,
+                'enabled' => true,
+            ]);
+
+            /* ...then increment their sequences by one:
+             */
+            foreach ($fields as $field) {
+                $field->setSequence($field->getSequence() + 1);
+
+                $this->fieldMapper->save($field);
+            }
+
+            /* ...then inject our new field at sequence 0.
+             */
+            $fieldModel = $this->fieldMapper->findOneByColumnList([
+                'roleType' => $roleType,
+                'field' => $fieldId,
+            ]);
+
+            /** @var int|null $index - The index at which to insert the field */
+            $index = (int)$this->requestPost->get('index');
+
+            /* New fields are spawned with sequence 1, since $index is always
+             * given to us as 0 in this usage from frontend.
+             */
+            $fieldModel->setSequence($index);
+            $fieldModel->setEnabled(1);
+
+            $this->fieldMapper->save($fieldModel);
+
+            $this->response = $this->responseAsJson(['success' => true]);
+        } catch (\Exception $e) {
+            $this->response = $this->responseAsJson(
+                ['success' => false, 'message' => $e->getMessage()]
+            )->withStatus(500);
+        }
     }
 
 
     /**
-     * This executes when the superuser removes a field from a profile screen.
+     * POST Remove (disable) a field so that is not visible a role type's profile screen
      *
-     * @return void
+     * @api   POST /adminv2/profileEditor/field/{roleType}/{fieldId}/remove
+     * @since 24.1
+     *
+     * @param string $roleType The relevant role type
+     * @param string $fieldId The field to remove
+     * @throws \InvalidArgumentException
      */
-    public function postFieldRemove(): void
+    public function postFieldRemove(string $roleType, string $fieldId): void
     {
-        new \Alaress_Probe('postFieldRemove', $this->requestPost->getArrayCopy());
+        try {
+            $fieldModel = $this->fieldMapper->findOneByColumnList([
+                'roleType' => $roleType,
+                'field' => $fieldId,
+            ]);
+
+            $fieldModel->setEnabled(0);
+            $this->fieldMapper->save($fieldModel);
+
+            /* Removed fields will leave a hole in the sequencing.
+             * To make sequencing contiguous, we need to fetch all
+             * the fields ordered by their sequence:
+             */
+            $fields = $this->fieldMapper->findByColumnList([
+                'roleType' => $roleType,
+                'enabled' => true,
+            ], [
+                'order' => [
+                    'sequence' => 'asc'
+                ]
+            ]);
+
+            /* ...then reassign them in zero-indexed order.
+             */
+            $i = 0;
+
+            foreach ($fields as $field) {
+                $field->setSequence($i++);
+
+                $this->fieldMapper->save($field);
+            }
+
+            $this->response = $this->responseAsJson(['success' => true]);
+        } catch (\Exception $e) {
+            $this->response = $this->responseAsJson(
+                ['success' => false, 'message' => $e->getMessage()]
+            )->withStatus(500);
+        }
     }
 
 
     /**
-     * This executes when the superuser updates availability ("Appears On") and visibility
-     * ("Visible For") checkbox settings on a particular field.
+     * POST Update field settings for a particular field
      *
-     * @return void
+     * @api   POST /adminv2/profileEditor/field/{roleType}/{fieldId}/settings
+     * @since 24.1
+     *
+     * @param string $roleType The roletype to update
+     * @param string $fieldId  The field to update
+     * @throws \InvalidArgumentException
      */
-    public function postFieldSettings(): void
+    public function postFieldSettings(string $roleType, string $fieldId): void
     {
-        new \Alaress_Probe('postFieldSettings', $this->requestPost->getArrayCopy());
+        try {
+            $settings = $this->requestPost->get('fieldSettings');
+
+            if (null === $settings) {
+                throw new \RuntimeException('No field settings provided');
+            }
+
+            $fieldModel = $this->fieldMapper->findOneByColumnList([
+                'roleType' => $roleType,
+                'field' => $fieldId,
+            ]);
+
+            /** @var string[] $requestedAvailabilityCampuses */
+            $requestedAvailabilityCampuses = $settings['availability'] ?? [];
+
+            /** @var string[] $requestedVisibilityRoleTypes */
+            $requestedVisibilityRoleTypes = $settings['visibility'] ?? [];
+
+            // TODO
+
+            $this->fieldMapper->save($fieldModel);
+
+            $this->response = $this->responseAsJson(['success' => true]);
+        } catch (\Exception $e) {
+            $this->response = $this->responseAsJson(
+                ['success' => false, 'message' => $e->getMessage()]
+            )->withStatus(500);
+        }
     }
 
 
     /**
-     * This executes when the superuser reorders fields.
+     * POST Resequence fields for a particular role type
      *
-     * @return void
+     * Note that sequences are zero-indexed.
+     *
+     * @api   POST /adminv2/profileEditor/field/{roleType}/sequence
+     * @since 24.1
+     *
+     * @param string $roleType The roletype for which the sequence is updated
+     * @throws \InvalidArgumentException
      */
-    public function postFieldSequence(): void
+    public function postFieldSequence(string $roleType): void
     {
-        new \Alaress_Probe('postFieldSequence', $this->requestPost->getArrayCopy());
+        try {
+            /** @var string[]|null $sequence - The new sequence of field IDs, in order */
+            $sequence = $this->requestPost->get('sequence');
+
+            if (!\is_array($sequence)) {
+                throw new \RuntimeException('Invalid sequence provided');
+            }
+
+            /* When we resequence fields, we aren't adding or removing them
+             * which means we can presume to obtain all the necessary fields
+             * in one database call
+             */
+            $fields = $this->fieldMapper->findByColumnList([
+                'roleType' => $roleType,
+                'enabled' => true,
+            ])->indexBy('field');
+
+            /* Sequence is actually a (int, string) tuple that represents
+             * (index, field name), not its primary key in profile_field.
+             */
+            foreach ($sequence as $index => $field) {
+                $fieldModel = $fields->getOffset($field);
+
+                /* For some edge-casey reason, the model doesn't exist anymore;
+                 * someone else might have deleted it at the same moment we were
+                 * trying to resequence it
+                 */
+                if (null === $fieldModel) {
+                    continue;
+                }
+
+                /* Assign new sequence
+                 */
+                $fieldModel->setSequence($index);
+
+                $this->fieldMapper->save($fieldModel);
+            }
+
+            $this->response = $this->responseAsJson(['success' => true]);
+        } catch (\Exception $e) {
+            $this->response = $this->responseAsJson(
+                ['success' => false, 'message' => $e->getMessage()]
+            )->withStatus(500);
+        }
     }
 }

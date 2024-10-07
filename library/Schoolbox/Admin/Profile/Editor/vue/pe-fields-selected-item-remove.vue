@@ -4,7 +4,7 @@
  */
 
 import { slideDownOnEnter, slideUpOnLeave } from "@schoolboxVue/transitions/transitions";
-import { useProfileEditorStore } from "./store/profileEditorStore";
+import { useProfileEditorFieldsStore } from "./store/profileEditorFieldsStore";
 import type { ProfileEditorSelectedField } from "./profileEditorTypes";
 
 interface Props {
@@ -13,7 +13,7 @@ interface Props {
 }
 
 const props = defineProps<Props>();
-const peStore = useProfileEditorStore();
+const peFieldsStore = useProfileEditorFieldsStore();
 const emit = defineEmits(["close"]);
 
 const isRemoving = window.Vue.ref(false);
@@ -22,17 +22,9 @@ const isRemoving = window.Vue.ref(false);
  * When the user clicks the remove button
  */
 async function onRemoveClicked(): Promise<void> {
-    if (peStore.selectedRoleType === null) return;
-
     isRemoving.value = true;
-
-    await new Promise((resolve) => {
-        setTimeout(resolve, 500);
-    });
-
-    peStore.selectedRoleType.fields.selected = peStore.selectedRoleType.fields.selected.filter(
-        (field) => field.field !== props.field.field,
-    );
+    await peFieldsStore.disableField(props.field.field);
+    isRemoving.value = false;
 }
 </script>
 
@@ -57,4 +49,3 @@ async function onRemoveClicked(): Promise<void> {
 </template>
 
 <style scoped></style>
-./types/profileEditorTypes

@@ -22,6 +22,7 @@ use Schoolbox\Mapper\Exception;
  * @method Model findById($identifierValue)
  * @method null|Model hydrate(array $row, $alias = '', $callback = null)
  * @method Model[]|GenericCollection findByColumn($columnName, $columnValue, $options = [])
+ * @method Model[]|GenericCollection findByColumnList($columnList, array $options = [])
  * @method Model[]|GenericCollection createCollection($contents = [])
  * @method Model[]|GenericCollection findAll($contents = [])
  */

@@ -1,3 +1,10 @@
+{##
+ # Profile Editor
+ #
+ # @param string $pageCurrent  The current page we're on
+ # @param array $allBreadcrumbs  A set of breadcrumb nodes, as defined by Admin Subnav
+ # @param array $payload  A structured array of each roletype's payloads in one big bag
+ #}
 {% import 'sub/breadcrumbs.twig' as bread %}
 {{ bread.crumbsArray(allBreadcrumbs) }}
 
@@ -8,102 +15,16 @@
     <div class="admin-content">
         <div id="profile-editor-container">
             <profile-editor
-                :endpoints="[]"
+                :endpoints="{
+                    adminProfileEditorPostFieldAdd: '{{ routeLookupIfAuthorized('adminProfileEditor.postFieldAdd') }}',
+                    adminProfileEditorPostFieldRemove: '{{ routeLookupIfAuthorized('adminProfileEditor.postFieldRemove') }}',
+                    adminProfileEditorPostFieldSettings: '{{ routeLookupIfAuthorized('adminProfileEditor.postFieldSettings') }}',
+                    adminProfileEditorPostFieldSequence: '{{ routeLookupIfAuthorized('adminProfileEditor.postFieldSequence') }}'
+                }"
                 :payload="{{ payload |json_encode }}"
             />
         </div>
         <script src="{{ CDN_PREFIX }}/js/bundle/profileEditor.js?v={{ config.site_version }}"></script>
-
-
-        <script>
-            $(function() {
-                let hash = window.location.hash.substring(1);
-                hash = hash.charAt(0).toUpperCase() + hash.slice(1);
-
-                $('#editor-name').text(hash);
-            });
-        </script>
-
-        <div class="small-12 island">
-            put your tabs here I guess
-
-            <dl class="tabs">
-                <dd><a>student</a></dd>
-                <dd><a>staff</a></dd>
-                <dd><a>parent</a></dd>
-            </dl>
-        </div>
-
-        <div class="small-12 large-6 island">
-            <h2 class="subheader">Selected Fields</h2>
-
-            {% if not payload.data.roleTypes[0].fields.selected %}
-                <div class="empty-state">
-                    <i class="icon-student"></i>
-                    <p>You haven't chosen any fields yet. Drag some from the available fields over there.</p>
-                </div>
-            {% else %}
-                <section class="content">
-                    <ul>
-                        {% for field in payload.data.roleTypes[0].fields.selected %}
-                            <li>
-                                {{ field.displayAs }} (<code>{{ field.field }}</code> in the backend)
-                                {% if field.icon %}
-                                    <span class="button {{ field.icon }} {{ field.css }}"></span>
-                                {% endif %}
-                            </li>
-                        {% endfor %}
-                    </ul>
-                </section>
-            {% endif %}
-        </div>
-
-        <div class="small-12 large-6 island">
-            <h2 class="subheader">Available Fields</h2>
-
-            <section class="content">
-                <ul>
-                    {% for field in payload.data.roleTypes[0].fields.available %}
-                        <li>
-                            {{ field.displayAs }} (<code>{{ field.field }}</code> in the backend)
-                            {% if field.icon %}
-                                <span class="button {{ field.icon }} {{ field.css }}"></span>
-                            {% endif %}
-                        </li>
-                    {% endfor %}
-                </ul>
-            </section>
-        </div>
-
-        <div class="small-12 island">
-            <h2 class="subheader">postFieldAdd</h2>
-            <section class="content">
-                {% set formAction = routeLookupIfAuthorized('adminProfileEditor.postFieldAdd', {fieldId: 7}) %}
-                {% if formAction %}
-                    <form action="{{ formAction }}" method="post">
-                        <input type="text" name="action" value="add" />
-                        <input type="submit" />
-                    </form>
-                {% else %}
-                    Not authorised to POST
-                {% endif %}
-            </section>
-        </div>
-
-        <div class="small-12 island">
-            <h2 class="subheader">postFieldRemove</h2>
-            <section class="content">
-                {% set formAction = routeLookupIfAuthorized('adminProfileEditor.postFieldRemove', {fieldId: 9}) %}
-                {% if formAction %}
-                    <form action="{{ formAction }}" method="post">
-                        <input type="text" name="action" value="remove" />
-                        <input type="submit" />
-                    </form>
-                {% else %}
-                    Not authorised to POST
-                {% endif %}
-            </section>
-        </div>
 
         <div class="small-12 island">
             <h2 class="subheader">postFieldSettings</h2>
@@ -112,21 +33,6 @@
                 {% if formAction %}
                     <form action="{{ formAction }}" method="post">
                         <input type="text" name="action" value="settings" />
-                        <input type="submit" />
-                    </form>
-                {% else %}
-                    Not authorised to POST
-                {% endif %}
-            </section>
-        </div>
-
-        <div class="small-12 island">
-            <h2 class="subheader">postFieldSequence</h2>
-            <section class="content">
-                {% set formAction = routeLookupIfAuthorized('adminProfileEditor.postFieldSequence', {roletype: 'student'}) %}
-                {% if formAction %}
-                    <form action="{{ formAction }}" method="post">
-                        <input type="text" name="action" value="sequence" />
                         <input type="submit" />
                     </form>
                 {% else %}

@@ -1,0 +1,346 @@
+import { defineStore } from "pinia";
+import { cloneDeep } from "lodash";
+import { until } from "@vueuse/core";
+import { useProfileEditorStore } from "./profileEditorStore";
+
+type EnableFieldAction = {
+    type: "ENABLE_FIELD";
+    field: string; // The field to enable
+    index: number; // The index at which to insert the field
+};
+
+type DisableFieldAction = {
+    type: "DISABLE_FIELD";
+    field: string; // The field to disable
+};
+
+type ResequenceFieldsAction = {
+    type: "RESEQUENCE_FIELDS";
+    // The fields that are "targeted" by the resequence action
+    // - this is entirely for tracking purposes and is not used to actually resequence
+    fields: string[];
+};
+
+// A type of action that can be queued
+type FieldAction = EnableFieldAction | DisableFieldAction | ResequenceFieldsAction;
+
+// An action that is currently in the queue, with additional metadata to keep track of it
+type QueuedFieldAction = FieldAction & {
+    actionId: number;
+    isProcessing: boolean;
+};
+
+type ProfileEditorFetchResponse = {
+    success: boolean;
+    message?: string;
+};
+
+/**
+ * Fetch a given endpoint for the profile editor and process the response for errors
+ * @param endpoint - The endpoint to fetch
+ * @param options - The fetch options to use
+ * @returns The response from the fetch
+ */
+async function fetchProfileEditorEndpoint(endpoint: string, options: RequestInit): Promise<ProfileEditorFetchResponse> {
+    const responseData: ProfileEditorFetchResponse = { success: false, message: "An unknown error occured" }; // Default error case
+
+    try {
+        const response = await fetch(endpoint, options);
+        const responseText = await response.text();
+
+        // If we got some form of response, set the initial message to that
+        responseData.message = responseText;
+
+        // Safely parse the response as JSON, we don't necessarily know what it will be in advance
+        let responseJson: unknown = null;
+        try {
+            responseJson = JSON.parse(responseText);
+        } catch {
+            // If it fails to parse, we'll just leave it as null
+        }
+
+        if (typeof responseJson === "object" && responseJson !== null) {
+            if ("success" in responseJson && typeof responseJson.success === "boolean") {
+                responseData.success = responseJson.success;
+            }
+
+            if ("message" in responseJson && typeof responseJson.message === "string") {
+                responseData.message = responseJson.message;
+            } else if (responseData.success === true) {
+                // Remove the default error message if the response was successful but had no message
+                delete responseData.message;
+            }
+        }
+    } catch (e) {
+        responseData.success = false;
+        responseData.message = (e as Error).message;
+    }
+
+    return responseData;
+}
+
+export const useProfileEditorFieldsStore = defineStore("profileEditorFieldsStore", () => {
+    const peStore = useProfileEditorStore();
+
+    // The current queue of actions to be processed
+    const actionQueue = window.Vue.ref<QueuedFieldAction[]>([]);
+
+    // A map of field keys to any errors that occurred while processing actions for that field
+    const actionErrors = window.Vue.ref<{ [key: string]: string }>({});
+
+    /**
+     * Whether a field can be selected or not
+     * @param field - The field to check
+     * @returns true if the field is disabled (and can't be selected), false otherwise
+     */
+    function isFieldDisabled(field: string): boolean {
+        if (peStore.selectedRoleType === null) return true;
+        if (peStore.selectedRoleType.fields.selected.some((selectedField) => selectedField.field === field)) {
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * Process enabling a field after ensuring all prior actions are completed
+     * @param field - The key of the field to enable
+     * @param index - The index at which to insert the field
+     */
+    async function processEnableField(field: string, index: number): Promise<void> {
+        if (!peStore.selectedRoleType) return;
+        if (!peStore.savedSelectedRoleType) return;
+
+        const selectedField = peStore.selectedRoleType.fields.selected.find((f) => f.field === field);
+        if (!selectedField) throw new Error("Field not found in selected fields.");
+
+        const endpoint = peStore.endpoints.adminProfileEditorPostFieldAdd
+            .replace("{roleType}", peStore.selectedRoleType.roleType)
+            .replace("{fieldId}", field);
+
+        const response = await fetchProfileEditorEndpoint(endpoint, {
+            method: "POST",
+            body: JSON.stringify({ index }),
+            headers: { "Content-Type": "application/json" },
+        });
+
+        if (!response.success) {
+            actionErrors.value[field] = response.message ?? "An unknown error occurred";
+            return;
+        }
+
+        peStore.savedSelectedRoleType.fields.selected.splice(index, 0, cloneDeep(selectedField));
+    }
+
+    /**
+     * Process disabling a field after ensuring all prior actions are completed
+     * @param field - The key of the field to disable
+     */
+    async function processDisableField(field: string): Promise<void> {
+        if (!peStore.selectedRoleType) return;
+        if (!peStore.savedSelectedRoleType) return;
+
+        const endpoint = peStore.endpoints.adminProfileEditorPostFieldRemove
+            .replace("{roleType}", peStore.selectedRoleType.roleType)
+            .replace("{fieldId}", field);
+
+        const response = await fetchProfileEditorEndpoint(endpoint, { method: "POST" });
+
+        if (!response.success) {
+            actionErrors.value[field] = response.message ?? "An unknown error occurred";
+            return;
+        }
+
+        peStore.selectedRoleType.fields.selected = peStore.selectedRoleType.fields.selected.filter(
+            (f) => f.field !== field,
+        );
+        peStore.savedSelectedRoleType.fields.selected = peStore.savedSelectedRoleType.fields.selected.filter(
+            (f) => f.field !== field,
+        );
+    }
+
+    /**
+     * Process resequencing fields after ensuring all prior actions are completed
+     * @param fields - The fields relevant to the resequence action (for error reporting purposes, not used to resequence)
+     */
+    async function processResequenceFields(fields: string[]): Promise<void> {
+        if (!peStore.selectedRoleType) throw new Error("No role type selected");
+        if (!peStore.savedSelectedRoleType) throw new Error("No role type selected");
+
+        const endpoint = peStore.endpoints.adminProfileEditorPostFieldSequence.replace(
+            "{roleType}",
+            peStore.selectedRoleType.roleType,
+        );
+        const sequence = peStore.selectedRoleType.fields.selected.map((f) => f.field);
+
+        const response = await fetchProfileEditorEndpoint(endpoint, {
+            method: "POST",
+            body: JSON.stringify({ sequence }),
+            headers: { "Content-Type": "application/json" },
+        });
+
+        if (!response.success) {
+            fields.forEach((field) => {
+                actionErrors.value[field] = response.message ?? "An unknown error occurred";
+            });
+            return;
+        }
+
+        peStore.savedSelectedRoleType.fields.selected = cloneDeep(peStore.selectedRoleType.fields.selected);
+    }
+
+    /**
+     * Process the action queue in sequence
+     */
+    async function processQueue(): Promise<void> {
+        if (actionQueue.value.length === 0) return;
+
+        // Find the next action in the queue that hasn't been processed yet
+        const action = actionQueue.value[0];
+        action.isProcessing = true;
+
+        switch (action.type) {
+            case "ENABLE_FIELD":
+                await processEnableField(action.field, action.index);
+                break;
+            case "DISABLE_FIELD":
+                await processDisableField(action.field);
+                break;
+            case "RESEQUENCE_FIELDS":
+                await processResequenceFields(action.fields);
+                break;
+            default:
+                ((a: never): Error => new Error(a))(action); // Assert exhaustive switch
+        }
+
+        action.isProcessing = false; // In case something is specifically tracking this object
+        actionQueue.value.shift(); // Remove the action from the queue since it's been processed
+
+        // Process the next action in the queue
+        if (actionQueue.value.length > 0) {
+            await processQueue();
+        }
+    }
+
+    /**
+     * Add an action to the queue and start processing if not already doing so
+     * @param action - The action to be added to the queue
+     * @returns A promise that resolves when the action has been processed
+     */
+    async function queueAction(action: FieldAction): Promise<void> {
+        const actionId = Math.floor(Math.random() * 1000000); // Generate a random action ID for tracking
+        const queuedAction: QueuedFieldAction = { ...action, actionId, isProcessing: false };
+
+        // Remove any errors for the field(s) since it's being reprocessed
+        if ("field" in action) {
+            delete actionErrors.value[action.field];
+        }
+        if ("fields" in action) {
+            action.fields.forEach((field) => delete actionErrors.value[field]);
+        }
+
+        if (queuedAction.type === "RESEQUENCE_FIELDS") {
+            // Remove any other resequence actions from the queue that are still pending, as they are redundant
+            // If any do exist, add their field list to the current action so whatever is tracking it can still know
+            const resequenceActions = actionQueue.value.filter((a) => a.type === "RESEQUENCE_FIELDS");
+            if (resequenceActions.length > 0) {
+                queuedAction.fields.push(...resequenceActions.flatMap((a) => a.fields));
+            }
+            actionQueue.value = actionQueue.value.filter((a) => a.type !== "RESEQUENCE_FIELDS");
+        } else {
+            // Otherwise, if there's a resequence action in the queue, move it to the very end so it's processed last
+            const resequenceActionIndex = actionQueue.value.findIndex((a) => a.type === "RESEQUENCE_FIELDS");
+            if (resequenceActionIndex !== -1) {
+                const resequenceAction = actionQueue.value[resequenceActionIndex];
+                actionQueue.value.splice(resequenceActionIndex, 1);
+                actionQueue.value.push(resequenceAction);
+            }
+        }
+
+        actionQueue.value.push(queuedAction);
+
+        // Start processing the queue if not already doing so
+        if (actionQueue.value.length <= 1) {
+            void processQueue();
+        }
+
+        // Wait until the action has been processed before continuing
+        await until(() =>
+            actionQueue.value.some((a) => {
+                // If the action is a resequence, check if there is any resequence action in the queue
+                if (action.type === "RESEQUENCE_FIELDS") return a.type === "RESEQUENCE_FIELDS";
+
+                // Otherwise, check if the action has been processed by matching the action ID
+                return a.actionId === actionId;
+            }),
+        ).toBe(false);
+    }
+
+    /**
+     * Trigger a field to be enabled (added to the selected fields)
+     * @param field - The key of the field to enable
+     * @param index - The index at which to insert the field (default: 0)
+     */
+    async function enableField(field: string, index: number = 0): Promise<void> {
+        if (!peStore.selectedRoleType) throw new Error("No role type selected");
+
+        const availableField = peStore.selectedRoleType.fields.available.find((f) => f.field === field);
+        if (availableField === undefined) throw new Error(`Field ${field} not found`);
+
+        if (isFieldDisabled(field)) throw new Error(`Field ${field} is already selected`);
+
+        // a map of each field setting key to an empty array to start with (all settings are deselected)
+        const emptyFieldSettings = Object.fromEntries(Object.keys(peStore.fieldSettings).map((key) => [key, []]));
+
+        // Immediate UI preview
+        peStore.selectedRoleType.fields.selected.splice(index, 0, {
+            field: availableField.field,
+            displayAs: availableField.displayAs,
+            icon: availableField.icon,
+            css: availableField.css,
+            fieldSettings: emptyFieldSettings,
+        });
+
+        // Timeout so the loading state renders nicely and the user can see the change
+        await new Promise((resolve) => {
+            setTimeout(resolve, 300);
+        });
+
+        // Queue action
+        await queueAction({ type: "ENABLE_FIELD", field, index });
+    }
+
+    /**
+     * Trigger a field to be disabled (removed from the selected fields)
+     * @param field - The key of the field to disable
+     */
+    async function disableField(field: string): Promise<void> {
+        if (!peStore.selectedRoleType) throw new Error("No role type selected");
+
+        // Queue action without immediately removing it from the UI so we can show a loading state
+        await queueAction({ type: "DISABLE_FIELD", field });
+    }
+
+    /**
+     * Resequence a field to a new index
+     * @param oldIndex - The original index of the field
+     * @param newIndex - The new index of the field
+     */
+    async function resequenceField(oldIndex: number, newIndex: number): Promise<void> {
+        if (!peStore.selectedRoleType) throw new Error("No role type selected");
+
+        // Update UI immediately
+        const [movedField] = peStore.selectedRoleType.fields.selected.splice(oldIndex, 1);
+        peStore.selectedRoleType.fields.selected.splice(newIndex, 0, movedField);
+
+        await queueAction({ type: "RESEQUENCE_FIELDS", fields: [movedField.field] });
+    }
+
+    return {
+        actionQueue,
+        actionErrors,
+        isFieldDisabled,
+        enableField,
+        disableField,
+        resequenceField,
+    };
+});

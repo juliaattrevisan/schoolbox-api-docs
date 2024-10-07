@@ -145,7 +145,7 @@ class Model
     /**
      * @return GenericCollection|null
      */
-    public function getavailabilityCampus(): ?GenericCollection
+    public function getAvailabilityCampus(): ?GenericCollection
     {
         return $this->availabilityCampus;
     }
@@ -155,7 +155,7 @@ class Model
      * @param GenericCollection|null $availabilityCampus
      * @return $this
      */
-    public function setavailabilityCampus(?GenericCollection $availabilityCampus): self
+    public function setAvailabilityCampus(?GenericCollection $availabilityCampus): self
     {
         $this->availabilityCampus = $availabilityCampus;
         return $this;

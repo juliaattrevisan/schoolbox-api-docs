@@ -3,7 +3,7 @@
  * A specific available item in the fields palette that can be clicked on or dragged into the selected fields
  */
 
-import { useProfileEditorStore } from "./store/profileEditorStore";
+import { useProfileEditorFieldsStore } from "./store/profileEditorFieldsStore";
 import type { ProfileEditorAvailableField } from "./profileEditorTypes";
 import PeFieldsIcon from "./pe-fields-icon.vue";
 
@@ -12,9 +12,9 @@ interface Props {
 }
 
 const props = defineProps<Props>();
-const peStore = useProfileEditorStore();
+const peFieldsStore = useProfileEditorFieldsStore();
 
-const disabled = window.Vue.computed(() => peStore.isFieldDisabled(props.field.field));
+const disabled = window.Vue.computed(() => peFieldsStore.isFieldDisabled(props.field.field));
 </script>
 
 <template>
@@ -23,7 +23,7 @@ const disabled = window.Vue.computed(() => peStore.isFieldDisabled(props.field.f
         :class="{ disabled }"
         :title="disabled ? 'This field is already selected' : undefined"
         :data-pe-prevent-drag="disabled ? true : undefined"
-        @click="peStore.addSelectedField(props.field.field)"
+        @click="peFieldsStore.enableField(props.field.field)"
     >
         <pe-fields-icon :field="props.field" />
         {{ props.field.displayAs }}
@@ -51,4 +51,3 @@ const disabled = window.Vue.computed(() => peStore.isFieldDisabled(props.field.f
     }
 }
 </style>
-./profileEditorTypes

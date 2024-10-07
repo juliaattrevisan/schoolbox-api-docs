@@ -8,8 +8,10 @@ import SortableWrapper from "@schoolboxVue/components/sortable-wrapper.vue";
 import { slideDownOnEnter, slideUpOnLeave } from "@schoolboxVue/transitions/transitions";
 import PeFieldsSelectedItem from "./pe-fields-selected-item.vue";
 import { useProfileEditorStore } from "./store/profileEditorStore";
+import { useProfileEditorFieldsStore } from "./store/profileEditorFieldsStore";
 
 const peStore = useProfileEditorStore();
+const peFieldsStore = useProfileEditorFieldsStore();
 
 const sortableOptions = window.Vue.computed(() => ({
     // Link the selected fields sortable to the available fields sortable so that we can drag between them
@@ -32,29 +34,26 @@ const sortableOptions = window.Vue.computed(() => ({
  * When the user resequences the fields
  * @param event The event that triggered the resequence
  */
-function resequenceFields(event: Sortable.SortableEvent): void {
+async function onResequenceField(event: Sortable.SortableEvent): Promise<void> {
     if (peStore.selectedRoleType === null) return;
     if (event.oldIndex === event.newIndex) return;
     if (event.oldIndex === undefined || event.newIndex === undefined) return;
 
-    const newFields = [...peStore.selectedRoleType.fields.selected];
-    const movedField = newFields.splice(event.oldIndex, 1)[0];
-    newFields.splice(event.newIndex, 0, movedField);
-    peStore.selectedRoleType.fields.selected = newFields;
+    await peFieldsStore.resequenceField(event.oldIndex, event.newIndex);
 }
 
 /**
  * When a field is added from the available fields
  * @param event The event that triggered the add
  */
-function onAddField(event: Sortable.SortableEvent): void {
+async function onAddField(event: Sortable.SortableEvent): Promise<void> {
     const field = event.item.getAttribute("data-pe-field");
     if (field === null) throw new Error("dragged item is missing a data-pe-field attribute");
 
-    peStore.addSelectedField(field, event.newIndex);
-
     // Send the actual item (controlled by vue) back into the palette to keep its reactivity
     event.clone.replaceWith(event.item);
+
+    await peFieldsStore.enableField(field, event.newIndex);
 }
 </script>
 
@@ -67,7 +66,7 @@ function onAddField(event: Sortable.SortableEvent): void {
             :transition-key="peStore.selectedRoleType.roleType"
             :transition-enter="slideDownOnEnter"
             :transition-leave="slideUpOnLeave"
-            @end="resequenceFields"
+            @end="onResequenceField"
             @add="onAddField"
         >
             <template #item="item">
