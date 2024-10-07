@@ -4,7 +4,7 @@
 
 import { defineStore } from "pinia";
 import type { Course } from "@schoolboxLibrary/types/Course";
-import { useSelectedStore } from "./coseSelectedStore";
+import { useSelectedStore } from "@schoolboxVue/store/useSelectedStore";
 
 export const useStore = defineStore("courseSelector", () => {
     /**

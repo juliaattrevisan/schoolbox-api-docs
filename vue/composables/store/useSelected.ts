@@ -1,18 +1,36 @@
 /**
- * To manage the list of currently selected courses
+ * To manage the state of any selected items
  */
 
-import { defineStore } from "pinia";
-import type { Course } from "@schoolboxLibrary/types/Course";
+import type { Ref, ComputedRef } from "vue";
 
-export const useSelectedStore = defineStore("courseSelector", () => {
-    const selected = window.Vue.ref<Course[]>([]); // the courses to display in the report
+type Item = {
+    id: number;
+};
+
+/**
+ * To manage the state of the selected items
+ * @returns - the functions to manage the selected items
+ */
+export function useSelected(): {
+    selected: Ref<Item[]>;
+    isEmpty: ComputedRef<boolean>;
+    hasItems: ComputedRef<boolean>;
+    add: (toAdd: Item | Item[]) => void;
+    remove: (toRemove: Item | Item[]) => void;
+    switchItem: (course: Item, isChecked: boolean) => void;
+    update: (updated: Item[]) => void;
+    empty: () => void;
+} {
+    const selected = window.Vue.ref<Item[]>([]); // the items selected
+    const isEmpty = window.Vue.computed(() => selected.value.length === 0); // whether the selected list is empty
+    const hasItems = window.Vue.computed(() => selected.value.length > 0); // whether the selected list has items
 
     /**
      * store any passed through properties
      * @param toAdd - the course or courses to add to the selected list
      */
-    function add(toAdd: Course | Course[]): void {
+    function add(toAdd: Item | Item[]): void {
         if (Array.isArray(toAdd)) {
             selected.value = [...selected.value, ...toAdd];
         } else {
@@ -24,7 +42,7 @@ export const useSelectedStore = defineStore("courseSelector", () => {
      * remove the course or courses from the selected list
      * @param toRemove - the course or courses to remove from the selected list
      */
-    function remove(toRemove: Course | Course[]): void {
+    function remove(toRemove: Item | Item[]): void {
         if (Array.isArray(toRemove)) {
             toRemove.forEach((courseToRemove) => {
                 selected.value = selected.value.filter((course) => course.id !== courseToRemove.id);
@@ -39,7 +57,7 @@ export const useSelectedStore = defineStore("courseSelector", () => {
      * @param course - the course to switch the selection status of
      * @param isChecked - whether the course is checked or not
      */
-    function switchCourse(course: Course, isChecked: boolean): void {
+    function switchItem(course: Item, isChecked: boolean): void {
         if (isChecked) {
             add(course);
         } else {
@@ -51,7 +69,7 @@ export const useSelectedStore = defineStore("courseSelector", () => {
      * completely update the courses with a new array
      * @param updated - the new array of courses
      */
-    function update(updated: Course[]): void {
+    function update(updated: Item[]): void {
         selected.value = [...updated];
     }
 
@@ -63,10 +81,13 @@ export const useSelectedStore = defineStore("courseSelector", () => {
     }
 
     return {
+        selected,
+        isEmpty,
+        hasItems,
         add,
         remove,
-        switchCourse,
+        switchItem,
         update,
         empty,
     };
-});
+}
