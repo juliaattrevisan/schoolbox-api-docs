@@ -26,15 +26,6 @@
         </div>
         <script src="{{ CDN_PREFIX }}/js/bundle/profileEditor.js?v={{ config.site_version }}"></script>
 
-        <script>
-            $(function() {
-                let hash = window.location.hash.substring(1);
-                hash = hash.charAt(0).toUpperCase() + hash.slice(1);
-
-                $('#editor-name').text(hash);
-            });
-        </script>
-
         <div class="small-12 island">
             <h2 class="subheader">postFieldSettings</h2>
             <section class="content">
