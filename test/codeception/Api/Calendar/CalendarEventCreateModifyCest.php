@@ -84,7 +84,7 @@ class CalendarEventCreateModifyCest
         // In created event, check keys with non-array values.
         $currentDateYmd = date('Y-m-d');
         $tomorrowDateYmd = date('Y-m-d', strtotime('+1 day'));
-        $timezoneOffset = date('P'); // E.g. '+10:00'.
+        $timezoneOffset = date('P'); // E.g. '+10:00', or '+11:00' during daylight savings time.
         $expectedValueByKey = [
             'allDay' => true,
             'efficacy' => 'self',
