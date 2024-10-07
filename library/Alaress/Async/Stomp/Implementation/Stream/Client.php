@@ -69,8 +69,8 @@ class Client implements IClient
             function () use ($deferred): void {
                 $deferred->resolve($this);
             },
-            function ($reason) use ($deferred): void {
-                $deferred->reject(new ConnectionException($reason));
+            function ($error) use ($deferred): void {
+                $deferred->reject($error);
             }
         );
         return $deferred->promise();
