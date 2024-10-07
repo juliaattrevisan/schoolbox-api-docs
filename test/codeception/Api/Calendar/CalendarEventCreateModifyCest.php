@@ -49,10 +49,9 @@ class CalendarEventCreateModifyCest
         // (even during daylight savings time).
 
         $currentDateDmY = date('d/m/Y');
-        $tomorrowDateDmY = date('d/m/Y', strtotime('+1 day'));
         $this->eventMinimalRequiredParams['endDate'] = $currentDateDmY;
         $this->eventMinimalRequiredParams['startDate'] = $currentDateDmY;
-        $this->eventMinimalRequiredParams['publishDate'] = "$tomorrowDateDmY 7:00pm";
+        $this->eventMinimalRequiredParams['publishDate'] = "$currentDateDmY 7:00pm";
     }
 
     /**
@@ -83,7 +82,6 @@ class CalendarEventCreateModifyCest
 
         // In created event, check keys with non-array values.
         $currentDateYmd = date('Y-m-d');
-        $tomorrowDateYmd = date('Y-m-d', strtotime('+1 day'));
         $timezoneOffset = date('P'); // E.g. '+10:00', or '+11:00' during daylight savings time.
         $expectedValueByKey = [
             'allDay' => true,
@@ -95,7 +93,7 @@ class CalendarEventCreateModifyCest
             'repeat_until' => "{$currentDateYmd}T23:59:59$timezoneOffset",
             'location' => '',
             'detail' => '',
-            'publishDate' => "{$tomorrowDateYmd}T19:00:00$timezoneOffset",
+            'publishDate' => "{$currentDateYmd}T19:00:00$timezoneOffset",
             'level' => Event::ACCESS_PERSONAL,
             'attendance' => EventAttendanceModel::LEVEL_NO_ATTENDANCE,
             'maxAttendees' => null,
@@ -144,10 +142,10 @@ class CalendarEventCreateModifyCest
      */
     public function testModifyEvent(ApiTester $i): void
     {
-        $twoDaysAheadDateYmd = date('Y-m-d', strtotime('+2 day'));
         $userJackColes      = $i->getUserByUsername('jcoles');
         $userJanaReed       = $i->getUserByUsername('jreed');
-        $timezoneOffset     = date('P'); // E.g. '+10:00'.
+        $currentDateYmd     = date('Y-m-d');
+        $timezoneOffset     = date('P'); // E.g. '+10:00', or '+11:00' during daylight savings time.
         $eventModifications = [
             // Fields that can be modified without affecting other fields.
             'author'        => ['id' => $userJanaReed->getId()],
@@ -155,7 +153,7 @@ class CalendarEventCreateModifyCest
             'title'         => 'Festivus',
             'location'      => 'This is where it all happens.',
             'detail'        => 'These are the details.',
-            'publishDate'   => "{$twoDaysAheadDateYmd}T00:00:00$timezoneOffset",
+            'publishDate'   => "{$currentDateYmd}T22:00:00$timezoneOffset",
             'maxAttendees'  => 5,
             'showAttendees' => true,
             'attendance'    => EventAttendanceModel::LEVEL_OPEN_ATTENDANCE,
