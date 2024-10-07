@@ -226,7 +226,7 @@ class Scheduler extends AbstractScheduler implements IConsumer
                     $e->getMessage()
                 )
             );
-            // Acknowledge the message, the user is deleted,
+            // Acknowledge the message,
             // we should be able to discard the message, it will never be sent again.
             $resolver->acknowledge();
             return;
