@@ -42,7 +42,7 @@ CREATE TABLE `profile_field_campus_availability` (
 CREATE TABLE `profile_field_roletype_visibility` (
     `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
     `profile_field_id` INT UNSIGNED NOT NULL,
-    `roletype` ENUM('staff', 'student', 'parent') NOT NULL,
+    `roletype` ENUM('staff', 'student', 'parent', 'self') NOT NULL,
     PRIMARY KEY (`id`),
     INDEX `profile_field_profile_field_roletype_visibility` (`profile_field_id` ASC),
     INDEX `fk_profile_field_roletype_visibility_idx` (`roletype` ASC)
