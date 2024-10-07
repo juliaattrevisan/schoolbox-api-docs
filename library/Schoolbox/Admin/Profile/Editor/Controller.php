@@ -41,6 +41,9 @@ class Controller extends Base
             $roleType = \Schoolbox\Role::STUDENT;
         }
 
+        /* Frontend wanted the full payload for all roletypes when we arrive at
+         * the index screen, rather than have the $roleType's payload specifically.
+         */
         $payload = (new Payload(
             $this->fieldMapper,
             $this->campusMapper
