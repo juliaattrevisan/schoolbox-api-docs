@@ -1,6 +1,6 @@
 INSERT INTO package (title, description, location, installed, hidden)
 VALUES ('Victorian Curriculum Version 2.0',
-        'The Victorian Curriculum v 2.0 package makes the core Learning Area, Capabilities and Cross-curriculum priorities available in the Schoolbox Curriculum mapping module',
+        'Attaches codes to the Victorian Curriculum (v2.0), to allow for mapping of the core Learning Areas, Capabilities and Cross-curriculum priorities, to learning resources.',
         'VictorianCurriculumV2', 0, 'false')
 ;
 
