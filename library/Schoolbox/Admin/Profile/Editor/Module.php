@@ -45,13 +45,16 @@ class Module extends BaseModule
             return $this->preloadField($params);
         };
 
+        $preloadRoleType = function ($params) {
+            return $this->preloadRoleType($params);
+        };
 
         $this->register('GET', '', 'getIndex', $perms);
         $this->register('POST', '/field/{roleType}/{fieldId}/remove', 'postFieldRemove', $perms, $preloadField);
         $this->register('POST', '/field/{roleType}/{fieldId}/add', 'postFieldAdd', $perms, $preloadField);
         $this->register('POST', '/field/{roleType}/{fieldId}/settings', 'postFieldSettings', $perms, $preloadField);
-        $this->register('POST', '/field/{roleType}/sequence', 'postFieldSequence', $perms);
-        $this->register('POST', '/field/{roleType}/nameformat', 'postNameFormat', $perms);
+        $this->register('POST', '/field/{roleType}/sequence', 'postFieldSequence', $perms, $preloadRoleType);
+        $this->register('POST', '/field/{roleType}/nameformat', 'postNameFormat', $perms, $preloadRoleType);
     }
 
 
@@ -62,9 +65,12 @@ class Module extends BaseModule
      * @return array
      * @throws \Schoolbox\Application\Exception\NotFound
      * @throws NotFound
+     * @throws \InvalidArgumentException
      */
     private function preloadField(array $params): array
     {
+        $roleType = $this->preloadRoleType($params['roleType']);
+
         try {
             $field = $this->getFieldMapper()->findOneByColumnList([
                 'roleType' => $params['roleType'],
@@ -79,12 +85,37 @@ class Module extends BaseModule
         }
 
         return [
-            'roleType' => $params['roleType'],
+            'roleType' => $roleType['roleType'],
             'field' => $field,
         ];
     }
 
 
+    /**
+     * Check that a valid and supported roletype was provided
+     *
+     * @param array $params
+     * @return array
+     * @throws NotFound
+     */
+    private function preloadRoleType(array $params): array
+    {
+        $roleType = $params['roleType'] ?? null;
+
+        if (!isset(Payload::CONFIG_ROLETYPE[$roleType])) {
+            throw new NotFound('Roletype not provided');
+        }
+
+        return [
+            'roleType' => $params['roleType'],
+        ];
+    }
+
+
+    /**
+     * @return Field\Mapper
+     * @throws \InvalidArgumentException
+     */
     public function getFieldMapper(): \Schoolbox\Admin\Profile\Editor\Field\Mapper
     {
         return $this->getMapperFactory()->get(\Schoolbox\Admin\Profile\Editor\Field\Mapper::class);

@@ -18,17 +18,6 @@ use Schoolbox\Mapper\Exception\Deleted;
 class Controller extends Base
 {
     /**
-     * These roletypes - and their name formats - are what we support.
-     * The GUEST roletype doesn't get a look-in.
-     */
-    private const CONFIG_ROLETYPE = [
-        \Schoolbox\Role::STUDENT => 'name_format_student',
-        \Schoolbox\Role::STAFF => 'name_format_staff',
-        \Schoolbox\Role::PARENT => 'name_format_parent',
-    ];
-
-
-    /**
      * Controller constructor.
      */
     public function __construct(
@@ -53,7 +42,7 @@ class Controller extends Base
 
         /* Check that $roletype was valid; if not, default to Student
          */
-        if (!isset(self::CONFIG_ROLETYPE[$roleType])) {
+        if (!isset(Payload::CONFIG_ROLETYPE[$roleType])) {
             $roleType = \Schoolbox\Role::STUDENT;
         }
 
@@ -83,16 +72,9 @@ class Controller extends Base
      * @param Field\Model $field The field to enable
      * @return void
      * @throws \InvalidArgumentException
-     * @throws \RuntimeException
      */
     public function postFieldAdd(string $roleType, Field\Model $field): void
     {
-        /* Check that $roleType was valid
-         */
-        if (!isset(self::CONFIG_ROLETYPE[$roleType])) {
-            throw new \RuntimeException('Invalid role type');
-        }
-
         try {
             /* When clicked to add, new fields are spawned at the top of the list,
              * forcing other fields down the screen.
@@ -158,16 +140,9 @@ class Controller extends Base
      * @param string $roleType The relevant role type
      * @param Field\Model $field The field to remove
      * @throws \InvalidArgumentException
-     * @throws \RuntimeException
      */
     public function postFieldRemove(string $roleType, Field\Model $field): void
     {
-        /* Check that $roleType was valid
-         */
-        if (!isset(self::CONFIG_ROLETYPE[$roleType])) {
-            throw new \RuntimeException('Invalid role type');
-        }
-
         try {
             $field->setEnabled(0);
             $this->fieldMapper->save($field);
@@ -221,16 +196,9 @@ class Controller extends Base
      * @param string $roleType The roletype to update
      * @param Field\Model $field  The field to update
      * @throws \InvalidArgumentException
-     * @throws \RuntimeException
      */
     public function postFieldSettings(string $roleType, Field\Model $field): void
     {
-        /* Check that $roleType was valid
-         */
-        if (!isset(self::CONFIG_ROLETYPE[$roleType])) {
-            throw new \RuntimeException('Invalid role type');
-        }
-
         try {
             $settings = $this->requestPost->get('fieldSettings');
 
@@ -328,12 +296,6 @@ class Controller extends Base
      */
     public function postFieldSequence(string $roleType): void
     {
-        /* Check that $roleType was valid
-         */
-        if (!isset(self::CONFIG_ROLETYPE[$roleType])) {
-            throw new \RuntimeException('Invalid role type');
-        }
-
         try {
             /** @var string[]|null $sequence - The new sequence of field IDs, in order */
             $sequence = $this->requestPost->get('sequence');
@@ -398,19 +360,12 @@ class Controller extends Base
      * @throws Exception
      * @throws Deleted
      * @throws \UnexpectedValueException
-     * @throws \RuntimeException
      */
     public function postNameFormat(string $roleType): void
     {
-        /* Check that $roleType was valid
-         */
-        if (!isset(self::CONFIG_ROLETYPE[$roleType])) {
-            throw new \RuntimeException('Invalid role type');
-        }
-
         /* Figure out which roletype config to update
          */
-        $configName = self::CONFIG_ROLETYPE[$roleType];
+        $configName = Payload::CONFIG_ROLETYPE[$roleType];
         $nameFormat = $this->requestPost->get('nameFormat');
 
         /* No format? No trabajo; exit early

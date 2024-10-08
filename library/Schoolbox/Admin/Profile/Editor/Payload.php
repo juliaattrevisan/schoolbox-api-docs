@@ -16,6 +16,17 @@ use Schoolbox\Role;
 class Payload
 {
     /**
+     * These roletypes - and their name formats - are what we support.
+     * The GUEST roletype doesn't get a look-in.
+     */
+    public const CONFIG_ROLETYPE = [
+        Role::STUDENT => 'name_format_student',
+        Role::STAFF => 'name_format_staff',
+        Role::PARENT => 'name_format_parent',
+    ];
+
+
+    /**
      * A special case field - it's mandatory and always appears in everyone's
      * profile screen when administering
      */
