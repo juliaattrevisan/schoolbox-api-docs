@@ -16,6 +16,7 @@ export const useSearchStore = defineStore(`searchStore`, () => {
     const isLoading = window.Vue.ref(false); // to notify that an action is taking place,
     const query = window.Vue.ref(""); // current search term to filter the active nodes
     const results = window.Vue.ref<Result[]>([]); // nodes returned in the current search results
+    const hasSearched = window.Vue.ref(false); // to show that a search has been made
 
     /**
      * To only start showing search results once enough characters
@@ -53,6 +54,7 @@ export const useSearchStore = defineStore(`searchStore`, () => {
      */
     async function search(): Promise<void> {
         try {
+            hasSearched.value = true;
             const response = await fetch(`${endpoint}${query.value}`, {
                 method: "GET",
                 headers: {
@@ -75,6 +77,16 @@ export const useSearchStore = defineStore(`searchStore`, () => {
     }, DEBOUNCE_AMOUNT);
 
     /**
+     * clear the current search
+     */
+    function clear(): void {
+        query.value = "";
+        results.value = [];
+        isLoading.value = false;
+        hasSearched.value = false;
+    }
+
+    /**
      * start searching once the search is active, watching the query string for input
      */
     window.Vue.watch(
@@ -83,18 +95,11 @@ export const useSearchStore = defineStore(`searchStore`, () => {
             if (isActive.value) {
                 enableSearch();
                 await debounceSearch();
+            } else if (hasSearched.value) {
+                clear();
             }
         },
     );
-
-    /**
-     * clear the current search
-     */
-    function clear(): void {
-        query.value = "";
-        results.value = [];
-        isLoading.value = false;
-    }
 
     return {
         isLoading,

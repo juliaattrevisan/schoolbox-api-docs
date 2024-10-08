@@ -35,13 +35,33 @@ function animateHeight(targetHeight: number): void {
     });
 }
 
+/**
+ * to animate the search results
+ */
+async function animateResults(): Promise<void> {
+    await window.Vue.nextTick();
+    const targetHeight = (searchResultsEl.value as HTMLDivElement).offsetHeight;
+    animateHeight(targetHeight);
+}
+
+/**
+ * results have been preset prior to search
+ */
 window.Vue.onMounted(async () => {
     if (store.results.length > 0) {
-        await window.Vue.nextTick(); // I don't know why this is needed yet...
-        const targetHeight = (searchResultsEl.value as HTMLDivElement).offsetHeight;
-        animateHeight(targetHeight);
+        await animateResults();
     }
 });
+
+/**
+ * to slide up and down the search results
+ */
+window.Vue.watch(
+    () => store.isActive,
+    async () => {
+        await animateResults();
+    },
+);
 
 /**
  * to slide up and down the search results
@@ -52,10 +72,7 @@ window.Vue.watch(
         if (newResults.length === oldResults.length) {
             return;
         }
-        await window.Vue.nextTick();
-        await window.Vue.nextTick(); // I don't know why this is needed yet...
-        const targetHeight = (searchResultsEl.value as HTMLDivElement).offsetHeight;
-        animateHeight(targetHeight);
+        await animateResults();
     },
 );
 
@@ -65,13 +82,7 @@ window.Vue.watch(
  * @returns {boolean} - whether to show the select all option
  */
 const showSelectAll = window.Vue.computed(() => {
-    if (props.isSingleSelect) {
-        return false;
-    }
-    if (store.results.length <= 1) {
-        return false;
-    }
-    return true;
+    return !props.isSingleSelect && store.results.length <= 1;
 });
 
 /**
@@ -85,11 +96,8 @@ function onSelected(result: Result): void {
 <template>
     <div ref="searchResultsContainerEl" class="search-results-container">
         <div ref="searchResultsEl" class="search-results">
-            <!-- <template v-if="store.isActive"> -->
             <div v-if="store.isLoading" class="search-status">Searching for results....</div>
-            <div v-else-if="store.results.length === 0" class="search-status">
-                No results found for your current search.
-            </div>
+            <div v-else-if="store.hasNoResults" class="search-status">No results found for your current search.</div>
             <template v-else>
                 <search-select-select-all v-if="showSelectAll" />
                 <search-select-result
@@ -103,7 +111,6 @@ function onSelected(result: Result): void {
                     @select="onSelected"
                 />
             </template>
-            <!-- </template> -->
         </div>
         <!-- .search-results -->
     </div>
