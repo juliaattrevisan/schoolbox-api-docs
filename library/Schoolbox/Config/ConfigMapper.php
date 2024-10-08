@@ -323,6 +323,13 @@ class ConfigMapper extends Mapper
      */
     public const NAME_MAINTENANCE_MODE = 'maintenance_mode';
 
+    /* Profile Editor name formats
+     */
+    public const NAME_NAME_FORMAT_STUDENT = 'name_format_student';
+    public const NAME_NAME_FORMAT_STAFF = 'name_format_staff';
+    public const NAME_NAME_FORMAT_PARENT = 'name_format_parent';
+
+
     /**
      * Isams specific
      */
