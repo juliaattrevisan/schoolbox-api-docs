@@ -2,6 +2,11 @@ import { defineStore } from "pinia";
 import { cloneDeep } from "lodash";
 import { until } from "@vueuse/core";
 import { useProfileEditorStore } from "./profileEditorStore";
+import type {
+    ProfileEditorSelectedField,
+    ProfileEditorFieldSettingKey,
+    ProfileEditorFieldSettingOption,
+} from "../types/profileEditorTypes";
 
 type EnableFieldAction = {
     type: "ENABLE_FIELD";
@@ -14,6 +19,11 @@ type DisableFieldAction = {
     field: string; // The field to disable
 };
 
+type UpdateFieldSettingsAction = {
+    type: "UPDATE_FIELD_SETTINGS";
+    field: string; // The field to update
+};
+
 type ResequenceFieldsAction = {
     type: "RESEQUENCE_FIELDS";
     // The fields that are "targeted" by the resequence action
@@ -22,7 +32,7 @@ type ResequenceFieldsAction = {
 };
 
 // A type of action that can be queued
-type FieldAction = EnableFieldAction | DisableFieldAction | ResequenceFieldsAction;
+type FieldAction = EnableFieldAction | DisableFieldAction | UpdateFieldSettingsAction | ResequenceFieldsAction;
 
 // An action that is currently in the queue, with additional metadata to keep track of it
 type QueuedFieldAction = FieldAction & {
@@ -159,6 +169,37 @@ export const useProfileEditorFieldsStore = defineStore("profileEditorFieldsStore
     }
 
     /**
+     * Process updating field settings for a specific field after ensuring all prior actions are completed
+     * @param field - The key of the field to update
+     */
+    async function processUpdateFieldSettings(field: string): Promise<void> {
+        if (!peStore.selectedRoleType || !peStore.savedSelectedRoleType) return;
+
+        const endpoint = peStore.endpoints.adminProfileEditorPostFieldSettings
+            .replace("{roleType}", peStore.selectedRoleType.roleType)
+            .replace("{fieldId}", field);
+
+        const currentField = peStore.selectedRoleType.fields.selected.find((f) => f.field === field);
+        if (!currentField) return;
+
+        const response = await fetchProfileEditorEndpoint(endpoint, {
+            method: "POST",
+            body: JSON.stringify({ fieldSettings: currentField.fieldSettings }),
+            headers: { "Content-Type": "application/json" },
+        });
+
+        if (!response.success) {
+            actionErrors.value[field] = response.message ?? "An unknown error occurred";
+            return;
+        }
+
+        const savedField = peStore.savedSelectedRoleType.fields.selected.find((f) => f.field === field);
+        if (savedField) {
+            savedField.fieldSettings = cloneDeep(currentField.fieldSettings);
+        }
+    }
+
+    /**
      * Process resequencing fields after ensuring all prior actions are completed
      * @param fields - The fields relevant to the resequence action (for error reporting purposes, not used to resequence)
      */
@@ -204,6 +245,9 @@ export const useProfileEditorFieldsStore = defineStore("profileEditorFieldsStore
                 break;
             case "DISABLE_FIELD":
                 await processDisableField(action.field);
+                break;
+            case "UPDATE_FIELD_SETTINGS":
+                await processUpdateFieldSettings(action.field);
                 break;
             case "RESEQUENCE_FIELDS":
                 await processResequenceFields(action.fields);
@@ -321,6 +365,14 @@ export const useProfileEditorFieldsStore = defineStore("profileEditorFieldsStore
     }
 
     /**
+     * Trigger updating field settings
+     * @param field - The key of the field to update
+     */
+    async function saveFieldSettings(field: string): Promise<void> {
+        await queueAction({ type: "UPDATE_FIELD_SETTINGS", field });
+    }
+
+    /**
      * Resequence a field to a new index
      * @param oldIndex - The original index of the field
      * @param newIndex - The new index of the field
@@ -335,12 +387,69 @@ export const useProfileEditorFieldsStore = defineStore("profileEditorFieldsStore
         await queueAction({ type: "RESEQUENCE_FIELDS", fields: [movedField.field] });
     }
 
+    /**
+     * Whether the settings for a given field are currently unsaved
+     * @param field - The field to check
+     * @returns true if the field settings are unsaved, false otherwise
+     */
+    function isFieldSettingsUnsaved(field: string): boolean {
+        if (peStore.selectedRoleType === null) return false;
+        if (peStore.savedSelectedRoleType === null) return false;
+
+        const selectedField = peStore.selectedRoleType.fields.selected.find((f) => f.field === field);
+        const savedField = peStore.savedSelectedRoleType.fields.selected.find((f) => f.field === field);
+
+        // If the field itself hasn't been saved, then treat the settings as saved for now
+        if (selectedField === undefined || savedField === undefined) return false;
+
+        // Check if the field settings are different, each setting list *should* be sorted, so we can compare them directly
+        return Object.keys(selectedField.fieldSettings).some(
+            (key) => JSON.stringify(selectedField.fieldSettings[key]) !== JSON.stringify(savedField.fieldSettings[key]),
+        );
+    }
+
+    /**
+     * Update the field settings for a selected field
+     * Note, this does NOT persist the changes to the server - use saveFieldSettings for that
+     * @param field - The key of the field to update
+     * @param fieldSettingKey - The key of the field setting to update
+     * @param fieldSettingOptionId - The id of the option to set
+     * @param isSelected - Whether the option is selected or deselected
+     */
+    function updateFieldSettingOption(
+        field: ProfileEditorSelectedField["field"],
+        fieldSettingKey: ProfileEditorFieldSettingKey,
+        fieldSettingOptionId: ProfileEditorFieldSettingOption["id"],
+        isSelected: boolean,
+    ): void {
+        if (peStore.selectedRoleType === null) throw new Error("No role type selected");
+
+        const selectedField = peStore.selectedRoleType.fields.selected.find((f) => f.field === field);
+        if (selectedField === undefined) throw new Error(`Field ${field} not found`);
+
+        // Always filter the settings to avoid duplicates
+        const filteredSettings = selectedField.fieldSettings[fieldSettingKey].filter(
+            (id) => id !== fieldSettingOptionId,
+        );
+
+        // Add the setting if it is selected
+        if (isSelected) {
+            filteredSettings.push(fieldSettingOptionId);
+        }
+
+        filteredSettings.sort(); // Sort the settings to ensure consistency and allow for easier comparison
+        selectedField.fieldSettings[fieldSettingKey] = filteredSettings;
+    }
+
     return {
         actionQueue,
         actionErrors,
         isFieldDisabled,
         enableField,
         disableField,
+        saveFieldSettings,
         resequenceField,
+        isFieldSettingsUnsaved,
+        updateFieldSettingOption,
     };
 });

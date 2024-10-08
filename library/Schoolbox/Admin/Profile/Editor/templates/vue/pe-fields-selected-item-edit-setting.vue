@@ -4,11 +4,12 @@
  */
 
 import { useProfileEditorStore } from "./store/profileEditorStore";
+import { useProfileEditorFieldsStore } from "./store/profileEditorFieldsStore";
 import type {
     ProfileEditorFieldSettingKey,
     ProfileEditorFieldSettingOption,
     ProfileEditorSelectedField,
-} from "./profileEditorTypes";
+} from "./types/profileEditorTypes";
 
 interface Props {
     field: ProfileEditorSelectedField;
@@ -17,6 +18,7 @@ interface Props {
 
 const props = defineProps<Props>();
 const peStore = useProfileEditorStore();
+const peFieldsStore = useProfileEditorFieldsStore();
 
 /**
  * Get the key to use in the label:for attribute for a field setting option
@@ -43,20 +45,7 @@ const fieldSettingDefinition = window.Vue.computed(() => {
  * @param isChecked - whether the option is checked
  */
 function onFieldSettingOptionChange(fieldSettingOption: ProfileEditorFieldSettingOption, isChecked: boolean): void {
-    if (peStore.selectedRoleType === null) return;
-
-    const storeField = peStore.selectedRoleType.fields.selected.find((field) => field.field === props.field.field);
-    if (storeField === undefined) throw new Error("Field not found in store");
-
-    const filteredSettings = storeField.fieldSettings[props.fieldSettingKey].filter(
-        (id) => id !== fieldSettingOption.id,
-    );
-
-    if (isChecked) {
-        storeField.fieldSettings[props.fieldSettingKey] = [...filteredSettings, fieldSettingOption.id];
-    } else {
-        storeField.fieldSettings[props.fieldSettingKey] = filteredSettings;
-    }
+    peFieldsStore.updateFieldSettingOption(props.field.field, props.fieldSettingKey, fieldSettingOption.id, isChecked);
 }
 
 window.Vue.onMounted(() => {

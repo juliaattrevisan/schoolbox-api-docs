@@ -2,8 +2,8 @@
 
 import type { Meta, StoryObj } from "@storybook/vue3";
 // import { http, HttpResponse } from "msw";
-import ProfileEditor from "@schoolboxLibrary/Admin/Profile/Editor/vue/profile-editor.vue";
-import type { ProfileEditorEndpoints } from "@schoolboxLibrary/Admin/Profile/Editor/vue/profileEditorTypes";
+import ProfileEditor from "@schoolboxLibrary/Admin/Profile/Editor/templates/vue/profile-editor.vue";
+import type { ProfileEditorEndpoints } from "@schoolboxLibrary/Admin/Profile/Editor/templates/vue/types/profileEditorTypes";
 import { mockData } from "./peMockData";
 
 /**

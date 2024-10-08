@@ -4,7 +4,7 @@
  */
 import { capitalizeFirstLetter } from "@js/util/stringUtils";
 import { useProfileEditorStore } from "./store/profileEditorStore";
-import type { ProfileEditorRoleType } from "./profileEditorTypes";
+import type { ProfileEditorRoleType } from "./types/profileEditorTypes";
 
 const peStore = useProfileEditorStore();
 
