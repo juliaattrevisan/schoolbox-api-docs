@@ -12,6 +12,8 @@ namespace Schoolbox\Admin\Profile\Editor;
 
 use Alaress\Web\Controller\Base;
 use Schoolbox\Admin\Navigation\Subnav;
+use Schoolbox\Mapper\Exception;
+use Schoolbox\Mapper\Exception\Deleted;
 
 class Controller extends Base
 {
@@ -23,6 +25,7 @@ class Controller extends Base
         private Field\Availability\Campus\Mapper $availabilityCampusMapper,
         private Field\Visibility\Mapper $visibilityMapper,
         private \Schoolbox\CampusMapper $campusMapper,
+        private \Schoolbox\Config\ConfigMapper $configMapper
     ) {
     }
 
@@ -352,9 +355,24 @@ class Controller extends Base
      *
      * @param string $roleType
      * @return void
+     * @throws \PDOException
+     * @throws Exception
+     * @throws Deleted
+     * @throws \UnexpectedValueException
      */
     public function postNameFormat(string $roleType): void
     {
-        
+        $nameFormat = $this->requestPost->get('nameFormat');
+
+        /* No format? No trabajo; exit early
+         */
+        if (null === $nameFormat) {
+            return;
+        }
+
+        $config = $this->configMapper->findOneByColumn('name', 'name_format_student')
+            ->setValue($nameFormat);
+
+        $this->configMapper->save($config);
     }
 }

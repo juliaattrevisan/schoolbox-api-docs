@@ -100,7 +100,8 @@ class Module extends BaseModule
             $this->getMapperFactory()->get(\Schoolbox\Admin\Profile\Editor\Field\Mapper::class),
             $this->getMapperFactory()->get(\Schoolbox\Admin\Profile\Editor\Field\Availability\Campus\Mapper::class),
             $this->getMapperFactory()->get(\Schoolbox\Admin\Profile\Editor\Field\Visibility\Mapper::class),
-            $this->getMapperFactory()->get(\Schoolbox\CampusMapper::class)
+            $this->getMapperFactory()->get(\Schoolbox\CampusMapper::class),
+            $this->getMapperFactory()->get(\Schoolbox\Config\ConfigMapper::class),
         );
     }
 
