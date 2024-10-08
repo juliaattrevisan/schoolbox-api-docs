@@ -103,7 +103,7 @@ class Controller extends Base
                     /* Portrait Image is always sequence zero
                      */
                     $currentField->setSequence(0);
-                } else if ($currentField->getSequence() >= $index){
+                } elseif ($currentField->getSequence() >= $index){
                     /* Increment by one
                      */
                     $currentField->setSequence($currentField->getSequence() + 1);
