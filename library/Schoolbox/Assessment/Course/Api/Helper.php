@@ -200,7 +200,6 @@ class Helper
         // obtain curriculum codes...
         $codes = $folder->getCurriculumNodes()?->getPropertyValues('code');
 
-        var_dump($codes);
         // It appears that the curriculumNodes is never null, however it is nullable
         // so we will do a sanity check and exit early if it is ever null
         if (null === $codes) {
