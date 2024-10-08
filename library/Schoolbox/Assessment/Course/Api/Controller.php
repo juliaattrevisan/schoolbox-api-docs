@@ -13,6 +13,7 @@ namespace Schoolbox\Assessment\Course\Api;
 use Alaress\Web\Controller\Base;
 use Crell\ApiProblem\ApiProblem;
 use Schoolbox\Collection;
+use Schoolbox\Curriculum\Api\Translator\ModelToArray;
 use Schoolbox\Learning\Course\DataModel\Specification\Mapper as CourseSpecificationMapper;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Mapper as UnitSpecificationMapper;
 use Schoolbox\Learning\Course\DataModel\Specification\Translator as CourseTranslator;
@@ -72,7 +73,18 @@ class Controller extends Base
         /* Set the maximum parent lookup to 10 should be reasonable to reach all the
          * ancestors
          */
-        $folderTranslator = new Folder\Translator\ModelToArray\LinkOnly(10);
+        $curriculumTranslator = new ModelToArray(
+            $this->routeGenerator,
+            $this->authorizer,
+            $this->getUser(),
+            0,
+            0,
+            null
+        );
+        $folderTranslator = new Folder\Translator\ModelToArray\ModelToArray(
+            $curriculumTranslator,
+            10
+        );
         $translator = new CourseTranslator\ModelToArray(
             $this->routeGenerator,
             $this->authorizer,
