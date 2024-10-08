@@ -6,6 +6,7 @@
 import { slideDownOnEnter, slideUpOnLeave } from "@schoolboxVue/transitions/transitions";
 import PeFieldsSelectedItemEditSetting from "./pe-fields-selected-item-edit-setting.vue";
 import { useProfileEditorStore } from "./store/profileEditorStore";
+import { useProfileEditorFieldsStore } from "./store/profileEditorFieldsStore";
 import type { ProfileEditorSelectedField } from "./types/profileEditorTypes";
 
 interface Props {
@@ -15,6 +16,7 @@ interface Props {
 
 const props = defineProps<Props>();
 const peStore = useProfileEditorStore();
+const peFieldsStore = useProfileEditorFieldsStore();
 const emit = defineEmits(["close"]);
 
 /**
@@ -32,11 +34,7 @@ const isUpdating = window.Vue.ref(false);
  */
 async function onUpdateClicked(): Promise<void> {
     isUpdating.value = true;
-
-    await new Promise((resolve) => {
-        setTimeout(resolve, 500);
-    });
-
+    await peFieldsStore.saveFieldSettings(props.field.field);
     isUpdating.value = false;
 
     emit("close");
@@ -55,12 +53,16 @@ async function onUpdateClicked(): Promise<void> {
                         :field-setting-key="fieldSettingKey"
                     />
                 </div>
-                <input
-                    type="submit"
-                    :value="isUpdating ? 'Updating...' : 'Update'"
-                    :disabled="isUpdating"
-                    @click="onUpdateClicked"
-                />
+                <Transition @enter="slideDownOnEnter" @leave="slideUpOnLeave">
+                    <div v-if="peFieldsStore.isFieldSettingsUnsaved(props.field.field)">
+                        <input
+                            type="submit"
+                            :value="isUpdating ? 'Updating...' : 'Update'"
+                            :disabled="isUpdating"
+                            @click="onUpdateClicked"
+                        />
+                    </div>
+                </Transition>
             </section>
         </div>
     </Transition>
