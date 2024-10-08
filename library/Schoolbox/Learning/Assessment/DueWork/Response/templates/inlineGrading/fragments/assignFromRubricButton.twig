@@ -69,16 +69,18 @@
          * Update the Grade based on the grid summation and existence of a
          * customised human-provided value
          *
-         * Update the mark input field with current rubric total if the total is different from the input val
-         * but ONLY if we haven't already customised the mark - don't clobber!
+         * Update the mark input field with current rubric total only if:
+         *  - the current rubric total is non-blank (it will be blank if no points have been set on rubric values) AND
+         *  - the total is different from the input val AND
+         *  - we haven't already customised the mark - don't clobber!
          *
          * @param rubricSum string
          * @return void
          */
         function updateGrade(rubricSum) {
-            var currentMarkInput = $status.find(markInputSelector).val();
+            var currentMarkInputValue = $status.find(markInputSelector).val();
 
-            if (rubricSum !== currentMarkInput && (!wasCustomised()) ) {
+            if (rubricSum !== '' && rubricSum !== currentMarkInputValue && (!wasCustomised()) ) {
                 $status.find(markInputSelector).val(rubricSum);
             }
         }
@@ -122,12 +124,6 @@
          *
          * This varies from isCustomGrade() in that it remembers historically that you've entered
          * a grade manually, rather than circumstantially based on grid summation
-         *
-         * TODO: Verify
-         * Prevents a clobbering when you cycle through the grid selections, whose summation
-         * just so happens to match a human-defined var. This flag explicitly states that a custom
-         * grade was provided, even if it matches the current grid selection's summation it won't
-         * be overridden by the next selection
          *
          * @return bool
          */
