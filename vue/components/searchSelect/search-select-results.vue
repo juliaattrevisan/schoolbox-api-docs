@@ -7,12 +7,10 @@ import gsap from "gsap";
 import type { Result } from "./types/Result";
 import SearchSelectSelectAll from "./search-select-select-all.vue";
 import SearchSelectResult from "./search-select-result.vue";
+import { useSearchStore } from "./store/searchStore";
 
 interface Props {
-    query: string; // the search query
-    isSearching: boolean; // to notify of searching
     isSingleSelect: boolean; // whether only one result can be selected
-    results: Result[]; // the results returned from the search
     selected: Result[]; // the selected results
 }
 
@@ -22,6 +20,7 @@ const emit = defineEmits<{
     select: [result: Result];
 }>();
 
+const store = useSearchStore();
 const searchResultsContainerEl = window.Vue.ref<HTMLDivElement | null>(null);
 const searchResultsEl = window.Vue.ref<HTMLDivElement | null>(null);
 
@@ -37,7 +36,7 @@ function animateHeight(targetHeight: number): void {
 }
 
 window.Vue.onMounted(async () => {
-    if (props.results.length > 0) {
+    if (store.results.length > 0) {
         await window.Vue.nextTick(); // I don't know why this is needed yet...
         const targetHeight = (searchResultsEl.value as HTMLDivElement).offsetHeight;
         animateHeight(targetHeight);
@@ -48,7 +47,7 @@ window.Vue.onMounted(async () => {
  * to slide up and down the search results
  */
 window.Vue.watch(
-    () => props.results,
+    () => store.results,
     async (newResults, oldResults) => {
         if (newResults.length === oldResults.length) {
             return;
@@ -69,7 +68,7 @@ const showSelectAll = window.Vue.computed(() => {
     if (props.isSingleSelect) {
         return false;
     }
-    if (props.results.length <= 1) {
+    if (store.results.length <= 1) {
         return false;
     }
     return true;
@@ -86,24 +85,25 @@ function onSelected(result: Result): void {
 <template>
     <div ref="searchResultsContainerEl" class="search-results-container">
         <div ref="searchResultsEl" class="search-results">
-            <div v-if="props.isSearching" class="search-status">Searching for results....</div>
-            <div v-else-if="props.results.length === 0 && props.selected.length === 0" class="search-status">
+            <!-- <template v-if="store.isActive"> -->
+            <div v-if="store.isLoading" class="search-status">Searching for results....</div>
+            <div v-else-if="store.results.length === 0" class="search-status">
                 No results found for your current search.
             </div>
             <template v-else>
                 <search-select-select-all v-if="showSelectAll" />
                 <search-select-result
-                    v-for="result in props.results"
+                    v-for="result in store.results"
                     :key="result.id"
                     :data-test="`search-select-result-${result.id}`"
-                    :query="query"
                     :selected="selected"
-                    :results="props.results"
+                    :results="store.results"
                     :result="result"
                     :is-single-select="props.isSingleSelect"
                     @select="onSelected"
                 />
             </template>
+            <!-- </template> -->
         </div>
         <!-- .search-results -->
     </div>
