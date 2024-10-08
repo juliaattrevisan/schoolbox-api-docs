@@ -159,7 +159,7 @@ class Helper
 
         foreach (array_reverse($lineage->getAll()) as $parent) {
             //Set parent to null when reached the faculty root folder
-            if ($parent->getParent()->getName() === null) {
+            if ($parent->getParent()?->getName() === null) {
                 $parent->setParent(null);
             }
             $return->setParent($parent);
@@ -200,6 +200,7 @@ class Helper
         // obtain curriculum codes...
         $codes = $folder->getCurriculumNodes()?->getPropertyValues('code');
 
+        var_dump($codes);
         // It appears that the curriculumNodes is never null, however it is nullable
         // so we will do a sanity check and exit early if it is ever null
         if (null === $codes) {
