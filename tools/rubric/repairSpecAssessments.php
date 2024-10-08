@@ -834,7 +834,13 @@ $kernel->run(new class extends App {
             // UNION
             // Select submission boxes
             //    linked to assessments whose context is
-            //    a project within a course unit specification linked to the given folder.
+            //    a project within a course unit specification linked to the given folder
+            // UNION
+            // Select submission boxes whose context is
+            //    a course unit implementation linked to the given folder
+            // UNION
+            // Select submission boxes whose context is
+            //    a project within a course unit implementation linked to the given folder.
             'SELECT sb.id
             FROM submission_box sb
             JOIN assessment a ON sb.assessment_id = a.id
@@ -849,7 +855,25 @@ $kernel->run(new class extends App {
             JOIN project p ON pa.project_id = p.id
             JOIN assessment_course_unit_specification acus ON p.assessment_id = acus.assessment_id
             JOIN course_unit_specification cus ON acus.course_unit_specification_id = cus.id
-            WHERE cus.folder_id = :folderId',
+            WHERE cus.folder_id = :folderId
+            UNION
+            SELECT sb.id
+            FROM submission_box sb
+            JOIN assessment a ON sb.assessment_id = a.id
+            JOIN assessment_course_unit_implementation acui ON a.id = acui.assessment_id
+            JOIN course_unit_implementation cui ON acui.course_unit_implementation_id = cui.id
+            JOIN course_implementation ci ON cui.course_implementation_id = ci.id
+            WHERE ci.folder_id = :folderId
+            UNION
+            SELECT sb.id
+            FROM submission_box sb
+            JOIN assessment a ON sb.assessment_id = a.id
+            JOIN project_assessment pa ON a.id = pa.assessment_id
+            JOIN project p ON pa.project_id = p.id
+            JOIN assessment_course_unit_implementation acui ON p.assessment_id = acui.assessment_id
+            JOIN course_unit_implementation cui ON acui.course_unit_implementation_id = cui.id
+            JOIN course_implementation ci ON cui.course_implementation_id = ci.id
+            WHERE ci.folder_id = :folderId',
             ['folderId' => $unitFolderId]
         )->fetchAll(PDO::FETCH_COLUMN);
 
