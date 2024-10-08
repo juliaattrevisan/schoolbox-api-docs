@@ -51,7 +51,7 @@ class Module extends BaseModule
         return new Controller(
             CourseSpecificationMapper::getInstance(),
             FolderMapper::getInstance(),
-            Access::getInstance(),
+            $this->getMapperFactory()->get(Access::class),
             UnitSpecificationMapper::getInstance(),
         );
     }
