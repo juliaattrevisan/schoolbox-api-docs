@@ -1,6 +1,6 @@
 import { defineStore } from "pinia";
 import { cloneDeep } from "lodash";
-import type { ProfileEditorRoleType, ProfileEditorEndpoints, ProfileEditorPayload } from "../profileEditorTypes";
+import type { ProfileEditorRoleType, ProfileEditorEndpoints, ProfileEditorPayload } from "../types/profileEditorTypes";
 
 export const useProfileEditorStore = defineStore("profileEditorStore", () => {
     const isLoading = window.Vue.ref<boolean>(true);

@@ -6,7 +6,7 @@
 import { slideDownOnEnter, slideUpOnLeave } from "@schoolboxVue/transitions/transitions";
 import PeFieldsSelectedItemEditSetting from "./pe-fields-selected-item-edit-setting.vue";
 import { useProfileEditorStore } from "./store/profileEditorStore";
-import type { ProfileEditorSelectedField } from "./profileEditorTypes";
+import type { ProfileEditorSelectedField } from "./types/profileEditorTypes";
 
 interface Props {
     field: ProfileEditorSelectedField;

@@ -4,7 +4,7 @@
  * This represents a different way the field may show on the actual profile itself
  */
 
-import type { ProfileEditorAvailableField } from "./profileEditorTypes";
+import type { ProfileEditorAvailableField } from "./types/profileEditorTypes";
 
 interface Props {
     field: ProfileEditorAvailableField;

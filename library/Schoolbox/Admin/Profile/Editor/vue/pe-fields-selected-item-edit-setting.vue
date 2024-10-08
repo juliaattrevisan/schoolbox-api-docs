@@ -8,7 +8,7 @@ import type {
     ProfileEditorFieldSettingKey,
     ProfileEditorFieldSettingOption,
     ProfileEditorSelectedField,
-} from "./profileEditorTypes";
+} from "./types/profileEditorTypes";
 
 interface Props {
     field: ProfileEditorSelectedField;

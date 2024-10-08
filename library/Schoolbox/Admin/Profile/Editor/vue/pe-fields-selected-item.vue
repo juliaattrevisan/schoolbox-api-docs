@@ -11,7 +11,7 @@ import PeFieldsSelectedItemEdit from "./pe-fields-selected-item-edit.vue";
 import PeFieldsSelectedItemRemove from "./pe-fields-selected-item-remove.vue";
 import PeFieldsSelectedItemError from "./pe-fields-selected-item-error.vue";
 import PeFieldsIcon from "./pe-fields-icon.vue";
-import type { ProfileEditorAvailableField, ProfileEditorSelectedField } from "./profileEditorTypes";
+import type { ProfileEditorAvailableField, ProfileEditorSelectedField } from "./types/profileEditorTypes";
 
 interface Props {
     // Allow an available field to be passed in as well so we can use this component to also render the drag preview

@@ -7,7 +7,7 @@ import PePortraitImage from "./pe-portrait-image.vue";
 import PeFields from "./pe-fields.vue";
 import PeRoleType from "./pe-role-type.vue";
 import { useProfileEditorStore } from "./store/profileEditorStore";
-import type { ProfileEditorEndpoints, ProfileEditorPayload } from "./profileEditorTypes";
+import type { ProfileEditorEndpoints, ProfileEditorPayload } from "./types/profileEditorTypes";
 
 interface Props {
     endpoints: ProfileEditorEndpoints;

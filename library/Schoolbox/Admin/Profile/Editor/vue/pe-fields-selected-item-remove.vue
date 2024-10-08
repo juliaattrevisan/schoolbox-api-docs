@@ -5,7 +5,7 @@
 
 import { slideDownOnEnter, slideUpOnLeave } from "@schoolboxVue/transitions/transitions";
 import { useProfileEditorFieldsStore } from "./store/profileEditorFieldsStore";
-import type { ProfileEditorSelectedField } from "./profileEditorTypes";
+import type { ProfileEditorSelectedField } from "./types/profileEditorTypes";
 
 interface Props {
     field: ProfileEditorSelectedField;

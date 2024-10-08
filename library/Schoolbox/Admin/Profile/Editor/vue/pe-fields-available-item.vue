@@ -4,7 +4,7 @@
  */
 
 import { useProfileEditorFieldsStore } from "./store/profileEditorFieldsStore";
-import type { ProfileEditorAvailableField } from "./profileEditorTypes";
+import type { ProfileEditorAvailableField } from "./types/profileEditorTypes";
 import PeFieldsIcon from "./pe-fields-icon.vue";
 
 interface Props {
