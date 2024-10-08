@@ -198,7 +198,13 @@ class Helper
     public function getLinkSuggestions(Folder $folder): Collection
     {
         // obtain curriculum codes...
-        $codes = $folder->getCurriculumNodes()->getPropertyValues('code');
+        $codes = $folder->getCurriculumNodes()?->getPropertyValues('code');
+
+        // It appears that the curriculumNodes is never null, however it is nullable
+        // so we will do a sanity check and exit early if it is ever null
+        if (null === $codes) {
+            return new Collection();
+        }
 
         // find all the folders that match this code, then filter for coarseness
         $courseFolders = $this->folderMapper->findByCurriculumCode($codes)->filter(function ($result) {
