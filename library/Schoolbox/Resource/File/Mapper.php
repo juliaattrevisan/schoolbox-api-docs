@@ -55,6 +55,7 @@ class Mapper extends Resource\AbstractFileMapper implements ILocator, IFileMappe
         $this->joins('category', Resource\Folder\Mapper::class, 'id', null, null, 'folder', 'category');
 
         $this->registerCallback(self::CALLBACK_PRESAVE, [$this, 'ensureOwnerIsNotNull']);
+        $this->registerPersistSearchIndexCallbacks();
     }
 
     /**

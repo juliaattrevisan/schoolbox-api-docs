@@ -186,7 +186,7 @@ class Hydrator extends BaseHydrator
             FROM forumPost
             WHERE threadID IN (' . implode(',', array_map('intval', $threadIds)) . ')
             AND ' . implode(' AND ', $whereParts) . '
-            AND deleted="false"
+            AND deleted_at IS NULL
             GROUP BY threadID',
             $params
         )->fetchColumnArray('count', 'threadID');

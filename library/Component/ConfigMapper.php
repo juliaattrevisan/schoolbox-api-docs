@@ -60,6 +60,7 @@ class Component_ConfigMapper extends \Schoolbox\Mapper
             }
             $this->handleDelete($instance, (int)$model->getValue());
         });
+        $this->registerPersistSearchIndexCallbacks();
     }
 
 

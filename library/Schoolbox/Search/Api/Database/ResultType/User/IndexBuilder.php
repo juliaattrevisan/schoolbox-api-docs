@@ -11,6 +11,8 @@ namespace Schoolbox\Search\Api\Database\ResultType\User;
 
 use Alaress_Date_Format;
 use Schoolbox\Search\Api\Database\Index\BaseBuilder;
+use Schoolbox\Search\Api\Database\Index\BuildType;
+use Schoolbox\User;
 
 /**
  * Index builder for users.
@@ -18,9 +20,33 @@ use Schoolbox\Search\Api\Database\Index\BaseBuilder;
 class IndexBuilder extends BaseBuilder
 {
     /**
+     * This builder works with user objects.
+     *
+     * @param object    $subject
+     * @param BuildType $buildType
+     * @return bool
+     */
+    protected function accepts(object $subject, BuildType $buildType): bool
+    {
+        return $subject instanceof User;
+    }
+
+    /**
+     * @param BuildType $buildType
      * @inheritdoc
      */
-    public function buildUpdates(?Alaress_Date_Format $fromDate, ?Alaress_Date_Format $toDate): iterable
+    protected function augmentQueryParams(object $subject, BuildType $buildType, string $baseQuery, array $baseParams): array
+    {
+        return [
+            $baseQuery . ' AND u.id = :id',
+            $baseParams + ['id' => $subject->getId()],
+        ];
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function buildUpdates(?Alaress_Date_Format $fromDate, ?Alaress_Date_Format $toDate, ?object $subject): iterable
     {
         $queryString = "
             SELECT
@@ -48,6 +74,12 @@ class IndexBuilder extends BaseBuilder
         if ($toDate) {
             $queryString .= ' AND u.updated_at <= :toDate';
             $params['toDate'] = $toDate->getDatabase();
+        }
+        if ($subject) {
+            if (!$this->accepts($subject, BuildType::UPDATE)) {
+                return;
+            }
+            [$queryString, $params] = $this->augmentQueryParams($subject, BuildType::UPDATE, $queryString, $params);
         }
         $query = $this->connector->prepareQuery($queryString);
         $this->logger->info('Finding users...');
@@ -78,7 +110,7 @@ class IndexBuilder extends BaseBuilder
     /**
      * @inheritdoc
      */
-    public function buildDeletes(?Alaress_Date_Format $fromDate, ?Alaress_Date_Format $toDate): iterable
+    public function buildDeletes(?Alaress_Date_Format $fromDate, ?Alaress_Date_Format $toDate, ?object $subject): iterable
     {
         $queryString = "SELECT
             u.id,
@@ -95,6 +127,12 @@ class IndexBuilder extends BaseBuilder
         if ($toDate) {
             $queryString .= ' AND u.deleted_at <= :toDate';
             $params['toDate'] = $toDate->getDatabase();
+        }
+        if ($subject) {
+            if (!$this->accepts($subject, BuildType::DELETE)) {
+                return;
+            }
+            [$queryString, $params] = $this->augmentQueryParams($subject, BuildType::DELETE, $queryString, $params);
         }
         $query = $this->connector->prepareQuery($queryString);
         $query->execute($params);

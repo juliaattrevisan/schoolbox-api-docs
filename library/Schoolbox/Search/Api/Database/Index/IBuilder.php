@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace Schoolbox\Search\Api\Database\Index;
 
 use Alaress_Date_Format;
+use Psr\Log\LoggerInterface;
 use Schoolbox\Search\Index\Model;
 
 /**
@@ -24,13 +25,19 @@ interface IBuilder
      * This list is intended to override any existing indices with the same
      * identifier.
      *
-     * @param Alaress_Date_Format|null $fromDate If provided, only build indices
-     *                                           updated at or after this date.
-     * @param Alaress_Date_Format|null $toDate   If provided, only build indices
-     *                                           updated at or before this date.
+     * @param Alaress_Date_Format|null $fromDate If provided, only build indices updated at or after this date.
+     * @param Alaress_Date_Format|null $toDate   If provided, only build indices updated at or before this date.
+     * @param object|null              $subject  If provided, only build indices for this item.
+     *                                           Each implementation should be able to tell whether it can build indices
+     *                                           for any given type of item, and return early if it cannot.
+     *
      * @return iterable<Model> A collection of search indices to create.
      */
-    public function buildUpdates(?Alaress_Date_Format $fromDate, ?Alaress_Date_Format $toDate): iterable;
+    public function buildUpdates(
+        ?Alaress_Date_Format $fromDate,
+        ?Alaress_Date_Format $toDate,
+        ?object $subject,
+    ): iterable;
 
     /**
      * Build a collection of search indices which were deleted between
@@ -38,11 +45,25 @@ interface IBuilder
      *
      * This list is intended to delete any indices which match the identifiers.
      *
-     * @param Alaress_Date_Format|null $fromDate  If provided, only clear indices
-     *                                            updated at or after this date.
-     * @param Alaress_Date_Format|null $toDate    If provided, only clear indices
-     *                                            updated at or before this date.
+     * @param Alaress_Date_Format|null $fromDate If provided, only clear indices updated at or after this date.
+     * @param Alaress_Date_Format|null $toDate   If provided, only clear indices updated at or before this date.
+     * @param object|null              $subject  If provided, only clear indices for this item.
+     *                                           Each implementation should be able to tell whether it can build indices
+     *                                           for any given type of item, and return early if it cannot.
      * @return iterable<Model> A collection of search indices to delete.
      */
-    public function buildDeletes(?Alaress_Date_Format $fromDate, ?Alaress_Date_Format $toDate): iterable;
+    public function buildDeletes(
+        ?Alaress_Date_Format $fromDate,
+        ?Alaress_Date_Format $toDate,
+        ?object $subject,
+    ): iterable;
+
+    /**
+     * Install a logger into this search result builder: the default logger may
+     * need to be overwritten.
+     *
+     * @param LoggerInterface $logger
+     * @return self
+     */
+    public function setLogger(LoggerInterface $logger): self;
 }

@@ -15,7 +15,9 @@ use InvalidArgumentException;
 use Schoolbox\Application\CliKernelAbstract;
 use Schoolbox\Application\CliTool\App;
 use Schoolbox\Database\Factory as DatabaseFactory;
+use Schoolbox\Search\Api\Database\Index\CompositeBuilder;
 use Schoolbox\Search\Api\Database\Index\IBuilder;
+use Schoolbox\Search\Api\Database\Index\Persistor;
 use Schoolbox\Search\Api\Database\ResultType;
 
 /**
@@ -109,37 +111,42 @@ class IndexBuilder extends App
         $dbFactory = $this->getDi()->get('databaseFactory');
         $dbi       = $dbFactory->getInternalWriteDatabase();
 
-        /** @var array<string, IBuilder> $indexBuilders */
-        $indexBuilders = [
-            ResultType\Assessment\Hydrator::BASE_TYPE => new ResultType\Assessment\IndexBuilder($dbi, $logger),
-            ResultType\Badge\Hydrator::BASE_TYPE      => new ResultType\Badge\IndexBuilder($dbi, $logger),
-            ResultType\Blog\Hydrator::BASE_TYPE       => new ResultType\Blog\IndexBuilder($dbi, $logger),
-            ResultType\Event\Hydrator::BASE_TYPE      => new ResultType\Event\IndexBuilder($dbi, $logger),
-            ResultType\File\Hydrator::BASE_TYPE       => new ResultType\File\IndexBuilder($dbi, $logger),
-            ResultType\Forum\Hydrator::BASE_TYPE      => new ResultType\Forum\IndexBuilder($dbi, $logger),
-            ResultType\Link\Hydrator::BASE_TYPE       => new ResultType\Link\IndexBuilder($dbi, $logger),
-            ResultType\News\Hydrator::BASE_TYPE       => new ResultType\News\IndexBuilder($dbi, $logger),
-            ResultType\Textbox\Hydrator::BASE_TYPE    => new ResultType\Textbox\IndexBuilder($dbi, $logger),
-            ResultType\Page\Hydrator::BASE_TYPE       => new ResultType\Page\IndexBuilder($dbi, $logger),
-            ResultType\Tile\Hydrator::BASE_TYPE       => new ResultType\Tile\IndexBuilder($dbi, $logger),
-            ResultType\User\Hydrator::BASE_TYPE       => new ResultType\User\IndexBuilder($dbi, $logger),
-        ];
         $types = $this->getOpt(self::OPT_LONG_TYPE);
         if (!isset($types)) {
             $logger->notice('Building search index for all result types');
+            /** @var IBuilder $indexBuilder */
+            $indexBuilder = $this->getDi()->get('search.indexBuilder');
+            $indexBuilder = $indexBuilder->setLogger($logger);
         } else {
-            $types = is_array($types) ? $types : [$types];
+            // Build index builders from a list of candidate types
+            $types                  = is_array($types) ? $types : [$types];
+            $includedIndexBuilders  = [];
+            $candidateIndexBuilders = [
+                ResultType\Assessment\Hydrator::BASE_TYPE => new ResultType\Assessment\IndexBuilder($dbi, $logger),
+                ResultType\Badge\Hydrator::BASE_TYPE      => new ResultType\Badge\IndexBuilder($dbi, $logger),
+                ResultType\Blog\Hydrator::BASE_TYPE       => new ResultType\Blog\IndexBuilder($dbi, $logger),
+                ResultType\Event\Hydrator::BASE_TYPE      => new ResultType\Event\IndexBuilder($dbi, $logger),
+                ResultType\File\Hydrator::BASE_TYPE       => new ResultType\File\IndexBuilder($dbi, $logger),
+                ResultType\Forum\Hydrator::BASE_TYPE      => new ResultType\Forum\IndexBuilder($dbi, $logger),
+                ResultType\Link\Hydrator::BASE_TYPE       => new ResultType\Link\IndexBuilder($dbi, $logger),
+                ResultType\News\Hydrator::BASE_TYPE       => new ResultType\News\IndexBuilder($dbi, $logger),
+                ResultType\Textbox\Hydrator::BASE_TYPE    => new ResultType\Textbox\IndexBuilder($dbi, $logger),
+                ResultType\Page\Hydrator::BASE_TYPE       => new ResultType\Page\IndexBuilder($dbi, $logger),
+                ResultType\Tile\Hydrator::BASE_TYPE       => new ResultType\Tile\IndexBuilder($dbi, $logger),
+                ResultType\User\Hydrator::BASE_TYPE       => new ResultType\User\IndexBuilder($dbi, $logger),
+            ];
             foreach ($types as $type) {
-                if (!isset($indexBuilders[$type])) {
+                if (!isset($candidateIndexBuilders[$type])) {
                     $logger->error(
                         sprintf(
                             'Result type "%s" is not recognised (recognised types: %s): exiting',
                             $type,
-                            implode(', ', array_keys($indexBuilders)),
+                            implode(', ', array_keys($candidateIndexBuilders)),
                         )
                     );
                     exit(CliKernelAbstract::EXIT_STATUS_APP_ERROR);
                 }
+                $includedIndexBuilders[] = $candidateIndexBuilders[$type];
             }
             $logger->notice(
                 sprintf(
@@ -147,7 +154,9 @@ class IndexBuilder extends App
                     implode(', ', $types),
                 )
             );
+            $indexBuilder = new CompositeBuilder(...$includedIndexBuilders);
         }
+        $persistor = new Persistor($indexBuilder, $dbi);
 
         // Some queries run during the filling of the search_index table can take a long time to run.  It is crucial
         // that these queries be allowed to finish, because if they are interrupted, the search_index table will not be
@@ -166,110 +175,54 @@ class IndexBuilder extends App
             if (empty($types)) {
                 $logger->notice('Clearing ALL existing indices before rebuilding!');
                 if ($this->perform()) {
-                    // This used to TRUNCATE instead of DELETE:
-                    // whilst TRUNCATE should be faster, it is susceptible to
-                    // crashing the database server for reasons I haven't
-                    // been able to determine.
-                    // Tt must acquire a lock, as it deletes and recreates the
-                    // table: this lock isn't always acquirable.
-                    $dbi->execute('DELETE FROM search_index');
+                    $persistor->clearAllIndices();
                 }
             } else {
                 $logger->notice('Clearing indices for provided types before rebuilding!');
-                $deleteIndexQuery = $dbi->prepareQuery(
-                    'DELETE FROM search_index WHERE type = :type OR type LIKE :typeLike',
-                );
                 foreach ($types as $type) {
                     $logger->notice(sprintf('Clearing indices for type: %s', $type));
                     if ($this->perform()) {
-                        $deleteIndexQuery->execute([
-                            'type'     => $type,
-                            'typeLike' => $dbi->getQuoter()->escapeForLike($type . '.') . '%',
-                        ]);
+                        $persistor->clearIndicesOfType($type);
                     }
                 }
             }
         }
 
         // Actually create data
-        $updateStatement = $dbi->prepareQuery("
-            REPLACE INTO search_index (
-                type,
-                identifier,
-                title,
-                date,
-                is_relevance_date_affected,
-                created_by,
-                folder_id,
-                fulltext_index
-            ) VALUES (
-                :type,
-                :identifier,
-                :title,
-                :date,
-                :isRelevanceDateAffected,
-                :createdBy,
-                :folderId,
-                :fulltextIndex
-            )
-        ");
-        $deleteStatement = $dbi->prepareQuery("
-            DELETE FROM search_index WHERE type = :type AND identifier = :identifier
-        ");
-
         $time = microtime(true);
         try {
-            foreach ($indexBuilders as $indexBuilderType => $indexBuilder) {
-                // Not in the list of types to build? Skip
-                if (!empty($types) && !in_array($indexBuilderType, $types, true)) {
+            // Refresh lock before building list of updates
+            $logger->debug('Refreshing lock.');
+            $this->refreshLock($lock);
+
+            foreach ($persistor->buildUpdates($fromDate, $toDate, null) as $updatedIndex) {
+                if (!$this->perform()) {
                     continue;
                 }
 
-                // Refresh lock before building list of updates
-                $logger->debug('Refreshing lock.');
+                // Refresh lock between each update
                 $this->refreshLock($lock);
 
-                foreach ($indexBuilder->buildUpdates($fromDate, $toDate) as $updatedIndex) {
-                    if (!$this->perform()) {
-                        continue;
-                    }
-
-                    // Refresh lock between each update
-                    $this->refreshLock($lock);
-
-                    try {
-                        $updateStatement->execute([
-                            'type'                    => $updatedIndex->getType(),
-                            'identifier'              => $updatedIndex->getIdentifier(),
-                            'title'                   => $updatedIndex->getTitle(),
-                            'date'                    => $updatedIndex->getDate()?->getDatabase(),
-                            'isRelevanceDateAffected' => $updatedIndex->getIsRelevanceDateAffected() ? 1 : 0,
-                            'createdBy'               => $updatedIndex->getCreatedBy(),
-                            'folderId'                => $updatedIndex->getFolderId(),
-                            'fulltextIndex'           => $updatedIndex->getFulltextIndex(),
-                        ]);
-                    } catch (Exception $e) {
-                        $logger->warning(
-                            sprintf(
-                                'Unexpected database error when index for "%s:%s" (%s): ignoring',
-                                $updatedIndex->getType(),
-                                $updatedIndex->getIdentifier(),
-                                $e->getMessage(),
-                            )
-                        );
-                        continue;
-                    }
+                try {
+                    $persistor->updateIndex($updatedIndex);
+                } catch (Exception $e) {
+                    $logger->warning(
+                        sprintf(
+                            'Unexpected database error when index for "%s:%s" (%s): ignoring',
+                            $updatedIndex->getType(),
+                            $updatedIndex->getIdentifier(),
+                            $e->getMessage(),
+                        )
+                    );
+                    continue;
                 }
+            }
 
-                foreach ($indexBuilder->buildDeletes($fromDate, $toDate) as $deletedIndex) {
-                    if (!$this->perform()) {
-                        continue;
-                    }
-                    $deleteStatement->execute([
-                        'identifier' => $deletedIndex->getIdentifier(),
-                        'type'       => $deletedIndex->getType(),
-                    ]);
+            foreach ($persistor->buildDeletes($fromDate, $toDate, null) as $deletedIndex) {
+                if (!$this->perform()) {
+                    continue;
                 }
+                $persistor->deleteIndex($deletedIndex);
             }
         } catch (LockRefreshException) {
             // Do not carry on: instead, exit politely

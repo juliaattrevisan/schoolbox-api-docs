@@ -10,7 +10,12 @@ declare(strict_types=1);
 namespace Schoolbox\Search\Api\Database\ResultType\Page;
 
 use Alaress_Date_Format;
+use Schoolbox\Learning\Course\DataModel\Specification;
+use Schoolbox\Resource\Folder;
+use Schoolbox\Resource\Group;
+use Schoolbox\Resource\HomepageConfig;
 use Schoolbox\Search\Api\Database\Index\BaseBuilder;
+use Schoolbox\Search\Api\Database\Index\BuildType;
 
 /**
  * Index builder for pages/folders.
@@ -18,9 +23,78 @@ use Schoolbox\Search\Api\Database\Index\BaseBuilder;
 class IndexBuilder extends BaseBuilder
 {
     /**
+     * This builder works with:
+     * * folders
+     * * folder codes
+     * * course specs
+     * * course unit specs
+     * * user groups
+     * * homepage configs
+     *
+     * @param object    $subject
+     * @param BuildType $buildType
+     * @return bool
+     */
+    protected function accepts(object $subject, BuildType $buildType): bool
+    {
+        return $subject instanceof Folder\Model
+            || $subject instanceof Folder\Code\Model
+            || $subject instanceof Specification\Model
+            || $subject instanceof Specification\Unit\Model
+            || $subject instanceof Group
+            || $subject instanceof HomepageConfig
+        ;
+    }
+
+    /**
      * @inheritdoc
      */
-    public function buildUpdates(?Alaress_Date_Format $fromDate, ?Alaress_Date_Format $toDate): iterable
+    protected function augmentQueryParams(object $subject, BuildType $buildType, string $baseQuery, array $baseParams): array
+    {
+        if ($subject instanceof Folder\Model) {
+            return [
+                $baseQuery . ' AND f.id = :id',
+                $baseParams + ['id' => $subject->getId()],
+            ];
+        }
+        if ($subject instanceof Folder\Code\Model) {
+            return [
+                $baseQuery . ' AND f.id = :id',
+                $baseParams + ['id' => $subject->getFolder()->getId()],
+            ];
+        }
+        if ($subject instanceof Specification\Model) {
+            return [
+                $baseQuery . ' AND f.id = :id',
+                $baseParams + ['id' => $subject->getFolder()->getId()],
+            ];
+        }
+        if ($subject instanceof Specification\Unit\Model) {
+            return [
+                $baseQuery . ' AND f.id = :id',
+                $baseParams + ['id' => $subject->getFolder()->getId()],
+            ];
+        }
+        if ($subject instanceof Group) {
+            return [
+                $baseQuery . ' AND f.id = :id',
+                $baseParams + ['id' => $subject->getFolder()->getId()],
+            ];
+        }
+        if ($subject instanceof HomepageConfig) {
+            return [
+                $baseQuery . ' AND f.id = :id',
+                $baseParams + ['id' => $subject->getCategory()->getId()],
+            ];
+        }
+
+        return [$baseQuery, $baseParams];
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function buildUpdates(?Alaress_Date_Format $fromDate, ?Alaress_Date_Format $toDate, ?object $subject): iterable
     {
         $queryString = "
             SELECT
@@ -44,6 +118,12 @@ class IndexBuilder extends BaseBuilder
             $queryString .= ' AND f.updated_at <= :toDate';
             $params['toDate'] = $toDate->getDatabase();
         }
+        if ($subject) {
+            if (!$this->accepts($subject, BuildType::UPDATE)) {
+                return;
+            }
+            [$queryString, $params] = $this->augmentQueryParams($subject, BuildType::UPDATE, $queryString, $params);
+        }
         $query = $this->connector->prepareQuery($queryString);
         $this->logger->info('Finding pages/folders...');
         $query->execute($params);
@@ -66,7 +146,7 @@ class IndexBuilder extends BaseBuilder
     /**
      * @inheritdoc
      */
-    public function buildDeletes(?Alaress_Date_Format $fromDate, ?Alaress_Date_Format $toDate): iterable
+    public function buildDeletes(?Alaress_Date_Format $fromDate, ?Alaress_Date_Format $toDate, ?object $subject): iterable
     {
         $queryString = "
             SELECT
@@ -84,6 +164,12 @@ class IndexBuilder extends BaseBuilder
         if ($toDate) {
             $queryString .= ' AND f.deleted_at <= :toDate';
             $params['toDate'] = $toDate->getDatabase();
+        }
+        if ($subject) {
+            if (!$this->accepts($subject, BuildType::DELETE)) {
+                return;
+            }
+            [$queryString, $params] = $this->augmentQueryParams($subject, BuildType::DELETE, $queryString, $params);
         }
         $query = $this->connector->prepareQuery($queryString);
         $query->execute($params);

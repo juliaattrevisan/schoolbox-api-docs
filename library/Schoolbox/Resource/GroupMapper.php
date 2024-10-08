@@ -41,6 +41,8 @@ class GroupMapper extends Mapper
         $this->joins('cid', FolderMapper::class, 'id', null, self::COLUMN_IDENTIFIER, 'folder', 'folder');
 
         $this->registerCallback(self::CALLBACK_POSTDELETE, [ $this, 'deleteGroupMemberships' ]);
+
+        $this->registerPersistSearchIndexCallbacks();
     }
 
 

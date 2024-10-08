@@ -160,6 +160,7 @@ class EventMapper extends Schoolbox\Mapper implements Schoolbox\IHomepageCleanab
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
 
         $this->registerCallback('postSave', array($this, 'postSave'));
+        $this->registerPersistSearchIndexCallbacks();
     }
 
     /**

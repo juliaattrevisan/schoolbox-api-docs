@@ -10,7 +10,10 @@ declare(strict_types=1);
 namespace Schoolbox\Search\Api\Database\ResultType\File;
 
 use Alaress_Date_Format;
+use Schoolbox\Resource\File\Model;
+use Schoolbox\Resource\Folder\Model as FolderModel;
 use Schoolbox\Search\Api\Database\Index\BaseBuilder;
+use Schoolbox\Search\Api\Database\Index\BuildType;
 
 /**
  * Index builder for files.
@@ -53,9 +56,44 @@ class IndexBuilder extends BaseBuilder
     ";
 
     /**
+     * This builder works with file objects, and with folders on delete.
+     *
+     * @param object    $subject
+     * @param BuildType $buildType
+     * @return bool
+     */
+    protected function accepts(object $subject, BuildType $buildType): bool
+    {
+        return match ($buildType) {
+            BuildType::DELETE => $subject instanceof Model || $subject instanceof FolderModel,
+            default           => $subject instanceof Model,
+        };
+    }
+
+    /**
      * @inheritdoc
      */
-    public function buildUpdates(?Alaress_Date_Format $fromDate, ?Alaress_Date_Format $toDate): iterable
+    protected function augmentQueryParams(object $subject, BuildType $buildType, string $baseQuery, array $baseParams): array
+    {
+        if ($subject instanceof Model) {
+            return [
+                $baseQuery . ' AND f.id = :id',
+                $baseParams + ['id' => $subject->getId()],
+            ];
+        }
+        if ($subject instanceof FolderModel) {
+            return [
+                $baseQuery . ' AND fo.id = :id',
+                $baseParams + ['id' => $subject->getId()],
+            ];
+        }
+        return [$baseQuery, $baseParams];
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function buildUpdates(?Alaress_Date_Format $fromDate, ?Alaress_Date_Format $toDate, ?object $subject): iterable
     {
         $subtypeExpression = self::SUBTYPE_EXPRESSION;
         $joinStatement     = self::JOIN_STATEMENT;
@@ -87,6 +125,12 @@ class IndexBuilder extends BaseBuilder
             $queryString .= ' AND f.modified <= :toDate';
             $params['toDate'] = $toDate->getDatabase();
         }
+        if ($subject) {
+            if (!$this->accepts($subject, BuildType::UPDATE)) {
+                return;
+            }
+            [$queryString, $params] = $this->augmentQueryParams($subject, BuildType::UPDATE, $queryString, $params);
+        }
         $query = $this->connector->prepareQuery($queryString);
         $this->logger->info('Finding files...');
         $query->execute($params);
@@ -110,7 +154,7 @@ class IndexBuilder extends BaseBuilder
     /**
      * @inheritdoc
      */
-    public function buildDeletes(?Alaress_Date_Format $fromDate, ?Alaress_Date_Format $toDate): iterable
+    public function buildDeletes(?Alaress_Date_Format $fromDate, ?Alaress_Date_Format $toDate, ?object $subject): iterable
     {
         $subtypeExpression = self::SUBTYPE_EXPRESSION;
         $joinStatement     = self::JOIN_STATEMENT;
@@ -130,6 +174,12 @@ class IndexBuilder extends BaseBuilder
         if ($toDate) {
             $queryString      .= ' AND COALESCE(f.deleted_at, fo.deleted_at) <= :toDate';
             $params['toDate'] = $toDate->getDatabase();
+        }
+        if ($subject) {
+            if (!$this->accepts($subject, BuildType::DELETE)) {
+                return;
+            }
+            [$queryString, $params] = $this->augmentQueryParams($subject, BuildType::DELETE, $queryString, $params);
         }
         $query = $this->connector->prepareQuery($queryString);
         $query->execute($params);

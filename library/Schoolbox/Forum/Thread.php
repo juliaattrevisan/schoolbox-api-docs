@@ -13,11 +13,14 @@ namespace Schoolbox\Forum;
 use Alaress_Date_Format;
 use Schoolbox\Collection;
 use Schoolbox\ISoftDeletable;
+use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
 use Schoolbox\Resource\Folder\Model as Folder;
 use Schoolbox\User;
 
 class Thread implements ISoftDeletable
 {
+    use DeletedAtDate;
+
     /** @var int */
     protected $id;
 
@@ -33,7 +36,10 @@ class Thread implements ISoftDeletable
     /** @var Alaress_Date_Format */
     protected $date;
 
-    /** @var string */
+    /**
+     * @deprecated use `$deletedAt`
+     * @var string
+     */
     protected $deleted = 'false';
 
     /** @var bool */
@@ -159,6 +165,8 @@ class Thread implements ISoftDeletable
 
 
     /**
+     * @deprecated use `setDeletedAt`
+     *
      * @param string $deleted
      * @return self
      */
@@ -170,6 +178,8 @@ class Thread implements ISoftDeletable
 
 
     /**
+     * @deprecated use `getDeletedAt`
+     *
      * @return string
      */
     public function getDeleted()
@@ -305,14 +315,6 @@ class Thread implements ISoftDeletable
         return $this->lastPostUser;
     }
 
-    /**
-     * Is this object deleted?
-     * @return bool
-     */
-    public function isDeleted(): bool
-    {
-        return ($this->getDeleted() == 'true');
-    }
 
     /**
      * Is this object locked?

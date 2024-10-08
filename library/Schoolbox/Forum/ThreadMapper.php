@@ -18,114 +18,118 @@ use Schoolbox\Feed\FeedableMapperInterface;
 use Schoolbox\GenericCollection;
 use Schoolbox\IHomepageCleanable;
 use Schoolbox\Mapper;
+use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\User;
+use Schoolbox\UserMapper;
 
 class ThreadMapper extends Mapper implements FeedableMapperInterface, IHomepageCleanable
 {
     const FORUM_THREADS_PER_PAGE = 30;
+
     protected function mapping()
     {
         $this->hasTable('forumThread');
         $this->hasModel(Thread::class);
-        $this->hasMap(array(
-                'column'     => 'threadID',
-                'property'   => 'id',
-                'type'       => self::TYPE_INTEGER,
-                'identifier' => true
-            ));
+        $this->hasMap([
+            'column'     => 'threadID',
+            'property'   => 'id',
+            'type'       => self::TYPE_INTEGER,
+            'identifier' => true,
+        ]);
 
-        $this->hasMap(array(
-                'column'     => 'categoryID',
-                'property'   => 'category',
-                'type'       => self::TYPE_MODEL,
-                'join'       => 'category'
-            ));
+        $this->hasMap([
+            'column'   => 'categoryID',
+            'property' => 'category',
+            'type'     => self::TYPE_MODEL,
+            'join'     => 'category',
+        ]);
 
-        $this->hasMap(array(
-                'column'     => 'userID',
-                'property'   => 'user',
-                'type'       => self::TYPE_MODEL,
-                'join'       => 'owner'
-            ));
+        $this->hasMap([
+            'column'   => 'userID',
+            'property' => 'user',
+            'type'     => self::TYPE_MODEL,
+            'join'     => 'owner',
+        ]);
 
-        $this->hasMap(array(
-                'column'     => 'title',
-                'property'   => 'title',
-                'type'       => self::TYPE_STRING
-            ));
+        $this->hasMap([
+            'column'   => 'title',
+            'property' => 'title',
+            'type'     => self::TYPE_STRING,
+        ]);
 
-        $this->hasMap(array(
-                'column'     => 'date',
-                'property'   => 'date',
-                'type'       => self::TYPE_DATETIME,
-                'created_timestamp' => true,
-            ));
+        $this->hasMap([
+            'column'            => 'date',
+            'property'          => 'date',
+            'type'              => self::TYPE_DATETIME,
+            'created_timestamp' => true,
+        ]);
 
 
-        $this->hasMap(array(
-                'column'     => 'deleted',
-                'property'   => 'deleted',
-                'type'       => self::TYPE_STRING
-            ));
-        $this->hasSoftDeleteField('deleted', 'true', 'false');
+//        $this->hasMap([
+//            'column'   => 'deleted',
+//            'property' => 'deleted',
+//            'type'     => self::TYPE_STRING,
+//        ]);
+//        $this->hasSoftDeleteField('deleted', 'true', 'false');
+        $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
 
-        $this->hasMap(array(
-                'column'     => 'locked',
-                'property'   => 'locked',
-                'type'       => self::TYPE_BOOL_ENUM
-            ));
+        $this->hasMap([
+            'column'   => 'locked',
+            'property' => 'locked',
+            'type'     => self::TYPE_BOOL_ENUM,
+        ]);
 
-        $this->hasMap(array(
-                'column'     => 'views',
-                'property'   => 'views',
-                'type'       => self::TYPE_INTEGER
-            ));
+        $this->hasMap([
+            'column'   => 'views',
+            'property' => 'views',
+            'type'     => self::TYPE_INTEGER,
+        ]);
 
-        $this->hasMap(array(
-                'column'     => 'last_post_id',
-                'property'   => 'lastPost',
-                'type'       => self::TYPE_MODEL,
-                'join'       => 'post'
-            ));
+        $this->hasMap([
+            'column'   => 'last_post_id',
+            'property' => 'lastPost',
+            'type'     => self::TYPE_MODEL,
+            'join'     => 'post',
+        ]);
 
-        $this->hasMap(array(
-                'column'     => 'last_post_date',
-                'property'   => 'lastPostDate',
-                'type'       => self::TYPE_DATETIME
-            ));
+        $this->hasMap([
+            'column'   => 'last_post_date',
+            'property' => 'lastPostDate',
+            'type'     => self::TYPE_DATETIME,
+        ]);
 
-        $this->hasMap(array(
-                'column'     => 'last_post_user_id',
-                'property'   => 'lastPostUser',
-                'type'       => self::TYPE_MODEL,
-                'join'       => 'lastPoster'
-            ));
+        $this->hasMap([
+            'column'   => 'last_post_user_id',
+            'property' => 'lastPostUser',
+            'type'     => self::TYPE_MODEL,
+            'join'     => 'lastPoster',
+        ]);
 
-        $this->hasJoin('owner', array(
-            'mapper'    => '\Schoolbox\UserMapper',
+        $this->hasJoin('owner', [
+            'mapper'    => UserMapper::class,
             'this_key'  => 'userID',
-            'other_key' => 'id'
-        ));
+            'other_key' => 'id',
+        ]);
 
-        $this->hasJoin('lastPoster', array(
-            'mapper'    => '\Schoolbox\UserMapper',
+        $this->hasJoin('lastPoster', [
+            'mapper'    => UserMapper::class,
             'this_key'  => 'last_post_user_id',
-            'other_key' => 'id'
-        ));
+            'other_key' => 'id',
+        ]);
 
-        $this->hasJoin('category', array(
-            'mapper'    => '\Schoolbox\Resource\Folder\Mapper',
+        $this->hasJoin('category', [
+            'mapper'    => FolderMapper::class,
             'this_key'  => 'categoryID',
-            'other_key' => 'id'
-        ));
+            'other_key' => 'id',
+        ]);
 
-        $this->hasJoin('post', array(
-            'mapper'    => '\Schoolbox\Forum\PostMapper',
+        $this->hasJoin('post', [
+            'mapper'    => PostMapper::class,
             'this_key'  => 'last_post_id',
-            'other_key' => 'postID'
-        ));
+            'other_key' => 'postID',
+        ]);
 
-        $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, array($this, 'postDelete'));
+        $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, [$this, 'postDelete']);
     }
 
     /**
@@ -138,7 +142,6 @@ class ThreadMapper extends Mapper implements FeedableMapperInterface, IHomepageC
     }
 
 
-
     /**
      * @param int $id
      * @return Thread
@@ -146,7 +149,6 @@ class ThreadMapper extends Mapper implements FeedableMapperInterface, IHomepageC
      */
     public function findById($id)
     {
-
         $post_mapper = $this->getJoinMapper('post');
 
         $query =
@@ -155,11 +157,11 @@ class ThreadMapper extends Mapper implements FeedableMapperInterface, IHomepageC
                 {$post_mapper->getColumnString('firstPost')}
             FROM {$this->getTable()} AS thread
             JOIN forumPost firstPost ON thread.threadID = firstPost.threadID
-			WHERE thread.threadID = ?
-			ORDER BY firstPost.date ASC LIMIT 1 ";
+            WHERE thread.threadID = ?
+            ORDER BY firstPost.date ASC LIMIT 1 ";
 
         $statement = $this->database->prepare($query);
-        $statement->execute(array($id));
+        $statement->execute([$id]);
 
         if (($row = $statement->fetch()) !== false) {
             $thread = $this->hydrate($row, 'thread');
@@ -189,9 +191,9 @@ class ThreadMapper extends Mapper implements FeedableMapperInterface, IHomepageC
             WHERE t.threadID = ?
         ");
 
-        $stmt->execute(array($thread->getId()));
+        $stmt->execute([$thread->getId()]);
 
-        $ids = array();
+        $ids = [];
 
         while ($id = $stmt->fetchColumn()) {
             $ids[] = $id;
@@ -210,9 +212,9 @@ class ThreadMapper extends Mapper implements FeedableMapperInterface, IHomepageC
      */
     public function findForFeed($context, $limit, $offset = 0, $time = 0)
     {
-        $time = date('Y-m-d H:i:s', $time ? : time());
+        $time = date('Y-m-d H:i:s', $time ?: time());
 
-        $limit = (int)$limit;
+        $limit  = (int)$limit;
         $offset = (int)$offset;
 
         $stmt = $this->database->prepare("
@@ -223,18 +225,16 @@ class ThreadMapper extends Mapper implements FeedableMapperInterface, IHomepageC
             FROM `{$this->getTable()}` t
             INNER JOIN {$this->getJoinSql('owner', 't', 'o', true)}
             LEFT JOIN {$this->getJoinSql('owner.pronoun', 'o', 'op')}
-            WHERE t.deleted = 'false'
+            WHERE t.deleted_at IS NULL
             AND t.categoryID = :cat
             AND t.date < :time
             LIMIT $offset, $limit
         ");
 
-        $stmt->execute(
-            array(
-                'cat'  => $context,
-                'time' => $time
-            )
-        );
+        $stmt->execute([
+            'cat'  => $context,
+            'time' => $time,
+        ]);
 
         $c = $this->createCollection();
 
@@ -273,14 +273,14 @@ class ThreadMapper extends Mapper implements FeedableMapperInterface, IHomepageC
          * break up the forum query into 2 separate checks, one to check if it is on a page,
          * the other to see if it is alt sourced.
          */
-        $homepageQuery  = $this->database->prepare("SELECT ci.id FROM component_instance ci
-        JOIN component_definition cd ON ci.`component_definition_id`=cd.`id`
-        WHERE class = 'Component_Homepage_ForumListController' AND ci.module = 'homepage'
-        AND identifier = :id");
+        $homepageQuery = $this->database->prepare("
+            SELECT ci.id FROM component_instance ci
+            JOIN component_definition cd ON ci.`component_definition_id`=cd.`id`
+            WHERE class = 'Component_Homepage_ForumListController' AND ci.module = 'homepage'
+            AND identifier = :id
+        ");
 
-        $homepageQuery->execute(array(
-                                'id' => $folderID,
-                            ));
+        $homepageQuery->execute(['id' => $folderID]);
 
         /**
          * if we found a forum on the homepage, return true, else check for alt sourcing forums
@@ -289,25 +289,26 @@ class ThreadMapper extends Mapper implements FeedableMapperInterface, IHomepageC
             return true;
         }
 
-        $altSourceQuery  = $this->database->prepare("
-SELECT
-    `component_instance`.`id`, `component_instance`.`identifier`, `cci`.`value`
-FROM        `component_instance`
-    INNER JOIN  `component_definition` `cd` ON `component_instance`.`component_definition_id` = `cd`.`id`  AND class = 'Component_Homepage_ForumListController'
-    JOIN   `component_config_definition` `ccd` ON `cd`.`id` = `ccd`.`component_definition_id` AND `ccd`.`label` = 'Source'
-    JOIN   `component_config_instance` `cci` ON
+        $altSourceQuery = $this->database->prepare("
+            SELECT
+                `component_instance`.`id`, `component_instance`.`identifier`, `cci`.`value`
+            FROM        `component_instance`
+            INNER JOIN  `component_definition` `cd` ON `component_instance`.`component_definition_id` = `cd`.`id`  AND class = 'Component_Homepage_ForumListController'
+            JOIN   `component_config_definition` `ccd` ON `cd`.`id` = `ccd`.`component_definition_id` AND `ccd`.`label` = 'Source'
+            JOIN   `component_config_instance` `cci` ON
             `ccd`.`id` = `cci`.`component_config_definition_id` AND
             `cci`.`component_instance_id` = `component_instance`.`id` AND `cci`.`value` = :id1
 
-WHERE
-  `component_instance`.module = 'homepage'
-  AND
-        `component_instance`.`identifier` != :id2");
+            WHERE
+                `component_instance`.module = 'homepage'
+            AND
+                `component_instance`.`identifier` != :id2
+        ");
 
-        $altSourceQuery->execute(array(
+        $altSourceQuery->execute([
             'id1' => $folderID,
             'id2' => $folderID,
-                            ));
+        ]);
 
         if (($row = $altSourceQuery->fetch()) !== false) {
             return true;
@@ -331,7 +332,7 @@ WHERE
     }
 
     /**
-     * @param int $categoryID
+     * @param int   $categoryID
      * @param array $config
      * @return array|bool
      */
@@ -340,7 +341,7 @@ WHERE
         /* Set default sorting to threads, but leave options for other sort fields
          */
         $params = [
-            'categoryID'    => $categoryID,
+            'categoryID' => $categoryID,
         ];
 
         $query = "SELECT t.*, u.title userTitle, u.firstname userFirstname, u.preferred_name userPreferredName, u.lastname userLastname, u.synergy_id,
@@ -349,7 +350,7 @@ WHERE
                   LEFT JOIN user u ON u.id = t.userID
                   LEFT JOIN `pronoun` ON u.pronoun = pronoun.id
                   WHERE t.categoryID = :categoryID
-                  AND t.deleted = 'false'
+                  AND t.deleted_at IS NULL
                   ORDER BY ";
 
         if ($config['sort'] == 'Posts') {
@@ -361,7 +362,7 @@ WHERE
         }
 
         if ($config['size'] != 0 && $config['size'] != '') {
-            $query .= " LIMIT 0, :size";
+            $query          .= " LIMIT 0, :size";
             $params['size'] = (int)$config['size'];
         }
         $statement = $this->database->prepare($query);
@@ -422,10 +423,10 @@ WHERE
             /** @var User $lastPoster */
             $lastPoster = $this->hydrateJoin($row, 'lastPoster', 'lastPoster');
             $lastPoster->setPronoun($this->hydrateJoin($row, 'lastPoster.pronoun', 'lpp'));
-            $thread = $this->hydrate($row)
-                         ->setUser($owner)
-                         ->setLastPost($this->hydrateJoin($row, 'post', 'post'))
-                         ->setLastPostUser($lastPoster);
+            $thread                       = $this->hydrate($row)
+                                                 ->setUser($owner)
+                                                 ->setLastPost($this->hydrateJoin($row, 'post', 'post'))
+                                                 ->setLastPostUser($lastPoster);
             $collection[$thread->getId()] = $thread;
         }
 
@@ -441,8 +442,7 @@ WHERE
             SELECT threadID, count(*) -1 as count
             FROM forumPost
             WHERE threadID in (" . implode(',', $threads->getPropertyValues('id')) . ")
-                AND
-                deleted = 'false'
+            AND deleted_at IS NULL
             GROUP BY threadID
         ");
         $statement->execute();

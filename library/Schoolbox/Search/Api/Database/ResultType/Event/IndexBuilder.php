@@ -10,7 +10,9 @@ declare(strict_types=1);
 namespace Schoolbox\Search\Api\Database\ResultType\Event;
 
 use Alaress_Date_Format;
+use Schoolbox\Calendar\Event;
 use Schoolbox\Search\Api\Database\Index\BaseBuilder;
+use Schoolbox\Search\Api\Database\Index\BuildType;
 
 /**
  * Index builder for events.
@@ -18,9 +20,33 @@ use Schoolbox\Search\Api\Database\Index\BaseBuilder;
 class IndexBuilder extends BaseBuilder
 {
     /**
+     * This builder works with calendar event objects.
+     *
+     * @param object    $subject
+     * @param BuildType $buildType
+     * @return bool
+     */
+    protected function accepts(object $subject, BuildType $buildType): bool
+    {
+        return $subject instanceof Event;
+    }
+
+    /**
+     * @param BuildType $buildType
      * @inheritdoc
      */
-    public function buildUpdates(?Alaress_Date_Format $fromDate, ?Alaress_Date_Format $toDate): iterable
+    protected function augmentQueryParams(object $subject, BuildType $buildType, string $baseQuery, array $baseParams): array
+    {
+        return [
+            $baseQuery . ' AND e.id = :id',
+            $baseParams + ['id' => $subject->getId()],
+        ];
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function buildUpdates(?Alaress_Date_Format $fromDate, ?Alaress_Date_Format $toDate, ?object $subject): iterable
     {
         $queryString = "
             SELECT
@@ -41,6 +67,12 @@ class IndexBuilder extends BaseBuilder
         if ($toDate) {
             $queryString .= ' AND e.updated_at <= :toDate';
             $params['toDate'] = $toDate->getDatabase();
+        }
+        if ($subject) {
+            if (!$this->accepts($subject, BuildType::UPDATE)) {
+                return;
+            }
+            [$queryString, $params] = $this->augmentQueryParams($subject, BuildType::UPDATE, $queryString, $params);
         }
         $query = $this->connector->prepareQuery($queryString);
         $this->logger->info('Finding events...');
@@ -65,23 +97,27 @@ class IndexBuilder extends BaseBuilder
     /**
      * @inheritdoc
      */
-    public function buildDeletes(?Alaress_Date_Format $fromDate, ?Alaress_Date_Format $toDate): iterable
+    public function buildDeletes(?Alaress_Date_Format $fromDate, ?Alaress_Date_Format $toDate, ?object $subject): iterable
     {
         $queryString = "SELECT
             e.id
             FROM event e
-            LEFT JOIN event_folder evf ON e.id = evf.event_id
-            LEFT JOIN folder f ON evf.folder_id = f.id
-            WHERE COALESCE(e.deleted_at, f.deleted_at) IS NOT NULL
+            WHERE e.deleted_at IS NOT NULL
         ";
-        $params      = [];
+        $params       = [];
         if ($fromDate) {
-            $queryString        .= ' AND COALESCE(e.deleted_at, f.deleted_at) >= :fromDate';
+            $queryString        .= ' AND e.deleted_at >= :fromDate';
             $params['fromDate'] = $fromDate->getDatabase();
         }
         if ($toDate) {
-            $queryString      .= ' AND COALESCE(e.deleted_at, f.deleted_at) <= :toDate';
+            $queryString      .= ' AND e.deleted_at <= :toDate';
             $params['toDate'] = $toDate->getDatabase();
+        }
+        if ($subject) {
+            if (!$this->accepts($subject, BuildType::DELETE)) {
+                return;
+            }
+            [$queryString, $params] = $this->augmentQueryParams($subject, BuildType::DELETE, $queryString, $params);
         }
         $query = $this->connector->prepareQuery($queryString);
         $query->execute($params);

@@ -23,7 +23,6 @@ use Schoolbox\External\Connector\ICommunityPortal;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Application\Exception\Exception as SchoolboxException;
 use Schoolbox\Resource\Storage;
-use SensitiveParameter;
 use UnexpectedValueException;
 
 /**
@@ -186,6 +185,9 @@ class UserMapper extends Mapper
         );
 
         $this->registerCallback(self::CALLBACK_POSTRESTORE, [$this, 'addUsernameToCache']);
+
+        // Persist search index changes on changing of a user.
+        $this->registerPersistSearchIndexCallbacks();
     }
 
 

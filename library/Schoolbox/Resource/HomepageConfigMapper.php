@@ -67,6 +67,8 @@ class HomepageConfigMapper extends Mapper
         $this->uses('top_head_bg', self::TYPE_STRING);
         $this->uses('top_font', self::TYPE_STRING);
         $this->uses('top_bg_primary', self::TYPE_STRING);
+
+        $this->registerPersistSearchIndexCallbacks();
     }
 
     /**

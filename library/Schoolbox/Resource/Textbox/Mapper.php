@@ -75,6 +75,7 @@ class Mapper extends \Schoolbox\Mapper implements IHomepageCleanable
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE, 'deletedAt');
         $this->uses('deleted_by', self::TYPE_INTEGER);
         $this->joins('categoryID', FolderMapper::class, 'id', null, null, 'category', 'category');
+        $this->registerPersistSearchIndexCallbacks();
     }
 
 

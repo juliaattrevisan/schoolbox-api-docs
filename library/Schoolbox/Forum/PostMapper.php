@@ -18,6 +18,7 @@ use Schoolbox\Feed\FeedableMapperInterface;
 use Schoolbox\GenericCollection;
 use Schoolbox\Mapper;
 use Schoolbox\User;
+use Schoolbox\UserMapper;
 
 class PostMapper extends Mapper implements FeedableMapperInterface
 {
@@ -28,84 +29,87 @@ class PostMapper extends Mapper implements FeedableMapperInterface
     {
         $this->hasTable('forumPost');
         $this->hasModel(Post::class);
-        $this->hasMap(array(
-                'column'     => 'postID',
-                'property'   => 'id',
-                'type'       => self::TYPE_INTEGER,
-                'identifier' => true
-            ));
+        $this->hasMap([
+            'column'     => 'postID',
+            'property'   => 'id',
+            'type'       => self::TYPE_INTEGER,
+            'identifier' => true,
+        ]);
 
-        $this->hasMap(array(
-                'column'     => 'threadID',
-                'property'   => 'thread',
-                'type'       => self::TYPE_MODEL,
-                'join'       => 'thread'
-            ));
+        $this->hasMap([
+            'column'   => 'threadID',
+            'property' => 'thread',
+            'type'     => self::TYPE_MODEL,
+            'join'     => 'thread',
+        ]);
 
-        $this->hasMap(array(
-            'column'     => 'parentID',
-            'property'   => 'parent',
-            'type'       => self::TYPE_MODEL,
-            'join'       => 'parent'
-        ));
+        $this->hasMap([
+            'column'   => 'parentID',
+            'property' => 'parent',
+            'type'     => self::TYPE_MODEL,
+            'join'     => 'parent',
+        ]);
 
-        $this->hasMap(array(
-                'column'     => 'userID',
-                'property'   => 'owner',
-                'type'       => self::TYPE_MODEL,
-                'join'       => 'owner',
-            ));
+        $this->hasMap([
+            'column'   => 'userID',
+            'property' => 'owner',
+            'type'     => self::TYPE_MODEL,
+            'join'     => 'owner',
+        ]);
 
-        $this->hasMap(array(
-                'column'     => 'date',
-                'property'   => 'date',
-                'type'       => self::TYPE_DATETIME,
-                'created_timestamp' => true
-            ));
+        $this->hasMap([
+            'column'            => 'date',
+            'property'          => 'date',
+            'type'              => self::TYPE_DATETIME,
+            'created_timestamp' => true,
+        ]);
 
-        $this->hasMap(array(
-                'column'     => 'body',
-                'property'   => 'body',
-                'type'       => self::TYPE_STRING
-            ));
+        $this->hasMap([
+            'column'   => 'body',
+            'property' => 'body',
+            'type'     => self::TYPE_STRING,
+        ]);
 
-        $this->hasMap(array(
-                'column'     => 'deleted',
-                'property'   => 'deleted',
-                'type'       => self::TYPE_STRING
-            ));
-        $this->hasSoftDeleteField('deleted', 'true', 'false');
+//        $this->hasMap([
+//            'column'   => 'deleted',
+//            'property' => 'deleted',
+//            'type'     => self::TYPE_STRING,
+//        ]);
+//        $this->hasSoftDeleteField('deleted', 'true', 'false');
+        $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
 
-        $this->hasMap(array(
-                'column'     => 'modified',
-                'property'   => 'modified',
-                'type'       => self::TYPE_DATETIME,
-                'updated_timestamp' => true
-            ));
+        $this->hasMap([
+            'column'            => 'modified',
+            'property'          => 'modified',
+            'type'              => self::TYPE_DATETIME,
+            'updated_timestamp' => true,
+        ]);
 
-        $this->hasMap(array(
-                'column'     => 'censored',
-                'property'   => 'censored',
-                'type'       => self::TYPE_STRING
-            ));
+        $this->hasMap([
+            'column'   => 'censored',
+            'property' => 'censored',
+            'type'     => self::TYPE_STRING,
+        ]);
 
-        $this->hasJoin('owner', array(
-            'mapper'    => '\\Schoolbox\\UserMapper',
+        $this->hasJoin('owner', [
+            'mapper'    => UserMapper::class,
             'this_key'  => 'userID',
             'other_key' => 'id',
-        ));
+        ]);
 
-        $this->hasJoin('parent', array(
-            'mapper'    => '\\Schoolbox\\Forum\\PostMapper',
+        $this->hasJoin('parent', [
+            'mapper'    => PostMapper::class,
             'this_key'  => 'parentID',
             'other_key' => 'postID',
-        ));
+        ]);
 
-        $this->hasJoin('thread', array(
-            'mapper'    => '\\Schoolbox\\Forum\\ThreadMapper',
+        $this->hasJoin('thread', [
+            'mapper'    => ThreadMapper::class,
             'this_key'  => 'threadID',
             'other_key' => 'threadID',
-        ));
+        ]);
+
+        $this->registerPersistSearchIndexCallbacks();
     }
 
 
@@ -125,7 +129,7 @@ class PostMapper extends Mapper implements FeedableMapperInterface
             WHERE post.postID=? ";
 
         $statement = $this->database->prepare($query);
-        $statement->execute(array($id));
+        $statement->execute([$id]);
 
         if (($row = $statement->fetch()) !== false) {
             $post = $this->hydrate($row, 'post');
@@ -151,9 +155,9 @@ class PostMapper extends Mapper implements FeedableMapperInterface
      */
     public function findForFeed($context, $limit, $offset = 0, $time = 0)
     {
-        $time = \Alaress_Date_Format::newFromTimestamp($time ? : time())->getDatabase();
+        $time = \Alaress_Date_Format::newFromTimestamp($time ?: time())->getDatabase();
 
-        $limit = (int)$limit;
+        $limit  = (int)$limit;
         $offset = (int)$offset;
 
         $stmt = $this->database->prepare("
@@ -166,18 +170,16 @@ class PostMapper extends Mapper implements FeedableMapperInterface
               INNER JOIN {$this->getJoinSql('owner', 'p', 'o', true)}
               LEFT JOIN {$this->getJoinSql('owner.pronoun', 'o', 'op')}
               INNER JOIN {$this->getJoinSql('thread', 'p', 't', true)}
-            WHERE p.deleted = 'false'
+            WHERE p.deleted_at IS NULL
             AND t.categoryID = :cat
             AND p.date < :time
             LIMIT $offset, $limit
         ");
 
-        $stmt->execute(
-            array(
-                'cat'  => $context,
-                'time' => $time
-            )
-        );
+        $stmt->execute([
+            'cat'  => $context,
+            'time' => $time,
+        ]);
 
         $c = $this->createCollection();
 
@@ -207,7 +209,6 @@ class PostMapper extends Mapper implements FeedableMapperInterface
      */
     public function findFirstPost($threadID)
     {
-
         $query =
             "SELECT
                 {$this->getColumnString('post')},
@@ -218,7 +219,7 @@ class PostMapper extends Mapper implements FeedableMapperInterface
             LIMIT 1";
 
         $statement = $this->database->prepare($query);
-        $statement->execute(array($threadID));
+        $statement->execute([$threadID]);
 
         if (($row = $statement->fetch()) !== false) {
             $post = $this->hydrate($row, 'post');
@@ -277,8 +278,8 @@ class PostMapper extends Mapper implements FeedableMapperInterface
             $owner = $this->hydrateJoin($row, 'owner', 'owner');
             $owner->setPronoun($this->hydrateJoin($row, 'owner.pronoun', 'op'));
             $post = $this->hydrate($row)
-                ->setOwner($owner)
-                ->setThread($this->hydrateJoin($row, 'thread', 'thread'));
+                         ->setOwner($owner)
+                         ->setThread($this->hydrateJoin($row, 'thread', 'thread'));
             /**
              * check if the post has a parent, if so, hydrate
              */
@@ -297,14 +298,16 @@ class PostMapper extends Mapper implements FeedableMapperInterface
      */
     public function getPageNumber(Post $post)
     {
-        $stmt = $this->database->prepare("SELECT count(*) as postCount FROM forumPost
-        WHERE deleted = 'false'
+        $stmt = $this->database->prepare("
+            SELECT count(*) as postCount FROM forumPost
+            WHERE deleted_at IS NULL
             AND threadID = :threadId
-            AND postID <= :postId");
+            AND postID <= :postId
+        ");
         $stmt->execute([
-                'threadId' => $post->getThread()->getId(),
-                'postId' => $post->getId(),
-                ]);
+            'threadId' => $post->getThread()->getId(),
+            'postId'   => $post->getId(),
+        ]);
 
         return ceil($stmt->fetch()['postCount'] / self::FORUM_POSTS_PER_PAGE);
     }

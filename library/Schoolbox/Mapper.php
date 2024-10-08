@@ -44,6 +44,7 @@ use Schoolbox\Realtime\Schedule\Event\Splitter;
 use Schoolbox\Realtime\Schedule\Trigger\IPropagator;
 use Schoolbox\Realtime\Schedule\Trigger\Propagator;
 use Schoolbox\Realtime\Schedule\Trigger\Test\MockPropagator;
+use Schoolbox\Search\Api\Database\Index\Persistor;
 use Traversable;
 use TypeError;
 use UnderflowException;
@@ -4154,6 +4155,45 @@ abstract class Mapper implements IMapper
             }
         }
         return true;
+    }
+
+
+    /**
+     * Register all callbacks required for persisting a search index change.
+     *
+     * @return void
+     */
+    public function registerPersistSearchIndexCallbacks(): void
+    {
+        $this->registerCallback(self::CALLBACK_POSTSAVE, $this->persistSearchIndex(...));
+        $this->registerCallback(self::CALLBACK_POSTDELETE, $this->persistSearchIndex(...));
+        $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, $this->persistSearchIndex(...));
+        $this->registerCallback(self::CALLBACK_POSTRESTORE, $this->persistSearchIndex(...));
+    }
+
+
+    /**
+     * Hook upon saving, deleting or restoring a model: persist resultant
+     * changes to the search index, after any transactions have been committed.
+     * This should only happen after transaction commit, because the search
+     * index build may rely on sub-objects which don't exist at the time the
+     * callback is triggered.
+     *
+     * This should be used as a post-change (save/delete/soft-delete/restore)
+     * callback for any mapper whose changes modify the search index.
+     *
+     * @param object $model
+     * @return void
+     */
+    public function persistSearchIndex(object $model): void
+    {
+        // For now: manually trigger the search index rebuild in the proxy.
+        // Can't do it in the base mapper's post-save, because at the trigger
+        // point the sub-objects (due work, quiz, etc.) don't yet exist.
+
+        /** @var Persistor $persistor */
+        $persistor = self::getDi()->get('search.indexPersistor');
+        $this->getDatabase()->onPersist(fn () => $persistor->persist($model));
     }
 
 

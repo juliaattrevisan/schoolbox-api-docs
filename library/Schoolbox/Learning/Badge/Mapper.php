@@ -97,6 +97,7 @@ class Mapper extends \Schoolbox\Mapper
         );
 
         $this->registerCallback(self::CALLBACK_PRESOFTDELETE, [$this, 'deleteAwards']);
+        $this->registerPersistSearchIndexCallbacks();
     }
 
 

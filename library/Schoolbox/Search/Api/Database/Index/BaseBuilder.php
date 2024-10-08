@@ -59,6 +59,15 @@ abstract class BaseBuilder implements IBuilder
     }
 
     /**
+     * @inheritdoc
+     */
+    public function setLogger(LoggerInterface $logger): self
+    {
+        $this->logger = $logger;
+        return $this;
+    }
+
+    /**
      * Helper function for building an index object.
      *
      * @param string      $identifier
@@ -177,4 +186,34 @@ abstract class BaseBuilder implements IBuilder
             ),
         );
     }
+
+    /**
+     * Does this builder rebuild search indices for this subject?
+     *
+     * This is not as clear-cut as just determining whether the subject is the
+     * same type as what the builder builds indices for (e.g. tiles for the tile
+     * builder): changes to related objects can re-trigger changes to the search
+     * index (e.g. tile layouts for the tile builder).
+     *
+     * @param object    $subject
+     * @param BuildType $buildType
+     * @return bool
+     */
+    abstract protected function accepts(object $subject, BuildType $buildType): bool;
+
+    /**
+     * Augment `$baseQuery` and `$baseParams` to find results only for
+     * `$subject`.
+     *
+     * Presumes that `$this->accepts` has passed, but otherwise needs to craft
+     * a query which handles any type of subject the builder may find results
+     * for.
+     *
+     * @param object    $subject
+     * @param BuildType $buildType
+     * @param string    $baseQuery  The base query onto which to add conditions.
+     * @param array     $baseParams The base params onto which to add parameters.
+     * @return array{string, array} a tuple of the query and parameters
+     */
+    abstract protected function augmentQueryParams(object $subject, BuildType $buildType, string $baseQuery, array $baseParams): array;
 }

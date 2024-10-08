@@ -10,10 +10,12 @@ declare(strict_types=1);
 namespace Schoolbox\Search\Api\Database\ResultType\Textbox;
 
 use Alaress_Date_Format;
+use Component_Config;
 use Component_Config_Componentname;
-use Schoolbox\Resource\Textbox\Component\Homepage\Controller as ComponentHomepageController;
-use Schoolbox\Resource\Textbox\Mapper as TextboxMapper;
+use Component_Instance;
+use Schoolbox\Resource\Textbox;
 use Schoolbox\Search\Api\Database\Index\BaseBuilder;
+use Schoolbox\Search\Api\Database\Index\BuildType;
 
 /**
  * Index builder for text boxes.
@@ -25,10 +27,73 @@ use Schoolbox\Search\Api\Database\Index\BaseBuilder;
  */
 class IndexBuilder extends BaseBuilder
 {
+    private ?int $textboxComponentConfigDefinitionId = null;
+
+    /**
+     * This builder works with:
+     * * textbox objects
+     * * textbox components
+     * * component configs, if it is for a textbox
+     *
+     * @param object    $subject
+     * @param BuildType $buildType
+     * @return bool
+     */
+    protected function accepts(object $subject, BuildType $buildType): bool
+    {
+        if ($subject instanceof Textbox\Model) {
+            return true;
+        }
+
+        if (
+            $subject instanceof Component_Instance
+            /** @phpstan-ignore-next-line - $subject->getDefinition can return null */
+            && $subject->getDefinition()?->getClass() === self::getComponentClass()
+        ) {
+            return true;
+        }
+
+        if ($subject instanceof Component_Config) {
+            // Need to lookup component config definition,
+            // to determine if it is actually a textbox.
+            $this->textboxComponentConfigDefinitionId ??= $this->getTextboxComponentConfigDefinitionId();
+            return $this->textboxComponentConfigDefinitionId === $subject->getConfigDefinitionId();
+        }
+
+        return false;
+    }
+
+    /**
+     * @param BuildType $buildType
+     * @inheritdoc
+     */
+    protected function augmentQueryParams(object $subject, BuildType $buildType, string $baseQuery, array $baseParams): array
+    {
+        if ($subject instanceof Textbox\Model) {
+            return [
+                $baseQuery . ' AND tb.textBoxID = :id',
+                $baseParams + ['id' => $subject->getId()],
+            ];
+        }
+        if ($subject instanceof Component_Instance) {
+            return [
+                $baseQuery . ' AND ci.id = :id',
+                $baseParams + ['id' => $subject->getId()],
+            ];
+        }
+        if ($subject instanceof Component_Config) {
+            return [
+                $baseQuery . ' AND ci.id = :id',
+                $baseParams + ['id' => $subject->getInstanceId()],
+            ];
+        }
+        return [$baseQuery, $baseParams];
+    }
+
     /**
      * @inheritdoc
      */
-    public function buildUpdates(?Alaress_Date_Format $fromDate, ?Alaress_Date_Format $toDate): iterable
+    public function buildUpdates(?Alaress_Date_Format $fromDate, ?Alaress_Date_Format $toDate, ?object $subject): iterable
     {
         // Pass 1: textboxes within a component
         //  * A similar query exists in library/Schoolbox/Assessment/Course/Plan/Controller.php.
@@ -70,14 +135,15 @@ class IndexBuilder extends BaseBuilder
                 cci_componentname.component_config_definition_id = ccd_componentname.id AND
                 cci_componentname.component_instance_id = ci.id
             )
-            WHERE cd.`class` = 'Schoolbox\\\Resource\\\Textbox\\\Component\\\Homepage\\\Controller'
+            WHERE cd.`class` = :componentClass
             AND f.deleted_at IS NULL
             AND tb.deleted_at IS NULL
         ";
         $params = [
-            'homepageDefaultComponentHeading' => ComponentHomepageController::DEFAULT_COMPONENT_HEADING,
-            'homepageComponentKey' => TextboxMapper::HOMEPAGE_COMPONENT_KEY,
-            'componentConfigComponentNameKey' => Component_Config_Componentname::KEY
+            'homepageDefaultComponentHeading' => Textbox\Component\Homepage\Controller::DEFAULT_COMPONENT_HEADING,
+            'homepageComponentKey'            => Textbox\Mapper::HOMEPAGE_COMPONENT_KEY,
+            'componentConfigComponentNameKey' => Component_Config_Componentname::KEY,
+            'componentClass'                  => self::getComponentClass(),
         ];
         if ($fromDate) {
             $queryString .= ' AND tb.updated_at >= :fromDate';
@@ -86,6 +152,12 @@ class IndexBuilder extends BaseBuilder
         if ($toDate) {
             $queryString .= ' AND tb.updated_at <= :toDate';
             $params['toDate'] = $toDate->getDatabase();
+        }
+        if ($subject) {
+            if (!$this->accepts($subject, BuildType::UPDATE)) {
+                return;
+            }
+            [$queryString, $params] = $this->augmentQueryParams($subject, BuildType::UPDATE, $queryString, $params);
         }
         $query = $this->connector->prepareQuery($queryString);
         $this->logger->info('Finding text boxes (with components)...');
@@ -108,25 +180,25 @@ class IndexBuilder extends BaseBuilder
         // Pass 2: textboxes without a component
         $queryString = "
             SELECT
-                CONCAT(tb2.textBoxID, '--') AS id,
-                tb2.heading AS title,
-                tb2.updated_at AS date,
-                tb2.created_by AS created_by,
-                tb2.body AS fulltext_index
-            FROM textBox tb2
+                CONCAT(tb.textBoxID, '--') AS id,
+                tb.heading AS title,
+                tb.updated_at AS date,
+                tb.created_by AS created_by,
+                tb.body AS fulltext_index
+            FROM textBox tb
             LEFT JOIN component_config_instance cci2 ON (
                 cci2.component_config_definition_id = (
                     SELECT id
                     FROM component_config_definition ccd2
                     WHERE ccd2.key = :homepageComponentKey
                 ) AND
-                cci2.value = CAST(tb2.textBoxID AS NCHAR)
+                cci2.value = CAST(tb.textBoxID AS NCHAR)
             )
-            WHERE tb2.deleted_at IS NULL
+            WHERE tb.deleted_at IS NULL
             AND cci2.id IS NULL
         ";
         $params = [
-            'homepageComponentKey' => TextboxMapper::HOMEPAGE_COMPONENT_KEY,
+            'homepageComponentKey' => Textbox\Mapper::HOMEPAGE_COMPONENT_KEY,
         ];
         if ($fromDate) {
             $queryString .= ' AND tb2.updated_at >= :fromDate';
@@ -135,6 +207,15 @@ class IndexBuilder extends BaseBuilder
         if ($toDate) {
             $queryString .= ' AND tb2.updated_at <= :toDate';
             $params['toDate'] = $toDate->getDatabase();
+        }
+        if ($subject) {
+            // Don't need to re-check if subject is accepted, as it was checked
+            // in an earlier query.
+            // However: need to exclude component search.
+            if ($subject instanceof Component_Instance || $subject instanceof Component_Config) {
+                return;
+            }
+            [$queryString, $params] = $this->augmentQueryParams($subject, BuildType::UPDATE, $queryString, $params);
         }
         $query = $this->connector->prepareQuery($queryString);
         $this->logger->info('Finding text boxes (without components)...');
@@ -167,16 +248,35 @@ class IndexBuilder extends BaseBuilder
      *
      * @param Alaress_Date_Format|null $fromDate Ignored
      * @param Alaress_Date_Format|null $toDate   Ignored
+     * @param object|null              $subject
      * @return iterable
      */
-    public function buildDeletes(?Alaress_Date_Format $fromDate, ?Alaress_Date_Format $toDate): iterable
+    public function buildDeletes(?Alaress_Date_Format $fromDate, ?Alaress_Date_Format $toDate, ?object $subject): iterable
     {
         // Examine and clean up every search index for textboxes
-        $searchIndexQuery = $this->connector->prepareQuery("
+        $searchIndexQueryString = "
             SELECT identifier
             FROM search_index
             WHERE type = :type
-        ");
+        ";
+        $searchIndexParams = ['type' => Hydrator::BASE_TYPE];
+
+        // Also add subject filters here, in a convoluted way
+        if ($subject instanceof Textbox\Model) {
+            $searchIndexQueryString .= ' AND identifier LIKE :textboxIdentifier';
+            $searchIndexParams['textboxIdentifier'] = $subject->getId() . '-%';
+        } elseif ($subject instanceof Component_Instance) {
+            $searchIndexQueryString .= ' AND identifier LIKE :componentIdentifier';
+            $searchIndexParams['componentIdentifier'] = '%-' . $subject->getId() . '-%';
+        } elseif ($subject instanceof Component_Config) {
+            $searchIndexQueryString .= ' AND identifier LIKE :componentIdentifier';
+            $searchIndexParams['componentIdentifier'] = '%-' . $subject->getInstanceId() . '-%';
+        } else {
+            return;
+        }
+        $searchIndexQuery = $this->connector->prepareQuery($searchIndexQueryString);
+
+        // Set up textbox and component exists query
         $textboxExistsQueryString = "
             SELECT textBoxID
             FROM textBox
@@ -195,7 +295,7 @@ class IndexBuilder extends BaseBuilder
         ");
         $componentExistsCache = [];
 
-        $searchIndexQuery->execute(['type' => Hydrator::BASE_TYPE]);
+        $searchIndexQuery->execute($searchIndexParams);
         $this->logger->info(sprintf('Examining and cleaning up %d text box search indices', $searchIndexQuery->rowCount()));
         foreach ($searchIndexQuery->fetchColumnArray('identifier') as $identifier) {
             $removeIndex = false;
@@ -217,7 +317,7 @@ class IndexBuilder extends BaseBuilder
                 if (!isset($componentExistsCache[$textboxId])) {
                     $componentExistsQuery->execute([
                         'textboxId' => $textboxId,
-                        'key'       => TextboxMapper::HOMEPAGE_COMPONENT_KEY,
+                        'key'       => Textbox\Mapper::HOMEPAGE_COMPONENT_KEY,
                     ]);
                     $componentExistsCache[$textboxId] = $componentExistsQuery->fetchColumnArray('component_instance_id');
                 }
@@ -234,17 +334,17 @@ class IndexBuilder extends BaseBuilder
                         $removeIndex = true;
                     }
                 } else {
+                    // This index does have a component:
+                    // remove it if it is not associated with that component
                     if (!in_array($componentId, $componentExistsCache[$textboxId])) {
-                        if (!$componentExistsCache[$textboxId]) {
-                            $this->logger->debug(
-                                sprintf(
-                                    'Textbox %d is no longer associated with component %d: removing index',
-                                    $textboxId,
-                                    $componentId,
-                                ),
-                            );
-                            $removeIndex = true;
-                        }
+                        $this->logger->debug(
+                            sprintf(
+                                'Textbox %d is no longer associated with component %d: removing index',
+                                $textboxId,
+                                $componentId,
+                            ),
+                        );
+                        $removeIndex = true;
                     }
                 }
             }
@@ -261,5 +361,34 @@ class IndexBuilder extends BaseBuilder
                 );
             }
         }
+    }
+
+    /**
+     * Find the config definition ID for textboxes.
+     *
+     * @return int|null
+     */
+    private function getTextboxComponentConfigDefinitionId(): ?int
+    {
+        // Look it up if not yet set
+        $query = $this->connector->prepareQuery("
+            SELECT ccd.id
+            FROM component_config_definition ccd
+            INNER JOIN component_definition cd ON ccd.component_definition_id = cd.id
+            WHERE ccd.key = 'textbox'
+            AND   cd.class = :class
+        ");
+        $query->execute(['class' => self::getComponentClass()]);
+        return filter_var($query->fetchColumn(), FILTER_VALIDATE_INT, FILTER_NULL_ON_FAILURE);
+    }
+
+    /**
+     * Retrieve and trim the homepage component class name, for use in queries.
+     *
+     * @return string
+     */
+    private static function getComponentClass(): string
+    {
+        return trim(Textbox\Component\Homepage\Controller::class, '\\');
     }
 }

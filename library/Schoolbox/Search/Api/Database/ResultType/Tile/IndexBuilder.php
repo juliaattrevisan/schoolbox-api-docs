@@ -10,7 +10,10 @@ declare(strict_types=1);
 namespace Schoolbox\Search\Api\Database\ResultType\Tile;
 
 use Alaress_Date_Format;
+use Schoolbox\Resource\Folder;
 use Schoolbox\Search\Api\Database\Index\BaseBuilder;
+use Schoolbox\Search\Api\Database\Index\BuildType;
+use Schoolbox\Tile;
 
 /**
  * Index builder for tiles.
@@ -18,9 +21,56 @@ use Schoolbox\Search\Api\Database\Index\BaseBuilder;
 class IndexBuilder extends BaseBuilder
 {
     /**
+     * This builder works with:
+     * * tile objects
+     * * tile layouts
+     * * folders, when they are deleted
+     *
+     * @param object    $subject
+     * @param BuildType $buildType
+     * @return bool
+     */
+    protected function accepts(object $subject, BuildType $buildType): bool
+    {
+        if ($subject instanceof Tile\Model || $subject instanceof Tile\Layout\Model) {
+            return true;
+        }
+        if ($buildType === BuildType::DELETE && $subject instanceof Folder\Model) {
+            return true;
+        }
+        return false;
+    }
+
+    /**
      * @inheritdoc
      */
-    public function buildUpdates(?Alaress_Date_Format $fromDate, ?Alaress_Date_Format $toDate): iterable
+    protected function augmentQueryParams(object $subject, BuildType $buildType, string $baseQuery, array $baseParams): array
+    {
+        if ($subject instanceof Tile\Model) {
+            return [
+                $baseQuery . ' AND t.id = :id',
+                $baseParams + ['id' => $subject->getId()],
+            ];
+        }
+        if ($subject instanceof Tile\Layout\Model) {
+            return [
+                $baseQuery . ' AND tl.id = :id',
+                $baseParams + ['id' => $subject->getId()],
+            ];
+        }
+        if ($subject instanceof Folder\Model) {
+            return [
+                $baseQuery . ' AND f.id = :id',
+                $baseParams + ['id' => $subject->getId()],
+            ];
+        }
+        return [$baseQuery, $baseParams];
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function buildUpdates(?Alaress_Date_Format $fromDate, ?Alaress_Date_Format $toDate, ?object $subject): iterable
     {
         // Notes:
         // * Tiles without a title should not appear in search results (AC for SA-8841)
@@ -52,6 +102,12 @@ class IndexBuilder extends BaseBuilder
             $queryString .= ' AND t.modified_at <= :toDate';
             $params['toDate'] = $toDate->getDatabase();
         }
+        if ($subject) {
+            if (!$this->accepts($subject, BuildType::UPDATE)) {
+                return;
+            }
+            [$queryString, $params] = $this->augmentQueryParams($subject, BuildType::UPDATE, $queryString, $params);
+        }
         $query = $this->connector->prepareQuery($queryString);
         $this->logger->info('Finding tiles...');
         $query->execute($params);
@@ -74,7 +130,7 @@ class IndexBuilder extends BaseBuilder
     /**
      * @inheritdoc
      */
-    public function buildDeletes(?Alaress_Date_Format $fromDate, ?Alaress_Date_Format $toDate): iterable
+    public function buildDeletes(?Alaress_Date_Format $fromDate, ?Alaress_Date_Format $toDate, ?object $subject): iterable
     {
         // What database updates could cause a tile that was included
         // in the buildUpdates() query to be excluded from that query?
@@ -122,6 +178,12 @@ class IndexBuilder extends BaseBuilder
                 )'
             );
             $params['toDate'] = $toDate->getDatabase();
+        }
+        if ($subject) {
+            if (!$this->accepts($subject, BuildType::DELETE)) {
+                return;
+            }
+            [$queryString, $params] = $this->augmentQueryParams($subject, BuildType::DELETE, $queryString, $params);
         }
         $query = $this->connector->prepareQuery($queryString);
         $query->execute($params);
