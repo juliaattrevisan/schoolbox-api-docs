@@ -13,6 +13,7 @@ export const DEBOUNCE_AMOUNT = 350; // the amount in ms to hold off on searching
 
 export const useSearchStore = defineStore(`searchStore`, () => {
     let endpoint = "";
+    let isSingleSelect = false;
     const isLoading = window.Vue.ref(false); // to notify that an action is taking place,
     const query = window.Vue.ref(""); // current search term to filter the active nodes
     const results = window.Vue.ref<Result[]>([]); // nodes returned in the current search results
@@ -38,16 +39,20 @@ export const useSearchStore = defineStore(`searchStore`, () => {
      * To show the current results, or the default results if the search is not active
      * @returns { Result[] }
      */
-    const currentResults = window.Vue.computed(() => (isActive.value ? results.value : defaultResults.value));
+    const currentResults = window.Vue.computed(() => {
+        return isActive.value ? results.value : defaultResults.value;
+    });
 
     /**
      * initialise the search store, just passing the endpoint
      * @param $endpoint - the endpoint to search for results
      * @param $defaultResults - the default results to display
+     * @param $isSingleSelect - whether the search is for a single select
      */
-    function init($endpoint: string, $defaultResults: Result[]): void {
+    function init($endpoint: string, $defaultResults: Result[], $isSingleSelect: boolean): void {
         endpoint = $endpoint;
         defaultResults.value = $defaultResults;
+        isSingleSelect = $isSingleSelect;
     }
 
     /**
