@@ -19,7 +19,9 @@ class Controller extends Base
      * Controller constructor.
      */
     public function __construct(
-        private \Schoolbox\Admin\Profile\Editor\Field\Mapper $fieldMapper,
+        private Field\Mapper $fieldMapper,
+        private Field\Availability\Campus\Mapper $availabilityCampusMapper,
+        private Field\Visibility\Mapper $visibilityMapper,
         private \Schoolbox\CampusMapper $campusMapper,
     ) {
     }
@@ -64,47 +66,58 @@ class Controller extends Base
      * @since 24.1
      *
      * @param string $roleType The relevant role type
-     * @param string $fieldId The field to enable
+     * @param Field\Model $field The field to enable
      * @return void
      * @throws \InvalidArgumentException
      */
-    public function postFieldAdd(string $roleType, string $fieldId): void
+    public function postFieldAdd(string $roleType, Field\Model $field): void
     {
         try {
-            /* New fields are spawned at the top of the list, forcing other
-             * fields down the screen. This means we need to first obtain the
-             * current set of enabled fields:
+            /* When clicked to add, new fields are spawned at the top of the list,
+             * forcing other fields down the screen.
+             *
+             * When dragged, new fields are spawned in the spot you dragged - this could
+             * be in the middle of the list, or at either extreme. Anything equal to, or
+             * greater, than this sequence index needs to be incremented to make a gap.
+             *
+             * This means we need to first obtain the current set of enabled fields:
              */
             $fields = $this->fieldMapper->findByColumnList([
                 'roleType' => $roleType,
                 'enabled' => true,
+            ], [
+                'order' => [
+                    'sequence' => 'asc'
+                ]
             ]);
 
-            /* ...then increment their sequences by one:
+            /* Then find out what sequence we need to inject a field.
              */
-            foreach ($fields as $field) {
-                $field->setSequence($field->getSequence() + 1);
+            /** @var int|null $index - The index at which to insert the field */
+            $index = (int)($this->requestPost->get('index')) + 1;
 
-                $this->fieldMapper->save($field);
+            /* ...then increment fields whose sequences are equal to, or greater than, $index
+             */
+            foreach ($fields as $currentField) {
+                if (Payload::FIELD_PORTRAIT_IMAGE === $currentField->getField()) {
+                    /* Portrait Image is always sequence zero
+                     */
+                    $currentField->setSequence(0);
+                } elseif ($currentField->getSequence() >= $index) {
+                    /* Increment by one
+                     */
+                    $currentField->setSequence($currentField->getSequence() + 1);
+                }
+
+                $this->fieldMapper->save($currentField);
             }
 
-            /* ...then inject our new field at sequence 0.
+            /* Spawn in place using the index provided by frontend
              */
-            $fieldModel = $this->fieldMapper->findOneByColumnList([
-                'roleType' => $roleType,
-                'field' => $fieldId,
-            ]);
+            $field->setSequence($index);
+            $field->setEnabled(1);
 
-            /** @var int|null $index - The index at which to insert the field */
-            $index = (int)$this->requestPost->get('index');
-
-            /* New fields are spawned with sequence 1, since $index is always
-             * given to us as 0 in this usage from frontend.
-             */
-            $fieldModel->setSequence($index);
-            $fieldModel->setEnabled(1);
-
-            $this->fieldMapper->save($fieldModel);
+            $this->fieldMapper->save($field);
 
             $this->response = $this->responseAsJson(['success' => true]);
         } catch (\Exception $e) {
@@ -122,19 +135,14 @@ class Controller extends Base
      * @since 24.1
      *
      * @param string $roleType The relevant role type
-     * @param string $fieldId The field to remove
+     * @param Field\Model $field The field to remove
      * @throws \InvalidArgumentException
      */
-    public function postFieldRemove(string $roleType, string $fieldId): void
+    public function postFieldRemove(string $roleType, Field\Model $field): void
     {
         try {
-            $fieldModel = $this->fieldMapper->findOneByColumnList([
-                'roleType' => $roleType,
-                'field' => $fieldId,
-            ]);
-
-            $fieldModel->setEnabled(0);
-            $this->fieldMapper->save($fieldModel);
+            $field->setEnabled(0);
+            $this->fieldMapper->save($field);
 
             /* Removed fields will leave a hole in the sequencing.
              * To make sequencing contiguous, we need to fetch all
@@ -149,14 +157,22 @@ class Controller extends Base
                 ]
             ]);
 
-            /* ...then reassign them in zero-indexed order.
+            /* ...then reassign them in 1-indexed order.
              */
-            $i = 0;
+            $i = 1;
 
-            foreach ($fields as $field) {
-                $field->setSequence($i++);
+            foreach ($fields as $currentField) {
+                if (Payload::FIELD_PORTRAIT_IMAGE === $currentField->getField()) {
+                    /* Portrait Image is always sequence zero
+                     */
+                    $field->setSequence(0);
+                } else {
+                    /* Assign new sequence
+                     */
+                    $field->setSequence($i++);
+                }
 
-                $this->fieldMapper->save($field);
+                $this->fieldMapper->save($currentField);
             }
 
             $this->response = $this->responseAsJson(['success' => true]);
@@ -175,10 +191,10 @@ class Controller extends Base
      * @since 24.1
      *
      * @param string $roleType The roletype to update
-     * @param string $fieldId  The field to update
+     * @param Field\Model $field  The field to update
      * @throws \InvalidArgumentException
      */
-    public function postFieldSettings(string $roleType, string $fieldId): void
+    public function postFieldSettings(string $roleType, Field\Model $field): void
     {
         try {
             $settings = $this->requestPost->get('fieldSettings');
@@ -187,20 +203,72 @@ class Controller extends Base
                 throw new \RuntimeException('No field settings provided');
             }
 
-            $fieldModel = $this->fieldMapper->findOneByColumnList([
-                'roleType' => $roleType,
-                'field' => $fieldId,
-            ]);
+            /* The updated availabilities and visibilities are in this array struct
+             * where availability is *presumed* to be campus ids only (for now)
+             * and visibility is *presumed* to be roletype strings only (for now)
+             * imho it'd be better served seeing a campus node in here and also a
+             * roletype node, so you know conclusively what these represent.
+             *
+                [fieldSettings] => Array
+                    (
+                        [availability] => Array
+                            (
+                                [0] => 1
+                                [1] => 2
+                            )
 
-            /** @var string[] $requestedAvailabilityCampuses */
-            $requestedAvailabilityCampuses = $settings['availability'] ?? [];
+                        [visibility] => Array
+                            (
+                                [0] => parent
+                                [1] => student
+                                [2] => staff
+                                [3] => self
+                            )
 
-            /** @var string[] $requestedVisibilityRoleTypes */
-            $requestedVisibilityRoleTypes = $settings['visibility'] ?? [];
+                    )
+             */
 
-            // TODO
+            /* First purge existing relations
+             */
+            $this->availabilityCampusMapper->deleteByColumn('profile_field_id', $field->getId());
 
-            $this->fieldMapper->save($fieldModel);
+            /* Then, if there are any campus ids chosen, reinsert these new ones
+             * Otherwise leave it empty (this is a legitimate use case)
+             */
+            /** @var int[] $newCampusIds */
+            $newCampusIds = $settings['availability'] ?? [];
+
+            if (\count($newCampusIds)) {
+                $campuses = $this->campusMapper->findByColumn('id', $newCampusIds);
+
+                foreach ($campuses as $campus) {
+                    $relation = $this->availabilityCampusMapper->createModel()
+                        ->setField($field)
+                        ->setCampus($campus);
+
+                    $this->availabilityCampusMapper->save($relation);
+                }
+            }
+
+            /* First purge existing relations
+             */
+            $this->visibilityMapper->deleteByColumn('profile_field_id', $field->getId());
+
+            /* Then, if there are any roletypes chosen, reinsert these new ones
+             * Otherwise leave it empty (this is a legitimate use case)
+             */
+            /** @var string[] $newRoleTypes */
+            $newRoleTypes = $settings['visibility'] ?? [];
+
+            if (\count($newRoleTypes)) {
+                foreach ($newRoleTypes as $newRoleType) {
+                    $relation = $this->visibilityMapper->createModel()
+                        ->setField($field)
+                        ->setRoleType($newRoleType);
+
+                    $this->visibilityMapper->save($relation);
+                }
+            }
 
             $this->response = $this->responseAsJson(['success' => true]);
         } catch (\Exception $e) {
@@ -214,7 +282,7 @@ class Controller extends Base
     /**
      * POST Resequence fields for a particular role type
      *
-     * Note that sequences are zero-indexed.
+     * Note that sequences are 1-indexed.
      *
      * @api   POST /adminv2/profileEditor/field/{roleType}/sequence
      * @since 24.1
@@ -255,9 +323,14 @@ class Controller extends Base
                     continue;
                 }
 
-                /* Assign new sequence
+                /* Portrait Image should never appear in this $sequence array
+                 * But if it does one day, is always sequence zero
+                 *
+                 * if (Payload::FIELD_PORTRAIT_IMAGE === $field) {
+                 *     $fieldModel->setSequence(0);
+                 * }
                  */
-                $fieldModel->setSequence($index);
+                $fieldModel->setSequence($index + 1);
 
                 $this->fieldMapper->save($fieldModel);
             }

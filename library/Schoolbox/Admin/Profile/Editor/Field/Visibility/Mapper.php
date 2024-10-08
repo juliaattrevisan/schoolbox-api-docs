@@ -32,6 +32,7 @@ class Mapper extends \Schoolbox\Mapper
         $this->hasTable('profile_field_roletype_visibility');
         $this->hasModel(Model::class);
         $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
+        $this->joins('profile_field_id', \Schoolbox\Admin\Profile\Editor\Field\Mapper::class, 'id', null, null, 'field', 'field');
         $this->uses('roletype', self::TYPE_STRING, null, 'roleType', 'roleType');
     }
 }

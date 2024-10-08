@@ -16,6 +16,13 @@ use Schoolbox\Role;
 class Payload
 {
     /**
+     * A special case field - it's mandatory and always appears in everyone's
+     * profile screen when administering
+     */
+    public const FIELD_PORTRAIT_IMAGE = 'portrait';
+
+
+    /**
      * Common nodes and human-readable name equivalents
      */
     private const AVAILABILITY_NODE = 'availability';
@@ -107,7 +114,13 @@ class Payload
         $fieldSettingsRoleType = [
             'displayAs' => self::VISIBILITY_NAME,
             'tooltip' => self::VISIBILITY_TOOLTIP,
-            'options' => []
+            'options' => [
+                [
+                    'type' => 'roleType',
+                    'id' => 'self',
+                    'name' => 'Self'
+                ]
+            ]
         ];
 
         foreach ($roleTypes as $roleType) {
@@ -130,7 +143,8 @@ class Payload
                 'roleType' => $roleType,
                 'fields' => [
                     'available' => [],
-                    'selected' => []
+                    'selected' => [],
+                    'mandatory' => []
                 ]
             ];
 
@@ -145,6 +159,12 @@ class Payload
             /* Ones that you could possibly choose
              */
             foreach ($fields as $field) {
+                /* Portrait Image can never be chosen; it's mandatory
+                 */
+                if (self::FIELD_PORTRAIT_IMAGE === $field->getField()) {
+                    continue;
+                }
+
                 $roleTypeSettings['fields']['available'][] = [
                     'field' => $field->getField(),
                     'displayAs' => $field->getDisplayAs(),
@@ -165,9 +185,17 @@ class Payload
                     continue;
                 }
 
+                $node = 'selected';
+
+                /* Portrait Image can never be disabled; it's mandatory
+                 */
+                if (self::FIELD_PORTRAIT_IMAGE === $field->getField()) {
+                    $node = 'mandatory';
+                }
+
                 /* Pile it into the stack
                  */
-                $roleTypeSettings['fields']['selected'][] = [
+                $roleTypeSettings['fields'][$node][] = [
                     'field' => $field->getField(),
                     'displayAs' => $field->getDisplayAs(),
                     'icon' => $field->getIcon(),
