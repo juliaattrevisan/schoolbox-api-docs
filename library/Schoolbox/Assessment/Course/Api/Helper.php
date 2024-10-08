@@ -26,7 +26,7 @@ class Helper
         private User $user,
         private ?string $search,
         private int $limit,
-        private ICodec $codec,
+        private ?ICodec $codec,
     ) {
     }
 
@@ -158,6 +158,10 @@ class Helper
         $return = $folder;
 
         foreach (array_reverse($lineage->getAll()) as $parent) {
+            //Set parent to null when reached the faculty root folder
+            if ($parent->getParent()->getName() === null) {
+                $parent->setParent(null);
+            }
             $return->setParent($parent);
             $return = $return->getParent();
         }
