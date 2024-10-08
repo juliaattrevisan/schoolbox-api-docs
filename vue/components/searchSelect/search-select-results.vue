@@ -48,7 +48,7 @@ async function animateResults(): Promise<void> {
  * results have been preset prior to search
  */
 window.Vue.onMounted(async () => {
-    if (store.results.length > 0) {
+    if (props.selected.length > 0) {
         await animateResults();
     }
 });
@@ -97,7 +97,9 @@ function onSelected(result: Result): void {
     <div ref="searchResultsContainerEl" class="search-results-container">
         <div ref="searchResultsEl" class="search-results">
             <div v-if="store.isLoading" class="search-status">Searching for results....</div>
-            <div v-else-if="store.hasNoResults" class="search-status">No results found for your current search.</div>
+            <div v-else-if="store.hasNoResults && props.selected.length === 0" class="search-status">
+                No results found for your current search.
+            </div>
             <template v-else>
                 <search-select-select-all v-if="showSelectAll" />
                 <search-select-result
