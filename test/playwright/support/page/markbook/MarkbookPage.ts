@@ -7,6 +7,8 @@ import { Page, expect } from "@playwright/test";
 export default class MarkbookPage {
     private page: Page;
 
+    static readonly URL = "/homepage/{class_id}";
+
     static readonly REPORT_CONTENT = "#report_content";
 
     constructor(page: Page) {
@@ -17,19 +19,47 @@ export default class MarkbookPage {
      * Navigates to the markbook page
      * @param classId - The ID of the class
      */
-    async open(classId: number): Promise<void> {
-        // back to homepage
-        await this.page.goto(`/homepage/${classId}`);
+    async open(classId: string): Promise<void> {
+        // back to homepage, waiting so it does not attempt to navigate before the previous action is completed
+        await this.page.waitForTimeout(2000);
+        await this.page.goto(MarkbookPage.URL.replace("{class_id}", classId));
+
+        await this.page.waitForTimeout(2000);
         // Jelly tot
-        await this.page.click("[data-test=sbx-pop-out-tab-control] [data-test=sbx-pop-out-tab-control-button]");
+        await this.page
+            .locator("[data-test=sbx-pop-out-tab-control] [data-test=sbx-pop-out-tab-control-button]")
+            .click();
         // Markbook
-        await this.page.click("a.icon-curriculum");
-        await this.page.click('li[data-component="12"]');
-        await this.page.click('label[for="filter_selection_12_1"]');
-        await this.page.click('li[data-component="10"]');
-        await this.page.click('label[for="filter_selection_10_open"]');
-        await this.page.click('li[data-component="10"]');
-        await this.page.click("input#submit_button");
+        await this.page.locator("a.icon-curriculum").first().click();
+        await this.page.locator(`h1:has-text("Class Markbook for Demo Class Page 2")`).isVisible({ timeout: 30000 });
+    }
+
+    /**
+     * clas smarkbook filter - select work type
+     * @param workType - The work type to select: None 13, Assessment Task 1, Assignment 2, Homework3 etc
+     */
+    async selectWorkType(workType: number): Promise<void> {
+        await this.page.getByTestId("sbx-pop-out-filter-component-12-button").click();
+        await this.page.locator(`label[for="filter_selection_12_${workType}"]`).click();
+    }
+
+    /**
+     * Selects the activity from the markbook page
+     * @param status - the assessment status:  unpublished, open, closed, overdue. upcomiing
+     */
+    async selectStatus(status: string): Promise<void> {
+        await this.page.locator('li[data-component="10"]').click();
+        await this.page.locator(`label[for="filter_selection_10_${status}"]`).click();
+        await this.page.locator('li[data-component="10"]').click();
+    }
+
+    /**
+     * cliick Apply  button
+     */
+    async applyFilter(): Promise<void> {
+        await this.page.locator("input#submit_button").click();
+        // give time to load the data
+        await this.page.waitForTimeout(2000);
     }
 
     /**

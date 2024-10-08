@@ -66,7 +66,8 @@ export default class StatusPage {
      * click the jelly tot
      */
     async clickJellyTot(): Promise<void> {
-        await this.page.locator(StatusPage.DATA_TEST_JELLY_TOT).isVisible({ timeout: 30000 });
+        await this.page.waitForTimeout(2000);
+        await this.page.getByTestId(StatusPage.DATA_TEST_JELLY_TOT).isVisible({ timeout: 30000 });
         await this.page.getByTestId(StatusPage.DATA_TEST_JELLY_TOT).click();
     }
 

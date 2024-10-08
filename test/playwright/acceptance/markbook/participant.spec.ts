@@ -23,14 +23,12 @@ test.describe("Participant Tests", () => {
      * creates a due work, remove participants and check the excluded user for that activity is no longer presented in the class markbook
      */
     test("Participant", async ({ tester, page }) => {
-        const classId = Common.CLASS_ID_DEMO2;
-        const student = Common.USER_LOUISASMITH;
+        const classId = Common.CLASS_ID_DEMO2.toString();
         const studentId = Common.USER_ID_LOUISASMITH;
         const teacher = Common.USER_JACKCOLES;
         const teacherId = Common.USER_ID_JACKCOLES;
 
         const addComponent = new Homepage(page);
-        const common = new Common(page);
         const dueworkForm = new AssessmentForm(tester, page);
         const submitForm = new SubmitForm(tester, page);
         const markbookPage = new MarkbookPage(page);
@@ -49,7 +47,6 @@ test.describe("Participant Tests", () => {
 
         tester.isGoingTo("As Jack Coles, create a due work");
         await tester.impersonate(teacher);
-        await page.goto("/learning/assessments/821/modify");
         const dueworkTitle1 = `Cest One ${Common.genText(6)}`;
         const filename = path.join(__dirname, "../../support/file/test-80x80.png");
 
@@ -96,8 +93,44 @@ test.describe("Participant Tests", () => {
             "open course mark book and check that Jack Coles is not presented and the student is presented",
         );
         await markbookPage.open(classId);
+        await markbookPage.selectWorkType(1);
+        await markbookPage.selectStatus("open");
+        await markbookPage.applyFilter();
         await markbookPage.canSeeAssessment("Cest One");
         await markbookPage.cantSeeParticipant("Coles, Jack");
         await markbookPage.canSeeParticipant("Smith, Louisa");
+
+        tester.isGoingTo("exclude a student (Louisa Smith) from the due work participants list");
+        await page.locator(`a:has-text("Cest One")`).click();
+        await page.locator(`h1:has-text("Status of Cest One")`).isVisible({ timeout: 30000 });
+        await statusPage.clickJellyTot();
+        await statusPage.clickJellyTotOption("modify");
+        await page.locator(`h2:has-text("Update Cest One")`).isVisible({ timeout: 30000 });
+        await dueworkForm.modifyParticipation(studentId, false, false);
+        await dueworkForm.update();
+        await page.locator(`h1:has-text("Status of Cest One")`).isVisible({ timeout: 30000 });
+
+        tester.isGoingTo("open course mark book and check that Jack Coles and Louisa Smith are not presented");
+        await markbookPage.open(classId);
+        await markbookPage.canSeeAssessment("Cest One");
+        await markbookPage.cantSeeParticipant("Coles, Jack");
+        await markbookPage.cantSeeParticipant("Smith, Louisa");
+
+        // remove the duework component from the homepage to avoid issues in the next test
+        tester.isGoingTo("remove the duework component from the homepage");
+        await page.goto("/homepage/106");
+        await page.waitForTimeout(1000);
+        await addComponent.clickLockToggle();
+        await addComponent.clickComponentRemoveIcon();
+        await addComponent.clickRemoveConfirmationMessage();
+    });
+
+    /**
+     * remove the duework component from the homepage and delete the assessment
+     */
+
+    test.afterAll(async ({ baseTester, db }) => {
+        baseTester.isGoingTo("delete the assessment");
+        await db.updateInDatabase("assessment", { deleted_at: "2022-01-15 11:22:34" }, { "title like": "Cest One%" });
     });
 });
