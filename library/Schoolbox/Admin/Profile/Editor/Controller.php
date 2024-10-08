@@ -73,9 +73,14 @@ class Controller extends Base
     public function postFieldAdd(string $roleType, Field\Model $field): void
     {
         try {
-            /* New fields are spawned at the top of the list, forcing other
-             * fields down the screen. This means we need to first obtain the
-             * current set of enabled fields:
+            /* When clicked to add, new fields are spawned at the top of the list,
+             * forcing other fields down the screen.
+             *
+             * When dragged, new fields are spawned in the spot you dragged - this could
+             * be in the middle of the list, or at either extreme. Anything equal to, or
+             * greater, than this sequence index needs to be incremented to make a gap.
+             *
+             * This means we need to first obtain the current set of enabled fields:
              */
             $fields = $this->fieldMapper->findByColumnList([
                 'roleType' => $roleType,
