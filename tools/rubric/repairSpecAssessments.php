@@ -836,10 +836,12 @@ $kernel->run(new class extends App {
             //    linked to assessments whose context is
             //    a project within a course unit specification linked to the given folder
             // UNION
-            // Select submission boxes whose context is
+            // Select submission boxes
+            //    linked to assessments whose context is
             //    a course unit implementation linked to the given folder
             // UNION
-            // Select submission boxes whose context is
+            // Select submission boxes
+            //    linked to assessments whose context is
             //    a project within a course unit implementation linked to the given folder.
             'SELECT sb.id
             FROM submission_box sb
