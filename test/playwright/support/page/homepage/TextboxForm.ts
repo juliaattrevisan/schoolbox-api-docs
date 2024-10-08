@@ -1,5 +1,5 @@
 import type AcceptanceTester from "@schoolboxTest/playwright/support/AcceptanceTester";
-import type { Page} from "@playwright/test";
+import type { Page } from "@playwright/test";
 import { expect } from "@playwright/test";
 
 export default class TextboxForm {

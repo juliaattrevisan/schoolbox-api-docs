@@ -5,11 +5,11 @@
 import { defineStore } from "pinia";
 import { useQueryStore } from "./spQueryStore";
 import { useFiltersStore } from "../filters/store/spFiltersStore";
-import type { FilterType} from "../filters/store/spFilterTypesStore";
+import type { FilterType } from "../filters/store/spFilterTypesStore";
 import { useFilterTypesStore } from "../filters/store/spFilterTypesStore";
-import type { FilterDateRange} from "../filters/store/spFilterDateRangeStore";
+import type { FilterDateRange } from "../filters/store/spFilterDateRangeStore";
 import { EMPTY_DATE, useFilterDateRangeStore } from "../filters/store/spFilterDateRangeStore";
-import type { Creator} from "../filters/store/spFilterCreatorsStore";
+import type { Creator } from "../filters/store/spFilterCreatorsStore";
 import { useFilterCreatorsStore } from "../filters/store/spFilterCreatorsStore";
 
 const SINGLE_COLUMN_BREAKPOINT = 800;

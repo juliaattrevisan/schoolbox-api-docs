@@ -4,18 +4,8 @@
  *  trying to ensure the content is always in the viewport
  */
 
-import type {
-    ReferenceElement,
-    ComputePositionReturn,
-    Placement,
-    Boundary,
-    FloatingElement} from "@floating-ui/dom";
-import {
-    computePosition,
-    autoUpdate,
-    flip,
-    shift
-} from "@floating-ui/dom";
+import type { ReferenceElement, ComputePositionReturn, Placement, Boundary, FloatingElement } from "@floating-ui/dom";
+import { computePosition, autoUpdate, flip, shift } from "@floating-ui/dom";
 import gsap from "gsap";
 import type { Ref } from "vue";
 import { onClickOutside } from "@vueuse/core";

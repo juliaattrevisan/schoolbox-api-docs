@@ -5,7 +5,7 @@
  */
 import { useUnitPlannerStore } from "./store/unitPlannerStore";
 import { useUnitPlannerTextboxStore } from "./store/unitPlannerTextboxStore";
-import type { Column} from "./unitPlannerConfig";
+import type { Column } from "./unitPlannerConfig";
 import { ColumnType } from "./unitPlannerConfig";
 import type { Unit } from "./unitPlannerTypes";
 

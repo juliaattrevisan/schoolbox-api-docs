@@ -2,7 +2,7 @@
  * Utilities to help with managing terminology
  * This is a class to manage an overall dictionary of L10n terms, it effectively aligns with library/Schoolbox/L10n/RosettaStone.php
  */
-import type { IL10n} from "@js/terminology/l10n";
+import type { IL10n } from "@js/terminology/l10n";
 import { L10n } from "@js/terminology/l10n";
 
 /**

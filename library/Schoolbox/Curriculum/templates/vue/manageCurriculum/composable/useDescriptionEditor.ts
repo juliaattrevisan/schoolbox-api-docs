@@ -7,7 +7,7 @@
  */
 
 import type { Ref } from "vue";
-import type { EditorCreatedEventInfo} from "@js/editor/event/editorEvent";
+import type { EditorCreatedEventInfo } from "@js/editor/event/editorEvent";
 import { EditorEvent } from "@js/editor/event/editorEvent";
 import { isScriptAdded, injectScript } from "@js/util/domUtils";
 
