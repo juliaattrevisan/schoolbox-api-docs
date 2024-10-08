@@ -4,7 +4,7 @@
  */
 
 import ShowMatches from "@schoolboxVue/components/search/show-matches.vue";
-import { Result } from "../../js/types/Result";
+import type { Result } from "../../js/types/Result";
 import { useQueryStore } from "../store/spQueryStore";
 
 interface Props {

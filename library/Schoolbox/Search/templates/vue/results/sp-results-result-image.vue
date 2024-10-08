@@ -3,7 +3,7 @@
  * To display the search results image or icon, wrapping the image in a link if there is one
  */
 
-import { Result } from "../../js/types/Result";
+import type { Result } from "../../js/types/Result";
 import { ResultTypes } from "../../js/types/ResultTypes";
 import SpResultsResultImageWrapper from "./sp-results-result-image-wrapper.vue";
 

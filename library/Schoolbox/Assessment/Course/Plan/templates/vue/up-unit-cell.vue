@@ -10,7 +10,8 @@ import { gsap } from "gsap";
 import { Draggable } from "gsap/Draggable";
 import { useUnitPlannerStore } from "./store/unitPlannerStore";
 import { useUnitPlannerDragStore } from "./store/unitPlannerDragStore";
-import { Column, ColumnType } from "./unitPlannerConfig";
+import type { Column} from "./unitPlannerConfig";
+import { ColumnType } from "./unitPlannerConfig";
 import type { Unit } from "./unitPlannerTypes";
 
 // Import all the content/action/empty components for the different column types

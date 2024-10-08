@@ -1,4 +1,4 @@
-import { Unit } from "./Unit";
+import type { Unit } from "./Unit";
 
 /**
  * The start of a SBX Course type

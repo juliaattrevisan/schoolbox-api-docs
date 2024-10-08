@@ -3,7 +3,7 @@
  * To display a single linked sub result within a result
  */
 
-import { Result } from "../../js/types/Result";
+import type { Result } from "../../js/types/Result";
 import SpResultsResultImage from "./sp-results-result-image.vue";
 import SpResultsResultTitle from "./sp-results-result-title.vue";
 import SpResultsResultMeta from "./sp-results-result-meta.vue";

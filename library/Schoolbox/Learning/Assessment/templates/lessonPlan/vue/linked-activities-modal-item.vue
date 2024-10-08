@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { kebabCase } from "lodash";
-import { Activity } from "@schoolboxAssessment/Types/assessmentTypes";
+import type { Activity } from "@schoolboxAssessment/Types/assessmentTypes";
 import { useLinkedActivitiesStore } from "./store/linkedActivitiesStore";
 
 interface Props {

@@ -4,16 +4,17 @@
  *  trying to ensure the content is always in the viewport
  */
 
-import {
+import type {
     ReferenceElement,
     ComputePositionReturn,
+    Placement,
+    Boundary,
+    FloatingElement} from "@floating-ui/dom";
+import {
     computePosition,
     autoUpdate,
     flip,
-    shift,
-    Placement,
-    Boundary,
-    FloatingElement,
+    shift
 } from "@floating-ui/dom";
 import gsap from "gsap";
 import type { Ref } from "vue";

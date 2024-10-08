@@ -4,7 +4,8 @@
 
 import type { MentionConfig } from "@ckeditor/ckeditor5-mention";
 import type { SbxEditorConfig } from "@js/editor/types/editorTypes";
-import { replaceAllStringSections, StringSection } from "@js/util/stringUtils";
+import type { StringSection } from "@js/util/stringUtils";
+import { replaceAllStringSections } from "@js/util/stringUtils";
 
 const DEFAULT_TOKENS = [
     "[firstname]",

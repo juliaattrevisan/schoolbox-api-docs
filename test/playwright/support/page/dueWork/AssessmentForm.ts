@@ -1,5 +1,6 @@
-import { Page, expect } from "@playwright/test";
-import AcceptanceTester from "@schoolboxTest/playwright/support/AcceptanceTester";
+import type { Page} from "@playwright/test";
+import { expect } from "@playwright/test";
+import type AcceptanceTester from "@schoolboxTest/playwright/support/AcceptanceTester";
 import Common from "@schoolboxTest/playwright/support/page/Common";
 
 export default class AssessmentForm {

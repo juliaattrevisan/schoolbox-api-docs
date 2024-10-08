@@ -1,4 +1,4 @@
-import { LightGallerySettings } from "lightgallery/lg-settings";
+import type { LightGallerySettings } from "lightgallery/lg-settings";
 import lgAutoplay from "lightgallery/plugins/autoplay";
 import lgFullScreen from "lightgallery/plugins/fullscreen";
 import lgVideo from "lightgallery/plugins/video";

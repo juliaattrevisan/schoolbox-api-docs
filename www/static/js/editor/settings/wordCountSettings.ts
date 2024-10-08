@@ -1,6 +1,7 @@
 import type { WordCountConfig } from "@ckeditor/ckeditor5-word-count";
 import { insertElementAfter } from "@js/util/domUtils";
-import { EditorEvent, EditorDeletedEventInfo } from "@js/editor/event/editorEvent";
+import type { EditorDeletedEventInfo } from "@js/editor/event/editorEvent";
+import { EditorEvent } from "@js/editor/event/editorEvent";
 import { getSourceElementIdentifier } from "@js/editor/config/editorCheckData";
 import type { SbxEditor, SbxEditorConfig, SbxEditorElement } from "@js/editor/types/editorTypes";
 

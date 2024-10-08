@@ -3,7 +3,7 @@
  * To display the search results title
  */
 
-import { Result } from "../../js/types/Result";
+import type { Result } from "../../js/types/Result";
 import { ResultTypes } from "../../js/types/ResultTypes";
 
 interface Props {

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { kebabCase } from "lodash";
 import { getGradient } from "@js/util/cssUtils";
-import { Activity } from "@schoolboxAssessment/Types/assessmentTypes";
+import type { Activity } from "@schoolboxAssessment/Types/assessmentTypes";
 import { useLinkedActivitiesStore } from "./store/linkedActivitiesStore";
 
 interface Props {

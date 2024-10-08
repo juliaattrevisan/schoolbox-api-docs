@@ -4,7 +4,7 @@
 
 import { Mention } from "@ckeditor/ckeditor5-mention";
 
-import { SbxEditorConfig } from "@js/editor/types/editorTypes";
+import type { SbxEditorConfig } from "@js/editor/types/editorTypes";
 
 /**
  * If tokens are enabled, return the tokens settings

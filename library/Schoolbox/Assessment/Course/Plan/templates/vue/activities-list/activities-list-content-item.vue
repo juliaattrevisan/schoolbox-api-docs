@@ -10,7 +10,7 @@ import { gsap } from "gsap";
 import { Draggable } from "gsap/Draggable";
 import { kebabCase, startCase } from "lodash";
 import { getReturnUrl } from "@js/util/sbx/urlUtils";
-import { Activity } from "@schoolboxAssessment/Types/assessmentTypes";
+import type { Activity } from "@schoolboxAssessment/Types/assessmentTypes";
 import { useActivitiesListStore } from "./store/activitiesListStore";
 import { useActivitiesListDragStore } from "./store/activitiesListDragStore";
 import { useActivitiesListDeleteModalStore } from "./store/activitiesListDeleteModalStore";

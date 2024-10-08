@@ -9,8 +9,8 @@ import type { InlineEditor } from "@ckeditor/ckeditor5-editor-inline";
 import MediaArticle from "@schoolboxVue/components/media-article.vue";
 import { useUnitPlannerStore } from "./store/unitPlannerStore";
 import { useUnitPlannerTextboxStore } from "./store/unitPlannerTextboxStore";
-import { Column } from "./unitPlannerConfig";
-import { Unit } from "./unitPlannerTypes";
+import type { Column } from "./unitPlannerConfig";
+import type { Unit } from "./unitPlannerTypes";
 
 interface Props {
     unit: Unit;

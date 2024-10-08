@@ -8,7 +8,7 @@
 
 /* eslint-disable max-classes-per-file */
 declare module "@phudak/ckeditor5-emoji/src" {
-    import type { Plugin } from "@ckeditor/ckeditor5-core";
+    import { Plugin } from "@ckeditor/ckeditor5-core";
 
     export class Emoji extends Plugin {}
     export class EmojiActivity extends Plugin {}
