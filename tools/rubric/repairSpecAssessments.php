@@ -826,6 +826,8 @@ $kernel->run(new class extends App {
     private function disableRubric(int $unitFolderId): void
     {
         $submissionBoxIds = $this->db->executeQuery(
+            // This query was adapted from the query defining the v_assessment_relation view.
+            //
             // Select submission boxes
             //    linked to assessments whose context is
             //    a course unit specification linked to the given folder.
