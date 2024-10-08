@@ -7,7 +7,7 @@ import gsap from "gsap";
 import type { Result } from "./types/Result";
 import SearchSelectSelectAll from "./search-select-select-all.vue";
 import SearchSelectResult from "./search-select-result.vue";
-import { useSearchStore } from "./store/searchStore";
+import { useSearchStore } from "./store/searchSelectStore";
 
 interface Props {
     isSingleSelect: boolean; // whether only one result can be selected

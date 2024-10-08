@@ -8,7 +8,7 @@ import type { Result } from "./types/Result";
 import SearchSelectSelected from "./search-select-selected.vue";
 import SearchSelectInput from "./search-select-input.vue";
 import SearchSelectResults from "./search-select-results.vue";
-import { useSearchStore } from "./store/searchStore";
+import { useSearchStore } from "./store/searchSelectStore";
 
 interface Props {
     endpoint: string; // the search api endpoint
@@ -37,7 +37,7 @@ const searchSelectEl = window.Vue.ref<HTMLDivElement | null>(null);
  * Pass through the endpoint to the store
  */
 window.Vue.onMounted(() => {
-    store.init(props.endpoint, props.defaultResults !== undefined ? props.defaultResults : []);
+    store.init(props.endpoint, props.defaultResults !== undefined ? props.defaultResults : [], props.isSingleSelect);
 });
 
 /**

@@ -3,7 +3,7 @@
  * To input the search query
  */
 
-import { useSearchStore } from "./store/searchStore";
+import { useSearchStore } from "./store/searchSelectStore";
 
 interface Props {
     placeholder: string; // the placeholder text
