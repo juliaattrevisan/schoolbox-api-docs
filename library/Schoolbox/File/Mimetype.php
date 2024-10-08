@@ -441,7 +441,7 @@ class Mimetype implements ISoftDeletable
             $filter = str_replace('*', '[^/]+', $filter);
 
             //preg_quote escapes characters like "+" in the mimetype (e.g. image/svg+xml)
-            if (preg_match("`^" . preg_quote($filter) . "$`", $this->getMime())) {
+            if (preg_match('/^' . preg_quote($filter, '/') . '$/', $this->getMime())) {
                 return true;
             }
         }
