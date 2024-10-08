@@ -524,10 +524,6 @@ $kernel->run(new class extends App {
                     $unitCapabilities = $this->findRubricCapabilityQuery->fetchColumnArray('name', 'id');
                     $this->deleteEmptyCapabilities($unitCapabilities);
                 }
-
-                $assessables = $unit->getAssessables();
-                echo "Found " . count($assessables) . " assessable(s) in unit " . $unit->getId() . "\n";
-
                 // disable rubric for assessments which are not using rubric
                 $this->disableRubric($unit->getFolder()->getId());
             }
