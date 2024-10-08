@@ -35,7 +35,7 @@ export const useSearchStore = defineStore(`searchStore`, () => {
     });
 
     /**
-     *
+     * To show the current results, or the default results if the search is not active
      * @returns { Result[] }
      */
     const currentResults = window.Vue.computed(() => (isActive.value ? results.value : defaultResults.value));
