@@ -54,6 +54,7 @@ class ModelToArray
             'name'                  => $model->getName(),
             'clientId'              => $model->getClientId(),
             'redirectUri'           => $model->getRedirectUri(),
+            'backChannelLogoutUri'  => $model->getBackChannelLogoutUri(),
             'clientCredentialsUser' => $model->getClientCredentialsUser()
                 ? call_user_func($this->userTranslator, $model->getClientCredentialsUser())
                 : null,

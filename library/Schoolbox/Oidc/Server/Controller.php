@@ -17,7 +17,6 @@ use OAT\Library\Lti1p3Core\Security\Key\KeyChainRepositoryInterface;
 use OpenIDConnectServer\ClaimExtractor;
 use Schoolbox\API\Token\Jwt;
 use Schoolbox\API\Token\JwtParser\IParser;
-use Schoolbox\Application\Exception\NotAuthenticated;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\LTI\KeyChain\RepositoryFactory;
 use Schoolbox\Url\Factory;
@@ -31,6 +30,13 @@ use Symfony\Component\HttpFoundation\Response;
  */
 class Controller extends Base
 {
+    /**
+     * Session var where OIDC clients which have authenticated using this server
+     * are stored: when this logs out, this server will send logout requests to
+     * all of those clients.
+     */
+    public const SESSION_OIDC_SERVER_CLIENTS = 'oidcServerClients';
+
     /**
      * Constructor
      *
@@ -82,6 +88,19 @@ class Controller extends Base
             );
         } else {
             $authRequest->setAuthorizationApproved($permission);
+
+            // At this point, if permission was granted: track that the server
+            // has granted a session to the client.
+            // Currently, only the client can be tracked, not a particular
+            // session ID (as that doesn't exist in the auth code, and I can't
+            // easily add it).
+            if ($permission) {
+                $client           = $authRequest->getClient();
+                $currentClients   = $this->getSession()->get(self::SESSION_OIDC_SERVER_CLIENTS, []);
+                $currentClients[] = $client->getIdentifier();
+                $this->getSession()->set(self::SESSION_OIDC_SERVER_CLIENTS, array_unique($currentClients));
+            }
+
             try {
                 $this->response = $this->authServer->completeAuthorizationRequest($authRequest, $this->responseEmpty());
             } catch (Server\Exception\OAuthServerException $e) {
@@ -160,6 +179,13 @@ class Controller extends Base
 
             // Allegedly OIDC must support the implicit grant type, but it is deprecated?
             'grant_types_supported' => ['authorization_code', 'refresh_token', 'implicit', 'client_credentials'],
+
+            // Schoolbox now supports back-channel logout:
+            // it currently does not support sessions for back-channel logout,
+            // therefore logging out of the provider will log out any sessions
+            // for any relying parties.
+            'backchannel_logout_supported'         => true,
+            'backchannel_logout_session_supported' => false,
         ]);
     }
 

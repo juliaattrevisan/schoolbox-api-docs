@@ -30,6 +30,7 @@ class ArrayToModel extends Base
         $model ??= new Model();
         $model = $this->setScalar($array, 'name', $model, 'setName');
         $model = $this->setScalar($array, 'redirectUri', $model, 'setRedirectUri');
+        $model = $this->setScalar($array, 'backChannelLogoutUri', $model, 'setBackChannelLogoutUri');
         $model = $this->setModel(
             $array,
             'clientCredentialsUser',
