@@ -85,17 +85,26 @@ class Controller extends Base
             $fields = $this->fieldMapper->findByColumnList([
                 'roleType' => $roleType,
                 'enabled' => true,
+            ], [
+                'order' => [
+                    'sequence' => 'asc'
+                ]
             ]);
 
-            /* ...then increment their sequences by one:
+            /* Then find out what sequence we need to inject a field.
+             */
+            /** @var int|null $index - The index at which to insert the field */
+            $index = (int)($this->requestPost->get('index')) + 1;
+
+            /* ...then increment fields whose sequences are equal to, or greater than, $index
              */
             foreach ($fields as $currentField) {
                 if (Payload::FIELD_PORTRAIT_IMAGE === $currentField->getField()) {
                     /* Portrait Image is always sequence zero
                      */
                     $currentField->setSequence(0);
-                } else {
-                    /* Assign new sequence
+                } else if ($currentField->getSequence() >= $index){
+                    /* Increment by one
                      */
                     $currentField->setSequence($currentField->getSequence() + 1);
                 }
@@ -103,13 +112,7 @@ class Controller extends Base
                 $this->fieldMapper->save($currentField);
             }
 
-            /* ...then inject our new field at sequence 1.
-             */
-            /** @var int|null $index - The index at which to insert the field */
-            $index = (int)($this->requestPost->get('index')) + 1;
-
-            /* New fields are spawned with sequence 1, since $index is always
-             * given to us as 0 in this usage from frontend.
+            /* Spawn in place using the index provided by frontend
              */
             $field->setSequence($index);
             $field->setEnabled(1);
