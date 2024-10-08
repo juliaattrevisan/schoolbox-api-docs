@@ -185,7 +185,8 @@ class Payload
                     'field' => $field->getField(),
                     'displayAs' => $field->getDisplayAs(),
                     'icon' => $field->getIcon(),
-                    'css' => $field->getCss()
+                    'css' => $field->getCss(),
+                    'terminology' => $field->getTerm(),
                 ];
             }
 
@@ -216,6 +217,7 @@ class Payload
                     'displayAs' => $field->getDisplayAs(),
                     'icon' => $field->getIcon(),
                     'css' => $field->getCss(),
+                    'terminology' => $field->getTerm(),
                     'fieldSettings' => [
                         /* Find the ids of the campuses for which this field might be available
                          */
