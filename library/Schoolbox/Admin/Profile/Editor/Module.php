@@ -103,7 +103,7 @@ class Module extends BaseModule
         $roleType = $params['roleType'] ?? null;
 
         if (!isset(Payload::CONFIG_ROLETYPE[$roleType])) {
-            throw new NotFound('Roletype not provided');
+            throw new NotFound('Roletype not provided', 400);
         }
 
         return [
