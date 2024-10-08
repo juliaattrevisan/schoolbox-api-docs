@@ -17,6 +17,7 @@ export const useSearchStore = defineStore(`searchStore`, () => {
     const isLoading = window.Vue.ref(false); // to notify that an action is taking place,
     const query = window.Vue.ref(""); // current search term to filter the active nodes
     const results = window.Vue.ref<Result[]>([]); // nodes returned in the current search results
+    const selectedResults = window.Vue.ref<Result[]>([]); // the selected results
     const defaultResults = window.Vue.ref<Result[]>([]); // the initial results to display
     const hasSearched = window.Vue.ref(false); // to show that a search has been made
 
@@ -40,17 +41,30 @@ export const useSearchStore = defineStore(`searchStore`, () => {
      * @returns { Result[] }
      */
     const currentResults = window.Vue.computed(() => {
-        return isActive.value ? results.value : defaultResults.value;
+        if (selectedResults.value.length === 1 && isSingleSelect) {
+            return [];
+        }
+        if (defaultResults.value.length > 0 && !isActive.value) {
+            return defaultResults.value;
+        }
+        return results.value;
     });
 
     /**
      * initialise the search store, just passing the endpoint
      * @param $endpoint - the endpoint to search for results
+     * @param $selectedResults - the selected results
      * @param $defaultResults - the default results to display
      * @param $isSingleSelect - whether the search is for a single select
      */
-    function init($endpoint: string, $defaultResults: Result[], $isSingleSelect: boolean): void {
+    function init(
+        $endpoint: string,
+        $selectedResults: Result[],
+        $defaultResults: Result[],
+        $isSingleSelect: boolean,
+    ): void {
         endpoint = $endpoint;
+        selectedResults.value = $selectedResults;
         defaultResults.value = $defaultResults;
         isSingleSelect = $isSingleSelect;
     }

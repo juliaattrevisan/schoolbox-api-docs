@@ -37,7 +37,12 @@ const searchSelectEl = window.Vue.ref<HTMLDivElement | null>(null);
  * Pass through the endpoint to the store
  */
 window.Vue.onMounted(() => {
-    store.init(props.endpoint, props.defaultResults !== undefined ? props.defaultResults : [], props.isSingleSelect);
+    store.init(
+        props.endpoint,
+        props.selected,
+        props.defaultResults !== undefined ? props.defaultResults : [],
+        props.isSingleSelect,
+    );
 });
 
 /**
