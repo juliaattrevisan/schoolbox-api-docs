@@ -22,6 +22,7 @@ export const useStore = defineStore(`curriculumSelector`, {
         selectedDefault: [], //the default selection relevant to the current user role
         isSelectAll: false, // to select any nodes, not just those that have a code
         canSelectChildren: true, // is able to select children of an already selected node
+        includeWithoutCode: false, // set to true if curriculum nodes with blank codes need to be selectable
     }),
 
     getters: {
@@ -56,6 +57,7 @@ export const useStore = defineStore(`curriculumSelector`, {
             this.formValueName = props.formValueName;
             this.isSelectAll = props.isSelectAll;
             this.canSelectChildren = props.canSelectChildren;
+            this.includeWithoutCode = props.includeWithoutCode;
             if (!this.isReadOnly && props.dataEndpoint !== "") {
                 //only load when we need to
                 apiEndpoint = props.dataEndpoint;

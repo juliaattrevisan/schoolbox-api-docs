@@ -3,7 +3,7 @@
  */
 
 import { defineStore } from "pinia";
-import { apiEndpoint } from "./curriculumSelectorStore";
+import { useStore, apiEndpoint } from "./curriculumSelectorStore";
 import { useSelectedNodesStore } from "./csSelectedNodesStore";
 
 const MIN_QUERY_LENGTH = 2; //the amount of characters typed before the search becomes active
@@ -12,7 +12,6 @@ export const DEBOUNCE_AMOUNT = 350; //the amount in ms to hold off on searching,
 export const useSearchStore = defineStore(`csSearch`, {
     state: () => ({
         isLoading: false, //to notify that an action is taking place,
-        includeWithoutCode: false, //set to true to include nodes with blank codes in search results
         query: "", //current search term to filter the active nodes
         results: [], //nodes returned in the current search results
     }),
@@ -65,9 +64,10 @@ export const useSearchStore = defineStore(`csSearch`, {
          */
         async search() {
             try {
+                const store = useStore();
                 const response = await fetch(
                     `${apiEndpoint}?query=${this.query}&enabled=1&limit=50` +
-                        (this.includeWithoutCode ? "&includeWithoutCode=1" : ""),
+                        (store.includeWithoutCode ? "&includeWithoutCode=1" : ""),
                     {
                         method: "GET",
                         headers: {
