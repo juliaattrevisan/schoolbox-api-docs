@@ -99,7 +99,7 @@ class ConfigMapper extends Mapper
     public const _SAVE_FOR_LATER                 = 'save_for_later';
     public const _STAFF_CAN_POST_NEWS            = 'news_staff_post_enabled';
     public const _AUDIENCE_TO_FOLDER_TEACHERS    = 'audience_to_folder_users_teachers';
-//    public const _EXTERNAL_MS_SQL_SERVER_DRIVER  = 'external_ms_sql_server_driver';
+    //    public const _EXTERNAL_MS_SQL_SERVER_DRIVER  = 'external_ms_sql_server_driver';
     public const COMMS_COMMENTS_ENABLED          = 'comms_comments_enabled';
     public const COMMS_STATISTICS_ENABLED        = 'comms_statistics_enabled';
     public const COMMS_STICKY_ENABLED            = 'comms_sticky_enabled';
@@ -338,7 +338,7 @@ class ConfigMapper extends Mapper
     public const NAME_NAME_FORMAT_STAFF = 'name_format_staff';
     public const NAME_NAME_FORMAT_PARENT = 'name_format_parent';
 
-
+    public const NAME_DATASET_INSTANCE = 'dataset_instance';
     /**
      * Isams specific
      */
