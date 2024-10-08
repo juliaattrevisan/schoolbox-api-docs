@@ -949,6 +949,10 @@ class Controller extends Base\Base
 
         if ($query->get('folder')) {
             $folderModel = $this->folderMapper->findById($query->get('folder'));
+            /* The payload will be replaced by the course api later, but we can use the helper class first
+             * to reduce the amount of code maintenance for the time being, the helper class should only be
+             * instantiated when needed, so should be fine to be here instead of injecting it
+             */
             $helper = new Helper(
                 $this->courseSpecificationMapper,
                 $this->folderMapper,
@@ -1025,6 +1029,10 @@ class Controller extends Base\Base
         // only offer suggestions if you're not searching
         if ($folder && !$search) {
             $folderModel = $this->folderMapper->findById($folder);
+            /* The payload will be replaced by the course api later, but we can use the helper class first
+             * to reduce the amount of code maintenance for the time being, the helper class should only be
+             * instantiated when needed, so should be fine to be here instead of injecting it
+             */
             $helper = new Helper(
                 $this->courseSpecificationMapper,
                 $this->folderMapper,
