@@ -182,7 +182,7 @@
     "test": "jest",
     "watch-test": "jest --watch",
     "typecheck": "vue-tsc --noEmit",
-    "lint": "npx eslint . --ext .ts,.vue",
+    "lint": "npx eslint --max-warnings=0 --ext .ts,.vue .",
     "prettier:check": "npx prettier --check \"**/*.{js,ts,vue,mdx,css,scss}\"",
     "prettier:write": "npx prettier --write \"**/*.{js,ts,vue,mdx,css,scss}\""
   },
