@@ -11,17 +11,6 @@ import CsModalHeaderSearchInput from "./cs-modal-header-search-input.vue";
 const modalNodeUsageStore = useModalNodeUsageStore();
 const nodesStore = useNodesStore();
 
-const props = defineProps({
-    /**
-     * set to true if curriculum nodes with blank codes need to be selectable
-     */
-    includeWithoutCode: {
-        type: Boolean,
-        required: false,
-        default: false,
-    },
-});
-
 /**
  * Can't select the breadcrumbs or search input while updating or adding a node
  * or while nodes are being loaded
@@ -33,7 +22,7 @@ const isDisabled = window.Vue.computed(() => modalNodeUsageStore.isOpen || nodes
 <template>
     <h2>Browse Curriculum</h2>
     <cs-modal-header-breadcrumbs :is-disabled="isDisabled" />
-    <cs-modal-header-search-input :is-disabled="isDisabled" :include-without-code="props.includeWithoutCode" />
+    <cs-modal-header-search-input :is-disabled="isDisabled" />
 </template>
 
 <style scoped></style>

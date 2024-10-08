@@ -158,10 +158,6 @@ function onSelectedNodeModalClosed() {
         />
         <cs-search-results :is-single-select="props.isSingleSelect" />
     </div>
-    <cs-modal
-        v-if="store.hasLoadedOk"
-        :is-single-select="props.isSingleSelect"
-        :include-without-code="props.includeWithoutCode"
-    />
+    <cs-modal v-if="store.hasLoadedOk" :is-single-select="props.isSingleSelect" />
     <selected-node-modal :node="selectedNodesStore.activeNode" @closed="onSelectedNodeModalClosed" />
 </template>
