@@ -524,6 +524,10 @@ $kernel->run(new class extends App {
                     $unitCapabilities = $this->findRubricCapabilityQuery->fetchColumnArray('name', 'id');
                     $this->deleteEmptyCapabilities($unitCapabilities);
                 }
+
+                $assessables = $unit->getAssessables();
+                echo "Found " . count($assessables) . " assessable(s) in unit " . $unit->getId() . "\n";
+
                 // disable rubric for assessments which are not using rubric
                 $this->disableRubric($unit->getFolder()->getId());
             }
@@ -825,24 +829,59 @@ $kernel->run(new class extends App {
      */
     private function disableRubric(int $unitFolderId): void
     {
-        $sql       = '
-        SELECT sb.id
-        FROM submission_box sb
-        LEFT JOIN rubric_indicator_usage rcu ON sb.id = rcu.submission_box_id
-        WHERE sb.use_rubric = 1
-        AND sb.category = :folderId
-        GROUP BY sb.id HAVING count(rcu.rubric_indicator_id) = 0
-        ';
-        $statement = $this->db->executeQuery($sql, ['folderId' => $unitFolderId]);
-        $ids       = $statement->fetchAll(PDO::FETCH_COLUMN);
+        $submissionBoxIds = $this->db->executeQuery(
+            // Select submission boxes
+            //    linked to assessments whose context is
+            //    a course unit specification linked to the given folder.
+            // UNION
+            // Select submission boxes
+            //    linked to assessments whose context is
+            //    a project within a course unit specification linked to the given folder.
+            'SELECT sb.id
+            FROM submission_box sb
+            JOIN assessment a ON sb.assessment_id = a.id
+            JOIN assessment_course_unit_specification acus ON a.id = acus.assessment_id
+            JOIN course_unit_specification cus ON acus.course_unit_specification_id = cus.id
+            WHERE cus.folder_id = :folderId
+            UNION
+            SELECT sb.id
+            FROM submission_box sb
+            JOIN assessment a ON sb.assessment_id = a.id
+            JOIN project_assessment pa ON a.id = pa.assessment_id
+            JOIN project p ON pa.project_id = p.id
+            JOIN assessment_course_unit_specification acus ON p.assessment_id = acus.assessment_id
+            JOIN course_unit_specification cus ON acus.course_unit_specification_id = cus.id
+            WHERE cus.folder_id = :folderId',
+            ['folderId' => $unitFolderId]
+        )->fetchAll(PDO::FETCH_COLUMN);
 
-        if (empty($ids)) {
+        if (empty($submissionBoxIds)) {
             return;
         }
 
-        $idString = implode(',', $ids);
-        $this->db->executeQuery("UPDATE submission_box set use_rubric = 0 WHERE id in ({$idString})");
-        $this->log->info(self::indent(2) . "submission boxes {$idString} in unit {$unitFolderId} are not using rubric: disabling Rubric");
+        // Further refine the list of submission box ids.
+        // This query is separate from the above query just to keep the queries readable.
+        $submissionBoxIds = $this->db->executeQuery(
+            'SELECT sb.id
+            FROM submission_box sb
+            JOIN assessment a ON sb.assessment_id = a.id
+            LEFT JOIN rubric_indicator_usage rcu ON sb.id = rcu.submission_box_id
+            WHERE sb.use_rubric = 1
+            AND sb.id IN (' . implode(',', array_map('intval', $submissionBoxIds)) . ')
+            GROUP BY sb.id HAVING count(rcu.rubric_indicator_id) = 0'
+        )->fetchAll(PDO::FETCH_COLUMN);
+
+        if (empty($submissionBoxIds)) {
+            return;
+        }
+
+        $idsString = implode(',', array_map('intval', $submissionBoxIds));
+        $this->db->executeQuery(
+            'UPDATE submission_box
+            SET use_rubric = 0
+            WHERE id IN (' . $idsString . ')'
+        );
+        $this->log->info(self::indent(2) . "submission boxes {$idsString} in unit {$unitFolderId} are not using rubric: disabling Rubric");
     }
 
     /**
