@@ -16,6 +16,7 @@ export const useSearchStore = defineStore(`searchStore`, () => {
     const isLoading = window.Vue.ref(false); // to notify that an action is taking place,
     const query = window.Vue.ref(""); // current search term to filter the active nodes
     const results = window.Vue.ref<Result[]>([]); // nodes returned in the current search results
+    const defaultResults = window.Vue.ref<Result[]>([]); // the initial results to display
     const hasSearched = window.Vue.ref(false); // to show that a search has been made
 
     /**
@@ -34,11 +35,19 @@ export const useSearchStore = defineStore(`searchStore`, () => {
     });
 
     /**
+     *
+     * @returns { Result[] }
+     */
+    const currentResults = window.Vue.computed(() => (isActive.value ? results.value : defaultResults.value));
+
+    /**
      * initialise the search store, just passing the endpoint
      * @param $endpoint - the endpoint to search for results
+     * @param $defaultResults - the default results to display
      */
-    function init($endpoint: string): void {
+    function init($endpoint: string, $defaultResults: Result[]): void {
         endpoint = $endpoint;
+        defaultResults.value = $defaultResults;
     }
 
     /**
@@ -104,7 +113,7 @@ export const useSearchStore = defineStore(`searchStore`, () => {
     return {
         isLoading,
         query,
-        results,
+        currentResults,
         isActive,
         hasNoResults,
         init,

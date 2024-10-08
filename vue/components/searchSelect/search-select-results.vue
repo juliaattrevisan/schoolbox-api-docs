@@ -48,7 +48,7 @@ async function animateResults(): Promise<void> {
  * results have been preset prior to search
  */
 window.Vue.onMounted(async () => {
-    if (props.selected.length > 0) {
+    if (store.currentResults.length > 0) {
         await animateResults();
     }
 });
@@ -67,7 +67,7 @@ window.Vue.watch(
  * to slide up and down the search results
  */
 window.Vue.watch(
-    () => store.results,
+    () => store.currentResults,
     async (newResults, oldResults) => {
         if (newResults.length === oldResults.length) {
             return;
@@ -82,7 +82,7 @@ window.Vue.watch(
  * @returns {boolean} - whether to show the select all option
  */
 const showSelectAll = window.Vue.computed(() => {
-    return !props.isSingleSelect && store.results.length <= 1;
+    return !props.isSingleSelect && store.currentResults.length <= 1;
 });
 
 /**
@@ -103,11 +103,11 @@ function onSelected(result: Result): void {
             <template v-else>
                 <search-select-select-all v-if="showSelectAll" />
                 <search-select-result
-                    v-for="result in store.results"
+                    v-for="result in store.currentResults"
                     :key="result.id"
                     :data-test="`search-select-result-${result.id}`"
                     :selected="selected"
-                    :results="store.results"
+                    :results="store.currentResults"
                     :result="result"
                     :is-single-select="props.isSingleSelect"
                     @select="onSelected"
