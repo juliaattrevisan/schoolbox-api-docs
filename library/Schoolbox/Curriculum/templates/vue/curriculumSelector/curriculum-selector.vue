@@ -153,7 +153,6 @@ function onSelectedNodeModalClosed() {
         <cs-search-input
             :curriculum-selector-el="curriculumSelectorEl"
             :is-single-select="props.isSingleSelect"
-            :include-without-code="props.includeWithoutCode"
             :input-id="props.inputId"
         />
         <cs-search-results :is-single-select="props.isSingleSelect" />
