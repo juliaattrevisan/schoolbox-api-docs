@@ -396,6 +396,7 @@ class CourseAssignments extends CourseAssessmentAbstract
             SELECT
                 {$this->submissionBoxMapper->getColumnString('sb')},
                 {$this->assessmentMapper->getColumnString('a')},
+                acus.course_unit_specification_id
             FROM submission_box sb
             JOIN assessment a ON a.id = sb.assessment_id
             JOIN assessment_course_unit_specification acus ON a.id = acus.assessment_id
@@ -410,8 +411,9 @@ class CourseAssignments extends CourseAssessmentAbstract
             throw new UnexpectedValueException("Unable to uniquely identify a SubmissionBox spec for canvas id '$canvasId'");
         }
 
-        $row = $rows[0];
+        $row        = $rows[0];
         $assessment = $this->assessmentMapper->hydrate($row, 'a');
+
         $submissionBox = $this->submissionBoxMapper->hydrate($row, 'sb');
         $submissionBox->setAssessmentModel($assessment);
         $assessment->setSubObject($submissionBox);
