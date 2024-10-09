@@ -315,10 +315,7 @@ class SectionAssignment extends SectionAssessmentAbstract
             ->setSelfReviewability($assessableSpec->getSelfReviewability())
             ->setOwner($owner)
             ->setMarkType($assessableSpec->getMarkType())
-            ->setGradeGroup($assessableSpec->getGradeGroup())
-            ->getAssessmentModel()
-                ->setContextFolder($unitImpl->getFolder())
-                ->setWeight($assessableSpec->getAssessmentModel()->getWeight());
+            ->setGradeGroup($assessableSpec->getGradeGroup());
         $this->submissionBoxMapper->save($assessableImpl);
         return true;
     }
