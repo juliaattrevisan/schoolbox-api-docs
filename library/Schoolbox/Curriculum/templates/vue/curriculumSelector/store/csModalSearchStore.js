@@ -3,7 +3,7 @@
  */
 
 import { defineStore } from "pinia";
-import { apiEndpoint, useStore } from "./store";
+import { apiEndpoint, useStore } from "./curriculumSelectorStore";
 import { useSelectedNodesStore } from "./csSelectedNodesStore";
 import { useModalViewNodesStore } from "./csModalViewNodesStore";
 
