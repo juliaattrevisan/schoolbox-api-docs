@@ -3,7 +3,7 @@
  */
 
 import { defineStore } from "pinia";
-import { apiEndpoint, useStore } from "./curriculumSelectorStore";
+import { apiEndpoint, useStore } from "./store";
 import { useSelectedNodesStore } from "./csSelectedNodesStore";
 import { useModalViewNodesStore } from "./csModalViewNodesStore";
 
@@ -66,11 +66,11 @@ export const useModalSearchStore = defineStore(`csModalSearch`, {
         async search() {
             this.isLoading = true;
             try {
-                const curriculumSelectorStore = useStore();
+                const store = useStore();
                 const modalViewNodesStore = useModalViewNodesStore();
                 const response = await fetch(
                     `${apiEndpoint}?parentId=${modalViewNodesStore.current.id}&query=${this.query}&enabled=1&limit=50` +
-                        (curriculumSelectorStore.includeWithoutCode ? "&includeWithoutCode=1" : ""),
+                        (store.includeWithoutCode ? "&includeWithoutCode=1" : ""),
                     {
                         method: "GET",
                         headers: {
