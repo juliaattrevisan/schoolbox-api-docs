@@ -396,12 +396,9 @@ class CourseAssignments extends CourseAssessmentAbstract
             SELECT
                 {$this->submissionBoxMapper->getColumnString('sb')},
                 {$this->assessmentMapper->getColumnString('a')},
-                acus.course_unit_specification_id,
-                cus.folder_id
             FROM submission_box sb
             JOIN assessment a ON a.id = sb.assessment_id
             JOIN assessment_course_unit_specification acus ON a.id = acus.assessment_id
-            JOIN course_unit_specification cus ON acus.course_unit_specification_id = cus.id
             WHERE a.deleted_at IS NULL AND sb.external_id = :externalId
         ";
 
@@ -415,7 +412,6 @@ class CourseAssignments extends CourseAssessmentAbstract
 
         $row = $rows[0];
         $assessment = $this->assessmentMapper->hydrate($row, 'a');
-        $assessment->setContextFolder((new Folder\Model())->setId($row['folder_id']));
         $submissionBox = $this->submissionBoxMapper->hydrate($row, 'sb');
         $submissionBox->setAssessmentModel($assessment);
         $assessment->setSubObject($submissionBox);
