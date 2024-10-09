@@ -490,6 +490,9 @@ $allow-sidebar-stash: $large-up;
             }
             a {
                 color: $off-canvas-foreground;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
                 &:hover {
                     color: $off-canvas-foreground;
                     background-color: $off-canvas-hover;
@@ -521,6 +524,7 @@ $allow-sidebar-stash: $large-up;
                 color: css-scale-color($off-canvas-foreground, $alpha: -65%);
                 a {
                     color: inherit;
+                    text-overflow: ellipsis;
                     &:hover {
                         color: $anchor-font-color-hover;
                     }
