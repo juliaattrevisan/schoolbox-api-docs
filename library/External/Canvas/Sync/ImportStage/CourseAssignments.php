@@ -357,7 +357,6 @@ class CourseAssignments extends CourseAssessmentAbstract
             $submissionBox->getAcceptMultiple() !== $acceptMultiple ||
             $submissionBox->getMarkVisibility() !== $markVisibility ||
             $submissionBox->getSelfReviewability() !== $selfReviewability ||
-            $submissionBox->getAssessmentModel()->getContextFolder()->getId() !== $unitSpecFolder->getId() ||
             $submissionBox->getMarkType()->getId() !== $markType->getId() ||
             $submissionBox->getGradeGroup()?->getId() !== $gradeGroup?->getId()
         ) {
@@ -369,10 +368,7 @@ class CourseAssignments extends CourseAssessmentAbstract
                 ->setAcceptOnline($acceptOnline)
                 ->setAcceptMultiple($acceptMultiple)
                 ->setMarkVisibility($markVisibility)
-                ->setSelfReviewability($selfReviewability)
-                ->getAssessmentModel()
-                    ->setContextFolder($unitSpecFolder)
-                    ->setWeight($weight);
+                ->setSelfReviewability($selfReviewability);
             $this->submissionBoxMapper->save($submissionBox);
             $isBoxUpdated = true;
         }
