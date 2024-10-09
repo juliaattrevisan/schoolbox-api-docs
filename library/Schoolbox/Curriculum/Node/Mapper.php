@@ -190,7 +190,17 @@ class Mapper extends BaseMapper
         $sortDirection = 'DESC'
     ) {
         // Load all ancestors, no descendants
-        return $this->findByKeyword($keyword, $limit, $offset, 50, 0, false, null, null);
+        return $this->findByKeyword(
+            $keyword,
+            $limit,
+            $offset,
+            50,
+            0,
+            false,
+            null,
+            null,
+            false
+        );
     }
 
     /**
@@ -218,6 +228,7 @@ class Mapper extends BaseMapper
         bool $topLevelOnly,
         ?int $parentId,
         ?bool $enabled,
+        bool $includeWithoutCode = false,
     ): Collection {
         $filteredIds = null;
         if (isset($parentId)) {
@@ -237,15 +248,23 @@ class Mapper extends BaseMapper
         $pb = $this->getPredicateBuilder()
             ->isNull('n.deleted_at');
         if ($keyword !== '') {
-            $pb = $pb->any(
-                $this->getPredicateBuilder()
-                    ->like('n.code', $quotedLike . '%')
+            if ($includeWithoutCode) {
+                $pb = $pb->any(
+                    $this->getPredicateBuilder()
+                        ->like('n.code', $quotedLike . '%')       // Code starts with keyword
+                        ->like('n.name', '%' . $quotedLike . '%') // Name contains keyword
+                );
+            } else {
+                $pb = $pb->any(
+                    $this->getPredicateBuilder()
+                    ->like('n.code', $quotedLike . '%') // Code starts with keyword
                     ->all(
                         $this->getPredicateBuilder()
-                            ->notEquals('n.code', '')
-                            ->like('n.name', '%' . $quotedLike . '%')
+                            ->notEquals('n.code', '')                 // Code not blank
+                            ->like('n.name', '%' . $quotedLike . '%') // Name contains keyword
                     )
-            );
+                );
+            }
         }
         if ($topLevelOnly) {
             $pb = $pb->isNull('n.curriculum_node_parent_id');

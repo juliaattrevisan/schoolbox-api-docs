@@ -1,9 +1,9 @@
 /**
- * Store the current search results when searcing from cs-modal-header-search-input
+ * Store the current search results when searching from cs-modal-header-search-input
  */
 
 import { defineStore } from "pinia";
-import { apiEndpoint } from "./curriculumSelectorStore";
+import { apiEndpoint, useStore } from "./curriculumSelectorStore";
 import { useSelectedNodesStore } from "./csSelectedNodesStore";
 import { useModalViewNodesStore } from "./csModalViewNodesStore";
 
@@ -66,9 +66,11 @@ export const useModalSearchStore = defineStore(`csModalSearch`, {
         async search() {
             this.isLoading = true;
             try {
+                const store = useStore();
                 const modalViewNodesStore = useModalViewNodesStore();
                 const response = await fetch(
-                    `${apiEndpoint}?parentId=${modalViewNodesStore.current.id}&query=${this.query}&enabled=1&limit=50`,
+                    `${apiEndpoint}?parentId=${modalViewNodesStore.current.id}&query=${this.query}&enabled=1&limit=50` +
+                        (store.includeWithoutCode ? "&includeWithoutCode=1" : ""),
                     {
                         method: "GET",
                         headers: {

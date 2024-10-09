@@ -98,6 +98,7 @@ const selectedNodes = window.Vue.ref<Pick<Node, "id" | "name" | "code" | "descri
                     :is-read-only="false"
                     :data-endpoint="props.endpoint"
                     :is-select-all="true"
+                    :include-without-code="true"
                     :can-select-children="false"
                     :selected-nodes="selectedNodes"
                     input-id="curriculum"

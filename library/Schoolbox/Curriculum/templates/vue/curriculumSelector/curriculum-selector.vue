@@ -41,6 +41,14 @@ const props = defineProps({
         default: true,
     },
     /**
+     * set to true if curriculum nodes with blank codes need to be selectable
+     */
+    includeWithoutCode: {
+        type: Boolean,
+        required: false,
+        default: false,
+    },
+    /**
      * input name, to allow custom form structure
      */
     formValueName: {
