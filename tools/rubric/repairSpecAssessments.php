@@ -828,9 +828,11 @@ $kernel->run(new class extends App {
         $sql       = '
         SELECT sb.id
         FROM submission_box sb
+        JOIN assessment a ON sb.assessment_id = a.id
+        JOIN v_assessment_relation var ON a.id = var.assessment_id
         LEFT JOIN rubric_indicator_usage rcu ON sb.id = rcu.submission_box_id
         WHERE sb.use_rubric = 1
-        AND sb.category = :folderId
+        AND var.folder_id = :folderId
         GROUP BY sb.id HAVING count(rcu.rubric_indicator_id) = 0
         ';
         $statement = $this->db->executeQuery($sql, ['folderId' => $unitFolderId]);
