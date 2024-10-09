@@ -169,10 +169,7 @@ $breadcrumb-noclick-bg-color: css-scale-color($breadcrumb-bg-color, $lightness: 
             display: block;
             float: left;
             margin-right: 0;
-            overflow: hidden;
-            text-overflow: ellipsis;
             white-space: nowrap;
-            max-width: 100vw;
 
             &:before,
             &:after {
@@ -221,7 +218,6 @@ $breadcrumb-noclick-bg-color: css-scale-color($breadcrumb-bg-color, $lightness: 
 
         // Active styles
         &.active span {
-            overflow: visible;
             &:before {
                 margin-left: 0;
             }
