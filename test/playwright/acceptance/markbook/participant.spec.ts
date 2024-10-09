@@ -85,6 +85,7 @@ test.describe("Participant Tests", () => {
         await statusPage.clickJellyTot();
         await statusPage.clickJellyTotOption("modify");
         await page.locator(`h2:has-text("Update Cest One")`).isVisible({ timeout: 30000 });
+        await expect(page.getByTestId("assessment-form-button-submit-Update")).toBeEnabled();
         await dueworkForm.modifyParticipation(teacherId, true, true);
         await dueworkForm.update();
         await page.locator(`h1:has-text("Status of Cest One")`).isVisible({ timeout: 30000 });
@@ -106,6 +107,7 @@ test.describe("Participant Tests", () => {
         await statusPage.clickJellyTot();
         await statusPage.clickJellyTotOption("modify");
         await page.locator(`h2:has-text("Update Cest One")`).isVisible({ timeout: 30000 });
+        await expect(page.getByTestId("assessment-form-button-submit-Update")).toBeEnabled();
         await dueworkForm.modifyParticipation(studentId, false, false);
         await dueworkForm.update();
         await page.locator(`h1:has-text("Status of Cest One")`).isVisible({ timeout: 30000 });
@@ -119,7 +121,7 @@ test.describe("Participant Tests", () => {
         // remove the duework component from the homepage to avoid issues in the next test
         tester.isGoingTo("remove the duework component from the homepage");
         await page.goto("/homepage/106");
-        await page.waitForTimeout(1000);
+        await page.waitForTimeout(2000);
         await addComponent.clickLockToggle();
         await addComponent.clickComponentRemoveIcon();
         await addComponent.clickRemoveConfirmationMessage();

@@ -47,6 +47,7 @@ export default class TextboxForm {
             .locator('div[class="component-container Schoolbox_Resource_Textbox_Component_Homepage_Controller"]')
             .scrollIntoViewIfNeeded();
         await this.page.locator('button[data-action="modify"]').click();
+        await this.page.waitForTimeout(2000);
     }
 
     async save(): Promise<void> {
@@ -54,5 +55,6 @@ export default class TextboxForm {
             .locator('div[class="component-container Schoolbox_Resource_Textbox_Component_Homepage_Controller"]')
             .scrollIntoViewIfNeeded();
         await this.page.locator('button[data-action="save"]').click();
+        await this.page.waitForTimeout(2000);
     }
 }

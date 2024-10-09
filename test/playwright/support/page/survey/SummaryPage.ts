@@ -15,6 +15,7 @@ export default class SummaryPage {
      */
     async goto(assessId: number): Promise<void> {
         await this.page.goto(SummaryPage.generateRoute(assessId));
+        await this.page.waitForTimeout(2000);
     }
 
     /**

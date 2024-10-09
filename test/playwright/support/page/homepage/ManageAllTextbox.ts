@@ -52,5 +52,6 @@ export default class ManageAllTextbox {
      */
     async clickSaveAll(): Promise<void> {
         await this.page.click("input[type=submit]");
+        await this.page.waitForTimeout(2000);
     }
 }

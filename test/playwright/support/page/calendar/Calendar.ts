@@ -10,6 +10,8 @@ export default class Calendar {
 
     static readonly DAY_PANEL = "td.fc-day-today";
 
+    static readonly CALENDAR_GRID = "fc-daygrid-day-number";
+
     static readonly CALENDAR_EVENT = "a.fc-daygrid-event";
 
     static readonly CALENDAR_PREVIOUS_BUTTON = "button.fc-customPrev-button.fc-button.fc-button-primary";
@@ -36,6 +38,7 @@ export default class Calendar {
      */
     async goto(): Promise<void> {
         await this.page.goto(Calendar.URL);
+        await this.page.waitForTimeout(2000);
     }
 
     /**

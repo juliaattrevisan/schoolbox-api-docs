@@ -113,6 +113,8 @@ test.describe("Textbox Tests", () => {
         await manageAll.typeTextBoxContent(textBoxItem, "Jana Reed");
         await manageAll.clickSaveAll();
         await tester.runShellCommand("php /usr/share/schoolbox/tools/search/buildIndex.php -p --from='-10 min'");
+        // give time to finish the index building
+        await page.waitForTimeout(2000);
     });
 
     /**
@@ -198,6 +200,8 @@ test.describe("Textbox Tests", () => {
         await textbox.save();
 
         await tester.runShellCommand("php /usr/share/schoolbox/tools/search/buildIndex.php -p --from='-10 min'");
+        // give time to finish the index building
+        await page.waitForTimeout(2000);
 
         tester.isGoingTo("As Jana Reed search for textboxes and check whether its is presented or not");
         await tester.impersonate("Jana Reed");

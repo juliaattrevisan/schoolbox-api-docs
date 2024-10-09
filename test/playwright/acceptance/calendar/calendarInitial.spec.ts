@@ -159,7 +159,7 @@ test.describe("Calendar tests", () => {
     /**
      * Soft deleting data to not impact the tests
      */
-    test.afterAll("Tear Down", async ({ baseTester, db }) => {
+    test.afterAll(async ({ baseTester, db }) => {
         baseTester.isGoingTo(
             "update delete_at for the data created in this test so it does impact next suite of tests",
         );
