@@ -1,6 +1,6 @@
 <script setup lang="ts">
 /**
- * To customise the portrait image displayed on a user profile page
+ * The list of mandatory fields for the selected role type
  */
 
 import PeFieldsActiveItem from "./pe-fields-active-item.vue";
