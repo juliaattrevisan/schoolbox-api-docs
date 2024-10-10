@@ -6,7 +6,7 @@
 import type Sortable from "sortablejs";
 import SortableWrapper from "@schoolboxVue/components/sortable-wrapper.vue";
 import PeFieldsAvailableItem from "./pe-fields-available-item.vue";
-import PeFieldsSelectedItem from "./pe-fields-selected-item.vue";
+import PeFieldsActiveItem from "./pe-fields-active-item.vue";
 import { useProfileEditorStore } from "./store/profileEditorStore";
 
 const peStore = useProfileEditorStore();
@@ -54,7 +54,7 @@ const sortableOptions = window.Vue.computed<Sortable.Options>(() => ({
                         <template #item="item">
                             <div :data-pe-field="item.element.field">
                                 <pe-fields-available-item :field="item.element" class="pe-fields-available-item" />
-                                <pe-fields-selected-item
+                                <pe-fields-active-item
                                     v-if="item.isDragging"
                                     :field="item.element"
                                     :dragging="true"

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 /**
- * A list of field settings for a selected field
+ * A list of field settings for an active (selected or mandatory) field
  */
 
 import { useProfileEditorStore } from "./store/profileEditorStore";
@@ -8,11 +8,11 @@ import { useProfileEditorFieldsStore } from "./store/profileEditorFieldsStore";
 import type {
     ProfileEditorFieldSettingKey,
     ProfileEditorFieldSettingOption,
-    ProfileEditorSelectedField,
+    ProfileEditorActiveField,
 } from "./types/profileEditorTypes";
 
 interface Props {
-    field: ProfileEditorSelectedField;
+    field: ProfileEditorActiveField;
     fieldSettingKey: ProfileEditorFieldSettingKey;
 }
 

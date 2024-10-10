@@ -1,25 +1,21 @@
 <script setup lang="ts">
 /**
- * An individual selected field in the profile editor
+ * An individual active field in the profile editor
  */
 
 import { animateRotation } from "@js/util/animateUtils";
 import { slideDownOnEnter, slideUpOnLeave } from "@schoolboxVue/transitions/transitions";
 import { useProfileEditorStore } from "./store/profileEditorStore";
 import { useProfileEditorFieldsStore } from "./store/profileEditorFieldsStore";
-import PeFieldsSelectedItemEdit from "./pe-fields-selected-item-edit.vue";
-import PeFieldsSelectedItemRemove from "./pe-fields-selected-item-remove.vue";
-import PeFieldsSelectedItemError from "./pe-fields-selected-item-error.vue";
+import PeFieldsActiveItemEdit from "./pe-fields-active-item-edit.vue";
+import PeFieldsActiveItemRemove from "./pe-fields-active-item-remove.vue";
+import PeFieldsActiveItemError from "./pe-fields-active-item-error.vue";
 import PeFieldsIcon from "./pe-fields-icon.vue";
-import type {
-    ProfileEditorAvailableField,
-    ProfileEditorSelectedField,
-    ProfileEditorMandatoryField,
-} from "./types/profileEditorTypes";
+import type { ProfileEditorActiveField, ProfileEditorMandatoryField } from "./types/profileEditorTypes";
 
 interface Props {
     // Allow an available field to be passed in as well so we can use this component to also render the drag preview
-    field: ProfileEditorAvailableField | ProfileEditorSelectedField | ProfileEditorMandatoryField;
+    field: ProfileEditorActiveField | ProfileEditorMandatoryField;
     dragging: boolean;
 }
 
@@ -79,7 +75,7 @@ window.Vue.watch(isRemovePanelOpen, (isOpen) => {
  * @param field - the field to check
  * @returns whether the field is NOT an available field
  */
-function isNotAvailableField(field: Props["field"]): field is ProfileEditorSelectedField | ProfileEditorMandatoryField {
+function isNotAvailableField(field: Props["field"]): field is ProfileEditorActiveField {
     return "fieldSettings" in field;
 }
 
@@ -211,18 +207,18 @@ const isSaving = window.Vue.computed(() => {
 
                 <Transition @enter="slideDownOnEnter" @leave="slideUpOnLeave">
                     <div v-if="fieldSaveError" class="component-panel">
-                        <pe-fields-selected-item-error :message="fieldSaveError" />
+                        <pe-fields-active-item-error :message="fieldSaveError" />
                     </div>
                 </Transition>
 
                 <div v-if="isNotAvailableField(props.field)" class="component-panel">
-                    <pe-fields-selected-item-edit
+                    <pe-fields-active-item-edit
                         v-if="panelsToShow.edit !== false"
                         :field="props.field"
                         :is-open="isEditPanelOpen && !$props.dragging"
                         @close="isEditPanelOpen = false"
                     />
-                    <pe-fields-selected-item-remove
+                    <pe-fields-active-item-remove
                         v-if="panelsToShow.remove !== false"
                         :field="props.field"
                         :is-open="isRemovePanelOpen && !$props.dragging"
