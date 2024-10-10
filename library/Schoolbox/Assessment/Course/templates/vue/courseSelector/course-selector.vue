@@ -4,9 +4,9 @@
  */
 
 import SearchSelect from "@schoolboxVue/components/searchSelect/search-select.vue";
+import { useSelected } from "@schoolboxVue/composables/store/useSelected";
 import type { Course } from "@schoolboxLibrary/types/Course";
 import type { Result } from "@schoolboxVue/components/searchSelect/types/Result";
-import { useSelectedStore } from "@schoolboxVue/store/useSelectedStore";
 
 interface Props {
     endpoint: string; // The course api endpoint
@@ -14,7 +14,7 @@ interface Props {
 }
 const props = defineProps<Props>();
 
-const selectedStore = useSelectedStore();
+const { selected, add, remove } = useSelected();
 
 /**
  * When a result is selected, add it to the selected store
@@ -22,11 +22,11 @@ const selectedStore = useSelectedStore();
  * @param result - the result selected
  */
 function onSelected(result: Result): void {
-    const exists = selectedStore.selected.find((item) => item.id === result.id);
+    const exists = selected.value.find((item) => item.id === result.id);
     if (exists) {
-        selectedStore.remove(result);
+        remove(result);
     } else {
-        selectedStore.add(result);
+        add(result);
     }
 }
 
@@ -35,14 +35,14 @@ function onSelected(result: Result): void {
  * @param result - the result removed
  */
 function onRemoved(result: Result): void {
-    selectedStore.remove(result);
+    remove(result);
 }
 </script>
 
 <template>
     <search-select
         :endpoint="props.endpoint"
-        :selected="selectedStore.selected"
+        :selected="selected"
         placeholder="Search for courses..."
         @select="onSelected"
         @remove="onRemoved"
