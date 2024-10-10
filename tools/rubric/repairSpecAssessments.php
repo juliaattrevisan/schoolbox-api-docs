@@ -835,7 +835,7 @@ $kernel->run(new class extends App {
             LEFT JOIN course_specification cs ON (cs.id = var.course_specification_id)
             LEFT JOIN course_unit_specification cus ON (cus.id = var.course_unit_specification_id)
             LEFT JOIN rubric_indicator_usage rcu ON sb.id = rcu.submission_box_id
-            WHERE TRUE #sb.use_rubric = 1
+            WHERE sb.use_rubric = 1
             AND (
                 CASE (
                     CONCAT(
