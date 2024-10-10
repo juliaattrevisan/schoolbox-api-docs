@@ -8,7 +8,7 @@ import type { Result } from "./types/Result";
 
 interface Props {
     query: string; // the search query
-    selected: Result[]; // the selected results
+    selectedItems: Result[]; // the selected results
     results: Result[]; // the results returned from the search
     result: Result; // the result to display
     isSingleSelect: boolean; // whether only one result can be selected
@@ -26,7 +26,7 @@ const emit = defineEmits<{
  * @returns {boolean}
  */
 const isSelected = window.Vue.computed(() => {
-    return props.selected.some((result) => result.id === props.result.id);
+    return props.selectedItems.some((result) => result.id === props.result.id);
 });
 
 /**

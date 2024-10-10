@@ -11,7 +11,7 @@ import SearchSelectResults from "./search-select-results.vue";
 
 interface Props {
     endpoint: string; // the search api endpoint
-    selected: Result[]; // the selected searchResults
+    selectedItems: Result[]; // the selected searchResults
     defaultResults?: Result[]; // show selection options when the search input is empty
     isSingleSelect?: boolean; // whether only one result can be selected
     formValueName?: string; // the name of the form value
@@ -25,8 +25,8 @@ const props = withDefaults(defineProps<Props>(), {
 });
 
 const emit = defineEmits<{
-    select: [result: Result];
-    remove: [result: Result];
+    selectResult: [result: Result]; // to select a search result
+    removeItem: [result: Result]; // to remove a selected item
 }>();
 
 const searchSelectEl = window.Vue.ref<HTMLDivElement | null>(null);
@@ -34,11 +34,11 @@ const searchSelectEl = window.Vue.ref<HTMLDivElement | null>(null);
 const { query, isActive, isSearching, hasNoResults, results } = useSearch(props.endpoint);
 
 /**
- * To show the current results, or the default results if the search is not active
+ * To show the current search results, or the default results if the search is not active
  * @returns { Result[] }
  */
 const currentResults = window.Vue.computed(() => {
-    if (props.selected.length === 1 && props.isSingleSelect) {
+    if (props.selectedItems.length === 1 && props.isSingleSelect) {
         return [];
     }
     if (props.defaultResults && props.defaultResults.length > 0 && !isActive.value) {
@@ -52,7 +52,7 @@ const currentResults = window.Vue.computed(() => {
  * @param result - the result selected
  */
 function onSelected(result: Result): void {
-    emit("select", result);
+    emit("selectResult", result);
 }
 
 /**
@@ -60,7 +60,7 @@ function onSelected(result: Result): void {
  * @param result - the result removed
  */
 function onRemoved(result: Result): void {
-    emit("remove", result);
+    emit("removeItem", result);
 }
 
 /**
@@ -75,7 +75,7 @@ function onInput($query: string): void {
 <template>
     <div ref="searchSelectEl" class="c-search-select">
         <search-select-selected
-            :selected="props.selected"
+            :selected-items="props.selectedItems"
             :form-value-name="props.formValueName"
             :is-single-select="props.isSingleSelect"
             @remove="onRemoved"
@@ -88,7 +88,7 @@ function onInput($query: string): void {
             :is-single-select="props.isSingleSelect"
             :results="currentResults"
             :has-no-results="hasNoResults"
-            :selected="selected"
+            :selected-items="selectedItems"
             @select="onSelected"
         />
     </div>

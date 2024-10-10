@@ -8,7 +8,7 @@ import type { Result } from "./types/Result";
 
 interface Props {
     results: Result[]; // the results returned from the search
-    selected: Result[]; // the selected results
+    selectedItems: Result[]; // the selected items
 }
 const props = defineProps<Props>();
 
@@ -23,9 +23,9 @@ const emit = defineEmits<{
  * @returns - whether all results are selected
  */
 const isAllResultsSelected = window.Vue.computed(() => {
-    if (props.selected.length > 0) {
+    if (props.selectedItems.length > 0) {
         const alreadySelected = props.results.filter((resultItem) => {
-            return props.selected.some((node) => resultItem.id === node.id);
+            return props.selectedItems.some((node) => resultItem.id === node.id);
         });
         return alreadySelected.length === props.results.length;
     }
@@ -38,9 +38,9 @@ const isAllResultsSelected = window.Vue.computed(() => {
  * @returns - whether some results are selected
  */
 const isSomeResultsSelected = window.Vue.computed(() => {
-    if (props.selected.length > 0) {
+    if (props.selectedItems.length > 0) {
         const alreadySelected = props.results.filter((resultItem) => {
-            return props.selected.some((node) => resultItem.id === node.id);
+            return props.selectedItems.some((node) => resultItem.id === node.id);
         });
         return alreadySelected.length >= 1 && alreadySelected.length !== props.results.length;
     }

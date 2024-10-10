@@ -15,7 +15,7 @@ interface Props {
     isSingleSelect: boolean; // whether only one result can be selected
     results: Result[]; // the results returned from the search
     hasNoResults: boolean; // whether there are no results
-    selected: Result[]; // the selected results
+    selectedItems: Result[]; // the selected results
 }
 
 const props = defineProps<Props>();
@@ -106,17 +106,21 @@ function onSelected(result: Result): void {
     <div ref="searchResultsContainerEl" class="search-results-container">
         <div ref="searchResultsEl" class="search-results">
             <div v-if="props.isSearching" class="search-status">Searching for results....</div>
-            <div v-else-if="props.hasNoResults && props.selected.length === 0" class="search-status">
+            <div v-else-if="props.hasNoResults && props.selectedItems.length === 0" class="search-status">
                 No results found for your current search.
             </div>
             <template v-else>
-                <search-select-select-all v-if="showSelectAll" :results="props.results" :selected="props.selected" />
+                <search-select-select-all
+                    v-if="showSelectAll"
+                    :results="props.results"
+                    :selected-items="props.selectedItems"
+                />
                 <search-select-result
                     v-for="result in props.results"
                     :key="result.id"
                     :data-test="`search-select-result-${result.id}`"
                     :query="props.query"
-                    :selected="selected"
+                    :selected-items="props.selectedItems"
                     :results="props.results"
                     :result="result"
                     :is-single-select="props.isSingleSelect"

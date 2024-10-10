@@ -45,12 +45,12 @@ function onRemoved(): void {
         <label for="creator">Creator</label>
         <search-select
             endpoint="/ajax/user.php?groupID=0&query="
-            :selected="filterCreatorsStore.creator"
+            :selected-items="filterCreatorsStore.creator"
             :is-single-select="true"
             :default-results="[currentUser as Result]"
             placeholder="Search for users..."
-            @select="onSelected"
-            @remove="onRemoved"
+            @select-result="onSelected"
+            @remove-item="onRemoved"
         />
     </div>
 </template>

@@ -42,10 +42,10 @@ function onRemoved(result: Result): void {
 <template>
     <search-select
         :endpoint="props.endpoint"
-        :selected="selected"
+        :selected-items="selected"
         placeholder="Search for courses..."
-        @select="onSelected"
-        @remove="onRemoved"
+        @select-result="onSelected"
+        @remove-item="onRemoved"
     />
 </template>
 
