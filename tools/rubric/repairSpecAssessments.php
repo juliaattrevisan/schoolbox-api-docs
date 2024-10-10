@@ -825,6 +825,8 @@ $kernel->run(new class extends App {
      */
     private function disableRubric(int $unitFolderId): void
     {
+        // To make sense of this query, compare with the query defining the v_assessment_relation view.
+        // Each of the WHEN rows below corresponds to one of the UNIONed SELECT statements in that view.
         $ids = $this->db->executeQuery(
             'SELECT sb.id
             FROM submission_box sb
