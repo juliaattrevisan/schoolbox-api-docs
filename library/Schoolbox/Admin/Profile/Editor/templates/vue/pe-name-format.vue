@@ -49,7 +49,7 @@ async function onUpdateClicked(): Promise<void> {
         />
         <Transition @enter="slideDownOnEnter" @leave="slideUpOnLeave">
             <div v-if="isNameFormatUnsaved()">
-                <button class="button" :disabled="isSaving" @change="saveError = null" @click="onUpdateClicked">
+                <button class="button submit" :disabled="isSaving" @change="saveError = null" @click="onUpdateClicked">
                     {{ isSaving ? "Updating..." : "Update" }}
                 </button>
             </div>
