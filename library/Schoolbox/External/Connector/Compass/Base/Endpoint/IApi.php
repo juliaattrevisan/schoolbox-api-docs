@@ -9,6 +9,8 @@ declare(strict_types=1);
 
 namespace Schoolbox\External\Connector\Compass\Base\Endpoint;
 
+use GuzzleHttp\Client;
+
 /**
  * Interface IApi
  *
@@ -16,7 +18,6 @@ namespace Schoolbox\External\Connector\Compass\Base\Endpoint;
  */
 interface IApi
 {
-
     /**
      * Retrieves data from an endpoint
      *
@@ -37,4 +38,16 @@ interface IApi
      * @return string
      */
     public function getHost(): string;
+
+
+    /**
+     * Get the HTTP client this API uses.
+     *
+     * This client will be pre-configured with the necessary headers required
+     * for making requests against Compass' API, as well as to static resources
+     * on the Compass instance's CDN.
+     *
+     * @return Client
+     */
+    public function getClient(): Client;
 }
