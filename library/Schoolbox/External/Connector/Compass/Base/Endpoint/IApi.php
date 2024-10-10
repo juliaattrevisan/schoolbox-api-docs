@@ -43,6 +43,10 @@ interface IApi
     /**
      * Get the HTTP client this API uses.
      *
+     * This client will be pre-configured with the necessary headers required
+     * for making requests against Compass' API, as well as to static resources
+     * on the Compass instance's CDN.
+     *
      * @return Client
      */
     public function getClient(): Client;

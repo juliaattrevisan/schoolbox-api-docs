@@ -1247,6 +1247,9 @@ class Profile implements IStrategy
 
         while ($fails < self::NUM_RETRY) {
             try {
+                // Use the API's HTTP client to fetch profile images:
+                // it has the headers required for making valid requests against
+                // Compass' CDN.
                 $response = $this->api->getClient()->get($url);
                 $image    = $response->getBody()->getContents();
                 break;
