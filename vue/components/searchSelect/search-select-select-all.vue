@@ -66,7 +66,7 @@ function onSelectAll(): void {
 </script>
 
 <template>
-    <button class="search-result" @click.prevent="onSelectAll">
+    <button class="search-result f-no-margins" @click.prevent="onSelectAll">
         <div class="checklist">
             <input
                 id="checkbox-select-all"
@@ -74,30 +74,28 @@ function onSelectAll(): void {
                 :checked="isChecked"
                 :class="{ indeterminate: isSomeResultsSelected }"
             />
-            <label for="checkbox-select-all"></label>
+            <label for="checkbox-select-all">Select All</label>
         </div>
-        <strong>Select All</strong>
     </button>
 </template>
 
 <style lang="scss" scoped>
 .search-result {
-    background: white;
+    background: var(--color-foreground-primary);
+    border-bottom: 1px solid var(--body-background);
+    border-left: 1px solid var(--form-border-color);
+    border-right: 1px solid var(--form-border-color);
     display: flex;
     font-size: 0.825rem;
-    margin: 0;
-    padding: 0.5rem 0.75rem;
-    text-align: left;
+    padding: var(--spacing-s);
     transition: background 0.2s;
     width: 100%;
     &:hover {
         background: var(--content-ui-hover);
     }
-}
-
-.checklist {
-    flex: 2rem 0 0; //ensure a long name doesn't impact the checkbox width, which may add dodgy scroll bars on it
-    margin: 0;
+    &:last-of-type {
+        border-bottom: none;
+    }
 }
 
 input[type="checkbox"]:not(.plain) + label {

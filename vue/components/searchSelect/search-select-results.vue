@@ -85,7 +85,13 @@ window.Vue.watch(
  * @returns {boolean} - whether to show the select all option
  */
 const showSelectAll = window.Vue.computed(() => {
-    return !props.isSingleSelect && props.results.length <= 1;
+    if (props.isSingleSelect) {
+        return false;
+    }
+    if (props.results.length <= 1) {
+        return false;
+    }
+    return true;
 });
 
 /**
@@ -104,7 +110,7 @@ function onSelected(result: Result): void {
                 No results found for your current search.
             </div>
             <template v-else>
-                <search-select-select-all v-if="showSelectAll" />
+                <search-select-select-all v-if="showSelectAll" :results="props.results" :selected="props.selected" />
                 <search-select-result
                     v-for="result in props.results"
                     :key="result.id"
