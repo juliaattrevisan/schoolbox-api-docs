@@ -351,7 +351,6 @@ class CourseAssignments extends CourseAssessmentAbstract
         $isBoxUpdated = false;
         if (
             // Does any attribute no longer align?
-            (float)$submissionBox->getAssessmentModel()->getWeight() !== $weight ||
             $submissionBox->getMaxMark() !== $maxMark ||
             $submissionBox->getAcceptOnline() !== $acceptOnline ||
             $submissionBox->getAcceptMultiple() !== $acceptMultiple ||
