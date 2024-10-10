@@ -21,7 +21,7 @@ const { selected, add, remove } = useSelected();
  * or remove it if it already exists
  * @param result - the result selected
  */
-function onSelected(result: Result): void {
+function onSelectResult(result: Result): void {
     const exists = selected.value.find((item) => item.id === result.id);
     if (exists) {
         remove(result);
@@ -31,10 +31,36 @@ function onSelected(result: Result): void {
 }
 
 /**
+ * Select all the results
+ * @param results - the results to add
+ */
+function selectAllResults(results: Result[]): void {
+    results.forEach((result) => {
+        const exists = selected.value.find((item) => item.id === result.id);
+        if (!exists) {
+            add(result);
+        }
+    });
+}
+
+/**
+ * Remove all the results
+ * @param results - the results to remove
+ */
+function removeAllResults(results: Result[]): void {
+    results.forEach((result) => {
+        const exists = selected.value.find((item) => item.id === result.id);
+        if (exists) {
+            remove(result);
+        }
+    });
+}
+
+/**
  * Remove the result from the selected list
  * @param result - the result removed
  */
-function onRemoved(result: Result): void {
+function onRemoveItem(result: Result): void {
     remove(result);
 }
 </script>
@@ -44,8 +70,10 @@ function onRemoved(result: Result): void {
         :endpoint="props.endpoint"
         :selected-items="selected"
         placeholder="Search for courses..."
-        @select-result="onSelected"
-        @remove-item="onRemoved"
+        @select-result="onSelectResult"
+        @select-all-results="selectAllResults"
+        @remove-all-results="removeAllResults"
+        @remove-item="onRemoveItem"
     />
 </template>
 

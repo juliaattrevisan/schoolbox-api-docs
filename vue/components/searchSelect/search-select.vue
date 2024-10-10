@@ -1,6 +1,6 @@
 <script setup lang="ts">
 /**
- * To search for searchResults and select them
+ * To search for results with a query and select them
  */
 
 import { useSearch } from "./composables/useSearch";
@@ -27,6 +27,8 @@ const props = withDefaults(defineProps<Props>(), {
 const emit = defineEmits<{
     selectResult: [result: Result]; // to select a search result
     removeItem: [result: Result]; // to remove a selected item
+    selectAllResults: [results: Result[]]; // to select all search results
+    removeAllResults: [results: Result[]]; // to remove all search results
 }>();
 
 const searchSelectEl = window.Vue.ref<HTMLDivElement | null>(null);
@@ -48,19 +50,33 @@ const currentResults = window.Vue.computed(() => {
 });
 
 /**
- * To toggle the selected state of the result
- * @param result - the result selected
- */
-function onSelected(result: Result): void {
-    emit("selectResult", result);
-}
-
-/**
  * To remove a result
  * @param result - the result removed
  */
 function onRemoved(result: Result): void {
     emit("removeItem", result);
+}
+
+/**
+ * To toggle the selected state of the result
+ * @param result - the result selected
+ */
+function onSelect(result: Result): void {
+    emit("selectResult", result);
+}
+
+/**
+ * To select all search results
+ */
+function onSelectAll(): void {
+    emit("selectAllResults", results.value);
+}
+
+/**
+ * To remove all search results
+ */
+function onRemoveAll(): void {
+    emit("removeAllResults", results.value);
 }
 
 /**
@@ -89,7 +105,9 @@ function onInput($query: string): void {
             :results="currentResults"
             :has-no-results="hasNoResults"
             :selected-items="selectedItems"
-            @select="onSelected"
+            @select="onSelect"
+            @select-all="onSelectAll"
+            @remove-all="onRemoveAll"
         />
     </div>
 </template>

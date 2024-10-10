@@ -13,7 +13,7 @@ interface Props {
 const props = defineProps<Props>();
 
 const emit = defineEmits<{
-    addAll: [];
+    selectAll: [];
     removeAll: [];
 }>();
 
@@ -60,7 +60,7 @@ function onSelectAll(): void {
     if (isChecked.value) {
         emit("removeAll");
     } else {
-        emit("addAll");
+        emit("selectAll");
     }
 }
 </script>

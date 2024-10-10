@@ -21,7 +21,9 @@ interface Props {
 const props = defineProps<Props>();
 
 const emit = defineEmits<{
-    select: [result: Result];
+    select: [result: Result]; // to select a search result
+    selectAll: []; // to select all search results
+    removeAll: []; // to remove all search results
 }>();
 
 const searchResultsContainerEl = window.Vue.ref<HTMLDivElement | null>(null);
@@ -101,6 +103,20 @@ const showSelectAll = window.Vue.computed(() => {
 function onSelected(result: Result): void {
     emit("select", result);
 }
+
+/**
+ * To select all search results
+ */
+function onSelectAll(): void {
+    emit("selectAll");
+}
+
+/**
+ * To remove all search results
+ */
+function onRemoveAll(): void {
+    emit("removeAll");
+}
 </script>
 <template>
     <div ref="searchResultsContainerEl" class="search-results-container">
@@ -114,6 +130,8 @@ function onSelected(result: Result): void {
                     v-if="showSelectAll"
                     :results="props.results"
                     :selected-items="props.selectedItems"
+                    @select-all="onSelectAll"
+                    @remove-all="onRemoveAll"
                 />
                 <search-select-result
                     v-for="result in props.results"
