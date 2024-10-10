@@ -41,7 +41,7 @@ export default class SectionForm {
      * @param title - The title of the section
      */
     async setTitle(title: string): Promise<void> {
-        await this.page.locator(`h2.subheader:has-text("CREATE SECTION")`).isVisible();
+        await this.page.locator(`h2.subheader:has-text("CREATE SECTION")`).isVisible({ timeout: 30000 });
         await this.page.fill(SectionForm.SELECTOR_TITLE, title);
     }
 

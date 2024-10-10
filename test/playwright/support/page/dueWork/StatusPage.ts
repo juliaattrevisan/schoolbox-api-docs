@@ -14,6 +14,8 @@ export default class StatusPage {
 
     static readonly SELECTOR_BUTTON_PUBLISH = "a[data-draft='publish']";
 
+    static readonly DATA_TEST_JELLY_TOT = "sbx-pop-out-header-options-button";
+
     constructor(tester: AcceptanceTester, page: Page) {
         this.tester = tester;
         this.page = page;
@@ -58,5 +60,23 @@ export default class StatusPage {
         await this.page.waitForTimeout(2000); // Wait for auto-save to finish
         await publishButton.click();
         await expect(publishButton).not.toBeVisible();
+    }
+
+    /**
+     * click the jelly tot
+     */
+    async clickJellyTot(): Promise<void> {
+        await this.page.waitForTimeout(2000);
+        await this.page.getByTestId(StatusPage.DATA_TEST_JELLY_TOT).isVisible({ timeout: 30000 });
+        await this.page.getByTestId(StatusPage.DATA_TEST_JELLY_TOT).click();
+    }
+
+    /**
+     * click an option in the jelly tot dropdown
+     * @param option - The option to click: modify, feedback, task, download
+     */
+    async clickJellyTotOption(option: string): Promise<void> {
+        await this.page.locator(`#header-options a.icon-${option}`).isVisible({ timeout: 30000 });
+        await this.page.locator(`#header-options a.icon-${option}`).click();
     }
 }

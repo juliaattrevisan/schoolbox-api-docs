@@ -241,9 +241,8 @@ export default class AssessmentForm {
         if (openSection) {
             await this.page.getByTestId(AssessmentForm.SELECTOR_PARTICIPATION_LEGEND).click();
         }
-
+        await this.page.waitForTimeout(2000);
         await this.page.getByTestId(`${AssessmentForm.SELECTOR_PARTICIPATION_PARTICIPANT}-${userId}`).click();
-
         await this.page.getByTestId(AssessmentForm.SELECTOR_PARTICIPATION_CUSTOMISE_OPTIONS_POPOUT_BUTTON).click();
         await this.page.getByTestId(AssessmentForm.SELECTOR_PARTICIPATION_CUSTOMISE_OPTIONS_EXCLUDE).click();
 

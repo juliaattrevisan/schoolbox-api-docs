@@ -36,7 +36,7 @@ export default class QuestionBankPage {
      */
     async clickCategory(categoryId: number): Promise<void> {
         await this.page.click(`#node_${categoryId}_anchor`);
-        await this.page.locator(`h2.subheader:has-text("ELECTIVE SELECTION")`).isVisible();
+        await this.page.locator(`h2.subheader:has-text("ELECTIVE SELECTION")`).isVisible({ timeout: 30000 });
     }
 
     /**

@@ -28,6 +28,7 @@ export default class Resources {
      */
     async clickFolderName(folderName: string): Promise<void> {
         await this.page.locator(`a.jstree-anchor:has-text("${folderName}")`).click();
+        await this.page.locator(`a[title="${folderName}"]`).isVisible();
     }
 
     /**

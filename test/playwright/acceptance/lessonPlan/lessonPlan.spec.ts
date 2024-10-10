@@ -87,7 +87,6 @@ async function createLessonPlanTemplate(
     await resources.clickFolderName(folderName);
 
     await page.waitForLoadState("domcontentloaded");
-    // await page.click("Homepage");
     await resources.clickMenuItem("home");
     await page.waitForLoadState("domcontentloaded");
     tester.isGoingTo("Add Jacl Coles into the group via the manage group page");

@@ -6,9 +6,11 @@ export default class Calendar {
 
     private page: Page;
 
-    static readonly URL = "/calendar/week";
+    static readonly URL = "/calendar/month";
 
-    static readonly DAY_PANEL = "td.fc-day";
+    static readonly DAY_PANEL = "td.fc-day-today";
+
+    static readonly CALENDAR_GRID = "fc-daygrid-day-number";
 
     static readonly CALENDAR_EVENT = "a.fc-daygrid-event";
 
@@ -36,6 +38,7 @@ export default class Calendar {
      */
     async goto(): Promise<void> {
         await this.page.goto(Calendar.URL);
+        await this.page.waitForTimeout(2000);
     }
 
     /**

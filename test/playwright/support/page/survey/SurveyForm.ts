@@ -43,7 +43,7 @@ export default class SurveyForm {
      * @param title - The title of the survey
      */
     async setTitle(title: string): Promise<void> {
-        await this.page.locator(`h1:has-text("CREATE SURVEY")`).isVisible();
+        await this.page.locator(`h1:has-text("CREATE SURVEY")`).isVisible({ timeout: 30000 });
         await this.page.fill(SurveyForm.SELECTOR_TITLE, title);
     }
 

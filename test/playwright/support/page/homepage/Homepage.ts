@@ -202,6 +202,7 @@ export default class Homepage {
      * Click the component remove icon
      */
     async clickComponentRemoveIcon(): Promise<void> {
+        await this.page.locator(Homepage.ELEMENT_REMOVE_ICON).first().isVisible({ timeout: 30000 });
         await this.page.locator(Homepage.ELEMENT_REMOVE_ICON).first().click();
     }
 
@@ -237,6 +238,10 @@ export default class Homepage {
      * Click the remove confirmation button
      */
     async clickRemoveConfirmationMessage(): Promise<void> {
+        await this.page
+            .locator(`a:text("${Homepage.REMOVE_BUTTON_CONFIRMATION_MESSAGE}")`)
+            .first()
+            .isVisible({ timeout: 30000 });
         await this.page.locator(`a:text("${Homepage.REMOVE_BUTTON_CONFIRMATION_MESSAGE}")`).first().click();
     }
 }

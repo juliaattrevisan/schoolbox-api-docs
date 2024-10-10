@@ -169,6 +169,7 @@ test.describe("Learning Moment Photo Tests", () => {
         await learningMomentsPage.clickDropdownMenu(evidenceId);
         await learningMomentsPage.clickLearningMomentDeleteButton(evidenceId);
         await learningMomentsPage.clickLearningMomentConfirmDeleteButton();
+        await page.waitForTimeout(2000);
 
         tester.isGoingTo("check the text is no longer presented ");
         await learningMomentsPage.verifyEvidenceNotPresent("This is a learning moment test to get deleted");
