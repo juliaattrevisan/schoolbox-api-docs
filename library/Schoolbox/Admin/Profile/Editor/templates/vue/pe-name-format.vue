@@ -42,7 +42,11 @@ async function onUpdateClicked(): Promise<void> {
 
 <template>
     <div v-if="peStore.selectedRoleType" class="l-mar-m--top">
-        <input v-model="peStore.selectedRoleType.nameFormat" type="text" />
+        <input
+            v-model="peStore.selectedRoleType.nameFormat"
+            type="text"
+            placeholder="Name output format. Can contain: {title}, {firstname}, {preferredname} (falls back to first name if empty), {lastname}, {pronoun}."
+        />
         <Transition @enter="slideDownOnEnter" @leave="slideUpOnLeave">
             <div v-if="isNameFormatUnsaved()">
                 <button class="button" :disabled="isSaving" @change="saveError = null" @click="onUpdateClicked">
