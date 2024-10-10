@@ -34,6 +34,7 @@ class Controller extends Base
      */
     public function getGreenhouse(string $templateName): void
     {
-        $this->response = $this->responseFromTemplate('@greenhouse/' . $templateName . '.twig', []);
+        $this->response = $this->responseFromTemplate('@greenhouse/' . $templateName . '.twig', [
+        ]);
     }
 }

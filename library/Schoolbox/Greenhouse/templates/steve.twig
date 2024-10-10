@@ -1,4 +1,14 @@
-
+<ul>
+{% for field in fields %}
+    <li>
+        {% if field.terminology %}
+            <span style="color:green">Used localisation for {{ field.field }}: <strong>{{ locale.translate(field.terminology) }}</strong></span>
+        {% else %}
+            <span style="color:red">Used default for {{ field.field }}: {{ field.displayAs }}</span>
+        {% endif %}
+    </li>
+{% endfor %}
+</ul>
 
 
 {#<h1>Audit</h1>#}

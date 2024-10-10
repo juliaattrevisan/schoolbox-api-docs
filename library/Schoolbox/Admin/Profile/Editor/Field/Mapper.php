@@ -14,6 +14,7 @@ use Alaress\Database\Predicate\Builder;
 use Schoolbox\GenericCollection;
 use Schoolbox\Mapper\DefinitionException;
 use Schoolbox\Mapper\Exception;
+use Schoolbox\User;
 
 /**
  * Class Mapper
@@ -152,15 +153,14 @@ class Mapper extends \Schoolbox\Mapper
      * Find $viewee's fields that $viewer can see, when $viewer
      * visits $viewee's profile screen.
      *
-     * @param $viewee
-     * @param $viewer
+     * @param User $viewee
+     * @param User $viewer
      * @return GenericCollection
-     * @throws \DebugBar\DebugBarException
+     * @throws Exception
      * @throws \PDOException
-     * @throws \Schoolbox\Mapper\Exception
      * @throws \UnexpectedValueException
      */
-    public function findRenderableFields($viewee, $viewer): GenericCollection
+    public function findRenderableFields(\Schoolbox\User $viewee, \Schoolbox\User $viewer): GenericCollection
     {
         $collection = $this->createCollection();
 

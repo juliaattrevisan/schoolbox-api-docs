@@ -10,7 +10,6 @@ declare(strict_types=1);
 namespace Schoolbox\Profile\Field;
 
 use Alaress\Database\Predicate\InvalidColumnException;
-use DebugBar\DebugBarException;
 use Schoolbox\Admin\Profile\Editor\Field\Mapper;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Role;
@@ -42,7 +41,6 @@ class Factory
      * @param User $viewee
      * @param User $viewer
      * @return array
-     * @throws DebugBarException
      * @throws InvalidColumnException
      * @throws MapperException
      * @throws \DomainException
@@ -52,8 +50,6 @@ class Factory
     public function produce(\Schoolbox\User $viewee, \Schoolbox\User $viewer): array
     {
         $payload = [
-            /* TODO add rosetta stone
-             */
             'locale' => null,
             'roleTypes' => [
                 'roleType' => $viewee->getRole()->getType(),
@@ -71,10 +67,12 @@ class Factory
          */
         $renderableFields = $this->fieldMapper->findRenderableFields($viewee, $viewer);
 
+        /** @var \Schoolbox\Admin\Profile\Editor\Field\Model $renderableField */
         foreach ($renderableFields as $renderableField) {
             $payload['roleTypes']['fields']['selected'][] = [
                 'field' => $renderableField->getField(),
                 'displayAs' => $renderableField->getDisplayAs(),
+                'terminology' => $renderableField->getTerm(),
                 'value' => $referenceFields[$renderableField->getField()] ?? null
             ];
         }
