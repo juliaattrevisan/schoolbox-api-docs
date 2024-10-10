@@ -1247,7 +1247,8 @@ class Profile implements IStrategy
 
         while ($fails < self::NUM_RETRY) {
             try {
-                $image = file_get_contents($url);
+                $response = $this->api->getClient()->get($url);
+                $image    = $response->getBody()->getContents();
                 break;
             } catch (\Exception $e) {
                 $this->log->warning(sprintf(

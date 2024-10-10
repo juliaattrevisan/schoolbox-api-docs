@@ -104,7 +104,7 @@ class Api implements IApi
 
         $headers = [
             'CompassApiKey' => $credentials['key'],
-            'Content-Type' => 'application/json'
+            'Content-Type'  => 'application/json',
         ];
 
         return new Client([
@@ -219,5 +219,16 @@ class Api implements IApi
     public function getHost(): string
     {
         return $this->host;
+    }
+
+
+    /**
+     * Get the HTTP client this API uses.
+     *
+     * @return Client
+     */
+    public function getClient(): Client
+    {
+        return $this->client;
     }
 }
