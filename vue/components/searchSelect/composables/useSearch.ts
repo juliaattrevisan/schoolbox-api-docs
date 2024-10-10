@@ -1,17 +1,18 @@
 /**
- *
+ * Search for results that match the current query
  */
 
 import debounce from "lodash/debounce";
 import type { Ref } from "vue";
-import type { Result } from "../../components/searchSelect/types/Result";
+import type { Result } from "../types/Result";
 
 const MIN_QUERY_LENGTH = 2; // the amount of characters typed before the search becomes active
 const DEBOUNCE_AMOUNT = 350; // the amount in ms to hold off on searching, to allow the user to keep typing
 
 /**
- *
+ * search for results that match the current query
  * @param endpoint - the endpoint to search for results
+ * @returns isSearching, query, results, isActive, hasNoResults,  search
  */
 export function useSearch(endpoint: string): {
     isSearching: Ref<boolean>;
@@ -19,7 +20,6 @@ export function useSearch(endpoint: string): {
     results: Ref<Result[]>;
     isActive: Ref<boolean>;
     hasNoResults: Ref<boolean>;
-    enableSearch: () => void;
     search: () => Promise<void>;
 } {
     const isSearching = window.Vue.ref(false); // to notify that an action is taking place,
@@ -108,7 +108,6 @@ export function useSearch(endpoint: string): {
         results,
         isActive,
         hasNoResults,
-        enableSearch,
         search,
     };
 }

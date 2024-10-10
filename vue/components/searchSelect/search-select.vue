@@ -3,7 +3,7 @@
  * To search for searchResults and select them
  */
 
-import { useSearch } from "@schoolboxVue/composables/search/useSearch";
+import { useSearch } from "./composables/useSearch";
 import type { Result } from "./types/Result";
 import SearchSelectSelected from "./search-select-selected.vue";
 import SearchSelectInput from "./search-select-input.vue";
