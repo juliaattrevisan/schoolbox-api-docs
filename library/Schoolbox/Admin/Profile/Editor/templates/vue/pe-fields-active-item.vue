@@ -11,11 +11,15 @@ import PeFieldsActiveItemEdit from "./pe-fields-active-item-edit.vue";
 import PeFieldsActiveItemRemove from "./pe-fields-active-item-remove.vue";
 import PeFieldsActiveItemError from "./pe-fields-active-item-error.vue";
 import PeFieldsIcon from "./pe-fields-icon.vue";
-import type { ProfileEditorActiveField, ProfileEditorMandatoryField } from "./types/profileEditorTypes";
+import type {
+    ProfileEditorActiveField,
+    ProfileEditorAvailableField,
+    ProfileEditorMandatoryField,
+} from "./types/profileEditorTypes";
 
 interface Props {
     // Allow an available field to be passed in as well so we can use this component to also render the drag preview
-    field: ProfileEditorActiveField | ProfileEditorMandatoryField;
+    field: ProfileEditorActiveField | ProfileEditorAvailableField;
     dragging: boolean;
 }
 
