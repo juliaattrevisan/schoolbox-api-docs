@@ -825,7 +825,6 @@ $kernel->run(new class extends App {
      */
     private function disableRubric(int $unitFolderId): void
     {
-echo "Disabling rubric...";
         $ids = $this->db->executeQuery(
             'SELECT sb.id
             FROM submission_box sb
@@ -861,14 +860,12 @@ echo "Disabling rubric...";
         )->fetchAll(PDO::FETCH_COLUMN);
 
         if (empty($ids)) {
-echo "exiting.\n";
             return;
         }
 
         $idString = implode(',', array_map('intval', $ids));
         $this->db->executeQuery("UPDATE submission_box set use_rubric = 0 WHERE id in ({$idString})");
         $this->log->info(self::indent(2) . "submission boxes {$idString} in unit {$unitFolderId} are not using rubric: disabling Rubric");
-echo "submissionBoxIds: " . implode(',', $ids) . "\n";
     }
 
     /**
