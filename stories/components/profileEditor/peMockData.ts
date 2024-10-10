@@ -191,6 +191,7 @@ export const mockData: ProfileEditorPayload = {
                             },
                         },
                     ],
+                    mandatory: [],
                 },
             },
             {
@@ -227,6 +228,7 @@ export const mockData: ProfileEditorPayload = {
                             },
                         },
                     ],
+                    mandatory: [],
                 },
             },
         ],

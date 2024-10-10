@@ -1,6 +1,6 @@
 <script setup lang="ts">
 /**
- * The error panel for a selected field that has an error
+ * The error panel for an active field that has an error
  */
 
 interface Props {

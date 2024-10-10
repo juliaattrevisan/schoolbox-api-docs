@@ -1,16 +1,16 @@
 <script setup lang="ts">
 /**
- * The edit panel for a selected field
+ * The edit panel for an active field
  */
 
 import { slideDownOnEnter, slideUpOnLeave } from "@schoolboxVue/transitions/transitions";
-import PeFieldsSelectedItemEditSetting from "./pe-fields-selected-item-edit-setting.vue";
+import PeFieldsActiveItemEditSetting from "./pe-fields-active-item-edit-setting.vue";
 import { useProfileEditorStore } from "./store/profileEditorStore";
 import { useProfileEditorFieldsStore } from "./store/profileEditorFieldsStore";
-import type { ProfileEditorSelectedField } from "./types/profileEditorTypes";
+import type { ProfileEditorActiveField } from "./types/profileEditorTypes";
 
 interface Props {
-    field: ProfileEditorSelectedField;
+    field: ProfileEditorActiveField;
     isOpen: boolean;
 }
 
@@ -46,7 +46,7 @@ async function onUpdateClicked(): Promise<void> {
         <div v-if="props.isOpen" class="editPanel small-12">
             <section>
                 <div class="l-grid l-grid--12 l-gap-m">
-                    <pe-fields-selected-item-edit-setting
+                    <pe-fields-active-item-edit-setting
                         v-for="fieldSettingKey in validFieldSettingKeys"
                         :key="fieldSettingKey"
                         :field="props.field"

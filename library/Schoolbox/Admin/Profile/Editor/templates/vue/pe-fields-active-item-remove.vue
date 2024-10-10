@@ -1,14 +1,14 @@
 <script setup lang="ts">
 /**
- * The remove panel for a selected field
+ * The remove panel for an active field
  */
 
 import { slideDownOnEnter, slideUpOnLeave } from "@schoolboxVue/transitions/transitions";
 import { useProfileEditorFieldsStore } from "./store/profileEditorFieldsStore";
-import type { ProfileEditorSelectedField } from "./types/profileEditorTypes";
+import type { ProfileEditorActiveField } from "./types/profileEditorTypes";
 
 interface Props {
-    field: ProfileEditorSelectedField;
+    field: ProfileEditorActiveField;
     isOpen: boolean;
 }
 

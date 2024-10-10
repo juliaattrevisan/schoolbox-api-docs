@@ -3,9 +3,9 @@ import { cloneDeep } from "lodash";
 import { until } from "@vueuse/core";
 import { useProfileEditorStore } from "./profileEditorStore";
 import type {
-    ProfileEditorSelectedField,
     ProfileEditorFieldSettingKey,
     ProfileEditorFieldSettingOption,
+    ProfileEditorActiveField,
 } from "../types/profileEditorTypes";
 
 type EnableFieldAction = {
@@ -99,16 +99,17 @@ export const useProfileEditorFieldsStore = defineStore("profileEditorFieldsStore
     const actionErrors = window.Vue.ref<{ [key: string]: string }>({});
 
     /**
-     * Whether a field can be selected or not
-     * @param field - The field to check
-     * @returns true if the field is disabled (and can't be selected), false otherwise
+     * Get the type of an active field (selected or mandatory)
+     * @param field - The field to get the type of
+     * @returns The type of the field, or null if it is not active
      */
-    function isFieldDisabled(field: string): boolean {
-        if (peStore.selectedRoleType === null) return true;
-        if (peStore.selectedRoleType.fields.selected.some((selectedField) => selectedField.field === field)) {
-            return true;
-        }
-        return false;
+    function getActiveFieldType(field: string): "selected" | "mandatory" | null {
+        if (peStore.selectedRoleType === null) return null;
+
+        if (peStore.selectedRoleType.fields.mandatory.some((f) => f.field === field)) return "mandatory";
+        if (peStore.selectedRoleType.fields.selected.some((f) => f.field === field)) return "selected";
+
+        return null;
     }
 
     /**
@@ -175,12 +176,15 @@ export const useProfileEditorFieldsStore = defineStore("profileEditorFieldsStore
     async function processUpdateFieldSettings(field: string): Promise<void> {
         if (!peStore.selectedRoleType || !peStore.savedSelectedRoleType) return;
 
+        const activeFieldType = getActiveFieldType(field);
+        if (activeFieldType === null) throw new Error("Field not found in active fields.");
+
         const endpoint = peStore.endpoints.adminProfileEditorPostFieldSettings
             .replace("{roleType}", peStore.selectedRoleType.roleType)
             .replace("{fieldId}", field);
 
-        const currentField = peStore.selectedRoleType.fields.selected.find((f) => f.field === field);
-        if (!currentField) return;
+        const currentField = peStore.selectedRoleType.fields[activeFieldType].find((f) => f.field === field);
+        if (!currentField) throw new Error("Field not found in active fields.");
 
         const response = await fetchProfileEditorEndpoint(endpoint, {
             method: "POST",
@@ -193,7 +197,7 @@ export const useProfileEditorFieldsStore = defineStore("profileEditorFieldsStore
             return;
         }
 
-        const savedField = peStore.savedSelectedRoleType.fields.selected.find((f) => f.field === field);
+        const savedField = peStore.savedSelectedRoleType.fields[activeFieldType].find((f) => f.field === field);
         if (savedField) {
             savedField.fieldSettings = cloneDeep(currentField.fieldSettings);
         }
@@ -329,8 +333,7 @@ export const useProfileEditorFieldsStore = defineStore("profileEditorFieldsStore
 
         const availableField = peStore.selectedRoleType.fields.available.find((f) => f.field === field);
         if (availableField === undefined) throw new Error(`Field ${field} not found`);
-
-        if (isFieldDisabled(field)) throw new Error(`Field ${field} is already selected`);
+        if (getActiveFieldType(field) !== null) return;
 
         // a map of each field setting key to an empty array to start with (all settings are deselected)
         const emptyFieldSettings = Object.fromEntries(Object.keys(peStore.fieldSettings).map((key) => [key, []]));
@@ -396,20 +399,23 @@ export const useProfileEditorFieldsStore = defineStore("profileEditorFieldsStore
         if (peStore.selectedRoleType === null) return false;
         if (peStore.savedSelectedRoleType === null) return false;
 
-        const selectedField = peStore.selectedRoleType.fields.selected.find((f) => f.field === field);
-        const savedField = peStore.savedSelectedRoleType.fields.selected.find((f) => f.field === field);
+        const activeFieldType = getActiveFieldType(field);
+        if (activeFieldType === null) return false;
+
+        const activeField = peStore.selectedRoleType.fields[activeFieldType].find((f) => f.field === field);
+        const savedField = peStore.savedSelectedRoleType.fields[activeFieldType].find((f) => f.field === field);
 
         // If the field itself hasn't been saved, then treat the settings as saved for now
-        if (selectedField === undefined || savedField === undefined) return false;
+        if (activeField === undefined || savedField === undefined) return false;
 
         // Check if the field settings are different, each setting list *should* be sorted, so we can compare them directly
-        return Object.keys(selectedField.fieldSettings).some(
-            (key) => JSON.stringify(selectedField.fieldSettings[key]) !== JSON.stringify(savedField.fieldSettings[key]),
+        return Object.keys(activeField.fieldSettings).some(
+            (key) => JSON.stringify(activeField.fieldSettings[key]) !== JSON.stringify(savedField.fieldSettings[key]),
         );
     }
 
     /**
-     * Update the field settings for a selected field
+     * Update the field settings for an active (selected or mandatory) field
      * Note, this does NOT persist the changes to the server - use saveFieldSettings for that
      * @param field - The key of the field to update
      * @param fieldSettingKey - The key of the field setting to update
@@ -417,20 +423,21 @@ export const useProfileEditorFieldsStore = defineStore("profileEditorFieldsStore
      * @param isSelected - Whether the option is selected or deselected
      */
     function updateFieldSettingOption(
-        field: ProfileEditorSelectedField["field"],
+        field: ProfileEditorActiveField["field"],
         fieldSettingKey: ProfileEditorFieldSettingKey,
         fieldSettingOptionId: ProfileEditorFieldSettingOption["id"],
         isSelected: boolean,
     ): void {
         if (peStore.selectedRoleType === null) throw new Error("No role type selected");
 
-        const selectedField = peStore.selectedRoleType.fields.selected.find((f) => f.field === field);
-        if (selectedField === undefined) throw new Error(`Field ${field} not found`);
+        const activeFieldType = getActiveFieldType(field);
+        if (activeFieldType === null) throw new Error(`Field ${field} not found`);
+
+        const activeField = peStore.selectedRoleType.fields[activeFieldType].find((f) => f.field === field);
+        if (activeField === undefined) throw new Error(`Field ${field} not found`);
 
         // Always filter the settings to avoid duplicates
-        const filteredSettings = selectedField.fieldSettings[fieldSettingKey].filter(
-            (id) => id !== fieldSettingOptionId,
-        );
+        const filteredSettings = activeField.fieldSettings[fieldSettingKey].filter((id) => id !== fieldSettingOptionId);
 
         // Add the setting if it is selected
         if (isSelected) {
@@ -438,13 +445,13 @@ export const useProfileEditorFieldsStore = defineStore("profileEditorFieldsStore
         }
 
         filteredSettings.sort(); // Sort the settings to ensure consistency and allow for easier comparison
-        selectedField.fieldSettings[fieldSettingKey] = filteredSettings;
+        activeField.fieldSettings[fieldSettingKey] = filteredSettings;
     }
 
     return {
         actionQueue,
         actionErrors,
-        isFieldDisabled,
+        getActiveFieldType,
         enableField,
         disableField,
         saveFieldSettings,

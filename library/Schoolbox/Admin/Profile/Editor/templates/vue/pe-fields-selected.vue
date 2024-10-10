@@ -6,7 +6,7 @@
 import type Sortable from "sortablejs";
 import SortableWrapper from "@schoolboxVue/components/sortable-wrapper.vue";
 import { slideDownOnEnter, slideUpOnLeave } from "@schoolboxVue/transitions/transitions";
-import PeFieldsSelectedItem from "./pe-fields-selected-item.vue";
+import PeFieldsActiveItem from "./pe-fields-active-item.vue";
 import { useProfileEditorStore } from "./store/profileEditorStore";
 import { useProfileEditorFieldsStore } from "./store/profileEditorFieldsStore";
 
@@ -70,7 +70,7 @@ async function onAddField(event: Sortable.SortableEvent): Promise<void> {
             @add="onAddField"
         >
             <template #item="item">
-                <pe-fields-selected-item :field="item.element" :dragging="item.isDragging" />
+                <pe-fields-active-item :field="item.element" :dragging="item.isDragging" />
             </template>
         </sortable-wrapper>
 

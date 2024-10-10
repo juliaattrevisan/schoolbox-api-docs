@@ -4,10 +4,10 @@
  * This represents a different way the field may show on the actual profile itself
  */
 
-import type { ProfileEditorAvailableField } from "./types/profileEditorTypes";
+import type { ProfileEditorActiveField, ProfileEditorAvailableField } from "./types/profileEditorTypes";
 
 interface Props {
-    field: ProfileEditorAvailableField;
+    field: ProfileEditorActiveField | ProfileEditorAvailableField;
 }
 
 const props = defineProps<Props>();
