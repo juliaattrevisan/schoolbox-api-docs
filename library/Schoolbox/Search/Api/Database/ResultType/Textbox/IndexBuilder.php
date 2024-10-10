@@ -201,11 +201,11 @@ class IndexBuilder extends BaseBuilder
             'homepageComponentKey' => Textbox\Mapper::HOMEPAGE_COMPONENT_KEY,
         ];
         if ($fromDate) {
-            $queryString .= ' AND tb2.updated_at >= :fromDate';
+            $queryString .= ' AND tb.updated_at >= :fromDate';
             $params['fromDate'] = $fromDate->getDatabase();
         }
         if ($toDate) {
-            $queryString .= ' AND tb2.updated_at <= :toDate';
+            $queryString .= ' AND tb.updated_at <= :toDate';
             $params['toDate'] = $toDate->getDatabase();
         }
         if ($subject) {
