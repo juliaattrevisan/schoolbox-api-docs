@@ -11,10 +11,22 @@ namespace Schoolbox\Admin\Profile\Editor;
 
 use Schoolbox\Admin\Profile\Editor\Field\Mapper;
 use Schoolbox\CampusMapper;
+use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Role;
 
 class Payload
 {
+    /**
+     * These roletypes - and their name formats - are what we support.
+     * The GUEST roletype doesn't get a look-in.
+     */
+    public const CONFIG_ROLETYPE = [
+        Role::STUDENT => ConfigMapper::NAME_NAME_FORMAT_STUDENT,
+        Role::STAFF => ConfigMapper::NAME_NAME_FORMAT_STAFF,
+        Role::PARENT => ConfigMapper::NAME_NAME_FORMAT_PARENT,
+    ];
+
+
     /**
      * A special case field - it's mandatory and always appears in everyone's
      * profile screen when administering

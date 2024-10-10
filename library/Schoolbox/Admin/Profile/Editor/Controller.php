@@ -12,6 +12,8 @@ namespace Schoolbox\Admin\Profile\Editor;
 
 use Alaress\Web\Controller\Base;
 use Schoolbox\Admin\Navigation\Subnav;
+use Schoolbox\Mapper\Exception;
+use Schoolbox\Mapper\Exception\Deleted;
 
 class Controller extends Base
 {
@@ -23,6 +25,7 @@ class Controller extends Base
         private Field\Availability\Campus\Mapper $availabilityCampusMapper,
         private Field\Visibility\Mapper $visibilityMapper,
         private \Schoolbox\CampusMapper $campusMapper,
+        private \Schoolbox\Config\ConfigMapper $configMapper
     ) {
     }
 
@@ -39,7 +42,7 @@ class Controller extends Base
 
         /* Check that $roletype was valid; if not, default to Student
          */
-        if (!\in_array($roleType, \Schoolbox\Role::getRoleTypes(), true)) {
+        if (!isset(Payload::CONFIG_ROLETYPE[$roleType])) {
             $roleType = \Schoolbox\Role::STUDENT;
         }
 
@@ -289,6 +292,7 @@ class Controller extends Base
      *
      * @param string $roleType The roletype for which the sequence is updated
      * @throws \InvalidArgumentException
+     * @throws \RuntimeException
      */
     public function postFieldSequence(string $roleType): void
     {
@@ -341,5 +345,38 @@ class Controller extends Base
                 ['success' => false, 'message' => $e->getMessage()]
             )->withStatus(500);
         }
+    }
+
+
+    /**
+     * Update the name format for users' names on their profile screens.
+     *
+     * This only applies to student roletype for now, because of EIM's custom work,
+     * but it could potentially spread to other roletypes once people get wind of it.
+     *
+     * @param string $roleType
+     * @return void
+     * @throws \PDOException
+     * @throws Exception
+     * @throws Deleted
+     * @throws \UnexpectedValueException
+     */
+    public function postNameFormat(string $roleType): void
+    {
+        /* Figure out which roletype config to update
+         */
+        $configName = Payload::CONFIG_ROLETYPE[$roleType];
+        $nameFormat = $this->requestPost->get('nameFormat');
+
+        /* No format? No trabajo; exit early
+         */
+        if (null === $nameFormat) {
+            return;
+        }
+
+        $config = $this->configMapper->findOneByColumn('name', $configName)
+            ->setValue($nameFormat);
+
+        $this->configMapper->save($config);
     }
 }
