@@ -1350,13 +1350,14 @@ class DataSource
      * * Usages are copied from srcBox + srcIndicator to dstBox + dstIndicator
      *
      * @param int $sourceAssessmentId
+     * @param AssessmentContext $assessmentContext
      * @param int $destinationAssessmentId
      *
      * @return bool Whether a new Rubric was created.
      * @throws MapperException
      * @throws MapperException\Deleted
      */
-    public function copyRubric($sourceAssessmentId, $destinationAssessmentId)
+    public function copyRubric($sourceAssessmentId, AssessmentContext $assessmentContext, $destinationAssessmentId)
     {
         // TODO extract this entire monstrosity elsewhere
 
@@ -1380,7 +1381,9 @@ class DataSource
             return false;
         }
 
-        $dstBox    = $boxMapper->findOneByColumn('assessment_id', $destinationAssessmentId);
+        $dstBox = $boxMapper->findOneByColumn('assessment_id', $destinationAssessmentId);
+        $dstBox->getAssessmentModel()->setContextFolder($assessmentContext->getFolder());
+
         $dstFolder = $dstBox->getAssessmentModel()->getContextFolder();
 
         // Cannot mutate identity of objects returned from mappers.

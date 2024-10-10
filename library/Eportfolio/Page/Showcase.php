@@ -105,19 +105,27 @@ class Eportfolio_Page_Showcase extends Eportfolio_Page_Abstract
                 if (!$participant) {
                     continue;
                 }
+
+                // Set the submission box's assessment context folder as this is not yet hydrated.
+                $currentBox->getAssessmentModel()->setContextFolder($assessment->getContext()->getFolder());
+
                 /** @var Response $submission */
                 $submission = $participant->findMostRecentSubmittedResponse();
                 /** @var Feedback $return */
                 $return = $participant->findMostRecentInstructorGivenPublishedFeedback();
 
+                $currentBoxContextFolder = $currentBox->getAssessmentModel()->getContextFolder();
+                $contextFolderId = $currentBoxContextFolder->getId();
+                $contextFolderName = $currentBoxContextFolder->getName();
+
                 /* Set up subject info
                  */
-                $allSubjects[$currentBox->getCategory()->getId()]['id']   = $currentBox->getCategory()->getId();
-                $allSubjects[$currentBox->getCategory()->getId()]['name'] = $currentBox->getCategory()->getName();
+                $allSubjects[$contextFolderId]['id']   = $contextFolderId;
+                $allSubjects[$contextFolderId]['name'] = $contextFolderName;
 
                 /* Push individual items into the subject
                  */
-                $allSubjects[$currentBox->getCategory()->getId()]['items'][] = [
+                $allSubjects[$contextFolderId]['items'][] = [
                     'currentBox'           => $currentBox,
                     'currentShowcasedItem' => $currentShowcasedItem,
                     'latestSubmission'     => $submission,

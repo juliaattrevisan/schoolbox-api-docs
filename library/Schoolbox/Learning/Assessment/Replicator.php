@@ -17,6 +17,7 @@ use Schoolbox\Learning\Assessment\Quiz\Model as Quiz;
 use Schoolbox\Learning\AssessmentContext;
 use Schoolbox\Learning\Learnosity\Helper;
 use Schoolbox\Learning\Quiz\Mapper as QuizMapper;
+use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\TaskDaemon\Producer;
 use Schoolbox\TaskDaemon\Request\HttpRequest\MessageFactory;
 use Schoolbox\User;
@@ -61,6 +62,7 @@ class Replicator
      * @return IAssessable if any part of the replication fails
      * @throws \InvalidArgumentException If Destination Quiz already has Sections
      * @throws \UnexpectedValueException
+     * @throws MapperException
      */
     public function replicateInNewContext(
         IAssessable $source,
@@ -92,7 +94,7 @@ class Replicator
         $destinationContext->getAssessables()->add($newAssessment);
 
         // Copy DueWork Rubrics
-        $this->replicateDueWorkRubric($source, $newAssessment);
+        $this->replicateDueWorkRubric($source, $destinationContext, $newAssessment);
 
         // Copy Quiz Sections/Questions/Solutions
         $this->replicateQuizConstituents($source, $newAssessment, $newOwner);
@@ -177,14 +179,16 @@ class Replicator
      * Copy the rubric from `$source` into `$destination`.
      *
      * @param IAssessable $source
+     * @param AssessmentContext $assessmentContext
      * @param IAssessable $destination
      * @return void
+     * @throws MapperException
      */
-    private function replicateDueWorkRubric(IAssessable $source, IAssessable $destination): void
+    private function replicateDueWorkRubric(IAssessable $source, AssessmentContext $assessmentContext, IAssessable $destination): void
     {
         if (!($source instanceof DueWork && $destination instanceof DueWork)) {
             return;
         }
-        $this->rubricMapper->copyRubric($source->getId(), $destination->getId());
+        $this->rubricMapper->copyRubric($source->getId(), $assessmentContext, $destination->getId());
     }
 }

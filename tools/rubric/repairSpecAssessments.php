@@ -825,22 +825,47 @@ $kernel->run(new class extends App {
      */
     private function disableRubric(int $unitFolderId): void
     {
-        $sql       = '
-        SELECT sb.id
-        FROM submission_box sb
-        LEFT JOIN rubric_indicator_usage rcu ON sb.id = rcu.submission_box_id
-        WHERE sb.use_rubric = 1
-        AND sb.category = :folderId
-        GROUP BY sb.id HAVING count(rcu.rubric_indicator_id) = 0
-        ';
-        $statement = $this->db->executeQuery($sql, ['folderId' => $unitFolderId]);
-        $ids       = $statement->fetchAll(PDO::FETCH_COLUMN);
+        // To make sense of this query, compare with the query defining the v_assessment_relation view.
+        // Each of the WHEN rows below corresponds to one of the UNIONed SELECT statements in that view.
+        $ids = $this->db->executeQuery(
+            'SELECT sb.id
+            FROM submission_box sb
+            JOIN assessment a ON sb.assessment_id = a.id
+            JOIN v_assessment_relation var ON a.id = var.assessment_id
+            LEFT JOIN folder f ON (f.id = var.folder_id)
+            LEFT JOIN course_implementation ci ON (ci.id = var.course_implementation_id)
+            LEFT JOIN course_specification cs ON (cs.id = var.course_specification_id)
+            LEFT JOIN course_unit_specification cus ON (cus.id = var.course_unit_specification_id)
+            LEFT JOIN rubric_indicator_usage rcu ON sb.id = rcu.submission_box_id
+            WHERE sb.use_rubric = 1
+            AND (
+                CASE (
+                    CONCAT(
+                        IF(var.project_assessment_id         IS NULL, "0", "1"), "-",
+                        IF(var.course_implementation_id      IS NULL, "0", "1"), "-",
+                        IF(var.course_unit_implementation_id IS NULL, "0", "1"), "-",
+                        IF(var.course_specification_id       IS NULL, "0", "1"), "-",
+                        IF(var.course_unit_specification_id  IS NULL, "0", "1")
+                    )
+                )
+                    WHEN "0-0-0-0-0" THEN var.folder_id # Folder.
+                    WHEN "0-0-0-1-1" THEN cus.folder_id # Course unit specification.
+                    WHEN "0-1-1-0-0" THEN ci.folder_id  # Course unit implementation.
+                    WHEN "1-0-0-0-0" THEN var.folder_id # Project.
+                    WHEN "1-0-0-1-1" THEN cus.folder_id # Project within course unit specification.
+                    WHEN "1-1-1-0-0" THEN ci.folder_id  # Project within course unit implementation.
+                    ELSE "This case should occur due to the way v_assessment_relation is constructed."
+                END
+            ) = :folderId
+            GROUP BY sb.id HAVING count(rcu.rubric_indicator_id) = 0',
+            ['folderId' => $unitFolderId]
+        )->fetchAll(PDO::FETCH_COLUMN);
 
         if (empty($ids)) {
             return;
         }
 
-        $idString = implode(',', $ids);
+        $idString = implode(',', array_map('intval', $ids));
         $this->db->executeQuery("UPDATE submission_box set use_rubric = 0 WHERE id in ({$idString})");
         $this->log->info(self::indent(2) . "submission boxes {$idString} in unit {$unitFolderId} are not using rubric: disabling Rubric");
     }

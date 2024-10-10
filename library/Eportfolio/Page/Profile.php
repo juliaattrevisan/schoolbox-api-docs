@@ -202,7 +202,7 @@ class Eportfolio_Page_Profile extends Eportfolio_Page_Abstract
             foreach ($allShowcasedItems as $currentShowcasedItem) {
                 $currentBox = $currentShowcasedItem->getSubmissionBox();
                 /** @var IAssessable|null $assessment */
-                $assessment  = $assessments->getOffset($currentBox->getAssessmentId());
+                $assessment = $assessments->getOffset($currentBox->getAssessmentId());
 
                 // if box's assessment is deleted, it's not included in $assessments
                 if (!$assessment) {
@@ -229,6 +229,9 @@ class Eportfolio_Page_Profile extends Eportfolio_Page_Abstract
                 $latestReturn = $participant->findMostRecentInstructorGivenPublishedFeedback();
 
                 $workType = $assessment->getWorkType();
+
+                // Set the submission box's assessment context folder as this is not yet hydrated.
+                $currentBox->getAssessmentModel()->setContextFolder($assessment->getContext()->getFolder());
 
                 $this->getPage()->setVar(array(
                     'SHOWCASED_WORK_ITEM_ID' => $currentShowcasedItem->getId(),

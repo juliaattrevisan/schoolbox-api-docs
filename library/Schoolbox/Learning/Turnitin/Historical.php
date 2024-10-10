@@ -123,8 +123,8 @@ class Historical
          * Ignore submission_boxes that did not enable similarity check
          */
         $query = "
-            SELECT 
-                sb.id AS submission_box_id, sb.name AS submission_box_name, 
+            SELECT
+                sb.id AS submission_box_id, a.title AS submission_box_name,
                 ssf.*,
                 s.*
             FROM submission_box sb

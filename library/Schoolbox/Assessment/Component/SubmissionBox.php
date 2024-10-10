@@ -628,29 +628,6 @@ class SubmissionBox implements IAssessableDataModel, ISoftDeletable
     }
 
     /**
-     * Determine whether $user has $requiredAccessLevel (or greater)
-     * upon the Folder associated with $submissionBox
-     *
-     * @param User $user
-     * @param int $requiredAccessLevel
-     * @return bool
-     */
-    public function hasAccess(User $user, $requiredAccessLevel)
-    {
-        $access = Access::getInstance();
-
-        /* Access level for $user on $submissionBox
-         */
-        $boxLevel = $access->getFolderAccess($user, $this->getAssessmentModel()->getContextFolder()->getId());
-
-        if ($boxLevel >= $requiredAccessLevel) {
-            return true;
-        }
-
-        return false;
-    }
-
-    /**
      * @return int the core Assessment ID
      */
     public function getAssessmentId()
