@@ -26,7 +26,8 @@
                     adminProfileEditorPostFieldAdd: '{{ routeLookupIfAuthorized('adminProfileEditor.postFieldAdd') }}',
                     adminProfileEditorPostFieldRemove: '{{ routeLookupIfAuthorized('adminProfileEditor.postFieldRemove') }}',
                     adminProfileEditorPostFieldSettings: '{{ routeLookupIfAuthorized('adminProfileEditor.postFieldSettings') }}',
-                    adminProfileEditorPostFieldSequence: '{{ routeLookupIfAuthorized('adminProfileEditor.postFieldSequence') }}'
+                    adminProfileEditorPostFieldSequence: '{{ routeLookupIfAuthorized('adminProfileEditor.postFieldSequence') }}',
+                    adminProfileEditorPostNameFormat: '{{ routeLookupIfAuthorized('adminProfileEditor.postNameFormat') }}',
                 }"
                 :payload="{{ payload |json_encode }}"
             />

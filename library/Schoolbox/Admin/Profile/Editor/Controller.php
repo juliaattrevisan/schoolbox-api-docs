@@ -50,6 +50,7 @@ class Controller extends Base
          * the index screen, rather than have the $roleType's payload specifically.
          */
         $payload = (new Payload(
+            $this->getConfigLoader(),
             $this->fieldMapper,
             $this->campusMapper
         ))->generateAll();

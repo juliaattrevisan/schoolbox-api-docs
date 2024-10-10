@@ -21,6 +21,7 @@ export const useProfileEditorStore = defineStore("profileEditorStore", () => {
         adminProfileEditorPostFieldRemove: "",
         adminProfileEditorPostFieldSettings: "",
         adminProfileEditorPostFieldSequence: "", // TODO: replace and handle null for all these
+        adminProfileEditorPostNameFormat: "",
     });
 
     /**
