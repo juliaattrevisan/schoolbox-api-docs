@@ -5,6 +5,7 @@ export const mockData: ProfileEditorPayload = {
         roleTypes: [
             {
                 roleType: "student", // only ever "student", "staff", or "parent" in real life
+                nameFormat: "{title} {firstname} {lastname}",
                 fields: {
                     // Available Fields
                     // These are in alphabetical order and represent what could be dragged onto
@@ -196,6 +197,7 @@ export const mockData: ProfileEditorPayload = {
             },
             {
                 roleType: "staff", // only ever "student", "staff", or "parent" in real life
+                nameFormat: "{title} {firstname} {lastname}",
                 fields: {
                     // Available Fields
                     // These are in alphabetical order and represent what could be dragged onto
