@@ -2,28 +2,22 @@
 /**
  * To customise the portrait image displayed on a user profile page
  */
+
+import PeFieldsSelectedItem from "./pe-fields-selected-item.vue";
+import { useProfileEditorStore } from "./store/profileEditorStore";
+
+const peStore = useProfileEditorStore();
 </script>
 
 <template>
-    <div class="component">
-        <div class="row collapse">
-            <div class="small-12 columns">
-                <div class="component-titlebar">
-                    <div class="actions-small-2">
-                        <div class="list-item">
-                            <h2 title="Portrait Image">Portrait Image</h2>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="editPanel small-12" style="display: block">
-                    <section>
-                        <div>profile image thingy here</div>
-                    </section>
-                </div>
-            </div>
-        </div>
-    </div>
+    <template v-if="peStore.selectedRoleType">
+        <pe-fields-selected-item
+            v-for="mandatoryField in peStore.selectedRoleType.fields.mandatory"
+            :key="mandatoryField.field"
+            :field="mandatoryField"
+            :dragging="false"
+        />
+    </template>
 </template>
 
 <style scoped></style>

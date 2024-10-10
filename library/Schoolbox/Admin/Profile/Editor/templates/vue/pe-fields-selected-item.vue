@@ -11,11 +11,15 @@ import PeFieldsSelectedItemEdit from "./pe-fields-selected-item-edit.vue";
 import PeFieldsSelectedItemRemove from "./pe-fields-selected-item-remove.vue";
 import PeFieldsSelectedItemError from "./pe-fields-selected-item-error.vue";
 import PeFieldsIcon from "./pe-fields-icon.vue";
-import type { ProfileEditorAvailableField, ProfileEditorSelectedField } from "./types/profileEditorTypes";
+import type {
+    ProfileEditorAvailableField,
+    ProfileEditorSelectedField,
+    ProfileEditorMandatoryField,
+} from "./types/profileEditorTypes";
 
 interface Props {
     // Allow an available field to be passed in as well so we can use this component to also render the drag preview
-    field: ProfileEditorSelectedField | ProfileEditorAvailableField;
+    field: ProfileEditorAvailableField | ProfileEditorSelectedField | ProfileEditorMandatoryField;
     dragging: boolean;
 }
 
@@ -68,17 +72,26 @@ window.Vue.watch(isRemovePanelOpen, (isOpen) => {
 });
 
 /**
- * Determine if the current field we are rendering is a "selected" field rather than an "available" field
- * These both have different data structures, but it is useful to use the same component to render both
+ * Determine if the current field is NOT an "available" field
+ * Each field type has different properties, but it is useful to use the same component to render both
  * The field will only be "available" if it is the preview of a field being dragged
- * This function also tells TypeScript to narrow the type of the field
+ * This allows us to narrow the type of the field so we can access other properties on it
  * @param field - the field to check
- * @returns whether the field is a selected field
+ * @returns whether the field is NOT an available field
  */
-function isSelectedField(
-    field: ProfileEditorAvailableField | ProfileEditorSelectedField,
-): field is ProfileEditorSelectedField {
+function isNotAvailableField(field: Props["field"]): field is ProfileEditorSelectedField | ProfileEditorMandatoryField {
     return "fieldSettings" in field;
+}
+
+/**
+ * Determine if the current field we are rendering is a "mandatory" field
+ * @param field - the field to check
+ * @returns whether the field is a mandatory field
+ */
+function isMandatoryField(field: Props["field"]): field is ProfileEditorMandatoryField {
+    if (!isNotAvailableField(field)) return false;
+    if (!peStore.selectedRoleType) return false;
+    return peStore.selectedRoleType.fields.mandatory.some((mandatoryField) => mandatoryField.field === field.field);
 }
 
 /**
@@ -86,20 +99,39 @@ function isSelectedField(
  * That is, this is true if and only if the field exists on the server already
  */
 const isFieldOnServer = window.Vue.computed(() => {
-    return peStore.savedSelectedRoleType?.fields.selected.some((field) => field.field === props.field.field) === true;
+    const activeFieldType = peFieldsStore.getActiveFieldType(props.field.field);
+    if (activeFieldType === null) return false;
+
+    return peStore.savedSelectedRoleType?.fields[activeFieldType].some((field) => field.field === props.field.field);
 });
 
 /**
- * Whether the panel components should be available or not
+ * Whether the field should be draggable or not
+ * This is true if it's a selected or available field, but not if it's a mandatory field
  */
-const showPanels = window.Vue.computed(() => {
-    // If this field is not a selected field (e.g. if its a preview of a field being dragged) don't show the panels
-    if (!isSelectedField(props.field)) return false;
+const isDraggable = window.Vue.computed(() => {
+    return !isMandatoryField(props.field);
+});
+
+/**
+ * The panels that should be shown for this field
+ * - false: don't show the panel or button for it at all
+ * - true: show the button for the panel, and allow it to be opened
+ * - disabled: show the button for the panel, but don't allow it to be opened
+ */
+const panelsToShow = window.Vue.computed<{ edit: boolean | "disabled"; remove: boolean | "disabled" }>(() => {
+    // If this field is an available field, show disabled states
+    if (!isNotAvailableField(props.field)) return { edit: "disabled", remove: "disabled" };
 
     // If this field is not known to the server yet (we are still saving its initial add) don't show the panels
-    if (!isFieldOnServer.value) return false;
+    if (!isFieldOnServer.value) return { edit: "disabled", remove: "disabled" };
 
-    return true;
+    return {
+        // Always show the edit panel
+        edit: true,
+        // Only show the remove panel if it's not a mandatory field
+        remove: !isMandatoryField(props.field),
+    };
 });
 
 /**
@@ -123,7 +155,7 @@ const isSaving = window.Vue.computed(() => {
 
     // Always show the grip for available fields, the user won't be able to interact with them
     // but this makes the drag preview look more like an actual saved field rather than having a spinner
-    if (!isSelectedField(props.field)) return false;
+    if (!isNotAvailableField(props.field)) return false;
 
     // Always show the loading state if the field is not on the server yet
     if (!isFieldOnServer.value) return true;
@@ -138,7 +170,7 @@ const isSaving = window.Vue.computed(() => {
 </script>
 
 <template>
-    <div class="component l-mar-m--bottom" :class="{ saving: isSaving }" :data-sortable-item="props.field.field">
+    <div class="component l-mar-m--bottom" :data-sortable-item="isDraggable ? props.field.field : undefined">
         <div class="row collapse">
             <div class="small-12 columns">
                 <div class="component-titlebar">
@@ -147,7 +179,7 @@ const isSaving = window.Vue.computed(() => {
                             <h2 :title="props.field.displayAs">
                                 <span v-if="isSaving" class="loader" />
                                 <a
-                                    v-else
+                                    v-else-if="isDraggable"
                                     class="icon-grip"
                                     data-pe-field-drag-handle
                                     style="user-select: none; touch-action: none; cursor: grab"
@@ -158,17 +190,19 @@ const isSaving = window.Vue.computed(() => {
                         </div>
                         <nav>
                             <a
+                                v-if="panelsToShow.edit !== false"
                                 ref="editBtn"
                                 class="icon-settings"
                                 title="Settings"
-                                :disabled="showPanels ? undefined : true"
+                                :disabled="panelsToShow.edit ? undefined : true"
                                 @click="isEditPanelOpen = !isEditPanelOpen"
                             />
                             <a
+                                v-if="panelsToShow.remove !== false"
                                 ref="removeBtn"
                                 class="icon-close"
                                 title="Close"
-                                :disabled="showPanels ? undefined : true"
+                                :disabled="panelsToShow.remove ? undefined : true"
                                 @click="isRemovePanelOpen = !isRemovePanelOpen"
                             />
                         </nav>
@@ -181,13 +215,15 @@ const isSaving = window.Vue.computed(() => {
                     </div>
                 </Transition>
 
-                <div v-if="isSelectedField(props.field) && showPanels" class="component-panel">
+                <div v-if="isNotAvailableField(props.field)" class="component-panel">
                     <pe-fields-selected-item-edit
+                        v-if="panelsToShow.edit !== false"
                         :field="props.field"
                         :is-open="isEditPanelOpen && !$props.dragging"
                         @close="isEditPanelOpen = false"
                     />
                     <pe-fields-selected-item-remove
+                        v-if="panelsToShow.remove !== false"
                         :field="props.field"
                         :is-open="isRemovePanelOpen && !$props.dragging"
                         @close="isRemovePanelOpen = false"

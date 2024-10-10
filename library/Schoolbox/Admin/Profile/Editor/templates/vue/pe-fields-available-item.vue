@@ -14,7 +14,8 @@ interface Props {
 const props = defineProps<Props>();
 const peFieldsStore = useProfileEditorFieldsStore();
 
-const disabled = window.Vue.computed(() => peFieldsStore.isFieldDisabled(props.field.field));
+// Prevent the user from selecting a field that is already selected
+const disabled = window.Vue.computed(() => peFieldsStore.getActiveFieldType(props.field.field) !== null);
 </script>
 
 <template>
