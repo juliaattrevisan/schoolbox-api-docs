@@ -69,7 +69,7 @@ class Module extends BaseModule
      */
     private function preloadField(array $params): array
     {
-        $roleType = $this->preloadRoleType($params['roleType']);
+        $roleType = $this->preloadRoleType($params);
 
         try {
             $field = $this->getFieldMapper()->findOneByColumnList([
