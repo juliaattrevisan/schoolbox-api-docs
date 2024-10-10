@@ -14,6 +14,7 @@ const endpoints: ProfileEditorEndpoints = {
     adminProfileEditorPostFieldRemove: "nothing here for now...",
     adminProfileEditorPostFieldSettings: "nothing here for now...",
     adminProfileEditorPostFieldSequence: "nothing here for now...",
+    adminProfileEditorPostNameFormat: "nothing here for now...",
 };
 
 // const mswHandlers = [
