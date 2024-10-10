@@ -22,3 +22,13 @@
         list-style: none;
     }
 }
+
+// Limits text to two lines and hides overflow.
+.t-restrict-length {
+    display: -webkit-box;
+    overflow: hidden;
+    line-clamp: 2; // standard property
+    -webkit-line-clamp: 2; // WebKit-specific property
+    -webkit-box-orient: vertical;
+    white-space: normal;
+}
