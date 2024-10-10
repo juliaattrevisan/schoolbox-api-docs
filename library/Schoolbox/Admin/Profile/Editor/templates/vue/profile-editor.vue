@@ -5,6 +5,7 @@
 
 import PeFields from "./pe-fields.vue";
 import PeRoleType from "./pe-role-type.vue";
+import PeNameFormat from "./pe-name-format.vue";
 import { useProfileEditorStore } from "./store/profileEditorStore";
 import type { ProfileEditorEndpoints, ProfileEditorPayload } from "./types/profileEditorTypes";
 
@@ -31,6 +32,7 @@ window.Vue.onMounted(() => {
 
 <template>
     <pe-role-type />
+    <pe-name-format />
     <pe-fields />
 </template>
 
