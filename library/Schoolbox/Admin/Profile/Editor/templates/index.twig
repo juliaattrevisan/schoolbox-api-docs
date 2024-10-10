@@ -32,27 +32,5 @@
             />
         </div>
         <script src="{{ CDN_PREFIX }}/js/bundle/profileEditor.js?v={{ config.site_version }}"></script>
-
-        <div class="small-12 island">
-            <h2 class="subheader">postFieldSettings</h2>
-            <section class="content">
-                {% set formAction = routeLookupIfAuthorized('adminProfileEditor.postFieldSettings', {roleType: 'student', fieldId: 'StudentMedicalAlert'}) %}
-                {% if formAction %}
-                    <form action="{{ formAction }}" method="post">
-                        <p>Campus Ids</p>
-                        <input type="text" name="fieldSettings[availability][]" value="1" />
-
-                        <p>Roletype Visibilities</p>
-                        <input type="text" name="fieldSettings[visibility][]" value="staff" />
-                        <input type="text" name="fieldSettings[visibility][]" value="student" />
-                        <input type="text" name="fieldSettings[visibility][]" value="self" />
-
-                        <input type="submit" />
-                    </form>
-                {% else %}
-                    Not authorised to POST
-                {% endif %}
-            </section>
-        </div>
     </div>
 </div>
