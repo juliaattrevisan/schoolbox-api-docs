@@ -17,7 +17,7 @@ const props = defineProps<Props>();
 const { selected, add, remove } = useSelected();
 
 /**
- * When a result is selected, add it to the selected store
+ * When a result is selected, add it in
  * or remove it if it already exists
  * @param result - the result selected
  */
@@ -31,7 +31,7 @@ function onSelected(result: Result): void {
 }
 
 /**
- * Remove the result from the selected store
+ * Remove the result from the selected list
  * @param result - the result removed
  */
 function onRemoved(result: Result): void {

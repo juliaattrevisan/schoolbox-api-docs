@@ -1,7 +1,6 @@
 <script setup lang="ts">
 /**
  * The creator filter input, to show results linked to a specific user
- * currently uses the exisitng jquery selectize plugin
  */
 
 import type { Result } from "@schoolboxVue/components/searchSelect/types/Result";
