@@ -33,14 +33,16 @@ const disabled = window.Vue.computed(() => peFieldsStore.isFieldDisabled(props.f
 <style scoped lang="scss">
 .pe-palette-item {
     background-color: #ffffff;
+    height: 100%; // To avoid a gap between the items
 
     &.disabled {
         cursor: not-allowed;
-        opacity: 0.5;
+        opacity: 0.7;
     }
 
     &:not(.disabled) {
         cursor: grab;
+        color: var(--content-ui-foreground);
 
         /* Hover effect on the items in the palette */
         &:hover {

@@ -70,10 +70,6 @@ const sortableOptions = window.Vue.computed<Sortable.Options>(() => ({
 </template>
 
 <style scoped>
-.pe-fields-palette {
-    background-color: #ffffff;
-}
-
 /* Hide the selected preview while we are still in the palette area */
 .pe-fields-palette .pe-dragged-selected-item {
     display: none !important;

@@ -216,8 +216,7 @@ nav > a[class^="icon-"]:hover {
     margin-left: 0px; /* Remove left margin from the loader's default styling so it aligns */
 }
 
-.component.saving {
-    opacity: 0.5;
-    pointer-events: none;
+.icon-grip {
+    display: inline-block; /* Like homepages, use inline-block so it gets a bit taller and more targetable */
 }
 </style>
