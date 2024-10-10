@@ -3,8 +3,8 @@
  * https://ilikekillnerds.com/2022/09/how-to-extend-the-window-object-in-typescript/
  */
 
-import Vue from "vue";
-import dayjs from "dayjs";
+import type Vue from "vue";
+import type dayjs from "dayjs";
 import type { lightGallery } from "lightgallery";
 import type { LightGallery } from "lightgallery/lightgallery";
 import type { InitLightGallery } from "@js/image-lightbox/imageLightbox";

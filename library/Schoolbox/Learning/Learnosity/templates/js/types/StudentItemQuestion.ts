@@ -2,7 +2,7 @@
  * A question, linked to an Item
  */
 
-import { StudentItemQuestionResponse } from "./StudentItemQuestionResponse";
+import type { StudentItemQuestionResponse } from "./StudentItemQuestionResponse";
 
 export type StudentItemQuestion = {
     metadata: {

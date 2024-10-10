@@ -1,6 +1,6 @@
 import { defineStore } from "pinia";
 import * as toast from "@schoolboxVue/components/toast/sbxToastEvent";
-import { CourseTemplate, Permissions } from "../courseBuilderTypes";
+import type { CourseTemplate, Permissions } from "../courseBuilderTypes";
 
 export const useCourseBuilderStore = defineStore("courseBuilderStore", () => {
     const courseTemplates = window.Vue.ref<CourseTemplate[]>([]); // Current state of the course templates

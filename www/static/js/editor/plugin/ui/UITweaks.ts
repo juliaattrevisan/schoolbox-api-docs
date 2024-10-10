@@ -4,14 +4,14 @@
  */
 
 import { Plugin } from "@ckeditor/ckeditor5-core";
-import { ClassicEditor } from "@ckeditor/ckeditor5-editor-classic";
+import type { ClassicEditor } from "@ckeditor/ckeditor5-editor-classic";
 import { getOptimalPosition } from "@ckeditor/ckeditor5-utils";
 import { EditorEvent } from "@js/editor/event/editorEvent";
 import type { DropdownView } from "@ckeditor/ckeditor5-ui";
 import type ViewCollection from "@ckeditor/ckeditor5-ui/src/viewcollection";
 import type { Position } from "@ckeditor/ckeditor5-utils/src/dom/position";
 import type View from "@ckeditor/ckeditor5-ui/src/view";
-import { PanelPosition } from "@ckeditor/ckeditor5-ui/src/dropdown/dropdownpanelview";
+import type { PanelPosition } from "@ckeditor/ckeditor5-ui/src/dropdown/dropdownpanelview";
 
 export default class PanelTweaks extends Plugin {
     /**

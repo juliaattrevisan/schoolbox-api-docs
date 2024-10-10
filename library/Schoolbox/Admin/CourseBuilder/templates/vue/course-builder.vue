@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { useCourseBuilderStore } from "./store/courseBuilderStore";
-import { PageTemplate, CourseTemplate, Role, Permissions } from "./courseBuilderTypes";
+import type { PageTemplate, CourseTemplate, Role, Permissions } from "./courseBuilderTypes";
 import CourseBuilderRows from "./course-builder-rows.vue";
 import CourseBuilderAccessCourse from "./course-builder-access-course.vue";
 import CourseBuilderAccessUnit from "./course-builder-access-unit.vue";

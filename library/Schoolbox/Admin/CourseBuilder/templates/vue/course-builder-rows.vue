@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { slideDown, slideUp } from "@js/util/animateUtils";
 import { useCourseBuilderStore } from "./store/courseBuilderStore";
-import { PageTemplate, CourseTemplate } from "./courseBuilderTypes";
+import type { PageTemplate, CourseTemplate } from "./courseBuilderTypes";
 
 interface Props {
     availableTemplates: PageTemplate[];

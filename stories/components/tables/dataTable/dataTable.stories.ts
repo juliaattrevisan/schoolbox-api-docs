@@ -3,8 +3,8 @@
 import type { Meta, StoryObj } from "@storybook/vue3";
 import { http, HttpResponse } from "msw";
 import DataTable from "@schoolboxVue/components/dataTable/data-table.vue";
-import { ColumnConfig } from "@schoolboxVue/components/dataTable/types/dataTableTypes";
-import { TableOptions } from "@schoolboxVue/components/vueTables2/types/vueTables2Types";
+import type { ColumnConfig } from "@schoolboxVue/components/dataTable/types/dataTableTypes";
+import type { TableOptions } from "@schoolboxVue/components/vueTables2/types/vueTables2Types";
 import { data } from "./dataTableMockData";
 
 /**

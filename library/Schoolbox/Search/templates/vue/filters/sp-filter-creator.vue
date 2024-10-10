@@ -6,7 +6,8 @@
 
 import type { Result } from "@schoolboxVue/components/searchSelect/types/Result";
 import SearchSelect from "@schoolboxVue/components/searchSelect/search-select.vue";
-import { Creator, useFilterCreatorsStore } from "./store/spFilterCreatorsStore";
+import type { Creator } from "./store/spFilterCreatorsStore";
+import { useFilterCreatorsStore } from "./store/spFilterCreatorsStore";
 
 const filterCreatorsStore = useFilterCreatorsStore();
 

@@ -6,7 +6,7 @@ import { Command, type Editor } from "@ckeditor/ckeditor5-core";
 import { getSrc } from "@js/editor/plugin/resource/resourceUtils";
 import type { Resource } from "@js/editor/plugin/resource/resourceUtils";
 import type { SbxEditorConfig } from "@js/editor/types/editorTypes";
-import LinkUI from "@js/editor/plugin/link/LinkUI";
+import type LinkUI from "@js/editor/plugin/link/LinkUI";
 
 export default class InsertResourceLinkCommand extends Command {
     /**

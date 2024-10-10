@@ -1,5 +1,5 @@
-import { Page, expect } from "@playwright/test";
-import type { Locator } from "@playwright/test";
+import { expect } from "@playwright/test";
+import type { Locator, Page } from "@playwright/test";
 
 export default class Common {
     private page: Page;

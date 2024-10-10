@@ -4,7 +4,7 @@
  */
 import { getReturnUrl } from "@js/util/sbx/urlUtils";
 import locale from "@js/terminology/rosettaStone";
-import { RubricCapability } from "./unitPlannerTypes";
+import type { RubricCapability } from "./unitPlannerTypes";
 
 interface Props {
     rubricCapabilities: RubricCapability[];

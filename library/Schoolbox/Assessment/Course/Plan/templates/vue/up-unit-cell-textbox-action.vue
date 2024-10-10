@@ -5,8 +5,9 @@
  */
 import { useUnitPlannerStore } from "./store/unitPlannerStore";
 import { useUnitPlannerTextboxStore } from "./store/unitPlannerTextboxStore";
-import { Column, ColumnType } from "./unitPlannerConfig";
-import { Unit } from "./unitPlannerTypes";
+import type { Column } from "./unitPlannerConfig";
+import { ColumnType } from "./unitPlannerConfig";
+import type { Unit } from "./unitPlannerTypes";
 
 interface Props {
     unit: Unit;

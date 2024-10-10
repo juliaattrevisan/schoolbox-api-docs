@@ -1,4 +1,4 @@
-import { Result } from "./Result";
+import type { Result } from "./Result";
 
 /**
  * The returned search data

@@ -1,5 +1,5 @@
-import { Page } from "@playwright/test";
-import AcceptanceTester from "@schoolboxTest/playwright/support/AcceptanceTester";
+import type { Page } from "@playwright/test";
+import type AcceptanceTester from "@schoolboxTest/playwright/support/AcceptanceTester";
 
 export default class FeedbackForm {
     private tester: AcceptanceTester;

@@ -1,4 +1,4 @@
-import { Activity } from "@schoolboxAssessment/Types/assessmentTypes";
+import type { Activity } from "@schoolboxAssessment/Types/assessmentTypes";
 
 export type Unit = {
     id: number;

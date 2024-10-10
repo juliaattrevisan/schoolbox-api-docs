@@ -1,4 +1,5 @@
-import { createPool, Pool, RowDataPacket, ResultSetHeader } from "mysql2/promise";
+import type { Pool, RowDataPacket, ResultSetHeader } from "mysql2/promise";
+import { createPool } from "mysql2/promise";
 
 export interface DataPairs {
     [key: string]: string | number | boolean | null;

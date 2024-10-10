@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import SequentialRevealModal from "@schoolboxVue/components/sequential-reveal-modal.vue";
-import { Activity } from "@schoolboxAssessment/Types/assessmentTypes";
+import type { Activity } from "@schoolboxAssessment/Types/assessmentTypes";
 import locale from "@js/terminology/rosettaStone";
 import { useLinkedActivitiesStore } from "./store/linkedActivitiesStore";
 import linkedActivitiesItem from "./linked-activities-item.vue";
 import LinkedActivitiesUnlink from "./linked-activities-unlink.vue";
-import { Unit, CourseAssessments } from "./linkedActivitiesTypes";
+import type { Unit, CourseAssessments } from "./linkedActivitiesTypes";
 import linkedActivitiesModalItem from "./linked-activities-modal-item.vue";
 
 interface Props {

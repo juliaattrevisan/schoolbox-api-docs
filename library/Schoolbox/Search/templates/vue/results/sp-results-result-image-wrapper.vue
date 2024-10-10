@@ -3,7 +3,7 @@
  * To display the search results image or icon
  */
 
-import { Result } from "../../js/types/Result";
+import type { Result } from "../../js/types/Result";
 
 interface Props {
     result: Result; // the result to display

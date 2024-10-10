@@ -6,7 +6,8 @@
  * with a new way to call the toast using document.dispatchEvent.
  */
 
-import { ToastActivateEventDetail, ToastLink, ToastTimeoutEventDetail, ToastEvent } from "./sbxToastEvent";
+import type { ToastActivateEventDetail, ToastLink, ToastTimeoutEventDetail } from "./sbxToastEvent";
+import { ToastEvent } from "./sbxToastEvent";
 
 const STATE_HIDDEN = "hidden";
 const STATE_PENDING = "pending";

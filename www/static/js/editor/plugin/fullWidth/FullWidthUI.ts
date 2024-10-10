@@ -5,7 +5,7 @@
 
 import { Plugin } from "@ckeditor/ckeditor5-core";
 import { ButtonView } from "@ckeditor/ckeditor5-ui";
-import ToggleFullWidthCommand from "./ToggleFullWidthCommand";
+import type ToggleFullWidthCommand from "./ToggleFullWidthCommand";
 
 export default class FullWidthUI extends Plugin {
     /**

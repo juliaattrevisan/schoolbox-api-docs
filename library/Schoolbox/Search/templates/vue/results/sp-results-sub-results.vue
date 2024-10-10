@@ -4,8 +4,8 @@
  */
 
 import LoadingCards from "@schoolboxVue/components/loading/loading-cards.vue";
-import { Results } from "../../js/types/Results";
-import { Result } from "../../js/types/Result";
+import type { Results } from "../../js/types/Results";
+import type { Result } from "../../js/types/Result";
 import { useStore } from "../store/searchPageStore";
 import { useResultsStore } from "./store/spResultsStore";
 import { useHasMoreResults } from "./composable/useHasMoreResults";

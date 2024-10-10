@@ -4,7 +4,8 @@
  * Modified from https://github.com/MaxLeiter/sortablejs-vue3
  */
 import type { Ref } from "vue";
-import Sortable, { SortableOptions } from "sortablejs";
+import type { SortableOptions } from "sortablejs";
+import Sortable from "sortablejs";
 import type { AutoScrollOptions } from "sortablejs/plugins";
 
 type SortableOptionsProp = Omit<

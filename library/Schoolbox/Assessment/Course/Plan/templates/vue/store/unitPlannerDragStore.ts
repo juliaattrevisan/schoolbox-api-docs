@@ -5,7 +5,7 @@ import { ScrollToPlugin } from "gsap/all";
 import { defineStore } from "pinia";
 import { activate, timeout } from "@schoolboxVue/components/toast/sbxToastEvent";
 import { extractErrorMessage } from "@js/util/sbx/fetchUtils";
-import { Unit } from "../unitPlannerTypes";
+import type { Unit } from "../unitPlannerTypes";
 import { useUnitPlannerStore } from "./unitPlannerStore";
 
 gsap.registerPlugin(Draggable);

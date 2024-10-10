@@ -1,5 +1,5 @@
-import AcceptanceTester from "@schoolboxTest/playwright/support/AcceptanceTester";
-import { Page } from "@playwright/test";
+import type AcceptanceTester from "@schoolboxTest/playwright/support/AcceptanceTester";
+import type { Page } from "@playwright/test";
 
 export default class LessonPlanTemplateList {
     private tester: AcceptanceTester;

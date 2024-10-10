@@ -9,9 +9,9 @@ import CreateFolder from "@schoolboxTest/playwright/support/page/folder/CreateFo
 import ManageGroup from "@schoolboxTest/playwright/support/page/group/ManageGroup";
 import CreateLessonPlan from "@schoolboxTest/playwright/support/page/lessonPlan/CreateLessonPlan";
 import TemplateList from "@schoolboxTest/playwright/support/page/lessonPlan/TemplateList";
-import AcceptanceTester from "@schoolboxTest/playwright/support/AcceptanceTester";
-import { Page } from "@playwright/test";
-import DatabaseHelper from "@schoolboxTest/playwright/support/DatabaseHelper";
+import type AcceptanceTester from "@schoolboxTest/playwright/support/AcceptanceTester";
+import type { Page } from "@playwright/test";
+import type DatabaseHelper from "@schoolboxTest/playwright/support/DatabaseHelper";
 import Resources from "@schoolboxTest/playwright/support/page/resources/Resources";
 
 /**

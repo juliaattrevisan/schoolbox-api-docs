@@ -2,7 +2,7 @@
  * A badge that can be assigned to a student as a goal or achievement
  */
 
-import { Node } from "@schoolboxCurriculum/types/Node";
+import type { Node } from "@schoolboxCurriculum/types/Node";
 
 export interface Badge {
     id: number;

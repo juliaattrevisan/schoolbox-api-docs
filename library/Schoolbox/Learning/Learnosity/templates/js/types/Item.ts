@@ -2,7 +2,7 @@
  * A item (called a card in sbx), that can contain multiple questions/features
  */
 
-import { StudentItemQuestion } from "./StudentItemQuestion";
+import type { StudentItemQuestion } from "./StudentItemQuestion";
 
 export type Item = {
     id: string;

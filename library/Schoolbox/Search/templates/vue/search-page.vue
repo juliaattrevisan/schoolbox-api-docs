@@ -16,7 +16,7 @@ import type { FilterDateRange } from "./filters/store/spFilterDateRangeStore";
 import { useSearchStore } from "./store/spSearchStore";
 import { useResultsStore } from "./results/store/spResultsStore";
 import { useBadgeStore } from "./results/store/spBadgeStore";
-import { Creator } from "./filters/store/spFilterCreatorsStore";
+import type { Creator } from "./filters/store/spFilterCreatorsStore";
 import { SEARCH_PARAM } from "./store/spQueryStore";
 
 interface Props {

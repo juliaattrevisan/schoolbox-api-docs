@@ -1,6 +1,6 @@
 import * as toast from "@schoolboxVue/components/toast/sbxToastEvent";
 import { defineStore } from "pinia";
-import { Activity } from "@schoolboxAssessment/Types/assessmentTypes";
+import type { Activity } from "@schoolboxAssessment/Types/assessmentTypes";
 import { LessonPlanEvent } from "../../js/event/lessonPlanEvent";
 
 export const useLinkedActivitiesStore = defineStore("linkedActivitiesStore", () => {

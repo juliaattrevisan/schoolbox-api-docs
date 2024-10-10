@@ -3,7 +3,8 @@
  * A filter type
  */
 
-import { useFilterTypesStore, FilterType } from "./store/spFilterTypesStore";
+import type { FilterType } from "./store/spFilterTypesStore";
+import { useFilterTypesStore } from "./store/spFilterTypesStore";
 
 interface Props {
     type: FilterType; // the filter type to display

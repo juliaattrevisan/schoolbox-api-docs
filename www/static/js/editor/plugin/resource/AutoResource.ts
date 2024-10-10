@@ -11,7 +11,8 @@ import type { ImageUploadCompleteEvent } from "@ckeditor/ckeditor5-image/src/ima
 import type { Resource } from "@js/editor/plugin/resource/resourceUtils";
 import { addResource } from "@js/editor/plugin/resource/resourceUtils";
 import ResourceUI from "@js/editor/plugin/resource/ResourceUI";
-import { SbxEditorConfig, EditorToolbar } from "@js/editor/types/editorTypes";
+import type { SbxEditorConfig } from "@js/editor/types/editorTypes";
+import { EditorToolbar } from "@js/editor/types/editorTypes";
 import type { FileLoader, FileRepository } from "@ckeditor/ckeditor5-upload/";
 import type { ViewDocumentClipboardInputEvent } from "@ckeditor/ckeditor5-clipboard/src/clipboardobserver";
 import { createImageTypeRegExp } from "@ckeditor/ckeditor5-image/src/imageupload/utils";

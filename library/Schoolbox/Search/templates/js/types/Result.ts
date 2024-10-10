@@ -1,4 +1,4 @@
-import { ResultTypes } from "./ResultTypes";
+import type { ResultTypes } from "./ResultTypes";
 import type { ResultContext } from "./ResultContext";
 import type { ResultLink } from "./ResultLink";
 import type { Results } from "./Results";

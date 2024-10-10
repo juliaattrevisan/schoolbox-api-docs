@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { useCourseBuilderStore } from "./store/courseBuilderStore";
-import { Role } from "./courseBuilderTypes";
+import type { Role } from "./courseBuilderTypes";
 
 interface Props {
     roles: Role[];

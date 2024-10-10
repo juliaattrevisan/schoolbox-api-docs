@@ -1,6 +1,6 @@
-import { Page } from "@playwright/test";
-import AcceptanceTester from "@schoolboxTest/playwright/support/AcceptanceTester";
-import DatabaseHelper from "../../DatabaseHelper";
+import type { Page } from "@playwright/test";
+import type AcceptanceTester from "@schoolboxTest/playwright/support/AcceptanceTester";
+import type DatabaseHelper from "../../DatabaseHelper";
 
 export default class QuestionForm {
     private page: Page;

@@ -6,7 +6,7 @@
 import type { Badge } from "@schoolboxBadge/templates/types/Badge";
 import type { BadgeAward } from "@schoolboxBadge/templates/types/BadgeAward";
 import { useBadgeStore } from "./store/spBadgeStore";
-import { Result } from "../../js/types/Result";
+import type { Result } from "../../js/types/Result";
 
 interface Props {
     result: Result; // the result to display
