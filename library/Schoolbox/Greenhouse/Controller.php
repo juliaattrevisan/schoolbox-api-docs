@@ -34,20 +34,7 @@ class Controller extends Base
      */
     public function getGreenhouse(string $templateName): void
     {
-        $fieldMapper = \Schoolbox\Admin\Profile\Editor\Field\Mapper::getInstance();
-        $userMapper = \Schoolbox\UserMapper::getInstance();
-
-        /* Find all the fields that were enabled on $user's profile screen,
-         * ordered by their prescribed sequence
-         */
-        $super = \Schoolbox\UserMapper::getInstance()->findById(1);
-        $jana = \Schoolbox\UserMapper::getInstance()->findById(25);
-
-        $fields = (new \Schoolbox\Profile\Field\Factory($fieldMapper, $userMapper, new \External_User()))
-            ->produce($jana, $super)['data']['roleTypes']['fields']['selected'];
-
         $this->response = $this->responseFromTemplate('@greenhouse/' . $templateName . '.twig', [
-            'fields' => $fields
         ]);
     }
 }
