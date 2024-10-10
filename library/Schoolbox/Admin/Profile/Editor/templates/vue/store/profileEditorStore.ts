@@ -1,6 +1,7 @@
 import { defineStore } from "pinia";
 import { cloneDeep } from "lodash";
 import type { ProfileEditorRoleType, ProfileEditorEndpoints, ProfileEditorPayload } from "../types/profileEditorTypes";
+import { fetchProfileEditorEndpoint } from "./profileEditorUtils";
 
 export const useProfileEditorStore = defineStore("profileEditorStore", () => {
     const isLoading = window.Vue.ref<boolean>(true);
@@ -21,6 +22,7 @@ export const useProfileEditorStore = defineStore("profileEditorStore", () => {
         adminProfileEditorPostFieldRemove: "",
         adminProfileEditorPostFieldSettings: "",
         adminProfileEditorPostFieldSequence: "", // TODO: replace and handle null for all these
+        adminProfileEditorPostNameFormat: "",
     });
 
     /**
@@ -48,6 +50,39 @@ export const useProfileEditorStore = defineStore("profileEditorStore", () => {
         selectedRoleType.value = roleType;
     }
 
+    /**
+     * Save changes to the current role type's name format
+     * @returns true if the save was successful, otherwise an error message
+     */
+    async function saveNameFormat(): Promise<true | string> {
+        if (selectedRoleType.value === null) throw new Error("No role type selected");
+        if (savedSelectedRoleType.value === null) throw new Error("No saved role type selected");
+
+        if (selectedRoleType.value.nameFormat === savedSelectedRoleType.value.nameFormat) {
+            return true;
+        }
+
+        const endpoint = endpoints.value.adminProfileEditorPostNameFormat.replace(
+            "{roleType}",
+            selectedRoleType.value.roleType,
+        );
+
+        const response = await fetchProfileEditorEndpoint(endpoint, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ nameFormat: selectedRoleType.value.nameFormat }),
+        });
+
+        if (!response.success) {
+            return response.message ?? "An unknown error occurred";
+        }
+
+        savedSelectedRoleType.value.nameFormat = selectedRoleType.value.nameFormat;
+        return true;
+    }
+
     return {
         init,
         endpoints,
@@ -58,5 +93,6 @@ export const useProfileEditorStore = defineStore("profileEditorStore", () => {
         selectedRoleType,
         savedSelectedRoleType,
         setSelectedRoleType,
+        saveNameFormat,
     };
 });

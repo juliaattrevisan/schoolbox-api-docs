@@ -50,6 +50,7 @@ class Controller extends Base
          * the index screen, rather than have the $roleType's payload specifically.
          */
         $payload = (new Payload(
+            $this->getConfigLoader(),
             $this->fieldMapper,
             $this->campusMapper
         ))->generateAll();
@@ -363,20 +364,28 @@ class Controller extends Base
      */
     public function postNameFormat(string $roleType): void
     {
-        /* Figure out which roletype config to update
-         */
-        $configName = Payload::CONFIG_ROLETYPE[$roleType];
-        $nameFormat = $this->requestPost->get('nameFormat');
+        try {
+            /* Figure out which roletype config to update
+             */
+            $configName = Payload::CONFIG_ROLETYPE[$roleType];
+            $nameFormat = $this->requestPost->get('nameFormat');
 
-        /* No format? No trabajo; exit early
-         */
-        if (null === $nameFormat) {
-            return;
+            /* No format? No trabajo; exit early
+             */
+            if (null === $nameFormat) {
+                return;
+            }
+
+            $config = $this->configMapper->findOneByColumn('name', $configName)
+                ->setValue($nameFormat);
+
+            $this->configMapper->save($config);
+
+            $this->response = $this->responseAsJson(['success' => true]);
+        } catch (\Exception $e) {
+            $this->response = $this->responseAsJson(
+                ['success' => false, 'message' => $e->getMessage()]
+            )->withStatus(500);
         }
-
-        $config = $this->configMapper->findOneByColumn('name', $configName)
-            ->setValue($nameFormat);
-
-        $this->configMapper->save($config);
     }
 }

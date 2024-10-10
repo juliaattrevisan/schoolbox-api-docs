@@ -7,6 +7,7 @@ export type ProfileEditorEndpoints = {
     adminProfileEditorPostFieldRemove: string;
     adminProfileEditorPostFieldSettings: string;
     adminProfileEditorPostFieldSequence: string;
+    adminProfileEditorPostNameFormat: string;
 };
 
 export type ProfileEditorFieldSettingOption = {
@@ -54,6 +55,7 @@ export type ProfileEditorActiveField = ProfileEditorSelectedField | ProfileEdito
 
 export type ProfileEditorRoleType = {
     roleType: string; // only ever "student", "staff", or "parent" at the moment... for display purposes make Title Case if required
+    nameFormat: string; // The name format string for the role type (e.g. "{title} {firstname} {lastname")
     fields: {
         // Available Fields
         // These should be sorted into alphabetical order

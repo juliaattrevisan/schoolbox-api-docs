@@ -13,6 +13,7 @@ use Schoolbox\Admin\Profile\Editor\Field\Mapper;
 use Schoolbox\CampusMapper;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Role;
+use Schoolbox\IConfigLoader;
 
 class Payload
 {
@@ -46,10 +47,12 @@ class Payload
 
 
     /**
+     * @param IConfigLoader $config
      * @param Mapper $fieldMapper
      * @param CampusMapper $campusMapper
      */
     public function __construct(
+        private IConfigLoader $config,
         private \Schoolbox\Admin\Profile\Editor\Field\Mapper $fieldMapper,
         private \Schoolbox\CampusMapper $campusMapper
     ) {
@@ -153,6 +156,7 @@ class Payload
         foreach ($roleTypes as $roleType) {
             $roleTypeSettings = [
                 'roleType' => $roleType,
+                'nameFormat' => $this->config->get(self::CONFIG_ROLETYPE[$roleType]),
                 'fields' => [
                     'available' => [],
                     'selected' => [],

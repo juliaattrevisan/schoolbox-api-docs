@@ -13,20 +13,14 @@
     {{ renderAdminNavigation(pageCurrent) }}
 
     <div class="admin-content">
-
-        <h2 class="subheader">Name Format</h2>
-        <form method="post" action="{{ routeLookupIfAuthorized('adminProfileEditor.postNameFormat', {roleType: 'student'}) }}">
-            <input type="text" name="nameFormat" value="{{ config.name_format_student }}" />
-            <input type="submit" />
-        </form>
-
         <div id="profile-editor-container">
             <profile-editor
                 :endpoints="{
                     adminProfileEditorPostFieldAdd: '{{ routeLookupIfAuthorized('adminProfileEditor.postFieldAdd') }}',
                     adminProfileEditorPostFieldRemove: '{{ routeLookupIfAuthorized('adminProfileEditor.postFieldRemove') }}',
                     adminProfileEditorPostFieldSettings: '{{ routeLookupIfAuthorized('adminProfileEditor.postFieldSettings') }}',
-                    adminProfileEditorPostFieldSequence: '{{ routeLookupIfAuthorized('adminProfileEditor.postFieldSequence') }}'
+                    adminProfileEditorPostFieldSequence: '{{ routeLookupIfAuthorized('adminProfileEditor.postFieldSequence') }}',
+                    adminProfileEditorPostNameFormat: '{{ routeLookupIfAuthorized('adminProfileEditor.postNameFormat') }}',
                 }"
                 :payload="{{ payload |json_encode }}"
             />
