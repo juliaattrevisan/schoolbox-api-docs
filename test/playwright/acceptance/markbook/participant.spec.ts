@@ -82,10 +82,12 @@ test.describe("Participant Tests", () => {
         tester.isGoingTo("exclude Jack Coles from the due work participants list");
         await page.locator(`a:has-text("Cest One")`).click();
         await page.locator(`h1:has-text("Status of Cest One")`).isVisible({ timeout: 30000 });
+        await page.waitForTimeout(2000);
         await statusPage.clickJellyTot();
         await statusPage.clickJellyTotOption("modify");
         await page.locator(`h2:has-text("Update Cest One")`).isVisible({ timeout: 30000 });
         await expect(page.getByTestId("assessment-form-button-submit-Update")).toBeEnabled();
+        await page.waitForTimeout(2000);
         await dueworkForm.modifyParticipation(teacherId, true, true);
         await dueworkForm.update();
         await page.locator(`h1:has-text("Status of Cest One")`).isVisible({ timeout: 30000 });
@@ -104,6 +106,7 @@ test.describe("Participant Tests", () => {
         tester.isGoingTo("exclude a student (Louisa Smith) from the due work participants list");
         await page.locator(`a:has-text("Cest One")`).click();
         await page.locator(`h1:has-text("Status of Cest One")`).isVisible({ timeout: 30000 });
+        await page.waitForTimeout(2000);
         await statusPage.clickJellyTot();
         await statusPage.clickJellyTotOption("modify");
         await page.locator(`h2:has-text("Update Cest One")`).isVisible({ timeout: 30000 });

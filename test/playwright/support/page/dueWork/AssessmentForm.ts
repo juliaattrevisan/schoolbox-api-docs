@@ -238,7 +238,6 @@ export default class AssessmentForm {
      * @param openSection - Whether to open the section
      */
     async modifyParticipation(userId: number, confirm: boolean, openSection: boolean): Promise<void> {
-        await this.page.waitForTimeout(1000);
         if (openSection) {
             await this.page.getByTestId(AssessmentForm.SELECTOR_PARTICIPATION_LEGEND).click();
         }
