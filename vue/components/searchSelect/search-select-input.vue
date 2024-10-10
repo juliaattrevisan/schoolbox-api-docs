@@ -6,7 +6,7 @@
 import { onClickOutside } from "@vueuse/core";
 
 interface Props {
-    parentEl: HTMLDivElement; //
+    parentEl: HTMLDivElement | null; // the parent element to close the search results
     placeholder: string; // the placeholder text
 }
 const props = defineProps<Props>();

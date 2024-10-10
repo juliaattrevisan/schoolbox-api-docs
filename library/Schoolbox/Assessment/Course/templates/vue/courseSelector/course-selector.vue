@@ -37,11 +37,6 @@ function onSelected(result: Result): void {
 function onRemoved(result: Result): void {
     selectedStore.remove(result);
 }
-
-/**
- * Start loading the courses data
- */
-window.Vue.onMounted(() => {});
 </script>
 
 <template>
