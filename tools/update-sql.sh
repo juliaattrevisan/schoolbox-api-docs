@@ -12,7 +12,7 @@ readonly LOG=/usr/bin/alaress-logger
 readonly L_INFO=200
 readonly L_WARN=300
 readonly L_ERROR=400
-readonly UNSUPPORTED_FROM_MAJOR='20.1' # Require force if upgrading a schema at this version or below
+readonly UNSUPPORTED_FROM_MAJOR='23.1' # Require force if upgrading a schema at this version or below
 
 # Global vars
 declare sql_user
