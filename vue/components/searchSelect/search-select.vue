@@ -4,11 +4,11 @@
  */
 
 import { onClickOutside } from "@vueuse/core";
+import { useSearch } from "@schoolboxVue/composables/search/useSearch";
 import type { Result } from "./types/Result";
 import SearchSelectSelected from "./search-select-selected.vue";
 import SearchSelectInput from "./search-select-input.vue";
 import SearchSelectResults from "./search-select-results.vue";
-import { useSearchStore } from "./store/searchSelectStore";
 
 interface Props {
     endpoint: string; // the search api endpoint
@@ -30,19 +30,22 @@ const emit = defineEmits<{
     remove: [result: Result];
 }>();
 
-const store = useSearchStore();
 const searchSelectEl = window.Vue.ref<HTMLDivElement | null>(null);
 
+const { query, isActive, isLoading, results, clear } = useSearch(props.endpoint);
+
 /**
- * Pass through the endpoint to the store
+ * To show the current results, or the default results if the search is not active
+ * @returns { Result[] }
  */
-window.Vue.onMounted(() => {
-    store.init(
-        props.endpoint,
-        props.selected,
-        props.defaultResults !== undefined ? props.defaultResults : [],
-        props.isSingleSelect,
-    );
+const currentResults = window.Vue.computed(() => {
+    if (props.selected.length === 1 && props.isSingleSelect) {
+        return [];
+    }
+    if (props.defaultResults && props.defaultResults.length > 0 && !isActive.value) {
+        return props.defaultResults;
+    }
+    return results.value;
 });
 
 /**
@@ -65,7 +68,7 @@ function onRemoved(result: Result): void {
  * To close the search results when clicking outside
  */
 onClickOutside(searchSelectEl, () => {
-    store.clear();
+    clear();
 });
 </script>
 

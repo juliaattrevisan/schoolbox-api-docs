@@ -14,41 +14,6 @@ export const DEBOUNCE_AMOUNT = 350; // the amount in ms to hold off on searching
 export const useSearchStore = defineStore(`searchStore`, () => {
     let endpoint = "";
     let isSingleSelect = false;
-    const isLoading = window.Vue.ref(false); // to notify that an action is taking place,
-    const query = window.Vue.ref(""); // current search term to filter the active nodes
-    const results = window.Vue.ref<Result[]>([]); // nodes returned in the current search results
-    const selectedResults = window.Vue.ref<Result[]>([]); // the selected results
-    const defaultResults = window.Vue.ref<Result[]>([]); // the initial results to display
-    const hasSearched = window.Vue.ref(false); // to show that a search has been made
-
-    /**
-     * To only start showing search results once enough characters
-     * have been added
-     * @returns { boolean }
-     */
-    const isActive = window.Vue.computed(() => query.value.length >= MIN_QUERY_LENGTH);
-
-    /**
-     * To show that no nodes match the current search
-     * @returns { boolean }
-     */
-    const hasNoResults = window.Vue.computed(() => {
-        return isActive.value && results.value.length === 0 && !isLoading.value;
-    });
-
-    /**
-     * To show the current results, or the default results if the search is not active
-     * @returns { Result[] }
-     */
-    const currentResults = window.Vue.computed(() => {
-        if (selectedResults.value.length === 1 && isSingleSelect) {
-            return [];
-        }
-        if (defaultResults.value.length > 0 && !isActive.value) {
-            return defaultResults.value;
-        }
-        return results.value;
-    });
 
     /**
      * initialise the search store, just passing the endpoint
@@ -68,66 +33,6 @@ export const useSearchStore = defineStore(`searchStore`, () => {
         defaultResults.value = $defaultResults;
         isSingleSelect = $isSingleSelect;
     }
-
-    /**
-     * when the search isActive, we should display the loading prompt straight away,
-     * but the debounce holds on calling search() until we assume the user has stopped typing
-     */
-    function enableSearch(): void {
-        isLoading.value = true;
-    }
-
-    /**
-     * search for results that match the current query
-     */
-    async function search(): Promise<void> {
-        try {
-            hasSearched.value = true;
-            const response = await fetch(`${endpoint}${query.value}`, {
-                method: "GET",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-            });
-            results.value = (await response.json()) as Result[];
-        } catch (error) {
-            console.error(error);
-        } finally {
-            isLoading.value = false;
-        }
-    }
-
-    /**
-     * debounce to avoid constant polling while the user is typing
-     */
-    const debounceSearch = debounce(async () => {
-        await search();
-    }, DEBOUNCE_AMOUNT);
-
-    /**
-     * clear the current search
-     */
-    function clear(): void {
-        query.value = "";
-        results.value = [];
-        isLoading.value = false;
-        hasSearched.value = false;
-    }
-
-    /**
-     * start searching once the search is active, watching the query string for input
-     */
-    window.Vue.watch(
-        () => query.value,
-        async () => {
-            if (isActive.value) {
-                enableSearch();
-                await debounceSearch();
-            } else if (hasSearched.value) {
-                clear();
-            }
-        },
-    );
 
     return {
         isLoading,
