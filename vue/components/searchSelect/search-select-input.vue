@@ -3,7 +3,7 @@
  * To input the search query
  */
 
-import { onClickOutside } from "@vueuse/core";
+import { onClickOutside, useFocus } from "@vueuse/core";
 
 interface Props {
     parentEl: HTMLDivElement | null; // the parent element to close the search results
@@ -15,6 +15,7 @@ const emit = defineEmits<{
     input: [value: string];
 }>();
 
+const queryInputEl = window.Vue.ref<HTMLInputElement | null>(null);
 const query = window.Vue.ref<string>("");
 
 /**
@@ -32,6 +33,16 @@ window.Vue.onMounted(async () => {
     onClickOutside(props.parentEl, () => {
         query.value = "";
     });
+});
+
+/**
+ * To close the search results when the input is not focused
+ */
+const { focused } = useFocus(queryInputEl);
+window.Vue.watch(focused, ($focused) => {
+    if (!$focused) {
+        query.value = "";
+    }
 });
 </script>
 

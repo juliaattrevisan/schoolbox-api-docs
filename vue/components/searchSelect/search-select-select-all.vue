@@ -66,7 +66,7 @@ function onSelectAll(): void {
 </script>
 
 <template>
-    <button class="search-result f-no-margins" @click.prevent="onSelectAll">
+    <div class="search-result f-no-margins" @click.prevent="onSelectAll">
         <div class="checklist">
             <input
                 id="checkbox-select-all"
@@ -76,7 +76,7 @@ function onSelectAll(): void {
             />
             <label for="checkbox-select-all">Select All</label>
         </div>
-    </button>
+    </div>
 </template>
 
 <style lang="scss" scoped>

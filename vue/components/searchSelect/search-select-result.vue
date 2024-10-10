@@ -38,7 +38,7 @@ function onSelected(): void {
 </script>
 
 <template>
-    <button class="search-result f-no-margins" :title="result.name" @click.prevent="onSelected">
+    <div class="search-result f-no-margins" :title="result.name" @click.prevent="onSelected">
         <show-matches v-if="props.isSingleSelect" tag="span" :text="props.result.name" :query="props.query" />
         <div v-else class="checklist">
             <input :id="`checkbox-${result.id}`" type="checkbox" :checked="isSelected" />
@@ -50,7 +50,7 @@ function onSelected(): void {
                 class="f-no-margins"
             />
         </div>
-    </button>
+    </div>
 </template>
 
 <style lang="scss" scoped>
