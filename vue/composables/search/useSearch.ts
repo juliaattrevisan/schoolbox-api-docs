@@ -14,16 +14,15 @@ const DEBOUNCE_AMOUNT = 350; // the amount in ms to hold off on searching, to al
  * @param endpoint - the endpoint to search for results
  */
 export function useSearch(endpoint: string): {
-    isLoading: Ref<boolean>;
+    isSearching: Ref<boolean>;
     query: Ref<string>;
     results: Ref<Result[]>;
     isActive: Ref<boolean>;
     hasNoResults: Ref<boolean>;
     enableSearch: () => void;
     search: () => Promise<void>;
-    clear: () => void;
 } {
-    const isLoading = window.Vue.ref(false); // to notify that an action is taking place,
+    const isSearching = window.Vue.ref(false); // to notify that an action is taking place,
     const query = window.Vue.ref(""); // current search term to filter the active nodes
     const results = window.Vue.ref<Result[]>([]); // nodes returned in the current search results
     const hasSearched = window.Vue.ref(false); // to show that a search has been made
@@ -40,7 +39,7 @@ export function useSearch(endpoint: string): {
      * @returns { boolean }
      */
     const hasNoResults = window.Vue.computed(() => {
-        return isActive.value && results.value.length === 0 && !isLoading.value;
+        return isActive.value && results.value.length === 0 && !isSearching.value;
     });
 
     /**
@@ -48,7 +47,7 @@ export function useSearch(endpoint: string): {
      * but the debounce holds on calling search() until we assume the user has stopped typing
      */
     function enableSearch(): void {
-        isLoading.value = true;
+        isSearching.value = true;
     }
 
     /**
@@ -67,7 +66,7 @@ export function useSearch(endpoint: string): {
         } catch (error) {
             console.error(error);
         } finally {
-            isLoading.value = false;
+            isSearching.value = false;
         }
     }
 
@@ -84,7 +83,7 @@ export function useSearch(endpoint: string): {
     function clear(): void {
         query.value = "";
         results.value = [];
-        isLoading.value = false;
+        isSearching.value = false;
         hasSearched.value = false;
     }
 
@@ -104,13 +103,12 @@ export function useSearch(endpoint: string): {
     );
 
     return {
-        isLoading,
+        isSearching,
         query,
         results,
         isActive,
         hasNoResults,
         enableSearch,
         search,
-        clear,
     };
 }

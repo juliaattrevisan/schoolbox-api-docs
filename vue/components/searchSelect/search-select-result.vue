@@ -4,10 +4,10 @@
  */
 
 import ShowMatches from "@schoolboxVue/components/search/show-matches.vue";
-import { useSearchStore } from "./store/searchSelectStore";
 import type { Result } from "./types/Result";
 
 interface Props {
+    query: string; // the search query
     selected: Result[]; // the selected results
     results: Result[]; // the results returned from the search
     result: Result; // the result to display
@@ -19,8 +19,6 @@ const props = defineProps<Props>();
 const emit = defineEmits<{
     select: [result: Result];
 }>();
-
-const store = useSearchStore();
 
 /**
  * To determine whether the checkbox is currently selected
@@ -41,10 +39,10 @@ function onSelected(): void {
 
 <template>
     <button class="search-result f-no-margins" :title="result.name" @click.prevent="onSelected">
-        <show-matches v-if="props.isSingleSelect" tag="span" :text="props.result.name" :query="store.query" />
+        <show-matches v-if="props.isSingleSelect" tag="span" :text="props.result.name" :query="props.query" />
         <div v-else class="checklist">
             <input :id="`checkbox-${result.id}`" type="checkbox" :checked="isSelected" />
-            <show-matches tag="label" :for="`checkbox-${result.id}`" :text="props.result.name" :query="store.query" />
+            <show-matches tag="label" :for="`checkbox-${result.id}`" :text="props.result.name" :query="props.query" />
         </div>
     </button>
 </template>

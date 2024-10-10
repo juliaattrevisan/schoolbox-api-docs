@@ -3,7 +3,6 @@
  * To search for searchResults and select them
  */
 
-import { onClickOutside } from "@vueuse/core";
 import { useSearch } from "@schoolboxVue/composables/search/useSearch";
 import type { Result } from "./types/Result";
 import SearchSelectSelected from "./search-select-selected.vue";
@@ -32,7 +31,7 @@ const emit = defineEmits<{
 
 const searchSelectEl = window.Vue.ref<HTMLDivElement | null>(null);
 
-const { query, isActive, isLoading, results, clear } = useSearch(props.endpoint);
+const { query, isActive, isSearching, hasNoResults, results } = useSearch(props.endpoint);
 
 /**
  * To show the current results, or the default results if the search is not active
@@ -65,11 +64,12 @@ function onRemoved(result: Result): void {
 }
 
 /**
- * To close the search results when clicking outside
+ * To update the search query
+ * @param $query - the search query
  */
-onClickOutside(searchSelectEl, () => {
-    clear();
-});
+function onInput($query: string): void {
+    query.value = $query;
+}
 </script>
 
 <template>
@@ -80,8 +80,17 @@ onClickOutside(searchSelectEl, () => {
             :is-single-select="props.isSingleSelect"
             @remove="onRemoved"
         />
-        <search-select-input :placeholder="props.placeholder" />
-        <search-select-results :is-single-select="props.isSingleSelect" :selected="selected" @select="onSelected" />
+        <search-select-input :parent-el="searchSelectEl" :placeholder="props.placeholder" @input="onInput" />
+        <search-select-results
+            :query="query"
+            :is-active="isActive"
+            :is-searching="isSearching"
+            :is-single-select="props.isSingleSelect"
+            :results="currentResults"
+            :has-no-results="hasNoResults"
+            :selected="selected"
+            @select="onSelected"
+        />
     </div>
 </template>
 
