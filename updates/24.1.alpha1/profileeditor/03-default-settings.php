@@ -16,6 +16,11 @@ while ($row = $campusQuery->fetchRow()) {
     $campusIds[] = $row['id'];
 }
 
+/* TODO Find the field ids w/o mappers
+ * TODO group by roletype => field name => settings
+ * TODO Adjust traversal
+ */
+
 /* A list of (roletype, field name, visibility) tuples
  * and (roletype, field name, availability)
  */
