@@ -107,7 +107,6 @@ class IndexBuilder extends BaseBuilder
             FROM folder f
             " . $this->getJoinsFromFolderForTypeExpression() . "
             WHERE f.deleted_at IS NULL
-            GROUP BY f.id
         ";
         $params = [];
         if ($fromDate) {
@@ -124,6 +123,7 @@ class IndexBuilder extends BaseBuilder
             }
             [$queryString, $params] = $this->augmentQueryParams($subject, BuildType::UPDATE, $queryString, $params);
         }
+        $queryString .= ' GROUP BY f.id';
         $query = $this->connector->prepareQuery($queryString);
         $this->logger->info('Finding pages/folders...');
         $query->execute($params);
