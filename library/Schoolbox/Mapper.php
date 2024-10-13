@@ -4161,14 +4161,50 @@ abstract class Mapper implements IMapper
     /**
      * Register all callbacks required for persisting a search index change.
      *
+     * @param array $irrelevantFields if only these fields have changed: do not
+     *                                trigger a search index change.
      * @return void
      */
-    public function registerPersistSearchIndexCallbacks(): void
+    public function registerPersistSearchIndexCallbacks(array $irrelevantFields = []): void
     {
-        $this->registerCallback(self::CALLBACK_POSTSAVE, $this->persistSearchIndex(...));
-        $this->registerCallback(self::CALLBACK_POSTDELETE, $this->persistSearchIndex(...));
-        $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, $this->persistSearchIndex(...));
-        $this->registerCallback(self::CALLBACK_POSTRESTORE, $this->persistSearchIndex(...));
+        $callback = function (object $model, ?object $previous = null) use ($irrelevantFields) {
+            if ($this->hasModelChanged($model, $previous, $irrelevantFields)) {
+                $this->persistSearchIndex($model);
+            }
+        };
+        $this->registerCallback(self::CALLBACK_POSTSAVE, $callback);
+        $this->registerCallback(self::CALLBACK_POSTDELETE, $callback);
+        $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, $callback);
+        $this->registerCallback(self::CALLBACK_POSTRESTORE, $callback);
+    }
+
+
+    /**
+     * Has this model changed from its previous state?
+     *
+     * @param object      $model            The model's current state.
+     * @param object|null $previous         The model's previous state.
+     * @param array       $irrelevantFields If only these fields have changed,
+     *                                      the model has not changed.
+     * @return bool
+     * @throws Exception
+     */
+    private function hasModelChanged(object $model, ?object $previous = null, array $irrelevantFields = []): bool
+    {
+        // No previous state (e.g. created, deleted or restored?)
+        // This is always a change
+        if (!$previous) {
+            return true;
+        }
+
+        // Otherwise: this is a change if the model has changed,
+        // excluding irrelevant fields.
+        $diff = $this->diff($model, $previous);
+        foreach ($irrelevantFields as $irrelevantField) {
+            unset($diff[$irrelevantField]);
+        }
+
+        return !empty($diff);
     }
 
 
@@ -4185,12 +4221,8 @@ abstract class Mapper implements IMapper
      * @param object $model
      * @return void
      */
-    public function persistSearchIndex(object $model): void
+    private function persistSearchIndex(object $model): void
     {
-        // For now: manually trigger the search index rebuild in the proxy.
-        // Can't do it in the base mapper's post-save, because at the trigger
-        // point the sub-objects (due work, quiz, etc.) don't yet exist.
-
         /** @var Persistor $persistor */
         $persistor = self::getDi()->get('search.indexPersistor');
         $this->getDatabase()->onPersist(fn () => $persistor->persist($model));
