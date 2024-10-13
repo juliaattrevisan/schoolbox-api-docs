@@ -594,17 +594,3 @@ $block-grid-media-queries: true !default;
 [data-component] {
     @include top-content-alignment();
 }
-
-// Text will be truncated with ellipsis if it's too long to fit on a single line.
-#content {
-    > .row {
-        h1 {
-            display: -webkit-box;
-            overflow: hidden;
-            line-clamp: 2; // standard property
-            -webkit-line-clamp: 2; // WebKit-specific property
-            -webkit-box-orient: vertical;
-            white-space: normal;
-        }
-    }
-}
