@@ -21,8 +21,36 @@ while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
     $campusIds[] = $row['id'];
 }
 
-/* TODO Find the field ids w/o mappers
+/* Most fields are available for All Campuses or No Campuses.
+ * We might as well collect a list of campus ids to start with.
  */
+$db = $this->getDi()->get('databaseInternal');
+
+$statement = $db->prepare('SELECT id FROM luCampus');
+$statement->execute();
+
+$campusIds = [];
+
+while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
+    $campusIds[] = $row['id'];
+}
+
+/* Find all the fields' ids to build a relation; derive that from
+ * the array key which its its name in the mega array below
+ */
+$statement = $db->prepare('SELECT id, roletype, field, display_as FROM profile_field');
+$statement->execute();
+
+$fields = [];
+
+while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
+    $fields[$row['roletype']][$row['field']] = [
+        'id' => $row['id'],
+        'displayAs' => $row['display_as']
+    ];
+}
+
+new \Alaress_Probe($fields);
 
 /* A list of (roletype, field name, visibility) tuples
  * and (roletype, field name, availability)
