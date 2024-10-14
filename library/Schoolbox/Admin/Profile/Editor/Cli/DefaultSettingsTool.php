@@ -34,6 +34,15 @@ class DefaultSettingsTool  extends CliTool\App
 
 
     /**
+     * Consts used - including the "self" pseudo-roletype
+     */
+    private const ROLETYPE_SELF = 'self';
+    private const ROLETYPE_STUDENT = \Schoolbox\Role::STUDENT;
+    private const ROLETYPE_PARENT = \Schoolbox\Role::PARENT;
+    private const ROLETYPE_STAFF = \Schoolbox\Role::STAFF;
+
+
+    /**
      * @inheritdoc
      */
     public function getLongOpts(): array
@@ -96,6 +105,12 @@ HELP;
             /* For each field, insert their own special blend of Availability and Visibility
              */
             foreach ($settingsIndex as $roletype => $fieldSettings) {
+                $this->getLogger()->info(sprintf(
+                    'Found %s %s elements to process.',
+                    \count($fieldSettings),
+                    $roletype
+                ));
+
                 foreach ($fieldSettings as $fieldName => $fieldSetting) {
                     $fieldId = $fieldsIndex[$roletype][$fieldName]['id'];
                     $fieldDisplayAs = $fieldsIndex[$roletype][$fieldName]['displayAs'];
@@ -180,60 +195,246 @@ HELP;
 
         /* A list of (roletype, field name, visibility) tuples
          * and (roletype, field name, availability)
+         *
+         * lol this is a chunky lookup
          */
         $roletypes = [
             'student' => [
-                'field name 1' => [
+                'portrait' => [
                     'availability' => $campusIds,
-                    'visibility' => ['self', 'staff', 'student', 'parent' ],
+                    'visibility' => [self::ROLETYPE_SELF, self::ROLETYPE_STUDENT, self::ROLETYPE_PARENT, self::ROLETYPE_STAFF],
                 ],
-                'field name 2' => [
-                    'availability' => [],
-                    'visibility' => ['self', 'student', 'parent'],
-                ],
-                'field name 3' => [
-                    'availability' => [],
-                    'visibility' => ['self', 'staff'],
-                ],
-                'field name ..n' => [
+                'StudentSpecialNeedsFlag' => [
                     'availability' => $campusIds,
-                    'visibility' => ['self', 'staff', 'student', 'parent' ],
+                    'visibility' =>  [self::ROLETYPE_STAFF],
+                ],
+                'EnglishSecondFlag' => [
+                    'availability' => $campusIds,
+                    'visibility' =>  [self::ROLETYPE_STAFF],
+                ],
+                /* StudentMedicalAlert: Consciously no visibility: forces schools to opt-in to reveal
+                 */
+                'StudentMedicalAlert' => [
+                    'availability' => $campusIds,
+                    'visibility' =>  [],
+                ],
+                'ParentsSeparatedFlag' => [
+                    'availability' => $campusIds,
+                    'visibility' =>  [self::ROLETYPE_STAFF],
+                ],
+                'AlertMessages' => [
+                    'availability' => $campusIds,
+                    'visibility' =>  [self::ROLETYPE_PARENT, self::ROLETYPE_STAFF],
+                ],
+                /* AlertLegal: Consciously no visibility: forces schools to opt-in to reveal
+                 */
+                'AlertLegal' => [
+                    'availability' => $campusIds,
+                    'visibility' =>  [],
+                ],
+                'countIndividualEducationPlans' => [
+                    'availability' => $campusIds,
+                    'visibility' =>  [self::ROLETYPE_STAFF],
+                ],
+                'Comment' => [
+                    'availability' => $campusIds,
+                    'visibility' =>  [self::ROLETYPE_STAFF],
+                ],
+                'positionTitle' => [
+                    'availability' => $campusIds,
+                    'visibility' =>  [self::ROLETYPE_SELF, self::ROLETYPE_STUDENT, self::ROLETYPE_PARENT, self::ROLETYPE_STAFF],
+                ],
+                'pronoun' => [
+                    'availability' => $campusIds,
+                    'visibility' =>  [self::ROLETYPE_SELF, self::ROLETYPE_STUDENT, self::ROLETYPE_PARENT, self::ROLETYPE_STAFF],
+                ],
+                'email' => [
+                    'availability' => $campusIds,
+                    'visibility' =>  [self::ROLETYPE_SELF, self::ROLETYPE_STUDENT, self::ROLETYPE_PARENT, self::ROLETYPE_STAFF],
+                ],
+                'externalId' => [
+                    'availability' => $campusIds,
+                    'visibility' =>  [self::ROLETYPE_SELF, self::ROLETYPE_PARENT, self::ROLETYPE_STAFF],
+                ],
+                'role' => [
+                    'availability' => $campusIds,
+                    'visibility' =>  [self::ROLETYPE_SELF, self::ROLETYPE_STUDENT, self::ROLETYPE_PARENT, self::ROLETYPE_STAFF],
+                ],
+                'StudentBirthDate' => [
+                    'availability' => $campusIds,
+                    'visibility' =>  [self::ROLETYPE_SELF, self::ROLETYPE_STAFF],
+                ],
+                'formTeacher' => [
+                    'availability' => $campusIds,
+                    'visibility' =>  [self::ROLETYPE_SELF, self::ROLETYPE_PARENT, self::ROLETYPE_STAFF],
+                ],
+                'StudentYearLevel' => [
+                    'availability' => $campusIds,
+                    'visibility' =>  [self::ROLETYPE_SELF, self::ROLETYPE_PARENT, self::ROLETYPE_STAFF],
+                ],
+                'tutorTeacher' => [
+                    'availability' => $campusIds,
+                    'visibility' =>  [self::ROLETYPE_SELF, self::ROLETYPE_PARENT, self::ROLETYPE_STAFF],
+                ],
+                'coordTeacher' => [
+                    'availability' => $campusIds,
+                    'visibility' =>  [self::ROLETYPE_SELF, self::ROLETYPE_PARENT, self::ROLETYPE_STAFF],
+                ],
+                'StudentHouseDescription' => [
+                    'availability' => $campusIds,
+                    'visibility' =>  [self::ROLETYPE_SELF, self::ROLETYPE_PARENT, self::ROLETYPE_STAFF],
+                ],
+                'StudentTutorDescription' => [
+                    'availability' => $campusIds,
+                    'visibility' =>  [self::ROLETYPE_SELF, self::ROLETYPE_PARENT, self::ROLETYPE_STAFF],
+                ],
+                'hohTeacher' => [
+                    'availability' => $campusIds,
+                    'visibility' =>  [self::ROLETYPE_SELF, self::ROLETYPE_PARENT, self::ROLETYPE_STAFF],
+                ],
+                'residentialHouse' => [
+                    'availability' => $campusIds,
+                    'visibility' =>  [self::ROLETYPE_SELF, self::ROLETYPE_PARENT, self::ROLETYPE_STAFF],
+                ],
+                'campusCollection' => [
+                    'availability' => $campusIds,
+                    'visibility' =>  [self::ROLETYPE_SELF, self::ROLETYPE_PARENT, self::ROLETYPE_STAFF],
+                ],
+                'StudentForm' => [
+                    'availability' => $campusIds,
+                    'visibility' =>  [self::ROLETYPE_SELF, self::ROLETYPE_PARENT, self::ROLETYPE_STAFF],
+                ],
+                'boarderType' => [
+                    'availability' => $campusIds,
+                    'visibility' =>  [self::ROLETYPE_SELF, self::ROLETYPE_PARENT, self::ROLETYPE_STAFF],
+                ],
+                'StudentGovernmentStudentNumber' => [
+                    'availability' => $campusIds,
+                    'visibility' =>  [self::ROLETYPE_SELF, self::ROLETYPE_PARENT, self::ROLETYPE_STAFF],
+                ],
+                'StudentStudiesCode' => [
+                    'availability' => $campusIds,
+                    'visibility' =>  [self::ROLETYPE_SELF, self::ROLETYPE_PARENT, self::ROLETYPE_STAFF],
+                ],
+                'pastoralCounts' => [
+                    'availability' => $campusIds,
+                    'visibility' =>  [self::ROLETYPE_SELF, self::ROLETYPE_PARENT, self::ROLETYPE_STAFF],
                 ],
             ],
             'staff' => [
-                'field name 1' => [
+                'portrait' => [
                     'availability' => $campusIds,
-                    'visibility' => ['self', 'staff', 'student', 'parent' ],
+                    'visibility' =>  [self::ROLETYPE_SELF, self::ROLETYPE_STUDENT, self::ROLETYPE_PARENT, self::ROLETYPE_STAFF],
                 ],
-                'field name 2' => [
+                'externalId' => [
                     'availability' => [],
-                    'visibility' => ['self', 'student', 'parent'],
+                    'visibility' =>  [],
                 ],
-                'field name 3' => [
+                'SchoolStaffCode' => [
                     'availability' => [],
-                    'visibility' => ['self', 'staff'],
+                    'visibility' =>  [],
                 ],
-                'field name ..n' => [
+                'positionTitle' => [
                     'availability' => $campusIds,
-                    'visibility' => ['self', 'staff', 'student', 'parent' ],
+                    'visibility' =>  [self::ROLETYPE_SELF, self::ROLETYPE_STUDENT, self::ROLETYPE_PARENT, self::ROLETYPE_STAFF],
+                ],
+                'pronoun' => [
+                    'availability' => $campusIds,
+                    'visibility' =>  [self::ROLETYPE_SELF, self::ROLETYPE_STUDENT, self::ROLETYPE_PARENT, self::ROLETYPE_STAFF],
+                ],
+                'email' => [
+                    'availability' => $campusIds,
+                    'visibility' =>  [self::ROLETYPE_SELF, self::ROLETYPE_STAFF],
+                ],
+                'role' => [
+                    'availability' => [],
+                    'visibility' =>  [],
+                ],
+                'StaffDepartment' => [
+                    'availability' => $campusIds,
+                    'visibility' =>  [self::ROLETYPE_SELF, self::ROLETYPE_STAFF],
+                ],
+                'StaffCategoryDescription' => [
+                    'availability' => $campusIds,
+                    'visibility' =>  [self::ROLETYPE_SELF, self::ROLETYPE_STAFF],
+                ],
+                'StaffBuilding' => [
+                    'availability' => $campusIds,
+                    'visibility' =>  [self::ROLETYPE_SELF, self::ROLETYPE_STAFF],
+                ],
+                'StaffRoom' => [
+                    'availability' => $campusIds,
+                    'visibility' =>  [self::ROLETYPE_SELF, self::ROLETYPE_STAFF],
+                ],
+                'StaffExtension' => [
+                    'availability' => $campusIds,
+                    'visibility' =>  [self::ROLETYPE_SELF, self::ROLETYPE_STAFF],
+                ],
+                'StaffCampusDescription' => [
+                    'availability' => $campusIds,
+                    'visibility' =>  [self::ROLETYPE_SELF, self::ROLETYPE_STAFF],
+                ],
+                'schoolHouse' => [
+                    'availability' => [],
+                    'visibility' =>  [],
+                ],
+                'residentialHouse' => [
+                    'availability' => [],
+                    'visibility' =>  [],
                 ],
             ],
             'parent' => [
-                'field name 1' => [
+                'portrait' => [
                     'availability' => $campusIds,
-                    'visibility' => ['self', 'staff', 'student', 'parent' ],
+                    'visibility' =>  [self::ROLETYPE_SELF, self::ROLETYPE_STUDENT, self::ROLETYPE_PARENT, self::ROLETYPE_STAFF],
                 ],
-                'field name 2' => [
+                'externalId' => [
                     'availability' => [],
-                    'visibility' => ['self', 'student', 'parent'],
+                    'visibility' =>  [],
                 ],
-                'field name 3' => [
-                    'availability' => [],
-                    'visibility' => ['self', 'staff'],
-                ],
-                'field name ..n' => [
+                'positionTitle' => [
                     'availability' => $campusIds,
-                    'visibility' => ['self', 'staff', 'student', 'parent' ],
+                    'visibility' =>  [self::ROLETYPE_SELF, self::ROLETYPE_STUDENT, self::ROLETYPE_PARENT, self::ROLETYPE_STAFF],
+                ],
+                'pronoun' => [
+                    'availability' => $campusIds,
+                    'visibility' =>  [self::ROLETYPE_SELF, self::ROLETYPE_STUDENT, self::ROLETYPE_PARENT, self::ROLETYPE_STAFF],
+                ],
+                'email' => [
+                    'availability' => $campusIds,
+                    'visibility' =>  [self::ROLETYPE_SELF, self::ROLETYPE_STAFF],
+                ],
+                'campusCollection' => [
+                    'availability' => [],
+                    'visibility' =>  [],
+                ],
+                'role' => [
+                    'availability' => [],
+                    'visibility' =>  [],
+                ],
+                'HomePhone' => [
+                    'availability' => $campusIds,
+                    'visibility' =>  [self::ROLETYPE_SELF, self::ROLETYPE_STAFF],
+                ],
+                'MobilePhone' => [
+                    'availability' => $campusIds,
+                    'visibility' =>  [self::ROLETYPE_SELF, self::ROLETYPE_STAFF],
+                ],
+                'WorkPhone' => [
+                    'availability' => $campusIds,
+                    'visibility' =>  [self::ROLETYPE_SELF, self::ROLETYPE_STAFF],
+                ],
+                'SpouseEmail' => [
+                    'availability' => $campusIds,
+                    'visibility' =>  [self::ROLETYPE_SELF, self::ROLETYPE_STAFF],
+                ],
+                'SpouseMobilePhone' => [
+                    'availability' => $campusIds,
+                    'visibility' =>  [self::ROLETYPE_SELF, self::ROLETYPE_STAFF],
+                ],
+                'spouseName' => [
+                    'availability' => $campusIds,
+                    'visibility' =>  [self::ROLETYPE_SELF, self::ROLETYPE_STAFF],
                 ],
             ]
         ];
