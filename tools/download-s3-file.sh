@@ -140,10 +140,14 @@ function validate_args(){
   fi
 }
 
-# See https://docs.aws.amazon.com/AmazonS3/latest/API/API_GetObject.html
+# See:
+# https://awscli.amazonaws.com/v2/documentation/api/latest/reference/s3/sync.html
+# https://awscli.amazonaws.com/v2/documentation/api/latest/reference/s3/cp.html
 function download_file_s3(){
   aws s3 sync "s3://$s3_bucket" "$cache_dir" --exclude='*' --include="$file_name_short"
-  if [ $? -ne 0 ] ; then
+  if [[ $? -ne 0 || ! -f $file_name_short ]] ; then
+    # file may not exist locally yet, or sync may not be permitted:
+    # either way fall back to cp
     error "Unable to sync file: $data_source/$file_name, falling back to cp"
     if ! aws s3 cp "s3://$s3_bucket/$file_name_short" "$cache_dir/$file_basename"; then
       error "Unable to cp file: $data_source/$file_name"
