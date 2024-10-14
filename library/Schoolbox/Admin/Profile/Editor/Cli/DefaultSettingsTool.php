@@ -201,7 +201,7 @@ HELP;
          * lol this is a chunky lookup
          */
         $roletypes = [
-            'student' => [
+            self::ROLETYPE_STUDENT => [
                 'portrait' => [
                     'availability' => $campusIds,
                     'visibility' => [self::ROLETYPE_SELF, self::ROLETYPE_STUDENT, self::ROLETYPE_PARENT, self::ROLETYPE_STAFF],
@@ -323,7 +323,7 @@ HELP;
                     'visibility' =>  [self::ROLETYPE_SELF, self::ROLETYPE_PARENT, self::ROLETYPE_STAFF],
                 ],
             ],
-            'staff' => [
+            self::ROLETYPE_STAFF => [
                 'portrait' => [
                     'availability' => $campusIds,
                     'visibility' =>  [self::ROLETYPE_SELF, self::ROLETYPE_STUDENT, self::ROLETYPE_PARENT, self::ROLETYPE_STAFF],
@@ -385,7 +385,7 @@ HELP;
                     'visibility' =>  [],
                 ],
             ],
-            'parent' => [
+            self::ROLETYPE_PARENT => [
                 'portrait' => [
                     'availability' => $campusIds,
                     'visibility' =>  [self::ROLETYPE_SELF, self::ROLETYPE_STUDENT, self::ROLETYPE_PARENT, self::ROLETYPE_STAFF],
