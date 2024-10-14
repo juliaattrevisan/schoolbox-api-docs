@@ -87,6 +87,9 @@ HELP;
         }
 
         try {
+            $this->getLogger()->info('Profile Editor Default Settings.');
+            $this->getLogger()->info('');
+
             $settingsIndex = $this->buildSettingsIndex();
             $fieldsIndex = $this->buildFieldsIndex();
 
@@ -104,12 +107,35 @@ HELP;
                 VALUES (:profileFieldId, :roletype)
             ");
 
+            /* Some meaningful diagnostic stats
+             */
+            $stats = [
+                self::ROLETYPE_STUDENT => [
+                    'availability' => 0,
+                    'visibility' => 0
+                ],
+                self::ROLETYPE_STAFF => [
+                    'availability' => 0,
+                    'visibility' => 0
+                ],
+                self::ROLETYPE_PARENT => [
+                    'availability' => 0,
+                    'visibility' => 0
+                ],
+            ];
+
             /* For each field, insert their own special blend of Availability and Visibility
              */
+            $totalFields = 0;
+
             foreach ($settingsIndex as $roletype => $fieldSettings) {
+                $n = \count($fieldSettings);
+
+                $totalFields += $n;
+
                 $this->getLogger()->info(sprintf(
                     'Found %s %s elements to process.',
-                    \count($fieldSettings),
+                    $n,
                     $roletype
                 ));
 
@@ -128,12 +154,14 @@ HELP;
                             ]);
                         }
 
-                        $this->getLogger()->info(sprintf(
+                        $this->getLogger()->debug(sprintf(
                             'Profile Field %s (%s): added availability for campus id %s',
                             $fieldDisplayAs,
                             $fieldName,
                             $campusId
                         ));
+
+                        $stats[$roletype]['availability']++;
                     }
 
                     /* We'll need another outer loop to insert new Visibility rules for each field
@@ -146,15 +174,42 @@ HELP;
                             ]);
                         }
 
-                        $this->getLogger()->info(sprintf(
+                        $this->getLogger()->debug(sprintf(
                             'Profile Field %s (%s): added visibility for roletype %s',
                             $fieldDisplayAs,
                             $fieldName,
                             $roletypeVisibility
                         ));
+
+                        $stats[$roletype]['visibility']++;
                     }
                 }
             }
+
+            /* Dump out the stats
+             */
+            $this->getLogger()->info('');
+            $this->getLogger()->info('Statistics');
+
+            $this->getLogger()->info(sprintf(
+                '    Total: %s fields itemised.',
+                $totalFields
+            ));
+
+            $this->getLogger()->info('');
+
+            foreach ([self::ROLETYPE_STUDENT, self::ROLETYPE_STAFF, self::ROLETYPE_PARENT] as $roletype) {
+                foreach ($stats[$roletype] as $key => $value) {
+                    $this->getLogger()->info(sprintf(
+                        '    %s %s: %s',
+                        $roletype,
+                        $key,
+                        $value
+                    ));
+                }
+            }
+
+            $this->getLogger()->info('');
         } catch (\Alaress\Lock\LockRefreshException $e) {
             /* Lock TTL expired; just leave politely
              */
