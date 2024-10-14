@@ -350,49 +350,53 @@ window.Vue.onMounted(() => {
             </template>
             <template v-else>
                 <table class="no-margin">
-                    <tr>
-                        <th>Name</th>
-                        <th>Redirect URI</th>
-                        <th>Client ID</th>
-                        <th>Client Credentials User</th>
-                        <th class="text-right">Actions</th>
-                    </tr>
-                    <tr v-for="row in clientList" :key="row.clientId">
-                        <td>{{ row.name }}</td>
-                        <td>{{ row.redirectUri }}</td>
-                        <td>{{ row.clientId }}</td>
-                        <td>
-                            <a v-if="row.clientCredentialsUser" :href="row.clientCredentialsUser._links.profile">{{
-                                row.clientCredentialsUser.fullName
-                            }}</a>
-                            <em v-else>No user</em>
-                        </td>
-                        <td class="actions-small-2">
-                            <nav>
-                                <a
-                                    href="#modify"
-                                    class="icon-modify no-text"
-                                    title="Modify this client"
-                                    aria-label="Modify this client"
-                                    @click.prevent="showModifyModal(row)"
-                                ></a>
-                                <a
-                                    href="#regenerate"
-                                    class="icon-refresh no-text"
-                                    title="Regenerate this client&rsquo;s secret"
-                                    aria-label="Regenerate this client&rsquo;s secret"
-                                    @click.prevent="showRegenerateModal(row)"
-                                ></a>
-                                <a
-                                    href="#delete"
-                                    class="icon-delete no-text"
-                                    title="Delete this client"
-                                    aria-label="Delete this client"
-                                    @click.prevent="showDeleteModal(row)"
-                                ></a>
-                            </nav>
-                        </td>
-                    </tr>
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Redirect URI</th>
+                            <th>Client ID</th>
+                            <th>Client Credentials User</th>
+                            <th class="text-right">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr v-for="row in clientList" :key="row.clientId">
+                            <td>{{ row.name }}</td>
+                            <td>{{ row.redirectUri }}</td>
+                            <td>{{ row.clientId }}</td>
+                            <td>
+                                <a v-if="row.clientCredentialsUser" :href="row.clientCredentialsUser._links.profile">{{
+                                    row.clientCredentialsUser.fullName
+                                }}</a>
+                                <em v-else>No user</em>
+                            </td>
+                            <td class="actions-small-2">
+                                <nav>
+                                    <a
+                                        href="#modify"
+                                        class="icon-modify no-text"
+                                        title="Modify this client"
+                                        aria-label="Modify this client"
+                                        @click.prevent="showModifyModal(row)"
+                                    ></a>
+                                    <a
+                                        href="#regenerate"
+                                        class="icon-refresh no-text"
+                                        title="Regenerate this client&rsquo;s secret"
+                                        aria-label="Regenerate this client&rsquo;s secret"
+                                        @click.prevent="showRegenerateModal(row)"
+                                    ></a>
+                                    <a
+                                        href="#delete"
+                                        class="icon-delete no-text"
+                                        title="Delete this client"
+                                        aria-label="Delete this client"
+                                        @click.prevent="showDeleteModal(row)"
+                                    ></a>
+                                </nav>
+                            </td>
+                        </tr>
+                    </tbody>
                 </table>
                 <div class="component-action">
                     <section>
