@@ -1,134 +1,37 @@
 <?php
 
 /**
- * @copyright   Copyright 2024, Schoolbox Pty Ltd
- * @link        https://schoolbox.com.au/
+ * @author      Steve Chan <steve.chan@schoolbox.com.au>
+ * @copyright   Copyright 2019, Schoolbox Pty Ltd
+ * @link        http://www.schoolbox.com.au/
  */
 
 declare(strict_types=1);
 
-/* Most fields are available for All Campuses or No Campuses.
- * We might as well collect a list of campus ids to start with.
+use Schoolbox\Admin\Profile\Editor\Cli\DefaultSettingsTool;
+use Schoolbox\Application\CliTool;
+
+require_once __DIR__ . '/../../../conf/core/require.php';
+
+/**
+ * CLI Tool
+ *
+ * Copy this to /tools folder
+ *
+ * To redirect log output to a file(s):
+ *     STDOUT is file descriptor 1
+ *     STDERR is file descriptor 2; our logger output ends up going here
+ *
+ *     Example: php example.php 2> log.txt
  */
-$db = $this->getDi()->get('databaseInternal');
+$app = new DefaultSettingsTool();
 
-$statement = $db->prepare('SELECT id FROM luCampus');
-$statement->execute();
-
-$campusIds = [];
-
-while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
-    $campusIds[] = $row['id'];
-}
-
-/* Most fields are available for All Campuses or No Campuses.
- * We might as well collect a list of campus ids to start with.
+/* OPTION_ERRORS => E_ALL causes all notices and errors to fatally crash your script
+ *
+ * You should generally try to fix those, even though in some special cases php will throw notices
+ * for its own expected behaviours which will inadvertently cause this to fail
  */
-$db = $this->getDi()->get('databaseInternal');
+$options = [CliTool\Kernel::OPTION_LEVEL => Monolog\Logger::INFO, CliTool\Kernel::OPTION_ERRORS => E_ALL,];
 
-$statement = $db->prepare('SELECT id FROM luCampus');
-$statement->execute();
-
-$campusIds = [];
-
-while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
-    $campusIds[] = $row['id'];
-}
-
-/* Find all the fields' ids to build a relation; derive that from
- * the array key which its its name in the mega array below
- */
-$statement = $db->prepare('SELECT id, roletype, field, display_as FROM profile_field');
-$statement->execute();
-
-$fields = [];
-
-while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
-    $fields[$row['roletype']][$row['field']] = [
-        'id' => $row['id'],
-        'displayAs' => $row['display_as']
-    ];
-}
-
-new \Alaress_Probe($fields);
-
-/* A list of (roletype, field name, visibility) tuples
- * and (roletype, field name, availability)
- */
-$roletypes = [
-    'student' => [
-        'field name 1' => [
-            'availability' => $campusIds,
-            'visibility' => ['self', 'staff', 'student', 'parent' ],
-        ],
-        'field name 2' => [
-            'availability' => [],
-            'visibility' => ['self', 'student', 'parent'],
-        ],
-        'field name 3' => [
-            'availability' => [],
-            'visibility' => ['self', 'staff'],
-        ],
-        'field name ..n' => [
-            'availability' => $campusIds,
-            'visibility' => ['self', 'staff', 'student', 'parent' ],
-        ],
-    ],
-    'staff' => [
-        'field name 1' => [
-            'availability' => $campusIds,
-            'visibility' => ['self', 'staff', 'student', 'parent' ],
-        ],
-        'field name 2' => [
-            'availability' => [],
-            'visibility' => ['self', 'student', 'parent'],
-        ],
-        'field name 3' => [
-            'availability' => [],
-            'visibility' => ['self', 'staff'],
-        ],
-        'field name ..n' => [
-            'availability' => $campusIds,
-            'visibility' => ['self', 'staff', 'student', 'parent' ],
-        ],
-    ],
-    'parent' => [
-        'field name 1' => [
-            'availability' => $campusIds,
-            'visibility' => ['self', 'staff', 'student', 'parent' ],
-        ],
-        'field name 2' => [
-            'availability' => [],
-            'visibility' => ['self', 'student', 'parent'],
-        ],
-        'field name 3' => [
-            'availability' => [],
-            'visibility' => ['self', 'staff'],
-        ],
-        'field name ..n' => [
-            'availability' => $campusIds,
-            'visibility' => ['self', 'staff', 'student', 'parent' ],
-        ],
-    ]
-];
-
-/* For each field, insert their own special blend of Availability and Visibility
- */
-foreach ($roletypes as $roletype => $settings) {
-    foreach ($settings as $setting) {
-        /* We'll need an outer loop to insert new Availability rules for each campus
-         * for the roletypes listed in SA-18688
-         */
-        foreach ($setting['availability'] as $campusId) {
-            /* $query = INSERT INTO profile_field_availability_campus
-             */
-        }
-
-        /* We'll need another outer loop to insert new Visibility rules for each field
-         */
-        foreach ($setting['visibility'] as $roletype) {
-            /* $query = INSERT INTO profile_field_visibility_roletype
-             */
-        }
-    }
-}
+/** @noinspection PhpUnhandledExceptionInspection */
+(new Schoolbox\Application\CliTool\Kernel($app, $options))->runApp();

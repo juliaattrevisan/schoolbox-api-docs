@@ -1,0 +1,248 @@
+<?php
+/**
+ * @copyright   Copyright 2024, Schoolbox Pty Ltd
+ * @link        https://schoolbox.com.au/
+ */
+declare(strict_types=1);
+
+namespace Schoolbox\Admin\Profile\Editor\Cli;
+
+use Schoolbox\Application\CliTool;
+
+class DefaultSettingsTool  extends CliTool\App
+{
+    /**
+     * Make sure to add your locking script to the Lock Inspector tool
+     * const LOCK_NAMES in Inspector.php
+     */
+    public const MY_TOOL_LOCK_NAME = 'profileEditorDefaults';
+
+
+    /**
+     * Decide how long this should be based on your usage
+     * You might have to adjust it, but it should cover the cost of an iteration
+     */
+    private const LOCK_TTL = 60;
+
+
+    /**
+     * --help
+     *
+     * Print help text for those who don't know how to use this tool
+     */
+    private const OPT_LONG_HELP = 'help';
+
+
+    /**
+     * @inheritdoc
+     */
+    public function getLongOpts(): array
+    {
+        return [
+            self::OPT_LONG_HELP,
+        ];
+    }
+
+
+    /**
+     * Run the cli tool
+     */
+    public function run(): void
+    {
+        if ($this->getOpt(self::OPT_LONG_HELP)) {
+            echo <<<HELP
+
+Profile Editor Default Availability/Visibility
+
+Adds some default settings for the availability and visibility checkboxes that are 
+as close to the original profile's settings as I can infer.
+
+Usage: profileEditorDefaults.php -vvv --perform
+
+
+HELP;
+            return;
+        }
+
+        /* Decide how loudly to announce lock acquisition failure
+         *
+         * Simply using $lock = $this->acquireLock() will keep you safe, even if you don't
+         * specifically check for acquisition
+         */
+        try {
+            $lock = $this->acquireLock(self::MY_TOOL_LOCK_NAME, self::LOCK_TTL);
+        } catch (\RuntimeException $e) {
+            return;
+        }
+
+        try {
+            $settingsIndex = $this->buildSettingsIndex();
+            $fieldsIndex = $this->buildFieldsIndex();
+
+            /* TODO: Implement this
+             */
+            /* For each field, insert their own special blend of Availability and Visibility
+             */
+            foreach ($roletypes as $roletype => $settings) {
+                foreach ($settings as $setting) {
+                    /* We'll need an outer loop to insert new Availability rules for each campus
+                     * for the roletypes listed in SA-18688
+                     */
+                    foreach ($setting['availability'] as $campusId) {
+                        /* $query = INSERT INTO profile_field_availability_campus
+                         */
+                    }
+
+                    /* We'll need another outer loop to insert new Visibility rules for each field
+                     */
+                    foreach ($setting['visibility'] as $roletype) {
+                        /* $query = INSERT INTO profile_field_visibility_roletype
+                         */
+                    }
+                }
+            }
+        } catch (\Alaress\Lock\LockRefreshException $e) {
+            /* Lock TTL expired; just leave politely
+             */
+            return;
+        }
+
+        /* Announce conclusion
+         */
+        if (!$this->perform()) {
+            $this->getLogger()->info('Planning finished.');
+        }
+
+        /* Announce lock release
+          */
+        $this->getLogger()->debug('Releasing lock');
+
+        $lock->release();
+    }
+
+
+    /**
+     * Build a hash lookup of (roletype, settings) tuples for every campus in your instance
+     *
+     * @return array[]
+     * @throws \PDOException
+     */
+    private function buildSettingsIndex(): array
+    {
+        /* Most fields are available for All Campuses or No Campuses.
+         * We might as well collect a list of campus ids to start with.
+         */
+        $statement = $this->getDatabaseInternal()->prepare('SELECT id FROM luCampus');
+        $statement->execute();
+
+        $campusIds = [];
+
+        while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
+            $campusIds[] = $row['id'];
+        }
+
+        /* A list of (roletype, field name, visibility) tuples
+         * and (roletype, field name, availability)
+         */
+        $roletypes = [
+            'student' => [
+                'field name 1' => [
+                    'availability' => $campusIds,
+                    'visibility' => ['self', 'staff', 'student', 'parent' ],
+                ],
+                'field name 2' => [
+                    'availability' => [],
+                    'visibility' => ['self', 'student', 'parent'],
+                ],
+                'field name 3' => [
+                    'availability' => [],
+                    'visibility' => ['self', 'staff'],
+                ],
+                'field name ..n' => [
+                    'availability' => $campusIds,
+                    'visibility' => ['self', 'staff', 'student', 'parent' ],
+                ],
+            ],
+            'staff' => [
+                'field name 1' => [
+                    'availability' => $campusIds,
+                    'visibility' => ['self', 'staff', 'student', 'parent' ],
+                ],
+                'field name 2' => [
+                    'availability' => [],
+                    'visibility' => ['self', 'student', 'parent'],
+                ],
+                'field name 3' => [
+                    'availability' => [],
+                    'visibility' => ['self', 'staff'],
+                ],
+                'field name ..n' => [
+                    'availability' => $campusIds,
+                    'visibility' => ['self', 'staff', 'student', 'parent' ],
+                ],
+            ],
+            'parent' => [
+                'field name 1' => [
+                    'availability' => $campusIds,
+                    'visibility' => ['self', 'staff', 'student', 'parent' ],
+                ],
+                'field name 2' => [
+                    'availability' => [],
+                    'visibility' => ['self', 'student', 'parent'],
+                ],
+                'field name 3' => [
+                    'availability' => [],
+                    'visibility' => ['self', 'staff'],
+                ],
+                'field name ..n' => [
+                    'availability' => $campusIds,
+                    'visibility' => ['self', 'staff', 'student', 'parent' ],
+                ],
+            ]
+        ];
+
+        return $roletypes;
+    }
+
+
+    /**
+     * Build a hash lookup of (roletype, field) tuples that we use for the field's
+     * id and display name, for logging purposes
+     *
+     * @return array
+     * @throws \PDOException
+     */
+    private function buildFieldsIndex(): array
+    {
+        /* Find all the fields' ids to build a relation; derive that from
+         * the array key which its its name in the mega array below
+         */
+        $statement = $this->getDatabaseInternal()->prepare('SELECT id, roletype, field, display_as FROM profile_field');
+        $statement->execute();
+
+        $fields = [];
+
+        while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
+            $fields[$row['roletype']][$row['field']] = [
+                'id' => $row['id'],
+                'displayAs' => $row['display_as']
+            ];
+        }
+
+        return $fields;
+    }
+
+
+    /**
+     * FIXME Decide whether this script must be run as root
+     *  By default, this returns false (see CliTool\App) but if you're using methods that require
+     *  access to special folders (such as when you're creating files) you need to run this as root.
+     *  Otherwise it'll fail with a generic error that might mislead you
+     *
+     * @return bool|null
+     */
+    public function runAsRoot(): ?bool
+    {
+        return parent::runAsRoot();
+    }
+}
