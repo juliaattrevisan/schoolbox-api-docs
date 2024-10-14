@@ -162,13 +162,17 @@ table.rb {
         line-height: inherit; /* to remove the large line-height on the link */
     }
     p {
-        padding: 0.625rem;
+        padding: 0.625rem 0;
     }
     th:first-of-type {
         border-right: none; /* remove the 2px right border on the first th */
     }
     th p {
         font-weight: bold;
+    }
+    td {
+        border-bottom: none;
+        border-left: none;
     }
 }
 
