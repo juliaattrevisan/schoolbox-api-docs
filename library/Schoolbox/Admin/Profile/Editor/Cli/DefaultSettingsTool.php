@@ -24,7 +24,7 @@ class DefaultSettingsTool extends CliTool\App
      * Decide how long this should be based on your usage
      * You might have to adjust it, but it should cover the cost of an iteration
      */
-    private const LOCK_TTL = 60;
+    private const LOCK_TTL = 10;
 
 
     /**
@@ -68,7 +68,7 @@ Profile Editor Default Availability/Visibility
 Adds some default settings for the availability and visibility checkboxes that are 
 as close to the original profile's settings as I can infer.
 
-Usage: profileEditorDefaults.php -vvv --perform
+Usage: php profileEditorDefaults.php -vvv --perform
 
 
 HELP;
@@ -140,6 +140,9 @@ HELP;
                 ));
 
                 foreach ($fieldSettings as $fieldName => $fieldSetting) {
+                    $this->getLogger()->debug('Refreshing lock.');
+                    $this->refreshLock($lock);
+
                     $fieldId = $fieldsIndex[$roletype][$fieldName]['id'];
                     $fieldDisplayAs = $fieldsIndex[$roletype][$fieldName]['displayAs'];
 
@@ -147,6 +150,9 @@ HELP;
                      * for the roletypes listed in SA-18688
                      */
                     foreach ($fieldSetting['availability'] as $campusId) {
+                        $this->getLogger()->debug('Refreshing lock.');
+                        $this->refreshLock($lock);
+
                         if ($this->perform()) {
                             $availabilityCampusStatement->execute([
                                 'profileFieldId' => $fieldId,
@@ -167,6 +173,9 @@ HELP;
                     /* We'll need another outer loop to insert new Visibility rules for each field
                      */
                     foreach ($fieldSetting['visibility'] as $roletypeVisibility) {
+                        $this->getLogger()->debug('Refreshing lock.');
+                        $this->refreshLock($lock);
+
                         if ($this->perform()) {
                             $visibilityCampusStatement->execute([
                                 'profileFieldId' => $fieldId,
