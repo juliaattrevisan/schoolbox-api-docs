@@ -144,8 +144,11 @@ function validate_args(){
 function download_file_s3(){
   aws s3 sync "s3://$s3_bucket" "$cache_dir" --exclude='*' --include="$file_name_short"
   if [ $? -ne 0 ] ; then
-    error "Unable to download file: $data_source/$file_name"
-    exit 1;
+    error "Unable to sync file: $data_source/$file_name, falling back to cp"
+    if ! aws s3 cp "s3://$s3_bucket/$file_name_short" "$cache_dir/$file_basename"; then
+      error "Unable to cp file: $data_source/$file_name"
+      exit 1;
+    fi
   fi
 }
 
