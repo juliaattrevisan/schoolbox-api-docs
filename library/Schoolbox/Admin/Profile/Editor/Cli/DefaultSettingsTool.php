@@ -38,7 +38,7 @@ class DefaultSettingsTool extends CliTool\App
     /**
      * Consts used - including the "self" pseudo-roletype
      */
-    private const ROLETYPE_SELF = 'self';
+    private const ROLETYPE_SELF = \Schoolbox\Admin\Profile\Editor\Payload::ROLETYPE_SELF;
     private const ROLETYPE_STUDENT = \Schoolbox\Role::STUDENT;
     private const ROLETYPE_PARENT = \Schoolbox\Role::PARENT;
     private const ROLETYPE_STAFF = \Schoolbox\Role::STAFF;
