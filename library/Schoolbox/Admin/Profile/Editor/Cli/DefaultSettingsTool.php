@@ -1,15 +1,17 @@
 <?php
+
 /**
  * @copyright   Copyright 2024, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 declare(strict_types=1);
 
 namespace Schoolbox\Admin\Profile\Editor\Cli;
 
 use Schoolbox\Application\CliTool;
 
-class DefaultSettingsTool  extends CliTool\App
+class DefaultSettingsTool extends CliTool\App
 {
     /**
      * Make sure to add your locking script to the Lock Inspector tool
