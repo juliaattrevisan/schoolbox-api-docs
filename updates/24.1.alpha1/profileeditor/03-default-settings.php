@@ -1,8 +1,10 @@
 <?php
+
 /**
  * @copyright   Copyright 2024, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 declare(strict_types=1);
 
 /* Most fields are available for All Campuses or No Campuses.
@@ -10,54 +12,95 @@ declare(strict_types=1);
  */
 $db = $this->getDi()->get('databaseInternal');
 
-$campusQuery = $db->execute("SELECT id FROM luCampus");
+$statement = $db->prepare('SELECT id FROM luCampus');
+$statement->execute();
 
-while ($row = $campusQuery->fetchRow()) {
+$campusIds = [];
+
+while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
     $campusIds[] = $row['id'];
 }
 
 /* TODO Find the field ids w/o mappers
- * TODO group by roletype => field name => settings
- * TODO Adjust traversal
  */
 
 /* A list of (roletype, field name, visibility) tuples
  * and (roletype, field name, availability)
  */
-$settings = [
-    'field name 1' => [
-        'availability' => $campusIds,
-        'visibility' => ['self', 'staff', 'student', 'parent' ],
+$roletypes = [
+    'student' => [
+        'field name 1' => [
+            'availability' => $campusIds,
+            'visibility' => ['self', 'staff', 'student', 'parent' ],
+        ],
+        'field name 2' => [
+            'availability' => [],
+            'visibility' => ['self', 'student', 'parent'],
+        ],
+        'field name 3' => [
+            'availability' => [],
+            'visibility' => ['self', 'staff'],
+        ],
+        'field name ..n' => [
+            'availability' => $campusIds,
+            'visibility' => ['self', 'staff', 'student', 'parent' ],
+        ],
     ],
-    'field name 2' => [
-        'availability' => [],
-        'visibility' => ['self', 'student', 'parent'],
+    'staff' => [
+        'field name 1' => [
+            'availability' => $campusIds,
+            'visibility' => ['self', 'staff', 'student', 'parent' ],
+        ],
+        'field name 2' => [
+            'availability' => [],
+            'visibility' => ['self', 'student', 'parent'],
+        ],
+        'field name 3' => [
+            'availability' => [],
+            'visibility' => ['self', 'staff'],
+        ],
+        'field name ..n' => [
+            'availability' => $campusIds,
+            'visibility' => ['self', 'staff', 'student', 'parent' ],
+        ],
     ],
-    'field name 3' => [
-        'availability' => [],
-        'visibility' => ['self', 'staff'],
-    ],
-    'field name ..n' => [
-        'availability' => $campusIds,
-        'visibility' => ['self', 'staff', 'student', 'parent' ],
-    ],
+    'parent' => [
+        'field name 1' => [
+            'availability' => $campusIds,
+            'visibility' => ['self', 'staff', 'student', 'parent' ],
+        ],
+        'field name 2' => [
+            'availability' => [],
+            'visibility' => ['self', 'student', 'parent'],
+        ],
+        'field name 3' => [
+            'availability' => [],
+            'visibility' => ['self', 'staff'],
+        ],
+        'field name ..n' => [
+            'availability' => $campusIds,
+            'visibility' => ['self', 'staff', 'student', 'parent' ],
+        ],
+    ]
 ];
 
 /* For each field, insert their own special blend of Availability and Visibility
  */
-foreach ($settings as $setting) {
-    /* We'll need an outer loop to insert new Availability rules for each campus
-     * for the roletypes listed in SA-18688
-     */
-    foreach ($setting['availability'] as $campusId) {
-        /* $query = INSERT INTO profile_field_availability_campus
+foreach ($roletypes as $roletype => $settings) {
+    foreach ($settings as $setting) {
+        /* We'll need an outer loop to insert new Availability rules for each campus
+         * for the roletypes listed in SA-18688
          */
-    }
+        foreach ($setting['availability'] as $campusId) {
+            /* $query = INSERT INTO profile_field_availability_campus
+             */
+        }
 
-    /* We'll need another outer loop to insert new Visibility rules for each field
-     */
-    foreach ($setting['visibility'] as $roletype) {
-        /* $query = INSERT INTO profile_field_visibility_roletype
+        /* We'll need another outer loop to insert new Visibility rules for each field
          */
+        foreach ($setting['visibility'] as $roletype) {
+            /* $query = INSERT INTO profile_field_visibility_roletype
+             */
+        }
     }
 }
