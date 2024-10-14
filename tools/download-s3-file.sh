@@ -147,7 +147,7 @@ function validate_args(){
 # https://awscli.amazonaws.com/v2/documentation/api/latest/reference/s3/cp.html
 function download_file_s3(){
   aws s3 sync "s3://$s3_bucket/$file_dirname" "$cache_dir" --exclude='*' --include="$file_basename"
-  if [[ $? -ne 0 || ! -f $file_name_short ]] ; then
+  if [[ $? -ne 0 || ! -f "$cache_dir/$file_basename" ]] ; then
     # file may not exist locally yet, or sync may not be permitted:
     # either way fall back to cp
     error "Unable to sync file: $data_source/$file_name, falling back to cp"
