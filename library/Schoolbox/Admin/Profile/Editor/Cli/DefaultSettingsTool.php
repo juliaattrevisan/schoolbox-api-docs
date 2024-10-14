@@ -79,25 +79,62 @@ HELP;
             $settingsIndex = $this->buildSettingsIndex();
             $fieldsIndex = $this->buildFieldsIndex();
 
-            /* TODO: Implement this
+            /* Prepare some oft-used queries
              */
+            $availabilityCampusStatement = $this->getDatabaseInternal()->prepare("
+                INSERT INTO profile_field_campus_availability
+                (profile_field_id, campus_id)
+                VALUES (:profileFieldId, :campusId)
+            ");
+
+            $visibilityCampusStatement = $this->getDatabaseInternal()->prepare("
+                INSERT INTO profile_field_roletype_visibility
+                (profile_field_id, roletype)
+                VALUES (:profileFieldId, :roletype)
+            ");
+
             /* For each field, insert their own special blend of Availability and Visibility
              */
-            foreach ($roletypes as $roletype => $settings) {
-                foreach ($settings as $setting) {
+            foreach ($settingsIndex as $roletype => $fieldSettings) {
+                foreach ($fieldSettings as $fieldName => $fieldSetting) {
+                    $fieldId = $fieldsIndex[$roletype][$fieldName]['id'];
+                    $fieldDisplayAs = $fieldsIndex[$roletype][$fieldName]['displayAs'];
+
                     /* We'll need an outer loop to insert new Availability rules for each campus
                      * for the roletypes listed in SA-18688
                      */
-                    foreach ($setting['availability'] as $campusId) {
-                        /* $query = INSERT INTO profile_field_availability_campus
-                         */
+                    foreach ($fieldSetting['availability'] as $campusId) {
+                        if ($this->perform()) {
+                            $availabilityCampusStatement->execute([
+                                'profileFieldId' => $fieldId,
+                                'campusId' => $campusId,
+                            ]);
+                        }
+
+                        $this->getLogger()->info(sprintf(
+                            'Profile Field %s (%s): added availability for campus id %s',
+                            $fieldDisplayAs,
+                            $fieldName,
+                            $campusId
+                        ));
                     }
 
                     /* We'll need another outer loop to insert new Visibility rules for each field
                      */
-                    foreach ($setting['visibility'] as $roletype) {
-                        /* $query = INSERT INTO profile_field_visibility_roletype
-                         */
+                    foreach ($fieldSetting['visibility'] as $roletypeVisibility) {
+                        if ($this->perform()) {
+                            $visibilityCampusStatement->execute([
+                                'profileFieldId' => $fieldId,
+                                'roletype' => $roletypeVisibility,
+                            ]);
+                        }
+
+                        $this->getLogger()->info(sprintf(
+                            'Profile Field %s (%s): added visibility for roletype %s',
+                            $fieldDisplayAs,
+                            $fieldName,
+                            $roletypeVisibility
+                        ));
                     }
                 }
             }
