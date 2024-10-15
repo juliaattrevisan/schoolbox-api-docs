@@ -33,6 +33,7 @@ readonly CACHE_DIR_DEFAULT="/tmp"
 # Global vars
 declare file_name;                              # The name in the S3 bucket,     eg 'prefix/sales.tar.gz?versionId=abc'
 declare file_name_short;                        # The name we use on local disk, eg 'prefix/sales.tar.gz'
+declare file_dirname                            # The dirname of the file,       eg 'prefix'
 declare file_basename                           # Prefix and version stripped,   eg 'sales.tar.gz'
 declare cache_dir="$CACHE_DIR_DEFAULT"
 declare s3_referer;
@@ -87,6 +88,7 @@ function parse_args(){
         --"$ARG_FILE_NAME")
         file_name="$2"; shift; shift;
         file_name_short=$(echo "$file_name" | cut -d'?' -f1); # Strip off any '?versionId=abc' trailing part
+        file_dirname=$(dirname "$file_name_short")
         file_basename=$(basename "$file_name_short")
         ;;
         --"$ARG_CACHE_DIR")
@@ -140,12 +142,19 @@ function validate_args(){
   fi
 }
 
-# See https://docs.aws.amazon.com/AmazonS3/latest/API/API_GetObject.html
+# See:
+# https://awscli.amazonaws.com/v2/documentation/api/latest/reference/s3/sync.html
+# https://awscli.amazonaws.com/v2/documentation/api/latest/reference/s3/cp.html
 function download_file_s3(){
-  aws s3 sync "s3://$s3_bucket" "$cache_dir" --exclude='*' --include="$file_name_short"
-  if [ $? -ne 0 ] ; then
-    error "Unable to download file: $data_source/$file_name"
-    exit 1;
+  aws s3 sync "s3://$s3_bucket/$file_dirname" "$cache_dir" --exclude='*' --include="$file_basename"
+  if [[ $? -ne 0 || ! -f "$cache_dir/$file_basename" ]] ; then
+    # file may not exist locally yet, or sync may not be permitted:
+    # either way fall back to cp
+    error "Unable to sync file: $data_source/$file_name, falling back to cp"
+    if ! aws s3 cp "s3://$s3_bucket/$file_name_short" "$cache_dir/$file_basename"; then
+      error "Unable to cp file: $data_source/$file_name"
+      exit 1;
+    fi
   fi
 }
 
