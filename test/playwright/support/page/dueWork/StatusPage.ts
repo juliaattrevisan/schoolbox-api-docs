@@ -67,8 +67,7 @@ export default class StatusPage {
      * click the jelly tot
      */
     async clickJellyTot(): Promise<void> {
-        await this.page.waitForTimeout(2000);
-        await this.page.getByTestId(StatusPage.DATA_TEST_JELLY_TOT).isVisible({ timeout: 30000 });
+        await expect(this.page.getByTestId(StatusPage.DATA_TEST_JELLY_TOT)).toBeVisible();
         await this.page.getByTestId(StatusPage.DATA_TEST_JELLY_TOT).click();
     }
 
@@ -77,7 +76,8 @@ export default class StatusPage {
      * @param option - The option to click: modify, feedback, task, download
      */
     async clickJellyTotOption(option: string): Promise<void> {
-        await this.page.locator(`#header-options a.icon-${option}`).isVisible({ timeout: 30000 });
+        await expect(this.page.locator(`#header-options a.icon-${option}`)).toBeVisible();
         await this.page.locator(`#header-options a.icon-${option}`).click();
+        await this.tester.common.waitForPageLoad();
     }
 }

@@ -1,3 +1,4 @@
+import { expect } from "@playwright/test";
 import type { Page } from "@playwright/test";
 
 export default class Resources {
@@ -28,7 +29,7 @@ export default class Resources {
      */
     async clickFolderName(folderName: string): Promise<void> {
         await this.page.locator(`a.jstree-anchor:has-text("${folderName}")`).click();
-        await this.page.locator(`a[title="${folderName}"]`).isVisible();
+        await expect(this.page.locator(`a[title="${folderName}"]`)).toBeVisible();
     }
 
     /**

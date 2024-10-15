@@ -151,7 +151,7 @@ export default class Common {
 
         // The profile drop gets a data-test-ready="true" applied when its associated event listeners are ready
         const profileDrop = this.page.getByTestId("profile-drop");
-        await expect(profileDrop).toHaveAttribute("data-test-ready", "true");
+        await expect(profileDrop).toHaveAttribute("data-test-ready", "true", { timeout: 30000 });
 
         // Make sure the search bar and profile drop are stable
         // uses "trial: true" to see if the elements are interactable, but not actually interact with them

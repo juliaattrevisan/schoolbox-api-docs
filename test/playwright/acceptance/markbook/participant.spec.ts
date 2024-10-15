@@ -37,7 +37,9 @@ test.describe("Participant Tests", () => {
         tester.isGoingTo("add a due work component into the homepage");
         await page.goto("/homepage/106");
 
-        await page.locator(`h1:has-text("Demo Class Page 2 (DEMO2)")`).isVisible({ timeout: 30000 });
+        await tester.common.waitForPageLoad();
+
+        await expect(page.locator(`h1:has-text("Demo Class Page 2 (DEMO2)")`)).toBeVisible();
         await addComponent.addComponent(Homepage.ELEMENT_ADD_COMPONENT_SECTION_LEARNING, "Due Work");
         await expect(
             page.locator(
@@ -64,15 +66,15 @@ test.describe("Participant Tests", () => {
         await dueworkForm.create();
 
         tester.isGoingTo("As Jack Coles, create submission");
-        await page.locator(`h3:has-text("Cest One")`).isVisible({ timeout: 30000 });
+        await expect(page.locator(`h3:has-text("Cest One")`)).toBeVisible();
         await page.locator(`h3:has-text("Cest One")`).click();
-        await page.locator('data-test="assessment-summary-create-button"').isVisible({ timeout: 30000 });
+        await expect(page.locator('data-test="assessment-summary-create-button"')).toBeVisible();
         await page.getByTestId("assessment-summary-create-button").click();
 
         await submitForm.setContents(Common.genText(200));
         await submitForm.setAttachment(filename);
         await submitForm.submit();
-        await page.locator(`h2.subheader:has-text("Submission History")`).isVisible({ timeout: 30000 });
+        await expect(page.locator(`h2.subheader:has-text("Submission History")`)).toBeVisible();
 
         tester.isGoingTo("open the markbook and check if I can see my submission");
         await markbookPage.open(classId);
@@ -81,16 +83,16 @@ test.describe("Participant Tests", () => {
 
         tester.isGoingTo("exclude Jack Coles from the due work participants list");
         await page.locator(`a:has-text("Cest One")`).click();
-        await page.locator(`h1:has-text("Status of Cest One")`).isVisible({ timeout: 30000 });
+        await expect(page.locator(`h1:has-text("Status of Cest One")`)).toBeVisible();
         await page.waitForTimeout(2000);
         await statusPage.clickJellyTot();
         await statusPage.clickJellyTotOption("modify");
-        await page.locator(`h2:has-text("Update Cest One")`).isVisible({ timeout: 30000 });
+        await expect(page.locator(`h2:has-text("Update Cest One")`)).toBeVisible();
         await expect(page.getByTestId("assessment-form-button-submit-Update")).toBeEnabled();
         await page.waitForTimeout(2000);
         await dueworkForm.modifyParticipation(teacherId, true, true);
         await dueworkForm.update();
-        await page.locator(`h1:has-text("Status of Cest One")`).isVisible({ timeout: 30000 });
+        await expect(page.locator(`h1:has-text("Status of Cest One")`)).toBeVisible();
 
         tester.isGoingTo(
             "open course mark book and check that Jack Coles is not presented and the student is presented",
@@ -105,15 +107,15 @@ test.describe("Participant Tests", () => {
 
         tester.isGoingTo("exclude a student (Louisa Smith) from the due work participants list");
         await page.locator(`a:has-text("Cest One")`).click();
-        await page.locator(`h1:has-text("Status of Cest One")`).isVisible({ timeout: 30000 });
+        await expect(page.locator(`h1:has-text("Status of Cest One")`)).toBeVisible();
         await page.waitForTimeout(2000);
         await statusPage.clickJellyTot();
         await statusPage.clickJellyTotOption("modify");
-        await page.locator(`h2:has-text("Update Cest One")`).isVisible({ timeout: 30000 });
+        await expect(page.locator(`h2:has-text("Update Cest One")`)).toBeVisible();
         await expect(page.getByTestId("assessment-form-button-submit-Update")).toBeEnabled();
         await dueworkForm.modifyParticipation(studentId, false, false);
         await dueworkForm.update();
-        await page.locator(`h1:has-text("Status of Cest One")`).isVisible({ timeout: 30000 });
+        await expect(page.locator(`h1:has-text("Status of Cest One")`)).toBeVisible();
 
         tester.isGoingTo("open course mark book and check that Jack Coles and Louisa Smith are not presented");
         await markbookPage.open(classId);
