@@ -111,9 +111,8 @@ test.describe("Textbox Tests", () => {
         await manageAll.typeTextBoxHeading(textBoxItem, "Third Text Box");
         await manageAll.typeTextBoxContent(textBoxItem, "Jana Reed");
         await manageAll.clickSaveAll();
-        await tester.runShellCommand("php /usr/share/schoolbox/tools/search/buildIndex.php -p --from='-10 min'");
-        // give time to finish the index building
-        await page.waitForTimeout(2000);
+
+        await tester.rebuildSearchIndex();
     });
 
     /**
@@ -196,9 +195,7 @@ test.describe("Textbox Tests", () => {
         await textbox.fillContent("Jamal to be presented", textboxId);
         await textbox.save();
 
-        await tester.runShellCommand("php /usr/share/schoolbox/tools/search/buildIndex.php -p --from='-10 min'");
-        // give time to finish the index building
-        await page.waitForTimeout(2000);
+        await tester.rebuildSearchIndex();
 
         tester.isGoingTo("As Jana Reed search for textboxes and check whether its is presented or not");
         await tester.impersonate("Jana Reed");

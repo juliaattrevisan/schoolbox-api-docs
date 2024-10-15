@@ -55,6 +55,19 @@ export default class BaseTester {
     }
 
     /**
+     * Rebuild the search index
+     */
+    async rebuildSearchIndex(): Promise<void> {
+        this.isGoingTo("rebuild the search index");
+        await this.runShellCommand("php /usr/share/schoolbox/tools/search/buildIndex.php -p --from='-10 min'");
+
+        this.isGoingTo("wait for the search index to finish building");
+        await new Promise((resolve) => {
+            setTimeout(resolve, 2000);
+        });
+    }
+
+    /**
      * Create an "I am going to " comment for debugging
      * @param argumentation - The message to log
      */
