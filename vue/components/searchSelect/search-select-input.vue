@@ -15,7 +15,6 @@ const emit = defineEmits<{
     input: [value: string];
 }>();
 
-const queryInputEl = window.Vue.ref<HTMLInputElement | null>(null);
 const query = window.Vue.ref<string>("");
 
 /**
@@ -38,17 +37,16 @@ window.Vue.onMounted(async () => {
 /**
  * To close the search results when the input is not focused
  */
-// const { focused } = useFocus(queryInputEl);
-// window.Vue.watch(focused, ($focused) => {
-//     if (!$focused) {
-//         query.value = "";
-//     }
-// });
+const { focused } = useFocus(props.parentEl);
+window.Vue.watch(focused, ($focused) => {
+    if (!$focused) {
+        query.value = "";
+    }
+});
 </script>
 
 <template>
     <input
-        ref="queryInputEl"
         v-model="query"
         type="text"
         class="search-input f-no-margins"
