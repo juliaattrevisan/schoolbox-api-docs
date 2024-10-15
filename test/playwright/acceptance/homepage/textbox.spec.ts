@@ -190,12 +190,11 @@ test.describe("Textbox Tests", () => {
         await homepage.uncheckComponentCheckbox(componentId, "showComponentTitle");
         await manageAll.clickSaveAll();
         tester.isGoingTo("Update the textbox content");
-        await page.locator("button").getByText("Modify").click();
+        await textbox.modify();
         tester.isGoingTo("get the component id");
         const textboxId = (await db.grabFromDatabase("component_instance", "id", {
             identifier: homepageId,
         })) as number;
-        await textbox.modify();
         await textbox.fillContent("Jamal to be presented", textboxId);
         await textbox.save();
 
