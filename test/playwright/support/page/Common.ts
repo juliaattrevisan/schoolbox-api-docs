@@ -91,6 +91,12 @@ export default class Common {
     static readonly ICON_MODIFY_PAGES = "a.icon-modify.no-text";
 
     /**
+     * the currently open modal dialog
+     * use this in combination with the other modal dialog selectors for better precision
+     */
+    static readonly SELECTOR_MODAL_DIALOG = "div[data-reveal].open";
+
+    /**
      * confirm button on modal dialogs
      */
     static readonly SELECTOR_CONFIRM_DIALOG_BUTTON_CONFIRM = "a#confirm-dialog-confirm-button";
@@ -103,7 +109,7 @@ export default class Common {
     /**
      * close x button on modal dialogs
      */
-    static readonly SELECTOR_CLOSE_BUTTON_MODAL = "#modal-role";
+    static readonly SELECTOR_CLOSE_BUTTON_MODAL = ".close-reveal-modal";
 
     /**
      * add a comment element for learning moments, news, pastoral records
@@ -224,10 +230,16 @@ export default class Common {
     }
 
     /**
-     * clicks the close x button on the dialogs
+     * clicks the close x button on the currently open modal dialog
      */
     async closeModal(): Promise<void> {
-        await this.page.locator(Common.SELECTOR_CLOSE_BUTTON_MODAL).getByLabel("Close").click();
+        // You can't close a reveal modal before it is in a fully opened state,
+        // so wait for it to be visible and fully opaque before trying to close it
+        const currentModal = this.page.locator(Common.SELECTOR_MODAL_DIALOG);
+        await expect(currentModal).toBeVisible();
+        await expect(currentModal).toHaveCSS("opacity", "1");
+
+        await currentModal.locator(Common.SELECTOR_CLOSE_BUTTON_MODAL).click();
     }
 
     /**
