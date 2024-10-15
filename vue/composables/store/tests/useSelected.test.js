@@ -6,9 +6,21 @@ test("single item is added to selected", () => {
     expect(selected.value).toHaveLength(1);
 });
 
+test("single item is added to selected only once", () => {
+    const { selected, add } = useSelected();
+    add([{ id: 1 }, { id: 1 }]);
+    expect(selected.value).toHaveLength(1);
+});
+
 test("multiple items are in selected when added", () => {
     const { selected, add } = useSelected();
     add([{ id: 1 }, { id: 2 }, { id: 3 }]);
+    expect(selected.value).toHaveLength(3);
+});
+
+test("multiple items are in selected when added only once", () => {
+    const { selected, add } = useSelected();
+    add([{ id: 1 }, { id: 2 }, { id: 3 }, { id: 2 }]);
     expect(selected.value).toHaveLength(3);
 });
 

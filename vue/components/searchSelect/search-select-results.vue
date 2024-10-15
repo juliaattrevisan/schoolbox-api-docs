@@ -22,6 +22,7 @@ const props = defineProps<Props>();
 
 const emit = defineEmits<{
     select: [result: Result]; // to select a search result
+    deselect: [result: Result]; // to deselect a search result
     selectAll: []; // to select all search results
     removeAll: []; // to remove all search results
 }>();
@@ -97,11 +98,19 @@ const showSelectAll = window.Vue.computed(() => {
 });
 
 /**
- * To toggle the selected state of the result
+ * To select the search result
  * @param result - the result selected
  */
 function onSelect(result: Result): void {
     emit("select", result);
+}
+
+/**
+ * To deselect the search result
+ * @param result - the result deselected
+ */
+function onDeselect(result: Result): void {
+    emit("deselect", result);
 }
 
 /**
@@ -142,6 +151,7 @@ function onRemoveAll(): void {
                     :result="result"
                     :is-single-select="props.isSingleSelect"
                     @select="onSelect"
+                    @deselect="onDeselect"
                 />
             </template>
         </div>

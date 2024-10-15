@@ -17,6 +17,7 @@ const props = defineProps<Props>();
 
 const emit = defineEmits<{
     select: [result: Result];
+    deselect: [result: Result];
 }>();
 
 /**
@@ -32,7 +33,11 @@ const isSelected = window.Vue.computed(() => {
  * To toggle the selected state of the result
  */
 function onSelected(): void {
-    emit("select", props.result);
+    if (isSelected.value) {
+        emit("deselect", props.result);
+    } else {
+        emit("select", props.result);
+    }
 }
 </script>
 

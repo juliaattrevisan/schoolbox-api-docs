@@ -66,6 +66,14 @@ function onSelect(result: Result): void {
 }
 
 /**
+ * To toggle the selected state of the result
+ * @param result - the result selected
+ */
+function onDeselect(result: Result): void {
+    emit("removeItem", result);
+}
+
+/**
  * To select all search results
  */
 function onSelectAll(): void {
@@ -106,6 +114,7 @@ function onInput($query: string): void {
             :has-no-results="hasNoResults"
             :selected-items="selectedItems"
             @select="onSelect"
+            @deselect="onDeselect"
             @select-all="onSelectAll"
             @remove-all="onRemoveAll"
         />
