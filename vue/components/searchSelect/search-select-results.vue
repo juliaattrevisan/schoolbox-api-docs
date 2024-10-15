@@ -100,7 +100,7 @@ const showSelectAll = window.Vue.computed(() => {
  * To toggle the selected state of the result
  * @param result - the result selected
  */
-function onSelected(result: Result): void {
+function onSelect(result: Result): void {
     emit("select", result);
 }
 
@@ -139,10 +139,9 @@ function onRemoveAll(): void {
                     :data-test="`search-select-result-${result.id}`"
                     :query="props.query"
                     :selected-items="props.selectedItems"
-                    :results="props.results"
                     :result="result"
                     :is-single-select="props.isSingleSelect"
-                    @select="onSelected"
+                    @select="onSelect"
                 />
             </template>
         </div>

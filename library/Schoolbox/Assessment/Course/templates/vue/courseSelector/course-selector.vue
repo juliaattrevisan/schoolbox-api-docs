@@ -22,12 +22,7 @@ const { selected, add, remove } = useSelected();
  * @param result - the result selected
  */
 function onSelectResult(result: Result): void {
-    const exists = selected.value.find((item) => item.id === result.id);
-    if (exists) {
-        remove(result);
-    } else {
-        add(result);
-    }
+    add(result);
 }
 
 /**
@@ -35,12 +30,7 @@ function onSelectResult(result: Result): void {
  * @param results - the results to add
  */
 function selectAllResults(results: Result[]): void {
-    results.forEach((result) => {
-        const exists = selected.value.find((item) => item.id === result.id);
-        if (!exists) {
-            add(result);
-        }
-    });
+    add(results);
 }
 
 /**
@@ -48,12 +38,7 @@ function selectAllResults(results: Result[]): void {
  * @param results - the results to remove
  */
 function removeAllResults(results: Result[]): void {
-    results.forEach((result) => {
-        const exists = selected.value.find((item) => item.id === result.id);
-        if (exists) {
-            remove(result);
-        }
-    });
+    remove(results);
 }
 
 /**

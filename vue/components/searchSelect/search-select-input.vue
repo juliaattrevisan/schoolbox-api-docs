@@ -38,12 +38,12 @@ window.Vue.onMounted(async () => {
 /**
  * To close the search results when the input is not focused
  */
-const { focused } = useFocus(queryInputEl);
-window.Vue.watch(focused, ($focused) => {
-    if (!$focused) {
-        query.value = "";
-    }
-});
+// const { focused } = useFocus(queryInputEl);
+// window.Vue.watch(focused, ($focused) => {
+//     if (!$focused) {
+//         query.value = "";
+//     }
+// });
 </script>
 
 <template>

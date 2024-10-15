@@ -9,7 +9,6 @@ import type { Result } from "./types/Result";
 interface Props {
     query: string; // the search query
     selectedItems: Result[]; // the selected results
-    results: Result[]; // the results returned from the search
     result: Result; // the result to display
     isSingleSelect: boolean; // whether only one result can be selected
 }
@@ -38,7 +37,7 @@ function onSelected(): void {
 </script>
 
 <template>
-    <div class="search-result f-no-margins" :title="result.name" @click.prevent="onSelected">
+    <div class="search-result f-no-margins" @click.prevent="onSelected">
         <show-matches v-if="props.isSingleSelect" tag="span" :text="props.result.name" :query="props.query" />
         <div v-else class="checklist">
             <input :id="`checkbox-${result.id}`" type="checkbox" :checked="isSelected" />
