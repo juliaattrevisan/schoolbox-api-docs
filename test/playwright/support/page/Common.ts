@@ -125,6 +125,35 @@ export default class Common {
     }
 
     /**
+     * Ensures the page is loaded and ready to be interacted with (mostly)
+     * This completes some specific checks to ensure that components such as the search bar are interactable
+     *
+     * Note, usually this isn't necessary as playwright's actionability checks are sufficient most of the time
+     * However, in some cases, interacting with elements that load after the page has loaded can cause issues
+     *
+     * This function will wait for *most* of the page to be in a stable state before continuing
+     * However, it is not a guarantee that all elements will be interactable (e.g. some vue component doing extra requests before loading)
+     */
+    async waitForPageLoad(): Promise<void> {
+        // First wait for load to complete
+        await this.page.waitForLoadState("load");
+
+        // Are we on the login page? If so, skip the rest as it's irrelevant
+        if ((await this.page.getByTestId("login-submit").count()) > 0) {
+            return;
+        }
+
+        // The profile drop gets a data-test-ready="true" applied when its associated event listeners are ready
+        const profileDrop = this.page.getByTestId("profile-drop");
+        await expect(profileDrop).toHaveAttribute("data-test-ready", "true");
+
+        // Make sure the search bar and profile drop are stable
+        // uses "trial: true" to see if the elements are interactable, but not actually interact with them
+        await profileDrop.click({ trial: true });
+        await this.page.getByTestId("search-input-button").click({ trial: true });
+    }
+
+    /**
      * Generate a random string of text
      * @param length - the length of the string to generate
      * @returns - the generated string
@@ -158,6 +187,7 @@ export default class Common {
      * @param text - the text to search
      */
     async search(text: string): Promise<void> {
+        await this.waitForPageLoad(); // When using the search bar, ensure it's interactable first
         await this.page.getByTestId(Common.DATATEST_SEARCH_ICON).click();
         await this.page.locator(Common.SELECTOR_SEARCH).fill(text);
         await this.page.getByTestId(Common.DATATEST_SEARCH_ICON).click();

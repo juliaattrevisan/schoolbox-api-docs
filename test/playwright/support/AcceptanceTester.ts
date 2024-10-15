@@ -4,6 +4,7 @@ import type { Page, Locator } from "@playwright/test";
 import { expect } from "@playwright/test";
 import LoginPage from "@schoolboxTest/playwright/support/page/LoginPage";
 import BaseTester from "@schoolboxTest/playwright/support/BaseTester";
+import Common from "@schoolboxTest/playwright/support/page/Common";
 
 /**
  * AcceptanceTester class to provide common functionality for acceptance tests
@@ -15,9 +16,14 @@ import BaseTester from "@schoolboxTest/playwright/support/BaseTester";
 export default class AcceptanceTester extends BaseTester {
     private page: Page;
 
+    public common: Common;
+
     constructor(page: Page) {
         super(); // Call the constructor of the BaseTester class
         this.page = page;
+
+        // Provide common via tester for easy access
+        this.common = new Common(page);
     }
 
     /**

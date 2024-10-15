@@ -3,7 +3,6 @@
  */
 import { test, expect } from "@schoolboxTest/playwright/support/integrations";
 import LearningMomentsPage from "@schoolboxTest/playwright/support/page/learningMoments/LearningMomentsPage";
-import Common from "@schoolboxTest/playwright/support/page/Common";
 
 test.describe("Learning Moment Photo Tests", () => {
     /**
@@ -47,7 +46,6 @@ test.describe("Learning Moment Photo Tests", () => {
     });
 
     test("Learning Moment Comments", async ({ tester, page }) => {
-        const common = new Common(page);
         const learningMomentsPage = new LearningMomentsPage(tester, page);
         await page.goto(LearningMomentsPage.getStudentProfilePage(6));
 
@@ -63,7 +61,7 @@ test.describe("Learning Moment Photo Tests", () => {
 
         tester.isGoingTo("check the learning moment is presented in the student activity feed and comment it");
         await learningMomentsPage.verifyEvidence("This is a learning moments test to be commented");
-        await common.clickAddComment();
+        await tester.common.clickAddComment();
         await learningMomentsPage.typeComment();
         await learningMomentsPage.clickPostComment();
 
@@ -110,7 +108,6 @@ test.describe("Learning Moment Photo Tests", () => {
     });
 
     test("Learning Moment Delete Comment", async ({ tester, page }) => {
-        const common = new Common(page);
         const learningMomentsPage = new LearningMomentsPage(tester, page);
         await page.goto(LearningMomentsPage.getStudentProfilePage(60));
 
@@ -128,7 +125,7 @@ test.describe("Learning Moment Photo Tests", () => {
 
         tester.isGoingTo("check the learning moment is presented in the student activity feed and adding a comment");
         await learningMomentsPage.verifyEvidence("This is a learning moments test to get comments deleted");
-        await common.clickAddComment();
+        await tester.common.clickAddComment();
         await learningMomentsPage.typeComment();
         await learningMomentsPage.clickPostComment();
 
@@ -169,7 +166,6 @@ test.describe("Learning Moment Photo Tests", () => {
         await learningMomentsPage.clickDropdownMenu(evidenceId);
         await learningMomentsPage.clickLearningMomentDeleteButton(evidenceId);
         await learningMomentsPage.clickLearningMomentConfirmDeleteButton();
-        await page.waitForTimeout(2000);
 
         tester.isGoingTo("check the text is no longer presented ");
         await learningMomentsPage.verifyEvidenceNotPresent("This is a learning moment test to get deleted");

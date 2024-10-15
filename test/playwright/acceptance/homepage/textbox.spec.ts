@@ -11,7 +11,6 @@ import ManageAllTextbox from "@schoolboxTest/playwright/support/page/homepage/Ma
 import Homepage from "@schoolboxTest/playwright/support/page/homepage/Homepage";
 import Resources from "@schoolboxTest/playwright/support/page/resources/Resources";
 import TextboxForm from "@schoolboxTest/playwright/support/page/homepage/TextboxForm";
-import Common from "@schoolboxTest/playwright/support/page/Common";
 import SearchPage from "@schoolboxTest/playwright/support/page/search/SearchPage";
 
 test.describe("Textbox Tests", () => {
@@ -127,7 +126,6 @@ test.describe("Textbox Tests", () => {
 
     test("textbox visibility", async ({ tester, page, db }) => {
         const folderName = "Test TextBox Homepage";
-        const common = new Common(page);
         const manageAll = new ManageAllTextbox(tester, page);
         const searchPage = new SearchPage(page);
         const homepage = new Homepage(page);
@@ -135,7 +133,7 @@ test.describe("Textbox Tests", () => {
 
         tester.isGoingTo("As Jack Coles search for a  textbox and ensure it is presented in the search results grid");
         await tester.impersonate("Jack Coles");
-        await common.search("Jana Reed");
+        await tester.common.search("Jana Reed");
         await searchPage.clearFilters();
         await searchPage.clickFilterType("textbox");
         await searchPage.clickApplyFilters();
@@ -156,9 +154,9 @@ test.describe("Textbox Tests", () => {
             "As Jana Reed search for a  textbox and check whether it is presented in the search results grid or not",
         );
         await tester.impersonate("Jana Reed");
-        await common.search("'Jana Reed'");
+        await tester.common.search("'Jana Reed'");
         await searchPage.clearFilters();
-        await common.clickSearchTypeCheckbox("textbox");
+        await tester.common.clickSearchTypeCheckbox("textbox");
         await searchPage.clickApplyFilters();
         await page.waitForSelector("#search-page-container");
         await expect(page.locator('div[class="l-flex-col l-gap-m"]')).not.toContainText("Jana Reed");
@@ -204,9 +202,9 @@ test.describe("Textbox Tests", () => {
 
         tester.isGoingTo("As Jana Reed search for textboxes and check whether its is presented or not");
         await tester.impersonate("Jana Reed");
-        await common.search("Jamal");
+        await tester.common.search("Jamal");
         await searchPage.clearFilters();
-        await common.clickSearchTypeCheckbox("textbox");
+        await tester.common.clickSearchTypeCheckbox("textbox");
         await searchPage.clickApplyFilters();
         await expect(page.locator('div[class="l-flex-col l-gap-m"]')).toContainText("Jamal to be presented");
         await searchPage.inputKeyword("Jana");
