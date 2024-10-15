@@ -1,6 +1,6 @@
 import AcceptanceTester from "@schoolboxTest/playwright/support/AcceptanceTester";
 import { Page, expect } from "@playwright/test";
-import { A } from "@fullcalendar/resource/internal-common";
+import path from "path";
 
 export default class Form {
     private tester: AcceptanceTester;
@@ -21,7 +21,11 @@ export default class Form {
 
     static readonly ARTICLE_HEADLINE = "title";
 
-    static readonly ARTICLE_BODY = "body";
+    static readonly DATA_TEST_ARTICLE_BODY = "news-article-form-body";
+
+    static readonly DATA_TEST_ARTICLE_BLURB = "news-article-form-blurb";
+
+    private filePath?: string;
 
     constructor(tester: AcceptanceTester, page: Page) {
         this.tester = tester;
@@ -63,8 +67,10 @@ export default class Form {
      * fill article
      * @param article - The article to fill
      */
-    async fillArticle(article: string): Promise<void> {
-        await this.page.fill(Form.ARTICLE_BODY, article);
+
+    async fillArticle(articleBody: string): Promise<void> {
+        const body = this.page.getByTestId(Form.DATA_TEST_ARTICLE_BODY);
+        await this.tester.fillCKEditorByLocator(body, articleBody);
     }
 
     /**
@@ -72,16 +78,17 @@ export default class Form {
      * @param headline - The article to see
      */
     async seeArticle(headline: string): Promise<void> {
-        await expect(this.page.locator(Form.ARTICLE_BODY)).toHaveText(headline);
+        await expect(this.page.locator(Form.DATA_TEST_ARTICLE_BODY)).toHaveText(headline);
     }
 
     /**
      * fill blurb
-     * @param blurb - The blurb to fill
+     * @param blurbBody - The blurb to fill
      */
-    async fillBlurb(blurb: string): Promise<void> {
+    async fillBlurb(blurbBody: string): Promise<void> {
         await this.page.locator("legend.icon-down-arrow").click();
-        await this.page.fill("blurb", blurb);
+        const blurb = this.page.getByTestId(Form.DATA_TEST_ARTICLE_BLURB);
+        await this.tester.fillCKEditorByLocator(blurb, blurbBody);
     }
 
     /**
@@ -95,10 +102,20 @@ export default class Form {
 
     /**
      * fill feature image
-     * @param filename - The filename to fill
+     * @param filePath - The filename to fill
      */
-    async fillFeatureImage(filename: string): Promise<void> {
-        await this.page.setInputFiles("#featureImage-zone", filename);
+    async attachFeatureImage(filePath: string): Promise<void> {
+        // await this.page.setInputFiles("#featureImage-zone", filename);
+
+        const attachZone = this.page.locator(`div[id="FeatureImageZone"]`);
+        await this.tester.dragAndDropFile(attachZone, filePath);
+        this.filePath = filePath;
+    }
+
+    async setAttachment(filePath: string): Promise<void> {
+        const attachZone = this.page.locator("#FileZone");
+        await this.tester.dragAndDropFile(attachZone, filePath);
+        this.filePath = filePath;
     }
 
     /**
@@ -131,12 +148,16 @@ export default class Form {
      * select audience option
      * @param audienceBrick - The audience brick
      * @param audienceType - The audience type
-     * @param checkboxOption - The checkbox option
      */
-    async selectAudienceOption(audienceBrick: string, audienceType: string, checkboxOption: string[]): Promise<void> {
+    async selectAudienceOption(audienceBrick: string, audienceType: string): Promise<void> {
         await this.page.locator("button.button.icon-drag-drop").click();
-        await expect(this.page.locator("div.item")).toHaveText(topic);
-
+        await expect(this.page.locator('div[class="reveal-modal no-pad open"]')).toBeVisible();
+        await this.page.locator(`button.button-block:has-text("${audienceBrick}")`).click();
+        await expect(this.page.locator('label[for="audience-list-input-IjEi"]')).toBeVisible();
+        await this.page.locator(`label[for="audience-list-input-IjEi"]:has-text("${audienceType}")`).click();
+        await this.page.locator("button.button.submit").first().click();
+        await this.page.waitForTimeout(2000);
+    }
 }
 
 /**
