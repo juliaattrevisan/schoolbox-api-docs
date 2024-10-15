@@ -18,7 +18,7 @@ const SELECTOR_HOMEPAGE_ACTIONS_FOLDER_MANAGEGROUP = "homepage-actions-folder-ma
 
 const SELECTOR_COMPONENT_DUEWORK_CREATE_BUTTON = "component-dueWork-create-button";
 const SELECTOR_COMPONENT_DUEWORK_EMPTY_CREATE_BUTTON = "component-dueWork-empty-create-button";
-const SELECTOR_COMPONENT_DUEWORK_POPOUT_BUTTON = "sbx-pop-out-duework-options"; // Append "[assessmentID]"
+const SELECTOR_COMPONENT_DUEWORK_POPOUT_BUTTON = "sbx-pop-out-duework-options"; // Append "[assessmentID]-button"
 const SELECTOR_COMPONENT_ASSESSMENT_TITLE = "component-assessment-title"; // Append "-[assessmentID]"
 const SELECTOR_COMPONENT_ASSESSMENT_ACTIONS_DELETE = "component-assessment-actions-delete"; // Append "-[assessmentID]"
 const SELECTOR_COMPONENT_ASSESSMENT_ACTIONS_VIEWSTATUS = "component-assessment-actions-viewStatus"; // Append "-[assessmentID]"
@@ -29,7 +29,7 @@ const SELECTOR_MANAGEGROUP_SEARCH_RESULT = "manage-group-search-result"; // Appe
 const SELECTOR_MANAGEGROUP_ADD_MEMBERS_SUBMIT = "manage-group-add-members-submit";
 const SELECTOR_MANAGEGROUP_CURRENT_MEMBERS = "manage-group-current-members";
 
-const SELECTOR_ASSESSMENT_STATUS_FEEDBACK_POPOUT_BUTTON = "sbx-pop-out-feedback-options"; // Append "-[userId]"
+const SELECTOR_ASSESSMENT_STATUS_FEEDBACK_POPOUT_BUTTON = "sbx-pop-out-feedback-options"; // Append "-[userId]-button"
 const SELECTOR_ASSESSMENT_STATUS_FEEDBACK_VIEWSUBMISSION = "assessment-status-feedback-viewSubmission"; // Append "-[userId]"
 const SELECTOR_ASSESSMENT_STATUS_META_TITLE = "assessment-status-meta-title";
 const SELECTOR_ASSESSMENT_SUMMARY_CREATE_BUTTON = "assessment-summary-create-button";
@@ -190,7 +190,7 @@ test.describe("Initial Due Work functionality tests", () => {
         const assessment2ID = currentURL.split("/").slice(-2, -1)[0];
 
         await page.goto(homepageUrl);
-        await page.getByTestId(`${SELECTOR_COMPONENT_DUEWORK_POPOUT_BUTTON}${assessment2ID}`).click();
+        await page.getByTestId(`${SELECTOR_COMPONENT_DUEWORK_POPOUT_BUTTON}${assessment2ID}-button`).click();
         await page.getByTestId(`${SELECTOR_COMPONENT_ASSESSMENT_ACTIONS_DELETE}-${assessment2ID}`).click();
         await page.getByTestId(SELECTOR_CONFIRM_DIALOG_BUTTON_CONFIRM).click();
     });
@@ -251,13 +251,11 @@ test.describe("Initial Due Work functionality tests", () => {
 
         tester.isGoingTo("select 'View Status' of the 'Test Due Work' assessment");
         await page.goto(homepageUrl);
-        await page.waitForTimeout(2000);
-        await page.getByTestId(`${SELECTOR_COMPONENT_DUEWORK_POPOUT_BUTTON}${assessmentID}`).click();
+        await page.getByTestId(`${SELECTOR_COMPONENT_DUEWORK_POPOUT_BUTTON}${assessmentID}-button`).click();
         await page.getByTestId(`${SELECTOR_COMPONENT_ASSESSMENT_ACTIONS_VIEWSTATUS}-${assessmentID}`).click();
-        await page.waitForTimeout(2000);
 
         tester.isGoingTo(`navigate to the due work status page for ${student}`);
-        await page.getByTestId(`${SELECTOR_ASSESSMENT_STATUS_FEEDBACK_POPOUT_BUTTON}-${studentId}`).click();
+        await page.getByTestId(`${SELECTOR_ASSESSMENT_STATUS_FEEDBACK_POPOUT_BUTTON}-${studentId}-button`).click();
         await page.getByTestId(`${SELECTOR_ASSESSMENT_STATUS_FEEDBACK_VIEWSUBMISSION}-${studentId}`).click();
         await expect(page.getByTestId(SELECTOR_ASSESSMENT_RESPONSE_META_TITLE)).toHaveText("Grading Test Due Work");
     });
@@ -282,12 +280,11 @@ test.describe("Initial Due Work functionality tests", () => {
 
         tester.isGoingTo("navigate to the due work status page for Eden Reed");
         await page.goto(homepageUrl);
-        await page.waitForTimeout(3000);
-        await page.getByTestId(`${SELECTOR_COMPONENT_DUEWORK_POPOUT_BUTTON}${assessmentID}`).click();
+        await page.getByTestId(`${SELECTOR_COMPONENT_DUEWORK_POPOUT_BUTTON}${assessmentID}-button`).click();
         await page.getByTestId(`${SELECTOR_COMPONENT_ASSESSMENT_ACTIONS_VIEWSTATUS}-${assessmentID}`).click();
 
         tester.isGoingTo(`navigate to the due work status page for ${student}`);
-        await page.getByTestId(`${SELECTOR_ASSESSMENT_STATUS_FEEDBACK_POPOUT_BUTTON}-${studentId}`).click();
+        await page.getByTestId(`${SELECTOR_ASSESSMENT_STATUS_FEEDBACK_POPOUT_BUTTON}-${studentId}-button`).click();
         await page.getByTestId(`${SELECTOR_ASSESSMENT_STATUS_FEEDBACK_VIEWSUBMISSION}-${studentId}`).click();
         await expect(page.getByTestId(SELECTOR_ASSESSMENT_RESPONSE_META_TITLE)).toHaveText("Grading Test Due Work");
 

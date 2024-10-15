@@ -34,8 +34,6 @@ export default class Homepage {
 
     static readonly ELEMENT_EDIT_COLUMNS_TAB = "#tabs-2";
 
-    static readonly DATATEST_LINK_MENU = "sbx-pop-out-tab-control";
-
     static readonly DATATEST_LINK_MENU_BUTTON = "sbx-pop-out-tab-control-button";
 
     static readonly ELEMENT_COMPONENT_LAYOUT = "#component-layout";

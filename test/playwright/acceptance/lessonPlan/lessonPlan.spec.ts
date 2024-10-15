@@ -89,8 +89,8 @@ async function createLessonPlanTemplate(
     await page.waitForLoadState("domcontentloaded");
     await resources.clickMenuItem("home");
     await page.waitForLoadState("domcontentloaded");
-    tester.isGoingTo("Add Jacl Coles into the group via the manage group page");
-    await page.getByTestId("sbx-pop-out-tab-control").click(); // clicking the homepage 3-dot menu
+    tester.isGoingTo("Add Jack Coles into the group via the manage group page");
+    await page.getByTestId("sbx-pop-out-tab-control-button").click(); // clicking the homepage 3-dot menu
     await page.getByTestId("homepage-actions-folder-manageGroup").click(); // clicking Manage group option
     await page.waitForLoadState("domcontentloaded");
     await manageGroup.search(teacher);
