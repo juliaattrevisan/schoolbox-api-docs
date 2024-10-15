@@ -1,5 +1,6 @@
 import AcceptanceTester from "@schoolboxTest/playwright/support/AcceptanceTester";
 import { Page, expect } from "@playwright/test";
+import { A } from "@fullcalendar/resource/internal-common";
 
 export default class Form {
     private tester: AcceptanceTester;
@@ -8,15 +9,19 @@ export default class Form {
 
     static readonly URL = "/news/create";
 
-    static readonly ARTICLE_TITLE = 'input[name="title"]';
+    static readonly ARTICLE_TITLE_CKEDITOR = 'input[name="title"]';
 
-    static readonly ARTICLE_BODY = 'textarea[name="body"]';
+    static readonly ARTICLE_BODY_CKEDITOR = 'textarea[name="body"]';
 
     static readonly LINK_ADD_NEWS = ".icon-add";
 
     static readonly FORM = "#newsForm";
 
     static readonly FORM_SAVE = "#news-submit";
+
+    static readonly ARTICLE_HEADLINE = "title";
+
+    static readonly ARTICLE_BODY = "body";
 
     constructor(tester: AcceptanceTester, page: Page) {
         this.tester = tester;
@@ -43,7 +48,7 @@ export default class Form {
      * @param headline - The headline to fill
      */
     async fillHeadline(headline: string): Promise<void> {
-        await this.page.fill(Form.ARTICLE_TITLE, headline);
+        await this.page.fill(Form.ARTICLE_TITLE_CKEDITOR, headline);
     }
 
     /**
@@ -51,7 +56,7 @@ export default class Form {
      * @param headline - The headline to see
      */
     async seeHeadline(headline: string): Promise<void> {
-        await expect(this.page.locator(Form.ARTICLE_TITLE)).toHaveText(headline);
+        await expect(this.page.locator(Form.ARTICLE_HEADLINE)).toHaveText(headline);
     }
 
     /**
@@ -61,6 +66,77 @@ export default class Form {
     async fillArticle(article: string): Promise<void> {
         await this.page.fill(Form.ARTICLE_BODY, article);
     }
+
+    /**
+     * see article
+     * @param headline - The article to see
+     */
+    async seeArticle(headline: string): Promise<void> {
+        await expect(this.page.locator(Form.ARTICLE_BODY)).toHaveText(headline);
+    }
+
+    /**
+     * fill blurb
+     * @param blurb - The blurb to fill
+     */
+    async fillBlurb(blurb: string): Promise<void> {
+        await this.page.locator("legend.icon-down-arrow").click();
+        await this.page.fill("blurb", blurb);
+    }
+
+    /**
+     * see blurb
+     * @param blurb - The blurb to see
+     */
+    async seeBlurb(blurb: string): Promise<void> {
+        await this.page.locator("legend.icon-down-arrow").click();
+        await expect(this.page.locator("blurb")).toHaveText(blurb);
+    }
+
+    /**
+     * fill feature image
+     * @param filename - The filename to fill
+     */
+    async fillFeatureImage(filename: string): Promise<void> {
+        await this.page.setInputFiles("#featureImage-zone", filename);
+    }
+
+    /**
+     * see feature image
+     * @param filename - The filename to see
+     */
+    async seeFeatureImage(filename: string): Promise<void> {
+        await expect(this.page.locator("#featureImage-zone")).toHaveValue(filename);
+    }
+
+    /**
+     * fill topic
+     * @param topic - The topic to fill
+     */
+    async fillTopic(topic: string): Promise<void> {
+        await this.page.locator("input#news-topics-selectized").click();
+        await this.page.locator(`div.option:has-text("${topic}")`).click();
+        // await this.page.locator("div.option").click();
+    }
+
+    /**
+     * see topic
+     * @param topic - The topic to see
+     */
+    async seeTopic(topic: string): Promise<void> {
+        await expect(this.page.locator("div.item")).toHaveText(topic);
+    }
+
+    /**
+     * select audience option
+     * @param audienceBrick - The audience brick
+     * @param audienceType - The audience type
+     * @param checkboxOption - The checkbox option
+     */
+    async selectAudienceOption(audienceBrick: string, audienceType: string, checkboxOption: string[]): Promise<void> {
+        await this.page.locator("button.button.icon-drag-drop").click();
+        await expect(this.page.locator("div.item")).toHaveText(topic);
+
 }
 
 /**
