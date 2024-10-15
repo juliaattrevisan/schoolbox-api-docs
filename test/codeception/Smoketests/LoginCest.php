@@ -96,11 +96,6 @@ class LoginCest
         $user     = 'alaress';
         $password = 'alaress';
 
-        /** @var \Codeception\Module\Db $db */
-        $db = $i->grabDBModule();
-        $db->haveInDatabase('mobile_app', ['id' => 1, 'app_identifier' => 'auto_test', 'provider' => 'GCM', 'key' => 'anAutoTestKey', 'cert_hash' => null]);
-        printf("app_identifier set: " . $db->grabFromDatabase('mobile_app', 'app_identifier', ['id' => '1']));
-
         #WHEN
         $loginPayload = new Payload\Authentication\ApiLogin();
         $loginPayload->setUsername($user);
@@ -124,11 +119,6 @@ class LoginCest
         $user     = 'alaress';
         $password = 'alar99';
 
-        /** @var \Codeception\Module\Db $db */
-        $db = $i->grabDBModule();
-        $db->haveInDatabase('mobile_app', ['id' => 1, 'app_identifier' => 'auto_test', 'provider' => 'GCM', 'key' => 'anAutoTestKey', 'cert_hash' => null]);
-        printf("app_identifier set: " . $db->grabFromDatabase('mobile_app', 'app_identifier', ['id' => '1']));
-
         #WHEN
         $loginPayload = new Payload\Authentication\ApiLogin();
         $loginPayload->setUsername($user);
@@ -146,11 +136,6 @@ class LoginCest
         $user     = 'alaress';
         $password = 'alaress';
         $page     = '/course/list';
-
-        /** @var \Codeception\Module\Db $db */
-        $db = $i->grabDBModule();
-        $db->haveInDatabase('mobile_app', ['id' => 1, 'app_identifier' => 'auto_test', 'provider' => 'GCM', 'key' => 'anAutoTestKey', 'cert_hash' => null]);
-        printf("app_identifier set: " . $db->grabFromDatabase('mobile_app', 'app_identifier', ['id' => '1']));
 
         #WHEN
         $loginPayload = new Payload\Authentication\ApiLogin();
