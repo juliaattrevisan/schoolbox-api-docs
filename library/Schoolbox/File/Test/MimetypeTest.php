@@ -15,18 +15,17 @@ use Schoolbox\Resource\Attachment\Zone;
 
 /**
  * Test for mimetype methods.
- * @covers \Schoolbox\File\Mimetype
  */
+#[\PHPUnit\Framework\Attributes\CoversClass(\Schoolbox\File\Mimetype::class)]
 class MimetypeTest extends TestCase
 {
     /**
-     * @dataProvider getTestMatchesData
-     * @covers       \Schoolbox\File\Mimetype::matches
      * @param Mimetype    $mimetype
      * @param string|null $filter
      * @param bool        $expected
      * @return void
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('getTestMatchesData')]
     public function testMatches(Mimetype $mimetype, ?string $filter, bool $expected): void
     {
         $this->assertSame($expected, $mimetype->matches($filter));
