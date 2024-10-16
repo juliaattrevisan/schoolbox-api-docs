@@ -206,6 +206,9 @@
                                                     {% for message in selectedField.value %}
                                                         {{ message|nl2br }}
                                                     {% endfor %}
+                                                {% elseif selectedField.field in ['Comment'] %}
+                                                    {# A string that displays in a flag #}
+                                                    {{ selectedField.value }}
                                                 {% elseif selectedField.field in ['ParentsSeparatedFlag'] %}
                                                     {# A special flag that has a hardcoded text string #}
                                                     Parents separated; please be mindful when making contact.
@@ -239,6 +242,10 @@
                                                 <dd class="small-8 medium-9 columns">
                                                     <a href="{{ session.mailhandle }}{{ selectedField.value.email }}">{{ selectedField.value.formatName }}</a>
                                                 </dd>
+                                            {% elseif selectedField.field in ['email'] %}
+                                                {# Renders a mailto: hyperlink #}
+                                                <dt class="small-4 medium-3 columns">{{ fieldName }}</dt>
+                                                <dd class="small-8 medium-9 columns"><a href="{{ session.mailhandle }}{{ selectedField.value }}">{{ selectedField.value }}</a></dd>
                                             {% else %}
                                                 {# A generic tuple (key, value) pair #}
                                                 <dt class="small-4 medium-3 columns">{{ fieldName }}</dt>
