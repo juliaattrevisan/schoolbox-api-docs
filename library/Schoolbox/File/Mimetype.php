@@ -12,6 +12,7 @@ namespace Schoolbox\File;
 
 use Config;
 use Schoolbox\ISoftDeletable;
+use Schoolbox\Resource\Attachment\Zone;
 
 /**
  * Class Mimetype
@@ -440,8 +441,16 @@ class Mimetype implements ISoftDeletable
             // harder comparison
             $filter = str_replace('*', '[^/]+', $filter);
 
-            //preg_quote escapes characters like "+" in the mimetype (e.g. image/svg+xml)
-            if (preg_match('/^' . preg_quote($filter, '/') . '$/', $this->getMime())) {
+            $regex = '/^' . preg_quote($filter, '/') . '$/';
+
+            /* Use the itemised equivalent of the wildcard, because stupid svg
+             * Otherwise use whatever was sent to us
+             */
+            if (\Schoolbox\Resource\Attachment\Zone::IMAGE_ALL_WILDCARD === $mimeFilter && preg_match($regex, \Schoolbox\Resource\Attachment\Zone::IMAGE_ALL)) {
+                return true;
+            }
+
+            if (preg_match($regex, $this->getMime())) {
                 return true;
             }
         }

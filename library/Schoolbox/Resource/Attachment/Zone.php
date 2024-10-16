@@ -28,6 +28,14 @@ use UnexpectedValueException;
  */
 class Zone
 {
+    /**
+     * The programmatic equivalent of "image/*", which we need to bust down into a combination
+     *  of mime types and file extensions
+     */
+    public const IMAGE_ALL_WILDCARD = 'image/*';
+    public const IMAGE_ALL = 'image/jpg,image/jpeg,image/pjpeg,image/gif,image/png,image/svg+xml,image/bmp,.svg,.heic,.heics,.heif';
+
+
     const TPL = 'azTpl';
 
     /** @var string */
@@ -219,7 +227,7 @@ class Zone
              * .svg files have an image/svg+xml mimetype (not image/svg)
              * .jpg files have the variant .jpeg and .pjpeg (progressive jpeg)
              */
-            $filter = 'image/jpg,image/jpeg,image/pjpeg,image/gif,image/png,image/svg+xml,image/bmp,.svg,.heic,.heics,.heif';
+            $filter = self::IMAGE_ALL;
         }
         $this->mimeFilter = $filter;
         return $this;

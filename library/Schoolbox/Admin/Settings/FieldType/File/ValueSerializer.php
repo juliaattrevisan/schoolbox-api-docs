@@ -38,8 +38,16 @@ class ValueSerializer implements IFieldValueSerializer
         try {
             $result   = $this->collectorFactory->build([$value])->getFirst();
 
-            // Validate the mime type
-            if ($result->getMimeType()->matches($options['mimeFilter'])) {
+            $mimeFilter = $options['mimeFilter'];
+
+            /* Use the itemised equivalent of the wildcard, because stupid svg
+             * Otherwise use whatever was sent to us
+             */
+            if (\Schoolbox\Resource\Attachment\Zone::IMAGE_ALL_WILDCARD === $options['mimeFilter']) {
+                $mimeFilter = \Schoolbox\Resource\Attachment\Zone::IMAGE_ALL;
+            }
+
+            if ($result->getMimeType()->matches($mimeFilter)) {
                 $newValue = $result->getHash();
             }
         } catch (\Schoolbox\Resource\Exception $e) {
