@@ -196,6 +196,14 @@
                                 {% set inDefinitionList = false %}
 
                                 {% for selectedField in externalUser.data.roleTypes.fields.selected[1:] %}
+                                    {# TODO Decide if the viewer can actually see this field, due to additional
+                                     #  permissions, privacy and configuration settings that go well beyond
+                                     #  the viewer's role type; if you can see it, show it. Otherwise skip it.
+                                     #}
+
+                                    {# TODO Build a hash lookup of additional clauses and cross-reference them here
+                                     #}
+
                                     {# Use localisation variant from Terminology, if it exists;
                                      # otherwise use default Display As that I provided by default
                                      #}
