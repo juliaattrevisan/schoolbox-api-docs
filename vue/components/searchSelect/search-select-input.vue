@@ -6,6 +6,7 @@
 import { onClickOutside, useFocus } from "@vueuse/core";
 
 interface Props {
+    labelId: string; // the label id
     parentEl: HTMLDivElement | null; // the parent element to close the search results
     placeholder: string; // the placeholder text
 }
@@ -47,6 +48,7 @@ window.Vue.watch(focused, ($focused) => {
 
 <template>
     <input
+        :id="props.labelId"
         v-model="query"
         type="text"
         class="search-input f-no-margins"

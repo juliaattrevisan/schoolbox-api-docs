@@ -10,6 +10,7 @@ import SearchSelectInput from "./search-select-input.vue";
 import SearchSelectResults from "./search-select-results.vue";
 
 interface Props {
+    labelId: string; // the label id
     endpoint: string; // the search api endpoint
     selectedItems: Result[]; // the selected searchResults
     defaultResults?: Result[]; // show selection options when the search input is empty
@@ -80,7 +81,12 @@ function onInput($query: string): void {
             :is-single-select="props.isSingleSelect"
             @remove="onRemove"
         />
-        <search-select-input :parent-el="searchSelectEl" :placeholder="props.placeholder" @input="onInput" />
+        <search-select-input
+            :label-id="props.labelId"
+            :parent-el="searchSelectEl"
+            :placeholder="props.placeholder"
+            @input="onInput"
+        />
         <search-select-results
             :query="query"
             :is-active="isActive"

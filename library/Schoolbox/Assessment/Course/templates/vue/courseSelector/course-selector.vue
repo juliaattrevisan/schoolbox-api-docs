@@ -34,7 +34,9 @@ function onRemove(results: Result[]): void {
 </script>
 
 <template>
+    <label for="courses">Select Courses</label>
     <search-select
+        label-id="courses"
         :endpoint="props.endpoint"
         :selected-items="selected"
         placeholder="Search for courses..."
