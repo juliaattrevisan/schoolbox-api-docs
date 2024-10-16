@@ -9,7 +9,9 @@
     <meta http-equiv="Content-Language" content="en-au" />
     <meta name="author" content="Schoolbox Pty Ltd"/>
     {% if not config.web_crawlers_enabled %}<meta name="robots" content="noindex">{% endif %}
-    <link rel="manifest" href="/manifest">
+    {% if config.pwa_enable %}
+        <link rel="manifest" href="/manifest">
+    {% endif %}
     <meta itemprop="user.externalId" content="{{ user.current.externalId }}" />
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
