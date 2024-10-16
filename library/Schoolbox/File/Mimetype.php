@@ -438,9 +438,11 @@ class Mimetype implements ISoftDeletable
                 return true;
             }
 
+            $mime = $this->getMime() ?? '';
+
             // wildcard subtype match (e.g. image/* against any image mimetype)
             if (preg_match('`^(?P<type>.*?/)\\*$`', $filter, $matches)) {
-                if (str_starts_with($this->getMime() ?? '', $matches['type'])) {
+                if (str_starts_with($mime, $matches['type'])) {
                     return true;
                 }
             }
@@ -460,7 +462,7 @@ class Mimetype implements ISoftDeletable
                 return true;
             }
 
-            if (preg_match($regex, $this->getMime())) {
+            if (preg_match($regex, $mime)) {
                 return true;
             }
         }
