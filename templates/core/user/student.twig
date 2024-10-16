@@ -87,7 +87,6 @@
         })
     });
 
-
     // Enable Expandables
     $(function () {
         $('[data-collapser]').collapsable();
@@ -108,15 +107,6 @@
         {% endif %}
     </nav>
 </div>
-
-{# @zacmcw I don't know where you put styles anymore
- # Migrate this inline stylesheet into the appropriate place
- #}
-<style>
-    .profile.content .alert-box {
-        margin-left: 0;
-    }
-</style>
 
 <div class="row">
     <div class="small-12 island">
@@ -189,6 +179,15 @@
 {#                        {% endblock synergeticComments %}#}
 
                         {% block details %}
+
+                            {# TODO @zacmcw I don't know where you put styles anymore
+                             #  Migrate this inline stylesheet into the appropriate place
+                             #}
+                            <style>
+                                .profile.content .alert-box {
+                                    margin-left: 0;
+                                }
+                            </style>
                             <dl>
                                 {# Portrait is always element 0 at the moment: we can skip iterating
                                  # that array element here, because it's rendered elsewhere.
