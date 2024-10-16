@@ -74,7 +74,7 @@
     {% if config.messaging_enabled %}
         {% set installGoogle = config.digistorm_google_play_store_link ?? '' %}
         {% set installApple = config.digistorm_apple_app_store_link ?? '' %}
-        {% if config.pwa_enable or installGoogle is not empty or installApple is not empty %}
+        {% if config.pwa_enable or config.push_notifications_enabled or installGoogle is not empty or installApple is not empty %}
         <div class="small-12 columns">
             <div class="row actions-small-1">
                 <div class="list-item">
