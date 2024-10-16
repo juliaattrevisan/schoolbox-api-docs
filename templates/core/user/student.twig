@@ -187,73 +187,65 @@
                                 {% set inDefinitionList = false %}
 
                                 {% for selectedField in externalUser.data.roleTypes.fields.selected[1:] %}
+                                    {# Use localisation variant from Terminology, if it exists;
+                                     # otherwise use default Display As that I provided by default
+                                     #}
+                                    {% set fieldName = selectedField.displayAs %}
+
+                                    {% if selectedField.terminology %}
+                                        {% set fieldName = locale.translate(selectedField.terminology, false, true) %}
+                                    {% endif %}
+
+                                    {# Now render each of the flags/tuples in some manner #}
+
                                     {% if selectedField.icon and selectedField.css %}
-                                        {# A flag
-                                         #
-                                         # Use localisation variant from Terminology, if it exists;
-                                         # otherwise use default Display As that I provided by default
-                                         #
-                                         # Flags always display fullwidth and I can cheat by rendering
-                                         # a full-width definition title without a definition data lol
-                                         #}
                                         <dt class="full-width">
                                             <div class="alert-box {{ selectedField.css ?? '' }} {{ selectedField.icon ?? '' }}">
-                                                {% if selectedField.terminology %}
-                                                    {{ locale.translate(selectedField.terminology, false, true) }}
+                                                {# A set of Alert Messages that display in one big flag #}
+                                                {% if selectedField.field in ['AlertMessages'] %}
+                                                    {% for message in selectedField.value %}
+                                                        {{ message|nl2br }}
+                                                    {% endfor %}
+                                                {% elseif selectedField.field in ['ParentsSeparatedFlag'] %}
+                                                    {# A special flag that has a hardcoded text string #}
+                                                    Parents separated; please be mindful when making contact.
                                                 {% else %}
-                                                    {{ selectedField.displayAs }}
+                                                    {# A generic flag
+                                                     #
+                                                     # Flags always display fullwidth and I can cheat by rendering
+                                                     # a full-width definition title without a definition data lol
+                                                     #}
+                                                    {{ fieldName }}
                                                 {% endif %}
                                             </div>
                                         </dt>
                                     {% else %}
                                         {# Only render a tuple if it has a meaningful value #}
                                         {% if selectedField.value %}
-{#                                            {{ selectedField }}#}
+                                            {# Some fields require special handling #}
+                                            {% if selectedField.field in ['campusCollection'] %}
+                                                 {# A list of campuses #}
+                                                {% if selectedField.value|length %}
+                                                    <dt class="small-4 medium-3 columns">{{ fieldName }}</dt>
+                                                    <dd class="small-8 medium-9 columns">
+                                                        {% for campus in selectedField.value %}
+                                                            {{ campus.name }}{% if not loop.last %}, {% endif %}
+                                                        {% endfor %}
+                                                    </dd>
+                                                {% endif %}
+                                            {% elseif selectedField.field in ['formTeacher', 'tutorTeacher', 'hohTeacher', 'coordTeacher', 'studentCoach'] %}
+                                                {# These fields are Schoolbox\User instances and need special treatment #}
+                                                <dt class="small-4 medium-3 columns">{{ fieldName }}</dt>
+                                                <dd class="small-8 medium-9 columns">
+                                                    <a href="{{ session.mailhandle }}{{ selectedField.value.email }}">{{ selectedField.value.formatName }}</a>
+                                                </dd>
+                                            {% else %}
+                                                {# A generic tuple (key, value) pair #}
+                                                <dt class="small-4 medium-3 columns">{{ fieldName }}</dt>
+                                                <dd class="small-8 medium-9 columns">{{ selectedField.value }}</dd>
+                                            {% endif %}
                                         {% endif %}
                                     {% endif %}
-{#                                    {% endif %}#}
-{#                                    <dt class="small-4 medium-3 columns">#}
-{#                                        {% if selectedField.terminology %}#}
-{#                                            {{ locale.translate(selectedField.terminology, false, true) }}#}
-{#                                        {% else %}#}
-{#                                            {{ selectedField.displayAs }}#}
-{#                                        {% endif %}#}
-{#                                    </dt>#}
-
-{#                                    {% if selectedField.field in ['formTeacher', 'tutorTeacher', 'hohTeacher', 'coordTeacher', 'studentCoach'] %}#}
-{#                                        #}{# These fields are Schoolbox\User instances and need special treatment #}
-{#                                        <dd class="small-8 medium-9 columns">#}
-{#                                            <a href="{{ session.mailhandle }}{{ selectedField.value.email }}">{{ selectedField.value.formatName }}</a>#}
-{#                                        </dd>#}
-{#                                    {% elseif selectedField.field in ['AlertMessages'] %}#}
-{#                                        #}{# An array of data #}
-{#                                        <dd>#}
-{#                                            <div class="alert-box {{ selectedField.css ?? '' }} {{ selectedField.icon ?? '' }}">#}
-{#                                                {% for message in selectedField.value %}#}
-{#                                                    {{ message|nl2br }}#}
-{#                                                {% endfor %}#}
-{#                                            </div>#}
-{#                                        </dd>#}
-{#                                    {% elseif selectedField.field in ['ParentsSeparatedFlag'] %}#}
-{#                                        #}{# A special flag that has a hardcoded text string #}
-{#                                        <dd class="small-8 medium-9 columns">#}
-{#                                            <div class="alert-box {{ selectedField.css ?? '' }} {{ selectedField.icon ?? '' }}">#}
-{#                                                Parents separated; please be mindful when making contact.#}
-{#                                            </div>#}
-{#                                        </dd>#}
-
-{#                                        </dd>#}
-{#                                    {% elseif selectedField.field in ['campusCollection'] %}#}
-{#                                        #}{# A list of campuses #}
-{#                                        <dd>#}
-{#                                            {% for campus in selectedField.value %}#}
-{#                                                {{ campus.name }}{% if not loop.last %}, {% endif %}#}
-{#                                            {% endfor %}#}
-{#                                        </dd>#}
-{#                                    {% else %}#}
-{#                                        <dd class="small-8 medium-9 columns">{{ selectedField.value }}</dd>#}
-{#                                    {% endif %}#}
-
                                 {% endfor %}
 
 {#                                {% if showTitle %}#}
