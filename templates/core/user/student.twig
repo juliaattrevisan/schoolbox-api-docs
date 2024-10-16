@@ -246,6 +246,10 @@
                                                 {# Renders a mailto: hyperlink #}
                                                 <dt class="small-4 medium-3 columns">{{ fieldName }}</dt>
                                                 <dd class="small-8 medium-9 columns"><a href="{{ session.mailhandle }}{{ selectedField.value }}">{{ selectedField.value }}</a></dd>
+                                            {% elseif selectedField.field in ['StudentBirthDate'] %}
+                                                {# Renders with date formatting #}
+                                                <dt class="small-4 medium-3 columns">{{ fieldName }}</dt>
+                                                <dd class="small-8 medium-9 columns">{{ selectedField.value|date(dateFormats.shortDateOnlyFormat) }}</dd>
                                             {% else %}
                                                 {# A generic tuple (key, value) pair #}
                                                 <dt class="small-4 medium-3 columns">{{ fieldName }}</dt>
@@ -254,13 +258,6 @@
                                         {% endif %}
                                     {% endif %}
                                 {% endfor %}
-
-{#                                {% if showTitle %}#}
-{#                                    <dt class="small-4 medium-3 columns">Position Title:</dt>#}
-{#                                    <dd class="small-8 medium-9 columns">#}
-{#                                        {{ user.positionTitle }}#}
-{#                                    </dd>#}
-{#                                {% endif %}#}
 
 {#                                {% if showEmail %}#}
 {#                                    {% block details_email %}#}
