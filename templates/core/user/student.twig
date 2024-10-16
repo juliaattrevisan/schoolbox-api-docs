@@ -209,27 +209,33 @@
 
                                     {% if selectedField.icon and selectedField.css %}
                                         <dt class="full-width">
-                                            <div class="alert-box {{ selectedField.css ?? '' }} {{ selectedField.icon ?? '' }}">
-                                                {# A set of Alert Messages that display in one big flag #}
-                                                {% if selectedField.field in ['AlertMessages'] %}
-                                                    {% for message in selectedField.value %}
-                                                        {{ message|nl2br }}
-                                                    {% endfor %}
-                                                {% elseif selectedField.field in ['Comment'] %}
-                                                    {# A string that displays in a flag #}
-                                                    {{ selectedField.value }}
-                                                {% elseif selectedField.field in ['ParentsSeparatedFlag'] %}
-                                                    {# A special flag that has a hardcoded text string #}
-                                                    Parents separated; please be mindful when making contact.
-                                                {% else %}
-                                                    {# A generic flag
-                                                     #
-                                                     # Flags always display fullwidth and I can cheat by rendering
-                                                     # a full-width definition title without a definition data lol
-                                                     #}
-                                                    {{ fieldName }}
+                                            {# A set of Alert Messages that display in one big flag #}
+                                            {% if selectedField.field in ['AlertMessages'] %}
+                                                {% if selectedField.value|length %}
+                                                    <div class="alert-box {{ selectedField.css ?? '' }} {{ selectedField.icon ?? '' }}">
+                                                        {% for message in selectedField.value %}
+                                                            {{ message|nl2br }}
+                                                        {% endfor %}
+                                                    </div>
                                                 {% endif %}
-                                            </div>
+                                            {% elseif selectedField.value %}
+                                                <div class="alert-box {{ selectedField.css ?? '' }} {{ selectedField.icon ?? '' }}">
+                                                    {% if selectedField.field in ['Comment'] %}
+                                                        {# A string that displays in a flag #}
+                                                        {{ selectedField.value }}
+                                                    {% elseif selectedField.field in ['ParentsSeparatedFlag'] %}
+                                                        {# A special flag that has a hardcoded text string #}
+                                                        Parents separated; please be mindful when making contact.
+                                                    {% else %}
+                                                        {# A generic flag
+                                                         #
+                                                         # Flags always display fullwidth and I can cheat by rendering
+                                                         # a full-width definition title without a definition data lol
+                                                         #}
+                                                        {{ fieldName }}
+                                                    {% endif %}
+                                                </div>
+                                            {% endif %}
                                         </dt>
                                     {% else %}
                                         {# Only render a tuple if it has a meaningful value #}
@@ -245,24 +251,26 @@
                                                         {% endfor %}
                                                     </dd>
                                                 {% endif %}
-                                            {% elseif selectedField.field in ['formTeacher', 'tutorTeacher', 'hohTeacher', 'coordTeacher', 'studentCoach'] %}
-                                                {# These fields are Schoolbox\User instances and need special treatment #}
+                                            {% else %}
+                                                {# The field name will always show at this point, though their values
+                                                 # will need special treatment (different data structures)
+                                                 #}
                                                 <dt class="small-4 medium-3 columns">{{ fieldName }}</dt>
                                                 <dd class="small-8 medium-9 columns">
-                                                    <a href="{{ session.mailhandle }}{{ selectedField.value.email }}">{{ selectedField.value.formatName }}</a>
+                                                    {% if selectedField.field in ['formTeacher', 'tutorTeacher', 'hohTeacher', 'coordTeacher', 'studentCoach'] %}
+                                                        {# These fields are Schoolbox\User instances and need special treatment #}
+                                                        <a href="{{ session.mailhandle }}{{ selectedField.value.email }}">{{ selectedField.value.formatName }}</a>
+                                                    {% elseif selectedField.field in ['email'] %}
+                                                        {# Renders a mailto: hyperlink #}
+                                                        <a href="{{ session.mailhandle }}{{ selectedField.value }}">{{ selectedField.value }}</a>
+                                                    {% elseif selectedField.field in ['StudentBirthDate'] %}
+                                                        {# Renders with date formatting #}
+                                                        {{ selectedField.value|date(dateFormats.shortDateOnlyFormat) }}
+                                                    {% else %}
+                                                        {# A generic tuple (key, value) pair #}
+                                                        {{ selectedField.value }}
+                                                    {% endif %}
                                                 </dd>
-                                            {% elseif selectedField.field in ['email'] %}
-                                                {# Renders a mailto: hyperlink #}
-                                                <dt class="small-4 medium-3 columns">{{ fieldName }}</dt>
-                                                <dd class="small-8 medium-9 columns"><a href="{{ session.mailhandle }}{{ selectedField.value }}">{{ selectedField.value }}</a></dd>
-                                            {% elseif selectedField.field in ['StudentBirthDate'] %}
-                                                {# Renders with date formatting #}
-                                                <dt class="small-4 medium-3 columns">{{ fieldName }}</dt>
-                                                <dd class="small-8 medium-9 columns">{{ selectedField.value|date(dateFormats.shortDateOnlyFormat) }}</dd>
-                                            {% else %}
-                                                {# A generic tuple (key, value) pair #}
-                                                <dt class="small-4 medium-3 columns">{{ fieldName }}</dt>
-                                                <dd class="small-8 medium-9 columns">{{ selectedField.value }}</dd>
                                             {% endif %}
                                         {% endif %}
                                     {% endif %}
