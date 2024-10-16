@@ -40,7 +40,6 @@ function onRemove(results: Result[]): void {
         :is-required="true"
         :endpoint="props.endpoint"
         :selected-items="selected"
-        placeholder="Search for courses..."
         @add="onAdd"
         @remove="onRemove"
     />
