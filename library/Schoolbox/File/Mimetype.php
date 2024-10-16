@@ -438,7 +438,17 @@ class Mimetype implements ISoftDeletable
                 return true;
             }
 
-            // harder comparison
+            // wildcard subtype match (e.g. image/* against any image mimetype)
+            if (preg_match('`^(?P<type>.*?/)\\*$`', $filter, $matches)) {
+                if (str_starts_with($this->getMime() ?? '', $matches['type'])) {
+                    return true;
+                }
+            }
+
+            // harder comparison:
+            // could probably use an exact comparison instead, but this method
+            // is likely used in ways I don't know about yet.
+            // At least there's unit tests to cover it now.
             $filter = str_replace('*', '[^/]+', $filter);
 
             $regex = '/^' . preg_quote($filter, '/') . '$/';
