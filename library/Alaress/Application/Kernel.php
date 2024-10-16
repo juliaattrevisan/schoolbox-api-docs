@@ -23,6 +23,7 @@ use Alaress\Module\Registry;
 use Alaress\Redis;
 use Alaress\Redis\Cache\ItemPool;
 use Alaress\Redis\Cache\KeyGenerator;
+use Alaress\Sentry\Transaction\Manager;
 use Alaress\Session\Factory;
 use Alaress\Session\Session;
 use Alaress\Twig\Loader\ChainLoader;
@@ -1862,6 +1863,10 @@ abstract class Kernel
                 }
             )
         );
+        $di->set(
+            'sentry.transactionManager',
+            $di->lazyNew(\Alaress\Sentry\Transaction\Manager::class, [$di->lazyGet('sentry')]),
+        );
 
 
         // Filter factory factory
@@ -2347,7 +2352,7 @@ abstract class Kernel
 
         // Origin: different for different kernels,
         // but probably just the same as operation?
-        $transactionContext->setOp(__CLASS__);
+        $transactionContext->setOrigin(__CLASS__);
 
         // Source: dependent on kernel
         // Web request: route if Aura, url if Sitepage
@@ -2397,6 +2402,8 @@ abstract class Kernel
      */
     private function finishSentryTransaction(): void
     {
-        $this->sentryTransaction?->finish();
+        /** @var Manager $manager */
+        $manager = $this->di->get('sentry.transactionManager');
+        $manager->finishTransaction();
     }
 }
