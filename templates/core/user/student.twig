@@ -247,9 +247,23 @@
                                             {% endif %}
                                         </dt>
                                     {% else %}
-                                        {# Only render a tuple if it has a meaningful value #}
-                                        {% if selectedField.value %}
-                                            {# Some fields require special handling #}
+                                        {% if selectedField.field in ['pastoralCounts'] and pastoralCounts|length %}
+                                            {# This is handled separately and specially in the controller
+                                             # it's not really consolidated in this payload
+                                             #}
+                                            <div class="pastoral-flags">
+                                                {% for pastoralCount in pastoralCounts %}
+                                                    <a href="{{ pastoralCount.destinationUrl }}">
+                                                        <span class="label neutral icon-{{ pastoralCount.icon }} pastoral-flag-in-profile"
+                                                              data-tooltip title="{{ pastoralCount.title }}"
+                                                              style="color: {{ pastoralCount.fgColor }}; background-color: {{ pastoralCount.bgColor }}"
+                                                        >{{ pastoralCount.count }}</span></a>
+                                                {% endfor %}
+                                            </div>
+                                        {% elseif selectedField.value %}
+                                            {# Only render a tuple if it has a meaningful value
+                                             # Note that some fields require special handling (different data structures)
+                                             #}
                                             {% if selectedField.field in ['campusCollection'] %}
                                                  {# A list of campuses #}
                                                 {% if selectedField.value|length %}
@@ -262,7 +276,7 @@
                                                 {% endif %}
                                             {% else %}
                                                 {# The field name will always show at this point, though their values
-                                                 # will need special treatment (different data structures)
+                                                 # will need special treatment somehow
                                                  #}
                                                 <dt class="small-4 medium-3 columns">{{ fieldName }}</dt>
                                                 <dd class="small-8 medium-9 columns">
@@ -371,17 +385,17 @@
 {#                                {% endblock extraDetails %}#}
                             </dl>
                         {% endblock details %}
-                        {% if showPastoral and pastoralCounts|length > 0 %}
-                            <div class="pastoral-flags">
-                                {% for pastoralCount in pastoralCounts %}
-                                    <a href="{{ pastoralCount.destinationUrl }}">
-                                        <span class="label neutral icon-{{ pastoralCount.icon }} pastoral-flag-in-profile"
-                                              data-tooltip title="{{ pastoralCount.title }}"
-                                              style="color: {{ pastoralCount.fgColor }}; background-color: {{ pastoralCount.bgColor }}"
-                                        >{{ pastoralCount.count }}</span></a>
-                                {% endfor %}
-                            </div>
-                        {% endif %}
+{#                        {% if showPastoral and pastoralCounts|length > 0 %}#}
+{#                            <div class="pastoral-flags">#}
+{#                                {% for pastoralCount in pastoralCounts %}#}
+{#                                    <a href="{{ pastoralCount.destinationUrl }}">#}
+{#                                        <span class="label neutral icon-{{ pastoralCount.icon }} pastoral-flag-in-profile"#}
+{#                                              data-tooltip title="{{ pastoralCount.title }}"#}
+{#                                              style="color: {{ pastoralCount.fgColor }}; background-color: {{ pastoralCount.bgColor }}"#}
+{#                                        >{{ pastoralCount.count }}</span></a>#}
+{#                                {% endfor %}#}
+{#                            </div>#}
+{#                        {% endif %}#}
                     </div>
                 </div>
             </div>
