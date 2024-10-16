@@ -11,6 +11,7 @@ declare(strict_types=1);
 namespace Schoolbox\Admin\Profile\Editor\Field;
 
 use Alaress\Database\Predicate\Builder;
+use Schoolbox\Admin\Profile\Editor\Payload;
 use Schoolbox\GenericCollection;
 use Schoolbox\Mapper\DefinitionException;
 use Schoolbox\Mapper\Exception;
@@ -174,6 +175,9 @@ class Mapper extends \Schoolbox\Mapper
             /* Viewer's roletype determine visibility
              */
             'viewerRoleType' => $viewer->getRole()->getType(),
+            /* Also include the SELF pseudo-roletype
+             */
+            'selfRoleType' => Payload::ROLETYPE_SELF,
             /* You'd probably never change this, but always return enabled fields only
              */
             'enabled' => true
@@ -194,7 +198,7 @@ class Mapper extends \Schoolbox\Mapper
             INNER JOIN profile_field_roletype_visibility pfrv ON f.id = pfrv.profile_field_id
             WHERE f.roletype = :vieweeRoleType
             AND pfca.campus_id IN {$vieweeCampusPlaceholders}
-            AND pfrv.roletype = :viewerRoleType
+            AND (pfrv.roletype = :viewerRoleType OR pfrv.roletype = :selfRoleType)
             AND f.enabled = :enabled
             ORDER BY f.sequence ASC 
         ";
