@@ -1,23 +1,25 @@
 import { test, expect } from "@schoolboxTest/playwright/support/integrations";
 import Form from "@schoolboxTest/playwright/support/page/news/Form";
+import Index from "@schoolboxTest/playwright/support/page/news/Index";
+import Item from "@schoolboxTest/playwright/support/page/news/Item";
 import path from "path";
 
 test.describe("Create and Verify News Article Test", () => {
-    test.beforeAll(async ({ baseTester, db }) => {
-        baseTester.isGoingTo("update delete_at for the news article so it does not impact the news tests");
-        await db.updateInDatabase(
-            "comms_news_article",
-            { deleted_at: "2022-01-15 11:22:34" },
-            { title: "Acceptance Test News%" },
-        );
-    });
+    // test.beforeAll(async ({ baseTester, db }) => {
+    //     baseTester.isGoingTo("update delete_at for the news article so it does not impact the news tests");
+    //     await db.updateInDatabase(
+    //         "comms_news_article",
+    //         { deleted_at: "2022-01-15 11:22:34" },
+    //         { title: "Acceptance Test News%" },
+    //     );
+    // });
 
     test.beforeEach(async ({ tester, page }) => {
         await tester.logout();
         await tester.loginAsAdmin();
         const form = new Form(tester, page);
         tester.isGoingTo("news form page");
-        await form.goto();
+        // await form.goto();
     });
 
     // test.afterEach(async ({ baseTester, db }) => {
@@ -47,31 +49,72 @@ test.describe("Create and Verify News Article Test", () => {
      *
      */
 
-    test("Create news article", async ({ tester, page }) => {
+    test("Create news article", async ({ tester, page, db }) => {
         const form = new Form(tester, page);
+        const index = new Index(tester, page);
+        const item = new Item(tester, page);
         const headline = "Acceptance Test News Article Testing ";
         const article = "Random Article Random article text";
         const blurb = "Blurb";
         const image = path.join(__dirname, "../../support/file/baboon.png");
         const topic = "General";
-        const roles = ["Teacher"];
-        const campi = ["Primary"];
-        const users = ["Jana Reed", "Mario Izzo"];
-        const publish = new Date().toISOString();
-        const expiry = new Date().toISOString();
-        tester.isGoingTo("Fill news article form");
-        await form.fillHeadline(headline);
-        await form.fillArticle(article);
-        await form.fillBlurb(blurb);
-        await form.attachFeatureImage(image);
-        await form.selectAudienceOption("Campuses", "Secondary");
-        await form.fillTopic(topic);
-        // await form.fill(roles);
-        // await form.selectCampuses(campi);
-        // await form.selectUsers(users);
-        // await form.typePublishDate(publish);
-        // await form.typeExpiryDate(expiry);
-        await form.submit();
+        const role = "Teacher";
+        const campus = "Primary";
+        const user1 = "Jana Reed";
+        const user2 = "Mario Izzo";
+        // tester.isGoingTo("Fill news article form");
+        // await form.fillHeadline(headline);
+        // await form.fillArticle(article);
+        // await form.fillBlurb(blurb);
+        // // await form.attachFeatureImage(image);
+        // await form.fillTopic(topic);
+        // await form.selectAudienceOption("Roles");
+        // await form.checkboxAudience(role);
+        // await form.fillUser(user1);
+        // await form.fillUser(user2);
+        // const publish = new Date();
+        // publish.setDate(publish.getDate() - 2); // 2 days ago
+        // const expiry = new Date();
+        // expiry.setDate(expiry.getDate() + 7); // 7 days from now
+        // await form.fillPublishDate(publish);
+        // await form.fillExpiryDate(expiry);
+        // await form.selectAudienceOption("Campuses");
+        // await form.checkboxAudience(campus);
+        // await form.submit();
+
+        tester.isGoingTo("Verify that the news is in the All topic, and is the first news item");
+        await index.goto("all");
+
+        // await index.seeHeadline(headline);
+
+        // tester.isGoingTo("Verify that the blurb shows, not the article I entered");
+        // await index.seeArticleSummary(blurb);
+        // await index.dontSeeArticleSummary(article);
+
+        // tester.isGoingTo("the news article has a feature image");
+        // const featureImage = await db.grabFromDatabase("comms_news_article", "feature_image_hash", {
+        //     title: headline,
+        // });
+
+        // tester.isGoingTo("Verify I don't see it at all in some other topic");
+        // await index.goto("music");
+        // await index.dontSeeHeadline(headline);
+
+        tester.isGoingTo("Verify I see it in the topic I put it in");
+        await index.goto("general");
+        await index.seeHeadline(headline);
+
+        tester.isGoingTo("View the article I'm searched for");
+        const articleId = (await db.grabFromDatabase("comms_news_article", "id", {
+            title: headline,
+            deleted_at: null,
+        })) as number;
+        await index.viewArticle(articleId);
+
+        tester.isGoingTo("Verify I see the article, and not the blurb");
+        await item.seeHeadline(headline);
+        await item.seeArticle(article);
+        await item.modifyArticle();
     });
 });
 
