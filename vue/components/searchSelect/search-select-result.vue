@@ -19,8 +19,8 @@ interface Props {
 const props = defineProps<Props>();
 
 const emit = defineEmits<{
-    select: [result: Result];
-    deselect: [result: Result];
+    add: [results: Result[]];
+    remove: [results: Result[]];
     hover: [index: number];
 }>();
 
@@ -36,18 +36,18 @@ const isChecked = window.Vue.computed(() => {
 /**
  * To toggle the selected state of the result
  */
-function onSelected(): void {
+function onClick(): void {
     if (isChecked.value) {
-        emit("deselect", props.result);
+        emit("remove", [props.result]);
     } else {
-        emit("select", props.result);
+        emit("add", [props.result]);
     }
 }
 
 /**
  * To toggle the selected state of the result
  */
-function onHover(): void {
+function onMouseover(): void {
     emit("hover", props.index);
 }
 
@@ -60,7 +60,7 @@ const { isActive } = useActiveIndex(
     resultEl,
     props.index,
     toRef(() => props.activeIndex),
-    onSelected,
+    onClick,
 );
 </script>
 
@@ -68,12 +68,12 @@ const { isActive } = useActiveIndex(
     <div
         ref="resultEl"
         :class="`search-result ${isActive ? 'search-result--active' : ''} f-no-margins`"
-        @click="onSelected"
-        @mouseover="onHover"
+        @click="onClick"
+        @mouseover="onMouseover"
     >
         <show-matches v-if="props.isSingleSelect" tag="span" :text="props.result.name" :query="props.query" />
         <div v-else class="checklist">
-            <input :id="`checkbox-${result.id}`" type="checkbox" :checked="isChecked" @click.stop="onSelected" />
+            <input :id="`checkbox-${result.id}`" type="checkbox" :checked="isChecked" @click.stop="onClick" />
             <show-matches
                 tag="label"
                 :for="`checkbox-${result.id}`"

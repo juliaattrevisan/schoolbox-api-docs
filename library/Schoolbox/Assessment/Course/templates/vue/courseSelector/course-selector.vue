@@ -17,19 +17,10 @@ const props = defineProps<Props>();
 const { selected, add, remove } = useSelected();
 
 /**
- * When a result is selected, add it in
- * or remove it if it already exists
- * @param result - the result selected
- */
-function onSelectResult(result: Result): void {
-    add(result);
-}
-
-/**
  * Select all the results
  * @param results - the results to add
  */
-function selectAllResults(results: Result[]): void {
+function onAdd(results: Result[]): void {
     add(results);
 }
 
@@ -37,16 +28,8 @@ function selectAllResults(results: Result[]): void {
  * Remove all the results
  * @param results - the results to remove
  */
-function removeAllResults(results: Result[]): void {
+function onRemove(results: Result[]): void {
     remove(results);
-}
-
-/**
- * Remove the result from the selected list
- * @param result - the result removed
- */
-function onRemoveItem(result: Result): void {
-    remove(result);
 }
 </script>
 
@@ -55,10 +38,8 @@ function onRemoveItem(result: Result): void {
         :endpoint="props.endpoint"
         :selected-items="selected"
         placeholder="Search for courses..."
-        @select-result="onSelectResult"
-        @select-all-results="selectAllResults"
-        @remove-all-results="removeAllResults"
-        @remove-item="onRemoveItem"
+        @add="onAdd"
+        @remove="onRemove"
     />
 </template>
 

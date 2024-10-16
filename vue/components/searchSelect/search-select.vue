@@ -25,10 +25,8 @@ const props = withDefaults(defineProps<Props>(), {
 });
 
 const emit = defineEmits<{
-    selectResult: [result: Result]; // to select a search result
-    removeItem: [result: Result]; // to remove a selected item
-    selectAllResults: [results: Result[]]; // to select all search results
-    removeAllResults: [results: Result[]]; // to remove all search results
+    add: [results: Result[]];
+    remove: [results: Result[]];
 }>();
 
 const searchSelectEl = window.Vue.ref<HTMLDivElement | null>(null);
@@ -50,41 +48,19 @@ const currentResults = window.Vue.computed(() => {
 });
 
 /**
- * To remove a result
- * @param result - the result removed
+ * To add results
+ * @param $results - the results selected
  */
-function onRemoved(result: Result): void {
-    emit("removeItem", result);
+function onAdd($results: Result[]): void {
+    emit("add", $results);
 }
 
 /**
- * To toggle the selected state of the result
- * @param result - the result selected
+ * To remove results
+ * @param $results - the results deselected
  */
-function onSelect(result: Result): void {
-    emit("selectResult", result);
-}
-
-/**
- * To toggle the selected state of the result
- * @param result - the result selected
- */
-function onDeselect(result: Result): void {
-    emit("removeItem", result);
-}
-
-/**
- * To select all search results
- */
-function onSelectAll(): void {
-    emit("selectAllResults", results.value);
-}
-
-/**
- * To remove all search results
- */
-function onRemoveAll(): void {
-    emit("removeAllResults", results.value);
+function onRemove($results: Result[]): void {
+    emit("remove", $results);
 }
 
 /**
@@ -102,7 +78,7 @@ function onInput($query: string): void {
             :selected-items="props.selectedItems"
             :form-value-name="props.formValueName"
             :is-single-select="props.isSingleSelect"
-            @remove="onRemoved"
+            @remove="onRemove"
         />
         <search-select-input :parent-el="searchSelectEl" :placeholder="props.placeholder" @input="onInput" />
         <search-select-results
@@ -113,10 +89,8 @@ function onInput($query: string): void {
             :results="currentResults"
             :has-no-results="hasNoResults"
             :selected-items="selectedItems"
-            @select="onSelect"
-            @deselect="onDeselect"
-            @select-all="onSelectAll"
-            @remove-all="onRemoveAll"
+            @add="onAdd"
+            @remove="onRemove"
         />
     </div>
 </template>

@@ -14,7 +14,7 @@ interface Props {
 const props = defineProps<Props>();
 
 const emit = defineEmits<{
-    remove: [result: Result];
+    remove: [results: Result[]];
 }>();
 
 /**
@@ -31,7 +31,7 @@ const ids = window.Vue.computed(() => {
  * @param result - the result to remove
  */
 function onRemoveItem(result: Result): void {
-    emit("remove", result);
+    emit("remove", [result]);
 }
 </script>
 

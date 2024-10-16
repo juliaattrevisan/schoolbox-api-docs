@@ -22,10 +22,8 @@ interface Props {
 const props = defineProps<Props>();
 
 const emit = defineEmits<{
-    select: [result: Result]; // to select a search result
-    deselect: [result: Result]; // to deselect a search result
-    selectAll: []; // to select all search results
-    removeAll: []; // to remove all search results
+    add: [results: Result[]];
+    remove: [results: Result[]];
 }>();
 
 const searchResultsContainerEl = window.Vue.ref<HTMLDivElement | null>(null);
@@ -99,33 +97,19 @@ const showSelectAll = window.Vue.computed(() => {
 });
 
 /**
- * To select the search result
- * @param result - the result selected
+ * To add results
+ * @param results - the results selected
  */
-function onSelect(result: Result): void {
-    emit("select", result);
+function onAdd(results: Result[]): void {
+    emit("add", results);
 }
 
 /**
- * To deselect the search result
- * @param result - the result deselected
+ * To remove results
+ * @param results - the results deselected
  */
-function onDeselect(result: Result): void {
-    emit("deselect", result);
-}
-
-/**
- * To select all search results
- */
-function onSelectAll(): void {
-    emit("selectAll");
-}
-
-/**
- * To remove all search results
- */
-function onRemoveAll(): void {
-    emit("removeAll");
+function onRemove(results: Result[]): void {
+    emit("remove", results);
 }
 
 const activeIndex = window.Vue.ref(-1); // to be able to use keyboard navigation to move through the search results
@@ -181,8 +165,8 @@ function onHover(index: number): void {
                     :selected-items="props.selectedItems"
                     :index="0"
                     :active-index="activeIndex"
-                    @select-all="onSelectAll"
-                    @remove-all="onRemoveAll"
+                    @add="onAdd"
+                    @remove="onRemove"
                     @hover="onHover"
                 />
                 <search-select-result
@@ -195,8 +179,8 @@ function onHover(index: number): void {
                     :is-single-select="props.isSingleSelect"
                     :index="showSelectAll ? index + 1 : index"
                     :active-index="activeIndex"
-                    @select="onSelect"
-                    @deselect="onDeselect"
+                    @add="onAdd"
+                    @remove="onRemove"
                     @hover="onHover"
                 />
             </template>
