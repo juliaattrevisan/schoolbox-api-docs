@@ -186,7 +186,11 @@
                                  #}
                                 {% for selectedField in externalUser.data.roleTypes.fields.selected[1:] %}
                                     <dt class="small-4 medium-3 columns">
-                                        {{ selectedField.field }}
+                                        {% if selectedField.terminology %}
+                                            {{ locale.translate(selectedField.terminology, false, true) }}
+                                        {% else %}
+                                            {{ selectedField.displayAs }}
+                                        {% endif %}
                                     </dt>
 
                                     {% if selectedField.field in ['formTeacher', 'tutorTeacher', 'hohTeacher', 'coordTeacher', 'studentCoach'] %}
