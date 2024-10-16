@@ -193,8 +193,6 @@
                                 {# Portrait is always element 0 at the moment: we can skip iterating
                                  # that array element here, because it's rendered elsewhere.
                                  #}
-                                {% set inDefinitionList = false %}
-
                                 {% for selectedField in externalUser.data.roleTypes.fields.selected[1:] %}
                                     {# TODO Decide if the viewer can actually see this field, due to additional
                                      #  permissions, privacy and configuration settings that go well beyond
