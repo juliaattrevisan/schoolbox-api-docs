@@ -8,30 +8,5 @@
 
 declare(strict_types=1);
 
-use Schoolbox\Admin\Profile\Editor\Cli\DefaultSettingsTool;
-use Schoolbox\Application\CliTool;
-
-require_once __DIR__ . '/../../../conf/core/require.php';
-
-/**
- * CLI Tool
- *
- * Copy this to /tools folder
- *
- * To redirect log output to a file(s):
- *     STDOUT is file descriptor 1
- *     STDERR is file descriptor 2; our logger output ends up going here
- *
- *     Example: php example.php 2> log.txt
- */
-$app = new DefaultSettingsTool();
-
-/* OPTION_ERRORS => E_ALL causes all notices and errors to fatally crash your script
- *
- * You should generally try to fix those, even though in some special cases php will throw notices
- * for its own expected behaviours which will inadvertently cause this to fail
- */
-$options = [CliTool\Kernel::OPTION_LEVEL => Monolog\Logger::INFO, CliTool\Kernel::OPTION_ERRORS => E_ALL,];
-
-/** @noinspection PhpUnhandledExceptionInspection */
-(new Schoolbox\Application\CliTool\Kernel($app, $options))->runApp();
+passthru('php ' . __DIR__ .  '/../../../tools/profile-editor/default-settings.php --perform', $resultCode);
+exit($resultCode);
