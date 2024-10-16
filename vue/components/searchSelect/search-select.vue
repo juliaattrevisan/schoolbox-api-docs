@@ -10,7 +10,9 @@ import SearchSelectInput from "./search-select-input.vue";
 import SearchSelectResults from "./search-select-results.vue";
 
 interface Props {
+    label: string; // the label text
     labelId: string; // the label id
+    isRequired?: boolean; // whether the input requires a value
     endpoint: string; // the search api endpoint
     selectedItems: Result[]; // the selected searchResults
     defaultResults?: Result[]; // show selection options when the search input is empty
@@ -75,6 +77,7 @@ function onInput($query: string): void {
 
 <template>
     <div ref="searchSelectEl" class="c-search-select">
+        <label :for="props.labelId" :class="`${props.isRequired ? 'required' : ''}`">{{ props.label }}</label>
         <search-select-selected
             :selected-items="props.selectedItems"
             :form-value-name="props.formValueName"
