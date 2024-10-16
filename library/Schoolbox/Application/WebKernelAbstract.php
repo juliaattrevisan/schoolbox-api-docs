@@ -259,12 +259,12 @@ abstract class WebKernelAbstract extends \Alaress\Application\Kernel
      */
     protected function registerShutdownHandling(): void
     {
+        parent::registerShutdownHandling();
         $this->getShutdownHandler()->registerFunction(
             new ResourceLimitExceededHandler(function (): void {
                 $this->shutdownSafely(error_get_last(), debug_backtrace());
             })
         );
-        register_shutdown_function($this->getShutdownHandler());
     }
 
 

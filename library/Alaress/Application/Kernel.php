@@ -185,6 +185,10 @@ use Schoolbox\User\Token\Mapper as TokenMapper;
 use Schoolbox\UserMapper;
 use Schoolbox\Version\Version;
 use Scrub;
+use Sentry\State\HubInterface;
+use Sentry\Tracing\Transaction;
+use Sentry\Tracing\TransactionContext;
+use Sentry\Tracing\TransactionSource;
 use SitePage;
 use Symfony\Component\Lock\LockFactory;
 use Symfony\Component\Lock\Store\RedisStore;
@@ -220,6 +224,12 @@ abstract class Kernel
      * @var callable[]
      */
     private $exceptionCallbacks = [];
+
+    /**
+     * A Sentry transaction: used for instrumenting this kernel and sending its
+     * trace to Sentry.
+     */
+    private ?Transaction $sentryTransaction = null;
 
     /**
      * @throws Di\Exception
@@ -314,7 +324,11 @@ abstract class Kernel
      *
      * @return void
      */
-    abstract protected function registerShutdownHandling(): void;
+    protected function registerShutdownHandling(): void
+    {
+        $this->getShutdownHandler()->registerFunction($this->finishSentryTransaction(...));
+        register_shutdown_function($this->getShutdownHandler());
+    }
 
 
     /**
@@ -2310,5 +2324,79 @@ abstract class Kernel
             $modules = $moduleCache->fetchModuleRegistrations();
         }
         Registry::setRegistrations($modules);
+    }
+
+    /**
+     * Start a Sentry transaction.
+     *
+     * @param string $name The transaction's name:
+     *                     should be something which identifies the controller or script for this request, such as the
+     *                     script's name or controller action.
+     * @return void
+     * @throws Di\Exception\ServiceNotFound
+     */
+    public function startSentryTransaction(string $name): void
+    {
+        $transactionContext = new TransactionContext();
+
+        // Operation: based on this class' name, I guess?
+        $transactionContext->setOp(__CLASS__);
+
+        // Name: whatever was provided
+        $transactionContext->setName($name);
+
+        // Origin: different for different kernels,
+        // but probably just the same as operation?
+        $transactionContext->setOp(__CLASS__);
+
+        // Source: dependent on kernel
+        // Web request: route if Aura, url if Sitepage
+        // Basic request: url
+        // CLI: task
+        $transactionContext->setSource(TransactionSource::url());
+
+        // Data: dependent on parameters
+        // Web and basic requests: Request path and method
+        // CLI: name of script
+
+        // Start time: if possible the request time from $_SERVER?
+        $transactionContext->setStartTimestamp(Alaress_Date_Format::now()->getUnixTimeStampWithMicroseconds());
+
+
+        // From https://github.com/getsentry/sentry-laravel/blob/85502656da86271ed757ee8490fe9b108c76ad59/src/Sentry/Laravel/Tracing/Middleware.php#L135
+//        $context->setOp('http.server');
+//        $context->setName($requestPath);
+//        $context->setOrigin('auto.http.server');
+//        $context->setSource(TransactionSource::url());
+//        $context->setStartTimestamp($requestStartTime);
+//
+//        $context->setData([
+//                              'url' => $requestPath,
+//                              'http.request.method' => strtoupper($request->method()),
+//                          ]);
+
+        /** @var HubInterface $sentry */
+        $sentry      = $this->di->get('sentry');
+        $transaction = $sentry->startTransaction($transactionContext);
+        $sentry->setSpan($transaction);
+
+
+        // Transaction not sampled: no need to set anything
+        if (!$transaction->getSampled()) {
+            return;
+        }
+        $this->sentryTransaction = $transaction;
+    }
+
+    // TODO add method for adding spans
+
+    /**
+     * Close the Sentry transaction, if there is one.
+     *
+     * @return void
+     */
+    private function finishSentryTransaction(): void
+    {
+        $this->sentryTransaction?->finish();
     }
 }
