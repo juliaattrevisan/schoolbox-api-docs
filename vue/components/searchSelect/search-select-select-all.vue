@@ -70,6 +70,9 @@ function onSelectAll(): void {
 
 const resultEl = window.Vue.ref<HTMLElement | null>(null);
 
+/**
+ * To allow keyboard navigation of the search results
+ */
 const { isActive } = useActiveIndex(
     resultEl,
     props.index,
@@ -82,7 +85,7 @@ const { isActive } = useActiveIndex(
     <div
         ref="resultEl"
         :class="`search-result ${isActive ? 'search-result--active' : ''} f-no-margins`"
-        @click.prevent="onSelectAll"
+        @click="onSelectAll"
     >
         <div class="checklist">
             <input
@@ -90,6 +93,7 @@ const { isActive } = useActiveIndex(
                 type="checkbox"
                 :checked="isChecked"
                 :class="{ indeterminate: isSomeResultsSelected }"
+                @click.stop="onSelectAll"
             />
             <label for="checkbox-select-all">Select All</label>
         </div>

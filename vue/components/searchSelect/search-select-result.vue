@@ -16,7 +16,6 @@ interface Props {
     index: number; // the index of the result
     activeIndex: number; // the active index, to determine if this result is active
 }
-
 const props = defineProps<Props>();
 
 const emit = defineEmits<{
@@ -29,7 +28,7 @@ const emit = defineEmits<{
  * based on whether it's in the selected list
  * @returns {boolean}
  */
-const isSelected = window.Vue.computed(() => {
+const isChecked = window.Vue.computed(() => {
     return props.selectedItems.some((result) => result.id === props.result.id);
 });
 
@@ -37,7 +36,8 @@ const isSelected = window.Vue.computed(() => {
  * To toggle the selected state of the result
  */
 function onSelected(): void {
-    if (isSelected.value) {
+    console.warn("onSelected");
+    if (isChecked.value) {
         emit("deselect", props.result);
     } else {
         emit("select", props.result);
@@ -46,6 +46,9 @@ function onSelected(): void {
 
 const resultEl = window.Vue.ref<HTMLElement | null>(null);
 
+/**
+ * To allow keyboard navigation of the search results
+ */
 const { isActive } = useActiveIndex(
     resultEl,
     props.index,
@@ -58,11 +61,11 @@ const { isActive } = useActiveIndex(
     <div
         ref="resultEl"
         :class="`search-result ${isActive ? 'search-result--active' : ''} f-no-margins`"
-        @click.prevent="onSelected"
+        @click="onSelected"
     >
         <show-matches v-if="props.isSingleSelect" tag="span" :text="props.result.name" :query="props.query" />
         <div v-else class="checklist">
-            <input :id="`checkbox-${result.id}`" type="checkbox" :checked="isSelected" />
+            <input :id="`checkbox-${result.id}`" type="checkbox" :checked="isChecked" @click.stop="onSelected" />
             <show-matches
                 tag="label"
                 :for="`checkbox-${result.id}`"
