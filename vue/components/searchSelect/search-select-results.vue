@@ -4,6 +4,7 @@
  */
 
 import gsap from "gsap";
+import { onKeyStroke } from "@vueuse/core";
 import type { Result } from "./types/Result";
 import SearchSelectSelectAll from "./search-select-select-all.vue";
 import SearchSelectResult from "./search-select-result.vue";
@@ -126,6 +127,53 @@ function onSelectAll(): void {
 function onRemoveAll(): void {
     emit("removeAll");
 }
+
+const activeIndex = window.Vue.ref(-1);
+
+/**
+ * to be able to move up and down through the selections
+ * with the arrow keys
+ */
+function decrementActiveIndex(): void {
+    if (activeIndex.value > 0) {
+        activeIndex.value -= 1;
+    }
+}
+
+/**
+ * to be able to move up and down through the selections
+ * with the arrow keys
+ */
+function incrementActiveIndex(): void {
+    const maxIncrement = showSelectAll.value ? props.results.length : props.results.length - 1;
+    if (showSelectAll.value && activeIndex.value < maxIncrement) {
+        activeIndex.value += 1;
+    }
+}
+
+/**
+ * to be able to move down the search results
+ */
+onKeyStroke("ArrowDown", () => {
+    incrementActiveIndex();
+});
+
+/**
+ * to be able to move up the search results
+ */
+onKeyStroke("ArrowUp", () => {
+    decrementActiveIndex();
+});
+
+/**
+ * Reset the index whenever the search query changes
+ */
+window.Vue.watch(
+    () => props.query,
+    () => {
+        activeIndex.value = 0;
+    },
+);
 </script>
 <template>
     <div ref="searchResultsContainerEl" class="search-results-container">
@@ -139,17 +187,21 @@ function onRemoveAll(): void {
                     v-if="showSelectAll"
                     :results="props.results"
                     :selected-items="props.selectedItems"
+                    :index="0"
+                    :active-index="activeIndex"
                     @select-all="onSelectAll"
                     @remove-all="onRemoveAll"
                 />
                 <search-select-result
-                    v-for="result in props.results"
+                    v-for="(result, index) in props.results"
                     :key="result.id"
                     :data-test="`search-select-result-${result.id}`"
                     :query="props.query"
                     :selected-items="props.selectedItems"
                     :result="result"
                     :is-single-select="props.isSingleSelect"
+                    :index="showSelectAll ? index + 1 : index"
+                    :active-index="activeIndex"
                     @select="onSelect"
                     @deselect="onDeselect"
                 />

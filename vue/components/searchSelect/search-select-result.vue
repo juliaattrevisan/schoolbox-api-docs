@@ -3,7 +3,9 @@
  * A single search result that can be selected / unselected with a checkbox status
  */
 
+import { toRef } from "vue";
 import ShowMatches from "@schoolboxVue/components/search/show-matches.vue";
+import { useActiveIndex } from "./composables/useActiveIndex";
 import type { Result } from "./types/Result";
 
 interface Props {
@@ -11,6 +13,8 @@ interface Props {
     selectedItems: Result[]; // the selected results
     result: Result; // the result to display
     isSingleSelect: boolean; // whether only one result can be selected
+    index: number; // the index of the result
+    activeIndex: number; // the active index, to determine if this result is active
 }
 
 const props = defineProps<Props>();
@@ -39,10 +43,23 @@ function onSelected(): void {
         emit("select", props.result);
     }
 }
+
+const resultEl = window.Vue.ref<HTMLElement | null>(null);
+
+const { isActive } = useActiveIndex(
+    resultEl,
+    props.index,
+    toRef(() => props.activeIndex),
+    onSelected,
+);
 </script>
 
 <template>
-    <div class="search-result f-no-margins" @click.prevent="onSelected">
+    <div
+        ref="resultEl"
+        :class="`search-result ${isActive ? 'search-result--active' : ''} f-no-margins`"
+        @click.prevent="onSelected"
+    >
         <show-matches v-if="props.isSingleSelect" tag="span" :text="props.result.name" :query="props.query" />
         <div v-else class="checklist">
             <input :id="`checkbox-${result.id}`" type="checkbox" :checked="isSelected" />
@@ -68,11 +85,15 @@ function onSelected(): void {
     padding: var(--spacing-s);
     transition: background 0.2s;
     width: 100%;
-    &:hover {
+    &:hover,
+    &:focus {
         background: var(--content-ui-hover);
     }
     &:last-of-type {
         border-bottom: none;
+    }
+    &--active {
+        background: var(--content-ui-hover);
     }
 }
 

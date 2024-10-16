@@ -4,11 +4,15 @@
  * multiple search results at once
  */
 
+import { toRef } from "vue";
+import { useActiveIndex } from "./composables/useActiveIndex";
 import type { Result } from "./types/Result";
 
 interface Props {
     results: Result[]; // the results returned from the search
     selectedItems: Result[]; // the selected items
+    index: number; // the index of the result
+    activeIndex: number; // the active index, to determine if this result is active
 }
 const props = defineProps<Props>();
 
@@ -63,10 +67,23 @@ function onSelectAll(): void {
         emit("selectAll");
     }
 }
+
+const resultEl = window.Vue.ref<HTMLElement | null>(null);
+
+const { isActive } = useActiveIndex(
+    resultEl,
+    props.index,
+    toRef(() => props.activeIndex),
+    onSelectAll,
+);
 </script>
 
 <template>
-    <div class="search-result f-no-margins" @click.prevent="onSelectAll">
+    <div
+        ref="resultEl"
+        :class="`search-result ${isActive ? 'search-result--active' : ''} f-no-margins`"
+        @click.prevent="onSelectAll"
+    >
         <div class="checklist">
             <input
                 id="checkbox-select-all"
@@ -90,11 +107,15 @@ function onSelectAll(): void {
     padding: var(--spacing-s);
     transition: background 0.2s;
     width: 100%;
-    &:hover {
+    &:hover,
+    &:focus {
         background: var(--content-ui-hover);
     }
     &:last-of-type {
         border-bottom: none;
+    }
+    &--active {
+        background: var(--content-ui-hover);
     }
 }
 
