@@ -210,7 +210,7 @@
                                     {% if selectedField.icon and selectedField.css %}
                                         <dt class="full-width">
                                             {# A set of Alert Messages that display in one big flag #}
-                                            {% if selectedField.field in ['AlertMessages'] %}
+                                            {% if selectedField.field in ['AlertMessages', 'AlertLegal'] %}
                                                 {% if selectedField.value|length %}
                                                     <div class="alert-box {{ selectedField.css ?? '' }} {{ selectedField.icon ?? '' }}">
                                                         {% for message in selectedField.value %}
@@ -220,14 +220,17 @@
                                                 {% endif %}
                                             {% elseif selectedField.value %}
                                                 <div class="alert-box {{ selectedField.css ?? '' }} {{ selectedField.icon ?? '' }}">
-                                                    {% if selectedField.field in ['Comment'] %}
+                                                    {% if selectedField.field in ['StudentMedicalAlert'] %}
+                                                        {# A string that displays in a flag #}
+                                                        Medical Note: {{ selectedField.value }}
+                                                    {% elseif selectedField.field in ['Comment'] %}
                                                         {# A string that displays in a flag #}
                                                         {{ selectedField.value }}
                                                     {% elseif selectedField.field in ['ParentsSeparatedFlag'] %}
                                                         {# A special flag that has a hardcoded text string #}
                                                         Parents separated; please be mindful when making contact.
                                                     {% else %}
-                                                        {# A generic flag
+                                                        {# A generic flag which shows Display As/Terminology equivalent
                                                          #
                                                          # Flags always display fullwidth and I can cheat by rendering
                                                          # a full-width definition title without a definition data lol
