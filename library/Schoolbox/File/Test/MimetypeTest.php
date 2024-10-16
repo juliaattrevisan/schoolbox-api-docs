@@ -11,6 +11,7 @@ namespace Schoolbox\File\Test;
 
 use PHPUnit\Framework\TestCase;
 use Schoolbox\File\Mimetype;
+use Schoolbox\Resource\Attachment\Zone;
 
 /**
  * Test for mimetype methods.
@@ -136,6 +137,19 @@ class MimetypeTest extends TestCase
                     ['mimetype' => 'image/png', 'expected' => false,],
                     ['mimetype' => 'text/plain', 'expected' => false,],
                     ['mimetype' => 'image/svg+xml', 'expected' => true,],
+                ],
+            ],
+            // Prescribed image/* alias
+            [
+                'filter'    => Zone::IMAGE_ALL,
+                'mimetypes' => [
+                    ['mimetype' => null, 'expected' => false,],
+                    ['mimetype' => '', 'expected' => false,],
+                    ['mimetype' => 'image/jpeg', 'expected' => true,],
+                    ['mimetype' => 'image/png', 'expected' => true,],
+                    ['mimetype' => 'text/plain', 'expected' => false,],
+                    ['mimetype' => 'image/svg+xml', 'expected' => true,],
+                    ['mimetype' => 'image/bmp', 'expected' => true,],
                 ],
             ],
         ];
