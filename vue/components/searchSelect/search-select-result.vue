@@ -21,6 +21,7 @@ const props = defineProps<Props>();
 const emit = defineEmits<{
     select: [result: Result];
     deselect: [result: Result];
+    hover: [index: number];
 }>();
 
 /**
@@ -36,12 +37,18 @@ const isChecked = window.Vue.computed(() => {
  * To toggle the selected state of the result
  */
 function onSelected(): void {
-    console.warn("onSelected");
     if (isChecked.value) {
         emit("deselect", props.result);
     } else {
         emit("select", props.result);
     }
+}
+
+/**
+ * To toggle the selected state of the result
+ */
+function onHover(): void {
+    emit("hover", props.index);
 }
 
 const resultEl = window.Vue.ref<HTMLElement | null>(null);
@@ -62,6 +69,7 @@ const { isActive } = useActiveIndex(
         ref="resultEl"
         :class="`search-result ${isActive ? 'search-result--active' : ''} f-no-margins`"
         @click="onSelected"
+        @mouseover="onHover"
     >
         <show-matches v-if="props.isSingleSelect" tag="span" :text="props.result.name" :query="props.query" />
         <div v-else class="checklist">
@@ -88,10 +96,6 @@ const { isActive } = useActiveIndex(
     padding: var(--spacing-s);
     transition: background 0.2s;
     width: 100%;
-    &:hover,
-    &:focus {
-        background: var(--content-ui-hover);
-    }
     &:last-of-type {
         border-bottom: none;
     }

@@ -19,6 +19,7 @@ const props = defineProps<Props>();
 const emit = defineEmits<{
     selectAll: [];
     removeAll: [];
+    hover: [index: number];
 }>();
 
 /**
@@ -60,12 +61,19 @@ const isChecked = window.Vue.computed(() => isAllResultsSelected.value);
 /**
  * toggle all depending on current check status
  */
-function onSelectAll(): void {
+function onSelected(): void {
     if (isChecked.value) {
         emit("removeAll");
     } else {
         emit("selectAll");
     }
+}
+
+/**
+ * To toggle the selected state of the result
+ */
+function onHover(): void {
+    emit("hover", props.index);
 }
 
 const resultEl = window.Vue.ref<HTMLElement | null>(null);
@@ -77,7 +85,7 @@ const { isActive } = useActiveIndex(
     resultEl,
     props.index,
     toRef(() => props.activeIndex),
-    onSelectAll,
+    onSelected,
 );
 </script>
 
@@ -85,7 +93,8 @@ const { isActive } = useActiveIndex(
     <div
         ref="resultEl"
         :class="`search-result ${isActive ? 'search-result--active' : ''} f-no-margins`"
-        @click="onSelectAll"
+        @click="onSelected"
+        @mouseover="onHover"
     >
         <div class="checklist">
             <input
@@ -93,7 +102,7 @@ const { isActive } = useActiveIndex(
                 type="checkbox"
                 :checked="isChecked"
                 :class="{ indeterminate: isSomeResultsSelected }"
-                @click.stop="onSelectAll"
+                @click.stop="onSelected"
             />
             <label for="checkbox-select-all">Select All</label>
         </div>
@@ -111,10 +120,6 @@ const { isActive } = useActiveIndex(
     padding: var(--spacing-s);
     transition: background 0.2s;
     width: 100%;
-    &:hover,
-    &:focus {
-        background: var(--content-ui-hover);
-    }
     &:last-of-type {
         border-bottom: none;
     }

@@ -128,41 +128,25 @@ function onRemoveAll(): void {
     emit("removeAll");
 }
 
-const activeIndex = window.Vue.ref(-1);
+const activeIndex = window.Vue.ref(-1); // to be able to use keyboard navigation to move through the search results
 
 /**
- * to be able to move up and down through the selections
- * with the arrow keys
+ * Move down the search results
  */
-function decrementActiveIndex(): void {
-    if (activeIndex.value > 0) {
-        activeIndex.value -= 1;
-    }
-}
-
-/**
- * to be able to move up and down through the selections
- * with the arrow keys
- */
-function incrementActiveIndex(): void {
+onKeyStroke("ArrowDown", () => {
     const maxIncrement = showSelectAll.value ? props.results.length : props.results.length - 1;
     if (showSelectAll.value && activeIndex.value < maxIncrement) {
         activeIndex.value += 1;
     }
-}
-
-/**
- * to be able to move down the search results
- */
-onKeyStroke("ArrowDown", () => {
-    incrementActiveIndex();
 });
 
 /**
- * to be able to move up the search results
+ * Move up the search results
  */
 onKeyStroke("ArrowUp", () => {
-    decrementActiveIndex();
+    if (activeIndex.value > 0) {
+        activeIndex.value -= 1;
+    }
 });
 
 /**
@@ -174,6 +158,14 @@ window.Vue.watch(
         activeIndex.value = 0;
     },
 );
+
+/**
+ * Set the active index to the result currently hovered over
+ * @param index - the index of the hovered result
+ */
+function onHover(index: number): void {
+    activeIndex.value = index;
+}
 </script>
 <template>
     <div ref="searchResultsContainerEl" class="search-results-container">
@@ -191,6 +183,7 @@ window.Vue.watch(
                     :active-index="activeIndex"
                     @select-all="onSelectAll"
                     @remove-all="onRemoveAll"
+                    @hover="onHover"
                 />
                 <search-select-result
                     v-for="(result, index) in props.results"
@@ -204,6 +197,7 @@ window.Vue.watch(
                     :active-index="activeIndex"
                     @select="onSelect"
                     @deselect="onDeselect"
+                    @hover="onHover"
                 />
             </template>
         </div>
