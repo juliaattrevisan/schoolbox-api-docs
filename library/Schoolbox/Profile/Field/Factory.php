@@ -72,6 +72,8 @@ class Factory
             $payload['roleTypes']['fields']['selected'][] = [
                 'field' => $renderableField->getField(),
                 'displayAs' => $renderableField->getDisplayAs(),
+                'icon' => $renderableField->getIcon(),
+                'css' => $renderableField->getCss(),
                 'terminology' => $renderableField->getTerm(),
                 'value' => $referenceFields[$renderableField->getField()] ?? null
             ];
@@ -134,9 +136,6 @@ class Factory
                 $externalUser['AlertMessages'] = $externalUser['AlertMessage'];
             } else {
                 $externalUser['AlertMessages'] = empty($externalUser['AlertMessage']) ? [] : [trim($externalUser['AlertMessage'])];
-            }
-            if (isset($externalUser['CourtOrderType']) && (trim($externalUser['CourtOrderType']) !== '')) {
-                $externalUser['AlertMessages'][] = 'Court Order - ' . trim($externalUser['CourtOrderType']);
             }
         }
 
@@ -246,8 +245,8 @@ class Factory
             'email' => $viewee->getEmail(),
             'externalId' => $viewee->getExternalId(),
             'role' => $viewee->getRole()->getName(),
-            'residentialHouse' => $viewee->getResidentialHouse()->getHouse(),
-            'campus' => $viewee->getCampusCollection(),
+            'residentialHouse' => $viewee->getResidentialHouse()?->getHouse(),
+            'campusCollection' => $viewee->getCampusCollection(),
             /* This is an arbitrary set of people associated with $viewee somehow
              * They might (or might not) have actual schoolbox user accounts
              */

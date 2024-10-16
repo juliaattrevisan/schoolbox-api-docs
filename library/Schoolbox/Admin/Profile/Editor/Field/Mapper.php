@@ -188,7 +188,7 @@ class Mapper extends \Schoolbox\Mapper
          * This is the maximum fields that could be rendered on a profile screen
          */
         $query = "
-            SELECT f.*
+            SELECT DISTINCT f.*
             FROM {$this->getTable()} f
             INNER JOIN profile_field_campus_availability pfca ON f.id = pfca.profile_field_id
             INNER JOIN profile_field_roletype_visibility pfrv ON f.id = pfrv.profile_field_id
