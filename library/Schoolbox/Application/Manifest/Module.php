@@ -29,9 +29,9 @@ class Module extends BaseModule
     {
         if ($this->getConfig()->get(ConfigMapper::NAME_PWA_ENABLED)) {
             $this->register('GET', 'manifest', 'getManifest', null, null);
-            $this->register('GET', 'manifest/offline', 'getOffline', null, null);
-            $this->register('GET', 'service-worker.js', 'getServiceWorker', null, null);
         }
+        $this->register('GET', 'manifest/offline', 'getOffline', null, null);
+        $this->register('GET', 'service-worker.js', 'getServiceWorker', null, null);
     }
 
 
