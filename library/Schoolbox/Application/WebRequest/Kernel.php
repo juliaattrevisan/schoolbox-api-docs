@@ -249,13 +249,13 @@ class Kernel extends WebKernelAbstract
         $this->sentryTransactionManager->startTransaction(
             $route->name,
             null,
-            null,
+            'http.server',
             null,
             TransactionSource::route(),
             $_SERVER['REQUEST_TIME_FLOAT'],
             [
-                'url'    => $_SERVER['REQUEST_URI'],
-                'method' => $_SERVER['REQUEST_METHOD'],
+                'url'                 => $_SERVER['REQUEST_URI'],
+                'http.request.method' => $_SERVER['REQUEST_METHOD'],
             ],
         );
 
@@ -472,13 +472,13 @@ class Kernel extends WebKernelAbstract
         $this->sentryTransactionManager->startTransaction(
             $pageName,
             null,
-            null,
+            'http.server',
             null,
             TransactionSource::url(),
             $_SERVER['REQUEST_TIME_FLOAT'],
             [
-                'url'    => $_SERVER['REQUEST_URI'],
-                'method' => $_SERVER['REQUEST_METHOD'],
+                'url'                 => $_SERVER['REQUEST_URI'],
+                'http.request.method' => $_SERVER['REQUEST_METHOD'],
             ],
         );
 
