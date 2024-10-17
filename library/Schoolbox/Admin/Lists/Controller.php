@@ -1432,7 +1432,6 @@ class Controller extends Base
 
         $listCategory = match ($table) {
             'news-topic' => 'News',
-            'achievement-category' => 'Badge',
             default => '',
         };
 
