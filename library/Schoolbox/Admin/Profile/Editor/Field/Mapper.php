@@ -157,13 +157,13 @@ class Mapper extends \Schoolbox\Mapper
      *
      * @param User $viewee
      * @param User $viewer
-     * @return GenericCollection
+     * @return array
      * @throws Exception
      * @throws DebugBarException
      * @throws \PDOException
      * @throws \UnexpectedValueException
      */
-    public function findRenderableFields(\Schoolbox\User $viewee, \Schoolbox\User $viewer): GenericCollection
+    public function findRenderableFields(\Schoolbox\User $viewee, \Schoolbox\User $viewer): array
     {
         $collection = $this->createCollection();
 
@@ -196,7 +196,9 @@ class Mapper extends \Schoolbox\Mapper
          */
         if ($viewee->getId() === $viewer->getId()) {
             $query = "
-                SELECT f.*
+                SELECT DISTINCT
+                    f.*, 
+                    pfrv.roletype AS visibility_roletype
                 FROM {$this->getTable()} f
                 INNER JOIN profile_field_campus_availability pfca ON f.id = pfca.profile_field_id
                 INNER JOIN profile_field_roletype_visibility pfrv ON f.id = pfrv.profile_field_id
@@ -210,7 +212,9 @@ class Mapper extends \Schoolbox\Mapper
             $params['selfRoleType'] = $viewer->getRole()->getType();
         } else {
             $query = "
-                SELECT f.*
+                SELECT DISTINCT 
+                    f.*, 
+                    pfrv.roletype AS visibility_roletype
                 FROM {$this->getTable()} f
                 INNER JOIN profile_field_campus_availability pfca ON f.id = pfca.profile_field_id
                 INNER JOIN profile_field_roletype_visibility pfrv ON f.id = pfrv.profile_field_id
@@ -225,6 +229,13 @@ class Mapper extends \Schoolbox\Mapper
         $statement = $this->getDatabase()->prepare($query);
         $statement->execute($params);
 
+        /* Allow each roletype's visibility rule to be further analysed in twig land
+         * because there are additional constraints which reduce this set of visibilities,
+         * such as configuration of a user account or some other rule that isn't in
+         * this sql query itself (also, some schools override this in custom work)
+         */
+        $rules = [];
+
         /* Additional visibility rules to be checked in twig land
          */
         while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
@@ -233,8 +244,15 @@ class Mapper extends \Schoolbox\Mapper
             if ($field) {
                 $collection->setOffset($field->getId(), $field);
             }
+
+            /* Remember the visibility rules for further scrutiny
+             */
+            $rules[$row['field']][] = $row['visibility_roletype'];
         }
 
-        return $collection;
+        return [
+            'manifest' => $collection,
+            'rules' => $rules
+        ];
     }
 }
