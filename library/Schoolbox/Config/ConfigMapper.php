@@ -183,7 +183,7 @@ class ConfigMapper extends Mapper
     public const NAME_SUMMATIVE_REPORT_ENABLED = 'summative_report_enabled';
 
     public const NAME_PWA_ENABLED = 'pwa_enable';
-    public const NAME_PUSH_NOTIFICATIONS_ENABLED = 'push_notifications_enabled';
+    public const NAME_WEB_PUSH_NOTIFICATIONS_ENABLED = 'web_push_notifications_enabled';
 
     public const NAME_SHOW_SCHOOLBOX_HELP_LINK = 'show_schoolbox_help_link';
 

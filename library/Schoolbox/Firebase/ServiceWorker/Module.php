@@ -30,7 +30,7 @@ class Module extends BaseModule
      */
     protected function registerRoutes()
     {
-        if ($this->getConfig()->get(ConfigMapper::NAME_PUSH_NOTIFICATIONS_ENABLED)) {
+        if ($this->getConfig()->get(ConfigMapper::NAME_WEB_PUSH_NOTIFICATIONS_ENABLED)) {
             $this->register('GET', 'firebase-messaging-sw.js', 'getServiceWorker');
         }
     }
