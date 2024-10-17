@@ -16,6 +16,9 @@ use Schoolbox\Resource\Folder\Model as Folder;
 use Schoolbox\User;
 use InvalidArgumentException;
 
+/**
+ * Helper class for retrieve data for course API and course list
+ */
 class Helper
 {
     /**
