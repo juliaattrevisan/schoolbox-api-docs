@@ -25,7 +25,7 @@ const emit = defineEmits<{
 }>();
 
 /**
- * To determine whether the checkbox is currently selected
+ * To determine whether the radio/checkbox is currently selected
  * based on whether it's in the selected list
  * @returns {boolean}
  */
@@ -35,8 +35,13 @@ const isChecked = window.Vue.computed(() => {
 
 /**
  * To toggle the selected state of the result
+ * @param event - the click event
  */
-function onClick(): void {
+function onClick(event?: MouseEvent | undefined): void {
+    // ignore input label clicks, which get picked up due to the click listener on the parent div
+    if (event && event.target && (event.target as HTMLElement).nodeName === "LABEL") {
+        return;
+    }
     if (isChecked.value) {
         emit("remove", [props.result]);
     } else {
@@ -91,7 +96,7 @@ const { isActive } = useActiveIndex(
             />
             <input
                 v-else
-                :id="`checkbox-${result.id}`"
+                :id="`search-select-result-input-${result.id}`"
                 type="checkbox"
                 :checked="isChecked"
                 :data-test="`search-select-result-checkbox-${props.result.id}`"

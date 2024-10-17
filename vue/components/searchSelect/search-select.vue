@@ -38,13 +38,11 @@ const searchSelectEl = useTemplateRef("searchSelectEl");
 const { query, isActive, isSearching, hasNoResults, results } = useSearch(props.endpoint);
 
 /**
- * To show the current search results, or the default results if the search is not active
+ * To show the current search results, or the default results
+ * if the search is not active
  * @returns { Result[] }
  */
 const currentResults = window.Vue.computed(() => {
-    if (props.selectedItems.length === 1 && props.isSingleSelect) {
-        return [];
-    }
     if (props.defaultResults && props.defaultResults.length > 0 && !isActive.value) {
         return props.defaultResults;
     }
