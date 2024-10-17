@@ -190,9 +190,17 @@ class Mapper extends \Schoolbox\Mapper
 
         /* Find an ordered list of fields there enabled for $viewee.
          * This is the maximum fields that could be rendered on a profile screen
+         *
+         * Note that we also send back the pfrv.roletype value for each field, because
+         * visibility is more than just the roletype; there are special conditionals
+         * that constrain roletype further, such as config options on a user's account.
+         * A staff member might have visibility on a field, but that field itself is
+         * subjected to a config var that isn't in this query. It's being checked elsewhere.
          */
         $query = "
-            SELECT DISTINCT f.*
+            SELECT  
+                f.*,
+                pfrv.roletype
             FROM {$this->getTable()} f
             INNER JOIN profile_field_campus_availability pfca ON f.id = pfca.profile_field_id
             INNER JOIN profile_field_roletype_visibility pfrv ON f.id = pfrv.profile_field_id
@@ -206,14 +214,21 @@ class Mapper extends \Schoolbox\Mapper
         $statement = $this->getDatabase()->prepare($query);
         $statement->execute($params);
 
+        /* Additional visibility rules to be checked in twig land
+         */
+        $rules = [];
+
         while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
             $field = $this->hydrate($row);
 
+            $rules[$row['field']][] = $row['roletype'];
+
             if ($field) {
-                $collection->add($field);
+                $collection->setOffset($field->getId(), $field);
             }
         }
 
+        new \Alaress_Probe($collection, $rules);
         return $collection;
     }
 }
