@@ -178,19 +178,17 @@ class FetchPagesFromCsvCest
         try {
             $i->seeResponseCodeIs(400);
             if ($example[4] == '401') {
-                $skippedTest = true;
+                $skippedTest = true; // This line will execute only if the above line doesn't throw an exception.
             }
         } catch (\Exception $e) {
-            //If its a different code don't catch it
         }
 
         try {
             $i->seeResponseCodeIs(403);
             if ($example[4] == '401') {
-                $skippedTest = true;
+                $skippedTest = true; // This line will execute only if the above line doesn't throw an exception.
             }
         } catch (\Exception $e) {
-            //If its a different code don't catch it
         }
 
         if ($skippedTest) {
