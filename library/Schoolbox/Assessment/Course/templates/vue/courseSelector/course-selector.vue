@@ -40,6 +40,7 @@ function onRemove(results: Result[]): void {
         :is-required="true"
         :endpoint="props.endpoint"
         :selected-items="selected"
+        :is-single-select="true"
         @add="onAdd"
         @remove="onRemove"
     />

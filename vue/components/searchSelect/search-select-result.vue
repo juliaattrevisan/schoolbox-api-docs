@@ -72,8 +72,7 @@ const { isActive } = useActiveIndex(
 </script>
 
 <template>
-    <component
-        :is="props.isSingleSelect ? 'button' : 'div'"
+    <div
         ref="resultEl"
         :class="`search-result ${isActive ? 'search-result--active' : ''} f-no-margins`"
         :data-test="`search-select-result-container-${props.result.id}`"
@@ -81,9 +80,17 @@ const { isActive } = useActiveIndex(
         @mouseover="onMouseover"
         @mouseout="onMouseout"
     >
-        <show-matches v-if="props.isSingleSelect" tag="span" :text="props.result.name" :query="props.query" />
-        <div v-else class="checklist">
+        <div class="checklist">
             <input
+                v-if="props.isSingleSelect"
+                :id="`search-select-result-input-${result.id}`"
+                type="radio"
+                :checked="isChecked"
+                :data-test="`search-select-result-radio-${props.result.id}`"
+                @click.stop="onClick"
+            />
+            <input
+                v-else
                 :id="`checkbox-${result.id}`"
                 type="checkbox"
                 :checked="isChecked"
@@ -92,13 +99,13 @@ const { isActive } = useActiveIndex(
             />
             <show-matches
                 tag="label"
-                :for="`checkbox-${result.id}`"
+                :for="`search-select-result-input-${result.id}`"
                 :text="props.result.name"
                 :query="props.query"
                 class="f-no-margins"
             />
         </div>
-    </component>
+    </div>
 </template>
 
 <style lang="scss" scoped>
