@@ -49,7 +49,7 @@ class Cursor implements ICursor
         if ($this->limit < self::LIMIT_MIN) {
             throw new ValueError(
                 sprintf(
-                    '$limit must be at least %d: %d provided',
+                    'Limit must be at least %d: %d provided',
                     self::LIMIT_MIN,
                     $this->limit
                 )
@@ -58,7 +58,7 @@ class Cursor implements ICursor
         if ($this->limit > self::LIMIT_MAX) {
             throw new ValueError(
                 sprintf(
-                    '$limit must be at most %d: %d provided',
+                    'Limit must be at most %d: %d provided',
                     self::LIMIT_MAX,
                     $this->limit
                 )
