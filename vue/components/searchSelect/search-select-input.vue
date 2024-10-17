@@ -3,7 +3,7 @@
  * To input the search query
  */
 
-import { onClickOutside, useFocus } from "@vueuse/core";
+import { onClickOutside, useFocus, onKeyStroke } from "@vueuse/core";
 
 interface Props {
     labelId: string; // the label id
@@ -43,6 +43,14 @@ window.Vue.watch(focused, ($focused) => {
     if (!$focused) {
         query.value = "";
     }
+});
+
+/**
+ * Prevent the form from submitting when pressing Enter in the search input,
+ * and the text input from shifting to the start/end on ArrowUp/ArrowDown
+ */
+onKeyStroke(["Enter", "ArrowUp", "ArrowDown"], (event) => {
+    event.preventDefault();
 });
 </script>
 

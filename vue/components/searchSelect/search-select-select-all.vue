@@ -76,6 +76,13 @@ function onMouseover(): void {
     emit("hover", props.index);
 }
 
+/**
+ * To unset the active index
+ */
+function onMouseout(): void {
+    emit("hover", -1);
+}
+
 const resultEl = window.Vue.ref<HTMLElement | null>(null);
 
 /**
@@ -96,6 +103,7 @@ const { isActive } = useActiveIndex(
         data-test="search-select-select-all"
         @click="onClick"
         @mouseover="onMouseover"
+        @mouseout="onMouseout"
     >
         <div class="checklist">
             <input

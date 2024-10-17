@@ -119,7 +119,7 @@ const activeIndex = window.Vue.ref(-1); // to be able to use keyboard navigation
  */
 onKeyStroke("ArrowDown", () => {
     const maxIncrement = showSelectAll.value ? props.results.length : props.results.length - 1;
-    if (showSelectAll.value && activeIndex.value < maxIncrement) {
+    if (activeIndex.value < maxIncrement) {
         activeIndex.value += 1;
     }
 });

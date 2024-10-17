@@ -45,10 +45,17 @@ function onClick(): void {
 }
 
 /**
- * To toggle the selected state of the result
+ * To potentially shift the active index to this result
  */
 function onMouseover(): void {
     emit("hover", props.index);
+}
+
+/**
+ * To unset the active index
+ */
+function onMouseout(): void {
+    emit("hover", -1);
 }
 
 const resultEl = window.Vue.ref<HTMLElement | null>(null);
@@ -65,12 +72,14 @@ const { isActive } = useActiveIndex(
 </script>
 
 <template>
-    <div
+    <component
+        :is="props.isSingleSelect ? 'button' : 'div'"
         ref="resultEl"
         :class="`search-result ${isActive ? 'search-result--active' : ''} f-no-margins`"
         :data-test="`search-select-result-container-${props.result.id}`"
         @click="onClick"
         @mouseover="onMouseover"
+        @mouseout="onMouseout"
     >
         <show-matches v-if="props.isSingleSelect" tag="span" :text="props.result.name" :query="props.query" />
         <div v-else class="checklist">
@@ -89,7 +98,7 @@ const { isActive } = useActiveIndex(
                 class="f-no-margins"
             />
         </div>
-    </div>
+    </component>
 </template>
 
 <style lang="scss" scoped>
