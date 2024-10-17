@@ -130,6 +130,7 @@ class ThreadMapper extends Mapper implements FeedableMapperInterface, IHomepageC
         ]);
 
         $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, [$this, 'postDelete']);
+        $this->registerPersistSearchIndexCallbacks(['views']);
     }
 
     /**

@@ -107,7 +107,6 @@ class IndexBuilder extends BaseBuilder
             FROM folder f
             " . $this->getJoinsFromFolderForTypeExpression() . "
             WHERE f.deleted_at IS NULL
-            GROUP BY f.id
         ";
         $params = [];
         if ($fromDate) {
@@ -124,6 +123,7 @@ class IndexBuilder extends BaseBuilder
             }
             [$queryString, $params] = $this->augmentQueryParams($subject, BuildType::UPDATE, $queryString, $params);
         }
+        $queryString .= ' GROUP BY f.id';
         $query = $this->connector->prepareQuery($queryString);
         $this->logger->info('Finding pages/folders...');
         $query->execute($params);
@@ -148,6 +148,7 @@ class IndexBuilder extends BaseBuilder
      */
     public function buildDeletes(?Alaress_Date_Format $fromDate, ?Alaress_Date_Format $toDate, ?object $subject): iterable
     {
+        // Pass 1: delete all indices for deleted folders
         $queryString = "
             SELECT
                 f.id,
@@ -184,6 +185,50 @@ class IndexBuilder extends BaseBuilder
                 null,
                 null,
             );
+        }
+
+        // Pass 2: delete indices for non-deleted folders,
+        // if the index's type is different to this folder's index type.
+        // Required so that if, e.g. a homepage template is added to a folder,
+        // the folder's previous "page.folder" index is deleted whilst
+        // preserving its "page.homepage" index.
+        $queryString = "
+            SELECT
+                f.id,
+                " . $this->buildTypeExpression() . " AS type
+            FROM folder f
+            " . $this->getJoinsFromFolderForTypeExpression() . "
+            WHERE f.deleted_at IS NULL
+        ";
+        $params = [];
+        if ($fromDate) {
+            $queryString .= ' AND f.updated_at >= :fromDate';
+            $params['fromDate'] = $fromDate->getDatabase();
+        }
+        if ($toDate) {
+            $queryString .= ' AND f.updated_at <= :toDate';
+            $params['toDate'] = $toDate->getDatabase();
+        }
+        if ($subject) {
+            [$queryString, $params] = $this->augmentQueryParams($subject, BuildType::DELETE, $queryString, $params);
+        }
+        $query = $this->connector->prepareQuery($queryString);
+        $query->execute($params);
+        $this->logger->info(sprintf('Deleting search indices for %d pages/folders', $query->rowCount()));
+        foreach ($query as $row) {
+            foreach (Hydrator::SUB_TYPES as $subType) {
+                if ($subType !== $row['type']) {
+                    yield $this->buildIndex(
+                        (string)$row['id'],
+                        null,
+                        $subType,
+                        null,
+                        false,
+                        null,
+                        null,
+                    );
+                }
+            }
         }
     }
 
