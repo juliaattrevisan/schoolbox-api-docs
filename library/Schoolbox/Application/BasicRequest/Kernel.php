@@ -338,7 +338,7 @@ class Kernel extends WebKernelAbstract
                     $twig = new Environment($loader, $options);
 
                     $twig->addExtension(new DebugExtension());
-                    $twig->addExtension(new AdminNavigationRenderer());
+                    $twig->addExtension(new AdminNavigationRenderer($di->get('authorizer'), $di->get('user')));
 
                     // HTML Purifier filter - known to output safe HTML
                     $scrubAdapter = new ScrubAdapter();
