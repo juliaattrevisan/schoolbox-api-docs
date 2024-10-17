@@ -4,12 +4,16 @@ import { useSelected } from "@schoolboxVue/composables/store/useSelected";
 import SearchSelect from "../search-select.vue";
 import { DEBOUNCE_AMOUNT } from "../composables/useSearch";
 
+const defaultProps = {
+    label: "Search Select",
+    labelId: "search-select",
+    endpoint: "",
+};
+
 test("selected items are visible", async () => {
     const wrapper = mount(SearchSelect, {
         props: {
-            label: "Search Select",
-            labelId: "search-select",
-            endpoint: "",
+            ...defaultProps,
             selectedItems: [
                 { id: 1, name: "Item 1" },
                 { id: 2, name: "Item 2" },
@@ -29,9 +33,7 @@ test("search results can be added", async () => {
     add([{ id: 1, name: "Item 1" }]);
     const wrapper = mount(SearchSelect, {
         props: {
-            label: "Search Select",
-            labelId: "search-select",
-            endpoint: "",
+            ...defaultProps,
             selectedItems: selected.value,
         },
     });
@@ -63,9 +65,7 @@ test("selected items can be removed", async () => {
     add([{ id: 1, name: "Item 1" }, itemToRemove, { id: 3, name: "Item 3" }]);
     const wrapper = mount(SearchSelect, {
         props: {
-            label: "Search Select",
-            labelId: "search-select",
-            endpoint: "",
+            ...defaultProps,
             selectedItems: selected.value,
         },
     });
@@ -87,9 +87,7 @@ test("select all can be used to add/remove all search results", async () => {
     add([{ id: 1, name: "Item 1" }]);
     const wrapper = mount(SearchSelect, {
         props: {
-            label: "Search Select",
-            labelId: "search-select",
-            endpoint: "",
+            ...defaultProps,
             selectedItems: selected.value,
         },
     });
@@ -130,9 +128,7 @@ test("select all is not visible when only one search result is found", async () 
     add([{ id: 1, name: "Item 1" }]);
     const wrapper = mount(SearchSelect, {
         props: {
-            label: "Search Select",
-            labelId: "search-select",
-            endpoint: "",
+            ...defaultProps,
             selectedItems: selected.value,
         },
     });
@@ -157,9 +153,7 @@ test("search results are removed when search query is cleared", async () => {
     ];
     const wrapper = mount(SearchSelect, {
         props: {
-            label: "Search Select",
-            labelId: "search-select",
-            endpoint: "",
+            ...defaultProps,
             selectedItems: [],
         },
     });
@@ -181,9 +175,7 @@ test("search results are removed when search query is cleared", async () => {
 test("default results are visible when search is not active", async () => {
     const wrapper = mount(SearchSelect, {
         props: {
-            label: "Search Select",
-            labelId: "search-select",
-            endpoint: "",
+            ...defaultProps,
             selectedItems: [],
             defaultResults: [
                 { id: 1, name: "Default Item 1" },
@@ -195,12 +187,10 @@ test("default results are visible when search is not active", async () => {
 });
 
 test("only one selection allowed when isSingleSelect is true", async () => {
-    const { selected, add } = useSelected();
+    const { selected, add, remove } = useSelected();
     const wrapper = mount(SearchSelect, {
         props: {
-            label: "Search Select",
-            labelId: "search-select",
-            endpoint: "",
+            ...defaultProps,
             selectedItems: selected.value,
             defaultResults: [
                 { id: 1, name: "Default Item 1" },
@@ -210,9 +200,32 @@ test("only one selection allowed when isSingleSelect is true", async () => {
         },
     });
     expect(wrapper.findAll('[data-test^="search-select-result-checkbox-"]')).toHaveLength(0); // validate the checkboxes on results are not visible
-    add([{ id: 1, name: "Default Item 1" }]);
+    /**
+     * Add a search result
+     */
+    const searchResult = wrapper.get(`[data-test="search-select-result-container-1"]`);
+    searchResult.trigger("click"); // add the search result to the selected items
+    let addEvent = wrapper.emitted("add"); // validate the event has been emitted
+    expect(addEvent[0]).toEqual([[{ id: 1, name: "Default Item 1" }]]); // validate the event has the correct payload
+    add({ id: 1, name: "Default Item 1" }); // add the result to the selected items
     await wrapper.setProps({ selectedItems: selected.value }); // update the selected items (this is needed because the prop is apparent not reactive in this context)
-    expect(wrapper.findAll('[data-test^="search-select-result-container-"]')).toHaveLength(0); // validate the default results are no longer visible
-    const selectedItem = wrapper.get(`[data-test="search-select-selected-item-container-1"]`); // get the first selected item
-    expect(selectedItem.html()).toContain("Default Item 1"); // validate the selected item contains the correct text
+    expect(wrapper.findAll('[data-test^="search-select-selected-item-container-"]')).toHaveLength(1); // validate only one selected result
+    /**
+     * Now choose another search result
+     */
+    const anotherSearchResult = wrapper.get(`[data-test="search-select-result-container-2"]`);
+    anotherSearchResult.trigger("click"); // add another search result to the selected items
+    const removeEvent = wrapper.emitted("remove"); // validate the remove event has first been emitted
+    expect(removeEvent[0]).toEqual([[{ id: 1, name: "Default Item 1" }]]); // validate the event has the correct payload
+    remove({ id: 1, name: "Default Item 1" }); // remove the first selected item
+    addEvent = wrapper.emitted("add"); // validate the event has been emitted
+    expect(addEvent[1]).toEqual([[{ id: 2, name: "Default Item 2" }]]); // validate the event has the correct payload
+    add({ id: 2, name: "Default Item 2" }); // add the result to the selected items
+    await wrapper.setProps({ selectedItems: selected.value }); // update the selected items (this is needed because the prop is apparent not reactive in this context)
+    /**
+     * Validate the second item is the only selected item
+     */
+    expect(wrapper.findAll('[data-test^="search-select-selected-item-container-"]')).toHaveLength(1); // validate only one selected result
+    const selectedItem = wrapper.get(`[data-test="search-select-selected-item-container-2"]`); // get the selected item
+    expect(selectedItem.html()).toContain("Default Item 2"); // validate the selected item contains the correct text
 });

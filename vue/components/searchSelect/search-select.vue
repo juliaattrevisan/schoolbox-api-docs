@@ -55,7 +55,7 @@ const currentResults = window.Vue.computed(() => {
  */
 function onAdd($results: Result[]): void {
     // if single select, remove the previous selection
-    if (props.isSingleSelect) {
+    if (props.isSingleSelect && props.selectedItems.length > 0) {
         emit("remove", props.selectedItems);
     }
     emit("add", $results);
