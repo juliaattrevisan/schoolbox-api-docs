@@ -214,8 +214,10 @@
 
                                     {% if selectedField.icon and selectedField.css %}
                                         <dt class="full-width">
-                                            {# A set of Alert Messages that display in one big flag #}
                                             {% if selectedField.field in ['AlertMessages', 'AlertLegal'] %}
+                                                {# A set of Alert Messages that display in one big flag
+                                                 # This is often a set of strings that need to be output sequentially
+                                                 #}
                                                 {% if selectedField.value|length %}
                                                     <div class="alert-box {{ selectedField.css ?? '' }} {{ selectedField.icon ?? '' }}">
                                                         {% for message in selectedField.value %}
@@ -224,12 +226,13 @@
                                                     </div>
                                                 {% endif %}
                                             {% elseif selectedField.value %}
+                                                {# A string that displays in a flag in some manner, typically #}
                                                 <div class="alert-box {{ selectedField.css ?? '' }} {{ selectedField.icon ?? '' }}">
                                                     {% if selectedField.field in ['StudentMedicalAlert'] %}
-                                                        {# A string that displays in a flag #}
+                                                        {# A string with a special prefix that displays in a flag #}
                                                         Medical Note: {{ selectedField.value }}
                                                     {% elseif selectedField.field in ['Comment'] %}
-                                                        {# A string that displays in a flag #}
+                                                        {# A string that displays on its own in a flag#}
                                                         {{ selectedField.value }}
                                                     {% elseif selectedField.field in ['ParentsSeparatedFlag'] %}
                                                         {# A special flag that has a hardcoded text string #}
