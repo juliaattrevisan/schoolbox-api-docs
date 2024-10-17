@@ -13,6 +13,7 @@ use Alaress\Twig\Loader\IChainLoader;
 use Alaress\Web\Controller\Base;
 use Schoolbox\Config\ConfigMapper;
 use Alaress\Authorizer\Rule;
+use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
 
 class Module extends \Alaress\Module\Module
@@ -25,10 +26,17 @@ class Module extends \Alaress\Module\Module
      */
     protected function registerRoutes(): void
     {
-        $isSuper = new Rule\IsSuperuser();
-        $this->register('GET', '/search', 'searchSettings', $isSuper);
-        $this->register('GET', '{/typeLabel}', 'getSettings', $isSuper);
-        $this->register('POST', '/{typeLabel}', 'postSettings', $isSuper);
+        $rule = new Rule\All(
+            new Rule\IsLoggedIn(),
+            new Rule\Any(
+                new Rule\IsSuperuser(),
+                new Rule\HasServicePermission(UserAccess::SERVICE_NEWS, UserAccess::ACCESS_FULL)
+            )
+        );
+
+        $this->register('GET', '/search', 'searchSettings', $rule);
+        $this->register('GET', '{/typeLabel}', 'getSettings', $rule);
+        $this->register('POST', '/{typeLabel}', 'postSettings', $rule);
     }
 
     /**
