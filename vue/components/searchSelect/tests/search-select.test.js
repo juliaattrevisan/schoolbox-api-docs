@@ -48,7 +48,7 @@ test("search results can be added", async () => {
     /**
      * Add a search result
      */
-    const searchResult = wrapper.get(`[data-test="search-select-result-container-4"]`);
+    const searchResult = wrapper.get(`[data-test="search-select-result-checkbox-4"]`);
     searchResult.trigger("click"); // add the search result to the selected items
     const addEvent = wrapper.emitted("add"); // validate the event has been emitted
     expect(addEvent[0]).toEqual([[itemToAdd]]); // validate the event has the correct payload
@@ -117,7 +117,7 @@ test("select all can be used to add/remove all search results", async () => {
     expect(removeEvent[0]).toEqual([mockSearchList]); // validate the event has the correct payload
     remove(mockSearchList); // add the result to the selected items
     await wrapper.setProps({ selectedItems: selected.value }); // update the selected items (this is needed because the prop is apparent not reactive in this context)
-    expect(wrapper.findAll('[data-test^="search-select-selected-item-container-"]')).toHaveLength(1); // validate the results have been removed to the UI
+    expect(wrapper.findAll('[data-test^="search-select-selected-item-container-"]')).toHaveLength(1); // validate the results have been removed from the UI
 
     global.fetch.mockClear();
 });
@@ -203,7 +203,7 @@ test("only one selection allowed when isSingleSelect is true", async () => {
     /**
      * Add a search result
      */
-    const searchResult = wrapper.get(`[data-test="search-select-result-container-1"]`);
+    const searchResult = wrapper.get(`[data-test="search-select-result-radio-1"]`);
     searchResult.trigger("click"); // add the search result to the selected items
     let addEvent = wrapper.emitted("add"); // validate the event has been emitted
     expect(addEvent[0]).toEqual([[{ id: 1, name: "Default Item 1" }]]); // validate the event has the correct payload
@@ -213,7 +213,7 @@ test("only one selection allowed when isSingleSelect is true", async () => {
     /**
      * Now choose another search result
      */
-    const anotherSearchResult = wrapper.get(`[data-test="search-select-result-container-2"]`);
+    const anotherSearchResult = wrapper.get(`[data-test="search-select-result-radio-2"]`);
     anotherSearchResult.trigger("click"); // add another search result to the selected items
     const removeEvent = wrapper.emitted("remove"); // validate the remove event has first been emitted
     expect(removeEvent[0]).toEqual([[{ id: 1, name: "Default Item 1" }]]); // validate the event has the correct payload
