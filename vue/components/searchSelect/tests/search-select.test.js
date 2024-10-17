@@ -1,17 +1,11 @@
-import { mount } from "@vue/test-utils";
+import { mount, flushPromises } from "@vue/test-utils";
+import axios from "axios";
+import { timeout } from "@js/util/jsUtils";
+import { useSelected } from "@schoolboxVue/composables/store/useSelected";
 import SearchSelect from "../search-select.vue";
-
-beforeEach(() => {
-    document.body.innerHTML = `
-        <div id="container">
-            <div id="app"></div>
-        </div>
-    `;
-});
 
 test("selected items are visible", async () => {
     const wrapper = mount(SearchSelect, {
-        attachTo: document.getElementById("app"),
         props: {
             label: "Search Select",
             labelId: "search-select",
@@ -19,95 +13,60 @@ test("selected items are visible", async () => {
             selectedItems: [
                 { id: 1, name: "Item 1" },
                 { id: 2, name: "Item 2" },
+                { id: 3, name: "Item 3" },
             ],
         },
     });
-    await wrapper.vm.$nextTick();
-    const selectedItem = wrapper.get(`[data-test="search-select-selected-item-1"]`);
+    expect(wrapper.findAll('[data-test^="search-select-selected-item-container-"]')).toHaveLength(3);
+    const selectedItem = wrapper.get(`[data-test="search-select-selected-item-container-1"]`);
     expect(selectedItem.html()).toContain("Item 1");
 });
 
-// test("when clicked again content is hidden", async () => {
-//     const wrapper = mount(SbxPopOut, {
-//         attachTo: document.getElementById("app"),
-//         props: {
-//             contentId: "my-content",
-//         },
-//     });
-//     await wrapper.vm.$nextTick();
-//     wrapper.get(`[data-test="sbx-pop-out-my-content-button"]`).trigger("click");
-//     wrapper.get(`[data-test="sbx-pop-out-my-content-button"]`).trigger("click");
-//     const content = document.querySelector("#my-content");
-//     expect(content.style.display).toBe("none");
-// });
+test("selected items can be removed", async () => {
+    const { selected, add, remove } = useSelected();
+    const itemToRemove = { id: 2, name: "Item 2" };
+    add([{ id: 1, name: "Item 1" }, itemToRemove, { id: 3, name: "Item 3" }]);
+    const wrapper = mount(SearchSelect, {
+        props: {
+            label: "Search Select",
+            labelId: "search-select",
+            endpoint: "",
+            selectedItems: selected.value,
+        },
+    });
+    wrapper.get(`[data-test="search-select-selected-item-remove-2"]`).trigger("click");
+    const removeEvent = wrapper.emitted("remove"); // validate the event has been emitted
+    expect(removeEvent[0]).toEqual([[itemToRemove]]); // validate the event has the correct payload
+    remove(itemToRemove); // remove the item from the selected items
+    expect(selected.value).toHaveLength(2); // validate the item has been removed
+    await wrapper.setProps({ selectedItems: selected.value }); // update the selected items (this is needed because the prop is apparent not reactive in this context)
+    expect(wrapper.findAll('[data-test^="search-select-selected-item-container-"]')).toHaveLength(2);
+});
 
-// test("button has text when provided", async () => {
-//     const wrapper = mount(SbxPopOut, {
-//         attachTo: document.getElementById("app"),
-//         props: {
-//             contentId: "my-content",
-//             buttonText: "Open My Content",
-//         },
-//     });
-//     await wrapper.vm.$nextTick();
-//     const button = wrapper.get(`[data-test="sbx-pop-out-my-content-button"]`);
-//     expect(button.html()).toContain("Open My Content");
-// });
+const mockSearchList = [
+    { id: 4, title: "Search result 1" },
+    { id: 5, title: "Search result 2" },
+];
 
-// // moveTo tests
-// test("content moves to new parent when moveTo is specified by a querySelector", async () => {
-//     document.body.innerHTML += `<div id="move-to-target"></div>`;
-//     const wrapper = mount(SbxPopOut, {
-//         attachTo: document.getElementById("app"),
-//         props: {
-//             contentId: "my-content",
-//             moveTo: "#move-to-target",
-//         },
-//     });
-//     await wrapper.vm.$nextTick();
+test("search results can be added", async () => {
+    const { selected, add } = useSelected();
+    add([{ id: 1, name: "Item 1" }]);
+    const wrapper = mount(SearchSelect, {
+        props: {
+            label: "Search Select",
+            labelId: "search-select",
+            endpoint: "",
+            selectedItems: selected.value,
+        },
+    });
 
-//     const content = document.querySelector("#my-content");
-//     expect(content.parentElement.id).toBe("move-to-target");
-//     wrapper.unmount();
-// });
+    jest.spyOn(axios, "get").mockResolvedValue(mockSearchList);
 
-// test("content moves to new parent when moveTo specified by an element reference", async () => {
-//     document.body.innerHTML += `<div id="move-to-target"></div>`;
-//     const moveToElement = document.getElementById("move-to-target");
-//     const wrapper = mount(SbxPopOut, {
-//         attachTo: document.getElementById("app"),
-//         props: {
-//             contentId: "my-content",
-//             moveTo: moveToElement,
-//         },
-//     });
-//     await wrapper.vm.$nextTick();
-
-//     const content = document.querySelector("#my-content");
-//     expect(content.parentElement).toBe(moveToElement);
-//     wrapper.unmount();
-// });
-
-// test("content moves back to original parent on unmount if moveTo is was specified", async () => {
-//     document.body.innerHTML += `<div id="move-to-target"></div>`;
-//     const moveToElement = document.getElementById("move-to-target");
-//     const originalParent = document.getElementById("app");
-//     const wrapper = mount(SbxPopOut, {
-//         attachTo: originalParent,
-//         props: {
-//             contentId: "my-content",
-//             moveTo: moveToElement,
-//         },
-//     });
-//     await wrapper.vm.$nextTick();
-
-//     // Confirm it moved to new parent first
-//     let content = document.querySelector("#my-content");
-//     expect(content.parentElement).toBe(moveToElement);
-
-//     wrapper.unmount();
-
-//     // Now, the content should be back to its original parent
-//     content = document.querySelector("#my-content");
-//     expect(content.parentElement.id).toBe(originalParent.parentElement.id);
-// });
+    const searchInput = wrapper.get(`[data-test="search-select-input"]`);
+    searchInput.setValue("search this");
+    // Let's assert that we've called axios.get the right amount of times and
+    // with the right parameters.
+    await timeout(1000);
+    expect(axios.get).toHaveBeenCalledTimes(1);
+    // expect(axios.get).toHaveBeenCalledWith("/api/posts");
+});
