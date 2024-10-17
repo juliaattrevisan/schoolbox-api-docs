@@ -473,12 +473,6 @@ class Subnav
                         'children'    => [],
                         'description' => 'Configure tags that can be used on learning moments when students capture evidence.',
                     ],
-                    '/adminv2/lists/news-topic'                       => [
-                        'name'        => 'News Topics',
-                        'visible'     => true,
-                        'children'    => [],
-                        'description' => 'Configure the list of news topics to allow categorisation of news.',
-                    ],
                     '/adminv2/lists/pastoral-action'                  => [
                         'name'        => 'Pastoral Actions',
                         'visible'     => $this->configLoader->get(ConfigMapper::NAME_PASTORAL_ENABLED)
@@ -603,11 +597,24 @@ class Subnav
                     ],
                 ],
             ],
-            '/adminv2/news'                           => [
+            'news' => [
                 'name'        => 'News',
                 'visible'     => true,
                 'searchable'  => true,
-                'children'    => [],
+                'children'    => [
+                    'adminv2/news' => [
+                        'name'        => 'Settings / Policy',
+                        'visible'     => true,
+                        'children'    => [],
+                        'description' => 'Configure the list of news topics to allow categorisation of news.',
+                    ],
+                    '/adminv2/lists/news/news-topic' => [
+                        'name'        => 'Topics List',
+                        'visible'     => true,
+                        'children'    => [],
+                        'description' => 'Configure the list of news topics to allow categorisation of news.',
+                    ],
+                ],
                 'description' => 'Configure moderation and default values when posting and modifying news.',
             ],
             '/adminv2/notifications'                       => [

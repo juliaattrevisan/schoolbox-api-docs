@@ -12,6 +12,11 @@ namespace Schoolbox\Admin\Lists;
 
 use Alaress\Diff\Differ;
 use Alaress\Web\Controller\Base;
+use Aura\Router\Exception\RouteNotFound;
+use Exception;
+use External_Pastoral;
+use External_Timetable;
+use ReflectionException;
 use Schoolbox\Application\Exception\Exception as SchoolboxException;
 use Schoolbox\Admin\Navigation\Subnav;
 use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Mapper as GradeLevelGroupMapper;
@@ -19,6 +24,7 @@ use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Learning\Moment\Evidence\Tag\Mapper as LearningMomentEvidenceTag;
 use Schoolbox\Mapper;
 use Schoolbox\Mapper\Exception as MapperException;
+use Schoolbox\Mapper\Exception\Deleted;
 use Schoolbox\MapperFactory;
 use Schoolbox\Role;
 use Schoolbox\RoleMapper;
@@ -42,6 +48,7 @@ use Schoolbox\Pastoral\DocumentClassification\Mapper as PastoralDocumentClassifi
 use Schoolbox\Pastoral;
 use Schoolbox\YearLevel;
 use Timetable_ColourMapper;
+use Twig\Error\Error;
 use UnexpectedValueException;
 
 /**
@@ -51,8 +58,7 @@ use UnexpectedValueException;
 class Controller extends Base
 {
     /** @var MapperFactory */
-    private $mapperFactory;
-
+    private MapperFactory $mapperFactory;
 
     /**
      * Note to anyone thinking about using the RosettaStone here to fix terminology:
@@ -71,13 +77,31 @@ class Controller extends Base
     /**
      * Deletes a list item using the specified mapper
      */
-    public function postDelete()
+    public function postDelete(): void
+    {
+        $this->postDeleteSlave($this->requestPost->get('table', ''));
+    }
+
+    /**
+     * @param string $table
+     * @return void
+     */
+    public function postNewsDelete(string $table): void
+    {
+        $this->postDeleteSlave($table);
+    }
+
+    /**
+     * @param string $table
+     * @return void
+     */
+    private function postDeleteSlave(string $table): void
     {
         $result = false;
         $post = $this->requestPost;
 
         $tableData = $this->getTableData();
-        $mapperName = $tableData[$post['table']]['mapper'];
+        $mapperName = $tableData[$table]['mapper'];
 
         if (class_exists($mapperName)) {
             /** @var Mapper $mapper */
@@ -85,12 +109,12 @@ class Controller extends Base
             try {
                 $record = $mapper->findById($post['id']);
                 $result = $mapper->delete($record);
-            } catch (MapperException $e) {
+            } catch (MapperException) {
                 // Something failed in the mapper: noop
 
                 // Deletion _can_ raise UnexpectedValueException
                 /** @phpstan-ignore-next-line */
-            } catch (UnexpectedValueException $e) {
+            } catch (UnexpectedValueException) {
                 // Something else unexpected happened, likely thrown by a
                 // pre-delete: noop
             }
@@ -99,22 +123,47 @@ class Controller extends Base
         $responseData = ['result' => $result];
 
         // Did deletion fail, and a message is defined to display on failure?
-        if (!$result && isset($tableData[$post['table']]['deleteFailMsg'])) {
-            $responseData['message'] = $tableData[$post['table']]['deleteFailMsg'];
+        if (!$result && isset($tableData[$table]['deleteFailMsg'])) {
+            $responseData['message'] = $tableData[$table]['deleteFailMsg'];
         }
 
         $this->response = $this->responseAsJson($responseData);
     }
 
     /**
-     * @throws \Alaress\Web\Controller\Exception
+     * @throws MapperException
+     * @throws Deleted
+     * @since    160
+     * @api      /adminv2/lists/save
+     * @return void
+     */
+    public function postSave(): void
+    {
+        $this->postSaveSlave($this->requestPost->get('table', ''));
+    }
+
+    /**
+     * @param string $table
+     * @return void
+     * @throws Deleted
+     * @throws MapperException
      * @since    160
      * @api      /adminv2/lists/save
      */
-    public function postSave()
+    public function postNewsSave(string $table): void
     {
-        $tableKey        = $this->requestPost['table'];
-        $tableData       = $this->getTableData();
+        $this->postSaveSlave($table);
+    }
+
+    /**
+     * @param string $tableKey
+     * @return void
+     * @throws Deleted
+     * @throws MapperException
+     */
+    private function postSaveSlave(string $tableKey): void
+    {
+        $tableData = $this->getTableData();
 
         // Check for incorrect URLs
         if (!isset($tableData[$tableKey])) {
@@ -222,7 +271,7 @@ class Controller extends Base
                     if (null === $oldModel) {
                         $newIds = array_merge($newIds, $affectedIds);
                     }
-                } catch (\Exception $e) {
+                } catch (Exception $e) {
                     throw new SchoolboxException('Could not save: ' . $e->getMessage());
                 }
             }
@@ -273,13 +322,12 @@ class Controller extends Base
         return $fieldValues;
     }
 
-
     /**
      * Gets all table settings
      *
      * @return array
      */
-    private function getTableData()
+    private function getTableData(): array
     {
         $luRoleType = [
             ['key' => Role::GUEST,   'value' => 'Guest'],
@@ -324,7 +372,7 @@ class Controller extends Base
 
         $documentClassifications   = PastoralDocumentClassificationMapper::getInstance()->findAll(['deleted' => true]);
         $luDocumentClassifications = [];
-        $pastoralExternal          = new \External_Pastoral();
+        $pastoralExternal          = new External_Pastoral();
         foreach ($documentClassifications as $classification) {
             $luDocumentClassifications[] = [
                 'key'     => $classification->getId(),
@@ -335,7 +383,7 @@ class Controller extends Base
 
         /* Available Timetable Cycles from your current connector
          */
-        $luCycles = (new \External_Timetable())->findCycleLookup();
+        $luCycles = (new External_Timetable())->findCycleLookup();
 
         $return = [
             'roles' => [
@@ -345,7 +393,7 @@ class Controller extends Base
                 'deleteFailMsg'     => 'You cannot delete a role that still has non-deleted users with that role',
                 'mapper'            => RoleMapper::class,                       // Mapper for the list item
                 'showId'            => true,                                    // Set this to true to display the db ID on the front end.
-                'fields'            => [                                        // This is a list of all of the updateable fields
+                'fields'            => [                                        // This is a list of all the updatable fields
                     'id' => [
                         'caption'   => 'ID',
                         'width'     => 1,
@@ -362,7 +410,7 @@ class Controller extends Base
                         'caption'   => 'Role Type',
                         'lookup'    => $luRoleType,                             // If defined the column will appear as a select box
                         'width'     => 2,
-                        'mandatory' => true,                                    // Set this true to remove an empty option from a drop down field.
+                        'mandatory' => true,                                    // Set this true to remove an empty option from a drop-down field.
                     ],
                     'permissions' => [
                         'caption'             => 'Permissions',
@@ -1229,14 +1277,22 @@ class Controller extends Base
      * Show options
      *
      * @param string|null $table Arbitrary value to identify a table. Does not need to be the actual table name.
+     * @throws ReflectionException|Error|RouteNotFound
      * @since 160
-     *
      * @api   /adminv2/lists
-     *
-     * @throws \Aura\Router\Exception\RouteNotFound
-     * @throws \ReflectionException
      */
     public function getIndex(?string $table): void
+    {
+        $this->getLists($table, false);
+    }
+
+    /**
+     * @param string|null $table
+     * @return void
+     * @throws RouteNotFound
+     * @throws ReflectionException|Error
+     */
+    public function getNewsIndex(?string $table): void
     {
         $this->getLists($table, false);
     }
@@ -1245,14 +1301,26 @@ class Controller extends Base
      * Show options in JSON format
      *
      * @param string|null $table Arbitrary value to identify a table. Does not need to be the actual table name.
-     * @since 210
-     *
+     * @throws RouteNotFound
+     * @throws ReflectionException|Error
      * @api   /adminv2/lists/data
      *
-     * @throws \Aura\Router\Exception\RouteNotFound
-     * @throws \ReflectionException
+     * @since 210
+     *
      */
     public function getData(?string $table): void
+    {
+        $this->getLists($table, true);
+    }
+
+    /**
+     * @param string|null $table
+     * @return void
+     * @throws RouteNotFound
+     * @throws ReflectionException
+     * @throws Error
+     */
+    public function getNewsData(?string $table): void
     {
         $this->getLists($table, true);
     }
@@ -1262,8 +1330,8 @@ class Controller extends Base
      *
      * @param string|null $table Arbitrary value to identify a table. Does not need to be the actual table name.
      * @param bool        $json
-     * @throws \Aura\Router\Exception\RouteNotFound
-     * @throws \ReflectionException
+     * @throws RouteNotFound
+     * @throws ReflectionException|Error
      */
     private function getLists(?string $table, bool $json): void
     {
@@ -1362,6 +1430,12 @@ class Controller extends Base
             }
         }
 
+        $listCategory = match ($table) {
+            'news-topic' => 'News',
+            'achievement-category' => 'Badge',
+            default => '',
+        };
+
         if ($json) {
             $currentTable = $tables[$table];
             $this->response = $this->responseAsJson(
@@ -1369,23 +1443,24 @@ class Controller extends Base
                     'hasDBid'       => $currentTable['showId'] ?? false,
                     'canDelete'     => $currentTable['delete'] ?? false,
                     'deleteFailMsg' => $currentTable['deleteFailMsg'] ?? '',
-                    'deleteRoute'   => $this->routeGenerator->generate('adminLists.postDelete'),
+                    'deleteRoute'   => str_replace('{table}', $table, $this->routeGenerator->generate("adminLists.post{$listCategory}Delete")),
                     'deleteWarning' => $currentTable['deleteWarning'] ?? '',
                     'fields'        => $currentTable['fields'] ? $this->reformatForJson($currentTable['fields'], false) : [],
                     'isSortable'    => $currentTable['sortable'] ?? false,
                     'noNewRecords'  => $currentTable['noNewRecords'] ?? false,
                     'rows'          => $this->reformatForJson($records, true),
-                    'saveRoute'     => $this->routeGenerator->generate('adminLists.postSave'),
+                    'saveRoute'     => str_replace('{table}', $table, $this->routeGenerator->generate("adminLists.post{$listCategory}Save")),
                     'title'         => $currentTable['title'],
                 ]
             );
         } else {
-            // Render this thing out
+            $routeUrl = str_replace('{table}', $table, $this->routeGenerator->generate("adminLists.get{$listCategory}Index"));
             $this->response = $this->responseFromTemplate(
                 '@adminLists/index.twig',
                 [
-                    'pageCurrent'    => $this->routeGenerator->generate('adminLists.getIndex') . "/{$table}",
-                    'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->routeGenerator->generate('adminLists.getIndex') . "/{$table}"),
+                    'pageCurrent'    => $routeUrl,
+                    'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($routeUrl),
+                    'listCategory'   => strtolower($listCategory),
                     'tables'         => $tables,
                     'table'          => $table,
                     'records'        => $records,
