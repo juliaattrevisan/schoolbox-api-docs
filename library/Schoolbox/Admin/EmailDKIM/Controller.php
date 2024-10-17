@@ -50,7 +50,7 @@ class Controller extends Base
             '@emailDKIM/index.twig',
             [
                 'pageCurrent'    => $this->routeGenerator->generate('emailDKIM.getDomainListPage'),
-                'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->routeGenerator->generate('emailDKIM.getDomainListPage')),
+                'allBreadcrumbs' => (new Subnav($this->getConfigLoader(), $this->getAuthorizer(), $this->getUser()))->generateBreadcrumbs($this->routeGenerator->generate('emailDKIM.getDomainListPage')),
             ]
         );
     }

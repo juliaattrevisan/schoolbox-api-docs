@@ -118,7 +118,7 @@ class Controller extends Base
             '@adminEportfolio/index.twig',
             [
                 'pageCurrent' => $this->routeGenerator->generate('adminEportfolio.getDeploy'),
-                'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->routeGenerator->generate('adminEportfolio.getDeploy')),
+                'allBreadcrumbs' => (new Subnav($this->getConfigLoader(), $this->getAuthorizer(), $this->getUser()))->generateBreadcrumbs($this->routeGenerator->generate('adminEportfolio.getDeploy')),
                 'roles' => $this->roleMapper->findAll(['order' => ['name' => 'asc']]),
                 'campuses' => $this->campusMapper->findAll(['order' => ['name' => 'asc']])
             ],
@@ -147,7 +147,7 @@ class Controller extends Base
             '@adminEportfolio/importResults.twig',
             [
                 'pageCurrent' => $this->routeGenerator->generate('adminEportfolio.getDeploy'),
-                'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->routeGenerator->generate('adminEportfolio.getDeploy')),
+                'allBreadcrumbs' => (new Subnav($this->getConfigLoader(), $this->getAuthorizer(), $this->getUser()))->generateBreadcrumbs($this->routeGenerator->generate('adminEportfolio.getDeploy')),
                 'id' => $id
             ],
         );

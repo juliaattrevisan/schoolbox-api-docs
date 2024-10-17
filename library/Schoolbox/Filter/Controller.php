@@ -105,7 +105,7 @@ class Controller extends BaseController
             'ENTITY_ASSESSMENTS' => Assessment\Mapper::class,
             'ENTITY_BADGES'      => Badge\Mapper::class,
             'pageCurrent'        => $this->routeGenerator->generate('filters.getIndex'),
-            'allBreadcrumbs'     => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->routeGenerator->generate('filters.getIndex')),
+            'allBreadcrumbs'     => (new Subnav($this->getConfigLoader(), $this->getAuthorizer(), $this->getUser()))->generateBreadcrumbs($this->routeGenerator->generate('filters.getIndex')),
         ], 'Filterable pages');
     }
 
@@ -150,7 +150,7 @@ class Controller extends BaseController
         $this->response = $this->responseFromTemplate('@filters/settings.twig', [
             'page'               => $page,
             'pageCurrent'        => $this->routeGenerator->generate('filters.getPageSettings', ['page' => $page]),
-            'allBreadcrumbs'     => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->routeGenerator->generate('filters.getPageSettings', ['page' => $page])),
+            'allBreadcrumbs'     => (new Subnav($this->getConfigLoader(), $this->getAuthorizer(), $this->getUser()))->generateBreadcrumbs($this->routeGenerator->generate('filters.getPageSettings', ['page' => $page])),
             'definitions'        => $definitions,
             'pageFilters'        => $pageFilters,
             'roleTypes'          => $roleTypes,

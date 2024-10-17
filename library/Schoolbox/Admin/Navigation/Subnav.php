@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\Admin\Navigation;
 
+use Alaress\Authorizer\Authorizer;
 use Schoolbox\Cdn\PrefixGenerator;
 use Schoolbox\Config\Config;
 use Schoolbox\Config\ConfigMapper;
@@ -19,6 +20,7 @@ use Schoolbox\Filter\Page\AvailabilityChecker;
 use Schoolbox\Filter\Page\LabelBuilder;
 use Schoolbox\Filter\Page\Model as FilterPageModel;
 use Schoolbox\IConfigLoader;
+use Schoolbox\User;
 use Twig\Environment;
 use Twig\Loader\FilesystemLoader;
 
@@ -41,6 +43,9 @@ class Subnav
      */
     private IConfigLoader $configLoader;
 
+    private Authorizer $authorizer;
+
+    private User $loggedInUser;
 
     /**
      * A twig rendering environment. I know it's spawned in the constructor, but half
@@ -50,15 +55,16 @@ class Subnav
      */
     private Environment $twig;
 
-
     /**
      * Subnav constructor.
      *
      * @param IConfigLoader $configLoader
      */
-    public function __construct(IConfigLoader $configLoader)
+    public function __construct(IConfigLoader $configLoader, Authorizer $authorizer, User $loggedInUser)
     {
         $this->configLoader = $configLoader;
+        $this->authorizer = $authorizer;
+        $this->loggedInUser = $loggedInUser;
 
         $paths[] = SITE_root . '/library/Schoolbox/Admin/Navigation/templates';
         $paths[] = SITE_root . '/templates/core/sub';
@@ -78,7 +84,6 @@ class Subnav
         // The CDN_PREFIX needs to be made available in this Twig instance
         $this->twig->addGlobal('CDN_PREFIX', (new PrefixGenerator($this->configLoader))->generate());
     }
-
 
     /**
      * Generate the menu navigation
@@ -130,7 +135,7 @@ class Subnav
          * and won't be explicitly stated as one of these urls, so be mindful
          * that there are multiple ways to match these urls
          */
-        return [
+        $navTree = [
             '/adminv2/home'                           => [
                 'name'        => 'Home',
                 'visible'     => true,
@@ -959,8 +964,31 @@ class Subnav
                 ],
             ],
         ];
-    }
 
+        // This will be the subset of $navTree that is accessible by the logged-in user.
+        $accessibleNavTree = [];
+
+        foreach ($navTree as $category => $categoryInfo) {
+            $accessibleChildPageInfoByPath = [];
+
+            foreach ($categoryInfo['children'] as $childPagePath => $childPageInfo) {
+                if ($this->authorizer->isPathAuthorizedForUser($childPagePath, [], $this->loggedInUser)) {
+                    $accessibleChildPageInfoByPath[$childPagePath] = $childPageInfo;
+                }
+            }
+
+            if (count($accessibleChildPageInfoByPath) > 0) {
+                $accessibleNavTree[$category] = [
+                    'name' => $categoryInfo['name'],
+                    'visible' => $categoryInfo['visible'],
+                    'searchable' => $categoryInfo['searchable'],
+                    'children' => $accessibleChildPageInfoByPath
+                ];
+            }
+        }
+
+        return $accessibleNavTree;
+    }
 
     /**
      * Render the self-contained subnav as a purely html fragment
@@ -975,7 +1003,6 @@ class Subnav
      */
     public function generateHtml(string $url, ?string $title = null): string
     {
-
         /* Look ahead for $url
          * If it's in a child node, remember its parent and pass that too
          */
@@ -1009,7 +1036,6 @@ class Subnav
         );
     }
 
-
     /**
      * Shank the html menu directly into a phplib
      *
@@ -1028,7 +1054,6 @@ class Subnav
 
         return $this;
     }
-
 
     /**
      * Generate breadcrumbs from the adminSubnav stack, for the consistency of names

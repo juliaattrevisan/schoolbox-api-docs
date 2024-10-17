@@ -62,7 +62,7 @@ class Controller extends ConfigController
             '@adminLti/modify.twig',
             [
                 'pageCurrent'    => $this->routeGenerator->generate('adminLti.getIndex'),
-                'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->routeGenerator->generate('adminLti.getIndex')),
+                'allBreadcrumbs' => (new Subnav($this->getConfigLoader(), $this->getAuthorizer(), $this->getUser()))->generateBreadcrumbs($this->routeGenerator->generate('adminLti.getIndex')),
             ],
         );
     }
@@ -84,7 +84,7 @@ class Controller extends ConfigController
             '@adminLti/index.twig',
             [
                 'pageCurrent'           => $this->routeGenerator->generate('adminLti.getIndex'),
-                'allBreadcrumbs'        => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->routeGenerator->generate('adminLti.getIndex')),
+                'allBreadcrumbs'        => (new Subnav($this->getConfigLoader(), $this->getAuthorizer(), $this->getUser()))->generateBreadcrumbs($this->routeGenerator->generate('adminLti.getIndex')),
                 'providers'             => $this->providerMapper->findAll(),
                 'providerLtiVersion11'  => Provider::LTI_VERSION_1_1,
                 'providerLtiVersion13'  => Provider::LTI_VERSION_1_3,
@@ -112,7 +112,7 @@ class Controller extends ConfigController
             '@adminLti/modify.twig',
             [
                 'pageCurrent'    => $this->routeGenerator->generate('adminLti.getIndex'),
-                'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->routeGenerator->generate('adminLti.getIndex')),
+                'allBreadcrumbs' => (new Subnav($this->getConfigLoader(), $this->getAuthorizer(), $this->getUser()))->generateBreadcrumbs($this->routeGenerator->generate('adminLti.getIndex')),
                 'provider'       => $provider,
             ],
         );

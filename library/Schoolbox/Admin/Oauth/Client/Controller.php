@@ -33,7 +33,7 @@ class Controller extends Base
         $pageCurrent = $this->routeGenerator->generate('adminOauthClient.getIndex');
         $data = [
             'pageCurrent'    => $pageCurrent,
-            'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($pageCurrent),
+            'allBreadcrumbs' => (new Subnav($this->getConfigLoader(), $this->getAuthorizer(), $this->getUser()))->generateBreadcrumbs($pageCurrent),
         ];
 
         $this->response = $this->responseFromTemplate(

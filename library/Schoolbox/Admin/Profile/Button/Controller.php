@@ -116,7 +116,7 @@ class Controller extends Base
             '@adminProfileButton/index.twig',
             [
                 'pageCurrent' => $this->routeGenerator->generate('adminProfileButton.getIndex'),
-                'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->routeGenerator->generate('adminProfileButton.getIndex')),
+                'allBreadcrumbs' => (new Subnav($this->getConfigLoader(), $this->getAuthorizer(), $this->getUser()))->generateBreadcrumbs($this->routeGenerator->generate('adminProfileButton.getIndex')),
                 'profile' => $this->profileButtonMapper->findAll()->sortBy('sortOrder', 'asc'),
                 'roles' => $this->roleMapper->findAll()->sortBy('name', 'asc'),
                 'campuses' => $this->campusMapper->findAll()->sortBy('name', 'asc'),
@@ -163,7 +163,7 @@ class Controller extends Base
             [
                 'pageCurrent' => $this->routeGenerator->generate('adminProfileButton.getIndex'),
                 'allBreadcrumbs' => array_merge(
-                    (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->routeGenerator->generate('adminProfileButton.getIndex')),
+                    (new Subnav($this->getConfigLoader(), $this->getAuthorizer(), $this->getUser()))->generateBreadcrumbs($this->routeGenerator->generate('adminProfileButton.getIndex')),
                     [['Modify', null]]
                 ),
                 'item' => $this->profileButtonMapper->findOneByColumn($this->profileButtonMapper->getIdentifierColumn(), $id, [ 'cache' => false ]),
@@ -194,7 +194,7 @@ class Controller extends Base
             [
                 'pageCurrent' => $this->routeGenerator->generate('adminProfileButton.getIndex'),
                 'allBreadcrumbs' => array_merge(
-                    (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->routeGenerator->generate('adminProfileButton.getIndex')),
+                    (new Subnav($this->getConfigLoader(), $this->getAuthorizer(), $this->getUser()))->generateBreadcrumbs($this->routeGenerator->generate('adminProfileButton.getIndex')),
                     [['Create', null]]
                 ),
                 'icons' => $this->iconMapper->findAll()->sortBy('title', 'asc'),

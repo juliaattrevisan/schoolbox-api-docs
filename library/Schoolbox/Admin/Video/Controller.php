@@ -45,7 +45,7 @@ class Controller extends Base
             '@adminVideo/index.twig',
             [
                 'pageCurrent' => $this->routeGenerator->generate('adminVideo.getIndex'),
-                'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->routeGenerator->generate('adminVideo.getIndex')),
+                'allBreadcrumbs' => (new Subnav($this->getConfigLoader(), $this->getAuthorizer(), $this->getUser()))->generateBreadcrumbs($this->routeGenerator->generate('adminVideo.getIndex')),
                 'queue' => $queueItems,
                 'statusOrder' => $statuses
             ],

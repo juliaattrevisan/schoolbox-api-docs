@@ -1458,7 +1458,7 @@ class Controller extends Base
                 '@adminLists/index.twig',
                 [
                     'pageCurrent'    => $routeUrl,
-                    'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($routeUrl),
+                    'allBreadcrumbs' => (new Subnav($this->getConfigLoader(), $this->getAuthorizer(), $this->getUser()))->generateBreadcrumbs($routeUrl),
                     'listCategory'   => strtolower($listCategory),
                     'tables'         => $tables,
                     'table'          => $table,

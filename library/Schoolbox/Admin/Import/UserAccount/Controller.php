@@ -98,7 +98,7 @@ class Controller extends Base
     {
         return [
             'pageCurrent' => $this->routeGenerator->generate("{$this->basename}.getUpload"),
-            'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->routeGenerator->generate("{$this->basename}.getUpload")),
+            'allBreadcrumbs' => (new Subnav($this->getConfigLoader(), $this->getAuthorizer(), $this->getUser()))->generateBreadcrumbs($this->routeGenerator->generate("{$this->basename}.getUpload")),
             'allNavigation' => $this->navigation->buildNavigation($this->routeGenerator, $this->basename)->getAllNodes(),
             'basename' => $this->basename,
             'now' => \Alaress_Date_Format::now(),

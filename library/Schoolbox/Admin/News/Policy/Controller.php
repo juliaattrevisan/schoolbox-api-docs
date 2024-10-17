@@ -79,7 +79,7 @@ class Controller extends ConfigController
             '@commsNewsPolicy/index.twig',
             [
                 'pageCurrent'   => $this->routeGenerator->generate('commsNewsPolicy.getPolicies'),
-                'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->routeGenerator->generate('commsNewsPolicy.getPolicies')),
+                'allBreadcrumbs' => (new Subnav($this->getConfigLoader(), $this->getAuthorizer(), $this->getUser()))->generateBreadcrumbs($this->routeGenerator->generate('commsNewsPolicy.getPolicies')),
                 'commsOfficers' => $this->userAccessMapper->findUsersForService(UserAccess::SERVICE_NEWS, null, UserAccess::ACCESS_FULL)->indexBy('id'),
                 'configContext' => $configContext,
                 'topics'        => $this->topicMapper->findAll(['order' => ['sequence' => 'asc']]),
