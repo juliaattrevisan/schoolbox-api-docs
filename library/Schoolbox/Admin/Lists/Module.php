@@ -41,10 +41,10 @@ class Module extends BaseModule
         );
 
         // Routes to which users with service permission UserAccess::SERVICE_NEWS need access.
-        $this->register('GET', "/news/{table}", 'getNewsIndex', $ruleNews);
-        $this->register('GET', "/news/data/{table}", 'getNewsData', $ruleNews);
-        $this->register('POST', "/news/save/{table}", 'postNewsSave', $ruleNews);
-        $this->register('POST', "/news/delete/{table}", 'postNewsDelete', $ruleNews);
+        $this->register('GET', "/news/{table:news-topic}", 'getNewsIndex', $ruleNews);
+        $this->register('GET', "/news/data/{table:news-topic}", 'getNewsData', $ruleNews);
+        $this->register('POST', "/news/save/{table:news-topic}", 'postNewsSave', $ruleNews);
+        $this->register('POST', "/news/delete/{table:news-topic}", 'postNewsDelete', $ruleNews);
 
         // Routes to which only superusers need access.
         $this->register('GET', "/{table}", 'getIndex', $ruleSuperuserOnly);
