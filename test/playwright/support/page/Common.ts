@@ -154,6 +154,11 @@ export default class Common {
             return;
         }
 
+        // Is the what's new tour open? If so, we can't do the rest of the actionability checks
+        if ((await this.page.locator("div.introjs-tooltipbuttons a").count()) > 0) {
+            return;
+        }
+
         // The profile drop gets a data-test-ready="true" applied when its associated event listeners are ready
         const profileDrop = this.page.getByTestId("profile-drop");
         await expect(profileDrop).toHaveAttribute("data-test-ready", "true", { timeout: 30000 });
