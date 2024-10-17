@@ -20,7 +20,7 @@ const emit = defineEmits<{
 /**
  * Add a comma separated string of the ids of the selected codes
  * for use in forms
- * @returns {string}
+ * @returns - a comma separated string of the ids
  */
 const ids = window.Vue.computed(() => {
     return props.selectedItems.join(",");

@@ -18,7 +18,6 @@ interface Props {
     hasNoResults: boolean; // whether there are no results
     selectedItems: Result[]; // the selected results
 }
-
 const props = defineProps<Props>();
 
 const emit = defineEmits<{
@@ -84,7 +83,7 @@ window.Vue.watch(
 /**
  * show select all option for adding / removing results only if there's
  * more than one search result and only a single result can't be selected
- * @returns {boolean} - whether to show the select all option
+ * @returns - whether to show the select all option
  */
 const showSelectAll = window.Vue.computed(() => {
     if (props.isSingleSelect) {

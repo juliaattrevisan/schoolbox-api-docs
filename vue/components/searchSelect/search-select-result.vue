@@ -27,7 +27,7 @@ const emit = defineEmits<{
 /**
  * To determine whether the radio/checkbox is currently selected
  * based on whether it's in the selected list
- * @returns {boolean}
+ * @returns - whether the result is selected
  */
 const isChecked = window.Vue.computed(() => {
     return props.selectedItems.some((result) => result.id === props.result.id);

@@ -18,7 +18,7 @@ const emit = defineEmits<{
 
 /**
  * Prevent rapid fire while loading the selected node
- * @returns {boolean}
+ * @returns - whether the button is disabled
  */
 const isDisabled = window.Vue.computed(() => false);
 
