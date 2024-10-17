@@ -602,7 +602,7 @@ class Subnav
                 'visible'     => true,
                 'searchable'  => true,
                 'children'    => [
-                    'adminv2/news' => [
+                    '/adminv2/news' => [
                         'name'        => 'Settings / Policy',
                         'visible'     => true,
                         'children'    => [],
