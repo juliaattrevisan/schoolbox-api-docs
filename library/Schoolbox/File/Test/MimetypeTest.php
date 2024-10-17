@@ -151,6 +151,21 @@ class MimetypeTest extends TestCase
                     ['mimetype' => 'image/bmp', 'expected' => true,],
                 ],
             ],
+            // Wildcard type, prescribed subtype?
+            [
+                'filter'    => '*/mpeg',
+                'mimetypes' => [
+                    ['mimetype' => null, 'expected' => false,],
+                    ['mimetype' => '', 'expected' => false,],
+                    ['mimetype' => 'image/jpeg', 'expected' => false,],
+                    ['mimetype' => 'image/png', 'expected' => false,],
+                    ['mimetype' => 'text/plain', 'expected' => false,],
+                    ['mimetype' => 'image/svg+xml', 'expected' => false,],
+                    ['mimetype' => 'image/bmp', 'expected' => false,],
+                    ['mimetype' => 'image/mpeg', 'expected' => true,],
+                    ['mimetype' => 'video/mpeg', 'expected' => true,],
+                ],
+            ],
         ];
         foreach ($cases as $case) {
             foreach ($case['mimetypes'] as $mimetypeData) {

@@ -447,6 +447,13 @@ class Mimetype implements ISoftDeletable
                 }
             }
 
+            // wildcard type match (e.g. */mpeg against any type of mpeg)
+            if (preg_match('`^\\*(?P<subtype>.*)$`', $filter, $matches)) {
+                if (str_ends_with($mime, $matches['subtype'])) {
+                    return true;
+                }
+            }
+
             // harder comparison:
             // could probably use an exact comparison instead, but this method
             // is likely used in ways I don't know about yet.
