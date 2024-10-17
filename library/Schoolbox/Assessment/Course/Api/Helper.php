@@ -29,6 +29,7 @@ class Helper
         private CourseSpecificationMapper $courseSpecificationMapper,
         private FolderMapper $folderMapper,
         private UnitSpecificationMapper $unitSpecificationMapper,
+        private Ancestry $ancestry,
         private Access $access,
         private User $user,
         private ?string $search,
@@ -150,7 +151,7 @@ class Helper
      */
     private function getLineage(Folder $course): Collection
     {
-        return Ancestry::getInstance($this->folderMapper)->findParentsCheaply($course, $this->courseSpecificationMapper->getFacultyRootFolder());
+        return $this->ancestry->findParentsCheaply($course, $this->courseSpecificationMapper->getFacultyRootFolder());
     }
 
     /**

@@ -9,6 +9,7 @@ use Alaress\Module\Module as BaseModule;
 use Alaress\Web\Controller\Base;
 use Schoolbox\Learning\Course\DataModel\Specification\Mapper as CourseSpecificationMapper;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Mapper as UnitSpecificationMapper;
+use Schoolbox\Resource\Folder\Ancestry;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Role;
@@ -48,11 +49,13 @@ class Module extends BaseModule
      */
     public function buildController(): Base
     {
+        $folderMapper = $this->getMapperFactory()->get(FolderMapper::class);
         return new Controller(
             $this->getMapperFactory()->get(CourseSpecificationMapper::class),
-            $this->getMapperFactory()->get(FolderMapper::class),
+            $folderMapper,
             $this->getMapperFactory()->get(Access::class),
             $this->getMapperFactory()->get(UnitSpecificationMapper::class),
+            Ancestry::getInstance($folderMapper),
         );
     }
 }

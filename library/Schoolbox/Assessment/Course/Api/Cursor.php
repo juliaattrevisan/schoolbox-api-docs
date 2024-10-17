@@ -8,6 +8,7 @@ use Schoolbox\API\Cursor\ICursor;
 use Schoolbox\Collection;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Permission\Access\Access;
+use Schoolbox\Resource\Folder\Ancestry;
 use Schoolbox\User;
 use ValueError;
 use Schoolbox\Learning\Course\DataModel\Specification\Mapper as CourseSpecificationMapper;
@@ -38,6 +39,7 @@ class Cursor implements ICursor
         private CourseSpecificationMapper $courseSpecificationMapper,
         private FolderMapper $folderMapper,
         private UnitSpecificationMapper $unitSpecificationMapper,
+        private Ancestry $ancestry,
         private Access $access,
         private User $user,
         private ?string $folder,
@@ -76,6 +78,7 @@ class Cursor implements ICursor
             $this->courseSpecificationMapper,
             $this->folderMapper,
             $this->unitSpecificationMapper,
+            $this->ancestry,
             $this->access,
             $this->user,
             $this->search,

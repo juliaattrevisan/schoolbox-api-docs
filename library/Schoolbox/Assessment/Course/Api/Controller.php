@@ -32,6 +32,7 @@ class Controller extends Base
         private FolderMapper $folderMapper,
         private Access $access,
         private UnitSpecificationMapper $unitSpecificationMapper,
+        private Folder\Ancestry $ancestry,
     ) {
     }
 
@@ -53,6 +54,7 @@ class Controller extends Base
             $this->courseSpecificationMapper,
             $this->folderMapper,
             $this->unitSpecificationMapper,
+            $this->ancestry,
             $this->access,
             $this->getUser(),
             $folder,
