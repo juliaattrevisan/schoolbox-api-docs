@@ -23,7 +23,7 @@ $this->setFile(TEMPLATE_content, 'adminv2/calendar.html');
 $this->setTitle('Admin - Calendar');
 
 // include the admin navigation
-(new Subnav($this->getDi()->get('config')))
+(new Subnav($this->getDi()->get('config'), $this->getDi()->get('authorizer'), $this->getDi()->get('user')))
     ->generatePhplib($this, "/adminv2/calendar/{$selectedType}")
     ->generateBreadcrumbsHtml($this, "/adminv2/calendar/{$selectedType}");
 

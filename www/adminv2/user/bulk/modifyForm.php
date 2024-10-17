@@ -44,7 +44,7 @@ if (count($userIds) === 0) {
 }
 
 // include the admin navigation
-(new Subnav($this->getDi()->get('config')))
+(new Subnav($this->getDi()->get('config'), $this->getDi()->get('authorizer'), $this->getDi()->get('user')))
     ->generatePhplib($this, '/adminv2/user/bulk/modify')
     ->generateBreadcrumbsHtml($this, '/adminv2/user/bulk/modify');
 

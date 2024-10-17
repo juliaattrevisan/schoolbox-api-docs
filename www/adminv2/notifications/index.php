@@ -32,7 +32,7 @@ if (in_array($this->arg[0] ?? false, array('enable', 'disable'))) {
 $this->setFile(TEMPLATE_content, '/adminv2/notifications/index.html');
 
 // include the admin navigation
-(new Subnav($this->getDi()->get('config')))
+(new Subnav($this->getDi()->get('config'), $this->getDi()->get('authorizer'), $this->getDi()->get('user')))
     ->generatePhplib($this, '/adminv2/notifications')
     ->generateBreadcrumbsHtml($this, '/adminv2/notifications');
 
