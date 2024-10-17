@@ -461,8 +461,16 @@ class Kernel extends WebKernelAbstract
      */
     private function outputSitepageContent(?string $path, ?User $authHeaderUser, bool $bypassIpTracking): void
     {
+        // we shall assume that if a specific page is requested,
+        // the user just be sent to that page regardless of device
+        if ($path !== null && $path && $path !== '/') {
+            $pageName = $path;
+        } else {
+            $pageName = 'dashboard';
+        }
+
         $this->sentryTransactionManager->startTransaction(
-            $path,
+            $pageName,
             null,
             null,
             null,
@@ -473,14 +481,6 @@ class Kernel extends WebKernelAbstract
                 'method' => $_SERVER['REQUEST_METHOD'],
             ],
         );
-
-        // we shall assume that if a specific page is requested,
-        // the user just be sent to that page regardless of device
-        if ($path !== null && $path && $path !== '/') {
-            $pageName = $path;
-        } else {
-            $pageName = 'dashboard';
-        }
 
         // Was a user received via an auth header?
         // If so: auth the user for only this request.
