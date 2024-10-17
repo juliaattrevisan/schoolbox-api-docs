@@ -209,7 +209,7 @@ class Mapper extends \Schoolbox\Mapper
                 ORDER BY f.sequence ASC 
             ";
 
-            $params['selfRoleType'] = $viewer->getRole()->getType();
+            $params['selfRoleType'] = Payload::ROLETYPE_SELF;
         } else {
             $query = "
                 SELECT DISTINCT 
