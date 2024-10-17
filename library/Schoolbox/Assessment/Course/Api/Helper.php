@@ -18,6 +18,10 @@ use InvalidArgumentException;
 
 class Helper
 {
+    /**
+     * @var Collection Keep track of the course tree
+     */
+    private Collection $lineage;
     public function __construct(
         private CourseSpecificationMapper $courseSpecificationMapper,
         private FolderMapper $folderMapper,
@@ -108,9 +112,9 @@ class Helper
             /* Also store the path to this Course
              */
             try {
-                $lineage = $this->getLineage($currentCourse->getFolder());
+                $this->lineage = $this->getLineage($currentCourse->getFolder());
                 $currentCourse->setFolder(
-                    $this->getParent($currentCourse->getFolder(), $lineage)
+                    $this->getParent($currentCourse->getFolder())
                 );
             } catch (MapperException $e) {
                 // somehow, against all odds, one of my ancestors has been deleted: show nothing
@@ -150,14 +154,13 @@ class Helper
      * Link up the children to their parent folders
      *
      * @param Folder     $folder
-     * @param Collection $lineage
      * @return Folder
      */
-    private function getParent(Folder $folder, Collection $lineage): Folder
+    private function getParent(Folder $folder): Folder
     {
         $return = $folder;
 
-        foreach (array_reverse($lineage->getAll()) as $parent) {
+        foreach (array_reverse($this->lineage->getAll()) as $parent) {
             //Set parent to null when reached the faculty root folder
             if ($parent->getParent()?->getName() === null) {
                 $parent->setParent(null);
@@ -222,6 +225,16 @@ class Helper
 
         $courseSpecs = $this->courseSpecificationMapper->findByColumn('folder_id', $courseFolderIds);
 
-        return $courseSpecs;
+        return $courseSpecs->map(function ($courseSpec) {
+            //Hydrate the parents
+            try {
+                return $courseSpec->setFolder(
+                    $this->getParent($courseSpec->getFolder())
+                );
+            } catch (MapperException $e) {
+                //noop; skip if orphaned
+            }
+            return $courseSpec;
+        });
     }
 }
