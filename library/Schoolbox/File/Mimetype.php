@@ -12,6 +12,7 @@ namespace Schoolbox\File;
 
 use Config;
 use Schoolbox\ISoftDeletable;
+use Schoolbox\Resource\Attachment\Zone;
 
 /**
  * Class Mimetype
@@ -437,11 +438,32 @@ class Mimetype implements ISoftDeletable
                 return true;
             }
 
-            // harder comparison
-            $filter = str_replace('*', '[^/]+', $filter);
+            $mime = $this->getMime() ?? '';
 
-            //preg_quote escapes characters like "+" in the mimetype (e.g. image/svg+xml)
-            if (preg_match('/^' . preg_quote($filter, '/') . '$/', $this->getMime())) {
+            // wildcard subtype match, e.g.:
+            // * "image/*" against any image mimetype
+            // * "application/vnd.*" against any vendor mimetype
+            if (preg_match('`^(?P<type>.*?)\\*$`', $filter, $matches)) {
+                if (str_starts_with($mime, $matches['type'])) {
+                    return true;
+                }
+            }
+
+            // wildcard type match, e.g.:
+            // * "*/mpeg" against any type of mpeg
+            if (preg_match('`^\\*(?P<subtype>.*)$`', $filter, $matches)) {
+                if (str_ends_with($mime, $matches['subtype'])) {
+                    return true;
+                }
+            }
+
+            // harder comparison:
+            // could probably use an exact comparison instead, but this method
+            // is likely used in ways I don't know about yet.
+            // At least there's unit tests to cover it now.
+            $filter = str_replace('*', '[^/]+', $filter);
+            $regex  = '/^' . preg_quote($filter, '/') . '$/';
+            if (preg_match($regex, $mime)) {
                 return true;
             }
         }

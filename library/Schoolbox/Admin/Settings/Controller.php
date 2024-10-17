@@ -180,11 +180,14 @@ class Controller extends ConfigController
         $reloadScheduleDaemon = false;
         $rebuildModules       = false;
         $clearOidcCache       = false;
+
         foreach ($postedValues as $name => $value) {
             $existingConfig  = $existingConfigs[$name];
+
             if (!$existingConfig->getEditable()) {
                 continue;
             }
+
             $valueSerializer = $this->getFieldStrategyFactory()->makeValueSerializer($existingConfig->getFieldId());
             $newValue        = $valueSerializer->serializeValue($value, $existingConfig);
 
