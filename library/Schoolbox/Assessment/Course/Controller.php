@@ -97,6 +97,7 @@ class Controller extends Base\Base
         private Component_ConfigMapper $ccm,
         private \Schoolbox\Tile\Layout\Mapper $layoutMapper,
         private \Schoolbox\Tile\Mapper $tileMapper,
+        private Ancestry $ancestry
     ) {
     }
 
@@ -957,6 +958,7 @@ class Controller extends Base\Base
                 $this->courseSpecificationMapper,
                 $this->folderMapper,
                 $this->unitSpecificationMapper,
+                $this->ancestry,
                 $this->access,
                 $this->getUser(),
                 null,
@@ -1037,6 +1039,7 @@ class Controller extends Base\Base
                 $this->courseSpecificationMapper,
                 $this->folderMapper,
                 $this->unitSpecificationMapper,
+                $this->ancestry,
                 $this->access,
                 $this->getUser(),
                 null,
