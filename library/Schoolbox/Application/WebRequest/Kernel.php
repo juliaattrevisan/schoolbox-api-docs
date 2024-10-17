@@ -32,6 +32,7 @@ use Schoolbox\Application\Login\Controller as LoginController;
 use Schoolbox\Application\WebKernelAbstract;
 use Schoolbox\Mapper\Exception\Deleted;
 use Schoolbox\User;
+use Sentry\Tracing\TransactionSource;
 use Throwable;
 use Schoolbox\Url\Uri;
 use Schoolbox\Application\Exception\Exception as SchoolboxException;
@@ -244,6 +245,21 @@ class Kernel extends WebKernelAbstract
      */
     private function outputAuraContent(Route $route, ?User $authHeaderUser, bool $bypassIpTracking): void
     {
+        // Track this thing
+        $this->sentryTransactionManager->startTransaction(
+            $route->name,
+            null,
+            null,
+            null,
+            TransactionSource::route(),
+            $_SERVER['REQUEST_TIME_FLOAT'],
+            [
+                'url'    => $_SERVER['REQUEST_URI'],
+                'method' => $_SERVER['REQUEST_METHOD'],
+            ],
+        );
+
+
         // The route name's format:
         // "[controllerName].[action](:[label])"
         // The : and label are optional.
@@ -445,6 +461,19 @@ class Kernel extends WebKernelAbstract
      */
     private function outputSitepageContent(?string $path, ?User $authHeaderUser, bool $bypassIpTracking): void
     {
+        $this->sentryTransactionManager->startTransaction(
+            $path,
+            null,
+            null,
+            null,
+            TransactionSource::url(),
+            $_SERVER['REQUEST_TIME_FLOAT'],
+            [
+                'url'    => $_SERVER['REQUEST_URI'],
+                'method' => $_SERVER['REQUEST_METHOD'],
+            ],
+        );
+
         // we shall assume that if a specific page is requested,
         // the user just be sent to that page regardless of device
         if ($path !== null && $path && $path !== '/') {
