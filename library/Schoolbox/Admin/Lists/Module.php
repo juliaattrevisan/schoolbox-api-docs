@@ -47,8 +47,8 @@ class Module extends BaseModule
         $this->register('POST', "/news/delete/{table:news-topic}", 'postNewsDelete', $ruleNews);
 
         // Routes to which only superusers need access.
-        $this->register('GET', "/{table}", 'getIndex', $ruleSuperuserOnly);
-        $this->register('GET', "/data/{table}", 'getData', $ruleSuperuserOnly);
+        $this->register('GET', "{/table}", 'getIndex', $ruleSuperuserOnly);
+        $this->register('GET', "/data{/table}", 'getData', $ruleSuperuserOnly);
         $this->register('POST', "/save", 'postSave', $ruleSuperuserOnly);
         $this->register('POST', "/delete", 'postDelete', $ruleSuperuserOnly);
     }
