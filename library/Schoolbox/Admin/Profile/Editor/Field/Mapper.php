@@ -163,7 +163,7 @@ class Mapper extends \Schoolbox\Mapper
      * @throws \PDOException
      * @throws \UnexpectedValueException
      */
-    public function findRenderableFields(\Schoolbox\User $viewee, \Schoolbox\User $viewer): array
+    public function findRenderableFields(\Schoolbox\User $viewee, \Schoolbox\User $viewer): GenericCollection
     {
         $collection = $this->createCollection();
 
@@ -198,7 +198,7 @@ class Mapper extends \Schoolbox\Mapper
             $query = "
                 SELECT DISTINCT
                     f.*, 
-                    pfrv.roletype AS visibility_roletype
+                    {$this->getJoinColumnString('visibility', 'pfrv')}
                 FROM {$this->getTable()} f
                 INNER JOIN profile_field_campus_availability pfca ON f.id = pfca.profile_field_id
                 INNER JOIN profile_field_roletype_visibility pfrv ON f.id = pfrv.profile_field_id
@@ -214,7 +214,7 @@ class Mapper extends \Schoolbox\Mapper
             $query = "
                 SELECT DISTINCT 
                     f.*, 
-                    pfrv.roletype AS visibility_roletype
+                    {$this->getJoinColumnString('visibility', 'pfrv')}
                 FROM {$this->getTable()} f
                 INNER JOIN profile_field_campus_availability pfca ON f.id = pfca.profile_field_id
                 INNER JOIN profile_field_roletype_visibility pfrv ON f.id = pfrv.profile_field_id
@@ -234,25 +234,34 @@ class Mapper extends \Schoolbox\Mapper
          * such as configuration of a user account or some other rule that isn't in
          * this sql query itself (also, some schools override this in custom work)
          */
-        $rules = [];
+        /** @var \Schoolbox\Admin\Profile\Editor\Field\Visibility\Mapper $visibilityMapper */
+        $visibilityMapper = $this->getJoinMapper('visibility');
 
         /* Additional visibility rules to be checked in twig land
          */
         while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
-            $field = $this->hydrate($row);
+            $instance = $this->hydrate($row);
 
-            if ($field) {
-                $collection->setOffset($field->getId(), $field);
+            /* Start collating visibilities here
+             */
+            if ($instance && null === $collection->getOffset($instance->getId())) {
+                $instance->setVisibility($visibilityMapper->createCollection());
+                $collection->setOffset($instance->getId(), $instance);
             }
+
+            $field = $collection->getOffset($instance->getId());
 
             /* Remember the visibility rules for further scrutiny
              */
-            $rules[$row['field']][] = $row['visibility_roletype'];
+            /** @var Visibility\Model $visibility */
+            $visibility = $visibilityMapper->hydrate($row, 'pfrv');
+
+            /* Could set up a circular reference here, but probably not needed
+             *   $visibility->setField($field);
+             */
+            $field->getVisibility()->setOffset($visibility->getRoleType(), $visibility);
         }
 
-        return [
-            'manifest' => $collection,
-            'rules' => $rules
-        ];
+        return $collection;
     }
 }
