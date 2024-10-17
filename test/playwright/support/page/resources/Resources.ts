@@ -29,7 +29,7 @@ export default class Resources {
      */
     async clickFolderName(folderName: string): Promise<void> {
         await this.page.locator(`a.jstree-anchor:has-text("${folderName}")`).click();
-        await expect(this.page.locator(`a[title="${folderName}"]`)).toBeVisible();
+        await expect(this.page.locator(`.meta-preview h3`)).toContainText(folderName);
     }
 
     /**

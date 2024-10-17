@@ -90,17 +90,17 @@ test.describe("Homepage Initial Tests", () => {
         await homepage.addComponent("#tabs-sub-1", "Blog");
         await expect(
             page.locator(`div[class="component-container Schoolbox_Blog_Homepage_Component_Controller"]`),
-        ).toBeVisible({ timeout: 30000 });
+        ).toBeVisible();
         await page.reload();
         await homepage.addComponent("#tabs-sub-1", "News");
         await expect(
             page.locator(`div[class="component-container Schoolbox_Comms_News_Component_Homepage_Controller"]`),
-        ).toBeVisible({ timeout: 30000 });
+        ).toBeVisible();
         await page.reload();
         await homepage.addComponent("#tabs-sub-1", "Text Box");
         await expect(
             page.locator(`div[class="component-container Schoolbox_Resource_Textbox_Component_Homepage_Controller"]`),
-        ).toBeVisible({ timeout: 30000 });
+        ).toBeVisible();
     });
 
     /**

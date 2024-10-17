@@ -63,7 +63,7 @@ test.describe("Question Bank tests", () => {
 
         tester.isGoingTo("back to survey summary page");
         await summaryPage.goto(assessId);
-        await expect(page.locator(`h1:has-text("${surveyTitle}")`)).toBeVisible({ timeout: 30000 });
+        await expect(page.locator(`h1:has-text("${surveyTitle}")`)).toBeVisible();
 
         tester.isGoingTo("add the question to question bank");
         await summaryPage.addToQuestionBank(questionId, categoryId);
@@ -78,7 +78,7 @@ test.describe("Question Bank tests", () => {
 
         tester.isGoingTo("back to survey summary page");
         await summaryPage.goto(assessId);
-        await expect(page.locator(`h1:has-text("${surveyTitle}")`)).toBeVisible({ timeout: 30000 });
+        await expect(page.locator(`h1:has-text("${surveyTitle}")`)).toBeVisible();
 
         tester.isGoingTo("create another question");
         await summaryPage.clickNewQuestion(sectionId);
@@ -93,7 +93,7 @@ test.describe("Question Bank tests", () => {
 
         tester.isGoingTo("back to survey summary page");
         await summaryPage.goto(assessId);
-        await expect(page.locator(`h1:has-text("${surveyTitle}")`)).toBeVisible({ timeout: 30000 });
+        await expect(page.locator(`h1:has-text("${surveyTitle}")`)).toBeVisible();
 
         tester.isGoingTo("add the question to question bank");
         await summaryPage.addToQuestionBank(question2Id, categoryId);
@@ -108,7 +108,7 @@ test.describe("Question Bank tests", () => {
 
         tester.isGoingTo("back to survey summary page");
         await summaryPage.goto(assessId);
-        await expect(page.locator(`h1:has-text("${surveyTitle}")`)).toBeVisible({ timeout: 30000 });
+        await expect(page.locator(`h1:has-text("${surveyTitle}")`)).toBeVisible();
 
         tester.isGoingTo("create one more question");
         await summaryPage.clickNewQuestion(sectionId);
@@ -123,7 +123,7 @@ test.describe("Question Bank tests", () => {
 
         tester.isGoingTo("back to survey summary page");
         await summaryPage.goto(assessId);
-        await expect(page.locator(`h1:has-text("${surveyTitle}")`)).toBeVisible({ timeout: 30000 });
+        await expect(page.locator(`h1:has-text("${surveyTitle}")`)).toBeVisible();
 
         tester.isGoingTo("add the question to question bank");
         await summaryPage.addToQuestionBank(question3Id, categoryId);

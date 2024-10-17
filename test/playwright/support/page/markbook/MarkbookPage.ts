@@ -84,8 +84,6 @@ export default class MarkbookPage {
      * @param name - The name of the participant
      */
     async cantSeeParticipant(name: string): Promise<void> {
-        await expect(this.page.locator(`a[title="View Profile"]:has-text("${name}")`)).not.toBeVisible({
-            timeout: 30000,
-        });
+        await expect(this.page.locator(`a[title="View Profile"]:has-text("${name}")`)).not.toBeVisible();
     }
 }

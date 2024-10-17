@@ -69,9 +69,9 @@ export default class QuestionForm {
      * Submits this form to modify a question bank
      */
     async modify(): Promise<void> {
-        await this.page.locator(QuestionForm.SELECTOR_BUTTON_MODIFY).isEnabled({ timeout: 30000 });
+        await this.page.locator(QuestionForm.SELECTOR_BUTTON_MODIFY).isEnabled();
         await this.page.click(QuestionForm.SELECTOR_BUTTON_MODIFY);
-        await expect(this.page.locator(`h2.subheader:has-text("Question Bank")`)).toBeVisible();
+        await expect(this.page.locator(`h1:has-text("Question Bank")`)).toBeVisible();
     }
 
     /*

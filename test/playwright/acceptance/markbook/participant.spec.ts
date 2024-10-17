@@ -45,7 +45,7 @@ test.describe("Participant Tests", () => {
             page.locator(
                 `div[class="component-container Schoolbox_Learning_Assessment_DueWork_Component_Homepage_Controller"]`,
             ),
-        ).toBeVisible({ timeout: 30000 });
+        ).toBeVisible();
 
         tester.isGoingTo("As Jack Coles, create a due work");
         await tester.impersonate(teacher);
@@ -68,7 +68,6 @@ test.describe("Participant Tests", () => {
         tester.isGoingTo("As Jack Coles, create submission");
         await expect(page.locator(`h3:has-text("Cest One")`)).toBeVisible();
         await page.locator(`h3:has-text("Cest One")`).click();
-        await expect(page.locator('data-test="assessment-summary-create-button"')).toBeVisible();
         await page.getByTestId("assessment-summary-create-button").click();
 
         await submitForm.setContents(Common.genText(200));
@@ -87,7 +86,7 @@ test.describe("Participant Tests", () => {
         await page.waitForTimeout(2000);
         await statusPage.clickJellyTot();
         await statusPage.clickJellyTotOption("modify");
-        await expect(page.locator(`h2:has-text("Update Cest One")`)).toBeVisible();
+        await expect(page.locator(`h1:has-text("Update Cest One")`)).toBeVisible();
         await expect(page.getByTestId("assessment-form-button-submit-Update")).toBeEnabled();
         await page.waitForTimeout(2000);
         await dueworkForm.modifyParticipation(teacherId, true, true);
@@ -111,17 +110,19 @@ test.describe("Participant Tests", () => {
         await page.waitForTimeout(2000);
         await statusPage.clickJellyTot();
         await statusPage.clickJellyTotOption("modify");
-        await expect(page.locator(`h2:has-text("Update Cest One")`)).toBeVisible();
+        await expect(page.locator(`h1:has-text("Update Cest One")`)).toBeVisible();
         await expect(page.getByTestId("assessment-form-button-submit-Update")).toBeEnabled();
         await dueworkForm.modifyParticipation(studentId, false, false);
         await dueworkForm.update();
         await expect(page.locator(`h1:has-text("Status of Cest One")`)).toBeVisible();
 
-        tester.isGoingTo("open course mark book and check that Jack Coles and Louisa Smith are not presented");
+        tester.isGoingTo(
+            "open course mark book and check that Jack Coles is not presented and Louisa Smith is presented",
+        );
         await markbookPage.open(classId);
         await markbookPage.canSeeAssessment("Cest One");
         await markbookPage.cantSeeParticipant("Coles, Jack");
-        await markbookPage.cantSeeParticipant("Smith, Louisa");
+        await markbookPage.canSeeParticipant("Smith, Louisa");
 
         // remove the duework component from the homepage to avoid issues in the next test
         tester.isGoingTo("remove the duework component from the homepage");
