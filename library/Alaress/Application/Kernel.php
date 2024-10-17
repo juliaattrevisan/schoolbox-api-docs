@@ -227,10 +227,12 @@ abstract class Kernel
     private $exceptionCallbacks = [];
 
     /**
-     * A Sentry transaction: used for instrumenting this kernel and sending its
-     * trace to Sentry.
+     * A Sentry transaction manager: used for instrumenting this kernel and
+     * sending its trace to Sentry.
+     *
+     * Exists in DI, and may be used elsewhere.
      */
-    private ?Transaction $sentryTransaction = null;
+    protected ?Manager $sentryTransactionManager = null;
 
     /**
      * @throws Di\Exception
@@ -301,6 +303,8 @@ abstract class Kernel
         } catch (Di\Exception\ServiceNotFound $e) {
             throw new LogicException("The 'config' dependency should have been installed.");
         }
+
+        $this->sentryTransactionManager = $this->di->get('sentry.transactionManager');
 
         self::dieGracefullyIfInMaintenanceMode($config);
         session_save_path(PipeManager::getSessionSavePath($config->get(ConfigMapper::NAME_REDIS_URL), INSTANCE_ID));
