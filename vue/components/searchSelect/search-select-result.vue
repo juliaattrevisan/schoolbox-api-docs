@@ -68,13 +68,19 @@ const { isActive } = useActiveIndex(
     <div
         ref="resultEl"
         :class="`search-result ${isActive ? 'search-result--active' : ''} f-no-margins`"
-        :data-test="`search-select-result-${props.result.id}`"
+        :data-test="`search-select-result-container-${props.result.id}`"
         @click="onClick"
         @mouseover="onMouseover"
     >
         <show-matches v-if="props.isSingleSelect" tag="span" :text="props.result.name" :query="props.query" />
         <div v-else class="checklist">
-            <input :id="`checkbox-${result.id}`" type="checkbox" :checked="isChecked" @click.stop="onClick" />
+            <input
+                :id="`checkbox-${result.id}`"
+                type="checkbox"
+                :checked="isChecked"
+                :data-test="`search-select-result-checkbox-${props.result.id}`"
+                @click.stop="onClick"
+            />
             <show-matches
                 tag="label"
                 :for="`checkbox-${result.id}`"

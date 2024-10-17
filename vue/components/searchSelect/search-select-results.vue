@@ -172,7 +172,6 @@ function onHover(index: number): void {
                 <search-select-result
                     v-for="(result, index) in props.results"
                     :key="result.id"
-                    :data-test="`search-select-result-${result.id}`"
                     :query="props.query"
                     :selected-items="props.selectedItems"
                     :result="result"
