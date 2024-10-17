@@ -13,9 +13,9 @@ use Alaress\Authorizer\Rule;
 use Alaress\Module\Module as BaseModule;
 use Alaress\Twig\Loader\IChainLoader;
 use Alaress\Web\Controller\Base;
-use Aura\Router\Map;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\External\Connector\Log\Mapper as LogMapper;
+use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\Storage\S3\DisasterRecovery;
 
 class Module extends BaseModule
@@ -38,17 +38,26 @@ class Module extends BaseModule
      */
     public function initRoutePermissions(Authorizer $authorizer)
     {
+        $this->addRoutePermission(
+            $authorizer,
+            '.*',
+            new Rule\All(
+                new Rule\IsLoggedIn(),
+                new Rule\Any(
+                    new Rule\IsSuperuser(),
+                    new Rule\HasServicePermission(UserAccess::SERVICE_NEWS, UserAccess::ACCESS_FULL)
+                )
+            )
+        );
 
-        $this->addRoutePermission($authorizer, '.*', new Rule\IsLoggedIn())
-             ->addRoutePermission($authorizer, '.*', new Rule\IsSuperuser())
-             ->addRoutePermission(
-                 $authorizer,
-                 'getDisasterRecovery',
-                 new Rule\All(
-                     new Rule\IsSuperuser(),
-                     new Rule\IsConfigOn(DisasterRecovery::CONFIG_DR_VISIBILITY, $this->getConfig())
-                 )
-             );
+        $this->addRoutePermission(
+            $authorizer,
+            'getDisasterRecovery',
+            new Rule\All(
+                new Rule\IsSuperuser(),
+                new Rule\IsConfigOn(DisasterRecovery::CONFIG_DR_VISIBILITY, $this->getConfig())
+            )
+        );
     }
 
     /**
