@@ -11,6 +11,7 @@ declare(strict_types=1);
 namespace Schoolbox\Admin\Profile\Editor\Field;
 
 use Alaress\Database\Predicate\Builder;
+use DebugBar\DebugBarException;
 use Schoolbox\Admin\Profile\Editor\Payload;
 use Schoolbox\GenericCollection;
 use Schoolbox\Mapper\DefinitionException;
@@ -158,6 +159,7 @@ class Mapper extends \Schoolbox\Mapper
      * @param User $viewer
      * @return GenericCollection
      * @throws Exception
+     * @throws DebugBarException
      * @throws \PDOException
      * @throws \UnexpectedValueException
      */
@@ -175,9 +177,6 @@ class Mapper extends \Schoolbox\Mapper
             /* Viewer's roletype determine visibility
              */
             'viewerRoleType' => $viewer->getRole()->getType(),
-            /* Also include the SELF pseudo-roletype
-             */
-            'selfRoleType' => Payload::ROLETYPE_SELF,
             /* You'd probably never change this, but always return enabled fields only
              */
             'enabled' => true
@@ -191,44 +190,51 @@ class Mapper extends \Schoolbox\Mapper
         /* Find an ordered list of fields there enabled for $viewee.
          * This is the maximum fields that could be rendered on a profile screen
          *
-         * Note that we also send back the pfrv.roletype value for each field, because
-         * visibility is more than just the roletype; there are special conditionals
-         * that constrain roletype further, such as config options on a user's account.
-         * A staff member might have visibility on a field, but that field itself is
-         * subjected to a config var that isn't in this query. It's being checked elsewhere.
+         * Note that if you're viewing your own profile, we need to include fields assigned
+         * the SELF pseudo-roletype. If you're viewing someone else's profile, we can
+         * exclude any fields with the SELF pseudo-roletype.
          */
-        $query = "
-            SELECT  
-                f.*,
-                pfrv.roletype
-            FROM {$this->getTable()} f
-            INNER JOIN profile_field_campus_availability pfca ON f.id = pfca.profile_field_id
-            INNER JOIN profile_field_roletype_visibility pfrv ON f.id = pfrv.profile_field_id
-            WHERE f.roletype = :vieweeRoleType
-            AND pfca.campus_id IN {$vieweeCampusPlaceholders}
-            AND (pfrv.roletype = :viewerRoleType OR pfrv.roletype = :selfRoleType)
-            AND f.enabled = :enabled
-            ORDER BY f.sequence ASC 
-        ";
+        if ($viewee->getId() === $viewer->getId()) {
+            $query = "
+                SELECT f.*
+                FROM {$this->getTable()} f
+                INNER JOIN profile_field_campus_availability pfca ON f.id = pfca.profile_field_id
+                INNER JOIN profile_field_roletype_visibility pfrv ON f.id = pfrv.profile_field_id
+                WHERE f.roletype = :vieweeRoleType
+                AND pfca.campus_id IN {$vieweeCampusPlaceholders}
+                AND (pfrv.roletype = :viewerRoleType OR pfrv.roletype = :selfRoleType)
+                AND f.enabled = :enabled
+                ORDER BY f.sequence ASC 
+            ";
+
+            $params['selfRoleType'] = $viewer->getRole()->getType();
+        } else {
+            $query = "
+                SELECT f.*
+                FROM {$this->getTable()} f
+                INNER JOIN profile_field_campus_availability pfca ON f.id = pfca.profile_field_id
+                INNER JOIN profile_field_roletype_visibility pfrv ON f.id = pfrv.profile_field_id
+                WHERE f.roletype = :vieweeRoleType
+                AND pfca.campus_id IN {$vieweeCampusPlaceholders}
+                AND (pfrv.roletype = :viewerRoleType)
+                AND f.enabled = :enabled
+                ORDER BY f.sequence ASC 
+            ";
+        }
 
         $statement = $this->getDatabase()->prepare($query);
         $statement->execute($params);
 
         /* Additional visibility rules to be checked in twig land
          */
-        $rules = [];
-
         while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
             $field = $this->hydrate($row);
-
-            $rules[$row['field']][] = $row['roletype'];
 
             if ($field) {
                 $collection->setOffset($field->getId(), $field);
             }
         }
 
-        new \Alaress_Probe($collection, $rules);
         return $collection;
     }
 }
