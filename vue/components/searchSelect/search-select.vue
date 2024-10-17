@@ -3,6 +3,7 @@
  * To search for results with a query and select them
  */
 
+import { useTemplateRef } from "vue";
 import { useSearch } from "./composables/useSearch";
 import type { Result } from "./types/Result";
 import SearchSelectSelected from "./search-select-selected.vue";
@@ -32,7 +33,7 @@ const emit = defineEmits<{
     remove: [results: Result[]];
 }>();
 
-const searchSelectEl = window.Vue.ref<HTMLDivElement | null>(null);
+const searchSelectEl = useTemplateRef("searchSelectEl");
 
 const { query, isActive, isSearching, hasNoResults, results } = useSearch(props.endpoint);
 
