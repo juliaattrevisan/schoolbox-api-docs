@@ -123,12 +123,32 @@ test.describe("Participant Tests", () => {
         await markbookPage.canSeeAssessment("Cest One");
         await markbookPage.cantSeeParticipant("Coles, Jack");
         await markbookPage.canSeeParticipant("Smith, Louisa");
+    });
+
+    /**
+     * Ideally this should be in .afterAll but since removing a component via the DB is
+     * more complex, this is done via page interaction for now.
+     */
+    test("Participant - Delete component", async ({ tester, page }) => {
+        await page.goto("/homepage/106");
+        await tester.common.waitForPageLoad();
+
+        // if there is no duework component, skip this test
+        const dueWorkComponent = page.locator(
+            ".component-container.Schoolbox_Learning_Assessment_DueWork_Component_Homepage_Controller",
+        );
+        if ((await dueWorkComponent.count()) === 0) {
+            return;
+        }
+
+        const addComponent = new Homepage(page);
 
         // remove the duework component from the homepage to avoid issues in the next test
         tester.isGoingTo("remove the duework component from the homepage");
         await page.goto("/homepage/106");
         await page.waitForTimeout(2000);
         await addComponent.clickLockToggle();
+        // this removes the first component on the page, which is presumed to be the duework component for now
         await addComponent.clickComponentRemoveIcon();
         await addComponent.clickRemoveConfirmationMessage();
     });
