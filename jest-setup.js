@@ -72,3 +72,22 @@ export function register() {
     window.customElements.define("sbx-icon", SbxIconCE);
 }
 register();
+
+/**
+ * So we can use fetch in tests, we need to mock it
+ * @param data
+ * @returns
+ */
+function setupFetchStub(data) {
+    return function fetchStub(_url) {
+        return new Promise((resolve) => {
+            resolve({
+                json: () =>
+                    Promise.resolve({
+                        data,
+                    }),
+            });
+        });
+    };
+}
+global.setupFetchStub = setupFetchStub;

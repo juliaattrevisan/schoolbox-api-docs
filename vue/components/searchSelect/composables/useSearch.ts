@@ -7,7 +7,7 @@ import type { Ref } from "vue";
 import type { Result } from "../types/Result";
 
 const MIN_QUERY_LENGTH = 2; // the amount of characters typed before the search becomes active
-const DEBOUNCE_AMOUNT = 350; // the amount in ms to hold off on searching, to allow the user to keep typing
+export const DEBOUNCE_AMOUNT = 350; // the amount in ms to hold off on searching, to allow the user to keep typing
 
 /**
  * search for results that match the current query
@@ -62,7 +62,15 @@ export function useSearch(endpoint: string): {
                     "Content-Type": "application/json",
                 },
             });
-            results.value = (await response.json()) as Result[];
+            const json: unknown = await response.json();
+            // if json is an array, set results to json
+            if (json instanceof Array) {
+                results.value = json as Result[];
+            }
+            // if json.data exists, set results to json.data
+            if (typeof json === "object" && json !== null && "data" in json) {
+                results.value = (json as { data: Result[] }).data;
+            }
         } catch (error) {
             console.error(error);
         } finally {

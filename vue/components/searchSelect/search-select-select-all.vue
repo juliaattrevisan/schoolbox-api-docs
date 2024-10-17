@@ -93,6 +93,7 @@ const { isActive } = useActiveIndex(
     <div
         ref="resultEl"
         :class="`search-result ${isActive ? 'search-result--active' : ''} f-no-margins`"
+        data-test="search-select-select-all"
         @click="onClick"
         @mouseover="onMouseover"
     >
