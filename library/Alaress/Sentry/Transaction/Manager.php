@@ -39,11 +39,6 @@ class Manager
     private array $spans = [];
 
     /**
-     * The current span within the transaction, if there is one.
-     */
-    private ?Span $span = null;
-
-    /**
      * Constructor
      *
      * @param HubInterface $hub The Sentry connection which the transactions and
@@ -54,16 +49,28 @@ class Manager
     }
 
     /**
-     * Start a new transaction, finishing an existing one if there is one
-     * already open.
+     * Start a new transaction.
      *
-     * @param string                 $name
-     * @param string|null            $description
-     * @param string|null            $operation
-     * @param string|null            $origin
-     * @param TransactionSource|null $source
-     * @param float|null             $startTimestamp
-     * @param array                  $data
+     * @param string                 $name           The transaction's name: this should be something which describes
+     *                                               the request which spawned the transaction, e.g. a route name or
+     *                                               request URI.
+     * @param string|null            $description    A description of the transaction: e.g. a database query,
+     *                                               route name, request URL.
+     *                                               Neither the Laravel nor Symfony implementations seem to set a
+     *                                               transaction description, only its name.
+     * @param string|null            $operation      The operation which the transaction is tracking: see
+     *                                               https://develop.sentry.dev/sdk/telemetry/traces/span-operations/
+     *                                               for standard examples.
+     * @param string|null            $origin         The action which created the transaction: see
+     *                                               https://develop.sentry.dev/sdk/telemetry/traces/trace-origin/
+     *                                               for how this value may be created.
+     * @param TransactionSource|null $source         How the transaction's name was generated.
+     * @param float|null             $startTimestamp When the transaction is to be recorded as having started:
+     *                                               usually, this will be the start time of the request, i.e.
+     *                                               `$_SERVER['REQUEST_TIME_FLOAT']`.
+     * @param array                  $data           Additional data to add to the transaction: see
+     *                                               https://develop.sentry.dev/sdk/telemetry/traces/span-data-conventions/
+     *                                               for standard examples.
      * @return void
      */
     public function startTransaction(
@@ -102,12 +109,25 @@ class Manager
     }
 
     /**
-     * Start a new span, finishing an existing one if there is one already open.
+     * Start a new span.
      *
-     * @param string|null $description
-     * @param string|null $operation
-     * @param string|null $origin
-     * @param array       $data
+     * This span will be created within the transaction's currently active span,
+     * or the transaction itself if it does not exist.
+     *
+     * If the transaction does not exist at all (because it is not yet created,
+     * or it was created but is not being sampled), this does nothing.
+     *
+     * @param string|null $description A description of the span: e.g. a database query,
+     *                                 route name, request URL.
+     * @param string|null $operation   The operation which the span is tracking: see
+     *                                 https://develop.sentry.dev/sdk/telemetry/traces/span-operations/
+     *                                 for standard examples.
+     * @param string|null $origin      The action which created the span: see
+     *                                 https://develop.sentry.dev/sdk/telemetry/traces/trace-origin/
+     *                                 for how this value may be created.
+     * @param array       $data        Additional data to add to the span: see
+     *                                 https://develop.sentry.dev/sdk/telemetry/traces/span-data-conventions/
+     *                                 for standard examples.
      * @return void
      */
     public function startSpan(
@@ -154,9 +174,7 @@ class Manager
 
         // Finish current span
         $span = array_pop($this->spans);
-        if ($span) {
-            $span->finish();
-        }
+        $span?->finish();
 
         // Set current span to next most recent span,
         // or transaction if there is none
@@ -164,7 +182,7 @@ class Manager
         if ($parent) {
             $this->spans[] = $parent;
         } else {
-            $parent  = $this->transaction;
+            $parent = $this->transaction;
         }
         /** @noinspection PhpExpressionResultUnusedInspection - this method mutates */
         $this->hub->setSpan($parent);
@@ -172,6 +190,8 @@ class Manager
 
     /**
      * Run `$callable` within the entirety of a new span.
+     *
+     * @see startSpan for description of other parameters.
      *
      * @param callable    $callable
      * @param string|null $description
