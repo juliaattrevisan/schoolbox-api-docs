@@ -87,7 +87,7 @@
     "ts-ebml": "~3.0.1",
     "v-tables-3-select-rows": "~0.4.9",
     "videojs-record": "~4.8.0",
-    "vue": "~3.4.38",
+    "vue": "~3.5.12",
     "vue-select": "~4.0.0-beta.6",
     "vuejs-paginate-next": "~1.0.2"
   },
