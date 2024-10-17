@@ -49,10 +49,10 @@ class Module extends BaseModule
     public function buildController(): Base
     {
         return new Controller(
-            CourseSpecificationMapper::getInstance(),
-            FolderMapper::getInstance(),
+            $this->getMapperFactory()->get(CourseSpecificationMapper::class),
+            $this->getMapperFactory()->get(FolderMapper::class),
             $this->getMapperFactory()->get(Access::class),
-            UnitSpecificationMapper::getInstance(),
+            $this->getMapperFactory()->get(UnitSpecificationMapper::class),
         );
     }
 }
