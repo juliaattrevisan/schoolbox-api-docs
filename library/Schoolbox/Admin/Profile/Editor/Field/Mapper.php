@@ -220,7 +220,7 @@ class Mapper extends \Schoolbox\Mapper
                 INNER JOIN profile_field_roletype_visibility pfrv ON f.id = pfrv.profile_field_id
                 WHERE f.roletype = :vieweeRoleType
                 AND pfca.campus_id IN {$vieweeCampusPlaceholders}
-                AND (pfrv.roletype = :viewerRoleType)
+                AND pfrv.roletype = :viewerRoleType
                 AND f.enabled = :enabled
                 ORDER BY f.sequence ASC 
             ";

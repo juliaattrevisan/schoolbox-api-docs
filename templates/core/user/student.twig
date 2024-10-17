@@ -192,114 +192,124 @@
                                     margin-left: 1rem;
                                 }
                             </style>
+
+                            {# Build a hash lookup of additional clauses and cross-reference them
+                             #
+                             # Additional visibility constraints for the viewer's roletype
+                             # and the corresponding bool set by old twig implementation
+                             #}
+                            {% set additionalConstraints = {
+                                'staff': {
+                                    'Comment': showComments
+                                }
+                            } %}
+
                             <dl>
                                 {# Portrait is always element 0 at the moment: we can skip iterating
                                  # that array element here, because it's rendered elsewhere.
                                  #}
                                 {% for selectedField in externalUser.data.roleTypes.fields.selected[1:] %}
-                                    {# TODO Decide if the viewer can actually see this field, due to additional
-                                     #  permissions, privacy and configuration settings that go well beyond
-                                     #  the viewer's role type; if you can see it, show it. Otherwise skip it.
+                                    {# Decide if the viewer can actually see this field, due to additional
+                                     # permissions, privacy and configuration settings that go well beyond
+                                     # the viewer's role type; if you can see it, show it. Otherwise skip it.
                                      #}
+                                    {% if (additionalConstraints[USER.role.type][selectedField.field] ?? true) %}
+                                        {# Use localisation variant from Terminology, if it exists;
+                                         # otherwise use default Display As that I provided by default
+                                         #}
+                                        {% set fieldName = selectedField.displayAs %}
 
-                                    {# TODO Build a hash lookup of additional clauses and cross-reference them here
-                                     #}
+                                        {% if selectedField.terminology %}
+                                            {% set fieldName = locale.translate(selectedField.terminology, false, true) %}
+                                        {% endif %}
 
-                                    {# Use localisation variant from Terminology, if it exists;
-                                     # otherwise use default Display As that I provided by default
-                                     #}
-                                    {% set fieldName = selectedField.displayAs %}
+                                        {# Now render each of the flags/tuples in some manner #}
 
-                                    {% if selectedField.terminology %}
-                                        {% set fieldName = locale.translate(selectedField.terminology, false, true) %}
-                                    {% endif %}
-
-                                    {# Now render each of the flags/tuples in some manner #}
-
-                                    {% if selectedField.icon and selectedField.css %}
-                                        <dt class="full-width">
-                                            {% if selectedField.field in ['AlertMessages', 'AlertLegal'] %}
-                                                {# A set of Alert Messages that display in one big flag
+                                        {% if selectedField.icon and selectedField.css %}
+                                            <dt class="full-width">
+                                                {% if selectedField.field in ['AlertMessages', 'AlertLegal'] %}
+                                                    {# A set of Alert Messages that display in one big flag
                                                  # This is often a set of strings that need to be output sequentially
-                                                 #}
-                                                {% if selectedField.value|length %}
+                                                    #}
+                                                    {% if selectedField.value|length %}
+                                                        <div class="alert-box {{ selectedField.css ?? '' }} {{ selectedField.icon ?? '' }}">
+                                                            {% for message in selectedField.value %}
+                                                                {{ message|nl2br }}
+                                                            {% endfor %}
+                                                        </div>
+                                                    {% endif %}
+                                                {% elseif selectedField.value %}
+                                                    {# A string that displays in a flag in some manner, typically #}
                                                     <div class="alert-box {{ selectedField.css ?? '' }} {{ selectedField.icon ?? '' }}">
-                                                        {% for message in selectedField.value %}
-                                                            {{ message|nl2br }}
-                                                        {% endfor %}
-                                                    </div>
-                                                {% endif %}
-                                            {% elseif selectedField.value %}
-                                                {# A string that displays in a flag in some manner, typically #}
-                                                <div class="alert-box {{ selectedField.css ?? '' }} {{ selectedField.icon ?? '' }}">
-                                                    {% if selectedField.field in ['StudentMedicalAlert'] %}
-                                                        {# A string with a special prefix that displays in a flag #}
-                                                        Medical Note: {{ selectedField.value }}
-                                                    {% elseif selectedField.field in ['Comment'] %}
-                                                        {# A string that displays on its own in a flag#}
-                                                        {{ selectedField.value }}
-                                                    {% elseif selectedField.field in ['ParentsSeparatedFlag'] %}
-                                                        {# A special flag that has a hardcoded text string #}
-                                                        Parents separated; please be mindful when making contact.
-                                                    {% else %}
-                                                        {# A generic flag which shows Display As/Terminology equivalent
+                                                        {% if selectedField.field in ['StudentMedicalAlert'] %}
+                                                            {# A string with a special prefix that displays in a flag #}
+                                                            Medical Note: {{ selectedField.value }}
+                                                        {% elseif selectedField.field in ['Comment'] %}
+                                                            {# A string that displays on its own in a flag#}
+                                                            {{ selectedField.value }}
+                                                        {% elseif selectedField.field in ['ParentsSeparatedFlag'] %}
+                                                            {# A special flag that has a hardcoded text string #}
+                                                            Parents separated; please be mindful when making contact.
+                                                        {% else %}
+                                                            {# A generic flag which shows Display As/Terminology equivalent
                                                          #
                                                          # Flags always display fullwidth and I can cheat by rendering
                                                          # a full-width definition title without a definition data lol
-                                                         #}
-                                                        {{ fieldName }}
-                                                    {% endif %}
-                                                </div>
-                                            {% endif %}
-                                        </dt>
-                                    {% else %}
-                                        {% if selectedField.field in ['pastoralCounts'] and pastoralCounts|length %}
-                                            {# This is handled separately and specially in the controller
+                                                            #}
+                                                            {{ fieldName }}
+                                                        {% endif %}
+                                                    </div>
+                                                {% endif %}
+                                            </dt>
+                                        {% else %}
+                                            {% if selectedField.field in ['pastoralCounts'] and pastoralCounts|length %}
+                                                {# This is handled separately and specially in the controller
                                              # it's not really consolidated in this payload
-                                             #}
-                                            <div class="pastoral-flags">
-                                                {% for pastoralCount in pastoralCounts %}
-                                                    <a href="{{ pastoralCount.destinationUrl }}">
+                                                #}
+                                                <div class="pastoral-flags">
+                                                    {% for pastoralCount in pastoralCounts %}
+                                                        <a href="{{ pastoralCount.destinationUrl }}">
                                                         <span class="label neutral icon-{{ pastoralCount.icon }} pastoral-flag-in-profile"
                                                               data-tooltip title="{{ pastoralCount.title }}"
                                                               style="color: {{ pastoralCount.fgColor }}; background-color: {{ pastoralCount.bgColor }}"
                                                         >{{ pastoralCount.count }}</span></a>
-                                                {% endfor %}
-                                            </div>
-                                        {% elseif selectedField.value %}
-                                            {# Only render a tuple if it has a meaningful value
+                                                    {% endfor %}
+                                                </div>
+                                            {% elseif selectedField.value %}
+                                                {# Only render a tuple if it has a meaningful value
                                              # Note that some fields require special handling (different data structures)
-                                             #}
-                                            {% if selectedField.field in ['campusCollection'] %}
-                                                 {# A list of campuses #}
-                                                {% if selectedField.value|length %}
+                                                #}
+                                                {% if selectedField.field in ['campusCollection'] %}
+                                                    {# A list of campuses #}
+                                                    {% if selectedField.value|length %}
+                                                        <dt class="small-4 medium-3 columns">{{ fieldName }}</dt>
+                                                        <dd class="small-8 medium-9 columns">
+                                                            {% for campus in selectedField.value %}
+                                                                {{ campus.name }}{% if not loop.last %}, {% endif %}
+                                                            {% endfor %}
+                                                        </dd>
+                                                    {% endif %}
+                                                {% else %}
+                                                    {# The field name will always show at this point, though their values
+                                                 # will need special treatment somehow
+                                                    #}
                                                     <dt class="small-4 medium-3 columns">{{ fieldName }}</dt>
                                                     <dd class="small-8 medium-9 columns">
-                                                        {% for campus in selectedField.value %}
-                                                            {{ campus.name }}{% if not loop.last %}, {% endif %}
-                                                        {% endfor %}
+                                                        {% if selectedField.field in ['formTeacher', 'tutorTeacher', 'hohTeacher', 'coordTeacher', 'studentCoach'] %}
+                                                            {# These fields are Schoolbox\User instances and need special treatment #}
+                                                            <a href="{{ session.mailhandle }}{{ selectedField.value.email }}">{{ selectedField.value.formatName }}</a>
+                                                        {% elseif selectedField.field in ['email'] %}
+                                                            {# Renders a mailto: hyperlink #}
+                                                            <a href="{{ session.mailhandle }}{{ selectedField.value }}">{{ selectedField.value }}</a>
+                                                        {% elseif selectedField.field in ['StudentBirthDate'] %}
+                                                            {# Renders with date formatting #}
+                                                            {{ selectedField.value|date(dateFormats.shortDateOnlyFormat) }}
+                                                        {% else %}
+                                                            {# A generic tuple (key, value) pair #}
+                                                            {{ selectedField.value }}
+                                                        {% endif %}
                                                     </dd>
                                                 {% endif %}
-                                            {% else %}
-                                                {# The field name will always show at this point, though their values
-                                                 # will need special treatment somehow
-                                                 #}
-                                                <dt class="small-4 medium-3 columns">{{ fieldName }}</dt>
-                                                <dd class="small-8 medium-9 columns">
-                                                    {% if selectedField.field in ['formTeacher', 'tutorTeacher', 'hohTeacher', 'coordTeacher', 'studentCoach'] %}
-                                                        {# These fields are Schoolbox\User instances and need special treatment #}
-                                                        <a href="{{ session.mailhandle }}{{ selectedField.value.email }}">{{ selectedField.value.formatName }}</a>
-                                                    {% elseif selectedField.field in ['email'] %}
-                                                        {# Renders a mailto: hyperlink #}
-                                                        <a href="{{ session.mailhandle }}{{ selectedField.value }}">{{ selectedField.value }}</a>
-                                                    {% elseif selectedField.field in ['StudentBirthDate'] %}
-                                                        {# Renders with date formatting #}
-                                                        {{ selectedField.value|date(dateFormats.shortDateOnlyFormat) }}
-                                                    {% else %}
-                                                        {# A generic tuple (key, value) pair #}
-                                                        {{ selectedField.value }}
-                                                    {% endif %}
-                                                </dd>
                                             {% endif %}
                                         {% endif %}
                                     {% endif %}
