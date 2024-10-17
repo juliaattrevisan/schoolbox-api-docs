@@ -452,16 +452,7 @@ class Mimetype implements ISoftDeletable
             // is likely used in ways I don't know about yet.
             // At least there's unit tests to cover it now.
             $filter = str_replace('*', '[^/]+', $filter);
-
-            $regex = '/^' . preg_quote($filter, '/') . '$/';
-
-            /* Use the itemised equivalent of the wildcard, because stupid svg
-             * Otherwise use whatever was sent to us
-             */
-            if (\Schoolbox\Resource\Attachment\Zone::IMAGE_ALL_WILDCARD === $mimeFilter && preg_match($regex, \Schoolbox\Resource\Attachment\Zone::IMAGE_ALL)) {
-                return true;
-            }
-
+            $regex  = '/^' . preg_quote($filter, '/') . '$/';
             if (preg_match($regex, $mime)) {
                 return true;
             }
