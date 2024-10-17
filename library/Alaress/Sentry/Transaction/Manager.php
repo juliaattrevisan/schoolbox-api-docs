@@ -15,6 +15,7 @@ use Sentry\Tracing\SpanContext;
 use Sentry\Tracing\Transaction;
 use Sentry\Tracing\TransactionContext;
 use Sentry\Tracing\TransactionSource;
+use Throwable;
 
 /**
  * Sentry transaction manager: handles currently open transaction and span for
@@ -27,6 +28,15 @@ class Manager
      * trace to Sentry.
      */
     private ?Transaction $transaction = null;
+
+    /**
+     * The stack of currently open spans.
+     *
+     * Starting a span will add it to the stack; finishing it will remove it.
+     *
+     * @var array<Span>
+     */
+    private array $spans = [];
 
     /**
      * The current span within the transaction, if there is one.
@@ -65,6 +75,7 @@ class Manager
         ?float $startTimestamp = null,
         array $data = [],
     ): void {
+        // No concurrent transactions
         $this->finishTransaction();
 
         $transactionContext = new TransactionContext();
@@ -93,8 +104,6 @@ class Manager
     /**
      * Start a new span, finishing an existing one if there is one already open.
      *
-     * TODO determine if more than one span can be open?
-     *
      * @param string|null $description
      * @param string|null $operation
      * @param string|null $origin
@@ -110,20 +119,22 @@ class Manager
         if (!$this->transaction) {
             return;
         }
-        $this->finishSpan();
-
         $spanContext = new SpanContext();
         $spanContext->setDescription($description);
         $spanContext->setOp($operation);
         $spanContext->setOrigin($origin);
         $spanContext->setData($data);
 
-        $span = $this->transaction->startChild($spanContext);
-        if (!$span->getSampled()) {
-            return;
+        // Create new span within most recent span,
+        // or within transaction if there is no current span
+        $parent = array_pop($this->spans);
+        if ($parent) {
+            $span          = $parent->startChild($spanContext);
+            $this->spans[] = $parent;
+        } else {
+            $span = $this->transaction->startChild($spanContext);
         }
-
-        $this->span = $span;
+        $this->spans[] = $span;
 
         /** @noinspection PhpExpressionResultUnusedInspection - this method mutates */
         $this->hub->setSpan($span);
@@ -140,13 +151,49 @@ class Manager
         if (!$this->transaction) {
             return;
         }
-        if (!$this->span) {
-            return;
-        }
-        $this->span->finish();
 
+        // Finish current span
+        $span = array_pop($this->spans);
+        if ($span) {
+            $span->finish();
+        }
+
+        // Set current span to next most recent span,
+        // or transaction if there is none
+        $parent = array_pop($this->spans);
+        if ($parent) {
+            $this->spans[] = $parent;
+        } else {
+            $parent  = $this->transaction;
+        }
         /** @noinspection PhpExpressionResultUnusedInspection - this method mutates */
-        $this->hub->setSpan($this->transaction);
+        $this->hub->setSpan($parent);
+    }
+
+    /**
+     * Run `$callable` within the entirety of a new span.
+     *
+     * @param callable    $callable
+     * @param string|null $description
+     * @param string|null $operation
+     * @param string|null $origin
+     * @param array       $data
+     * @return mixed Returns whatever `$callable` does when run.
+     * @throws Throwable May throw whatever `$callable` may.
+     */
+    public function runWithinSpan(
+        callable $callable,
+        ?string $description = null,
+        ?string $operation = null,
+        ?string $origin = null,
+        array $data = [],
+    ): mixed {
+        $this->startSpan($description, $operation, $origin, $data);
+        try {
+            return $callable();
+        } finally {
+            $this->finishSpan();
+        }
     }
 
     /**
