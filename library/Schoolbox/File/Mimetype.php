@@ -440,14 +440,17 @@ class Mimetype implements ISoftDeletable
 
             $mime = $this->getMime() ?? '';
 
-            // wildcard subtype match (e.g. image/* against any image mimetype)
-            if (preg_match('`^(?P<type>.*?/)\\*$`', $filter, $matches)) {
+            // wildcard subtype match, e.g.:
+            // * "image/*" against any image mimetype
+            // * "application/vnd.*" against any vendor mimetype
+            if (preg_match('`^(?P<type>.*?)\\*$`', $filter, $matches)) {
                 if (str_starts_with($mime, $matches['type'])) {
                     return true;
                 }
             }
 
-            // wildcard type match (e.g. */mpeg against any type of mpeg)
+            // wildcard type match, e.g.:
+            // * "*/mpeg" against any type of mpeg
             if (preg_match('`^\\*(?P<subtype>.*)$`', $filter, $matches)) {
                 if (str_ends_with($mime, $matches['subtype'])) {
                     return true;

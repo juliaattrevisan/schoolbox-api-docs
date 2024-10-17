@@ -166,6 +166,18 @@ class MimetypeTest extends TestCase
                     ['mimetype' => 'video/mpeg', 'expected' => true,],
                 ],
             ],
+            // Partial wildcard subtype: is this even a thing?
+            [
+                'filter'    => 'application/vnd.*',
+                'mimetypes' => [
+                    ['mimetype' => null, 'expected' => false,],
+                    ['mimetype' => '', 'expected' => false,],
+                    ['mimetype' => 'image/jpeg', 'expected' => false,],
+                    ['mimetype' => 'image/png', 'expected' => false,],
+                    ['mimetype' => 'text/plain', 'expected' => false,],
+                    ['mimetype' => 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'expected' => true,],
+                ],
+            ],
         ];
         foreach ($cases as $case) {
             foreach ($case['mimetypes'] as $mimetypeData) {
