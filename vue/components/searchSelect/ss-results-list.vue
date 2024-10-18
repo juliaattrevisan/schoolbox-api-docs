@@ -45,7 +45,9 @@ const showSelectAll = window.Vue.computed(() => {
  * @returns - the bottom border style
  */
 const bottomBorder = window.Vue.computed(() => {
-    return props.isActive ? "1px solid var(--form-border-color)" : "none";
+    return props.isSearching || props.hasNoResults || props.results.length > 0
+        ? "1px solid var(--form-border-color)"
+        : "none";
 });
 
 /**
