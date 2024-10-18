@@ -38,7 +38,7 @@ $this->setBlock('content', 'component_page', 'component_page_block');
 $this->setBlock('component_page', 'component', 'component_block');
 
 // include the admin navigation
-(new Subnav($this->getDi()->get('config'), $this->getDi()->get('authorizer'), $this->getDi()->get('user')))
+(new Subnav($this->getDi()->get('config'), $this->getDi()->get('user')))
     ->generatePhplib($this, '/adminv2/homepage')
     ->generateBreadcrumbsHtml($this, '/adminv2/homepage');
 

@@ -45,7 +45,7 @@ if (isset($this->arg[0]) && in_array($this->arg[0], $validPages)) {
 }
 
 // include the admin navigation
-(new Subnav($this->getDi()->get('config'), $this->getDi()->get('authorizer'), $this->getDi()->get('user')))
+(new Subnav($this->getDi()->get('config'), $this->getDi()->get('user')))
     ->generatePhplib($this, "/adminv2/engagement/index/{$page}")
     ->generateBreadcrumbsHtml($this, "/adminv2/engagement/index/{$page}");
 

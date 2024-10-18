@@ -17,7 +17,7 @@ $this->setFile(TEMPLATE_content, 'adminv2/bulkAddCalendar.html');
 $this->setBlock(TEMPLATE_content, 'event', 'event_block');
 
 // include the admin navigation
-(new Subnav($this->getDi()->get('config'), $this->getDi()->get('authorizer'), $this->getDi()->get('user')))
+(new Subnav($this->getDi()->get('config'), $this->getDi()->get('user')))
     ->generatePhplib($this, '/adminv2/calendar/Import')
     ->generateBreadcrumbsHtml($this, '/adminv2/calendar/Import');
 
