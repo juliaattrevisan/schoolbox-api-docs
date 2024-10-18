@@ -3,7 +3,6 @@
  * The search results container
  */
 
-import gsap from "gsap";
 import { onKeyStroke } from "@vueuse/core";
 import type { Result } from "./types/Result";
 import SearchSelectSelectAll from "./search-select-select-all.vue";
@@ -24,61 +23,6 @@ const emit = defineEmits<{
     add: [results: Result[]];
     remove: [results: Result[]];
 }>();
-
-const searchResultsContainerEl = window.Vue.ref<HTMLDivElement | null>(null);
-const searchResultsEl = window.Vue.ref<HTMLDivElement | null>(null);
-
-/**
- * to animate the height of the search results container
- * @param targetHeight - the height to animate to
- */
-function animateHeight(targetHeight: number): void {
-    gsap.to(searchResultsContainerEl.value, {
-        duration: 0.3,
-        height: targetHeight === 1 ? 0 : targetHeight,
-    });
-}
-
-/**
- * to animate the search results
- */
-async function animateResults(): Promise<void> {
-    await window.Vue.nextTick();
-    const targetHeight = (searchResultsEl.value as HTMLDivElement).offsetHeight;
-    animateHeight(targetHeight);
-}
-
-/**
- * results have been preset prior to search
- */
-window.Vue.onMounted(async () => {
-    if (props.results.length > 0) {
-        await animateResults();
-    }
-});
-
-/**
- * to slide up and down the search results
- */
-window.Vue.watch(
-    () => props.isActive,
-    async () => {
-        await animateResults();
-    },
-);
-
-/**
- * to slide up and down the search results
- */
-window.Vue.watch(
-    () => props.results,
-    async (newResults, oldResults) => {
-        if (newResults.length === oldResults.length) {
-            return;
-        }
-        await animateResults();
-    },
-);
 
 /**
  * show select all option for adding / removing results only if there's
@@ -151,8 +95,8 @@ function onHover(index: number): void {
 }
 </script>
 <template>
-    <div ref="searchResultsContainerEl" class="search-results-container">
-        <div ref="searchResultsEl" class="search-results">
+    <div v-if="props.isActive">
+        <div class="search-results">
             <div v-if="props.isSearching" class="search-status">Searching for results....</div>
             <div v-else-if="props.hasNoResults && props.selectedItems.length === 0" class="search-status">
                 No results found for your current search.
@@ -189,12 +133,6 @@ function onHover(index: number): void {
 </template>
 
 <style lang="scss" scoped>
-.search-results-container {
-    height: 0; //will animate the results within with the window.Vue.watch() above
-    overflow: hidden;
-    position: relative;
-}
-
 .search-results {
     max-height: 400px;
     overflow: auto;
