@@ -4,7 +4,7 @@
 
 import debounce from "lodash/debounce";
 import type { Ref } from "vue";
-import type { Result } from "../types/searchSelectTypes";
+import type { SearchSelectItem } from "../types/searchSelectTypes";
 
 const MIN_QUERY_LENGTH = 2; // the amount of characters typed before the search becomes active
 export const DEBOUNCE_AMOUNT = 350; // the amount in ms to hold off on searching, to allow the user to keep typing
@@ -17,14 +17,14 @@ export const DEBOUNCE_AMOUNT = 350; // the amount in ms to hold off on searching
 export function useSearch(endpoint: string): {
     isSearching: Ref<boolean>;
     query: Ref<string>;
-    results: Ref<Result[]>;
+    results: Ref<SearchSelectItem[]>;
     isActive: Ref<boolean>;
     hasNoResults: Ref<boolean>;
     search: () => Promise<void>;
 } {
     const isSearching = window.Vue.ref(false); // to notify that an action is taking place,
     const query = window.Vue.ref(""); // current search term to filter the active nodes
-    const results = window.Vue.ref<Result[]>([]); // nodes returned in the current search results
+    const results = window.Vue.ref<SearchSelectItem[]>([]); // nodes returned in the current search results
     const hasSearched = window.Vue.ref(false); // to show that a search has been made
 
     /**
@@ -65,11 +65,11 @@ export function useSearch(endpoint: string): {
             const json: unknown = await response.json();
             // if json is an array, set results to json
             if (json instanceof Array) {
-                results.value = json as Result[];
+                results.value = json as SearchSelectItem[];
             }
             // if json.data exists, set results to json.data
             if (typeof json === "object" && json !== null && "data" in json) {
-                results.value = (json as { data: Result[] }).data;
+                results.value = (json as { data: SearchSelectItem[] }).data;
             }
         } catch (error) {
             console.error(error);
