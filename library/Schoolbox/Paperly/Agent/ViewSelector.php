@@ -8,7 +8,8 @@ class ViewSelector
 {
     /** @param array $viewLookUp Approved default paperly view mapping*/
     private array $viewLookup = [
-        'allClasses'            => 'uvPaperlyAllClasses',
+        'allClasses'            => 'uvPaperlyStudentsByClassCode',
+        'getStudentsByClass'    => 'uvPaperlyStudentsByClassCode',
         'allStaffs'             => 'uvPaperlyAllStaff',
         'allStudents'           => 'uvPaperlyAllStudents',
         'getStudentsAvatar'     => 'uvPaperlyPhotos',
