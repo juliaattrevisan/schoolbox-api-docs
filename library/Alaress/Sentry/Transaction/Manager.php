@@ -117,23 +117,26 @@ class Manager
      * If the transaction does not exist at all (because it is not yet created,
      * or it was created but is not being sampled), this does nothing.
      *
-     * @param string|null $description A description of the span: e.g. a database query,
-     *                                 route name, request URL.
-     * @param string|null $operation   The operation which the span is tracking: see
-     *                                 https://develop.sentry.dev/sdk/telemetry/traces/span-operations/
-     *                                 for standard examples.
-     * @param string|null $origin      The action which created the span: see
-     *                                 https://develop.sentry.dev/sdk/telemetry/traces/trace-origin/
-     *                                 for how this value may be created.
-     * @param array       $data        Additional data to add to the span: see
-     *                                 https://develop.sentry.dev/sdk/telemetry/traces/span-data-conventions/
-     *                                 for standard examples.
+     * @param string      $description    A description of the span: e.g. a database query, route name, request URL.
+     * @param string|null $operation      The operation which the span is tracking: see
+     *                                    https://develop.sentry.dev/sdk/telemetry/traces/span-operations/
+     *                                    for standard examples.
+     * @param string|null $origin         The action which created the span: see
+     *                                    https://develop.sentry.dev/sdk/telemetry/traces/trace-origin/
+     *                                    for how this value may be created.
+     * @param float|null  $startTimestamp When the span is to be recorded as having started:
+     *                                    usually, this will be the start time of the request, i.e.
+     *                                    `$_SERVER['REQUEST_TIME_FLOAT']`.
+     * @param array       $data           Additional data to add to the span: see
+     *                                    https://develop.sentry.dev/sdk/telemetry/traces/span-data-conventions/
+     *                                    for standard examples.
      * @return void
      */
     public function startSpan(
-        ?string $description = null,
+        string $description,
         ?string $operation = null,
         ?string $origin = null,
+        ?float $startTimestamp = null,
         array $data = [],
     ): void {
         if (!$this->transaction) {
@@ -143,6 +146,7 @@ class Manager
         $spanContext->setDescription($description);
         $spanContext->setOp($operation);
         $spanContext->setOrigin($origin);
+        $spanContext->setStartTimestamp($startTimestamp);
         $spanContext->setData($data);
 
         // Create new span within most recent span,
