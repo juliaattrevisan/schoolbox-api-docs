@@ -5,7 +5,7 @@
 
 import { useTemplateRef } from "vue";
 import { useSearch } from "./composables/useSearch";
-import type { Result } from "./types/Result";
+import type { SearchSelectItem } from "./types/searchSelectTypes";
 import SsSelectedList from "./ss-selected-list.vue";
 import SsQueryInput from "./ss-query-input.vue";
 import SsResultsList from "./ss-results-list.vue";
@@ -15,8 +15,8 @@ interface Props {
     labelId: string; // the label id
     isRequired?: boolean; // whether the input requires a value
     endpoint: string; // the search api endpoint
-    selectedItems: Result[]; // the selected searchResults
-    defaultResults?: Result[]; // show selection options when the search input is empty
+    selectedItems: SearchSelectItem[]; // the selected searchResults
+    defaultResults?: SearchSelectItem[]; // show selection options when the search input is empty
     isSingleSelect?: boolean; // whether only one result can be selected
     formValueName?: string; // the name of the form value
     placeholder?: string; // the placeholder text
@@ -29,8 +29,8 @@ const props = withDefaults(defineProps<Props>(), {
 });
 
 const emit = defineEmits<{
-    add: [results: Result[]];
-    remove: [results: Result[]];
+    add: [results: SearchSelectItem[]];
+    remove: [results: SearchSelectItem[]];
 }>();
 
 const searchSelectEl = useTemplateRef("searchSelectEl");
@@ -56,7 +56,7 @@ const currentResults = window.Vue.computed(() => {
  * To add results
  * @param $results - the results selected
  */
-function onAdd($results: Result[]): void {
+function onAdd($results: SearchSelectItem[]): void {
     // if single select, remove the previous selection
     if (props.isSingleSelect && props.selectedItems.length > 0) {
         emit("remove", props.selectedItems);
@@ -68,7 +68,7 @@ function onAdd($results: Result[]): void {
  * To remove results
  * @param $results - the results deselected
  */
-function onRemove($results: Result[]): void {
+function onRemove($results: SearchSelectItem[]): void {
     emit("remove", $results);
 }
 

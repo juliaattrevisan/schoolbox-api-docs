@@ -3,7 +3,7 @@
  * The creator filter input, to show results linked to a specific user
  */
 
-import type { Result } from "@schoolboxVue/components/searchSelect/types/Result";
+import type { SearchSelectItem } from "@schoolboxVue/components/searchSelect/types/searchSelectTypes";
 import SearchSelect from "@schoolboxVue/components/searchSelect/search-select.vue";
 import type { Creator } from "./store/spFilterCreatorsStore";
 import { useFilterCreatorsStore } from "./store/spFilterCreatorsStore";
@@ -21,7 +21,7 @@ const currentUser: Creator = {
  * or unselect the current result if it's already selected
  * @param results - the results selected
  */
-function onAdded(results: Result[]): void {
+function onAdded(results: SearchSelectItem[]): void {
     const result = results[0];
     if (!filterCreatorsStore.isActive) {
         filterCreatorsStore.creator.push(result as Creator);

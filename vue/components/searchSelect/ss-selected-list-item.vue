@@ -3,17 +3,17 @@
  * Displays a single selected result that can be removed
  */
 
-import type { Result } from "./types/Result";
+import type { SearchSelectItem } from "./types/searchSelectTypes";
 
 interface Props {
-    result: Result; // the selected result
+    result: SearchSelectItem; // the selected result
     isSingleSelect: boolean; // whether only one result can be selected
 }
 const props = defineProps<Props>();
 
 const emit = defineEmits<{
-    select: [result: Result];
-    remove: [result: Result];
+    select: [result: SearchSelectItem];
+    remove: [result: SearchSelectItem];
 }>();
 
 /**

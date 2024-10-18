@@ -6,12 +6,12 @@
 import { toRef } from "vue";
 import ShowMatches from "@schoolboxVue/components/search/show-matches.vue";
 import { useActiveIndex } from "./composables/useActiveIndex";
-import type { Result } from "./types/Result";
+import type { SearchSelectItem } from "./types/searchSelectTypes";
 
 interface Props {
     query: string; // the search query
-    selectedItems: Result[]; // the selected results
-    result: Result; // the result to display
+    selectedItems: SearchSelectItem[]; // the selected results
+    result: SearchSelectItem; // the result to display
     isSingleSelect: boolean; // whether only one result can be selected
     index: number; // the index of the result
     activeIndex: number; // the active index, to determine if this result is active
@@ -19,8 +19,8 @@ interface Props {
 const props = defineProps<Props>();
 
 const emit = defineEmits<{
-    add: [results: Result[]];
-    remove: [results: Result[]];
+    add: [results: SearchSelectItem[]];
+    remove: [results: SearchSelectItem[]];
     hover: [index: number];
 }>();
 

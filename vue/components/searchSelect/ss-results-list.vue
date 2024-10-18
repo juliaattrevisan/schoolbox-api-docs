@@ -4,7 +4,7 @@
  */
 
 import { onKeyStroke } from "@vueuse/core";
-import type { Result } from "./types/Result";
+import type { SearchSelectItem } from "./types/searchSelectTypes";
 import SsResultsListSelectAll from "./ss-results-list-select-all.vue";
 import SsResultsListItem from "./ss-results-list-item.vue";
 
@@ -13,15 +13,15 @@ interface Props {
     isActive: boolean; // whether the search is active
     isSearching: boolean; // to notify of searching
     isSingleSelect: boolean; // whether only one result can be selected
-    results: Result[]; // the results returned from the search
+    results: SearchSelectItem[]; // the results returned from the search
     hasNoResults: boolean; // whether there are no results
-    selectedItems: Result[]; // the selected results
+    selectedItems: SearchSelectItem[]; // the selected results
 }
 const props = defineProps<Props>();
 
 const emit = defineEmits<{
-    add: [results: Result[]];
-    remove: [results: Result[]];
+    add: [results: SearchSelectItem[]];
+    remove: [results: SearchSelectItem[]];
 }>();
 
 /**
@@ -52,7 +52,7 @@ const bottomBorder = window.Vue.computed(() => {
  * To add results
  * @param results - the results selected
  */
-function onAdd(results: Result[]): void {
+function onAdd(results: SearchSelectItem[]): void {
     emit("add", results);
 }
 
@@ -60,7 +60,7 @@ function onAdd(results: Result[]): void {
  * To remove results
  * @param results - the results deselected
  */
-function onRemove(results: Result[]): void {
+function onRemove(results: SearchSelectItem[]): void {
     emit("remove", results);
 }
 

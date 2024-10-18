@@ -6,19 +6,19 @@
 
 import { toRef } from "vue";
 import { useActiveIndex } from "./composables/useActiveIndex";
-import type { Result } from "./types/Result";
+import type { SearchSelectItem } from "./types/searchSelectTypes";
 
 interface Props {
-    results: Result[]; // the results returned from the search
-    selectedItems: Result[]; // the selected items
+    results: SearchSelectItem[]; // the results returned from the search
+    selectedItems: SearchSelectItem[]; // the selected items
     index: number; // the index of the result
     activeIndex: number; // the active index, to determine if this result is active
 }
 const props = defineProps<Props>();
 
 const emit = defineEmits<{
-    add: [results: Result[]];
-    remove: [results: Result[]];
+    add: [results: SearchSelectItem[]];
+    remove: [results: SearchSelectItem[]];
     hover: [index: number];
 }>();
 

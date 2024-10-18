@@ -3,18 +3,18 @@
  * To list all the currently selected Curriculum codes
  */
 
-import type { Result } from "./types/Result";
+import type { SearchSelectItem } from "./types/searchSelectTypes";
 import SsSelectedListItem from "./ss-selected-list-item.vue";
 
 interface Props {
-    selectedItems: Result[]; // the selected results
+    selectedItems: SearchSelectItem[]; // the selected results
     formValueName: string; // the name of the form value
     isSingleSelect: boolean; // whether only one result can be selected
 }
 const props = defineProps<Props>();
 
 const emit = defineEmits<{
-    remove: [results: Result[]];
+    remove: [results: SearchSelectItem[]];
 }>();
 
 /**
@@ -30,7 +30,7 @@ const ids = window.Vue.computed(() => {
  * To remove a selected search result
  * @param result - the result to remove
  */
-function onRemoveItem(result: Result): void {
+function onRemoveItem(result: SearchSelectItem): void {
     emit("remove", [result]);
 }
 </script>

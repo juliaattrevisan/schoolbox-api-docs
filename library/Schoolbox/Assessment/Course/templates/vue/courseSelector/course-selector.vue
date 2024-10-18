@@ -6,7 +6,7 @@
 import SearchSelect from "@schoolboxVue/components/searchSelect/search-select.vue";
 import { useSelected } from "@schoolboxVue/composables/store/useSelected";
 import type { Course } from "@schoolboxLibrary/types/Course";
-import type { Result } from "@schoolboxVue/components/searchSelect/types/Result";
+import type { SearchSelectItem } from "@schoolboxVue/components/searchSelect/types/searchSelectTypes";
 
 interface Props {
     endpoint: string; // The course api endpoint
@@ -20,7 +20,7 @@ const { selected, add, remove } = useSelected();
  * Select all the results
  * @param results - the results to add
  */
-function onAdd(results: Result[]): void {
+function onAdd(results: SearchSelectItem[]): void {
     add(results);
 }
 
@@ -28,7 +28,7 @@ function onAdd(results: Result[]): void {
  * Remove all the results
  * @param results - the results to remove
  */
-function onRemove(results: Result[]): void {
+function onRemove(results: SearchSelectItem[]): void {
     remove(results);
 }
 </script>
