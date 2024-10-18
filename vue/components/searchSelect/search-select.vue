@@ -6,9 +6,9 @@
 import { useTemplateRef } from "vue";
 import { useSearch } from "./composables/useSearch";
 import type { Result } from "./types/Result";
-import SearchSelectSelected from "./search-select-selected.vue";
+import SsSelectedList from "./ss-selected-list.vue";
 import SsQueryInput from "./ss-query-input.vue";
-import SearchSelectResults from "./search-select-results.vue";
+import SsResultsList from "./ss-results-list.vue";
 
 interface Props {
     label: string; // the label text
@@ -84,7 +84,7 @@ function onInput($query: string): void {
 <template>
     <div ref="searchSelectEl" class="c-search-select">
         <label :for="props.labelId" :class="`${props.isRequired ? 'required' : ''}`">{{ props.label }}</label>
-        <search-select-selected
+        <ss-selected-list
             :selected-items="props.selectedItems"
             :form-value-name="props.formValueName"
             :is-single-select="props.isSingleSelect"
@@ -96,7 +96,7 @@ function onInput($query: string): void {
             :placeholder="props.placeholder"
             @input="onInput"
         />
-        <search-select-results
+        <ss-results-list
             :query="query"
             :is-active="isActive"
             :is-searching="isSearching"

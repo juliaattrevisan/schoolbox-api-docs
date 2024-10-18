@@ -5,8 +5,8 @@
 
 import { onKeyStroke } from "@vueuse/core";
 import type { Result } from "./types/Result";
-import SearchSelectSelectAll from "./search-select-select-all.vue";
-import SearchSelectResult from "./search-select-result.vue";
+import SsResultsListSelectAll from "./ss-results-list-select-all.vue";
+import SsResultsListItem from "./ss-results-list-item.vue";
 
 interface Props {
     query: string; // the search query
@@ -110,7 +110,7 @@ function onHover(index: number): void {
             No results found for your current search.
         </div>
         <template v-else>
-            <search-select-select-all
+            <ss-results-list-select-all
                 v-if="showSelectAll"
                 :results="props.results"
                 :selected-items="props.selectedItems"
@@ -120,7 +120,7 @@ function onHover(index: number): void {
                 @remove="onRemove"
                 @hover="onHover"
             />
-            <search-select-result
+            <ss-results-list-item
                 v-for="(result, index) in props.results"
                 :key="result.id"
                 :query="props.query"
