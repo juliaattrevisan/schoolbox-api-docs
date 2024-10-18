@@ -122,11 +122,11 @@ class Kernel extends CliKernelAbstract
             }
         }
 
-        // Instrument here:
-        // presume that the invocation is in the last node of the backtrace
-        $backtrace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS);
-        $origin    = array_pop($backtrace);
-        $this->sentryTransactionManager->startTransactionFromCommandLineTool($origin['file'], $_SERVER);
+        // Instrument here
+        $this->sentryTransactionManager->startTransactionFromCommandLineTool(
+            $this->app->getToolFilenameAbsolute(),
+            $_SERVER,
+        );
 
         $perform = $forcePerform || $this->getKernelOpt(self::OPT_SHORT_PERFORM) || $this->getKernelOpt(self::OPT_LONG_PERFORM);
         $this->app->setup($this->appOpts, $this->getDependencyInjector(), $this->outStream, $this->logger(), $perform);
