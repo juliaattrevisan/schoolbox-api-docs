@@ -51,6 +51,10 @@ class Manager
     /**
      * Start a new transaction.
      *
+     * This should only be called when a new request is created and handled, as
+     * a transaction represents a single request to a service: see
+     * https://docs.sentry.io/concepts/key-terms/tracing/distributed-tracing/#traces-transactions-and-spans.
+     *
      * @param string                 $name           The transaction's name: this should be something which describes
      *                                               the request which spawned the transaction, e.g. a route name or
      *                                               request URI.
@@ -71,6 +75,10 @@ class Manager
      * @param array                  $data           Additional data to add to the transaction: see
      *                                               https://develop.sentry.dev/sdk/telemetry/traces/span-data-conventions/
      *                                               for standard examples.
+     * @param bool                   $autostartSpan  If true: auto-start a root span with matching details for this
+     *                                               transaction, with matching details.
+     *                                               This prevents the transaction from closing when a manually created
+     *                                               span is closed.
      * @return void
      */
     public function startTransaction(
@@ -81,6 +89,7 @@ class Manager
         ?TransactionSource $source = null,
         ?float $startTimestamp = null,
         array $data = [],
+        bool $autostartSpan = true,
     ): void {
         // No concurrent transactions
         $this->finishTransaction();
@@ -106,6 +115,10 @@ class Manager
             return;
         }
         $this->transaction = $transaction;
+
+        if ($autostartSpan) {
+            $this->startSpan($name, $operation, $origin, $startTimestamp, $data);
+        }
     }
 
     /**
