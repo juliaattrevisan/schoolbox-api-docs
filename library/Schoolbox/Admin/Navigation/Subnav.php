@@ -649,7 +649,7 @@ class Subnav
                         'children'    => [],
                         'description' => 'Configure and review how push notifications are delivered to mobile phones.',
                     ],
-                    '/adminv2/notifications/push' => [
+                    '/adminv2/notifications/puush' => [
                         'name'        => 'Mobile App Registrations',
                         'visible'     => $loggedInUserIsSuperuser && $this->configLoader->get(ConfigMapper::NAME_NOTIFICATIONS_ENABLED),
                         'children'    => [],
