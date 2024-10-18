@@ -209,10 +209,6 @@ class Manager
             'auto.console',
             TransactionSource::task(),
             $serverVars['REQUEST_TIME_FLOAT'] ?? null,
-            [
-                'url'                 => $serverVars['REQUEST_URI'] ?? null,
-                'http.request.method' => $serverVars['REQUEST_METHOD'] ?? null,
-            ],
         );
     }
 
