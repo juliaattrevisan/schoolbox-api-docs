@@ -59,7 +59,6 @@ use Alaress\Twig\Method as TwigMethod;
 use Twig\Extension\DebugExtension;
 use Twig\Loader\FilesystemLoader;
 use Twig\TwigFilter;
-use Schoolbox\Admin\Navigation\Renderer as AdminNavigationRenderer;
 use Alaress_Date_Locale_Config;
 use Alaress_Date_Format;
 use Schoolbox\Learning\Assessment\Redirect;
@@ -338,7 +337,6 @@ class Kernel extends WebKernelAbstract
                     $twig = new Environment($loader, $options);
 
                     $twig->addExtension(new DebugExtension());
-                    $twig->addExtension(new AdminNavigationRenderer($di->get('authorizer'), $di->get('user')));
 
                     // HTML Purifier filter - known to output safe HTML
                     $scrubAdapter = new ScrubAdapter();
