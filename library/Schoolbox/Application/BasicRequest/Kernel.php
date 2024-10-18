@@ -53,6 +53,7 @@ use Schoolbox\TaskDaemon\Request\MessageFactory;
 use Schoolbox\User\Token\Mapper as TokenMapper;
 use Schoolbox\UserMapper;
 use Schoolbox\Version\Version;
+use Sentry\Tracing\TransactionSource;
 use SitePage;
 use Twig\Environment;
 use Alaress\Twig\Method as TwigMethod;
@@ -412,7 +413,7 @@ class Kernel extends WebKernelAbstract
                                 'decoded' => isset($_REQUEST[Redirect::RETURN_URL])
                                     ? Redirect::decode($_REQUEST[Redirect::RETURN_URL])
                                     : null,
-                            ]
+                            ],
                         ]
                     );
 
@@ -577,5 +578,30 @@ class Kernel extends WebKernelAbstract
         );
 
         return $di;
+    }
+
+    /**
+     * Helper function for basic requests only to start a Sentry transaction:
+     * needs to be called manually with the filename of the script which created
+     * the basic request.
+     *
+     * @param string $path The full path of the script which was invoked:
+     *                     this path (minus the web root) will be used as the
+     *                     name of the transaction.
+     * @return void
+     */
+    public function startSentryTransaction(string $path): void
+    {
+        $this->sentryTransactionManager->startTransaction(
+            'basicRequest:' . trim(str_replace(WEB_root, '', $path), '/'),
+            'http.server',
+            'auto.http.server',
+            TransactionSource::url(),
+            $_SERVER['REQUEST_TIME_FLOAT'],
+            [
+                'url'                 => $_SERVER['REQUEST_URI'],
+                'http.request.method' => $_SERVER['REQUEST_METHOD'],
+            ],
+        );
     }
 }
