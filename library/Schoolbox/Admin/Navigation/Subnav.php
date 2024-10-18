@@ -127,13 +127,9 @@ class Subnav
         $filterLabelBuilder        = new LabelBuilder();
 
         $loggedInUserIsSuperuser = $this->loggedInUser->isSuperuser();
-
-        $loggedInUserHasServicePermissionNews = false;
-        foreach ($this->loggedInUser->getAccessList()->filterBy('service', UserAccess::SERVICE_NEWS) as $access) {
-            if ($access->getAccessLevel() === UserAccess::ACCESS_FULL) {
-                $loggedInUserHasServicePermissionNews = true;
-            }
-        }
+        $loggedInUserHasServicePermissionNews = (
+            $this->loggedInUser->hasServicePermission(UserAccess::SERVICE_NEWS, UserAccess::ACCESS_FULL)
+        );
 
         /* Keys of this array uniquely identify a page and its subpages
          * Used to preselect menu options so users have a sense of where they are
