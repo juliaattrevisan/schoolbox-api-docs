@@ -9,7 +9,6 @@ declare(strict_types=1);
 
 namespace Schoolbox\Admin\Navigation;
 
-use Alaress\Authorizer\Authorizer;
 use Schoolbox\Cdn\PrefixGenerator;
 use Schoolbox\Config\Config;
 use Schoolbox\Config\ConfigMapper;
@@ -58,6 +57,7 @@ class Subnav
      * Subnav constructor.
      *
      * @param IConfigLoader $configLoader
+     * @param User          $loggedInUser
      */
     public function __construct(IConfigLoader $configLoader, User $loggedInUser)
     {
