@@ -98,7 +98,7 @@ export default class Index {
      * @param articleId - Article number to view
      */
     async viewArticle(articleId: number): Promise<void> {
-        await this.page.locator(`a[href="/news/${articleId}?ref=index"]`).first().click();
+        await this.page.locator(`a[href="/news/${articleId}?ref=index"]`).last().click();
     }
 
     /**

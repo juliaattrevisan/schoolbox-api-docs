@@ -1,6 +1,7 @@
 import AcceptanceTester from "@schoolboxTest/playwright/support/AcceptanceTester";
 import { Page, expect } from "@playwright/test";
 import Common from "@schoolboxTest/playwright/support/page/Common";
+import { has } from "lodash";
 
 // this page object is for the create news page
 export default class Form {
@@ -20,11 +21,13 @@ export default class Form {
 
     static readonly FORM_SAVE = "#news-submit";
 
-    static readonly ARTICLE_HEADLINE = "title";
+    static readonly ARTICLE_HEADLINE = "#news-title";
 
     static readonly DATA_TEST_ARTICLE_BODY = "news-article-form-body";
 
     static readonly DATA_TEST_ARTICLE_BLURB = "news-article-form-blurb";
+
+    static readonly FORM_CREATE = "form#createForm";
 
     private filePath?: string;
 
@@ -61,7 +64,7 @@ export default class Form {
      * @param headline - The headline to see
      */
     async seeHeadline(headline: string): Promise<void> {
-        await expect(this.page.locator(Form.ARTICLE_HEADLINE)).toHaveText(headline);
+        await expect(this.page.locator(Form.ARTICLE_HEADLINE)).toHaveValue(headline);
     }
 
     /**
@@ -79,7 +82,7 @@ export default class Form {
      * @param headline - The article to see
      */
     async seeArticle(headline: string): Promise<void> {
-        await expect(this.page.locator(Form.DATA_TEST_ARTICLE_BODY)).toHaveText(headline);
+        await expect(this.page.locator(`div[class="ck ck-editor__main"]`).filter({ hasText: headline })).toBeVisible();
     }
 
     /**
@@ -98,7 +101,7 @@ export default class Form {
      */
     async seeBlurb(blurb: string): Promise<void> {
         await this.page.locator("legend.icon-down-arrow").click();
-        await expect(this.page.locator("blurb")).toHaveText(blurb);
+        await expect(this.page.locator(`div[class="ck ck-editor__main"]`).filter({ hasText: blurb })).toBeVisible();
     }
 
     /**
@@ -106,9 +109,7 @@ export default class Form {
      * @param filePath - The filename to fill
      */
     async attachFeatureImage(filePath: string): Promise<void> {
-        // await this.page.setInputFiles("#featureImage-zone", filename);
-
-        const attachZone = this.page.locator(`div[id="FeatureImageZone"]`);
+        const attachZone = this.page.locator("#featureImage-zone");
         await this.tester.dragAndDropFile(attachZone, filePath);
         this.filePath = filePath;
     }
@@ -122,9 +123,11 @@ export default class Form {
     /**
      * see feature image
      * @param filename - The filename to see
+     * @param imageHash - The image hash to see
      */
-    async seeFeatureImage(filename: string): Promise<void> {
-        await expect(this.page.locator("#featureImage-zone")).toHaveValue(filename);
+    async seeFeatureImage(filename: string, imageHash: string): Promise<void> {
+        await expect(this.page.locator(`a[data-plugin="preview"]`)).toContainText(filename);
+        await expect(this.page.locator(`img[src*="/storage/image.php?hash=${imageHash}&size=square64"]`)).toBeVisible();
     }
 
     /**
@@ -134,7 +137,6 @@ export default class Form {
     async fillTopic(topic: string): Promise<void> {
         await this.page.locator("input#news-topics-selectized").click();
         await this.page.locator(`div.option:has-text("${topic}")`).click();
-        // await this.page.locator("div.option").click();
     }
 
     /**
@@ -142,7 +144,7 @@ export default class Form {
      * @param topic - The topic to see
      */
     async seeTopic(topic: string): Promise<void> {
-        await expect(this.page.locator("div.item")).toHaveText(topic);
+        await expect(this.page.locator("div.item")).toContainText(topic);
     }
 
     /**
@@ -154,9 +156,6 @@ export default class Form {
         await expect(this.page.locator('div[class="reveal-modal no-pad open"]')).toBeVisible();
         await this.page.locator(`button.button-block:has-text("${audienceBrick}")`).click();
         await expect(this.page.locator('label[for="audience-list-input-IjEi"]')).toBeVisible();
-        // await this.page.locator(`label[for="audience-list-input-IjEi"]:has-text("${audienceType}")`).click();
-        // await this.page.locator("button.button.submit").first().click();
-        // await this.page.waitForTimeout(2000);
     }
 
     /**
@@ -164,9 +163,6 @@ export default class Form {
      * @param audience - tick a checkbox in the Select Audience: Campuses, Roles, Teams, HOuses, Year Levels
      */
     async checkboxAudience(audience: string): Promise<void> {
-        // await this.page.locator("button.button.icon-drag-drop").click();
-        // await expect(this.page.locator('div[class="reveal-modal no-pad open"]')).toBeVisible();
-        // await this.page.locator(`button.button-block:has-text("Roles")`).click();
         await this.page.locator(`div.checklist-wrapper:has-text("${audience}")`).click();
         await this.page.locator("button.button.submit").first().click();
         await this.page.waitForTimeout(2000);
@@ -185,9 +181,9 @@ export default class Form {
      * @param user - tick a checkbox in the Select Audience: Campuses, Roles, Teams, HOuses, Year Levels
      */
     async fillUser(user: string): Promise<void> {
-        await this.page.locator(`input[id="audience-search-selectized"]`).fill(user);
-        await this.page.keyboard.press("Enter");
-        //     await this.page.locator("input#audience-search-selectized").press("Enter");
+        await this.page.locator(`input[id="audience-search-selectized"]`).click();
+        await this.page.keyboard.type(user, { delay: 500 });
+        await this.page.locator("[data-selectable]").first().filter({ hasText: user }).click();
     }
 
     /**
@@ -195,7 +191,8 @@ export default class Form {
      * @param user - The users that was selected on the modal is presented in the news form
      */
     async seeUser(user: string): Promise<void> {
-        await expect(this.page.locator(`div.h4`)).toHaveText(user);
+        // await expect(this.page.locator(`div[class="card small-12"]`)).toContainText(user);
+        await this.page.locator(`h4[title="${user}"]`).first().filter({ hasText: user }).isVisible();
     }
 
     /**
@@ -229,15 +226,15 @@ export default class Form {
     async fillPublishDate(publishDate: Date): Promise<void> {
         // await this.page.locator("input#publishAt").fill(publishDate);
 
-        await this.page.fill("input#publishAt", Common.formatDate(publishDate, false));
+        await this.page.fill("input#publishAt", Common.formatDate(publishDate, true));
     }
 
     /**
      * see publish date
      * @param publishDate - The publish date
      */
-    async seePublishDate(publishDate: string): Promise<void> {
-        await expect(this.page.locator("input#publishAt")).toContainText(publishDate);
+    async seePublishDate(publishDate: Date): Promise<void> {
+        await expect(this.page.locator("input#publishAt")).toHaveValue(Common.formatDate(publishDate, true));
     }
 
     /**
@@ -247,15 +244,15 @@ export default class Form {
     async fillExpiryDate(expiryDate: Date): Promise<void> {
         // await this.page.locator("input#expiresAt").fill(expiryDate);
 
-        await this.page.fill("input#expiresAt", Common.formatDate(expiryDate, false));
+        await this.page.fill("input#expiresAt", Common.formatDate(expiryDate, true));
     }
 
     /**
      * see expiry date
      * @param expiryDate - The expiry date
      */
-    async seeExpiryDate(expiryDate: string): Promise<void> {
-        await expect(this.page.locator("input#expiresAt")).toContainText(expiryDate);
+    async seeExpiryDate(expiryDate: Date): Promise<void> {
+        await expect(this.page.locator("input#expiresAt")).toHaveValue(Common.formatDate(expiryDate, true));
     }
 
     /**

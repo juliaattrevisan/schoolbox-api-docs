@@ -81,5 +81,6 @@ export default class Item {
         await expect(this.page.getByTestId(Item.DATA_TEST_DOT_MENU)).toBeEnabled();
         await this.page.getByTestId(Item.DATA_TEST_DOT_MENU_BUTTON).click();
         await this.page.locator(Item.LINK_MODIFY).last().click();
+        await expect(this.page.locator('h1:has-text("Update news")')).toBeVisible();
     }
 }

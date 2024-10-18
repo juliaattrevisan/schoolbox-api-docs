@@ -5,27 +5,31 @@ import Item from "@schoolboxTest/playwright/support/page/news/Item";
 import path from "path";
 
 test.describe("Create and Verify News Article Test", () => {
-    // test.beforeAll(async ({ baseTester, db }) => {
-    //     baseTester.isGoingTo("update delete_at for the news article so it does not impact the news tests");
-    //     await db.updateInDatabase(
-    //         "comms_news_article",
-    //         { deleted_at: "2022-01-15 11:22:34" },
-    //         { title: "Acceptance Test News%" },
-    //     );
-    // });
+    test.beforeAll(async ({ baseTester, db }) => {
+        baseTester.isGoingTo("update delete_at for the news article so it does not impact the news tests");
+        await db.updateInDatabase(
+            "comms_news_article",
+            { deleted_at: "2022-01-15 11:22:34" },
+            { title: "Acceptance Test News%" },
+        );
+    });
 
     test.beforeEach(async ({ tester, page }) => {
         await tester.logout();
         await tester.loginAsAdmin();
         const form = new Form(tester, page);
         tester.isGoingTo("news form page");
-        // await form.goto();
+        await form.goto();
     });
 
-    // test.afterEach(async ({ baseTester, db }) => {
-    //     baseTester.isGoingTo("update delete_at for the news article so it does not impact the news tests");
-    //     await db.updateInDatabase("comms_news_article", { deleted_at: "2022-01-15 11:22:34" }, { title: "Acceptance Test News%" });
-    // });
+    test.afterEach(async ({ baseTester, db }) => {
+        baseTester.isGoingTo("update delete_at for the news article so it does not impact the news tests");
+        await db.updateInDatabase(
+            "comms_news_article",
+            { deleted_at: "2022-01-15 11:22:34" },
+            { title: "Acceptance Test News%", deleted_at: null },
+        );
+    });
 
     /**
      * as alaress:
@@ -62,43 +66,48 @@ test.describe("Create and Verify News Article Test", () => {
         const campus = "Primary";
         const user1 = "Jana Reed";
         const user2 = "Mario Izzo";
-        // tester.isGoingTo("Fill news article form");
-        // await form.fillHeadline(headline);
-        // await form.fillArticle(article);
-        // await form.fillBlurb(blurb);
-        // // await form.attachFeatureImage(image);
-        // await form.fillTopic(topic);
-        // await form.selectAudienceOption("Roles");
-        // await form.checkboxAudience(role);
-        // await form.fillUser(user1);
-        // await form.fillUser(user2);
-        // const publish = new Date();
-        // publish.setDate(publish.getDate() - 2); // 2 days ago
-        // const expiry = new Date();
-        // expiry.setDate(expiry.getDate() + 7); // 7 days from now
-        // await form.fillPublishDate(publish);
-        // await form.fillExpiryDate(expiry);
-        // await form.selectAudienceOption("Campuses");
-        // await form.checkboxAudience(campus);
-        // await form.submit();
+        const student = "Mr Tim Reed";
+        const teacher = "Ms Alison Chan";
+        tester.isGoingTo("Fill news article form");
+        await form.fillHeadline(headline);
+        await form.fillArticle(article);
+        await form.fillBlurb(blurb);
+        await form.attachFeatureImage(image);
+        await form.fillTopic(topic);
+        await form.selectAudienceOption("Roles");
+        await form.checkboxAudience(role);
+        await form.fillUser(user1);
+        await form.fillUser(user2);
+        const publish = new Date();
+        publish.setDate(publish.getDate() - 2); // 2 days ago
+        const expiry = new Date();
+        expiry.setDate(expiry.getDate() + 7); // 7 days from now
+        await form.fillPublishDate(publish);
+        await form.fillExpiryDate(expiry);
+        await form.selectAudienceOption("Campuses");
+        await form.checkboxAudience(campus);
+        await form.submit();
+        // had to add this as it was going away from this page too quickly and not publishing
+        await page.waitForURL("/");
 
         tester.isGoingTo("Verify that the news is in the All topic, and is the first news item");
         await index.goto("all");
 
-        // await index.seeHeadline(headline);
+        await index.seeHeadline(headline);
 
-        // tester.isGoingTo("Verify that the blurb shows, not the article I entered");
-        // await index.seeArticleSummary(blurb);
-        // await index.dontSeeArticleSummary(article);
+        tester.isGoingTo("Verify that the blurb shows, not the article I entered");
+        await index.seeArticleSummary(blurb);
+        await index.dontSeeArticleSummary(article);
 
-        // tester.isGoingTo("the news article has a feature image");
-        // const featureImage = await db.grabFromDatabase("comms_news_article", "feature_image_hash", {
-        //     title: headline,
-        // });
+        tester.isGoingTo("the news article has a feature image");
+        const featureImage = (await db.grabFromDatabase("comms_news_article", "feature_image_hash", {
+            title: headline,
+            deleted_at: null,
+        })) as string;
 
-        // tester.isGoingTo("Verify I don't see it at all in some other topic");
-        // await index.goto("music");
-        // await index.dontSeeHeadline(headline);
+        tester.isGoingTo("Verify I don't see it at all in some other topic");
+        await index.goto("music");
+        await index.dontSeeHeadline(headline);
 
         tester.isGoingTo("Verify I see it in the topic I put it in");
         await index.goto("general");
@@ -114,7 +123,52 @@ test.describe("Create and Verify News Article Test", () => {
         tester.isGoingTo("Verify I see the article, and not the blurb");
         await item.seeHeadline(headline);
         await item.seeArticle(article);
+        // added this timeout as it was clicking the 3-dot button too early
+        await page.waitForTimeout(2000);
         await item.modifyArticle();
+
+        tester.isGoingTo("Now, I'm back on the form page. Verify what is there is what I entered");
+        await form.seeHeadline(headline);
+        await form.seeArticle(article);
+        await form.seeBlurb(blurb);
+        await form.seeFeatureImage("baboon", featureImage);
+        await form.seeTopic(topic);
+        await form.seeAudience(role);
+        await form.seeAudience(campus);
+        await form.seeUser(user1);
+        await form.seeUser(user2);
+        await form.seePublishDate(publish);
+        await form.seeExpiryDate(expiry);
+
+        tester.isGoingTo("Verify that user Tim Reed(student from secondary) cannot see it");
+        await tester.impersonateViaModifyUserPage(student);
+        await index.goto("all");
+        await index.dontSeeHeadline(headline);
+        await index.goto("general");
+        await index.dontSeeHeadline(headline);
+
+        tester.isGoingTo("Verify that user Alison Chan(teacher) can see it");
+        await tester.impersonateViaModifyUserPage(teacher);
+        await index.goto("all");
+        await index.seeHeadline(headline);
+        await index.goto("general");
+        await index.seeHeadline(headline);
+
+        tester.isGoingTo("Make it unpublished");
+        await tester.loginAsAdmin();
+        await index.goto("all");
+        await index.viewArticle(articleId);
+        await item.modifyArticle();
+        publish.setDate(publish.getDate() + 2); // 2 days from now
+        await form.fillPublishDate(publish);
+        await form.submit();
+
+        tester.isGoingTo("Verify that user Alison Chan can no longer see it");
+        await tester.impersonateViaModifyUserPage(teacher);
+        await index.goto("all");
+        await index.dontSeeHeadline(headline);
+        await index.goto("general");
+        await index.dontSeeHeadline(headline);
     });
 });
 
