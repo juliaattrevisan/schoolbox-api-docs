@@ -50,10 +50,10 @@ class Factory
         }
 
         Sentry\init([
-            'dsn'         => "https://{$sentryToken}@sentry.io/{$sentryProject}",
-            'environment' => $instance->getType(),
-            'release'     => $applicationName . '@' . $instance->getVersion(),
-            'before_send' => new CompositeFilter(
+            'dsn'                => "https://{$sentryToken}@sentry.io/{$sentryProject}",
+            'environment'        => $instance->getType(),
+            'release'            => $applicationName . '@' . $instance->getVersion(),
+            'before_send'        => new CompositeFilter(
                 new ExceptionFilter(
                     Deleted::class,
                     NotFound::class,
@@ -62,9 +62,10 @@ class Factory
                 ),
                 new DeprecationFilter(),
             ),
-            'error_types' => self::ERROR_REPORTING,
-            'send_default_pii' => true,
-            'attach_stacktrace' => true,
+            'error_types'        => self::ERROR_REPORTING,
+            'send_default_pii'   => true,
+            'attach_stacktrace'  => true,
+            // TODO make sample rate configurable
             'traces_sample_rate' => 1.0,
         ]);
         Sentry\configureScope(static function (Sentry\State\Scope $scope) use ($instance): void {
