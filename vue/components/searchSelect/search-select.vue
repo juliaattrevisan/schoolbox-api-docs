@@ -7,7 +7,7 @@ import { useTemplateRef } from "vue";
 import { useSearch } from "./composables/useSearch";
 import type { Result } from "./types/Result";
 import SearchSelectSelected from "./search-select-selected.vue";
-import SearchSelectInput from "./search-select-input.vue";
+import SsQueryInput from "./ss-query-input.vue";
 import SearchSelectResults from "./search-select-results.vue";
 
 interface Props {
@@ -90,7 +90,7 @@ function onInput($query: string): void {
             :is-single-select="props.isSingleSelect"
             @remove="onRemove"
         />
-        <search-select-input
+        <ss-query-input
             :label-id="props.labelId"
             :parent-el="searchSelectEl"
             :placeholder="props.placeholder"
