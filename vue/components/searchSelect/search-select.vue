@@ -82,7 +82,7 @@ function onInput($query: string): void {
 </script>
 
 <template>
-    <div ref="searchSelectEl" class="c-search-select">
+    <div ref="searchSelectEl">
         <label :for="props.labelId" :class="`${props.isRequired ? 'required' : ''}`">{{ props.label }}</label>
         <ss-selected-list
             :selected-items="props.selectedItems"

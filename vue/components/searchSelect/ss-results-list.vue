@@ -108,7 +108,7 @@ function onHover(index: number): void {
 <template>
     <div class="results">
         <div v-if="props.isSearching" class="results__status">Searching for results....</div>
-        <div v-else-if="props.hasNoResults && props.selectedItems.length === 0" class="esults__status">
+        <div v-else-if="props.hasNoResults && props.selectedItems.length === 0" class="results__status">
             No results found for your current search.
         </div>
         <template v-else>
