@@ -49,6 +49,9 @@ class Handler
             case 'allClasses':
                 $selectedView = $this->viewSelector->getView($method);
                 return $this->handleAllClassesRequest($data, $selectedView);
+            case 'getStudentsByClass':
+                $selectedView = $this->viewSelector->getView($method);
+                return $this->handleGetStudentsByClassRequest($data, $selectedView);
             case 'allStaffs':
                 $selectedView = $this->viewSelector->getView($method);
                 return $this->handleAllStaffsRequest($data, $selectedView);
@@ -177,7 +180,45 @@ class Handler
         foreach ($stmt as $row) {
             $yearLevelArr[] = [
                 "Code"        => $row["ClassCode"],
-                "Description" => $row["Description"],
+                "Description" => $row["ClassDesc"],
+            ];
+        }
+
+        return $yearLevelArr;
+    }
+
+    /**
+     * Handle request for getting students from the class code
+     *
+     * @param array $data `$data['code']` may be an array or CSV list of codes:
+     *                    if set, return only classes which match these codes.
+     * @param string $selectedView paperly view
+     *
+     * @return array
+     */
+    public function handleGetStudentsByClassRequest(array $data, string $selectedView): array
+    {
+        $yearLevelArr = [];
+        $params       = [];
+        $sql          = "SELECT DISTINCT ClassCode, ID, ClassDesc, Surname, Preferred FROM {$selectedView} WHERE 1=1";
+
+        if (isset($data['code'])) {
+            $codes        = is_array($data['code']) ? $data['code'] : explode(',', $data['code']);
+            $placeholders = implode(',', array_fill(0, count($codes), '?'));
+            $sql          .= " AND classcode IN ($placeholders)";
+            $params       = array_merge($params, $codes);
+        }
+
+        $sql .= " ORDER BY ClassCode";
+
+        $stmt = $this->externalDb->executeQuery($sql, $params);
+        foreach ($stmt as $row) {
+            $yearLevelArr[] = [
+                "ID"          => $row["ID"],
+                "Code"        => $row["ClassCode"],
+                "Description" => $row["ClassDesc"],
+                "Surname"     => $row["Surname"],
+                "Preferred"   => $row["Preferred"],
             ];
         }
 
@@ -217,16 +258,23 @@ class Handler
             $params[]    = $data['email'];
         }
 
+        if (isset($data['year_level'])) {
+            $yls = is_array($data['year_level']) ? $data['year_level'] : explode(',', $data['year_level']);
+            $placeholders = implode(',', array_fill(0, count($yls), '?'));
+            $params = array_merge($params, $yls);
+
+            $sql .= " AND NormalYearLevel IN ($placeholders)";
+        }
+
         $sql .= " ORDER BY StaffSurname";
 
         $stmt = $this->externalDb->executeQuery($sql, $params);
         foreach ($stmt as $row) {
             $stfArr[] = [
                 "ID"         => $row["StaffID"],
-                "Preferred"  => $row["StaffPreferredName"],
+                "Preferred"  => $row["StaffPreferred"],
                 "Surname"    => $row["StaffSurname"],
-                "Email"      => $row["StaffOccupEmail"],
-                "ActiveFlag" => $row["ActiveFlag"],
+                "Email"      => $row["StaffEmail"],
             ];
         }
 
@@ -276,30 +324,54 @@ class Handler
         }
 
         $stmt = $this->externalDb->executeQuery($sql, $params);
+        $students = [];
         foreach ($stmt as $row) {
-            $stuArr[] = [
-                "ID"                   => $row["StudentID"],
-                "Preferred"            => $row["StudentPreferred"],
-                "Surname"              => $row["StudentSurname"],
-                "YearLevelCode"        => $row["StudentYearLevel"],
-                "YearLevelDescription" => $row["StudentYearLevelDescription"],
-                "Boarder"              => $row["StudentBoarder"],
-                "RollGroup"            => $row["StudentTutor"],
-                "HouseCode"            => $row["StudentHouse"],
-                "HouseDescription"     => $row["StudentHouseDescription"],
-                "Gender"               => $row["StudentGender"],
-                "Email"                => $row["StudentEmail"],
-                "BirthDate"            => $row["StudentBirthDate"],
-                "Contact1Surname"      => $row["Surname"],
-                "Contact1Name"         => $row["Preferred"],
-                "Contact1Mobile"       => $row["MobilePhone"],
-                "Contact1Email"        => $row["DefaultEmail"],
-                "Contact2Surname"      => $row["SpouseSurname"],
-                "Contact2Name"         => $row["SpousePreferred"],
-                "Contact2Mobile"       => $row["SpouseMobile"],
-                "Contact2Email"        => $row["SpouseDefaultEmail"],
-            ];
+            $studentId = $row["StudentID"];
+            $birthDate = $row['StudentBirthDate'];
+            $formattedBirthDate = ($birthDate !== null)
+                ? (\Alaress_Date_Format::newFromTimestamp(strtotime($birthDate)))->getUsingFormat('Y-m-d')
+                : null;
+
+            if (!isset($students[$studentId])) {
+                $students[$studentId] = [
+                    "ID"                   => $row["StudentID"],
+                    "Preferred"            => $row["StudentPreferred"],
+                    "Surname"              => $row["StudentSurname"],
+                    "YearLevelCode"        => $row["StudentYearLevel"],
+                    "YearLevelDescription" => $row["StudentYearLevelDescription"],
+                    "Boarder"              => $row["StudentBoarder"],
+                    "RollGroup"            => $row["StudentTutor"],
+                    "HouseCode"            => $row["StudentHouse"],
+                    "HouseDescription"     => $row["StudentHouseDescription"],
+                    "Gender"               => $row["StudentGender"],
+                    "Email"                => $row["StudentEmail"],
+                    "BirthDate"            => $formattedBirthDate,
+                    "Contact1Surname"      => null,
+                    "Contact1Name"         => null,
+                    "Contact1Mobile"       => null,
+                    "Contact1Email"        => null,
+                    "Contact2Surname"      => null,
+                    "Contact2Name"         => null,
+                    "Contact2Mobile"       => null,
+                    "Contact2Email"        => null,
+                ];
+            }
+
+            // Determine if we should add the contact as Contact1 or Contact2
+            if (is_null($students[$studentId]["Contact1Surname"])) {
+                $students[$studentId]["Contact1Surname"] = $row["ContactSurname"];
+                $students[$studentId]["Contact1Name"] = $row["ContactPreferred"];
+                $students[$studentId]["Contact1Mobile"] = $row["ContactMobilePhone"];
+                $students[$studentId]["Contact1Email"] = $row["ContactDefaultEmail"];
+            } else if (is_null($students[$studentId]["Contact2Surname"])) {
+                $students[$studentId]["Contact2Surname"] = $row["ContactSurname"];
+                $students[$studentId]["Contact2Name"] = $row["ContactPreferred"];
+                $students[$studentId]["Contact2Mobile"] = $row["ContactMobilePhone"];
+                $students[$studentId]["Contact2Email"] = $row["ContactDefaultEmail"];
+            }
         }
+
+        $stuArr = array_values($students);
 
         return $stuArr;
     }
@@ -323,20 +395,24 @@ class Handler
             $columnToUse = 'Photo';
         }
 
-        $sql = "SELECT DISTINCT ID, {$columnToUse} FROM {$selectedView}";
+        $sql = "SELECT DISTINCT ID, {$columnToUse} FROM {$selectedView} WHERE 1=1";
 
         if (isset($data['id'])) {
             $ids          = is_array($data['id']) ? $data['id'] : explode(',', $data['id']);
             $placeholders = implode(',', array_fill(0, count($ids), '?'));
-            $sql          .= " WHERE ID IN ($placeholders)";
+            $sql          .= " AND ID IN ($placeholders)";
             $params       = array_merge($params, $ids);
         }
 
+        //Since the ID is nullable, we have to check
+        $sql .= " AND ID IS NOT NULL";
+
         $stmt = $this->externalDb->executeQuery($sql, $params);
         foreach ($stmt as $row) {
+            $photoColumn = $row[$columnToUse];
             $avatarArr[$row["ID"]] = [
                 "ID"     => $row["ID"],
-                "Avatar" => base64_encode($row["Photo"]),
+                "Avatar" => $photoColumn ? base64_encode($photoColumn) : '',
             ];
         }
 
@@ -368,8 +444,8 @@ class Handler
 
         $stmt = $this->externalDb->executeQuery($sql, $params);
         foreach ($stmt as $row) {
-            $stuMedicalArr[$row["StudentID"]][] = [
-                "ID"                                  => $row["StudentID"],
+            $stuMedicalArr[$row["ID"]][] = [
+                "ID"                                  => $row["ID"],
                 "MedicalConditionCode"                => $row["MedicalConditionCode"],
                 "MedicalConditionTypeDescription"     => $row["MedicalConditionTypeDescription"],
                 "MedicalConditionSeverityCode"        => $row["SeverityCode"],
@@ -400,9 +476,10 @@ class Handler
 
         $stuArr = [];
 
-        $sql = "SELECT * FROM {$selectedView} WHERE (contactID = ? OR contactSpouseID = ?)";
+        //ContactSposeID column removed on Paperly's request, because no such column exist in the view
+        $sql = "SELECT * FROM {$selectedView} WHERE (contactID = ?)";
 
-        $params = [$id, $id];
+        $params = [$id];
 
         $stmt = $this->externalDb->executeQuery($sql, $params);
         foreach ($stmt as $row) {
@@ -444,6 +521,8 @@ class Handler
             $sql    .= " AND (email = ? OR occupEmail = ?)";
             $params = array_merge($params, [$email, $email]);
         }
+
+        $sql .= " ORDER BY Surname";
 
         $stmt = $this->externalDb->executeQuery($sql, $params);
         foreach ($stmt as $row) {
