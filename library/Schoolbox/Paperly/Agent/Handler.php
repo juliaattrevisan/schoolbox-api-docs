@@ -215,8 +215,8 @@ class Handler
         foreach ($stmt as $row) {
             $yearLevelArr[] = [
                 "ID"          => $row["ID"],
-                "Code"        => $row["ClassCode"],
-                "Description" => $row["ClassDesc"],
+                "ClassCode"   => $row["ClassCode"],
+                "ClassDesc"   => $row["ClassDesc"],
                 "Surname"     => $row["Surname"],
                 "Preferred"   => $row["Preferred"],
             ];
