@@ -102,6 +102,8 @@ abstract class CliKernelAbstract extends \Alaress\Application\Kernel implements 
         }
 
         $this->sentryTransactionManager = $this->di->get('sentry.transactionManager');
+        $this->getShutdownHandler()->registerFunction($this->sentryTransactionManager->finishTransaction(...));
+
         $this->initRoutes();
         $this->initModules();
     }
