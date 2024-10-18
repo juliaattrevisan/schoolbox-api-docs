@@ -17,8 +17,8 @@ interface Props {
 const props = defineProps<Props>();
 
 const emit = defineEmits<{
-    add: [results: SearchSelectItem[]];
-    remove: [results: SearchSelectItem[]];
+    add: [items: SearchSelectItem[]];
+    remove: [items: SearchSelectItem[]];
     hover: [index: number];
 }>();
 

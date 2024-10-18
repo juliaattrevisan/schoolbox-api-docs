@@ -29,8 +29,8 @@ const props = withDefaults(defineProps<Props>(), {
 });
 
 const emit = defineEmits<{
-    add: [results: SearchSelectItem[]];
-    remove: [results: SearchSelectItem[]];
+    add: [items: SearchSelectItem[]];
+    remove: [items: SearchSelectItem[]];
 }>();
 
 const searchSelectEl = useTemplateRef("searchSelectEl");
@@ -54,22 +54,22 @@ const currentResults = window.Vue.computed(() => {
 
 /**
  * To add results
- * @param $results - the results selected
+ * @param $items - the items selected
  */
-function onAdd($results: SearchSelectItem[]): void {
+function onAdd($items: SearchSelectItem[]): void {
     // if single select, remove the previous selection
     if (props.isSingleSelect && props.selectedItems.length > 0) {
         emit("remove", props.selectedItems);
     }
-    emit("add", $results);
+    emit("add", $items);
 }
 
 /**
  * To remove results
- * @param $results - the results deselected
+ * @param $items - the items deselected
  */
-function onRemove($results: SearchSelectItem[]): void {
-    emit("remove", $results);
+function onRemove($items: SearchSelectItem[]): void {
+    emit("remove", $items);
 }
 
 /**

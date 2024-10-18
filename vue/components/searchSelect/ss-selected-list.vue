@@ -14,7 +14,7 @@ interface Props {
 const props = defineProps<Props>();
 
 const emit = defineEmits<{
-    remove: [results: SearchSelectItem[]];
+    remove: [items: SearchSelectItem[]];
 }>();
 
 /**
@@ -28,19 +28,19 @@ const ids = window.Vue.computed(() => {
 
 /**
  * To remove a selected search result
- * @param result - the result to remove
+ * @param item - the result to remove
  */
-function onRemoveItem(result: SearchSelectItem): void {
-    emit("remove", [result]);
+function onRemoveItem(item: SearchSelectItem): void {
+    emit("remove", [item]);
 }
 </script>
 
 <template>
     <div v-if="props.selectedItems.length > 0" class="selected-container l-flex-row l-gap-s l-pad-s">
         <ss-selected-list-item
-            v-for="result in props.selectedItems"
-            :key="result.id"
-            :result="result"
+            v-for="item in props.selectedItems"
+            :key="item.id"
+            :item="item"
             :is-single-select="props.isSingleSelect"
             @remove="onRemoveItem"
         />

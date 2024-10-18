@@ -17,19 +17,19 @@ const props = defineProps<Props>();
 const { selected, add, remove } = useSelected();
 
 /**
- * Select all the results
- * @param results - the results to add
+ * Add items
+ * @param items - the items to add
  */
-function onAdd(results: SearchSelectItem[]): void {
-    add(results);
+function onAdd(items: SearchSelectItem[]): void {
+    add(items);
 }
 
 /**
- * Remove all the results
- * @param results - the results to remove
+ * Remove items
+ * @param items - the items to remove
  */
-function onRemove(results: SearchSelectItem[]): void {
-    remove(results);
+function onRemove(items: SearchSelectItem[]): void {
+    remove(items);
 }
 </script>
 

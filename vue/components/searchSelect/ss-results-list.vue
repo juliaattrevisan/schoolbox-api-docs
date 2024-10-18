@@ -20,8 +20,8 @@ interface Props {
 const props = defineProps<Props>();
 
 const emit = defineEmits<{
-    add: [results: SearchSelectItem[]];
-    remove: [results: SearchSelectItem[]];
+    add: [items: SearchSelectItem[]];
+    remove: [items: SearchSelectItem[]];
 }>();
 
 /**
@@ -50,18 +50,18 @@ const bottomBorder = window.Vue.computed(() => {
 
 /**
  * To add results
- * @param results - the results selected
+ * @param items - the items selected
  */
-function onAdd(results: SearchSelectItem[]): void {
-    emit("add", results);
+function onAdd(items: SearchSelectItem[]): void {
+    emit("add", items);
 }
 
 /**
  * To remove results
- * @param results - the results deselected
+ * @param items - the items deselected
  */
-function onRemove(results: SearchSelectItem[]): void {
-    emit("remove", results);
+function onRemove(items: SearchSelectItem[]): void {
+    emit("remove", items);
 }
 
 const activeIndex = window.Vue.ref(-1); // to be able to use keyboard navigation to move through the search results

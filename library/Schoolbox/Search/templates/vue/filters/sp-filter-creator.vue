@@ -19,10 +19,10 @@ const currentUser: Creator = {
  * We only allow one creator to be selected at a time,
  * so only select a result if there isn't one already selected
  * or unselect the current result if it's already selected
- * @param results - the results selected
+ * @param items - the items selected
  */
-function onAdded(results: SearchSelectItem[]): void {
-    const result = results[0];
+function onAdded(items: SearchSelectItem[]): void {
+    const result = items[0];
     if (!filterCreatorsStore.isActive) {
         filterCreatorsStore.creator.push(result as Creator);
         return;
@@ -49,7 +49,7 @@ function onRemoved(): void {
             endpoint="/ajax/user.php?groupID=0&query="
             :selected-items="filterCreatorsStore.creator"
             :is-single-select="true"
-            :default-results="[currentUser as Result]"
+            :default-results="[currentUser as SearchSelectItem]"
             placeholder="Search for users..."
             @add="onAdded"
             @remove="onRemoved"
