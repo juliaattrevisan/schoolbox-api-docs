@@ -246,18 +246,13 @@ class Kernel extends WebKernelAbstract
     private function outputAuraContent(Route $route, ?User $authHeaderUser, bool $bypassIpTracking): void
     {
         // Track this thing
-        $this->sentryTransactionManager->startTransaction(
-            $route->name,
-            'http.server',
-            'auto.http.server',
+        /** @var ServerRequestInterface $request */
+        $request = $this->di->get('httpRequest');
+        $this->sentryTransactionManager->startTransactionFromHttpRequest(
+            'aura:' . $route->name,
             TransactionSource::route(),
-            $_SERVER['REQUEST_TIME_FLOAT'],
-            [
-                'url'                 => $_SERVER['REQUEST_URI'],
-                'http.request.method' => $_SERVER['REQUEST_METHOD'],
-            ],
+            $request->getServerParams(),
         );
-
 
         // The route name's format:
         // "[controllerName].[action](:[label])"
@@ -467,18 +462,6 @@ class Kernel extends WebKernelAbstract
         } else {
             $pageName = 'dashboard';
         }
-
-        $this->sentryTransactionManager->startTransaction(
-            $pageName,
-            'http.server',
-            'auto.http.server',
-            TransactionSource::url(),
-            $_SERVER['REQUEST_TIME_FLOAT'],
-            [
-                'url'                 => $_SERVER['REQUEST_URI'],
-                'http.request.method' => $_SERVER['REQUEST_METHOD'],
-            ],
-        );
 
         // Was a user received via an auth header?
         // If so: auth the user for only this request.

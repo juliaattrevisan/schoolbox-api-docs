@@ -117,6 +117,34 @@ class Manager
     }
 
     /**
+     * Helper function for creating a transaction for a HTTP request which this
+     * request is serving.
+     *
+     * @param string                 $name       The transaction's name.
+     * @param TransactionSource|null $source     The source of the name.
+     * @param array                  $serverVars `$_SERVER` superglobal: used to
+     *                                           set request time/URI/method.
+     * @return void
+     */
+    public function startTransactionFromHttpRequest(
+        string $name,
+        ?TransactionSource $source,
+        array $serverVars,
+    ): void {
+        $this->startTransaction(
+            $name,
+            'http.server',
+            'auto.http.server',
+            $source,
+            $serverVars['REQUEST_TIME_FLOAT'] ?? null,
+            [
+                'url'                 => $serverVars['REQUEST_URI'] ?? null,
+                'http.request.method' => $serverVars['REQUEST_METHOD'] ?? null,
+            ],
+        );
+    }
+
+    /**
      * Start a new span.
      *
      * This span will be created within the transaction's currently active span,

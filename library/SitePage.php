@@ -1,6 +1,7 @@
 <?php
 
 use Alaress\Authorizer\Failure\Unauthenticated;
+use Alaress\Sentry\Transaction\Manager;
 use Alaress\Web\Response\Factory as ResponseFactory;
 use Alaress\Web\Response\Outputter;
 use Aura\Router\Generator;
@@ -15,6 +16,7 @@ use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\IConfigLoader;
 use Schoolbox\L10n\RosettaStone;
 use Schoolbox\User;
+use Sentry\Tracing\TransactionSource;
 
 class SitePage
 {
@@ -153,15 +155,29 @@ class SitePage
 
         $total = count($path);
 
+        /** @var Manager $sentryTransactionManager */
+        $sentryTransactionManager = $this->di->get('sentry.transactionManager');
+
         /* iterate backwards through the path */
         for ($i = 0; $i < $total; $i++) {
             $filename = rtrim(implode("/", $path), '/');
 
+            // Start Sentry transaction here, now there's a path to include
             if (is_file(WEB_root . '/' . $filename . '.php') && $execute) {
-                include(WEB_root . '/' . $filename . '.php');
+                $sentryTransactionManager->startTransactionFromHttpRequest(
+                    'sitepage:' . $filename . '.php',
+                    TransactionSource::url(),
+                    $_SERVER,
+                );
+                include WEB_root . '/' . $filename . '.php';
                 return true;
             } elseif (is_file(WEB_root . '/' . $filename . '/index.php') && $execute) {
-                include(WEB_root . '/' . $filename . '/index.php');
+                $sentryTransactionManager->startTransactionFromHttpRequest(
+                    'sitepage:' . $filename . '/index.php',
+                    TransactionSource::url(),
+                    $_SERVER,
+                );
+                include WEB_root . '/' . $filename . '/index.php';
                 return true;
             }
 
