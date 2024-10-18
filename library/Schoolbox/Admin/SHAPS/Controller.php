@@ -170,7 +170,7 @@ class Controller extends Base
             '@shaps/index.twig',
             [
                 'pageCurrent'    => $this->routeGenerator->generate('shaps.getAll'),
-                'allBreadcrumbs' => (new Subnav($this->getConfigLoader(), $this->getAuthorizer(), $this->getUser()))->generateBreadcrumbs($this->routeGenerator->generate('shaps.getAll')),
+                'allBreadcrumbs' => (new Subnav($this->getConfigLoader(), $this->getUser()))->generateBreadcrumbs($this->routeGenerator->generate('shaps.getAll')),
                 'campuses'       => $campuses,
                 'roles'          => $roles,
                 'courses'        => $courses,

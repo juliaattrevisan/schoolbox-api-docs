@@ -112,7 +112,7 @@ class Controller extends Base
             '@adminMenuSide/index.twig',
             [
                 'pageCurrent' => $this->routeGenerator->generate('adminMenuSide.getIndex'),
-                'allBreadcrumbs' => (new Subnav($this->getConfigLoader(), $this->getAuthorizer(), $this->getUser()))->generateBreadcrumbs($this->routeGenerator->generate('adminMenuSide.getIndex')),
+                'allBreadcrumbs' => (new Subnav($this->getConfigLoader(), $this->getUser()))->generateBreadcrumbs($this->routeGenerator->generate('adminMenuSide.getIndex')),
                 'tree' => $treeList,
                 'sections' => $sections,
                 'configTitle' => $this->getConfigLoader()->get('title'),
@@ -199,7 +199,7 @@ class Controller extends Base
                 'resource' => $this->getDi()->get('sitePage')->getLocalisedTerm('resource', true, true),
                 'pageCurrent' => $this->routeGenerator->generate('adminMenuSide.getIndex'),
                 'allBreadcrumbs' => array_merge(
-                    (new Subnav($this->getConfigLoader(), $this->getAuthorizer(), $this->getUser()))->generateBreadcrumbs($this->routeGenerator->generate('adminMenuSide.getIndex')),
+                    (new Subnav($this->getConfigLoader(), $this->getUser()))->generateBreadcrumbs($this->routeGenerator->generate('adminMenuSide.getIndex')),
                     [['Modify', null]]
                 ),
                 'item' => $this->getMenuSideMapper()->findById($id),
@@ -226,7 +226,7 @@ class Controller extends Base
                 'resource' => $this->getDi()->get('sitePage')->getLocalisedTerm('resource', true, true),
                 'pageCurrent' => $this->routeGenerator->generate('adminMenuSide.getIndex'),
                 'allBreadcrumbs' => array_merge(
-                    (new Subnav($this->getConfigLoader(), $this->getAuthorizer(), $this->getUser()))->generateBreadcrumbs($this->routeGenerator->generate('adminMenuSide.getIndex')),
+                    (new Subnav($this->getConfigLoader(), $this->getUser()))->generateBreadcrumbs($this->routeGenerator->generate('adminMenuSide.getIndex')),
                     [['Create', null]]
                 ),
                 'roles' => $this->getRoleMapper()->findAll()->sortBy('name', 'asc'),

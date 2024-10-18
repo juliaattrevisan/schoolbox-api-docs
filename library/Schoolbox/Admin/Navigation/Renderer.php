@@ -56,7 +56,7 @@ class Renderer extends Extension\AbstractExtension
         // TODO SA-8354: inject this
 
         // Render this thing out
-        return (new Subnav(new Loader(), $this->authorizer, $this->loggedInUser))->generateHtml($pageCurrent, $title);
+        return (new Subnav(new Loader(), $this->loggedInUser))->generateHtml($pageCurrent, $title);
     }
 
     /**

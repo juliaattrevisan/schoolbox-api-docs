@@ -37,7 +37,7 @@ class Controller extends Base
             '@adminPackage/index.twig',
             [
                 'pageCurrent' => $this->routeGenerator->generate('adminPackage.getIndex'),
-                'allBreadcrumbs' => (new Subnav($this->getConfigLoader(), $this->getAuthorizer(), $this->getUser()))->generateBreadcrumbs($this->routeGenerator->generate('adminPackage.getIndex')),
+                'allBreadcrumbs' => (new Subnav($this->getConfigLoader(), $this->getUser()))->generateBreadcrumbs($this->routeGenerator->generate('adminPackage.getIndex')),
                 'packages'    => $this->packageMapper->findAvailablePackages(),
             ]
         );

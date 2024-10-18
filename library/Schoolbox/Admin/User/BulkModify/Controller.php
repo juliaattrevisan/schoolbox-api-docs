@@ -109,7 +109,7 @@ class Controller extends Base
             '@adminUserBulkModify/bulkModify.twig',
             [
                 'pageCurrent'    => $this->routeGenerator->generate('adminUserBulkModify.getModify'),
-                'allBreadcrumbs' => (new Subnav($this->getConfigLoader(), $this->getAuthorizer(), $this->getUser()))->generateBreadcrumbs(
+                'allBreadcrumbs' => (new Subnav($this->getConfigLoader(), $this->getUser()))->generateBreadcrumbs(
                     $this->routeGenerator->generate('adminUserBulkModify.getModify'),
                     'Bulk Modify'
                 ),

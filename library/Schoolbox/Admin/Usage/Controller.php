@@ -48,7 +48,7 @@ class Controller extends Base
     {
         $this->response = $this->responseFromTemplate('@adminUsage/global.twig', [
             'pageCurrent' => $this->routeGenerator->generate('adminUsage.getIndex'),
-            'allBreadcrumbs' => (new Subnav($this->getConfigLoader(), $this->getAuthorizer(), $this->getUser()))->generateBreadcrumbs($this->routeGenerator->generate('adminUsage.getIndex')),
+            'allBreadcrumbs' => (new Subnav($this->getConfigLoader(), $this->getUser()))->generateBreadcrumbs($this->routeGenerator->generate('adminUsage.getIndex')),
             'isS3Adapter' => $this->isS3Adapter(),
         ]);
     }
@@ -74,7 +74,7 @@ class Controller extends Base
      */
     public function getSpecificUser(User $user): void
     {
-        $crumbs = (new Subnav($this->getConfigLoader(), $this->getAuthorizer(), $this->getUser()))->generateBreadcrumbs($this->routeGenerator->generate('adminUsage.getIndex'));
+        $crumbs = (new Subnav($this->getConfigLoader(), $this->getUser()))->generateBreadcrumbs($this->routeGenerator->generate('adminUsage.getIndex'));
         $crumbs[] = [$user->getFullName(), ''];
 
         $this->response = $this->responseFromTemplate('@adminUsage/specificUser.twig', [

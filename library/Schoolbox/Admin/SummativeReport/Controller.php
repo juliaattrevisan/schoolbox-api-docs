@@ -187,7 +187,7 @@ class Controller extends ConfigController
             '@adminSummativeReport/list.twig',
             [
                 'pageCurrent' => $this->routeGenerator->generate('adminSummativeReport.getList'),
-                'allBreadcrumbs' => (new Subnav($this->getConfigLoader(), $this->getAuthorizer(), $this->getUser()))->generateBreadcrumbs($this->routeGenerator->generate('adminSummativeReport.getList')),
+                'allBreadcrumbs' => (new Subnav($this->getConfigLoader(), $this->getUser()))->generateBreadcrumbs($this->routeGenerator->generate('adminSummativeReport.getList')),
                 'reports' => $reports
             ]
         );
@@ -234,7 +234,7 @@ class Controller extends ConfigController
             '@adminSummativeReport/create.twig',
             [
                 'pageCurrent' => $this->routeGenerator->generate('adminSummativeReport.getList'),
-                'allBreadcrumbs' => (new Subnav($this->getConfigLoader(), $this->getAuthorizer(), $this->getUser()))->generateBreadcrumbs($this->routeGenerator->generate('adminSummativeReport.getList')),
+                'allBreadcrumbs' => (new Subnav($this->getConfigLoader(), $this->getUser()))->generateBreadcrumbs($this->routeGenerator->generate('adminSummativeReport.getList')),
                 'report' => $report,
                 'options' => Model::DEFAULT_OPTIONS,
                 'viewAs' => self::AVAILABLE_ROLETYPES,
@@ -327,7 +327,7 @@ class Controller extends ConfigController
             [
                 'pageCurrent' => $this->routeGenerator->generate('adminSummativeReport.getList'),
                 'allBreadcrumbs' => array_merge(
-                    (new Subnav($this->getConfigLoader(), $this->getAuthorizer(), $this->getUser()))->generateBreadcrumbs($this->routeGenerator->generate('adminSummativeReport.getList')),
+                    (new Subnav($this->getConfigLoader(), $this->getUser()))->generateBreadcrumbs($this->routeGenerator->generate('adminSummativeReport.getList')),
                     [['Modify', null]]
                 ),
                 'report' => $report,
@@ -775,7 +775,7 @@ class Controller extends ConfigController
             '@adminSummativeReport/result.twig',
             [
                 'pageCurrent'    => $this->routeGenerator->generate('adminSummativeReport.getList'),
-                'allBreadcrumbs' => (new Subnav($this->getConfigLoader(), $this->getAuthorizer(), $this->getUser()))->generateBreadcrumbs(
+                'allBreadcrumbs' => (new Subnav($this->getConfigLoader(), $this->getUser()))->generateBreadcrumbs(
                     $this->routeGenerator->generate('adminSummativeReport.getList')
                 ),
                 'reportCount'    => $statusPayload['numReports'],

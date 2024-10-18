@@ -59,7 +59,7 @@ class Controller extends ConfigController
         /* Settings are now recategorised by the feature to which they are relevant
          */
         $pageCurrent = $this->routeGenerator->generate('settings.postSettings', ['typeLabel' => $typeLabel]);
-        $allBreadcrumbs = (new Subnav($this->getConfigLoader(), $this->getAuthorizer(), $this->getUser()))->generateBreadcrumbs($this->routeGenerator->generate('settings.postSettings', ['typeLabel' => $typeLabel]));
+        $allBreadcrumbs = (new Subnav($this->getConfigLoader(), $this->getUser()))->generateBreadcrumbs($this->routeGenerator->generate('settings.postSettings', ['typeLabel' => $typeLabel]));
 
         $this->response = $this->responseDependentOnRequest(
             '@settings/settings.twig',
@@ -97,7 +97,7 @@ class Controller extends ConfigController
         ];
 
         //Also include the navigation elements
-        $subnav = new Subnav($this->getConfigLoader(), $this->getAuthorizer(), $this->getUser());
+        $subnav = new Subnav($this->getConfigLoader(), $this->getUser());
         $pageList = $subnav->generate();
 
         $hiddenUrls = [];

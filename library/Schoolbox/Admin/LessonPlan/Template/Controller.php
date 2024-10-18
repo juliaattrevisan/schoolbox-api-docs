@@ -54,7 +54,7 @@ class Controller extends Base
             '@adminLessonPlanTemplate/list.twig',
             [
                 'pageCurrent' => $this->routeGenerator->generate('adminLessonPlanTemplate.getList'),
-                'allBreadcrumbs' => (new Subnav($this->getConfigLoader(), $this->getAuthorizer(), $this->getUser()))->generateBreadcrumbs($this->routeGenerator->generate('adminLessonPlanTemplate.getList')),
+                'allBreadcrumbs' => (new Subnav($this->getConfigLoader(), $this->getUser()))->generateBreadcrumbs($this->routeGenerator->generate('adminLessonPlanTemplate.getList')),
                 'lessonPlanTemplates' => $this->templateMapper->findAll()->sortNaturally('title')
             ]
         );
@@ -74,7 +74,7 @@ class Controller extends Base
             [
                 'pageCurrent' => $this->routeGenerator->generate('adminLessonPlanTemplate.getList'),
                 'allBreadcrumbs' => array_merge(
-                    (new Subnav($this->getConfigLoader(), $this->getAuthorizer(), $this->getUser()))->generateBreadcrumbs($this->routeGenerator->generate('adminLessonPlanTemplate.getList')),
+                    (new Subnav($this->getConfigLoader(), $this->getUser()))->generateBreadcrumbs($this->routeGenerator->generate('adminLessonPlanTemplate.getList')),
                     [['Create', null]]
                 ),
                 'lessonPlanTemplate' => null,
@@ -161,7 +161,7 @@ class Controller extends Base
             [
                 'pageCurrent' => $this->routeGenerator->generate('adminLessonPlanTemplate.getList'),
                 'allBreadcrumbs' => array_merge(
-                    (new Subnav($this->getConfigLoader(), $this->getAuthorizer(), $this->getUser()))->generateBreadcrumbs($this->routeGenerator->generate('adminLessonPlanTemplate.getList')),
+                    (new Subnav($this->getConfigLoader(), $this->getUser()))->generateBreadcrumbs($this->routeGenerator->generate('adminLessonPlanTemplate.getList')),
                     [['Modify', null]]
                 ),
                 'lessonPlanTemplate' => $lessonPlanTemplate,

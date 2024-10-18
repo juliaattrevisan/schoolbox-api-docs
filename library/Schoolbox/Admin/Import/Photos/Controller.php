@@ -189,7 +189,7 @@ class Controller extends Base
             '@adminImportPhotos/index.twig',
             [
                 'pageCurrent' => $this->routeGenerator->generate('adminImportPhotos.getIndex'),
-                'allBreadcrumbs' => (new Subnav($this->getConfigLoader(), $this->getAuthorizer(), $this->getUser()))->generateBreadcrumbs($this->routeGenerator->generate('adminImportPhotos.getIndex')),
+                'allBreadcrumbs' => (new Subnav($this->getConfigLoader(), $this->getUser()))->generateBreadcrumbs($this->routeGenerator->generate('adminImportPhotos.getIndex')),
                 'allNavigation'  => $this->navigation->buildNavigation($this->routeGenerator, 'adminImportPhotos')->getAllNodes(),
                 'attachzone' => $this->getAttachZone(),
                 'users' => $users,

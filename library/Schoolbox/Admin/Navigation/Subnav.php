@@ -44,8 +44,6 @@ class Subnav
      */
     private IConfigLoader $configLoader;
 
-    private Authorizer $authorizer;
-
     private User $loggedInUser;
 
     /**
@@ -61,10 +59,9 @@ class Subnav
      *
      * @param IConfigLoader $configLoader
      */
-    public function __construct(IConfigLoader $configLoader, Authorizer $authorizer, User $loggedInUser)
+    public function __construct(IConfigLoader $configLoader, User $loggedInUser)
     {
         $this->configLoader = $configLoader;
-        $this->authorizer = $authorizer;
         $this->loggedInUser = $loggedInUser;
 
         $paths[] = SITE_root . '/library/Schoolbox/Admin/Navigation/templates';

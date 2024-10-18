@@ -163,7 +163,7 @@ class Controller extends ConfigController
             '@adminImportIndex/schoolData/index.twig',
             [
                 'pageCurrent' => $this->routeGenerator->generate('adminImportIndex.getSchoolDataIndex'),
-                'allBreadcrumbs' => (new Subnav($this->getConfigLoader(), $this->getAuthorizer(), $this->getUser()))->generateBreadcrumbs($this->routeGenerator->generate('adminImportIndex.getSchoolDataIndex')),
+                'allBreadcrumbs' => (new Subnav($this->getConfigLoader(), $this->getUser()))->generateBreadcrumbs($this->routeGenerator->generate('adminImportIndex.getSchoolDataIndex')),
                 'allNavigation'  => (new SchoolData())->buildNavigation($this->routeGenerator)->getAllNodes(),
                 'dataSource' => $dataSource,
                 'configContext' => $configContext,
