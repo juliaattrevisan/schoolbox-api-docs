@@ -586,7 +586,7 @@ class Kernel extends WebKernelAbstract
      * the basic request.
      *
      * @param string $path The full path of the script which was invoked:
-     *                     this path (minus the web root) will be used as the
+     *                     this path (minus the site root) will be used as the
      *                     name of the transaction.
      * @return void
      */
