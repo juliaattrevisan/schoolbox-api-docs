@@ -75,59 +75,32 @@ class Controller extends Base
     }
 
     /**
-     * Deletes a list item using the specified mapper
+     * Show options
+     *
+     * @param string|null $table Arbitrary value to identify a table. Does not need to be the actual table name.
+     * @throws ReflectionException|Error|RouteNotFound
+     * @since 160
+     * @api   /adminv2/lists
      */
-    public function postDelete(): void
+    public function getIndex(?string $table): void
     {
-        $this->postDeleteSlave($this->requestPost->get('table', ''));
+        $this->getLists($table, false);
     }
 
     /**
-     * @param string $table
-     * @return void
+     * Show options in JSON format
+     *
+     * @param string|null $table Arbitrary value to identify a table. Does not need to be the actual table name.
+     * @throws RouteNotFound
+     * @throws ReflectionException|Error
+     * @api   /adminv2/lists/data
+     *
+     * @since 210
+     *
      */
-    public function postNewsDelete(string $table): void
+    public function getData(?string $table): void
     {
-        $this->postDeleteSlave($table);
-    }
-
-    /**
-     * @param string $table
-     * @return void
-     */
-    private function postDeleteSlave(string $table): void
-    {
-        $result = false;
-        $post = $this->requestPost;
-
-        $tableData = $this->getTableData();
-        $mapperName = $tableData[$table]['mapper'];
-
-        if (class_exists($mapperName)) {
-            /** @var Mapper $mapper */
-            $mapper = $mapperName::getInstance();
-            try {
-                $record = $mapper->findById($post['id']);
-                $result = $mapper->delete($record);
-            } catch (MapperException) {
-                // Something failed in the mapper: noop
-
-                // Deletion _can_ raise UnexpectedValueException
-                /** @phpstan-ignore-next-line */
-            } catch (UnexpectedValueException) {
-                // Something else unexpected happened, likely thrown by a
-                // pre-delete: noop
-            }
-        }
-
-        $responseData = ['result' => $result];
-
-        // Did deletion fail, and a message is defined to display on failure?
-        if (!$result && isset($tableData[$table]['deleteFailMsg'])) {
-            $responseData['message'] = $tableData[$table]['deleteFailMsg'];
-        }
-
-        $this->response = $this->responseAsJson($responseData);
+        $this->getLists($table, true);
     }
 
     /**
@@ -143,6 +116,39 @@ class Controller extends Base
     }
 
     /**
+     * Deletes a list item using the specified mapper
+     */
+    public function postDelete(): void
+    {
+        $this->postDeleteSlave($this->requestPost->get('table', ''));
+    }
+
+    // Functions for routes accessible by news moderators ------------------------------------------------------------//
+
+    /**
+     * @param string|null $table
+     * @return void
+     * @throws RouteNotFound
+     * @throws ReflectionException|Error
+     */
+    public function getNewsIndex(?string $table): void
+    {
+        $this->getLists($table, false);
+    }
+
+    /**
+     * @param string|null $table
+     * @return void
+     * @throws RouteNotFound
+     * @throws ReflectionException
+     * @throws Error
+     */
+    public function getNewsData(?string $table): void
+    {
+        $this->getLists($table, true);
+    }
+
+    /**
      * @param string $table
      * @return void
      * @throws Deleted
@@ -154,6 +160,17 @@ class Controller extends Base
     {
         $this->postSaveSlave($table);
     }
+
+    /**
+     * @param string $table
+     * @return void
+     */
+    public function postNewsDelete(string $table): void
+    {
+        $this->postDeleteSlave($table);
+    }
+
+    // Private functions ---------------------------------------------------------------------------------------------//
 
     /**
      * @param string $tableKey
@@ -286,6 +303,45 @@ class Controller extends Base
         }
 
         $this->response = $this->redirectAfterPost('/adminv2/lists/' . $this->requestPost["table"]);
+    }
+
+    /**
+     * @param string $table
+     * @return void
+     */
+    private function postDeleteSlave(string $table): void
+    {
+        $result = false;
+        $post = $this->requestPost;
+
+        $tableData = $this->getTableData();
+        $mapperName = $tableData[$table]['mapper'];
+
+        if (class_exists($mapperName)) {
+            /** @var Mapper $mapper */
+            $mapper = $mapperName::getInstance();
+            try {
+                $record = $mapper->findById($post['id']);
+                $result = $mapper->delete($record);
+            } catch (MapperException) {
+                // Something failed in the mapper: noop
+
+                // Deletion _can_ raise UnexpectedValueException
+                /** @phpstan-ignore-next-line */
+            } catch (UnexpectedValueException) {
+                // Something else unexpected happened, likely thrown by a
+                // pre-delete: noop
+            }
+        }
+
+        $responseData = ['result' => $result];
+
+        // Did deletion fail, and a message is defined to display on failure?
+        if (!$result && isset($tableData[$table]['deleteFailMsg'])) {
+            $responseData['message'] = $tableData[$table]['deleteFailMsg'];
+        }
+
+        $this->response = $this->responseAsJson($responseData);
     }
 
     /**
@@ -706,7 +762,7 @@ class Controller extends Base
                         'width'     => 1,
                         'readonly'  => true,
                     ],
-                    'showOnGradesPage'       => [
+                    'showOnGradesPage' => [
                         'caption'   => 'Grades page',
                         'tooltip'   => 'If checked, assessments with this work type will appear on the grades summary page.',
                         'checkbox'  =>  true,
@@ -812,7 +868,7 @@ class Controller extends Base
                     ]
                 ]
             ],
-            'timetable-colour'   => [
+            'timetable-colour' => [
                 'title'             => 'Timetable Colours',
                 'mapper'            => Timetable_ColourMapper::class,
                 'showId'            => false,
@@ -831,7 +887,7 @@ class Controller extends Base
                     ],
                 ]
             ],
-            'pastoral-type'      => [
+            'pastoral-type' => [
                 'title'             => 'Pastoral Types',
                 'mapper'            => PastoralTypeMapper::class,
                 'delete'            => true,
@@ -1271,58 +1327,6 @@ class Controller extends Base
         ];
 
         return $return;
-    }
-
-    /**
-     * Show options
-     *
-     * @param string|null $table Arbitrary value to identify a table. Does not need to be the actual table name.
-     * @throws ReflectionException|Error|RouteNotFound
-     * @since 160
-     * @api   /adminv2/lists
-     */
-    public function getIndex(?string $table): void
-    {
-        $this->getLists($table, false);
-    }
-
-    /**
-     * @param string|null $table
-     * @return void
-     * @throws RouteNotFound
-     * @throws ReflectionException|Error
-     */
-    public function getNewsIndex(?string $table): void
-    {
-        $this->getLists($table, false);
-    }
-
-    /**
-     * Show options in JSON format
-     *
-     * @param string|null $table Arbitrary value to identify a table. Does not need to be the actual table name.
-     * @throws RouteNotFound
-     * @throws ReflectionException|Error
-     * @api   /adminv2/lists/data
-     *
-     * @since 210
-     *
-     */
-    public function getData(?string $table): void
-    {
-        $this->getLists($table, true);
-    }
-
-    /**
-     * @param string|null $table
-     * @return void
-     * @throws RouteNotFound
-     * @throws ReflectionException
-     * @throws Error
-     */
-    public function getNewsData(?string $table): void
-    {
-        $this->getLists($table, true);
     }
 
     /**
