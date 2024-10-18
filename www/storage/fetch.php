@@ -20,6 +20,7 @@ use Schoolbox\Resource\Storage\S3\PreSignedUrlService;
 
 require_once __DIR__ . '/../../conf/core/require.php';
 $kernel = new Kernel();
+$kernel->startSentryTransaction(__FILE__);
 
 try {
     if (isset($_GET['hash']) && $_GET['hash']) {

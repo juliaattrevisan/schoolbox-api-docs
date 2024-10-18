@@ -24,6 +24,7 @@ use Schoolbox\Video\ResourceVideo;
 
 require_once __DIR__ . '/../../conf/core/require.php';
 $kernel = new \Schoolbox\Application\BasicRequest\Kernel();
+$kernel->startSentryTransaction(__FILE__);
 
 /** @var PrefixGenerator $prefixGenerator */
 $prefixGenerator = $kernel->get('cdnPrefixGenerator');

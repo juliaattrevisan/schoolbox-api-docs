@@ -21,6 +21,7 @@ if (isset($this)) {
 
 require_once __DIR__ . '/../../conf/core/require.php';
 $kernel = new \Schoolbox\Application\BasicRequest\Kernel();
+$kernel->startSentryTransaction(__FILE__);
 
 // Init the session from auth header if it's there
 [$user, $bypassIpTracking] = $kernel->extractUserFromAuthHeader($_SERVER['HTTP_AUTHORIZATION'] ?? null);

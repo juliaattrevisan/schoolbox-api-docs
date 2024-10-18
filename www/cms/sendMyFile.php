@@ -15,6 +15,7 @@ use Schoolbox\Resource\Storage\FilesystemProxy;
 
 require_once __DIR__ . '/../../conf/core/require.php';
 $kernel = new \Schoolbox\Application\BasicRequest\Kernel();
+$kernel->startSentryTransaction(__FILE__);
 
 if (is_numeric($_GET['id'])) {
     // ensure session
