@@ -250,7 +250,7 @@ class Kernel extends WebKernelAbstract
             $route->name,
             null,
             'http.server',
-            null,
+            'auto.http.server',
             TransactionSource::route(),
             $_SERVER['REQUEST_TIME_FLOAT'],
             [
@@ -473,7 +473,7 @@ class Kernel extends WebKernelAbstract
             $pageName,
             null,
             'http.server',
-            null,
+            'auto.http.server',
             TransactionSource::url(),
             $_SERVER['REQUEST_TIME_FLOAT'],
             [
