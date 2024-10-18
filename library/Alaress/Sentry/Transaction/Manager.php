@@ -236,10 +236,16 @@ class Manager
     /**
      * Finish any existing transaction, if there is one.
      *
+     * Also finishes any spans which may still be open.
+     *
      * @return void
      */
     public function finishTransaction(): void
     {
+        while (!empty($this->spans)) {
+            $span = array_pop($this->spans);
+            $span->finish();
+        }
         $this->transaction?->finish();
     }
 }
