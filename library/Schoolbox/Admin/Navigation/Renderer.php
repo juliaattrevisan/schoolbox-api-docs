@@ -8,7 +8,6 @@
 
 namespace Schoolbox\Admin\Navigation;
 
-use Alaress\Authorizer\Authorizer;
 use Schoolbox\Config\Loader;
 use Schoolbox\User;
 use Twig\Environment;
@@ -24,7 +23,7 @@ use Twig\TwigFunction;
  */
 class Renderer extends Extension\AbstractExtension
 {
-    public function __construct(private readonly Authorizer $authorizer, private readonly User $loggedInUser)
+    public function __construct(private readonly User $loggedInUser)
     {
     }
 

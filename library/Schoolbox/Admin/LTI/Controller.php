@@ -62,7 +62,7 @@ class Controller extends ConfigController
             '@adminLti/modify.twig',
             [
                 'pageCurrent'    => $this->routeGenerator->generate('adminLti.getIndex'),
-                'allBreadcrumbs' => (new Subnav($this->getConfigLoader(), $this->getAuthorizer(), $this->getUser()))->generateBreadcrumbs($this->routeGenerator->generate('adminLti.getIndex')),
+                'allBreadcrumbs' => (new Subnav($this->getConfigLoader(), $this->getUser()))->generateBreadcrumbs($this->routeGenerator->generate('adminLti.getIndex')),
             ],
         );
     }
