@@ -40,6 +40,15 @@ const showSelectAll = window.Vue.computed(() => {
 });
 
 /**
+ * To only show the bottom border if the search is active,
+ * otherwise there's a double border when the search is inactive
+ * @returns - the bottom border style
+ */
+const bottomBorder = window.Vue.computed(() => {
+    return props.isActive ? "1px solid var(--form-border-color)" : "none";
+});
+
+/**
  * To add results
  * @param results - the results selected
  */
@@ -95,59 +104,55 @@ function onHover(index: number): void {
 }
 </script>
 <template>
-    <div v-if="props.isActive">
-        <div class="search-results">
-            <div v-if="props.isSearching" class="search-status">Searching for results....</div>
-            <div v-else-if="props.hasNoResults && props.selectedItems.length === 0" class="search-status">
-                No results found for your current search.
-            </div>
-            <template v-else>
-                <search-select-select-all
-                    v-if="showSelectAll"
-                    :results="props.results"
-                    :selected-items="props.selectedItems"
-                    :index="0"
-                    :active-index="activeIndex"
-                    @add="onAdd"
-                    @remove="onRemove"
-                    @hover="onHover"
-                />
-                <search-select-result
-                    v-for="(result, index) in props.results"
-                    :key="result.id"
-                    :query="props.query"
-                    :selected-items="props.selectedItems"
-                    :result="result"
-                    :is-single-select="props.isSingleSelect"
-                    :index="showSelectAll ? index + 1 : index"
-                    :active-index="activeIndex"
-                    @add="onAdd"
-                    @remove="onRemove"
-                    @hover="onHover"
-                />
-            </template>
+    <div class="results">
+        <div v-if="props.isSearching" class="results__status">Searching for results....</div>
+        <div v-else-if="props.hasNoResults && props.selectedItems.length === 0" class="esults__status">
+            No results found for your current search.
         </div>
-        <!-- .search-results -->
+        <template v-else>
+            <search-select-select-all
+                v-if="showSelectAll"
+                :results="props.results"
+                :selected-items="props.selectedItems"
+                :index="0"
+                :active-index="activeIndex"
+                @add="onAdd"
+                @remove="onRemove"
+                @hover="onHover"
+            />
+            <search-select-result
+                v-for="(result, index) in props.results"
+                :key="result.id"
+                :query="props.query"
+                :selected-items="props.selectedItems"
+                :result="result"
+                :is-single-select="props.isSingleSelect"
+                :index="showSelectAll ? index + 1 : index"
+                :active-index="activeIndex"
+                @add="onAdd"
+                @remove="onRemove"
+                @hover="onHover"
+            />
+        </template>
     </div>
-    <!-- .search-results-container -->
+    <!-- .results -->
 </template>
 
 <style lang="scss" scoped>
-.search-results {
+.results {
     max-height: 400px;
     overflow: auto;
     width: 100%;
     &:last-child {
-        border-bottom: 1px solid var(--form-border-color);
+        border-bottom: v-bind(bottomBorder);
     }
-}
-
-.search-status {
-    background: var(--color-foreground-primary);
-    border-left: 1px solid var(--form-border-color);
-    border-right: 1px solid var(--form-border-color);
-    padding: var(--spacing-s);
-    font-size: 0.825rem;
-    font-style: italic;
+    &__status {
+        background: var(--color-foreground-primary);
+        border-left: 1px solid var(--form-border-color);
+        border-right: 1px solid var(--form-border-color);
+        font-size: 0.825rem;
+        font-style: italic;
+        padding: var(--spacing-s);
+    }
 }
 </style>

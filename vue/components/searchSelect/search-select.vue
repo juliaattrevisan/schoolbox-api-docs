@@ -43,7 +43,10 @@ const { query, isActive, isSearching, hasNoResults, results } = useSearch(props.
  * @returns - the current results
  */
 const currentResults = window.Vue.computed(() => {
-    if (props.defaultResults && props.defaultResults.length > 0 && !isActive.value) {
+    if (isActive.value) {
+        return results.value;
+    }
+    if (props.defaultResults && props.defaultResults.length > 0) {
         return props.defaultResults;
     }
     return results.value;
