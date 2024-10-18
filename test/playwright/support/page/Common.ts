@@ -91,6 +91,12 @@ export default class Common {
     static readonly ICON_MODIFY_PAGES = "a.icon-modify.no-text";
 
     /**
+     * the currently open modal dialog
+     * use this in combination with the other modal dialog selectors for better precision
+     */
+    static readonly SELECTOR_MODAL_DIALOG = "div[data-reveal].open";
+
+    /**
      * confirm button on modal dialogs
      */
     static readonly SELECTOR_CONFIRM_DIALOG_BUTTON_CONFIRM = "a#confirm-dialog-confirm-button";
@@ -103,7 +109,7 @@ export default class Common {
     /**
      * close x button on modal dialogs
      */
-    static readonly SELECTOR_CLOSE_BUTTON_MODAL = "#modal-role";
+    static readonly SELECTOR_CLOSE_BUTTON_MODAL = ".close-reveal-modal";
 
     /**
      * add a comment element for learning moments, news, pastoral records
@@ -122,6 +128,45 @@ export default class Common {
 
     constructor(page: Page) {
         this.page = page;
+    }
+
+    /**
+     * Ensures the page is loaded and ready to be interacted with (mostly)
+     * This completes some specific checks to ensure that components such as the search bar are interactable
+     *
+     * Note, usually this isn't necessary as playwright's actionability checks are sufficient most of the time
+     * However, in some cases, interacting with elements that load after the page has loaded can cause issues
+     *
+     * This function will wait for *most* of the page to be in a stable state before continuing
+     * However, it is not a guarantee that all elements will be interactable (e.g. some vue component doing extra requests before loading)
+     */
+    async waitForPageLoad(): Promise<void> {
+        // First wait for load to complete
+        await this.page.waitForLoadState("load");
+
+        // Are we on the login page? If so, skip the rest as it's irrelevant
+        if ((await this.page.getByTestId("login-submit").count()) > 0) {
+            return;
+        }
+
+        // Is there a modal open? If so, we can't do the rest of the actionability checks
+        if ((await this.page.locator(Common.SELECTOR_MODAL_DIALOG).count()) > 0) {
+            return;
+        }
+
+        // Is the what's new tour open? If so, we can't do the rest of the actionability checks
+        if ((await this.page.locator("div.introjs-tooltipbuttons a").count()) > 0) {
+            return;
+        }
+
+        // The profile drop gets a data-test-ready="true" applied when its associated event listeners are ready
+        const profileDrop = this.page.getByTestId("profile-drop");
+        await expect(profileDrop).toHaveAttribute("data-test-ready", "true", { timeout: 30000 });
+
+        // Make sure the search bar and profile drop are stable
+        // uses "trial: true" to see if the elements are interactable, but not actually interact with them
+        await profileDrop.click({ trial: true });
+        await this.page.getByTestId("search-input-button").click({ trial: true });
     }
 
     /**
@@ -158,6 +203,7 @@ export default class Common {
      * @param text - the text to search
      */
     async search(text: string): Promise<void> {
+        await this.waitForPageLoad(); // When using the search bar, ensure it's interactable first
         await this.page.getByTestId(Common.DATATEST_SEARCH_ICON).click();
         await this.page.locator(Common.SELECTOR_SEARCH).fill(text);
         await this.page.getByTestId(Common.DATATEST_SEARCH_ICON).click();
@@ -194,10 +240,16 @@ export default class Common {
     }
 
     /**
-     * clicks the close x button on the dialogs
+     * clicks the close x button on the currently open modal dialog
      */
     async closeModal(): Promise<void> {
-        await this.page.locator(Common.SELECTOR_CLOSE_BUTTON_MODAL).getByLabel("Close").click();
+        // You can't close a reveal modal before it is in a fully opened state,
+        // so wait for it to be visible and fully opaque before trying to close it
+        const currentModal = this.page.locator(Common.SELECTOR_MODAL_DIALOG);
+        await expect(currentModal).toBeVisible();
+        await expect(currentModal).toHaveCSS("opacity", "1");
+
+        await currentModal.locator(Common.SELECTOR_CLOSE_BUTTON_MODAL).click();
     }
 
     /**

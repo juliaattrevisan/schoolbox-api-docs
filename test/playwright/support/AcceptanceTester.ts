@@ -4,6 +4,7 @@ import type { Page, Locator } from "@playwright/test";
 import { expect } from "@playwright/test";
 import LoginPage from "@schoolboxTest/playwright/support/page/LoginPage";
 import BaseTester from "@schoolboxTest/playwright/support/BaseTester";
+import Common from "@schoolboxTest/playwright/support/page/Common";
 
 /**
  * AcceptanceTester class to provide common functionality for acceptance tests
@@ -15,9 +16,14 @@ import BaseTester from "@schoolboxTest/playwright/support/BaseTester";
 export default class AcceptanceTester extends BaseTester {
     private page: Page;
 
+    public common: Common;
+
     constructor(page: Page) {
         super(); // Call the constructor of the BaseTester class
         this.page = page;
+
+        // Provide common via tester for easy access
+        this.common = new Common(page);
     }
 
     /**
@@ -38,9 +44,8 @@ export default class AcceptanceTester extends BaseTester {
     async login(username: string, password: string): Promise<void> {
         const loginPage = new LoginPage(this.page);
         await loginPage.login(username, password, true);
-        await loginPage.verifyLoginSuccess();
-
         await this.skipWhatsNewTour();
+        await loginPage.verifyLoginSuccess();
     }
 
     /**
@@ -63,11 +68,11 @@ export default class AcceptanceTester extends BaseTester {
         const accountContent = this.page.getByTestId("account-content");
         await accountContent.getByText(fullname).click();
 
+        await this.skipWhatsNewTour();
+
         const loginPage = new LoginPage(this.page);
         await loginPage.verifyLoginSuccess();
         await loginPage.verifyCurrentUserIs(fullname);
-
-        await this.skipWhatsNewTour();
     }
 
     /**
@@ -93,11 +98,11 @@ export default class AcceptanceTester extends BaseTester {
         await this.page.getByTestId("sbx-pop-out-header-options-button").click();
         await this.page.getByTestId("admin-user-modify-impersonate").click();
 
+        await this.skipWhatsNewTour();
+
         const loginPage = new LoginPage(this.page);
         await loginPage.verifyLoginSuccess();
         await loginPage.verifyCurrentUserIs(fullname);
-
-        await this.skipWhatsNewTour();
     }
 
     /**
@@ -131,10 +136,21 @@ export default class AcceptanceTester extends BaseTester {
      * @param content - The content to fill the editor with
      */
     async fillCKEditorById(editorId: string, content: string): Promise<void> {
+        // There should be at least one ckeditor, somewhere on the page, first.
+        // The actual element of the ckeditor has no direct correlation to the editorId, but if one exists then
+        // we can proceed with the next checks to find the actual editor we want
+        await expect(this.page.locator("div.ck.ck-editor").first()).toHaveCount(1);
+
         // Wait for the editor to be ready
         await this.page.waitForFunction(
             ([_editorId]) => {
-                return window.sbProps.editors[_editorId] !== undefined;
+                if (window.sbProps === undefined || window.sbProps.editors === undefined) {
+                    return false;
+                }
+                if (window.sbProps.editors[_editorId] === undefined) {
+                    return false;
+                }
+                return true;
             },
             [editorId],
         );

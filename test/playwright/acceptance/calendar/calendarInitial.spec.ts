@@ -56,7 +56,6 @@ test.describe("Calendar tests", () => {
         await tester.impersonate(student);
         await calendar.goto();
         await expect(page.locator("table.fc-scrollgrid-sync-table")).not.toContainText(eventTitle);
-        await expect(page.locator("table.fc-scrollgrid-sync-table")).not.toContainText(eventTitle);
     });
 
     /**

@@ -71,10 +71,10 @@ test.describe("Group Permission Tests", () => {
         tester.isGoingTo("get logged in as Eloise White and check she is able to leave the group");
         await tester.impersonateViaModifyUserPage(groupMember);
         await page.goto(`https://vagrant.dev.schoolbox.cloud/homepage/${folderId}`);
-        await page.click("[data-test=sbx-pop-out-tab-control] [data-test=sbx-pop-out-tab-control-button]");
+        await page.click("[data-test=sbx-pop-out-tab-control-button]");
         await expect(page.locator("#container")).toContainText("Group Free");
         await page.getByText("Leave Group").click();
-        await page.click("[data-test=sbx-pop-out-tab-control] [data-test=sbx-pop-out-tab-control-button]");
+        await page.click("[data-test=sbx-pop-out-tab-control-button]");
         await expect(page.locator("#container")).toContainText("Join Group");
     });
 
@@ -142,10 +142,10 @@ test.describe("Group Permission Tests", () => {
         tester.isGoingTo("get logged in as Eloise White and check she is able to leave the group");
         await tester.impersonateViaModifyUserPage(groupMember);
         await page.goto(`https://vagrant.dev.schoolbox.cloud/homepage/${folderId}`);
-        await page.click("[data-test=sbx-pop-out-tab-control] [data-test=sbx-pop-out-tab-control-button]");
+        await page.click("[data-test=sbx-pop-out-tab-control-button]");
         await expect(page.locator("#container")).toContainText("Leave Group");
         await page.getByText("Leave Group").click();
-        await page.click("[data-test=sbx-pop-out-tab-control] [data-test=sbx-pop-out-tab-control-button]");
+        await page.click("[data-test=sbx-pop-out-tab-control-button]");
         await expect(page.locator("#container")).not.toContainText("Cancel Application");
     });
 
@@ -214,7 +214,7 @@ test.describe("Group Permission Tests", () => {
         tester.isGoingTo("get logged in as Jana Reed and check she is able to leave the group");
         await tester.impersonateViaModifyUserPage(groupMember);
         await page.goto(`https://vagrant.dev.schoolbox.cloud/homepage/${folderId}`);
-        await page.click("[data-test=sbx-pop-out-tab-control] [data-test=sbx-pop-out-tab-control-button]");
+        await page.click("[data-test=sbx-pop-out-tab-control-button]");
         await expect(page.locator("#container")).not.toContainText("Leave Group");
     });
 

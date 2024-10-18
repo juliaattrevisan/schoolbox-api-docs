@@ -81,9 +81,10 @@ $(function () {
     /* Open / Close account menu
      * + click outside div to close
      */
-    var accountMenu = $("#account-content");
+    const accountMenu = $("#account-content");
+    const profileDrop = $("#profile-drop");
 
-    $("#profile-drop").on("click", function (e) {
+    profileDrop.on("click", function (e) {
         e.stopPropagation();
         accountMenu.toggleClass("open");
     });
@@ -220,6 +221,10 @@ $(function () {
         this.clearTimeout(resizeTimeout);
         resizeTimeout = setTimeout(updateTopNavItems, 100);
     });
+
+    // Set a data-test-ready="true" attribute as a flag for playwright tests
+    // to ensure that we've successfully added the listener to the profile drop (and other parts of this script have finished)
+    profileDrop.attr("data-test-ready", "true");
 });
 
 /**

@@ -1,5 +1,5 @@
-import type { Page } from "@playwright/test";
 import { expect } from "@playwright/test";
+import type { Page } from "@playwright/test";
 
 /*
  * Page object for the Markbook page
@@ -32,7 +32,7 @@ export default class MarkbookPage {
             .click();
         // Markbook
         await this.page.locator("a.icon-curriculum").first().click();
-        await this.page.locator(`h1:has-text("Class Markbook for Demo Class Page 2")`).isVisible({ timeout: 30000 });
+        await expect(this.page.locator(`h1:has-text("Class Markbook for Demo Class Page 2")`)).toBeVisible();
     }
 
     /**
@@ -68,7 +68,7 @@ export default class MarkbookPage {
      * @param title - The title of the assessment
      */
     async canSeeAssessment(title: string): Promise<void> {
-        await this.page.locator(`a:has-text("${title}")`).isVisible({ timeout: 30000 });
+        await expect(this.page.locator(`a:has-text("${title}")`)).toBeVisible();
     }
 
     /**
@@ -76,7 +76,7 @@ export default class MarkbookPage {
      * @param name - The name of the participant
      */
     async canSeeParticipant(name: string): Promise<void> {
-        await this.page.locator(`a[title="View Profile"]:has-text("${name}")`).isVisible({ timeout: 30000 });
+        await expect(this.page.locator(`a[title="View Profile"]:has-text("${name}")`)).toBeVisible();
     }
 
     /**
@@ -84,8 +84,6 @@ export default class MarkbookPage {
      * @param name - The name of the participant
      */
     async cantSeeParticipant(name: string): Promise<void> {
-        await expect(this.page.locator(`a[title="View Profile"]:has-text("${name}")`)).not.toBeVisible({
-            timeout: 30000,
-        });
+        await expect(this.page.locator(`a[title="View Profile"]:has-text("${name}")`)).not.toBeVisible();
     }
 }

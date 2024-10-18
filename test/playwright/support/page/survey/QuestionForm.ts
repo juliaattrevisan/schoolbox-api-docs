@@ -1,3 +1,4 @@
+import { expect } from "@playwright/test";
 import type { Page } from "@playwright/test";
 import type AcceptanceTester from "@schoolboxTest/playwright/support/AcceptanceTester";
 import type DatabaseHelper from "../../DatabaseHelper";
@@ -42,9 +43,9 @@ export default class QuestionForm {
      * @param type - The type of the question
      */
     async setType(type: number): Promise<void> {
-        await this.page.locator(`h2.subheader:has-text("CREATE QUESTION")`).isVisible();
+        await expect(this.page.locator(`h2.subheader:has-text("CREATE QUESTION")`)).toBeVisible();
         await this.page.selectOption(QuestionForm.SELECTOR_TYPE_ID, type.toString());
-        await this.page.locator(QuestionForm.SELECTOR_DESCRIPTION).isVisible({ timeout: 30000 });
+        await expect(this.page.locator(QuestionForm.SELECTOR_DESCRIPTION)).toBeVisible();
     }
 
     /*
@@ -61,17 +62,16 @@ export default class QuestionForm {
      */
     async create(): Promise<void> {
         await this.page.click(QuestionForm.SELECTOR_BUTTON_CREATE);
-        await this.page.locator(`h2.subheader:has-text("CREATE QUESTION")`).isVisible({ timeout: 30000 });
+        await expect(this.page.locator(`h2.subheader:has-text("CREATE QUESTION")`)).toBeVisible();
     }
 
     /*
      * Submits this form to modify a question bank
      */
     async modify(): Promise<void> {
-        await this.page.locator(QuestionForm.SELECTOR_BUTTON_MODIFY).isEnabled({ timeout: 30000 });
+        await this.page.locator(QuestionForm.SELECTOR_BUTTON_MODIFY).isEnabled();
         await this.page.click(QuestionForm.SELECTOR_BUTTON_MODIFY);
-        await this.page.locator(`h2.subheader:has-text("Question Bank")`).isVisible({ timeout: 30000 });
-        await this.page.waitForTimeout(2000);
+        await expect(this.page.locator(`h1:has-text("Question Bank")`)).toBeVisible();
     }
 
     /*

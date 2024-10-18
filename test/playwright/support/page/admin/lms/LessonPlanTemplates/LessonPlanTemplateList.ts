@@ -10,8 +10,6 @@ export default class LessonPlanTemplateList {
 
     static readonly ICON_ADD = "a.icon-add";
 
-    static readonly ICON_MODAL_CLOSE = "a.close-reveal-modal";
-
     constructor(tester: AcceptanceTester, page: Page) {
         this.tester = tester;
         this.page = page;
@@ -70,14 +68,5 @@ export default class LessonPlanTemplateList {
      */
     async clickDeleteTemplate(templateIdNumber: number): Promise<void> {
         await this.page.click(`a[href="/adminv2/lesson-plan/template/delete/${templateIdNumber}"]`);
-    }
-
-    /**
-     * click the close button on the modal dialog
-     * @param templateIdNumber - the id of the template
-     */
-    async clickCloseModal(templateIdNumber: number): Promise<void> {
-        await this.page.waitForTimeout(1000);
-        await this.page.getByTestId(`lpt-preview-${templateIdNumber}-template-list-modal-close`).click();
     }
 }

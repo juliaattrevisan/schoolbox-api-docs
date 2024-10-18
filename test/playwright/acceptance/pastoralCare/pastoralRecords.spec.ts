@@ -2,7 +2,6 @@ import { test, expect } from "@schoolboxTest/playwright/support/integrations";
 import ProfilePage from "@schoolboxTest/playwright/support/page/profilePage/ProfilePage";
 import PastoralProfile from "@schoolboxTest/playwright/support/page/pastoralCare/PastoralProfile";
 import CreatePastoralRecord from "@schoolboxTest/playwright/support/page/pastoralCare/CreatePastoralRecord";
-import Common from "@schoolboxTest/playwright/support/page/Common";
 
 /**
  * creates a pastoral record, check the pastoral record details, comments it,
@@ -58,7 +57,6 @@ test.describe("Pastoral Records", () => {
         const profilePage = new ProfilePage(tester, page);
         const pastoralProfile = new PastoralProfile(tester, page);
         const createPastoralRecord = new CreatePastoralRecord(tester, page);
-        const common = new Common(page);
         const studentId = "25";
         const pastoralTitle = "Automation Test Pastoral Record";
         const pastoralDescription = "This is an automation pastoral record";
@@ -75,7 +73,7 @@ test.describe("Pastoral Records", () => {
         await tester.fillCKEditorByLocator(body, pastoralDescription);
         await createPastoralRecord.clickVisibilityLink("Role");
         await createPastoralRecord.clickPastoralRole("Administration");
-        await common.closeModal();
+        await tester.common.closeModal();
         await createPastoralRecord.clickSave();
         tester.isGoingTo("ensure the record is presented under pastoral records");
         await pastoralProfile.goto(studentId);
@@ -92,7 +90,6 @@ test.describe("Pastoral Records", () => {
 
     test("Comment Pastoral Record", async ({ tester, page, db }) => {
         const pastoralProfile = new PastoralProfile(tester, page);
-        const common = new Common(page);
         const studentId = "25";
         const pastoralComment = "This is an automation pastoral comment";
         tester.isGoingTo("navigate to the student pastoral profile page");
@@ -103,14 +100,14 @@ test.describe("Pastoral Records", () => {
             "heading like": "Automation Test Pastoral Record%",
         })) as number;
         await pastoralProfile.clickPastoralRecord(studentId, recordId);
-        await common.clickAddComment();
+        await tester.common.clickAddComment();
         await tester.fillCKEditorById("comment-public", pastoralComment);
         await pastoralProfile.clickPostComment();
         tester.isGoingTo("check the comment is presented");
         await expect(page.locator("#pastoral-record-comments-container-public")).toContainText(pastoralComment);
         tester.isGoingTo("delete the pastoral comment");
         await pastoralProfile.clickDeleteCommentIcon();
-        await common.clickModalDeleteButton();
+        await tester.common.clickModalDeleteButton();
         await expect(page.locator("#pastoral-record-comments-container-public")).not.toContainText(pastoralComment);
     });
 
@@ -122,7 +119,6 @@ test.describe("Pastoral Records", () => {
 
     test("Modify Pastoral Record", async ({ tester, page, db }) => {
         const pastoralProfile = new PastoralProfile(tester, page);
-        const common = new Common(page);
         const createPastoralRecord = new CreatePastoralRecord(tester, page);
         const studentId = "25";
         const pastoralTitle = "This is an automation pastoral record updated";
@@ -133,7 +129,7 @@ test.describe("Pastoral Records", () => {
             "heading like": "Automation Test Pastoral Record%",
         })) as number;
         await pastoralProfile.clickPastoralRecord(studentId, recordId);
-        await common.clickIconModifyPage();
+        await tester.common.clickIconModifyPage();
         tester.isGoingTo("get the pastoral record updated");
         await createPastoralRecord.typeTitle(pastoralTitle);
         await createPastoralRecord.clickTypeDropdown();
@@ -153,7 +149,6 @@ test.describe("Pastoral Records", () => {
      */
     test("Delete Pastoral Record", async ({ tester, page, db }) => {
         const pastoralProfile = new PastoralProfile(tester, page);
-        const common = new Common(page);
         const studentId = "25";
         tester.isGoingTo("navigate to the pastoral profile page and delete a pastoral record");
         await pastoralProfile.goto(studentId);
@@ -163,7 +158,7 @@ test.describe("Pastoral Records", () => {
             "heading like": pastoralTitle,
         })) as number;
         await pastoralProfile.clickDeleteIcon(recordId);
-        await common.clickConfirmButton();
+        await tester.common.clickConfirmButton();
         tester.isGoingTo("ensure the record is no longer presented");
         await page.waitForTimeout(2000);
         await expect(page.locator("#pastoralRecords")).not.toContainText(pastoralTitle);
@@ -179,7 +174,6 @@ test.describe("Pastoral Records", () => {
         const profilePage = new ProfilePage(tester, page);
         const pastoralProfile = new PastoralProfile(tester, page);
         const createPastoralRecord = new CreatePastoralRecord(tester, page);
-        const common = new Common(page);
         const studentId = "25";
         const pastoralTitle = "Automation Test View Pastoral Record";
         const pastoralDescription = "This is an automation pastoral record";
@@ -197,7 +191,7 @@ test.describe("Pastoral Records", () => {
         await createPastoralRecord.clickVisibilityLink("Role");
         await createPastoralRecord.clickPastoralRole("Student");
         await createPastoralRecord.clickPastoralRole("Parent");
-        await common.closeModal();
+        await tester.common.closeModal();
         await createPastoralRecord.clickSave();
         tester.isGoingTo("ensure the record is presented under pastoral records");
         await pastoralProfile.goto(studentId);

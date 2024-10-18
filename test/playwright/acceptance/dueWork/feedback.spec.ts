@@ -20,8 +20,6 @@ test.describe("Feedback Tests", () => {
      * and checks notifications for it at each step
      */
     test("due work via inline grader", async ({ tester, page }) => {
-        const common = new Common(page);
-
         const className = Common.CLASS_9AENG;
         const classId = Common.CLASS_ID_9AENG;
         const student = Common.USER_LOUISASMITH;
@@ -48,7 +46,7 @@ test.describe("Feedback Tests", () => {
 
         tester.isGoingTo("As Louisa Smith, check notification");
         await tester.impersonateViaModifyUserPage(student);
-        const assessmentNotificationLouisa = await common.findNotification(
+        const assessmentNotificationLouisa = await tester.common.findNotification(
             `Assessment Task ${dueworkTitle1} opened in ${className}`,
             true,
         );
@@ -66,7 +64,7 @@ test.describe("Feedback Tests", () => {
 
         tester.isGoingTo("As Jack Coles, check the notification");
         await tester.impersonate(teacher);
-        const assessmentNotificationJack = await common.findNotification(
+        const assessmentNotificationJack = await tester.common.findNotification(
             `${student} submitted work to ${dueworkTitle1} in ${className}`,
             true,
         );
@@ -88,7 +86,7 @@ test.describe("Feedback Tests", () => {
 
         tester.isGoingTo("As Louisa Smith, check notification");
         await tester.impersonateViaModifyUserPage(student);
-        const assessmentNotificationLuisa2 = await common.findNotification(
+        const assessmentNotificationLuisa2 = await tester.common.findNotification(
             `${teacher} has marked your work for ${dueworkTitle1} in ${className}`,
             true,
         );
@@ -103,8 +101,6 @@ test.describe("Feedback Tests", () => {
      * and checks notifications for it at each step
      */
     test("due work via activity status page", async ({ tester, page }) => {
-        const common = new Common(page);
-
         const className = Common.CLASS_9AENG;
         const classId = Common.CLASS_ID_9AENG;
         const student = Common.USER_LOUISASMITH;
@@ -130,7 +126,7 @@ test.describe("Feedback Tests", () => {
 
         tester.isGoingTo("As Louisa Smith, check notification");
         await tester.impersonateViaModifyUserPage(student);
-        const assessmentNotificationLouisa = await common.findNotification(
+        const assessmentNotificationLouisa = await tester.common.findNotification(
             `Assessment Task ${dueworkTitle2} opened in ${className}`,
             true,
         );
@@ -147,7 +143,7 @@ test.describe("Feedback Tests", () => {
 
         tester.isGoingTo("As Jack Coles, check notification");
         await tester.impersonate(teacher);
-        const assessmentNotificationJack = await common.findNotification(
+        const assessmentNotificationJack = await tester.common.findNotification(
             `${student} submitted work to ${dueworkTitle2} in ${className}`,
             true,
         );
@@ -172,7 +168,7 @@ test.describe("Feedback Tests", () => {
 
         tester.isGoingTo("As Louisa, check notification");
         await tester.impersonateViaModifyUserPage(student);
-        const assessmentNotificationLuisa2 = await common.findNotification(
+        const assessmentNotificationLuisa2 = await tester.common.findNotification(
             `${teacher} has marked your work for ${dueworkTitle2} in ${className}`,
             true,
         );

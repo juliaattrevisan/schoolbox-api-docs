@@ -77,7 +77,15 @@ function initIframely(): void {
 /**
  * To properly display any media within the content
  */
-window.Vue.onMounted(() => {
+window.Vue.onMounted(async () => {
+    // @ts-expect-error Sometimes $.fn.schoolboxResource_ReplaceAll is not defined yet, and causes this to fail loading
+    // This checks if it's undefined and waits 100ms before trying again if so
+    if ($.fn.schoolboxResource_ReplaceAll === undefined) {
+        console.warn("schoolboxResource_ReplaceAll is not defined, trying again in 100ms");
+        await new Promise((resolve) => {
+            setTimeout(resolve, 100);
+        });
+    }
     void initMediaElementPlayer();
     initIframely();
 });

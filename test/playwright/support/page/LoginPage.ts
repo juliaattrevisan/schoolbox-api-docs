@@ -1,5 +1,10 @@
-import type { Page } from "@playwright/test";
+/**
+ * Methods to interact with the login page
+ * Note: This is used by the AcceptanceTester class, so to avoid recursion, you can't use tester.* methods here
+ */
 import { expect } from "@playwright/test";
+import type { Page } from "@playwright/test";
+import Common from "@schoolboxTest/playwright/support/page/Common";
 
 export default class LoginPage {
     public static LOGIN_URL = "/login";
@@ -68,12 +73,10 @@ export default class LoginPage {
      * Verify that the user is currently logged in
      */
     async verifyLoginSuccess(): Promise<void> {
-        // Ensure the page and JavaScript has fully loaded and is ready for interaction
-        // An issue was found where the profile drop was not clickable for around 400ms
-        //  after the page loaded as miscellaneous.js had not created the event listeners yet
-        await this.page.getByTestId("profile-drop").waitFor({ state: "visible" });
-        await this.page.waitForLoadState("load");
+        const common = new Common(this.page);
+        await common.waitForPageLoad();
 
+        // Verify that the profile drop is visible
         await expect(this.page.getByTestId("profile-drop")).toBeVisible();
     }
 

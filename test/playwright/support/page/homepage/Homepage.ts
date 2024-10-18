@@ -1,5 +1,5 @@
-import type { Page } from "@playwright/test";
 import { expect } from "@playwright/test";
+import type { Page } from "@playwright/test";
 
 export default class Homepage {
     private page: Page;
@@ -33,8 +33,6 @@ export default class Homepage {
     static readonly ELEMENT_COMPONENT_SECTION_FEEDS = 'a[href="#tabs-sub-6"]';
 
     static readonly ELEMENT_EDIT_COLUMNS_TAB = "#tabs-2";
-
-    static readonly DATATEST_LINK_MENU = "sbx-pop-out-tab-control";
 
     static readonly DATATEST_LINK_MENU_BUTTON = "sbx-pop-out-tab-control-button";
 
@@ -203,7 +201,6 @@ export default class Homepage {
      * Click the component remove icon
      */
     async clickComponentRemoveIcon(): Promise<void> {
-        await this.page.locator(Homepage.ELEMENT_REMOVE_ICON).first().isVisible({ timeout: 30000 });
         await this.page.locator(Homepage.ELEMENT_REMOVE_ICON).first().click();
     }
 
@@ -239,10 +236,6 @@ export default class Homepage {
      * Click the remove confirmation button
      */
     async clickRemoveConfirmationMessage(): Promise<void> {
-        await this.page
-            .locator(`a:text("${Homepage.REMOVE_BUTTON_CONFIRMATION_MESSAGE}")`)
-            .first()
-            .isVisible({ timeout: 30000 });
         await this.page.locator(`a:text("${Homepage.REMOVE_BUTTON_CONFIRMATION_MESSAGE}")`).first().click();
     }
 }

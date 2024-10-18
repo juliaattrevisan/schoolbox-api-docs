@@ -1,7 +1,6 @@
 import { test, expect } from "@schoolboxTest/playwright/support/integrations";
 import CreateLessonPlanTemplate from "@schoolboxTest/playwright/support/page/admin/lms/LessonPlanTemplates/CreateLessonPlanTemplate";
 import LessonPlanTemplateList from "@schoolboxTest/playwright/support/page/admin/lms/LessonPlanTemplates/LessonPlanTemplateList";
-import Common from "@schoolboxTest/playwright/support/page/Common";
 import CourseModify from "@schoolboxTest/playwright/support/page/courses/CourseModify";
 import CourseList from "@schoolboxTest/playwright/support/page/courses/CourseList";
 import ImportCourseIntoClass from "@schoolboxTest/playwright/support/page/courses/ImportCourseIntoClass";
@@ -89,8 +88,8 @@ async function createLessonPlanTemplate(
     await page.waitForLoadState("domcontentloaded");
     await resources.clickMenuItem("home");
     await page.waitForLoadState("domcontentloaded");
-    tester.isGoingTo("Add Jacl Coles into the group via the manage group page");
-    await page.getByTestId("sbx-pop-out-tab-control").click(); // clicking the homepage 3-dot menu
+    tester.isGoingTo("Add Jack Coles into the group via the manage group page");
+    await page.getByTestId("sbx-pop-out-tab-control-button").click(); // clicking the homepage 3-dot menu
     await page.getByTestId("homepage-actions-folder-manageGroup").click(); // clicking Manage group option
     await page.waitForLoadState("domcontentloaded");
     await manageGroup.search(teacher);
@@ -162,7 +161,6 @@ test.describe("Lesson Plan Activity", () => {
     test("Create Lesson Plan", async ({ tester, page, db }) => {
         const courseModify = new CourseModify(page);
         const templateList = new TemplateList(tester, page);
-        const common = new Common(page);
         const createLessonPlan = new CreateLessonPlan(tester, page);
         // const createLessonPlanTemplate = new CreateLessonPlanTemplate(page, tester);
         const templateName = "Automation Template to create a lesson plan";
@@ -187,7 +185,7 @@ test.describe("Lesson Plan Activity", () => {
             title: templateName,
         })) as number;
         await templateList.clickTemplateLink(lessonPlanTemplateId);
-        await common.clickSubmitButton();
+        await tester.common.clickSubmitButton();
         await createLessonPlan.typeName(lessonPlanName);
         await createLessonPlan.clickCreateButton();
         tester.isGoingTo("check if the lesson plan is presented");

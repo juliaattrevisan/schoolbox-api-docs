@@ -1,4 +1,5 @@
 import type AcceptanceTester from "@schoolboxTest/playwright/support/AcceptanceTester";
+import { expect } from "@playwright/test";
 import type { Page } from "@playwright/test";
 
 export default class Calendar {
@@ -83,6 +84,7 @@ export default class Calendar {
     async clickCreateEvent(): Promise<void> {
         await this.page.waitForTimeout(3000);
         await this.page.getByTestId(Calendar.DATA_TEST_DIALOG_CREATE_BUTTON).click();
+        await expect(this.page.getByTestId("toast")).toContainText("Created");
     }
 
     /**

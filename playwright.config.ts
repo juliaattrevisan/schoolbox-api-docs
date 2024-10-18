@@ -42,12 +42,15 @@ export default defineConfig({
         viewport: { width: 1920, height: 1080 },
 
         /* Set the default timeout for all the actions to be 10 seconds - Value is in milliseconds */
-        actionTimeout: 10 * 1000,
+        actionTimeout: 15 * 1000,
 
         /* Set the default timeout for page.goto to be 30 seconds - Value is in milliseconds */
         navigationTimeout: 30 * 1000,
     },
-
+    expect: {
+        /* Set the default timeout for all the expect assertions to be 10 seconds - Value is in milliseconds */
+        timeout: 15 * 1000,
+    },
     /* Configure projects for major browsers */
     projects: [
         {

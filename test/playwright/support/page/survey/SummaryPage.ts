@@ -1,3 +1,4 @@
+import { expect } from "@playwright/test";
 import type { Page } from "@playwright/test";
 
 export default class SummaryPage {
@@ -15,7 +16,6 @@ export default class SummaryPage {
      */
     async goto(assessId: number): Promise<void> {
         await this.page.goto(SummaryPage.generateRoute(assessId));
-        await this.page.waitForTimeout(2000);
     }
 
     /**
@@ -48,7 +48,7 @@ export default class SummaryPage {
     async clickAddFromQuestionBank(sectionId: number): Promise<void> {
         await this.page.click(`[data-test=sbx-pop-out-section${sectionId}-options]`);
         await this.page.click(`#section${sectionId}-options a.icon-download`);
-        await this.page.locator(`h2.subheader:has-text("Categories")`).isVisible({ timeout: 30000 });
+        await expect(this.page.locator(`h2.subheader:has-text("Categories")`)).toBeVisible();
     }
 
     /**
@@ -58,6 +58,6 @@ export default class SummaryPage {
     async clickNewQuestion(sectionId: number): Promise<void> {
         await this.page.click(`[data-test=sbx-pop-out-section${sectionId}-options]`);
         await this.page.click(`#section${sectionId}-options a.icon-add`);
-        await this.page.locator(`h2.subheader:has-text("Create Question")`).isVisible({ timeout: 30000 });
+        await expect(this.page.locator(`h2.subheader:has-text("Create Question")`)).toBeVisible();
     }
 }
