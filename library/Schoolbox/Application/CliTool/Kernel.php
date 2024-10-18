@@ -121,6 +121,13 @@ class Kernel extends CliKernelAbstract
                 exit(self::EXIT_STATUS_KERNEL_ERROR);
             }
         }
+
+        // Instrument here
+        $this->sentryTransactionManager->startTransactionFromCommandLineTool(
+            getcwd() . '/' . $_SERVER['SCRIPT_FILENAME'],
+            $_SERVER,
+        );
+
         $perform = $forcePerform || $this->getKernelOpt(self::OPT_SHORT_PERFORM) || $this->getKernelOpt(self::OPT_LONG_PERFORM);
         $this->app->setup($this->appOpts, $this->getDependencyInjector(), $this->outStream, $this->logger(), $perform);
         $this->app->run();
