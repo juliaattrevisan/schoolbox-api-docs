@@ -58,10 +58,7 @@ class Manager
      * @param string                 $name           The transaction's name: this should be something which describes
      *                                               the request which spawned the transaction, e.g. a route name or
      *                                               request URI.
-     * @param string|null            $description    A description of the transaction: e.g. a database query,
-     *                                               route name, request URL.
-     *                                               Neither the Laravel nor Symfony implementations seem to set a
-     *                                               transaction description, only its name.
+     *                                               This is also used as the auto-started transaction's description.
      * @param string|null            $operation      The operation which the transaction is tracking: see
      *                                               https://develop.sentry.dev/sdk/telemetry/traces/span-operations/
      *                                               for standard examples.
@@ -83,7 +80,6 @@ class Manager
      */
     public function startTransaction(
         string $name,
-        ?string $description = null,
         ?string $operation = null,
         ?string $origin = null,
         ?TransactionSource $source = null,
@@ -96,7 +92,6 @@ class Manager
 
         $transactionContext = new TransactionContext();
         $transactionContext->setName($name);
-        $transactionContext->setDescription($description);
         $transactionContext->setOp($operation);
         $transactionContext->setOrigin($origin);
         if ($source) {

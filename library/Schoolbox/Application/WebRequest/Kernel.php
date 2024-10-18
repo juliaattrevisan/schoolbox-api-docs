@@ -248,7 +248,6 @@ class Kernel extends WebKernelAbstract
         // Track this thing
         $this->sentryTransactionManager->startTransaction(
             $route->name,
-            null,
             'http.server',
             'auto.http.server',
             TransactionSource::route(),
@@ -471,7 +470,6 @@ class Kernel extends WebKernelAbstract
 
         $this->sentryTransactionManager->startTransaction(
             $pageName,
-            null,
             'http.server',
             'auto.http.server',
             TransactionSource::url(),
