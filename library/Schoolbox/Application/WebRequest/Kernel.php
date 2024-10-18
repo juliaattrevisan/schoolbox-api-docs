@@ -248,11 +248,7 @@ class Kernel extends WebKernelAbstract
         // Track this thing
         /** @var ServerRequestInterface $request */
         $request = $this->di->get('httpRequest');
-        $this->sentryTransactionManager->startTransactionFromHttpRequest(
-            'aura:' . $route->name,
-            TransactionSource::route(),
-            $request->getServerParams(),
-        );
+        $this->sentryTransactionManager->startTransactionFromAuraRoute($route->name, $request->getServerParams());
 
         // The route name's format:
         // "[controllerName].[action](:[label])"

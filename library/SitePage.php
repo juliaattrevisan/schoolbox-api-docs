@@ -164,19 +164,11 @@ class SitePage
 
             // Start Sentry transaction here, now there's a path to include
             if (is_file(WEB_root . '/' . $filename . '.php') && $execute) {
-                $sentryTransactionManager->startTransactionFromHttpRequest(
-                    'sitepage:' . $filename . '.php',
-                    TransactionSource::url(),
-                    $_SERVER,
-                );
+                $sentryTransactionManager->startTransactionFromSitePage(WEB_root . '/' . $filename . '.php', $_SERVER);
                 include WEB_root . '/' . $filename . '.php';
                 return true;
             } elseif (is_file(WEB_root . '/' . $filename . '/index.php') && $execute) {
-                $sentryTransactionManager->startTransactionFromHttpRequest(
-                    'sitepage:' . $filename . '/index.php',
-                    TransactionSource::url(),
-                    $_SERVER,
-                );
+                $sentryTransactionManager->startTransactionFromSitePage(WEB_root . '/' . $filename . '/index.php', $_SERVER);
                 include WEB_root . '/' . $filename . '/index.php';
                 return true;
             }

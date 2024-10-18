@@ -592,16 +592,6 @@ class Kernel extends WebKernelAbstract
      */
     public function startSentryTransaction(string $path): void
     {
-        $this->sentryTransactionManager->startTransaction(
-            'basicRequest:' . trim(str_replace(WEB_root, '', $path), '/'),
-            'http.server',
-            'auto.http.server',
-            TransactionSource::url(),
-            $_SERVER['REQUEST_TIME_FLOAT'],
-            [
-                'url'                 => $_SERVER['REQUEST_URI'],
-                'http.request.method' => $_SERVER['REQUEST_METHOD'],
-            ],
-        );
+        $this->sentryTransactionManager->startTransactionFromBasicRequest($path, $_SERVER);
     }
 }

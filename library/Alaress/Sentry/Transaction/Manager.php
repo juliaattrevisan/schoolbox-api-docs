@@ -117,31 +117,115 @@ class Manager
     }
 
     /**
-     * Helper function for creating a transaction for a HTTP request which this
-     * request is serving.
+     * Helper function for creating a transaction which this request is serving,
+     * which maps to an Aura route.
      *
-     * @param string                 $name       The transaction's name.
-     * @param TransactionSource|null $source     The source of the name.
-     * @param array                  $serverVars `$_SERVER` superglobal: used to
-     *                                           set request time/URI/method.
+     * @param string $route      The name of the Aura route.
+     * @param array  $serverVars `$_SERVER` superglobal: used to set request
+     *                           time/URI/method.
      * @return void
      */
-    public function startTransactionFromHttpRequest(
-        string $name,
-        ?TransactionSource $source,
-        array $serverVars,
-    ): void {
+    public function startTransactionFromAuraRoute(string $route, array $serverVars): void
+    {
         $this->startTransaction(
-            $name,
+            'aura:' . $route,
             'http.server',
-            'auto.http.server',
-            $source,
+            'auto.http.aura',
+            TransactionSource::route(),
             $serverVars['REQUEST_TIME_FLOAT'] ?? null,
             [
                 'url'                 => $serverVars['REQUEST_URI'] ?? null,
                 'http.request.method' => $serverVars['REQUEST_METHOD'] ?? null,
             ],
         );
+    }
+
+    /**
+     * Helper function for creating a transaction which this request is serving,
+     * which maps to a filename served by SitePage.
+     *
+     * @param string $filename   The path of the filename being served: either a
+     *                           full path, or the path relative to the site
+     *                           root.
+     * @param array  $serverVars `$_SERVER` superglobal: used to set request
+     *                           time/URI/method.
+     * @return void
+     */
+    public function startTransactionFromSitePage(string $filename, array $serverVars): void
+    {
+        $this->startTransaction(
+            'sitePage:' . self::normaliseFilename($filename),
+            'http.server',
+            'auto.http.sitePage',
+            TransactionSource::url(),
+            $serverVars['REQUEST_TIME_FLOAT'] ?? null,
+            [
+                'url'                 => $serverVars['REQUEST_URI'] ?? null,
+                'http.request.method' => $serverVars['REQUEST_METHOD'] ?? null,
+            ],
+        );
+    }
+
+    /**
+     * Helper function for creating a transaction which this request is serving,
+     * which maps to a filename served by the basic request kernel.
+     *
+     * @param string $filename   The path of the filename being served: either a
+     *                           full path, or the path relative to the site
+     *                           root.
+     * @param array  $serverVars `$_SERVER` superglobal: used to set request
+     *                           time/URI/method.
+     * @return void
+     */
+    public function startTransactionFromBasicRequest(string $filename, array $serverVars): void
+    {
+        $this->startTransaction(
+            'basicRequest:' . self::normaliseFilename($filename),
+            'http.server',
+            'auto.http.basicRequest',
+            TransactionSource::url(),
+            $serverVars['REQUEST_TIME_FLOAT'] ?? null,
+            [
+                'url'                 => $serverVars['REQUEST_URI'] ?? null,
+                'http.request.method' => $serverVars['REQUEST_METHOD'] ?? null,
+            ],
+        );
+    }
+
+    /**
+     * Helper function for creating a transaction for an invocation of a command
+     * line tool.
+     *
+     * @param string $filename   The full path of the file being invoked.
+     * @param array  $serverVars `$_SERVER` superglobal: used to set request
+     *                           time/URI/method.
+     * @return void
+     */
+    public function startTransactionFromCommandLineTool(string $filename, array $serverVars): void
+    {
+        $this->startTransaction(
+            'cli:' . self::normaliseFilename($filename),
+            'console.command',
+            'auto.console',
+            TransactionSource::task(),
+            $serverVars['REQUEST_TIME_FLOAT'] ?? null,
+            [
+                'url'                 => $serverVars['REQUEST_URI'] ?? null,
+                'http.request.method' => $serverVars['REQUEST_METHOD'] ?? null,
+            ],
+        );
+    }
+
+    /**
+     * Normalises a full filename path for use in a transaction name, by
+     * stripping away the site root.
+     *
+     * @param string $filename
+     * @return string
+     */
+    private static function normaliseFilename(string $filename): string
+    {
+        return trim(str_replace(SITE_root, '', $filename), '/');
     }
 
     /**
