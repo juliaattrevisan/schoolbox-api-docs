@@ -12,7 +12,10 @@ interface Props {
 }
 const props = defineProps<Props>();
 
-const selectedItems = window.Vue.ref<Course[]>([]);
+const selectedItems = window.Vue.ref<Course[]>([
+    { id: 1, name: "Course 1" },
+    { id: 2, name: "Course 2" },
+]);
 
 window.Vue.watch(selectedItems, (newValue) => {
     console.warn("Selected Items: ", newValue.length);

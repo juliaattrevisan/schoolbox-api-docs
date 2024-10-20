@@ -49,8 +49,10 @@ export function useSelected($selected: ModelRef<Item[]> | undefined): {
             const exists = selected.value.find((selectedItem) => selectedItem.id === itemToAdd.id); // check if the item already exists, preventing duplicates
             if (!exists) {
                 selected.value = [...selected.value, itemToAdd];
+                console.warn("Adding: ", selected.value);
             }
         });
+        console.warn("Adding: ", selected.value);
     }
 
     /**

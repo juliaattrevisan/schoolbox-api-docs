@@ -17,7 +17,6 @@ interface Props {
     labelId: string; // the label id
     isRequired?: boolean; // whether the input requires a value
     endpoint: string; // the search api endpoint
-    // selectedItems: SearchSelectItem[]; // the selected searchResults
     defaultResults?: SearchSelectItem[]; // show selection options when the search input is empty
     isSingleSelect?: boolean; // whether only one result can be selected
     formValueName?: string; // the name of the form value
