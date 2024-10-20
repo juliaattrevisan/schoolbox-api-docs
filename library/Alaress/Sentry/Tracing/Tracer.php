@@ -19,21 +19,37 @@ use Sentry\Tracing\TransactionSource;
  * Defines a set of static methods for starting transactions and their stack,
  * and flushing them to Sentry.
  *
- * This won't push them just yet.
+ * This won't push them until `finishTransaction` is called.
  */
 class Tracer
 {
     /**
+     * Singleton instance of the default trace to use.
+     */
+    private static ?Tracer $defaultTrace = null;
+
+    /**
      * The current transaction context, if there is one.
      */
-    private static ?TransactionContext $transactionContext = null;
+    private ?TransactionContext $transactionContext = null;
 
     /**
      * A set of stack changes, updated with `startSpan` and `finishSpan`.
      *
      * @var array<Operation\Pop|Operation\Push>
      */
-    private static array $stackChanges = [];
+    private array $stackChanges = [];
+
+    /**
+     * Build and return the default trace object.
+     *
+     * @return self
+     */
+    public static function getDefaultTrace(): self
+    {
+        self::$defaultTrace ??= new Tracer();
+        return self::$defaultTrace;
+    }
 
     /**
      * Create a new transaction context, and add it to the internal stack.
@@ -63,7 +79,7 @@ class Tracer
      *                                               for standard examples.
      * @return TransactionContext
      */
-    public static function startTransaction(
+    public function startTransaction(
         string $name,
         ?string $operation = null,
         ?string $origin = null,
@@ -83,8 +99,8 @@ class Tracer
         $transactionContext->setData($data);
 
         // Clear the current transaction state, before setting a new one.
-        self::$stackChanges       = [];
-        self::$transactionContext = $transactionContext;
+        $this->stackChanges       = [];
+        $this->transactionContext = $transactionContext;
         return $transactionContext;
     }
 
@@ -112,7 +128,7 @@ class Tracer
      *                                    for standard examples.
      * @return SpanContext
      */
-    public static function startSpan(
+    public function startSpan(
         string $description,
         ?string $operation = null,
         ?string $origin = null,
@@ -126,7 +142,7 @@ class Tracer
         $spanContext->setStartTimestamp($startTimestamp ?? microtime(true));
         $spanContext->setData($data);
 
-        self::$stackChanges[] = new Operation\Push($spanContext);
+        $this->stackChanges[] = new Operation\Push($spanContext);
         return $spanContext;
     }
 
@@ -139,9 +155,9 @@ class Tracer
      *
      * @return void
      */
-    public static function finishSpan(?float $endTimestamp = null): void
+    public function finishSpan(?float $endTimestamp = null): void
     {
-        self::$stackChanges[] = new Operation\Pop($endTimestamp ?? microtime(true));
+        $this->stackChanges[] = new Operation\Pop($endTimestamp ?? microtime(true));
     }
 
     /**
@@ -155,18 +171,18 @@ class Tracer
      *                                   recorded as having finished.
      * @return void
      */
-    public static function finishTransaction(HubInterface $hub, ?float $endTimestamp = null): void
+    public function finishTransaction(HubInterface $hub, ?float $endTimestamp = null): void
     {
         // Write the transaction and its spans into the hub
-        if (self::$transactionContext instanceof TransactionContext) {
-            $transaction = $hub->startTransaction(self::$transactionContext);
+        if ($this->transactionContext instanceof TransactionContext) {
+            $transaction = $hub->startTransaction($this->transactionContext);
             if (!$transaction->getSampled()) {
                 return;
             }
 
             /** @var array<Span> $spanStack */
             $spanStack = [];
-            foreach (self::$stackChanges as $stackChange) {
+            foreach ($this->stackChanges as $stackChange) {
                 if ($stackChange instanceof Operation\Push) {
                     // Start context in most recently added stack,
                     // or transaction if there is no stack
