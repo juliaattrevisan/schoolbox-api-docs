@@ -3,7 +3,7 @@
  * To search for results with a query and select them
  */
 
-import { useTemplateRef, defineModel } from "vue";
+import { useTemplateRef } from "vue";
 import { useSelected, type Item } from "@schoolboxVue/composables/store/useSelected";
 import { useSearch } from "./composables/useSearch";
 import type { SearchSelectItem } from "./types/searchSelectTypes";
@@ -29,7 +29,7 @@ const props = withDefaults(defineProps<Props>(), {
 });
 
 const selectedItems = defineModel<Item[]>("selected-items", { default: [] }); // to store selected items
-const { add, remove } = useSelected(selectedItems); // to add and remove selected items
+const { add, remove, update } = useSelected(selectedItems); // to add and remove selected items
 
 const searchSelectEl = useTemplateRef("searchSelectEl");
 
@@ -55,9 +55,10 @@ const currentResults = window.Vue.computed(() => {
  * @param $items - the items selected
  */
 function onAdd($items: SearchSelectItem[]): void {
-    // if single select, remove the previous selection
+    // if single select, switch with the previous selection
     if (props.isSingleSelect && selectedItems.value.length > 0) {
-        remove($items);
+        update($items);
+        return;
     }
     add($items);
 }

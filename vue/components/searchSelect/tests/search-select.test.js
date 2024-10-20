@@ -1,6 +1,5 @@
 import { mount } from "@vue/test-utils";
 import { timeout } from "@js/util/jsUtils";
-import { useSelected } from "@schoolboxVue/composables/store/useSelected";
 import SearchSelect from "../search-select.vue";
 import { DEBOUNCE_AMOUNT } from "../composables/useSearch";
 
@@ -29,12 +28,10 @@ test("selected items are visible", async () => {
 test("search results can be added", async () => {
     const itemToAdd = { id: 4, name: "Search result item 1" };
     const mockSearchList = [itemToAdd, { id: 5, name: "Search result item 2" }];
-    const { selected, add } = useSelected();
-    add([{ id: 1, name: "Item 1" }]);
     const wrapper = mount(SearchSelect, {
         props: {
             ...defaultProps,
-            selectedItems: selected.value,
+            selectedItems: [{ id: 1, name: "Item 1" }],
         },
     });
     /**
@@ -50,31 +47,23 @@ test("search results can be added", async () => {
      */
     const searchResult = wrapper.get(`[data-test="search-select-result-checkbox-4"]`);
     searchResult.trigger("click"); // add the search result to the selected items
-    const addEvent = wrapper.emitted("add"); // validate the event has been emitted
-    expect(addEvent[0]).toEqual([[itemToAdd]]); // validate the event has the correct payload
-    add(itemToAdd); // add the result to the selected items
-    await wrapper.setProps({ selectedItems: selected.value }); // update the selected items (this is needed because the prop is apparent not reactive in this context)
+    await wrapper.vm.$nextTick();
     expect(wrapper.findAll('[data-test^="search-select-selected-item-container-"]')).toHaveLength(2); // validate the item has been added to the UI
 
     global.fetch.mockClear();
 });
 
 test("selected items can be removed", async () => {
-    const { selected, add, remove } = useSelected();
     const itemToRemove = { id: 2, name: "Item 2" };
-    add([{ id: 1, name: "Item 1" }, itemToRemove, { id: 3, name: "Item 3" }]);
     const wrapper = mount(SearchSelect, {
         props: {
             ...defaultProps,
-            selectedItems: selected.value,
+            selectedItems: [{ id: 1, name: "Item 1" }, itemToRemove, { id: 3, name: "Item 3" }],
         },
     });
+    expect(wrapper.findAll('[data-test^="search-select-selected-item-container-"]')).toHaveLength(3); // validate the expected number of selected items
     wrapper.get(`[data-test="search-select-selected-item-remove-2"]`).trigger("click");
-    const removeEvent = wrapper.emitted("remove"); // validate the event has been emitted
-    expect(removeEvent[0]).toEqual([[itemToRemove]]); // validate the event has the correct payload
-    remove(itemToRemove); // remove the item from the selected items
-    expect(selected.value).toHaveLength(2); // validate the item has been removed
-    await wrapper.setProps({ selectedItems: selected.value }); // update the selected items (this is needed because the prop is apparent not reactive in this context)
+    await wrapper.vm.$nextTick();
     expect(wrapper.findAll('[data-test^="search-select-selected-item-container-"]')).toHaveLength(2); // validate the item has been removed from the UI
 });
 
@@ -83,12 +72,10 @@ test("select all can be used to add/remove all search results", async () => {
         { id: 4, name: "Search result item 1" },
         { id: 5, name: "Search result item 2" },
     ];
-    const { selected, add, remove } = useSelected();
-    add([{ id: 1, name: "Item 1" }]);
     const wrapper = mount(SearchSelect, {
         props: {
             ...defaultProps,
-            selectedItems: selected.value,
+            selectedItems: [{ id: 1, name: "Item 1" }],
         },
     });
     /**
@@ -104,19 +91,13 @@ test("select all can be used to add/remove all search results", async () => {
      */
     const selectAll = wrapper.get(`[data-test="search-select-select-all"]`);
     selectAll.trigger("click"); // add the search result to the selected items
-    const addEvent = wrapper.emitted("add"); // validate the event has been emitted
-    expect(addEvent[0]).toEqual([mockSearchList]); // validate the event has the correct payload
-    add(mockSearchList); // add the result to the selected items
-    await wrapper.setProps({ selectedItems: selected.value }); // update the selected items (this is needed because the prop is apparent not reactive in this context)
-    expect(wrapper.findAll('[data-test^="search-select-selected-item-container-"]')).toHaveLength(3); // validate the item has been added to the UI
+    await wrapper.vm.$nextTick();
+    expect(wrapper.findAll('[data-test^="search-select-selected-item-container-"]')).toHaveLength(3); // validate the items have been added to the UI
     /**
      * Remove all search results
      */
     selectAll.trigger("click"); // click again to remove the search results from the selected items
-    const removeEvent = wrapper.emitted("remove"); // validate the event has been emitted
-    expect(removeEvent[0]).toEqual([mockSearchList]); // validate the event has the correct payload
-    remove(mockSearchList); // add the result to the selected items
-    await wrapper.setProps({ selectedItems: selected.value }); // update the selected items (this is needed because the prop is apparent not reactive in this context)
+    await wrapper.vm.$nextTick();
     expect(wrapper.findAll('[data-test^="search-select-selected-item-container-"]')).toHaveLength(1); // validate the results have been removed from the UI
 
     global.fetch.mockClear();
@@ -124,12 +105,10 @@ test("select all can be used to add/remove all search results", async () => {
 
 test("select all is not visible when only one search result is found", async () => {
     const mockSearchList = [{ id: 4, name: "Search result item 1" }];
-    const { selected, add } = useSelected();
-    add([{ id: 1, name: "Item 1" }]);
     const wrapper = mount(SearchSelect, {
         props: {
             ...defaultProps,
-            selectedItems: selected.value,
+            selectedItems: [{ id: 1, name: "Item 1" }],
         },
     });
     /**
@@ -187,11 +166,10 @@ test("default results are visible when search is not active", async () => {
 });
 
 test("only one selection allowed when isSingleSelect is true", async () => {
-    const { selected, add, remove } = useSelected();
     const wrapper = mount(SearchSelect, {
         props: {
             ...defaultProps,
-            selectedItems: selected.value,
+            selectedItems: [],
             defaultResults: [
                 { id: 1, name: "Default Item 1" },
                 { id: 2, name: "Default Item 2" },
@@ -205,23 +183,14 @@ test("only one selection allowed when isSingleSelect is true", async () => {
      */
     const searchResult = wrapper.get(`[data-test="search-select-result-radio-1"]`);
     searchResult.trigger("click"); // add the search result to the selected items
-    let addEvent = wrapper.emitted("add"); // validate the event has been emitted
-    expect(addEvent[0]).toEqual([[{ id: 1, name: "Default Item 1" }]]); // validate the event has the correct payload
-    add({ id: 1, name: "Default Item 1" }); // add the result to the selected items
-    await wrapper.setProps({ selectedItems: selected.value }); // update the selected items (this is needed because the prop is apparent not reactive in this context)
+    await wrapper.vm.$nextTick();
     expect(wrapper.findAll('[data-test^="search-select-selected-item-container-"]')).toHaveLength(1); // validate only one selected result
     /**
      * Now choose another search result
      */
     const anotherSearchResult = wrapper.get(`[data-test="search-select-result-radio-2"]`);
     anotherSearchResult.trigger("click"); // add another search result to the selected items
-    const removeEvent = wrapper.emitted("remove"); // validate the remove event has first been emitted
-    expect(removeEvent[0]).toEqual([[{ id: 1, name: "Default Item 1" }]]); // validate the event has the correct payload
-    remove({ id: 1, name: "Default Item 1" }); // remove the first selected item
-    addEvent = wrapper.emitted("add"); // validate the event has been emitted
-    expect(addEvent[1]).toEqual([[{ id: 2, name: "Default Item 2" }]]); // validate the event has the correct payload
-    add({ id: 2, name: "Default Item 2" }); // add the result to the selected items
-    await wrapper.setProps({ selectedItems: selected.value }); // update the selected items (this is needed because the prop is apparent not reactive in this context)
+    await wrapper.vm.$nextTick();
     /**
      * Validate the second item is the only selected item
      */

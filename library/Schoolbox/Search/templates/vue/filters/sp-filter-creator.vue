@@ -14,45 +14,17 @@ const currentUser: Creator = {
     id: window.schoolboxUser.id,
     name: window.schoolboxUser.name,
 };
-
-/**
- * We only allow one creator to be selected at a time,
- * so only select a result if there isn't one already selected
- * or unselect the current result if it's already selected
- * @param items - the items selected
- */
-function onAdded(items: SearchSelectItem[]): void {
-    const result = items[0];
-    if (!filterCreatorsStore.isActive) {
-        filterCreatorsStore.creator.push(result as Creator);
-        return;
-    }
-    if (result.id === filterCreatorsStore.creator[0].id) {
-        filterCreatorsStore.clear();
-    }
-}
-
-/**
- * Remove the result, as we only allow one creator to be selected at a time
- * we can simply just clear the store
- */
-function onRemoved(): void {
-    filterCreatorsStore.clear();
-}
 </script>
-<section></section>
 <template>
     <div class="l-flex-col">
         <search-select
+            v-model:selected-items="filterCreatorsStore.creator"
             label="Creator"
             label-id="creator"
             endpoint="/ajax/user.php?groupID=0&query="
-            :selected-items="filterCreatorsStore.creator"
             :is-single-select="true"
             :default-results="[currentUser as SearchSelectItem]"
             placeholder="Search for users..."
-            @add="onAdded"
-            @remove="onRemoved"
         />
     </div>
 </template>
