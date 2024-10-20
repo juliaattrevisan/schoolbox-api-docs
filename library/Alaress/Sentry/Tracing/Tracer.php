@@ -23,27 +23,46 @@ use Sentry\Tracing\TransactionSource;
  */
 class Tracer
 {
-//    private ?TransactionContext $transactionContext = null;
-//
-//    /**
-//     * @var array{
-//     *     span: SpanContext,
-//     *     children:
-//     * }
-//     */
-//    private static array $spans;
-
-    public static ?SpanContainer $transactionContainer = null;
-
-    public static ?SpanContainer $currentSpanContainer = null;
-
+    /**
+     * The current transaction context, if there is one.
+     */
     private static ?TransactionContext $transactionContext = null;
 
     /**
+     * A set of stack changes, updated with `startSpan` and `finishSpan`.
+     *
      * @var array<Operation\Pop|Operation\Push>
      */
     private static array $stackChanges = [];
 
+    /**
+     * Create a new transaction context, and add it to the internal stack.
+     *
+     * This will only be added to Sentry when `finishTransaction` is called.
+     *
+     * This should only be called when a new request is created and handled, as
+     * a transaction represents a single request to a service: see
+     * https://docs.sentry.io/concepts/key-terms/tracing/distributed-tracing/#traces-transactions-and-spans.
+     *
+     * @param string                 $name           The transaction's name: this should be something which describes
+     *                                               the request which spawned the transaction, e.g. a route name or
+     *                                               request URI.
+     *                                               This is also used as the auto-started transaction's description.
+     * @param string|null            $operation      The operation which the transaction is tracking: see
+     *                                               https://develop.sentry.dev/sdk/telemetry/traces/span-operations/
+     *                                               for standard examples.
+     * @param string|null            $origin         The action which created the transaction: see
+     *                                               https://develop.sentry.dev/sdk/telemetry/traces/trace-origin/
+     *                                               for how this value may be created.
+     * @param TransactionSource|null $source         How the transaction's name was generated.
+     * @param float|null             $startTimestamp When the transaction is to be recorded as having started:
+     *                                               usually, this will be the start time of the request, i.e.
+     *                                               `$_SERVER['REQUEST_TIME_FLOAT']`.
+     * @param array                  $data           Additional data to add to the transaction: see
+     *                                               https://develop.sentry.dev/sdk/telemetry/traces/span-data-conventions/
+     *                                               for standard examples.
+     * @return TransactionContext
+     */
     public static function startTransaction(
         string $name,
         ?string $operation = null,
@@ -52,10 +71,6 @@ class Tracer
         ?float $startTimestamp = null,
         array $data = [],
     ): TransactionContext {
-        // Clear the current transaction, I guess?
-//        self::$transactionContainer = null;
-//        self::$currentSpanContainer = null;
-        self::$stackChanges = [];
 
         $transactionContext = new TransactionContext();
         $transactionContext->setName($name);
@@ -67,15 +82,36 @@ class Tracer
         $transactionContext->setStartTimestamp($startTimestamp ?? microtime(true));
         $transactionContext->setData($data);
 
-        // Put this transaction context somewhere,
-        // so it can be found with startSpan
-//        self::$transactionContainer = new SpanContainer($transactionContext, null);
-//        self::$currentSpanContainer = self::$transactionContainer;
-
+        // Clear the current transaction state, before setting a new one.
+        self::$stackChanges       = [];
         self::$transactionContext = $transactionContext;
         return $transactionContext;
     }
 
+    /**
+     * Start a new span.
+     *
+     * This span will be created within the last started span, or the
+     * transaction itself if it does not exist.
+     *
+     * If the transaction does not exist at all (because it is not yet created,
+     * or it was created but is not being sampled), this does nothing.
+     *
+     * @param string      $description    A description of the span: e.g. a database query, route name, request URL.
+     * @param string|null $operation      The operation which the span is tracking: see
+     *                                    https://develop.sentry.dev/sdk/telemetry/traces/span-operations/
+     *                                    for standard examples.
+     * @param string|null $origin         The action which created the span: see
+     *                                    https://develop.sentry.dev/sdk/telemetry/traces/trace-origin/
+     *                                    for how this value may be created.
+     * @param float|null  $startTimestamp When the span is to be recorded as having started:
+     *                                    usually, this will be the start time of the request, i.e.
+     *                                    `$_SERVER['REQUEST_TIME_FLOAT']`.
+     * @param array       $data           Additional data to add to the span: see
+     *                                    https://develop.sentry.dev/sdk/telemetry/traces/span-data-conventions/
+     *                                    for standard examples.
+     * @return SpanContext
+     */
     public static function startSpan(
         string $description,
         ?string $operation = null,
@@ -91,34 +127,42 @@ class Tracer
         $spanContext->setData($data);
 
         self::$stackChanges[] = new Operation\Push($spanContext);
-
-//        // Put this into the current span container
-//        $spanContainer = new SpanContainer($spanContext, self::$currentSpanContainer);
-//
-//        // This should update the child context within the parent as well?
-//        self::$currentSpanContainer->addChildContext($spanContext);
-//
-//        self::$currentSpanContainer = $spanContainer;
-
         return $spanContext;
     }
 
+    /**
+     * Finish any existing span, reverting the Sentry hub back to tracking the
+     * current transaction.
+     *
+     * @param float|null $endTimestamp When the span is to be recorded as having
+     *                                 finished.
+     *
+     * @return void
+     */
     public static function finishSpan(?float $endTimestamp = null): void
     {
-        // Find span from current container, set its end timestamp
         self::$stackChanges[] = new Operation\Pop($endTimestamp ?? microtime(true));
-
-//        self::$currentSpanContainer?->spanContext->setEndTimestamp($endTimestamp ?? microtime(true));
-//
-//        // Set the current container back to the parent of the current container
-//        self::$currentSpanContainer = self::$currentSpanContainer?->parent;
     }
 
+    /**
+     * Finish any existing transaction, if there is one, and writes its trace to
+     * the Sentry hub.
+     *
+     * Also finishes any spans which may still be open.
+     *
+     * @param HubInterface $hub          The Sentry hub to write the trace to.
+     * @param float|null   $endTimestamp When the transactions is to be
+     *                                   recorded as having finished.
+     * @return void
+     */
     public static function finishTransaction(HubInterface $hub, ?float $endTimestamp = null): void
     {
         // Write the transaction and its spans into the hub
         if (self::$transactionContext instanceof TransactionContext) {
             $transaction = $hub->startTransaction(self::$transactionContext);
+            if (!$transaction->getSampled()) {
+                return;
+            }
 
             /** @var array<Span> $spanStack */
             $spanStack = [];
@@ -145,12 +189,14 @@ class Tracer
                 }
             }
 
-//            // End any remaining spans?
-//            while (!empty($spanStack)) {
-//                $leftoverSpan = array_pop($spanStack);
-//            }
+            // End any leftover spans?
+            $endTimestamp ??= microtime(true);
+            while (!empty($spanStack)) {
+                $leftoverSpan = array_pop($spanStack);
+                $leftoverSpan->finish($endTimestamp);
+            }
 
-            $transaction->finish($endTimestamp ?? microtime(true));
+            $transaction->finish($endTimestamp);
         }
     }
 }
