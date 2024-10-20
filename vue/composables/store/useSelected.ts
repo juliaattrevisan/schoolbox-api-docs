@@ -3,18 +3,19 @@
  * Items are uniquely identified by their id
  */
 
-import type { Ref, ComputedRef } from "vue";
+import type { Ref, ModelRef, ComputedRef } from "vue";
 
-type Item = {
+export type Item = {
     id: number;
     name: string;
 };
 
 /**
  * To manage the state of a selected items list
+ * @param $selected - to pass in a reference to the selected list
  * @returns - selected, isEmpty, hasItems, add, remove, update, empty
  */
-export function useSelected(): {
+export function useSelected($selected: ModelRef<Item[]> | undefined): {
     selected: Ref<Item[]>;
     isEmpty: ComputedRef<boolean>;
     hasItems: ComputedRef<boolean>;
@@ -23,7 +24,7 @@ export function useSelected(): {
     update: (updated: Item[]) => void;
     empty: () => void;
 } {
-    const selected = window.Vue.ref<Item[]>([]); // the items selected
+    const selected = $selected === undefined ? window.Vue.ref<Item[]>([]) : $selected; // create a new selected list if one is not passed in
     const isEmpty = window.Vue.computed(() => selected.value.length === 0); // whether the selected list is empty
     const hasItems = window.Vue.computed(() => selected.value.length > 0); // whether the selected list has items
 

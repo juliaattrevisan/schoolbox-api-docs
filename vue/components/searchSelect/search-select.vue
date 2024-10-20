@@ -3,7 +3,9 @@
  * To search for results with a query and select them
  */
 
-import { useTemplateRef } from "vue";
+import { useTemplateRef, defineModel } from "vue";
+// import type { Ref } from "vue";
+import { useSelected, type Item } from "@schoolboxVue/composables/store/useSelected";
 import { useSearch } from "./composables/useSearch";
 import type { SearchSelectItem } from "./types/searchSelectTypes";
 import SsSelectedList from "./ss-selected-list.vue";
@@ -15,7 +17,7 @@ interface Props {
     labelId: string; // the label id
     isRequired?: boolean; // whether the input requires a value
     endpoint: string; // the search api endpoint
-    selectedItems: SearchSelectItem[]; // the selected searchResults
+    // selectedItems: SearchSelectItem[]; // the selected searchResults
     defaultResults?: SearchSelectItem[]; // show selection options when the search input is empty
     isSingleSelect?: boolean; // whether only one result can be selected
     formValueName?: string; // the name of the form value
@@ -28,14 +30,12 @@ const props = withDefaults(defineProps<Props>(), {
     placeholder: "Search...",
 });
 
-const emit = defineEmits<{
-    add: [items: SearchSelectItem[]];
-    remove: [items: SearchSelectItem[]];
-}>();
-
 const searchSelectEl = useTemplateRef("searchSelectEl");
 
 const { query, isActive, isSearching, hasNoResults, results } = useSearch(props.endpoint);
+
+const selectedItems = defineModel<Item[]>("selected-items", { default: [] });
+const { add, remove } = useSelected(selectedItems);
 
 /**
  * To show the current search results, or the default results
@@ -58,10 +58,10 @@ const currentResults = window.Vue.computed(() => {
  */
 function onAdd($items: SearchSelectItem[]): void {
     // if single select, remove the previous selection
-    if (props.isSingleSelect && props.selectedItems.length > 0) {
-        emit("remove", props.selectedItems);
+    if (props.isSingleSelect && selectedItems.value.length > 0) {
+        remove($items);
     }
-    emit("add", $items);
+    add($items);
 }
 
 /**
@@ -69,7 +69,7 @@ function onAdd($items: SearchSelectItem[]): void {
  * @param $items - the items deselected
  */
 function onRemove($items: SearchSelectItem[]): void {
-    emit("remove", $items);
+    remove($items);
 }
 
 /**
@@ -85,7 +85,7 @@ function onInput($query: string): void {
     <div ref="searchSelectEl">
         <label :for="props.labelId" :class="`${props.isRequired ? 'required' : ''}`">{{ props.label }}</label>
         <ss-selected-list
-            :selected-items="props.selectedItems"
+            :selected-items="selectedItems"
             :form-value-name="props.formValueName"
             :is-single-select="props.isSingleSelect"
             @remove="onRemove"

@@ -4,9 +4,7 @@
  */
 
 import SearchSelect from "@schoolboxVue/components/searchSelect/search-select.vue";
-import { useSelected } from "@schoolboxVue/composables/store/useSelected";
 import type { Course } from "@schoolboxLibrary/types/Course";
-import type { SearchSelectItem } from "@schoolboxVue/components/searchSelect/types/searchSelectTypes";
 
 interface Props {
     endpoint: string; // The course api endpoint
@@ -14,34 +12,20 @@ interface Props {
 }
 const props = defineProps<Props>();
 
-const { selected, add, remove } = useSelected();
+const selectedItems = window.Vue.ref<Course[]>([]);
 
-/**
- * Add items
- * @param items - the items to add
- */
-function onAdd(items: SearchSelectItem[]): void {
-    add(items);
-}
-
-/**
- * Remove items
- * @param items - the items to remove
- */
-function onRemove(items: SearchSelectItem[]): void {
-    remove(items);
-}
+window.Vue.watch(selectedItems, (newValue) => {
+    console.warn("Selected Items: ", newValue.length);
+});
 </script>
 
 <template>
     <search-select
+        v-model:selected-items="selectedItems"
         label="Select Courses"
         label-id="courses"
         :is-required="true"
         :endpoint="props.endpoint"
-        :selected-items="selected"
-        @add="onAdd"
-        @remove="onRemove"
     />
 </template>
 
