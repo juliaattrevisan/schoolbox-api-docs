@@ -4,7 +4,6 @@
  */
 
 import { useTemplateRef, defineModel } from "vue";
-// import type { Ref } from "vue";
 import { useSelected, type Item } from "@schoolboxVue/composables/store/useSelected";
 import { useSearch } from "./composables/useSearch";
 import type { SearchSelectItem } from "./types/searchSelectTypes";
@@ -29,12 +28,12 @@ const props = withDefaults(defineProps<Props>(), {
     placeholder: "Search...",
 });
 
+const selectedItems = defineModel<Item[]>("selected-items", { default: [] }); // to store selected items
+const { add, remove } = useSelected(selectedItems); // to add and remove selected items
+
 const searchSelectEl = useTemplateRef("searchSelectEl");
 
-const { query, isActive, isSearching, hasNoResults, results } = useSearch(props.endpoint);
-
-const selectedItems = defineModel<Item[]>("selected-items", { default: [] });
-const { add, remove } = useSelected(selectedItems);
+const { query, isActive, isSearching, hasNoResults, results } = useSearch(props.endpoint); // to search for results
 
 /**
  * To show the current search results, or the default results

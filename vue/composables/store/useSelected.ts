@@ -3,7 +3,7 @@
  * Items are uniquely identified by their id
  */
 
-import type { Ref, ModelRef, ComputedRef } from "vue";
+import type { Ref, ComputedRef } from "vue";
 
 export type Item = {
     id: number;
@@ -12,10 +12,10 @@ export type Item = {
 
 /**
  * To manage the state of a selected items list
- * @param $selected - to pass in a reference to the selected list
+ * @param $selected - to optionally pass in a reference to the selected list
  * @returns - selected, isEmpty, hasItems, add, remove, update, empty
  */
-export function useSelected($selected: ModelRef<Item[]> | undefined): {
+export function useSelected($selected: Ref<Item[]> | undefined = undefined): {
     selected: Ref<Item[]>;
     isEmpty: ComputedRef<boolean>;
     hasItems: ComputedRef<boolean>;
@@ -33,10 +33,12 @@ export function useSelected($selected: ModelRef<Item[]> | undefined): {
      * @param toRemove - the item or items to remove from the selected list
      */
     function remove(toRemove: Item | Item[]): void {
+        let currentSelected = selected.value; // get the current selected list to modify
         const itemsToRemove = Array.isArray(toRemove) ? toRemove : [toRemove];
         itemsToRemove.forEach((itemToRemove) => {
-            selected.value = selected.value.filter((selectedItem) => selectedItem.id !== itemToRemove.id);
+            currentSelected = currentSelected.filter((selectedItem) => selectedItem.id !== itemToRemove.id);
         });
+        selected.value = [...currentSelected]; // update the selected list
     }
 
     /**
@@ -44,15 +46,15 @@ export function useSelected($selected: ModelRef<Item[]> | undefined): {
      * @param toAdd - the item or items to add to the selected list
      */
     function add(toAdd: Item | Item[]): void {
+        let currentSelected = selected.value; // get the current selected list to modify
         const itemsToAdd = Array.isArray(toAdd) ? toAdd : [toAdd];
         itemsToAdd.forEach((itemToAdd) => {
             const exists = selected.value.find((selectedItem) => selectedItem.id === itemToAdd.id); // check if the item already exists, preventing duplicates
             if (!exists) {
-                selected.value = [...selected.value, itemToAdd];
-                console.warn("Adding: ", selected.value);
+                currentSelected = [...currentSelected, itemToAdd];
             }
         });
-        console.warn("Adding: ", selected.value);
+        selected.value = [...currentSelected]; // update the selected list
     }
 
     /**
