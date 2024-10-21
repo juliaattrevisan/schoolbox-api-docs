@@ -65,7 +65,7 @@ class DefaultSettingsTool extends CliTool\App
 
 Profile Editor Default Availability/Visibility
 
-Adds some default settings for the availability and visibility checkboxes that are 
+Adds some default settings for the availability and visibility checkboxes that are
 as close to the original profile's settings as I can infer.
 
 Usage: php profileEditorDefaults.php -vvv --perform
@@ -709,15 +709,12 @@ HELP;
 
 
     /**
-     * FIXME Decide whether this script must be run as root
-     *  By default, this returns false (see CliTool\App) but if you're using methods that require
-     *  access to special folders (such as when you're creating files) you need to run this as root.
-     *  Otherwise it'll fail with a generic error that might mislead you
+     * Does not require special file permissions
      *
      * @return bool|null
      */
     public function runAsRoot(): ?bool
     {
-        return false;
+        return null;
     }
 }
