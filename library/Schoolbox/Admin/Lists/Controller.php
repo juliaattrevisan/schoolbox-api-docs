@@ -153,6 +153,7 @@ class Controller extends Base
      * @return void
      * @throws Deleted
      * @throws MapperException
+     * @throws RouteNotFound
      * @since    160
      * @api      /adminv2/lists/save
      */
@@ -173,29 +174,30 @@ class Controller extends Base
     // Private functions ---------------------------------------------------------------------------------------------//
 
     /**
-     * @param string $tableKey
+     * @param string $table
      * @return void
      * @throws Deleted
      * @throws MapperException
+     * @throws RouteNotFound
      */
-    private function postSaveSlave(string $tableKey): void
+    private function postSaveSlave(string $table): void
     {
         $tableData = $this->getTableData();
 
         // Check for incorrect URLs
-        if (!isset($tableData[$tableKey])) {
+        if (!isset($tableData[$table])) {
             $this->response = $this->responseEmpty(404);
             return;
         }
 
         // Reformat to rows to field -> values
         if ($this->requestPost['rows']) {
-            $fieldValues = $this->processRows($tableData[$tableKey]['fields'], $this->requestPost['rows']);
+            $fieldValues = $this->processRows($tableData[$table]['fields'], $this->requestPost['rows']);
         } else {
             $fieldValues = $this->requestPost;
         }
 
-        $mapper_name     = $tableData[$tableKey]['mapper'];
+        $mapper_name     = $tableData[$table]['mapper'];
 
         /** @var Mapper $mapper */
         $mapper = $this->mapperFactory->get($mapper_name);
@@ -302,7 +304,9 @@ class Controller extends Base
             return;
         }
 
-        $this->response = $this->redirectAfterPost('/adminv2/lists/' . $this->requestPost["table"]);
+        $redirectUrlTemplate = $this->routeGenerator->generate('adminLists.get' . $this->getListCategory($table) . 'Index');
+
+        $this->response = $this->redirectAfterPost(str_replace('{table}', $table, $redirectUrlTemplate));
     }
 
     /**
@@ -1434,10 +1438,7 @@ class Controller extends Base
             }
         }
 
-        $listCategory = match ($table) {
-            'news-topic' => 'News',
-            default => '',
-        };
+        $listCategory = $this->getListCategory($table);
 
         if ($json) {
             $currentTable = $tables[$table];
@@ -1470,6 +1471,18 @@ class Controller extends Base
                 ],
             );
         }
+    }
+
+    /**
+     * @param string|null $table
+     * @return string|null
+     */
+    private function getListCategory(?string $table): ?string
+    {
+        return match ($table) {
+            'news-topic' => 'News',
+            default => '',
+        };
     }
 
     /**
