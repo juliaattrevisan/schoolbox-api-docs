@@ -97,7 +97,7 @@
     <div class="list-item">
         <div class="small-12 column">
             {% block profileHeading %}
-                <h1 data-test="user-profile-name">{{ user.formatName }}</h1>
+                <h1 data-test="user-profile-name">{{ user.formatName(nameFormat) }}</h1>
             {% endblock %}
         </div>
     </div>

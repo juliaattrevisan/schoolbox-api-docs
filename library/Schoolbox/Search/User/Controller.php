@@ -543,9 +543,14 @@ class Controller extends BaseController
         $this->response = $this->responseFromTemplate(
             'user/student.twig',
             [
+                /* Profile Editor
+                 */
+                'externalUser'             => $externalUser,
+                'nameFormat'               => $this->getConfigLoader()->get('name_format_student'),
+                /* Old implementation
+                 */
                 'session'                  => $_SESSION,
                 'user'                     => $student,
-                'externalUser'             => $externalUser,
                 'showPastoral'             => $showPastoral,
                 'eportfolioAuth'           => $this->eportfolioAuthenticator->canView(),
                 'hideContacts'             => $hideContacts,
