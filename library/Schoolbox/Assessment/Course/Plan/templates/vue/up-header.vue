@@ -64,6 +64,11 @@ function onPrintSelected(): void {
             <a :href="`/learning/courseMarkbook/${props.courseId}`" class="icon-curriculum">Course Markbook</a>
         </li>
         <li>
+            <a :href="`/curriculum/reports/coverage?course-id=${props.courseId}`" class="icon-report"
+                >Curriculum Coverage</a
+            >
+        </li>
+        <li>
             <a :href="`/learning/assessment/calendar?course=${props.courseId}`" class="icon-calendar"
                 >Assessment Calendar</a
             >
