@@ -20,6 +20,7 @@ use Schoolbox\Learning\Course\DataModel\Specification\Translator as CourseTransl
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Resource\Folder;
+use ValueError;
 
 class Controller extends Base
 {
@@ -50,21 +51,30 @@ class Controller extends Base
         $limit = $query->getInt('limit', Cursor::LIMIT_DEFAULT);
         $encodedCursor = $query->get('cursor');
 
-        $cursor = new Cursor(
-            $this->courseSpecificationMapper,
-            $this->folderMapper,
-            $this->unitSpecificationMapper,
-            $this->ancestry,
-            $this->access,
-            $this->getUser(),
-            $folder,
-            $search,
-            $limit
-        );
+        //Early exit if limit is not of type int
+        if (null === $limit) {
+            $problem = (new ApiProblem("Limit must be an positive integer"))
+                ->setStatus(400)
+                ->asArray();
+            $this->response = $this->responseAsJson($problem)->withStatus(400);
+            return;
+        }
 
         try {
+            $cursor = new Cursor(
+                $this->courseSpecificationMapper,
+                $this->folderMapper,
+                $this->unitSpecificationMapper,
+                $this->ancestry,
+                $this->access,
+                $this->getUser(),
+                $folder,
+                $search,
+                $limit
+            );
+
             $data = $cursor->retrieveResults($encodedCursor);
-        } catch (\Exception $e) {
+        } catch (\Exception | ValueError $e) {
             $problem = (new ApiProblem($e->getMessage()))
                 ->setStatus(400)
                 ->asArray();
