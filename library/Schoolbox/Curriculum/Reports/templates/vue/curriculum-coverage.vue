@@ -8,7 +8,8 @@ import type { Node } from "@schoolboxCurriculum/types/Node";
 import CcReport from "./cc-report.vue";
 
 interface Props {
-    endpoint: string; // The curriculum api endpoint.
+    coursesEndpoint: string; // The courses api endpoint.
+    curriculumEndpoint: string; // The curriculum api endpoint.
 }
 const props = defineProps<Props>();
 
@@ -96,7 +97,7 @@ const selectedNodes = window.Vue.ref<Pick<Node, "id" | "name" | "code" | "descri
                 <label for="curriculum">Select Curriculum</label>
                 <curriculum-selector
                     :is-read-only="false"
-                    :data-endpoint="props.endpoint"
+                    :data-endpoint="props.curriculumEndpoint"
                     :is-select-all="true"
                     :include-without-code="true"
                     :can-select-children="false"
