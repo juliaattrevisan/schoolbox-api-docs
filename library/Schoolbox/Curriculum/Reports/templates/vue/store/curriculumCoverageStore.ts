@@ -4,10 +4,13 @@
 
 import { defineStore } from "pinia";
 import type { Course } from "@schoolboxLibrary/types/Course";
+import type { Node } from "@schoolboxCurriculum/types/Node";
+import { useSelectedNodesStore } from "@schoolboxCurriculum/vue/curriculumSelector/store/csSelectedNodesStore";
 import { ReportOptionValues, type ReportOption } from "../../js/types/curriculumCoverageTypes";
 
 export const useStore = defineStore("curriculumCoverage", () => {
-    const courses = window.Vue.ref<Course[]>([]); // the courses to display in the report
+    const courses = window.Vue.ref<Course[]>([]); // the selected courses to display in the report
+    const nodes = useSelectedNodesStore().nodes as Node[]; // the selected nodes to display in the report
     const allReportOptionValues = window.Vue.ref<ReportOption[]>([
         {
             value: ReportOptionValues.COURSE,
@@ -45,6 +48,7 @@ export const useStore = defineStore("curriculumCoverage", () => {
 
     return {
         courses,
+        nodes,
         allReportOptionValues,
         selectedReportOptionValues,
         onlyShowGaps,
