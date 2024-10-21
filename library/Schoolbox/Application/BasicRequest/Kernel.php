@@ -293,10 +293,6 @@ class Kernel extends WebKernelAbstract
                 }
             )
         );
-        $di->set(
-            'sentry.transactionManager',
-            $di->lazyNew(\Alaress\Sentry\Transaction\Manager::class, [$di->lazyGet('sentry')]),
-        );
 
         // JWT parser
         $di->set(

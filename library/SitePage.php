@@ -2,7 +2,6 @@
 
 use Alaress\Authorizer\Failure\Unauthenticated;
 use Alaress\Sentry\Tracing\Tracer;
-use Alaress\Sentry\Transaction\Manager;
 use Alaress\Web\Response\Factory as ResponseFactory;
 use Alaress\Web\Response\Outputter;
 use Aura\Router\Generator;
@@ -155,9 +154,6 @@ class SitePage
         $path = explode('/', trim($pageFile, '/'));
 
         $total = count($path);
-
-        /** @var Manager $sentryTransactionManager */
-        $sentryTransactionManager = $this->di->get('sentry.transactionManager');
 
         /* iterate backwards through the path */
         for ($i = 0; $i < $total; $i++) {

@@ -1855,10 +1855,6 @@ abstract class Kernel
                 }
             )
         );
-        $di->set(
-            'sentry.transactionManager',
-            $di->lazyNew(\Alaress\Sentry\Transaction\Manager::class, [$di->lazyGet('sentry')]),
-        );
 
 
         // Filter factory factory
