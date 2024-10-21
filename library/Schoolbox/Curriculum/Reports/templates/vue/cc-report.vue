@@ -3,6 +3,7 @@
  * Displays the curriculum coverage report in a table format.
  */
 
+import LoadingTable from "@schoolboxVue/components/loading/loading-table.vue";
 import CcReportHeader from "./cc-report-header.vue";
 import CcReportTable from "./cc-report-table.vue";
 
@@ -18,6 +19,7 @@ const store = useStore();
             <cc-report-table />
         </div>
     </div>
+    <loading-table v-else-if="store.isLoading" />
     <div v-else class="empty-state-flex-centered">
         <i class="icon-report"></i>
         To generate a report, first select at least one Course and Curriculum.
