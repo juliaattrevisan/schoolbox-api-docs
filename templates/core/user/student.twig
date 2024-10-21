@@ -130,7 +130,32 @@
                                 .profile .pastoral-flags {
                                     margin-left: 1rem;
                                 }
+
+                                .obscured {
+                                    width: 2rem;
+                                    cursor: pointer;
+                                }
                             </style>
+
+                            <script>
+                                $(function() {
+                                    $('[data-click-to-reveal]').on('click', function(event) {
+                                        event.preventDefault();
+                                        let elem = $(this).find('span');
+                                        if (elem.is(':visible')) {
+                                            elem.hide();
+                                            $(this).css({
+                                                'width': '2rem'
+                                            });
+                                        } else {
+                                            elem.show();
+                                            $(this).css({
+                                                'width': 'auto',
+                                            });
+                                        }
+                                    });
+                                });
+                            </script>
 
                             {# Build a hash lookup of additional clauses and cross-reference them
                              # This list is your last opportunity to show/hide a field
@@ -187,32 +212,36 @@
                                                      # This is often a set of strings that need to be output sequentially
                                                      #}
                                                     {% if selectedField.value|length %}
-                                                        <div class="alert-box {{ selectedField.css ?? '' }} {{ selectedField.icon ?? '' }}">
-                                                            {% for message in selectedField.value %}
-                                                                {{ message|nl2br }}
-                                                            {% endfor %}
+                                                        <div class="alert-box {{ selectedField.css ?? '' }} {{ selectedField.icon ?? '' }} {% if selectedField.clickToReveal %}obscured{% endif %}" {% if selectedField.clickToReveal %}data-click-to-reveal{% endif %}>
+                                                            <span {% if selectedField.clickToReveal %}style="display:none"{% endif %}>
+                                                                {% for message in selectedField.value %}
+                                                                    {{ message|nl2br }}
+                                                                {% endfor %}
+                                                            </span>
                                                         </div>
                                                     {% endif %}
                                                 {% elseif selectedField.value %}
                                                     {# A string that displays in a flag in some manner, typically #}
-                                                    <div class="alert-box {{ selectedField.css ?? '' }} {{ selectedField.icon ?? '' }}">
-                                                        {% if selectedField.field in ['StudentMedicalAlert'] %}
-                                                            {# A string with a special prefix that displays in a flag #}
-                                                            Medical Note: {{ selectedField.value }}
-                                                        {% elseif selectedField.field in ['Comment'] %}
-                                                            {# A string that displays on its own in a flag#}
-                                                            {{ selectedField.value }}
-                                                        {% elseif selectedField.field in ['ParentsSeparatedFlag'] %}
-                                                            {# A special flag that has a hardcoded text string #}
-                                                            Parents separated; please be mindful when making contact.
-                                                        {% else %}
-                                                            {# A generic flag which shows Display As/Terminology equivalent
-                                                             #
-                                                             # Flags always display fullwidth and I can cheat by rendering
-                                                             # a full-width definition title without a definition data lol
-                                                             #}
-                                                            {{ fieldName }}
-                                                        {% endif %}
+                                                    <div class="alert-box {{ selectedField.css ?? '' }} {{ selectedField.icon ?? '' }} {% if selectedField.clickToReveal %}obscured{% endif %}" {% if selectedField.clickToReveal %}data-click-to-reveal{% endif %}>
+                                                        <span {% if selectedField.clickToReveal %}style="display:none"{% endif %}>
+                                                            {% if selectedField.field in ['StudentMedicalAlert'] %}
+                                                                {# A string with a special prefix that displays in a flag #}
+                                                                Medical Note: {{ selectedField.value }}
+                                                            {% elseif selectedField.field in ['Comment'] %}
+                                                                {# A string that displays on its own in a flag#}
+                                                                {{ selectedField.value }}
+                                                            {% elseif selectedField.field in ['ParentsSeparatedFlag'] %}
+                                                                {# A special flag that has a hardcoded text string #}
+                                                                Parents separated; please be mindful when making contact.
+                                                            {% else %}
+                                                                {# A generic flag which shows Display As/Terminology equivalent
+                                                                 #
+                                                                 # Flags always display fullwidth and I can cheat by rendering
+                                                                 # a full-width definition title without a definition data lol
+                                                                 #}
+                                                                {{ fieldName }}
+                                                            {% endif %}
+                                                        </span>
                                                     </div>
                                                 {% endif %}
                                             </dt>

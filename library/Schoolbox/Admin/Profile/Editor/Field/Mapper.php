@@ -47,6 +47,7 @@ class Mapper extends \Schoolbox\Mapper
         $this->uses('term', self::TYPE_STRING);
         $this->uses('icon', self::TYPE_STRING);
         $this->uses('css', self::TYPE_STRING);
+        $this->uses('click_to_reveal', self::TYPE_INTEGER);
 
         $this->hasJoin(
             'availabilityCampus',
@@ -157,11 +158,12 @@ class Mapper extends \Schoolbox\Mapper
      *
      * @param User $viewee
      * @param User $viewer
-     * @return array
+     * @return GenericCollection
      * @throws Exception
      * @throws DebugBarException
      * @throws \PDOException
      * @throws \UnexpectedValueException
+     * @throws DefinitionException
      */
     public function findRenderableFields(\Schoolbox\User $viewee, \Schoolbox\User $viewer): GenericCollection
     {

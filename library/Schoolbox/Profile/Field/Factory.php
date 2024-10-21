@@ -72,9 +72,10 @@ class Factory
             $payload['roleTypes']['fields']['selected'][] = [
                 'field' => $renderableField->getField(),
                 'displayAs' => $renderableField->getDisplayAs(),
+                'terminology' => $renderableField->getTerm(),
                 'icon' => $renderableField->getIcon(),
                 'css' => $renderableField->getCss(),
-                'terminology' => $renderableField->getTerm(),
+                'clickToReveal' => $renderableField->getClickToReveal(),
                 'value' => $referenceFields[$renderableField->getField()] ?? null
             ];
         }

@@ -99,6 +99,15 @@ class Model
 
 
     /**
+     * Some fields (flags) have an option click-to-reveal for privacy reasons
+     * This is configurable per school in their db; it's not in the user interface atm
+     *
+     * @var int|null
+     */
+    private ?int $clickToReveal = null;
+
+
+    /**
      * A list of Availability settings for this field
      *
      * @var GenericCollection|null
@@ -338,6 +347,26 @@ class Model
     public function setCss(?string $css): self
     {
         $this->css = $css;
+        return $this;
+    }
+
+
+    /**
+     * @return int|null
+     */
+    public function getClickToReveal(): ?int
+    {
+        return $this->clickToReveal;
+    }
+
+
+    /**
+     * @param int|null $clickToReveal
+     * @return $this
+     */
+    public function setClickToReveal(?int $clickToReveal): self
+    {
+        $this->clickToReveal = $clickToReveal;
         return $this;
     }
 }
