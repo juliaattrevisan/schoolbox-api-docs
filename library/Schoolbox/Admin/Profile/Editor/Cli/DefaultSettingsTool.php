@@ -665,7 +665,7 @@ HELP;
              */
             $roletypes[self::ROLETYPE_STAFF]['portrait']['visibility'] = [self::ROLETYPE_SELF, self::ROLETYPE_PARENT, self::ROLETYPE_STAFF];
         }
-        
+
         return $roletypes;
     }
 
