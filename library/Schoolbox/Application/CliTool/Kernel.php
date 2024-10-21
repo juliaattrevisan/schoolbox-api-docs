@@ -124,16 +124,18 @@ class Kernel extends CliKernelAbstract
         }
 
         // Instrument here
-        Tracer::getDefaultTrace()->startTransaction(startTimestamp: microtime(true));
-        Tracer::getDefaultTrace()->setTransactionContextForCommandLineTool(
-            $this->app->getToolFilenameAbsolute()
+        $trace = Tracer::getDefaultTrace();
+        $trace->setServerVars($_SERVER);
+        $trace->startTransaction(startTimestamp: microtime(true));
+        $trace->setTransactionContextForCommandLineTool(
+            $this->app->getToolFilenameAbsolute(),
         );
 
         $perform = $forcePerform || $this->getKernelOpt(self::OPT_SHORT_PERFORM) || $this->getKernelOpt(self::OPT_LONG_PERFORM);
         $this->app->setup($this->appOpts, $this->getDependencyInjector(), $this->outStream, $this->logger(), $perform);
         $this->app->run();
 
-        Tracer::getDefaultTrace()->finishTransaction($this->di->get('sentry'), endTimestamp: microtime(true));
+        $trace->finishTransaction($this->di->get('sentry'), endTimestamp: microtime(true));
     }
 
 

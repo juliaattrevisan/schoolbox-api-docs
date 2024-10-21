@@ -243,6 +243,16 @@ class Tracer
             $transactionContext->setOp('console.command');
             $transactionContext->setOrigin('auto.console');
             $transactionContext->setSource(TransactionSource::task());
+
+            // Process data, from
+            // https://github.com/open-telemetry/semantic-conventions/blob/main/docs/resource/process.md
+            $transactionContext->setData(
+                $transactionContext->getData() + [
+                    'process.command_args' => $this->serverVars['ARGV'] ?? null,
+                    'process.owner'        => get_current_user(),
+                    'process.pid'          => getmypid(),
+                ],
+            );
         }
     }
 
