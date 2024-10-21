@@ -10,6 +10,10 @@ declare(strict_types=1);
 namespace Schoolbox\Application\CliTool;
 
 use Alaress\Lumberjack;
+use Aura\Di\Exception;
+use Aura\Di\Exception\ContainerLocked;
+use Aura\Di\Exception\ServiceNotFound;
+use Aura\Di\Exception\ServiceNotObject;
 use ErrorException;
 use InvalidArgumentException;
 use Psr\Log\LoggerInterface;
@@ -71,13 +75,14 @@ class Kernel extends CliKernelAbstract
 
 
     /**
-     * @param App       $app
-     * @param array     $options Keys are one of the self::OPTION_X constants
+     * @param App $app
+     * @param array $options Keys are one of the self::OPTION_X constants
+     * @param bool $bypassMaintenanceModeCheck  Our upgrades sometimes prevent scripts from running unless this is set to true
      * @throws InvalidArgumentException
-     * @throws \Aura\Di\Exception
-     * @throws \Aura\Di\Exception\ContainerLocked
-     * @throws \Aura\Di\Exception\ServiceNotFound
-     * @throws \Aura\Di\Exception\ServiceNotObject
+     * @throws Exception
+     * @throws ContainerLocked
+     * @throws ServiceNotFound
+     * @throws ServiceNotObject
      * @throws \RuntimeException
      * @throws \Schoolbox\External\Exception
      * @throws \UnexpectedValueException

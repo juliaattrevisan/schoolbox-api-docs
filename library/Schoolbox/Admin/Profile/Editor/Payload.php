@@ -29,6 +29,12 @@ class Payload
 
 
     /**
+     * A special pseudo-roletype
+     */
+    public const ROLETYPE_SELF = 'self';
+
+
+    /**
      * A special case field - it's mandatory and always appears in everyone's
      * profile screen when administering
      */
@@ -132,8 +138,8 @@ class Payload
             'options' => [
                 [
                     'type' => 'roleType',
-                    'id' => 'self',
-                    'name' => 'Self'
+                    'id' => self::ROLETYPE_SELF,
+                    'name' => ucwords(self::ROLETYPE_SELF)
                 ]
             ]
         ];
