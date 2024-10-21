@@ -99,7 +99,7 @@ test.describe("Create and Verify News Article Test", () => {
      *
      */
 
-    test("Create news article", async ({ tester, page, db }) => {
+    test("Create news article adding audiende via bricks", async ({ tester, page, db }) => {
         const form = new Form(tester, page);
         const index = new Index(tester, page);
         const item = new Item(tester, page);
@@ -122,6 +122,7 @@ test.describe("Create and Verify News Article Test", () => {
         await form.fillTopic(topic);
         await form.selectAudienceOption("Roles");
         await form.checkboxAudience(role);
+        await form.clickAddAudience();
         await form.fillUser(user1);
         await form.fillUser(user2);
         const publish = new Date();
@@ -132,6 +133,7 @@ test.describe("Create and Verify News Article Test", () => {
         await form.fillExpiryDate(expiry);
         await form.selectAudienceOption("Campuses");
         await form.checkboxAudience(campus);
+        await form.clickAddAudience();
         await form.submit();
         // had to add this as it was going away from this page too quickly and not publishing
         await page.waitForURL("/");
@@ -225,26 +227,130 @@ test.describe("Create and Verify News Article Test", () => {
      *
      */
 
-    // test("News Audience Test", async ({ tester, page }) => {
-    //     const form = new Form(tester, page);
-    //     const index = new Index(tester, page);
-    //     const item = new Item(tester, page);
-    //     tester.isGoingTo("Fill in form values with composite audience: 4 roles and 2 campuses + team and year level");
-    //     const headline = "Acceptance Test News Composite Audience Article Testing ";
-    //     // await tester.impersonateViaModifyUserPage("Mr Jack Coles");
-    //     await form.goto();
-    //     await form.fillHeadline(headline);
-    //     // await form.createCompositeAudience("Team", ["primary-IjEi"], "Year Level", ["secondary-Ijki"]);
-    //     // await form.seeAudience("1 Team & 1 Year Level");
+    test("News Audience Test composite audience", async ({ tester, page, db }) => {
+        const form = new Form(tester, page);
+        const index = new Index(tester, page);
+        const item = new Item(tester, page);
+        tester.isGoingTo("Fill in form values with composite audience: 4 roles and 2 campuses + team and year level");
+        const headline = "Acceptance Test News Composite Audience Article Testing ";
+        await tester.impersonateViaModifyUserPage("Mr Jack Coles");
+        await form.goto();
+        await form.fillHeadline(headline);
+        await form.createCompositeAudience("Team", ["primary-IjEi"], "Year Level", ["secondary-Ijki"]);
+        await form.seeAudience("1 Team & 1 Year Level");
 
-    //     await form.createCompositeAudience("Campus", ["primary-IjEi", "primary-IjIi"], "Role", [
-    //         "secondary-IjEi",
-    //         "secondary-IjIi",
-    //         "secondary-IjQi",
-    //         "secondary-Ijci",
-    //     ]);
-    //     // await form.seeAudience("2 Campuses & 4 Roles");
-    // });
+        await form.createCompositeAudience("Campus", ["primary-IjEi", "primary-IjIi"], "Role", [
+            "secondary-IjEi",
+            "secondary-IjIi",
+            "secondary-IjQi",
+            "secondary-Ijci",
+        ]);
+        await form.seeAudience("2 Campuses & 4 Roles");
+
+        tester.isGoingTo(
+            "check the draft article presents the proper audience: 4 roles and 2 campuses + 1 team and 1 year level",
+        );
+        await page.goto("/news/me?status=Drafted");
+        const articleId = (await db.grabFromDatabase("comms_news_article", "id", {
+            title: headline,
+            deleted_at: null,
+        })) as number;
+        await index.clickArticleTitle(articleId);
+        await form.seeAudience("2 Campuses & 4 Roles");
+        await form.seeAudience("1 Team & 1 Year Level");
+
+        tester.isGoingTo(
+            "check the modify article page presents the proper audience: 4 roles and 2 campuses + 1 team and 1 year level",
+        );
+        await item.modifyArticle();
+        await form.seeAudience("2 Campuses & 4 Roles");
+        await form.seeAudience("1 Team & 1 Year Level");
+
+        tester.isGoingTo(
+            "Fill in form values with selecting audience: campus Primary + class 9A Eng (group members and parents)",
+        );
+        await form.removeAudience("2 Campuses & 4 Roles");
+        await form.removeAudience("1 Team & 1 Year Level");
+        await form.selectAudienceOption("Campuses");
+        await form.checkboxAudience("Primary");
+        await form.clickAddAudience();
+        await form.selectAudienceOption("Groups");
+        await form.checkboxAudience("9A English (9ENGA)");
+        await form.selectIncludeUsers("parents");
+        await form.clickAddAudience();
+        tester.isGoingTo(
+            "check the modify article page presents the proper audience: Primary and 9A English (9ENGA) Inc parents of students",
+        );
+        await form.seeAudience("Primary");
+        await form.seeAudience("9A English (9ENGA)");
+        await form.seeAudience("Class/Group");
+        await form.seeAudience("(Inc. parents of students)");
+
+        tester.isGoingTo(
+            "check the draft article presents the proper audience: Primary and 9A English (9ENGA) Inc parents of students",
+        );
+        await page.goto("/news/me?status=Drafted");
+        await index.clickArticleTitle(articleId);
+        await form.seeAudience("9A English (9ENGA) (Inc. parents of students)");
+        await form.seeAudience("(Inc. parents of students)");
+
+        tester.isGoingTo("'Fill in form values by typing an audience: Jana Reed, Tim Reed and Jenni Reed");
+        await item.modifyArticle();
+
+        await form.removeAudience("9A English (9ENGA)");
+        await form.removeAudience("Primary");
+        await form.fillUser("Jana Reed");
+        await form.fillUser("Tim Reed");
+        await form.fillUser("Jenni Reed");
+        await form.fillUser("Demo 1");
+        await form.fillUser("Primary");
+        // await the draft to be saved - cuurrently it takes 3 seconds
+        await page.waitForTimeout(3000);
+
+        tester.isGoingTo("check the draft article presents the proper audience: Primary and Demo class 1");
+        await page.goto("/news/me?status=Drafted");
+        await index.clickArticleTitle(articleId);
+        await item.seeArticleAudience("Primary");
+        await item.seeArticleAudience("Demo Class Page 1 (DEMO1)");
+
+        tester.isGoingTo(
+            "Fill in form values by selecting audience via bricks and composite: year level + house and Teams Raide",
+        );
+        await item.modifyArticle();
+
+        await form.removeAudience("Ms Jana Reed (507) (Middle Student)");
+        await form.removeAudience("Ms Tim Reed (509) (Senior Student)");
+        await form.removeAudience("Ms Jenni Reed (502) (Senior Student)");
+        await form.removeAudience("Primary");
+        await form.removeAudience("Demo Class Page 1 (DEMO1)");
+
+        await form.selectAudienceOption("Year Levels");
+        await form.checkboxAudience("Year 9");
+        await form.selectIncludeUsers("parents");
+        await form.createCompositeAudience("House", ["primary-IjEid"], "Team", ["secondary-IjIi"]);
+        await form.seeAudience("1 Year Level & 1 House");
+        await form.seeAudience("Year 9");
+        await form.seeAudience("Composite Audience (view details)");
+        await form.seeAudience("Year Level");
+        await form.seeAudience("Inc. parents of students");
+
+        tester.isGoingTo("check the draft article presents the proper audience: Year 9 and 1 House and 1 Team");
+        await page.goto("/news/me?status=Drafted");
+        await index.clickArticleTitle(articleId);
+        await item.seeArticleAudience("1 Team & 1 House");
+        await item.seeArticleAudience("Year 9");
+        await item.seeArticleAudience("Inc. parents of students");
+
+        tester.isGoingTo("Publish the article and ensure the proper audience is presented");
+        await item.modifyArticle();
+        await form.submit();
+        await expect(page.locator('div[id="flash"]')).toContainText(
+            "Your article has been submitted for moderation. You will receive a notification when your article is rejected or approved.",
+        );
+        await item.seeArticleAudience("1 Team & 1 House");
+        await item.seeArticleAudience("Year 9");
+        await item.seeArticleAudience("Inc. parents of students");
+    });
 
     /**
      * creates a news article via news component in a class page
@@ -293,6 +399,7 @@ test.describe("Create and Verify News Article Test", () => {
         tester.isGoingTo("Add new audience to the news article: Eden Reed and Teacher role");
         await form.selectAudienceOption("Roles");
         await form.checkboxAudience("Teacher");
+        await form.clickAddAudience();
         await page.waitForTimeout(1000);
         await form.fillUser("Eden Reed");
         // this is the time it takes to save a draft currently

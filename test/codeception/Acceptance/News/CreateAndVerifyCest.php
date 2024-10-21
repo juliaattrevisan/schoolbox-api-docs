@@ -281,8 +281,8 @@ class CreateAndVerifyCest
         $formPage->seeRoles([$janaReed->getFullName(), $jenniReed->getFullName(), $timReed->getFullName(),'Demo Class Page 1 (DEMO1)','Primary']);
         $i->amGoingTo('check the draft article presents the proper audience: Primary and Demo class 1');
         $i->amOnPage('/news/me?status=Drafted');
-        $element = Locator::contains('div.small-12.card h3 a', 'Acceptance Test News Composite Audience Article Testing');
-        $i->click($element);
+        $i->click($element);        $element = Locator::contains('div.small-12.card h3 a', 'Acceptance Test News Composite Audience Article Testing');
+
         $formPage->seeRoles(['Demo Class Page 1 (DEMO1)','Primary']);
 
         $i->amGoingTo('Fill in form values by selecting audience via bricks and composite: year level + house and Teams Raiders');

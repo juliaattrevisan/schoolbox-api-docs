@@ -163,10 +163,24 @@ export default class Form {
 
     /**
      * fill roles
-     * @param audience - tick a checkbox in the Select Audience: Campuses, Roles, Teams, HOuses, Year Levels
+     * @param audience - tick a checkbox in the Select Audience via bricks: Campuses, Roles, Teams, HOuses, Year Levels
      */
     async checkboxAudience(audience: string): Promise<void> {
         await this.page.locator(`div.checklist-wrapper:has-text("${audience}")`).click();
+    }
+
+    /**
+     * fill class/group members and parents of students checkbox
+     * @param audience - tick a checkbox: Class/Group Members (users) and Parents of Students(parents)
+     */
+    async selectIncludeUsers(audience: string): Promise<void> {
+        await this.page.locator(`label[for="audience-select-${audience}"]`).click();
+    }
+
+    /**
+     * click Add Audience in the modal
+     */
+    async clickAddAudience(): Promise<void> {
         await this.page.locator("button.button.submit").first().click();
         await this.page.waitForTimeout(2000);
     }
