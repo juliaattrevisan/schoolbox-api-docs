@@ -83,7 +83,9 @@ class Controller extends BaseController
         private PastoralSubTypeMapper $pastoralSubTypeMapper,
         private PastoralDataSource $pastoralDataSource,
         private TermMapper $termMapper,
-        private \Schoolbox\External\User $userRelationHydrator
+        private \Schoolbox\External\User $userRelationHydrator,
+        private \Schoolbox\Admin\Profile\Editor\Field\Mapper $fieldMapper,
+
     ) {
     }
 
@@ -188,9 +190,6 @@ class Controller extends BaseController
      */
     private function renderStudent(User $student): void
     {
-        $fieldMapper = \Schoolbox\Admin\Profile\Editor\Field\Mapper::getInstance();
-        $userMapper = \Schoolbox\UserMapper::getInstance();
-
         $viewee = $student;
         $viewer = $this->getUser();
 
@@ -226,7 +225,7 @@ class Controller extends BaseController
          * Note this uses a callback to inject some data halfway through the compilation algorithm
          * to service this extra widgety thing, Pastoral Counts
          */
-        $externalUser = (new \Schoolbox\Profile\Field\Factory($fieldMapper, $userMapper, $this->externalUser))
+        $externalUser = (new \Schoolbox\Profile\Field\Factory($this->fieldMapper, $this->userMapper, $this->externalUser))
             ->produce($student, $this->getUser(), static function ($result) use ($pastoralCountHelper, $pastoralCountPeriod, $viewee, $viewer) {
                 /* Inject pastoral counts so it executes in proper place deeper in the Factory
                  */
