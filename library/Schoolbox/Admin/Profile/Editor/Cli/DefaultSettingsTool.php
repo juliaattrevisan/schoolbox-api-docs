@@ -299,7 +299,9 @@ HELP;
                     'availability' => $campusIds,
                     'visibility' =>  [],
                 ],
-                /* AlertLegal: Consciously no visibility: forces schools to opt-in to reveal
+                /* AlertLegal: originally no visibility and ideally force schools to opt-in to reveal
+                 * Historically speaking though, AlertLegal used to be classified the same way as
+                 * AlertMessages so in this context we're just going to inherit the same idea as above
                  */
                 'AlertLegal' => [
                     'availability' => $campusIds,
@@ -556,6 +558,11 @@ HELP;
          */
         if ($this->getConfig()->get('synergetic_community_alerts')) {
             $roletypes[self::ROLETYPE_STUDENT]['AlertMessages']['visibility'] = [self::ROLETYPE_STAFF, self::ROLETYPE_PARENT];
+
+            /* This used to be thrown together with all the other alerts, but we've split them in Profile Editor
+             * for more granular control. As far as defaults go, use the same ones as above
+             */
+            $roletypes[self::ROLETYPE_STUDENT]['AlertLegal']['visibility'] = [self::ROLETYPE_STAFF, self::ROLETYPE_PARENT];
         }
 
         /* protect_medicalspecial_profile
