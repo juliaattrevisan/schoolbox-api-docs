@@ -195,8 +195,7 @@ class Mapper extends AbstractCourseMapper
             WHERE $where
         ";
 
-        $count = $this->database->executeQuery($query, $pb->getParams())->fetchColumn();
-        return $count;
+        return $this->database->executeQuery($query, $pb->getParams())->fetchColumn();
     }
 
 
