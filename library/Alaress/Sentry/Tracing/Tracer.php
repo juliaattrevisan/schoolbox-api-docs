@@ -248,7 +248,7 @@ class Tracer
             // https://github.com/open-telemetry/semantic-conventions/blob/main/docs/resource/process.md
             $transactionContext->setData(
                 $transactionContext->getData() + [
-                    'process.command_args' => $this->serverVars['ARGV'] ?? null,
+                    'process.command_args' => $this->serverVars['argv'] ?? null,
                     'process.owner'        => get_current_user(),
                     'process.pid'          => getmypid(),
                 ],
