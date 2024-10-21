@@ -14,6 +14,7 @@ use Sentry\Tracing\Span;
 use Sentry\Tracing\SpanContext;
 use Sentry\Tracing\TransactionContext;
 use Sentry\Tracing\TransactionSource;
+use Throwable;
 
 /**
  * Defines a set of static methods for starting transactions and their stack,
@@ -279,6 +280,34 @@ class Tracer
 
         $this->stackChanges[] = new Operation\Push($spanContext);
         return $spanContext;
+    }
+
+    /**
+     * Run `$callable` within the entirety of a new span.
+     *
+     * @see startSpan for description of other parameters.
+     *
+     * @param callable    $callable
+     * @param string|null $description
+     * @param string|null $operation
+     * @param string|null $origin
+     * @param array       $data
+     * @return mixed Returns whatever `$callable` does when run.
+     * @throws Throwable May throw whatever `$callable` may.
+     */
+    public function runWithinSpan(
+        callable $callable,
+        ?string $description = null,
+        ?string $operation = null,
+        ?string $origin = null,
+        array $data = [],
+    ): mixed {
+        $this->startSpan($description, $operation, $origin, null, $data);
+        try {
+            return $callable();
+        } finally {
+            $this->finishSpan();
+        }
     }
 
     /**
