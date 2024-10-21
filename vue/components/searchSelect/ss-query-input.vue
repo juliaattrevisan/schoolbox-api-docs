@@ -61,7 +61,7 @@ onKeyStroke(["Enter", "ArrowUp", "ArrowDown"], (event) => {
         type="text"
         class="search-input f-no-margins"
         :placeholder="props.placeholder"
-        data-test="search-select-input"
+        data-test="ss-query-input"
     />
 </template>
 

@@ -4,6 +4,7 @@
  */
 
 import type { Ref, ComputedRef } from "vue";
+import { uniqBy } from "lodash";
 
 export type Item = {
     id: number;
@@ -47,7 +48,7 @@ export function useSelected($selected: Ref<Item[]> | undefined = undefined): {
      */
     function add(toAdd: Item | Item[]): void {
         let currentSelected = selected.value; // get the current selected list to modify
-        const itemsToAdd = Array.isArray(toAdd) ? toAdd : [toAdd];
+        const itemsToAdd = Array.isArray(toAdd) ? uniqBy(toAdd, "id") : [toAdd]; // ensure the items are unique
         itemsToAdd.forEach((itemToAdd) => {
             const exists = selected.value.find((selectedItem) => selectedItem.id === itemToAdd.id); // check if the item already exists, preventing duplicates
             if (!exists) {

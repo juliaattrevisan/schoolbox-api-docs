@@ -80,7 +80,7 @@ const { isActive } = useActiveIndex(
     <div
         ref="resultEl"
         :class="`search-result ${isActive ? 'search-result--active' : ''} f-no-margins`"
-        :data-test="`search-select-result-container-${props.result.id}`"
+        :data-test="`ss-results-list-item-container${props.result.id}`"
         @click="onClick"
         @mouseover="onMouseover"
         @mouseout="onMouseout"
@@ -91,7 +91,7 @@ const { isActive } = useActiveIndex(
                 :id="`search-select-result-input-${result.id}`"
                 type="radio"
                 :checked="isChecked"
-                :data-test="`search-select-result-radio-${props.result.id}`"
+                :data-test="`ss-results-list-item-radio-${props.result.id}`"
                 @click.stop="onClick"
             />
             <input
@@ -99,7 +99,7 @@ const { isActive } = useActiveIndex(
                 :id="`search-select-result-input-${result.id}`"
                 type="checkbox"
                 :checked="isChecked"
-                :data-test="`search-select-result-checkbox-${props.result.id}`"
+                :data-test="`ss-results-list-item-checkbox-${props.result.id}`"
                 @click.stop="onClick"
             />
             <show-matches

@@ -33,7 +33,7 @@ export default class SearchPage {
 
     static readonly FILTER_TYPE_LABEL = "sp-filter-type-label"; // Append "-[type]" like "-news", "-blog" etc.
 
-    static readonly CREATOR_SEARCH_SELECT_INPUT = "search-select-input";
+    static readonly CREATOR_SEARCH_SELECT_INPUT = "ss-query-input";
 
     static readonly CREATOR_SEARCH_SELECT_RESULT = "search-select-result"; // Append "-id"
 

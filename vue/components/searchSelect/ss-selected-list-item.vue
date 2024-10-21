@@ -43,7 +43,7 @@ function onRemoveSelected(): void {
         :class="`selected-item l-flex-row l-flex--align-center l-pad-s l-gap-s ${
             props.isSingleSelect ? 'l-flex__item--1' : ''
         }`"
-        :data-test="`search-select-selected-item-container-${props.item.id}`"
+        :data-test="`ss-selected-list-item-container-${props.item.id}`"
     >
         <button
             type="button"
@@ -61,7 +61,7 @@ function onRemoveSelected(): void {
             class="selected-item__remove-button icon-close"
             :title="`Remove ${props.item.name}`"
             :aria-label="`Remove ${props.item.name}`"
-            :data-test="`search-select-selected-item-remove-${props.item.id}`"
+            :data-test="`ss-selected-list-item-remove-${props.item.id}`"
             @click.prevent="onRemoveSelected"
         ></button>
     </div>
