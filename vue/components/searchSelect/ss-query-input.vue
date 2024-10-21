@@ -64,5 +64,3 @@ onKeyStroke(["Enter", "ArrowUp", "ArrowDown"], (event) => {
         data-test="ss-query-input"
     />
 </template>
-
-<style scoped></style>

@@ -75,8 +75,8 @@ register();
 
 /**
  * So we can use fetch in tests, we need to mock it
- * @param data
- * @returns
+ * @param data - The data to return from the fetch
+ * @returns - A function that will return the data when called
  */
 function setupFetchStub(data) {
     return function fetchStub(_url) {

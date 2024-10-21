@@ -1,5 +1,5 @@
 /**
- *
+ * To select from a list of courses
  */
 
 import { defineStore } from "pinia";
@@ -10,7 +10,7 @@ export const useCourseSelectorStore = defineStore("courseSelectorStore", () => {
     const selectedIds = window.Vue.computed(() => selected.value.map((course) => course.id)); // the ids of the selected courses
 
     /**
-     * Initialize the store, passing through the selected courses
+     * Initialize the store, passing through the selected courses if set
      * @param $selected - the selected courses
      */
     function init($selected: Course[] = []): void {

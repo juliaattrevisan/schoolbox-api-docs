@@ -7,7 +7,6 @@ import type { Ref } from "vue";
 import { useElementVisibility, onKeyStroke } from "@vueuse/core";
 
 /**
- *
  * @param resultEl - the element to scroll into view
  * @param index - the index of the result
  * @param activeIndex - the index of the active result

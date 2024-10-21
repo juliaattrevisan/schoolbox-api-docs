@@ -24,23 +24,10 @@ export function useSearch(endpoint: string): {
 } {
     const isSearching = window.Vue.ref(false); // to notify that an action is taking place,
     const query = window.Vue.ref(""); // current search term to filter the active nodes
+    const isActive = window.Vue.computed(() => query.value.length >= MIN_QUERY_LENGTH); // To only start showing search results once enough characters have been typed
     const results = window.Vue.ref<SearchSelectItem[]>([]); // nodes returned in the current search results
     const hasSearched = window.Vue.ref(false); // to show that a search has been made
-
-    /**
-     * To only start showing search results once enough characters
-     * have been added
-     * @returns { boolean }
-     */
-    const isActive = window.Vue.computed(() => query.value.length >= MIN_QUERY_LENGTH);
-
-    /**
-     * To show that no nodes match the current search
-     * @returns { boolean }
-     */
-    const hasNoResults = window.Vue.computed(() => {
-        return isActive.value && results.value.length === 0 && !isSearching.value;
-    });
+    const hasNoResults = window.Vue.computed(() => isActive.value && results.value.length === 0 && !isSearching.value); // To show that no nodes match the current search
 
     /**
      * when the search isActive, we should display the loading prompt straight away,

@@ -3,7 +3,6 @@
  * The creator filter input, to show results linked to a specific user
  */
 
-import type { SearchSelectItem } from "@schoolboxVue/components/searchSelect/types/searchSelectTypes";
 import SearchSelect from "@schoolboxVue/components/searchSelect/search-select.vue";
 import type { Creator } from "./store/spFilterCreatorsStore";
 import { useFilterCreatorsStore } from "./store/spFilterCreatorsStore";
@@ -23,7 +22,7 @@ const currentUser: Creator = {
             label-id="creator"
             endpoint="/ajax/user.php?groupID=0&query="
             :is-single-select="true"
-            :default-results="[currentUser as SearchSelectItem]"
+            :default-results="[currentUser]"
             placeholder="Search for users..."
         />
     </div>

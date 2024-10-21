@@ -1,6 +1,6 @@
 <script setup lang="ts">
 /**
- * A single search result that can be selected / unselected with a checkbox status
+ * A single search result that can be selected / unselected with a checkbox/radio status
  */
 
 import { toRef } from "vue";
@@ -10,7 +10,7 @@ import type { SearchSelectItem } from "./types/searchSelectTypes";
 
 interface Props {
     query: string; // the search query
-    selectedItems: SearchSelectItem[]; // the selected results
+    selectedItems: SearchSelectItem[]; // the selected items
     result: SearchSelectItem; // the result to display
     isSingleSelect: boolean; // whether only one result can be selected
     index: number; // the index of the result
