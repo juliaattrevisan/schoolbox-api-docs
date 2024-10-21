@@ -1,6 +1,7 @@
 <?php
 
 // Front controller for all web requests
+use Alaress\Sentry\Tracing\Tracer;
 use Schoolbox\Application\WebRequest;
 use Schoolbox\Application\WebRequest\RequestUriParser;
 use Symfony\Component\HttpFoundation\Exception\BadRequestException;
@@ -19,6 +20,11 @@ if ($path !== "/index.php" && preg_match('/.+\.php$/', $path) && file_exists(WEB
     require WEB_root . $path;
 } else {
     // Full Web kernel
+    // The transaction's actual name will be set later.
+    $trace = Tracer::getDefaultTrace();
+    $trace->setServerVars($_SERVER);
+    $transactionContext = $trace->startTransaction('placeholder', startTimestamp: microtime(true));
     $kernel = new WebRequest\Kernel();
     $kernel->run();
+    $trace->finishTransaction($kernel->get('sentry'), endTimestamp: microtime(true));
 }

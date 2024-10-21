@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace Schoolbox\Application\CliTool;
 
 use Alaress\Lumberjack;
+use Alaress\Sentry\Tracing\Tracer;
 use Aura\Di\Exception;
 use Aura\Di\Exception\ContainerLocked;
 use Aura\Di\Exception\ServiceNotFound;
@@ -123,14 +124,16 @@ class Kernel extends CliKernelAbstract
         }
 
         // Instrument here
-        $this->sentryTransactionManager->startTransactionFromCommandLineTool(
-            $this->app->getToolFilenameAbsolute(),
-            $_SERVER,
+        Tracer::getDefaultTrace()->startTransaction('placeholder', startTimestamp: microtime(true));
+        Tracer::getDefaultTrace()->setTransactionContextForCommandLineTool(
+            $this->app->getToolFilenameAbsolute()
         );
 
         $perform = $forcePerform || $this->getKernelOpt(self::OPT_SHORT_PERFORM) || $this->getKernelOpt(self::OPT_LONG_PERFORM);
         $this->app->setup($this->appOpts, $this->getDependencyInjector(), $this->outStream, $this->logger(), $perform);
         $this->app->run();
+
+        Tracer::getDefaultTrace()->finishTransaction($this->di->get('sentry'), endTimestamp: microtime(true));
     }
 
 

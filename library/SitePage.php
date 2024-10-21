@@ -1,6 +1,7 @@
 <?php
 
 use Alaress\Authorizer\Failure\Unauthenticated;
+use Alaress\Sentry\Tracing\Tracer;
 use Alaress\Sentry\Transaction\Manager;
 use Alaress\Web\Response\Factory as ResponseFactory;
 use Alaress\Web\Response\Outputter;
@@ -164,11 +165,11 @@ class SitePage
 
             // Start Sentry transaction here, now there's a path to include
             if (is_file(WEB_root . '/' . $filename . '.php') && $execute) {
-                $sentryTransactionManager->startTransactionFromSitePage(WEB_root . '/' . $filename . '.php', $_SERVER);
+                Tracer::getDefaultTrace()->setTransactionContextForSitePage(WEB_root . '/' . $filename . '.php');
                 include WEB_root . '/' . $filename . '.php';
                 return true;
             } elseif (is_file(WEB_root . '/' . $filename . '/index.php') && $execute) {
-                $sentryTransactionManager->startTransactionFromSitePage(WEB_root . '/' . $filename . '/index.php', $_SERVER);
+                Tracer::getDefaultTrace()->setTransactionContextForSitePage(WEB_root . '/' . $filename . '/index.php');
                 include WEB_root . '/' . $filename . '/index.php';
                 return true;
             }

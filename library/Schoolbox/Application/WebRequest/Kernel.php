@@ -17,6 +17,7 @@ use Alaress\Csrf;
 use Alaress\DebugBar\DataCollector\RouteCollector;
 use Alaress\DebugBar\Instance as DebugBar;
 use Alaress\Module\Registry;
+use Alaress\Sentry\Tracing\Tracer;
 use Alaress\Web\Request\IsJson;
 use Alaress\Web\Request\IsXhr;
 use Alaress\Web\Response\Factory;
@@ -246,9 +247,7 @@ class Kernel extends WebKernelAbstract
     private function outputAuraContent(Route $route, ?User $authHeaderUser, bool $bypassIpTracking): void
     {
         // Track this thing
-        /** @var ServerRequestInterface $request */
-        $request = $this->di->get('httpRequest');
-        $this->sentryTransactionManager->startTransactionFromAuraRoute($route->name, $request->getServerParams());
+        Tracer::getDefaultTrace()->setTransactionContextForAuraRoute($route->name);
 
         // The route name's format:
         // "[controllerName].[action](:[label])"

@@ -13,6 +13,7 @@ use Alaress\HTMLPurifier\Adapter\ScrubAdapter;
 use Alaress\Image\ProcessorFactory;
 use Alaress\Redis\Cache\ItemPool;
 use Alaress\Redis\Cache\KeyGenerator;
+use Alaress\Sentry\Tracing\Tracer;
 use Cache\Bridge\SimpleCache\SimpleCacheBridge;
 use enshrined\svgSanitize\Sanitizer as BaseSvgSanitizer;
 use GuzzleHttp;
@@ -592,6 +593,6 @@ class Kernel extends WebKernelAbstract
      */
     public function startSentryTransaction(string $path): void
     {
-        $this->sentryTransactionManager->startTransactionFromBasicRequest($path, $_SERVER);
+        Tracer::getDefaultTrace()->setTransactionContextForBasicRequest($path);
     }
 }

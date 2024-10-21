@@ -204,12 +204,10 @@ class Tracer
      * Helper function for updating the current transaction context with
      * settings for tracing an invocation of a command line tool.
      *
-     * @param string $filename   The full path of the file being invoked.
-     * @param array  $serverVars `$_SERVER` superglobal: used to set request
-     *                           time/URI/method.
+     * @param string $filename The full path of the file being invoked.
      * @return void
      */
-    public function setTransactionContextForCommandLineTool(string $filename, array $serverVars): void
+    public function setTransactionContextForCommandLineTool(string $filename): void
     {
         $transactionContext = $this->transactionContext;
         if ($transactionContext) {
