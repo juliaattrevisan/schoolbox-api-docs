@@ -12,6 +12,7 @@ namespace Alaress\Sentry\Tracing;
 use Sentry\State\HubInterface;
 use Sentry\Tracing\Span;
 use Sentry\Tracing\SpanContext;
+use Sentry\Tracing\SpanStatus;
 use Sentry\Tracing\TransactionContext;
 use Sentry\Tracing\TransactionSource;
 use Throwable;
@@ -358,12 +359,14 @@ class Tracer
      *
      * Also finishes any spans which may still be open.
      *
-     * @param HubInterface $hub          The Sentry hub to write the trace to.
-     * @param float|null   $endTimestamp When the transactions is to be
-     *                                   recorded as having finished.
+     * @param HubInterface    $hub          The hub to write the trace to.
+     * @param float|null      $endTimestamp When the transactions is to be
+     *                                      recorded as having finished.
+     * @param SpanStatus|null $status       The status to set on the transaction
+     *                                      once it has finished.
      * @return void
      */
-    public function finishTransaction(HubInterface $hub, ?float $endTimestamp = null): void
+    public function finishTransaction(HubInterface $hub, ?float $endTimestamp = null, ?SpanStatus $status = null): void
     {
         // Write the transaction and its spans into the hub
         if ($this->transactionContext instanceof TransactionContext) {
@@ -418,6 +421,7 @@ class Tracer
                 $leftoverSpan->finish($endTimestamp);
             }
 
+            $transaction->setStatus($status);
             $transaction->finish($endTimestamp);
         }
     }

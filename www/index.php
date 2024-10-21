@@ -15,16 +15,17 @@ try {
     die($e->getMessage());
 }
 
+// Start tracing
+// The transaction's actual name will be set later.
+$trace = Tracer::getDefaultTrace();
+$trace->setServerVars($_SERVER);
+$trace->startTransaction(startTimestamp: microtime(true));
+
 if ($path !== "/index.php" && preg_match('/.+\.php$/', $path) && file_exists(WEB_root . $path)) {
     // Script will load a Basic or Full Web kernel
     require WEB_root . $path;
 } else {
     // Full Web kernel
-    // The transaction's actual name will be set later.
-    $trace = Tracer::getDefaultTrace();
-    $trace->setServerVars($_SERVER);
-    $transactionContext = $trace->startTransaction(startTimestamp: microtime(true));
     $kernel = new WebRequest\Kernel();
     $kernel->run();
-    $trace->finishTransaction($kernel->get('sentry'), endTimestamp: microtime(true));
 }

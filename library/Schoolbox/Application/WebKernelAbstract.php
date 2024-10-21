@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace Schoolbox\Application;
 
 use Alaress\Application\WrongSapiException;
+use Alaress\Sentry\Tracing\Tracer;
 use Alaress\Session\Session;
 use Alaress\Web\Response\Factory as ResponseFactory;
 use Alaress\Web\Response\Outputter;
@@ -26,6 +27,7 @@ use Schoolbox\Deprecation\Registry;
 use Schoolbox\IConfigLoader;
 use Alaress\Web\Request\IsJson;
 use Schoolbox\User;
+use Sentry\Tracing\SpanStatus;
 use Throwable;
 
 /**
@@ -265,6 +267,13 @@ abstract class WebKernelAbstract extends \Alaress\Application\Kernel
                 $this->shutdownSafely(error_get_last(), debug_backtrace());
             })
         );
+        $this->getShutdownHandler()->registerFunction(function (): void {
+            Tracer::getDefaultTrace()->finishTransaction(
+                $this->get('sentry'),
+                microtime(true),
+                SpanStatus::createFromHttpStatusCode(http_response_code()),
+            );
+        });
     }
 
 

@@ -54,6 +54,7 @@ use Schoolbox\TaskDaemon\Request\MessageFactory;
 use Schoolbox\User\Token\Mapper as TokenMapper;
 use Schoolbox\UserMapper;
 use Schoolbox\Version\Version;
+use Sentry\Tracing\SpanStatus;
 use Sentry\Tracing\TransactionSource;
 use SitePage;
 use Twig\Environment;
@@ -579,7 +580,7 @@ class Kernel extends WebKernelAbstract
     }
 
     /**
-     * Helper function for basic requests only to start a Sentry transaction:
+     * Helper function for basic requests only to set up a Sentry transaction:
      * needs to be called manually with the filename of the script which created
      * the basic request.
      *
@@ -591,9 +592,6 @@ class Kernel extends WebKernelAbstract
     public function startSentryTransaction(string $path): void
     {
         $trace = Tracer::getDefaultTrace();
-        $trace->setServerVars($_SERVER);
-        $trace->startTransaction();
         $trace->setTransactionContextForBasicRequest($path);
-        $this->registerCustomShutdown(fn () => $trace->finishTransaction($this->get('sentry')));
     }
 }
