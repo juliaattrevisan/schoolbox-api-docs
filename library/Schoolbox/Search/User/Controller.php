@@ -242,7 +242,6 @@ class Controller extends BaseController
                 return $result;
             });
 
-
         // Wrangle default colors
         $colors              = $this->timetableColourMapper->findAll()->reindex();
         $colorFactory        = new ColorFactory();
