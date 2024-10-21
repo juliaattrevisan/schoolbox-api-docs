@@ -4,6 +4,7 @@
  */
 import CurriculumSelector from "@schoolboxCurriculum/vue/curriculumSelector/curriculum-selector.vue";
 import SearchSelect from "@schoolboxVue/components/searchSelect/search-select.vue";
+import { useSelectedNodesStore } from "@schoolboxCurriculum/vue/curriculumSelector/store/csSelectedNodesStore";
 import { useStore } from "./store/curriculumCoverageStore";
 
 interface Props {
@@ -13,13 +14,14 @@ interface Props {
 const props = defineProps<Props>();
 
 const store = useStore();
+const selectedNodesStore = useSelectedNodesStore();
 
 /**
  * Submit the form to generate the report
  */
 function onGenerateReport(): void {
     console.warn(store.selectedCourses);
-    console.warn(store.nodes);
+    console.warn(selectedNodesStore.nodes);
 }
 </script>
 
