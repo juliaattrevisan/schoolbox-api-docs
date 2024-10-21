@@ -23,7 +23,6 @@ use Alaress\Module\Registry;
 use Alaress\Redis;
 use Alaress\Redis\Cache\ItemPool;
 use Alaress\Redis\Cache\KeyGenerator;
-use Alaress\Sentry\Transaction\Manager;
 use Alaress\Session\Factory;
 use Alaress\Session\Session;
 use Alaress\Twig\Loader\ChainLoader;
@@ -227,14 +226,6 @@ abstract class Kernel
     private $exceptionCallbacks = [];
 
     /**
-     * A Sentry transaction manager: used for instrumenting this kernel and
-     * sending its trace to Sentry.
-     *
-     * Exists in DI, and may be used elsewhere.
-     */
-    protected ?Manager $sentryTransactionManager = null;
-
-    /**
      * @throws Di\Exception
      * @throws Di\Exception\ContainerLocked
      * @throws Di\Exception\ServiceNotFound
@@ -303,9 +294,6 @@ abstract class Kernel
         } catch (Di\Exception\ServiceNotFound $e) {
             throw new LogicException("The 'config' dependency should have been installed.");
         }
-
-        $this->sentryTransactionManager = $this->di->get('sentry.transactionManager');
-        $this->getShutdownHandler()->registerFunction($this->sentryTransactionManager->finishTransaction(...));
 
         self::dieGracefullyIfInMaintenanceMode($config);
         session_save_path(PipeManager::getSessionSavePath($config->get(ConfigMapper::NAME_REDIS_URL), INSTANCE_ID));

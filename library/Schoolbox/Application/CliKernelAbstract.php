@@ -101,9 +101,6 @@ abstract class CliKernelAbstract extends \Alaress\Application\Kernel implements 
             self::dieGracefullyIfInMaintenanceMode($this->di->get('config'));
         }
 
-        $this->sentryTransactionManager = $this->di->get('sentry.transactionManager');
-        $this->getShutdownHandler()->registerFunction($this->sentryTransactionManager->finishTransaction(...));
-
         $this->initRoutes();
         $this->initModules();
     }
