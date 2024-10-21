@@ -191,23 +191,22 @@ class Controller extends BaseController
         $fieldMapper = \Schoolbox\Admin\Profile\Editor\Field\Mapper::getInstance();
         $userMapper = \Schoolbox\UserMapper::getInstance();
 
-        $externalUser = (new \Schoolbox\Profile\Field\Factory($fieldMapper, $userMapper, $this->externalUser))
-            ->produce($student, $this->getUser());
+        $viewee = $student;
+        $viewer = $this->getUser();
 
-        /* Pastoral Counts: Implement in a callback
+        /* Pastoral Count injection
          */
-        $showPastoral =
-            $this->getConfigLoader()->get(ConfigMapper::NAME_PASTORAL_ENABLED)
-            && $this->getAuthorizer()->isPathAuthorizedForUser(
-                'pastoral.getStudent',
-                [
-                    'studentId' => $student->getId(),
-                    'student'   => $student,
-                ],
-                $this->getUser()
-            );
+        $showPastoral = $this->getConfigLoader()->get(ConfigMapper::NAME_PASTORAL_ENABLED) && $this->getAuthorizer()->isPathAuthorizedForUser(
+            'pastoral.getStudent',
+            [
+                'studentId' => $viewee->getId(),
+                'student'   => $viewee,
+            ],
+            $viewer
+        );
 
-        $pastoralCounts = null;
+        $pastoralCountHelper = null;
+        $pastoralCountPeriod = null;
 
         if ($showPastoral) {
             $pastoralCountHelper = (new PastoralCountHelper(
@@ -218,15 +217,31 @@ class Controller extends BaseController
                 $this->termMapper
             ));
 
-            $pastoralCounts = $pastoralCountHelper->countStudentEventsByTypes(
-                $this->getUser(),
-                $student,
-                null,
-                null,
-                $pastoralCountHelper->getStartDate((int)$this->getConfigLoader()->get(ConfigMapper::NAME_PASTORAL_FLAG_COUNT_PERIOD))
-            );
+            $pastoralCountPeriod = (int)$this->getConfigLoader()->get(ConfigMapper::NAME_PASTORAL_FLAG_COUNT_PERIOD);
         }
 
+        /* Full Payload Construction
+         * $externalUser is the complete payload that we use to fulfil frontend
+         *
+         * Note this uses a callback to inject some data halfway through the compilation algorithm
+         * to service this extra widgety thing, Pastoral Counts
+         */
+        $externalUser = (new \Schoolbox\Profile\Field\Factory($fieldMapper, $userMapper, $this->externalUser))
+            ->produce($student, $this->getUser(), static function ($result) use ($pastoralCountHelper, $pastoralCountPeriod, $viewee, $viewer) {
+                /* Inject pastoral counts so it executes in proper place deeper in the Factory
+                 */
+                if ($pastoralCountHelper && $pastoralCountPeriod) {
+                    $result['pastoralCounts'] = $pastoralCountHelper->countStudentEventsByTypes(
+                        $viewer,
+                        $viewee,
+                        null,
+                        null,
+                        $pastoralCountHelper->getStartDate($pastoralCountPeriod)
+                    );
+                }
+
+                return $result;
+            });
 
 
         // Wrangle default colors
@@ -534,7 +549,6 @@ class Controller extends BaseController
                 'user'                     => $student,
                 'externalUser'             => $externalUser,
                 'showPastoral'             => $showPastoral,
-                'pastoralCounts'           => $pastoralCounts,
                 'eportfolioAuth'           => $this->eportfolioAuthenticator->canView(),
                 'hideContacts'             => $hideContacts,
                 'showClasses'              => $showClasses,
