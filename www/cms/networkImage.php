@@ -12,7 +12,7 @@ use Schoolbox\Config\ConfigMapper;
 
 require_once __DIR__ . '/../../conf/core/require.php';
 $kernel = new \Schoolbox\Application\BasicRequest\Kernel();
-$kernel->startSentryTransaction(__FILE__);
+$kernel->setupSentryTrace(__FILE__);
 $kernel->outputCacheControlMaxAgeHeaderFromConfig(ConfigMapper::NAME_BROWSER_CACHE_IMAGE_TIMEOUT);
 
 [$width, $height] = MyImage::ensureDimensionsAreReasonable($_GET['width'] ?? null, $_GET['height'] ?? null);

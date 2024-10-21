@@ -580,16 +580,16 @@ class Kernel extends WebKernelAbstract
     }
 
     /**
-     * Helper function for basic requests only to set up a Sentry transaction:
+     * Helper function for basic requests only to set up a Sentry trace:
      * needs to be called manually with the filename of the script which created
      * the basic request.
      *
      * @param string $path The full path of the script which was invoked:
      *                     this path (minus the site root) will be used as the
-     *                     name of the transaction.
+     *                     name of the trace's transaction.
      * @return void
      */
-    public function startSentryTransaction(string $path): void
+    public function setupSentryTrace(string $path): void
     {
         $trace = Tracer::getDefaultTrace();
         $trace->setTransactionContextForBasicRequest($path);

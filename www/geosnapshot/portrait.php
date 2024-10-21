@@ -27,7 +27,7 @@ use Schoolbox\UserMapper;
 require_once __DIR__ . '/../../conf/core/require.php';
 
 $kernel = new \Schoolbox\Application\BasicRequest\Kernel();
-$kernel->startSentryTransaction(__FILE__);
+$kernel->setupSentryTrace(__FILE__);
 
 /* All geosnapshot pictures are constrain200 transformation
  */

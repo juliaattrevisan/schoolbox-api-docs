@@ -21,7 +21,7 @@ use Schoolbox\Resource\Storage\S3\PreSignedUrlService;
 
 require_once __DIR__ . '/../../conf/core/require.php';
 $kernel = new BasicRequest\Kernel();
-$kernel->startSentryTransaction(__FILE__);
+$kernel->setupSentryTrace(__FILE__);
 
 $transformType = $_GET['transform_type'] ?? '';
 $browserCacheTimeoutConfigName = $transformType === 'portrait'
