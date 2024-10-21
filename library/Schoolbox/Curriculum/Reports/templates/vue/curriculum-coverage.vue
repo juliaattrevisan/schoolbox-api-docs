@@ -5,6 +5,7 @@
 
 import CurriculumSelector from "@schoolboxCurriculum/vue/curriculumSelector/curriculum-selector.vue";
 import type { Node } from "@schoolboxCurriculum/types/Node";
+import SearchSelect from "@schoolboxVue/components/searchSelect/search-select.vue";
 import CcReport from "./cc-report.vue";
 
 interface Props {
@@ -34,64 +35,7 @@ const selectedNodes = window.Vue.ref<Pick<Node, "id" | "name" | "code" | "descri
         <div class="c-island l-flex-col l-pad-m l-gap-m">
             <div>
                 <label for="courses">Select Courses</label>
-                <div>
-                    <div data-v-75ed7460="" class="selected-nodes-container" data-test-nodes-container="">
-                        <div data-v-3596dc9a="" data-v-75ed7460="" class="selected-node" data-test-node="">
-                            <button
-                                data-v-3596dc9a=""
-                                type="button"
-                                class="title-button"
-                                title="View Communication skills"
-                                data-test-title-button=""
-                            >
-                                Year 9 English
-                            </button>
-                            <button
-                                data-v-3596dc9a=""
-                                type="button"
-                                class="remove-button icon-close"
-                                title="Remove Communication skills"
-                                data-test-remove-button=""
-                            ></button>
-                        </div>
-                        <div data-v-3596dc9a="" data-v-75ed7460="" class="selected-node" data-test-node="">
-                            <button
-                                data-v-3596dc9a=""
-                                type="button"
-                                class="title-button"
-                                title="View Communication skills"
-                                data-test-title-button=""
-                            >
-                                Year 9 Humanities
-                            </button>
-                            <button
-                                data-v-3596dc9a=""
-                                type="button"
-                                class="remove-button icon-close"
-                                title="Remove Communication skills"
-                                data-test-remove-button=""
-                            ></button>
-                        </div>
-                    </div>
-                    <div data-v-3fcd9114="" class="input-group" data-is-small-container="false">
-                        <input
-                            id="courses"
-                            data-v-3fcd9114=""
-                            type="text"
-                            class="search-input"
-                            placeholder="Search for courses or keywords..."
-                            data-search-select-search-input=""
-                        />
-                        <button
-                            data-v-3fcd9114=""
-                            type="button"
-                            class="button icon-course"
-                            title="Browse and select from the Courses"
-                        >
-                            Browse
-                        </button>
-                    </div>
-                </div>
+                <search-select endpoint="" :selected="[]" />
             </div>
             <div>
                 <label for="curriculum">Select Curriculum</label>
