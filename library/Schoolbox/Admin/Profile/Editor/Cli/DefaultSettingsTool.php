@@ -495,6 +495,9 @@ HELP;
                     'availability' => $campusIds,
                     'visibility' =>  [self::ROLETYPE_SELF, self::ROLETYPE_STUDENT, self::ROLETYPE_PARENT, self::ROLETYPE_STAFF],
                 ],
+                /* NOTE: Decided by restrict_parent_emails
+                 * By default it's visible to self, staff
+                 */
                 'email' => [
                     'availability' => $campusIds,
                     'visibility' =>  [self::ROLETYPE_SELF, self::ROLETYPE_STAFF],
@@ -503,9 +506,12 @@ HELP;
                     'availability' => [],
                     'visibility' =>  [],
                 ],
+                /* NOTE: Decided by restrict_parent_emails
+                 * By default it's visible to self, staff
+                 */
                 'role' => [
                     'availability' => [],
-                    'visibility' =>  [],
+                    'visibility' =>  [self::ROLETYPE_SELF, self::ROLETYPE_STAFF],
                 ],
                 'HomePhone' => [
                     'availability' => $campusIds,
@@ -582,6 +588,32 @@ HELP;
             $roletypes[self::ROLETYPE_STAFF]['StaffDefaultMobilePhone']['visibility'][] = [self::ROLETYPE_PARENT];
         }
 
+        /* restrict_parent_emails
+         *
+         * Be careful with the double negative here: !restrict_parent_emails allows people to see
+         * all the stuff. restrict_parent_emails prevents them from seeing all that stuff.
+         *
+         * If falsy, parents can see role, mail addresses, contact numbers, and speece, on another parent's profile
+         * If falsy, parents can see their own home phone, mobile, work phone
+         * Otherwise, only show them to self and staff
+         */
+        if (!$this->getConfig()->get('restrict_parent_emails')) {
+            $roletypes[self::ROLETYPE_PARENT]['email']['visibility'][] = [self::ROLETYPE_PARENT];
+            $roletypes[self::ROLETYPE_PARENT]['role']['visibility'][] = [self::ROLETYPE_PARENT];
+
+            /* imho these should be hidden from other parents, regardless of this config setting
+             */
+            $roletypes[self::ROLETYPE_PARENT]['HomePhone']['visibility'][] = [self::ROLETYPE_PARENT];
+            $roletypes[self::ROLETYPE_PARENT]['WorkPhone']['visibility'][] = [self::ROLETYPE_PARENT];
+            $roletypes[self::ROLETYPE_PARENT]['MobilePhone']['visibility'][] = [self::ROLETYPE_PARENT];
+
+            /* Spouse stuff - further constrained by SpouseDirectoryIncludeFlag and getHideContacts
+             * but those are implemented further away
+             */
+            $roletypes[self::ROLETYPE_PARENT]['spouseName']['visibility'][] = [self::ROLETYPE_PARENT];
+            $roletypes[self::ROLETYPE_PARENT]['SpouseEmail']['visibility'][] = [self::ROLETYPE_PARENT];
+            $roletypes[self::ROLETYPE_PARENT]['SpouseMobilePhone']['visibility'][] = [self::ROLETYPE_PARENT];
+        }
 
         return $roletypes;
     }
@@ -628,3 +660,4 @@ HELP;
         return parent::runAsRoot();
     }
 }
+
