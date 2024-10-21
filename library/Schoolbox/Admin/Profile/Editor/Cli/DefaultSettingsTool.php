@@ -93,8 +93,7 @@ HELP;
             $settingsIndex = $this->buildSettingsIndex();
             $fieldsIndex = $this->buildFieldsIndex();
 
-            print_r($settingsIndex['student']['StudentMedicalAlert']);
-            print_r($settingsIndex['student']['StudentSpecialNeedsFlag']);
+            print_r($settingsIndex['staff']['portrait']);
             die();
 
             /* Prepare some oft-used queries
@@ -659,15 +658,15 @@ HELP;
          *    1 (all): visible to nobody
          *    2 (students): visible to staff and parents only
          */
-        if (0 === $this->getConfig()->get('protect_teacher_photo')) {
+        if ('0' === $this->getConfig()->get('protect_teacher_photo')) {
             /* Protected from nobody; everyone can see it
              */
             $roletypes[self::ROLETYPE_STAFF]['portrait']['visibility'] = [self::ROLETYPE_SELF, self::ROLETYPE_STUDENT, self::ROLETYPE_PARENT, self::ROLETYPE_STAFF];
-        } elseif (1 === $this->getConfig()->get('protect_teacher_photo')) {
+        } elseif ('1' === $this->getConfig()->get('protect_teacher_photo')) {
             /* Protected from EVERYBODY; nobody can see it (this is also the default case I've assigned)
              */
             $roletypes[self::ROLETYPE_STAFF]['portrait']['visibility'] = [];
-        } elseif (2 === $this->getConfig()->get('protect_teacher_photo')) {
+        } elseif ('2' === $this->getConfig()->get('protect_teacher_photo')) {
             /* Protected from students only; staff and parents can see it.
              */
             $roletypes[self::ROLETYPE_STAFF]['portrait']['visibility'] = [self::ROLETYPE_SELF, self::ROLETYPE_PARENT, self::ROLETYPE_STAFF];
