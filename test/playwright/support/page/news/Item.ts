@@ -1,5 +1,6 @@
-import AcceptanceTester from "@schoolboxTest/playwright/support/AcceptanceTester";
-import { Page, expect } from "@playwright/test";
+import type AcceptanceTester from "@schoolboxTest/playwright/support/AcceptanceTester";
+import type { Page } from "@playwright/test";
+import { expect } from "@playwright/test";
 
 /**
  * News item page object - this is related to when viewing a single news article
@@ -82,5 +83,22 @@ export default class Item {
         await this.page.getByTestId(Item.DATA_TEST_DOT_MENU_BUTTON).click();
         await this.page.locator(Item.LINK_MODIFY).last().click();
         await expect(this.page.locator('h1:has-text("Update news")')).toBeVisible();
+    }
+
+    /**
+     * see the audience of the article
+     * @param audience - The article to check
+     */
+    async seeArticleAudience(audience: string): Promise<void> {
+        // await expect(this.page.locator(`span#audience-info-container:has-text(${audience})`)).toBeVisible();
+        await expect(this.page.locator(`span#audience-info-container`)).toContainText(audience);
+    }
+
+    /**
+     * check the article status
+     * @param status - The article to check
+     */
+    async seeArticleStatus(status: string): Promise<void> {
+        await expect(this.page.locator(`span#status-new`)).toContainText(status);
     }
 }

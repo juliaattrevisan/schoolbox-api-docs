@@ -1,7 +1,10 @@
-import AcceptanceTester from "@schoolboxTest/playwright/support/AcceptanceTester";
-import { Page, expect } from "@playwright/test";
+import type AcceptanceTester from "@schoolboxTest/playwright/support/AcceptanceTester";
+import type { Page } from "@playwright/test";
+import { expect } from "@playwright/test";
 import Common from "@schoolboxTest/playwright/support/page/Common";
-import { has } from "lodash";
+import { ex } from "@fullcalendar/core/internal-common";
+import { waitFor } from "@storybook/test";
+import { forEach } from "lodash";
 
 // this page object is for the create news page
 export default class Form {
@@ -195,28 +198,85 @@ export default class Form {
         await this.page.locator(`h4[title="${user}"]`).first().filter({ hasText: user }).isVisible();
     }
 
+    // /**
+    //  * create composite audience
+    //  * @param dropdown1 - The checkboxes to tick
+    //  * @param dropdown2 - The checkboxes to tick
+    //  * @param audienceType1 - The first audience type
+    //  * @param audienceType2 - The second audience type
+    //  */
+    // async createCompositeAudience(
+    //     dropdown1: string,
+    //     dropdown2: string,
+    //     audienceType1: string,
+    //     audienceType2: string,
+    // ): Promise<void> {
+    //     await this.page.locator("button.button.icon-drag-drop").click();
+    //     await expect(this.page.locator('div[class="reveal-modal no-pad open"]')).toBeVisible();
+    //     await this.page.locator("a:has-text('Create Composite Audience')").click();
+    //     await this.page.locator(`select.option:has-text(${dropdown1})`).click();
+    //     await this.page.locator(`label:has-text(${audienceType1})`).click();
+    //     await this.page.locator(`select.option:has-text(${dropdown2})`).click();
+    //     await this.page.locator(`label:has-text(${audienceType2})`).click();
+    //     await this.page.locator("button.button.submit").click();
+    //     await this.page.waitForTimeout(2000);
+    // }
+
     /**
      * create composite audience
      * @param dropdown1 - The checkboxes to tick
-     * @param dropdown2 - The checkboxes to tick
      * @param audienceType1 - The first audience type
+     * @param dropdown2 - The checkboxes to tick
      * @param audienceType2 - The second audience type
      */
     async createCompositeAudience(
         dropdown1: string,
+        audienceType1: Array<string>,
         dropdown2: string,
-        audienceType1: string,
-        audienceType2: string,
+        audienceType2: Array<string>,
     ): Promise<void> {
         await this.page.locator("button.button.icon-drag-drop").click();
         await expect(this.page.locator('div[class="reveal-modal no-pad open"]')).toBeVisible();
         await this.page.locator("a:has-text('Create Composite Audience')").click();
-        await this.page.locator(`select.option:has-text(${dropdown1})`).click();
-        await this.page.locator(`label:has-text(${audienceType1})`).click();
-        await this.page.locator(`select.option:has-text(${dropdown2})`).click();
-        await this.page.locator(`label:has-text(${audienceType2})`).click();
-        await this.page.locator("button.button.submit").click();
         await this.page.waitForTimeout(2000);
+        // await this.page.locator("select").filter({ hasText: "Rle" }).getByRole("combobox").click();
+        await this.page.locator("legend").filter({ hasText: "Audience Type 1:" }).getByRole("combobox").click();
+        await this.page.waitForTimeout(2000);
+        // if there is a better way to select the dropdown, please let me know
+        // await this.page.locator("option").filter({ hasText: "Team" }).first().click();
+        // await this.page.locator("option").getByText("Team").first().click();
+        await this.page.keyboard.type(dropdown1);
+        await this.page.keyboard.press("Enter");
+        await this.page.waitForTimeout(2000);
+        await this.tickCheckboxes(audienceType1);
+        await this.page.waitForTimeout(2000);
+
+        await this.page.locator("legend").filter({ hasText: "Audience Type 2:" }).getByRole("combobox").click();
+        await this.page.waitForTimeout(2000);
+        await this.page.keyboard.type(dropdown2);
+        await this.page.keyboard.press("Enter");
+        await this.page.waitForTimeout(2000);
+        await this.tickCheckboxes(audienceType2);
+
+        await this.page.locator("button.button.submit").last().click();
+    }
+
+    /**
+     * tick the checkboxes
+     * @param checkboxes - The checkboxes to tick
+     */
+    async tickCheckboxes(checkboxes: Array<string>): Promise<void> {
+        const result = checkboxes.map((checkbox) => this.page.locator(`label[for="${checkbox}"]`).click());
+
+        // const result = checkboxes.map((checkbox) => {
+        //     const locator = this.page.locator(`label[for="${checkbox}"]`);
+        //     return forEach(checkboxes, async () => {
+        //         await locator.click();
+        //         await this.page.waitForTimeout(2000);
+        //     });
+        // });
+
+        await Promise.allSettled(result);
     }
 
     /**
@@ -252,7 +312,14 @@ export default class Form {
      * @param expiryDate - The expiry date
      */
     async seeExpiryDate(expiryDate: Date): Promise<void> {
-        await expect(this.page.locator("input#expiresAt")).toHaveValue(Common.formatDate(expiryDate, true));
+        // await expect(this.page.locator("input#expiresAt")).toHaveValue(Common.formatDate(expiryDate, true));
+
+        // get value from a locator
+        const value = await this.page.locator("input#expiresAt").inputValue();
+        // convert value to date
+        const date = new Date(value);
+        // expect the date to be the same as the date passed in
+        expect(date).toEqual(expiryDate);
     }
 
     /**

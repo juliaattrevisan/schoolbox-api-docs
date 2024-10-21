@@ -1,5 +1,6 @@
-import AcceptanceTester from "@schoolboxTest/playwright/support/AcceptanceTester";
-import { Page, expect } from "@playwright/test";
+import type AcceptanceTester from "@schoolboxTest/playwright/support/AcceptanceTester";
+import type { Page } from "@playwright/test";
+import { expect } from "@playwright/test";
 
 /**
  * News index page object - this is related to the news page where all the news articles are listed
@@ -99,6 +100,14 @@ export default class Index {
      */
     async viewArticle(articleId: number): Promise<void> {
         await this.page.locator(`a[href="/news/${articleId}?ref=index"]`).last().click();
+    }
+
+    /**
+     * click the article  title
+     * @param articleId - Article number to view
+     */
+    async clickArticleTitle(articleId: number): Promise<void> {
+        await this.page.locator(`a[href="/news/${articleId}"]`).first().click();
     }
 
     /**
