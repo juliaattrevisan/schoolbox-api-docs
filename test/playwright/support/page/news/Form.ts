@@ -2,9 +2,6 @@ import type AcceptanceTester from "@schoolboxTest/playwright/support/AcceptanceT
 import type { Page } from "@playwright/test";
 import { expect } from "@playwright/test";
 import Common from "@schoolboxTest/playwright/support/page/Common";
-import { ex } from "@fullcalendar/core/internal-common";
-import { waitFor } from "@storybook/test";
-import { forEach } from "lodash";
 
 // this page object is for the create news page
 export default class Form {
