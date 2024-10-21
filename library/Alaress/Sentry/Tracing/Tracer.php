@@ -119,7 +119,7 @@ class Tracer
      * @return TransactionContext
      */
     public function startTransaction(
-        string $name,
+        string $name = self::PLACEHOLDER_TRANSACTION_NAME,
         ?string $operation = null,
         ?string $origin = null,
         ?TransactionSource $source = null,
