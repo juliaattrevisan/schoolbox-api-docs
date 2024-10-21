@@ -37,8 +37,11 @@ export const useStore = defineStore("curriculumCoverage", () => {
 
     /**
      * store any passed through properties
+     * @param $courses - the courses to display in the report
      */
-    function init(): void {}
+    function init($courses: Course[]): void {
+        courses.value = $courses;
+    }
 
     return {
         courses,

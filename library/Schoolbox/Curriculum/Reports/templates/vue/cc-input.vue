@@ -4,21 +4,27 @@
  */
 import CurriculumSelector from "@schoolboxCurriculum/vue/curriculumSelector/curriculum-selector.vue";
 import SearchSelect from "@schoolboxVue/components/searchSelect/search-select.vue";
-import type { Course } from "@schoolboxLibrary/types/Course";
+import { useStore } from "./store/curriculumCoverageStore";
 
 interface Props {
     coursesEndpoint: string; // The courses api endpoint.
     curriculumEndpoint: string; // The curriculum api endpoint.
-    selectedCourses: Course[]; // The pre selected courses
 }
 const props = defineProps<Props>();
+
+const store = useStore();
+
+/**
+ * Submit the form to generate the report
+ */
+function onGenerateReport(): void {}
 </script>
 
 <template>
-    <div class="c-island l-flex-col l-pad-m l-gap-m">
+    <form class="c-island l-flex-col l-pad-m l-gap-m" @submit.prevent="onGenerateReport">
         <div>
             <label for="courses">Select Courses</label>
-            <search-select endpoint="" :selected="props.selectedCourses" />
+            <search-select endpoint="" :selected="store.courses" />
         </div>
         <div>
             <label for="curriculum">Select Curriculum</label>
@@ -32,7 +38,7 @@ const props = defineProps<Props>();
             />
         </div>
         <button>Generate report</button>
-    </div>
+    </form>
 </template>
 
 <style scoped></style>
