@@ -23,6 +23,8 @@ use Alaress\Module\Registry;
 use Alaress\Redis;
 use Alaress\Redis\Cache\ItemPool;
 use Alaress\Redis\Cache\KeyGenerator;
+use Alaress\Sentry\Tracing\GuzzleTracingMiddleware;
+use Alaress\Sentry\Tracing\Tracer;
 use Alaress\Session\Factory;
 use Alaress\Session\Session;
 use Alaress\Twig\Loader\ChainLoader;
@@ -1649,7 +1651,12 @@ abstract class Kernel
                     // \Sentry\Tracing\GuzzleTracingMiddleware won't work, as
                     // it adds the span directly to the transaction instead of
                     // aggregating and adding later.
-                    return new GuzzleHttp\Client(['curl' => $proxyServer->buildCurlOptions()]);
+                    $handlerStack = GuzzleHttp\HandlerStack::create();
+                    $handlerStack->push(GuzzleTracingMiddleware::trace($di->get('sentry'), Tracer::getDefaultTrace()));
+                    return new GuzzleHttp\Client([
+                        'curl'    => $proxyServer->buildCurlOptions(),
+                        'handler' => $handlerStack,
+                    ]);
                 }
             ),
         );

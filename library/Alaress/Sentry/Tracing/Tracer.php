@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace Alaress\Sentry\Tracing;
 
+use Sentry\Breadcrumb;
 use Sentry\State\HubInterface;
 use Sentry\Tracing\Span;
 use Sentry\Tracing\SpanContext;
@@ -41,9 +42,10 @@ class Tracer
     private ?TransactionContext $transactionContext = null;
 
     /**
-     * A set of stack changes, updated with `startSpan` and `finishSpan`.
+     * A set of stack changes, updated with `startSpan`, `finishSpan` and
+     * `addBreadcrumb`.
      *
-     * @var array<Operation\Pop|Operation\Push>
+     * @var array<Operation\Pop|Operation\Push|Operation\Breadcrumb>
      */
     private array $stackChanges = [];
 
@@ -312,6 +314,34 @@ class Tracer
     }
 
     /**
+     * Add a breadcrumb.
+     *
+     * @see Breadcrumb::__construct for description of parameters.
+     *
+     * @param string      $level
+     * @param string      $type
+     * @param string      $category
+     * @param string|null $message
+     * @param array       $metadata
+     * @param float|null  $timestamp
+     * @return void
+     */
+    public function addBreadcrumb(
+        string $level,
+        string $type,
+        string $category,
+        ?string $message = null,
+        array $metadata = [],
+        ?float $timestamp = null,
+    ): void
+    {
+        $this->stackChanges[] = new Operation\Breadcrumb(
+            new Breadcrumb($level, $type, $category, $message, $metadata, $timestamp),
+        );
+    }
+
+
+    /**
      * Run `$callable` within the entirety of a new span.
      *
      * @see startSpan for description of other parameters.
@@ -413,6 +443,9 @@ class Tracer
                         ? $spanStack[count($spanStack) - 1]
                         : $transaction;
                     $hub->setSpan($previousSpan);
+                } elseif ($stackChange instanceof Operation\Breadcrumb) {
+                    // Add a breadcrumb at the current point
+                    $hub->addBreadcrumb($stackChange->breadcrumb);
                 }
             }
 
