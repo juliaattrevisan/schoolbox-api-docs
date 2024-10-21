@@ -93,9 +93,6 @@ HELP;
             $settingsIndex = $this->buildSettingsIndex();
             $fieldsIndex = $this->buildFieldsIndex();
 
-            print_r($settingsIndex['staff']['portrait']);
-            die();
-
             /* Prepare some oft-used queries
              */
             $availabilityCampusStatement = $this->getDatabaseInternal()->prepare("
