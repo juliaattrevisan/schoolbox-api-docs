@@ -5,7 +5,7 @@
 import { defineStore } from "pinia";
 import type { Course } from "@schoolboxLibrary/types/Course";
 
-export const useCourseSelectorStore = defineStore("courseSelectStore", () => {
+export const useCourseSelectorStore = defineStore("courseSelectorStore", () => {
     const selected = window.Vue.ref<Course[]>([]); // the selected courses
     const selectedIds = window.Vue.computed(() => selected.value.map((course) => course.id)); // the ids of the selected courses
 
