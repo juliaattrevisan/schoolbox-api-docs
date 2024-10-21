@@ -51,6 +51,7 @@ function onRemoveSelected(): void {
             :title="`View ${props.item.name}`"
             :aria-label="`View ${props.item.name}`"
             :disabled="isDisabled"
+            :data-test="`search-select-selected-item-select-${props.item.id}`"
             @click.prevent="onNameSelected"
         >
             {{ props.item.name }}
