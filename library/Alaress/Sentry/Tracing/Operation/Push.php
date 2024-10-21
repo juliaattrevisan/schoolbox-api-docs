@@ -16,6 +16,11 @@ use Sentry\Tracing\SpanContext;
  */
 class Push
 {
+    /**
+     * Constructor
+     *
+     * @param SpanContext $context The span context to push.
+     */
     public function __construct(public SpanContext $context)
     {
     }

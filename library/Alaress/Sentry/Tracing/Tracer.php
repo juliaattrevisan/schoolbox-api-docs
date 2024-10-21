@@ -343,14 +343,16 @@ class Tracer
      * Finish any existing span, reverting the Sentry hub back to tracking the
      * current transaction.
      *
-     * @param float|null $endTimestamp When the span is to be recorded as having
-     *                                 finished.
+     * @param float|null      $endTimestamp When the span is to be recorded as
+     *                                      having finished.
+     * @param SpanStatus|null $status       The status to set on the span once
+     *                                      it has finished.
      *
      * @return void
      */
-    public function finishSpan(?float $endTimestamp = null): void
+    public function finishSpan(?float $endTimestamp = null, ?SpanStatus $status = null): void
     {
-        $this->stackChanges[] = new Operation\Pop($endTimestamp ?? microtime(true));
+        $this->stackChanges[] = new Operation\Pop($endTimestamp ?? microtime(true), $status);
     }
 
     /**

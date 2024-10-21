@@ -1644,6 +1644,11 @@ abstract class Kernel
                 static function () use ($di) {
                     /** @var ProxyServer $proxyServer */
                     $proxyServer = $di->get('proxyServer');
+
+                    // Add Sentry tracing middleware:
+                    // \Sentry\Tracing\GuzzleTracingMiddleware won't work, as
+                    // it adds the span directly to the transaction instead of
+                    // aggregating and adding later.
                     return new GuzzleHttp\Client(['curl' => $proxyServer->buildCurlOptions()]);
                 }
             ),
