@@ -7,7 +7,7 @@ import type { Course } from "@schoolboxLibrary/types/Course";
 import { ReportOptionValues, type ReportOption } from "../../js/types/curriculumCoverageTypes";
 
 export const useStore = defineStore("curriculumCoverage", () => {
-    const selectedCourses = window.Vue.ref<Course[]>([]); // the selected courses
+    const selectedCourses = window.Vue.ref<Course[]>([]); // the selected courses @todo - this will be stored in a selectedCoursesStore instead with SA-18582
     const courses = window.Vue.ref<Course[]>([]); // the courses to display in the report
     const allReportOptionValues = window.Vue.ref<ReportOption[]>([
         {

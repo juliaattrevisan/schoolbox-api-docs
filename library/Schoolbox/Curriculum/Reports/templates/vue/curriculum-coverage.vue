@@ -16,13 +16,7 @@ interface Props {
 const props = defineProps<Props>();
 
 const store = useStore();
-
-/**
- * Initialise the store with the selected courses
- */
-window.Vue.onMounted(() => {
-    store.init(props.selectedCourses);
-});
+store.init(props.selectedCourses);
 </script>
 
 <template>
