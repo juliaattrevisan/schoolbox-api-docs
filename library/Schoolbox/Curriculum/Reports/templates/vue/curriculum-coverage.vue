@@ -12,7 +12,7 @@ import CcReport from "./cc-report.vue";
 interface Props {
     coursesEndpoint: string; // The courses api endpoint.
     curriculumEndpoint: string; // The curriculum api endpoint.
-    selectedCourses: Course[]; // The selected courses.
+    selectedCourses: Course[]; // The pre selected courses
 }
 const props = defineProps<Props>();
 
