@@ -268,7 +268,7 @@ HELP;
             self::ROLETYPE_STUDENT => [
                 'portrait' => [
                     'availability' => $campusIds,
-                    'visibility' => [self::ROLETYPE_SELF, self::ROLETYPE_STUDENT, self::ROLETYPE_PARENT, self::ROLETYPE_STAFF],
+                    'visibility' => [self::ROLETYPE_SELF, self::ROLETYPE_PARENT, self::ROLETYPE_STAFF],
                 ],
                 /* NOTE: Decided by protect_medicalspecial_profile
                  * By default it's visible to nobody
@@ -398,9 +398,12 @@ HELP;
                 ],
             ],
             self::ROLETYPE_STAFF => [
+                /* NOTE: Decided by protect_teacher_photo
+                 * By default it's visible to nobody
+                 */
                 'portrait' => [
                     'availability' => $campusIds,
-                    'visibility' =>  [self::ROLETYPE_SELF, self::ROLETYPE_STUDENT, self::ROLETYPE_PARENT, self::ROLETYPE_STAFF],
+                    'visibility' =>  [],
                 ],
                 'externalId' => [
                     'availability' => [],
@@ -615,6 +618,54 @@ HELP;
             $roletypes[self::ROLETYPE_PARENT]['SpouseMobilePhone']['visibility'][] = [self::ROLETYPE_PARENT];
         }
 
+        /* protect_student_photo
+         *
+         * Note that Portrait.php already interprets this on its own so even if you chose different
+         * visibility settings in the Profile Editor, you're still beholden to that config var.
+         * That's a bit weird, but the defaults will indicate what that config means, even though
+         * it won't override it.
+         *
+         * See Portrait::canViewImage()
+         *
+         * Anyway;
+         * If truthy, students can't see other student's photos.
+         * Otherwise, they can.
+         */
+        if (!$this->getConfig()->get('protect_student_photo')) {
+            $roletypes[self::ROLETYPE_STUDENT]['portrait']['visibility'][] = [self::ROLETYPE_STUDENT];
+        }
+
+        /* protect_teacher_photo
+         *
+         * Note that Portrait.php already interprets this on its own so even if you chose different
+         * visibility settings in the Profile Editor, you're still beholden to that config var.
+         * That's a bit weird, but the defaults will indicate what that config means, even though
+         * it won't override it.
+         *
+         * Interestingly this config decides _from whom_ a staff profile picture is hidden.
+         *
+         * See Portrait::canViewImage()
+         *
+         * Anyway;
+         * If truthy, find out how truthy it is.
+         *    0 (none): visible to students, staff and parents
+         *    1 (all): visible to nobody
+         *    2 (students): visible to staff and parents only
+         */
+        if (0 === $this->getConfig()->get('protect_teacher_photo')) {
+            /* Protected from nobody; everyone can see it
+             */
+            $roletypes[self::ROLETYPE_STAFF]['portrait']['visibility'] = [self::ROLETYPE_SELF, self::ROLETYPE_STUDENT, self::ROLETYPE_PARENT, self::ROLETYPE_STAFF];
+        } elseif (1 === $this->getConfig()->get('protect_teacher_photo')) {
+            /* Protected from EVERYBODY; nobody can see it (this is also the default case I've assigned)
+             */
+            $roletypes[self::ROLETYPE_STAFF]['portrait']['visibility'] = [];
+        } elseif (2 === $this->getConfig()->get('protect_teacher_photo')) {
+            /* Protected from students only; staff and parents can see it.
+             */
+            $roletypes[self::ROLETYPE_STAFF]['portrait']['visibility'] = [self::ROLETYPE_SELF, self::ROLETYPE_PARENT, self::ROLETYPE_STAFF];
+        }
+        
         return $roletypes;
     }
 
