@@ -41,6 +41,14 @@ class Tracer
     private array $stackChanges = [];
 
     /**
+     * Any server vars to associate with the trace: these will be added
+     * automatically to transaction contexts.
+     *
+     * @var array
+     */
+    private array $serverVars = [];
+
+    /**
      * Build and return the default trace object.
      *
      * @return self
@@ -49,6 +57,18 @@ class Tracer
     {
         self::$defaultTrace ??= new Tracer();
         return self::$defaultTrace;
+    }
+
+    /**
+     * Set server vars for this trace.
+     *
+     * @param array $serverVars
+     * @return $this
+     */
+    public function setServerVars(array $serverVars): self
+    {
+        $this->serverVars = $serverVars;
+        return $this;
     }
 
     /**
@@ -102,6 +122,114 @@ class Tracer
         $this->stackChanges       = [];
         $this->transactionContext = $transactionContext;
         return $transactionContext;
+    }
+
+    /**
+     * Helper function for updating the current transaction context with
+     * settings for tracing an Aura route.
+     *
+     * @param string $route The name of the Aura route.
+     * @return void
+     */
+    public function setTransactionContextForAuraRoute(string $route): void
+    {
+        $transactionContext = $this->transactionContext;
+        if ($transactionContext) {
+            $transactionContext->setName('aura:' . $route);
+            $transactionContext->setOp('http.server');
+            $transactionContext->setOrigin('auto.http.aura');
+            $transactionContext->setSource(TransactionSource::route());
+            $transactionContext->setData(
+                $transactionContext->getData() + [
+                    'url'                 => $this->serverVars['REQUEST_URI'] ?? null,
+                    'http.request.method' => $this->serverVars['REQUEST_METHOD'] ?? null,
+                ],
+            );
+        }
+    }
+
+    /**
+     * Helper function for updating the current transaction context with
+     * settings for tracing a SitePage page load.
+     *
+     * @param string $filename The path of the filename being served: either a
+     *                         full path, or the path relative to the site
+     *                         root.
+     * @return void
+     */
+    public function setTransactionContextForSitePage(string $filename): void
+    {
+        $transactionContext = $this->transactionContext;
+        if ($transactionContext) {
+            $transactionContext->setName('sitePage:' . self::normaliseFilename($filename));
+            $transactionContext->setOp('http.server');
+            $transactionContext->setOrigin('auto.http.sitePage');
+            $transactionContext->setSource(TransactionSource::url());
+            $transactionContext->setData(
+                $transactionContext->getData() + [
+                    'url'                 => $this->serverVars['REQUEST_URI'] ?? null,
+                    'http.request.method' => $this->serverVars['REQUEST_METHOD'] ?? null,
+                ],
+            );
+        }
+    }
+
+    /**
+     * Helper function for updating the current transaction context with
+     * settings for tracing a basic request.
+     *
+     * @param string $filename The path of the filename being served: either a
+     *                         full path, or the path relative to the site
+     *                         root.
+     * @return void
+     */
+    public function setTransactionContextForBasicRequest(string $filename): void
+    {
+        $transactionContext = $this->transactionContext;
+        if ($transactionContext) {
+            $transactionContext->setName('basicRequest:' . self::normaliseFilename($filename));
+            $transactionContext->setOp('http.server');
+            $transactionContext->setOrigin('auto.http.basicRequest');
+            $transactionContext->setSource(TransactionSource::url());
+            $transactionContext->setData(
+                $transactionContext->getData() + [
+                    'url'                 => $this->serverVars['REQUEST_URI'] ?? null,
+                    'http.request.method' => $this->serverVars['REQUEST_METHOD'] ?? null,
+                ],
+            );
+        }
+    }
+
+    /**
+     * Helper function for updating the current transaction context with
+     * settings for tracing an invocation of a command line tool.
+     *
+     * @param string $filename   The full path of the file being invoked.
+     * @param array  $serverVars `$_SERVER` superglobal: used to set request
+     *                           time/URI/method.
+     * @return void
+     */
+    public function setTransactionContextForCommandLineTool(string $filename, array $serverVars): void
+    {
+        $transactionContext = $this->transactionContext;
+        if ($transactionContext) {
+            $transactionContext->setName('cli:' . self::normaliseFilename($filename));
+            $transactionContext->setOp('console.command');
+            $transactionContext->setOrigin('auto.console');
+            $transactionContext->setSource(TransactionSource::task());
+        }
+    }
+
+    /**
+     * Normalises a full filename path for use in a transaction name, by
+     * stripping away the site root.
+     *
+     * @param string $filename
+     * @return string
+     */
+    private static function normaliseFilename(string $filename): string
+    {
+        return trim(str_replace(SITE_root, '', $filename), '/');
     }
 
     /**
