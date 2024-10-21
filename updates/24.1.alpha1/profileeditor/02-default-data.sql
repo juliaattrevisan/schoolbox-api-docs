@@ -55,6 +55,7 @@ INSERT INTO `profile_field` VALUES
 (52,'staff','StaffBuilding','Building',8,1,NULL,NULL,NULL),
 (53,'staff','StaffRoom','Room',9,1,NULL,NULL,NULL),
 (54,'staff','StaffExtension','Extension',10,1,NULL,NULL,NULL),
-(55,'staff','StaffCampusDescription','Campus',11,1,NULL,NULL,NULL),
-(56,'staff','schoolHouse','House',12,1,NULL,NULL,NULL),
-(57,'staff','residentialHouse','Residential House',13,1,NULL,NULL,NULL);
+(55,'staff','StaffDefaultMobilePhone','Mobile Phone',11,1,NULL,NULL,NULL),
+(56,'staff','StaffCampusDescription','Campus',12,1,NULL,NULL,NULL),
+(57,'staff','schoolHouse','House',13,1,NULL,NULL,NULL),
+(58,'staff','residentialHouse','Residential House',14,1,NULL,NULL,NULL);

@@ -426,10 +426,16 @@ HELP;
                     'availability' => [],
                     'visibility' =>  [],
                 ],
+                /* NOTE: Decided by report_staff_access
+                 * By default it's visible to self, staff
+                 */
                 'StaffDepartment' => [
                     'availability' => $campusIds,
                     'visibility' =>  [self::ROLETYPE_SELF, self::ROLETYPE_STAFF],
                 ],
+                /* NOTE: Decided by report_staff_access
+                 * By default it's visible to self, staff
+                 */
                 'StaffCategoryDescription' => [
                     'availability' => $campusIds,
                     'visibility' =>  [self::ROLETYPE_SELF, self::ROLETYPE_STAFF],
@@ -442,10 +448,23 @@ HELP;
                     'availability' => $campusIds,
                     'visibility' =>  [self::ROLETYPE_SELF, self::ROLETYPE_STAFF],
                 ],
+                /* NOTE: Decided by report_staff_access
+                 * By default it's visible to self, staff
+                 */
                 'StaffExtension' => [
                     'availability' => $campusIds,
                     'visibility' =>  [self::ROLETYPE_SELF, self::ROLETYPE_STAFF],
                 ],
+                /* NOTE: Decided by report_staff_access
+                 * By default it's visible to self, staff
+                 */
+                'StaffDefaultMobilePhone' => [
+                    'availability' => $campusIds,
+                    'visibility' =>  [self::ROLETYPE_SELF, self::ROLETYPE_STAFF],
+                ],
+                /* NOTE: Decided by report_staff_access
+                 * By default it's visible to self, staff
+                 */
                 'StaffCampusDescription' => [
                     'availability' => $campusIds,
                     'visibility' =>  [self::ROLETYPE_SELF, self::ROLETYPE_STAFF],
@@ -549,6 +568,20 @@ HELP;
         if ($this->getConfig()->get('synergetic_student_comment')) {
             $roletypes[self::ROLETYPE_STUDENT]['Comment']['visibility'] = [self::ROLETYPE_STAFF];
         }
+
+        /* report_staff_access
+         *
+         * If truthy, parents can see staff's email address, mobile, department, phone, campus
+         * Otherwise only show them to staff
+         */
+        if ($this->getConfig()->get('report_staff_access')) {
+            $roletypes[self::ROLETYPE_STAFF]['StaffExtension']['visibility'][] = [self::ROLETYPE_PARENT];
+            $roletypes[self::ROLETYPE_STAFF]['StaffCampusDescription']['visibility'][] = [self::ROLETYPE_PARENT];
+            $roletypes[self::ROLETYPE_STAFF]['StaffDepartment']['visibility'][] = [self::ROLETYPE_PARENT];
+            $roletypes[self::ROLETYPE_STAFF]['StaffCategoryDescription']['visibility'][] = [self::ROLETYPE_PARENT];
+            $roletypes[self::ROLETYPE_STAFF]['StaffDefaultMobilePhone']['visibility'][] = [self::ROLETYPE_PARENT];
+        }
+
 
         return $roletypes;
     }
