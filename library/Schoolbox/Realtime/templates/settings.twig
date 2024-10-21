@@ -87,7 +87,9 @@
         <div class="small-12 island">
             <section class="content">
                     {% include '@notifications/pwa.twig' with { notifButton : 'notifOnSettings', pwaPage: 'settings' } %}
-                    <p class="notifNote"><strong>Note:</strong> If you want to receive push notifications on multiple devices, you must install the {{ config.title }} web app on all your devices.</p>
+                    {% if config.web_push_notifications_enabled %}
+                    <p class="notifNote"><strong>Note:</strong> If you want to receive push notifications on multiple devices, you must enable notifications on all your devices.</p>
+                    {% endif %}
             </section>
         </div>
         {% endif %}
