@@ -244,7 +244,11 @@ class Handler
         $stfArr = [];
         $params = [];
 
-        $sql = "SELECT * FROM {$selectedView} c WHERE 1=1";
+        $sql = "SELECT StaffID, StaffPreferred, StaffSurname, StaffEmail
+                FROM (
+                    SELECT StaffID, StaffPreferred, StaffSurname, StaffEmail, ClassCode, NormalYearLevel
+                    FROM {$selectedView} WHERE 1=1
+                ";
 
         if (isset($data['id'])) {
             $ids          = is_array($data['id']) ? $data['id'] : explode(',', $data['id']);
@@ -254,7 +258,7 @@ class Handler
         }
 
         if (isset($data['email'])) {
-            $sql         .= " AND StaffOccupEmail = ?";
+            $sql         .= " AND StaffEmail = ?";
             $params[]    = $data['email'];
         }
 
@@ -266,7 +270,16 @@ class Handler
             $sql .= " AND NormalYearLevel IN ($placeholders)";
         }
 
-        $sql .= " ORDER BY StaffSurname";
+        if (isset($data['class_code'])) {
+            $classCodes = is_array($data['class_code']) ? $data['class_code'] : explode(',', $data['class_code']);
+            $placeholders = implode(',', array_fill(0, count($classCodes), '?'));
+            $params = array_merge($params, $classCodes);
+            $sql .= " AND classcode IN ($placeholders)";
+        }
+
+        $sql .= " ) filtered_results
+                GROUP BY StaffID, StaffPreferred, StaffSurname, StaffEmail
+                ORDER BY StaffSurname";
 
         $stmt = $this->externalDb->executeQuery($sql, $params);
         foreach ($stmt as $row) {
