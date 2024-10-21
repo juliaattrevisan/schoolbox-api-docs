@@ -50,6 +50,15 @@ class Tracer
     private array $serverVars = [];
 
     /**
+     * Upon starting a transaction: should a span be automatically started which
+     * encompasses the entire transaction?
+     *
+     * (If a transaction is created without any spans, it shows in Sentry as a
+     *  transaction without any time span.)
+     */
+    private bool $autostartSpan = true;
+
+    /**
      * Build and return the default trace object.
      *
      * @return self
@@ -113,7 +122,8 @@ class Tracer
         array $data = [],
         bool $autostartSpan = true,
     ): TransactionContext {
-        $transactionContext = new TransactionContext();
+        $this->autostartSpan = $autostartSpan;
+        $transactionContext  = new TransactionContext();
         $transactionContext->setName($name);
         $transactionContext->setOp($operation);
         $transactionContext->setOrigin($origin);
@@ -126,11 +136,6 @@ class Tracer
         // Clear the current transaction state, before setting a new one.
         $this->stackChanges       = [];
         $this->transactionContext = $transactionContext;
-
-        if ($autostartSpan) {
-            $this->startSpan($name, $operation, $origin, $startTimestamp, $data);
-        }
-
         return $transactionContext;
     }
 
@@ -346,6 +351,20 @@ class Tracer
 
             /** @var array<Span> $spanStack */
             $spanStack = [];
+
+            // Autostart a span, if requested
+            if ($this->autostartSpan) {
+                $spanContext = new SpanContext();
+                $spanContext->setDescription($transaction->getName());
+                $spanContext->setOp($transaction->getOp());
+                $spanContext->setOrigin($transaction->getOrigin());
+                $spanContext->setStartTimestamp($transaction->getStartTimestamp());
+                $span = $transaction->startChild($spanContext);
+                $hub->setSpan($span);
+                $spanStack[] = $span;
+            }
+
+            // Apply each change to the actual transaction stack.
             foreach ($this->stackChanges as $stackChange) {
                 if ($stackChange instanceof Operation\Push) {
                     // Start context in most recently added stack,
@@ -369,7 +388,7 @@ class Tracer
                 }
             }
 
-            // End any leftover spans?
+            // End any leftover spans (including the autostarted span, if there)
             $endTimestamp ??= microtime(true);
             while (!empty($spanStack)) {
                 $leftoverSpan = array_pop($spanStack);
