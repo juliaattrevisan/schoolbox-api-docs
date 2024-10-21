@@ -169,7 +169,7 @@ class Controller extends Base
         // Don't store to the history
         $this->setAllowBackToTheFuture(false);
         $this->response = $this
-            ->responseFromTemplateUnthemed('@manifest/service-worker.js', ['debug' => (bool)$this->getConfigLoader()->get('debug_mode')])
+            ->responseFromTemplateUnthemed('@manifest/service-worker.js.twig', ['debug' => (bool)$this->getConfigLoader()->get('debug_mode')])
             ->withHeader('Content-Type', 'application/javascript')
         ;
     }

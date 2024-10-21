@@ -10,6 +10,7 @@ namespace Schoolbox\Firebase\ServiceWorker;
 use Alaress\Module\Module as BaseModule;
 use Alaress\Twig\Loader\IChainLoader;
 use Alaress\Web\Controller\Base;
+use Schoolbox\Config\ConfigMapper;
 
 /**
  * Module for the Firebase service worker.
@@ -29,7 +30,9 @@ class Module extends BaseModule
      */
     protected function registerRoutes()
     {
-        $this->register('GET', 'firebase-messaging-sw.js', 'getServiceWorker');
+        if ($this->getConfig()->get(ConfigMapper::NAME_WEB_PUSH_NOTIFICATIONS_ENABLED)) {
+            $this->register('GET', 'firebase-messaging-sw.js', 'getServiceWorker');
+        }
     }
 
 

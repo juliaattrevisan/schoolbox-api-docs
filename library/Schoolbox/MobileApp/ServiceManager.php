@@ -185,6 +185,14 @@ class ServiceManager implements IServiceManager
         );
 
         foreach ($registryOfUser as $registration) {
+            /* if Firebase, and push is disabled, then skip trying to send to firebase.
+             */
+            if (
+                (false === $this->configLoader->get(Schoolbox\Config\ConfigMapper::NAME_WEB_PUSH_NOTIFICATIONS_ENABLED)) &&
+                Registry::PROVIDER_FIREBASE === $registration->getService()->getProviderName()
+            ) {
+                continue;
+            }
             $srv = $registration->getService();
 
             // by-reference for convenience

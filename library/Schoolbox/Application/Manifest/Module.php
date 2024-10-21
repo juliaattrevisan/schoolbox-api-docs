@@ -11,6 +11,7 @@ namespace Schoolbox\Application\Manifest;
 use Alaress\Module\Module as BaseModule;
 use Alaress\Twig\Loader\IChainLoader;
 use Alaress\Web\Controller\Base;
+use Schoolbox\Config\ConfigMapper;
 use Twig\Error\LoaderError;
 
 class Module extends BaseModule
@@ -26,7 +27,9 @@ class Module extends BaseModule
      */
     protected function registerRoutes()
     {
-        $this->register('GET', 'manifest', 'getManifest', null, null);
+        if ($this->getConfig()->get(ConfigMapper::NAME_PWA_ENABLED)) {
+            $this->register('GET', 'manifest', 'getManifest', null, null);
+        }
         $this->register('GET', 'manifest/offline', 'getOffline', null, null);
         $this->register('GET', 'service-worker.js', 'getServiceWorker', null, null);
     }

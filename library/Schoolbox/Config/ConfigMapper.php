@@ -182,6 +182,9 @@ class ConfigMapper extends Mapper
     public const NAME_GOTENBERG_API_VERSION = 'gotenberg_api_version';
     public const NAME_SUMMATIVE_REPORT_ENABLED = 'summative_report_enabled';
 
+    public const NAME_PWA_ENABLED = 'pwa_enable';
+    public const NAME_WEB_PUSH_NOTIFICATIONS_ENABLED = 'web_push_notifications_enabled';
+
     public const NAME_SHOW_SCHOOLBOX_HELP_LINK = 'show_schoolbox_help_link';
 
     public const NAME_EPORTFOLIO_ENABLED = 'eportfolio_enabled';
@@ -390,6 +393,7 @@ class ConfigMapper extends Mapper
         self::_CLOUDWORK_OAUTH_IDENTITY_PROVIDER,
         self::NAME_OAUTH_ENABLE_SSO,
         self::NAME_MAIL_ENABLED,
+        self::NAME_PWA_ENABLED,
     ];
 
     /**

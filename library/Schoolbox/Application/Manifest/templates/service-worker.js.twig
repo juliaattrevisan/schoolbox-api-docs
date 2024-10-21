@@ -88,6 +88,7 @@ self.addEventListener("fetch", (evt) => {
     );
 });
 
+{% if config.web_push_notifications_enabled %}
 // Listen for messages from the main script
 self.addEventListener("message", (event) => {
     // iOS requires notifications to be dispatched from inside a service worker
@@ -122,3 +123,5 @@ self.addEventListener("notificationclick", (e) => {
         }),
     );
 });
+
+{% endif %}
