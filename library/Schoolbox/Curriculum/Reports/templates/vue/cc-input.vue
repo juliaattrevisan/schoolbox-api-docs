@@ -17,14 +17,17 @@ const store = useStore();
 /**
  * Submit the form to generate the report
  */
-function onGenerateReport(): void {}
+function onGenerateReport(): void {
+    console.warn(store.selectedCourses);
+    console.warn(store.nodes);
+}
 </script>
 
 <template>
     <form class="c-island l-flex-col l-pad-m l-gap-m" @submit.prevent="onGenerateReport">
         <div>
             <label for="courses">Select Courses</label>
-            <search-select endpoint="" :selected="store.courses" />
+            <search-select endpoint="" :selected="store.selectedCourses" />
         </div>
         <div>
             <label for="curriculum">Select Curriculum</label>

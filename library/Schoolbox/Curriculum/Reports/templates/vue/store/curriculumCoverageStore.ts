@@ -9,7 +9,8 @@ import { useSelectedNodesStore } from "@schoolboxCurriculum/vue/curriculumSelect
 import { ReportOptionValues, type ReportOption } from "../../js/types/curriculumCoverageTypes";
 
 export const useStore = defineStore("curriculumCoverage", () => {
-    const courses = window.Vue.ref<Course[]>([]); // the selected courses to display in the report
+    const selectedCourses = window.Vue.ref<Course[]>([]); // the selected courses
+    const courses = window.Vue.ref<Course[]>([]); // the courses to display in the report
     const nodes = useSelectedNodesStore().nodes as Node[]; // the selected nodes to display in the report
     const allReportOptionValues = window.Vue.ref<ReportOption[]>([
         {
@@ -43,10 +44,11 @@ export const useStore = defineStore("curriculumCoverage", () => {
      * @param $courses - the courses to display in the report
      */
     function init($courses: Course[]): void {
-        courses.value = $courses;
+        selectedCourses.value = $courses;
     }
 
     return {
+        selectedCourses,
         courses,
         nodes,
         allReportOptionValues,
