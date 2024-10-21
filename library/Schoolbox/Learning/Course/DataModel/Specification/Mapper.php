@@ -186,7 +186,7 @@ class Mapper extends AbstractCourseMapper
         $pb = $this->getPredicateBuilder();
         $pb->like('f.name', "%{$this->database->getQuoter()->escapeForLike($searchParam)}%");
         $pb->isNull('f.deleted_at');
-        $where = implode(' AND ', $pb->getWhere());
+        $where = $pb->getWhereIntersect();
 
         $query = "
             SELECT COUNT(DISTINCT s.{$this->getIdentifierColumn()})
