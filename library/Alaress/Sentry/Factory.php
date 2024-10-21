@@ -11,6 +11,8 @@ namespace Alaress\Sentry;
 
 use Alaress\Authorizer\Failure\Base as BaseAuthorizationFailure;
 use Schoolbox\Application\Exception\Exception as SchoolboxException;
+use Schoolbox\Config\ConfigMapper;
+use Schoolbox\IConfigLoader;
 use Schoolbox\Instance;
 use Schoolbox\Mapper\Exception\Deleted;
 use Schoolbox\Mapper\Exception\NotFound;
@@ -44,16 +46,17 @@ class Factory
         string $applicationName,
         ?string $sentryToken,
         ?string $sentryProject,
+        IConfigLoader $configLoader,
     ): Sentry\State\HubInterface {
         if (!isset($sentryToken, $sentryProject) || $sentryToken === '' || $sentryProject === '') {
             return new NullHub();
         }
 
         Sentry\init([
-            'dsn'                => "https://{$sentryToken}@sentry.io/{$sentryProject}",
-            'environment'        => $instance->getType(),
-            'release'            => $applicationName . '@' . $instance->getVersion(),
-            'before_send'        => new CompositeFilter(
+            'dsn'               => "https://{$sentryToken}@sentry.io/{$sentryProject}",
+            'environment'       => $instance->getType(),
+            'release'           => $applicationName . '@' . $instance->getVersion(),
+            'before_send'       => new CompositeFilter(
                 new ExceptionFilter(
                     Deleted::class,
                     NotFound::class,
@@ -62,11 +65,23 @@ class Factory
                 ),
                 new DeprecationFilter(),
             ),
-            'error_types'        => self::ERROR_REPORTING,
-            'send_default_pii'   => true,
-            'attach_stacktrace'  => true,
-            // TODO make sample rate configurable
-            'traces_sample_rate' => 1.0,
+            'error_types'       => self::ERROR_REPORTING,
+            'send_default_pii'  => true,
+            'attach_stacktrace' => true,
+            'traces_sampler'    => function (Sentry\Tracing\SamplingContext $context) use ($configLoader): float {
+                // Do something with sample rates
+                $lines = explode("\n", $configLoader->get(ConfigMapper::NAME_SENTRY_TRACE_CUSTOM_SAMPLE_RATES));
+                foreach ($lines as $line) {
+                    $row = str_getcsv($line);
+                    if (count($row) >= 2) {
+                        [$name, $sampleRate] = $row;
+                        if (fnmatch($name, $context->getTransactionContext()?->getName())) {
+                            return floatval($sampleRate);
+                        }
+                    }
+                }
+                return floatval($configLoader->get(ConfigMapper::NAME_SENTRY_TRACE_DEFAULT_SAMPLE_RATE));
+            },
         ]);
         Sentry\configureScope(static function (Sentry\State\Scope $scope) use ($instance): void {
             $scope->setTags([

@@ -279,7 +279,7 @@ class Kernel extends WebKernelAbstract
         $di->set(
             'sentry',
             $di->lazy(
-                static function () use ($di) {
+                static function () use ($di, $config) {
                     $sentryToken   = defined('SENTRY_TOKEN') ? SENTRY_TOKEN : null;
                     $sentryProject = defined('SENTRY_PROJECT') ? SENTRY_PROJECT : null;
                     /** @var Instance $sb */
@@ -289,6 +289,7 @@ class Kernel extends WebKernelAbstract
                         Instance::APPLICATION_NAME,
                         $sentryToken,
                         $sentryProject,
+                        $config,
                     );
                 }
             )
