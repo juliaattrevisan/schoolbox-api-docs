@@ -148,6 +148,18 @@ class Controller extends Base
             $field->setEnabled(0);
             $this->fieldMapper->save($field);
 
+            /* I think that we should remove the Availability and Visibility settings
+             * if you disable a field. Disabling and immediately re-adding it will
+             * spawn the field with checkboxes unticked; but if you refresh the page
+             * it'll restore the values persisted in the database, resulting in a weird
+             * kind of outcome you might not have expected.
+             *
+             * If you're removing a field, I have to assume you're doing that for a reason
+             * that doesn't warrant restoring configuration from the grave
+             */
+            $this->availabilityCampusMapper->deleteByColumn('profile_field_id', $field->getId());
+            $this->visibilityMapper->deleteByColumn('profile_field_id', $field->getId());
+
             /* Removed fields will leave a hole in the sequencing.
              * To make sequencing contiguous, we need to fetch all
              * the fields ordered by their sequence:
