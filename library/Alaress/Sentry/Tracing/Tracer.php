@@ -363,9 +363,12 @@ class Tracer
     ): mixed {
         $this->startSpan($description, $operation, $origin, null, $data);
         try {
-            return $callable();
-        } finally {
-            $this->finishSpan();
+            $result = $callable();
+            $this->finishSpan(status: SpanStatus::ok());
+            return $result;
+        } catch (Throwable $e) {
+            $this->finishSpan(status: SpanStatus::internalError());
+            throw $e;
         }
     }
 
