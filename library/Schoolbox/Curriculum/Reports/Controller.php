@@ -37,7 +37,8 @@ class Controller extends Base
         $this->response = $this->responseFromTemplate('@curriculumreports/index.twig', [
             'var' => 'GET',
             'error' => $this->errorMapper,
-            'curric' => $this->curriculumMapper
+            'curric' => $this->curriculumMapper,
+            'selectedCourses' => [['id' => 1, 'name' => 'Course 1'], ['id' => 2, 'name' => 'Course 2']],
         ]);
     }
 

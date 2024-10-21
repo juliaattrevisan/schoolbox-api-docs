@@ -2,6 +2,7 @@
     <curriculum-coverage
         courses-endpoint=""
         curriculum-endpoint="{{ routeLookup('curriculumApi.searchNode') }}"
+        :selected-courses="{{ (selectedCourses ?? []) | json_encode }}"
     />
 </div>
 <script src="{{ CDN_PREFIX }}/js/bundle/curriculumCoverage.js?v={{ config.site_version }}"></script>

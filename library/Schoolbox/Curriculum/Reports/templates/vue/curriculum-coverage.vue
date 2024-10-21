@@ -6,11 +6,13 @@
 import CurriculumSelector from "@schoolboxCurriculum/vue/curriculumSelector/curriculum-selector.vue";
 import type { Node } from "@schoolboxCurriculum/types/Node";
 import SearchSelect from "@schoolboxVue/components/searchSelect/search-select.vue";
+import type { Course } from "@schoolboxLibrary/types/Course";
 import CcReport from "./cc-report.vue";
 
 interface Props {
     coursesEndpoint: string; // The courses api endpoint.
     curriculumEndpoint: string; // The curriculum api endpoint.
+    selectedCourses: Course[]; // The selected courses.
 }
 const props = defineProps<Props>();
 
@@ -35,7 +37,7 @@ const selectedNodes = window.Vue.ref<Pick<Node, "id" | "name" | "code" | "descri
         <div class="c-island l-flex-col l-pad-m l-gap-m">
             <div>
                 <label for="courses">Select Courses</label>
-                <search-select endpoint="" :selected="[]" />
+                <search-select endpoint="" :selected="props.selectedCourses" />
             </div>
             <div>
                 <label for="curriculum">Select Curriculum</label>
