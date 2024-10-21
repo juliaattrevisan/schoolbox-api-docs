@@ -194,6 +194,41 @@ class Controller extends BaseController
         $externalUser = (new \Schoolbox\Profile\Field\Factory($fieldMapper, $userMapper, $this->externalUser))
             ->produce($student, $this->getUser());
 
+        /* Pastoral Counts: Implement in a callback
+         */
+        $showPastoral =
+            $this->getConfigLoader()->get(ConfigMapper::NAME_PASTORAL_ENABLED)
+            && $this->getAuthorizer()->isPathAuthorizedForUser(
+                'pastoral.getStudent',
+                [
+                    'studentId' => $student->getId(),
+                    'student'   => $student,
+                ],
+                $this->getUser()
+            );
+
+        $pastoralCounts = null;
+
+        if ($showPastoral) {
+            $pastoralCountHelper = (new PastoralCountHelper(
+                $this->routeGenerator,
+                $this->pastoralTypeMapper,
+                $this->pastoralSubTypeMapper,
+                $this->pastoralDataSource,
+                $this->termMapper
+            ));
+
+            $pastoralCounts = $pastoralCountHelper->countStudentEventsByTypes(
+                $this->getUser(),
+                $student,
+                null,
+                null,
+                $pastoralCountHelper->getStartDate((int)$this->getConfigLoader()->get(ConfigMapper::NAME_PASTORAL_FLAG_COUNT_PERIOD))
+            );
+        }
+
+
+
         // Wrangle default colors
         $colors              = $this->timetableColourMapper->findAll()->reindex();
         $colorFactory        = new ColorFactory();
@@ -373,16 +408,7 @@ class Controller extends BaseController
             }
         }
 
-        $showPastoral =
-            $this->getConfigLoader()->get(ConfigMapper::NAME_PASTORAL_ENABLED)
-            && $this->getAuthorizer()->isPathAuthorizedForUser(
-                'pastoral.getStudent',
-                [
-                    'studentId' => $student->getId(),
-                    'student'   => $student,
-                ],
-                $this->getUser()
-            );
+
 
         $protectStudentContacts = $this->getConfigLoader()->get('protect_student_contacts');
 
@@ -493,18 +519,6 @@ class Controller extends BaseController
 
         if (!$this->getConfigLoader()->get('report_staff_access') && $this->getUser()->getRole()->isParent()) {
             $canEmailStaff = false;
-        }
-
-        $pastoralCounts = 0;
-        if ($showPastoral) {
-            $pastoralCountHelper = new PastoralCountHelper(
-                $this->routeGenerator,
-                $this->pastoralTypeMapper,
-                $this->pastoralSubTypeMapper,
-                $this->pastoralDataSource,
-                $this->termMapper
-            );
-            $pastoralCounts      = $pastoralCountHelper->countStudentEventsByTypes($this->getUser(), $student, null, null, $pastoralCountHelper->getStartDate((int)$this->getConfigLoader()->get(ConfigMapper::NAME_PASTORAL_FLAG_COUNT_PERIOD)));
         }
 
         // Does the current user share a campus with the student?

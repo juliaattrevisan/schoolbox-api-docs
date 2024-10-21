@@ -10,7 +10,9 @@ declare(strict_types=1);
 namespace Schoolbox\Profile\Field;
 
 use Alaress\Database\Predicate\InvalidColumnException;
+use DebugBar\DebugBarException;
 use Schoolbox\Admin\Profile\Editor\Field\Mapper;
+use Schoolbox\Mapper\DefinitionException;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Role;
 use Schoolbox\User;
@@ -43,8 +45,10 @@ class Factory
      * @return array
      * @throws InvalidColumnException
      * @throws MapperException
+     * @throws DebugBarException
      * @throws \DomainException
      * @throws \PDOException
+     * @throws DefinitionException
      * @throws \UnexpectedValueException
      */
     public function produce(\Schoolbox\User $viewee, \Schoolbox\User $viewer): array
@@ -256,13 +260,18 @@ class Factory
             'hohTeacher' => $hohTeacher,
             'coordTeacher' => $coordTeacher,
             'studentCoach' => $studentCoach,
-            /* TODO A specially crafted pastoral thing
-             *  Push that in when the time comes
+            /* Pastoral Counts was obtained specially in the controller cos it needs
+             * a bunch of little bits and pieces
              */
-            'pastoralFlags' => null
+            'pastoralCounts' => null
         ];
 
-        return array_merge($externalUser, $referenceFields);
+        $result = array_merge($externalUser, $referenceFields);
+
+        /* TODO Mutate $result with an optional callback...such as that pastoral counts stuff
+         */
+
+        return $result;
     }
 
 
