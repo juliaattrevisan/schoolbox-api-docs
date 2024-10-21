@@ -4,7 +4,7 @@
  */
 
 // import { useTemplateRef } from "vue";
-import { useSelected, type Item } from "@schoolboxVue/composables/store/useSelected";
+import { useSelected } from "@schoolboxVue/composables/store/useSelected";
 import { useSearch } from "./composables/useSearch";
 import type { SearchSelectItem } from "./types/searchSelectTypes";
 import SsSelectedList from "./ss-selected-list.vue";
@@ -28,13 +28,14 @@ const props = withDefaults(defineProps<Props>(), {
     placeholder: "Search...",
 });
 
-const selectedItems = defineModel<Item[]>("selected-items", { default: [] }); // to store selected items
+const selectedItems = defineModel<SearchSelectItem[]>("selected-items", { default: [] }); // to store selected items
 const { add, remove, update } = useSelected(selectedItems); // to add and remove selected items
 
 // const searchSelectEl = useTemplateRef("searchSelectEl"); // failing typecheck currently :(
 const searchSelectEl = window.Vue.ref<HTMLDivElement | null>(null);
 
-const { query, isActive, isSearching, hasNoResults, results } = useSearch(props.endpoint); // to search for results
+const results = defineModel<SearchSelectItem[]>("results", { default: [] }); // to store search results
+const { query, isActive, isSearching, hasNoResults } = useSearch(props.endpoint, results); // to search for results
 
 /**
  * To show the current search results, or the default results

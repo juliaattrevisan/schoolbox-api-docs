@@ -12,9 +12,13 @@ export const DEBOUNCE_AMOUNT = 350; // the amount in ms to hold off on searching
 /**
  * search for results that match the current query
  * @param endpoint - the endpoint to search for results
+ * @param $results - to optionally pass in a reference to the results list
  * @returns isSearching, query, results, isActive, hasNoResults,  search
  */
-export function useSearch(endpoint: string): {
+export function useSearch(
+    endpoint: string,
+    $results: Ref<SearchSelectItem[]> | undefined = undefined,
+): {
     isSearching: Ref<boolean>;
     query: Ref<string>;
     results: Ref<SearchSelectItem[]>;
@@ -25,7 +29,7 @@ export function useSearch(endpoint: string): {
     const isSearching = window.Vue.ref(false); // to notify that an action is taking place,
     const query = window.Vue.ref(""); // current search term to filter the active nodes
     const isActive = window.Vue.computed(() => query.value.length >= MIN_QUERY_LENGTH); // To only start showing search results once enough characters have been typed
-    const results = window.Vue.ref<SearchSelectItem[]>([]); // nodes returned in the current search results
+    const results = $results === undefined ? window.Vue.ref<SearchSelectItem[]>([]) : $results; // create a new results list if one is not passed in
     const hasSearched = window.Vue.ref(false); // to show that a search has been made
     const hasNoResults = window.Vue.computed(() => isActive.value && results.value.length === 0 && !isSearching.value); // To show that no nodes match the current search
 

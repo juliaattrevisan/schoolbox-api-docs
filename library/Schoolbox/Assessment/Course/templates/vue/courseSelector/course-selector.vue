@@ -19,7 +19,8 @@ store.init(props.preselected);
 
 <template>
     <search-select
-        v-model:selected-items="store.selected"
+        :v-model:selected-items="store.selected"
+        :v-model:results="[]"
         label="Select Courses"
         label-id="courses"
         :is-required="true"
