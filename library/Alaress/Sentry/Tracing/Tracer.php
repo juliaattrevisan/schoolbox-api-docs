@@ -97,6 +97,10 @@ class Tracer
      * @param array                  $data           Additional data to add to the transaction: see
      *                                               https://develop.sentry.dev/sdk/telemetry/traces/span-data-conventions/
      *                                               for standard examples.
+     * @param bool                   $autostartSpan  If true: auto-start a root span with matching details for this
+     *                                               transaction, with matching details.
+     *                                               This prevents the transaction from closing when a manually created
+     *                                               span is closed.
      * @return TransactionContext
      */
     public function startTransaction(
@@ -106,8 +110,8 @@ class Tracer
         ?TransactionSource $source = null,
         ?float $startTimestamp = null,
         array $data = [],
+        bool $autostartSpan = true,
     ): TransactionContext {
-
         $transactionContext = new TransactionContext();
         $transactionContext->setName($name);
         $transactionContext->setOp($operation);
@@ -121,6 +125,11 @@ class Tracer
         // Clear the current transaction state, before setting a new one.
         $this->stackChanges       = [];
         $this->transactionContext = $transactionContext;
+
+        if ($autostartSpan) {
+            $this->startSpan($name, $operation, $origin, $startTimestamp, $data);
+        }
+
         return $transactionContext;
     }
 
