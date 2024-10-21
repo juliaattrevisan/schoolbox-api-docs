@@ -12,18 +12,7 @@ interface Props {
 }
 const props = defineProps<Props>();
 
-const emit = defineEmits<{
-    input: [value: string];
-}>();
-
-const query = window.Vue.ref<string>("");
-
-/**
- * To emit the search query whenever it changes
- */
-window.Vue.watch(query, () => {
-    emit("input", query.value);
-});
+const query = defineModel<string>("query", { default: "" });
 
 /**
  * To close the search results when clicking outside

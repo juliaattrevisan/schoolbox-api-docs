@@ -71,14 +71,6 @@ function onAdd($items: SearchSelectItem[]): void {
 function onRemove($items: SearchSelectItem[]): void {
     remove($items);
 }
-
-/**
- * To update the search query
- * @param $query - the search query
- */
-function onInput($query: string): void {
-    query.value = $query;
-}
 </script>
 
 <template>
@@ -91,10 +83,10 @@ function onInput($query: string): void {
             @remove="onRemove"
         />
         <ss-query-input
+            v-model:query="query"
             :label-id="props.labelId"
             :parent-el="searchSelectEl"
             :placeholder="props.placeholder"
-            @input="onInput"
         />
         <ss-results-list
             :query="query"
