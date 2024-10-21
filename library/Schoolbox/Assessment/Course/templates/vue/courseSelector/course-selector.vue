@@ -5,6 +5,7 @@
 
 import SearchSelect from "@schoolboxVue/components/searchSelect/search-select.vue";
 import type { Course } from "@schoolboxLibrary/types/Course";
+import { useCourseSelectorStore } from "./store/courseSelectorStore";
 
 interface Props {
     endpoint: string; // The course api endpoint
@@ -12,12 +13,13 @@ interface Props {
 }
 const props = defineProps<Props>();
 
-const selectedItems = window.Vue.ref<Course[]>([]);
+const store = useCourseSelectorStore();
+store.init(props.preselected);
 </script>
 
 <template>
     <search-select
-        v-model:selected-items="selectedItems"
+        v-model:selected-items="store.selected"
         label="Select Courses"
         label-id="courses"
         :is-required="true"
