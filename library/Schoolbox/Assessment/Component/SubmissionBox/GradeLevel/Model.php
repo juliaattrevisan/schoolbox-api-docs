@@ -143,10 +143,10 @@ class Model implements ISoftDeletable
     /**
      * User that first authored this grade level
      *
-     * @param User $createdBy
+     * @param ?User $createdBy
      * @return $this
      */
-    public function setCreatedBy(User $createdBy): self
+    public function setCreatedBy(?User $createdBy): self
     {
         $this->createdBy = $createdBy;
         return $this;
@@ -165,10 +165,10 @@ class Model implements ISoftDeletable
     /**
      * User that has made the most recent changes to this grade level group
      *
-     * @param User $updatedBy
+     * @param ?User $updatedBy
      * @return $this
      */
-    public function setUpdatedBy(User $updatedBy): self
+    public function setUpdatedBy(?User $updatedBy): self
     {
         $this->updatedBy = $updatedBy;
         return $this;
