@@ -93,6 +93,10 @@ HELP;
             $settingsIndex = $this->buildSettingsIndex();
             $fieldsIndex = $this->buildFieldsIndex();
 
+            print_r($settingsIndex['student']['StudentMedicalAlert']);
+            print_r($settingsIndex['student']['StudentSpecialNeedsFlag']);
+            die();
+
             /* Prepare some oft-used queries
              */
             $availabilityCampusStatement = $this->getDatabaseInternal()->prepare("
@@ -560,11 +564,14 @@ HELP;
 
         /* protect_medicalspecial_profile
          *
-         * If truthy, show medical alerts to staff
-         * If truthy, also show special needs to staff (idk why Special Needs historically classified as medical...)
+         * Be careful with the double negative here: !protect_medicalspecial_profile allows people to see
+         * all the stuff. protect_medicalspecial_profile prevents them from seeing all that stuff.
+         *
+         * If falsy, show medical alerts to staff
+         * If falsy, also show special needs to staff (idk why Special Needs historically classified as medical...)
          * Otherwise, hide it from everyone
          */
-        if ($this->getConfig()->get('protect_medicalspecial_profile')) {
+        if (!$this->getConfig()->get('protect_medicalspecial_profile')) {
             $roletypes[self::ROLETYPE_STUDENT]['StudentMedicalAlert']['visibility'] = [self::ROLETYPE_STAFF];
             $roletypes[self::ROLETYPE_STUDENT]['StudentSpecialNeedsFlag']['visibility'] = [self::ROLETYPE_STAFF];
         }
