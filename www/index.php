@@ -23,7 +23,7 @@ if ($path !== "/index.php" && preg_match('/.+\.php$/', $path) && file_exists(WEB
     // The transaction's actual name will be set later.
     $trace = Tracer::getDefaultTrace();
     $trace->setServerVars($_SERVER);
-    $transactionContext = $trace->startTransaction('placeholder', startTimestamp: microtime(true));
+    $transactionContext = $trace->startTransaction(startTimestamp: microtime(true));
     $kernel = new WebRequest\Kernel();
     $kernel->run();
     $trace->finishTransaction($kernel->get('sentry'), endTimestamp: microtime(true));

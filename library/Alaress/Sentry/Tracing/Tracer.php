@@ -25,6 +25,11 @@ use Throwable;
 class Tracer
 {
     /**
+     * A placeholder name for the transaction.
+     */
+    private const PLACEHOLDER_TRANSACTION_NAME = 'placeholder';
+
+    /**
      * Singleton instance of the default trace to use.
      */
     private static ?Tracer $defaultTrace = null;
@@ -90,10 +95,10 @@ class Tracer
      * a transaction represents a single request to a service: see
      * https://docs.sentry.io/concepts/key-terms/tracing/distributed-tracing/#traces-transactions-and-spans.
      *
-     * @param string                 $name           The transaction's name: this should be something which describes
-     *                                               the request which spawned the transaction, e.g. a route name or
-     *                                               request URI.
-     *                                               This is also used as the auto-started transaction's description.
+     * @param string                 $name           The transaction's name: defaults to a placeholder value.
+     *                                               This placeholder may be modified with one of the
+     *                                               `setTransactionContextFor*` methods, or by calling `setName`
+     *                                               directly on the context returned by `getTransactionContext`.
      * @param string|null            $operation      The operation which the transaction is tracking: see
      *                                               https://develop.sentry.dev/sdk/telemetry/traces/span-operations/
      *                                               for standard examples.
@@ -137,6 +142,14 @@ class Tracer
         $this->stackChanges       = [];
         $this->transactionContext = $transactionContext;
         return $transactionContext;
+    }
+
+    /**
+     * @return TransactionContext|null
+     */
+    public function getTransactionContext(): ?TransactionContext
+    {
+        return $this->transactionContext;
     }
 
     /**

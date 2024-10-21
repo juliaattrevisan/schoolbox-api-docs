@@ -124,7 +124,7 @@ class Kernel extends CliKernelAbstract
         }
 
         // Instrument here
-        Tracer::getDefaultTrace()->startTransaction('placeholder', startTimestamp: microtime(true));
+        Tracer::getDefaultTrace()->startTransaction(startTimestamp: microtime(true));
         Tracer::getDefaultTrace()->setTransactionContextForCommandLineTool(
             $this->app->getToolFilenameAbsolute()
         );
