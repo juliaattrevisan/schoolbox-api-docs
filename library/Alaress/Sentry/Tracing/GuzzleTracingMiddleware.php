@@ -16,11 +16,8 @@ use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 use Sentry\Breadcrumb;
 use Sentry\ClientInterface;
-use Sentry\SentrySdk;
 use Sentry\State\HubInterface;
-use Sentry\Tracing\SpanContext;
 use Sentry\Tracing\SpanStatus;
-
 use Throwable;
 
 use function Sentry\getBaggage;
