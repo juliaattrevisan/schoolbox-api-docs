@@ -4,7 +4,6 @@
  */
 
 import CurriculumSelector from "@schoolboxCurriculum/vue/curriculumSelector/curriculum-selector.vue";
-import type { Node } from "@schoolboxCurriculum/types/Node";
 import SearchSelect from "@schoolboxVue/components/searchSelect/search-select.vue";
 import type { Course } from "@schoolboxLibrary/types/Course";
 import CcReport from "./cc-report.vue";
@@ -15,20 +14,6 @@ interface Props {
     selectedCourses: Course[]; // The pre selected courses
 }
 const props = defineProps<Props>();
-
-/**
- * @todo - This is a temporary solution to store the selected nodes to demo the mock report
- */
-const selectedNodes = window.Vue.ref<Pick<Node, "id" | "name" | "code" | "description" | "children" | "enabled">[]>([
-    {
-        id: 3104,
-        name: "Communication skills",
-        code: "E-ATL-CO",
-        description: "",
-        children: [],
-        enabled: true,
-    },
-]);
 </script>
 
 <template>
@@ -47,7 +32,6 @@ const selectedNodes = window.Vue.ref<Pick<Node, "id" | "name" | "code" | "descri
                     :is-select-all="true"
                     :include-without-code="true"
                     :can-select-children="false"
-                    :selected-nodes="selectedNodes"
                     input-id="curriculum"
                 />
             </div>
