@@ -555,7 +555,7 @@ HELP;
          * Otherwise, hide it from everyone
          */
         if ($this->getConfig()->get('synergetic_community_alerts')) {
-            $roletypes[self::ROLETYPE_STUDENT]['AlertMessage']['visibility'] = [self::ROLETYPE_STAFF, self::ROLETYPE_PARENT];
+            $roletypes[self::ROLETYPE_STUDENT]['AlertMessages']['visibility'] = [self::ROLETYPE_STAFF, self::ROLETYPE_PARENT];
         }
 
         /* protect_medicalspecial_profile
