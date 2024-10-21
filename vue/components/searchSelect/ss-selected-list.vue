@@ -36,7 +36,7 @@ function onRemoveItem(item: SearchSelectItem): void {
 </script>
 
 <template>
-    <div v-if="props.selectedItems.length > 0" class="selected-container l-flex-row l-gap-s l-pad-s">
+    <div v-if="props.selectedItems.length > 0" class="selected-list-container l-flex-row l-gap-s l-pad-s">
         <ss-selected-list-item
             v-for="item in props.selectedItems"
             :key="item.id"
@@ -49,7 +49,7 @@ function onRemoveItem(item: SearchSelectItem): void {
 </template>
 
 <style lang="scss" scoped>
-.selected-container {
+.selected-list-container {
     border: 1px solid var(--form-border-color);
     margin-bottom: -1px; //to butt up against the search input
     max-height: 133px;

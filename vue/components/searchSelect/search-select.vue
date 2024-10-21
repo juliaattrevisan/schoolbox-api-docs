@@ -108,5 +108,3 @@ function onInput($query: string): void {
         />
     </div>
 </template>
-
-<style scoped></style>
