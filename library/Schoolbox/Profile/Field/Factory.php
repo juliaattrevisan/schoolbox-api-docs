@@ -253,6 +253,9 @@ class Factory
             'email' => $viewee->getEmail(),
             'externalId' => $viewee->getExternalId(),
             'role' => $viewee->getRole()->getName(),
+            /* ResidentialHouse can indeed be null: storm and phpstannis have different ideas
+             */
+            /** @phpstan-ignore-next-line */
             'residentialHouse' => $viewee->getResidentialHouse()?->getHouse(),
             'campusCollection' => $viewee->getCampusCollection(),
             /* This is an arbitrary set of people associated with $viewee somehow

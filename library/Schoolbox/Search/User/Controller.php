@@ -85,7 +85,6 @@ class Controller extends BaseController
         private TermMapper $termMapper,
         private \Schoolbox\External\User $userRelationHydrator,
         private \Schoolbox\Admin\Profile\Editor\Field\Mapper $fieldMapper,
-
     ) {
     }
 
