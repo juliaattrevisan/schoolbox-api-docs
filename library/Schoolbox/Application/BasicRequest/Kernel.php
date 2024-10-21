@@ -589,6 +589,10 @@ class Kernel extends WebKernelAbstract
      */
     public function startSentryTransaction(string $path): void
     {
-        Tracer::getDefaultTrace()->setTransactionContextForBasicRequest($path);
+        $trace = Tracer::getDefaultTrace();
+        $trace->setServerVars($_SERVER);
+        $trace->startTransaction();
+        $trace->setTransactionContextForBasicRequest($path);
+        $this->registerCustomShutdown(fn () => $trace->finishTransaction($this->get('sentry')));
     }
 }
