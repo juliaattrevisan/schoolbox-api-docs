@@ -3,9 +3,8 @@
  * To help identify gaps in chosen curriculum areas
  */
 
-import CurriculumSelector from "@schoolboxCurriculum/vue/curriculumSelector/curriculum-selector.vue";
-import SearchSelect from "@schoolboxVue/components/searchSelect/search-select.vue";
 import type { Course } from "@schoolboxLibrary/types/Course";
+import CcInput from "./cc-input.vue";
 import CcReport from "./cc-report.vue";
 
 interface Props {
@@ -19,24 +18,11 @@ const props = defineProps<Props>();
 <template>
     <h1>Curriculum Coverage Report</h1>
     <div class="l-flex-col l-gap-m">
-        <div class="c-island l-flex-col l-pad-m l-gap-m">
-            <div>
-                <label for="courses">Select Courses</label>
-                <search-select endpoint="" :selected="props.selectedCourses" />
-            </div>
-            <div>
-                <label for="curriculum">Select Curriculum</label>
-                <curriculum-selector
-                    :is-read-only="false"
-                    :data-endpoint="props.curriculumEndpoint"
-                    :is-select-all="true"
-                    :include-without-code="true"
-                    :can-select-children="false"
-                    input-id="curriculum"
-                />
-            </div>
-            <button>Generate report</button>
-        </div>
+        <cc-input
+            :courses-endpoint="props.coursesEndpoint"
+            :curriculum-endpoint="props.curriculumEndpoint"
+            :selected-courses="props.selectedCourses"
+        />
         <cc-report />
     </div>
 </template>
