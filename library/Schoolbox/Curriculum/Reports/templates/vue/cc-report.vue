@@ -8,9 +8,11 @@ import CcReportTable from "./cc-report-table.vue";
 </script>
 
 <template>
-    <div class="l-flex l-flex-col l-gap-s">
-        <cc-report-header />
-        <cc-report-table />
+    <div class="c-island l-pad-m">
+        <div class="l-flex l-flex-col l-gap-s">
+            <cc-report-header />
+            <cc-report-table />
+        </div>
     </div>
 </template>
 

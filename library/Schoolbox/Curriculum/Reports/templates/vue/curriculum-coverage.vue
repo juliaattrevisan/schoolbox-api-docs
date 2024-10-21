@@ -37,9 +37,7 @@ const props = defineProps<Props>();
             </div>
             <button>Generate report</button>
         </div>
-        <div class="c-island l-pad-m">
-            <cc-report />
-        </div>
+        <cc-report />
     </div>
 </template>
 
