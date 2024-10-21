@@ -24,7 +24,7 @@ function onCreateNewSelected(): void {
 </script>
 
 <template>
-    <div :class="`row ${store.isReadOnly ? '' : 'actions-small-1 actions-medium-2'}`">
+    <div :class="`row ${store.isReadOnly ? '' : 'actions-small-2 actions-medium-2'}`">
         <div class="list-item">
             <div class="small-12 column">
                 <h1>Manage Curriculum</h1>
@@ -32,6 +32,7 @@ function onCreateNewSelected(): void {
         </div>
         <template v-if="store.hasLoadedOk && !store.isReadOnly">
             <nav>
+                <a href="/curriculum/reports/coverage" class="icon-report" title="View Curriculum Coverage Report"> </a>
                 <a
                     href="#create-curriculum"
                     data-interaction="create-curriculum"
