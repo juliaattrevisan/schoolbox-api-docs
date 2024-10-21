@@ -584,11 +584,11 @@ HELP;
          * Otherwise only show them to staff
          */
         if ($this->getConfig()->get('report_staff_access')) {
-            $roletypes[self::ROLETYPE_STAFF]['StaffExtension']['visibility'][] = [self::ROLETYPE_PARENT];
-            $roletypes[self::ROLETYPE_STAFF]['StaffCampusDescription']['visibility'][] = [self::ROLETYPE_PARENT];
-            $roletypes[self::ROLETYPE_STAFF]['StaffDepartment']['visibility'][] = [self::ROLETYPE_PARENT];
-            $roletypes[self::ROLETYPE_STAFF]['StaffCategoryDescription']['visibility'][] = [self::ROLETYPE_PARENT];
-            $roletypes[self::ROLETYPE_STAFF]['StaffDefaultMobilePhone']['visibility'][] = [self::ROLETYPE_PARENT];
+            $roletypes[self::ROLETYPE_STAFF]['StaffExtension']['visibility'][] = self::ROLETYPE_PARENT;
+            $roletypes[self::ROLETYPE_STAFF]['StaffCampusDescription']['visibility'][] = self::ROLETYPE_PARENT;
+            $roletypes[self::ROLETYPE_STAFF]['StaffDepartment']['visibility'][] = self::ROLETYPE_PARENT;
+            $roletypes[self::ROLETYPE_STAFF]['StaffCategoryDescription']['visibility'][] = self::ROLETYPE_PARENT;
+            $roletypes[self::ROLETYPE_STAFF]['StaffDefaultMobilePhone']['visibility'][] = self::ROLETYPE_PARENT;
         }
 
         /* restrict_parent_emails
@@ -601,21 +601,21 @@ HELP;
          * Otherwise, only show them to self and staff
          */
         if (!$this->getConfig()->get('restrict_parent_emails')) {
-            $roletypes[self::ROLETYPE_PARENT]['email']['visibility'][] = [self::ROLETYPE_PARENT];
-            $roletypes[self::ROLETYPE_PARENT]['role']['visibility'][] = [self::ROLETYPE_PARENT];
+            $roletypes[self::ROLETYPE_PARENT]['email']['visibility'][] = self::ROLETYPE_PARENT;
+            $roletypes[self::ROLETYPE_PARENT]['role']['visibility'][] = self::ROLETYPE_PARENT;
 
             /* imho these should be hidden from other parents, regardless of this config setting
              */
-            $roletypes[self::ROLETYPE_PARENT]['HomePhone']['visibility'][] = [self::ROLETYPE_PARENT];
-            $roletypes[self::ROLETYPE_PARENT]['WorkPhone']['visibility'][] = [self::ROLETYPE_PARENT];
-            $roletypes[self::ROLETYPE_PARENT]['MobilePhone']['visibility'][] = [self::ROLETYPE_PARENT];
+            $roletypes[self::ROLETYPE_PARENT]['HomePhone']['visibility'][] = self::ROLETYPE_PARENT;
+            $roletypes[self::ROLETYPE_PARENT]['WorkPhone']['visibility'][] = self::ROLETYPE_PARENT;
+            $roletypes[self::ROLETYPE_PARENT]['MobilePhone']['visibility'][] = self::ROLETYPE_PARENT;
 
             /* Spouse stuff - further constrained by SpouseDirectoryIncludeFlag and getHideContacts
              * but those are implemented further away
              */
-            $roletypes[self::ROLETYPE_PARENT]['spouseName']['visibility'][] = [self::ROLETYPE_PARENT];
-            $roletypes[self::ROLETYPE_PARENT]['SpouseEmail']['visibility'][] = [self::ROLETYPE_PARENT];
-            $roletypes[self::ROLETYPE_PARENT]['SpouseMobilePhone']['visibility'][] = [self::ROLETYPE_PARENT];
+            $roletypes[self::ROLETYPE_PARENT]['spouseName']['visibility'][] = self::ROLETYPE_PARENT;
+            $roletypes[self::ROLETYPE_PARENT]['SpouseEmail']['visibility'][] = self::ROLETYPE_PARENT;
+            $roletypes[self::ROLETYPE_PARENT]['SpouseMobilePhone']['visibility'][] = self::ROLETYPE_PARENT;
         }
 
         /* protect_student_photo
@@ -632,7 +632,7 @@ HELP;
          * Otherwise, they can.
          */
         if (!$this->getConfig()->get('protect_student_photo')) {
-            $roletypes[self::ROLETYPE_STUDENT]['portrait']['visibility'][] = [self::ROLETYPE_STUDENT];
+            $roletypes[self::ROLETYPE_STUDENT]['portrait']['visibility'][] = self::ROLETYPE_STUDENT;
         }
 
         /* protect_teacher_photo
