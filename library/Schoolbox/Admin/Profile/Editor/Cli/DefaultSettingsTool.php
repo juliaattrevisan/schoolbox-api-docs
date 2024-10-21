@@ -270,15 +270,19 @@ HELP;
                     'availability' => $campusIds,
                     'visibility' => [self::ROLETYPE_SELF, self::ROLETYPE_STUDENT, self::ROLETYPE_PARENT, self::ROLETYPE_STAFF],
                 ],
+                /* NOTE: Decided by protect_medicalspecial_profile
+                 * By default it's visible to nobody
+                 */
                 'StudentSpecialNeedsFlag' => [
                     'availability' => $campusIds,
-                    'visibility' =>  [self::ROLETYPE_STAFF],
+                    'visibility' =>  [],
                 ],
                 'EnglishSecondFlag' => [
                     'availability' => $campusIds,
                     'visibility' =>  [self::ROLETYPE_STAFF],
                 ],
-                /* StudentMedicalAlert: Consciously no visibility: forces schools to opt-in to reveal
+                /* NOTE: Decided by protect_medicalspecial_profile
+                 * By default it's visible to nobody
                  */
                 'StudentMedicalAlert' => [
                     'availability' => $campusIds,
@@ -288,9 +292,12 @@ HELP;
                     'availability' => $campusIds,
                     'visibility' =>  [self::ROLETYPE_STAFF],
                 ],
+                /* NOTE: Decided by synergetic_community_alerts
+                 * By default it's visible to nobody
+                 */
                 'AlertMessages' => [
                     'availability' => $campusIds,
-                    'visibility' =>  [self::ROLETYPE_PARENT, self::ROLETYPE_STAFF],
+                    'visibility' =>  [],
                 ],
                 /* AlertLegal: Consciously no visibility: forces schools to opt-in to reveal
                  */
@@ -302,9 +309,12 @@ HELP;
                     'availability' => $campusIds,
                     'visibility' =>  [self::ROLETYPE_STAFF],
                 ],
+                /* NOTE: Decided by synergetic_student_comment
+                 * By default it's visible to nobody
+                 */
                 'Comment' => [
                     'availability' => $campusIds,
-                    'visibility' =>  [self::ROLETYPE_STAFF],
+                    'visibility' =>  [],
                 ],
                 'positionTitle' => [
                     'availability' => $campusIds,
@@ -504,6 +514,41 @@ HELP;
                 ],
             ]
         ];
+
+        /* Config var equivalents
+         *
+         * These configs ultimately get superseded by the Profile Editor
+         * but we'll use them to craft some idiosyncratic defaults
+         */
+
+        /* synergetic_community_alerts
+         *
+         * If truthy, show alerts to staff or parents of the student
+         * Otherwise, hide it from everyone
+         */
+        if ($this->getConfig()->get('synergetic_community_alerts')) {
+            $roletypes[self::ROLETYPE_STUDENT]['AlertMessage']['visibility'] = [self::ROLETYPE_STAFF, self::ROLETYPE_PARENT];
+        }
+
+        /* protect_medicalspecial_profile
+         *
+         * If truthy, show medical alerts to staff
+         * If truthy, also show special needs to staff (idk why Special Needs historically classified as medical...)
+         * Otherwise, hide it from everyone
+         */
+        if ($this->getConfig()->get('protect_medicalspecial_profile')) {
+            $roletypes[self::ROLETYPE_STUDENT]['StudentMedicalAlert']['visibility'] = [self::ROLETYPE_STAFF];
+            $roletypes[self::ROLETYPE_STUDENT]['StudentSpecialNeedsFlag']['visibility'] = [self::ROLETYPE_STAFF];
+        }
+
+        /* synergetic_student_comment
+         *
+         * If truthy, show student comments to staff
+         * Otherwise, hide it from everyone
+         */
+        if ($this->getConfig()->get('synergetic_student_comment')) {
+            $roletypes[self::ROLETYPE_STUDENT]['Comment']['visibility'] = [self::ROLETYPE_STAFF];
+        }
 
         return $roletypes;
     }
