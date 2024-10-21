@@ -1474,10 +1474,10 @@ class Controller extends Base
     }
 
     /**
-     * @param string|null $table
-     * @return string|null
+     * @param string $table
+     * @return string
      */
-    private function getListCategory(?string $table): ?string
+    private function getListCategory(string $table): string
     {
         return match ($table) {
             'news-topic' => 'News',
