@@ -19,7 +19,6 @@ use ErrorException;
 use InvalidArgumentException;
 use Psr\Log\LoggerInterface;
 use Schoolbox\Application\CliKernelAbstract;
-use Schoolbox\Config\Loader as ConfigLoader;
 
 /**
  * This Kernel is designed for running CLI scripts/tools that are one-offs, for example:
@@ -130,12 +129,21 @@ class Kernel extends CliKernelAbstract
         $trace->setTransactionContextForCommandLineTool(
             $this->app->getToolFilenameAbsolute(),
         );
+        $this->getShutdownHandler()->registerFunction(
+            function (): void {
+                // I don't believe it's possible to capture the exit code.
+                // I don't even reliably have an error here, so leave status
+                // as empty.
+                Tracer::getDefaultTrace()->finishTransaction(
+                    $this->get('sentry'),
+                    microtime(true),
+                );
+            },
+        );
 
         $perform = $forcePerform || $this->getKernelOpt(self::OPT_SHORT_PERFORM) || $this->getKernelOpt(self::OPT_LONG_PERFORM);
         $this->app->setup($this->appOpts, $this->getDependencyInjector(), $this->outStream, $this->logger(), $perform);
         $this->app->run();
-
-        $trace->finishTransaction($this->di->get('sentry'), endTimestamp: microtime(true));
     }
 
 
