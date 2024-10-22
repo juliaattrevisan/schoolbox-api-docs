@@ -18,6 +18,7 @@ use Alaress\Database\Predicate\Builder;
 use Alaress\Database\Predicate\InvalidColumnException;
 use Alaress\Database\Quoter\IQuoter;
 use Alaress\DebugBar\Instance as DebugBar;
+use Alaress\Sentry\Tracing\Tracer;
 use Alaress_Date_Format;
 use InvalidArgumentException;
 use PDO;
@@ -509,7 +510,12 @@ abstract class Mapper implements IMapper
     {
         // a cache of SELECT results
         $this->selectCache = new Cache(function (PDOStatement $statement, $bypassCache = false) {
-            $statement->execute();
+            Tracer::getDefaultTrace()->runWithinSpan(
+                $statement->execute(...),
+                $statement->queryString,
+                'db.sql.query',
+                'auto.db.mapper.select',
+            );
 
             // Bypass cache if requested, and cache isn't already being bypassed
             $previousLocalBodyCacheBypass = $this->localBodyCacheBypass;
@@ -1682,7 +1688,13 @@ abstract class Mapper implements IMapper
 
             // Run query
             try {
-                if (!$statement->execute()) {
+                $result = Tracer::getDefaultTrace()->runWithinSpan(
+                    $statement->execute(...),
+                    $statement->queryString,
+                    'db.sql.execute',
+                    'auto.db.mapper.delete',
+                );
+                if (!$result) {
                     $this->database->rollBack();
                     return false;
                 }
@@ -1908,7 +1920,13 @@ abstract class Mapper implements IMapper
 
             // Run query
             try {
-                if (!$statement->execute()) {
+                $result = Tracer::getDefaultTrace()->runWithinSpan(
+                    $statement->execute(...),
+                    $statement->queryString,
+                    'db.sql.execute',
+                    'auto.db.mapper.update',
+                );
+                if (!$result) {
                     $this->database->rollBack();
                     return false;
                 }
@@ -2794,7 +2812,12 @@ abstract class Mapper implements IMapper
 
         $statement = $this->prepareSelect($select, $from, new Builder($this->getDatabase()->getQuoter(), $this->getTable()), $columnList, $options);
 
-        $statement->execute();
+        Tracer::getDefaultTrace()->runWithinSpan(
+            $statement->execute(...),
+            $statement->queryString,
+            'db.sql.query',
+            'auto.db.mapper.select',
+        );
 
         return $statement;
     }
@@ -3209,10 +3232,20 @@ abstract class Mapper implements IMapper
                 // (Need to use replace rather than update to handle tables with
                 //  a non-auto-incrementing primary key, i.e. storage.hash)
                 if (isset($insertStatement) && !$this->getModelProperty($model, $idProperty)) {
-                    $result         = $insertStatement->execute($this->dehydrate($model));
+                    $result = Tracer::getDefaultTrace()->runWithinSpan(
+                        fn () => $insertStatement->execute($this->dehydrate($model)),
+                        $insertStatement->queryString,
+                        'db.sql.execute',
+                        'auto.db.mapper.insert',
+                    );
                     $pdoMethods[$i] = self::METHOD_CREATE;
                 } else {
-                    $result = $replaceStatement->execute($this->dehydrate($model));
+                    $result = Tracer::getDefaultTrace()->runWithinSpan(
+                        fn () => $replaceStatement->execute($this->dehydrate($model)),
+                        $replaceStatement->queryString,
+                        'db.sql.execute',
+                        'auto.db.mapper.replace',
+                    );
                     // take note of whether this was an insert or update
                     switch ($replaceStatement->rowCount()) {
                         case self::PDO_RESULT_INSERT:
@@ -4361,7 +4394,12 @@ abstract class Mapper implements IMapper
     {
         $query     = "DELETE FROM `{$this->getTable()}`";
         $statement = $this->database->prepare($query);
-        $statement->execute();
+        Tracer::getDefaultTrace()->runWithinSpan(
+            $statement->execute(...),
+            $statement->queryString,
+            'db.sql.execute',
+            'auto.db.mapper.truncate',
+        );
     }
 
 
