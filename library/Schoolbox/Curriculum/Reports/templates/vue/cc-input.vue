@@ -51,9 +51,7 @@ function onGenerateReport(): void {
         <div>
             <label for="courses">Select Courses</label>
             <search-select endpoint="" :selected="store.selectedCourses" />
-            <label v-if="isCoursesInvalid" id="courses-error" class="error" for="courses"
-                >This field is required.</label
-            >
+            <label v-if="isCoursesInvalid" class="error" for="courses">This field is required.</label>
         </div>
         <div>
             <label for="curriculum">Select Curriculum</label>
@@ -65,9 +63,7 @@ function onGenerateReport(): void {
                 :can-select-children="false"
                 input-id="curriculum"
             />
-            <label v-if="isCurriculumInvalid" id="curriculum-error" class="error" for="curriculum"
-                >This field is required.</label
-            >
+            <label v-if="isCurriculumInvalid" class="error" for="curriculum">This field is required.</label>
         </div>
         <button>{{ buttonText }}</button>
     </form>
