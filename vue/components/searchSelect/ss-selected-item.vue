@@ -8,6 +8,7 @@ import type { SearchSelectItem } from "./types/searchSelectTypes";
 interface Props {
     item: SearchSelectItem; // the selected item
     isSingleSelect: boolean; // whether only one item can be selected
+    canSelectItem: boolean; // whether the user can select an item (to trigger the select emit)
 }
 const props = defineProps<Props>();
 
@@ -46,6 +47,7 @@ function onRemoveSelected(): void {
         :data-test="`ss-selected-list-item-container-${props.item.id}`"
     >
         <button
+            v-if="props.canSelectItem"
             type="button"
             :class="`selected-item__name-button ${props.isSingleSelect ? 'l-flex__item--1' : ''}`"
             :title="`View ${props.item.name}`"
@@ -56,6 +58,7 @@ function onRemoveSelected(): void {
         >
             {{ props.item.name }}
         </button>
+        <span v-else class="selected-item__name-span">{{ props.item.name }}</span>
         <button
             type="button"
             class="selected-item__remove-button icon-close"

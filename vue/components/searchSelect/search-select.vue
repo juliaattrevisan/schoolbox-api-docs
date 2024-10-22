@@ -14,16 +14,16 @@ import SsResults from "./ss-results.vue";
 interface Props {
     label: string; // the label text
     labelId: string; // the label id
-    isRequired?: boolean; // whether the input requires a value
     endpoint: string; // the search api endpoint
+    isRequired?: boolean; // whether the input requires a value
     defaultResults?: SearchSelectItem[]; // show selection options when the search input is empty
     isSingleSelect?: boolean; // whether only one result can be selected
     formValueName?: string; // the name of the form value
-    placeholder?: string; // the placeholder text
+    placeholder?: string; // the query input placeholder text
+    canSelectItem?: boolean; // whether the user can select an item (to trigger the select emit)
 }
 const props = withDefaults(defineProps<Props>(), {
     defaultResults: undefined,
-    isSingleSelect: false,
     formValueName: "",
     placeholder: "Search...",
 });
@@ -92,6 +92,7 @@ function onRemove(items: SearchSelectItem[]): void {
             :selected="selected"
             :form-value-name="props.formValueName"
             :is-single-select="props.isSingleSelect"
+            :can-select-item="props.canSelectItem"
             @select="onSelect"
             @remove="onRemove"
         />
