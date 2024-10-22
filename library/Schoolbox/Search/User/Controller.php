@@ -549,10 +549,18 @@ class Controller extends BaseController
                  */
                 'externalUser'             => $externalUser,
                 'nameFormat'               => $this->getConfigLoader()->get('name_format_student'),
+                /* The viewee's User instance - sadly, very easy to confuse with USER global, which means
+                 * the viewer, so be careful with that
+                 */
+                'user'                     => $student,
+                /* Takes into account whether the viewer has the View Student Profile role permission
+                 * in addition to some other standard checks for Guest-ness. We need to keep that.
+                 */
+                'showDetails'              => $showDetails,
+
                 /* Old implementation
                  */
                 'session'                  => $_SESSION,
-                'user'                     => $student,
                 'showPastoral'             => $showPastoral,
                 'eportfolioAuth'           => $this->eportfolioAuthenticator->canView(),
                 'hideContacts'             => $hideContacts,
@@ -573,7 +581,6 @@ class Controller extends BaseController
                 'allTeacherIds'            => implode(',', $allTeacherIds),
                 'pdStates'                 => $this->professionalDevelopmentMapper->getStates(),
                 'pd'                       => $pd,
-                'showDetails'              => $showDetails,
                 'showEmail'                => $showEmails,
                 'travelLogs'               => $travelLogs,
                 'learningMomentCanComment' => $learningMomentCanComment,
