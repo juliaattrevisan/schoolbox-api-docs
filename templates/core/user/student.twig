@@ -161,14 +161,8 @@
                     </div>
                     <div class="small-12 medium-10 columns no-pad">
                         {# Profile Editor v24 begins here mostly
-                         #
-                         # All flags and tuples need you to pass showDetails check which is the same implementation
-                         # as it's always been (you need role-bnased permissions, etc. to get here) Inadvertently
-                         # I might have hidden more than needed, but you can use the additionalConstraints to lock
-                         # and unlock on a per-field basis if push comes to shove
                          #}
-                        {% if showDetails %}
-                            {% block details %}
+                        {% block details %}
                                 {# TODO @zacmcw I don't know where you put styles anymore
                                  #  Migrate this inline stylesheet into the appropriate place
                                  #}
@@ -330,7 +324,6 @@
                                     {% endfor %}
                                 </dl>
                             {% endblock details %}
-                        {% endif %}
                     </div>
                 </div>
             </div>
