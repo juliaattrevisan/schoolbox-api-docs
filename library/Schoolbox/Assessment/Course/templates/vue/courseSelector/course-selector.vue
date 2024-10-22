@@ -3,6 +3,7 @@
  * To select Courses
  */
 
+import { watchIgnorable } from "@vueuse/core";
 import SearchSelect from "@schoolboxVue/components/searchSelect/search-select.vue";
 import type { Course } from "@schoolboxLibrary/types/Course";
 import { useCourseSelectorStore } from "./store/courseSelectorStore";
@@ -25,11 +26,32 @@ const props = withDefaults(defineProps<Props>(), {
 
 const store = useCourseSelectorStore();
 store.init(props.preselected);
+
+const results = window.Vue.ref<Course[]>([]);
+
+/**
+ * To manipulate the results to target the courses object and
+ * use the title as the name
+ */
+const { ignoreUpdates } = watchIgnorable(results, (newResults) => {
+    ignoreUpdates(() => {
+        if (newResults.length === 0) {
+            return;
+        }
+        results.value = newResults.courses.map((course) => {
+            return {
+                id: course.id,
+                name: course.title,
+            };
+        });
+    });
+});
 </script>
 
 <template>
     <search-select
         v-model:selected="store.selected"
+        v-model:results="results"
         :label="props.label"
         :label-id="props.labelId"
         :is-required="props.isRequired"

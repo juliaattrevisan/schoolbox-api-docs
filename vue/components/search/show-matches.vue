@@ -68,7 +68,7 @@ function onClicked(event: Event): void {
         :disabled="props.disabled ? props.disabled : undefined"
         :for="props.for ? props.for : undefined"
         @click="onClicked"
-        v-html="addMarks(props.text, queryWordList)"
+        v-html="addMarks(props.text, queryWordList, true)"
     ></component>
     <!-- eslint-enable vue/no-v-html -->
     <!-- eslint-enable vue/no-v-text-v-html-on-component -->
