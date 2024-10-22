@@ -22,6 +22,7 @@ use Schoolbox\IConfigLoader;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\User;
 use Twig\Environment;
+use Twig\Extension\DebugExtension;
 use Twig\Loader\FilesystemLoader;
 
 use function count;
@@ -78,6 +79,7 @@ class Subnav
         }
 
         $this->twig = new Environment(new FilesystemLoader($paths), $options);
+        $this->twig->addExtension(new DebugExtension());
 
         // The CDN_PREFIX needs to be made available in this Twig instance
         $this->twig->addGlobal('CDN_PREFIX', (new PrefixGenerator($this->configLoader))->generate());
