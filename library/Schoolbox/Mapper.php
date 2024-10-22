@@ -1249,14 +1249,6 @@ abstract class Mapper implements IMapper
         $hydrator    = $map['hydrator'] ?? null;
         if ($hydrator instanceof IColumnType) {
             $value = $hydrator->hydrate($value, $join_mapper);
-            // Attempting to set a model value to NULL will likely break,
-            // and won't do anything because it will be NULL on hydrate anyway.
-            // TODO reconsider this? This was introduced in SA-1605 way back in
-            //      2017 when type safety wasn't really a thing.
-            //      NULL is a valid value for a model, if there is no relation.
-            if (!isset($value) && $hydrator instanceof ModelColumn) {
-                return $this;
-            }
         }
         $model->$set_method($value);
         return $this;

@@ -33,6 +33,7 @@ class SubmissionBoxMapperTest extends TestCase
     {
         $data = array(
             'id'                      => 3,
+            'assessment_id'           => 3,
             'owner'                   => 15,
             'accept_submission'       => true,
             'multi_submission'        => false,

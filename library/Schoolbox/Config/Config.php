@@ -43,8 +43,8 @@ class Config
     /** @var null|int */
     private $typeId;
 
-    /** @var Type\Model */
-    private $type;
+    /** @var ?Type\Model */
+    private ?Type\Model $type;
 
     /** @var bool */
     private $editable;
@@ -196,9 +196,9 @@ class Config
     }
 
     /**
-     * @param Type\Model $type
+     * @param ?Type\Model $type
      */
-    public function setType(Type\Model $type): self
+    public function setType(?Type\Model $type): self
     {
         $this->type = $type;
         return $this;
