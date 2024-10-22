@@ -114,7 +114,8 @@
             <div class="profile content">
                 <div class="row no-margin">
                     {# Build a hash lookup of additional clauses and cross-reference them
-                     # This list is your last opportunity to show/hide a field
+                     # This list is your last opportunity to show/hide a field based on your
+                     # own boolean rather than the showDetails one I used
                      #
                      # Additional visibility constraints for the **viewer's** roletype
                      # and the corresponding bool set by old twig implementation
@@ -124,13 +125,14 @@
                      #}
                     {% set additionalConstraints = {
                         'staff': {
+                            '_default': USER.role.viewStudentProfile,
                             'email': showEmail,
-                            'formTeacher': user.isShowTimetable,
-                            'hohTeacher': user.isShowTimetable,
-                            'pastoralCounts': showPastoral,
-                            'StudentForm': user.isShowTimetable,
-                            'StudentTutorDescription': user.isShowTimetable,
-                            'tutorTeacher': user.isShowTimetable
+                            'formTeacher': USER.role.viewStudentProfile and user.isShowTimetable,
+                            'hohTeacher': USER.role.viewStudentProfile and user.isShowTimetable,
+                            'pastoralCounts': USER.role.viewStudentProfile and showPastoral,
+                            'StudentForm': USER.role.viewStudentProfile and user.isShowTimetable,
+                            'StudentTutorDescription': USER.role.viewStudentProfile and user.isShowTimetable,
+                            'tutorTeacher': USER.role.viewStudentProfile and user.isShowTimetable
                         }
                     } %}
 
@@ -141,7 +143,10 @@
                         {% set foundPortrait = false %}
 
                         {% for selectedField in externalUser.data.roleTypes.fields.selected|filter(selectedField => selectedField.field == 'portrait') %}
-                            {% if (additionalConstraints[USER.role.type][selectedField.field] ?? true) %}
+                            {# If this field doesn't have a special boolean associated with it that might make it visible,
+                             # use the prescribed default bool
+                             #}
+                            {% if (additionalConstraints[USER.role.type][selectedField.field] ?? additionalConstraints[USER.role.type]['_default']) %}
                                 {% set foundPortrait = true %}
 
                                 {# Portrait was available and visible to you,
@@ -214,7 +219,7 @@
                                          # permissions, privacy and configuration settings that go well beyond
                                          # the viewer's role type; if you can see it, show it. Otherwise skip it.
                                          #}
-                                        {% if (additionalConstraints[USER.role.type][selectedField.field] ?? true) %}
+                                        {% if (additionalConstraints[USER.role.type][selectedField.field] ?? additionalConstraints[USER.role.type]['_default']) %}
                                             {# Use localisation variant from Terminology, if it exists;
                                              # otherwise use default Display As that I provided by default
                                              #}
