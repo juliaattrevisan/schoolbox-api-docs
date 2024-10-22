@@ -7,9 +7,9 @@
 import { useSelected } from "@schoolboxVue/composables/store/useSelected";
 import { useSearch } from "./composables/useSearch";
 import type { SearchSelectItem } from "./types/searchSelectTypes";
-import SsSelectedList from "./ss-selected-list.vue";
+import SsSelected from "./ss-selected.vue";
 import SsQueryInput from "./ss-query-input.vue";
-import SsResultsList from "./ss-results-list.vue";
+import SsResults from "./ss-results.vue";
 
 interface Props {
     label: string; // the label text
@@ -77,7 +77,7 @@ function onRemove($items: SearchSelectItem[]): void {
 <template>
     <div ref="searchSelectEl">
         <label :for="props.labelId" :class="`${props.isRequired ? 'required' : ''}`">{{ props.label }}</label>
-        <ss-selected-list
+        <ss-selected
             :selected="selected"
             :form-value-name="props.formValueName"
             :is-single-select="props.isSingleSelect"
@@ -89,7 +89,7 @@ function onRemove($items: SearchSelectItem[]): void {
             :parent-el="searchSelectEl"
             :placeholder="props.placeholder"
         />
-        <ss-results-list
+        <ss-results
             :query="query"
             :is-active="isActive"
             :is-searching="isSearching"

@@ -4,7 +4,7 @@
  */
 
 import type { SearchSelectItem } from "./types/searchSelectTypes";
-import SsSelectedListItem from "./ss-selected-item.vue";
+import SsSelectedItem from "./ss-selected-item.vue";
 
 interface Props {
     selected: SearchSelectItem[]; // the selected results
@@ -37,7 +37,7 @@ function onRemoveItem(item: SearchSelectItem): void {
 
 <template>
     <div v-if="props.selected.length > 0" class="selected l-flex-row l-gap-s l-pad-s">
-        <ss-selected-list-item
+        <ss-selected-item
             v-for="item in props.selected"
             :key="item.id"
             :item="item"
