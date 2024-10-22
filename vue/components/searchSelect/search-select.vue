@@ -21,6 +21,8 @@ interface Props {
     formValueName?: string; // the name of the form value
     placeholder?: string; // the query input placeholder text
     canSelectItem?: boolean; // whether the user can select an item (to trigger the select emit)
+    hasError: boolean; // Whether the input has an error
+    errorMessage: string; // The error message to display
 }
 const props = withDefaults(defineProps<Props>(), {
     defaultResults: undefined,
@@ -102,6 +104,7 @@ function onRemove(items: SearchSelectItem[]): void {
             :parent-el="searchSelectEl"
             :placeholder="props.placeholder"
         />
+        <label v-if="props.hasError" class="error" :for="props.labelId">{{ errorMessage }}</label>
         <ss-results
             :query="query"
             :is-active="isActive"

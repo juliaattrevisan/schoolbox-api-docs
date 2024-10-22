@@ -13,10 +13,13 @@ interface Props {
     label?: string; // The label text
     labelId?: string; // The label id
     isRequired?: boolean; // Whether the input requires a value
+    hasError?: boolean; // Whether the input has an error
+    errorMessage?: string; // The error message to display
 }
 const props = withDefaults(defineProps<Props>(), {
     label: "Select Courses",
     labelId: "courses",
+    errorMessage: "Please select at least one course",
 });
 
 const store = useCourseSelectorStore();
@@ -30,6 +33,8 @@ store.init(props.preselected);
         :label-id="props.labelId"
         :is-required="props.isRequired"
         :endpoint="props.endpoint"
+        :has-error="props.hasError"
+        :error-message="props.errorMessage"
     />
 </template>
 

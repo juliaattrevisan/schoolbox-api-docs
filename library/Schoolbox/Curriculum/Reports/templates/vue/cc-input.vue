@@ -57,8 +57,8 @@ function onGenerateReport(): void {
                 :endpoint="props.coursesEndpoint"
                 :preselected="props.selectedCourses"
                 :is-required="true"
+                :has-error="isCoursesInvalid"
             />
-            <label v-if="isCoursesInvalid" class="error" for="courses">This field is required.</label>
         </div>
         <div>
             <label for="curriculum">Select Curriculum</label>
