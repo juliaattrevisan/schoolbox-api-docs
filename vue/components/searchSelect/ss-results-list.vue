@@ -15,7 +15,7 @@ interface Props {
     isSingleSelect: boolean; // whether only one result can be selected
     results: SearchSelectItem[]; // the results returned from the search
     hasNoResults: boolean; // whether there are no results
-    selectedItems: SearchSelectItem[]; // the selected results
+    selected: SearchSelectItem[]; // the selected results
 }
 const props = defineProps<Props>();
 
@@ -108,14 +108,14 @@ function onHover(index: number): void {
 <template>
     <div class="results">
         <div v-if="props.isSearching" class="results__status">Searching for results....</div>
-        <div v-else-if="props.hasNoResults && props.selectedItems.length === 0" class="results__status">
+        <div v-else-if="props.hasNoResults && props.selected.length === 0" class="results__status">
             No results found for your current search.
         </div>
         <template v-else>
             <ss-results-list-select-all
                 v-if="showSelectAll"
                 :results="props.results"
-                :selected-items="props.selectedItems"
+                :selected-items="props.selected"
                 :index="0"
                 :active-index="activeIndex"
                 @add="onAdd"
@@ -126,7 +126,7 @@ function onHover(index: number): void {
                 v-for="(result, index) in props.results"
                 :key="result.id"
                 :query="props.query"
-                :selected-items="props.selectedItems"
+                :selected-items="props.selected"
                 :result="result"
                 :is-single-select="props.isSingleSelect"
                 :index="showSelectAll ? index + 1 : index"

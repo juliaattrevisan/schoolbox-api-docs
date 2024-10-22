@@ -7,7 +7,7 @@ import type { SearchSelectItem } from "./types/searchSelectTypes";
 import SsSelectedListItem from "./ss-selected-list-item.vue";
 
 interface Props {
-    selectedItems: SearchSelectItem[]; // the selected results
+    selected: SearchSelectItem[]; // the selected results
     formValueName: string; // the name of the form value
     isSingleSelect: boolean; // whether only one result can be selected
 }
@@ -23,7 +23,7 @@ const emit = defineEmits<{
  * @returns - a comma separated string of the ids
  */
 const ids = window.Vue.computed(() => {
-    return props.selectedItems.join(",");
+    return props.selected.join(",");
 });
 
 /**
@@ -36,9 +36,9 @@ function onRemoveItem(item: SearchSelectItem): void {
 </script>
 
 <template>
-    <div v-if="props.selectedItems.length > 0" class="selected-list-container l-flex-row l-gap-s l-pad-s">
+    <div v-if="props.selected.length > 0" class="selected l-flex-row l-gap-s l-pad-s">
         <ss-selected-list-item
-            v-for="item in props.selectedItems"
+            v-for="item in props.selected"
             :key="item.id"
             :item="item"
             :is-single-select="props.isSingleSelect"
@@ -49,7 +49,7 @@ function onRemoveItem(item: SearchSelectItem): void {
 </template>
 
 <style lang="scss" scoped>
-.selected-list-container {
+.selected {
     border: 1px solid var(--form-border-color);
     margin-bottom: -1px; //to butt up against the search input
     max-height: 133px;

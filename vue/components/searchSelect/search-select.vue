@@ -28,8 +28,8 @@ const props = withDefaults(defineProps<Props>(), {
     placeholder: "Search...",
 });
 
-const selectedItems = defineModel<SearchSelectItem[]>("selected-items", { default: [] }); // to store selected items
-const { add, remove, update } = useSelected(selectedItems); // to add and remove selected items
+const selected = defineModel<SearchSelectItem[]>("selected", { default: [] }); // to store selected items
+const { add, remove, update } = useSelected(selected); // to add and remove selected items
 
 // const searchSelectEl = useTemplateRef("searchSelectEl"); // failing typecheck currently :(
 const searchSelectEl = window.Vue.ref<HTMLDivElement | null>(null);
@@ -58,7 +58,7 @@ const currentResults = window.Vue.computed(() => {
  */
 function onAdd($items: SearchSelectItem[]): void {
     // if single select, switch with the previous selection
-    if (props.isSingleSelect && selectedItems.value.length > 0) {
+    if (props.isSingleSelect && selected.value.length > 0) {
         update($items);
         return;
     }
@@ -78,7 +78,7 @@ function onRemove($items: SearchSelectItem[]): void {
     <div ref="searchSelectEl">
         <label :for="props.labelId" :class="`${props.isRequired ? 'required' : ''}`">{{ props.label }}</label>
         <ss-selected-list
-            :selected-items="selectedItems"
+            :selected="selected"
             :form-value-name="props.formValueName"
             :is-single-select="props.isSingleSelect"
             @remove="onRemove"
@@ -96,7 +96,7 @@ function onRemove($items: SearchSelectItem[]): void {
             :is-single-select="props.isSingleSelect"
             :results="currentResults"
             :has-no-results="hasNoResults"
-            :selected-items="selectedItems"
+            :selected="selected"
             @add="onAdd"
             @remove="onRemove"
         />
