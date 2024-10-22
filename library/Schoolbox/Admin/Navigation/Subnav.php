@@ -150,7 +150,7 @@ class Subnav
                 'description' => 'Key system status information.',
                 'children'    => [],
             ],
-            '/adminv2/calendar/Cleanup' => [
+            '/adminv2/calendar' => [
                 'name'       => 'Calendar',
                 'visible'    => $userIsSuperuser,
                 'searchable' => false,
@@ -172,6 +172,12 @@ class Subnav
                         'visible'     => $userIsSuperuser,
                         'children'    => [],
                         'description' => 'Control which additional calendars are included into a users calendar. This includes VCAL events, modules and the SIS.',
+                    ],
+                    '/adminv2/lists/event-type' => [
+                        'name'        => 'Event Types',
+                        'visible'     => $userIsSuperuser,
+                        'children'    => [],
+                        'description' => 'Setup the list of event types for filtering and colour coding.',
                     ],
                 ],
             ],
@@ -466,12 +472,6 @@ class Subnav
                         'visible'     => $userIsSuperuser && $this->configLoader->get(ConfigMapper::NAME_WEBDAV_ENABLED),
                         'children'    => [],
                         'description' => 'Configure network drives that users will be able to browse inside the platform using the WebDAV protocol.',
-                    ],
-                    '/adminv2/lists/event-type' => [
-                        'name'        => 'Event Types',
-                        'visible'     => $userIsSuperuser,
-                        'children'    => [],
-                        'description' => 'Setup the list of event types for filtering and colour coding.',
                     ],
                     '/adminv2/lists/house' => [
                         'name'        => 'Houses',
