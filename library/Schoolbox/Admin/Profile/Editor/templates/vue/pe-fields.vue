@@ -12,15 +12,16 @@ const peStore = useProfileEditorStore();
 </script>
 
 <template>
-    <div v-if="peStore.selectedRoleType" class="l-grid l-grid--12 l-gap-m l-mar-m--top">
-        <div class="small-12 large-3">
+    <template v-if="peStore.selectedRoleType">
+        <div class="small-12 large-3 island">
             <pe-fields-mandatory />
         </div>
-        <div class="small-12 large-9">
+        <div class="small-12 large-9 island">
+            <h3 class="subheader">Fields</h3>
             <pe-fields-available />
             <pe-fields-selected />
         </div>
-    </div>
+    </template>
 </template>
 
 <style scoped></style>

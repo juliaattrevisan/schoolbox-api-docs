@@ -31,45 +31,83 @@ const sortableOptions = window.Vue.computed<Sortable.Options>(() => ({
     // Removes the clone element when it is not showing, rather than just hiding it.
     removeCloneOnHide: true,
 }));
+
+const fieldCategories = window.Vue.computed(() => {
+    if (peStore.selectedRoleType === null) return [];
+    const categoryMap: Record<string, number> = {};
+
+    // Count occurrences of each category
+    peStore.selectedRoleType.fields.available.forEach((field) => {
+        categoryMap[field.category] = (categoryMap[field.category] || 0) + 1;
+    });
+
+    // Convert the category map into an array and sort reverse-alphabetically by category (so "Internal" appears first for now...)
+    return Object.entries(categoryMap)
+        .map(([category, count]) => ({ category, count }))
+        .sort((a, b) => b.category.localeCompare(a.category));
+});
+
+const selectedCategory = window.Vue.ref<(typeof fieldCategories.value)[0] | null>(null);
+
+const availableFieldsToShow = window.Vue.computed(() => {
+    if (peStore.selectedRoleType === null) return [];
+    const allFields = peStore.selectedRoleType.fields.available;
+
+    // If there is only one category, show all fields
+    const category = selectedCategory.value;
+    if (category === null || fieldCategories.value.length <= 1) return allFields;
+
+    // Otherwise, filter the fields by the selected category
+    return allFields.filter((field) => field.category === category.category);
+});
+
+window.Vue.onMounted(() => {
+    // Set the selected category to the first one
+    const firstCategory = fieldCategories.value[0];
+    if (firstCategory) {
+        selectedCategory.value = firstCategory;
+    }
+});
 </script>
 
 <template>
-    <div v-if="peStore.selectedRoleType !== null" class="component l-mar-m--bottom">
-        <div class="component-titlebar">
-            <div class="actions-small-2">
-                <div class="list-item">
-                    <h2 title="Fields">Fields</h2>
+    <dl v-if="fieldCategories.length > 1" class="tabs">
+        <dd
+            v-for="category in fieldCategories"
+            :key="category.category"
+            :class="{ active: category.category === selectedCategory?.category }"
+        >
+            <a @click="selectedCategory = category">{{ category.category }} ({{ category.count }})</a>
+        </dd>
+    </dl>
+    <section v-if="peStore.selectedRoleType !== null" class="pe-fields-palette">
+        <sortable-wrapper
+            :list="availableFieldsToShow"
+            :item-key="(item) => item.field"
+            :options="sortableOptions"
+            class="l-grid l-grid--4-col"
+        >
+            <template #item="item">
+                <div :data-pe-field="item.element.field">
+                    <pe-fields-available-item :field="item.element" class="pe-fields-available-item" />
+                    <pe-fields-active-item
+                        v-if="item.isDragging"
+                        :field="item.element"
+                        :dragging="true"
+                        class="pe-dragged-selected-item"
+                    />
                 </div>
-            </div>
-        </div>
-        <div class="pe-fields-palette">
-            <div class="small-12">
-                <section class="content">
-                    <sortable-wrapper
-                        :list="peStore.selectedRoleType.fields.available"
-                        :item-key="(item) => item.field"
-                        :options="sortableOptions"
-                        class="l-grid l-grid--4-col"
-                    >
-                        <template #item="item">
-                            <div :data-pe-field="item.element.field">
-                                <pe-fields-available-item :field="item.element" class="pe-fields-available-item" />
-                                <pe-fields-active-item
-                                    v-if="item.isDragging"
-                                    :field="item.element"
-                                    :dragging="true"
-                                    class="pe-dragged-selected-item"
-                                />
-                            </div>
-                        </template>
-                    </sortable-wrapper>
-                </section>
-            </div>
-        </div>
-    </div>
+            </template>
+        </sortable-wrapper>
+    </section>
 </template>
 
 <style scoped>
+/* Allow the opacity of the fields to show through, rather than the default white */
+.pe-fields-palette {
+    background: transparent;
+}
+
 /* Hide the selected preview while we are still in the palette area */
 .pe-fields-palette .pe-dragged-selected-item {
     display: none !important;

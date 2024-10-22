@@ -187,12 +187,16 @@ class Payload
                     continue;
                 }
 
+                // TEMP - needs implementing, just show 20 as internal, rest as external for now
+                $fieldCategory = count($roleTypeSettings['fields']['available']) >= 20 ? "External Fields" : "Internal Fields";
+
                 $roleTypeSettings['fields']['available'][] = [
                     'field' => $field->getField(),
                     'displayAs' => $field->getDisplayAs(),
                     'icon' => $field->getIcon(),
                     'css' => $field->getCss(),
                     'terminology' => $field->getTerm(),
+                    'category' => $fieldCategory,
                 ];
             }
 

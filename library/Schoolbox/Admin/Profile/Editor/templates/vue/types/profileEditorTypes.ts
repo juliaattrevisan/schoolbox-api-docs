@@ -28,6 +28,7 @@ export type ProfileEditorAvailableField = {
     displayAs: string;
     icon: string | null;
     css: string | null;
+    category: string; // The category to show the field under (these are the tabs at the top of the field palette)
 };
 
 export type ProfileEditorSelectedField = {
