@@ -7,14 +7,14 @@
 
 declare(strict_types=1);
 
-namespace Schoolbox\LTI\Prototype\Platform;
+namespace Schoolbox\LTI\Platform;
 
 use Cache\Adapter\PHPArray\ArrayCachePool;
 use OAT\Library\Lti1p3Core\Message\Launch\Validator\Platform\PlatformLaunchValidator;
 use OAT\Library\Lti1p3Core\Message\Launch\Validator\Result\LaunchValidationResultInterface;
 use OAT\Library\Lti1p3Core\Registration\RegistrationRepositoryInterface;
-use Schoolbox\LTI\Security\Nonce\NonceRepository;
 use Psr\Http\Message\ServerRequestInterface;
+use Schoolbox\LTI\Security\Nonce\NonceRepository;
 
 /**
  * Factory for tool originating launches, e.g. a response from a deep linking

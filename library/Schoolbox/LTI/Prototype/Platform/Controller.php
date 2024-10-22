@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace Schoolbox\LTI\Prototype\Platform;
 
 use Alaress\Web\Controller\Base;
+use Schoolbox\LTI\Platform\ToolOriginatingLaunchFactory;
 use OAT\Library\Lti1p3Core\Exception\LtiExceptionInterface;
 use OAT\Library\Lti1p3Core\Message\LtiMessageInterface;
 use OAT\Library\Lti1p3DeepLinking\Factory\ResourceCollectionFactory;
