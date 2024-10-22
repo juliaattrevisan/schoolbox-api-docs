@@ -63,11 +63,10 @@ function onMouseout(): void {
     emit("hover", -1);
 }
 
-const resultEl = useTemplateRef<HTMLDivElement | null>("resultEl");
-
 /**
  * To allow keyboard navigation of the search results
  */
+const resultEl = useTemplateRef<HTMLDivElement | null>("resultEl");
 const { isActive } = useActiveIndex(
     resultEl,
     props.index,

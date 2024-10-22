@@ -14,6 +14,7 @@ interface Props {
 const props = defineProps<Props>();
 
 const emit = defineEmits<{
+    select: [item: SearchSelectItem];
     remove: [items: SearchSelectItem[]];
 }>();
 
@@ -27,8 +28,16 @@ const ids = window.Vue.computed(() => {
 });
 
 /**
+ * To select the name of the selected item
+ * @param item - the item to select
+ */
+function onSelectItem(item: SearchSelectItem): void {
+    emit("select", item);
+}
+
+/**
  * To remove a selected search result
- * @param item - the result to remove
+ * @param item - the item to remove
  */
 function onRemoveItem(item: SearchSelectItem): void {
     emit("remove", [item]);
@@ -42,6 +51,7 @@ function onRemoveItem(item: SearchSelectItem): void {
             :key="item.id"
             :item="item"
             :is-single-select="props.isSingleSelect"
+            @select="onSelectItem"
             @remove="onRemoveItem"
         />
     </div>

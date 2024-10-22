@@ -28,6 +28,10 @@ const props = withDefaults(defineProps<Props>(), {
     placeholder: "Search...",
 });
 
+const emit = defineEmits<{
+    select: [item: SearchSelectItem];
+}>();
+
 const searchSelectEl = useTemplateRef<HTMLDivElement | null>("searchSelectEl");
 
 const selected = defineModel<SearchSelectItem[]>("selected", { default: [] }); // to store selected items
@@ -52,24 +56,32 @@ const currentResults = window.Vue.computed(() => {
 });
 
 /**
- * To add items
- * @param $items - the items selected
+ * A selected item name has been selected
+ * @param item - the items selected
  */
-function onAdd($items: SearchSelectItem[]): void {
+function onSelect(item: SearchSelectItem): void {
+    emit("select", item);
+}
+
+/**
+ * To add items
+ * @param items - the items selected
+ */
+function onAdd(items: SearchSelectItem[]): void {
     // if single select, switch with the previous selection
     if (props.isSingleSelect && selected.value.length > 0) {
-        update($items);
+        update(items);
         return;
     }
-    add($items);
+    add(items);
 }
 
 /**
  * To remove items
- * @param $items - the items deselected
+ * @param items - the items deselected
  */
-function onRemove($items: SearchSelectItem[]): void {
-    remove($items);
+function onRemove(items: SearchSelectItem[]): void {
+    remove(items);
 }
 </script>
 
@@ -80,6 +92,7 @@ function onRemove($items: SearchSelectItem[]): void {
             :selected="selected"
             :form-value-name="props.formValueName"
             :is-single-select="props.isSingleSelect"
+            @select="onSelect"
             @remove="onRemove"
         />
         <ss-query-input
