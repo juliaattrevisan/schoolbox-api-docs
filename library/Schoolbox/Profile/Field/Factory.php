@@ -40,6 +40,10 @@ class Factory
      * that $viewer was able to see,
      * ordered by sequence ascending
      *
+     * $mutatorIndex is a set of optional callbacks indexed by field name that
+     * allows you to fetch its particular value from an expensive place only
+     * when it's needed.
+     *
      * @param User $viewee
      * @param User $viewer
      * @param array|null $mutatorIndex
