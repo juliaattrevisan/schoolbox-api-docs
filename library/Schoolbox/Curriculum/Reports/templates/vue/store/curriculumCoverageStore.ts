@@ -7,7 +7,10 @@ import type { Course } from "@schoolboxLibrary/types/Course";
 import { ReportOptionValues, type ReportOption } from "../../js/types/curriculumCoverageTypes";
 
 export const useStore = defineStore("curriculumCoverage", () => {
+    const selectedCourses = window.Vue.ref<Course[]>([]); // the selected courses @todo - this will be stored in a selectedCoursesStore instead with SA-18582
     const courses = window.Vue.ref<Course[]>([]); // the courses to display in the report
+    const hasReport = window.Vue.ref<boolean>(false); // whether the report has been generated
+    const isLoading = window.Vue.ref<boolean>(false); // whether the report is currently loading
     const allReportOptionValues = window.Vue.ref<ReportOption[]>([
         {
             value: ReportOptionValues.COURSE,
@@ -37,11 +40,17 @@ export const useStore = defineStore("curriculumCoverage", () => {
 
     /**
      * store any passed through properties
+     * @param $courses - the courses to display in the report
      */
-    function init(): void {}
+    function init($courses: Course[]): void {
+        selectedCourses.value = $courses;
+    }
 
     return {
+        selectedCourses,
         courses,
+        hasReport,
+        isLoading,
         allReportOptionValues,
         selectedReportOptionValues,
         onlyShowGaps,

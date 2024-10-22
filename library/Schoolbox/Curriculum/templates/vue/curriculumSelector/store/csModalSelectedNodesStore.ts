@@ -184,7 +184,6 @@ export const useModalSelectedNodesStore = defineStore(`csModalSelectedNodes`, ()
      * clear all the currently selected nodes
      */
     function empty(): void {
-        console.warn("emptying selected nodes");
         nodes.value.forEach((node) => remove(node));
     }
 
