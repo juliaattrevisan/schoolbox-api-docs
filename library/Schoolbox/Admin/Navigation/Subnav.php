@@ -144,7 +144,6 @@ class Subnav
             '/adminv2/home' => [
                 'name'        => 'Home',
                 'visible'     => $loggedInUserIsSuperuser,
-                'searchable'  => true,
                 'description' => 'Key system status information.',
                 'children'    => [],
             ],
@@ -580,7 +579,6 @@ class Subnav
             '/adminv2/setting/Modules' => [
                 'name'       => 'Modules',
                 'visible'    => $loggedInUserIsSuperuser,
-                'searchable' => true,
                 'children'   => [
                     '/adminv2/setting/Modules' => [
                         'name'        => 'Home',
@@ -617,7 +615,6 @@ class Subnav
             'news' => [
                 'name'        => 'News',
                 'visible'     => $loggedInUserIsSuperuser || $loggedInUserHasServicePermissionNews,
-                'searchable'  => true,
                 'children'    => [
                     '/adminv2/news' => [
                         'name'        => 'Settings / Policy',
@@ -637,7 +634,6 @@ class Subnav
             '/adminv2/notifications' => [
                 'name'       => 'Notifications',
                 'visible'    => $loggedInUserIsSuperuser && $this->configLoader->get(ConfigMapper::NAME_NOTIFICATIONS_ENABLED),
-                'searchable' => true,
                 'children'   => [
                     '/adminv2/notifications' => [
                         'name'        => 'Home',
@@ -916,7 +912,6 @@ class Subnav
             '/adminv2/user' => [
                 'name'       => 'User Management',
                 'visible'    => $loggedInUserIsSuperuser,
-                'searchable' => true,
                 'children'   => [
                     '/adminv2/user' => [
                         'name'        => 'Home',

@@ -110,7 +110,7 @@ class Controller extends ConfigController
             // Some parent items are intended only as root nodes for the HTML
             // navigation: they are not designed to be navigable themselves.
             // Do not add these items to the searchable payload.
-            if ($parentData['searchable'] ?? false) {
+            if ($parentData['searchable'] ?? $parentData['visible'] ?? false) {
                 $jsonPayload[] = [
                     'name'        => $parentUrl,
                     'title'       => $parentData['name'] ?? '',
@@ -124,12 +124,14 @@ class Controller extends ConfigController
                     $hiddenUrls[] = $childUrl;
                     continue;
                 }
-                $jsonPayload[] = [
-                    'name'        => $childUrl,
-                    'title'       => ($parentData['name'] ?? '') . ' › ' . ($childData['name'] ?? ''),
-                    'description' => $childData['description'] ?? '',
-                    'url'         => $childUrl,
-                ];
+                if ($childData['searchable'] ?? $chileData['visible'] ?? false) {
+                    $jsonPayload[] = [
+                        'name'        => $childUrl,
+                        'title'       => ($parentData['name'] ?? '') . ' › ' . ($childData['name'] ?? ''),
+                        'description' => $childData['description'] ?? '',
+                        'url'         => $childUrl,
+                    ];
+                }
             }
         }
 
