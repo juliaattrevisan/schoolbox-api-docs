@@ -30,7 +30,6 @@ use OAT\Library\Lti1p3Nrps\Service\MembershipServiceInterface;
 use Psr\Cache\CacheItemPoolInterface;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\LTI\KeyChain\RepositoryFactory as KeyChainRepositoryFactory;
-use Schoolbox\LTI\Prototype\Platform\ToolOriginatingLaunchFactory;
 use Schoolbox\LTI\Provider\Model as ToolModel;
 use Schoolbox\LTI\Util\OidcAuthenticationRequestFactory;
 
