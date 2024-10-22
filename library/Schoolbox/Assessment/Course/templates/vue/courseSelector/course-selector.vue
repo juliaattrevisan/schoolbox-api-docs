@@ -8,6 +8,10 @@ import SearchSelect from "@schoolboxVue/components/searchSelect/search-select.vu
 import type { Course } from "@schoolboxLibrary/types/Course";
 import { useCourseSelectorStore } from "./store/courseSelectorStore";
 
+type CourseAPIResponse = {
+    courses: Course[];
+};
+
 interface Props {
     endpoint: string; // The course api endpoint
     preselected: Course[]; // The courses that have already been selected previously
@@ -30,20 +34,22 @@ store.init(props.preselected);
 const results = window.Vue.ref<Course[]>([]);
 
 /**
- * To manipulate the results to target the courses object and
- * use the title as the name
+ * To manipulate the results to target the courses object
  */
-const { ignoreUpdates } = watchIgnorable(results, (newResults) => {
+const { ignoreUpdates } = watchIgnorable(results, (newResults: CourseAPIResponse | unknown[]) => {
     ignoreUpdates(() => {
-        if (newResults.length === 0) {
+        if (newResults instanceof Array && newResults.length === 0) {
             return;
         }
-        results.value = newResults.courses.map((course) => {
-            return {
-                id: course.id,
-                name: course.title,
-            };
-        });
+        if (typeof newResults === "object" && "courses" in newResults) {
+            // all we need is the id and name of each course
+            results.value = newResults.courses.map((course: Course) => {
+                return {
+                    id: course.id,
+                    name: course.name,
+                };
+            });
+        }
     });
 });
 </script>

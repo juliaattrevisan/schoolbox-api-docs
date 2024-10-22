@@ -5,6 +5,6 @@ import type { Unit } from "./Unit";
  */
 export type Course = {
     id: number;
-    title: string;
+    name: string;
     units?: Unit[];
 };
