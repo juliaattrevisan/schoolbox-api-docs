@@ -143,6 +143,11 @@ class Service extends AbstractService
                     $detailMessage = $detailMessage->withQuery($parsedUrl['query']);
                 }
 
+                //Encoding the fragment if exists
+                if (isset($parsedUrl['fragment'])) {
+                    $detailMessage = $detailMessage->withFragment($parsedUrl['fragment']);
+                }
+
                 $notifRequest['detail_message'] =
                     "<p>More Details: <a href='" . htmlspecialchars($detailMessage) . "'>" . htmlspecialchars($this->configLoader->get('title')) . "</a></p>";
             }
