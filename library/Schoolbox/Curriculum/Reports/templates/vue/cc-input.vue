@@ -2,18 +2,22 @@
 /**
  * To choose course(s) and curriculum nodes to generate a report on
  */
+import CourseSelector from "@schoolboxLibrary/Assessment/Course/templates/vue/courseSelector/course-selector.vue";
+import { useCourseSelectorStore } from "@schoolboxLibrary/Assessment/Course/templates/vue/courseSelector/store/courseSelectorStore";
 import CurriculumSelector from "@schoolboxCurriculum/vue/curriculumSelector/curriculum-selector.vue";
-import SearchSelect from "@schoolboxVue/components/searchSelect/search-select.vue";
 import { useSelectedNodesStore } from "@schoolboxCurriculum/vue/curriculumSelector/store/csSelectedNodesStore";
+import type { Course } from "@schoolboxLibrary/types/Course";
 import { useStore } from "./store/curriculumCoverageStore";
 
 interface Props {
     coursesEndpoint: string; // The courses api endpoint.
     curriculumEndpoint: string; // The curriculum api endpoint.
+    selectedCourses: Course[]; // The pre selected courses
 }
 const props = defineProps<Props>();
 
 const store = useStore();
+const selectedCoursesStore = useCourseSelectorStore();
 const selectedNodesStore = useSelectedNodesStore();
 const isCoursesInvalid = window.Vue.ref(false);
 const isCurriculumInvalid = window.Vue.ref(false);
@@ -35,7 +39,7 @@ function onGenerateReport(): void {
     }
     isCoursesInvalid.value = false;
     isCurriculumInvalid.value = false;
-    if (store.selectedCourses.length === 0) {
+    if (selectedCoursesStore.selected.length === 0) {
         isCoursesInvalid.value = true;
     }
     if (selectedNodesStore.nodes.length === 0) {
@@ -50,7 +54,7 @@ function onGenerateReport(): void {
     <form class="c-island l-flex-col l-pad-m l-gap-m" @submit.prevent="onGenerateReport">
         <div>
             <label for="courses">Select Courses</label>
-            <search-select endpoint="" :selected="store.selectedCourses" />
+            <course-selector :endpoint="props.coursesEndpoint" :preselected="props.selectedCourses" />
             <label v-if="isCoursesInvalid" class="error" for="courses">This field is required.</label>
         </div>
         <div>
