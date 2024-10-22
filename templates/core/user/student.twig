@@ -116,9 +116,9 @@
                     <div class="small-12 medium-2 columns no-pad">
                         {% include 'include/portrait.twig' with {user: user, render: 'profile', class: 'full-width', description: ''} only %}
                     </div>
-
                     <div class="small-12 medium-10 columns no-pad">
-                        {% block details %}
+                        {% if showDetails %}
+                            {% block details %}
                             {# TODO @zacmcw I don't know where you put styles anymore
                              #  Migrate this inline stylesheet into the appropriate place
                              #}
@@ -304,6 +304,7 @@
                                 {% endfor %}
                             </dl>
                         {% endblock details %}
+                        {% endif %}
                     </div>
                 </div>
             </div>
