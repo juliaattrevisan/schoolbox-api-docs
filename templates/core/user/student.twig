@@ -166,6 +166,8 @@
                                  #
                                  # Additional visibility constraints for the **viewer's** roletype
                                  # and the corresponding bool set by old twig implementation
+                                 #
+                                 # showEmail: This checked for role permissions, email existence, etc. we need to keep
                                  #}
                                 {% set additionalConstraints = {
                                     'staff': {
@@ -176,7 +178,7 @@
                                         'StudentForm': showClasses,
                                         'StudentTutorDescription': showDetails and showClasses,
                                         'tutorTeacher': showDetails and showClasses
-                                    }
+                                    #}
                                 } %}
 
                                 <dl>
