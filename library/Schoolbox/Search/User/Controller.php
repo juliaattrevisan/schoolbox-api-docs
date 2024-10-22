@@ -560,27 +560,31 @@ class Controller extends BaseController
                 'user'                     => $student,
                 /* Takes into account whether the viewer has the View Student Profile role permission
                  * in addition to some other standard checks for Guest-ness. We need to keep that.
+                 * Most user details are in a block that is toggled by this var
                  */
                 'showDetails'              => $showDetails,
+                /* Decides if pastoral buttons and stuff actually exist beyond our Availability and
+                 * Visibility settings (ie. does your user have permissions etc to this place)
+                 *
+                 * We needed to keep this
+                 */
+                'showPastoral'             => $showPastoral,
 
                 /* Old implementation
                  */
                 'session'                  => $_SESSION,
-                'showPastoral'             => $showPastoral,
+                /* This is mostly superseded by user.showTimetable in twig
+                 */
+                'showClasses'              => $showClasses,
+
                 'eportfolioAuth'           => $this->eportfolioAuthenticator->canView(),
                 'hideContacts'             => $hideContacts,
-                'showClasses'              => $showClasses,
                 'now'                      => Alaress_Date_Format::now(),
                 'boarderType'              => $this->externalUser->determineBoarderType(isset($externalUser['StudentBoarder']) ? (string)$externalUser['StudentBoarder'] : null),
                 'contacts'                 => $contacts,
                 'subjects'                 => $subjects,
                 'customButtons'            => $customButtons,
                 'groups'                   => $groups,
-                'formTeacher'              => $externalUser['formTeacher'] ?? null,
-                'tutorTeacher'             => $externalUser['tutorTeacher'] ?? null,
-                'hohTeacher'               => $externalUser['hohTeacher'] ?? null,
-                'coordTeacher'             => $externalUser['coordTeacher'] ?? null,
-                'studentCoach'             => $externalUser['studentCoach'] ?? null,
                 'isParentOfStudent'        => $isParentOfStudent,
                 'isPrimaryCarer'           => $isPrimaryCarer,
                 'allTeacherIds'            => implode(',', $allTeacherIds),
