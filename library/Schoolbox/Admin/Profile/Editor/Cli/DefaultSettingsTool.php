@@ -568,27 +568,27 @@ HELP;
          */
         if ('0' === $protectStudentContacts) {
             if ($synergeticCommunityAlerts) {
-                $roletypes[self::ROLETYPE_STUDENT]['AlertMessages']['visibility'] = [];
-                $roletypes[self::ROLETYPE_STUDENT]['AlertLegal']['visibility'] = [];
-            } else {
                 $roletypes[self::ROLETYPE_STUDENT]['AlertMessages']['visibility'] = [self::ROLETYPE_STAFF, self::ROLETYPE_PARENT];
                 $roletypes[self::ROLETYPE_STUDENT]['AlertLegal']['visibility'] = [self::ROLETYPE_STAFF, self::ROLETYPE_PARENT];
+            } else {
+                $roletypes[self::ROLETYPE_STUDENT]['AlertMessages']['visibility'] = [];
+                $roletypes[self::ROLETYPE_STUDENT]['AlertLegal']['visibility'] = [];
             }
         } elseif ('1' === $protectStudentContacts) {
             if ($synergeticCommunityAlerts) {
-                $roletypes[self::ROLETYPE_STUDENT]['AlertMessages']['visibility'] = [];
-                $roletypes[self::ROLETYPE_STUDENT]['AlertLegal']['visibility'] = [];
-            } else {
                 $roletypes[self::ROLETYPE_STUDENT]['AlertMessages']['visibility'] = [self::ROLETYPE_STAFF];
                 $roletypes[self::ROLETYPE_STUDENT]['AlertLegal']['visibility'] = [self::ROLETYPE_STAFF];
+            } else {
+                $roletypes[self::ROLETYPE_STUDENT]['AlertMessages']['visibility'] = [];
+                $roletypes[self::ROLETYPE_STUDENT]['AlertLegal']['visibility'] = [];
             }
         } elseif ('2' === $protectStudentContacts) {
             if ($synergeticCommunityAlerts) {
-                $roletypes[self::ROLETYPE_STUDENT]['AlertMessages']['visibility'] = [];
-                $roletypes[self::ROLETYPE_STUDENT]['AlertLegal']['visibility'] = [];
-            } else {
                 $roletypes[self::ROLETYPE_STUDENT]['AlertMessages']['visibility'] = [self::ROLETYPE_STAFF, self::ROLETYPE_PARENT];
                 $roletypes[self::ROLETYPE_STUDENT]['AlertLegal']['visibility'] = [self::ROLETYPE_STAFF, self::ROLETYPE_PARENT];
+            } else {
+                $roletypes[self::ROLETYPE_STUDENT]['AlertMessages']['visibility'] = [];
+                $roletypes[self::ROLETYPE_STUDENT]['AlertLegal']['visibility'] = [];
             }
         }
 
