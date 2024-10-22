@@ -18,6 +18,7 @@ use PDOException;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
 use RangeException;
+use Schoolbox\Assessment\Course\Api\Helper;
 use Schoolbox\Assessment\Course\Template\Mapper as CourseTemplateMapper;
 use Schoolbox\Assessment\Course\Template\Model as CourseTemplateModel;
 use Schoolbox\Resource\Folder\Ancestry;
@@ -96,6 +97,7 @@ class Controller extends Base\Base
         private Component_ConfigMapper $ccm,
         private \Schoolbox\Tile\Layout\Mapper $layoutMapper,
         private \Schoolbox\Tile\Mapper $tileMapper,
+        private Ancestry $ancestry
     ) {
     }
 
@@ -948,7 +950,22 @@ class Controller extends Base\Base
 
         if ($query->get('folder')) {
             $folderModel = $this->folderMapper->findById($query->get('folder'));
-            $data['suggestions'] = $this->getLinkSuggestions($folderModel);
+            /* The payload will be replaced by the course api later, but we can use the helper class first
+             * to reduce the amount of code maintenance for the time being, the helper class should only be
+             * instantiated when needed, so should be fine to be here instead of injecting it
+             */
+            $helper = new Helper(
+                $this->courseSpecificationMapper,
+                $this->folderMapper,
+                $this->unitSpecificationMapper,
+                $this->ancestry,
+                $this->access,
+                $this->getUser(),
+                null,
+                0,
+                null
+            );
+            $data['suggestions'] = $helper->getLinkSuggestions($folderModel);
         }
 
         if ($this->isXhrRequest()) {
@@ -1014,7 +1031,22 @@ class Controller extends Base\Base
         // only offer suggestions if you're not searching
         if ($folder && !$search) {
             $folderModel = $this->folderMapper->findById($folder);
-            $data['suggestions'] = $this->getLinkSuggestions($folderModel);
+            /* The payload will be replaced by the course api later, but we can use the helper class first
+             * to reduce the amount of code maintenance for the time being, the helper class should only be
+             * instantiated when needed, so should be fine to be here instead of injecting it
+             */
+            $helper = new Helper(
+                $this->courseSpecificationMapper,
+                $this->folderMapper,
+                $this->unitSpecificationMapper,
+                $this->ancestry,
+                $this->access,
+                $this->getUser(),
+                null,
+                0,
+                null
+            );
+            $data['suggestions'] = $helper->getLinkSuggestions($folderModel);
         }
 
         $options = [

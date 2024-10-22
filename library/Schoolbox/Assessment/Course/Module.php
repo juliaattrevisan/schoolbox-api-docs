@@ -14,6 +14,7 @@ use Alaress\Module\Module as BaseModule;
 use Alaress\Web\Controller\Base;
 use Component_ConfigMapper;
 use Component_InstanceMapper;
+use Schoolbox\Resource\Folder\Ancestry;
 use Schoolbox\Resource\HomepageConfigMapper;
 use Twig\Error\LoaderError;
 use Alaress\Twig\Loader\IChainLoader;
@@ -165,12 +166,13 @@ class Module extends BaseModule
      */
     public function buildController(): Base
     {
+        $folderMapper = $this->getMapperFactory()->get(FolderMapper::class);
         return new Controller(
             $this->injector->get('assessmentDataSource'),
             $this->getMapperFactory()->get(CourseSpecificationMapper::class),
             $this->getMapperFactory()->get(UnitSpecificationMapper::class),
             $this->getMapperFactory()->get(UnitImplementationMapper::class),
-            $this->getMapperFactory()->get(FolderMapper::class),
+            $folderMapper,
             $this->getMapperFactory()->get(Access::class),
             $this->getMapperFactory()->get(CourseConfigMapper::class),
             $this->getMapperFactory()->get(UserAccessMapper::class),
@@ -182,6 +184,7 @@ class Module extends BaseModule
             $this->getMapperFactory()->get(Component_ConfigMapper::class),
             $this->getMapperFactory()->get(\Schoolbox\Tile\Layout\Mapper::class),
             $this->getMapperFactory()->get(\Schoolbox\Tile\Mapper::class),
+            Ancestry::getInstance($folderMapper),
         );
     }
 

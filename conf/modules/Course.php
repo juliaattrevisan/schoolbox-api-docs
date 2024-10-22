@@ -36,6 +36,9 @@ class Course implements ModuleConfigInterface
 
             $exportModule = new Assessment\Course\Export\Module($di);
             $exportModule->registerModule('/course/export');
+
+            $apiModule = new Assessment\Course\Api\Module($di);
+            $apiModule->registerModule('/api/courses');
         }
     }
 }

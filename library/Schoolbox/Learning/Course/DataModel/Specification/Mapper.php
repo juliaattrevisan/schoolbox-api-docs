@@ -179,6 +179,28 @@ class Mapper extends AbstractCourseMapper
         return $this->findByPredicates($pb, $options);
     }
 
+    public function countAllByName(string $searchParam, array $options = []): int
+    {
+        if (strlen($searchParam) === 0) {
+            return $this->countAll($options);
+        }
+
+        $pb = $this->getPredicateBuilder();
+        $pb->like('f.name', "%{$this->database->getQuoter()->escapeForLike($searchParam)}%");
+        $pb->isNull('f.deleted_at');
+        $where = $pb->getWhereIntersect();
+
+        $query = "
+            SELECT COUNT(DISTINCT s.{$this->getIdentifierColumn()})
+            FROM {$this->table} s
+            INNER JOIN folder f ON f.id = s.folder_id
+            WHERE $where
+        ";
+
+        return $this->database->executeQuery($query, $pb->getParams())->fetchColumn();
+    }
+
+
     /**
      * Validator for if a folder is a valid folder for a course.
      *
