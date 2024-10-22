@@ -333,8 +333,7 @@ class Tracer
         ?string $message = null,
         array $metadata = [],
         ?float $timestamp = null,
-    ): void
-    {
+    ): void {
         $this->stackChanges[] = new Operation\Breadcrumb(
             new Breadcrumb($level, $type, $category, $message, $metadata, $timestamp),
         );
