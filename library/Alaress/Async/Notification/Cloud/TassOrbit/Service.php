@@ -131,10 +131,23 @@ class Service extends AbstractService
             }
 
             if ($notification->getHref()) {
+                $href = $notification->getHref();
+                $parsedUrl = parse_url($href);
                 //Building absolute url path for external use
                 $detailMessage = (new \Schoolbox\Url\Factory($this->configLoader))
                     ->buildFullyQualified()
-                    ->withPath($notification->getHref());
+                    ->withPath($parsedUrl['path'] ?? '');
+
+                //Separate the query parameter so it doesn't get encoded incorrectly
+                if (isset($parsedUrl['query'])) {
+                    $detailMessage = $detailMessage->withQuery($parsedUrl['query']);
+                }
+
+                //Encoding the fragment if exists
+                if (isset($parsedUrl['fragment'])) {
+                    $detailMessage = $detailMessage->withFragment($parsedUrl['fragment']);
+                }
+
                 $notifRequest['detail_message'] =
                     "<p>More Details: <a href='" . htmlspecialchars($detailMessage) . "'>" . htmlspecialchars($this->configLoader->get('title')) . "</a></p>";
             }
