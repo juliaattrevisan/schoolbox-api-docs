@@ -203,7 +203,7 @@ const isSaving = window.Vue.computed(() => {
                                 class="icon-close"
                                 title="Close"
                                 :disabled="panelsToShow.remove ? undefined : true"
-                                @click="isRemovePanelOpen = !isRemovePanelOpen"
+                                @click="peFieldsStore.disableField(props.field.field)"
                             />
                         </nav>
                     </div>
@@ -221,12 +221,6 @@ const isSaving = window.Vue.computed(() => {
                         :field="props.field"
                         :is-open="isEditPanelOpen && !$props.dragging"
                         @close="isEditPanelOpen = false"
-                    />
-                    <pe-fields-active-item-remove
-                        v-if="panelsToShow.remove !== false"
-                        :field="props.field"
-                        :is-open="isRemovePanelOpen && !$props.dragging"
-                        @close="isRemovePanelOpen = false"
                     />
                 </div>
             </div>
