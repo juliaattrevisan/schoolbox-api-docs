@@ -563,27 +563,30 @@ HELP;
         $protectStudentContacts = $this->getConfig()->get('protect_student_contacts');
         $synergeticCommunityAlerts = $this->getConfig()->get('synergetic_community_alerts');
 
+        /* sigh $protectStudentContacts is a string numeral,
+         * but $synergeticCommunityAlerts is a boolean.
+         */
         if ('0' === $protectStudentContacts) {
-            if ('0' === $synergeticCommunityAlerts) {
+            if ($synergeticCommunityAlerts) {
                 $roletypes[self::ROLETYPE_STUDENT]['AlertMessages']['visibility'] = [];
                 $roletypes[self::ROLETYPE_STUDENT]['AlertLegal']['visibility'] = [];
-            } elseif ('1' === $synergeticCommunityAlerts) {
+            } else {
                 $roletypes[self::ROLETYPE_STUDENT]['AlertMessages']['visibility'] = [self::ROLETYPE_STAFF, self::ROLETYPE_PARENT];
                 $roletypes[self::ROLETYPE_STUDENT]['AlertLegal']['visibility'] = [self::ROLETYPE_STAFF, self::ROLETYPE_PARENT];
             }
         } elseif ('1' === $protectStudentContacts) {
-            if ('0' === $synergeticCommunityAlerts) {
+            if ($synergeticCommunityAlerts) {
                 $roletypes[self::ROLETYPE_STUDENT]['AlertMessages']['visibility'] = [];
                 $roletypes[self::ROLETYPE_STUDENT]['AlertLegal']['visibility'] = [];
-            } elseif ('1' === $synergeticCommunityAlerts) {
+            } else {
                 $roletypes[self::ROLETYPE_STUDENT]['AlertMessages']['visibility'] = [self::ROLETYPE_STAFF];
                 $roletypes[self::ROLETYPE_STUDENT]['AlertLegal']['visibility'] = [self::ROLETYPE_STAFF];
             }
         } elseif ('2' === $protectStudentContacts) {
-            if ('0' === $synergeticCommunityAlerts) {
+            if ($synergeticCommunityAlerts) {
                 $roletypes[self::ROLETYPE_STUDENT]['AlertMessages']['visibility'] = [];
                 $roletypes[self::ROLETYPE_STUDENT]['AlertLegal']['visibility'] = [];
-            } elseif ('1' === $synergeticCommunityAlerts) {
+            } else {
                 $roletypes[self::ROLETYPE_STUDENT]['AlertMessages']['visibility'] = [self::ROLETYPE_STAFF, self::ROLETYPE_PARENT];
                 $roletypes[self::ROLETYPE_STUDENT]['AlertLegal']['visibility'] = [self::ROLETYPE_STAFF, self::ROLETYPE_PARENT];
             }
