@@ -124,6 +124,10 @@
                      # showPastoral: This checked for permissions, routes, etc. we need to keep
                      #}
                     {% set additionalConstraints = {
+                        'student': {
+                            '_default': null,
+                            'email': showEmail
+                        },
                         'staff': {
                             '_default': USER.role.viewStudentProfile,
                             'email': showEmail,
@@ -219,7 +223,7 @@
                                          # permissions, privacy and configuration settings that go well beyond
                                          # the viewer's role type; if you can see it, show it. Otherwise skip it.
                                          #}
-                                        {% if (additionalConstraints[USER.role.type][selectedField.field] ?? additionalConstraints[USER.role.type]['_default']) %}
+                                        {% if (additionalConstraints[USER.role.type][selectedField.field] ?? additionalConstraints[USER.role.type]['_default'] ?? true) %}
                                             {# Use localisation variant from Terminology, if it exists;
                                              # otherwise use default Display As that I provided by default
                                              #}
