@@ -547,7 +547,12 @@ class Controller extends BaseController
             [
                 /* Profile Editor
                  */
+                /* This is an augmented object consisting of schoolbox user fields
+                 * and external sis fields from the External Interface (hybrid theory)
+                 */
                 'externalUser'             => $externalUser,
+                /* Profile screens can have their own roletype-specific name format
+                 */
                 'nameFormat'               => $this->getConfigLoader()->get('name_format_student'),
                 /* The viewee's User instance - sadly, very easy to confuse with USER global, which means
                  * the viewer, so be careful with that
