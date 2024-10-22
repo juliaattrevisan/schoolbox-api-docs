@@ -551,18 +551,42 @@ HELP;
          * but we'll use them to craft some idiosyncratic defaults
          */
 
-        /* synergetic_community_alerts
+        /* synergetic_community_alerts and protect_student_contacts
          *
-         * If truthy, show alerts to staff or parents of the student
-         * Otherwise, hide it from everyone
+         * The combined effect of these two config vars determines who can see stuff.
+         * See SA-18747 for a truth table (note this might move to confluence soon)
+         *
+         * AlertLegal has now been separated from AlertMessages.
+         * This used to be thrown together with all the other alerts, but we've split them in Profile Editor
+         * for more granular control. As far as defaults go, use the same ones as above
          */
-        if ($this->getConfig()->get('synergetic_community_alerts')) {
-            $roletypes[self::ROLETYPE_STUDENT]['AlertMessages']['visibility'] = [self::ROLETYPE_STAFF, self::ROLETYPE_PARENT];
+        $protectStudentContacts = $this->getConfig()->get('protect_student_contacts');
+        $synergeticCommunityAlerts = $this->getConfig()->get('synergetic_community_alerts');
 
-            /* This used to be thrown together with all the other alerts, but we've split them in Profile Editor
-             * for more granular control. As far as defaults go, use the same ones as above
-             */
-            $roletypes[self::ROLETYPE_STUDENT]['AlertLegal']['visibility'] = [self::ROLETYPE_STAFF, self::ROLETYPE_PARENT];
+        if ('0' === $protectStudentContacts) {
+            if ('0' === $synergeticCommunityAlerts) {
+                $roletypes[self::ROLETYPE_STUDENT]['AlertMessages']['visibility'] = [];
+                $roletypes[self::ROLETYPE_STUDENT]['AlertLegal']['visibility'] = [];
+            } elseif ('1' === $synergeticCommunityAlerts) {
+                $roletypes[self::ROLETYPE_STUDENT]['AlertMessages']['visibility'] = [self::ROLETYPE_STAFF, self::ROLETYPE_PARENT];
+                $roletypes[self::ROLETYPE_STUDENT]['AlertLegal']['visibility'] = [self::ROLETYPE_STAFF, self::ROLETYPE_PARENT];
+            }
+        } elseif ('1' === $protectStudentContacts) {
+            if ('0' === $synergeticCommunityAlerts) {
+                $roletypes[self::ROLETYPE_STUDENT]['AlertMessages']['visibility'] = [];
+                $roletypes[self::ROLETYPE_STUDENT]['AlertLegal']['visibility'] = [];
+            } elseif ('1' === $synergeticCommunityAlerts) {
+                $roletypes[self::ROLETYPE_STUDENT]['AlertMessages']['visibility'] = [self::ROLETYPE_STAFF];
+                $roletypes[self::ROLETYPE_STUDENT]['AlertLegal']['visibility'] = [self::ROLETYPE_STAFF];
+            }
+        } elseif ('2' === $protectStudentContacts) {
+            if ('0' === $synergeticCommunityAlerts) {
+                $roletypes[self::ROLETYPE_STUDENT]['AlertMessages']['visibility'] = [];
+                $roletypes[self::ROLETYPE_STUDENT]['AlertLegal']['visibility'] = [];
+            } elseif ('1' === $synergeticCommunityAlerts) {
+                $roletypes[self::ROLETYPE_STUDENT]['AlertMessages']['visibility'] = [self::ROLETYPE_STAFF, self::ROLETYPE_PARENT];
+                $roletypes[self::ROLETYPE_STUDENT]['AlertLegal']['visibility'] = [self::ROLETYPE_STAFF, self::ROLETYPE_PARENT];
+            }
         }
 
         /* protect_medicalspecial_profile
