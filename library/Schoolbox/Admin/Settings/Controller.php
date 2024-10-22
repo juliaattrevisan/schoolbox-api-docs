@@ -124,7 +124,7 @@ class Controller extends ConfigController
                     $hiddenUrls[] = $childUrl;
                     continue;
                 }
-                if ($childData['searchable'] ?? $chileData['visible'] ?? false) {
+                if ($childData['searchable'] ?? $childData['visible'] ?? false) {
                     $jsonPayload[] = [
                         'name'        => $childUrl,
                         'title'       => ($parentData['name'] ?? '') . ' › ' . ($childData['name'] ?? ''),
@@ -135,24 +135,30 @@ class Controller extends ConfigController
             }
         }
 
-        foreach ($foundConfig as $config) {
-            /** @var Config $config */
-            $type = $config->getType() ? $config->getType()->getType() : '';
-            $url = isset($module[$config->getModule()])
-                ? sprintf($module[$config->getModule()], $type)
-                : sprintf("/adminv2/%s", $config->getModule());
+        // Add config settings to the searchable payload only for superusers.
+        // Non-superusers who have access to the Admin system (e.g. News Moderators) will see only a small subset of
+        // pages, so they should be able to find what they're looking for just by inspecting the few admin pages to
+        // which they have access.
+        if ($this->user->isSuperuser()) {
+            foreach ($foundConfig as $config) {
+                /** @var Config $config */
+                $type = $config->getType() ? $config->getType()->getType() : '';
+                $url = isset($module[$config->getModule()])
+                    ? sprintf($module[$config->getModule()], $type)
+                    : sprintf("/adminv2/%s", $config->getModule());
 
-            if (in_array($url, $hiddenUrls)) {
-                continue;
+                if (in_array($url, $hiddenUrls)) {
+                    continue;
+                }
+
+                $jsonPayload[] = [
+                    'name'          => $config->getName(),
+                    'title'         => $config->getTitle(),
+                    'description'   => $config->getDescription(),
+                    'module'        => $config->getModule(),
+                    'url'           => $url . '#' . $config->getName()
+                ];
             }
-
-            $jsonPayload[] = [
-                'name'          => $config->getName(),
-                'title'         => $config->getTitle(),
-                'description'   => $config->getDescription(),
-                'module'        => $config->getModule(),
-                'url'           => $url . '#' . $config->getName()
-            ];
         }
 
         $this->response = $this->responseAsJson($jsonPayload);
