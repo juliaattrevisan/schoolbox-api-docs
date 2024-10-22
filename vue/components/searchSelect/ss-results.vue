@@ -5,8 +5,8 @@
 
 import { onKeyStroke } from "@vueuse/core";
 import type { SearchSelectItem } from "./types/searchSelectTypes";
-import SsResultsListSelectAll from "./ss-results-list-select-all.vue";
-import SsResultsListItem from "./ss-results-list-item.vue";
+import SsResultsListSelectAll from "./ss-results-select-all.vue";
+import SsResultsListItem from "./ss-results-item.vue";
 
 interface Props {
     query: string; // the search query

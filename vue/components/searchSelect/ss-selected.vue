@@ -4,7 +4,7 @@
  */
 
 import type { SearchSelectItem } from "./types/searchSelectTypes";
-import SsSelectedListItem from "./ss-selected-list-item.vue";
+import SsSelectedListItem from "./ss-selected-item.vue";
 
 interface Props {
     selected: SearchSelectItem[]; // the selected results

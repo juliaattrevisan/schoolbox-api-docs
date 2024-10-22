@@ -1,5 +1,5 @@
 import { mount } from "@vue/test-utils";
-import SsResultsListItem from "../ss-results-list-item.vue";
+import SsResultsListItem from "../ss-results-item.vue";
 
 const defaultProps = {
     query: "",

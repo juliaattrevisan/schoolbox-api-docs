@@ -1,5 +1,5 @@
 import { mount } from "@vue/test-utils";
-import SsSelectedListItem from "../ss-selected-list-item.vue";
+import SsSelectedListItem from "../ss-selected-item.vue";
 
 const defaultProps = {
     item: { id: 1, name: "Item 1" },
