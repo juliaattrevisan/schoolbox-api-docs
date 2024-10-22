@@ -54,6 +54,13 @@ const { currentLabel, isOpen, onButtonSelected } = usePopOut(
     props.isCloseOnContentClick,
     props.moveTo,
 );
+
+// To help acceptance tests know when the component is ready and can be interacted with
+// keep the data-test attribute off until it is mounted
+const isReady = window.Vue.ref(false);
+window.Vue.onMounted(() => {
+    isReady.value = true;
+});
 </script>
 
 <template>
@@ -72,7 +79,7 @@ const { currentLabel, isOpen, onButtonSelected } = usePopOut(
         :aria-expanded="isOpen"
         :aria-controls="props.contentId"
         :aria-pressed="isOpen"
-        :data-test="`sbx-pop-out-${props.contentId}-button`"
+        :data-test="isReady ? `sbx-pop-out-${props.contentId}-button` : undefined"
         :disabled="props.disabled"
         @click.prevent="onButtonSelected"
     >
