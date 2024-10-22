@@ -19,6 +19,16 @@ test("item can be removed", async () => {
     expect(removeEvent[0]).toEqual([{ id: 1, name: "Item 1" }]); // validate the event has the correct payload
 });
 
+test("item cant be removed if isReadOnly is true", async () => {
+    const wrapper = mount(SsSelectedListItem, {
+        props: {
+            ...defaultProps,
+            isReadOnly: true,
+        },
+    });
+    expect(wrapper.find(`[data-test="ss-selected-item-remove-1"]`).exists()).toBe(false);
+});
+
 test("item can be selected if canSelectItem is true", async () => {
     const wrapper = mount(SsSelectedListItem, {
         props: {

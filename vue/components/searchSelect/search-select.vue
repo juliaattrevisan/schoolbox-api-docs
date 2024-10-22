@@ -21,14 +21,15 @@ interface Props {
     formValueName?: string; // the name of the form value
     placeholder?: string; // the query input placeholder text
     canSelectItem?: boolean; // whether the user can select an item (to trigger the select emit)
-    hasError: boolean; // Whether the input has an error
-    errorMessage: string; // The error message to display
+    hasError?: boolean; // Whether the input has an error
+    errorMessage?: string; // The error message to display
     isReadOnly?: boolean; // Whether the input is read only
 }
 const props = withDefaults(defineProps<Props>(), {
     defaultResults: undefined,
     formValueName: "",
     placeholder: "Search...",
+    errorMessage: "This field is required",
 });
 
 const emit = defineEmits<{

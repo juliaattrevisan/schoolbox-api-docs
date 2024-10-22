@@ -198,3 +198,14 @@ test("only one selection allowed when isSingleSelect is true", async () => {
     const selectedItem = wrapper.get(`[data-test="ss-selected-item-container-2"]`); // get the selected item
     expect(selectedItem.html()).toContain("Default Item 2"); // validate the selected item contains the correct text
 });
+
+test("query input is not shown if isReadOnly is true", async () => {
+    const wrapper = mount(SearchSelect, {
+        props: {
+            ...defaultProps,
+            selected: [],
+            isReadOnly: true,
+        },
+    });
+    expect(wrapper.find(`[data-test="ss-query-input"]`).exists()).toBe(false);
+});
