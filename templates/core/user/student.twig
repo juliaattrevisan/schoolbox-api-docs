@@ -113,8 +113,51 @@
         <section class="no-pad">
             <div class="profile content">
                 <div class="row no-margin">
+                    {# Build a hash lookup of additional clauses and cross-reference them
+                     # This list is your last opportunity to show/hide a field
+                     #
+                     # Additional visibility constraints for the **viewer's** roletype
+                     # and the corresponding bool set by old twig implementation
+                     #
+                     # showEmail: This checked for role permissions, email existence, etc. we need to keep
+                     # showPastoral: This checked for permissions, routes, etc. we need to keep
+                     #}
+                    {% set additionalConstraints = {
+                        'staff': {
+                            'email': showEmail,
+                            'formTeacher': user.showTimetable,
+                            'hohTeacher': user.showTimetable,
+                            'pastoralCounts': showPastoral,
+                            'StudentForm': user.showTimetable,
+                            'StudentTutorDescription': user.showTimetable,
+                            'tutorTeacher': user.showTimetable
+                        }
+                    } %}
+
                     <div class="small-12 medium-2 columns no-pad">
-                        {% include 'include/portrait.twig' with {user: user, render: 'profile', class: 'full-width', description: ''} only %}
+                        {# If the portrait was made available and visible to you, it would normally appear
+                         # as element 0 in this selected list, but you have to check anyway to be sure
+                         #}
+                        {% set foundPortrait = false %}
+
+                        {% for selectedField in externalUser.data.roleTypes.fields.selected|filter(selectedField => selectedField.field == 'portrait') %}
+                            {% if (additionalConstraints[USER.role.type][selectedField.field] ?? true) %}
+                                {% set foundPortrait = true %}
+
+                                {# Portrait was available and visible to you,
+                                 # and you pass the additionalConstraints listed above
+                                 # Ask php to give you an image (it might not...)
+                                 #}
+                                {% include 'include/portrait.twig' with {user: user, render: 'profile', class: 'full-width', description: ''} only %}
+                            {% endif %}
+                        {% endfor %}
+
+                        {# No image? Grey man
+                         # We can kind of force this with a null user...wow
+                         #}
+                        {% if not foundPortrait %}
+                            {% include 'include/portrait.twig' with {user: null, render: 'profile', class: 'full-width', description: ''} only %}
+                        {% endif %}
                     </div>
                     <div class="small-12 medium-10 columns no-pad">
                         {# Profile Editor v24 begins here mostly
@@ -167,27 +210,6 @@
                                         });
                                     });
                                 </script>
-
-                                {# Build a hash lookup of additional clauses and cross-reference them
-                                 # This list is your last opportunity to show/hide a field
-                                 #
-                                 # Additional visibility constraints for the **viewer's** roletype
-                                 # and the corresponding bool set by old twig implementation
-                                 #
-                                 # showEmail: This checked for role permissions, email existence, etc. we need to keep
-                                 # showPastoral: This checked for permissions, routes, etc. we need to keep
-                                 #}
-                                {% set additionalConstraints = {
-                                    'staff': {
-                                        'email': showEmail,
-                                        'formTeacher': user.showTimetable,
-                                        'hohTeacher': user.showTimetable,
-                                        'pastoralCounts': showPastoral,
-                                        'StudentForm': user.showTimetable,
-                                        'StudentTutorDescription': user.showTimetable,
-                                        'tutorTeacher': user.showTimetable
-                                    }
-                                } %}
 
                                 <dl>
                                     {# Portrait is always element 0 at the moment: we can skip iterating
@@ -486,7 +508,7 @@
                         $('[data-tab] a').first().trigger('click');
                         break;
                 #}
-            });
+            %});
         </script>
 
         {# These are all the possible tab buttons that could exist
