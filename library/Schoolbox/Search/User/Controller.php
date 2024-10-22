@@ -225,21 +225,24 @@ class Controller extends BaseController
          * to service this extra widgety thing, Pastoral Counts
          */
         $externalUser = (new \Schoolbox\Profile\Field\Factory($this->fieldMapper, $this->userMapper, $this->externalUser))
-            ->produce($student, $this->getUser(), static function ($result) use ($pastoralCountHelper, $pastoralCountPeriod, $viewee, $viewer) {
+            ->produce($student, $this->getUser(), [
                 /* Inject pastoral counts so it executes in proper place deeper in the Factory
+                 * ...but only if Pastoral Counts were a renderable field, as per admin
                  */
-                if ($pastoralCountHelper && $pastoralCountPeriod) {
-                    $result['pastoralCounts'] = $pastoralCountHelper->countStudentEventsByTypes(
-                        $viewer,
-                        $viewee,
-                        null,
-                        null,
-                        $pastoralCountHelper->getStartDate($pastoralCountPeriod)
-                    );
-                }
+                'pastoralCounts' => static function () use ($pastoralCountHelper, $pastoralCountPeriod, $viewee, $viewer) {
+                    if ($pastoralCountHelper && $pastoralCountPeriod) {
+                        return $pastoralCountHelper->countStudentEventsByTypes(
+                            $viewer,
+                            $viewee,
+                            null,
+                            null,
+                            $pastoralCountHelper->getStartDate($pastoralCountPeriod)
+                        );
+                    }
 
-                return $result;
-            });
+                    return [];
+                }
+            ]);
 
         // Wrangle default colors
         $colors              = $this->timetableColourMapper->findAll()->reindex();

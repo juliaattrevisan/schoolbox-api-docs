@@ -42,7 +42,7 @@ class Factory
      *
      * @param User $viewee
      * @param User $viewer
-     * @param callable|null $mutator
+     * @param array|null $mutatorIndex
      * @return array
      * @throws DebugBarException
      * @throws DefinitionException
@@ -52,7 +52,7 @@ class Factory
      * @throws \PDOException
      * @throws \UnexpectedValueException
      */
-    public function produce(\Schoolbox\User $viewee, \Schoolbox\User $viewer, ?callable $mutator = null): array
+    public function produce(\Schoolbox\User $viewee, \Schoolbox\User $viewer, ?array $mutatorIndex = []): array
     {
         $payload = [
             'locale' => null,
@@ -66,7 +66,7 @@ class Factory
 
         /* Data about $viewee that we'll put through the $renderableFields list
          */
-        $referenceFields = $this->generateReferenceFields($viewee, $mutator);
+        $referenceFields = $this->generateReferenceFields($viewee);
 
         /* Fields that $viewer can actually see on screen
          */
@@ -74,7 +74,7 @@ class Factory
 
         /** @var \Schoolbox\Admin\Profile\Editor\Field\Model $renderableField */
         foreach ($renderableFields as $renderableField) {
-            $payload['roleTypes']['fields']['selected'][] = [
+            $node = [
                 'field' => $renderableField->getField(),
                 'displayAs' => $renderableField->getDisplayAs(),
                 'terminology' => $renderableField->getTerm(),
@@ -83,6 +83,19 @@ class Factory
                 'clickToReveal' => $renderableField->getClickToReveal(),
                 'value' => $referenceFields[$renderableField->getField()] ?? null
             ];
+
+            /* Some aftermarket data that isn't part of the externals and needs to be fetched
+             * from a context outside of this factory. This started with Pastoral Counts that
+             * needs various controller-specific instances that are annoying to inject here
+             *
+             * Find out if $mutator has a callback indexed by the current renderableField's name
+             * If there is, use that as the value
+             */
+            if (isset($mutatorIndex[$renderableField->getField()])) {
+                $node['value'] = $mutatorIndex[$renderableField->getField()]();
+            }
+
+            $payload['roleTypes']['fields']['selected'][] = $node;
         }
 
         /* The preprocessed payload that frontend can just use
@@ -101,24 +114,23 @@ class Factory
      * list of renderable fields as determined by admin.
      *
      * @param User $viewee
-     * @param callable|null $mutator
      * @return array
      * @throws InvalidColumnException
      * @throws MapperException
      * @throws \DomainException
      */
-    public function generateReferenceFields(\Schoolbox\User $viewee, ?callable $mutator): array
+    public function generateReferenceFields(\Schoolbox\User $viewee): array
     {
         if ($viewee->getRole()->isStudent()) {
-            return $this->generateStudentReferenceFields($viewee, $mutator);
+            return $this->generateStudentReferenceFields($viewee);
         }
 
         if ($viewee->getRole()->isParent()) {
-            return $this->generateParentReferenceFields($viewee, $mutator);
+            return $this->generateParentReferenceFields($viewee);
         }
 
         if ($viewee->getRole()->isStaff()) {
-            return $this->generateStaffReferenceFields($viewee, $mutator);
+            return $this->generateStaffReferenceFields($viewee);
         }
 
         throw new \DomainException('Viewee has an unknown role type');
@@ -129,12 +141,11 @@ class Factory
      * Preprocesses $viewee (a student) and their corresponding External_UserInterface array
      *
      * @param User $viewee
-     * @param callable|null $mutator
      * @return array
      * @throws InvalidColumnException
      * @throws MapperException
      */
-    private function generateStudentReferenceFields(\Schoolbox\User $viewee, ?callable $mutator): array
+    private function generateStudentReferenceFields(\Schoolbox\User $viewee): array
     {
         $externalUser = [];
 
@@ -272,15 +283,13 @@ class Factory
             'pastoralCounts' => null
         ];
 
-        $result = array_merge($externalUser, $referenceFields);
-
-        /* Mutate $result with an optional callback...such as that pastoral counts stuff
-         */
-        if (null !== $mutator) {
-            $result = $mutator($result);
-        }
-
-        return $result;
+        return array_merge($externalUser, $referenceFields);
+//
+//        /* Mutate $result with an optional callback...such as that pastoral counts stuff
+//         */
+//        if (null !== $mutator) {
+//            $result = $mutator($result);
+//        }
     }
 
 
@@ -288,10 +297,9 @@ class Factory
      * Preprocesses $viewee (a parent) and their corresponding External_UserInterface array
      *
      * @param User $viewee
-     * @param callable|null $mutator
      * @return array
      */
-    private function generateParentReferenceFields(\Schoolbox\User $viewee, ?callable $mutator): array
+    private function generateParentReferenceFields(\Schoolbox\User $viewee): array
     {
         return [];
     }
@@ -301,10 +309,9 @@ class Factory
      * Preprocesses $viewee (a staff) and their corresponding External_UserInterface array
      *
      * @param User $viewee
-     * @param callable|null $mutator
      * @return array
      */
-    private function generateStaffReferenceFields(\Schoolbox\User $viewee, ?callable $mutator): array
+    private function generateStaffReferenceFields(\Schoolbox\User $viewee): array
     {
         return [];
     }
