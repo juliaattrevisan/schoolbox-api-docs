@@ -15,12 +15,18 @@ const props = defineProps<Props>();
 
 const store = useCourseSelectorStore();
 store.init(props.preselected);
+
+const results = window.Vue.ref<Course[]>([]);
+
+window.Vue.watch(results, (newResults) => {
+    console.warn("Results changed", newResults);
+});
 </script>
 
 <template>
     <search-select
-        :v-model:selected-items="store.selected"
-        :v-model:results="[]"
+        v-model:selected-items="store.selected"
+        v-model:results-list="results"
         label="Select Courses"
         label-id="courses"
         :is-required="true"

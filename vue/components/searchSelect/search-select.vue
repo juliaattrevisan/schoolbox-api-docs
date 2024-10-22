@@ -34,8 +34,8 @@ const { add, remove, update } = useSelected(selectedItems); // to add and remove
 // const searchSelectEl = useTemplateRef("searchSelectEl"); // failing typecheck currently :(
 const searchSelectEl = window.Vue.ref<HTMLDivElement | null>(null);
 
-const results = defineModel<SearchSelectItem[]>("results", { default: [] }); // to store search results
-const { query, isActive, isSearching, hasNoResults } = useSearch(props.endpoint, results); // to search for results
+const resultsList = defineModel<SearchSelectItem[]>("results-list", { default: [] }); // to store search results
+const { query, isActive, isSearching, hasNoResults } = useSearch(props.endpoint, resultsList); // to search for results
 
 /**
  * To show the current search results, or the default results
@@ -44,12 +44,12 @@ const { query, isActive, isSearching, hasNoResults } = useSearch(props.endpoint,
  */
 const currentResults = window.Vue.computed(() => {
     if (isActive.value) {
-        return results.value;
+        return resultsList.value;
     }
     if (props.defaultResults && props.defaultResults.length > 0) {
         return props.defaultResults;
     }
-    return results.value;
+    return resultsList.value;
 });
 
 /**
