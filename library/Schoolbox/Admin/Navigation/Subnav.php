@@ -1084,7 +1084,7 @@ class Subnav
      */
     private function generateBreadcrumbsSub(string $parentUrl, array $parentData, string $url, ?string $overrideUrl = null, ?string $overrideName = null): array
     {
-        $allCrumbs               = [];
+        $allCrumbs = [];
         $parentHasBreadcrumbLink = $parentData['searchable'] ?? true;
         if ($parentUrl === $url) {
             $allCrumbs[] = [
