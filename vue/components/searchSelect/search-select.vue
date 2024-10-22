@@ -90,6 +90,7 @@ function onRemove(items: SearchSelectItem[]): void {
 <template>
     <div ref="searchSelectEl">
         <label :for="props.labelId" :class="`${props.isRequired ? 'required' : ''}`">{{ props.label }}</label>
+        <label v-if="props.hasError" class="error" :for="props.labelId">{{ errorMessage }}</label>
         <ss-selected
             :selected="selected"
             :form-value-name="props.formValueName"
@@ -104,7 +105,6 @@ function onRemove(items: SearchSelectItem[]): void {
             :parent-el="searchSelectEl"
             :placeholder="props.placeholder"
         />
-        <label v-if="props.hasError" class="error" :for="props.labelId">{{ errorMessage }}</label>
         <ss-results
             :query="query"
             :is-active="isActive"
