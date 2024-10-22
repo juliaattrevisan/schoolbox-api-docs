@@ -4,7 +4,7 @@
  * multiple search results at once
  */
 
-import { toRef } from "vue";
+import { toRef, useTemplateRef } from "vue";
 import { useActiveIndex } from "./composables/useActiveIndex";
 import type { SearchSelectItem } from "./types/searchSelectTypes";
 
@@ -88,7 +88,7 @@ function onMouseout(): void {
     emit("hover", -1);
 }
 
-const resultEl = window.Vue.ref<HTMLElement | null>(null);
+const resultEl = useTemplateRef<HTMLDivElement | null>("resultEl");
 
 /**
  * To allow keyboard navigation of the search results

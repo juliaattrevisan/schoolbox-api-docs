@@ -3,7 +3,7 @@
  * To search for results with a query and select them
  */
 
-// import { useTemplateRef } from "vue";
+import { useTemplateRef } from "vue";
 import { useSelected } from "@schoolboxVue/composables/store/useSelected";
 import { useSearch } from "./composables/useSearch";
 import type { SearchSelectItem } from "./types/searchSelectTypes";
@@ -28,8 +28,7 @@ const props = withDefaults(defineProps<Props>(), {
     placeholder: "Search...",
 });
 
-// const searchSelectEl = useTemplateRef("searchSelectEl"); // failing typecheck currently :(
-const searchSelectEl = window.Vue.ref<HTMLDivElement | null>(null);
+const searchSelectEl = useTemplateRef<HTMLDivElement | null>("searchSelectEl");
 
 const selected = defineModel<SearchSelectItem[]>("selected", { default: [] }); // to store selected items
 const { add, remove, update } = useSelected(selected); // to add and remove selected items
