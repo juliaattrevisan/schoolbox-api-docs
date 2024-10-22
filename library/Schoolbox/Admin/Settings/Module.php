@@ -26,7 +26,7 @@ class Module extends \Alaress\Module\Module
      */
     protected function registerRoutes(): void
     {
-        $rule = new Rule\All(
+        $ruleSearchSettings = new Rule\All(
             new Rule\IsLoggedIn(),
             new Rule\Any(
                 new Rule\IsSuperuser(),
@@ -34,9 +34,14 @@ class Module extends \Alaress\Module\Module
             )
         );
 
-        $this->register('GET', '/search', 'searchSettings', $rule);
-        $this->register('GET', '{/typeLabel}', 'getSettings', $rule);
-        $this->register('POST', '/{typeLabel}', 'postSettings', $rule);
+        $ruleSuperuserOnly = new Rule\All(
+            new Rule\IsLoggedIn(),
+            new Rule\IsSuperuser(),
+        );
+
+        $this->register('GET', '/search', 'searchSettings', $ruleSearchSettings);
+        $this->register('GET', '{/typeLabel}', 'getSettings', $ruleSuperuserOnly);
+        $this->register('POST', '/{typeLabel}', 'postSettings', $ruleSuperuserOnly);
     }
 
     /**
