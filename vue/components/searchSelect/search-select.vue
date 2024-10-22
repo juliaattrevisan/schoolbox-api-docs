@@ -28,14 +28,14 @@ const props = withDefaults(defineProps<Props>(), {
     placeholder: "Search...",
 });
 
-const selected = defineModel<SearchSelectItem[]>("selected", { default: [] }); // to store selected items
-const { add, remove, update } = useSelected(selected); // to add and remove selected items
-
 // const searchSelectEl = useTemplateRef("searchSelectEl"); // failing typecheck currently :(
 const searchSelectEl = window.Vue.ref<HTMLDivElement | null>(null);
 
-const resultsList = defineModel<SearchSelectItem[]>("results-list", { default: [] }); // to store search results
-const { query, isActive, isSearching, hasNoResults } = useSearch(props.endpoint, resultsList); // to search for results
+const selected = defineModel<SearchSelectItem[]>("selected", { default: [] }); // to store selected items
+const { add, remove, update } = useSelected(selected); // to add and remove selected items
+
+const results = defineModel<SearchSelectItem[]>("results", { default: [] }); // to store search results
+const { query, isActive, isSearching, hasNoResults } = useSearch(props.endpoint, results); // to search for results
 
 /**
  * To show the current search results, or the default results
@@ -44,16 +44,16 @@ const { query, isActive, isSearching, hasNoResults } = useSearch(props.endpoint,
  */
 const currentResults = window.Vue.computed(() => {
     if (isActive.value) {
-        return resultsList.value;
+        return results.value;
     }
     if (props.defaultResults && props.defaultResults.length > 0) {
         return props.defaultResults;
     }
-    return resultsList.value;
+    return results.value;
 });
 
 /**
- * To add results
+ * To add items
  * @param $items - the items selected
  */
 function onAdd($items: SearchSelectItem[]): void {
@@ -66,7 +66,7 @@ function onAdd($items: SearchSelectItem[]): void {
 }
 
 /**
- * To remove results
+ * To remove items
  * @param $items - the items deselected
  */
 function onRemove($items: SearchSelectItem[]): void {
