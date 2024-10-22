@@ -612,9 +612,10 @@ class Subnav
                     ],
                 ],
             ],
-            'news' => [
+            'adminv2/news' => [
                 'name'        => 'News',
                 'visible'     => $loggedInUserIsSuperuser || $loggedInUserHasServicePermissionNews,
+                'searchable'  => false,
                 'children'    => [
                     '/adminv2/news' => [
                         'name'        => 'Settings / Policy',
