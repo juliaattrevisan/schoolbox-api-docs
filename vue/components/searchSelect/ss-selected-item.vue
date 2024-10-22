@@ -9,6 +9,7 @@ interface Props {
     item: SearchSelectItem; // the selected item
     isSingleSelect: boolean; // whether only one item can be selected
     canSelectItem: boolean; // whether the user can select an item (to trigger the select emit)
+    isReadOnly?: boolean; // whether can remove items
 }
 const props = defineProps<Props>();
 
@@ -60,6 +61,7 @@ function onRemoveSelected(): void {
         </button>
         <span v-else class="selected-item__name-span">{{ props.item.name }}</span>
         <button
+            v-if="!props.isReadOnly"
             type="button"
             class="selected-item__remove-button icon-close"
             :title="`Remove ${props.item.name}`"

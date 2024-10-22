@@ -23,6 +23,7 @@ interface Props {
     canSelectItem?: boolean; // whether the user can select an item (to trigger the select emit)
     hasError: boolean; // Whether the input has an error
     errorMessage: string; // The error message to display
+    isReadOnly?: boolean; // Whether the input is read only
 }
 const props = withDefaults(defineProps<Props>(), {
     defaultResults: undefined,
@@ -96,10 +97,12 @@ function onRemove(items: SearchSelectItem[]): void {
             :form-value-name="props.formValueName"
             :is-single-select="props.isSingleSelect"
             :can-select-item="props.canSelectItem"
+            :is-read-only="props.isReadOnly"
             @select="onSelect"
             @remove="onRemove"
         />
         <ss-query-input
+            v-if="!props.isReadOnly"
             v-model:query="query"
             :label-id="props.labelId"
             :parent-el="searchSelectEl"

@@ -15,6 +15,7 @@ interface Props {
     isRequired?: boolean; // Whether the input requires a value
     hasError?: boolean; // Whether the input has an error
     errorMessage?: string; // The error message to display
+    isReadOnly?: boolean; // Whether the input is read only
 }
 const props = withDefaults(defineProps<Props>(), {
     label: "Select Courses",
@@ -35,6 +36,7 @@ store.init(props.preselected);
         :endpoint="props.endpoint"
         :has-error="props.hasError"
         :error-message="props.errorMessage"
+        :is-read-only="props.isReadOnly"
     />
 </template>
 

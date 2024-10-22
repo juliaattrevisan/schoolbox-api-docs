@@ -11,6 +11,7 @@ interface Props {
     formValueName: string; // the name of the form value
     isSingleSelect: boolean; // whether only one result can be selected
     canSelectItem: boolean; // whether the user can select an item (to trigger the select emit)
+    isReadOnly?: boolean; // whether can remove items
 }
 const props = defineProps<Props>();
 
@@ -53,6 +54,7 @@ function onRemoveItem(item: SearchSelectItem): void {
             :item="item"
             :is-single-select="props.isSingleSelect"
             :can-select-item="props.canSelectItem"
+            :is-read-only="props.isReadOnly"
             @select="onSelectItem"
             @remove="onRemoveItem"
         />
