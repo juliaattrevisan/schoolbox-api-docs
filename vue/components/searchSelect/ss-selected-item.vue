@@ -44,7 +44,7 @@ function onRemoveSelected(): void {
         :class="`selected-item l-flex-row l-flex--align-center l-pad-s l-gap-s ${
             props.isSingleSelect ? 'l-flex__item--1' : ''
         }`"
-        :data-test="`ss-selected-list-item-container-${props.item.id}`"
+        :data-test="`ss-selected-item-container-${props.item.id}`"
     >
         <button
             v-if="props.canSelectItem"
@@ -53,7 +53,7 @@ function onRemoveSelected(): void {
             :title="`View ${props.item.name}`"
             :aria-label="`View ${props.item.name}`"
             :disabled="isDisabled"
-            :data-test="`search-select-selected-item-select-${props.item.id}`"
+            :data-test="`ss-selected-item-select-${props.item.id}`"
             @click.prevent="onNameSelected"
         >
             {{ props.item.name }}
