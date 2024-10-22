@@ -51,6 +51,7 @@ export default class Index {
      */
     async goto(newsTopic: string): Promise<void> {
         await this.page.goto(Index.generateRoute(newsTopic));
+        await this.page.waitForURL(Index.generateRoute(newsTopic));
     }
 
     /**
@@ -67,7 +68,8 @@ export default class Index {
      * @param headline - news article headline
      */
     async seeHeadline(headline: string): Promise<void> {
-        await expect(this.page.locator(`a:has-text("${headline}")`)).toBeVisible();
+        // await expect(this.page.locator(`a:has-text("${headline}")`)).toBeVisible();
+        await expect(this.page.locator(`ul.information-list`).first()).toContainText(headline);
     }
 
     /**
@@ -75,7 +77,7 @@ export default class Index {
      * @param headline - news article headline
      */
     async dontSeeHeadline(headline: string): Promise<void> {
-        await expect(this.page.locator(`a:has-text("${headline}")`)).not.toBeVisible();
+        await expect(this.page.locator(`ul.information-list`).first()).not.toContainText(headline);
     }
 
     /**
@@ -100,6 +102,7 @@ export default class Index {
      */
     async viewArticle(articleId: number): Promise<void> {
         await this.page.locator(`a[href="/news/${articleId}?ref=index"]`).last().click();
+        await this.tester.common.waitForPageLoad();
     }
 
     /**
@@ -108,6 +111,7 @@ export default class Index {
      */
     async clickArticleTitle(articleId: number): Promise<void> {
         await this.page.locator(`a[href="/news/${articleId}"]`).first().click();
+        await this.tester.common.waitForPageLoad();
     }
 
     /**

@@ -185,8 +185,8 @@ test.describe("Create and Verify News Article Test", () => {
         await form.seeAudience(campus);
         await form.seeUser(user1);
         await form.seeUser(user2);
-        // await form.seePublishDate(publish);
-        // await form.seeExpiryDate(expiry);
+        await form.seePublishDate(publish);
+        await form.seeExpiryDate(expiry);
 
         tester.isGoingTo("Verify that user Tim Reed(student from secondary) cannot see it");
         await tester.impersonateViaModifyUserPage(student);
@@ -203,13 +203,13 @@ test.describe("Create and Verify News Article Test", () => {
         await index.seeHeadline(headline);
 
         tester.isGoingTo("Make it unpublished");
+        await tester.logout();
         await tester.loginAsAdmin();
         await index.goto("all");
         await index.viewArticle(articleId);
-        await item.modifyArticle();
-        publish.setDate(publish.getDate() + 2); // 2 days from now
-        await form.fillPublishDate(publish);
-        await form.submit();
+        await item.unpublishArticle();
+        // await item.modifyArticle();
+        // await form.fillPublishDate(Common.getTodayAtMidnight());
 
         tester.isGoingTo("Verify that user Alison Chan can no longer see it");
         await tester.impersonateViaModifyUserPage(teacher);
@@ -233,7 +233,7 @@ test.describe("Create and Verify News Article Test", () => {
         const item = new Item(tester, page);
         tester.isGoingTo("Fill in form values with composite audience: 4 roles and 2 campuses + team and year level");
         const headline = "Acceptance Test News Composite Audience Article Testing ";
-        await tester.impersonateViaModifyUserPage("Mr Jack Coles");
+        await tester.impersonateTeacher();
         await form.goto();
         await form.fillHeadline(headline);
         await form.createCompositeAudience("Team", ["primary-IjEi"], "Year Level", ["secondary-Ijki"]);
@@ -245,6 +245,8 @@ test.describe("Create and Verify News Article Test", () => {
             "secondary-IjQi",
             "secondary-Ijci",
         ]);
+        // waiting to make sure the drat is created  - currently it takes 3 seconds
+        await form.waitForDraftToast();
         await form.seeAudience("2 Campuses & 4 Roles");
 
         tester.isGoingTo(
@@ -256,8 +258,8 @@ test.describe("Create and Verify News Article Test", () => {
             deleted_at: null,
         })) as number;
         await index.clickArticleTitle(articleId);
-        await form.seeAudience("2 Campuses & 4 Roles");
-        await form.seeAudience("1 Team & 1 Year Level");
+        await item.seeArticleAudience("2 Campuses & 4 Roles");
+        await item.seeArticleAudience("1 Team & 1 Year Level");
 
         tester.isGoingTo(
             "check the modify article page presents the proper audience: 4 roles and 2 campuses + 1 team and 1 year level",
@@ -278,21 +280,29 @@ test.describe("Create and Verify News Article Test", () => {
         await form.checkboxAudience("9A English (9ENGA)");
         await form.selectIncludeUsers("parents");
         await form.clickAddAudience();
+        // waiting to make sure the drat is created  - currently it takes 3 seconds
+        // when we get something better in the waitForDraftToast we can remove  the timeout
+        await form.waitForDraftToast();
+        await page.waitForTimeout(3000);
+
         tester.isGoingTo(
             "check the modify article page presents the proper audience: Primary and 9A English (9ENGA) Inc parents of students",
         );
         await form.seeAudience("Primary");
         await form.seeAudience("9A English (9ENGA)");
-        await form.seeAudience("Class/Group");
-        await form.seeAudience("(Inc. parents of students)");
+        await form.seeAudienceMetaData("Class/Group");
+        await form.seeAudienceMetaData("(Inc. parents of students)");
+
+        tester.isGoingTo("PASS 1");
 
         tester.isGoingTo(
             "check the draft article presents the proper audience: Primary and 9A English (9ENGA) Inc parents of students",
         );
         await page.goto("/news/me?status=Drafted");
         await index.clickArticleTitle(articleId);
-        await form.seeAudience("9A English (9ENGA) (Inc. parents of students)");
-        await form.seeAudience("(Inc. parents of students)");
+        await item.seeArticleAudience("9A English (9ENGA) (Inc. parents of students)");
+
+        tester.isGoingTo("PASS 2");
 
         tester.isGoingTo("'Fill in form values by typing an audience: Jana Reed, Tim Reed and Jenni Reed");
         await item.modifyArticle();
@@ -302,10 +312,11 @@ test.describe("Create and Verify News Article Test", () => {
         await form.fillUser("Jana Reed");
         await form.fillUser("Tim Reed");
         await form.fillUser("Jenni Reed");
-        await form.fillUser("Demo 1");
+        await form.fillUser("DEMO1");
         await form.fillUser("Primary");
-        // await the draft to be saved - cuurrently it takes 3 seconds
-        await page.waitForTimeout(3000);
+        // had to wait as the toast is presented for the previous user and was not saving the last one
+        await form.waitForDraftToast();
+        await page.waitForTimeout(4000);
 
         tester.isGoingTo("check the draft article presents the proper audience: Primary and Demo class 1");
         await page.goto("/news/me?status=Drafted");
@@ -313,26 +324,34 @@ test.describe("Create and Verify News Article Test", () => {
         await item.seeArticleAudience("Primary");
         await item.seeArticleAudience("Demo Class Page 1 (DEMO1)");
 
+        tester.isGoingTo("PASS 3");
+
         tester.isGoingTo(
             "Fill in form values by selecting audience via bricks and composite: year level + house and Teams Raide",
         );
         await item.modifyArticle();
-
-        await form.removeAudience("Ms Jana Reed (507) (Middle Student)");
-        await form.removeAudience("Ms Tim Reed (509) (Senior Student)");
-        await form.removeAudience("Ms Jenni Reed (502) (Senior Student)");
-        await form.removeAudience("Primary");
         await form.removeAudience("Demo Class Page 1 (DEMO1)");
+        await form.removeAudience("Primary");
+        await form.removeAudience("Mr Tim Reed (509) (Senior Student)");
+        await form.removeAudience("Ms Jenni Reed (502) (Parent)");
+        await form.removeAudience("Ms Jana Reed (507) (Middle Student)");
 
         await form.selectAudienceOption("Year Levels");
         await form.checkboxAudience("Year 9");
         await form.selectIncludeUsers("parents");
-        await form.createCompositeAudience("House", ["primary-IjEid"], "Team", ["secondary-IjIi"]);
-        await form.seeAudience("1 Year Level & 1 House");
+        await form.clickAddAudience();
+        await form.createCompositeAudience("House", ["primary-IjEi"], "Team", ["secondary-IjIi"]);
+        // waiting to make sure the drat is created  - currently it takes 3 seconds
+        // when we get something better in the waitForDraftToast we can remove  the timeout
+        await form.waitForDraftToast();
+        await page.waitForTimeout(3000);
+        await form.seeAudience("1 Team & 1 House");
         await form.seeAudience("Year 9");
-        await form.seeAudience("Composite Audience (view details)");
-        await form.seeAudience("Year Level");
-        await form.seeAudience("Inc. parents of students");
+        await form.seeAudienceMetaData("Composite Audience");
+        await form.seeAudienceMetaData("Year Level");
+        await form.seeAudienceMetaData("(Inc. parents of students)");
+
+        tester.isGoingTo("PASS 4");
 
         tester.isGoingTo("check the draft article presents the proper audience: Year 9 and 1 House and 1 Team");
         await page.goto("/news/me?status=Drafted");
@@ -340,6 +359,8 @@ test.describe("Create and Verify News Article Test", () => {
         await item.seeArticleAudience("1 Team & 1 House");
         await item.seeArticleAudience("Year 9");
         await item.seeArticleAudience("Inc. parents of students");
+
+        tester.isGoingTo("PASS 5");
 
         tester.isGoingTo("Publish the article and ensure the proper audience is presented");
         await item.modifyArticle();
@@ -350,6 +371,8 @@ test.describe("Create and Verify News Article Test", () => {
         await item.seeArticleAudience("1 Team & 1 House");
         await item.seeArticleAudience("Year 9");
         await item.seeArticleAudience("Inc. parents of students");
+
+        tester.isGoingTo("PASS 6");
     });
 
     /**

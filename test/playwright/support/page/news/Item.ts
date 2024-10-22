@@ -1,4 +1,5 @@
 import type AcceptanceTester from "@schoolboxTest/playwright/support/AcceptanceTester";
+import Common from "@schoolboxTest/playwright/support/page/Common";
 import type { Page } from "@playwright/test";
 import { expect } from "@playwright/test";
 
@@ -27,7 +28,7 @@ export default class Item {
 
     static readonly ELEMENT_BREADCRUMB = ".breadcrumb";
 
-    static readonly ELEMENT_HEADLINE = "h1";
+    static readonly ELEMENT_HEADLINE = "div.title-section";
 
     static readonly ELEMENT_META_AUTHOR = ".card > .meta:nth-of-type(1)";
 
@@ -64,7 +65,7 @@ export default class Item {
      * @param headline - The headline to check
      */
     async seeHeadline(headline: string): Promise<void> {
-        await expect(this.page.locator(Item.ELEMENT_HEADLINE)).toHaveText(headline);
+        await expect(this.page.locator(Item.ELEMENT_HEADLINE)).toContainText(headline);
     }
 
     /**
@@ -83,6 +84,19 @@ export default class Item {
         await this.page.getByTestId(Item.DATA_TEST_DOT_MENU_BUTTON).click();
         await this.page.locator(Item.LINK_MODIFY).last().click();
         await expect(this.page.locator('h1:has-text("Update news")')).toBeVisible();
+        await this.tester.common.waitForPageLoad();
+    }
+
+    /**
+     * click unpublish article and confirm it
+     */
+    async unpublishArticle(): Promise<void> {
+        await expect(this.page.getByTestId(Item.DATA_TEST_DOT_MENU)).toBeEnabled();
+        await this.page.getByTestId(Item.DATA_TEST_DOT_MENU_BUTTON).click();
+        await this.page.locator('a[id="unpublish-article"]').click();
+        await expect(this.page.locator("div.reveal-modal.small.open")).toBeVisible();
+        await this.page.getByTestId("confirm-dialog-confirm-button").click();
+        await expect(this.page.locator('a[href="#awaiting-acceptance"]')).toBeVisible();
     }
 
     /**

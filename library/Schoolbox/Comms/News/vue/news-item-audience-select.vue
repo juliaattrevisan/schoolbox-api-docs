@@ -872,7 +872,11 @@ export default {
                         >
                             <legend>
                                 <label for="">Audience Type {{ index + 1 }}:</label>
-                                <select @change="updateIntersectList(key)" v-model="intersect[key]">
+                                <select
+                                    data-test="news-item-audience-select"
+                                    @change="updateIntersectList(key)"
+                                    v-model="intersect[key]"
+                                >
                                     <template v-for="(audienceOption, index) in audienceOptions.intersect[key]">
                                         <option
                                             :value="audienceOption"

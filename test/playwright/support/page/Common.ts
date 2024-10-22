@@ -354,7 +354,8 @@ export default class Common {
         let formattedDate = `${day}/${month}/${year}`;
 
         if (includeTime) {
-            const hours = zeroPad(date.getHours() % 12 || 12);
+            // const hours = zeroPad(date.getHours() % 12 || 12);
+            const hours = date.getHours() % 12 || 12;
             const minutes = zeroPad(date.getMinutes());
             const ampm = date.getHours() >= 12 ? "pm" : "am";
 

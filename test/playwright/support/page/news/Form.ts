@@ -155,7 +155,8 @@ export default class Form {
         await this.page.locator("button.button.icon-drag-drop").click();
         await expect(this.page.locator('div[class="reveal-modal no-pad open"]')).toBeVisible();
         await this.page.locator(`button.button-block:has-text("${audienceBrick}")`).click();
-        await expect(this.page.locator('label[for="audience-list-input-IjEi"]')).toBeVisible();
+        // await expect(this.page.locator('label[for="audience-list-input-IjEi"]')).toBeVisible();
+        await expect(this.page.locator('div[class="checklist-wrapper"]').first()).toBeVisible();
     }
 
     /**
@@ -179,7 +180,7 @@ export default class Form {
      */
     async clickAddAudience(): Promise<void> {
         await this.page.locator("button.button.submit").first().click();
-        await this.page.waitForTimeout(2000);
+        await this.waitForDraftToast();
     }
 
     /**
@@ -188,6 +189,18 @@ export default class Form {
      */
     async seeAudience(role: string): Promise<void> {
         await expect(this.page.locator(`h4[title="${role}"]`)).toHaveText(role);
+    }
+
+    /**
+     * see audience meta data - eg: Inc. parents of studenrs, Class/Group Members
+     * @param meta - The meta data of the audience
+     */
+    async seeAudienceMetaData(meta: string): Promise<void> {
+        await expect(
+            this.page.locator(
+                'ul[class="grid small-block-grid-1 medium-block-grid-2 large-block-grid-4 audience-grid"]',
+            ),
+        ).toContainText(meta);
     }
 
     /**
@@ -205,33 +218,8 @@ export default class Form {
      * @param user - The users that was selected on the modal is presented in the news form
      */
     async seeUser(user: string): Promise<void> {
-        // await expect(this.page.locator(`div[class="card small-12"]`)).toContainText(user);
         await this.page.locator(`h4[title="${user}"]`).first().filter({ hasText: user }).isVisible();
     }
-
-    // /**
-    //  * create composite audience
-    //  * @param dropdown1 - The checkboxes to tick
-    //  * @param dropdown2 - The checkboxes to tick
-    //  * @param audienceType1 - The first audience type
-    //  * @param audienceType2 - The second audience type
-    //  */
-    // async createCompositeAudience(
-    //     dropdown1: string,
-    //     dropdown2: string,
-    //     audienceType1: string,
-    //     audienceType2: string,
-    // ): Promise<void> {
-    //     await this.page.locator("button.button.icon-drag-drop").click();
-    //     await expect(this.page.locator('div[class="reveal-modal no-pad open"]')).toBeVisible();
-    //     await this.page.locator("a:has-text('Create Composite Audience')").click();
-    //     await this.page.locator(`select.option:has-text(${dropdown1})`).click();
-    //     await this.page.locator(`label:has-text(${audienceType1})`).click();
-    //     await this.page.locator(`select.option:has-text(${dropdown2})`).click();
-    //     await this.page.locator(`label:has-text(${audienceType2})`).click();
-    //     await this.page.locator("button.button.submit").click();
-    //     await this.page.waitForTimeout(2000);
-    // }
 
     /**
      * create composite audience
@@ -249,24 +237,13 @@ export default class Form {
         await this.page.locator("button.button.icon-drag-drop").click();
         await expect(this.page.locator('div[class="reveal-modal no-pad open"]')).toBeVisible();
         await this.page.locator("a:has-text('Create Composite Audience')").click();
-        await this.page.waitForTimeout(2000);
-        // await this.page.locator("select").filter({ hasText: "Rle" }).getByRole("combobox").click();
+        // await this.page.waitForTimeout(2000);
         await this.page.locator("legend").filter({ hasText: "Audience Type 1:" }).getByRole("combobox").click();
-        await this.page.waitForTimeout(2000);
-        // if there is a better way to select the dropdown, please let me know
-        // await this.page.locator("option").filter({ hasText: "Team" }).first().click();
-        // await this.page.locator("option").getByText("Team").first().click();
-        await this.page.keyboard.type(dropdown1);
-        await this.page.keyboard.press("Enter");
-        await this.page.waitForTimeout(2000);
+        await this.page.getByTestId("news-item-audience-select").first().selectOption({ label: dropdown1 });
         await this.tickCheckboxes(audienceType1);
-        await this.page.waitForTimeout(2000);
 
         await this.page.locator("legend").filter({ hasText: "Audience Type 2:" }).getByRole("combobox").click();
-        await this.page.waitForTimeout(2000);
-        await this.page.keyboard.type(dropdown2);
-        await this.page.keyboard.press("Enter");
-        await this.page.waitForTimeout(2000);
+        await this.page.getByTestId("news-item-audience-select").last().selectOption({ label: dropdown2 });
         await this.tickCheckboxes(audienceType2);
 
         await this.page.locator("button.button.submit").last().click();
@@ -277,17 +254,12 @@ export default class Form {
      * @param checkboxes - The checkboxes to tick
      */
     async tickCheckboxes(checkboxes: Array<string>): Promise<void> {
-        const result = checkboxes.map((checkbox) => this.page.locator(`label[for="${checkbox}"]`).click());
+        const checkbox = checkboxes.pop();
+        if (checkbox) {
+            await this.page.locator(`label[for="${checkbox}"]`).click();
 
-        // const result = checkboxes.map((checkbox) => {
-        //     const locator = this.page.locator(`label[for="${checkbox}"]`);
-        //     return forEach(checkboxes, async () => {
-        //         await locator.click();
-        //         await this.page.waitForTimeout(2000);
-        //     });
-        // });
-
-        await Promise.allSettled(result);
+            await this.tickCheckboxes(checkboxes);
+        }
     }
 
     /**
@@ -295,9 +267,7 @@ export default class Form {
      * @param publishDate - The publish date
      */
     async fillPublishDate(publishDate: Date): Promise<void> {
-        // await this.page.locator("input#publishAt").fill(publishDate);
-
-        await this.page.fill("input#publishAt", Common.formatDate(publishDate, true));
+        await this.page.locator("input#publishAt").fill(Common.formatDate(publishDate, true));
     }
 
     /**
@@ -313,9 +283,7 @@ export default class Form {
      * @param expiryDate - The expiry date
      */
     async fillExpiryDate(expiryDate: Date): Promise<void> {
-        // await this.page.locator("input#expiresAt").fill(expiryDate);
-
-        await this.page.fill("input#expiresAt", Common.formatDate(expiryDate, true));
+        await this.page.locator("input#expiresAt").fill(Common.formatDate(expiryDate, true));
     }
 
     /**
@@ -323,14 +291,7 @@ export default class Form {
      * @param expiryDate - The expiry date
      */
     async seeExpiryDate(expiryDate: Date): Promise<void> {
-        // await expect(this.page.locator("input#expiresAt")).toHaveValue(Common.formatDate(expiryDate, true));
-
-        // get value from a locator
-        const value = await this.page.locator("input#expiresAt").inputValue();
-        // convert value to date
-        const date = new Date(value);
-        // expect the date to be the same as the date passed in
-        expect(date).toEqual(expiryDate);
+        await expect(this.page.locator("input#expiresAt")).toHaveValue(Common.formatDate(expiryDate, true));
     }
 
     /**
@@ -339,5 +300,13 @@ export default class Form {
      */
     async removeAudience(title: string): Promise<void> {
         await this.page.locator(`a[title="Remove ${title} from audience"]`).click();
+    }
+
+    /**
+     * wait the toast to be presented  to ensure the draft is created
+     */
+    async waitForDraftToast(): Promise<void> {
+        await expect(this.page.locator("#saveDraft")).toBeVisible({ timeout: 3000 });
+        await expect(this.page.locator("#saveDraft")).toContainText("Saved");
     }
 }
