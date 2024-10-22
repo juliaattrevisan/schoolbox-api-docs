@@ -9,6 +9,7 @@ interface Props {
     tag: string; // the element to display
     text: string; // the text to show in the element
     query: string; // the list of words within the query
+    allowPartialMatches?: boolean; // whether to allow partial matches, so can match part of a word
     isSearching?: boolean; // whether the search is currently active, if not we don't need to use v-html
     href?: string; // the href to navigate to
     class?: string; // the classes to apply to the elements
@@ -68,7 +69,7 @@ function onClicked(event: Event): void {
         :disabled="props.disabled ? props.disabled : undefined"
         :for="props.for ? props.for : undefined"
         @click="onClicked"
-        v-html="addMarks(props.text, queryWordList, true)"
+        v-html="addMarks(props.text, queryWordList, props.allowPartialMatches)"
     ></component>
     <!-- eslint-enable vue/no-v-html -->
     <!-- eslint-enable vue/no-v-text-v-html-on-component -->

@@ -10,6 +10,7 @@ import type { SearchSelectItem } from "./types/searchSelectTypes";
 
 interface Props {
     query: string; // the search query
+    allowPartialMatches?: boolean; // whether to allow partial matches, so can match part of a word
     selectedItems: SearchSelectItem[]; // the selected items
     result: SearchSelectItem; // the result to display
     isSingleSelect: boolean; // whether only one result can be selected
@@ -106,6 +107,7 @@ const { isActive } = useActiveIndex(
                 :for="`search-select-result-input-${result.id}`"
                 :text="props.result.name"
                 :query="props.query"
+                :allow-partial-matches="props.allowPartialMatches"
                 class="f-no-margins"
             />
         </div>

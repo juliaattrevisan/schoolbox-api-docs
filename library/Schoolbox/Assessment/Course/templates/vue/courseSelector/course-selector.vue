@@ -59,6 +59,7 @@ const { ignoreUpdates } = watchIgnorable(results, (newResults) => {
         :has-error="props.hasError"
         :error-message="props.errorMessage"
         :is-read-only="props.isReadOnly"
+        :allow-partial-matches="true"
     />
 </template>
 

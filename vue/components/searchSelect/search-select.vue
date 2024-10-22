@@ -24,6 +24,7 @@ interface Props {
     hasError?: boolean; // Whether the input has an error
     errorMessage?: string; // The error message to display
     isReadOnly?: boolean; // Whether the input is read only
+    allowPartialMatches?: boolean; // whether to allow partial matches, so can match part of a word
 }
 const props = withDefaults(defineProps<Props>(), {
     defaultResults: undefined,
@@ -113,6 +114,7 @@ function onRemove(items: SearchSelectItem[]): void {
             :query="query"
             :is-active="isActive"
             :is-searching="isSearching"
+            :allow-partial-matches="props.allowPartialMatches"
             :is-single-select="props.isSingleSelect"
             :results="currentResults"
             :has-no-results="hasNoResults"

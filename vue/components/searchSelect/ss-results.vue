@@ -12,6 +12,7 @@ interface Props {
     query: string; // the search query
     isActive: boolean; // whether the search is active
     isSearching: boolean; // to notify of searching
+    allowPartialMatches?: boolean; // whether to allow partial matches, so can match part of a word
     isSingleSelect: boolean; // whether only one result can be selected
     results: SearchSelectItem[]; // the results returned from the search
     hasNoResults: boolean; // whether there are no results
@@ -126,6 +127,7 @@ function onHover(index: number): void {
                 v-for="(result, index) in props.results"
                 :key="result.id"
                 :query="props.query"
+                :allow-partial-matches="props.allowPartialMatches"
                 :selected-items="props.selected"
                 :result="result"
                 :is-single-select="props.isSingleSelect"
