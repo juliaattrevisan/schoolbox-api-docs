@@ -53,8 +53,11 @@ function onGenerateReport(): void {
 <template>
     <form class="c-island l-flex-col l-pad-m l-gap-m" @submit.prevent="onGenerateReport">
         <div>
-            <label for="courses">Select Courses</label>
-            <course-selector :endpoint="props.coursesEndpoint" :preselected="props.selectedCourses" />
+            <course-selector
+                :endpoint="props.coursesEndpoint"
+                :preselected="props.selectedCourses"
+                :is-required="true"
+            />
             <label v-if="isCoursesInvalid" class="error" for="courses">This field is required.</label>
         </div>
         <div>
