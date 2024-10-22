@@ -23,8 +23,8 @@ function setSelectedRoleType(role: ProfileEditorRoleType): void {
 </script>
 
 <template>
-    <dl class="tabs">
-        <dd
+    <ul class="sub-nav">
+        <li
             v-for="role in peStore.roleTypes"
             :key="role.roleType"
             :class="{ active: role === peStore.selectedRoleType }"
@@ -36,8 +36,8 @@ function setSelectedRoleType(role: ProfileEditorRoleType): void {
             >
                 {{ capitalizeFirstLetter(role.roleType) }}
             </a>
-        </dd>
-    </dl>
+        </li>
+    </ul>
 </template>
 
 <style scoped></style>
