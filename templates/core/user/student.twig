@@ -125,12 +125,12 @@
                     {% set additionalConstraints = {
                         'staff': {
                             'email': showEmail,
-                            'formTeacher': user.showTimetable,
-                            'hohTeacher': user.showTimetable,
+                            'formTeacher': user.isShowTimetable,
+                            'hohTeacher': user.isShowTimetable,
                             'pastoralCounts': showPastoral,
-                            'StudentForm': user.showTimetable,
-                            'StudentTutorDescription': user.showTimetable,
-                            'tutorTeacher': user.showTimetable
+                            'StudentForm': user.isShowTimetable,
+                            'StudentTutorDescription': user.isShowTimetable,
+                            'tutorTeacher': user.isShowTimetable
                         }
                     } %}
 

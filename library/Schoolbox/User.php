@@ -974,7 +974,7 @@ class User implements Serializable, Linkable, ISoftDeletable, IModel
      *
      * @return bool
      */
-    public function getShowTimetable(): bool
+    public function isShowTimetable(): bool
     {
         return !$this->getHideTimetable();
     }
