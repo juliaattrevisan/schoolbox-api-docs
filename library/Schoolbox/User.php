@@ -965,6 +965,21 @@ class User implements Serializable, Linkable, ISoftDeletable, IModel
         return $this->hideTimetable ? true : false;
     }
 
+
+    /**
+     * I got so sick of being confused by not hiding a timetable
+     * in code so I made this inverted alias instead. Ideally we'd
+     * invert the db schema as well, but this gets us close enough
+     * for the most part
+     *
+     * @return bool
+     */
+    public function getShowTimetable(): bool
+    {
+        return !$this->getHideTimetable();
+    }
+
+
     /**
      * @param GenericCollection|Campus[] $campusCollection
      * @return self

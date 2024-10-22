@@ -178,9 +178,12 @@
                                         'StudentForm': showClasses,
                                         'StudentTutorDescription': showDetails and showClasses,
                                         'tutorTeacher': showDetails and showClasses
-                                    #}
+                                    }
                                 } %}
 
+                        {{ dump(showClasses) }}
+                        --
+                        {{ dump(user.showTimetable) }}
                                 <dl>
                                     {# Portrait is always element 0 at the moment: we can skip iterating
                                      # that array element here, because it's rendered elsewhere.
