@@ -37,18 +37,13 @@ const results = window.Vue.ref<Course[]>([]);
  * To manipulate the results to target the courses object
  */
 const { ignoreUpdates } = watchIgnorable(results, (newResults: CourseAPIResponse | unknown[]) => {
+    // ignore updates to avoid an infinite loop...
     ignoreUpdates(() => {
         if (newResults instanceof Array && newResults.length === 0) {
             return;
         }
         if (typeof newResults === "object" && "courses" in newResults) {
-            // all we need is the id and name of each course
-            results.value = newResults.courses.map((course: Course) => {
-                return {
-                    id: course.id,
-                    name: course.name,
-                };
-            });
+            results.value = newResults.courses;
         }
     });
 });
