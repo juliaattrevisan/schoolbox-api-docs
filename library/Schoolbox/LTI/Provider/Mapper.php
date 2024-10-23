@@ -119,4 +119,18 @@ class Mapper extends BaseMapper
                  ->isTrue('available_for_assessment')
         );
     }
+
+    /**
+     * Find a tool by the provided client ID.
+     *
+     * (In this implementation, the client ID maps to the deployment ID.)
+     *
+     * @param string $clientId
+     * @return Model
+     * @throws BaseMapper\Exception if no matching client exists
+     */
+    public function findOneByClientId(string $clientId): Model
+    {
+        return $this->findOneByColumn('deployment_id', $clientId);
+    }
 }

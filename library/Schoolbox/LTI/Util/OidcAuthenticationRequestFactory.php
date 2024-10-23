@@ -21,6 +21,7 @@ use OAT\Library\Lti1p3Core\Security\User\UserAuthenticatorInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Schoolbox\LTI\Platform\Context\ConfigurationFactory;
 use Schoolbox\LTI\Provider;
+use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Url\Uri;
 
 /**
@@ -87,7 +88,15 @@ class OidcAuthenticationRequestFactory
         }
         $registration = $this->registrationRepository->findByClientId($clientId);
         if (!$registration) {
-            throw new LtiException('Request parameter "client_id" value does not match the client ID of an LTI tool');
+            throw new LtiException('Request parameter "client_id" value does not match the client ID of an LTI tool in the repository.');
+        }
+
+        // Map this registration back to a configuration in Schoolbox,
+        // and use its redirect URLs as well.
+        try {
+            $toolModel = $this->toolMapper->findOneByClientId($clientId);
+        } catch (MapperException) {
+            throw new LtiException('Request parameter "client_id" value does not match the client ID of an LTI tool in the database.');
         }
 
         // Validate the redirect URI against the tool's launch URL.
@@ -97,13 +106,8 @@ class OidcAuthenticationRequestFactory
         // for exposing redirect URIs.
         // I'm just going to assume the launch and deep linking URLs are valid
         // redirects.
-        $tool        = $registration->getTool();
-        $validUrls   = array_filter([$tool->getLaunchUrl(), $tool->getDeepLinkingUrl()]);
-
-        // Map this registration back to a configuration in Schoolbox,
-        // and use its redirect URLs as well.
-        /** @var Provider\Model $toolModel */
-        $toolModel = $this->toolMapper->findOneByColumn('deployment_id', $registration->getIdentifier());
+        $tool      = $registration->getTool();
+        $validUrls = array_filter([$tool->getLaunchUrl(), $tool->getDeepLinkingUrl()]);
         foreach ($toolModel->getRedirectUrls() as $redirectUrl) {
             $validUrls[] = $redirectUrl->getRedirectUrl();
         }
