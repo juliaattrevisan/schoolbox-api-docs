@@ -17,6 +17,8 @@ use Alaress\Web\Controller\Base;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Role;
 use Schoolbox\Curriculum\Node\Mapper as CurriculumMapper;
+use Schoolbox\Learning\Course\DataModel\Specification\Unit\Mapper as CourseUnitSpecificationMapper;
+use Schoolbox\Learning\Course\DataModel\Specification\Mapper as CourseSpecificationMapper;
 
 class Module extends BaseModule
 {
@@ -51,7 +53,9 @@ class Module extends BaseModule
     {
         return new Controller(
             $this->getMapperFactory()->get(ErrorMapper::class),
-            $this->getMapperFactory()->get(CurriculumMapper::class)
+            $this->getMapperFactory()->get(CurriculumMapper::class),
+            $this->getMapperFactory()->get(CourseSpecificationMapper::class),
+            $this->getMapperFactory()->get(CourseUnitSpecificationMapper::class),
         );
     }
 
