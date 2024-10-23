@@ -123,7 +123,7 @@ class OidcAuthenticationRequestFactory
         }
         if (!$isRedirectUriValid) {
             throw new LtiException(
-                'Request parameter "redirect_uri" value does not match the LTI tool\'s launch or deep linking URL'
+                'Request parameter "redirect_uri" value does not match the LTI tool\'s launch or deep linking URL, nor any of its redirect URLs'
             );
         }
 
