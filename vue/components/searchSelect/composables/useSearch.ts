@@ -24,6 +24,7 @@ export function useSearch(
     results: Ref<SearchSelectItem[]>;
     isActive: Ref<boolean>;
     hasNoResults: Ref<boolean>;
+    hasError: Ref<boolean>;
     search: () => Promise<void>;
 } {
     const isSearching = window.Vue.ref(false); // to notify that an action is taking place,
@@ -32,6 +33,7 @@ export function useSearch(
     const results = $results === undefined ? window.Vue.ref<SearchSelectItem[]>([]) : $results; // create a new results list if one is not passed in
     const hasSearched = window.Vue.ref(false); // to show that a search has been made
     const hasNoResults = window.Vue.computed(() => isActive.value && results.value.length === 0 && !isSearching.value); // To show that no results match the current search
+    const hasError = window.Vue.ref(false); // To show that an error has occurred
 
     /**
      * when the search isActive, we should display the loading prompt straight away,
@@ -47,16 +49,22 @@ export function useSearch(
     async function search(): Promise<void> {
         try {
             hasSearched.value = true;
+            hasError.value = false;
             const response = await fetch(`${endpoint}${query.value}`, {
                 method: "GET",
                 headers: {
                     "Content-Type": "application/json",
                 },
             });
+            if (!response.ok) {
+                hasError.value = true;
+                return;
+            }
             const json: unknown = await response.json();
             // if json is an array, set results to json
             if (json instanceof Array) {
                 results.value = json as SearchSelectItem[];
+                return;
             }
             // if json.data exists, set results to json.data
             if (typeof json === "object" && json !== null && "data" in json) {
@@ -64,6 +72,8 @@ export function useSearch(
             }
         } catch (error) {
             console.error(error);
+            hasError.value = true;
+            results.value = [];
         } finally {
             isSearching.value = false;
         }
@@ -84,6 +94,7 @@ export function useSearch(
         results.value = [];
         isSearching.value = false;
         hasSearched.value = false;
+        hasError.value = false;
     }
 
     /**
@@ -107,6 +118,7 @@ export function useSearch(
         results,
         isActive,
         hasNoResults,
+        hasError,
         search,
     };
 }

@@ -16,6 +16,7 @@ interface Props {
     isSingleSelect: boolean; // whether only one result can be selected
     results: SearchSelectItem[]; // the results returned from the search
     hasNoResults: boolean; // whether there are no results
+    hasError: boolean; // whether there's an error
     selected: SearchSelectItem[]; // the selected results
 }
 const props = defineProps<Props>();
@@ -109,6 +110,10 @@ function onHover(index: number): void {
 <template>
     <div class="results">
         <div v-if="props.isSearching" class="results__status">Searching for results....</div>
+        <div v-else-if="props.hasError" class="results__status alert">
+            Sorry, there was an unknown error retrieving your search results. Please try again and contact your support
+            if the problem persists.
+        </div>
         <div v-else-if="props.hasNoResults && props.selected.length === 0" class="results__status">
             No results found for your current search.
         </div>

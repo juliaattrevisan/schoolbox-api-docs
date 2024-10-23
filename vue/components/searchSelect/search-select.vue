@@ -43,7 +43,7 @@ const selected = defineModel<SearchSelectItem[]>("selected", { default: [] }); /
 const { add, remove, update } = useSelected(selected); // to add and remove selected items
 
 const results = defineModel<SearchSelectItem[]>("results", { default: [] }); // to store search results
-const { query, isActive, isSearching, hasNoResults } = useSearch(props.endpoint, results); // to search for results
+const { query, isActive, isSearching, hasNoResults, hasError } = useSearch(props.endpoint, results); // to search for results
 
 /**
  * To show the current search results, or the default results
@@ -118,6 +118,7 @@ function onRemove(items: SearchSelectItem[]): void {
             :is-single-select="props.isSingleSelect"
             :results="currentResults"
             :has-no-results="hasNoResults"
+            :has-error="hasError"
             :selected="selected"
             @add="onAdd"
             @remove="onRemove"
