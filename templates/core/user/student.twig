@@ -484,7 +484,7 @@
         {# Programmatically detect the anchor value and select that tab via foundation
          # This allows you to link /search/user/...#classes to open the Classes tab initially
          # upon visiting that url
-        #}
+         #}
         <script>
             $(function() {
                 switch (window.location.hash) {
@@ -504,13 +504,13 @@
                         break;
 
                         {# If you visit this url directly without a hash, just do default behaviour
-                     # Don't try to preselect any tabs, because you might not be here for the tabs
-                        #}
+                         # Don't try to preselect any tabs, because you might not be here for the tabs
+                         #}
                     default:
                         $('[data-tab] a').first().trigger('click');
                         break;
-                #}
-            %});
+                }
+            });
         </script>
 
         {# These are all the possible tab buttons that could exist
