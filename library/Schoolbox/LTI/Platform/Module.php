@@ -78,6 +78,7 @@ class Module extends BaseModule
             $this->injector->get('lti.registrations'),
             $this->injector->get('lti.userAuthenticator'),
             $this->injector->get('lti.accessTokenCache'),
+            $this->getMapperFactory()->get(ToolMapper::class),
         );
     }
 

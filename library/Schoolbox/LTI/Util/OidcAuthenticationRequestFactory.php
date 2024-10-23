@@ -33,10 +33,13 @@ class OidcAuthenticationRequestFactory
      *
      * @param RegistrationRepositoryInterface $registrationRepository Repository of LTI registrations.
      * @param UserAuthenticatorInterface      $userAuthenticator      User authenticator.
+     * @param Provider\Mapper                 $toolMapper             Tool mapper, for fetching configuration when
+     *                                                                building authentication requests.
      */
     public function __construct(
         private RegistrationRepositoryInterface $registrationRepository,
-        private UserAuthenticatorInterface $userAuthenticator
+        private UserAuthenticatorInterface $userAuthenticator,
+        private Provider\Mapper $toolMapper,
     ) {
     }
 
@@ -100,7 +103,7 @@ class OidcAuthenticationRequestFactory
         // Map this registration back to a configuration in Schoolbox,
         // and use its redirect URLs as well.
         /** @var Provider\Model $toolModel */
-        $toolModel = Provider\Mapper::getInstance()->findOneByColumn('deployment_id', $registration->getIdentifier());
+        $toolModel = $this->toolMapper->findOneByColumn('deployment_id', $registration->getIdentifier());
         foreach ($toolModel->getRedirectUrls() as $redirectUrl) {
             $validUrls[] = $redirectUrl->getRedirectUrl();
         }
