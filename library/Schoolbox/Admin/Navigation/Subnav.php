@@ -143,7 +143,7 @@ class Subnav
         return [
             '/adminv2/home' => [
                 'name'        => 'Home',
-                'visible'     => $loggedInUserIsSuperuser,
+                'visible'     => $loggedInUserIsSuperuser || $loggedInUserHasServicePermissionNews,
                 'description' => 'Key system status information.',
                 'children'    => [],
             ],
