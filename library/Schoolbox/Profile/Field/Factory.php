@@ -272,6 +272,9 @@ class Factory
              */
             /** @phpstan-ignore-next-line */
             'residentialHouse' => $viewee->getResidentialHouse()?->getHouse(),
+            /* Favour schoolbox's data over the sis' data
+             */
+            'yearLevel' => $viewee->getYear()?->getName() ?? '',
             'campusCollection' => $viewee->getCampusCollection(),
             /* This is an arbitrary set of people associated with $viewee somehow
              * They might (or might not) have actual schoolbox user accounts

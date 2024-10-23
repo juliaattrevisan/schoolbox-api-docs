@@ -17,7 +17,7 @@ INSERT INTO `profile_field` VALUES
 (14,'student','role','Role',13,1,NULL,NULL,NULL,0),
 (15,'student','StudentBirthDate','Date of Birth',14,1,NULL,NULL,NULL,0),
 (16,'student','formTeacher','Class Teacher',15,1,NULL,NULL,NULL,0),
-(17,'student','StudentYearLevel','Year Level',16,1,'yearLevel',NULL,NULL,0),
+(17,'student','yearLevel','Year Level',16,1,'yearLevel',NULL,NULL,0),
 (18,'student','tutorTeacher','Tutor',17,1,'tutor',NULL,NULL,0),
 (19,'student','coordTeacher','Year Level Coordinator',18,1,'yearLevelCoordinator',NULL,NULL,0),
 (20,'student','StudentHouseDescription','House',19,1,NULL,NULL,NULL,0),
