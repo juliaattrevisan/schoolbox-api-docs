@@ -8,6 +8,7 @@
 
 namespace Schoolbox\LTI\Provider;
 
+use Schoolbox\GenericCollection;
 use Schoolbox\ISoftDeletable;
 use Schoolbox\Mapper\Traits\Model\CreatedAtDate;
 use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
@@ -182,6 +183,13 @@ class Model implements ISoftDeletable
     private ?bool $availableForAssessment;
 
     /**
+     * LTI 1.3: any valid redirect URIs for this provider.
+     *
+     * @var GenericCollection<RedirectUri\Model>
+     */
+    private GenericCollection $redirectUris;
+
+    /**
      * LTI 1.1: likely intended to store custom fields as defined within the XML
      * configuration: currently unused.
      */
@@ -222,6 +230,14 @@ class Model implements ISoftDeletable
      * LTI 1.1: the launch type, one of the `self::LAUNCH_TYPE_*` constants.
      */
     private ?string $launchType;
+
+    /**
+     * Constructor: creates empty redirect URI list.
+     */
+    public function __construct()
+    {
+        $this->redirectUris = new GenericCollection(RedirectUri\Model::class);
+    }
 
     /**
      * Is this an LTI 1.1 tool?
@@ -494,6 +510,24 @@ class Model implements ISoftDeletable
     public function setAvailableForAssessment(?bool $availableForAssessment): self
     {
         $this->availableForAssessment = $availableForAssessment;
+        return $this;
+    }
+
+    /**
+     * @return GenericCollection<RedirectUri\Model>
+     */
+    public function getRedirectUris(): GenericCollection
+    {
+        return $this->redirectUris;
+    }
+
+    /**
+     * @param GenericCollection<RedirectUri\Model> $redirectUris
+     * @return $this
+     */
+    public function setRedirectUris(GenericCollection $redirectUris): self
+    {
+        $this->redirectUris = $redirectUris;
         return $this;
     }
 
