@@ -48,6 +48,14 @@ class Module extends BaseModule
             )
         );
 
+        $rulePastoral = new Rule\All(
+            new Rule\IsLoggedIn(),
+            new Rule\Any(
+                new Rule\IsSuperuser(),
+                new Rule\HasServicePermission(UserAccess::SERVICE_PASTORAL, UserAccess::ACCESS_FULL)
+            )
+        );
+
         // Routes to which users with service permission UserAccess::SERVICE_NEWS need access.
         $this->register('GET', "/news/{table:news-topic}", 'getNewsIndex', $ruleNews);
         $this->register('GET', "/news/data/{table:news-topic}", 'getNewsData', $ruleNews);
@@ -59,6 +67,13 @@ class Module extends BaseModule
         $this->register('GET', "/calendar/data/{table:event-type}", 'getCalendarData', $ruleCalendar);
         $this->register('POST', "/calendar/save/{table:event-type}", 'postCalendarSave', $ruleCalendar);
         $this->register('POST', "/calendar/delete/{table:event-type}", 'postCalendarDelete', $ruleCalendar);
+
+        // Routes to which users with service permission UserAccess::SERVICE_PASTORAL need access.
+        $pastoralTablesRegex = '(pastoral-action|pastoral-severity|pastoral-tags|pastoral-document-classification|pastoral-category|pastoral-type)';
+        $this->register('GET', "/pastoral/{table:$pastoralTablesRegex}", 'getPastoralIndex', $rulePastoral);
+        $this->register('GET', "/pastoral/data/{table:$pastoralTablesRegex}", 'getPastoralData', $rulePastoral);
+        $this->register('POST', "/pastoral/save/{table:$pastoralTablesRegex}", 'postPastoralSave', $rulePastoral);
+        $this->register('POST', "/pastoral/delete/{table:$pastoralTablesRegex}", 'postPastoralDelete', $rulePastoral);
 
         // Routes to which only superusers need access.
         $this->register('GET', "{/table}", 'getIndex', $ruleSuperuserOnly);

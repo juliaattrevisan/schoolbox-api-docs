@@ -219,6 +219,54 @@ class Controller extends Base
         $this->postDeleteSlave($table);
     }
 
+    // Functions for routes accessible by pastoral moderators --------------------------------------------------------//
+
+    /**
+     * @param string|null $table
+     * @return void
+     * @throws RouteNotFound
+     * @throws ReflectionException|Error
+     */
+    public function getPastoralIndex(?string $table): void
+    {
+        $this->getLists($table, false);
+    }
+
+    /**
+     * @param string|null $table
+     * @return void
+     * @throws RouteNotFound
+     * @throws ReflectionException
+     * @throws Error
+     */
+    public function getPastoralData(?string $table): void
+    {
+        $this->getLists($table, true);
+    }
+
+    /**
+     * @param string $table
+     * @return void
+     * @throws Deleted
+     * @throws MapperException
+     * @throws RouteNotFound
+     * @since    160
+     * @api      /adminv2/lists/save
+     */
+    public function postPastoralSave(string $table): void
+    {
+        $this->postSaveSlave($table);
+    }
+
+    /**
+     * @param string $table
+     * @return void
+     */
+    public function postPastoralDelete(string $table): void
+    {
+        $this->postDeleteSlave($table);
+    }
+
     // Private functions ---------------------------------------------------------------------------------------------//
 
     /**
@@ -1530,6 +1578,12 @@ class Controller extends Base
         return match ($table) {
             'news-topic' => 'News',
             'event-type' => 'Calendar',
+            'pastoral-action',
+            'pastoral-severity',
+            'pastoral-tags',
+            'pastoral-document-classification',
+            'pastoral-category',
+            'pastoral-type' => 'Pastoral',
             default => '',
         };
     }
