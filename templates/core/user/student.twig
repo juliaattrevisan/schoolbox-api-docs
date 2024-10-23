@@ -305,38 +305,26 @@
                                                 {% elseif selectedField.value %}
                                                     {# Only render a tuple if it has a meaningful value
                                                      # Note that some fields require special handling (different data structures)
+                                                     #
+                                                     # The field name will always show at this point, though their values
+                                                     # will need special treatment somehow
                                                      #}
-                                                    {% if selectedField.field in ['campusCollection'] %}
-                                                        {# A list of campuses #}
-                                                        {% if selectedField.value|length %}
-                                                            <dt class="small-4 medium-3 columns">{{ fieldName }}</dt>
-                                                            <dd class="small-8 medium-9 columns">
-                                                                {% for campus in selectedField.value %}
-                                                                    {{ campus.name }}{% if not loop.last %}, {% endif %}
-                                                                {% endfor %}
-                                                            </dd>
+                                                    <dt class="small-4 medium-3 columns">{{ fieldName }}</dt>
+                                                    <dd class="small-8 medium-9 columns">
+                                                        {% if selectedField.field in ['formTeacher', 'tutorTeacher', 'hohTeacher', 'coordTeacher', 'studentCoach'] %}
+                                                            {# These fields are Schoolbox\User instances and need special treatment #}
+                                                            <a href="{{ session.mailhandle }}{{ selectedField.value.email }}">{{ selectedField.value.formatName }}</a>
+                                                        {% elseif selectedField.field in ['email'] %}
+                                                            {# Renders a mailto: hyperlink #}
+                                                            <a href="{{ session.mailhandle }}{{ selectedField.value }}">{{ selectedField.value }}</a>
+                                                        {% elseif selectedField.field in ['StudentBirthDate'] %}
+                                                            {# Renders with date formatting #}
+                                                            {{ selectedField.value|date(dateFormats.shortDateOnlyFormat) }}
+                                                        {% else %}
+                                                            {# A generic tuple (key, value) pair #}
+                                                            {{ selectedField.value }}
                                                         {% endif %}
-                                                    {% else %}
-                                                        {# The field name will always show at this point, though their values
-                                                         # will need special treatment somehow
-                                                         #}
-                                                        <dt class="small-4 medium-3 columns">{{ fieldName }}</dt>
-                                                        <dd class="small-8 medium-9 columns">
-                                                            {% if selectedField.field in ['formTeacher', 'tutorTeacher', 'hohTeacher', 'coordTeacher', 'studentCoach'] %}
-                                                                {# These fields are Schoolbox\User instances and need special treatment #}
-                                                                <a href="{{ session.mailhandle }}{{ selectedField.value.email }}">{{ selectedField.value.formatName }}</a>
-                                                            {% elseif selectedField.field in ['email'] %}
-                                                                {# Renders a mailto: hyperlink #}
-                                                                <a href="{{ session.mailhandle }}{{ selectedField.value }}">{{ selectedField.value }}</a>
-                                                            {% elseif selectedField.field in ['StudentBirthDate'] %}
-                                                                {# Renders with date formatting #}
-                                                                {{ selectedField.value|date(dateFormats.shortDateOnlyFormat) }}
-                                                            {% else %}
-                                                                {# A generic tuple (key, value) pair #}
-                                                                {{ selectedField.value }}
-                                                            {% endif %}
-                                                        </dd>
-                                                    {% endif %}
+                                                    </dd>
                                                 {% endif %}
                                             {% endif %}
                                         {% endif %}

@@ -261,6 +261,14 @@ class Factory
             }
         }
 
+        /* For convenience, collate the campus names here
+         */
+        $campusNames = '';
+
+        if ($viewee->getCampusCollection()) {
+            $campusNames = implode(', ', $viewee->getCampusCollection()->indexBy('name')->keys());
+        }
+
         /* Hybrid Theory
          */
         $referenceFields = [
@@ -275,7 +283,7 @@ class Factory
             /* Favour schoolbox's data over the sis' data
              */
             'yearLevel' => $viewee->getYear()?->getName() ?? '',
-            'campusCollection' => $viewee->getCampusCollection(),
+            'campusCollection' => $campusNames,
             /* This is an arbitrary set of people associated with $viewee somehow
              * They might (or might not) have actual schoolbox user accounts
              */
