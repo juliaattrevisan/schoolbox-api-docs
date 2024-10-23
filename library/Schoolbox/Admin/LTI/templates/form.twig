@@ -102,6 +102,26 @@
             >{{ provider.publicKey ?? '' }}</textarea>
         </div>
 
+        {# Redirect URLs are stored as individual models, but are displayed as a list for ease of editing. #}
+        <div class="small-12 large-6 columns">
+            <label for="redirect_urls-{{ identifier }}">
+                Redirect URL(s)
+                <span data-tooltip
+                      class="has-tip tip-top hint"
+                      title="Optional additional URLs which the LTI tool is permitted to request Schoolbox redirect to after OpenID Connect initiation; the Launch and Deep Linking URLs are always permitted, and need not be copied here.">?</span>
+            </label>
+            <textarea data-lti-version="{{ providerLtiVersion13 }}"
+                      id="redirect_urls-{{ identifier }}"
+                      type="text"
+                      name="redirect_urls"
+                      rows="10"
+            >
+                {%- for redirectUrl in (provider.redirectUrls ?? []) -%}
+                    {{- redirectUrl.redirectUrl -}}
+                {%- endfor -%}
+            </textarea>
+        </div>
+
         <div class="small-12 large-6 columns">
             <label>
                 Availability
