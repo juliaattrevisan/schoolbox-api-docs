@@ -34,7 +34,7 @@ if (isset($_POST['action']) && $_POST['action'] == 'subscribe') {
                 // Config could not be decoded, so create a blank record matching the expected class.
                 // This allows the corrupted data to be overwritten.
                 $connectorClassName = "Calendar_Api_Config_Connector_{$attribs['connectorClass']}";
-                $config = new $connectorClassName;
+                $config = new $connectorClassName();
             }
 
             /* Process multiple Vcals
