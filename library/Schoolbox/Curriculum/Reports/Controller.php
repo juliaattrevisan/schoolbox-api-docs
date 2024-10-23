@@ -11,12 +11,13 @@ declare(strict_types=1);
 namespace Schoolbox\Curriculum\Reports;
 
 use Alaress\Web\Controller\Base;
-use Schoolbox\Collection;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Curriculum\Node\Mapper as CurriculumMapper;
-use Schoolbox\Curriculum\Api\Translator\ModelToArray;
-use Schoolbox\Learning\Course\DataModel\Specification\Translator as CourseTranslator;
-use Schoolbox\Resource\Folder;
+use Schoolbox\Curriculum\Reports\Translator\ModelToArray as ModelToArrayTranslator;
+use Schoolbox\Curriculum\Reports\Translator\UnitAssessmentUsage as UnitAssessmentUsageTranslator;
+use Schoolbox\Curriculum\Reports\Translator\CourseUsage as CourseUsageTranslator;
+use Schoolbox\Learning\Course\DataModel\Specification\Unit\Mapper as CourseUnitSpecificationMapper;
+use Schoolbox\Learning\Course\DataModel\Specification\Mapper as CourseSpecificationMapper;
 
 class Controller extends Base
 {
@@ -28,7 +29,9 @@ class Controller extends Base
      */
     public function __construct(
         private ErrorMapper $errorMapper,
-        private CurriculumMapper $curriculumMapper
+        private CurriculumMapper $curriculumMapper,
+        private CourseSpecificationMapper $courseSpecificationMapper,
+        private CourseUnitSpecificationMapper $courseUnitSpecificationMapper,
     ) {
     }
 
@@ -38,36 +41,85 @@ class Controller extends Base
      */
     public function getCoverage(): void
     {
-        /**
-         * temporary code to get the course object
-         */
-        if (isset($_GET['course-id'])) {
-            $courseId =  $_GET['course-id'];
-            $CM = \Schoolbox\Learning\Course\DataModel\Specification\Mapper::getInstance();
-            $courses = new Collection([$CM->findById($courseId)]);
-            $folderTranslator = new Folder\Translator\ModelToArray\LinkOnly(
-                10
-            );
-            $translator = new CourseTranslator\ModelToArray(
-                $this->routeGenerator,
-                $this->authorizer,
-                $this->getUser(),
-                $folderTranslator,
-            );
-            $selectedCourses = [];
-            $result = $courses->map($translator);
-            foreach ($result as $resultItem) {
-                array_push($selectedCourses, ["id" => $resultItem['id'], "name" => $resultItem['title']]);
-            }
-        } else {
-            $selectedCourses = [];
-        }
+        $query = $this->requestQuery;
+        $courseId = $query->get('courseId');
+        $nodeId = $query->get('nodeId');
+        $limit = $query->get('limit', Cursor::LIMIT_DEFAULT);
+        $encodedCursor = $query->get('encodedCursor');
 
-        $this->response = $this->responseFromTemplate('@curriculumreports/index.twig', [
-            'var' => 'GET',
-            'error' => $this->errorMapper,
-            'curric' => $this->curriculumMapper,
-            'selectedCourses' => $selectedCourses,
+        $courseId =
+            is_array($courseId) ? $courseId : explode(',', $courseId);
+        $nodeId =
+            is_array($nodeId) ? $nodeId : explode(',', $nodeId);
+
+
+        $cursor = new Cursor(
+            $this->curriculumMapper,
+            $courseId,
+            $nodeId,
+            $limit,
+        );
+
+        $data = $cursor->retrieveResults($encodedCursor);
+
+        $usageCount = $cursor->retrieveUsageCount();
+
+        $courseSpecs =
+            $this->courseSpecificationMapper->findByColumn('id', $courseId);
+
+        $courseUnitSpecs = [];
+        array_map(
+            function ($id) use (&$courseUnitSpecs) {
+                $courseUnitSpecs[$id] =
+                    $this->courseUnitSpecificationMapper
+                        ->findByColumn('course_specification_id', $id);
+            },
+            $courseId
+        );
+
+        $unitTranslator = new UnitAssessmentUsageTranslator(
+            $this->routeGenerator,
+            $this->authorizer,
+            $this->getUser(),
+            $usageCount
+        );
+
+        $courseUsageTranslator = new CourseUsageTranslator(
+            $this->routeGenerator,
+            $this->authorizer,
+            $this->getUser(),
+            $unitTranslator,
+            $courseUnitSpecs,
+            $usageCount
+        );
+
+        $reportTranslator = new ModelToArrayTranslator(
+            $this->routeGenerator,
+            $this->authorizer,
+            $this->getUser(),
+            $courseUsageTranslator,
+            $courseSpecs,
+            $usageCount
+        );
+
+        $response = array_map(
+            fn($node) => $node->map(
+                $reportTranslator,
+            ),
+            $data['nodes']
+        );
+
+
+//        $this->response = $this->responseDependentOnRequest('@curriculumreports/index.twig', [
+        $this->response = $this->responseAsJson([
+            'data' => $response,
+            'metadata' => [
+                'count' => $cursor->retrieveResultCount(),
+                'cursor' => [
+                    'current' => $encodedCursor ?? null,
+                    'next' => null,
+                ]
+            ]
         ]);
     }
 
