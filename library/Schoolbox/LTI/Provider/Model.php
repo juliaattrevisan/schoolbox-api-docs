@@ -183,11 +183,11 @@ class Model implements ISoftDeletable
     private ?bool $availableForAssessment;
 
     /**
-     * LTI 1.3: any valid redirect URIs for this provider.
+     * LTI 1.3: any valid redirect URLs for this provider.
      *
-     * @var GenericCollection<RedirectUri\Model>
+     * @var GenericCollection<RedirectUrl\Model>
      */
-    private GenericCollection $redirectUris;
+    private GenericCollection $redirectUrls;
 
     /**
      * LTI 1.1: likely intended to store custom fields as defined within the XML
@@ -232,11 +232,11 @@ class Model implements ISoftDeletable
     private ?string $launchType;
 
     /**
-     * Constructor: creates empty redirect URI list.
+     * Constructor: creates empty redirect URL list.
      */
     public function __construct()
     {
-        $this->redirectUris = new GenericCollection(RedirectUri\Model::class);
+        $this->redirectUrls = new GenericCollection(RedirectUrl\Model::class);
     }
 
     /**
@@ -514,20 +514,20 @@ class Model implements ISoftDeletable
     }
 
     /**
-     * @return GenericCollection<RedirectUri\Model>
+     * @return GenericCollection<RedirectUrl\Model>
      */
-    public function getRedirectUris(): GenericCollection
+    public function getRedirectUrls(): GenericCollection
     {
-        return $this->redirectUris;
+        return $this->redirectUrls;
     }
 
     /**
-     * @param GenericCollection<RedirectUri\Model> $redirectUris
+     * @param GenericCollection<RedirectUrl\Model> $redirectUrls
      * @return $this
      */
-    public function setRedirectUris(GenericCollection $redirectUris): self
+    public function setRedirectUrls(GenericCollection $redirectUrls): self
     {
-        $this->redirectUris = $redirectUris;
+        $this->redirectUrls = $redirectUrls;
         return $this;
     }
 

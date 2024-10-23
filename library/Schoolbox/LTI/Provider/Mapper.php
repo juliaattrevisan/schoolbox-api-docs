@@ -45,7 +45,7 @@ class Mapper extends BaseMapper
         $this->uses('public_key', self::TYPE_STRING);
         $this->uses('available_for_component', self::TYPE_BOOLEAN);
         $this->uses('available_for_assessment', self::TYPE_BOOLEAN);
-        $this->joinsReverseMulti('lti_provider_id', RedirectUri\Mapper::class, 'redirectUris', 'redirectUri');
+        $this->joinsReverseMulti('lti_provider_id', RedirectUrl\Mapper::class, 'redirectUrls', 'redirectUrl');
 
         // LTI 1.1 fields
         $this->uses('key', self::TYPE_STRING);
@@ -62,22 +62,22 @@ class Mapper extends BaseMapper
     }
 
     /**
-     * Fetch and hydrate each provider's redirect URIs.
+     * Fetch and hydrate each provider's redirect URLs.
      */
     protected function hydrateSelect(PDOStatement $statement)
     {
         $providers = parent::hydrateSelect($statement);
 
-        // Fetch and group redirect URIs
-        /** @var Collection<int, GenericCollection<RedirectUri\Model>> $groupedRedirectUris */
-        $groupedRedirectUris = $this->getJoinMapper('redirectUri')
+        // Fetch and group redirect URLs
+        /** @var Collection<int, GenericCollection<RedirectUrl\Model>> $groupedRedirectUrls */
+        $groupedRedirectUrls = $this->getJoinMapper('redirectUrl')
             ->findByColumn('lti_provider_id', $providers->getPropertyValues('id'))
-            ->groupByCallback(fn (RedirectUri\Model $r) => $r->getLtiProvider()->getId());
+            ->groupByCallback(fn (RedirectUrl\Model $r) => $r->getLtiProvider()->getId());
 
-        // Assign each provider's URI
+        // Assign each provider's URL
         foreach ($providers as $provider) {
-            if (isset($groupedRedirectUris[$provider->getId()])) {
-                $provider->setRedirectUris($groupedRedirectUris[$provider->getId()]);
+            if (isset($groupedRedirectUrls[$provider->getId()])) {
+                $provider->setRedirectUrls($groupedRedirectUrls[$provider->getId()]);
             }
         }
 

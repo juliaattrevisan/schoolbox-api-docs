@@ -5,28 +5,28 @@
  * @link      https://schoolbox.education/
  */
 
-namespace Schoolbox\LTI\Provider\RedirectUri;
+namespace Schoolbox\LTI\Provider\RedirectUrl;
 
 use Schoolbox\LTI\Provider as LtiProvider;
 use Schoolbox\Mapper\Traits\Model\Id;
 
 /**
- * A valid redirect URI for an LTI provider (a.k.a. tool).
+ * A valid redirect URL for an LTI provider (a.k.a. tool).
  */
 class Model
 {
     use Id;
 
     /**
-     * The LTI provider to which this redirect URI is associated.
+     * The LTI provider to which this redirect URL is associated.
      */
     private LtiProvider\Model $ltiProvider;
 
     /**
-     * The actual redirect URI which Schoolbox is allowed to redirect to, when
+     * The actual redirect URL which Schoolbox is allowed to redirect to, when
      * it receives a launch request from the provider.
      */
-    private string $redirectUri;
+    private string $redirectUrl;
 
     /**
      * @return LtiProvider\Model
@@ -49,18 +49,18 @@ class Model
     /**
      * @return string
      */
-    public function getRedirectUri(): string
+    public function getRedirectUrl(): string
     {
-        return $this->redirectUri;
+        return $this->redirectUrl;
     }
 
     /**
-     * @param string $redirectUri
+     * @param string $redirectUrl
      * @return $this
      */
-    public function setRedirectUri(string $redirectUri): self
+    public function setRedirectUrl(string $redirectUrl): self
     {
-        $this->redirectUri = $redirectUri;
+        $this->redirectUrl = $redirectUrl;
         return $this;
     }
 }
