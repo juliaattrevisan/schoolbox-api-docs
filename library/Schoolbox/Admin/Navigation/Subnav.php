@@ -44,6 +44,9 @@ class Subnav
      */
     private IConfigLoader $configLoader;
 
+    /**
+     * @var User The logged-in user.
+     */
     private User $user;
 
     /**
