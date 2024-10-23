@@ -624,7 +624,7 @@ class Subnav
                         'name'        => 'Settings / Policy',
                         'visible'     => $userIsSuperuser || $userHasServicePermissionNews,
                         'children'    => [],
-                        'description' => 'Configure the list of news topics to allow categorisation of news.',
+                        'description' => 'Configure moderation and default values when posting and modifying news.',
                     ],
                     '/adminv2/lists/news/news-topic' => [
                         'name'        => 'Topics List',
