@@ -633,7 +633,6 @@ class Subnav
                         'description' => 'Configure the list of news topics to allow categorisation of news.',
                     ],
                 ],
-                'description' => 'Configure moderation and default values when posting and modifying news.',
             ],
             '/adminv2/notifications' => [
                 'name'       => 'Notifications',
