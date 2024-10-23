@@ -167,10 +167,6 @@ class Factory implements ResponseFactoryInterface
             'template' => $template,
             'data'     => $data,
             'chrome'   => $chromeData,
-            'userIsModerator' => (
-                $currentUser !== null &&
-                $currentUser->hasServicePermission(UserAccess::SERVICE_NEWS, UserAccess::ACCESS_FULL)
-            )
         ];
         foreach ($this->dataGenerators as $key => $generator) {
             $data[$key] = $generator->generate($chromeData);

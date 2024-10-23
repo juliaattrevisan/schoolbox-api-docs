@@ -209,7 +209,7 @@
                                     <span>{{ user.current.formatName }}</span>
                                 </a>
                                 <div id="account-content-mobile" class="content">
-                                    {% include 'include/accountMenu.twig' with {user: user, userIsModerator: userIsModerator, mobile: true} only %}
+                                    {% include 'include/accountMenu.twig' with {user: user, mobile: true} only %}
                                 </div>
                             </li>
                         </ul>
@@ -280,7 +280,7 @@
                                     {% include 'include/portrait.twig' with {user: user.current, render: 'menuMobile'} only %}
                                 </a>
                                 <div id="account-content" class="account-drop" data-test="account-content">
-                                    {% include 'include/accountMenu.twig' with {user: user, userIsModerator: userIsModerator, mobile: false} only %}
+                                    {% include 'include/accountMenu.twig' with {user: user, mobile: false} only %}
                                 </div>
                             {% endif %}
                         {% endblock accountMenu %}
