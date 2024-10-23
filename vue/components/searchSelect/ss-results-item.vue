@@ -11,9 +11,9 @@ import type { SearchSelectItem } from "./types/searchSelectTypes";
 interface Props {
     query: string; // the search query
     allowPartialMatches?: boolean; // whether to allow partial matches, so can match part of a word
-    selectedItems: SearchSelectItem[]; // the selected items
+    selected: SearchSelectItem[]; // the selected items
     result: SearchSelectItem; // the result to display
-    isSingleSelect: boolean; // whether only one result can be selected
+    isSingleSelect: boolean; // whether only one result can be selected, to vary the input type
     index: number; // the index of the result
     activeIndex: number; // the active index, to determine if this result is active
 }
@@ -30,8 +30,8 @@ const emit = defineEmits<{
  * based on whether it's in the selected list
  * @returns - whether the result is selected
  */
-const isChecked = window.Vue.computed(() => {
-    return props.selectedItems.some((result) => result.id === props.result.id);
+const isSelected = window.Vue.computed(() => {
+    return props.selected.some((result) => result.id === props.result.id);
 });
 
 /**
@@ -43,7 +43,7 @@ function onClick(event?: MouseEvent | undefined): void {
     if (event && event.target && (event.target as HTMLElement).nodeName === "LABEL") {
         return;
     }
-    if (isChecked.value) {
+    if (isSelected.value) {
         emit("remove", [props.result]);
     } else {
         emit("add", [props.result]);
@@ -90,7 +90,7 @@ const { isActive } = useActiveIndex(
                 v-if="props.isSingleSelect"
                 :id="`search-select-result-input-${result.id}`"
                 type="radio"
-                :checked="isChecked"
+                :checked="isSelected"
                 :data-test="`ss-results-item-radio-${props.result.id}`"
                 @click.stop="onClick"
             />
@@ -98,7 +98,7 @@ const { isActive } = useActiveIndex(
                 v-else
                 :id="`search-select-result-input-${result.id}`"
                 type="checkbox"
-                :checked="isChecked"
+                :checked="isSelected"
                 :data-test="`ss-results-item-checkbox-${props.result.id}`"
                 @click.stop="onClick"
             />

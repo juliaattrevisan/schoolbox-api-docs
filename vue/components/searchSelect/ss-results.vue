@@ -116,7 +116,7 @@ function onHover(index: number): void {
             <ss-results-select-all
                 v-if="showSelectAll"
                 :results="props.results"
-                :selected-items="props.selected"
+                :selected="props.selected"
                 :index="0"
                 :active-index="activeIndex"
                 @add="onAdd"
@@ -128,7 +128,7 @@ function onHover(index: number): void {
                 :key="result.id"
                 :query="props.query"
                 :allow-partial-matches="props.allowPartialMatches"
-                :selected-items="props.selected"
+                :selected="props.selected"
                 :result="result"
                 :is-single-select="props.isSingleSelect"
                 :index="showSelectAll ? index + 1 : index"

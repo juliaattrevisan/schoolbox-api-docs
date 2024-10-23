@@ -7,7 +7,7 @@ import { onClickOutside, useFocus, onKeyStroke } from "@vueuse/core";
 
 interface Props {
     labelId: string; // the label id
-    parentEl: HTMLDivElement | null; // the parent element to close the search results
+    parentEl: HTMLDivElement | null; // the parent element to track, so can close the search results when focus lost
     placeholder: string; // the placeholder text
 }
 const props = defineProps<Props>();

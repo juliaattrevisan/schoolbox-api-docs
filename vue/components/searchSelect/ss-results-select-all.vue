@@ -10,7 +10,7 @@ import type { SearchSelectItem } from "./types/searchSelectTypes";
 
 interface Props {
     results: SearchSelectItem[]; // the results returned from the search
-    selectedItems: SearchSelectItem[]; // the selected items
+    selected: SearchSelectItem[]; // the selected items
     index: number; // the index of the result
     activeIndex: number; // the active index, to determine if this result is active
 }
@@ -28,9 +28,9 @@ const emit = defineEmits<{
  * @returns - whether all results are selected
  */
 const isAllResultsSelected = window.Vue.computed(() => {
-    if (props.selectedItems.length > 0) {
+    if (props.selected.length > 0) {
         const alreadySelected = props.results.filter((resultItem) => {
-            return props.selectedItems.some((node) => resultItem.id === node.id);
+            return props.selected.some((node) => resultItem.id === node.id);
         });
         return alreadySelected.length === props.results.length;
     }
@@ -43,9 +43,9 @@ const isAllResultsSelected = window.Vue.computed(() => {
  * @returns - whether some results are selected
  */
 const isSomeResultsSelected = window.Vue.computed(() => {
-    if (props.selectedItems.length > 0) {
+    if (props.selected.length > 0) {
         const alreadySelected = props.results.filter((resultItem) => {
-            return props.selectedItems.some((node) => resultItem.id === node.id);
+            return props.selected.some((node) => resultItem.id === node.id);
         });
         return alreadySelected.length >= 1 && alreadySelected.length !== props.results.length;
     }
@@ -56,7 +56,7 @@ const isSomeResultsSelected = window.Vue.computed(() => {
  * To determine the check display of the checkbox
  * @returns - whether it's checked
  */
-const isChecked = window.Vue.computed(() => isAllResultsSelected.value);
+const isSelected = window.Vue.computed(() => isAllResultsSelected.value);
 
 /**
  * toggle all depending on current check status
@@ -67,7 +67,7 @@ function onClick(event?: MouseEvent | undefined): void {
     if (event && event.target && (event.target as HTMLElement).nodeName === "LABEL") {
         return;
     }
-    if (isChecked.value) {
+    if (isSelected.value) {
         emit("remove", props.results);
     } else {
         emit("add", props.results);
@@ -113,7 +113,7 @@ const { isActive } = useActiveIndex(
             <input
                 id="checkbox-select-all"
                 type="checkbox"
-                :checked="isChecked"
+                :checked="isSelected"
                 :class="{ indeterminate: isSomeResultsSelected }"
                 @click.stop="onClick"
             />

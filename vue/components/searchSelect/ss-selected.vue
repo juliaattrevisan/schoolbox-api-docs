@@ -1,13 +1,13 @@
 <script setup lang="ts">
 /**
- * To list all the currently selected Curriculum codes
+ * To list all the currently selected items
  */
 
 import type { SearchSelectItem } from "./types/searchSelectTypes";
 import SsSelectedItem from "./ss-selected-item.vue";
 
 interface Props {
-    selected: SearchSelectItem[]; // the selected results
+    selected: SearchSelectItem[]; // the selected items
     formValueName: string; // the name of the form value
     isSingleSelect: boolean; // whether only one result can be selected
     canSelectItem: boolean; // whether the user can select an item (to trigger the select emit)
@@ -21,7 +21,7 @@ const emit = defineEmits<{
 }>();
 
 /**
- * Add a comma separated string of the ids of the selected codes
+ * Add a comma separated string of the ids of the selected ids
  * for use in forms
  * @returns - a comma separated string of the ids
  */
@@ -38,7 +38,7 @@ function onSelectItem(item: SearchSelectItem): void {
 }
 
 /**
- * To remove a selected search result
+ * To remove a selected item
  * @param item - the item to remove
  */
 function onRemoveItem(item: SearchSelectItem): void {

@@ -3,7 +3,7 @@ import SsResultsListItem from "../ss-results-item.vue";
 
 const defaultProps = {
     query: "",
-    selectedItems: [],
+    selected: [],
     result: { id: 1, name: "Result 1" },
     isSingleSelect: false,
     index: 0,
@@ -37,7 +37,7 @@ test("if result already selected, remove is triggered", async () => {
     const wrapper = mount(SsResultsListItem, {
         props: {
             ...defaultProps,
-            selectedItems: [{ id: 1, name: "Result 1" }],
+            selected: [{ id: 1, name: "Result 1" }],
         },
     });
     const searchResult = wrapper.get(`[data-test="ss-results-item-checkbox-1"]`);

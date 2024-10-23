@@ -1,6 +1,6 @@
 <script setup lang="ts">
 /**
- * To select Courses
+ * To search and select Courses
  */
 
 import { watchIgnorable } from "@vueuse/core";

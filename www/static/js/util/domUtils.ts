@@ -324,7 +324,7 @@ export async function injectScriptsIfNotLoaded(params: InjectScriptsParams): Pro
  *                          any HTML special characters in `toMark` are escaped,
  *                          so output is known to be safe for v-html
  */
-export function addMarks(toMark: string, wordList: string[], allowPartialMatches = false): string {
+export function addMarks(toMark: string, wordList: string[], allowPartialMatches: boolean = false): string {
     let marked = escape(toMark);
     const uniqueWorkList = [...new Set(wordList)]; // remove any duplicate search words
     uniqueWorkList.forEach((wordInSearch) => {

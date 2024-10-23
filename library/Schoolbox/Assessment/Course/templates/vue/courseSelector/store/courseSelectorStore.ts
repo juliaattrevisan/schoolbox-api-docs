@@ -1,5 +1,5 @@
 /**
- * To select from a list of courses
+ * To maintain a selection of courses
  */
 
 import { defineStore } from "pinia";

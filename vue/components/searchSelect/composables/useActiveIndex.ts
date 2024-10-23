@@ -1,6 +1,7 @@
 /**
  * To highlight the active result in the search results,
- * tracking the activeIndex which changes with keyboard navigation
+ * tracking the activeIndex which changes with keyboard navigation,
+ * and can also be altered via mouse hover
  */
 
 import type { Ref } from "vue";
