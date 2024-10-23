@@ -346,7 +346,7 @@ HELP;
                     'availability' => $campusIds,
                     'visibility' =>  [self::ROLETYPE_SELF, self::ROLETYPE_PARENT, self::ROLETYPE_STAFF],
                 ],
-                'StudentYearLevel' => [
+                'yearLevel' => [
                     'availability' => $campusIds,
                     'visibility' =>  [self::ROLETYPE_SELF, self::ROLETYPE_PARENT, self::ROLETYPE_STAFF],
                 ],
@@ -408,6 +408,10 @@ HELP;
                     'visibility' =>  [],
                 ],
                 'externalId' => [
+                    'availability' => [],
+                    'visibility' =>  [],
+                ],
+                'yearLevel' => [
                     'availability' => [],
                     'visibility' =>  [],
                 ],
