@@ -20,7 +20,7 @@
 
     <li><a class="icon-staff-students" href="/search/user/{{ user.current.id }}">Profile</a></li>
     <li><a class="icon-settings" href="/settings/notifications">Notification Settings</a></li>
-    {% if user.current.superuser %}
+    {% if user.current.superuser or userIsModerator %}
         <li><a class="icon-locked" href="/adminv2/home">Administration</a></li>
     {% endif %}
 

@@ -15,6 +15,7 @@ use Psr\Http\Message\ResponseFactoryInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\StreamFactoryInterface;
 use Psr\Http\Message\StreamInterface;
+use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\User;
 use Symfony\Component\HttpFoundation\Response;
 use Twig\Environment;
@@ -166,6 +167,10 @@ class Factory implements ResponseFactoryInterface
             'template' => $template,
             'data'     => $data,
             'chrome'   => $chromeData,
+            'userIsModerator' => (
+                $currentUser !== null &&
+                $currentUser->hasServicePermission(UserAccess::SERVICE_NEWS, UserAccess::ACCESS_FULL)
+            )
         ];
         foreach ($this->dataGenerators as $key => $generator) {
             $data[$key] = $generator->generate($chromeData);
