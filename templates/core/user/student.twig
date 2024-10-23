@@ -227,11 +227,11 @@
                                     });
                                 </script>
 
-                                <dl>
+                                <dl class="profile">
                                     {# Portrait is always element 0 at the moment: we can skip iterating
                                      # that array element here, because it's rendered elsewhere.
                                      #}
-                                    {% for selectedField in externalUser.data.roleTypes.fields.selected[1:] %}
+                                    {% for selectedField in externalUser.data.roleTypes.fields.selected|filter(selectedField => selectedField.field != 'portrait') %}
                                         {# Decide if the viewer can actually see this field, due to additional
                                          # permissions, privacy and configuration settings that go well beyond
                                          # the viewer's role type; if you can see it, show it. Otherwise skip it.
