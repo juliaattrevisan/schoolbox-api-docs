@@ -117,7 +117,7 @@ const { isActive } = useActiveIndex(
                 :class="{ indeterminate: isSomeResultsSelected }"
                 @click.stop="onClick"
             />
-            <label for="checkbox-select-all">Select All</label>
+            <label for="checkbox-select-all">Select all</label>
         </div>
     </div>
 </template>

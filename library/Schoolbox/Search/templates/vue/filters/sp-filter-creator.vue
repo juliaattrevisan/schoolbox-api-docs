@@ -17,7 +17,7 @@ const currentUser: Creator = {
 <template>
     <div class="l-flex-col">
         <search-select
-            v-model:selected-items="filterCreatorsStore.creator"
+            v-model:selected="filterCreatorsStore.creator"
             label="Creator"
             label-id="creator"
             endpoint="/ajax/user.php?groupID=0&query="
