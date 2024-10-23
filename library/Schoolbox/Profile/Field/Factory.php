@@ -324,7 +324,7 @@ class Factory
 
         if (isset($externalUser['SpouseID']) && $externalUser['SpouseDirectoryIncludeFlag']) {
             try {
-                $spouse = $this->userMapper->findByExternalId($externalUser['SpouseID'], Role::PARENT);
+                $spouse = $this->userMapper->findByExternalId(306, Role::PARENT);
             } catch (MapperException $e) {
                 // noop: spouse not found
             }
@@ -355,7 +355,15 @@ class Factory
             'email' => $viewee->getEmail(),
             'externalId' => $viewee->getExternalId(),
             'role' => $viewee->getRole()->getName(),
-            'spouse' => $spouse
+            /* Assign schoolbox's version of a spouse's details, but we need multiple data points:
+             * The name is formatted with a hyperlink to a user profile screen since this spouse
+             * has a schoolbox user account. We need their id and name as a struct...so, it's some
+             * special handling but we can do that
+             */
+            'spouseName' => [
+                'id' => $spouse->getId(),
+                'value' => "{$spouse?->getTitle()} {$spouse?->getPreferredName()} {$spouse?->getLastname()}"
+            ]
         ];
 
         return array_merge($externalUser, $referenceFields);

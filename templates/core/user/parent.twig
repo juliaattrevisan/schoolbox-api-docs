@@ -122,7 +122,8 @@
                                         <dt class="small-4 medium-3 columns">{{ fieldName }}</dt>
                                         <dd class="small-8 medium-9 columns">
                                             {% if selectedField.field in ['spouseName'] %}
-                                                <a href="/search/user/{{ spouse.id }}">{{ externalUser.SpouseTitle }} {{ externalUser.SpousePreferred }} {{ externalUser.SpouseSurname }}</a>
+                                                {# A unique data structure, sadly #}
+                                                <a href="/search/user/{{ selectedField.value.id }}">{{ selectedField.value.value }}</a>
                                             {% elseif selectedField.field in ['email', 'SpouseEmail'] %}
                                                 {# Renders a mailto: hyperlink #}
                                                 <a href="{{ session.mailhandle }}{{ selectedField.value }}">{{ selectedField.value }}</a>
