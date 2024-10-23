@@ -157,7 +157,12 @@
                                  # and you pass the additionalConstraints listed above
                                  # Ask php to give you an image (it might not...)
                                  #}
-                                {% include 'include/portrait.twig' with {user: user, render: 'profile', class: 'full-width', description: ''} only %}
+                                {% include 'include/portrait.twig' with {
+                                    user: user,
+                                    render: 'profile',
+                                    class: 'full-width',
+                                    description: ''
+                                } only %}
                             {% endif %}
                         {% endfor %}
 
@@ -165,7 +170,12 @@
                          # We can kind of force this with a null user...wow
                          #}
                         {% if not foundPortrait %}
-                            {% include 'include/portrait.twig' with {user: null, render: 'profile', class: 'full-width', description: ''} only %}
+                            {% include 'include/portrait.twig' with {
+                                user: null,
+                                render: 'profile',
+                                class: 'full-width',
+                                description: ''
+                            } only %}
                         {% endif %}
                     </div>
                     <div class="small-12 medium-10 columns no-pad">
