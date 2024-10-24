@@ -5,9 +5,15 @@ use Sabre\VObject\ParseException;
 use Schoolbox\Calendar\Cache\Vcal;
 use Schoolbox\Calendar\Event;
 use Schoolbox\Collection;
+use Schoolbox\Permission\Access\UserAccess;
 
 /** @var SitePage $this */
-if (!$this->getDi()->get('session')->get('user')->isSuperuser()) {
+try {
+    $loggedInUser = $this->getDi()->get('session')->get('user');
+} catch (Exception $e) {
+    $this->error(\Schoolbox\Error\Mapper::ERROR_USER_NOT_FOUND);
+}
+if (!$loggedInUser->isSuperuser() && !$loggedInUser->hasServicePermission(UserAccess::SERVICE_CALENDAR, UserAccess::ACCESS_FULL)) {
     $this->error(\Schoolbox\Error\Mapper::ERROR_PERM_PAGE_VIEW, '', 403);
 }
 
@@ -28,7 +34,7 @@ if (isset($_POST['action']) && $_POST['action'] == 'subscribe') {
                 // Config could not be decoded, so create a blank record matching the expected class.
                 // This allows the corrupted data to be overwritten.
                 $connectorClassName = "Calendar_Api_Config_Connector_{$attribs['connectorClass']}";
-                $config = new $connectorClassName;
+                $config = new $connectorClassName();
             }
 
             /* Process multiple Vcals

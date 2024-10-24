@@ -132,6 +132,13 @@ class Subnav
         $userHasServicePermissionNews = (
             $this->user->hasServicePermission(UserAccess::SERVICE_NEWS, UserAccess::ACCESS_FULL)
         );
+        $userHasServicePermissionCalendar = (
+            $this->user->hasServicePermission(UserAccess::SERVICE_CALENDAR, UserAccess::ACCESS_FULL)
+        );
+        $userHasAnyModeratorServicePermission = (
+            $userHasServicePermissionNews ||
+            $userHasServicePermissionCalendar
+        );
 
         /* Keys of this array uniquely identify a page and its subpages
          * Used to preselect menu options so users have a sense of where they are
@@ -146,32 +153,38 @@ class Subnav
         return [
             '/adminv2/home' => [
                 'name'        => 'Home',
-                'visible'     => $userIsSuperuser || $userHasServicePermissionNews,
+                'visible'     => $userIsSuperuser || $userHasAnyModeratorServicePermission,
                 'description' => 'Key system status information.',
                 'children'    => [],
             ],
-            '/adminv2/calendar/Cleanup' => [
+            '/adminv2/calendar' => [
                 'name'       => 'Calendar',
-                'visible'    => $userIsSuperuser,
+                'visible'    => $userIsSuperuser || $userHasServicePermissionCalendar,
                 'searchable' => false,
                 'children'   => [
                     '/adminv2/calendar/Cleanup' => [
                         'name'        => 'Cleanup',
-                        'visible'     => $userIsSuperuser,
+                        'visible'     => $userIsSuperuser || $userHasServicePermissionCalendar,
                         'children'    => [],
                         'description' => 'A tool to bulk or individually remove events from personal or group calendars.',
                     ],
                     '/adminv2/calendar/Import' => [
                         'name'        => 'Import',
-                        'visible'     => $userIsSuperuser,
+                        'visible'     => $userIsSuperuser || $userHasServicePermissionCalendar,
                         'children'    => [],
                         'description' => 'Import events into the school calendar via ICS or CSV.',
                     ],
                     '/adminv2/calendar/Subscribe' => [
                         'name'        => 'Subscribe',
-                        'visible'     => $userIsSuperuser,
+                        'visible'     => $userIsSuperuser || $userHasServicePermissionCalendar,
                         'children'    => [],
                         'description' => 'Control which additional calendars are included into a users calendar. This includes VCAL events, modules and the SIS.',
+                    ],
+                    '/adminv2/lists/calendar/event-type' => [
+                        'name'        => 'Event Types',
+                        'visible'     => $userIsSuperuser || $userHasServicePermissionCalendar,
+                        'children'    => [],
+                        'description' => 'Setup the list of event types for filtering and colour coding.',
                     ],
                 ],
             ],
@@ -467,12 +480,6 @@ class Subnav
                         'children'    => [],
                         'description' => 'Configure network drives that users will be able to browse inside the platform using the WebDAV protocol.',
                     ],
-                    '/adminv2/lists/event-type' => [
-                        'name'        => 'Event Types',
-                        'visible'     => $userIsSuperuser,
-                        'children'    => [],
-                        'description' => 'Setup the list of event types for filtering and colour coding.',
-                    ],
                     '/adminv2/lists/house' => [
                         'name'        => 'Houses',
                         'visible'     => $userIsSuperuser,
@@ -615,7 +622,7 @@ class Subnav
                     ],
                 ],
             ],
-            'adminv2/news' => [
+            '/adminv2/news' => [
                 'name'        => 'News',
                 'visible'     => $userIsSuperuser || $userHasServicePermissionNews,
                 'searchable'  => false,

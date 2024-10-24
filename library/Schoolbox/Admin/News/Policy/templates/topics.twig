@@ -14,6 +14,7 @@
 
 <div class="row">
     <div class="small-12 island">
+        {% set topicRoute = routeLookupIfAuthorized('adminLists.getNewsIndex', {table: 'news-topic'}) %}
         {% if topics|length %}
             <section>
                 <ul class="information-list">
@@ -27,7 +28,7 @@
                 </ul>
                 <div class="component-action">
                     <section>
-                        <a href="/adminv2/lists/news/news-topic" class="button">Modify List</a>
+                        <a href="{{ topicRoute }}" class="button">Modify List</a>
                     </section>
                 </div>
             </section>
@@ -36,9 +37,6 @@
             <div class="empty-state">
                 <i class="icon-news"></i>
                 <p>{{ locale.news.proper }} topics haven't been created.</p>
-
-                {% set topicRoute = routeLookupIfAuthorized('adminLists.getNewsIndex', {table: 'news-topic'}) %}
-
                 {% if topicRoute %}
                 <p><a href="{{ topicRoute }}" title="Define {{ locale.news }} topics">Define {{ locale.news }} topics</a> so that content creators can categorise their articles.</p>
                 {% endif %}
