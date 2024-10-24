@@ -69,7 +69,6 @@ class Base implements IIterator
             data: ['db.system' => $this->broker->getDriver(),],
         );
         try {
-            // Add wrap here
             if ($this->broker->getCollector() instanceof Collector) {
                 $result = $this->broker->getCollector()->execute($this->statement);
             } else {

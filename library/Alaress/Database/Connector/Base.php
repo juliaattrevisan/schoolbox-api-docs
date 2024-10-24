@@ -314,8 +314,6 @@ class Base implements IConnector
      */
     public function executeDirectly(string $sql): bool
     {
-        // This needs to be run directly via exec(),
-        // but should be prepared anyway
         return Tracer::getDefaultTrace()->runWithinSpan(
             fn () => $this->broker->getPdo()->exec($sql) !== false,
             'db.sql.query',
