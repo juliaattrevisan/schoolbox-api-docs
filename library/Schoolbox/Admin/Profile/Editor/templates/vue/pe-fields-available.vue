@@ -6,7 +6,7 @@
 import type Sortable from "sortablejs";
 import SortableWrapper from "@schoolboxVue/components/sortable-wrapper.vue";
 import PeFieldsAvailableItem from "./pe-fields-available-item.vue";
-import PeFieldsActiveItem from "./pe-fields-active-item.vue";
+import PeFieldsSelectedItem from "./pe-fields-selected-item.vue";
 import { useProfileEditorStore } from "./store/profileEditorStore";
 
 const peStore = useProfileEditorStore();
@@ -68,7 +68,7 @@ window.Vue.watch(
 </script>
 
 <template>
-    <dl v-if="fieldCategories.length > 1" class="tabs">
+    <dl class="tabs">
         <dd v-for="category in fieldCategories" :key="category" :class="{ active: category === selectedCategory }">
             <a @click="selectedCategory = category">{{ category }}</a>
         </dd>
@@ -83,7 +83,7 @@ window.Vue.watch(
             <template #item="item">
                 <div :data-pe-field="item.element.field">
                     <pe-fields-available-item :field="item.element" class="pe-fields-available-item" />
-                    <pe-fields-active-item
+                    <pe-fields-selected-item
                         v-if="item.isDragging"
                         :field="item.element"
                         :dragging="true"
