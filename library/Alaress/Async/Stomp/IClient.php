@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace Alaress\Async\Stomp;
 
+use Alaress\Async\Stomp\Implementation\Stream\Connection;
 use React\Promise\PromiseInterface;
 
 /**
@@ -29,10 +30,15 @@ interface IClient
     /**
      * Subscribes to a Stomp queue.
      *
-     * @param string   $destination
-     * @param string   $ackMode
-     * @param callable $callback
-     * @param array    $headers
+     * @param string                                                                                 $destination
+     * @param string                                                                                 $ackMode
+     * @param callable(IFrame $frame, IAckResolver $resolver, Connection $conn, string $subId): void $callback
+     *        The callback to call upon receiving a message:
+     *        * $frame:    the Stomp message frame
+     *        * $resolver: the object which may resolve or reject the frame
+     *        * $conn:     the underlying Stomp connection
+     *        * $subId:    the subscription ID
+     * @param array                                                                                  $headers
      * @return mixed the subscription ID that the Stomp queue returns
      */
     public function subscribeWithAck(string $destination, string $ackMode, callable $callback, array $headers = []);

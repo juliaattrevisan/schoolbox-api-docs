@@ -15,6 +15,7 @@ use Alaress\Redis\Async;
 use Alaress\Async\Notification\Postman;
 use Alaress\Date\Clock;
 use Alaress\Scheduler\Cache\RedisCache;
+use Alaress\Sentry\Tracing\Tracer;
 use Predis\ClientInterface;
 use Psr\Container\ContainerInterface;
 use Psr\Log\LoggerInterface;
@@ -54,7 +55,8 @@ $kernel->run(function (ContainerInterface $di, LoopInterface $loop, LoggerInterf
         $amqp = $di->get('amqp');
 
         // we'll be using the schedule broker for receiving...
-        $scheduleBroker = new Broker(INSTANCE_ID, $amqp, $redis, $stomp);
+        $tracer         = Tracer::getDefaultTrace()->setHub($di->get('sentry'));
+        $scheduleBroker = new Broker(INSTANCE_ID, $amqp, $redis, $stomp, $tracer);
 
         /** @var Routing\Cache\Redis\ReadCache $subscriptionCache */
         $subscriptionCache = $di->get('subscriptionCache.readonly');

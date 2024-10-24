@@ -37,6 +37,11 @@ class Tracer
     private static ?Tracer $defaultTrace = null;
 
     /**
+     * The Sentry hub to send to: may be set prior to or in `finishTransaction`.
+     */
+    private ?HubInterface $hub = null;
+
+    /**
      * The current transaction context, if there is one.
      */
     private ?TransactionContext $transactionContext = null;
@@ -156,6 +161,16 @@ class Tracer
     }
 
     /**
+     * @param HubInterface|null $hub
+     * @return $this
+     */
+    public function setHub(?HubInterface $hub): self
+    {
+        $this->hub = $hub;
+        return $this;
+    }
+
+    /**
      * Helper function for updating the current transaction context with
      * settings for tracing an Aura route.
      *
@@ -263,11 +278,13 @@ class Tracer
      * Helper function for updating the current transaction context with
      * settings for tracing a message received by a daemon.
      *
-     * @param string $destination An identifier for the queue which received
-     *                            the message.
+     * @param string $destination    An identifier for the queue which received
+     *                               the message.
+     * @param string $subscriptionId A subscription ID for the queue?
+     * @param string $messageId      An ID for the message received.
      * @return void
      */
-    public function setTransactionContextForDaemon(string $destination): void
+    public function setTransactionContextForDaemon(string $destination, string $subscriptionId, string $messageId): void
     {
         $transactionContext = $this->transactionContext;
         if ($transactionContext) {
@@ -280,8 +297,10 @@ class Tracer
             // https://github.com/open-telemetry/semantic-conventions/blob/main/docs/messaging/messaging-spans.md
             $transactionContext->setData(
                 $transactionContext->getData() + [
+                    'messaging.destination.name'     => $subscriptionId,
                     'messaging.destination.template' => $destination,
                     'messaging.operation.name'       => 'consume',
+                    'messaging.message.id'           => $messageId,
                 ],
             );
         }
@@ -421,17 +440,27 @@ class Tracer
      *
      * Also finishes any spans which may still be open.
      *
-     * @param HubInterface    $hub          The hub to write the trace to.
-     * @param float|null      $endTimestamp When the transactions is to be
-     *                                      recorded as having finished.
-     * @param SpanStatus|null $status       The status to set on the transaction
-     *                                      once it has finished.
+     * @param HubInterface|null $hub          The hub to write the trace to:
+     *                                        falls back to `$this->hub` if set,
+     *                                        if not raises error.
+     * @param float|null        $endTimestamp When the transactions is to be
+     *                                        recorded as having finished.
+     * @param SpanStatus|null   $status       The transaction status to set once
+     *                                        it has finished.
      * @return void
      */
-    public function finishTransaction(HubInterface $hub, ?float $endTimestamp = null, ?SpanStatus $status = null): void
-    {
+    public function finishTransaction(
+        ?HubInterface $hub = null,
+        ?float $endTimestamp = null,
+        ?SpanStatus $status = null,
+    ): void {
         // Write the transaction and its spans into the hub
         if ($this->transactionContext instanceof TransactionContext) {
+            $hub ??= $this->hub;
+            if (!$hub) {
+                // TODO error out
+                return;
+            }
             $transaction = $hub->startTransaction($this->transactionContext);
             if (!$transaction->getSampled()) {
                 return;

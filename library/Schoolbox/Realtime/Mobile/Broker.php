@@ -12,6 +12,7 @@ namespace Schoolbox\Realtime\Mobile;
 use Alaress\Async\Broker\StompRedis;
 use Alaress\Async\AMQP\AMQPInterface;
 use Alaress\Async\Stomp\IClient;
+use Alaress\Sentry\Tracing\Tracer;
 use Predis\ClientInterface;
 
 /**
@@ -31,13 +32,15 @@ class Broker extends StompRedis\Broker
      * @param AMQPInterface   $amqp
      * @param ClientInterface $redis
      * @param IClient|null    $stomp
+     * @param Tracer|null     $tracer
      */
     public function __construct(
         string $instanceId,
         AMQPInterface $amqp,
         ClientInterface $redis,
-        ?IClient $stomp = null
+        ?IClient $stomp = null,
+        ?Tracer $tracer = null,
     ) {
-        parent::__construct(self::QUEUE, $instanceId, $amqp, $redis, $stomp);
+        parent::__construct(self::QUEUE, $instanceId, $amqp, $redis, $stomp, $tracer);
     }
 }

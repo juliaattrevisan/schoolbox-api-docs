@@ -9,7 +9,6 @@ declare(strict_types=1);
 
 namespace Alaress\Async\Stomp\Implementation\Stream;
 
-use Alaress\Async\Stomp\ConnectionException;
 use Alaress\Async\Stomp\IAckResolver;
 use Alaress\Async\Stomp\IClient;
 use React\Promise\Deferred;
@@ -50,8 +49,8 @@ class Client implements IClient
         // Need to pass in a callback to subscribe method
         $this->connection->onMessage(
             $subscriptionId,
-            static function (BaseFrame $frame, IAckResolver $resolver) use ($callback): void {
-                $callback(new Frame($frame), $resolver);
+            function (BaseFrame $frame, IAckResolver $resolver) use ($callback, $subscriptionId): void {
+                $callback(new Frame($frame), $resolver, $this->connection, $subscriptionId);
             }
         );
         return $subscriptionId;
