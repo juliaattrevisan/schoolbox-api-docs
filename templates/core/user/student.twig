@@ -87,7 +87,6 @@
         })
     });
 
-
     // Enable Expandables
     $(function () {
         $('[data-collapser]').collapsable();
@@ -98,7 +97,7 @@
     <div class="list-item">
         <div class="small-12 column">
             {% block profileHeading %}
-                <h1 data-test="user-profile-name">{{ user.formatName }}</h1>
+                <h1 data-test="user-profile-name">{{ user.formatName(nameFormat) }}</h1>
             {% endblock %}
         </div>
     </div>
@@ -114,236 +113,228 @@
         <section class="no-pad">
             <div class="profile content">
                 <div class="row no-margin">
+                    {# Build a hash lookup of additional clauses and cross-reference them
+                     # This list is your last opportunity to show/hide a field based on your
+                     # own boolean rather than the showDetails one I used
+                     #
+                     # Additional visibility constraints for the **viewer's** roletype
+                     # and the corresponding bool set by old twig implementation
+                     #
+                     # showEmail: This checked for role permissions, email existence, etc. we need to keep
+                     # showPastoral: This checked for permissions, routes, etc. we need to keep
+                     #}
+                    {% set additionalConstraints = {
+                        'student': {
+                            '_default': true,
+                            'email': showEmail
+                        },
+                        'parent': {
+                            '_default': true,
+                        },
+                        'staff': {
+                            '_default': USER.role.viewStudentProfile,
+                            'email': showEmail,
+                            'formTeacher': USER.role.viewStudentProfile and user.isShowTimetable,
+                            'hohTeacher': USER.role.viewStudentProfile and user.isShowTimetable,
+                            'pastoralCounts': USER.role.viewStudentProfile and showPastoral,
+                            'StudentForm': USER.role.viewStudentProfile and user.isShowTimetable,
+                            'StudentTutorDescription': USER.role.viewStudentProfile and user.isShowTimetable,
+                            'tutorTeacher': USER.role.viewStudentProfile and user.isShowTimetable
+                        }
+                    } %}
+
                     <div class="small-12 medium-2 columns no-pad">
-                        {% include 'include/portrait.twig' with {user: user, render: 'profile', class: 'full-width', description: ''} only %}
+                        {# If the portrait was made available and visible to you, it would normally appear
+                         # as element 0 in this selected list, but you have to check anyway to be sure
+                         #}
+                        {% set foundPortrait = false %}
+
+                        {% for selectedField in externalUser.data.roleTypes.fields.selected|filter(selectedField => selectedField.field == 'portrait') %}
+                            {# If this field doesn't have a special boolean associated with it that might make it visible,
+                             # use the prescribed default bool
+                             #}
+                            {% if (additionalConstraints[USER.role.type][selectedField.field] ?? additionalConstraints[USER.role.type]['_default']) %}
+                                {% set foundPortrait = true %}
+
+
+                                {# Portrait was available and visible to you,
+                                 # and you pass the additionalConstraints listed above
+                                 # Ask php to give you an image (it might not...)
+                                 #}
+                                {% include 'include/portrait.twig' with {
+                                    user: user,
+                                    render: 'profile',
+                                    class: 'full-width',
+                                    description: ''
+                                } only %}
+                            {% endif %}
+                        {% endfor %}
+
+                        {# No image? Grey man
+                         # We can kind of force this with a null user...wow
+                         #}
+                        {% if not foundPortrait %}
+                            {% include 'include/portrait.twig' with {
+                                user: null,
+                                render: 'profile',
+                                class: 'full-width',
+                                description: ''
+                            } only %}
+                        {% endif %}
                     </div>
-
                     <div class="small-12 medium-10 columns no-pad">
-                        {% block specialAlert %}
-                            {% if externalUser.StudentSpecialNeedsFlag ?? false and showSpecialAlert %}
-                                <div class="alert-box highlight icon-bell">
-                                    {{ locale.translate('specialNeeds', false, true) }}
-                                </div>
-                            {% endif %}
-                        {% endblock specialAlert %}
-
-                        {% block englishSecond %}
-                            {% if externalUser.EnglishSecondFlag ?? false and showSpecialAlert  %}
-                                <div class="alert-box highlight icon-eng-second-lang">
-                                    English as an Additional Language
-                                </div>
-                            {% endif %}
-                        {% endblock englishSecond %}
-
-                        {% block medicalAlert %}
-                            {% if externalUser.StudentMedicalAlert ?? false and showMedicalAlert %}
-                                <div class="alert-box alert icon-alert">
-                                    Medical Note: {{ externalUser.StudentMedicalAlert | nl2br }}
-                                </div>
-                            {% endif %}
-                        {% endblock medicalAlert %}
-
-                        {% if showContactsAlert %}
-                            {% for message in externalUser.AlertMessage ?? [] %}
-                                {% block contacts_alert %}
-                                    {# Only staff may view contact alerts #}
-                                    <div class="alert-box alert icon-alert">
-                                        {{ message | nl2br }}
-                                    </div>
-                                {% endblock contacts_alert %}
-                            {% endfor %}
-
-                            {% for message in externalUser.AlertLegal ?? [] %}
-                                {% block alert_legal %}
-                                    {# Only staff may view legal matters #}
-                                    <div class="alert-box alert icon-alert">
-                                        {{ message | nl2br }}
-                                    </div>
-                                {% endblock alert_legal %}
-                            {% endfor %}
-                        {% endif %}
-
-                        {% block individualEducationPlan %}
-                            {% if isStaffWhoCanView and externalUser.countIndividualEducationPlans is defined and externalUser.countIndividualEducationPlans > 0 %}
-                                <div class="alert-box highlight icon-curriculum">
-                                    Individual Education Plan
-                                </div>
-                            {% endif %}
-                        {% endblock individualEducationPlan %}
-
-                        {% block synergeticComments %}
-                            {% if externalUser.Comment ?? false and showComments %}
-                                <div class="alert-box highlight icon-info">
-                                    {{ externalUser.Comment | nl2br }}
-                                </div>
-                            {% endif %}
-                        {% endblock synergeticComments %}
-
+                        {# Profile Editor v24 begins here mostly
+                         #}
                         {% block details %}
-                            <dl>
-                                {% if showTitle %}
-                                    <dt class="small-4 medium-3 columns">Position Title:</dt>
-                                    <dd class="small-8 medium-9 columns">
-                                        {{ user.positionTitle }}
-                                    </dd>
-                                {% endif %}
+                                {# TODO @zacmcw I don't know where you put styles anymore
+                                 #  Migrate this inline stylesheet into the appropriate place
+                                 #}
+                                <style>
+                                    .profile.content .alert-box {
+                                        margin-left: 0;
+                                    }
 
-                                {% if showEmail %}
-                                    {% block details_email %}
-                                        {% if user.email %}
-                                            <dt class="small-4 medium-3 columns">Email:</dt>
-                                            <dd class="small-8 medium-9 columns">
-                                                <a href="{{ session.mailhandle }}{{ user.email }}">{{ user.email }}</a>
-                                            </dd>
-                                        {% endif %}
-                                    {% endblock details_email %}
-                                {% endif %}
+                                    .profile .pastoral-flags {
+                                        margin-left: 1rem;
+                                    }
 
-                                {% if showDetails %}
-                                    {% block details_studentId %}
-                                        <dt class="small-4 medium-3 columns">Student ID:</dt>
-                                        <dd class="small-8 medium-9 columns">{{ user.externalId }}</dd>
-                                    {% endblock details_studentId %}
+                                    /* What is with these paddings?!?
+                                     */
+                                    .alert-box.obscured {
+                                        width: 2rem;
+                                        cursor: pointer;
+                                        padding-right: 2rem;
+                                    }
+                                </style>
 
-                                    {% block details_dob %}
-                                        {% if externalUser.StudentBirthDate is defined and externalUser.StudentBirthDate %}
-                                            <dt class="small-4 medium-3 columns">Date of Birth:</dt>
-                                            <dd class="small-8 medium-9 columns">{{ externalUser.StudentBirthDate|date(dateFormats.shortDateOnlyFormat) }}</dd>
-                                        {% endif %}
-                                    {% endblock details_dob %}
+                                {# TODO @zacmcw you might be able to implement this gooder than me #}
+                                <script>
+                                    $(function() {
+                                        $('[data-click-to-reveal]').on('click', function(event) {
+                                            event.preventDefault();
+                                            let elem = $(this).find('span');
+                                            if (elem.is(':visible')) {
+                                                elem.hide();
+                                                $(this).css({
+                                                    'width': '2rem'
+                                                });
+                                            } else {
+                                                elem.show();
+                                                $(this).css({
+                                                    'width': 'auto',
+                                                });
+                                            }
+                                        });
+                                    });
+                                </script>
 
-                                    {% block details_formTeacher %}
-                                        {% if showClasses %}
-                                            {% if formTeacher %}
-                                                <dt class="small-4 medium-3 columns">Class Teacher:</dt>
-                                                <dd class="small-8 medium-9 columns">
-                                                    {% if formTeacher.id %}
-                                                        <a href="{{ session.mailhandle }}{{ formTeacher.email }}">{{ formTeacher.formatName }}</a>
-                                                    {% else %}
-                                                        {{ formTeacher.formatName }}
-                                                    {% endif %}
-                                                </dd>
+                                <dl class="profile">
+                                    {# Portrait is always element 0 at the moment: we can skip iterating
+                                     # that array element here, because it's rendered elsewhere.
+                                     #}
+                                    {% for selectedField in externalUser.data.roleTypes.fields.selected|filter(selectedField => selectedField.field != 'portrait') %}
+                                        {# Decide if the viewer can actually see this field, due to additional
+                                         # permissions, privacy and configuration settings that go well beyond
+                                         # the viewer's role type; if you can see it, show it. Otherwise skip it.
+                                         #}
+                                        {% if (additionalConstraints[USER.role.type][selectedField.field] ?? additionalConstraints[USER.role.type]['_default'] ?? true) %}
+                                            {# Use localisation variant from Terminology, if it exists;
+                                             # otherwise use default Display As that I provided by default
+                                             #}
+                                            {% set fieldName = selectedField.displayAs %}
+
+                                            {% if selectedField.terminology %}
+                                                {% set fieldName = locale.translate(selectedField.terminology, false, true) %}
                                             {% endif %}
-                                        {% endif %}
-                                    {% endblock details_formTeacher %}
 
-                                    {% block details_yearLevel %}
-                                        {% if externalUser.StudentYearLevel is defined %}
-                                            <dt class="small-4 medium-3 columns">{{ locale.yearLevel.proper }}:</dt>
-                                            <dd class="small-8 medium-9 columns">{{ externalUser.StudentYearLevel }}</dd>
-                                        {% endif %}
-                                    {% endblock details_yearLevel %}
+                                            {# Now render each of the flags/tuples in some manner #}
 
-                                    {% block details_tutorTeacher %}
-                                        {% if showClasses %}
-                                            {% if tutorTeacher %}
-                                                <dt class="small-4 medium-3 columns">{{ locale.tutor.proper }}:</dt>
-                                                <dd class="small-8 medium-9 columns">
-                                                    {% if tutorTeacher.id %}
-                                                        <a href="{{ session.mailhandle }}{{ tutorTeacher.email }}">{{ tutorTeacher.formatName }}</a>
-                                                    {% else %}
-                                                        {{ tutorTeacher.formatName }}
+                                            {# Presence of icon and css means it renders as a flag/alert #}
+                                            {% if selectedField.icon and selectedField.css %}
+                                                <dt class="full-width">
+                                                    {% if selectedField.field in ['AlertMessages', 'AlertLegal'] %}
+                                                        {# A set of Alert Messages that display in one big flag
+                                                         # This is often a set of strings that need to be output sequentially
+                                                         #}
+                                                        {% if selectedField.value|length %}
+                                                            <div class="alert-box {{ selectedField.css ?? '' }} {{ selectedField.icon ?? '' }} {% if selectedField.clickToReveal %}obscured{% endif %}" {% if selectedField.clickToReveal %}data-click-to-reveal{% endif %}>
+                                                                <span {% if selectedField.clickToReveal %}style="display:none"{% endif %}>
+                                                                    {% for message in selectedField.value %}
+                                                                        {{ message|nl2br }}
+                                                                    {% endfor %}
+                                                                </span>
+                                                            </div>
+                                                        {% endif %}
+                                                    {% elseif selectedField.value %}
+                                                        {# A string that displays in a flag in some manner, typically #}
+                                                        <div class="alert-box {{ selectedField.css ?? '' }} {{ selectedField.icon ?? '' }} {% if selectedField.clickToReveal %}obscured{% endif %}" {% if selectedField.clickToReveal %}data-click-to-reveal{% endif %}>
+                                                            <span {% if selectedField.clickToReveal %}style="display:none"{% endif %}>
+                                                                {% if selectedField.field in ['StudentMedicalAlert'] %}
+                                                                    {# A string with a special prefix that displays in a flag #}
+                                                                    Medical Note: {{ selectedField.value }}
+                                                                {% elseif selectedField.field in ['Comment'] %}
+                                                                    {# A string that displays on its own in a flag#}
+                                                                    {{ selectedField.value }}
+                                                                {% elseif selectedField.field in ['ParentsSeparatedFlag'] %}
+                                                                    {# A special flag that has a hardcoded text string #}
+                                                                    Parents separated; please be mindful when making contact.
+                                                                {% else %}
+                                                                    {# A generic flag which shows Display As/Terminology equivalent
+                                                                     #
+                                                                     # Flags always display fullwidth and I can cheat by rendering
+                                                                     # a full-width definition title without a definition data lol
+                                                                     #}
+                                                                    {{ fieldName }}
+                                                                {% endif %}
+                                                            </span>
+                                                        </div>
                                                     {% endif %}
-                                                </dd>
-                                            {% endif %}
-                                        {% endif %}
-                                    {% endblock details_tutorTeacher %}
-
-                                    {% block details_coordTeacher %}
-                                        {% if coordTeacher %}
-                                            <dt class="small-4 medium-3 columns">{{ locale.yearLevelCoordinator.proper }}:</dt>
-                                            <dd class="small-8 medium-9 columns">
-                                                {% if coordTeacher.id %}
-                                                    <a href="{{ session.mailhandle }}{{ coordTeacher.email }}">{{ coordTeacher.formatName }}</a>
-                                                {% else %}
-                                                    {{ coordTeacher.formatName }}
+                                                </dt>
+                                            {% else %}
+                                                {% if selectedField.field in ['pastoralCounts'] and selectedField.value is not null %}
+                                                    {# This is handled separately and specially in the controller
+                                                     # it's not really consolidated in this payload
+                                                     #}
+                                                    {% if selectedField.value|length %}
+                                                        <div class="pastoral-flags">
+                                                            {% for pastoralCount in selectedField.value %}
+                                                                <a href="{{ pastoralCount.destinationUrl }}">
+                                                                <span class="label neutral icon-{{ pastoralCount.icon }} pastoral-flag-in-profile"
+                                                                      data-tooltip title="{{ pastoralCount.title }}"
+                                                                      style="color: {{ pastoralCount.fgColor }}; background-color: {{ pastoralCount.bgColor }}"
+                                                                >{{ pastoralCount.count }}</span></a>
+                                                            {% endfor %}
+                                                        </div>
+                                                    {% endif %}
+                                                {% elseif selectedField.value %}
+                                                    {# Only render a tuple if it has a meaningful value
+                                                     # Note that some fields require special handling (different data structures)
+                                                     #
+                                                     # The field name will always show at this point, though their values
+                                                     # will need special treatment somehow
+                                                     #}
+                                                    <dt class="small-4 medium-3 columns">{{ fieldName }}</dt>
+                                                    <dd class="small-8 medium-9 columns">
+                                                        {% if selectedField.field in ['formTeacher', 'tutorTeacher', 'hohTeacher', 'coordTeacher', 'studentCoach'] %}
+                                                            {# These fields are Schoolbox\User instances and need special treatment #}
+                                                            <a href="{{ session.mailhandle }}{{ selectedField.value.email }}">{{ selectedField.value.formatName }}</a>
+                                                        {% elseif selectedField.field in ['email'] %}
+                                                            {# Renders a mailto: hyperlink #}
+                                                            <a href="{{ session.mailhandle }}{{ selectedField.value }}">{{ selectedField.value }}</a>
+                                                        {% elseif selectedField.field in ['StudentBirthDate'] %}
+                                                            {# Renders with date formatting #}
+                                                            {{ selectedField.value|date(dateFormats.shortDateOnlyFormat) }}
+                                                        {% else %}
+                                                            {# A generic tuple (key, value) pair #}
+                                                            {{ selectedField.value }}
+                                                        {% endif %}
+                                                    </dd>
                                                 {% endif %}
-                                            </dd>
-                                        {% endif %}
-                                    {% endblock details_coordTeacher %}
-
-                                    {% block details_house %}
-                                        {% if externalUser.StudentHouseDescription ?? false %}
-                                            <dt class="small-4 medium-3 columns">House:</dt>
-                                            <dd class="small-8 medium-9 columns">{{ externalUser.StudentHouseDescription }}</dd>
-                                        {% endif %}
-                                    {% endblock details_house %}
-
-                                    {% block details_tutorGroup %}
-                                        {% if showClasses %}
-                                            {% if externalUser.StudentTutorDescription ?? false %}
-                                                <dt class="small-4 medium-3 columns">{{ locale.tutorGroup.proper }}:</dt>
-                                                <dd class="small-8 medium-9 columns">{{ externalUser.StudentTutorDescription }}</dd>
                                             {% endif %}
                                         {% endif %}
-                                    {% endblock details_tutorGroup %}
-
-                                    {% block details_hohTeacher %}
-                                        {% if showClasses %}
-                                            {% if hohTeacher %}
-                                                <dt class="small-4 medium-3 columns">{{ locale.headOfHouse.proper }}:</dt>
-                                                <dd class="small-8 medium-9 columns">
-                                                    {% if hohTeacher.id %}
-                                                        <a href="{{ session.mailhandle }}{{ hohTeacher.email }}">{{ hohTeacher.formatName }}</a>
-                                                    {% else %}
-                                                        {{ hohTeacher.formatName }}
-                                                    {% endif %}
-                                                </dd>
-                                            {% endif %}
-                                        {% endif %}
-                                    {% endblock details_hohTeacher %}
-
-                                    {% block details_studentForm %}
-                                        {% if showClasses %}
-                                            {% if externalUser.StudentForm ?? false %}
-                                                <dt class="small-4 medium-3 columns">Class:</dt>
-                                                <dd class="small-8 medium-9 columns">{{ externalUser.StudentForm }}</dd>
-                                            {% endif %}
-                                        {% endif %}
-                                    {% endblock details_studentForm %}
-
-                                    {% block details_studentType %}
-                                        {% if boarderType %}
-                                            <dt class="small-4 medium-3 columns">Student Type:</dt>
-                                            <dd class="small-8 medium-9 columns">{{ boarderType }}</dd>
-                                        {% endif %}
-                                    {% endblock details_studentType %}
-
-                                    {% block details_studentDates %}
-                                    {% endblock %}
-
-                                    {% block details_studiesCode %}
-                                        {% if externalUser.StudentStudiesCode ?? false %}
-                                            <dt class="no-margin small-4 medium-3">{{ locale.studies_code.proper }}:</dt>
-                                            <dd class="no-margin small-8 medium-9">{{ externalUser.StudentStudiesCode }}</dd>
-                                        {% endif %}
-                                    {% endblock details_studiesCode %}
-
-                                    {% block details_gender %}
-                                        {#<dt class="small-4 medium-3 columns">Gender:</dt>
-                                        <dd class="small-8 medium-9 columns">{{ externalUser.StudentGender }}</dd>#}
-                                    {% endblock details_gender %}
-
-                                    {% block details_coach %}
-                                    {% endblock details_coach %}
-                                {% endif %}
-
-                                {% block extraDetails %}
-                                    {# Schools can insert extra details here #}
-                                {% endblock extraDetails %}
-                            </dl>
-                        {% endblock details %}
-                        {% if showPastoral and pastoralCounts|length > 0 %}
-                            <div class="pastoral-flags">
-                                {% for pastoralCount in pastoralCounts %}
-                                    <a href="{{ pastoralCount.destinationUrl }}">
-                                        <span class="label neutral icon-{{ pastoralCount.icon }} pastoral-flag-in-profile"
-                                              data-tooltip title="{{ pastoralCount.title }}"
-                                              style="color: {{ pastoralCount.fgColor }}; background-color: {{ pastoralCount.bgColor }}"
-                                        >{{ pastoralCount.count }}</span></a>
-                                {% endfor %}
-                            </div>
-                        {% endif %}
+                                    {% endfor %}
+                                </dl>
+                            {% endblock details %}
                     </div>
                 </div>
             </div>
@@ -495,7 +486,7 @@
         {# Programmatically detect the anchor value and select that tab via foundation
          # This allows you to link /search/user/...#classes to open the Classes tab initially
          # upon visiting that url
-        #}
+         #}
         <script>
             $(function() {
                 switch (window.location.hash) {
@@ -515,12 +506,12 @@
                         break;
 
                         {# If you visit this url directly without a hash, just do default behaviour
-                     # Don't try to preselect any tabs, because you might not be here for the tabs
-                        #}
+                         # Don't try to preselect any tabs, because you might not be here for the tabs
+                         #}
                     default:
                         $('[data-tab] a').first().trigger('click');
                         break;
-                }
+                }}
             });
         </script>
 

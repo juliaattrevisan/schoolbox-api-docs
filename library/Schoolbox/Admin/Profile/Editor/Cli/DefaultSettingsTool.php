@@ -346,7 +346,7 @@ HELP;
                     'availability' => $campusIds,
                     'visibility' =>  [self::ROLETYPE_SELF, self::ROLETYPE_PARENT, self::ROLETYPE_STAFF],
                 ],
-                'StudentYearLevel' => [
+                'yearLevel' => [
                     'availability' => $campusIds,
                     'visibility' =>  [self::ROLETYPE_SELF, self::ROLETYPE_PARENT, self::ROLETYPE_STAFF],
                 ],
@@ -411,6 +411,10 @@ HELP;
                     'availability' => [],
                     'visibility' =>  [],
                 ],
+                'yearLevel' => [
+                    'availability' => [],
+                    'visibility' =>  [],
+                ],
                 'SchoolStaffCode' => [
                     'availability' => [],
                     'visibility' =>  [],
@@ -470,7 +474,7 @@ HELP;
                 /* NOTE: Decided by report_staff_access
                  * By default it's visible to self, staff
                  */
-                'StaffCampusDescription' => [
+                'campusCollection' => [
                     'availability' => $campusIds,
                     'visibility' =>  [self::ROLETYPE_SELF, self::ROLETYPE_STAFF],
                 ],
@@ -551,18 +555,45 @@ HELP;
          * but we'll use them to craft some idiosyncratic defaults
          */
 
-        /* synergetic_community_alerts
+        /* synergetic_community_alerts and protect_student_contacts
          *
-         * If truthy, show alerts to staff or parents of the student
-         * Otherwise, hide it from everyone
+         * The combined effect of these two config vars determines who can see stuff.
+         * See SA-18747 for a truth table (note this might move to confluence soon)
+         *
+         * AlertLegal has now been separated from AlertMessages.
+         * This used to be thrown together with all the other alerts, but we've split them in Profile Editor
+         * for more granular control. As far as defaults go, use the same ones as above
          */
-        if ($this->getConfig()->get('synergetic_community_alerts')) {
-            $roletypes[self::ROLETYPE_STUDENT]['AlertMessages']['visibility'] = [self::ROLETYPE_STAFF, self::ROLETYPE_PARENT];
+        $protectStudentContacts = $this->getConfig()->get('protect_student_contacts');
+        $synergeticCommunityAlerts = $this->getConfig()->get('synergetic_community_alerts');
 
-            /* This used to be thrown together with all the other alerts, but we've split them in Profile Editor
-             * for more granular control. As far as defaults go, use the same ones as above
-             */
-            $roletypes[self::ROLETYPE_STUDENT]['AlertLegal']['visibility'] = [self::ROLETYPE_STAFF, self::ROLETYPE_PARENT];
+        /* sigh $protectStudentContacts is a string numeral,
+         * but $synergeticCommunityAlerts is a boolean.
+         */
+        if ('0' === $protectStudentContacts) {
+            if ($synergeticCommunityAlerts) {
+                $roletypes[self::ROLETYPE_STUDENT]['AlertMessages']['visibility'] = [self::ROLETYPE_STAFF, self::ROLETYPE_PARENT];
+                $roletypes[self::ROLETYPE_STUDENT]['AlertLegal']['visibility'] = [self::ROLETYPE_STAFF, self::ROLETYPE_PARENT];
+            } else {
+                $roletypes[self::ROLETYPE_STUDENT]['AlertMessages']['visibility'] = [];
+                $roletypes[self::ROLETYPE_STUDENT]['AlertLegal']['visibility'] = [];
+            }
+        } elseif ('1' === $protectStudentContacts) {
+            if ($synergeticCommunityAlerts) {
+                $roletypes[self::ROLETYPE_STUDENT]['AlertMessages']['visibility'] = [self::ROLETYPE_STAFF];
+                $roletypes[self::ROLETYPE_STUDENT]['AlertLegal']['visibility'] = [self::ROLETYPE_STAFF];
+            } else {
+                $roletypes[self::ROLETYPE_STUDENT]['AlertMessages']['visibility'] = [];
+                $roletypes[self::ROLETYPE_STUDENT]['AlertLegal']['visibility'] = [];
+            }
+        } elseif ('2' === $protectStudentContacts) {
+            if ($synergeticCommunityAlerts) {
+                $roletypes[self::ROLETYPE_STUDENT]['AlertMessages']['visibility'] = [self::ROLETYPE_STAFF, self::ROLETYPE_PARENT];
+                $roletypes[self::ROLETYPE_STUDENT]['AlertLegal']['visibility'] = [self::ROLETYPE_STAFF, self::ROLETYPE_PARENT];
+            } else {
+                $roletypes[self::ROLETYPE_STUDENT]['AlertMessages']['visibility'] = [];
+                $roletypes[self::ROLETYPE_STUDENT]['AlertLegal']['visibility'] = [];
+            }
         }
 
         /* protect_medicalspecial_profile
@@ -595,7 +626,7 @@ HELP;
          */
         if ($this->getConfig()->get('report_staff_access')) {
             $roletypes[self::ROLETYPE_STAFF]['StaffExtension']['visibility'][] = self::ROLETYPE_PARENT;
-            $roletypes[self::ROLETYPE_STAFF]['StaffCampusDescription']['visibility'][] = self::ROLETYPE_PARENT;
+            $roletypes[self::ROLETYPE_STAFF]['campusCollection']['visibility'][] = self::ROLETYPE_PARENT;
             $roletypes[self::ROLETYPE_STAFF]['StaffDepartment']['visibility'][] = self::ROLETYPE_PARENT;
             $roletypes[self::ROLETYPE_STAFF]['StaffCategoryDescription']['visibility'][] = self::ROLETYPE_PARENT;
             $roletypes[self::ROLETYPE_STAFF]['StaffDefaultMobilePhone']['visibility'][] = self::ROLETYPE_PARENT;

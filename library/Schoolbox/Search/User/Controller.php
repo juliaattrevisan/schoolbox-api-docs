@@ -83,7 +83,8 @@ class Controller extends BaseController
         private PastoralSubTypeMapper $pastoralSubTypeMapper,
         private PastoralDataSource $pastoralDataSource,
         private TermMapper $termMapper,
-        private \Schoolbox\External\User $userRelationHydrator
+        private \Schoolbox\External\User $userRelationHydrator,
+        private \Schoolbox\Admin\Profile\Editor\Field\Mapper $fieldMapper,
     ) {
     }
 
@@ -188,14 +189,60 @@ class Controller extends BaseController
      */
     private function renderStudent(User $student): void
     {
-        $externalUser = [];
+        $viewee = $student;
+        $viewer = $this->getUser();
 
-        /* Users might exist without a meaningful external identifier.
-         * If set, go find more info about this user.
+        /* Pastoral Count injection
          */
-        if ($student->getExternalId()) {
-            $externalUser = $this->externalUser->getStudent($student->getExternalId());
+        $showPastoral = $this->getConfigLoader()->get(ConfigMapper::NAME_PASTORAL_ENABLED) && $this->getAuthorizer()->isPathAuthorizedForUser(
+            'pastoral.getStudent',
+            [
+                'studentId' => $viewee->getId(),
+                'student'   => $viewee,
+            ],
+            $viewer
+        );
+
+        $pastoralCountHelper = null;
+        $pastoralCountPeriod = null;
+
+        if ($showPastoral) {
+            $pastoralCountHelper = (new PastoralCountHelper(
+                $this->routeGenerator,
+                $this->pastoralTypeMapper,
+                $this->pastoralSubTypeMapper,
+                $this->pastoralDataSource,
+                $this->termMapper
+            ));
+
+            $pastoralCountPeriod = (int)$this->getConfigLoader()->get(ConfigMapper::NAME_PASTORAL_FLAG_COUNT_PERIOD);
         }
+
+        /* Full Payload Construction
+         * $externalUser is the complete payload that we use to fulfil frontend
+         *
+         * Note this uses a callback to inject some data halfway through the compilation algorithm
+         * to service this extra widgety thing, Pastoral Counts
+         */
+        $externalUser = (new \Schoolbox\Profile\Field\Factory($this->fieldMapper, $this->userMapper, $this->externalUser))
+            ->produce($student, $this->getUser(), [
+                /* Inject pastoral counts so it executes in proper place deeper in the Factory
+                 * ...but only if Pastoral Counts were a renderable field, as per admin
+                 */
+                'pastoralCounts' => static function () use ($pastoralCountHelper, $pastoralCountPeriod, $viewee, $viewer) {
+                    if ($pastoralCountHelper && $pastoralCountPeriod) {
+                        return $pastoralCountHelper->countStudentEventsByTypes(
+                            $viewer,
+                            $viewee,
+                            null,
+                            null,
+                            $pastoralCountHelper->getStartDate($pastoralCountPeriod)
+                        );
+                    }
+
+                    return [];
+                }
+            ]);
 
         // Wrangle default colors
         $colors              = $this->timetableColourMapper->findAll()->reindex();
@@ -328,85 +375,6 @@ class Controller extends BaseController
             $groups[] = $group;
         }
 
-        // Load users for form teacher, tutor, etc.
-        $formTeacher = null;
-        if (isset($externalUser['TeacherFormID']) && (string)$externalUser['TeacherFormID'] !== '') {
-            try {
-                $formTeacher = $this->userMapper->findByExternalId($externalUser['TeacherFormID'], Role::STAFF);
-            } catch (MapperException $e) {
-                // noop
-            }
-        }
-        if (!$formTeacher && isset($externalUser['StudentFormStaffName']) && (string)$externalUser['StudentFormStaffName'] !== '') {
-            $formTeacher = $this->userMapper->createModel();
-            $formTeacher->setLastname($externalUser['StudentFormStaffName']);
-        }
-
-        /* Display their name if you couldn't find them in the db
-         * via their id (some sis don't have the id)
-         */
-        $tutorTeacher = null;
-        if (isset($externalUser['TeacherTutorID']) && (string)$externalUser['TeacherTutorID'] !== '') {
-            try {
-                $tutorTeacher = $this->userMapper->findByExternalId($externalUser['TeacherTutorID'], Role::STAFF);
-            } catch (MapperException $e) {
-                // noop
-            }
-        }
-        if (!$tutorTeacher && isset($externalUser['StudentTutorName']) && (string)$externalUser['StudentTutorName'] !== '') {
-            $tutorTeacher = $this->userMapper->createModel();
-            $tutorTeacher->setLastname($externalUser['StudentTutorName']);
-        }
-
-        $hohTeacher = null;
-        if (isset($externalUser['StudentHeadOfHouse']) && (string)$externalUser['StudentHeadOfHouse'] !== '') {
-            if ($externalUser['HeadOfHouseID']) {
-                try {
-                    $hohTeacher = $this->userMapper->findByExternalId($externalUser['HeadOfHouseID'], Role::STAFF);
-                } catch (MapperException $e) {
-                    $hohTeacher = $this->userMapper->createModel();
-                    $hohTeacher->setLastname($externalUser['StudentHeadOfHouse']);
-                }
-            } else {
-                $hohTeacher = $this->userMapper->createModel();
-                $hohTeacher->setLastname($externalUser['StudentHeadOfHouse']);
-            }
-        }
-
-        /* Display their name if you couldn't find them in the db
-         * via their id (some sis don't have the id)
-         */
-        $coordTeacher = null;
-        if (!empty($externalUser['StudentYearLevelCoordinator'])) {
-            if (!empty($externalUser['YearLevelCoordID'])) {
-                try {
-                    $coordTeacher = $this->userMapper->findByExternalId($externalUser['YearLevelCoordID'], Role::STAFF);
-                } catch (MapperException $e) {
-                    $coordTeacher = $this->userMapper->createModel();
-                    $coordTeacher->setLastname($externalUser['StudentYearLevelCoordinator']);
-                }
-            } else {
-                $coordTeacher = $this->userMapper->createModel();
-                $coordTeacher->setLastname($externalUser['StudentYearLevelCoordinator']);
-            }
-        }
-
-        // Get coach
-        $studentCoach = null;
-        if (!empty($externalUser['StudentCoach'])) {
-            if (!empty($externalUser['CoachID'])) {
-                try {
-                    $studentCoach = $this->userMapper->findByExternalId($externalUser['CoachID']);
-                } catch (MapperException $e) {
-                    $studentCoach = $this->userMapper->createModel();
-                    $studentCoach->setLastname($externalUser['StudentCoach']);
-                }
-            } else {
-                $studentCoach = $this->userMapper->createModel();
-                $studentCoach->setLastname($externalUser['StudentCoach']);
-            }
-        }
-
         // Load contact's user IDs
         $contacts = [];
         $contactList = [];
@@ -455,16 +423,7 @@ class Controller extends BaseController
             }
         }
 
-        $showPastoral =
-            $this->getConfigLoader()->get(ConfigMapper::NAME_PASTORAL_ENABLED)
-            && $this->getAuthorizer()->isPathAuthorizedForUser(
-                'pastoral.getStudent',
-                [
-                    'studentId' => $student->getId(),
-                    'student'   => $student,
-                ],
-                $this->getUser()
-            );
+
 
         $protectStudentContacts = $this->getConfigLoader()->get('protect_student_contacts');
 
@@ -496,7 +455,13 @@ class Controller extends BaseController
             }
         }
 
-        $teacherEmails = array_filter([$formTeacher, $tutorTeacher, $hohTeacher, $coordTeacher, $studentCoach]);
+        $teacherEmails = array_filter([
+            $externalUser['formTeacher'] ?? null,
+            $externalUser['tutorTeacher'] ?? null,
+            $externalUser['hohTeacher'] ?? null,
+            $externalUser['coordTeacher'] ?? null,
+            $externalUser['studentCoach'] ?? null,
+        ]);
 
         foreach ($teacherEmails as $object) {
             if ($object instanceof User) {
@@ -571,18 +536,6 @@ class Controller extends BaseController
             $canEmailStaff = false;
         }
 
-        $pastoralCounts = 0;
-        if ($showPastoral) {
-            $pastoralCountHelper = new PastoralCountHelper(
-                $this->routeGenerator,
-                $this->pastoralTypeMapper,
-                $this->pastoralSubTypeMapper,
-                $this->pastoralDataSource,
-                $this->termMapper
-            );
-            $pastoralCounts      = $pastoralCountHelper->countStudentEventsByTypes($this->getUser(), $student, null, null, $pastoralCountHelper->getStartDate((int)$this->getConfigLoader()->get(ConfigMapper::NAME_PASTORAL_FLAG_COUNT_PERIOD)));
-        }
-
         // Does the current user share a campus with the student?
         // This may matter for multi-school deployments.
         // Eventually: this will likely be made a config setting with wider
@@ -592,31 +545,51 @@ class Controller extends BaseController
         $this->response = $this->responseFromTemplate(
             'user/student.twig',
             [
-                'session'                  => $_SESSION,
-                'user'                     => $student,
+                /* Profile Editor
+                 */
+                /* This is an augmented object consisting of schoolbox user fields
+                 * and external sis fields from the External Interface (hybrid theory)
+                 */
                 'externalUser'             => $externalUser,
+                /* Profile screens can have their own roletype-specific name format
+                 */
+                'nameFormat'               => $this->getConfigLoader()->get('name_format_student'),
+                /* The viewee's User instance - sadly, very easy to confuse with USER global, which means
+                 * the viewer, so be careful with that
+                 */
+                'user'                     => $student,
+                /* Takes into account whether the viewer has the View Student Profile role permission
+                 * in addition to some other standard checks for Guest-ness. We need to keep that.
+                 * Most user details are in a block that is toggled by this var
+                 */
+                'showDetails'              => $showDetails,
+                /* Decides if pastoral buttons and stuff actually exist beyond our Availability and
+                 * Visibility settings (ie. does your user have permissions etc to this place)
+                 *
+                 * We needed to keep this
+                 */
                 'showPastoral'             => $showPastoral,
-                'pastoralCounts'           => $pastoralCounts,
+
+                /* Old implementation
+                 */
+                'session'                  => $_SESSION,
+                /* This is mostly superseded by user.showTimetable in twig
+                 */
+                'showClasses'              => $showClasses,
+
                 'eportfolioAuth'           => $this->eportfolioAuthenticator->canView(),
                 'hideContacts'             => $hideContacts,
-                'showClasses'              => $showClasses,
                 'now'                      => Alaress_Date_Format::now(),
                 'boarderType'              => $this->externalUser->determineBoarderType(isset($externalUser['StudentBoarder']) ? (string)$externalUser['StudentBoarder'] : null),
                 'contacts'                 => $contacts,
                 'subjects'                 => $subjects,
                 'customButtons'            => $customButtons,
                 'groups'                   => $groups,
-                'formTeacher'              => $formTeacher,
-                'tutorTeacher'             => $tutorTeacher,
-                'hohTeacher'               => $hohTeacher,
-                'coordTeacher'             => $coordTeacher,
-                'studentCoach'             => $studentCoach,
                 'isParentOfStudent'        => $isParentOfStudent,
                 'isPrimaryCarer'           => $isPrimaryCarer,
                 'allTeacherIds'            => implode(',', $allTeacherIds),
                 'pdStates'                 => $this->professionalDevelopmentMapper->getStates(),
                 'pd'                       => $pd,
-                'showDetails'              => $showDetails,
                 'showEmail'                => $showEmails,
                 'travelLogs'               => $travelLogs,
                 'learningMomentCanComment' => $learningMomentCanComment,

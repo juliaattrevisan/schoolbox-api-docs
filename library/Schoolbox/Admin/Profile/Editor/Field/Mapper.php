@@ -11,6 +11,8 @@ declare(strict_types=1);
 namespace Schoolbox\Admin\Profile\Editor\Field;
 
 use Alaress\Database\Predicate\Builder;
+use DebugBar\DebugBarException;
+use Schoolbox\Admin\Profile\Editor\Payload;
 use Schoolbox\GenericCollection;
 use Schoolbox\Mapper\DefinitionException;
 use Schoolbox\Mapper\Exception;
@@ -45,6 +47,7 @@ class Mapper extends \Schoolbox\Mapper
         $this->uses('term', self::TYPE_STRING);
         $this->uses('icon', self::TYPE_STRING);
         $this->uses('css', self::TYPE_STRING);
+        $this->uses('click_to_reveal', self::TYPE_INTEGER);
 
         $this->hasJoin(
             'availabilityCampus',
@@ -157,8 +160,10 @@ class Mapper extends \Schoolbox\Mapper
      * @param User $viewer
      * @return GenericCollection
      * @throws Exception
+     * @throws DebugBarException
      * @throws \PDOException
      * @throws \UnexpectedValueException
+     * @throws DefinitionException
      */
     public function findRenderableFields(\Schoolbox\User $viewee, \Schoolbox\User $viewer): GenericCollection
     {
@@ -186,28 +191,82 @@ class Mapper extends \Schoolbox\Mapper
 
         /* Find an ordered list of fields there enabled for $viewee.
          * This is the maximum fields that could be rendered on a profile screen
+         *
+         * Note that if you're viewing your own profile, we need to include fields assigned
+         * the SELF pseudo-roletype. If you're viewing someone else's profile, we can
+         * exclude any fields with the SELF pseudo-roletype.
          */
-        $query = "
-            SELECT f.*
-            FROM {$this->getTable()} f
-            INNER JOIN profile_field_campus_availability pfca ON f.id = pfca.profile_field_id
-            INNER JOIN profile_field_roletype_visibility pfrv ON f.id = pfrv.profile_field_id
-            WHERE f.roletype = :vieweeRoleType
-            AND pfca.campus_id IN {$vieweeCampusPlaceholders}
-            AND pfrv.roletype = :viewerRoleType
-            AND f.enabled = :enabled
-            ORDER BY f.sequence ASC 
-        ";
+        if ($viewee->getId() === $viewer->getId()) {
+            $query = "
+                SELECT DISTINCT
+                    f.*, 
+                    {$this->getJoinColumnString('visibility', 'pfrv')}
+                FROM {$this->getTable()} f
+                INNER JOIN profile_field_campus_availability pfca ON f.id = pfca.profile_field_id
+                INNER JOIN profile_field_roletype_visibility pfrv ON f.id = pfrv.profile_field_id
+                WHERE f.roletype = :vieweeRoleType
+                AND pfca.campus_id IN {$vieweeCampusPlaceholders}
+                AND (pfrv.roletype = :viewerRoleType OR pfrv.roletype = :selfRoleType)
+                AND f.enabled = :enabled
+                ORDER BY f.sequence ASC 
+            ";
+
+            $params['selfRoleType'] = Payload::ROLETYPE_SELF;
+        } elseif ($viewee->getRole()->isStudent() && $viewer->getRole()->isParent() && !$viewer->isParentOf($viewee)) {
+            /* Intentionally exit early when parents view students outside of their family
+             * Literally show nothing
+             */
+            return $collection;
+        } else {
+            $query = "
+                SELECT DISTINCT 
+                    f.*, 
+                    {$this->getJoinColumnString('visibility', 'pfrv')}
+                FROM {$this->getTable()} f
+                INNER JOIN profile_field_campus_availability pfca ON f.id = pfca.profile_field_id
+                INNER JOIN profile_field_roletype_visibility pfrv ON f.id = pfrv.profile_field_id
+                WHERE f.roletype = :vieweeRoleType
+                AND pfca.campus_id IN {$vieweeCampusPlaceholders}
+                AND pfrv.roletype = :viewerRoleType
+                AND f.enabled = :enabled
+                ORDER BY f.sequence ASC 
+            ";
+        }
 
         $statement = $this->getDatabase()->prepare($query);
         $statement->execute($params);
 
-        while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
-            $field = $this->hydrate($row);
+        /* Allow each roletype's visibility rule to be further analysed in twig land
+         * because there are additional constraints which reduce this set of visibilities,
+         * such as configuration of a user account or some other rule that isn't in
+         * this sql query itself (also, some schools override this in custom work)
+         */
+        /** @var \Schoolbox\Admin\Profile\Editor\Field\Visibility\Mapper $visibilityMapper */
+        $visibilityMapper = $this->getJoinMapper('visibility');
 
-            if ($field) {
-                $collection->add($field);
+        /* Additional visibility rules to be checked in twig land
+         */
+        while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
+            $instance = $this->hydrate($row);
+
+            /* Start collating visibilities here
+             */
+            if ($instance && null === $collection->getOffset($instance->getId())) {
+                $instance->setVisibility($visibilityMapper->createCollection());
+                $collection->setOffset($instance->getId(), $instance);
             }
+
+            $field = $collection->getOffset($instance->getId());
+
+            /* Remember the visibility rules for further scrutiny
+             */
+            /** @var Visibility\Model $visibility */
+            $visibility = $visibilityMapper->hydrate($row, 'pfrv');
+
+            /* Could set up a circular reference here, but probably not needed
+             *   $visibility->setField($field);
+             */
+            $field->getVisibility()->setOffset($visibility->getRoleType(), $visibility);
         }
 
         return $collection;

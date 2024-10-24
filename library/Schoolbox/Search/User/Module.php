@@ -67,7 +67,8 @@ class Module extends BaseModule
                 new \External_Class(),
                 new \External_User(),
                 $this->getMapperFactory()->get(UserMapper::class)
-            )
+            ),
+            $this->getMapperFactory()->get(\Schoolbox\Admin\Profile\Editor\Field\Mapper::class),
         );
     }
 

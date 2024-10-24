@@ -12,6 +12,7 @@ CREATE TABLE `profile_field` (
     `term` varchar(255) NULL,
     `icon` varchar(255) NULL,
     `css` varchar(255) NULL,
+    `click_to_reveal` tinyint(4) NOT NULL DEFAULT 0,
     PRIMARY KEY (`id`),
     UNIQUE KEY `roletype_field` (`roletype`,`field`),
     KEY `roletype` (`roletype`),

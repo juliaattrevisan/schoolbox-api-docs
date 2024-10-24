@@ -10,7 +10,9 @@ declare(strict_types=1);
 namespace Schoolbox\Profile\Field;
 
 use Alaress\Database\Predicate\InvalidColumnException;
+use DebugBar\DebugBarException;
 use Schoolbox\Admin\Profile\Editor\Field\Mapper;
+use Schoolbox\Mapper\DefinitionException;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Role;
 use Schoolbox\User;
@@ -38,16 +40,23 @@ class Factory
      * that $viewer was able to see,
      * ordered by sequence ascending
      *
+     * $mutatorIndex is a set of optional callbacks indexed by field name that
+     * allows you to fetch its particular value from an expensive place only
+     * when it's needed.
+     *
      * @param User $viewee
      * @param User $viewer
+     * @param array|null $mutatorIndex
      * @return array
+     * @throws DebugBarException
+     * @throws DefinitionException
      * @throws InvalidColumnException
      * @throws MapperException
      * @throws \DomainException
      * @throws \PDOException
      * @throws \UnexpectedValueException
      */
-    public function produce(\Schoolbox\User $viewee, \Schoolbox\User $viewer): array
+    public function produce(\Schoolbox\User $viewee, \Schoolbox\User $viewer, ?array $mutatorIndex = []): array
     {
         $payload = [
             'locale' => null,
@@ -69,12 +78,28 @@ class Factory
 
         /** @var \Schoolbox\Admin\Profile\Editor\Field\Model $renderableField */
         foreach ($renderableFields as $renderableField) {
-            $payload['roleTypes']['fields']['selected'][] = [
+            $node = [
                 'field' => $renderableField->getField(),
                 'displayAs' => $renderableField->getDisplayAs(),
                 'terminology' => $renderableField->getTerm(),
+                'icon' => $renderableField->getIcon(),
+                'css' => $renderableField->getCss(),
+                'clickToReveal' => $renderableField->getClickToReveal(),
                 'value' => $referenceFields[$renderableField->getField()] ?? null
             ];
+
+            /* Some aftermarket data that isn't part of the externals and needs to be fetched
+             * from a context outside of this factory. This started with Pastoral Counts that
+             * needs various controller-specific instances that are annoying to inject here
+             *
+             * Find out if $mutator has a callback indexed by the current renderableField's name
+             * If there is, use that as the value
+             */
+            if (isset($mutatorIndex[$renderableField->getField()])) {
+                $node['value'] = $mutatorIndex[$renderableField->getField()]();
+            }
+
+            $payload['roleTypes']['fields']['selected'][] = $node;
         }
 
         /* The preprocessed payload that frontend can just use
@@ -121,8 +146,8 @@ class Factory
      *
      * @param User $viewee
      * @return array
-     * @throws MapperException
      * @throws InvalidColumnException
+     * @throws MapperException
      */
     private function generateStudentReferenceFields(\Schoolbox\User $viewee): array
     {
@@ -134,9 +159,6 @@ class Factory
                 $externalUser['AlertMessages'] = $externalUser['AlertMessage'];
             } else {
                 $externalUser['AlertMessages'] = empty($externalUser['AlertMessage']) ? [] : [trim($externalUser['AlertMessage'])];
-            }
-            if (isset($externalUser['CourtOrderType']) && (trim($externalUser['CourtOrderType']) !== '')) {
-                $externalUser['AlertMessages'][] = 'Court Order - ' . trim($externalUser['CourtOrderType']);
             }
         }
 
@@ -239,6 +261,14 @@ class Factory
             }
         }
 
+        /* For convenience, collate the campus names here
+         */
+        $campusNames = '';
+
+        if ($viewee->getCampusCollection()) {
+            $campusNames = implode(', ', $viewee->getCampusCollection()->indexBy('name')->keys());
+        }
+
         /* Hybrid Theory
          */
         $referenceFields = [
@@ -246,8 +276,14 @@ class Factory
             'email' => $viewee->getEmail(),
             'externalId' => $viewee->getExternalId(),
             'role' => $viewee->getRole()->getName(),
-            'residentialHouse' => $viewee->getResidentialHouse()->getHouse(),
-            'campus' => $viewee->getCampusCollection(),
+            /* ResidentialHouse can indeed be null: storm and phpstannis have different ideas
+             */
+            /** @phpstan-ignore-next-line */
+            'residentialHouse' => $viewee->getResidentialHouse()?->getHouse(),
+            /* Favour schoolbox's data over the sis' data
+             */
+            'yearLevel' => $viewee->getYear()?->getName() ?? '',
+            'campusCollection' => $campusNames,
             /* This is an arbitrary set of people associated with $viewee somehow
              * They might (or might not) have actual schoolbox user accounts
              */
@@ -256,13 +292,19 @@ class Factory
             'hohTeacher' => $hohTeacher,
             'coordTeacher' => $coordTeacher,
             'studentCoach' => $studentCoach,
-            /* TODO A specially crafted pastoral thing
-             *  Push that in when the time comes
+            /* Pastoral Counts was obtained specially in the controller cos it needs
+             * a bunch of little bits and pieces; use the callback to populate it
              */
-            'pastoralFlags' => null
+            'pastoralCounts' => null
         ];
 
         return array_merge($externalUser, $referenceFields);
+//
+//        /* Mutate $result with an optional callback...such as that pastoral counts stuff
+//         */
+//        if (null !== $mutator) {
+//            $result = $mutator($result);
+//        }
     }
 
 
