@@ -7,7 +7,7 @@ use Alaress\Authorizer\GetRouteIfAuthorized;
 use Aura\Router\Generator;
 use Schoolbox\Curriculum\Node\Model as CurriculumNodeModel;
 use Schoolbox\Curriculum\Reports\Translator\UnitAssessmentUsage as UnitAssessmentUsageTranslator;
-use Schoolbox\Learning\Course\DataModel\Specification\Model;
+use Schoolbox\Learning\Course\DataModel\Specification\Model as CourseSpecificationModel;
 use Schoolbox\User;
 
 class CourseUsage
@@ -22,7 +22,6 @@ class CourseUsage
      * @param User                          $currentUser
      * @param UnitAssessmentUsageTranslator $unitAssessmentUsageUsageTranslator
      * @param array                         $courseUnitSpec
-     * @param ?array                        $counts A set of usage counts for each node to be translated.
      */
     public function __construct(
         protected Generator $routeGenerator,
@@ -30,43 +29,57 @@ class CourseUsage
         protected User $currentUser,
         private UnitAssessmentUsageTranslator $unitAssessmentUsageUsageTranslator,
         private array $courseUnitSpec,
-        private ?array $counts,
     ) {
     }
 
     /**
-     * @param Model                 $model
-     * @param CurriculumNodeModel   $node
+     * @param CourseSpecificationModel  $course
+     * @param CurriculumNodeModel       $node
+     * @param array                     $counts
      * @return array
      */
-    public function __invoke(Model $model, CurriculumNodeModel $node): array
-    {
-        return $this->translate($model, $node);
+    public function __invoke(
+        CourseSpecificationModel $course,
+        CurriculumNodeModel $node,
+        array $counts
+    ): array {
+        return $this->translate($course, $node, $counts);
     }
 
-    private function translate(Model $model, CurriculumNodeModel $node): array
-    {
+    private function translate(
+        CourseSpecificationModel $course,
+        CurriculumNodeModel $node,
+        array $counts
+    ): array {
 
-        $courseCount = $this->counts['courseSpecification'][$node->getId()][$model->getId()] ?? 0;
+        $courseCount = $counts[$node->getId()][$course->getId()]['courseSpecification'] ?? 0;
 
         return [
-            'id'    => $model->getId(),
-            'name'  => $model->getTitle(),
-            'usage'  => [
+            'id'    => $course->getId(),
+            'name'  => $course->getTitle(),
+            'usage' => [
                 'course' => [
                     'count' => $courseCount
                 ]
             ],
-            'units' => [
-                array_map(
-                    fn($unit) =>
-                    call_user_func(
-                        $this->unitAssessmentUsageUsageTranslator,
-                        $unit,
-                        $node
-                    ),
-                    $this->courseUnitSpec[$model->getId()]->getAll()
-                )
+            'units' => array_map(
+                fn($unit) => call_user_func(
+                    $this->unitAssessmentUsageUsageTranslator,
+                    $unit,
+                    $node,
+                    $counts
+                ),
+                $this->courseUnitSpec[$course->getId()]->getAll()
+            ),
+            '_links'        => [
+                'modify' => $this->getRouteIfAuthorized(
+                    'course.modifyCourse',
+                    ['id' => $course->getId(), 'course' => $course],
+                ),
+                'delete' => $this->getRouteIfAuthorized(
+                    'course.deleteCourseSpecification',
+                    ['id' => $course->getId(), 'course' => $course],
+                ),
             ]
         ];
     }

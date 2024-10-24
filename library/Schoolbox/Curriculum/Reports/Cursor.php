@@ -28,6 +28,15 @@ class Cursor implements ICursor
      */
     public const LIMIT_DEFAULT = self::LIMIT_MAX;
 
+    public const COURSE_COURSE_SPECIFICATION = 'courseSpecification';
+    public const COURSE_UNIT = 'unit';
+    public const COURSE_ACTIVITY_TASK = 'task';
+    public const COURSE_ACTIVITY_QUIZ = 'quiz';
+    public const COURSE_ACTIVITY_LTI = 'LTI';
+    public const COURSE_ACTIVITY_DUE_WORK = 'dueWork';
+    public const COURSE_ACTIVITY_PROJECT = 'project';
+    public const COURSE_ACTIVITY_LESSON_PLAN = 'lessonPlan';
+
     public function __construct(
         private CurriculumMapper $curriculumMapper,
         private array $courseId,
@@ -70,49 +79,11 @@ class Cursor implements ICursor
         $nodes = [];
 
         foreach ($this->nodeId as $nodeId) {
-
-//            if (empty($results)) {
-//                continue;
-//            }
-
-//            echo '<pre>', var_dump(array_column($results, 'curriculum_node_id')) , '</pre>';
-
-//            $existingNodes = $this->curriculumMapper->findByColumn('id', $allLineageNodeIds);
-
-//            echo '<pre>', var_dump($existingNodes) , '</pre>';
-//            echo '<pre>', var_dump(Collection::arrayColumn($existingNodes, 'id')) , '</pre>';
-//            echo '<pre>', var_dump(array_column($existingNodes->getAll(), 'id')) , '</pre>';
-//            die();
-//            $gg = $this->curriculumMapper->findFamilyTreeIds([$nodeId], 'curriculum_node_parent_id');
-//            $gg = $this->curriculumMapper->findByColumn('id', $gg);
-//            $tree = $this->curriculumMapper->getCollectionAsTree($gg);
-
-//            $tree = $this->curriculumMapper->getCollectionAsTree(
-//                $this->curriculumMapper->findAll(),
-//                'parent',
-//                'children',
-//            );
-//
-//            $tree->map(fn($g) => var_dump($g->getID()));
-//
-//            die();
-
             $test = $this->curriculumMapper->findById($nodeId);
             $collect = $this->curriculumMapper->loadDescendants($test);
 
             $collect = $this->curriculumMapper->getModelAsCollection($collect);
 
-//            echo '<pre>', var_dump($collect) , '</pre>';
-//            $collect->map(fn($g) => var_dump($g->getID()));
-
-//            echo '<pre>', var_dump() , '</pre>';
-//            echo '<pre>', var_dump($tree->map(fn($node) => $node->getId())) , '</pre>';
-//            die();
-//            foreach ($existingNodes as $exitingNode) {
-//                echo '<pre>', var_dump($exitingNode->getId()) , '</pre>';
-//                echo '<pre>', var_dump($exitingNode->getParent()) , '</pre>';
-////                echo '<pre>', var_dump('') , '</pre>';
-//            }
             $nodes[] = $collect;
         }
 
@@ -127,9 +98,7 @@ class Cursor implements ICursor
 
         $db = $this->curriculumMapper->getDatabase();
 
-        $count = [];
-
-        $nodes = [];
+        $counts = [];
 
         foreach ($this->nodeId as $nodeId) {
             $allLineageNodeIds = array_merge(
@@ -137,48 +106,37 @@ class Cursor implements ICursor
                 $this->curriculumMapper->findDescendantIds([$nodeId], 'curriculum_node_parent_id')
             );
 
-            $findOptions = [
-                'limit' => $this->limit,
-            ];
-
             $nodesPlaceHolder = Builder::getArrayPlaceholders($allLineageNodeIds, 'nodes');
             $params           = Builder::getArrayParameters($allLineageNodeIds, 'nodes');
 
             $courseCountQuery = sprintf(
                 "
-                SELECT 'courseSpecification' type, cnfc.curriculum_node_id, cs.id courseSpecId, null unitId, COUNT(*) count
+                SELECT '%s' type, cnfc.curriculum_node_id, cs.id courseSpecId, null unitId, COUNT(*) count
                 FROM course_specification cs
                 INNER JOIN curriculum_node_for_category cnfc ON cs.folder_id = cnfc.category_id AND cs.id IN %s
                 WHERE cnfc.curriculum_node_id IN %s
                 GROUP BY cnfc.curriculum_node_id, cs.id
                 ",
+                self::COURSE_COURSE_SPECIFICATION,
                 $inCourseId,
                 $nodesPlaceHolder
             );
 
-
-//            $courseCountResult = $db->executeQuery($courseCountQuery, $params)->fetchAll();
-
-//            echo '<pre>', var_dump($courseCountResult) , '</pre>';
-
             $unitCountQuery = sprintf(
                 "
-                SELECT 'unit' type, cnfc.curriculum_node_id, cus.course_specification_id courseSpecId, cus.folder_id unitId, COUNT(*) count
+                SELECT '%s' type, cnfc.curriculum_node_id, cus.course_specification_id courseSpecId, cus.folder_id unitId, COUNT(*) count
                 FROM course_unit_specification cus
                 INNER JOIN curriculum_node_for_category cnfc
                     ON cnfc.category_id = cus.folder_id AND cnfc.curriculum_node_id IN %s
                 WHERE cus.course_specification_id IN %s
                 GROUP BY cnfc.curriculum_node_id, cus.course_specification_id
             ",
+                self::COURSE_UNIT,
                 $nodesPlaceHolder,
                 $inCourseId
             );
 
-//            $unitCountResult = $db->executeQuery($unitCountQuery, $params)->fetchAll();
-
-//            echo '<pre>', var_dump($unitCountResult) , '</pre>';
-
-            $unitActivityLessonPlanCountQuery = sprintf(
+            $unitActivityCountQuery = sprintf(
                 "
                 SELECT
                     activity.type,
@@ -187,22 +145,53 @@ class Cursor implements ICursor
                     cus.folder_id as unitId,
                     COUNT(cnfa.curriculum_node_id) as count
                 FROM (
-                     SELECT 'task' type, t.assessment_id
+                     SELECT '%s' type, t.assessment_id
                      FROM task t
                      UNION
-                     SELECT 'quiz' type, a.assessment_id
+                     SELECT '%s' type, a.assessment_id
                      FROM assess a
                      UNION
-                     SELECT 'LTI' type, lti.assessment_id
+                     SELECT '%s' type, lti.assessment_id
                      FROM lti_assessment lti
                      UNION
-                     SELECT 'dueWork' type, sbox.assessment_id
+                     SELECT '%s' type, sbox.assessment_id
                      FROM submission_box sbox
                      UNION
-                     SELECT 'project' type, p.assessment_id
+                     SELECT '%s' type, p.assessment_id
                      FROM project p
                      UNION
-                     SELECT 'lessonPlan' type, lp.assessment_id
+                     SELECT '%s' type, lp.assessment_id
+                     FROM lesson_plan lp
+                ) activity
+                INNER JOIN curriculum_node_for_assessment cnfa
+                    ON cnfa.assessment_id = activity.assessment_id
+                    AND cnfa.curriculum_node_id IN %s
+                INNER JOIN assessment_course_unit_specification acus ON acus.assessment_id = cnfa.assessment_id
+                INNER JOIN course_unit_specification cus
+                        ON cus.id = acus.course_unit_specification_id
+                        AND cus.course_specification_id IN %s
+                GROUP BY type, cnfa.curriculum_node_id, cus.course_specification_id, cus.folder_id
+            ",
+                self::COURSE_ACTIVITY_TASK,
+                self::COURSE_ACTIVITY_QUIZ,
+                self::COURSE_ACTIVITY_LTI,
+                self::COURSE_ACTIVITY_DUE_WORK,
+                self::COURSE_ACTIVITY_PROJECT,
+                self::COURSE_ACTIVITY_LESSON_PLAN,
+                $nodesPlaceHolder,
+                $inCourseId
+            );
+
+            $unitLessonPlanCountQuery = sprintf(
+                "
+                SELECT
+                    activity.type,
+                    cnfa.curriculum_node_id,
+                    cus.course_specification_id courseSpecId,
+                    cus.folder_id as unitId,
+                    COUNT(cnfa.curriculum_node_id) as count
+                FROM (
+                     SELECT '%s' type, lp.assessment_id
                      FROM lesson_plan lp
                 ) activity
                 INNER JOIN curriculum_node_for_assessment cnfa
@@ -214,28 +203,35 @@ class Cursor implements ICursor
                         AND cus.course_specification_id IN %s
                 GROUP BY activity.type, cnfa.curriculum_node_id, cus.course_specification_id, cus.folder_id
             ",
+                self::COURSE_ACTIVITY_LESSON_PLAN,
                 $nodesPlaceHolder,
                 $inCourseId
             );
 
-//            $unitActivityLessonPlanCountResult = $db->executeQuery($unitActivityLessonPlanCountQuery, $params)->fetchAll();
-
-//            $results = array_merge($courseCountResult, $unitCountResult, $unitActivityLessonPlanCountResult);
-
-            $megaQuery = '( ' . implode(' ) UNION ( ', [$courseCountQuery, $unitCountQuery, $unitActivityLessonPlanCountQuery]) . ' )';
+            $megaQuery = '( ' .
+                implode(
+                    ' ) UNION ( ',
+                    [
+                        $courseCountQuery,
+                        $unitCountQuery,
+                        $unitActivityCountQuery,
+                        $unitLessonPlanCountQuery
+                    ]
+                ) . ' )';
 
             $query = $db->executeQuery($megaQuery, $params);
 
             foreach ($query->fetchAll() as $row) {
                 $type = $row['type'];
-                if ($type === 'courseSpecification') {
-                    $count[$type][$row['curriculum_node_id']][$row['courseSpecId']] = $row['count'];
+                if ($type === self::COURSE_COURSE_SPECIFICATION) {
+                    $counts[$row['curriculum_node_id']][$row['courseSpecId']][$type] = $row['count'];
                 } else {
-                    $count[$type][$row['curriculum_node_id']][$row['courseSpecId']][$row['unitId']] = $row['count'];
+                    $counts[$row['curriculum_node_id']][$row['courseSpecId']][$row['unitId']][$type] = $row['count'];
                 }
             }
         }
-        return $count;
+
+        return $counts;
     }
 
     /**

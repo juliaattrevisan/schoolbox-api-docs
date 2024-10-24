@@ -23,6 +23,7 @@ class ModelToArray
      * @param User                  $currentUser
      * @param CourseUsageTranslator $courseUsageTranslator
      * @param Collection            $courseSpec
+     * @param array                 $counts A set of usage counts for each node to be translated.
      */
     public function __construct(
         protected Generator $routeGenerator,
@@ -30,6 +31,7 @@ class ModelToArray
         protected User $currentUser,
         private CourseUsageTranslator $courseUsageTranslator,
         private Collection $courseSpec,
+        private array $counts
     ) {
     }
 
@@ -65,43 +67,38 @@ class ModelToArray
             'id'            => $node->getId(),
             'name'          => $node->getName(),
             'code'          => $node->getCode(),
-//            'reference'     => $node->getReference(),
-//            'description'   => $node->getDescription(),
-//            'enabled'       => $node->getEnabled(),
-            'children'      => $children,
-//            'order'         => $node->getOrder(),
-//            'createdAt'     => $node->getCreatedAt()->toRfc3339String(),
-//            'modifiedAt'    => $node->getModifiedAt()->toRfc3339String(),
-            'usage'  => [
+            'usage'         => [
                 'courses' =>
                     array_map(
                         fn($course) =>
                         call_user_func(
                             $this->courseUsageTranslator,
                             $course,
-                            $node
+                            $node,
+                            $this->counts
                         ),
                         $this->courseSpec->getAll()
                     )
-            ]
-//            '_links'        => [
-//                'read' => $this->getRouteIfAuthorized(
-//                    'curriculumApi.getNode',
-//                    ['id' => $node->getId(), 'node' => $node],
-//                ),
-//                'update' => $this->getRouteIfAuthorized(
-//                    'curriculumApi.putNode',
-//                    ['id' => $node->getId(), 'node' => $node],
-//                ),
-//                'delete' => $this->getRouteIfAuthorized(
-//                    'curriculumApi.deleteNode',
-//                    ['id' => $node->getId(), 'node' => $node],
-//                ),
-//                'getUsage' => $this->getRouteIfAuthorized(
-//                    'curriculumApiUsage.getNodeUsage',
-//                    ['id' => $node->getId(), 'node' => $node],
-//                ),
-//            ],
+            ],
+            'children'      => $children,
+            '_links'        => [
+                'read' => $this->getRouteIfAuthorized(
+                    'curriculumApi.getNode',
+                    ['id' => $node->getId(), 'node' => $node],
+                ),
+                'update' => $this->getRouteIfAuthorized(
+                    'curriculumApi.putNode',
+                    ['id' => $node->getId(), 'node' => $node],
+                ),
+                'delete' => $this->getRouteIfAuthorized(
+                    'curriculumApi.deleteNode',
+                    ['id' => $node->getId(), 'node' => $node],
+                ),
+                'getUsage' => $this->getRouteIfAuthorized(
+                    'curriculumApiUsage.getNodeUsage',
+                    ['id' => $node->getId(), 'node' => $node],
+                ),
+            ],
         ];
     }
 }

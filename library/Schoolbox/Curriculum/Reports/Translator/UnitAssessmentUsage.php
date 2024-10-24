@@ -5,7 +5,8 @@ namespace Schoolbox\Curriculum\Reports\Translator;
 use Alaress\Authorizer\Authorizer;
 use Alaress\Authorizer\GetRouteIfAuthorized;
 use Aura\Router\Generator;
-use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as Model;
+use Schoolbox\Curriculum\Reports\Cursor;
+use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as CourseUnitModel;
 use Schoolbox\Curriculum\Node\Model as CurriculumNodeModel;
 use Schoolbox\User;
 
@@ -19,43 +20,43 @@ class UnitAssessmentUsage
      * @param Generator     $routeGenerator
      * @param Authorizer    $authorizer
      * @param User          $currentUser
-     * @param ?array        $counts A set of usage counts for each node to be translated.
      */
     public function __construct(
         protected Generator $routeGenerator,
         protected Authorizer $authorizer,
         protected User $currentUser,
-        private ?array $counts,
     ) {
     }
 
     /**
-     * @param Model               $model
-     * @param CurriculumNodeModel $node
+     * @param CourseUnitModel       $unit
+     * @param CurriculumNodeModel   $node
+     * @param array                 $counts
      * @return array
      */
-    public function __invoke(Model $model, CurriculumNodeModel $node): array
+    public function __invoke(CourseUnitModel $unit, CurriculumNodeModel $node, array $counts): array
     {
-        return $this->translate($model, $node);
+        return $this->translate($unit, $node, $counts);
     }
 
-    private function translate(Model $model, CurriculumNodeModel $node): array
+    private function translate(CourseUnitModel $unit, CurriculumNodeModel $node, array $counts): array
     {
+        $unitUsage = $counts[$node->getId()][$unit->getCourse()->getId()][$unit->getFolder()->getId()] ?? null;
         $unitCount =
-            $this->counts['unit'][$node->getId()][$model->getCourse()->getId()][$model->getFolder()->getId()] ?? 0;
+            $unitUsage[Cursor::COURSE_UNIT] ?? 0;
         $activityCount =
-            ($this->counts['task'][$node->getId()][$model->getCourse()->getId()][$model->getFolder()->getId()] ?? 0) +
-            ($this->counts['quiz'][$node->getId()][$model->getCourse()->getId()][$model->getFolder()->getId()] ?? 0) +
-            ($this->counts['LTI'][$node->getId()][$model->getCourse()->getId()][$model->getFolder()->getId()] ?? 0) +
-            ($this->counts['dueWork'][$node->getId()][$model->getCourse()->getId()][$model->getFolder()->getId()] ?? 0) +
-            ($this->counts['project'][$node->getId()][$model->getCourse()->getId()][$model->getFolder()->getId()] ?? 0);
+            ($unitUsage[Cursor::COURSE_ACTIVITY_TASK] ?? 0) +
+            ($unitUsage[Cursor::COURSE_ACTIVITY_QUIZ] ?? 0) +
+            ($unitUsage[Cursor::COURSE_ACTIVITY_LTI] ?? 0) +
+            ($unitUsage[Cursor::COURSE_ACTIVITY_DUE_WORK] ?? 0) +
+            ($unitUsage[Cursor::COURSE_ACTIVITY_PROJECT] ?? 0);
         $lessonPlanCount =
-            ($this->counts['lessonPlan'][$node->getId()][$model->getCourse()->getId()][$model->getFolder()->getId()] ?? 0);
+            ($unitUsage[Cursor::COURSE_ACTIVITY_LESSON_PLAN] ?? 0);
 
         return [
-            'id'    => $model->getFolder()->getId(),
-            'name'  => $model->getTitle(),
-            'usage'  => [
+            'id'    => $unit->getFolder()->getId(),
+            'name'  => $unit->getTitle(),
+            'usage' => [
                 'unit' => [
                     'count' => $unitCount
                 ],
@@ -65,6 +66,16 @@ class UnitAssessmentUsage
                 'lessonPlan' => [
                     'count' => $lessonPlanCount
                 ]
+            ],
+            '_links' => [
+                'modify' => $this->getRouteIfAuthorized(
+                    'folder.getFolderModify',
+                    ['id' => $unit->getFolder()->getId(), 'folder' => $unit->getFolder()],
+                ),
+                'delete' => $this->getRouteIfAuthorized(
+                    'folder.deleteFolder',
+                    ['id' => $unit->getFolder()->getId(), 'folder' => $unit->getFolder()],
+                ),
             ]
         ];
     }
