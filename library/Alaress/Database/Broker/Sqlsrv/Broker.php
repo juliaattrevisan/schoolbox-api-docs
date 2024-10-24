@@ -124,6 +124,14 @@ class Broker extends Base
     /**
      * @inheritdoc
      */
+    public function getDriver(): string
+    {
+        return 'sqlsrv';
+    }
+
+    /**
+     * @inheritdoc
+     */
     public function getDsn()
     {
         $portString = '';
@@ -139,7 +147,7 @@ class Broker extends Base
         }
 
         return
-            "sqlsrv:Server={$this->connector->getHostname()}{$portString};" .
+            "{$this->getDriver()}:Server={$this->connector->getHostname()}{$portString};" .
             "Database={$this->connector->getDatabase()};" .
             "TrustServerCertificate=True;" .
             "Encrypt={$this->options['Encrypt']};" .                        // Encrypt the connection

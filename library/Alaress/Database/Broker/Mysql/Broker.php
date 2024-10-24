@@ -62,6 +62,14 @@ class Broker extends Base
     /**
      * @inheritdoc
      */
+    public function getDriver(): string
+    {
+        return 'mysql';
+    }
+
+    /**
+     * @inheritdoc
+     */
     public function getDsn()
     {
         $portString = '';
@@ -70,7 +78,7 @@ class Broker extends Base
             $portString = "port={$this->connector->getPort()};";
         }
 
-        return "mysql:host={$this->connector->getHostname()};{$portString}dbname={$this->connector->getDatabase()}";
+        return "{$this->getDriver()}:host={$this->connector->getHostname()};{$portString}dbname={$this->connector->getDatabase()}";
     }
 
     /**

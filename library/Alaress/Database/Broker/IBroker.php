@@ -19,7 +19,6 @@ use Alaress\Database\Statement\IStatement;
 use Alaress\Database\Statement\Query\IQuery;
 use Alaress\Database\Statement\StoredProcedure\IStoredProcedure;
 use PDO;
-use PDOException;
 use PDOStatement;
 
 interface IBroker
@@ -37,6 +36,13 @@ interface IBroker
      * @param IConnector $connector
      */
     public function setConnector($connector);
+
+    /**
+     * Get the driver this broker's DB connection uses.
+     *
+     * This will generally be used as the prefix of the DSN.
+     */
+    public function getDriver(): string;
 
     /**
      * Create DSN string from connector properties

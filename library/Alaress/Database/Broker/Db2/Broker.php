@@ -59,6 +59,14 @@ class Broker extends Base
     /**
      * @inheritdoc
      */
+    public function getDriver(): string
+    {
+        return 'ibm';
+    }
+
+    /**
+     * @inheritdoc
+     */
     public function getDsn()
     {
         $portString = '';

@@ -16,9 +16,12 @@ use Alaress\Database\Connector\IConnector;
 use Alaress\Database\Exception as DatabaseException;
 use Alaress\Database\Statement\Query\Base as Query;
 use Alaress\DebugBar\Instance as DebugBar;
+use Alaress\Sentry\Tracing\Tracer;
 use DebugBar\DataCollector\DataCollectorInterface;
 use PDO;
 use PDOException;
+use Schoolbox\Url\Uri;
+use Sentry\Tracing\SpanStatus;
 
 abstract class Base implements IBroker
 {
@@ -122,19 +125,28 @@ abstract class Base implements IBroker
 
         ini_set('default_socket_timeout', self::LOGIN_TIMEOUT);
 
+        // Build a DSN, without password
+        $url = (new Uri())
+            ->withScheme($this->getDriver())
+            ->withHost($this->connector->getHostname())
+            ->withPort($this->connector->getPort())
+            ->withUserInfo($this->connector->getUsername())
+            ->withPath($this->connector->getDatabase());
+        Tracer::getDefaultTrace()->startSpan('connect ' . $url);
         try {
             // Create a new PDO instance using the DSN string and supplied username/password parameters
 
             $this->pdo = $this->buildPdoConnection($connectOptions);
         } catch (PDOException $e) {
-            // Need to restore timeout both here and in normal control flow
+            Tracer::getDefaultTrace()->finishSpan(status: SpanStatus::internalError());
 
+            // Need to restore timeout both here and in normal control flow
             ini_set('default_socket_timeout', $defaultSocketTimeout);
 
             // Something went wrong during connection
-
             throw new DatabaseException("Error connecting to database.\nDSN String: {$this->getDsn()}\nPDO Error: {$e->getMessage()}");
         }
+        Tracer::getDefaultTrace()->finishSpan();
 
         // Restore default socket timeout
 
