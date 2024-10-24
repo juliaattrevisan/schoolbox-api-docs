@@ -11,7 +11,6 @@ namespace Alaress\Sentry\Tracing\Database;
 
 use Alaress\Sentry\Tracing\Tracer;
 use Iterator;
-use JetBrains\PhpStorm\ArrayShape;
 use PDO;
 use PDOException;
 use PDOStatement;
@@ -106,7 +105,7 @@ class TracedPdoStatement extends PDOStatement
         return $this->statement->errorCode();
     }
 
-    #[ArrayShape([0 => "string", 1 => "int", 2 => "string"])] public function errorInfo(): array
+    public function errorInfo(): array
     {
         return $this->statement->errorInfo();
     }
@@ -126,16 +125,7 @@ class TracedPdoStatement extends PDOStatement
         return $this->statement->columnCount();
     }
 
-    #[ArrayShape([
-        "name"          => "string",
-        "len"           => "int",
-        "precision"     => "int",
-        "oci:decl_type" => "int|string",
-        "native_type"   => "string",
-        "scale"         => "int",
-        "flags"         => "array",
-        "pdo_type"      => "int",
-    ])] public function getColumnMeta(int $column): array|false
+    public function getColumnMeta(int $column): array|false
     {
         return $this->statement->getColumnMeta($column);
     }
@@ -164,6 +154,4 @@ class TracedPdoStatement extends PDOStatement
     {
         return $this->statement->getIterator();
     }
-
-
 }
