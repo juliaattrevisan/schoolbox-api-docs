@@ -29,14 +29,18 @@ class TracedPdoStatement extends PDOStatement
 
     public function execute(?array $params = null): bool
     {
-        // Wrap this part
         return Tracer::getDefaultTrace()->runWithinSpan(
             fn () => $this->statement->execute($params),
+            $this->statement->queryString,
             'db.sql.query',
             'auto.db',
-            data: ['db.system' => $this->driverName,],
+            [
+                'db.system' => $this->driverName,
+            ],
         );
     }
+
+    /** All methods below this point are simply wrappers around `$this->statement`. */
 
     public function fetch(int $mode = PDO::FETCH_DEFAULT, int $cursorOrientation = PDO::FETCH_ORI_NEXT, int $cursorOffset = 0): mixed
     {
