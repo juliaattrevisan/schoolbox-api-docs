@@ -19,6 +19,8 @@ use Schoolbox\Curriculum\Reports\Translator\CourseStructureOnly as CourseStructu
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Mapper as CourseUnitSpecificationMapper;
 use Schoolbox\Learning\Course\DataModel\Specification\Mapper as CourseSpecificationMapper;
 use Twig\Error\Error as TwigError;
+use ValueError;
+use Crell\ApiProblem\ApiProblem;
 
 class Controller extends Base
 {
@@ -48,7 +50,7 @@ class Controller extends Base
         $query = $this->requestQuery;
         $courseId = $query->get('courseId');
         $nodeId = $query->get('nodeId');
-        $limit = $query->get('limit', Cursor::LIMIT_DEFAULT);
+        $limit = $query->getInt('limit', Cursor::LIMIT_DEFAULT);
         $encodedCursor = $query->get('encodedCursor');
 
         //Only process usage when both course specifications and curriculum nodes have been provided
@@ -58,14 +60,31 @@ class Controller extends Base
             $nodeId   =
                 is_array($nodeId) ? $nodeId : explode(',', $nodeId);
 
-            $cursor = new Cursor(
-                $this->curriculumMapper,
-                $courseId,
-                $nodeId,
-                $limit,
-            );
+            //Early exit if limit is not of type int
+            if (null === $limit) {
+                $problem = (new ApiProblem("Limit must be an positive integer"))
+                    ->setStatus(400)
+                    ->asArray();
+                $this->response = $this->responseAsJson($problem)->withStatus(400);
+                return;
+            }
 
-            $data = $cursor->retrieveResults($encodedCursor);
+            try {
+                $cursor = new Cursor(
+                    $this->curriculumMapper,
+                    $courseId,
+                    $nodeId,
+                    $limit,
+                );
+
+                $data = $cursor->retrieveResults($encodedCursor);
+            } catch (\Exception | ValueError $e) {
+                $problem = (new ApiProblem($e->getMessage()))
+                    ->setStatus(400)
+                    ->asArray();
+                $this->response = $this->responseAsJson($problem)->withStatus(400);
+                return;
+            }
 
             $usageCount = $cursor->retrieveUsageCount();
 
