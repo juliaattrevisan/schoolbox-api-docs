@@ -30,20 +30,29 @@ async function onRemoveClicked(): Promise<void> {
 
 <template>
     <Transition @enter="slideDownOnEnter" @leave="slideUpOnLeave">
-        <div v-if="props.isOpen" class="editPanel small-12">
-            <section>
-                <div>
-                    <p>Are you sure you want to remove this field?</p>
-                    <ul class="flex-list buttons">
-                        <li>
-                            <button class="button submit" :disabled="isRemoving" @click="onRemoveClicked">
-                                {{ isRemoving ? "Removing..." : "Remove" }}
-                            </button>
-                        </li>
-                        <li><button class="button" @click="emit('close')">Cancel</button></li>
-                    </ul>
-                </div>
-            </section>
+        <div v-if="props.isOpen" class="column content small-12">
+            <p>Are you sure you want to remove this field?</p>
+            <ul class="flex-list buttons">
+                <li>
+                    <button
+                        class="button submit"
+                        :disabled="isRemoving"
+                        :data-test="`${peFieldsStore.getFieldIdentifier(props.field)}-remove-confirm`"
+                        @click="onRemoveClicked"
+                    >
+                        {{ isRemoving ? "Removing..." : "Remove" }}
+                    </button>
+                </li>
+                <li>
+                    <button
+                        class="button"
+                        :data-test="`${peFieldsStore.getFieldIdentifier(props.field)}-remove-cancel`"
+                        @click="emit('close')"
+                    >
+                        Cancel
+                    </button>
+                </li>
+            </ul>
         </div>
     </Transition>
 </template>

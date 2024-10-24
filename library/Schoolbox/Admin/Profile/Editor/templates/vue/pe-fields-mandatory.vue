@@ -3,7 +3,7 @@
  * The list of mandatory fields for the selected role type
  */
 
-import PeFieldsActiveItem from "./pe-fields-active-item.vue";
+import PeFieldsMandatoryItem from "./pe-fields-mandatory-item.vue";
 import { useProfileEditorStore } from "./store/profileEditorStore";
 
 const peStore = useProfileEditorStore();
@@ -11,11 +11,10 @@ const peStore = useProfileEditorStore();
 
 <template>
     <template v-if="peStore.selectedRoleType">
-        <pe-fields-active-item
+        <pe-fields-mandatory-item
             v-for="mandatoryField in peStore.selectedRoleType.fields.mandatory"
             :key="mandatoryField.field"
             :field="mandatoryField"
-            :dragging="false"
         />
     </template>
 </template>

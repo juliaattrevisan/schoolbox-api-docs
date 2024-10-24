@@ -24,6 +24,7 @@ const disabled = window.Vue.computed(() => peFieldsStore.getActiveFieldType(prop
         :class="{ disabled }"
         :title="disabled ? 'This field is already selected' : undefined"
         :data-pe-prevent-drag="disabled ? true : undefined"
+        :data-test="peFieldsStore.getFieldIdentifier(props.field)"
         @click="peFieldsStore.enableField(props.field.field)"
     >
         <pe-fields-icon :field="props.field" />

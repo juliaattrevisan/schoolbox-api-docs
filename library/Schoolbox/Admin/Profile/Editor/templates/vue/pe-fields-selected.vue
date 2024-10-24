@@ -6,7 +6,7 @@
 import type Sortable from "sortablejs";
 import SortableWrapper from "@schoolboxVue/components/sortable-wrapper.vue";
 import { slideDownOnEnter, slideUpOnLeave } from "@schoolboxVue/transitions/transitions";
-import PeFieldsActiveItem from "./pe-fields-active-item.vue";
+import PeFieldsSelectedItem from "./pe-fields-selected-item.vue";
 import { useProfileEditorStore } from "./store/profileEditorStore";
 import { useProfileEditorFieldsStore } from "./store/profileEditorFieldsStore";
 
@@ -58,8 +58,10 @@ async function onAddField(event: Sortable.SortableEvent): Promise<void> {
 </script>
 
 <template>
-    <div v-if="peStore.selectedRoleType" class="pe-fields-selected">
+    <section v-if="peStore.selectedRoleType" class="pe-fields-selected">
         <sortable-wrapper
+            tag="ul"
+            class="information-list sortable-card ui-sortable pe-fields-selected"
             :list="peStore.selectedRoleType.fields.selected"
             :item-key="(item) => item.field"
             :options="sortableOptions"
@@ -70,13 +72,13 @@ async function onAddField(event: Sortable.SortableEvent): Promise<void> {
             @add="onAddField"
         >
             <template #item="item">
-                <pe-fields-active-item :field="item.element" :dragging="item.isDragging" />
+                <pe-fields-selected-item :field="item.element" :dragging="item.isDragging" />
             </template>
         </sortable-wrapper>
+    </section>
 
-        <div v-if="peStore.selectedRoleType.fields.selected.length === 0" class="masonry-placeholder">
-            You can drag fields into this space
-        </div>
+    <div v-if="peStore.selectedRoleType?.fields.selected.length === 0" class="masonry-placeholder">
+        You can drag fields into this space
     </div>
 </template>
 

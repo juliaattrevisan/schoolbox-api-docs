@@ -41,11 +41,17 @@ async function onUpdateClicked(): Promise<void> {
 </script>
 
 <template>
-    <div v-if="peStore.selectedRoleType" class="l-mar-m--top">
+    <section v-if="peStore.selectedRoleType" class="content">
+        <label for="pe-name-format">Name Display Options</label>
+        <p class="meta">
+            Insert a default format for how user names will be displayed. Can contain: {title}, {firstname},
+            {preferredname} (falls back to first name if empty), {lastname}, {pronoun}.
+        </p>
         <input
+            id="pe-name-format"
             v-model="peStore.selectedRoleType.nameFormat"
             type="text"
-            placeholder="Name output format. Can contain: {title}, {firstname}, {preferredname} (falls back to first name if empty), {lastname}, {pronoun}."
+            placeholder="Enter a name display format"
         />
         <Transition @enter="slideDownOnEnter" @leave="slideUpOnLeave">
             <div v-if="isNameFormatUnsaved()">
@@ -62,7 +68,7 @@ async function onUpdateClicked(): Promise<void> {
                 {{ saveError }}
             </div>
         </Transition>
-    </div>
+    </section>
 </template>
 
 <style scoped>

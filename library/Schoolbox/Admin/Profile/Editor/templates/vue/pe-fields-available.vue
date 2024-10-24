@@ -6,7 +6,7 @@
 import type Sortable from "sortablejs";
 import SortableWrapper from "@schoolboxVue/components/sortable-wrapper.vue";
 import PeFieldsAvailableItem from "./pe-fields-available-item.vue";
-import PeFieldsActiveItem from "./pe-fields-active-item.vue";
+import PeFieldsSelectedItem from "./pe-fields-selected-item.vue";
 import { useProfileEditorStore } from "./store/profileEditorStore";
 
 const peStore = useProfileEditorStore();
@@ -31,45 +31,76 @@ const sortableOptions = window.Vue.computed<Sortable.Options>(() => ({
     // Removes the clone element when it is not showing, rather than just hiding it.
     removeCloneOnHide: true,
 }));
+
+/**
+ * A list of all category names that are available for the selected role type
+ * Sorted alphabetically
+ */
+const fieldCategories = window.Vue.computed(() => {
+    if (peStore.selectedRoleType === null) return [];
+    const uniqueCategories = [...new Set(peStore.selectedRoleType.fields.available.map((field) => field.category))];
+    return uniqueCategories.sort();
+});
+
+const selectedCategory = window.Vue.ref<string | null>(null);
+
+const availableFieldsToShow = window.Vue.computed(() => {
+    if (peStore.selectedRoleType === null) return [];
+    const allFields = peStore.selectedRoleType.fields.available;
+
+    // If no category is selected, show all fields
+    if (selectedCategory.value === null) {
+        return allFields;
+    }
+
+    // Filter the fields by the selected category
+    return allFields.filter((field) => field.category === selectedCategory.value);
+});
+
+// When the selected role type changes, reset the selected category
+window.Vue.watch(
+    () => peStore.selectedRoleType,
+    () => {
+        selectedCategory.value = fieldCategories.value[0] ?? null;
+    },
+    { immediate: true },
+);
 </script>
 
 <template>
-    <div v-if="peStore.selectedRoleType !== null" class="component l-mar-m--bottom">
-        <div class="component-titlebar">
-            <div class="actions-small-2">
-                <div class="list-item">
-                    <h2 title="Fields">Fields</h2>
+    <dl class="tabs">
+        <dd v-for="category in fieldCategories" :key="category" :class="{ active: category === selectedCategory }">
+            <a @click="selectedCategory = category">{{ category }}</a>
+        </dd>
+    </dl>
+    <section v-if="peStore.selectedRoleType !== null" class="pe-fields-palette">
+        <sortable-wrapper
+            :list="availableFieldsToShow"
+            :item-key="(item) => item.field"
+            :options="sortableOptions"
+            class="l-grid l-grid--4-col"
+        >
+            <template #item="item">
+                <div :data-pe-field="item.element.field">
+                    <pe-fields-available-item :field="item.element" class="pe-fields-available-item" />
+                    <pe-fields-selected-item
+                        v-if="item.isDragging"
+                        :field="item.element"
+                        :dragging="true"
+                        class="pe-dragged-selected-item"
+                    />
                 </div>
-            </div>
-        </div>
-        <div class="pe-fields-palette">
-            <div class="small-12">
-                <section class="content">
-                    <sortable-wrapper
-                        :list="peStore.selectedRoleType.fields.available"
-                        :item-key="(item) => item.field"
-                        :options="sortableOptions"
-                        class="l-grid l-grid--4-col"
-                    >
-                        <template #item="item">
-                            <div :data-pe-field="item.element.field">
-                                <pe-fields-available-item :field="item.element" class="pe-fields-available-item" />
-                                <pe-fields-active-item
-                                    v-if="item.isDragging"
-                                    :field="item.element"
-                                    :dragging="true"
-                                    class="pe-dragged-selected-item"
-                                />
-                            </div>
-                        </template>
-                    </sortable-wrapper>
-                </section>
-            </div>
-        </div>
-    </div>
+            </template>
+        </sortable-wrapper>
+    </section>
 </template>
 
 <style scoped>
+/* Allow the opacity of the fields to show through, rather than the default white */
+.pe-fields-palette {
+    background: transparent;
+}
+
 /* Hide the selected preview while we are still in the palette area */
 .pe-fields-palette .pe-dragged-selected-item {
     display: none !important;

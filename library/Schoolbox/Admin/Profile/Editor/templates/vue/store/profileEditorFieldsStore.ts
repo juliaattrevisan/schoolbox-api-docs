@@ -1,12 +1,14 @@
 import { defineStore } from "pinia";
 import { cloneDeep } from "lodash";
 import { until } from "@vueuse/core";
+import * as toast from "@schoolboxVue/components/toast/sbxToastEvent";
 import { useProfileEditorStore } from "./profileEditorStore";
 import { fetchProfileEditorEndpoint } from "./profileEditorUtils";
 import type {
     ProfileEditorFieldSettingKey,
     ProfileEditorFieldSettingOption,
     ProfileEditorActiveField,
+    ProfileEditorAvailableField,
 } from "../types/profileEditorTypes";
 
 type EnableFieldAction = {
@@ -76,6 +78,8 @@ export const useProfileEditorFieldsStore = defineStore("profileEditorFieldsStore
         const selectedField = peStore.selectedRoleType.fields.selected.find((f) => f.field === field);
         if (!selectedField) throw new Error("Field not found in selected fields.");
 
+        toast.activate(`Adding ${selectedField.displayAs}...`);
+
         const endpoint = peStore.endpoints.adminProfileEditorPostFieldAdd
             .replace("{roleType}", peStore.selectedRoleType.roleType)
             .replace("{fieldId}", field);
@@ -88,10 +92,12 @@ export const useProfileEditorFieldsStore = defineStore("profileEditorFieldsStore
 
         if (!response.success) {
             actionErrors.value[field] = response.message ?? "An unknown error occurred";
+            toast.timeout({ text: `Failed to add ${selectedField.displayAs}`, isSuccess: false });
             return;
         }
 
         peStore.savedSelectedRoleType.fields.selected.splice(index, 0, cloneDeep(selectedField));
+        toast.timeout({ text: `Added ${selectedField.displayAs}`, isSuccess: true });
     }
 
     /**
@@ -102,6 +108,11 @@ export const useProfileEditorFieldsStore = defineStore("profileEditorFieldsStore
         if (!peStore.selectedRoleType) return;
         if (!peStore.savedSelectedRoleType) return;
 
+        const selectedField = peStore.selectedRoleType.fields.selected.find((f) => f.field === field);
+        if (!selectedField) throw new Error("Field not found in selected fields.");
+
+        toast.activate(`Removing ${selectedField.displayAs}...`);
+
         const endpoint = peStore.endpoints.adminProfileEditorPostFieldRemove
             .replace("{roleType}", peStore.selectedRoleType.roleType)
             .replace("{fieldId}", field);
@@ -110,6 +121,7 @@ export const useProfileEditorFieldsStore = defineStore("profileEditorFieldsStore
 
         if (!response.success) {
             actionErrors.value[field] = response.message ?? "An unknown error occurred";
+            toast.timeout({ text: `Failed to remove ${selectedField.displayAs}`, isSuccess: false });
             return;
         }
 
@@ -119,6 +131,8 @@ export const useProfileEditorFieldsStore = defineStore("profileEditorFieldsStore
         peStore.savedSelectedRoleType.fields.selected = peStore.savedSelectedRoleType.fields.selected.filter(
             (f) => f.field !== field,
         );
+
+        toast.timeout({ text: `Removed ${selectedField.displayAs}`, isSuccess: true });
     }
 
     /**
@@ -131,12 +145,14 @@ export const useProfileEditorFieldsStore = defineStore("profileEditorFieldsStore
         const activeFieldType = getActiveFieldType(field);
         if (activeFieldType === null) throw new Error("Field not found in active fields.");
 
+        const currentField = peStore.selectedRoleType.fields[activeFieldType].find((f) => f.field === field);
+        if (!currentField) throw new Error("Field not found in active fields.");
+
+        toast.activate(`Saving settings for ${currentField.displayAs}...`);
+
         const endpoint = peStore.endpoints.adminProfileEditorPostFieldSettings
             .replace("{roleType}", peStore.selectedRoleType.roleType)
             .replace("{fieldId}", field);
-
-        const currentField = peStore.selectedRoleType.fields[activeFieldType].find((f) => f.field === field);
-        if (!currentField) throw new Error("Field not found in active fields.");
 
         const response = await fetchProfileEditorEndpoint(endpoint, {
             method: "POST",
@@ -146,6 +162,7 @@ export const useProfileEditorFieldsStore = defineStore("profileEditorFieldsStore
 
         if (!response.success) {
             actionErrors.value[field] = response.message ?? "An unknown error occurred";
+            toast.timeout({ text: `Failed to save settings for ${currentField.displayAs}`, isSuccess: false });
             return;
         }
 
@@ -153,6 +170,8 @@ export const useProfileEditorFieldsStore = defineStore("profileEditorFieldsStore
         if (savedField) {
             savedField.fieldSettings = cloneDeep(currentField.fieldSettings);
         }
+
+        toast.timeout({ text: `Saved settings for ${currentField.displayAs}`, isSuccess: true });
     }
 
     /**
@@ -162,6 +181,8 @@ export const useProfileEditorFieldsStore = defineStore("profileEditorFieldsStore
     async function processResequenceFields(fields: string[]): Promise<void> {
         if (!peStore.selectedRoleType) throw new Error("No role type selected");
         if (!peStore.savedSelectedRoleType) throw new Error("No role type selected");
+
+        toast.activate("Resequencing fields...");
 
         const endpoint = peStore.endpoints.adminProfileEditorPostFieldSequence.replace(
             "{roleType}",
@@ -179,10 +200,12 @@ export const useProfileEditorFieldsStore = defineStore("profileEditorFieldsStore
             fields.forEach((field) => {
                 actionErrors.value[field] = response.message ?? "An unknown error occurred";
             });
+            toast.timeout({ text: "Failed to resequence fields", isSuccess: false });
             return;
         }
 
         peStore.savedSelectedRoleType.fields.selected = cloneDeep(peStore.selectedRoleType.fields.selected);
+        toast.timeout({ text: "Resequenced fields", isSuccess: true });
     }
 
     /**
@@ -400,6 +423,20 @@ export const useProfileEditorFieldsStore = defineStore("profileEditorFieldsStore
         activeField.fieldSettings[fieldSettingKey] = filteredSettings;
     }
 
+    /**
+     * Get an identifier for a given field to be used for data-test attributes
+     * or other keys such as for a label:for connection
+     * Includes the selected role type for uniqueness between role types
+     * This should be extended with more specificity depending on the context
+     * @param field - The field to get the identifier for
+     * @returns The identifier for the field
+     */
+    function getFieldIdentifier(field: ProfileEditorAvailableField | ProfileEditorActiveField): string {
+        const roleType = peStore.selectedRoleType?.roleType ?? "unknown";
+        const fieldType = "fieldSettings" in field ? "active" : "available";
+        return `pe-${roleType}-fields-${fieldType}-item-${field.field}`;
+    }
+
     return {
         actionQueue,
         actionErrors,
@@ -410,5 +447,6 @@ export const useProfileEditorFieldsStore = defineStore("profileEditorFieldsStore
         resequenceField,
         isFieldSettingsUnsaved,
         updateFieldSettingOption,
+        getFieldIdentifier,
     };
 });

@@ -31,8 +31,12 @@ window.Vue.onMounted(() => {
 </script>
 
 <template>
-    <pe-role-type />
-    <pe-name-format />
+    <div class="small-12 island">
+        <pe-role-type />
+    </div>
+    <div class="small-12 island">
+        <pe-name-format />
+    </div>
     <pe-fields />
 </template>
 
