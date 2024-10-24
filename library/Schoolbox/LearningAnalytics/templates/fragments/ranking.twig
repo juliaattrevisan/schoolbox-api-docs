@@ -1,0 +1,29 @@
+<section>
+    {% if weightedAssessments | length == 0 %}
+        <div class="content">
+            <p>
+                There are no weighted activities within this
+                {% if classFolder %}class{% else %}course{% endif %},
+                so there is no standard to compare students against.
+            </p>
+        </div>
+    {% elseif ranking | length > 0 %}
+        <ul class="information-list">
+            {% for currentStudent in ranking | slice(0,3) %}
+                <li>
+                    <div class="card small-12">
+                        <a href="/search/user/{{ currentStudent.user.id }}" title="View Profile">
+                            {% include 'include/portrait.twig' with {user: currentStudent.user} %}
+                            <p>{{ currentStudent.user.fullName }}</p>
+                        </a>
+                        <p class="meta">{{ currentStudent.average | number_format(1) }}%</p>
+                    </div>
+                </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <div class="content">
+            <p>Nobody has attempted these activities yet.</p>
+        </div>
+    {% endif %}
+</section>

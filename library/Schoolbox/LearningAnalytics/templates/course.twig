@@ -211,56 +211,22 @@
     </div>
     <div class="small-12 large-3 island">
         <h4 class="subheader">Above Standard</h4>
-
         <section>
-            {% if ranking.top | length > 0 %}
-            <ul class="information-list">
-                {% for currentStudent in ranking.top | slice(0,3) %}
-                <li>
-                    <div class="card small-12">
-                        <a href="/search/user/{{ currentStudent.user.id }}" title="View Profile">
-                            {% include 'include/portrait.twig' with {user: currentStudent.user} %}
-                            <p>{{ currentStudent.user.fullName }}</p>
-                        </a>
-                        <p class="meta">{{ currentStudent.average | number_format(1) }}%</p>
-                    </div>
-                </li>
-                {% endfor %}
-            </ul>
-            {% else %}
-            <div class="content">
-                <p>
-                    Nobody has attempted these activities yet.
-                </p>
-            </div>
-            {% endif %}
+            {% include '@learningAnalytics/fragments/ranking.twig' with {
+                weightedAssessments: weightedAssessments,
+                classFolder: classFolder,
+                ranking: ranking.top
+            } only %}
         </section>
     </div>
     <div class="small-12 large-3 island">
         <h4 class="subheader">Well Below</h4>
-
         <section>
-            {% if ranking.bottom | length > 0 %}
-            <ul class="information-list">
-                {% for currentStudent in ranking.bottom | slice(0,3) %}
-                <li>
-                    <div class="card small-12">
-                        <a href="/search/user/{{ currentStudent.user.id }}" title="View Profile">
-                            {% include 'include/portrait.twig' with {user: currentStudent.user} %}
-                            <p>{{ currentStudent.user.fullName }}</p>
-                        </a>
-                        <p class="meta">{{ currentStudent.average | number_format(1) }}%</p>
-                    </div>
-                </li>
-                {% endfor %}
-            </ul>
-            {% else %}
-            <div class="content">
-                <p>
-                    Nobody has attempted these activities yet.
-                </p>
-            </div>
-            {% endif %}
+            {% include '@learningAnalytics/fragments/ranking.twig' with {
+                weightedAssessments: weightedAssessments,
+                classFolder: classFolder,
+                ranking: ranking.bottom
+            } only %}
         </section>
     </div>
 </div>
