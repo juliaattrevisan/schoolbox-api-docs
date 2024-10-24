@@ -1,10 +1,8 @@
 <script setup lang="ts">
 /**
  * The creator filter input, to show results linked to a specific user
- * currently uses the exisitng jquery selectize plugin
  */
 
-import type { Result } from "@schoolboxVue/components/searchSelect/types/Result";
 import SearchSelect from "@schoolboxVue/components/searchSelect/search-select.vue";
 import type { Creator } from "./store/spFilterCreatorsStore";
 import { useFilterCreatorsStore } from "./store/spFilterCreatorsStore";
@@ -15,43 +13,17 @@ const currentUser: Creator = {
     id: window.schoolboxUser.id,
     name: window.schoolboxUser.name,
 };
-
-/**
- * We only allow one creator to be selected at a time,
- * so only select a result if there isn't one already selected
- * or unselect the current result if it's already selected
- * @param result - the result selected
- */
-function onSelected(result: Result): void {
-    if (!filterCreatorsStore.isActive) {
-        filterCreatorsStore.creator.push(result as Creator);
-        return;
-    }
-    if (result.id === filterCreatorsStore.creator[0].id) {
-        filterCreatorsStore.clear();
-    }
-}
-
-/**
- * Remove the result, as we only allow one creator to be selected at a time
- * we can simply just clear the store
- */
-function onRemoved(): void {
-    filterCreatorsStore.clear();
-}
 </script>
-<section></section>
 <template>
     <div class="l-flex-col">
-        <label for="creator">Creator</label>
         <search-select
+            v-model:selected="filterCreatorsStore.creator"
+            label="Creator"
+            label-id="creator"
             endpoint="/ajax/user.php?groupID=0&query="
-            :selected="filterCreatorsStore.creator"
             :is-single-select="true"
-            :default-results="[currentUser as Result]"
+            :default-results="[currentUser]"
             placeholder="Search for users..."
-            @select="onSelected"
-            @remove="onRemoved"
         />
     </div>
 </template>

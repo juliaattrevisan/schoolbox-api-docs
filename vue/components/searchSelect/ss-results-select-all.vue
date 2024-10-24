@@ -1,0 +1,147 @@
+<script setup lang="ts">
+/**
+ * Toggle the selection of currently listed search results so can select
+ * multiple search results at once
+ */
+
+import { toRef, useTemplateRef } from "vue";
+import { useActiveIndex } from "./composables/useActiveIndex";
+import type { SearchSelectItem } from "./types/searchSelectTypes";
+
+interface Props {
+    results: SearchSelectItem[]; // the results returned from the search
+    selected: SearchSelectItem[]; // the selected items
+    index: number; // the index of the result
+    activeIndex: number; // the active index, to determine if this result is active
+}
+const props = defineProps<Props>();
+
+const emit = defineEmits<{
+    add: [items: SearchSelectItem[]];
+    remove: [items: SearchSelectItem[]];
+    hover: [index: number];
+}>();
+
+/**
+ * To determine the behaviour of the 'Select all' button, whether to
+ * add all results or remove all results
+ * @returns - whether all results are selected
+ */
+const isAllResultsSelected = window.Vue.computed(() => {
+    if (props.selected.length > 0) {
+        const alreadySelected = props.results.filter((resultItem) => {
+            return props.selected.some((node) => resultItem.id === node.id);
+        });
+        return alreadySelected.length === props.results.length;
+    }
+    return false;
+});
+
+/**
+ * To add the 'indeterminate' class to the select all checkbox to show some
+ * in the search results are already selected
+ * @returns - whether some results are selected
+ */
+const isSomeResultsSelected = window.Vue.computed(() => {
+    if (props.selected.length > 0) {
+        const alreadySelected = props.results.filter((resultItem) => {
+            return props.selected.some((node) => resultItem.id === node.id);
+        });
+        return alreadySelected.length >= 1 && alreadySelected.length !== props.results.length;
+    }
+    return false;
+});
+
+/**
+ * To determine the check display of the checkbox
+ * @returns - whether it's checked
+ */
+const isSelected = window.Vue.computed(() => isAllResultsSelected.value);
+
+/**
+ * toggle all depending on current check status
+ * @param event - the click event
+ */
+function onClick(event?: MouseEvent | undefined): void {
+    // ignore input label clicks, which get picked up due to the click listener on the parent div
+    if (event && event.target && (event.target as HTMLElement).nodeName === "LABEL") {
+        return;
+    }
+    if (isSelected.value) {
+        emit("remove", props.results);
+    } else {
+        emit("add", props.results);
+    }
+}
+
+/**
+ * To toggle the selected state of the result
+ */
+function onMouseover(): void {
+    emit("hover", props.index);
+}
+
+/**
+ * To unset the active index
+ */
+function onMouseout(): void {
+    emit("hover", -1);
+}
+
+/**
+ * To allow keyboard navigation of the search results
+ */
+const resultEl = useTemplateRef<HTMLDivElement | null>("resultEl");
+const { isActive } = useActiveIndex(
+    resultEl,
+    props.index,
+    toRef(() => props.activeIndex),
+    onClick,
+);
+</script>
+
+<template>
+    <div
+        ref="resultEl"
+        :class="`search-result ${isActive ? 'search-result--active' : ''} f-no-margins`"
+        data-test="ss-results-select-all"
+        @click="onClick"
+        @mouseover="onMouseover"
+        @mouseout="onMouseout"
+    >
+        <div class="checklist">
+            <input
+                id="checkbox-select-all"
+                type="checkbox"
+                :checked="isSelected"
+                :class="{ indeterminate: isSomeResultsSelected }"
+                @click.stop="onClick"
+            />
+            <label for="checkbox-select-all">Select all</label>
+        </div>
+    </div>
+</template>
+
+<style lang="scss" scoped>
+.search-result {
+    background: var(--color-foreground-primary);
+    border-bottom: 1px solid var(--body-background);
+    border-left: 1px solid var(--form-border-color);
+    border-right: 1px solid var(--form-border-color);
+    display: flex;
+    font-size: 0.825rem;
+    padding: var(--spacing-s);
+    transition: background 0.2s;
+    width: 100%;
+    &:last-of-type {
+        border-bottom: none;
+    }
+    &--active {
+        background: var(--content-ui-hover);
+    }
+}
+
+input[type="checkbox"]:not(.plain) + label {
+    margin: 0;
+}
+</style>

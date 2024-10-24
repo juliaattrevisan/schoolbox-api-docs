@@ -1,6 +1,6 @@
 <div id="curriculum-coverage-container" class="f-container">
     <curriculum-coverage
-        courses-endpoint=""
+        courses-endpoint="/api/courses/?query="
         curriculum-endpoint="{{ routeLookup('curriculumApi.searchNode') }}"
         :selected-courses="{{ (selectedCourses ?? []) | json_encode }}"
     />

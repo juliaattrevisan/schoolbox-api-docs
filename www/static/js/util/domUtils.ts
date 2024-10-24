@@ -319,15 +319,21 @@ export async function injectScriptsIfNotLoaded(params: InjectScriptsParams): Pro
  * (?![^>]*>) is used to check we are not inside an element node
  * @param toMark - the string to find all instanced of the current search string in
  * @param wordList - the list of words to search for
+ * @param allowPartialMatches - if true, will match partial words
  * @returns string for v-html with <mark></mark> wrapped around each found result:
  *                          any HTML special characters in `toMark` are escaped,
  *                          so output is known to be safe for v-html
  */
-export function addMarks(toMark: string, wordList: string[]): string {
+export function addMarks(toMark: string, wordList: string[], allowPartialMatches: boolean = false): string {
     let marked = escape(toMark);
     const uniqueWorkList = [...new Set(wordList)]; // remove any duplicate search words
     uniqueWorkList.forEach((wordInSearch) => {
-        const regex = new RegExp(`(?<!<[^>]*)\\b${escapeRegExp(wordInSearch)}\\b(?![^<]*>)`, "ig");
+        // Adjust the regex based on allowPartialMatches
+        const wordBoundary = allowPartialMatches ? "" : "\\b"; // Remove word boundary if partial matches are allowed
+        const regex = new RegExp(
+            `(?<!<[^>]*)${wordBoundary}${escapeRegExp(wordInSearch)}${wordBoundary}(?![^<]*>)`,
+            "ig",
+        );
         marked = marked.replace(regex, (match) => {
             return `<mark>${match}</mark>`;
         });

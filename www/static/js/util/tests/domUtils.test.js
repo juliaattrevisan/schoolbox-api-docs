@@ -121,4 +121,14 @@ describe("addMarks()", () => {
         const marksAdded = addMarks("this is cafe del mar, isn't it nice", ["nice", "mar", "mark", "cafe"]);
         expect(marksAdded).toBe("this is <mark>cafe</mark> del <mark>mar</mark>, isn&#39;t it <mark>nice</mark>");
     });
+
+    test("single mark added within words when allowPartialMatches is true", () => {
+        const marksAdded = addMarks("Year 9 English", ["eng"], true);
+        expect(marksAdded).toBe("Year 9 <mark>Eng</mark>lish");
+    });
+
+    test("two marks added within words when allowPartialMatches is true", () => {
+        const marksAdded = addMarks("Year 9 English, Advanced English", ["eng"], true);
+        expect(marksAdded).toBe("Year 9 <mark>Eng</mark>lish, Advanced <mark>Eng</mark>lish");
+    });
 });

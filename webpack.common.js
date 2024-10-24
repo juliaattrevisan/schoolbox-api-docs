@@ -189,7 +189,7 @@ module.exports = {
 
         // Class
         classList: "./library/Schoolbox/Learning/vue/classList.ts",
-        classSelector: "./library/Schoolbox/Assessment/Course/templates/vue/classSelector.ts",
+        classSelector: "./library/Schoolbox/Assessment/Course/templates/vue/classSelector/classSelector.ts",
 
         // Groups
         manageGroups: "./library/Schoolbox/Group/vue/manageGroups.ts",

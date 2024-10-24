@@ -1,138 +1,127 @@
 <script setup lang="ts">
 /**
- * To search for searchResults and select them
+ * To search for results with a query and select them
  */
 
-import type { Ref } from "vue";
-import { useFetch, useDebounceFn } from "@vueuse/core";
-import type { Result } from "./types/Result";
-import SearchSelectSelected from "./search-select-selected.vue";
-import SearchSelectInput from "./search-select-input.vue";
-import SearchSelectResults from "./search-select-results.vue";
+import { useTemplateRef } from "vue";
+import { useSelected } from "@schoolboxVue/composables/store/useSelected";
+import { useSearch } from "./composables/useSearch";
+import type { SearchSelectItem } from "./types/searchSelectTypes";
+import SsSelected from "./ss-selected.vue";
+import SsQueryInput from "./ss-query-input.vue";
+import SsResults from "./ss-results.vue";
 
 interface Props {
+    label: string; // the label text
+    labelId: string; // the label id
     endpoint: string; // the search api endpoint
-    selected: Result[]; // the selected searchResults
-    defaultResults?: Result[]; // show selection options when the search input is empty
+    isRequired?: boolean; // whether the input requires a value
+    defaultResults?: SearchSelectItem[]; // show selection options when the search input is empty
     isSingleSelect?: boolean; // whether only one result can be selected
     formValueName?: string; // the name of the form value
-    placeholder?: string; // the placeholder text
+    placeholder?: string; // the query input placeholder text
+    canSelectItem?: boolean; // whether the user can select an item (to trigger the select emit)
+    hasError?: boolean; // Whether the input has an error
+    errorMessage?: string; // The error message to display
+    isReadOnly?: boolean; // Whether the input is read only
+    allowPartialMatches?: boolean; // whether to allow partial matches, so can match part of a word
 }
 const props = withDefaults(defineProps<Props>(), {
     defaultResults: undefined,
-    isSingleSelect: false,
     formValueName: "",
     placeholder: "Search...",
+    errorMessage: "This field is required",
 });
 
 const emit = defineEmits<{
-    select: [result: Result];
-    remove: [result: Result];
+    select: [item: SearchSelectItem];
 }>();
 
-const query = window.Vue.ref<string>("");
-const searchResults = window.Vue.ref<Result[]>([]);
-const canSearch = window.Vue.ref<boolean>(false);
-const minKeywordLength = 2;
+const searchSelectEl = useTemplateRef<HTMLDivElement | null>("searchSelectEl");
 
-const url = window.Vue.computed(() => {
-    return `${props.endpoint}${query.value}`;
-});
+const selected = defineModel<SearchSelectItem[]>("selected", { default: [] }); // to store selected items
+const { add, remove, update } = useSelected(selected); // to add and remove selected items
+
+const results = defineModel<SearchSelectItem[]>("results", { default: [] }); // to store search results
+const { query, isActive, isSearching, hasNoResults, hasError } = useSearch(props.endpoint, results); // to search for results
 
 /**
- * Return the results depending on the current state
+ * To show the current search results, or the default results
+ * if the search is not active
+ * @returns - the current results
  */
-const results = window.Vue.computed(() => {
-    if (props.selected.length === 1 && props.isSingleSelect) {
-        return [];
+const currentResults = window.Vue.computed(() => {
+    if (isActive.value) {
+        return results.value;
     }
-    if (props.defaultResults && !canSearch.value) {
+    if (props.defaultResults && props.defaultResults.length > 0) {
         return props.defaultResults;
     }
-    return searchResults.value;
+    return results.value;
 });
 
 /**
- * Submit the current query, using _debounce to accommodate for key presses
- * so not sending on every key press
+ * A selected item name has been selected
+ * @param item - the items selected
  */
-const {
-    execute,
-    data, // the search searchResults
-    isFetching, // to notify of searching
-    error: hasError, // to notify of a search error
-} = useFetch(url, {
-    immediate: false,
-    onFetchError(ctx: { response: Response | null; error: unknown; data: unknown }) {
-        return ctx;
-    },
-})
-    .get()
-    .json();
+function onSelect(item: SearchSelectItem): void {
+    emit("select", item);
+}
 
 /**
- * Debounce the search so we don't send a request on every key press
+ * To add items
+ * @param items - the items selected
  */
-// eslint-disable-next-line @typescript-eslint/no-misused-promises
-const search = useDebounceFn(async () => {
-    await execute();
-    try {
-        searchResults.value = (data as Ref<Result[]>).value;
-    } catch (error) {
-        hasError.value = true;
-    }
-}, 300);
-
-/**
- * start searching once the keyword length is greater than the minimum
- * @param value - The input value
- */
-async function onInput(value: string): Promise<void> {
-    query.value = value;
-    if (query.value.length < minKeywordLength) {
-        canSearch.value = false;
-        searchResults.value = [];
+function onAdd(items: SearchSelectItem[]): void {
+    // if single select, switch with the previous selection
+    if (props.isSingleSelect && selected.value.length > 0) {
+        update(items);
         return;
     }
-    canSearch.value = true;
-    await search();
+    add(items);
 }
 
 /**
- * To toggle the selected state of the result
- * @param result - the result selected
+ * To remove items
+ * @param items - the items deselected
  */
-function onSelected(result: Result): void {
-    emit("select", result);
-}
-
-/**
- * To remove a result
- * @param result - the result removed
- */
-function onRemoved(result: Result): void {
-    emit("remove", result);
+function onRemove(items: SearchSelectItem[]): void {
+    remove(items);
 }
 </script>
 
 <template>
-    <div class="c-search-select">
-        <search-select-selected
-            :selected="props.selected"
+    <div ref="searchSelectEl">
+        <label :for="props.labelId" :class="`${props.isRequired ? 'required' : ''}`">{{ props.label }}</label>
+        <label v-if="props.hasError" class="error" :for="props.labelId">{{ errorMessage }}</label>
+        <ss-selected
+            :selected="selected"
             :form-value-name="props.formValueName"
             :is-single-select="props.isSingleSelect"
-            @remove="onRemoved"
+            :can-select-item="props.canSelectItem"
+            :is-read-only="props.isReadOnly"
+            @select="onSelect"
+            @remove="onRemove"
         />
-        <search-select-input :placeholder="props.placeholder" @input="onInput" />
-        <search-select-results
+        <ss-query-input
+            v-if="!props.isReadOnly"
+            v-model:query="query"
+            :label-id="props.labelId"
+            :parent-el="searchSelectEl"
+            :placeholder="props.placeholder"
+        />
+        <ss-results
             :query="query"
-            :is-searching="isFetching"
+            :is-active="isActive"
+            :is-searching="isSearching"
+            :allow-partial-matches="props.allowPartialMatches"
             :is-single-select="props.isSingleSelect"
-            :results="results"
+            :results="currentResults"
+            :has-no-results="hasNoResults"
+            :has-error="hasError"
             :selected="selected"
-            @select="onSelected"
+            @add="onAdd"
+            @remove="onRemove"
         />
     </div>
 </template>
-
-<style scoped></style>
