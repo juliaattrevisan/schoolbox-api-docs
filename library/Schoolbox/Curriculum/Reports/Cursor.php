@@ -3,10 +3,12 @@
 namespace Schoolbox\Curriculum\Reports;
 
 use Alaress\Codec\ICodec;
+use Alaress\Codec\Json\Base64;
 use Alaress\Database\Predicate\Builder;
 use Schoolbox\API\Cursor\ICursor;
 use Schoolbox\Collection;
 use Schoolbox\Curriculum\Node\Mapper as CurriculumMapper;
+use ValueError;
 
 class Cursor implements ICursor
 {
@@ -44,6 +46,13 @@ class Cursor implements ICursor
         private int $limit,
         private ?ICodec $codec = null,
     ) {
+        $this->codec ??= new Base64();
+        if ($this->limit < self::LIMIT_MIN) {
+            throw new ValueError(sprintf('Limit must be at least %d: %d provided', self::LIMIT_MIN, $this->limit));
+        }
+        if ($this->limit > self::LIMIT_MAX) {
+            throw new ValueError(sprintf('Limit must be at most %d: %d provided', self::LIMIT_MAX, $this->limit));
+        }
     }
 
     /**
@@ -235,10 +244,14 @@ class Cursor implements ICursor
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
+     * @return ?int
      */
     public function retrieveResultCount(): ?int
     {
+        /*I guess realistically speaking it should return the requested nodes as that's how it will
+         * be used for iterating results, and each node has different number of descendants
+         */
         return count($this->nodeId);
     }
 }
