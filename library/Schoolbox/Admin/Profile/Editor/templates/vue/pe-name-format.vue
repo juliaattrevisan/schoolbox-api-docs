@@ -51,7 +51,7 @@ async function onUpdateClicked(): Promise<void> {
             v-model="peStore.selectedRoleType.nameFormat"
             type="text"
             name="pe-name-format"
-            placeholder="Name output format. Can contain: {title}, {firstname}, {preferredname} (falls back to first name if empty), {lastname}, {pronoun}."
+            placeholder="Enter a name display format"
         />
         <Transition @enter="slideDownOnEnter" @leave="slideUpOnLeave">
             <div v-if="isNameFormatUnsaved()">
