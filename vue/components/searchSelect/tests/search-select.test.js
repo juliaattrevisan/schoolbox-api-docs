@@ -41,7 +41,7 @@ test("search results can be added", async () => {
     const searchInput = wrapper.get(`[data-test="ss-query-input"]`);
     searchInput.setValue("search this"); // set the search input value, which will trigger the search
     await timeout(DEBOUNCE_AMOUNT + 150); // allow the search to kick in after debounce complete
-    expect(wrapper.findAll('[data-test^="ss-results-item-container"]')).toHaveLength(2); // validate the search results are visible
+    expect(wrapper.findAll('[data-test^="ss-results-item-container-"]')).toHaveLength(2); // validate the search results are visible
     /**
      * Add a search result
      */
@@ -85,7 +85,7 @@ test("select all can be used to add/remove all search results", async () => {
     const searchInput = wrapper.get(`[data-test="ss-query-input"]`);
     searchInput.setValue("search this"); // set the search input value, which will trigger the search
     await timeout(DEBOUNCE_AMOUNT + 150); // allow the search to kick in after debounce complete
-    expect(wrapper.findAll('[data-test^="ss-results-item-container"]')).toHaveLength(2); // validate the search results are visible
+    expect(wrapper.findAll('[data-test^="ss-results-item-container-"]')).toHaveLength(2); // validate the search results are visible
     /**
      * Add all search results
      */
@@ -118,7 +118,7 @@ test("select all is not visible when only one search result is found", async () 
     const searchInput = wrapper.get(`[data-test="ss-query-input"]`);
     searchInput.setValue("search this"); // set the search input value, which will trigger the search
     await timeout(DEBOUNCE_AMOUNT + 150); // allow the search to kick in after debounce complete
-    expect(wrapper.findAll('[data-test^="ss-results-item-container"]')).toHaveLength(1); // validate the search results are visible
+    expect(wrapper.findAll('[data-test^="ss-results-item-container-"]')).toHaveLength(1); // validate the search results are visible
 
     expect(wrapper.findAll(`[data-test="ss-results-select-all"]`)).toHaveLength(0); // validate the select all button is not visible
 
@@ -143,10 +143,10 @@ test("search results are removed when search query is cleared", async () => {
     const searchInput = wrapper.get(`[data-test="ss-query-input"]`);
     searchInput.setValue("search this"); // set the search input value, which will trigger the search
     await timeout(DEBOUNCE_AMOUNT + 150); // allow the search to kick in after debounce complete
-    expect(wrapper.findAll('[data-test^="ss-results-item-container"]')).toHaveLength(2); // validate the search results are visible
+    expect(wrapper.findAll('[data-test^="ss-results-item-container-"]')).toHaveLength(2); // validate the search results are visible
     searchInput.setValue(""); // set the search input value, which will trigger the search
     await wrapper.vm.$nextTick(); // allow the DOM to update after search cleared
-    expect(wrapper.findAll('[data-test^="ss-results-item-container"]')).toHaveLength(0); // validate the search results are no longer visible
+    expect(wrapper.findAll('[data-test^="ss-results-item-container-"]')).toHaveLength(0); // validate the search results are no longer visible
 
     global.fetch.mockClear();
 });
@@ -162,7 +162,7 @@ test("default results are visible when search is not active", async () => {
             ],
         },
     });
-    expect(wrapper.findAll('[data-test^="ss-results-item-container"]')).toHaveLength(2); // validate the default results is visible
+    expect(wrapper.findAll('[data-test^="ss-results-item-container-"]')).toHaveLength(2); // validate the default results is visible
 });
 
 test("only one selection allowed when isSingleSelect is true", async () => {

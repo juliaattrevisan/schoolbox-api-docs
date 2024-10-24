@@ -80,7 +80,7 @@ const { isActive } = useActiveIndex(
     <div
         ref="resultEl"
         :class="`search-result ${isActive ? 'search-result--active' : ''} f-no-margins`"
-        :data-test="`ss-results-item-container${props.result.id}`"
+        :data-test="`ss-results-item-container-${props.result.id}`"
         @click="onClick"
         @mouseover="onMouseover"
         @mouseout="onMouseout"
