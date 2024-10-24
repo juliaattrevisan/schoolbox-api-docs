@@ -132,7 +132,12 @@ abstract class Base implements IBroker
             ->withPort($this->connector->getPort())
             ->withUserInfo($this->connector->getUsername())
             ->withPath($this->connector->getDatabase());
-        Tracer::getDefaultTrace()->startSpan('connect ' . $url);
+        Tracer::getDefaultTrace()->startSpan(
+            'connect ' . $url,
+            'db.sql.connect',
+            'auto.db',
+            data: ['db.system' => $this->getDriver(),],
+        );
         try {
             // Create a new PDO instance using the DSN string and supplied username/password parameters
 
