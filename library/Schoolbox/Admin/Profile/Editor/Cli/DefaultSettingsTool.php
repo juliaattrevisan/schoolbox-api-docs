@@ -474,7 +474,7 @@ HELP;
                 /* NOTE: Decided by report_staff_access
                  * By default it's visible to self, staff
                  */
-                'StaffCampusDescription' => [
+                'campusCollection' => [
                     'availability' => $campusIds,
                     'visibility' =>  [self::ROLETYPE_SELF, self::ROLETYPE_STAFF],
                 ],
@@ -626,7 +626,7 @@ HELP;
          */
         if ($this->getConfig()->get('report_staff_access')) {
             $roletypes[self::ROLETYPE_STAFF]['StaffExtension']['visibility'][] = self::ROLETYPE_PARENT;
-            $roletypes[self::ROLETYPE_STAFF]['StaffCampusDescription']['visibility'][] = self::ROLETYPE_PARENT;
+            $roletypes[self::ROLETYPE_STAFF]['campusCollection']['visibility'][] = self::ROLETYPE_PARENT;
             $roletypes[self::ROLETYPE_STAFF]['StaffDepartment']['visibility'][] = self::ROLETYPE_PARENT;
             $roletypes[self::ROLETYPE_STAFF]['StaffCategoryDescription']['visibility'][] = self::ROLETYPE_PARENT;
             $roletypes[self::ROLETYPE_STAFF]['StaffDefaultMobilePhone']['visibility'][] = self::ROLETYPE_PARENT;
