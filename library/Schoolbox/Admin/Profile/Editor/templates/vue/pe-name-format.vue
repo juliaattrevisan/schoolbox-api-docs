@@ -48,9 +48,9 @@ async function onUpdateClicked(): Promise<void> {
             {preferredname} (falls back to first name if empty), {lastname}, {pronoun}.
         </p>
         <input
+            id="pe-name-format"
             v-model="peStore.selectedRoleType.nameFormat"
             type="text"
-            name="pe-name-format"
             placeholder="Enter a name display format"
         />
         <Transition @enter="slideDownOnEnter" @leave="slideUpOnLeave">
