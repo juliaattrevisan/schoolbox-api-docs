@@ -1,7 +1,15 @@
 <?php
 
 /** @var SitePage $this */
-if (!$this->getDi()->get('session')->get('user')->isSuperuser()) {
+
+use Schoolbox\Permission\Access\UserAccess;
+
+try {
+    $loggedInUser = $this->getDi()->get('session')->get('user');
+} catch (Exception $e) {
+    $this->error(\Schoolbox\Error\Mapper::ERROR_USER_NOT_FOUND);
+}
+if (!$loggedInUser->isSuperuser() && !$loggedInUser->hasServicePermission(UserAccess::SERVICE_CALENDAR, UserAccess::ACCESS_FULL)) {
     $this->error(\Schoolbox\Error\Mapper::ERROR_PERM_PAGE_VIEW, '', 403);
 }
 
