@@ -510,12 +510,7 @@ abstract class Mapper implements IMapper
     {
         // a cache of SELECT results
         $this->selectCache = new Cache(function (PDOStatement $statement, $bypassCache = false) {
-            Tracer::getDefaultTrace()->runWithinSpan(
-                $statement->execute(...),
-                $statement->queryString,
-                'db.sql.query',
-                'auto.db.mapper.select',
-            );
+            $statement->execute();
 
             // Bypass cache if requested, and cache isn't already being bypassed
             $previousLocalBodyCacheBypass = $this->localBodyCacheBypass;
@@ -1688,13 +1683,7 @@ abstract class Mapper implements IMapper
 
             // Run query
             try {
-                $result = Tracer::getDefaultTrace()->runWithinSpan(
-                    $statement->execute(...),
-                    $statement->queryString,
-                    'db.sql.execute',
-                    'auto.db.mapper.delete',
-                );
-                if (!$result) {
+                if (!$statement->execute()) {
                     $this->database->rollBack();
                     return false;
                 }
@@ -1920,13 +1909,7 @@ abstract class Mapper implements IMapper
 
             // Run query
             try {
-                $result = Tracer::getDefaultTrace()->runWithinSpan(
-                    $statement->execute(...),
-                    $statement->queryString,
-                    'db.sql.execute',
-                    'auto.db.mapper.update',
-                );
-                if (!$result) {
+                if (!$statement->execute()) {
                     $this->database->rollBack();
                     return false;
                 }
@@ -2812,12 +2795,7 @@ abstract class Mapper implements IMapper
 
         $statement = $this->prepareSelect($select, $from, new Builder($this->getDatabase()->getQuoter(), $this->getTable()), $columnList, $options);
 
-        Tracer::getDefaultTrace()->runWithinSpan(
-            $statement->execute(...),
-            $statement->queryString,
-            'db.sql.query',
-            'auto.db.mapper.select',
-        );
+        $statement->execute();
 
         return $statement;
     }
@@ -3232,20 +3210,10 @@ abstract class Mapper implements IMapper
                 // (Need to use replace rather than update to handle tables with
                 //  a non-auto-incrementing primary key, i.e. storage.hash)
                 if (isset($insertStatement) && !$this->getModelProperty($model, $idProperty)) {
-                    $result = Tracer::getDefaultTrace()->runWithinSpan(
-                        fn () => $insertStatement->execute($this->dehydrate($model)),
-                        $insertStatement->queryString,
-                        'db.sql.execute',
-                        'auto.db.mapper.insert',
-                    );
+                    $result         = $insertStatement->execute($this->dehydrate($model));
                     $pdoMethods[$i] = self::METHOD_CREATE;
                 } else {
-                    $result = Tracer::getDefaultTrace()->runWithinSpan(
-                        fn () => $replaceStatement->execute($this->dehydrate($model)),
-                        $replaceStatement->queryString,
-                        'db.sql.execute',
-                        'auto.db.mapper.replace',
-                    );
+                    $result = $replaceStatement->execute($this->dehydrate($model));
                     // take note of whether this was an insert or update
                     switch ($replaceStatement->rowCount()) {
                         case self::PDO_RESULT_INSERT:
@@ -4394,12 +4362,7 @@ abstract class Mapper implements IMapper
     {
         $query     = "DELETE FROM `{$this->getTable()}`";
         $statement = $this->database->prepare($query);
-        Tracer::getDefaultTrace()->runWithinSpan(
-            $statement->execute(...),
-            $statement->queryString,
-            'db.sql.execute',
-            'auto.db.mapper.truncate',
-        );
+        $statement->execute();
     }
 
 
