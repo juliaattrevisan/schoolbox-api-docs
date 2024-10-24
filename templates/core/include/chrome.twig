@@ -498,16 +498,13 @@
                         });
                     }
 
-                    {# Determine whether or not the sidebar is empty (has no install button or notification message)
+                    {# Determine whether or not the sidebar/settings prompt is empty (has no install button or notification message)
                      # This is useful when hiding parts of the sidebar prompt contents so that we don't end up with
                      # weird padding or the "Later" button floating in the middle of nowhere...
+                     # @param {"sidebarPrompt"|"settingsPrompt"} promptId - The location to check for emptiness
                      #}
-                    function isSidebarPromptEmpty() {
-                        return Array.from(document.querySelectorAll('[data-pwa="sidebarPrompt"]')).some((sidebarElement) => {
-                            if (sidebarElement.classList.contains('hide')) {
-                                return true; // The whole sidebar prompt is hidden, so it's effectively empty
-                            }
-
+                    function isPromptSectionEmpty(promptId) {
+                        return Array.from(document.querySelectorAll(`[data-pwa="${promptId}"]`)).some((sidebarElement) => {
                             // Check install section
                             if (isPWAInstallPromptVisible(sidebarElement)) {
                                 return false; // An install button is visible, so the sidebar prompt is not empty
@@ -519,6 +516,19 @@
                             };
 
                             return true;
+                        });
+                    }
+
+                    {# Hide the sidebar/settings prompt if it's empty, or show it if it's not #}
+                    function hideShowPromptsIfEmpty() {
+                        ['sidebarPrompt', 'settingsPrompt'].forEach((promptId) => {
+                            document.querySelectorAll(`[data-pwa="${promptId}"]`).forEach((element) => {
+                                if (isPromptSectionEmpty(promptId)) {
+                                    element.classList.add('hide');
+                                } else {
+                                    element.classList.remove('hide');
+                                }
+                            });
                         });
                     }
 
@@ -559,6 +569,7 @@
                         document.querySelectorAll('[data-pwa="sidebarPrompt"], [data-pwa="install"], [data-pwa-action="installApple"]').forEach((element) => {
                             element.classList.remove('hide');
                         });
+                        hideShowPromptsIfEmpty();
                     }
                     {# If on Android and digistorm app exists, show digistorm and not PWA #}
                     else if (
@@ -573,6 +584,7 @@
                         document.querySelectorAll('[data-pwa="sidebarPrompt"], [data-pwa="install"], [data-pwa-action="installGoogle"]').forEach((element) => {
                             element.classList.remove('hide');
                         });
+                        hideShowPromptsIfEmpty();
                     }
                     {# Otherwise, show PWA installer if we aren't already in the PWA #}
                     else if (!isPWA) {
@@ -589,6 +601,7 @@
                             document.querySelectorAll('[data-pwa="sidebarPrompt"], [data-pwa="install"], [data-pwa-action="installPWAiOS"]').forEach((element) => {
                                 element.classList.remove('hide');
                             });
+                            hideShowPromptsIfEmpty();
                         } else {
                             {# Otherwise, rely on beforeinstallprompt to detect browser compatibility before showing the install button
                              # This event is not widely supported, so we either need to provide a manual guide (e.g. iOS) or wait for
@@ -614,6 +627,7 @@
                                 document.querySelectorAll('[data-pwa="sidebarPrompt"], [data-pwa="install"], [data-pwa-action="installPWA"]').forEach((element) => {
                                     element.classList.remove('hide');
                                 });
+                                hideShowPromptsIfEmpty();
 
                                 {# When the user clicks the install button, use the deferredPrompt we just made #}
                                 document.querySelectorAll('[data-pwa-action="installPWA"]').forEach((element) => {
@@ -636,12 +650,8 @@
                                             element.classList.add('hide');
                                         });
 
-                                        // Hide the sidebar prompt if it's now empty
-                                        if (isSidebarPromptEmpty()) {
-                                            document.querySelectorAll('[data-pwa="sidebarPrompt"]').forEach((element) => {
-                                                element.classList.add('hide');
-                                            });
-                                        }
+                                        // Hide the sidebar/settings prompt if it's now empty
+                                        hideShowPromptsIfEmpty();
 
                                         const result = await promptEvent.userChoice;
 
@@ -855,6 +865,7 @@
                                         }),
                                     );
                                 }
+                                hideShowPromptsIfEmpty();
                             });
                         });
 
@@ -909,6 +920,8 @@
                             });
                         }
                     }
+
+                    hideShowPromptsIfEmpty();
                 </script>
                 {% endautoescape %}
             {% endif %}
