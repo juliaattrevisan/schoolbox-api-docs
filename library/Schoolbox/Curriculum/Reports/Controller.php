@@ -18,17 +18,18 @@ use Schoolbox\Curriculum\Reports\Translator\UnitAssessmentUsage as UnitAssessmen
 use Schoolbox\Curriculum\Reports\Translator\CourseUsage as CourseUsageTranslator;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Mapper as CourseUnitSpecificationMapper;
 use Schoolbox\Learning\Course\DataModel\Specification\Mapper as CourseSpecificationMapper;
+use Twig\Error\Error as TwigError;
 
 class Controller extends Base
 {
     /**
      * Controller constructor.
      *
-     * @param ErrorMapper $errorMapper
-     * @param CurriculumMapper  $curriculumMapper
+     * @param CurriculumMapper              $curriculumMapper
+     * @param CourseSpecificationMapper     $courseSpecificationMapper
+     * @param CourseUnitSpecificationMapper $courseUnitSpecificationMapper
      */
     public function __construct(
-        private ErrorMapper $errorMapper,
         private CurriculumMapper $curriculumMapper,
         private CourseSpecificationMapper $courseSpecificationMapper,
         private CourseUnitSpecificationMapper $courseUnitSpecificationMapper,
@@ -38,6 +39,9 @@ class Controller extends Base
 
     /**
      * Get the coverage report
+     *
+     * @return void
+     * @throws TwigError
      */
     public function getCoverage(): void
     {
@@ -126,6 +130,9 @@ class Controller extends Base
 
     /**
      * fetch the coverage report
+     *
+     * @return void
+     * @throws TwigError
      */
     public function postCoverage(): void
     {
