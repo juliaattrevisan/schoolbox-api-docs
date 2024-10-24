@@ -44,7 +44,7 @@ async function onUpdateClicked(): Promise<void> {
 <template>
     <Transition @enter="slideDownOnEnter" @leave="slideUpOnLeave">
         <div v-if="props.isOpen" class="column content small-12">
-            <div class="l-grid l-grid--12 l-gap-m">
+            <div class="l-grid l-grid--12 l-gap-m l-pad-s">
                 <pe-fields-active-item-edit-setting
                     v-for="fieldSettingKey in validFieldSettingKeys"
                     :key="fieldSettingKey"
