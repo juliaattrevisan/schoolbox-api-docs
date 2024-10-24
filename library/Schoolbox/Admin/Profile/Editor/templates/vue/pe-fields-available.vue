@@ -32,52 +32,45 @@ const sortableOptions = window.Vue.computed<Sortable.Options>(() => ({
     removeCloneOnHide: true,
 }));
 
+/**
+ * A list of all category names that are available for the selected role type
+ * Sorted alphabetically
+ */
 const fieldCategories = window.Vue.computed(() => {
     if (peStore.selectedRoleType === null) return [];
-    const categoryMap: Record<string, number> = {};
-
-    // Count occurrences of each category
-    peStore.selectedRoleType.fields.available.forEach((field) => {
-        categoryMap[field.category] = (categoryMap[field.category] || 0) + 1;
-    });
-
-    // Convert the category map into an array and sort reverse-alphabetically by category (so "Internal" appears first for now...)
-    return Object.entries(categoryMap)
-        .map(([category, count]) => ({ category, count }))
-        .sort((a, b) => b.category.localeCompare(a.category));
+    const uniqueCategories = [...new Set(peStore.selectedRoleType.fields.available.map((field) => field.category))];
+    return uniqueCategories.sort();
 });
 
-const selectedCategory = window.Vue.ref<(typeof fieldCategories.value)[0] | null>(null);
+const selectedCategory = window.Vue.ref<string | null>(null);
 
 const availableFieldsToShow = window.Vue.computed(() => {
     if (peStore.selectedRoleType === null) return [];
     const allFields = peStore.selectedRoleType.fields.available;
 
-    // If there is only one category, show all fields
-    const category = selectedCategory.value;
-    if (category === null || fieldCategories.value.length <= 1) return allFields;
-
-    // Otherwise, filter the fields by the selected category
-    return allFields.filter((field) => field.category === category.category);
-});
-
-window.Vue.onMounted(() => {
-    // Set the selected category to the first one
-    const firstCategory = fieldCategories.value[0];
-    if (firstCategory) {
-        selectedCategory.value = firstCategory;
+    // If no category is selected, show all fields
+    if (selectedCategory.value === null) {
+        return allFields;
     }
+
+    // Filter the fields by the selected category
+    return allFields.filter((field) => field.category === selectedCategory.value);
 });
+
+// When the selected role type changes, reset the selected category
+window.Vue.watch(
+    () => peStore.selectedRoleType,
+    () => {
+        selectedCategory.value = fieldCategories.value[0] ?? null;
+    },
+    { immediate: true },
+);
 </script>
 
 <template>
     <dl v-if="fieldCategories.length > 1" class="tabs">
-        <dd
-            v-for="category in fieldCategories"
-            :key="category.category"
-            :class="{ active: category.category === selectedCategory?.category }"
-        >
-            <a @click="selectedCategory = category">{{ category.category }} ({{ category.count }})</a>
+        <dd v-for="category in fieldCategories" :key="category" :class="{ active: category === selectedCategory }">
+            <a @click="selectedCategory = category">{{ category }}</a>
         </dd>
     </dl>
     <section v-if="peStore.selectedRoleType !== null" class="pe-fields-palette">
