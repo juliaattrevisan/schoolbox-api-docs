@@ -947,7 +947,7 @@ class Subnav
                 ],
             ],
             '/adminv2/pastoral' => [
-                'name'       => 'Pastoral',
+                'name'       => 'Pastoral Care',
                 'visible'    => $userIsSuperuser || $userHasServicePermissionPastoral,
                 'children'   => [
                     '/adminv2/setting/Pastoral%20Care' => [
