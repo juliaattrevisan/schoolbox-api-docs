@@ -67,6 +67,10 @@ class Broker implements IBroker
                 $this->queue,
                 IClient::ACK_MODE_CLIENT_INDIVIDUAL,
                 function (IFrame $frame, IAckResolver $resolver) use ($consumer): void {
+                    // Start Sentry transaction here?
+                    // op: message.receive
+                    // origin: auto.message
+                    // data:
                     $resolve = new Resolver($resolver);
 
                     try {

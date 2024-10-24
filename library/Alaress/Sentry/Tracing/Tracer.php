@@ -260,6 +260,34 @@ class Tracer
     }
 
     /**
+     * Helper function for updating the current transaction context with
+     * settings for tracing a message received by a daemon.
+     *
+     * @param string $destination An identifier for the queue which received
+     *                            the message.
+     * @return void
+     */
+    public function setTransactionContextForDaemon(string $destination): void
+    {
+        $transactionContext = $this->transactionContext;
+        if ($transactionContext) {
+            $transactionContext->setName('consume ' . $destination);
+            $transactionContext->setOp('message.receive');
+            $transactionContext->setOrigin('auto.message');
+            $transactionContext->setSource(TransactionSource::task());
+
+            // Messaging data, from
+            // https://github.com/open-telemetry/semantic-conventions/blob/main/docs/messaging/messaging-spans.md
+            $transactionContext->setData(
+                $transactionContext->getData() + [
+                    'messaging.destination.template' => $destination,
+                    'messaging.operation.name'       => 'consume',
+                ],
+            );
+        }
+    }
+
+    /**
      * Normalises a full filename path for use in a transaction name, by
      * stripping away the site root.
      *
