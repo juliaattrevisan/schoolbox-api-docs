@@ -297,6 +297,7 @@ class Base implements IConnector
         return new TracedPdoStatement(
             $this->broker->prepare($statement, $driverOptions),
             $this->broker->getDriver(),
+            Tracer::getDefaultTrace(),
         );
     }
 

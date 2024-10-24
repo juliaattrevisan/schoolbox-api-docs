@@ -13,23 +13,42 @@ use Alaress\Sentry\Tracing\Tracer;
 use Iterator;
 use JetBrains\PhpStorm\ArrayShape;
 use PDO;
+use PDOException;
 use PDOStatement;
 
 /**
- * Class WrappedPdoStatement
+ * A wrapper around a `PDOStatement`, which wraps `execute` in a call to a
+ * span within a trace.
  */
 class TracedPdoStatement extends PDOStatement
 {
-    public string $queryString;
-
-    public function __construct(private PDOStatement $statement, private string $driverName)
-    {
+    /**
+     * Constructor
+     *
+     * @param PDOStatement $statement  The statement to execute.
+     * @param string       $driverName The name of the driver: used in the span.
+     * @param Tracer       $tracer     The tracer to send the span to.
+     */
+    public function __construct(
+        private PDOStatement $statement,
+        private string $driverName,
+        private Tracer $tracer,
+    ) {
         $this->queryString = $statement->queryString;
     }
 
+    /**
+     * Execute the wrapped statement, wrapping it in a span.
+     *
+     * @param array|null $params
+     * @return bool
+     * @throws PDOException if the execution of the statement raises an error.
+     * @noinspection PhpDocMissingThrowsInspection this will only throw PDOException
+     */
     public function execute(?array $params = null): bool
     {
-        return Tracer::getDefaultTrace()->runWithinSpan(
+        /** @noinspection PhpUnhandledExceptionInspection */
+        return $this->tracer->runWithinSpan(
             fn () => $this->statement->execute($params),
             $this->statement->queryString,
             'db.sql.query',

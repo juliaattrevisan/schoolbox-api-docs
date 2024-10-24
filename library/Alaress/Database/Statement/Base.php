@@ -15,6 +15,7 @@ use Alaress\Database\Collector;
 use Alaress\Database\Exception;
 use Alaress\Database\Iterator\IIterator;
 use Alaress\Sentry\Tracing\Database\TracedPdoStatement;
+use Alaress\Sentry\Tracing\Tracer;
 use PDO;
 use PDOException;
 use PDOStatement;
@@ -181,6 +182,7 @@ abstract class Base implements IStatement
                 $this->statement = new TracedPdoStatement(
                     $this->broker->prepare($this->getSql()),
                     $this->broker->getDriver(),
+                    Tracer::getDefaultTrace(),
                 );
             } catch (PDOException $e) {
                 throw new Exception("Error preparing execution: " . $e->getMessage(), 0, $e);
