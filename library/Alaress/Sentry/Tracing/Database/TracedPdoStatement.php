@@ -33,6 +33,8 @@ class TracedPdoStatement extends PDOStatement
         private string $driverName,
         private Tracer $tracer,
     ) {
+        // Expose the statement's query string in this object, so other
+        // processes can read it.
         $this->queryString = $statement->queryString;
     }
 
@@ -130,7 +132,7 @@ class TracedPdoStatement extends PDOStatement
         return $this->statement->getColumnMeta($column);
     }
 
-    public function setFetchMode($mode, $className = null, ...$params)
+    public function setFetchMode($mode, $className = null, ...$params): bool
     {
         return $this->statement->setFetchMode($mode, $className, ...$params);
     }
