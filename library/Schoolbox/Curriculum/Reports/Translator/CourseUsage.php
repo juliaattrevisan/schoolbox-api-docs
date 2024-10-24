@@ -5,7 +5,7 @@ namespace Schoolbox\Curriculum\Reports\Translator;
 use Alaress\Authorizer\Authorizer;
 use Alaress\Authorizer\GetRouteIfAuthorized;
 use Aura\Router\Generator;
-use Schoolbox\Curriculum\Node\Model as NodeModel;
+use Schoolbox\Curriculum\Node\Model as CurriculumNodeModel;
 use Schoolbox\Curriculum\Reports\Translator\UnitAssessmentUsage as UnitAssessmentUsageTranslator;
 use Schoolbox\Learning\Course\DataModel\Specification\Model;
 use Schoolbox\User;
@@ -17,7 +17,12 @@ class CourseUsage
     /**
      * Constructor
      *
-     * @param ?array $counts A set of usage counts for each node to be translated.
+     * @param Generator                     $routeGenerator
+     * @param Authorizer                    $authorizer
+     * @param User                          $currentUser
+     * @param UnitAssessmentUsageTranslator $unitAssessmentUsageUsageTranslator
+     * @param array                         $courseUnitSpec
+     * @param ?array                        $counts A set of usage counts for each node to be translated.
      */
     public function __construct(
         protected Generator $routeGenerator,
@@ -30,15 +35,16 @@ class CourseUsage
     }
 
     /**
-     * @param Model $model
+     * @param Model                 $model
+     * @param CurriculumNodeModel   $node
      * @return array
      */
-    public function __invoke(Model $model, NodeModel $node): array
+    public function __invoke(Model $model, CurriculumNodeModel $node): array
     {
         return $this->translate($model, $node);
     }
 
-    private function translate(Model $model, NodeModel $node): array
+    private function translate(Model $model, CurriculumNodeModel $node): array
     {
 
         $courseCount = $this->counts['courseSpecification'][$node->getId()][$model->getId()] ?? 0;

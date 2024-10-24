@@ -14,7 +14,6 @@ use Alaress\Authorizer\Rule;
 use Alaress\Module\Module as BaseModule;
 use Alaress\Twig\Loader\IChainLoader;
 use Alaress\Web\Controller\Base;
-use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Role;
 use Schoolbox\Curriculum\Node\Mapper as CurriculumMapper;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Mapper as CourseUnitSpecificationMapper;

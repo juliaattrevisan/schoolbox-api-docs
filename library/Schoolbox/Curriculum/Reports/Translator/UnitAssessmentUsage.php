@@ -6,7 +6,7 @@ use Alaress\Authorizer\Authorizer;
 use Alaress\Authorizer\GetRouteIfAuthorized;
 use Aura\Router\Generator;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as Model;
-use Schoolbox\Curriculum\Node\Model as NodeModel;
+use Schoolbox\Curriculum\Node\Model as CurriculumNodeModel;
 use Schoolbox\User;
 
 class UnitAssessmentUsage
@@ -16,7 +16,10 @@ class UnitAssessmentUsage
     /**
      * Constructor
      *
-     * @param ?array $counts A set of usage counts for each node to be translated.
+     * @param Generator     $routeGenerator
+     * @param Authorizer    $authorizer
+     * @param User          $currentUser
+     * @param ?array        $counts A set of usage counts for each node to be translated.
      */
     public function __construct(
         protected Generator $routeGenerator,
@@ -27,15 +30,16 @@ class UnitAssessmentUsage
     }
 
     /**
-     * @param Model $node
+     * @param Model               $model
+     * @param CurriculumNodeModel $node
      * @return array
      */
-    public function __invoke(Model $model, NodeModel $node): array
+    public function __invoke(Model $model, CurriculumNodeModel $node): array
     {
         return $this->translate($model, $node);
     }
 
-    private function translate(Model $model, NodeModel $node): array
+    private function translate(Model $model, CurriculumNodeModel $node): array
     {
         $unitCount =
             $this->counts['unit'][$node->getId()][$model->getCourse()->getId()][$model->getFolder()->getId()] ?? 0;
