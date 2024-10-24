@@ -234,7 +234,7 @@ export default window.Vue.defineComponent({
          * check if already loaded and saved, or load up
          */
         async loadSettings() {
-            if (sessionStorage.getItem(SB_SETTINGS_LIST)) {
+            if (sessionStorage.getItem(`${SB_SETTINGS_LIST}-${window.schoolboxUser.id}`)) {
                 this.loadSessionSettings();
             } else {
                 await this.loadRemoteSettings();
@@ -263,7 +263,12 @@ export default window.Vue.defineComponent({
                 const response = await fetch("/adminv2/setting/search");
                 const responseJson = (await response.json()) as SBSettingsListItem[];
                 this.settingsList = responseJson;
-                sessionStorage.setItem(SB_SETTINGS_LIST, JSON.stringify(this.settingsList)); // session storage vars need to be saved as strings only
+                sessionStorage.setItem(
+                    // Index by userId so that for example if a superuser logs out and then a non-superuser moderator
+                    // logs in using the same browser tab, the moderator will not see the superuser's search index.
+                    `${SB_SETTINGS_LIST}-${window.schoolboxUser.id}`,
+                    JSON.stringify(this.settingsList),
+                ); // session storage vars need to be saved as strings only
             } catch (error) {
                 this.hasLoadError = true; // hide search bar in the dom
             } finally {
