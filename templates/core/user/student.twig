@@ -125,7 +125,7 @@
                      #}
                     {% set additionalConstraints = {
                         'student': {
-                            '_default': null,
+                            '_default': true,
                             'email': showEmail
                         },
                         'parent': {
@@ -155,6 +155,7 @@
                              #}
                             {% if (additionalConstraints[USER.role.type][selectedField.field] ?? additionalConstraints[USER.role.type]['_default']) %}
                                 {% set foundPortrait = true %}
+
 
                                 {# Portrait was available and visible to you,
                                  # and you pass the additionalConstraints listed above
@@ -510,7 +511,7 @@
                     default:
                         $('[data-tab] a').first().trigger('click');
                         break;
-                }
+                }}
             });
         </script>
 
