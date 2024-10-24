@@ -102,7 +102,6 @@ class Controller extends Base
             $this->getUser(),
             $courseUsageTranslator,
             $courseSpecs,
-            $usageCount
         );
 
         $response = array_map(
