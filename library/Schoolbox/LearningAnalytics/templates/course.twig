@@ -321,11 +321,11 @@
             <span class='hint has-tip tip-top' title="The Effort Graph aggregates data across all terms/semesters" data-tooltip>?</span>
         </h2>
 
-        {% if results.assessments | length %}
+        {% if (results.assessments | length) and (weightedAssessments | length) %}
         <section class="content">
             <div data-graph="effort"></div>
         </section>
-        {% elseif 0 == (gradableAssessments | length) %}
+        {% else %}
         <div class="empty-state">
             <i class="icon-due-work"></i>
             <p>There are no gradable activities due in this {{ locale.term }}, maybe try selecting a different {{ locale.term }}.</p>
