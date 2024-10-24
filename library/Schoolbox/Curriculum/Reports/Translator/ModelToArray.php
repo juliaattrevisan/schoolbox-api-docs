@@ -23,7 +23,6 @@ class ModelToArray
      * @param User                  $currentUser
      * @param CourseUsageTranslator $courseUsageTranslator
      * @param Collection            $courseSpec
-     * @param ?array                $counts A set of usage counts for each node to be translated.
      */
     public function __construct(
         protected Generator $routeGenerator,
@@ -31,7 +30,6 @@ class ModelToArray
         protected User $currentUser,
         private CourseUsageTranslator $courseUsageTranslator,
         private Collection $courseSpec,
-        private ?array $counts,
     ) {
     }
 
