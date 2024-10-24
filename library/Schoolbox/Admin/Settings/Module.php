@@ -50,8 +50,8 @@ class Module extends \Alaress\Module\Module
         );
 
         // Routes to which users with service permission UserAccess::SERVICE_PASTORAL need access.
-        $this->register('GET', '/{typeLabel:Pastoral Care}', 'getSettingsPastoral', $rulePastoral);
-        $this->register('POST', '/{typeLabel:Pastoral Care}', 'postSettingsPastoral', $rulePastoral);
+        $this->register('GET', '/{typeLabel:Pastoral%20Care}', 'getSettingsPastoral', $rulePastoral);
+        $this->register('POST', '/{typeLabel:Pastoral%20Care}', 'postSettingsPastoral', $rulePastoral);
 
         $this->register('GET', '/search', 'searchSettings', $ruleSearchSettings);
         $this->register('GET', '{/typeLabel}', 'getSettings', $ruleSuperuserOnly);
