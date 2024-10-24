@@ -149,11 +149,22 @@ class TracedPdoStatement extends PDOStatement
 
     public function debugDumpParams(): ?bool
     {
+        /**
+         * @phpstan-ignore-next-line
+         *
+         * PDOStatement::debugDumpParams returns ?bool, not void as PHPStan is reporting
+         */
         return $this->statement->debugDumpParams();
     }
 
     public function getIterator(): Iterator
     {
+        /**
+         * @phpstan-ignore-next-line
+         *
+         * PDOStatement::getIterator returns Iterator, not a Traversable as
+         * PHPStan is reporting
+         */
         return $this->statement->getIterator();
     }
 }
