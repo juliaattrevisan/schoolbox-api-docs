@@ -71,7 +71,7 @@ class Controller extends Base
             '@adminMenuTop/index.twig',
             [
                 'pageCurrent' => $this->routeGenerator->generate('adminMenuTop.getIndex'),
-                'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->routeGenerator->generate('adminMenuTop.getIndex')),
+                'allBreadcrumbs' => (new Subnav($this->getConfigLoader(), $this->getUser()))->generateBreadcrumbs($this->routeGenerator->generate('adminMenuTop.getIndex')),
                 'menu' => $this->getMenuTopMapper()->findByColumn('plan_hide', 0, ['order' => ['sort_order' => BaseMapper::SORT_ORDER_ASC]])
             ],
             'Admin - Top Menu'
@@ -114,7 +114,7 @@ class Controller extends Base
                 'resource' => $this->getDi()->get('sitePage')->getLocalisedTerm('resource', true, true),
                 'pageCurrent' => $this->routeGenerator->generate('adminMenuTop.getIndex'),
                 'allBreadcrumbs' => array_merge(
-                    (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->routeGenerator->generate('adminMenuTop.getIndex')),
+                    (new Subnav($this->getConfigLoader(), $this->getUser()))->generateBreadcrumbs($this->routeGenerator->generate('adminMenuTop.getIndex')),
                     [['Modify', null]]
                 ),
                 'item' => $this->getMenuTopMapper()->findOneByColumn($this->getMenuTopMapper()->getIdentifierColumn(), $id, ['cache' => false]),
@@ -142,7 +142,7 @@ class Controller extends Base
             [
                 'pageCurrent' => $this->routeGenerator->generate('adminMenuTop.getIndex'),
                 'allBreadcrumbs' => array_merge(
-                    (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->routeGenerator->generate('adminMenuTop.getIndex')),
+                    (new Subnav($this->getConfigLoader(), $this->getUser()))->generateBreadcrumbs($this->routeGenerator->generate('adminMenuTop.getIndex')),
                     [['Create', null]]
                 ),
                 'icons' => $this->getMenuIconMapper()->findAll(['order' => ['title' => BaseMapper::SORT_ORDER_ASC]]),

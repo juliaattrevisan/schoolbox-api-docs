@@ -1,7 +1,7 @@
 <?php
 
 /**
-  * @author    Damian Sloane <damian.sloane@alaress.com.au>
+ * @author    Damian Sloane <damian.sloane@alaress.com.au>
  * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
  */
@@ -9,6 +9,7 @@
 namespace Schoolbox\Admin\Navigation;
 
 use Schoolbox\Config\Loader;
+use Schoolbox\User;
 use Twig\Environment;
 use Twig\Extension;
 use Twig\TwigFunction;
@@ -22,6 +23,10 @@ use Twig\TwigFunction;
  */
 class Renderer extends Extension\AbstractExtension
 {
+    public function __construct(private readonly User $loggedInUser)
+    {
+    }
+
     /**
      * @return array|TwigFunction[]
      */
@@ -34,7 +39,6 @@ class Renderer extends Extension\AbstractExtension
             ]),
         );
     }
-
 
     /**
      * @param Environment $twig
@@ -51,7 +55,7 @@ class Renderer extends Extension\AbstractExtension
         // TODO SA-8354: inject this
 
         // Render this thing out
-        return (new Subnav(new Loader()))->generateHtml($pageCurrent, $title);
+        return (new Subnav(new Loader(), $this->loggedInUser))->generateHtml($pageCurrent, $title);
     }
 
     /**

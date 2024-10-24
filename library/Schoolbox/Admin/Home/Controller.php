@@ -170,7 +170,7 @@ class Controller extends Base
             '@adminHome/index.twig',
             [
                 'pageCurrent' => $this->routeGenerator->generate('adminHome.getIndex'),
-                'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->routeGenerator->generate('adminHome.getIndex')),
+                'allBreadcrumbs' => (new Subnav($this->getConfigLoader(), $this->getUser()))->generateBreadcrumbs($this->routeGenerator->generate('adminHome.getIndex')),
                 'usageInGraph' => $usageInGraph,
                 'showUpgradeReminder'  => $version->showUpgradeReminder(),
                 'major_site_version'   => $version->getMajor(),
@@ -243,7 +243,7 @@ class Controller extends Base
             '@adminHome/healthcheck.twig',
             [
                 'pageCurrent' => $this->routeGenerator->generate('adminHome.getIndex'),
-                'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->routeGenerator->generate('adminHome.getIndex')),
+                'allBreadcrumbs' => (new Subnav($this->getConfigLoader(), $this->getUser()))->generateBreadcrumbs($this->routeGenerator->generate('adminHome.getIndex')),
                 'output' => $output
             ]
         );
@@ -273,7 +273,7 @@ class Controller extends Base
             array_merge(
                 [
                     'pageCurrent'    => $this->routeGenerator->generate('adminHome.getIndex'),
-                    'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->routeGenerator->generate('adminHome.getIndex')),
+                    'allBreadcrumbs' => (new Subnav($this->getConfigLoader(), $this->getUser()))->generateBreadcrumbs($this->routeGenerator->generate('adminHome.getIndex')),
                     'enabled'        => $isEnabled,
                 ],
                 $enabledData

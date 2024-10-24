@@ -16,6 +16,7 @@ use InvalidArgumentException;
 use Schoolbox\Admin\Settings\FieldStrategyFactory;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Comms\News\Topic;
+use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
 
@@ -26,7 +27,6 @@ class Module extends BaseModule
      */
     protected $basename = 'commsNewsPolicy';
 
-
     /**
      * Hook method for setting up routes via self::register()
      *
@@ -35,29 +35,16 @@ class Module extends BaseModule
      */
     protected function registerRoutes()
     {
-        /* Any staff can see the form
-         */
-        $getPerms = new Rule\All(
+        $perms = new Rule\All(
             new Rule\IsLoggedIn(),
             new Rule\Any(
-                new Rule\IsSuperuser()
-                //new Rule\HasRole(Role::STAFF),
-                //new Rule\HasServicePermission(UserAccess::SERVICE_NEWS, UserAccess::ACCESS_FULL)
+                new Rule\IsSuperuser(),
+                new Rule\HasServicePermission(UserAccess::SERVICE_NEWS, UserAccess::ACCESS_FULL)
             )
         );
 
-        /* Only superusers or comms officers can receive data from the form
-         */
-        $postPerms = new Rule\All(
-            new Rule\IsLoggedIn(),
-            new Rule\Any(
-                new Rule\IsSuperuser()
-                //new Rule\HasServicePermission(UserAccess::SERVICE_NEWS, UserAccess::ACCESS_FULL)
-            )
-        );
-
-        $this->register('GET', '', 'getPolicies', $getPerms);
-        $this->register('POST', '', 'postPolicies', $postPerms);
+        $this->register('GET', '', 'getPolicies', $perms);
+        $this->register('POST', '', 'postPolicies', $perms);
     }
 
     /**

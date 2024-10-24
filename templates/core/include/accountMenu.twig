@@ -20,8 +20,9 @@
 
     <li><a class="icon-staff-students" href="/search/user/{{ user.current.id }}">Profile</a></li>
     <li><a class="icon-settings" href="/settings/notifications">Notification Settings</a></li>
-    {% if user.current.superuser %}
-        <li><a class="icon-locked" href="/adminv2/home">Administration</a></li>
+    {% set adminHomeUrl = routeLookupIfAuthorized('adminHome.getIndex') %}
+    {% if adminHomeUrl %}
+        <li><a class="icon-locked" href="{{ adminHomeUrl }}">Administration</a></li>
     {% endif %}
 
     {# Not Help? Show a link to Help #}

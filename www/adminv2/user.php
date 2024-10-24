@@ -19,7 +19,7 @@ $this->setBlock(TEMPLATE_content, 'superusers', 'superusers_block');
 $this->setBlock(TEMPLATE_content, 'service', 'service_block');
 
 // include the admin navigation
-(new Subnav($this->getDi()->get('config')))
+(new Subnav($this->getDi()->get('config'), $this->getDi()->get('user')))
     ->generatePhplib($this, '/adminv2/user')
     ->generateBreadcrumbsHtml($this, '/adminv2/user');
 

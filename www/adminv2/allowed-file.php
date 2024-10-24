@@ -18,7 +18,7 @@ $this->setBlock('file', 'enabled', 'enabled_block');
 $this->setBlock(TEMPLATE_content, 'image', 'image_block');
 
 // include the admin navigation
-(new Subnav($this->getDi()->get('config')))
+(new Subnav($this->getDi()->get('config'), $this->getDi()->get('user')))
     ->generatePhplib($this, '/adminv2/allowed-file')
     ->generateBreadcrumbsHtml($this, '/adminv2/allowed-file');
 

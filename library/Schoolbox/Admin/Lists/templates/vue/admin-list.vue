@@ -33,8 +33,13 @@ export default {
     mixins: [saveRows],
 
     props: {
+        listCategory: {
+            // The category of list, as used in the URL (e.g. 'adminv2/lists/news/news-topic' - 'news' is the category in this URL).
+            type: String,
+            required: true,
+        },
         tableName: {
-            //the name of the current list, used to submit updates to the DB
+            // The name of the current list, used to submit updates to the DB.
             type: String,
             required: true,
         },
@@ -52,7 +57,7 @@ export default {
         ...mapState(useAdminListStore, ["loadedData", "rows", "selectedRow", "isPopOutOpen", "headerFields"]),
 
         /**
-         * Whether the admin-list-pop-out.vue is requred
+         * Whether the admin-list-pop-out.vue is required
          *
          * @returns { Boolean }
          */
@@ -84,8 +89,13 @@ export default {
          * Load the list data relevant to the current list
          */
         async getData() {
+            let url =
+                this.listCategory === ""
+                    ? `/adminv2/lists/data/${this.tableName}`
+                    : `/adminv2/lists/${this.listCategory}/data/${this.tableName}`;
+
             try {
-                const response = await fetch(`/adminv2/lists/data/${this.tableName}`);
+                const response = await fetch(url);
                 const responseData = await response.json();
                 this.updateLoadedData(responseData);
             } catch (error) {
@@ -154,7 +164,8 @@ export default {
                 <transition name="fade" mode="out-in" @after-enter="onListAfterEnter">
                     <admin-list-no-rows v-if="rows.length === 0" key="empty-list" />
 
-                    <form v-else method="post" action="/adminv2/lists/save" key="list">
+                    <!-- The 'action' value will be set by Javascript in adminListStore.js. -->
+                    <form v-else method="post" action="" key="list">
                         <section>
                             <div class="list-container">
                                 <admin-list-header />

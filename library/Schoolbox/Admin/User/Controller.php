@@ -382,7 +382,7 @@ class Controller extends Base
                 'identifiers' => self::IDENTIFIERS,
                 'accessLevel' => self::ACCESS_LEVELS,
                 'pageCurrent' => $this->routeGenerator->generate('adminUser.getInsert'),
-                'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs(
+                'allBreadcrumbs' => (new Subnav($this->getConfigLoader(), $this->getUser()))->generateBreadcrumbs(
                     $this->routeGenerator->generate('adminUser.getInsert'),
                     $this->routeGenerator->generate('adminUser.getModify', ['userId' => $user->getId()]),
                     'Modify User'
@@ -430,7 +430,7 @@ class Controller extends Base
             '@adminUser/stale.twig',
             [
                 'pageCurrent' => $this->routeGenerator->generate('adminUser.getStaleReport'),
-                'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->routeGenerator->generate('adminUser.getStaleReport')),
+                'allBreadcrumbs' => (new Subnav($this->getConfigLoader(), $this->getUser()))->generateBreadcrumbs($this->routeGenerator->generate('adminUser.getStaleReport')),
                 'listEndpoint' => $this->routeGenerator->generate('adminUser.getStaleUsers'),
                 'deleteEndpoint' => $this->routeGenerator->generate('adminUser.postDeleteList'),
             ]
@@ -497,7 +497,7 @@ class Controller extends Base
             '@adminUser/modify.twig',
             [
                 'pageCurrent' => $this->routeGenerator->generate('adminUser.getInsert'),
-                'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->routeGenerator->generate('adminUser.getInsert')),
+                'allBreadcrumbs' => (new Subnav($this->getConfigLoader(), $this->getUser()))->generateBreadcrumbs($this->routeGenerator->generate('adminUser.getInsert')),
                 'method'    => 'Create',
                 'user' => $user,
                 'yearLevels' => $this->yearLevelMapper->findAll(),

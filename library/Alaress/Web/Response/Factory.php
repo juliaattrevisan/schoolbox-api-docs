@@ -15,6 +15,7 @@ use Psr\Http\Message\ResponseFactoryInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\StreamFactoryInterface;
 use Psr\Http\Message\StreamInterface;
+use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\User;
 use Symfony\Component\HttpFoundation\Response;
 use Twig\Environment;

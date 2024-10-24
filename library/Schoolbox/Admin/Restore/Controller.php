@@ -79,7 +79,7 @@ class Controller extends Base
 
         $this->response = $this->responseFromTemplate('@restore/index.twig', [
             'pageCurrent'        => $this->routeGenerator->generate('restore.getIndex'),
-            'allBreadcrumbs'     => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->routeGenerator->generate('restore.getIndex')),
+            'allBreadcrumbs'     => (new Subnav($this->getConfigLoader(), $this->getUser()))->generateBreadcrumbs($this->routeGenerator->generate('restore.getIndex')),
             'deletedFolders'     => $deletedFolders,
             'deletedAssessments' => $deletedAssessments,
             'assessmentTypes'    => Assessment\AssessmentType::getOptions(

@@ -84,7 +84,7 @@ class Controller extends Base
             '@adminTerms/index.twig',
             [
                 'pageCurrent'      => $this->routeGenerator->generate('adminTerms.getIndex'),
-                'allBreadcrumbs'   => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->routeGenerator->generate('adminTerms.getIndex')),
+                'allBreadcrumbs'   => (new Subnav($this->getConfigLoader(), $this->getUser()))->generateBreadcrumbs($this->routeGenerator->generate('adminTerms.getIndex')),
                 'terms'            => $terms,
                 'yearLevelValues'  => $yearLevelValues,
                 'yearLevelOptions' => $yearLevelOptions,

@@ -44,7 +44,7 @@ class Controller extends Base
             '@adminIntellischool/console.twig',
             [
                 'pageCurrent'      => $this->routeGenerator->generate('adminIntellischool.getConsole'),
-                'allBreadcrumbs'   => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->routeGenerator->generate('adminIntellischool.getConsole')),
+                'allBreadcrumbs'   => (new Subnav($this->getConfigLoader(), $this->getUser()))->generateBreadcrumbs($this->routeGenerator->generate('adminIntellischool.getConsole')),
                 'ltiEndpoint' => $this->jwtFactory::LTI_ENDPOINT,
                 'jwt'         => $this->jwtFactory->buildForAdminView($this->getUser()),
                 'title' => 'Intellischool - Admin Console'

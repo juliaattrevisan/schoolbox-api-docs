@@ -27,7 +27,7 @@
                 </ul>
                 <div class="component-action">
                     <section>
-                        <a href="/adminv2/lists/news-topic" class="button">Modify List</a>
+                        <a href="/adminv2/lists/news/news-topic" class="button">Modify List</a>
                     </section>
                 </div>
             </section>
@@ -37,7 +37,7 @@
                 <i class="icon-news"></i>
                 <p>{{ locale.news.proper }} topics haven't been created.</p>
 
-                {% set topicRoute = routeLookupIfAuthorized('adminLists.getIndex', {table: 'news-topic'}) %}
+                {% set topicRoute = routeLookupIfAuthorized('adminLists.getNewsIndex', {table: 'news-topic'}) %}
 
                 {% if topicRoute %}
                 <p><a href="{{ topicRoute }}" title="Define {{ locale.news }} topics">Define {{ locale.news }} topics</a> so that content creators can categorise their articles.</p>

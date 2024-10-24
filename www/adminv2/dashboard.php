@@ -33,7 +33,7 @@ $this->setBlock('layout', 'position_right', 'position_right_block');
 $this->setBlock(TEMPLATE_content, 'component', 'component_block');
 
 // include the admin navigation
-(new Subnav($this->getDi()->get('config')))
+(new Subnav($this->getDi()->get('config'), $this->getDi()->get('user')))
     ->generatePhplib($this, '/adminv2/dashboard')
     ->generateBreadcrumbsHtml($this, '/adminv2/dashboard');
 

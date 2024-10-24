@@ -37,7 +37,7 @@ class Controller extends Base
             '@adminTerminology/index.twig',
             [
                 'pageCurrent' => $this->routeGenerator->generate('adminTerminology.getIndex'),
-                'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->routeGenerator->generate('adminTerminology.getIndex')),
+                'allBreadcrumbs' => (new Subnav($this->getConfigLoader(), $this->getUser()))->generateBreadcrumbs($this->routeGenerator->generate('adminTerminology.getIndex')),
                 'terms' => $this->l10nMapper->findAll()->sortNaturally('title'),
             ],
             'Admin - Terminology'

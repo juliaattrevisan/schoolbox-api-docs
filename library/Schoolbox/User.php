@@ -444,7 +444,7 @@ class User implements Serializable, Linkable, ISoftDeletable, IModel
     }
 
 
-   /**
+    /**
      * @param string $altEmail
      * @return self
      */
@@ -1388,6 +1388,24 @@ class User implements Serializable, Linkable, ISoftDeletable, IModel
             }
         }
         return $this->getRole()->getAccessPastoral();
+    }
+
+    /**
+     * Note this function deliberately does not check whether the user is a staff member.
+     *
+     * @param int $servicePermission - One of UserAccess::SERVICE_NEWS, UserAccess::SERVICE_CALENDAR, etc.
+     * @param int $level - One of UserAccess::ACCESS_READ, UserAccess::ACCESS_WRITE, etc.
+     * @return bool
+     */
+    public function hasServicePermission(int $servicePermission, int $level): bool
+    {
+        foreach ($this->getAccessList()->filterBy('service', $servicePermission) as $access) {
+            if ($access->getAccessLevel() >= $level) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**

@@ -89,7 +89,7 @@ class Controller extends Base
             '@adminBulkCourseImport/index.twig',
             [
                 'pageCurrent'    => $this->routeGenerator->generate('adminBulkCourseImport.getIndex'),
-                'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->routeGenerator->generate('adminBulkCourseImport.getIndex')),
+                'allBreadcrumbs' => (new Subnav($this->getConfigLoader(), $this->getUser()))->generateBreadcrumbs($this->routeGenerator->generate('adminBulkCourseImport.getIndex')),
                 'attachzone'     => $this->getAttachZone(),
             ],
         );
@@ -134,7 +134,7 @@ class Controller extends Base
             '@adminBulkCourseImport/importResults.twig',
             [
                 'pageCurrent'    => $this->routeGenerator->generate('adminBulkCourseImport.getIndex'),
-                'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->routeGenerator->generate('adminBulkCourseImport.getIndex')),
+                'allBreadcrumbs' => (new Subnav($this->getConfigLoader(), $this->getUser()))->generateBreadcrumbs($this->routeGenerator->generate('adminBulkCourseImport.getIndex')),
                 'results'        => $imported,
                 'perform'        => $performMode,
             ],

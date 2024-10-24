@@ -25,7 +25,7 @@ if (!$group->isSuperuser()) {
 $this->setFile(TEMPLATE_content, 'adminv2/rollover.html');
 
 // include the admin navigation
-(new Subnav($this->getDi()->get('config')))
+(new Subnav($this->getDi()->get('config'), $this->getDi()->get('user')))
     ->generatePhplib($this, '/adminv2/rollover')
     ->generateBreadcrumbsHtml($this, '/adminv2/rollover');
 

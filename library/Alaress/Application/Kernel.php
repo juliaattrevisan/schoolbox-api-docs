@@ -1206,7 +1206,7 @@ abstract class Kernel
                     // According to https://twig.symfony.com/doc/1.x/deprecated.html#globals
                     // globals must be loaded before extensions.
                     $twig->addExtension(new DebugExtension());
-                    $twig->addExtension(new AdminNavigationRenderer());
+                    $twig->addExtension(new AdminNavigationRenderer($di->get('user')));
                     $twig->addExtension(new LearningRenderer());
 
                     return $twig;

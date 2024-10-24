@@ -101,7 +101,7 @@ class Controller extends Base
             '@adminImportFolder/index.twig',
             [
                 'pageCurrent'    => $this->routeGenerator->generate('adminImportFolder.getIndex'),
-                'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->routeGenerator->generate('adminImportFolder.getIndex')),
+                'allBreadcrumbs' => (new Subnav($this->getConfigLoader(), $this->getUser()))->generateBreadcrumbs($this->routeGenerator->generate('adminImportFolder.getIndex')),
                 'allNavigation' => $this->navigation->buildNavigation($this->routeGenerator, 'adminImportFolder')->getAllNodes(),
                 'templates' => $this->homepageTemplateMapper->findAll()->sortBy('name', 'asc'),
                 'roles' => $this->roleMapper->findAll(),
@@ -162,7 +162,7 @@ class Controller extends Base
             [
                 'errorMessage'   => $csvFileFormatErrorMessage,
                 'pageCurrent'    => $this->routeGenerator->generate('adminImportFolder.getIndex'),
-                'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->routeGenerator->generate('adminImportFolder.getIndex')),
+                'allBreadcrumbs' => (new Subnav($this->getConfigLoader(), $this->getUser()))->generateBreadcrumbs($this->routeGenerator->generate('adminImportFolder.getIndex')),
                 'results'        => $allFolders,
                 'perform'        => $performMode,
             ],

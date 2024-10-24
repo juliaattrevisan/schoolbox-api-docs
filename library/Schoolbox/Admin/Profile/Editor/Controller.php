@@ -57,7 +57,7 @@ class Controller extends Base
 
         $this->response = $this->responseFromTemplate('@adminProfileEditor/index.twig', [
             'pageCurrent' => $this->routeGenerator->generate('adminProfileEditor.getIndex'),
-            'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->routeGenerator->generate('adminProfileEditor.getIndex')),
+            'allBreadcrumbs' => (new Subnav($this->getConfigLoader(), $this->getUser()))->generateBreadcrumbs($this->routeGenerator->generate('adminProfileEditor.getIndex')),
             'payload' => $payload
         ], 'Profile Editor - ' . ucwords($roleType));
     }

@@ -8,38 +8,49 @@
  * @link      https://schoolbox.com.au/
  */
 
+declare(strict_types=1);
+
 namespace Schoolbox\Admin\Lists;
 
-use Alaress\Authorizer\Authorizer;
 use Alaress\Module\Module as BaseModule;
 use Alaress\Authorizer\Rule;
 use Alaress\Web\Controller\Base;
-use Aura\Router\Map;
 use Alaress\Twig\Loader\IChainLoader;
+use Schoolbox\Permission\Access\UserAccess;
 
 class Module extends BaseModule
 {
     protected $basename = 'adminLists';
 
     /**
-     * {@inheritdoc}
+     * @return void
      */
-    public function initRoutes(string $basePath)
+    public function registerRoutes(): void
     {
-        $this->addGetRoute('getIndex', $basePath, "{/table}");
-        $this->addGetRoute('getData', $basePath, "/data{/table}");
-        $this->addPostRoute('postSave', $basePath, "/save");
-        $this->addPostRoute('postDelete', $basePath, "/delete");
-    }
+        $ruleSuperuserOnly = new Rule\All(
+            new Rule\IsLoggedIn(),
+            new Rule\IsSuperuser(),
+        );
 
-    /**
-     * {@inheritdoc}
-     */
-    public function initRoutePermissions(Authorizer $authorizer)
-    {
+        $ruleNews = new Rule\All(
+            new Rule\IsLoggedIn(),
+            new Rule\Any(
+                new Rule\IsSuperuser(),
+                new Rule\HasServicePermission(UserAccess::SERVICE_NEWS, UserAccess::ACCESS_FULL)
+            )
+        );
 
-        $this->addRoutePermission($authorizer, '.*', new Rule\IsLoggedIn())
-             ->addRoutePermission($authorizer, '.*', new Rule\IsSuperuser());
+        // Routes to which users with service permission UserAccess::SERVICE_NEWS need access.
+        $this->register('GET', "/news/{table:news-topic}", 'getNewsIndex', $ruleNews);
+        $this->register('GET', "/news/data/{table:news-topic}", 'getNewsData', $ruleNews);
+        $this->register('POST', "/news/save/{table:news-topic}", 'postNewsSave', $ruleNews);
+        $this->register('POST', "/news/delete/{table:news-topic}", 'postNewsDelete', $ruleNews);
+
+        // Routes to which only superusers need access.
+        $this->register('GET', "{/table}", 'getIndex', $ruleSuperuserOnly);
+        $this->register('GET', "/data{/table}", 'getData', $ruleSuperuserOnly);
+        $this->register('POST', "/save", 'postSave', $ruleSuperuserOnly);
+        $this->register('POST', "/delete", 'postDelete', $ruleSuperuserOnly);
     }
 
     /**
@@ -53,7 +64,7 @@ class Module extends BaseModule
     /**
      * {@inheritdoc}
      */
-    public function initTemplatePaths(IChainLoader $templateLoader)
+    public function initTemplatePaths(IChainLoader $templateLoader): void
     {
         $this->addTemplatePath($templateLoader, __DIR__ . '/templates');
     }

@@ -34,7 +34,7 @@ class Controller extends ConfigController
 
         $data = [
             'pageCurrent' => $this->routeGenerator->generate('adminOauth.postAdmin'),
-            'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->routeGenerator->generate('adminOauth.postAdmin')),
+            'allBreadcrumbs' => (new Subnav($this->getConfigLoader(), $this->getUser()))->generateBreadcrumbs($this->routeGenerator->generate('adminOauth.postAdmin')),
             'configContext' => $configContext,
         ];
 

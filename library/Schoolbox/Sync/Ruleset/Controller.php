@@ -92,7 +92,7 @@ class Controller extends Base
             '@upsRuleset/intro.twig',
             [
                 'pageCurrent'    => $this->routeGenerator->generate('upsRuleset.intro'),
-                'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->routeGenerator->generate('upsRuleset.intro')),
+                'allBreadcrumbs' => (new Subnav($this->getConfigLoader(), $this->getUser()))->generateBreadcrumbs($this->routeGenerator->generate('upsRuleset.intro')),
                 'allNavigation'  => $allNavigation->getAllNodes(),
                 'logs'           => $this->findLogs(3),
                 'upsCronTime'    => $this->getConfigLoader()->get('ups_cron_run_time'),
@@ -136,7 +136,7 @@ class Controller extends Base
         }
 
         $twigData['pageCurrent'] = $this->routeGenerator->generate('upsRuleset.intro');
-        $twigData['allBreadcrumbs'] = (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->routeGenerator->generate('upsRuleset.read', ['rulesetId' => $rulesetId]));
+        $twigData['allBreadcrumbs'] = (new Subnav($this->getConfigLoader(), $this->getUser()))->generateBreadcrumbs($this->routeGenerator->generate('upsRuleset.read', ['rulesetId' => $rulesetId]));
 
         $this->response = $this->responseFromTemplate(
             '@upsRuleset/ruleset.twig',
@@ -193,7 +193,7 @@ class Controller extends Base
             '@upsRuleset/log/list.twig',
             [
                 'pageCurrent' => $this->routeGenerator->generate('upsRuleset.intro'),
-                'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->routeGenerator->generate('upsRuleset.intro')),
+                'allBreadcrumbs' => (new Subnav($this->getConfigLoader(), $this->getUser()))->generateBreadcrumbs($this->routeGenerator->generate('upsRuleset.intro')),
                 'logs'           => $this->findLogs()
             ]
         );
@@ -284,7 +284,7 @@ class Controller extends Base
                     'filterBlacklist' => ['rulestring'],
                     'log' => $log,
                     'pageCurrent' => $this->routeGenerator->generate('upsRuleset.intro'),
-                    'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->routeGenerator->generate('upsRuleset.intro')),
+                    'allBreadcrumbs' => (new Subnav($this->getConfigLoader(), $this->getUser()))->generateBreadcrumbs($this->routeGenerator->generate('upsRuleset.intro')),
                     'filterSummary' => $filter ? ('Filter applied: ' . str_replace(';', '; ', $filter)) : '',
                 ];
 

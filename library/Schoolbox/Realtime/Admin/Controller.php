@@ -197,7 +197,7 @@ class Controller extends BaseController
 
         $data = [
             'pageCurrent'    => $this->routeGenerator->generate('adminNotifications.getApps'),
-            'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->routeGenerator->generate('adminNotifications.getApps')),
+            'allBreadcrumbs' => (new Subnav($this->getConfigLoader(), $this->getUser()))->generateBreadcrumbs($this->routeGenerator->generate('adminNotifications.getApps')),
             'apps'           => $apps,
             'attachzones'    => $zones,
             'providers'      => [
@@ -467,7 +467,7 @@ class Controller extends BaseController
             '@adminNotifications/configure.twig',
             [
                 'pageCurrent' => $this->routeGenerator->generate('adminNotifications.configure'),
-                'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->routeGenerator->generate('adminNotifications.configure')),
+                'allBreadcrumbs' => (new Subnav($this->getConfigLoader(), $this->getUser()))->generateBreadcrumbs($this->routeGenerator->generate('adminNotifications.configure')),
                 'filters' => $filters,
                 'roles'   => $roles,
                 'ns'      => $ns,
@@ -602,7 +602,7 @@ class Controller extends BaseController
             'data'     => [
                 'liveMessage'    => $liveMessage,
                 'pageCurrent'    => $this->routeGenerator->generate('adminNotifications.testPush'),
-                'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))
+                'allBreadcrumbs' => (new Subnav($this->getConfigLoader(), $this->getUser()))
                     ->generateBreadcrumbs($this->routeGenerator->generate('adminNotifications.testPush')),
             ],
         ];

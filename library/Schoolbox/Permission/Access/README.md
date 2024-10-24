@@ -52,7 +52,12 @@ Where:
     * for 'service'=1 (Homepage), 'sid' refers to folder.id
     * for 'service'=2 (Calendar), 'sid' refers to luCampus.id
     * for other values of 'service', 'sid' is ignored (but should always be 0).
- * 'type' refers to the type of access: {0 => none, 1 => read, 2 => write, 3 => full} (see UserAccess.php).
+  * 'type' refers to the type of access (see UserAccess.php):
+    * 0 => none
+    * 1 => read-level access
+    * 2 => write-level access
+    * 3 => full/moderate-level access - this allows users write-level access, plus the ability to
+           modify/delete other user’s content.  Also moderate-level access grants access to related admin sections
  * 'favourite' determines whether this userAccess relationship should be included in a 'favourites' list.
    This currently only applies to 'service' 1, and is used to mark as favourites, a subset of groups the user has access to.
    E.g. See the /schoolbox/groups#my-favourite-groups page.

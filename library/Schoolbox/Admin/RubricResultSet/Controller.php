@@ -48,7 +48,7 @@ class Controller extends Base
                 'pageCurrent'          => $this->routeGenerator->generate('adminRubricResultSet.getList'),
                 'rubricsByResultSetId' => $this->mapper->findSets(),
                 'allBreadcrumbs'       => (
-                    (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->routeGenerator->generate('adminRubricResultSet.getList'))
+                    (new Subnav($this->getConfigLoader(), $this->getUser()))->generateBreadcrumbs($this->routeGenerator->generate('adminRubricResultSet.getList'))
                 )
             ]
         );
@@ -105,7 +105,7 @@ class Controller extends Base
                 'resultSetId'         => $resultSetId,
                 'rubricResultRows'    => (($resultSetId === null) ? [] : $this->mapper->findRows($resultSetId)),
                 'allBreadcrumbs'      => (
-                    (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->routeGenerator->generate('adminRubricResultSet.getList'))
+                    (new Subnav($this->getConfigLoader(), $this->getUser()))->generateBreadcrumbs($this->routeGenerator->generate('adminRubricResultSet.getList'))
                 )
             ]
         );

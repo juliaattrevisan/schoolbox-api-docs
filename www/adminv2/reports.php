@@ -74,7 +74,7 @@ if (isset($this->arg[2]) && $this->arg[2] == "exportToCSV") {
 }
 
 // include the admin navigation
-(new Subnav($this->getDi()->get('config')))
+(new Subnav($this->getDi()->get('config'), $this->getDi()->get('user')))
     ->generatePhplib($this, "/adminv2/reports/{$reportType}/all")
     ->generateBreadcrumbsHtml($this, "/adminv2/reports/{$reportType}/all");
 
