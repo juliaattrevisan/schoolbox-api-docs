@@ -17,9 +17,11 @@ use Alaress\Database\Collector;
 use Alaress\Database\Exception as DatabaseException;
 use Alaress\Database\Exception;
 use Alaress\Database\Statement\IStatement;
+use Alaress\Sentry\Tracing\Tracer;
 use PDO;
 use PDOException;
 use PDOStatement;
+use Sentry\Tracing\SpanStatus;
 
 class Base implements IIterator
 {
@@ -60,7 +62,14 @@ class Base implements IIterator
      */
     public function execute()
     {
+        Tracer::getDefaultTrace()->startSpan(
+            $this->pdoStatement->queryString,
+            'db.sql.query',
+            'auto.db',
+            data: ['db.system' => $this->broker->getDriver(),],
+        );
         try {
+            // Add wrap here
             if ($this->broker->getCollector() instanceof Collector) {
                 $result = $this->broker->getCollector()->execute($this->statement);
             } else {
@@ -72,9 +81,11 @@ class Base implements IIterator
                 $this->next();
             }
         } catch (PDOException $e) {
+            Tracer::getDefaultTrace()->finishSpan(status: SpanStatus::internalError());
             throw new Exception($e->getMessage(), 0, $e);
         }
 
+        Tracer::getDefaultTrace()->finishSpan();
         return $result;
     }
 

@@ -19,6 +19,8 @@ use Alaress\Database\Statement\IStatement;
 use Alaress\Database\Statement\Query\IQuery;
 use Alaress\Database\Statement\StoredProcedure\IStoredProcedure;
 use Alaress\Database\Transactor\ITransactor;
+use Alaress\Sentry\Tracing\Database\TracedPdoStatement;
+use Alaress\Sentry\Tracing\Tracer;
 use PDOStatement;
 use SensitiveParameter;
 
@@ -291,7 +293,11 @@ class Base implements IConnector
      */
     public function prepare(string $statement, array $driverOptions = []): PDOStatement
     {
-        return $this->broker->prepare($statement, $driverOptions);
+        // Create a wrapper around a PDO statement here
+        return new TracedPdoStatement(
+            $this->broker->prepare($statement, $driverOptions),
+            $this->broker->getDriver(),
+        );
     }
 
     /**
@@ -307,7 +313,14 @@ class Base implements IConnector
      */
     public function executeDirectly(string $sql): bool
     {
-        return $this->broker->getPdo()->exec($sql) !== false;
+        // This needs to be run directly via exec(),
+        // but should be prepared anyway
+        return Tracer::getDefaultTrace()->runWithinSpan(
+            fn () => $this->broker->getPdo()->exec($sql) !== false,
+            'db.sql.query',
+            'auto.db',
+            data: ['db.system' => $this->broker->getDriver(),],
+        );
     }
 
     /**

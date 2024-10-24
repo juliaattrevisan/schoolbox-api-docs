@@ -14,10 +14,10 @@ use Alaress\Database\Broker\IBroker;
 use Alaress\Database\Collector;
 use Alaress\Database\Exception;
 use Alaress\Database\Iterator\IIterator;
+use Alaress\Sentry\Tracing\Database\TracedPdoStatement;
 use PDO;
 use PDOException;
 use PDOStatement;
-use Traversable;
 
 abstract class Base implements IStatement
 {
@@ -178,7 +178,10 @@ abstract class Base implements IStatement
     {
         if (empty($this->statement)) {
             try {
-                $this->statement = $this->broker->prepare($this->getSql());
+                $this->statement = new TracedPdoStatement(
+                    $this->broker->prepare($this->getSql()),
+                    $this->broker->getDriver(),
+                );
             } catch (PDOException $e) {
                 throw new Exception("Error preparing execution: " . $e->getMessage(), 0, $e);
             }
