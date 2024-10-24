@@ -11,25 +11,27 @@ namespace Schoolbox\Admin\Settings;
 
 use Alaress\Redis;
 use Alaress\Web\Controller\ConfigController;
+use Aura\Router\Exception\RouteNotFound;
 use Schoolbox\Admin\Navigation\Subnav;
+use Schoolbox\Application\Exception\Exception;
 use Schoolbox\Config\Config;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Error\Mapper;
 use Schoolbox\GenericCollection;
 use Alaress\Database\Predicate;
+use Twig\Error\Error;
 
 class Controller extends ConfigController
 {
     /**
      * Renders an admin settings page for settings with the specified type
      *
+     * @param string|null $typeLabel The human-friendly type label stored in lu_config_type
+     * @throws RouteNotFound
+     * @throws Exception
+     * @throws Predicate\InvalidColumnException|Error
      * @since 18.1
      * @api   GET /adminv2/setting/{typeLabel}
-     *
-     * @param string|null $typeLabel The human-friendly type label stored in lu_config_type
-     * @throws \Aura\Router\Exception\RouteNotFound
-     * @throws \Schoolbox\Application\Exception\Exception
-     * @throws Predicate\InvalidColumnException
      */
     public function getSettings(string $typeLabel = null): void
     {
@@ -165,16 +167,15 @@ class Controller extends ConfigController
     }
 
     /**
-     * @since 18.
-     * @api   POST /adminv2/setting/{typeLabel}
-     *
      * @param string $typeLabel
-     * @throws \Aura\Router\Exception\RouteNotFound
+     * @throws RouteNotFound
      * @throws \PDOException
      * @throws \Schoolbox\Mapper\Exception
      * @throws \UnexpectedValueException
      * @throws Predicate\InvalidColumnException
      * @noinspection PhpUnused (web route)
+     * @since 18.
+     * @api   POST /adminv2/setting/{typeLabel}
      */
     public function postSettings(string $typeLabel): void
     {
@@ -239,7 +240,6 @@ class Controller extends ConfigController
         $this->response = $this->redirectAfterPost($route);
     }
 
-
     /**
      * Returns a predicate suitable for finding config for this module
      *
@@ -255,5 +255,25 @@ class Controller extends ConfigController
                    ->equals(ConfigMapper::COL_MODULE, ConfigMapper::MODULE_SETTINGS);
 
         return $pb;
+    }
+
+    // Functions for routes accessible by pastoral moderators --------------------------------------------------------//
+
+    /**
+     * @throws RouteNotFound
+     * @throws Error
+     */
+    public function getSettingsPastoral(): void
+    {
+        $this->getSettings('Pastoral Care');
+    }
+
+    /**
+     * @throws RouteNotFound
+     * @throws \Schoolbox\Mapper\Exception
+     */
+    public function postSettingsPastoral(): void
+    {
+        $this->postSettings('Pastoral Care');
     }
 }
