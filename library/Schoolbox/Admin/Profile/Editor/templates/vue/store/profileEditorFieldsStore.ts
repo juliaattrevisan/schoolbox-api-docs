@@ -8,6 +8,7 @@ import type {
     ProfileEditorFieldSettingKey,
     ProfileEditorFieldSettingOption,
     ProfileEditorActiveField,
+    ProfileEditorAvailableField,
 } from "../types/profileEditorTypes";
 
 type EnableFieldAction = {
@@ -422,6 +423,20 @@ export const useProfileEditorFieldsStore = defineStore("profileEditorFieldsStore
         activeField.fieldSettings[fieldSettingKey] = filteredSettings;
     }
 
+    /**
+     * Get an identifier for a given field to be used for data-test attributes
+     * or other keys such as for a label:for connection
+     * Includes the selected role type for uniqueness between role types
+     * This should be extended with more specificity depending on the context
+     * @param field - The field to get the identifier for
+     * @returns The identifier for the field
+     */
+    function getFieldIdentifier(field: ProfileEditorAvailableField | ProfileEditorActiveField): string {
+        const roleType = peStore.selectedRoleType?.roleType ?? "unknown";
+        const fieldType = "fieldSettings" in field ? "active" : "available";
+        return `pe-${roleType}-fields-${fieldType}-item-${field.field}`;
+    }
+
     return {
         actionQueue,
         actionErrors,
@@ -432,5 +447,6 @@ export const useProfileEditorFieldsStore = defineStore("profileEditorFieldsStore
         resequenceField,
         isFieldSettingsUnsaved,
         updateFieldSettingOption,
+        getFieldIdentifier,
     };
 });

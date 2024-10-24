@@ -22,14 +22,13 @@ const peFieldsStore = useProfileEditorFieldsStore();
 
 /**
  * Get the key to use in the label:for attribute for a field setting option
+ * Also used as the data-test attribute for testing
  * @param fieldSettingOption - the field setting option
  * @returns the identifier
  */
 function getLabelKeyForOption(fieldSettingOption: ProfileEditorFieldSettingOption): string {
-    return (
-        `pe-${peStore.selectedRoleType?.roleType || "-"}-fields-selected-item` +
-        `-${props.field.field}-setting-${props.fieldSettingKey}-option-${fieldSettingOption.id}`
-    );
+    const baseKey = peFieldsStore.getFieldIdentifier(props.field);
+    return `${baseKey}-setting-${props.fieldSettingKey}-option-${fieldSettingOption.id}`;
 }
 
 /**
@@ -72,7 +71,10 @@ window.Vue.onMounted(() => {
                             onFieldSettingOptionChange(fieldSettingOption, ($event.target as HTMLInputElement).checked)
                         "
                     />
-                    <label :for="getLabelKeyForOption(fieldSettingOption)">
+                    <label
+                        :for="getLabelKeyForOption(fieldSettingOption)"
+                        :data-test="getLabelKeyForOption(fieldSettingOption)"
+                    >
                         {{ fieldSettingOption.name }}
                     </label>
                 </li>

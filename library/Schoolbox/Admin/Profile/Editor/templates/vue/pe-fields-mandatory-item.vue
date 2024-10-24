@@ -58,7 +58,13 @@ const fieldSaveError = window.Vue.computed(() => {
         </div>
 
         <nav>
-            <a ref="editBtn" class="icon-settings" title="Settings" @click="isEditPanelOpen = !isEditPanelOpen" />
+            <a
+                ref="editBtn"
+                class="icon-settings"
+                title="Settings"
+                :data-test="`${peFieldsStore.getFieldIdentifier(props.field)}-settings`"
+                @click="isEditPanelOpen = !isEditPanelOpen"
+            />
         </nav>
     </div>
 

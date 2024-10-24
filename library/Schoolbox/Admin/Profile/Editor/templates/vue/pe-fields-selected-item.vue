@@ -144,8 +144,20 @@ const isSaving = window.Vue.computed(() => {
             </div>
 
             <nav>
-                <a ref="editBtn" class="icon-settings" title="Settings" @click="isEditPanelOpen = !isEditPanelOpen" />
-                <a ref="removeBtn" class="icon-close" title="Remove" @click="isRemovePanelOpen = !isRemovePanelOpen" />
+                <a
+                    ref="editBtn"
+                    class="icon-settings"
+                    title="Settings"
+                    :data-test="`${peFieldsStore.getFieldIdentifier(props.field)}-settings`"
+                    @click="isEditPanelOpen = !isEditPanelOpen"
+                />
+                <a
+                    ref="removeBtn"
+                    class="icon-close"
+                    title="Remove"
+                    :data-test="`${peFieldsStore.getFieldIdentifier(props.field)}-remove`"
+                    @click="isRemovePanelOpen = !isRemovePanelOpen"
+                />
             </nav>
         </div>
 

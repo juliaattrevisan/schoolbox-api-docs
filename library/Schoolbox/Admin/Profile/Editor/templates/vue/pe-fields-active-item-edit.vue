@@ -58,6 +58,7 @@ async function onUpdateClicked(): Promise<void> {
                         type="submit"
                         :value="isUpdating ? 'Updating...' : 'Update'"
                         :disabled="isUpdating"
+                        :data-test="`${peFieldsStore.getFieldIdentifier(props.field)}-settings-confirm`"
                         @click="onUpdateClicked"
                     />
                 </div>
