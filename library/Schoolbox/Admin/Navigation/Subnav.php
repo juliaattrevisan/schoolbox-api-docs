@@ -950,7 +950,7 @@ class Subnav
                 'name'       => 'Pastoral Care',
                 'visible'    => $userIsSuperuser || $userHasServicePermissionPastoral,
                 'children'   => [
-                    '/adminv2/setting/Pastoral%20Care' => [
+                    '/adminv2/setting/pastoral/Pastoral Care' => [
                         'name'        => 'Pastoral Care',
                         'visible'     => (
                             ($userIsSuperuser || $userHasServicePermissionPastoral) &&

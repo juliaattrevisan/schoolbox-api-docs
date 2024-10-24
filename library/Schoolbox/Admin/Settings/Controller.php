@@ -43,9 +43,12 @@ class Controller extends ConfigController
             throw Mapper::getInstance()->generateException(Mapper::ERROR_PAGE_NOT_FOUND);
         }
 
+        $settingsCategory = $this->getSettingsCategoryFromTypeLabel($typeLabel);
+        $routeUrlTemplate = $this->routeGenerator->generate("settings.postSettings$settingsCategory");
+        $routeUrl = str_replace('{typeLabel}', $typeLabel, $routeUrlTemplate);
         $configContext = $this->buildConfigContext(
             $this->buildConfigPredicate($typeLabel),
-            $this->routeGenerator->generate('settings.postSettings', ['typeLabel' => $typeLabel]),
+            $routeUrl,
             [ModuleConfig::CONTEXT_TYPE_LABEL => $typeLabel],
         );
 
@@ -60,13 +63,12 @@ class Controller extends ConfigController
 
         /* Settings are now recategorised by the feature to which they are relevant
          */
-        $pageCurrent = $this->routeGenerator->generate('settings.postSettings', ['typeLabel' => $typeLabel]);
-        $allBreadcrumbs = (new Subnav($this->getConfigLoader(), $this->getUser()))->generateBreadcrumbs($this->routeGenerator->generate('settings.postSettings', ['typeLabel' => $typeLabel]));
+        $allBreadcrumbs = (new Subnav($this->getConfigLoader(), $this->getUser()))->generateBreadcrumbs($routeUrl);
 
         $this->response = $this->responseDependentOnRequest(
             '@settings/settings.twig',
             [
-                'pageCurrent'    => $pageCurrent,
+                'pageCurrent'    => $routeUrl,
                 'allBreadcrumbs' => $allBreadcrumbs,
                 'settingsTabs'   => $settingsTabs,
                 'configContext'  => $configContext,
@@ -236,25 +238,12 @@ class Controller extends ConfigController
             $this->oidcCache->clear();
         }
 
-        $route          = urldecode($this->routeGenerator->generate('settings.getSettings', ['typeLabel' => str_replace(' ', '+', $typeLabel)]));
-        $this->response = $this->redirectAfterPost($route);
-    }
+        $settingsCategory = $this->getSettingsCategoryFromTypeLabel($typeLabel);
+        $routeUrlTemplate = $this->routeGenerator->generate("settings.getSettings$settingsCategory");
+        $routeUrl = str_replace('{typeLabel}', $typeLabel, $routeUrlTemplate);
+        $routeUrlDecoded = urldecode($routeUrl);
 
-    /**
-     * Returns a predicate suitable for finding config for this module
-     *
-     * @param string $typeLabel
-     * @return Predicate\Builder
-     * @throws Predicate\InvalidColumnException
-     */
-    private function buildConfigPredicate(string $typeLabel): Predicate\Builder
-    {
-        $pb = $this->getConfigMapper()
-                   ->getPredicateBuilder()
-                   ->equals('lct.type', $typeLabel)
-                   ->equals(ConfigMapper::COL_MODULE, ConfigMapper::MODULE_SETTINGS);
-
-        return $pb;
+        $this->response = $this->redirectAfterPost($routeUrlDecoded);
     }
 
     // Functions for routes accessible by pastoral moderators --------------------------------------------------------//
@@ -275,5 +264,36 @@ class Controller extends ConfigController
     public function postSettingsPastoral(): void
     {
         $this->postSettings('Pastoral Care');
+    }
+
+    // Private functions ---------------------------------------------------------------------------------------------//
+
+    /**
+     * Returns a predicate suitable for finding config for this module
+     *
+     * @param string $typeLabel
+     * @return Predicate\Builder
+     * @throws Predicate\InvalidColumnException
+     */
+    private function buildConfigPredicate(string $typeLabel): Predicate\Builder
+    {
+        $pb = $this->getConfigMapper()
+                   ->getPredicateBuilder()
+                   ->equals('lct.type', $typeLabel)
+                   ->equals(ConfigMapper::COL_MODULE, ConfigMapper::MODULE_SETTINGS);
+
+        return $pb;
+    }
+
+    /**
+     * @param string $typeLabel
+     * @return string
+     */
+    private function getSettingsCategoryFromTypeLabel(string $typeLabel): string
+    {
+        return match ($typeLabel) {
+            'Pastoral Care' => 'Pastoral',
+            default => '',
+        };
     }
 }
