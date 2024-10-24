@@ -135,6 +135,10 @@ class Subnav
         $userHasServicePermissionCalendar = (
             $this->user->hasServicePermission(UserAccess::SERVICE_CALENDAR, UserAccess::ACCESS_FULL)
         );
+        $userHasAnyModeratorServicePermission = (
+            $userHasServicePermissionNews ||
+            $userHasServicePermissionCalendar
+        );
 
         /* Keys of this array uniquely identify a page and its subpages
          * Used to preselect menu options so users have a sense of where they are
@@ -149,7 +153,7 @@ class Subnav
         return [
             '/adminv2/home' => [
                 'name'        => 'Home',
-                'visible'     => $userIsSuperuser || $userHasServicePermissionNews,
+                'visible'     => $userIsSuperuser || $userHasAnyModeratorServicePermission,
                 'description' => 'Key system status information.',
                 'children'    => [],
             ],
