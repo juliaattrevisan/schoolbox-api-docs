@@ -9,6 +9,7 @@ use Schoolbox\API\Cursor\ICursor;
 use Schoolbox\Collection;
 use Schoolbox\Curriculum\Node\Mapper as CurriculumMapper;
 use ValueError;
+use InvalidArgumentException;
 
 class Cursor implements ICursor
 {
@@ -65,9 +66,16 @@ class Cursor implements ICursor
             return null;
         }
 
+        $last = $collection->last();
         // Find the last item in the collection: get a pointer to that
         // Expect `$last` to be an array
-        return $this->codec->encode($collection->last());
+        return $this->codec->encode(
+            [
+                'id' => $last->getId(),
+                'courseId' => json_encode($this->courseId),
+                'nodeId' => json_encode($this->nodeId),
+            ]
+        );
     }
 
     /**
@@ -87,12 +95,32 @@ class Cursor implements ICursor
 
         $pb->in('id', $this->nodeId);
 
+        $idColumn = "{$this->curriculumMapper->getTable()}.{$this->curriculumMapper->getIdentifierColumn()}";
+
         $options = [
             'order' => [
-                'id' => 'ASC',
+                $idColumn => 'asc',
             ],
             'limit' => $this->limit
         ];
+
+        if (null !== $encodedCursor) {
+            $cursor = $this->codec->decode($encodedCursor);
+
+            if (json_decode($cursor['courseId']) != $this->courseId || $this->courseId === null) {
+                throw new InvalidArgumentException('Course IDs supplied mismatched with the cursor given');
+            }
+
+            if (json_decode($cursor['nodeId']) != $this->nodeId || $this->nodeId === null) {
+                throw new InvalidArgumentException(
+                    'Curriculum node IDs supplied mismatched with the cursor given'
+                );
+            }
+
+            $pb->greaterThan(
+                $idColumn, $cursor['id']
+            );
+        }
 
         $result = $this->curriculumMapper->findByPredicates($pb, $options);
 
