@@ -21,9 +21,9 @@ class Cursor implements ICursor
 
     /**
      * Maximum number of results returnable from the cursor at once:
-     * IMO 100 results is a sensible maximum.
+     * IMO 3 results is a sensible maximum.
      */
-    public const LIMIT_MAX = 100;
+    public const LIMIT_MAX = 3;
 
     /**
      * A sensible default number of results to return from the cursor at once:
