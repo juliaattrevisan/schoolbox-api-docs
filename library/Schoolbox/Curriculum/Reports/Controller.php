@@ -145,8 +145,8 @@ class Controller extends Base
                     'metadata' => [
                         'count' => $cursor->retrieveResultCount(),
                         'cursor' => [
-                            'current' => $encodedCursor ?? null,
-                            'next' => null,
+                            'current' => $encodedCursor ?? $cursor->current($data),
+                            'next' => $cursor->next($data),
                         ]
                     ]
                 ]
