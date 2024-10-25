@@ -132,12 +132,7 @@ class Controller extends Base
                 $courseUnitSpecs
             );
 
-            $usage = array_map(
-                fn($node) => $node->map(
-                    $reportTranslator,
-                ),
-                $data['nodes']
-            );
+            $usage = $data->map($reportTranslator);
 
             $structure = $courseSpecs->map($structureTranslator);
 
