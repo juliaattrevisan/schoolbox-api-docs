@@ -107,19 +107,17 @@ class Cursor implements ICursor
         if (null !== $encodedCursor) {
             $cursor = $this->codec->decode($encodedCursor);
 
-            if (json_decode($cursor['courseId']) != $this->courseId || $this->courseId === null) {
+            if (json_decode($cursor['courseId']) != $this->courseId) {
                 throw new InvalidArgumentException('Course IDs supplied mismatched with the cursor given');
             }
 
-            if (json_decode($cursor['nodeId']) != $this->nodeId || $this->nodeId === null) {
+            if (json_decode($cursor['nodeId']) != $this->nodeId) {
                 throw new InvalidArgumentException(
                     'Curriculum node IDs supplied mismatched with the cursor given'
                 );
             }
 
-            $pb->greaterThan(
-                $idColumn, $cursor['id']
-            );
+            $pb->greaterThan($idColumn, $cursor['id']);
         }
 
         $result = $this->curriculumMapper->findByPredicates($pb, $options);
