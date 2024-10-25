@@ -1010,8 +1010,8 @@ class Subnav
                         'children'    => [],
                         'description' => 'Setup the types of pastoral records, to control visibility and categorisation..',
                     ],
-                    '/adminv2/filters/classPastoral' => [
-                        'name'        => $filterLabelBuilder->buildLabel(FilterPageModel::PAGE_CLASS_PASTORAL),
+                    '/adminv2/filters/pastoral/classPastoral' => [
+                        'name'        => $filterLabelBuilder->buildLabel(FilterPageModel::PAGE_CLASS_PASTORAL). ' Filter',
                         'visible'     => (
                             ($userIsSuperuser || $userHasServicePermissionPastoral) &&
                             $filterAvailabilityChecker->isAvailable(FilterPageModel::PAGE_CLASS_PASTORAL)

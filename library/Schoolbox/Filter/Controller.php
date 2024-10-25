@@ -35,28 +35,23 @@ class Controller extends BaseController
     /** @var Page\Option\Defaults\Mapper $defaultsMapper */
     private $defaultsMapper;
 
-
     /**
      * @var Selection\Mapper
      */
     private $selectionMapper;
-
 
     /**
      * @var RoleMapper
      */
     private $roleMapper;
 
-
     /**
      * @var ErrorMapper
      */
     private $errorMapper;
 
-
     /** @var RosettaStone */
     private $rosettaStone;
-
 
     /**
      * @param Mapper                      $filterMapper
@@ -88,7 +83,6 @@ class Controller extends BaseController
         $this->rosettaStone    = $rosettaStone;
     }
 
-
     /**
      * Display a summary of filter configurations for Admins
      *
@@ -109,19 +103,17 @@ class Controller extends BaseController
         ], 'Filterable pages');
     }
 
-
     /**
      * Display a page where admins can alter default filter selections
      *
-     * @api   GET /adminv2/filters/{pageKey}
-     * @since 17.0
      * @param IFactoryFactory $factoryFactory The factory responsible for the entity filtered by this page
      * @param string          $page
-     * @throws \InvalidArgumentException If a filter definition class not found, or filter factory not registered
-     * @throws \Schoolbox\Mapper\DefinitionException If join $name isn't on this mapper
-     * @throws \Schoolbox\Mapper\Exception If an alias is incorrect
+     * @throws \Aura\Router\Exception\RouteNotFound
+     * @throws \Twig\Error\Error
+     * @api   GET /adminv2/filters/{pageKey}
+     * @since 17.0
      */
-    public function getPageSettings(IFactoryFactory $factoryFactory, $page): void
+    public function getPageSettings(IFactoryFactory $factoryFactory, string $page): void
     {
         $enabledOnly = false;
         $definitions = $factoryFactory->buildCurrentState($page, $enabledOnly);
@@ -147,18 +139,20 @@ class Controller extends BaseController
             }
         }
 
+        $filterCategory = $this->getFilterCategory($page);
+
         $this->response = $this->responseFromTemplate('@filters/settings.twig', [
             'page'               => $page,
-            'pageCurrent'        => $this->routeGenerator->generate('filters.getPageSettings', ['page' => $page]),
-            'allBreadcrumbs'     => (new Subnav($this->getConfigLoader(), $this->getUser()))->generateBreadcrumbs($this->routeGenerator->generate('filters.getPageSettings', ['page' => $page])),
+            'pageCurrent'        => $this->routeGenerator->generate("filters.getPageSettings$filterCategory", ['page' => $page]),
+            'allBreadcrumbs'     => (new Subnav($this->getConfigLoader(), $this->getUser()))->generateBreadcrumbs($this->routeGenerator->generate("filters.getPageSettings$filterCategory", ['page' => $page])),
             'definitions'        => $definitions,
             'pageFilters'        => $pageFilters,
             'roleTypes'          => $roleTypes,
             'rolesForFilter'     => $rolesForFilter,
             'pageLabels'         => $this->buildFilteredPageLabels(),
+            'filterCategory'     => $filterCategory,
         ], ucfirst($page) . ' filters');
     }
-
 
     /**
      * Load up all settings for this page, overlay new settings, and save
@@ -173,7 +167,7 @@ class Controller extends BaseController
      * @throws \Schoolbox\Mapper\Exception If an alias is incorrect
      * @throws \UnderflowException
      */
-    public function postSavePageSettings(IFactoryFactory $factoryFactory, $page)
+    public function postSavePageSettings(IFactoryFactory $factoryFactory, string $page): void
     {
         $enabledOnly = false;
         $definitions = $factoryFactory->buildCurrentState($page, $enabledOnly);
@@ -258,14 +252,13 @@ class Controller extends BaseController
         $this->response = $this->responseAsJson(['status' => 200]);
     }
 
-
     /**
      * Push default selections to users in the given roles.
      *
+     * @param string $page
+     * @throws \Exception
      * @api   POST /adminv2/filters/{page}/pushDefaultSelections
      * @since 20.1
-     *
-     * @param string $page
      */
     public function postPushDefaultSelections(string $page): void
     {
@@ -277,6 +270,51 @@ class Controller extends BaseController
         $this->response = $this->responseAsJson(['status' => 200]);
     }
 
+    // Functions for routes accessible by pastoral moderators --------------------------------------------------------//
+
+    /**
+     * Display a page where admins can alter default filter selections
+     *
+     * @param IFactoryFactory $factoryFactory The factory responsible for the entity filtered by this page
+     * @param string          $page
+     * @throws \Aura\Router\Exception\RouteNotFound
+     * @throws \Twig\Error\Error
+     */
+    public function getPageSettingsPastoral(IFactoryFactory $factoryFactory, string $page): void
+    {
+        $this->getPageSettings($factoryFactory, $page);
+    }
+
+    /**
+     * Load up all settings for this page, overlay new settings, and save
+     *
+     * @param IFactoryFactory $factoryFactory The factory responsible for the entity filtered by this page
+     * @param string          $page
+     * @throws \UnexpectedValueException
+     * @throws \PDOException
+     * @throws \Alaress\Database\Predicate\InvalidColumnException
+     * @throws \InvalidArgumentException If a filter definition class not found, or filter factory not registered
+     * @throws \Schoolbox\Mapper\DefinitionException If join $name isn't on this mapper
+     * @throws \Schoolbox\Mapper\Exception If an alias is incorrect
+     * @throws \UnderflowException
+     */
+    public function postSavePageSettingsPastoral(IFactoryFactory $factoryFactory, string $page): void
+    {
+        $this->postSavePageSettings($factoryFactory, $page);
+    }
+
+    /**
+     * Push default selections to users in the given roles.
+     *
+     * @param string $page
+     * @throws \Exception
+     */
+    public function postPushDefaultSelectionsPastoral(string $page): void
+    {
+        $this->postPushDefaultSelections($page);
+    }
+
+    // Private functions ---------------------------------------------------------------------------------------------//
 
     /**
      * @return GenericCollection[]|Model[][] $visibleFilters Indexed by page, then filterDefinition.name
@@ -304,7 +342,6 @@ class Controller extends BaseController
         return $filtersPerPage;
     }
 
-
     /**
      * Returns labels for each type of filtered page, indexed by page
      *
@@ -326,5 +363,17 @@ class Controller extends BaseController
             Page\Model::PAGE_AWARD_LIST           => $labelBuilder->buildLabel(Page\Model::PAGE_AWARD_LIST),
             Page\Model::PAGE_CLASS_PASTORAL       => $labelBuilder->buildLabel(Page\Model::PAGE_CLASS_PASTORAL),
         ];
+    }
+
+    /**
+     * @param string $page
+     * @return string
+     */
+    private function getFilterCategory(string $page): string
+    {
+        return match ($page) {
+            'classPastoral' => 'Pastoral',
+            default => '',
+        };
     }
 }
