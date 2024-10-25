@@ -51,7 +51,7 @@ class Controller extends Base
         $courseId = $query->get('courseId');
         $nodeId = $query->get('nodeId');
         $limit = $query->getInt('limit', Cursor::LIMIT_DEFAULT);
-        $encodedCursor = $query->get('encodedCursor');
+        $encodedCursor = $query->get('cursor');
 
         //Only process usage when both course specifications and curriculum nodes have been provided
         if ($courseId !== null && $nodeId !== null) {
