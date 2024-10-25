@@ -951,7 +951,7 @@ class Subnav
                 'visible'    => $userIsSuperuser || $userHasServicePermissionPastoral,
                 'children'   => [
                     '/adminv2/setting/pastoral/Pastoral Care' => [
-                        'name'        => 'Pastoral Care',
+                        'name'        => 'Settings / Policy',
                         'visible'     => (
                             ($userIsSuperuser || $userHasServicePermissionPastoral) &&
                             $this->configLoader->get(ConfigMapper::NAME_PASTORAL_ENABLED)
