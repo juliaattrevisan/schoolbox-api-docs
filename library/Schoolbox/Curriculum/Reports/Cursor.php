@@ -83,22 +83,26 @@ class Cursor implements ICursor
      */
     public function retrieveResults(?string $encodedCursor): Collection
     {
-        $response = [];
+        $pb = $this->curriculumMapper->getPredicateBuilder();
 
-        $nodes = [];
+        $pb->in('id', $this->nodeId);
 
-        foreach ($this->nodeId as $nodeId) {
-            $test = $this->curriculumMapper->findById($nodeId);
-            $collect = $this->curriculumMapper->loadDescendants($test);
+        $options = [
+            'order' => [
+                'id' => 'ASC',
+            ],
+            'limit' => $this->limit
+        ];
 
-            $collect = $this->curriculumMapper->getModelAsCollection($collect);
+        $result = $this->curriculumMapper->findByPredicates($pb, $options);
 
-            $nodes[] = $collect;
-        }
+        $result->map(function ($node) {
+            return $this->curriculumMapper->getModelAsCollection(
+                $this->curriculumMapper->loadDescendants($node)
+            );
+        });
 
-        $response['nodes'] = $nodes;
-
-        return new Collection($response);
+        return $result;
     }
 
     public function retrieveUsageCount(): array
