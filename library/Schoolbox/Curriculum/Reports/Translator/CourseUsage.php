@@ -10,6 +10,9 @@ use Schoolbox\Curriculum\Reports\Translator\UnitAssessmentUsage as UnitAssessmen
 use Schoolbox\Learning\Course\DataModel\Specification\Model as CourseSpecificationModel;
 use Schoolbox\User;
 
+/**
+ * Course spec model to array translator for curriculum coverage report
+ */
 class CourseUsage
 {
     use GetRouteIfAuthorized;

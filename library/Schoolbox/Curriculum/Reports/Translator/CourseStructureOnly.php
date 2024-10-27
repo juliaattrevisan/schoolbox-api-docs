@@ -7,6 +7,10 @@ use Aura\Router\Generator;
 use Schoolbox\Learning\Course\DataModel\Specification\Model as Model;
 use Schoolbox\User;
 
+/**
+ *  This translator builds the response for the details and structure of the
+ *  nodes as well as the details of the courses and units that it associated with
+ */
 class CourseStructureOnly
 {
     /**
