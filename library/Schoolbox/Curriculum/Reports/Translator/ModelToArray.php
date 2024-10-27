@@ -11,6 +11,9 @@ use Schoolbox\Learning\Course\DataModel\Specification\Mapper;
 use Schoolbox\User;
 use Schoolbox\Curriculum\Reports\Translator\CourseUsage as courseUsageTranslator;
 
+/**
+ * Curriculum node model to array translator for curriculum coverage report
+ */
 class ModelToArray
 {
     use GetRouteIfAuthorized;
