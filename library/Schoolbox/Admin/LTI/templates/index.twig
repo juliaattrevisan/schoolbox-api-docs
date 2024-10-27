@@ -98,7 +98,27 @@
                     let segmentLtiVersion = $(this).attr('data-lti-version-section');
                     $(this).toggleClass('hide', segmentLtiVersion !== selectedLtiVersion);
                 })
-            })
+            });
+
+            // Handle redirect URL addition and removal
+            let $redirectUrls = $form.find('[data-redirect-urls]'),
+                $redirectUrlList = $redirectUrls.find('[data-list]'),
+                $redirectUrlTemplate = $redirectUrls.find('[data-template]'),
+                newRedirectUrlCount = 1;
+            $redirectUrls.on('click', '[data-action="add"]', function (event) {
+                event.preventDefault();
+                let $newRedirectUrlItem = $redirectUrlTemplate.clone().removeAttr('data-template').removeClass('hide');
+                $newRedirectUrlItem.find(':input').each(function () {
+                    let $input = $(this);
+                    $input.attr('name', $input.attr('name').replace('-1', String(-newRedirectUrlCount)));
+                });
+                newRedirectUrlCount += 1;
+                $redirectUrlList.append($newRedirectUrlItem);
+            });
+            $redirectUrls.on('click', '[data-action="delete"]', function (event) {
+                event.preventDefault();
+                $(this).closest('[data-item]').remove();
+            });
         });
 
         let $content       = $('#content'),

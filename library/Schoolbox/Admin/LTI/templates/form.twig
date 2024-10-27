@@ -103,15 +103,15 @@
         </div>
 
         {# Redirect URLs are stored as individual models, but are displayed as a list for ease of editing. #}
-        <div class="small-12 large-6 columns">
+        <div class="small-12 large-6 columns" data-redirect-urls>
             <label for="redirect_urls-{{ identifier }}">
                 Additional Redirect URL(s)
                 <span data-tooltip
                       class="has-tip tip-top hint"
                       title="Optional additional URLs which the LTI tool is permitted to request Schoolbox redirect to after OpenID Connect initiation; the Launch and Deep Linking URLs are always permitted, and need not be copied here.">?</span>
             </label>
-            <ul class="information-list">
-                <li class="list-item-container hide" data-template>
+            <ul class="information-list" data-list>
+                <li class="list-item-container hide" data-template data-item>
                     <div class="actions-small-1">
                         <div class="list-item">
                             <input name="redirect_urls-{{ identifier }}[-1][id]" type="hidden" />
@@ -121,7 +121,7 @@
                     </div>
                 </li>
                 {% for i, redirectUrl in (provider.redirectUrls ?? []) %}
-                <li class="list-item-container">
+                <li class="list-item-container" data-item>
                     <div class="actions-small-1">
                         <div class="list-item">
                             <input name="redirect_urls-{{ identifier }}[{{ i }}][id]" type="hidden" value="{{ redirectUrl.id }}" />
@@ -132,7 +132,7 @@
                 </li>
                 {% endfor %}
             </ul>
-            <button class="full-width">Add Redirect URL</button>
+            <button class="full-width" data-action="add">Add Redirect URL</button>
         </div>
 
         <div class="small-12 large-6 columns">
