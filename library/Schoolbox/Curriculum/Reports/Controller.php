@@ -146,7 +146,7 @@ class Controller extends Base
                         'count' => $cursor->retrieveResultCount(),
                         'cursor' => [
                             'current' => $encodedCursor ?? $cursor->current($data),
-                            'next' => $cursor->next($data),
+                            'next' => (count($data) < $limit) ? null : $cursor->next($data),
                         ]
                     ]
                 ]
