@@ -114,8 +114,8 @@
                 <li class="list-item-container hide" data-template data-item>
                     <div class="actions-small-1">
                         <div class="list-item">
-                            <input name="redirect_urls-{{ identifier }}[-1][id]" type="hidden" />
-                            <input name="redirect_urls-{{ identifier }}[-1][redirect_url]" />
+                            <input name="redirect_urls[-1][id]" type="hidden" />
+                            <input name="redirect_urls[-1][redirect_url]" />
                         </div>
                         <nav><a class="delete-row-button icon-delete" title="Delete this Redirect URL" data-action="delete"></a></nav>
                     </div>
@@ -124,8 +124,8 @@
                 <li class="list-item-container" data-item>
                     <div class="actions-small-1">
                         <div class="list-item">
-                            <input name="redirect_urls-{{ identifier }}[{{ i }}][id]" type="hidden" value="{{ redirectUrl.id }}" />
-                            <input name="redirect_urls-{{ identifier }}[{{ i }}][redirect_url]" value="{{ redirectUrl.redirectUrl }}" />
+                            <input name="redirect_urls[{{ i }}][id]" type="hidden" value="{{ redirectUrl.id }}" />
+                            <input name="redirect_urls[{{ i }}][redirect_url]" value="{{ redirectUrl.redirectUrl }}" />
                         </div>
                         <nav><a class="delete-row-button icon-delete" title="Delete this Redirect URL" data-action="delete"></a></nav>
                     </div>

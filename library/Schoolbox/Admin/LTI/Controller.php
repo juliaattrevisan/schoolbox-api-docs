@@ -169,18 +169,22 @@ class Controller extends ConfigController
         if ($provider->isLtiVersion13()) {
             $provider = $provider->setTarget($post['target1p3']);
         }
-        if (isset($post['redirect_urls'])) {
-            $redirectUrls          = explode("\n", $post['redirect_urls']);
-            $redirectUrlCollection = new GenericCollection(Provider\RedirectUrl\Model::class);
-            foreach ($redirectUrls as $redirectUrl) {
-                $redirectUrl = trim($redirectUrl);
-                if ($redirectUrl !== '') {
-                    $redirectUrlCollection->add((new Provider\RedirectUrl\Model())
-                        ->setLtiProvider($provider)
-                        ->setRedirectUrl($redirectUrl));
+
+        // Add and remove redirect URLs
+        $existingRedirectUrls = $provider->getRedirectUrls();
+        $newRedirectUrls      = $this->redirectUrlMapper->createCollection();
+        foreach (($post['redirect_urls'] ?? []) as $data) {
+            $idValue          = (int)($data['id'] ?? '');
+            $redirectUrlValue = $data['redirect_url'] ?? '';
+            if ($redirectUrlValue !== '') {
+                $newRedirectUrlModel = $this->redirectUrlMapper->createModel()
+                    ->setLtiProvider($provider)
+                    ->setRedirectUrl($redirectUrlValue);
+                if ($idValue > 0) {
+                    $newRedirectUrlModel = $newRedirectUrlModel->setId($idValue);
                 }
+                $newRedirectUrls->add($newRedirectUrlModel);
             }
-            $provider = $provider->setRedirectUrls($redirectUrlCollection);
         }
 
         // LTI 1.1 fields, including XML
@@ -233,8 +237,9 @@ class Controller extends ConfigController
         }
 
         $this->providerMapper->save($provider);
-        $this->redirectUrlMapper->deleteByColumn('lti_provider_id', $provider->getId());
-        $this->redirectUrlMapper->save($provider->getRedirectUrls());
+
+        $this->redirectUrlMapper->delete($existingRedirectUrls->diff($newRedirectUrls));
+        $this->redirectUrlMapper->save($newRedirectUrls);
 
         $this->response = $this->redirectAfterPost($this->routeGenerator->generate('adminLti.getIndex'));
     }
