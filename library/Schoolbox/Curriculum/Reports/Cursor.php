@@ -11,6 +11,12 @@ use Schoolbox\Curriculum\Node\Mapper as CurriculumMapper;
 use ValueError;
 use InvalidArgumentException;
 
+/**
+ * Cursor for curriculum coverage report
+ *
+ * Fetches a list of curriculum nodes and the descendants, associate it with the specified course specifications
+ * and its units to find the usage of the nodes within the courses.
+ */
 class Cursor implements ICursor
 {
     /**
