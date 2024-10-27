@@ -245,7 +245,7 @@ export default window.Vue.defineComponent({
          * pull the settings from local storage
          */
         loadSessionSettings() {
-            const sessionStorageSettingsList = sessionStorage.getItem(SB_SETTINGS_LIST);
+            const sessionStorageSettingsList = sessionStorage.getItem(`${SB_SETTINGS_LIST}-${window.schoolboxUser.id}`);
 
             if (sessionStorageSettingsList === null) {
                 this.settingsList = [];
