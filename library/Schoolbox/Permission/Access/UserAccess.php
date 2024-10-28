@@ -96,7 +96,7 @@ class UserAccess implements IModel
 
     /**
      * Value for $this->service:
-     * $this->user has $this->accessLevel permission for the design system.
+     * $this->user has $this->accessLevel permission for the LMS system.
      */
     public const SERVICE_LMS = 14;
 
