@@ -25,16 +25,22 @@ interface Props {
     errorMessage?: string; // The error message to display
     isReadOnly?: boolean; // Whether the input is read only
     allowPartialMatches?: boolean; // whether to allow partial matches, so can match part of a word
+    hasButton?: boolean; // whether to show the a button next to the input
+    buttonIcon?: string; // the icon to display on the button
+    buttonTitle?: string; // the title of the button
 }
 const props = withDefaults(defineProps<Props>(), {
     defaultResults: undefined,
     formValueName: "",
     placeholder: "Search...",
     errorMessage: "This field is required",
+    buttonIcon: "",
+    buttonTitle: "Browse",
 });
 
 const emit = defineEmits<{
     select: [item: SearchSelectItem];
+    buttonSelect: [];
 }>();
 
 const searchSelectEl = useTemplateRef<HTMLDivElement | null>("searchSelectEl");
@@ -88,6 +94,13 @@ function onAdd(items: SearchSelectItem[]): void {
 function onRemove(items: SearchSelectItem[]): void {
     remove(items);
 }
+
+/**
+ * To notify of the button being selected
+ */
+function onButtonSelected(): void {
+    emit("buttonSelect");
+}
 </script>
 
 <template>
@@ -103,13 +116,23 @@ function onRemove(items: SearchSelectItem[]): void {
             @select="onSelect"
             @remove="onRemove"
         />
-        <ss-query-input
-            v-if="!props.isReadOnly"
-            v-model:query="query"
-            :label-id="props.labelId"
-            :parent-el="searchSelectEl"
-            :placeholder="props.placeholder"
-        />
+        <div class="input-group">
+            <ss-query-input
+                v-if="!props.isReadOnly"
+                v-model:query="query"
+                :label-id="props.labelId"
+                :parent-el="searchSelectEl"
+                :placeholder="props.placeholder"
+            />
+            <button
+                v-if="props.hasButton"
+                type="button"
+                :class="`button ${props.buttonIcon}`"
+                @click.prevent="onButtonSelected"
+            >
+                {{ props.buttonTitle }}
+            </button>
+        </div>
         <ss-results
             :query="query"
             :is-active="isActive"

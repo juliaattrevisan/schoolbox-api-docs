@@ -13,6 +13,7 @@ import { useStore } from "@schoolboxCurriculum/vue/curriculumSelector/store/curr
 import { useSelectedNodesStore } from "@schoolboxCurriculum/vue/curriculumSelector/store/csSelectedNodesStore";
 import { useNodeTitle } from "@schoolboxCurriculum/vue/composables/useNodeTitle";
 import { getEmptyNode } from "@schoolboxCurriculum/js/nodeUtils";
+import CsModal from "@schoolboxCurriculum/vue/curriculumSelector/modal/cs-modal.vue";
 import SelectedNodeModal from "@schoolboxCurriculum/vue/selected-node-modal.vue";
 import type { Node } from "@schoolboxCurriculum/types/Node";
 
@@ -95,6 +96,8 @@ function onSelectedNodeModalClosed(): void {
         :is-read-only="props.isReadOnly"
         :allow-partial-matches="true"
         :can-select-item="true"
+        :has-button="true"
+        button-icon="icon-curriculum"
         @select="onNodeNameSelect"
     />
     <cs-modal v-if="store.hasLoadedOk" :is-single-select="props.isSingleSelect" />
