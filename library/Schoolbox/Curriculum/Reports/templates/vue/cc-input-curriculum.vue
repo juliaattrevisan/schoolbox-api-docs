@@ -10,14 +10,14 @@ import { watchIgnorable } from "@vueuse/core";
 import SearchSelect from "@schoolboxVue/components/searchSelect/search-select.vue";
 import type { Course } from "@schoolboxLibrary/types/Course";
 import { useSelectedNodesStore } from "@schoolboxCurriculum/vue/curriculumSelector/store/csSelectedNodesStore";
+import type { Node } from "@schoolboxCurriculum/types/Node";
 
 type CurriculumAPIResponse = {
     courses: Course[];
 };
 
 interface Props {
-    endpoint: string; // The course api endpoint
-    preselected: Course[]; // The courses that have already been selected previously
+    endpoint: string; // The curriculum api endpoint
     label?: string; // The label text
     labelId?: string; // The label id
     isRequired?: boolean; // Whether the input requires a value
@@ -27,33 +27,33 @@ interface Props {
 }
 const props = withDefaults(defineProps<Props>(), {
     label: "Select Curriculum",
-    labelId: "courses",
+    labelId: "curriculum",
     errorMessage: "Please select at least one curriculum outcome",
 });
 
 const store = useSelectedNodesStore();
 
-const results = window.Vue.ref<Course[]>([]);
+const results = window.Vue.ref<Node[]>([]);
 
 /**
  * To manipulate the results to target the courses object
  */
-const { ignoreUpdates } = watchIgnorable(results, (newResults: CurriculumAPIResponse | unknown[]) => {
-    // ignore updates to avoid an infinite loop...
-    ignoreUpdates(() => {
-        if (newResults instanceof Array && newResults.length === 0) {
-            return;
-        }
-        if (typeof newResults === "object" && "courses" in newResults) {
-            results.value = newResults.courses;
-        }
-    });
-});
+// const { ignoreUpdates } = watchIgnorable(results, (newResults: CurriculumAPIResponse | unknown[]) => {
+//     // ignore updates to avoid an infinite loop...
+//     ignoreUpdates(() => {
+//         if (newResults instanceof Array && newResults.length === 0) {
+//             return;
+//         }
+//         if (typeof newResults === "object" && "courses" in newResults) {
+//             results.value = newResults.courses;
+//         }
+//     });
+// });
 </script>
 
 <template>
     <search-select
-        v-model:selected="store.selected"
+        v-model:selected="store.nodes"
         v-model:results="results"
         :label="props.label"
         :label-id="props.labelId"
