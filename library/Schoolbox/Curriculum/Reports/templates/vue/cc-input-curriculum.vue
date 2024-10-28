@@ -6,11 +6,13 @@
  * the scope of the changes
  */
 
-import { unref } from "vue";
 import { watchIgnorable } from "@vueuse/core";
 import SearchSelect from "@schoolboxVue/components/searchSelect/search-select.vue";
+import type { SearchSelectItem } from "@schoolboxVue/components/searchSelect/types/searchSelectTypes";
 import { useSelectedNodesStore } from "@schoolboxCurriculum/vue/curriculumSelector/store/csSelectedNodesStore";
 import { useNodeTitle } from "@schoolboxCurriculum/vue/composables/useNodeTitle";
+import { getEmptyNode } from "@schoolboxCurriculum/js/nodeUtils";
+import SelectedNodeModal from "@schoolboxCurriculum/vue/selected-node-modal.vue";
 import type { Node } from "@schoolboxCurriculum/types/Node";
 
 interface Props {
@@ -51,6 +53,21 @@ const { ignoreUpdates } = watchIgnorable(results, (newResults: Node[] | unknown[
         });
     });
 });
+
+/**
+ * To open up the selected node modal
+ * @param node - The selected node
+ */
+function onNodeNameSelect(node: SearchSelectItem): void {
+    store.setActiveNode(node as Node);
+}
+
+/**
+ * close the modal, setting the activeNode to null so we can allow another selection
+ */
+function onSelectedNodeModalClosed(): void {
+    store.setActiveNode(getEmptyNode());
+}
 </script>
 
 <template>
@@ -65,7 +82,10 @@ const { ignoreUpdates } = watchIgnorable(results, (newResults: Node[] | unknown[
         :error-message="props.errorMessage"
         :is-read-only="props.isReadOnly"
         :allow-partial-matches="true"
+        :can-select-item="true"
+        @select="onNodeNameSelect"
     />
+    <selected-node-modal :node="store.activeNode" @closed="onSelectedNodeModalClosed" />
 </template>
 
 <style scoped></style>
