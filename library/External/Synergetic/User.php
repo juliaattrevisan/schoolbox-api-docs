@@ -153,18 +153,40 @@ class External_Synergetic_User implements External_UserInterface
                             ELSE ''
                         END AS MobilePhone,
                         Contact.DirectoryIncludeFlag,
-                        Contact.SpouseID,
-                        Spouse.Title SpouseTitle,
-                        Spouse.Preferred SpousePreferred,
-                        Spouse.Surname SpouseSurname,
+                        CASE 
+                            WHEN Spouse.DirectoryIncludeFlag = 1 THEN Contact.SpouseID
+                            ELSE ''
+                        END AS SpouseID,
+                        CASE 
+                            WHEN Spouse.DirectoryIncludeFlag = 1 THEN Spouse.Title
+                            ELSE ''
+                        END AS SpouseTitle,
+                        CASE 
+                            WHEN Spouse.DirectoryIncludeFlag = 1 THEN Spouse.Preferred
+                            ELSE ''
+                        END AS SpousePreferred,
+                        CASE 
+                            WHEN Spouse.DirectoryIncludeFlag = 1 THEN Spouse.Surname
+                            ELSE ''
+                        END AS SpouseSurname,
                         CASE
-                          WHEN Spouse.DefaultEmailCode = 'O' THEN Spouse.OccupEmail
-                          ELSE Spouse.Email
+                          WHEN Spouse.DirectoryIncludeFlag = 1 AND Spouse.DefaultEmailCode = 'O' THEN Spouse.OccupEmail
+                          WHEN Spouse.DirectoryIncludeFlag = 1 AND Spouse.DefaultEmailCode != 'O' THEN Spouse.Email
+                          ELSE ''
                         END AS SpouseEmail,
-                        Spouse.OccupEmail SpouseOccupEmail,
+                        CASE 
+                            WHEN Spouse.DirectoryIncludeFlag = 1 THEN Spouse.OccupEmail
+                            ELSE ''
+                        END AS SpouseOccupEmail,
                         Spouse.DefaultEmailCode SpouseDefaultEmailCode,
-                        Spouse.MobilePhone SpouseMobilePhone,
-                        Spouse.OccupPhone AS SpouseWorkPhone,
+                        CASE 
+                            WHEN Spouse.DirectoryIncludeFlag = 1 THEN Spouse.MobilePhone
+                            ELSE ''
+                        END AS SpouseMobilePhone,
+                        CASE 
+                            WHEN Spouse.DirectoryIncludeFlag = 1 THEN Spouse.OccupPhone
+                            ELSE ''
+                        END AS SpouseWorkPhone,
                         Spouse.DirectoryIncludeFlag SpouseDirectoryIncludeFlag
             FROM        dbo.Community Contact
             LEFT JOIN   dbo.Addresses Addresses ON Contact.AddressID = Addresses.AddressID
