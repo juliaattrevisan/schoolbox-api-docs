@@ -36,6 +36,7 @@ const props = withDefaults(defineProps<Props>(), {
 
 const store = useStore();
 store.init({
+    // just pass the props directly to the store for now, this would later be handled just as props with <curriculum-selector>
     dataEndpoint: props.endpoint,
     selectedNodes: [],
     isReadOnly: props.isReadOnly,

@@ -25,7 +25,7 @@ interface Props {
     errorMessage?: string; // The error message to display
     isReadOnly?: boolean; // Whether the input is read only
     allowPartialMatches?: boolean; // whether to allow partial matches, so can match part of a word
-    hasButton?: boolean; // whether to show the a button next to the input
+    hasButton?: boolean; // whether to show a button next to the input
     buttonIcon?: string; // the icon to display on the button
     buttonTitle?: string; // the title of the button
 }
