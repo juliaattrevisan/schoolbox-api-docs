@@ -118,6 +118,7 @@ function onHover(index: number): void {
             No results found for your current search.
         </div>
         <fieldset v-else class="results__fieldset">
+            <legend class="t-visually-hidden">Search results</legend>
             <ss-results-select-all
                 v-if="showSelectAll"
                 :results="props.results"
