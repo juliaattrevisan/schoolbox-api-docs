@@ -25,7 +25,7 @@ class SearchPage
     public const FILTER_DATE_RANGE_END = 'sp-filter-date-range-end';
     public const FILTER_TYPE_LABEL = 'sp-filter-type-label'; // ID 1 = Type, such as "news"
     public const CREATOR_SEARCH_SELECT_INPUT = 'ss-query-input';
-    public const CREATOR_SEARCH_SELECT_RESULT = 'search-select-result'; // ID 1 = User ID
+    public const CREATOR_SEARCH_SELECT_RESULT = 'ss-results-item-container'; // ID 1 = User ID
 
     private AcceptanceTester $tester;
 
