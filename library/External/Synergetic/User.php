@@ -138,8 +138,6 @@ class External_Synergetic_User implements External_UserInterface
                         END AS Email,
                         Contact.OccupEmail,
                         Contact.DefaultEmailCode,
-                        Addresses.SilentPhoneFlag,
-                        Contact.SilentMobilePhoneFlag,
                         CASE
                             WHEN Addresses.SilentPhoneFlag = 0 THEN Addresses.Phone
                             ELSE ''
@@ -153,19 +151,19 @@ class External_Synergetic_User implements External_UserInterface
                             ELSE ''
                         END AS MobilePhone,
                         Contact.DirectoryIncludeFlag,
-                        CASE 
+                        CASE
                             WHEN Spouse.DirectoryIncludeFlag = 1 THEN Contact.SpouseID
                             ELSE ''
                         END AS SpouseID,
-                        CASE 
+                        CASE
                             WHEN Spouse.DirectoryIncludeFlag = 1 THEN Spouse.Title
                             ELSE ''
                         END AS SpouseTitle,
-                        CASE 
+                        CASE
                             WHEN Spouse.DirectoryIncludeFlag = 1 THEN Spouse.Preferred
                             ELSE ''
                         END AS SpousePreferred,
-                        CASE 
+                        CASE
                             WHEN Spouse.DirectoryIncludeFlag = 1 THEN Spouse.Surname
                             ELSE ''
                         END AS SpouseSurname,
@@ -174,16 +172,16 @@ class External_Synergetic_User implements External_UserInterface
                           WHEN Spouse.DirectoryIncludeFlag = 1 AND Spouse.DefaultEmailCode != 'O' THEN Spouse.Email
                           ELSE ''
                         END AS SpouseEmail,
-                        CASE 
+                        CASE
                             WHEN Spouse.DirectoryIncludeFlag = 1 THEN Spouse.OccupEmail
                             ELSE ''
                         END AS SpouseOccupEmail,
                         Spouse.DefaultEmailCode SpouseDefaultEmailCode,
-                        CASE 
+                        CASE
                             WHEN Spouse.DirectoryIncludeFlag = 1 THEN Spouse.MobilePhone
                             ELSE ''
                         END AS SpouseMobilePhone,
-                        CASE 
+                        CASE
                             WHEN Spouse.DirectoryIncludeFlag = 1 THEN Spouse.OccupPhone
                             ELSE ''
                         END AS SpouseWorkPhone,

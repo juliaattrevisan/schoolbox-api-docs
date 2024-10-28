@@ -219,8 +219,6 @@ class External_Synergetic_Amity_User extends External_Synergetic_User
                         END AS Email,
                         Contact.OccupEmail,
                         Contact.DefaultEmailCode,
-                        Addresses.SilentPhoneFlag,
-                        Contact.SilentMobilePhoneFlag,
                         CASE
                             WHEN Addresses.SilentPhoneFlag = 0 THEN Addresses.Phone
                             ELSE ''
