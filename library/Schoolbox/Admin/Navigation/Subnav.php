@@ -954,6 +954,15 @@ class Subnav
                         'children'    => [],
                         'description' => 'Configure policy settings related to the pastoral care module.',
                     ],
+                    '/adminv2/filters/pastoral/classPastoral' => [
+                        'name'        => $filterLabelBuilder->buildLabel(FilterPageModel::PAGE_CLASS_PASTORAL) . ' Filter',
+                        'visible'     => (
+                            ($userIsSuperuser || $userHasServicePermissionPastoral) &&
+                            $filterAvailabilityChecker->isAvailable(FilterPageModel::PAGE_CLASS_PASTORAL)
+                        ),
+                        'children'    => [],
+                        'description' => 'Configure the default and available filter options on the class pastoral report.',
+                    ],
                     '/adminv2/lists/pastoral/pastoral-action' => [
                         'name'        => 'Actions List',
                         'visible'     => (
@@ -1009,15 +1018,6 @@ class Subnav
                         ),
                         'children'    => [],
                         'description' => 'Setup the types of pastoral records, to control visibility and categorisation..',
-                    ],
-                    '/adminv2/filters/pastoral/classPastoral' => [
-                        'name'        => $filterLabelBuilder->buildLabel(FilterPageModel::PAGE_CLASS_PASTORAL) . ' Filter',
-                        'visible'     => (
-                            ($userIsSuperuser || $userHasServicePermissionPastoral) &&
-                            $filterAvailabilityChecker->isAvailable(FilterPageModel::PAGE_CLASS_PASTORAL)
-                        ),
-                        'children'    => [],
-                        'description' => 'Configure the default and available filter options on the class pastoral report.',
                     ],
                 ]
             ]
