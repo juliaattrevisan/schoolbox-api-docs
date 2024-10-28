@@ -955,7 +955,7 @@ class Subnav
                         'description' => 'Configure policy settings related to the pastoral care module.',
                     ],
                     '/adminv2/lists/pastoral/pastoral-action' => [
-                        'name'        => 'Actions',
+                        'name'        => 'Actions List',
                         'visible'     => (
                             ($userIsSuperuser || $userHasServicePermissionPastoral) &&
                             $this->configLoader->get(ConfigMapper::NAME_PASTORAL_ENABLED) &&
@@ -965,7 +965,7 @@ class Subnav
                         'description' => 'Setup the actions of pastoral records.',
                     ],
                     '/adminv2/lists/pastoral/pastoral-severity' => [
-                        'name'        => 'Record Severity',
+                        'name'        => 'Record Severity List',
                         'visible'     => (
                             ($userIsSuperuser || $userHasServicePermissionPastoral) &&
                             $this->configLoader->get(ConfigMapper::NAME_PASTORAL_ENABLED) &&
@@ -975,7 +975,7 @@ class Subnav
                         'description' => 'Setup appropriate severity or importance of your pastoral records.',
                     ],
                     '/adminv2/lists/pastoral/pastoral-tags' => [
-                        'name'        => 'Record Tags',
+                        'name'        => 'Record Tags List',
                         'visible'     => (
                             ($userIsSuperuser || $userHasServicePermissionPastoral) &&
                             $this->configLoader->get(ConfigMapper::NAME_PASTORAL_ENABLED)
@@ -984,7 +984,7 @@ class Subnav
                         'description' => 'Maintain tags used on pastoral records, or if setup, lock this list to be the only tags available.',
                     ],
                     '/adminv2/lists/pastoral/pastoral-document-classification' => [
-                        'name'        => 'SIS Document Classifications',
+                        'name'        => 'SIS Document Classifications List',
                         'visible'     => (
                             ($userIsSuperuser || $userHasServicePermissionPastoral) &&
                             $this->configLoader->get(ConfigMapper::NAME_PASTORAL_ENABLED)
@@ -993,7 +993,7 @@ class Subnav
                         'description' => 'Configure how file attachments in pastoral are synchronised back to DocMan in Synergetic.',
                     ],
                     '/adminv2/lists/pastoral/pastoral-category' => [
-                        'name'        => 'Sub-Types',
+                        'name'        => 'Sub-Types List',
                         'visible'     => (
                             ($userIsSuperuser || $userHasServicePermissionPastoral) &&
                             $this->configLoader->get(ConfigMapper::NAME_PASTORAL_ENABLED)
@@ -1002,7 +1002,7 @@ class Subnav
                         'description' => 'Optionally configure further sub types under your existing types for more detailed categorisation of pastoral records.',
                     ],
                     '/adminv2/lists/pastoral/pastoral-type' => [
-                        'name'        => 'Types',
+                        'name'        => 'Types List',
                         'visible'     => (
                             ($userIsSuperuser || $userHasServicePermissionPastoral) &&
                             $this->configLoader->get(ConfigMapper::NAME_PASTORAL_ENABLED)
