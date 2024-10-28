@@ -527,7 +527,15 @@ class SimpleTest extends TestCase
                 various agents and [[[[fox] at the ports of [.cat]. a [   token3] or
                 invoice of goods transported by truck or train. a list of the cargo
                 or [firstname   ] carried on an airplane.[firstname]",
-                [],
+                [
+                    '[tok@#%*(&en1]' => '[tok@#%*(&en1]',
+                    '[__918]' => '[__918]',
+                    '[[[[fox]' => '[[[[fox]',
+                    '[.cat]' => '[.cat]',
+                    '[   token3]' => '[   token3]',
+                    '[firstname   ]' => '[firstname   ]',
+                    '[firstname]' => '[firstname]',
+                ],
             ],
 
             'Replacement: More tokens than replacements 2' => [
@@ -540,7 +548,13 @@ class SimpleTest extends TestCase
                 invoice of goods transported by truck or train. a list of the cargo
                 or [firstname   ] carried on an airplane.someone else might have gotten it wrong",
                 [
-                    '[firstname]' => 'someone else might have gotten it wrong'
+                    '[tok@#%*(&en1]' => '[tok@#%*(&en1]',
+                    '[__918]' => '[__918]',
+                    '[[[[fox]' => '[[[[fox]',
+                    '[.cat]' => '[.cat]',
+                    '[   token3]' => '[   token3]',
+                    '[firstname   ]' => '[firstname   ]',
+                    '[firstname]' => 'someone else might have gotten it wrong',
                 ],
             ],
 
@@ -553,15 +567,7 @@ class SimpleTest extends TestCase
                 various agents and officials at the ports of destination. a list or
                 invoice of goods transported by truck or train. a list of the cargo
                 or passengers carried on an airplane.",
-                [
-                    '[tok@#%*(&en1]' => 'Liara',
-                    '[__918]' => 'Shepard',
-                    '[[[[fox]' => 'Wrex',
-                    '[.cat]' => 'Grunt',
-                    '[   token3]' => 'Garrus',
-                    '[firstname   ]' => 'Tali',
-                    '[firstname]' => 'someone else might have gotten it wrong'
-                ],
+                [],
             ],
 
             'Replacement: More replacements than tokens 2' => [
@@ -574,13 +580,7 @@ class SimpleTest extends TestCase
                 invoice of goods transported by truck or train. a list of the cargo
                 or passengers carried on an airplane.",
                 [
-                    '[tok@#%*(&en1]' => 'Liara',
                     '[__918]' => 'Shepard',
-                    '[[[[fox]' => 'Wrex',
-                    '[.cat]' => 'Grunt',
-                    '[   token3]' => 'Garrus',
-                    '[firstname   ]' => 'Tali',
-                    '[firstname]' => 'someone else might have gotten it wrong'
                 ],
             ],
 
