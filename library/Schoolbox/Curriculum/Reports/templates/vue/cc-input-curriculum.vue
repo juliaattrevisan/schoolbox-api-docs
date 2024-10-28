@@ -32,7 +32,7 @@ const props = withDefaults(defineProps<Props>(), {
 });
 
 const store = useSelectedNodesStore();
-
+const endpoint = `${props.endpoint}?enabled=1&limit=50&includeWithoutCode=1&query=`; // The endpoint to retrieve the curriculum data from
 const results = window.Vue.ref<Node[]>([]);
 
 /**
@@ -58,7 +58,7 @@ const results = window.Vue.ref<Node[]>([]);
         :label="props.label"
         :label-id="props.labelId"
         :is-required="props.isRequired"
-        :endpoint="props.endpoint"
+        :endpoint="endpoint"
         :has-error="props.hasError"
         :error-message="props.errorMessage"
         :is-read-only="props.isReadOnly"
