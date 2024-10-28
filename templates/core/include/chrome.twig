@@ -744,7 +744,10 @@
 
                             {# If on iOS and outside of the PWA, disable the button.
                              # iOS requires the user to be in the PWA to before enabling notifications.
+                             #
+                             # If PWA is disabled in admin, then don't even try to do any of this logic
                              #}
+                            {% if config.pwa_enable %}
                             if (iOS() && !isPWA) {
                                 document.querySelectorAll('[data-pwa-notif="iOSHomePrompt"]').forEach((element) => {
                                     element.classList.remove('hide');
@@ -754,6 +757,7 @@
                                     element.toggleAttribute('disabled', true);
                                 });
                             }
+                            {% endif %}
                         }
 
                         {# on iOS, Notification.permission is completely unreliable until we have used
@@ -909,7 +913,9 @@
                         {# If the browser doesn't support notifications
                          # and we are on iOS outside of the PWA, show the iOS home prompt.
                          # iOS requires the user to be in the PWA to before enabling notifications.
-                         #}
+                         # If PWA is disabled in admin, then don't even try to do any of this logic
+                        #}
+                        {% if config.pwa_enable %}
                         if (iOS() && !isPWA) {
                             document.querySelectorAll('[data-pwa-notif="iOSHomePrompt"]').forEach((element) => {
                                 element.classList.remove('hide');
@@ -919,6 +925,7 @@
                                 element.toggleAttribute('disabled', true);
                             });
                         }
+                        {% endif %}
                     }
 
                     hideShowPromptsIfEmpty();
