@@ -330,24 +330,6 @@ class Factory
             }
         }
 
-        /* Only show phone numbers if their corresponding SilentPhoneFlag is falsy
-         */
-        if ($externalUser['SilentMobilePhoneFlag'] ?? false) {
-            $externalUser['MobilePhone'] = null;
-        }
-
-        if ($externalUser['SilentPhoneFlag'] ?? false) {
-            $externalUser['MobilePhone'] = null;
-        }
-
-        if ($externalUser['StudentContactSilentMobilePhoneFlag'] ?? false) {
-            $externalUser['SpouseMobilePhone'] = null;
-        }
-
-        if ($externalUser['StudentContactSilentPhoneFlag'] ?? false) {
-            $externalUser['StudentContactSpouseOccupPhone'] = null;
-        }
-
         /* Only show a spouse if they have meaningful data
          */
         $spouseNode = null;

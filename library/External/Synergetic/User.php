@@ -138,11 +138,20 @@ class External_Synergetic_User implements External_UserInterface
                         END AS Email,
                         Contact.OccupEmail,
                         Contact.DefaultEmailCode,
-                        Addresses.Phone AS HomePhone,
                         Addresses.SilentPhoneFlag,
                         Contact.SilentMobilePhoneFlag,
-                        Contact.MobilePhone,
-                        Contact.OccupPhone AS WorkPhone,
+                        CASE
+                            WHEN Addresses.SilentPhoneFlag = 0 THEN Addresses.Phone
+                            ELSE ''
+                        END AS HomePhone,
+                        CASE
+                            WHEN Addresses.SilentPhoneFlag = 0 THEN Contact.OccupPhone
+                            ELSE ''
+                        END AS OccupPhone,
+                        CASE
+                            WHEN Contact.SilentMobilePhoneFlag = 0 THEN Contact.MobilePhone
+                            ELSE ''
+                        END AS MobilePhone,
                         Contact.DirectoryIncludeFlag,
                         Contact.SpouseID,
                         Spouse.Title SpouseTitle,
@@ -168,6 +177,7 @@ class External_Synergetic_User implements External_UserInterface
         // Try and fetch the requested parent
 
         if ($parent = $parentQuery->fetch()) {
+            new \Alaress_Probe($parent);
             return $this->clearInvalidValues($parent);
         }
 
