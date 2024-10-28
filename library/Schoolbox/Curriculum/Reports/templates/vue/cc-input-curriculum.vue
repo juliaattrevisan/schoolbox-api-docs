@@ -6,15 +6,12 @@
  * the scope of the changes
  */
 
+import { unref } from "vue";
 import { watchIgnorable } from "@vueuse/core";
 import SearchSelect from "@schoolboxVue/components/searchSelect/search-select.vue";
-import type { Course } from "@schoolboxLibrary/types/Course";
 import { useSelectedNodesStore } from "@schoolboxCurriculum/vue/curriculumSelector/store/csSelectedNodesStore";
+import { useNodeTitle } from "@schoolboxCurriculum/vue/composables/useNodeTitle";
 import type { Node } from "@schoolboxCurriculum/types/Node";
-
-type CurriculumAPIResponse = {
-    courses: Course[];
-};
 
 interface Props {
     endpoint: string; // The curriculum api endpoint
@@ -36,19 +33,24 @@ const endpoint = `${props.endpoint}?enabled=1&limit=50&includeWithoutCode=1&quer
 const results = window.Vue.ref<Node[]>([]);
 
 /**
- * To manipulate the results to target the courses object
+ * To inject the code / title of the node into the name field
  */
-// const { ignoreUpdates } = watchIgnorable(results, (newResults: CurriculumAPIResponse | unknown[]) => {
-//     // ignore updates to avoid an infinite loop...
-//     ignoreUpdates(() => {
-//         if (newResults instanceof Array && newResults.length === 0) {
-//             return;
-//         }
-//         if (typeof newResults === "object" && "courses" in newResults) {
-//             results.value = newResults.courses;
-//         }
-//     });
-// });
+const { ignoreUpdates } = watchIgnorable(results, (newResults: Node[] | unknown[]) => {
+    // ignore updates to avoid an infinite loop...
+    ignoreUpdates(() => {
+        if (newResults instanceof Array && newResults.length === 0) {
+            return;
+        }
+        results.value = results.value.map((result) => {
+            const { title } = useNodeTitle(result);
+            return {
+                ...result,
+                id: result.id,
+                name: title.value, // manipulate the name to display the code / title of the curriculum
+            };
+        });
+    });
+});
 </script>
 
 <template>
