@@ -23,6 +23,7 @@ interface Props {
     hasError?: boolean; // Whether the input has an error
     errorMessage?: string; // The error message to display
     isReadOnly?: boolean; // Whether the input is read only
+    isSingleSelect?: boolean; // Whether only one curriculum node can be selected
 }
 const props = withDefaults(defineProps<Props>(), {
     label: "Select Curriculum",
@@ -85,6 +86,7 @@ function onSelectedNodeModalClosed(): void {
         :can-select-item="true"
         @select="onNodeNameSelect"
     />
+    <!-- <cs-modal v-if="store.hasLoadedOk" :is-single-select="props.isSingleSelect" /> -->
     <selected-node-modal :node="store.activeNode" @closed="onSelectedNodeModalClosed" />
 </template>
 
