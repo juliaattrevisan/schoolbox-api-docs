@@ -619,6 +619,87 @@ class Subnav
                     ],
                 ],
             ],
+            '/adminv2/pastoral' => [
+                'name'       => 'Pastoral Care',
+                'visible'    => $userIsSuperuser || $userHasServicePermissionPastoral,
+                'searchable' => false,
+                'children'   => [
+                    '/adminv2/setting/pastoral/Pastoral Care' => [
+                        'name'        => 'Settings / Policy',
+                        'visible'     => (
+                            ($userIsSuperuser || $userHasServicePermissionPastoral) &&
+                            $this->configLoader->get(ConfigMapper::NAME_PASTORAL_ENABLED)
+                        ),
+                        'children'    => [],
+                        'description' => 'Configure policy settings related to the pastoral care module.',
+                    ],
+                    '/adminv2/filters/pastoral/classPastoral' => [
+                        'name'        => $filterLabelBuilder->buildLabel(FilterPageModel::PAGE_CLASS_PASTORAL) . ' Filter',
+                        'visible'     => (
+                            ($userIsSuperuser || $userHasServicePermissionPastoral) &&
+                            $filterAvailabilityChecker->isAvailable(FilterPageModel::PAGE_CLASS_PASTORAL)
+                        ),
+                        'children'    => [],
+                        'description' => 'Configure the default and available filter options on the class pastoral report.',
+                    ],
+                    '/adminv2/lists/pastoral/pastoral-action' => [
+                        'name'        => 'Actions List',
+                        'visible'     => (
+                            ($userIsSuperuser || $userHasServicePermissionPastoral) &&
+                            $this->configLoader->get(ConfigMapper::NAME_PASTORAL_ENABLED) &&
+                            $this->configLoader->get(ConfigMapper::NAME_PASTORAL_ACTION_ENABLED)
+                        ),
+                        'children'    => [],
+                        'description' => 'Setup the actions of pastoral records.',
+                    ],
+                    '/adminv2/lists/pastoral/pastoral-severity' => [
+                        'name'        => 'Record Severity List',
+                        'visible'     => (
+                            ($userIsSuperuser || $userHasServicePermissionPastoral) &&
+                            $this->configLoader->get(ConfigMapper::NAME_PASTORAL_ENABLED) &&
+                            $this->configLoader->get('pastoral_severity')
+                        ),
+                        'children'    => [],
+                        'description' => 'Setup appropriate severity or importance of your pastoral records.',
+                    ],
+                    '/adminv2/lists/pastoral/pastoral-tags' => [
+                        'name'        => 'Record Tags List',
+                        'visible'     => (
+                            ($userIsSuperuser || $userHasServicePermissionPastoral) &&
+                            $this->configLoader->get(ConfigMapper::NAME_PASTORAL_ENABLED)
+                        ),
+                        'children'    => [],
+                        'description' => 'Maintain tags used on pastoral records, or if setup, lock this list to be the only tags available.',
+                    ],
+                    '/adminv2/lists/pastoral/pastoral-document-classification' => [
+                        'name'        => 'SIS Document Classifications List',
+                        'visible'     => (
+                            ($userIsSuperuser || $userHasServicePermissionPastoral) &&
+                            $this->configLoader->get(ConfigMapper::NAME_PASTORAL_ENABLED)
+                        ),
+                        'children'    => [],
+                        'description' => 'Configure how file attachments in pastoral are synchronised back to DocMan in Synergetic.',
+                    ],
+                    '/adminv2/lists/pastoral/pastoral-category' => [
+                        'name'        => 'Sub-Types List',
+                        'visible'     => (
+                            ($userIsSuperuser || $userHasServicePermissionPastoral) &&
+                            $this->configLoader->get(ConfigMapper::NAME_PASTORAL_ENABLED)
+                        ),
+                        'children'    => [],
+                        'description' => 'Optionally configure further sub types under your existing types for more detailed categorisation of pastoral records.',
+                    ],
+                    '/adminv2/lists/pastoral/pastoral-type' => [
+                        'name'        => 'Types List',
+                        'visible'     => (
+                            ($userIsSuperuser || $userHasServicePermissionPastoral) &&
+                            $this->configLoader->get(ConfigMapper::NAME_PASTORAL_ENABLED)
+                        ),
+                        'children'    => [],
+                        'description' => 'Setup the types of pastoral records, to control visibility and categorisation..',
+                    ],
+                ]
+            ],
             '/adminv2/dashboard' => [
                 'name'       => 'Personalisation',
                 'visible'    => $userIsSuperuser,
@@ -940,87 +1021,6 @@ class Subnav
                     ],
                 ],
             ],
-            '/adminv2/pastoral' => [
-                'name'       => 'Pastoral Care',
-                'visible'    => $userIsSuperuser || $userHasServicePermissionPastoral,
-                'searchable' => false,
-                'children'   => [
-                    '/adminv2/setting/pastoral/Pastoral Care' => [
-                        'name'        => 'Settings / Policy',
-                        'visible'     => (
-                            ($userIsSuperuser || $userHasServicePermissionPastoral) &&
-                            $this->configLoader->get(ConfigMapper::NAME_PASTORAL_ENABLED)
-                        ),
-                        'children'    => [],
-                        'description' => 'Configure policy settings related to the pastoral care module.',
-                    ],
-                    '/adminv2/filters/pastoral/classPastoral' => [
-                        'name'        => $filterLabelBuilder->buildLabel(FilterPageModel::PAGE_CLASS_PASTORAL) . ' Filter',
-                        'visible'     => (
-                            ($userIsSuperuser || $userHasServicePermissionPastoral) &&
-                            $filterAvailabilityChecker->isAvailable(FilterPageModel::PAGE_CLASS_PASTORAL)
-                        ),
-                        'children'    => [],
-                        'description' => 'Configure the default and available filter options on the class pastoral report.',
-                    ],
-                    '/adminv2/lists/pastoral/pastoral-action' => [
-                        'name'        => 'Actions List',
-                        'visible'     => (
-                            ($userIsSuperuser || $userHasServicePermissionPastoral) &&
-                            $this->configLoader->get(ConfigMapper::NAME_PASTORAL_ENABLED) &&
-                            $this->configLoader->get(ConfigMapper::NAME_PASTORAL_ACTION_ENABLED)
-                        ),
-                        'children'    => [],
-                        'description' => 'Setup the actions of pastoral records.',
-                    ],
-                    '/adminv2/lists/pastoral/pastoral-severity' => [
-                        'name'        => 'Record Severity List',
-                        'visible'     => (
-                            ($userIsSuperuser || $userHasServicePermissionPastoral) &&
-                            $this->configLoader->get(ConfigMapper::NAME_PASTORAL_ENABLED) &&
-                            $this->configLoader->get('pastoral_severity')
-                        ),
-                        'children'    => [],
-                        'description' => 'Setup appropriate severity or importance of your pastoral records.',
-                    ],
-                    '/adminv2/lists/pastoral/pastoral-tags' => [
-                        'name'        => 'Record Tags List',
-                        'visible'     => (
-                            ($userIsSuperuser || $userHasServicePermissionPastoral) &&
-                            $this->configLoader->get(ConfigMapper::NAME_PASTORAL_ENABLED)
-                        ),
-                        'children'    => [],
-                        'description' => 'Maintain tags used on pastoral records, or if setup, lock this list to be the only tags available.',
-                    ],
-                    '/adminv2/lists/pastoral/pastoral-document-classification' => [
-                        'name'        => 'SIS Document Classifications List',
-                        'visible'     => (
-                            ($userIsSuperuser || $userHasServicePermissionPastoral) &&
-                            $this->configLoader->get(ConfigMapper::NAME_PASTORAL_ENABLED)
-                        ),
-                        'children'    => [],
-                        'description' => 'Configure how file attachments in pastoral are synchronised back to DocMan in Synergetic.',
-                    ],
-                    '/adminv2/lists/pastoral/pastoral-category' => [
-                        'name'        => 'Sub-Types List',
-                        'visible'     => (
-                            ($userIsSuperuser || $userHasServicePermissionPastoral) &&
-                            $this->configLoader->get(ConfigMapper::NAME_PASTORAL_ENABLED)
-                        ),
-                        'children'    => [],
-                        'description' => 'Optionally configure further sub types under your existing types for more detailed categorisation of pastoral records.',
-                    ],
-                    '/adminv2/lists/pastoral/pastoral-type' => [
-                        'name'        => 'Types List',
-                        'visible'     => (
-                            ($userIsSuperuser || $userHasServicePermissionPastoral) &&
-                            $this->configLoader->get(ConfigMapper::NAME_PASTORAL_ENABLED)
-                        ),
-                        'children'    => [],
-                        'description' => 'Setup the types of pastoral records, to control visibility and categorisation..',
-                    ],
-                ]
-            ]
         ];
     }
 
