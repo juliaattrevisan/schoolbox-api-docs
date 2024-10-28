@@ -324,7 +324,7 @@ class Factory
 
         if (isset($externalUser['SpouseID']) && $externalUser['SpouseDirectoryIncludeFlag']) {
             try {
-                $spouse = $this->userMapper->findByExternalId(306, Role::PARENT);
+                $spouse = $this->userMapper->findByExternalId($externalUser['SpouseID'], Role::PARENT);
             } catch (MapperException $e) {
                 // noop: spouse not found
             }
