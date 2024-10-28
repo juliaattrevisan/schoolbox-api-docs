@@ -348,6 +348,24 @@ class Factory
             $externalUser['StudentContactSpouseOccupPhone'] = null;
         }
 
+        /* Only show a spouse if they have meaningful data
+         */
+        $spouseNode = null;
+
+        /* Assign schoolbox's version of a spouse's details, but we need multiple data points:
+         * The name is formatted with a hyperlink to a user profile screen since this spouse
+         * has a schoolbox user account. We need their id and name as a struct...so, it's some
+         * special handling but we can do that
+         */
+        $spouseValue = "{$spouse?->getTitle()} {$spouse?->getPreferredName()} {$spouse?->getLastname()}";
+
+        if ($spouse?->getId() && '' !== trim($spouseValue)) {
+            $spouseNode = [
+                'id' => $spouse?->getId(),
+                'value' => $spouseValue
+            ];
+        }
+
         /* Hybrid Theory
          */
         $referenceFields = [
@@ -355,15 +373,7 @@ class Factory
             'email' => $viewee->getEmail(),
             'externalId' => $viewee->getExternalId(),
             'role' => $viewee->getRole()->getName(),
-            /* Assign schoolbox's version of a spouse's details, but we need multiple data points:
-             * The name is formatted with a hyperlink to a user profile screen since this spouse
-             * has a schoolbox user account. We need their id and name as a struct...so, it's some
-             * special handling but we can do that
-             */
-            'spouseName' => [
-                'id' => $spouse?->getId(),
-                'value' => "{$spouse?->getTitle()} {$spouse?->getPreferredName()} {$spouse?->getLastname()}"
-            ]
+            'spouseName' => $spouseNode
         ];
 
         return array_merge($externalUser, $referenceFields);

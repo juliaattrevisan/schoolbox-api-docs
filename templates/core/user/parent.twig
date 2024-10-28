@@ -119,11 +119,7 @@
                                     {# Now render each of the flags/tuples in some manner #}
 
                                     {# Spouses have a special construct we need to inspect #}
-                                    {% if selectedField.field in ['spouseName'] %}
-                                        {% if selectedField.value.id and selectedField.value.value %}
-                                            <a href="/search/user/{{ selectedField.value.id }}">{{ selectedField.value.value }}</a>
-                                        {% endif %}
-                                    {% elseif selectedField.value %}
+                                    {% if selectedField.value %}
                                         {# Only render a tuple if it has a meaningful value
                                          # Note that some fields require special handling (different data structures)
                                          #
