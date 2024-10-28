@@ -53,6 +53,8 @@ class Controller extends Base
         $limit = $query->getInt('limit', Cursor::LIMIT_DEFAULT);
         $encodedCursor = $query->get('cursor');
 
+        $response = [];
+
         //Only process usage when both course specifications and curriculum nodes have been provided
         if ($courseId !== null && $nodeId !== null) {
             $courseId =
@@ -136,25 +138,24 @@ class Controller extends Base
 
             $structure = $courseSpecs->map($structureTranslator);
 
-            $this->response = $this->responseAsJson(
-                [
-                    'data' => [
-                        'courses' => $structure,
-                        'nodes' => $usage,
-                    ],
-                    'metadata' => [
-                        'count' => $cursor->retrieveResultCount(),
-                        'cursor' => [
-                            'current' => $encodedCursor ?? $cursor->current($data),
-                            'next' => (count($data) < $limit) ? null : $cursor->next($data),
-                        ]
+            $response =  [
+                'data' => [
+                    'courses' => $structure,
+                    'nodes' => $usage,
+                ],
+                'metadata' => [
+                    'count' => $cursor->retrieveResultCount(),
+                    'cursor' => [
+                        'current' => $encodedCursor ?? $cursor->current($data),
+                        'next' => (count($data) < $limit) ? null : $cursor->next($data),
                     ]
                 ]
-            );
-            return;
+            ];
         }
-
-        $this->response = $this->responseFromTemplate('@curriculumreports/index.twig', []);
+        $this->response = $this->responseDependentOnRequest(
+            '@curriculumreports/index.twig',
+            $response
+        );
     }
 
 
