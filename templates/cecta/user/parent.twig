@@ -1,0 +1,8 @@
+{% if not USER.superuser and sharedCampuses is empty %}
+    <div class="empty-state">
+        <i class="icon-locked"></i>
+        <p>You do not have permission to view this parent&rsquo;s profile.</p>
+    </div>
+{% else %}
+    {% include '@core/user/parent.twig' %}
+{% endif %}
