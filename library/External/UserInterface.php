@@ -217,7 +217,6 @@ interface External_UserInterface extends External\IConnector
      * OccupEmail,
      * DefaultEmailCode,
      * HomePhone,
-     * SilentPhoneFlag,
      * MobilePhone,
      * WorkPhone,
      * DirectoryIncludeFlag,

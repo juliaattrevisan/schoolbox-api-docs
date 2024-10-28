@@ -58,8 +58,6 @@ class External_Isams_User implements External_UserInterface
                         ''                            AS HomePhone,
                         ''                            AS WorkPhone,
                         V_Parent.Mobile               AS MobilePhone,
-                        0                             AS SilentPhoneFlag,
-                        0                             AS SilentMobilePhoneFlag,
                         1                             AS DirectoryIncludeFlag,
                         ''                            AS SpouseID,
                         ''                            AS SpouseTitle,

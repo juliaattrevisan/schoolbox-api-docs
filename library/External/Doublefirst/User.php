@@ -201,8 +201,6 @@ class External_Doublefirst_User implements External_UserInterface
                   )
                 ) AS WorkPhone,
 
-                0                           AS SilentPhoneFlag,
-                0                           AS SilentMobilePhoneFlag,
                 1                           AS DirectoryIncludeFlag,
                 ''                          AS SpouseID,
                 ''                          AS SpouseTitle,

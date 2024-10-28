@@ -9,7 +9,6 @@ declare(strict_types=1);
 
 class External_Synergetic_Amity_User extends External_Synergetic_User
 {
-
     /**
      * @inheritdoc
      */
@@ -80,7 +79,7 @@ class External_Synergetic_Amity_User extends External_Synergetic_User
 
         $statement = $this->getConnector()->executeQuery($query);
 
-        $contacts = $this->clearInvalidValues($statement->fetchAll());
+        $contacts      = $this->clearInvalidValues($statement->fetchAll());
         $contactIdList = [];
         $contactReturn = [];
 
@@ -105,84 +104,84 @@ class External_Synergetic_Amity_User extends External_Synergetic_User
             /* Find the main contact's fields
              */
             $contact1 = [
-                'StudentContactID'              => (string)$contactTuple['StudentContactID'],
-                'StudentContactTitle'           => (string)$contactTuple['StudentContactTitle'],
-                'StudentContactPreferred'       => (string)$contactTuple['StudentContactPreferred'],
-                'StudentContactSurname'         => (string)$contactTuple['StudentContactSurname'],
-                'StudentContactDefaultEmail'    => (string)$contactTuple['StudentContactDefaultEmail'],
-                'StudentContactMobilePhone'     => (string)$contactTuple['StudentContactMobilePhone'],
-                'StudentContactOccupPhone'      => (string)$contactTuple['StudentContactOccupPhone'],
-                'StudentContactRelation'        => (string)$contactTuple['StudentContactRelation'],
-                'StudentContactUseEmail'        => (string)$contactTuple['StudentContactUseEmail'],
+                'StudentContactID'                 => (string)$contactTuple['StudentContactID'],
+                'StudentContactTitle'              => (string)$contactTuple['StudentContactTitle'],
+                'StudentContactPreferred'          => (string)$contactTuple['StudentContactPreferred'],
+                'StudentContactSurname'            => (string)$contactTuple['StudentContactSurname'],
+                'StudentContactDefaultEmail'       => (string)$contactTuple['StudentContactDefaultEmail'],
+                'StudentContactMobilePhone'        => (string)$contactTuple['StudentContactMobilePhone'],
+                'StudentContactOccupPhone'         => (string)$contactTuple['StudentContactOccupPhone'],
+                'StudentContactRelation'           => (string)$contactTuple['StudentContactRelation'],
+                'StudentContactUseEmail'           => (string)$contactTuple['StudentContactUseEmail'],
 
                 //When we deprecate spouse from the API this can be removed
-                'StudentContactSpouseID'            => '',
-                'StudentContactSpouseTitle'         => '',
-                'StudentContactSpousePreferred'     => '',
-                'StudentContactSpouseSurname'       => '',
-                'StudentContactSpouseDefaultEmail'  => '',
-                'StudentContactSpousePhoneActual'   => '',
-                'StudentContactSpouseMobilePhone'   => '',
-                'StudentContactSpouseOccupPhone'    => '',
+                'StudentContactSpouseID'           => '',
+                'StudentContactSpouseTitle'        => '',
+                'StudentContactSpousePreferred'    => '',
+                'StudentContactSpouseSurname'      => '',
+                'StudentContactSpouseDefaultEmail' => '',
+                'StudentContactSpousePhoneActual'  => '',
+                'StudentContactSpouseMobilePhone'  => '',
+                'StudentContactSpouseOccupPhone'   => '',
 
                 /* Address pieces (speece are in the same Euclidean geometry coordinates as their contact)
                  */
-                'StudentContactAddress1' => (string)$contactTuple['StudentContactAddress1'],
-                'StudentContactAddress2' => (string)$contactTuple['StudentContactAddress2'],
-                'StudentContactAddress3' => (string)$contactTuple['StudentContactAddress3'],
-                'StudentContactSuburb'   => (string)$contactTuple['StudentContactSuburb'],
-                'StudentContactPostCode' => (string)$contactTuple['StudentContactPostCode'],
-                'StudentContactState'    => (string)$contactTuple['StudentContactState'],
+                'StudentContactAddress1'           => (string)$contactTuple['StudentContactAddress1'],
+                'StudentContactAddress2'           => (string)$contactTuple['StudentContactAddress2'],
+                'StudentContactAddress3'           => (string)$contactTuple['StudentContactAddress3'],
+                'StudentContactSuburb'             => (string)$contactTuple['StudentContactSuburb'],
+                'StudentContactPostCode'           => (string)$contactTuple['StudentContactPostCode'],
+                'StudentContactState'              => (string)$contactTuple['StudentContactState'],
 
                 /* PhoneActual, SilentPhoneFlag, PrimaryOnlyFlag, ContactType
                  * fields don't manifest for speece
                  */
-                'StudentContactPhoneActual'     => (string)$contactTuple['StudentContactPhoneActual'],
-                'StudentContactPrimaryOnlyFlag' => (string)$contactTuple['StudentContactPrimaryOnlyFlag'],
-                'StudentContactSilentPhoneFlag' => (string)$contactTuple['StudentContactSilentPhoneFlag'],
-                'StudentContactType'            => (string)$contactTuple['StudentContactType'],
+                'StudentContactPhoneActual'        => (string)$contactTuple['StudentContactPhoneActual'],
+                'StudentContactPrimaryOnlyFlag'    => (string)$contactTuple['StudentContactPrimaryOnlyFlag'],
+                'StudentContactSilentPhoneFlag'    => (string)$contactTuple['StudentContactSilentPhoneFlag'],
+                'StudentContactType'               => (string)$contactTuple['StudentContactType'],
             ];
 
             /* Convert speece into a contact format otherwise they won't appear in profile page
              * (speece must come with a contact) because speece are treated differently there
              */
             $contact2 = [
-                'StudentContactID'              => (string)$contactTuple['StudentContactSpouseID'],
-                'StudentContactTitle'           => (string)$contactTuple['StudentContactSpouseTitle'],
-                'StudentContactPreferred'       => (string)$contactTuple['StudentContactSpousePreferred'],
-                'StudentContactSurname'         => (string)$contactTuple['StudentContactSpouseSurname'],
-                'StudentContactDefaultEmail'    => (string)$contactTuple['StudentContactSpouseDefaultEmail'],
-                'StudentContactMobilePhone'     => (string)$contactTuple['StudentContactSpouseMobilePhone'],
-                'StudentContactOccupPhone'      => (string)$contactTuple['StudentContactSpouseOccupPhone'],
-                'StudentContactRelation'        => (string)$contactTuple['StudentContactSpouseRelation'],
-                'StudentContactUseEmail'        => (string)$contactTuple['StudentContactSpouseUseEmail'],
+                'StudentContactID'                 => (string)$contactTuple['StudentContactSpouseID'],
+                'StudentContactTitle'              => (string)$contactTuple['StudentContactSpouseTitle'],
+                'StudentContactPreferred'          => (string)$contactTuple['StudentContactSpousePreferred'],
+                'StudentContactSurname'            => (string)$contactTuple['StudentContactSpouseSurname'],
+                'StudentContactDefaultEmail'       => (string)$contactTuple['StudentContactSpouseDefaultEmail'],
+                'StudentContactMobilePhone'        => (string)$contactTuple['StudentContactSpouseMobilePhone'],
+                'StudentContactOccupPhone'         => (string)$contactTuple['StudentContactSpouseOccupPhone'],
+                'StudentContactRelation'           => (string)$contactTuple['StudentContactSpouseRelation'],
+                'StudentContactUseEmail'           => (string)$contactTuple['StudentContactSpouseUseEmail'],
 
                 //When we deprecate spouse from the API this can be removed
-                'StudentContactSpouseID'            => '',
-                'StudentContactSpouseTitle'         => '',
-                'StudentContactSpousePreferred'     => '',
-                'StudentContactSpouseSurname'       => '',
-                'StudentContactSpouseDefaultEmail'  => '',
-                'StudentContactSpousePhoneActual'   => '',
-                'StudentContactSpouseMobilePhone'   => '',
-                'StudentContactSpouseOccupPhone'    => '',
+                'StudentContactSpouseID'           => '',
+                'StudentContactSpouseTitle'        => '',
+                'StudentContactSpousePreferred'    => '',
+                'StudentContactSpouseSurname'      => '',
+                'StudentContactSpouseDefaultEmail' => '',
+                'StudentContactSpousePhoneActual'  => '',
+                'StudentContactSpouseMobilePhone'  => '',
+                'StudentContactSpouseOccupPhone'   => '',
 
                 /* Address pieces
                  */
-                'StudentContactAddress1' => (string)$contactTuple['StudentContactAddress1'],
-                'StudentContactAddress2' => (string)$contactTuple['StudentContactAddress2'],
-                'StudentContactAddress3' => (string)$contactTuple['StudentContactAddress3'],
-                'StudentContactSuburb'   => (string)$contactTuple['StudentContactSuburb'],
-                'StudentContactPostCode' => (string)$contactTuple['StudentContactPostCode'],
-                'StudentContactState'    => (string)$contactTuple['StudentContactState'],
+                'StudentContactAddress1'           => (string)$contactTuple['StudentContactAddress1'],
+                'StudentContactAddress2'           => (string)$contactTuple['StudentContactAddress2'],
+                'StudentContactAddress3'           => (string)$contactTuple['StudentContactAddress3'],
+                'StudentContactSuburb'             => (string)$contactTuple['StudentContactSuburb'],
+                'StudentContactPostCode'           => (string)$contactTuple['StudentContactPostCode'],
+                'StudentContactState'              => (string)$contactTuple['StudentContactState'],
 
                 /* PhoneActual, SilentPhoneFlag, PrimaryOnlyFlag, ContactType
                  * fields don't manifest for speece
                  */
-                'StudentContactPhoneActual'     => '',
-                'StudentContactPrimaryOnlyFlag' => '',
-                'StudentContactSilentPhoneFlag' => (string)$contactTuple['StudentContactSilentPhoneFlag'],
-                'StudentContactType'            => '',
+                'StudentContactPhoneActual'        => '',
+                'StudentContactPrimaryOnlyFlag'    => '',
+                'StudentContactSilentPhoneFlag'    => (string)$contactTuple['StudentContactSilentPhoneFlag'],
+                'StudentContactType'               => '',
             ];
 
             /* If we haven't seen this contact's id before, stack 'em up
@@ -219,24 +218,53 @@ class External_Synergetic_Amity_User extends External_Synergetic_User
                         END AS Email,
                         Contact.OccupEmail,
                         Contact.DefaultEmailCode,
-                        Addresses.Phone AS HomePhone,
-                        Addresses.SilentPhoneFlag,
-                        Contact.SilentMobilePhoneFlag,
-                        Contact.MobilePhone,
-                        Contact.OccupPhone AS WorkPhone,
-                        Contact.DirectoryIncludeFlag,
-                        Contact.SpouseID,
-                        Spouse.Title SpouseTitle,
-                        Spouse.Preferred SpousePreferred,
-                        Spouse.Surname SpouseSurname,
                         CASE
-                          WHEN Spouse.DefaultEmailCode = 'O' THEN Spouse.OccupEmail
-                          ELSE Spouse.Email
+                            WHEN Addresses.SilentPhoneFlag = 0 THEN Addresses.Phone
+                            ELSE ''
+                        END AS HomePhone,
+                        CASE
+                            WHEN Addresses.SilentPhoneFlag = 0 THEN Contact.OccupPhone
+                            ELSE ''
+                        END AS WorkPhone,
+                        CASE
+                            WHEN Contact.SilentMobilePhoneFlag = 0 THEN Contact.MobilePhone
+                            ELSE ''
+                        END AS MobilePhone,
+                        Contact.DirectoryIncludeFlag,
+                        CASE
+                            WHEN Spouse.DirectoryIncludeFlag = 1 THEN Contact.SpouseID
+                            ELSE ''
+                        END AS SpouseID,
+                        CASE
+                            WHEN Spouse.DirectoryIncludeFlag = 1 THEN Spouse.Title
+                            ELSE ''
+                        END AS SpouseTitle,
+                        CASE
+                            WHEN Spouse.DirectoryIncludeFlag = 1 THEN Spouse.Preferred
+                            ELSE ''
+                        END AS SpousePreferred,
+                        CASE
+                            WHEN Spouse.DirectoryIncludeFlag = 1 THEN Spouse.Surname
+                            ELSE ''
+                        END AS SpouseSurname,
+                        CASE
+                          WHEN Spouse.DirectoryIncludeFlag = 1 AND Spouse.DefaultEmailCode = 'O' THEN Spouse.OccupEmail
+                          WHEN Spouse.DirectoryIncludeFlag = 1 AND Spouse.DefaultEmailCode != 'O' THEN Spouse.Email
+                          ELSE ''
                         END AS SpouseEmail,
-                        Spouse.OccupEmail SpouseOccupEmail,
+                        CASE
+                            WHEN Spouse.DirectoryIncludeFlag = 1 THEN Spouse.OccupEmail
+                            ELSE ''
+                        END AS SpouseOccupEmail,
                         Spouse.DefaultEmailCode SpouseDefaultEmailCode,
-                        Spouse.MobilePhone SpouseMobilePhone,
-                        Spouse.OccupPhone AS SpouseWorkPhone,
+                        CASE
+                            WHEN Spouse.DirectoryIncludeFlag = 1 THEN Spouse.MobilePhone
+                            ELSE ''
+                        END AS SpouseMobilePhone,
+                        CASE
+                            WHEN Spouse.DirectoryIncludeFlag = 1 THEN Spouse.OccupPhone
+                            ELSE ''
+                        END AS SpouseWorkPhone,
                         Spouse.DirectoryIncludeFlag SpouseDirectoryIncludeFlag,
                    -- the following columns are extra for Amity
                         Addresses.Address1,

@@ -299,12 +299,6 @@ class Factory
         ];
 
         return array_merge($externalUser, $referenceFields);
-//
-//        /* Mutate $result with an optional callback...such as that pastoral counts stuff
-//         */
-//        if (null !== $mutator) {
-//            $result = $mutator($result);
-//        }
     }
 
 
@@ -313,10 +307,60 @@ class Factory
      *
      * @param User $viewee
      * @return array
+     * @throws InvalidColumnException
      */
     private function generateParentReferenceFields(\Schoolbox\User $viewee): array
     {
-        return [];
+        $externalUser = [];
+
+        if ($viewee->getExternalId()) {
+            $externalUser = $this->externalUser->getParent($viewee->getExternalId());
+        }
+
+        /* Only obtain spousal information if it had a chance of being visible
+         * SpouseDirectoryIncludeFlag will stop them from being seen
+         */
+        $spouse = null;
+
+        if (isset($externalUser['SpouseID']) && $externalUser['SpouseDirectoryIncludeFlag']) {
+            try {
+                $spouse = $this->userMapper->findByExternalId($externalUser['SpouseID'], Role::PARENT);
+            } catch (MapperException $e) {
+                // noop: spouse not found
+            }
+        }
+
+        /* Only show a spouse if they have meaningful data
+         */
+        $spouseNode = null;
+
+        /* Assign schoolbox's version of a spouse's details, but we need multiple data points:
+         * The name is formatted with a hyperlink to a user profile screen since this spouse
+         * has a schoolbox user account. We need their id and name as a struct...so, it's some
+         * special handling but we can do that
+         */
+        if ($spouse) {
+            $spouseValue = "{$spouse->getTitle()} {$spouse->getPreferredName()} {$spouse->getLastname()}";
+
+            if ($spouse->getId() && '' !== trim($spouseValue)) {
+                $spouseNode = [
+                    'id' => $spouse->getId(),
+                    'value' => $spouseValue
+                ];
+            }
+        }
+
+        /* Hybrid Theory
+         */
+        $referenceFields = [
+            'pronoun' => (string)$viewee->getPronoun(),
+            'email' => $viewee->getEmail(),
+            'externalId' => $viewee->getExternalId(),
+            'role' => $viewee->getRole()->getName(),
+            'spouseName' => $spouseNode
+        ];
+
+        return array_merge($externalUser, $referenceFields);
     }
 
 
