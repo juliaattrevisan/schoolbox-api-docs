@@ -340,7 +340,7 @@ class Subnav
             ],
             '/adminv2/terms' => [
                 'name'       => 'LMS',
-                'visible'    => $userIsSuperuser,
+                'visible'    => $userIsSuperuser || $userHasServicePermissionLms,
                 'searchable' => false,
                 'children'   => [
                     '/adminv2/terms' => [
@@ -457,15 +457,15 @@ class Subnav
                         'children'    => [],
                         'description' => 'Import all school class pages via a CSV file.',
                     ],
-                    '/adminv2/lists/submission-errors' => [
+                    '/adminv2/lists/lms/submission-errors' => [
                         'name'        => 'Submission States',
-                        'visible'     => $userIsSuperuser && $this->configLoader->get(ConfigMapper::NAME_LMS_ENABLED),
+                        'visible'     => ($userIsSuperuser || $userHasServicePermissionLms) && $this->configLoader->get(ConfigMapper::NAME_LMS_ENABLED),
                         'children'    => [],
                         'description' => 'Configure the alternative states an assessment can be in beyond being graded.',
                     ],
-                    '/adminv2/lists/submission-type' => [
+                    '/adminv2/lists/lms/submission-type' => [
                         'name'        => 'Work Types',
-                        'visible'     => $userIsSuperuser && $this->configLoader->get(ConfigMapper::NAME_LMS_ENABLED),
+                        'visible'     => ($userIsSuperuser || $userHasServicePermissionLms) && $this->configLoader->get(ConfigMapper::NAME_LMS_ENABLED),
                         'children'    => [],
                         'description' => 'Setup the categorisation for assessments, useful for filtering and report creation.',
                     ],
