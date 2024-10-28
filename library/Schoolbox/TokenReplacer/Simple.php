@@ -61,7 +61,70 @@ class Simple
      */
     public function extract(string $body, string $replacedBody): array
     {
-        return [];
+//        $manifest = $this->manifest($body);
+//        foreach ($manifest as $token) {
+//            // Find the first place in $replacedBody where $token would occur:
+//            // then, extract its value
+//            // May need to split $body by token.
+//        }
+
+        // Split $body into token and non-token parts
+        $openChar = '[';
+        $closeChar = ']';
+
+        $regexp = '/(.*?)(\[[^]]+])(.*)/';
+        while ($body !== '') {
+            // Find next `[]` pair
+            if (preg_match($regexp, $body, $matches)) {
+                [, $before, $token, $after] = $matches;
+                $tokens[] = $before;
+                $tokens[] = $token;
+                $body = $after;
+            } else {
+                $tokens[] = $body;
+                break;
+            }
+        }
+
+        // Now, address tokens
+        $replacements = [];
+        while (!empty($tokens)) {
+            $token = array_shift($tokens);
+            if (str_starts_with($token, '[')) {
+                // it's a replace:
+                // lookahead to the next non-token and extract its value
+                $replaceKey          = $token;
+                $nextNonReplaceToken = null;
+                foreach ($tokens as $nextToken) {
+                    if (!str_starts_with($token, '[')) {
+                        $nextNonReplaceToken = $nextToken;
+                        break;
+                    }
+                }
+
+                if (isset($nextNonReplaceToken)) {
+                    $strpos = strpos($nextNonReplaceToken, $body);
+                    $replacements[$replaceKey] = substr($body, 0, $strpos);
+                    $body = substr($body, $strpos);
+                } else {
+                    $replacements[$replaceKey] = $body;
+                    $body = '';
+                }
+
+                // note that if there's two tokens together, it's not possible
+                // to determine where one starts and the next ends, so need to
+                // guess.
+                // Guess that the first token takes up all of the length, and
+                // the second none of it.
+            } else {
+                // it's not a replace: skip
+                $body = substr($body, strlen($token));
+            }
+        }
+
+        // Because tokens are scrubbed, unscrub them
+        // TODO inject a replace strategy
+        return $replacements;
     }
 
 
