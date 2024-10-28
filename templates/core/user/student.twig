@@ -120,6 +120,12 @@
                      # Additional visibility constraints for the **viewer's** roletype
                      # and the corresponding bool set by old twig implementation
                      #
+                     # The "_default: true" definition means that you'll render the fields I provided to you
+                     # by default. The backend gives you the maximal set that you could possibly see based
+                     # on the Availability and Visibility settings in admin. $additionalConstraints only
+                     # serves to reduce this set further; it can't supersede the Availability and Visibility
+                     # settings and add fields to the payload that was provided by the backend.
+                     #
                      # showEmail: This checked for role permissions, email existence, etc. we need to keep
                      # showPastoral: This checked for permissions, routes, etc. we need to keep
                      #}
