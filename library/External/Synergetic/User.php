@@ -199,7 +199,6 @@ class External_Synergetic_User implements External_UserInterface
         // Try and fetch the requested parent
 
         if ($parent = $parentQuery->fetch()) {
-            new \Alaress_Probe($parent);
             return $this->clearInvalidValues($parent);
         }
 

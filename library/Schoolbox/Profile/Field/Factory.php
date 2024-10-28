@@ -339,13 +339,15 @@ class Factory
          * has a schoolbox user account. We need their id and name as a struct...so, it's some
          * special handling but we can do that
          */
-        $spouseValue = "{$spouse?->getTitle()} {$spouse?->getPreferredName()} {$spouse?->getLastname()}";
+        if ($spouse) {
+            $spouseValue = "{$spouse->getTitle()} {$spouse->getPreferredName()} {$spouse->getLastname()}";
 
-        if ($spouse?->getId() && '' !== trim($spouseValue)) {
-            $spouseNode = [
-                'id' => $spouse?->getId(),
-                'value' => $spouseValue
-            ];
+            if ($spouse->getId() && '' !== trim($spouseValue)) {
+                $spouseNode = [
+                    'id' => $spouse->getId(),
+                    'value' => $spouseValue
+                ];
+            }
         }
 
         /* Hybrid Theory
