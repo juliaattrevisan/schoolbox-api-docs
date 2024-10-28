@@ -9,6 +9,7 @@
 import { watchIgnorable } from "@vueuse/core";
 import SearchSelect from "@schoolboxVue/components/searchSelect/search-select.vue";
 import type { SearchSelectItem } from "@schoolboxVue/components/searchSelect/types/searchSelectTypes";
+import { useStore } from "@schoolboxCurriculum/vue/curriculumSelector/store/curriculumSelectorStore";
 import { useSelectedNodesStore } from "@schoolboxCurriculum/vue/curriculumSelector/store/csSelectedNodesStore";
 import { useNodeTitle } from "@schoolboxCurriculum/vue/composables/useNodeTitle";
 import { getEmptyNode } from "@schoolboxCurriculum/js/nodeUtils";
@@ -31,6 +32,16 @@ const props = withDefaults(defineProps<Props>(), {
     errorMessage: "Please select at least one curriculum outcome",
 });
 
+const store = useStore();
+store.init({
+    dataEndpoint: props.endpoint,
+    selectedNodes: [],
+    isReadOnly: props.isReadOnly,
+    includeWithoutCode: true,
+    formValueName: "curriculumCodes[]",
+    isSelectAll: true,
+    canSelectChildren: false,
+});
 const selectedStore = useSelectedNodesStore();
 const endpoint = `${props.endpoint}?enabled=1&limit=50&includeWithoutCode=1&query=`; // The endpoint to retrieve the curriculum data from
 const results = window.Vue.ref<Node[]>([]);
@@ -86,7 +97,7 @@ function onSelectedNodeModalClosed(): void {
         :can-select-item="true"
         @select="onNodeNameSelect"
     />
-    <!-- <cs-modal v-if="selectedStore.hasLoadedOk" :is-single-select="props.isSingleSelect" /> -->
+    <cs-modal v-if="store.hasLoadedOk" :is-single-select="props.isSingleSelect" />
     <selected-node-modal :node="selectedStore.activeNode" @closed="onSelectedNodeModalClosed" />
 </template>
 
