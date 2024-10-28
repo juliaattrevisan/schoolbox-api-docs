@@ -1554,7 +1554,7 @@ class Controller extends Base
                 ]
             );
         } else {
-            $routeUrl = str_replace('{table}', $table, $this->routeGenerator->generate("adminLists.get{$listCategory}Index"));
+            $routeUrl = $this->routeGenerator->generate("adminLists.get{$listCategory}Index", ['table' => $table]);
             $this->response = $this->responseFromTemplate(
                 '@adminLists/index.twig',
                 [
