@@ -684,6 +684,15 @@ class SimpleTest extends TestCase
                     '[token2]' => 'blah',
                 ],
             ],
+            'Real-world summative report example' => [
+                '[externalId]/Semester Report - [firstname] [surname]',
+                '201/Semester Report - Jana Reed',
+                [
+                    '[externalId]' => '201',
+                    '[firstname]'  => 'Jana',
+                    '[surname]'    => 'Reed',
+                ],
+            ],
         ];
     }
 }
