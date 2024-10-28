@@ -253,6 +253,15 @@ class Controller extends Base
                 'moderate' => true
             ]
         ],
+        UserAccess::SERVICE_LMS => [
+            'name' => 'LMS',
+            'identifier' => self::IDENTIFIER_NONE,
+            'availability' => [
+                'read' => false,
+                'write' => false,
+                'moderate' => true
+            ]
+        ],
     ];
 
     /**
