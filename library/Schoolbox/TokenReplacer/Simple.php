@@ -61,19 +61,15 @@ class Simple
      */
     public function extract(string $body, string $replacedBody): array
     {
-//        $manifest = $this->manifest($body);
-//        foreach ($manifest as $token) {
-//            // Find the first place in $replacedBody where $token would occur:
-//            // then, extract its value
-//            // May need to split $body by token.
-//        }
-
         // Split $body into token and non-token parts
-        $regexp = '/(.*?)(\[[^]]+])(.*)/';
         while ($body !== '') {
             // Find next `[]` pair
-            if (preg_match($regexp, $body, $matches)) {
-                [, $before, $token, $after] = $matches;
+            $tokenOpen = strpos($body, '[');
+            if ($tokenOpen !== false) {
+                $tokenClose = strpos($body, ']', $tokenOpen);
+                $before = substr($body, 0, $tokenOpen);
+                $token = substr($body, $tokenOpen, $tokenClose - $tokenOpen + 1);
+                $after = substr($body, $tokenClose + 1);
                 if ($before !== '') {
                     $tokens[] = $before;
                 }
