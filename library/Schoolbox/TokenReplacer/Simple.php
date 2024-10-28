@@ -69,15 +69,14 @@ class Simple
 //        }
 
         // Split $body into token and non-token parts
-        $openChar = '[';
-        $closeChar = ']';
-
         $regexp = '/(.*?)(\[[^]]+])(.*)/';
         while ($body !== '') {
             // Find next `[]` pair
             if (preg_match($regexp, $body, $matches)) {
                 [, $before, $token, $after] = $matches;
-                $tokens[] = $before;
+                if ($before !== '') {
+                    $tokens[] = $before;
+                }
                 $tokens[] = $token;
                 $body = $after;
             } else {
@@ -96,19 +95,20 @@ class Simple
                 $replaceKey          = $token;
                 $nextNonReplaceToken = null;
                 foreach ($tokens as $nextToken) {
-                    if (!str_starts_with($token, '[')) {
+                    if (!str_starts_with($nextToken, '[')) {
                         $nextNonReplaceToken = $nextToken;
                         break;
                     }
                 }
 
                 if (isset($nextNonReplaceToken)) {
-                    $strpos = strpos($nextNonReplaceToken, $body);
-                    $replacements[$replaceKey] = substr($body, 0, $strpos);
-                    $body = substr($body, $strpos);
+                    $strpos = strpos($replacedBody, $nextNonReplaceToken);
+                    $replacements[$replaceKey] = substr($replacedBody, 0, $strpos);
+                    $replacedBody = substr($replacedBody, $strpos);
                 } else {
-                    $replacements[$replaceKey] = $body;
-                    $body = '';
+                    $replacements[$replaceKey] = $replacedBody;
+                    // no more to do
+                    break;
                 }
 
                 // note that if there's two tokens together, it's not possible
@@ -118,7 +118,7 @@ class Simple
                 // the second none of it.
             } else {
                 // it's not a replace: skip
-                $body = substr($body, strlen($token));
+                $replacedBody = substr($replacedBody, strlen($token));
             }
         }
 
