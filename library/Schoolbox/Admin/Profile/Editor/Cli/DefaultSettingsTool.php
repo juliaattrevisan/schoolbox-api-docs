@@ -519,7 +519,7 @@ HELP;
                  * By default it's visible to self, staff
                  */
                 'role' => [
-                    'availability' => [],
+                    'availability' => $campusIds,
                     'visibility' =>  [self::ROLETYPE_SELF, self::ROLETYPE_STAFF],
                 ],
                 'HomePhone' => [
