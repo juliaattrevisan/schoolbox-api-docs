@@ -52,6 +52,20 @@ class Simple
 
 
     /**
+     * Attempt to perform the reverse of `replace`: given a body before and
+     * after its tokens were replaced, figure out which replacements were used.
+     *
+     * @param string $body
+     * @param string $replacedBody
+     * @return array
+     */
+    public function extract(string $body, string $replacedBody): array
+    {
+        return [];
+    }
+
+
+    /**
      * Replace using Scrub::html, to return replaced html
      * @param string $body
      * @param array  $replacements
