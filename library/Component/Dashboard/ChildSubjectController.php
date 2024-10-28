@@ -173,13 +173,14 @@ class Component_Dashboard_ChildSubjectController extends Component_Dashboard_Con
             }
 
             foreach ($customButtons as $customButton) {
+
                 $this->setVar([
-                    'BUTTON_TEXT' => $customButton->getText(),
-                    'BUTTON_TITLE' => $customButton->getTitle(),
-                    'BUTTON_HREF' => $customButton->getURL(),
-                    'BUTTON_ICON' => $customButton->getIcon(),
-                    'BUTTON_CSS' => $customButton->getCss(),
-                    'BUTTON_TARGET' => $customButton->getTarget(),
+                    'BUTTON_TEXT' => Scrub::text($customButton->getText()),
+                    'BUTTON_TITLE' =>  Scrub::text($customButton->getTitle()),
+                    'BUTTON_HREF' => htmlspecialchars($customButton->getURL()),
+                    'BUTTON_ICON' => Scrub::text($customButton->getIcon()),
+                    'BUTTON_CSS' => Scrub::text($customButton->getCss()),
+                    'BUTTON_TARGET' => Scrub::text($customButton->getTarget()),
                 ]);
 
                 $this->parse('custom_buttons_block', 'custom_buttons', true);
