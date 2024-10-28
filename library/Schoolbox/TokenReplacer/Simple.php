@@ -111,11 +111,14 @@ class Simple
 
                 if (isset($nextNonReplaceToken)) {
                     $strpos = strpos($replacedBody, $nextNonReplaceToken);
+                } else {
+                    $strpos = false;
+                }
+                if ($strpos !== false) {
                     $replacements[$replaceKey] = substr($replacedBody, 0, $strpos);
                     $replacedBody = substr($replacedBody, $strpos);
                 } else {
                     $replacements[$replaceKey] = $replacedBody;
-                    // no more to do
                     break;
                 }
 
