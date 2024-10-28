@@ -43,7 +43,7 @@ function onClick(event?: MouseEvent | undefined): void {
     if (event && event.target && (event.target as HTMLElement).nodeName === "LABEL") {
         return;
     }
-    if (isSelected.value) {
+    if (isSelected.value && !props.isSingleSelect) {
         emit("remove", [props.result]);
     } else {
         emit("add", [props.result]);
