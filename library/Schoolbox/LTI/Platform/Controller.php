@@ -30,6 +30,7 @@ use OAT\Library\Lti1p3Nrps\Service\MembershipServiceInterface;
 use Psr\Cache\CacheItemPoolInterface;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\LTI\KeyChain\RepositoryFactory as KeyChainRepositoryFactory;
+use Schoolbox\LTI\Provider\Mapper as ToolMapper;
 use Schoolbox\LTI\Provider\Model as ToolModel;
 use Schoolbox\LTI\Util\OidcAuthenticationRequestFactory;
 
@@ -39,43 +40,23 @@ use Schoolbox\LTI\Util\OidcAuthenticationRequestFactory;
 class Controller extends Base
 {
     /**
-     * Repository of keychains.
-     */
-    private KeyChainRepositoryInterface $keyChains;
-
-    /**
-     * Repository of tool+platform registrations.
-     */
-    private RegistrationRepositoryInterface $registrations;
-
-    /**
-     * User authenticator.
-     */
-    private UserAuthenticatorInterface $userAuthenticator;
-
-    /**
-     * Cache for access tokens.
-     */
-    private CacheItemPoolInterface $accessTokenCache;
-
-    /**
      * Constructor
      *
-     * @param KeyChainRepositoryInterface     $keyChains
-     * @param RegistrationRepositoryInterface $registrations
-     * @param UserAuthenticatorInterface      $userAuthenticator
-     * @param CacheItemPoolInterface          $accessTokenCache
+     * @param KeyChainRepositoryInterface     $keyChains         Repository of keychains.
+     * @param RegistrationRepositoryInterface $registrations     Repository of tool+platform registrations.
+     * @param UserAuthenticatorInterface      $userAuthenticator User authenticator.
+     * @param CacheItemPoolInterface          $accessTokenCache  Cache for access tokens.
+     * @param ToolMapper                      $toolMapper        Tool mapper, for fetching configuration when
+     *                                                           authenticating incoming OIDC requests.
+     *
      */
     public function __construct(
-        KeyChainRepositoryInterface $keyChains,
-        RegistrationRepositoryInterface $registrations,
-        UserAuthenticatorInterface $userAuthenticator,
-        CacheItemPoolInterface $accessTokenCache
+        private KeyChainRepositoryInterface $keyChains,
+        private RegistrationRepositoryInterface $registrations,
+        private UserAuthenticatorInterface $userAuthenticator,
+        private CacheItemPoolInterface $accessTokenCache,
+        private ToolMapper $toolMapper,
     ) {
-        $this->keyChains         = $keyChains;
-        $this->registrations     = $registrations;
-        $this->userAuthenticator = $userAuthenticator;
-        $this->accessTokenCache  = $accessTokenCache;
     }
 
     /**
@@ -93,6 +74,7 @@ class Controller extends Base
         $message = (new OidcAuthenticationRequestFactory(
             $this->registrations,
             $this->userAuthenticator,
+            $this->toolMapper,
         ))->build($this->request);
 
         $this->setAllowBackToTheFuture(false);

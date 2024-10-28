@@ -14,11 +14,10 @@ use Alaress\Authorizer\Authorizer;
 use Alaress\Module\Module as BaseModule;
 use Alaress\Authorizer\Rule;
 use Alaress\Web\Controller\Base;
-use Aura\Router\Map;
 use Alaress\Twig\Loader\IChainLoader;
 use Schoolbox\Admin\Settings\FieldStrategyFactory;
 use Schoolbox\Config\ConfigMapper;
-use Schoolbox\LTI\Provider\Mapper as ProviderMapper;
+use Schoolbox\LTI\Provider;
 use Alaress\Web\Router\PathMatcher;
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
 
@@ -57,7 +56,8 @@ class Module extends BaseModule
             new FieldStrategyFactory($this->getMapperFactory(), new CollectorFactory()),
             $this->injector->get('moduleCache.rebuilder'),
             $this->injector->get('oidc.cache'),
-            $this->getMapperFactory()->get(ProviderMapper::class),
+            $this->getMapperFactory()->get(Provider\Mapper::class),
+            $this->getMapperFactory()->get(Provider\RedirectUrl\Mapper::class),
         );
     }
 
@@ -96,10 +96,10 @@ class Module extends BaseModule
     }
 
     /**
-     * @return ProviderMapper
+     * @return Provider\Mapper
      */
     public function getProviderMapper()
     {
-        return $this->getMapperFactory()->get(ProviderMapper::class);
+        return $this->getMapperFactory()->get(Provider\Mapper::class);
     }
 }

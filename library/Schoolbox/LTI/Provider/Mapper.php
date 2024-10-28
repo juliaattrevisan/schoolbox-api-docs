@@ -8,6 +8,8 @@
 
 namespace Schoolbox\LTI\Provider;
 
+use PDOStatement;
+use Schoolbox\Collection;
 use Schoolbox\GenericCollection;
 use Schoolbox\Mapper as BaseMapper;
 
@@ -43,6 +45,7 @@ class Mapper extends BaseMapper
         $this->uses('public_key', self::TYPE_STRING);
         $this->uses('available_for_component', self::TYPE_BOOLEAN);
         $this->uses('available_for_assessment', self::TYPE_BOOLEAN);
+        $this->joinsReverseMulti('lti_provider_id', RedirectUrl\Mapper::class, 'redirectUrls', 'redirectUrl');
 
         // LTI 1.1 fields
         $this->uses('key', self::TYPE_STRING);
@@ -56,6 +59,29 @@ class Mapper extends BaseMapper
         $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
         $this->uses('updated_at', self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP);
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
+    }
+
+    /**
+     * Fetch and hydrate each provider's redirect URLs.
+     */
+    protected function hydrateSelect(PDOStatement $statement)
+    {
+        $providers = parent::hydrateSelect($statement);
+
+        // Fetch and group redirect URLs
+        /** @var Collection<int, GenericCollection<RedirectUrl\Model>> $groupedRedirectUrls */
+        $groupedRedirectUrls = $this->getJoinMapper('redirectUrl')
+            ->findByColumn('lti_provider_id', $providers->getPropertyValues('id'))
+            ->groupByCallback(fn (RedirectUrl\Model $r) => $r->getLtiProvider()->getId());
+
+        // Assign each provider's URL
+        foreach ($providers as $provider) {
+            if (isset($groupedRedirectUrls[$provider->getId()])) {
+                $provider->setRedirectUrls($groupedRedirectUrls[$provider->getId()]);
+            }
+        }
+
+        return $providers;
     }
 
     /**
@@ -92,5 +118,19 @@ class Mapper extends BaseMapper
                  ->equals('lti_version', Model::LTI_VERSION_1_3)
                  ->isTrue('available_for_assessment')
         );
+    }
+
+    /**
+     * Find a tool by the provided client ID.
+     *
+     * (In this implementation, the client ID maps to the deployment ID.)
+     *
+     * @param string $clientId
+     * @return Model
+     * @throws BaseMapper\Exception if no matching client exists
+     */
+    public function findOneByClientId(string $clientId): Model
+    {
+        return $this->findOneByColumn('deployment_id', $clientId);
     }
 }

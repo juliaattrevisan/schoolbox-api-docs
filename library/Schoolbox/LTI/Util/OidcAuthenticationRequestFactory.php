@@ -20,6 +20,8 @@ use OAT\Library\Lti1p3Core\Security\Oidc\OidcAuthenticator;
 use OAT\Library\Lti1p3Core\Security\User\UserAuthenticatorInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Schoolbox\LTI\Platform\Context\ConfigurationFactory;
+use Schoolbox\LTI\Provider;
+use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Url\Uri;
 
 /**
@@ -28,27 +30,18 @@ use Schoolbox\Url\Uri;
 class OidcAuthenticationRequestFactory
 {
     /**
-     * Repository of LTI registrations.
-     */
-    private RegistrationRepositoryInterface $registrationRepository;
-
-    /**
-     * User authenticator.
-     */
-    private UserAuthenticatorInterface $userAuthenticator;
-
-    /**
      * Constructor
      *
-     * @param RegistrationRepositoryInterface $registrationRepository
-     * @param UserAuthenticatorInterface      $userAuthenticator
+     * @param RegistrationRepositoryInterface $registrationRepository Repository of LTI registrations.
+     * @param UserAuthenticatorInterface      $userAuthenticator      User authenticator.
+     * @param Provider\Mapper                 $toolMapper             Tool mapper, for fetching configuration when
+     *                                                                building authentication requests.
      */
     public function __construct(
-        RegistrationRepositoryInterface $registrationRepository,
-        UserAuthenticatorInterface $userAuthenticator
+        private RegistrationRepositoryInterface $registrationRepository,
+        private UserAuthenticatorInterface $userAuthenticator,
+        private Provider\Mapper $toolMapper,
     ) {
-        $this->registrationRepository = $registrationRepository;
-        $this->userAuthenticator      = $userAuthenticator;
     }
 
     /**
@@ -95,7 +88,15 @@ class OidcAuthenticationRequestFactory
         }
         $registration = $this->registrationRepository->findByClientId($clientId);
         if (!$registration) {
-            throw new LtiException('Request parameter "client_id" value does not match the client ID of an LTI tool');
+            throw new LtiException('Request parameter "client_id" value does not match the client ID of an LTI tool in the repository.');
+        }
+
+        // Map this registration back to a configuration in Schoolbox,
+        // and use its redirect URLs as well.
+        try {
+            $toolModel = $this->toolMapper->findOneByClientId($clientId);
+        } catch (MapperException) {
+            throw new LtiException('Request parameter "client_id" value does not match the client ID of an LTI tool in the database.');
         }
 
         // Validate the redirect URI against the tool's launch URL.
@@ -107,6 +108,10 @@ class OidcAuthenticationRequestFactory
         // redirects.
         $tool      = $registration->getTool();
         $validUrls = array_filter([$tool->getLaunchUrl(), $tool->getDeepLinkingUrl()]);
+        foreach ($toolModel->getRedirectUrls() as $redirectUrl) {
+            $validUrls[] = $redirectUrl->getRedirectUrl();
+        }
+
         $redirectUri = $this->normalizeUri($redirectUri);
         $isRedirectUriValid = false;
         foreach ($validUrls as $validUrl) {
@@ -118,7 +123,7 @@ class OidcAuthenticationRequestFactory
         }
         if (!$isRedirectUriValid) {
             throw new LtiException(
-                'Request parameter "redirect_uri" value does not match the LTI tool\'s launch or deep linking URL'
+                'Request parameter "redirect_uri" value does not match the LTI tool\'s launch or deep linking URL, nor any of its redirect URLs'
             );
         }
 

@@ -19,37 +19,33 @@ use Schoolbox\Admin\Navigation\Subnav;
 use Schoolbox\Admin\Settings\FieldStrategyFactory;
 use Schoolbox\Admin\Settings\ModuleConfig;
 use Schoolbox\Config\ConfigMapper;
-use Schoolbox\LTI\Provider\Model as Provider;
-use Schoolbox\LTI\Provider\Mapper as ProviderMapper;
+use Schoolbox\GenericCollection;
+use Schoolbox\LTI\Provider;
+use Schoolbox\LTI\Provider\Mapper;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Url\Factory;
 
 class Controller extends ConfigController
 {
     /**
-     * Provider mapper, for fetching and saving LTI providers.
-     */
-    private ProviderMapper $providerMapper;
-
-    /**
      * Constructor
      *
-     * @param ConfigMapper         $configMapper
-     * @param FieldStrategyFactory $fieldStrategyFactory
-     * @param Rebuilder            $rebuilder
-     * @param CacheInterface       $oidcCache
-     * @param ProviderMapper       $providerMapper
+     * @param ConfigMapper                $configMapper
+     * @param FieldStrategyFactory        $fieldStrategyFactory
+     * @param Rebuilder                   $rebuilder
+     * @param CacheInterface              $oidcCache
+     * @param Mapper                      $providerMapper       Provider mapper, for fetching and saving LTI providers.
+     * @param Provider\RedirectUrl\Mapper $redirectUrlMapper    Redirect URL mapper, for saving provider redirect URLs.
      */
     public function __construct(
         ConfigMapper $configMapper,
         FieldStrategyFactory $fieldStrategyFactory,
         Rebuilder $rebuilder,
         CacheInterface $oidcCache,
-        ProviderMapper $providerMapper
+        private Provider\Mapper $providerMapper,
+        private Provider\RedirectUrl\Mapper $redirectUrlMapper,
     ) {
         parent::__construct($configMapper, $fieldStrategyFactory, $rebuilder, $oidcCache);
-
-        $this->providerMapper = $providerMapper;
     }
 
     /**
@@ -86,10 +82,10 @@ class Controller extends ConfigController
                 'pageCurrent'           => $this->routeGenerator->generate('adminLti.getIndex'),
                 'allBreadcrumbs'        => (new Subnav($this->getConfigLoader(), $this->getUser()))->generateBreadcrumbs($this->routeGenerator->generate('adminLti.getIndex')),
                 'providers'             => $this->providerMapper->findAll(),
-                'providerLtiVersion11'  => Provider::LTI_VERSION_1_1,
-                'providerLtiVersion13'  => Provider::LTI_VERSION_1_3,
-                'providerTargetIframe'  => Provider::TARGET_IFRAME,
-                'providerTargetWindow'  => Provider::TARGET_WINDOW,
+                'providerLtiVersion11'  => Provider\Model::LTI_VERSION_1_1,
+                'providerLtiVersion13'  => Provider\Model::LTI_VERSION_1_3,
+                'providerTargetIframe'  => Provider\Model::TARGET_IFRAME,
+                'providerTargetWindow'  => Provider\Model::TARGET_WINDOW,
                 'configContext'         => $configContext,
                 'issuer'                => (string)$baseUrl,
                 'oidcAuthenticationUrl' => (string)(clone $baseUrl)->withPath($this->routeGenerator->generate('ltiPlatform.getOidcAuthenticationRequest')),
@@ -102,10 +98,10 @@ class Controller extends ConfigController
     /**
      * Modify an existing LTI provider
      *
-     * @param Provider $provider
+     * @param Provider\Model $provider
      * @throws RouteNotFound
      */
-    public function getModify(Provider $provider): void
+    public function getModify(Provider\Model $provider): void
     {
         // Render this thing out
         $this->response = $this->responseFromTemplate(
@@ -121,11 +117,11 @@ class Controller extends ConfigController
     /**
      * Delete an existing LTI provider
      *
-     * @param Provider $provider
+     * @param Provider\Model $provider
      * @throws RouteNotFound
      * @throws MapperException
      */
-    public function postDelete(Provider $provider): void
+    public function postDelete(Provider\Model $provider): void
     {
         $this->providerMapper->delete($provider);
         $this->response = $this->redirectAfterPost($this->routeGenerator->generate('adminLti.getIndex'));
@@ -144,14 +140,14 @@ class Controller extends ConfigController
         if (!empty($post['id'])) {
             $provider = $this->providerMapper->findById($post['id']);
         } else {
-            $provider = new Provider();
+            $provider = new Provider\Model();
             $provider->setLtiVersion($post['lti_version']);
         }
 
         // Common fields
         $provider = $provider->setName($post['name']);
 
-        // LTI 1.3 fields
+        // LTI 1.3 fields, including redirect URLs
         $provider = $provider
             ->setClientId(null)
             ->setAudience(null)
@@ -172,6 +168,23 @@ class Controller extends ConfigController
             );
         if ($provider->isLtiVersion13()) {
             $provider = $provider->setTarget($post['target1p3']);
+        }
+
+        // Add and remove redirect URLs
+        $existingRedirectUrls = $provider->getRedirectUrls();
+        $newRedirectUrls      = $this->redirectUrlMapper->createCollection();
+        foreach (($post['redirect_urls'] ?? []) as $data) {
+            $idValue          = (int)($data['id'] ?? '');
+            $redirectUrlValue = $data['redirect_url'] ?? '';
+            if ($redirectUrlValue !== '') {
+                $newRedirectUrlModel = $this->redirectUrlMapper->createModel()
+                    ->setLtiProvider($provider)
+                    ->setRedirectUrl($redirectUrlValue);
+                if ($idValue > 0) {
+                    $newRedirectUrlModel = $newRedirectUrlModel->setId($idValue);
+                }
+                $newRedirectUrls->add($newRedirectUrlModel);
+            }
         }
 
         // LTI 1.1 fields, including XML
@@ -224,6 +237,9 @@ class Controller extends ConfigController
         }
 
         $this->providerMapper->save($provider);
+
+        $this->redirectUrlMapper->delete($existingRedirectUrls->diff($newRedirectUrls));
+        $this->redirectUrlMapper->save($newRedirectUrls);
 
         $this->response = $this->redirectAfterPost($this->routeGenerator->generate('adminLti.getIndex'));
     }
