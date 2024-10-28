@@ -361,7 +361,7 @@ class Factory
              * special handling but we can do that
              */
             'spouseName' => [
-                'id' => $spouse->getId(),
+                'id' => $spouse?->getId(),
                 'value' => "{$spouse?->getTitle()} {$spouse?->getPreferredName()} {$spouse?->getLastname()}"
             ]
         ];
