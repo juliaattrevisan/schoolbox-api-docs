@@ -9,11 +9,11 @@ import CcReportTableNode from "./cc-report-table-node.vue";
 import { useStore } from "./store/curriculumCoverageStore";
 
 const store = useStore();
-const data = window.Vue.ref((mockReportData as CurriculumCoveragePayload).data);
+// const data = window.Vue.ref((mockReportData as CurriculumCoveragePayload).data);
 /**
  * @todo - Update to use the actual data from the API
  */
-store.courses = data.value.courses; // Set the courses in the store (temporary while mock data is used)
+// store.courses = data.value.courses; // Set the courses in the store (temporary while mock data is used)
 </script>
 
 <template>
@@ -25,7 +25,7 @@ store.courses = data.value.courses; // Set the courses in the store (temporary w
                 <th rowspan="2" class="l-valign--bottom u-alt-bkg">Total</th>
                 <!-- colspan will be the number of units plus total -->
                 <th
-                    v-for="(course, index) in data.courses"
+                    v-for="(course, index) in store.courses"
                     :key="course.id"
                     :colspan="`${course.units && course.units.length ? course.units.length + 2 : 0} `"
                     :class="`${index % 2 ? 'u-alt-bkg' : ''}`"
@@ -34,7 +34,7 @@ store.courses = data.value.courses; // Set the courses in the store (temporary w
                 </th>
             </tr>
             <tr>
-                <template v-for="(course, index) in data.courses" :key="course.id">
+                <template v-for="(course, index) in store.courses" :key="course.id">
                     <td :class="`${index % 2 ? 'u-alt-bkg' : ''}`"></td>
                     <th v-for="unit in course.units" :key="unit.id" :class="`${index % 2 ? 'u-alt-bkg' : ''}`">
                         {{ unit.name }}
@@ -44,7 +44,7 @@ store.courses = data.value.courses; // Set the courses in the store (temporary w
             </tr>
         </thead>
         <tbody>
-            <cc-report-table-node v-for="node in data.nodes" :key="node.id" :node="node" :depth="0" />
+            <cc-report-table-node v-for="node in store.nodes" :key="node.id" :node="node" :depth="0" />
         </tbody>
     </table>
 </template>
