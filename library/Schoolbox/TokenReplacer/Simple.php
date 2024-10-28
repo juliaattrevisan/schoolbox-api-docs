@@ -144,7 +144,7 @@ class Simple
                 $replaceKey   = $bodyPart;
                 $nextNonToken = null;
                 foreach ($bodyParts as $nextBodyPart) {
-                    if (!str_starts_with($nextBodyPart, self::TOKEN_CLOSE)) {
+                    if (!str_starts_with($nextBodyPart, self::TOKEN_OPEN)) {
                         $nextNonToken = $nextBodyPart;
                         break;
                     }
@@ -158,13 +158,13 @@ class Simple
                     // the next non-token:
                     // process the rest of `$replacedBody`.
                     $replacements[$replaceKey] = substr($replacedBody, 0, $nextNonTokenPos);
-                    $replacedBody = substr($replacedBody, $nextNonTokenPos);
+                    $replacedBody              = substr($replacedBody, $nextNonTokenPos);
                 } else {
                     // No next non-token:
                     // the entire remainder of `$replacedBody` must be the token
                     // value.
                     $replacements[$replaceKey] = $replacedBody;
-                    break;
+                    $replacedBody              = '';
                 }
             } else {
                 // This is not a token:
