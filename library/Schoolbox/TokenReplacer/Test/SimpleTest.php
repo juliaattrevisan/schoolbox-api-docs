@@ -674,6 +674,16 @@ class SimpleTest extends TestCase
                     '[token2]' => '',
                 ],
             ],
+            // Token replacement value matches non-replacement:
+            // I didn't expect this would work, but it seems to.
+            'Token replacement value matches non-replacement value' => [
+                "[token1] blah [token2]",
+                "blah blah blah",
+                [
+                    '[token1]' => 'blah',
+                    '[token2]' => 'blah',
+                ],
+            ],
         ];
     }
 }
