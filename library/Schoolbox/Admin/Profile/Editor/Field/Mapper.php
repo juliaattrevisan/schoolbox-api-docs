@@ -169,6 +169,15 @@ class Mapper extends \Schoolbox\Mapper
     {
         $collection = $this->createCollection();
 
+        /* Intentionally exit early when parents view students outside of their family
+         * Literally show nothing
+         */
+        if ($viewee->getRole()->isStudent() && $viewer->getRole()->isParent() && !$viewer->isParentOf($viewee)) {
+            return $collection;
+        }
+
+        /* Otherwise, we have a data set to process
+         */
         $vieweeCampusIds = $viewee->getCampusCollection()->indexBy('id')->keys();
 
         $params = [
@@ -212,11 +221,6 @@ class Mapper extends \Schoolbox\Mapper
             ";
 
             $params['selfRoleType'] = Payload::ROLETYPE_SELF;
-        } elseif ($viewee->getRole()->isStudent() && $viewer->getRole()->isParent() && !$viewer->isParentOf($viewee)) {
-            /* Intentionally exit early when parents view students outside of their family
-             * Literally show nothing
-             */
-            return $collection;
         } else {
             $query = "
                 SELECT DISTINCT 
