@@ -138,6 +138,9 @@ class Controller extends BaseController
         }
         $showDetails = (new ValidDetailsVisible($this->externalUser, $this->getConfigLoader()))->isSatisfiedBy($parent, $this->getUser());
 
+        // As with students in SA-16859:
+        // set the shared campuses between the subject of the profile and the
+        // viewing user, to determine what (if any) of the profile can be shown.
         $this->response = $this->responseFromTemplate(
             'user/parent.twig',
             [
@@ -150,6 +153,7 @@ class Controller extends BaseController
                 'eportfolioAuth' => $this->eportfolioAuthenticator->canView(),
                 'now'            => Alaress_Date_Format::now(),
                 'showDetails'    => $showDetails,
+                'sharedCampuses' => $this->getUser()->getCampusCollection()->intersect($parent->getCampusCollection()),
             ]
         );
     }
