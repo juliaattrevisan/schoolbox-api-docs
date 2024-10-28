@@ -116,7 +116,7 @@ function onButtonSelected(): void {
             @select="onSelect"
             @remove="onRemove"
         />
-        <div class="input-group">
+        <div class="input-group f-no-margins">
             <ss-query-input
                 v-if="!props.isReadOnly"
                 v-model:query="query"

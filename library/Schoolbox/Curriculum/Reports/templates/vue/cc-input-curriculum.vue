@@ -11,6 +11,7 @@ import SearchSelect from "@schoolboxVue/components/searchSelect/search-select.vu
 import type { SearchSelectItem } from "@schoolboxVue/components/searchSelect/types/searchSelectTypes";
 import { useStore } from "@schoolboxCurriculum/vue/curriculumSelector/store/curriculumSelectorStore";
 import { useSelectedNodesStore } from "@schoolboxCurriculum/vue/curriculumSelector/store/csSelectedNodesStore";
+import { useModalStore } from "@schoolboxCurriculum/vue/curriculumSelector/store/csModalStore";
 import { useNodeTitle } from "@schoolboxCurriculum/vue/composables/useNodeTitle";
 import { getEmptyNode } from "@schoolboxCurriculum/js/nodeUtils";
 import CsModal from "@schoolboxCurriculum/vue/curriculumSelector/modal/cs-modal.vue";
@@ -44,6 +45,7 @@ store.init({
     canSelectChildren: false,
 });
 const selectedStore = useSelectedNodesStore();
+const modalStore = useModalStore();
 const endpoint = `${props.endpoint}?enabled=1&limit=50&includeWithoutCode=1&query=`; // The endpoint to retrieve the curriculum data from
 const results = window.Vue.ref<Node[]>([]);
 
@@ -99,6 +101,7 @@ function onSelectedNodeModalClosed(): void {
         :has-button="true"
         button-icon="icon-curriculum"
         @select="onNodeNameSelect"
+        @button-select="modalStore.open"
     />
     <cs-modal v-if="store.hasLoadedOk" :is-single-select="props.isSingleSelect" />
     <selected-node-modal :node="selectedStore.activeNode" @closed="onSelectedNodeModalClosed" />
