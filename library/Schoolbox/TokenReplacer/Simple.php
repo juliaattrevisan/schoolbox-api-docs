@@ -19,6 +19,17 @@ namespace Schoolbox\TokenReplacer;
 class Simple
 {
     /**
+     * Constructor
+     *
+     * @param EscapeStrategy\IEscapeStrategy $escapeStrategy An strategy to use to escape/unescape replaced tokens:
+     *                                                       defaults to `EscapeStrategy\ScrubText` for scrubbing using
+     *                                                       a `htmlspecialchars` based strategy.
+     */
+    public function __construct(private EscapeStrategy\IEscapeStrategy $escapeStrategy = new EscapeStrategy\ScrubText())
+    {
+    }
+
+    /**
      * $replacements is a set of key-value tuples just like phplib:
      *
      * [
@@ -43,9 +54,10 @@ class Simple
     public function replace(string $body, array $replacements): string
     {
         $body = $this->stripMentionAttribute($body);
-        $sanitisedReplacements = array_map(static function ($val) {
-            return \Scrub::text($val);
-        }, array_values($replacements));
+        $sanitisedReplacements = array_map(
+            fn ($val) => $this->escapeStrategy->escape($val),
+            array_values($replacements),
+        );
 
         return str_replace(array_keys($replacements), $sanitisedReplacements, $body);
     }
@@ -119,13 +131,14 @@ class Simple
         }
 
         // Because tokens are scrubbed, unscrub them
-        // TODO inject a replace strategy
-        return $replacements;
+        return array_map($this->escapeStrategy->unescape(...), $replacements);
     }
 
 
     /**
      * Replace using Scrub::html, to return replaced html
+     *
+     * @deprecated use escape strategy `IEscapeStrategy\ScrubHtml` instead
      * @param string $body
      * @param array  $replacements
      * @return string
