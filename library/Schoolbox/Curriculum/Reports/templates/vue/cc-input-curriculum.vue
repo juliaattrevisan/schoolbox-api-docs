@@ -31,7 +31,7 @@ const props = withDefaults(defineProps<Props>(), {
     errorMessage: "Please select at least one curriculum outcome",
 });
 
-const store = useSelectedNodesStore();
+const selectedStore = useSelectedNodesStore();
 const endpoint = `${props.endpoint}?enabled=1&limit=50&includeWithoutCode=1&query=`; // The endpoint to retrieve the curriculum data from
 const results = window.Vue.ref<Node[]>([]);
 
@@ -60,20 +60,20 @@ const { ignoreUpdates } = watchIgnorable(results, (newResults: Node[] | unknown[
  * @param node - The selected node
  */
 function onNodeNameSelect(node: SearchSelectItem): void {
-    store.setActiveNode(node as Node);
+    selectedStore.setActiveNode(node as Node);
 }
 
 /**
  * close the modal, setting the activeNode to null so we can allow another selection
  */
 function onSelectedNodeModalClosed(): void {
-    store.setActiveNode(getEmptyNode());
+    selectedStore.setActiveNode(getEmptyNode());
 }
 </script>
 
 <template>
     <search-select
-        v-model:selected="store.nodes"
+        v-model:selected="selectedStore.nodes"
         v-model:results="results"
         :label="props.label"
         :label-id="props.labelId"
@@ -86,8 +86,8 @@ function onSelectedNodeModalClosed(): void {
         :can-select-item="true"
         @select="onNodeNameSelect"
     />
-    <!-- <cs-modal v-if="store.hasLoadedOk" :is-single-select="props.isSingleSelect" /> -->
-    <selected-node-modal :node="store.activeNode" @closed="onSelectedNodeModalClosed" />
+    <!-- <cs-modal v-if="selectedStore.hasLoadedOk" :is-single-select="props.isSingleSelect" /> -->
+    <selected-node-modal :node="selectedStore.activeNode" @closed="onSelectedNodeModalClosed" />
 </template>
 
 <style scoped></style>
