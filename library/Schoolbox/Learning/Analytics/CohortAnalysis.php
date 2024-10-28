@@ -559,6 +559,18 @@ class CohortAnalysis
         return $filteredAssessments;
     }
 
+    public function getWeightedAssessments(): Collection
+    {
+        $weightedAssessments = $this->assessmentCache->emptyClone();
+        foreach ($this->assessmentGrades as $assessmentId => $studentGrades) {
+            $assessment = $this->assessmentCache[$assessmentId];
+            if ($assessment->getWeight() > 0) {
+                $weightedAssessments[$assessment->getId()] = $assessment;
+            }
+        }
+        return $weightedAssessments;
+    }
+
     /**
      * Gets the student marks to display in the 'Results' box-plot.
      * Respects submission-type filtering

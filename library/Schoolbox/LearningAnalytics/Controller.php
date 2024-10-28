@@ -402,6 +402,7 @@ class Controller extends Base
             ],
             'dueAssessments'      => $dueAssessments,
             'gradableAssessments' => $analysis->getGradableAssessments(false),
+            'weightedAssessments' => $analysis->getWeightedAssessments(),
             'results'             => [
                 'assessments' => $analysis->getGradableAssessments(true),
                 'grades'      => $analysis->getAssessmentMarks(true),
