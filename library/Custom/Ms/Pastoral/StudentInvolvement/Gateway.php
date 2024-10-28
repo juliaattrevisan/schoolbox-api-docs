@@ -42,9 +42,9 @@ class Gateway
     private const ABSENCE_TYPE_LATE = 'LFS';
     private const ABSENCE_TYPE_DETENTION = 'INF';
     private const ABSENCE_TYPE_ENDORSED_LEAVE = 'AFS';
-    private const ABSENCE_TYPES_AWAY = ['AFS', 'APD', 'AAM', 'APM', 'EDP'];
+    private const ABSENCE_TYPES_AWAY = ['AFS', 'APD', 'AAM', 'APM'];
 
-    private const REASON_CODES_AWAY_OR_LATE = ['A', 'L', 'S'];
+    private const REASON_CODES_AWAY_OR_LATE = ['A', 'E', 'L', 'S', 'ALA'];
     private const REASON_CODES_ENDORSED_LEAVE = ['M'];
 
     /**
