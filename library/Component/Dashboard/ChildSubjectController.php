@@ -173,7 +173,6 @@ class Component_Dashboard_ChildSubjectController extends Component_Dashboard_Con
             }
 
             foreach ($customButtons as $customButton) {
-
                 $this->setVar([
                     'BUTTON_TEXT' => Scrub::text($customButton->getText()),
                     'BUTTON_TITLE' =>  Scrub::text($customButton->getTitle()),
