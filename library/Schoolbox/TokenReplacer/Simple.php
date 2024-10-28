@@ -89,6 +89,10 @@ class Simple
      * Attempt to perform the reverse of `replace`: given a body before and
      * after its tokens were replaced, figure out which replacements were used.
      *
+     * Due to the non-structured nature of text, this is not foolproof:
+     * if `$body` contains two adjacent tokens (e.g. "[token1][token2]"), this
+     * cannot tell which part of `$replacedBody` makes up which token.
+     *
      * @param string $body
      * @param string $replacedBody
      * @return array
@@ -134,13 +138,6 @@ class Simple
                 // `$replacedBody`.
                 // Anything before that position must be the value which was
                 // passed into `replace`.
-
-                // note that if there's two tokens together, it's not possible
-                // to determine where one starts and the next ends, so need to
-                // guess.
-                // Guess that the first token takes up all of the length, and
-                // the second none of it.
-
                 $replaceKey   = $bodyPart;
                 $nextNonToken = null;
                 foreach ($bodyParts as $nextBodyPart) {

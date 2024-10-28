@@ -656,6 +656,24 @@ class SimpleTest extends TestCase
                     '[firstname]' => 'Brother',
                 ],
             ],
+            // Case which extract cannot handle properly: two tokens together
+            // It can't be known exactly where the split between the tokens was.
+            'Consecutive tokens 1: entire body' => [
+                "[token1][token2]",
+                "Blah blah",
+                [
+                    '[token1]' => 'Blah blah',
+                    '[token2]' => '',
+                ],
+            ],
+            'Consecutive tokens 2: start of body only' => [
+                "[token1][token2] X",
+                "Blah blah X",
+                [
+                    '[token1]' => 'Blah blah',
+                    '[token2]' => '',
+                ],
+            ],
         ];
     }
 }
