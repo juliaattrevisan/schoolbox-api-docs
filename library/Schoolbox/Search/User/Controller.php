@@ -117,25 +117,23 @@ class Controller extends BaseController
      */
     private function renderParent(User $parent): void
     {
-        $externalUser = $parent->getExternalId() ? $this->externalUser->getParent($parent->getExternalId()) : [];
+        /* Full Payload Construction
+         * $externalUser is the complete payload that we use to fulfil frontend
+         *
+         * Note this uses a callback to inject some data halfway through the compilation algorithm
+         * to service this extra widgety thing, Pastoral Counts
+         */
+        $externalUser = (new \Schoolbox\Profile\Field\Factory($this->fieldMapper, $this->userMapper, $this->externalUser))
+            ->produce($parent, $this->getUser());
 
         $students = $parent->getChildren();
-
-        if (isset($externalUser['SpouseID'])) {
-            try {
-                $spouse = $this->userMapper->findByExternalId($externalUser['SpouseID'], Role::PARENT);
-            } catch (MapperException $e) {
-                $spouse = null;
-            }
-        } else {
-            $spouse = null;
-        }
 
         try {
             $customButtons = ProfileButtonMapper::getInstance()->findButtonsForUser($parent, $this->getUser());
         } catch (MapperException $e) {
             $customButtons = [];
         }
+
         $showDetails = (new ValidDetailsVisible($this->externalUser, $this->getConfigLoader()))->isSatisfiedBy($parent, $this->getUser());
 
         $this->response = $this->responseFromTemplate(
@@ -144,7 +142,6 @@ class Controller extends BaseController
                 'session'        => $_SESSION,
                 'user'           => $parent,
                 'externalUser'   => $externalUser,
-                'spouse'         => $spouse,
                 'students'       => $students,
                 'customButtons'  => $customButtons,
                 'eportfolioAuth' => $this->eportfolioAuthenticator->canView(),

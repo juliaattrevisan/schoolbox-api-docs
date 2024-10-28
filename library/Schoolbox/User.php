@@ -956,6 +956,17 @@ class User implements Serializable, Linkable, ISoftDeletable, IModel
         return $this->hideContacts ? true : false;
     }
 
+
+    /**
+     * @return bool
+     */
+    public function isShowContacts()
+    {
+        // explicit cast
+        return !$this->getHideContacts();
+    }
+
+
     /**
      * @return bool
      */

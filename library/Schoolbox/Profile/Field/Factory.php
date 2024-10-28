@@ -299,12 +299,6 @@ class Factory
         ];
 
         return array_merge($externalUser, $referenceFields);
-//
-//        /* Mutate $result with an optional callback...such as that pastoral counts stuff
-//         */
-//        if (null !== $mutator) {
-//            $result = $mutator($result);
-//        }
     }
 
 
@@ -313,10 +307,58 @@ class Factory
      *
      * @param User $viewee
      * @return array
+     * @throws InvalidColumnException
      */
     private function generateParentReferenceFields(\Schoolbox\User $viewee): array
     {
-        return [];
+        $externalUser = [];
+
+        if ($viewee->getExternalId()) {
+            $externalUser = $this->externalUser->getParent($viewee->getExternalId());
+        }
+
+        /* Only obtain spousal information if it had a chance of being visible
+         * SpouseDirectoryIncludeFlag will stop them from being seen
+         */
+        $spouse = null;
+
+        if (isset($externalUser['SpouseID']) && $externalUser['SpouseDirectoryIncludeFlag']) {
+            try {
+                $spouse = $this->userMapper->findByExternalId($externalUser['SpouseID'], Role::PARENT);
+            } catch (MapperException $e) {
+                // noop: spouse not found
+            }
+        }
+
+        /* Only show phone numbers if their corresponding SilentPhoneFlag is falsy
+         */
+        if ($externalUser['SilentMobilePhoneFlag'] ?? false) {
+            $externalUser['MobilePhone'] = null;
+        }
+
+        if ($externalUser['SilentPhoneFlag'] ?? false) {
+            $externalUser['MobilePhone'] = null;
+        }
+
+        if ($externalUser['StudentContactSilentMobilePhoneFlag'] ?? false) {
+            $externalUser['SpouseMobilePhone'] = null;
+        }
+
+        if ($externalUser['StudentContactSilentPhoneFlag'] ?? false) {
+            $externalUser['StudentContactSpouseOccupPhone'] = null;
+        }
+
+        /* Hybrid Theory
+         */
+        $referenceFields = [
+            'pronoun' => (string)$viewee->getPronoun(),
+            'email' => $viewee->getEmail(),
+            'externalId' => $viewee->getExternalId(),
+            'role' => $viewee->getRole()->getName(),
+            'spouse' => $spouse
+        ];
+
+        return array_merge($externalUser, $referenceFields);
     }
 
 
