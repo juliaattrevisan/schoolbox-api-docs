@@ -4,7 +4,6 @@
  */
 import CourseSelector from "@schoolboxLibrary/Assessment/Course/templates/vue/courseSelector/course-selector.vue";
 import { useCourseSelectorStore } from "@schoolboxLibrary/Assessment/Course/templates/vue/courseSelector/store/courseSelectorStore";
-import CurriculumSelector from "@schoolboxCurriculum/vue/curriculumSelector/curriculum-selector.vue";
 import { useSelectedNodesStore } from "@schoolboxCurriculum/vue/curriculumSelector/store/csSelectedNodesStore";
 import type { Course } from "@schoolboxLibrary/types/Course";
 import { useStore } from "./store/curriculumCoverageStore";
@@ -61,7 +60,7 @@ function onGenerateReport(): void {
             />
         </div>
         <div>
-            <label for="curriculum">Select Curriculum</label>
+            <!-- <label for="curriculum">Select Curriculum</label>
             <curriculum-selector
                 :is-read-only="false"
                 :data-endpoint="props.curriculumEndpoint"
@@ -70,7 +69,14 @@ function onGenerateReport(): void {
                 :can-select-children="false"
                 input-id="curriculum"
             />
-            <label v-if="isCurriculumInvalid" class="error" for="curriculum">This field is required.</label>
+            <label v-if="isCurriculumInvalid" class="error" for="curriculum">This field is required.</label> -->
+            <cc-input-curriculum
+                :endpoint="props.curriculumEndpoint"
+                label="Select Curriculum"
+                label-id="curriculum"
+                :is-required="true"
+                :has-error="isCurriculumInvalid"
+            />
         </div>
         <button>{{ buttonText }}</button>
     </form>
