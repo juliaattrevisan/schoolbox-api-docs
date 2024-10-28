@@ -145,7 +145,7 @@ class External_Synergetic_User implements External_UserInterface
                         CASE
                             WHEN Addresses.SilentPhoneFlag = 0 THEN Contact.OccupPhone
                             ELSE ''
-                        END AS OccupPhone,
+                        END AS WorkPhone,
                         CASE
                             WHEN Contact.SilentMobilePhoneFlag = 0 THEN Contact.MobilePhone
                             ELSE ''

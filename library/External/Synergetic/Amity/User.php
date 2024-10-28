@@ -226,7 +226,7 @@ class External_Synergetic_Amity_User extends External_Synergetic_User
                         CASE
                             WHEN Addresses.SilentPhoneFlag = 0 THEN Contact.OccupPhone
                             ELSE ''
-                        END AS OccupPhone,
+                        END AS WorkPhone,
                         CASE
                             WHEN Contact.SilentMobilePhoneFlag = 0 THEN Contact.MobilePhone
                             ELSE ''
