@@ -48,6 +48,7 @@ class Module extends BaseModule
                     new Rule\HasServicePermission(UserAccess::SERVICE_NEWS, UserAccess::ACCESS_FULL),
                     new Rule\HasServicePermission(UserAccess::SERVICE_CALENDAR, UserAccess::ACCESS_FULL),
                     new Rule\HasServicePermission(UserAccess::SERVICE_PASTORAL, UserAccess::ACCESS_FULL),
+                    new Rule\HasServicePermission(UserAccess::SERVICE_LMS, UserAccess::ACCESS_FULL),
                 )
             )
         );
@@ -74,7 +75,6 @@ class Module extends BaseModule
             $this->getMapperFactory()->get(LogMapper::class),
         );
     }
-
 
     /**
      * {@inheritdoc}

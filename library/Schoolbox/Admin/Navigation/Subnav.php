@@ -138,10 +138,14 @@ class Subnav
         $userHasServicePermissionPastoral = (
             $this->user->hasServicePermission(UserAccess::SERVICE_PASTORAL, UserAccess::ACCESS_FULL)
         );
+        $userHasServicePermissionLms = (
+            $this->user->hasServicePermission(UserAccess::SERVICE_LMS, UserAccess::ACCESS_FULL)
+        );
         $userHasAnyModeratorServicePermission = (
             $userHasServicePermissionNews ||
             $userHasServicePermissionCalendar ||
-            $userHasServicePermissionPastoral
+            $userHasServicePermissionPastoral ||
+            $userHasServicePermissionLms
         );
 
         /* Keys of this array uniquely identify a page and its subpages
