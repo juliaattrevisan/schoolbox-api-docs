@@ -95,7 +95,13 @@ class UserAccess implements IModel
     public const SERVICE_DESIGN = 13;
 
     /**
-     * Services that do not have have service identifiers (sid) use this value
+     * Value for $this->service:
+     * $this->user has $this->accessLevel permission for the design system.
+     */
+    public const SERVICE_LMS = 14;
+
+    /**
+     * Services that do not have service identifiers (sid) use this value
      * (This is enforced at the DB level by not permitted nulls, and defaulting to '0)
      */
     public const SID_NONE = 0;
@@ -196,6 +202,7 @@ class UserAccess implements IModel
             self::SERVICE_BADGE,
             self::SERVICE_TIMETABLE,
             self::SERVICE_DESIGN,
+            self::SERVICE_LMS,
         ];
     }
 
