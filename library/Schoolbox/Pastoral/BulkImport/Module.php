@@ -14,6 +14,9 @@ use Alaress\Module\Module as BaseModule;
 use Alaress\Twig\Loader\IChainLoader;
 use Alaress\Web\Controller\Base;
 use Schoolbox\Config\ConfigMapper;
+use Schoolbox\Pastoral\Mapper;
+use Schoolbox\Pastoral\SubType;
+use Schoolbox\Pastoral\Type;
 use Schoolbox\Permission\Access\UserAccess;
 
 /**
@@ -50,6 +53,11 @@ class Module extends BaseModule
 
     public function buildController(): Base
     {
-        return new Controller($this->injector->get('l10n'));
+        return new Controller(
+            $this->injector->get('l10n'),
+            $this->getMapperFactory()->get(Mapper::class),
+            $this->getMapperFactory()->get(Type\Mapper::class),
+            $this->getMapperFactory()->get(SubType\Mapper::class),
+        );
     }
 }

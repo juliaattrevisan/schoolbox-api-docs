@@ -1,6 +1,6 @@
 {% import 'sub/breadcrumbs.twig' as bread %}
 {{ bread.crumbs(
-    [ locale.pastoralCare.proper,    routeLookup('pastoral.getIndex') ],
+    [ locale.pastoralCare.proper, routeLookup('pastoral.getIndex') ],
     [ 'Bulk Upload' ]
 ) }}
 
@@ -9,5 +9,56 @@
         <div class="small-12 column">
             <h1>{{ locale.pastoral.proper }} Bulk Upload</h1>
         </div>
+    </div>
+</div>
+
+{# Can this user access summative reports? If so, they can go there and download one. #}
+
+{# The actual pastoral form #}
+<div class="row">
+    <div class="small-12 island" id="formPastoral">
+        {# TODO replace with actual form input #}
+        <form class="top" id="pastoralForm" method="post"
+              action="?{{ RETURN_URL.name }}={{ RETURN_URL.previous.encoded }}">
+            <section>
+                <fieldset class="content">
+                    <div class="small-12 columns">
+                        <label class="required" for="heading">Title</label>
+                        <input type="text" name="heading" id="heading" size="35" maxlength="100" required />
+                    </div>
+                </fieldset>
+                <fieldset class="content">
+                    <div class="small-12 medium-6 columns">
+                        <label for="typeId" class="required">Type</label>
+                        <select name="typeId" id="typeId" required>
+                            <option disabled selected>Please select a type</option>
+                            {% for type in types %}
+                                <option value="{{ type.id }}">{{ type.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="small-12 medium-6 columns">
+                        <label for="subtypeId" class="required">Sub-Type</label>
+                        <select name="subtypeId" id="subtypeId">
+                            {% for subtype in subTypes %}
+                                <option data-chained="{{ subtype.pastoralType.id }}"
+                                        class="{{ subtype.pastoralType.id }}"
+                                        value="{{ subtype.id }}"
+                                >{{ subtype.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="small-12 columns">
+                        <label for="tags">
+                            Tags
+                            <span class="hint has-tip tip-top" data-tooltip
+                                  title="Tags can be added to support {{ locale.pastoral }} reports and filtering.">?</span>
+                        </label>
+                        <input id="tags" name="tags">
+                        <input id="tagNames" type="hidden" name="tagNames">
+                    </div>
+                </fieldset>
+            </section>
+        </form>
     </div>
 </div>

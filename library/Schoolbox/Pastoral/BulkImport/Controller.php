@@ -11,6 +11,7 @@ namespace Schoolbox\Pastoral\BulkImport;
 
 use Alaress\Web\Controller\Base;
 use Schoolbox\L10n\RosettaStone;
+use Schoolbox\Pastoral;
 
 /**
  * Module for bulk importation of pastoral records.
@@ -22,8 +23,12 @@ class Controller extends Base
      *
      * @param RosettaStone $translator Required for translating values used in the page title.
      */
-    public function __construct(private RosettaStone $translator)
-    {
+    public function __construct(
+        private RosettaStone $translator,
+        private Pastoral\Mapper $pastoralMapper,
+        private Pastoral\Type\Mapper $pastoralTypeMapper,
+        private Pastoral\Subtype\Mapper $pastoralSubTypeMapper,
+    ) {
     }
 
     /**
@@ -37,7 +42,10 @@ class Controller extends Base
     {
         $this->response = $this->responseFromTemplate(
             '@pastoralBulkImport/form.twig',
-            [],
+            [
+                'types'    => $this->pastoralTypeMapper->findAll(),
+                'subTypes' => $this->pastoralSubTypeMapper->findAll(),
+            ],
             $this->translator->translate('pastoral', capital: true) . ' Bulk Upload',
         );
     }
