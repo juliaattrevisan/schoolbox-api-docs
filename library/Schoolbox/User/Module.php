@@ -85,7 +85,9 @@ class Module extends BaseModule
     {
         return new Controller(
             $this->getMapperFactory()->get(UserAccessMapper::class),
-            $this->getMapperFactory()->get(Logger\Mapper::class)
+            $this->getMapperFactory()->get(Logger\Mapper::class),
+            $this->injector->get('user.logout.requestFactory'),
+            $this->injector->get('httpClient'),
         );
     }
 
