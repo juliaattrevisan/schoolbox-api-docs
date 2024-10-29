@@ -10,21 +10,16 @@ declare(strict_types=1);
 namespace Schoolbox\Search\User;
 
 use Alaress\Color\ColorFactory;
-use Alaress\Database\Predicate\InvalidColumnException;
 use Alaress\Web\Controller\Base as BaseController;
 use Alaress_Date_Format;
 use Custom;
-use DebugBar\DebugBarException;
 use Eportfolio_Authenticator;
 use External_ClassInterface;
 use External_UserInterface;
-use Psr\Container\ContainerExceptionInterface;
-use Psr\Container\NotFoundExceptionInterface;
 use Schoolbox\Admin\Profile\Editor\Field\Mapper;
 use Schoolbox\Assessment\Term\Mapper as TermMapper;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Geosnapshot\ValidStudentPhotosAvailable;
-use Schoolbox\Mapper\DefinitionException;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Pastoral\Count\Helper as PastoralCountHelper;
 use Schoolbox\Pastoral\DataSource as PastoralDataSource;
@@ -48,9 +43,6 @@ use Timetable_ColourManager;
 use Timetable_ColourMapper;
 use Twig\Environment;
 use Twig\Error\Error;
-use Twig\Error\LoaderError;
-use Twig\Error\RuntimeError;
-use Twig\Error\SyntaxError;
 
 /**
  * The controller for the mock version of the search API.
