@@ -28,6 +28,18 @@ export const useStore = defineStore("curriculumCoverage", () => {
     }
 
     /**
+     * To update the url with the current query params
+     * @param simulateRedirect - whether to simulate a redirect
+     */
+    function setQueryParams(simulateRedirect: boolean = false): void {
+        if (simulateRedirect) {
+            window.history.pushState({}, "", window.location.href);
+        }
+        const newQueryParams = getQueryParams();
+        window.history.replaceState({}, "", `${window.location.pathname}?${newQueryParams.toString()}`);
+    }
+
+    /**
      * To collect all the params to send to the search api
      * @returns - the query params
      */
@@ -38,6 +50,7 @@ export const useStore = defineStore("curriculumCoverage", () => {
 
     return {
         init,
+        setQueryParams,
         getEndpointWithParams,
     };
 });

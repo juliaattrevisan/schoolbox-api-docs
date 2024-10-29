@@ -6,6 +6,9 @@ import { defineStore } from "pinia";
 import { useCourseSelectorStore } from "@schoolboxLibrary/Assessment/Course/templates/vue/courseSelector/store/courseSelectorStore";
 import { useSelectedNodesStore } from "@schoolboxCurriculum/vue/curriculumSelector/store/csSelectedNodesStore";
 
+export const COURSES_PARAM = "courseId"; // the incoming param to check for initial report
+export const NODES_PARAM = "nodeId"; // the incoming param to check for initial report
+
 export const useInputStore = defineStore(`ccInput`, () => {
     const selectedCoursesStore = useCourseSelectorStore();
     const selectedNodesStore = useSelectedNodesStore();

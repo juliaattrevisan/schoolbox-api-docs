@@ -42,7 +42,7 @@ export const useReportStore = defineStore("ccReport", () => {
     async function report(): Promise<void> {
         useInputStore().setActive();
         // useResultsStore().clear();
-        // useStore().setQueryParams(simulateRedirect);
+        useStore().setQueryParams();
         hasNotSearched.value = false;
         // abort the previous search if it's still running
         if (isLoading.value) {
