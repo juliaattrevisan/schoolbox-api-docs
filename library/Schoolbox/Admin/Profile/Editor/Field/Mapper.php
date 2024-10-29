@@ -107,7 +107,6 @@ class Mapper extends \Schoolbox\Mapper
      *
      * @param \PDOStatement $statement
      * @return GenericCollection
-     * @throws DefinitionException
      * @throws Exception
      * @throws \UnexpectedValueException
      */
@@ -160,10 +159,7 @@ class Mapper extends \Schoolbox\Mapper
      * @param User $viewer
      * @return GenericCollection
      * @throws Exception
-     * @throws DebugBarException
-     * @throws \PDOException
      * @throws \UnexpectedValueException
-     * @throws DefinitionException
      */
     public function findRenderableFields(\Schoolbox\User $viewee, \Schoolbox\User $viewer): GenericCollection
     {
