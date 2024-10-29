@@ -10,9 +10,7 @@ declare(strict_types=1);
 namespace Schoolbox\Profile\Field;
 
 use Alaress\Database\Predicate\InvalidColumnException;
-use DebugBar\DebugBarException;
 use Schoolbox\Admin\Profile\Editor\Field\Mapper;
-use Schoolbox\Mapper\DefinitionException;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Role;
 use Schoolbox\User;
@@ -43,17 +41,12 @@ class Factory
      * $mutatorIndex is a set of optional callbacks indexed by field name that
      * allows you to fetch its particular value from an expensive place only
      * when it's needed.
-     *
      * @param User $viewee
      * @param User $viewer
      * @param array|null $mutatorIndex
-     * @return array
-     * @throws DebugBarException
-     * @throws DefinitionException
-     * @throws InvalidColumnException
+     * @return array[]
      * @throws MapperException
      * @throws \DomainException
-     * @throws \PDOException
      * @throws \UnexpectedValueException
      */
     public function produce(\Schoolbox\User $viewee, \Schoolbox\User $viewer, ?array $mutatorIndex = []): array
@@ -119,7 +112,6 @@ class Factory
      *
      * @param User $viewee
      * @return array
-     * @throws InvalidColumnException
      * @throws MapperException
      * @throws \DomainException
      */
@@ -146,7 +138,6 @@ class Factory
      *
      * @param User $viewee
      * @return array
-     * @throws InvalidColumnException
      * @throws MapperException
      */
     private function generateStudentReferenceFields(\Schoolbox\User $viewee): array
@@ -307,7 +298,6 @@ class Factory
      *
      * @param User $viewee
      * @return array
-     * @throws InvalidColumnException
      */
     private function generateParentReferenceFields(\Schoolbox\User $viewee): array
     {
