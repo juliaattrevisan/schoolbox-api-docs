@@ -32,7 +32,7 @@ const reportStore = useReportStore();
                     <th v-for="unit in course.units" :key="unit.id" :class="`${index % 2 ? 'u-alt-bkg' : ''}`">
                         {{ unit.name }}
                     </th>
-                    <th :class="`${index % 2 ? 'u-alt-bkg' : ''}`">Total</th>
+                    <th v-if="reportStore.hasMultipleCourses" :class="`${index % 2 ? 'u-alt-bkg' : ''}`">Total</th>
                 </template>
             </tr>
         </thead>

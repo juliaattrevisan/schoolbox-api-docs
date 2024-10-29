@@ -26,6 +26,7 @@ export const useReportStore = defineStore("cpReport", () => {
     const hasLoadError = window.Vue.ref(false);
     const loadError = window.Vue.ref<ReportError | null>(null);
     const courses = window.Vue.ref<Course[]>([]); // the courses to display in the report
+    const hasMultipleCourses = window.Vue.computed(() => courses.value.length > 1); // don't need to show a total for at the end of the unit if there's only one course
     const nodes = window.Vue.ref<CurriculumCoverageNode[]>([]); // the nodes to display in the report
     const hasReport = window.Vue.ref<boolean>(false); // whether the report has been generated
     let controller: AbortController; // to allow aborting the previous search if a new one is started
@@ -113,6 +114,7 @@ export const useReportStore = defineStore("cpReport", () => {
         hasLoadError,
         report,
         courses,
+        hasMultipleCourses,
         nodes,
         hasReport,
         // canSearch,

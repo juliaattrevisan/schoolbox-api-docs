@@ -163,7 +163,10 @@ const showNode = window.Vue.computed(() => {
             >
                 {{ getUnitUsageCount(course, unit) }}
             </td>
-            <td :class="`${index % 2 ? 'u-alt-bkg' : ''} ${getTotalUsageCount(course) === 0 ? 'u-highlight' : ''}`">
+            <td
+                v-if="reportStore.hasMultipleCourses"
+                :class="`${index % 2 ? 'u-alt-bkg' : ''} ${getTotalUsageCount(course) === 0 ? 'u-highlight' : ''}`"
+            >
                 {{ getTotalUsageCount(course) }}
             </td>
         </template>
