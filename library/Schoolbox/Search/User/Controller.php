@@ -102,22 +102,14 @@ class Controller extends BaseController
 
 
     /**
-     * User profile.
+     * Pick a profile screen for which to provide a payload
+     *
      * @param User $user
-     * @throws ContainerExceptionInterface
-     * @throws DebugBarException
-     * @throws DefinitionException
-     * @throws Error
-     * @throws InvalidColumnException
-     * @throws LoaderError
+     * @return void
      * @throws MapperException
-     * @throws NotFoundExceptionInterface
-     * @throws RuntimeError
-     * @throws SyntaxError
      * @throws \DomainException
      * @throws \InvalidArgumentException
      * @throws \LogicException
-     * @throws \PDOException
      * @throws \UnexpectedValueException
      */
     public function getProfile(User $user): void
@@ -137,21 +129,14 @@ class Controller extends BaseController
 
 
     /**
+     * Provide a payload for student profile screen
+     *
      * @param User $student
-     * @throws DebugBarException
-     * @throws DefinitionException
-     * @throws Error
-     * @throws InvalidColumnException
+     * @return void
      * @throws MapperException
      * @throws \DomainException
      * @throws \InvalidArgumentException
      * @throws \LogicException
-     * @throws \PDOException
-     * @throws ContainerExceptionInterface
-     * @throws NotFoundExceptionInterface
-     * @throws LoaderError
-     * @throws RuntimeError
-     * @throws SyntaxError
      * @throws \UnexpectedValueException
      */
     private function renderStudent(User $student): void
@@ -569,14 +554,13 @@ class Controller extends BaseController
 
 
     /**
+     * Provide a payload for staff profile screen
+     *
      * @param User $staff
-     * @throws MapperException
-     * @throws InvalidColumnException
-     * @throws DebugBarException
-     * @throws \DomainException
-     * @throws \PDOException
-     * @throws DefinitionException
+     * @return void
      * @throws Error
+     * @throws MapperException
+     * @throws \DomainException
      * @throws \UnexpectedValueException
      */
     private function renderStaff(User $staff): void
@@ -613,14 +597,12 @@ class Controller extends BaseController
 
 
     /**
+     * Provide a payload for parent profile screen
+     *
      * @param User $parent
-     * @throws DebugBarException
-     * @throws DefinitionException
-     * @throws Error
-     * @throws InvalidColumnException
+     * @return void
      * @throws MapperException
      * @throws \DomainException
-     * @throws \PDOException
      * @throws \UnexpectedValueException
      */
     private function renderParent(User $parent): void
