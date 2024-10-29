@@ -362,6 +362,7 @@ class UserMapper extends Mapper
                 {$this->getJoinColumnString('role', 'g')},
                 {$this->getJoinColumnString('userCampus', 'c')},
                 {$this->getJoinColumnString('schoolHouse', 'h')},
+                {$this->getJoinColumnString('residentialHouse', 'rh')},
                 {$this->getColumnString('lu')},
                 {$this->getJoinColumnString('role', 'lur')},
                 {$this->getJoinColumnString('year', 'lyl')},
@@ -376,6 +377,7 @@ class UserMapper extends Mapper
             LEFT JOIN {$this->getJoinSql('role', 'lu', 'lur', true)}
             LEFT JOIN {$this->getJoinSql('year', '', 'lyl', true)}
             LEFT JOIN {$this->getJoinSql('schoolHouse', '', 'h')}
+            LEFT JOIN {$this->getJoinSql('residentialHouse', '', 'rh')}
             LEFT JOIN {$this->getJoinSql('portrait', '', 'portrait')}
             LEFT JOIN {$this->getJoinSql('portrait.allowedFileExtension', 'portrait', 'afe', true)}
             LEFT JOIN {$this->getJoinSql('pronoun', '', 'p')}
@@ -413,17 +415,21 @@ class UserMapper extends Mapper
                 /** @var House $schoolHouse **/
                 $schoolHouse = $this->hydrateJoin($row, 'schoolHouse', 'h');
 
+                /** @var \HouseResidential $residentialHouse **/
+                $residentialHouse = $this->hydrateJoin($row, 'residentialHouse', 'rh');
+
                 /** @var User\Pronoun\Model|null $pronoun **/
                 $pronoun = $this->hydrateJoin($row, 'pronoun', 'p');
 
                 $users[$userId] = $this->hydrate($row)
-                                       ->setSuperuser($row['superuser'] == 1)
-                                       ->setRole($role)
-                                       ->setYear($year)
-                                       ->setSchoolHouse($schoolHouse)
-                                       ->setLinkedUsers($this->createCollection())
-                                       ->setPronoun($pronoun)
-                                       ->setCampusCollection($campusMapper->createCollection());
+                    ->setSuperuser($row['superuser'] == 1)
+                    ->setRole($role)
+                    ->setYear($year)
+                    ->setSchoolHouse($schoolHouse)
+                    ->setResidentialHouse($residentialHouse)
+                    ->setLinkedUsers($this->createCollection())
+                    ->setPronoun($pronoun)
+                    ->setCampusCollection($campusMapper->createCollection());
             }
 
             $campus = $campusMapper->hydrate($row, 'c');
