@@ -212,7 +212,10 @@
                                         {% if (additionalConstraints[USER.role.type][selectedField.field] ?? additionalConstraints[USER.role.type]['_default'] ?? true) %}
                                             {# Now render each of the flags/tuples in some manner #}
 
-                                            {# Presence of icon and css means it renders as a flag/alert #}
+                                            {# Presence of icon and css means it renders as a flag/alert
+                                             # Flags always display fullwidth and I can cheat by rendering
+                                             # a full-width definition title without a definition data lol
+                                             #}
                                             {% if selectedField.icon and selectedField.css %}
                                                 <dt class="full-width">
                                                     {% if selectedField.field in ['AlertMessages', 'AlertLegal'] %}
@@ -242,11 +245,7 @@
                                                                     {# A special flag that has a hardcoded text string #}
                                                                     Parents separated; please be mindful when making contact.
                                                                 {% else %}
-                                                                    {# A generic flag which shows Display As/Terminology equivalent
-                                                                     #
-                                                                     # Flags always display fullwidth and I can cheat by rendering
-                                                                     # a full-width definition title without a definition data lol
-                                                                     #}
+                                                                    {# A generic flag which shows Display As/Terminology equivalent #}
                                                                     {{ fieldName }}
                                                                 {% endif %}
                                                             </span>
