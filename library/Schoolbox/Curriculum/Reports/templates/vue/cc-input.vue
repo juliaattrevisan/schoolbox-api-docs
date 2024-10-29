@@ -6,7 +6,6 @@ import CourseSelector from "@schoolboxLibrary/Assessment/Course/templates/vue/co
 import { useCourseSelectorStore } from "@schoolboxLibrary/Assessment/Course/templates/vue/courseSelector/store/courseSelectorStore";
 import { useSelectedNodesStore } from "@schoolboxCurriculum/vue/curriculumSelector/store/csSelectedNodesStore";
 import type { Course } from "@schoolboxLibrary/types/Course";
-import { useStore } from "./store/curriculumCoverageStore";
 import CcInputCurriculum from "./cc-input-curriculum.vue";
 import { useReportStore } from "./store/ccReportStore";
 
@@ -17,10 +16,9 @@ interface Props {
 }
 const props = defineProps<Props>();
 
-const store = useStore();
-const reportStore = useReportStore();
 const selectedCoursesStore = useCourseSelectorStore();
 const selectedNodesStore = useSelectedNodesStore();
+const reportStore = useReportStore();
 const isCoursesInvalid = window.Vue.ref(false);
 const isCurriculumInvalid = window.Vue.ref(false);
 
@@ -48,7 +46,7 @@ function onGenerateReport(): void {
         isCurriculumInvalid.value = true;
         return;
     }
-    store.isLoading = true;
+    void reportStore.report();
 }
 </script>
 
