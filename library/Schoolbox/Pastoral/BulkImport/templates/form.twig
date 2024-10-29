@@ -91,24 +91,24 @@
                         <textarea id="body_public" name="body_public"></textarea>
                     </div>
                 </fieldset>
-
-                {% include "@pastoral/modify_section_visibility.twig" with {
-                    record: record,
-                    allowIndividual: allowIndividual,
-                    groups: groups,
-                    allowParents: allowParents,
-                    allowStudents: allowStudents,
-                    roles: roles,
-                    roleTypes: roleTypes,
-                    roleUserCounts: roleUserCounts,
-                    rolesWithUsers: rolesWithUsers,
-                    moderatorIds: [],
-                    bulkCreate: false,
-                    managePage: false,
-                    reportPage: false,
-                    visibilityLocked: false,
-                } only %}
             </section>
+
+            {% include "@pastoral/modify_section_visibility.twig" with {
+                record: record,
+                allowIndividual: allowIndividual,
+                groups: groups,
+                allowParents: allowParents,
+                allowStudents: allowStudents,
+                roles: roles,
+                roleTypes: roleTypes,
+                roleUserCounts: roleUserCounts,
+                rolesWithUsers: rolesWithUsers,
+                moderatorIds: moderatorIds,
+                bulkCreate: false,
+                managePage: true,
+                reportPage: false,
+                visibilityLocked: false,
+            } only %}
         </form>
     </div>
 </div>

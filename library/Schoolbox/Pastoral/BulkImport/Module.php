@@ -17,6 +17,7 @@ use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Pastoral;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\RoleMapper;
+use Schoolbox\UserMapper;
 
 /**
  * Module for bulk importation of pastoral records.
@@ -60,6 +61,7 @@ class Module extends BaseModule
             $this->getMapperFactory()->get(RoleMapper::class),
             $this->getMapperFactory()->get(Pastoral\Access\Mapper::class),
             $this->getMapperFactory()->get(Pastoral\Group\Mapper::class),
+            $this->getMapperFactory()->get(UserMapper::class),
         );
     }
 }
