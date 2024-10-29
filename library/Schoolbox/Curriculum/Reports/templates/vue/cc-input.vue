@@ -32,7 +32,8 @@ const buttonText = window.Vue.computed(() => {
  * Submit the form to generate the report
  */
 function onGenerateReport(): void {
-    if (reportStore.isLoading || !reportStore.canReport) {
+    if (reportStore.isLoading) {
+        // Prevent multiple submissions
         return;
     }
     isCoursesInvalid.value = false;
@@ -42,6 +43,10 @@ function onGenerateReport(): void {
     }
     if (inputStore.selectedNodesStore.nodes.length === 0) {
         isCurriculumInvalid.value = true;
+        return;
+    }
+    if (!reportStore.canReport) {
+        // avoid generating the same report multiple times
         return;
     }
     void reportStore.report();
