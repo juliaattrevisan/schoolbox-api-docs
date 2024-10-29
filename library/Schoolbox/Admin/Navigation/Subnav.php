@@ -379,6 +379,12 @@ class Subnav
                         'children'    => [],
                         'description' => 'Configure the available grade scales that can be used for assessment and marking.',
                     ],
+                    '/adminv2/import/folder' => [
+                        'name'        => 'Import Class Pages',
+                        'visible'     => ($userIsSuperuser || $userHasServicePermissionLms),
+                        'children'    => [],
+                        'description' => 'Import all school class pages via a CSV file.',
+                    ],
                     '/adminv2/lesson-plan/template' => [
                         'name'        => $rosettaStone->translate("lessonPlan", false, true) . ' Templates',
                         'visible'     => ($userIsSuperuser || $userHasServicePermissionLms) && $this->configLoader->get(ConfigMapper::NAME_LMS_ENABLED),
@@ -451,20 +457,14 @@ class Subnav
                         'children'    => [],
                         'description' => 'Configure the default and available filter options on the class rubric markbook.',
                     ],
-                    '/adminv2/import/folder' => [
-                        'name'        => 'Pages',
-                        'visible'     => ($userIsSuperuser || $userHasServicePermissionLms),
-                        'children'    => [],
-                        'description' => 'Import all school class pages via a CSV file.',
-                    ],
                     '/adminv2/lists/lms/submission-errors' => [
-                        'name'        => 'Submission States',
+                        'name'        => 'Submission States List',
                         'visible'     => ($userIsSuperuser || $userHasServicePermissionLms) && $this->configLoader->get(ConfigMapper::NAME_LMS_ENABLED),
                         'children'    => [],
                         'description' => 'Configure the alternative states an assessment can be in beyond being graded.',
                     ],
                     '/adminv2/lists/lms/submission-type' => [
-                        'name'        => 'Work Types',
+                        'name'        => 'Work Types List',
                         'visible'     => ($userIsSuperuser || $userHasServicePermissionLms) && $this->configLoader->get(ConfigMapper::NAME_LMS_ENABLED),
                         'children'    => [],
                         'description' => 'Setup the categorisation for assessments, useful for filtering and report creation.',
