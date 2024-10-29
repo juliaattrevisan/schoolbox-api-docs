@@ -104,7 +104,6 @@ class Component_ConfigNotifier extends AbstractModuleNotifier
                 return;
             }
         } catch (\Schoolbox\Mapper\Exception $e) {
-            $this->log->debug("Failed to find instance: {$model->getInstanceId()} " . $e->getMessage());
             return;
         }
 
