@@ -550,7 +550,6 @@ class Controller extends BaseController
      *
      * @param User $staff
      * @return void
-     * @throws Error
      * @throws MapperException
      * @throws \DomainException
      * @throws \UnexpectedValueException
