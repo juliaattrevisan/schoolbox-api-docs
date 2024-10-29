@@ -116,7 +116,12 @@
 </div>
 
 {% include "@pastoral/modify_scripts.twig" with {
+    record: record,
     canCreate: true,
     students: '[]',
     audiences: audiences,
-} %}
+    typesIndex: typesIndex,
+    typesIndexPrivate: typesIndexPrivate,
+    subtypesIndex: subtypesIndex,
+    subtypesIndexPrivate: subtypesIndexPrivate,
+} only %}

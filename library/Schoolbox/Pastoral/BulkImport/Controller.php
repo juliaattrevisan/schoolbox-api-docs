@@ -129,6 +129,7 @@ class Controller extends Base
         $this->response = $this->responseFromTemplate(
             '@pastoralBulkImport/form.twig',
             [
+                // Base form requirements
                 'types'            => $types,
                 'subTypes'         => $subtypes,
                 'reportAttachzone' => (new Zone('report'))
@@ -141,25 +142,26 @@ class Controller extends Base
                     ->setFileVar('report')
                     ->setMulti(false)
                     ->getTwigContext(),
+
                 // Requirements for displaying visibility inputs
-                'record'           => $this->pastoralMapper->createModel()->setStudent(null),
-                'allowIndividual'  => $allowIndividual,
-                'allowParents'     => $allowParents,
-                'allowStudents'    => $allowStudents,
-                'roles'            => $roles,
-                'roleTypes'        => $this->pastoralAccessMapper->determineAllowedRoleTypes(),
-                'groups'           => $this->pastoralGroupMapper->findAll()->sortNaturally('name'),
-                'rolesWithUsers'   => $roleUserCounts,
-                'roleUserCounts'   => $rolesWithUsers,
-                'moderatorIds'     => $this->userMapper->findByAccess(UserAccess::SERVICE_PASTORAL, UserAccess::ACCESS_READ)
-                                                       ->getPropertyValues('id'),
+                'record'          => $this->pastoralMapper->createModel()->setStudent(null),
+                'allowIndividual' => $allowIndividual,
+                'allowParents'    => $allowParents,
+                'allowStudents'   => $allowStudents,
+                'roles'           => $roles,
+                'roleTypes'       => $this->pastoralAccessMapper->determineAllowedRoleTypes(),
+                'groups'          => $this->pastoralGroupMapper->findAll()->sortNaturally('name'),
+                'rolesWithUsers'  => $roleUserCounts,
+                'roleUserCounts'  => $rolesWithUsers,
+                'moderatorIds'    => $this->userMapper->findByAccess(UserAccess::SERVICE_PASTORAL, UserAccess::ACCESS_READ)
+                                                      ->getPropertyValues('id'),
 
                 // Requirements for displaying scripts
-                'audiences'        => $audienceDefaults,
-                'typesIndexPrivate' => $typesIndexPrivate,
-                'typesIndex'        => $typesIndex,
-                'subtypesIndexPrivate'  => $subtypesIndexPrivate,
-                'subtypesIndex'     => $subtypesIndex,
+                'audiences'            => $audienceDefaults,
+                'typesIndexPrivate'    => $typesIndexPrivate,
+                'typesIndex'           => $typesIndex,
+                'subtypesIndexPrivate' => $subtypesIndexPrivate,
+                'subtypesIndex'        => $subtypesIndex,
             ],
             $this->translator->translate('pastoral', capital: true) . ' Bulk Import',
         );
