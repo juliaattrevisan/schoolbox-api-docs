@@ -3,21 +3,44 @@
  */
 
 import { defineStore } from "pinia";
-import type { Course } from "@schoolboxLibrary/types/Course";
+import { useCourseSelectorStore } from "@schoolboxLibrary/Assessment/Course/templates/vue/courseSelector/store/courseSelectorStore";
+import { useSelectedNodesStore } from "@schoolboxCurriculum/vue/curriculumSelector/store/csSelectedNodesStore";
 
 export const useStore = defineStore("curriculumCoverage", () => {
-    const selectedCourses = window.Vue.ref<Course[]>([]); // the selected courses @todo - this will be stored in a selectedCoursesStore instead with SA-18582
+    let endpoint = ""; // the endpoint to use for the report
+    const selectedCoursesStore = useCourseSelectorStore();
+    const selectedNodesStore = useSelectedNodesStore();
 
     /**
      * store any passed through properties
-     * @param $courses - the courses to display in the report
+     * @param $endpoint - the report api url
      */
-    function init($courses: Course[]): void {
-        selectedCourses.value = $courses;
+    function init($endpoint: string): void {
+        endpoint = $endpoint;
+    }
+
+    /**
+     * To collect all the params to send to the search api
+     * @returns - the query params
+     */
+    function getQueryParams(): URLSearchParams {
+        const newQueryParams = new URLSearchParams();
+        newQueryParams.append("courseId", selectedCoursesStore.selectedIds.join(","));
+        newQueryParams.append("nodeId", (selectedNodesStore.nodesIds as number[]).join(","));
+        return newQueryParams;
+    }
+
+    /**
+     * To collect all the params to send to the search api
+     * @returns - the query params
+     */
+    function getEndpointWithParams(): string {
+        const newQueryParams = getQueryParams();
+        return `${endpoint}?${newQueryParams.toString()}`;
     }
 
     return {
-        selectedCourses,
         init,
+        getEndpointWithParams,
     };
 });

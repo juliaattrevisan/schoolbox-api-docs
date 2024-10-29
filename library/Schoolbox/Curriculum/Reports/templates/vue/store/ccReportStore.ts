@@ -3,10 +3,9 @@
  */
 
 import { defineStore } from "pinia";
-import { useCourseSelectorStore } from "@schoolboxLibrary/Assessment/Course/templates/vue/courseSelector/store/courseSelectorStore";
-import { useSelectedNodesStore } from "@schoolboxCurriculum/vue/curriculumSelector/store/csSelectedNodesStore";
 import type { Course } from "@schoolboxLibrary/types/Course";
 import type { CurriculumCoveragePayload, CurriculumCoverageNode } from "../../js/types/curriculumCoverageTypes";
+import { useStore } from "./curriculumCoverageStore";
 
 /**
  * What is returned when there is a search error
@@ -18,10 +17,7 @@ export type ReportError = {
 };
 
 export const useReportStore = defineStore("cpReport", () => {
-    const selectedCoursesStore = useCourseSelectorStore();
-    const selectedNodesStore = useSelectedNodesStore();
     const hasNotSearched = window.Vue.ref(true); // to prompt a search if the user hasn't searched yet
-    // const url = window.Vue.ref("");
     const isLoading = window.Vue.ref(false);
     const hasLoadError = window.Vue.ref(false);
     const loadError = window.Vue.ref<ReportError | null>(null);
@@ -48,7 +44,6 @@ export const useReportStore = defineStore("cpReport", () => {
         // useResultsStore().clear();
         // useStore().setQueryParams(simulateRedirect);
         hasNotSearched.value = false;
-        // url.value = useStore().getEndpointWithParams();
         // abort the previous search if it's still running
         if (isLoading.value) {
             controller.abort();
@@ -57,16 +52,13 @@ export const useReportStore = defineStore("cpReport", () => {
             isLoading.value = true;
             hasLoadError.value = false;
             controller = new AbortController();
-            const response = await fetch(
-                `https://vagrant.dev.schoolbox.cloud/curriculum/reports/coverage?courseId=${selectedCoursesStore.selectedIds.join(",")}&nodeId=${selectedNodesStore.nodesIds.join(",")}`,
-                {
-                    method: "GET",
-                    signal: controller.signal,
-                    headers: {
-                        Accept: "application/json",
-                    },
+            const response = await fetch(useStore().getEndpointWithParams(), {
+                method: "GET",
+                signal: controller.signal,
+                headers: {
+                    Accept: "application/json",
                 },
-            );
+            });
             if (!response.ok) {
                 hasLoadError.value = true;
                 loadError.value = {
