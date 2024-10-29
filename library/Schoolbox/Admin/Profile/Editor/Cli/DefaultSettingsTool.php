@@ -382,7 +382,7 @@ HELP;
                     'availability' => $campusIds,
                     'visibility' =>  [self::ROLETYPE_SELF, self::ROLETYPE_PARENT, self::ROLETYPE_STAFF],
                 ],
-                'boarderType' => [
+                'StudentBoarder' => [
                     'availability' => $campusIds,
                     'visibility' =>  [self::ROLETYPE_SELF, self::ROLETYPE_PARENT, self::ROLETYPE_STAFF],
                 ],
