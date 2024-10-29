@@ -42,7 +42,6 @@ use Schoolbox\UserMapper;
 use Timetable_ColourManager;
 use Timetable_ColourMapper;
 use Twig\Environment;
-use Twig\Error\Error;
 
 /**
  * The controller for the mock version of the search API.
