@@ -132,7 +132,7 @@
                                                 <a href="/search/user/{{ selectedField.value.id }}">{{ selectedField.value.value }}</a>
                                             {% elseif selectedField.field in ['email', 'SpouseEmail'] %}
                                                 {# Renders a mailto: hyperlink #}
-                                                <a href="{{ session.mailhandle }}{{ selectedField.value }}">{{ selectedField.value }}</a>
+                                                {% include '@searchUser/field/email.twig' with {session: session, email: selectedField.value} only %}
                                             {% else %}
                                                 {# A generic tuple (key, value) pair #}
                                                 {{ selectedField.value }}

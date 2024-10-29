@@ -11,6 +11,7 @@ namespace Schoolbox\Search\User;
 
 use Alaress\Authorizer\Rule\IsLoggedIn;
 use Alaress\Module\Module as BaseModule;
+use Alaress\Twig\Loader\IChainLoader;
 use Alaress\Web\Controller\Base;
 use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Mapper;
@@ -19,6 +20,7 @@ use Schoolbox\RoleMapper;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
 use Schoolbox\Profile\Button\Mapper as ProfileButtonMapper;
+use Twig\Error\LoaderError;
 
 /**
  * The module for user profile page.
@@ -71,6 +73,17 @@ class Module extends BaseModule
             $this->getMapperFactory()->get(\Schoolbox\Admin\Profile\Editor\Field\Mapper::class),
         );
     }
+
+
+    /**
+     * @param IChainLoader $templateLoader
+     * @throws LoaderError
+     */
+    public function initTemplatePaths(IChainLoader $templateLoader)
+    {
+        $this->addTemplatePath($templateLoader, __DIR__ . '/templates');
+    }
+
 
     /**
      * Preload a User instance

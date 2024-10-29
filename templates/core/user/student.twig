@@ -325,7 +325,7 @@
                                                             <a href="{{ session.mailhandle }}{{ selectedField.value.email }}">{{ selectedField.value.formatName }}</a>
                                                         {% elseif selectedField.field in ['email'] %}
                                                             {# Renders a mailto: hyperlink #}
-                                                            <a href="{{ session.mailhandle }}{{ selectedField.value }}">{{ selectedField.value }}</a>
+                                                            {% include '@searchUser/field/email.twig' with {session: session, email: selectedField.value} only %}
                                                         {% elseif selectedField.field in ['StudentBirthDate'] %}
                                                             {# Renders with date formatting #}
                                                             {{ selectedField.value|date(dateFormats.shortDateOnlyFormat) }}
