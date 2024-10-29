@@ -305,12 +305,6 @@ class Subnav
                         'children'    => [],
                         'description' => 'Configure the default and available filter options on the goal and achievements search page.',
                     ],
-                    '/adminv2/filters/classPastoral' => [
-                        'name'        => $filterLabelBuilder->buildLabel(FilterPageModel::PAGE_CLASS_PASTORAL),
-                        'visible'     => $userIsSuperuser && $filterAvailabilityChecker->isAvailable(FilterPageModel::PAGE_CLASS_PASTORAL),
-                        'children'    => [],
-                        'description' => 'Configure the default and available filter options on the class pastoral report.',
-                    ],
                 ],
             ],
             '/adminv2/import' => [
