@@ -407,6 +407,7 @@ class Controller extends BaseController
             $externalUser['studentCoach'] ?? null,
         ]);
 
+        /** @var \Schoolbox\User $object */
         foreach ($teacherEmails as $object) {
             $allTeacherIds[] = $object->getId();
         }
