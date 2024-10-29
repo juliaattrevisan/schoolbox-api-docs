@@ -106,7 +106,7 @@ class Controller extends Base
                 'moderatorIds'     => $this->userMapper->findByAccess(UserAccess::SERVICE_PASTORAL, UserAccess::ACCESS_READ)
                                                        ->getPropertyValues('id'),
             ],
-            $this->translator->translate('pastoral', capital: true) . ' Bulk Upload',
+            $this->translator->translate('pastoral', capital: true) . ' Bulk Import',
         );
     }
 
