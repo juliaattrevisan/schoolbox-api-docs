@@ -26,7 +26,7 @@ VALUES (
             'web_push_notifications_enabled',
             '1',
             'Enable Web Push Notifications',
-            "If ON, Web Push Notifications will be enabled and allow notifiction button will appear",
+            "If ON, Web Push Notifications will be enabled and allow notifications button will appear",
             (SELECT id FROM lu_config_field WHERE field = 'boolean'),
             null,
             (SELECT id FROM lu_config_type WHERE type = 'Modules'),
