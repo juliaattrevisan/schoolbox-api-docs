@@ -33,7 +33,7 @@
                             The ZIP file which contains the files to upload to the created records.
 
                             Each file within this ZIP which may be attributed to a student will be attached to their
-                            {{ locale.pastoral }} record, as a general-level attachment.
+                            {{ locale.pastoral }} record, as a generally available attachment.
                         </p>
                         {% include 'sub/attachzone.twig' with {attachzone: reportAttachzone} %}
                     </div>
@@ -82,7 +82,11 @@
                     <div class="small-12 columns">
                         <label for="body_public">General content</label>
                         <p class="meta">
-                            Student detail tokens can be viewed when you press [. Tokens will be substituted with the students details on creation.
+                            Generally available content which will be added to each {{ locale.pastoral }} record created
+                            by this import.
+
+                            (Student detail tokens can be viewed when you press [.
+                            Tokens will be substituted with the student&rsquo;s details on creation.)
                         </p>
                         <textarea id="body_public" name="body_public"></textarea>
                     </div>
