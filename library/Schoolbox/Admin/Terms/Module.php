@@ -13,9 +13,9 @@ use Alaress\Module\Module as BaseModule;
 use Alaress\Authorizer\Rule;
 use Alaress\Web\Controller\Base;
 use Alaress\Web\Router\PathMatcher;
-use Aura\Router\Map;
 use Schoolbox\Assessment\Term\Mapper as TermMapper;
 use Alaress\Twig\Loader\IChainLoader;
+use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\YearLevel\Mapper as YearLevelMapper;
 
 /**
@@ -45,11 +45,16 @@ class Module extends BaseModule
      */
     public function initRoutePermissions(Authorizer $authorizer)
     {
-
-        $this
-            ->addRoutePermission($authorizer, '.*', new Rule\IsLoggedIn())
-            ->addRoutePermission($authorizer, '.*', new Rule\IsSuperuser())
-        ;
+        $this->addRoutePermission(
+            $authorizer,
+            '.*',
+            new Rule\All(
+                new Rule\Any(
+                    new Rule\IsLoggedIn(),
+                    new Rule\HasServicePermission(UserAccess::SERVICE_LMS, UserAccess::ACCESS_FULL)
+                )
+            )
+        );
     }
 
     /**
@@ -85,9 +90,6 @@ class Module extends BaseModule
     {
         $this->addTemplatePath($templateLoader, __DIR__ . '/templates');
     }
-
-    /* Getters / Setters
-     */
 
     /**
      * @return TermMapper
