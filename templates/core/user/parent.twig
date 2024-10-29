@@ -57,48 +57,13 @@
                         }
                     } %}
 
+                    {% import '@searchUser/field/macro.twig' as macro %}
+
                     <div class="small-12 medium-2 columns no-pad">
-                        {# If the portrait was made available and visible to you, it would normally appear
-                         # as element 0 in this selected list, but you have to check anyway to be sure
-                         #}
-                        {% set foundPortrait = false %}
-
-                        {% for selectedField in externalUser.data.roleTypes.fields.selected|filter(selectedField => selectedField.field == 'portrait') %}
-                            {# If this field doesn't have a special boolean associated with it that might make it visible,
-                             # use the prescribed default bool
-                             #}
-                            {% if (additionalConstraints[USER.role.type][selectedField.field] ?? additionalConstraints[USER.role.type]['_default']) %}
-                                {% set foundPortrait = true %}
-
-                                {# Portrait was available and visible to you,
-                                 # and you pass the additionalConstraints listed above
-                                 # Ask php to give you an image (it might not...)
-                                 #}
-                                {% include 'include/portrait.twig' with {
-                                    user: user,
-                                    render: 'profile',
-                                    class: 'full-width',
-                                    description: ''
-                                } only %}
-                            {% endif %}
-                        {% endfor %}
-
-                        {# No image? Grey man
-                         # We can kind of force this with a null user...wow
-                         #}
-                        {% if not foundPortrait %}
-                            {% include 'include/portrait.twig' with {
-                                user: null,
-                                render: 'profile',
-                                class: 'full-width',
-                                description: ''
-                            } only %}
-                        {% endif %}
+                        {{ macro.portrait(user, externalUser, additionalConstraints) }}
                     </div>
 
                     <div class="small-12 medium-10 columns no-pad">
-                        {% import '@searchUser/field/macro.twig' as macro %}
-
                         <dl class="profile">
                             {# Portrait is always element 0 at the moment: we can skip iterating
                              # that array element here, because it's rendered elsewhere.
