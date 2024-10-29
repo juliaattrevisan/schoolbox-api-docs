@@ -408,9 +408,7 @@ class Controller extends BaseController
         ]);
 
         foreach ($teacherEmails as $object) {
-            if ($object instanceof User) {
-                $allTeacherIds[] = $object->getId();
-            }
+            $allTeacherIds[] = $object->getId();
         }
         $allTeacherIds = array_unique(array_filter($allTeacherIds));
 
