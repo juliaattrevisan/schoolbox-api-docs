@@ -29,6 +29,9 @@ class Module extends BaseModule
      */
     protected $basename = 'pastoralBulkImport';
 
+    /**
+     * @return void
+     */
     protected function registerRoutes(): void
     {
         $permission = new Rule\All(
@@ -41,6 +44,12 @@ class Module extends BaseModule
             'getForm',
             $permission,
         );
+        $this->register(
+            self::METHOD_POST,
+            '',
+            'postImportPreview',
+            $permission,
+        );
     }
 
     /**
@@ -51,6 +60,9 @@ class Module extends BaseModule
         $this->addTemplatePath($templateLoader, __DIR__ . '/templates');
     }
 
+    /**
+     * @inheritdoc
+     */
     public function buildController(): Base
     {
         return new Controller(

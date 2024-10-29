@@ -19,7 +19,7 @@ use Schoolbox\RoleMapper;
 use Schoolbox\UserMapper;
 
 /**
- * Module for bulk importation of pastoral records.
+ * Controller for bulk importation of pastoral records.
  */
 class Controller extends Base
 {
@@ -50,9 +50,10 @@ class Controller extends Base
     /**
      * Display form for creating a pastoral bulk import.
      *
-     * @return void
-     * @since 24.1
      * @api   GET /pastoral/bulk-import
+     * @since 24.1
+     *
+     * @return void
      */
     public function getForm(): void
     {
@@ -106,6 +107,23 @@ class Controller extends Base
                                                        ->getPropertyValues('id'),
             ],
             $this->translator->translate('pastoral', capital: true) . ' Bulk Upload',
+        );
+    }
+
+    /**
+     * Display preview of pastoral bulk import, after having posted the form
+     * above.
+     *
+     * @api   POST /pastoral/bulk-import/preview
+     * @since 24.1
+     *
+     * @return void
+     */
+    public function postImportPreview(): void
+    {
+        $this->response = $this->responseFromTemplate(
+            '@pastoralBulkImport/importPreview.twig',
+            [],
         );
     }
 }

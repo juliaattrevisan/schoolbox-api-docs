@@ -1,0 +1,14 @@
+{% import 'sub/breadcrumbs.twig' as bread %}
+{{ bread.crumbs(
+    [ locale.pastoralCare.proper, routeLookup('pastoral.getIndex') ],
+    [ 'Bulk Import', routeLookup('pastoralBulkImport.getForm') ],
+    [ 'Preview' ],
+) }}
+
+<div class="actions-small-1 row">
+    <div class="list-item">
+        <div class="small-12 column">
+            <h1>{{ locale.pastoral.proper }} Bulk Import Preview</h1>
+        </div>
+    </div>
+</div>

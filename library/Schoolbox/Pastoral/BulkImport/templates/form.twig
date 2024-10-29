@@ -19,7 +19,7 @@
     <div class="small-12 island" id="formPastoral">
         {# TODO replace with actual form input #}
         <form class="top" id="pastoralForm" method="post"
-              action="?{{ RETURN_URL.name }}={{ RETURN_URL.previous.encoded }}">
+              action="{{ routeLookupIfAuthorized('pastoralBulkImport.postImportPreview') }}?{{ RETURN_URL.name }}={{ RETURN_URL.previous.encoded }}">
             <section>
                 <fieldset class="content">
                     <div class="small-12 columns">
