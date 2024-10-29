@@ -62,3 +62,10 @@
         </form>
     </div>
 </div>
+
+<script type="text/javascript" src="{{ CDN_PREFIX }}/js/vendors/chained/jquery.chained.min.js?v={{ config.site_version }}"></script>
+<script type="text/javascript">
+    $(function () {
+        $('#subtypeId').chained('#typeId');
+    });
+</script>
