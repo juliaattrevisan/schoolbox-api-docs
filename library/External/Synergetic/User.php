@@ -377,6 +377,10 @@ class External_Synergetic_User implements External_UserInterface
                     $student['StudentBirthDate'] = false;
                 }
 
+                /* Forcibly re-evaluate boarderlyness using this connector's specific interpretation
+                 */
+                $student['StudentBoarder'] = $this->determineBoarderType((string)$student['StudentBoarder']);
+
                 /* Initialise stacks
                  */
                 $student['AlertMessage'] = [];

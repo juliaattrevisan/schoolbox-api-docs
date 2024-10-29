@@ -409,6 +409,10 @@ class External_Doublefirst_User implements External_UserInterface
             }
         }
 
+        /* Forcibly re-evaluate boarderlyness using this connector's specific interpretation
+         */
+        $student['StudentBoarder'] = $this->determineBoarderType((string)$student['StudentBoarder']);
+
         /* Forcibly obey External_UserInterface
          */
         $student['AlertMessage'] = [$student['AlertMessage']];

@@ -223,6 +223,10 @@ class External_Schooledge_User implements External_UserInterface
             $i++;
         }
 
+        /* Forcibly re-evaluate boarderlyness using this connector's specific interpretation
+         */
+        $result['StudentBoarder'] = $this->determineBoarderType((string)$result['StudentBoarder']);
+
         /* Forcibly obey External_UserInterface
          */
         $result['AlertMessage'] = [];

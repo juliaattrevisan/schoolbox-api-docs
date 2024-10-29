@@ -120,6 +120,10 @@ class External_Synergetic_Smcs_User extends External_Synergetic_User
                     $student['StudentBirthDate'] = false;
                 }
 
+                /* Forcibly re-evaluate boarderlyness using this connector's specific interpretation
+                 */
+                $student['StudentBoarder'] = $this->determineBoarderType((string)$student['StudentBoarder']);
+
                 /* Initialise stacks
                  */
                 $student['AlertMessage'] = [];

@@ -161,6 +161,10 @@ class External_Isams_User implements External_UserInterface
             $student = [];
         }
 
+        /* Forcibly re-evaluate boarderlyness using this connector's specific interpretation
+         */
+        $student['StudentBoarder'] = $this->determineBoarderType((string)$student['StudentBoarder']);
+
         $student['AlertMessage'] = [];
         $student['AlertLegal'] = [];
 

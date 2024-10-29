@@ -522,7 +522,6 @@ class Controller extends BaseController
                 'eportfolioAuth'           => $this->eportfolioAuthenticator->canView(),
                 'hideContacts'             => $hideContacts,
                 'now'                      => Alaress_Date_Format::now(),
-                'boarderType'              => $this->externalUser->determineBoarderType(isset($externalUser['StudentBoarder']) ? (string)$externalUser['StudentBoarder'] : null),
                 'contacts'                 => $contacts,
                 'subjects'                 => $subjects,
                 'customButtons'            => $customButtons,
