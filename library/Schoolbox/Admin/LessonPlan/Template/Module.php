@@ -16,6 +16,7 @@ use Alaress\Twig\Loader\IChainLoader;
 use Alaress\Web\Controller\Base;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Mapper\Exception\NotFound;
+use Schoolbox\Permission\Access\UserAccess;
 
 class Module extends BaseModule
 {
@@ -23,7 +24,6 @@ class Module extends BaseModule
      * @inheritdoc
      */
     protected $basename = 'adminLessonPlanTemplate';
-
 
     /**
      * Hook method for setting up routes via self::register()
@@ -34,10 +34,11 @@ class Module extends BaseModule
     {
         /* Superusers only
          */
-        $getPerms = $postPerms = new Rule\All(
+        $perms = new Rule\All(
             new Rule\IsLoggedIn(),
             new Rule\Any(
-                new Rule\IsSuperuser()
+                new Rule\IsSuperuser(),
+                new Rule\HasServicePermission(UserAccess::SERVICE_LMS, UserAccess::ACCESS_FULL)
             )
         );
 
@@ -45,16 +46,14 @@ class Module extends BaseModule
             return $this->preloadLessonPlanTemplate($params);
         };
 
-        $this->register('GET', '', 'getList', $getPerms);
-        $this->register('GET', '/create', 'getCreate', $getPerms);
-        $this->register('POST', '/create', 'postCreate', $postPerms);
-        $this->register('GET', '/update/{lessonPlanTemplateId}', 'getUpdate', $getPerms, $preloadLessonPlanTemplate);
-        $this->register('POST', '/update/{lessonPlanTemplateId}', 'postUpdate', $postPerms, $preloadLessonPlanTemplate);
-        $this->register('DELETE', '/delete/{lessonPlanTemplateId}', 'delete', $postPerms, $preloadLessonPlanTemplate);
-        $this->register('POST', '/toggle/{lessonPlanTemplateId}', 'postToggleEnableState', $postPerms, $preloadLessonPlanTemplate);
+        $this->register('GET', '', 'getList', $perms);
+        $this->register('GET', '/create', 'getCreate', $perms);
+        $this->register('POST', '/create', 'postCreate', $perms);
+        $this->register('GET', '/update/{lessonPlanTemplateId}', 'getUpdate', $perms, $preloadLessonPlanTemplate);
+        $this->register('POST', '/update/{lessonPlanTemplateId}', 'postUpdate', $perms, $preloadLessonPlanTemplate);
+        $this->register('DELETE', '/delete/{lessonPlanTemplateId}', 'delete', $perms, $preloadLessonPlanTemplate);
+        $this->register('POST', '/toggle/{lessonPlanTemplateId}', 'postToggleEnableState', $perms, $preloadLessonPlanTemplate);
     }
-
-
 
     /**
      * Preload a lesson plan template
@@ -80,7 +79,6 @@ class Module extends BaseModule
         ];
     }
 
-
     /**
      * @inheritdoc
      */
@@ -92,7 +90,6 @@ class Module extends BaseModule
             $this->getMapperFactory()->get(\Schoolbox\Admin\LessonPlan\Template\Field\Mapper::class),
         );
     }
-
 
     /**
      * {@inheritdoc}
