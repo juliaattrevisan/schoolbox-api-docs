@@ -375,7 +375,7 @@ class Factory
         $externalUser = [];
 
         if ($viewee->getExternalId()) {
-            $externalUser = $this->externalUser->getParent($viewee->getExternalId());
+            $externalUser = $this->externalUser->getStaff($viewee->getExternalId());
         }
 
         /* For convenience, collate the campus names here
