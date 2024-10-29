@@ -70,3 +70,15 @@
         } only %}
     {% endif %}
 {% endmacro %}
+
+
+{##
+ # Renders a linked name for someone who has a schoolbox user account
+ # It's a shortcut to emailing them, apparently, which is mostly identical to macro.email()
+ #}
+{% macro internalUser(session, email, name) %}
+{% apply spaceless %}
+    <a href="{{ session.mailhandle }}{{ email }}">{{ name }}</a>
+{% endapply %}
+{% endmacro %}
+
