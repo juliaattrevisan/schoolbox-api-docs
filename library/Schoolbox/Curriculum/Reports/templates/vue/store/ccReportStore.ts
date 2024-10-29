@@ -6,6 +6,7 @@ import { defineStore } from "pinia";
 import type { Course } from "@schoolboxLibrary/types/Course";
 import type { CurriculumCoveragePayload, CurriculumCoverageNode } from "../../js/types/curriculumCoverageTypes";
 import { useStore } from "./curriculumCoverageStore";
+import { useInputStore } from "./ccInputStore";
 
 /**
  * What is returned when there is a search error
@@ -16,7 +17,7 @@ export type ReportError = {
     status: number;
 };
 
-export const useReportStore = defineStore("cpReport", () => {
+export const useReportStore = defineStore("ccReport", () => {
     const hasNotSearched = window.Vue.ref(true); // to prompt a search if the user hasn't searched yet
     const isLoading = window.Vue.ref(false);
     const hasLoadError = window.Vue.ref(false);
@@ -28,19 +29,18 @@ export const useReportStore = defineStore("cpReport", () => {
     let controller: AbortController; // to allow aborting the previous search if a new one is started
 
     /**
-     * Whether a search can be performed, can be if there's a change of query or filters
-     * @returns {boolean} - whether a new search can be performed
+     * Whether a search can be performed, can be if there's a change of course or node selection
+     * @returns {boolean} - whether a new report can be requested
      */
-    // const canSearch = window.Vue.computed(() => {
-    //     return useQueryStore().canSearch || useFiltersStore().canSearch;
-    // });
+    const canReport = window.Vue.computed(() => {
+        return useInputStore().canReport;
+    });
 
     /**
      * search for nodes that match
      */
     async function report(): Promise<void> {
-        // useQueryStore().setActive();
-        // useFiltersStore().setActive();
+        useInputStore().setActive();
         // useResultsStore().clear();
         // useStore().setQueryParams(simulateRedirect);
         hasNotSearched.value = false;
@@ -92,14 +92,6 @@ export const useReportStore = defineStore("cpReport", () => {
         }
     }
 
-    /**
-     * clear the filters and search
-     */
-    // async function clearFiltersAndSearch(): Promise<void> {
-    //     useFiltersStore().clear();
-    //     await search(true);
-    // }
-
     return {
         hasNotSearched,
         isLoading,
@@ -109,6 +101,6 @@ export const useReportStore = defineStore("cpReport", () => {
         hasMultipleCourses,
         nodes,
         hasReport,
-        // canSearch,
+        canReport,
     };
 });

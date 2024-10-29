@@ -22,8 +22,8 @@ export const useStore = defineStore("curriculumCoverage", () => {
      */
     function getQueryParams(): URLSearchParams {
         const newQueryParams = new URLSearchParams();
-        newQueryParams.append("courseId", useInputStore().selectedCoursesStore.selectedIds.join(","));
-        newQueryParams.append("nodeId", (useInputStore().selectedNodesStore.nodesIds as number[]).join(","));
+        newQueryParams.append("courseId", useInputStore().coursesValue);
+        newQueryParams.append("nodeId", useInputStore().nodesValue);
         return newQueryParams;
     }
 

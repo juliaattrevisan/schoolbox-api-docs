@@ -9,9 +9,33 @@ import { useSelectedNodesStore } from "@schoolboxCurriculum/vue/curriculumSelect
 export const useInputStore = defineStore(`ccInput`, () => {
     const selectedCoursesStore = useCourseSelectorStore();
     const selectedNodesStore = useSelectedNodesStore();
+    const coursesValue = window.Vue.computed(() => selectedCoursesStore.selectedIds.join(","));
+    const nodesValue = window.Vue.computed(() => (selectedNodesStore.nodesIds as number[]).join(","));
+    const activeCoursesValue = window.Vue.ref("");
+    const activeNodesValue = window.Vue.ref("");
+
+    /**
+     * report has been triggered so set the active course and nodes
+     */
+    function setActive(): void {
+        activeCoursesValue.value = coursesValue.value;
+        activeNodesValue.value = nodesValue.value;
+    }
+
+    /**
+     * prevent the report from running again if the same courses and nodes are selected
+     * @returns - whether there's been a change in the date range
+     */
+    const canReport = window.Vue.computed(() => {
+        return activeCoursesValue.value !== coursesValue.value || activeNodesValue.value !== nodesValue.value;
+    });
 
     return {
         selectedCoursesStore,
         selectedNodesStore,
+        coursesValue,
+        nodesValue,
+        setActive,
+        canReport,
     };
 });

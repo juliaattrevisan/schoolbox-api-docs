@@ -32,7 +32,7 @@ const buttonText = window.Vue.computed(() => {
  * Submit the form to generate the report
  */
 function onGenerateReport(): void {
-    if (reportStore.isLoading) {
+    if (reportStore.isLoading || !reportStore.canReport) {
         return;
     }
     isCoursesInvalid.value = false;
