@@ -12,6 +12,7 @@ namespace Schoolbox\Pastoral\BulkImport;
 use Alaress\Web\Controller\Base;
 use Schoolbox\L10n\RosettaStone;
 use Schoolbox\Pastoral;
+use Schoolbox\Resource\Attachment\Zone;
 
 /**
  * Module for bulk importation of pastoral records.
@@ -46,8 +47,18 @@ class Controller extends Base
         $this->response = $this->responseFromTemplate(
             '@pastoralBulkImport/form.twig',
             [
-                'types'    => $this->pastoralTypeMapper->findAll(),
-                'subTypes' => $this->pastoralSubTypeMapper->findAll(),
+                'types'            => $this->pastoralTypeMapper->findAll(),
+                'subTypes'         => $this->pastoralSubTypeMapper->findAll(),
+                'reportAttachzone' => (new Zone('report'))
+                    ->setThumbnailSize(64)
+                    ->setModalTitle('Select report ZIP')
+                    ->setAttachmentsLabel('')
+                    ->setAttachPrompt('Upload report ZIP')
+                    ->setMimeFilter('application/zip')
+                    ->setReadOnly(false)
+                    ->setFileVar('report')
+                    ->setMulti(false)
+                    ->getTwigContext()
             ],
             $this->translator->translate('pastoral', capital: true) . ' Bulk Upload',
         );

@@ -26,7 +26,11 @@
                         <label class="required" for="heading">Title</label>
                         <input type="text" name="heading" id="heading" size="35" maxlength="100" required />
                     </div>
+                    <div class="small-12 columns">
+                        {% include 'sub/attachzone.twig' with {attachzone: reportAttachzone} %}
+                    </div>
                 </fieldset>
+
                 <fieldset class="content">
                     <div class="small-12 medium-6 columns">
                         <label for="typeId" class="required">Type</label>
@@ -63,9 +67,38 @@
     </div>
 </div>
 
+<script type="text/javascript" src="{{ CDN_PREFIX }}/js/vendors/selectize/selectize.min.js?v={{ config.site_version }}"></script>
+<script type="text/javascript" src="{{ CDN_PREFIX }}/js/vendors/selectize/jquery.selectize-selector.js?v={{ config.site_version }}"></script>
 <script type="text/javascript" src="{{ CDN_PREFIX }}/js/vendors/chained/jquery.chained.min.js?v={{ config.site_version }}"></script>
 <script type="text/javascript">
     $(function () {
+        $('#tags').selectizeSelector({
+            multiple: true,
+            selectize: {
+                create: function (input) {
+                    $('#tagNames').val($('#tagNames').val()+','+input);
+                    return {
+                        id: 'new-' + input,
+                        name: input
+                    }
+                },
+                preload: true,
+                load: function(query, callback) {
+                    $.ajax({
+                        url: '{{ routeLookup('pastoral.searchTags') }}',
+                        type: 'GET',
+                        dataType: 'json',
+                        data: { query: query }
+                    }).done(function(result) {
+                        callback(result)
+                    }).fail(function() {
+                        callback()
+                    })
+                }
+            },
+            value: []
+        });
+
         $('#subtypeId').chained('#typeId');
     });
 </script>
