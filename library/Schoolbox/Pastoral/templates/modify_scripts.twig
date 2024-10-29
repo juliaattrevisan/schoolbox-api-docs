@@ -251,7 +251,7 @@
                 dataType: 'json',
                 data: {'typeId': typeId, 'subtypeId': subtypeId}
             }).done(function (result) {
-                if (actionSelectize[0] === 'undefined') {
+                if (actionSelectize.length === 0) {
                     return;
                 }
                 actionSelectize[0].selectize.clear();
