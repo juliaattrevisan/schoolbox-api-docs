@@ -10,15 +10,21 @@ declare(strict_types=1);
 namespace Schoolbox\Search\User;
 
 use Alaress\Color\ColorFactory;
+use Alaress\Database\Predicate\InvalidColumnException;
 use Alaress\Web\Controller\Base as BaseController;
 use Alaress_Date_Format;
 use Custom;
+use DebugBar\DebugBarException;
 use Eportfolio_Authenticator;
 use External_ClassInterface;
 use External_UserInterface;
+use Psr\Container\ContainerExceptionInterface;
+use Psr\Container\NotFoundExceptionInterface;
+use Schoolbox\Admin\Profile\Editor\Field\Mapper;
 use Schoolbox\Assessment\Term\Mapper as TermMapper;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Geosnapshot\ValidStudentPhotosAvailable;
+use Schoolbox\Mapper\DefinitionException;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Pastoral\Count\Helper as PastoralCountHelper;
 use Schoolbox\Pastoral\DataSource as PastoralDataSource;
@@ -41,6 +47,10 @@ use Schoolbox\UserMapper;
 use Timetable_ColourManager;
 use Timetable_ColourMapper;
 use Twig\Environment;
+use Twig\Error\Error;
+use Twig\Error\LoaderError;
+use Twig\Error\RuntimeError;
+use Twig\Error\SyntaxError;
 
 /**
  * The controller for the mock version of the search API.
@@ -52,22 +62,24 @@ class Controller extends BaseController
      */
     private Eportfolio_Authenticator $eportfolioAuthenticator;
 
+
     /**
      * Constructor
-     * @param UserMapper                    $userMapper
-     * @param RoleMapper                    $roleMapper
-     * @param FolderMapper                  $folderMapper
-     * @param Access                        $access
-     * @param External_UserInterface        $externalUser
-     * @param External_ClassInterface       $externalClass
-     * @param ProfileButtonMapper           $profileButtonMapper
-     * @param Timetable_ColourMapper        $timetableColourMapper
+     * @param UserMapper $userMapper
+     * @param RoleMapper $roleMapper
+     * @param FolderMapper $folderMapper
+     * @param Access $access
+     * @param External_UserInterface $externalUser
+     * @param External_ClassInterface $externalClass
+     * @param ProfileButtonMapper $profileButtonMapper
+     * @param Timetable_ColourMapper $timetableColourMapper
      * @param ProfessionalDevelopmentMapper $professionalDevelopmentMapper
-     * @param PastoralTypeMapper            $pastoralTypeMapper
-     * @param PastoralSubTypeMapper         $pastoralSubTypeMapper
-     * @param PastoralDataSource            $pastoralDataSource
-     * @param TermMapper                    $termMapper
-     * @param \Schoolbox\External\User      $userRelationHydrator
+     * @param PastoralTypeMapper $pastoralTypeMapper
+     * @param PastoralSubTypeMapper $pastoralSubTypeMapper
+     * @param PastoralDataSource $pastoralDataSource
+     * @param TermMapper $termMapper
+     * @param \Schoolbox\External\User $userRelationHydrator
+     * @param Mapper $fieldMapper
      */
     public function __construct(
         private UserMapper $userMapper,
@@ -88,14 +100,25 @@ class Controller extends BaseController
     ) {
     }
 
+
     /**
      * User profile.
      * @param User $user
+     * @throws ContainerExceptionInterface
+     * @throws DebugBarException
+     * @throws DefinitionException
+     * @throws Error
+     * @throws InvalidColumnException
+     * @throws LoaderError
      * @throws MapperException
-     * @throws \Psr\Container\NotFoundExceptionInterface|\Psr\Container\ContainerExceptionInterface
-     * @throws \Twig\Error\LoaderError
-     * @throws \Twig\Error\RuntimeError
-     * @throws \Twig\Error\SyntaxError
+     * @throws NotFoundExceptionInterface
+     * @throws RuntimeError
+     * @throws SyntaxError
+     * @throws \DomainException
+     * @throws \InvalidArgumentException
+     * @throws \LogicException
+     * @throws \PDOException
+     * @throws \UnexpectedValueException
      */
     public function getProfile(User $user): void
     {
@@ -112,81 +135,24 @@ class Controller extends BaseController
         }
     }
 
-    /**
-     * @param User $parent
-     */
-    private function renderParent(User $parent): void
-    {
-        /* Full Payload Construction
-         * $externalUser is the complete payload that we use to fulfil frontend
-         *
-         * Note this uses a callback to inject some data halfway through the compilation algorithm
-         * to service this extra widgety thing, Pastoral Counts
-         */
-        $externalUser = (new \Schoolbox\Profile\Field\Factory($this->fieldMapper, $this->userMapper, $this->externalUser))
-            ->produce($parent, $this->getUser());
-
-        $students = $parent->getChildren();
-
-        try {
-            $customButtons = ProfileButtonMapper::getInstance()->findButtonsForUser($parent, $this->getUser());
-        } catch (MapperException $e) {
-            $customButtons = [];
-        }
-
-        $showDetails = (new ValidDetailsVisible($this->externalUser, $this->getConfigLoader()))->isSatisfiedBy($parent, $this->getUser());
-
-        // As with students in SA-16859:
-        // set the shared campuses between the subject of the profile and the
-        // viewing user, to determine what (if any) of the profile can be shown.
-        $this->response = $this->responseFromTemplate(
-            'user/parent.twig',
-            [
-                'session'        => $_SESSION,
-                'user'           => $parent,
-                'externalUser'   => $externalUser,
-                'students'       => $students,
-                'customButtons'  => $customButtons,
-                'eportfolioAuth' => $this->eportfolioAuthenticator->canView(),
-                'now'            => Alaress_Date_Format::now(),
-                'showDetails'    => $showDetails,
-                'sharedCampuses' => $this->getUser()->getCampusCollection()->intersect($parent->getCampusCollection()),
-            ]
-        );
-    }
-
-    /**
-     * @param User $staff
-     * @throws MapperException
-     */
-    private function renderStaff(User $staff): void
-    {
-        $detailsVisible = new ValidDetailsVisible($this->externalUser, $this->getConfigLoader());
-        $customButtons  = $this->profileButtonMapper->findButtonsForUser($staff, $this->getUser());
-        $externalUser   = $staff->getExternalId() ? $this->externalUser->getStaff($staff->getExternalId()) : [];
-
-        $this->response = $this->responseFromTemplate(
-            'user/staff.twig',
-            [
-                'session'        => $_SESSION,
-                'user'           => $staff,
-                'externalUser'   => $externalUser,
-                'eportfolioAuth' => $this->eportfolioAuthenticator->canView(),
-                'customButtons'  => $customButtons,
-                'now'            => Alaress_Date_Format::now(),
-                'showDetails'    => $detailsVisible->isSatisfiedBy($staff, $this->getUser()),
-            ],
-            'User'
-        );
-    }
 
     /**
      * @param User $student
+     * @throws DebugBarException
+     * @throws DefinitionException
+     * @throws Error
+     * @throws InvalidColumnException
      * @throws MapperException
-     * @throws \Psr\Container\NotFoundExceptionInterface|\Psr\Container\ContainerExceptionInterface
-     * @throws \Twig\Error\LoaderError
-     * @throws \Twig\Error\RuntimeError
-     * @throws \Twig\Error\SyntaxError
+     * @throws \DomainException
+     * @throws \InvalidArgumentException
+     * @throws \LogicException
+     * @throws \PDOException
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     * @throws LoaderError
+     * @throws RuntimeError
+     * @throws SyntaxError
+     * @throws \UnexpectedValueException
      */
     private function renderStudent(User $student): void
     {
@@ -597,6 +563,104 @@ class Controller extends BaseController
                 'isGeosnapshotAvailable'   => $isGeosnapshotAvailable,
                 'canEmailStaff'            => $canEmailStaff,
                 'sharedCampuses'           => $sharedCampuses,
+            ]
+        );
+    }
+
+
+    /**
+     * @param User $staff
+     * @throws MapperException
+     * @throws InvalidColumnException
+     * @throws DebugBarException
+     * @throws \DomainException
+     * @throws \PDOException
+     * @throws DefinitionException
+     * @throws Error
+     * @throws \UnexpectedValueException
+     */
+    private function renderStaff(User $staff): void
+    {
+        /* Full Payload Construction
+         * $externalUser is the complete payload that we use to fulfil frontend
+         *
+         * Note this uses a callback to inject some data halfway through the compilation algorithm
+         * to service this extra widgety thing, Pastoral Counts
+         */
+        $externalUser = (new \Schoolbox\Profile\Field\Factory($this->fieldMapper, $this->userMapper, $this->externalUser))
+            ->produce($staff, $this->getUser());
+
+        $detailsVisible = new ValidDetailsVisible($this->externalUser, $this->getConfigLoader());
+
+        try {
+            $customButtons = $this->profileButtonMapper->findButtonsForUser($staff, $this->getUser());
+        } catch (MapperException $e) {
+            $customButtons = [];
+        }
+
+        $this->response = $this->responseFromTemplate(
+            'user/staff.twig',
+            [
+                'session'        => $_SESSION,
+                'user'           => $staff,
+                'externalUser'   => $externalUser,
+                'eportfolioAuth' => $this->eportfolioAuthenticator->canView(),
+                'customButtons'  => $customButtons,
+                'now'            => Alaress_Date_Format::now(),
+                'showDetails'    => $detailsVisible->isSatisfiedBy($staff, $this->getUser()),
+            ],
+            'User'
+        );
+    }
+
+
+    /**
+     * @param User $parent
+     * @throws DebugBarException
+     * @throws DefinitionException
+     * @throws Error
+     * @throws InvalidColumnException
+     * @throws MapperException
+     * @throws \DomainException
+     * @throws \PDOException
+     * @throws \UnexpectedValueException
+     */
+    private function renderParent(User $parent): void
+    {
+        /* Full Payload Construction
+         * $externalUser is the complete payload that we use to fulfil frontend
+         *
+         * Note this uses a callback to inject some data halfway through the compilation algorithm
+         * to service this extra widgety thing, Pastoral Counts
+         */
+        $externalUser = (new \Schoolbox\Profile\Field\Factory($this->fieldMapper, $this->userMapper, $this->externalUser))
+            ->produce($parent, $this->getUser());
+
+        $students = $parent->getChildren();
+
+        try {
+            $customButtons = ProfileButtonMapper::getInstance()->findButtonsForUser($parent, $this->getUser());
+        } catch (MapperException $e) {
+            $customButtons = [];
+        }
+
+        $showDetails = (new ValidDetailsVisible($this->externalUser, $this->getConfigLoader()))->isSatisfiedBy($parent, $this->getUser());
+
+        // As with students in SA-16859:
+        // set the shared campuses between the subject of the profile and the
+        // viewing user, to determine what (if any) of the profile can be shown.
+        $this->response = $this->responseFromTemplate(
+            'user/parent.twig',
+            [
+                'session'        => $_SESSION,
+                'user'           => $parent,
+                'externalUser'   => $externalUser,
+                'students'       => $students,
+                'customButtons'  => $customButtons,
+                'eportfolioAuth' => $this->eportfolioAuthenticator->canView(),
+                'now'            => Alaress_Date_Format::now(),
+                'showDetails'    => $showDetails,
+                'sharedCampuses' => $this->getUser()->getCampusCollection()->intersect($parent->getCampusCollection()),
             ]
         );
     }
