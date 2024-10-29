@@ -100,7 +100,7 @@
                     </div>
 
                     <div class="small-12 medium-10 columns">
-                        {% import '@searchUser/field/fieldName.twig' as macro %}
+                        {% import '@searchUser/field/macro.twig' as macro %}
 
                         <dl class="profile">
                             {# Portrait is always element 0 at the moment: we can skip iterating
@@ -124,8 +124,7 @@
                                         <dt class="small-4 medium-3 columns">{{ macro.fieldName(selectedField) }}</dt>
                                         <dd class="small-8 medium-9 columns">
                                             {% if selectedField.field in ['email'] %}
-                                                {# Renders a mailto: hyperlink #}
-                                                {% include '@searchUser/field/email.twig' with {session: session, email: selectedField.value} only %}
+                                                {{ macro.email(session, selectedField.value) }}
                                             {% else %}
                                                 {# A generic tuple (key, value) pair #}
                                                 {{ selectedField.value }}

@@ -233,7 +233,7 @@
                                     });
                                 </script>
 
-                                {% import '@searchUser/field/fieldName.twig' as macro %}
+                                {% import '@searchUser/field/macro.twig' as macro %}
 
                                 <dl class="profile">
                                     {# Portrait is always element 0 at the moment: we can skip iterating
@@ -318,7 +318,7 @@
                                                             <a href="{{ session.mailhandle }}{{ selectedField.value.email }}">{{ selectedField.value.formatName }}</a>
                                                         {% elseif selectedField.field in ['email'] %}
                                                             {# Renders a mailto: hyperlink #}
-                                                            {% include '@searchUser/field/email.twig' with {session: session, email: selectedField.value} only %}
+                                                            {{ macro.email(session, selectedField.value) }}
                                                         {% elseif selectedField.field in ['StudentBirthDate'] %}
                                                             {# Renders with date formatting #}
                                                             {{ selectedField.value|date(dateFormats.shortDateOnlyFormat) }}

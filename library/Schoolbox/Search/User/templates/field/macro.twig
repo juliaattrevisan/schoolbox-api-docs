@@ -5,6 +5,7 @@
  # @param array $selectedField  A (displayAs, terminology) tuple
  #}
 {% macro fieldName(selectedField) %}
+{% apply spaceless %}
     {% set fieldName = selectedField.displayAs %}
 
     {% if selectedField.terminology %}
@@ -12,4 +13,18 @@
     {% endif %}
 
     {{ fieldName }}
+{% endapply %}
+{% endmacro %}
+
+
+{##
+ # Renders a mailto: hyperlink
+ #
+ # @param array $session  A $_SESSION superglobal, sadly
+ # @param string $email  An email address
+ #}
+{% macro email(session, email) %}
+{% apply spaceless %}
+<a href="{{ session.mailhandle }}{{ email }}">{{ email }}</a>
+{% endapply %}
 {% endmacro %}
