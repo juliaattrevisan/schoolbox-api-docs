@@ -21,13 +21,16 @@ class Controller extends Base
     /**
      * Constructor
      *
-     * @param RosettaStone $translator Required for translating values used in the page title.
+     * @param RosettaStone            $translator            Required for translating values used in the page title.
+     * @param Pastoral\Mapper         $pastoralMapper        Required for creating pastoral records.
+     * @param Pastoral\Type\Mapper    $pastoralTypeMapper    Required for loading and validating pastoral types.
+     * @param Pastoral\SubType\Mapper $pastoralSubTypeMapper Required for loading and validating pastoral subtypes.
      */
     public function __construct(
         private RosettaStone $translator,
         private Pastoral\Mapper $pastoralMapper,
         private Pastoral\Type\Mapper $pastoralTypeMapper,
-        private Pastoral\Subtype\Mapper $pastoralSubTypeMapper,
+        private Pastoral\SubType\Mapper $pastoralSubTypeMapper,
     ) {
     }
 
