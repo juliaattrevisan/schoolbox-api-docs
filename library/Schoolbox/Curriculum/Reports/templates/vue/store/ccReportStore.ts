@@ -4,13 +4,7 @@
 
 import { defineStore } from "pinia";
 import type { Course } from "@schoolboxLibrary/types/Course";
-import type { Node } from "@schoolboxCurriculum/types/Node";
-import type { CurriculumCoveragePayload } from "../../js/types/curriculumCoverageTypes";
-// import { useStore } from "./searchPageStore";
-// import { useQueryStore } from "./spQueryStore";
-// import { useResultsStore } from "../results/store/spResultsStore";
-// import { useFiltersStore } from "../filters/store/spFiltersStore";
-// import type { Results } from "../../js/types/Results";
+import type { CurriculumCoveragePayload, CurriculumCoverageNode } from "../../js/types/curriculumCoverageTypes";
 
 /**
  * What is returned when there is a search error
@@ -28,7 +22,7 @@ export const useReportStore = defineStore("cpReport", () => {
     const hasLoadError = window.Vue.ref(false);
     const loadError = window.Vue.ref<ReportError | null>(null);
     const courses = window.Vue.ref<Course[]>([]); // the courses to display in the report
-    const nodes = window.Vue.ref<Node[]>([]); // the nodes to display in the report
+    const nodes = window.Vue.ref<CurriculumCoverageNode[]>([]); // the nodes to display in the report
     const hasReport = window.Vue.ref<boolean>(false); // whether the report has been generated
     let controller: AbortController; // to allow aborting the previous search if a new one is started
 
@@ -68,18 +62,26 @@ export const useReportStore = defineStore("cpReport", () => {
                     },
                 },
             );
-            // const responseJson = await response.json();
-            // courses.value = responseJson.data.courses;
-            // nodes.value = responseJson.data.nodes;
-            // hasReport.value = true;
-            const responseJson = (await response.json()) as CurriculumCoveragePayload | ReportError;
-            // if there's a status, it's an error
-            if ((responseJson as ReportError).status) {
+            if (!response.ok) {
                 hasLoadError.value = true;
-                loadError.value = responseJson as ReportError;
+                loadError.value = {
+                    title: "An error occurred",
+                    type: "error",
+                    status: response.status,
+                };
                 return;
             }
-            if (responseJson.data) {
+            const responseJson = (await response.json()) as CurriculumCoveragePayload | ReportError;
+            if (typeof responseJson !== "object" || responseJson === null) {
+                hasLoadError.value = true;
+                return;
+            }
+            if ("status" in responseJson) {
+                hasLoadError.value = true;
+                loadError.value = responseJson;
+                return;
+            }
+            if ("data" in responseJson) {
                 courses.value = responseJson.data.courses;
                 nodes.value = responseJson.data.nodes;
                 hasReport.value = true;
