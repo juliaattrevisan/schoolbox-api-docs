@@ -1,5 +1,6 @@
 <?php
 
+use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\HomepageConfig;
 
 /**
@@ -25,11 +26,13 @@ $page->initSession();
 
 header('Content-Type: application/json');
 
-$group = new Group();
-
-if (!$group->isSuperuser()) {
+if (
+    !$_SESSION['user']->isSuperuser() &&
+    !$_SESSION['user']->hasServicePermission(UserAccess::SERVICE_LMS, UserAccess::ACCESS_FULL)
+) {
     respond("You are not authorised to perform that function.", 403);
 }
+
 
 // what are we doing?
 
