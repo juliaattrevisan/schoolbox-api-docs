@@ -7,7 +7,8 @@ import { useNodeTitle } from "@schoolboxCurriculum/vue/composables/useNodeTitle"
 import type { Course } from "@schoolboxLibrary/types/Course";
 import type { Unit } from "@schoolboxLibrary/types/Unit";
 import type { CurriculumCoverageNode } from "../js/types/curriculumCoverageTypes";
-import { useStore } from "./store/curriculumCoverageStore";
+import { useReportStore } from "./store/ccReportStore";
+import { useFiltersStore } from "./store/ccFiltersStore";
 import { ReportOptionValues } from "../js/types/curriculumCoverageTypes";
 
 interface Props {
@@ -16,7 +17,8 @@ interface Props {
 }
 const props = defineProps<Props>();
 
-const store = useStore();
+const reportStore = useReportStore();
+const filtersStore = useFiltersStore();
 const { title } = useNodeTitle(props.node);
 
 /**
@@ -39,7 +41,7 @@ function getUnitUsageCount($course: Course, $unit: Unit): number {
     if (unit === undefined) return 0;
     const { usage } = unit;
     if (usage === undefined) return 0;
-    return store.selectedReportOptionValues.reduce((acc, option) => {
+    return filtersStore.selectedReportOptions.reduce((acc, option) => {
         // always skip course option as it can't be assigned within a unit
         if (option === ReportOptionValues.COURSE) return acc;
         if (usage[option] === undefined) return acc;
@@ -59,7 +61,7 @@ function getCourseUsageCount($course: Course): number {
     if (course === undefined) return 0;
     const { usage } = course;
     if (usage === undefined) return 0;
-    return store.selectedReportOptionValues.reduce((acc, option) => {
+    return filtersStore.selectedReportOptions.reduce((acc, option) => {
         // always skip unit, learning activity and lesson plan options as they can't be assigned within a course
         if (
             option === ReportOptionValues.UNIT ||
@@ -109,7 +111,7 @@ const nodeUsageCount = window.Vue.computed(() => {
 const hasNoCourseUsages = window.Vue.computed(() => {
     if (props.node.usage === undefined) return true;
     // loop through every course, checking if any have a usage count of 0
-    return !store.courses.every((course) => {
+    return !reportStore.courses.every((course) => {
         return getCourseUsageCount(course) !== 0;
     });
 });
@@ -122,7 +124,7 @@ const hasNoCourseUsages = window.Vue.computed(() => {
 const hasNoUnitUsages = window.Vue.computed(() => {
     if (props.node.usage === undefined) return true;
     // loop through every unit in every course, checking if any have a usage count of 0
-    return !store.courses.every((course) => {
+    return !reportStore.courses.every((course) => {
         return course.units?.every((unit) => {
             return getUnitUsageCount(course, unit) !== 0;
         });
@@ -135,11 +137,11 @@ const hasNoUnitUsages = window.Vue.computed(() => {
  */
 const showNode = window.Vue.computed(() => {
     // always show the node when onlyShowGaps is false
-    if (!store.onlyShowGaps) {
+    if (!filtersStore.onlyShowGaps) {
         return true;
     }
     // otherwise, only show the node if it has no usages
-    return (hasNoCourseUsages.value || hasNoUnitUsages.value) && store.onlyShowGaps;
+    return (hasNoCourseUsages.value || hasNoUnitUsages.value) && filtersStore.onlyShowGaps;
 });
 </script>
 
@@ -150,7 +152,7 @@ const showNode = window.Vue.computed(() => {
             {{ nodeUsageCount }}
         </td>
         <!-- loop through each course/unit, retrieving the node usage or returning 0 for undefined usages -->
-        <template v-for="(course, index) in store.courses" :key="course.id">
+        <template v-for="(course, index) in reportStore.courses" :key="course.id">
             <td :class="`${index % 2 ? 'u-alt-bkg' : ''}  ${getCourseUsageCount(course) === 0 ? 'u-highlight' : ''}`">
                 {{ getCourseUsageCount(course) }}
             </td>

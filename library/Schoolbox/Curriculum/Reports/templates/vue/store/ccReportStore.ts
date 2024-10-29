@@ -1,5 +1,5 @@
 /**
- * To request a search based on the query and any filters set
+ * To generate a report of the curriculum coverage
  */
 
 import { defineStore } from "pinia";

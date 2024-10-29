@@ -7,7 +7,7 @@ import LoadingTable from "@schoolboxVue/components/loading/loading-table.vue";
 import CcReportHeader from "./cc-report-header.vue";
 import CcReportTable from "./cc-report-table.vue";
 
-import { useReportStore } from "./store/cpReportStore";
+import { useReportStore } from "./store/ccReportStore";
 
 const reportStore = useReportStore();
 </script>

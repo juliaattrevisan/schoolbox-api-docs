@@ -4,7 +4,7 @@
  */
 
 import CcReportTableNode from "./cc-report-table-node.vue";
-import { useReportStore } from "./store/cpReportStore";
+import { useReportStore } from "./store/ccReportStore";
 
 const reportStore = useReportStore();
 </script>
