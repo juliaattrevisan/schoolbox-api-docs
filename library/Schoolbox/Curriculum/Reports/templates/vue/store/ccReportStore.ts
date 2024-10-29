@@ -3,6 +3,8 @@
  */
 
 import { defineStore } from "pinia";
+import { useCourseSelectorStore } from "@schoolboxLibrary/Assessment/Course/templates/vue/courseSelector/store/courseSelectorStore";
+import { useSelectedNodesStore } from "@schoolboxCurriculum/vue/curriculumSelector/store/csSelectedNodesStore";
 import type { Course } from "@schoolboxLibrary/types/Course";
 import type { CurriculumCoveragePayload, CurriculumCoverageNode } from "../../js/types/curriculumCoverageTypes";
 
@@ -16,6 +18,8 @@ export type ReportError = {
 };
 
 export const useReportStore = defineStore("cpReport", () => {
+    const selectedCoursesStore = useCourseSelectorStore();
+    const selectedNodesStore = useSelectedNodesStore();
     const hasNotSearched = window.Vue.ref(true); // to prompt a search if the user hasn't searched yet
     // const url = window.Vue.ref("");
     const isLoading = window.Vue.ref(false);
@@ -53,7 +57,7 @@ export const useReportStore = defineStore("cpReport", () => {
             hasLoadError.value = false;
             controller = new AbortController();
             const response = await fetch(
-                `https://vagrant.dev.schoolbox.cloud/curriculum/reports/coverage?courseId[]=5&courseId[]=13&nodeId=1997,3105`,
+                `https://vagrant.dev.schoolbox.cloud/curriculum/reports/coverage?courseId=${selectedCoursesStore.selectedIds.join(",")}&nodeId=${selectedNodesStore.nodesIds.join(",")}`,
                 {
                     method: "GET",
                     signal: controller.signal,
