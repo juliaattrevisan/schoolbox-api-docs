@@ -29,7 +29,12 @@
                     </div>
                     <div class="small-12 columns">
                         <label class="required" for="ReportZone">ZIP File</label>
-                        <p class="meta">The ZIP file which contains the files to upload to the created records.</p>
+                        <p class="meta">
+                            The ZIP file which contains the files to upload to the created records.
+
+                            Each file within this ZIP which may be attributed to a student will be attached to their
+                            {{ locale.pastoral }} record, as a general-level attachment.
+                        </p>
                         {% include 'sub/attachzone.twig' with {attachzone: reportAttachzone} %}
                     </div>
                     <div class="small-12 columns">
@@ -72,6 +77,16 @@
                         <input id="tagNames" type="hidden" name="tagNames">
                     </div>
                 </fieldset>
+
+                <fieldset>
+                    <div class="small-12 columns">
+                        <label for="body_public">General content</label>
+                        <p class="meta">
+                            Student detail tokens can be viewed when you press [. Tokens will be substituted with the students details on creation.
+                        </p>
+                        <textarea id="body_public" name="body_public"></textarea>
+                    </div>
+                </fieldset>
             </section>
         </form>
     </div>
@@ -79,9 +94,18 @@
 
 <script type="text/javascript" src="{{ CDN_PREFIX }}/js/vendors/selectize/selectize.min.js?v={{ config.site_version }}"></script>
 <script type="text/javascript" src="{{ CDN_PREFIX }}/js/vendors/selectize/jquery.selectize-selector.js?v={{ config.site_version }}"></script>
+<script type="text/javascript" src="{{ CDN_PREFIX }}/js/bundle/editor.js?v={{ config.site_version }}"></script>
 <script type="text/javascript" src="{{ CDN_PREFIX }}/js/vendors/chained/jquery.chained.min.js?v={{ config.site_version }}"></script>
 <script type="text/javascript">
     $(function () {
+        document.dispatchEvent(new CustomEvent("EDITOR__CREATE", {
+            detail: {
+                maxCharCount: window.sbProps.MAX_BYTES_MYSQL_MEDIUMTEXT,
+                targetElements: ['#body_public'],
+                hasTokens: true,
+            }
+        }));
+
         $('#tags').selectizeSelector({
             multiple: true,
             selectize: {
