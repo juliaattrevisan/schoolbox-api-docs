@@ -590,8 +590,6 @@ class Controller extends BaseController
         $externalUser = (new \Schoolbox\Profile\Field\Factory($this->fieldMapper, $this->userMapper, $this->externalUser))
             ->produce($staff, $this->getUser());
 
-        $detailsVisible = new ValidDetailsVisible($this->externalUser, $this->getConfigLoader());
-
         try {
             $customButtons = $this->profileButtonMapper->findButtonsForUser($staff, $this->getUser());
         } catch (MapperException $e) {
@@ -607,7 +605,7 @@ class Controller extends BaseController
                 'eportfolioAuth' => $this->eportfolioAuthenticator->canView(),
                 'customButtons'  => $customButtons,
                 'now'            => Alaress_Date_Format::now(),
-                'showDetails'    => $detailsVisible->isSatisfiedBy($staff, $this->getUser()),
+                'showDetails'    => (new ValidDetailsVisible($this->externalUser, $this->getConfigLoader()))->isSatisfiedBy($staff, $this->getUser()),
             ],
             'User'
         );
@@ -636,15 +634,11 @@ class Controller extends BaseController
         $externalUser = (new \Schoolbox\Profile\Field\Factory($this->fieldMapper, $this->userMapper, $this->externalUser))
             ->produce($parent, $this->getUser());
 
-        $students = $parent->getChildren();
-
         try {
             $customButtons = ProfileButtonMapper::getInstance()->findButtonsForUser($parent, $this->getUser());
         } catch (MapperException $e) {
             $customButtons = [];
         }
-
-        $showDetails = (new ValidDetailsVisible($this->externalUser, $this->getConfigLoader()))->isSatisfiedBy($parent, $this->getUser());
 
         // As with students in SA-16859:
         // set the shared campuses between the subject of the profile and the
@@ -655,11 +649,11 @@ class Controller extends BaseController
                 'session'        => $_SESSION,
                 'user'           => $parent,
                 'externalUser'   => $externalUser,
-                'students'       => $students,
+                'students'       => $parent->getChildren(),
                 'customButtons'  => $customButtons,
                 'eportfolioAuth' => $this->eportfolioAuthenticator->canView(),
                 'now'            => Alaress_Date_Format::now(),
-                'showDetails'    => $showDetails,
+                'showDetails'    => (new ValidDetailsVisible($this->externalUser, $this->getConfigLoader()))->isSatisfiedBy($parent, $this->getUser()),
                 'sharedCampuses' => $this->getUser()->getCampusCollection()->intersect($parent->getCampusCollection()),
             ]
         );
