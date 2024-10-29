@@ -26,7 +26,7 @@ INSERT INTO `profile_field` VALUES
 (23,'student','residentialHouse','Residential House',22,1,NULL,NULL,NULL,0),
 (24,'student','campusCollection','Campus',23,1,NULL,NULL,NULL,0),
 (25,'student','StudentForm','Class',24,1,NULL,NULL,NULL,0),
-(26,'student','boarderType','Student Type',25,1,NULL,NULL,NULL,0),
+(26,'student','StudentBoarder','Student Type',25,1,NULL,NULL,NULL,0),
 (27,'student','StudentGovernmentStudentNumber','Govt. Student Number',26,1,NULL,NULL,NULL,0),
 (28,'student','StudentStudiesCode','Studies Code',27,1,'studies_code',NULL,NULL,0),
 (29,'student','pastoralCounts','Pastoral Flags',28,1,NULL,NULL,NULL,0),
