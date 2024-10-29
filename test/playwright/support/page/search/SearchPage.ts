@@ -35,7 +35,7 @@ export default class SearchPage {
 
     static readonly CREATOR_SEARCH_SELECT_INPUT = "ss-query-input";
 
-    static readonly CREATOR_SEARCH_SELECT_RESULT = "search-select-result"; // Append "-id"
+    static readonly CREATOR_SEARCH_SELECT_RESULT = "ss-results-item-container"; // Append "-id"
 
     constructor(page: Page) {
         this.page = page;

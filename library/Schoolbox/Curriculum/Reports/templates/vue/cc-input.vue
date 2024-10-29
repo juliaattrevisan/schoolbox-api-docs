@@ -4,10 +4,10 @@
  */
 import CourseSelector from "@schoolboxLibrary/Assessment/Course/templates/vue/courseSelector/course-selector.vue";
 import { useCourseSelectorStore } from "@schoolboxLibrary/Assessment/Course/templates/vue/courseSelector/store/courseSelectorStore";
-import CurriculumSelector from "@schoolboxCurriculum/vue/curriculumSelector/curriculum-selector.vue";
 import { useSelectedNodesStore } from "@schoolboxCurriculum/vue/curriculumSelector/store/csSelectedNodesStore";
 import type { Course } from "@schoolboxLibrary/types/Course";
 import { useStore } from "./store/curriculumCoverageStore";
+import CcInputCurriculum from "./cc-input-curriculum.vue";
 
 interface Props {
     coursesEndpoint: string; // The courses api endpoint.
@@ -61,16 +61,11 @@ function onGenerateReport(): void {
             />
         </div>
         <div>
-            <label for="curriculum">Select Curriculum</label>
-            <curriculum-selector
-                :is-read-only="false"
-                :data-endpoint="props.curriculumEndpoint"
-                :is-select-all="true"
-                :include-without-code="true"
-                :can-select-children="false"
-                input-id="curriculum"
+            <cc-input-curriculum
+                :endpoint="props.curriculumEndpoint"
+                :is-required="true"
+                :has-error="isCurriculumInvalid"
             />
-            <label v-if="isCurriculumInvalid" class="error" for="curriculum">This field is required.</label>
         </div>
         <button>{{ buttonText }}</button>
     </form>

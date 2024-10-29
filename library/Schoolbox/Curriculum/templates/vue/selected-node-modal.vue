@@ -12,7 +12,7 @@ interface Props {
     /**
      * the selected curriculum node
      */
-    node: Node;
+    node: Pick<Node, "id">;
 }
 
 const props = defineProps<Props>();

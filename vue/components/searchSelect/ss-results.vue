@@ -117,7 +117,8 @@ function onHover(index: number): void {
         <div v-else-if="props.hasNoResults && props.selected.length === 0" class="results__status">
             No results found for your current search.
         </div>
-        <template v-else>
+        <fieldset v-else class="results__fieldset">
+            <legend class="t-visually-hidden">Search results</legend>
             <ss-results-select-all
                 v-if="showSelectAll"
                 :results="props.results"
@@ -142,7 +143,7 @@ function onHover(index: number): void {
                 @remove="onRemove"
                 @hover="onHover"
             />
-        </template>
+        </fieldset>
     </div>
 </template>
 
@@ -161,6 +162,11 @@ function onHover(index: number): void {
         font-size: 0.825rem;
         font-style: italic;
         padding: var(--spacing-s);
+    }
+    &__fieldset {
+        border: none;
+        margin: 0;
+        padding: 0;
     }
 }
 </style>
