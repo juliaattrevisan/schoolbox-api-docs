@@ -22,7 +22,7 @@ INSERT INTO `profile_field` VALUES
 (19,'student','coordTeacher','Year Level Coordinator',18,1,'yearLevelCoordinator',NULL,NULL,0),
 (20,'student','StudentHouseDescription','House',19,1,NULL,NULL,NULL,0),
 (21,'student','StudentTutorDescription','Tutor Group',20,1,'tutorGroup',NULL,NULL,0),
-(22,'student','hohTeacher','Housemaster',21,1,'headOfHouse',NULL,NULL,0),
+(22,'student','hohTeacher','Head of House',21,1,'headOfHouse',NULL,NULL,0),
 (23,'student','residentialHouse','Residential House',22,1,NULL,NULL,NULL,0),
 (24,'student','campusCollection','Campus',23,1,NULL,NULL,NULL,0),
 (25,'student','StudentForm','Class',24,1,NULL,NULL,NULL,0),
