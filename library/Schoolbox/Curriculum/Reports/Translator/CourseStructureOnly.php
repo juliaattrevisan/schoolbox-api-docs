@@ -46,8 +46,8 @@ class CourseStructureOnly
             'units' => array_map(
                 fn($unit) =>
                 [
-                'id' => $unit->getId(),
-                'name' => $unit->getTitle(),
+                    'id' => $unit->getFolder()->getId(),
+                    'name' => $unit->getTitle(),
                 ],
                 $this->courseUnitSpec[$model->getId()]->getAll()
             ),
