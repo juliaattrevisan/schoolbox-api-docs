@@ -1,5 +1,6 @@
 /**
- * Store for the curriculum coverage filters, so we can refine down what's shown in the report
+ * Store for the curriculum coverage filters,
+ * so we can refine down what's shown in the report
  */
 
 import { defineStore } from "pinia";

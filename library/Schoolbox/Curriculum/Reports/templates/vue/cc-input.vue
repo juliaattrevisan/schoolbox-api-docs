@@ -8,6 +8,7 @@ import { useSelectedNodesStore } from "@schoolboxCurriculum/vue/curriculumSelect
 import type { Course } from "@schoolboxLibrary/types/Course";
 import { useStore } from "./store/curriculumCoverageStore";
 import CcInputCurriculum from "./cc-input-curriculum.vue";
+import { useReportStore } from "./store/ccReportStore";
 
 interface Props {
     coursesEndpoint: string; // The courses api endpoint.
@@ -17,6 +18,7 @@ interface Props {
 const props = defineProps<Props>();
 
 const store = useStore();
+const reportStore = useReportStore();
 const selectedCoursesStore = useCourseSelectorStore();
 const selectedNodesStore = useSelectedNodesStore();
 const isCoursesInvalid = window.Vue.ref(false);
@@ -27,14 +29,14 @@ const isCurriculumInvalid = window.Vue.ref(false);
  * @returns - The text to display on the button
  */
 const buttonText = window.Vue.computed(() => {
-    return store.isLoading ? "Generating report..." : "Generate report";
+    return reportStore.isLoading ? "Generating report..." : "Generate report";
 });
 
 /**
  * Submit the form to generate the report
  */
 function onGenerateReport(): void {
-    if (store.isLoading) {
+    if (reportStore.isLoading) {
         return;
     }
     isCoursesInvalid.value = false;

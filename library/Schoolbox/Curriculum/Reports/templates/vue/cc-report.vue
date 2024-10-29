@@ -19,7 +19,7 @@ const reportStore = useReportStore();
             <cc-report-table />
         </div>
     </div>
-    <loading-table v-else-if="reportStore.isSearching" />
+    <loading-table v-else-if="reportStore.isLoading" />
     <div v-else class="empty-state-flex-centered">
         <i class="icon-report"></i>
         To generate a report, first select at least one Course and Curriculum.
