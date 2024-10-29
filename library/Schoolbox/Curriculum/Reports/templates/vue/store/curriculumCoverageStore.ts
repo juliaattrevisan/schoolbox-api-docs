@@ -3,13 +3,10 @@
  */
 
 import { defineStore } from "pinia";
-import { useCourseSelectorStore } from "@schoolboxLibrary/Assessment/Course/templates/vue/courseSelector/store/courseSelectorStore";
-import { useSelectedNodesStore } from "@schoolboxCurriculum/vue/curriculumSelector/store/csSelectedNodesStore";
+import { useInputStore } from "./ccInputStore";
 
 export const useStore = defineStore("curriculumCoverage", () => {
     let endpoint = ""; // the endpoint to use for the report
-    const selectedCoursesStore = useCourseSelectorStore();
-    const selectedNodesStore = useSelectedNodesStore();
 
     /**
      * store any passed through properties
@@ -25,8 +22,8 @@ export const useStore = defineStore("curriculumCoverage", () => {
      */
     function getQueryParams(): URLSearchParams {
         const newQueryParams = new URLSearchParams();
-        newQueryParams.append("courseId", selectedCoursesStore.selectedIds.join(","));
-        newQueryParams.append("nodeId", (selectedNodesStore.nodesIds as number[]).join(","));
+        newQueryParams.append("courseId", useInputStore().selectedCoursesStore.selectedIds.join(","));
+        newQueryParams.append("nodeId", (useInputStore().selectedNodesStore.nodesIds as number[]).join(","));
         return newQueryParams;
     }
 

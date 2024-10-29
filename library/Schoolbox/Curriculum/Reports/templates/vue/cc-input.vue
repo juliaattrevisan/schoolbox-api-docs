@@ -3,10 +3,9 @@
  * To choose course(s) and curriculum nodes to generate a report on
  */
 import CourseSelector from "@schoolboxLibrary/Assessment/Course/templates/vue/courseSelector/course-selector.vue";
-import { useCourseSelectorStore } from "@schoolboxLibrary/Assessment/Course/templates/vue/courseSelector/store/courseSelectorStore";
-import { useSelectedNodesStore } from "@schoolboxCurriculum/vue/curriculumSelector/store/csSelectedNodesStore";
 import type { Course } from "@schoolboxLibrary/types/Course";
 import CcInputCurriculum from "./cc-input-curriculum.vue";
+import { useInputStore } from "./store/ccInputStore";
 import { useReportStore } from "./store/ccReportStore";
 
 interface Props {
@@ -16,8 +15,7 @@ interface Props {
 }
 const props = defineProps<Props>();
 
-const selectedCoursesStore = useCourseSelectorStore();
-const selectedNodesStore = useSelectedNodesStore();
+const inputStore = useInputStore();
 const reportStore = useReportStore();
 const isCoursesInvalid = window.Vue.ref(false);
 const isCurriculumInvalid = window.Vue.ref(false);
@@ -39,10 +37,10 @@ function onGenerateReport(): void {
     }
     isCoursesInvalid.value = false;
     isCurriculumInvalid.value = false;
-    if (selectedCoursesStore.selected.length === 0) {
+    if (inputStore.selectedCoursesStore.selected.length === 0) {
         isCoursesInvalid.value = true;
     }
-    if (selectedNodesStore.nodes.length === 0) {
+    if (inputStore.selectedNodesStore.nodes.length === 0) {
         isCurriculumInvalid.value = true;
         return;
     }
