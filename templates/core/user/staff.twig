@@ -89,7 +89,7 @@
                                         <dt class="small-4 medium-3 columns">{{ macro.fieldName(selectedField) }}</dt>
                                         <dd class="small-8 medium-9 columns">
                                             {% if selectedField.field in ['email'] %}
-                                                {{ macro.email(session, selectedField.value) }}
+                                                {{ macro.email(session, selectedField.value, selectedField.value) }}
                                             {% else %}
                                                 {# A generic tuple (key, value) pair #}
                                                 {{ selectedField.value }}

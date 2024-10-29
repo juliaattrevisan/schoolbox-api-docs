@@ -90,7 +90,7 @@
                                                 <a href="/search/user/{{ selectedField.value.id }}">{{ selectedField.value.value }}</a>
                                             {% elseif selectedField.field in ['email', 'SpouseEmail'] %}
                                                 {# Renders a mailto: hyperlink #}
-                                                {{ macro.email(session, selectedField.value) }}
+                                                {{ macro.email(session, selectedField.value, selectedField.value) }}
                                             {% else %}
                                                 {# A generic tuple (key, value) pair #}
                                                 {{ selectedField.value }}

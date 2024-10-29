@@ -280,10 +280,10 @@
                                                     <dd class="small-8 medium-9 columns">
                                                         {% if selectedField.field in ['formTeacher', 'tutorTeacher', 'hohTeacher', 'coordTeacher', 'studentCoach'] %}
                                                             {# These fields are Schoolbox\User instances and need special treatment #}
-                                                            {{ macro.internalUser(session, selectedField.value.email, selectedField.value.formatName) }}
+                                                            {{ macro.email(session, selectedField.value.email, selectedField.value.formatName) }}
                                                         {% elseif selectedField.field in ['email'] %}
                                                             {# Renders a mailto: hyperlink #}
-                                                            {{ macro.email(session, selectedField.value) }}
+                                                            {{ macro.email(session, selectedField.value, selectedField.value) }}
                                                         {% elseif selectedField.field in ['StudentBirthDate'] %}
                                                             {# Renders with date formatting #}
                                                             {{ selectedField.value|date(dateFormats.shortDateOnlyFormat) }}
