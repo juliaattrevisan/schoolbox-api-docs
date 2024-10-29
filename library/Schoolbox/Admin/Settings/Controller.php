@@ -44,6 +44,8 @@ class Controller extends ConfigController
         }
 
         $settingsCategory = $this->getSettingsCategoryFromTypeLabel($typeLabel);
+        // NOTE: $typeLabel is not passed to routeGenerator->generate() to avoid regex match error
+        //       E.g. "Parameter value for [typeLabel] did not match the regex `LMS%20Policy`"
         $routeUrlTemplate = $this->routeGenerator->generate("settings.postSettings$settingsCategory");
         $routeUrl = str_replace('{typeLabel}', $typeLabel, $routeUrlTemplate);
         $configContext = $this->buildConfigContext(
@@ -246,24 +248,48 @@ class Controller extends ConfigController
         $this->response = $this->redirectAfterPost($routeUrlDecoded);
     }
 
-    // Functions for routes accessible by pastoral moderators --------------------------------------------------------//
+    // Functions for routes accessible by Pastoral Moderators --------------------------------------------------------//
 
     /**
+     * @param string $typeLabel
      * @throws RouteNotFound
      * @throws Error
      */
-    public function getSettingsPastoral(): void
+    public function getSettingsPastoral(string $typeLabel): void
     {
-        $this->getSettings('Pastoral Care');
+        $this->getSettings($typeLabel);
     }
 
     /**
+     * @param string $typeLabel
      * @throws RouteNotFound
      * @throws \Schoolbox\Mapper\Exception
      */
-    public function postSettingsPastoral(): void
+    public function postSettingsPastoral(string $typeLabel): void
     {
-        $this->postSettings('Pastoral Care');
+        $this->postSettings($typeLabel);
+    }
+
+    // Functions for routes accessible by LMS Moderators -------------------------------------------------------------//
+
+    /**
+     * @param string $typeLabel
+     * @throws RouteNotFound
+     * @throws Error
+     */
+    public function getSettingsLms(string $typeLabel): void
+    {
+        $this->getSettings($typeLabel);
+    }
+
+    /**
+     * @param string $typeLabel
+     * @throws RouteNotFound
+     * @throws \Schoolbox\Mapper\Exception
+     */
+    public function postSettingsLms(string $typeLabel): void
+    {
+        $this->postSettings($typeLabel);
     }
 
     // Private functions ---------------------------------------------------------------------------------------------//
@@ -293,6 +319,8 @@ class Controller extends ConfigController
     {
         return match ($typeLabel) {
             'Pastoral Care' => 'Pastoral',
+            'Document Management',
+            'LMS Policy' => 'Lms',
             default => '',
         };
     }
