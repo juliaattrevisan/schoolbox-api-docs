@@ -26,6 +26,7 @@ use Schoolbox\Learning\Course\DataModel\Implementation\Mapper as ImplementationM
 use Schoolbox\Learning\DueWork\StateMapper;
 use Schoolbox\Mapper\Exception\NotFound;
 use Schoolbox\Permission\Access\Access;
+use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\UserBulkMapper;
@@ -36,7 +37,6 @@ class Module extends BaseModule
 {
     protected $basename = 'adminSummativeReport';
 
-
     /**
      * Hook method for setting up routes via self::register()
      *
@@ -46,20 +46,13 @@ class Module extends BaseModule
     {
         /* Any staff can see the form
          */
-        $getPerms = $postPerms = new Rule\All(
+        $perms = new Rule\All(
             new Rule\IsLoggedIn(),
             new Rule\Any(
-                new Rule\IsSuperuser()
+                new Rule\IsSuperuser(),
+                new Rule\HasServicePermission(UserAccess::SERVICE_LMS, UserAccess::ACCESS_FULL)
             )
         );
-
-        /* Presumably this will one day include a special subset of stuff
-         * whose duty will be to manufacture these reports. This staff
-         * member(s) might not be superusers, nor teachers; their ability
-         * to be here wil be based on a Service Permission that might
-         * not currently exist
-         */
-        //new Rule\HasServicePermission(UserAccess::SERVICE_NEWS, UserAccess::ACCESS_FULL)
 
         $preloadReport = function ($params) {
             return $this->preloadReport($params);
@@ -69,23 +62,22 @@ class Module extends BaseModule
             return $this->preloadReportWithStudent($params);
         };
 
-        $this->register('GET', '', 'getList', $getPerms);
-        $this->register('GET', '/create', 'getCreate', $getPerms);
-        $this->register('POST', '/create', 'postCreate', $getPerms);
-        $this->register('GET', '/worktypes', 'getWorkTypes', $getPerms);
-        $this->register('GET', '/terms', 'getTerms', $getPerms);
-        $this->register('GET', '/yearlevels', 'getYearLevels', $getPerms);
-        $this->register('GET', '/campuses', 'getCampuses', $getPerms);
-        $this->register('GET', '/{reportId}/update', 'getUpdate', $getPerms, $preloadReport);
-        $this->register('POST', '/{reportId}/update', 'postUpdate', $postPerms, $preloadReport);
-        $this->register('GET', '/{reportId}/duplicate', 'getDuplicate', $getPerms, $preloadReport);
-        $this->register('POST', '/{reportId}/delete', 'postDelete', $postPerms, $preloadReport);
-        $this->register('GET', '/{reportId}/generate', 'getGenerate', $postPerms, $preloadReport);
-        $this->register('GET', '/{reportId}/status/{key}', 'getStatus', $getPerms);
-        $this->register('GET', '/{reportId}/preview', 'getPreview', $getPerms, $preloadReport);
-        $this->register('GET', '/{reportId}/studentReport/{studentId}', 'getStudentReport', $getPerms, $preloadReportWithStudent);
+        $this->register('GET', '', 'getList', $perms);
+        $this->register('GET', '/create', 'getCreate', $perms);
+        $this->register('POST', '/create', 'postCreate', $perms);
+        $this->register('GET', '/worktypes', 'getWorkTypes', $perms);
+        $this->register('GET', '/terms', 'getTerms', $perms);
+        $this->register('GET', '/yearlevels', 'getYearLevels', $perms);
+        $this->register('GET', '/campuses', 'getCampuses', $perms);
+        $this->register('GET', '/{reportId}/update', 'getUpdate', $perms, $preloadReport);
+        $this->register('POST', '/{reportId}/update', 'postUpdate', $perms, $preloadReport);
+        $this->register('GET', '/{reportId}/duplicate', 'getDuplicate', $perms, $preloadReport);
+        $this->register('POST', '/{reportId}/delete', 'postDelete', $perms, $preloadReport);
+        $this->register('GET', '/{reportId}/generate', 'getGenerate', $perms, $preloadReport);
+        $this->register('GET', '/{reportId}/status/{key}', 'getStatus', $perms);
+        $this->register('GET', '/{reportId}/preview', 'getPreview', $perms, $preloadReport);
+        $this->register('GET', '/{reportId}/studentReport/{studentId}', 'getStudentReport', $perms, $preloadReportWithStudent);
     }
-
 
     /**
      * Preload a summative report
@@ -110,7 +102,6 @@ class Module extends BaseModule
             'report' => $report
         ];
     }
-
 
     /**
      * Preload a summative report with a student
@@ -147,7 +138,6 @@ class Module extends BaseModule
             'student' => $student
         ];
     }
-
 
     /**
      * @inheritdoc
