@@ -1,1 +1,13 @@
-<h1>Pastoral Bulk Upload</h1>
+{% import 'sub/breadcrumbs.twig' as bread %}
+{{ bread.crumbs(
+    [ locale.pastoralCare.proper,    routeLookup('pastoral.getIndex') ],
+    [ 'Bulk Upload' ]
+) }}
+
+<div class="actions-small-1 row">
+    <div class="list-item">
+        <div class="small-12 column">
+            <h1>{{ locale.pastoral.proper }} Bulk Upload</h1>
+        </div>
+    </div>
+</div>
