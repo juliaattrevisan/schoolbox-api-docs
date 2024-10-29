@@ -115,47 +115,8 @@
     </div>
 </div>
 
-<script type="text/javascript" src="{{ CDN_PREFIX }}/js/vendors/selectize/selectize.min.js?v={{ config.site_version }}"></script>
-<script type="text/javascript" src="{{ CDN_PREFIX }}/js/vendors/selectize/jquery.selectize-selector.js?v={{ config.site_version }}"></script>
-<script type="text/javascript" src="{{ CDN_PREFIX }}/js/bundle/editor.js?v={{ config.site_version }}"></script>
-<script type="text/javascript" src="{{ CDN_PREFIX }}/js/vendors/chained/jquery.chained.min.js?v={{ config.site_version }}"></script>
-<script type="text/javascript">
-    $(function () {
-        document.dispatchEvent(new CustomEvent("EDITOR__CREATE", {
-            detail: {
-                maxCharCount: window.sbProps.MAX_BYTES_MYSQL_MEDIUMTEXT,
-                targetElements: ['#body_public'],
-                hasTokens: true,
-            }
-        }));
-
-        $('#tags').selectizeSelector({
-            multiple: true,
-            selectize: {
-                create: function (input) {
-                    $('#tagNames').val($('#tagNames').val()+','+input);
-                    return {
-                        id: 'new-' + input,
-                        name: input
-                    }
-                },
-                preload: true,
-                load: function(query, callback) {
-                    $.ajax({
-                        url: '{{ routeLookup('pastoral.searchTags') }}',
-                        type: 'GET',
-                        dataType: 'json',
-                        data: { query: query }
-                    }).done(function(result) {
-                        callback(result)
-                    }).fail(function() {
-                        callback()
-                    })
-                }
-            },
-            value: []
-        });
-
-        $('#subtypeId').chained('#typeId');
-    });
-</script>
+{% include "@pastoral/modify_scripts.twig" with {
+    canCreate: true,
+    students: '[]',
+    audiences: audiences,
+} %}

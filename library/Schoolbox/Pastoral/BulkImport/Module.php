@@ -74,6 +74,7 @@ class Module extends BaseModule
             $this->getMapperFactory()->get(Pastoral\Access\Mapper::class),
             $this->getMapperFactory()->get(Pastoral\Group\Mapper::class),
             $this->getMapperFactory()->get(UserMapper::class),
+            $this->getMapperFactory()->get(Pastoral\Audience\Mapper::class),
         );
     }
 }

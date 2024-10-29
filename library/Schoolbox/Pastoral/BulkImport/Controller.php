@@ -26,14 +26,15 @@ class Controller extends Base
     /**
      * Constructor
      *
-     * @param RosettaStone            $translator            Used for translating values used in the page title.
-     * @param Pastoral\Mapper         $pastoralMapper        Used for creating pastoral records.
-     * @param Pastoral\Type\Mapper    $pastoralTypeMapper    Used for loading and validating pastoral types.
-     * @param Pastoral\SubType\Mapper $pastoralSubTypeMapper Used for loading and validating pastoral subtypes.
-     * @param RoleMapper              $roleMapper            Used for loading roles to show in record visibility.
-     * @param Pastoral\Access\Mapper  $pastoralAccessMapper  Used for determining roles which may access records.
-     * @param Pastoral\Group\Mapper   $pastoralGroupMapper   Used for loading pastoral groups to select visibility.
-     * @param UserMapper              $userMapper            Used for loading pastoral moderators.
+     * @param RosettaStone             $translator             Used for translating values used in the page title.
+     * @param Pastoral\Mapper          $pastoralMapper         Used for creating pastoral records.
+     * @param Pastoral\Type\Mapper     $pastoralTypeMapper     Used for loading and validating pastoral types.
+     * @param Pastoral\SubType\Mapper  $pastoralSubTypeMapper  Used for loading and validating pastoral subtypes.
+     * @param RoleMapper               $roleMapper             Used for loading roles to show in record visibility.
+     * @param Pastoral\Access\Mapper   $pastoralAccessMapper   Used for determining roles which may access records.
+     * @param Pastoral\Group\Mapper    $pastoralGroupMapper    Used for loading pastoral groups to select visibility.
+     * @param UserMapper               $userMapper             Used for loading pastoral moderators.
+     * @param Pastoral\Audience\Mapper $pastoralAudienceMapper Used for loading audiences for types and subtypes.
      */
     public function __construct(
         private RosettaStone $translator,
@@ -44,6 +45,7 @@ class Controller extends Base
         private Pastoral\Access\Mapper $pastoralAccessMapper,
         private Pastoral\Group\Mapper $pastoralGroupMapper,
         private UserMapper $userMapper,
+        private Pastoral\Audience\Mapper $pastoralAudienceMapper,
     ) {
     }
 
@@ -58,6 +60,7 @@ class Controller extends Base
     public function getForm(): void
     {
         // Requirements for loading pastoral visibility inputs
+        // TODO extract elsewhere, and use in pastoral modify form as well
         $allowIndividual = $this->getConfigLoader()->get('pastoral_individual_access');
         $allowParents    = $this->getConfigLoader()->get(ConfigMapper::NAME_PASTORAL_PARENT_ACCESS_ENABLED);
         $allowStudents   = $this->getConfigLoader()->get(ConfigMapper::NAME_PASTORAL_STUDENT_ACCESS_ENABLED);
@@ -78,11 +81,56 @@ class Controller extends Base
             }
         }
 
+        // Requirements for updating selections on change
+        // TODO extract elsewhere, and use in pastoral modify form as well
+        $types            = $this->pastoralTypeMapper->findAll();
+        $subtypes         = $this->pastoralSubTypeMapper->findAll();
+        $audiences        = $this->pastoralAudienceMapper->findAll()->filter($this->pastoralAudienceMapper->getPermissionCallback());
+        $typeAudiences    = [];
+        $subtypeAudiences = [];
+        foreach ($audiences as $audience) {
+            if ($audience->getSubtype()) {
+                $subtypeAudiences[$audience->getSubtype()->getId()][] = $audience;
+            } else {
+                $typeAudiences[$audience->getType()->getId()][] = $audience;
+            }
+        }
+
+        $typesIndex       = [];
+        $typesIndexPrivate       = [];
+        $audienceDefaults = [];
+        foreach ($types as $type) {
+            $typesIndex[$type->getId()] = $type->getTemplate();
+            $typesIndexPrivate[$type->getId()] = $type->getTemplatePrivate();
+            if (key_exists($type->getId(), $typeAudiences) || $type->getVisibilityLocked()) {
+                $audienceDefaults[] = [
+                    'typeId'    => $type->getId(),
+                    'subtypeId' => 0,
+                    'audiences' => $typeAudiences[$type->getId()] ?? [],
+                ];
+            }
+        }
+
+        $subtypesIndex = [];
+        $subtypesIndexPrivate = [];
+
+        foreach ($subtypes as $subtype) {
+            $subtypesIndex[$subtype->getId()] = $subtype->getTemplate();
+            $subtypesIndexPrivate[$subtype->getId()] = $subtype->getTemplatePrivate();
+            if (key_exists($subtype->getId(), $subtypeAudiences) || $subtype->getVisibilityLocked()) {
+                $audienceDefaults[] = [
+                    'typeId'    => $subtype->getPastoralType()->getId(),
+                    'subtypeId' => $subtype->getId(),
+                    'audiences' => $subtypeAudiences[$subtype->getId()] ?? [],
+                ];
+            }
+        }
+
         $this->response = $this->responseFromTemplate(
             '@pastoralBulkImport/form.twig',
             [
-                'types'            => $this->pastoralTypeMapper->findAll(),
-                'subTypes'         => $this->pastoralSubTypeMapper->findAll(),
+                'types'            => $types,
+                'subTypes'         => $subtypes,
                 'reportAttachzone' => (new Zone('report'))
                     ->setThumbnailSize(64)
                     ->setModalTitle('Select report ZIP')
@@ -105,6 +153,13 @@ class Controller extends Base
                 'roleUserCounts'   => $rolesWithUsers,
                 'moderatorIds'     => $this->userMapper->findByAccess(UserAccess::SERVICE_PASTORAL, UserAccess::ACCESS_READ)
                                                        ->getPropertyValues('id'),
+
+                // Requirements for displaying scripts
+                'audiences'        => $audienceDefaults,
+                'typesIndexPrivate' => $typesIndexPrivate,
+                'typesIndex'        => $typesIndex,
+                'subtypesIndexPrivate'  => $subtypesIndexPrivate,
+                'subtypesIndex'     => $subtypesIndex,
             ],
             $this->translator->translate('pastoral', capital: true) . ' Bulk Import',
         );
