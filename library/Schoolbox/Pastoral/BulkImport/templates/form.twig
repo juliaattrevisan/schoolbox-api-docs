@@ -24,10 +24,23 @@
                 <fieldset class="content">
                     <div class="small-12 columns">
                         <label class="required" for="heading">Title</label>
+                        <p class="meta">Each {{ locale.pastoral }} record created will have this title.</p>
                         <input type="text" name="heading" id="heading" size="35" maxlength="100" required />
                     </div>
                     <div class="small-12 columns">
+                        <label class="required" for="ReportZone">ZIP File</label>
+                        <p class="meta">The ZIP file which contains the files to upload to the created records.</p>
                         {% include 'sub/attachzone.twig' with {attachzone: reportAttachzone} %}
+                    </div>
+                    <div class="small-12 columns">
+                        <label class="required" for="template">File path template</label>
+                        <p class="meta">
+                            The template which was used to generate paths for files within the ZIP file above.
+
+                            [externalId] must be part of this template: that value is used to identify the student to
+                            which each file should be attributed.
+                        </p>
+                        <input type="text" name="template" id="template" size="35" maxlength="100" required />
                     </div>
                 </fieldset>
 
@@ -53,11 +66,8 @@
                         </select>
                     </div>
                     <div class="small-12 columns">
-                        <label for="tags">
-                            Tags
-                            <span class="hint has-tip tip-top" data-tooltip
-                                  title="Tags can be added to support {{ locale.pastoral }} reports and filtering.">?</span>
-                        </label>
+                        <label for="tags">Tags</label>
+                        <p class="meta">Tags can be added to support {{ locale.pastoral }} reports and filtering.</p>
                         <input id="tags" name="tags">
                         <input id="tagNames" type="hidden" name="tagNames">
                     </div>
