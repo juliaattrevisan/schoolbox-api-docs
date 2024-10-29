@@ -14,10 +14,9 @@ use Alaress\Module\Module as BaseModule;
 use Alaress\Twig\Loader\IChainLoader;
 use Alaress\Web\Controller\Base;
 use Schoolbox\Config\ConfigMapper;
-use Schoolbox\Pastoral\Mapper;
-use Schoolbox\Pastoral\SubType;
-use Schoolbox\Pastoral\Type;
+use Schoolbox\Pastoral;
 use Schoolbox\Permission\Access\UserAccess;
+use Schoolbox\RoleMapper;
 
 /**
  * Module for bulk importation of pastoral records.
@@ -55,9 +54,12 @@ class Module extends BaseModule
     {
         return new Controller(
             $this->injector->get('l10n'),
-            $this->getMapperFactory()->get(Mapper::class),
-            $this->getMapperFactory()->get(Type\Mapper::class),
-            $this->getMapperFactory()->get(SubType\Mapper::class),
+            $this->getMapperFactory()->get(Pastoral\Mapper::class),
+            $this->getMapperFactory()->get(Pastoral\Type\Mapper::class),
+            $this->getMapperFactory()->get(Pastoral\SubType\Mapper::class),
+            $this->getMapperFactory()->get(RoleMapper::class),
+            $this->getMapperFactory()->get(Pastoral\Access\Mapper::class),
+            $this->getMapperFactory()->get(Pastoral\Group\Mapper::class),
         );
     }
 }
