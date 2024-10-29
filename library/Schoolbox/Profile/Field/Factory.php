@@ -372,6 +372,33 @@ class Factory
      */
     private function generateStaffReferenceFields(\Schoolbox\User $viewee): array
     {
-        return [];
+        $externalUser = [];
+
+        if ($viewee->getExternalId()) {
+            $externalUser = $this->externalUser->getParent($viewee->getExternalId());
+        }
+
+        /* For convenience, collate the campus names here
+         */
+        $campusNames = '';
+
+        if ($viewee->getCampusCollection()) {
+            $campusNames = implode(', ', $viewee->getCampusCollection()->indexBy('name')->keys());
+        }
+
+        /* Hybrid Theory
+         */
+        $referenceFields = [
+            'pronoun' => (string)$viewee->getPronoun(),
+            'email' => $viewee->getEmail(),
+            'externalId' => $viewee->getExternalId(),
+            'role' => $viewee->getRole()->getName(),
+            /* Favour schoolbox's data over the sis' data
+             */
+            'yearLevel' => $viewee->getYear()?->getName() ?? '',
+            'campusCollection' => $campusNames,
+        ];
+
+        return array_merge($externalUser, $referenceFields);
     }
 }

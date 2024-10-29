@@ -35,60 +35,112 @@
         <section class="no-pad">
             <div class="profile content">
                 <div class="row no-margin">
+                    {# Build a hash lookup of additional clauses and cross-reference them
+                     # This list is your last opportunity to show/hide a field based on your
+                     # own boolean rather than the showDetails one I used
+                     #
+                     # Additional visibility constraints for the **viewer's** roletype
+                     # and the corresponding bool set by old twig implementation
+                     #
+                     # The "_default: true" definition means that you'll render the fields I provided to you
+                     # by default. The backend gives you the maximal set that you could possibly see based
+                     # on the Availability and Visibility settings in admin. $additionalConstraints only
+                     # serves to reduce this set further; it can't supersede the Availability and Visibility
+                     # settings and add fields to the payload that was provided by the backend.
+                    #}
+                    {% set additionalConstraints = {
+                        'student': {
+                            '_default': true,
+                        },
+                        'parent': {
+                            '_default': true,
+                        },
+                        'staff': {
+                            '_default': true,
+                        }
+                    } %}
+
                     <div class="small-12 medium-2 columns no-pad">
-                        {% include 'include/portrait.twig' with {user: user, render: 'profile', class: 'full-width', description: ''} only %}
+                        {# If the portrait was made available and visible to you, it would normally appear
+                         # as element 0 in this selected list, but you have to check anyway to be sure
+                        #}
+                        {% set foundPortrait = false %}
+
+                        {% for selectedField in externalUser.data.roleTypes.fields.selected|filter(selectedField => selectedField.field == 'portrait') %}
+                            {# If this field doesn't have a special boolean associated with it that might make it visible,
+                             # use the prescribed default bool
+                            #}
+                            {% if (additionalConstraints[USER.role.type][selectedField.field] ?? additionalConstraints[USER.role.type]['_default']) %}
+                                {% set foundPortrait = true %}
+
+                                {# Portrait was available and visible to you,
+                                 # and you pass the additionalConstraints listed above
+                                 # Ask php to give you an image (it might not...)
+                                #}
+                                {% include 'include/portrait.twig' with {
+                                    user: user,
+                                    render: 'profile',
+                                    class: 'full-width',
+                                    description: ''
+                                } only %}
+                            {% endif %}
+                        {% endfor %}
+
+                        {# No image? Grey man
+                         # We can kind of force this with a null user...wow
+                        #}
+                        {% if not foundPortrait %}
+                            {% include 'include/portrait.twig' with {
+                                user: null,
+                                render: 'profile',
+                                class: 'full-width',
+                                description: ''
+                            } only %}
+                        {% endif %}
                     </div>
 
                     <div class="small-12 medium-10 columns">
                         <dl class="profile">
-                            {% if showTitle %}
-                                <dt class="small-12 medium-3">Position Title</dt>
-                                <dd class="small-12 medium-9">
-                                    {{ user.getPositionTitle() }}
-                                </dd>
-                            {% endif %}
+                            {# Portrait is always element 0 at the moment: we can skip iterating
+                             # that array element here, because it's rendered elsewhere.
+                             #}
+                            {% for selectedField in externalUser.data.roleTypes.fields.selected|filter(selectedField => selectedField.field != 'portrait') %}
+                                {# Decide if the viewer can actually see this field, due to additional
+                                 # permissions, privacy and configuration settings that go well beyond
+                                 # the viewer's role type; if you can see it, show it. Otherwise skip it.
+                                 #}
+                                {% if (additionalConstraints[USER.role.type][selectedField.field] ?? additionalConstraints[USER.role.type]['_default'] ?? true) %}
+                                    {# Use localisation variant from Terminology, if it exists;
+                                     # otherwise use default Display As that I provided by default
+                                    #}
+                                    {% set fieldName = selectedField.displayAs %}
 
-                            {% if showDetails %}
-                                {% block details_email %}
-                                    {% if user.getEmail() %}
-                                        <dt class="small-12 medium-3">Email</dt>
-                                        <dd class="small-12 medium-9">
-                                            <a href="{{ session.mailhandle }}{{ user.getEmail() }}">{{ user.getEmail() }}</a>
+                                    {% if selectedField.terminology %}
+                                        {% set fieldName = locale.translate(selectedField.terminology, false, true) %}
+                                    {% endif %}
+
+                                    {# Now render each of the flags/tuples in some manner #}
+
+                                    {% if selectedField.value %}
+                                        {# Only render a tuple if it has a meaningful value
+                                         # Note that some fields require special handling (different data structures)
+                                         #
+                                         # The field name will always show at this point, though their values
+                                         # will need special treatment somehow
+                                         #}
+                                        <dt class="small-4 medium-3 columns">{{ fieldName }}</dt>
+                                        <dd class="small-8 medium-9 columns">
+                                            {% if selectedField.field in ['email'] %}
+                                                {# Renders a mailto: hyperlink #}
+                                                <a href="{{ session.mailhandle }}{{ selectedField.value }}">{{ selectedField.value }}</a>
+                                            {% else %}
+                                                {# A generic tuple (key, value) pair #}
+                                                {{ selectedField.value }}
+                                            {% endif %}
                                         </dd>
                                     {% endif %}
-                                {% endblock details_email %}
-                            {% endif %}
-
-                            {% if showDetails %}
-                                {% block details %}
-                                    {% if externalUser.StaffDepartment is defined and externalUser.StaffDepartment%}
-                                        <dt class="small-12 medium-3">Department:</dt>
-                                        <dd class="small-12 medium-9">{{ externalUser.StaffDepartment }}</dd>
-                                    {% endif %}
-                                    {% if externalUser.StaffCategoryDescription is defined and externalUser.StaffCategoryDescription %}
-                                        <dt class="small-12 medium-3">Type:</dt>
-                                        <dd class="small-12 medium-9">{{ externalUser.StaffCategoryDescription }}</dd>
-                                    {% endif %}
-                                    {% if externalUser.StaffBuilding is defined and externalUser.StaffBuilding%}
-                                        <dt class="small-12 medium-3">Building:</dt>
-                                        <dd class="small-12 medium-9">{{ externalUser.StaffBuilding }}</dd>
-                                    {% endif %}
-                                    {% if externalUser.StaffRoom is defined and externalUser.StaffRoom%}
-                                        <dt class="small-12 medium-3">Room:</dt>
-                                        <dd class="small-12 medium-9">{{ externalUser.StaffRoom }}</dd>
-                                    {% endif %}
-                                    {% if externalUser.StaffExtension is defined and externalUser.StaffExtension %}
-                                        <dt class="small-12 medium-3">Extension:</dt>
-                                        <dd class="small-12 medium-9">{{ externalUser.StaffExtension }}</dd>
-                                    {% endif %}
-                                    {% if externalUser.StaffCampusDescription is defined and externalUser.StaffCampusDescription%}
-                                        <dt class="small-12 medium-3">Campus:</dt>
-                                        <dd class="small-12 medium-9">{{ externalUser.StaffCampusDescription }}</dd>
-                                    {% endif %}
-                                    {% block house %}
-                                    {% endblock %}
-                                {% endblock %}
-                            {% endif %}
+                                {% endif %}
+                            {% endfor %}
                         </dl>
                     </div>
                 </div>
