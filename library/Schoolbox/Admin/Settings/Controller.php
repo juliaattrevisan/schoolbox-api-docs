@@ -11,25 +11,27 @@ namespace Schoolbox\Admin\Settings;
 
 use Alaress\Redis;
 use Alaress\Web\Controller\ConfigController;
+use Aura\Router\Exception\RouteNotFound;
 use Schoolbox\Admin\Navigation\Subnav;
+use Schoolbox\Application\Exception\Exception;
 use Schoolbox\Config\Config;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Error\Mapper;
 use Schoolbox\GenericCollection;
 use Alaress\Database\Predicate;
+use Twig\Error\Error;
 
 class Controller extends ConfigController
 {
     /**
      * Renders an admin settings page for settings with the specified type
      *
+     * @param string|null $typeLabel The human-friendly type label stored in lu_config_type
+     * @throws RouteNotFound
+     * @throws Exception
+     * @throws Predicate\InvalidColumnException|Error
      * @since 18.1
      * @api   GET /adminv2/setting/{typeLabel}
-     *
-     * @param string|null $typeLabel The human-friendly type label stored in lu_config_type
-     * @throws \Aura\Router\Exception\RouteNotFound
-     * @throws \Schoolbox\Application\Exception\Exception
-     * @throws Predicate\InvalidColumnException
      */
     public function getSettings(string $typeLabel = null): void
     {
@@ -41,9 +43,12 @@ class Controller extends ConfigController
             throw Mapper::getInstance()->generateException(Mapper::ERROR_PAGE_NOT_FOUND);
         }
 
+        $settingsCategory = $this->getSettingsCategoryFromTypeLabel($typeLabel);
+        $routeUrlTemplate = $this->routeGenerator->generate("settings.postSettings$settingsCategory");
+        $routeUrl = str_replace('{typeLabel}', $typeLabel, $routeUrlTemplate);
         $configContext = $this->buildConfigContext(
             $this->buildConfigPredicate($typeLabel),
-            $this->routeGenerator->generate('settings.postSettings', ['typeLabel' => $typeLabel]),
+            $routeUrl,
             [ModuleConfig::CONTEXT_TYPE_LABEL => $typeLabel],
         );
 
@@ -58,13 +63,12 @@ class Controller extends ConfigController
 
         /* Settings are now recategorised by the feature to which they are relevant
          */
-        $pageCurrent = $this->routeGenerator->generate('settings.postSettings', ['typeLabel' => $typeLabel]);
-        $allBreadcrumbs = (new Subnav($this->getConfigLoader(), $this->getUser()))->generateBreadcrumbs($this->routeGenerator->generate('settings.postSettings', ['typeLabel' => $typeLabel]));
+        $allBreadcrumbs = (new Subnav($this->getConfigLoader(), $this->getUser()))->generateBreadcrumbs($routeUrl);
 
         $this->response = $this->responseDependentOnRequest(
             '@settings/settings.twig',
             [
-                'pageCurrent'    => $pageCurrent,
+                'pageCurrent'    => $routeUrl,
                 'allBreadcrumbs' => $allBreadcrumbs,
                 'settingsTabs'   => $settingsTabs,
                 'configContext'  => $configContext,
@@ -165,16 +169,15 @@ class Controller extends ConfigController
     }
 
     /**
-     * @since 18.
-     * @api   POST /adminv2/setting/{typeLabel}
-     *
      * @param string $typeLabel
-     * @throws \Aura\Router\Exception\RouteNotFound
+     * @throws RouteNotFound
      * @throws \PDOException
      * @throws \Schoolbox\Mapper\Exception
      * @throws \UnexpectedValueException
      * @throws Predicate\InvalidColumnException
      * @noinspection PhpUnused (web route)
+     * @since 18.
+     * @api   POST /adminv2/setting/{typeLabel}
      */
     public function postSettings(string $typeLabel): void
     {
@@ -235,10 +238,35 @@ class Controller extends ConfigController
             $this->oidcCache->clear();
         }
 
-        $route          = urldecode($this->routeGenerator->generate('settings.getSettings', ['typeLabel' => str_replace(' ', '+', $typeLabel)]));
-        $this->response = $this->redirectAfterPost($route);
+        $settingsCategory = $this->getSettingsCategoryFromTypeLabel($typeLabel);
+        $routeUrlTemplate = $this->routeGenerator->generate("settings.getSettings$settingsCategory");
+        $routeUrl = str_replace('{typeLabel}', $typeLabel, $routeUrlTemplate);
+        $routeUrlDecoded = urldecode($routeUrl);
+
+        $this->response = $this->redirectAfterPost($routeUrlDecoded);
     }
 
+    // Functions for routes accessible by pastoral moderators --------------------------------------------------------//
+
+    /**
+     * @throws RouteNotFound
+     * @throws Error
+     */
+    public function getSettingsPastoral(): void
+    {
+        $this->getSettings('Pastoral Care');
+    }
+
+    /**
+     * @throws RouteNotFound
+     * @throws \Schoolbox\Mapper\Exception
+     */
+    public function postSettingsPastoral(): void
+    {
+        $this->postSettings('Pastoral Care');
+    }
+
+    // Private functions ---------------------------------------------------------------------------------------------//
 
     /**
      * Returns a predicate suitable for finding config for this module
@@ -255,5 +283,17 @@ class Controller extends ConfigController
                    ->equals(ConfigMapper::COL_MODULE, ConfigMapper::MODULE_SETTINGS);
 
         return $pb;
+    }
+
+    /**
+     * @param string $typeLabel
+     * @return string
+     */
+    private function getSettingsCategoryFromTypeLabel(string $typeLabel): string
+    {
+        return match ($typeLabel) {
+            'Pastoral Care' => 'Pastoral',
+            default => '',
+        };
     }
 }

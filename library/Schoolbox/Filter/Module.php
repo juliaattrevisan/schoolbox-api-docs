@@ -7,13 +7,12 @@
 
 namespace Schoolbox\Filter;
 
-use Alaress\Authorizer\Rule\IsSuperuser;
+use Alaress\Authorizer\Rule;
 use Alaress\Module\Module as AlaressModule;
 use Alaress\Web\Controller\Base;
-use Psr\Container\ContainerInterface;
 use Schoolbox\Error\Mapper as ErrorMapper;
-use Schoolbox\Filter\Filters;
 use Alaress\Twig\Loader\IChainLoader;
+use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\RoleMapper;
 
 /**
@@ -33,7 +32,15 @@ class Module extends AlaressModule
      */
     protected function registerRoutes(): void
     {
-        $isSuper = new IsSuperuser();
+        $isSuper = new Rule\IsSuperuser();
+
+        $rulePastoral = new Rule\All(
+            new Rule\IsLoggedIn(),
+            new Rule\Any(
+                new Rule\IsSuperuser(),
+                new Rule\HasServicePermission(UserAccess::SERVICE_PASTORAL, UserAccess::ACCESS_FULL)
+            )
+        );
 
         $loadFactoryFactory = function (array $params) {
             switch ($params['page']) {
@@ -53,13 +60,16 @@ class Module extends AlaressModule
             return [];
         };
 
+        // Routes to which users with service permission UserAccess::SERVICE_PASTORAL need access.
+        $this->register('GET', '/pastoral/{page:classPastoral}', 'getPageSettingsPastoral', $rulePastoral, $loadFactoryFactory);
+        $this->register('POST', '/pastoral/{page:classPastoral}', 'postSavePageSettingsPastoral', $rulePastoral, $loadFactoryFactory);
+        $this->register('POST', '/pastoral/{page:classPastoral}/pushDefaultSelections', 'postPushDefaultSelectionsPastoral', $rulePastoral, $loadFactoryFactory);
 
         $this->register('GET', '', 'getIndex', $isSuper);
         $this->register('GET', '/{page}', 'getPageSettings', $isSuper, $loadFactoryFactory);
         $this->register('POST', '/{page}', 'postSavePageSettings', $isSuper, $loadFactoryFactory);
         $this->register('POST', '/{page}/pushDefaultSelections', 'postPushDefaultSelections', $isSuper, $loadFactoryFactory);
     }
-
 
     /**
      * @inheritdoc
@@ -78,7 +88,6 @@ class Module extends AlaressModule
         );
     }
 
-
     /**
      * {@inheritdoc}
      */
@@ -87,7 +96,6 @@ class Module extends AlaressModule
         $this->addTemplatePath($templateLoader, __DIR__ . '/templates');
         $this->addTemplatePath($templateLoader, __DIR__ . '/Filters', 'filterDefinitions');
     }
-
 
     /**
      * @return \Schoolbox\Mapper|Mapper

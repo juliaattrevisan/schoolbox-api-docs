@@ -8,6 +8,7 @@
         definitions              IDefinition[]         Indexed by definition.class
         pageFilters              Filter\Page\Model[]   Indexed by definition.class
         pageLabels               string[]
+        filterCategory           string
         ENTITY_ASSESSMENTS       string
 #}
 <script type="text/javascript">
@@ -340,7 +341,7 @@
                 </section>
             {% endfor %}
 
-            <input type="submit" id="save_settings" value="Save Settings" data-href="{{ routeLookup('filters.postSavePageSettings', { page: page }) }}">
+            <input type="submit" id="save_settings" value="Save Settings" data-href="{{ routeLookup('filters.postSavePageSettings' ~ filterCategory, { page: page }) }}">
             <div class="toast" data-toast></div>
         </form>
     </div>
@@ -353,7 +354,7 @@
         made for this page's filters, and replace them with the currently saved
         defaults for their role type.
     </p>
-    <form id="push-selections-modal-form" method="post" action="{{ routeLookup('filters.postPushDefaultSelections', { page: page }) }}">
+    <form id="push-selections-modal-form" method="post" action="{{ routeLookup('filters.postPushDefaultSelections' ~ filterCategory, { page: page }) }}">
         {% for roleType, roles in rolesForFilter %}
             {% if roles is not empty %}
                 <fieldset class="checklist">

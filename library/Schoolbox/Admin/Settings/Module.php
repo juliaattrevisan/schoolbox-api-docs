@@ -32,6 +32,15 @@ class Module extends \Alaress\Module\Module
                 new Rule\IsSuperuser(),
                 new Rule\HasServicePermission(UserAccess::SERVICE_NEWS, UserAccess::ACCESS_FULL),
                 new Rule\HasServicePermission(UserAccess::SERVICE_CALENDAR, UserAccess::ACCESS_FULL),
+                new Rule\HasServicePermission(UserAccess::SERVICE_PASTORAL, UserAccess::ACCESS_FULL),
+            )
+        );
+
+        $rulePastoral = new Rule\All(
+            new Rule\IsLoggedIn(),
+            new Rule\Any(
+                new Rule\IsSuperuser(),
+                new Rule\HasServicePermission(UserAccess::SERVICE_PASTORAL, UserAccess::ACCESS_FULL)
             )
         );
 
@@ -39,6 +48,10 @@ class Module extends \Alaress\Module\Module
             new Rule\IsLoggedIn(),
             new Rule\IsSuperuser(),
         );
+
+        // Routes to which users with service permission UserAccess::SERVICE_PASTORAL need access.
+        $this->register('GET', '/pastoral/{typeLabel:Pastoral%20Care}', 'getSettingsPastoral', $rulePastoral);
+        $this->register('POST', '/pastoral/{typeLabel:Pastoral%20Care}', 'postSettingsPastoral', $rulePastoral);
 
         $this->register('GET', '/search', 'searchSettings', $ruleSearchSettings);
         $this->register('GET', '{/typeLabel}', 'getSettings', $ruleSuperuserOnly);
