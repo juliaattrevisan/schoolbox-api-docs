@@ -233,6 +233,8 @@
                                     });
                                 </script>
 
+                                {% import '@searchUser/field/fieldName.twig' as macro %}
+
                                 <dl class="profile">
                                     {# Portrait is always element 0 at the moment: we can skip iterating
                                      # that array element here, because it's rendered elsewhere.
@@ -243,15 +245,6 @@
                                          # the viewer's role type; if you can see it, show it. Otherwise skip it.
                                          #}
                                         {% if (additionalConstraints[USER.role.type][selectedField.field] ?? additionalConstraints[USER.role.type]['_default'] ?? true) %}
-                                            {# Use localisation variant from Terminology, if it exists;
-                                             # otherwise use default Display As that I provided by default
-                                             #}
-                                            {% set fieldName = selectedField.displayAs %}
-
-                                            {% if selectedField.terminology %}
-                                                {% set fieldName = locale.translate(selectedField.terminology, false, true) %}
-                                            {% endif %}
-
                                             {# Now render each of the flags/tuples in some manner #}
 
                                             {# Presence of icon and css means it renders as a flag/alert #}
@@ -318,7 +311,7 @@
                                                      # The field name will always show at this point, though their values
                                                      # will need special treatment somehow
                                                      #}
-                                                    <dt class="small-4 medium-3 columns">{{ fieldName }}</dt>
+                                                    <dt class="small-4 medium-3 columns">{{ macro.fieldName(selectedField) }}</dt>
                                                     <dd class="small-8 medium-9 columns">
                                                         {% if selectedField.field in ['formTeacher', 'tutorTeacher', 'hohTeacher', 'coordTeacher', 'studentCoach'] %}
                                                             {# These fields are Schoolbox\User instances and need special treatment #}

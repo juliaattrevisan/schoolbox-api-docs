@@ -1,0 +1,15 @@
+{##
+ # Use localisation variant from Terminology, if it exists;
+ # otherwise use default Display As that I provided by default
+ #
+ # @param array $selectedField  A (displayAs, terminology) tuple
+ #}
+{% macro fieldName(selectedField) %}
+    {% set fieldName = selectedField.displayAs %}
+
+    {% if selectedField.terminology %}
+        {% set fieldName = locale.translate(selectedField.terminology, false, true) %}
+    {% endif %}
+
+    {{ fieldName }}
+{% endmacro %}
