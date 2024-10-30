@@ -224,6 +224,8 @@ class CustomButtons
                 'profileButtonId' => $oldProfileButtonId
             ]);
 
+            /* TODO make this a key-value tuple
+             */
             while ($row = $this->campusAvailabilityStatement->fetch(\PDO::FETCH_ASSOC)) {
                 $this->campusAvailabilityInsertStatement->execute([$profileButtonId, $row['campus_id']]);
             }
@@ -254,6 +256,8 @@ class CustomButtons
                 'profileButtonId' => $oldProfileButtonId
             ]);
 
+            /* TODO make this a key-value tuple
+             */
             while ($row = $this->campusVisibilityStatement->fetch(\PDO::FETCH_ASSOC)) {
                 $this->campusVisibilityInsertStatement->execute([$profileButtonId, $row['campus_id']]);
             }
@@ -284,6 +288,8 @@ class CustomButtons
                 'profileButtonId' => $oldProfileButtonId
             ]);
 
+            /* TODO make this a key-value tuple
+             */
             while ($row = $this->roleAvailabilityStatement->fetch(\PDO::FETCH_ASSOC)) {
                 $this->roleAvailabilityInsertStatement->execute([$profileButtonId, $row['role_id']]);
             }
@@ -312,6 +318,8 @@ class CustomButtons
                 'profileButtonId' => $oldProfileButtonId
             ]);
 
+            /* TODO make this a key-value tuple
+             */
             while ($row = $this->roleVisibilityStatement->fetch(\PDO::FETCH_ASSOC)) {
                 $this->roleVisibilityInsertStatement->execute([$profileButtonId, $row['role_id']]);
             }
