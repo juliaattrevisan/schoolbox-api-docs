@@ -39,13 +39,19 @@ class Controller extends Base
      *
      * @param RosettaStone             $translator             Used for translating values used in the page title.
      * @param Pastoral\DataSource      $pastoralDataSource     Used for creating pastoral records.
-     * @param Pastoral\Type\Mapper     $pastoralTypeMapper     Used for loading and validating pastoral types.
      * @param Pastoral\SubType\Mapper  $pastoralSubTypeMapper  Used for loading and validating pastoral subtypes.
+     * @param Pastoral\Type\Mapper     $pastoralTypeMapper     Used for loading and validating pastoral types.
+     * @param Pastoral\Severity\Mapper $pastoralSeverityMapper Used for loading pastoral severities.
      * @param RoleMapper               $roleMapper             Used for loading roles to show in record visibility.
      * @param Pastoral\Access\Mapper   $pastoralAccessMapper   Used for determining roles which may access records.
      * @param Pastoral\Group\Mapper    $pastoralGroupMapper    Used for loading pastoral groups to select visibility.
      * @param UserMapper               $userMapper             Used for loading pastoral moderators.
      * @param Pastoral\Audience\Mapper $pastoralAudienceMapper Used for loading audiences for types and subtypes.
+     * @param Storage\FilesystemProxy  $filesystemProxy        Used for copying ZIP files from storage to local:
+     *                                                         required for working with ZIP files.
+     * @param Storage\Receiver         $receiver               Used for copying streams from inside the ZIP to storage.
+     * @param Pastoral\RecordProcessor $recordProcessor        Used for actually saving pastoral records according to
+     *                                                         form input.
      */
     public function __construct(
         private RosettaStone $translator,
