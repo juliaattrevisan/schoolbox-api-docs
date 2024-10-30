@@ -132,6 +132,10 @@ class External_Schoolbox_User implements External_UserInterface
             return [];
         }
 
+        /* Forcibly re-evaluate boarderlyness using this connector's specific interpretation
+         */
+        $student['StudentBoarder'] = $this->determineBoarderType((string)$student['StudentBoarder']);
+
         /* Forcibly obey External_UserInterface
          */
         $student['AlertMessage'] = array_unique(array_filter([$student['AlertMessage']]));

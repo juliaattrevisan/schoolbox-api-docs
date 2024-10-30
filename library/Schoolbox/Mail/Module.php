@@ -42,7 +42,7 @@ class Module extends BaseModule
                 if (!empty($user->getEmail())) {
                     return;
                 }
-                throw new Forbidden('Email is not set');
+                throw new Forbidden('Session user\'s email is not set');
             })
         );
         $this->register(self::METHOD_GET, '/create', 'getCreateMail', $perm);

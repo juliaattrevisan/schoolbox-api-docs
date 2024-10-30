@@ -57,43 +57,10 @@
                         }
                     } %}
 
+                    {% import '@searchUser/field/macro.twig' as macro %}
+
                     <div class="small-12 medium-2 columns no-pad">
-                        {# If the portrait was made available and visible to you, it would normally appear
-                         # as element 0 in this selected list, but you have to check anyway to be sure
-                         #}
-                        {% set foundPortrait = false %}
-
-                        {% for selectedField in externalUser.data.roleTypes.fields.selected|filter(selectedField => selectedField.field == 'portrait') %}
-                            {# If this field doesn't have a special boolean associated with it that might make it visible,
-                             # use the prescribed default bool
-                             #}
-                            {% if (additionalConstraints[USER.role.type][selectedField.field] ?? additionalConstraints[USER.role.type]['_default']) %}
-                                {% set foundPortrait = true %}
-
-                                {# Portrait was available and visible to you,
-                                 # and you pass the additionalConstraints listed above
-                                 # Ask php to give you an image (it might not...)
-                                 #}
-                                {% include 'include/portrait.twig' with {
-                                    user: user,
-                                    render: 'profile',
-                                    class: 'full-width',
-                                    description: ''
-                                } only %}
-                            {% endif %}
-                        {% endfor %}
-
-                        {# No image? Grey man
-                         # We can kind of force this with a null user...wow
-                         #}
-                        {% if not foundPortrait %}
-                            {% include 'include/portrait.twig' with {
-                                user: null,
-                                render: 'profile',
-                                class: 'full-width',
-                                description: ''
-                            } only %}
-                        {% endif %}
+                        {{ macro.portrait(user, externalUser, additionalConstraints) }}
                     </div>
 
                     <div class="small-12 medium-10 columns no-pad">
@@ -107,15 +74,6 @@
                                  # the viewer's role type; if you can see it, show it. Otherwise skip it.
                                  #}
                                 {% if (additionalConstraints[USER.role.type][selectedField.field] ?? additionalConstraints[USER.role.type]['_default'] ?? true) %}
-                                    {# Use localisation variant from Terminology, if it exists;
-                                     # otherwise use default Display As that I provided by default
-                                     #}
-                                    {% set fieldName = selectedField.displayAs %}
-
-                                    {% if selectedField.terminology %}
-                                        {% set fieldName = locale.translate(selectedField.terminology, false, true) %}
-                                    {% endif %}
-
                                     {# Now render each of the flags/tuples in some manner #}
 
                                     {% if selectedField.value %}
@@ -125,14 +83,14 @@
                                          # The field name will always show at this point, though their values
                                          # will need special treatment somehow
                                          #}
-                                        <dt class="small-4 medium-3 columns">{{ fieldName }}</dt>
+                                        <dt class="small-4 medium-3 columns">{{ macro.fieldName(selectedField) }}</dt>
                                         <dd class="small-8 medium-9 columns">
                                             {% if selectedField.field in ['spouseName'] %}
                                                 {# A unique data structure, sadly #}
                                                 <a href="/search/user/{{ selectedField.value.id }}">{{ selectedField.value.value }}</a>
                                             {% elseif selectedField.field in ['email', 'SpouseEmail'] %}
                                                 {# Renders a mailto: hyperlink #}
-                                                <a href="{{ session.mailhandle }}{{ selectedField.value }}">{{ selectedField.value }}</a>
+                                                {{ macro.email(session, selectedField.value, selectedField.value) }}
                                             {% else %}
                                                 {# A generic tuple (key, value) pair #}
                                                 {{ selectedField.value }}

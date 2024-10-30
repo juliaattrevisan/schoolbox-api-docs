@@ -209,6 +209,10 @@ class External_Tass_User implements External_UserInterface
             $student['StudentBirthDate'] = false;
         }
 
+        /* Forcibly re-evaluate boarderlyness using this connector's specific interpretation
+         */
+        $student['StudentBoarder'] = $this->determineBoarderType((string)$student['StudentBoarder']);
+
         /* Forcibly obey External_UserInterface
          */
         $student['AlertMessage'] = [];

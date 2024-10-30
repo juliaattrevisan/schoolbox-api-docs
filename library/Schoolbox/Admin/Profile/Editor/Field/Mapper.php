@@ -11,10 +11,8 @@ declare(strict_types=1);
 namespace Schoolbox\Admin\Profile\Editor\Field;
 
 use Alaress\Database\Predicate\Builder;
-use DebugBar\DebugBarException;
 use Schoolbox\Admin\Profile\Editor\Payload;
 use Schoolbox\GenericCollection;
-use Schoolbox\Mapper\DefinitionException;
 use Schoolbox\Mapper\Exception;
 use Schoolbox\User;
 
@@ -90,7 +88,6 @@ class Mapper extends \Schoolbox\Mapper
      * @inheritdoc
      *
      * @return string
-     * @throws \Schoolbox\Mapper\DefinitionException
      */
     protected function getFromString(): string
     {
@@ -107,7 +104,6 @@ class Mapper extends \Schoolbox\Mapper
      *
      * @param \PDOStatement $statement
      * @return GenericCollection
-     * @throws DefinitionException
      * @throws Exception
      * @throws \UnexpectedValueException
      */
@@ -160,10 +156,7 @@ class Mapper extends \Schoolbox\Mapper
      * @param User $viewer
      * @return GenericCollection
      * @throws Exception
-     * @throws DebugBarException
-     * @throws \PDOException
      * @throws \UnexpectedValueException
-     * @throws DefinitionException
      */
     public function findRenderableFields(\Schoolbox\User $viewee, \Schoolbox\User $viewer): GenericCollection
     {
