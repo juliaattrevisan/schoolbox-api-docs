@@ -20,8 +20,7 @@ use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
 use Schoolbox\Resource\Attachment\Zone;
 use Schoolbox\Resource\Exception as ResourceException;
-use Schoolbox\Resource\Storage\FilesystemProxy;
-use Schoolbox\Resource\Storage\IStorage;
+use Schoolbox\Resource\Storage;
 use Schoolbox\Role;
 use Schoolbox\RoleMapper;
 use Schoolbox\TokenReplacer\Simple;
@@ -63,7 +62,8 @@ class Controller extends Base
         private UserMapper $userMapper,
         private Pastoral\Audience\Mapper $pastoralAudienceMapper,
         private ErrorMapper $errorMapper,
-        private FilesystemProxy $filesystemProxy,
+        private Storage\FilesystemProxy $filesystemProxy,
+        private Storage\Receiver $receiver,
     ) {
     }
 
@@ -247,12 +247,21 @@ class Controller extends Base
             $this->errorMapper,
         );
         foreach ($files as $file) {
-            // Extract processPastoralRecords to its own class
             if ($file['user']) {
+                // Need to add attachment as well, and probably group them
+                // by user.
+                $attachment = $this->receiver->acceptStream(
+                    basename($file['name']),
+                    $archive->getStream($file['name']),
+                );
+                $this->requestPost->offsetSet(
+                    Pastoral\Controller::ATTACHZONE_PUBLIC . '_attachments',
+                    [\Schoolbox\Resource\Browser\NodeFactory::STORE . ':' . $attachment->getHash()],
+                );
                 $processor->processPastoralRecords(
                     $this->getUser(),
                     $file['user']->getId(),
-                    $this->getRequestPost(),
+                    $this->requestPost,
                 );
             }
         }
@@ -263,10 +272,10 @@ class Controller extends Base
     /**
      * Load the ZIP file from storage.
      *
-     * @return IStorage
+     * @return Storage\IStorage
      * @throws ResourceException
      */
-    private function loadStorageZipFile(): IStorage
+    private function loadStorageZipFile(): Storage\IStorage
     {
         $factory = new CollectorFactory();
         return $factory->build([$this->requestPost->get('report')])->getFirst();
@@ -276,11 +285,11 @@ class Controller extends Base
      * Given a ZIP file in storage: copy it to local temp storage, and create a
      * `ZipArchive` out of it.
      *
-     * @param IStorage $zipFile
+     * @param Storage\IStorage $zipFile
      * @return ZipArchive
      * @throws FilesystemException
      */
-    private function createLocalZipArchive(IStorage $zipFile): ZipArchive
+    private function createLocalZipArchive(Storage\IStorage $zipFile): ZipArchive
     {
         // Need to ensure it exists locally:
         // otherwise it can't operate upon it

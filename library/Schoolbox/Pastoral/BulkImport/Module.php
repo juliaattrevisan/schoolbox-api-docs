@@ -93,6 +93,7 @@ class Module extends BaseModule
             $this->getMapperFactory()->get(Pastoral\Audience\Mapper::class),
             $this->getMapperFactory()->get(ErrorMapper::class),
             $this->injector->get('filesystem.storageProxy'),
+            $this->injector->get('filesystem.receiver'),
         );
     }
 }
