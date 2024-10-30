@@ -228,11 +228,6 @@ class Controller extends Base
         $archive = $this->createLocalZipArchive($zipFile);
         $files   = $this->associateFilesWithUser($archive);
 
-        $dummyRecord = $this->pastoralDataSource->createModel();
-        foreach ($files as $file) {
-            // Extract processPastoralRecords to its own class
-        }
-
         $processor = new Pastoral\RecordProcessor(
             $this->getConfigLoader(),
             $this->pastoralDataSource,
@@ -248,6 +243,16 @@ class Controller extends Base
             $this->pastoralGroupMapper,
             $this->errorMapper,
         );
+        foreach ($files as $file) {
+            // Extract processPastoralRecords to its own class
+            if ($file['user']) {
+                $processor->processPastoralRecords(
+                    $this->getUser(),
+                    $file['user']->getId(),
+                    $this->getRequestPost(),
+                );
+            }
+        }
 
         // Create a new pastoral record for each student extracted from the ZIP
     }
