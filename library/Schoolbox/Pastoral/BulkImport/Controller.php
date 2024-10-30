@@ -53,18 +53,14 @@ class Controller extends Base
         private Pastoral\SubType\Mapper $pastoralSubTypeMapper,
         private Pastoral\Type\Mapper $pastoralTypeMapper,
         private Pastoral\Severity\Mapper $pastoralSeverityMapper,
-        private Pastoral\Tag\Mapper $pastoralTagMapper,
-        private Pastoral\Action\Mapper $pastoralActionMapper,
-        private Pastoral\RecordAction\Mapper $pastoralRecordActionMapper,
-        private Pastoral\Attachment\Mapper $pastoralAttachmentMapper,
         private RoleMapper $roleMapper,
         private Pastoral\Access\Mapper $pastoralAccessMapper,
         private Pastoral\Group\Mapper $pastoralGroupMapper,
         private UserMapper $userMapper,
         private Pastoral\Audience\Mapper $pastoralAudienceMapper,
-        private ErrorMapper $errorMapper,
         private Storage\FilesystemProxy $filesystemProxy,
         private Storage\Receiver $receiver,
+        private Pastoral\RecordProcessor $recordProcessor,
     ) {
     }
 
@@ -232,22 +228,6 @@ class Controller extends Base
         $archive = $this->createLocalZipArchive($zipFile);
         $files   = $this->associateFilesWithUser($archive);
 
-        $processor = new Pastoral\RecordProcessor(
-            $this->getConfigLoader(),
-            $this->pastoralDataSource,
-            $this->pastoralSubTypeMapper,
-            $this->pastoralTypeMapper,
-            $this->pastoralSeverityMapper,
-            $this->pastoralTagMapper,
-            $this->pastoralActionMapper,
-            $this->pastoralRecordActionMapper,
-            $this->pastoralAttachmentMapper,
-            $this->userMapper,
-            $this->pastoralAccessMapper,
-            $this->pastoralGroupMapper,
-            $this->errorMapper,
-        );
-
         // Group files by user, so a single record is created for each user:
         // possibly with multiple files
         $pastoralRecordsToCreate = [];
@@ -274,7 +254,7 @@ class Controller extends Base
                 Pastoral\Controller::ATTACHZONE_PUBLIC . '_attachments',
                 $attachmentHashes,
             );
-            $pastoralRecordsToCreate[$userId]['records'] = $processor->processPastoralRecords(
+            $pastoralRecordsToCreate[$userId]['records'] = $this->recordProcessor->processPastoralRecords(
                 $this->getUser(),
                 $userId,
                 $requestPost,

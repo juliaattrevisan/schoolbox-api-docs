@@ -17,9 +17,6 @@ use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Pastoral;
 use Schoolbox\Pastoral\Attachment\Mapper as PastoralAttachmentMapper;
-use Schoolbox\Pastoral\Comment\Mapper as PastoralCommentMapper;
-use Schoolbox\Pastoral\Severity\Mapper as PastoralSeverityMapper;
-use Schoolbox\Pastoral\Tag\Mapper as PastoralTagMapper;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\RoleMapper;
 use Schoolbox\UserMapper;
@@ -76,8 +73,8 @@ class Module extends BaseModule
      */
     public function buildController(): Base
     {
-        return new Controller(
-            $this->injector->get('l10n'),
+        $pastoralRecordProcessor = new Pastoral\RecordProcessor(
+            $this->injector->get('config'),
             $this->injector->get('pastoralDataSource'),
             $this->getMapperFactory()->get(Pastoral\SubType\Mapper::class),
             $this->getMapperFactory()->get(Pastoral\Type\Mapper::class),
@@ -85,15 +82,27 @@ class Module extends BaseModule
             $this->getMapperFactory()->get(Pastoral\Tag\Mapper::class),
             $this->getMapperFactory()->get(Pastoral\Action\Mapper::class),
             $this->getMapperFactory()->get(Pastoral\RecordAction\Mapper::class),
-            $this->getMapperFactory()->get(Pastoral\Attachment\Mapper::class),
+            $this->getMapperFactory()->get(PastoralAttachmentMapper::class),
+            $this->getMapperFactory()->get(UserMapper::class),
+            $this->getMapperFactory()->get(Pastoral\Access\Mapper::class),
+            $this->getMapperFactory()->get(Pastoral\Group\Mapper::class),
+            $this->getMapperFactory()->get(ErrorMapper::class),
+//            $this->injector->get('sentry'),
+        );
+        return new Controller(
+            $this->injector->get('l10n'),
+            $this->injector->get('pastoralDataSource'),
+            $this->getMapperFactory()->get(Pastoral\SubType\Mapper::class),
+            $this->getMapperFactory()->get(Pastoral\Type\Mapper::class),
+            $this->getMapperFactory()->get(Pastoral\Severity\Mapper::class),
             $this->getMapperFactory()->get(RoleMapper::class),
             $this->getMapperFactory()->get(Pastoral\Access\Mapper::class),
             $this->getMapperFactory()->get(Pastoral\Group\Mapper::class),
             $this->getMapperFactory()->get(UserMapper::class),
             $this->getMapperFactory()->get(Pastoral\Audience\Mapper::class),
-            $this->getMapperFactory()->get(ErrorMapper::class),
             $this->injector->get('filesystem.storageProxy'),
             $this->injector->get('filesystem.receiver'),
+            $pastoralRecordProcessor,
         );
     }
 }
