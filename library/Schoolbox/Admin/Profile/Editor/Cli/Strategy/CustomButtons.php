@@ -57,12 +57,12 @@ class CustomButtons
     {
         /* Set up some prepared statements, presuming that we'll go ahead with all this
          */
-        $this->prepareStatements();;
+        $this->prepareStatements();
 
         /* Get a list of buttons to inspect - users can specify --system,
          * --custom, or both
          */
-        $candidates = $this->generateCandidates($this->roletypeLookup);
+        $candidates = $this->generateCandidates();
 
         /* Each button can have zero or more roles associated with it
          * Inspect each button's relationships to find out which roles,
@@ -81,7 +81,7 @@ class CustomButtons
             foreach ($candidate['_roletypes'] as $roletype) {
                 /* Create a button in the current roletype
                  */
-                $profileButtonId = $this->createButton($candidate, $roletype, self::CUSTOM);
+                $profileButtonId = $this->createButton($candidate, $roletype);
 
                 /* Bring along their existing relationships too, exactly as they were,
                  * and reassign them to this new row we just made
@@ -166,10 +166,9 @@ class CustomButtons
      *
      * @param array $candidate
      * @param string $roletype
-     * @param string $type
      * @return int
      */
-    private function createButton(array $candidate, string $roletype, string $type): int {
+    private function createButton(array $candidate, string $roletype): int {
         $this->log->info(sprintf(
             'Migrating "%s" to %s roletype',
             $candidate['title'],
@@ -184,7 +183,7 @@ class CustomButtons
             $candidate['url'],
             $candidate['css'],
             $candidate['target'],
-            $type,
+            self::CUSTOM,
             $roletype
         ]);
 
@@ -273,10 +272,9 @@ class CustomButtons
     /**
      * Generate a list of buttons we need to recreate
      *
-     * @param array $roletypeLookup
      * @return array
      */
-    public function generateCandidates(array $roletypeLookup): array
+    public function generateCandidates(): array
     {
         $query = "
             SELECT 
@@ -309,7 +307,7 @@ class CustomButtons
 
             /* Identify the roletype
              */
-            $roletype = $roletypeLookup[$row['role_id']];
+            $roletype = $this->roletypeLookup[$row['role_id']];
 
             /* Add it to the list uniquely
              */

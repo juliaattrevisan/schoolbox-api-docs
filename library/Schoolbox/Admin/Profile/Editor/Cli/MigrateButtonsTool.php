@@ -129,7 +129,7 @@ HELP;
             }
 
             if ($this->getOpt(self::OPT_LONG_TYPE_SYSTEM)) {
-                $strats[] = new SystemButtons($this->getDatabaseInternal(), $this->getLogger(), $roletypeLookup);
+//                $strats[] = new SystemButtons($this->getDatabaseInternal(), $this->getLogger(), $roletypeLookup);
             }
 
             /* Slam them in if we chose some
