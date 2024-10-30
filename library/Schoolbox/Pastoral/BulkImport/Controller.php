@@ -12,6 +12,7 @@ namespace Schoolbox\Pastoral\BulkImport;
 use Alaress\Web\Controller\Base;
 use League\Flysystem\FilesystemException;
 use Schoolbox\Config\ConfigMapper;
+use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\L10n\RosettaStone;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Pastoral;
@@ -49,13 +50,19 @@ class Controller extends Base
     public function __construct(
         private RosettaStone $translator,
         private Pastoral\DataSource $pastoralDataSource,
-        private Pastoral\Type\Mapper $pastoralTypeMapper,
         private Pastoral\SubType\Mapper $pastoralSubTypeMapper,
+        private Pastoral\Type\Mapper $pastoralTypeMapper,
+        private Pastoral\Severity\Mapper $pastoralSeverityMapper,
+        private Pastoral\Tag\Mapper $pastoralTagMapper,
+        private Pastoral\Action\Mapper $pastoralActionMapper,
+        private Pastoral\RecordAction\Mapper $pastoralRecordActionMapper,
+        private Pastoral\Attachment\Mapper $pastoralAttachmentMapper,
         private RoleMapper $roleMapper,
         private Pastoral\Access\Mapper $pastoralAccessMapper,
         private Pastoral\Group\Mapper $pastoralGroupMapper,
         private UserMapper $userMapper,
         private Pastoral\Audience\Mapper $pastoralAudienceMapper,
+        private ErrorMapper $errorMapper,
         private FilesystemProxy $filesystemProxy,
     ) {
     }
