@@ -162,6 +162,9 @@ class Controller extends Base
                     ->getTwigContext(),
                 'returnUrl'         => $this->requestQuery->get('returnUrl')
                     ?? $this->routeGenerator->generate('pastoral.getIndex'),
+                'severities'        => $this->getConfigLoader()->get(ConfigMapper::NAME_PASTORAL_SEVERITY_ENABLED)
+                    ? $this->pastoralSeverityMapper->findAll()
+                    : [],
 
                 // Requirements for displaying visibility inputs
                 'record'          => $this->pastoralDataSource->createModel()->setStudent(null),
