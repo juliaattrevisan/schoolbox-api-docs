@@ -12,7 +12,6 @@ namespace Schoolbox\Pastoral\BulkImport;
 use Alaress\Web\Controller\Base;
 use League\Flysystem\FilesystemException;
 use Schoolbox\Config\ConfigMapper;
-use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\L10n\RosettaStone;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Pastoral;
@@ -303,6 +302,8 @@ class Controller extends Base
      * Given a ZIP file in storage: copy it to local temp storage, and create a
      * `ZipArchive` out of it.
      *
+     * This is required as `ZipArchive` cannot work on a stream.
+     *
      * @param Storage\IStorage $zipFile
      * @return ZipArchive
      * @throws FilesystemException
@@ -325,7 +326,7 @@ class Controller extends Base
      * Associate files in `$archive` with a user.
      *
      * @param ZipArchive $archive
-     * @return array{name: string, user: ?User, externalId: string}
+     * @return array<array{name: string, user: ?User, externalId: string}>
      */
     private function associateFilesWithUser(ZipArchive $archive): array
     {
