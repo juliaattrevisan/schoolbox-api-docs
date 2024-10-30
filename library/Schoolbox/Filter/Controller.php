@@ -7,7 +7,12 @@
 
 namespace Schoolbox\Filter;
 
+use Alaress\Database\Predicate\InvalidColumnException;
 use Alaress\Web\Controller\Base as BaseController;
+use Aura\Router\Exception\RouteNotFound;
+use Exception;
+use InvalidArgumentException;
+use PDOException;
 use Schoolbox\Admin\Navigation\Subnav;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Filter\Page\AvailabilityChecker;
@@ -15,9 +20,15 @@ use Schoolbox\Filter\Page\LabelBuilder;
 use Schoolbox\GenericCollection;
 use Schoolbox\L10n\RosettaStone;
 use Schoolbox\Learning\Assessment\DataModel as Assessment;
+use Schoolbox\Mapper\DefinitionException;
+use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Role;
 use Schoolbox\RoleMapper;
 use Schoolbox\Learning\Badge;
+use Twig\Error\Error as TwigError;
+
+use UnderflowException;
+use UnexpectedValueException;
 
 use function count;
 
@@ -86,8 +97,9 @@ class Controller extends BaseController
     /**
      * Display a summary of filter configurations for Admins
      *
-     * @api   GET /adminv2/filters
+     * @throws TwigError|RouteNotFound
      * @since 17.0
+     * @api   GET /adminv2/filters
      */
     public function getIndex(): void
     {
@@ -108,8 +120,8 @@ class Controller extends BaseController
      *
      * @param IFactoryFactory $factoryFactory The factory responsible for the entity filtered by this page
      * @param string          $page
-     * @throws \Aura\Router\Exception\RouteNotFound
-     * @throws \Twig\Error\Error
+     * @throws RouteNotFound
+     * @throws TwigError
      * @api   GET /adminv2/filters/{pageKey}
      * @since 17.0
      */
@@ -159,13 +171,13 @@ class Controller extends BaseController
      *
      * @param IFactoryFactory $factoryFactory The factory responsible for the entity filtered by this page
      * @param string          $page
-     * @throws \UnexpectedValueException
-     * @throws \PDOException
-     * @throws \Alaress\Database\Predicate\InvalidColumnException
-     * @throws \InvalidArgumentException If a filter definition class not found, or filter factory not registered
-     * @throws \Schoolbox\Mapper\DefinitionException If join $name isn't on this mapper
-     * @throws \Schoolbox\Mapper\Exception If an alias is incorrect
-     * @throws \UnderflowException
+     * @throws UnexpectedValueException
+     * @throws PDOException
+     * @throws InvalidColumnException
+     * @throws InvalidArgumentException If a filter definition class not found, or filter factory not registered
+     * @throws DefinitionException If join $name isn't on this mapper
+     * @throws MapperException If an alias is incorrect
+     * @throws UnderflowException
      */
     public function postSavePageSettings(IFactoryFactory $factoryFactory, string $page): void
     {
@@ -256,7 +268,7 @@ class Controller extends BaseController
      * Push default selections to users in the given roles.
      *
      * @param string $page
-     * @throws \Exception
+     * @throws Exception
      * @api   POST /adminv2/filters/{page}/pushDefaultSelections
      * @since 20.1
      */
@@ -277,8 +289,8 @@ class Controller extends BaseController
      *
      * @param IFactoryFactory $factoryFactory The factory responsible for the entity filtered by this page
      * @param string          $page
-     * @throws \Aura\Router\Exception\RouteNotFound
-     * @throws \Twig\Error\Error
+     * @throws RouteNotFound
+     * @throws TwigError
      */
     public function getPageSettingsPastoral(IFactoryFactory $factoryFactory, string $page): void
     {
@@ -290,13 +302,13 @@ class Controller extends BaseController
      *
      * @param IFactoryFactory $factoryFactory The factory responsible for the entity filtered by this page
      * @param string          $page
-     * @throws \UnexpectedValueException
-     * @throws \PDOException
-     * @throws \Alaress\Database\Predicate\InvalidColumnException
-     * @throws \InvalidArgumentException If a filter definition class not found, or filter factory not registered
-     * @throws \Schoolbox\Mapper\DefinitionException If join $name isn't on this mapper
-     * @throws \Schoolbox\Mapper\Exception If an alias is incorrect
-     * @throws \UnderflowException
+     * @throws UnexpectedValueException
+     * @throws PDOException
+     * @throws InvalidColumnException
+     * @throws InvalidArgumentException If a filter definition class not found, or filter factory not registered
+     * @throws DefinitionException If join $name isn't on this mapper
+     * @throws MapperException If an alias is incorrect
+     * @throws UnderflowException
      */
     public function postSavePageSettingsPastoral(IFactoryFactory $factoryFactory, string $page): void
     {
@@ -307,7 +319,7 @@ class Controller extends BaseController
      * Push default selections to users in the given roles.
      *
      * @param string $page
-     * @throws \Exception
+     * @throws Exception
      */
     public function postPushDefaultSelectionsPastoral(string $page): void
     {
