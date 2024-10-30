@@ -16,6 +16,8 @@ class ViewSelector
         'getStudentsMedical'    => 'uvPaperlyMedicalConditions',
         'getStudentsFromParent' => 'uvPaperlyAllStudents',
         'allParents'            => 'uvPaperlyParentDetails',
+        'getStudentAbilities'   => 'uvPaperlyParentDetails',
+        'getStudentConsents'    => 'uvPaperlyStudentConsents',
     ];
 
     public function __construct(

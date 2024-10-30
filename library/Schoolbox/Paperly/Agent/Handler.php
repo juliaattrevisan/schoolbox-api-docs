@@ -11,6 +11,7 @@ namespace Schoolbox\Paperly\Agent;
 
 use Alaress\Database\Connector\IConnector;
 use OutOfBoundsException;
+use InvalidArgumentException;
 
 /**
  * Handler for the various actions the Paperly agent may perform.
@@ -18,10 +19,11 @@ use OutOfBoundsException;
 class Handler
 {
     private ViewSelector $viewSelector;
+
     /**
      * Constructor
      *
-     * @param IConnector $externalDb
+     * @param IConnector   $externalDb
      * @param ViewSelector $viewSelector
      */
     public function __construct(private IConnector $externalDb, ViewSelector $viewSelector)
@@ -70,6 +72,8 @@ class Handler
             case 'allParents':
                 $selectedView = $this->viewSelector->getView($method);
                 return $this->handleAllParentsRequest($data, $selectedView);
+            case 'getDetailsData':
+                return $this->handleGetDetailsDataRequest($data);
             case 'allMedicalConditionTypes':
                 return $this->handleAllMedicalConditionTypesRequest();
             case 'allMedicalConditionSeverityTypes':
@@ -155,8 +159,8 @@ class Handler
     /**
      * Handle request for all classes.
      *
-     * @param array $data `$data['code']` may be an array or CSV list of codes:
-     *                    if set, return only classes which match these codes.
+     * @param array  $data         `$data['code']` may be an array or CSV list of codes:
+     *                             if set, return only classes which match these codes.
      * @param string $selectedView paperly view
      *
      * @return array
@@ -190,8 +194,8 @@ class Handler
     /**
      * Handle request for getting students from the class code
      *
-     * @param array $data `$data['code']` may be an array or CSV list of codes:
-     *                    if set, return only classes which match these codes.
+     * @param array  $data         `$data['code']` may be an array or CSV list of codes:
+     *                             if set, return only classes which match these codes.
      * @param string $selectedView paperly view
      *
      * @return array
@@ -228,13 +232,13 @@ class Handler
     /**
      * Handle request for all staff members.
      *
-     * @param array $data `$data['id']` may be an array or CSV list of IDs:
-     *                    if set, return only staff which match these IDs.
-     *                    `$data['email']` may be an email address: if set,
-     *                    return only this staff member.
-     *                    `$data['year_level']` may be an array or CSV list of
-     *                    year levels: if set, return only staff which teach
-     *                    these year levels.
+     * @param array  $data         `$data['id']` may be an array or CSV list of IDs:
+     *                             if set, return only staff which match these IDs.
+     *                             `$data['email']` may be an email address: if set,
+     *                             return only this staff member.
+     *                             `$data['year_level']` may be an array or CSV list of
+     *                             year levels: if set, return only staff which teach
+     *                             these year levels.
      * @param string $selectedView paperly view
      *
      * @return array
@@ -297,16 +301,16 @@ class Handler
     /**
      * Handle request for all students.
      *
-     * @param array $data `$data['id']` may be an array or CSV list of IDs:
-     *                    if set, return only students which match these IDs.
-     *                    `$data['email']` may be an email address: if set,
-     *                    return only this student.
-     *                    `$data['year_level']` may be an array or CSV list of
-     *                    year levels: if set, return only students within these
-     *                    year levels.
-     *                    `$data['class']` may be an array or CSV list of
-     *                    classes: if set, return only students within these
-     *                    classes.
+     * @param array  $data         `$data['id']` may be an array or CSV list of IDs:
+     *                             if set, return only students which match these IDs.
+     *                             `$data['email']` may be an email address: if set,
+     *                             return only this student.
+     *                             `$data['year_level']` may be an array or CSV list of
+     *                             year levels: if set, return only students within these
+     *                             year levels.
+     *                             `$data['class']` may be an array or CSV list of
+     *                             classes: if set, return only students within these
+     *                             classes.
      * @param string $selectedView paperly view
      *
      * @return array
@@ -392,8 +396,8 @@ class Handler
     /**
      * Handle request for student avatars (profile pictures).
      *
-     * @param array $data `$data['id']` may be an array or CSV list of IDs:
-     *                    if set, return only avatars for these students.
+     * @param array  $data         `$data['id']` may be an array or CSV list of IDs:
+     *                             if set, return only avatars for these students.
      * @param string $selectedView paperly view
      *
      * @return array
@@ -435,8 +439,8 @@ class Handler
     /**
      * Handle request for student medical data.
      *
-     * @param array $data `$data['id']` may be an array or CSV list of IDs:
-     *                    if set, return only medical data for these students.
+     * @param array  $data         `$data['id']` may be an array or CSV list of IDs:
+     *                             if set, return only medical data for these students.
      * @param string $selectedView paperly view
      *
      * @return array
@@ -475,7 +479,7 @@ class Handler
     /**
      * Handle request for fetching students for a parent.
      *
-     * @param array $data `$data['id']` must be a parent ID.
+     * @param array  $data         `$data['id']` must be a parent ID.
      * @param string $selectedView paperly view
      * @return array
      * @throws OutOfBoundsException if `$data['id']` is not a parent ID.
@@ -544,7 +548,7 @@ class Handler
                 "Surname" => $row["Surname"],
                 "Given"   => $row["Given1"],
                 "Mobile"  => $row["MobilePhone"],
-                "Email"   => $row["Email"]
+                "Email"   => $row["Email"],
             ];
         }
 
@@ -808,5 +812,506 @@ class Handler
         }
 
         return $typeArray;
+    }
+
+    public function handleGetDetailsDataRequest(array $data): array
+    {
+        if (!isset($data['id']) || !$this->validateParent($data['id'])) {
+            throw new InvalidArgumentException("Invalid Parent ID");
+        }
+
+        $parentId = $data['id'];
+
+        $relatedData = $this->getRelatedData($parentId);
+
+        $linkedID = $relatedData['linkedID'];
+        $spouseID = $relatedData['spouseID'];
+
+        $authArr = [];
+
+        if ($parentId == $linkedID) {
+            $authArr = array_merge(
+                $authArr,
+                $this->getPrimaryData($parentId, $relatedData['linkedIDRel'])
+            );
+        }
+
+        if ($parentId == $spouseID) {
+            $authArr = array_merge(
+                $authArr,
+                $this->getSpouseData($parentId, $relatedData['spouseRel'])
+            );
+        }
+
+        $authArr = array_merge(
+            $authArr,
+            $this->getStudentData($relatedData['studentIDs'])
+        );
+
+        return $authArr;
+    }
+
+    private function validateParent(?string $parentId): bool
+    {
+        $selectedView = $this->viewSelector->getView('allParents');
+
+        $sql    = "SELECT * FROM {$selectedView} WHERE ID = ?";
+        $params = [$parentId];
+
+        $stmt = $this->externalDb->executeQuery($sql, $params);
+        return $stmt->fetchColumn() !== false;
+    }
+
+    private function getRelatedData(string $parentId): array
+    {
+        $selectedView = $this->viewSelector->getView('allStudents');
+
+        $relatedData = [
+            'studentIDs'  => [],
+            'linkedID'    => null,
+            'linkedIDRel' => null,
+            'spouseID'    => null,
+            'spouseRel'   => null,
+        ];
+
+        $sql = "SELECT * FROM {$selectedView} WHERE ContactID = ?";
+
+        $params = [$parentId];
+
+        $stmt = $this->externalDb->executeQuery($sql, $params);
+        foreach ($stmt as $row) {
+            $relatedData['studentIDs'][] = $row["StudentID"];
+            $relatedData['linkedID']     = $row["ContactID"];
+            $relatedData['linkedIDRel']  = $row["ContactRelationship"];
+        }
+
+        $relatedData['studentIDs'] = array_values(array_unique($relatedData['studentIDs']));
+
+        return $relatedData;
+    }
+
+    private function getPrimaryData(string $parentId, string $parentRel): array
+    {
+        $primaryData = [];
+
+        $selectedView = $this->viewSelector->getView('allParents');
+
+        $sql = "SELECT * FROM {$selectedView} WHERE 1=1 AND ID = ?";
+
+        $params = [$parentId];
+
+        $stmt = $this->externalDb->executeQuery($sql, $params);
+
+        foreach ($stmt as $row) {
+            $birthDate          = $row['BirthDate'];
+            $formattedBirthDate = ($birthDate !== null)
+                ? (\Alaress_Date_Format::newFromTimestamp(strtotime($birthDate)))->getUsingFormat('d-m-Y')
+                : null;
+
+            $primaryData[] = [
+                "Type"                          => "Primary",
+                "ID"                            => $row["ID"],
+                "Relationship"                  => $parentRel,
+                "Gender"                        => $row["Gender"],
+                "Surname"                       => $row["Surname"],
+                "Preferred"                     => $row["Preferred"],
+                "Given1"                        => $row["Given1"],
+                "BirthDate"                     => $formattedBirthDate,
+                "AddressID"                     => $row["AddressID"],
+                "Address"                       => $row["HomeAddress1"],
+                "Address2"                      => $row["HomeAddress2"],
+                "Address3"                      => $row["HomeAddress3"],
+                "Suburb"                        => $row["HomeSuburb"],
+                "State"                         => $row["HomeState"],
+                "Postcode"                      => $row["HomePostCode"],
+                "SamePostal"                    => $row["HomeAddressSameFlag"],
+                "PostalAddress"                 => $row["Address1"],
+                "PostalAddress2"                => $row["Address2"],
+                "PostalAddress3"                => $row["Address3"],
+                "PostalSuburb"                  => $row["Suburb"],
+                "PostalState"                   => $row["State"],
+                "PostalPostcode"                => $row["PostCode"],
+                "HomePhone"                     => $row["Phone"],
+                "Mobile"                        => $row["MobilePhone"],
+                "DefaultMobilePhoneCode"        => $row["DefaultMobilePhoneCode"],
+                "Email"                         => $row["Email"],
+                "OccupDesc"                     => $row["OccupDesc"],
+                "OccupationPositionDescription" => $row["OccupationPositionDescription"],
+                "OccupCompany"                  => $row["OccupCompany"],
+                "OccupCode"                     => $row["OccupCode"],
+                "OccupCountry"                  => $row["OccupCountryCode"],
+                "OccupIndustryCode"             => $row["OccupIndustryCode"],
+                "OccupPhone"                    => $row["OccupPhone"],
+                "OccupEmail"                    => $row["OccupEmail"],
+                "OccupAddress"                  => $row["OccupAddress1"],
+                "OccupAddress2"                 => $row["OccupAddress2"],
+                "OccupAddress3"                 => $row["OccupAddress3"],
+                "OccupSuburb"                   => $row["OccupSuburb"],
+                "OccupState"                    => $row["OccupState"],
+                "OccupPostcode"                 => $row["OccupPostCode"],
+                "ReligionDescription"           => $row["ReligionDescription"],
+                "NationalityDescription"        => $row["NationalityDescription"],
+                "CountryOfBirthDescription"     => $row["CountryOfBirthDescription"],
+                "HomeLanguageDescription"       => $row["HomeLanguageDescription"],
+                "HighestSecondaryYearLevel"     => $row["HighestSecondaryYearLevel"],
+                "QualificationLevelDescription" => $row["QualificationLevelDescription"],
+                "ReceiveMailFlag"               => $row["MailFlag"],
+                "DefaultEmailCode"              => $row["DefaultEmailCode"],
+            ];
+        }
+        return $primaryData;
+    }
+
+    private function getSpouseData(string $spouseID, $spouseRel): array
+    {
+        $spouseData = [];
+
+        $viewSelected = $this->viewSelector->getView('allParents');
+
+        $sql    = "SELECT * FROM $viewSelected WHERE 1=1 AND ID = ?";
+        $params = [$spouseID];
+
+        $stmt = $this->externalDb->executeQuery($sql, $params);
+        foreach ($stmt as $row) {
+            $birthDate          = $row['BirthDate'];
+            $formattedBirthDate = ($birthDate !== null)
+                ? (\Alaress_Date_Format::newFromTimestamp(strtotime($birthDate)))->getUsingFormat('d-m-Y')
+                : null;
+
+            $spouseData[] = [
+                "Type"                          => "Spouse",
+                "ID"                            => $row["ID"],
+                "Relationship"                  => $spouseRel,
+                "Gender"                        => $row["Gender"],
+                "Surname"                       => $row["Surname"],
+                "Preferred"                     => $row["Preferred"],
+                "Given1"                        => $row["Given1"],
+                "BirthDate"                     => $formattedBirthDate,
+                "AddressID"                     => $row["AddressID"],
+                "Address"                       => $row["HomeAddress1"],
+                "Address2"                      => $row["HomeAddress2"],
+                "Address3"                      => $row["HomeAddress3"],
+                "Suburb"                        => $row["HomeSuburb"],
+                "State"                         => $row["HomeState"],
+                "Postcode"                      => $row["HomePostCode"],
+                "SamePostal"                    => $row["HomeAddressSameFlag"],
+                "PostalAddress"                 => $row["Address1"],
+                "PostalAddress2"                => $row["Address2"],
+                "PostalAddress3"                => $row["Address3"],
+                "PostalSuburb"                  => $row["Suburb"],
+                "PostalState"                   => $row["State"],
+                "PostalPostcode"                => $row["PostCode"],
+                "HomePhone"                     => $row["Phone"],
+                "Mobile"                        => $row["MobilePhone"],
+                "DefaultMobilePhoneCode"        => $row["DefaultMobilePhoneCode"],
+                "Email"                         => $row["Email"],
+                "OccupDesc"                     => $row["OccupDesc"],
+                "OccupationPositionDescription" => $row["OccupationPositionDescription"],
+                "OccupCompany"                  => $row["OccupCompany"],
+                "OccupCode"                     => $row["OccupCode"],
+                "OccupCountry"                  => $row["OccupCountryCode"],
+                "OccupIndustryCode"             => $row["OccupIndustryCode"],
+                "OccupPhone"                    => $row["OccupPhone"],
+                "OccupEmail"                    => $row["OccupEmail"],
+                "OccupAddress"                  => $row["OccupAddress1"],
+                "OccupAddress2"                 => $row["OccupAddress2"],
+                "OccupAddress3"                 => $row["OccupAddress3"],
+                "OccupSuburb"                   => $row["OccupSuburb"],
+                "OccupState"                    => $row["OccupState"],
+                "OccupPostcode"                 => $row["OccupPostCode"],
+                "ReligionDescription"           => $row["ReligionDescription"],
+                "NationalityDescription"        => $row["NationalityDescription"],
+                "CountryOfBirthDescription"     => $row["CountryOfBirthDescription"],
+                "HomeLanguageDescription"       => $row["HomeLanguageDescription"],
+                "HighestSecondaryYearLevel"     => $row["HighestSecondaryYearLevel"],
+                "QualificationLevelDescription" => $row["QualificationLevelDescription"],
+                "ReceiveMailFlag"               => $row["MailFlag"],
+                "DefaultEmailCode"              => $row["DefaultEmailCode"],
+            ];
+        }
+        return $spouseData;
+    }
+
+    private function getStudentData(array $studentIDs): array
+    {
+        $authArr = [];
+
+        $viewSelected = $this->viewSelector->getView('allStudents');
+
+        foreach ($studentIDs as $stuID) {
+            $smcArr       = $this->getStudentMedicalConditions($stuID);
+            $abiArr       = $this->getStudentAbilities($stuID);
+            $consentArr   = $this->getStudentConsents($stuID);
+            $livesWithArr = $this->getStudentLivesWith($stuID);
+
+            $sql = "
+                SELECT
+                    s.StudentID,
+                    s.StudentLegalFullName,
+                    s.StudentBirthDate,
+                    s.IndigenousFlag,
+                    s.StudentTSIFlag,
+                    s.StudentGender,
+                    s.StudentPreferred,
+                    s.StudentYearLevelDescription,
+                    s.StudentTutor,
+                    s.StudentHomeLanguageCode,
+                    s.StudentDoctorName,
+                    s.StudentDoctorPhone,
+                    s.StudentDoctorAddress,
+                    s.StudentDentistName,
+                    s.StudentDentistPhone,
+                    s.StudentDentistAddress,
+                    s.StudentEmergencyName,
+                    s.StudentEmergencyAddress,
+                    s.StudentEmergencyPhone,
+                    s.StudentEmergencyPhoneAlt,
+                    s.StudentEmergencyRelat,
+                    s.StudentEmergency2Name,
+                    s.StudentEmergency2Address,
+                    s.StudentEmergency2Phone,
+                    s.StudentEmergency2PhoneAlt,
+                    s.StudentEmergency2Relat,
+                    s.StudentEmergency3Name,
+                    s.StudentEmergency3Address,
+                    s.StudentEmergency3Phone,
+                    s.StudentEmergency3PhoneAlt,
+                    s.StudentEmergency3Relat,
+                    s.LegalPhotoPublicationFlag,
+                    s.LegalPhotoPromFlag,
+                    s.LegalPhotoWebFlag,
+                    s.LegalParentsSeparatedFlag,
+                    s.LegalCourtOrderType,
+                    s.StudentMedicalAlertFlag
+                FROM {$viewSelected} s
+                WHERE s.StudentYearLevelDescription NOT LIKE '%CCGS'
+                  AND s.StudentID IN (?)
+                ";
+
+            $params = [$stuID];
+            $stmt   = $this->externalDb->executeQuery($sql, $params);
+
+            foreach ($stmt as $sturow) {
+                if ($sturow["LegalParentsSeparatedFlag"] == 1 || $sturow["LegalCourtOrderType"] !== '') {
+                    $authArr[] = ["Type" => "BLOCK"];
+                    continue;
+                }
+
+                $birthDate          = $sturow['StudentBirthDate'];
+                $formattedBirthDate = ($birthDate !== null)
+                    ? (\Alaress_Date_Format::newFromTimestamp(strtotime($birthDate)))->getUsingFormat('d-m-Y')
+                    : null;
+
+                $authArr[] = [
+                    "Type"                        => "Student",
+                    "ID"                          => $sturow["StudentID"],
+                    "StudentLegalFullName"        => $sturow["StudentLegalFullName"],
+                    "StudentPreferred"            => $sturow["StudentPreferred"],
+                    "StudentGender"               => $sturow["StudentGender"],
+                    "IndigenousFlag"              => $sturow["IndigenousFlag"],
+                    "StudentTSIFlag"              => $sturow["StudentTSIFlag"],
+                    "StudentHomeLanguageCode"     => $sturow["StudentHomeLanguageCode"],
+                    "StudentBirthDate"            => $formattedBirthDate,
+                    "StudentYearLevelDescription" => $sturow["StudentYearLevelDescription"],
+                    "StudentTutor"                => $sturow["StudentTutor"],
+                    "StudentDoctorName"           => $sturow["StudentDoctorName"],
+                    "StudentDoctorPhone"          => $sturow["StudentDoctorPhone"],
+                    "StudentDoctorAddress"        => trim(
+                        preg_replace(
+                            '/\s+/',
+                            ' ',
+                            str_replace(
+                                '"',
+                                '\"',
+                                str_replace(
+                                    "'",
+                                    "\'",
+                                    $sturow["StudentDoctorAddress"]
+                                )
+                            )
+                        )
+                    ),
+                    "StudentDentistName"          => $sturow["StudentDentistName"],
+                    "StudentDentistPhone"         => $sturow["StudentDentistPhone"],
+                    "StudentDentistAddress"       => trim(
+                        preg_replace(
+                            '/\s+/',
+                            ' ',
+                            str_replace(
+                                '"',
+                                '\"',
+                                str_replace(
+                                    "'",
+                                    "\'",
+                                    $sturow["StudentDentistAddress"]
+                                )
+                            )
+                        )
+                    ),
+                    "StudentEmergencyName"        => $sturow["StudentEmergencyName"],
+                    "StudentEmergencyAddress"     => trim(
+                        preg_replace(
+                            '/\s\s+/',
+                            ' ',
+                            $sturow["StudentEmergencyAddress"]
+                        )
+                    ),
+                    "StudentEmergencyPhone"       => $sturow["StudentEmergencyPhone"],
+                    "StudentEmergencyPhoneAlt"    => $sturow["StudentEmergencyPhoneAlt"],
+                    "StudentEmergencyRelatDesc"   => $sturow["StudentEmergencyRelat"],
+                    "StudentEmergency2Name"       => $sturow["StudentEmergency2Name"],
+                    "StudentEmergency2Address"    => trim(
+                        preg_replace(
+                            '/\s\s+/',
+                            ' ',
+                            $sturow["StudentEmergency2Address"]
+                        )
+                    ),
+                    "StudentEmergency2Phone"      => $sturow["StudentEmergency2Phone"],
+                    "StudentEmergency2PhoneAlt"   => $sturow["StudentEmergency2PhoneAlt"],
+                    "StudentEmergency2RelatDesc"  => $sturow["StudentEmergency2Relat"],
+                    "StudentEmergency3Name"       => $sturow["StudentEmergency3Name"],
+                    "StudentEmergency3Address"    => trim(
+                        preg_replace(
+                            '/\s\s+/',
+                            ' ',
+                            $sturow["StudentEmergency3Address"]
+                        )
+                    ),
+                    "StudentEmergency3Phone"      => $sturow["StudentEmergency3Phone"],
+                    "StudentEmergency3PhoneAlt"   => $sturow["StudentEmergency3PhoneAlt"],
+                    "StudentEmergency3RelatDesc"  => $sturow["StudentEmergency3Relat"],
+                    "DoNotUsePhoto"               => $sturow["LegalPhotoPublicationFlag"],
+                    "DoNotPublishPhoto"           => $sturow["LegalPhotoPromFlag"],
+                    "PhotoWebFlag"                => $sturow["LegalPhotoWebFlag"],
+                    "StudentMedicalAlertFlag"     => $sturow["StudentMedicalAlertFlag"],
+                    "StudentMedicalConditions"    => $smcArr,
+                    "StudentAbilities"            => $abiArr,
+                    "StudentConsents"             => $consentArr,
+                    "StudentLivesWith"            => $livesWithArr,
+                ];
+            }
+        }
+        return $authArr;
+    }
+
+    private function getStudentMedicalConditions(int $stuID): array
+    {
+        $viewSelected = $this->viewSelector->getView('getStudentsMedical');
+
+        $smcArr = [];
+
+        $sql    = "SELECT * FROM $viewSelected WHERE ID = ?";
+        $params = [$stuID];
+        $stmt   = $this->externalDb->executeQuery($sql, $params);
+
+        foreach ($stmt as $row) {
+            $smcArr[] = [
+                "MedicalConditionSeq"                 => $row["MedicalConditionSeq"],
+                "MedicalConditionCode"                => $row["MedicalConditionCode"],
+                "MedicalConditionTypeDescription"     => $row["MedicalConditionTypeDescription"],
+                "MedicalConditionSeverityCode"        => $row["SeverityCode"],
+                "MedicalConditionSeverityDescription" => $row["SeverityDescription"],
+                "MedicalConditionDetails"             => htmlentities($row["ConditionDetails"]),
+                "EmergencyTreatmentDetails"           => $row["EmergencyTreatmentDetails"],
+                "OtherTreatmentDetails"               => $row["OtherTreatmentDetails"],
+            ];
+        }
+        return $smcArr;
+    }
+
+    private function getStudentAbilities(int $stuID): array
+    {
+        $abiArr = [];
+
+        $viewSelected = $this->viewSelector->getView('getStudentAbilities');
+
+        $sql    = "SELECT * FROM $viewSelected WHERE ID = ?";
+        $params = [$stuID];
+
+        $stmt = $this->externalDb->executeQuery($sql, $params);
+        foreach ($stmt as $row) {
+            $abiArr[] = [
+                "AbilitySeq"              => $row["AbilitySeq"],
+                "AbilityTypeCode"         => $row["AbilityTypeCode"],
+                "AbilityTypeDesc"         => $row["TypeDesc"],
+                "AbilityLevel"            => $row["AbilityLevel"],
+                "AbilityLevelDescription" => $row["Description"],
+                "AbilityComment"          => $row["AbilityComment"],
+            ];
+        }
+
+        return $abiArr;
+    }
+
+    private function getStudentConsents(int $stuID): array
+    {
+        $consentArr = [];
+
+        $viewSelected = $this->viewSelector->getView('getStudentConsents');
+
+        $sql = "
+            SELECT
+                smcons.ConsentSeq,
+                smcons.ID,
+                lu.Code,
+                lu.Description,
+                CASE
+                    WHEN smcons.ConsentCode IS NOT NULL THEN 1
+                    ELSE 0
+                END AS GivenConsent
+            FROM
+                luConsentType AS lu
+            LEFT JOIN (
+                SELECT
+                    DISTINCT ConsentCode, ID, ConsentSeq
+                    FROM {$viewSelected}
+                    WHERE ID = ?
+            ) AS smcons
+            ON
+                lu.Code = smcons.ConsentCode
+            WHERE
+                lu.ActiveFlag = 1
+        ";
+
+        $params = [$stuID];
+        $stmt   = $this->externalDb->executeQuery($sql, $params);
+        foreach ($stmt as $row) {
+            $consentArr[] = [
+                "ConsentSeq"   => $row["ConsentSeq"],
+                "ConsentCode"  => $row["Code"],
+                "Consent"      => $row["Description"],
+                "GivenConsent" => $row["GivenConsent"],
+            ];
+        }
+        return $consentArr;
+    }
+
+    private function getStudentLivesWith(int $stuID): array
+    {
+        $livesWithArr = [];
+
+        $viewSelected = $this->viewSelector->getView('allStudents');
+
+        $params = [$stuID];
+        $sql    = "SELECT * FROM $viewSelected WHERE StudentID = ?";
+        $stmt   = $this->externalDb->executeQuery($sql, $params);
+        foreach ($stmt as $row) {
+            // Initialize the student array if it doesn't exist
+            if (!isset($livesWithArr[$stuID])) {
+                $livesWithArr[$stuID] = [
+                    "Contact1" => null,
+                    "Contact2" => null,
+                ];
+            }
+
+            // Determine if we should add the contact as Contact1 or Contact2
+            if (empty($livesWithArr[$stuID]["Contact1"])) {
+                $livesWithArr[$stuID]["Contact1"] = $row["ContactID"];
+            } elseif (empty($livesWithArr[$stuID]["Contact2"])) {
+                $livesWithArr[$stuID]["Contact2"] = $row["ContactID"];
+            }
+        }
+        return array_values($livesWithArr);
     }
 }
