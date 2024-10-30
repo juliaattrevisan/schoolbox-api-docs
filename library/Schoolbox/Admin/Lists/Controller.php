@@ -123,7 +123,7 @@ class Controller extends Base
         $this->postDeleteSlave($this->requestPost->get('table', ''));
     }
 
-    // Functions for routes accessible by news moderators ------------------------------------------------------------//
+    // Functions for routes accessible by News Moderators ------------------------------------------------------------//
 
     /**
      * @param string|null $table
@@ -169,7 +169,7 @@ class Controller extends Base
         $this->postDeleteSlave($table);
     }
 
-    // Functions for routes accessible by calendar moderators --------------------------------------------------------//
+    // Functions for routes accessible by Calendar Moderators --------------------------------------------------------//
 
     /**
      * @param string|null $table
@@ -215,7 +215,7 @@ class Controller extends Base
         $this->postDeleteSlave($table);
     }
 
-    // Functions for routes accessible by pastoral moderators --------------------------------------------------------//
+    // Functions for routes accessible by Pastoral Moderators --------------------------------------------------------//
 
     /**
      * @param string|null $table
@@ -261,7 +261,7 @@ class Controller extends Base
         $this->postDeleteSlave($table);
     }
 
-    // Functions for routes accessible by LMS moderators -------------------------------------------------------------//
+    // Functions for routes accessible by LMS Moderators -------------------------------------------------------------//
 
     /**
      * @param string|null $table
@@ -303,6 +303,52 @@ class Controller extends Base
      * @return void
      */
     public function postLmsDelete(string $table): void
+    {
+        $this->postDeleteSlave($table);
+    }
+
+    // Functions for routes accessible by Badge Moderators -----------------------------------------------------------//
+
+    /**
+     * @param string|null $table
+     * @return void
+     * @throws RouteNotFound
+     * @throws ReflectionException|Error
+     */
+    public function getBadgeIndex(?string $table): void
+    {
+        $this->getLists($table, false);
+    }
+
+    /**
+     * @param string|null $table
+     * @return void
+     * @throws RouteNotFound
+     * @throws ReflectionException
+     * @throws Error
+     */
+    public function getBadgeData(?string $table): void
+    {
+        $this->getLists($table, true);
+    }
+
+    /**
+     * @param string $table
+     * @return void
+     * @throws Deleted
+     * @throws MapperException
+     * @throws RouteNotFound
+     */
+    public function postBadgeSave(string $table): void
+    {
+        $this->postSaveSlave($table);
+    }
+
+    /**
+     * @param string $table
+     * @return void
+     */
+    public function postBadgeDelete(string $table): void
     {
         $this->postDeleteSlave($table);
     }
@@ -1628,6 +1674,7 @@ class Controller extends Base
             'pastoral-type' => 'Pastoral',
             'submission-type',
             'submission-errors' => 'Lms',
+            'achievement-category' => 'Badge',
             default => '',
         };
     }

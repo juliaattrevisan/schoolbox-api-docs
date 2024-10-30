@@ -64,6 +64,14 @@ class Module extends BaseModule
             )
         );
 
+        $ruleBadge = new Rule\All(
+            new Rule\IsLoggedIn(),
+            new Rule\Any(
+                new Rule\IsSuperuser(),
+                new Rule\HasServicePermission(UserAccess::SERVICE_BADGE, UserAccess::ACCESS_FULL)
+            )
+        );
+
         // Routes to which users with service permission UserAccess::SERVICE_NEWS need access.
         $this->register('GET', "/news/{table:news-topic}", 'getNewsIndex', $ruleNews);
         $this->register('GET', "/news/data/{table:news-topic}", 'getNewsData', $ruleNews);
@@ -89,6 +97,12 @@ class Module extends BaseModule
         $this->register('GET', "/lms/data/{table:$lmsTablesRegex}", 'getLmsData', $ruleLms);
         $this->register('POST', "/lms/save/{table:$lmsTablesRegex}", 'postLmsSave', $ruleLms);
         $this->register('POST', "/lms/delete/{table:$lmsTablesRegex}", 'postLmsDelete', $ruleLms);
+
+        // Routes to which users with service permission UserAccess::SERVICE_BADGE need access.
+        $this->register('GET', "/badge/{table:achievement-category}", 'getBadgeIndex', $ruleBadge);
+        $this->register('GET', "/badge/data/{table:achievement-category}", 'getBadgeData', $ruleBadge);
+        $this->register('POST', "/badge/save/{table:achievement-category}", 'postBadgeSave', $ruleBadge);
+        $this->register('POST', "/badge/delete/{table:achievement-category}", 'postBadgeDelete', $ruleBadge);
 
         // Routes to which only superusers need access.
         $this->register('GET', "{/table}", 'getIndex', $ruleSuperuserOnly);
