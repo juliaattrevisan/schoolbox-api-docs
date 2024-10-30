@@ -296,6 +296,7 @@ HELP;
                 pbra.role_id
             FROM profile_button pb
             INNER JOIN profile_button_role_availability pbra ON pb.id = pbra.profile_button_id
+            WHERE pb.roletype IS NULL
         ";
 
         $statement = $this->getDatabaseInternal()->prepare($query);
