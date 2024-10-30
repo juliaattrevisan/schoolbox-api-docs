@@ -16,7 +16,7 @@
 
 {# The actual pastoral form #}
 <div class="row">
-    <div class="small-12 island" id="formPastoral">
+    <div class="small-12 island">
         {# TODO replace with actual form input #}
         <form class="top" id="pastoralForm" method="post"
               action="{{ routeLookupIfAuthorized('pastoralBulkImport.postImportPreview') }}?{{ RETURN_URL.name }}={{ RETURN_URL.previous.encoded }}">
@@ -46,7 +46,7 @@
                             [externalId] must be part of this template: that value is used to identify the student to
                             which each file should be attributed.
                         </p>
-                        <input type="text" name="template" id="template" size="35" maxlength="100" required />
+                        <input type="text" name="template" id="template" size="35" maxlength="100" required pattern=".*\[externalId\].*" />
                     </div>
                 </fieldset>
 

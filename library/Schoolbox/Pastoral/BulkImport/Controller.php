@@ -14,9 +14,13 @@ use Schoolbox\Config\ConfigMapper;
 use Schoolbox\L10n\RosettaStone;
 use Schoolbox\Pastoral;
 use Schoolbox\Permission\Access\UserAccess;
+use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
 use Schoolbox\Resource\Attachment\Zone;
+use Schoolbox\Resource\Storage\FilesystemProxy;
 use Schoolbox\RoleMapper;
+use Schoolbox\TokenReplacer\Simple;
 use Schoolbox\UserMapper;
+use ZipArchive;
 
 /**
  * Controller for bulk importation of pastoral records.
@@ -46,6 +50,7 @@ class Controller extends Base
         private Pastoral\Group\Mapper $pastoralGroupMapper,
         private UserMapper $userMapper,
         private Pastoral\Audience\Mapper $pastoralAudienceMapper,
+        private FilesystemProxy $filesystemProxy,
     ) {
     }
 
@@ -178,9 +183,33 @@ class Controller extends Base
      */
     public function postImportPreview(): void
     {
+        // Parse the uploaded ZIP file
+        $factory = new CollectorFactory();
+        $zipFile = $factory->build([$this->requestPost->get('report')])->getFirst();
+
+        // Need to ensure it exists locally:
+        // otherwise it can't operate upon it
+        $filename = tempnam($this->getConfigLoader()->get('zip_dir'), 'zip');
+        $fp       = fopen($filename, 'wb');
+        stream_copy_to_stream($this->filesystemProxy->readStream($zipFile), $fp);
+        fclose($fp);
+
+        // Create and interrogate ZIP
+        $archive = new ZipArchive();
+        $archive->open($filename);
+        $tokenReplacer = new Simple();
+        $stats = [];
+        for ($i = 0; $i < $archive->numFiles; $i++) {
+            $stat = $archive->statIndex($i);
+            $stat['tokens'] = $tokenReplacer->extract($this->requestPost->get('template'), $stat['name']);
+            $stats[] = $stat;
+        }
+
         $this->response = $this->responseFromTemplate(
             '@pastoralBulkImport/importPreview.twig',
-            [],
+            [
+                'stats' => $stats,
+            ],
         );
     }
 }
