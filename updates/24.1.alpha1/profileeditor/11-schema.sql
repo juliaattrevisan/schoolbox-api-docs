@@ -25,4 +25,4 @@ PRIMARY KEY (`id`)
 -- Put back the old rows here, cos we're gonna work on them next
 
 INSERT INTO `profile_button` (id, sort_order, title, text, icon, url, css, target, deleted_at)
-SELECT * FROM `_profile_button`;
+SELECT * FROM `_profile_button` WHERE deleted_at IS NULL;
