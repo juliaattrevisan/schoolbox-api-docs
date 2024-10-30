@@ -1,0 +1,69 @@
+{% import 'sub/breadcrumbs.twig' as bread %}
+{{ bread.crumbs(
+    [ locale.pastoralCare.proper, routeLookup('pastoral.getIndex') ],
+    [ 'Bulk Import', routeLookup('pastoralBulkImport.getForm') ],
+    [ 'Results' ],
+) }}
+
+<div class="actions-small-1 row">
+    <div class="list-item">
+        <div class="small-12 column">
+            <h1>{{ locale.pastoral.proper }} Bulk Import Results</h1>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="small-12 island">
+        <table>
+            <thead>
+            <tr>
+                <th>Time</th>
+                <th>File uploaded</th>
+                <th>External ID</th>
+                <th>Student</th>
+                <th>Import Result</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for file in files %}
+                <tr>
+                    <td>
+                        {% if file.records is empty %}
+                            &mdash;
+                        {% else %}
+                            {{ (file.records | first).createdAt.timeOnly }}
+                        {% endif %}
+                    </td>
+                    <td>{{ file.name }}</td>
+                    <td>
+                        {% if file.externalId %}
+                            {{ file.externalId }}
+                        {% else %}
+                            &mdash;
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if file.user %}
+                            {{ file.user.formatName }}
+                        {% elseif file.externalId %}
+                            <i>No student found for external ID</i>
+                        {% else %}
+                            &mdash;
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if file.records is empty %}
+                            No record created
+                        {% else %}
+                            Created (<a href="{{ routeLookup('pastoral.getStudentRecord', {studentId: (file.records | first).student.id, recordId: (file.records | first).id}) }}">#{{ (file.records | first).id }}</a>)
+                        {% endif %}
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+
+        <a href="{{ returnUrl }}">Return</a>
+    </div>
+</div>

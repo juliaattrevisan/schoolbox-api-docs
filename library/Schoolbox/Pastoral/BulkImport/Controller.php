@@ -19,6 +19,7 @@ use Schoolbox\Pastoral;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
 use Schoolbox\Resource\Attachment\Zone;
+use Schoolbox\Resource\Browser\NodeFactory;
 use Schoolbox\Resource\Exception as ResourceException;
 use Schoolbox\Resource\Storage;
 use Schoolbox\Role;
@@ -246,27 +247,58 @@ class Controller extends Base
             $this->pastoralGroupMapper,
             $this->errorMapper,
         );
+
+        // Group files by user, so a single record is created for each user:
+        // possibly with multiple files
+        $pastoralRecordsToCreate = [];
         foreach ($files as $file) {
             if ($file['user']) {
-                // Need to add attachment as well, and probably group them
-                // by user.
-                $attachment = $this->receiver->acceptStream(
-                    basename($file['name']),
-                    $archive->getStream($file['name']),
-                );
-                $this->requestPost->offsetSet(
-                    Pastoral\Controller::ATTACHZONE_PUBLIC . '_attachments',
-                    [\Schoolbox\Resource\Browser\NodeFactory::STORE . ':' . $attachment->getHash()],
-                );
-                $processor->processPastoralRecords(
-                    $this->getUser(),
-                    $file['user']->getId(),
-                    $this->requestPost,
-                );
+                $pastoralRecordsToCreate[$file['user']->getId()]['fileNames'][] = $file['name'];
             }
         }
 
-        // Create a new pastoral record for each student extracted from the ZIP
+        // Create the records
+        foreach ($pastoralRecordsToCreate as $userId => $pastoralRecords) {
+            $attachmentHashes = [];
+            foreach ($pastoralRecords['fileNames'] as $fileName) {
+                $attachment = $this->receiver->acceptStream(
+                    basename($fileName),
+                    $archive->getStream($fileName),
+                );
+                $attachmentHashes[] = NodeFactory::STORE . ':' . $attachment->getHash();
+            }
+
+            // Need to add attachment as well, and probably group them
+            $requestPost = clone $this->requestPost;
+            $requestPost->offsetSet(
+                Pastoral\Controller::ATTACHZONE_PUBLIC . '_attachments',
+                $attachmentHashes,
+            );
+            $pastoralRecordsToCreate[$userId]['records'] = $processor->processPastoralRecords(
+                $this->getUser(),
+                $userId,
+                $this->requestPost,
+            );
+        }
+
+        // Output some sort of response
+        foreach ($files as $i => $file) {
+            if ($file['user']) {
+                $files[$i]['records'] = $pastoralRecordsToCreate[$file['user']->getId()]['records'] ?? [];
+            } else {
+                $files[$i]['records'] = [];
+            }
+        }
+
+        // And show the results
+        $this->response = $this->responseFromTemplate(
+            '@pastoralBulkImport/import.twig',
+            [
+                'files'     => $files,
+                'returnUrl' => $this->requestQuery->get('returnUrl')
+                    ?? $this->routeGenerator->generate('pastoral.getIndex'),
+            ],
+        );
     }
 
     /**
