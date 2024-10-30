@@ -231,6 +231,7 @@ class Controller extends Base
                 'files'     => $files,
                 'returnUrl' => $this->requestQuery->get('returnUrl')
                     ?? $this->routeGenerator->generate('pastoral.getIndex'),
+                'formVars'  => $this->requestPost->getArrayCopy(),
             ],
         );
     }

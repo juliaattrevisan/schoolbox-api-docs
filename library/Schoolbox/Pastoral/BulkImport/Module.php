@@ -46,8 +46,14 @@ class Module extends BaseModule
         );
         $this->register(
             self::METHOD_POST,
-            '',
+            '/preview',
             'postImportPreview',
+            $permission,
+        );
+        $this->register(
+            self::METHOD_POST,
+            '',
+            'postImport',
             $permission,
         );
     }
