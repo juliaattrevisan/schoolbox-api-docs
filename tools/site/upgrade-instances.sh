@@ -339,6 +339,9 @@ function main() {
   parse_global_vars "$@"
   reload_route_and_module_cache
   upgrade_instances
+  # Ensure any routes dependent on config options run based on those configs,
+  # by running after upgrade as well.
+  reload_route_and_module_cache
   update_schoolbox_update_error_fact_file
   restart_php_fpm
   restart_daemons
