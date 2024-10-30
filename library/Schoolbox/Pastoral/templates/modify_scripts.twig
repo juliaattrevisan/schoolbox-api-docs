@@ -195,6 +195,12 @@
                 'duplicateIds': {
                     'duplicateIdSelected': {{ record.student ? 'false' : 'true' }}
                 },
+                'report-file': {
+                    required: true,
+                    depends: function () {
+                        return document.getElementById("report-zone").querySelector("[data-dz-previews]").children.length === 0;
+                    },
+                },
             },
 
             messages: {

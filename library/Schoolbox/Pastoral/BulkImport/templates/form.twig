@@ -36,6 +36,7 @@
                             {{ locale.pastoral }} record, as a generally available attachment.
                         </p>
                         {% include 'sub/attachzone.twig' with {attachzone: reportAttachzone} %}
+                        <input type="hidden" name="report-file" id="report-file" />
                     </div>
                     <div class="small-12 columns">
                         <label class="required" for="template">File path template</label>
