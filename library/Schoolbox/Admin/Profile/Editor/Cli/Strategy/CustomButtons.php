@@ -212,7 +212,7 @@ class CustomButtons
         if ($this->perform) {
             if (!$profileButtonId) {
                 $this->log->warning(sprintf(
-                    'Invalid profile buttton identifier for old profile button %s; skipping',
+                    'Invalid profile button identifier for old profile button %s; skipping',
                     $oldProfileButtonId
                 ));
 
@@ -242,7 +242,7 @@ class CustomButtons
         if ($this->perform) {
             if (!$profileButtonId) {
                 $this->log->warning(sprintf(
-                    'Invalid profile buttton identifier for old profile button %s; skipping',
+                    'Invalid profile button identifier for old profile button %s; skipping',
                     $oldProfileButtonId
                 ));
 
@@ -272,7 +272,7 @@ class CustomButtons
         if ($this->perform) {
             if (!$profileButtonId) {
                 $this->log->warning(sprintf(
-                    'Invalid profile buttton identifier for old profile button %s; skipping',
+                    'Invalid profile button identifier for old profile button %s; skipping',
                     $oldProfileButtonId
                 ));
 
@@ -301,7 +301,7 @@ class CustomButtons
     {
         if (!$profileButtonId) {
             $this->log->warning(sprintf(
-                'Invalid profile buttton identifier for old profile button %s',
+                'Invalid profile button identifier for old profile button %s',
                 $oldProfileButtonId
             ));
         }

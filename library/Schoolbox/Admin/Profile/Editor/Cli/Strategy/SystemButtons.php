@@ -40,6 +40,10 @@ class SystemButtons
     /* Some prepared statements that we'll often reuse
      */
     private \PDOStatement $createButtonStatement;
+    private \PDOStatement $campusAvailabilityInsertStatement;
+    private \PDOStatement $campusVisibilityInsertStatement;
+    private \PDOStatement $roleAvailabilityInsertStatement;
+    private \PDOStatement $roleVisibilityInsertStatement;
 
 
     /**
@@ -50,7 +54,8 @@ class SystemButtons
      * @param bool $perform
      * @param IConnector $db
      * @param LoggerInterface $log
-     * @param array $roletypeLookup
+     * @param array $campusIds
+     * @param array $roleIds
      * @param string $externalStaffPortal
      */
     public function __construct(
@@ -91,6 +96,8 @@ class SystemButtons
                 if ($this->perform) {
                     $this->createButtonStatement->execute($candidate['row']);
 
+                    $profileButtonId = (int)$this->db->lastInsertId();
+
                     /* Assign relationships
                      *
                      * Technically speaking, all these hardcoded system buttons would have
@@ -99,6 +106,10 @@ class SystemButtons
                      * nip it in the bud if they want to prevent viewers from seeing a
                      * button by unticking their role(s) as per the ui
                      */
+                    $this->createCampusAvailability($profileButtonId, $candidate['availability']['campus']);
+                    $this->createCampusVisibility($profileButtonId, $candidate['visibility']['campus']);
+                    $this->createRoleAvailability($profileButtonId, $candidate['availability']['role']);
+                    $this->createRoleVisibility($profileButtonId, $candidate['visibility']['role']);
                 }
             }
         }
@@ -115,6 +126,26 @@ class SystemButtons
         $this->createButtonStatement = $this->db->prepare("
             INSERT INTO profile_button (roletype, type, sort_order, title, text, icon, url, css, target)
             VALUES (:roletype, :type, :sortOrder, :title, :text, :icon, :url, :css, :target)
+        ");
+
+        $this->campusAvailabilityInsertStatement = $this->db->prepare("
+            INSERT INTO profile_button_campus_availability (profile_button_id, campus_id)
+            VALUES (?, ?)
+        ");
+
+        $this->campusVisibilityInsertStatement = $this->db->prepare("
+            INSERT INTO profile_button_campus_visibility (profile_button_id, campus_id)
+            VALUES (?, ?)
+        ");
+
+        $this->roleAvailabilityInsertStatement = $this->db->prepare("
+            INSERT INTO profile_button_role_availability (profile_button_id, role_id)
+            VALUES (?, ?)
+        ");
+
+        $this->roleVisibilityInsertStatement = $this->db->prepare("
+            INSERT INTO profile_button_role_visibility (profile_button_id, role_id)
+            VALUES (?, ?)
         ");
     }
 
@@ -369,5 +400,89 @@ class SystemButtons
         }
 
         return null;
+    }
+
+
+    /**
+     * Recreate a relationship using $candidate's existing nodes and this new $profileButtonId
+     *
+     * @param int|null $profileButtonId
+     * @param array $campusIds
+     * @return void
+     */
+    private function createCampusAvailability(?int $profileButtonId, array $campusIds): void
+    {
+        if ($this->perform) {
+            foreach ($campusIds as $campusId) {
+                /* TODO make this a key-value tuple
+                 */
+                $this->campusAvailabilityInsertStatement->execute([
+                    $profileButtonId, $campusId
+                ]);
+            }
+        }
+    }
+
+
+    /**
+     * Recreate a relationship using $candidate's existing nodes and this new $profileButtonId
+     *
+     * @param int|null $profileButtonId
+     * @param array $campusIds
+     * @return void
+     */
+    private function createCampusVisibility(?int $profileButtonId, array $campusIds): void
+    {
+        if ($this->perform) {
+            foreach ($campusIds as $campusId) {
+                /* TODO make this a key-value tuple
+                 */
+                $this->campusVisibilityInsertStatement->execute([
+                    $profileButtonId, $campusId
+                ]);
+            }
+        }
+    }
+
+
+    /**
+     * Recreate a relationship using $candidate's existing nodes and this new $profileButtonId
+     *
+     * @param int|null $profileButtonId
+     * @param array $roleIds
+     * @return void
+     */
+    private function createRoleAvailability(?int $profileButtonId, array $roleIds): void
+    {
+        if ($this->perform) {
+            foreach ($roleIds as $roleId) {
+                /* TODO make this a key-value tuple
+                 */
+                $this->roleAvailabilityInsertStatement->execute([
+                    $profileButtonId, $roleId
+                ]);
+            }
+        }
+    }
+
+
+    /**
+     * Recreate a relationship using $candidate's existing nodes and this new $profileButtonId
+     *
+     * @param int|null $profileButtonId
+     * @param array $roleIds
+     * @return void
+     */
+    private function createRoleVisibility(?int $profileButtonId, array $roleIds): void
+    {
+        if ($this->perform) {
+            foreach ($roleIds as $roleId) {
+                /* TODO make this a key-value tuple
+                 */
+                $this->roleVisibilityInsertStatement->execute([
+                    $profileButtonId, $roleId
+                ]);
+            }
+        }
     }
 }
