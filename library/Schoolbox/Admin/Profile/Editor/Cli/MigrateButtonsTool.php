@@ -62,6 +62,7 @@ class MigrateButtonsTool extends CliTool\App
 
     /* Some prepared statements that we'll often reuse
      */
+    private \PDOStatement $createButtonStatement;
     private \PDOStatement $campusAvailabilityStatement;
     private \PDOStatement $campusAvailabilityInsertStatement;
     private \PDOStatement $campusVisibilityStatement;
@@ -205,6 +206,11 @@ HELP;
      */
     private function prepareStatements(): void
     {
+        $this->createButtonStatement = $this->getDatabaseInternal()->prepare("
+            INSERT INTO profile_button (sort_order, title, text, icon, url, css, target, type, roletype)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+        ");
+
         $this->campusAvailabilityStatement = $this->getDatabaseInternal()->prepare("
             SELECT *
             FROM profile_button_campus_availability
@@ -342,13 +348,7 @@ HELP;
             $roletype
         ));
 
-        $query = "
-            INSERT INTO profile_button (sort_order, title, text, icon, url, css, target, type, roletype)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-        ";
-
-        $statement = $this->getDatabaseInternal()->prepare($query);
-        $statement->execute([
+        $this->createButtonStatement->execute([
             $candidate['sort_order'],
             $candidate['title'],
             $candidate['text'],
