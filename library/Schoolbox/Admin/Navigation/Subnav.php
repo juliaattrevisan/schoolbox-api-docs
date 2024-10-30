@@ -183,8 +183,8 @@ class Subnav
                         'children'    => [],
                         'description' => 'Configure the list of categories that badges can be defined within.',
                     ],
-                    '/adminv2/filters/badgeList' => [
-                        'name'        => $filterLabelBuilder->buildLabel(FilterPageModel::PAGE_BADGE_LIST),
+                    '/adminv2/filters/badge/badgeList' => [
+                        'name'        => $filterLabelBuilder->buildLabel(FilterPageModel::PAGE_BADGE_LIST) . ' Filter',
                         'visible'     => (
                             ($userIsSuperuser || $userHasServicePermissionBadge) &&
                             $filterAvailabilityChecker->isAvailable(FilterPageModel::PAGE_BADGE_LIST)
@@ -192,8 +192,8 @@ class Subnav
                         'children'    => [],
                         'description' => 'Configure the default and available filter options on the goal and achievements search page.',
                     ],
-                    '/adminv2/filters/awardList' => [
-                        'name'        => $filterLabelBuilder->buildLabel(FilterPageModel::PAGE_AWARD_LIST),
+                    '/adminv2/filters/badge/awardList' => [
+                        'name'        => $filterLabelBuilder->buildLabel(FilterPageModel::PAGE_AWARD_LIST) . ' Filter',
                         'visible'     => (
                             ($userIsSuperuser || $userHasServicePermissionBadge) &&
                             $filterAvailabilityChecker->isAvailable(FilterPageModel::PAGE_AWARD_LIST)

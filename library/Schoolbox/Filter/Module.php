@@ -50,6 +50,14 @@ class Module extends AlaressModule
             )
         );
 
+        $ruleBadge = new Rule\All(
+            new Rule\IsLoggedIn(),
+            new Rule\Any(
+                new Rule\IsSuperuser(),
+                new Rule\HasServicePermission(UserAccess::SERVICE_BADGE, UserAccess::ACCESS_FULL)
+            )
+        );
+
         $loadFactoryFactory = function (array $params) {
             switch ($params['page']) {
                 case Page\Model::PAGE_PENDING_ASSESSMENTS:
@@ -78,6 +86,12 @@ class Module extends AlaressModule
         $this->register('GET', "/lms/{page:$pagesRegex}", 'getPageSettingsLms', $ruleLms, $loadFactoryFactory);
         $this->register('POST', "/lms/{page:$pagesRegex}", 'postSavePageSettingsLms', $ruleLms, $loadFactoryFactory);
         $this->register('POST', "/lms/{page:$pagesRegex}/pushDefaultSelections", 'postPushDefaultSelectionsLms', $ruleLms, $loadFactoryFactory);
+
+        // Routes to which users with service permission UserAccess::SERVICE_BADGE need access.
+        $pagesRegex = '(badgeList|awardList)';
+        $this->register('GET', "/badge/{page:$pagesRegex}", 'getPageSettingsBadge', $ruleBadge, $loadFactoryFactory);
+        $this->register('POST', "/badge/{page:$pagesRegex}", 'postSavePageSettingsBadge', $ruleBadge, $loadFactoryFactory);
+        $this->register('POST', "/badge/{page:$pagesRegex}/pushDefaultSelections", 'postPushDefaultSelectionsBadge', $ruleBadge, $loadFactoryFactory);
 
         $this->register('GET', '', 'getIndex', $isSuper);
         $this->register('GET', '/{page}', 'getPageSettings', $isSuper, $loadFactoryFactory);
