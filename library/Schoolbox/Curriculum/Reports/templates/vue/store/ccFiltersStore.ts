@@ -28,6 +28,10 @@ export const useFiltersStore = defineStore("ccFilters", () => {
             value: ReportOptionValues.RUBRIC,
             label: "Rubric",
         },
+        {
+            value: ReportOptionValues.RUBRIC,
+            label: "In-use Rubric",
+        },
     ]); // all report options available
     const selectedReportOptions = window.Vue.ref<ReportOptionValues[]>([
         ...allReportOptions.value.map((option) => option.value),

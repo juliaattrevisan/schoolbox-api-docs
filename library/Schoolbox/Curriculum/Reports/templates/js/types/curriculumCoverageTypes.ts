@@ -48,6 +48,7 @@ export enum ReportOptionValues {
     LEARNING_ACTIVITY = "activity",
     LEARNING_ACTIVITY_LESSON_PLAN = "lessonPlan",
     RUBRIC = "rubric",
+    IN_USE_RUBRIC = "inUseRubric",
 }
 
 /**
