@@ -6,7 +6,7 @@
 
 import { toRef, useTemplateRef } from "vue";
 import { useActiveIndex } from "./composables/useActiveIndex";
-import type { SearchSelectItem } from "./types/searchSelectTypes";
+import type { SearchSelectItem } from "../../composables/search/types/SearchSelectItem";
 
 interface Props {
     results: SearchSelectItem[]; // the results returned from the search

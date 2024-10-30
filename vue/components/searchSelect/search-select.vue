@@ -5,8 +5,8 @@
 
 import { useTemplateRef } from "vue";
 import { useSelected } from "@schoolboxVue/composables/store/useSelected";
-import { useSearch } from "./composables/useSearch";
-import type { SearchSelectItem } from "./types/searchSelectTypes";
+import { useSearch } from "../../composables/search/useSearch";
+import type { SearchSelectItem } from "../../composables/search/types/SearchSelectItem";
 import SsSelected from "./ss-selected.vue";
 import SsQueryInput from "./ss-query-input.vue";
 import SsResults from "./ss-results.vue";

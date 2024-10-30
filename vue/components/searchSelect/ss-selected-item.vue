@@ -3,7 +3,7 @@
  * Displays a single selected item that can be removed
  */
 
-import type { SearchSelectItem } from "./types/searchSelectTypes";
+import type { SearchSelectItem } from "../../composables/search/types/SearchSelectItem";
 
 interface Props {
     item: SearchSelectItem; // the selected item

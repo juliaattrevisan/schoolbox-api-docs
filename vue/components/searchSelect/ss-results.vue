@@ -4,7 +4,7 @@
  */
 
 import { onKeyStroke } from "@vueuse/core";
-import type { SearchSelectItem } from "./types/searchSelectTypes";
+import type { SearchSelectItem } from "../../composables/search/types/SearchSelectItem";
 import SsResultsSelectAll from "./ss-results-select-all.vue";
 import SsResultsItem from "./ss-results-item.vue";
 
