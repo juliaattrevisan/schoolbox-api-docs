@@ -85,12 +85,12 @@ class SystemButtons
             foreach ($data as $candidate) {
                 $this->log->info(sprintf(
                     'Adding "%s" into %s roletype',
-                    $candidate['title'],
+                    $candidate['row']['title'],
                     $roletype
                 ));
 
                 if ($this->perform) {
-                    $this->createButtonStatement->execute($candidate);
+                    $this->createButtonStatement->execute($candidate['row']);
                 }
             }
         }
@@ -122,106 +122,196 @@ class SystemButtons
         $candidates = [
             MigrateButtonsTool::ROLETYPE_STUDENT => [
                 [
-                    'roletype' => MigrateButtonsTool::ROLETYPE_STUDENT,
-                    'type' => self::SYSTEM_EPORTFOLIO,
-                    'sortOrder' => 1,
-                    'title' => 'ePortfolio',
-                    'text' => 'ePortfolio',
-                    'icon' => 'eportfolio',
-                    'url' => '/eportfolio/[profileId]', // named confusingly, this is the viewee's user.id
-                    'css' => null,
-                    'target' => null,
+                    'row' => [
+                        'roletype' => MigrateButtonsTool::ROLETYPE_STUDENT,
+                        'type' => self::SYSTEM_EPORTFOLIO,
+                        'sortOrder' => 1,
+                        'title' => 'ePortfolio',
+                        'text' => 'ePortfolio',
+                        'icon' => 'eportfolio',
+                        'url' => '/eportfolio/[profileId]', // named confusingly, this is the viewee's user.id
+                        'css' => null,
+                        'target' => null,
+                    ],
+                    'availability' => [
+                        'campus' => [],
+                        'role' => []
+                    ],
+                    'visibility' => [
+                        'campus' => [],
+                        'role' => []
+                    ],
                 ],
                 [
-                    'roletype' => MigrateButtonsTool::ROLETYPE_STUDENT,
-                    'type' => self::SYSTEM_DUEWORK,
-                    'sortOrder' => 2,
-                    'title' => 'Due Work',
-                    'text' => 'Due Work',
-                    'icon' => 'due-work',
-                    'url' => '', // derived dynamically with a routeLookup
-                    'css' => null,
-                    'target' => null,
+                    'row' => [
+                        'roletype' => MigrateButtonsTool::ROLETYPE_STUDENT,
+                        'type' => self::SYSTEM_DUEWORK,
+                        'sortOrder' => 2,
+                        'title' => 'Due Work',
+                        'text' => 'Due Work',
+                        'icon' => 'due-work',
+                        'url' => '', // derived dynamically with a routeLookup
+                        'css' => null,
+                        'target' => null,
+                    ],
+                    'availability' => [
+                        'campus' => [],
+                        'role' => []
+                    ],
+                    'visibility' => [
+                        'campus' => [],
+                        'role' => []
+                    ],
                 ],
                 [
-                    'roletype' => MigrateButtonsTool::ROLETYPE_STUDENT,
-                    'type' => self::SYSTEM_GRADES,
-                    'sortOrder' => 3,
-                    'title' => 'Grades',
-                    'text' => 'Grades',
-                    'icon' => 'tick',
-                    'url' => '', // derived dynamically with a routeLookup
-                    'css' => null,
-                    'target' => null,
+                    'row' => [
+                        'roletype' => MigrateButtonsTool::ROLETYPE_STUDENT,
+                        'type' => self::SYSTEM_GRADES,
+                        'sortOrder' => 3,
+                        'title' => 'Grades',
+                        'text' => 'Grades',
+                        'icon' => 'tick',
+                        'url' => '', // derived dynamically with a routeLookup
+                        'css' => null,
+                        'target' => null,
+                    ],
+                    'availability' => [
+                        'campus' => [],
+                        'role' => []
+                    ],
+                    'visibility' => [
+                        'campus' => [],
+                        'role' => []
+                    ],
                 ],
                 [
-                    'roletype' => MigrateButtonsTool::ROLETYPE_STUDENT,
-                    'type' => self::SYSTEM_PASTORAL,
-                    'sortOrder' => 4,
-                    'title' => 'Pastoral Care',
-                    'text' => 'Pastoral Care',
-                    'icon' => 'pastoral',
-                    'url' => '', // derived dynamically with a routeLookup
-                    'css' => null,
-                    'target' => null,
+                    'row' => [
+                        'roletype' => MigrateButtonsTool::ROLETYPE_STUDENT,
+                        'type' => self::SYSTEM_PASTORAL,
+                        'sortOrder' => 4,
+                        'title' => 'Pastoral Care',
+                        'text' => 'Pastoral Care',
+                        'icon' => 'pastoral',
+                        'url' => '', // derived dynamically with a routeLookup
+                        'css' => null,
+                        'target' => null,
+                    ],
+                    'availability' => [
+                        'campus' => [],
+                        'role' => []
+                    ],
+                    'visibility' => [
+                        'campus' => [],
+                        'role' => []
+                    ],
                 ],
                 [
-                    'roletype' => MigrateButtonsTool::ROLETYPE_STUDENT,
-                    'type' => self::SYSTEM_CALENDAR,
-                    'sortOrder' => 5,
-                    'title' => 'Calendar',
-                    'text' => 'Calendar',
-                    'icon' => 'calendar',
-                    'url' => '', // derived dynamically with a routeLookup
-                    'css' => null,
-                    'target' => null,
+                    'row' => [
+                        'roletype' => MigrateButtonsTool::ROLETYPE_STUDENT,
+                        'type' => self::SYSTEM_CALENDAR,
+                        'sortOrder' => 5,
+                        'title' => 'Calendar',
+                        'text' => 'Calendar',
+                        'icon' => 'calendar',
+                        'url' => '', // derived dynamically with a routeLookup
+                        'css' => null,
+                        'target' => null,
+                    ],
+                    'availability' => [
+                        'campus' => [],
+                        'role' => []
+                    ],
+                    'visibility' => [
+                        'campus' => [],
+                        'role' => []
+                    ],
                 ],
                 [
-                    'roletype' => MigrateButtonsTool::ROLETYPE_STUDENT,
-                    'type' => self::SYSTEM_TIMETABLE,
-                    'sortOrder' => 6,
-                    'title' => 'Timetable',
-                    'text' => 'Timetable',
-                    'icon' => 'timetable',
-                    'url' => '', // derived dynamically with a routeLookup
-                    'css' => null,
-                    'target' => null,
+                    'row' => [
+                        'roletype' => MigrateButtonsTool::ROLETYPE_STUDENT,
+                        'type' => self::SYSTEM_TIMETABLE,
+                        'sortOrder' => 6,
+                        'title' => 'Timetable',
+                        'text' => 'Timetable',
+                        'icon' => 'timetable',
+                        'url' => '', // derived dynamically with a routeLookup
+                        'css' => null,
+                        'target' => null,
+                    ],
+                    'availability' => [
+                        'campus' => [],
+                        'role' => []
+                    ],
+                    'visibility' => [
+                        'campus' => [],
+                        'role' => []
+                    ],
                 ],
                 [
-                    'roletype' => MigrateButtonsTool::ROLETYPE_STUDENT,
-                    'type' => self::SYSTEM_PASTORAL_SYNERGETIC,
-                    'sortOrder' => 7,
-                    'title' => 'Synweb',
-                    'text' => 'Synweb',
-                    'icon' => 'synergetic',
-                    'url' => sprintf(
-                        '%s/stud.aspx?id=[profileExternalId]',
-                        $this->externalStaffPortal
-                    ),
-                    'css' => null,
-                    'target' => '_blank',
+                    'row' => [
+                        'roletype' => MigrateButtonsTool::ROLETYPE_STUDENT,
+                        'type' => self::SYSTEM_PASTORAL_SYNERGETIC,
+                        'sortOrder' => 7,
+                        'title' => 'Synweb',
+                        'text' => 'Synweb',
+                        'icon' => 'synergetic',
+                        'url' => sprintf(
+                            '%s/stud.aspx?id=[profileExternalId]',
+                            $this->externalStaffPortal
+                        ),
+                        'css' => null,
+                        'target' => '_blank',
+                    ],
+                    'availability' => [
+                        'campus' => [],
+                        'role' => []
+                    ],
+                    'visibility' => [
+                        'campus' => [],
+                        'role' => []
+                    ],
                 ],
                 [
-                    'roletype' => MigrateButtonsTool::ROLETYPE_STUDENT,
-                    'type' => self::SYSTEM_DOCUMENT_MANAGEMENT,
-                    'sortOrder' => 8,
-                    'title' => 'Documents',
-                    'text' => 'Documents',
-                    'icon' => 'document',
-                    'url' => '', // derived dynamically with a routeLookup
-                    'css' => null,
-                    'target' => null,
+                    'row' => [
+                        'roletype' => MigrateButtonsTool::ROLETYPE_STUDENT,
+                        'type' => self::SYSTEM_DOCUMENT_MANAGEMENT,
+                        'sortOrder' => 8,
+                        'title' => 'Documents',
+                        'text' => 'Documents',
+                        'icon' => 'document',
+                        'url' => '', // derived dynamically with a routeLookup
+                        'css' => null,
+                        'target' => null,
+                    ],
+                    'availability' => [
+                        'campus' => [],
+                        'role' => []
+                    ],
+                    'visibility' => [
+                        'campus' => [],
+                        'role' => []
+                    ],
                 ],
                 [
-                    'roletype' => MigrateButtonsTool::ROLETYPE_STUDENT,
-                    'type' => self::SYSTEM_GEOSNAPSHOT,
-                    'sortOrder' => 9,
-                    'title' => 'GeoSnapShot',
-                    'text' => 'GeoSnapShot',
-                    'icon' => 'geosnapshot',
-                    'url' => '/geosnapshot/user/[profileId]', // derived dynamically with a routeLookup in addition
-                    'css' => null,
-                    'target' => null,
+                    'row' => [
+                        'roletype' => MigrateButtonsTool::ROLETYPE_STUDENT,
+                        'type' => self::SYSTEM_GEOSNAPSHOT,
+                        'sortOrder' => 9,
+                        'title' => 'GeoSnapShot',
+                        'text' => 'GeoSnapShot',
+                        'icon' => 'geosnapshot',
+                        'url' => '/geosnapshot/user/[profileId]', // derived dynamically with a routeLookup in addition
+                        'css' => null,
+                        'target' => null,
+                    ],
+                    'availability' => [
+                        'campus' => [],
+                        'role' => []
+                    ],
+                    'visibility' => [
+                        'campus' => [],
+                        'role' => []
+                    ],
                 ],
                 /* TODO There are emailAllStaff and emailAllParents buttons
                  *  Not really sure how I'll deal wtih those just yet
