@@ -9,6 +9,8 @@ declare(strict_types=1);
 
 namespace Schoolbox\Admin\Profile\Editor\Cli;
 
+use Schoolbox\Admin\Profile\Editor\Cli\Strategy\CustomButtons;
+use Schoolbox\Admin\Profile\Editor\Cli\Strategy\SystemButtons;
 use Schoolbox\Application\CliTool;
 
 class MigrateButtonsTool extends CliTool\App
@@ -63,14 +65,7 @@ class MigrateButtonsTool extends CliTool\App
     /* Some prepared statements that we'll often reuse
      */
     private \PDOStatement $createButtonStatement;
-    private \PDOStatement $campusAvailabilityStatement;
-    private \PDOStatement $campusAvailabilityInsertStatement;
-    private \PDOStatement $campusVisibilityStatement;
-    private \PDOStatement $campusVisibilityInsertStatement;
-    private \PDOStatement $roleAvailabilityStatement;
-    private \PDOStatement $roleAvailabilityInsertStatement;
-    private \PDOStatement $roleVisibilityStatement;
-    private \PDOStatement $roleVisibilityInsertStatement;
+
 
 
     /**
@@ -100,7 +95,9 @@ This creates Profile Button equivalents for our previously-hardcoded system butt
 It also migrates System and Custom buttons into their corresponding roletypes based
 on whatever role(s) were enabled for them.
 
-Usage: php migrate-buttons.php -vvv --perform
+Usage: php migrate-buttons.php -vvv --custom --perform
+Usage: php migrate-buttons.php -vvv --system --perform
+Usage: php migrate-buttons.php -vvv --system --custom --perform
 
 
 HELP;
@@ -122,10 +119,6 @@ HELP;
             $this->getLogger()->info('Profile Editor Button Migration.');
             $this->getLogger()->info('');
 
-            /* Set up some prepared statements, presuming that we'll go ahead with all this
-             */
-            $this->prepareStatements();
-
             /* Figure out which roletype corresponds to each role
              */
             $roletypeLookup = $this->generateRoletypeLookup();
@@ -133,41 +126,26 @@ HELP;
             /* Get a list of buttons to inspect - users can specify --system,
              * --custom, or both
              */
-            $candidates = $this->generateCustomCandidates($roletypeLookup);
+            $strats = [];
 
-            /* Each button can have zero or more roles associated with it
-             * Inspect each button's relationships to find out which roles,
-             * and thus which role types, they need. Find a unique list of
-             * roletypes; we need to clone thus button out for each one.
-             *
-             * We'll use role visibility as the most definitive way to figure
-             * out corresponding roletype(s) for a button. Campus is too broad
-             * a stroke and roles have a direct relationship with a roletype.
+            if ($this->getOpt(self::OPT_LONG_TYPE_CUSTOM)) {
+                $strats[] = new CustomButtons($this->getDatabaseInternal(), $this->getLogger(), $roletypeLookup);
+            }
+
+            if ($this->getOpt(self::OPT_LONG_TYPE_SYSTEM)) {
+                $strats[] = new SystemButtons($this->getDatabaseInternal(), $this->getLogger(), $roletypeLookup);
+            }
+
+            /* Slam them in if we chose some
+             * Otherwise tell the user
              */
-            foreach ($candidates as $candidate) {
-                /* For every role type related to this button, spawn a new one,
-                 * an exact replica. If the button is associated with only one
-                 * role type, you can just reuse it instead.
-                 */
-                foreach ($candidate['_roletypes'] as $roletype) {
-                    /* Create a button in the current roletype
-                     */
-                    $profileButtonId = $this->createButton($candidate, $roletype, self::OPT_LONG_TYPE_CUSTOM);
+            if (!count($strats)) {
+                $this->getLogger()->info('Please select --system and/or --custom.');
+                return;
+            }
 
-                    /* Bring along their existing relationships too, exactly as they were,
-                     * and reassign them to this new row we just made
-                     */
-
-                    /* Campus availability/visibility
-                     */
-                    $this->createCampusAvailability($profileButtonId, (int)$candidate['id']);
-                    $this->createCampusVisibility($profileButtonId, (int)$candidate['id']);
-
-                    /* Role availability/visibility
-                     */
-                    $this->createRoleAvailability($profileButtonId, (int)$candidate['id']);
-                    $this->createRoleVisibility($profileButtonId, (int)$candidate['id']);
-                }
+            foreach ($strats as $strat) {
+                $strat->migrate();
             }
         } catch (\Alaress\Lock\LockRefreshException $e) {
             /* Lock TTL expired; just leave politely
@@ -186,64 +164,6 @@ HELP;
         $this->getLogger()->debug('Releasing lock');
 
         $lock->release();
-    }
-
-
-    /**
-     * We'll be reusing these prepared statements a lot
-     *
-     * @return void
-     */
-    private function prepareStatements(): void
-    {
-        $this->createButtonStatement = $this->getDatabaseInternal()->prepare("
-            INSERT INTO profile_button (sort_order, title, text, icon, url, css, target, type, roletype)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-        ");
-
-        $this->campusAvailabilityStatement = $this->getDatabaseInternal()->prepare("
-            SELECT *
-            FROM profile_button_campus_availability
-            WHERE profile_button_id = :profileButtonId
-        ");
-
-        $this->campusAvailabilityInsertStatement = $this->getDatabaseInternal()->prepare("
-            INSERT INTO profile_button_campus_availability (profile_button_id, campus_id)
-            VALUES (?, ?)
-        ");
-
-        $this->campusVisibilityStatement = $this->getDatabaseInternal()->prepare("
-            SELECT *
-            FROM profile_button_campus_visibility
-            WHERE profile_button_id = :profileButtonId
-        ");
-
-        $this->campusVisibilityInsertStatement = $this->getDatabaseInternal()->prepare("
-            INSERT INTO profile_button_campus_visibility (profile_button_id, campus_id)
-            VALUES (?, ?)
-        ");
-
-        $this->roleAvailabilityStatement = $this->getDatabaseInternal()->prepare("
-            SELECT *
-            FROM profile_button_role_availability
-            WHERE profile_button_id = :profileButtonId
-        ");
-
-        $this->roleAvailabilityInsertStatement = $this->getDatabaseInternal()->prepare("
-            INSERT INTO profile_button_role_availability (profile_button_id, role_id)
-            VALUES (?, ?)
-        ");
-
-        $this->roleVisibilityStatement = $this->getDatabaseInternal()->prepare("
-            SELECT *
-            FROM profile_button_role_visibility
-            WHERE profile_button_id = :profileButtonId
-        ");
-
-        $this->roleVisibilityInsertStatement = $this->getDatabaseInternal()->prepare("
-            INSERT INTO profile_button_role_visibility (profile_button_id, role_id)
-            VALUES (?, ?)
-        ");
     }
 
 
@@ -269,167 +189,6 @@ HELP;
         }
 
         return $lookup;
-    }
-
-
-    /**
-     * Generate a list of buttons we need to recreate
-     *
-     * @param array $roletypeLookup
-     * @return array
-     */
-    public function generateCustomCandidates(array $roletypeLookup): array
-    {
-        $query = "
-            SELECT 
-                pb.*,
-                pbra.role_id
-            FROM profile_button pb
-            INNER JOIN profile_button_role_availability pbra ON pb.id = pbra.profile_button_id
-            WHERE pb.roletype IS NULL
-        ";
-
-        $statement = $this->getDatabaseInternal()->prepare($query);
-        $statement->execute();
-
-        $candidates = [];
-
-        while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
-            if (!isset($candidates[$row['id']])) {
-                $data = $row;
-
-                /* We don't actually need this node here
-                 */
-                unset($data['role_id']);
-
-                $candidates[$row['id']] = $data;
-
-                /* Build a unique list of related role_ids
-                 */
-                $candidates[$row['id']]['_roletypes'] = [];
-            }
-
-            /* Identify the roletype
-             */
-            $roletype = $roletypeLookup[$row['role_id']];
-
-            /* Add it to the list uniquely
-             */
-            $candidates[$row['id']]['_roletypes'][$roletype] = $roletype;
-        }
-
-        return $candidates;
-    }
-
-
-    /**
-     * Creates a new button in profile_button, associated with $roletype,
-     * returning you its autoincremented id so you can re-establish relationships
-     * with this new button
-     *
-     * @param array $candidate
-     * @param string $roletype
-     * @param string $type
-     * @return int
-     */
-    private function createButton(array $candidate, string $roletype, string $type): int {
-        $this->getLogger()->info(sprintf(
-            'Migrating "%s" to %s roletype',
-            $candidate['title'],
-            $roletype
-        ));
-
-        $this->createButtonStatement->execute([
-            $candidate['sort_order'],
-            $candidate['title'],
-            $candidate['text'],
-            $candidate['icon'],
-            $candidate['url'],
-            $candidate['css'],
-            $candidate['target'],
-            $type,
-            $roletype
-        ]);
-
-        /* The new button's id - we just made this a moment ago
-         */
-        return (int)$this->getDatabaseInternal()->lastInsertId();
-    }
-
-
-    /**
-     * Recreate a relationship using $candidate's existing nodes and this new $profileButtonId
-     *
-     * @param int $profileButtonId
-     * @param int $oldProfileButtonId
-     * @return void
-     */
-    private function createCampusAvailability(int $profileButtonId, int $oldProfileButtonId): void
-    {
-        $this->campusAvailabilityStatement->execute([
-            'profileButtonId' => $oldProfileButtonId
-        ]);
-
-        while ($row = $this->campusAvailabilityStatement->fetch(\PDO::FETCH_ASSOC)) {
-            $this->campusAvailabilityInsertStatement->execute([$profileButtonId, $row['campus_id']]);
-        }
-    }
-
-
-    /**
-     * Recreate a relationship using $candidate's existing nodes and this new $profileButtonId
-     *
-     * @param int $profileButtonId
-     * @param int $oldProfileButtonId
-     * @return void
-     */
-    private function createCampusVisibility(int $profileButtonId, int $oldProfileButtonId): void
-    {
-        $this->campusVisibilityStatement->execute([
-            'profileButtonId' => $oldProfileButtonId
-        ]);
-
-        while ($row = $this->campusVisibilityStatement->fetch(\PDO::FETCH_ASSOC)) {
-            $this->campusVisibilityInsertStatement->execute([$profileButtonId, $row['campus_id']]);
-        }
-    }
-
-
-    /**
-     * Recreate a relationship using $candidate's existing nodes and this new $profileButtonId
-     *
-     * @param int $profileButtonId
-     * @param int $oldProfileButtonId
-     * @return void
-     */
-    private function createRoleAvailability(int $profileButtonId, int $oldProfileButtonId): void
-    {
-        $this->roleAvailabilityStatement->execute([
-            'profileButtonId' => $oldProfileButtonId
-        ]);
-
-        while ($row = $this->roleAvailabilityStatement->fetch(\PDO::FETCH_ASSOC)) {
-            $this->roleAvailabilityInsertStatement->execute([$profileButtonId, $row['role_id']]);
-        }
-    }
-
-
-    /**
-     * Recreate a relationship using $candidate's existing nodes and this new $profileButtonId
-     *
-     * @param int $profileButtonId
-     * @param int $oldProfileButtonId
-     * @return void
-     */
-    private function createRoleVisibility(int $profileButtonId, int $oldProfileButtonId): void
-    {
-        $this->roleVisibilityStatement->execute([
-            'profileButtonId' => $oldProfileButtonId
-        ]);
-
-        while ($row = $this->roleVisibilityStatement->fetch(\PDO::FETCH_ASSOC)) {
-            $this->roleVisibilityInsertStatement->execute([$profileButtonId, $row['role_id']]);
-        }
     }
 
 
