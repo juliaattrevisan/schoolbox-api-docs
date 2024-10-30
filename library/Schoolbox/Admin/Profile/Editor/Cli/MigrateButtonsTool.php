@@ -141,6 +141,53 @@ HELP;
                         $candidate['title'],
                         self::ROLETYPE_STUDENT
                     ));
+
+                    $query = "
+                        INSERT INTO profile_button (sort_order, title, text, icon, url, css, target, type, roletype)
+                        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+                    ";
+
+                    $statement = $this->getDatabaseInternal()->prepare($query);
+                    $statement->execute([
+                        $candidate['sort_order'],
+                        $candidate['title'],
+                        $candidate['text'],
+                        $candidate['icon'],
+                        $candidate['url'],
+                        $candidate['css'],
+                        $candidate['target'],
+                        self::OPT_LONG_TYPE_CUSTOM,
+                        $roletype
+                    ]);
+
+                    /* The new button's id - we just made this a moment ago
+                     */
+                    $id = $this->getDatabaseInternal()->lastInsertId();
+
+                    /* Bring along their existing relationships too, exactly as they were,
+                     * and reassign them to this new row we just made
+                     */
+                    $query = "
+                        SELECT * 
+                        FROM profile_button_campus_availability
+                        WHERE profile_button_id = :profileButtonId
+                    ";
+
+                    $statement = $this->getDatabaseInternal()->prepare($query);
+                    $statement->execute([
+                        'profileButtonId' => $candidate['id']
+                    ]);
+
+                    while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
+                        $query = "
+                            INSERT INTO profile_button_campus_availability (profile_button_id, campus_id)
+                            VALUES (?, ?)
+                        ";
+
+                        print_r([$id, $row['campus_id']]);
+                        $campusAvailabilityStatement = $this->getDatabaseInternal()->prepare($query);
+                        $campusAvailabilityStatement->execute([$id, $row['campus_id']]);
+                    }
                 }
             }
 
