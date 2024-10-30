@@ -11,7 +11,7 @@
         <li><a href="{{ routeReportBuilder }}" class="icon-result" title="{{ locale.pastoral.proper }} Report Builder">Report Builder</a></li>
     {% endif %}
     {% if routeBulkImport %}
-        <li><a href="{{ routeBulkImport }}" class="icon-upload" title="Bulk Import {{ locale.pastoral.proper }} Records">Bulk Import</a></li>
+        <li><a href="{{ routeBulkImport }}?{{ RETURN_URL.name }}={{ RETURN_URL.current }}" class="icon-upload" title="Bulk Import {{ locale.pastoral.proper }} Records">Bulk Import</a></li>
     {% endif %}
     {% if routeGetGroups %}
         <li><a href="{{ routeGetGroups }}" class="icon-group" title="Manage {{ locale.pastoral.proper }} Groups">Manage Groups</a></li>

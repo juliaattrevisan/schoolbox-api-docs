@@ -149,6 +149,8 @@ class Controller extends Base
                     ->setFileVar('report')
                     ->setMulti(false)
                     ->getTwigContext(),
+                'returnUrl'         => $this->requestQuery->get('returnUrl')
+                    ?? $this->routeGenerator->generate('pastoral.getIndex'),
 
                 // Requirements for displaying visibility inputs
                 'record'          => $this->pastoralMapper->createModel()->setStudent(null),
@@ -226,7 +228,9 @@ class Controller extends Base
         $this->response = $this->responseFromTemplate(
             '@pastoralBulkImport/importPreview.twig',
             [
-                'files' => $files,
+                'files'     => $files,
+                'returnUrl' => $this->requestQuery->get('returnUrl')
+                    ?? $this->routeGenerator->generate('pastoral.getIndex'),
             ],
         );
     }
