@@ -57,6 +57,10 @@ function onCourseNameSelect(course: Course): void {
         window.location.href = course.folder._links.view;
     }
 }
+/*
+ * To open up the course selector modal
+ */
+function onButtonSelect() {}
 </script>
 
 <template>
@@ -73,6 +77,9 @@ function onCourseNameSelect(course: Course): void {
         :allow-partial-matches="true"
         :can-select-item="true"
         @select="onCourseNameSelect"
+        :has-button="true"
+        button-icon="icon-course"
+        @button-select="onButtonSelect"
     />
 </template>
 
