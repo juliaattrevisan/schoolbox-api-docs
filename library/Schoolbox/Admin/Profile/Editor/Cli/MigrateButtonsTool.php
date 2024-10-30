@@ -113,8 +113,24 @@ HELP;
              */
             $roletypeLookup = $this->generateRoletypeLookup();
 
-            print_r($roletypeLookup);
+            /* Get a list of buttons to inspect - users can specify --system,
+             * --custom, or both
+             */
 
+            /* Each button can have zero or more roles associated with it
+             * Inspect each button's relationships to find out which roles,
+             * and thus which role types, they need. Find a unique list of
+             * roletypes; we need to clone thus button out for each one.
+             *
+             * We'll use role visibility as the most definitive way to figure
+             * out corresponding roletype(s) for a button. Campus is too broad
+             * a stroke and roles have a direct relationship with a roletype.
+             */
+
+            /* For every role type related to this button, spawn a new one,
+             * an exact replica. If the button is associated with only one
+             * role type, you can just reuse it instead.
+             */
 
         } catch (\Alaress\Lock\LockRefreshException $e) {
             /* Lock TTL expired; just leave politely
