@@ -12,6 +12,7 @@ namespace Schoolbox\Paperly\Agent;
 use Alaress\Database\Connector\IConnector;
 use OutOfBoundsException;
 use InvalidArgumentException;
+use Exception;
 
 /**
  * Handler for the various actions the Paperly agent may perform.
@@ -98,6 +99,8 @@ class Handler
                 return $this->handleAllLanguagesRequest();
             case 'allRelationshipTypes':
                 return $this->handleAllRelationshipTypesRequest();
+            case 'updateDetailsData':
+                return $this->handleUpdateDetailsDataRequest($data);
             case 'healthcheck':
                 return $this->handleHealthCheckRequest();
             default:
@@ -1313,5 +1316,1009 @@ class Handler
             }
         }
         return array_values($livesWithArr);
+    }
+
+    public function validateUpdateDetailsRequestData(array $data): void
+    {
+        if (!isset($data['data']) || count((array)$data['data']) < 1) {
+            throw new OutOfBoundsException('Request body is not provided');
+        }
+
+        if (!isset($data['modified_by']) || $data['modified_by'] == '') {
+            throw new OutOfBoundsException('Modified By is not provided');
+        }
+
+        if (!$this->validateModifiedByUser($data['modified_by'])) {
+            throw new OutOfBoundsException('Invalid Modified By value');
+        }
+        // Validate each of the request params
+        $this->validateUpdateDetailsRequestBody($data);
+    }
+
+    private function validateModifiedByUser(int $id)
+    {
+        $sql = "SELECT ID FROM Community WHERE ID = ?";
+        $params = [$id];
+
+        $stmt = $this->externalDb->executeQuery($sql, $params);
+        return $stmt->fetchColumn() !== false;
+    }
+
+    private function validateUpdateDetailsRequestBody(array $data): void
+    {
+        $primaryAndSpouseValidators = $this->getParentUpdatedDetailsDataValidators();
+        $studentValidators = $this->getStudentUpdatedDetailsDataValidators();
+
+        $errors = [];
+
+        foreach (['primary', 'spouse', 'student'] as $type) {
+            if (isset($data['data'][$type])) {
+                $data = $data['data']['type'];
+                $validators = ($type === 'student') ? $studentValidators : $primaryAndSpouseValidators;
+
+                if ($type === 'student') {
+                    foreach ($data as $studentID => $studentData) {
+                        foreach ($studentData as $key => $value) {
+                            if (is_array($value)) {
+                                foreach ($value as $arrayField) {
+                                    foreach ($arrayField as $fieldKey => $fieldValue) {
+                                        if (isset($validators[$fieldKey])) {
+                                            if (!$validators[$fieldKey]($fieldValue)) {
+                                                $errors[] =
+                                                    "Invalid value for $fieldKey in $type user $studentID $key attribute";
+                                            }
+                                        } else {
+                                            $errors[] = "Invalid key $fieldKey in $type user $studentID $key attribute";
+                                        }
+                                    }
+                                }
+                            } else {
+                                if (isset($validators[$key])) {
+                                    if (!$validators[$key]($value)) {
+                                        $errors[] = "Invalid value for $key in $type user $studentID";
+                                    }
+                                } else {
+                                    $errors[] = "Invalid key $key in $type user $studentID";
+                                }
+                            }
+                        }
+                    }
+                } else {
+                    foreach ($data as $key => $value) {
+                        if (isset($validators[$key])) {
+                            if (!$validators[$key]($value)) {
+                                $errors[] = "Invalid value for $key in $type user";
+                            }
+                        } else {
+                            $errors[] = "Invalid key $key in $type user";
+                        }
+                    }
+                }
+            }
+        }
+
+        if (!empty($errors)) {
+            throw new OutOfBoundsException(implode("; ", $errors));
+        }
+    }
+
+    private function getParentUpdatedDetailsDataValidators(): array
+    {
+        return [
+            'ID' => function ($value) {
+                return !empty($value) && $value !== 'null';
+            },
+            'Surname' => function ($value) {
+                return is_string($value) && strlen($value) <= 30;
+            },
+            'Preferred' => function ($value) {
+                if (empty($value) || $value == 'null') {
+                    return true;
+                }
+                return is_string($value) && strlen($value) <= 20;
+            },
+            'Given1' => function ($value) {
+                return is_string($value) && strlen($value) <= 20;
+            },
+            'BirthDate' => function ($value) {
+                if (empty($value) || $value == 'null') {
+                    return true;
+                }
+                $date = (\Alaress_Date_Format::newFromTimestamp(strtotime($value)))->getUsingFormat('Y-m-d');
+                return $date === $value;
+            },
+            'HomeAddress1' => function ($value) {
+                return is_string($value);
+            },
+            'HomeAddress2' => function ($value) {
+                if (empty($value) || $value == 'null') {
+                    return true;
+                }
+                return is_string($value);
+            },
+            'HomeSuburb' => function ($value) {
+                return is_string($value);
+            },
+            'HomeState' => function ($value) {
+                return is_string($value);
+            },
+            'HomePostCode' => function ($value) {
+                return is_numeric($value);
+            },
+            'HomeAddressComma' => function ($value) {
+                if (empty($value) || $value == 'null') {
+                    return true;
+                }
+                return is_string($value);
+            },
+            'HomeAddressFull' => function ($value) {
+                if (empty($value) || $value == 'null') {
+                    return true;
+                }
+                return is_string($value);
+            },
+            'HomeAddressDPID' => function ($value) {
+                if (empty($value) || $value == 'null') {
+                    return true;
+                }
+                return is_numeric($value);
+            },
+            'HomeAddressLatitude' => function ($value) {
+                if (empty($value) || $value == 'null') {
+                    return true;
+                }
+                return is_numeric($value) && $value >= -90 && $value <= 90;
+            },
+            'HomeAddressLongitude' => function ($value) {
+                if (empty($value) || $value == 'null') {
+                    return true;
+                }
+                return is_numeric($value) && $value >= -180 && $value <= 180;
+            },
+            'Phone' => function ($value) {
+                if (empty($value) || $value == 'null') {
+                    return true;
+                }
+                return is_numeric($value);
+            },
+            'MobilePhone' => function ($value) {
+                if (empty($value) || $value == 'null') {
+                    return true;
+                }
+                return is_numeric($value) && strlen($value) <= 15;
+            },
+            'Email' => function ($value) {
+                return filter_var($value, FILTER_VALIDATE_EMAIL) && strlen($value) <= 100;
+            },
+            'OccupDesc' => function ($value) {
+                return is_string($value) && strlen($value) <= 50;
+            },
+            'OccupCode' => function ($value) {
+                if (empty($value) || $value == 'null') {
+                    return true;
+                }
+                return is_string($value);
+            },
+            'OccupPositionCode' => function ($value) {
+                return is_numeric($value) && strlen($value) <= 50;
+            },
+            'OccupCompany' => function ($value) {
+                if (empty($value) || $value == 'null') {
+                    return true;
+                }
+                return is_string($value) && strlen($value) <= 50;
+            },
+            'OccupPhone' => function ($value) {
+                if (empty($value) || $value == 'null') {
+                    return true;
+                }
+                return is_numeric($value) && strlen($value) <= 15;
+            },
+            'OccupEmail' => function ($value) {
+                if (empty($value) || $value == 'null') {
+                    return true;
+                }
+                return filter_var($value, FILTER_VALIDATE_EMAIL) && strlen($value) <= 100;
+            },
+            'OccupAddress1' => function ($value) {
+                if (empty($value) || $value == 'null') {
+                    return true;
+                }
+                return is_string($value) && strlen($value) <= 40;
+            },
+            'OccupAddress2' => function ($value) {
+                if (empty($value) || $value == 'null') {
+                    return true;
+                }
+                return is_string($value) && strlen($value) <= 40;
+            },
+            'OccupAddress3' => function ($value) {
+                if (empty($value) || $value == 'null') {
+                    return true;
+                }
+                return is_string($value) && strlen($value) <= 40;
+            },
+            'OccupSuburb' => function ($value) {
+                if (empty($value) || $value == 'null') {
+                    return true;
+                }
+                return is_string($value) && strlen($value) <= 40;
+            },
+            'OccupState' => function ($value) {
+                if (empty($value) || $value == 'null') {
+                    return true;
+                }
+                return is_string($value) && strlen($value) <= 5;
+            },
+            'OccupPostcode' => function ($value) {
+                if (empty($value) || $value == 'null') {
+                    return true;
+                }
+                return is_numeric($value);
+            },
+            'ReligionCode' => function ($value) {
+                if (empty($value) || $value == 'null') {
+                    return true;
+                }
+                return is_string($value);
+            },
+            'NationalityCode' => function ($value) {
+                if (empty($value) || $value == 'null') {
+                    return true;
+                }
+                return is_string($value);
+            },
+            'CountryOfBirthCode' => function ($value) {
+                return is_string($value);
+            },
+            'HomeLanguageCode' => function ($value) {
+                return is_string($value) || is_numeric($value);
+            },
+            'HighestSecondaryYearLevel' => function ($value) {
+                return is_numeric($value);
+            },
+            'HighestQualificationLevel' => function ($value) {
+                return is_numeric($value);
+            },
+        ];
+    }
+
+    private function getStudentUpdatedDetailsDataValidators(): array
+    {
+        return [
+            'ID' => function ($value) {
+                return !empty($value) && $value !== 'null';
+            },
+            'Preferred' => function ($value) {
+                if (empty($value) || $value == 'null') {
+                    return true;
+                }
+                return is_string($value) && strlen($value) <= 20;
+            },
+            'Gender' => function ($value) {
+                return is_string($value);
+            },
+            'IndigenousFlag' => function ($value) {
+                return is_bool(filter_var($value, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE));
+            },
+            'TSIFlag' => function ($value) {
+                return is_bool(filter_var($value, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE));
+            },
+            'HomeLanguageCode' => function ($value) {
+                return is_string($value) || is_numeric($value);
+            },
+            'PhotoPromFlag' => function ($value) {
+                return is_bool(filter_var($value, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE));
+            },
+            'PhotoPublicationFlag' => function ($value) {
+                return is_bool(filter_var($value, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE));
+            },
+            'PhotoWebFlag' => function ($value) {
+                return is_bool(filter_var($value, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE));
+            },
+            'DoctorName' => function ($value) {
+                if (empty($value) || $value == 'null') {
+                    return true;
+                }
+                return is_string($value) && strlen($value) <= 80;
+            },
+            'DoctorPhone' => function ($value) {
+                if (empty($value) || $value == 'null') {
+                    return true;
+                }
+                return is_numeric($value) && strlen($value) <= 15;
+            },
+            'DoctorAddress' => function ($value) {
+                if (empty($value) || $value == 'null') {
+                    return true;
+                }
+                return is_string($value) && strlen($value) <= 200;
+            },
+            'DentistName' => function ($value) {
+                if (empty($value) || $value == 'null') {
+                    return true;
+                }
+                return is_string($value) && strlen($value) <= 80;
+            },
+            'DentistPhone' => function ($value) {
+                if (empty($value) || $value == 'null') {
+                    return true;
+                }
+                return is_numeric($value) && strlen($value) <= 15;
+            },
+            'DentistAddress' => function ($value) {
+                if (empty($value) || $value == 'null') {
+                    return true;
+                }
+                return is_string($value) && strlen($value) <= 200;
+            },
+            'EmergencyName' => function ($value) {
+                if (empty($value) || $value == 'null') {
+                    return true;
+                }
+                return is_string($value) && strlen($value) <= 80;
+            },
+            'EmergencyAddress' => function ($value) {
+                if (empty($value) || $value == 'null') {
+                    return true;
+                }
+                return is_string($value) && strlen($value) <= 200;
+            },
+            'EmergencyPhone' => function ($value) {
+                if (empty($value) || $value == 'null') {
+                    return true;
+                }
+                return is_numeric($value) && strlen($value) <= 15;
+            },
+            'EmergencyPhoneAlt' => function ($value) {
+                if (empty($value) || $value == 'null') {
+                    return true;
+                }
+                return is_numeric($value) && strlen($value) <= 15;
+            },
+            'EmergencyRelat' => function ($value) {
+                if (empty($value) || $value == 'null') {
+                    return true;
+                }
+                return is_string($value);
+            },
+            'Emergency2Name' => function ($value) {
+                if (empty($value) || $value == 'null') {
+                    return true;
+                }
+                return is_string($value) && strlen($value) <= 80;
+            },
+            'Emergency2Address' => function ($value) {
+                if (empty($value) || $value == 'null') {
+                    return true;
+                }
+                return is_string($value) && strlen($value) <= 200;
+            },
+            'Emergency2Phone' => function ($value) {
+                if (empty($value) || $value == 'null') {
+                    return true;
+                }
+                return is_numeric($value) && strlen($value) <= 15;
+            },
+            'Emergency2PhoneAlt' => function ($value) {
+                if (empty($value) || $value == 'null') {
+                    return true;
+                }
+                return is_numeric($value) && strlen($value) <= 15;
+            },
+            'Emergency2Relat' => function ($value) {
+                if (empty($value) || $value == 'null') {
+                    return true;
+                }
+                return is_string($value);
+            },
+            'Emergency3Name' => function ($value) {
+                if (empty($value) || $value == 'null') {
+                    return true;
+                }
+                return is_string($value) && strlen($value) <= 80;
+            },
+            'Emergency3Address' => function ($value) {
+                if (empty($value) || $value == 'null') {
+                    return true;
+                }
+                return is_string($value) && strlen($value) <= 200;
+            },
+            'Emergency3Phone' => function ($value) {
+                if (empty($value) || $value == 'null') {
+                    return true;
+                }
+                return is_numeric($value) && strlen($value) <= 15;
+            },
+            'Emergency3PhoneAlt' => function ($value) {
+                if (empty($value) || $value == 'null') {
+                    return true;
+                }
+                return is_numeric($value) && strlen($value) <= 15;
+            },
+            'Emergency3Relat' => function ($value) {
+                if (empty($value) || $value == 'null') {
+                    return true;
+                }
+                return is_string($value);
+            },
+            'MedicalConditionSeq'  => function ($value) {
+                if (empty($value) || $value == 'null') {
+                    return true;
+                }
+                return is_numeric($value);
+            },
+            'MedicalConditionCode' => function ($value) {
+                if (empty($value) || $value == 'null') {
+                    return true;
+                }
+                return is_string($value);
+            },
+            'SeverityCode'         => function ($value) {
+                if (empty($value) || $value == 'null') {
+                    return true;
+                }
+                return is_string($value);
+            },
+            'ConsentSeq' => function ($value) {
+                if (empty($value) || $value == 'null') {
+                    return true;
+                }
+                return is_numeric($value);
+            },
+            'ConsentCode' => function ($value) {
+                if (empty($value) || $value == 'null') {
+                    return true;
+                }
+                return is_string($value);
+            },
+            'ConsentGivenBy' => function ($value) {
+                return !empty($value) && $value !== 'null';
+            },
+        ];
+    }
+
+    public function handleUpdateDetailsDataRequest($data): array
+    {
+        try {
+            $this->externalDb->beginTransaction();
+            if (isset($data['data']['primary'])) {
+                $this->handleUpdateParentDataRequest($data['data']['primary']);
+            } else if (isset($data['data']['spouse'])) {
+                $this->handleUpdateParentDataRequest($data['data']['spouse']);
+            } else if (isset($data['data']['student'])) {
+                $this->handleUpdateStudentDataRequest(
+                    $data['data']['student'],
+                    $data['modified_by']
+                );
+            }
+
+            $this->externalDb->commit();
+            return [
+                'success' => true,
+                'message' => 'Data has been updated successfully',
+            ];
+        } catch (Exception $e) {
+            $this->externalDb->rollback();
+            throw new OutOfBoundsException($e->getMessage(), $e->getCode());
+        }
+    }
+
+    private function handleUpdateParentDataRequest(object $data): void
+    {
+        $parentID = $data->ID;
+
+        // Remove ID from the $data array
+        $data = (array) $data;
+        unset($data['ID']);
+
+        // Separate AddressData from the rest of the data
+        $addressData = [];
+        $addressKeys = [
+            'HomeAddress1',
+            'HomeAddress2',
+            'HomeSuburb',
+            'HomeState',
+            'HomePostCode',
+            'HomeAddressComma',
+            'HomeAddressFull',
+            'HomeAddressDPID',
+            'HomeAddressLatitude',
+            'HomeAddressLongitude',
+        ];
+        foreach ($addressKeys as $key) {
+            if (isset($data[$key])) {
+                $addressData[$key] = $data[$key];
+                unset($data[$key]);
+            }
+        }
+
+        $params = [];
+        // Process AddressData if it exists
+        if (!empty($addressData)) {
+            $updateAddressData = "";
+
+            foreach ($addressData as $column => $value) {
+                $value = htmlspecialchars($value, ENT_QUOTES);
+                $updateAddressData .= "$column = ?, ";
+                $params[] = $value;
+            }
+
+            $sql = "UPDATE a SET " . rtrim($updateAddressData, ", ") . "
+            FROM Addresses a
+            LEFT JOIN Community c ON c.AddressID = a.AddressID
+            WHERE c.ID = ?;";
+            $params[] = $parentID;
+
+            $stmt = $this->externalDb->prepareQuery($sql, $params)->execute();
+            if ($stmt === false) {
+                throw new Exception(
+                    print_r($this->externalDb->errorInfo(), true)
+                );
+            }
+        }
+
+        // Process the rest of the data
+        $communitySql = "";
+        $params = [];
+        foreach ($data as $key => $value) {
+            $value = htmlspecialchars($value, ENT_QUOTES);
+
+            if (empty($value) || $value == 'null') {
+                $communitySql .= "$key = NULL, ";
+            } else {
+                if ($key == "BirthDate") {
+                    $value .= " 00:00:00.000";
+                }
+                $communitySql .= "$key = ?, ";
+                $params[] = $value;
+            }
+        }
+
+        // Update community table
+        if (!empty($communitySql)) {
+            $primaryCommunitySQL = "UPDATE Community SET " . rtrim($communitySql, ", ") . " WHERE ID = ?;";
+            $params[] = $parentID;
+
+            $stmt = $this->externalDb->prepareQuery($primaryCommunitySQL, $params)->execute();
+            if ($stmt === false) {
+                throw new Exception(
+                    print_r($this->externalDb->errorInfo(), true)
+                );
+            }
+        }
+    }
+
+    private function handleUpdateStudentDataRequest(object $data, $modifiedBy): void
+    {
+        $groupedData = $this->groupStudentDataByDatabaseTable($data);
+        $this->processGroupedStudentData($groupedData, $modifiedBy);
+    }
+
+    private function groupStudentDataByDatabaseTable(object $data): array
+    {
+        $groupedData = [
+            'community' => [],
+            'students' => [],
+            'medical_conditions' => [
+                'delete' => [],
+                'create' => []
+
+            ],
+            'consents' => [
+                'delete' => [],
+                'create' => []
+            ],
+        ];
+
+        foreach (array_keys(get_object_vars($data)) as $getStudentID) {
+            $studentData = $data->$getStudentID;
+
+            foreach ($studentData as $key => $value) {
+                if (
+                    !in_array(
+                        $key,
+                        [
+                            'DeletedMedicalConditions',
+                            'MedicalConditions',
+                            'DeletedStudentConsents',
+                            'StudentConsents',
+                        ]
+                    )
+                ) {
+                    $value = htmlspecialchars($value, ENT_QUOTES);
+
+                    if (empty($value) || $value == 'null') {
+                        $value = 'NULL';
+                    }
+                }
+
+                // Group data for community table
+                if (
+                    in_array(
+                        $key,
+                        [
+                            'Preferred',
+                            'Gender',
+                            'HomeLanguageCode',
+                        ]
+                    )
+                ) {
+                    $groupedData['community'][$getStudentID][$key] = $value;
+                }
+
+                // Group data for students table
+                if ($key == 'IndigenousFlag' || $key == 'TSIFlag' || str_contains($key, 'Doctor') || str_contains($key, 'Dentist') || str_contains($key, 'Emergency')) {
+                    $groupedData['students'][$getStudentID][$key] = $value;
+                }
+
+                // Group data for community legal table
+                if (
+                    in_array(
+                        $key,
+                        [
+                            'PhotoPromFlag',
+                            'PhotoPublicationFlag',
+                            'PhotoWebFlag',
+                        ]
+                    )
+                ) {
+                    $groupedData['community_legal'][$getStudentID][$key] = $value;
+                }
+
+                // Group data for deleted student consents
+                if ($key == 'DeletedStudentConsents') {
+                    foreach ($value as $consent) {
+                        $data = [];
+                        foreach ($consent as $key => $fieldValue) {
+                            $fieldValue = htmlspecialchars($fieldValue, ENT_QUOTES);
+                            $data[$key] = $fieldValue;
+                        }
+                        $groupedData['consents']['delete'][$getStudentID][] = $data;
+                    }
+                }
+
+                // Group data for student consents
+                if ($key == 'StudentConsents') {
+                    foreach ($value as $consent) {
+                        $data = [];
+                        foreach ($consent as $key => $fieldValue) {
+                            $fieldValue = htmlspecialchars($fieldValue, ENT_QUOTES);
+                            $data[$key] = $fieldValue;
+                        }
+                        $groupedData['consents']['create'][$getStudentID][] = $data;
+                    }
+                }
+
+                // Group data for deleted student medical conditions
+                if ($key == 'DeletedMedicalConditions') {
+                    foreach ($value as $condition) {
+                        foreach ($condition as $apiSeqId) {
+                            $apiSeqId = htmlspecialchars($apiSeqId, ENT_QUOTES);
+                            $groupedData['medical_conditions']['delete'][$getStudentID][] = $apiSeqId;
+                        }
+                    }
+                }
+
+                // Group data for student medical conditions
+                if ($key == 'MedicalConditions') {
+                    foreach ($value as $condition) {
+                        $data = [];
+                        foreach ($condition as $key => $fieldValue) {
+                            $fieldValue = htmlspecialchars($fieldValue, ENT_QUOTES);
+                            if (empty($fieldValue) || $fieldValue == 'null') {
+                                $fieldValue = 'NULL';
+                            }
+                            $data[$key] = $fieldValue;
+                        }
+                        $groupedData['medical_conditions']['create'][$getStudentID][] = $data;
+                    }
+                }
+            }
+
+            // Check if MedicalAlertFlag needs to be updated
+            $hasDeletedMedicalConditions = !empty($groupedData['medical_conditions']['delete'][$getStudentID]);
+            $hasNewMedicalConditions = !empty($groupedData['medical_conditions']['create'][$getStudentID]);
+
+            if ($hasDeletedMedicalConditions || $hasNewMedicalConditions) {
+                // Fetch existing medical conditions for the student
+                $existingMedicalConditions = $this->getStudentMedicalConditions($getStudentID);
+
+                // Calculate the number of remaining conditions after deletion
+                $remainingConditions = count($existingMedicalConditions) - count($groupedData['medical_conditions']['delete'][$getStudentID]);
+
+                // Set MedicalAlertFlag based on the conditions
+                if ($remainingConditions <= 0 && !$hasNewMedicalConditions) {
+                    $groupedData['students'][$getStudentID]['MedicalAlertFlag'] = 0;
+                } elseif ($remainingConditions == 0 && $hasNewMedicalConditions) {
+                    $groupedData['students'][$getStudentID]['MedicalAlertFlag'] = 1;
+                }
+            }
+        }
+        return $groupedData;
+    }
+
+    private function processGroupedStudentData(array $groupedData, $modifiedBy)
+    {
+        // Process community data
+        foreach ($groupedData['community'] as $studentID => $data) {
+            $this->updateCommunityTable($data, $studentID);
+        }
+
+        // Process students data
+        foreach ($groupedData['students'] as $studentID => $data) {
+            $this->updateStudentsTable($data, $studentID);
+        }
+
+        // Process community legal data
+        foreach ($groupedData['community_legal'] as $studentID => $data) {
+            $this->updateCommunityLegalTable($data, $studentID, $modifiedBy);
+        }
+
+        // Process student medical conditions
+        foreach ($groupedData['medical_conditions']['delete'] as $studentID => $conditions) {
+            $this->deleteStudentMedicalConditions($conditions, $studentID);
+        }
+        foreach ($groupedData['medical_conditions']['create'] as $studentID => $conditions) {
+            $this->createStudentMedicalConditions($conditions, $studentID, $modifiedBy);
+        }
+
+        // Process student consents
+        foreach ($groupedData['consents']['delete'] as $consents) {
+            $this->deleteStudentConsents($consents, $modifiedBy);
+        }
+        foreach ($groupedData['consents']['create'] as $studentID => $consents) {
+            $this->createOrUpdateStudentConsents($consents, $studentID, $modifiedBy);
+        }
+    }
+
+    private function updateCommunityTable($data, $studentID): void
+    {
+        if (!empty($data)) {
+            $updateFields = implode(', ', array_map(function ($key) {
+                return "$key = ?";
+            }, array_keys($data)));
+
+            $params = array_values($data);
+            $params[] = $studentID;
+
+            $updateSQL = "UPDATE Community SET $updateFields WHERE ID = ?";
+            $stmt = $this->externalDb->prepareQuery($updateSQL, $params)->execute();
+            if ($stmt === false) {
+                throw new Exception(
+                    print_r($this->externalDb->errorInfo(), true)
+                );
+            }
+        }
+    }
+
+    private function updateStudentsTable($data, $studentID): void
+    {
+        if (!empty($data)) {
+            $updateFields = implode(', ', array_map(function ($key) {
+                return "$key = ?";
+            }, array_keys($data)));
+
+            $params = array_values($data);
+            $params[] = $studentID;
+
+            $updateSQL = "UPDATE Students SET $updateFields WHERE ID = ?";
+            $stmt = $this->externalDb->prepareQuery($updateSQL, $params)->execute();
+            if ($stmt === false) {
+                throw new Exception(
+                    print_r($this->externalDb->errorInfo(), true)
+                );
+            }
+        }
+    }
+
+    private function updateCommunityLegalTable($data, $studentID, $modifiedBy): void
+    {
+        if (!empty($data)) {
+            $updateFields = implode(', ', array_map(function ($key) {
+                return "$key = ?";
+            }, array_keys($data)));
+
+            $params = array_values($data);
+            $params[] = $modifiedBy;
+            $params[] = date('Y-m-d H:i:s'); // ModifiedDate
+            $params[] = $studentID;
+
+            $updateSQL = "UPDATE CommunityLegal SET $updateFields, ModifiedBy = ?, ModifiedDate = ? WHERE ID = ?";
+            $stmt = $this->externalDb->prepareQuery($updateSQL, $params)->execute();
+            if ($stmt === false) {
+                throw new Exception(
+                    print_r($this->externalDb->errorInfo(), true)
+                );
+            }
+        }
+    }
+
+    private function deleteStudentMedicalConditions($conditions, $studentID): void
+    {
+        $viewSelected = $this->viewSelector->getView('getStudentsMedical');
+        if (!empty($conditions)) {
+            foreach ($conditions as $apiSeqId) {
+                $checkSQL = "SELECT * FROM {$viewSelected} WHERE ID = ? AND MedicalConditionSeq = ?";
+                $statement = $this->externalDb->prepareQuery($checkSQL, [$studentID, $apiSeqId]);
+                $stmt = $statement->execute();
+                if ($stmt === false) {
+                    throw new Exception(
+                        print_r($this->externalDb->errorInfo(), true)
+                    );
+                }
+
+                if ($statement->rowCount() === 1) {
+                    $deleteSQL = "
+                        UPDATE MedicalCondition
+                        SET ActiveFlag = 0,
+                            ConditionEndDate = GETDATE()
+                        WHERE MedicalConditionSeq = ?";
+                    $stmt = $this->externalDb->prepareQuery($checkSQL, [$studentID, $apiSeqId])->execute();
+                    if ($stmt === false) {
+                        throw new Exception(
+                            print_r($this->externalDb->errorInfo(), true)
+                        );
+                    }
+                }
+            }
+        }
+    }
+
+    private function createStudentMedicalConditions($conditions, $studentID, $modifiedBy): void
+    {
+        if (!empty($conditions)) {
+            foreach ($conditions as $condition) {
+                if (!isset($condition['MedicalConditionCode'])) {
+                    throw new Exception('Medical condition code is required.');
+                }
+
+                $code = $condition['MedicalConditionCode'];
+                $severity = isset($condition['SeverityCode']) ? $condition['SeverityCode'] : 'NULL';
+                $details = isset($condition['ConditionDetails']) ? $condition['ConditionDetails'] : 'NULL';
+
+                $insertSQL = "
+                    INSERT INTO
+                        MedicalCondition (
+                                          ID,
+                                          MedicalConditionCode,
+                                          ActiveFlag,
+                                          ConditionDetails,
+                                          SeverityCode,
+                                          ModifiedBy,
+                                          ModifiedDate,
+                                          Visibility
+                    )
+                    VALUES (?, ?, 1, ?, ?, ?, GETDATE(), 'B')";
+                $params = [$studentID, $code, $details, $severity, $modifiedBy];
+                $stmt = $this->externalDb->prepareQuery($insertSQL, $params)->execute();
+                if ($stmt === false) {
+                    throw new Exception(
+                        print_r($this->externalDb->errorInfo(), true)
+                    );
+                }
+            }
+        }
+    }
+
+    private function deleteStudentConsents($consents, $modifiedBy): void
+    {
+        if (!empty($consents)) {
+            $viewSelected = $this->viewSelector->getView('getStudentConsents');
+            foreach ($consents as $consent) {
+                if (!isset($consent['ConsentGivenBy'])) {
+                    throw new Exception('Consent given by is required.');
+                }
+
+                if (!isset($consent['ConsentSeq'])) {
+                    throw new Exception('Consent Seq is required.');
+                }
+
+                $consentGivenBy = $consent['ConsentGivenBy'];
+                $consentSeq = $consent['ConsentSeq'];
+
+                $checkSQL = "SELECT * FROM {$viewSelected} WHERE AND ConsentSeq = ?";
+                $statement = $this->externalDb->prepareQuery($checkSQL, [$consentSeq]);
+                $stmt = $statement->execute();
+                if ($stmt === false) {
+                    throw new Exception(
+                        print_r($this->externalDb->errorInfo(), true)
+                    );
+                }
+
+                if ($statement->rowCount() === 1) {
+                    $deleteSQL = "
+                        UPDATE Consent
+                        SET ActiveFlag = 0,
+                            ConsentExpiryDate = GETDATE(),
+                            ConsentGivenBy = ?,
+                            ModifiedBy = ?,
+                            ModifiedDate = GETDATE()
+                        WHERE ConsentSeq = ?";
+                    $params = [$consentGivenBy, $modifiedBy, $consentSeq];
+                    $stmt = $this->externalDb->prepareQuery($deleteSQL, $params)->execute();
+                    if ($stmt === false) {
+                        throw new Exception(
+                            print_r($this->externalDb->errorInfo(), true)
+                        );
+                    }
+                }
+            }
+        }
+    }
+
+    private function createOrUpdateStudentConsents($consents, $studentID, $modifiedBy): void
+    {
+        if (!empty($consents)) {
+            $viewSelected = $this->viewSelector->getView('getStudentConsents');
+            foreach ($consents as $consent) {
+                if (!isset($consent['ConsentGivenBy'])) {
+                    throw new Exception('Consent given by is required.');
+
+                }
+
+                if (!isset($consent['ConsentCode'])) {
+                    throw new Exception('Consent Code is required.');
+
+                }
+
+                $consentGivenBy = $consent['ConsentGivenBy'];
+                $consentCode = $consent['ConsentCode'];
+
+                $checkSQL = "SELECT * FROM {$viewSelected} WHERE ConsentCode = ? AND ID = ?";
+                $statement = $this->externalDb->prepareQuery($checkSQL, [$consentCode, $studentID]);
+                $stmt = $statement->execute();
+                if ($stmt === false) {
+                    throw new Exception(
+                        print_r($this->externalDb->errorInfo(), true)
+                    );
+                }
+
+                // If the record exists and ActiveFlag is 0, update it
+                if ($statement->rowCount()) {
+                    foreach ($stmt as $row) {
+                        if ($row["ActiveFlag"] == 0) {
+                            $updateSQL = "
+                                UPDATE Consent
+                                SET ActiveFlag = 1,
+                                    ConsentExpiryDate = NULL,
+                                    ConsentGivenBy = ?,
+                                    ConsentGivenDate = GETDATE(),
+                                    ModifiedBy = ?,
+                                    ModifiedDate = GETDATE()
+                                WHERE ConsentSeq = ?";
+                            $params = [$consentGivenBy, $modifiedBy, $row["ConsentSeq"]];
+                            $stmt = $this->externalDb->prepareQuery($updateSQL, $params)->execute();
+                            if ($stmt === false) {
+                                throw new Exception(
+                                    print_r($this->externalDb->errorInfo(), true)
+                                );
+                            }
+                        }
+                    }
+                } else {
+                    // If no record, insert a new one
+                    $insertSQL = "
+                        INSERT INTO
+                            Consent (
+                                     ID,
+                                     ConsentCode,
+                                     ActiveFlag,
+                                     ConsentGivenBy,
+                                     ConsentGivenDate,
+                                     ModifiedBy,
+                                     ModifiedDate
+                     )
+                    VALUES (?, ?, 1, ?, GETDATE(), ?, GETDATE())";
+                    $params = [$studentID, $consentCode, $consentGivenBy, $modifiedBy];
+                    $stmt = $this->externalDb->prepareQuery($insertSQL, $params)->execute();
+                    if ($stmt === false) {
+                        throw new Exception(
+                            print_r($this->externalDb->errorInfo(), true)
+                        );
+                    }
+                }
+            }
+        }
     }
 }
