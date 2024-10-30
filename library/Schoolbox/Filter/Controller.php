@@ -26,10 +26,8 @@ use Schoolbox\Role;
 use Schoolbox\RoleMapper;
 use Schoolbox\Learning\Badge;
 use Twig\Error\Error as TwigError;
-
 use UnderflowException;
 use UnexpectedValueException;
-
 use function count;
 
 class Controller extends BaseController
