@@ -110,8 +110,8 @@ class CustomButtons
     private function prepareStatements(): void
     {
         $this->createButtonStatement = $this->db->prepare("
-            INSERT INTO profile_button (sort_order, title, text, icon, url, css, target, type, roletype)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+            INSERT INTO profile_button (roletype, type, sort_order, title, text, icon, url, css, target)
+            VALUES (:roletype, :type, :sortOrder, :title, :text, :icon, :url, :css, :target)
         ");
 
         $this->campusAvailabilityStatement = $this->db->prepare("
@@ -177,15 +177,15 @@ class CustomButtons
         ));
 
         $this->createButtonStatement->execute([
-            $candidate['sort_order'],
-            $candidate['title'],
-            $candidate['text'],
-            $candidate['icon'],
-            $candidate['url'],
-            $candidate['css'],
-            $candidate['target'],
-            self::CUSTOM,
-            $roletype
+            'roletype' => $roletype,
+            'type' => self::CUSTOM,
+            'sortOrder' => $candidate['sort_order'],
+            'title' => $candidate['title'],
+            'text' => $candidate['text'],
+            'icon' => $candidate['icon'],
+            'url' => $candidate['url'],
+            'css'=> $candidate['css'],
+            'target' => $candidate['target'],
         ]);
 
         /* The new button's id - we just made this a moment ago

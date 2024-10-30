@@ -69,15 +69,28 @@ class SystemButtons
     {
         $candidates = [
             MigrateButtonsTool::ROLETYPE_STUDENT => [
-                1,
-                'ePortfolio',
-                'ePortfolio',
-                'eportfolio',
-                '/eportfolio/[profileId]',  // named confusingly, this is the viewee's user.id
-                null,
-                null,
-                self::SYSTEM_EPORTFOLIO,
-                MigrateButtonsTool::ROLETYPE_STUDENT
+                [
+                    1,
+                    'ePortfolio',
+                    'ePortfolio',
+                    'eportfolio',
+                    '/eportfolio/[profileId]',  // named confusingly, this is the viewee's user.id
+                    null,
+                    null,
+                    self::SYSTEM_EPORTFOLIO,
+                    MigrateButtonsTool::ROLETYPE_STUDENT
+                ],
+                [
+                    1,
+                    'Due Work',
+                    'ePortfolio',
+                    'eportfolio',
+                    '/eportfolio/[profileId]',  // named confusingly, this is the viewee's user.id
+                    null,
+                    null,
+                    self::SYSTEM_EPORTFOLIO,
+                    MigrateButtonsTool::ROLETYPE_STUDENT
+                ],
             ],
             MigrateButtonsTool::ROLETYPE_STAFF => [],
             MigrateButtonsTool::ROLETYPE_PARENT => [],
