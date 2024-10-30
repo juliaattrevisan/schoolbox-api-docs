@@ -94,9 +94,7 @@ class SystemButtons
                 ));
 
                 if ($this->perform) {
-                    $this->createButtonStatement->execute($candidate['row']);
-
-                    $profileButtonId = (int)$this->db->lastInsertId();
+                    $profileButtonId = $this->createButton($candidate['row'], $roletype);
 
                     /* Assign relationships
                      *
