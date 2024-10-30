@@ -108,6 +108,14 @@ HELP;
         try {
             $this->getLogger()->info('Profile Editor Button Migration.');
             $this->getLogger()->info('');
+
+            /* Figure out which roletype corresponds to each role
+             */
+            $roletypeLookup = $this->generateRoletypeLookup();
+
+            print_r($roletypeLookup);
+
+
         } catch (\Alaress\Lock\LockRefreshException $e) {
             /* Lock TTL expired; just leave politely
              */
@@ -125,6 +133,31 @@ HELP;
         $this->getLogger()->debug('Releasing lock');
 
         $lock->release();
+    }
+
+
+    /**
+     * @return array
+     */
+    public function generateRoletypeLookup(): array
+    {
+        $db = $this->getDatabaseInternal();
+
+        $query = "
+            SELECT id, name, group_type 
+            FROM `groups`
+        ";
+
+        $statement = $db->prepare($query);
+        $statement->execute();
+
+        $lookup = [];
+
+        while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
+            $lookup[$row['id']] = $row['group_type'];
+        }
+
+        return $lookup;
     }
 
 
