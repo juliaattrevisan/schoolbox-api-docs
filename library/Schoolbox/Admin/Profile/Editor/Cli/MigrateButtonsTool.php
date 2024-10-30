@@ -127,6 +127,33 @@ HELP;
              * out corresponding roletype(s) for a button. Campus is too broad
              * a stroke and roles have a direct relationship with a roletype.
              */
+            print_r($roletypeLookup);
+            print_r($candidates);
+            foreach ($candidates as $candidate) {
+                foreach ($candidate['_roles'] as $roleId) {
+                    if (self::ROLETYPE_STUDENT === $roletypeLookup[$roleId]) {
+                        /* Create a button in the student roletype
+                         * TODO if there's only one $roleId you could just update
+                         *  the existing row rather than arbitrarily spawn a new one
+                         */
+                    } elseif (self::ROLETYPE_STAFF === $roletypeLookup[$roleId]) {
+                        /* Create a button in the staff roletype
+                         * TODO if there's only one $roleId you could just update
+                         *  the existing row rather than arbitrarily spawn a new one
+                         */
+                    } elseif (self::ROLETYPE_PARENT === $roletypeLookup[$roleId]) {
+                        /* Create a button in the parent roletype
+                         * TODO if there's only one $roleId you could just update
+                         *  the existing row rather than arbitrarily spawn a new one
+                         */
+                    } else {
+                        /* Unsupported roletype; skip it
+                         * Not sure how you'd get here, but it might be possible somehow
+                         */
+                        continue;
+                    }
+                }
+            }
 
             /* For every role type related to this button, spawn a new one,
              * an exact replica. If the button is associated with only one
