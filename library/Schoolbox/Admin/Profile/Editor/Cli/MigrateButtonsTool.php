@@ -157,19 +157,19 @@ HELP;
 
                     /* Campus availability
                      */
-                    $this->createCampusAvailability($profileButtonId, $candidate);
+                    $this->createCampusAvailability($profileButtonId, (int)$candidate['id']);
 
                     /* Campus visibility
                      */
-                    $this->createCampusVisibility($profileButtonId, $candidate);
+                    $this->createCampusVisibility($profileButtonId, (int)$candidate['id']);
 
                     /* Role availability
                      */
-                    $this->createRoleAvailability($profileButtonId, $candidate);
+                    $this->createRoleAvailability($profileButtonId, (int)$candidate['id']);
 
                     /* Role visibility
                      */
-                    $this->createRoleVisibility($profileButtonId, $candidate);
+                    $this->createRoleVisibility($profileButtonId, (int)$candidate['id']);
                 }
             }
 
@@ -339,7 +339,7 @@ HELP;
         $this->getLogger()->info(sprintf(
             'Migrating "%s" to %s roletype',
             $candidate['title'],
-            self::ROLETYPE_STUDENT
+            $roletype
         ));
 
         $query = "
@@ -370,13 +370,13 @@ HELP;
      * Recreate a relationship using $candidate's existing nodes and this new $profileButtonId
      *
      * @param int $profileButtonId
-     * @param array $candidate
+     * @param int $oldProfileButtonId
      * @return void
      */
-    private function createCampusAvailability(int $profileButtonId, array $candidate): void
+    private function createCampusAvailability(int $profileButtonId, int $oldProfileButtonId): void
     {
         $this->campusAvailabilityStatement->execute([
-            'profileButtonId' => $candidate['id']
+            'profileButtonId' => $oldProfileButtonId
         ]);
 
         while ($row = $this->campusAvailabilityStatement->fetch(\PDO::FETCH_ASSOC)) {
@@ -389,13 +389,13 @@ HELP;
      * Recreate a relationship using $candidate's existing nodes and this new $profileButtonId
      *
      * @param int $profileButtonId
-     * @param array $candidate
+     * @param int $oldProfileButtonId
      * @return void
      */
-    private function createCampusVisibility(int $profileButtonId, array $candidate): void
+    private function createCampusVisibility(int $profileButtonId, int $oldProfileButtonId): void
     {
         $this->campusVisibilityStatement->execute([
-            'profileButtonId' => $candidate['id']
+            'profileButtonId' => $oldProfileButtonId
         ]);
 
         while ($row = $this->campusVisibilityStatement->fetch(\PDO::FETCH_ASSOC)) {
@@ -408,13 +408,13 @@ HELP;
      * Recreate a relationship using $candidate's existing nodes and this new $profileButtonId
      *
      * @param int $profileButtonId
-     * @param array $candidate
+     * @param int $oldProfileButtonId
      * @return void
      */
-    private function createRoleAvailability(int $profileButtonId, array $candidate): void
+    private function createRoleAvailability(int $profileButtonId, int $oldProfileButtonId): void
     {
         $this->roleAvailabilityStatement->execute([
-            'profileButtonId' => $candidate['id']
+            'profileButtonId' => $oldProfileButtonId
         ]);
 
         while ($row = $this->roleAvailabilityStatement->fetch(\PDO::FETCH_ASSOC)) {
@@ -427,13 +427,13 @@ HELP;
      * Recreate a relationship using $candidate's existing nodes and this new $profileButtonId
      *
      * @param int $profileButtonId
-     * @param array $candidate
+     * @param int $oldProfileButtonId
      * @return void
      */
-    private function createRoleVisibility(int $profileButtonId, array $candidate): void
+    private function createRoleVisibility(int $profileButtonId, int $oldProfileButtonId): void
     {
         $this->roleVisibilityStatement->execute([
-            'profileButtonId' => $candidate['id']
+            'profileButtonId' => $oldProfileButtonId
         ]);
 
         while ($row = $this->roleVisibilityStatement->fetch(\PDO::FETCH_ASSOC)) {
