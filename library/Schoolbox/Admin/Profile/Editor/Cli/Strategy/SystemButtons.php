@@ -16,7 +16,7 @@ use Schoolbox\Admin\Profile\Editor\Cli\MigrateButtonsTool;
 class SystemButtons
 {
     /**
-     * Corresponds to a secondary identifier in the schema so that we 
+     * Corresponds to a secondary identifier in the schema so that we
      * can figure out custom buttons from system buttons, and also when
      * schools fill their buttons with junk, we'll be able to discern which
      * row is the ePortfolio button and so on.

@@ -171,7 +171,8 @@ class CustomButtons
      * @param string $roletype
      * @return int|null
      */
-    private function createButton(array $candidate, string $roletype): ?int {
+    private function createButton(array $candidate, string $roletype): ?int
+    {
         $this->log->info(sprintf(
             'Migrating "%s" to %s roletype',
             $candidate['title'],
