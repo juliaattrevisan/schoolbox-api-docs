@@ -66,12 +66,6 @@ class Controller extends Base
     private const MIN_CHARACTER_LIMIT = 2;
 
     /**
-     * Class for processing pastoral records: was previously internal to this
-     * controller, extracted so that other places may use it.
-     */
-    private RecordProcessor $recordProcessor;
-
-    /**
      * Constructor
      *
      * @param IConfigLoader                   $config
@@ -85,7 +79,6 @@ class Controller extends Base
      * @param PastoralActionMapper            $pastoralActionMapper
      * @param RecordAction\Mapper             $pastoralRecordActionMapper
      * @param PastoralCommentMapper           $pastoralCommentMapper
-     * @param PastoralAttachmentMapper        $pastoralAttachmentMapper
      * @param UserMapper                      $userMapper
      * @param PastoralAccessMapper            $pastoralAccessMapper
      * @param PastoralGroupMapper             $pastoralGroupMapper
@@ -98,6 +91,7 @@ class Controller extends Base
      * @param Translator\ModelToArray         $pastoralTranslator
      * @param FilesystemProxy                 $filesystemProxy
      * @param \Schoolbox\External\User        $externalUser
+     * @param RecordProcessor                 $recordProcessor
      */
     public function __construct(
         private IConfigLoader $config,
@@ -111,7 +105,6 @@ class Controller extends Base
         private PastoralActionMapper $pastoralActionMapper,
         private \Schoolbox\Pastoral\RecordAction\Mapper $pastoralRecordActionMapper,
         private PastoralCommentMapper $pastoralCommentMapper,
-        private PastoralAttachmentMapper $pastoralAttachmentMapper,
         private UserMapper $userMapper,
         private PastoralAccessMapper $pastoralAccessMapper,
         private PastoralGroupMapper $pastoralGroupMapper,
@@ -123,23 +116,9 @@ class Controller extends Base
         private Comment\Translator\ModelToArray $pastoralCommentTranslator,
         private Translator\ModelToArray $pastoralTranslator,
         private FilesystemProxy $filesystemProxy,
-        private \Schoolbox\External\User $externalUser
+        private \Schoolbox\External\User $externalUser,
+        private RecordProcessor $recordProcessor,
     ) {
-        $this->recordProcessor = new RecordProcessor(
-            $this->config,
-            $this->pastoralDataSource,
-            $this->pastoralSubTypeMapper,
-            $this->pastoralTypeMapper,
-            $this->pastoralSeverityMapper,
-            $this->pastoralTagMapper,
-            $this->pastoralActionMapper,
-            $this->pastoralRecordActionMapper,
-            $this->pastoralAttachmentMapper,
-            $this->userMapper,
-            $this->pastoralAccessMapper,
-            $this->pastoralGroupMapper,
-            $this->errorMapper,
-        );
     }
 
     /**
