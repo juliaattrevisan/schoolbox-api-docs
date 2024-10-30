@@ -133,7 +133,7 @@ HELP;
             /* Get a list of buttons to inspect - users can specify --system,
              * --custom, or both
              */
-            $candidates = $this->generateCandidates($roletypeLookup);
+            $candidates = $this->generateCustomCandidates($roletypeLookup);
 
             /* Each button can have zero or more roles associated with it
              * Inspect each button's relationships to find out which roles,
@@ -288,7 +288,7 @@ HELP;
      * @param array $roletypeLookup
      * @return array
      */
-    public function generateCandidates(array $roletypeLookup): array
+    public function generateCustomCandidates(array $roletypeLookup): array
     {
         $query = "
             SELECT 
