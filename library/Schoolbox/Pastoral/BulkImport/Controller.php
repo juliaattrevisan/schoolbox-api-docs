@@ -277,7 +277,7 @@ class Controller extends Base
             $pastoralRecordsToCreate[$userId]['records'] = $processor->processPastoralRecords(
                 $this->getUser(),
                 $userId,
-                $this->requestPost,
+                $requestPost,
             );
         }
 
