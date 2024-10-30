@@ -3,7 +3,7 @@
  * To list all the currently selected items
  */
 
-import type { SearchSelectItem } from "../../composables/search/types/SearchSelectItem";
+import type { SearchSelectItem } from "@schoolboxVue/composables/search/types/SearchSelectItem";
 import SsSelectedItem from "./ss-selected-item.vue";
 
 interface Props {
