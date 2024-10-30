@@ -74,7 +74,7 @@ function onButtonSelect(): void {
         :label="props.label"
         :label-id="props.labelId"
         :is-required="props.isRequired"
-        :endpoint="props.endpoint"
+        :endpoint="`${props.endpoint}?query=`"
         :has-error="props.hasError"
         :error-message="props.errorMessage"
         :is-read-only="props.isReadOnly"
