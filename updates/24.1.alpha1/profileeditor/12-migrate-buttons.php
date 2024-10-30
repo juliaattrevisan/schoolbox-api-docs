@@ -8,5 +8,5 @@
 
 declare(strict_types=1);
 
-passthru('php ' . __DIR__ .  '/../../../tools/profile-editor/migrate-buttons.php --custom --perform', $resultCode);
+passthru('php ' . __DIR__ .  '/../../../tools/profile-editor/migrate-buttons.php --custom --system --perform', $resultCode);
 exit($resultCode);
