@@ -42,6 +42,14 @@ class Module extends AlaressModule
             )
         );
 
+        $ruleLms = new Rule\All(
+            new Rule\IsLoggedIn(),
+            new Rule\Any(
+                new Rule\IsSuperuser(),
+                new Rule\HasServicePermission(UserAccess::SERVICE_LMS, UserAccess::ACCESS_FULL)
+            )
+        );
+
         $loadFactoryFactory = function (array $params) {
             switch ($params['page']) {
                 case Page\Model::PAGE_PENDING_ASSESSMENTS:
@@ -64,6 +72,12 @@ class Module extends AlaressModule
         $this->register('GET', '/pastoral/{page:classPastoral}', 'getPageSettingsPastoral', $rulePastoral, $loadFactoryFactory);
         $this->register('POST', '/pastoral/{page:classPastoral}', 'postSavePageSettingsPastoral', $rulePastoral, $loadFactoryFactory);
         $this->register('POST', '/pastoral/{page:classPastoral}/pushDefaultSelections', 'postPushDefaultSelectionsPastoral', $rulePastoral, $loadFactoryFactory);
+
+        // Routes to which users with service permission UserAccess::SERVICE_LMS need access.
+        $pagesRegex = '(assessmentCal|classMarkbook|courseMarkbook|dueWorkCal|grades|pending|rubricMarkbook)';
+        $this->register('GET', "/lms/{page:$pagesRegex}", 'getPageSettingsLms', $ruleLms, $loadFactoryFactory);
+        $this->register('POST', "/lms/{page:$pagesRegex}", 'postSavePageSettingsLms', $ruleLms, $loadFactoryFactory);
+        $this->register('POST', "/lms/{page:$pagesRegex}/pushDefaultSelections", 'postPushDefaultSelectionsLms', $ruleLms, $loadFactoryFactory);
 
         $this->register('GET', '', 'getIndex', $isSuper);
         $this->register('GET', '/{page}', 'getPageSettings', $isSuper, $loadFactoryFactory);

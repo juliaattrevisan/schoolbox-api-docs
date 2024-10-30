@@ -343,8 +343,8 @@ class Subnav
                         'children'    => [],
                         'description' => 'Configure the blocks of time that assessments will be visible within, often called terms or semesters.',
                     ],
-                    '/adminv2/filters/assessmentCal' => [
-                        'name'        => $filterLabelBuilder->buildLabel(FilterPageModel::PAGE_ASSESSMENT_CALENDAR),
+                    '/adminv2/filters/lms/assessmentCal' => [
+                        'name'        => $filterLabelBuilder->buildLabel(FilterPageModel::PAGE_ASSESSMENT_CALENDAR) . ' Filter',
                         'visible'     => ($userIsSuperuser || $userHasServicePermissionLms) && $filterAvailabilityChecker->isAvailable(FilterPageModel::PAGE_ASSESSMENT_CALENDAR),
                         'children'    => [],
                         'description' => 'Configure the default and available filter options on the assessment calendar.',
@@ -355,8 +355,8 @@ class Subnav
                         'children'    => [],
                         'description' => '',
                     ],
-                    '/adminv2/filters/classMarkbook' => [
-                        'name'        => $filterLabelBuilder->buildLabel(FilterPageModel::PAGE_CLASS_MARK_BOOK),
+                    '/adminv2/filters/lms/classMarkbook' => [
+                        'name'        => $filterLabelBuilder->buildLabel(FilterPageModel::PAGE_CLASS_MARK_BOOK) . ' Filter',
                         'visible'     => ($userIsSuperuser || $userHasServicePermissionLms) && $filterAvailabilityChecker->isAvailable(FilterPageModel::PAGE_CLASS_MARK_BOOK) && $this->configLoader->get(ConfigMapper::NAME_LMS_ENABLED),
                         'children'    => [],
                         'description' => 'Configure the default and available filter options on the class markbook.',
@@ -373,8 +373,8 @@ class Subnav
                         'children'    => [],
                         'description' => 'Configure the default page templates and permissions for course and unit pages.',
                     ],
-                    '/adminv2/filters/courseMarkbook' => [
-                        'name'        => $filterLabelBuilder->buildLabel(FilterPageModel::PAGE_COURSE_MARK_BOOK),
+                    '/adminv2/filters/lms/courseMarkbook' => [
+                        'name'        => $filterLabelBuilder->buildLabel(FilterPageModel::PAGE_COURSE_MARK_BOOK) . ' Filter',
                         'visible'     => ($userIsSuperuser || $userHasServicePermissionLms) && $filterAvailabilityChecker->isAvailable(FilterPageModel::PAGE_COURSE_MARK_BOOK) && $this->configLoader->get(ConfigMapper::NAME_LMS_ENABLED),
                         'children'    => [],
                         'description' => 'Configure the default and available filter options on the course markbook.',
@@ -395,7 +395,7 @@ class Subnav
                         'children'    => [],
                         'description' => 'Configure the available grade scales that can be used for assessment and marking.',
                     ],
-                    '/adminv2/filters/grades' => [
+                    '/adminv2/filters/lms/grades' => [
                         'name'        => $filterLabelBuilder->buildLabel(FilterPageModel::PAGE_GRADES) . ' Filter',
                         'visible'     => ($userIsSuperuser || $userHasServicePermissionLms) && $filterAvailabilityChecker->isAvailable(FilterPageModel::PAGE_GRADES) && $this->configLoader->get(ConfigMapper::NAME_LMS_ENABLED),
                         'children'    => [],
@@ -419,20 +419,20 @@ class Subnav
                         'children'    => [],
                         'description' => 'Configure the 3rd party LTI integrations that you wish to make available for use in the LTI component.',
                     ],
-                    '/adminv2/filters/dueWorkCal' => [
-                        'name'        => $filterLabelBuilder->buildLabel(FilterPageModel::PAGE_UPCOMING_ASSESSMENTS),
+                    '/adminv2/filters/lms/dueWorkCal' => [
+                        'name'        => $filterLabelBuilder->buildLabel(FilterPageModel::PAGE_UPCOMING_ASSESSMENTS) . ' Filter',
                         'visible'     => ($userIsSuperuser || $userHasServicePermissionLms) && $filterAvailabilityChecker->isAvailable(FilterPageModel::PAGE_UPCOMING_ASSESSMENTS) && $this->configLoader->get(ConfigMapper::NAME_LMS_ENABLED),
                         'children'    => [],
                         'description' => 'Configure the default and available filter options on the students due work calendar.',
                     ],
-                    '/adminv2/filters/pending' => [
-                        'name'        => $filterLabelBuilder->buildLabel(FilterPageModel::PAGE_PENDING_ASSESSMENTS),
+                    '/adminv2/filters/lms/pending' => [
+                        'name'        => $filterLabelBuilder->buildLabel(FilterPageModel::PAGE_PENDING_ASSESSMENTS) . ' Filter',
                         'visible'     => ($userIsSuperuser || $userHasServicePermissionLms) && $filterAvailabilityChecker->isAvailable(FilterPageModel::PAGE_PENDING_ASSESSMENTS),
                         'children'    => [],
                         'description' => 'Configure the default and available filter options on the pending assessments page.',
                     ],
-                    '/adminv2/filters/rubricMarkbook' => [
-                        'name'        => $filterLabelBuilder->buildLabel(FilterPageModel::PAGE_RUBRIC_MARK_BOOK),
+                    '/adminv2/filters/lms/rubricMarkbook' => [
+                        'name'        => $filterLabelBuilder->buildLabel(FilterPageModel::PAGE_RUBRIC_MARK_BOOK) . ' Filter',
                         'visible'     => ($userIsSuperuser || $userHasServicePermissionLms) && $filterAvailabilityChecker->isAvailable(FilterPageModel::PAGE_RUBRIC_MARK_BOOK) &&  $this->configLoader->get(ConfigMapper::NAME_LMS_ENABLED),
                         'children'    => [],
                         'description' => 'Configure the default and available filter options on the class rubric markbook.',
