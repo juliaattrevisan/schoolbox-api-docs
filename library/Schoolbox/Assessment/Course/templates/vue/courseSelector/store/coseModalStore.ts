@@ -15,6 +15,11 @@ export const useModalStore = defineStore(`coseModal`, () => {
     }
 
     /**
+     * select the modal options
+     */
+    function select(): void {}
+
+    /**
      * close the modal
      */
     function close(): void {
@@ -24,6 +29,7 @@ export const useModalStore = defineStore(`coseModal`, () => {
     return {
         isOpen,
         open,
+        select,
         close,
     };
 });
