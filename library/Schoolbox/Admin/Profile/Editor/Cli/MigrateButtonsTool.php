@@ -89,6 +89,8 @@ This creates Profile Button equivalents for our previously-hardcoded system butt
 It also migrates System and Custom buttons into their corresponding roletypes based
 on whatever role(s) were enabled for them.
 
+Custom buttons are always processed first.
+
 Usage: php migrate-buttons.php -vvv --custom --perform
 Usage: php migrate-buttons.php -vvv --system --perform
 Usage: php migrate-buttons.php -vvv --system --custom --perform
