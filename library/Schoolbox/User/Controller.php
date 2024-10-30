@@ -19,6 +19,7 @@ use External_User;
 use Ramsey\Uuid\Uuid;
 use Schoolbox\Oidc\Server\RelyingParty\Mapper as RelyingPartyMapper;
 use Schoolbox\Oidc\Server\BackChannelLogout;
+use Schoolbox\Oidc\Server\Controller as OidcServerController;
 
 class Controller extends Base
 {
@@ -30,6 +31,8 @@ class Controller extends Base
     /** @var Logger\Mapper */
     private $assumeUserLogMapper;
 
+    /** @var RelyingPartyMapper */
+    private $relyingPartyMapper;
     private $requestFactory;
 
     private $httpClient;
@@ -37,11 +40,13 @@ class Controller extends Base
     public function __construct(
         UserAccessMapper $userAccessMapper,
         Logger\Mapper $assumeUserLogMapper,
+        RelyingPartyMapper $relyingPartyMapper,
         RequestFactory $requestFactory,
         ClientInterface $httpClient,
     ) {
         $this->userAccessMapper    = $userAccessMapper;
         $this->assumeUserLogMapper = $assumeUserLogMapper;
+        $this->relyingPartyMapper  = $relyingPartyMapper;
         $this->requestFactory      = $requestFactory;
         $this->httpClient          = $httpClient;
     }
@@ -62,7 +67,7 @@ class Controller extends Base
         $initialUser    = $this->session->get(ImpersonationCheck::SESSION_KEY_INITIAL_USER);
         $sessionHandler = new \Session();
         $oidcServerClients = $this->session
-            ->get(\Schoolbox\Oidc\Server\Controller::SESSION_OIDC_SERVER_CLIENTS);
+            ->get(OidcServerController::SESSION_OIDC_SERVER_CLIENTS);
 
         if ($sessionHandler->create($user->getUsername())) {
             // Log the user which began impersonation
@@ -90,9 +95,10 @@ class Controller extends Base
         }
 
         $this->logoutOIDCSessions(
+            $this->relyingPartyMapper,
             $this->requestFactory,
             $this->httpClient,
-            $initialUser,
+            $this->getUser(),
             $oidcServerClients,
         );
 
@@ -151,36 +157,47 @@ class Controller extends Base
     private function recoverSessionInternal(string $key): void
     {
         $user = $this->session->get($key);
+        $oidcServerClients = $this->session
+            ->get(OidcServerController::SESSION_OIDC_SERVER_CLIENTS);
         if ($user instanceof User) {
             $session = new \Session();
             if (!$session->create($user->getUsername())) {
                 $session->destroy();
             }
+            $this->logoutOIDCSessions(
+                $this->relyingPartyMapper,
+                $this->requestFactory,
+                $this->httpClient,
+                $this->getUser(),
+                $oidcServerClients
+            );
         }
         $this->response = $this->redirectFound('/');
     }
 
     /**
-     * @param RequestFactory  $logoutFactory
-     * @param ClientInterface $httpClient
-     * @param User            $initialUser
-     * @param array|null      $oidcServerClients
+     * Sending request to log out of the oAuth session
+     *
+     * @param RelyingPartyMapper $relyingPartyMapper
+     * @param RequestFactory     $logoutFactory
+     * @param ClientInterface    $httpClient
+     * @param User               $initialUser
+     * @param array|null         $oidcServerClients
      * @return void
      */
     private function logoutOIDCSessions(
+        RelyingPartyMapper $relyingPartyMapper,
         RequestFactory $logoutFactory,
         ClientInterface $httpClient,
         User $initialUser,
         ?array $oidcServerClients,
     ): void {
+        // This is similar to what's implemented in www/logout.php when user logs out
         $backChannelRequests = [];
-        echo '<pre>', var_dump($this->session
-                                   ->get(\Schoolbox\Oidc\Server\Controller::SESSION_OIDC_SERVER_CLIENTS)) , '</pre>';
-        die();
         foreach ($oidcServerClients ?? [] as $clientId) {
             // Does this client support logout?
             // If so, craft a logout token and send it
-            $client = RelyingPartyMapper::getInstance()->findByClientId($clientId);
+            $client = $relyingPartyMapper->findByClientId($clientId);
             if ($client?->getBackChannelLogoutUri()) {
                 // Create logout factory and client on demand only
                 $request = $logoutFactory->build(
