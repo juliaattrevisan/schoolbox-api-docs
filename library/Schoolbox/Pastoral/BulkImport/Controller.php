@@ -37,7 +37,7 @@ class Controller extends Base
      * Constructor
      *
      * @param RosettaStone             $translator             Used for translating values used in the page title.
-     * @param Pastoral\Mapper          $pastoralMapper         Used for creating pastoral records.
+     * @param Pastoral\DataSource      $pastoralDataSource     Used for creating pastoral records.
      * @param Pastoral\Type\Mapper     $pastoralTypeMapper     Used for loading and validating pastoral types.
      * @param Pastoral\SubType\Mapper  $pastoralSubTypeMapper  Used for loading and validating pastoral subtypes.
      * @param RoleMapper               $roleMapper             Used for loading roles to show in record visibility.
@@ -48,7 +48,7 @@ class Controller extends Base
      */
     public function __construct(
         private RosettaStone $translator,
-        private Pastoral\Mapper $pastoralMapper,
+        private Pastoral\DataSource $pastoralDataSource,
         private Pastoral\Type\Mapper $pastoralTypeMapper,
         private Pastoral\SubType\Mapper $pastoralSubTypeMapper,
         private RoleMapper $roleMapper,
@@ -157,7 +157,7 @@ class Controller extends Base
                     ?? $this->routeGenerator->generate('pastoral.getIndex'),
 
                 // Requirements for displaying visibility inputs
-                'record'          => $this->pastoralMapper->createModel()->setStudent(null),
+                'record'          => $this->pastoralDataSource->createModel()->setStudent(null),
                 'allowIndividual' => $allowIndividual,
                 'allowParents'    => $allowParents,
                 'allowStudents'   => $allowStudents,
@@ -221,10 +221,26 @@ class Controller extends Base
         $archive = $this->createLocalZipArchive($zipFile);
         $files   = $this->associateFilesWithUser($archive);
 
-        $dummyRecord = $this->pastoralMapper->createModel();
+        $dummyRecord = $this->pastoralDataSource->createModel();
         foreach ($files as $file) {
             // Extract processPastoralRecords to its own class
         }
+
+        $processor = new Pastoral\RecordProcessor(
+            $this->getConfigLoader(),
+            $this->pastoralDataSource,
+            $this->pastoralSubTypeMapper,
+            $this->pastoralTypeMapper,
+            $this->pastoralSeverityMapper,
+            $this->pastoralTagMapper,
+            $this->pastoralActionMapper,
+            $this->pastoralRecordActionMapper,
+            $this->pastoralAttachmentMapper,
+            $this->userMapper,
+            $this->pastoralAccessMapper,
+            $this->pastoralGroupMapper,
+            $this->errorMapper,
+        );
 
         // Create a new pastoral record for each student extracted from the ZIP
     }
