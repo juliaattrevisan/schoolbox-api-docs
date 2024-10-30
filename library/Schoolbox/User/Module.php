@@ -14,6 +14,7 @@ use Alaress\Authorizer\Rule;
 use Alaress\Module\Module as BaseModule;
 use Alaress\Web\Controller\Base;
 use Schoolbox\Error\Mapper as ErrorMapper;
+use Schoolbox\Oidc\Server\RelyingParty\Mapper as RelyingPartyMapper;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\UserMapper;
@@ -86,6 +87,7 @@ class Module extends BaseModule
         return new Controller(
             $this->getMapperFactory()->get(UserAccessMapper::class),
             $this->getMapperFactory()->get(Logger\Mapper::class),
+            $this->getMapperFactory()->get(RelyingPartyMapper::class),
             $this->injector->get('user.logout.requestFactory'),
             $this->injector->get('httpClient'),
         );
