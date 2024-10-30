@@ -24,5 +24,5 @@ SELECT * FROM `profile_button` WHERE deleted_at IS NULL;
 -- I don't want default values to cloud what I'm seeing here
 
 ALTER TABLE `profile_button`
-    ADD COLUMN `type` ENUM('system', 'custom') NOT NULL DEFAULT 'custom' AFTER `target`,
-    ADD COLUMN `roletype` ENUM('student', 'staff', 'parent') NULL DEFAULT NULL AFTER `target`;
+    ADD COLUMN `roletype` ENUM('student', 'staff', 'parent') NULL DEFAULT NULL AFTER `id`,
+    ADD COLUMN `type` VARCHAR(255) NOT NULL DEFAULT 'custom' AFTER `roletype`;

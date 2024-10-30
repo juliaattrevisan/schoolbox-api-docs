@@ -15,7 +15,8 @@ use Psr\Log\LoggerInterface;
 class CustomButtons
 {
     /**
-     * Corresponds to an enum in the schema
+     * Corresponds to a secondary identifier in the schema
+     * so we can figure out custom buttons from system buttons
      */
     private const CUSTOM = 'custom';
 

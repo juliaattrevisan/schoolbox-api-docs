@@ -16,6 +16,15 @@ use Schoolbox\Application\CliTool;
 class MigrateButtonsTool extends CliTool\App
 {
     /**
+     * Consts used - including the "self" pseudo-roletype
+     */
+    public const ROLETYPE_SELF = \Schoolbox\Admin\Profile\Editor\Payload::ROLETYPE_SELF;
+    public const ROLETYPE_STUDENT = \Schoolbox\Role::STUDENT;
+    public const ROLETYPE_PARENT = \Schoolbox\Role::PARENT;
+    public const ROLETYPE_STAFF = \Schoolbox\Role::STAFF;
+
+
+    /**
      * Make sure to add your locking script to the Lock Inspector tool
      * const LOCK_NAMES in Inspector.php
      */
@@ -51,15 +60,6 @@ class MigrateButtonsTool extends CliTool\App
      * Migrate custom buttons into their corresponding roletype(s)
      */
     private const OPT_LONG_TYPE_CUSTOM = 'custom';
-
-
-    /**
-     * Consts used - including the "self" pseudo-roletype
-     */
-    private const ROLETYPE_SELF = \Schoolbox\Admin\Profile\Editor\Payload::ROLETYPE_SELF;
-    private const ROLETYPE_STUDENT = \Schoolbox\Role::STUDENT;
-    private const ROLETYPE_PARENT = \Schoolbox\Role::PARENT;
-    private const ROLETYPE_STAFF = \Schoolbox\Role::STAFF;
 
 
     /**
