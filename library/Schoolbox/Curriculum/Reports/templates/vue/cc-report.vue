@@ -4,7 +4,7 @@
  */
 
 import LoadingTable from "@schoolboxVue/components/loading/loading-table.vue";
-import CcFilters from "./cc-filters.vue";
+import CcReportFilters from "./cc-report-filters.vue";
 import CcReportTable from "./cc-report-table.vue";
 
 import { useReportStore } from "./store/ccReportStore";
@@ -20,7 +20,7 @@ const reportStore = useReportStore();
     <loading-table v-else-if="reportStore.isLoading" />
     <div v-else-if="reportStore.hasReport" class="c-island l-pad-m">
         <div class="l-flex l-flex-col l-gap-s">
-            <cc-filters />
+            <cc-report-filters />
             <cc-report-table />
         </div>
     </div>

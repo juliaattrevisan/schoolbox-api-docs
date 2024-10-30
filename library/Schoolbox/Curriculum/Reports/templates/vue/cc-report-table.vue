@@ -10,7 +10,6 @@ const reportStore = useReportStore();
 </script>
 
 <template>
-    <div></div>
     <table>
         <thead>
             <tr>
