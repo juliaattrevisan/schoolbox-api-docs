@@ -265,7 +265,7 @@ class Module extends BaseModule
             $this->getMapperFactory()->get(PastoralAccessMapper::class),
             $this->getMapperFactory()->get(PastoralGroupMapper::class),
             $this->getMapperFactory()->get(ErrorMapper::class),
-//            $this->injector->get('sentry'),
+            $this->injector->get('sentry'),
         );
 
         return new Controller(

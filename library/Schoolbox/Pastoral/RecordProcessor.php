@@ -36,6 +36,7 @@ use Schoolbox\Resource\Storage\Model as Storage;
 use Schoolbox\TokenReplacer;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
+use Sentry\State\HubInterface;
 
 /**
  * Class for processing pastoral records from a form.
@@ -73,6 +74,7 @@ class RecordProcessor
         private PastoralAccessMapper $pastoralAccessMapper,
         private PastoralGroupMapper $pastoralGroupMapper,
         private ErrorMapper $errorMapper,
+        private HubInterface $sentry,
     ) {
     }
 
@@ -383,10 +385,10 @@ class RecordProcessor
                             $this->config->get('external_pastoral_title_include')
                         );
                     } catch (\Exception $e) {
-                        // TODO figure out how to pass to Sentry
-//                        // Send it to Sentry I suppose: there's nothing that
-//                        // the end user may do with this information.
-//                        $this->controller->captureException($e);
+                        // Send it to Sentry I suppose: there's nothing that
+                        // the end user may do with this information.
+                        /** @noinspection PhpExpressionResultUnusedInspection */
+                        $this->sentry->captureException($e);
                     }
                 }
             );

@@ -87,7 +87,7 @@ class Module extends BaseModule
             $this->getMapperFactory()->get(Pastoral\Access\Mapper::class),
             $this->getMapperFactory()->get(Pastoral\Group\Mapper::class),
             $this->getMapperFactory()->get(ErrorMapper::class),
-//            $this->injector->get('sentry'),
+            $this->injector->get('sentry'),
         );
         return new Controller(
             $this->injector->get('l10n'),
