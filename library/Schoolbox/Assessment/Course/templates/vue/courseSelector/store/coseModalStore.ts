@@ -5,7 +5,16 @@
 import { defineStore } from "pinia";
 
 export const useModalStore = defineStore(`coseModal`, () => {
+    let endpoint = ""; // the endpoint to search for courses
     const isOpen = window.Vue.ref(false);
+
+    /**
+     * Open the modal
+     * @param $endpoint - the endpoint to search for courses
+     */
+    function init($endpoint: string): void {
+        endpoint = $endpoint;
+    }
 
     /**
      * Open the modal
@@ -28,6 +37,7 @@ export const useModalStore = defineStore(`coseModal`, () => {
 
     return {
         isOpen,
+        init,
         open,
         select,
         close,

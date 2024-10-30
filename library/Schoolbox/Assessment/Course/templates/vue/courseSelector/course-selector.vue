@@ -33,6 +33,7 @@ const props = withDefaults(defineProps<Props>(), {
 const store = useCourseSelectorStore();
 store.init(props.preselected);
 const modalStore = useModalStore();
+modalStore.init(props.endpoint);
 const results = window.Vue.ref<Course[]>([]);
 
 /**
