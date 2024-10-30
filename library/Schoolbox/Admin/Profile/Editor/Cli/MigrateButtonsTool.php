@@ -136,16 +136,49 @@ HELP;
                          * TODO if there's only one $roleId you could just update
                          *  the existing row rather than arbitrarily spawn a new one
                          */
+                        $this->getLogger()->info(sprintf(
+                            'Migrating "%s" to %s roletype',
+                            $candidate['title'],
+                            self::ROLETYPE_STUDENT
+                        ));
+
+                        $this->getLogger()->debug(sprintf(
+                            'Assigning roletype %s via lookup, using role id %s',
+                            self::ROLETYPE_STUDENT,
+                            $roleId
+                        ));
                     } elseif (self::ROLETYPE_STAFF === $roletypeLookup[$roleId]) {
                         /* Create a button in the staff roletype
                          * TODO if there's only one $roleId you could just update
                          *  the existing row rather than arbitrarily spawn a new one
                          */
+                        $this->getLogger()->info(sprintf(
+                            'Migrating "%s" to %s roletype',
+                            $candidate['title'],
+                            self::ROLETYPE_STAFF
+                        ));
+
+                        $this->getLogger()->debug(sprintf(
+                            'Assigning roletype %s via lookup, using role id %s',
+                            self::ROLETYPE_STAFF,
+                            $roleId
+                        ));
                     } elseif (self::ROLETYPE_PARENT === $roletypeLookup[$roleId]) {
                         /* Create a button in the parent roletype
                          * TODO if there's only one $roleId you could just update
                          *  the existing row rather than arbitrarily spawn a new one
                          */
+                        $this->getLogger()->info(sprintf(
+                            'Migrating "%s" to %s roletype',
+                            $candidate['title'],
+                            self::ROLETYPE_PARENT
+                        ));
+
+                        $this->getLogger()->debug(sprintf(
+                            'Assigning roletype %s via lookup, using role id %s',
+                            self::ROLETYPE_PARENT,
+                            $roleId
+                        ));
                     } else {
                         /* Unsupported roletype; skip it
                          * Not sure how you'd get here, but it might be possible somehow
