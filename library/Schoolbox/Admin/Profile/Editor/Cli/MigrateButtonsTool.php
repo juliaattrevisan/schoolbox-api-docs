@@ -116,7 +116,7 @@ HELP;
             /* Get a list of buttons to inspect - users can specify --system,
              * --custom, or both
              */
-            $candidates = $this->generateCandidates();
+            $candidates = $this->generateCandidates($roletypeLookup);
 
             /* Each button can have zero or more roles associated with it
              * Inspect each button's relationships to find out which roles,
@@ -129,62 +129,18 @@ HELP;
              */
             print_r($roletypeLookup);
             print_r($candidates);
+
             foreach ($candidates as $candidate) {
-                foreach ($candidate['_roles'] as $roleId) {
-                    if (self::ROLETYPE_STUDENT === $roletypeLookup[$roleId]) {
-                        /* Create a button in the student roletype
-                         * TODO if there's only one $roleId you could just update
-                         *  the existing row rather than arbitrarily spawn a new one
-                         */
-                        $this->getLogger()->info(sprintf(
-                            'Migrating "%s" to %s roletype',
-                            $candidate['title'],
-                            self::ROLETYPE_STUDENT
-                        ));
-
-                        $this->getLogger()->debug(sprintf(
-                            'Assigning roletype %s via lookup, using role id %s',
-                            self::ROLETYPE_STUDENT,
-                            $roleId
-                        ));
-                    } elseif (self::ROLETYPE_STAFF === $roletypeLookup[$roleId]) {
-                        /* Create a button in the staff roletype
-                         * TODO if there's only one $roleId you could just update
-                         *  the existing row rather than arbitrarily spawn a new one
-                         */
-                        $this->getLogger()->info(sprintf(
-                            'Migrating "%s" to %s roletype',
-                            $candidate['title'],
-                            self::ROLETYPE_STAFF
-                        ));
-
-                        $this->getLogger()->debug(sprintf(
-                            'Assigning roletype %s via lookup, using role id %s',
-                            self::ROLETYPE_STAFF,
-                            $roleId
-                        ));
-                    } elseif (self::ROLETYPE_PARENT === $roletypeLookup[$roleId]) {
-                        /* Create a button in the parent roletype
-                         * TODO if there's only one $roleId you could just update
-                         *  the existing row rather than arbitrarily spawn a new one
-                         */
-                        $this->getLogger()->info(sprintf(
-                            'Migrating "%s" to %s roletype',
-                            $candidate['title'],
-                            self::ROLETYPE_PARENT
-                        ));
-
-                        $this->getLogger()->debug(sprintf(
-                            'Assigning roletype %s via lookup, using role id %s',
-                            self::ROLETYPE_PARENT,
-                            $roleId
-                        ));
-                    } else {
-                        /* Unsupported roletype; skip it
-                         * Not sure how you'd get here, but it might be possible somehow
-                         */
-                        continue;
-                    }
+                foreach ($candidate['_roletypes'] as $roletype) {
+                    /* Create a button in the current roletype
+                     * TODO if there's only one $roleId you could just update
+                     *  the existing row rather than arbitrarily spawn a new one
+                     */
+                    $this->getLogger()->info(sprintf(
+                        'Migrating "%s" to %s roletype',
+                        $candidate['title'],
+                        self::ROLETYPE_STUDENT
+                    ));
                 }
             }
 
@@ -241,9 +197,10 @@ HELP;
     /**
      * Generate a list of buttons we need to recreate
      *
+     * @param array $roletypeLookup
      * @return array
      */
-    public function generateCandidates(): array
+    public function generateCandidates(array $roletypeLookup): array
     {
         $query = "
             SELECT 
@@ -270,12 +227,16 @@ HELP;
 
                 /* Build a unique list of related role_ids
                  */
-                $candidates[$row['id']]['_roles'][$row['role_id']] = $row['role_id'];
+                $candidates[$row['id']]['_roletypes'] = [];
             }
+
+            /* Identify the roletype
+             */
+            $roletype = $roletypeLookup[$row['role_id']];
 
             /* Add it to the list uniquely
              */
-            $candidates[$row['id']]['_roles'][$row['role_id']] = $row['role_id'];
+            $candidates[$row['id']]['_roletypes'][$roletype] = $roletype;
         }
 
         return $candidates;
