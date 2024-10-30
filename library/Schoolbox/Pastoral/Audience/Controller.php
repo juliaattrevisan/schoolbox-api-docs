@@ -212,7 +212,7 @@ class Controller extends Base
                 'flyout'          => $flyout->generateVars($url),
                 'breadcrumbs'     => $flyout->generateBreadcrumbs($url),
                 'record'          => $record,
-                'allowIndividual' => $this->getConfigLoader()->get('pastoral_individual_access'),
+                'allowIndividual' => $this->getConfigLoader()->get(ConfigMapper::NAME_PASTORAL_INDIVIDUAL_ACCESS_ENABLED),
                 'allowParents'    => false,  //prevent user search from including student parents
                 'roles'           => $roles,
                 'roleTypes'       => $this->pastoralAccessMapper->determineAllowedRoleTypes(),

@@ -82,7 +82,7 @@ class Controller extends Base
     {
         // Requirements for loading pastoral visibility inputs
         // TODO extract elsewhere, and use in pastoral modify form as well
-        $allowIndividual = $this->getConfigLoader()->get('pastoral_individual_access');
+        $allowIndividual = $this->getConfigLoader()->get(ConfigMapper::NAME_PASTORAL_INDIVIDUAL_ACCESS_ENABLED);
         $allowParents    = $this->getConfigLoader()->get(ConfigMapper::NAME_PASTORAL_PARENT_ACCESS_ENABLED);
         $allowStudents   = $this->getConfigLoader()->get(ConfigMapper::NAME_PASTORAL_STUDENT_ACCESS_ENABLED);
 

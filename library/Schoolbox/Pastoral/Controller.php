@@ -614,7 +614,7 @@ class Controller extends Base
             [
                 'record'            => $record,
                 'canCreate'         => $this->getConfigLoader()->get('pastoral_create_tag_enable'),
-                'allowIndividual'   => $this->config->get('pastoral_individual_access'),
+                'allowIndividual'   => $this->config->get(ConfigMapper::NAME_PASTORAL_INDIVIDUAL_ACCESS_ENABLED),
                 'allowParents'      => $allowParents,
                 'allowStudents'     => $allowStudents,
                 'types'             => $types,
