@@ -1610,6 +1610,8 @@ class Controller extends Base
     }
 
     /**
+     * Return a camel-cased list category, to be used in route and function names.
+     * E.g. "adminLists.get{$listCategory}Index" (when $listCategory is 'Lms' becomes "adminLists.getLmsIndex").
      * @param string $table
      * @return string
      */
