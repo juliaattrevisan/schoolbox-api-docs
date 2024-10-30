@@ -196,9 +196,10 @@
                     'duplicateIdSelected': {{ record.student ? 'false' : 'true' }}
                 },
                 'report-file': {
-                    required: true,
-                    depends: function () {
-                        return document.getElementById("report-zone").querySelector("[data-dz-previews]").children.length === 0;
+                    required: {
+                        depends: function () {
+                            return document.getElementById("report-zone").querySelector("[data-dz-previews]").children.length === 0;
+                        },
                     },
                 },
             },
@@ -219,6 +220,12 @@
 
                 window.setTimeout(function() { form.submit(); }, 0);
             }
+        });
+
+        // Remove the error message when a report file is uploaded.
+        // (The form will later validate)
+        $('#report-zone').on('success.attachzone', () => {
+            $('#report-file-error').remove();
         });
 
         {# Chain Pastoral Type/Subtype Dropdowns #}
