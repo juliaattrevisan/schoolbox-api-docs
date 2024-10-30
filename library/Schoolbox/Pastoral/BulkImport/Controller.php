@@ -17,6 +17,7 @@ use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
 use Schoolbox\Resource\Attachment\Zone;
 use Schoolbox\Resource\Storage\FilesystemProxy;
+use Schoolbox\Role;
 use Schoolbox\RoleMapper;
 use Schoolbox\TokenReplacer\Simple;
 use Schoolbox\UserMapper;
@@ -101,11 +102,11 @@ class Controller extends Base
             }
         }
 
-        $typesIndex       = [];
-        $typesIndexPrivate       = [];
-        $audienceDefaults = [];
+        $typesIndex        = [];
+        $typesIndexPrivate = [];
+        $audienceDefaults  = [];
         foreach ($types as $type) {
-            $typesIndex[$type->getId()] = $type->getTemplate();
+            $typesIndex[$type->getId()]        = $type->getTemplate();
             $typesIndexPrivate[$type->getId()] = $type->getTemplatePrivate();
             if (key_exists($type->getId(), $typeAudiences) || $type->getVisibilityLocked()) {
                 $audienceDefaults[] = [
@@ -116,11 +117,11 @@ class Controller extends Base
             }
         }
 
-        $subtypesIndex = [];
+        $subtypesIndex        = [];
         $subtypesIndexPrivate = [];
 
         foreach ($subtypes as $subtype) {
-            $subtypesIndex[$subtype->getId()] = $subtype->getTemplate();
+            $subtypesIndex[$subtype->getId()]        = $subtype->getTemplate();
             $subtypesIndexPrivate[$subtype->getId()] = $subtype->getTemplatePrivate();
             if (key_exists($subtype->getId(), $subtypeAudiences) || $subtype->getVisibilityLocked()) {
                 $audienceDefaults[] = [
@@ -198,17 +199,29 @@ class Controller extends Base
         $archive = new ZipArchive();
         $archive->open($filename);
         $tokenReplacer = new Simple();
-        $stats = [];
+        $files         = [];
         for ($i = 0; $i < $archive->numFiles; $i++) {
-            $stat = $archive->statIndex($i);
-            $stat['tokens'] = $tokenReplacer->extract($this->requestPost->get('template'), $stat['name']);
-            $stats[] = $stat;
+            $name = $archive->getNameIndex($i);
+            if ($name !== false) {
+                $tokens     = $tokenReplacer->extract($this->requestPost->get('template'), $name);
+                $user       = null;
+                $externalId = null;
+                if (isset($tokens['[externalId]'])) {
+                    $externalId = $tokens['[externalId]'];
+                    $user       = $this->userMapper->findByExternalId($externalId, Role::STUDENT);
+                }
+                $files[] = [
+                    'name'       => $name,
+                    'user'       => $user,
+                    'externalId' => $externalId,
+                ];
+            }
         }
 
         $this->response = $this->responseFromTemplate(
             '@pastoralBulkImport/importPreview.twig',
             [
-                'stats' => $stats,
+                'files' => $files,
             ],
         );
     }
