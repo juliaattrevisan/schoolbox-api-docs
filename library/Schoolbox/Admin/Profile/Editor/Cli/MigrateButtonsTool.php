@@ -60,6 +60,18 @@ class MigrateButtonsTool extends CliTool\App
     private const ROLETYPE_STAFF = \Schoolbox\Role::STAFF;
 
 
+    /* Some prepared statements that we'll often reuse
+     */
+    private \PDOStatement $campusAvailabilityStatement;
+    private \PDOStatement $campusAvailabilityInsertStatement;
+    private \PDOStatement $campusVisibilityStatement;
+    private \PDOStatement $campusVisibilityInsertStatement;
+    private \PDOStatement $roleAvailabilityStatement;
+    private \PDOStatement $roleAvailabilityInsertStatement;
+    private \PDOStatement $roleVisibilityStatement;
+    private \PDOStatement $roleVisibilityInsertStatement;
+
+
     /**
      * @inheritdoc
      */
@@ -108,6 +120,10 @@ HELP;
         try {
             $this->getLogger()->info('Profile Editor Button Migration.');
             $this->getLogger()->info('');
+
+            /* Set up some prepared statements, presuming that we'll go ahead with all this
+             */
+            $this->prepareStatements();
 
             /* Figure out which roletype corresponds to each role
              */
@@ -179,6 +195,59 @@ HELP;
         $this->getLogger()->debug('Releasing lock');
 
         $lock->release();
+    }
+
+
+    /**
+     * We'll be reusing these prepared statements a lot
+     *
+     * @return void
+     */
+    private function prepareStatements(): void
+    {
+        $this->campusAvailabilityStatement = $this->getDatabaseInternal()->prepare("
+            SELECT *
+            FROM profile_button_campus_availability
+            WHERE profile_button_id = :profileButtonId
+        ");
+
+        $this->campusAvailabilityInsertStatement = $this->getDatabaseInternal()->prepare("
+            INSERT INTO profile_button_campus_availability (profile_button_id, campus_id)
+            VALUES (?, ?)
+        ");
+
+        $this->campusVisibilityStatement = $this->getDatabaseInternal()->prepare("
+            SELECT *
+            FROM profile_button_campus_visibility
+            WHERE profile_button_id = :profileButtonId
+        ");
+
+        $this->campusVisibilityInsertStatement = $this->getDatabaseInternal()->prepare("
+            INSERT INTO profile_button_campus_visibility (profile_button_id, campus_id)
+            VALUES (?, ?)
+        ");
+
+        $this->roleAvailabilityStatement = $this->getDatabaseInternal()->prepare("
+            SELECT *
+            FROM profile_button_role_availability
+            WHERE profile_button_id = :profileButtonId
+        ");
+
+        $this->roleAvailabilityInsertStatement = $this->getDatabaseInternal()->prepare("
+            INSERT INTO profile_button_role_availability (profile_button_id, role_id)
+            VALUES (?, ?)
+        ");
+
+        $this->roleVisibilityStatement = $this->getDatabaseInternal()->prepare("
+            SELECT *
+            FROM profile_button_role_availability
+            WHERE profile_button_id = :profileButtonId
+        ");
+
+        $this->roleVisibilityInsertStatement = $this->getDatabaseInternal()->prepare("
+            INSERT INTO profile_button_role_visibility (profile_button_id, role_id)
+            VALUES (?, ?)
+        ");
     }
 
 
@@ -306,25 +375,12 @@ HELP;
      */
     private function createCampusAvailability(int $profileButtonId, array $candidate): void
     {
-        $query = "
-            SELECT *
-            FROM profile_button_campus_availability
-            WHERE profile_button_id = :profileButtonId
-        ";
-
-        $statement = $this->getDatabaseInternal()->prepare($query);
-        $statement->execute([
+        $this->campusAvailabilityStatement->execute([
             'profileButtonId' => $candidate['id']
         ]);
 
-        while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
-            $query = "
-                INSERT INTO profile_button_campus_availability (profile_button_id, campus_id)
-                VALUES (?, ?)
-            ";
-
-            $campusAvailabilityStatement = $this->getDatabaseInternal()->prepare($query);
-            $campusAvailabilityStatement->execute([$profileButtonId, $row['campus_id']]);
+        while ($row = $this->campusAvailabilityStatement->fetch(\PDO::FETCH_ASSOC)) {
+            $this->campusAvailabilityInsertStatement->execute([$profileButtonId, $row['campus_id']]);
         }
     }
 
@@ -338,25 +394,12 @@ HELP;
      */
     private function createCampusVisibility(int $profileButtonId, array $candidate): void
     {
-        $query = "
-            SELECT *
-            FROM profile_button_campus_visibility
-            WHERE profile_button_id = :profileButtonId
-        ";
-
-        $statement = $this->getDatabaseInternal()->prepare($query);
-        $statement->execute([
+        $this->campusVisibilityStatement->execute([
             'profileButtonId' => $candidate['id']
         ]);
 
-        while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
-            $query = "
-                INSERT INTO profile_button_campus_visibility (profile_button_id, campus_id)
-                VALUES (?, ?)
-            ";
-
-            $campusVisibilityStatement = $this->getDatabaseInternal()->prepare($query);
-            $campusVisibilityStatement->execute([$profileButtonId, $row['campus_id']]);
+        while ($row = $this->campusVisibilityStatement->fetch(\PDO::FETCH_ASSOC)) {
+            $this->campusVisibilityInsertStatement->execute([$profileButtonId, $row['campus_id']]);
         }
     }
 
@@ -370,25 +413,12 @@ HELP;
      */
     private function createRoleAvailability(int $profileButtonId, array $candidate): void
     {
-        $query = "
-            SELECT *
-            FROM profile_button_role_availability
-            WHERE profile_button_id = :profileButtonId
-        ";
-
-        $statement = $this->getDatabaseInternal()->prepare($query);
-        $statement->execute([
+        $this->roleAvailabilityStatement->execute([
             'profileButtonId' => $candidate['id']
         ]);
 
-        while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
-            $query = "
-                INSERT INTO profile_button_role_availability (profile_button_id, role_id)
-                VALUES (?, ?)
-            ";
-
-            $roleAvailabilityStatement = $this->getDatabaseInternal()->prepare($query);
-            $roleAvailabilityStatement->execute([$profileButtonId, $row['role_id']]);
+        while ($row = $this->roleAvailabilityStatement->fetch(\PDO::FETCH_ASSOC)) {
+            $this->roleAvailabilityInsertStatement->execute([$profileButtonId, $row['role_id']]);
         }
     }
 
@@ -402,25 +432,12 @@ HELP;
      */
     private function createRoleVisibility(int $profileButtonId, array $candidate): void
     {
-        $query = "
-            SELECT *
-            FROM profile_button_role_visibility
-            WHERE profile_button_id = :profileButtonId
-        ";
-
-        $statement = $this->getDatabaseInternal()->prepare($query);
-        $statement->execute([
+        $this->roleVisibilityStatement->execute([
             'profileButtonId' => $candidate['id']
         ]);
 
-        while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
-            $query = "
-                INSERT INTO profile_button_role_visibility (profile_button_id, role_id)
-                VALUES (?, ?)
-            ";
-
-            $roleAvailabilityStatement = $this->getDatabaseInternal()->prepare($query);
-            $roleAvailabilityStatement->execute([$profileButtonId, $row['role_id']]);
+        while ($row = $this->roleVisibilityStatement->fetch(\PDO::FETCH_ASSOC)) {
+            $this->roleVisibilityInsertStatement->execute([$profileButtonId, $row['role_id']]);
         }
     }
 
