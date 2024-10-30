@@ -18,7 +18,7 @@ export type ReportError = {
 };
 
 export const useReportStore = defineStore("ccReport", () => {
-    const hasNotSearched = window.Vue.ref(true); // to prompt a search if the user hasn't searched yet
+    const hasNotReported = window.Vue.ref(true); // to prompt a search if the user hasn't searched yet
     const isLoading = window.Vue.ref(false);
     const hasLoadError = window.Vue.ref(false);
     const loadError = window.Vue.ref<ReportError | null>(null);
@@ -43,7 +43,7 @@ export const useReportStore = defineStore("ccReport", () => {
         useInputStore().setActive();
         // useResultsStore().clear();
         useStore().setQueryParams();
-        hasNotSearched.value = false;
+        hasNotReported.value = false;
         // abort the previous search if it's still running
         if (isLoading.value) {
             controller.abort();
@@ -93,7 +93,7 @@ export const useReportStore = defineStore("ccReport", () => {
     }
 
     return {
-        hasNotSearched,
+        hasNotReported,
         isLoading,
         hasLoadError,
         report,

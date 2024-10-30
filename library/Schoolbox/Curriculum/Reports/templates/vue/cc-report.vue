@@ -13,16 +13,16 @@ const reportStore = useReportStore();
 </script>
 
 <template>
-    <div v-if="reportStore.hasReport" class="c-island l-pad-m">
+    <div v-if="reportStore.hasNotReported" class="empty-state-flex-centered">
+        <i class="icon-report"></i>
+        To generate a report, first select at least one Course and Curriculum.
+    </div>
+    <loading-table v-else-if="reportStore.isLoading" />
+    <div v-else-if="reportStore.hasReport" class="c-island l-pad-m">
         <div class="l-flex l-flex-col l-gap-s">
             <cc-report-header />
             <cc-report-table />
         </div>
-    </div>
-    <loading-table v-else-if="reportStore.isLoading" />
-    <div v-else class="empty-state-flex-centered">
-        <i class="icon-report"></i>
-        To generate a report, first select at least one Course and Curriculum.
     </div>
 </template>
 
