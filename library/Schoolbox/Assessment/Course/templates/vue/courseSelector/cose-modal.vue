@@ -5,6 +5,7 @@
 
 import RevealModal from "@schoolboxVue/components/reveal-modal.vue";
 import { useModalStore } from "./store/coseModalStore";
+import CoseModalList from "./cose-modal-list.vue";
 import CoseModalFooter from "./cose-modal-footer.vue";
 
 const modalEl = window.Vue.ref<InstanceType<typeof RevealModal> | null>();
@@ -34,7 +35,7 @@ function onModalClosed(): void {
 
 <template>
     <reveal-modal ref="modalEl" :close-on-background-click="false" @closed="onModalClosed">
-        <p>Yep</p>
+        <cose-modal-list />
         <cose-modal-footer />
     </reveal-modal>
 </template>
