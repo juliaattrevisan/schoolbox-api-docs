@@ -125,11 +125,17 @@ HELP;
             $strats = [];
 
             if ($this->getOpt(self::OPT_LONG_TYPE_CUSTOM)) {
-                $strats[] = new CustomButtons($this->getDatabaseInternal(), $this->getLogger(), $roletypeLookup);
+                $strats[] = new CustomButtons(
+                    $this->perform(),
+                    $this->getDatabaseInternal(),
+                    $this->getLogger(),
+                    $roletypeLookup
+                );
             }
 
             if ($this->getOpt(self::OPT_LONG_TYPE_SYSTEM)) {
                 $strats[] = new SystemButtons(
+                    $this->perform(),
                     $this->getDatabaseInternal(),
                     $this->getLogger(),
                     $roletypeLookup,

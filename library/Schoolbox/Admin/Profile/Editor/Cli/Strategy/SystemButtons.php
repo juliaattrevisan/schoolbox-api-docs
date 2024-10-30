@@ -47,12 +47,14 @@ class SystemButtons
      *
      * Note that some system buttons depend on config vars
      *
+     * @param bool $perform
      * @param IConnector $db
      * @param LoggerInterface $log
      * @param array $roletypeLookup
      * @param string $externalStaffPortal
      */
     public function __construct(
+        private bool $perform,
         private IConnector $db,
         private LoggerInterface $log,
         private array $roletypeLookup,
@@ -87,7 +89,9 @@ class SystemButtons
                     $roletype
                 ));
 
-                $this->createButtonStatement->execute($candidate);
+                if ($this->perform) {
+                    $this->createButtonStatement->execute($candidate);
+                }
             }
         }
     }
@@ -238,29 +242,34 @@ class SystemButtons
      *
      * @param array $candidate
      * @param string $roletype
-     * @return int
+     * @return int|null
      */
-    private function createButton(array $candidate, string $roletype): int {
+    private function createButton(array $candidate, string $roletype): ?int
+    {
         $this->log->info(sprintf(
             'Migrating "%s" to %s roletype',
             $candidate['title'],
             $roletype
         ));
 
-        $this->createButtonStatement->execute([
-            'roletype' => $candidate['roletype'],
-            'type' => $candidate['type'],
-            'sortOrder' => $candidate['sort_order'],
-            'title' => $candidate['title'],
-            'text' => $candidate['text'],
-            'icon' => $candidate['icon'],
-            'url' => $candidate['url'],
-            'css'=> $candidate['css'],
-            'target' => $candidate['target'],
-        ]);
+        if ($this->perform) {
+            $this->createButtonStatement->execute([
+                'roletype' => $candidate['roletype'],
+                'type' => $candidate['type'],
+                'sortOrder' => $candidate['sort_order'],
+                'title' => $candidate['title'],
+                'text' => $candidate['text'],
+                'icon' => $candidate['icon'],
+                'url' => $candidate['url'],
+                'css' => $candidate['css'],
+                'target' => $candidate['target'],
+            ]);
 
-        /* The new button's id - we just made this a moment ago
-         */
-        return (int)$this->db->lastInsertId();
+            /* The new button's id - we just made this a moment ago
+             */
+            return (int)$this->db->lastInsertId();
+        }
+
+        return null;
     }
 }

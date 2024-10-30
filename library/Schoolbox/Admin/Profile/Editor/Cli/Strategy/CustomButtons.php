@@ -37,11 +37,13 @@ class CustomButtons
     /**
      * Constructor.
      *
+     * @param bool $perform
      * @param IConnector $db
      * @param LoggerInterface $log
      * @param array $roletypeLookup
      */
     public function __construct(
+        private bool $perform,
         private IConnector $db,
         private LoggerInterface $log,
         private array $roletypeLookup
@@ -167,48 +169,63 @@ class CustomButtons
      *
      * @param array $candidate
      * @param string $roletype
-     * @return int
+     * @return int|null
      */
-    private function createButton(array $candidate, string $roletype): int {
+    private function createButton(array $candidate, string $roletype): ?int {
         $this->log->info(sprintf(
             'Migrating "%s" to %s roletype',
             $candidate['title'],
             $roletype
         ));
 
-        $this->createButtonStatement->execute([
-            'roletype' => $roletype,
-            'type' => self::CUSTOM,
-            'sortOrder' => $candidate['sort_order'],
-            'title' => $candidate['title'],
-            'text' => $candidate['text'],
-            'icon' => $candidate['icon'],
-            'url' => $candidate['url'],
-            'css'=> $candidate['css'],
-            'target' => $candidate['target'],
-        ]);
+        if ($this->perform) {
+            $this->createButtonStatement->execute([
+                'roletype' => $roletype,
+                'type' => self::CUSTOM,
+                'sortOrder' => $candidate['sort_order'],
+                'title' => $candidate['title'],
+                'text' => $candidate['text'],
+                'icon' => $candidate['icon'],
+                'url' => $candidate['url'],
+                'css' => $candidate['css'],
+                'target' => $candidate['target'],
+            ]);
 
-        /* The new button's id - we just made this a moment ago
-         */
-        return (int)$this->db->lastInsertId();
+            /* The new button's id - we just made this a moment ago
+             */
+            return (int)$this->db->lastInsertId();
+        }
+
+        return null;
     }
 
 
     /**
      * Recreate a relationship using $candidate's existing nodes and this new $profileButtonId
      *
-     * @param int $profileButtonId
+     * @param int|null $profileButtonId
      * @param int $oldProfileButtonId
      * @return void
      */
-    private function createCampusAvailability(int $profileButtonId, int $oldProfileButtonId): void
+    private function createCampusAvailability(?int $profileButtonId, int $oldProfileButtonId): void
     {
-        $this->campusAvailabilityStatement->execute([
-            'profileButtonId' => $oldProfileButtonId
-        ]);
+        if ($this->perform) {
+            if (!$profileButtonId) {
+                $this->log->warning(sprintf(
+                    'Invalid profile buttton identifier for old profile button %s; skipping',
+                    $oldProfileButtonId
+                ));
 
-        while ($row = $this->campusAvailabilityStatement->fetch(\PDO::FETCH_ASSOC)) {
-            $this->campusAvailabilityInsertStatement->execute([$profileButtonId, $row['campus_id']]);
+                return;
+            }
+
+            $this->campusAvailabilityStatement->execute([
+                'profileButtonId' => $oldProfileButtonId
+            ]);
+
+            while ($row = $this->campusAvailabilityStatement->fetch(\PDO::FETCH_ASSOC)) {
+                $this->campusAvailabilityInsertStatement->execute([$profileButtonId, $row['campus_id']]);
+            }
         }
     }
 
@@ -216,18 +233,29 @@ class CustomButtons
     /**
      * Recreate a relationship using $candidate's existing nodes and this new $profileButtonId
      *
-     * @param int $profileButtonId
+     * @param int|null $profileButtonId
      * @param int $oldProfileButtonId
      * @return void
      */
-    private function createCampusVisibility(int $profileButtonId, int $oldProfileButtonId): void
+    private function createCampusVisibility(?int $profileButtonId, int $oldProfileButtonId): void
     {
-        $this->campusVisibilityStatement->execute([
-            'profileButtonId' => $oldProfileButtonId
-        ]);
+        if ($this->perform) {
+            if (!$profileButtonId) {
+                $this->log->warning(sprintf(
+                    'Invalid profile buttton identifier for old profile button %s; skipping',
+                    $oldProfileButtonId
+                ));
 
-        while ($row = $this->campusVisibilityStatement->fetch(\PDO::FETCH_ASSOC)) {
-            $this->campusVisibilityInsertStatement->execute([$profileButtonId, $row['campus_id']]);
+                return;
+            }
+
+            $this->campusVisibilityStatement->execute([
+                'profileButtonId' => $oldProfileButtonId
+            ]);
+
+            while ($row = $this->campusVisibilityStatement->fetch(\PDO::FETCH_ASSOC)) {
+                $this->campusVisibilityInsertStatement->execute([$profileButtonId, $row['campus_id']]);
+            }
         }
     }
 
@@ -235,18 +263,29 @@ class CustomButtons
     /**
      * Recreate a relationship using $candidate's existing nodes and this new $profileButtonId
      *
-     * @param int $profileButtonId
+     * @param int|null $profileButtonId
      * @param int $oldProfileButtonId
      * @return void
      */
-    private function createRoleAvailability(int $profileButtonId, int $oldProfileButtonId): void
+    private function createRoleAvailability(?int $profileButtonId, int $oldProfileButtonId): void
     {
-        $this->roleAvailabilityStatement->execute([
-            'profileButtonId' => $oldProfileButtonId
-        ]);
+        if ($this->perform) {
+            if (!$profileButtonId) {
+                $this->log->warning(sprintf(
+                    'Invalid profile buttton identifier for old profile button %s; skipping',
+                    $oldProfileButtonId
+                ));
 
-        while ($row = $this->roleAvailabilityStatement->fetch(\PDO::FETCH_ASSOC)) {
-            $this->roleAvailabilityInsertStatement->execute([$profileButtonId, $row['role_id']]);
+                return;
+            }
+
+            $this->roleAvailabilityStatement->execute([
+                'profileButtonId' => $oldProfileButtonId
+            ]);
+
+            while ($row = $this->roleAvailabilityStatement->fetch(\PDO::FETCH_ASSOC)) {
+                $this->roleAvailabilityInsertStatement->execute([$profileButtonId, $row['role_id']]);
+            }
         }
     }
 
@@ -254,18 +293,27 @@ class CustomButtons
     /**
      * Recreate a relationship using $candidate's existing nodes and this new $profileButtonId
      *
-     * @param int $profileButtonId
+     * @param int|null $profileButtonId
      * @param int $oldProfileButtonId
      * @return void
      */
-    private function createRoleVisibility(int $profileButtonId, int $oldProfileButtonId): void
+    private function createRoleVisibility(?int $profileButtonId, int $oldProfileButtonId): void
     {
-        $this->roleVisibilityStatement->execute([
-            'profileButtonId' => $oldProfileButtonId
-        ]);
+        if (!$profileButtonId) {
+            $this->log->warning(sprintf(
+                'Invalid profile buttton identifier for old profile button %s',
+                $oldProfileButtonId
+            ));
+        }
 
-        while ($row = $this->roleVisibilityStatement->fetch(\PDO::FETCH_ASSOC)) {
-            $this->roleVisibilityInsertStatement->execute([$profileButtonId, $row['role_id']]);
+        if ($this->perform) {
+            $this->roleVisibilityStatement->execute([
+                'profileButtonId' => $oldProfileButtonId
+            ]);
+
+            while ($row = $this->roleVisibilityStatement->fetch(\PDO::FETCH_ASSOC)) {
+                $this->roleVisibilityInsertStatement->execute([$profileButtonId, $row['role_id']]);
+            }
         }
     }
 
