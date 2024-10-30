@@ -57,7 +57,8 @@ class SystemButtons
         private bool $perform,
         private IConnector $db,
         private LoggerInterface $log,
-        private array $roletypeLookup,
+        private array $campusIds,
+        private array $roleIds,
         private string $externalStaffPortal
     ) {
     }
@@ -78,8 +79,6 @@ class SystemButtons
          * --custom, or both
          */
         $candidates = $this->generateCandidates();
-
-        print_r($candidates);
 
         foreach ($candidates as $roletype => $data) {
             foreach ($data as $candidate) {
@@ -143,12 +142,12 @@ class SystemButtons
                         'target' => null,
                     ],
                     'availability' => [
-                        'campus' => [],
-                        'role' => []
+                        'campus' => $this->campusIds,
+                        'role' => $this->roleIds
                     ],
                     'visibility' => [
-                        'campus' => [],
-                        'role' => []
+                        'campus' => $this->campusIds,
+                        'role' => $this->roleIds
                     ],
                 ],
                 [
@@ -164,12 +163,12 @@ class SystemButtons
                         'target' => null,
                     ],
                     'availability' => [
-                        'campus' => [],
-                        'role' => []
+                        'campus' => $this->campusIds,
+                        'role' => $this->roleIds
                     ],
                     'visibility' => [
-                        'campus' => [],
-                        'role' => []
+                        'campus' => $this->campusIds,
+                        'role' => $this->roleIds
                     ],
                 ],
                 [
@@ -185,12 +184,12 @@ class SystemButtons
                         'target' => null,
                     ],
                     'availability' => [
-                        'campus' => [],
-                        'role' => []
+                        'campus' => $this->campusIds,
+                        'role' => $this->roleIds
                     ],
                     'visibility' => [
-                        'campus' => [],
-                        'role' => []
+                        'campus' => $this->campusIds,
+                        'role' => $this->roleIds
                     ],
                 ],
                 [
@@ -206,12 +205,12 @@ class SystemButtons
                         'target' => null,
                     ],
                     'availability' => [
-                        'campus' => [],
-                        'role' => []
+                        'campus' => $this->campusIds,
+                        'role' => $this->roleIds
                     ],
                     'visibility' => [
-                        'campus' => [],
-                        'role' => []
+                        'campus' => $this->campusIds,
+                        'role' => $this->roleIds
                     ],
                 ],
                 [
@@ -227,12 +226,12 @@ class SystemButtons
                         'target' => null,
                     ],
                     'availability' => [
-                        'campus' => [],
-                        'role' => []
+                        'campus' => $this->campusIds,
+                        'role' => $this->roleIds
                     ],
                     'visibility' => [
-                        'campus' => [],
-                        'role' => []
+                        'campus' => $this->campusIds,
+                        'role' => $this->roleIds
                     ],
                 ],
                 [
@@ -248,12 +247,12 @@ class SystemButtons
                         'target' => null,
                     ],
                     'availability' => [
-                        'campus' => [],
-                        'role' => []
+                        'campus' => $this->campusIds,
+                        'role' => $this->roleIds
                     ],
                     'visibility' => [
-                        'campus' => [],
-                        'role' => []
+                        'campus' => $this->campusIds,
+                        'role' => $this->roleIds
                     ],
                 ],
                 [
@@ -272,12 +271,12 @@ class SystemButtons
                         'target' => '_blank',
                     ],
                     'availability' => [
-                        'campus' => [],
-                        'role' => []
+                        'campus' => $this->campusIds,
+                        'role' => $this->roleIds
                     ],
                     'visibility' => [
-                        'campus' => [],
-                        'role' => []
+                        'campus' => $this->campusIds,
+                        'role' => $this->roleIds
                     ],
                 ],
                 [
@@ -293,12 +292,12 @@ class SystemButtons
                         'target' => null,
                     ],
                     'availability' => [
-                        'campus' => [],
-                        'role' => []
+                        'campus' => $this->campusIds,
+                        'role' => $this->roleIds
                     ],
                     'visibility' => [
-                        'campus' => [],
-                        'role' => []
+                        'campus' => $this->campusIds,
+                        'role' => $this->roleIds
                     ],
                 ],
                 [
@@ -314,12 +313,12 @@ class SystemButtons
                         'target' => null,
                     ],
                     'availability' => [
-                        'campus' => [],
-                        'role' => []
+                        'campus' => $this->campusIds,
+                        'role' => $this->roleIds
                     ],
                     'visibility' => [
-                        'campus' => [],
-                        'role' => []
+                        'campus' => $this->campusIds,
+                        'role' => $this->roleIds
                     ],
                 ],
                 /* TODO There are emailAllStaff and emailAllParents buttons

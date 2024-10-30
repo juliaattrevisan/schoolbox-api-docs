@@ -134,11 +134,15 @@ HELP;
             }
 
             if ($this->getOpt(self::OPT_LONG_TYPE_SYSTEM)) {
+                $campusIds = \Schoolbox\CampusMapper::getInstance()->findAll()->indexBy('id')->keys();
+                $roleIds = \Schoolbox\RoleMapper::getInstance()->findAll()->indexBy('id')->keys();
+
                 $strats[] = new SystemButtons(
                     $this->perform(),
                     $this->getDatabaseInternal(),
                     $this->getLogger(),
-                    $roletypeLookup,
+                    $campusIds,
+                    $roleIds,
                     trim((string)$this->getConfig()->get('external_staff_portal'))
                 );
             }
