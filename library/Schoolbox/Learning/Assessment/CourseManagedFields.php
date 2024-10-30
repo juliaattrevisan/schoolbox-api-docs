@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\Learning\Assessment;
 
+use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\Folder;
 use Schoolbox\User;
 
@@ -163,7 +164,7 @@ class CourseManagedFields
          * a superuser, then you can change stuff
          */
         if ($context->isImplementationContext() && $this->assessment->getSpecificationAssessment() && $this->assessment->getCourseManaged()) {
-            return !$this->viewer->isSuperuser();
+            return ! ( $this->viewer->isSuperuser() || $this->viewer->hasServicePermission(UserAccess::SERVICE_LMS, UserAccess::ACCESS_FULL));
         }
 
         return false;
