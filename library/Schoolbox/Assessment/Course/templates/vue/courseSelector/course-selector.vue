@@ -7,6 +7,8 @@ import { watchIgnorable } from "@vueuse/core";
 import SearchSelect from "@schoolboxVue/components/searchSelect/search-select.vue";
 import type { Course } from "@schoolboxLibrary/types/Course";
 import { useCourseSelectorStore } from "./store/courseSelectorStore";
+import { useModalStore } from "./store/coseModalStore";
+import CoseModal from "./cose-modal.vue";
 
 type CourseAPIResponse = {
     courses: Course[];
@@ -30,7 +32,7 @@ const props = withDefaults(defineProps<Props>(), {
 
 const store = useCourseSelectorStore();
 store.init(props.preselected);
-
+const modalStore = useModalStore();
 const results = window.Vue.ref<Course[]>([]);
 
 /**
@@ -60,7 +62,9 @@ function onCourseNameSelect(course: Course): void {
 /*
  * To open up the course selector modal
  */
-function onButtonSelect() {}
+function onButtonSelect(): void {
+    modalStore.open();
+}
 </script>
 
 <template>
@@ -81,6 +85,7 @@ function onButtonSelect() {}
         button-icon="icon-course"
         @button-select="onButtonSelect"
     />
+    <cose-modal />
 </template>
 
 <style scoped></style>
