@@ -78,7 +78,20 @@ class SystemButtons
         $candidates = $this->generateCandidates();
 
         print_r($candidates);
+
+        foreach ($candidates as $roletype => $data) {
+            foreach ($data as $candidate) {
+                $this->log->info(sprintf(
+                    'Adding "%s" into %s roletype',
+                    $candidate['title'],
+                    $roletype
+                ));
+
+                $this->createButtonStatement->execute($candidate);
+            }
+        }
     }
+
 
     /**
      * We'll be reusing these prepared statements a lot
@@ -122,7 +135,7 @@ class SystemButtons
                     'title' => 'Due Work',
                     'text' => 'Due Work',
                     'icon' => 'due-work',
-                    'url' => null, // derived dynamically with a routeLookup
+                    'url' => '', // derived dynamically with a routeLookup
                     'css' => null,
                     'target' => null,
                 ],
@@ -133,7 +146,7 @@ class SystemButtons
                     'title' => 'Grades',
                     'text' => 'Grades',
                     'icon' => 'tick',
-                    'url' => null, // derived dynamically with a routeLookup
+                    'url' => '', // derived dynamically with a routeLookup
                     'css' => null,
                     'target' => null,
                 ],
@@ -144,7 +157,7 @@ class SystemButtons
                     'title' => 'Pastoral Care',
                     'text' => 'Pastoral Care',
                     'icon' => 'pastoral',
-                    'url' => null, // derived dynamically with a routeLookup
+                    'url' => '', // derived dynamically with a routeLookup
                     'css' => null,
                     'target' => null,
                 ],
@@ -155,7 +168,7 @@ class SystemButtons
                     'title' => 'Calendar',
                     'text' => 'Calendar',
                     'icon' => 'calendar',
-                    'url' => null, // derived dynamically with a routeLookup
+                    'url' => '', // derived dynamically with a routeLookup
                     'css' => null,
                     'target' => null,
                 ],
@@ -166,7 +179,7 @@ class SystemButtons
                     'title' => 'Timetable',
                     'text' => 'Timetable',
                     'icon' => 'timetable',
-                    'url' => null, // derived dynamically with a routeLookup
+                    'url' => '', // derived dynamically with a routeLookup
                     'css' => null,
                     'target' => null,
                 ],
@@ -191,7 +204,7 @@ class SystemButtons
                     'title' => 'Documents',
                     'text' => 'Documents',
                     'icon' => 'document',
-                    'url' => null, // derived dynamically with a routeLookup
+                    'url' => '', // derived dynamically with a routeLookup
                     'css' => null,
                     'target' => null,
                 ],
@@ -200,7 +213,7 @@ class SystemButtons
                     'type' => self::SYSTEM_GEOSNAPSHOT,
                     'sortOrder' => 9,
                     'title' => 'GeoSnapShot',
-                    'text' => 'GeoSnapSHot',
+                    'text' => 'GeoSnapShot',
                     'icon' => 'geosnapshot',
                     'url' => '/geosnapshot/user/[profileId]', // derived dynamically with a routeLookup in addition
                     'css' => null,
