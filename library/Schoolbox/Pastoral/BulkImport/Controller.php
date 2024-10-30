@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace Schoolbox\Pastoral\BulkImport;
 
 use Alaress\Web\Controller\Base;
+use League\Flysystem\FilesystemException;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\L10n\RosettaStone;
 use Schoolbox\Mapper\Exception as MapperException;
@@ -17,10 +18,13 @@ use Schoolbox\Pastoral;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
 use Schoolbox\Resource\Attachment\Zone;
+use Schoolbox\Resource\Exception as ResourceException;
 use Schoolbox\Resource\Storage\FilesystemProxy;
+use Schoolbox\Resource\Storage\IStorage;
 use Schoolbox\Role;
 use Schoolbox\RoleMapper;
 use Schoolbox\TokenReplacer\Simple;
+use Schoolbox\User;
 use Schoolbox\UserMapper;
 use ZipArchive;
 
@@ -188,9 +192,65 @@ class Controller extends Base
     public function postImportPreview(): void
     {
         // Parse the uploaded ZIP file
-        $factory = new CollectorFactory();
-        $zipFile = $factory->build([$this->requestPost->get('report')])->getFirst();
+        $zipFile = $this->loadStorageZipFile();
+        $archive = $this->createLocalZipArchive($zipFile);
+        $files   = $this->associateFilesWithUser($archive);
 
+        $this->response = $this->responseFromTemplate(
+            '@pastoralBulkImport/importPreview.twig',
+            [
+                'files'     => $files,
+                'returnUrl' => $this->requestQuery->get('returnUrl')
+                    ?? $this->routeGenerator->generate('pastoral.getIndex'),
+                'formVars'  => $this->requestPost->getArrayCopy(),
+            ],
+        );
+    }
+
+    /**
+     * Actually perform the pastoral bulk import.
+     *
+     * @api   POST /pastoral/bulk-import
+     * @since 24.1
+     *
+     * @return void
+     */
+    public function postImport(): void
+    {
+        $zipFile = $this->loadStorageZipFile();
+        $archive = $this->createLocalZipArchive($zipFile);
+        $files   = $this->associateFilesWithUser($archive);
+
+        $dummyRecord = $this->pastoralMapper->createModel();
+        foreach ($files as $file) {
+            // Extract processPastoralRecords to its own class
+        }
+
+        // Create a new pastoral record for each student extracted from the ZIP
+    }
+
+    /**
+     * Load the ZIP file from storage.
+     *
+     * @return IStorage
+     * @throws ResourceException
+     */
+    private function loadStorageZipFile(): IStorage
+    {
+        $factory = new CollectorFactory();
+        return $factory->build([$this->requestPost->get('report')])->getFirst();
+    }
+
+    /**
+     * Given a ZIP file in storage: copy it to local temp storage, and create a
+     * `ZipArchive` out of it.
+     *
+     * @param IStorage $zipFile
+     * @return ZipArchive
+     * @throws FilesystemException
+     */
+    private function createLocalZipArchive(IStorage $zipFile): ZipArchive
+    {
         // Need to ensure it exists locally:
         // otherwise it can't operate upon it
         $filename = tempnam($this->getConfigLoader()->get('zip_dir'), 'zip');
@@ -198,9 +258,19 @@ class Controller extends Base
         stream_copy_to_stream($this->filesystemProxy->readStream($zipFile), $fp);
         fclose($fp);
 
-        // Create and interrogate ZIP
         $archive = new ZipArchive();
         $archive->open($filename);
+        return $archive;
+    }
+
+    /**
+     * Associate files in `$archive` with a user.
+     *
+     * @param ZipArchive $archive
+     * @return array{name: string, user: ?User, externalId: string}
+     */
+    private function associateFilesWithUser(ZipArchive $archive): array
+    {
         $tokenReplacer = new Simple();
         $files         = [];
         for ($i = 0; $i < $archive->numFiles; $i++) {
@@ -224,15 +294,6 @@ class Controller extends Base
                 ];
             }
         }
-
-        $this->response = $this->responseFromTemplate(
-            '@pastoralBulkImport/importPreview.twig',
-            [
-                'files'     => $files,
-                'returnUrl' => $this->requestQuery->get('returnUrl')
-                    ?? $this->routeGenerator->generate('pastoral.getIndex'),
-                'formVars'  => $this->requestPost->getArrayCopy(),
-            ],
-        );
+        return $files;
     }
 }
