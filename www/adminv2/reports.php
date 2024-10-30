@@ -8,11 +8,12 @@
  */
 
 use Schoolbox\Admin\Navigation\Subnav;
+use Schoolbox\Error\Mapper as ErrorMapper;
 
 $userHandler = new User();
 
 if (!$_SESSION['user']->isSuperuser()) {
-    error(19);
+    throw ErrorMapper::getInstance()->generateException(ErrorMapper::ERROR_PERM_PAGE_VIEW);
 }
 /** @var SitePage $this */
 $this->setFile(TEMPLATE_content, 'adminv2/reports.html');

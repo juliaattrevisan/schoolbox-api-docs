@@ -10,12 +10,13 @@ use Alaress\Web\Response\Factory;
 use Schoolbox\Admin\Navigation\Subnav;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\Folder;
+use Schoolbox\Error\Mapper as ErrorMapper;
 
 if (
     !$_SESSION['user']->isSuperuser() &&
     !$_SESSION['user']->hasServicePermission(UserAccess::SERVICE_LMS, UserAccess::ACCESS_FULL)
 ) {
-    error(19, "", 401);
+    throw ErrorMapper::getInstance()->generateException(ErrorMapper::ERROR_PERM_PAGE_VIEW);
 }
 
 /**

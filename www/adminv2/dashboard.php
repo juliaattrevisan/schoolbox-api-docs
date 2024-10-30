@@ -11,10 +11,11 @@
 /** @var SitePage $this */
 
 use Schoolbox\Admin\Navigation\Subnav;
+use Schoolbox\Error\Mapper as ErrorMapper;
 
 
 if (!$this->getDi()->get('session')->get('user')->isSuperuser()) {
-    error(19, "", 401);
+    throw ErrorMapper::getInstance()->generateException(ErrorMapper::ERROR_PERM_PAGE_VIEW);
 }
 
 /** @var SitePage $this */

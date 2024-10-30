@@ -2,6 +2,7 @@
 
 use Schoolbox\Admin\Navigation\Subnav;
 use Schoolbox\Collection;
+use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Role;
 use Schoolbox\RoleMapper;
 use Schoolbox\Admin\Service\Permissions;
@@ -10,7 +11,7 @@ use Schoolbox\Permission\Access\UserAccessMapper;
 /** @var SitePage $this */
 
 if (!$_SESSION['user']->isSuperuser()) {
-    error(19, "", 401);
+    throw ErrorMapper::getInstance()->generateException(ErrorMapper::ERROR_PERM_PAGE_VIEW);
 }
 
 $this->setFile(TEMPLATE_content, 'adminv2/user.html');

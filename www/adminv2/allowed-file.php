@@ -2,12 +2,13 @@
 
 use Schoolbox\Admin\Navigation\Subnav;
 use Schoolbox\Collection;
+use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\File\ExtensionMapper;
 use Schoolbox\File\Mimetype;
 use Schoolbox\File\MimetypeMapper;
 
 if (!$_SESSION['user']->isSuperuser()) {
-    error(19, "", 401);
+    throw ErrorMapper::getInstance()->generateException(ErrorMapper::ERROR_PERM_PAGE_VIEW);
 }
 
 $this->setTitle('Admin - Allowed Files');
