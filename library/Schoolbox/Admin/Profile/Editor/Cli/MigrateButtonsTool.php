@@ -127,67 +127,33 @@ HELP;
              * out corresponding roletype(s) for a button. Campus is too broad
              * a stroke and roles have a direct relationship with a roletype.
              */
-            print_r($roletypeLookup);
-            print_r($candidates);
-
             foreach ($candidates as $candidate) {
                 foreach ($candidate['_roletypes'] as $roletype) {
                     /* Create a button in the current roletype
                      * TODO if there's only one $roleId you could just update
                      *  the existing row rather than arbitrarily spawn a new one
                      */
-                    $this->getLogger()->info(sprintf(
-                        'Migrating "%s" to %s roletype',
-                        $candidate['title'],
-                        self::ROLETYPE_STUDENT
-                    ));
-
-                    $query = "
-                        INSERT INTO profile_button (sort_order, title, text, icon, url, css, target, type, roletype)
-                        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-                    ";
-
-                    $statement = $this->getDatabaseInternal()->prepare($query);
-                    $statement->execute([
-                        $candidate['sort_order'],
-                        $candidate['title'],
-                        $candidate['text'],
-                        $candidate['icon'],
-                        $candidate['url'],
-                        $candidate['css'],
-                        $candidate['target'],
-                        self::OPT_LONG_TYPE_CUSTOM,
-                        $roletype
-                    ]);
-
-                    /* The new button's id - we just made this a moment ago
-                     */
-                    $id = $this->getDatabaseInternal()->lastInsertId();
+                    $profileButtonId = $this->createButton($candidate, $roletype, self::OPT_LONG_TYPE_CUSTOM);
 
                     /* Bring along their existing relationships too, exactly as they were,
                      * and reassign them to this new row we just made
                      */
-                    $query = "
-                        SELECT * 
-                        FROM profile_button_campus_availability
-                        WHERE profile_button_id = :profileButtonId
-                    ";
 
-                    $statement = $this->getDatabaseInternal()->prepare($query);
-                    $statement->execute([
-                        'profileButtonId' => $candidate['id']
-                    ]);
+                    /* Campus availability
+                     */
+                    $this->createCampusAvailability($profileButtonId, $candidate);
 
-                    while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
-                        $query = "
-                            INSERT INTO profile_button_campus_availability (profile_button_id, campus_id)
-                            VALUES (?, ?)
-                        ";
+                    /* Campus visibility
+                     */
+                    $this->createCampusVisibility($profileButtonId, $candidate);
 
-                        print_r([$id, $row['campus_id']]);
-                        $campusAvailabilityStatement = $this->getDatabaseInternal()->prepare($query);
-                        $campusAvailabilityStatement->execute([$id, $row['campus_id']]);
-                    }
+                    /* Role availability
+                     */
+                    $this->createRoleAvailability($profileButtonId, $candidate);
+
+                    /* Role visibility
+                     */
+                    $this->createRoleVisibility($profileButtonId, $candidate);
                 }
             }
 
@@ -287,6 +253,175 @@ HELP;
         }
 
         return $candidates;
+    }
+
+
+    /**
+     * Creates a new button in profile_button, associated with $roletype,
+     * returning you its autoincremented id so you can re-establish relationships
+     * with this new button
+     *
+     * @param array $candidate
+     * @param string $roletype
+     * @param string $type
+     * @return int
+     */
+    private function createButton(array $candidate, string $roletype, string $type): int {
+        $this->getLogger()->info(sprintf(
+            'Migrating "%s" to %s roletype',
+            $candidate['title'],
+            self::ROLETYPE_STUDENT
+        ));
+
+        $query = "
+            INSERT INTO profile_button (sort_order, title, text, icon, url, css, target, type, roletype)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+        ";
+
+        $statement = $this->getDatabaseInternal()->prepare($query);
+        $statement->execute([
+            $candidate['sort_order'],
+            $candidate['title'],
+            $candidate['text'],
+            $candidate['icon'],
+            $candidate['url'],
+            $candidate['css'],
+            $candidate['target'],
+            $type,
+            $roletype
+        ]);
+
+        /* The new button's id - we just made this a moment ago
+         */
+        return (int)$this->getDatabaseInternal()->lastInsertId();
+    }
+
+
+    /**
+     * Recreate a relationship using $candidate's existing nodes and this new $profileButtonId
+     *
+     * @param int $profileButtonId
+     * @param array $candidate
+     * @return void
+     */
+    private function createCampusAvailability(int $profileButtonId, array $candidate): void
+    {
+        $query = "
+            SELECT *
+            FROM profile_button_campus_availability
+            WHERE profile_button_id = :profileButtonId
+        ";
+
+        $statement = $this->getDatabaseInternal()->prepare($query);
+        $statement->execute([
+            'profileButtonId' => $candidate['id']
+        ]);
+
+        while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
+            $query = "
+                INSERT INTO profile_button_campus_availability (profile_button_id, campus_id)
+                VALUES (?, ?)
+            ";
+
+            $campusAvailabilityStatement = $this->getDatabaseInternal()->prepare($query);
+            $campusAvailabilityStatement->execute([$profileButtonId, $row['campus_id']]);
+        }
+    }
+
+
+    /**
+     * Recreate a relationship using $candidate's existing nodes and this new $profileButtonId
+     *
+     * @param int $profileButtonId
+     * @param array $candidate
+     * @return void
+     */
+    private function createCampusVisibility(int $profileButtonId, array $candidate): void
+    {
+        $query = "
+            SELECT *
+            FROM profile_button_campus_visibility
+            WHERE profile_button_id = :profileButtonId
+        ";
+
+        $statement = $this->getDatabaseInternal()->prepare($query);
+        $statement->execute([
+            'profileButtonId' => $candidate['id']
+        ]);
+
+        while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
+            $query = "
+                INSERT INTO profile_button_campus_visibility (profile_button_id, campus_id)
+                VALUES (?, ?)
+            ";
+
+            $campusVisibilityStatement = $this->getDatabaseInternal()->prepare($query);
+            $campusVisibilityStatement->execute([$profileButtonId, $row['campus_id']]);
+        }
+    }
+
+
+    /**
+     * Recreate a relationship using $candidate's existing nodes and this new $profileButtonId
+     *
+     * @param int $profileButtonId
+     * @param array $candidate
+     * @return void
+     */
+    private function createRoleAvailability(int $profileButtonId, array $candidate): void
+    {
+        $query = "
+            SELECT *
+            FROM profile_button_role_availability
+            WHERE profile_button_id = :profileButtonId
+        ";
+
+        $statement = $this->getDatabaseInternal()->prepare($query);
+        $statement->execute([
+            'profileButtonId' => $candidate['id']
+        ]);
+
+        while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
+            $query = "
+                INSERT INTO profile_button_role_availability (profile_button_id, role_id)
+                VALUES (?, ?)
+            ";
+
+            $roleAvailabilityStatement = $this->getDatabaseInternal()->prepare($query);
+            $roleAvailabilityStatement->execute([$profileButtonId, $row['role_id']]);
+        }
+    }
+
+
+    /**
+     * Recreate a relationship using $candidate's existing nodes and this new $profileButtonId
+     *
+     * @param int $profileButtonId
+     * @param array $candidate
+     * @return void
+     */
+    private function createRoleVisibility(int $profileButtonId, array $candidate): void
+    {
+        $query = "
+            SELECT *
+            FROM profile_button_role_visibility
+            WHERE profile_button_id = :profileButtonId
+        ";
+
+        $statement = $this->getDatabaseInternal()->prepare($query);
+        $statement->execute([
+            'profileButtonId' => $candidate['id']
+        ]);
+
+        while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
+            $query = "
+                INSERT INTO profile_button_role_visibility (profile_button_id, role_id)
+                VALUES (?, ?)
+            ";
+
+            $roleAvailabilityStatement = $this->getDatabaseInternal()->prepare($query);
+            $roleAvailabilityStatement->execute([$profileButtonId, $row['role_id']]);
+        }
     }
 
 
