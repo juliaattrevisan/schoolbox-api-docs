@@ -62,12 +62,6 @@ class MigrateButtonsTool extends CliTool\App
     private const ROLETYPE_STAFF = \Schoolbox\Role::STAFF;
 
 
-    /* Some prepared statements that we'll often reuse
-     */
-    private \PDOStatement $createButtonStatement;
-
-
-
     /**
      * @inheritdoc
      */

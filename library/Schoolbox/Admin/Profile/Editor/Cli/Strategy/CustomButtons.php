@@ -22,6 +22,7 @@ class CustomButtons
 
     /* Some prepared statements that we'll often reuse
      */
+    private \PDOStatement $createButtonStatement;
     private \PDOStatement $campusAvailabilityStatement;
     private \PDOStatement $campusAvailabilityInsertStatement;
     private \PDOStatement $campusVisibilityStatement;
