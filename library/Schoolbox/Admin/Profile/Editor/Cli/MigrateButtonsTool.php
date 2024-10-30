@@ -116,6 +116,7 @@ HELP;
             /* Get a list of buttons to inspect - users can specify --system,
              * --custom, or both
              */
+            $candidates = $this->generateCandidates();
 
             /* Each button can have zero or more roles associated with it
              * Inspect each button's relationships to find out which roles,
@@ -174,6 +175,50 @@ HELP;
         }
 
         return $lookup;
+    }
+
+
+    /**
+     * Generate a list of buttons we need to recreate
+     *
+     * @return array
+     */
+    public function generateCandidates(): array
+    {
+        $query = "
+            SELECT 
+                pb.*,
+                pbra.role_id
+            FROM profile_button pb
+            INNER JOIN profile_button_role_availability pbra ON pb.id = pbra.profile_button_id
+        ";
+
+        $statement = $this->getDatabaseInternal()->prepare($query);
+        $statement->execute();
+
+        $candidates = [];
+
+        while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
+            if (!isset($candidates[$row['id']])) {
+                $data = $row;
+
+                /* We don't actually need this node here
+                 */
+                unset($data['role_id']);
+
+                $candidates[$row['id']] = $data;
+
+                /* Build a unique list of related role_ids
+                 */
+                $candidates[$row['id']]['_roles'][$row['role_id']] = $row['role_id'];
+            }
+
+            /* Add it to the list uniquely
+             */
+            $candidates[$row['id']]['_roles'][$row['role_id']] = $row['role_id'];
+        }
+
+        return $candidates;
     }
 
 
