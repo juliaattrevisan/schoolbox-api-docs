@@ -429,7 +429,7 @@ class Subnav
                         'description' => 'Configure the default and available filter options on the continuous report / class grades page.',
                     ],
                     '/adminv2/import/folder' => [
-                        'name'        => 'Import Class Pages',
+                        'name'        => 'Import Pages',
                         'visible'     => ($userIsSuperuser || $userHasServicePermissionLms),
                         'children'    => [],
                         'description' => 'Import all school class pages via a CSV file.',
