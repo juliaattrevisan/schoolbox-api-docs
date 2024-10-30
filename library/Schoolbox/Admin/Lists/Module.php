@@ -84,11 +84,11 @@ class Module extends BaseModule
         $this->register('POST', "/pastoral/delete/{table:$pastoralTablesRegex}", 'postPastoralDelete', $rulePastoral);
 
         // Routes to which users with service permission UserAccess::SERVICE_LMS need access.
-        $pastoralTablesRegex = '(submission-type|submission-errors)';
-        $this->register('GET', "/lms/{table:$pastoralTablesRegex}", 'getLmsIndex', $ruleLms);
-        $this->register('GET', "/lms/data/{table:$pastoralTablesRegex}", 'getLmsData', $ruleLms);
-        $this->register('POST', "/lms/save/{table:$pastoralTablesRegex}", 'postLmsSave', $ruleLms);
-        $this->register('POST', "/lms/delete/{table:$pastoralTablesRegex}", 'postLmsDelete', $ruleLms);
+        $lmsTablesRegex = '(submission-type|submission-errors)';
+        $this->register('GET', "/lms/{table:$lmsTablesRegex}", 'getLmsIndex', $ruleLms);
+        $this->register('GET', "/lms/data/{table:$lmsTablesRegex}", 'getLmsData', $ruleLms);
+        $this->register('POST', "/lms/save/{table:$lmsTablesRegex}", 'postLmsSave', $ruleLms);
+        $this->register('POST', "/lms/delete/{table:$lmsTablesRegex}", 'postLmsDelete', $ruleLms);
 
         // Routes to which only superusers need access.
         $this->register('GET', "{/table}", 'getIndex', $ruleSuperuserOnly);
