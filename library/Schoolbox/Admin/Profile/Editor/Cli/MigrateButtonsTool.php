@@ -145,10 +145,12 @@ HELP;
              * a stroke and roles have a direct relationship with a roletype.
              */
             foreach ($candidates as $candidate) {
+                /* For every role type related to this button, spawn a new one,
+                 * an exact replica. If the button is associated with only one
+                 * role type, you can just reuse it instead.
+                 */
                 foreach ($candidate['_roletypes'] as $roletype) {
                     /* Create a button in the current roletype
-                     * TODO if there's only one $roleId you could just update
-                     *  the existing row rather than arbitrarily spawn a new one
                      */
                     $profileButtonId = $this->createButton($candidate, $roletype, self::OPT_LONG_TYPE_CUSTOM);
 
@@ -156,29 +158,17 @@ HELP;
                      * and reassign them to this new row we just made
                      */
 
-                    /* Campus availability
+                    /* Campus availability/visibility
                      */
                     $this->createCampusAvailability($profileButtonId, (int)$candidate['id']);
-
-                    /* Campus visibility
-                     */
                     $this->createCampusVisibility($profileButtonId, (int)$candidate['id']);
 
-                    /* Role availability
+                    /* Role availability/visibility
                      */
                     $this->createRoleAvailability($profileButtonId, (int)$candidate['id']);
-
-                    /* Role visibility
-                     */
                     $this->createRoleVisibility($profileButtonId, (int)$candidate['id']);
                 }
             }
-
-            /* For every role type related to this button, spawn a new one,
-             * an exact replica. If the button is associated with only one
-             * role type, you can just reuse it instead.
-             */
-
         } catch (\Alaress\Lock\LockRefreshException $e) {
             /* Lock TTL expired; just leave politely
              */
@@ -246,7 +236,7 @@ HELP;
 
         $this->roleVisibilityStatement = $this->getDatabaseInternal()->prepare("
             SELECT *
-            FROM profile_button_role_availability
+            FROM profile_button_role_visibility
             WHERE profile_button_id = :profileButtonId
         ");
 
