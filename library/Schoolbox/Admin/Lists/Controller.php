@@ -1624,8 +1624,8 @@ class Controller extends Base
             'pastoral-document-classification',
             'pastoral-category',
             'pastoral-type' => 'Pastoral',
-            'submission-type' => 'Lms',
-            'submission-error' => 'Lms',
+            'submission-type',
+            'submission-errors' => 'Lms',
             default => '',
         };
     }
