@@ -12,6 +12,7 @@ namespace Schoolbox\Pastoral\BulkImport;
 use Alaress\Web\Controller\Base;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\L10n\RosettaStone;
+use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Pastoral;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
@@ -208,7 +209,11 @@ class Controller extends Base
                 $externalId = null;
                 if (isset($tokens['[externalId]'])) {
                     $externalId = $tokens['[externalId]'];
-                    $user       = $this->userMapper->findByExternalId($externalId, Role::STUDENT);
+                    try {
+                        $user = $this->userMapper->findByExternalId($externalId, Role::STUDENT);
+                    } catch (MapperException) {
+                        // noop
+                    }
                 }
                 $files[] = [
                     'name'       => $name,
