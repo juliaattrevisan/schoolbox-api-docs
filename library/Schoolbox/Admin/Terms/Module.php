@@ -49,8 +49,9 @@ class Module extends BaseModule
             $authorizer,
             '.*',
             new Rule\All(
+                new Rule\IsLoggedIn(),
                 new Rule\Any(
-                    new Rule\IsLoggedIn(),
+                    new Rule\IsSuperuser(),
                     new Rule\HasServicePermission(UserAccess::SERVICE_LMS, UserAccess::ACCESS_FULL)
                 )
             )
