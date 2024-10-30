@@ -443,6 +443,16 @@ class Subnav
                         'children'    => [],
                         'description' => 'Configure ' . $rosettaStone->translate("lessonPlan", false, false) . ' templates.',
                     ],
+                    '/adminv2/setting/lms/LMS Policy' => [
+                        'name'        => 'LMS Policy',
+                        'visible'     => (
+                            ($userIsSuperuser || $userHasServicePermissionLms) &&
+                            count($enabledConfigs[ConfigMapper::TYPE_LMS_POLICY] ?? []) > 0 &&
+                            $this->configLoader->get(ConfigMapper::NAME_LMS_ENABLED)
+                        ),
+                        'children'    => [],
+                        'description' => 'Configure policy related to continuous reporting, grades, due work, assessment and feedback.',
+                    ],
                     '/adminv2/lti' => [
                         'name'        => 'LTI Tools',
                         'visible'     => ($userIsSuperuser || $userHasServicePermissionLms),
@@ -486,16 +496,6 @@ class Subnav
                         ),
                         'description' => 'Setup quick fill results for rubrics to help quickly build a rubric with generic level descriptors.',
                         'children'    => []
-                    ],
-                    '/adminv2/setting/lms/LMS Policy' => [
-                        'name'        => 'Settings / Policy',
-                        'visible'     => (
-                            ($userIsSuperuser || $userHasServicePermissionLms) &&
-                            count($enabledConfigs[ConfigMapper::TYPE_LMS_POLICY] ?? []) > 0 &&
-                            $this->configLoader->get(ConfigMapper::NAME_LMS_ENABLED)
-                        ),
-                        'children'    => [],
-                        'description' => 'Configure policy related to continuous reporting, grades, due work, assessment and feedback.',
                     ],
                     '/adminv2/summative-report' => [
                         'name'        => 'Summative Reports',
