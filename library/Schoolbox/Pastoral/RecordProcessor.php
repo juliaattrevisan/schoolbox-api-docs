@@ -25,6 +25,7 @@ use Schoolbox\Pastoral\Attachment\Mapper as PastoralAttachmentMapper;
 use Schoolbox\Pastoral\DataSource as PastoralDataSource;
 use Schoolbox\Pastoral\Group\Mapper as PastoralGroupMapper;
 use Schoolbox\Pastoral\Model as PastoralModel;
+use Schoolbox\Pastoral\RecordAction\Mapper as PastoralRecordActionMapper;
 use Schoolbox\Pastoral\Severity\Mapper as PastoralSeverityMapper;
 use Schoolbox\Pastoral\SubType\Mapper as PastoralSubTypeMapper;
 use Schoolbox\Pastoral\Tag\Mapper as PastoralTagMapper;
@@ -46,19 +47,20 @@ class RecordProcessor
     /**
      * Constructor
      *
-     * @param IConfigLoader            $config
-     * @param DataSource               $pastoralDataSource
-     * @param PastoralSubTypeMapper    $pastoralSubTypeMapper
-     * @param PastoralTypeMapper       $pastoralTypeMapper
-     * @param PastoralSeverityMapper   $pastoralSeverityMapper
-     * @param PastoralTagMapper        $pastoralTagMapper
-     * @param PastoralActionMapper     $pastoralActionMapper
-     * @param RecordAction\Mapper      $pastoralRecordActionMapper
-     * @param PastoralAttachmentMapper $pastoralAttachmentMapper
-     * @param UserMapper               $userMapper
-     * @param PastoralAccessMapper     $pastoralAccessMapper
-     * @param PastoralGroupMapper      $pastoralGroupMapper
-     * @param ErrorMapper              $errorMapper
+     * @param IConfigLoader              $config
+     * @param DataSource                 $pastoralDataSource
+     * @param PastoralSubTypeMapper      $pastoralSubTypeMapper
+     * @param PastoralTypeMapper         $pastoralTypeMapper
+     * @param PastoralSeverityMapper     $pastoralSeverityMapper
+     * @param PastoralTagMapper          $pastoralTagMapper
+     * @param PastoralActionMapper       $pastoralActionMapper
+     * @param PastoralRecordActionMapper $pastoralRecordActionMapper
+     * @param PastoralAttachmentMapper   $pastoralAttachmentMapper
+     * @param UserMapper                 $userMapper
+     * @param PastoralAccessMapper       $pastoralAccessMapper
+     * @param PastoralGroupMapper        $pastoralGroupMapper
+     * @param ErrorMapper                $errorMapper
+     * @param HubInterface               $sentry
      */
     public function __construct(
         private IConfigLoader $config,
@@ -68,7 +70,7 @@ class RecordProcessor
         private PastoralSeverityMapper $pastoralSeverityMapper,
         private PastoralTagMapper $pastoralTagMapper,
         private PastoralActionMapper $pastoralActionMapper,
-        private \Schoolbox\Pastoral\RecordAction\Mapper $pastoralRecordActionMapper,
+        private PastoralRecordActionMapper $pastoralRecordActionMapper,
         private PastoralAttachmentMapper $pastoralAttachmentMapper,
         private UserMapper $userMapper,
         private PastoralAccessMapper $pastoralAccessMapper,
@@ -79,8 +81,9 @@ class RecordProcessor
     }
 
     /**
-     * Create/update student records
+     * Create and/or update student records, based on the content of a form.
      *
+     * @param User               $user                The user who is creating the record
      * @param int                $primaryStudentId    The primary record's student ID
      * @param Values             $post                POST parameters passed by the create/update form
      * @param array              $duplicateStudentIds List of students the primary record should be duplicated on

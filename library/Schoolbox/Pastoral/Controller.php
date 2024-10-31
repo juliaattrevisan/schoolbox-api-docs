@@ -57,8 +57,8 @@ use Schoolbox\UserMapper;
 
 class Controller extends Base
 {
-    const ATTACHZONE_PRIVATE  = 'private';
-    const ATTACHZONE_PUBLIC   = 'public';
+    public const ATTACHZONE_PRIVATE  = 'private';
+    public const ATTACHZONE_PUBLIC   = 'public';
 
     /**
      * The minimum amount of characters required when searching for a user
