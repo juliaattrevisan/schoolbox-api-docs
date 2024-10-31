@@ -266,7 +266,7 @@ class Cursor implements ICursor
 
             $query = $db->executeQuery($megaQuery, $params);
 
-            foreach ($query->fetchAll() as $row) {
+            while ($row = $query->fetch(\PDO::FETCH_ASSOC)) {
                 $type = $row['type'];
                 if ($type === self::COURSE_COURSE_SPECIFICATION) {
                     $counts[$row['curriculum_node_id']][$row['courseSpecId']][$type] = $row['count'];
