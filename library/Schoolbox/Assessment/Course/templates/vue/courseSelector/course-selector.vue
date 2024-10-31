@@ -68,6 +68,13 @@ function onCourseNameSelect(course: Course): void {
 function onButtonSelect(): void {
     isModalOpen.value = true;
 }
+
+/**
+ * To open up the course selector modal
+ */
+function onModalClose(): void {
+    isModalOpen.value = false;
+}
 </script>
 
 <template>
@@ -88,7 +95,7 @@ function onButtonSelect(): void {
         button-icon="icon-course"
         @button-select="onButtonSelect"
     />
-    <search-select-modal :is-open="isModalOpen" />
+    <search-select-modal :is-open="isModalOpen" @close="onModalClose" />
 </template>
 
 <style scoped></style>
