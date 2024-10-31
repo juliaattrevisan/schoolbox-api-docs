@@ -7,7 +7,7 @@
 
 declare(strict_types=1);
 
-namespace Schoolbox\Pastoral\BulkImport;
+namespace Schoolbox\Pastoral;
 
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\GenericCollection;

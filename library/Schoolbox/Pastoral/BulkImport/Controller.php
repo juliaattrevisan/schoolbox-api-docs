@@ -16,6 +16,7 @@ use Schoolbox\GenericCollection;
 use Schoolbox\L10n\RosettaStone;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Pastoral;
+use Schoolbox\Pastoral\TemplateDataHelper;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
 use Schoolbox\Resource\Attachment\Zone;
