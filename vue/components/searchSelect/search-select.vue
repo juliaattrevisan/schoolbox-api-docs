@@ -4,7 +4,7 @@
  */
 
 import { useTemplateRef } from "vue";
-import { useSelected } from "@schoolboxVue/composables/store/useSelected";
+import { useSelected } from "@schoolboxVue/composables/selected/useSelected";
 import { useSearch } from "@schoolboxVue/composables/search/useSearch";
 import type { SearchSelectItem } from "@schoolboxVue/composables/search/types/SearchSelectItem";
 import SsSelected from "./ss-selected.vue";
