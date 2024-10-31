@@ -69,7 +69,8 @@ class Payload
         private IConfigLoader $config,
         private \Schoolbox\Admin\Profile\Editor\Field\Mapper $fieldMapper,
         private \Schoolbox\CampusMapper $campusMapper
-    ) {}
+    ) {
+    }
 
 
     /**
