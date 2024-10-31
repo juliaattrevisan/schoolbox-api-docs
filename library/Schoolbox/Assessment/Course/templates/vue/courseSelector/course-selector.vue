@@ -98,7 +98,7 @@ function onModalSelect(): void {
         button-icon="icon-course"
         @button-select="onButtonSelect"
     />
-    <search-select-modal v-model:is-open="isModalOpen" @select="onModalSelect" />
+    <search-select-modal v-model:is-open="isModalOpen" title="Browse Courses" @select="onModalSelect" />
 </template>
 
 <style scoped></style>

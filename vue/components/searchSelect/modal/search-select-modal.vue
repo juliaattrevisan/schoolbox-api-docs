@@ -6,10 +6,10 @@
 import BasicModal from "@schoolboxVue/components/modal/basic-modal.vue";
 import SsmFooter from "./ssm-footer.vue";
 
-// interface Props {
-//     isOpen: boolean; // whether the modal is open
-// }
-// const props = defineProps<Props>();
+interface Props {
+    title: string; // the title of the modal
+}
+const props = defineProps<Props>();
 
 const emit = defineEmits<{
     close: [];
@@ -37,7 +37,7 @@ function onSelect(): void {
 <template>
     <div>
         <basic-modal v-model:is-open="isOpen">
-            <h2>Browse Courses</h2>
+            <h2>{{ props.title }}</h2>
             <ssm-footer @cancel="onCancel" @select="onSelect" />
         </basic-modal>
     </div>
