@@ -250,7 +250,7 @@ class Controller extends Base
             $pastoralRecordsToCreate = [];
             foreach ($files as $file) {
                 if ($file['user']) {
-                    $pastoralRecordsToCreate[$file['user']->getId()]['fileNames'][] = $file['name'];
+                    $pastoralRecordsToCreate[$file['user']->getId()]['fileNames'][] = $file['filename'];
                 }
             }
 
@@ -369,7 +369,7 @@ class Controller extends Base
      * Associate and group files in `$archive` with a user.
      *
      * @param ZipArchive $archive
-     * @return array<array{name: string, user: ?User, externalId: string}>
+     * @return array<array{filename: string, user: ?User, externalId: ?string}>
      */
     private function associateFilesWithUser(ZipArchive $archive): array
     {
@@ -391,7 +391,7 @@ class Controller extends Base
                     }
                 }
                 $files[] = [
-                    'name'       => $name,
+                    'filename'   => $name,
                     'user'       => $user,
                     'externalId' => $externalId,
                 ];
