@@ -3,7 +3,7 @@
  * A modal to search and select items
  */
 
-import SbxModal from "@schoolboxVue/components/modal/sbx-modal.vue";
+import SbxModal from "@schoolboxVue/components/modal/sbx-modal.ce.vue";
 
 interface Props {
     isOpen: boolean; // whether the modal is open
