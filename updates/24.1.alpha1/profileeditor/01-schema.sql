@@ -13,6 +13,7 @@ CREATE TABLE `profile_field` (
     `icon` varchar(255) NULL,
     `css` varchar(255) NULL,
     `click_to_reveal` tinyint(4) NOT NULL DEFAULT 0,
+    `is_external` boolean NOT NULL,
     PRIMARY KEY (`id`),
     UNIQUE KEY `roletype_field` (`roletype`,`field`),
     KEY `roletype` (`roletype`),

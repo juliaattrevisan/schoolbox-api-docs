@@ -106,6 +106,13 @@ class Model
      */
     private ?int $clickToReveal = null;
 
+    /**
+     * Whether the field is an external field (true) or internal field (false)
+     * This determines the tab the field appears in on the profile editor's available fields list
+     * @var bool|null
+     */
+    private ?bool $is_external = null;
+
 
     /**
      * A list of Availability settings for this field
@@ -367,6 +374,24 @@ class Model
     public function setClickToReveal(?int $clickToReveal): self
     {
         $this->clickToReveal = $clickToReveal;
+        return $this;
+    }
+
+    /**
+     * @return bool|null
+     */
+    public function getIsExternal(): ?bool
+    {
+        return $this->is_external;
+    }
+
+    /**
+     * @param bool|null $is_external
+     * @return $this
+     */
+    public function setIsExternal(?bool $is_external): self
+    {
+        $this->is_external = $is_external;
         return $this;
     }
 }

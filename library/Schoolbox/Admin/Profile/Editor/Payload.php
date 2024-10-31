@@ -51,6 +51,14 @@ class Payload
     private const VISIBILITY_NAME = 'Visibility';
     private const VISIBILITY_TOOLTIP = 'Will appear for profile viewers in the selected role types';
 
+    /**
+     * The labels of the field categories which are used to group the fields in
+     * the available fields palette on the profile editor screen
+     * Currently just "Internal Fields" and "External Fields"
+     */
+    private const FIELD_CATEGORY_INTERNAL = 'Internal Fields';
+    private const FIELD_CATEGORY_EXTERNAL = 'External Fields';
+
 
     /**
      * @param IConfigLoader $config
@@ -187,16 +195,13 @@ class Payload
                     continue;
                 }
 
-                // TEMP - needs implementing, just show 20 as internal, rest as external for now
-                $fieldCategory = count($roleTypeSettings['fields']['available']) >= 20 ? "External Fields" : "Internal Fields";
-
                 $roleTypeSettings['fields']['available'][] = [
                     'field' => $field->getField(),
                     'displayAs' => $field->getDisplayAs(),
                     'icon' => $field->getIcon(),
                     'css' => $field->getCss(),
                     'terminology' => $field->getTerm(),
-                    'category' => $fieldCategory,
+                    'category' => $field->getIsExternal() ? self::FIELD_CATEGORY_EXTERNAL : self::FIELD_CATEGORY_INTERNAL,
                 ];
             }
 
