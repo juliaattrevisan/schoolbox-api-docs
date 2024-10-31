@@ -288,6 +288,6 @@ class Cursor implements ICursor
         /*I guess realistically speaking it should return the requested nodes as that's how it will
          * be used for iterating results, and each node has different number of descendants
          */
-        return count($this->nodeId);
+        return $this->curriculumMapper->findByColumn('id', $this->nodeId)->count();
     }
 }
