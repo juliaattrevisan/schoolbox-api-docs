@@ -152,7 +152,7 @@ class TemplateDataHelper
 
     /**
      * @param GenericCollection<Pastoral\Audience\Model> $audiences
-     * @return array<Pastoral\Audience\Model>
+     * @return array<int, array<Pastoral\Audience\Model>>
      */
     private function loadTypeAudiences(GenericCollection $audiences): array
     {
@@ -167,7 +167,7 @@ class TemplateDataHelper
 
     /**
      * @param GenericCollection<Pastoral\Audience\Model> $audiences
-     * @return array<Pastoral\Audience\Model>
+     * @return array<int, array<Pastoral\Audience\Model>>
      */
     private function loadSubtypeAudiences(GenericCollection $audiences): array
     {
