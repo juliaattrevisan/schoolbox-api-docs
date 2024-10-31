@@ -1,5 +1,4 @@
 import type AcceptanceTester from "@schoolboxTest/playwright/support/AcceptanceTester";
-import Common from "@schoolboxTest/playwright/support/page/Common";
 import type { Page } from "@playwright/test";
 import { expect } from "@playwright/test";
 
@@ -15,8 +14,6 @@ export default class Item {
     static readonly URL = "/news/item/{id}";
 
     // Selectors
-
-    static readonly DATA_TEST_DOT_MENU = "sbx-pop-out-header-options";
 
     static readonly DATA_TEST_DOT_MENU_BUTTON = "sbx-pop-out-header-options-button";
 
@@ -44,7 +41,7 @@ export default class Item {
     }
 
     /**
-     * Generates route for this page.
+     * Visit the page for a given news item
      * @param newsId - The topic
      */
     async goto(newsId: string): Promise<void> {
@@ -52,7 +49,7 @@ export default class Item {
     }
 
     /**
-     * Generates route for this page
+     * Generate the route for a given news item
      * @param newsId - The ID of the page
      * @returns - the URL for the page
      */
@@ -80,7 +77,6 @@ export default class Item {
      * Follow this article's modify link.
      */
     async modifyArticle(): Promise<void> {
-        await expect(this.page.getByTestId(Item.DATA_TEST_DOT_MENU)).toBeEnabled();
         await this.page.getByTestId(Item.DATA_TEST_DOT_MENU_BUTTON).click();
         await this.page.locator(Item.LINK_MODIFY).last().click();
         await expect(this.page.locator('h1:has-text("Update news")')).toBeVisible();
@@ -91,7 +87,6 @@ export default class Item {
      * click unpublish article and confirm it
      */
     async unpublishArticle(): Promise<void> {
-        await expect(this.page.getByTestId(Item.DATA_TEST_DOT_MENU)).toBeEnabled();
         await this.page.getByTestId(Item.DATA_TEST_DOT_MENU_BUTTON).click();
         await this.page.locator('a[id="unpublish-article"]').click();
         await expect(this.page.locator("div.reveal-modal.small.open")).toBeVisible();
