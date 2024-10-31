@@ -5,10 +5,10 @@
 
 import { watchIgnorable } from "@vueuse/core";
 import SearchSelect from "@schoolboxVue/components/searchSelect/search-select.vue";
+import SearchSelectModal from "@schoolboxVue/components/searchSelect/modal/search-select-modal.vue";
 import type { Course } from "@schoolboxLibrary/types/Course";
 import { useCourseSelectorStore } from "./store/courseSelectorStore";
 import { useModalStore } from "./store/coseModalStore";
-import CoseModal from "./cose-modal.vue";
 
 type CourseAPIResponse = {
     courses: Course[];
@@ -51,6 +51,8 @@ const { ignoreUpdates } = watchIgnorable(results, (newResults: CourseAPIResponse
     });
 });
 
+const isModalOpen = window.Vue.ref(false);
+
 /**
  * To select a link to the course
  * @param course - the selected course
@@ -64,7 +66,7 @@ function onCourseNameSelect(course: Course): void {
  * To open up the course selector modal
  */
 function onButtonSelect(): void {
-    modalStore.open();
+    isModalOpen.value = true;
 }
 </script>
 
@@ -86,7 +88,7 @@ function onButtonSelect(): void {
         button-icon="icon-course"
         @button-select="onButtonSelect"
     />
-    <cose-modal />
+    <search-select-modal :is-open="isModalOpen" />
 </template>
 
 <style scoped></style>
