@@ -133,7 +133,6 @@ class Controller extends Base
 
         $subtypesIndex        = [];
         $subtypesIndexPrivate = [];
-
         foreach ($subtypes as $subtype) {
             $subtypesIndex[$subtype->getId()]        = $subtype->getTemplate();
             $subtypesIndexPrivate[$subtype->getId()] = $subtype->getTemplatePrivate();
@@ -203,10 +202,17 @@ class Controller extends Base
      */
     public function postImportPreview(): void
     {
-        // Parse the uploaded ZIP file
-        $zipFile = $this->loadStorageZipFile();
-        $archive = $this->createLocalZipArchive($zipFile);
-        $files   = $this->associateFilesWithUser($archive);
+        // Load the Zip file's contents, cleaning up once done.
+        $zipArchive       = null;
+        $localZipFilename = null;
+        try {
+            $zipStorage       = $this->loadZipFromStorage();
+            $localZipFilename = $this->createLocalZipFile($zipStorage);
+            $zipArchive       = $this->createZipArchive($localZipFilename);
+            $files            = $this->associateFilesWithUser($zipArchive);
+        } finally {
+            $this->cleanup($zipArchive, $localZipFilename);
+        }
 
         $this->response = $this->responseFromTemplate(
             '@pastoralBulkImport/importPreview.twig',
@@ -229,53 +235,67 @@ class Controller extends Base
      */
     public function postImport(): void
     {
-        $zipFile = $this->loadStorageZipFile();
-        $archive = $this->createLocalZipArchive($zipFile);
-        $files   = $this->associateFilesWithUser($archive);
+        // Load the Zip file's contents, cleaning up only once all files have
+        // been extracted from the ZIP.
+        $zipArchive       = null;
+        $localZipFilename = null;
+        try {
+            $zipStorage       = $this->loadZipFromStorage();
+            $localZipFilename = $this->createLocalZipFile($zipStorage);
+            $zipArchive       = $this->createZipArchive($localZipFilename);
+            $files            = $this->associateFilesWithUser($zipArchive);
 
-        // Group files by user, so a single record is created for each user:
-        // possibly with multiple files
-        $pastoralRecordsToCreate = [];
-        foreach ($files as $file) {
-            if ($file['user']) {
-                $pastoralRecordsToCreate[$file['user']->getId()]['fileNames'][] = $file['name'];
+            // Group files by user, so a single record is created for each user:
+            // possibly with multiple files
+            $pastoralRecordsToCreate = [];
+            foreach ($files as $file) {
+                if ($file['user']) {
+                    $pastoralRecordsToCreate[$file['user']->getId()]['fileNames'][] = $file['name'];
+                }
             }
-        }
 
-        // Create the records
-        foreach ($pastoralRecordsToCreate as $userId => $pastoralRecords) {
-            $attachmentHashes = [];
-            foreach ($pastoralRecords['fileNames'] as $fileName) {
-                $attachment = $this->receiver->acceptStream(
-                    basename($fileName),
-                    $archive->getStream($fileName),
+            // Create the records
+            foreach ($pastoralRecordsToCreate as $userId => $pastoralRecords) {
+                // Finagle the post data for this user's record, so that each file
+                // in the ZIP for them is included in their post data.
+                $attachmentHashes = [];
+                foreach ($pastoralRecords['fileNames'] as $fileName) {
+                    $attachment = $this->receiver->acceptStream(
+                        basename($fileName),
+                        $zipArchive->getStream($fileName),
+                    );
+                    $attachmentHashes[] = NodeFactory::STORE . ':' . $attachment->getHash();
+                }
+                $requestPost = clone $this->requestPost;
+                $requestPost->offsetSet(
+                    Pastoral\Controller::ATTACHZONE_PUBLIC . '_attachments',
+                    $attachmentHashes,
                 );
-                $attachmentHashes[] = NodeFactory::STORE . ':' . $attachment->getHash();
-            }
 
-            // Need to add attachment as well, and probably group them
-            $requestPost = clone $this->requestPost;
-            $requestPost->offsetSet(
-                Pastoral\Controller::ATTACHZONE_PUBLIC . '_attachments',
-                $attachmentHashes,
-            );
-            $pastoralRecordsToCreate[$userId]['records'] = $this->recordProcessor->processPastoralRecords(
-                $this->getUser(),
-                $userId,
-                $requestPost,
-            );
+                // And create their records.
+                // There should be only a single record created for each user,
+                // so for simplicity's sake show only their first.
+                $pastoralRecordsToCreate[$userId]['record'] = $this->recordProcessor->processPastoralRecords(
+                    $this->getUser(),
+                    $userId,
+                    $requestPost,
+                )->first();
+            }
+        } finally {
+            $this->cleanup($zipArchive, $localZipFilename);
         }
 
-        // Output some sort of response
+        // Output a response for each file
         foreach ($files as $i => $file) {
             if ($file['user']) {
-                $files[$i]['records'] = $pastoralRecordsToCreate[$file['user']->getId()]['records'] ?? [];
+                $files[$i]['record'] = $pastoralRecordsToCreate[$file['user']->getId()]['record'] ?? null;
             } else {
-                $files[$i]['records'] = [];
+                $files[$i]['record'] = null;
             }
         }
 
         // And show the results
+        // TODO fix return URL
         $this->response = $this->responseFromTemplate(
             '@pastoralBulkImport/import.twig',
             [
@@ -292,38 +312,64 @@ class Controller extends Base
      * @return Storage\IStorage
      * @throws ResourceException
      */
-    private function loadStorageZipFile(): Storage\IStorage
+    private function loadZipFromStorage(): Storage\IStorage
     {
         $factory = new CollectorFactory();
         return $factory->build([$this->requestPost->get('report')])->getFirst();
     }
 
     /**
-     * Given a ZIP file in storage: copy it to local temp storage, and create a
-     * `ZipArchive` out of it.
-     *
-     * This is required as `ZipArchive` cannot work on a stream.
+     * Write the ZIP file from storage to the local file system, so that a
+     * `ZipArchive` may be created from it.
      *
      * @param Storage\IStorage $zipFile
-     * @return ZipArchive
+     * @return string
      * @throws FilesystemException
      */
-    private function createLocalZipArchive(Storage\IStorage $zipFile): ZipArchive
+    private function createLocalZipFile(Storage\IStorage $zipFile): string
     {
-        // Need to ensure it exists locally:
-        // otherwise it can't operate upon it
         $filename = tempnam($this->getConfigLoader()->get('zip_dir'), 'zip');
         $fp       = fopen($filename, 'wb');
         stream_copy_to_stream($this->filesystemProxy->readStream($zipFile), $fp);
         fclose($fp);
+        return $filename;
+    }
 
+    /**
+     * Given a ZIP file in storage: copy it to local temp storage, and create a
+     * `ZipArchive` out of it.
+     *
+     * This is required as `ZipArchive` cannot work on a stream: it may only
+     * work upon a local file.
+     *
+     * @param string $zipFilename
+     * @return ZipArchive
+     */
+    private function createZipArchive(string $zipFilename): ZipArchive
+    {
         $archive = new ZipArchive();
-        $archive->open($filename);
+        $archive->open($zipFilename);
         return $archive;
     }
 
     /**
-     * Associate files in `$archive` with a user.
+     * Clean up the `ZipArchive` object and its file on disk, if either exists.
+     *
+     * @param ZipArchive|null $zipArchive       The archive, if created.
+     * @param string|null     $localZipFilename The filename of the archive,
+     *                                          if created.
+     * @return void
+     */
+    private function cleanup(?ZipArchive $zipArchive, ?string $localZipFilename): void
+    {
+        $zipArchive?->close();
+        if (isset($localZipFilename) && is_file($localZipFilename) && is_writable($localZipFilename)) {
+            unlink($localZipFilename);
+        }
+    }
+
+    /**
+     * Associate and group files in `$archive` with a user.
      *
      * @param ZipArchive $archive
      * @return array<array{name: string, user: ?User, externalId: string}>
@@ -343,7 +389,8 @@ class Controller extends Base
                     try {
                         $user = $this->userMapper->findByExternalId($externalId, Role::STUDENT);
                     } catch (MapperException) {
-                        // noop
+                        // noop: no user was found.
+                        // This will show as a "no student found" message.
                     }
                 }
                 $files[] = [
@@ -353,6 +400,7 @@ class Controller extends Base
                 ];
             }
         }
+
         return $files;
     }
 }

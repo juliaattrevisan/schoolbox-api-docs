@@ -29,10 +29,10 @@
             {% for file in files %}
                 <tr>
                     <td>
-                        {% if file.records is empty %}
-                            &mdash;
+                        {% if file.record %}
+                            {{ file.record.createdAt.timeOnly }}
                         {% else %}
-                            {{ (file.records | first).createdAt.timeOnly }}
+                            &mdash;
                         {% endif %}
                     </td>
                     <td>{{ file.name }}</td>
@@ -53,10 +53,14 @@
                         {% endif %}
                     </td>
                     <td>
-                        {% if file.records is empty %}
-                            No record created
+                        {% if file.record %}
+                            Created
+                            (<a href="{{ routeLookup(
+                                'pastoral.getStudentRecord',
+                                {studentId: file.record.student.id, recordId: file.record.id}
+                            ) }}">#{{ file.record.id }}</a>)
                         {% else %}
-                            Created (<a href="{{ routeLookup('pastoral.getStudentRecord', {studentId: (file.records | first).student.id, recordId: (file.records | first).id}) }}">#{{ (file.records | first).id }}</a>)
+                            No record created
                         {% endif %}
                     </td>
                 </tr>
