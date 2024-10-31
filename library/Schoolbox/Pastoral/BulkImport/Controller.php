@@ -175,8 +175,8 @@ class Controller extends Base
                 'roles'           => $roles,
                 'roleTypes'       => $this->pastoralAccessMapper->determineAllowedRoleTypes(),
                 'groups'          => $this->pastoralGroupMapper->findAll()->sortNaturally('name'),
-                'rolesWithUsers'  => $roleUserCounts,
-                'roleUserCounts'  => $rolesWithUsers,
+                'rolesWithUsers'  => $rolesWithUsers,
+                'roleUserCounts'  => $roleUserCounts,
                 'moderatorIds'    => $this->userMapper->findByAccess(UserAccess::SERVICE_PASTORAL, UserAccess::ACCESS_READ)
                                                       ->getPropertyValues('id'),
 
