@@ -31,8 +31,14 @@ export function useSearch(
 } {
     const isSearching = window.Vue.ref(false); // to notify that an action is taking place,
     const query = window.Vue.ref(""); // current search term being typed
-    const url = window.Vue.computed(() => (requiresQuery ? `${endpoint}${query.value}` : endpoint)); // the url to search
     const isActive = window.Vue.computed(() => query.value.length >= MIN_QUERY_LENGTH); // To only start showing search results once enough characters have been typed
+    const url = window.Vue.computed(() => {
+        if (!isActive.value && !requiresQuery) {
+            // so can search without a query
+            return endpoint;
+        }
+        return `${endpoint}?query=${query.value}`;
+    });
     const results = $results === undefined ? window.Vue.ref<SearchSelectItem[]>([]) : $results; // create a new results list if one is not passed in
     const hasSearched = window.Vue.ref(false); // to show that a search has been made
     const hasNoResults = window.Vue.computed(() => isActive.value && results.value.length === 0 && !isSearching.value); // To show that no results match the current search

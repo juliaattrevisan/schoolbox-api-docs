@@ -33,7 +33,7 @@ const selected = defineModel<SearchSelectItem[]>("selected", { default: [] }); /
 const { add, remove, update, save, undo } = useSelected(selected); // to add and remove selected items
 
 const results = defineModel<SearchSelectItem[]>("results", { default: [] }); // to store search results
-const { query, isActive, isSearching, hasNoResults, hasError, search } = useSearch(props.endpoint, results, true); // to search for results
+const { query, isActive, isSearching, hasNoResults, hasError, search } = useSearch(props.endpoint, results, false); // to search for results
 
 /**
  * To display results without searching

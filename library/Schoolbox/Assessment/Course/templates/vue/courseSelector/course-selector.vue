@@ -98,7 +98,7 @@ const { ignoreUpdates: ignoreModalUpdates } = watchIgnorable(
         :label-id="props.labelId"
         placeholder="Search for courses..."
         :is-required="props.isRequired"
-        :endpoint="`${props.endpoint}?query=`"
+        :endpoint="`${props.endpoint}`"
         :has-error="props.hasError"
         :error-message="props.errorMessage"
         :is-read-only="props.isReadOnly"
