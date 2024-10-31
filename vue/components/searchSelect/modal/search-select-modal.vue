@@ -13,7 +13,9 @@ const props = defineProps<Props>();
 
 <template>
     <div>
-        <basic-modal :is-open="props.isOpen"></basic-modal>
+        <basic-modal :is-open="props.isOpen">
+            <h2>Browse Courses</h2>
+        </basic-modal>
     </div>
 </template>
 

@@ -13,6 +13,10 @@ const props = defineProps<Props>();
 <template>
     <Teleport to="body">
         <div v-if="props.isOpen" class="modal">
+            <div class="modal__container">
+                <!-- @slot Reveal modal content goes into this slot -->
+                <slot></slot>
+            </div>
             <div class="modal__bkg"></div>
         </div>
     </Teleport>
@@ -22,10 +26,19 @@ const props = defineProps<Props>();
 .modal {
     height: 100%;
     left: 0;
-    position: absolute;
+    position: fixed;
     top: 0;
     width: 100%;
     z-index: var(--sbx-depth-modal);
+    &__container {
+        background: white;
+        margin: 0 auto;
+        padding: var(--spacing-m);
+        position: absolute;
+        top: 100px;
+        width: 70%;
+        z-index: calc(var(--sbx-depth-modal) + 1);
+    }
     &__bkg {
         background-color: rgba(0, 0, 0, 0.5);
         height: 100%;
@@ -33,6 +46,7 @@ const props = defineProps<Props>();
         position: fixed;
         top: 0;
         width: 100%;
+        z-index: calc(var(--sbx-depth-modal) - 1);
     }
 }
 </style>
