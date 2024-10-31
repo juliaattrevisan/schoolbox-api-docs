@@ -72,6 +72,24 @@ function onButtonSelect(): void {
 }
 
 /**
+ * To manipulate the results to target the courses object
+ */
+const { ignoreUpdates: ignoreModalUpdates } = watchIgnorable(
+    modalResults,
+    (newResults: CourseAPIResponse | unknown[]) => {
+        // ignore updates to avoid an infinite loop...
+        ignoreModalUpdates(() => {
+            if (newResults instanceof Array && newResults.length === 0) {
+                return;
+            }
+            if (typeof newResults === "object" && "courses" in newResults) {
+                results.value = newResults.courses;
+            }
+        });
+    },
+);
+
+/**
  * To update the course selection considering the
  * selection made in the modal
  */
@@ -98,7 +116,14 @@ function onModalSelect(): void {
         button-icon="icon-course"
         @button-select="onButtonSelect"
     />
-    <search-select-modal v-model:is-open="isModalOpen" title="Browse Courses" @select="onModalSelect" />
+    <search-select-modal
+        v-model:is-open="isModalOpen"
+        v-model:results="modalResults"
+        title="Browse Courses"
+        :endpoint="`${props.endpoint}`"
+        :allow-partial-matches="true"
+        @select="onModalSelect"
+    />
 </template>
 
 <style scoped></style>
