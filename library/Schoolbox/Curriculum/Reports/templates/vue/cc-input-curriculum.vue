@@ -101,6 +101,7 @@ function onSelectedNodeModalClosed(): void {
         :is-read-only="props.isReadOnly"
         :allow-partial-matches="true"
         :can-select-item="true"
+        placeholder="Search for curriculum codes or keywords..."
         :has-button="true"
         button-icon="icon-curriculum"
         @select="onNodeNameSelect"

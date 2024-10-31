@@ -112,6 +112,7 @@ function onModalSelect(): void {
         :allow-partial-matches="true"
         :can-select-item="true"
         @select="onCourseNameSelect"
+        placeholder="Search for courses..."
         :has-button="true"
         button-icon="icon-course"
         @button-select="onButtonSelect"
