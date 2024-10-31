@@ -45,7 +45,7 @@ function close(): void {
 }
 
 /**
- * Close the modal, also clearing any selected results
+ * Close the modal, also clearing any updated selected
  */
 function onCancel(): void {
     undo();
@@ -75,7 +75,6 @@ function onRemove(items: SearchSelectItem[]): void {
 
 /**
  * The selection has been confirmed, so close the modal
- * and insert into the current selection
  */
 function onSelect(): void {
     close();
