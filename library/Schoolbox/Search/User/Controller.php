@@ -571,9 +571,20 @@ class Controller extends BaseController
         $this->response = $this->responseFromTemplate(
             'user/staff.twig',
             [
+                /* Profile Editor
+                 */
+                /* This is an augmented object consisting of schoolbox user fields
+                 * and external sis fields from the External Interface (hybrid theory)
+                 */
+                'externalUser' => $externalUser,
+                /* Profile screens can have their own roletype-specific name format
+                 */
+                'nameFormat' => $this->getConfigLoader()->get('name_format_staff'),
+
+                /* Old implementation
+                 */
                 'session'        => $_SESSION,
                 'user'           => $staff,
-                'externalUser'   => $externalUser,
                 'eportfolioAuth' => $this->eportfolioAuthenticator->canView(),
                 'customButtons'  => $customButtons,
                 'now'            => Alaress_Date_Format::now(),
@@ -616,9 +627,20 @@ class Controller extends BaseController
         $this->response = $this->responseFromTemplate(
             'user/parent.twig',
             [
+                /* Profile Editor
+                 */
+                /* This is an augmented object consisting of schoolbox user fields
+                 * and external sis fields from the External Interface (hybrid theory)
+                 */
+                'externalUser' => $externalUser,
+                /* Profile screens can have their own roletype-specific name format
+                 */
+                'nameFormat' => $this->getConfigLoader()->get('name_format_parent'),
+
+                /* Old implementation
+                 */
                 'session'        => $_SESSION,
                 'user'           => $parent,
-                'externalUser'   => $externalUser,
                 'students'       => $parent->getChildren(),
                 'customButtons'  => $customButtons,
                 'eportfolioAuth' => $this->eportfolioAuthenticator->canView(),

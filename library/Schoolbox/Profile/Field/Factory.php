@@ -267,6 +267,7 @@ class Factory
             'email' => $viewee->getEmail(),
             'externalId' => $viewee->getExternalId(),
             'role' => $viewee->getRole()->getName(),
+            'positionTitle' => $viewee->getPositionTitle(),
             /* ResidentialHouse can indeed be null: storm and phpstannis have different ideas
              */
             /** @phpstan-ignore-next-line */
@@ -340,6 +341,14 @@ class Factory
             }
         }
 
+        /* For convenience, collate the campus names here
+         */
+        $campusNames = '';
+
+        if ($viewee->getCampusCollection()) {
+            $campusNames = implode(', ', $viewee->getCampusCollection()->indexBy('name')->keys());
+        }
+
         /* Hybrid Theory
          */
         $referenceFields = [
@@ -347,7 +356,11 @@ class Factory
             'email' => $viewee->getEmail(),
             'externalId' => $viewee->getExternalId(),
             'role' => $viewee->getRole()->getName(),
-            'spouseName' => $spouseNode
+            'positionTitle' => $viewee->getPositionTitle(),
+            'spouseName' => $spouseNode,
+            /* Favour schoolbox's data over the sis' data
+             */
+            'campusCollection' => $campusNames,
         ];
 
         return array_merge($externalUser, $referenceFields);
@@ -383,6 +396,7 @@ class Factory
             'email' => $viewee->getEmail(),
             'externalId' => $viewee->getExternalId(),
             'role' => $viewee->getRole()->getName(),
+            'positionTitle' => $viewee->getPositionTitle(),
             /* Favour schoolbox's data over the sis' data
              */
             'yearLevel' => $viewee->getYear()?->getName() ?? '',
