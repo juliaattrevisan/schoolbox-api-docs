@@ -29,7 +29,16 @@ const selected = defineModel<SearchSelectItem[]>("selected", { default: [] }); /
 const { add, remove, update } = useSelected(selected); // to add and remove selected items
 
 const results = defineModel<SearchSelectItem[]>("results", { default: [] }); // to store search results
-const { query, isActive, isSearching, hasNoResults, hasError } = useSearch(props.endpoint, results, true); // to search for results
+const { query, isActive, isSearching, hasNoResults, hasError, search } = useSearch(props.endpoint, results, true); // to search for results
+
+/**
+ * To display results without searching
+ */
+window.Vue.watch(isOpen, (newIsOpen) => {
+    if (newIsOpen) {
+        void search();
+    }
+});
 
 /**
  * Close the modal
@@ -71,21 +80,23 @@ function onSelect(): void {
 <template>
     <div>
         <basic-modal v-model:is-open="isOpen">
-            <h2>{{ props.title }}</h2>
-            <ss-results
-                :query="query"
-                :is-active="isActive"
-                :is-searching="isSearching"
-                :allow-partial-matches="props.allowPartialMatches"
-                :is-single-select="props.isSingleSelect"
-                :results="results"
-                :has-no-results="hasNoResults"
-                :has-error="hasError"
-                :selected="selected"
-                @add="onAdd"
-                @remove="onRemove"
-            />
-            <ssm-footer @cancel="onCancel" @select="onSelect" />
+            <div class="l-flex-col l-gap-m">
+                <h2 class="f-no-margins">{{ props.title }}</h2>
+                <ss-results
+                    :query="query"
+                    :is-active="isActive"
+                    :is-searching="isSearching"
+                    :allow-partial-matches="props.allowPartialMatches"
+                    :is-single-select="props.isSingleSelect"
+                    :results="results"
+                    :has-no-results="hasNoResults"
+                    :has-error="hasError"
+                    :selected="selected"
+                    @add="onAdd"
+                    @remove="onRemove"
+                />
+                <ssm-footer @cancel="onCancel" @select="onSelect" />
+            </div>
         </basic-modal>
     </div>
 </template>

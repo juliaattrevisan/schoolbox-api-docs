@@ -83,7 +83,7 @@ const { ignoreUpdates: ignoreModalUpdates } = watchIgnorable(
                 return;
             }
             if (typeof newResults === "object" && "courses" in newResults) {
-                results.value = newResults.courses;
+                modalResults.value = newResults.courses;
             }
         });
     },
@@ -94,7 +94,7 @@ const { ignoreUpdates: ignoreModalUpdates } = watchIgnorable(
  * selection made in the modal
  */
 function onModalSelect(): void {
-    isModalOpen.value = false;
+    // isModalOpen.value = false;
 }
 </script>
 
