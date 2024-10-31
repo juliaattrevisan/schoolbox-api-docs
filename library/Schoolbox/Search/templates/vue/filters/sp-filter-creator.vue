@@ -20,7 +20,7 @@ const currentUser: Creator = {
             v-model:selected="filterCreatorsStore.creator"
             label="Creator"
             label-id="creator"
-            endpoint="/ajax/user.php?groupID=0&query="
+            endpoint="/ajax/user.php?groupID=0&"
             :is-single-select="true"
             :default-results="[currentUser]"
             placeholder="Search for users..."

@@ -40,7 +40,7 @@ export function useSearch(
             // so can search without a query
             return endpoint;
         }
-        return `${endpoint}?query=${query.value}`;
+        return `${endpoint}query=${query.value}`;
     });
     const hasSearched = window.Vue.ref(false); // to show that a search has been made
     const hasNoResults = window.Vue.computed(() => isActive.value && results.value.length === 0 && !isSearching.value); // To show that no results match the current search

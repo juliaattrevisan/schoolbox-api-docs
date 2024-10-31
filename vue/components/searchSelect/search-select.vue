@@ -14,7 +14,7 @@ import SsResults from "./ss-results.vue";
 interface Props {
     label: string; // the label text
     labelId: string; // the label id
-    endpoint: string; // the search api endpoint
+    endpoint: string; // the search api endpoint, expects an endpoint without a `query` parameter, which will be added via useSearch
     isRequired?: boolean; // whether the input requires a value
     defaultResults?: SearchSelectItem[]; // show selection options when the search input is empty
     isSingleSelect?: boolean; // whether only one result can be selected
@@ -40,7 +40,7 @@ const props = withDefaults(defineProps<Props>(), {
 });
 
 const emit = defineEmits<{
-    response: [response: unknown];
+    searchResponse: [json: unknown];
     select: [item: SearchSelectItem];
     buttonSelect: [];
 }>();
@@ -58,7 +58,7 @@ const results = defineModel<SearchSelectItem[]>("results", { default: [] }); // 
 function onSearchSuccess(json: unknown): void {
     // emit to handle the response externally, as the response object is typically something not handled by the the basic structure below
     if (props.manageSearchResponse) {
-        emit("response", json);
+        emit("searchResponse", json);
         return;
     }
     // if json is an array, set results to json
@@ -157,7 +157,7 @@ function onButtonSelected(): void {
         </div>
         <div class="results-container">
             <ss-results
-                v-if="isActive"
+                v-if="isActive || (props.defaultResults && props.defaultResults.length > 0)"
                 :query="query"
                 :is-active="isActive"
                 :is-searching="isSearching"
