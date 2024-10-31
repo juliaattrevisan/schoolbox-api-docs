@@ -92,19 +92,18 @@ class Controller extends Base
 
         // Requirements for updating selections on change
         // TODO extract elsewhere, and use in pastoral modify form as well
-        $types            = $this->pastoralTypeMapper->findAll();
-        $subtypes         = $this->pastoralSubTypeMapper->findAll();
+        $types            = $this->pastoralTypeMapper->findAll()->indexBy('id');
+        $subtypes         = $this->pastoralSubTypeMapper->findAll()->indexBy('id');
         $audiences        = $this->loadAudiences();
         $typeAudiences    = $this->loadTypeAudiences($audiences);
         $subtypeAudiences = $this->loadSubtypeAudiences($audiences);
 
-        [
-            $typesIndex,
-            $typesIndexPrivate,
-            $audienceDefaults,
-            $subtypesIndex,
-            $subtypesIndexPrivate
-        ] = $this->loadTypeAndSubtypeDefaults($types, $typeAudiences, $subtypes, $subtypeAudiences);
+        $typesIndex           = $types->map(fn (Pastoral\Type\Model $model) => $model->getTemplate());
+        $typesIndexPrivate    = $types->map(fn (Pastoral\Type\Model $model) => $model->getTemplatePrivate());
+        $subtypesIndex        = $subtypes->map(fn (Pastoral\SubType\Model $model) => $model->getTemplate());
+        $subtypesIndexPrivate = $subtypes->map(fn (Pastoral\SubType\Model $model) => $model->getTemplatePrivate());
+
+        $audienceDefaults = $this->loadTypeAndSubtypeDefaults($types, $typeAudiences, $subtypes, $subtypeAudiences);
 
         $this->response = $this->responseFromTemplate(
             '@pastoralBulkImport/form.twig',
@@ -449,18 +448,21 @@ class Controller extends Base
         return $subtypeAudiences;
     }
 
+
     /**
-     * @param GenericCollection $types
-     * @param mixed                   $typeAudiences
-     * @param GenericCollection $subtypes
-     * @param mixed                   $subtypeAudiences
+     * @param GenericCollection<Pastoral\Type\Model>    $types
+     * @param array<int, Pastoral\Audience\Model>       $typeAudiences
+     * @param GenericCollection<Pastoral\SubType\Model> $subtypes
+     * @param array<int, Pastoral\Audience\Model>       $subtypeAudiences
      * @return array
      */
-    private function loadTypeAndSubtypeDefaults(GenericCollection $types, mixed $typeAudiences, GenericCollection $subtypes, mixed $subtypeAudiences): array
-    {
-        $typesIndex        = [];
-        $typesIndexPrivate = [];
-        $audienceDefaults  = [];
+    private function loadTypeAndSubtypeDefaults(
+        GenericCollection $types,
+        array $typeAudiences,
+        GenericCollection $subtypes,
+        array $subtypeAudiences,
+    ): array {
+        $audienceDefaults = [];
         foreach ($types as $type) {
             $typesIndex[$type->getId()]        = $type->getTemplate();
             $typesIndexPrivate[$type->getId()] = $type->getTemplatePrivate();
@@ -473,8 +475,6 @@ class Controller extends Base
             }
         }
 
-        $subtypesIndex        = [];
-        $subtypesIndexPrivate = [];
         foreach ($subtypes as $subtype) {
             $subtypesIndex[$subtype->getId()]        = $subtype->getTemplate();
             $subtypesIndexPrivate[$subtype->getId()] = $subtype->getTemplatePrivate();
@@ -486,6 +486,6 @@ class Controller extends Base
                 ];
             }
         }
-        return [$typesIndex, $typesIndexPrivate, $audienceDefaults, $subtypesIndex, $subtypesIndexPrivate];
+        return $audienceDefaults;
     }
 }
