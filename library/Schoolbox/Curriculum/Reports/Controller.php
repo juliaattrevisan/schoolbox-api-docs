@@ -64,10 +64,10 @@ class Controller extends Base
         $encodedCursor = $query->get('cursor');
 
         //Making sure both courseId and nodeId are given in the query
-        $courseId = is_array($courseId) ? $courseId : explode(',', $courseId ?? '');
-        $nodeId = is_array($nodeId) ? $nodeId : explode(',', $nodeId ?? '');
+        $courseId = $this->formatQueryIds($courseId);
+        $nodeId = $this->formatQueryIds($nodeId);
 
-        if (empty(array_filter($courseId))) {
+        if (empty($courseId)) {
             $problem = (new ApiProblem("courseId must be defined"))
                 ->setStatus(400)
                 ->asArray();
@@ -75,7 +75,7 @@ class Controller extends Base
             return;
         }
 
-        if (empty(array_filter($nodeId))) {
+        if (empty($nodeId)) {
             $problem = (new ApiProblem("nodeId must be defined"))
                 ->setStatus(400)
                 ->asArray();
@@ -187,5 +187,19 @@ class Controller extends Base
     public function postCoverage(): void
     {
         $this->response = $this->responseFromTemplate('@curriculumreports/index.twig', ['var' => 'POST']);
+    }
+
+    /**
+     * Format and filter the query parameters before retrieving results
+     *
+     * @param string|array|null $ids
+     * @return array
+     */
+    private function formatQueryIds(null|string|array $ids): array
+    {
+        return array_filter(
+            is_array($ids) ? $ids : explode(',', $ids ?? ''),
+            fn($id) => $id > 0
+        );
     }
 }
