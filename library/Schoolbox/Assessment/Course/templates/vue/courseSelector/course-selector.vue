@@ -49,7 +49,8 @@ function onSearchResponse(json: unknown): void {
  ------------------------------------------------*/
 
 const isModalOpen = window.Vue.ref(false);
-const modalResults = window.Vue.ref<Course[]>([]);
+const modalDefaultResults = window.Vue.ref<Course[]>([]); // to display results when the search input is empty
+const modalSearchResults = window.Vue.ref<Course[]>([]); // to store the search results
 
 /**
  * To select a link to the course
@@ -92,7 +93,7 @@ function onButtonSelect(): void {
 function onModalSearchResponse(json: unknown): void {
     if (typeof json === "object" && json !== null && "data" in json) {
         const newResults = json.data as CourseAPIResponse;
-        modalResults.value = newResults.courses;
+        modalSearchResults.value = newResults.courses;
     }
 }
 </script>
@@ -122,7 +123,7 @@ function onModalSearchResponse(json: unknown): void {
     <search-select-modal
         v-model:selected="store.selected"
         v-model:is-open="isModalOpen"
-        v-model:results="modalResults"
+        v-model:results="modalSearchResults"
         label="Search"
         :label-id="`${props.labelId}-modal-search`"
         placeholder="Search for courses..."

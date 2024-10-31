@@ -21,9 +21,11 @@ interface Props {
     isSingleSelect?: boolean; // whether only one result can be selected
     allowPartialMatches?: boolean; // whether to allow partial matches, so can match part of a word
     placeholder?: string; // the query input placeholder text
+    defaultResults?: SearchSelectItem[]; // show selection options when the search input is empty
 }
 const props = withDefaults(defineProps<Props>(), {
     placeholder: "Search...",
+    defaultResults: undefined,
 });
 
 const emit = defineEmits<{
@@ -75,6 +77,21 @@ window.Vue.watch(isOpen, (newIsOpen) => {
         save();
         void search();
     }
+});
+
+/**
+ * To show the current search results, or the default results
+ * if the search is not active
+ * @returns - the current results
+ */
+const currentResults = window.Vue.computed(() => {
+    if (isActive.value) {
+        return results.value;
+    }
+    if (props.defaultResults && props.defaultResults.length > 0) {
+        return props.defaultResults;
+    }
+    return results.value;
 });
 
 /**
@@ -142,7 +159,7 @@ function onSelect(): void {
                             :is-searching="isSearching"
                             :allow-partial-matches="props.allowPartialMatches"
                             :is-single-select="props.isSingleSelect"
-                            :results="results"
+                            :results="currentResults"
                             :has-no-results="hasNoResults"
                             :has-error="hasError"
                             :selected="selected"
