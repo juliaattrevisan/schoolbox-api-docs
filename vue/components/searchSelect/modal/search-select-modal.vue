@@ -29,7 +29,7 @@ const props = withDefaults(defineProps<Props>(), {
 });
 
 const emit = defineEmits<{
-    searchResponse: [json: unknown];
+    searchResponse: [json: unknown, isDefaultResults: boolean];
 }>();
 
 const isOpen = defineModel<boolean>("is-open", { default: false }); // to open/close the modal
@@ -44,11 +44,12 @@ const results = defineModel<SearchSelectItem[]>("results", { default: [] }); // 
  * To handle the search response, we handle some basic responses internally,
  * but if the response is more complex, we emit the response to be handled externally
  * @param json - the returned json
+ * @param isActive - whether the search is active
  */
-function onSearchSuccess(json: unknown): void {
+function onSearchSuccess(json: unknown, isActive: boolean): void {
     // emit to handle the response externally, as the response object is typically something not handled by the the basic structure below
     if (props.manageSearchResponse) {
-        emit("searchResponse", json);
+        emit("searchResponse", json, isActive);
         return;
     }
     // if json is an array, set results to json

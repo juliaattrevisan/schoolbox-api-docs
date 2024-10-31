@@ -69,32 +69,20 @@ function onButtonSelect(): void {
 }
 
 /**
- * To manipulate the results to target the courses object
- */
-// const { ignoreUpdates: ignoreModalUpdates } = watchIgnorable(
-//     modalResults,
-//     (newResults: CourseAPIResponse | unknown[]) => {
-//         // ignore updates to avoid an infinite loop...
-//         ignoreModalUpdates(() => {
-//             if (newResults instanceof Array && newResults.length === 0) {
-//                 return;
-//             }
-//             if (typeof newResults === "object" && "courses" in newResults) {
-//                 modalResults.value = newResults.courses;
-//             }
-//         });
-//     },
-// );
-
-/**
- * To manipulate the results to target the courses object
+ * To manipulate the results to target the courses object, and display the results
  * @param json - the returned json
+ * @param isActive - whether the search is active
  */
-function onModalSearchResponse(json: unknown): void {
-    if (typeof json === "object" && json !== null && "data" in json) {
-        const newResults = json.data as CourseAPIResponse;
-        modalSearchResults.value = newResults.courses;
+function onModalSearchResponse(json: unknown, isActive: boolean): void {
+    if (typeof json !== "object" || json === null || "data" in json === false) {
+        return;
     }
+    const newResults = json.data as CourseAPIResponse;
+    if (isActive) {
+        modalSearchResults.value = newResults.courses;
+        return;
+    }
+    modalDefaultResults.value = newResults.courses;
 }
 </script>
 
@@ -124,6 +112,7 @@ function onModalSearchResponse(json: unknown): void {
         v-model:selected="store.selected"
         v-model:is-open="isModalOpen"
         v-model:results="modalSearchResults"
+        :default-results="modalDefaultResults"
         label="Search"
         :label-id="`${props.labelId}-modal-search`"
         placeholder="Search for courses..."

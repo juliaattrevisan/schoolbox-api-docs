@@ -21,7 +21,7 @@ export const DEBOUNCE_AMOUNT = 350; // the amount in ms to hold off on searching
 export function useSearch(
     endpoint: string,
     results: Ref<SearchSelectItem[]>,
-    onSuccess: (json: unknown) => void,
+    onSuccess: (json: unknown, isActive: boolean) => void,
     requiresQuery: boolean = true,
 ): {
     isSearching: Ref<boolean>;
@@ -72,7 +72,7 @@ export function useSearch(
                 return;
             }
             const json: unknown = await response.json();
-            onSuccess(json);
+            onSuccess(json, isActive.value);
         } catch (error) {
             console.error(error);
             hasError.value = true;
