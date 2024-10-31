@@ -47,117 +47,138 @@ class Controller extends Base
      */
     public function getCoverage(): void
     {
-        $query = $this->requestQuery;
-        $courseId = $query->get('courseId');
-        $nodeId = $query->get('nodeId');
-        $limit = $query->getInt('limit', Cursor::LIMIT_DEFAULT);
-        $encodedCursor = $query->get('cursor');
-
         $response = [];
-
-        //Only process usage when both course specifications and curriculum nodes have been provided
-        if ((string)$courseId !== "" && (string)$nodeId !== "") {
-            $courseId =
-                is_array($courseId) ? $courseId : explode(',', $courseId);
-            $nodeId   =
-                is_array($nodeId) ? $nodeId : explode(',', $nodeId);
-
-            //Early exit if limit is not of type int
-            if (null === $limit) {
-                $problem = (new ApiProblem("Limit must be an positive integer"))
-                    ->setStatus(400)
-                    ->asArray();
-                $this->response = $this->responseAsJson($problem)->withStatus(400);
-                return;
-            }
-
-            try {
-                $cursor = new Cursor(
-                    $this->curriculumMapper,
-                    $courseId,
-                    $nodeId,
-                    $limit,
-                );
-
-                $data = $cursor->retrieveResults($encodedCursor);
-            } catch (\Exception | ValueError $e) {
-                $problem = (new ApiProblem($e->getMessage()))
-                    ->setStatus(400)
-                    ->asArray();
-                $this->response = $this->responseAsJson($problem)->withStatus(400);
-                return;
-            }
-
-            $usageCount = $cursor->retrieveUsageCount();
-
-            $courseSpecs =
-                $this->courseSpecificationMapper->findByColumn('id', $courseId);
-
-            $courseUnitSpecs = [];
-            array_map(
-                function ($id) use (&$courseUnitSpecs) {
-                    $courseUnitSpecs[$id] =
-                        $this->courseUnitSpecificationMapper
-                            ->findByColumn('course_specification_id', $id)
-                            ->reindex();
-                },
-                $courseId
-            );
-
-            $unitTranslator = new UnitAssessmentUsageTranslator(
-                $this->routeGenerator,
-                $this->authorizer,
-                $this->getUser(),
-            );
-
-            $courseUsageTranslator = new CourseUsageTranslator(
-                $this->routeGenerator,
-                $this->authorizer,
-                $this->getUser(),
-                $unitTranslator,
-                $courseUnitSpecs,
-            );
-
-            $reportTranslator = new ModelToArrayTranslator(
-                $this->routeGenerator,
-                $this->authorizer,
-                $this->getUser(),
-                $courseUsageTranslator,
-                $courseSpecs,
-                $usageCount
-            );
-
-            $structureTranslator = new CourseStructureTranslator(
-                $this->routeGenerator,
-                $this->authorizer,
-                $this->getUser(),
-                $courseUnitSpecs
-            );
-
-            $usage = $data->map($reportTranslator);
-
-            $structure = $courseSpecs->map($structureTranslator);
-
-            $response =  [
-                'data' => [
-                    'courses' => $structure,
-                    'nodes' => $usage,
-                ],
-                'metadata' => [
-                    'count' => $cursor->retrieveResultCount(),
-                    'cursor' => [
-                        'current' => $encodedCursor ?? $cursor->current($data),
-                        'next' => (count($data) < $limit) ? null : $cursor->next($data),
-                    ]
-                ]
-            ];
-        }
         $this->response = $this->responseDependentOnRequest(
             '@curriculumreports/index.twig',
             $response
         );
     }
 
+
+    public function generateCoverage(): void
+    {
+        $query = $this->requestQuery;
+        $courseId = $query->get('courseId');
+        $nodeId = $query->get('nodeId');
+        $limit = $query->getInt('limit', Cursor::LIMIT_DEFAULT);
+        $encodedCursor = $query->get('cursor');
+
+        //Making sure both courseId and nodeId are given in the query
+        if ("" === (string)$courseId) {
+            $problem = (new ApiProblem("courseId must be defined"))
+                ->setStatus(400)
+                ->asArray();
+            $this->response = $this->responseAsJson($problem)->withStatus(400);
+            return;
+        }
+
+        if ("" === (string)$nodeId) {
+            $problem = (new ApiProblem("nodeId must be defined"))
+                ->setStatus(400)
+                ->asArray();
+            $this->response = $this->responseAsJson($problem)->withStatus(400);
+            return;
+        }
+
+        $courseId =
+            is_array($courseId) ? $courseId : explode(',', $courseId);
+        $nodeId   =
+            is_array($nodeId) ? $nodeId : explode(',', $nodeId);
+
+        //Early exit if limit is not of type int
+        if (null === $limit) {
+            $problem = (new ApiProblem("Limit must be an positive integer"))
+                ->setStatus(400)
+                ->asArray();
+            $this->response = $this->responseAsJson($problem)->withStatus(400);
+            return;
+        }
+
+        try {
+            $cursor = new Cursor(
+                $this->curriculumMapper,
+                $courseId,
+                $nodeId,
+                $limit,
+            );
+
+            $data = $cursor->retrieveResults($encodedCursor);
+        } catch (\Exception | ValueError $e) {
+            $problem = (new ApiProblem($e->getMessage()))
+                ->setStatus(400)
+                ->asArray();
+            $this->response = $this->responseAsJson($problem)->withStatus(400);
+            return;
+        }
+
+        $usageCount = $cursor->retrieveUsageCount();
+
+        $courseSpecs =
+            $this->courseSpecificationMapper->findByColumn('id', $courseId);
+
+        $courseUnitSpecs = [];
+        array_map(
+            function ($id) use (&$courseUnitSpecs) {
+                $courseUnitSpecs[$id] =
+                    $this->courseUnitSpecificationMapper
+                        ->findByColumn('course_specification_id', $id)
+                        ->reindex();
+            },
+            $courseId
+        );
+
+        $unitTranslator = new UnitAssessmentUsageTranslator(
+            $this->routeGenerator,
+            $this->authorizer,
+            $this->getUser(),
+        );
+
+        $courseUsageTranslator = new CourseUsageTranslator(
+            $this->routeGenerator,
+            $this->authorizer,
+            $this->getUser(),
+            $unitTranslator,
+            $courseUnitSpecs,
+        );
+
+        $reportTranslator = new ModelToArrayTranslator(
+            $this->routeGenerator,
+            $this->authorizer,
+            $this->getUser(),
+            $courseUsageTranslator,
+            $courseSpecs,
+            $usageCount
+        );
+
+        $structureTranslator = new CourseStructureTranslator(
+            $this->routeGenerator,
+            $this->authorizer,
+            $this->getUser(),
+            $courseUnitSpecs
+        );
+
+        $usage = $data->map($reportTranslator);
+
+        $structure = $courseSpecs->map($structureTranslator);
+
+        $response =  [
+            'data' => [
+                'courses' => $structure,
+                'nodes' => $usage,
+            ],
+            'metadata' => [
+                'count' => $cursor->retrieveResultCount(),
+                'cursor' => [
+                    'current' => $encodedCursor ?? $cursor->current($data),
+                    'next' => (count($data) < $limit) ? null : $cursor->next($data),
+                ]
+            ]
+        ];
+
+        $this->response = $this->responseAsJson(
+            $response
+        );
+    }
 
     /**
      * fetch the coverage report
