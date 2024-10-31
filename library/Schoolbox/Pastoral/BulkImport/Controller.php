@@ -87,7 +87,6 @@ class Controller extends Base
             $this->pastoralSubTypeMapper,
             $this->pastoralTypeMapper,
             $this->pastoralSeverityMapper,
-            $this->roleMapper,
             $this->pastoralAccessMapper,
             $this->pastoralGroupMapper,
             $this->userMapper,

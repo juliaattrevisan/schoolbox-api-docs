@@ -15,7 +15,6 @@ use Schoolbox\IConfigLoader;
 use Schoolbox\Pastoral;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Role;
-use Schoolbox\RoleMapper;
 use Schoolbox\UserMapper;
 
 /**
@@ -31,7 +30,6 @@ class TemplateDataHelper
      * @param Pastoral\SubType\Mapper  $pastoralSubTypeMapper
      * @param Pastoral\Type\Mapper     $pastoralTypeMapper
      * @param Pastoral\Severity\Mapper $pastoralSeverityMapper
-     * @param RoleMapper               $roleMapper
      * @param Pastoral\Access\Mapper   $pastoralAccessMapper
      * @param Pastoral\Group\Mapper    $pastoralGroupMapper
      * @param UserMapper               $userMapper
@@ -42,7 +40,6 @@ class TemplateDataHelper
         private Pastoral\SubType\Mapper $pastoralSubTypeMapper,
         private Pastoral\Type\Mapper $pastoralTypeMapper,
         private Pastoral\Severity\Mapper $pastoralSeverityMapper,
-        private RoleMapper $roleMapper,
         private Pastoral\Access\Mapper $pastoralAccessMapper,
         private Pastoral\Group\Mapper $pastoralGroupMapper,
         private UserMapper $userMapper,
@@ -114,7 +111,7 @@ class TemplateDataHelper
      */
     private function loadRoles(bool $allowParentRoles): GenericCollection
     {
-        $roles        = $this->roleMapper->createCollection();
+        $roles        = new GenericCollection(Role::class);
         $allowedRoles = $this->pastoralAccessMapper->determineAllowedRoles();
         foreach ($allowedRoles as $roleCurrent) {
             if ($roleCurrent->isStaff() && $roleCurrent->getAccessPastoral()) {

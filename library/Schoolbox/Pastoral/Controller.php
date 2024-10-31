@@ -479,25 +479,23 @@ class Controller extends Base
     public function getStudentRecordUpdateForm(Model $record): void
     {
         $this->assertSyncability();
-        if (!$this->getConfigLoader()->get(ConfigMapper::NAME_PASTORAL_SEVERITY_ENABLED)) {
-            $severities = [];
-        } else {
-            $severities = $this->pastoralSeverityMapper->findAll();
-        }
+
+        // Load default data, then what's left over
+        $templateDataHelper = new TemplateDataHelper(
+            $this->getConfigLoader(),
+            $this->pastoralSubTypeMapper,
+            $this->pastoralTypeMapper,
+            $this->pastoralSeverityMapper,
+            $this->pastoralAccessMapper,
+            $this->pastoralGroupMapper,
+            $this->userMapper,
+            $this->audienceMapper,
+        );
+        $templateData = $templateDataHelper->loadTemplateData();
 
         // Check if user is a pastoral moderator
 
         $moderator = $this->getUser()->getAccessList()->filterBy('service', UserAccess::SERVICE_PASTORAL)->count() > 0;
-
-        $allowParents  = $this->config->get(ConfigMapper::NAME_PASTORAL_PARENT_ACCESS_ENABLED);
-        $allowStudents = $this->config->get(ConfigMapper::NAME_PASTORAL_STUDENT_ACCESS_ENABLED);
-
-        // Tally counts for staff roles:
-        // for parent and student roles, only count if there is a user
-        $roles          = new Collection();
-        $roleUserCounts = [];
-
-        $allowedRoles   = $this->pastoralAccessMapper->determineAllowedRoles();
 
         // When student ids are provided to copy this record to:
         // add all those students and their parents to the role user counts.
@@ -509,36 +507,6 @@ class Controller extends Base
         ]);
         $this->externalUser->loadParents($duplicates);
 
-        /** @var Role $roleCurrent */
-        foreach ($allowedRoles as $roleCurrent) {
-            $roleUserCounts[$roleCurrent->getId()] = 0;
-
-            // Staff role? Show user count
-            if ($roleCurrent->isStaff() && $roleCurrent->getAccessPastoral()) {
-                $roles->add($roleCurrent);
-                $roleUserCounts[$roleCurrent->getId()] = $this->userMapper->countByColumn('group_id', $roleCurrent->getId());
-            }
-
-            // Parent role?
-            // Don't track the number, as this will be shown as a role type
-            // instead.
-            if ($allowParents && $roleCurrent->isParent()) {
-                $roles->add($roleCurrent);
-                $roleUserCounts[$roleCurrent->getId()] = 0;
-            }
-        }
-
-        $audiences        = $this->audienceMapper->findAll()->filter($this->audienceMapper->getPermissionCallback());
-        $typeAudiences    = [];
-        $subtypeAudiences = [];
-        foreach ($audiences as $audience) {
-            if ($audience->getSubtype()) {
-                $subtypeAudiences[$audience->getSubtype()->getId()][] = $audience;
-            } else {
-                $typeAudiences[$audience->getType()->getId()][] = $audience;
-            }
-        }
-
         // Prefill create duplicate record field with duplicate students
         $students = [];
         foreach ($duplicates as $student) {
@@ -548,71 +516,16 @@ class Controller extends Base
             ];
         }
 
-        /* Build a hash lookup of (typeId => html) and (subtypeId => html) tuples
-         * for the front end's dropdowns. When those dropdowns change, sometimes
-         * the General Template should get updated and the easiest way is to simply
-         * perform an id lookup
-         */
-        $types    = $this->pastoralTypeMapper->findAll();
-        $subtypes = $this->pastoralSubTypeMapper->findAll();
-
-        $typesIndex       = [];
-        $typesIndexPrivate       = [];
-        $audienceDefaults = [];
-
-        foreach ($types as $type) {
-            $typesIndex[$type->getId()] = $type->getTemplate();
-            $typesIndexPrivate[$type->getId()] = $type->getTemplatePrivate();
-            if (key_exists($type->getId(), $typeAudiences) || $type->getVisibilityLocked()) {
-                $audienceDefaults[] = [
-                    'typeId'    => $type->getId(),
-                    'subtypeId' => 0,
-                    'audiences' => $typeAudiences[$type->getId()] ?? [],
-                ];
-            }
-        }
-
-        $subtypesIndex = [];
-        $subtypesIndexPrivate = [];
-
-        foreach ($subtypes as $subtype) {
-            $subtypesIndex[$subtype->getId()] = $subtype->getTemplate();
-            $subtypesIndexPrivate[$subtype->getId()] = $subtype->getTemplatePrivate();
-            if (key_exists($subtype->getId(), $subtypeAudiences) || $subtype->getVisibilityLocked()) {
-                $audienceDefaults[] = [
-                    'typeId'    => $subtype->getPastoralType()->getId(),
-                    'subtypeId' => $subtype->getId(),
-                    'audiences' => $subtypeAudiences[$subtype->getId()] ?? [],
-                ];
-            }
-        }
-
         // Render this thing out
 
         $this->response = $this->responseFromTemplate(
             '@pastoral/modify.twig',
-            [
+            $templateData + [
                 'record'            => $record,
                 'canCreate'         => $this->getConfigLoader()->get('pastoral_create_tag_enable'),
-                'allowIndividual'   => $this->config->get(ConfigMapper::NAME_PASTORAL_INDIVIDUAL_ACCESS_ENABLED),
-                'allowParents'      => $allowParents,
-                'allowStudents'     => $allowStudents,
-                'types'             => $types,
-                'typesIndexPrivate' => $typesIndexPrivate,
-                'typesIndex'        => $typesIndex,
-                'subTypes'          => $subtypes,
-                'subtypesIndexPrivate'  => $subtypesIndexPrivate,
-                'subtypesIndex'     => $subtypesIndex,
-                'severities'        => $severities,
-                'roles'             => $roles,
-                'roleTypes'         => $this->pastoralAccessMapper->determineAllowedRoleTypes(),
-                'roleUserCounts'    => $roleUserCounts,
-                'groups'            => $this->pastoralGroupMapper->findAll()->sortNaturally('name'),
                 'moderator'         => $moderator,
-                'moderatorIds'      => $this->userMapper->findByAccess(UserAccess::SERVICE_PASTORAL, UserAccess::ACCESS_READ)->getPropertyValues('id'),
                 'attachzonePublic'  => $this->getAttachZone(self::ATTACHZONE_PUBLIC, $record),
                 'attachzonePrivate' => $this->getAttachZone(self::ATTACHZONE_PRIVATE, $record),
-                'audiences'         => $audienceDefaults,
                 'students'          => json_encode($students),
                 'returnUrlName'     => Redirect::RETURN_URL,
                 'encodedReturnUrl'  => $this->requestQuery->get(Redirect::RETURN_URL),
