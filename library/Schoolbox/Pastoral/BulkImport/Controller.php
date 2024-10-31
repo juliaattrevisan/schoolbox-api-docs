@@ -43,7 +43,6 @@ class Controller extends Base
      * @param Pastoral\SubType\Mapper  $pastoralSubTypeMapper  Used for loading and validating pastoral subtypes.
      * @param Pastoral\Type\Mapper     $pastoralTypeMapper     Used for loading and validating pastoral types.
      * @param Pastoral\Severity\Mapper $pastoralSeverityMapper Used for loading pastoral severities.
-     * @param RoleMapper               $roleMapper             Used for loading roles to show in record visibility.
      * @param Pastoral\Access\Mapper   $pastoralAccessMapper   Used for determining roles which may access records.
      * @param Pastoral\Group\Mapper    $pastoralGroupMapper    Used for loading pastoral groups to select visibility.
      * @param UserMapper               $userMapper             Used for loading pastoral moderators.
@@ -60,7 +59,6 @@ class Controller extends Base
         private Pastoral\SubType\Mapper $pastoralSubTypeMapper,
         private Pastoral\Type\Mapper $pastoralTypeMapper,
         private Pastoral\Severity\Mapper $pastoralSeverityMapper,
-        private RoleMapper $roleMapper,
         private Pastoral\Access\Mapper $pastoralAccessMapper,
         private Pastoral\Group\Mapper $pastoralGroupMapper,
         private UserMapper $userMapper,

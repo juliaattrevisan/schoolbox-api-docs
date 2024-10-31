@@ -95,7 +95,6 @@ class Module extends BaseModule
             $this->getMapperFactory()->get(Pastoral\SubType\Mapper::class),
             $this->getMapperFactory()->get(Pastoral\Type\Mapper::class),
             $this->getMapperFactory()->get(Pastoral\Severity\Mapper::class),
-            $this->getMapperFactory()->get(RoleMapper::class),
             $this->getMapperFactory()->get(Pastoral\Access\Mapper::class),
             $this->getMapperFactory()->get(Pastoral\Group\Mapper::class),
             $this->getMapperFactory()->get(UserMapper::class),
