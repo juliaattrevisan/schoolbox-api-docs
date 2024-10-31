@@ -99,7 +99,7 @@ test.describe("Create and Verify News Article Test", () => {
      *
      */
 
-    test("Create news article adding audiende via bricks", async ({ tester, page, db }) => {
+    test("Create news article adding audience via bricks", async ({ tester, page, db }) => {
         const form = new Form(tester, page);
         const index = new Index(tester, page);
         const item = new Item(tester, page);
@@ -208,8 +208,6 @@ test.describe("Create and Verify News Article Test", () => {
         await index.goto("all");
         await index.viewArticle(articleId);
         await item.unpublishArticle();
-        // await item.modifyArticle();
-        // await form.fillPublishDate(Common.getTodayAtMidnight());
 
         tester.isGoingTo("Verify that user Alison Chan can no longer see it");
         await tester.impersonateViaModifyUserPage(teacher);
