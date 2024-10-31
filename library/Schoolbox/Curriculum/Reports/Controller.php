@@ -64,7 +64,10 @@ class Controller extends Base
         $encodedCursor = $query->get('cursor');
 
         //Making sure both courseId and nodeId are given in the query
-        if ("" === (string)$courseId) {
+        $courseId = is_array($courseId) ? $courseId : explode(',', $courseId);
+        $nodeId = is_array($nodeId) ? $nodeId : explode(',', $nodeId);
+
+        if (empty(array_filter($courseId))) {
             $problem = (new ApiProblem("courseId must be defined"))
                 ->setStatus(400)
                 ->asArray();
@@ -72,18 +75,13 @@ class Controller extends Base
             return;
         }
 
-        if ("" === (string)$nodeId) {
+        if (empty(array_filter($nodeId))) {
             $problem = (new ApiProblem("nodeId must be defined"))
                 ->setStatus(400)
                 ->asArray();
             $this->response = $this->responseAsJson($problem)->withStatus(400);
             return;
         }
-
-        $courseId =
-            is_array($courseId) ? $courseId : explode(',', $courseId);
-        $nodeId   =
-            is_array($nodeId) ? $nodeId : explode(',', $nodeId);
 
         //Early exit if limit is not of type int
         if (null === $limit) {
