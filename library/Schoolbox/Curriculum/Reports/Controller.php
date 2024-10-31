@@ -64,8 +64,8 @@ class Controller extends Base
         $encodedCursor = $query->get('cursor');
 
         //Making sure both courseId and nodeId are given in the query
-        $courseId = is_array($courseId) ? $courseId : explode(',', $courseId);
-        $nodeId = is_array($nodeId) ? $nodeId : explode(',', $nodeId);
+        $courseId = is_array($courseId) ? $courseId : explode(',', $courseId ?? '');
+        $nodeId = is_array($nodeId) ? $nodeId : explode(',', $nodeId ?? '');
 
         if (empty(array_filter($courseId))) {
             $problem = (new ApiProblem("courseId must be defined"))
