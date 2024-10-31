@@ -238,12 +238,18 @@ export default class Form {
         await expect(this.page.locator('div[class="reveal-modal no-pad open"]')).toBeVisible();
         await this.page.locator("a:has-text('Create Composite Audience')").click();
         // await this.page.waitForTimeout(2000);
-        await this.page.locator("legend").filter({ hasText: "Audience Type 1:" }).getByRole("combobox").click();
-        await this.page.getByTestId("news-item-audience-select").first().selectOption({ label: dropdown1 });
+        await this.page
+            .locator("legend")
+            .filter({ hasText: "Audience Type 1:" })
+            .getByRole("combobox")
+            .selectOption({ label: dropdown1 });
         await this.tickCheckboxes(audienceType1);
 
-        await this.page.locator("legend").filter({ hasText: "Audience Type 2:" }).getByRole("combobox").click();
-        await this.page.getByTestId("news-item-audience-select").last().selectOption({ label: dropdown2 });
+        await this.page
+            .locator("legend")
+            .filter({ hasText: "Audience Type 2:" })
+            .getByRole("combobox")
+            .selectOption({ label: dropdown2 });
         await this.tickCheckboxes(audienceType2);
 
         await this.page.locator("button.button.submit").last().click();

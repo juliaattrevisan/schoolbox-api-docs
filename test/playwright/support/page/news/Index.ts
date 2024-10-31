@@ -68,7 +68,6 @@ export default class Index {
      * @param headline - news article headline
      */
     async seeHeadline(headline: string): Promise<void> {
-        // await expect(this.page.locator(`a:has-text("${headline}")`)).toBeVisible();
         await expect(this.page.locator(`ul.information-list`).first()).toContainText(headline);
     }
 
