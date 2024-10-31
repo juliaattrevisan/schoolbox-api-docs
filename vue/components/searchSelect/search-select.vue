@@ -133,18 +133,28 @@ function onButtonSelected(): void {
                 {{ props.buttonTitle }}
             </button>
         </div>
-        <ss-results
-            :query="query"
-            :is-active="isActive"
-            :is-searching="isSearching"
-            :allow-partial-matches="props.allowPartialMatches"
-            :is-single-select="props.isSingleSelect"
-            :results="currentResults"
-            :has-no-results="hasNoResults"
-            :has-error="hasError"
-            :selected="selected"
-            @add="onAdd"
-            @remove="onRemove"
-        />
+        <div class="results-container">
+            <ss-results
+                v-if="isActive"
+                :query="query"
+                :is-active="isActive"
+                :is-searching="isSearching"
+                :allow-partial-matches="props.allowPartialMatches"
+                :is-single-select="props.isSingleSelect"
+                :results="currentResults"
+                :has-no-results="hasNoResults"
+                :has-error="hasError"
+                :selected="selected"
+                @add="onAdd"
+                @remove="onRemove"
+            />
+        </div>
     </div>
 </template>
+
+<style lang="scss" scoped>
+.results-container {
+    position: relative;
+    top: -1px; // to align the results with the bottom of the ss-query-input
+}
+</style>
