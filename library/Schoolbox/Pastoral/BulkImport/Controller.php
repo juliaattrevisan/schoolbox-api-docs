@@ -295,13 +295,10 @@ class Controller extends Base
         }
 
         // And show the results
-        // TODO fix return URL
         $this->response = $this->responseFromTemplate(
             '@pastoralBulkImport/import.twig',
             [
-                'files'     => $files,
-                'returnUrl' => $this->requestQuery->get('returnUrl')
-                    ?? $this->routeGenerator->generate('pastoral.getIndex'),
+                'files' => $files,
             ],
         );
     }

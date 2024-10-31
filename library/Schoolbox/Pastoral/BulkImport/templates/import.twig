@@ -68,6 +68,6 @@
             </tbody>
         </table>
 
-        <a href="{{ returnUrl }}">Return</a>
+        <a href="{{ RETURN_URL.previous.decoded ?? routeLookup('pastoral.getIndex') }}" class="submit">Return</a>
     </div>
 </div>
