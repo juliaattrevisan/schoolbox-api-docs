@@ -148,48 +148,28 @@ class Simple
                     }
                 }
 
-//                $nextNonTokenPos = isset($nextNonToken)
-//                    ? strpos($replacedBody, $nextNonToken)
-//                    : false;
-//                if ($nextNonTokenPos !== false) {
-//                    // The replacement must be whatever is before the start of
-//                    // the next non-token:
-//                    // process the rest of `$replacedBody`.
-//                    $replacements[$replaceKey] = substr($replacedBody, 0, $nextNonTokenPos);
-//                    $replacedBody              = substr($replacedBody, $nextNonTokenPos);
-//                } else {
-//                    // No next non-token:
-//                    // the entire remainder of `$replacedBody` must be the token
-//                    // value.
-//                    $replacements[$replaceKey] = $replacedBody;
-//                    $replacedBody              = '';
-//                }
-
                 $replacements[$replaceKey] = '';
                 if (!isset($nextNonToken)) {
                     // No more non-tokens:
-                    if (empty($bodyParts)) {
-                        // No next non-token, and no body parts to check:
-                        // the entire remainder of `$replacedBody` must be the
-                        // token value.
-                        $replacements[$replaceKey] = $replacedBody;
-//                    } else {
-                        // No next non-token, and no match:
-//                        return false;
-                    }
-                    break;
+                    // the entire remainder of `$replacedBody` must be the
+                    // token value.
+                    $replacements[$replaceKey] = $replacedBody;
+                    $replacedBody = '';
                 } else {
+                    // There is a non-token upcoming:
+                    // find where in `$replacedBody` it starts.
                     $nextNonTokenPos = strpos($replacedBody, $nextNonToken);
                     if ($nextNonTokenPos !== false) {
-                        // The replacement must be whatever is before the start of
-                        // the next non-token:
+                        // The replacement must be whatever is before the start
+                        // of the next non-token:
                         // process the rest of `$replacedBody`.
                         $replacements[$replaceKey] = substr($replacedBody, 0, $nextNonTokenPos);
+                        $replacedBody = substr($replacedBody, $nextNonTokenPos);
                     } else {
-                        // this doesn't match at all:
+                        // If next non-token isn't in `$replacedBody` at all,
+                        // this can't possibly match.
                         return false;
                     }
-                    $replacedBody = substr($replacedBody, $nextNonTokenPos);
                 }
             } else {
                 // This is not a token:
