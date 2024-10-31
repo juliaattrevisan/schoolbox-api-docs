@@ -24,10 +24,13 @@ export function useSelected($selected: Ref<Item[]> | undefined = undefined): {
     remove: (toRemove: Item | Item[]) => void;
     update: (updated: Item[]) => void;
     empty: () => void;
+    save: () => void;
+    undo: () => void;
 } {
     const selected = $selected === undefined ? window.Vue.ref<Item[]>([]) : $selected; // create a new selected list if one is not passed in
     const isEmpty = window.Vue.computed(() => selected.value.length === 0); // whether the selected list is empty
     const hasItems = window.Vue.computed(() => selected.value.length > 0); // whether the selected list has items
+    const savedSelected = window.Vue.ref<Item[]>([]); // to save the selected list for undo
 
     /**
      * remove the item or items from the selected list
@@ -73,6 +76,20 @@ export function useSelected($selected: Ref<Item[]> | undefined = undefined): {
         selected.value = [];
     }
 
+    /**
+     * save the currently selected list for undo
+     */
+    function save(): void {
+        savedSelected.value = [...selected.value];
+    }
+
+    /**
+     * undo the last changes to the currently selected list
+     */
+    function undo(): void {
+        selected.value = [...savedSelected.value];
+    }
+
     return {
         selected,
         isEmpty,
@@ -81,5 +98,7 @@ export function useSelected($selected: Ref<Item[]> | undefined = undefined): {
         remove,
         update,
         empty,
+        save,
+        undo,
     };
 }

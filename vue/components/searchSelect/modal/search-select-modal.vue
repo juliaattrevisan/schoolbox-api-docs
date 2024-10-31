@@ -20,13 +20,13 @@ const props = defineProps<Props>();
 
 const emit = defineEmits<{
     close: [];
-    select: [];
+    select: [items: SearchSelectItem[]];
 }>();
 
 const isOpen = defineModel<boolean>("is-open", { default: false }); // to open/close the modal
 
 const selected = defineModel<SearchSelectItem[]>("selected", { default: [] }); // to store selected items
-const { add, remove, update, empty } = useSelected(selected); // to add and remove selected items
+const { add, remove, update, save, undo } = useSelected(selected); // to add and remove selected items
 
 const results = defineModel<SearchSelectItem[]>("results", { default: [] }); // to store search results
 const { query, isActive, isSearching, hasNoResults, hasError, search } = useSearch(props.endpoint, results, true); // to search for results
@@ -36,6 +36,7 @@ const { query, isActive, isSearching, hasNoResults, hasError, search } = useSear
  */
 window.Vue.watch(isOpen, (newIsOpen) => {
     if (newIsOpen) {
+        save();
         void search();
     }
 });
@@ -45,7 +46,7 @@ window.Vue.watch(isOpen, (newIsOpen) => {
  */
 function onCancel(): void {
     isOpen.value = false;
-    empty();
+    undo();
     query.value = "";
 }
 
@@ -75,7 +76,7 @@ function onRemove(items: SearchSelectItem[]): void {
  * and insert into the current selection
  */
 function onSelect(): void {
-    emit("select");
+    emit("select", selected.value);
 }
 </script>
 

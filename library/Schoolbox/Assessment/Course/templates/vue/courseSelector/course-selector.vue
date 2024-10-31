@@ -92,9 +92,10 @@ const { ignoreUpdates: ignoreModalUpdates } = watchIgnorable(
 /**
  * To update the course selection considering the
  * selection made in the modal
+ * @param items - the items selected
  */
-function onModalSelect(): void {
-    // isModalOpen.value = false;
+function onModalSelect(items: Course[]): void {
+    // store.add(items);
 }
 </script>
 
