@@ -267,6 +267,7 @@ class Factory
             'email' => $viewee->getEmail(),
             'externalId' => $viewee->getExternalId(),
             'role' => $viewee->getRole()->getName(),
+            'positionTitle' => $viewee->getPositionTitle(),
             /* ResidentialHouse can indeed be null: storm and phpstannis have different ideas
              */
             /** @phpstan-ignore-next-line */
@@ -355,6 +356,7 @@ class Factory
             'email' => $viewee->getEmail(),
             'externalId' => $viewee->getExternalId(),
             'role' => $viewee->getRole()->getName(),
+            'positionTitle' => $viewee->getPositionTitle(),
             'spouseName' => $spouseNode,
             /* Favour schoolbox's data over the sis' data
              */
@@ -394,6 +396,7 @@ class Factory
             'email' => $viewee->getEmail(),
             'externalId' => $viewee->getExternalId(),
             'role' => $viewee->getRole()->getName(),
+            'positionTitle' => $viewee->getPositionTitle(),
             /* Favour schoolbox's data over the sis' data
              */
             'yearLevel' => $viewee->getYear()?->getName() ?? '',
