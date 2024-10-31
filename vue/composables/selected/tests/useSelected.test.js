@@ -73,3 +73,14 @@ test("hasItems returns false when selected has no items", () => {
     const { hasItems } = useSelected();
     expect(hasItems.value).toBe(false);
 });
+
+test("save/undo reverts back to saved selection", () => {
+    const { selected, add, remove, save, undo } = useSelected();
+    add([{ id: 1 }, { id: 2 }, { id: 3 }]);
+    expect(selected.value).toHaveLength(3);
+    save();
+    remove([{ id: 2 }, { id: 3 }]);
+    expect(selected.value).toHaveLength(1);
+    undo();
+    expect(selected.value).toHaveLength(3);
+});
