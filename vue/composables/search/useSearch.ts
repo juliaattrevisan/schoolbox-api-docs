@@ -13,13 +13,15 @@ export const DEBOUNCE_AMOUNT = 350; // the amount in ms to hold off on searching
 /**
  * search for results that match the current query
  * @param endpoint - the endpoint to search for results
- * @param $results - to optionally pass in a reference to the results list
+ * @param results - a reference to the results list
+ * @param onSuccess - a callback to run when the search is successful
  * @param requiresQuery - whether the search requires a query to be active
  * @returns isSearching, query, results, isActive, hasNoResults,  search
  */
 export function useSearch(
     endpoint: string,
-    $results: Ref<SearchSelectItem[]> | undefined = undefined,
+    results: Ref<SearchSelectItem[]>,
+    onSuccess: (json: unknown) => void,
     requiresQuery: boolean = true,
 ): {
     isSearching: Ref<boolean>;
@@ -40,7 +42,6 @@ export function useSearch(
         }
         return `${endpoint}?query=${query.value}`;
     });
-    const results = $results === undefined ? window.Vue.ref<SearchSelectItem[]>([]) : $results; // create a new results list if one is not passed in
     const hasSearched = window.Vue.ref(false); // to show that a search has been made
     const hasNoResults = window.Vue.computed(() => isActive.value && results.value.length === 0 && !isSearching.value); // To show that no results match the current search
     const hasError = window.Vue.ref(false); // To show that an error has occurred
@@ -71,15 +72,7 @@ export function useSearch(
                 return;
             }
             const json: unknown = await response.json();
-            // if json is an array, set results to json
-            if (json instanceof Array) {
-                results.value = json as SearchSelectItem[];
-                return;
-            }
-            // if json.data exists, set results to json.data
-            if (typeof json === "object" && json !== null && "data" in json) {
-                results.value = (json as { data: SearchSelectItem[] }).data;
-            }
+            onSuccess(json);
         } catch (error) {
             console.error(error);
             hasError.value = true;

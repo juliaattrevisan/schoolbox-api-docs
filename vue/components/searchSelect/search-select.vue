@@ -28,6 +28,7 @@ interface Props {
     hasButton?: boolean; // whether to show a button next to the input
     buttonIcon?: string; // the icon to display on the button
     buttonTitle?: string; // the title of the button
+    manageSearchResponse?: boolean; // whether to manage the response internally, or dispatch an emit to manage it externally
 }
 const props = withDefaults(defineProps<Props>(), {
     defaultResults: undefined,
@@ -39,6 +40,7 @@ const props = withDefaults(defineProps<Props>(), {
 });
 
 const emit = defineEmits<{
+    response: [response: unknown];
     select: [item: SearchSelectItem];
     buttonSelect: [];
 }>();
@@ -49,7 +51,27 @@ const selected = defineModel<SearchSelectItem[]>("selected", { default: [] }); /
 const { add, remove, update } = useSelected(selected); // to add and remove selected items
 
 const results = defineModel<SearchSelectItem[]>("results", { default: [] }); // to store search results
-const { query, isActive, isSearching, hasNoResults, hasError } = useSearch(props.endpoint, results); // to search for results
+/**
+ * To handle the search response
+ * @param json - the returned json
+ */
+function onSearchSuccess(json: unknown): void {
+    // emit to handle the response externally, as the response object is typically something not handled by the the basic structure below
+    if (props.manageSearchResponse) {
+        emit("response", json);
+        return;
+    }
+    // if json is an array, set results to json
+    if (json instanceof Array) {
+        results.value = json as SearchSelectItem[];
+        return;
+    }
+    // if json.data exists, set results to json.data
+    if (typeof json === "object" && json !== null && "data" in json) {
+        results.value = (json as { data: SearchSelectItem[] }).data;
+    }
+}
+const { query, isActive, isSearching, hasNoResults, hasError } = useSearch(props.endpoint, results, onSearchSuccess); // to search for results
 
 /**
  * To show the current search results, or the default results
