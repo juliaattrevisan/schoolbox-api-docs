@@ -340,6 +340,14 @@ class Factory
             }
         }
 
+        /* For convenience, collate the campus names here
+         */
+        $campusNames = '';
+
+        if ($viewee->getCampusCollection()) {
+            $campusNames = implode(', ', $viewee->getCampusCollection()->indexBy('name')->keys());
+        }
+
         /* Hybrid Theory
          */
         $referenceFields = [
@@ -347,7 +355,10 @@ class Factory
             'email' => $viewee->getEmail(),
             'externalId' => $viewee->getExternalId(),
             'role' => $viewee->getRole()->getName(),
-            'spouseName' => $spouseNode
+            'spouseName' => $spouseNode,
+            /* Favour schoolbox's data over the sis' data
+             */
+            'campusCollection' => $campusNames,
         ];
 
         return array_merge($externalUser, $referenceFields);
