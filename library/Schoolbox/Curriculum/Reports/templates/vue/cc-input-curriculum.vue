@@ -6,7 +6,6 @@
  * the scope of the changes
  */
 
-import { watchIgnorable } from "@vueuse/core";
 import SearchSelect from "@schoolboxVue/components/searchSelect/search-select.vue";
 import type { SearchSelectItem } from "@schoolboxVue/composables/search/types/SearchSelectItem";
 import { useStore } from "@schoolboxCurriculum/vue/curriculumSelector/store/curriculumSelectorStore";

@@ -35,18 +35,14 @@ const results = window.Vue.ref<Course[]>([]);
 
 /**
  * To manipulate the results to target the courses object
+ * @param json - the returned json
  */
-const { ignoreUpdates } = watchIgnorable(results, (newResults: CourseAPIResponse | unknown[]) => {
-    // ignore updates to avoid an infinite loop...
-    ignoreUpdates(() => {
-        if (newResults instanceof Array && newResults.length === 0) {
-            return;
-        }
-        if (typeof newResults === "object" && "courses" in newResults) {
-            results.value = newResults.courses;
-        }
-    });
-});
+function onSearchResponse(json: unknown): void {
+    if (typeof json === "object" && json !== null && "data" in json) {
+        const newResults = json.data as CourseAPIResponse;
+        results.value = newResults.courses;
+    }
+}
 
 /**-----------------------------------------------
  * Modal related features
@@ -99,6 +95,7 @@ const { ignoreUpdates: ignoreModalUpdates } = watchIgnorable(
         placeholder="Search for courses..."
         :is-required="props.isRequired"
         :endpoint="`${props.endpoint}`"
+        :manage-search-response="true"
         :has-error="props.hasError"
         :error-message="props.errorMessage"
         :is-read-only="props.isReadOnly"
@@ -108,6 +105,7 @@ const { ignoreUpdates: ignoreModalUpdates } = watchIgnorable(
         placeholder="Search for courses..."
         :has-button="true"
         button-icon="icon-course"
+        @search-response="onSearchResponse"
         @button-select="onButtonSelect"
     />
     <search-select-modal
