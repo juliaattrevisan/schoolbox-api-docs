@@ -8,7 +8,6 @@ import SearchSelect from "@schoolboxVue/components/searchSelect/search-select.vu
 import SearchSelectModal from "@schoolboxVue/components/searchSelect/modal/search-select-modal.vue";
 import type { Course } from "@schoolboxLibrary/types/Course";
 import { useCourseSelectorStore } from "./store/courseSelectorStore";
-import { useModalStore } from "./store/coseModalStore";
 
 type CourseAPIResponse = {
     courses: Course[];
@@ -32,8 +31,6 @@ const props = withDefaults(defineProps<Props>(), {
 
 const store = useCourseSelectorStore();
 store.init(props.preselected);
-const modalStore = useModalStore();
-modalStore.init(props.endpoint);
 const results = window.Vue.ref<Course[]>([]);
 
 /**
