@@ -56,7 +56,7 @@ class Controller extends Base
         $response = [];
 
         //Only process usage when both course specifications and curriculum nodes have been provided
-        if ($courseId !== null && $nodeId !== null) {
+        if ((string)$courseId !== "" && (string)$nodeId !== "") {
             $courseId =
                 is_array($courseId) ? $courseId : explode(',', $courseId);
             $nodeId   =
