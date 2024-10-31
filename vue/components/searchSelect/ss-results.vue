@@ -42,17 +42,6 @@ const showSelectAll = window.Vue.computed(() => {
 });
 
 /**
- * To only show the bottom border if the search is active,
- * otherwise there's a double border when the search is inactive
- * @returns - the bottom border style
- */
-const bottomBorder = window.Vue.computed(() => {
-    return props.isSearching || props.hasNoResults || props.results.length > 0
-        ? "1px solid var(--form-border-color)"
-        : "none";
-});
-
-/**
  * To add results
  * @param items - the items selected
  */

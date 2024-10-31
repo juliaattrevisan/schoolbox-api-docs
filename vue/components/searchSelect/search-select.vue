@@ -52,7 +52,8 @@ const { add, remove, update } = useSelected(selected); // to add and remove sele
 
 const results = defineModel<SearchSelectItem[]>("results", { default: [] }); // to store search results
 /**
- * To handle the search response
+ * To handle the search response, we handle some basic responses internally,
+ * but if the response is more complex, we emit the response to be handled externally
  * @param json - the returned json
  */
 function onSearchSuccess(json: unknown): void {
