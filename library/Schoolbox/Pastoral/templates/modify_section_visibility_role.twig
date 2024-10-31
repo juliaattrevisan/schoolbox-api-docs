@@ -93,7 +93,7 @@
         <section>
             <ul class="information-list">
                 {# Only show roles which actually have users #}
-                {% for role in roles|filter(r => rolesWithUsers[r.id]) %}
+                {% for role in roles|filter(r => roleUserCounts[r.id] > 0) %}
                     <li data-role-add="{{ role.id }}" data-role-name="{{ role.name }}">
                         <a class="list-item link-row">
                             <div class="card small-12">

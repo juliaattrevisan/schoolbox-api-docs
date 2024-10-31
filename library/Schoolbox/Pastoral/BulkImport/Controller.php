@@ -88,7 +88,6 @@ class Controller extends Base
         // Load roles and empty counts to display on pastoral visibility
         $roles          = $this->loadRoles($allowParents);
         $roleUserCounts = $this->loadRoleUserCounts($roles);
-        $rolesWithUsers = $this->loadRolesWithUsers($roles);
 
         // Requirements for updating selections on change
         // TODO extract elsewhere, and use in pastoral modify form as well
@@ -135,7 +134,6 @@ class Controller extends Base
                 'roles'           => $roles,
                 'roleTypes'       => $this->pastoralAccessMapper->determineAllowedRoleTypes(),
                 'groups'          => $this->pastoralGroupMapper->findAll()->sortNaturally('name'),
-                'rolesWithUsers'  => $rolesWithUsers,
                 'roleUserCounts'  => $roleUserCounts,
                 'moderatorIds'    => $this->userMapper->findByAccess(UserAccess::SERVICE_PASTORAL, UserAccess::ACCESS_READ)
                                                       ->getPropertyValues('id'),
@@ -389,22 +387,12 @@ class Controller extends Base
     {
         $roleUserCounts = [];
         foreach ($roles as $roleCurrent) {
-            // This depends on whether the role count is actually shown
-            $roleUserCounts[$roleCurrent->getId()] = 0;
-        }
-        return $roleUserCounts;
-    }
-
-    /**
-     * @param GenericCollection<Role> $roles
-     * @return array
-     */
-    private function loadRolesWithUsers(GenericCollection $roles): array
-    {
-        $roleUserCounts = [];
-        foreach ($roles as $roleCurrent) {
-            // This depends on whether the role count is actually shown
-            $roleUserCounts[$roleCurrent->getId()] = false;
+            // This depends on whether the role count is actually shown.
+            if ($roleCurrent->isStaff()) {
+                $roleUserCounts[$roleCurrent->getId()] = $this->userMapper->countByColumn('group_id', $roleCurrent->getId());
+            } else {
+                $roleUserCounts[$roleCurrent->getId()] = 0;
+            }
         }
         return $roleUserCounts;
     }
