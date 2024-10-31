@@ -247,6 +247,7 @@ export default class Form {
         await this.tickCheckboxes(audienceType2);
 
         await this.page.locator("button.button.submit").last().click();
+        await this.tester.common.waitForModalToBeClosed();
     }
 
     /**
