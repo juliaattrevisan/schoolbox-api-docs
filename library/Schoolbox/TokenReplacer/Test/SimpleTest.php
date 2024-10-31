@@ -386,13 +386,13 @@ class SimpleTest extends TestCase
     }
 
     /**
-     * @param string $body
-     * @param string $replacedBody
-     * @param array  $expected
+     * @param string      $body
+     * @param string      $replacedBody
+     * @param array|false $expected
      * @return void
      */
     #[\PHPUnit\Framework\Attributes\DataProvider('providerExtract')]
-    public function testExtract(string $body, string $replacedBody, array $expected): void
+    public function testExtract(string $body, string $replacedBody, array|false $expected): void
     {
         $outcome = (new Simple())->extract($body, $replacedBody);
         $this->assertSame($expected, $outcome);
@@ -674,6 +674,14 @@ class SimpleTest extends TestCase
                     '[token2]' => '',
                 ],
             ],
+            'Consecutive tokens 3: end of body only' => [
+                "X [token1][token2]",
+                "X Blah blah",
+                [
+                    '[token1]' => 'Blah blah',
+                    '[token2]' => '',
+                ],
+            ],
             // Token replacement value matches non-replacement:
             // I didn't expect this would work, but it seems to.
             'Token replacement value matches non-replacement value' => [
@@ -692,6 +700,11 @@ class SimpleTest extends TestCase
                     '[firstname]'  => 'Jana',
                     '[surname]'    => 'Reed',
                 ],
+            ],
+            'Real-world summative report example: non-matching' => [
+                '[externalId] blargh',
+                '201/Semester Report - Jana Reed',
+                false,
             ],
         ];
     }
