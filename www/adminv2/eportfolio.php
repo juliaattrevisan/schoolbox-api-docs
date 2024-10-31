@@ -9,9 +9,10 @@
  */
 
 use Schoolbox\Admin\Navigation\Subnav;
+use Schoolbox\Error\Mapper as ErrorMapper;
 
 if (!$_SESSION['user']->isSuperuser()) {
-    error(19, "", 401);
+    throw ErrorMapper::getInstance()->generateException(ErrorMapper::ERROR_PERM_PAGE_VIEW);
 }
 
 $this->setFile(TEMPLATE_content, 'adminv2/eportfolio.html');

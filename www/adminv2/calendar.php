@@ -5,6 +5,7 @@ use Calendar\Api\ModuleChecker;
 use Schoolbox\Admin\Navigation\Subnav;
 use Schoolbox\Calendar\Relation;
 use Schoolbox\Config\Loader as ConfigLoader;
+use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Learning\Assessment\Redirect;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\Attachment\Zone;
@@ -13,7 +14,7 @@ if (
     !$_SESSION['user']->isSuperuser() &&
     !$_SESSION['user']->hasServicePermission(UserAccess::SERVICE_CALENDAR, UserAccess::ACCESS_FULL)
 ) {
-    error(19, "", 401);
+    throw ErrorMapper::getInstance()->generateException(ErrorMapper::ERROR_PERM_PAGE_VIEW);
 }
 
 if ($this->arg[0] ?? null) {

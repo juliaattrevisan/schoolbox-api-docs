@@ -147,9 +147,9 @@ class FetchPagesFromCsvCest
         $expected_result = $example[4];
 
         /*
-         * Due to the data from example url being so huge, over ride the feature to include an extra
+         * Due to the data from example url being so huge, override the feature to include an extra
          * line with the details that can be huge. What user is doing, Persona, URL
-        */
+         */
         $scenario->setFeature($scenario->getFeature() . PHP_EOL . 'Scenario: ' . $example[1] . ' | ' . $persona . ' | ' . $url);
 
         if ($expected_result == 'IGNORE') {
@@ -165,7 +165,7 @@ class FetchPagesFromCsvCest
             $i->setSessionCookie($this->users[$persona][0] ?? '');
         }
 
-        #Need to login to the right user
+        #Need to log in the right user
         #proceed to test the url which is below.
         $getPayload = new Payload\Base('GET', '/', $url);
 

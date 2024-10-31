@@ -19,6 +19,7 @@ use Schoolbox\Admin\Settings\FieldStrategyFactory;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\LTI\Provider;
 use Alaress\Web\Router\PathMatcher;
+use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
 
 class Module extends BaseModule
@@ -42,8 +43,17 @@ class Module extends BaseModule
      */
     public function initRoutePermissions(Authorizer $authorizer)
     {
-        $this->addRoutePermission($authorizer, '.*', new Rule\IsLoggedIn())
-             ->addRoutePermission($authorizer, '.*', new Rule\IsSuperuser());
+        $this->addRoutePermission(
+            $authorizer,
+            '.*',
+            new Rule\All(
+                new Rule\IsLoggedIn(),
+                new Rule\Any(
+                    new Rule\IsSuperuser(),
+                    new Rule\HasServicePermission(UserAccess::SERVICE_LMS, UserAccess::ACCESS_FULL)
+                )
+            )
+        );
     }
 
     /**

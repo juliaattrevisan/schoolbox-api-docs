@@ -12,6 +12,7 @@ use Alaress\Module\Module as BaseModule;
 use Alaress\Twig\Loader\IChainLoader;
 use Alaress\Web\Controller\Base;
 use InvalidArgumentException;
+use Schoolbox\Permission\Access\UserAccess;
 
 /**
  * RubricResultSet module class.
@@ -29,7 +30,13 @@ class Module extends BaseModule
      */
     protected function registerRoutes(): void
     {
-        $perms = new Rule\IsSuperuser();
+        $perms = new Rule\All(
+            new Rule\IsLoggedIn(),
+            new Rule\Any(
+                new Rule\IsSuperuser(),
+                new Rule\HasServicePermission(UserAccess::SERVICE_LMS, UserAccess::ACCESS_FULL)
+            )
+        );
 
         $this->register('GET', '/create', 'getCreate', $perms);
         $this->register('POST', '/create', 'postCreate', $perms);
@@ -40,17 +47,7 @@ class Module extends BaseModule
     }
 
     /**
-     * Build the controller for this module.
-     *
-     * Dependencies can and should be injected into the controller's
-     * constructor:
-     * * objects specific to this controller may simply be constructed here
-     * * mappers may be retrieved with
-     *   `$this->getMapperFactory()->get(Mapper::class)`
-     * * previously configured services may be extracted from the DI container
-     *   with `$this->injector->get($serviceName)`
-     *
-     * @return Base
+     * @inheritdoc
      */
     public function buildController(): Base
     {
@@ -58,7 +55,7 @@ class Module extends BaseModule
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function initTemplatePaths(IChainLoader $templateLoader): void
     {

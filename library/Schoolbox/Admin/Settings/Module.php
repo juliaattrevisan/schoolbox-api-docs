@@ -33,6 +33,7 @@ class Module extends \Alaress\Module\Module
                 new Rule\HasServicePermission(UserAccess::SERVICE_NEWS, UserAccess::ACCESS_FULL),
                 new Rule\HasServicePermission(UserAccess::SERVICE_CALENDAR, UserAccess::ACCESS_FULL),
                 new Rule\HasServicePermission(UserAccess::SERVICE_PASTORAL, UserAccess::ACCESS_FULL),
+                new Rule\HasServicePermission(UserAccess::SERVICE_LMS, UserAccess::ACCESS_FULL),
             )
         );
 
@@ -44,6 +45,14 @@ class Module extends \Alaress\Module\Module
             )
         );
 
+        $ruleLms = new Rule\All(
+            new Rule\IsLoggedIn(),
+            new Rule\Any(
+                new Rule\IsSuperuser(),
+                new Rule\HasServicePermission(UserAccess::SERVICE_LMS, UserAccess::ACCESS_FULL)
+            )
+        );
+
         $ruleSuperuserOnly = new Rule\All(
             new Rule\IsLoggedIn(),
             new Rule\IsSuperuser(),
@@ -52,6 +61,11 @@ class Module extends \Alaress\Module\Module
         // Routes to which users with service permission UserAccess::SERVICE_PASTORAL need access.
         $this->register('GET', '/pastoral/{typeLabel:Pastoral%20Care}', 'getSettingsPastoral', $rulePastoral);
         $this->register('POST', '/pastoral/{typeLabel:Pastoral%20Care}', 'postSettingsPastoral', $rulePastoral);
+
+        // Routes to which users with service permission UserAccess::SERVICE_LMS need access.
+        $lmsTypeLabelsRegex = '(Document%20Management|LMS%20Policy)';
+        $this->register('GET', "/lms/{typeLabel:$lmsTypeLabelsRegex}", 'getSettingsLms', $ruleLms);
+        $this->register('POST', "/lms/{typeLabel:$lmsTypeLabelsRegex}", 'postSettingsLms', $ruleLms);
 
         $this->register('GET', '/search', 'searchSettings', $ruleSearchSettings);
         $this->register('GET', '{/typeLabel}', 'getSettings', $ruleSuperuserOnly);

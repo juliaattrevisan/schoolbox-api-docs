@@ -12,9 +12,9 @@ use Alaress\Authorizer\Authorizer;
 use Alaress\Module\Module as BaseModule;
 use Alaress\Authorizer\Rule;
 use Alaress\Web\Controller\Base;
-use Aura\Router\Map;
 use Alaress\Twig\Loader\IChainLoader;
 use Schoolbox\Error;
+use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\HomepageTemplateMapper;
 use Schoolbox\RoleMapper;
 
@@ -48,7 +48,17 @@ class Module extends BaseModule
      */
     public function initRoutePermissions(Authorizer $authorizer)
     {
-        $this->addRoutePermission($authorizer, '.*', new Rule\IsSuperuser());
+        $this->addRoutePermission(
+            $authorizer,
+            '.*',
+            new Rule\All(
+                new Rule\IsLoggedIn(),
+                new Rule\Any(
+                    new Rule\IsSuperuser(),
+                    new Rule\HasServicePermission(UserAccess::SERVICE_LMS, UserAccess::ACCESS_FULL)
+                )
+            )
+        );
     }
 
     /**

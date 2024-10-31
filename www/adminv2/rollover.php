@@ -1,21 +1,22 @@
 <?php
 
 /**
- *
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
 
 use Alaress\Web\Response\Factory;
-use Alaress\Web\Template\DebugTwig;
 use Schoolbox\Admin\Navigation\Subnav;
+use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\Folder;
+use Schoolbox\Error\Mapper as ErrorMapper;
 
-$group = new Group();
-
-if (!$group->isSuperuser()) {
-    error(19, "", 401);
+if (
+    !$_SESSION['user']->isSuperuser() &&
+    !$_SESSION['user']->hasServicePermission(UserAccess::SERVICE_LMS, UserAccess::ACCESS_FULL)
+) {
+    throw ErrorMapper::getInstance()->generateException(ErrorMapper::ERROR_PERM_PAGE_VIEW);
 }
 
 /**

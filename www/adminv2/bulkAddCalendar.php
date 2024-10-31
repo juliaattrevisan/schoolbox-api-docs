@@ -12,7 +12,7 @@ if (
     !$_SESSION['user']->isSuperuser() &&
     !$_SESSION['user']->hasServicePermission(UserAccess::SERVICE_CALENDAR, UserAccess::ACCESS_FULL)
 ) {
-    error(19);
+    throw ErrorMapper::getInstance()->generateException(ErrorMapper::ERROR_PERM_PAGE_VIEW);
 }
 
 /** @var SitePage $this */

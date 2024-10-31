@@ -18,6 +18,7 @@ use Alaress\Twig\Loader\IChainLoader;
 use Schoolbox\Assessment\Course\Config\Mapper as CourseConfigMapper;
 use Schoolbox\Assessment\Course\Template\Mapper as CourseTemplateMapper;
 use Schoolbox\Config\ConfigMapper;
+use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\HomepageTemplateMapper;
 use Schoolbox\RoleMapper;
 use Schoolbox\Mapper as BaseMapper;
@@ -30,7 +31,10 @@ class Module extends BaseModule
     {
         $perms = new Rule\All(
             new Rule\IsLoggedIn(),
-            new Rule\IsSuperuser()
+            new Rule\Any(
+                new Rule\IsSuperuser(),
+                new Rule\HasServicePermission(UserAccess::SERVICE_LMS, UserAccess::ACCESS_FULL)
+            )
         );
 
         $loadTemplate = function (array $params) {

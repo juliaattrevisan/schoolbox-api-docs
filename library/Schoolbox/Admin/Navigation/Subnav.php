@@ -138,10 +138,14 @@ class Subnav
         $userHasServicePermissionPastoral = (
             $this->user->hasServicePermission(UserAccess::SERVICE_PASTORAL, UserAccess::ACCESS_FULL)
         );
+        $userHasServicePermissionLms = (
+            $this->user->hasServicePermission(UserAccess::SERVICE_LMS, UserAccess::ACCESS_FULL)
+        );
         $userHasAnyModeratorServicePermission = (
             $userHasServicePermissionNews ||
             $userHasServicePermissionCalendar ||
-            $userHasServicePermissionPastoral
+            $userHasServicePermissionPastoral ||
+            $userHasServicePermissionLms
         );
 
         /* Keys of this array uniquely identify a page and its subpages
@@ -289,12 +293,6 @@ class Subnav
                 'visible'    => $userIsSuperuser && $filterAvailabilityChecker->isAnyFilterAvailable(),
                 'searchable' => false,
                 'children'   => [
-                    '/adminv2/filters/assessmentCal' => [
-                        'name'        => $filterLabelBuilder->buildLabel(FilterPageModel::PAGE_ASSESSMENT_CALENDAR),
-                        'visible'     => $userIsSuperuser && $filterAvailabilityChecker->isAvailable(FilterPageModel::PAGE_ASSESSMENT_CALENDAR),
-                        'children'    => [],
-                        'description' => 'Configure the default and available filter options on the assessment calendar.',
-                    ],
                     '/adminv2/filters/badgeList' => [
                         'name'        => $filterLabelBuilder->buildLabel(FilterPageModel::PAGE_BADGE_LIST),
                         'visible'     => $userIsSuperuser && $filterAvailabilityChecker->isAvailable(FilterPageModel::PAGE_BADGE_LIST),
@@ -307,55 +305,13 @@ class Subnav
                         'children'    => [],
                         'description' => 'Configure the default and available filter options on the goal and achievements search page.',
                     ],
-                    '/adminv2/filters/classMarkbook' => [
-                        'name'        => $filterLabelBuilder->buildLabel(FilterPageModel::PAGE_CLASS_MARK_BOOK),
-                        'visible'     => $userIsSuperuser && $filterAvailabilityChecker->isAvailable(FilterPageModel::PAGE_CLASS_MARK_BOOK) && $this->configLoader->get(ConfigMapper::NAME_LMS_ENABLED),
-                        'children'    => [],
-                        'description' => 'Configure the default and available filter options on the class markbook.',
-                    ],
-                    '/adminv2/filters/courseMarkbook' => [
-                        'name'        => $filterLabelBuilder->buildLabel(FilterPageModel::PAGE_COURSE_MARK_BOOK),
-                        'visible'     => $userIsSuperuser && $filterAvailabilityChecker->isAvailable(FilterPageModel::PAGE_COURSE_MARK_BOOK) && $this->configLoader->get(ConfigMapper::NAME_LMS_ENABLED),
-                        'children'    => [],
-                        'description' => 'Configure the default and available filter options on the course markbook.',
-                    ],
-                    '/adminv2/filters/dueWorkCal' => [
-                        'name'        => $filterLabelBuilder->buildLabel(FilterPageModel::PAGE_UPCOMING_ASSESSMENTS),
-                        'visible'     => $userIsSuperuser && $filterAvailabilityChecker->isAvailable(FilterPageModel::PAGE_UPCOMING_ASSESSMENTS) && $this->configLoader->get(ConfigMapper::NAME_LMS_ENABLED),
-                        'children'    => [],
-                        'description' => 'Configure the default and available filter options on the students due work calendar.',
-                    ],
-                    '/adminv2/filters/grades' => [
-                        'name'        => $filterLabelBuilder->buildLabel(FilterPageModel::PAGE_GRADES),
-                        'visible'     => $userIsSuperuser && $filterAvailabilityChecker->isAvailable(FilterPageModel::PAGE_GRADES) && $this->configLoader->get(ConfigMapper::NAME_LMS_ENABLED),
-                        'children'    => [],
-                        'description' => 'Configure the default and available filter options on the continuous report / class grades page.',
-                    ],
-                    '/adminv2/filters/pending' => [
-                        'name'        => $filterLabelBuilder->buildLabel(FilterPageModel::PAGE_PENDING_ASSESSMENTS),
-                        'visible'     => $userIsSuperuser && $filterAvailabilityChecker->isAvailable(FilterPageModel::PAGE_PENDING_ASSESSMENTS),
-                        'children'    => [],
-                        'description' => 'Configure the default and available filter options on the pending assessments page.',
-                    ],
-                    '/adminv2/filters/rubricMarkbook' => [
-                        'name'        => $filterLabelBuilder->buildLabel(FilterPageModel::PAGE_RUBRIC_MARK_BOOK),
-                        'visible'     => $userIsSuperuser && $filterAvailabilityChecker->isAvailable(FilterPageModel::PAGE_RUBRIC_MARK_BOOK) &&  $this->configLoader->get(ConfigMapper::NAME_LMS_ENABLED),
-                        'children'    => [],
-                        'description' => 'Configure the default and available filter options on the class rubric markbook.',
-                    ],
                 ],
             ],
-            '/adminv2/import/folder' => [
+            '/adminv2/import' => [
                 'name'       => 'Import',
                 'visible'    => $userIsSuperuser,
                 'searchable' => false,
                 'children'   => [
-                    '/adminv2/import/folder' => [
-                        'name'        => 'Pages',
-                        'visible'     => $userIsSuperuser,
-                        'children'    => [],
-                        'description' => 'Import all school class pages via a CSV file.',
-                    ],
                     '/adminv2/import/pastoral' => [
                         'name'        => 'Pastoral Care',
                         'visible'     => $userIsSuperuser && $this->configLoader->get('external_type') === 'synergetic',
@@ -376,76 +332,197 @@ class Subnav
                     ],
                 ],
             ],
-            '/adminv2/terms' => [
+            '/adminv2/lms' => [
                 'name'       => 'LMS',
-                'visible'    => $userIsSuperuser,
+                'visible'    => $userIsSuperuser || $userHasServicePermissionLms,
                 'searchable' => false,
                 'children'   => [
                     '/adminv2/terms' => [
                         'name'        => 'Academic Period',
-                        'visible'     => $userIsSuperuser && $this->configLoader->get(ConfigMapper::NAME_LMS_ENABLED),
+                        'visible'     => (
+                            ($userIsSuperuser || $userHasServicePermissionLms) &&
+                            $this->configLoader->get(ConfigMapper::NAME_LMS_ENABLED)
+                        ),
                         'children'    => [],
                         'description' => 'Configure the blocks of time that assessments will be visible within, often called terms or semesters.',
                     ],
+                    '/adminv2/filters/lms/assessmentCal' => [
+                        'name'        => $filterLabelBuilder->buildLabel(FilterPageModel::PAGE_ASSESSMENT_CALENDAR) . ' Filter',
+                        'visible'     => (
+                            ($userIsSuperuser || $userHasServicePermissionLms) &&
+                            $filterAvailabilityChecker->isAvailable(FilterPageModel::PAGE_ASSESSMENT_CALENDAR)
+                        ),
+                        'children'    => [],
+                        'description' => 'Configure the default and available filter options on the assessment calendar.',
+                    ],
                     '/adminv2/bulkCourseImport' => [
                         'name'        => 'Bulk Course Import',
-                        'visible'     => $userIsSuperuser && $this->configLoader->get(ConfigMapper::NAME_LMS_ENABLED),
+                        'visible'     => (
+                            ($userIsSuperuser || $userHasServicePermissionLms) &&
+                            $this->configLoader->get(ConfigMapper::NAME_LMS_ENABLED)
+                        ),
                         'children'    => [],
                         'description' => '',
                     ],
+                    '/adminv2/filters/lms/classMarkbook' => [
+                        'name'        => $filterLabelBuilder->buildLabel(FilterPageModel::PAGE_CLASS_MARK_BOOK) . ' Filter',
+                        'visible'     => (
+                            ($userIsSuperuser || $userHasServicePermissionLms) &&
+                            $filterAvailabilityChecker->isAvailable(FilterPageModel::PAGE_CLASS_MARK_BOOK) &&
+                            $this->configLoader->get(ConfigMapper::NAME_LMS_ENABLED)
+                        ),
+                        'children'    => [],
+                        'description' => 'Configure the default and available filter options on the class markbook.',
+                    ],
                     '/adminv2/rollover' => [
                         'name'        => 'Class Rollover',
-                        'visible'     => $userIsSuperuser,
+                        'visible'     => ($userIsSuperuser || $userHasServicePermissionLms),
                         'children'    => [],
                         'description' => 'At the end of the year or semester, archive your class pages so you can start fresh the following year.',
                     ],
                     '/adminv2/course-builder' => [
                         'name'        => 'Course Builder',
-                        'visible'     => $userIsSuperuser && $this->configLoader->get(ConfigMapper::NAME_LMS_ENABLED),
+                        'visible'     => (
+                            ($userIsSuperuser || $userHasServicePermissionLms) &&
+                            $this->configLoader->get(ConfigMapper::NAME_LMS_ENABLED)
+                        ),
                         'children'    => [],
                         'description' => 'Configure the default page templates and permissions for course and unit pages.',
                     ],
-                    '/adminv2/setting/Document%20Management' => [
+                    '/adminv2/filters/lms/courseMarkbook' => [
+                        'name'        => $filterLabelBuilder->buildLabel(FilterPageModel::PAGE_COURSE_MARK_BOOK) . ' Filter',
+                        'visible'     => (
+                            ($userIsSuperuser || $userHasServicePermissionLms) &&
+                            $filterAvailabilityChecker->isAvailable(FilterPageModel::PAGE_COURSE_MARK_BOOK) &&
+                            $this->configLoader->get(ConfigMapper::NAME_LMS_ENABLED)
+                        ),
+                        'children'    => [],
+                        'description' => 'Configure the default and available filter options on the course markbook.',
+                    ],
+                    '/adminv2/setting/lms/Document Management' => [
                         'name'        => 'Document Management',
-                        'visible'     => $userIsSuperuser && count($enabledConfigs[ConfigMapper::TYPE_DOC_MANAGE] ?? []) > 0 && $this->configLoader->get('external_type') === 'synergetic',
+                        'visible'     => (
+                            ($userIsSuperuser || $userHasServicePermissionLms) &&
+                            count($enabledConfigs[ConfigMapper::TYPE_DOC_MANAGE] ?? []) > 0 &&
+                            $this->configLoader->get('external_type') === 'synergetic'
+                        ),
                         'children'    => [],
                         'description' => 'Configure which Synergetic DocMan documents are visible via the Academic Reports button on the students profile.',
                     ],
                     '/adminv2/grades' => [
                         'name'        => 'Grades',
-                        'visible'     => $userIsSuperuser && $this->configLoader->get(ConfigMapper::NAME_LMS_ENABLED),
+                        'visible'     => (
+                            ($userIsSuperuser || $userHasServicePermissionLms) &&
+                            $this->configLoader->get(ConfigMapper::NAME_LMS_ENABLED)
+                        ),
                         'children'    => [],
                         'description' => 'Configure the available grade scales that can be used for assessment and marking.',
                     ],
+                    '/adminv2/filters/lms/grades' => [
+                        'name'        => $filterLabelBuilder->buildLabel(FilterPageModel::PAGE_GRADES) . ' Filter',
+                        'visible'     => (
+                            ($userIsSuperuser || $userHasServicePermissionLms) &&
+                            $filterAvailabilityChecker->isAvailable(FilterPageModel::PAGE_GRADES) &&
+                            $this->configLoader->get(ConfigMapper::NAME_LMS_ENABLED)
+                        ),
+                        'children'    => [],
+                        'description' => 'Configure the default and available filter options on the continuous report / class grades page.',
+                    ],
+                    '/adminv2/import/folder' => [
+                        'name'        => 'Import Pages',
+                        'visible'     => ($userIsSuperuser || $userHasServicePermissionLms),
+                        'children'    => [],
+                        'description' => 'Import all school class pages via a CSV file.',
+                    ],
                     '/adminv2/lesson-plan/template' => [
                         'name'        => $rosettaStone->translate("lessonPlan", false, true) . ' Templates',
-                        'visible'     => $userIsSuperuser && $this->configLoader->get(ConfigMapper::NAME_LMS_ENABLED),
+                        'visible'     => (
+                            ($userIsSuperuser || $userHasServicePermissionLms) &&
+                            $this->configLoader->get(ConfigMapper::NAME_LMS_ENABLED)
+                        ),
                         'children'    => [],
                         'description' => 'Configure ' . $rosettaStone->translate("lessonPlan", false, false) . ' templates.',
                     ],
-                    '/adminv2/setting/LMS%20Policy' => [
+                    '/adminv2/setting/lms/LMS Policy' => [
                         'name'        => 'LMS Policy',
-                        'visible'     => $userIsSuperuser && count($enabledConfigs[ConfigMapper::TYPE_LMS_POLICY] ?? []) > 0 && $this->configLoader->get(ConfigMapper::NAME_LMS_ENABLED),
+                        'visible'     => (
+                            ($userIsSuperuser || $userHasServicePermissionLms) &&
+                            count($enabledConfigs[ConfigMapper::TYPE_LMS_POLICY] ?? []) > 0 &&
+                            $this->configLoader->get(ConfigMapper::NAME_LMS_ENABLED)
+                        ),
                         'children'    => [],
                         'description' => 'Configure policy related to continuous reporting, grades, due work, assessment and feedback.',
                     ],
                     '/adminv2/lti' => [
                         'name'        => 'LTI Tools',
-                        'visible'     => $userIsSuperuser,
+                        'visible'     => ($userIsSuperuser || $userHasServicePermissionLms),
                         'children'    => [],
                         'description' => 'Configure the 3rd party LTI integrations that you wish to make available for use in the LTI component.',
                     ],
+                    '/adminv2/filters/lms/dueWorkCal' => [
+                        'name'        => $filterLabelBuilder->buildLabel(FilterPageModel::PAGE_UPCOMING_ASSESSMENTS) . ' Filter',
+                        'visible'     => (
+                            ($userIsSuperuser || $userHasServicePermissionLms) &&
+                            $filterAvailabilityChecker->isAvailable(FilterPageModel::PAGE_UPCOMING_ASSESSMENTS) &&
+                            $this->configLoader->get(ConfigMapper::NAME_LMS_ENABLED)
+                        ),
+                        'children'    => [],
+                        'description' => 'Configure the default and available filter options on the students due work calendar.',
+                    ],
+                    '/adminv2/filters/lms/pending' => [
+                        'name'        => $filterLabelBuilder->buildLabel(FilterPageModel::PAGE_PENDING_ASSESSMENTS) . ' Filter',
+                        'visible'     => (
+                            ($userIsSuperuser || $userHasServicePermissionLms) &&
+                            $filterAvailabilityChecker->isAvailable(FilterPageModel::PAGE_PENDING_ASSESSMENTS)
+                        ),
+                        'children'    => [],
+                        'description' => 'Configure the default and available filter options on the pending assessments page.',
+                    ],
+                    '/adminv2/filters/lms/rubricMarkbook' => [
+                        'name'        => $filterLabelBuilder->buildLabel(FilterPageModel::PAGE_RUBRIC_MARK_BOOK) . ' Filter',
+                        'visible'     => (
+                            ($userIsSuperuser || $userHasServicePermissionLms) &&
+                            $filterAvailabilityChecker->isAvailable(FilterPageModel::PAGE_RUBRIC_MARK_BOOK) &&
+                            $this->configLoader->get(ConfigMapper::NAME_LMS_ENABLED)
+                        ),
+                        'children'    => [],
+                        'description' => 'Configure the default and available filter options on the class rubric markbook.',
+                    ],
                     '/adminv2/rubric-result-set' => [
                         'name'        => 'Rubric Result Sets',
-                        'visible'     => $userIsSuperuser && $this->configLoader->get(ConfigMapper::NAME_LMS_ENABLED),
+                        'visible'     => (
+                            ($userIsSuperuser || $userHasServicePermissionLms) &&
+                            $this->configLoader->get(ConfigMapper::NAME_LMS_ENABLED)
+                        ),
                         'description' => 'Setup quick fill results for rubrics to help quickly build a rubric with generic level descriptors.',
                         'children'    => []
                     ],
                     '/adminv2/summative-report' => [
                         'name'        => 'Summative Reports',
-                        'visible'     => $userIsSuperuser && $this->configLoader->get(ConfigMapper::NAME_SUMMATIVE_REPORT_ENABLED),
+                        'visible'     => (
+                            ($userIsSuperuser || $userHasServicePermissionLms) &&
+                            $this->configLoader->get(ConfigMapper::NAME_SUMMATIVE_REPORT_ENABLED)
+                        ),
                         'children'    => [],
                         'description' => 'Configure a batch of student summative reports to be printed to PDF for reporting purposes.',
+                    ],
+                    '/adminv2/lists/lms/submission-errors' => [
+                        'name'        => 'Submission States List',
+                        'visible'     => (
+                            ($userIsSuperuser || $userHasServicePermissionLms) &&
+                            $this->configLoader->get(ConfigMapper::NAME_LMS_ENABLED)
+                        ),
+                        'children'    => [],
+                        'description' => 'Configure the alternative states an assessment can be in beyond being graded.',
+                    ],
+                    '/adminv2/lists/lms/submission-type' => [
+                        'name'        => 'Work Types List',
+                        'visible'     => (
+                            ($userIsSuperuser || $userHasServicePermissionLms) &&
+                            $this->configLoader->get(ConfigMapper::NAME_LMS_ENABLED)
+                        ),
+                        'children'    => [],
+                        'description' => 'Setup the categorisation for assessments, useful for filtering and report creation.',
                     ],
                 ],
             ],
@@ -502,12 +579,6 @@ class Subnav
                         'children'    => [],
                         'description' => 'Configure user roles within the system, the type of access they have and permissions.',
                     ],
-                    '/adminv2/lists/submission-errors' => [
-                        'name'        => 'Submission States',
-                        'visible'     => $userIsSuperuser && $this->configLoader->get(ConfigMapper::NAME_LMS_ENABLED),
-                        'children'    => [],
-                        'description' => 'Configure the alternative states an assessment can be in beyond being graded.',
-                    ],
                     '/adminv2/lists/timetable-colour' => [
                         'name'        => 'Timetable Colours',
                         'visible'     => $userIsSuperuser,
@@ -525,12 +596,6 @@ class Subnav
                         'visible'     => $userIsSuperuser,
                         'children'    => [],
                         'description' => 'Configure the drop down list of pronouns available for users.',
-                    ],
-                    '/adminv2/lists/submission-type' => [
-                        'name'        => 'Work Types',
-                        'visible'     => $userIsSuperuser && $this->configLoader->get(ConfigMapper::NAME_LMS_ENABLED),
-                        'children'    => [],
-                        'description' => 'Setup the categorisation for assessments, useful for filtering and report creation.',
                     ],
                     '/adminv2/lists/year-levels' => [
                         'name'        => 'Year Levels',
