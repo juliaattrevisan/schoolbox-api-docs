@@ -701,10 +701,22 @@ class SimpleTest extends TestCase
                     '[surname]'    => 'Reed',
                 ],
             ],
-            'Real-world summative report example: non-matching' => [
+            'Real-world summative report example: non-matching start' => [
                 '[externalId] blargh',
                 '201/Semester Report - Jana Reed',
                 false,
+            ],
+            'Real-world summative report example: non-matching end' => [
+                'blargh [externalId]',
+                '201/Semester Report - Jana Reed',
+                false,
+            ],
+            'Real-world summative report example: partial match end' => [
+                '[externalId]/Semester Report',
+                '201/Semester Report - Jana Reed',
+                [
+                    '[externalId]' => '201',
+                ],
             ],
         ];
     }

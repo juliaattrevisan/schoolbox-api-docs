@@ -134,7 +134,7 @@ class Simple
         while (!empty($bodyParts)) {
             $bodyPart = array_shift($bodyParts);
             if (str_starts_with($bodyPart, self::TOKEN_OPEN)) {
-                // This is a token:
+                // This body part is a token:
                 // find the next non-token body part, and find its position in
                 // `$replacedBody`.
                 // Anything before that position must be the value which was
@@ -172,9 +172,16 @@ class Simple
                     }
                 }
             } else {
-                // This is not a token:
-                // remove its character count from `$replacedBody`, and continue
-                $replacedBody = substr($replacedBody, strlen($bodyPart));
+                // This body part is not a token:
+                // trim that part's length off the start of `$replacedBody`,
+                // and process the rest of `$replacedBody`.
+                if (str_starts_with($replacedBody, $bodyPart)) {
+                    $replacedBody = substr($replacedBody, strlen($bodyPart));
+                } else {
+                    // If the body part doesn't match the replaced body,
+                    // this can't possibly be a match.
+                    return false;
+                }
             }
         }
 
