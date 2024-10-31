@@ -70,9 +70,10 @@ function onButtonSelect(): void {
 }
 
 /**
- * To open up the course selector modal
+ * To update the course selection considering the
+ * selection made in the modal
  */
-function onModalClose(): void {
+function onModalSelect(): void {
     isModalOpen.value = false;
 }
 </script>
@@ -95,7 +96,7 @@ function onModalClose(): void {
         button-icon="icon-course"
         @button-select="onButtonSelect"
     />
-    <search-select-modal :is-open="isModalOpen" @close="onModalClose" />
+    <search-select-modal v-model:is-open="isModalOpen" @select="onModalSelect" />
 </template>
 
 <style scoped></style>

@@ -4,15 +4,12 @@
  * for foundation based <reveal-modal /> component
  */
 
-interface Props {
-    isOpen: boolean; // whether the modal is open
-}
-const props = defineProps<Props>();
+const isOpen = defineModel<boolean>("is-open", { default: false }); // to open/close the modal
 </script>
 
 <template>
     <Teleport to="body">
-        <div v-if="props.isOpen" class="modal">
+        <div v-if="isOpen" class="modal">
             <div class="modal__container">
                 <!-- @slot Reveal modal content goes into this slot -->
                 <slot></slot>

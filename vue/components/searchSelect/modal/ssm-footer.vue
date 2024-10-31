@@ -2,30 +2,20 @@
 /**
  * Display the modal buttons
  */
-
-// import { useModalStore } from "./store/coseModalStore";
-// import { useSelectedNodesStore } from "../store/csSelectedNodesStore";
-// import { useModalSelectedNodesStore } from "../store/csModalSelectedNodesStore";
-
-// const modalStore = useModalStore();
-// const selectedNodesStore = useSelectedNodesStore();
-// const modalSelectedNodesStore = useModalSelectedNodesStore();
-
 const emit = defineEmits<{
     cancel: [];
     select: [];
 }>();
 
 /**
- * Close the modal
+ * To prompt the modal close
  */
 function onCancel(): void {
     emit("cancel");
 }
 
 /**
- * The selection has been confirmed, so close the modal
- * and insert into the current selection
+ * To prompt the modal select
  */
 function onSelect(): void {
     emit("select");
