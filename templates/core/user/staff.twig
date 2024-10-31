@@ -16,7 +16,7 @@
 <div class="actions-small-{{ isSuperuser ? 1 : 0 }} row">
     <div class="list-item">
         <div class="small-12 column">
-            <h1 data-test="user-profile-name">{{ user.formatName() }}</h1>
+            <h1 data-test="user-profile-name">{{ user.formatName(nameFormat) }}</h1>
         </div>
     </div>
     <nav>
