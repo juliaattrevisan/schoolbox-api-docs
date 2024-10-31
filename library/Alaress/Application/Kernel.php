@@ -142,6 +142,7 @@ use Schoolbox\Notif\MQ\ConnectorFactory;
 use Schoolbox\Notif\Notifactory;
 use Schoolbox\Notif\StorefileLogger as NotifStorefileLogger;
 use Schoolbox\Oidc\CacheHelper;
+use Schoolbox\Oidc\Server\BackChannelLogout\RequestFactory;
 use Schoolbox\Oidc\Server\RelyingParty\Mapper as RelyingPartyMapper;
 use Schoolbox\Pastoral\AccessLevelCensor;
 use Schoolbox\Pastoral\Audit\Mapper as PastoralAuditMapper;
@@ -2242,6 +2243,18 @@ abstract class Kernel
                             session_get_cookie_params()
                         ),
                         new Remember\Redis(INSTANCE_ID, $redisStorage),
+                    );
+                }
+            )
+        );
+
+        $di->set(
+            'user.logout.requestFactory',
+            $di->lazy(
+                function () use ($di) {
+                    return new RequestFactory(
+                        $di->get('user.tokenBuilder'),
+                        $di->get('httpFactory'),
                     );
                 }
             )

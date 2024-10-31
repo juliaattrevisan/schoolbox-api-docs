@@ -10,10 +10,16 @@ namespace Schoolbox\User;
 
 use Alaress\Session\ImpersonationCheck;
 use Alaress\Web\Controller\Base;
+use GuzzleHttp\ClientInterface;
+use Schoolbox\Oidc\Server\BackChannelLogout\RequestFactory;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\User;
 use User\Logger;
 use External_User;
+use Ramsey\Uuid\Uuid;
+use Schoolbox\Oidc\Server\RelyingParty\Mapper as RelyingPartyMapper;
+use Schoolbox\Oidc\Server\BackChannelLogout;
+use Schoolbox\Oidc\Server\Controller as OidcServerController;
 
 class Controller extends Base
 {
@@ -25,12 +31,24 @@ class Controller extends Base
     /** @var Logger\Mapper */
     private $assumeUserLogMapper;
 
+    /** @var RelyingPartyMapper */
+    private $relyingPartyMapper;
+    private $requestFactory;
+
+    private $httpClient;
+
     public function __construct(
         UserAccessMapper $userAccessMapper,
-        Logger\Mapper $assumeUserLogMapper
+        Logger\Mapper $assumeUserLogMapper,
+        RelyingPartyMapper $relyingPartyMapper,
+        RequestFactory $requestFactory,
+        ClientInterface $httpClient,
     ) {
         $this->userAccessMapper    = $userAccessMapper;
         $this->assumeUserLogMapper = $assumeUserLogMapper;
+        $this->relyingPartyMapper  = $relyingPartyMapper;
+        $this->requestFactory      = $requestFactory;
+        $this->httpClient          = $httpClient;
     }
 
 
@@ -48,6 +66,8 @@ class Controller extends Base
         $currentUser    = $this->getUser();
         $initialUser    = $this->session->get(ImpersonationCheck::SESSION_KEY_INITIAL_USER);
         $sessionHandler = new \Session();
+        $oidcServerClients = $this->session
+            ->get(OidcServerController::SESSION_OIDC_SERVER_CLIENTS);
 
         if ($sessionHandler->create($user->getUsername())) {
             // Log the user which began impersonation
@@ -73,6 +93,15 @@ class Controller extends Base
             // is what `recoverSession()` does.
             $sessionHandler->create($currentUser->getUsername());
         }
+
+        $this->logoutOIDCSessions(
+            $this->relyingPartyMapper,
+            $this->requestFactory,
+            $this->httpClient,
+            $this->getUser(),
+            $oidcServerClients,
+        );
+
         $this->response = $this->redirectFound('/');
     }
 
@@ -128,12 +157,62 @@ class Controller extends Base
     private function recoverSessionInternal(string $key): void
     {
         $user = $this->session->get($key);
+        $oidcServerClients = $this->session
+            ->get(OidcServerController::SESSION_OIDC_SERVER_CLIENTS);
         if ($user instanceof User) {
             $session = new \Session();
             if (!$session->create($user->getUsername())) {
                 $session->destroy();
             }
+            $this->logoutOIDCSessions(
+                $this->relyingPartyMapper,
+                $this->requestFactory,
+                $this->httpClient,
+                $this->getUser(),
+                $oidcServerClients
+            );
         }
         $this->response = $this->redirectFound('/');
+    }
+
+    /**
+     * Sending request to log out of the oAuth session
+     *
+     * @param RelyingPartyMapper $relyingPartyMapper
+     * @param RequestFactory     $logoutFactory
+     * @param ClientInterface    $httpClient
+     * @param User               $initialUser
+     * @param array|null         $oidcServerClients
+     * @return void
+     */
+    private function logoutOIDCSessions(
+        RelyingPartyMapper $relyingPartyMapper,
+        RequestFactory $logoutFactory,
+        ClientInterface $httpClient,
+        User $initialUser,
+        ?array $oidcServerClients,
+    ): void {
+        // This is similar to what's implemented in www/logout.php when user logs out
+        $backChannelRequests = [];
+        foreach ($oidcServerClients ?? [] as $clientId) {
+            // Does this client support logout?
+            // If so, craft a logout token and send it
+            $client = $relyingPartyMapper->findByClientId($clientId);
+            if ($client?->getBackChannelLogoutUri()) {
+                // Create logout factory and client on demand only
+                $request = $logoutFactory->build(
+                    $initialUser,
+                    $client,
+                    Uuid::uuid4()->toString()
+                );
+                $logoutClient ??= new BackChannelLogout\Client($httpClient);
+                $backChannelRequests[$clientId] = $logoutClient->send($request);
+            }
+
+            // Wait for any back-channel requests to complete
+            if (!empty($backChannelRequests)) {
+                \GuzzleHttp\Promise\Utils::settle($backChannelRequests)->wait();
+            }
+        }
     }
 }
