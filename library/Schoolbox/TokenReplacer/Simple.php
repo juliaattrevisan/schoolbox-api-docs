@@ -191,25 +191,6 @@ class Simple
 
 
     /**
-     * Replace using Scrub::html, to return replaced html
-     *
-     * @deprecated use escape strategy `IEscapeStrategy\ScrubHtml` instead
-     * @param string $body
-     * @param array  $replacements
-     * @return string
-     */
-    public function replaceHtml(string $body, array $replacements): string
-    {
-        $body = $this->stripMentionAttribute($body);
-        $sanitisedReplacements = array_map(static function ($val) {
-            return \Scrub::html($val);
-        }, array_values($replacements));
-
-        return str_replace(array_keys($replacements), $sanitisedReplacements, $body);
-    }
-
-
-    /**
      * Diagnostic for seeing which tokens are available for substitutions
      *
      * @param string $body
