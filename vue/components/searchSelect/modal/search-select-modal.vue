@@ -3,7 +3,7 @@
  * A modal to search and select items
  */
 
-import SbxModal from "@schoolboxVue/components/modal/sbx-modal.ce.vue";
+import BasicModal from "@schoolboxVue/components/modal/basic-modal.vue";
 
 interface Props {
     isOpen: boolean; // whether the modal is open
@@ -13,7 +13,7 @@ const props = defineProps<Props>();
 
 <template>
     <div>
-        <sbx-modal v-if="props.isOpen"></sbx-modal>
+        <basic-modal :is-open="props.isOpen"></basic-modal>
     </div>
 </template>
 
