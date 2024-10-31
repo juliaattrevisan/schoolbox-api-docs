@@ -108,6 +108,7 @@ class Controller extends Base
                     ->setReadOnly(false)
                     ->setFileVar('report')
                     ->setMulti(false)
+                    ->useImportExpiryDate()
                     ->getTwigContext(),
             ],
             $this->translator->translate('pastoral', capital: true) . ' Bulk Import',
