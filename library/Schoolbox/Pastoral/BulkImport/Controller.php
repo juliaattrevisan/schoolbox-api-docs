@@ -12,6 +12,7 @@ namespace Schoolbox\Pastoral\BulkImport;
 use Alaress\Web\Controller\Base;
 use League\Flysystem\FilesystemException;
 use Schoolbox\Config\ConfigMapper;
+use Schoolbox\GenericCollection;
 use Schoolbox\L10n\RosettaStone;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Pastoral;
@@ -80,70 +81,30 @@ class Controller extends Base
     public function getForm(): void
     {
         // Requirements for loading pastoral visibility inputs
-        // TODO extract elsewhere, and use in pastoral modify form as well
         $allowIndividual = $this->getConfigLoader()->get(ConfigMapper::NAME_PASTORAL_INDIVIDUAL_ACCESS_ENABLED);
         $allowParents    = $this->getConfigLoader()->get(ConfigMapper::NAME_PASTORAL_PARENT_ACCESS_ENABLED);
         $allowStudents   = $this->getConfigLoader()->get(ConfigMapper::NAME_PASTORAL_STUDENT_ACCESS_ENABLED);
 
         // Load roles and empty counts to display on pastoral visibility
-        $roles          = $this->roleMapper->createCollection();
-        $roleUserCounts = [];
-        $rolesWithUsers = [];
-        $allowedRoles   = $this->pastoralAccessMapper->determineAllowedRoles();
-        foreach ($allowedRoles as $roleCurrent) {
-            $rolesWithUsers[$roleCurrent->getId()] = false;
-            $roleUserCounts[$roleCurrent->getId()] = 0;
-            if ($roleCurrent->isStaff() && $roleCurrent->getAccessPastoral()) {
-                $roles[] = $roleCurrent;
-            }
-            if ($allowParents && $roleCurrent->isParent()) {
-                $roles[] = $roleCurrent;
-            }
-        }
+        $roles          = $this->loadRoles($allowParents);
+        $roleUserCounts = $this->loadRoleUserCounts($roles);
+        $rolesWithUsers = $this->loadRolesWithUsers($roles);
 
         // Requirements for updating selections on change
         // TODO extract elsewhere, and use in pastoral modify form as well
         $types            = $this->pastoralTypeMapper->findAll();
         $subtypes         = $this->pastoralSubTypeMapper->findAll();
-        $audiences        = $this->pastoralAudienceMapper->findAll()->filter($this->pastoralAudienceMapper->getPermissionCallback());
-        $typeAudiences    = [];
-        $subtypeAudiences = [];
-        foreach ($audiences as $audience) {
-            if ($audience->getSubtype()) {
-                $subtypeAudiences[$audience->getSubtype()->getId()][] = $audience;
-            } else {
-                $typeAudiences[$audience->getType()->getId()][] = $audience;
-            }
-        }
+        $audiences        = $this->loadAudiences();
+        $typeAudiences    = $this->loadTypeAudiences($audiences);
+        $subtypeAudiences = $this->loadSubtypeAudiences($audiences);
 
-        $typesIndex        = [];
-        $typesIndexPrivate = [];
-        $audienceDefaults  = [];
-        foreach ($types as $type) {
-            $typesIndex[$type->getId()]        = $type->getTemplate();
-            $typesIndexPrivate[$type->getId()] = $type->getTemplatePrivate();
-            if (key_exists($type->getId(), $typeAudiences) || $type->getVisibilityLocked()) {
-                $audienceDefaults[] = [
-                    'typeId'    => $type->getId(),
-                    'subtypeId' => 0,
-                    'audiences' => $typeAudiences[$type->getId()] ?? [],
-                ];
-            }
-        }
-
-        $subtypesIndex        = [];
-        $subtypesIndexPrivate = [];
-        foreach ($subtypes as $subtype) {
-            $subtypesIndex[$subtype->getId()]        = $subtype->getTemplate();
-            $subtypesIndexPrivate[$subtype->getId()] = $subtype->getTemplatePrivate();
-            if (key_exists($subtype->getId(), $subtypeAudiences) || $subtype->getVisibilityLocked()) {
-                $audienceDefaults[] = [
-                    'typeId'    => $subtype->getPastoralType()->getId(),
-                    'subtypeId' => $subtype->getId(),
-                    'audiences' => $subtypeAudiences[$subtype->getId()] ?? [],
-                ];
-            }
-        }
+        [
+            $typesIndex,
+            $typesIndexPrivate,
+            $audienceDefaults,
+            $subtypesIndex,
+            $subtypesIndexPrivate
+        ] = $this->loadTypeAndSubtypeDefaults($types, $typeAudiences, $subtypes, $subtypeAudiences);
 
         $this->response = $this->responseFromTemplate(
             '@pastoralBulkImport/form.twig',
@@ -399,5 +360,132 @@ class Controller extends Base
         }
 
         return $files;
+    }
+
+
+    /**
+     * @param mixed $allowParentRoles
+     * @return GenericCollection<Role>
+     */
+    private function loadRoles(bool $allowParentRoles): GenericCollection
+    {
+        $roles        = $this->roleMapper->createCollection();
+        $allowedRoles = $this->pastoralAccessMapper->determineAllowedRoles();
+        foreach ($allowedRoles as $roleCurrent) {
+            if ($roleCurrent->isStaff() && $roleCurrent->getAccessPastoral()) {
+                $roles[] = $roleCurrent;
+            }
+            if ($allowParentRoles && $roleCurrent->isParent()) {
+                $roles[] = $roleCurrent;
+            }
+        }
+        return $roles;
+    }
+
+    /**
+     * @param GenericCollection<Role> $roles
+     * @return array
+     */
+    private function loadRoleUserCounts(GenericCollection $roles): array
+    {
+        $roleUserCounts = [];
+        foreach ($roles as $roleCurrent) {
+            // This depends on whether the role count is actually shown
+            $roleUserCounts[$roleCurrent->getId()] = 0;
+        }
+        return $roleUserCounts;
+    }
+
+    /**
+     * @param GenericCollection<Role> $roles
+     * @return array
+     */
+    private function loadRolesWithUsers(GenericCollection $roles): array
+    {
+        $roleUserCounts = [];
+        foreach ($roles as $roleCurrent) {
+            // This depends on whether the role count is actually shown
+            $roleUserCounts[$roleCurrent->getId()] = false;
+        }
+        return $roleUserCounts;
+    }
+
+    /**
+     * @return GenericCollection<Pastoral\Audience\Model>
+     */
+    private function loadAudiences(): GenericCollection
+    {
+        return $this->pastoralAudienceMapper->findAll()->filter($this->pastoralAudienceMapper->getPermissionCallback());
+    }
+
+    /**
+     * @param GenericCollection<Pastoral\Audience\Model> $audiences
+     * @return array<Pastoral\Audience\Model>
+     */
+    private function loadTypeAudiences(GenericCollection $audiences): array
+    {
+        $typeAudiences = [];
+        foreach ($audiences as $audience) {
+            if (!$audience->getSubtype()) {
+                $typeAudiences[$audience->getType()->getId()][] = $audience;
+            }
+        }
+        return $typeAudiences;
+    }
+
+
+    /**
+     * @param GenericCollection<Pastoral\Audience\Model> $audiences
+     * @return array<Pastoral\Audience\Model>
+     */
+    private function loadSubtypeAudiences(GenericCollection $audiences): array
+    {
+        $subtypeAudiences = [];
+        foreach ($audiences as $audience) {
+            if ($audience->getSubtype()) {
+                $subtypeAudiences[$audience->getSubtype()->getId()][] = $audience;
+            }
+        }
+        return $subtypeAudiences;
+    }
+
+    /**
+     * @param GenericCollection $types
+     * @param mixed                   $typeAudiences
+     * @param GenericCollection $subtypes
+     * @param mixed                   $subtypeAudiences
+     * @return array
+     */
+    private function loadTypeAndSubtypeDefaults(GenericCollection $types, mixed $typeAudiences, GenericCollection $subtypes, mixed $subtypeAudiences): array
+    {
+        $typesIndex        = [];
+        $typesIndexPrivate = [];
+        $audienceDefaults  = [];
+        foreach ($types as $type) {
+            $typesIndex[$type->getId()]        = $type->getTemplate();
+            $typesIndexPrivate[$type->getId()] = $type->getTemplatePrivate();
+            if (key_exists($type->getId(), $typeAudiences) || $type->getVisibilityLocked()) {
+                $audienceDefaults[] = [
+                    'typeId'    => $type->getId(),
+                    'subtypeId' => 0,
+                    'audiences' => $typeAudiences[$type->getId()] ?? [],
+                ];
+            }
+        }
+
+        $subtypesIndex        = [];
+        $subtypesIndexPrivate = [];
+        foreach ($subtypes as $subtype) {
+            $subtypesIndex[$subtype->getId()]        = $subtype->getTemplate();
+            $subtypesIndexPrivate[$subtype->getId()] = $subtype->getTemplatePrivate();
+            if (key_exists($subtype->getId(), $subtypeAudiences) || $subtype->getVisibilityLocked()) {
+                $audienceDefaults[] = [
+                    'typeId'    => $subtype->getPastoralType()->getId(),
+                    'subtypeId' => $subtype->getId(),
+                    'audiences' => $subtypeAudiences[$subtype->getId()] ?? [],
+                ];
+            }
+        }
+        return [$typesIndex, $typesIndexPrivate, $audienceDefaults, $subtypesIndex, $subtypesIndexPrivate];
     }
 }
