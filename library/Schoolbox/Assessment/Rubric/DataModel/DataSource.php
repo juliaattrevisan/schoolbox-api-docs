@@ -1240,8 +1240,11 @@ class DataSource
                 INNER JOIN rubric_indicator        ri ON ri.rubric_capability_id = rc.id
                 INNER JOIN submission_return       sr ON rcm.return_id = sr.id
                 INNER JOIN submission_box          sb ON sr.box_id = sb.id
+                -- Join rubric_indicator_usage to remove indicators indicators that aren't part of the submission
+                INNER JOIN rubric_indicator_usage  riu ON riu.rubric_indicator_id = ri.id AND riu.submission_box_id = sb.id
                 INNER JOIN assessment               a ON sb.assessment_id = a.id
-                LEFT  JOIN rubric_indicator_mark  rim ON rcm.id = rim.rubric_capability_mark_id
+                -- Check for rubric_indicator_mark_id match to avoid duplicate results after the join
+                LEFT  JOIN v_rubric_indicator_mark_extend  rim ON rcm.id = rim.rubric_capability_mark_id AND rim.rubric_indicator_id = ri.id
                 LEFT  JOIN rubric_descriptor       rd ON rim.descriptor_id = rd.id
                 LEFT  JOIN rubric_level            rl ON rd.level_id = rl.id
                 WHERE {$where}
