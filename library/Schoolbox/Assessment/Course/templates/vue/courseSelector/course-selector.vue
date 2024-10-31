@@ -117,6 +117,7 @@ function onModalSelect(): void {
         @button-select="onButtonSelect"
     />
     <search-select-modal
+        v-model:selected="store.selected"
         v-model:is-open="isModalOpen"
         v-model:results="modalResults"
         title="Browse Courses"

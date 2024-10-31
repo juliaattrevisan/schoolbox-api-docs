@@ -149,16 +149,12 @@ function onHover(index: number): void {
 
 <style lang="scss" scoped>
 .results {
+    border: 1px solid var(--form-border-color);
     max-height: 400px;
     overflow: auto;
     width: 100%;
-    &:last-child {
-        border-bottom: v-bind(bottomBorder);
-    }
     &__status {
         background: var(--color-foreground-primary);
-        border-left: 1px solid var(--form-border-color);
-        border-right: 1px solid var(--form-border-color);
         font-size: 0.825rem;
         font-style: italic;
         padding: var(--spacing-s);
