@@ -1,5 +1,6 @@
 /**
  * Search for results that match the current query
+ * Currently assumes that the query string is identified with the key "query"
  */
 
 import debounce from "lodash/debounce";
@@ -99,7 +100,6 @@ export function useSearch(
      * clear the current search
      */
     function clear(): void {
-        query.value = "";
         results.value = [];
         isSearching.value = false;
         hasSearched.value = false;
@@ -107,7 +107,10 @@ export function useSearch(
     }
 
     /**
-     * start searching once the search is active, watching the query string for input
+     * start searching once the search is active,
+     * watching the query string for input
+     * also bring up the results without a query
+     * if requiresQuery is false
      */
     window.Vue.watch(
         () => query.value,
@@ -115,7 +118,11 @@ export function useSearch(
             if (isActive.value) {
                 enableSearch();
                 await debounceSearch();
+            } else if (!requiresQuery) {
+                // bring up the default results if we don't need a query
+                void search();
             } else if (hasSearched.value) {
+                // clear the search if we move to an empty query
                 clear();
             }
         },
