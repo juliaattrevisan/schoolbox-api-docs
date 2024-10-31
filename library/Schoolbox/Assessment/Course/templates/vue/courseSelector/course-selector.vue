@@ -48,7 +48,12 @@ const { ignoreUpdates } = watchIgnorable(results, (newResults: CourseAPIResponse
     });
 });
 
+/**-----------------------------------------------
+ * Modal related features
+ ------------------------------------------------*/
+
 const isModalOpen = window.Vue.ref(false);
+const modalResults = window.Vue.ref<Course[]>([]);
 
 /**
  * To select a link to the course
