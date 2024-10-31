@@ -100,6 +100,7 @@ class Handler
             case 'allRelationshipTypes':
                 return $this->handleAllRelationshipTypesRequest();
             case 'updateDetailsData':
+                $this->validateUpdateDetailsRequestData($data);
                 return $this->handleUpdateDetailsDataRequest($data);
             case 'healthcheck':
                 return $this->handleHealthCheckRequest();
