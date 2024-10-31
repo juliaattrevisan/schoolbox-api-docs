@@ -46,6 +46,7 @@ class Mapper extends \Schoolbox\Mapper
         $this->uses('icon', self::TYPE_STRING);
         $this->uses('css', self::TYPE_STRING);
         $this->uses('click_to_reveal', self::TYPE_INTEGER);
+        $this->uses('is_external', self::TYPE_BOOLEAN);
 
         $this->hasJoin(
             'availabilityCampus',
@@ -201,7 +202,7 @@ class Mapper extends \Schoolbox\Mapper
         if ($viewee->getId() === $viewer->getId()) {
             $query = "
                 SELECT DISTINCT
-                    f.*, 
+                    f.*,
                     {$this->getJoinColumnString('visibility', 'pfrv')}
                 FROM {$this->getTable()} f
                 INNER JOIN profile_field_campus_availability pfca ON f.id = pfca.profile_field_id
@@ -210,14 +211,14 @@ class Mapper extends \Schoolbox\Mapper
                 AND pfca.campus_id IN {$vieweeCampusPlaceholders}
                 AND (pfrv.roletype = :viewerRoleType OR pfrv.roletype = :selfRoleType)
                 AND f.enabled = :enabled
-                ORDER BY f.sequence ASC 
+                ORDER BY f.sequence ASC
             ";
 
             $params['selfRoleType'] = Payload::ROLETYPE_SELF;
         } else {
             $query = "
-                SELECT DISTINCT 
-                    f.*, 
+                SELECT DISTINCT
+                    f.*,
                     {$this->getJoinColumnString('visibility', 'pfrv')}
                 FROM {$this->getTable()} f
                 INNER JOIN profile_field_campus_availability pfca ON f.id = pfca.profile_field_id
@@ -226,7 +227,7 @@ class Mapper extends \Schoolbox\Mapper
                 AND pfca.campus_id IN {$vieweeCampusPlaceholders}
                 AND pfrv.roletype = :viewerRoleType
                 AND f.enabled = :enabled
-                ORDER BY f.sequence ASC 
+                ORDER BY f.sequence ASC
             ";
         }
 
