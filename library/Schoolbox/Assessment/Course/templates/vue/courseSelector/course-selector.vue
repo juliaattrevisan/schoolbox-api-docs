@@ -88,15 +88,6 @@ const { ignoreUpdates: ignoreModalUpdates } = watchIgnorable(
         });
     },
 );
-
-/**
- * To update the course selection considering the
- * selection made in the modal
- * @param items - the items selected
- */
-function onModalSelect(items: Course[]): void {
-    // store.add(items);
-}
 </script>
 
 <template>
@@ -125,7 +116,6 @@ function onModalSelect(items: Course[]): void {
         title="Browse Courses"
         :endpoint="`${props.endpoint}`"
         :allow-partial-matches="true"
-        @select="onModalSelect"
     />
 </template>
 

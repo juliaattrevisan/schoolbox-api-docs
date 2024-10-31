@@ -18,11 +18,6 @@ interface Props {
 }
 const props = defineProps<Props>();
 
-const emit = defineEmits<{
-    close: [];
-    select: [items: SearchSelectItem[]];
-}>();
-
 const isOpen = defineModel<boolean>("is-open", { default: false }); // to open/close the modal
 
 const selected = defineModel<SearchSelectItem[]>("selected", { default: [] }); // to store selected items
@@ -42,12 +37,19 @@ window.Vue.watch(isOpen, (newIsOpen) => {
 });
 
 /**
+ * Rest the modal state
+ */
+function close(): void {
+    isOpen.value = false;
+    query.value = "";
+}
+
+/**
  * Close the modal, also clearing any selected results
  */
 function onCancel(): void {
-    isOpen.value = false;
     undo();
-    query.value = "";
+    close();
 }
 
 /**
@@ -76,7 +78,7 @@ function onRemove(items: SearchSelectItem[]): void {
  * and insert into the current selection
  */
 function onSelect(): void {
-    emit("select", selected.value);
+    close();
 }
 </script>
 
