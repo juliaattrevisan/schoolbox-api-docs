@@ -17,6 +17,7 @@ interface Props {
     labelId: string; // the label id
     title: string; // the title of the modal
     endpoint: string; // the search api endpoint
+    manageSearchResponse?: boolean; // whether to manage the response internally, or dispatch an emit to manage it externally
     isSingleSelect?: boolean; // whether only one result can be selected
     allowPartialMatches?: boolean; // whether to allow partial matches, so can match part of a word
     placeholder?: string; // the query input placeholder text
@@ -24,6 +25,10 @@ interface Props {
 const props = withDefaults(defineProps<Props>(), {
     placeholder: "Search...",
 });
+
+const emit = defineEmits<{
+    searchResponse: [json: unknown];
+}>();
 
 const isOpen = defineModel<boolean>("is-open", { default: false }); // to open/close the modal
 
@@ -33,10 +38,37 @@ const selected = defineModel<SearchSelectItem[]>("selected", { default: [] }); /
 const { add, remove, update, save, undo } = useSelected(selected); // to add and remove selected items
 
 const results = defineModel<SearchSelectItem[]>("results", { default: [] }); // to store search results
-const { query, isActive, isSearching, hasNoResults, hasError, search } = useSearch(props.endpoint, results, false); // to search for results
+/**
+ * To handle the search response, we handle some basic responses internally,
+ * but if the response is more complex, we emit the response to be handled externally
+ * @param json - the returned json
+ */
+function onSearchSuccess(json: unknown): void {
+    // emit to handle the response externally, as the response object is typically something not handled by the the basic structure below
+    if (props.manageSearchResponse) {
+        emit("searchResponse", json);
+        return;
+    }
+    // if json is an array, set results to json
+    if (json instanceof Array) {
+        results.value = json as SearchSelectItem[];
+        return;
+    }
+    // if json.data exists, set results to json.data
+    if (typeof json === "object" && json !== null && "data" in json) {
+        results.value = (json as { data: SearchSelectItem[] }).data;
+    }
+}
+
+const { query, isActive, isSearching, hasNoResults, hasError, search } = useSearch(
+    props.endpoint,
+    results,
+    onSearchSuccess,
+    false,
+); // to search for results
 
 /**
- * To display results without searching
+ * To display results straight away without searching
  */
 window.Vue.watch(isOpen, (newIsOpen) => {
     if (newIsOpen) {

@@ -15,6 +15,7 @@ interface Props {
     label: string; // the label text
     labelId: string; // the label id
     endpoint: string; // the search api endpoint, expects an endpoint without a `query` parameter, which will be added via useSearch
+    manageSearchResponse?: boolean; // whether to manage the response internally, or dispatch an emit to manage it externally
     isRequired?: boolean; // whether the input requires a value
     defaultResults?: SearchSelectItem[]; // show selection options when the search input is empty
     isSingleSelect?: boolean; // whether only one result can be selected
@@ -28,7 +29,6 @@ interface Props {
     hasButton?: boolean; // whether to show a button next to the input
     buttonIcon?: string; // the icon to display on the button
     buttonTitle?: string; // the title of the button
-    manageSearchResponse?: boolean; // whether to manage the response internally, or dispatch an emit to manage it externally
 }
 const props = withDefaults(defineProps<Props>(), {
     defaultResults: undefined,

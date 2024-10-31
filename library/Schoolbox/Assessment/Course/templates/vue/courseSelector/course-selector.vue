@@ -70,20 +70,31 @@ function onButtonSelect(): void {
 /**
  * To manipulate the results to target the courses object
  */
-const { ignoreUpdates: ignoreModalUpdates } = watchIgnorable(
-    modalResults,
-    (newResults: CourseAPIResponse | unknown[]) => {
-        // ignore updates to avoid an infinite loop...
-        ignoreModalUpdates(() => {
-            if (newResults instanceof Array && newResults.length === 0) {
-                return;
-            }
-            if (typeof newResults === "object" && "courses" in newResults) {
-                modalResults.value = newResults.courses;
-            }
-        });
-    },
-);
+// const { ignoreUpdates: ignoreModalUpdates } = watchIgnorable(
+//     modalResults,
+//     (newResults: CourseAPIResponse | unknown[]) => {
+//         // ignore updates to avoid an infinite loop...
+//         ignoreModalUpdates(() => {
+//             if (newResults instanceof Array && newResults.length === 0) {
+//                 return;
+//             }
+//             if (typeof newResults === "object" && "courses" in newResults) {
+//                 modalResults.value = newResults.courses;
+//             }
+//         });
+//     },
+// );
+
+/**
+ * To manipulate the results to target the courses object
+ * @param json - the returned json
+ */
+function onModalSearchResponse(json: unknown): void {
+    if (typeof json === "object" && json !== null && "data" in json) {
+        const newResults = json.data as CourseAPIResponse;
+        modalResults.value = newResults.courses;
+    }
+}
 </script>
 
 <template>
@@ -117,7 +128,9 @@ const { ignoreUpdates: ignoreModalUpdates } = watchIgnorable(
         placeholder="Search for courses..."
         title="Browse Courses"
         :endpoint="`${props.endpoint}`"
+        :manage-search-response="true"
         :allow-partial-matches="true"
+        @search-response="onModalSearchResponse"
     />
 </template>
 
