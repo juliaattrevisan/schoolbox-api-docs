@@ -26,7 +26,7 @@ const emit = defineEmits<{
 const isOpen = defineModel<boolean>("is-open", { default: false }); // to open/close the modal
 
 const selected = defineModel<SearchSelectItem[]>("selected", { default: [] }); // to store selected items
-const { add, remove, update } = useSelected(selected); // to add and remove selected items
+const { add, remove, update, empty } = useSelected(selected); // to add and remove selected items
 
 const results = defineModel<SearchSelectItem[]>("results", { default: [] }); // to store search results
 const { query, isActive, isSearching, hasNoResults, hasError, search } = useSearch(props.endpoint, results, true); // to search for results
@@ -41,10 +41,12 @@ window.Vue.watch(isOpen, (newIsOpen) => {
 });
 
 /**
- * Close the modal
+ * Close the modal, also clearing any selected results
  */
 function onCancel(): void {
     isOpen.value = false;
+    empty();
+    query.value = "";
 }
 
 /**
