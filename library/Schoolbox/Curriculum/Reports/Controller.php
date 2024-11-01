@@ -18,6 +18,9 @@ use Schoolbox\Curriculum\Reports\Translator\CourseUsage as CourseUsageTranslator
 use Schoolbox\Curriculum\Reports\Translator\CourseStructureOnly as CourseStructureTranslator;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Mapper as CourseUnitSpecificationMapper;
 use Schoolbox\Learning\Course\DataModel\Specification\Mapper as CourseSpecificationMapper;
+use Schoolbox\Resource\Folder\Translator\ModelToArray\LinkOnly as FolderTranslator;
+use Schoolbox\Learning\Course\DataModel\Specification\Translator\ModelToArray as CourseSpecTranslator;
+use Schoolbox\Curriculum\Api\Translator\ModelToArray as NodeTranslator;
 use Twig\Error\Error as TwigError;
 use ValueError;
 use Crell\ApiProblem\ApiProblem;
@@ -48,9 +51,44 @@ class Controller extends Base
     public function getCoverage(): void
     {
         $response = [];
-        $this->response = $this->responseDependentOnRequest(
+
+        $query = $this->requestQuery;
+        $courseId = $query->get('courseId');
+        $nodeId = $query->get('nodeId');
+
+        $courseId = $this->formatQueryIds($courseId);
+        $nodeId = $this->formatQueryIds($nodeId);
+
+        $courseSpecs = $this->courseSpecificationMapper->findByColumn('id', $courseId);
+        $curriculumNodes = $this->curriculumMapper->findByColumn('id', $nodeId);
+
+        $folderTranslator = new FolderTranslator(0);
+        $courseTranslator = new CourseSpecTranslator(
+            $this->routeGenerator,
+            $this->authorizer,
+            $this->getUser(),
+            $folderTranslator
+        );
+
+        $courses = $courseSpecs->map($courseTranslator);
+
+        $nodeTranslator = new NodeTranslator(
+            $this->routeGenerator,
+            $this->authorizer,
+            $this->getUser(),
+            0,
+            0,
+            null
+        );
+
+        $nodes = $curriculumNodes->map($nodeTranslator);
+
+        $this->response = $this->responseFromTemplate(
             '@curriculumreports/index.twig',
-            $response
+            [
+                'selectedCourses' => $courses,
+                'selectedNodes' => $nodes,
+            ]
         );
     }
 
