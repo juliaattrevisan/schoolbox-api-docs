@@ -90,8 +90,12 @@ class Controller extends Base
      */
     public function getIndex(): void
     {
-        $buttons = $this->profileButtonMapper->findAll()->sortBy('sortOrder', 'asc');
+        $roletype = $this->requestQuery->get('roletype');
 
+        $buttons = $this->profileButtonMapper
+            ->findByColumn('roletype', $roletype)
+            ->sortBy('sortOrder', 'asc');
+new \Alaress_Probe($buttons);
         $roleAvailabilitySelected = [];
         $campusAvailabilitySelected = [];
 
