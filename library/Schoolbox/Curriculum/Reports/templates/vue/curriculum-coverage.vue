@@ -28,6 +28,7 @@ useStore().init(props.reportEndpoint); // just to pass the
             :courses-endpoint="props.coursesEndpoint"
             :curriculum-endpoint="props.curriculumEndpoint"
             :selected-courses="props.selectedCourses"
+            :selected-nodes="props.selectedNodes"
         />
         <cc-report />
     </div>

@@ -4,6 +4,7 @@
  */
 import CourseSelector from "@schoolboxLibrary/Assessment/Course/templates/vue/courseSelector/course-selector.vue";
 import type { Course } from "@schoolboxLibrary/types/Course";
+import type { Node } from "@schoolboxCurriculum/types/Node";
 import CcInputCurriculum from "./cc-input-curriculum.vue";
 import { useInputStore } from "./store/ccInputStore";
 import { useReportStore } from "./store/ccReportStore";
@@ -12,6 +13,7 @@ interface Props {
     coursesEndpoint: string; // The courses api endpoint.
     curriculumEndpoint: string; // The curriculum api endpoint.
     selectedCourses: Course[]; // The pre selected courses
+    selectedNodes: Node[]; // The pre selected nodes
 }
 const props = defineProps<Props>();
 
@@ -66,6 +68,7 @@ function onGenerateReport(): void {
         <div>
             <cc-input-curriculum
                 :endpoint="props.curriculumEndpoint"
+                :preselected="props.selectedNodes"
                 :is-required="true"
                 :has-error="isCurriculumInvalid"
             />
