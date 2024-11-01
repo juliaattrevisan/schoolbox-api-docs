@@ -68,6 +68,11 @@
             </tbody>
         </table>
 
+        {% include '@pastoralBulkImport/fragments/userProfileLink.twig' with {
+            typeId:    typeId,
+            subtypeId: subtypeId,
+        } only %}
+
         <a href="{{ RETURN_URL.previous.decoded ?? routeLookup('pastoral.getIndex') }}" class="submit">Return</a>
     </div>
 </div>

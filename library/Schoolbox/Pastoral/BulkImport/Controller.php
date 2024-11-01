@@ -220,7 +220,9 @@ class Controller extends Base
         $this->response = $this->responseFromTemplate(
             '@pastoralBulkImport/import.twig',
             [
-                'files' => $files,
+                'files'     => $files,
+                'typeId'    => $this->requestPost->get('typeId'),
+                'subtypeId' => $this->requestPost->get('subtypeId'),
             ],
         );
     }
