@@ -3,7 +3,8 @@
  * The search results container
  */
 
-import { onKeyStroke } from "@vueuse/core";
+import { toRefs, useTemplateRef } from "vue";
+import { onKeyStroke, useScroll, useResizeObserver } from "@vueuse/core";
 import type { SearchSelectItem } from "@schoolboxVue/composables/search/types/SearchSelectItem";
 import SsResultsSelectAll from "./ss-results-select-all.vue";
 import SsResultsItem from "./ss-results-item.vue";
@@ -99,9 +100,27 @@ window.Vue.watch(
 function onHover(index: number): void {
     activeIndex.value = index;
 }
+
+const resultsEl = useTemplateRef<HTMLDivElement | null>("resultsEl"); // to detect when the results container is scrolled to the bottom
+const maxResultsHeight = 400; // the maximum height of the results container
+
+const currentHeight = window.Vue.ref(0);
+useResizeObserver(resultsEl, (entries) => {
+    const entry = entries[0];
+    currentHeight.value = entry.contentRect.height;
+});
+
+const { arrivedState } = useScroll(resultsEl);
+const { bottom } = toRefs(arrivedState);
+window.Vue.watch(bottom, (isAtBottom) => {
+    if (isAtBottom && currentHeight.value === maxResultsHeight - 2) {
+        // -2 to account for the border
+        console.warn("scrolled to the bottom");
+    }
+});
 </script>
 <template>
-    <div class="results">
+    <div ref="resultsEl" class="results">
         <div v-if="props.isSearching" class="results__status">Searching for results....</div>
         <div v-else-if="props.hasError" class="results__status alert">
             Sorry, there was an unknown error retrieving your search results. Please try again and contact your support
