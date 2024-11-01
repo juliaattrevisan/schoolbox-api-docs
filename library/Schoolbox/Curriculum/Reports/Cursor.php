@@ -139,7 +139,6 @@ class Cursor implements ICursor
 
     public function retrieveUsageCount(): array
     {
-        $inCourseId = '(' . implode(',', $this->courseId) . ')';
 
         $db = $this->curriculumMapper->getDatabase();
 
@@ -154,6 +153,12 @@ class Cursor implements ICursor
             $nodesPlaceHolder = Builder::getArrayPlaceholders($allLineageNodeIds, 'nodes');
             $params           = Builder::getArrayParameters($allLineageNodeIds, 'nodes');
 
+            $coursePlaceHolder = Builder::getArrayPlaceholders($this->courseId, 'courses');
+            $params = array_merge(
+                $params,
+                Builder::getArrayParameters($this->courseId, 'courses')
+            );
+
             $courseCountQuery = sprintf(
                 "
                 SELECT '%s' type, cnfc.curriculum_node_id, cs.id courseSpecId, null unitId, COUNT(*) count
@@ -163,7 +168,7 @@ class Cursor implements ICursor
                 GROUP BY cnfc.curriculum_node_id, cs.id
                 ",
                 self::COURSE_COURSE_SPECIFICATION,
-                $inCourseId,
+                $coursePlaceHolder,
                 $nodesPlaceHolder
             );
 
@@ -178,7 +183,7 @@ class Cursor implements ICursor
             ",
                 self::COURSE_UNIT,
                 $nodesPlaceHolder,
-                $inCourseId
+                $coursePlaceHolder
             );
 
             $unitActivityCountQuery = sprintf(
@@ -224,7 +229,7 @@ class Cursor implements ICursor
                 self::COURSE_ACTIVITY_PROJECT,
                 self::COURSE_ACTIVITY_LESSON_PLAN,
                 $nodesPlaceHolder,
-                $inCourseId
+                $coursePlaceHolder
             );
 
             $unitLessonPlanCountQuery = sprintf(
@@ -250,7 +255,7 @@ class Cursor implements ICursor
             ",
                 self::COURSE_ACTIVITY_LESSON_PLAN,
                 $nodesPlaceHolder,
-                $inCourseId
+                $coursePlaceHolder
             );
 
             $megaQuery = '( ' .
