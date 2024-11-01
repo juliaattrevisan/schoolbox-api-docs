@@ -35,6 +35,10 @@ const showSelectAll = window.Vue.computed(() => {
     if (props.isSingleSelect) {
         return false;
     }
+    if (!props.isActive) {
+        // don't show select all if the search is not active
+        return false;
+    }
     if (props.results.length <= 1) {
         return false;
     }
