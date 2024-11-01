@@ -14,8 +14,15 @@
         // This allows us to know whether or not to replace the content when changing the type
         let publicEditorIsTemplate = false;
         let privateEditorIsTemplate = false;
-
-        let editorIdsToLoad = ["#body_public", "#body_private"];
+        let publicEditor = document.getElementById("body_public"),
+            privateEditor = document.getElementById("body_private"),
+            editorIdsToLoad = [];
+        if (publicEditor) {
+            editorIdsToLoad.push('#body_public');
+        }
+        if (privateEditor) {
+            editorIdsToLoad.push('#body_private');
+        }
         document.dispatchEvent(new CustomEvent("EDITOR__CREATE", {
             detail: {
                 maxCharCount: window.sbProps.MAX_BYTES_MYSQL_MEDIUMTEXT,
@@ -25,8 +32,12 @@
         }));
 
         /* Also Initialise upon load of both editors*/
-        document.getElementById("body_public").addEventListener("EDITOR__CREATED", onPublicEditorCreated);
-        document.getElementById("body_private").addEventListener("EDITOR__CREATED", onPrivateEditorCreated);
+        if (publicEditor) {
+            publicEditor.addEventListener("EDITOR__CREATED", onPublicEditorCreated);
+        }
+        if (privateEditor) {
+            privateEditor.addEventListener("EDITOR__CREATED", onPrivateEditorCreated);
+        }
 
         function onPublicEditorCreated(event) {
             onEditorCreated(event);
@@ -184,6 +195,13 @@
                 'duplicateIds': {
                     'duplicateIdSelected': {{ record.student ? 'false' : 'true' }}
                 },
+                'report-file': {
+                    required: {
+                        depends: function () {
+                            return document.getElementById("report-zone").querySelector("[data-dz-previews]").children.length === 0;
+                        },
+                    },
+                },
             },
 
             messages: {
@@ -202,6 +220,12 @@
 
                 window.setTimeout(function() { form.submit(); }, 0);
             }
+        });
+
+        // Remove the error message when a report file is uploaded.
+        // (The form will later validate)
+        $('#report-zone').on('success.attachzone', () => {
+            $('#report-file-error').remove();
         });
 
         {# Chain Pastoral Type/Subtype Dropdowns #}
@@ -240,7 +264,7 @@
                 dataType: 'json',
                 data: {'typeId': typeId, 'subtypeId': subtypeId}
             }).done(function (result) {
-                if (actionSelectize[0] === 'undefined') {
+                if (actionSelectize.length === 0) {
                     return;
                 }
                 actionSelectize[0].selectize.clear();
@@ -389,8 +413,6 @@
             let normalizeSpace = function (value) {
                 return $.trim(value.replace(/\s+/g, ' '));
             };
-            let current = normalizeSpace(window.sbProps.editors['body_public'].getData());
-            let currentPrivate = normalizeSpace(window.sbProps.editors['body_private'].getData());
 
             /* If the current data is the same as the template contents,
              * then you're safe to swap it to another template
@@ -400,17 +422,22 @@
              * When we change the data in the editor, we need to trigger the EDITOR__CHECK_DATA event
              * to make sure that old tokens from CKEditor4 are migrated to format correctly in CKEditor5
              */
-            if (current === '' || publicEditorIsTemplate) {
-                window.sbProps.editors['body_public'].setData(template);
-                window.sbProps.editors['body_public'].sourceElement.dispatchEvent(new CustomEvent("EDITOR__CHECK_DATA"));
-                publicEditorIsTemplate = true;
+            if (window.sbProps.editors['body_public']) {
+                let current = normalizeSpace(window.sbProps.editors['body_public'].getData());
+                if (current === '' || publicEditorIsTemplate) {
+                    window.sbProps.editors['body_public'].setData(template);
+                    window.sbProps.editors['body_public'].sourceElement.dispatchEvent(new CustomEvent("EDITOR__CHECK_DATA"));
+                    publicEditorIsTemplate = true;
+                }
             }
-            if (currentPrivate === '' || privateEditorIsTemplate) {
-                window.sbProps.editors['body_private'].setData(templatePrivate);
-                window.sbProps.editors['body_private'].sourceElement.dispatchEvent(new CustomEvent("EDITOR__CHECK_DATA"));
-                privateEditorIsTemplate = true;
+            if (window.sbProps.editors['body_private']) {
+                let currentPrivate = normalizeSpace(window.sbProps.editors['body_private'].getData());
+                if (currentPrivate === '' || privateEditorIsTemplate) {
+                    window.sbProps.editors['body_private'].setData(templatePrivate);
+                    window.sbProps.editors['body_private'].sourceElement.dispatchEvent(new CustomEvent("EDITOR__CHECK_DATA"));
+                    privateEditorIsTemplate = true;
+                }
             }
-
         }
     });
 </script>

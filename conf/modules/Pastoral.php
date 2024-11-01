@@ -13,6 +13,7 @@ namespace Config\Modules;
 use Config\ModuleLoader;
 use Psr\Container\ContainerInterface;
 use Schoolbox\Config\ConfigMapper;
+use Schoolbox\Pastoral\BulkImport\Module as PastoralBulkImportModule;
 use Schoolbox\Pastoral\ClassReport\Module as PastoralClassModule;
 use Schoolbox\Pastoral\Module as PastoralModule;
 use Schoolbox\Pastoral\ReportBuilder\Module as PastoralReportBuilderModule;
@@ -32,6 +33,7 @@ class Pastoral extends ModuleLoader
             $this->loadModule($di, PastoralManagementModule::class, "/pastoral/management/groups");
             $this->loadModule($di, PastoralModule::class, "/pastoral");
             $this->loadModule($di, PastoralReportBuilderModule::class, "/pastoral/report");
+            $this->loadModule($di, PastoralBulkImportModule::class, "/pastoral/bulk-import");
         }
     }
 }

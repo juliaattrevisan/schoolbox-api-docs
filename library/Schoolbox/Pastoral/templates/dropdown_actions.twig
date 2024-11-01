@@ -2,12 +2,16 @@
     {% set routeGetGroups = routeLookupIfAuthorized('pastoralManagement.getGroups') %}
     {% set routeReportBuilder = routeLookupIfAuthorized('pastoralReportBuilder.getIndex') %}
     {% set routeGetAudiences = routeLookupIfAuthorized('pastoralAudience.getAudiences') %}
+    {% set routeBulkImport = routeLookupIfAuthorized('pastoralBulkImport.getForm') %}
 
     <sbx-pop-out content-id="header-options"></sbx-pop-out>
 </nav>
 <ul class="f-dropdown fadeInDown" data-dropdown-content="" id="header-options">
     {% if routeReportBuilder %}
         <li><a href="{{ routeReportBuilder }}" class="icon-result" title="{{ locale.pastoral.proper }} Report Builder">Report Builder</a></li>
+    {% endif %}
+    {% if routeBulkImport %}
+        <li><a href="{{ routeBulkImport }}" class="icon-upload" title="Bulk Import {{ locale.pastoral.proper }} Records">Bulk Import</a></li>
     {% endif %}
     {% if routeGetGroups %}
         <li><a href="{{ routeGetGroups }}" class="icon-group" title="Manage {{ locale.pastoral.proper }} Groups">Manage Groups</a></li>

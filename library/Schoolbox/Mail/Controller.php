@@ -508,7 +508,9 @@ class Controller extends Base
          */
         $emailBody     = '';
         $signature     = (string)$this->getConfigLoader()->get(ConfigMapper::NAME_EMAIL_SIGNATURE);
-        $tokenReplacer = new \Schoolbox\TokenReplacer\Simple();
+        $tokenReplacer = new \Schoolbox\TokenReplacer\Simple(
+            new \Schoolbox\TokenReplacer\EscapeStrategy\ScrubHtml(),
+        );
         $emailParts    = explode('@', $this->getUser()->getEmail(), 2);
         if (
             count($emailParts) === 2 &&
@@ -517,7 +519,7 @@ class Controller extends Base
         ) {
             //build signature, and replace requested tokens
             $emailBody = "<p>&nbsp;</p><p>---</p>"
-                . $tokenReplacer->replaceHtml(
+                . $tokenReplacer->replace(
                     $signature,
                     [
                         '[title]'         => $this->getUser()->getTitle(),
