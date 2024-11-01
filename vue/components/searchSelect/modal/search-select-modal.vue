@@ -3,11 +3,12 @@
  * A modal to search and select items
  */
 
-import { useTemplateRef } from "vue";
+import { toRef, useTemplateRef } from "vue";
 import BasicModal from "@schoolboxVue/components/modal/basic-modal.vue";
 import { useSelected } from "@schoolboxVue/composables/selected/useSelected";
 import { useSearch } from "@schoolboxVue/composables/search/useSearch";
 import type { SearchSelectItem } from "@schoolboxVue/composables/search/types/SearchSelectItem";
+import { useOnSelectedChange } from "../composables/useOnSelectedChange";
 import SsQueryInput from "../ss-query-input.vue";
 import SsResults from "../ss-results.vue";
 import SsmFooter from "./ssm-footer.vue";
@@ -38,6 +39,13 @@ const searchSelectEl = useTemplateRef<HTMLDivElement | null>("searchSelectEl");
 
 const selected = defineModel<SearchSelectItem[]>("selected", { default: [] }); // to store selected items
 const { add, remove, update, save, undo } = useSelected(selected); // to add and remove selected items
+const { onAdd, onRemove } = useOnSelectedChange(
+    toRef(() => props.isSingleSelect),
+    selected,
+    add,
+    remove,
+    update,
+); // to handle selected item changes picked up within the <template/>
 
 const results = defineModel<SearchSelectItem[]>("results", { default: [] }); // to store search results
 /**
@@ -109,27 +117,6 @@ function close(): void {
 function onCancel(): void {
     undo();
     close();
-}
-
-/**
- * To add items
- * @param items - the items selected
- */
-function onAdd(items: SearchSelectItem[]): void {
-    // if single select, switch with the previous selection
-    if (props.isSingleSelect && selected.value.length > 0) {
-        update(items);
-        return;
-    }
-    add(items);
-}
-
-/**
- * To remove items
- * @param items - the items deselected
- */
-function onRemove(items: SearchSelectItem[]): void {
-    remove(items);
 }
 
 /**

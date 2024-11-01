@@ -86,7 +86,6 @@ onKeyStroke("Escape", () => {
         position: absolute;
         top: 100px;
         width: 70%;
-        z-index: calc(var(--sbx-depth-modal) + 1);
     }
 }
 

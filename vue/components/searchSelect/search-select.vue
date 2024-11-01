@@ -3,10 +3,11 @@
  * To search for results with a query and select them
  */
 
-import { useTemplateRef } from "vue";
+import { toRef, useTemplateRef } from "vue";
 import { useSelected } from "@schoolboxVue/composables/selected/useSelected";
 import { useSearch } from "@schoolboxVue/composables/search/useSearch";
 import type { SearchSelectItem } from "@schoolboxVue/composables/search/types/SearchSelectItem";
+import { useOnSelectedChange } from "./composables/useOnSelectedChange";
 import SsSelected from "./ss-selected.vue";
 import SsQueryInput from "./ss-query-input.vue";
 import SsResults from "./ss-results.vue";
@@ -45,10 +46,17 @@ const emit = defineEmits<{
     buttonSelect: [];
 }>();
 
-const searchSelectEl = useTemplateRef<HTMLDivElement | null>("searchSelectEl");
+const searchSelectEl = useTemplateRef<HTMLDivElement | null>("searchSelectEl"); // for <ss-query-input/> to check if focus is within the <search-select/>
 
 const selected = defineModel<SearchSelectItem[]>("selected", { default: [] }); // to store selected items
 const { add, remove, update } = useSelected(selected); // to add and remove selected items
+const { onAdd, onRemove } = useOnSelectedChange(
+    toRef(() => props.isSingleSelect),
+    selected,
+    add,
+    remove,
+    update,
+); // to handle selected item changes picked up within the <template/>
 
 const results = defineModel<SearchSelectItem[]>("results", { default: [] }); // to store search results
 /**
@@ -95,27 +103,6 @@ const currentResults = window.Vue.computed(() => {
  */
 function onSelect(item: SearchSelectItem): void {
     emit("select", item);
-}
-
-/**
- * To add items
- * @param items - the items selected
- */
-function onAdd(items: SearchSelectItem[]): void {
-    // if single select, switch with the previous selection
-    if (props.isSingleSelect && selected.value.length > 0) {
-        update(items);
-        return;
-    }
-    add(items);
-}
-
-/**
- * To remove items
- * @param items - the items deselected
- */
-function onRemove(items: SearchSelectItem[]): void {
-    remove(items);
 }
 
 /**
