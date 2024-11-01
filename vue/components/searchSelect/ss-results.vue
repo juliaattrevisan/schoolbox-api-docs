@@ -25,6 +25,7 @@ const props = defineProps<Props>();
 const emit = defineEmits<{
     add: [items: SearchSelectItem[]];
     remove: [items: SearchSelectItem[]];
+    atBottom: []; // scrolled to the bottom of the results container
 }>();
 
 /**
@@ -115,7 +116,7 @@ const { bottom } = toRefs(arrivedState);
 window.Vue.watch(bottom, (isAtBottom) => {
     if (isAtBottom && currentHeight.value === maxResultsHeight - 2) {
         // -2 to account for the border
-        console.warn("scrolled to the bottom");
+        emit("atBottom");
     }
 });
 </script>

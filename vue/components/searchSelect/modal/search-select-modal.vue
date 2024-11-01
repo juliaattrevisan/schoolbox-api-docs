@@ -125,6 +125,13 @@ function onCancel(): void {
 function onSelect(): void {
     close();
 }
+
+/**
+ * To check if we can load more results
+ */
+function onAtResultsBottom(): void {
+    console.warn("load more?");
+}
 </script>
 
 <template>
@@ -153,6 +160,7 @@ function onSelect(): void {
                             :selected="selected"
                             @add="onAdd"
                             @remove="onRemove"
+                            @at-bottom="onAtResultsBottom"
                         />
                     </div>
                 </div>
