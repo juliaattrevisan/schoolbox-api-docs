@@ -4,14 +4,31 @@
  * for foundation based <reveal-modal /> component
  */
 
+import { onKeyStroke } from "@vueuse/core";
+
 const isOpen = defineModel<boolean>("is-open", { default: false }); // to open/close the modal
 
 /**
  * To close the modal
  */
-function onCloseClick(): void {
+function close(): void {
+    if (!isOpen.value) return;
     isOpen.value = false;
 }
+
+/**
+ * To handle the close click event
+ */
+function onCloseClick(): void {
+    close();
+}
+
+/**
+ *  To close the modal on the Escape key press
+ */
+onKeyStroke("Escape", () => {
+    close();
+});
 </script>
 
 <template>
