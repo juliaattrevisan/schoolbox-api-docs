@@ -7,7 +7,6 @@ use Alaress\Authorizer\GetRouteIfAuthorized;
 use Aura\Router\Generator;
 use Schoolbox\Collection;
 use Schoolbox\Curriculum\Node\Model;
-use Schoolbox\Learning\Course\DataModel\Specification\Mapper;
 use Schoolbox\User;
 use Schoolbox\Curriculum\Reports\Translator\CourseUsage as courseUsageTranslator;
 
@@ -75,7 +74,8 @@ class ModelToArray
                     $this->courseSpec->map(
                         function ($course) use ($node) {
                             return call_user_func($this->courseUsageTranslator, $course, $node, $this->counts);
-                        })
+                        }
+                    )
             ],
             'children'      => $children,
             '_links'        => [
