@@ -36,6 +36,17 @@ class Model implements ISoftDeletable
     /** @var string|null */
     protected $target;
 
+
+    /**
+     * A string that helps identify truly Custom buttons made by schools vs the
+     * special system buttons that we have by default. It'll be "custom" for the
+     * ones created by schools; ours will have a unique string that conclusively
+     * identifies a system button even when the school totally pollutes the data
+     *
+     * @var string|null
+     */
+    protected ?string $type = null;
+
     /**
      * @param int $id
      * @return self
@@ -180,5 +191,25 @@ class Model implements ISoftDeletable
     public function getSortOrder(): int
     {
         return $this->sortOrder;
+    }
+
+
+    /**
+     * @return string|null
+     */
+    public function getType(): ?string
+    {
+        return $this->type;
+    }
+
+
+    /**
+     * @param string|null $type
+     * @return $this
+     */
+    public function setType(?string $type): self
+    {
+        $this->type = $type;
+        return $this;
     }
 }

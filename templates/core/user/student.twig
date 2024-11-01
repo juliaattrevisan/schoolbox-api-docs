@@ -320,7 +320,7 @@
 
                         {% if showButtons %}
                             {% for button in buttons %}
-                                <li>
+                                <li>{{ button.type }}
                                     <a href="{{ button.url }}" title="{{ button.title }}" class="icon-{{ button.icon }} {{ button.css }}" target="{{ button.target }}">{{ button.text }}</a>
                                 </li>
                             {% endfor %}
