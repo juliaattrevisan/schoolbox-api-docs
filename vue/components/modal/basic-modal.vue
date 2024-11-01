@@ -4,9 +4,26 @@
  * for foundation based <reveal-modal /> component
  */
 
+import { useTemplateRef } from "vue";
 import { onKeyStroke } from "@vueuse/core";
+import { useFocusTrap } from "@vueuse/integrations/useFocusTrap";
+
+const modalContainerEl = useTemplateRef<HTMLDivElement | null>("searchSelectEl");
 
 const isOpen = defineModel<boolean>("is-open", { default: false }); // to open/close the modal
+
+const { activate, deactivate } = useFocusTrap(modalContainerEl);
+
+/**
+ * Keep focus within the modal when it's open
+ */
+window.Vue.watch(isOpen, (newIsOpen) => {
+    if (newIsOpen) {
+        activate();
+    } else {
+        deactivate();
+    }
+});
 
 /**
  * To close the modal
@@ -35,7 +52,7 @@ onKeyStroke("Escape", () => {
     <teleport to="body">
         <transition>
             <div v-if="isOpen" class="modal">
-                <div class="modal__container">
+                <div ref="modalContainerEl" class="modal__container">
                     <!-- @slot Reveal modal content goes into this slot -->
                     <slot></slot>
                     <button

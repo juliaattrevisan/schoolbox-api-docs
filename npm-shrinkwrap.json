@@ -63,7 +63,7 @@
         "@phudak/ckeditor5-emoji": "~1.1.1",
         "@vueuse/components": "~11.0.0",
         "@vueuse/core": "~11.0.0",
-        "@vueuse/integrations": "^11.2.0",
+        "@vueuse/integrations": "~11.2.0",
         "axios": "~1.7.4",
         "clipboard": "~2.0.11",
         "datatables.net": "~1.13.8",
@@ -72,6 +72,7 @@
         "dropzone": "~6.0.0-beta.2",
         "firebase": "^10.13.1",
         "flatpickr": "~4.6.13",
+        "focus-trap": "^7.6.0",
         "gsap": "npm:@gsap/business@~3.12.5",
         "highcharts": "~11.4.7",
         "highcharts-vue": "~2.0.1",
@@ -16154,6 +16155,14 @@
         "node": ">=0.4.0"
       }
     },
+    "node_modules/focus-trap": {
+      "version": "7.6.0",
+      "resolved": "https://registry.npmjs.org/focus-trap/-/focus-trap-7.6.0.tgz",
+      "integrity": "sha512-1td0l3pMkWJLFipobUcGaf+5DTY4PLDDrcqoSaKP8ediO/CoWCCYk/fT/Y2A4e6TNB+Sh6clRJCjOPPnKoNHnQ==",
+      "dependencies": {
+        "tabbable": "^6.2.0"
+      }
+    },
     "node_modules/follow-redirects": {
       "version": "1.15.6",
       "resolved": "https://registry.npmjs.org/follow-redirects/-/follow-redirects-1.15.6.tgz",
@@ -26301,6 +26310,11 @@
       "engines": {
         "node": ">= 4.7.0"
       }
+    },
+    "node_modules/tabbable": {
+      "version": "6.2.0",
+      "resolved": "https://registry.npmjs.org/tabbable/-/tabbable-6.2.0.tgz",
+      "integrity": "sha512-Cat63mxsVJlzYvN51JmVXIgNoUokrIaT2zLclCXjRd8boZ0004U4KCs/sToJ75C6sdlByWxpYnb5Boif1VSFew=="
     },
     "node_modules/tapable": {
       "version": "2.2.1",
@@ -41168,6 +41182,14 @@
       "integrity": "sha512-Dkc88m5k8bx1VvHTO9HEJ7tvMcSb3Zvcv1PY4OHK7pHdtdY2aUjhmPy6vpjVJ2uUUOIybRlb91sXE8g4doChtA==",
       "dev": true
     },
+    "focus-trap": {
+      "version": "7.6.0",
+      "resolved": "https://registry.npmjs.org/focus-trap/-/focus-trap-7.6.0.tgz",
+      "integrity": "sha512-1td0l3pMkWJLFipobUcGaf+5DTY4PLDDrcqoSaKP8ediO/CoWCCYk/fT/Y2A4e6TNB+Sh6clRJCjOPPnKoNHnQ==",
+      "requires": {
+        "tabbable": "^6.2.0"
+      }
+    },
     "follow-redirects": {
       "version": "1.15.6",
       "resolved": "https://registry.npmjs.org/follow-redirects/-/follow-redirects-1.15.6.tgz",
@@ -48509,6 +48531,11 @@
       "version": "11.1.9",
       "resolved": "https://registry.npmjs.org/swiper/-/swiper-11.1.9.tgz",
       "integrity": "sha512-rflu8zvfGa3x1v/aeSufk4zRJffhOQowyvtJlp46sUBnOqAuk1Rdv5Ldj0AWWBV595iZ+ZMk7VB35ZRtRUomtA=="
+    },
+    "tabbable": {
+      "version": "6.2.0",
+      "resolved": "https://registry.npmjs.org/tabbable/-/tabbable-6.2.0.tgz",
+      "integrity": "sha512-Cat63mxsVJlzYvN51JmVXIgNoUokrIaT2zLclCXjRd8boZ0004U4KCs/sToJ75C6sdlByWxpYnb5Boif1VSFew=="
     },
     "tapable": {
       "version": "2.2.1",
