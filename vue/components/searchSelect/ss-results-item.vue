@@ -70,7 +70,7 @@ function onMouseout(): void {
 const resultEl = useTemplateRef<HTMLDivElement | null>("resultEl");
 const { isActive } = useActiveIndex(
     resultEl,
-    props.index,
+    toRef(() => props.index),
     toRef(() => props.activeIndex),
     onClick,
 );

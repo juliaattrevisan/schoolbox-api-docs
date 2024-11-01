@@ -16,7 +16,7 @@ import { useElementVisibility, onKeyStroke } from "@vueuse/core";
  */
 export function useActiveIndex(
     resultEl: Ref<HTMLElement | null>,
-    index: number,
+    index: Ref<number>,
     activeIndex: Ref<number>,
     onSelected: () => void,
 ): {
@@ -31,7 +31,7 @@ export function useActiveIndex(
      * not already visible
      */
     function checkIndex(): void {
-        if (index === activeIndex.value) {
+        if (index.value === activeIndex.value) {
             isActive.value = true;
             if (!targetIsVisible.value) {
                 resultEl.value?.scrollIntoView({ block: "nearest", behavior: "smooth" });
