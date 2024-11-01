@@ -15,7 +15,7 @@ function onCloseClick(): void {
 </script>
 
 <template>
-    <Teleport to="body">
+    <teleport to="body">
         <div v-if="isOpen" class="modal">
             <div class="modal__container">
                 <!-- @slot Reveal modal content goes into this slot -->
@@ -24,13 +24,13 @@ function onCloseClick(): void {
                     <sbx-icon name="close" size="1.5rem" color="white" />
                 </button>
             </div>
-            <div class="modal__bkg"></div>
         </div>
-    </Teleport>
+    </teleport>
 </template>
 
 <style lang="scss" scoped>
 .modal {
+    background-color: rgba(0, 0, 0, 0.5);
     height: 100%;
     left: 0;
     position: fixed;
@@ -46,15 +46,6 @@ function onCloseClick(): void {
         top: 100px;
         width: 70%;
         z-index: calc(var(--sbx-depth-modal) + 1);
-    }
-    &__bkg {
-        background-color: rgba(0, 0, 0, 0.5);
-        height: 100%;
-        left: 0;
-        position: fixed;
-        top: 0;
-        width: 100%;
-        z-index: calc(var(--sbx-depth-modal) - 1);
     }
 }
 
