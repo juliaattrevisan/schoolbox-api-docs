@@ -320,9 +320,17 @@
 
                         {% if showButtons %}
                             {% for button in buttons %}
-                                <li>{{ button.type }}
-                                    <a href="{{ button.url }}" title="{{ button.title }}" class="icon-{{ button.icon }} {{ button.css }}" target="{{ button.target }}">{{ button.text }}</a>
-                                </li>
+                                {% if additionalConstraints[button.type] ?? true %}
+                                    <li>
+
+                                        {# In some additionalConstraints we already have the url here #}
+                                        {% if button.type in ['duework', 'grades', 'calendar'] %}
+                                            <a href="{{ additionalConstraints[button.type] }}" title="{{ button.title }}" class="icon-{{ button.icon }} {{ button.css }}" target="{{ button.target }}">{{ button.text }}</a>
+                                        {% endif %}
+
+
+                                    </li>
+                                {% endif %}
                             {% endfor %}
 
 
