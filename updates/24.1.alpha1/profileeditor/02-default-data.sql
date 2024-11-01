@@ -20,7 +20,7 @@ INSERT INTO `profile_field` VALUES
 (17,'student','yearLevel','Year Level',16,1,'yearLevel',NULL,NULL,0,0),
 (18,'student','tutorTeacher','Tutor',17,1,'tutor',NULL,NULL,0,1),
 (19,'student','coordTeacher','Year Level Coordinator',18,1,'yearLevelCoordinator',NULL,NULL,0,1),
-(20,'student','StudentHouseDescription','House',19,1,NULL,NULL,NULL,0,1),
+(20,'student','schoolHouse','House',19,1,NULL,NULL,NULL,0,0),
 (21,'student','StudentTutorDescription','Tutor Group',20,1,'tutorGroup',NULL,NULL,0,1),
 (22,'student','hohTeacher','Head of House',21,1,'headOfHouse',NULL,NULL,0,1),
 (23,'student','residentialHouse','Residential House',22,1,NULL,NULL,NULL,0,0),
@@ -58,5 +58,5 @@ INSERT INTO `profile_field` VALUES
 (54,'staff','StaffExtension','Extension',12,1,NULL,NULL,NULL,0,1),
 (55,'staff','StaffDefaultMobilePhone','Mobile Phone',13,1,NULL,NULL,NULL,0,1),
 (56,'staff','campusCollection','Campus',14,1,NULL,NULL,NULL,0,0),
-(57,'staff','schoolHouse','House',15,1,NULL,NULL,NULL,0,1),
-(58,'staff','residentialHouse','Residential House',16,1,NULL,NULL,NULL,0,1);
+(57,'staff','schoolHouse','House',15,1,NULL,NULL,NULL,0,0),
+(58,'staff','residentialHouse','Residential House',16,1,NULL,NULL,NULL,0,0);

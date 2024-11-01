@@ -268,12 +268,13 @@ class Factory
             'externalId' => $viewee->getExternalId(),
             'role' => $viewee->getRole()->getName(),
             'positionTitle' => $viewee->getPositionTitle(),
+            /* Favour schoolbox's data over the sis' data
+             */
+            'schoolHouse' => $viewee->getSchoolHouse()->getHouse(),
             /* ResidentialHouse can indeed be null: storm and phpstannis have different ideas
              */
             /** @phpstan-ignore-next-line */
             'residentialHouse' => $viewee->getResidentialHouse()?->getHouse(),
-            /* Favour schoolbox's data over the sis' data
-             */
             'yearLevel' => $viewee->getYear()?->getName() ?? '',
             'campusCollection' => $campusNames,
             /* This is an arbitrary set of people associated with $viewee somehow
@@ -357,10 +358,10 @@ class Factory
             'externalId' => $viewee->getExternalId(),
             'role' => $viewee->getRole()->getName(),
             'positionTitle' => $viewee->getPositionTitle(),
-            'spouseName' => $spouseNode,
             /* Favour schoolbox's data over the sis' data
              */
             'campusCollection' => $campusNames,
+            'spouseName' => $spouseNode,
         ];
 
         return array_merge($externalUser, $referenceFields);
@@ -399,6 +400,11 @@ class Factory
             'positionTitle' => $viewee->getPositionTitle(),
             /* Favour schoolbox's data over the sis' data
              */
+            'schoolHouse' => $viewee->getSchoolHouse()?->getHouse(),
+            /* ResidentialHouse can indeed be null: storm and phpstannis have different ideas
+             */
+            /** @phpstan-ignore-next-line */
+            'residentialHouse' => $viewee->getResidentialHouse()?->getHouse(),
             'yearLevel' => $viewee->getYear()?->getName() ?? '',
             'campusCollection' => $campusNames,
         ];
