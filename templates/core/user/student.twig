@@ -306,19 +306,29 @@
                     {% block buttons %}
 
                         {% set additionalConstraints = {
-                            'eportfolio': showButtons and eportfolioAuth,
-                            'duework': showButtons and routeLookupIfAuthorized('learningUpcoming.getUpcomingForStudent', {student: user, studentId: user.id}),
-                            'grades': showButtons and routeLookupIfAuthorized('learningGrades.getGrades', {viewee: user, userId: user.id}),
-                            'pastoral': showButtons and showPastoral and pastoralUrl,
-                            'calendar': showButtons and routeLookupIfAuthorized('calendar.getCalendar', {selectedDate: now.urlDate, userId: user.id, user: user}),
-                            'timetable': showButtons and showClasses,
-                            'pastoralsynergetic': showButtons and isStaffWhoCanView and config.external_type == 'synergetic' and config.external_staff_portal,
-                            'documentmanagement': showButtons and config.external_document_report_enabled and config.external_document_button_enable and routeLookupIfAuthorized('profileDocumentManagement.getIndex', {studentId: user.id})
-                            'geosnapshot': showButtons and isGeosnapshotAvailable and routeLookupIfAuthorized('geosnapshotApi.getStudentPhotos', {id: user.id}),
+                            'eportfolio': eportfolioAuth,
+                            'duework': routeLookupIfAuthorized('learningUpcoming.getUpcomingForStudent', {student: user, studentId: user.id}),
+                            'grades': routeLookupIfAuthorized('learningGrades.getGrades', {viewee: user, userId: user.id}),
+                            'pastoral': showPastoral and pastoralUrl,
+                            'calendar': routeLookupIfAuthorized('calendar.getCalendar', {selectedDate: now.urlDate, userId: user.id, user: user}),
+                            'timetable': showClasses,
+                            'pastoralsynergetic': isStaffWhoCanView and config.external_type == 'synergetic' and config.external_staff_portal,
+                            'documentmanagement': config.external_document_report_enabled and config.external_document_button_enable and routeLookupIfAuthorized('profileDocumentManagement.getIndex', {studentId: user.id}),
+                            'geosnapshot': isGeosnapshotAvailable and routeLookupIfAuthorized('geosnapshotApi.getStudentPhotos', {id: user.id}),
                         } %}
 
 
                         {% if showButtons %}
+                            {% for button in buttons %}
+                                <li>
+                                    <a href="{{ button.url }}" title="{{ button.title }}" class="icon-{{ button.icon }} {{ button.css }}" target="{{ button.target }}">{{ button.text }}</a>
+                                </li>
+                            {% endfor %}
+
+
+
+
+
                             {#                        {% if eportfolioAuth %}#}
                             {#                            {% block buttons_eportfolio %}#}
                             {#                                <li>#}
@@ -437,11 +447,11 @@
                             {% block buttons_miscellaneous %}
                             {% endblock buttons_miscellaneous %}
 
-                            {% for button in customButtons %}
-                                <li>
-                                    <a href="{{ button.url }}" title="{{ button.title }}" class="icon-{{ button.icon }} {{ button.css }}" target="{{ button.target }}">{{ button.text }}</a>
-                                </li>
-                            {% endfor %}
+{#                            {% for button in customButtons %}#}
+{#                                <li>#}
+{#                                    <a href="{{ button.url }}" title="{{ button.title }}" class="icon-{{ button.icon }} {{ button.css }}" target="{{ button.target }}">{{ button.text }}</a>#}
+{#                                </li>#}
+{#                            {% endfor %}#}
                         {% endif %}
                     {% endblock buttons %}
                 </ul>
