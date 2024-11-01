@@ -64,6 +64,7 @@ class Mapper extends BaseMapper
                 AND cv.campus_id IN " . $this->getPredicateBuilder()->getArrayPlaceholders($viewerCampusList, 'viewercampus') . "
                 AND rv.role_id = :visibilityRoleId
                 AND profile_button.deleted_at IS NULL
+                AND profile_button.roletype = :roletype
                 ORDER BY sort_order ASC
         ";
 
@@ -72,7 +73,8 @@ class Mapper extends BaseMapper
 
         $params = array_merge($vieweeParams, $viewerParams, [
             'availabilityRoleId' => $viewee->getRole()->getId(),
-            'visibilityRoleId' => $viewer->getRole()->getId()
+            'visibilityRoleId' => $viewer->getRole()->getId(),
+            'roletype' => $viewee->getRole()->getType()
         ]);
 
         $statement = $this->getDatabase()->prepare($query);
