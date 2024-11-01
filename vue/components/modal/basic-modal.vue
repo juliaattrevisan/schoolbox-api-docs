@@ -82,10 +82,17 @@ onKeyStroke("Escape", () => {
         background: white;
         box-shadow: 0 0 10px rgba(0, 0, 0, 0.4);
         left: 15%;
+        max-width: 62.5rem;
         padding: var(--spacing-m);
         position: absolute;
         top: 100px;
         width: 70%;
+    }
+    @media (max-width: 700px) {
+        &__container {
+            left: 0;
+            width: 100%;
+        }
     }
 }
 
@@ -94,6 +101,10 @@ onKeyStroke("Escape", () => {
     position: absolute;
     right: -2rem;
     top: -3rem;
+    @media (max-width: 700px) {
+        right: 0;
+        top: -3rem;
+    }
 }
 
 // Fade in/out animation, linked to <transition> in the template
