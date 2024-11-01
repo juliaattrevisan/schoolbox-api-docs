@@ -171,9 +171,9 @@ class Handler
      */
     public function handleAllClassesRequest(array $data, string $selectedView): array
     {
-        $yearLevelArr = [];
-        $params       = [];
-        $sql          = "SELECT * FROM {$selectedView} WHERE 1=1";
+        $classArr = [];
+        $params   = [];
+        $sql      = "SELECT * FROM {$selectedView} WHERE 1=1";
 
         if (isset($data['code'])) {
             $codes        = is_array($data['code']) ? $data['code'] : explode(',', $data['code']);
@@ -186,13 +186,16 @@ class Handler
 
         $stmt = $this->externalDb->executeQuery($sql, $params);
         foreach ($stmt as $row) {
-            $yearLevelArr[] = [
-                "Code"        => $row["ClassCode"],
-                "Description" => $row["ClassDesc"],
-            ];
+            if (!isset($classArr[$row["ClassCode"]])) {
+                $classArr[$row["ClassCode"]] = [
+                    "Code"        => $row["ClassCode"],
+                    "Description" => $row["ClassDesc"],
+                ];
+            }
         }
 
-        return $yearLevelArr;
+        // Convert associative array to indexed array
+        return array_values($classArr);
     }
 
     /**
