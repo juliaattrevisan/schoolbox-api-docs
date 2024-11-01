@@ -95,7 +95,7 @@ class Controller extends Base
         $buttons = $this->profileButtonMapper
             ->findByColumn('roletype', $roletype)
             ->sortBy('sortOrder', 'asc');
-new \Alaress_Probe($buttons);
+
         $roleAvailabilitySelected = [];
         $campusAvailabilitySelected = [];
 
@@ -121,7 +121,7 @@ new \Alaress_Probe($buttons);
             [
                 'pageCurrent' => $this->routeGenerator->generate('adminProfileButton.getIndex'),
                 'allBreadcrumbs' => (new Subnav($this->getConfigLoader(), $this->getUser()))->generateBreadcrumbs($this->routeGenerator->generate('adminProfileButton.getIndex')),
-                'profile' => $this->profileButtonMapper->findAll()->sortBy('sortOrder', 'asc'),
+                'profile' => $buttons,
                 'roles' => $this->roleMapper->findAll()->sortBy('name', 'asc'),
                 'campuses' => $this->campusMapper->findAll()->sortBy('name', 'asc'),
 
