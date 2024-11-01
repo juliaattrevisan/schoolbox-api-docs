@@ -72,16 +72,10 @@ class ModelToArray
             'code'          => $node->getCode(),
             'usage'         => [
                 'courses' =>
-                    array_map(
-                        fn($course) =>
-                        call_user_func(
-                            $this->courseUsageTranslator,
-                            $course,
-                            $node,
-                            $this->counts
-                        ),
-                        $this->courseSpec->getAll()
-                    )
+                    $this->courseSpec->map(
+                        function ($course) use ($node) {
+                            return call_user_func($this->courseUsageTranslator, $course, $node, $this->counts);
+                        })
             ],
             'children'      => $children,
             '_links'        => [

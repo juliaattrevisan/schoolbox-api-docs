@@ -65,14 +65,10 @@ class CourseUsage
                     'count' => $courseCount
                 ]
             ],
-            'units' => array_map(
-                fn($unit) => call_user_func(
-                    $this->unitAssessmentUsageUsageTranslator,
-                    $unit,
-                    $node,
-                    $counts
-                ),
-                $this->courseUnitSpec[$course->getId()]->getAll()
+            'units' => $this->courseUnitSpec[$course->getId()]?->map(
+                function ($unit) use ($node, $counts) {
+                    return call_user_func($this->unitAssessmentUsageUsageTranslator, $unit, $node, $counts);
+                }
             ),
             '_links'        => [
                 'modify' => $this->getRouteIfAuthorized(
