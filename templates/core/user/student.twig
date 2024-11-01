@@ -305,82 +305,93 @@
                 <ul class='flex-list flex-wrap buttons'>
                     {% block buttons %}
 
-                        {% if eportfolioAuth %}
-                            {% block buttons_eportfolio %}
-                                <li>
-                                    <a href="/eportfolio/{{ user.id }}/profile"
-                                       class="icon-eportfolio">ePortfolio</a>
-                                </li>
-                            {% endblock buttons_eportfolio %}
-                        {% endif %}
+                        {% set additionalConstraints = {
+                            'eportfolio': eportfolioAuth,
+                            'duework': showButtons and routeLookupIfAuthorized('learningUpcoming.getUpcomingForStudent', {student: user, studentId: user.id}),
+                            'grades': showButtons and routeLookupIfAuthorized('learningGrades.getGrades', {viewee: user, userId: user.id}),
+                            'pastoral': showButtons and showPastoral and pastoralUrl,
+                            'calendar': showButtons and routeLookupIfAuthorized('calendar.getCalendar', {selectedDate: now.urlDate, userId: user.id, user: user}),
+                            'timetable': showButtons and showClasses,
+                            'pastoralsynergetic': showButtons and isStaffWhoCanView and config.external_type == 'synergetic' and config.external_staff_portal,
+                            'documentmanagement': showButtons and config.external_document_report_enabled and config.external_document_button_enable and routeLookupIfAuthorized('profileDocumentManagement.getIndex', {studentId: user.id})
+                            'geosnapshot': showButtons and isGeosnapshotAvailable and routeLookupIfAuthorized('geosnapshotApi.getStudentPhotos', {id: user.id}),
+                        } %}
+{#                        {% if eportfolioAuth %}#}
+{#                            {% block buttons_eportfolio %}#}
+{#                                <li>#}
+{#                                    <a href="/eportfolio/{{ user.id }}/profile"#}
+{#                                       class="icon-eportfolio">ePortfolio</a>#}
+{#                                </li>#}
+{#                            {% endblock buttons_eportfolio %}#}
+{#                        {% endif %}#}
 
                         {% if showButtons %}
-                            {% block buttons_dueWork %}
-                                {% set route = routeLookupIfAuthorized('learningUpcoming.getUpcomingForStudent', {student: user, studentId: user.id}) %}
-                                {% if route %}
-                                    <li>
-                                        <a href="{{ route }}" class="icon-due-work">{{ locale.dueWork.proper }}</a>
-                                    </li>
-                                {% endif %}
-                            {% endblock buttons_dueWork %}
+{#                            {% block buttons_dueWork %}#}
+{#                                {% set route = routeLookupIfAuthorized('learningUpcoming.getUpcomingForStudent', {student: user, studentId: user.id}) %}#}
+{#                                {% if route %}#}
+{#                                    <li>#}
+{#                                        <a href="{{ route }}" class="icon-due-work">{{ locale.dueWork.proper }}</a>#}
+{#                                    </li>#}
+{#                                {% endif %}#}
+{#                            {% endblock buttons_dueWork %}#}
 
-                            {% block buttons_grades %}
-                                {% set route = routeLookupIfAuthorized('learningGrades.getGrades', {viewee: user, userId: user.id}) %}
-                                {% if route %}
-                                    <li>
-                                        <a href="{{ route }}" class="icon-tick">{{ locale.grades.properPlural }}</a>
-                                    </li>
-                                {% endif %}
-                            {% endblock buttons_grades %}
+{#                            {% block buttons_grades %}#}
+{#                                {% set route = routeLookupIfAuthorized('learningGrades.getGrades', {viewee: user, userId: user.id}) %}#}
+{#                                {% if route %}#}
+{#                                    <li>#}
+{#                                        <a href="{{ route }}" class="icon-tick">{{ locale.grades.properPlural }}</a>#}
+{#                                    </li>#}
+{#                                {% endif %}#}
+{#                            {% endblock buttons_grades %}#}
 
 
 
-                            {% if showPastoral and pastoralUrl %}
-                                <li>
-                                    <a href="{{ pastoralUrl }}"
-                                       class="icon-pastoral">{{ locale.pastoralCare.proper }}</a>
-                                </li>
-                            {% endif %}
+{#                            {% if showPastoral and pastoralUrl %}#}
+{#                                <li>#}
+{#                                    <a href="{{ pastoralUrl }}"#}
+{#                                       class="icon-pastoral">{{ locale.pastoralCare.proper }}</a>#}
+{#                                </li>#}
+{#                            {% endif %}#}
 
-                            {% set calendarUrl = routeLookupIfAuthorized('calendar.getCalendar', {selectedDate: now.urlDate, userId: user.id, user: user})  %}
-                            {% if calendarUrl %}
-                                {% block buttons_calendar %}
-                                    <li>
-                                        <a href='{{ calendarUrl }}'
-                                           class="icon-calendar">{{ locale.calendar.proper }}</a>
-                                    </li>
-                                {% endblock buttons_calendar %}
-                            {% endif %}
+{#                            {% set calendarUrl = routeLookupIfAuthorized('calendar.getCalendar', {selectedDate: now.urlDate, userId: user.id, user: user})  %}#}
+{#                            {% if calendarUrl %}#}
+{#                                {% block buttons_calendar %}#}
+{#                                    <li>#}
+{#                                        <a href='{{ calendarUrl }}'#}
+{#                                           class="icon-calendar">{{ locale.calendar.proper }}</a>#}
+{#                                    </li>#}
+{#                                {% endblock buttons_calendar %}#}
+{#                            {% endif %}#}
 
-                            {% if showClasses %}
-                                {% block buttons_timetable %}
-                                    <li>
-                                        <a href="/timetable/{{ user.id }}"
-                                           class="icon-timetable">Timetable</a>
-                                    </li>
-                                {% endblock buttons_timetable %}
-                            {% endif %}
+{#                            {% if showClasses %}#}
+{#                                {% block buttons_timetable %}#}
+{#                                    <li>#}
+{#                                        <a href="/timetable/{{ user.id }}"#}
+{#                                           class="icon-timetable">Timetable</a>#}
+{#                                    </li>#}
+{#                                {% endblock buttons_timetable %}#}
+{#                            {% endif %}#}
 
-                            {% block buttons_pastoralCare %}
-                                {% if isStaffWhoCanView and config.external_type == 'synergetic' and config.external_staff_portal %}
-                                    <li>
-                                        <a href="{{ config.external_staff_portal }}/stud.aspx?id={{ user.externalId }}"
-                                           class="icon-synergetic"
-                                           target="_blank">Synweb</a>
-                                    </li>
-                                {% endif %}
-                            {% endblock buttons_pastoralCare %}
+{#                            {% block buttons_pastoralCare %}#}
+{#                                {% if isStaffWhoCanView and config.external_type == 'synergetic' and config.external_staff_portal %}#}
+{#                                    <li>#}
+{#                                        <a href="{{ config.external_staff_portal }}/stud.aspx?id={{ user.externalId }}"#}
+{#                                           class="icon-synergetic"#}
+{#                                           target="_blank">Synweb</a>#}
+{#                                    </li>#}
+{#                                {% endif %}#}
+{#                            {% endblock buttons_pastoralCare %}#}
 
-                            {% block buttons_documents %}
-                                {% if config.external_document_report_enabled and config.external_document_button_enable %}
-                                    {% set routeAcademicReports = routeLookupIfAuthorized('profileDocumentManagement.getIndex', {studentId: user.id}) %}
-                                    {% if routeAcademicReports %}
-                                        <li>
-                                            <a href="{{ routeAcademicReports }}" class="icon-document">{{ locale.reports.properPlural }}</a>
-                                        </li>
-                                    {% endif %}
-                                {% endif %}
-                            {% endblock buttons_documents %}
+{#                            {% block buttons_documents %}#}
+{#                                {% if config.external_document_report_enabled and config.external_document_button_enable %}#}
+{#                                    {% set routeAcademicReports = routeLookupIfAuthorized('profileDocumentManagement.getIndex', {studentId: user.id}) %}#}
+{#                                    {% if routeAcademicReports %}#}
+{#                                        <li>#}
+{#                                            <a href="{{ routeAcademicReports }}" class="icon-document">{{ locale.reports.properPlural }}</a>#}
+{#                                        </li>#}
+{#                                    {% endif %}#}
+{#                                {% endif %}#}
+{#                            {% endblock buttons_documents %}#}
 
                             {% block buttons_email_all_staff %}
                                 {% if config.mail_enable and isStaffWhoCanView and config.email_all_staff and session.user.email %}
@@ -410,17 +421,17 @@
                                 {% endif %}
                             {% endblock buttons_email_parents %}
 
-                            {% block buttons_geosnapshots %}
-                                {% if isGeosnapshotAvailable %}
-                                    {% set route = routeLookupIfAuthorized('geosnapshotApi.getStudentPhotos', {id: user.id})  %}
+{#                            {% block buttons_geosnapshots %}#}
+{#                                {% if isGeosnapshotAvailable %}#}
+{#                                    {% set route = routeLookupIfAuthorized('geosnapshotApi.getStudentPhotos', {id: user.id})  %}#}
 
-                                    {% if route %}
-                                        <li>
-                                            <a class="icon-geosnapshot" href="/geosnapshot/user/{{ user.id }}">View Photos</a>
-                                        </li>
-                                    {% endif %}
-                                {% endif %}
-                            {% endblock %}
+{#                                    {% if route %}#}
+{#                                        <li>#}
+{#                                            <a class="icon-geosnapshot" href="/geosnapshot/user/{{ user.id }}">View Photos</a>#}
+{#                                        </li>#}
+{#                                    {% endif %}#}
+{#                                {% endif %}#}
+{#                            {% endblock %}#}
 
                             {% block buttons_miscellaneous %}
                             {% endblock buttons_miscellaneous %}
