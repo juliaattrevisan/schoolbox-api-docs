@@ -306,7 +306,7 @@
                     {% block buttons %}
 
                         {% set additionalConstraints = {
-                            'eportfolio': eportfolioAuth,
+                            'eportfolio': showButtons and eportfolioAuth,
                             'duework': showButtons and routeLookupIfAuthorized('learningUpcoming.getUpcomingForStudent', {student: user, studentId: user.id}),
                             'grades': showButtons and routeLookupIfAuthorized('learningGrades.getGrades', {viewee: user, userId: user.id}),
                             'pastoral': showButtons and showPastoral and pastoralUrl,
@@ -316,16 +316,17 @@
                             'documentmanagement': showButtons and config.external_document_report_enabled and config.external_document_button_enable and routeLookupIfAuthorized('profileDocumentManagement.getIndex', {studentId: user.id})
                             'geosnapshot': showButtons and isGeosnapshotAvailable and routeLookupIfAuthorized('geosnapshotApi.getStudentPhotos', {id: user.id}),
                         } %}
-{#                        {% if eportfolioAuth %}#}
-{#                            {% block buttons_eportfolio %}#}
-{#                                <li>#}
-{#                                    <a href="/eportfolio/{{ user.id }}/profile"#}
-{#                                       class="icon-eportfolio">ePortfolio</a>#}
-{#                                </li>#}
-{#                            {% endblock buttons_eportfolio %}#}
-{#                        {% endif %}#}
+
 
                         {% if showButtons %}
+                            {#                        {% if eportfolioAuth %}#}
+                            {#                            {% block buttons_eportfolio %}#}
+                            {#                                <li>#}
+                            {#                                    <a href="/eportfolio/{{ user.id }}/profile"#}
+                            {#                                       class="icon-eportfolio">ePortfolio</a>#}
+                            {#                                </li>#}
+                            {#                            {% endblock buttons_eportfolio %}#}
+                            {#                        {% endif %}#}
 {#                            {% block buttons_dueWork %}#}
 {#                                {% set route = routeLookupIfAuthorized('learningUpcoming.getUpcomingForStudent', {student: user, studentId: user.id}) %}#}
 {#                                {% if route %}#}
