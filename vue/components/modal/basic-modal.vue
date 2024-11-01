@@ -40,6 +40,7 @@ function onCloseClick(): void {
     background-color: rgba(0, 0, 0, 0.5);
     height: 100%;
     left: 0;
+    overflow: auto;
     position: fixed;
     top: 0;
     width: 100%;
