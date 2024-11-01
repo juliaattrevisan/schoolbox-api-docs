@@ -83,6 +83,23 @@ function onModalSearchResponse(json: unknown, isActive: boolean): void {
     }
     modalDefaultResults.value = newResults.courses;
 }
+
+/**
+ * To manipulate the results to target the courses object, and display the results
+ * @param json - the returned json
+ * @param isActive - whether the search is active
+ */
+function onModalNextSearchResponse(json: unknown, isActive: boolean): void {
+    if (typeof json !== "object" || json === null || "data" in json === false) {
+        return;
+    }
+    const newResults = json.data as CourseAPIResponse;
+    if (isActive) {
+        modalSearchResults.value = [...modalSearchResults.value, ...newResults.courses];
+        return;
+    }
+    modalDefaultResults.value = [...modalDefaultResults.value, ...newResults.courses];
+}
 </script>
 
 <template>
@@ -120,6 +137,7 @@ function onModalSearchResponse(json: unknown, isActive: boolean): void {
         :manage-search-response="true"
         :allow-partial-matches="true"
         @search-response="onModalSearchResponse"
+        @next-search-response="onModalNextSearchResponse"
     />
 </template>
 

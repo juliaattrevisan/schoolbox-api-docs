@@ -28,6 +28,7 @@ export function useSearch(
     query: Ref<string>;
     results: Ref<SearchSelectItem[]>;
     isActive: Ref<boolean>;
+    url: Ref<string>;
     hasNoResults: Ref<boolean>;
     hasError: Ref<boolean>;
     search: () => Promise<void>;
@@ -127,6 +128,7 @@ export function useSearch(
         query,
         results,
         isActive,
+        url,
         hasNoResults,
         hasError,
         search,

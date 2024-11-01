@@ -31,6 +31,7 @@ const props = withDefaults(defineProps<Props>(), {
 
 const emit = defineEmits<{
     searchResponse: [json: unknown, isDefaultResults: boolean];
+    nextSearchResponse: [json: unknown, isDefaultResults: boolean];
 }>();
 
 const isOpen = defineModel<boolean>("is-open", { default: false }); // to open/close the modal
@@ -48,13 +49,23 @@ const { onAdd, onRemove } = useOnSelectedChange(
 ); // to handle selected item changes picked up within the <template/>
 
 const results = defineModel<SearchSelectItem[]>("results", { default: [] }); // to store search results
+const nextResultsCursor = window.Vue.ref<string | null>(null); // to store the next cursor for the next search
 /**
  * To handle the search response, we handle some basic responses internally,
  * but if the response is more complex, we emit the response to be handled externally
  * @param json - the returned json
  * @param isActive - whether the search is active
+ * @param isNextResults - whether the results are the next set of results
  */
-function onSearchSuccess(json: unknown, isActive: boolean): void {
+function onSearchSuccess(json: unknown, isActive: boolean, isNextResults: boolean = false): void {
+    // check for next cursor at metadata.cursor.next
+    if (typeof json === "object" && json !== null && "metadata" in json) {
+        nextResultsCursor.value = (json as { metadata: { cursor: { next: string } } }).metadata.cursor.next;
+    }
+    if (isNextResults && props.manageSearchResponse) {
+        emit("nextSearchResponse", json, isActive);
+        return;
+    }
     // emit to handle the response externally, as the response object is typically something not handled by the the basic structure below
     if (props.manageSearchResponse) {
         emit("searchResponse", json, isActive);
@@ -71,7 +82,7 @@ function onSearchSuccess(json: unknown, isActive: boolean): void {
     }
 }
 
-const { query, isActive, isSearching, hasNoResults, hasError, search } = useSearch(
+const { query, isActive, url, isSearching, hasNoResults, hasError, search } = useSearch(
     props.endpoint,
     results,
     onSearchSuccess,
@@ -127,10 +138,29 @@ function onSelect(): void {
 }
 
 /**
- * To check if we can load more results
+ * Load more results if there's more to load
  */
-function onAtResultsBottom(): void {
-    console.warn("load more?");
+async function onAtResultsBottom(): Promise<void> {
+    if (nextResultsCursor.value) {
+        try {
+            const response = await fetch(`${url.value}&cursor=${nextResultsCursor.value}`, {
+                method: "GET",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+            });
+            if (!response.ok) {
+                hasError.value = true;
+                return;
+            }
+            const json: unknown = await response.json();
+            onSearchSuccess(json, isActive.value, true);
+        } catch (error) {
+            console.error(error);
+        } finally {
+            // isSearching.value = false;
+        }
+    }
 }
 </script>
 
