@@ -400,7 +400,7 @@ class Factory
             'positionTitle' => $viewee->getPositionTitle(),
             /* Favour schoolbox's data over the sis' data
              */
-            'schoolHouse' => $viewee->getSchoolHouse()->getHouse(),
+            'schoolHouse' => $viewee->getSchoolHouse()?->getHouse(),
             /* ResidentialHouse can indeed be null: storm and phpstannis have different ideas
              */
             /** @phpstan-ignore-next-line */
