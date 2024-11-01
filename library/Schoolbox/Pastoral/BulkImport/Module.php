@@ -18,7 +18,6 @@ use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Pastoral;
 use Schoolbox\Pastoral\Attachment\Mapper as PastoralAttachmentMapper;
 use Schoolbox\Permission\Access\UserAccess;
-use Schoolbox\RoleMapper;
 use Schoolbox\UserMapper;
 
 /**
@@ -38,7 +37,10 @@ class Module extends BaseModule
     {
         $permission = new Rule\All(
             new Rule\IsConfigOn(ConfigMapper::NAME_PASTORAL_BULK_UPLOAD_ENABLED, $this->getConfig()),
-            new Rule\HasServicePermission(UserAccess::SERVICE_PASTORAL, UserAccess::ACCESS_FULL),
+            new Rule\Any(
+                new Rule\IsSuperuser(),
+                new Rule\HasServicePermission(UserAccess::SERVICE_PASTORAL, UserAccess::ACCESS_WRITE),
+            ),
         );
         $this->register(
             self::METHOD_GET,
