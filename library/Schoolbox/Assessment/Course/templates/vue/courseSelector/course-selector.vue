@@ -3,7 +3,6 @@
  * To search and select Courses
  */
 
-import { watchIgnorable } from "@vueuse/core";
 import SearchSelect from "@schoolboxVue/components/searchSelect/search-select.vue";
 import SearchSelectModal from "@schoolboxVue/components/searchSelect/modal/search-select-modal.vue";
 import type { Course } from "@schoolboxLibrary/types/Course";

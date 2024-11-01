@@ -9,9 +9,9 @@ import type { SearchSelectItem } from "@schoolboxVue/composables/search/types/Se
  * To update the selected items
  * @param isSingleSelect - whether the search is single select
  * @param selected - the selected items
- * @param update - to update the selected items
  * @param add - to add items to the selected items
  * @param remove - to remove items from the selected items
+ * @param update - to update the selected items
  * @returns - the functions to add and remove items
  */
 export function useOnSelectedChange(
