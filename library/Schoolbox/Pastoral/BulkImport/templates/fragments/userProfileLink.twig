@@ -1,0 +1,16 @@
+{% if routeLookupIfAuthorized('adminProfileButton.getCreate') %}
+    <section>
+        <fieldset class="content">
+            <div class="small-12 columns">
+                <label class="required" for="link">Title</label>
+                <p class="meta">
+                    A link to be copied to user profile buttons: this will allow access to recent imported reports
+                    to any user who may view them.
+                </p>
+                <input type="text" id="link" readonly
+                       value="{{ routeLookup('pastoral.getStudent', {studentId: 1}) | replace({'1': '[profileId]'}) }}?type={{ typeId }}&amp;subType={{ subtypeId }}"
+                />
+            </div>
+        </fieldset>
+    </section>
+{% endif %}

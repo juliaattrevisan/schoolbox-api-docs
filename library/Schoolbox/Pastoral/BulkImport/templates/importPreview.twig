@@ -55,22 +55,13 @@
                 </tbody>
             </table>
 
-            {# Ensure the previously submitted form inputs are preserved #}
-            {% macro outputForm(vars, prefix = '') %}
-                {% for name, value in vars %}
-                    {% if prefix %}
-                        {% set inputName = prefix ~ '[' ~ name ~ ']' %}
-                    {% else %}
-                        {% set inputName = name %}
-                    {% endif %}
-                    {% if value is iterable  %}
-                        {{ _self.outputForm(value, inputName) }}
-                    {% else %}
-                        <input type="hidden" name="{{ inputName }}" value="{{ value }}" />
-                    {% endif %}
-                {% endfor %}
-            {% endmacro %}
-            {{ _self.outputForm(formVars) }}
+            {% include '@pastoralBulkImport/fragments/userProfileLink.twig' with {
+                typeId:    formVars.typeId,
+                subtypeId: formVars.subtypeId,
+            } only %}
+
+            {% import '@pastoralBulkImport/macros/outputForm.twig' as outputForm %}
+            {{ outputForm.outputForm(formVars) }}
 
             <input type="submit" value="Import" />
         </form>
