@@ -323,22 +323,16 @@
                                     {# Unique derivations #}
                                     {% if button.type in ['duework'] %}
                                         {% set route = routeLookupIfAuthorized('learningUpcoming.getUpcomingForStudent', {student: user, studentId: user.id}) %}
-                                        {% set text = locale.dueWork.proper %}
                                     {% elseif button.type in ['grades'] %}
                                         {% set route = routeLookupIfAuthorized('learningGrades.getGrades', {viewee: user, userId: user.id}) %}
-                                        {% set text = locale.grades.properPlural %}
                                     {% elseif button.type in ['pastoral'] %}
                                         {% set route = pastoralUrl %}
-                                        {% set text = locale.pastoralCare.proper %}
                                     {% elseif button.type in ['calendar'] %}
                                         {% set route = routeLookupIfAuthorized('calendar.getCalendar', {selectedDate: now.urlDate, userId: user.id, user: user}) %}
-                                        {% set text = locale.calendar.proper %}
                                     {% elseif button.type in ['documentmanagement'] %}
                                         {% set route = routeLookupIfAuthorized('profileDocumentManagement.getIndex', {studentId: user.id}) %}
-                                        {% set text = locale.reports.properPlural %}
                                     {% elseif button.type in ['geosnapshot'] %}
                                         {% set route = routeLookupIfAuthorized('geosnapshotApi.getStudentPhotos', {id: user.id}) %}
-                                        {% set text = 'View Photos' %}
                                     {% elseif button.type in ['pastoralsynergetic'] %}
                                         {% set route = config.external_staff_portal ~ '/stud.aspx?id=' ~ user.externalId %}
                                     {% endif %}

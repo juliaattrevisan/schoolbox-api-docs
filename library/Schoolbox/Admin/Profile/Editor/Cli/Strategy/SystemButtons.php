@@ -12,6 +12,7 @@ namespace Schoolbox\Admin\Profile\Editor\Cli\Strategy;
 use Alaress\Database\Connector\IConnector;
 use Psr\Log\LoggerInterface;
 use Schoolbox\Admin\Profile\Editor\Cli\MigrateButtonsTool;
+use Schoolbox\L10n\RosettaStone;
 
 class SystemButtons
 {
@@ -46,22 +47,24 @@ class SystemButtons
     private \PDOStatement $roleVisibilityInsertStatement;
 
 
-    /**
-     * Constructor.
-     *
-     * Note that some system buttons depend on config vars
-     *
-     * @param bool $perform
-     * @param IConnector $db
-     * @param LoggerInterface $log
-     * @param array $campusIds
-     * @param array $roleIds
-     * @param string $externalStaffPortal
-     */
+	/**
+	 * Constructor.
+	 *
+	 * Note that some system buttons depend on config vars
+	 *
+	 * @param bool $perform
+	 * @param IConnector $db
+	 * @param LoggerInterface $log
+	 * @param RosettaStone $rosettaStone
+	 * @param array $campusIds
+	 * @param array $roleIds
+	 * @param string $externalStaffPortal
+	 */
     public function __construct(
         private bool $perform,
         private IConnector $db,
         private LoggerInterface $log,
+		private RosettaStone $rosettaStone,
         private array $campusIds,
         private array $roleIds,
         private string $externalStaffPortal
@@ -184,8 +187,8 @@ class SystemButtons
                         'roletype' => MigrateButtonsTool::ROLETYPE_STUDENT,
                         'type' => self::SYSTEM_DUEWORK,
                         'sort_order' => 2,
-                        'title' => 'Due Work',
-                        'text' => 'Due Work',
+                        'title' => $this->rosettaStone->translate('dueWork', false, true),
+                        'text' => $this->rosettaStone->translate('dueWork', false, true),
                         'icon' => 'due-work',
                         'url' => '', // derived dynamically with a routeLookup
                         'css' => null,
@@ -205,8 +208,8 @@ class SystemButtons
                         'roletype' => MigrateButtonsTool::ROLETYPE_STUDENT,
                         'type' => self::SYSTEM_GRADES,
                         'sort_order' => 3,
-                        'title' => 'Grades',
-                        'text' => 'Grades',
+                        'title' => $this->rosettaStone->translate('grades', false, true),
+                        'text' => $this->rosettaStone->translate('grades', false, true),
                         'icon' => 'tick',
                         'url' => '', // derived dynamically with a routeLookup
                         'css' => null,
@@ -226,8 +229,8 @@ class SystemButtons
                         'roletype' => MigrateButtonsTool::ROLETYPE_STUDENT,
                         'type' => self::SYSTEM_PASTORAL,
                         'sort_order' => 4,
-                        'title' => 'Pastoral Care',
-                        'text' => 'Pastoral Care',
+                        'title' => $this->rosettaStone->translate('pastoralCare', false, true),
+                        'text' => $this->rosettaStone->translate('pastoralCare', false, true),
                         'icon' => 'pastoral',
                         'url' => '', // derived dynamically with a routeLookup
                         'css' => null,
@@ -247,8 +250,8 @@ class SystemButtons
                         'roletype' => MigrateButtonsTool::ROLETYPE_STUDENT,
                         'type' => self::SYSTEM_CALENDAR,
                         'sort_order' => 5,
-                        'title' => 'Calendar',
-                        'text' => 'Calendar',
+                        'title' => $this->rosettaStone->translate('calendar', false, true),
+                        'text' => $this->rosettaStone->translate('calendar', false, true),
                         'icon' => 'calendar',
                         'url' => '', // derived dynamically with a routeLookup
                         'css' => null,
@@ -313,8 +316,8 @@ class SystemButtons
                         'roletype' => MigrateButtonsTool::ROLETYPE_STUDENT,
                         'type' => self::SYSTEM_DOCUMENT_MANAGEMENT,
                         'sort_order' => 8,
-                        'title' => 'Documents',
-                        'text' => 'Documents',
+                        'title' => $this->rosettaStone->translate('reports', false, true),
+                        'text' => $this->rosettaStone->translate('reports', false, true),
                         'icon' => 'document',
                         'url' => '', // derived dynamically with a routeLookup
                         'css' => null,
@@ -334,8 +337,8 @@ class SystemButtons
                         'roletype' => MigrateButtonsTool::ROLETYPE_STUDENT,
                         'type' => self::SYSTEM_GEOSNAPSHOT,
                         'sort_order' => 9,
-                        'title' => 'GeoSnapShot',
-                        'text' => 'GeoSnapShot',
+                        'title' => 'View Photos',
+                        'text' => 'View Photos',
                         'icon' => 'geosnapshot',
                         'url' => '/geosnapshot/user/[profileId]', // derived dynamically with a routeLookup in addition
                         'css' => null,

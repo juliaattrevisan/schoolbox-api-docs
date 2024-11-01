@@ -141,6 +141,7 @@ HELP;
                     $this->perform(),
                     $this->getDatabaseInternal(),
                     $this->getLogger(),
+					$this->getDi()->get('l10n'),
                     $campusIds,
                     $roleIds,
                     trim((string)$this->getConfig()->get('external_staff_portal'))
@@ -186,7 +187,7 @@ HELP;
         $db = $this->getDatabaseInternal();
 
         $query = "
-            SELECT id, name, group_type 
+            SELECT id, name, group_type
             FROM `groups`
         ";
 
