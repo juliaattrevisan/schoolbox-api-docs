@@ -15,3 +15,6 @@ SELECT * FROM `profile_button` WHERE deleted_at IS NULL;
 ALTER TABLE `profile_button`
     ADD COLUMN `roletype` ENUM('student', 'staff', 'parent') NULL DEFAULT NULL AFTER `id`,
     ADD COLUMN `type` VARCHAR(255) NOT NULL DEFAULT 'custom' AFTER `roletype`;
+
+create index profile_button_roletype_index
+    on profile_button (roletype);
