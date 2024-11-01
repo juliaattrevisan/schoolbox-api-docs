@@ -1,17 +1,6 @@
 -- Back up ol' boy
 
-CREATE TABLE `_profile_button` (
-    `id` int(11) NOT NULL AUTO_INCREMENT,
-    `sort_order` int(11) DEFAULT NULL,
-    `title` varchar(255) DEFAULT NULL,
-    `text` varchar(255) DEFAULT NULL,
-    `icon` varchar(255) DEFAULT NULL,
-    `url` varchar(2048) DEFAULT NULL,
-    `css` varchar(255) DEFAULT NULL,
-    `target` varchar(255) DEFAULT NULL,
-    `deleted_at` datetime DEFAULT NULL,
-PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+CREATE TABLE `_profile_button` AS SELECT * FROM profile_button;
 
 INSERT INTO `_profile_button` (id, sort_order, title, text, icon, url, css, target, deleted_at)
 SELECT * FROM `profile_button` WHERE deleted_at IS NULL;
