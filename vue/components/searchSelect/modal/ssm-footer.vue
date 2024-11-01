@@ -2,6 +2,14 @@
 /**
  * Display the modal buttons
  */
+
+import type { SearchSelectItem } from "@schoolboxVue/composables/search/types/SearchSelectItem";
+
+interface Props {
+    savedSelected: SearchSelectItem[]; // whether there are currently any selected items
+}
+const props = defineProps<Props>();
+
 const emit = defineEmits<{
     cancel: [];
     select: [];
@@ -22,12 +30,10 @@ function onSelect(): void {
 }
 
 /**
- * If there's currently a selection,
- * otherwise we are Modifying
+ * Changes the text of the button depending on whether there are any selected items
  * @returns - the text to display on the button
  */
-// const saveText = window.Vue.computed(() => (selectedNodesStore.hasNoNodes ? "Select" : "Modify"));
-const saveText = window.Vue.computed(() => "Select");
+const saveText = window.Vue.computed(() => (props.savedSelected.length === 0 ? "Select" : "Modify"));
 </script>
 
 <template>

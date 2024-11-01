@@ -38,7 +38,7 @@ const isOpen = defineModel<boolean>("is-open", { default: false }); // to open/c
 const searchSelectEl = useTemplateRef<HTMLDivElement | null>("searchSelectEl");
 
 const selected = defineModel<SearchSelectItem[]>("selected", { default: [] }); // to store selected items
-const { add, remove, update, save, undo } = useSelected(selected); // to add and remove selected items
+const { add, remove, update, save, undo, savedSelected } = useSelected(selected); // to add and remove selected items
 const { onAdd, onRemove } = useOnSelectedChange(
     toRef(() => props.isSingleSelect),
     selected,
@@ -156,7 +156,7 @@ function onSelect(): void {
                         />
                     </div>
                 </div>
-                <ssm-footer @cancel="onCancel" @select="onSelect" />
+                <ssm-footer :saved-selected="savedSelected" @cancel="onCancel" @select="onSelect" />
             </div>
         </basic-modal>
     </div>

@@ -20,6 +20,7 @@ export function useSelected($selected: Ref<Item[]> | undefined = undefined): {
     selected: Ref<Item[]>;
     isEmpty: ComputedRef<boolean>;
     hasItems: ComputedRef<boolean>;
+    savedSelected: Ref<Item[]>;
     add: (toAdd: Item | Item[]) => void;
     remove: (toRemove: Item | Item[]) => void;
     update: (updated: Item[]) => void;
@@ -94,6 +95,7 @@ export function useSelected($selected: Ref<Item[]> | undefined = undefined): {
         selected,
         isEmpty,
         hasItems,
+        savedSelected,
         add,
         remove,
         update,
