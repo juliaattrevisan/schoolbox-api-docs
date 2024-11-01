@@ -162,7 +162,7 @@ class SystemButtons
                     'row' => [
                         'roletype' => MigrateButtonsTool::ROLETYPE_STUDENT,
                         'type' => self::SYSTEM_EPORTFOLIO,
-                        'sortOrder' => 1,
+                        'sort_order' => 1,
                         'title' => 'ePortfolio',
                         'text' => 'ePortfolio',
                         'icon' => 'eportfolio',
@@ -183,7 +183,7 @@ class SystemButtons
                     'row' => [
                         'roletype' => MigrateButtonsTool::ROLETYPE_STUDENT,
                         'type' => self::SYSTEM_DUEWORK,
-                        'sortOrder' => 2,
+                        'sort_order' => 2,
                         'title' => 'Due Work',
                         'text' => 'Due Work',
                         'icon' => 'due-work',
@@ -204,7 +204,7 @@ class SystemButtons
                     'row' => [
                         'roletype' => MigrateButtonsTool::ROLETYPE_STUDENT,
                         'type' => self::SYSTEM_GRADES,
-                        'sortOrder' => 3,
+                        'sort_order' => 3,
                         'title' => 'Grades',
                         'text' => 'Grades',
                         'icon' => 'tick',
@@ -225,7 +225,7 @@ class SystemButtons
                     'row' => [
                         'roletype' => MigrateButtonsTool::ROLETYPE_STUDENT,
                         'type' => self::SYSTEM_PASTORAL,
-                        'sortOrder' => 4,
+                        'sort_order' => 4,
                         'title' => 'Pastoral Care',
                         'text' => 'Pastoral Care',
                         'icon' => 'pastoral',
@@ -246,7 +246,7 @@ class SystemButtons
                     'row' => [
                         'roletype' => MigrateButtonsTool::ROLETYPE_STUDENT,
                         'type' => self::SYSTEM_CALENDAR,
-                        'sortOrder' => 5,
+                        'sort_order' => 5,
                         'title' => 'Calendar',
                         'text' => 'Calendar',
                         'icon' => 'calendar',
@@ -267,7 +267,7 @@ class SystemButtons
                     'row' => [
                         'roletype' => MigrateButtonsTool::ROLETYPE_STUDENT,
                         'type' => self::SYSTEM_TIMETABLE,
-                        'sortOrder' => 6,
+                        'sort_order' => 6,
                         'title' => 'Timetable',
                         'text' => 'Timetable',
                         'icon' => 'timetable',
@@ -288,7 +288,7 @@ class SystemButtons
                     'row' => [
                         'roletype' => MigrateButtonsTool::ROLETYPE_STUDENT,
                         'type' => self::SYSTEM_PASTORAL_SYNERGETIC,
-                        'sortOrder' => 7,
+                        'sort_order' => 7,
                         'title' => 'Synweb',
                         'text' => 'Synweb',
                         'icon' => 'synergetic',
@@ -312,7 +312,7 @@ class SystemButtons
                     'row' => [
                         'roletype' => MigrateButtonsTool::ROLETYPE_STUDENT,
                         'type' => self::SYSTEM_DOCUMENT_MANAGEMENT,
-                        'sortOrder' => 8,
+                        'sort_order' => 8,
                         'title' => 'Documents',
                         'text' => 'Documents',
                         'icon' => 'document',
@@ -333,7 +333,7 @@ class SystemButtons
                     'row' => [
                         'roletype' => MigrateButtonsTool::ROLETYPE_STUDENT,
                         'type' => self::SYSTEM_GEOSNAPSHOT,
-                        'sortOrder' => 9,
+                        'sort_order' => 9,
                         'title' => 'GeoSnapShot',
                         'text' => 'GeoSnapShot',
                         'icon' => 'geosnapshot',
