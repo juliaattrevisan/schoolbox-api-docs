@@ -4,6 +4,7 @@
  */
 
 import type { Course } from "@schoolboxLibrary/types/Course";
+import type { Node } from "@schoolboxCurriculum/types/Node";
 import CcInput from "./cc-input.vue";
 import CcReport from "./cc-report.vue";
 import { useStore } from "./store/curriculumCoverageStore";
@@ -12,6 +13,7 @@ interface Props {
     coursesEndpoint: string; // The courses api endpoint.
     curriculumEndpoint: string; // The curriculum api endpoint.
     selectedCourses: Course[]; // The pre selected courses
+    selectedNodes: Node[]; // The pre selected nodes
     reportEndpoint: string; // The report api endpoint.
 }
 const props = defineProps<Props>();

@@ -3,6 +3,7 @@
         courses-endpoint="/api/courses/?query="
         curriculum-endpoint="{{ routeLookup('curriculumApi.searchNode') }}"
         :selected-courses="{{ (selectedCourses ?? []) | json_encode }}"
+        :selected-nodes="{{ (selectedNodes ?? []) | json_encode }}"
         report-endpoint="/curriculum/reports/coverage"
     />
 </div>
