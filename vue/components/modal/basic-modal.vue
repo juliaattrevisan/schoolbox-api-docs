@@ -16,15 +16,22 @@ function onCloseClick(): void {
 
 <template>
     <teleport to="body">
-        <div v-if="isOpen" class="modal">
-            <div class="modal__container">
-                <!-- @slot Reveal modal content goes into this slot -->
-                <slot></slot>
-                <button class="close-modal" title="Close modal" aria-label="Close modal" @click.prevent="onCloseClick">
-                    <sbx-icon name="close" size="1.5rem" color="white" />
-                </button>
+        <transition>
+            <div v-if="isOpen" class="modal">
+                <div class="modal__container">
+                    <!-- @slot Reveal modal content goes into this slot -->
+                    <slot></slot>
+                    <button
+                        class="close-modal"
+                        title="Close modal"
+                        aria-label="Close modal"
+                        @click.prevent="onCloseClick"
+                    >
+                        <sbx-icon name="close" size="1.5rem" color="white" />
+                    </button>
+                </div>
             </div>
-        </div>
+        </transition>
     </teleport>
 </template>
 
@@ -54,5 +61,16 @@ function onCloseClick(): void {
     position: absolute;
     right: -2rem;
     top: -3rem;
+}
+
+// Fade in/out animation, linked to <transition> in the template
+.v-enter-active,
+.v-leave-active {
+    transition: opacity 0.3s ease;
+}
+
+.v-enter-from,
+.v-leave-to {
+    opacity: 0;
 }
 </style>
