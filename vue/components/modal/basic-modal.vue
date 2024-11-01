@@ -8,17 +8,16 @@ import { useTemplateRef } from "vue";
 import { onKeyStroke } from "@vueuse/core";
 import { useFocusTrap } from "@vueuse/integrations/useFocusTrap";
 
-const modalContainerEl = useTemplateRef<HTMLDivElement | null>("searchSelectEl");
-
+const modalEl = useTemplateRef<HTMLDivElement | null>("modalEl"); // to get the modal element
 const isOpen = defineModel<boolean>("is-open", { default: false }); // to open/close the modal
-
-const { activate, deactivate } = useFocusTrap(modalContainerEl);
+const { activate, deactivate } = useFocusTrap(modalEl); // to keep focus within the modal when open
 
 /**
  * Keep focus within the modal when it's open
  */
-window.Vue.watch(isOpen, (newIsOpen) => {
+window.Vue.watch(isOpen, async (newIsOpen) => {
     if (newIsOpen) {
+        await window.Vue.nextTick(); // to ensure the modal is rendered before activating the focus trap
         activate();
     } else {
         deactivate();
@@ -51,8 +50,8 @@ onKeyStroke("Escape", () => {
 <template>
     <teleport to="body">
         <transition>
-            <div v-if="isOpen" class="modal">
-                <div ref="modalContainerEl" class="modal__container">
+            <div v-if="isOpen" ref="modalEl" class="modal">
+                <div class="modal__container">
                     <!-- @slot Reveal modal content goes into this slot -->
                     <slot></slot>
                     <button
