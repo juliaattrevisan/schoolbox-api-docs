@@ -8,12 +8,12 @@ use Alaress\Authorizer\Authorizer;
 use Alaress\Module\Module as BaseModule;
 use Alaress\Authorizer\Rule;
 use Alaress\Web\Controller\Base;
-use Aura\Router\Map;
 use Alaress\Twig\Loader\IChainLoader;
 use Schoolbox\Admin\Profile\Editor\Payload;
 use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Menu\Icon\Mapper as IconMapper;
+use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Profile\Button\Mapper as ProfileButtonMapper;
 use Schoolbox\Profile\Button\Campus;
 use Schoolbox\Profile\Button\Role;
@@ -29,7 +29,6 @@ class Module extends BaseModule
 {
     protected $basename = 'adminProfileButton';
 
-
     /**
      * Hook method for setting up routes via self::register()
      *
@@ -37,13 +36,12 @@ class Module extends BaseModule
      */
     protected function registerRoutes(): void
     {
-        /* Keep an eye out on Granular Permissions epic SA-18424
-         * Hopefully there isn't a service permission that affects us here
-         * and we can continue to assume Superusers Only
-         */
         $perms = new Rule\All(
             new Rule\IsLoggedIn(),
-            new Rule\IsSuperuser()
+            new Rule\Any(
+                new Rule\IsSuperuser(),
+                new Rule\HasServicePermission(UserAccess::SERVICE_DESIGN, UserAccess::ACCESS_FULL)
+            )
         );
 
         $preloadRoleType = function ($params) {
@@ -61,7 +59,6 @@ class Module extends BaseModule
         $this->register('POST', '/order', 'postOrder', $perms);
         $this->register('POST', '/modify', 'postModify', $perms);
     }
-
 
     /**
      * Check that a valid and supported roletype was provided;
@@ -103,7 +100,6 @@ class Module extends BaseModule
             'roleType' => $params['roleType'],
         ];
     }
-
 
     /**
      * @inheritdoc
