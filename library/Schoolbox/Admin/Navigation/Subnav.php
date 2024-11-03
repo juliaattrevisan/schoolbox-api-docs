@@ -170,7 +170,7 @@ class Subnav
                 'children'    => [],
             ],
             '/adminv2/badge' => [
-                'name'       => 'Badge',
+                'name'       => 'Badges',
                 'visible'    => $userIsSuperuser || $userHasServicePermissionBadge,
                 'searchable' => false,
                 'children'   => [
