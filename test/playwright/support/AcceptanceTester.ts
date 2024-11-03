@@ -112,7 +112,9 @@ export default class AcceptanceTester extends BaseTester {
     async searchForUser(fullname: string): Promise<void> {
         this.isGoingTo(`search for a user by the name of ${fullname}`);
         await this.page.getByTestId("search-input-button").click();
-        await this.page.getByTestId("search-input-field").fill(fullname);
+        // await this.page.getByTestId("search-input-field").fill(fullname);
+        await this.page.getByTestId("search-input-field").click();
+        await this.page.keyboard.type(fullname, { delay: 500 });
         await this.page.getByTestId(`header-search-user-result-link-${fullname}`).click();
 
         this.isGoingTo("expect to be redirected to the user profile page");
@@ -192,11 +194,13 @@ export default class AcceptanceTester extends BaseTester {
         const dataTransfer = await this.page.evaluateHandle(
             ({ data, fileName }) => {
                 const dt = new DataTransfer();
-                const file = new File([Uint8Array.from(atob(data), (c) => c.charCodeAt(0))], fileName);
+                const file = new File([Uint8Array.from(atob(data), (c) => c.charCodeAt(0))], fileName, {
+                    type: "image/png",
+                });
                 dt.items.add(file);
                 return dt;
             },
-            { data: buffer.toString("base64"), fileName: path.basename(filePath) },
+            { data: buffer.toString("base64"), fileName: path.basename(filePath), mimeType: "image/png" },
         );
 
         // Then, dispatch a drop event on the dropzone element

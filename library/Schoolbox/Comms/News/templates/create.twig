@@ -521,13 +521,13 @@
 
                     <div class="small-12 columns">
                         <label for="body">Body</label>
-                        <textarea id="body" name="body">{{ article.body }}</textarea>
+                        <textarea id="body" name="body" data-test="news-article-form-body">{{ article.body }}</textarea>
                     </div>
 
                     <legend data-collapser="optional-section" class="icon-down-arrow" >Include a blurb to be displayed alongside the title</legend>
                     <div class="column small-12 hide" data-collapsable="optional-section" data-collapse-state="collapsed" >
                         <label for="blurb">Blurb</label>
-                        <textarea id="blurb" name="blurb">{{ article.blurb }}</textarea>
+                        <textarea id="blurb" name="blurb" data-test="news-article-form-blurb">{{ article.blurb }}</textarea>
                     </div>
                 </fieldset>
                 <fieldset class="content">

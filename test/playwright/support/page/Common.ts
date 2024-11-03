@@ -91,10 +91,17 @@ export default class Common {
     static readonly ICON_MODIFY_PAGES = "a.icon-modify.no-text";
 
     /**
+     * any modal dialog, open or closed
+     * use this in combination with the other modal dialog selectors for better precision
+     */
+
+    static readonly SELECTOR_MODAL_DIALOG = "div[data-reveal]";
+
+    /**
      * the currently open modal dialog
      * use this in combination with the other modal dialog selectors for better precision
      */
-    static readonly SELECTOR_MODAL_DIALOG = "div[data-reveal].open";
+    static readonly SELECTOR_MODAL_DIALOG_OPEN = `${this.SELECTOR_MODAL_DIALOG}.open`;
 
     /**
      * confirm button on modal dialogs
@@ -240,16 +247,47 @@ export default class Common {
     }
 
     /**
+     * Wait for a modal dialog to be fully open and visible
+     * This should be used after triggering a modal dialog to ensure it has been fully opened
+     * Usually it's fine to skip this and playwright's actionability checks will handle it for you
+     * but in some cases, e.g. closing a modal dialog after opening it, it can be useful
+     * @returns - the locator for the modal dialog
+     */
+    async waitForModalToBeOpen(): Promise<Locator> {
+        const currentModal = this.page.locator(Common.SELECTOR_MODAL_DIALOG_OPEN);
+        await expect(currentModal).toBeVisible();
+        await expect(currentModal).toHaveCSS("opacity", "1");
+        return currentModal;
+    }
+
+    /**
+     * Wait for a modal dialog to be fully closed and invisible
+     * If you are triggering actions to open/close modals at a fast pace,
+     * this avoids a modal getting stuck in an intermediate state
+     */
+    async waitForModalToBeClosed(): Promise<void> {
+        const currentOpenModals = await this.page.locator(Common.SELECTOR_MODAL_DIALOG_OPEN).all();
+        await Promise.all(
+            currentOpenModals.map(async (modal) => {
+                await expect(modal).not.toBeVisible();
+            }),
+        );
+
+        const currentModals = await this.page.locator(Common.SELECTOR_MODAL_DIALOG).all();
+        await Promise.all(
+            currentModals.map(async (modal) => {
+                await expect(modal).not.toBeVisible();
+            }),
+        );
+    }
+
+    /**
      * clicks the close x button on the currently open modal dialog
      */
     async closeModal(): Promise<void> {
-        // You can't close a reveal modal before it is in a fully opened state,
-        // so wait for it to be visible and fully opaque before trying to close it
-        const currentModal = this.page.locator(Common.SELECTOR_MODAL_DIALOG);
-        await expect(currentModal).toBeVisible();
-        await expect(currentModal).toHaveCSS("opacity", "1");
-
+        const currentModal = await this.waitForModalToBeOpen();
         await currentModal.locator(Common.SELECTOR_CLOSE_BUTTON_MODAL).click();
+        await this.waitForModalToBeClosed();
     }
 
     /**
@@ -338,7 +376,7 @@ export default class Common {
     }
 
     /**
-     * Convert a Date object to a string in the format "dd/mm/yyyy" or "dd/mm/yyyy hh:mm[am/pm]"
+     * Convert a Date object to a string in the format "dd/mm/yyyy" or "dd/mm/yyyy h:mm[am/pm]"
      * This is the expected format for date inputs around schoolbox
      * @param date - the date to convert
      * @param includeTime - whether to include the time in the string
@@ -354,7 +392,7 @@ export default class Common {
         let formattedDate = `${day}/${month}/${year}`;
 
         if (includeTime) {
-            const hours = zeroPad(date.getHours() % 12 || 12);
+            const hours = date.getHours() % 12 || 12;
             const minutes = zeroPad(date.getMinutes());
             const ampm = date.getHours() >= 12 ? "pm" : "am";
 
