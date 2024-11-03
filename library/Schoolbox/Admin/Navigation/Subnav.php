@@ -147,13 +147,17 @@ class Subnav
         $userHasServicePermissionCms = (
             $this->user->hasServicePermission(UserAccess::SERVICE_CMS, UserAccess::ACCESS_FULL)
         );
+        $userHasServicePermissionDesign = (
+            $this->user->hasServicePermission(UserAccess::SERVICE_DESIGN, UserAccess::ACCESS_FULL)
+        );
         $userHasAnyModeratorServicePermission = (
             $userHasServicePermissionNews ||
             $userHasServicePermissionCalendar ||
             $userHasServicePermissionPastoral ||
             $userHasServicePermissionLms ||
             $userHasServicePermissionBadge ||
-            $userHasServicePermissionCms
+            $userHasServicePermissionCms ||
+            $userHasServicePermissionDesign
         );
 
         /* Keys of this array uniquely identify a page and its subpages
@@ -563,12 +567,6 @@ class Subnav
                         'children'    => [],
                         'description' => 'Setup the campus within the school and configure which timetables are used by the campus.',
                     ],
-                    '/adminv2/lists/component-definition' => [
-                        'name'        => 'Components',
-                        'visible'     => $userIsSuperuser,
-                        'children'    => [],
-                        'description' => 'Control which components can be used on homepages, dashboards and ePortfolios.',
-                    ],
                     '/adminv2/lists/webdav' => [
                         'name'        => 'Drives',
                         'visible'     => $userIsSuperuser && $this->configLoader->get(ConfigMapper::NAME_WEBDAV_ENABLED),
@@ -598,12 +596,6 @@ class Subnav
                         'visible'     => $userIsSuperuser,
                         'children'    => [],
                         'description' => 'Configure user roles within the system, the type of access they have and permissions.',
-                    ],
-                    '/adminv2/lists/timetable-colour' => [
-                        'name'        => 'Timetable Colours',
-                        'visible'     => $userIsSuperuser,
-                        'children'    => [],
-                        'description' => 'Configure the set of colours used to randomly colour the timetable.',
                     ],
                     '/adminv2/lists/user-title' => [
                         'name'        => 'User Titles',
@@ -813,30 +805,6 @@ class Subnav
                         'visible'     => $userIsSuperuser,
                         'children'    => [],
                         'description' => 'Add your own custom buttons to a users profile page.',
-                    ],
-                    '/adminv2/menu-side' => [
-                        'name'        => 'Side Menu',
-                        'visible'     => $userIsSuperuser,
-                        'children'    => [],
-                        'description' => 'Add and remove links to the hierarchical navigation menu on the left hand side of the screen.',
-                    ],
-                    '/adminv2/setting/Skin%20Config' => [
-                        'name'        => 'Skin Config',
-                        'visible'     => $userIsSuperuser,
-                        'children'    => [],
-                        'description' => 'Configure the look and feel of your system, including colours, images and logos.',
-                    ],
-                    '/adminv2/terminology' => [
-                        'name'        => 'Terminology',
-                        'visible'     => $userIsSuperuser,
-                        'children'    => [],
-                        'description' => 'Localise the words used to describe key features to your own language.',
-                    ],
-                    '/adminv2/menu-top' => [
-                        'name'        => 'Top Menu',
-                        'visible'     => $userIsSuperuser,
-                        'children'    => [],
-                        'description' => 'Configure the top menu navigation and give quick access to the most important features.',
                     ],
                 ],
             ],
@@ -1109,6 +1077,54 @@ class Subnav
                     ],
                 ],
             ],
+            '/adminv2/design' => [
+                'name'       => 'Design',
+                'visible'    => $userIsSuperuser || $userHasServicePermissionDesign,
+                'children'   => [
+                    '/adminv2/profile-button' => [
+                        'name'        => 'Profile Buttons',
+                        'visible'     => $userIsSuperuser || $userHasServicePermissionDesign,
+                        'children'    => [],
+                        'description' => 'Add your own custom buttons to a users profile page.',
+                    ],
+                    '/adminv2/menu-side' => [
+                        'name'        => 'Side Menu',
+                        'visible'     => $userIsSuperuser || $userHasServicePermissionDesign,
+                        'children'    => [],
+                        'description' => 'Add and remove links to the hierarchical navigation menu on the left hand side of the screen.',
+                    ],
+                    '/adminv2/setting/Skin%20Config' => [
+                        'name'        => 'Skin Config',
+                        'visible'     => $userIsSuperuser || $userHasServicePermissionDesign,
+                        'children'    => [],
+                        'description' => 'Configure the look and feel of your system, including colours, images and logos.',
+                    ],
+                    '/adminv2/terminology' => [
+                        'name'        => 'Terminology',
+                        'visible'     => $userIsSuperuser || $userHasServicePermissionDesign,
+                        'children'    => [],
+                        'description' => 'Localise the words used to describe key features to your own language.',
+                    ],
+                    '/adminv2/menu-top' => [
+                        'name'        => 'Top Menu',
+                        'visible'     => $userIsSuperuser || $userHasServicePermissionDesign,
+                        'children'    => [],
+                        'description' => 'Configure the top menu navigation and give quick access to the most important features.',
+                    ],
+                    '/adminv2/lists/component-definition' => [
+                        'name'        => 'Components',
+                        'visible'     => $userIsSuperuser || $userHasServicePermissionDesign,
+                        'children'    => [],
+                        'description' => 'Control which components can be used on homepages, dashboards and ePortfolios.',
+                    ],
+                    '/adminv2/lists/timetable-colour' => [
+                        'name'        => 'Timetable Colours',
+                        'visible'     => $userIsSuperuser || $userHasServicePermissionDesign,
+                        'children'    => [],
+                        'description' => 'Configure the set of colours used to randomly colour the timetable.',
+                    ],
+                ]
+            ]
         ];
     }
 
