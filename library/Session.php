@@ -383,7 +383,7 @@ class Session
                         // extract error code
                         preg_match('/(data [0-9a-z]*)/', $ldap_error, $matches);
                         // if the preg_match finds an error formatted as expected
-                        if ($matches[0]) {
+                        if ($matches[0] ?? null) {
                             $err_code = substr($matches[0], 5);
                             // error codes referenced from per http://wiki.service-now.com/index.php?title=LDAP_Error_Codes
                             switch ($err_code) {
