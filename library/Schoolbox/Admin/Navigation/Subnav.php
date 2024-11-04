@@ -1080,6 +1080,7 @@ class Subnav
             '/adminv2/design' => [
                 'name'       => 'Design',
                 'visible'    => $userIsSuperuser || $userHasServicePermissionDesign,
+                'searchable' => false,
                 'children'   => [
                     '/adminv2/profile-button' => [
                         'name'        => 'Profile Buttons',
