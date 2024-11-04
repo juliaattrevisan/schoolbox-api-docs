@@ -82,7 +82,7 @@ window.Vue.onMounted(() => {
                 :has-error="isCurriculumInvalid"
             />
         </div>
-        <button>{{ buttonText }}</button>
+        <button class="submit">{{ buttonText }}</button>
     </form>
 </template>
 
