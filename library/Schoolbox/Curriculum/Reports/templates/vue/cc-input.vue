@@ -66,21 +66,23 @@ window.Vue.onMounted(() => {
 
 <template>
     <form class="c-island l-flex-col l-pad-m l-gap-m" @submit.prevent="onGenerateReport">
-        <div>
-            <course-selector
-                :endpoint="props.coursesEndpoint"
-                :preselected="props.selectedCourses"
-                :is-required="true"
-                :has-error="isCoursesInvalid"
-            />
-        </div>
-        <div>
-            <cc-input-curriculum
-                :endpoint="props.curriculumEndpoint"
-                :preselected="props.selectedNodes"
-                :is-required="true"
-                :has-error="isCurriculumInvalid"
-            />
+        <div class="l-flex l-gap-m">
+            <div class="l-flex__item--1">
+                <course-selector
+                    :endpoint="props.coursesEndpoint"
+                    :preselected="props.selectedCourses"
+                    :is-required="true"
+                    :has-error="isCoursesInvalid"
+                />
+            </div>
+            <div class="l-flex__item--1">
+                <cc-input-curriculum
+                    :endpoint="props.curriculumEndpoint"
+                    :preselected="props.selectedNodes"
+                    :is-required="true"
+                    :has-error="isCurriculumInvalid"
+                />
+            </div>
         </div>
         <button class="submit">{{ buttonText }}</button>
     </form>
