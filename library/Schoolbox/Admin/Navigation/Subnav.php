@@ -141,11 +141,15 @@ class Subnav
         $userHasServicePermissionLms = (
             $this->user->hasServicePermission(UserAccess::SERVICE_LMS, UserAccess::ACCESS_FULL)
         );
+        $userHasServicePermissionBadge = (
+            $this->user->hasServicePermission(UserAccess::SERVICE_BADGE, UserAccess::ACCESS_FULL)
+        );
         $userHasAnyModeratorServicePermission = (
             $userHasServicePermissionNews ||
             $userHasServicePermissionCalendar ||
             $userHasServicePermissionPastoral ||
-            $userHasServicePermissionLms
+            $userHasServicePermissionLms ||
+            $userHasServicePermissionBadge
         );
 
         /* Keys of this array uniquely identify a page and its subpages
@@ -164,6 +168,43 @@ class Subnav
                 'visible'     => $userIsSuperuser || $userHasAnyModeratorServicePermission,
                 'description' => 'Key system status information.',
                 'children'    => [],
+            ],
+            '/adminv2/badge' => [
+                'name'       => 'Badges',
+                'visible'    =>  (
+                    ($userIsSuperuser || $userHasServicePermissionBadge) &&
+                    $this->configLoader->get(ConfigMapper::NAME_BADGES_ENABLED)
+                ),
+                'searchable' => false,
+                'children'   => [
+                    '/adminv2/lists/badge/achievement-category' => [
+                        'name'        => 'Categories List',
+                        'visible'     => (
+                            ($userIsSuperuser || $userHasServicePermissionBadge) &&
+                            $this->configLoader->get(ConfigMapper::NAME_BADGES_ENABLED)
+                        ),
+                        'children'    => [],
+                        'description' => 'Configure the list of categories that badges can be defined within.',
+                    ],
+                    '/adminv2/filters/badge/badgeList' => [
+                        'name'        => $filterLabelBuilder->buildLabel(FilterPageModel::PAGE_BADGE_LIST) . ' Filter',
+                        'visible'     => (
+                            ($userIsSuperuser || $userHasServicePermissionBadge) &&
+                            $filterAvailabilityChecker->isAvailable(FilterPageModel::PAGE_BADGE_LIST)
+                        ),
+                        'children'    => [],
+                        'description' => 'Configure the default and available filter options on the goal and achievements search page.',
+                    ],
+                    '/adminv2/filters/badge/awardList' => [
+                        'name'        => $filterLabelBuilder->buildLabel(FilterPageModel::PAGE_AWARD_LIST) . ' Filter',
+                        'visible'     => (
+                            ($userIsSuperuser || $userHasServicePermissionBadge) &&
+                            $filterAvailabilityChecker->isAvailable(FilterPageModel::PAGE_AWARD_LIST)
+                        ),
+                        'children'    => [],
+                        'description' => 'Configure the default and available filter options on the goal and achievements search page.',
+                    ],
+                ]
             ],
             '/adminv2/calendar' => [
                 'name'       => 'Calendar',
@@ -285,25 +326,6 @@ class Subnav
                         'visible'     => $userIsSuperuser && $this->configLoader->get(ConfigMapper::NAME_EPORTFOLIO_ENABLED),
                         'children'    => [],
                         'description' => 'Clone and deploy an ePortfolio page from one user to many other users.',
-                    ],
-                ],
-            ],
-            '/adminv2/filters' => [
-                'name'       => 'Filters',
-                'visible'    => $userIsSuperuser && $filterAvailabilityChecker->isAnyFilterAvailable(),
-                'searchable' => false,
-                'children'   => [
-                    '/adminv2/filters/badgeList' => [
-                        'name'        => $filterLabelBuilder->buildLabel(FilterPageModel::PAGE_BADGE_LIST),
-                        'visible'     => $userIsSuperuser && $filterAvailabilityChecker->isAvailable(FilterPageModel::PAGE_BADGE_LIST),
-                        'children'    => [],
-                        'description' => 'Configure the default and available filter options on the goal and achievements search page.',
-                    ],
-                    '/adminv2/filters/awardList' => [
-                        'name'        => $filterLabelBuilder->buildLabel(FilterPageModel::PAGE_AWARD_LIST),
-                        'visible'     => $userIsSuperuser && $filterAvailabilityChecker->isAvailable(FilterPageModel::PAGE_AWARD_LIST),
-                        'children'    => [],
-                        'description' => 'Configure the default and available filter options on the goal and achievements search page.',
                     ],
                 ],
             ],
@@ -526,17 +548,11 @@ class Subnav
                     ],
                 ],
             ],
-            '/adminv2/lists/achievement-category' => [
+            '/adminv2/lists' => [
                 'name'       => 'Lists',
                 'visible'    => $userIsSuperuser,
                 'searchable' => false,
                 'children'   => [
-                    '/adminv2/lists/achievement-category' => [
-                        'name'        => 'Badge Categories',
-                        'visible'     => $userIsSuperuser && $this->configLoader->get(ConfigMapper::NAME_BADGES_ENABLED),
-                        'children'    => [],
-                        'description' => 'Configure the list of categories that badges can be defined within.',
-                    ],
                     '/adminv2/lists/campus' => [
                         'name'        => 'Campus',
                         'visible'     => $userIsSuperuser,

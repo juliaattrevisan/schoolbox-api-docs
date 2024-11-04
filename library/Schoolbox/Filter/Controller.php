@@ -369,6 +369,50 @@ class Controller extends BaseController
         $this->postPushDefaultSelections($page);
     }
 
+    // Functions for routes accessible by Badge Moderators -----------------------------------------------------------//
+
+    /**
+     * Display a page where admins can alter default filter selections
+     *
+     * @param IFactoryFactory $factoryFactory The factory responsible for the entity filtered by this page
+     * @param string          $page
+     * @throws RouteNotFound
+     * @throws TwigError
+     */
+    public function getPageSettingsBadge(IFactoryFactory $factoryFactory, string $page): void
+    {
+        $this->getPageSettings($factoryFactory, $page);
+    }
+
+    /**
+     * Load up all settings for this page, overlay new settings, and save
+     *
+     * @param IFactoryFactory $factoryFactory The factory responsible for the entity filtered by this page
+     * @param string          $page
+     * @throws UnexpectedValueException
+     * @throws PDOException
+     * @throws InvalidColumnException
+     * @throws InvalidArgumentException If a filter definition class not found, or filter factory not registered
+     * @throws DefinitionException If join $name isn't on this mapper
+     * @throws MapperException If an alias is incorrect
+     * @throws UnderflowException
+     */
+    public function postSavePageSettingsBadge(IFactoryFactory $factoryFactory, string $page): void
+    {
+        $this->postSavePageSettings($factoryFactory, $page);
+    }
+
+    /**
+     * Push default selections to users in the given roles.
+     *
+     * @param string $page
+     * @throws Exception
+     */
+    public function postPushDefaultSelectionsBadge(string $page): void
+    {
+        $this->postPushDefaultSelections($page);
+    }
+
     // Private functions ---------------------------------------------------------------------------------------------//
 
     /**
@@ -435,6 +479,8 @@ class Controller extends BaseController
             'grades',
             'pending',
             'rubricMarkbook' => 'Lms',
+            'badgeList',
+            'awardList' => 'Badge',
             default => '',
         };
     }
