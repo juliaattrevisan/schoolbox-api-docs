@@ -1093,7 +1093,7 @@ class Subnav
                         'children'    => [],
                         'description' => 'Add and remove links to the hierarchical navigation menu on the left hand side of the screen.',
                     ],
-                    '/adminv2/setting/Skin%20Config' => [
+                    '/adminv2/setting/design/Skin Config' => [
                         'name'        => 'Skin Config',
                         'visible'     => $userIsSuperuser || $userHasServicePermissionDesign,
                         'children'    => [],

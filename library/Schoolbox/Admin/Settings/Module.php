@@ -36,6 +36,7 @@ class Module extends \Alaress\Module\Module
                 new Rule\HasServicePermission(UserAccess::SERVICE_LMS, UserAccess::ACCESS_FULL),
                 new Rule\HasServicePermission(UserAccess::SERVICE_BADGE, UserAccess::ACCESS_FULL),
                 new Rule\HasServicePermission(UserAccess::SERVICE_CMS, UserAccess::ACCESS_FULL),
+                new Rule\HasServicePermission(UserAccess::SERVICE_DESIGN, UserAccess::ACCESS_FULL),
             )
         );
 
@@ -63,6 +64,14 @@ class Module extends \Alaress\Module\Module
             )
         );
 
+        $ruleDesign = new Rule\All(
+            new Rule\IsLoggedIn(),
+            new Rule\Any(
+                new Rule\IsSuperuser(),
+                new Rule\HasServicePermission(UserAccess::SERVICE_DESIGN, UserAccess::ACCESS_FULL)
+            )
+        );
+
         $ruleSuperuserOnly = new Rule\All(
             new Rule\IsLoggedIn(),
             new Rule\IsSuperuser(),
@@ -80,6 +89,10 @@ class Module extends \Alaress\Module\Module
         // Routes to which users with service permission UserAccess::SERVICE_CMS need access.
         $this->register('GET', '/cms/{typeLabel:Resources}', 'getSettingsCms', $ruleCms);
         $this->register('POST', '/cms/{typeLabel:Resources}', 'postSettingsCms', $ruleCms);
+
+        // Routes to which users with service permission UserAccess::SERVICE_DESIGN need access.
+        $this->register('GET', '/design/{typeLabel:Skin%20Config}', 'getSettingsDesign', $ruleDesign);
+        $this->register('POST', '/design/{typeLabel:Skin%20Config}', 'postSettingsDesign', $ruleDesign);
 
         $this->register('GET', '/search', 'searchSettings', $ruleSearchSettings);
         $this->register('GET', '{/typeLabel}', 'getSettings', $ruleSuperuserOnly);

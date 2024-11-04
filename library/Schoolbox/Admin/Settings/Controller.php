@@ -314,6 +314,28 @@ class Controller extends ConfigController
         $this->postSettings($typeLabel);
     }
 
+    // Functions for routes accessible by Design Moderators ----------------------------------------------------------//
+
+    /**
+     * @param string $typeLabel
+     * @throws RouteNotFound
+     * @throws Error
+     */
+    public function getSettingsDesign(string $typeLabel): void
+    {
+        $this->getSettings($typeLabel);
+    }
+
+    /**
+     * @param string $typeLabel
+     * @throws RouteNotFound
+     * @throws \Schoolbox\Mapper\Exception
+     */
+    public function postSettingsDesign(string $typeLabel): void
+    {
+        $this->postSettings($typeLabel);
+    }
+
     // Private functions ---------------------------------------------------------------------------------------------//
 
     /**
@@ -344,6 +366,7 @@ class Controller extends ConfigController
             'Document Management',
             'LMS Policy' => 'Lms',
             'Resources' => 'Cms',
+            'Skin Config' => 'Design',
             default => '',
         };
     }
