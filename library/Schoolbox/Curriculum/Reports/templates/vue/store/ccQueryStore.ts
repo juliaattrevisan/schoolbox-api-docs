@@ -5,7 +5,7 @@
 import { defineStore } from "pinia";
 import { useInputStore } from "./ccInputStore";
 
-export const useStore = defineStore("curriculumCoverage", () => {
+export const useQueryStore = defineStore("ccQuery", () => {
     let endpoint = ""; // the endpoint to use for the report
 
     /**

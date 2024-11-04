@@ -5,7 +5,7 @@
 import { defineStore } from "pinia";
 import type { Course } from "@schoolboxLibrary/types/Course";
 import type { CurriculumCoveragePayload, CurriculumCoverageNode } from "../../js/types/curriculumCoverageTypes";
-import { useStore } from "./curriculumCoverageStore";
+import { useQueryStore } from "./ccQueryStore";
 import { useInputStore } from "./ccInputStore";
 
 /**
@@ -41,8 +41,7 @@ export const useReportStore = defineStore("ccReport", () => {
      */
     async function report(): Promise<void> {
         useInputStore().setActive();
-        // useResultsStore().clear();
-        useStore().setQueryParams();
+        useQueryStore().setQueryParams();
         hasNotReported.value = false;
         // abort the previous search if it's still running
         if (isLoading.value) {
@@ -52,7 +51,7 @@ export const useReportStore = defineStore("ccReport", () => {
             isLoading.value = true;
             hasLoadError.value = false;
             controller = new AbortController();
-            const response = await fetch(useStore().getEndpointWithParams(), {
+            const response = await fetch(useQueryStore().getEndpointWithParams(), {
                 method: "GET",
                 signal: controller.signal,
                 headers: {
