@@ -800,12 +800,6 @@ class Subnav
                         'children'    => [],
                         'description' => 'Customise the fields and buttons on the staff, student and parent profile screens.',
                     ],
-                    '/adminv2/profile-button' => [
-                        'name'        => 'Profile Buttons',
-                        'visible'     => $userIsSuperuser,
-                        'children'    => [],
-                        'description' => 'Add your own custom buttons to a users profile page.',
-                    ],
                 ],
             ],
             '/adminv2/cms' => [
