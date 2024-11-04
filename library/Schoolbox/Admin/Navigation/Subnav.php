@@ -1111,7 +1111,7 @@ class Subnav
                         'children'    => [],
                         'description' => 'Configure the top menu navigation and give quick access to the most important features.',
                     ],
-                    '/adminv2/lists/component-definition' => [
+                    '/adminv2/lists/design/component-definition' => [
                         'name'        => 'Components',
                         'visible'     => $userIsSuperuser || $userHasServicePermissionDesign,
                         'children'    => [],
