@@ -292,6 +292,28 @@ class Controller extends ConfigController
         $this->postSettings($typeLabel);
     }
 
+    // Functions for routes accessible by CMS Moderators -------------------------------------------------------------//
+
+    /**
+     * @param string $typeLabel
+     * @throws RouteNotFound
+     * @throws Error
+     */
+    public function getSettingsCms(string $typeLabel): void
+    {
+        $this->getSettings($typeLabel);
+    }
+
+    /**
+     * @param string $typeLabel
+     * @throws RouteNotFound
+     * @throws \Schoolbox\Mapper\Exception
+     */
+    public function postSettingsCms(string $typeLabel): void
+    {
+        $this->postSettings($typeLabel);
+    }
+
     // Private functions ---------------------------------------------------------------------------------------------//
 
     /**
@@ -321,6 +343,7 @@ class Controller extends ConfigController
             'Pastoral Care' => 'Pastoral',
             'Document Management',
             'LMS Policy' => 'Lms',
+            'Resources' => 'Cms',
             default => '',
         };
     }

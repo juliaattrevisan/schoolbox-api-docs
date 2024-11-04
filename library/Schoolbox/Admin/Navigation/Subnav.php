@@ -258,20 +258,20 @@ class Subnav
                         'children'    => [],
                         'description' => 'A log of videos and audio that is currently being transcoded or failed to transcode.',
                     ],
-                    '/adminv2/restore' => [
-                        'name'        => 'Restore Resources',
-                        'visible'     => $userIsSuperuser || $userHasServicePermissionCms,
-                        'children'    => [],
-                        'description' => 'Undelete pages, folders and assessments that were accidentally deleted recently.',
-                    ],
-                    '/adminv2/setting/Resources' => [
-                        'name'        => 'Settings',
+                    '/adminv2/setting/cms/Resources' => [
+                        'name'        => 'Resource Settings',
                         'visible'     => (
                             ($userIsSuperuser || $userHasServicePermissionCms) &&
                             count($enabledConfigs[ConfigMapper::TYPE_RESOURCES] ?? []) > 0
                         ),
                         'children'    => [],
                         'description' => 'Control how files are stored and processed when uploaded.',
+                    ],
+                    '/adminv2/restore' => [
+                        'name'        => 'Restore Resources',
+                        'visible'     => $userIsSuperuser || $userHasServicePermissionCms,
+                        'children'    => [],
+                        'description' => 'Undelete pages, folders and assessments that were accidentally deleted recently.',
                     ],
                     '/adminv2/usage' => [
                         'name'        => 'Usage',
