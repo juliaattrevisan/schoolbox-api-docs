@@ -66,7 +66,9 @@ function getCourseUsageCount($course: Course): number {
         if (
             option === ReportOptionValues.UNIT ||
             option === ReportOptionValues.LEARNING_ACTIVITY ||
-            option === ReportOptionValues.LEARNING_ACTIVITY_LESSON_PLAN
+            option === ReportOptionValues.LEARNING_ACTIVITY_LESSON_PLAN ||
+            option === ReportOptionValues.RUBRIC ||
+            option === ReportOptionValues.IN_USE_RUBRIC
         )
             return acc;
         if (usage[option] === undefined) return acc;
