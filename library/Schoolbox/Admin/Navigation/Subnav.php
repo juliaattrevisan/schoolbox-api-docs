@@ -171,7 +171,10 @@ class Subnav
             ],
             '/adminv2/badge' => [
                 'name'       => 'Badges',
-                'visible'    => $userIsSuperuser || $userHasServicePermissionBadge,
+                'visible'    =>  (
+                    ($userIsSuperuser || $userHasServicePermissionBadge) &&
+                    $this->configLoader->get(ConfigMapper::NAME_BADGES_ENABLED)
+                ),
                 'searchable' => false,
                 'children'   => [
                     '/adminv2/lists/badge/achievement-category' => [
