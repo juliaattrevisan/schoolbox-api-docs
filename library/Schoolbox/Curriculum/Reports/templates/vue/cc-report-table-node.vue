@@ -150,27 +150,31 @@ const showNode = window.Vue.computed(() => {
 <template>
     <tr v-if="showNode">
         <th scope="row" class="node__name" :style="{ paddingInlineStart: paddingStart }">{{ title }}</th>
-        <td :class="`u-key-bkg ${nodeUsageCount === 0 ? 'u-highlight' : ''}`">
-            {{ nodeUsageCount }}
-        </td>
-        <!-- loop through each course/unit, retrieving the node usage or returning 0 for undefined usages -->
-        <template v-for="(course, index) in reportStore.courses" :key="course.id">
-            <td :class="`${index % 2 ? 'u-alt-bkg' : ''}  ${getCourseUsageCount(course) === 0 ? 'u-highlight' : ''}`">
-                {{ getCourseUsageCount(course) }}
+        <template v-if="node.code">
+            <td :class="`u-key-bkg ${nodeUsageCount === 0 ? 'u-highlight' : ''}`">
+                {{ nodeUsageCount }}
             </td>
-            <td
-                v-for="unit in course.units"
-                :key="unit.id"
-                :class="`${index % 2 ? 'u-alt-bkg' : ''} ${getUnitUsageCount(course, unit) === 0 ? 'u-highlight' : ''}`"
-            >
-                {{ getUnitUsageCount(course, unit) }}
-            </td>
-            <td
-                v-if="reportStore.hasMultipleCourses"
-                :class="`${index % 2 ? 'u-alt-bkg' : ''} ${getTotalUsageCount(course) === 0 ? 'u-highlight' : ''}`"
-            >
-                {{ getTotalUsageCount(course) }}
-            </td>
+            <!-- loop through each course/unit, retrieving the node usage or returning 0 for undefined usages -->
+            <template v-for="(course, index) in reportStore.courses" :key="course.id">
+                <td
+                    :class="`${index % 2 ? 'u-alt-bkg' : ''}  ${getCourseUsageCount(course) === 0 ? 'u-highlight' : ''}`"
+                >
+                    {{ getCourseUsageCount(course) }}
+                </td>
+                <td
+                    v-for="unit in course.units"
+                    :key="unit.id"
+                    :class="`${index % 2 ? 'u-alt-bkg' : ''} ${getUnitUsageCount(course, unit) === 0 ? 'u-highlight' : ''}`"
+                >
+                    {{ getUnitUsageCount(course, unit) }}
+                </td>
+                <td
+                    v-if="reportStore.hasMultipleCourses"
+                    :class="`${index % 2 ? 'u-alt-bkg' : ''} ${getTotalUsageCount(course) === 0 ? 'u-highlight' : ''}`"
+                >
+                    {{ getTotalUsageCount(course) }}
+                </td>
+            </template>
         </template>
     </tr>
     <template v-if="props.node.children && props.node.children.length > 0">
