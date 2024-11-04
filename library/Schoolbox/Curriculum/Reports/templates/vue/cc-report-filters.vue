@@ -9,10 +9,10 @@ const filtersStore = useFiltersStore();
 </script>
 
 <template>
-    <div class="c-island l-flex l-gap-m">
+    <div class="c-island l-flex-col l-gap-m">
         <div class="checklist">
             <label>Report on</label>
-            <ul class="option-list">
+            <ul class="option-list l-flex l-gap-m f-no-margins">
                 <li v-for="reportOption in filtersStore.allReportOptions" :key="reportOption.value">
                     <input
                         :id="reportOption.value"
@@ -20,7 +20,7 @@ const filtersStore = useFiltersStore();
                         :value="reportOption.value"
                         type="checkbox"
                     />
-                    <label :for="reportOption.value">{{ reportOption.label }}</label>
+                    <label :for="reportOption.value" class="f-no-margins">{{ reportOption.label }}</label>
                 </li>
             </ul>
         </div>
