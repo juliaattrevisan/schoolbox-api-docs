@@ -181,7 +181,7 @@ class Cursor implements ICursor
                 INNER JOIN curriculum_node_for_category cnfc
                     ON cnfc.category_id = cus.folder_id AND cnfc.curriculum_node_id IN %s
                 WHERE cus.course_specification_id IN %s
-                GROUP BY cnfc.curriculum_node_id, cus.course_specification_id
+                GROUP BY cnfc.curriculum_node_id, cus.course_specification_id, cus.folder_id
             ",
                 self::COURSE_UNIT,
                 $nodesPlaceHolder,
