@@ -1076,6 +1076,12 @@ class Subnav
                 'visible'    => $userIsSuperuser || $userHasServicePermissionDesign,
                 'searchable' => false,
                 'children'   => [
+                    '/adminv2/lists/design/component-definition' => [
+                        'name'        => 'Components List',
+                        'visible'     => $userIsSuperuser || $userHasServicePermissionDesign,
+                        'children'    => [],
+                        'description' => 'Control which components can be used on homepages, dashboards and ePortfolios.',
+                    ],
                     '/adminv2/profile-button' => [
                         'name'        => 'Profile Buttons',
                         'visible'     => $userIsSuperuser || $userHasServicePermissionDesign,
@@ -1100,23 +1106,17 @@ class Subnav
                         'children'    => [],
                         'description' => 'Localise the words used to describe key features to your own language.',
                     ],
-                    '/adminv2/menu-top' => [
-                        'name'        => 'Top Menu',
-                        'visible'     => $userIsSuperuser || $userHasServicePermissionDesign,
-                        'children'    => [],
-                        'description' => 'Configure the top menu navigation and give quick access to the most important features.',
-                    ],
-                    '/adminv2/lists/design/component-definition' => [
-                        'name'        => 'Components List',
-                        'visible'     => $userIsSuperuser || $userHasServicePermissionDesign,
-                        'children'    => [],
-                        'description' => 'Control which components can be used on homepages, dashboards and ePortfolios.',
-                    ],
                     '/adminv2/lists/design/timetable-colour' => [
                         'name'        => 'Timetable Colours List',
                         'visible'     => $userIsSuperuser || $userHasServicePermissionDesign,
                         'children'    => [],
                         'description' => 'Configure the set of colours used to randomly colour the timetable.',
+                    ],
+                    '/adminv2/menu-top' => [
+                        'name'        => 'Top Menu',
+                        'visible'     => $userIsSuperuser || $userHasServicePermissionDesign,
+                        'children'    => [],
+                        'description' => 'Configure the top menu navigation and give quick access to the most important features.',
                     ],
                 ]
             ]
