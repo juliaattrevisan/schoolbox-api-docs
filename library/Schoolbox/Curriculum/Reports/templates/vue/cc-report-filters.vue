@@ -9,7 +9,7 @@ const filtersStore = useFiltersStore();
 </script>
 
 <template>
-    <div class="c-island l-flex-col l-gap-m">
+    <div class="c-island l-flex l-gap-l">
         <div class="checklist">
             <label>Report on</label>
             <ul class="option-list l-flex l-gap-m f-no-margins">
