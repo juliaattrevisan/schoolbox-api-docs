@@ -20,6 +20,7 @@ import type { Node } from "@schoolboxCurriculum/types/Node";
 
 interface Props {
     endpoint: string; // The curriculum api endpoint
+    preselected: Node[]; // The nodes that have already been selected previously
     label?: string; // The label text
     labelId?: string; // The label id
     isRequired?: boolean; // Whether the input requires a value
@@ -46,6 +47,7 @@ store.init({
     canSelectChildren: false,
 });
 const selectedStore = useSelectedNodesStore();
+selectedStore.add(props.preselected);
 const modalStore = useModalStore();
 const endpoint = `${props.endpoint}?enabled=1&limit=50&includeWithoutCode=1&query=`; // The endpoint to retrieve the curriculum data from
 const results = window.Vue.ref<Node[]>([]);

@@ -47,6 +47,16 @@ const { ignoreUpdates } = watchIgnorable(results, (newResults: CourseAPIResponse
         }
     });
 });
+
+/**
+ * To select a link to the course
+ * @param course - the selected course
+ */
+function onCourseNameSelect(course: Course): void {
+    if (course.folder) {
+        window.location.href = course.folder._links.view;
+    }
+}
 </script>
 
 <template>
@@ -61,6 +71,8 @@ const { ignoreUpdates } = watchIgnorable(results, (newResults: CourseAPIResponse
         :error-message="props.errorMessage"
         :is-read-only="props.isReadOnly"
         :allow-partial-matches="true"
+        :can-select-item="true"
+        @select="onCourseNameSelect"
     />
 </template>
 

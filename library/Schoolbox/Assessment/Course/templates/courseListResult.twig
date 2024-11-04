@@ -125,7 +125,7 @@ Usage:
             <li><a href="{{ unitPlannerUrl }}" class="icon-project">Unit Planner</a></li>
         {% endif %}
         <li>
-            <a href="/curriculum/reports/coverage?course-id={{ courseSpec.id }}" class="icon-report">Curriculum Coverage</a>
+            <a href="/curriculum/reports/coverage?courseId={{ courseSpec.id }}" class="icon-report">Curriculum Coverage</a>
         </li>
         {% if folderAccess[courseSpec.folder.id] ?? false %}
             {% set modifyCourseUrl = routeLookupIfAuthorized('course.modifyCourse', {id: courseSpec.id, course: courseSpec }) %}

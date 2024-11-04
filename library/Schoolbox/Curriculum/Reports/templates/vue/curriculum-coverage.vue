@@ -4,15 +4,21 @@
  */
 
 import type { Course } from "@schoolboxLibrary/types/Course";
+import type { Node } from "@schoolboxCurriculum/types/Node";
 import CcInput from "./cc-input.vue";
 import CcReport from "./cc-report.vue";
+import { useQueryStore } from "./store/ccQueryStore";
 
 interface Props {
     coursesEndpoint: string; // The courses api endpoint.
     curriculumEndpoint: string; // The curriculum api endpoint.
     selectedCourses: Course[]; // The pre selected courses
+    selectedNodes: Node[]; // The pre selected nodes
+    reportEndpoint: string; // The report api endpoint.
 }
 const props = defineProps<Props>();
+
+useQueryStore().init(props.reportEndpoint); // pass through the report endpoint to the store
 </script>
 
 <template>
@@ -22,6 +28,7 @@ const props = defineProps<Props>();
             :courses-endpoint="props.coursesEndpoint"
             :curriculum-endpoint="props.curriculumEndpoint"
             :selected-courses="props.selectedCourses"
+            :selected-nodes="props.selectedNodes"
         />
         <cc-report />
     </div>

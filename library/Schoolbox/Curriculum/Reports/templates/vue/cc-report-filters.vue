@@ -3,31 +3,31 @@
  * To be able to filter the report and control any other settings
  */
 
-import { useStore } from "./store/curriculumCoverageStore";
+import { useFiltersStore } from "./store/ccFiltersStore";
 
-const store = useStore();
+const filtersStore = useFiltersStore();
 </script>
 
 <template>
-    <div class="c-island">
+    <div class="c-island l-flex l-gap-l">
         <div class="checklist">
             <label>Report on</label>
-            <ul class="option-list">
-                <li v-for="reportOption in store.allReportOptionValues" :key="reportOption.value">
+            <ul class="option-list l-flex l-gap-m f-no-margins">
+                <li v-for="reportOption in filtersStore.allReportOptions" :key="reportOption.value">
                     <input
                         :id="reportOption.value"
-                        v-model="store.selectedReportOptionValues"
+                        v-model="filtersStore.selectedReportOptions"
                         :value="reportOption.value"
                         type="checkbox"
                     />
-                    <label :for="reportOption.value">{{ reportOption.label }}</label>
+                    <label :for="reportOption.value" class="f-no-margins">{{ reportOption.label }}</label>
                 </li>
             </ul>
         </div>
         <div>
             <label>Only show gaps</label>
             <div class="switch">
-                <input id="onlyShowGapsSwitch" v-model="store.onlyShowGaps" type="checkbox" />
+                <input id="onlyShowGapsSwitch" v-model="filtersStore.onlyShowGaps" type="checkbox" />
                 <label for="onlyShowGapsSwitch">
                     <span class="icon-approve"></span>
                     <span class="icon-cancel"></span>
