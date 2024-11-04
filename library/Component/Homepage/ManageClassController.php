@@ -356,7 +356,7 @@ class Component_Homepage_ManageClassController extends Component_Homepage_Contro
         // Curriculum coverage report should show for Course pages.
         if ($lmsEnabled && $isCoursePage && $this->getContentPermission() >= UserAccess::ACCESS_READ) {
             $coverageLink = null;
-            $coverageLink = "/curriculum/reports/coverage?course-id=" . $this->getContext()->getCourseSpecification()->getId();
+            $coverageLink = "/curriculum/reports/coverage?courseId=" . $this->getContext()->getCourseSpecification()->getId();
             $this->setVar('CURRICULUM_COVERAGE_LINK', $coverageLink);
             $this->parse('curriculum_coverage_block', 'curriculum_coverage');
         } else {
