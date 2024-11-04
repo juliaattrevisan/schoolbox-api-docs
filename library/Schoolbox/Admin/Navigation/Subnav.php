@@ -1117,7 +1117,7 @@ class Subnav
                         'children'    => [],
                         'description' => 'Control which components can be used on homepages, dashboards and ePortfolios.',
                     ],
-                    '/adminv2/lists/timetable-colour' => [
+                    '/adminv2/lists/design/timetable-colour' => [
                         'name'        => 'Timetable Colours',
                         'visible'     => $userIsSuperuser || $userHasServicePermissionDesign,
                         'children'    => [],

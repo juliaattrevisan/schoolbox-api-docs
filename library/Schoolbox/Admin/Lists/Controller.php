@@ -1721,7 +1721,8 @@ class Controller extends Base
             'submission-type',
             'submission-errors' => 'Lms',
             'achievement-category' => 'Badge',
-            'component-definition' => 'Design',
+            'component-definition',
+            'timetable-colour' => 'Design',
             default => '',
         };
     }

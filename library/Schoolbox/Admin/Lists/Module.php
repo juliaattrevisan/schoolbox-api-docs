@@ -113,10 +113,11 @@ class Module extends BaseModule
         $this->register('POST', "/badge/delete/{table:achievement-category}", 'postBadgeDelete', $ruleBadge);
 
         // Routes to which users with service permission UserAccess::SERVICE_DESIGN need access.
-        $this->register('GET', "/design/{table:component-definition}", 'getDesignIndex', $ruleDesign);
-        $this->register('GET', "/design/data/{table:component-definition}", 'getDesignData', $ruleDesign);
-        $this->register('POST', "/design/save/{table:component-definition}", 'postDesignSave', $ruleDesign);
-        $this->register('POST', "/design/delete/{table:component-definition}", 'postDesignDelete', $ruleDesign);
+        $designTablesRegex = '(component-definition|timetable-colour)';
+        $this->register('GET', "/design/{table:$designTablesRegex", 'getDesignIndex', $ruleDesign);
+        $this->register('GET', "/design/data/{table:$designTablesRegex}", 'getDesignData', $ruleDesign);
+        $this->register('POST', "/design/save/{table:$designTablesRegex}", 'postDesignSave', $ruleDesign);
+        $this->register('POST', "/design/delete/{table:$designTablesRegex}", 'postDesignDelete', $ruleDesign);
 
         // Routes to which only superusers need access.
         $this->register('GET', "{/table}", 'getIndex', $ruleSuperuserOnly);
