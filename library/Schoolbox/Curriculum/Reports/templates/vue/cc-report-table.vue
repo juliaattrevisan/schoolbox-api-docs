@@ -15,7 +15,7 @@ const reportStore = useReportStore();
             <thead>
                 <tr>
                     <th rowspan="2" class="l-valign--bottom">Curriculum</th>
-                    <th rowspan="2" class="l-valign--bottom u-alt-bkg">Total</th>
+                    <th rowspan="2" class="l-valign--bottom u-key-bkg">Total</th>
                     <!-- colspan will be the number of units plus total -->
                     <th
                         v-for="(course, index) in reportStore.courses"
