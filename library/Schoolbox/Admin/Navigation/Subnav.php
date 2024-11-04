@@ -1112,13 +1112,13 @@ class Subnav
                         'description' => 'Configure the top menu navigation and give quick access to the most important features.',
                     ],
                     '/adminv2/lists/design/component-definition' => [
-                        'name'        => 'Components',
+                        'name'        => 'Components List',
                         'visible'     => $userIsSuperuser || $userHasServicePermissionDesign,
                         'children'    => [],
                         'description' => 'Control which components can be used on homepages, dashboards and ePortfolios.',
                     ],
                     '/adminv2/lists/design/timetable-colour' => [
-                        'name'        => 'Timetable Colours',
+                        'name'        => 'Timetable Colours List',
                         'visible'     => $userIsSuperuser || $userHasServicePermissionDesign,
                         'children'    => [],
                         'description' => 'Configure the set of colours used to randomly colour the timetable.',
