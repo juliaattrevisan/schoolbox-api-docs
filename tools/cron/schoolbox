@@ -52,8 +52,8 @@ MAILTO="ist+cron@schoolbox.com.au"
 # Expired Storage Removal Tool - every Sunday at 5am
 15 5 * * 0	www-data	/usr/local/bin/jitter 1200 php /usr/share/schoolbox/tools/storage/expired-storage-removal.php --perform >> /var/log/schoolbox/expired-storage-removal.log 2>&1
 
-# Etherpad - sync back to MySQL - every hour
-38 * * * *	www-data	php /usr/share/schoolbox/tools/etherpad-sync.php >> /var/log/schoolbox/etherpad-sync.log 2>&1
+# Etherpad - sync back to MySQL - once a day
+38 1 * * *	www-data	/usr/local/bin/jitter 3600 php /usr/share/schoolbox/tools/etherpad-sync.php >> /var/log/schoolbox/etherpad-sync.log 2>&1
 
 # Complete quizzes that have expired
 # (Jitter by 1 minute I guess)
