@@ -53,6 +53,15 @@ function onGenerateReport(): void {
     }
     void reportStore.report();
 }
+
+/**
+ * If courses and curriculum are preselected, generate the report straight away
+ */
+window.Vue.onMounted(() => {
+    if (props.selectedCourses.length > 0 && props.selectedNodes.length > 0) {
+        void reportStore.report();
+    }
+});
 </script>
 
 <template>
