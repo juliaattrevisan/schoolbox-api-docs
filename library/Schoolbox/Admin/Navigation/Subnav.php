@@ -144,12 +144,16 @@ class Subnav
         $userHasServicePermissionBadge = (
             $this->user->hasServicePermission(UserAccess::SERVICE_BADGE, UserAccess::ACCESS_FULL)
         );
+        $userHasServicePermissionCms = (
+            $this->user->hasServicePermission(UserAccess::SERVICE_CMS, UserAccess::ACCESS_FULL)
+        );
         $userHasAnyModeratorServicePermission = (
             $userHasServicePermissionNews ||
             $userHasServicePermissionCalendar ||
             $userHasServicePermissionPastoral ||
             $userHasServicePermissionLms ||
-            $userHasServicePermissionBadge
+            $userHasServicePermissionBadge ||
+            $userHasServicePermissionCms
         );
 
         /* Keys of this array uniquely identify a page and its subpages
@@ -236,6 +240,46 @@ class Subnav
                         'description' => 'Setup the list of event types for filtering and colour coding.',
                     ],
                 ],
+            ],
+            '/adminv2/cms' => [
+                'name'       => 'CMS',
+                'visible'    => $userIsSuperuser || $userHasServicePermissionCms,
+                'searchable' => false,
+                'children'   => [
+                    '/adminv2/allowed-file' => [
+                        'name'        => 'Allowed Files',
+                        'visible'     => $userIsSuperuser || $userHasServicePermissionCms,
+                        'children'    => [],
+                        'description' => 'Define the file mime types that can be uploaded, the maximum filesize and the icon they will use.',
+                    ],
+                    '/adminv2/video' => [
+                        'name'        => 'Media Queue',
+                        'visible'     => $userIsSuperuser || $userHasServicePermissionCms,
+                        'children'    => [],
+                        'description' => 'A log of videos and audio that is currently being transcoded or failed to transcode.',
+                    ],
+                    '/adminv2/restore' => [
+                        'name'        => 'Restore',
+                        'visible'     => $userIsSuperuser || $userHasServicePermissionCms,
+                        'children'    => [],
+                        'description' => 'Undelete pages, folders and assessments that were accidentally deleted recently.',
+                    ],
+                    '/adminv2/setting/Resources' => [
+                        'name'        => 'Settings',
+                        'visible'     => (
+                            ($userIsSuperuser || $userHasServicePermissionCms) &&
+                            count($enabledConfigs[ConfigMapper::TYPE_RESOURCES] ?? []) > 0
+                        ),
+                        'children'    => [],
+                        'description' => 'Control how files are stored and processed when uploaded.',
+                    ],
+                    '/adminv2/usage' => [
+                        'name'        => 'Usage',
+                        'visible'     => $userIsSuperuser || $userHasServicePermissionCms,
+                        'children'    => [],
+                        'description' => 'View what files have been uploaded, by whom and how much disk space they are using.',
+                    ],
+                ]
             ],
             '/adminv2/engagement/index/collaboration' => [
                 'name'       => 'Engagement',
@@ -833,43 +877,6 @@ class Subnav
                         'visible'     => $userIsSuperuser,
                         'children'    => [],
                         'description' => 'Configure the top menu navigation and give quick access to the most important features.',
-                    ],
-                ],
-            ],
-            '/adminv2/setting/Resources' => [
-                'name'       => 'Resources',
-                'visible'    => $userIsSuperuser,
-                'searchable' => false,
-                'children'   => [
-                    '/adminv2/allowed-file' => [
-                        'name'        => 'Allowed Files',
-                        'visible'     => $userIsSuperuser,
-                        'children'    => [],
-                        'description' => 'Define the file mime types that can be uploaded, the maximum filesize and the icon they will use.',
-                    ],
-                    '/adminv2/video' => [
-                        'name'        => 'Media Queue',
-                        'visible'     => $userIsSuperuser,
-                        'children'    => [],
-                        'description' => 'A log of videos and audio that is currently being transcoded or failed to transcode.',
-                    ],
-                    '/adminv2/setting/Resources' => [
-                        'name'        => 'Settings',
-                        'visible'     => $userIsSuperuser && count($enabledConfigs[ConfigMapper::TYPE_RESOURCES] ?? []) > 0,
-                        'children'    => [],
-                        'description' => 'Control how files are stored and processed when uploaded.',
-                    ],
-                    '/adminv2/restore' => [
-                        'name'        => 'Restore',
-                        'visible'     => $userIsSuperuser,
-                        'children'    => [],
-                        'description' => 'Undelete pages, folders and assessments that were accidentally deleted recently.',
-                    ],
-                    '/adminv2/usage' => [
-                        'name'        => 'Usage',
-                        'visible'     => $userIsSuperuser,
-                        'children'    => [],
-                        'description' => 'View what files have been uploaded, by whom and how much disk space they are using.',
                     ],
                 ],
             ],
