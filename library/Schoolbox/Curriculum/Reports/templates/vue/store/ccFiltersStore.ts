@@ -29,7 +29,7 @@ export const useFiltersStore = defineStore("ccFilters", () => {
             label: "Rubric",
         },
         {
-            value: ReportOptionValues.RUBRIC,
+            value: ReportOptionValues.IN_USE_RUBRIC,
             label: "In-use Rubric",
         },
     ]); // all report options available
