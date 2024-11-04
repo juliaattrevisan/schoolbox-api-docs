@@ -12,8 +12,8 @@ use Alaress\Authorizer\Authorizer;
 use Alaress\Module\Module as BaseModule;
 use Alaress\Authorizer\Rule;
 use Alaress\Web\Controller\Base;
-use Aura\Router\Map;
 use Alaress\Twig\Loader\IChainLoader;
+use Schoolbox\Permission\Access\UserAccess;
 
 /**
  * The module for managing school terms through the admin section.
@@ -56,7 +56,17 @@ class Module extends BaseModule
      */
     public function initRoutePermissions(Authorizer $authorizer)
     {
-        $this->addRoutePermission($authorizer, '.*', new Rule\IsSuperuser());
+        $this->addRoutePermission(
+            $authorizer,
+            '.*',
+            new Rule\All(
+                new Rule\IsLoggedIn(),
+                new Rule\Any(
+                    new Rule\IsSuperuser(),
+                    new Rule\HasServicePermission(UserAccess::SERVICE_DESIGN, UserAccess::ACCESS_FULL)
+                )
+            )
+        );
     }
 
     /**
