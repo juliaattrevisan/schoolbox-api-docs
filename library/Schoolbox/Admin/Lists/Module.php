@@ -114,7 +114,7 @@ class Module extends BaseModule
 
         // Routes to which users with service permission UserAccess::SERVICE_DESIGN need access.
         $designTablesRegex = '(component-definition|timetable-colour)';
-        $this->register('GET', "/design/{table:$designTablesRegex", 'getDesignIndex', $ruleDesign);
+        $this->register('GET', "/design/{table:$designTablesRegex}", 'getDesignIndex', $ruleDesign);
         $this->register('GET', "/design/data/{table:$designTablesRegex}", 'getDesignData', $ruleDesign);
         $this->register('POST', "/design/save/{table:$designTablesRegex}", 'postDesignSave', $ruleDesign);
         $this->register('POST', "/design/delete/{table:$designTablesRegex}", 'postDesignDelete', $ruleDesign);
