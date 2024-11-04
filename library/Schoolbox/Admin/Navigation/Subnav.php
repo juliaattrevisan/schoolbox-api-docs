@@ -259,7 +259,7 @@ class Subnav
                         'description' => 'A log of videos and audio that is currently being transcoded or failed to transcode.',
                     ],
                     '/adminv2/restore' => [
-                        'name'        => 'Restore',
+                        'name'        => 'Restore Resources',
                         'visible'     => $userIsSuperuser || $userHasServicePermissionCms,
                         'children'    => [],
                         'description' => 'Undelete pages, folders and assessments that were accidentally deleted recently.',
