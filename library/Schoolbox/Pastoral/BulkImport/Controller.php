@@ -102,7 +102,7 @@ class Controller extends Base
                     ->setModalTitle('Select report ZIP')
                     ->setAttachmentsLabel('')
                     ->setAttachPrompt('Upload report ZIP')
-                    ->setMimeFilter('application/zip,application/x-zip-compressed')
+                    ->setMimeFilter(Zone::ZIP_ALL)
                     ->setReadOnly(false)
                     ->setFileVar('report')
                     ->setMulti(false)
