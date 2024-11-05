@@ -36,7 +36,7 @@ class Module extends BaseModule
     protected function registerRoutes(): void
     {
         $permission = new Rule\All(
-            new Rule\IsConfigOn(ConfigMapper::NAME_PASTORAL_BULK_UPLOAD_ENABLED, $this->getConfig()),
+            new Rule\IsConfigOn(ConfigMapper::NAME_PASTORAL_BULK_IMPORT_ENABLED, $this->getConfig()),
             new Rule\Any(
                 new Rule\IsSuperuser(),
                 new Rule\HasServicePermission(UserAccess::SERVICE_PASTORAL, UserAccess::ACCESS_WRITE),

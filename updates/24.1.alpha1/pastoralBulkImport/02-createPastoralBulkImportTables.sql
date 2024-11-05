@@ -1,4 +1,4 @@
-create table pastoral_bulk_upload
+create table pastoral_bulk_import
 (
     id                 int auto_increment primary key,
     owner_id           int unsigned               not null,
@@ -13,22 +13,22 @@ create table pastoral_bulk_upload
     created_at         datetime                   not null,
     updated_at         datetime                   not null,
     deleted_at         datetime                   null,
-    constraint fk_pastoral_bulk_upload_owner_id
+    constraint fk_pastoral_bulk_import_owner_id
         foreign key (owner_id) references user (id),
-    constraint fk_pastoral_bulk_upload_zip_hash
+    constraint fk_pastoral_bulk_import_zip_hash
         foreign key (zip_hash) references storage (hash),
-    constraint fk_pastoral_bulk_upload_severity
+    constraint fk_pastoral_bulk_import_severity
         foreign key (severity_id) references lu_pastoral_severity (id),
-    constraint fk_pastoral_bulk_upload_type
+    constraint fk_pastoral_bulk_import_type
         foreign key (type_id) references lu_pastoral_type (id),
-    constraint fk_pastoral_bulk_upload_subtype
+    constraint fk_pastoral_bulk_import_subtype
         foreign key (subtype_id) references lu_pastoral_subtype (id)
 );
 
-create table pastoral_bulk_upload_access
+create table pastoral_bulk_import_access
 (
     id                      int auto_increment primary key,
-    pastoral_bulk_upload_id int                                          not null,
+    pastoral_bulk_import_id int                                          not null,
     group_id                int                                          null,
     role_id                 int unsigned                                 null,
     role_type               enum ('guest', 'student', 'parent', 'staff') null,
@@ -38,12 +38,12 @@ create table pastoral_bulk_upload_access
     access                  int     default 0                            null,
     match_campus            tinyint default 0                            null,
     comments_allowed        tinyint default 0                            null,
-    constraint fk_pastoral_bulk_upload_access_pastoral_bulk_upload_id
-        foreign key (pastoral_bulk_upload_id) references pastoral (id),
-    constraint fk_pastoral_bulk_upload_access_group_id
+    constraint fk_pastoral_bulk_import_access_pastoral_bulk_import_id
+        foreign key (pastoral_bulk_import_id) references pastoral (id),
+    constraint fk_pastoral_bulk_import_access_group_id
         foreign key (group_id) references pastoral_group (id),
-    constraint fk_pastoral_bulk_upload_access_role_id
+    constraint fk_pastoral_bulk_import_access_role_id
         foreign key (role_id) references `groups` (id),
-    constraint fk_pastoral_bulk_upload_user_id
+    constraint fk_pastoral_bulk_import_user_id
         foreign key (user_id) references user (id)
 );

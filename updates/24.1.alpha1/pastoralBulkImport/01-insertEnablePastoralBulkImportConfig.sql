@@ -16,10 +16,10 @@ INSERT INTO config (
     module,
     sequence
 ) VALUES (
-    'pastoral_bulk_upload_enabled',
+    'pastoral_bulk_import_enabled',
     '1',
-    'Enable Pastoral Record Bulk Upload',
-    'If toggled to ''ON'', pastoral moderators may bulk upload reports in a ZIP file into pastoral records for multiple students at once.',
+    'Enable Pastoral Record Bulk Import',
+    'If toggled to ''ON'', pastoral moderators may bulk import reports in a ZIP file into pastoral records for multiple students at once.',
     @fieldId,
     '',
     @typeId,
