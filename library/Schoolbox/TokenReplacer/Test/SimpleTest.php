@@ -718,6 +718,55 @@ class SimpleTest extends TestCase
                     '[externalId]' => '201',
                 ],
             ],
+            'Real-world summative report example: parentheses, no extension or filename in template' => [
+                '([externalId])',
+                '(3428) Document.pdf',
+                [
+                    '[externalId]' => '3428',
+                ],
+            ],
+            'Real-world summative report example: parentheses, no extension in template' => [
+                '([externalId]) Document',
+                '(3428) Document.pdf',
+                [
+                    '[externalId]' => '3428',
+                ],
+            ],
+            'Real-world summative report example: parentheses, extension in template' => [
+                '([externalId]) Document.pdf',
+                '(3428) Document.pdf',
+                [
+                    '[externalId]' => '3428',
+                ],
+            ],
+            'Real-world summative report example: external ID only, no extension in template' => [
+                '[externalId]',
+                '46473.pdf',
+                [
+                    '[externalId]' => '46473',
+                ],
+            ],
+            'Real-world summative report example: external ID only, extension in template' => [
+                '[externalId].pdf',
+                '46473.pdf',
+                [
+                    '[externalId]' => '46473',
+                ],
+            ],
+            'Real-world summative report example: sub-folder, no extension in template' => [
+                'reports/[externalId]',
+                'reports/3456.pdf',
+                [
+                    '[externalId]' => '3456',
+                ],
+            ],
+            'Real-world summative report example: sub-folder, extension in template' => [
+                'reports/[externalId].pdf',
+                'reports/3456.pdf',
+                [
+                    '[externalId]' => '3456',
+                ],
+            ],
         ];
     }
 }
