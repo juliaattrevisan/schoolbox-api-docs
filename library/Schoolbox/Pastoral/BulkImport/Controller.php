@@ -299,10 +299,11 @@ class Controller extends Base
     {
         $tokenReplacer = new Simple();
         $files         = [];
+        $template      = $this->trimExtension($this->requestPost->get('template'));
         for ($i = 0; $i < $archive->numFiles; $i++) {
             $name = $archive->getNameIndex($i);
             if ($name !== false) {
-                $tokens     = $tokenReplacer->extract($this->requestPost->get('template'), $name);
+                $tokens     = $tokenReplacer->extract($template, $this->trimExtension($name));
                 $user       = null;
                 $externalId = null;
                 if (isset($tokens['[externalId]'])) {
@@ -323,5 +324,24 @@ class Controller extends Base
         }
 
         return $files;
+    }
+
+    /**
+     * Trim the extension off of `$path`, if there is one.
+     *
+     * Required because `\Schoolbox\TokenReplacer\Simple::extract` extracts the
+     * entire remainder of a string if the template's last character is a token:
+     * e.g. "[externalId]" matches "123.pdf" in "123.pdf".
+     *
+     * @param string $path
+     * @return string
+     */
+    private function trimExtension(string $path): string
+    {
+        $extension = pathinfo($path, PATHINFO_EXTENSION);
+        if ($extension !== '') {
+            return substr($path, 0, -(strlen($extension) + 1));
+        }
+        return $path;
     }
 }
