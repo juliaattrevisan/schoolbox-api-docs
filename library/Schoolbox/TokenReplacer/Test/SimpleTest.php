@@ -739,11 +739,14 @@ class SimpleTest extends TestCase
                     '[externalId]' => '3428',
                 ],
             ],
+            // This case includes the extension in the extracted token:
+            // this is unavoidable, as `extract()` doesn't know what format an
+            // external ID should have: it just extracts a bunch of characters.
             'Real-world summative report example: external ID only, no extension in template' => [
                 '[externalId]',
                 '46473.pdf',
                 [
-                    '[externalId]' => '46473',
+                    '[externalId]' => '46473.pdf',
                 ],
             ],
             'Real-world summative report example: external ID only, extension in template' => [
@@ -753,11 +756,13 @@ class SimpleTest extends TestCase
                     '[externalId]' => '46473',
                 ],
             ],
+            // As with the other "no extension in template" case, this includes
+            // the extension in the extracted token.
             'Real-world summative report example: sub-folder, no extension in template' => [
                 'reports/[externalId]',
                 'reports/3456.pdf',
                 [
-                    '[externalId]' => '3456',
+                    '[externalId]' => '3456.pdf',
                 ],
             ],
             'Real-world summative report example: sub-folder, extension in template' => [
