@@ -24,3 +24,26 @@ create table pastoral_bulk_upload
     constraint fk_pastoral_bulk_upload_subtype
         foreign key (subtype_id) references lu_pastoral_subtype (id)
 );
+
+create table pastoral_bulk_upload_access
+(
+    id                      int auto_increment primary key,
+    pastoral_bulk_upload_id int                                          not null,
+    group_id                int                                          null,
+    role_id                 int unsigned                                 null,
+    role_type               enum ('guest', 'student', 'parent', 'staff') null,
+    user_id                 int unsigned                                 null,
+    created_at              datetime                                     not null,
+    deleted_at              datetime                                     null,
+    access                  int     default 0                            null,
+    match_campus            tinyint default 0                            null,
+    comments_allowed        tinyint default 0                            null,
+    constraint fk_pastoral_bulk_upload_access_pastoral_bulk_upload_id
+        foreign key (pastoral_bulk_upload_id) references pastoral (id),
+    constraint fk_pastoral_bulk_upload_access_group_id
+        foreign key (group_id) references pastoral_group (id),
+    constraint fk_pastoral_bulk_upload_access_role_id
+        foreign key (role_id) references `groups` (id),
+    constraint fk_pastoral_bulk_upload_user_id
+        foreign key (user_id) references user (id)
+);
