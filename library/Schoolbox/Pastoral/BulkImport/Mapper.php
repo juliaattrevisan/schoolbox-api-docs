@@ -56,6 +56,9 @@ class Mapper extends BaseMapper
             'tag_id',
             'pastoral_bulk_import_id',
             'id',
+            null,
+            null,
+            'tags',
         );
     }
 }

@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\Pastoral\BulkImport;
 
+use Schoolbox\GenericCollection;
 use Schoolbox\ISoftDeletable;
 use Schoolbox\Mapper\Traits\Model\CreatedAtDate;
 use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
@@ -16,6 +17,7 @@ use Schoolbox\Mapper\Traits\Model\Id;
 use Schoolbox\Mapper\Traits\Model\UpdatedAtDate;
 use Schoolbox\Pastoral\Severity\Model as PastoralSeverity;
 use Schoolbox\Pastoral\SubType\Model as PastoralSubType;
+use Schoolbox\Pastoral\Tag\Model as TagModel;
 use Schoolbox\Pastoral\Type\Model as PastoralType;
 use Schoolbox\Resource\Storage\Model as StorageModel;
 use Schoolbox\User;
@@ -85,7 +87,219 @@ class Model implements ISoftDeletable
     private string $bodyPublic;
 
     /**
-     * The points assigned to this record, if any.
+     * The points to be assigned records created for this import, if any.
      */
-    protected ?float $points = null;
+    private ?float $points = null;
+
+    /**
+     * Access records for this bulk import.
+     *
+     * @var GenericCollection<Access\Model>
+     */
+    private GenericCollection $access;
+
+    /**
+     * Tags for this bulk import.
+     *
+     * @var GenericCollection<TagModel>
+     */
+    private GenericCollection $tags;
+
+    /**
+     * @return User
+     */
+    public function getOwner(): User
+    {
+        return $this->owner;
+    }
+
+    /**
+     * @param User $owner
+     * @return $this
+     */
+    public function setOwner(User $owner): self
+    {
+        $this->owner = $owner;
+        return $this;
+    }
+
+    /**
+     * @return StorageModel
+     */
+    public function getZip(): StorageModel
+    {
+        return $this->zip;
+    }
+
+    /**
+     * @param StorageModel $zip
+     * @return $this
+     */
+    public function setZip(StorageModel $zip): self
+    {
+        $this->zip = $zip;
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getFilePathTemplate(): string
+    {
+        return $this->filePathTemplate;
+    }
+
+    /**
+     * @param string $filePathTemplate
+     * @return $this
+     */
+    public function setFilePathTemplate(string $filePathTemplate): self
+    {
+        $this->filePathTemplate = $filePathTemplate;
+        return $this;
+    }
+
+    /**
+     * @return PastoralSeverity|null
+     */
+    public function getSeverity(): ?PastoralSeverity
+    {
+        return $this->severity;
+    }
+
+    /**
+     * @param PastoralSeverity|null $severity
+     * @return $this
+     */
+    public function setSeverity(?PastoralSeverity $severity): self
+    {
+        $this->severity = $severity;
+        return $this;
+    }
+
+    /**
+     * @return PastoralType
+     */
+    public function getType(): PastoralType
+    {
+        return $this->type;
+    }
+
+    /**
+     * @param PastoralType $type
+     * @return $this
+     */
+    public function setType(PastoralType $type): self
+    {
+        $this->type = $type;
+        return $this;
+    }
+
+    /**
+     * @return PastoralSubType|null
+     */
+    public function getSubtype(): ?PastoralSubType
+    {
+        return $this->subtype;
+    }
+
+    /**
+     * @param PastoralSubType|null $subtype
+     * @return $this
+     */
+    public function setSubtype(?PastoralSubType $subtype): self
+    {
+        $this->subtype = $subtype;
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getHeading(): string
+    {
+        return $this->heading;
+    }
+
+    /**
+     * @param string $heading
+     * @return $this
+     */
+    public function setHeading(string $heading): self
+    {
+        $this->heading = $heading;
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getBodyPublic(): string
+    {
+        return $this->bodyPublic;
+    }
+
+    /**
+     * @param string $bodyPublic
+     * @return $this
+     */
+    public function setBodyPublic(string $bodyPublic): self
+    {
+        $this->bodyPublic = $bodyPublic;
+        return $this;
+    }
+
+    /**
+     * @return float|null
+     */
+    public function getPoints(): ?float
+    {
+        return $this->points;
+    }
+
+    /**
+     * @param float|null $points
+     * @return $this
+     */
+    public function setPoints(?float $points): self
+    {
+        $this->points = $points;
+        return $this;
+    }
+
+    /**
+     * @return GenericCollection<Access\Model>
+     */
+    public function getAccess(): GenericCollection
+    {
+        return $this->access;
+    }
+
+    /**
+     * @param GenericCollection<Access\Model> $access
+     * @return $this
+     */
+    public function setAccess(GenericCollection $access): self
+    {
+        $this->access = $access;
+        return $this;
+    }
+
+    /**
+     * @return GenericCollection<TagModel>
+     */
+    public function getTags(): GenericCollection
+    {
+        return $this->tags;
+    }
+
+    /**
+     * @param GenericCollection<TagModel> $tags
+     * @return $this
+     */
+    public function setTags(GenericCollection $tags): self
+    {
+        $this->tags = $tags;
+        return $this;
+    }
 }
