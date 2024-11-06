@@ -60,8 +60,9 @@ function onCourseNameSelect(course: Course): void {
         window.location.href = course.folder._links.view;
     }
 }
-/*
- * To open up the course selector modal
+
+/**
+ *  To open up the course selector modal
  */
 function onButtonSelect(): void {
     isModalOpen.value = true;
@@ -117,11 +118,10 @@ function onModalNextSearchResponse(json: unknown, isActive: boolean): void {
         :is-read-only="props.isReadOnly"
         :allow-partial-matches="true"
         :can-select-item="true"
-        @select="onCourseNameSelect"
-        placeholder="Search for courses..."
         :has-button="true"
         button-icon="icon-course"
         @search-response="onSearchResponse"
+        @select="onCourseNameSelect"
         @button-select="onButtonSelect"
     />
     <search-select-modal
