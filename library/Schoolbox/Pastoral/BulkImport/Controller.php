@@ -12,13 +12,11 @@ namespace Schoolbox\Pastoral\BulkImport;
 use Alaress\Web\Controller\Base;
 use League\Flysystem\FilesystemException;
 use Schoolbox\Config\ConfigMapper;
-use Schoolbox\GenericCollection;
 use Schoolbox\L10n\RosettaStone;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Pastoral;
 use Schoolbox\Pastoral\TemplateDataHelper;
 use Schoolbox\Pastoral\Translator\VisibilityTranslator;
-use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
 use Schoolbox\Resource\Attachment\Zone;
 use Schoolbox\Resource\Browser\NodeFactory;
@@ -152,17 +150,22 @@ class Controller extends Base
             ->setPoints($this->requestPost->getFloat('points'))
         ;
 
-        // Create tags and access
-        foreach ($this->requestPost->get('tags') as $tag) {
+        // Create tags
+        $model = $model->setTags(
+            $this->recordProcessor->prepareTags(
+                $this->requestPost->get('tags') ?? '',
+                $this->requestPost->get('tagNames') ?? ''
+            )
+        );
 
-        }
+        // Create access
         $visibilityTranslator = new VisibilityTranslator(
             $this->pastoralAccessMapper,
             $this->pastoralGroupMapper,
             $this->userMapper,
             Access\Model::class,
         );
-        $visibilityTranslator->prepareAccesses($this->requestPost, $subType ?? $type);
+        $model = $model->setAccess($visibilityTranslator->prepareAccesses($this->requestPost, $subType ?? $type));
 
         // And save
         $this->pastoralBulkImportMapper->save($model);
