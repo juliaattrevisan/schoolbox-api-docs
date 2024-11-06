@@ -21,33 +21,6 @@ use Schoolbox\Error\Mapper as ErrorMapper;
  */
 class Controller extends Base
 {
-    /** @var ErrorMapper $errorMapper */
-    private $errorMapper;
-
-    /** @var IconMapper $iconMapper */
-    private $iconMapper;
-
-    /** @var ProfileButtonMapper $profileButtonMapper */
-    private $profileButtonMapper;
-
-    /** @var Campus\Availability\Mapper $campusAvailabilityMapper */
-    private $campusAvailabilityMapper;
-
-    /** @var Role\Availability\Mapper $roleAvailabilityMapper */
-    private $roleAvailabilityMapper;
-
-    /** @var Campus\Visibility\Mapper $campusVisibilityMapper */
-    private $campusVisibilityMapper;
-
-    /** @var Role\Visibility\Mapper $roleVisibilityMapper */
-    private $roleVisibilityMapper;
-
-    /** @var RoleMapper $roleMapper */
-    private $roleMapper;
-
-    /** @var CampusMapper $campusMapper */
-    private $campusMapper;
-
     /**
      * Controller constructor.
      * @param ErrorMapper                $errorMapper
@@ -61,25 +34,16 @@ class Controller extends Base
      * @param Role\Visibility\Mapper     $roleVisibilityMapper
      */
     public function __construct(
-        ErrorMapper $errorMapper,
-        IconMapper $iconMapper,
-        ProfileButtonMapper $profileButtonMapper,
-        RoleMapper $roleMapper,
-        CampusMapper $campusMapper,
-        Campus\Availability\Mapper $campusAvailabilityMapper,
-        Role\Availability\Mapper $roleAvailabilityMapper,
-        Campus\Visibility\Mapper $campusVisibilityMapper,
-        Role\Visibility\Mapper $roleVisibilityMapper
+        private ErrorMapper $errorMapper,
+        private IconMapper $iconMapper,
+        private ProfileButtonMapper $profileButtonMapper,
+        private RoleMapper $roleMapper,
+        private CampusMapper $campusMapper,
+        private Campus\Availability\Mapper $campusAvailabilityMapper,
+        private Role\Availability\Mapper $roleAvailabilityMapper,
+        private Campus\Visibility\Mapper $campusVisibilityMapper,
+        private Role\Visibility\Mapper $roleVisibilityMapper
     ) {
-        $this->errorMapper = $errorMapper;
-        $this->iconMapper = $iconMapper;
-        $this->profileButtonMapper = $profileButtonMapper;
-        $this->roleMapper = $roleMapper;
-        $this->campusMapper = $campusMapper;
-        $this->campusAvailabilityMapper = $campusAvailabilityMapper;
-        $this->roleAvailabilityMapper = $roleAvailabilityMapper;
-        $this->campusVisibilityMapper = $campusVisibilityMapper;
-        $this->roleVisibilityMapper = $roleVisibilityMapper;
     }
 
     /**
