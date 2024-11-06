@@ -74,6 +74,16 @@ class Model implements ISoftDeletable
 
 
     /**
+     * A complementary implementation of isCustom();
+     * )
+     * @return bool
+     */
+    public function isSystem(): bool {
+        return !$this->isCustom();
+    }
+
+
+    /**
      * @param string|null $title
      * @return self
      */

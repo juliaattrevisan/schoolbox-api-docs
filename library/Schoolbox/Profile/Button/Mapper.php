@@ -10,6 +10,10 @@ use Schoolbox\Profile\Button\Model;
 use Schoolbox\Collection;
 use Schoolbox\User;
 
+/**
+ * @method Model createModel($idValue = null)
+ * @method Model findById($identifierValue)
+ */
 class Mapper extends BaseMapper
 {
     /**

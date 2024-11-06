@@ -6,7 +6,6 @@ namespace Schoolbox\Admin\Profile\Button;
 
 use Alaress\Web\Controller\Base;
 use Schoolbox\Admin\Navigation\Subnav;
-use Schoolbox\Admin\Profile\Editor\Payload;
 use Schoolbox\Menu\Icon\Mapper as IconMapper;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Profile\Button\Campus;
@@ -238,8 +237,17 @@ class Controller extends Base
     public function postDelete(): void
     {
         $post = $this->requestPost;
+
         if (!empty($post['id'])) {
-            $this->profileButtonMapper->deleteByColumn('id', $post['id']);
+            $button = $this->profileButtonMapper->findById($post['id']);
+
+            /* System buttons cannot be deleted
+             */
+            if ($button->isSystem()) {
+                throw new \DomainException('System profile buttons cannot be deleted.');
+            }
+
+            $this->profileButtonMapper->delete($button);
         }
     }
 
