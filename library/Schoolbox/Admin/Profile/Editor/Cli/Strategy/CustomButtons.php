@@ -101,6 +101,10 @@ class CustomButtons
                 $this->createRoleVisibility($profileButtonId, (int)$candidate['id']);
             }
         }
+
+        /* Soft-delete all the old buttons from which we migrated
+         */
+        $this->cleanup();
     }
 
 
@@ -335,7 +339,7 @@ class CustomButtons
     public function generateCandidates(): array
     {
         $query = "
-            SELECT 
+            SELECT
                 pb.*,
                 pbra.role_id
             FROM profile_button pb
@@ -373,5 +377,22 @@ class CustomButtons
         }
 
         return $candidates;
+    }
+
+
+    /**
+     * Soft-delete all the old buttons from which we migrated
+     *
+     * @return void
+     */
+    public function cleanup(): void {
+        $query = "
+            UPDATE profile_button
+            SET deleted_at = NOW()
+            WHERE roletype IS NULL
+        ";
+
+        $statement = $this->db->prepare($query);
+        $statement->execute();
     }
 }
