@@ -23,25 +23,25 @@ class Model implements ISoftDeletable
 
 
     /** @var int */
-    protected int $sortOrder;
+    private int $sortOrder;
 
     /** @var string|null */
-    protected ?string $title;
+    private ?string $title;
 
     /** @var string */
-    protected string $text;
+    private string $text;
 
     /** @var string|null */
-    protected ?string $icon;
+    private ?string $icon;
 
     /** @var string */
-    protected string $url;
+    private string $url;
 
     /** @var string|null */
-    protected ?string $css;
+    private ?string $css;
 
     /** @var string|null */
-    protected ?string $target;
+    private ?string $target;
 
 
     /**
@@ -61,7 +61,7 @@ class Model implements ISoftDeletable
      *
      * @var string|null
      */
-    protected ?string $type = null;
+    private ?string $type = null;
 
 
     /**
