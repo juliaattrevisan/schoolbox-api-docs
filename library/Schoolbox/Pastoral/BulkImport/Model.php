@@ -106,6 +106,15 @@ class Model implements ISoftDeletable
     private GenericCollection $tags;
 
     /**
+     * Constructor: creates empty access and tag collections.
+     */
+    public function __construct()
+    {
+        $this->access = new GenericCollection(Access\Model::class);
+        $this->tags   = new GenericCollection(TagModel::class);
+    }
+
+    /**
      * @return User
      */
     public function getOwner(): User

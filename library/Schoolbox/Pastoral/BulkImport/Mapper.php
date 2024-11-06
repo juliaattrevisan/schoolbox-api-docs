@@ -19,6 +19,8 @@ use Schoolbox\UserMapper;
 
 /**
  * Mapper for pastoral bulk import records.
+ *
+ * @method Model createModel($idValue = null)
  */
 class Mapper extends BaseMapper
 {

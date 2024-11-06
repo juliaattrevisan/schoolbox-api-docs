@@ -15,6 +15,7 @@ use Schoolbox\Mapper\Traits\Model\Id;
 use Schoolbox\Pastoral\Access\Mapper as PastoralAccessMapper;
 use Schoolbox\Pastoral\BulkImport\Model as BulkImportModel;
 use Schoolbox\Pastoral\Group\Model as Group;
+use Schoolbox\Pastoral\IPastoralAccess;
 use Schoolbox\Role;
 use Schoolbox\User;
 
@@ -24,7 +25,7 @@ use Schoolbox\User;
  * Used as a template for adding access records to the pastoral records the bulk
  * import process creates.
  */
-class Model
+class Model implements IPastoralAccess
 {
     use Id;
     use CreatedAtDate;

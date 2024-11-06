@@ -93,6 +93,7 @@ class Module extends BaseModule
         );
         return new Controller(
             $this->injector->get('l10n'),
+            $this->getMapperFactory()->get(Mapper::class),
             $this->injector->get('pastoralDataSource'),
             $this->getMapperFactory()->get(Pastoral\SubType\Mapper::class),
             $this->getMapperFactory()->get(Pastoral\Type\Mapper::class),

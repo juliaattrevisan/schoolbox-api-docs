@@ -17,6 +17,7 @@ use Schoolbox\L10n\RosettaStone;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Pastoral;
 use Schoolbox\Pastoral\TemplateDataHelper;
+use Schoolbox\Pastoral\Translator\VisibilityTranslator;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
 use Schoolbox\Resource\Attachment\Zone;
@@ -24,7 +25,6 @@ use Schoolbox\Resource\Browser\NodeFactory;
 use Schoolbox\Resource\Exception as ResourceException;
 use Schoolbox\Resource\Storage;
 use Schoolbox\Role;
-use Schoolbox\RoleMapper;
 use Schoolbox\TokenReplacer\Simple;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
@@ -38,23 +38,25 @@ class Controller extends Base
     /**
      * Constructor
      *
-     * @param RosettaStone             $translator             Used for translating values used in the page title.
-     * @param Pastoral\DataSource      $pastoralDataSource     Used for creating pastoral records.
-     * @param Pastoral\SubType\Mapper  $pastoralSubTypeMapper  Used for loading and validating pastoral subtypes.
-     * @param Pastoral\Type\Mapper     $pastoralTypeMapper     Used for loading and validating pastoral types.
-     * @param Pastoral\Severity\Mapper $pastoralSeverityMapper Used for loading pastoral severities.
-     * @param Pastoral\Access\Mapper   $pastoralAccessMapper   Used for determining roles which may access records.
-     * @param Pastoral\Group\Mapper    $pastoralGroupMapper    Used for loading pastoral groups to select visibility.
-     * @param UserMapper               $userMapper             Used for loading pastoral moderators.
-     * @param Pastoral\Audience\Mapper $pastoralAudienceMapper Used for loading audiences for types and subtypes.
-     * @param Storage\FilesystemProxy  $filesystemProxy        Used for copying ZIP files from storage to local:
-     *                                                         required for working with ZIP files.
-     * @param Storage\Receiver         $receiver               Used for copying streams from inside the ZIP to storage.
-     * @param Pastoral\RecordProcessor $recordProcessor        Used for actually saving pastoral records according to
-     *                                                         form input.
+     * @param RosettaStone             $translator               Used for translating values used in the page title.
+     * @param Mapper                   $pastoralBulkImportMapper Used for creating bulk import records.
+     * @param Pastoral\DataSource      $pastoralDataSource       Used for creating pastoral records.
+     * @param Pastoral\SubType\Mapper  $pastoralSubTypeMapper    Used for loading and validating pastoral subtypes.
+     * @param Pastoral\Type\Mapper     $pastoralTypeMapper       Used for loading and validating pastoral types.
+     * @param Pastoral\Severity\Mapper $pastoralSeverityMapper   Used for loading pastoral severities.
+     * @param Pastoral\Access\Mapper   $pastoralAccessMapper     Used for determining roles which may access records.
+     * @param Pastoral\Group\Mapper    $pastoralGroupMapper      Used for loading pastoral groups to select visibility.
+     * @param UserMapper               $userMapper               Used for loading pastoral moderators.
+     * @param Pastoral\Audience\Mapper $pastoralAudienceMapper   Used for loading audiences for types and subtypes.
+     * @param Storage\FilesystemProxy  $filesystemProxy          Used for copying ZIP files from storage to local:
+     *                                                           required for working with ZIP files.
+     * @param Storage\Receiver         $receiver                 Used for copying streams from inside upload to storage.
+     * @param Pastoral\RecordProcessor $recordProcessor          Used for actually saving pastoral records according to
+     *                                                           form input.
      */
     public function __construct(
         private RosettaStone $translator,
+        private Mapper $pastoralBulkImportMapper,
         private Pastoral\DataSource $pastoralDataSource,
         private Pastoral\SubType\Mapper $pastoralSubTypeMapper,
         private Pastoral\Type\Mapper $pastoralTypeMapper,
@@ -128,6 +130,43 @@ class Controller extends Base
      */
     public function postImportPreview(): void
     {
+        // Save the import here, then redirect to a create page.
+        $zipStorage = $this->loadZipFromStorage();
+        $type       = $this->pastoralTypeMapper->findById($this->requestPost->get('typeId'));
+        $subType    = $this->requestPost->get('subtypeId')
+            ? $this->pastoralSubTypeMapper->findById($this->requestPost->get('subtypeId'))
+            : null;
+        $model      = $this->pastoralBulkImportMapper->createModel()
+            ->setOwner($this->getUser())
+            ->setZip($zipStorage)
+            ->setFilePathTemplate($this->requestPost->get('template'))
+            ->setSeverity(
+                $this->getConfigLoader()->get(ConfigMapper::NAME_PASTORAL_SEVERITY_ENABLED)
+                    ? $this->pastoralSeverityMapper->findById($this->requestPost->get('severityId'))
+                    : null
+            )
+            ->setType($this->pastoralTypeMapper->findById($this->requestPost->get('typeId')))
+            ->setSubtype($subType)
+            ->setHeading($this->requestPost->get('heading'))
+            ->setBodyPublic($this->requestPost->get('body_public'))
+            ->setPoints($this->requestPost->getFloat('points'))
+        ;
+
+        // Create tags and access
+        foreach ($this->requestPost->get('tags') as $tag) {
+
+        }
+        $visibilityTranslator = new VisibilityTranslator(
+            $this->pastoralAccessMapper,
+            $this->pastoralGroupMapper,
+            $this->userMapper,
+            Access\Model::class,
+        );
+        $visibilityTranslator->prepareAccesses($this->requestPost, $subType ?? $type);
+
+        // And save
+        $this->pastoralBulkImportMapper->save($model);
+
         // Load the Zip file's contents, cleaning up once done.
         $zipArchive       = null;
         $localZipFilename = null;
