@@ -133,22 +133,22 @@ class SystemButtons
 
         $this->campusAvailabilityInsertStatement = $this->db->prepare("
             INSERT INTO profile_button_campus_availability (profile_button_id, campus_id)
-            VALUES (?, ?)
+            VALUES (:profileButtonId, :campusId)
         ");
 
         $this->campusVisibilityInsertStatement = $this->db->prepare("
             INSERT INTO profile_button_campus_visibility (profile_button_id, campus_id)
-            VALUES (?, ?)
+            VALUES (:profileButtonId, :campusId)
         ");
 
         $this->roleAvailabilityInsertStatement = $this->db->prepare("
             INSERT INTO profile_button_role_availability (profile_button_id, role_id)
-            VALUES (?, ?)
+            VALUES (:profileButtonId, :roleId)
         ");
 
         $this->roleVisibilityInsertStatement = $this->db->prepare("
             INSERT INTO profile_button_role_visibility (profile_button_id, role_id)
-            VALUES (?, ?)
+            VALUES (:profileButtonId, :roleId)
         ");
     }
 
@@ -566,10 +566,9 @@ class SystemButtons
     {
         if ($this->perform) {
             foreach ($campusIds as $campusId) {
-                /* TODO make this a key-value tuple
-                 */
                 $this->campusAvailabilityInsertStatement->execute([
-                    $profileButtonId, $campusId
+                    'profileButtonId' =>$profileButtonId,
+                    'campusId' => $campusId
                 ]);
             }
         }
@@ -587,10 +586,9 @@ class SystemButtons
     {
         if ($this->perform) {
             foreach ($campusIds as $campusId) {
-                /* TODO make this a key-value tuple
-                 */
                 $this->campusVisibilityInsertStatement->execute([
-                    $profileButtonId, $campusId
+                    'profileButtonId' =>$profileButtonId,
+                    'campusId' => $campusId
                 ]);
             }
         }
@@ -608,10 +606,9 @@ class SystemButtons
     {
         if ($this->perform) {
             foreach ($roleIds as $roleId) {
-                /* TODO make this a key-value tuple
-                 */
                 $this->roleAvailabilityInsertStatement->execute([
-                    $profileButtonId, $roleId
+                    'profileButtonId' => $profileButtonId,
+                    'roleId' => $roleId
                 ]);
             }
         }
@@ -629,10 +626,9 @@ class SystemButtons
     {
         if ($this->perform) {
             foreach ($roleIds as $roleId) {
-                /* TODO make this a key-value tuple
-                 */
                 $this->roleVisibilityInsertStatement->execute([
-                    $profileButtonId, $roleId
+                    'profileButtonId' => $profileButtonId,
+                    'roleId' => $roleId
                 ]);
             }
         }

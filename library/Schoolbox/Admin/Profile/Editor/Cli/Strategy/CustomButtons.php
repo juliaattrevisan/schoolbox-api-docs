@@ -128,7 +128,7 @@ class CustomButtons
 
         $this->campusAvailabilityInsertStatement = $this->db->prepare("
             INSERT INTO profile_button_campus_availability (profile_button_id, campus_id)
-            VALUES (?, ?)
+            VALUES (:profileButtonId, :campusId)
         ");
 
         $this->campusVisibilityStatement = $this->db->prepare("
@@ -139,7 +139,7 @@ class CustomButtons
 
         $this->campusVisibilityInsertStatement = $this->db->prepare("
             INSERT INTO profile_button_campus_visibility (profile_button_id, campus_id)
-            VALUES (?, ?)
+            VALUES (:profileButtonId, :campusId)
         ");
 
         $this->roleAvailabilityStatement = $this->db->prepare("
@@ -150,7 +150,7 @@ class CustomButtons
 
         $this->roleAvailabilityInsertStatement = $this->db->prepare("
             INSERT INTO profile_button_role_availability (profile_button_id, role_id)
-            VALUES (?, ?)
+            VALUES (:profileButtonId, :roleId)
         ");
 
         $this->roleVisibilityStatement = $this->db->prepare("
@@ -161,7 +161,7 @@ class CustomButtons
 
         $this->roleVisibilityInsertStatement = $this->db->prepare("
             INSERT INTO profile_button_role_visibility (profile_button_id, role_id)
-            VALUES (?, ?)
+            VALUES (:profileButtonId, :roleId)
         ");
     }
 
@@ -228,10 +228,11 @@ class CustomButtons
                 'profileButtonId' => $oldProfileButtonId
             ]);
 
-            /* TODO make this a key-value tuple
-             */
             while ($row = $this->campusAvailabilityStatement->fetch(\PDO::FETCH_ASSOC)) {
-                $this->campusAvailabilityInsertStatement->execute([$profileButtonId, $row['campus_id']]);
+                $this->campusAvailabilityInsertStatement->execute([
+                    'profileButtonId' => $profileButtonId,
+                    'campusId' => $row['campus_id']
+                ]);
             }
         }
     }
@@ -260,10 +261,11 @@ class CustomButtons
                 'profileButtonId' => $oldProfileButtonId
             ]);
 
-            /* TODO make this a key-value tuple
-             */
             while ($row = $this->campusVisibilityStatement->fetch(\PDO::FETCH_ASSOC)) {
-                $this->campusVisibilityInsertStatement->execute([$profileButtonId, $row['campus_id']]);
+                $this->campusVisibilityInsertStatement->execute([
+                    'profileButtonId' => $profileButtonId,
+                    'campusId' => $row['campus_id']
+                ]);
             }
         }
     }
@@ -292,10 +294,11 @@ class CustomButtons
                 'profileButtonId' => $oldProfileButtonId
             ]);
 
-            /* TODO make this a key-value tuple
-             */
             while ($row = $this->roleAvailabilityStatement->fetch(\PDO::FETCH_ASSOC)) {
-                $this->roleAvailabilityInsertStatement->execute([$profileButtonId, $row['role_id']]);
+                $this->roleAvailabilityInsertStatement->execute([
+                    'profileButtonId' => $profileButtonId,
+                    'roleId' => $row['role_id']
+                ]);
             }
         }
     }
@@ -322,10 +325,11 @@ class CustomButtons
                 'profileButtonId' => $oldProfileButtonId
             ]);
 
-            /* TODO make this a key-value tuple
-             */
             while ($row = $this->roleVisibilityStatement->fetch(\PDO::FETCH_ASSOC)) {
-                $this->roleVisibilityInsertStatement->execute([$profileButtonId, $row['role_id']]);
+                $this->roleVisibilityInsertStatement->execute([
+                    'profileButtonId' => $profileButtonId,
+                    'roleId' => $row['role_id']
+                ]);
             }
         }
     }
