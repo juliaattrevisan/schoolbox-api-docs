@@ -22,7 +22,6 @@ class ValidButtonTest extends TestCase
      */
     public static function providerValidButtonRequirements(): array
     {
-
         return [
             'Valid Custom 1' => [
                 'custom',
@@ -260,13 +259,15 @@ class ValidButtonTest extends TestCase
     }
 
     /**
+     * @param string $type
+     * @param array $post
      * @param int   $expected
      */
     #[\PHPUnit\Framework\Attributes\DataProvider('providerValidButtonRequirements')]
-    public function testValidButtonRequirements(array $post, $expected): void
+    public function testValidButtonRequirements(string $type, array $post, $expected): void
     {
         $validation = new ValidButton();
 
-        $this->assertEquals($expected, $validation->isSatisfiedBy($post));
+        $this->assertEquals($expected, $validation->isSatisfiedBy($type, $post));
     }
 }
