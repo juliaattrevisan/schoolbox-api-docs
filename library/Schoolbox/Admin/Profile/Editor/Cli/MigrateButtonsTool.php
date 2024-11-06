@@ -11,6 +11,7 @@ namespace Schoolbox\Admin\Profile\Editor\Cli;
 
 use Schoolbox\Admin\Profile\Editor\Cli\Strategy\CustomButtons;
 use Schoolbox\Admin\Profile\Editor\Cli\Strategy\SystemButtons;
+use Schoolbox\Admin\Profile\Editor\Payload;
 use Schoolbox\Application\CliTool;
 
 class MigrateButtonsTool extends CliTool\App
@@ -18,10 +19,10 @@ class MigrateButtonsTool extends CliTool\App
     /**
      * Consts used - including the "self" pseudo-roletype
      */
-    public const ROLETYPE_SELF = \Schoolbox\Admin\Profile\Editor\Payload::ROLETYPE_SELF;
+    public const ROLETYPE_SELF    = \Schoolbox\Admin\Profile\Editor\Payload::ROLETYPE_SELF;
     public const ROLETYPE_STUDENT = \Schoolbox\Role::STUDENT;
-    public const ROLETYPE_PARENT = \Schoolbox\Role::PARENT;
-    public const ROLETYPE_STAFF = \Schoolbox\Role::STAFF;
+    public const ROLETYPE_PARENT  = \Schoolbox\Role::PARENT;
+    public const ROLETYPE_STAFF   = \Schoolbox\Role::STAFF;
 
 
     /**
@@ -61,6 +62,13 @@ class MigrateButtonsTool extends CliTool\App
      */
     private const OPT_LONG_TYPE_CUSTOM = 'custom';
 
+
+    /**
+     * Used to resequence System Buttons before Custom Buttons
+     *
+     * @var \PDOStatement
+     */
+    private \PDOStatement $resequenceStatement;
 
     /**
      * @inheritdoc
@@ -135,13 +143,13 @@ HELP;
 
             if ($this->getOpt(self::OPT_LONG_TYPE_SYSTEM)) {
                 $campusIds = \Schoolbox\CampusMapper::getInstance()->findAll()->indexBy('id')->keys();
-                $roleIds = \Schoolbox\RoleMapper::getInstance()->findAll()->indexBy('id')->keys();
+                $roleIds   = \Schoolbox\RoleMapper::getInstance()->findAll()->indexBy('id')->keys();
 
                 $strats[] = new SystemButtons(
                     $this->perform(),
                     $this->getDatabaseInternal(),
                     $this->getLogger(),
-					$this->getDi()->get('l10n'),
+                    $this->getDi()->get('l10n'),
                     $campusIds,
                     $roleIds,
                     trim((string)$this->getConfig()->get('external_staff_portal'))
@@ -159,6 +167,13 @@ HELP;
             foreach ($strats as $strat) {
                 $strat->migrate();
             }
+
+            /* If you imported *both* System and Custom Buttons,
+             * force Custom Buttons to come after System Buttons.
+             */
+            if ($this->getOpt(self::OPT_LONG_TYPE_CUSTOM) && $this->getOpt(self::OPT_LONG_TYPE_SYSTEM)) {
+                $this->resequenceAll();
+            }
         } catch (\Alaress\Lock\LockRefreshException $e) {
             /* Lock TTL expired; just leave politely
              */
@@ -172,7 +187,7 @@ HELP;
         }
 
         /* Announce lock release
-          */
+         */
         $this->getLogger()->debug('Releasing lock');
 
         $lock->release();
@@ -201,6 +216,55 @@ HELP;
         }
 
         return $lookup;
+    }
+
+    /**
+     * Resequence buttons so that System Buttons always come first.
+     * Custom Buttons always comes after System Buttons.
+     *
+     * Executes for all role types.
+     *
+     * @return void
+     */
+    private function resequenceAll(): void
+    {
+        $this->resequenceStatement = $this->getDatabaseInternal()->prepare("
+            UPDATE profile_button
+            SET sort_order = sort_order +
+                (SELECT COUNT(*)
+                FROM profile_button
+                WHERE roletype = :roleType
+                AND type != :custom)
+            WHERE roleType = :roleType
+            AND type = :custom
+        ");
+
+        foreach (array_keys(Payload::CONFIG_ROLETYPE) as $roleType) {
+            $this->resequenceOne($roleType);
+        }
+    }
+
+
+    /**
+     * Resequence buttons so that System Buttons always come first.
+     * Custom Buttons always comes after System Buttons.
+     *
+     * Executes for the specified role type.
+     *
+     * @param string $roleType
+     * @return void
+     */
+    private function resequenceOne(string $roleType): void
+    {
+        $this->getLogger()->info(sprintf(
+            'Resequencing %s system and custom buttons.',
+            $roleType
+        ));
+
+        $this->resequenceStatement->execute([
+            'roleType' => $roleType,
+            'custom' => \Schoolbox\Profile\Button\Model::BUTTON_CUSTOM
+        ]);
     }
 
 
