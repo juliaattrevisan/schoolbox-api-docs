@@ -36,8 +36,8 @@ class SystemButtons
     private const SYSTEM_PASTORAL_SYNERGETIC = 'pastoralsynergetic';
     private const SYSTEM_DOCUMENT_MANAGEMENT = 'documentmanagement';
     private const SYSTEM_GEOSNAPSHOT = 'geosnapshot';
-	private const SYSTEM_EMAIL_STAFF = 'emailstaff';
-	private const SYSTEM_EMAIL_PARENTS = 'emailparents';
+    private const SYSTEM_EMAIL_STAFF = 'emailstaff';
+    private const SYSTEM_EMAIL_PARENTS = 'emailparents';
 
 
     /* Some prepared statements that we'll often reuse
@@ -49,24 +49,24 @@ class SystemButtons
     private \PDOStatement $roleVisibilityInsertStatement;
 
 
-	/**
-	 * Constructor.
-	 *
-	 * Note that some system buttons depend on config vars
-	 *
-	 * @param bool $perform
-	 * @param IConnector $db
-	 * @param LoggerInterface $log
-	 * @param RosettaStone $rosettaStone
-	 * @param array $campusIds
-	 * @param array $roleIds
-	 * @param string $externalStaffPortal
-	 */
+    /**
+     * Constructor.
+     *
+     * Note that some system buttons depend on config vars
+     *
+     * @param bool $perform
+     * @param IConnector $db
+     * @param LoggerInterface $log
+     * @param RosettaStone $rosettaStone
+     * @param array $campusIds
+     * @param array $roleIds
+     * @param string $externalStaffPortal
+     */
     public function __construct(
         private bool $perform,
         private IConnector $db,
         private LoggerInterface $log,
-		private RosettaStone $rosettaStone,
+        private RosettaStone $rosettaStone,
         private array $campusIds,
         private array $roleIds,
         private string $externalStaffPortal
@@ -358,158 +358,158 @@ class SystemButtons
                 /* There are emailAllStaff and emailAllParents buttons
                  * They're migrated along with everything else...pretty much
                  */
-				[
-					'row' => [
-						'roletype' => MigrateButtonsTool::ROLETYPE_STUDENT,
-						'type' => self::SYSTEM_EMAIL_STAFF,
-						'sort_order' => 10,
-						'title' => 'Email All Teachers',
-						'text' => 'Email All Teachers',
-						'icon' => 'email',
-						'url' => '', // derived dynamically with a routeLookup in addition
-						'css' => null,
-						'target' => null,
-					],
-					'availability' => [
-						'campus' => $this->campusIds,
-						'role' => $this->roleIds
-					],
-					'visibility' => [
-						'campus' => $this->campusIds,
-						'role' => $this->roleIds
-					],
-				],
-				[
-					'row' => [
-						'roletype' => MigrateButtonsTool::ROLETYPE_STUDENT,
-						'type' => self::SYSTEM_EMAIL_PARENTS,
-						'sort_order' => 11,
-						'title' => 'Email Parents',
-						'text' => 'Email Parents',
-						'icon' => 'email',
-						'url' => '', // derived dynamically with a routeLookup in addition
-						'css' => null,
-						'target' => null,
-					],
-					'availability' => [
-						'campus' => $this->campusIds,
-						'role' => $this->roleIds
-					],
-					'visibility' => [
-						'campus' => $this->campusIds,
-						'role' => $this->roleIds
-					],
-				],
+                [
+                    'row' => [
+                        'roletype' => MigrateButtonsTool::ROLETYPE_STUDENT,
+                        'type' => self::SYSTEM_EMAIL_STAFF,
+                        'sort_order' => 10,
+                        'title' => 'Email All Teachers',
+                        'text' => 'Email All Teachers',
+                        'icon' => 'email',
+                        'url' => '', // derived dynamically with a routeLookup in addition
+                        'css' => null,
+                        'target' => null,
+                    ],
+                    'availability' => [
+                        'campus' => $this->campusIds,
+                        'role' => $this->roleIds
+                    ],
+                    'visibility' => [
+                        'campus' => $this->campusIds,
+                        'role' => $this->roleIds
+                    ],
+                ],
+                [
+                    'row' => [
+                        'roletype' => MigrateButtonsTool::ROLETYPE_STUDENT,
+                        'type' => self::SYSTEM_EMAIL_PARENTS,
+                        'sort_order' => 11,
+                        'title' => 'Email Parents',
+                        'text' => 'Email Parents',
+                        'icon' => 'email',
+                        'url' => '', // derived dynamically with a routeLookup in addition
+                        'css' => null,
+                        'target' => null,
+                    ],
+                    'availability' => [
+                        'campus' => $this->campusIds,
+                        'role' => $this->roleIds
+                    ],
+                    'visibility' => [
+                        'campus' => $this->campusIds,
+                        'role' => $this->roleIds
+                    ],
+                ],
             ],
             MigrateButtonsTool::ROLETYPE_STAFF => [
-				[
-					'row' => [
-						'roletype' => MigrateButtonsTool::ROLETYPE_STAFF,
-						'type' => self::SYSTEM_EPORTFOLIO,
-						'sort_order' => 1,
-						'title' => 'ePortfolio',
-						'text' => 'ePortfolio',
-						'icon' => 'eportfolio',
-						'url' => '/eportfolio/[profileId]', // named confusingly, this is the viewee's user.id
-						'css' => null,
-						'target' => null,
-					],
-					'availability' => [
-						'campus' => $this->campusIds,
-						'role' => $this->roleIds
-					],
-					'visibility' => [
-						'campus' => $this->campusIds,
-						'role' => $this->roleIds
-					],
-				],
-				[
-					'row' => [
-						'roletype' => MigrateButtonsTool::ROLETYPE_STAFF,
-						'type' => self::SYSTEM_CALENDAR,
-						'sort_order' => 2,
-						'title' => $this->rosettaStone->translate('calendar', false, true),
-						'text' => $this->rosettaStone->translate('calendar', false, true),
-						'icon' => 'calendar',
-						'url' => '', // derived dynamically with a routeLookup
-						'css' => null,
-						'target' => null,
-					],
-					'availability' => [
-						'campus' => $this->campusIds,
-						'role' => $this->roleIds
-					],
-					'visibility' => [
-						'campus' => $this->campusIds,
-						'role' => $this->roleIds
-					],
-				],
-				[
-					'row' => [
-						'roletype' => MigrateButtonsTool::ROLETYPE_STAFF,
-						'type' => self::SYSTEM_TIMETABLE,
-						'sort_order' => 3,
-						'title' => 'Timetable',
-						'text' => 'Timetable',
-						'icon' => 'timetable',
+                [
+                    'row' => [
+                        'roletype' => MigrateButtonsTool::ROLETYPE_STAFF,
+                        'type' => self::SYSTEM_EPORTFOLIO,
+                        'sort_order' => 1,
+                        'title' => 'ePortfolio',
+                        'text' => 'ePortfolio',
+                        'icon' => 'eportfolio',
+                        'url' => '/eportfolio/[profileId]', // named confusingly, this is the viewee's user.id
+                        'css' => null,
+                        'target' => null,
+                    ],
+                    'availability' => [
+                        'campus' => $this->campusIds,
+                        'role' => $this->roleIds
+                    ],
+                    'visibility' => [
+                        'campus' => $this->campusIds,
+                        'role' => $this->roleIds
+                    ],
+                ],
+                [
+                    'row' => [
+                        'roletype' => MigrateButtonsTool::ROLETYPE_STAFF,
+                        'type' => self::SYSTEM_CALENDAR,
+                        'sort_order' => 2,
+                        'title' => $this->rosettaStone->translate('calendar', false, true),
+                        'text' => $this->rosettaStone->translate('calendar', false, true),
+                        'icon' => 'calendar',
+                        'url' => '', // derived dynamically with a routeLookup
+                        'css' => null,
+                        'target' => null,
+                    ],
+                    'availability' => [
+                        'campus' => $this->campusIds,
+                        'role' => $this->roleIds
+                    ],
+                    'visibility' => [
+                        'campus' => $this->campusIds,
+                        'role' => $this->roleIds
+                    ],
+                ],
+                [
+                    'row' => [
+                        'roletype' => MigrateButtonsTool::ROLETYPE_STAFF,
+                        'type' => self::SYSTEM_TIMETABLE,
+                        'sort_order' => 3,
+                        'title' => 'Timetable',
+                        'text' => 'Timetable',
+                        'icon' => 'timetable',
                         'url' => '/timetable/[profileId]',
-						'css' => null,
-						'target' => null,
-					],
-					'availability' => [
-						'campus' => $this->campusIds,
-						'role' => $this->roleIds
-					],
-					'visibility' => [
-						'campus' => $this->campusIds,
-						'role' => $this->roleIds
-					],
-				],
-			],
+                        'css' => null,
+                        'target' => null,
+                    ],
+                    'availability' => [
+                        'campus' => $this->campusIds,
+                        'role' => $this->roleIds
+                    ],
+                    'visibility' => [
+                        'campus' => $this->campusIds,
+                        'role' => $this->roleIds
+                    ],
+                ],
+            ],
             MigrateButtonsTool::ROLETYPE_PARENT => [
-				[
-				'row' => [
-					'roletype' => MigrateButtonsTool::ROLETYPE_PARENT,
-					'type' => self::SYSTEM_EPORTFOLIO,
-					'sort_order' => 1,
-					'title' => 'ePortfolio',
-					'text' => 'ePortfolio',
-					'icon' => 'eportfolio',
-					'url' => '/eportfolio/[profileId]/profile', // named confusingly, this is the viewee's user.id
-					'css' => null,
-					'target' => null,
-				],
-				'availability' => [
-					'campus' => $this->campusIds,
-					'role' => $this->roleIds
-				],
-				'visibility' => [
-					'campus' => $this->campusIds,
-					'role' => $this->roleIds
-				],
-			],
-				[
-				'row' => [
-					'roletype' => MigrateButtonsTool::ROLETYPE_PARENT,
-					'type' => self::SYSTEM_CALENDAR,
-					'sort_order' => 2,
-					'title' => $this->rosettaStone->translate('calendar', false, true),
-					'text' => $this->rosettaStone->translate('calendar', false, true),
-					'icon' => 'calendar',
-					'url' => '', // derived dynamically with a routeLookup
-					'css' => null,
-					'target' => null,
-				],
-				'availability' => [
-					'campus' => $this->campusIds,
-					'role' => $this->roleIds
-				],
-				'visibility' => [
-					'campus' => $this->campusIds,
-					'role' => $this->roleIds
-				],
-			],
-			]
+                [
+                    'row' => [
+                        'roletype' => MigrateButtonsTool::ROLETYPE_PARENT,
+                        'type' => self::SYSTEM_EPORTFOLIO,
+                        'sort_order' => 1,
+                        'title' => 'ePortfolio',
+                        'text' => 'ePortfolio',
+                        'icon' => 'eportfolio',
+                        'url' => '/eportfolio/[profileId]/profile', // named confusingly, this is the viewee's user.id
+                        'css' => null,
+                        'target' => null,
+                    ],
+                    'availability' => [
+                        'campus' => $this->campusIds,
+                        'role' => $this->roleIds
+                    ],
+                    'visibility' => [
+                        'campus' => $this->campusIds,
+                        'role' => $this->roleIds
+                    ],
+                ],
+                [
+                    'row' => [
+                        'roletype' => MigrateButtonsTool::ROLETYPE_PARENT,
+                        'type' => self::SYSTEM_CALENDAR,
+                        'sort_order' => 2,
+                        'title' => $this->rosettaStone->translate('calendar', false, true),
+                        'text' => $this->rosettaStone->translate('calendar', false, true),
+                        'icon' => 'calendar',
+                        'url' => '', // derived dynamically with a routeLookup
+                        'css' => null,
+                        'target' => null,
+                    ],
+                    'availability' => [
+                        'campus' => $this->campusIds,
+                        'role' => $this->roleIds
+                    ],
+                    'visibility' => [
+                        'campus' => $this->campusIds,
+                        'role' => $this->roleIds
+                    ],
+                ],
+            ]
         ];
 
         return $candidates;
@@ -567,7 +567,7 @@ class SystemButtons
         if ($this->perform) {
             foreach ($campusIds as $campusId) {
                 $this->campusAvailabilityInsertStatement->execute([
-                    'profileButtonId' =>$profileButtonId,
+                    'profileButtonId' => $profileButtonId,
                     'campusId' => $campusId
                 ]);
             }
@@ -587,7 +587,7 @@ class SystemButtons
         if ($this->perform) {
             foreach ($campusIds as $campusId) {
                 $this->campusVisibilityInsertStatement->execute([
-                    'profileButtonId' =>$profileButtonId,
+                    'profileButtonId' => $profileButtonId,
                     'campusId' => $campusId
                 ]);
             }

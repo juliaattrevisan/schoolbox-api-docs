@@ -11,14 +11,15 @@ use Schoolbox\Mapper\Traits\Model\Id;
 
 class Model implements ISoftDeletable
 {
+    use Id;
+    use DeletedAtDate;
+
+
     /**
      * This const conclusively identifies a Custom Button
      * Everything else is deemed to be a System Button
      */
     public const BUTTON_CUSTOM = 'custom';
-
-    use Id;
-    use DeletedAtDate;
 
 
     /** @var int */
@@ -68,7 +69,8 @@ class Model implements ISoftDeletable
      *
      * @return bool
      */
-    public function isCustom(): bool {
+    public function isCustom(): bool
+    {
         return self::BUTTON_CUSTOM === $this->type;
     }
 
@@ -78,7 +80,8 @@ class Model implements ISoftDeletable
      * )
      * @return bool
      */
-    public function isSystem(): bool {
+    public function isSystem(): bool
+    {
         return !$this->isCustom();
     }
 
