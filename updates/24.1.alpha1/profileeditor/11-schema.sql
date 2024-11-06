@@ -18,3 +18,9 @@ ALTER TABLE `profile_button`
 
 create index profile_button_roletype_index
     on profile_button (roletype);
+
+-- Missing icons need to exist, otherwise you'll never be able
+-- to update these buttons properly
+
+INSERT INTO menu_icons (name, title)
+VALUES ('geosnapshot', 'Geosnapshot');

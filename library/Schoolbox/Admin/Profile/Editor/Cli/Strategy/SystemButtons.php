@@ -212,7 +212,7 @@ class SystemButtons
                         'sort_order' => 3,
                         'title' => $this->rosettaStone->translate('grades', false, true),
                         'text' => $this->rosettaStone->translate('grades', false, true),
-                        'icon' => 'tick',
+                        'icon' => 'approve',
                         'url' => '', // derived dynamically with a routeLookup
                         'css' => null,
                         'target' => null,
@@ -320,7 +320,7 @@ class SystemButtons
                         'sort_order' => 8,
                         'title' => $this->rosettaStone->translate('reports', false, true),
                         'text' => $this->rosettaStone->translate('reports', false, true),
-                        'icon' => 'document',
+                        'icon' => 'live-marks',
                         'url' => '', // derived dynamically with a routeLookup
                         'css' => null,
                         'target' => null,
