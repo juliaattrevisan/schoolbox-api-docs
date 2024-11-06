@@ -511,7 +511,7 @@ class Controller extends BaseController
                  * We needed to keep this
                  */
                 'showPastoral' => $showPastoral,
-                /* This now incudes system buttons - there's no longer really a distinction between system and
+                /* This now includes system buttons - there's no longer really a distinction between system and
                  * custom buttons, as far as the end user is concerned
                  */
                 'buttons' => $buttons,
@@ -565,9 +565,9 @@ class Controller extends BaseController
             ->produce($staff, $this->getUser());
 
         try {
-            $customButtons = $this->profileButtonMapper->findButtonsForUser($staff, $this->getUser());
+            $buttons = $this->profileButtonMapper->findButtonsForUser($staff, $this->getUser());
         } catch (MapperException $e) {
-            $customButtons = [];
+            $buttons = [];
         }
 
         $this->response = $this->responseFromTemplate(
@@ -582,13 +582,16 @@ class Controller extends BaseController
                 /* Profile screens can have their own roletype-specific name format
                  */
                 'nameFormat' => $this->getConfigLoader()->get('name_format_staff'),
+                /* This now includes system buttons - there's no longer really a distinction between system and
+                 * custom buttons, as far as the end user is concerned
+                 */
+                'buttons'  => $buttons,
 
                 /* Old implementation
                  */
                 'session'        => $_SESSION,
                 'user'           => $staff,
                 'eportfolioAuth' => $this->eportfolioAuthenticator->canView(),
-                'customButtons'  => $customButtons,
                 'now'            => Alaress_Date_Format::now(),
                 'showDetails'    => (new ValidDetailsVisible($this->externalUser, $this->getConfigLoader()))->isSatisfiedBy($staff, $this->getUser()),
             ],
@@ -618,9 +621,9 @@ class Controller extends BaseController
             ->produce($parent, $this->getUser());
 
         try {
-            $customButtons = ProfileButtonMapper::getInstance()->findButtonsForUser($parent, $this->getUser());
+            $buttons = ProfileButtonMapper::getInstance()->findButtonsForUser($parent, $this->getUser());
         } catch (MapperException $e) {
-            $customButtons = [];
+            $buttons = [];
         }
 
         // As with students in SA-16859:
@@ -638,13 +641,16 @@ class Controller extends BaseController
                 /* Profile screens can have their own roletype-specific name format
                  */
                 'nameFormat' => $this->getConfigLoader()->get('name_format_parent'),
+                /* This now includes system buttons - there's no longer really a distinction between system and
+                 * custom buttons, as far as the end user is concerned
+                 */
+                'buttons'  => $buttons,
 
                 /* Old implementation
                  */
                 'session'        => $_SESSION,
                 'user'           => $parent,
                 'students'       => $parent->getChildren(),
-                'customButtons'  => $customButtons,
                 'eportfolioAuth' => $this->eportfolioAuthenticator->canView(),
                 'now'            => Alaress_Date_Format::now(),
                 'showDetails'    => (new ValidDetailsVisible($this->externalUser, $this->getConfigLoader()))->isSatisfiedBy($parent, $this->getUser()),

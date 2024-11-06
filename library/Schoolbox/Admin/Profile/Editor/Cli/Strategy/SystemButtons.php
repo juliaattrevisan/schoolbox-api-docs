@@ -466,7 +466,50 @@ class SystemButtons
 					],
 				],
 			],
-            MigrateButtonsTool::ROLETYPE_PARENT => [],
+            MigrateButtonsTool::ROLETYPE_PARENT => [
+				[
+				'row' => [
+					'roletype' => MigrateButtonsTool::ROLETYPE_PARENT,
+					'type' => self::SYSTEM_EPORTFOLIO,
+					'sort_order' => 1,
+					'title' => 'ePortfolio',
+					'text' => 'ePortfolio',
+					'icon' => 'eportfolio',
+					'url' => '/eportfolio/[profileId]/profile', // named confusingly, this is the viewee's user.id
+					'css' => null,
+					'target' => null,
+				],
+				'availability' => [
+					'campus' => $this->campusIds,
+					'role' => $this->roleIds
+				],
+				'visibility' => [
+					'campus' => $this->campusIds,
+					'role' => $this->roleIds
+				],
+			],
+				[
+				'row' => [
+					'roletype' => MigrateButtonsTool::ROLETYPE_PARENT,
+					'type' => self::SYSTEM_CALENDAR,
+					'sort_order' => 2,
+					'title' => $this->rosettaStone->translate('calendar', false, true),
+					'text' => $this->rosettaStone->translate('calendar', false, true),
+					'icon' => 'calendar',
+					'url' => '', // derived dynamically with a routeLookup
+					'css' => null,
+					'target' => null,
+				],
+				'availability' => [
+					'campus' => $this->campusIds,
+					'role' => $this->roleIds
+				],
+				'visibility' => [
+					'campus' => $this->campusIds,
+					'role' => $this->roleIds
+				],
+			],
+			]
         ];
 
         return $candidates;
