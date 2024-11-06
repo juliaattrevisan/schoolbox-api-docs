@@ -5,17 +5,17 @@
  # @param Collection collection     a collection of checkbox item instances (e.g. all the role instances)
  # @param array selectedCollection  an associative array of index=>true pairs
  #}
-{#{% macro checkboxString(item, collection, selectedCollection) %}#}
-{#    {% set i = 1 %}#}
-{#    {% set n = selectedCollection[item.id] | length %}#}
+{% macro checkboxString(item, collection, selectedCollection) %}
+    {% set i = 1 %}
+    {% set n = selectedCollection[item.id] | length %}
 
-{#    {% for obj in collection %}#}
-{#        {% if selectedCollection[item.id][obj.id] ?? false %}#}
-{#            {{ obj.name }}{% if i < n %}, {% endif %}#}
-{#            {% set i = i+1 %}#}
-{#        {% endif %}#}
-{#    {% endfor %}#}
-{#{% endmacro %}#}
+    {% for obj in collection %}
+        {% if selectedCollection[item.id][obj.id] ?? false %}
+            {{ obj.name }}{% if i < n %}, {% endif %}
+            {% set i = i+1 %}
+        {% endif %}
+    {% endfor %}
+{% endmacro %}
 {% import _self as macro %}
 
 {% import 'sub/breadcrumbs.twig' as bread %}
@@ -69,17 +69,17 @@
 
                                         <p class="meta">
                                             Available on profiles for
-{#                                            <strong>{{ macro.checkboxString(item, roles, roleAvailabilitySelected) }}</strong> role(s)#}
+                                            <strong>{{ macro.checkboxString(item, roles, roleAvailabilitySelected) }}</strong> role(s)
                                             within
-{#                                            <strong>{{ macro.checkboxString(item, campuses, campusAvailabilitySelected) }}</strong>#}
+                                            <strong>{{ macro.checkboxString(item, campuses, campusAvailabilitySelected) }}</strong>
                                             campus
                                         </p>
 
                                         <p class="meta">
                                             Visible to viewers in
-{#                                            <strong>{{ macro.checkboxString(item, roles, roleVisibilitySelected) }}</strong> role(s)#}
+                                            <strong>{{ macro.checkboxString(item, roles, roleVisibilitySelected) }}</strong> role(s)
                                             within
-{#                                            <strong>{{ macro.checkboxString(item, campuses, campusVisibilitySelected) }}</strong>#}
+                                            <strong>{{ macro.checkboxString(item, campuses, campusVisibilitySelected) }}</strong>
                                             campus
                                         </p>
                                     </div>
