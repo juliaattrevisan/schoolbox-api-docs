@@ -6,7 +6,7 @@
 import { toRef, useTemplateRef } from "vue";
 import BasicModal from "@schoolboxVue/components/modal/basic-modal.vue";
 import { useSelected } from "@schoolboxVue/composables/selected/useSelected";
-import { useSearch } from "@schoolboxVue/composables/search/useSearch";
+import { useQuerySearch } from "@schoolboxVue/composables/search/useQuerySearch";
 import type { SearchSelectItem } from "@schoolboxVue/composables/search/types/SearchSelectItem";
 import { useOnSelectedChange } from "../composables/useOnSelectedChange";
 import SsQueryInput from "../ss-query-input.vue";
@@ -82,7 +82,7 @@ function onSearchSuccess(json: unknown, isActive: boolean, isNextResults: boolea
     }
 }
 
-const { query, isActive, url, isSearching, hasNoResults, hasError, search } = useSearch(
+const { query, isActive, url, isSearching, hasNoResults, hasError, search } = useQuerySearch(
     props.endpoint,
     results,
     onSearchSuccess,

@@ -5,7 +5,7 @@
 
 import { toRef, useTemplateRef } from "vue";
 import { useSelected } from "@schoolboxVue/composables/selected/useSelected";
-import { useSearch } from "@schoolboxVue/composables/search/useSearch";
+import { useQuerySearch } from "@schoolboxVue/composables/search/useQuerySearch";
 import type { SearchSelectItem } from "@schoolboxVue/composables/search/types/SearchSelectItem";
 import { useOnSelectedChange } from "./composables/useOnSelectedChange";
 import SsSelected from "./ss-selected.vue";
@@ -15,7 +15,7 @@ import SsResults from "./ss-results.vue";
 interface Props {
     label: string; // the label text
     labelId: string; // the label id
-    endpoint: string; // the search api endpoint, expects an endpoint without a `query` parameter, which will be added via useSearch
+    endpoint: string; // the search api endpoint, expects an endpoint without a `query` parameter, which will be added via useQuerySearch
     manageSearchResponse?: boolean; // whether to manage the response internally, or dispatch an emit to manage it externally
     isRequired?: boolean; // whether the input requires a value
     defaultResults?: SearchSelectItem[]; // show selection options when the search input is empty
@@ -83,7 +83,11 @@ function onSearchSuccess(json: unknown): void {
         results.value = (json as { data: SearchSelectItem[] }).data;
     }
 }
-const { query, isActive, isSearching, hasNoResults, hasError } = useSearch(props.endpoint, results, onSearchSuccess); // to search for results
+const { query, isActive, isSearching, hasNoResults, hasError } = useQuerySearch(
+    props.endpoint,
+    results,
+    onSearchSuccess,
+); // to search for results
 
 /**
  * To show the current search results, or the default results

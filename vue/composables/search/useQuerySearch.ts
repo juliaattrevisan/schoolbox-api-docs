@@ -18,7 +18,7 @@ export const DEBOUNCE_AMOUNT = 350; // the amount in ms to hold off on searching
  * @param requiresQuery - whether the search requires a query to be active
  * @returns isSearching, query, results, isActive, hasNoResults,  search
  */
-export function useSearch(
+export function useQuerySearch(
     endpoint: string,
     results: Ref<SearchSelectItem[]>,
     onSuccess: (json: unknown, isActive: boolean) => void,
