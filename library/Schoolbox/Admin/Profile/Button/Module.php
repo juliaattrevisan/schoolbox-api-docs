@@ -27,42 +27,31 @@ class Module extends BaseModule
 {
     protected $basename = 'adminProfileButton';
 
-    /**
-     * @inheritdoc
-     */
-    public function initRoutes(string $basePath): void
-    {
-        $routes = [
-            'GET' => [
-                '' => 'getIndex',
-                '/create' => 'getCreate',
-                '/modify/{id}' => 'getModify',
-            ],
-            'POST' => [
-                '/delete' => 'postDelete',
-                '/order' => 'postOrder',
-                '/modify' => 'postModify',
-            ]
-        ];
-
-        foreach ($routes['GET'] as $path => $alias) {
-            $this->addGetRoute($alias, $basePath, $path);
-        }
-
-        foreach ($routes['POST'] as $path => $alias) {
-            $this->addPostRoute($alias, $basePath, $path);
-        }
-    }
 
     /**
-     * @inheritdoc
+     * Hook method for setting up routes via self::register()
+     *
+     * @return void
      */
-    public function initRoutePermissions(Authorizer $authorizer): void
+    protected function registerRoutes(): void
     {
-        $this
-            ->addRoutePermission($authorizer, '.*', new Rule\IsLoggedIn())
-            ->addRoutePermission($authorizer, '.*', new Rule\IsSuperuser());
+        /* Keep an eye out on Granular Permissions epic SA-18424
+         * Hopefully there isn't a service permission that affects us here
+         * and we can continue to assume Superusers Only
+         */
+        $perms = new Rule\All(
+            new Rule\IsLoggedIn(),
+            new Rule\IsSuperuser()
+        );
+
+        $this->register('GET', '', 'getIndex', $perms);
+        $this->register('GET', '/create', 'getCreate', $perms);
+        $this->register('GET', '/modify/{id}', 'getModify', $perms);
+        $this->register('POST', '/delete', 'postDelete', $perms);
+        $this->register('POST', '/order', 'postOrder', $perms);
+        $this->register('POST', '/modify', 'postModify', $perms);
     }
+
 
     /**
      * @inheritdoc
