@@ -30,7 +30,6 @@ use Schoolbox\User;
  */
 class CourseManagedFields
 {
-
     /**
      * @var User
      */
