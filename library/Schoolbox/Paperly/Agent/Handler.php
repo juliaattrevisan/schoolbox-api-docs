@@ -1339,7 +1339,7 @@ class Handler
         $this->validateUpdateDetailsRequestBody($data);
     }
 
-    private function validateModifiedByUser(int $id)
+    private function validateModifiedByUser(string $id)
     {
         $sql = "SELECT ID FROM Community WHERE ID = ?";
         $params = [$id];
