@@ -56,6 +56,7 @@ class UnitAssessmentUsage
         $lessonPlanCount =
             ($unitUsage[Cursor::COURSE_ACTIVITY_LESSON_PLAN] ?? 0);
 
+        $inUseRubricCount = $unitUsage[Cursor::COURSE_IN_USE_RUBRIC] ?? 0;
         return [
             'id'    => $unit->getFolder()->getId(),
             'name'  => $unit->getTitle(),
@@ -68,6 +69,9 @@ class UnitAssessmentUsage
                 ],
                 'lessonPlan' => [
                     'count' => $lessonPlanCount
+                ],
+                'rubric' => [
+                    'count' => $inUseRubricCount
                 ]
             ],
             '_links' => [
