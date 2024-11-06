@@ -89,16 +89,8 @@ class Controller extends Base
      * @api   GET /adminv2/profile-button
      * @since 182
      */
-    public function getIndex(): void
+    public function getIndex(string $roleType): void
     {
-        $roleType = $this->requestQuery->get('roleType');
-
-        /* Check that $roletype was valid; if not, default to Student
-         */
-        if (!isset(Payload::CONFIG_ROLETYPE[$roleType])) {
-            $roleType = \Schoolbox\Role::STUDENT;
-        }
-
         $buttons = $this->profileButtonMapper
             ->findByColumn('roletype', $roleType)
             ->sortBy('sortOrder', 'asc');

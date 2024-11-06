@@ -44,7 +44,8 @@
                         {% set selected = 'class="active"' %}
                     {% endif %}
 
-                    <li {{ selected|purify }}><a href="/adminv2/profile-button?roleType={{ i }}">{{ i|capitalize }}</a></li>
+                    {% set route = routeLookup('adminProfileButton.getIndex', {roleType: i}) %}
+                    <li {{ selected|purify }}><a href="{{ route }}">{{ i|capitalize }}</a></li>
                 {% endfor %}
             </ul>
 

@@ -50,7 +50,11 @@ class Module extends BaseModule
             return $this->preloadRoleType($params);
         };
 
-        $this->register('GET', '', 'getIndex', $perms);
+        $preloadRoleTypeDefault = function ($params) {
+            return $this->preloadRoleTypeDefault($params);
+        };
+
+        $this->register('GET', '{/roleType}', 'getIndex', $perms, $preloadRoleTypeDefault);
         $this->register('GET', '/create/{roleType}', 'getCreate', $perms, $preloadRoleType);
         $this->register('GET', '/modify/{id}', 'getModify', $perms);
         $this->register('POST', '/delete', 'postDelete', $perms);
@@ -58,6 +62,27 @@ class Module extends BaseModule
         $this->register('POST', '/modify', 'postModify', $perms);
     }
 
+
+    /**
+     * Check that a valid and supported roletype was provided;
+     * Use a default value instead, if omitted
+     *
+     * @param array $params
+     * @return array
+     * @throws NotFound
+     */
+    private function preloadRoleTypeDefault(array $params): array
+    {
+        $roleType = $params['roleType'] ?? \Schoolbox\Role::STUDENT;
+
+        if (!isset(Payload::CONFIG_ROLETYPE[$roleType])) {
+            throw new NotFound('Roletype not provided', 400);
+        }
+
+        return [
+            'roleType' => $roleType,
+        ];
+    }
 
     /**
      * Check that a valid and supported roletype was provided
