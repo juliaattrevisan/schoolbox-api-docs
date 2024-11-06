@@ -131,7 +131,7 @@ class Controller extends Base
                 'profile' => $buttons,
                 'roles' => $this->roleMapper->findAll()->sortBy('name', 'asc'),
                 'campuses' => $this->campusMapper->findAll()->sortBy('name', 'asc'),
-
+                'roleType' => $roleType,
                 'roleAvailabilitySelected' => $roleAvailabilitySelected,
                 'campusAvailabilitySelected' => $campusAvailabilitySelected,
                 'roleVisibilitySelected' => $roleVisibilitySelected,

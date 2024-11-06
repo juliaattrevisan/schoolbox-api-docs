@@ -30,7 +30,7 @@
         <div class="small-12 island {% if profile|length > 0 %}hide{% endif %}" id="profile-button-empty-state">
             <div class="empty-state">
                 <i class="icon-staff-students"></i>
-                <p><a href="{{ routeLookup('adminProfileButton.getCreate') }}">Add a custom button</a> to the profile page and 'My Students' dashboard component for certain users.</p>
+                <p><a href="{{ routeLookup('adminProfileButton.getCreate', {roleType: roleType}) }}">Add a custom button</a> to the profile page and 'My Students' dashboard component for certain users.</p>
             </div>
         </div>
 
@@ -50,7 +50,7 @@
                     </div>
                 </div>
                 <nav>
-                    <a href="{{ routeLookup('adminProfileButton.getCreate') }}" class="icon-add" title="Create a new profile button"></a>
+                    <a href="{{ routeLookup('adminProfileButton.getCreate', {roleType: roleType}) }}" class="icon-add" title="Create a new profile button"></a>
                 </nav>
             </div>
 
