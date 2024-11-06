@@ -47,3 +47,15 @@ create table pastoral_bulk_import_access
     constraint fk_pastoral_bulk_import_user_id
         foreign key (user_id) references user (id)
 );
+
+create table pastoral_bulk_import_tags
+(
+    pastoral_id int not null,
+    tag_id      int not null,
+    constraint unique_pastoral_bulk_import_tag_idx
+        unique (pastoral_id, tag_id),
+    constraint fk_pastoral_bulk_import_tags_pastoral
+        foreign key (pastoral_id) references pastoral (id),
+    constraint fk_pastoral_bulk_import_tags_tag
+        foreign key (tag_id) references lu_pastoral_tag (id)
+);
