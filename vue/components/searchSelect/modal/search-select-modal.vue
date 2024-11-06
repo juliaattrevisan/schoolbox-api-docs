@@ -82,22 +82,12 @@ function onQuerySearchSuccess(json: unknown, isActive: boolean, isNextResults: b
     }
 }
 
-const { query, isActive, url, isSearching, hasNoResults, hasError } = useQuerySearch(
+const { query, isActive, isSearching, hasNoResults, hasError } = useQuerySearch(
     props.endpoint,
     results,
     onQuerySearchSuccess,
     false,
 ); // to search for results
-
-/**
- * To display results straight away without searching
- */
-window.Vue.watch(isOpen, (newIsOpen) => {
-    if (newIsOpen) {
-        save();
-        //
-    }
-});
 
 /**
  * To show the current search results, or the default results
@@ -137,13 +127,16 @@ function onSelect(): void {
     close();
 }
 
+const defaultResultsUrl = window.Vue.ref(`${props.endpoint}`);
+
 /**
  * Load more results if there's more to load
+ * @param isMoreResults - whether this is more results to load
  */
-async function onAtResultsBottom(): Promise<void> {
+async function loadDefaultResults(isMoreResults: boolean): Promise<void> {
     if (nextResultsCursor.value) {
         try {
-            const response = await fetch(`${url.value}&cursor=${nextResultsCursor.value}`, {
+            const response = await fetch(defaultResultsUrl.value, {
                 method: "GET",
                 headers: {
                     "Content-Type": "application/json",
@@ -154,13 +147,31 @@ async function onAtResultsBottom(): Promise<void> {
                 return;
             }
             const json: unknown = await response.json();
-            onQuerySearchSuccess(json, isActive.value, true);
+            onQuerySearchSuccess(json, isActive.value, isMoreResults);
         } catch (error) {
             console.error(error);
         } finally {
             // isSearching.value = false;
         }
     }
+}
+
+/**
+ * To display results straight away without searching
+ */
+window.Vue.watch(isOpen, (newIsOpen) => {
+    if (newIsOpen) {
+        save();
+        void loadDefaultResults(false);
+    }
+});
+
+/**
+ * To load more results when the user scrolls to the bottom of the results container
+ */
+function onAtResultsBottom(): void {
+    defaultResultsUrl.value = `${props.endpoint}&cursor=${nextResultsCursor.value}`;
+    void loadDefaultResults(true);
 }
 </script>
 
