@@ -18,7 +18,8 @@ class ValidButton
      *   - Must have a title
      *   - Must have a url
      *   - Must have chosen a campus and role for Availability and also for Visibility
-
+     *
+     * @param string $type
      * @param array $post
      * @return bool
      */

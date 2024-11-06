@@ -1,7 +1,7 @@
 <?php
 
 /**
- * ValidationTest
+ * ValidButtonTest
  *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
@@ -20,13 +20,13 @@ class ValidButtonTest extends TestCase
      *
      * @return array
      */
-    public static function provider_validButtonRequirements(): array
+    public static function providerValidButtonRequirements(): array
     {
 
         return [
             'Valid Custom 1' => [
+                'custom',
                 [
-                    'type' => 'custom',
                     'text' => 'cat',
                     'url' => 'http://www.theage.com.au',
                     'campusAvailability' => [2,3,1],
@@ -37,8 +37,8 @@ class ValidButtonTest extends TestCase
                 true
             ],
             'Valid Custom 2' => [
+                'custom',
                 [
-                    'type' => 'custom',
                     'text' => 'cat',
                     'url' => 'http://www.theage.com.au',
                     'campusAvailability' => [2],
@@ -53,8 +53,8 @@ class ValidButtonTest extends TestCase
              * Urls are ignored in backend too, and will not update a model
              */
             'Valid System 1' => [
+                'duework',
                 [
-                    'type' => 'duework',
                     'text' => 'cat',
                     'url' => '',
                     'campusAvailability' => [2],
@@ -65,8 +65,8 @@ class ValidButtonTest extends TestCase
                 true
             ],
             'Valid System 2' => [
+                'duework',
                 [
-                    'type' => 'duework',
                     'text' => 'cat',
                     'url' => 'https://www.schoolbox.com.au',
                     'campusAvailability' => [2],
@@ -77,8 +77,8 @@ class ValidButtonTest extends TestCase
                 true
             ],
             'Invalid: missing all pieces 1' => [
+                'custom',
                 [
-                    'type' => 'custom',
                     'text' => null,
                     'url' => null,
                     'campusAvailability' => null,
@@ -89,8 +89,8 @@ class ValidButtonTest extends TestCase
                 false
             ],
             'Invalid: missing all pieces 2' => [
+                'custom',
                 [
-                    'type' => 'custom',
                     'text' => '',
                     'url' => '',
                     'campusAvailability' => '',
@@ -101,8 +101,8 @@ class ValidButtonTest extends TestCase
                 false
             ],
             'Invalid: missing all pieces 3' => [
+                'custom',
                 [
-                    'type' => 'custom',
                     'text' => '',
                     'url' => '',
                     'campusAvailability' => [],
@@ -113,8 +113,8 @@ class ValidButtonTest extends TestCase
                 false
             ],
             'Invalid: missing all pieces 4' => [
+                'custom',
                 [
-                    'type' => 'custom',
                     'text' => 'cat',
                     'url' => '',
                     'campusAvailability' => [],
@@ -125,8 +125,8 @@ class ValidButtonTest extends TestCase
                 false
             ],
             'Invalid: missing all pieces 5' => [
+                'custom',
                 [
-                    'type' => 'custom',
                     'text' => 'cat',
                     'url' => 'http://www.theage.com.au',
                     'campusAvailability' => [],
@@ -137,8 +137,8 @@ class ValidButtonTest extends TestCase
                 false
             ],
             'Invalid: missing all pieces 6' => [
+                'custom',
                 [
-                    'type' => 'custom',
                     'text' => 'cat',
                     'url' => 'http://www.theage.com.au',
                     'campusAvailability' => [1],
@@ -149,8 +149,8 @@ class ValidButtonTest extends TestCase
                 false
             ],
             'Invalid: missing all pieces 7' => [
+                'custom',
                 [
-                    'type' => 'custom',
                     'text' => 'cat',
                     'url' => 'http://www.theage.com.au',
                     'campusAvailability' => [1],
@@ -161,8 +161,8 @@ class ValidButtonTest extends TestCase
                 false
             ],
             'Invalid: missing all pieces 8' => [
+                'custom',
                 [
-                    'type' => 'custom',
                     'text' => 'cat',
                     'url' => 'http://www.theage.com.au',
                     'campusAvailability' => [1],
@@ -173,8 +173,8 @@ class ValidButtonTest extends TestCase
                 false
             ],
             'Invalid: missing all pieces 9' => [
+                'custom',
                 [
-                    'type' => 'custom',
                     'text' => '',
                     'url' => '',
                     'campusAvailability' => [1],
@@ -185,8 +185,8 @@ class ValidButtonTest extends TestCase
                 false
             ],
             'Invalid: missing all pieces 10' => [
+                'custom',
                 [
-                    'type' => 'custom',
                     'text' => 'cat',
                     'url' => 'http://www.theage.com.au',
                     'campusAvailability' => [],
@@ -197,8 +197,8 @@ class ValidButtonTest extends TestCase
                 false
             ],
             'Invalid: missing all pieces 11' => [
+                'custom',
                 [
-                    'type' => 'custom',
                     'text' => 'cat',
                     'url' => 'http://www.theage.com.au',
                     'campusAvailability' => [],
@@ -209,8 +209,8 @@ class ValidButtonTest extends TestCase
                 false
             ],
             'Invalid: missing all pieces 12' => [
+                'custom',
                 [
-                    'type' => 'custom',
                     'text' => 'cat',
                     'url' => 'http://www.theage.com.au',
                     'campusAvailability' => [],
@@ -221,8 +221,8 @@ class ValidButtonTest extends TestCase
                 false
             ],
             'Invalid: missing all pieces 13' => [
+                'custom',
                 [
-                    'type' => 'custom',
                     'text' => 'cat',
                     'url' => 'http://www.theage.com.au',
                     'campusAvailability' => [],
@@ -233,8 +233,8 @@ class ValidButtonTest extends TestCase
                 false
             ],
             'Invalid: missing all pieces 14' => [
+                'custom',
                 [
-                    'type' => 'custom',
                     'text' => 'cat',
                     'url' => '',
                     'campusAvailability' => [1],
@@ -245,8 +245,8 @@ class ValidButtonTest extends TestCase
                 false
             ],
             'Invalid: missing all pieces 15' => [
+                'custom',
                 [
-                    'type' => 'custom',
                     'text' => '',
                     'url' => 'http://www.theage.com.au',
                     'campusAvailability' => [1],
@@ -262,7 +262,7 @@ class ValidButtonTest extends TestCase
     /**
      * @param int   $expected
      */
-    #[\PHPUnit\Framework\Attributes\DataProvider('provider_validButtonRequirements')]
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerValidButtonRequirements')]
     public function testValidButtonRequirements(array $post, $expected): void
     {
         $validation = new ValidButton();
