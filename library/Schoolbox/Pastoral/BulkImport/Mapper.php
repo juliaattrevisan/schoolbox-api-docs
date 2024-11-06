@@ -9,7 +9,6 @@ declare(strict_types=1);
 
 namespace Schoolbox\Pastoral\BulkImport;
 
-use Schoolbox\Pastoral\Access\Mapper as PastoralAccessMapper;
 use Schoolbox\Pastoral\BaseMapper;
 use Schoolbox\Pastoral\Severity\Mapper as PastoralSeverityMapper;
 use Schoolbox\Pastoral\SubType\Mapper as PastoralSubTypeMapper;
@@ -49,8 +48,14 @@ class Mapper extends BaseMapper
         $this->uses('updated_at', self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP);
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
 
-        // TODO how will these be joined? Likely via joinsVia
-        $this->joinsReverseMulti('pastoral_id', PastoralAccessMapper::class, 'access', 'access');
-        $this->joinsReverseMulti('pastoral_id', PastoralTagMapper::class, 'tags', 'tags');
+        $this->joinsReverseMulti('pastoral_id', Access\Mapper::class, 'access', 'access');
+        $this->joinsVia(
+            'pastoral_bulk_import_tags',
+            PastoralTagMapper::class,
+            'id',
+            'tag_id',
+            'pastoral_bulk_import_id',
+            'id',
+        );
     }
 }
