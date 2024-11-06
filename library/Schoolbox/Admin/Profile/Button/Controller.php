@@ -296,7 +296,13 @@ class Controller extends Base
         $item->setText($post['text']);
         $item->setTitle($post['title']);
         $item->setIcon($post['icon']);
-        $item->setUrl($post['url'] ?? '');
+
+        /* Only set urls for Custom Buttons
+         */
+        if ($item->isCustom()) {
+            $item->setUrl($post['url'] ?? '');
+        }
+
         $item->setCss(trim($post['css']));
         $item->setTarget($post['target']);
 

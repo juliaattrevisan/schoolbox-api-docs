@@ -54,6 +54,17 @@ class Model implements ISoftDeletable
      */
     protected ?string $type = null;
 
+
+    /**
+     * Determines whether this instance is a System Button or a Custom Button
+     *
+     * @return bool
+     */
+    public function isCustom(): bool {
+        return self::BUTTON_CUSTOM === $this->type;
+    }
+
+
     /**
      * @param int $id
      * @return self

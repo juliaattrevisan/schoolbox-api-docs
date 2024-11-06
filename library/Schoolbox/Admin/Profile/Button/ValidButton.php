@@ -30,7 +30,7 @@ class ValidButton
          * Let System Buttons in freely
          */
         if (Model::BUTTON_CUSTOM === $type) {
-            $hasUrl = \strlen(trim($post['url']));
+            $hasUrl = \strlen(trim($post['url'] ?? ''));
         } else {
             $hasUrl = true;
         }
