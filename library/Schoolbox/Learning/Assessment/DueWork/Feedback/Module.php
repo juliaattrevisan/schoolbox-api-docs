@@ -78,7 +78,10 @@ class Module extends BaseModule
         );
 
         $canDeleteFeedback = new Rule\Any(
-            new Rule\IsSuperuser(),
+            new Rule\Any(
+                new Rule\IsSuperuser(),
+                new Rule\HasServicePermission(UserAccess::SERVICE_LMS, UserAccess::ACCESS_FULL),
+            ),
             new Rule\All(
                 new Rule\IsConfigOn('lms_permit_staff_feedback_delete', $this->getConfig()),
                 new Rule\HasRole(Role::STAFF),

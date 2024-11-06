@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\Learning\Assessment;
 
+use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\Folder;
 use Schoolbox\User;
 
@@ -29,7 +30,6 @@ use Schoolbox\User;
  */
 class CourseManagedFields
 {
-
     /**
      * @var User
      */
@@ -160,10 +160,10 @@ class CourseManagedFields
 
         /* You're editing in an implementation context and the assessment got its fields
          * locked in the course specification, so you can't change stuff...unless you're
-         * a superuser, then you can change stuff
+         * a superuser or an LMS moderator, then you can change stuff
          */
         if ($context->isImplementationContext() && $this->assessment->getSpecificationAssessment() && $this->assessment->getCourseManaged()) {
-            return !$this->viewer->isSuperuser();
+            return !($this->viewer->isSuperuser() || $this->viewer->hasServicePermission(UserAccess::SERVICE_LMS, UserAccess::ACCESS_FULL));
         }
 
         return false;
