@@ -25,6 +25,42 @@
                 :payload="{{ payload |json_encode }}"
             />
         </div>
+
+        <div id="button-editor-container">
+            <h2 class="subheader">Profile Buttons</h2>
+
+            {% for roleType, roleTypeButtons in buttons %}
+                <div data-button-roletype="{{ roleType }}" style="display:none;">
+                    <p class="meta">
+                        This is a preview of your current profile button configuration.
+                        <a href="{{ routeLookupIfAuthorized('adminProfileButton.getIndex', {roleType: roleType}) }}">Manage your profile buttons</a>.
+                    </p>
+
+                    {% for button in roleTypeButtons %}
+                        <a class="button icon-{{ button.icon }}" title="{{ button.title }}">{{ button.text }}</a>
+                    {% endfor %}
+                </div>
+            {% endfor %}
+
+            <script>
+                $(function() {
+                    {# TODO @zacmcw you can probably find a nicer way to do this #}
+                    function showRoleTypeButtons() {
+                        let roleType = window.location.hash.replace('#', '');
+
+                        $('[data-button-roletype]').hide();
+                        $('[data-button-roletype="' + roleType + '"]').show();
+                    }
+
+                    showRoleTypeButtons();
+
+                    $(window).on('hashchange', function() {
+                        showRoleTypeButtons();
+                    });
+                });
+            </script>
+        </div>
+
         <script src="{{ CDN_PREFIX }}/js/bundle/profileEditor.js?v={{ config.site_version }}"></script>
     </div>
 </div>

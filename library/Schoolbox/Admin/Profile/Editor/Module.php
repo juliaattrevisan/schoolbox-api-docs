@@ -133,6 +133,7 @@ class Module extends BaseModule
             $this->getMapperFactory()->get(\Schoolbox\Admin\Profile\Editor\Field\Visibility\Mapper::class),
             $this->getMapperFactory()->get(\Schoolbox\CampusMapper::class),
             $this->getMapperFactory()->get(\Schoolbox\Config\ConfigMapper::class),
+            $this->getMapperFactory()->get(\Schoolbox\Profile\Button\Mapper::class)
         );
     }
 

@@ -25,7 +25,8 @@ class Controller extends Base
         private Field\Availability\Campus\Mapper $availabilityCampusMapper,
         private Field\Visibility\Mapper $visibilityMapper,
         private \Schoolbox\CampusMapper $campusMapper,
-        private \Schoolbox\Config\ConfigMapper $configMapper
+        private \Schoolbox\Config\ConfigMapper $configMapper,
+        private \Schoolbox\Profile\Button\Mapper $buttonMapper
     ) {
     }
 
@@ -55,10 +56,26 @@ class Controller extends Base
             $this->campusMapper
         ))->generateAll();
 
+        /* Buttons are obtained (and managed) totally separately from Profile Fields
+         * TODO @zacmcw you can probably think of a better way to do this in frontend world
+         */
+        $buttons = [];
+
+        foreach (array_keys(Payload::CONFIG_ROLETYPE) as $roleType) {
+            $buttons[$roleType] = $this->buttonMapper
+                ->findByColumn('roletype', $roleType)
+                ->sortBy('sortOrder', 'asc');
+        }
+
         $this->response = $this->responseFromTemplate('@adminProfileEditor/index.twig', [
             'pageCurrent' => $this->routeGenerator->generate('adminProfileEditor.getIndex'),
             'allBreadcrumbs' => (new Subnav($this->getConfigLoader(), $this->getUser()))->generateBreadcrumbs($this->routeGenerator->generate('adminProfileEditor.getIndex')),
-            'payload' => $payload
+            /* Profile Fields
+             */
+            'payload' => $payload,
+            /* Profile Buttons
+             */
+            'buttons' => $buttons,
         ], 'Profile Editor - ' . ucwords($roleType));
     }
 
