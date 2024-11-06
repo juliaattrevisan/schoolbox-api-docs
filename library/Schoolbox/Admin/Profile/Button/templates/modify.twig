@@ -1,5 +1,9 @@
 {% set createForm = item is not defined %}
 
+{# Decide whether we're editing a system button or a custom button #}
+{% set buttonType = item.type ?? 'custom' %}
+{% set isCustomButton = ('custom' == buttonType) %}
+
 {% import 'sub/breadcrumbs.twig' as bread %}
 {{ bread.crumbsArray(allBreadcrumbs) }}
 
@@ -55,23 +59,28 @@
                         </div>
                     </fieldset>
                     <fieldset class="content">
-                        <div class="small-12 columns">
-                            <label for="profile-button-url" class="required">Destination URL</label>
-                            <p class="meta">You can use [profileId], [profileFirstName], [profileLastName], [profileExternalId], [profileUsername], [profileEmail] in the URL, these will be replaced with details of the user being <b>viewed</b>.</p> <p class="meta">You can also use [id], [firstName], [lastName], [externalId], [username], [email], these will be replaced with details of the user <b>viewing</b> the page.</p>
-                            <script>
-                                $(function() {
-                                    $('#modalLinkButton').schoolboxLink({
-                                        onSelect: function(url, name, mime, dialog) {
-                                            $('#profile-button-url').val(url);
-                                        }
+                        {% if isCustomButton %}
+                            <div class="small-12 columns">
+                                <label for="profile-button-url" class="required">Destination URL</label>
+                                <p class="meta">You can use [profileId], [profileFirstName], [profileLastName], [profileExternalId], [profileUsername], [profileEmail] in the URL, these will be replaced with details of the user being <b>viewed</b>.</p> <p class="meta">You can also use [id], [firstName], [lastName], [externalId], [username], [email], these will be replaced with details of the user <b>viewing</b> the page.</p>
+                                <script>
+                                    $(function() {
+                                        $('#modalLinkButton').schoolboxLink({
+                                            onSelect: function(url, name, mime, dialog) {
+                                                $('#profile-button-url').val(url);
+                                            }
+                                        });
                                     });
-                                });
-                            </script>
-                            <div class="input-group">
-                                <input name="url" id="profile-button-url" type="text" value="{{ item.url ?? '' }}">
-                                <a id="modalLinkButton" class="button icon-link">Browse</a>
+                                </script>
+                                <div class="input-group">
+                                    <input name="url" id="profile-button-url" type="text" value="{{ item.url ?? '' }}">
+                                    <a id="modalLinkButton" class="button icon-link">Browse</a>
+                                </div>
                             </div>
-                        </div>
+                        {% else %}
+                            <input type="hidden" name="url" value="{{ item.url ?? '' }}" />
+                        {% endif %}
+
                         <div class="small-12 columns">
                             <label for="profile-button-destination">Destination Target</label>
                             <select name="target" id="profile-button-destination">
@@ -202,7 +211,9 @@
             ignore: ':disabled',
             rules: {
                 'text': 'required',
+                {% if isCustomButton %}
                 'url': {required: true, isURL: true},
+                {% endif %}
                 'campusAvailability[]': 'required',
                 'roleAvailability[]': 'required',
                 'campusVisibility[]': 'required',
@@ -210,10 +221,12 @@
             },
             messages: {
                 'text': {required: 'Please enter a name for the profile button.'},
+                {% if isCustomButton %}
                 'url': {
                     required: 'Please enter a destination URL for the profile button.',
                     isURL: 'Please enter a valid URL for the profile button.'
                 },
+                {% endif %}
                 'campusAvailability[]': {required: 'Please select at least one campus.'},
                 'roleAvailability[]': {required: 'Please select at least one role.'},
                 'campusVisibility[]': {required: 'Please select at least one campus.'},
@@ -264,6 +277,5 @@
             selector: "#role-visibility-all",
             checkboxes: "[data-role-visibility]"
         });
-
     });
 </script>

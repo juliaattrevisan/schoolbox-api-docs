@@ -266,7 +266,9 @@ class Controller extends Base
         if (!empty($post['id'])) {
             $item = $this->profileButtonMapper->findById($post['id']);
         } else {
-            $item = new ProfileButton();
+            /* You can only create Custom Buttons, not System Buttons.
+             */
+            $item = (new ProfileButton())->setType(ProfileButton::BUTTON_CUSTOM);
 
             $itemOrder = $this->profileButtonMapper->findAll([
                 'limit' => 1,
@@ -287,14 +289,14 @@ class Controller extends Base
          *   - Must have a url
          *   - Must have chosen a campus and role for Availability and also for Visibility
          */
-        if (!(new ValidButton())->isSatisfiedBy($post->getArrayCopy())) {
+        if (!(new ValidButton())->isSatisfiedBy($item->getType(), $post->getArrayCopy())) {
             throw $this->errorMapper->generateException(\Schoolbox\Error\Mapper::ERROR_INFORMATION_MISSING);
         }
 
         $item->setText($post['text']);
         $item->setTitle($post['title']);
         $item->setIcon($post['icon']);
-        $item->setUrl($post['url']);
+        $item->setUrl($post['url'] ?? '');
         $item->setCss(trim($post['css']));
         $item->setTarget($post['target']);
 

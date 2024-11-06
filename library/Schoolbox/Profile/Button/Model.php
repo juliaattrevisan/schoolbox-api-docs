@@ -10,6 +10,13 @@ use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
 
 class Model implements ISoftDeletable
 {
+    /**
+     * This const conclusively identifies a Custom Button
+     * Everything else is deemed to be a System Button
+     */
+    public const BUTTON_CUSTOM = 'custom';
+
+
     use DeletedAtDate;
 
     /** @var int */
