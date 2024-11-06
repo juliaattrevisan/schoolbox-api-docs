@@ -6,6 +6,7 @@ namespace Schoolbox\Admin\Profile\Button;
 
 use Alaress\Web\Controller\Base;
 use Schoolbox\Admin\Navigation\Subnav;
+use Schoolbox\Admin\Profile\Editor\Payload;
 use Schoolbox\Menu\Icon\Mapper as IconMapper;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Profile\Button\Campus;
@@ -90,10 +91,16 @@ class Controller extends Base
      */
     public function getIndex(): void
     {
-        $roletype = $this->requestQuery->get('roletype');
+        $roleType = $this->requestQuery->get('roletype');
+
+        /* Check that $roletype was valid; if not, default to Student
+         */
+        if (!isset(Payload::CONFIG_ROLETYPE[$roleType])) {
+            $roleType = \Schoolbox\Role::STUDENT;
+        }
 
         $buttons = $this->profileButtonMapper
-            ->findByColumn('roletype', $roletype)
+            ->findByColumn('roletype', $roleType)
             ->sortBy('sortOrder', 'asc');
 
         $roleAvailabilitySelected = [];
