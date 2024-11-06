@@ -194,11 +194,9 @@ class Controller extends Base
     /**
      * Display create screen
      *
-     * @api   GET /adminv2/insert
-     * @since 182
-     *
+     * @api   GET /adminv2/profile-button/create/{roleType}
      */
-    public function getCreate(): void
+    public function getCreate(string $roleType): void
     {
         $this->response = $this->responseFromTemplate(
             '@adminProfileButton/modify.twig',
@@ -210,7 +208,8 @@ class Controller extends Base
                 ),
                 'icons' => $this->iconMapper->findAll()->sortBy('title', 'asc'),
                 'roles' => $this->roleMapper->findAll()->sortBy('name', 'asc'),
-                'campuses' => $this->campusMapper->findAll()->sortBy('name', 'asc')
+                'campuses' => $this->campusMapper->findAll()->sortBy('name', 'asc'),
+                'roleType' => $roleType
             ],
             'Admin - Create Profile Button'
         );
@@ -268,7 +267,9 @@ class Controller extends Base
         } else {
             /* You can only create Custom Buttons, not System Buttons.
              */
-            $item = (new ProfileButton())->setType(ProfileButton::BUTTON_CUSTOM);
+            $item = (new ProfileButton())
+                ->setType(ProfileButton::BUTTON_CUSTOM)
+                ->setRoleType($post['roleType']);
 
             $itemOrder = $this->profileButtonMapper->findAll([
                 'limit' => 1,
@@ -293,9 +294,9 @@ class Controller extends Base
             throw $this->errorMapper->generateException(\Schoolbox\Error\Mapper::ERROR_INFORMATION_MISSING);
         }
 
-        $item->setText($post['text']);
-        $item->setTitle($post['title']);
-        $item->setIcon($post['icon']);
+        $item->setText(trim((string)$post['text']));
+        $item->setTitle(trim((string)$post['title']));
+        $item->setIcon(trim((string)$post['icon']));
 
         /* Only set urls for Custom Buttons
          */
@@ -303,8 +304,8 @@ class Controller extends Base
             $item->setUrl($post['url'] ?? '');
         }
 
-        $item->setCss(trim($post['css']));
-        $item->setTarget($post['target']);
+        $item->setCss(trim((string)$post['css']));
+        $item->setTarget(trim((string)$post['target']));
 
         $this->profileButtonMapper->save($item);
 

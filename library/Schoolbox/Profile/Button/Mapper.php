@@ -20,6 +20,8 @@ class Mapper extends BaseMapper
         $this->hasTable('profile_button');
         $this->hasModel(Model::class);
         $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
+        $this->uses('roletype', self::TYPE_STRING);
+        $this->uses('type', self::TYPE_STRING);
         $this->uses('sort_order', self::TYPE_INTEGER);
         $this->uses('title', self::TYPE_STRING);
         $this->uses('text', self::TYPE_STRING);
@@ -27,7 +29,6 @@ class Mapper extends BaseMapper
         $this->uses('url', self::TYPE_STRING);
         $this->uses('css', self::TYPE_STRING);
         $this->uses('target', self::TYPE_STRING);
-        $this->uses('type', self::TYPE_STRING);
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
     }
 

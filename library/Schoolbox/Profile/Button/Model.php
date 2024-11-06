@@ -7,6 +7,7 @@ namespace Schoolbox\Profile\Button;
 use Schoolbox\ISoftDeletable;
 use Alaress_Date_Format;
 use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
+use Schoolbox\Mapper\Traits\Model\Id;
 
 class Model implements ISoftDeletable
 {
@@ -16,32 +17,39 @@ class Model implements ISoftDeletable
      */
     public const BUTTON_CUSTOM = 'custom';
 
-
+    use Id;
     use DeletedAtDate;
 
-    /** @var int */
-    protected $id;
 
     /** @var int */
-    protected $sortOrder;
+    protected int $sortOrder;
 
     /** @var string|null */
-    protected $title;
+    protected ?string $title;
 
     /** @var string */
-    protected $text;
+    protected string $text;
 
     /** @var string|null */
-    protected $icon;
+    protected ?string $icon;
 
     /** @var string */
-    protected $url;
-
-    /** @var string */
-    protected $css;
+    protected string $url;
 
     /** @var string|null */
-    protected $target;
+    protected ?string $css;
+
+    /** @var string|null */
+    protected ?string $target;
+
+
+    /**
+     * One of student, staff, parent;
+     * denotes a roletype to which a button belongs
+     *
+     * @var string
+     */
+    private string $roleType;
 
 
     /**
@@ -64,24 +72,6 @@ class Model implements ISoftDeletable
         return self::BUTTON_CUSTOM === $this->type;
     }
 
-
-    /**
-     * @param int $id
-     * @return self
-     */
-    public function setId(int $id): self
-    {
-        $this->id = $id;
-        return $this;
-    }
-
-    /**
-     * @return null|int
-     */
-    public function getId(): ?int
-    {
-        return $this->id;
-    }
 
     /**
      * @param string|null $title
@@ -228,6 +218,26 @@ class Model implements ISoftDeletable
     public function setType(?string $type): self
     {
         $this->type = $type;
+        return $this;
+    }
+
+
+    /**
+     * @return string
+     */
+    public function getRoleType(): string
+    {
+        return $this->roleType;
+    }
+
+
+    /**
+     * @param string $roleType
+     * @return $this
+     */
+    public function setRoleType(string $roleType): self
+    {
+        $this->roleType = $roleType;
         return $this;
     }
 }
