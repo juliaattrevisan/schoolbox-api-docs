@@ -276,7 +276,7 @@ class SystemButtons
                         'title' => 'Timetable',
                         'text' => 'Timetable',
                         'icon' => 'timetable',
-                        'url' => '', // derived dynamically with a routeLookup
+                        'url' => '/timetable/[profileId]',
                         'css' => null,
                         'target' => null,
                     ],
@@ -452,7 +452,7 @@ class SystemButtons
 						'title' => 'Timetable',
 						'text' => 'Timetable',
 						'icon' => 'timetable',
-						'url' => '', // derived dynamically with a routeLookup
+                        'url' => '/timetable/[profileId]',
 						'css' => null,
 						'target' => null,
 					],
