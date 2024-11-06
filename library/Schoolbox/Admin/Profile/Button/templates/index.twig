@@ -92,7 +92,11 @@
                                 </div>
                                 <nav>
                                     <a class="icon-modify" title="Edit this profile button" href="{{ routeLookup('adminProfileButton.getModify', {id: item.id}) }}"></a>
+
+                                    {# Only custom buttons can be deleted #}
+                                    {% if item.isCustom %}
                                     <a class="icon-delete" data-delete="{{ item.id }}" title="Delete this profile button"></a>
+                                    {% endif %}
                                 </nav>
                             </div>
                         </li>
