@@ -6,7 +6,6 @@
 import { toRef, useTemplateRef } from "vue";
 import BasicModal from "@schoolboxVue/components/modal/basic-modal.vue";
 import { useSelected } from "@schoolboxVue/composables/selected/useSelected";
-import { useSearch } from "@schoolboxVue/composables/search/useSearch";
 import { useQuerySearch } from "@schoolboxVue/composables/search/useQuerySearch";
 import type { SearchSelectItem } from "@schoolboxVue/composables/search/types/SearchSelectItem";
 import { useOnSelectedChange } from "../composables/useOnSelectedChange";
@@ -91,45 +90,12 @@ const { query, isActive, url, isSearching, hasNoResults, hasError } = useQuerySe
 ); // to search for results
 
 /**
- * To handle the search response, we handle some basic responses internally,
- * but if the response is more complex, we emit the response to be handled externally
- * @param json - the returned json
- * @param isNextResults - whether the results are the next set of results
- */
-function onSearchSuccess(json: unknown, isNextResults: boolean = false): void {
-    // check for next cursor at metadata.cursor.next
-    if (typeof json === "object" && json !== null && "metadata" in json) {
-        nextResultsCursor.value = (json as { metadata: { cursor: { next: string } } }).metadata.cursor.next;
-    }
-    if (isNextResults && props.manageSearchResponse) {
-        emit("nextSearchResponse", json, isActive);
-        return;
-    }
-    // emit to handle the response externally, as the response object is typically something not handled by the the basic structure below
-    if (props.manageSearchResponse) {
-        emit("searchResponse", json, isActive);
-        return;
-    }
-    // if json is an array, set results to json
-    if (json instanceof Array) {
-        results.value = json as SearchSelectItem[];
-        return;
-    }
-    // if json.data exists, set results to json.data
-    if (typeof json === "object" && json !== null && "data" in json) {
-        results.value = (json as { data: SearchSelectItem[] }).data;
-    }
-}
-
-const { search } = useSearch(props.endpoint, results, onSearchSuccess); // to search for results
-
-/**
  * To display results straight away without searching
  */
 window.Vue.watch(isOpen, (newIsOpen) => {
     if (newIsOpen) {
         save();
-        void search();
+        //
     }
 });
 
