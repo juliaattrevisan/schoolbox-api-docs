@@ -124,8 +124,6 @@
                                     {# Unique derivations #}
                                     {% if button.type in ['calendar'] %}
                                         {% set route = '/calendar/' ~  now.getURLDate() ~ '/' ~ user.id %}
-                                    {% elseif button.type in ['timetable'] %}
-                                        {% set route = '/timetable/' ~ user.id %}
                                     {% endif %}
 
                                     {% if route %}
