@@ -36,11 +36,16 @@
 
         {% if profile | length > 0 %}
         <div class="small-12 island" id="profile-button-container">
-
             <ul class="sub-nav">
-                <li><a href="/adminv2/profile-button?roletype=student">Student</a></li>
-                <li><a href="/adminv2/profile-button?roletype=staff">Staff</a></li>
-                <li><a href="/adminv2/profile-button?roletype=parent">Parent</a></li>
+                {% for i in ['student', 'staff', 'parent'] %}
+                    {% set selected = '' %}
+
+                    {% if i == roleType %}
+                        {% set selected = 'class="active"' %}
+                    {% endif %}
+
+                    <li {{ selected|purify }}><a href="/adminv2/profile-button?roleType={{ i }}">{{ i|capitalize }}</a></li>
+                {% endfor %}
             </ul>
 
             <div class="row actions-small-1">

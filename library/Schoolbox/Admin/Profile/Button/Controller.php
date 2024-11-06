@@ -91,7 +91,7 @@ class Controller extends Base
      */
     public function getIndex(): void
     {
-        $roleType = $this->requestQuery->get('roletype');
+        $roleType = $this->requestQuery->get('roleType');
 
         /* Check that $roletype was valid; if not, default to Student
          */
@@ -181,7 +181,6 @@ class Controller extends Base
                 'icons' => $this->iconMapper->findAll()->sortBy('title', 'asc'),
                 'roles' => $this->roleMapper->findAll()->sortBy('name', 'asc'),
                 'campuses' => $this->campusMapper->findAll()->sortBy('name', 'asc'),
-
                 'roleAvailabilitySelected' => $roleAvailabilitySelected,
                 'campusAvailabilitySelected' => $campusAvailabilitySelected,
                 'roleVisibilitySelected' => $roleVisibilitySelected,
@@ -353,6 +352,8 @@ class Controller extends Base
             }
         }
 
-        $this->response = $this->redirectAfterPost('/adminv2/profile-button');
+        $route = $this->routeGenerator->generate('adminProfileButton.getIndex') . '?roleType=' . $item->getRoleType();
+
+        $this->response = $this->redirectAfterPost($route);
     }
 }
