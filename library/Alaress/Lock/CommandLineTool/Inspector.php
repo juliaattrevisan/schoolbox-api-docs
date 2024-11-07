@@ -115,6 +115,10 @@ class Inspector extends CliTool\App
         /* Penola Semester 2, 2023 Vic Curric Progression Points importer
          */
         \Schoolbox\Admin\SummativeReport\Payload\VictorianProgression\ImporterTool::LOCK_NAME => 'Penola Semester 2, 2023 Progression Points CSV Importer (./tools/custom/pcc/import.php)',
+
+        /* Profile Editor: Button Migration
+         */
+        \Schoolbox\Admin\Profile\Editor\Cli\MigrateButtonsTool::LOCK_NAME => 'Profile Editor: Button Migration'
     ];
 
 
