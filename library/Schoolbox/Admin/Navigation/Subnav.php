@@ -150,6 +150,9 @@ class Subnav
         $userHasServicePermissionDesign = (
             $this->user->hasServicePermission(UserAccess::SERVICE_DESIGN, UserAccess::ACCESS_FULL)
         );
+        $userHasServicePermissionTimetable = (
+            $this->user->hasServicePermission(UserAccess::SERVICE_TIMETABLE, UserAccess::ACCESS_FULL)
+        );
         $userHasAnyModeratorServicePermission = (
             $userHasServicePermissionNews ||
             $userHasServicePermissionCalendar ||
@@ -157,7 +160,8 @@ class Subnav
             $userHasServicePermissionLms ||
             $userHasServicePermissionBadge ||
             $userHasServicePermissionCms ||
-            $userHasServicePermissionDesign
+            $userHasServicePermissionDesign ||
+            $userHasServicePermissionTimetable
         );
 
         /* Keys of this array uniquely identify a page and its subpages
@@ -911,19 +915,25 @@ class Subnav
             ],
             '/adminv2/import/schoolDataImport' => [
                 'name'       => 'School Data Import',
-                'visible'    => $userIsSuperuser && $this->configLoader->get('external_type') === 'schoolbox',
+                'visible'    => (
+                    ($userIsSuperuser || $userHasServicePermissionTimetable) &&
+                    $this->configLoader->get('external_type') === 'schoolbox'
+                ),
                 'searchable' => false,
                 'children'   => [
                     '/adminv2/import/schoolDataImport' => [
                         'name'        => 'Home',
-                        'visible'     => $userIsSuperuser && $this->configLoader->get('external_type') === 'schoolbox',
+                        'visible'     => (
+                            ($userIsSuperuser || $userHasServicePermissionTimetable) &&
+                            $this->configLoader->get('external_type') === 'schoolbox'
+                        ),
                         'children'    => [],
                         'description' => 'Configure your school data (SIS) import process.',
                     ],
                     '/adminv2/import/profile' => [
                         'name'        => 'User Profiles',
                         'visible'     => (
-                            $userIsSuperuser &&
+                            ($userIsSuperuser || $userHasServicePermissionTimetable) &&
                             $this->configLoader->get('external_type') === 'schoolbox' &&
                             $this->configLoader->get('schooldata_import_data_source') === 'csv'
                         ),
@@ -933,7 +943,7 @@ class Subnav
                     '/adminv2/import/timetableStructure' => [
                         'name'        => 'Timetable Structure',
                         'visible'     => (
-                            $userIsSuperuser &&
+                            ($userIsSuperuser || $userHasServicePermissionTimetable) &&
                             $this->configLoader->get('external_type') === 'schoolbox' &&
                             $this->configLoader->get('schooldata_import_data_source') === 'csv'
                         ),
@@ -943,7 +953,7 @@ class Subnav
                     '/adminv2/import/timetable' => [
                         'name'        => 'Timetable',
                         'visible'     => (
-                            $userIsSuperuser &&
+                            ($userIsSuperuser || $userHasServicePermissionTimetable) &&
                             $this->configLoader->get('external_type') === 'schoolbox' &&
                             $this->configLoader->get('schooldata_import_data_source') === 'csv'
                         ),
@@ -953,7 +963,7 @@ class Subnav
                     '/adminv2/import/timetableEnrolment' => [
                         'name'        => 'Timetable Enrolment',
                         'visible'     => (
-                            $userIsSuperuser &&
+                            ($userIsSuperuser || $userHasServicePermissionTimetable) &&
                             $this->configLoader->get('external_type') === 'schoolbox' &&
                             $this->configLoader->get('schooldata_import_data_source') === 'csv'
                         ),
