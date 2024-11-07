@@ -96,7 +96,7 @@
 
                         <div class="small-12 medium-6 columns">
                             <fieldset>
-                                <label class="required">Campuses</label>
+                                <label>Campuses</label>
                                 <div class="checklist">
                                     <ul class="option-list">
                                         <li>
@@ -115,7 +115,7 @@
                         </div>
                         <div class="small-12 medium-6 columns">
                             <fieldset>
-                                <label class="required">Roles</label>
+                                <label>Roles</label>
                                 <div class="checklist">
                                     <ul class="option-list">
                                         <li>
@@ -142,7 +142,7 @@
 
                         <div class="small-12 medium-6 columns">
                             <fieldset>
-                                <label class="required">Campuses</label>
+                                <label>Campuses</label>
                                 <div class="checklist">
                                     <ul class="option-list">
                                         <li>
@@ -161,7 +161,7 @@
                         </div>
                         <div class="small-12 medium-6 columns">
                             <fieldset>
-                                <label class="required">Roles</label>
+                                <label>Roles</label>
                                 <div class="checklist">
                                     <ul class="option-list">
                                         <li>
@@ -211,12 +211,8 @@
             rules: {
                 'text': 'required',
                 {% if isCustomButton %}
-                'url': {required: true, isURL: true},
+                'url': {required: true, isURL: true}
                 {% endif %}
-                'campusAvailability[]': 'required',
-                'roleAvailability[]': 'required',
-                'campusVisibility[]': 'required',
-                'roleVisibility[]': 'required'
             },
             messages: {
                 'text': {required: 'Please enter a name for the profile button.'},
@@ -224,12 +220,8 @@
                 'url': {
                     required: 'Please enter a destination URL for the profile button.',
                     isURL: 'Please enter a valid URL for the profile button.'
-                },
+                }
                 {% endif %}
-                'campusAvailability[]': {required: 'Please select at least one campus.'},
-                'roleAvailability[]': {required: 'Please select at least one role.'},
-                'campusVisibility[]': {required: 'Please select at least one campus.'},
-                'roleVisibility[]': {required: 'Please select at least one role.'}
             }
         });
 
