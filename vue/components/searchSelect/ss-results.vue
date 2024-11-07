@@ -111,6 +111,10 @@ useResizeObserver(resultsEl, (entries) => {
     currentHeight.value = entry.contentRect.height;
 });
 
+/**
+ * To notify the parent component when the results container
+ * is scrolled to the bottom, usually to load more results
+ */
 const { arrivedState } = useScroll(resultsEl);
 const { bottom } = toRefs(arrivedState);
 window.Vue.watch(bottom, (isAtBottom) => {

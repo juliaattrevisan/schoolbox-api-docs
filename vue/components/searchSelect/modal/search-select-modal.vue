@@ -136,6 +136,10 @@ const hasLoadedDefaultResults = window.Vue.ref(false); // to track if the defaul
  */
 async function loadDefaultResults(isMoreResults: boolean): Promise<void> {
     try {
+        if (!isMoreResults) {
+            // only show the initial loading on the first result load
+            isSearching.value = true;
+        }
         const response = await fetch(defaultResultsUrl.value, {
             method: "GET",
             headers: {
@@ -150,8 +154,9 @@ async function loadDefaultResults(isMoreResults: boolean): Promise<void> {
         onSearchSuccess(json, isActive.value, isMoreResults);
     } catch (error) {
         console.error(error);
+        hasError.value = true;
     } finally {
-        // isSearching.value = false;
+        isSearching.value = false;
     }
 }
 
