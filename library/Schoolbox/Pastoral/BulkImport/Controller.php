@@ -20,7 +20,6 @@ use Schoolbox\Pastoral\TemplateDataHelper;
 use Schoolbox\Pastoral\Translator\VisibilityTranslator;
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
 use Schoolbox\Resource\Attachment\Zone;
-use Schoolbox\Resource\Browser\NodeFactory;
 use Schoolbox\Resource\Exception as ResourceException;
 use Schoolbox\Resource\Storage;
 use Schoolbox\Role;
@@ -37,21 +36,23 @@ class Controller extends Base
     /**
      * Constructor
      *
-     * @param RosettaStone             $translator               Used for translating values used in the page title.
-     * @param Mapper                   $pastoralBulkImportMapper Used for creating bulk import records.
-     * @param Pastoral\DataSource      $pastoralDataSource       Used for creating pastoral records.
-     * @param Pastoral\SubType\Mapper  $pastoralSubTypeMapper    Used for loading and validating pastoral subtypes.
-     * @param Pastoral\Type\Mapper     $pastoralTypeMapper       Used for loading and validating pastoral types.
-     * @param Pastoral\Severity\Mapper $pastoralSeverityMapper   Used for loading pastoral severities.
-     * @param Pastoral\Access\Mapper   $pastoralAccessMapper     Used for determining roles which may access records.
-     * @param Pastoral\Group\Mapper    $pastoralGroupMapper      Used for loading pastoral groups to select visibility.
-     * @param UserMapper               $userMapper               Used for loading pastoral moderators.
-     * @param Pastoral\Audience\Mapper $pastoralAudienceMapper   Used for loading audiences for types and subtypes.
-     * @param Storage\FilesystemProxy  $filesystemProxy          Used for copying ZIP files from storage to local:
-     *                                                           required for working with ZIP files.
-     * @param Storage\Receiver         $receiver                 Used for copying streams from inside upload to storage.
-     * @param Pastoral\RecordProcessor $recordProcessor          Used for actually saving pastoral records according to
-     *                                                           form input.
+     * @param RosettaStone               $translator               For translating values used in the page title.
+     * @param Mapper                     $pastoralBulkImportMapper For creating bulk import records.
+     * @param Pastoral\DataSource        $pastoralDataSource       For creating pastoral records.
+     * @param Pastoral\SubType\Mapper    $pastoralSubTypeMapper    For loading and validating pastoral subtypes.
+     * @param Pastoral\Type\Mapper       $pastoralTypeMapper       For loading and validating pastoral types.
+     * @param Pastoral\Severity\Mapper   $pastoralSeverityMapper   For loading pastoral severities.
+     * @param Pastoral\Tag\Mapper        $pastoralTagMapper        For saving pastoral tags.
+     * @param Pastoral\Access\Mapper     $pastoralAccessMapper     For determining roles which may access records.
+     * @param Pastoral\Group\Mapper      $pastoralGroupMapper      For loading pastoral groups to select visibility.
+     * @param Pastoral\Attachment\Mapper $pastoralAttachmentMapper For creating pastoral attachments.
+     * @param UserMapper                 $userMapper               For loading pastoral moderators.
+     * @param Pastoral\Audience\Mapper   $pastoralAudienceMapper   For loading audiences for types and subtypes.
+     * @param Storage\FilesystemProxy    $filesystemProxy          For copying ZIP files from storage to local:
+     *                                                             required for working with ZIP files.
+     * @param Storage\Receiver           $receiver                 For copying streams from inside upload to storage.
+     * @param Pastoral\RecordProcessor   $recordProcessor          For actually saving pastoral records according to
+     *                                                             form input.
      */
     public function __construct(
         private RosettaStone $translator,
@@ -60,8 +61,10 @@ class Controller extends Base
         private Pastoral\SubType\Mapper $pastoralSubTypeMapper,
         private Pastoral\Type\Mapper $pastoralTypeMapper,
         private Pastoral\Severity\Mapper $pastoralSeverityMapper,
+        private Pastoral\Tag\Mapper $pastoralTagMapper,
         private Pastoral\Access\Mapper $pastoralAccessMapper,
         private Pastoral\Group\Mapper $pastoralGroupMapper,
+        private Pastoral\Attachment\Mapper $pastoralAttachmentMapper,
         private UserMapper $userMapper,
         private Pastoral\Audience\Mapper $pastoralAudienceMapper,
         private Storage\FilesystemProxy $filesystemProxy,
@@ -247,17 +250,6 @@ class Controller extends Base
 
             // Create the records
             foreach ($pastoralRecordsToCreate as $userId => $pastoralRecords) {
-                // Finagle the post data for this user's record, so that each file
-                // in the ZIP for them is included in their post data.
-                $attachmentHashes = [];
-                foreach ($pastoralRecords['fileNames'] as $fileName) {
-                    $attachment = $this->receiver->acceptStream(
-                        basename($fileName),
-                        $zipArchive->getStream($fileName),
-                    );
-                    $attachmentsHashes[] = NodeFactory::STORE . ':' . $attachment->getHash();
-                }
-
                 // Extract bulk import into something processPastoralRecords
                 // understands
                 $record = $this->pastoralDataSource->createModel()
@@ -276,7 +268,9 @@ class Controller extends Base
                 $accessModels = $this->pastoralAccessMapper->createCollection();
                 foreach ($import->getAccess() as $access) {
                     /** @var Access\Model $access */
-                    $accessModels->add($access->writeToPastoralAccess($this->pastoralAccessMapper->createModel()));
+                    $accessModels->add(
+                        $access->writeToPastoralAccess($this->pastoralAccessMapper->createModel()->setPastoral($record))
+                    );
                 }
                 $record->setAccess($accessModels);
                 foreach ($pastoralRecords['fileNames'] as $fileName) {
@@ -286,38 +280,55 @@ class Controller extends Base
                     );
                     $record->getAttachments()->add(
                         (new Pastoral\Attachment\Model())
+                            ->setPastoral($record)
                             ->setStorage($attachment)
                             ->setPrivate(false)
                     );
-//                    $attachmentsHashes[] = NodeFactory::STORE . ':' . $attachment->getHash();
                 }
 
                 // And save: also writing a log I guess
                 $this->pastoralDataSource->save($record);
                 $pastoralRecordsToCreate[$userId]['record']['id'] = $record->getId();
 
+                // Save access, attachments and tags as well
+                $this->pastoralAccessMapper->save($record->getAccess());
+                $this->pastoralAttachmentMapper->save($record->getAttachments());
+                foreach ($import->getTags() as $tag) {
+                    $this->pastoralTagMapper->assignToRecord($record, $tag);
+                }
+
+//                // Finagle the post data for this user's record, so that each file
+//                // in the ZIP for them is included in their post data.
+//                $attachmentHashes = [];
+//                foreach ($pastoralRecords['fileNames'] as $fileName) {
+//                    $attachment = $this->receiver->acceptStream(
+//                        basename($fileName),
+//                        $zipArchive->getStream($fileName),
+//                    );
+//                    $attachmentHashes[] = NodeFactory::STORE . ':' . $attachment->getHash();
+//                }
+//
 //                $requestData = new Values();
 //                $requestData['heading'] = $import->getHeading();
 //                $requestData['typeId'] = $import->getType()->getId();
 //                $requestData['subtypeId'] = $import->getSubtype()?->getId();
 //                $requestData['severityId'] = $import->getSeverity()?->getId();
+//                $requestData['points'] = $import->getPoints();
+//                $requestData['tags'] = implode(',', $import->getTags()->getPropertyValues('id'));
 //                $requestData['bodyPublic'] = $import->getBodyPublic();
 //                $requestData[Pastoral\Controller::ATTACHZONE_PUBLIC . '_attachments'] = $attachmentHashes;
-//
-//                $requestPost = clone $this->requestPost;
-//                $requestPost->offsetSet(
-//                    Pastoral\Controller::ATTACHZONE_PUBLIC . '_attachments',
-//                    $attachmentHashes,
-//                );
+//                foreach ($import->getAccess() as $access) {
+//                    //
+//                }
 //
 //                // And create their records.
 //                // There should be only a single record created for each user,
 //                // so for simplicity's sake show only their first.
-//                $pastoralRecordsToCreate[$userId]['record'] = $this->recordProcessor->processPastoralRecords(
+//                $pastoralRecordsToCreate[$userId]['record']['id'] = $this->recordProcessor->processPastoralRecords(
 //                    $this->getUser(),
 //                    $userId,
-//                    $requestPost,
-//                )->first();
+//                    $requestData,
+//                )->first()?->getId();
             }
         } finally {
             $this->cleanup($zipArchive, $localZipFilename);
@@ -325,7 +336,9 @@ class Controller extends Base
 
         // Save a record of the import, possibly including logs,
         // and then redirect back to the main page.
-        $import = $import->setImportedAt(Alaress_Date_Format::now());
+        $import = $import
+            ->setImportedAt(Alaress_Date_Format::now())
+            ->setImportLog($pastoralRecordsToCreate);
         $this->pastoralBulkImportMapper->save($import);
 
         $this->response = $this->redirectAfterPost(
