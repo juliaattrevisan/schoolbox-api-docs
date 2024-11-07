@@ -12,6 +12,7 @@ import { useOnSelectedChange } from "./composables/useOnSelectedChange";
 import SsSelected from "./ss-selected.vue";
 import SsQueryInput from "./ss-query-input.vue";
 import SsResults from "./ss-results.vue";
+import { escape } from "lodash";
 
 interface Props {
     label: string; // the label text
@@ -145,15 +146,28 @@ function onButtonSelected(): void {
     emit("buttonSelect");
 }
 
-const escapePressed = window.Vue.ref(false); // to determine if the escape key has been pressed
+// #region open/close results on escape key press
+
+const hasPressedEscape = window.Vue.ref(false); // to determine if the escape key has just been pressed
 
 /**
  * To close the search results when the escape key is pressed
  */
 function onEscapeInput(): void {
-    console.warn("Escape pressed!");
-    escapePressed.value = true;
+    hasPressedEscape.value = true;
 }
+
+/**
+ * to open the search results again whenever the query changes
+ */
+window.Vue.watch(
+    () => query.value,
+    () => {
+        hasPressedEscape.value = false;
+    },
+);
+
+// #endregion
 </script>
 
 <template>
@@ -186,9 +200,9 @@ function onEscapeInput(): void {
                 {{ props.buttonTitle }}
             </button>
         </div>
-        <div class="results-container">
+        <div v-show="!hasPressedEscape" class="results-container">
             <ss-results
-                v-if="isActive || (props.defaultResults && props.defaultResults.length > 0 && !escapePressed)"
+                v-if="isActive || (props.defaultResults && props.defaultResults.length > 0)"
                 :query="query"
                 :is-active="isActive"
                 :is-searching="isSearching"
