@@ -76,26 +76,28 @@
                                  # permissions, privacy and configuration settings that go well beyond
                                  # the viewer's role type; if you can see it, show it. Otherwise skip it.
                                  #}
-                                {% if (additionalConstraints[USER.role.type][selectedField.field] ?? additionalConstraints[USER.role.type]['_default'] ?? true) %}
+                                {% set viewerCanSeeField = additionalConstraints[USER.role.type][selectedField.field] ?? additionalConstraints[USER.role.type]['_default'] ?? true %}
+
+                                {# Make sure the field has a meaningful value before rendering anything out #}
+                                {% set fieldHasValue = selectedField.value is not null and (selectedField.value is iterable ? selectedField.value|length : selectedField.value) %}
+
+                                {% if viewerCanSeeField and fieldHasValue %}
                                     {# Now render each of the flags/tuples in some manner #}
 
-                                    {% if selectedField.value %}
-                                        {# Only render a tuple if it has a meaningful value
-                                         # Note that some fields require special handling (different data structures)
-                                         #
-                                         # The field name will always show at this point, though their values
-                                         # will need special treatment somehow
-                                         #}
-                                        <dt class="small-4 medium-3 columns">{{ macro.fieldName(selectedField) }}</dt>
-                                        <dd class="small-8 medium-9 columns">
-                                            {% if selectedField.field in ['email'] %}
-                                                {{ macro.email(session, selectedField.value, selectedField.value) }}
-                                            {% else %}
-                                                {# A generic tuple (key, value) pair #}
-                                                {{ selectedField.value }}
-                                            {% endif %}
-                                        </dd>
-                                    {% endif %}
+                                    {# Note that some fields require special handling (different data structures)
+                                     #
+                                     # The field name will always show at this point, though their values
+                                     # will need special treatment somehow
+                                     #}
+                                    <dt class="small-4 medium-3 columns">{{ macro.fieldName(selectedField) }}</dt>
+                                    <dd class="small-8 medium-9 columns">
+                                        {% if selectedField.field in ['email'] %}
+                                            {{ macro.email(session, selectedField.value, selectedField.value) }}
+                                        {% else %}
+                                            {# A generic tuple (key, value) pair #}
+                                            {{ selectedField.value }}
+                                        {% endif %}
+                                    </dd>
                                 {% endif %}
                             {% endfor %}
                         </dl>
