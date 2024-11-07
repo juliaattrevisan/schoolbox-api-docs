@@ -27,19 +27,20 @@
         </div>
 
         <div id="button-editor-container">
-            <h2 class="subheader">Profile Buttons</h2>
-
             {% for roleType, roleTypeButtons in buttons %}
-                <div data-button-roletype="{{ roleType }}" style="display:none;">
-                    <p class="meta">
-                        This is a preview of your current profile button configuration.
-                        <a href="{{ routeLookupIfAuthorized('adminProfileButton.getIndex', {roleType: roleType}) }}">Manage your profile buttons</a>.
-                    </p>
+                {% if roleTypeButtons|length %}
+                    <div data-button-roletype="{{ roleType }}" style="display:none;">
+                        <h2 class="subheader">Profile Buttons</h2>
+                        <p class="meta">
+                            This is a preview of your current profile button configuration.
+                            <a href="{{ routeLookupIfAuthorized('adminProfileButton.getIndex', {roleType: roleType}) }}">Manage your profile buttons</a>.
+                        </p>
 
-                    {% for button in roleTypeButtons %}
-                        <a class="button icon-{{ button.icon }}" title="{{ button.title }}">{{ button.text }}</a>
-                    {% endfor %}
-                </div>
+                        {% for button in roleTypeButtons %}
+                            <a class="button icon-{{ button.icon }}" title="{{ button.title }}">{{ button.text }}</a>
+                        {% endfor %}
+                    </div>
+                {% endif %}
             {% endfor %}
 
             <script>
@@ -47,6 +48,10 @@
                     {# TODO @zacmcw you can probably find a nicer way to do this #}
                     function showRoleTypeButtons() {
                         let roleType = window.location.hash.replace('#', '');
+
+                        if ('' === roleType) {
+                            roleType = 'student';
+                        }
 
                         $('[data-button-roletype]').hide();
                         $('[data-button-roletype="' + roleType + '"]').show();
