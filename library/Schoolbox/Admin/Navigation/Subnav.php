@@ -256,11 +256,29 @@ class Subnav
                         'children'    => [],
                         'description' => 'Control which components can be used on homepages, dashboards and ePortfolios.',
                     ],
+                    '/adminv2/dashboard' => [
+                        'name'        => 'Dashboard Templates',
+                        'visible'     => $userIsSuperuser || $userHasServicePermissionDesign,
+                        'children'    => [],
+                        'description' => 'Configure the layout of the initial landing page when you first login for each role.',
+                    ],
+                    '/adminv2/homepage' => [
+                        'name'        => 'Homepage Templates',
+                        'visible'     => $userIsSuperuser || $userHasServicePermissionDesign,
+                        'children'    => [],
+                        'description' => 'Configure and setup the scaffolding templates that users can create homepages from.',
+                    ],
                     '/adminv2/profile-button' => [
                         'name'        => 'Profile Buttons',
                         'visible'     => $userIsSuperuser || $userHasServicePermissionDesign,
                         'children'    => [],
                         'description' => 'Add your own custom buttons to a users profile page.',
+                    ],
+                    '/adminv2/profile-editor' => [
+                        'name'        => 'Profile Editor',
+                        'visible'     => $userIsSuperuser || $userHasServicePermissionDesign,
+                        'children'    => [],
+                        'description' => 'Customise the fields and buttons on the staff, student and parent profile screens.',
                     ],
                     '/adminv2/menu-side' => [
                         'name'        => 'Side Menu',
