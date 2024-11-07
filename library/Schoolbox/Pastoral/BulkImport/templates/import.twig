@@ -66,6 +66,19 @@
             subtypeId: import.subType.id,
         } only %}
 
-        <a href="{{ RETURN_URL.previous.decoded ?? routeLookup('pastoral.getIndex') }}" class="submit">Return</a>
+        <ul class="flex-list buttons">
+            {% if not import.importedAt %}
+                <li>
+                    <form class="top" method="post"
+                          action="{{ routeLookupIfAuthorized('pastoralBulkImport.postRunImport', {id: import.id}) }}?{{ RETURN_URL.name }}={{ returnUrl }}"
+                    >
+                        <input type="submit" value="Import" />
+                    </form>
+                </li>
+            {% endif %}
+            <li>
+                <a href="{{ RETURN_URL.previous.decoded ?? routeLookup('pastoral.getIndex') }}">Return</a>
+            </li>
+        </ul>
     </div>
 </div>
