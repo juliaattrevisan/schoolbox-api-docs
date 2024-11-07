@@ -17,6 +17,7 @@ use Alaress\Web\Controller\Base;
 use Schoolbox\Admin\Settings\FieldStrategyFactory;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Mapper;
+use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
 use Schoolbox\UserMapper;
 
@@ -32,7 +33,6 @@ class Module extends BaseModule
      */
     protected $basename = 'adminImportIndex';
 
-
     /**
      * Hook method for setting up routes via self::register()
      *
@@ -42,7 +42,10 @@ class Module extends BaseModule
     {
         $perms = new Rule\All(
             new Rule\IsLoggedIn(),
-            new Rule\IsSuperuser()
+            new Rule\Any(
+                new Rule\IsSuperuser(),
+                new Rule\HasServicePermission(UserAccess::SERVICE_TIMETABLE, UserAccess::ACCESS_FULL)
+            )
         );
 
         $this->register('POST', '/schoolDataImport/liss/delete', 'postDeleteLissPayload', $perms);
@@ -55,7 +58,6 @@ class Module extends BaseModule
         $this->register('GET', '/schoolDataImport/timetable/export', 'getTimetableExport', $perms);
         $this->register('GET', '/schoolDataImport/classes/export', 'getClassesExport', $perms);
     }
-
 
     /**
      * @inheritdoc
@@ -83,7 +85,6 @@ class Module extends BaseModule
     {
         $this->addTemplatePath($templateLoader, __DIR__ . '/templates');
     }
-
 
     /**
      * @return Mapper|UserMapper
