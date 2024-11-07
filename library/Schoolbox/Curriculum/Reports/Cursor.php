@@ -309,31 +309,25 @@ class Cursor implements ICursor
                        rubric.folder_id,
                        COUNT(*) AS count
                     FROM (
-                     SELECT cnrc.curriculum_node_id, cus.course_specification_id, cus.folder_id, sbox.assessment_id
-                     FROM submission_box sbox
-                              INNER JOIN rubric_capability_usage rcu ON rcu.submission_box_id = sbox.id
-                              INNER JOIN rubric_capability rc ON rc.id = rcu.rubric_capability_id
-                              INNER JOIN curriculum_node_for_rubric_capability cnrc
-                                ON rcu.rubric_capability_id = cnrc.rubric_capability_id
-                                AND cnrc.curriculum_node_id IN %s
-                              INNER JOIN assessment_course_unit_specification acus
-                                ON sbox.assessment_id = acus.assessment_id
-                              INNER JOIN course_unit_specification cus
-                                ON cus.id = acus.course_unit_specification_id
-                                AND cus.course_specification_id IN %s
-                     UNION
-                     SELECT cnri.curriculum_node_id, cus.course_specification_id, cus.folder_id, sbox.assessment_id
-                     FROM submission_box sbox
-                              INNER JOIN rubric_indicator_usage riu ON riu.submission_box_id = sbox.id
-                              INNER JOIN rubric_indicator ri ON ri.id = riu.rubric_indicator_id
-                              INNER JOIN curriculum_node_for_rubric_indicator cnri
-                                ON riu.rubric_indicator_id = cnri.rubric_indicator_id
-                                AND cnri.curriculum_node_id IN %s
-                              INNER JOIN rubric_capability rc ON rc.id = ri.rubric_capability_id
-                              INNER JOIN assessment_course_unit_specification acus ON sbox.assessment_id = acus.assessment_id
-                              INNER JOIN course_unit_specification cus
-                                ON cus.id = acus.course_unit_specification_id
-                                AND cus.course_specification_id IN %s
+                        SELECT cnrc.curriculum_node_id, cus.course_specification_id, cus.folder_id, v.assessment_id
+                        FROM v_rubric v
+                        INNER JOIN curriculum_node_for_rubric_capability cnrc
+                            ON cnrc.rubric_capability_id = v.capability_id
+                            AND cnrc.curriculum_node_id IN %s
+                        INNER JOIN assessment_course_unit_specification acus ON v.assessment_id = acus.assessment_id
+                        INNER JOIN course_unit_specification cus
+                            ON cus.id = acus.course_unit_specification_id
+                            AND cus.course_specification_id IN %s
+                        UNION
+                        SELECT cnri.curriculum_node_id, cus.course_specification_id, cus.folder_id, v.assessment_id
+                        FROM v_rubric v
+                        INNER JOIN curriculum_node_for_rubric_indicator cnri
+                            ON cnri.rubric_indicator_id = v.indicator_id
+                            AND cnri.curriculum_node_id IN %s
+                        INNER JOIN assessment_course_unit_specification acus ON v.assessment_id = acus.assessment_id
+                        INNER JOIN course_unit_specification cus
+                            ON cus.id = acus.course_unit_specification_id
+                            AND cus.course_specification_id IN %s
                     ) rubric
                     GROUP BY rubric.curriculum_node_id, rubric.course_specification_id, rubric.folder_id
                 ",
