@@ -101,6 +101,13 @@ class Model implements ISoftDeletable
     private ?Alaress_Date_Format $importedAt = null;
 
     /**
+     * The import log for this bulk import, in JSON format.
+     *
+     * @var array|null
+     */
+    private ?array $importLog = null;
+
+    /**
      * Access records for this bulk import.
      *
      * @var GenericCollection<Access\Model>
@@ -300,6 +307,24 @@ class Model implements ISoftDeletable
     public function setImportedAt(?Alaress_Date_Format $importedAt): self
     {
         $this->importedAt = $importedAt;
+        return $this;
+    }
+
+    /**
+     * @return array|null
+     */
+    public function getImportLog(): ?array
+    {
+        return $this->importLog;
+    }
+
+    /**
+     * @param array|null $importLog
+     * @return $this
+     */
+    public function setImportLog(?array $importLog): self
+    {
+        $this->importLog = $importLog;
         return $this;
     }
 

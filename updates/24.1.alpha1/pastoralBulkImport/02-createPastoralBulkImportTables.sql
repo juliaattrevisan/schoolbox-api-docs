@@ -11,6 +11,7 @@ create table pastoral_bulk_import
     body_public        mediumtext                 not null,
     points             float default 0            null,
     imported_at        datetime                   null,
+    import_log         json                       null,
     created_at         datetime                   not null,
     updated_at         datetime                   not null,
     deleted_at         datetime                   null,
