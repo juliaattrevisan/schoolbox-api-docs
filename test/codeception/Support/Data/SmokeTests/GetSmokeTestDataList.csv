@@ -62,10 +62,18 @@ Admin,"Go to profile button",Superuser,https://vagrant.dev.schoolbox.cloud/admin
 Admin,"Go to profile button",Teacher,https://vagrant.dev.schoolbox.cloud/adminv2/profile-button,401
 Admin,"Go to profile button",Student,https://vagrant.dev.schoolbox.cloud/adminv2/profile-button,401
 Admin,"Go to profile button",Parent,https://vagrant.dev.schoolbox.cloud/adminv2/profile-button,401
-Admin,"Create profile button",Superuser,https://vagrant.dev.schoolbox.cloud/adminv2/profile-button/create,200
-Admin,"Create profile button",Teacher,https://vagrant.dev.schoolbox.cloud/adminv2/profile-button/create,401
-Admin,"Create profile button",Student,https://vagrant.dev.schoolbox.cloud/adminv2/profile-button/create,401
-Admin,"Create profile button",Parent,https://vagrant.dev.schoolbox.cloud/adminv2/profile-button/create,401
+Admin,"Create profile button",Superuser,https://vagrant.dev.schoolbox.cloud/adminv2/profile-button/create/student,200
+Admin,"Create profile button",Teacher,https://vagrant.dev.schoolbox.cloud/adminv2/profile-button/create/student,401
+Admin,"Create profile button",Student,https://vagrant.dev.schoolbox.cloud/adminv2/profile-button/create/student,401
+Admin,"Create profile button",Parent,https://vagrant.dev.schoolbox.cloud/adminv2/profile-button/create/student,401
+Admin,"Create profile button",Superuser,https://vagrant.dev.schoolbox.cloud/adminv2/profile-button/create/staff,200
+Admin,"Create profile button",Teacher,https://vagrant.dev.schoolbox.cloud/adminv2/profile-button/create/staff,401
+Admin,"Create profile button",Student,https://vagrant.dev.schoolbox.cloud/adminv2/profile-button/create/staff,401
+Admin,"Create profile button",Parent,https://vagrant.dev.schoolbox.cloud/adminv2/profile-button/create/staff,401
+Admin,"Create profile button",Superuser,https://vagrant.dev.schoolbox.cloud/adminv2/profile-button/create/parent,200
+Admin,"Create profile button",Teacher,https://vagrant.dev.schoolbox.cloud/adminv2/profile-button/create/parent,401
+Admin,"Create profile button",Student,https://vagrant.dev.schoolbox.cloud/adminv2/profile-button/create/parent,401
+Admin,"Create profile button",Parent,https://vagrant.dev.schoolbox.cloud/adminv2/profile-button/create/parent,401
 Admin,"Setup dashboard",Superuser,https://vagrant.dev.schoolbox.cloud/adminv2/dashboard,200
 Admin,"Setup dashboard",Teacher,https://vagrant.dev.schoolbox.cloud/adminv2/dashboard,401
 Admin,"Setup dashboard",Student,https://vagrant.dev.schoolbox.cloud/adminv2/dashboard,401
