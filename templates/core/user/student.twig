@@ -159,6 +159,7 @@
                          #}
                         {% block details %}
                             <script>
+                                {# Handle the click-to-reveal alerts to make them toggleable #}
                                 document.addEventListener('DOMContentLoaded', function() {
                                     document.querySelectorAll('[data-click-to-reveal]').forEach(function(fieldEl) {
                                         fieldEl.addEventListener('click', function(event) {
@@ -232,15 +233,17 @@
                                                 {# This is handled separately and specially in the controller
                                                  # it's not really consolidated in this payload
                                                  #}
-                                                <div class="pastoral-flags">
-                                                    {% for pastoralCount in selectedField.value %}
-                                                        <a href="{{ pastoralCount.destinationUrl }}">
-                                                        <span class="label neutral icon-{{ pastoralCount.icon }} pastoral-flag-in-profile"
-                                                                data-tooltip title="{{ pastoralCount.title }}"
-                                                                style="color: {{ pastoralCount.fgColor }}; background-color: {{ pastoralCount.bgColor }}"
-                                                        >{{ pastoralCount.count }}</span></a>
-                                                    {% endfor %}
-                                                </div>
+                                                <dt class="full-width">
+                                                    <div class="pastoral-flags">
+                                                        {% for pastoralCount in selectedField.value %}
+                                                            <a href="{{ pastoralCount.destinationUrl }}">
+                                                            <span class="label neutral icon-{{ pastoralCount.icon }} pastoral-flag-in-profile"
+                                                                    data-tooltip title="{{ pastoralCount.title }}"
+                                                                    style="color: {{ pastoralCount.fgColor }}; background-color: {{ pastoralCount.bgColor }}"
+                                                            >{{ pastoralCount.count }}</span></a>
+                                                        {% endfor %}
+                                                    </div>
+                                                </dt>
                                             {% else %}
                                                 {# Note that some fields require special handling (different data structures)
                                                  #
