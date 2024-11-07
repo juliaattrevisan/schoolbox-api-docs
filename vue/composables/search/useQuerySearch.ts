@@ -37,11 +37,6 @@ export function useQuerySearch(
     const query = window.Vue.ref(""); // current search term being typed
     const isActive = window.Vue.computed(() => query.value.length >= MIN_QUERY_LENGTH); // To only start showing search results once enough characters have been typed
     const url = window.Vue.computed(() => {
-        return `${endpoint}query=`;
-        if (!isActive.value && !requiresQuery) {
-            // so can search without a query
-            return endpoint;
-        }
         return `${endpoint}query=${query.value}`;
     });
     const hasSearched = window.Vue.ref(false); // to show that a search has been made
