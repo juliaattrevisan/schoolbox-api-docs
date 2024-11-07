@@ -17,7 +17,6 @@ class ValidButton
     /** Check whether you have all the pieces
      *   - Must have a title
      *   - Must have a url
-     *   - Must have chosen a campus and role for Availability and also for Visibility
      *
      * @param string $type
      * @param array $post
@@ -36,11 +35,6 @@ class ValidButton
             $hasUrl = true;
         }
 
-        $hasCampusAvailability = \is_array($post['campusAvailability']) && \count($post['campusAvailability']);
-        $hasRoleAvailability = \is_array($post['roleAvailability']) && \count($post['roleAvailability']);
-        $hasCampusVisibility = \is_array($post['campusVisibility']) && \count($post['campusVisibility']);
-        $hasRoleVisibility = \is_array($post['roleVisibility']) && \count($post['roleVisibility']);
-
-        return $hasText && $hasUrl && $hasCampusAvailability && $hasRoleAvailability && $hasCampusVisibility && $hasRoleVisibility;
+        return $hasText && $hasUrl;
     }
 }
