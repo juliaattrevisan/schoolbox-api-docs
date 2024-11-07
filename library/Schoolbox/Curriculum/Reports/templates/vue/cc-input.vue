@@ -66,8 +66,8 @@ window.Vue.onMounted(() => {
 
 <template>
     <form class="c-island l-flex-col l-pad-m l-gap-m" @submit.prevent="onGenerateReport">
-        <div class="l-flex l-gap-m">
-            <div class="l-flex__item--1">
+        <div class="l-flex-col l-gap-m">
+            <div>
                 <course-selector
                     :endpoint="props.coursesEndpoint"
                     :preselected="props.selectedCourses"
@@ -75,7 +75,7 @@ window.Vue.onMounted(() => {
                     :has-error="isCoursesInvalid"
                 />
             </div>
-            <div class="l-flex__item--1">
+            <div>
                 <cc-input-curriculum
                     :endpoint="props.curriculumEndpoint"
                     :preselected="props.selectedNodes"
