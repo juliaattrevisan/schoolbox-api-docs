@@ -4,6 +4,7 @@
  */
 
 import { toRef, useTemplateRef } from "vue";
+import { onClickOutside, useFocus } from "@vueuse/core";
 import BasicModal from "@schoolboxVue/components/modal/basic-modal.vue";
 import { useSelected } from "@schoolboxVue/composables/selected/useSelected";
 import { useQuerySearch } from "@schoolboxVue/composables/search/useQuerySearch";
@@ -33,8 +34,6 @@ const emit = defineEmits<{
     searchResponse: [json: unknown, isActive: boolean];
     nextSearchResponse: [json: unknown, isActive: boolean];
 }>();
-
-const searchSelectEl = useTemplateRef<HTMLDivElement | null>("searchSelectEl");
 
 // #region Selected  Items
 
@@ -93,6 +92,28 @@ const { query, isActive, isSearching, hasNoResults, hasError } = useQuerySearch(
     onSearchSuccess,
     false,
 ); // to search for results
+
+const searchSelectEl = useTemplateRef<HTMLDivElement | null>("searchSelectEl"); // to clear the search results when clicking outside / not focused
+
+/**
+ * To close the search results when clicking outside
+ */
+window.Vue.onMounted(async () => {
+    await window.Vue.nextTick();
+    onClickOutside(searchSelectEl, () => {
+        query.value = "";
+    });
+});
+
+/**
+ * To close the search results when the input is not focused
+ */
+const { focused } = useFocus(searchSelectEl);
+window.Vue.watch(focused, ($focused) => {
+    if (!$focused) {
+        query.value = "";
+    }
+});
 
 // #endregion
 
@@ -212,7 +233,7 @@ window.Vue.watch(isOpen, async (newIsOpen) => {
         <basic-modal v-model:is-open="isOpen">
             <div class="l-flex-col l-gap-m">
                 <h2 class="f-no-margins">{{ props.title }}</h2>
-                <div class="f-no-margins">
+                <div ref="searchSelectEl" class="f-no-margins">
                     <label :for="props.labelId">{{ props.label }}</label>
                     <ss-query-input
                         v-model:query="query"

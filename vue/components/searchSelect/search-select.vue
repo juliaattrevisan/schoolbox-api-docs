@@ -4,6 +4,7 @@
  */
 
 import { toRef, useTemplateRef } from "vue";
+import { onClickOutside, useFocus } from "@vueuse/core";
 import { useSelected } from "@schoolboxVue/composables/selected/useSelected";
 import { useQuerySearch } from "@schoolboxVue/composables/search/useQuerySearch";
 import type { SearchSelectItem } from "@schoolboxVue/composables/search/types/SearchSelectItem";
@@ -45,8 +46,6 @@ const emit = defineEmits<{
     select: [item: SearchSelectItem];
     buttonSelect: [];
 }>();
-
-const searchSelectEl = useTemplateRef<HTMLDivElement | null>("searchSelectEl"); // for <ss-query-input/> to check if focus is within the <search-select/>
 
 // #region Selected  Items
 
@@ -92,6 +91,28 @@ const { query, isActive, isSearching, hasNoResults, hasError } = useQuerySearch(
     onSearchSuccess,
 ); // to search for results
 
+const searchSelectEl = useTemplateRef<HTMLDivElement | null>("searchSelectEl"); // to clear the search results when clicking outside / not focused
+
+/**
+ * To close the search results when clicking outside
+ */
+window.Vue.onMounted(async () => {
+    await window.Vue.nextTick();
+    onClickOutside(searchSelectEl, () => {
+        query.value = "";
+    });
+});
+
+/**
+ * To close the search results when the input is not focused
+ */
+const { focused } = useFocus(searchSelectEl);
+window.Vue.watch(focused, ($focused) => {
+    if (!$focused) {
+        query.value = "";
+    }
+});
+
 /**
  * To show the current search results, or the default results
  * if the search is not active
@@ -123,6 +144,16 @@ function onSelect(item: SearchSelectItem): void {
 function onButtonSelected(): void {
     emit("buttonSelect");
 }
+
+const escapePressed = window.Vue.ref(false); // to determine if the escape key has been pressed
+
+/**
+ * To close the search results when the escape key is pressed
+ */
+function onEscapeInput(): void {
+    console.warn("Escape pressed!");
+    escapePressed.value = true;
+}
 </script>
 
 <template>
@@ -143,8 +174,8 @@ function onButtonSelected(): void {
                 v-if="!props.isReadOnly"
                 v-model:query="query"
                 :label-id="props.labelId"
-                :parent-el="searchSelectEl"
                 :placeholder="props.placeholder"
+                @escape="onEscapeInput"
             />
             <button
                 v-if="props.hasButton"
@@ -157,7 +188,7 @@ function onButtonSelected(): void {
         </div>
         <div class="results-container">
             <ss-results
-                v-if="isActive || (props.defaultResults && props.defaultResults.length > 0)"
+                v-if="isActive || (props.defaultResults && props.defaultResults.length > 0 && !escapePressed)"
                 :query="query"
                 :is-active="isActive"
                 :is-searching="isSearching"
