@@ -228,6 +228,11 @@ class Controller extends Base
      */
     public function postRunImport(Model $import): void
     {
+        if ($import->getImportedAt()) {
+            $this->sendError('This import has already been run, and cannot be run again.');
+            return;
+        }
+
         // Load the Zip file's contents, cleaning up only once all files have
         // been extracted from the ZIP.
         $zipArchive       = null;
