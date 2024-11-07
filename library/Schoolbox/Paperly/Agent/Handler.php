@@ -551,11 +551,11 @@ class Handler
         $stmt = $this->externalDb->executeQuery($sql, $params);
         foreach ($stmt as $row) {
             $parentArr[] = [
-                "ID"      => $row["ID"],
-                "Surname" => $row["Surname"],
-                "Given"   => $row["Given1"],
-                "Mobile"  => $row["MobilePhone"],
-                "Email"   => $row["Email"],
+                "ID"        => $row["ID"],
+                "Surname"   => $row["Surname"],
+                "Preferred" => $row["Given1"],
+                "Mobile"    => $row["MobilePhone"],
+                "Email"     => $row["Email"],
             ];
         }
 
