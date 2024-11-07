@@ -24,7 +24,6 @@ use Schoolbox\Resource\Exception as ResourceException;
 use Schoolbox\Resource\Storage;
 use Schoolbox\Role;
 use Schoolbox\TokenReplacer;
-use Schoolbox\User;
 use Schoolbox\UserMapper;
 use ZipArchive;
 
@@ -242,18 +241,6 @@ class Controller extends Base
             $localZipFilename = $this->createLocalZipFile($zipStorage);
             $zipArchive       = $this->createZipArchive($localZipFilename);
             $importLog        = $this->generateImportLog($zipArchive, $import->getFilePathTemplate());
-//            $files            = $this->associateFilesWithUser($zipArchive, $import->getFilePathTemplate());
-
-//            // Group files by user, so a single record is created for each user:
-//            // possibly with multiple files
-//            $pastoralRecordsToCreate = [];
-//            foreach ($files as $file) {
-//                if ($file['user']) {
-//                    $userId = $file['user']->getId();
-//                    $pastoralRecordsToCreate[$userId]['user'] ??= $file['user'];
-//                    $pastoralRecordsToCreate[$userId]['fileNames'][] = $file['filename'];
-//                }
-//            }
 
             // Create the records
             $tokenReplacer = new TokenReplacer\Student(new TokenReplacer\Simple());
@@ -306,9 +293,6 @@ class Controller extends Base
 
                 // In the log: set the record ID
                 $importLog['known'][$i]['record']['id'] = $record->getId();
-
-//                $pastoralRecordsToCreate[$userId]['record']['id'] = $record->getId();
-//                $pastoralRecordsToCreate[$userId]['user'] = call_user_func($studentTranslator, $student);
 
                 // Save access, attachments and tags as well
                 $this->pastoralAccessMapper->save($record->getAccess());
@@ -403,20 +387,20 @@ class Controller extends Base
      * @param ZipArchive $archive
      * @param string     $template
      * @return array{
-     *      known: array<
-     *          array{
-     *               files: array<string>,
-     *               user: array{id: int, externalId: string, name: string},
-     *               record: ?array{id: int}
-     *          }
-     *      >,
-     *      unknown: array<
-     *          array{
-     *               file: string,
-     *               reason: string,
-     *               user: array{externalId: ?string},
-     *          },
-     *      >,
+     *     known: array<
+     *         array{
+     *             files: array<string>,
+     *             user: array{id: int, externalId: string, name: string},
+     *             record: ?array{id: int}
+     *         }
+     *     >,
+     *     unknown: array<
+     *         array{
+     *             file: string,
+     *             reason: string,
+     *             user: array{externalId: ?string},
+     *         },
+     *     >,
      * }
      */
     private function generateImportLog(ZipArchive $archive, string $template): array
