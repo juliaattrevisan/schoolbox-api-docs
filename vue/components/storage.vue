@@ -34,18 +34,31 @@ export default {
         };
     },
     mounted() {
-        switch (this.storage.type) {
-            case "audio":
-                this.player = new this.MediaElementPlayer(this.$el);
-                break;
+        // We need to wait for the source element to be visible first before initialising the MediaElement player
+        // otherwise it will never render correctly (see SA-18855)
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach((entry) => {
+                if (entry.isIntersecting) {
+                    // The component is visible, ready to init the player
+                    switch (this.storage.type) {
+                        case "audio":
+                            this.player = new this.MediaElementPlayer(this.$el);
+                            break;
 
-            case "video":
-                this.player = new this.MediaElementPlayer(this.$el, getConfigForVideo());
-                break;
+                        case "video":
+                            this.player = new this.MediaElementPlayer(this.$el, getConfigForVideo());
+                            break;
 
-            default:
-                break;
-        }
+                        default:
+                            break;
+                    }
+
+                    // Disconnect the observer after we've initialised the player
+                    observer.disconnect();
+                }
+            });
+        });
+        observer.observe(this.$el);
     },
     beforeUnmount() {
         switch (this.storage.type) {
