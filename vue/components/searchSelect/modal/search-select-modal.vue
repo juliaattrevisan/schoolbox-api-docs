@@ -57,7 +57,7 @@ const nextResultsCursor = window.Vue.ref<string | null>(null); // to store the n
  * @param isActive - whether the search is active
  * @param isNextResults - whether the results are the next set of results
  */
-function onQuerySearchSuccess(json: unknown, isActive: boolean, isNextResults: boolean = false): void {
+function onSearchSuccess(json: unknown, isActive: boolean, isNextResults: boolean = false): void {
     // check for next cursor at metadata.cursor.next
     if (typeof json === "object" && json !== null && "metadata" in json) {
         nextResultsCursor.value = (json as { metadata: { cursor: { next: string } } }).metadata.cursor.next;
@@ -85,7 +85,7 @@ function onQuerySearchSuccess(json: unknown, isActive: boolean, isNextResults: b
 const { query, isActive, isSearching, hasNoResults, hasError } = useQuerySearch(
     props.endpoint,
     results,
-    onQuerySearchSuccess,
+    onSearchSuccess,
     false,
 ); // to search for results
 
@@ -127,37 +127,36 @@ function onSelect(): void {
     close();
 }
 
-const defaultResultsUrl = window.Vue.ref(`${props.endpoint}`);
+const defaultResultsUrl = window.Vue.ref(`${props.endpoint}query=`); // query is currently required to due bug: https://schoolbox.atlassian.net/browse/SA-18815
 
 /**
  * Load more results if there's more to load
  * @param isMoreResults - whether this is more results to load
  */
 async function loadDefaultResults(isMoreResults: boolean): Promise<void> {
-    if (nextResultsCursor.value) {
-        try {
-            const response = await fetch(defaultResultsUrl.value, {
-                method: "GET",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-            });
-            if (!response.ok) {
-                hasError.value = true;
-                return;
-            }
-            const json: unknown = await response.json();
-            onQuerySearchSuccess(json, isActive.value, isMoreResults);
-        } catch (error) {
-            console.error(error);
-        } finally {
-            // isSearching.value = false;
+    try {
+        const response = await fetch(defaultResultsUrl.value, {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+            },
+        });
+        if (!response.ok) {
+            hasError.value = true;
+            return;
         }
+        const json: unknown = await response.json();
+        onSearchSuccess(json, isActive.value, isMoreResults);
+    } catch (error) {
+        console.error(error);
+    } finally {
+        // isSearching.value = false;
     }
 }
 
 /**
- * To display results straight away without searching
+ * To save results in case of cancellation and
+ * to display default results straight away without searching
  */
 window.Vue.watch(isOpen, (newIsOpen) => {
     if (newIsOpen) {
@@ -170,7 +169,7 @@ window.Vue.watch(isOpen, (newIsOpen) => {
  * To load more results when the user scrolls to the bottom of the results container
  */
 function onAtResultsBottom(): void {
-    defaultResultsUrl.value = `${props.endpoint}&cursor=${nextResultsCursor.value}`;
+    defaultResultsUrl.value = `${props.endpoint}query=&cursor=${nextResultsCursor.value}`;
     void loadDefaultResults(true);
 }
 </script>
