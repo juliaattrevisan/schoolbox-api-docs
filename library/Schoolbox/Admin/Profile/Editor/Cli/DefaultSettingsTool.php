@@ -17,7 +17,7 @@ class DefaultSettingsTool extends CliTool\App
      * Make sure to add your locking script to the Lock Inspector tool
      * const LOCK_NAMES in Inspector.php
      */
-    public const MY_TOOL_LOCK_NAME = 'profileEditorDefaults';
+    public const LOCK_NAME = 'profileEditorDefaults';
 
 
     /**
@@ -81,7 +81,7 @@ HELP;
          * specifically check for acquisition
          */
         try {
-            $lock = $this->acquireLock(self::MY_TOOL_LOCK_NAME, self::LOCK_TTL);
+            $lock = $this->acquireLock(self::LOCK_NAME, self::LOCK_TTL);
         } catch (\RuntimeException $e) {
             return;
         }
