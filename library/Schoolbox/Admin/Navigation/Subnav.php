@@ -268,7 +268,7 @@ class Subnav
                         'description' => 'Control how files are stored and processed when uploaded.',
                     ],
                     '/adminv2/restore' => [
-                        'name'        => 'Restore Resources',
+                        'name'        => 'Restore',
                         'visible'     => $userIsSuperuser || $userHasServicePermissionCms,
                         'children'    => [],
                         'description' => 'Undelete pages, folders and assessments that were accidentally deleted recently.',
