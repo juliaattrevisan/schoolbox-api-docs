@@ -115,8 +115,6 @@ window.Vue.watch(focused, ($focused) => {
     }
 });
 
-// #endregion
-
 /**
  * To show the current search results, or the default results
  * if the search is not active
@@ -131,6 +129,8 @@ const currentResults = window.Vue.computed(() => {
     }
     return results.value;
 });
+
+// #endregion
 
 // #region loading default results
 
