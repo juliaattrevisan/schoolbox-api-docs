@@ -3,6 +3,7 @@
  * To search and select Courses
  */
 
+import type { Ref } from "vue";
 import SearchSelect from "@schoolboxVue/components/searchSelect/search-select.vue";
 import SearchSelectModal from "@schoolboxVue/components/searchSelect/modal/search-select-modal.vue";
 import type { Course } from "@schoolboxLibrary/types/Course";
@@ -53,51 +54,53 @@ function onCourseNameSelect(course: Course): void {
     }
 }
 
-// #region modal related
+// #region modal
 
 const isModalOpen = window.Vue.ref(false);
 const modalDefaultResults = window.Vue.ref<Course[]>([]); // to display results when the search input is empty
-const modalSearchResults = window.Vue.ref<Course[]>([]); // to store the search results
+const modalSearchResults = window.Vue.ref<Course[]>([]); // to display results based on the search input
 
 /**
- *  To open up the course selector modal
+ *  To open up the modal
  */
 function onButtonSelect(): void {
     isModalOpen.value = true;
 }
 
 /**
- * To manipulate the results to target the courses object, and display the results
+ * Update the modal results, either the search results or default results
  * @param json - the returned json
- * @param isActive - whether the search is active, which determines whether to set the default results or search results
+ * @param $results - the results to update
+ * @param isMoreResults - whether the results are more results
  */
-function onModalSearchResponse(json: unknown, isActive: boolean): void {
+function updateResults(json: unknown, $results: Ref<Course[]>, isMoreResults: boolean): void {
     if (typeof json !== "object" || json === null || "data" in json === false) {
         return;
     }
     const newResults = json.data as CourseAPIResponse;
-    if (isActive) {
-        modalSearchResults.value = newResults.courses;
+    if (isMoreResults) {
+        $results.value = [...$results.value, ...newResults.courses];
         return;
     }
-    modalDefaultResults.value = newResults.courses;
+    $results.value = [...newResults.courses];
 }
 
 /**
  * To manipulate the results to target the courses object, and display the results
  * @param json - the returned json
- * @param isActive - whether the search is active, which determines whether to set the default results or search results
+ * @param isActive - whether the search is active, which determines whether to set the search results or default results
+ */
+function onModalSearchResponse(json: unknown, isActive: boolean): void {
+    updateResults(json, isActive ? modalSearchResults : modalDefaultResults, false);
+}
+
+/**
+ * To manipulate the results to target the courses object, and display the results
+ * @param json - the returned json
+ * @param isActive - whether the search is active, which determines whether to set the search results or default results
  */
 function onModalNextSearchResponse(json: unknown, isActive: boolean): void {
-    if (typeof json !== "object" || json === null || "data" in json === false) {
-        return;
-    }
-    const newResults = json.data as CourseAPIResponse;
-    if (isActive) {
-        modalSearchResults.value = [...modalSearchResults.value, ...newResults.courses];
-        return;
-    }
-    modalDefaultResults.value = [...modalDefaultResults.value, ...newResults.courses];
+    updateResults(json, isActive ? modalSearchResults : modalDefaultResults, true);
 }
 
 // #endregion
