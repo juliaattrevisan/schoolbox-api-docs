@@ -316,7 +316,7 @@ class Controller extends Base
             }
         }
 
-        $route = $this->routeGenerator->generate('adminProfileButton.getIndex') . '?roleType=' . $item->getRoleType();
+        $route = $this->routeGenerator->generate('adminProfileButton.getIndex', ['roleType' => $item->getRoleType()]);
 
         $this->response = $this->redirectAfterPost($route);
     }
