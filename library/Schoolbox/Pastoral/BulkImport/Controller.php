@@ -255,7 +255,8 @@ class Controller extends Base
             }
 
             // Create the records
-            $tokenReplacer = new TokenReplacer\Student(new TokenReplacer\Simple());
+            $tokenReplacer     = new TokenReplacer\Student(new TokenReplacer\Simple());
+            $studentTranslator = new User\Translator\Author\ModelToArray();
             foreach ($pastoralRecordsToCreate as $userId => $pastoralRecords) {
                 // First, create the record itself
                 $student = $pastoralRecords['user'];
@@ -302,7 +303,10 @@ class Controller extends Base
 
                 // And save: also writing a log I guess
                 $this->pastoralDataSource->save($record);
+
+                // In the log: replace the student with a cut-down version
                 $pastoralRecordsToCreate[$userId]['record']['id'] = $record->getId();
+                $pastoralRecordsToCreate[$userId]['user'] = call_user_func($studentTranslator, $student);
 
                 // Save access, attachments and tags as well
                 $this->pastoralAccessMapper->save($record->getAccess());
