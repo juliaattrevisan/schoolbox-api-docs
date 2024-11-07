@@ -305,7 +305,7 @@ class Controller extends Base
                 $this->pastoralDataSource->save($record);
 
                 // In the log: set the record ID
-                $importLog[$i]['record']['id'] = $record->getId();
+                $importLog['known'][$i]['record']['id'] = $record->getId();
 
 //                $pastoralRecordsToCreate[$userId]['record']['id'] = $record->getId();
 //                $pastoralRecordsToCreate[$userId]['user'] = call_user_func($studentTranslator, $student);
@@ -393,44 +393,6 @@ class Controller extends Base
         if (isset($localZipFilename) && is_file($localZipFilename) && is_writable($localZipFilename)) {
             unlink($localZipFilename);
         }
-    }
-
-    /**
-     * Associate and group files in `$archive` with a user.
-     *
-     * @param ZipArchive $archive
-     * @param string     $template
-     * @return array<array{filename: string, user: ?User, externalId: ?string}>
-     */
-    private function associateFilesWithUser(ZipArchive $archive, string $template): array
-    {
-        $tokenReplacer = new TokenReplacer\Simple();
-        $files         = [];
-        $template      = $this->trimExtension($template);
-        for ($i = 0; $i < $archive->numFiles; $i++) {
-            $name = $archive->getNameIndex($i);
-            if ($name !== false) {
-                $tokens     = $tokenReplacer->extract($template, $this->trimExtension($name));
-                $user       = null;
-                $externalId = null;
-                if (isset($tokens['[externalId]'])) {
-                    $externalId = $tokens['[externalId]'];
-                    try {
-                        $user = $this->userMapper->findByExternalId($externalId, Role::STUDENT);
-                    } catch (MapperException) {
-                        // noop: no user was found.
-                        // This will show as a "no student found" message.
-                    }
-                }
-                $files[] = [
-                    'filename'   => $name,
-                    'user'       => $user,
-                    'externalId' => $externalId,
-                ];
-            }
-        }
-
-        return $files;
     }
 
     /**

@@ -30,8 +30,8 @@
                 {% for file in data.files %}
                     <tr>
                         <td>
-                            {% if data.record ?? false %}
-                                {{ data.record.createdAt.timeOnly }}
+                            {% if import.importedAt %}
+                                {{ import.importedAt.local }}
                             {% else %}
                                 &mdash;
                             {% endif %}
