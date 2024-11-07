@@ -13,6 +13,7 @@ interface Props {
     query: string; // the search query
     isActive: boolean; // whether the search is active
     isSearching: boolean; // to notify of searching
+    isLoadingMore?: boolean; // whether more results are being loaded
     allowPartialMatches?: boolean; // whether to allow partial matches, so can match part of a word
     isSingleSelect: boolean; // whether only one result can be selected
     results: SearchSelectItem[]; // the results returned from the search
@@ -38,7 +39,7 @@ const showSelectAll = window.Vue.computed(() => {
         return false;
     }
     if (!props.isActive) {
-        // don't show select all if the search is not active
+        // don't show select all if the search is not active (as the default results will be shown instead)
         return false;
     }
     if (props.results.length <= 1) {
@@ -123,14 +124,23 @@ window.Vue.watch(bottom, (isAtBottom) => {
         emit("atBottom");
     }
 });
+
+/**
+ * Shift the results container scroll to the bottom so the loading of more results note is visible
+ */
+window.Vue.watch(
+    () => props.isLoadingMore,
+    async (newIsLoadingMore) => {
+        if (newIsLoadingMore && resultsEl.value) {
+            await window.Vue.nextTick();
+            resultsEl.value.scrollTop = resultsEl.value.scrollHeight;
+        }
+    },
+);
 </script>
 <template>
     <div ref="resultsEl" class="results">
         <div v-if="props.isSearching" class="results__status">Searching for results....</div>
-        <div v-else-if="props.hasError" class="results__status alert">
-            Sorry, there was an unknown error retrieving your search results. Please try again and contact your support
-            if the problem persists.
-        </div>
         <div v-else-if="props.hasNoResults && props.selected.length === 0" class="results__status">
             No results found for your current search.
         </div>
@@ -161,6 +171,11 @@ window.Vue.watch(bottom, (isAtBottom) => {
                 @hover="onHover"
             />
         </fieldset>
+        <div v-if="props.hasError" class="results__status alert">
+            Sorry, there was an unknown error retrieving your search results. Please try again and contact your support
+            if the problem persists.
+        </div>
+        <div v-if="props.isLoadingMore" class="results__status">Loading more results....</div>
     </div>
 </template>
 

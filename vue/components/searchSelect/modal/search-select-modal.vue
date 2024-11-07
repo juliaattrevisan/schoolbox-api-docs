@@ -129,6 +129,7 @@ function onSelect(): void {
 
 const defaultResultsUrl = window.Vue.ref(`${props.endpoint}query=`); // query is currently required to due bug: https://schoolbox.atlassian.net/browse/SA-18815
 const hasLoadedDefaultResults = window.Vue.ref(false); // to track if the default results have been loaded
+const isLoadingMore = window.Vue.ref(false); // to track if more results are being loaded
 
 /**
  * Load more results if there's more to load
@@ -136,8 +137,10 @@ const hasLoadedDefaultResults = window.Vue.ref(false); // to track if the defaul
  */
 async function loadDefaultResults(isMoreResults: boolean): Promise<void> {
     try {
-        if (!isMoreResults) {
+        if (isMoreResults) {
             // only show the initial loading on the first result load
+            isLoadingMore.value = true;
+        } else {
             isSearching.value = true;
         }
         const response = await fetch(defaultResultsUrl.value, {
@@ -156,6 +159,7 @@ async function loadDefaultResults(isMoreResults: boolean): Promise<void> {
         console.error(error);
         hasError.value = true;
     } finally {
+        isLoadingMore.value = false;
         isSearching.value = false;
     }
 }
@@ -204,6 +208,7 @@ function onAtResultsBottom(): void {
                             :query="query"
                             :is-active="isActive"
                             :is-searching="isSearching"
+                            :is-loading-more="isLoadingMore"
                             :allow-partial-matches="props.allowPartialMatches"
                             :is-single-select="props.isSingleSelect"
                             :results="currentResults"
