@@ -9,10 +9,12 @@ declare(strict_types=1);
 
 namespace Schoolbox\Pastoral\BulkImport;
 
-use Schoolbox\Pastoral\BaseMapper;
+use PDOStatement;
+use Schoolbox\GenericCollection;
+use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\Pastoral\Severity\Mapper as PastoralSeverityMapper;
 use Schoolbox\Pastoral\SubType\Mapper as PastoralSubTypeMapper;
-use Schoolbox\Pastoral\Tag\Mapper as PastoralTagMapper;
+use Schoolbox\Pastoral\Tag;
 use Schoolbox\Pastoral\Type\Mapper as PastoralTypeMapper;
 use Schoolbox\Resource\Storage\Mapper as StorageMapper;
 use Schoolbox\UserMapper;
@@ -50,10 +52,10 @@ class Mapper extends BaseMapper
         $this->uses('updated_at', self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP);
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
 
-        $this->joinsReverseMulti('pastoral_id', Access\Mapper::class, 'access', 'access');
+        $this->joinsReverseMulti('pastoral_bulk_import_id', Access\Mapper::class, 'access', 'access');
         $this->joinsVia(
             'pastoral_bulk_import_tags',
-            PastoralTagMapper::class,
+            Tag\Mapper::class,
             'id',
             'tag_id',
             'pastoral_bulk_import_id',
@@ -62,5 +64,83 @@ class Mapper extends BaseMapper
             null,
             'tags',
         );
+
+        $this->registerCallback(self::CALLBACK_POSTSAVE, $this->savePastoralAccess(...));
+    }
+
+    /**
+     * Hydrate this item, with all access and tags attached.
+     *
+     * @param PDOStatement $statement
+     * @return GenericCollection<Model>
+     */
+    public function hydrateSelect(PDOStatement $statement)
+    {
+        $models = parent::hydrateSelect($statement);
+        $ids    = $models->getPropertyValues('id');
+
+        if (!empty($ids)) {
+            // Load access models, keyed by import ID
+            /** @var Access\Mapper $accessMapper */
+            $accessMapper = $this->getJoinMapper('access');
+            $accessModels = $accessMapper
+                ->findByColumn('pastoral_bulk_import_id', $ids)
+                ->groupByCallback(fn (Access\Model $model) => $model->getPastoralBulkImport()->getId());
+
+            // Load tag models, keyed by import ID
+            $pb       = $this->getPredicateBuilder()->in('id', $ids);
+            $tagQuery = $this->getDatabase()->prepareQuery("
+                SELECT
+                    {$this->getColumnString()},
+                    {$this->getJoinColumnString('pastoral_bulk_import_tags', 'tag')}
+                FROM {$this->getDatabase()->getQuoter()->quoteIdentifier($this->getTable())}
+                INNER JOIN {$this->getJoinSql('pastoral_bulk_import_tags', '', 'tag')}
+                WHERE {$pb->in('id', $ids)->getWhereIntersect()}
+            ");
+            $tagModels = [];
+            $tagQuery->execute($pb->getParams());
+            foreach ($tagQuery as $row) {
+                $tagModels[$row['id']] ??= $this->getJoinMapper('pastoral_bulk_import_tags')->createCollection();
+                $tagModels[$row['id']][] = $this->hydrateJoin($row, 'pastoral_bulk_import_tags', 'tag');
+            }
+
+            // Assign access and tags
+            foreach ($models as $model) {
+                $id = $model->getId();
+                if (isset($accessModels[$id])) {
+                    $model->setAccess($accessModels[$id]);
+                }
+                if (isset($tagModels[$id])) {
+                    $model->setTags($tagModels[$id]);
+                }
+            }
+        }
+        return $models;
+    }
+
+    /**
+     * Save access rows on the import object.
+     *
+     * Tags are auto-saved as part of the `joinsVia` query, and don't need to be
+     * saved here.
+     *
+     * @param Model      $model
+     * @param Model|null $previous
+     * @return void
+     * @throws BaseMapper\Exception
+     */
+    public function savePastoralAccess(Model $model, ?Model $previous = null): void
+    {
+        /** @var Access\Mapper $accessMapper */
+        $accessMapper   = $this->getJoinMapper('access');
+        $previousAccess = $previous?->getAccess();
+        $currentAccess  = $model->getAccess();
+        $removedAccess  = $previousAccess?->diffBy($currentAccess, 'id');
+        if (!empty($removedAccess)) {
+            $accessMapper->delete($removedAccess);
+        }
+
+        // Assign every access to the current model
+        $accessMapper->save($currentAccess->map(fn (Access\Model $access) => $access->setPastoralBulkImport($model)));
     }
 }
