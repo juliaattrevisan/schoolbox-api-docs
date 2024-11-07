@@ -12,8 +12,10 @@ namespace Schoolbox\Pastoral\BulkImport;
 use Alaress\Web\Controller\Base;
 use Alaress_Date_Format;
 use League\Flysystem\FilesystemException;
+use Psr\Http\Message\UriInterface;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\L10n\RosettaStone;
+use Schoolbox\Learning\Assessment\Redirect;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Pastoral;
 use Schoolbox\Pastoral\TemplateDataHelper;
@@ -24,6 +26,7 @@ use Schoolbox\Resource\Exception as ResourceException;
 use Schoolbox\Resource\Storage;
 use Schoolbox\Role;
 use Schoolbox\TokenReplacer;
+use Schoolbox\Url\Uri;
 use Schoolbox\UserMapper;
 use ZipArchive;
 
@@ -174,9 +177,7 @@ class Controller extends Base
         $this->pastoralBulkImportMapper->save($import);
 
         // Then, redirect to a place where the fields are displayed
-        $this->response = $this->redirectAfterPost(
-            $this->routeGenerator->generate('pastoralBulkImport.getImport', ['id' => $import->getId()]),
-        );
+        $this->response = $this->redirectAfterPost($this->generateRedirectUrl($import)->__toString());
     }
 
     /**
@@ -312,9 +313,7 @@ class Controller extends Base
             ->setImportLog($importLog);
         $this->pastoralBulkImportMapper->save($import);
 
-        $this->response = $this->redirectAfterPost(
-            $this->routeGenerator->generate('pastoralBulkImport.getImport', ['id' => $import->getId()]),
-        );
+        $this->response = $this->redirectAfterPost($this->generateRedirectUrl($import)->__toString());
     }
 
     /**
@@ -473,5 +472,23 @@ class Controller extends Base
             return substr($path, 0, -(strlen($extension) + 1));
         }
         return $path;
+    }
+
+    /**
+     * Generate a URL for post-import or post-preview redirect, including the
+     * return URL if it's in the query string.
+     *
+     * @param Model $import
+     * @return UriInterface
+     */
+    private function generateRedirectUrl(Model $import): UriInterface
+    {
+        $returnQuery = [];
+        if ($this->requestQuery->get(Redirect::RETURN_URL)) {
+            $returnQuery[Redirect::RETURN_URL] = $this->requestQuery->get(Redirect::RETURN_URL);
+        }
+        return (new Uri())
+            ->withPath($this->routeGenerator->generate('pastoralBulkImport.getImport', ['id' => $import->getId()]))
+            ->withQuery(http_build_query($returnQuery));
     }
 }
