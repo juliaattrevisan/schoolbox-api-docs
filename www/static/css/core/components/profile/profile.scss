@@ -1,8 +1,3 @@
-.pastoral-flag-in-profile {
-    margin-bottom: 0.75rem !important;
-    font-size: 1rem !important;
-}
-
 .pastoral-flag-in-attendance {
     margin-bottom: 0.75rem !important;
 }
@@ -46,17 +41,26 @@
 }
 
 .profile {
-    .alert-box,
     .pastoral-flags {
-        margin: 0 0 0.75rem 0.75rem;
-        @media #{$small-only} {
-            margin: 0 0 0.5rem 0.5rem;
-            padding: 0.5rem 1.5rem 0.5rem 0.875rem;
+        margin-bottom: 0.5rem; // Space between this and other fields
+
+        span.label {
+            font-size: 1rem !important;
         }
     }
+
+    .alert-box {
+        margin-bottom: 0.5rem; // Space between this and other fields
+
+        // The entire alert box can be clicked to reveal the content
+        [data-click-to-reveal] {
+            cursor: pointer;
+        }
+    }
+
     dl {
         @extend .inline-dl;
-        margin: 0 0 0.75rem 0;
+        margin: 0 0 0 0;
         @media #{$small-only} {
             margin: 0 0 0.5rem 0.5rem;
             dt,

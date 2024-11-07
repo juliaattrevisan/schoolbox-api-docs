@@ -158,44 +158,17 @@
                         {# Profile Editor v24 begins here mostly
                          #}
                         {% block details %}
-                            {# TODO @zacmcw I don't know where you put styles anymore
-                             #  Migrate this inline stylesheet into the appropriate place
-                             #}
-                            <style>
-                                .profile.content .alert-box {
-                                    margin-left: 0;
-                                }
-
-                                .profile .pastoral-flags {
-                                    margin-left: 1rem;
-                                }
-
-                                /* What is with these paddings?!?
-                                 */
-                                .alert-box.obscured {
-                                    width: 2rem;
-                                    cursor: pointer;
-                                    padding-right: 2rem;
-                                }
-                            </style>
-
-                            {# TODO @zacmcw you might be able to implement this gooder than me #}
                             <script>
-                                $(function() {
-                                    $('[data-click-to-reveal]').on('click', function(event) {
-                                        event.preventDefault();
-                                        let elem = $(this).find('span');
-                                        if (elem.is(':visible')) {
-                                            elem.hide();
-                                            $(this).css({
-                                                'width': '2rem'
+                                document.addEventListener('DOMContentLoaded', function() {
+                                    document.querySelectorAll('[data-click-to-reveal]').forEach(function(fieldEl) {
+                                        fieldEl.addEventListener('click', function(event) {
+                                            event.preventDefault();
+
+                                            // Toggle whether the content or the "Click to reveal" text is visible
+                                            fieldEl.querySelectorAll('span, a').forEach(function(spanEl) {
+                                                spanEl.style.display = spanEl.style.display === 'none' ? '' : 'none';
                                             });
-                                        } else {
-                                            elem.show();
-                                            $(this).css({
-                                                'width': 'auto',
-                                            });
-                                        }
+                                        });
                                     });
                                 });
                             </script>
@@ -249,6 +222,9 @@
                                                             {{ macro.fieldName(selectedField) }}
                                                         {% endif %}
                                                     </span>
+                                                    {% if selectedField.clickToReveal %}
+                                                        <a href="#">Click to reveal</a>
+                                                    {% endif %}
                                                 </div>
                                             </dt>
                                         {% else %}
