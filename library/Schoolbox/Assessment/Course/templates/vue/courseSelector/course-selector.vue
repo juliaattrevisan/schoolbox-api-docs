@@ -71,35 +71,35 @@ function onButtonSelect(): void {
 /**
  * To manipulate the results to target the courses object, and display the results
  * @param json - the returned json
- * @param isDefaultResults - whether the results are the default results
+ * @param isActive - whether the search is active, which determines whether to set the default results or search results
  */
-function onModalSearchResponse(json: unknown, isDefaultResults: boolean): void {
+function onModalSearchResponse(json: unknown, isActive: boolean): void {
     if (typeof json !== "object" || json === null || "data" in json === false) {
         return;
     }
     const newResults = json.data as CourseAPIResponse;
-    if (isDefaultResults) {
-        modalDefaultResults.value = newResults.courses;
+    if (isActive) {
+        modalSearchResults.value = newResults.courses;
         return;
     }
-    modalSearchResults.value = newResults.courses;
+    modalDefaultResults.value = newResults.courses;
 }
 
 /**
  * To manipulate the results to target the courses object, and display the results
  * @param json - the returned json
- * @param isDefaultResults - whether the results are the default results
+ * @param isActive - whether the search is active, which determines whether to set the default results or search results
  */
-function onModalNextSearchResponse(json: unknown, isDefaultResults: boolean): void {
+function onModalNextSearchResponse(json: unknown, isActive: boolean): void {
     if (typeof json !== "object" || json === null || "data" in json === false) {
         return;
     }
     const newResults = json.data as CourseAPIResponse;
-    if (isDefaultResults) {
-        modalDefaultResults.value = [...modalDefaultResults.value, ...newResults.courses];
+    if (isActive) {
+        modalSearchResults.value = [...modalSearchResults.value, ...newResults.courses];
         return;
     }
-    modalSearchResults.value = [...modalSearchResults.value, ...newResults.courses];
+    modalDefaultResults.value = [...modalDefaultResults.value, ...newResults.courses];
 }
 </script>
 

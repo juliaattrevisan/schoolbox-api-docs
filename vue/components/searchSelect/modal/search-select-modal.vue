@@ -30,8 +30,8 @@ const props = withDefaults(defineProps<Props>(), {
 });
 
 const emit = defineEmits<{
-    searchResponse: [json: unknown, isDefaultResults: boolean];
-    nextSearchResponse: [json: unknown, isDefaultResults: boolean];
+    searchResponse: [json: unknown, isActive: boolean];
+    nextSearchResponse: [json: unknown, isActive: boolean];
 }>();
 
 const searchSelectEl = useTemplateRef<HTMLDivElement | null>("searchSelectEl");
