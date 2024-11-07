@@ -43,14 +43,6 @@ function onSearchResponse(json: unknown): void {
     }
 }
 
-/**-----------------------------------------------
- * Modal related features
- ------------------------------------------------*/
-
-const isModalOpen = window.Vue.ref(false);
-const modalDefaultResults = window.Vue.ref<Course[]>([]); // to display results when the search input is empty
-const modalSearchResults = window.Vue.ref<Course[]>([]); // to store the search results
-
 /**
  * To select a link to the course
  * @param course - the selected course
@@ -60,6 +52,12 @@ function onCourseNameSelect(course: Course): void {
         window.location.href = course.folder._links.view;
     }
 }
+
+// #region modal related
+
+const isModalOpen = window.Vue.ref(false);
+const modalDefaultResults = window.Vue.ref<Course[]>([]); // to display results when the search input is empty
+const modalSearchResults = window.Vue.ref<Course[]>([]); // to store the search results
 
 /**
  *  To open up the course selector modal
@@ -101,6 +99,8 @@ function onModalNextSearchResponse(json: unknown, isActive: boolean): void {
     }
     modalDefaultResults.value = [...modalDefaultResults.value, ...newResults.courses];
 }
+
+// #endregion
 </script>
 
 <template>
