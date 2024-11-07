@@ -174,8 +174,10 @@ window.Vue.watch(isOpen, async (newIsOpen) => {
  * To load more results when the user scrolls to the bottom of the results container
  */
 function onAtResultsBottom(): void {
-    defaultResultsUrl.value = `${props.endpoint}query=&cursor=${nextResultsCursor.value}`;
-    void loadDefaultResults(true);
+    if (nextResultsCursor.value) {
+        defaultResultsUrl.value = `${props.endpoint}query=&cursor=${nextResultsCursor.value}`;
+        void loadDefaultResults(true);
+    }
 }
 </script>
 
