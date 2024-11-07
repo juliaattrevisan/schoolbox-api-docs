@@ -23,7 +23,7 @@ use Schoolbox\Resource\Attachment\Zone;
 use Schoolbox\Resource\Exception as ResourceException;
 use Schoolbox\Resource\Storage;
 use Schoolbox\Role;
-use Schoolbox\TokenReplacer\Simple;
+use Schoolbox\TokenReplacer;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
 use ZipArchive;
@@ -244,17 +244,20 @@ class Controller extends Base
             $pastoralRecordsToCreate = [];
             foreach ($files as $file) {
                 if ($file['user']) {
-                    $pastoralRecordsToCreate[$file['user']->getId()]['fileNames'][] = $file['filename'];
+                    $userId = $file['user']->getId();
+                    $pastoralRecordsToCreate[$userId]['user'] ??= $file['user'];
+                    $pastoralRecordsToCreate[$userId]['fileNames'][] = $file['filename'];
                 }
             }
 
             // Create the records
+            $tokenReplacer = new TokenReplacer\Student(new TokenReplacer\Simple());
             foreach ($pastoralRecordsToCreate as $userId => $pastoralRecords) {
-                // Extract bulk import into something processPastoralRecords
-                // understands
-                $record = $this->pastoralDataSource->createModel()
+                // First, create the record itself
+                $student = $pastoralRecords['user'];
+                $record  = $this->pastoralDataSource->createModel()
                     ->setOwner($this->getUser())
-                    ->setStudent($this->userMapper->findById($userId))
+                    ->setStudent($student)
                     ->setModifiedBy($this->getUser())
                     ->setHeading($import->getHeading())
                     ->setType($import->getType())
@@ -262,9 +265,12 @@ class Controller extends Base
                     ->setSeverity($import->getSeverity())
                     ->setPoints($import->getPoints())
                     ->setTags($import->getTags())
-                    ->setBodyPublic($import->getBodyPublic())
+                    ->setBodyPublic($tokenReplacer->replace($import->getBodyPublic(), $student))
                     ->setBodyPrivate('')
+                    ->setExternalId(null)
                 ;
+
+                // Create access
                 $accessModels = $this->pastoralAccessMapper->createCollection();
                 foreach ($import->getAccess() as $access) {
                     /** @var Access\Model $access */
@@ -273,6 +279,8 @@ class Controller extends Base
                     );
                 }
                 $record->setAccess($accessModels);
+
+                // Create attachments
                 foreach ($pastoralRecords['fileNames'] as $fileName) {
                     $attachment = $this->receiver->acceptStream(
                         basename($fileName),
@@ -283,6 +291,8 @@ class Controller extends Base
                             ->setPastoral($record)
                             ->setStorage($attachment)
                             ->setPrivate(false)
+                            ->setExternalId(null)
+                            ->setRealname($attachment->getFilename())
                     );
                 }
 
@@ -296,39 +306,6 @@ class Controller extends Base
                 foreach ($import->getTags() as $tag) {
                     $this->pastoralTagMapper->assignToRecord($record, $tag);
                 }
-
-//                // Finagle the post data for this user's record, so that each file
-//                // in the ZIP for them is included in their post data.
-//                $attachmentHashes = [];
-//                foreach ($pastoralRecords['fileNames'] as $fileName) {
-//                    $attachment = $this->receiver->acceptStream(
-//                        basename($fileName),
-//                        $zipArchive->getStream($fileName),
-//                    );
-//                    $attachmentHashes[] = NodeFactory::STORE . ':' . $attachment->getHash();
-//                }
-//
-//                $requestData = new Values();
-//                $requestData['heading'] = $import->getHeading();
-//                $requestData['typeId'] = $import->getType()->getId();
-//                $requestData['subtypeId'] = $import->getSubtype()?->getId();
-//                $requestData['severityId'] = $import->getSeverity()?->getId();
-//                $requestData['points'] = $import->getPoints();
-//                $requestData['tags'] = implode(',', $import->getTags()->getPropertyValues('id'));
-//                $requestData['bodyPublic'] = $import->getBodyPublic();
-//                $requestData[Pastoral\Controller::ATTACHZONE_PUBLIC . '_attachments'] = $attachmentHashes;
-//                foreach ($import->getAccess() as $access) {
-//                    //
-//                }
-//
-//                // And create their records.
-//                // There should be only a single record created for each user,
-//                // so for simplicity's sake show only their first.
-//                $pastoralRecordsToCreate[$userId]['record']['id'] = $this->recordProcessor->processPastoralRecords(
-//                    $this->getUser(),
-//                    $userId,
-//                    $requestData,
-//                )->first()?->getId();
             }
         } finally {
             $this->cleanup($zipArchive, $localZipFilename);
@@ -437,7 +414,7 @@ class Controller extends Base
      */
     private function associateFilesWithUser(ZipArchive $archive, string $template): array
     {
-        $tokenReplacer = new Simple();
+        $tokenReplacer = new TokenReplacer\Simple();
         $files         = [];
         $template      = $this->trimExtension($template);
         for ($i = 0; $i < $archive->numFiles; $i++) {
