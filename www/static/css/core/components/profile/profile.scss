@@ -44,3 +44,33 @@
         }
     }
 }
+
+.profile {
+    .alert-box,
+    .pastoral-flags {
+        margin: 0 0 0.75rem 0.75rem;
+        @media #{$small-only} {
+            margin: 0 0 0.5rem 0.5rem;
+            padding: 0.5rem 1.5rem 0.5rem 0.875rem;
+        }
+    }
+    dl {
+        @extend .inline-dl;
+        margin: 0 0 0.75rem 0;
+        @media #{$small-only} {
+            margin: 0 0 0.5rem 0.5rem;
+            dt,
+            dd {
+                padding: 0 0.25rem 0 0;
+            }
+        }
+    }
+    @media #{$small-only} {
+        .medium-2 {
+            width: 20%;
+        }
+        .medium-10 {
+            width: 80%;
+        }
+    }
+}
