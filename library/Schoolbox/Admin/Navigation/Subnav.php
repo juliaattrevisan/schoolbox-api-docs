@@ -242,7 +242,7 @@ class Subnav
                 ],
             ],
             '/adminv2/cms' => [
-                'name'       => 'CMS',
+                'name'       => 'Resources',
                 'visible'    => $userIsSuperuser || $userHasServicePermissionCms,
                 'searchable' => false,
                 'children'   => [
