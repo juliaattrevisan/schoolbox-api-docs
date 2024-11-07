@@ -64,6 +64,13 @@ class Module extends BaseModule
             $permission,
             $preload,
         );
+        $this->register(
+            self::METHOD_POST,
+            '/{id}/run',
+            'postRunImport',
+            $permission,
+            $preload,
+        );
     }
 
     /**

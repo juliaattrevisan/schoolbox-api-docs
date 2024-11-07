@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace Schoolbox\Pastoral\BulkImport;
 
 use Alaress\Web\Controller\Base;
+use Alaress_Date_Format;
 use League\Flysystem\FilesystemException;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\L10n\RosettaStone;
@@ -133,7 +134,7 @@ class Controller extends Base
         $subType    = $this->requestPost->get('subtypeId')
             ? $this->pastoralSubTypeMapper->findById($this->requestPost->get('subtypeId'))
             : null;
-        $model      = $this->pastoralBulkImportMapper->createModel()
+        $import     = $this->pastoralBulkImportMapper->createModel()
             ->setOwner($this->getUser())
             ->setZip($zipStorage)
             ->setFilePathTemplate($this->requestPost->get('template'))
@@ -151,7 +152,7 @@ class Controller extends Base
         ;
 
         // Create tags
-        $model = $model->setTags(
+        $import = $import->setTags(
             $this->recordProcessor->prepareTags(
                 $this->requestPost->get('tags') ?? '',
                 $this->requestPost->get('tagNames') ?? ''
@@ -165,14 +166,14 @@ class Controller extends Base
             $this->userMapper,
             Access\Model::class,
         );
-        $model = $model->setAccess($visibilityTranslator->prepareAccesses($this->requestPost, $subType ?? $type));
+        $import = $import->setAccess($visibilityTranslator->prepareAccesses($this->requestPost, $subType ?? $type));
 
         // And save
-        $this->pastoralBulkImportMapper->save($model);
+        $this->pastoralBulkImportMapper->save($import);
 
         // Then, redirect to a place where the fields are displayed
         $this->response = $this->redirectAfterPost(
-            $this->routeGenerator->generate('pastoralBulkImport.getImport', ['id' => $model->getId()]),
+            $this->routeGenerator->generate('pastoralBulkImport.getImport', ['id' => $import->getId()]),
         );
     }
 
@@ -201,7 +202,9 @@ class Controller extends Base
         }
 
         $this->response = $this->responseFromTemplate(
-            '@pastoralBulkImport/importPreview.twig',
+            $import->getImportedAt()
+                ? '@pastoralBulkImport/importResult.twig'
+                : '@pastoralBulkImport/importPreview.twig',
             [
                 'files'     => $files,
                 'returnUrl' => $this->requestQuery->get('returnUrl')
@@ -210,33 +213,28 @@ class Controller extends Base
                 'import'    => $import,
             ],
         );
-
-        // If not imported:
-        // parse the attached ZIP, and show what would be imported
-
-        // If imported:
-        // display the log for what was imported (possibly as a JSON object)
     }
 
     /**
      * Actually perform the pastoral bulk import.
      *
-     * @api   POST /pastoral/bulk-import
+     * @api   POST /pastoral/bulk-import/{id}/run
      * @since 24.1
      *
+     * @param Model $import
      * @return void
      */
-    public function postImport(): void
+    public function postRunImport(Model $import): void
     {
         // Load the Zip file's contents, cleaning up only once all files have
         // been extracted from the ZIP.
         $zipArchive       = null;
         $localZipFilename = null;
         try {
-            $zipStorage       = $this->loadZipFromStorage();
+            $zipStorage       = $import->getZip();
             $localZipFilename = $this->createLocalZipFile($zipStorage);
             $zipArchive       = $this->createZipArchive($localZipFilename);
-            $files            = $this->associateFilesWithUser($zipArchive);
+            $files            = $this->associateFilesWithUser($zipArchive, $import->getFilePathTemplate());
 
             // Group files by user, so a single record is created for each user:
             // possibly with multiple files
@@ -278,24 +276,34 @@ class Controller extends Base
             $this->cleanup($zipArchive, $localZipFilename);
         }
 
-        // Output a response for each file
-        foreach ($files as $i => $file) {
-            if ($file['user']) {
-                $files[$i]['record'] = $pastoralRecordsToCreate[$file['user']->getId()]['record'] ?? null;
-            } else {
-                $files[$i]['record'] = null;
-            }
-        }
+        // Save a record of the import, possibly including logs,
+        // and then redirect back to the main page.
+        $import = $import->setImportedAt(Alaress_Date_Format::now());
+        $this->pastoralBulkImportMapper->save($import);
 
-        // And show the results
-        $this->response = $this->responseFromTemplate(
-            '@pastoralBulkImport/import.twig',
-            [
-                'files'     => $files,
-                'typeId'    => $this->requestPost->get('typeId'),
-                'subtypeId' => $this->requestPost->get('subtypeId'),
-            ],
+        $this->response = $this->redirectAfterPost(
+            $this->routeGenerator->generate('pastoralBulkImport.getImport', ['id' => $import->getId()]),
         );
+
+
+//        // Output a response for each file
+//        foreach ($files as $i => $file) {
+//            if ($file['user']) {
+//                $files[$i]['record'] = $pastoralRecordsToCreate[$file['user']->getId()]['record'] ?? null;
+//            } else {
+//                $files[$i]['record'] = null;
+//            }
+//        }
+//
+//        // And show the results
+//        $this->response = $this->responseFromTemplate(
+//            '@pastoralBulkImport/import.twig',
+//            [
+//                'files'     => $files,
+//                'typeId'    => $this->requestPost->get('typeId'),
+//                'subtypeId' => $this->requestPost->get('subtypeId'),
+//            ],
+//        );
     }
 
     /**
