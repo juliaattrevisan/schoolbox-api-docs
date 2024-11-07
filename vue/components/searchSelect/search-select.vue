@@ -12,7 +12,6 @@ import { useOnSelectedChange } from "./composables/useOnSelectedChange";
 import SsSelected from "./ss-selected.vue";
 import SsQueryInput from "./ss-query-input.vue";
 import SsResults from "./ss-results.vue";
-import { escape } from "lodash";
 
 interface Props {
     label: string; // the label text
