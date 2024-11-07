@@ -192,24 +192,24 @@ class Controller extends Base
      */
     public function getImport(Model $import): void
     {
-        // Load the Zip file's contents, cleaning up once done.
-        $zipArchive       = null;
-        $localZipFilename = null;
-        try {
-            $zipStorage       = $import->getZip();
-            $localZipFilename = $this->createLocalZipFile($zipStorage);
-            $zipArchive       = $this->createZipArchive($localZipFilename);
-            $files            = $this->associateFilesWithUser($zipArchive, $import->getFilePathTemplate());
-        } finally {
-            $this->cleanup($zipArchive, $localZipFilename);
+        if ($import->getImportLog() === null) {
+            // Generate the import log from the ZIP file's contents,
+            // cleaning up once done.
+            $zipArchive       = null;
+            $localZipFilename = null;
+            try {
+                $zipStorage       = $import->getZip();
+                $localZipFilename = $this->createLocalZipFile($zipStorage);
+                $zipArchive       = $this->createZipArchive($localZipFilename);
+                $import->setImportLog($this->generateImportLog($zipArchive, $import->getFilePathTemplate()));
+            } finally {
+                $this->cleanup($zipArchive, $localZipFilename);
+            }
         }
 
         $this->response = $this->responseFromTemplate(
-            $import->getImportedAt()
-                ? '@pastoralBulkImport/importResult.twig'
-                : '@pastoralBulkImport/importPreview.twig',
+            '@pastoralBulkImport/import.twig',
             [
-                'files'     => $files,
                 'returnUrl' => $this->requestQuery->get('returnUrl')
                     ?? $this->routeGenerator->generate('pastoral.getIndex'),
                 'import'    => $import,
@@ -429,6 +429,76 @@ class Controller extends Base
         }
 
         return $files;
+    }
+
+    /**
+     * Generate an import log for this archive: it will be written to the
+     * pastoral log import, and will be used to generate the preview and import
+     * result screens.
+     *
+     * @param ZipArchive $archive
+     * @param string     $template
+     * @return array{
+     *      known: array<
+     *          array{
+     *               files: array<string>,
+     *               user: array{id: int, externalId: string, name: string},
+     *               record: ?array{id: int}
+     *          }
+     *      >,
+     *      unknown: array<
+     *          array{file: string, reason: string},
+     *      >,
+     * }
+     */
+    private function generateImportLog(ZipArchive $archive, string $template): array
+    {
+        $tokenReplacer  = new TokenReplacer\Simple();
+        $importLog      = ['known' => [], 'unknown' => []];
+        $template       = $this->trimExtension($template);
+        for ($i = 0; $i < $archive->numFiles; $i++) {
+            $filename = $archive->getNameIndex($i);
+            if ($filename !== false) {
+                $tokens        = $tokenReplacer->extract($template, $this->trimExtension($filename));
+                $user          = null;
+                $externalId    = null;
+                $unknownReason = null;
+                if (isset($tokens['[externalId]'])) {
+                    $externalId = $tokens['[externalId]'];
+                    try {
+                        $user = $this->userMapper->findByExternalId($externalId, Role::STUDENT);
+                    } catch (MapperException\Deleted) {
+                        // noop: no user was found.
+                        // This will show as a "no student found" message.
+                        $unknownReason = 'Student was deleted';
+                    } catch (MapperException $e) {
+                        $unknownReason = $e->getMessage();
+                    }
+                } else {
+                    $unknownReason = 'External ID not found in filename';
+                }
+
+                if ($user) {
+                    $importLog['known'][$user->getId()] ??= [
+                        'user'  => [
+                            'id'         => $user->getId(),
+                            'externalId' => $user->getExternalId() ?? '',
+                            'name'       => $user->formatName(),
+                        ],
+                        'files'  => [],
+                        'record' => null,
+                    ];
+                    $importLog['known'][$user->getId()]['files'][] = $filename;
+                } else {
+                    $importLog['unknown'][] = [
+                        'file'   => $filename,
+                        'reason' => $unknownReason,
+                    ];
+                }
+            }
+        }
+
+        return $importLog;
     }
 
     /**

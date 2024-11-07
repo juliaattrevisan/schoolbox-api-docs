@@ -27,44 +27,40 @@
             </tr>
             </thead>
             <tbody>
-            {% for file in files %}
-                <tr>
-                    <td>
-                        {% if file.record %}
-                            {{ file.record.createdAt.timeOnly }}
-                        {% else %}
-                            &mdash;
-                        {% endif %}
-                    </td>
-                    <td>{{ file.filename }}</td>
-                    <td>
-                        {% if file.externalId %}
-                            {{ file.externalId }}
-                        {% else %}
-                            &mdash;
-                        {% endif %}
-                    </td>
-                    <td>
-                        {% if file.user %}
-                            {{ file.user.formatName }}
-                        {% elseif file.externalId %}
-                            <i>No student found for external ID</i>
-                        {% else %}
-                            &mdash;
-                        {% endif %}
-                    </td>
-                    <td>
-                        {% if file.record %}
-                            Created
-                            (<a href="{{ routeLookup(
+            {% for data in import.importLog.known %}
+                {% for filename in data.files %}
+                    <tr>
+                        <td>
+                            {% if data.record ?? false %}
+                                {{ data.record.createdAt.timeOnly }}
+                            {% else %}
+                                &mdash;
+                            {% endif %}
+                        </td>
+                        <td>{{ filename }}</td>
+                        <td>
+                            {% if data.user.externalId %}
+                                {{ data.user.externalId }}
+                            {% else %}
+                                &mdash;
+                            {% endif %}
+                        </td>
+                        <td>
+                            {{ data.user.fullName }}
+                        </td>
+                        <td>
+                            {% if data.record ?? false %}
+                                Created
+                                (<a href="{{ routeLookup(
                                 'pastoral.getStudentRecord',
                                 {studentId: file.record.student.id, recordId: file.record.id}
                             ) }}">#{{ file.record.id }}</a>)
-                        {% else %}
-                            No record created
-                        {% endif %}
-                    </td>
-                </tr>
+                            {% else %}
+                                No record created
+                            {% endif %}
+                        </td>
+                    </tr>
+                {% endfor %}
             {% endfor %}
             </tbody>
         </table>

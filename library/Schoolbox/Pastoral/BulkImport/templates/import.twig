@@ -1,0 +1,71 @@
+{% import 'sub/breadcrumbs.twig' as bread %}
+{{ bread.crumbs(
+    [ locale.pastoralCare.proper, routeLookup('pastoral.getIndex') ],
+    [ 'Bulk Import', routeLookup('pastoralBulkImport.getForm') ],
+    [ 'Results' ],
+) }}
+
+<div class="actions-small-1 row">
+    <div class="list-item">
+        <div class="small-12 column">
+            <h1>{{ locale.pastoral.proper }} Bulk Import Results</h1>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="small-12 island">
+        <table>
+            <thead>
+            <tr>
+                <th>Time</th>
+                <th>File uploaded</th>
+                <th>External ID</th>
+                <th>Student</th>
+                <th>Import Result</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for data in import.importLog.known %}
+                {% for filename in data.files %}
+                    <tr>
+                        <td>
+                            {% if data.record ?? false %}
+                                {{ data.record.createdAt.timeOnly }}
+                            {% else %}
+                                &mdash;
+                            {% endif %}
+                        </td>
+                        <td>{{ filename }}</td>
+                        <td>
+                            {% if data.user.externalId %}
+                                {{ data.user.externalId }}
+                            {% else %}
+                                &mdash;
+                            {% endif %}
+                        </td>
+                        <td>
+                            {{ data.user.name }}
+                        </td>
+                        <td>
+                            {% if data.record ?? false %}
+                                Created
+                                (<a href="{{ routeLookup('pastoral.getStudentRecord', {studentId: data.user.id, recordId: data.record.id}) }}">#{{ data.record.id }}</a>)
+                            {% else %}
+                                &mdash;
+                            {% endif %}
+                        </td>
+                    </tr>
+                {% endfor %}
+            {% endfor %}
+            </tbody>
+        </table>
+
+        {% include '@pastoralBulkImport/fragments/userProfileLink.twig' with {
+            typeId:    import.type.id,
+            subtypeId: import.subType.id,
+        } only %}
+
+        <a href="{{ RETURN_URL.previous.decoded ?? routeLookup('pastoral.getIndex') }}" class="submit">Return</a>
+    </div>
+</div>
