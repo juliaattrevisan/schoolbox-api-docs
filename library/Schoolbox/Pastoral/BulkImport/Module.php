@@ -42,6 +42,9 @@ class Module extends BaseModule
                 new Rule\HasServicePermission(UserAccess::SERVICE_PASTORAL, UserAccess::ACCESS_WRITE),
             ),
         );
+        $preload = fn (array $params): array => [
+            'import' => $this->getMapperFactory()->get(Mapper::class)->findById($params['id']),
+        ];
         $this->register(
             self::METHOD_GET,
             '',
@@ -50,15 +53,16 @@ class Module extends BaseModule
         );
         $this->register(
             self::METHOD_POST,
-            '/preview',
-            'postImportPreview',
+            '/create',
+            'postCreateImport',
             $permission,
         );
         $this->register(
-            self::METHOD_POST,
-            '',
-            'postImport',
+            self::METHOD_GET,
+            '/{id}',
+            'getImport',
             $permission,
+            $preload,
         );
     }
 

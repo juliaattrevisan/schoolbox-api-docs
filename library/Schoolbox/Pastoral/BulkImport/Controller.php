@@ -118,15 +118,14 @@ class Controller extends Base
     }
 
     /**
-     * Display preview of pastoral bulk import, after having posted the form
-     * above.
+     * Save the form import.
      *
-     * @api   POST /pastoral/bulk-import/preview
+     * @api   POST /pastoral/bulk-import/create
      * @since 24.1
      *
      * @return void
      */
-    public function postImportPreview(): void
+    public function postCreateImport(): void
     {
         // Save the import here, then redirect to a create page.
         $zipStorage = $this->loadZipFromStorage();
@@ -170,14 +169,32 @@ class Controller extends Base
         // And save
         $this->pastoralBulkImportMapper->save($model);
 
+        // Then, redirect to a place where the fields are displayed
+        $this->response = $this->redirectAfterPost(
+            $this->routeGenerator->generate('pastoralBulkImport.getImport', ['id' => $model->getId()]),
+        );
+    }
+
+    /**
+     * Display the current state of `$import`, including whether or not it has
+     * actually been imported.
+     *
+     * @api   GET /pastoral/bulk-import/{id}
+     * @since 24.1
+     *
+     * @param Model $import
+     * @return void
+     */
+    public function getImport(Model $import): void
+    {
         // Load the Zip file's contents, cleaning up once done.
         $zipArchive       = null;
         $localZipFilename = null;
         try {
-            $zipStorage       = $this->loadZipFromStorage();
+            $zipStorage       = $import->getZip();
             $localZipFilename = $this->createLocalZipFile($zipStorage);
             $zipArchive       = $this->createZipArchive($localZipFilename);
-            $files            = $this->associateFilesWithUser($zipArchive);
+            $files            = $this->associateFilesWithUser($zipArchive, $import->getFilePathTemplate());
         } finally {
             $this->cleanup($zipArchive, $localZipFilename);
         }
@@ -188,9 +205,16 @@ class Controller extends Base
                 'files'     => $files,
                 'returnUrl' => $this->requestQuery->get('returnUrl')
                     ?? $this->routeGenerator->generate('pastoral.getIndex'),
-                'formVars'  => $this->requestPost->getArrayCopy(),
+                'formVars'  => [],
+                'import'    => $import,
             ],
         );
+
+        // If not imported:
+        // parse the attached ZIP, and show what would be imported
+
+        // If imported:
+        // display the log for what was imported (possibly as a JSON object)
     }
 
     /**
@@ -339,13 +363,14 @@ class Controller extends Base
      * Associate and group files in `$archive` with a user.
      *
      * @param ZipArchive $archive
+     * @param string     $template
      * @return array<array{filename: string, user: ?User, externalId: ?string}>
      */
-    private function associateFilesWithUser(ZipArchive $archive): array
+    private function associateFilesWithUser(ZipArchive $archive, string $template): array
     {
         $tokenReplacer = new Simple();
         $files         = [];
-        $template      = $this->trimExtension($this->requestPost->get('template'));
+        $template      = $this->trimExtension($template);
         for ($i = 0; $i < $archive->numFiles; $i++) {
             $name = $archive->getNameIndex($i);
             if ($name !== false) {
