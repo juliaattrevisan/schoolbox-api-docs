@@ -81,16 +81,15 @@ onKeyStroke("Escape", () => {
     &__container {
         background: white;
         box-shadow: 0 0 10px rgba(0, 0, 0, 0.4);
-        left: 15%;
+        margin: 0 auto;
         max-width: 62.5rem;
         padding: var(--spacing-m);
-        position: absolute;
+        position: relative;
         top: 100px;
         width: 70%;
     }
     @media (max-width: 700px) {
         &__container {
-            left: 0;
             width: 100%;
         }
     }
