@@ -212,7 +212,6 @@ class Controller extends Base
                 'files'     => $files,
                 'returnUrl' => $this->requestQuery->get('returnUrl')
                     ?? $this->routeGenerator->generate('pastoral.getIndex'),
-                'formVars'  => [],
                 'import'    => $import,
             ],
         );
@@ -321,26 +320,6 @@ class Controller extends Base
         $this->response = $this->redirectAfterPost(
             $this->routeGenerator->generate('pastoralBulkImport.getImport', ['id' => $import->getId()]),
         );
-
-
-//        // Output a response for each file
-//        foreach ($files as $i => $file) {
-//            if ($file['user']) {
-//                $files[$i]['record'] = $pastoralRecordsToCreate[$file['user']->getId()]['record'] ?? null;
-//            } else {
-//                $files[$i]['record'] = null;
-//            }
-//        }
-//
-//        // And show the results
-//        $this->response = $this->responseFromTemplate(
-//            '@pastoralBulkImport/import.twig',
-//            [
-//                'files'     => $files,
-//                'typeId'    => $this->requestPost->get('typeId'),
-//                'subtypeId' => $this->requestPost->get('subtypeId'),
-//            ],
-//        );
     }
 
     /**
