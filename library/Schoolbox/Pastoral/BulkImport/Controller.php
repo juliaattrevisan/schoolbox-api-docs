@@ -241,25 +241,25 @@ class Controller extends Base
             $zipStorage       = $import->getZip();
             $localZipFilename = $this->createLocalZipFile($zipStorage);
             $zipArchive       = $this->createZipArchive($localZipFilename);
-            $files            = $this->associateFilesWithUser($zipArchive, $import->getFilePathTemplate());
+            $importLog        = $this->generateImportLog($zipArchive, $import->getFilePathTemplate());
+//            $files            = $this->associateFilesWithUser($zipArchive, $import->getFilePathTemplate());
 
-            // Group files by user, so a single record is created for each user:
-            // possibly with multiple files
-            $pastoralRecordsToCreate = [];
-            foreach ($files as $file) {
-                if ($file['user']) {
-                    $userId = $file['user']->getId();
-                    $pastoralRecordsToCreate[$userId]['user'] ??= $file['user'];
-                    $pastoralRecordsToCreate[$userId]['fileNames'][] = $file['filename'];
-                }
-            }
+//            // Group files by user, so a single record is created for each user:
+//            // possibly with multiple files
+//            $pastoralRecordsToCreate = [];
+//            foreach ($files as $file) {
+//                if ($file['user']) {
+//                    $userId = $file['user']->getId();
+//                    $pastoralRecordsToCreate[$userId]['user'] ??= $file['user'];
+//                    $pastoralRecordsToCreate[$userId]['fileNames'][] = $file['filename'];
+//                }
+//            }
 
             // Create the records
-            $tokenReplacer     = new TokenReplacer\Student(new TokenReplacer\Simple());
-            $studentTranslator = new User\Translator\Author\ModelToArray();
-            foreach ($pastoralRecordsToCreate as $userId => $pastoralRecords) {
+            $tokenReplacer = new TokenReplacer\Student(new TokenReplacer\Simple());
+            foreach ($importLog['known'] as $i => $pastoralRecord) {
                 // First, create the record itself
-                $student = $pastoralRecords['user'];
+                $student = $this->userMapper->findById($pastoralRecord['user']['id']);
                 $record  = $this->pastoralDataSource->createModel()
                     ->setOwner($this->getUser())
                     ->setStudent($student)
@@ -286,7 +286,7 @@ class Controller extends Base
                 $record->setAccess($accessModels);
 
                 // Create attachments
-                foreach ($pastoralRecords['fileNames'] as $fileName) {
+                foreach ($pastoralRecord['files'] as $fileName) {
                     $attachment = $this->receiver->acceptStream(
                         basename($fileName),
                         $zipArchive->getStream($fileName),
@@ -304,9 +304,11 @@ class Controller extends Base
                 // And save: also writing a log I guess
                 $this->pastoralDataSource->save($record);
 
-                // In the log: replace the student with a cut-down version
-                $pastoralRecordsToCreate[$userId]['record']['id'] = $record->getId();
-                $pastoralRecordsToCreate[$userId]['user'] = call_user_func($studentTranslator, $student);
+                // In the log: set the record ID
+                $importLog[$i]['record']['id'] = $record->getId();
+
+//                $pastoralRecordsToCreate[$userId]['record']['id'] = $record->getId();
+//                $pastoralRecordsToCreate[$userId]['user'] = call_user_func($studentTranslator, $student);
 
                 // Save access, attachments and tags as well
                 $this->pastoralAccessMapper->save($record->getAccess());
@@ -323,7 +325,7 @@ class Controller extends Base
         // and then redirect back to the main page.
         $import = $import
             ->setImportedAt(Alaress_Date_Format::now())
-            ->setImportLog($pastoralRecordsToCreate);
+            ->setImportLog($importLog);
         $this->pastoralBulkImportMapper->save($import);
 
         $this->response = $this->redirectAfterPost(
