@@ -54,17 +54,17 @@ abstract class Component_Homepage_ControllerAbstract extends Component_Controlle
             $sourceId = 0;
         }
 
-        // Control permission: always based on current context
-        $userAccessLevel = (
-            $this->getUser()->hasServicePermission(UserAccess::SERVICE_DESIGN, UserAccess::ACCESS_FULL)
-            ? UserAccess::ACCESS_FULL
-            : $this->access->getFolderAccess($this->getUser(), $contextId)
-        );
-        $this->setContextPermission(min($userAccessLevel, $this->getMaximumPermission()));
         try {
+            // Control permission: always based on current context
+            $userAccessLevel = (
+                $this->getUser()->hasServicePermission(UserAccess::SERVICE_DESIGN, UserAccess::ACCESS_FULL)
+                ? UserAccess::ACCESS_FULL
+                : $this->access->getFolderAccess($this->getUser(), $contextId)
+            );
+            $this->setContextPermission(min($userAccessLevel, $this->getMaximumPermission()));
             // Content permission: based on alt source if it's there
             $this->setContentPermission(min($this->access->getFolderAccess($this->getUser(), $sourceId), $this->getMaximumPermission()));
-        } catch (\Schoolbox\Mapper\Exception\Deleted $e) {
+        } catch (\Schoolbox\Mapper\Exception $e) {
             /**
              * If the alt source has been deleted, catch that here
              * So that it doesn't escalate to the kernel and 404 the whole page
