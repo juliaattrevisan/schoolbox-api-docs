@@ -26,7 +26,12 @@ class Module extends \Alaress\Module\Module
      */
     protected function registerRoutes(): void
     {
-        $ruleSearchSettings = new Rule\All(
+        $ruleSuperuserOnly = new Rule\All(
+            new Rule\IsLoggedIn(),
+            new Rule\IsSuperuser(),
+        );
+
+        $ruleSuperuserOrModerator = new Rule\All(
             new Rule\IsLoggedIn(),
             new Rule\Any(
                 new Rule\IsSuperuser(),
@@ -72,11 +77,6 @@ class Module extends \Alaress\Module\Module
             )
         );
 
-        $ruleSuperuserOnly = new Rule\All(
-            new Rule\IsLoggedIn(),
-            new Rule\IsSuperuser(),
-        );
-
         // Routes to which users with service permission UserAccess::SERVICE_PASTORAL need access.
         $this->register('GET', '/pastoral/{typeLabel:Pastoral%20Care}', 'getSettingsPastoral', $rulePastoral);
         $this->register('POST', '/pastoral/{typeLabel:Pastoral%20Care}', 'postSettingsPastoral', $rulePastoral);
@@ -94,7 +94,10 @@ class Module extends \Alaress\Module\Module
         $this->register('GET', '/design/{typeLabel:Skin%20Config}', 'getSettingsDesign', $ruleDesign);
         $this->register('POST', '/design/{typeLabel:Skin%20Config}', 'postSettingsDesign', $ruleDesign);
 
-        $this->register('GET', '/search', 'searchSettings', $ruleSearchSettings);
+        // Routes to which all moderators as well as superusers need access.
+        $this->register('GET', '/search', 'searchSettings', $ruleSuperuserOrModerator);
+
+        // Routes to which only superusers need access.
         $this->register('GET', '{/typeLabel}', 'getSettings', $ruleSuperuserOnly);
         $this->register('POST', '/{typeLabel}', 'postSettings', $ruleSuperuserOnly);
     }
