@@ -147,6 +147,7 @@ class Controller extends Base
             ->setHeading($this->requestPost->get('heading'))
             ->setBodyPublic($this->requestPost->get('body_public'))
             ->setPoints($this->requestPost->getFloat('points'))
+            ->setImportedAt(null)
         ;
 
         // Create tags

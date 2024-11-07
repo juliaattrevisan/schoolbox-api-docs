@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\Pastoral\BulkImport;
 
+use Alaress_Date_Format;
 use Schoolbox\GenericCollection;
 use Schoolbox\ISoftDeletable;
 use Schoolbox\Mapper\Traits\Model\CreatedAtDate;
@@ -90,6 +91,14 @@ class Model implements ISoftDeletable
      * The points to be assigned records created for this import, if any.
      */
     private ?float $points = null;
+
+    /**
+     * The date at which this bulk import was actually imported, and pastoral
+     * records were actually created.
+     *
+     * Null if this import has not been run yet.
+     */
+    private ?Alaress_Date_Format $importedAt = null;
 
     /**
      * Access records for this bulk import.
@@ -273,6 +282,24 @@ class Model implements ISoftDeletable
     public function setPoints(?float $points): self
     {
         $this->points = $points;
+        return $this;
+    }
+
+    /**
+     * @return Alaress_Date_Format|null
+     */
+    public function getImportedAt(): ?Alaress_Date_Format
+    {
+        return $this->importedAt;
+    }
+
+    /**
+     * @param Alaress_Date_Format|null $importedAt
+     * @return $this
+     */
+    public function setImportedAt(?Alaress_Date_Format $importedAt): self
+    {
+        $this->importedAt = $importedAt;
         return $this;
     }
 

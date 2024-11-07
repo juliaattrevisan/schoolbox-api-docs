@@ -10,6 +10,7 @@ create table pastoral_bulk_import
     heading            varchar(255)               not null,
     body_public        mediumtext                 not null,
     points             float default 0            null,
+    imported_at        datetime                   null,
     created_at         datetime                   not null,
     updated_at         datetime                   not null,
     deleted_at         datetime                   null,
