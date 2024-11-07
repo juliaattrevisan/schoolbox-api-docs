@@ -49,6 +49,7 @@ const emit = defineEmits<{
 const searchSelectEl = useTemplateRef<HTMLDivElement | null>("searchSelectEl"); // for <ss-query-input/> to check if focus is within the <search-select/>
 
 // #region Selected  Items
+
 const selected = defineModel<SearchSelectItem[]>("selected", { default: [] }); // to store selected items
 const { add, remove, update } = useSelected(selected); // to add and remove selected items
 const { onAdd, onRemove } = useOnSelectedChange(
@@ -58,9 +59,11 @@ const { onAdd, onRemove } = useOnSelectedChange(
     remove,
     update,
 ); // to handle selected item changes picked up within the <template/>
+
 // #endregion
 
 // #region Search Results
+
 const results = defineModel<SearchSelectItem[]>("results", { default: [] }); // to store search results
 /**
  * To handle the search response, we handle some basic responses internally,
@@ -103,6 +106,7 @@ const currentResults = window.Vue.computed(() => {
     }
     return results.value;
 });
+
 // #endregion
 
 /**

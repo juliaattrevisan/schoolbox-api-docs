@@ -34,9 +34,9 @@ const emit = defineEmits<{
     nextSearchResponse: [json: unknown, isDefaultResults: boolean];
 }>();
 
-const isOpen = defineModel<boolean>("is-open", { default: false }); // to open/close the modal
-
 const searchSelectEl = useTemplateRef<HTMLDivElement | null>("searchSelectEl");
+
+// #region Selected  Items
 
 const selected = defineModel<SearchSelectItem[]>("selected", { default: [] }); // to store selected items
 const { add, remove, update, save, undo, savedSelected } = useSelected(selected); // to add and remove selected items
@@ -48,8 +48,13 @@ const { onAdd, onRemove } = useOnSelectedChange(
     update,
 ); // to handle selected item changes picked up within the <template/>
 
+// #endregion
+
+// #region Search Results
+
 const results = defineModel<SearchSelectItem[]>("results", { default: [] }); // to store search results
 const nextResultsCursor = window.Vue.ref<string | null>(null); // to store the next cursor for the next search
+
 /**
  * To handle the search response, we handle some basic responses internally,
  * but if the response is more complex, we emit the response to be handled externally
@@ -89,6 +94,8 @@ const { query, isActive, isSearching, hasNoResults, hasError } = useQuerySearch(
     false,
 ); // to search for results
 
+// #endregion
+
 /**
  * To show the current search results, or the default results
  * if the search is not active
@@ -104,28 +111,7 @@ const currentResults = window.Vue.computed(() => {
     return results.value;
 });
 
-/**
- * Rest the modal state
- */
-function close(): void {
-    isOpen.value = false;
-    query.value = "";
-}
-
-/**
- * Close the modal, also clearing any updated selected
- */
-function onCancel(): void {
-    undo();
-    close();
-}
-
-/**
- * The selection has been confirmed, so close the modal
- */
-function onSelect(): void {
-    close();
-}
+// #region loading default results
 
 const defaultResultsUrl = window.Vue.ref(`${props.endpoint}query=`); // query is currently required to due bug: https://schoolbox.atlassian.net/browse/SA-18815
 const hasLoadedDefaultResults = window.Vue.ref(false); // to track if the default results have been loaded
@@ -165,6 +151,45 @@ async function loadDefaultResults(isMoreResults: boolean): Promise<void> {
 }
 
 /**
+ * To load more results when the user scrolls to the bottom of the results container
+ */
+function onAtResultsBottom(): void {
+    if (nextResultsCursor.value) {
+        defaultResultsUrl.value = `${props.endpoint}query=&cursor=${nextResultsCursor.value}`;
+        void loadDefaultResults(true);
+    }
+}
+
+// #endregion
+
+// #region Modal opening / closing / selecting
+
+const isOpen = defineModel<boolean>("is-open", { default: false }); // to open/close the modal
+
+/**
+ * Rest the modal state
+ */
+function close(): void {
+    isOpen.value = false;
+    query.value = "";
+}
+
+/**
+ * Close the modal, also clearing any updated selected
+ */
+function onCancel(): void {
+    undo();
+    close();
+}
+
+/**
+ * The selection has been confirmed, so close the modal
+ */
+function onSelect(): void {
+    close();
+}
+
+/**
  * To save results in case of cancellation and
  * to display default results straight away without searching
  */
@@ -179,15 +204,7 @@ window.Vue.watch(isOpen, async (newIsOpen) => {
     }
 });
 
-/**
- * To load more results when the user scrolls to the bottom of the results container
- */
-function onAtResultsBottom(): void {
-    if (nextResultsCursor.value) {
-        defaultResultsUrl.value = `${props.endpoint}query=&cursor=${nextResultsCursor.value}`;
-        void loadDefaultResults(true);
-    }
-}
+// #endregion
 </script>
 
 <template>
