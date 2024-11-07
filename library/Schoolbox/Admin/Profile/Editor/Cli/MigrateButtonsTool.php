@@ -125,7 +125,7 @@ HELP;
 
             /* Figure out which roletype corresponds to each role
              */
-            $roletypeLookup = $this->generateRoletypeLookup();
+            $roleTypeLookup = $this->generateRoleTypeLookup();
 
             /* Get a list of buttons to inspect - users can specify --system,
              * --custom, or both
@@ -137,7 +137,7 @@ HELP;
                     $this->perform(),
                     $this->getDatabaseInternal(),
                     $this->getLogger(),
-                    $roletypeLookup
+                    $roleTypeLookup
                 );
             }
 
@@ -197,7 +197,7 @@ HELP;
     /**
      * @return array
      */
-    public function generateRoletypeLookup(): array
+    public function generateRoleTypeLookup(): array
     {
         $db = $this->getDatabaseInternal();
 
