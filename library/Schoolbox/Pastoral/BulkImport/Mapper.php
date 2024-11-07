@@ -49,7 +49,7 @@ class Mapper extends BaseMapper
         $this->uses('body_public', self::TYPE_STRING);
         $this->uses('points', self::TYPE_DECIMAL);
 
-        $this->uses('imported_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
+        $this->uses('imported_at', self::TYPE_DATETIME);
         $this->uses('import_log', self::TYPE_JSON);
         $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
         $this->uses('updated_at', self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP);
