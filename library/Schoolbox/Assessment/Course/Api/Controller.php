@@ -48,8 +48,7 @@ class Controller extends Base
 
         $search = $query->get('query');
         $folder = $query->get('folder');
-        // $limit = $query->getInt('limit', Cursor::LIMIT_DEFAULT);
-        $limit = $query->getInt('limit', 15);
+        $limit = $query->getInt('limit', Cursor::LIMIT_DEFAULT);
         $encodedCursor = $query->get('cursor');
 
         //Early exit if limit is not of type int
