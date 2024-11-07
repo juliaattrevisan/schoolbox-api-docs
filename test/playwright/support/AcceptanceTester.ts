@@ -92,6 +92,8 @@ export default class AcceptanceTester extends BaseTester {
         await this.loginAsAdmin();
 
         await this.searchForUser(fullname);
+        await this.common.waitForPageLoad();
+
         await this.page.getByTestId("user-profile-modify").click();
 
         this.isGoingTo("click the options button and impersonate the user");

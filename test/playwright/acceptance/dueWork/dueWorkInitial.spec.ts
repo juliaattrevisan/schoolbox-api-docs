@@ -1,5 +1,5 @@
 /**
- * This test creates due work activities, deletes a due work activity, the student views the activity, submits it in person,
+ * This test creates due work activities, deletes a due work, the student views the activity, submits it in person,
  * the teacher views and marks the submission, the students views the marked submission, the teacher and submits a due work by typing in the ckeditor
  */
 import { test, expect } from "@schoolboxTest/playwright/support/integrations";
@@ -283,6 +283,7 @@ test.describe("Initial Due Work functionality tests", () => {
         await page.goto(homepageUrl);
         await page.getByTestId(`${SELECTOR_COMPONENT_DUEWORK_POPOUT_BUTTON}${assessmentID}-button`).click();
         await page.getByTestId(`${SELECTOR_COMPONENT_ASSESSMENT_ACTIONS_VIEWSTATUS}-${assessmentID}`).click();
+        await tester.common.waitForPageLoad();
 
         tester.isGoingTo(`navigate to the due work status page for ${student}`);
         await page.getByTestId(`${SELECTOR_ASSESSMENT_STATUS_FEEDBACK_POPOUT_BUTTON}-${studentId}-button`).click();
