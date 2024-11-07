@@ -11,6 +11,7 @@
 // require SitePage context
 
 use Schoolbox\Error\Mapper;
+use Schoolbox\Permission\Access\UserAccess;
 
 if (!isset($this)) {
     require_once __DIR__ . '/../../../conf/core/require.php';
@@ -19,7 +20,10 @@ if (!isset($this)) {
 }
 
 /** @var SitePage $this */
-if (!$this->getDi()->get('session')->get('user')->isSuperuser()) {
+if (
+    !$_SESSION['user']->isSuperuser() &&
+    !$_SESSION['user']->hasServicePermission(UserAccess::SERVICE_DESIGN, UserAccess::ACCESS_FULL)
+) {
     $this->error(\Schoolbox\Error\Mapper::ERROR_PERM_PAGE_VIEW, '', 403);
 }
 
