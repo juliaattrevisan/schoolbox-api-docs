@@ -128,6 +128,7 @@ function onSelect(): void {
 }
 
 const defaultResultsUrl = window.Vue.ref(`${props.endpoint}query=`); // query is currently required to due bug: https://schoolbox.atlassian.net/browse/SA-18815
+const hasLoadedDefaultResults = window.Vue.ref(false); // to track if the default results have been loaded
 
 /**
  * Load more results if there's more to load
@@ -158,10 +159,14 @@ async function loadDefaultResults(isMoreResults: boolean): Promise<void> {
  * To save results in case of cancellation and
  * to display default results straight away without searching
  */
-window.Vue.watch(isOpen, (newIsOpen) => {
+window.Vue.watch(isOpen, async (newIsOpen) => {
     if (newIsOpen) {
         save();
-        void loadDefaultResults(false);
+        if (hasLoadedDefaultResults.value) {
+            return;
+        }
+        await loadDefaultResults(false);
+        hasLoadedDefaultResults.value = true; // to prevent loading default results again
     }
 });
 
