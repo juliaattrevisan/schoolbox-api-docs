@@ -27,7 +27,7 @@
             </thead>
             <tbody>
             {% for data in import.importLog.known %}
-                {% for filename in data.files %}
+                {% for file in data.files %}
                     <tr>
                         <td>
                             {% if data.record ?? false %}
@@ -36,7 +36,7 @@
                                 &mdash;
                             {% endif %}
                         </td>
-                        <td>{{ filename }}</td>
+                        <td>{{ file }}</td>
                         <td>
                             {% if data.user.externalId %}
                                 {{ data.user.externalId }}
@@ -57,6 +57,24 @@
                         </td>
                     </tr>
                 {% endfor %}
+            {% endfor %}
+
+            {% for data in import.importLog.unknown %}
+                <tr>
+                    <td>&mdash;</td>
+                    <td>{{ data.file }}</td>
+                    <td>
+                        {% if data.user.externalId %}
+                            {{ data.user.externalId }}
+                        {% else %}
+                            &mdash;
+                        {% endif %}
+                    </td>
+                    <td>&mdash;</td>
+                    <td>
+                        <i>{{ data.reason }}</i>
+                    </td>
+                </tr>
             {% endfor %}
             </tbody>
         </table>

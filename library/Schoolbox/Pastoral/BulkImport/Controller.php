@@ -449,7 +449,11 @@ class Controller extends Base
      *          }
      *      >,
      *      unknown: array<
-     *          array{file: string, reason: string},
+     *          array{
+     *               file: string,
+     *               reason: string,
+     *               user: array{externalId: ?string},
+     *          },
      *      >,
      * }
      */
@@ -495,11 +499,14 @@ class Controller extends Base
                     $importLog['unknown'][] = [
                         'file'   => $filename,
                         'reason' => $unknownReason,
+                        'user'   => ['externalId' => $externalId ?? null],
                     ];
                 }
             }
         }
 
+        // Strip keys from known users
+        $importLog['known'] = array_values($importLog['known']);
         return $importLog;
     }
 
