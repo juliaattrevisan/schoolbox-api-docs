@@ -255,22 +255,69 @@ class Controller extends Base
                         basename($fileName),
                         $zipArchive->getStream($fileName),
                     );
-                    $attachmentHashes[] = NodeFactory::STORE . ':' . $attachment->getHash();
+                    $attachmentsHashes[] = NodeFactory::STORE . ':' . $attachment->getHash();
                 }
-                $requestPost = clone $this->requestPost;
-                $requestPost->offsetSet(
-                    Pastoral\Controller::ATTACHZONE_PUBLIC . '_attachments',
-                    $attachmentHashes,
-                );
 
-                // And create their records.
-                // There should be only a single record created for each user,
-                // so for simplicity's sake show only their first.
-                $pastoralRecordsToCreate[$userId]['record'] = $this->recordProcessor->processPastoralRecords(
-                    $this->getUser(),
-                    $userId,
-                    $requestPost,
-                )->first();
+                // Extract bulk import into something processPastoralRecords
+                // understands
+                $record = $this->pastoralDataSource->createModel()
+                    ->setOwner($this->getUser())
+                    ->setStudent($this->userMapper->findById($userId))
+                    ->setModifiedBy($this->getUser())
+                    ->setHeading($import->getHeading())
+                    ->setType($import->getType())
+                    ->setSubtype($import->getSubtype())
+                    ->setSeverity($import->getSeverity())
+                    ->setPoints($import->getPoints())
+                    ->setTags($import->getTags())
+                    ->setBodyPublic($import->getBodyPublic())
+                    ->setBodyPrivate('')
+                ;
+                $accessModels = $this->pastoralAccessMapper->createCollection();
+                foreach ($import->getAccess() as $access) {
+                    /** @var Access\Model $access */
+                    $accessModels->add($access->writeToPastoralAccess($this->pastoralAccessMapper->createModel()));
+                }
+                $record->setAccess($accessModels);
+                foreach ($pastoralRecords['fileNames'] as $fileName) {
+                    $attachment = $this->receiver->acceptStream(
+                        basename($fileName),
+                        $zipArchive->getStream($fileName),
+                    );
+                    $record->getAttachments()->add(
+                        (new Pastoral\Attachment\Model())
+                            ->setStorage($attachment)
+                            ->setPrivate(false)
+                    );
+//                    $attachmentsHashes[] = NodeFactory::STORE . ':' . $attachment->getHash();
+                }
+
+                // And save: also writing a log I guess
+                $this->pastoralDataSource->save($record);
+                $pastoralRecordsToCreate[$userId]['record']['id'] = $record->getId();
+
+//                $requestData = new Values();
+//                $requestData['heading'] = $import->getHeading();
+//                $requestData['typeId'] = $import->getType()->getId();
+//                $requestData['subtypeId'] = $import->getSubtype()?->getId();
+//                $requestData['severityId'] = $import->getSeverity()?->getId();
+//                $requestData['bodyPublic'] = $import->getBodyPublic();
+//                $requestData[Pastoral\Controller::ATTACHZONE_PUBLIC . '_attachments'] = $attachmentHashes;
+//
+//                $requestPost = clone $this->requestPost;
+//                $requestPost->offsetSet(
+//                    Pastoral\Controller::ATTACHZONE_PUBLIC . '_attachments',
+//                    $attachmentHashes,
+//                );
+//
+//                // And create their records.
+//                // There should be only a single record created for each user,
+//                // so for simplicity's sake show only their first.
+//                $pastoralRecordsToCreate[$userId]['record'] = $this->recordProcessor->processPastoralRecords(
+//                    $this->getUser(),
+//                    $userId,
+//                    $requestPost,
+//                )->first();
             }
         } finally {
             $this->cleanup($zipArchive, $localZipFilename);

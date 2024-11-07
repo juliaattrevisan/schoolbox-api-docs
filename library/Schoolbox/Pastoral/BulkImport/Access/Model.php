@@ -13,6 +13,7 @@ use Schoolbox\Mapper\Traits\Model\CreatedAtDate;
 use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
 use Schoolbox\Mapper\Traits\Model\Id;
 use Schoolbox\Pastoral\Access\Mapper as PastoralAccessMapper;
+use Schoolbox\Pastoral\Access\Model as PastoralAccessModel;
 use Schoolbox\Pastoral\BulkImport\Model as BulkImportModel;
 use Schoolbox\Pastoral\Group\Model as Group;
 use Schoolbox\Pastoral\IPastoralAccess;
@@ -218,5 +219,25 @@ class Model implements IPastoralAccess
     {
         $this->commentsAllowed = $commentsAllowed;
         return $this;
+    }
+
+    /**
+     * Update `$model` with the fields in this object, with the intent of
+     * saving them to a pastoral record.
+     *
+     * @param PastoralAccessModel $model
+     * @return PastoralAccessModel
+     */
+    public function writeToPastoralAccess(PastoralAccessModel $model): PastoralAccessModel
+    {
+        return $model
+            ->setAccess($this->access)
+            ->setCommentsAllowed($this->commentsAllowed)
+            ->setMatchCampus($this->matchCampus)
+            ->setGroup($this->group ? (clone $this->group) : null)
+            ->setRole($this->role ? (clone $this->role) : null)
+            ->setRoleType($this->roleType)
+            ->setUser($this->user ? (clone $this->user) : null)
+        ;
     }
 }

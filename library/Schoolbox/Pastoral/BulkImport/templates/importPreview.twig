@@ -17,7 +17,7 @@
 <div class="row">
     <div class="small-12 island">
         <form class="top" method="post"
-              action="{{ routeLookupIfAuthorized('pastoralBulkImport.postImport') }}?{{ RETURN_URL.name }}={{ returnUrl }}"
+              action="{{ routeLookupIfAuthorized('pastoralBulkImport.postRunImport', {id: import.id}) }}?{{ RETURN_URL.name }}={{ returnUrl }}"
         >
             <table>
                 <thead>
