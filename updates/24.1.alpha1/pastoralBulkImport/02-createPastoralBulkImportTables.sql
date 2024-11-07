@@ -14,6 +14,8 @@ create table pastoral_bulk_import
     created_at         datetime                   not null,
     updated_at         datetime                   not null,
     deleted_at         datetime                   null,
+    index pastoral_bulk_import_imported_at_index (imported_at),
+    index pastoral_bulk_import_deleted_at_index (deleted_at),
     constraint fk_pastoral_bulk_import_owner_id
         foreign key (owner_id) references user (id),
     constraint fk_pastoral_bulk_import_zip_hash
@@ -39,6 +41,7 @@ create table pastoral_bulk_import_access
     access                  int     default 0                            null,
     match_campus            tinyint default 0                            null,
     comments_allowed        tinyint default 0                            null,
+    index pastoral_bulk_import_access_deleted_at_index (deleted_at),
     constraint fk_pastoral_bulk_import_access_pastoral_bulk_import_id
         foreign key (pastoral_bulk_import_id) references pastoral (id),
     constraint fk_pastoral_bulk_import_access_group_id
