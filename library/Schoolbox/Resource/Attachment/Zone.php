@@ -35,8 +35,10 @@ class Zone
     public const IMAGE_ALL_WILDCARD = 'image/*';
     public const IMAGE_ALL = 'image/jpg,image/jpeg,image/pjpeg,image/gif,image/png,image/svg+xml,image/bmp,.svg,.heic,.heics,.heif';
 
-
-    const TPL = 'azTpl';
+    /**
+     * All ZIP mimetypes and extensions
+     */
+    public const ZIP_ALL = 'application/zip,application/x-zip-compressed,.zip';
 
     /** @var string */
     protected $id;

@@ -386,13 +386,13 @@ class SimpleTest extends TestCase
     }
 
     /**
-     * @param string $body
-     * @param string $replacedBody
-     * @param array  $expected
+     * @param string      $body
+     * @param string      $replacedBody
+     * @param array|false $expected
      * @return void
      */
     #[\PHPUnit\Framework\Attributes\DataProvider('providerExtract')]
-    public function testExtract(string $body, string $replacedBody, array $expected): void
+    public function testExtract(string $body, string $replacedBody, array|false $expected): void
     {
         $outcome = (new Simple())->extract($body, $replacedBody);
         $this->assertSame($expected, $outcome);
@@ -674,6 +674,14 @@ class SimpleTest extends TestCase
                     '[token2]' => '',
                 ],
             ],
+            'Consecutive tokens 3: end of body only' => [
+                "X [token1][token2]",
+                "X Blah blah",
+                [
+                    '[token1]' => 'Blah blah',
+                    '[token2]' => '',
+                ],
+            ],
             // Token replacement value matches non-replacement:
             // I didn't expect this would work, but it seems to.
             'Token replacement value matches non-replacement value' => [
@@ -691,6 +699,77 @@ class SimpleTest extends TestCase
                     '[externalId]' => '201',
                     '[firstname]'  => 'Jana',
                     '[surname]'    => 'Reed',
+                ],
+            ],
+            'Real-world summative report example: non-matching start' => [
+                '[externalId] blargh',
+                '201/Semester Report - Jana Reed',
+                false,
+            ],
+            'Real-world summative report example: non-matching end' => [
+                'blargh [externalId]',
+                '201/Semester Report - Jana Reed',
+                false,
+            ],
+            'Real-world summative report example: partial match end' => [
+                '[externalId]/Semester Report',
+                '201/Semester Report - Jana Reed',
+                [
+                    '[externalId]' => '201',
+                ],
+            ],
+            'Real-world summative report example: parentheses, no extension or filename in template' => [
+                '([externalId])',
+                '(3428) Document.pdf',
+                [
+                    '[externalId]' => '3428',
+                ],
+            ],
+            'Real-world summative report example: parentheses, no extension in template' => [
+                '([externalId]) Document',
+                '(3428) Document.pdf',
+                [
+                    '[externalId]' => '3428',
+                ],
+            ],
+            'Real-world summative report example: parentheses, extension in template' => [
+                '([externalId]) Document.pdf',
+                '(3428) Document.pdf',
+                [
+                    '[externalId]' => '3428',
+                ],
+            ],
+            // This case includes the extension in the extracted token:
+            // this is unavoidable, as `extract()` doesn't know what format an
+            // external ID should have: it just extracts a bunch of characters.
+            'Real-world summative report example: external ID only, no extension in template' => [
+                '[externalId]',
+                '46473.pdf',
+                [
+                    '[externalId]' => '46473.pdf',
+                ],
+            ],
+            'Real-world summative report example: external ID only, extension in template' => [
+                '[externalId].pdf',
+                '46473.pdf',
+                [
+                    '[externalId]' => '46473',
+                ],
+            ],
+            // As with the other "no extension in template" case, this includes
+            // the extension in the extracted token.
+            'Real-world summative report example: sub-folder, no extension in template' => [
+                'reports/[externalId]',
+                'reports/3456.pdf',
+                [
+                    '[externalId]' => '3456.pdf',
+                ],
+            ],
+            'Real-world summative report example: sub-folder, extension in template' => [
+                'reports/[externalId].pdf',
+                'reports/3456.pdf',
+                [
+                    '[externalId]' => '3456',
                 ],
             ],
         ];

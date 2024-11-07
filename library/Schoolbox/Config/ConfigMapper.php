@@ -228,6 +228,7 @@ class ConfigMapper extends Mapper
     public const NAME_SHOW_ATTENDANCE_FLAGS = 'show_attendance_flags';
     public const NAME_PASTORAL_EXTERNAL_UPLOAD = 'external_pastoral_upload';
 
+    public const NAME_PASTORAL_INDIVIDUAL_ACCESS_ENABLED = 'pastoral_individual_access';
     public const NAME_PASTORAL_PARENT_ACCESS_ENABLED = 'pastoral_parent_access';
     public const NAME_PASTORAL_STUDENT_ACCESS_ENABLED = 'pastoral_student_access';
     public const NAME_PASTORAL_BULK_UPLOAD_ENABLED = 'pastoral_bulk_upload_enabled';

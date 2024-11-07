@@ -10,17 +10,23 @@ declare(strict_types=1);
 namespace Schoolbox\Pastoral\BulkImport;
 
 use Alaress\Web\Controller\Base;
+use League\Flysystem\FilesystemException;
 use Schoolbox\Config\ConfigMapper;
+use Schoolbox\GenericCollection;
 use Schoolbox\L10n\RosettaStone;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Pastoral;
+use Schoolbox\Pastoral\TemplateDataHelper;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
 use Schoolbox\Resource\Attachment\Zone;
-use Schoolbox\Resource\Storage\FilesystemProxy;
+use Schoolbox\Resource\Browser\NodeFactory;
+use Schoolbox\Resource\Exception as ResourceException;
+use Schoolbox\Resource\Storage;
 use Schoolbox\Role;
 use Schoolbox\RoleMapper;
 use Schoolbox\TokenReplacer\Simple;
+use Schoolbox\User;
 use Schoolbox\UserMapper;
 use ZipArchive;
 
@@ -33,26 +39,33 @@ class Controller extends Base
      * Constructor
      *
      * @param RosettaStone             $translator             Used for translating values used in the page title.
-     * @param Pastoral\Mapper          $pastoralMapper         Used for creating pastoral records.
-     * @param Pastoral\Type\Mapper     $pastoralTypeMapper     Used for loading and validating pastoral types.
+     * @param Pastoral\DataSource      $pastoralDataSource     Used for creating pastoral records.
      * @param Pastoral\SubType\Mapper  $pastoralSubTypeMapper  Used for loading and validating pastoral subtypes.
-     * @param RoleMapper               $roleMapper             Used for loading roles to show in record visibility.
+     * @param Pastoral\Type\Mapper     $pastoralTypeMapper     Used for loading and validating pastoral types.
+     * @param Pastoral\Severity\Mapper $pastoralSeverityMapper Used for loading pastoral severities.
      * @param Pastoral\Access\Mapper   $pastoralAccessMapper   Used for determining roles which may access records.
      * @param Pastoral\Group\Mapper    $pastoralGroupMapper    Used for loading pastoral groups to select visibility.
      * @param UserMapper               $userMapper             Used for loading pastoral moderators.
      * @param Pastoral\Audience\Mapper $pastoralAudienceMapper Used for loading audiences for types and subtypes.
+     * @param Storage\FilesystemProxy  $filesystemProxy        Used for copying ZIP files from storage to local:
+     *                                                         required for working with ZIP files.
+     * @param Storage\Receiver         $receiver               Used for copying streams from inside the ZIP to storage.
+     * @param Pastoral\RecordProcessor $recordProcessor        Used for actually saving pastoral records according to
+     *                                                         form input.
      */
     public function __construct(
         private RosettaStone $translator,
-        private Pastoral\Mapper $pastoralMapper,
-        private Pastoral\Type\Mapper $pastoralTypeMapper,
+        private Pastoral\DataSource $pastoralDataSource,
         private Pastoral\SubType\Mapper $pastoralSubTypeMapper,
-        private RoleMapper $roleMapper,
+        private Pastoral\Type\Mapper $pastoralTypeMapper,
+        private Pastoral\Severity\Mapper $pastoralSeverityMapper,
         private Pastoral\Access\Mapper $pastoralAccessMapper,
         private Pastoral\Group\Mapper $pastoralGroupMapper,
         private UserMapper $userMapper,
         private Pastoral\Audience\Mapper $pastoralAudienceMapper,
-        private FilesystemProxy $filesystemProxy,
+        private Storage\FilesystemProxy $filesystemProxy,
+        private Storage\Receiver $receiver,
+        private Pastoral\RecordProcessor $recordProcessor,
     ) {
     }
 
@@ -66,109 +79,35 @@ class Controller extends Base
      */
     public function getForm(): void
     {
-        // Requirements for loading pastoral visibility inputs
-        // TODO extract elsewhere, and use in pastoral modify form as well
-        $allowIndividual = $this->getConfigLoader()->get('pastoral_individual_access');
-        $allowParents    = $this->getConfigLoader()->get(ConfigMapper::NAME_PASTORAL_PARENT_ACCESS_ENABLED);
-        $allowStudents   = $this->getConfigLoader()->get(ConfigMapper::NAME_PASTORAL_STUDENT_ACCESS_ENABLED);
-
-        // Load roles and empty counts to display on pastoral visibility
-        $roles          = $this->roleMapper->createCollection();
-        $roleUserCounts = [];
-        $rolesWithUsers = [];
-        $allowedRoles   = $this->pastoralAccessMapper->determineAllowedRoles();
-        foreach ($allowedRoles as $roleCurrent) {
-            $rolesWithUsers[$roleCurrent->getId()] = false;
-            $roleUserCounts[$roleCurrent->getId()] = 0;
-            if ($roleCurrent->isStaff() && $roleCurrent->getAccessPastoral()) {
-                $roles[] = $roleCurrent;
-            }
-            if ($allowParents && $roleCurrent->isParent()) {
-                $roles[] = $roleCurrent;
-            }
-        }
-
-        // Requirements for updating selections on change
-        // TODO extract elsewhere, and use in pastoral modify form as well
-        $types            = $this->pastoralTypeMapper->findAll();
-        $subtypes         = $this->pastoralSubTypeMapper->findAll();
-        $audiences        = $this->pastoralAudienceMapper->findAll()->filter($this->pastoralAudienceMapper->getPermissionCallback());
-        $typeAudiences    = [];
-        $subtypeAudiences = [];
-        foreach ($audiences as $audience) {
-            if ($audience->getSubtype()) {
-                $subtypeAudiences[$audience->getSubtype()->getId()][] = $audience;
-            } else {
-                $typeAudiences[$audience->getType()->getId()][] = $audience;
-            }
-        }
-
-        $typesIndex        = [];
-        $typesIndexPrivate = [];
-        $audienceDefaults  = [];
-        foreach ($types as $type) {
-            $typesIndex[$type->getId()]        = $type->getTemplate();
-            $typesIndexPrivate[$type->getId()] = $type->getTemplatePrivate();
-            if (key_exists($type->getId(), $typeAudiences) || $type->getVisibilityLocked()) {
-                $audienceDefaults[] = [
-                    'typeId'    => $type->getId(),
-                    'subtypeId' => 0,
-                    'audiences' => $typeAudiences[$type->getId()] ?? [],
-                ];
-            }
-        }
-
-        $subtypesIndex        = [];
-        $subtypesIndexPrivate = [];
-
-        foreach ($subtypes as $subtype) {
-            $subtypesIndex[$subtype->getId()]        = $subtype->getTemplate();
-            $subtypesIndexPrivate[$subtype->getId()] = $subtype->getTemplatePrivate();
-            if (key_exists($subtype->getId(), $subtypeAudiences) || $subtype->getVisibilityLocked()) {
-                $audienceDefaults[] = [
-                    'typeId'    => $subtype->getPastoralType()->getId(),
-                    'subtypeId' => $subtype->getId(),
-                    'audiences' => $subtypeAudiences[$subtype->getId()] ?? [],
-                ];
-            }
-        }
-
+        // Make loading data a little easier
+        $templateDataHelper = new TemplateDataHelper(
+            $this->getConfigLoader(),
+            $this->pastoralSubTypeMapper,
+            $this->pastoralTypeMapper,
+            $this->pastoralSeverityMapper,
+            $this->pastoralAccessMapper,
+            $this->pastoralGroupMapper,
+            $this->userMapper,
+            $this->pastoralAudienceMapper,
+        );
+        $templateData = $templateDataHelper->loadTemplateData();
         $this->response = $this->responseFromTemplate(
             '@pastoralBulkImport/form.twig',
-            [
-                // Base form requirements
-                'types'            => $types,
-                'subTypes'         => $subtypes,
+            $templateData + [
+                'returnUrl'        => $this->requestQuery->get('returnUrl')
+                    ?? $this->routeGenerator->generate('pastoral.getIndex'),
+                'record'           => $this->pastoralDataSource->createModel()->setStudent(null),
                 'reportAttachzone' => (new Zone('report'))
                     ->setThumbnailSize(64)
                     ->setModalTitle('Select report ZIP')
                     ->setAttachmentsLabel('')
                     ->setAttachPrompt('Upload report ZIP')
-                    ->setMimeFilter('application/zip')
+                    ->setMimeFilter(Zone::ZIP_ALL)
                     ->setReadOnly(false)
                     ->setFileVar('report')
                     ->setMulti(false)
+                    ->useImportExpiryDate()
                     ->getTwigContext(),
-
-                // Requirements for displaying visibility inputs
-                'record'          => $this->pastoralMapper->createModel()->setStudent(null),
-                'allowIndividual' => $allowIndividual,
-                'allowParents'    => $allowParents,
-                'allowStudents'   => $allowStudents,
-                'roles'           => $roles,
-                'roleTypes'       => $this->pastoralAccessMapper->determineAllowedRoleTypes(),
-                'groups'          => $this->pastoralGroupMapper->findAll()->sortNaturally('name'),
-                'rolesWithUsers'  => $roleUserCounts,
-                'roleUserCounts'  => $rolesWithUsers,
-                'moderatorIds'    => $this->userMapper->findByAccess(UserAccess::SERVICE_PASTORAL, UserAccess::ACCESS_READ)
-                                                      ->getPropertyValues('id'),
-
-                // Requirements for displaying scripts
-                'audiences'            => $audienceDefaults,
-                'typesIndexPrivate'    => $typesIndexPrivate,
-                'typesIndex'           => $typesIndex,
-                'subtypesIndexPrivate' => $subtypesIndexPrivate,
-                'subtypesIndex'        => $subtypesIndex,
             ],
             $this->translator->translate('pastoral', capital: true) . ' Bulk Import',
         );
@@ -185,26 +124,186 @@ class Controller extends Base
      */
     public function postImportPreview(): void
     {
-        // Parse the uploaded ZIP file
-        $factory = new CollectorFactory();
-        $zipFile = $factory->build([$this->requestPost->get('report')])->getFirst();
+        // Load the Zip file's contents, cleaning up once done.
+        $zipArchive       = null;
+        $localZipFilename = null;
+        try {
+            $zipStorage       = $this->loadZipFromStorage();
+            $localZipFilename = $this->createLocalZipFile($zipStorage);
+            $zipArchive       = $this->createZipArchive($localZipFilename);
+            $files            = $this->associateFilesWithUser($zipArchive);
+        } finally {
+            $this->cleanup($zipArchive, $localZipFilename);
+        }
 
-        // Need to ensure it exists locally:
-        // otherwise it can't operate upon it
+        $this->response = $this->responseFromTemplate(
+            '@pastoralBulkImport/importPreview.twig',
+            [
+                'files'     => $files,
+                'returnUrl' => $this->requestQuery->get('returnUrl')
+                    ?? $this->routeGenerator->generate('pastoral.getIndex'),
+                'formVars'  => $this->requestPost->getArrayCopy(),
+            ],
+        );
+    }
+
+    /**
+     * Actually perform the pastoral bulk import.
+     *
+     * @api   POST /pastoral/bulk-import
+     * @since 24.1
+     *
+     * @return void
+     */
+    public function postImport(): void
+    {
+        // Load the Zip file's contents, cleaning up only once all files have
+        // been extracted from the ZIP.
+        $zipArchive       = null;
+        $localZipFilename = null;
+        try {
+            $zipStorage       = $this->loadZipFromStorage();
+            $localZipFilename = $this->createLocalZipFile($zipStorage);
+            $zipArchive       = $this->createZipArchive($localZipFilename);
+            $files            = $this->associateFilesWithUser($zipArchive);
+
+            // Group files by user, so a single record is created for each user:
+            // possibly with multiple files
+            $pastoralRecordsToCreate = [];
+            foreach ($files as $file) {
+                if ($file['user']) {
+                    $pastoralRecordsToCreate[$file['user']->getId()]['fileNames'][] = $file['filename'];
+                }
+            }
+
+            // Create the records
+            foreach ($pastoralRecordsToCreate as $userId => $pastoralRecords) {
+                // Finagle the post data for this user's record, so that each file
+                // in the ZIP for them is included in their post data.
+                $attachmentHashes = [];
+                foreach ($pastoralRecords['fileNames'] as $fileName) {
+                    $attachment = $this->receiver->acceptStream(
+                        basename($fileName),
+                        $zipArchive->getStream($fileName),
+                    );
+                    $attachmentHashes[] = NodeFactory::STORE . ':' . $attachment->getHash();
+                }
+                $requestPost = clone $this->requestPost;
+                $requestPost->offsetSet(
+                    Pastoral\Controller::ATTACHZONE_PUBLIC . '_attachments',
+                    $attachmentHashes,
+                );
+
+                // And create their records.
+                // There should be only a single record created for each user,
+                // so for simplicity's sake show only their first.
+                $pastoralRecordsToCreate[$userId]['record'] = $this->recordProcessor->processPastoralRecords(
+                    $this->getUser(),
+                    $userId,
+                    $requestPost,
+                )->first();
+            }
+        } finally {
+            $this->cleanup($zipArchive, $localZipFilename);
+        }
+
+        // Output a response for each file
+        foreach ($files as $i => $file) {
+            if ($file['user']) {
+                $files[$i]['record'] = $pastoralRecordsToCreate[$file['user']->getId()]['record'] ?? null;
+            } else {
+                $files[$i]['record'] = null;
+            }
+        }
+
+        // And show the results
+        $this->response = $this->responseFromTemplate(
+            '@pastoralBulkImport/import.twig',
+            [
+                'files'     => $files,
+                'typeId'    => $this->requestPost->get('typeId'),
+                'subtypeId' => $this->requestPost->get('subtypeId'),
+            ],
+        );
+    }
+
+    /**
+     * Load the ZIP file from storage.
+     *
+     * @return Storage\IStorage
+     * @throws ResourceException
+     */
+    private function loadZipFromStorage(): Storage\IStorage
+    {
+        $factory = new CollectorFactory();
+        return $factory->build([$this->requestPost->get('report')])->getFirst();
+    }
+
+    /**
+     * Write the ZIP file from storage to the local file system, so that a
+     * `ZipArchive` may be created from it.
+     *
+     * @param Storage\IStorage $zipFile
+     * @return string
+     * @throws FilesystemException
+     */
+    private function createLocalZipFile(Storage\IStorage $zipFile): string
+    {
         $filename = tempnam($this->getConfigLoader()->get('zip_dir'), 'zip');
         $fp       = fopen($filename, 'wb');
         stream_copy_to_stream($this->filesystemProxy->readStream($zipFile), $fp);
         fclose($fp);
+        return $filename;
+    }
 
-        // Create and interrogate ZIP
+    /**
+     * Given a ZIP file in storage: copy it to local temp storage, and create a
+     * `ZipArchive` out of it.
+     *
+     * This is required as `ZipArchive` cannot work on a stream: it may only
+     * work upon a local file.
+     *
+     * @param string $zipFilename
+     * @return ZipArchive
+     */
+    private function createZipArchive(string $zipFilename): ZipArchive
+    {
         $archive = new ZipArchive();
-        $archive->open($filename);
+        $archive->open($zipFilename);
+        return $archive;
+    }
+
+    /**
+     * Clean up the `ZipArchive` object and its file on disk, if either exists.
+     *
+     * @param ZipArchive|null $zipArchive       The archive, if created.
+     * @param string|null     $localZipFilename The filename of the archive,
+     *                                          if created.
+     * @return void
+     */
+    private function cleanup(?ZipArchive $zipArchive, ?string $localZipFilename): void
+    {
+        $zipArchive?->close();
+        if (isset($localZipFilename) && is_file($localZipFilename) && is_writable($localZipFilename)) {
+            unlink($localZipFilename);
+        }
+    }
+
+    /**
+     * Associate and group files in `$archive` with a user.
+     *
+     * @param ZipArchive $archive
+     * @return array<array{filename: string, user: ?User, externalId: ?string}>
+     */
+    private function associateFilesWithUser(ZipArchive $archive): array
+    {
         $tokenReplacer = new Simple();
         $files         = [];
+        $template      = $this->trimExtension($this->requestPost->get('template'));
         for ($i = 0; $i < $archive->numFiles; $i++) {
             $name = $archive->getNameIndex($i);
             if ($name !== false) {
-                $tokens     = $tokenReplacer->extract($this->requestPost->get('template'), $name);
+                $tokens     = $tokenReplacer->extract($template, $this->trimExtension($name));
                 $user       = null;
                 $externalId = null;
                 if (isset($tokens['[externalId]'])) {
@@ -212,22 +311,37 @@ class Controller extends Base
                     try {
                         $user = $this->userMapper->findByExternalId($externalId, Role::STUDENT);
                     } catch (MapperException) {
-                        // noop
+                        // noop: no user was found.
+                        // This will show as a "no student found" message.
                     }
                 }
                 $files[] = [
-                    'name'       => $name,
+                    'filename'   => $name,
                     'user'       => $user,
                     'externalId' => $externalId,
                 ];
             }
         }
 
-        $this->response = $this->responseFromTemplate(
-            '@pastoralBulkImport/importPreview.twig',
-            [
-                'files' => $files,
-            ],
-        );
+        return $files;
+    }
+
+    /**
+     * Trim the extension off of `$path`, if there is one.
+     *
+     * Required because `\Schoolbox\TokenReplacer\Simple::extract` extracts the
+     * entire remainder of a string if the template's last character is a token:
+     * e.g. "[externalId]" matches "123.pdf" in "123.pdf".
+     *
+     * @param string $path
+     * @return string
+     */
+    private function trimExtension(string $path): string
+    {
+        $extension = pathinfo($path, PATHINFO_EXTENSION);
+        if ($extension !== '') {
+            return substr($path, 0, -(strlen($extension) + 1));
+        }
+        return $path;
     }
 }

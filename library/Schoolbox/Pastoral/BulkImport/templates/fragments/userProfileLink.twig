@@ -1,0 +1,33 @@
+{% if routeLookupIfAuthorized('adminProfileButton.getCreate') %}
+    <section>
+        <fieldset class="content">
+            <div class="small-12 columns">
+                <label for="link">User Profile Link</label>
+                <p class="meta">
+                    A link to be copied to user profile buttons: this will allow access to recent imported reports
+                    to any user who may view them.
+                </p>
+
+                {% set userProfileLink = (routeLookup('pastoral.getStudent', {studentId: 1}) | replace({'1': '[profileId]'}))
+                    ~ '?type=' ~ typeId ~ '&subType=' ~subtypeId
+                %}
+                <div class="input-group">
+                    <input type="text" id="link" readonly
+                           value="{{ userProfileLink }}"
+                    />
+                    <a href="#"
+                       data-clipboard-text="{{ userProfileLink }}"
+                       class="button icon-copy">Copy</a>
+                </div>
+                <script type="text/javascript">
+                    $(function () {
+                        $('a[data-clipboard-text]').on('click', function (event) {
+                            event.preventDefault();
+                            navigator.clipboard.writeText($(this).attr('data-clipboard-text'));
+                        })
+                    });
+                </script>
+            </div>
+        </fieldset>
+    </section>
+{% endif %}

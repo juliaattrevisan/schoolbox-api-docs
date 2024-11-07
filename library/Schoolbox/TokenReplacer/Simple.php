@@ -95,9 +95,10 @@ class Simple
      *
      * @param string $body
      * @param string $replacedBody
-     * @return array
+     * @return array|false A set of tokens, or false if `$body` could not
+     *                     possibly generate `$replacedBody`.
      */
-    public function extract(string $body, string $replacedBody): array
+    public function extract(string $body, string $replacedBody): array|false
     {
         // Strip out mention attribute, just as replace does
         $body = $this->stripMentionAttribute($body);
@@ -133,7 +134,7 @@ class Simple
         while (!empty($bodyParts)) {
             $bodyPart = array_shift($bodyParts);
             if (str_starts_with($bodyPart, self::TOKEN_OPEN)) {
-                // This is a token:
+                // This body part is a token:
                 // find the next non-token body part, and find its position in
                 // `$replacedBody`.
                 // Anything before that position must be the value which was
@@ -147,50 +148,45 @@ class Simple
                     }
                 }
 
-                $nextNonTokenPos = isset($nextNonToken)
-                    ? strpos($replacedBody, $nextNonToken)
-                    : false;
-                if ($nextNonTokenPos !== false) {
-                    // The replacement must be whatever is before the start of
-                    // the next non-token:
-                    // process the rest of `$replacedBody`.
-                    $replacements[$replaceKey] = substr($replacedBody, 0, $nextNonTokenPos);
-                    $replacedBody              = substr($replacedBody, $nextNonTokenPos);
-                } else {
-                    // No next non-token:
-                    // the entire remainder of `$replacedBody` must be the token
-                    // value.
+                $replacements[$replaceKey] = '';
+                if (!isset($nextNonToken)) {
+                    // No more non-tokens:
+                    // the entire remainder of `$replacedBody` must be the
+                    // token value.
                     $replacements[$replaceKey] = $replacedBody;
-                    $replacedBody              = '';
+                    $replacedBody = '';
+                } else {
+                    // There is a non-token upcoming:
+                    // find where in `$replacedBody` it starts.
+                    $nextNonTokenPos = strpos($replacedBody, $nextNonToken);
+                    if ($nextNonTokenPos !== false) {
+                        // The replacement must be whatever is before the start
+                        // of the next non-token:
+                        // process the rest of `$replacedBody`.
+                        $replacements[$replaceKey] = substr($replacedBody, 0, $nextNonTokenPos);
+                        $replacedBody = substr($replacedBody, $nextNonTokenPos);
+                    } else {
+                        // If next non-token isn't in `$replacedBody` at all,
+                        // this can't possibly match.
+                        return false;
+                    }
                 }
             } else {
-                // This is not a token:
-                // remove its character count from `$replacedBody`, and continue
-                $replacedBody = substr($replacedBody, strlen($bodyPart));
+                // This body part is not a token:
+                // trim that part's length off the start of `$replacedBody`,
+                // and process the rest of `$replacedBody`.
+                if (str_starts_with($replacedBody, $bodyPart)) {
+                    $replacedBody = substr($replacedBody, strlen($bodyPart));
+                } else {
+                    // If the body part doesn't match the replaced body,
+                    // this can't possibly be a match.
+                    return false;
+                }
             }
         }
 
         // Tokens will have been escaped in `replace`: unescape them
         return array_map($this->escapeStrategy->unescape(...), $replacements);
-    }
-
-
-    /**
-     * Replace using Scrub::html, to return replaced html
-     *
-     * @deprecated use escape strategy `IEscapeStrategy\ScrubHtml` instead
-     * @param string $body
-     * @param array  $replacements
-     * @return string
-     */
-    public function replaceHtml(string $body, array $replacements): string
-    {
-        $body = $this->stripMentionAttribute($body);
-        $sanitisedReplacements = array_map(static function ($val) {
-            return \Scrub::html($val);
-        }, array_values($replacements));
-
-        return str_replace(array_keys($replacements), $sanitisedReplacements, $body);
     }
 
 

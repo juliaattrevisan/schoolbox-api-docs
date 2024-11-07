@@ -243,12 +243,29 @@ class Module extends BaseModule
      */
     public function buildController(): Base
     {
-        $commentTranslator =             new Comment\Translator\ModelToArray(
+        $commentTranslator = new Comment\Translator\ModelToArray(
             new User\Translator\Author\ModelToArray(),
             $this->injector->get('router.generator'),
             $this->injector->get('authorizer'),
             $this->injector->get('user'),
             new ScrubAdapter(),
+        );
+
+        $pastoralRecordProcessor = new RecordProcessor(
+            $this->injector->get('config'),
+            $this->injector->get('pastoralDataSource'),
+            $this->getMapperFactory()->get(PastoralSubTypeMapper::class),
+            $this->getMapperFactory()->get(PastoralTypeMapper::class),
+            $this->getMapperFactory()->get(PastoralSeverityMapper::class),
+            $this->getMapperFactory()->get(PastoralTagMapper::class),
+            $this->getMapperFactory()->get(Action\Mapper::class),
+            $this->getMapperFactory()->get(RecordAction\Mapper::class),
+            $this->getMapperFactory()->get(PastoralAttachmentMapper::class),
+            $this->getMapperFactory()->get(UserMapper::class),
+            $this->getMapperFactory()->get(PastoralAccessMapper::class),
+            $this->getMapperFactory()->get(PastoralGroupMapper::class),
+            $this->getMapperFactory()->get(ErrorMapper::class),
+            $this->injector->get('sentry'),
         );
 
         return new Controller(
@@ -263,7 +280,6 @@ class Module extends BaseModule
             $this->getMapperFactory()->get(Action\Mapper::class),
             $this->getMapperFactory()->get(RecordAction\Mapper::class),
             $this->getMapperFactory()->get(PastoralCommentMapper::class),
-            $this->getMapperFactory()->get(PastoralAttachmentMapper::class),
             $this->getMapperFactory()->get(UserMapper::class),
             $this->getMapperFactory()->get(PastoralAccessMapper::class),
             $this->getMapperFactory()->get(PastoralGroupMapper::class),
@@ -288,7 +304,8 @@ class Module extends BaseModule
                 new \External_Class(),
                 new \External_User(),
                 $this->getMapperFactory()->get(UserMapper::class)
-            )
+            ),
+            $pastoralRecordProcessor,
         );
     }
 

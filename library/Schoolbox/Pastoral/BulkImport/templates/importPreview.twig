@@ -15,41 +15,55 @@
 
 <div class="row">
     <div class="small-12 island">
-        <table>
-            <thead>
-            <tr>
-                <th>Time</th>
-                <th>File uploaded</th>
-                <th>External ID</th>
-                <th>Student</th>
-                <th>Import Result</th>
-            </tr>
-            </thead>
-            <tbody>
-            {% for file in files %}
+        <form class="top" method="post"
+              action="{{ routeLookupIfAuthorized('pastoralBulkImport.postImport') }}?{{ RETURN_URL.name }}={{ returnUrl }}"
+        >
+            <table>
+                <thead>
                 <tr>
-                    <td>&mdash;</td>
-                    <td>{{ file.name }}</td>
-                    <td>
-                        {% if file.externalId %}
-                            {{ file.externalId }}
-                        {% else %}
-                            &mdash;
-                        {% endif %}
-                    </td>
-                    <td>
-                        {% if file.user %}
-                            {{ file.user.formatName }}
-                        {% elseif file.externalId %}
-                            <i>No student found for external ID</i>
-                        {% else %}
-                            &mdash;
-                        {% endif %}
-                    </td>
-                    <td>&mdash;</td>
+                    <th>Time</th>
+                    <th>File uploaded</th>
+                    <th>External ID</th>
+                    <th>Student</th>
+                    <th>Import Result</th>
                 </tr>
-            {% endfor %}
-            </tbody>
-        </table>
+                </thead>
+                <tbody>
+                {% for file in files %}
+                    <tr>
+                        <td>&mdash;</td>
+                        <td>{{ file.filename }}</td>
+                        <td>
+                            {% if file.externalId %}
+                                {{ file.externalId }}
+                            {% else %}
+                                &mdash;
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if file.user %}
+                                {{ file.user.formatName }}
+                            {% elseif file.externalId %}
+                                <i>No student found for external ID</i>
+                            {% else %}
+                                &mdash;
+                            {% endif %}
+                        </td>
+                        <td>&mdash;</td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+
+            {% include '@pastoralBulkImport/fragments/userProfileLink.twig' with {
+                typeId:    formVars.typeId,
+                subtypeId: formVars.subtypeId,
+            } only %}
+
+            {% import '@pastoralBulkImport/macros/outputForm.twig' as outputForm %}
+            {{ outputForm.outputForm(formVars) }}
+
+            <input type="submit" value="Import" />
+        </form>
     </div>
 </div>

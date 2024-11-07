@@ -17,7 +17,6 @@
 {# The actual pastoral form #}
 <div class="row">
     <div class="small-12 island">
-        {# TODO replace with actual form input #}
         <form class="top" id="pastoralForm" method="post"
               action="{{ routeLookupIfAuthorized('pastoralBulkImport.postImportPreview') }}?{{ RETURN_URL.name }}={{ RETURN_URL.previous.encoded }}">
             <section>
@@ -71,6 +70,27 @@
                             {% endfor %}
                         </select>
                     </div>
+                    <div class="small-12 medium-6 columns">
+                        {% if severities | length %}
+                            <label for="severityId">{{ locale.severity.proper }}</label>
+                            <select name="severityId" id="severityId">
+                                {% for severity in severities %}
+                                    <option value="{{ severity.id }}">{{ severity.name }}</option>
+                                {% endfor %}
+                            </select>
+                        {% endif %}
+                    </div>
+                    <div class="small-12 medium-6 columns">
+                        <label for="points">Points</label>
+                        <input id="points"
+                               type="number"
+                               inputmode="numeric"
+                               name="points"
+                               size="35"
+                               min="-1000000"
+                               max="1000000"
+                        />
+                    </div>
                     <div class="small-12 columns">
                         <label for="tags">Tags</label>
                         <p class="meta">Tags can be added to support {{ locale.pastoral }} reports and filtering.</p>
@@ -103,12 +123,10 @@
                 roles: roles,
                 roleTypes: roleTypes,
                 roleUserCounts: roleUserCounts,
-                rolesWithUsers: rolesWithUsers,
                 moderatorIds: moderatorIds,
                 bulkCreate: false,
                 managePage: true,
                 reportPage: false,
-                visibilityLocked: false,
             } only %}
 
             <input type="submit" value="Preview">
