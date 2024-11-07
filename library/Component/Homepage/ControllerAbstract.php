@@ -55,7 +55,12 @@ abstract class Component_Homepage_ControllerAbstract extends Component_Controlle
         }
 
         // Control permission: always based on current context
-        $this->setContextPermission(min($this->access->getFolderAccess($this->getUser(), $contextId), $this->getMaximumPermission()));
+        $userAccessLevel = (
+            $this->getUser()->hasServicePermission(UserAccess::SERVICE_DESIGN, UserAccess::ACCESS_FULL)
+            ? UserAccess::ACCESS_FULL
+            : $this->access->getFolderAccess($this->getUser(), $contextId)
+        );
+        $this->setContextPermission(min($userAccessLevel, $this->getMaximumPermission()));
         try {
             // Content permission: based on alt source if it's there
             $this->setContentPermission(min($this->access->getFolderAccess($this->getUser(), $sourceId), $this->getMaximumPermission()));
