@@ -162,10 +162,10 @@ class SystemButtons
     private function generateCandidates(): array
     {
         $candidates = [
-            MigrateButtonsTool::ROLETYPE_STUDENT => [
+            \Schoolbox\Role::STUDENT => [
                 [
                     'row' => [
-                        'roletype' => MigrateButtonsTool::ROLETYPE_STUDENT,
+                        'roletype' => \Schoolbox\Role::STUDENT,
                         'type' => self::SYSTEM_EPORTFOLIO,
                         'sort_order' => 1,
                         'title' => 'ePortfolio',
@@ -186,7 +186,7 @@ class SystemButtons
                 ],
                 [
                     'row' => [
-                        'roletype' => MigrateButtonsTool::ROLETYPE_STUDENT,
+                        'roletype' => \Schoolbox\Role::STUDENT,
                         'type' => self::SYSTEM_DUEWORK,
                         'sort_order' => 2,
                         'title' => $this->rosettaStone->translate('dueWork', false, true),
@@ -207,7 +207,7 @@ class SystemButtons
                 ],
                 [
                     'row' => [
-                        'roletype' => MigrateButtonsTool::ROLETYPE_STUDENT,
+                        'roletype' => \Schoolbox\Role::STUDENT,
                         'type' => self::SYSTEM_GRADES,
                         'sort_order' => 3,
                         'title' => $this->rosettaStone->translate('grades', false, true),
@@ -228,7 +228,7 @@ class SystemButtons
                 ],
                 [
                     'row' => [
-                        'roletype' => MigrateButtonsTool::ROLETYPE_STUDENT,
+                        'roletype' => \Schoolbox\Role::STUDENT,
                         'type' => self::SYSTEM_PASTORAL,
                         'sort_order' => 4,
                         'title' => $this->rosettaStone->translate('pastoralCare', false, true),
@@ -249,7 +249,7 @@ class SystemButtons
                 ],
                 [
                     'row' => [
-                        'roletype' => MigrateButtonsTool::ROLETYPE_STUDENT,
+                        'roletype' => \Schoolbox\Role::STUDENT,
                         'type' => self::SYSTEM_CALENDAR,
                         'sort_order' => 5,
                         'title' => $this->rosettaStone->translate('calendar', false, true),
@@ -270,7 +270,7 @@ class SystemButtons
                 ],
                 [
                     'row' => [
-                        'roletype' => MigrateButtonsTool::ROLETYPE_STUDENT,
+                        'roletype' => \Schoolbox\Role::STUDENT,
                         'type' => self::SYSTEM_TIMETABLE,
                         'sort_order' => 6,
                         'title' => 'Timetable',
@@ -291,7 +291,7 @@ class SystemButtons
                 ],
                 [
                     'row' => [
-                        'roletype' => MigrateButtonsTool::ROLETYPE_STUDENT,
+                        'roletype' => \Schoolbox\Role::STUDENT,
                         'type' => self::SYSTEM_PASTORAL_SYNERGETIC,
                         'sort_order' => 7,
                         'title' => 'Synweb',
@@ -315,7 +315,7 @@ class SystemButtons
                 ],
                 [
                     'row' => [
-                        'roletype' => MigrateButtonsTool::ROLETYPE_STUDENT,
+                        'roletype' => \Schoolbox\Role::STUDENT,
                         'type' => self::SYSTEM_DOCUMENT_MANAGEMENT,
                         'sort_order' => 8,
                         'title' => $this->rosettaStone->translate('reports', false, true),
@@ -336,7 +336,7 @@ class SystemButtons
                 ],
                 [
                     'row' => [
-                        'roletype' => MigrateButtonsTool::ROLETYPE_STUDENT,
+                        'roletype' => \Schoolbox\Role::STUDENT,
                         'type' => self::SYSTEM_GEOSNAPSHOT,
                         'sort_order' => 9,
                         'title' => 'View Photos',
@@ -360,7 +360,7 @@ class SystemButtons
                  */
                 [
                     'row' => [
-                        'roletype' => MigrateButtonsTool::ROLETYPE_STUDENT,
+                        'roletype' => \Schoolbox\Role::STUDENT,
                         'type' => self::SYSTEM_EMAIL_STAFF,
                         'sort_order' => 10,
                         'title' => 'Email All Teachers',
@@ -381,7 +381,7 @@ class SystemButtons
                 ],
                 [
                     'row' => [
-                        'roletype' => MigrateButtonsTool::ROLETYPE_STUDENT,
+                        'roletype' => \Schoolbox\Role::STUDENT,
                         'type' => self::SYSTEM_EMAIL_PARENTS,
                         'sort_order' => 11,
                         'title' => 'Email Parents',
@@ -401,10 +401,10 @@ class SystemButtons
                     ],
                 ],
             ],
-            MigrateButtonsTool::ROLETYPE_STAFF => [
+            \Schoolbox\Role::STAFF => [
                 [
                     'row' => [
-                        'roletype' => MigrateButtonsTool::ROLETYPE_STAFF,
+                        'roletype' => \Schoolbox\Role::STAFF,
                         'type' => self::SYSTEM_EPORTFOLIO,
                         'sort_order' => 1,
                         'title' => 'ePortfolio',
@@ -425,7 +425,7 @@ class SystemButtons
                 ],
                 [
                     'row' => [
-                        'roletype' => MigrateButtonsTool::ROLETYPE_STAFF,
+                        'roletype' => \Schoolbox\Role::STAFF,
                         'type' => self::SYSTEM_CALENDAR,
                         'sort_order' => 2,
                         'title' => $this->rosettaStone->translate('calendar', false, true),
@@ -446,7 +446,7 @@ class SystemButtons
                 ],
                 [
                     'row' => [
-                        'roletype' => MigrateButtonsTool::ROLETYPE_STAFF,
+                        'roletype' => \Schoolbox\Role::STAFF,
                         'type' => self::SYSTEM_TIMETABLE,
                         'sort_order' => 3,
                         'title' => 'Timetable',
@@ -466,10 +466,10 @@ class SystemButtons
                     ],
                 ],
             ],
-            MigrateButtonsTool::ROLETYPE_PARENT => [
+            \Schoolbox\Role::PARENT => [
                 [
                     'row' => [
-                        'roletype' => MigrateButtonsTool::ROLETYPE_PARENT,
+                        'roletype' => \Schoolbox\Role::PARENT,
                         'type' => self::SYSTEM_EPORTFOLIO,
                         'sort_order' => 1,
                         'title' => 'ePortfolio',
@@ -490,7 +490,7 @@ class SystemButtons
                 ],
                 [
                     'row' => [
-                        'roletype' => MigrateButtonsTool::ROLETYPE_PARENT,
+                        'roletype' => \Schoolbox\Role::PARENT,
                         'type' => self::SYSTEM_CALENDAR,
                         'sort_order' => 2,
                         'title' => $this->rosettaStone->translate('calendar', false, true),
