@@ -16,9 +16,9 @@
         <div class="small-12 columns">
             <h2 class="subheader">
                 {% if createForm %}
-                    Create Profile Button
+                    Create {{ (roleType ?? item.roleType)|capitalize }} Profile Button
                 {% else %}
-                    Modify Profile Button
+                    Modify {{ (roleType ?? item.roleType)|capitalize }} Profile Button
                 {% endif %}
             </h2>
         </div>
