@@ -32,6 +32,10 @@ class Helper
         private int $limit,
         private ?ICodec $codec,
     ) {
+        /* Disabling caching as the isDescendant function seems to have stored the incomplete object
+         * which causes the list to contain incorrect number of items
+         */
+        $this->folderMapper = $folderMapper->disableCache();
     }
 
     /**
