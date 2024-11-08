@@ -100,8 +100,7 @@ class FilePayload
                 LEFT JOIN `allowedFileExtension` `e` ON `s`.`ext` = `e`.`extension`
                 LEFT JOIN `allowedFileTypes` `t` ON `e`.`fileTypeId` = `t`.`fileTypeId`
                 INNER JOIN `submission_box` `b` ON `f`.`box_id` = `b`.`id`
-                INNER JOIN assessment a ON a.id = b.assessment_id
-                LEFT JOIN assessment_folder af ON af.assessment_id = a.id
+                LEFT JOIN assessment_folder af ON af.assessment_id = b.assessment_id
                 LEFT JOIN folder c ON af.folder_id = c.id
                 WHERE `f`.`owner` = :userId
                 AND `student_submission_file`.`deleted_at` IS NULL)
@@ -121,8 +120,7 @@ class FilePayload
                 LEFT JOIN `allowedFileExtension` `e` ON `s`.`ext` = `e`.`extension`
                 LEFT JOIN `allowedFileTypes` `t` ON `e`.`fileTypeId` = `t`.`fileTypeId`
                 INNER JOIN `submission_box` `b` ON `f`.`box_id` = `b`.`id`
-                INNER JOIN assessment a ON a.id = b.assessment_id
-                LEFT JOIN assessment_folder af ON af.assessment_id = a.id
+                LEFT JOIN assessment_folder af ON af.assessment_id = b.assessment_id
                 LEFT JOIN folder c ON af.folder_id = c.id
                 WHERE `f`.`owner` = :userId
                 AND srf.`deleted_at` IS NULL)
