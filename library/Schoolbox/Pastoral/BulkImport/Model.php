@@ -103,7 +103,22 @@ class Model implements ISoftDeletable
     /**
      * The import log for this bulk import, in JSON format.
      *
-     * @var array|null
+     * @var array{
+     *      known: array<
+     *          array{
+     *              files: array<string>,
+     *              user: array{id: int, externalId: string, name: string},
+     *              record: ?array{id: int}
+     *          }
+     *      >,
+     *      unknown: array<
+     *          array{
+     *              file: string,
+     *              reason: string,
+     *              user: array{externalId: ?string},
+     *          },
+     *      >,
+     *  }|null
      */
     private ?array $importLog = null;
 
