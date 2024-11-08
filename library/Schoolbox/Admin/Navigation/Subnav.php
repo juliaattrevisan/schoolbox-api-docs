@@ -930,26 +930,6 @@ class Subnav
                         'children'    => [],
                         'description' => 'Configure your school data (SIS) import process.',
                     ],
-                    '/adminv2/import/profile' => [
-                        'name'        => 'User Profiles',
-                        'visible'     => (
-                            ($userIsSuperuser || $userHasServicePermissionTimetable) &&
-                            $this->configLoader->get('external_type') === 'schoolbox' &&
-                            $this->configLoader->get('schooldata_import_data_source') === 'csv'
-                        ),
-                        'children'    => [],
-                        'description' => 'Import staff, student, parent and relationship data via CSV files.',
-                    ],
-                    '/adminv2/import/timetableStructure' => [
-                        'name'        => 'Timetable Structure',
-                        'visible'     => (
-                            ($userIsSuperuser || $userHasServicePermissionTimetable) &&
-                            $this->configLoader->get('external_type') === 'schoolbox' &&
-                            $this->configLoader->get('schooldata_import_data_source') === 'csv'
-                        ),
-                        'children'    => [],
-                        'description' => 'Import timetable definition and structure via CSV.',
-                    ],
                     '/adminv2/import/timetable' => [
                         'name'        => 'Timetable',
                         'visible'     => (
@@ -969,6 +949,26 @@ class Subnav
                         ),
                         'children'    => [],
                         'description' => 'Import the students and teachers in classes via CSV.',
+                    ],
+                    '/adminv2/import/timetableStructure' => [
+                        'name'        => 'Timetable Structure',
+                        'visible'     => (
+                            ($userIsSuperuser || $userHasServicePermissionTimetable) &&
+                            $this->configLoader->get('external_type') === 'schoolbox' &&
+                            $this->configLoader->get('schooldata_import_data_source') === 'csv'
+                        ),
+                        'children'    => [],
+                        'description' => 'Import timetable definition and structure via CSV.',
+                    ],
+                    '/adminv2/import/profile' => [
+                        'name'        => 'User Profiles',
+                        'visible'     => (
+                            ($userIsSuperuser || $userHasServicePermissionTimetable) &&
+                            $this->configLoader->get('external_type') === 'schoolbox' &&
+                            $this->configLoader->get('schooldata_import_data_source') === 'csv'
+                        ),
+                        'children'    => [],
+                        'description' => 'Import staff, student, parent and relationship data via CSV files.',
                     ],
                 ],
             ],
