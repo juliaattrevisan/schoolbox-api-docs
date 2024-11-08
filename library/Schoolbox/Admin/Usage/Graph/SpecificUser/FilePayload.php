@@ -21,7 +21,6 @@ use Schoolbox\User;
  */
 class FilePayload
 {
-
     /**
      * @var IConnector
      */
