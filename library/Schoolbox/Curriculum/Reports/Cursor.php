@@ -238,7 +238,7 @@ class Cursor implements ICursor
                     cus.folder_id as unitId,
                     COUNT(cnfa.curriculum_node_id) as count
                 FROM (
-                     SELECT '%s' type, lp.assessment_id
+                     SELECT '%s' type, lp.assessment_id, lp.deleted_at
                      FROM lesson_plan lp
                 ) activity
                 INNER JOIN curriculum_node_for_assessment cnfa
@@ -248,7 +248,7 @@ class Cursor implements ICursor
                 INNER JOIN course_unit_specification cus
                         ON cus.id = acus.course_unit_specification_id
                         AND cus.course_specification_id IN %s
-                INNER JOIN assessment a ON a.id = activity.assessment_id AND a.deleted_at IS NULL
+                WHERE activity.deleted_at IS NULL
                 GROUP BY activity.type, cnfa.curriculum_node_id, cus.course_specification_id, cus.folder_id
             ",
                 self::COURSE_ACTIVITY_LESSON_PLAN,
