@@ -3,36 +3,20 @@
  * To input the search query
  */
 
-import { onClickOutside, useFocus, onKeyStroke } from "@vueuse/core";
+import { useTemplateRef } from "vue";
+import { useFocus, onKeyStroke } from "@vueuse/core";
 
 interface Props {
     labelId: string; // the label id
-    parentEl: HTMLDivElement | null; // the parent element to track, so can close the search results when focus lost
     placeholder: string; // the placeholder text
 }
 const props = defineProps<Props>();
 
-const query = defineModel<string>("query", { default: "" });
+const emit = defineEmits<{
+    escape: [];
+}>();
 
-/**
- * To close the search results when clicking outside
- */
-window.Vue.onMounted(async () => {
-    await window.Vue.nextTick();
-    onClickOutside(props.parentEl, () => {
-        query.value = "";
-    });
-});
-
-/**
- * To close the search results when the input is not focused
- */
-const { focused } = useFocus(props.parentEl);
-window.Vue.watch(focused, ($focused) => {
-    if (!$focused) {
-        query.value = "";
-    }
-});
+const query = defineModel<string>("query", { default: "" }); // to store the search query
 
 /**
  * Prevent the form from submitting when pressing Enter in the search input,
@@ -41,11 +25,23 @@ window.Vue.watch(focused, ($focused) => {
 onKeyStroke(["Enter", "ArrowUp", "ArrowDown"], (event) => {
     event.preventDefault();
 });
+
+/**
+ * To close the search results when pressing Escape
+ */
+const inputEl = useTemplateRef<HTMLInputElement | null>("inputEl");
+const { focused } = useFocus(inputEl);
+onKeyStroke(["Escape"], () => {
+    if (focused.value) {
+        emit("escape");
+    }
+});
 </script>
 
 <template>
     <input
         :id="props.labelId"
+        ref="inputEl"
         v-model="query"
         type="text"
         class="search-input f-no-margins"

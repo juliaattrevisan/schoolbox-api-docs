@@ -5,8 +5,8 @@
 
 import { toRef, useTemplateRef } from "vue";
 import ShowMatches from "@schoolboxVue/components/search/show-matches.vue";
+import type { SearchSelectItem } from "@schoolboxVue/composables/search/types/SearchSelectItem";
 import { useActiveIndex } from "./composables/useActiveIndex";
-import type { SearchSelectItem } from "./types/searchSelectTypes";
 
 interface Props {
     query: string; // the search query
@@ -70,7 +70,7 @@ function onMouseout(): void {
 const resultEl = useTemplateRef<HTMLDivElement | null>("resultEl");
 const { isActive } = useActiveIndex(
     resultEl,
-    props.index,
+    toRef(() => props.index),
     toRef(() => props.activeIndex),
     onClick,
 );
@@ -118,8 +118,6 @@ const { isActive } = useActiveIndex(
 .search-result {
     background: var(--color-foreground-primary);
     border-bottom: 1px solid var(--body-background);
-    border-left: 1px solid var(--form-border-color);
-    border-right: 1px solid var(--form-border-color);
     display: flex;
     font-size: 0.825rem;
     padding: var(--spacing-s);

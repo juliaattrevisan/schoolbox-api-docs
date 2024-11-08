@@ -1,10 +1,12 @@
 /**
  * Search for results that match the current query
+ * Currently assumes that the query string is identified with the key "query"
  */
 
 import debounce from "lodash/debounce";
 import type { Ref } from "vue";
-import type { SearchSelectItem } from "../types/searchSelectTypes";
+import { isAbortError } from "@js/util/errorUtils";
+import type { SearchSelectItem } from "./types/SearchSelectItem";
 
 const MIN_QUERY_LENGTH = 2; // the amount of characters typed before the search becomes active
 export const DEBOUNCE_AMOUNT = 350; // the amount in ms to hold off on searching, to allow the user to keep typing
@@ -12,28 +14,37 @@ export const DEBOUNCE_AMOUNT = 350; // the amount in ms to hold off on searching
 /**
  * search for results that match the current query
  * @param endpoint - the endpoint to search for results
- * @param $results - to optionally pass in a reference to the results list
+ * @param results - a reference to the results list
+ * @param onSuccess - a callback to run when the search is successful
+ * @param requiresQuery - whether the search requires a query to be active
  * @returns isSearching, query, results, isActive, hasNoResults,  search
  */
-export function useSearch(
+export function useQuerySearch(
     endpoint: string,
-    $results: Ref<SearchSelectItem[]> | undefined = undefined,
+    results: Ref<SearchSelectItem[]>,
+    onSuccess: (json: unknown, isActive: boolean) => void,
+    requiresQuery: boolean = true,
 ): {
     isSearching: Ref<boolean>;
     query: Ref<string>;
     results: Ref<SearchSelectItem[]>;
     isActive: Ref<boolean>;
+    url: Ref<string>;
     hasNoResults: Ref<boolean>;
     hasError: Ref<boolean>;
     search: () => Promise<void>;
 } {
     const isSearching = window.Vue.ref(false); // to notify that an action is taking place,
+    const isFetching = window.Vue.ref(false); // to notify that a fetch is taking place
     const query = window.Vue.ref(""); // current search term being typed
     const isActive = window.Vue.computed(() => query.value.length >= MIN_QUERY_LENGTH); // To only start showing search results once enough characters have been typed
-    const results = $results === undefined ? window.Vue.ref<SearchSelectItem[]>([]) : $results; // create a new results list if one is not passed in
+    const url = window.Vue.computed(() => {
+        return `${endpoint}query=${query.value}`;
+    });
     const hasSearched = window.Vue.ref(false); // to show that a search has been made
     const hasNoResults = window.Vue.computed(() => isActive.value && results.value.length === 0 && !isSearching.value); // To show that no results match the current search
     const hasError = window.Vue.ref(false); // To show that an error has occurred
+    let controller: AbortController; // to allow aborting the previous search if a new one is started
 
     /**
      * when the search isActive, we should display the loading prompt straight away,
@@ -47,11 +58,18 @@ export function useSearch(
      * search for results that match the current query
      */
     async function search(): Promise<void> {
+        // abort the previous search if it's still running
+        if (isFetching.value) {
+            controller.abort();
+        }
         try {
+            isFetching.value = true;
             hasSearched.value = true;
             hasError.value = false;
-            const response = await fetch(`${endpoint}${query.value}`, {
+            controller = new AbortController();
+            const response = await fetch(url.value, {
                 method: "GET",
+                signal: controller.signal,
                 headers: {
                     "Content-Type": "application/json",
                 },
@@ -61,16 +79,13 @@ export function useSearch(
                 return;
             }
             const json: unknown = await response.json();
-            // if json is an array, set results to json
-            if (json instanceof Array) {
-                results.value = json as SearchSelectItem[];
+            isFetching.value = false;
+            onSuccess(json, isActive.value);
+        } catch (error) {
+            // ignore abort errors, as the previous search was cancelled
+            if (isAbortError(error)) {
                 return;
             }
-            // if json.data exists, set results to json.data
-            if (typeof json === "object" && json !== null && "data" in json) {
-                results.value = (json as { data: SearchSelectItem[] }).data;
-            }
-        } catch (error) {
             console.error(error);
             hasError.value = true;
             results.value = [];
@@ -90,7 +105,6 @@ export function useSearch(
      * clear the current search
      */
     function clear(): void {
-        query.value = "";
         results.value = [];
         isSearching.value = false;
         hasSearched.value = false;
@@ -98,7 +112,10 @@ export function useSearch(
     }
 
     /**
-     * start searching once the search is active, watching the query string for input
+     * start searching once the search is active,
+     * watching the query string for input
+     * also bring up the results without a query
+     * if requiresQuery is false
      */
     window.Vue.watch(
         () => query.value,
@@ -106,7 +123,11 @@ export function useSearch(
             if (isActive.value) {
                 enableSearch();
                 await debounceSearch();
+            } else if (!requiresQuery) {
+                // bring up the default results if we don't need a query
+                void search();
             } else if (hasSearched.value) {
+                // clear the search if we move to an empty query
                 clear();
             }
         },
@@ -117,6 +138,7 @@ export function useSearch(
         query,
         results,
         isActive,
+        url,
         hasNoResults,
         hasError,
         search,

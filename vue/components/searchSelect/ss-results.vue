@@ -3,8 +3,9 @@
  * The search results container
  */
 
-import { onKeyStroke } from "@vueuse/core";
-import type { SearchSelectItem } from "./types/searchSelectTypes";
+import { toRefs, useTemplateRef } from "vue";
+import { onKeyStroke, useScroll, useResizeObserver } from "@vueuse/core";
+import type { SearchSelectItem } from "@schoolboxVue/composables/search/types/SearchSelectItem";
 import SsResultsSelectAll from "./ss-results-select-all.vue";
 import SsResultsItem from "./ss-results-item.vue";
 
@@ -12,6 +13,7 @@ interface Props {
     query: string; // the search query
     isActive: boolean; // whether the search is active
     isSearching: boolean; // to notify of searching
+    isLoadingMore?: boolean; // whether more results are being loaded
     allowPartialMatches?: boolean; // whether to allow partial matches, so can match part of a word
     isSingleSelect: boolean; // whether only one result can be selected
     results: SearchSelectItem[]; // the results returned from the search
@@ -24,6 +26,7 @@ const props = defineProps<Props>();
 const emit = defineEmits<{
     add: [items: SearchSelectItem[]];
     remove: [items: SearchSelectItem[]];
+    atBottom: []; // scrolled to the bottom of the results container
 }>();
 
 /**
@@ -35,21 +38,14 @@ const showSelectAll = window.Vue.computed(() => {
     if (props.isSingleSelect) {
         return false;
     }
+    if (!props.isActive) {
+        // don't show select all if the search is not active (as the default results will be shown instead)
+        return false;
+    }
     if (props.results.length <= 1) {
         return false;
     }
     return true;
-});
-
-/**
- * To only show the bottom border if the search is active,
- * otherwise there's a double border when the search is inactive
- * @returns - the bottom border style
- */
-const bottomBorder = window.Vue.computed(() => {
-    return props.isSearching || props.hasNoResults || props.results.length > 0
-        ? "1px solid var(--form-border-color)"
-        : "none";
 });
 
 /**
@@ -106,14 +102,45 @@ window.Vue.watch(
 function onHover(index: number): void {
     activeIndex.value = index;
 }
+
+const resultsEl = useTemplateRef<HTMLDivElement | null>("resultsEl"); // to detect when the results container is scrolled to the bottom
+const maxResultsHeight = 400; // the maximum height of the results container
+
+const currentHeight = window.Vue.ref(0);
+useResizeObserver(resultsEl, (entries) => {
+    const entry = entries[0];
+    currentHeight.value = entry.contentRect.height;
+});
+
+/**
+ * To notify the parent component when the results container
+ * is scrolled to the bottom, usually to load more results
+ */
+const { arrivedState } = useScroll(resultsEl);
+const { bottom } = toRefs(arrivedState);
+window.Vue.watch(bottom, (isAtBottom) => {
+    if (isAtBottom && currentHeight.value === maxResultsHeight - 2) {
+        // -2 to account for the border
+        emit("atBottom");
+    }
+});
+
+/**
+ * Shift the results container scroll to the bottom so the loading of more results note is visible
+ */
+window.Vue.watch(
+    () => props.isLoadingMore,
+    async (newIsLoadingMore) => {
+        if (newIsLoadingMore && resultsEl.value) {
+            await window.Vue.nextTick();
+            resultsEl.value.scrollTop = resultsEl.value.scrollHeight;
+        }
+    },
+);
 </script>
 <template>
-    <div class="results">
+    <div ref="resultsEl" class="results">
         <div v-if="props.isSearching" class="results__status">Searching for results....</div>
-        <div v-else-if="props.hasError" class="results__status alert">
-            Sorry, there was an unknown error retrieving your search results. Please try again and contact your support
-            if the problem persists.
-        </div>
         <div v-else-if="props.hasNoResults && props.selected.length === 0" class="results__status">
             No results found for your current search.
         </div>
@@ -144,21 +171,22 @@ function onHover(index: number): void {
                 @hover="onHover"
             />
         </fieldset>
+        <div v-if="props.hasError" class="results__status alert">
+            Sorry, there was an unknown error retrieving your search results. Please try again and contact your support
+            if the problem persists.
+        </div>
+        <div v-if="props.isLoadingMore" class="results__status">Loading more results....</div>
     </div>
 </template>
 
 <style lang="scss" scoped>
 .results {
+    border: 1px solid var(--form-border-color);
     max-height: 400px;
     overflow: auto;
     width: 100%;
-    &:last-child {
-        border-bottom: v-bind(bottomBorder);
-    }
     &__status {
         background: var(--color-foreground-primary);
-        border-left: 1px solid var(--form-border-color);
-        border-right: 1px solid var(--form-border-color);
         font-size: 0.825rem;
         font-style: italic;
         padding: var(--spacing-s);

@@ -1,7 +1,7 @@
 import { mount } from "@vue/test-utils";
 import { timeout } from "@js/util/jsUtils";
 import SearchSelect from "../search-select.vue";
-import { DEBOUNCE_AMOUNT } from "../composables/useSearch";
+import { DEBOUNCE_AMOUNT } from "../../../composables/search/useQuerySearch";
 
 const defaultProps = {
     label: "Search Select",

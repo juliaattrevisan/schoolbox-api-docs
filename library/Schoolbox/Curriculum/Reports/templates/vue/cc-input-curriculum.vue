@@ -6,9 +6,8 @@
  * the scope of the changes
  */
 
-import { watchIgnorable } from "@vueuse/core";
 import SearchSelect from "@schoolboxVue/components/searchSelect/search-select.vue";
-import type { SearchSelectItem } from "@schoolboxVue/components/searchSelect/types/searchSelectTypes";
+import type { SearchSelectItem } from "@schoolboxVue/composables/search/types/SearchSelectItem";
 import { useStore } from "@schoolboxCurriculum/vue/curriculumSelector/store/curriculumSelectorStore";
 import { useSelectedNodesStore } from "@schoolboxCurriculum/vue/curriculumSelector/store/csSelectedNodesStore";
 import { useModalStore } from "@schoolboxCurriculum/vue/curriculumSelector/store/csModalStore";
@@ -49,19 +48,17 @@ store.init({
 const selectedStore = useSelectedNodesStore();
 selectedStore.add(props.preselected);
 const modalStore = useModalStore();
-const endpoint = `${props.endpoint}?enabled=1&limit=50&includeWithoutCode=1&query=`; // The endpoint to retrieve the curriculum data from
+const endpoint = `${props.endpoint}?enabled=1&limit=50&includeWithoutCode=1&`; // The endpoint to retrieve the curriculum data from
 const results = window.Vue.ref<Node[]>([]);
 
 /**
- * To inject the code / title of the node into the name field
+ * To handle the search response to update the name to display the code / title of the curriculum
+ * @param json - the returned json
  */
-const { ignoreUpdates } = watchIgnorable(results, (newResults: Node[] | unknown[]) => {
-    // ignore updates to avoid an infinite loop...
-    ignoreUpdates(() => {
-        if (newResults instanceof Array && newResults.length === 0) {
-            return;
-        }
-        results.value = results.value.map((result) => {
+function onSearchResponse(json: unknown): void {
+    if (json instanceof Array) {
+        const newResults = json as Node[];
+        results.value = newResults.map((result) => {
             const { title } = useNodeTitle(result);
             return {
                 ...result,
@@ -69,8 +66,8 @@ const { ignoreUpdates } = watchIgnorable(results, (newResults: Node[] | unknown[
                 name: title.value, // manipulate the name to display the code / title of the curriculum
             };
         });
-    });
-});
+    }
+}
 
 /**
  * To open up the selected node modal
@@ -96,13 +93,16 @@ function onSelectedNodeModalClosed(): void {
         :label-id="props.labelId"
         :is-required="props.isRequired"
         :endpoint="endpoint"
+        :manage-search-response="true"
         :has-error="props.hasError"
         :error-message="props.errorMessage"
         :is-read-only="props.isReadOnly"
         :allow-partial-matches="true"
         :can-select-item="true"
+        placeholder="Search for curriculum codes or keywords..."
         :has-button="true"
         button-icon="icon-curriculum"
+        @search-response="onSearchResponse"
         @select="onNodeNameSelect"
         @button-select="modalStore.open"
     />

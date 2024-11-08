@@ -3,10 +3,12 @@
  * To search for results with a query and select them
  */
 
-import { useTemplateRef } from "vue";
-import { useSelected } from "@schoolboxVue/composables/store/useSelected";
-import { useSearch } from "./composables/useSearch";
-import type { SearchSelectItem } from "./types/searchSelectTypes";
+import { toRef, useTemplateRef } from "vue";
+import { onClickOutside, useFocus } from "@vueuse/core";
+import { useSelected } from "@schoolboxVue/composables/selected/useSelected";
+import { useQuerySearch } from "@schoolboxVue/composables/search/useQuerySearch";
+import type { SearchSelectItem } from "@schoolboxVue/composables/search/types/SearchSelectItem";
+import { useOnSelectedChange } from "./composables/useOnSelectedChange";
 import SsSelected from "./ss-selected.vue";
 import SsQueryInput from "./ss-query-input.vue";
 import SsResults from "./ss-results.vue";
@@ -14,7 +16,8 @@ import SsResults from "./ss-results.vue";
 interface Props {
     label: string; // the label text
     labelId: string; // the label id
-    endpoint: string; // the search api endpoint
+    endpoint: string; // the search api endpoint, expects an endpoint without a `query` parameter, which will be added via useQuerySearch
+    manageSearchResponse?: boolean; // whether to manage the response internally, or dispatch an emit to manage it externally
     isRequired?: boolean; // whether the input requires a value
     defaultResults?: SearchSelectItem[]; // show selection options when the search input is empty
     isSingleSelect?: boolean; // whether only one result can be selected
@@ -39,17 +42,76 @@ const props = withDefaults(defineProps<Props>(), {
 });
 
 const emit = defineEmits<{
+    searchResponse: [json: unknown];
     select: [item: SearchSelectItem];
     buttonSelect: [];
 }>();
 
-const searchSelectEl = useTemplateRef<HTMLDivElement | null>("searchSelectEl");
+// #region Selected  Items
 
 const selected = defineModel<SearchSelectItem[]>("selected", { default: [] }); // to store selected items
 const { add, remove, update } = useSelected(selected); // to add and remove selected items
+const { onAdd, onRemove } = useOnSelectedChange(
+    toRef(() => props.isSingleSelect),
+    selected,
+    add,
+    remove,
+    update,
+); // to handle selected item changes picked up within the <template/>
+
+// #endregion
+
+// #region Search Results
 
 const results = defineModel<SearchSelectItem[]>("results", { default: [] }); // to store search results
-const { query, isActive, isSearching, hasNoResults, hasError } = useSearch(props.endpoint, results); // to search for results
+/**
+ * To handle the search response, we handle some basic responses internally,
+ * but if the response is more complex, we emit the response to be handled externally
+ * @param json - the returned json
+ */
+function onSearchSuccess(json: unknown): void {
+    // emit to handle the response externally, as the response object is typically something not handled by the the basic structure below
+    if (props.manageSearchResponse) {
+        emit("searchResponse", json);
+        return;
+    }
+    // if json is an array, set results to json
+    if (json instanceof Array) {
+        results.value = json as SearchSelectItem[];
+        return;
+    }
+    // if json.data exists, set results to json.data
+    if (typeof json === "object" && json !== null && "data" in json) {
+        results.value = (json as { data: SearchSelectItem[] }).data;
+    }
+}
+const { query, isActive, isSearching, hasNoResults, hasError } = useQuerySearch(
+    props.endpoint,
+    results,
+    onSearchSuccess,
+); // to search for results
+
+const searchSelectEl = useTemplateRef<HTMLDivElement | null>("searchSelectEl"); // to clear the search results when clicking outside / not focused
+
+/**
+ * To close the search results when clicking outside
+ */
+window.Vue.onMounted(async () => {
+    await window.Vue.nextTick();
+    onClickOutside(searchSelectEl, () => {
+        query.value = "";
+    });
+});
+
+/**
+ * To close the search results when the input is not focused
+ */
+const { focused } = useFocus(searchSelectEl);
+window.Vue.watch(focused, ($focused) => {
+    if (!$focused) {
+        query.value = "";
+    }
+});
 
 /**
  * To show the current search results, or the default results
@@ -66,6 +128,8 @@ const currentResults = window.Vue.computed(() => {
     return results.value;
 });
 
+// #endregion
+
 /**
  * A selected item name has been selected
  * @param item - the items selected
@@ -75,32 +139,34 @@ function onSelect(item: SearchSelectItem): void {
 }
 
 /**
- * To add items
- * @param items - the items selected
- */
-function onAdd(items: SearchSelectItem[]): void {
-    // if single select, switch with the previous selection
-    if (props.isSingleSelect && selected.value.length > 0) {
-        update(items);
-        return;
-    }
-    add(items);
-}
-
-/**
- * To remove items
- * @param items - the items deselected
- */
-function onRemove(items: SearchSelectItem[]): void {
-    remove(items);
-}
-
-/**
  * To notify of the button being selected
  */
 function onButtonSelected(): void {
     emit("buttonSelect");
 }
+
+// #region open/close results on escape key press
+
+const hasPressedEscape = window.Vue.ref(false); // to determine if the escape key has just been pressed
+
+/**
+ * To close the search results when the escape key is pressed
+ */
+function onEscapeInput(): void {
+    hasPressedEscape.value = true;
+}
+
+/**
+ * to open the search results again whenever the query changes
+ */
+window.Vue.watch(
+    () => query.value,
+    () => {
+        hasPressedEscape.value = false;
+    },
+);
+
+// #endregion
 </script>
 
 <template>
@@ -121,8 +187,8 @@ function onButtonSelected(): void {
                 v-if="!props.isReadOnly"
                 v-model:query="query"
                 :label-id="props.labelId"
-                :parent-el="searchSelectEl"
                 :placeholder="props.placeholder"
+                @escape="onEscapeInput"
             />
             <button
                 v-if="props.hasButton"
@@ -133,18 +199,28 @@ function onButtonSelected(): void {
                 {{ props.buttonTitle }}
             </button>
         </div>
-        <ss-results
-            :query="query"
-            :is-active="isActive"
-            :is-searching="isSearching"
-            :allow-partial-matches="props.allowPartialMatches"
-            :is-single-select="props.isSingleSelect"
-            :results="currentResults"
-            :has-no-results="hasNoResults"
-            :has-error="hasError"
-            :selected="selected"
-            @add="onAdd"
-            @remove="onRemove"
-        />
+        <div v-show="!hasPressedEscape" class="results-container">
+            <ss-results
+                v-if="isActive || (props.defaultResults && props.defaultResults.length > 0)"
+                :query="query"
+                :is-active="isActive"
+                :is-searching="isSearching"
+                :allow-partial-matches="props.allowPartialMatches"
+                :is-single-select="props.isSingleSelect"
+                :results="currentResults"
+                :has-no-results="hasNoResults"
+                :has-error="hasError"
+                :selected="selected"
+                @add="onAdd"
+                @remove="onRemove"
+            />
+        </div>
     </div>
 </template>
+
+<style lang="scss" scoped>
+.results-container {
+    position: relative;
+    top: -1px; // to align the results with the bottom of the ss-query-input
+}
+</style>
