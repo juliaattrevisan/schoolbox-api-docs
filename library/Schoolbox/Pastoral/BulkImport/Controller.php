@@ -108,9 +108,9 @@ class Controller extends Base
                     ->setMulti(false)
                     ->useImportExpiryDate()
                     ->getTwigContext(),
-                'moderator' => $this->getUser()->hasServicePermission(
+                'moderator'        => $this->getUser()->hasServicePermission(
                     UserAccess::SERVICE_PASTORAL,
-                    UserAccess::ACCESS_WRITE,
+                    UserAccess::ACCESS_READ,
                 ),
             ],
             $this->translator->translate('pastoral', capital: true) . ' Bulk Import',
