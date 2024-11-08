@@ -1348,7 +1348,7 @@ class Handler
         return $stmt->fetchColumn() !== false;
     }
 
-    private function validateUpdateDetailsRequestBody(array $data): void
+    private function validateUpdateDetailsRequestBody(array $results): void
     {
         $primaryAndSpouseValidators = $this->getParentUpdatedDetailsDataValidators();
         $studentValidators = $this->getStudentUpdatedDetailsDataValidators();
@@ -1356,8 +1356,8 @@ class Handler
         $errors = [];
 
         foreach (['primary', 'spouse', 'student'] as $type) {
-            if (isset($data['data'][$type])) {
-                $data = $data['data']['type'];
+            if (isset($results['data'][$type])) {
+                $data = $results['data'][$type];
                 $validators = ($type === 'student') ? $studentValidators : $primaryAndSpouseValidators;
 
                 if ($type === 'student') {
@@ -1808,7 +1808,7 @@ class Handler
         }
     }
 
-    private function handleUpdateParentDataRequest(object $data): void
+    private function handleUpdateParentDataRequest($data): void
     {
         $parentID = $data->ID;
 
