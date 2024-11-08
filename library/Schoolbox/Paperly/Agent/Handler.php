@@ -1091,8 +1091,7 @@ class Handler
                     s.LegalCourtOrderType,
                     s.StudentMedicalAlertFlag
                 FROM {$viewSelected} s
-                WHERE s.StudentYearLevelDescription NOT LIKE '%CCGS'
-                  AND s.StudentID IN (?)
+                WHERE s.StudentID IN (?)
                 ";
 
             $params = [$stuID];
@@ -1912,7 +1911,7 @@ class Handler
             'consents' => [
                 'delete' => [],
                 'create' => []
-            ],
+            ]
         ];
 
         foreach (array_keys(get_object_vars($data)) as $getStudentID) {
