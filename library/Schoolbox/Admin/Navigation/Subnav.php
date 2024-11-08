@@ -144,12 +144,16 @@ class Subnav
         $userHasServicePermissionBadge = (
             $this->user->hasServicePermission(UserAccess::SERVICE_BADGE, UserAccess::ACCESS_FULL)
         );
+        $userHasServicePermissionCms = (
+            $this->user->hasServicePermission(UserAccess::SERVICE_CMS, UserAccess::ACCESS_FULL)
+        );
         $userHasAnyModeratorServicePermission = (
             $userHasServicePermissionNews ||
             $userHasServicePermissionCalendar ||
             $userHasServicePermissionPastoral ||
             $userHasServicePermissionLms ||
-            $userHasServicePermissionBadge
+            $userHasServicePermissionBadge ||
+            $userHasServicePermissionCms
         );
 
         /* Keys of this array uniquely identify a page and its subpages
@@ -836,42 +840,45 @@ class Subnav
                     ],
                 ],
             ],
-            '/adminv2/setting/Resources' => [
+            '/adminv2/cms' => [
                 'name'       => 'Resources',
-                'visible'    => $userIsSuperuser,
+                'visible'    => $userIsSuperuser || $userHasServicePermissionCms,
                 'searchable' => false,
                 'children'   => [
                     '/adminv2/allowed-file' => [
                         'name'        => 'Allowed Files',
-                        'visible'     => $userIsSuperuser,
+                        'visible'     => $userIsSuperuser || $userHasServicePermissionCms,
                         'children'    => [],
                         'description' => 'Define the file mime types that can be uploaded, the maximum filesize and the icon they will use.',
                     ],
                     '/adminv2/video' => [
                         'name'        => 'Media Queue',
-                        'visible'     => $userIsSuperuser,
+                        'visible'     => $userIsSuperuser || $userHasServicePermissionCms,
                         'children'    => [],
                         'description' => 'A log of videos and audio that is currently being transcoded or failed to transcode.',
                     ],
-                    '/adminv2/setting/Resources' => [
-                        'name'        => 'Settings',
-                        'visible'     => $userIsSuperuser && count($enabledConfigs[ConfigMapper::TYPE_RESOURCES] ?? []) > 0,
+                    '/adminv2/setting/cms/Resources' => [
+                        'name'        => 'Resource Settings',
+                        'visible'     => (
+                            ($userIsSuperuser || $userHasServicePermissionCms) &&
+                            count($enabledConfigs[ConfigMapper::TYPE_RESOURCES] ?? []) > 0
+                        ),
                         'children'    => [],
                         'description' => 'Control how files are stored and processed when uploaded.',
                     ],
                     '/adminv2/restore' => [
                         'name'        => 'Restore',
-                        'visible'     => $userIsSuperuser,
+                        'visible'     => $userIsSuperuser || $userHasServicePermissionCms,
                         'children'    => [],
                         'description' => 'Undelete pages, folders and assessments that were accidentally deleted recently.',
                     ],
                     '/adminv2/usage' => [
                         'name'        => 'Usage',
-                        'visible'     => $userIsSuperuser,
+                        'visible'     => $userIsSuperuser || $userHasServicePermissionCms,
                         'children'    => [],
                         'description' => 'View what files have been uploaded, by whom and how much disk space they are using.',
                     ],
-                ],
+                ]
             ],
             '/adminv2/import/schoolDataImport' => [
                 'name'       => 'School Data Import',

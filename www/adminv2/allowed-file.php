@@ -6,8 +6,12 @@ use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\File\ExtensionMapper;
 use Schoolbox\File\Mimetype;
 use Schoolbox\File\MimetypeMapper;
+use Schoolbox\Permission\Access\UserAccess;
 
-if (!$_SESSION['user']->isSuperuser()) {
+if (
+    !$_SESSION['user']->isSuperuser() &&
+    !$_SESSION['user']->hasServicePermission(UserAccess::SERVICE_CMS, UserAccess::ACCESS_FULL)
+) {
     throw ErrorMapper::getInstance()->generateException(ErrorMapper::ERROR_PERM_PAGE_VIEW);
 }
 

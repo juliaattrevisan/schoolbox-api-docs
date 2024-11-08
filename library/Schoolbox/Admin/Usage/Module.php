@@ -19,6 +19,7 @@ use InvalidArgumentException;
 use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Mapper;
+use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\UserMapper;
 
 /**
@@ -33,7 +34,6 @@ class Module extends BaseModule
      */
     protected $basename = 'adminUsage';
 
-
     /**
      * Hook method for setting up routes via self::register()
      *
@@ -45,7 +45,10 @@ class Module extends BaseModule
          */
         $getPerms = new Rule\All(
             new Rule\IsLoggedIn(),
-            new Rule\IsSuperuser()
+            new Rule\Any(
+                new Rule\IsSuperuser(),
+                new Rule\HasServicePermission(UserAccess::SERVICE_CMS, UserAccess::ACCESS_FULL)
+            )
         );
 
         $preloadUser = function (array $params) {
@@ -71,7 +74,6 @@ class Module extends BaseModule
         $this->register('GET', '/specific/{userId}/file', 'getSpecificUserFilePayload', $getPerms, $preloadUser);
         $this->register('GET', '/specific/{userId}/type', 'getSpecificUserFileTypePayload', $getPerms, $preloadUser);
     }
-
 
     /**
      * Preload a User instance
@@ -108,7 +110,6 @@ class Module extends BaseModule
         );
     }
 
-
     /**
      * {@inheritdoc}
      */
@@ -116,7 +117,6 @@ class Module extends BaseModule
     {
         $this->addTemplatePath($templateLoader, __DIR__ . '/templates');
     }
-
 
     /**
      * @return Mapper|UserMapper

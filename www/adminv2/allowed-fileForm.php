@@ -5,6 +5,7 @@ use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\File\Extension;
 use Schoolbox\File\ExtensionMapper;
 use Schoolbox\File\MimetypeMapper;
+use Schoolbox\Permission\Access\UserAccess;
 
 require_once __DIR__ . '/../../conf/core/require.php';
 $kernel = new \Schoolbox\Application\WebRequest\Kernel();
@@ -13,7 +14,10 @@ $kernel = new \Schoolbox\Application\WebRequest\Kernel();
 $page = $kernel->get('sitePage');
 $page->initSession();
 
-if (!$_SESSION['user']->isSuperuser()) {
+if (
+    !$_SESSION['user']->isSuperuser() &&
+    !$_SESSION['user']->hasServicePermission(UserAccess::SERVICE_CMS, UserAccess::ACCESS_FULL)
+) {
     throw ErrorMapper::getInstance()->generateException(ErrorMapper::ERROR_PERM_PAGE_VIEW);
 }
 
