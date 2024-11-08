@@ -319,6 +319,34 @@ class Controller extends Base
     }
 
     /**
+     * Undo a previously run import, by deleting any records which were created.
+     *
+     * @api   POST /pastoral/bulk-import/{id}/undo
+     * @since 24.1
+     *
+     * @param Model $import
+     * @return void
+     */
+    public function postUndoImport(Model $import): void
+    {
+        if (!$import->getImportedAt()) {
+            $this->sendError('This import has not been run, and cannot be undone.');
+            return;
+        }
+
+        // Investigate the log to find what was created:
+        // delete all of these.
+        foreach ($import->getImportLog()['known'] as $item) {
+            $recordId = $item['record']['id'] ?? null;
+            if (isset($recordId)) {
+                $this->pastoralDataSource->delete(
+                    $this->pastoralDataSource->findById($this->getUser(), $recordId),
+                );
+            }
+        }
+    }
+
+    /**
      * Load the ZIP file from storage.
      *
      * @return Storage\IStorage
