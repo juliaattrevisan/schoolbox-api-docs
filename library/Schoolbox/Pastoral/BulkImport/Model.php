@@ -27,6 +27,23 @@ use Schoolbox\User;
  * Model for pastoral bulk import records.
  *
  * This defines a template from which records will be created.
+ *
+ * @phpstan-type ImportLog array{
+ *     known: array<
+ *         array{
+ *             files: array<string>,
+ *             user: array{id: int, externalId: string, name: string},
+ *             record: ?array{id: int}
+ *         }
+ *     >,
+ *     unknown: array<
+ *         array{
+ *             file: string,
+ *             reason: string,
+ *             user: array{externalId: ?string},
+ *         },
+ *     >,
+ * }
  */
 class Model implements ISoftDeletable
 {
@@ -103,22 +120,7 @@ class Model implements ISoftDeletable
     /**
      * The import log for this bulk import, in JSON format.
      *
-     * @var array{
-     *      known: array<
-     *          array{
-     *              files: array<string>,
-     *              user: array{id: int, externalId: string, name: string},
-     *              record: ?array{id: int}
-     *          }
-     *      >,
-     *      unknown: array<
-     *          array{
-     *              file: string,
-     *              reason: string,
-     *              user: array{externalId: ?string},
-     *          },
-     *      >,
-     *  }|null
+     * @var ImportLog|null
      */
     private ?array $importLog = null;
 
@@ -326,7 +328,7 @@ class Model implements ISoftDeletable
     }
 
     /**
-     * @return array|null
+     * @return ImportLog|null
      */
     public function getImportLog(): ?array
     {
@@ -334,7 +336,7 @@ class Model implements ISoftDeletable
     }
 
     /**
-     * @param array|null $importLog
+     * @param ImportLog|null $importLog
      * @return $this
      */
     public function setImportLog(?array $importLog): self

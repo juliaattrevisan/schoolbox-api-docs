@@ -32,6 +32,8 @@ use ZipArchive;
 
 /**
  * Controller for bulk importation of pastoral records.
+ *
+ * @phpstan-import-type ImportLog from Model
  */
 class Controller extends Base
 {
@@ -385,22 +387,7 @@ class Controller extends Base
      *
      * @param ZipArchive $archive
      * @param string     $template
-     * @return array{
-     *     known: array<
-     *         array{
-     *             files: array<string>,
-     *             user: array{id: int, externalId: string, name: string},
-     *             record: ?array{id: int}
-     *         }
-     *     >,
-     *     unknown: array<
-     *         array{
-     *             file: string,
-     *             reason: string,
-     *             user: array{externalId: ?string},
-     *         },
-     *     >,
-     * }
+     * @return ImportLog
      */
     private function generateImportLog(ZipArchive $archive, string $template): array
     {
@@ -430,6 +417,7 @@ class Controller extends Base
                 }
 
                 if ($user) {
+                    // TODO use standard format for name?
                     $importLog['known'][$user->getId()] ??= [
                         'user'  => [
                             'id'         => $user->getId(),
