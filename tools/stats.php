@@ -41,6 +41,21 @@ $app = new class extends CliTool\App {
             'guests_enabled'    => 'SELECT count(*) FROM user u WHERE u.deleted_at IS NULL AND enabled = 1 AND u.group_id IN (SELECT id FROM `groups` g WHERE g.group_type = "guest")',
             'guests_disabled'   => 'SELECT count(*) FROM user u WHERE u.deleted_at IS NULL AND enabled <> 1 AND u.group_id IN (SELECT id FROM `groups` g WHERE g.group_type = "guest")',
             'guests_deleted'    => 'SELECT count(*) FROM user u WHERE u.deleted_at IS not NULL AND u.group_id IN (SELECT id FROM `groups` g WHERE g.group_type = "guest")',
+            'superusers'        => 'SELECT count(*) FROM user u JOIN superusers s on u.id = s.id WHERE u.deleted_at IS NULL',
+
+            //Moderators
+            'calendar_moderator'    => 'SELECT count(*) FROM user u JOIN userAccess uA on u.id = uA.uid WHERE service = ' . UserAccess::SERVICE_CALENDAR . ' AND type=3 GROUP BY u.id',
+            'news_moderator'        => 'SELECT count(*) FROM user u JOIN userAccess uA on u.id = uA.uid WHERE service = ' . UserAccess::SERVICE_NEWS . ' AND type=3',
+            'cms_moderator'         => 'SELECT count(*) FROM user u JOIN userAccess uA on u.id = uA.uid WHERE service = ' . UserAccess::SERVICE_CMS . ' AND type=3',
+            'curriculum_moderator'  => 'SELECT count(*) FROM user u JOIN userAccess uA on u.id = uA.uid WHERE service = ' . UserAccess::SERVICE_CURRICULUM . ' AND type=3',
+            'resources_moderator'   => 'SELECT count(*) FROM user u JOIN userAccess uA on u.id = uA.uid WHERE service = ' . UserAccess::SERVICE_RESOURCE_BOOKING . ' AND type=3',
+            'fixtures_moderator'    => 'SELECT count(*) FROM user u JOIN userAccess uA on u.id = uA.uid WHERE service = ' . UserAccess::SERVICE_SPORTS_ADMINISTRATOR . ' AND type=3',
+            'pastoral_moderator'    => 'SELECT count(*) FROM user u JOIN userAccess uA on u.id = uA.uid WHERE service = ' . UserAccess::SERVICE_PASTORAL . ' AND type=3',
+            'badge_moderator'       => 'SELECT count(*) FROM user u JOIN userAccess uA on u.id = uA.uid WHERE service = ' . UserAccess::SERVICE_BADGE . ' AND type=3',
+            'timetable_moderator'   => 'SELECT count(*) FROM user u JOIN userAccess uA on u.id = uA.uid WHERE service = ' . UserAccess::SERVICE_TIMETABLE . ' AND type=3',
+            'design_moderator'      => 'SELECT count(*) FROM user u JOIN userAccess uA on u.id = uA.uid WHERE service = ' . UserAccess::SERVICE_DESIGN . ' AND type=3',
+            'lms_moderator'         => 'SELECT count(*) FROM user u JOIN userAccess uA on u.id = uA.uid WHERE service = ' . UserAccess::SERVICE_LMS . ' AND type=3',
+
 
             //Logins
             'unique_logins_yesterday' => "SELECT COUNT(DISTINCT username) FROM login_log WHERE login = 1 AND date >= SUBDATE(DATE(NOW()), INTERVAL 1 DAY) AND date < DATE(NOW())",
