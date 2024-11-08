@@ -5,6 +5,7 @@
 
 import debounce from "lodash/debounce";
 import type { Ref } from "vue";
+import { isAbortError } from "@js/util/errorUtils";
 import type { SearchSelectItem } from "./types/SearchSelectItem";
 
 const MIN_QUERY_LENGTH = 2; // the amount of characters typed before the search becomes active
@@ -34,6 +35,7 @@ export function useQuerySearch(
     search: () => Promise<void>;
 } {
     const isSearching = window.Vue.ref(false); // to notify that an action is taking place,
+    const isFetching = window.Vue.ref(false); // to notify that a fetch is taking place
     const query = window.Vue.ref(""); // current search term being typed
     const isActive = window.Vue.computed(() => query.value.length >= MIN_QUERY_LENGTH); // To only start showing search results once enough characters have been typed
     const url = window.Vue.computed(() => {
@@ -42,6 +44,7 @@ export function useQuerySearch(
     const hasSearched = window.Vue.ref(false); // to show that a search has been made
     const hasNoResults = window.Vue.computed(() => isActive.value && results.value.length === 0 && !isSearching.value); // To show that no results match the current search
     const hasError = window.Vue.ref(false); // To show that an error has occurred
+    let controller: AbortController; // to allow aborting the previous search if a new one is started
 
     /**
      * when the search isActive, we should display the loading prompt straight away,
@@ -55,11 +58,18 @@ export function useQuerySearch(
      * search for results that match the current query
      */
     async function search(): Promise<void> {
+        // abort the previous search if it's still running
+        if (isFetching.value) {
+            controller.abort();
+        }
         try {
+            isFetching.value = true;
             hasSearched.value = true;
             hasError.value = false;
+            controller = new AbortController();
             const response = await fetch(url.value, {
                 method: "GET",
+                signal: controller.signal,
                 headers: {
                     "Content-Type": "application/json",
                 },
@@ -69,8 +79,13 @@ export function useQuerySearch(
                 return;
             }
             const json: unknown = await response.json();
+            isFetching.value = false;
             onSuccess(json, isActive.value);
         } catch (error) {
+            // ignore abort errors, as the previous search was cancelled
+            if (isAbortError(error)) {
+                return;
+            }
             console.error(error);
             hasError.value = true;
             results.value = [];
