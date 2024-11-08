@@ -72,7 +72,7 @@ class Controller extends Base
 
         // Check secret
         $secret = $data['v'] ?? null;
-        if (!isset($secret) && $this->secret !== $secret) {
+        if (!isset($secret) || $this->secret !== $secret) {
             $this->sendJsonError('Access denied', Response::HTTP_UNAUTHORIZED);
             return;
         }
