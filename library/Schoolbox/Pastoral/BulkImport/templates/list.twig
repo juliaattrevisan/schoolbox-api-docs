@@ -21,22 +21,46 @@
 <div class="row">
     <div class="small-12 island">
         {% if imports is not empty %}
-            <ul class="information-list">
-                {% for import in imports %}
-                    <li>
-                        <div class="actions-small-1">
-                            <div class="card">
-                                {% set getRoute = routeLookupIfAuthorized('pastoralBulkImport.getCreateImportForm', {id: import.id, import: import}) %}
-                                {% if getRoute %}
-                                    <a href="{{ getRoute }}">{{ import.heading }}</a>
-                                {% else %}
-                                    <span>{{ import.heading }}</span>
-                                {% endif %}
+            <section>
+                <ul class="information-list">
+                    {% for import in imports %}
+                        <li>
+                            <div class="actions-small-1">
+                                <div class="card small-12">
+                                    {% set getRoute = routeLookupIfAuthorized('pastoralBulkImport.getImport', {id: import.id, import: import}) %}
+                                    <h3>
+                                        {% if getRoute %}
+                                            <a href="{{ getRoute }}">{{ import.heading }}</a>
+                                        {% else %}
+                                            {{ import.heading }}
+                                        {% endif %}
+                                    </h3>
+
+                                    {# Metadata: when it was imported, when it was undone #}
+                                    <p class="meta">
+                                        Created {{ import.createdAt.local }} by
+                                        {% if import.owner.deleted %}
+                                            {{ report.updatedBy.fullname }}
+                                        {% else %}
+                                            <a href="/search/user/{{ import.owner.id }}" title="{{ import.owner.fullname }}">{{ import.owner.fullname }}</a>
+                                        {% endif %}
+                                    </p>
+
+                                    <p class="meta">
+                                        {% if import.importedAt %}
+                                            Imported {{ import.importedAt.local }}.
+                                        {% else %}
+                                            Not yet imported.
+                                        {% endif %}
+                                    </p>
+
+                                    {# Buttons: run, undo, modify, archive?, delete?, archive? #}
+                                </div>
                             </div>
-                        </div>
-                    </li>
-                {% endfor %}
-            </ul>
+                        </li>
+                    {% endfor %}
+                </ul>
+            </section>
         {% else %}
             <div class="empty-state">
                 <i class="icon-upload"></i>
