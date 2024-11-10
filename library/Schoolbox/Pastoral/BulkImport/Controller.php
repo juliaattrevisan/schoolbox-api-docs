@@ -78,14 +78,39 @@ class Controller extends Base
     }
 
     /**
-     * Display form for creating a pastoral bulk import.
+     * Display list of previous imports.
      *
      * @api   GET /pastoral/bulk-import
      * @since 24.1
      *
      * @return void
      */
-    public function getForm(): void
+    public function getList(): void
+    {
+        // Show x number of previous imports, and when they were imported, and
+        // their undo status.
+        $this->response = $this->responseFromTemplate(
+            '@pastoralBulkImport/list.twig',
+            [
+                'imports' => $this->pastoralBulkImportMapper->findAll([
+                    'order' => [
+                        'created_at' => $this->pastoralBulkImportMapper::SORT_ORDER_DESC,
+                        'id'         => $this->pastoralBulkImportMapper::SORT_ORDER_DESC,
+                    ]
+                ]),
+            ],
+        );
+    }
+
+    /**
+     * Display form for creating a pastoral bulk import.
+     *
+     * @api   GET /pastoral/bulk-import/create
+     * @since 24.1
+     *
+     * @return void
+     */
+    public function getCreateImportForm(): void
     {
         // Make loading data a little easier
         $templateDataHelper = new TemplateDataHelper(

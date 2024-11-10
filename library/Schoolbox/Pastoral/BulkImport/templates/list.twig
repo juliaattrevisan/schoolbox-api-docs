@@ -1,0 +1,50 @@
+{% import 'sub/breadcrumbs.twig' as bread %}
+{{ bread.crumbs(
+    [ locale.pastoralCare.proper, routeLookup('pastoral.getIndex') ],
+    [ 'Bulk Import' ],
+) }}
+
+{% set createRoute = routeLookupIfAuthorized('pastoralBulkImport.getCreateImportForm') %}
+<div class="row actions-small-1">
+    <div class="list-item">
+        <div class="small-12 column">
+            <h1>{{ locale.pastoral.proper }} Bulk Imports</h1>
+        </div>
+    </div>
+    <nav>
+        {% if createRoute %}
+            <a href="{{ createRoute }}" class="icon-add" title="Add a summative report"></a>
+        {% endif %}
+    </nav>
+</div>
+
+<div class="row">
+    <div class="small-12 island">
+        {% if imports is not empty %}
+            <ul class="information-list">
+                {% for import in imports %}
+                    <li>
+                        <div class="actions-small-1">
+                            <div class="card">
+                                {% set getRoute = routeLookupIfAuthorized('pastoralBulkImport.getCreateImportForm', {id: import.id, import: import}) %}
+                                {% if getRoute %}
+                                    <a href="{{ getRoute }}">{{ import.heading }}</a>
+                                {% else %}
+                                    <span>{{ import.heading }}</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <div class="empty-state">
+                <i class="icon-upload"></i>
+                <p>No {{ locale.pastoral }} bulk imports have yet been performed.</p>
+                {% if createRoute %}
+                    <p><a href="{{ createRoute }}">Click here</a> to perform a bulk import.</p>
+                {% endif %}
+            </div>
+        {% endif %}
+    </div>
+</div>

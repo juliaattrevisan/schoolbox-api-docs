@@ -48,7 +48,13 @@ class Module extends BaseModule
         $this->register(
             self::METHOD_GET,
             '',
-            'getForm',
+            'getList',
+            $permission,
+        );
+        $this->register(
+            self::METHOD_GET,
+            '/create',
+            'getCreateImportForm',
             $permission,
         );
         $this->register(
@@ -68,6 +74,13 @@ class Module extends BaseModule
             self::METHOD_POST,
             '/{id}/run',
             'postRunImport',
+            $permission,
+            $preload,
+        );
+        $this->register(
+            self::METHOD_POST,
+            '/{id}/undo',
+            'postUndoImport',
             $permission,
             $preload,
         );
