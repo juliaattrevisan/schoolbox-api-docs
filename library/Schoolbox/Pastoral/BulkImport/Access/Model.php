@@ -50,7 +50,7 @@ class Model implements IPastoralAccess
     /**
      * The role type (if any) this access is associated with.
      *
-     * @var Role::STUDENT|ROLE::STAFF|ROLE::PARENT|ROLE::GUEST|null
+     * @var Role::STUDENT|Role::STAFF|Role::PARENT|Role::GUEST|null
      */
     private ?string $roleType = null;
 
@@ -132,7 +132,7 @@ class Model implements IPastoralAccess
     }
 
     /**
-     * @return string|null
+     * @return Role::STUDENT|Role::STAFF|Role::PARENT|Role::GUEST|null
      */
     public function getRoleType(): ?string
     {
@@ -140,7 +140,7 @@ class Model implements IPastoralAccess
     }
 
     /**
-     * @param string|null $roleType
+     * @param Role::STUDENT|Role::STAFF|Role::PARENT|Role::GUEST|null $roleType
      * @return $this
      */
     public function setRoleType(?string $roleType): self
@@ -168,7 +168,7 @@ class Model implements IPastoralAccess
     }
 
     /**
-     * @return int
+     * @return PastoralAccessMapper::ACCESS_*
      */
     public function getAccess(): int
     {
@@ -176,7 +176,7 @@ class Model implements IPastoralAccess
     }
 
     /**
-     * @param int $access
+     * @param PastoralAccessMapper::ACCESS_* $access
      * @return $this
      */
     public function setAccess(int $access): self
