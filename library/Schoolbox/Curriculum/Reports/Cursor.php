@@ -209,9 +209,6 @@ class Cursor implements ICursor
                      UNION
                      SELECT '%s' type, p.assessment_id
                      FROM project p
-                     UNION
-                     SELECT '%s' type, lp.assessment_id
-                     FROM lesson_plan lp
                 ) activity
                 INNER JOIN curriculum_node_for_assessment cnfa
                     ON cnfa.assessment_id = activity.assessment_id
@@ -220,6 +217,7 @@ class Cursor implements ICursor
                 INNER JOIN course_unit_specification cus
                         ON cus.id = acus.course_unit_specification_id
                         AND cus.course_specification_id IN %s
+                INNER JOIN assessment a ON a.id = activity.assessment_id AND a.deleted_at IS NULL
                 GROUP BY type, cnfa.curriculum_node_id, cus.course_specification_id, cus.folder_id
             ",
                 self::COURSE_ACTIVITY_TASK,
@@ -227,7 +225,6 @@ class Cursor implements ICursor
                 self::COURSE_ACTIVITY_LTI,
                 self::COURSE_ACTIVITY_DUE_WORK,
                 self::COURSE_ACTIVITY_PROJECT,
-                self::COURSE_ACTIVITY_LESSON_PLAN,
                 $nodesPlaceHolder,
                 $coursePlaceHolder
             );
@@ -241,7 +238,7 @@ class Cursor implements ICursor
                     cus.folder_id as unitId,
                     COUNT(cnfa.curriculum_node_id) as count
                 FROM (
-                     SELECT '%s' type, lp.assessment_id
+                     SELECT '%s' type, lp.assessment_id, lp.deleted_at
                      FROM lesson_plan lp
                 ) activity
                 INNER JOIN curriculum_node_for_assessment cnfa
@@ -251,6 +248,7 @@ class Cursor implements ICursor
                 INNER JOIN course_unit_specification cus
                         ON cus.id = acus.course_unit_specification_id
                         AND cus.course_specification_id IN %s
+                WHERE activity.deleted_at IS NULL
                 GROUP BY activity.type, cnfa.curriculum_node_id, cus.course_specification_id, cus.folder_id
             ",
                 self::COURSE_ACTIVITY_LESSON_PLAN,
