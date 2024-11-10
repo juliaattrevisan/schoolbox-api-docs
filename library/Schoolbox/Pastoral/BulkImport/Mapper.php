@@ -72,16 +72,43 @@ class Mapper extends BaseMapper
     }
 
     /**
-     * Hydrate this item, with all access and tags attached.
+     * Include the owner's name in the select string.
+     */
+    protected function getSelectString()
+    {
+        return "
+            SELECT
+                {$this->getColumnString()},
+                {$this->getJoinColumnString('owner', 'owner')}
+        ";
+    }
+
+    /**
+     * Include the owner's name in the join string.
+     */
+    protected function getFromString()
+    {
+        return "
+            FROM {$this->getTable()}
+            INNER JOIN {$this->getJoinSql('owner', '', 'owner', true)}
+        ";
+    }
+
+    /**
+     * Hydrate this item, with owner and all access and tags attached.
      *
      * @param PDOStatement $statement
      * @return GenericCollection<Model>
      */
     public function hydrateSelect(PDOStatement $statement)
     {
-        $models = parent::hydrateSelect($statement);
-        $ids    = $models->getPropertyValues('id');
+        $models = $this->createCollection();
+        foreach ($statement as $row) {
+            $models[] = $this->hydrate($row)
+                ->setOwner($this->hydrateJoin($row, 'owner', 'owner'));
+        }
 
+        $ids = $models->getPropertyValues('id');
         if (!empty($ids)) {
             // Load access models, keyed by import ID
             /** @var Access\Mapper $accessMapper */
