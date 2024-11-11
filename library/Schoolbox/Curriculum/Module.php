@@ -33,7 +33,7 @@ class Module extends BaseModule
         $this->attachResourceRoutes($basePath);
         $this->addGetRoute('search', $basePath, '/search');
         $this->addGetRoute('getTree', $basePath, '/tree');
-        $this->addGetRoute('getExport', $basePath, '/export');
+        $this->addGetRoute('getExport', $basePath, '/export/{id}');
 
         /* You can view the Curriculum Tree with this route
          * $this->addGetRoute($router, 'browse', $basePath, '/browse');
@@ -49,7 +49,7 @@ class Module extends BaseModule
 
         $this->addRoutePreload(
             $matcher,
-            '.*',
+            '(.*)|(getExport)',
             function ($params) {
                 if (array_key_exists('id', $params)) {
                     return array(
