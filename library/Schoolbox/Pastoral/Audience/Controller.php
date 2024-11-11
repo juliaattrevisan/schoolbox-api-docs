@@ -191,22 +191,39 @@ class Controller extends Base
          * part of the system where the flyout doesn't represent the full app hierarchy
          */
         $pastoralCareProper = $this->rosettaStone->translate('pastoralCare', false, true);
+
+        /**
+         * both pastoral Write and Moderators access this page, and they can access via different directions.
+         * we should try to map the breadcrumbs to the most logical starting point
+         * and build the sidenav with admin if they have access
+         *
+         * write > Pastoral home
+         * write+ > Administration Home
+         */
+        $hasAdminAccess = $this->getRouteIfAuthorized('adminHome.getIndex');
+        $firstBreadcrumb = [$pastoralCareProper, $this->routeGenerator->generate('pastoral.getIndex')];
+        if ($hasAdminAccess) {
+            $firstBreadcrumb = ['Administration Home', '/adminv2/home'];
+        }
+
         $flyout = (new Flyout(
             $this->getConfigLoader(),
             new FlyoutNodes($this->routeGenerator, $this->pastoralTypeMapper)
         ))->prefixBreadcrumbs([
-            ['Administration Home', '/adminv2/home'],
+            $firstBreadcrumb,
             ["Manage {$pastoralCareProper} Record Settings", $this->routeGenerator->generate('pastoralAudience.getAudiences')],
-        ])->injectParentEntry([
-            '/adminv2/home' => [
-                'name' => 'Back to Administration Home',
-                'visible' => true,
-                'hasBreadcrumbLink' => true,
-                'description' => '',
-                'children' => [],
-            ]
         ]);
-
+        if ($hasAdminAccess) {
+            $flyout->injectParentEntry([
+                '/adminv2/home' => [
+                    'name' => 'Back to Administration Home',
+                    'visible' => true,
+                    'hasBreadcrumbLink' => true,
+                    'description' => '',
+                    'children' => [],
+                ]
+            ]);
+        }
 
         // Figure out a background color based on the record's color
         // (default color: black)
