@@ -20,6 +20,7 @@ export type Node = {
         getUsage: string;
         read: string;
         update: string;
+        getExport: string;
     };
     _usageCounts: {
         // just the counts for each activity type

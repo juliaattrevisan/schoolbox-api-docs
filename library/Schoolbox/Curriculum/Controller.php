@@ -14,6 +14,7 @@ use Alaress\Web\Controller\Base;
 use Schoolbox\Admin\HealthCheck\Helper;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Curriculum\Node;
+use function Symfony\Component\Translation\t;
 
 class Controller extends Base
 {
@@ -303,7 +304,7 @@ class Controller extends Base
         // output headers
         fputcsv($fp, ['id', 'curriculum_node_parent_id', 'name', 'code', 'order', 'description', 'uuid']);
 
-        $this->csvChildren($fp, $node);
+        $this->csvChildren($fp, $node, true);
         exit;
     }
 
@@ -312,11 +313,15 @@ class Controller extends Base
      * @param Node\Model $node
      * @return void
      */
-    private function csvChildren($fp, Node\Model $node)
+    private function csvChildren($fp, Node\Model $node, bool $isFirst = false): void
     {
+        $parent = $node->getParent() ? $node->getParent()->getId() : '';
+        if ($isFirst) {
+            $parent = '';
+        }
         fputcsv($fp, [
             $node->getId(),
-            $node->getParent() ? $node->getParent()->getId() : '',
+            $parent,
             $node->getName(),
             $node->getCode(),
             $node->getOrder(),

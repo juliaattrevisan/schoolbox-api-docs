@@ -33,7 +33,6 @@ function onCreateNewSelected(): void {
         <template v-if="store.hasLoadedOk && !store.isReadOnly">
             <nav>
                 <a href="/curriculum/reports/coverage" class="icon-report" title="View Curriculum Coverage Report"> </a>
-                <a href="/curriculum/export" class="icon-export" title="Export All Curriculum Nodes"> </a>
                 <a
                     href="#create-curriculum"
                     data-interaction="create-curriculum"
