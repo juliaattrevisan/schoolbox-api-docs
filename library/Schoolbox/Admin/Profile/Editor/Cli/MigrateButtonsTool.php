@@ -216,6 +216,8 @@ HELP;
      */
     private function resequenceAll(): void
     {
+        $this->getLogger()->info('Preparing all buttons for resequencing...');
+
         if ($this->perform()) {
             $this->resequenceStatement = $this->getDatabaseInternal()->prepare("
                 UPDATE profile_button
