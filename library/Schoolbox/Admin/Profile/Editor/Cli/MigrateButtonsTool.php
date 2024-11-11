@@ -133,16 +133,13 @@ HELP;
             }
 
             if ($this->getOpt(self::OPT_LONG_TYPE_SYSTEM)) {
-                $campusIds = \Schoolbox\CampusMapper::getInstance()->findAll()->indexBy('id')->keys();
-                $roleIds   = \Schoolbox\RoleMapper::getInstance()->findAll()->indexBy('id')->keys();
-
                 $strats[] = new SystemButtons(
                     $this->perform(),
                     $this->getDatabaseInternal(),
                     $this->getLogger(),
                     $this->getDi()->get('l10n'),
-                    $campusIds,
-                    $roleIds,
+                    $this->fetchCampusIds(),
+                    $this->fetchRoleIds(),
                     trim((string)$this->getConfig()->get('external_staff_portal'))
                 );
             }
@@ -256,6 +253,47 @@ HELP;
             'roleType' => $roleType,
             'custom' => \Schoolbox\Profile\Button\Model::BUTTON_CUSTOM
         ]);
+    }
+
+
+    /**
+     * Fetch primary ids for campuses, returning them in a stack
+     *
+     * @return array
+     */
+    private function fetchCampusIds(): array
+    {
+        $ids = [];
+
+        $statement = $this->getDatabaseInternal()->prepare('SELECT id FROM luCampus');
+        $statement->execute();
+
+        while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
+            $ids[] = $row['id'];
+        }
+
+        return $ids;
+
+    }
+
+
+    /**
+     * Fetch primary ids for roles, returning them in a stack
+     *
+     * @return array
+     */
+    private function fetchRoleIds(): array
+    {
+        $ids = [];
+
+        $statement = $this->getDatabaseInternal()->prepare('SELECT id FROM groups');
+        $statement->execute();
+
+        while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
+            $ids[] = $row['id'];
+        }
+
+        return $ids;
     }
 
 
