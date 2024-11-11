@@ -90,10 +90,12 @@ class Helper
                 return $assessment->getBaseContext()->getFolder()->getId();
             });
 
-        /* Use the same ordering as you see in the markbookh162
+        /* Use the same ordering as you see in the markbook
          */
+        $comparator = (new SortForMarkbook())->getCallable();
+
         foreach ($assessmentsPerFolder as $folderId => $assessments) {
-            $assessmentsPerFolder->setOffset($folderId, $assessments->sortByCallback((new SortForMarkbook())->getCallable()));
+            $assessmentsPerFolder->setOffset($folderId, $assessments->sortByCallback($comparator));
         }
 
         // Load Teachers
