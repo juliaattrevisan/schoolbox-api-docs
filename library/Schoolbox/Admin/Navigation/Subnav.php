@@ -783,6 +783,15 @@ class Subnav
                         'children'    => [],
                         'description' => 'Setup the types of pastoral records, to control visibility and categorisation..',
                     ],
+                    '/pastoral/management/audience/' => [
+                        'name'        => 'Manage Pastoral Care Record Settings',
+                        'visible'     => (
+                            $userHasServicePermissionPastoral &&
+                            $this->configLoader->get(ConfigMapper::NAME_PASTORAL_ENABLED)
+                        ),
+                        'children'    => [],
+                        'description' => 'Setup the templates for types and subtypes of pastoral records, to control visibility and default options',
+                    ]
                 ]
             ],
             '/adminv2/dashboard' => [

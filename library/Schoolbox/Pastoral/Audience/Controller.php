@@ -195,8 +195,16 @@ class Controller extends Base
             $this->getConfigLoader(),
             new FlyoutNodes($this->routeGenerator, $this->pastoralTypeMapper)
         ))->prefixBreadcrumbs([
-            [$pastoralCareProper, $this->routeGenerator->generate('pastoral.getIndex')],
+            ['Administration Home', '/adminv2/home'],
             ["Manage {$pastoralCareProper} Record Settings", $this->routeGenerator->generate('pastoralAudience.getAudiences')],
+        ])->injectParentEntry([
+            '/adminv2/home' => [
+                'name' => 'Back to Administration Home',
+                'visible' => true,
+                'hasBreadcrumbLink' => true,
+                'description' => '',
+                'children' => [],
+            ]
         ]);
 
 
