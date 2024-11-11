@@ -737,6 +737,15 @@ class Subnav
                         'children'    => [],
                         'description' => 'Setup the actions of pastoral records.',
                     ],
+                    '/pastoral/bulk-import' => [
+                        'name'        => 'Bulk Import',
+                        'visible'     => (
+                            $userHasServicePermissionPastoral &&
+                            $this->configLoader->get(ConfigMapper::NAME_PASTORAL_ENABLED)
+                        ),
+                        'children'    => [],
+                        'description' => 'Import a large number of pastoral records from files within a ZIP',
+                    ],
                     '/pastoral/management/groups' => [
                         'name'        => 'Groups Management',
                         'visible'     => (
