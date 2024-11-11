@@ -808,7 +808,7 @@ class Subnav
                             $this->configLoader->get(ConfigMapper::NAME_PASTORAL_ENABLED)
                         ),
                         'children'    => [],
-                        'description' => 'Setup the templates for types and subtypes of pastoral records, to control visibility and default options',
+                        'description' => 'Manage Flag, Audience and Template Defaults',
                     ]
                 ]
             ],
