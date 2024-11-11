@@ -46,7 +46,7 @@ function onUpdateToggleSelected(): void {
     <a
         v-if="node._links.getExport"
         :href="node._links.getExport"
-        :class="`button-action-option ${props.isUpdating ? 'icon-close' : 'icon-export'}`"
+        class="button-action-option icon-export"
         :title="`Export ${props.title}`"
         data-test-export
     >
