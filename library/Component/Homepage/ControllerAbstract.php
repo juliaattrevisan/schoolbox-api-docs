@@ -75,7 +75,6 @@ abstract class Component_Homepage_ControllerAbstract extends Component_Controlle
         }
     }
 
-
     /**
      * Prepares data for the render function. Business logic.
      *
@@ -201,7 +200,7 @@ abstract class Component_Homepage_ControllerAbstract extends Component_Controlle
      * when something is collapsed; css class to hide an element; and
      * the data attribute for the toggler to function correctly
      *
-     * @return string
+     * @return array
      */
     protected function getDefaultCollapsedState()
     {
