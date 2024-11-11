@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\Pastoral\BulkImport;
 
+use Alaress\Authorizer\Failure;
 use Alaress\Authorizer\Rule;
 use Alaress\Module\Module as BaseModule;
 use Alaress\Twig\Loader\IChainLoader;
@@ -42,6 +43,33 @@ class Module extends BaseModule
                 new Rule\HasServicePermission(UserAccess::SERVICE_PASTORAL, UserAccess::ACCESS_WRITE),
             ),
         );
+
+        // Run permission: the import can't have already run
+        $runPermission = new Rule\All(
+            $permission,
+            new Rule\Callback(
+                function (array $params) {
+                    $import = $this->extractImportFromParams($params);
+                    if ($import->isImported()) {
+                        throw new Failure\InvalidPath('Import has already been run: cannot run again');
+                    }
+                }
+            ),
+        );
+
+        // Undo permission: the import must have already run
+        $undoPermission = new Rule\All(
+            $permission,
+            new Rule\Callback(
+                function (array $params) {
+                    $import = $this->extractImportFromParams($params);
+                    if (!$import->isImported()) {
+                        throw new Failure\InvalidPath('Import has not yet been run: cannot undo');
+                    }
+                }
+            ),
+        );
+
         $preload = fn (array $params): array => [
             'import' => $this->getMapperFactory()->get(Mapper::class)->findById($params['id']),
         ];
@@ -74,14 +102,14 @@ class Module extends BaseModule
             self::METHOD_POST,
             '/{id}/run',
             'postRunImport',
-            $permission,
+            $runPermission,
             $preload,
         );
         $this->register(
             self::METHOD_POST,
             '/{id}/undo',
             'postUndoImport',
-            $permission,
+            $undoPermission,
             $preload,
         );
     }
@@ -132,5 +160,20 @@ class Module extends BaseModule
             $this->injector->get('filesystem.receiver'),
             $pastoralRecordProcessor,
         );
+    }
+
+    /**
+     * Helper method for permission checks: extracts import out of `$params`.
+     *
+     * @param array $params
+     * @return Model
+     * @throws Failure\InvalidPath if the import wasn't found
+     */
+    private function extractImportFromParams(array $params): Model
+    {
+        if (!($params['import'] ?? null) instanceof Model) {
+            throw new Failure\InvalidPath('No import was found');
+        }
+        return $params['import'];
     }
 }

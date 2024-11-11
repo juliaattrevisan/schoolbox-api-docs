@@ -328,6 +328,16 @@ class Model implements ISoftDeletable
     }
 
     /**
+     * Has this already been imported?
+     *
+     * @return bool
+     */
+    public function isImported(): bool
+    {
+        return $this->importedAt !== null;
+    }
+
+    /**
      * @return ImportLog|null
      */
     public function getImportLog(): ?array

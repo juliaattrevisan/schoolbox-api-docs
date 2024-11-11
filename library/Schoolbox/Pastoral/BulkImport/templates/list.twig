@@ -25,37 +25,54 @@
                 <ul class="information-list">
                     {% for import in imports %}
                         <li>
-                            <div class="actions-small-1">
-                                <div class="card small-12">
-                                    {% set getRoute = routeLookupIfAuthorized('pastoralBulkImport.getImport', {id: import.id, import: import}) %}
-                                    <h3>
-                                        {% if getRoute %}
-                                            <a href="{{ getRoute }}">{{ import.heading }}</a>
-                                        {% else %}
-                                            {{ import.heading }}
-                                        {% endif %}
-                                    </h3>
+                            <div class="actions-small-2">
+                                {% set getRoute = routeLookupIfAuthorized('pastoralBulkImport.getImport', {id: import.id, import: import}) %}
+                                <div class="list-item">
+                                    <div class="card small-12">
+                                        <h3>
+                                            {% if getRoute %}
+                                                <a href="{{ getRoute }}">{{ import.heading }}</a>
+                                            {% else %}
+                                                {{ import.heading }}
+                                            {% endif %}
+                                        </h3>
 
-                                    {# Metadata: when it was imported, when it was undone #}
-                                    <p class="meta">
-                                        Created {{ import.createdAt.local }} by
-                                        {% if import.owner.deleted %}
-                                            {{ report.updatedBy.fullname }}
-                                        {% else %}
-                                            <a href="/search/user/{{ import.owner.id }}" title="{{ import.owner.fullname }}">{{ import.owner.fullname }}</a>
-                                        {% endif %}
-                                    </p>
+                                        {# Metadata: when it was imported, when it was undone #}
+                                        <p class="meta">
+                                            Created {{ import.createdAt.local }} by
+                                            {% if import.owner.deleted %}
+                                                {{ report.updatedBy.fullname }}
+                                            {% else %}
+                                                <a href="/search/user/{{ import.owner.id }}" title="{{ import.owner.fullname }}">{{ import.owner.fullname }}</a>
+                                            {% endif %}
+                                        </p>
 
-                                    <p class="meta">
-                                        {% if import.importedAt %}
-                                            Imported {{ import.importedAt.local }}.
-                                        {% else %}
-                                            Not yet imported.
-                                        {% endif %}
-                                    </p>
-
-                                    {# Buttons: run, undo, modify, archive?, delete?, archive? #}
+                                        <p class="meta">
+                                            {% if import.importedAt %}
+                                                Imported {{ import.importedAt.local }}.
+                                            {% else %}
+                                                Not yet imported.
+                                            {% endif %}
+                                        </p>
+                                    </div>
                                 </div>
+
+                                {# Buttons: run, undo, modify, archive?, delete? #}
+                                <nav>
+                                    {% if getRoute %}
+                                        <a class="icon-eye" href="{{ getRoute }}" title="{% if import.imported %}View import results{% else %}Preview import{% endif %}"></a>
+                                    {% endif %}
+
+                                    {% set runRoute = routeLookupIfAuthorized('pastoralBulkImport.postRunImport', {id: import.id, import: import}) %}
+                                    {% if runRoute %}
+                                        <a class="icon-import" href="{{ getRoute }}" title="Run import"></a>
+                                    {% endif %}
+
+                                    {% set undoRoute = routeLookupIfAuthorized('pastoralBulkImport.postUndoImport', {id: import.id, import: import}) %}
+                                    {% if undoRoute %}
+                                        <a class="icon-undo" href="{{ undoRoute }}" title="Undo import"></a>
+                                    {% endif %}
+                                </nav>
                             </div>
                         </li>
                     {% endfor %}
