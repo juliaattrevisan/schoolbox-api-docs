@@ -6,32 +6,24 @@ use Alaress\Database\Connector\IConnector;
 
 class ViewSelector
 {
-    /** @param array $viewLookUp Approved default paperly view mapping*/
-    private array $viewLookup = [
-        'allClasses'            => 'uvPaperlyStudentsByClassCode',
-        'getStudentsByClass'    => 'uvPaperlyStudentsByClassCode',
-        'allStaffs'             => 'uvPaperlyAllStaff',
-        'allStudents'           => 'uvPaperlyAllStudents',
-        'getStudentsAvatar'     => 'uvPaperlyPhotos',
-        'getStudentsMedical'    => 'uvPaperlyMedicalConditions',
-        'getStudentsFromParent' => 'uvPaperlyAllStudents',
-        'allParents'            => 'uvPaperlyParentDetails',
-        'getStudentAbilities'   => 'uvPaperlyParentDetails',
-        'getStudentConsents'    => 'uvPaperlyStudentConsents',
-    ];
+    public const PAPERLY_VIEW_ALL_CLASSES = 'uvPaperlyStudentsByClassCode';
+    public const PAPERLY_VIEW_ALL_STAFF = 'uvPaperlyAllStaff';
+    public const PAPERLY_VIEW_ALL_STUDENTS = 'uvPaperlyAllStudents';
+    public const PAPERLY_VIEW_ALL_PARENTS = 'uvPaperlyParentDetails';
+    public const PAPERLY_VIEW_STUDENT_AVATAR = 'uvPaperlyPhotos';
+    public const PAPERLY_VIEW_STUDENT_MEDICAL = 'uvPaperlyMedicalConditions';
+    public const PAPERLY_VIEW_STUDENT_CONSENT = 'uvPaperlyStudentConsents';
+    public const PAPERLY_VIEW_STUDENT_ABILITIES = 'uvPaperlyStudentAbilities';
+    public const PAPERLY_VIEW_STUDENT_FROM_PARENT = 'uvPaperlyAllStudents';
+
 
     public function __construct(
         private IConnector $externalDb,
     ) {
     }
 
-    public function getView(string $method): string
+    public function getView(string $view): string
     {
-        if (!array_key_exists($method, $this->viewLookup)) {
-            throw new \OutOfBoundsException('View does not exist');
-        }
-
-        $view = $this->viewLookup[$method];
 
         $sql = "SELECT count(TABLE_NAME)
 	            FROM INFORMATION_SCHEMA.VIEWS
