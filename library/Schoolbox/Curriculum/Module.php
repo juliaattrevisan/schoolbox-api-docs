@@ -33,6 +33,7 @@ class Module extends BaseModule
         $this->attachResourceRoutes($basePath);
         $this->addGetRoute('search', $basePath, '/search');
         $this->addGetRoute('getTree', $basePath, '/tree');
+        $this->addGetRoute('getExport', $basePath, '/export');
 
         /* You can view the Curriculum Tree with this route
          * $this->addGetRoute($router, 'browse', $basePath, '/browse');
@@ -70,7 +71,7 @@ class Module extends BaseModule
         $this
             ->addRoutePermission(
                 $authorizer,
-                '.*',
+                '(.*)|(!getExport)',
                 new Rule\All(
                     new Rule\IsLoggedIn(),
                     new Rule\HasRole(Role::STAFF)
@@ -78,7 +79,7 @@ class Module extends BaseModule
             )
             ->addRoutePermission(
                 $authorizer,
-                '(?:edit|add|delete|create|update|replace)',
+                '(getExport)|(?:edit|add|delete|create|update|replace)',
                 new Rule\Any(
                     new Rule\IsSuperuser(),
                     new Rule\HasServicePermission(

@@ -11,6 +11,7 @@
 namespace Schoolbox\Curriculum;
 
 use Alaress\Web\Controller\Base;
+use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Curriculum\Node;
 
 class Controller extends Base
@@ -279,5 +280,33 @@ class Controller extends Base
                 $this->getSession()->getHistory()
             );
         }
+    }
+
+    /**
+     * Export all the curriculum nodes, in a format suitable for import.
+     * Must be Superuser or Curric Moderator
+     *
+     * @api  GET /curriculum/export
+     * @since 24.1
+     */
+    public function getExport()
+    {
+        $exporter = new \Schoolbox\Admin\HealthCheck\Helper();
+        $statement = $this->nodeMapper->getDatabase()->prepare("SELECT
+                id,
+                curriculum_node_parent_id,
+                name,
+                code,
+                `order`
+                description,
+                uuid
+            FROM
+                curriculum_node
+            WHERE
+                deleted_at IS NULL; ");
+        $statement->execute();
+        $filename = sprintf("CurriculumExport-%s-%s.csv", ConfigMapper::NAME_SITE_SCHOOL_CODE, \Alaress_Date_Format::now()->toIso8601String());
+
+        $exporter->queryToCSV($statement, $filename);
     }
 }
