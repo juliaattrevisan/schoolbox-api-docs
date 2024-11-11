@@ -20,6 +20,7 @@ use Schoolbox\Learning\Assessment\Lti\Model as Lti;
 use Schoolbox\Learning\Assessment\Project;
 use Schoolbox\Learning\Assessment\Visibility;
 use Schoolbox\Learning\Markbook\Markbook;
+use Schoolbox\Learning\Markbook\SortForMarkbook;
 use Schoolbox\Learning\MarkScheme\Factory as MarkSchemeFactory;
 use Schoolbox\Learning\Assessment\Quiz\Model as Quiz;
 use Schoolbox\Mapper\Exception as MapperException;
@@ -89,6 +90,11 @@ class Helper
                 return $assessment->getBaseContext()->getFolder()->getId();
             });
 
+        /* Use the same ordering as you see in the markbook
+         */
+        foreach ($assessmentsPerFolder as $folderId => $assessments) {
+            $assessmentsPerFolder->setOffset($folderId, $assessments->sortByCallback((new SortForMarkbook())->getCallable()));
+        }
 
         // Load Teachers
         foreach ($folders as $folder) {
@@ -153,6 +159,9 @@ class Helper
                 $workTypeAssessmentsByFolder->offsetSet($folderId, $workTypeAssessments);
             }
         }
+
+        /* Sort them synonymously with the markbook comparator
+         */
         return $workTypeAssessmentsByFolder;
     }
 
