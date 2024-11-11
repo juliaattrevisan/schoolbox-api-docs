@@ -423,7 +423,7 @@ class Controller extends BaseController
             }
         }
 
-        $customButtons = ProfileButtonMapper::getInstance()->findButtonsForUser($student, $this->getUser());
+        $buttons = ProfileButtonMapper::getInstance()->findButtonsForUser($student, $this->getUser());
         $showDetails   = (new ValidDetailsVisible($this->externalUser, $this->getConfigLoader()))->isSatisfiedBy($student, $this->getUser());
         $showEmails    = (new ValidEmailVisible($this->externalUser, $this->getConfigLoader()))->isSatisfiedBy($student, $this->getUser());
 
@@ -492,39 +492,41 @@ class Controller extends BaseController
                 /* This is an augmented object consisting of schoolbox user fields
                  * and external sis fields from the External Interface (hybrid theory)
                  */
-                'externalUser'             => $externalUser,
+                'externalUser' => $externalUser,
                 /* Profile screens can have their own roletype-specific name format
                  */
-                'nameFormat'               => $this->getConfigLoader()->get('name_format_student'),
+                'nameFormat' => $this->getConfigLoader()->get('name_format_student'),
                 /* The viewee's User instance - sadly, very easy to confuse with USER global, which means
                  * the viewer, so be careful with that
                  */
-                'user'                     => $student,
+                'user' => $student,
                 /* Takes into account whether the viewer has the View Student Profile role permission
                  * in addition to some other standard checks for Guest-ness. We need to keep that.
                  * Most user details are in a block that is toggled by this var
                  */
-                'showDetails'              => $showDetails,
+                'showDetails' => $showDetails,
                 /* Decides if pastoral buttons and stuff actually exist beyond our Availability and
                  * Visibility settings (ie. does your user have permissions etc to this place)
                  *
                  * We needed to keep this
                  */
-                'showPastoral'             => $showPastoral,
+                'showPastoral' => $showPastoral,
+                /* This now includes system buttons - there's no longer really a distinction between system and
+                 * custom buttons, as far as the end user is concerned
+                 */
+                'buttons' => $buttons,
 
                 /* Old implementation
                  */
-                'session'                  => $_SESSION,
+                'session' => $_SESSION,
                 /* This is mostly superseded by user.showTimetable in twig
                  */
-                'showClasses'              => $showClasses,
-
+                'showClasses' => $showClasses,
                 'eportfolioAuth'           => $this->eportfolioAuthenticator->canView(),
                 'hideContacts'             => $hideContacts,
                 'now'                      => Alaress_Date_Format::now(),
                 'contacts'                 => $contacts,
                 'subjects'                 => $subjects,
-                'customButtons'            => $customButtons,
                 'groups'                   => $groups,
                 'isParentOfStudent'        => $isParentOfStudent,
                 'isPrimaryCarer'           => $isPrimaryCarer,
@@ -563,9 +565,9 @@ class Controller extends BaseController
             ->produce($staff, $this->getUser());
 
         try {
-            $customButtons = $this->profileButtonMapper->findButtonsForUser($staff, $this->getUser());
+            $buttons = $this->profileButtonMapper->findButtonsForUser($staff, $this->getUser());
         } catch (MapperException $e) {
-            $customButtons = [];
+            $buttons = [];
         }
 
         $this->response = $this->responseFromTemplate(
@@ -580,13 +582,16 @@ class Controller extends BaseController
                 /* Profile screens can have their own roletype-specific name format
                  */
                 'nameFormat' => $this->getConfigLoader()->get('name_format_staff'),
+                /* This now includes system buttons - there's no longer really a distinction between system and
+                 * custom buttons, as far as the end user is concerned
+                 */
+                'buttons'  => $buttons,
 
                 /* Old implementation
                  */
                 'session'        => $_SESSION,
                 'user'           => $staff,
                 'eportfolioAuth' => $this->eportfolioAuthenticator->canView(),
-                'customButtons'  => $customButtons,
                 'now'            => Alaress_Date_Format::now(),
                 'showDetails'    => (new ValidDetailsVisible($this->externalUser, $this->getConfigLoader()))->isSatisfiedBy($staff, $this->getUser()),
             ],
@@ -616,9 +621,9 @@ class Controller extends BaseController
             ->produce($parent, $this->getUser());
 
         try {
-            $customButtons = ProfileButtonMapper::getInstance()->findButtonsForUser($parent, $this->getUser());
+            $buttons = ProfileButtonMapper::getInstance()->findButtonsForUser($parent, $this->getUser());
         } catch (MapperException $e) {
-            $customButtons = [];
+            $buttons = [];
         }
 
         // As with students in SA-16859:
@@ -636,13 +641,16 @@ class Controller extends BaseController
                 /* Profile screens can have their own roletype-specific name format
                  */
                 'nameFormat' => $this->getConfigLoader()->get('name_format_parent'),
+                /* This now includes system buttons - there's no longer really a distinction between system and
+                 * custom buttons, as far as the end user is concerned
+                 */
+                'buttons'  => $buttons,
 
                 /* Old implementation
                  */
                 'session'        => $_SESSION,
                 'user'           => $parent,
                 'students'       => $parent->getChildren(),
-                'customButtons'  => $customButtons,
                 'eportfolioAuth' => $this->eportfolioAuthenticator->canView(),
                 'now'            => Alaress_Date_Format::now(),
                 'showDetails'    => (new ValidDetailsVisible($this->externalUser, $this->getConfigLoader()))->isSatisfiedBy($parent, $this->getUser()),

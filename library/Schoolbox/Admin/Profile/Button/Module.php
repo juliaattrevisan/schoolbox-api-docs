@@ -10,6 +10,8 @@ use Alaress\Authorizer\Rule;
 use Alaress\Web\Controller\Base;
 use Aura\Router\Map;
 use Alaress\Twig\Loader\IChainLoader;
+use Schoolbox\Admin\Profile\Editor\Payload;
+use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Menu\Icon\Mapper as IconMapper;
 use Schoolbox\Profile\Button\Mapper as ProfileButtonMapper;
@@ -27,42 +29,81 @@ class Module extends BaseModule
 {
     protected $basename = 'adminProfileButton';
 
+
     /**
-     * @inheritdoc
+     * Hook method for setting up routes via self::register()
+     *
+     * @return void
      */
-    public function initRoutes(string $basePath): void
+    protected function registerRoutes(): void
     {
-        $routes = [
-            'GET' => [
-                '' => 'getIndex',
-                '/create' => 'getCreate',
-                '/modify/{id}' => 'getModify',
-            ],
-            'POST' => [
-                '/delete' => 'postDelete',
-                '/order' => 'postOrder',
-                '/modify' => 'postModify',
-            ]
+        /* Keep an eye out on Granular Permissions epic SA-18424
+         * Hopefully there isn't a service permission that affects us here
+         * and we can continue to assume Superusers Only
+         */
+        $perms = new Rule\All(
+            new Rule\IsLoggedIn(),
+            new Rule\IsSuperuser()
+        );
+
+        $preloadRoleType = function ($params) {
+            return $this->preloadRoleType($params);
+        };
+
+        $preloadRoleTypeDefault = function ($params) {
+            return $this->preloadRoleTypeDefault($params);
+        };
+
+        $this->register('GET', '{/roleType}', 'getIndex', $perms, $preloadRoleTypeDefault);
+        $this->register('GET', '/create/{roleType}', 'getCreate', $perms, $preloadRoleType);
+        $this->register('GET', '/modify/{id}', 'getModify', $perms);
+        $this->register('POST', '/delete', 'postDelete', $perms);
+        $this->register('POST', '/order', 'postOrder', $perms);
+        $this->register('POST', '/modify', 'postModify', $perms);
+    }
+
+
+    /**
+     * Check that a valid and supported roletype was provided;
+     * Use a default value instead, if omitted
+     *
+     * @param array $params
+     * @return array
+     * @throws NotFound
+     */
+    private function preloadRoleTypeDefault(array $params): array
+    {
+        $roleType = $params['roleType'] ?? \Schoolbox\Role::STUDENT;
+
+        if (!isset(Payload::CONFIG_ROLETYPE[$roleType])) {
+            throw new NotFound('Roletype not provided', 400);
+        }
+
+        return [
+            'roleType' => $roleType,
         ];
-
-        foreach ($routes['GET'] as $path => $alias) {
-            $this->addGetRoute($alias, $basePath, $path);
-        }
-
-        foreach ($routes['POST'] as $path => $alias) {
-            $this->addPostRoute($alias, $basePath, $path);
-        }
     }
 
     /**
-     * @inheritdoc
+     * Check that a valid and supported roletype was provided
+     *
+     * @param array $params
+     * @return array
+     * @throws NotFound
      */
-    public function initRoutePermissions(Authorizer $authorizer): void
+    private function preloadRoleType(array $params): array
     {
-        $this
-            ->addRoutePermission($authorizer, '.*', new Rule\IsLoggedIn())
-            ->addRoutePermission($authorizer, '.*', new Rule\IsSuperuser());
+        $roleType = $params['roleType'] ?? null;
+
+        if (!isset(Payload::CONFIG_ROLETYPE[$roleType])) {
+            throw new NotFound('Roletype not provided', 400);
+        }
+
+        return [
+            'roleType' => $params['roleType'],
+        ];
     }
+
 
     /**
      * @inheritdoc

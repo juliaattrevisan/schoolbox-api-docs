@@ -30,21 +30,33 @@
         <div class="small-12 island {% if profile|length > 0 %}hide{% endif %}" id="profile-button-empty-state">
             <div class="empty-state">
                 <i class="icon-staff-students"></i>
-                <p><a href="{{ routeLookup('adminProfileButton.getCreate') }}">Add a custom button</a> to the profile page and 'My Students' dashboard component for certain users.</p>
+                <p><a href="{{ routeLookup('adminProfileButton.getCreate', {roleType: roleType}) }}">Add a custom button</a> to the profile page and 'My Students' dashboard component for certain users.</p>
             </div>
         </div>
 
         {% if profile | length > 0 %}
         <div class="small-12 island" id="profile-button-container">
+            <ul class="sub-nav">
+                {% for i in ['student', 'staff', 'parent'] %}
+                    {% set selected = '' %}
+
+                    {% if i == roleType %}
+                        {% set selected = 'class="active"' %}
+                    {% endif %}
+
+                    {% set route = routeLookup('adminProfileButton.getIndex', {roleType: i}) %}
+                    <li {{ selected|purify }}><a href="{{ route }}">{{ i|capitalize }}</a></li>
+                {% endfor %}
+            </ul>
 
             <div class="row actions-small-1">
                 <div class="list-item">
                     <div class="small-12 island">
-                        <h2 class="subheader">Profile Buttons</h2>
+                        <h2 class="subheader">{{ roleType|capitalize }} Profile Buttons</h2>
                     </div>
                 </div>
                 <nav>
-                    <a href="{{ routeLookup('adminProfileButton.getCreate') }}" class="icon-add" title="Create a new profile button"></a>
+                    <a href="{{ routeLookup('adminProfileButton.getCreate', {roleType: roleType}) }}" class="icon-add" title="Create a new profile button"></a>
                 </nav>
             </div>
 
@@ -80,7 +92,11 @@
                                 </div>
                                 <nav>
                                     <a class="icon-modify" title="Edit this profile button" href="{{ routeLookup('adminProfileButton.getModify', {id: item.id}) }}"></a>
+
+                                    {# Only custom buttons can be deleted #}
+                                    {% if item.isCustom %}
                                     <a class="icon-delete" data-delete="{{ item.id }}" title="Delete this profile button"></a>
+                                    {% endif %}
                                 </nav>
                             </div>
                         </li>

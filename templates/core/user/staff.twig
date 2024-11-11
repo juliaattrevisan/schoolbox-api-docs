@@ -105,34 +105,33 @@
             {% block buttons_island %}
                 <ul class='flex-list flex-wrap buttons'>
                     {% block buttons %}
-                        {% if eportfolioAuth %}
-                            {% block buttons_eportfolio %}
-                                <li>
-                                    <a href="/eportfolio/{{ user.getId() }}/profile"
-                                       class="icon-eportfolio">ePortfolio</a>
-                                </li>
-                            {% endblock buttons_eportfolio %}
-                        {% endif %}
+                        {# Special constraints that further reduce the payload I built
+                         # It uses the exact same philosophy as additionalConstraints for
+                         # rendering profile fields.
+                         #}
+                        {% set additionalConstraints = {
+                            'eportfolio': eportfolioAuth,
+                        } %}
 
                         {% if showButtons %}
-                            {% block buttons_calendar %}
-                                <li>
-                                    <a href='/calendar/{{ now.getURLDate() }}/{{ user.getId() }}'
-                                       class="icon-calendar">{{ locale.calendar.proper }}</a>
-                                </li>
-                            {% endblock buttons_calendar %}
+                            {% for button in buttons %}
+                                {% if additionalConstraints[button.type] ?? true %}
+                                    {% set text = button.text %}
 
-                            {% block buttons_timetable %}
-                                <li>
-                                    <a href="/timetable/{{ user.getId() }}"
-                                       class="icon-timetable">Timetable</a>
-                                </li>
-                            {% endblock buttons_timetable %}
+                                    {# A standard button whose urls need to be dynamically determined #}
+                                    {% set route = button.url %}
 
-                            {% for button in customButtons %}
-                                <li>
-                                    <a href="{{ button.url }}" title="{{ button.title }}" class="icon-{{ button.icon }} {{ button.css }}" target="{{ button.target }}">{{ button.text }}</a>
-                                </li>
+                                    {# Unique derivations #}
+                                    {% if button.type in ['calendar'] %}
+                                        {% set route = '/calendar/' ~  now.getURLDate() ~ '/' ~ user.id %}
+                                    {% endif %}
+
+                                    {% if route %}
+                                        <li>
+                                            <a href="{{ route }}" title="{{ button.title }}" class="icon-{{ button.icon }} {{ button.css }}" target="{{ button.target }}">{{ text }}</a>
+                                        </li>
+                                    {% endif %}
+                                {% endif %}
                             {% endfor %}
                         {% endif %}
                     {% endblock buttons %}

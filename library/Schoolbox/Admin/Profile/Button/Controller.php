@@ -21,33 +21,6 @@ use Schoolbox\Error\Mapper as ErrorMapper;
  */
 class Controller extends Base
 {
-    /** @var ErrorMapper $errorMapper */
-    private $errorMapper;
-
-    /** @var IconMapper $iconMapper */
-    private $iconMapper;
-
-    /** @var ProfileButtonMapper $profileButtonMapper */
-    private $profileButtonMapper;
-
-    /** @var Campus\Availability\Mapper $campusAvailabilityMapper */
-    private $campusAvailabilityMapper;
-
-    /** @var Role\Availability\Mapper $roleAvailabilityMapper */
-    private $roleAvailabilityMapper;
-
-    /** @var Campus\Visibility\Mapper $campusVisibilityMapper */
-    private $campusVisibilityMapper;
-
-    /** @var Role\Visibility\Mapper $roleVisibilityMapper */
-    private $roleVisibilityMapper;
-
-    /** @var RoleMapper $roleMapper */
-    private $roleMapper;
-
-    /** @var CampusMapper $campusMapper */
-    private $campusMapper;
-
     /**
      * Controller constructor.
      * @param ErrorMapper                $errorMapper
@@ -61,25 +34,16 @@ class Controller extends Base
      * @param Role\Visibility\Mapper     $roleVisibilityMapper
      */
     public function __construct(
-        ErrorMapper $errorMapper,
-        IconMapper $iconMapper,
-        ProfileButtonMapper $profileButtonMapper,
-        RoleMapper $roleMapper,
-        CampusMapper $campusMapper,
-        Campus\Availability\Mapper $campusAvailabilityMapper,
-        Role\Availability\Mapper $roleAvailabilityMapper,
-        Campus\Visibility\Mapper $campusVisibilityMapper,
-        Role\Visibility\Mapper $roleVisibilityMapper
+        private ErrorMapper $errorMapper,
+        private IconMapper $iconMapper,
+        private ProfileButtonMapper $profileButtonMapper,
+        private RoleMapper $roleMapper,
+        private CampusMapper $campusMapper,
+        private Campus\Availability\Mapper $campusAvailabilityMapper,
+        private Role\Availability\Mapper $roleAvailabilityMapper,
+        private Campus\Visibility\Mapper $campusVisibilityMapper,
+        private Role\Visibility\Mapper $roleVisibilityMapper
     ) {
-        $this->errorMapper = $errorMapper;
-        $this->iconMapper = $iconMapper;
-        $this->profileButtonMapper = $profileButtonMapper;
-        $this->roleMapper = $roleMapper;
-        $this->campusMapper = $campusMapper;
-        $this->campusAvailabilityMapper = $campusAvailabilityMapper;
-        $this->roleAvailabilityMapper = $roleAvailabilityMapper;
-        $this->campusVisibilityMapper = $campusVisibilityMapper;
-        $this->roleVisibilityMapper = $roleVisibilityMapper;
     }
 
     /**
@@ -88,9 +52,11 @@ class Controller extends Base
      * @api   GET /adminv2/profile-button
      * @since 182
      */
-    public function getIndex(): void
+    public function getIndex(string $roleType): void
     {
-        $buttons = $this->profileButtonMapper->findAll()->sortBy('sortOrder', 'asc');
+        $buttons = $this->profileButtonMapper
+            ->findByColumn('roletype', $roleType)
+            ->sortBy('sortOrder', 'asc');
 
         $roleAvailabilitySelected = [];
         $campusAvailabilitySelected = [];
@@ -117,10 +83,10 @@ class Controller extends Base
             [
                 'pageCurrent' => $this->routeGenerator->generate('adminProfileButton.getIndex'),
                 'allBreadcrumbs' => (new Subnav($this->getConfigLoader(), $this->getUser()))->generateBreadcrumbs($this->routeGenerator->generate('adminProfileButton.getIndex')),
-                'profile' => $this->profileButtonMapper->findAll()->sortBy('sortOrder', 'asc'),
+                'profile' => $buttons,
                 'roles' => $this->roleMapper->findAll()->sortBy('name', 'asc'),
                 'campuses' => $this->campusMapper->findAll()->sortBy('name', 'asc'),
-
+                'roleType' => $roleType,
                 'roleAvailabilitySelected' => $roleAvailabilitySelected,
                 'campusAvailabilitySelected' => $campusAvailabilitySelected,
                 'roleVisibilitySelected' => $roleVisibilitySelected,
@@ -170,7 +136,6 @@ class Controller extends Base
                 'icons' => $this->iconMapper->findAll()->sortBy('title', 'asc'),
                 'roles' => $this->roleMapper->findAll()->sortBy('name', 'asc'),
                 'campuses' => $this->campusMapper->findAll()->sortBy('name', 'asc'),
-
                 'roleAvailabilitySelected' => $roleAvailabilitySelected,
                 'campusAvailabilitySelected' => $campusAvailabilitySelected,
                 'roleVisibilitySelected' => $roleVisibilitySelected,
@@ -183,11 +148,9 @@ class Controller extends Base
     /**
      * Display create screen
      *
-     * @api   GET /adminv2/insert
-     * @since 182
-     *
+     * @api   GET /adminv2/profile-button/create/{roleType}
      */
-    public function getCreate(): void
+    public function getCreate(string $roleType): void
     {
         $this->response = $this->responseFromTemplate(
             '@adminProfileButton/modify.twig',
@@ -199,7 +162,8 @@ class Controller extends Base
                 ),
                 'icons' => $this->iconMapper->findAll()->sortBy('title', 'asc'),
                 'roles' => $this->roleMapper->findAll()->sortBy('name', 'asc'),
-                'campuses' => $this->campusMapper->findAll()->sortBy('name', 'asc')
+                'campuses' => $this->campusMapper->findAll()->sortBy('name', 'asc'),
+                'roleType' => $roleType
             ],
             'Admin - Create Profile Button'
         );
@@ -237,8 +201,17 @@ class Controller extends Base
     public function postDelete(): void
     {
         $post = $this->requestPost;
+
         if (!empty($post['id'])) {
-            $this->profileButtonMapper->deleteByColumn('id', $post['id']);
+            $button = $this->profileButtonMapper->findById($post['id']);
+
+            /* System buttons cannot be deleted
+             */
+            if ($button->isSystem()) {
+                throw new \DomainException('System profile buttons cannot be deleted.');
+            }
+
+            $this->profileButtonMapper->delete($button);
         }
     }
 
@@ -255,7 +228,11 @@ class Controller extends Base
         if (!empty($post['id'])) {
             $item = $this->profileButtonMapper->findById($post['id']);
         } else {
-            $item = new ProfileButton();
+            /* You can only create Custom Buttons, not System Buttons.
+             */
+            $item = (new ProfileButton())
+                ->setType(ProfileButton::BUTTON_CUSTOM)
+                ->setRoleType($post['roleType']);
 
             $itemOrder = $this->profileButtonMapper->findAll([
                 'limit' => 1,
@@ -276,16 +253,22 @@ class Controller extends Base
          *   - Must have a url
          *   - Must have chosen a campus and role for Availability and also for Visibility
          */
-        if (!(new ValidButton())->isSatisfiedBy($post->getArrayCopy())) {
+        if (!(new ValidButton())->isSatisfiedBy($item->getType(), $post->getArrayCopy())) {
             throw $this->errorMapper->generateException(\Schoolbox\Error\Mapper::ERROR_INFORMATION_MISSING);
         }
 
-        $item->setText($post['text']);
-        $item->setTitle($post['title']);
-        $item->setIcon($post['icon']);
-        $item->setUrl($post['url']);
-        $item->setCss(trim($post['css']));
-        $item->setTarget($post['target']);
+        $item->setText(trim((string)$post['text']));
+        $item->setTitle(trim((string)$post['title']));
+        $item->setIcon(trim((string)$post['icon']));
+
+        /* Only set urls for Custom Buttons
+         */
+        if ($item->isCustom()) {
+            $item->setUrl($post['url'] ?? '');
+        }
+
+        $item->setCss(trim((string)$post['css']));
+        $item->setTarget(trim((string)$post['target']));
 
         $this->profileButtonMapper->save($item);
 
@@ -333,6 +316,8 @@ class Controller extends Base
             }
         }
 
-        $this->response = $this->redirectAfterPost('/adminv2/profile-button');
+        $route = $this->routeGenerator->generate('adminProfileButton.getIndex', ['roleType' => $item->getRoleType()]);
+
+        $this->response = $this->redirectAfterPost($route);
     }
 }

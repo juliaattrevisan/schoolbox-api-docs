@@ -1,0 +1,23 @@
+-- Back up ol' boy
+
+CREATE TABLE `_profile_button` AS SELECT * FROM profile_button;
+
+-- Augment the current table with two new columns
+-- Add support for categorisation of buttons
+-- Add support for knowing the role type for a button
+
+-- roletype is nullable for now, to ease migration
+-- I don't want default values to cloud what I'm seeing here
+
+ALTER TABLE `profile_button`
+    ADD COLUMN `roletype` ENUM('student', 'staff', 'parent') NULL DEFAULT NULL AFTER `id`,
+    ADD COLUMN `type` VARCHAR(255) NOT NULL DEFAULT 'custom' AFTER `roletype`;
+
+create index profile_button_roletype_index
+    on profile_button (roletype);
+
+-- Missing icons need to exist, otherwise you'll never be able
+-- to update these buttons properly
+
+INSERT INTO menu_icons (name, title)
+VALUES ('geosnapshot', 'Geosnapshot');

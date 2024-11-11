@@ -10,6 +10,10 @@ use Schoolbox\Profile\Button\Model;
 use Schoolbox\Collection;
 use Schoolbox\User;
 
+/**
+ * @method Model createModel($idValue = null)
+ * @method Model findById($identifierValue)
+ */
 class Mapper extends BaseMapper
 {
     /**
@@ -20,6 +24,8 @@ class Mapper extends BaseMapper
         $this->hasTable('profile_button');
         $this->hasModel(Model::class);
         $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
+        $this->uses('roletype', self::TYPE_STRING);
+        $this->uses('type', self::TYPE_STRING);
         $this->uses('sort_order', self::TYPE_INTEGER);
         $this->uses('title', self::TYPE_STRING);
         $this->uses('text', self::TYPE_STRING);
@@ -63,6 +69,7 @@ class Mapper extends BaseMapper
                 AND cv.campus_id IN " . $this->getPredicateBuilder()->getArrayPlaceholders($viewerCampusList, 'viewercampus') . "
                 AND rv.role_id = :visibilityRoleId
                 AND profile_button.deleted_at IS NULL
+                AND profile_button.roletype = :roletype
                 ORDER BY sort_order ASC
         ";
 
@@ -71,7 +78,8 @@ class Mapper extends BaseMapper
 
         $params = array_merge($vieweeParams, $viewerParams, [
             'availabilityRoleId' => $viewee->getRole()->getId(),
-            'visibilityRoleId' => $viewer->getRole()->getId()
+            'visibilityRoleId' => $viewer->getRole()->getId(),
+            'roletype' => $viewee->getRole()->getType()
         ]);
 
         $statement = $this->getDatabase()->prepare($query);

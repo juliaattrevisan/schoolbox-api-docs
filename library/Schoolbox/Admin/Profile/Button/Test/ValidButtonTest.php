@@ -1,7 +1,7 @@
 <?php
 
 /**
- * ValidationTest
+ * ValidButtonTest
  *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
@@ -20,11 +20,11 @@ class ValidButtonTest extends TestCase
      *
      * @return array
      */
-    public static function provider_validButtonRequirements(): array
+    public static function providerValidButtonRequirements(): array
     {
-
         return [
-            'Valid 1' => [
+            'Valid Custom 1' => [
+                'custom',
                 [
                     'text' => 'cat',
                     'url' => 'http://www.theage.com.au',
@@ -35,7 +35,8 @@ class ValidButtonTest extends TestCase
                 ],
                 true
             ],
-            'Valid 2' => [
+            'Valid Custom 2' => [
+                'custom',
                 [
                     'text' => 'cat',
                     'url' => 'http://www.theage.com.au',
@@ -46,7 +47,36 @@ class ValidButtonTest extends TestCase
                 ],
                 true
             ],
-            'Invalid: missing all pieces 1' => [
+            /* System Buttons have system-generated urls; they are not user-defined.
+             * Urls from frontend are ignored entirely and weren't mandatory.
+             * Urls are ignored in backend too, and will not update a model
+             */
+            'Valid System 1' => [
+                'duework',
+                [
+                    'text' => 'cat',
+                    'url' => '',
+                    'campusAvailability' => [2],
+                    'roleAvailability' => [1],
+                    'campusVisibility' => [2],
+                    'roleVisibility' => [1]
+                ],
+                true
+            ],
+            'Valid System 2' => [
+                'duework',
+                [
+                    'text' => 'cat',
+                    'url' => 'https://www.schoolbox.com.au',
+                    'campusAvailability' => [2],
+                    'roleAvailability' => [1],
+                    'campusVisibility' => [2],
+                    'roleVisibility' => [1]
+                ],
+                true
+            ],
+            'Invalid: missing text and url 1' => [
+                'custom',
                 [
                     'text' => null,
                     'url' => null,
@@ -57,7 +87,8 @@ class ValidButtonTest extends TestCase
                 ],
                 false
             ],
-            'Invalid: missing all pieces 2' => [
+            'Invalid: missing text and url 2' => [
+                'custom',
                 [
                     'text' => '',
                     'url' => '',
@@ -68,7 +99,8 @@ class ValidButtonTest extends TestCase
                 ],
                 false
             ],
-            'Invalid: missing all pieces 3' => [
+            'Invalid: missing text and url 3' => [
+                'custom',
                 [
                     'text' => '',
                     'url' => '',
@@ -79,62 +111,8 @@ class ValidButtonTest extends TestCase
                 ],
                 false
             ],
-            'Invalid: missing all pieces 4' => [
-                [
-                    'text' => 'cat',
-                    'url' => '',
-                    'campusAvailability' => [],
-                    'roleAvailability' => [],
-                    'campusVisibility' => [],
-                    'roleVisibility' => []
-                ],
-                false
-            ],
-            'Invalid: missing all pieces 5' => [
-                [
-                    'text' => 'cat',
-                    'url' => 'http://www.theage.com.au',
-                    'campusAvailability' => [],
-                    'roleAvailability' => [],
-                    'campusVisibility' => [],
-                    'roleVisibility' => []
-                ],
-                false
-            ],
-            'Invalid: missing all pieces 6' => [
-                [
-                    'text' => 'cat',
-                    'url' => 'http://www.theage.com.au',
-                    'campusAvailability' => [1],
-                    'roleAvailability' => [],
-                    'campusVisibility' => [],
-                    'roleVisibility' => []
-                ],
-                false
-            ],
-            'Invalid: missing all pieces 7' => [
-                [
-                    'text' => 'cat',
-                    'url' => 'http://www.theage.com.au',
-                    'campusAvailability' => [1],
-                    'roleAvailability' => [2],
-                    'campusVisibility' => [],
-                    'roleVisibility' => []
-                ],
-                false
-            ],
-            'Invalid: missing all pieces 8' => [
-                [
-                    'text' => 'cat',
-                    'url' => 'http://www.theage.com.au',
-                    'campusAvailability' => [1],
-                    'roleAvailability' => [2],
-                    'campusVisibility' => [3],
-                    'roleVisibility' => []
-                ],
-                false
-            ],
-            'Invalid: missing all pieces 9' => [
+            'Invalid: missing text and url 4' => [
+                'custom',
                 [
                     'text' => '',
                     'url' => '',
@@ -145,51 +123,20 @@ class ValidButtonTest extends TestCase
                 ],
                 false
             ],
-            'Invalid: missing all pieces 10' => [
+            'Invalid: missing url 1' => [
+                'custom',
                 [
                     'text' => 'cat',
-                    'url' => 'http://www.theage.com.au',
-                    'campusAvailability' => [],
-                    'roleAvailability' => [2],
-                    'campusVisibility' => [3],
-                    'roleVisibility' => [4]
-                ],
-                false
-            ],
-            'Invalid: missing all pieces 11' => [
-                [
-                    'text' => 'cat',
-                    'url' => 'http://www.theage.com.au',
-                    'campusAvailability' => [],
-                    'roleAvailability' => [],
-                    'campusVisibility' => [3],
-                    'roleVisibility' => [4]
-                ],
-                false
-            ],
-            'Invalid: missing all pieces 12' => [
-                [
-                    'text' => 'cat',
-                    'url' => 'http://www.theage.com.au',
+                    'url' => '',
                     'campusAvailability' => [],
                     'roleAvailability' => [],
                     'campusVisibility' => [],
-                    'roleVisibility' => [4]
+                    'roleVisibility' => []
                 ],
                 false
             ],
-            'Invalid: missing all pieces 13' => [
-                [
-                    'text' => 'cat',
-                    'url' => 'http://www.theage.com.au',
-                    'campusAvailability' => [],
-                    'roleAvailability' => [],
-                    'campusVisibility' => [],
-                    'roleVisibility' => [4]
-                ],
-                false
-            ],
-            'Invalid: missing all pieces 14' => [
+            'Invalid: missing url 2' => [
+                'custom',
                 [
                     'text' => 'cat',
                     'url' => '',
@@ -200,7 +147,8 @@ class ValidButtonTest extends TestCase
                 ],
                 false
             ],
-            'Invalid: missing all pieces 15' => [
+            'Invalid: missing text 1' => [
+                'custom',
                 [
                     'text' => '',
                     'url' => 'http://www.theage.com.au',
@@ -210,18 +158,117 @@ class ValidButtonTest extends TestCase
                     'roleVisibility' => [4]
                 ],
                 false
+            ],
+            'Valid: availability/visibility optional 1' => [
+                'custom',
+                [
+                    'text' => 'cat',
+                    'url' => 'http://www.theage.com.au',
+                    'campusAvailability' => [],
+                    'roleAvailability' => [],
+                    'campusVisibility' => [],
+                    'roleVisibility' => []
+                ],
+                true
+            ],
+            'Valid: availability/visibility optional 2' => [
+                'custom',
+                [
+                    'text' => 'cat',
+                    'url' => 'http://www.theage.com.au',
+                    'campusAvailability' => [1],
+                    'roleAvailability' => [],
+                    'campusVisibility' => [],
+                    'roleVisibility' => []
+                ],
+                true
+            ],
+            'Valid: availability/visibility optional 3' => [
+                'custom',
+                [
+                    'text' => 'cat',
+                    'url' => 'http://www.theage.com.au',
+                    'campusAvailability' => [1],
+                    'roleAvailability' => [2],
+                    'campusVisibility' => [],
+                    'roleVisibility' => []
+                ],
+                true
+            ],
+            'Valid: availability/visibility optional 4' => [
+                'custom',
+                [
+                    'text' => 'cat',
+                    'url' => 'http://www.theage.com.au',
+                    'campusAvailability' => [1],
+                    'roleAvailability' => [2],
+                    'campusVisibility' => [3],
+                    'roleVisibility' => []
+                ],
+                true
+            ],
+
+            'Valid: availability/visibility optional 5' => [
+                'custom',
+                [
+                    'text' => 'cat',
+                    'url' => 'http://www.theage.com.au',
+                    'campusAvailability' => [],
+                    'roleAvailability' => [2],
+                    'campusVisibility' => [3],
+                    'roleVisibility' => [4]
+                ],
+                true
+            ],
+            'Valid: availability/visibility optional 6' => [
+                'custom',
+                [
+                    'text' => 'cat',
+                    'url' => 'http://www.theage.com.au',
+                    'campusAvailability' => [],
+                    'roleAvailability' => [],
+                    'campusVisibility' => [3],
+                    'roleVisibility' => [4]
+                ],
+                true
+            ],
+            'Valid: availability/visibility optional 7' => [
+                'custom',
+                [
+                    'text' => 'cat',
+                    'url' => 'http://www.theage.com.au',
+                    'campusAvailability' => [],
+                    'roleAvailability' => [],
+                    'campusVisibility' => [],
+                    'roleVisibility' => [4]
+                ],
+                true
+            ],
+            'Valid: availability/visibility optional 8' => [
+                'custom',
+                [
+                    'text' => 'cat',
+                    'url' => 'http://www.theage.com.au',
+                    'campusAvailability' => [],
+                    'roleAvailability' => [],
+                    'campusVisibility' => [],
+                    'roleVisibility' => [4]
+                ],
+                true
             ],
         ];
     }
 
     /**
+     * @param string $type
+     * @param array $post
      * @param int   $expected
      */
-    #[\PHPUnit\Framework\Attributes\DataProvider('provider_validButtonRequirements')]
-    public function testValidButtonRequirements(array $post, $expected): void
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerValidButtonRequirements')]
+    public function testValidButtonRequirements(string $type, array $post, $expected): void
     {
         $validation = new ValidButton();
 
-        $this->assertEquals($expected, $validation->isSatisfiedBy($post));
+        $this->assertEquals($expected, $validation->isSatisfiedBy($type, $post));
     }
 }

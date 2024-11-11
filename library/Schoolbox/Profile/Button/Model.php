@@ -7,52 +7,84 @@ namespace Schoolbox\Profile\Button;
 use Schoolbox\ISoftDeletable;
 use Alaress_Date_Format;
 use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
+use Schoolbox\Mapper\Traits\Model\Id;
 
 class Model implements ISoftDeletable
 {
+    use Id;
     use DeletedAtDate;
 
-    /** @var int */
-    protected $id;
-
-    /** @var int */
-    protected $sortOrder;
-
-    /** @var string|null */
-    protected $title;
-
-    /** @var string */
-    protected $text;
-
-    /** @var string|null */
-    protected $icon;
-
-    /** @var string */
-    protected $url;
-
-    /** @var string */
-    protected $css;
-
-    /** @var string|null */
-    protected $target;
 
     /**
-     * @param int $id
-     * @return self
+     * This const conclusively identifies a Custom Button
+     * Everything else is deemed to be a System Button
      */
-    public function setId(int $id): self
-    {
-        $this->id = $id;
-        return $this;
-    }
+    public const BUTTON_CUSTOM = 'custom';
+
+
+    /** @var int */
+    private int $sortOrder;
+
+    /** @var string|null */
+    private ?string $title;
+
+    /** @var string */
+    private string $text;
+
+    /** @var string|null */
+    private ?string $icon;
+
+    /** @var string */
+    private string $url;
+
+    /** @var string|null */
+    private ?string $css;
+
+    /** @var string|null */
+    private ?string $target;
+
 
     /**
-     * @return null|int
+     * One of student, staff, parent;
+     * denotes a roletype to which a button belongs
+     *
+     * @var string
      */
-    public function getId(): ?int
+    private string $roleType;
+
+
+    /**
+     * A string that helps identify truly Custom buttons made by schools vs the
+     * special system buttons that we have by default. It'll be "custom" for the
+     * ones created by schools; ours will have a unique string that conclusively
+     * identifies a system button even when the school totally pollutes the data
+     *
+     * @var string|null
+     */
+    private ?string $type = null;
+
+
+    /**
+     * Determines whether this instance is a System Button or a Custom Button
+     *
+     * @return bool
+     */
+    public function isCustom(): bool
     {
-        return $this->id;
+        return self::BUTTON_CUSTOM === $this->type;
     }
+
+
+    /**
+     * A complementary implementation of isCustom();
+     * )
+     * @return bool
+     */
+    public function isSystem(): bool
+    {
+        return !$this->isCustom();
+    }
+
 
     /**
      * @param string|null $title
@@ -180,5 +212,45 @@ class Model implements ISoftDeletable
     public function getSortOrder(): int
     {
         return $this->sortOrder;
+    }
+
+
+    /**
+     * @return string|null
+     */
+    public function getType(): ?string
+    {
+        return $this->type;
+    }
+
+
+    /**
+     * @param string|null $type
+     * @return $this
+     */
+    public function setType(?string $type): self
+    {
+        $this->type = $type;
+        return $this;
+    }
+
+
+    /**
+     * @return string
+     */
+    public function getRoleType(): string
+    {
+        return $this->roleType;
+    }
+
+
+    /**
+     * @param string $roleType
+     * @return $this
+     */
+    public function setRoleType(string $roleType): self
+    {
+        $this->roleType = $roleType;
+        return $this;
     }
 }
