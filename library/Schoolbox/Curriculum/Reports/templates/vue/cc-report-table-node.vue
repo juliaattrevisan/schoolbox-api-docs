@@ -149,7 +149,14 @@ const showNode = window.Vue.computed(() => {
 
 <template>
     <tr v-if="showNode">
-        <th scope="row" class="node__name" :style="{ paddingInlineStart: paddingStart }">{{ title }}</th>
+        <th
+            scope="row"
+            class="node__name l-flex l-flex--align-center l-gap-s f-no-margins"
+            :style="{ paddingInlineStart: paddingStart }"
+        >
+            <button class="expand-button expander icon-down-arrow l-flex l-flex--center" aria-label="Expand"></button
+            >{{ title }}
+        </th>
         <template v-if="node.code">
             <td :class="`u-key-bkg ${nodeUsageCount === 0 ? 'u-highlight' : ''}`">
                 {{ nodeUsageCount }}
@@ -187,4 +194,8 @@ const showNode = window.Vue.computed(() => {
     </template>
 </template>
 
-<style scoped></style>
+<style scoped>
+.expand-button {
+    background: none;
+}
+</style>
