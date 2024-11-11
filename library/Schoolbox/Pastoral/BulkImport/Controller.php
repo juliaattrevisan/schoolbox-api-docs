@@ -98,9 +98,10 @@ class Controller extends Base
      */
     public function getList(): void
     {
-        // Pagination
-        $paginator = (new Paginator\UrlPaginator())
-            ->setUrl($this->routeGenerator->generate('pastoralBulkImport.getList'))
+        // Set up pagination
+        $currentUrl = $this->routeGenerator->generate('pastoralBulkImport.getList');
+        $paginator  = (new Paginator\UrlPaginator())
+            ->setUrl($currentUrl)
             ->setPaginator(new Paginator\Paginator())
             ->setPageSize(self::PAGE_SIZE)
             ->setParam(self::PAGE_QUERY_STRING_PARAM)
@@ -113,7 +114,7 @@ class Controller extends Base
             '@pastoralBulkImport/list.twig',
             [
                 'imports' => $this->pastoralBulkImportMapper->findAll([
-                    'order' => [
+                    'order'  => [
                         'created_at' => $this->pastoralBulkImportMapper::SORT_ORDER_DESC,
                         'id'         => $this->pastoralBulkImportMapper::SORT_ORDER_DESC,
                     ],
@@ -122,6 +123,12 @@ class Controller extends Base
                 ]),
                 'paginator'   => $paginator,
                 'currentPage' => $currentPage,
+
+                // Encode return URL separately, so that page number is included
+                'encodedReturnUrl' => Redirect::encode(
+                    (new Uri($currentUrl))
+                        ->withQuery(http_build_query([self::PAGE_QUERY_STRING_PARAM => $currentPage]))
+                ),
             ],
         );
     }
