@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\Pastoral\BulkImport;
 
+use Alaress\Paginator;
 use Alaress\Web\Controller\Base;
 use Alaress_Date_Format;
 use League\Flysystem\FilesystemException;
@@ -37,6 +38,16 @@ use ZipArchive;
  */
 class Controller extends Base
 {
+    /**
+     * How many imports are shown per list page?
+     */
+    private const PAGE_SIZE = 10;
+
+    /**
+     * Which query string param is the page number in?
+     */
+    private const PAGE_QUERY_STRING_PARAM = 'page';
+
     /**
      * Constructor
      *
@@ -87,8 +98,17 @@ class Controller extends Base
      */
     public function getList(): void
     {
+        // Pagination
+        $paginator = (new Paginator\UrlPaginator())
+            ->setUrl($this->routeGenerator->generate('pastoralBulkImport.getList'))
+            ->setPaginator(new Paginator\Paginator())
+            ->setPageSize(self::PAGE_SIZE)
+            ->setParam(self::PAGE_QUERY_STRING_PARAM)
+            ->setTotal($this->pastoralBulkImportMapper->countAll());
+
         // Show x number of previous imports, and when they were imported, and
         // their undo status.
+        $currentPage    = $this->requestQuery->get(self::PAGE_QUERY_STRING_PARAM, 1);
         $this->response = $this->responseFromTemplate(
             '@pastoralBulkImport/list.twig',
             [
@@ -96,8 +116,12 @@ class Controller extends Base
                     'order' => [
                         'created_at' => $this->pastoralBulkImportMapper::SORT_ORDER_DESC,
                         'id'         => $this->pastoralBulkImportMapper::SORT_ORDER_DESC,
-                    ]
+                    ],
+                    'limit'  => $paginator->getPageSize(),
+                    'offset' => $paginator->getOffset($currentPage),
                 ]),
+                'paginator'   => $paginator,
+                'currentPage' => $currentPage,
             ],
         );
     }

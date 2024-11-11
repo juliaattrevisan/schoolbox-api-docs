@@ -96,6 +96,10 @@
                         </li>
                     {% endfor %}
                 </ul>
+                {% include 'sub/paginator.twig' with {
+                    paginator: paginator,
+                    page: currentPage,
+                } %}
             </section>
         {% else %}
             <div class="empty-state">
