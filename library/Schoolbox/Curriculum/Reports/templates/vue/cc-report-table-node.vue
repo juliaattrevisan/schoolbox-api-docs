@@ -27,6 +27,8 @@ const { title } = useNodeTitle(props.node);
  */
 const paddingStart = window.Vue.computed(() => `calc(${props.depth * 0.75}rem + 0.625rem)`);
 
+// #region usage counts
+
 /**
  * Get the total usage count for a unit, with the selected report options considered
  * @param $course - the course to get the usage count for
@@ -145,6 +147,22 @@ const showNode = window.Vue.computed(() => {
     // otherwise, only show the node if it has no usages
     return (hasNoCourseUsages.value || hasNoUnitUsages.value) && filtersStore.onlyShowGaps;
 });
+
+// #endregion
+
+// #region expand/collapse
+
+const isExpanded = window.Vue.ref(props.depth < 1); // to hide any grandchild and below nodes by default
+const expandTitle = window.Vue.computed(() => (isExpanded.value ? "Collapse" : "Expand"));
+
+/**
+ * To toggle the expanded state of the node
+ */
+function onExpandClicked(): void {
+    isExpanded.value = !isExpanded.value;
+}
+
+// #endregion
 </script>
 
 <template>
@@ -154,7 +172,12 @@ const showNode = window.Vue.computed(() => {
             class="node__name l-flex l-flex--align-center l-gap-s f-no-margins"
             :style="{ paddingInlineStart: paddingStart }"
         >
-            <button class="expand-button expander icon-down-arrow l-flex l-flex--center" aria-label="Expand"></button
+            <button
+                class="expand-button expander icon-down-arrow l-flex l-flex--center"
+                :aria-label="expandTitle"
+                :title="expandTitle"
+                @click="onExpandClicked"
+            ></button
             >{{ title }}
         </th>
         <template v-if="node.code">
@@ -185,12 +208,14 @@ const showNode = window.Vue.computed(() => {
         </template>
     </tr>
     <template v-if="props.node.children && props.node.children.length > 0">
-        <cc-report-table-node
-            v-for="child in props.node.children"
-            :key="child.id"
-            :node="child"
-            :depth="props.depth + 1"
-        />
+        <template v-if="isExpanded">
+            <cc-report-table-node
+                v-for="child in props.node.children"
+                :key="child.id"
+                :node="child"
+                :depth="props.depth + 1"
+            />
+        </template>
     </template>
 </template>
 
