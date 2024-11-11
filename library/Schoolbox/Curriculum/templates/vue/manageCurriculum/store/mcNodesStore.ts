@@ -58,6 +58,7 @@ export const useNodesStore = defineStore("mcNodes", () => {
                 getUsage: "",
                 read: "",
                 update: "",
+                getExport: "",
             }, // TODO: ... review this, it seems like it could lead to a bug
             _usageCounts: {
                 course: 0,
