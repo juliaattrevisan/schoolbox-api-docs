@@ -66,6 +66,9 @@ class Module extends BaseModule
                     if (!$import->isImported()) {
                         throw new Failure\InvalidPath('Import has not yet been run: cannot undo');
                     }
+                    if ($import->isUndone()) {
+                        throw new Failure\InvalidPath('Import has already been undone: cannot undo again');
+                    }
                 }
             ),
         );

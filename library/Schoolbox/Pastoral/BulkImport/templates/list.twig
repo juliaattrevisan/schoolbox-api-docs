@@ -33,31 +33,45 @@
                                 {% endif %}
                                 {% set undoRoute = routeLookupIfAuthorized('pastoralBulkImport.postUndoImport', {id: import.id, import: import}) %}
                                 {% if undoRoute %}
-                                    <form id="postUndoImport-{{ import.id }}" action="{{ runRoute }}" method="post"></form>
+                                    <form id="postUndoImport-{{ import.id }}" action="{{ undoRoute }}" method="post"></form>
                                 {% endif %}
                                 <div class="list-item">
                                     <div class="card small-12">
                                         <h3>
                                             {% if getRoute %}
-                                                <a href="{{ getRoute }}">{{ import.heading }}</a>
+                                                <a href="{{ getRoute }}" {% if import.undone %}class="strike"{% endif %}>{{ import.heading }}</a>
                                             {% else %}
-                                                {{ import.heading }}
+                                                <span {% if import.undone %}class="strike"{% endif %}>{{ import.heading }}</span>
                                             {% endif %}
                                         </h3>
 
                                         {# Metadata: when it was imported, when it was undone #}
                                         <p class="meta">
                                             Created {{ import.createdAt.local }} by
-                                            {% if import.owner.deleted %}
-                                                {{ report.updatedBy.fullname }}
-                                            {% else %}
+                                            {% if import.owner.deleted -%}
+                                                {{ report.owner.fullname }}
+                                            {%- else -%}
                                                 <a href="/search/user/{{ import.owner.id }}" title="{{ import.owner.fullname }}">{{ import.owner.fullname }}</a>
-                                            {% endif %}
+                                            {%- endif -%}.
                                         </p>
 
                                         <p class="meta">
-                                            {% if import.importedAt %}
-                                                Imported {{ import.importedAt.local }}.
+                                            {% if import.imported %}
+                                                Imported {{ import.importedAt.local }} by
+                                                {% if import.importedBy.deleted -%}
+                                                    {{ report.importedBy.fullname }}
+                                                {%- else -%}
+                                                    <a href="/search/user/{{ import.owner.id }}" title="{{ import.importedBy.fullname }}">{{ import.importedBy.fullname }}</a>
+                                                {%- endif -%}
+
+                                                {% if import.undone -%}
+                                                    , undone {{ import.undoneAt.local }} by
+                                                    {% if import.undoneBy.deleted -%}
+                                                        {{ report.undoneBy.fullname }}
+                                                    {%- else -%}
+                                                        <a href="/search/user/{{ import.owner.id }}" title="{{ import.undoneBy.fullname }}">{{ import.undoneBy.fullname }}</a>
+                                                    {%- endif -%}
+                                                {%- endif -%}.
                                             {% else %}
                                                 Not yet imported.
                                             {% endif %}
@@ -106,7 +120,7 @@
                     text: 'Are you sure you want to run this import? This will create pastoral records.',
                     confirmEvent: function (el) {
                         // Create a form and submit it?
-                        let $form = $(el.attr('data-form-id'));
+                        let $form = $('#' + el.attr('data-form-id'));
                         $form.submit();
                     }
                 });
@@ -114,10 +128,10 @@
             .on('click', '[data-action="undo"]', function(event) {
                 event.preventDefault();
                 $(this).confirmDialog({
-                    text: 'Are you sure you want to undo this import? This will delete any pastoral records which were created.',
+                    text: 'Are you sure you want to undo this import? This will delete any pastoral records which were created by this import.',
                     confirmEvent: function (el) {
                         // Create a form and submit it?
-                        let $form = $(el.attr('data-form-id'));
+                        let $form = $('#' + el.attr('data-form-id'));
                         $form.submit();
                     }
                 });
