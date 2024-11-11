@@ -11,10 +11,7 @@
 namespace Schoolbox\Curriculum;
 
 use Alaress\Web\Controller\Base;
-use Schoolbox\Admin\HealthCheck\Helper;
 use Schoolbox\Config\ConfigMapper;
-use Schoolbox\Curriculum\Node;
-use function Symfony\Component\Translation\t;
 
 class Controller extends Base
 {
