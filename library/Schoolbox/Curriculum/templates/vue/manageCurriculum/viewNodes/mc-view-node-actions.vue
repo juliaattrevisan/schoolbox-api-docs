@@ -50,7 +50,7 @@ function onUpdateToggleSelected(): void {
         :title="`Export ${props.title}`"
         data-test-export
     >
-      Export {{ props.title }}
+        Export {{ props.title }}
     </a>
     <button
         :class="`button-action-option ${props.isUpdating ? 'icon-close' : 'icon-modify'}`"
