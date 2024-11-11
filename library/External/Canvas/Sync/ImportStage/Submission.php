@@ -11,6 +11,7 @@ declare(strict_types=1);
 namespace External\Canvas\Sync\ImportStage;
 
 use Alaress\Database\Connector\IConnector;
+use Alaress\Html\ToText as Html2Text;
 use External\Canvas\Importer\CanvasDb;
 use External\Canvas\Sync\Bridge\Assignment;
 use Psr\Log\LoggerInterface;
@@ -245,13 +246,16 @@ class Submission extends SubmissionAbstract
         // time string from Canvas is coming in UTC
         $feedbackTime = $this->convertTime($feedbackTime);
 
+        // convert to plaintext first as a precaution
+        $plainComment = new Html2Text($canvasSubmission['comment']);
+
         // Couldn't find. Creating a new feedback
         $feedback = $this->returnedWorkMapper->createModel();
         $feedback->setSubmissionBox($submissionBox)
                  ->setMarker($reviewer)
                  ->setOwner($reviewee)
                  ->setReviewRoute(SubmissionBox\ReturnedWork::REVIEW_ROUTE_INSTRUCTOR)
-                 ->setComment($canvasSubmission['comment'])
+                 ->setComment($plainComment->getText())
                  ->setHumanReadableMark($readableMark)
                  ->setNormalizedMark($normMark)
                  ->setCreatedAt($feedbackTime)
