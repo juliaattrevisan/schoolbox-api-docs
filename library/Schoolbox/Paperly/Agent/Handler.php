@@ -2241,12 +2241,10 @@ class Handler
             foreach ($consents as $consent) {
                 if (!isset($consent['ConsentGivenBy'])) {
                     throw new Exception('Consent given by is required.');
-
                 }
 
                 if (!isset($consent['ConsentCode'])) {
                     throw new Exception('Consent Code is required.');
-
                 }
 
                 $consentGivenBy = $consent['ConsentGivenBy'];
@@ -2263,7 +2261,7 @@ class Handler
 
                 // If the record exists and ActiveFlag is 0, update it
                 if ($statement->rowCount()) {
-                    foreach ($stmt as $row) {
+                    while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
                         if ($row["ActiveFlag"] == 0) {
                             $updateSQL = "
                                 UPDATE Consent
