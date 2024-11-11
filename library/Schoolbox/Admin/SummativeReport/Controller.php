@@ -1047,11 +1047,18 @@ class Controller extends ConfigController
             }
         }
 
+        /* Need this to fetch the Govt. Student Number and slap it onto summative reports
+         * Your connector might not supply this, so could be entirely null for all we know
+         */
+        $externalUser = (new \External_User())->getStudent($student->getExternalId());
+        $govtStudentNumber = $externalUser['StudentGovernmentStudentNumber'] ?? null;
+
         /* Build it
          */
         $data = [
             'subjectOverviews'           => $subjectOverviews,
             'student'                    => $student,
+            'govtStudentNumber'          => $govtStudentNumber,
             'folders'                    => $folders,
             'markbooks'                  => $markbooks,
             'summaryAssessments'         => $summaryAssessments,
