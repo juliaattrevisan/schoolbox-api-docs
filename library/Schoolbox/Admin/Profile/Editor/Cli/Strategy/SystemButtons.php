@@ -98,22 +98,20 @@ class SystemButtons
                     $roletype
                 ));
 
-                if ($this->perform) {
-                    $profileButtonId = $this->createButton($candidate['row'], $roletype);
+                $profileButtonId = $this->createButton($candidate['row'], $roletype);
 
-                    /* Assign relationships
-                     *
-                     * Technically speaking, all these hardcoded system buttons would have
-                     * been available in every campus for every role, subject to further
-                     * checks by routeLookupIfAuthorized calls. Schools have the option to
-                     * nip it in the bud if they want to prevent viewers from seeing a
-                     * button by unticking their role(s) as per the ui
-                     */
-                    $this->createCampusAvailability($profileButtonId, $candidate['availability']['campus']);
-                    $this->createCampusVisibility($profileButtonId, $candidate['visibility']['campus']);
-                    $this->createRoleAvailability($profileButtonId, $candidate['availability']['role']);
-                    $this->createRoleVisibility($profileButtonId, $candidate['visibility']['role']);
-                }
+                /* Assign relationships
+                 *
+                 * Technically speaking, all these hardcoded system buttons would have
+                 * been available in every campus for every role, subject to further
+                 * checks by routeLookupIfAuthorized calls. Schools have the option to
+                 * nip it in the bud if they want to prevent viewers from seeing a
+                 * button by unticking their role(s) as per the ui
+                 */
+                $this->createCampusAvailability($profileButtonId, $candidate['availability']['campus']);
+                $this->createCampusVisibility($profileButtonId, $candidate['visibility']['campus']);
+                $this->createRoleAvailability($profileButtonId, $candidate['availability']['role']);
+                $this->createRoleVisibility($profileButtonId, $candidate['visibility']['role']);
             }
         }
     }
