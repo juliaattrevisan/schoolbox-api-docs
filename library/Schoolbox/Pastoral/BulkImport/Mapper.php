@@ -17,12 +17,14 @@ use Schoolbox\Pastoral\SubType\Mapper as PastoralSubTypeMapper;
 use Schoolbox\Pastoral\Tag;
 use Schoolbox\Pastoral\Type\Mapper as PastoralTypeMapper;
 use Schoolbox\Resource\Storage\Mapper as StorageMapper;
+use Schoolbox\User;
 use Schoolbox\UserMapper;
 
 /**
  * Mapper for pastoral bulk import records.
  *
  * @method Model createModel($idValue = null)
+ * @method Model hydrate(array $row, $alias = '', $callback = null)
  */
 class Mapper extends BaseMapper
 {
@@ -50,7 +52,12 @@ class Mapper extends BaseMapper
         $this->uses('points', self::TYPE_DECIMAL);
 
         $this->uses('imported_at', self::TYPE_DATETIME);
+        $this->joins('imported_by', UserMapper::class, 'id', null, null, 'importedBy', 'importedBy');
         $this->uses('import_log', self::TYPE_JSON);
+
+        $this->uses('undone_at', self::TYPE_DATETIME);
+        $this->joins('undone_by', UserMapper::class, 'id', null, null, 'undoneBy', 'undoneBy');
+
         $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
         $this->uses('updated_at', self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP);
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
@@ -79,7 +86,9 @@ class Mapper extends BaseMapper
         return "
             SELECT
                 {$this->getColumnString()},
-                {$this->getJoinColumnString('owner', 'owner')}
+                {$this->getJoinColumnString('owner', 'owner')},
+                {$this->getJoinColumnString('importedBy', 'importedBy')},
+                {$this->getJoinColumnString('undoneBy', 'undoneBy')}
         ";
     }
 
@@ -91,6 +100,8 @@ class Mapper extends BaseMapper
         return "
             FROM {$this->getTable()}
             INNER JOIN {$this->getJoinSql('owner', '', 'owner', true)}
+            LEFT  JOIN {$this->getJoinSql('importedBy', '', 'importedBy', true)}
+            LEFT  JOIN {$this->getJoinSql('undoneBy', '', 'undoneBy', true)}
         ";
     }
 
@@ -104,8 +115,16 @@ class Mapper extends BaseMapper
     {
         $models = $this->createCollection();
         foreach ($statement as $row) {
-            $models[] = $this->hydrate($row)
-                ->setOwner($this->hydrateJoin($row, 'owner', 'owner'));
+            /** @var User|null $owner */
+            /** @var User|null $importedBy */
+            /** @var User|null $undoneBy */
+            $owner      = $this->hydrateJoin($row, 'owner', 'owner');
+            $importedBy = $this->hydrateJoin($row, 'importedBy', 'importedBy');
+            $undoneBy   = $this->hydrateJoin($row, 'undoneBy', 'undoneBy');
+            $models[]   = $this->hydrate($row)
+                ->setOwner($owner)
+                ->setImportedBy($importedBy)
+                ->setUndoneBy($undoneBy);
         }
 
         $ids = $models->getPropertyValues('id');

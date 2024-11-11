@@ -336,6 +336,7 @@ class Controller extends Base
         // Save a record of the import, possibly including logs,
         // and then redirect back to the main page.
         $import = $import
+            ->setImportedBy($this->getUser())
             ->setImportedAt(Alaress_Date_Format::now())
             ->setImportLog($importLog);
         $this->pastoralBulkImportMapper->save($import);
@@ -369,6 +370,12 @@ class Controller extends Base
                 );
             }
         }
+
+        // Save undo fields
+        $import = $import
+            ->setUndoneBy($this->getUser())
+            ->setUndoneAt(Alaress_Date_Format::now());
+        $this->pastoralBulkImportMapper->save($import);
 
         // Redirect
         $this->response = $this->redirectAfterPost($this->generateRedirectUrl($import)->__toString());

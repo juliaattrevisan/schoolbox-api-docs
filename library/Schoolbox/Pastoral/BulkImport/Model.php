@@ -118,11 +118,27 @@ class Model implements ISoftDeletable
     private ?Alaress_Date_Format $importedAt = null;
 
     /**
+     * The user who initiated the import, if anyone.
+     */
+    private ?User $importedBy = null;
+
+    /**
      * The import log for this bulk import, in JSON format.
      *
      * @var ImportLog|null
      */
     private ?array $importLog = null;
+
+    /**
+     * The date at which this bulk import was undone, or null if this import has
+     * not been undone.
+     */
+    private ?Alaress_Date_Format $undoneAt = null;
+
+    /**
+     * The user who undid the import, if anyone.
+     */
+    private ?User $undoneBy = null;
 
     /**
      * Access records for this bulk import.
@@ -338,6 +354,24 @@ class Model implements ISoftDeletable
     }
 
     /**
+     * @return User|null
+     */
+    public function getImportedBy(): ?User
+    {
+        return $this->importedBy;
+    }
+
+    /**
+     * @param User|null $importedBy
+     * @return $this
+     */
+    public function setImportedBy(?User $importedBy): self
+    {
+        $this->importedBy = $importedBy;
+        return $this;
+    }
+
+    /**
      * @return ImportLog|null
      */
     public function getImportLog(): ?array
@@ -352,6 +386,52 @@ class Model implements ISoftDeletable
     public function setImportLog(?array $importLog): self
     {
         $this->importLog = $importLog;
+        return $this;
+    }
+
+    /**
+     * @return Alaress_Date_Format|null
+     */
+    public function getUndoneAt(): ?Alaress_Date_Format
+    {
+        return $this->undoneAt;
+    }
+
+    /**
+     * @param Alaress_Date_Format|null $undoneAt
+     * @return $this
+     */
+    public function setUndoneAt(?Alaress_Date_Format $undoneAt): self
+    {
+        $this->undoneAt = $undoneAt;
+        return $this;
+    }
+
+    /**
+     * Has this already been imported?
+     *
+     * @return bool
+     */
+    public function isUndone(): bool
+    {
+        return $this->undoneAt !== null;
+    }
+
+    /**
+     * @return User|null
+     */
+    public function getUndoneBy(): ?User
+    {
+        return $this->undoneBy;
+    }
+
+    /**
+     * @param User|null $undoneBy
+     * @return $this
+     */
+    public function setUndoneBy(?User $undoneBy): self
+    {
+        $this->undoneBy = $undoneBy;
         return $this;
     }
 

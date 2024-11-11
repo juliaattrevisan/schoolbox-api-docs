@@ -11,7 +11,10 @@ create table pastoral_bulk_import
     body_public        mediumtext                 not null,
     points             float default 0            null,
     imported_at        datetime                   null,
+    imported_by        int unsigned               null,
     import_log         json                       null,
+    undone_at          datetime                   null,
+    undone_by          int unsigned               null,
     created_at         datetime                   not null,
     updated_at         datetime                   not null,
     deleted_at         datetime                   null,
@@ -26,7 +29,11 @@ create table pastoral_bulk_import
     constraint fk_pastoral_bulk_import_type
         foreign key (type_id) references lu_pastoral_type (id),
     constraint fk_pastoral_bulk_import_subtype
-        foreign key (subtype_id) references lu_pastoral_subtype (id)
+        foreign key (subtype_id) references lu_pastoral_subtype (id),
+    constraint fk_pastoral_bulk_import_imported_by
+        foreign key (imported_by) references user (id),
+    constraint fk_pastoral_bulk_import_undone_by
+        foreign key (undone_by) references user (id)
 );
 
 create table pastoral_bulk_import_access
