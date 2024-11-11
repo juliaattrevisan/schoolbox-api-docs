@@ -55,7 +55,7 @@ class ModelToArray
             'id'             => $model->getId(),
             'mark'           => $model->getHumanReadableMark(),
             'normalisedMark' => $model->getNormalisedMark(),
-            'comment'        => $this->purifier->purify($model->getComment()),
+            'comment'        => $this->purifier->purify(nl2br($model->getComment())),
             'publishedAt'    => $model->getPublishedAt()->getUsingFormat(DATE_ATOM),
             'instructor'     => call_user_func($this->userTranslator, $model->getReviewer()),
             'assessment'     => $assessment,
