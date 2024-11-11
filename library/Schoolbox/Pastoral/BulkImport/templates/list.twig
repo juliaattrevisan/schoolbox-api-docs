@@ -37,13 +37,11 @@
                                 {% endif %}
                                 <div class="list-item">
                                     <div class="card small-12">
-                                        <h3>
-                                            {% if getRoute %}
-                                                <a href="{{ getRoute }}" {% if import.undone %}class="strike"{% endif %}>{{ import.heading }}</a>
-                                            {% else %}
-                                                <span {% if import.undone %}class="strike"{% endif %}>{{ import.heading }}</span>
-                                            {% endif %}
-                                        </h3>
+                                        {% if getRoute %}
+                                            <a href="{{ getRoute }}" {% if import.undone %}class="strike"{% endif %}><h3>{{ import.heading }}</h3></a>
+                                        {% else %}
+                                            <span {% if import.undone %}class="strike"{% endif %}><h3>{{ import.heading }}</h3></span>
+                                        {% endif %}
 
                                         {# Metadata: when it was imported, when it was undone #}
                                         <p class="meta">
