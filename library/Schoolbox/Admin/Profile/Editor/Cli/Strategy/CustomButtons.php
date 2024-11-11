@@ -313,14 +313,14 @@ class CustomButtons
      */
     private function createRoleVisibility(?int $profileButtonId, int $oldProfileButtonId): void
     {
-        if (!$profileButtonId) {
-            $this->log->warning(sprintf(
-                'Invalid profile button identifier for old profile button %s',
-                $oldProfileButtonId
-            ));
-        }
-
         if ($this->perform) {
+            if (!$profileButtonId) {
+                $this->log->warning(sprintf(
+                    'Invalid profile button identifier for old profile button %s',
+                    $oldProfileButtonId
+                ));
+            }
+
             $this->roleVisibilityStatement->execute([
                 'profileButtonId' => $oldProfileButtonId
             ]);
