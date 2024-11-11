@@ -249,10 +249,12 @@ HELP;
             $roleType
         ));
 
-        $this->resequenceStatement->execute([
-            'roleType' => $roleType,
-            'custom' => \Schoolbox\Profile\Button\Model::BUTTON_CUSTOM
-        ]);
+        if ($this->perform()) {
+            $this->resequenceStatement->execute([
+                'roleType' => $roleType,
+                'custom' => \Schoolbox\Profile\Button\Model::BUTTON_CUSTOM
+            ]);
+        }
     }
 
 
