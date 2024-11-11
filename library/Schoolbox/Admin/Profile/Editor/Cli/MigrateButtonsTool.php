@@ -216,16 +216,18 @@ HELP;
      */
     private function resequenceAll(): void
     {
-        $this->resequenceStatement = $this->getDatabaseInternal()->prepare("
-            UPDATE profile_button
-            SET sort_order = sort_order +
-                (SELECT COUNT(*)
-                FROM profile_button
-                WHERE roletype = :roleType
-                AND type != :custom)
-            WHERE roleType = :roleType
-            AND type = :custom
-        ");
+        if ($this->perform()) {
+            $this->resequenceStatement = $this->getDatabaseInternal()->prepare("
+                UPDATE profile_button
+                SET sort_order = sort_order +
+                    (SELECT COUNT(*)
+                    FROM profile_button
+                    WHERE roletype = :roleType
+                    AND type != :custom)
+                WHERE roleType = :roleType
+                AND type = :custom
+            ");
+        }
 
         foreach (array_keys(Payload::CONFIG_ROLETYPE) as $roleType) {
             $this->resequenceOne($roleType);
