@@ -284,7 +284,7 @@ class Controller extends Base
 
     /**
      * Export all the curriculum nodes, in a format suitable for import.
-     * Must be Superuser or Curric Moderator
+     * Must be Superuser or Curriculum Write+ users
      *
      * @api  GET /curriculum/export
      * @since 24.1
