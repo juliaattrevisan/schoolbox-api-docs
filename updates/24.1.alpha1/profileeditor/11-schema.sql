@@ -2,9 +2,6 @@
 
 CREATE TABLE `_profile_button` AS SELECT * FROM profile_button;
 
-INSERT INTO `_profile_button` (id, sort_order, title, text, icon, url, css, target, deleted_at)
-SELECT * FROM `profile_button` WHERE deleted_at IS NULL;
-
 -- Augment the current table with two new columns
 -- Add support for categorisation of buttons
 -- Add support for knowing the role type for a button
