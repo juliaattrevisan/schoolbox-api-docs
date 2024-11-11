@@ -369,6 +369,9 @@ class Controller extends Base
                 );
             }
         }
+
+        // Redirect
+        $this->response = $this->redirectAfterPost($this->generateRedirectUrl($import)->__toString());
     }
 
     /**
