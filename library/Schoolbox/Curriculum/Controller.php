@@ -297,7 +297,7 @@ class Controller extends Base
                 curriculum_node_parent_id,
                 name,
                 code,
-                `order`
+                `order`,
                 description,
                 uuid
             FROM
