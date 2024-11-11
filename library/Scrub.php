@@ -184,6 +184,7 @@ class Scrub
                 'sway.com/',
                 'flipgrid.com/',
                 'spark.adobe.com/',
+                'drive.google.com/',
             ];
 
             // Add any additional iframe sources as configured
