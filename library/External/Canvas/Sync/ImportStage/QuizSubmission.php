@@ -11,6 +11,7 @@ declare(strict_types=1);
 namespace External\Canvas\Sync\ImportStage;
 
 use Alaress\Database\Connector\IConnector;
+use Alaress\Html\ToText as Html2Text;
 use External\Canvas\Importer\CanvasDb;
 use Psr\Log\LoggerInterface;
 use Schoolbox\GenericCollection;
@@ -264,10 +265,13 @@ class QuizSubmission extends SubmissionAbstract
         $question = $section->getQuestions()?->first();
         $question->setSection($section);
 
+        // convert to plaintext first as a precaution
+        $plainComment = new Html2Text($canvasSubmission['comment']);
+
         $answers = $this->quizAnswerMapper->createCollection();
         $answer  = $this->quizAnswerMapper->createModel()
                                           ->setMark($normMark)
-                                          ->setComment($canvasSubmission['comment'])
+                                          ->setComment($plainComment->getText())
                                           ->setAutoMarked(false)
                                           ->setQuestion($question)
                                           ->setUpdatedAt($feedbackTime);
