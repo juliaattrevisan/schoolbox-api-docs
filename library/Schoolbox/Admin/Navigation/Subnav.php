@@ -740,7 +740,7 @@ class Subnav
                     '/pastoral/bulk-import' => [
                         'name'        => 'Bulk Import',
                         'visible'     => (
-                            $userHasServicePermissionPastoral &&
+                            ($userIsSuperuser || $userHasServicePermissionPastoral) &&
                             $this->configLoader->get(ConfigMapper::NAME_PASTORAL_ENABLED)
                         ),
                         'children'    => [],
