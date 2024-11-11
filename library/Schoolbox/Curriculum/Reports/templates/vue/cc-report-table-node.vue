@@ -169,8 +169,8 @@ function onExpandClicked(): void {
             :style="{ paddingInlineStart: paddingStart }"
         >
             <button
-                v-if="hasChildren"
-                :class="`expand-button expander l-flex l-flex--center ${isExpanded ? 'icon-down-arrow' : 'icon-up-arrow'}`"
+                v-if="props.depth !== 0 && hasChildren"
+                :class="`expand-button expander l-flex l-flex--center ${isExpanded ? 'icon-up-arrow' : 'icon-down-arrow'}`"
                 :aria-label="expandTitle"
                 :title="expandTitle"
                 @click="onExpandClicked"
