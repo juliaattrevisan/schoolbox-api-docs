@@ -44,7 +44,7 @@ function onUpdateToggleSelected(): void {
 
 <template>
     <a
-        v-if="node._links?.getExport && node.children.length !== 0"
+        v-if="node._links?.getExport && node.children?.length !== 0"
         :href="node._links.getExport"
         class="button-action-option icon-export"
         :title="`Export ${props.title}`"
