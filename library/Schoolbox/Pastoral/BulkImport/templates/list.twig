@@ -22,11 +22,19 @@
     <div class="small-12 island">
         {% if imports is not empty %}
             <section>
-                <ul class="information-list">
+                <ul class="information-list" id="import-list">
                     {% for import in imports %}
                         <li>
                             <div class="actions-small-2">
                                 {% set getRoute = routeLookupIfAuthorized('pastoralBulkImport.getImport', {id: import.id, import: import}) %}
+                                {% set runRoute = routeLookupIfAuthorized('pastoralBulkImport.postRunImport', {id: import.id, import: import}) %}
+                                {% if runRoute %}
+                                    <form id="postRunImport-{{ import.id }}" action="{{ runRoute }}" method="post"></form>
+                                {% endif %}
+                                {% set undoRoute = routeLookupIfAuthorized('pastoralBulkImport.postUndoImport', {id: import.id, import: import}) %}
+                                {% if undoRoute %}
+                                    <form id="postUndoImport-{{ import.id }}" action="{{ runRoute }}" method="post"></form>
+                                {% endif %}
                                 <div class="list-item">
                                     <div class="card small-12">
                                         <h3>
@@ -63,14 +71,12 @@
                                         <a class="icon-eye" href="{{ getRoute }}" title="{% if import.imported %}View import results{% else %}Preview import{% endif %}"></a>
                                     {% endif %}
 
-                                    {% set runRoute = routeLookupIfAuthorized('pastoralBulkImport.postRunImport', {id: import.id, import: import}) %}
                                     {% if runRoute %}
-                                        <a class="icon-import" href="{{ getRoute }}" title="Run import"></a>
+                                        <a class="icon-import" data-action="run" data-form-id="postRunImport-{{ import.id }}" title="Run import"></a>
                                     {% endif %}
 
-                                    {% set undoRoute = routeLookupIfAuthorized('pastoralBulkImport.postUndoImport', {id: import.id, import: import}) %}
                                     {% if undoRoute %}
-                                        <a class="icon-undo" href="{{ undoRoute }}" title="Undo import"></a>
+                                        <a class="icon-undo" data-action="undo" data-form-id="postUndoImport-{{ import.id }}" title="Undo import"></a>
                                     {% endif %}
                                 </nav>
                             </div>
@@ -89,3 +95,32 @@
         {% endif %}
     </div>
 </div>
+
+<script type="text/javascript">
+    $(function() {
+        let $importList = $('#import-list');
+        $importList
+            .on('click', '[data-action="run"]', function(event) {
+                event.preventDefault();
+                $(this).confirmDialog({
+                    text: 'Are you sure you want to run this import? This will create pastoral records.',
+                    confirmEvent: function (el) {
+                        // Create a form and submit it?
+                        let $form = $(el.attr('data-form-id'));
+                        $form.submit();
+                    }
+                });
+            })
+            .on('click', '[data-action="undo"]', function(event) {
+                event.preventDefault();
+                $(this).confirmDialog({
+                    text: 'Are you sure you want to undo this import? This will delete any pastoral records which were created.',
+                    confirmEvent: function (el) {
+                        // Create a form and submit it?
+                        let $form = $(el.attr('data-form-id'));
+                        $form.submit();
+                    }
+                });
+            })
+    });
+</script>
