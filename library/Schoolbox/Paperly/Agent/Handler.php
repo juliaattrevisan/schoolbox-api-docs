@@ -19,17 +19,16 @@ use Exception;
  */
 class Handler
 {
-    private ViewSelector $viewSelector;
-
     /**
      * Constructor
      *
      * @param IConnector   $externalDb
      * @param ViewSelector $viewSelector
      */
-    public function __construct(private IConnector $externalDb, ViewSelector $viewSelector)
-    {
-        $this->viewSelector = $viewSelector;
+    public function __construct(
+        private IConnector $externalDb,
+        private ViewSelector $viewSelector
+    ) {
     }
 
     /**
@@ -50,29 +49,21 @@ class Handler
             case 'allYearLevels':
                 return $this->handleAllYearLevelsRequest($data);
             case 'allClasses':
-                $selectedView = $this->viewSelector->getView($method);
-                return $this->handleAllClassesRequest($data, $selectedView);
+                return $this->handleAllClassesRequest($data);
             case 'getStudentsByClass':
-                $selectedView = $this->viewSelector->getView($method);
-                return $this->handleGetStudentsByClassRequest($data, $selectedView);
+                return $this->handleGetStudentsByClassRequest($data);
             case 'allStaffs':
-                $selectedView = $this->viewSelector->getView($method);
-                return $this->handleAllStaffsRequest($data, $selectedView);
+                return $this->handleAllStaffsRequest($data);
             case 'allStudents':
-                $selectedView = $this->viewSelector->getView($method);
-                return $this->handleAllStudentsRequest($data, $selectedView);
+                return $this->handleAllStudentsRequest($data);
             case 'getStudentsAvatar':
-                $selectedView = $this->viewSelector->getView($method);
-                return $this->handleGetStudentsAvatarRequest($data, $selectedView);
+                return $this->handleGetStudentsAvatarRequest($data);
             case 'getStudentsMedical':
-                $selectedView = $this->viewSelector->getView($method);
-                return $this->handleGetStudentsMedicalRequest($data, $selectedView);
+                return $this->handleGetStudentsMedicalRequest($data);
             case 'getStudentsFromParent':
-                $selectedView = $this->viewSelector->getView($method);
-                return $this->handleGetStudentsFromParentRequest($data, $selectedView);
+                return $this->handleGetStudentsFromParentRequest($data);
             case 'allParents':
-                $selectedView = $this->viewSelector->getView($method);
-                return $this->handleAllParentsRequest($data, $selectedView);
+                return $this->handleAllParentsRequest($data);
             case 'getDetailsData':
                 return $this->handleGetDetailsDataRequest($data);
             case 'allMedicalConditionTypes':
@@ -126,7 +117,6 @@ class Handler
 
         $stmt = $this->externalDb->executeQuery($sql, $params);
         return $stmt->fetchColumn() !== false;
-//        return count($stmt) > 0;
     }
 
     /**
@@ -165,14 +155,14 @@ class Handler
      *
      * @param array  $data         `$data['code']` may be an array or CSV list of codes:
      *                             if set, return only classes which match these codes.
-     * @param string $selectedView paperly view
      *
      * @return array
      */
-    public function handleAllClassesRequest(array $data, string $selectedView): array
+    public function handleAllClassesRequest(array $data): array
     {
         $classArr = [];
         $params   = [];
+        $selectedView = $this->viewSelector->getView(ViewSelector::PAPERLY_VIEW_ALL_CLASSES);
         $sql      = "SELECT * FROM {$selectedView} WHERE 1=1";
 
         if (isset($data['code'])) {
@@ -203,14 +193,14 @@ class Handler
      *
      * @param array  $data         `$data['code']` may be an array or CSV list of codes:
      *                             if set, return only classes which match these codes.
-     * @param string $selectedView paperly view
      *
      * @return array
      */
-    public function handleGetStudentsByClassRequest(array $data, string $selectedView): array
+    public function handleGetStudentsByClassRequest(array $data): array
     {
         $yearLevelArr = [];
         $params       = [];
+        $selectedView = $this->viewSelector->getView(ViewSelector::PAPERLY_VIEW_ALL_CLASSES);
         $sql          = "SELECT DISTINCT ClassCode, ID, ClassDesc, Surname, Preferred FROM {$selectedView} WHERE 1=1";
 
         if (isset($data['code'])) {
@@ -246,15 +236,14 @@ class Handler
      *                             `$data['year_level']` may be an array or CSV list of
      *                             year levels: if set, return only staff which teach
      *                             these year levels.
-     * @param string $selectedView paperly view
      *
      * @return array
      */
-    public function handleAllStaffsRequest(array $data, string $selectedView): array
+    public function handleAllStaffsRequest(array $data): array
     {
         $stfArr = [];
         $params = [];
-
+        $selectedView = $this->viewSelector->getView(ViewSelector::PAPERLY_VIEW_ALL_STAFF);
         $sql = "SELECT StaffID, StaffPreferred, StaffSurname, StaffEmail
                 FROM (
                     SELECT StaffID, StaffPreferred, StaffSurname, StaffEmail, ClassCode, NormalYearLevel
@@ -318,14 +307,13 @@ class Handler
      *                             `$data['class']` may be an array or CSV list of
      *                             classes: if set, return only students within these
      *                             classes.
-     * @param string $selectedView paperly view
      *
      * @return array
      */
-    public function handleAllStudentsRequest(array $data, string $selectedView): array
+    public function handleAllStudentsRequest(array $data): array
     {
-        $stuArr = [];
         $params = [];
+        $selectedView = $this->viewSelector->getView(ViewSelector::PAPERLY_VIEW_ALL_STUDENTS);
         $sql    = "SELECT * FROM {$selectedView} WHERE 1=1";
 
         if (isset($data['id'])) {
@@ -395,9 +383,7 @@ class Handler
             }
         }
 
-        $stuArr = array_values($students);
-
-        return $stuArr;
+        return array_values($students);
     }
 
     /**
@@ -405,16 +391,15 @@ class Handler
      *
      * @param array  $data         `$data['id']` may be an array or CSV list of IDs:
      *                             if set, return only avatars for these students.
-     * @param string $selectedView paperly view
      *
      * @return array
      */
-    public function handleGetStudentsAvatarRequest(array $data, string $selectedView): array
+    public function handleGetStudentsAvatarRequest(array $data): array
     {
         $avatarArr   = [];
         $params      = [];
         $columnToUse = 'PhotoMediumRes';
-
+        $selectedView = $this->viewSelector->getView(ViewSelector::PAPERLY_VIEW_STUDENT_AVATAR);
         if (!$this->columnExists($columnToUse, $selectedView)) {
             $columnToUse = 'Photo';
         }
@@ -448,15 +433,14 @@ class Handler
      *
      * @param array  $data         `$data['id']` may be an array or CSV list of IDs:
      *                             if set, return only medical data for these students.
-     * @param string $selectedView paperly view
      *
      * @return array
      */
-    public function handleGetStudentsMedicalRequest(array $data, string $selectedView): array
+    public function handleGetStudentsMedicalRequest(array $data): array
     {
         $stuMedicalArr = [];
         $params        = [date("Y")];
-
+        $selectedView = $this->viewSelector->getView(ViewSelector::PAPERLY_VIEW_STUDENT_MEDICAL);
         $sql = "SELECT * FROM {$selectedView} WHERE 1=1";
 
         if (isset($data['id'])) {
@@ -487,11 +471,10 @@ class Handler
      * Handle request for fetching students for a parent.
      *
      * @param array  $data         `$data['id']` must be a parent ID.
-     * @param string $selectedView paperly view
      * @return array
      * @throws OutOfBoundsException if `$data['id']` is not a parent ID.
      */
-    public function handleGetStudentsFromParentRequest(array $data, string $selectedView): array
+    public function handleGetStudentsFromParentRequest(array $data): array
     {
         $id = $data['id'] ?? null;
         if (!isset($id)) {
@@ -499,7 +482,7 @@ class Handler
         }
 
         $stuArr = [];
-
+        $selectedView = $this->viewSelector->getView(ViewSelector::PAPERLY_VIEW_STUDENT_FROM_PARENT);
         //ContactSposeID column removed on Paperly's request, because no such column exist in the view
         $sql = "SELECT * FROM {$selectedView} WHERE (contactID = ?)";
 
@@ -524,14 +507,14 @@ class Handler
      * Handle request for fetching parents
      *
      * @param array  $data
-     * @param string $selectedView
      * @return array
      */
-    public function handleAllParentsRequest(array $data, string $selectedView): array
+    public function handleAllParentsRequest(array $data): array
     {
         $parentArr = [];
         $email     = $data['email'] ?? null;
         $params    = [];
+        $selectedView = $this->viewSelector->getView(ViewSelector::PAPERLY_VIEW_ALL_PARENTS);
         $sql       = "SELECT * FROM {$selectedView} WHERE 1=1";
 
         if (isset($data['id'])) {
@@ -860,7 +843,7 @@ class Handler
 
     private function validateParent(?string $parentId): bool
     {
-        $selectedView = $this->viewSelector->getView('allParents');
+        $selectedView = $this->viewSelector->getView(ViewSelector::PAPERLY_VIEW_ALL_PARENTS);
 
         $sql    = "SELECT * FROM {$selectedView} WHERE ID = ?";
         $params = [$parentId];
@@ -871,7 +854,7 @@ class Handler
 
     private function getRelatedData(string $parentId): array
     {
-        $selectedView = $this->viewSelector->getView('allStudents');
+        $selectedView = $this->viewSelector->getView(ViewSelector::PAPERLY_VIEW_ALL_STUDENTS);
 
         $relatedData = [
             'studentIDs'  => [],
@@ -901,7 +884,7 @@ class Handler
     {
         $primaryData = [];
 
-        $selectedView = $this->viewSelector->getView('allParents');
+        $selectedView = $this->viewSelector->getView(ViewSelector::PAPERLY_VIEW_ALL_PARENTS);
 
         $sql = "SELECT * FROM {$selectedView} WHERE 1=1 AND ID = ?";
 
@@ -973,9 +956,9 @@ class Handler
     {
         $spouseData = [];
 
-        $viewSelected = $this->viewSelector->getView('allParents');
+        $selectedView = $this->viewSelector->getView(ViewSelector::PAPERLY_VIEW_ALL_PARENTS);
 
-        $sql    = "SELECT * FROM $viewSelected WHERE 1=1 AND ID = ?";
+        $sql    = "SELECT * FROM {$selectedView} WHERE 1=1 AND ID = ?";
         $params = [$spouseID];
 
         $stmt = $this->externalDb->executeQuery($sql, $params);
@@ -1043,7 +1026,7 @@ class Handler
     {
         $authArr = [];
 
-        $viewSelected = $this->viewSelector->getView('allStudents');
+        $selectedView = $this->viewSelector->getView(ViewSelector::PAPERLY_VIEW_ALL_STUDENTS);
 
         foreach ($studentIDs as $stuID) {
             $smcArr       = $this->getStudentMedicalConditions($stuID);
@@ -1090,7 +1073,7 @@ class Handler
                     s.LegalParentsSeparatedFlag,
                     s.LegalCourtOrderType,
                     s.StudentMedicalAlertFlag
-                FROM {$viewSelected} s
+                FROM {$selectedView} s
                 WHERE s.StudentID IN (?)
                 ";
 
@@ -1203,11 +1186,11 @@ class Handler
 
     private function getStudentMedicalConditions(int $stuID): array
     {
-        $viewSelected = $this->viewSelector->getView('getStudentsMedical');
+        $selectedView = $this->viewSelector->getView(ViewSelector::PAPERLY_VIEW_STUDENT_MEDICAL);
 
         $smcArr = [];
 
-        $sql    = "SELECT * FROM $viewSelected WHERE ID = ?";
+        $sql    = "SELECT * FROM {$selectedView} WHERE ID = ?";
         $params = [$stuID];
         $stmt   = $this->externalDb->executeQuery($sql, $params);
 
@@ -1230,9 +1213,9 @@ class Handler
     {
         $abiArr = [];
 
-        $viewSelected = $this->viewSelector->getView('getStudentAbilities');
+        $selectedView = $this->viewSelector->getView(ViewSelector::PAPERLY_VIEW_STUDENT_ABILITIES);
 
-        $sql    = "SELECT * FROM $viewSelected WHERE ID = ?";
+        $sql    = "SELECT * FROM {$selectedView} WHERE ID = ?";
         $params = [$stuID];
 
         $stmt = $this->externalDb->executeQuery($sql, $params);
@@ -1254,7 +1237,7 @@ class Handler
     {
         $consentArr = [];
 
-        $viewSelected = $this->viewSelector->getView('getStudentConsents');
+        $selectedView = $this->viewSelector->getView(ViewSelector::PAPERLY_VIEW_STUDENT_CONSENT);
 
         $sql = "
             SELECT
@@ -1271,7 +1254,7 @@ class Handler
             LEFT JOIN (
                 SELECT
                     DISTINCT ConsentCode, ID, ConsentSeq
-                    FROM {$viewSelected}
+                    FROM {$selectedView}
                     WHERE ID = ?
             ) AS smcons
             ON
@@ -1297,10 +1280,10 @@ class Handler
     {
         $livesWithArr = [];
 
-        $viewSelected = $this->viewSelector->getView('allStudents');
+        $selectedView = $this->viewSelector->getView(ViewSelector::PAPERLY_VIEW_ALL_STUDENTS);
 
         $params = [$stuID];
-        $sql    = "SELECT * FROM $viewSelected WHERE StudentID = ?";
+        $sql    = "SELECT * FROM $selectedView WHERE StudentID = ?";
         $stmt   = $this->externalDb->executeQuery($sql, $params);
         foreach ($stmt as $row) {
             // Initialize the student array if it doesn't exist
@@ -1809,10 +1792,11 @@ class Handler
 
     private function handleUpdateParentDataRequest($data): void
     {
-        $parentID = $data->ID;
+        //Making sure that it is an array
+        $data = (array) $data;
+        $parentID = $data['ID'];
 
         // Remove ID from the $data array
-        $data = (array) $data;
         unset($data['ID']);
 
         // Separate AddressData from the rest of the data
@@ -2139,10 +2123,10 @@ class Handler
 
     private function deleteStudentMedicalConditions($conditions, $studentID): void
     {
-        $viewSelected = $this->viewSelector->getView('getStudentsMedical');
+        $selectedView = $this->viewSelector->getView(ViewSelector::PAPERLY_VIEW_STUDENT_MEDICAL);
         if (!empty($conditions)) {
             foreach ($conditions as $apiSeqId) {
-                $checkSQL = "SELECT * FROM {$viewSelected} WHERE ID = ? AND MedicalConditionSeq = ?";
+                $checkSQL = "SELECT * FROM {$selectedView} WHERE ID = ? AND MedicalConditionSeq = ?";
                 $statement = $this->externalDb->prepareQuery($checkSQL, [$studentID, $apiSeqId]);
                 $stmt = $statement->execute();
                 if ($stmt === false) {
@@ -2157,7 +2141,7 @@ class Handler
                         SET ActiveFlag = 0,
                             ConditionEndDate = GETDATE()
                         WHERE MedicalConditionSeq = ?";
-                    $stmt = $this->externalDb->prepareQuery($checkSQL, [$studentID, $apiSeqId])->execute();
+                    $stmt = $this->externalDb->prepareQuery($deleteSQL, [$studentID, $apiSeqId])->execute();
                     if ($stmt === false) {
                         throw new Exception(
                             print_r($this->externalDb->errorInfo(), true)
@@ -2207,7 +2191,7 @@ class Handler
     private function deleteStudentConsents($consents, $modifiedBy): void
     {
         if (!empty($consents)) {
-            $viewSelected = $this->viewSelector->getView('getStudentConsents');
+            $selectedView = $this->viewSelector->getView(ViewSelector::PAPERLY_VIEW_STUDENT_CONSENT);
             foreach ($consents as $consent) {
                 if (!isset($consent['ConsentGivenBy'])) {
                     throw new Exception('Consent given by is required.');
@@ -2220,7 +2204,7 @@ class Handler
                 $consentGivenBy = $consent['ConsentGivenBy'];
                 $consentSeq = $consent['ConsentSeq'];
 
-                $checkSQL = "SELECT * FROM {$viewSelected} WHERE AND ConsentSeq = ?";
+                $checkSQL = "SELECT * FROM {$selectedView} WHERE AND ConsentSeq = ?";
                 $statement = $this->externalDb->prepareQuery($checkSQL, [$consentSeq]);
                 $stmt = $statement->execute();
                 if ($stmt === false) {
@@ -2253,7 +2237,7 @@ class Handler
     private function createOrUpdateStudentConsents($consents, $studentID, $modifiedBy): void
     {
         if (!empty($consents)) {
-            $viewSelected = $this->viewSelector->getView('getStudentConsents');
+            $selectedView = $this->viewSelector->getView(ViewSelector::PAPERLY_VIEW_STUDENT_CONSENT);
             foreach ($consents as $consent) {
                 if (!isset($consent['ConsentGivenBy'])) {
                     throw new Exception('Consent given by is required.');
@@ -2268,7 +2252,7 @@ class Handler
                 $consentGivenBy = $consent['ConsentGivenBy'];
                 $consentCode = $consent['ConsentCode'];
 
-                $checkSQL = "SELECT * FROM {$viewSelected} WHERE ConsentCode = ? AND ID = ?";
+                $checkSQL = "SELECT * FROM {$selectedView} WHERE ConsentCode = ? AND ID = ?";
                 $statement = $this->externalDb->prepareQuery($checkSQL, [$consentCode, $studentID]);
                 $stmt = $statement->execute();
                 if ($stmt === false) {
