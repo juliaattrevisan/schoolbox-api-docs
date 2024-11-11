@@ -105,6 +105,8 @@ class CustomButtons
         /* Soft-delete all the old buttons from which we migrated
          */
         $this->cleanup();
+
+        $this->log->info('Done.');
     }
 
 
@@ -391,13 +393,18 @@ class CustomButtons
      */
     public function cleanup(): void
     {
-        $query = "
-            UPDATE profile_button
-            SET deleted_at = NOW()
-            WHERE roletype IS NULL
-        ";
+        $this->log->info('Cleaning up...');
+        $this->log->debug('Soft-deleting buttons that were migrated into roletypes.');
 
-        $statement = $this->db->prepare($query);
-        $statement->execute();
+        if ($this->perform) {
+            $query = "
+                UPDATE profile_button
+                SET deleted_at = NOW()
+                WHERE roletype IS NULL
+            ";
+
+            $statement = $this->db->prepare($query);
+            $statement->execute();
+        }
     }
 }
