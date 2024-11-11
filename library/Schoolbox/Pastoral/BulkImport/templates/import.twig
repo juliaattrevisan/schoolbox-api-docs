@@ -122,7 +122,7 @@
             {% set runRoute = routeLookupIfAuthorized('pastoralBulkImport.postRunImport', {id: import.id, import: import}) %}
             {% if runRoute %}
                 <li>
-                    <form class="top" method="post" action="{{ runRoute }}?{{ RETURN_URL.name }}={{ returnUrl }}">
+                    <form class="top" method="post" action="{{ runRoute }}?{{ RETURN_URL.name }}={{ RETURN_URL.previous.encoded }}">
                         <input type="submit" value="Import" />
                     </form>
                 </li>
@@ -130,13 +130,13 @@
             {% set undoRoute = routeLookupIfAuthorized('pastoralBulkImport.postUndoImport', {id: import.id, import: import}) %}
             {% if undoRoute %}
                 <li>
-                    <form class="top" method="post" action="{{ undoRoute }}?{{ RETURN_URL.name }}={{ returnUrl }}">
+                    <form class="top" method="post" action="{{ undoRoute }}?{{ RETURN_URL.name }}={{ RETURN_URL.previous.encoded }}">
                         <input type="submit" value="Undo Import" />
                     </form>
                 </li>
             {% endif %}
             <li>
-                <a href="{{ RETURN_URL.previous.decoded ?? routeLookup('pastoral.getIndex') }}">Return</a>
+                <a href="{{ RETURN_URL.previous.decoded ?? routeLookup('pastoralBulkImport.getList') }}">Return</a>
             </li>
         </ul>
     </div>

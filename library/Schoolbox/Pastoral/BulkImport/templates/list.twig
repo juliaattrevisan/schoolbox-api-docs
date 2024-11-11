@@ -14,7 +14,7 @@
     </div>
     <nav>
         {% if createRoute %}
-            <a href="{{ createRoute }}" class="icon-add" title="Add a summative report"></a>
+            <a href="{{ createRoute }}?{{ returnQueryString }}" class="icon-add" title="Add a summative report"></a>
         {% endif %}
     </nav>
 </div>
