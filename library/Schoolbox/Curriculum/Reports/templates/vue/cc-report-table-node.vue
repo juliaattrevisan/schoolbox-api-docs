@@ -200,15 +200,13 @@ function onExpandClicked(): void {
             </td>
         </template>
     </tr>
-    <template v-if="hasChildren">
-        <template v-if="isExpanded">
-            <cc-report-table-node
-                v-for="child in props.node.children"
-                :key="child.id"
-                :node="child"
-                :depth="props.depth + 1"
-            />
-        </template>
+    <template v-if="hasChildren && isExpanded">
+        <cc-report-table-node
+            v-for="child in props.node.children"
+            :key="child.id"
+            :node="child"
+            :depth="props.depth + 1"
+        />
     </template>
 </template>
 
