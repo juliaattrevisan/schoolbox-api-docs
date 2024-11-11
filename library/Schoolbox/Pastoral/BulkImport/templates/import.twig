@@ -9,6 +9,38 @@
     <div class="list-item">
         <div class="small-12 column">
             <h1>{{ locale.pastoral.proper }} Bulk Import Results</h1>
+            <ul class="meta">
+                <li class="icon-add">
+                    Created {{ import.createdAt.local }} by
+                    {% if import.owner.deleted -%}
+                        {{ report.owner.fullname }}
+                    {%- else -%}
+                        <a href="/search/user/{{ import.owner.id }}" title="{{ import.owner.fullname }}">{{ import.owner.fullname }}</a>
+                    {%- endif -%}.
+                </li>
+
+                {% if import.imported %}
+                    <li class="icon-import">
+                        Imported {{ import.importedAt.local }} by
+                        {% if import.importedBy.deleted -%}
+                            {{ report.importedBy.fullname }}
+                        {%- else -%}
+                            <a href="/search/user/{{ import.owner.id }}" title="{{ import.importedBy.fullname }}">{{ import.importedBy.fullname }}</a>
+                        {%- endif -%}.
+                    </li>
+                {% endif %}
+
+                {% if import.undone %}
+                    <li class="icon-undo">
+                        Undone {{ import.undoneAt.local }} by
+                        {% if import.undoneBy.deleted -%}
+                            {{ report.undoneBy.fullname }}
+                        {%- else -%}
+                            <a href="/search/user/{{ import.owner.id }}" title="{{ import.undoneBy.fullname }}">{{ import.undoneBy.fullname }}</a>
+                        {%- endif -%}.
+                    </li>
+                {% endif %}
+            </ul>
         </div>
     </div>
 </div>
@@ -28,7 +60,7 @@
             <tbody>
             {% for data in import.importLog.known %}
                 {% for file in data.files %}
-                    <tr>
+                    <tr {% if import.undone %}class="strike"{% endif %}>
                         <td>
                             {% if import.importedAt %}
                                 {{ import.importedAt.local }}
@@ -60,7 +92,7 @@
             {% endfor %}
 
             {% for data in import.importLog.unknown %}
-                <tr>
+                <tr {% if import.undone %}class="strike"{% endif %}>
                     <td>&mdash;</td>
                     <td>{{ data.file }}</td>
                     <td>
@@ -79,10 +111,12 @@
             </tbody>
         </table>
 
-        {% include '@pastoralBulkImport/fragments/userProfileLink.twig' with {
-            typeId:    import.type.id,
-            subtypeId: import.subType.id,
-        } only %}
+        {% if not import.undone %}
+            {% include '@pastoralBulkImport/fragments/userProfileLink.twig' with {
+                typeId:    import.type.id,
+                subtypeId: import.subType.id,
+            } only %}
+        {% endif %}
 
         <ul class="flex-list buttons">
             {% set runRoute = routeLookupIfAuthorized('pastoralBulkImport.postRunImport', {id: import.id, import: import}) %}
