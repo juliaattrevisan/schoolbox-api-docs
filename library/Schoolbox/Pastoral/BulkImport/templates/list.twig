@@ -5,6 +5,7 @@
 ) }}
 
 {% set createRoute = routeLookupIfAuthorized('pastoralBulkImport.getCreateImportForm') %}
+{% set returnQueryString = RETURN_URL.name ~ '=' ~ RETURN_URL.current %}
 <div class="row actions-small-1">
     <div class="list-item">
         <div class="small-12 column">
@@ -29,16 +30,16 @@
                                 {% set getRoute = routeLookupIfAuthorized('pastoralBulkImport.getImport', {id: import.id, import: import}) %}
                                 {% set runRoute = routeLookupIfAuthorized('pastoralBulkImport.postRunImport', {id: import.id, import: import}) %}
                                 {% if runRoute %}
-                                    <form id="postRunImport-{{ import.id }}" action="{{ runRoute }}" method="post"></form>
+                                    <form id="postRunImport-{{ import.id }}" action="{{ runRoute }}?{{ returnQueryString }}" method="post"></form>
                                 {% endif %}
                                 {% set undoRoute = routeLookupIfAuthorized('pastoralBulkImport.postUndoImport', {id: import.id, import: import}) %}
                                 {% if undoRoute %}
-                                    <form id="postUndoImport-{{ import.id }}" action="{{ undoRoute }}" method="post"></form>
+                                    <form id="postUndoImport-{{ import.id }}" action="{{ undoRoute }}?{{ returnQueryString }}" method="post"></form>
                                 {% endif %}
                                 <div class="list-item">
                                     <div class="card small-12">
                                         {% if getRoute %}
-                                            <a href="{{ getRoute }}" {% if import.undone %}class="strike"{% endif %}><h3>{{ import.heading }}</h3></a>
+                                            <a href="{{ getRoute }}?{{ returnQueryString }}" {% if import.undone %}class="strike"{% endif %}><h3>{{ import.heading }}</h3></a>
                                         {% else %}
                                             <span {% if import.undone %}class="strike"{% endif %}><h3>{{ import.heading }}</h3></span>
                                         {% endif %}
@@ -80,7 +81,7 @@
                                 {# Buttons: run, undo, modify, archive?, delete? #}
                                 <nav>
                                     {% if getRoute %}
-                                        <a class="icon-eye" href="{{ getRoute }}" title="{% if import.imported %}View import results{% else %}Preview import{% endif %}"></a>
+                                        <a class="icon-eye" href="{{ getRoute }}?{{ returnQueryString }}" title="{% if import.imported %}View import results{% else %}Preview import{% endif %}"></a>
                                     {% endif %}
 
                                     {% if runRoute %}
