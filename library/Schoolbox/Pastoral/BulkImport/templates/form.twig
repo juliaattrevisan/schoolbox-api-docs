@@ -55,7 +55,9 @@
                         <select name="typeId" id="typeId" required>
                             <option disabled selected>Please select a type</option>
                             {% for type in types %}
-                                <option value="{{ type.id }}">{{ type.name }}</option>
+                                <option value="{{ type.id }}"
+                                        {% if not moderator %}data-visibility-locked="{{ type.visibilityLocked }}"{% endif %}
+                                >{{ type.name }}</option>
                             {% endfor %}
                         </select>
                     </div>
@@ -66,6 +68,7 @@
                                 <option data-chained="{{ subtype.pastoralType.id }}"
                                         class="{{ subtype.pastoralType.id }}"
                                         value="{{ subtype.id }}"
+                                        {% if not moderator %}data-visibility-locked="{{ subtype.visibilityLocked }}"{% endif %}
                                 >{{ subtype.name }}</option>
                             {% endfor %}
                         </select>
