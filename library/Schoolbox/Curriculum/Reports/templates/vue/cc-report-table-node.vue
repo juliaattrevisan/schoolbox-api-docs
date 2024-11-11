@@ -20,12 +20,8 @@ const props = defineProps<Props>();
 const reportStore = useReportStore();
 const filtersStore = useFiltersStore();
 const { title } = useNodeTitle(props.node);
-
-/**
- * to gradually add more paddingStart to indicate node level depth
- * @returns - the paddingStart value
- */
-const paddingStart = window.Vue.computed(() => `calc(${props.depth * 0.75}rem + 0.625rem)`);
+const paddingStart = window.Vue.ref(`calc(${props.depth * 0.75}rem + 0.625rem)`); // to gradually add more paddingStart to indicate node level depth
+const hasChildren = window.Vue.ref(props.node.children && props.node.children.length > 0);
 
 // #region usage counts
 
@@ -173,7 +169,8 @@ function onExpandClicked(): void {
             :style="{ paddingInlineStart: paddingStart }"
         >
             <button
-                class="expand-button expander icon-down-arrow l-flex l-flex--center"
+                v-if="hasChildren"
+                :class="`expand-button expander l-flex l-flex--center ${isExpanded ? 'icon-down-arrow' : 'icon-up-arrow'}`"
                 :aria-label="expandTitle"
                 :title="expandTitle"
                 @click="onExpandClicked"
@@ -207,7 +204,7 @@ function onExpandClicked(): void {
             </template>
         </template>
     </tr>
-    <template v-if="props.node.children && props.node.children.length > 0">
+    <template v-if="hasChildren">
         <template v-if="isExpanded">
             <cc-report-table-node
                 v-for="child in props.node.children"
