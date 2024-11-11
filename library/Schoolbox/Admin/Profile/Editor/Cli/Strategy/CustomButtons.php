@@ -106,7 +106,7 @@ class CustomButtons
          */
         $this->cleanup();
 
-        $this->log->info('Done.');
+        $this->log->info('Custom buttons migrated.');
     }
 
 
