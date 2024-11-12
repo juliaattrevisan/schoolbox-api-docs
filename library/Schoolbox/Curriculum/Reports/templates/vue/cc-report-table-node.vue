@@ -204,7 +204,7 @@ window.Vue.onMounted(async () => {
             </td>
         </template>
     </tr>
-    <template v-if="hasChildren && isExpanded">
+    <template v-if="hasChildren && (isExpanded || filtersStore.onlyShowGaps)">
         <cc-report-table-node
             v-for="child in props.node.children"
             :key="child.id"
