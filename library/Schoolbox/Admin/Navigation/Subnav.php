@@ -844,31 +844,6 @@ class Subnav
                     ],
                 ]
             ],
-            '/adminv2/dashboard' => [
-                'name'       => 'Personalisation',
-                'visible'    => $userIsSuperuser,
-                'searchable' => false,
-                'children'   => [
-                    '/adminv2/dashboard' => [
-                        'name'        => 'Dashboard Templates',
-                        'visible'     => $userIsSuperuser,
-                        'children'    => [],
-                        'description' => 'Configure the layout of the initial landing page when you first login for each role.',
-                    ],
-                    '/adminv2/homepage' => [
-                        'name'        => 'Homepage Templates',
-                        'visible'     => $userIsSuperuser,
-                        'children'    => [],
-                        'description' => 'Configure and setup the scaffolding templates that users can create homepages from.',
-                    ],
-                    '/adminv2/profile-editor' => [
-                        'name'        => 'Profile Editor',
-                        'visible'     => $userIsSuperuser,
-                        'children'    => [],
-                        'description' => 'Customise the fields and buttons on the staff, student and parent profile screens.',
-                    ],
-                ],
-            ],
             '/adminv2/cms' => [
                 'name'       => 'Resources',
                 'visible'    => $userIsSuperuser || $userHasServicePermissionCms,
