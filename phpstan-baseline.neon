@@ -686,26 +686,6 @@ parameters:
 			path: library/Component/Eportfolio/FileListController.php
 
 		-
-			message: "#^Method Component_Homepage_ControllerAbstract\\:\\:getDefaultCollapsedState\\(\\) should return string but returns array\\<string, string\\>\\.$#"
-			count: 2
-			path: library/Component/Homepage/ControllerAbstract.php
-
-		-
-			message: "#^Offset 'class' does not exist on string\\.$#"
-			count: 1
-			path: library/Component/Homepage/ControllerAbstract.php
-
-		-
-			message: "#^Offset 'data' does not exist on string\\.$#"
-			count: 1
-			path: library/Component/Homepage/ControllerAbstract.php
-
-		-
-			message: "#^Offset 'icon' does not exist on string\\.$#"
-			count: 1
-			path: library/Component/Homepage/ControllerAbstract.php
-
-		-
 			message: "#^Method Component_Homepage_EtherpadController\\:\\:setSortMapping\\(\\) is unused\\.$#"
 			count: 1
 			path: library/Component/Homepage/EtherpadController.php

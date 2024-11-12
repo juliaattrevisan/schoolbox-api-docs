@@ -26,7 +26,12 @@ class Module extends \Alaress\Module\Module
      */
     protected function registerRoutes(): void
     {
-        $ruleSearchSettings = new Rule\All(
+        $ruleSuperuserOnly = new Rule\All(
+            new Rule\IsLoggedIn(),
+            new Rule\IsSuperuser(),
+        );
+
+        $ruleSuperuserOrModerator = new Rule\All(
             new Rule\IsLoggedIn(),
             new Rule\Any(
                 new Rule\IsSuperuser(),
@@ -36,6 +41,7 @@ class Module extends \Alaress\Module\Module
                 new Rule\HasServicePermission(UserAccess::SERVICE_LMS, UserAccess::ACCESS_FULL),
                 new Rule\HasServicePermission(UserAccess::SERVICE_BADGE, UserAccess::ACCESS_FULL),
                 new Rule\HasServicePermission(UserAccess::SERVICE_CMS, UserAccess::ACCESS_FULL),
+                new Rule\HasServicePermission(UserAccess::SERVICE_DESIGN, UserAccess::ACCESS_FULL),
             )
         );
 
@@ -63,9 +69,12 @@ class Module extends \Alaress\Module\Module
             )
         );
 
-        $ruleSuperuserOnly = new Rule\All(
+        $ruleDesign = new Rule\All(
             new Rule\IsLoggedIn(),
-            new Rule\IsSuperuser(),
+            new Rule\Any(
+                new Rule\IsSuperuser(),
+                new Rule\HasServicePermission(UserAccess::SERVICE_DESIGN, UserAccess::ACCESS_FULL)
+            )
         );
 
         // Routes to which users with service permission UserAccess::SERVICE_PASTORAL need access.
@@ -81,7 +90,14 @@ class Module extends \Alaress\Module\Module
         $this->register('GET', '/cms/{typeLabel:Resources}', 'getSettingsCms', $ruleCms);
         $this->register('POST', '/cms/{typeLabel:Resources}', 'postSettingsCms', $ruleCms);
 
-        $this->register('GET', '/search', 'searchSettings', $ruleSearchSettings);
+        // Routes to which users with service permission UserAccess::SERVICE_DESIGN need access.
+        $this->register('GET', '/design/{typeLabel:Skin%20Config}', 'getSettingsDesign', $ruleDesign);
+        $this->register('POST', '/design/{typeLabel:Skin%20Config}', 'postSettingsDesign', $ruleDesign);
+
+        // Routes to which all moderators as well as superusers need access.
+        $this->register('GET', '/search', 'searchSettings', $ruleSuperuserOrModerator);
+
+        // Routes to which only superusers need access.
         $this->register('GET', '{/typeLabel}', 'getSettings', $ruleSuperuserOnly);
         $this->register('POST', '/{typeLabel}', 'postSettings', $ruleSuperuserOnly);
     }

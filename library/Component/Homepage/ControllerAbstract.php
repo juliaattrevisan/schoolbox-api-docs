@@ -54,12 +54,19 @@ abstract class Component_Homepage_ControllerAbstract extends Component_Controlle
             $sourceId = 0;
         }
 
-        // Control permission: always based on current context
-        $this->setContextPermission(min($this->access->getFolderAccess($this->getUser(), $contextId), $this->getMaximumPermission()));
         try {
+            // Control permission: always based on current context
+            $userAccessLevel = (
+                // TODO: Instead of checking permissions using this ternary expression, create an 'isSatisfiedBy()' function
+                //       in a new class similar to Comms/News/ValidHasReadMore.php.
+                $this->getUser()->hasServicePermission(UserAccess::SERVICE_DESIGN, UserAccess::ACCESS_FULL)
+                ? UserAccess::ACCESS_FULL
+                : $this->access->getFolderAccess($this->getUser(), $contextId)
+            );
+            $this->setContextPermission(min($userAccessLevel, $this->getMaximumPermission()));
             // Content permission: based on alt source if it's there
             $this->setContentPermission(min($this->access->getFolderAccess($this->getUser(), $sourceId), $this->getMaximumPermission()));
-        } catch (\Schoolbox\Mapper\Exception\Deleted $e) {
+        } catch (\Schoolbox\Mapper\Exception $e) {
             /**
              * If the alt source has been deleted, catch that here
              * So that it doesn't escalate to the kernel and 404 the whole page
@@ -67,7 +74,6 @@ abstract class Component_Homepage_ControllerAbstract extends Component_Controlle
             $this->setContentPermission(UserAccess::ACCESS_DENY);
         }
     }
-
 
     /**
      * Prepares data for the render function. Business logic.
@@ -194,7 +200,7 @@ abstract class Component_Homepage_ControllerAbstract extends Component_Controlle
      * when something is collapsed; css class to hide an element; and
      * the data attribute for the toggler to function correctly
      *
-     * @return string
+     * @return array
      */
     protected function getDefaultCollapsedState()
     {

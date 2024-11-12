@@ -20,13 +20,10 @@ $page->initSession();
 /** @var User $user */
 $user = $_SESSION['user'];
 
-if (!($user->isSuperuser())) {
-    throw ErrorMapper::getInstance()->generateException(ErrorMapper::ERROR_PERM_PAGE_VIEW);
-}
-
-$groupHandler = new Group(UserAccess::SERVICE_HOMEPAGE);
-
-if (!($user->isSuperuser())) {
+if (
+    !$_SESSION['user']->isSuperuser() &&
+    !$_SESSION['user']->hasServicePermission(UserAccess::SERVICE_DESIGN, UserAccess::ACCESS_FULL)
+) {
     throw ErrorMapper::getInstance()->generateException(ErrorMapper::ERROR_PERM_PAGE_VIEW);
 }
 
@@ -55,7 +52,7 @@ if (($_POST['type'] ?? '') == 'components') {
                 try {
                     /** @var Component_Instance $inst */
                     $inst = Component_InstanceMapper::getInstance()->findById($componentID);
-                    $inst->setSequence($sequence + 1); // because we prefer to not have 0s in the database///
+                    $inst->setSequence((int)$sequence + 1); // because we prefer to not have 0s in the database///
                     $inst->setPosition($position);
                     $instanceList[] = $inst;
                 } catch (Schoolbox\Mapper\Exception $e) {

@@ -353,6 +353,52 @@ class Controller extends Base
         $this->postDeleteSlave($table);
     }
 
+    // Functions for routes accessible by Design Moderators ----------------------------------------------------------//
+
+    /**
+     * @param string|null $table
+     * @return void
+     * @throws RouteNotFound
+     * @throws ReflectionException|Error
+     */
+    public function getDesignIndex(?string $table): void
+    {
+        $this->getLists($table, false);
+    }
+
+    /**
+     * @param string|null $table
+     * @return void
+     * @throws RouteNotFound
+     * @throws ReflectionException
+     * @throws Error
+     */
+    public function getDesignData(?string $table): void
+    {
+        $this->getLists($table, true);
+    }
+
+    /**
+     * @param string $table
+     * @return void
+     * @throws Deleted
+     * @throws MapperException
+     * @throws RouteNotFound
+     */
+    public function postDesignSave(string $table): void
+    {
+        $this->postSaveSlave($table);
+    }
+
+    /**
+     * @param string $table
+     * @return void
+     */
+    public function postDesignDelete(string $table): void
+    {
+        $this->postDeleteSlave($table);
+    }
+
     // Private functions ---------------------------------------------------------------------------------------------//
 
     /**
@@ -1675,6 +1721,8 @@ class Controller extends Base
             'submission-type',
             'submission-errors' => 'Lms',
             'achievement-category' => 'Badge',
+            'component-definition',
+            'timetable-colour' => 'Design',
             default => '',
         };
     }

@@ -12,8 +12,12 @@
 
 use Schoolbox\Admin\Navigation\Subnav;
 use Schoolbox\Error\Mapper as ErrorMapper;
+use Schoolbox\Permission\Access\UserAccess;
 
-if (!$this->getDi()->get('session')->get('user')->isSuperuser()) {
+if (
+    !$_SESSION['user']->isSuperuser() &&
+    !$_SESSION['user']->hasServicePermission(UserAccess::SERVICE_DESIGN, UserAccess::ACCESS_FULL)
+) {
     throw ErrorMapper::getInstance()->generateException(ErrorMapper::ERROR_PERM_PAGE_VIEW);
 }
 

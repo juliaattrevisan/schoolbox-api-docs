@@ -16,6 +16,7 @@ use Alaress\Twig\Loader\IChainLoader;
 use Alaress\Web\Controller\Base;
 use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Mapper\Exception as MapperException;
+use Schoolbox\Permission\Access\UserAccess;
 
 class Module extends BaseModule
 {
@@ -32,13 +33,12 @@ class Module extends BaseModule
      */
     protected function registerRoutes(): void
     {
-        /* Keep an eye out on Granular Permissions epic SA-18424
-         * Hopefully there isn't a service permission that affects us here
-         * and we can continue to assume Superusers Only
-         */
         $perms = new Rule\All(
             new Rule\IsLoggedIn(),
-            new Rule\IsSuperuser()
+            new Rule\Any(
+                new Rule\IsSuperuser(),
+                new Rule\HasServicePermission(UserAccess::SERVICE_DESIGN, UserAccess::ACCESS_FULL)
+            )
         );
 
         $preloadField = function ($params) {
