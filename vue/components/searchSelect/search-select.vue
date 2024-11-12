@@ -4,7 +4,8 @@
  */
 
 import { toRef, useTemplateRef } from "vue";
-import { onClickOutside, useFocusWithin } from "@vueuse/core";
+// import { onClickOutside, useFocusWithin } from "@vueuse/core";
+import { onClickOutside } from "@vueuse/core";
 import { useSelected } from "@schoolboxVue/composables/selected/useSelected";
 import { useQuerySearch } from "@schoolboxVue/composables/search/useQuerySearch";
 import type { SearchSelectItem } from "@schoolboxVue/composables/search/types/SearchSelectItem";
