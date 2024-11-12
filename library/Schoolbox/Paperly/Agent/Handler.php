@@ -804,6 +804,12 @@ class Handler
         return $typeArray;
     }
 
+    /**
+     * Handle get student data from parent id
+     *
+     * @param array $data
+     * @return array
+     */
     public function handleGetDetailsDataRequest(array $data): array
     {
         if (!isset($data['id']) || !$this->validateParent($data['id'])) {
@@ -841,6 +847,12 @@ class Handler
         return $authArr;
     }
 
+    /**
+     * Validating if parent exists
+     *
+     * @param string|null $parentId
+     * @return bool
+     */
     private function validateParent(?string $parentId): bool
     {
         $selectedView = $this->viewSelector->getView(ViewSelector::PAPERLY_VIEW_ALL_PARENTS);
@@ -852,6 +864,12 @@ class Handler
         return $stmt->fetchColumn() !== false;
     }
 
+    /**
+     * Get student relationship data
+     *
+     * @param string $parentId
+     * @return array
+     */
     private function getRelatedData(string $parentId): array
     {
         $selectedView = $this->viewSelector->getView(ViewSelector::PAPERLY_VIEW_ALL_STUDENTS);
@@ -880,6 +898,13 @@ class Handler
         return $relatedData;
     }
 
+    /**
+     * Get primary parent data
+     *
+     * @param string $parentId
+     * @param string $parentRel
+     * @return array
+     */
     private function getPrimaryData(string $parentId, string $parentRel): array
     {
         $primaryData = [];
@@ -952,6 +977,13 @@ class Handler
         return $primaryData;
     }
 
+    /**
+     * Get student parent spouse data
+     *
+     * @param string $spouseID
+     * @param        $spouseRel
+     * @return array
+     */
     private function getSpouseData(string $spouseID, $spouseRel): array
     {
         $spouseData = [];
@@ -1022,6 +1054,12 @@ class Handler
         return $spouseData;
     }
 
+    /**
+     * Get student data
+     *
+     * @param array $studentIDs
+     * @return array
+     */
     private function getStudentData(array $studentIDs): array
     {
         $authArr = [];
@@ -1184,6 +1222,12 @@ class Handler
         return $authArr;
     }
 
+    /**
+     * Student medical conditions
+     *
+     * @param int $stuID
+     * @return array
+     */
     private function getStudentMedicalConditions(int $stuID): array
     {
         $selectedView = $this->viewSelector->getView(ViewSelector::PAPERLY_VIEW_STUDENT_MEDICAL);
@@ -1209,6 +1253,12 @@ class Handler
         return $smcArr;
     }
 
+    /**
+     * Student abilities data
+     *
+     * @param int $stuID
+     * @return array
+     */
     private function getStudentAbilities(int $stuID): array
     {
         $abiArr = [];
@@ -1237,6 +1287,12 @@ class Handler
         return $abiArr;
     }
 
+    /**
+     * Student consents
+     *
+     * @param int $stuID
+     * @return array
+     */
     private function getStudentConsents(int $stuID): array
     {
         $consentArr = [];
@@ -1280,6 +1336,12 @@ class Handler
         return $consentArr;
     }
 
+    /**
+     * Student lives with
+     *
+     * @param int $stuID
+     * @return array
+     */
     private function getStudentLivesWith(int $stuID): array
     {
         $livesWithArr = [];
@@ -1308,6 +1370,12 @@ class Handler
         return array_values($livesWithArr);
     }
 
+    /**
+     * Validating the data request for updating details
+     *
+     * @param array $data
+     * @return void
+     */
     public function validateUpdateDetailsRequestData(array $data): void
     {
         if (!isset($data['data']) || count((array)$data['data']) < 1) {
@@ -1325,6 +1393,12 @@ class Handler
         $this->validateUpdateDetailsRequestBody($data);
     }
 
+    /**
+     * Validating user modifying the data
+     *
+     * @param string $id
+     * @return bool
+     */
     private function validateModifiedByUser(string $id)
     {
         $sql = "SELECT ID FROM Community WHERE ID = ?";
@@ -1392,6 +1466,11 @@ class Handler
         }
     }
 
+    /**
+     * Parent details validator
+     *
+     * @return array
+     */
     private function getParentUpdatedDetailsDataValidators(): array
     {
         return [
@@ -1573,6 +1652,11 @@ class Handler
         ];
     }
 
+    /**
+     * Student details validator
+     *
+     * @return array
+     */
     private function getStudentUpdatedDetailsDataValidators(): array
     {
         return [
@@ -1768,6 +1852,12 @@ class Handler
         ];
     }
 
+    /**
+     * Handle data for updating details
+     *
+     * @param $data
+     * @return array
+     */
     public function handleUpdateDetailsDataRequest($data): array
     {
         try {
@@ -1794,6 +1884,13 @@ class Handler
         }
     }
 
+    /**
+     * Handle parent update
+     *
+     * @param $data
+     * @return void
+     * @throws Exception
+     */
     private function handleUpdateParentDataRequest($data): void
     {
         //Making sure that it is an array
@@ -1880,12 +1977,26 @@ class Handler
         }
     }
 
+    /**
+     * Handle student data update
+     *
+     * @param object $data
+     * @param        $modifiedBy
+     * @return void
+     * @throws Exception
+     */
     private function handleUpdateStudentDataRequest(object $data, $modifiedBy): void
     {
         $groupedData = $this->groupStudentDataByDatabaseTable($data);
         $this->processGroupedStudentData($groupedData, $modifiedBy);
     }
 
+    /**
+     * Grouping of the student data
+     *
+     * @param object $data
+     * @return array
+     */
     private function groupStudentDataByDatabaseTable(object $data): array
     {
         $groupedData = [
@@ -2029,6 +2140,12 @@ class Handler
         return $groupedData;
     }
 
+    /**
+     * @param array $groupedData
+     * @param       $modifiedBy
+     * @return void
+     * @throws Exception
+     */
     private function processGroupedStudentData(array $groupedData, $modifiedBy)
     {
         // Process community data
@@ -2063,6 +2180,12 @@ class Handler
         }
     }
 
+    /**
+     * @param $data
+     * @param $studentID
+     * @return void
+     * @throws Exception
+     */
     private function updateCommunityTable($data, $studentID): void
     {
         if (!empty($data)) {
@@ -2083,6 +2206,12 @@ class Handler
         }
     }
 
+    /**
+     * @param $data
+     * @param $studentID
+     * @return void
+     * @throws Exception
+     */
     private function updateStudentsTable($data, $studentID): void
     {
         if (!empty($data)) {
@@ -2103,6 +2232,13 @@ class Handler
         }
     }
 
+    /**
+     * @param $data
+     * @param $studentID
+     * @param $modifiedBy
+     * @return void
+     * @throws Exception
+     */
     private function updateCommunityLegalTable($data, $studentID, $modifiedBy): void
     {
         if (!empty($data)) {
@@ -2125,6 +2261,14 @@ class Handler
         }
     }
 
+    /**
+     * Soft delete the student's medical condition
+     *
+     * @param $conditions
+     * @param $studentID
+     * @return void
+     * @throws Exception
+     */
     private function deleteStudentMedicalConditions($conditions, $studentID): void
     {
         $selectedView = $this->viewSelector->getView(ViewSelector::PAPERLY_VIEW_STUDENT_MEDICAL);
@@ -2156,6 +2300,15 @@ class Handler
         }
     }
 
+    /**
+     * Creating student's medical condition
+     *
+     * @param $conditions
+     * @param $studentID
+     * @param $modifiedBy
+     * @return void
+     * @throws Exception
+     */
     private function createStudentMedicalConditions($conditions, $studentID, $modifiedBy): void
     {
         if (!empty($conditions)) {
@@ -2192,6 +2345,14 @@ class Handler
         }
     }
 
+    /**
+     * Soft delete the status of the student consents
+     *
+     * @param $consents
+     * @param $modifiedBy
+     * @return void
+     * @throws Exception
+     */
     private function deleteStudentConsents($consents, $modifiedBy): void
     {
         if (!empty($consents)) {
@@ -2238,6 +2399,15 @@ class Handler
         }
     }
 
+    /**
+     * Creating/Updating the student consents
+     *
+     * @param $consents
+     * @param $studentID
+     * @param $modifiedBy
+     * @return void
+     * @throws Exception
+     */
     private function createOrUpdateStudentConsents($consents, $studentID, $modifiedBy): void
     {
         if (!empty($consents)) {
