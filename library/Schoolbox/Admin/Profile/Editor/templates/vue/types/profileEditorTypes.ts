@@ -108,6 +108,7 @@ export type ProfileEditorRoleType = {
         postFieldRemove: string;
         postFieldSettings: string;
         postFieldSequence: string;
+        postTabSequence: string;
     };
 };
 
