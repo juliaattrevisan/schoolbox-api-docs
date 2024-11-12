@@ -58,7 +58,7 @@ window.Vue.watch(isDetailsOpen, (isOpen) => {
             </tbody>
         </table>
     </div>
-    <basic-modal v-model:is-open="isDetailsOpen">
+    <basic-modal v-model:is-open="isDetailsOpen" :has-background-click="true">
         <node-details v-if="selectedNodeId !== null" :node-id="selectedNodeId" />
     </basic-modal>
 </template>
