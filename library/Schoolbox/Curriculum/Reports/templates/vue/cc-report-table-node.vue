@@ -88,7 +88,7 @@ function getCourseUsageCount(node: CurriculumCoverageNode, $course: Course): num
     if (course === undefined) return 0;
     const { usage } = course;
     if (usage === undefined) return 0;
-    return filtersStore.selectedReportOptions.reduce((acc, option) => {
+    const onNodeCount = filtersStore.selectedReportOptions.reduce((acc, option) => {
         // always skip unit, learning activity and lesson plan options as they can't be assigned within a course
         if (
             option === ReportOptionValues.UNIT ||
@@ -101,6 +101,17 @@ function getCourseUsageCount(node: CurriculumCoverageNode, $course: Course): num
         if (usage[option] === undefined) return acc;
         return acc + usage[option].count;
     }, 0);
+    /**
+     * When the node has children and is not expanded, we want to show the usage count inclusive of children
+     * to show how many usages are linked to the node and its children
+     */
+    if (node.children && node.children.length > 0 && !isExpanded.value) {
+        const onChildrenCount = node.children.reduce((acc, child) => {
+            return acc + getCourseUsageCount(child, $course);
+        }, 0);
+        return onNodeCount + onChildrenCount;
+    }
+    return onNodeCount;
 }
 
 /**
