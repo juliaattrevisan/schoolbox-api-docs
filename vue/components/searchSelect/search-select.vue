@@ -4,7 +4,7 @@
  */
 
 import { toRef, useTemplateRef } from "vue";
-import { onClickOutside, useFocus } from "@vueuse/core";
+import { onClickOutside, useFocusWithin } from "@vueuse/core";
 import { useSelected } from "@schoolboxVue/composables/selected/useSelected";
 import { useQuerySearch } from "@schoolboxVue/composables/search/useQuerySearch";
 import type { SearchSelectItem } from "@schoolboxVue/composables/search/types/SearchSelectItem";
@@ -104,9 +104,9 @@ window.Vue.onMounted(async () => {
 });
 
 /**
- * To close the search results when the input is not focused
+ * To close the search results when the search select is not focused
  */
-const { focused } = useFocus(searchSelectEl);
+const { focused } = useFocusWithin(searchSelectEl);
 window.Vue.watch(focused, ($focused) => {
     if (!$focused) {
         query.value = "";
