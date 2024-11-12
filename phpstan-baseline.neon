@@ -686,6 +686,7 @@ parameters:
 			path: library/Component/Eportfolio/FileListController.php
 
 		-
+<<<<<<< Updated upstream
 			message: "#^Offset 'class' does not exist on string\\.$#"
 			count: 1
 			path: library/Component/Homepage/ControllerAbstract.php
@@ -698,6 +699,10 @@ parameters:
 		-
 			message: "#^Offset 'icon' does not exist on string\\.$#"
 			count: 1
+=======
+			message: "#^Method Component_Homepage_ControllerAbstract\\:\\:getDefaultCollapsedState\\(\\) should return string but returns array\\<string, string\\>\\.$#"
+			count: 2
+>>>>>>> Stashed changes
 			path: library/Component/Homepage/ControllerAbstract.php
 
 		-
