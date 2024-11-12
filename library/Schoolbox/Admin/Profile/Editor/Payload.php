@@ -183,6 +183,7 @@ class Payload
                     'mandatory' => []
                 ],
                 'buttons' => [],
+                'tabs' => [],
                 '_links' => [
                     'manageButtons' => $this->routeGenerator->generate('adminProfileButton.getIndex', [
                         'roleType' => $roleType
@@ -195,6 +196,7 @@ class Payload
             $buttons = $this->buttonMapper
                 ->findByColumn('roletype', $roleType)
                 ->sortBy('sortOrder', 'asc');
+
             foreach ($buttons as $button) {
                 $roleTypeSettings['buttons'][] = [
                     'id' => $button->getId(),
@@ -206,6 +208,24 @@ class Payload
                             'id' => $button->getId()
                         ]),
                     ]
+                ];
+            }
+
+            /* TODO: Tabs
+             */
+            $tabs = [
+                ['id' => 'activity', 'label' => 'Activity Feed'],
+                ['id' => 'goals', 'label' => 'Goals'],
+                ['id' => 'achievements', 'label' => 'Achievements'],
+                ['id' => 'classes', 'label' => 'Classes'],
+                ['id' => 'groups', 'label' => 'Groups'],
+                ['id' => 'contacts', 'label' => 'Contacts'],
+            ];
+
+            foreach ($tabs as $tab) {
+                $roleTypeSettings['tabs'][] = [
+                    'id' => $tab['id'],
+                    'label' => $tab['label']
                 ];
             }
 

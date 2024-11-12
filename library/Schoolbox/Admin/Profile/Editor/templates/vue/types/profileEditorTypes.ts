@@ -10,6 +10,8 @@ export type ProfileEditorEndpoints = {
     adminProfileEditorPostNameFormat: string;
 };
 
+// FIELD SETTINGS
+
 export type ProfileEditorFieldSettingOption = {
     id: number | string;
     name: string;
@@ -22,6 +24,8 @@ export type ProfileEditorFieldSettingDefinition = {
     tooltip: string;
     options: ProfileEditorFieldSettingOption[];
 };
+
+// FIELD TYPES
 
 export type ProfileEditorAvailableField = {
     field: string;
@@ -54,6 +58,8 @@ export type ProfileEditorMandatoryField = {
 // This is not a
 export type ProfileEditorActiveField = ProfileEditorSelectedField | ProfileEditorMandatoryField;
 
+// BUTTONS
+
 // The buttons available on profiles, each with a link to the relevant modify page
 type ProfileEditorButton = {
     id: number;
@@ -64,6 +70,16 @@ type ProfileEditorButton = {
         modify: string;
     };
 };
+
+// TABS
+
+// The tabs available on the profile editor for a role type
+export type ProfileEditorTab = {
+    id: string;
+    label: string;
+};
+
+// ROLE TYPES
 
 export type ProfileEditorRoleType = {
     roleType: string; // only ever "student", "staff", or "parent" at the moment... for display purposes make Title Case if required
@@ -89,6 +105,8 @@ export type ProfileEditorRoleType = {
         mandatory: ProfileEditorMandatoryField[];
     };
     buttons: ProfileEditorButton[];
+    // These tabs are implicitly ordered by sequence any time the front- and back-end exchange payload data
+    tabs: ProfileEditorTab[];
     _links: {
         manageButtons: string; // The route to the relevant page for managing the buttons for this role type
     };

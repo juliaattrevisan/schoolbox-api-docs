@@ -5,6 +5,7 @@
 
 import PeFields from "./pe-fields.vue";
 import PeButtons from "./pe-buttons.vue";
+import PeTabs from "./pe-tabs.vue";
 import PeRoleType from "./pe-role-type.vue";
 import PeNameFormat from "./pe-name-format.vue";
 import { useProfileEditorStore } from "./store/profileEditorStore";
@@ -40,6 +41,7 @@ window.Vue.onMounted(() => {
     </div>
     <pe-fields />
     <pe-buttons />
+    <pe-tabs />
 </template>
 
 <style scoped></style>
