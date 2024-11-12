@@ -141,9 +141,7 @@ window.Vue.watch(
 <template>
     <div ref="resultsEl" class="results">
         <div v-if="props.isSearching" class="results__status">Searching for results....</div>
-        <div v-else-if="props.hasNoResults && props.selected.length === 0" class="results__status">
-            No results found for your current search.
-        </div>
+        <div v-else-if="props.hasNoResults" class="results__status">No results found for your current search.</div>
         <fieldset v-else class="results__fieldset">
             <legend class="t-visually-hidden">Search results</legend>
             <ss-results-select-all
