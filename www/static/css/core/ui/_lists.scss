@@ -471,7 +471,7 @@ ul.meta {
 }
 // Adjust padding for manage rubrice capabilities list items within .information-list for spacing consistency and better UI
 ul.information-list {
-    li {
+    li.rubric-criterion-padding {
         &.actions-small-1 > .list-item {
             padding-bottom: 2.5rem;
             padding-top: 0.5rem;

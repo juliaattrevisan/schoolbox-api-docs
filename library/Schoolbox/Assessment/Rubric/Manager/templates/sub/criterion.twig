@@ -13,7 +13,7 @@
 {% set maxIndicatorLength = 900 %}
 {# maxIndicatorLength is 900, due to the way browsers look at maxlength as character lenght, but mysql table looks at char byte lenght
 so if there are bullet points in the textbox they count as 3 characters, and will cause issues, so lets work on 900 as the limit, and we shouldn't hit the db max...#}
-<li class="actions-small-1"
+<li class="actions-small-1 rubric-criterion-padding"
     data-rubric-criterion-row="{{ criterionId }}"
     {% if not criterion %}data-rubric-unsaved data-rubric-criterion-new-row{% endif %}
 >
