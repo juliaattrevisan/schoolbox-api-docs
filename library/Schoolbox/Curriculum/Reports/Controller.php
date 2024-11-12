@@ -217,15 +217,14 @@ class Controller extends Base
         );
     }
 
-    /**
-     * fetch the coverage report
-     *
-     * @return void
-     * @throws TwigError
-     */
-    public function postCoverage(): void
+    public function getCoverageUsage(): void
     {
-        $this->response = $this->responseFromTemplate('@curriculumreports/index.twig', ['var' => 'POST']);
+        $response = [];
+        $query = $this->requestQuery;
+
+        $this->response = $this->responseAsJson(
+            $response
+        );
     }
 
     /**

@@ -43,7 +43,7 @@ class Module extends BaseModule
 
         $this->register('GET', '/coverage', 'getCoverage', $staffPerms);
         $this->register('GET', '/coverage/generate', 'generateCoverage', $staffPerms);
-        $this->register('POST', '/coverage', 'postCoverage', $staffPerms);
+        $this->register('GET', '/coverage/usage', 'getCoverageUsage', $staffPerms);
     }
 
     /**
