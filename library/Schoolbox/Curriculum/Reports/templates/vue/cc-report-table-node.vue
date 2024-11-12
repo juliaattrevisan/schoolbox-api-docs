@@ -20,7 +20,7 @@ const props = defineProps<Props>();
 const reportStore = useReportStore();
 const filtersStore = useFiltersStore();
 const { title } = useNodeTitle(props.node);
-const paddingStart = window.Vue.ref(`calc(${props.depth * 0.75}rem + 0.625rem)`); // to gradually add more paddingStart to indicate node level depth
+const paddingStart = window.Vue.ref(`calc(${props.depth * 0.5}rem + 0.5rem)`); // to gradually add more paddingStart to indicate node level depth
 const hasChildren = window.Vue.ref(props.node.children && props.node.children.length > 0);
 
 // #region usage counts
@@ -164,7 +164,6 @@ function onExpandClicked(): void {
 <template>
     <tr v-if="showNode">
         <th
-            scope="row"
             class="node__name l-flex l-flex--align-center l-gap-s f-no-margins"
             :style="{ paddingInlineStart: paddingStart }"
         >
