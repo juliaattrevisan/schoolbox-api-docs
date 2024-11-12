@@ -188,12 +188,12 @@ window.Vue.onMounted(async () => {
             ></button
             >{{ title }}
         </td>
-        <td :class="``">
+        <td class="u-border-left">
             {{ getEntireUsageCount(props.node) }}
         </td>
         <!-- loop through each course/unit, retrieving the node usage or returning 0 for undefined usages -->
         <template v-for="course in reportStore.courses" :key="course.id">
-            <td class="course-column">
+            <td class="u-border-left">
                 {{ getCourseUsageCount(props.node, course) }}
             </td>
             <td v-for="unit in course.units" :key="unit.id" :class="``">
@@ -220,12 +220,8 @@ tr:nth-child(odd) {
 }
 
 td {
-    border-bottom: 1px solid black;
-    border-right: 1px solid black;
-}
-
-.course-column {
-    border-left: 1px solid black; /* to distinguish the start of each course */
+    border-bottom: 1px solid rgb(139, 139, 139);
+    border-right: 1px solid rgb(139, 139, 139);
 }
 
 .expand-button {

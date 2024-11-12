@@ -477,16 +477,6 @@ table.attempts-table {
     vertical-align: bottom;
 }
 
-.u-key-bkg {
-    // to add extra emphasis on a column
-    background: rgb(237, 237, 237);
-}
-
-.u-alt-bkg {
-    // to help distinguish between rows or column groups
-    background: rgb(246, 246, 246);
-}
-
-.u-highlight {
-    background-color: var(--accent-background);
+.u-border-left {
+    border-left: 1px solid black;
 }
