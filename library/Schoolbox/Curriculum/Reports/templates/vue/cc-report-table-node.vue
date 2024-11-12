@@ -211,7 +211,7 @@ function onChildTitleClicked(node: CurriculumCoverageNode): void {
             <button class="title-button" @click="onTitleClicked">{{ title }}</button>
         </td>
         <td class="u-border-left">
-            {{ getEntireUsageCount(props.node) }}
+            <b>{{ getEntireUsageCount(props.node) }}</b>
         </td>
         <!-- loop through each course/unit, retrieving the node usage or returning 0 for undefined usages -->
         <template v-for="course in reportStore.courses" :key="course.id">
