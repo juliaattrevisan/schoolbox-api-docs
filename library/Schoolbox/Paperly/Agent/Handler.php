@@ -1213,22 +1213,26 @@ class Handler
     {
         $abiArr = [];
 
-        $selectedView = $this->viewSelector->getView(ViewSelector::PAPERLY_VIEW_STUDENT_ABILITIES);
-
-        $sql    = "SELECT * FROM {$selectedView} WHERE ID = ?";
-        $params = [$stuID];
-
-        $stmt = $this->externalDb->executeQuery($sql, $params);
-        foreach ($stmt as $row) {
-            $abiArr[] = [
-                "AbilitySeq"              => $row["AbilitySeq"],
-                "AbilityTypeCode"         => $row["AbilityTypeCode"],
-                "AbilityTypeDesc"         => $row["TypeDesc"],
-                "AbilityLevel"            => $row["AbilityLevel"],
-                "AbilityLevelDescription" => $row["Description"],
-                "AbilityComment"          => $row["AbilityComment"],
-            ];
-        }
+        /* Paperly has indicated that they currently don't require this query hence it is commented out for the
+         * time being, when needed, make sure the view has updated to include the `ID` column, or the sql will need
+         * to be adjusted to join with the table that contains the student id
+         */
+//        $selectedView = $this->viewSelector->getView(ViewSelector::PAPERLY_VIEW_STUDENT_ABILITIES);
+//
+//        $sql    = "SELECT * FROM {$selectedView} WHERE ID = ?";
+//        $params = [$stuID];
+//
+//        $stmt = $this->externalDb->executeQuery($sql, $params);
+//        foreach ($stmt as $row) {
+//            $abiArr[] = [
+//                "AbilitySeq"              => $row["AbilitySeq"],
+//                "AbilityTypeCode"         => $row["AbilityTypeCode"],
+//                "AbilityTypeDesc"         => $row["TypeDesc"],
+//                "AbilityLevel"            => $row["AbilityLevel"],
+//                "AbilityLevelDescription" => $row["Description"],
+//                "AbilityComment"          => $row["AbilityComment"],
+//            ];
+//        }
 
         return $abiArr;
     }
