@@ -913,7 +913,7 @@ class Subnav
                     ],
                 ]
             ],
-            '/adminv2/import/schoolDataImport' => [
+            '/adminv2/schoolDataImport' => [
                 'name'       => 'School Data Import',
                 'visible'    => (
                     ($userIsSuperuser || $userHasServicePermissionTimetable) &&
