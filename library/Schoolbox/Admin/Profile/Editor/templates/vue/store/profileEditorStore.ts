@@ -8,6 +8,7 @@ export const useProfileEditorStore = defineStore("profileEditorStore", () => {
     const roleTypes = window.Vue.ref<ProfileEditorPayload["data"]["roleTypes"]>([]);
     const savedRoleTypes = window.Vue.ref<typeof roleTypes.value>([]);
     const fieldSettings = window.Vue.ref<ProfileEditorPayload["data"]["fieldSettings"]>({});
+    const tabSettings = window.Vue.ref<ProfileEditorPayload["data"]["tabSettings"]>({});
     const selectedRoleType = window.Vue.ref<ProfileEditorRoleType | null>(null);
 
     const savedSelectedRoleType = window.Vue.computed<typeof selectedRoleType.value>(() => {
@@ -20,15 +21,18 @@ export const useProfileEditorStore = defineStore("profileEditorStore", () => {
     /**
      * Initialise the store with the relevant data
      * @param $roleTypes - The current role types
-     * @param $fieldSettings - The current field settings
+     * @param $fieldSettings - The current field settings spec
+     * @param $tabSettings - The current tab settings spec
      */
     function init(
         $roleTypes: ProfileEditorPayload["data"]["roleTypes"],
         $fieldSettings: ProfileEditorPayload["data"]["fieldSettings"],
+        $tabSettings: ProfileEditorPayload["data"]["tabSettings"],
     ): void {
         roleTypes.value = $roleTypes;
         savedRoleTypes.value = cloneDeep($roleTypes);
         fieldSettings.value = $fieldSettings;
+        tabSettings.value = $tabSettings;
     }
 
     /**
@@ -72,6 +76,7 @@ export const useProfileEditorStore = defineStore("profileEditorStore", () => {
         isLoading,
         roleTypes,
         fieldSettings,
+        tabSettings,
         savedRoleTypes,
         selectedRoleType,
         savedSelectedRoleType,

@@ -2,6 +2,9 @@
 /**
  * A specific (sortable) tab in the tabs list
  */
+
+import { animateRotation } from "@js/util/animateUtils";
+import PeTabsTabEdit from "./pe-tabs-tab-edit.vue";
 import type { ProfileEditorTab } from "./types/profileEditorTypes";
 
 interface Props {
@@ -12,6 +15,25 @@ interface Props {
 }
 
 const props = defineProps<Props>();
+const editBtn = window.Vue.ref<HTMLElement | null>(null);
+
+const isEditPanelOpen = window.Vue.ref<boolean>(false);
+
+window.Vue.watch(isEditPanelOpen, (isOpen) => {
+    // Animate the edit button
+    if (editBtn.value) {
+        const ANIMATE_CLOSED_POSITION = 0;
+        const ANIMATE_OPEN_POSITION = 90;
+        const ANIMATE_ORIGIN = "20px 20px";
+        const ANIMATE_SPEED = 0.3;
+        animateRotation(
+            editBtn.value,
+            isOpen ? ANIMATE_OPEN_POSITION : ANIMATE_CLOSED_POSITION,
+            ANIMATE_ORIGIN,
+            ANIMATE_SPEED,
+        );
+    }
+});
 </script>
 
 <template>
@@ -24,8 +46,16 @@ const props = defineProps<Props>();
                 </div>
             </div>
             <nav>
-                <a class="icon-settings" title="Settings" />
+                <a ref="editBtn" class="icon-settings" title="Settings" @click="isEditPanelOpen = !isEditPanelOpen" />
             </nav>
+        </div>
+
+        <div class="pe-tabs-tab-panel">
+            <pe-tabs-tab-edit
+                :tab="props.tab"
+                :is-open="isEditPanelOpen && !props.dragging"
+                @close="isEditPanelOpen = false"
+            />
         </div>
     </div>
 </template>
@@ -54,10 +84,23 @@ const props = defineProps<Props>();
         min-height: 2.5rem;
     }
 
+    /* To remove the hover background on the icons since they rotate */
+    nav > a[class^="icon-"]:hover {
+        background-color: transparent;
+    }
+
     /* The item held by the mouse when dragging */
     &.dragged-item {
         background-color: var(--content-ui-hover);
         height: auto !important;
+
+        /*
+         * Hide any component panel when this is the item held by the mouse.
+         * This must be a style since the element handling the drag will not react to changes here
+         */
+        .pe-tabs-tab-panel {
+            display: none;
+        }
     }
 }
 </style>

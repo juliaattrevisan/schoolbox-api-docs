@@ -118,6 +118,7 @@ class Payload
         $payload = [
             'data' => [
                 'fieldSettings' => [],
+                'tabSettings' => [],
                 'roleTypes' => [],
             ]
         ];
@@ -171,6 +172,9 @@ class Payload
             self::VISIBILITY_NODE => $fieldSettingsRoleType
         ];
 
+        // tabSettings is currently identical to fieldSettings but this allows it to diverge in the future
+        $payload['data']['tabSettings'] = $payload['data']['fieldSettings'];
+
         /* Start processing the roleTypes node
          */
         foreach ($roleTypes as $roleType) {
@@ -195,6 +199,7 @@ class Payload
                     'postFieldRemove' => $this->routeGenerator->generate('adminProfileEditor.postFieldRemove', ['roleType' => $roleType]),
                     'postFieldSettings' => $this->routeGenerator->generate('adminProfileEditor.postFieldSettings', ['roleType' => $roleType]),
                     'postFieldSequence' => $this->routeGenerator->generate('adminProfileEditor.postFieldSequence', ['roleType' => $roleType]),
+                    'postTabSettings' => "/adminv2/profileEditor/tab/{$roleType}/{tabId}/settings", // TODO Tabs
                     'postTabSequence' => "/adminv2/profileEditor/tab/{$roleType}/sequence", // TODO Tabs
                 ]
             ];
@@ -233,7 +238,15 @@ class Payload
             foreach ($tabs as $tab) {
                 $roleTypeSettings['tabs'][] = [
                     'id' => $tab['id'],
-                    'label' => $tab['label']
+                    'label' => $tab['label'],
+                    'tabSettings' => [
+                        /* Find the ids of the campuses for which this tab might be available
+                         */
+                        self::AVAILABILITY_NODE => [], // TODO Tabs
+                        /* Find the roletypes ("ids") for which this tab might be visible
+                         */
+                        self::VISIBILITY_NODE => [] // TODO Tabs
+                    ]
                 ];
             }
 

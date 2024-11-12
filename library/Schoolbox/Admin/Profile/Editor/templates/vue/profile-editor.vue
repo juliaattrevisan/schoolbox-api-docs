@@ -19,7 +19,7 @@ const props = defineProps<Props>();
 const peStore = useProfileEditorStore();
 
 window.Vue.onMounted(() => {
-    peStore.init(props.payload.data.roleTypes, props.payload.data.fieldSettings);
+    peStore.init(props.payload.data.roleTypes, props.payload.data.fieldSettings, props.payload.data.tabSettings);
 
     // Is there the url hash a valid role type? select it if so or fall back to the first role type
     const roleTypeViaHash = peStore.roleTypes.find((roleType) => roleType.roleType === window.location.hash.slice(1));

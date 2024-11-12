@@ -65,10 +65,25 @@ type ProfileEditorButton = {
 
 // TABS
 
+export type ProfileEditorTabSettingOption = {
+    id: number | string;
+    name: string;
+    type: string; // currently unused, e.g. "campus" or "role"
+};
+
+export type ProfileEditorTabSettingKey = string;
+export type ProfileEditorTabSettingDefinition = {
+    displayAs: string;
+    tooltip: string;
+    options: ProfileEditorFieldSettingOption[];
+};
+
 // The tabs available on the profile editor for a role type
 export type ProfileEditorTab = {
     id: string;
     label: string;
+    // A map of each tab setting key relevant to the tab to an array of the ids of each selected option
+    tabSettings: Record<ProfileEditorTabSettingKey, ProfileEditorTabSettingOption["id"][]>;
 };
 
 // ROLE TYPES
@@ -108,18 +123,22 @@ export type ProfileEditorRoleType = {
         postFieldRemove: string;
         postFieldSettings: string;
         postFieldSequence: string;
+        postTabSettings: string;
         postTabSequence: string;
     };
 };
 
 /**
  * The initial payload for the profile editor including all role types and
- * the definition of each of the field settings that may be applied to a field
+ * the definition of each of the field/tab settings that may be applied to a field/tab
+ * Currently fieldSettings and tabSettings are identical, but this allows them to diverge in the future
  */
 export type ProfileEditorPayload = {
     data: {
         roleTypes: ProfileEditorRoleType[];
         // A map of each field setting key to its definition (display name and options)
         fieldSettings: Record<ProfileEditorFieldSettingKey, ProfileEditorFieldSettingDefinition>;
+        // A map of each tab setting key to its definition (display name and options)
+        tabSettings: Record<ProfileEditorFieldSettingKey, ProfileEditorFieldSettingDefinition>;
     };
 };
