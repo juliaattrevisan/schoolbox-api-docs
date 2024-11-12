@@ -163,7 +163,7 @@ function onExpandClicked(): void {
 
 <template>
     <tr v-if="showNode">
-        <th
+        <td
             class="node__name l-flex l-flex--align-center l-gap-s f-no-margins"
             :style="{ paddingInlineStart: paddingStart }"
         >
@@ -175,26 +175,19 @@ function onExpandClicked(): void {
                 @click="onExpandClicked"
             ></button
             >{{ title }}
-        </th>
-        <td :class="`u-key-bkg ${nodeUsageCount === 0 ? 'u-highlight' : ''}`">
+        </td>
+        <td :class="``">
             {{ nodeUsageCount }}
         </td>
         <!-- loop through each course/unit, retrieving the node usage or returning 0 for undefined usages -->
-        <template v-for="(course, index) in reportStore.courses" :key="course.id">
-            <td :class="`${index % 2 ? 'u-alt-bkg' : ''}  ${getCourseUsageCount(course) === 0 ? 'u-highlight' : ''}`">
+        <template v-for="course in reportStore.courses" :key="course.id">
+            <td class="course-column">
                 {{ getCourseUsageCount(course) }}
             </td>
-            <td
-                v-for="unit in course.units"
-                :key="unit.id"
-                :class="`${index % 2 ? 'u-alt-bkg' : ''} ${getUnitUsageCount(course, unit) === 0 ? 'u-highlight' : ''}`"
-            >
+            <td v-for="unit in course.units" :key="unit.id" :class="``">
                 {{ getUnitUsageCount(course, unit) }}
             </td>
-            <td
-                v-if="reportStore.hasMultipleCourses"
-                :class="`${index % 2 ? 'u-alt-bkg' : ''} ${getTotalUsageCount(course) === 0 ? 'u-highlight' : ''}`"
-            >
+            <td v-if="reportStore.hasMultipleCourses" :class="``">
                 {{ getTotalUsageCount(course) }}
             </td>
         </template>
@@ -210,6 +203,15 @@ function onExpandClicked(): void {
 </template>
 
 <style scoped>
+td {
+    border-bottom: 1px solid black;
+    border-right: 1px solid black;
+}
+
+.course-column {
+    border-left: 1px solid black;
+}
+
 .expand-button {
     background: none;
 }

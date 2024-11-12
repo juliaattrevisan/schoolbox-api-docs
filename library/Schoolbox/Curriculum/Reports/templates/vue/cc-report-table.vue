@@ -15,24 +15,13 @@ const reportStore = useReportStore();
             <thead>
                 <tr>
                     <th rowspan="2" class="curriculum l-valign--bottom">Curriculum</th>
-                    <th rowspan="2" class="l-valign--bottom u-key-bkg">Total</th>
-                    <!-- colspan will be the number of units plus total -->
-                    <th
-                        v-for="(course, index) in reportStore.courses"
-                        :key="course.id"
-                        :colspan="`${course.units && course.units.length ? course.units.length + 2 : 0} `"
-                        :class="`${index % 2 ? 'u-alt-bkg' : ''}`"
-                    >
-                        {{ course.name }}
-                    </th>
+                    <th rowspan="2" class="l-valign--bottom">Total</th>
                 </tr>
                 <tr>
-                    <template v-for="(course, index) in reportStore.courses" :key="course.id">
-                        <td :class="`${index % 2 ? 'u-alt-bkg' : ''}`"></td>
-                        <th v-for="unit in course.units" :key="unit.id" :class="`${index % 2 ? 'u-alt-bkg' : ''}`">
-                            {{ unit.name }}
-                        </th>
-                        <th v-if="reportStore.hasMultipleCourses" :class="`${index % 2 ? 'u-alt-bkg' : ''}`">Total</th>
+                    <template v-for="course in reportStore.courses" :key="course.id">
+                        <td class="course-column"><b>Course:</b> {{ course.name }}</td>
+                        <td v-for="unit in course.units" :key="unit.id" :class="``"><b>Unit: </b>{{ unit.name }}</td>
+                        <td v-if="reportStore.hasMultipleCourses" :class="``"><b>Total</b></td>
                     </template>
                 </tr>
             </thead>
@@ -44,6 +33,25 @@ const reportStore = useReportStore();
 </template>
 
 <style scoped>
+table {
+    border-left: 1px solid black;
+    border-top: 1px solid black;
+}
+
+thead td {
+    font-weight: normal;
+}
+
+td,
+th {
+    border-bottom: 1px solid black;
+    border-right: 1px solid black;
+}
+
+.course-column {
+    border-left: 1px solid black;
+}
+
 .curriculum {
     width: 500px; /* fixed width for the curriculum column to prevent shifts on expand/collapse */
 }
