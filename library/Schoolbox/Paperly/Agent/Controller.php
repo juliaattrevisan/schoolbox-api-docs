@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\Paperly\Agent;
 
+use Alaress\Database\Exception as AlaressDatabaseException;
 use Alaress\Web\Controller\Base;
 use OutOfBoundsException;
 use Session;
@@ -71,7 +72,7 @@ class Controller extends Base
 
         // Check secret
         $secret = $data['v'] ?? null;
-        if (!isset($secret) && $this->secret !== $secret) {
+        if (!isset($secret) || $this->secret !== $secret) {
             $this->sendJsonError('Access denied', Response::HTTP_UNAUTHORIZED);
             return;
         }
@@ -80,6 +81,9 @@ class Controller extends Base
             $this->response = $this->responseAsJson($this->handler->handle($data));
         } catch (OutOfBoundsException $e) {
             $this->sendJsonError($e->getMessage(), Response::HTTP_NOT_FOUND);
+        } catch (AlaressDatabaseException $e) {
+            //Catching external database exception and return useful message in json
+            $this->sendJsonError($e->getMessage(), Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
 }
