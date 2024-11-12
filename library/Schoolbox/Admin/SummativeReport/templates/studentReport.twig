@@ -509,6 +509,11 @@
         <div>
             <h3 class="name">{{ student.firstname }} {{ student.lastname }}</h3>
 
+            {# Optional Government Student Number, if it exists #}
+            {% if govtStudentNumber %}
+                <h4 class="govtStudentNumber">{{ locale.govtStudentNumber }}: <span>{{ govtStudentNumber }}</span></h4>
+            {% endif %}
+
             {# Only show year if it was ever set and meaningful
              #}
             {% if student.year and student.year.longName(locale.year.proper) != '' %}

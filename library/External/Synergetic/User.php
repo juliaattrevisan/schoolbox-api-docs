@@ -323,6 +323,7 @@ class External_Synergetic_User implements External_UserInterface
                         vStudentsAll.StudentMobilePhone,
                         vStudentsAll.StudentSpecialNeedsFlag,
                         vStudentsAll.EnglishSecondFlag,
+                        vStudentsAll.StudentGovernmentStudentNumber,
                         vStudentsAll.StudentStudiesCode,
                         AlertMessage,
                         vStudentsAll.LegalCourtOrderType AS CourtOrderType,
