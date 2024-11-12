@@ -511,7 +511,7 @@
 
             {# Optional Government Student Number, if it exists #}
             {% if govtStudentNumber %}
-                <h4>{{ govtStudentNumber }}</h4>
+                <h4 class="govtStudentNumber">{{ locale.govtStudentNumber }}: <span>{{ govtStudentNumber }}</span></h4>
             {% endif %}
 
             {# Only show year if it was ever set and meaningful
