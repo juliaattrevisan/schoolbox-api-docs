@@ -20,7 +20,7 @@ interface Props {
 const props = defineProps<Props>();
 
 const emit = defineEmits<{
-    titleSelect: [node: CurriculumCoverageNode];
+    titleClick: [node: CurriculumCoverageNode];
 }>();
 
 const reportStore = useReportStore();
@@ -183,7 +183,15 @@ window.Vue.onMounted(async () => {
  * Emit to open up the node details modal
  */
 function onTitleClicked(): void {
-    emit("titleSelect", props.node);
+    emit("titleClick", props.node);
+}
+
+/**
+ * Emit to open up the node details modal
+ * @param node - the node that was selected
+ */
+function onChildTitleClicked(node: CurriculumCoverageNode): void {
+    emit("titleClick", node);
 }
 </script>
 
@@ -224,6 +232,7 @@ function onTitleClicked(): void {
             :key="child.id"
             :node="child"
             :depth="props.depth + 1"
+            @title-click="onChildTitleClicked"
         />
     </template>
 </template>
