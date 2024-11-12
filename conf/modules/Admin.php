@@ -136,6 +136,7 @@ class Admin extends ModuleLoader
          * This lets you configure what appears on each role type's Profile screen
          */
         $this->loadModule($di, \Schoolbox\Admin\Profile\Editor\Tab\Module::class, '/adminv2/profile-editor/tab');
+        $this->loadModule($di, \Schoolbox\Admin\Profile\Editor\Field\Module::class, '/adminv2/profile-editor/field');
         $this->loadModule($di, \Schoolbox\Admin\Profile\Editor\Module::class, '/adminv2/profile-editor');
 
     }

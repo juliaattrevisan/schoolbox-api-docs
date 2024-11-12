@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace Schoolbox\Admin\Profile\Editor;
 
 use Schoolbox\Admin\Profile\Editor\Field\Mapper as FieldMapper;
+use Schoolbox\Admin\Profile\Editor\Tab\Mapper as TabMapper;
 use Schoolbox\Profile\Button\Mapper as ButtonMapper;
 use Schoolbox\CampusMapper;
 use Schoolbox\Config\ConfigMapper;
@@ -73,6 +74,7 @@ class Payload
         private IConfigLoader $config,
         private Generator $routeGenerator,
         private FieldMapper $fieldMapper,
+        private TabMapper $tabMapper,
         private CampusMapper $campusMapper,
         private ButtonMapper $buttonMapper
     ) {
@@ -195,10 +197,10 @@ class Payload
                 ],
                 '_routes' => [
                     'postNameFormat' => $this->routeGenerator->generate('adminProfileEditor.postNameFormat', ['roleType' => $roleType]),
-                    'postFieldAdd' => $this->routeGenerator->generate('adminProfileEditor.postFieldAdd', ['roleType' => $roleType]),
-                    'postFieldRemove' => $this->routeGenerator->generate('adminProfileEditor.postFieldRemove', ['roleType' => $roleType]),
-                    'postFieldSettings' => $this->routeGenerator->generate('adminProfileEditor.postFieldSettings', ['roleType' => $roleType]),
-                    'postFieldSequence' => $this->routeGenerator->generate('adminProfileEditor.postFieldSequence', ['roleType' => $roleType]),
+                    'postFieldAdd' => $this->routeGenerator->generate('adminProfileEditorField.postAdd', ['roleType' => $roleType]),
+                    'postFieldRemove' => $this->routeGenerator->generate('adminProfileEditorField.postRemove', ['roleType' => $roleType]),
+                    'postFieldSettings' => $this->routeGenerator->generate('adminProfileEditorField.postSettings', ['roleType' => $roleType]),
+                    'postFieldSequence' => $this->routeGenerator->generate('adminProfileEditorField.postSequence', ['roleType' => $roleType]),
                     'postTabSettings' => "/adminv2/profileEditor/tab/{$roleType}/{tabId}/settings", // TODO Tabs
                     'postTabSequence' => "/adminv2/profileEditor/tab/{$roleType}/sequence", // TODO Tabs
                 ]
