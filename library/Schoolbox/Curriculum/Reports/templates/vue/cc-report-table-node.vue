@@ -3,6 +3,8 @@
  * A single node row in the curriculum coverage report.
  */
 
+import { useTemplateRef } from "vue";
+import { gsap } from "gsap/all";
 import { useNodeTitle } from "@schoolboxCurriculum/vue/composables/useNodeTitle";
 import type { Course } from "@schoolboxLibrary/types/Course";
 import type { Unit } from "@schoolboxLibrary/types/Unit";
@@ -22,8 +24,6 @@ const filtersStore = useFiltersStore();
 const { title } = useNodeTitle(props.node);
 const paddingStart = window.Vue.ref(`calc(${props.depth * 0.5}rem + 0.5rem)`); // to gradually add more paddingStart to indicate node level depth
 const hasChildren = window.Vue.ref(props.node.children && props.node.children.length > 0);
-
-// #endregion
 
 // #region expand/collapse
 
@@ -185,10 +185,24 @@ const showNode = window.Vue.computed(() => {
     // otherwise, only show the node if it has no usages
     return (hasNoCourseUsages.value || hasNoUnitUsages.value) && filtersStore.onlyShowGaps;
 });
+
+// #endregion
+
+const nodeEl = useTemplateRef<HTMLElement | null>("nodeEl");
+
+/**
+ * Fade in when shown to help provide context
+ */
+window.Vue.onMounted(() => {
+    // expand the node if it has no children
+    if (props.depth > 2 && showNode.value) {
+        gsap.from(nodeEl.value, { opacity: 0, duration: 0.3 });
+    }
+});
 </script>
 
 <template>
-    <tr v-if="showNode">
+    <tr v-if="showNode" ref="nodeEl">
         <td
             class="node__name l-flex l-flex--align-center l-gap-s f-no-margins"
             :style="{ paddingInlineStart: paddingStart }"
