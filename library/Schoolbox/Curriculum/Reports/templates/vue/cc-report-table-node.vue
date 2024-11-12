@@ -146,34 +146,6 @@ function getEntireUsageCount(node: CurriculumCoverageNode): number {
 }
 
 /**
- * Whether the node contains any course usage counts that are 0
- * for the currently selected report options
- * @returns - whether the node has no course usages
- */
-const hasNoCourseUsages = window.Vue.computed(() => {
-    if (props.node.usage === undefined) return true;
-    // loop through every course, checking if any have a usage count of 0
-    return !reportStore.courses.every((course) => {
-        return getCourseUsageCount(props.node, course) !== 0;
-    });
-});
-
-/**
- * Whether the node contains any unit usage counts that are 0
- * for the currently selected report options
- * @returns - whether the node has no unit usages
- */
-const hasNoUnitUsages = window.Vue.computed(() => {
-    if (props.node.usage === undefined) return true;
-    // loop through every unit in every course, checking if any have a usage count of 0
-    return !reportStore.courses.every((course) => {
-        return course.units?.every((unit) => {
-            return getUnitUsageCount(props.node, course, unit) !== 0;
-        });
-    });
-});
-
-/**
  * If has a unit with no usage, and only show gaps is selected, show the node
  * @returns - whether to show the node
  */
@@ -183,7 +155,7 @@ const showNode = window.Vue.computed(() => {
         return true;
     }
     // otherwise, only show the node if it has no usages
-    return (hasNoCourseUsages.value || hasNoUnitUsages.value) && filtersStore.onlyShowGaps;
+    return getEntireUsageCount(props.node) === 0 && filtersStore.onlyShowGaps;
 });
 
 // #endregion
