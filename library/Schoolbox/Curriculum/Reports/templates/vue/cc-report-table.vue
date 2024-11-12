@@ -20,7 +20,7 @@ const reportStore = useReportStore();
                 <tr>
                     <template v-for="course in reportStore.courses" :key="course.id">
                         <td class="course-column"><b>Course:</b> {{ course.name }}</td>
-                        <td v-for="unit in course.units" :key="unit.id" :class="``"><b>Unit: </b>{{ unit.name }}</td>
+                        <td v-for="unit in course.units" :key="unit.id" :class="``"><b>Unit:</b> {{ unit.name }}</td>
                         <td v-if="reportStore.hasMultipleCourses" :class="``"><b>Total</b></td>
                     </template>
                 </tr>
