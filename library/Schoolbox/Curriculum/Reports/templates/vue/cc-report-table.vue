@@ -40,14 +40,14 @@ window.Vue.watch(isDetailsOpen, (isOpen) => {
                 <tr>
                     <th rowspan="2" class="curriculum l-valign--bottom">Curriculum</th>
                     <th rowspan="2" class="u-border-left l-valign--bottom">Total</th>
-                    <!-- colspan will be the number of units plus total -->
                     <template v-for="course in reportStore.courses" :key="course.id">
                         <th class="u-border-left" style="border-right: none">Course</th>
+                        <!-- colspan will be the number of units plus total if more than one course -->
                         <th
                             style="border-left: none"
                             :colspan="`${course.units && course.units.length ? (reportStore.hasMultipleCourses ? course.units.length + 1 : course.units.length) : 0}`"
                         >
-                            Units
+                            {{ course.units && course.units.length > 1 ? "Units" : "Unit" }}
                         </th>
                     </template>
                 </tr>
