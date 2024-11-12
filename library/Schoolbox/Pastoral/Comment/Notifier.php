@@ -256,7 +256,12 @@ class Notifier extends AbstractModuleNotifier
      */
     public function notifyUpdated(Model $model, User $effector, $diff = []): Envelope
     {
-        return $this->buildMessage($model, self::TRIGGER_UPDATED);
+        trigger_error(
+            'Pastoral comments should never be updated, thus update notifications should never be raised',
+            E_USER_DEPRECATED,
+        );
+        return new Envelope();
+//        return $this->buildMessage($model, self::TRIGGER_UPDATED);
     }
 
     /**
@@ -273,7 +278,12 @@ class Notifier extends AbstractModuleNotifier
      */
     public function notifyUpdatedRelated(Model $model, User $effector, $diff = []): Envelope
     {
-        return $this->buildMessage($model, self::TRIGGER_UPDATED_RELATED);
+        trigger_error(
+            'Pastoral comments should never be updated, thus update notifications should never be raised',
+            E_USER_DEPRECATED,
+        );
+        return new Envelope();
+//        return $this->buildMessage($model, self::TRIGGER_UPDATED_RELATED);
     }
 
     /**
