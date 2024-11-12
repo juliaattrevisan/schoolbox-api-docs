@@ -138,6 +138,5 @@ class Admin extends ModuleLoader
         $this->loadModule($di, \Schoolbox\Admin\Profile\Editor\Tab\Module::class, '/adminv2/profile-editor/tab');
         $this->loadModule($di, \Schoolbox\Admin\Profile\Editor\Field\Module::class, '/adminv2/profile-editor/field');
         $this->loadModule($di, \Schoolbox\Admin\Profile\Editor\Module::class, '/adminv2/profile-editor');
-
     }
 }
