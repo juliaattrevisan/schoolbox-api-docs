@@ -13,6 +13,12 @@ const peStore = useProfileEditorStore();
 const peTabsStore = useProfileEditorTabsStore();
 
 const sortableOptions = window.Vue.computed<Sortable.Options>(() => ({
+    // Prevent these from ending up in the fields groups or other sortables
+    group: {
+        name: `tabs-${peStore.selectedRoleType ? peStore.selectedRoleType.roleType : "-"}`,
+        pull: false,
+        put: false,
+    },
     // We use this to force the html5 drag and drop logic to be ignored and use the fallback so we can style it
     forceFallback: true,
     // The class to apply to the clone when dragging
