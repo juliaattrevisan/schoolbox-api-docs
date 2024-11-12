@@ -115,7 +115,7 @@ function getCourseUsageCount(node: CurriculumCoverageNode, $course: Course): num
 }
 
 /**
- * Get the total node usage count for a course(s),
+ * Get the total node usage count for a course,
  * which is the total usage count linked to the course, and all units within the course
  * @param node - the node to get the usage count for
  * @param $course - the course to get the usage count for
@@ -135,14 +135,15 @@ function getTotalUsageCount(node: CurriculumCoverageNode, $course: Course): numb
 /**
  * Get the total node usage count for a node,
  * which is the total usage count for all courses
+ * @param node - the node to get the usage count for
  * @returns the total node usage count
  */
-const nodeUsageCount = window.Vue.computed(() => {
-    if (props.node.usage === undefined) return 0;
-    return props.node.usage.courses.reduce((acc, course) => {
-        return acc + getTotalUsageCount(props.node, course);
+function getEntireUsageCount(node: CurriculumCoverageNode): number {
+    if (node.usage === undefined) return 0;
+    return node.usage.courses.reduce((acc, course) => {
+        return acc + getTotalUsageCount(node, course);
     }, 0);
-});
+}
 
 /**
  * Whether the node contains any course usage counts that are 0
@@ -202,7 +203,7 @@ const showNode = window.Vue.computed(() => {
             >{{ title }}
         </td>
         <td :class="``">
-            {{ nodeUsageCount }}
+            {{ getEntireUsageCount(props.node) }}
         </td>
         <!-- loop through each course/unit, retrieving the node usage or returning 0 for undefined usages -->
         <template v-for="course in reportStore.courses" :key="course.id">
