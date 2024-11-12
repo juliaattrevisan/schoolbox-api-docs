@@ -45,7 +45,7 @@ class Module extends BaseModule
         };
 
         $this->register('GET', '', 'getIndex', $perms);
-        $this->register('POST', '/field/{roleType}/nameformat', 'postNameFormat', $perms, $preloadRoleType);
+        $this->register('POST', '/{roleType}/nameformat', 'postNameFormat', $perms, $preloadRoleType);
     }
 
 
