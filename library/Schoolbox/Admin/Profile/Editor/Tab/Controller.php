@@ -149,7 +149,6 @@ class Controller extends Base
              */
             $tabs = $this->tabMapper->findByColumnList([
                 'roleType' => $roleType,
-                'enabled' => true,
             ])->indexBy('tab');
 
             /* Sequence is actually a (int, string) tuple that represents
