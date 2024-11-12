@@ -80,9 +80,7 @@ export const useProfileEditorFieldsStore = defineStore("profileEditorFieldsStore
 
         toast.activate(`Adding ${selectedField.displayAs}...`);
 
-        const endpoint = peStore.endpoints.adminProfileEditorPostFieldAdd
-            .replace("{roleType}", peStore.selectedRoleType.roleType)
-            .replace("{fieldId}", field);
+        const endpoint = peStore.selectedRoleType._routes.postFieldAdd.replace("{fieldId}", field);
 
         const response = await fetchProfileEditorEndpoint(endpoint, {
             method: "POST",
@@ -113,9 +111,7 @@ export const useProfileEditorFieldsStore = defineStore("profileEditorFieldsStore
 
         toast.activate(`Removing ${selectedField.displayAs}...`);
 
-        const endpoint = peStore.endpoints.adminProfileEditorPostFieldRemove
-            .replace("{roleType}", peStore.selectedRoleType.roleType)
-            .replace("{fieldId}", field);
+        const endpoint = peStore.selectedRoleType._routes.postFieldRemove.replace("{fieldId}", field);
 
         const response = await fetchProfileEditorEndpoint(endpoint, { method: "POST" });
 
@@ -150,9 +146,7 @@ export const useProfileEditorFieldsStore = defineStore("profileEditorFieldsStore
 
         toast.activate(`Saving settings for ${currentField.displayAs}...`);
 
-        const endpoint = peStore.endpoints.adminProfileEditorPostFieldSettings
-            .replace("{roleType}", peStore.selectedRoleType.roleType)
-            .replace("{fieldId}", field);
+        const endpoint = peStore.selectedRoleType._routes.postFieldSettings.replace("{fieldId}", field);
 
         const response = await fetchProfileEditorEndpoint(endpoint, {
             method: "POST",
@@ -184,10 +178,7 @@ export const useProfileEditorFieldsStore = defineStore("profileEditorFieldsStore
 
         toast.activate("Resequencing fields...");
 
-        const endpoint = peStore.endpoints.adminProfileEditorPostFieldSequence.replace(
-            "{roleType}",
-            peStore.selectedRoleType.roleType,
-        );
+        const endpoint = peStore.selectedRoleType._routes.postFieldSequence;
         const sequence = peStore.selectedRoleType.fields.selected.map((f) => f.field);
 
         const response = await fetchProfileEditorEndpoint(endpoint, {

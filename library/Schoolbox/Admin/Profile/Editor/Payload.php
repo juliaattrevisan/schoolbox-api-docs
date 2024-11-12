@@ -188,6 +188,13 @@ class Payload
                     'manageButtons' => $this->routeGenerator->generate('adminProfileButton.getIndex', [
                         'roleType' => $roleType
                     ]),
+                ],
+                '_routes' => [
+                    'postNameFormat' => $this->routeGenerator->generate('adminProfileEditor.postNameFormat', ['roleType' => $roleType]),
+                    'postFieldAdd' => $this->routeGenerator->generate('adminProfileEditor.postFieldAdd', ['roleType' => $roleType]),
+                    'postFieldRemove' => $this->routeGenerator->generate('adminProfileEditor.postFieldRemove', ['roleType' => $roleType]),
+                    'postFieldSettings' => $this->routeGenerator->generate('adminProfileEditor.postFieldSettings', ['roleType' => $roleType]),
+                    'postFieldSequence' => $this->routeGenerator->generate('adminProfileEditor.postFieldSequence', ['roleType' => $roleType]),
                 ]
             ];
 

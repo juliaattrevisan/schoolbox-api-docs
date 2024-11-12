@@ -2,14 +2,6 @@
  * Types used only by the profile editor
  */
 
-export type ProfileEditorEndpoints = {
-    adminProfileEditorPostFieldAdd: string;
-    adminProfileEditorPostFieldRemove: string;
-    adminProfileEditorPostFieldSettings: string;
-    adminProfileEditorPostFieldSequence: string;
-    adminProfileEditorPostNameFormat: string;
-};
-
 // FIELD SETTINGS
 
 export type ProfileEditorFieldSettingOption = {
@@ -109,6 +101,13 @@ export type ProfileEditorRoleType = {
     tabs: ProfileEditorTab[];
     _links: {
         manageButtons: string; // The route to the relevant page for managing the buttons for this role type
+    };
+    _routes: {
+        postNameFormat: string;
+        postFieldAdd: string;
+        postFieldRemove: string;
+        postFieldSettings: string;
+        postFieldSequence: string;
     };
 };
 
