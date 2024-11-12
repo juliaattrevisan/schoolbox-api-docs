@@ -23,6 +23,22 @@ const { title } = useNodeTitle(props.node);
 const paddingStart = window.Vue.ref(`calc(${props.depth * 0.5}rem + 0.5rem)`); // to gradually add more paddingStart to indicate node level depth
 const hasChildren = window.Vue.ref(props.node.children && props.node.children.length > 0);
 
+// #endregion
+
+// #region expand/collapse
+
+const isExpanded = window.Vue.ref(props.depth < 1); // to hide any grandchild and below nodes by default
+const expandTitle = window.Vue.computed(() => (isExpanded.value ? "Collapse" : "Expand"));
+
+/**
+ * To toggle the expanded state of the node
+ */
+function onExpandClicked(): void {
+    isExpanded.value = !isExpanded.value;
+}
+
+// #endregion
+
 // #region usage counts
 
 /**
@@ -40,12 +56,23 @@ function getUnitUsageCount(node: CurriculumCoverageNode, $course: Course, $unit:
     if (unit === undefined) return 0;
     const { usage } = unit;
     if (usage === undefined) return 0;
-    return filtersStore.selectedReportOptions.reduce((acc, option) => {
-        // always skip course option as it can't be assigned within a unit
-        if (option === ReportOptionValues.COURSE) return acc;
+    const onNodeCount = filtersStore.selectedReportOptions.reduce((acc, option) => {
+        // always skip course and unit options as they can't be assigned within a unit
+        if (option === ReportOptionValues.COURSE || option === ReportOptionValues.UNIT) return acc;
         if (usage[option] === undefined) return acc;
         return acc + usage[option].count;
     }, 0);
+    /**
+     * When the node has children and is not expanded, we want to show the usage count inclusive of children
+     * to show how many usages are linked to the node and its children
+     */
+    if (node.children && node.children.length > 0 && !isExpanded.value) {
+        const onChildrenCount = node.children.reduce((acc, child) => {
+            return acc + getUnitUsageCount(child, $course, $unit);
+        }, 0);
+        return onNodeCount + onChildrenCount;
+    }
+    return onNodeCount;
 }
 
 /**
@@ -146,22 +173,6 @@ const showNode = window.Vue.computed(() => {
     // otherwise, only show the node if it has no usages
     return (hasNoCourseUsages.value || hasNoUnitUsages.value) && filtersStore.onlyShowGaps;
 });
-
-// #endregion
-
-// #region expand/collapse
-
-const isExpanded = window.Vue.ref(props.depth < 1); // to hide any grandchild and below nodes by default
-const expandTitle = window.Vue.computed(() => (isExpanded.value ? "Collapse" : "Expand"));
-
-/**
- * To toggle the expanded state of the node
- */
-function onExpandClicked(): void {
-    isExpanded.value = !isExpanded.value;
-}
-
-// #endregion
 </script>
 
 <template>
