@@ -27,13 +27,14 @@ const hasChildren = window.Vue.ref(props.node.children && props.node.children.le
 
 /**
  * Get the total usage count for a unit, with the selected report options considered
+ * @param node - the node to get the usage count for
  * @param $course - the course to get the usage count for
  * @param $unit - the unit to get the usage count for
  * @returns the total unit usage count
  */
-function getUnitUsageCount($course: Course, $unit: Unit): number {
-    if (props.node.usage === undefined) return 0;
-    const course = props.node.usage.courses.find((c) => c.id === $course.id);
+function getUnitUsageCount(node: CurriculumCoverageNode, $course: Course, $unit: Unit): number {
+    if (node.usage === undefined) return 0;
+    const course = node.usage.courses.find((c) => c.id === $course.id);
     if (course === undefined) return 0;
     const unit = course.units.find((u) => u.id === $unit.id);
     if (unit === undefined) return 0;
@@ -50,12 +51,13 @@ function getUnitUsageCount($course: Course, $unit: Unit): number {
 /**
  * Get the total usage count for a course, which is the
  * total usage count linked to the course, with the selected report options considered
+ * @param node - the node to get the usage count for
  * @param $course - the course to get the usage count for
  * @returns the total course usage count
  */
-function getCourseUsageCount($course: Course): number {
-    if (props.node.usage === undefined) return 0;
-    const course = props.node.usage.courses.find((c) => c.id === $course.id);
+function getCourseUsageCount(node: CurriculumCoverageNode, $course: Course): number {
+    if (node.usage === undefined) return 0;
+    const course = node.usage.courses.find((c) => c.id === $course.id);
     if (course === undefined) return 0;
     const { usage } = course;
     if (usage === undefined) return 0;
@@ -77,16 +79,17 @@ function getCourseUsageCount($course: Course): number {
 /**
  * Get the total node usage count for a course(s),
  * which is the total usage count linked to the course, and all units within the course
+ * @param node - the node to get the usage count for
  * @param $course - the course to get the usage count for
  * @returns the total node usage count for all selected course(s)
  */
-function getTotalUsageCount($course: Course): number {
-    if (props.node.usage === undefined) return 0;
-    const course = props.node.usage.courses.find((c) => c.id === $course.id);
+function getTotalUsageCount(node: CurriculumCoverageNode, $course: Course): number {
+    if (node.usage === undefined) return 0;
+    const course = node.usage.courses.find((c) => c.id === $course.id);
     if (course === undefined || course.units === undefined) return 0;
-    const courseUsageCount = getCourseUsageCount($course);
+    const courseUsageCount = getCourseUsageCount(node, $course);
     const unitUsageCount = course.units.reduce((acc, unit) => {
-        return acc + getUnitUsageCount(course, unit);
+        return acc + getUnitUsageCount(node, course, unit);
     }, 0);
     return courseUsageCount + unitUsageCount;
 }
@@ -99,7 +102,7 @@ function getTotalUsageCount($course: Course): number {
 const nodeUsageCount = window.Vue.computed(() => {
     if (props.node.usage === undefined) return 0;
     return props.node.usage.courses.reduce((acc, course) => {
-        return acc + getTotalUsageCount(course);
+        return acc + getTotalUsageCount(props.node, course);
     }, 0);
 });
 
@@ -112,7 +115,7 @@ const hasNoCourseUsages = window.Vue.computed(() => {
     if (props.node.usage === undefined) return true;
     // loop through every course, checking if any have a usage count of 0
     return !reportStore.courses.every((course) => {
-        return getCourseUsageCount(course) !== 0;
+        return getCourseUsageCount(props.node, course) !== 0;
     });
 });
 
@@ -126,7 +129,7 @@ const hasNoUnitUsages = window.Vue.computed(() => {
     // loop through every unit in every course, checking if any have a usage count of 0
     return !reportStore.courses.every((course) => {
         return course.units?.every((unit) => {
-            return getUnitUsageCount(course, unit) !== 0;
+            return getUnitUsageCount(props.node, course, unit) !== 0;
         });
     });
 });
@@ -182,13 +185,13 @@ function onExpandClicked(): void {
         <!-- loop through each course/unit, retrieving the node usage or returning 0 for undefined usages -->
         <template v-for="course in reportStore.courses" :key="course.id">
             <td class="course-column">
-                {{ getCourseUsageCount(course) }}
+                {{ getCourseUsageCount(props.node, course) }}
             </td>
             <td v-for="unit in course.units" :key="unit.id" :class="``">
-                {{ getUnitUsageCount(course, unit) }}
+                {{ getUnitUsageCount(props.node, course, unit) }}
             </td>
             <td v-if="reportStore.hasMultipleCourses" :class="``">
-                {{ getTotalUsageCount(course) }}
+                {{ getTotalUsageCount(props.node, course) }}
             </td>
         </template>
     </tr>
