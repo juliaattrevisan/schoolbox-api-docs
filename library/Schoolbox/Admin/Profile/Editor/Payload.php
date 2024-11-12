@@ -201,8 +201,8 @@ class Payload
                     'postFieldRemove' => $this->routeGenerator->generate('adminProfileEditorField.postRemove', ['roleType' => $roleType]),
                     'postFieldSettings' => $this->routeGenerator->generate('adminProfileEditorField.postSettings', ['roleType' => $roleType]),
                     'postFieldSequence' => $this->routeGenerator->generate('adminProfileEditorField.postSequence', ['roleType' => $roleType]),
-                    'postTabSettings' => "/adminv2/profileEditor/tab/{$roleType}/{tabId}/settings", // TODO Tabs
-                    'postTabSequence' => "/adminv2/profileEditor/tab/{$roleType}/sequence", // TODO Tabs
+                    'postTabSettings' => $this->routeGenerator->generate('adminProfileEditorTab.postSettings', ['roleType' => $roleType]),
+                    'postTabSequence' => $this->routeGenerator->generate('adminProfileEditorTab.postSequence', ['roleType' => $roleType]),
                 ]
             ];
 
