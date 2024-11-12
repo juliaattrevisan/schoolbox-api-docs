@@ -45,6 +45,9 @@ class Cursor implements ICursor
     public const COURSE_ACTIVITY_DUE_WORK = 'dueWork';
     public const COURSE_ACTIVITY_PROJECT = 'project';
     public const COURSE_ACTIVITY_LESSON_PLAN = 'lessonPlan';
+    public const COURSE_RUBRIC_CAPABILITY = 'rubricCapability';
+    public const COURSE_RUBRIC_INDICATOR = 'rubricIndicator';
+    public const COURSE_IN_USE_RUBRIC = 'inUseRubric';
 
     public function __construct(
         private CurriculumMapper $curriculumMapper,
@@ -256,6 +259,83 @@ class Cursor implements ICursor
                 $coursePlaceHolder
             );
 
+            $rubricCapabilityCountQuery = sprintf(
+                "
+                SELECT
+                    '%s' type,
+                    cnrc.curriculum_node_id,
+                    cs.id courseSpecId,
+                    null unitId,
+                    COUNT(*) AS count
+                FROM rubric_capability rc
+                INNER JOIN curriculum_node_for_rubric_capability cnrc
+                    ON rc.id = cnrc.rubric_capability_id AND cnrc.curriculum_node_id IN %s
+                INNER JOIN course_specification cs ON cs.folder_id = rc.parent_id AND cs.id IN %s
+                GROUP BY cnrc.curriculum_node_id, cs.id, cs.folder_id
+                ",
+                self::COURSE_RUBRIC_CAPABILITY,
+                $nodesPlaceHolder,
+                $coursePlaceHolder,
+            );
+
+            $rubricIndicatorCountQuery = sprintf(
+                "
+                SELECT
+                    '%s' type,
+                    cnri.curriculum_node_id,
+                    cs.id courseSpecId,
+                    null unitId,
+                    COUNT(*) AS count
+                FROM rubric_indicator ri
+                INNER JOIN curriculum_node_for_rubric_indicator cnri
+                    ON ri.id = cnri.rubric_indicator_id AND cnri.curriculum_node_id IN %s
+                INNER JOIN rubric_capability rc ON rc.id = ri.rubric_capability_id
+                INNER JOIN course_specification cs ON cs.folder_id = rc.parent_id AND cs.id IN %s
+                GROUP BY cnri.curriculum_node_id, cs.id, cs.folder_id
+                ",
+                self::COURSE_RUBRIC_INDICATOR,
+                $nodesPlaceHolder,
+                $coursePlaceHolder,
+            );
+
+            $inUseRubricCountQuery = sprintf(
+                "
+                   SELECT
+                       '%s' type,
+                       rubric.curriculum_node_id,
+                       rubric.course_specification_id,
+                       rubric.folder_id,
+                       COUNT(*) AS count
+                    FROM (
+                        SELECT cnrc.curriculum_node_id, cus.course_specification_id, cus.folder_id, v.assessment_id
+                        FROM v_rubric v
+                        INNER JOIN curriculum_node_for_rubric_capability cnrc
+                            ON cnrc.rubric_capability_id = v.capability_id
+                            AND cnrc.curriculum_node_id IN %s
+                        INNER JOIN assessment_course_unit_specification acus ON v.assessment_id = acus.assessment_id
+                        INNER JOIN course_unit_specification cus
+                            ON cus.id = acus.course_unit_specification_id
+                            AND cus.course_specification_id IN %s
+                        UNION
+                        SELECT cnri.curriculum_node_id, cus.course_specification_id, cus.folder_id, v.assessment_id
+                        FROM v_rubric v
+                        INNER JOIN curriculum_node_for_rubric_indicator cnri
+                            ON cnri.rubric_indicator_id = v.indicator_id
+                            AND cnri.curriculum_node_id IN %s
+                        INNER JOIN assessment_course_unit_specification acus ON v.assessment_id = acus.assessment_id
+                        INNER JOIN course_unit_specification cus
+                            ON cus.id = acus.course_unit_specification_id
+                            AND cus.course_specification_id IN %s
+                    ) rubric
+                    GROUP BY rubric.curriculum_node_id, rubric.course_specification_id, rubric.folder_id
+                ",
+                self::COURSE_IN_USE_RUBRIC,
+                $nodesPlaceHolder,
+                $coursePlaceHolder,
+                $nodesPlaceHolder,
+                $coursePlaceHolder
+            );
+
             $megaQuery = '( ' .
                 implode(
                     ' ) UNION ( ',
@@ -263,7 +343,10 @@ class Cursor implements ICursor
                         $courseCountQuery,
                         $unitCountQuery,
                         $unitActivityCountQuery,
-                        $unitLessonPlanCountQuery
+                        $unitLessonPlanCountQuery,
+                        $rubricCapabilityCountQuery,
+                        $rubricIndicatorCountQuery,
+                        $inUseRubricCountQuery,
                     ]
                 ) . ' )';
 
@@ -271,7 +354,11 @@ class Cursor implements ICursor
 
             while ($row = $query->fetch(\PDO::FETCH_ASSOC)) {
                 $type = $row['type'];
-                if ($type === self::COURSE_COURSE_SPECIFICATION) {
+                if (
+                    $type === self::COURSE_COURSE_SPECIFICATION ||
+                    $type === self::COURSE_RUBRIC_CAPABILITY ||
+                    $type === self::COURSE_RUBRIC_INDICATOR
+                ) {
                     $counts[$row['curriculum_node_id']][$row['courseSpecId']][$type] = $row['count'];
                 } else {
                     $counts[$row['curriculum_node_id']][$row['courseSpecId']][$row['unitId']][$type] = $row['count'];

@@ -6,6 +6,7 @@ use Alaress\Authorizer\Authorizer;
 use Alaress\Authorizer\GetRouteIfAuthorized;
 use Aura\Router\Generator;
 use Schoolbox\Curriculum\Node\Model as CurriculumNodeModel;
+use Schoolbox\Curriculum\Reports\Cursor;
 use Schoolbox\Curriculum\Reports\Translator\UnitAssessmentUsage as UnitAssessmentUsageTranslator;
 use Schoolbox\Learning\Course\DataModel\Specification\Model as CourseSpecificationModel;
 use Schoolbox\User;
@@ -55,7 +56,11 @@ class CourseUsage
         array $counts
     ): array {
 
-        $courseCount = $counts[$node->getId()][$course->getId()]['courseSpecification'] ?? 0;
+        $courseCount = $counts[$node->getId()][$course->getId()][Cursor::COURSE_COURSE_SPECIFICATION] ?? 0;
+        $courseRubricCount =
+            ($counts[$node->getId()][$course->getId()][Cursor::COURSE_RUBRIC_CAPABILITY] ?? 0) +
+            ($counts[$node->getId()][$course->getId()][Cursor::COURSE_RUBRIC_INDICATOR] ?? 0);
+
 
         return [
             'id'    => $course->getId(),
@@ -63,6 +68,9 @@ class CourseUsage
             'usage' => [
                 'course' => [
                     'count' => $courseCount
+                ],
+                'rubric' => [
+                    'count' => $courseRubricCount
                 ]
             ],
             'units' => $this->courseUnitSpec[$course->getId()]?->map(
