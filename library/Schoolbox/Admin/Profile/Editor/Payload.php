@@ -226,28 +226,28 @@ class Payload
                 ];
             }
 
-            /* TODO: Tabs
+            /* Load a set of tabs for the prescribed roletype
              */
-            $tabs = [
-                ['id' => 'activity', 'label' => 'Activity Feed'],
-                ['id' => 'goals', 'label' => 'Goals'],
-                ['id' => 'achievements', 'label' => 'Achievements'],
-                ['id' => 'classes', 'label' => 'Classes'],
-                ['id' => 'groups', 'label' => 'Groups'],
-                ['id' => 'contacts', 'label' => 'Contacts'],
-            ];
+            $tabs = $this->tabMapper->findByColumn('roletype', $roleType, [
+                'order' => [
+                    'sequence' => 'asc'
+                ]
+            ]);
 
             foreach ($tabs as $tab) {
                 $roleTypeSettings['tabs'][] = [
-                    'id' => $tab['id'],
-                    'label' => $tab['label'],
+                    'id' => $tab->getTab(),
+                    'label' => $tab->getDisplayAs(),
                     'tabSettings' => [
                         /* Find the ids of the campuses for which this tab might be available
                          */
-                        self::AVAILABILITY_NODE => [], // TODO Tabs
+                        self::AVAILABILITY_NODE => $tab->getAvailabilityCampus()?->indexByCallback(static function (\Schoolbox\Admin\Profile\Editor\Field\Availability\Campus\Model $campus) {
+                            return $campus->getCampus()?->getId();
+                        })->keys(),
+
                         /* Find the roletypes ("ids") for which this tab might be visible
                          */
-                        self::VISIBILITY_NODE => [] // TODO Tabs
+                        self::VISIBILITY_NODE => $tab->getVisibility()?->indexBy('roleType')->keys()
                     ]
                 ];
             }
