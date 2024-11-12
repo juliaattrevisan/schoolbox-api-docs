@@ -2146,7 +2146,7 @@ class Handler
      * @return void
      * @throws Exception
      */
-    private function processGroupedStudentData(array $groupedData, $modifiedBy)
+    private function processGroupedStudentData(array $groupedData, $modifiedBy): void
     {
         // Process community data
         foreach ($groupedData['community'] as $studentID => $data) {
