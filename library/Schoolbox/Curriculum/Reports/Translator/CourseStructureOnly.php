@@ -5,6 +5,7 @@ namespace Schoolbox\Curriculum\Reports\Translator;
 use Alaress\Authorizer\Authorizer;
 use Aura\Router\Generator;
 use Schoolbox\Learning\Course\DataModel\Specification\Model as Model;
+use Schoolbox\Resource\Folder\Translator\IModelToArray;
 use Schoolbox\User;
 
 /**
@@ -26,6 +27,7 @@ class CourseStructureOnly
         protected Authorizer $authorizer,
         protected User $currentUser,
         private array $courseUnitSpec,
+        private IModelToArray $folderTranslator,
     ) {
     }
 
@@ -43,11 +45,13 @@ class CourseStructureOnly
         return [
             'id' => $model->getId(),
             'name' => $model->getTitle(),
+            'folder' => call_user_func($this->folderTranslator, $model->getFolder()),
             'units' => $this->courseUnitSpec[$model->getId()]?->map(
                 fn($unit) =>
                 [
                     'id' => $unit->getFolder()->getId(),
                     'name' => $unit->getTitle(),
+                    'folder' => call_user_func($this->folderTranslator, $unit->getFolder()),
                 ],
             )
         ];
