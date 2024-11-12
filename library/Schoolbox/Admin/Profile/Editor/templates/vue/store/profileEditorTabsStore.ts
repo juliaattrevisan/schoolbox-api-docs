@@ -52,7 +52,7 @@ export const useProfileEditorTabsStore = defineStore("profileEditorTabsStore", (
 
         toast.activate(`Saving settings for ${currentTab.label}...`);
 
-        const endpoint = peStore.selectedRoleType._routes.postTabSettings.replace("{id}", tabId);
+        const endpoint = peStore.selectedRoleType._routes.postTabSettings.replace("{tabId}", tabId);
 
         const response = await fetchProfileEditorEndpoint(endpoint, {
             method: "POST",
