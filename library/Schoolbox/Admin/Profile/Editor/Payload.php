@@ -64,13 +64,17 @@ class Payload
 
     /**
      * @param IConfigLoader $config
-     * @param Mapper $fieldMapper
+     * @param Generator $routeGenerator
+     * @param FieldMapper $fieldMapper
      * @param CampusMapper $campusMapper
+     * @param ButtonMapper $buttonMapper
      */
     public function __construct(
         private IConfigLoader $config,
-        private \Schoolbox\Admin\Profile\Editor\Field\Mapper $fieldMapper,
-        private \Schoolbox\CampusMapper $campusMapper
+        private Generator $routeGenerator,
+        private FieldMapper $fieldMapper,
+        private CampusMapper $campusMapper,
+        private ButtonMapper $buttonMapper
     ) {
     }
 
@@ -197,6 +201,11 @@ class Payload
                     'icon' => $button->getIcon(),
                     'title' => $button->getTitle(),
                     'text' => $button->getText(),
+                    '_links' => [
+                        'modify' => $this->routeGenerator->generate('adminProfileButton.getModify', [
+                            'id' => $button->getId()
+                        ]),
+                    ]
                 ];
             }
 

@@ -54,12 +54,15 @@ export type ProfileEditorMandatoryField = {
 // This is not a
 export type ProfileEditorActiveField = ProfileEditorSelectedField | ProfileEditorMandatoryField;
 
-// The buttons available on profiles
+// The buttons available on profiles, each with a link to the relevant modify page
 type ProfileEditorButton = {
     id: number;
     icon: string;
     title: string;
     text: string;
+    _links: {
+        modify: string;
+    };
 };
 
 export type ProfileEditorRoleType = {
