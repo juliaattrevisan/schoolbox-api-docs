@@ -52,20 +52,11 @@ class Controller extends Base
          */
         $payload = (new Payload(
             $this->getConfigLoader(),
+            $this->routeGenerator,
             $this->fieldMapper,
-            $this->campusMapper
+            $this->campusMapper,
+            $this->buttonMapper,
         ))->generateAll();
-
-        /* Buttons are obtained (and managed) totally separately from Profile Fields
-         * TODO @zacmcw you can probably think of a better way to do this in frontend world
-         */
-        $buttons = [];
-
-        foreach (array_keys(Payload::CONFIG_ROLETYPE) as $roleType) {
-            $buttons[$roleType] = $this->buttonMapper
-                ->findByColumn('roletype', $roleType)
-                ->sortBy('sortOrder', 'asc');
-        }
 
         $this->response = $this->responseFromTemplate('@adminProfileEditor/index.twig', [
             'pageCurrent' => $this->routeGenerator->generate('adminProfileEditor.getIndex'),
@@ -73,9 +64,6 @@ class Controller extends Base
             /* Profile Fields
              */
             'payload' => $payload,
-            /* Profile Buttons
-             */
-            'buttons' => $buttons,
         ], 'Profile Editor - ' . ucwords($roleType));
     }
 

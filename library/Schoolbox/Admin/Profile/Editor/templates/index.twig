@@ -26,53 +26,6 @@
             />
         </div>
 
-        <div id="button-editor-container">
-            {% for roleType, roleTypeButtons in buttons %}
-                {% if roleTypeButtons|length %}
-                    <div data-button-roletype="{{ roleType }}" style="display:none;">
-                        <h2 class="subheader">Buttons</h2>
-                        <div class="row">
-                            <div class="small-12 island">
-                                <section class="content">
-                                    <p class="meta">
-                                        This is a preview of your current profile button configuration. These may not render
-                                        the same for all users;
-                                        <a href="{{ routeLookupIfAuthorized('adminProfileButton.getIndex', {roleType: roleType}) }}">manage profile buttons</a>.
-                                    </p>
-
-                                    {% for button in roleTypeButtons %}
-                                        <a class="button icon-{{ button.icon }}" title="{{ button.title }}">{{ button.text }}</a>
-                                    {% endfor %}
-                                </section>
-                            </div>
-                        </div>
-                    </div>
-                {% endif %}
-            {% endfor %}
-
-            <script>
-                $(function() {
-                    {# TODO @zacmcw you can probably find a nicer way to do this #}
-                    function showRoleTypeButtons() {
-                        let roleType = window.location.hash.replace('#', '');
-
-                        if ('' === roleType) {
-                            roleType = 'student';
-                        }
-
-                        $('[data-button-roletype]').hide();
-                        $('[data-button-roletype="' + roleType + '"]').show();
-                    }
-
-                    showRoleTypeButtons();
-
-                    $(window).on('hashchange', function() {
-                        showRoleTypeButtons();
-                    });
-                });
-            </script>
-        </div>
-
         <script src="{{ CDN_PREFIX }}/js/bundle/profileEditor.js?v={{ config.site_version }}"></script>
     </div>
 </div>

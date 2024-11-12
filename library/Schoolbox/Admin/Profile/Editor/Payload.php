@@ -9,11 +9,13 @@ declare(strict_types=1);
 
 namespace Schoolbox\Admin\Profile\Editor;
 
-use Schoolbox\Admin\Profile\Editor\Field\Mapper;
+use Schoolbox\Admin\Profile\Editor\Field\Mapper as FieldMapper;
+use Schoolbox\Profile\Button\Mapper as ButtonMapper;
 use Schoolbox\CampusMapper;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Role;
 use Schoolbox\IConfigLoader;
+use Aura\Router\Generator;
 
 class Payload
 {
@@ -175,8 +177,28 @@ class Payload
                     'available' => [],
                     'selected' => [],
                     'mandatory' => []
+                ],
+                'buttons' => [],
+                '_links' => [
+                    'manageButtons' => $this->routeGenerator->generate('adminProfileButton.getIndex', [
+                        'roleType' => $roleType
+                    ]),
                 ]
             ];
+
+            /* Buttons are obtained (and managed) totally separately from Profile Fields
+             */
+            $buttons = $this->buttonMapper
+                ->findByColumn('roletype', $roleType)
+                ->sortBy('sortOrder', 'asc');
+            foreach ($buttons as $button) {
+                $roleTypeSettings['buttons'][] = [
+                    'id' => $button->getId(),
+                    'icon' => $button->getIcon(),
+                    'title' => $button->getTitle(),
+                    'text' => $button->getText(),
+                ];
+            }
 
             /* Load a set of fields for the prescribed roletype
              */

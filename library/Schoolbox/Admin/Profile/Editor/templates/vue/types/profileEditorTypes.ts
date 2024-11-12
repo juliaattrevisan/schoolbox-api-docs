@@ -54,6 +54,14 @@ export type ProfileEditorMandatoryField = {
 // This is not a
 export type ProfileEditorActiveField = ProfileEditorSelectedField | ProfileEditorMandatoryField;
 
+// The buttons available on profiles
+type ProfileEditorButton = {
+    id: number;
+    icon: string;
+    title: string;
+    text: string;
+};
+
 export type ProfileEditorRoleType = {
     roleType: string; // only ever "student", "staff", or "parent" at the moment... for display purposes make Title Case if required
     nameFormat: string; // The name format string for the role type (e.g. "{title} {firstname} {lastname")
@@ -76,6 +84,10 @@ export type ProfileEditorRoleType = {
         // - These are not included in availableFields
         // - These show up on the left-hand side of the profile editor as a separate section
         mandatory: ProfileEditorMandatoryField[];
+    };
+    buttons: ProfileEditorButton[];
+    _links: {
+        manageButtons: string; // The route to the relevant page for managing the buttons for this role type
     };
 };
 
