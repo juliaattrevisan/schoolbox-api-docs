@@ -52,12 +52,12 @@ export async function fetchProfileEditorEndpoint(
         }
     } catch (e) {
         responseData.success = false;
-        responseData.message = "An unknown error occured";
+        responseData.message = "An unknown error occurred";
     }
 
     // If the response was unsuccessful and had no message, set a default message
     if (responseData.success === false && responseData.message === "") {
-        responseData.message = "An unknown error occured";
+        responseData.message = "An unknown error occurred";
     }
 
     return responseData;
