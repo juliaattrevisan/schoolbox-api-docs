@@ -53,8 +53,14 @@ window.Vue.watch(isDetailsOpen, (isOpen) => {
                 </tr>
                 <tr>
                     <template v-for="course in reportStore.courses" :key="course.id">
-                        <td class="u-border-left">{{ course.name }}</td>
-                        <td v-for="unit in course.units" :key="unit.id">{{ unit.name }}</td>
+                        <td class="u-border-left">
+                            <a v-if="course.folder" :href="course.folder._links.view">{{ course.name }}</a
+                            ><template v-else>{{ course.name }}</template>
+                        </td>
+                        <td v-for="unit in course.units" :key="unit.id">
+                            <a v-if="unit.folder" :href="unit.folder._links.view">{{ unit.name }}</a
+                            ><template v-else>{{ course.name }}</template>
+                        </td>
                         <td v-if="reportStore.hasMultipleCourses" class="l-valign--bottom"><b>Total</b></td>
                     </template>
                 </tr>
