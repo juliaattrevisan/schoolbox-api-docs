@@ -13,10 +13,18 @@ export async function fetchProfileEditorEndpoint(
     endpoint: string,
     options: RequestInit,
 ): Promise<ProfileEditorFetchResponse> {
-    const responseData: ProfileEditorFetchResponse = { success: false, message: "An unknown error occured" }; // Default error case
+    const responseData: ProfileEditorFetchResponse = { success: false, message: "An unknown error occurred" };
 
     try {
         const response = await fetch(endpoint, options);
+
+        // If the response is a 200 and HTML, then we probably got given the offline page, return a more meaningful message instead.
+        const contentType = response.headers.get("Content-Type") || "";
+        if (response.status === 200 && contentType.includes("text/html")) {
+            responseData.message = "You appear to be offline, check your internet connection and try again.";
+            return responseData;
+        }
+
         const responseText = await response.text();
 
         // If we got some form of response, set the initial message to that
@@ -44,7 +52,7 @@ export async function fetchProfileEditorEndpoint(
         }
     } catch (e) {
         responseData.success = false;
-        responseData.message = (e as Error).message;
+        responseData.message = "An unknown error occured";
     }
 
     // If the response was unsuccessful and had no message, set a default message
