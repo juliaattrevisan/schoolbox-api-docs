@@ -47,7 +47,7 @@ th {
 }
 
 .course-column {
-    border-left: 1px solid black;
+    border-left: 1px solid black; /* to distinguish the start of each course */
 }
 
 .curriculum {
