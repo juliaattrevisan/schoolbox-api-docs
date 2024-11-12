@@ -154,7 +154,10 @@ const showNode = window.Vue.computed(() => {
     if (!filtersStore.onlyShowGaps) {
         return true;
     }
-    // otherwise, only show the node if it has no usages
+    // don't show nodes that can't have usage assigned when only show gaps is active
+    if ((filtersStore.onlyShowGaps && props.node.code === null) || props.node.code === "") {
+        return false;
+    }
     return getEntireUsageCount(props.node) === 0 && filtersStore.onlyShowGaps;
 });
 
