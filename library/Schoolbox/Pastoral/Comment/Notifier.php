@@ -41,18 +41,18 @@ class Notifier extends AbstractModuleNotifier
 {
     // For staff, this will trigger for user / group based permissions, not for role based permissions
     private const TRIGGER_CREATED = 'created';
-    private const TRIGGER_UPDATED = 'updated';
+//    private const TRIGGER_UPDATED = 'updated';
     // For staff, this will trigger and role based permissions, not for user / group based permissions
     public const  TRIGGER_CREATED_RELATED = 'createdRelated';
-    public const  TRIGGER_UPDATED_RELATED = 'updatedRelated';
+//    public const  TRIGGER_UPDATED_RELATED = 'updatedRelated';
     private const TRIGGER_ADDED_TO_REPORT = 'addedToReport';
 
     // titles must not be the same
     private const TITLE = [
         self::TRIGGER_CREATED         => "A :pastoralcare comment has been created",
         self::TRIGGER_CREATED_RELATED => "A :pastoralcare comment has been created",
-        self::TRIGGER_UPDATED         => "A :pastoralcare comment has been updated",
-        self::TRIGGER_UPDATED_RELATED => "A :pastoralcare comment has been updated",
+//        self::TRIGGER_UPDATED         => "A :pastoralcare comment has been updated",
+//        self::TRIGGER_UPDATED_RELATED => "A :pastoralcare comment has been updated",
     ];
 
     /** @var Mapper */
