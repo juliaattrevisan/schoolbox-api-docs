@@ -241,7 +241,7 @@ class Payload
                     'tabSettings' => [
                         /* Find the ids of the campuses for which this tab might be available
                          */
-                        self::AVAILABILITY_NODE => $tab->getAvailabilityCampus()?->indexByCallback(static function (\Schoolbox\Admin\Profile\Editor\Field\Availability\Campus\Model $campus) {
+                        self::AVAILABILITY_NODE => $tab->getAvailabilityCampus()?->indexByCallback(static function (\Schoolbox\Admin\Profile\Editor\Tab\Availability\Campus\Model $campus) {
                             return $campus->getCampus()?->getId();
                         })->keys(),
 

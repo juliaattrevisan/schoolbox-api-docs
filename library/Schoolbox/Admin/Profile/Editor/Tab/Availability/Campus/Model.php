@@ -20,7 +20,7 @@ class Model
     /**
      * @var \Schoolbox\Admin\Profile\Editor\Tab\Model|null
      */
-    private ?\Schoolbox\Admin\Profile\Editor\Tab\Model $field = null;
+    private ?\Schoolbox\Admin\Profile\Editor\Tab\Model $tab = null;
 
 
     /**
