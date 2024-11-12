@@ -19,6 +19,10 @@ interface Props {
 }
 const props = defineProps<Props>();
 
+const emit = defineEmits<{
+    titleSelect: [node: CurriculumCoverageNode];
+}>();
+
 const reportStore = useReportStore();
 const filtersStore = useFiltersStore();
 const { title } = useNodeTitle(props.node);
@@ -174,6 +178,13 @@ window.Vue.onMounted(async () => {
         gsap.from(nodeEl.value, { opacity: 0, duration: 0.3 });
     }
 });
+
+/**
+ * Emit to open up the node details modal
+ */
+function onTitleClicked(): void {
+    emit("titleSelect", props.node);
+}
 </script>
 
 <template>
@@ -183,13 +194,13 @@ window.Vue.onMounted(async () => {
             :style="{ paddingInlineStart: paddingStart }"
         >
             <button
-                v-if="props.depth !== 0 && hasChildren"
+                v-if="props.depth !== 0 && hasChildren && !filtersStore.onlyShowGaps"
                 :class="`expand-button expander l-flex l-flex--center ${isExpanded ? 'icon-up-arrow' : 'icon-down-arrow'}`"
                 :aria-label="expandTitle"
                 :title="expandTitle"
                 @click="onExpandClicked"
-            ></button
-            >{{ title }}
+            ></button>
+            <button class="title-button" @click="onTitleClicked">{{ title }}</button>
         </td>
         <td class="u-border-left">
             {{ getEntireUsageCount(props.node) }}
@@ -229,5 +240,11 @@ td {
 
 .expand-button {
     background: none;
+}
+
+.title-button {
+    background: none;
+    padding: 0;
+    text-align: left;
 }
 </style>
