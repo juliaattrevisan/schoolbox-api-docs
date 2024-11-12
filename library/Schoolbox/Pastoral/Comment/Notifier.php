@@ -211,10 +211,10 @@ class Notifier extends AbstractModuleNotifier
                 $bundle->attach(self::TRIGGER_CREATED_RELATED, self::IMMEDIATELY);
                 $bundle->attach(self::TRIGGER_ADDED_TO_REPORT, self::IMMEDIATELY);
                 break;
-            case BaseMapper::METHOD_UPDATE:
-                $bundle->attach(self::TRIGGER_UPDATED, self::IMMEDIATELY);
-                $bundle->attach(self::TRIGGER_UPDATED_RELATED, self::IMMEDIATELY);
-                break;
+//            case BaseMapper::METHOD_UPDATE:
+//                $bundle->attach(self::TRIGGER_UPDATED, self::IMMEDIATELY);
+//                $bundle->attach(self::TRIGGER_UPDATED_RELATED, self::IMMEDIATELY);
+//                break;
         }
     }
 
@@ -243,6 +243,11 @@ class Notifier extends AbstractModuleNotifier
     }
 
     /**
+     * @deprecated Pastoral comments may not be modified once created, thus they
+     *             have no update notifications.
+     *             They may be deleted, but there is currently no source set up
+     *             for deleted comments.
+     *
      * @param Model $model
      * @param User  $effector
      * @param array $diff
@@ -255,6 +260,11 @@ class Notifier extends AbstractModuleNotifier
     }
 
     /**
+     * @deprecated Pastoral comments may not be modified once created, thus they
+     *             have no update notifications.
+     *             They may be deleted, but there is currently no source set up
+     *             for deleted comments.
+     *
      * @param Model $model
      * @param User  $effector
      * @param array $diff
