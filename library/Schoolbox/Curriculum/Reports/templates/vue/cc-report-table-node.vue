@@ -239,7 +239,11 @@ function onChildTitleClicked(node: CurriculumCoverageNode): void {
 
 <style scoped>
 tr:nth-child(odd) {
-    background-color: #f7f7f7;
+    background-color: #f7f7f7; /* to help legibility */
+}
+
+tr:hover {
+    background-color: var(--accent-background); /* to help legibility */
 }
 
 td {
