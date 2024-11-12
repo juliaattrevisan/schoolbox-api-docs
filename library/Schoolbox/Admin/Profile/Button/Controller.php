@@ -169,7 +169,8 @@ class Controller extends Base
                 'icons' => $this->iconMapper->findAll()->sortBy('title', 'asc'),
                 'roles' => $this->roleMapper->findAll()->sortBy('name', 'asc'),
                 'campuses' => $this->campusMapper->findAll()->sortBy('name', 'asc'),
-                'roleType' => $roleType
+                'roleType' => $roleType,
+                'returnUrl' => null
             ],
             'Admin - Create Profile Button'
         );
