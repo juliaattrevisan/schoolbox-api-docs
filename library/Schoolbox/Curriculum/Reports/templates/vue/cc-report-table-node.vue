@@ -188,14 +188,14 @@ const showNode = window.Vue.computed(() => {
 
 // #endregion
 
-const nodeEl = useTemplateRef<HTMLElement | null>("nodeEl");
-
 /**
  * Fade in when shown to help provide context
  */
-window.Vue.onMounted(() => {
+const nodeEl = useTemplateRef<HTMLElement | null>("nodeEl");
+window.Vue.onMounted(async () => {
     // expand the node if it has no children
-    if (props.depth > 2 && showNode.value) {
+    if (props.depth > 1 && showNode.value) {
+        await window.Vue.nextTick();
         gsap.from(nodeEl.value, { opacity: 0, duration: 0.3 });
     }
 });
@@ -243,6 +243,10 @@ window.Vue.onMounted(() => {
 </template>
 
 <style scoped>
+tr:nth-child(odd) {
+    background-color: #f7f7f7;
+}
+
 td {
     border-bottom: 1px solid black;
     border-right: 1px solid black;

@@ -11,13 +11,11 @@ const reportStore = useReportStore();
 
 <template>
     <div class="scrollable">
-        <table>
+        <table class="coverage-report">
             <thead>
                 <tr>
                     <th rowspan="2" class="curriculum l-valign--bottom">Curriculum</th>
                     <th rowspan="2" class="l-valign--bottom">Total</th>
-                </tr>
-                <tr>
                     <template v-for="course in reportStore.courses" :key="course.id">
                         <td class="course-column"><b>Course:</b> {{ course.name }}</td>
                         <td v-for="unit in course.units" :key="unit.id" :class="``"><b>Unit:</b> {{ unit.name }}</td>
@@ -38,7 +36,7 @@ table {
     border-top: 1px solid black;
 }
 
-thead td {
+table thead tr td {
     font-weight: normal;
 }
 
