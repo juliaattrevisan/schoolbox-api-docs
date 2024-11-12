@@ -185,8 +185,16 @@
             <div class="row">
                 <div class="small-12 column">
                     <ul class="flex-list buttons">
-                        <li><a href="{{ routeLookup('adminProfileButton.getIndex') }}" class="button">Cancel</a>
                         <li>
+                            {% if returnUrl|length %}
+                                <a href="{{ returnUrl }}" class="button">Cancel</a>
+                            {% else %}
+                                <a href="{{ routeLookup('adminProfileButton.getIndex') }}" class="button">Cancel</a>
+                            {% endif %}
+                        <li>
+                            {% if returnUrl|length %}
+                                <input type="hidden" name="{{ RETURN_URL.name }}" value="{{ returnUrl }}"/>
+                            {% endif %}
                             <button type="submit" class="submit" id="profile-button-submit">
                                 {% if createForm %}
                                     Create profile button

@@ -12,6 +12,7 @@ use Schoolbox\Profile\Button\Campus;
 use Schoolbox\Profile\Button\Role;
 use Schoolbox\Profile\Button\Mapper as ProfileButtonMapper;
 use Schoolbox\Profile\Button\Model as ProfileButton;
+use Schoolbox\Learning\Assessment\Redirect;
 use Schoolbox\CampusMapper;
 use Schoolbox\RoleMapper;
 use Schoolbox\Error\Mapper as ErrorMapper;
@@ -124,6 +125,10 @@ class Controller extends Base
         $campusVisibilitySelections = $this->campusVisibilityMapper->findByColumn('profile_button_id', $id);
         $campusVisibilitySelected = array_fill_keys($campusVisibilitySelections->indexBy('campusId')->keys(), true);
 
+        $returnUrl = $this->requestQuery->get(Redirect::RETURN_URL) ?
+            Redirect::decode($this->requestQuery->get(Redirect::RETURN_URL))
+            : null;
+
         $this->response = $this->responseFromTemplate(
             '@adminProfileButton/modify.twig',
             [
@@ -140,6 +145,7 @@ class Controller extends Base
                 'campusAvailabilitySelected' => $campusAvailabilitySelected,
                 'roleVisibilitySelected' => $roleVisibilitySelected,
                 'campusVisibilitySelected' => $campusVisibilitySelected,
+                'returnUrl' => $returnUrl
             ],
             'Admin - Modify Profile Button'
         );
@@ -316,7 +322,8 @@ class Controller extends Base
             }
         }
 
-        $route = $this->routeGenerator->generate('adminProfileButton.getIndex', ['roleType' => $item->getRoleType()]);
+        $route = $this->requestPost->get(Redirect::RETURN_URL)
+            ?: $this->routeGenerator->generate('adminProfileButton.getIndex', ['roleType' => $item->getRoleType()]);
 
         $this->response = $this->redirectAfterPost($route);
     }

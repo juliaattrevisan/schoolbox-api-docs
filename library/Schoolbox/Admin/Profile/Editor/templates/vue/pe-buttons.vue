@@ -4,6 +4,7 @@
  * each with a link to the relevant modify page
  */
 
+import { getReturnUrl } from "@js/util/sbx/urlUtils";
 import { useProfileEditorStore } from "./store/profileEditorStore";
 
 const peStore = useProfileEditorStore();
@@ -21,7 +22,7 @@ const peStore = useProfileEditorStore();
 
             <ul class="flex-list flex-wrap buttons">
                 <li v-for="button in peStore.selectedRoleType.buttons" :key="button.id">
-                    <a :class="`icon-${button.icon}`" :title="button.title" :href="button._links.modify">
+                    <a :class="`icon-${button.icon}`" :title="button.title" :href="getReturnUrl(button._links.modify)">
                         {{ button.text }}
                     </a>
                 </li>
