@@ -38,12 +38,24 @@ window.Vue.watch(isDetailsOpen, (isOpen) => {
         <table class="coverage-report">
             <thead>
                 <tr>
-                    <th class="curriculum l-valign--bottom">Curriculum</th>
-                    <th class="u-border-left l-valign--bottom">Total</th>
+                    <th rowspan="2" class="curriculum l-valign--bottom">Curriculum</th>
+                    <th rowspan="2" class="u-border-left l-valign--bottom">Total</th>
+                    <!-- colspan will be the number of units plus total -->
                     <template v-for="course in reportStore.courses" :key="course.id">
-                        <td class="u-border-left"><b>Course:</b> {{ course.name }}</td>
-                        <td v-for="unit in course.units" :key="unit.id" :class="``"><b>Unit:</b> {{ unit.name }}</td>
-                        <td v-if="reportStore.hasMultipleCourses" :class="``"><b>Total</b></td>
+                        <th class="u-border-left" style="border-right: none">Course</th>
+                        <th
+                            style="border-left: none"
+                            :colspan="`${course.units && course.units.length ? (reportStore.hasMultipleCourses ? course.units.length + 1 : course.units.length) : 0}`"
+                        >
+                            Units
+                        </th>
+                    </template>
+                </tr>
+                <tr>
+                    <template v-for="course in reportStore.courses" :key="course.id">
+                        <td class="u-border-left">{{ course.name }}</td>
+                        <td v-for="unit in course.units" :key="unit.id">{{ unit.name }}</td>
+                        <td v-if="reportStore.hasMultipleCourses" class="l-valign--bottom"><b>Total</b></td>
                     </template>
                 </tr>
             </thead>
