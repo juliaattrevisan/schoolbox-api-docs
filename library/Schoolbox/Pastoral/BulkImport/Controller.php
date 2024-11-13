@@ -240,7 +240,12 @@ class Controller extends Base
         $this->pastoralBulkImportMapper->save($import);
 
         // Then, redirect to a place where the fields are displayed
-        $this->response = $this->redirectAfterPost($this->generateRedirectUrl($import)->__toString());
+        $this->response = $this->redirectAfterPost(
+            $this->generateRedirectUrl(
+                $import,
+                $this->routeGenerator->generate('pastoralBulkImport.getImport', ['id' => $import->getId()]),
+            ),
+        );
     }
 
     /**
@@ -259,7 +264,12 @@ class Controller extends Base
     public function postDeleteImport(Model $import): void
     {
         $this->pastoralBulkImportMapper->delete($import);
-        $this->response = $this->redirectAfterPost($this->generateRedirectUrl($import)->__toString());
+        $this->response = $this->redirectAfterPost(
+            $this->generateRedirectUrl(
+                $import,
+                $this->routeGenerator->generate('pastoralBulkImport.getList', ['id' => $import->getId()]),
+            ),
+        );
     }
 
     /**
@@ -396,7 +406,12 @@ class Controller extends Base
             ->setImportLog($importLog);
         $this->pastoralBulkImportMapper->save($import);
 
-        $this->response = $this->redirectAfterPost($this->generateRedirectUrl($import)->__toString());
+        $this->response = $this->redirectAfterPost(
+            $this->generateRedirectUrl(
+                $import,
+                $this->routeGenerator->generate('pastoralBulkImport.getImport', ['id' => $import->getId()]),
+            ),
+        );
     }
 
     /**
@@ -433,7 +448,12 @@ class Controller extends Base
         $this->pastoralBulkImportMapper->save($import);
 
         // Redirect
-        $this->response = $this->redirectAfterPost($this->generateRedirectUrl($import)->__toString());
+        $this->response = $this->redirectAfterPost(
+            $this->generateRedirectUrl(
+                $import,
+                $this->routeGenerator->generate('pastoralBulkImport.getImport', ['id' => $import->getId()]),
+            ),
+        );
     }
 
     /**
@@ -585,16 +605,17 @@ class Controller extends Base
      * return URL if it's in the query string.
      *
      * @param Model $import
-     * @return UriInterface
+     * @return string
      */
-    private function generateRedirectUrl(Model $import): UriInterface
+    private function generateRedirectUrl(Model $import, string $redirectUrl): string
     {
         $returnQuery = [];
         if ($this->requestQuery->get(Redirect::RETURN_URL)) {
             $returnQuery[Redirect::RETURN_URL] = $this->requestQuery->get(Redirect::RETURN_URL);
         }
         return (new Uri())
-            ->withPath($this->routeGenerator->generate('pastoralBulkImport.getImport', ['id' => $import->getId()]))
-            ->withQuery(http_build_query($returnQuery));
+            ->withPath($redirectUrl)
+            ->withQuery(http_build_query($returnQuery))
+            ->__toString();
     }
 }
