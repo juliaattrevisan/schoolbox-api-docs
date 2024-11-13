@@ -8,7 +8,7 @@
 
 declare(strict_types=1);
 
-use Schoolbox\Admin\Profile\Editor\Cli\DefaultSettingsTool;
+use Schoolbox\Admin\Profile\Editor\Cli\FieldSettingsTool;
 use Schoolbox\Application\CliTool;
 
 require_once __DIR__ . '/../../conf/core/require.php';
@@ -24,7 +24,7 @@ require_once __DIR__ . '/../../conf/core/require.php';
  *
  *     Example: php example.php 2> log.txt
  */
-$app = new DefaultSettingsTool();
+$app = new FieldSettingsTool();
 
 /* OPTION_ERRORS => E_ALL causes all notices and errors to fatally crash your script
  *

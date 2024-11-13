@@ -11,7 +11,7 @@ namespace Schoolbox\Admin\Profile\Editor\Cli;
 
 use Schoolbox\Application\CliTool;
 
-class DefaultSettingsTool extends CliTool\App
+class FieldSettingsTool extends CliTool\App
 {
     /**
      * Make sure to add your locking script to the Lock Inspector tool

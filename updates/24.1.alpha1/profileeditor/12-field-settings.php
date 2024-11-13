@@ -8,5 +8,5 @@
 
 declare(strict_types=1);
 
-passthru('php ' . __DIR__ .  '/../../../tools/profile-editor/default-settings.php --perform', $resultCode);
+passthru('php ' . __DIR__ .  '/../../../tools/profile-editor/field-settings.php --perform', $resultCode);
 exit($resultCode);
