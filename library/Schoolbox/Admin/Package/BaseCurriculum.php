@@ -151,6 +151,12 @@ abstract class BaseCurriculum implements IPackageInstall
          */
         for ($i = 0; $next && $i < self::MAX_CALLS; $i++) {
             if (!isset($this->parentLookup[$next])) {
+                $uuid = $parent['uuid'] ?? null;
+                /* check if uuid is empty string, if set it to null
+                 */
+                if ($uuid === '') {
+                    $uuid = null;
+                }
                 $parent = $graph[$row['curriculum_node_parent_id']];
 
                 $node = $this->getCurriculumMapper()->createModel()
@@ -159,7 +165,7 @@ abstract class BaseCurriculum implements IPackageInstall
                              ->setDescription($parent['description'])
                              ->setCode(trim($parent['code']))
                              ->setOrder($parent['order'])
-                             ->setUuid($parent['uuid'] ?? null);
+                             ->setUuid($uuid);
 
                 $this->getCurriculumMapper()->save($node);
 
@@ -208,13 +214,20 @@ abstract class BaseCurriculum implements IPackageInstall
             $parentId = null;
         }
 
+        $uuid = $row['uuid'] ?? null;
+        /* check if uuid is empty string, if set it to null
+         */
+        if ($uuid === '') {
+            $uuid = null;
+        }
+
         $node = $this->getCurriculumMapper()->createModel()
                      ->setParent($parentId ? $this->parentLookup[$row['curriculum_node_parent_id']] : null)
                      ->setName($row['name'])
                      ->setDescription($row['description'])
                      ->setCode(trim($row['code']))
                      ->setOrder($row['order'])
-                     ->setUuid($row['uuid'] ?? null);
+                     ->setUuid($uuid);
 
         $this->getCurriculumMapper()->save($node);
 
