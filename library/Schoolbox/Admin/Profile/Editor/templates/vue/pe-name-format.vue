@@ -19,7 +19,7 @@ function isNameFormatUnsaved(): boolean {
     if (peStore.selectedRoleType === null) return false;
     if (peStore.savedSelectedRoleType === null) return false;
 
-    return peStore.selectedRoleType.nameFormat.trim() !== peStore.savedSelectedRoleType.nameFormat.trim();
+    return peStore.selectedRoleType.nameFormat !== peStore.savedSelectedRoleType.nameFormat;
 }
 
 /**
@@ -30,10 +30,12 @@ async function onUpdateClicked(): Promise<void> {
     saveError.value = null;
     isSaving.value = true;
     toast.activate("Updating name format...");
-    const saveResult = await peStore.saveNameFormat();
-    if (saveResult !== true) {
-        saveError.value = saveResult;
-        toast.timeout({ text: `Failed to update name format: ${saveResult}`, isSuccess: false });
+    if (isNameFormatUnsaved()) {
+        const saveResult = await peStore.saveNameFormat();
+        if (saveResult !== true) {
+            saveError.value = saveResult;
+            toast.timeout({ text: `Failed to update name format: ${saveResult}`, isSuccess: false });
+        }
     }
     isSaving.value = false;
     toast.timeout({ text: "Name format updated", isSuccess: true });
@@ -53,13 +55,9 @@ async function onUpdateClicked(): Promise<void> {
             type="text"
             placeholder="Enter a name display format"
         />
-        <Transition @enter="slideDownOnEnter" @leave="slideUpOnLeave">
-            <div v-if="isNameFormatUnsaved()">
-                <button class="button submit" :disabled="isSaving" @change="saveError = null" @click="onUpdateClicked">
-                    {{ isSaving ? "Updating..." : "Update" }}
-                </button>
-            </div>
-        </Transition>
+        <button class="button submit" :disabled="isSaving" @change="saveError = null" @click="onUpdateClicked">
+            {{ isSaving ? "Updating..." : "Update" }}
+        </button>
         <Transition @enter="slideDownOnEnter" @leave="slideUpOnLeave">
             <div v-if="saveError" class="alert alert-box" style="opacity: 1">
                 <b>Warning:</b> There was a problem saving changes to the name format. Please
@@ -71,13 +69,4 @@ async function onUpdateClicked(): Promise<void> {
     </section>
 </template>
 
-<style scoped>
-input {
-    width: 100%;
-    margin-bottom: 0px;
-}
-
-button {
-    width: 100%;
-}
-</style>
+<style scoped></style>

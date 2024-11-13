@@ -4,6 +4,7 @@
  */
 
 import { animateRotation } from "@js/util/animateUtils";
+import { slideDownOnEnter, slideUpOnLeave } from "@schoolboxVue/transitions/transitions";
 import PeTabsTabEdit from "./pe-tabs-tab-edit.vue";
 import PePanelError from "./pe-panel-error.vue";
 import { useProfileEditorTabsStore } from "./store/profileEditorTabsStore";

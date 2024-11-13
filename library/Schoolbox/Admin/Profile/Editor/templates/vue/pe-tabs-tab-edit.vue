@@ -33,9 +33,11 @@ const isUpdating = window.Vue.ref(false);
  * When the user clicks the update button
  */
 async function onUpdateClicked(): Promise<void> {
-    isUpdating.value = true;
-    await peTabsStore.saveTabSettings(props.tab.id);
-    isUpdating.value = false;
+    if (peTabsStore.isTabSettingsUnsaved(props.tab.id)) {
+        isUpdating.value = true;
+        await peTabsStore.saveTabSettings(props.tab.id);
+        isUpdating.value = false;
+    }
 
     emit("close");
 }
@@ -50,16 +52,12 @@ async function onUpdateClicked(): Promise<void> {
                 :tab="props.tab"
                 :tab-setting-key="tabSettingKey"
             />
-            <Transition @enter="slideDownOnEnter" @leave="slideUpOnLeave">
-                <div v-if="peTabsStore.isTabSettingsUnsaved(props.tab.id)">
-                    <input
-                        type="submit"
-                        :value="isUpdating ? 'Updating...' : 'Update'"
-                        :disabled="isUpdating"
-                        @click="onUpdateClicked"
-                    />
-                </div>
-            </Transition>
+            <input
+                type="submit"
+                :value="isUpdating ? 'Updating...' : 'Update'"
+                :disabled="isUpdating"
+                @click="onUpdateClicked"
+            />
         </div>
     </Transition>
 </template>
