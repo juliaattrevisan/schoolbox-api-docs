@@ -105,21 +105,29 @@ class SortForCourseMarkbook implements IAssessableComparator
     private function compareUnitSpecSequence(IAssessable $left, IAssessable $right): int
     {
         if ($left->isSpecification()) {
-            $leftSeqeunce = $left->getBaseContext()->getFolder()->getSequence();
+            $leftSequence = $left->getBaseContext()->getFolder()->getSequence();
+            $leftSpecName = $left->getBaseContext()->getTitle();
         } else {
             /** @var UnitImplementation\Model $unitImpl */
             $unitImpl     = $left->getBaseContext();
-            $leftSeqeunce = $unitImpl->getSpecification()->getFolder()->getSequence();
+            $leftSequence = $unitImpl->getSpecification()->getFolder()->getSequence();
+            $leftSpecName = $unitImpl->getSpecification()->getTitle();
         }
         if ($right->isSpecification()) {
             $rightSequence = $right->getBaseContext()->getFolder()->getSequence();
+            $rightSpecName = $right->getBaseContext()->getTitle();
         } else {
             /** @var UnitImplementation\Model $unitImpl */
             $unitImpl      = $right->getBaseContext();
             $rightSequence = $unitImpl->getSpecification()->getFolder()->getSequence();
+            $rightSpecName = $unitImpl->getSpecification()->getTitle();
         }
 
-        return  $rightSequence <=> $leftSeqeunce;
+        return  (
+            ($leftSequence === $rightSequence)
+            ? $rightSpecName <=> $leftSpecName
+            : $rightSequence <=> $leftSequence
+        );
     }
 
 
