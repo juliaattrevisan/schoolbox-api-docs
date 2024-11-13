@@ -126,7 +126,7 @@ class SortForCourseMarkbook implements IAssessableComparator
         return  (
             ($leftSequence === $rightSequence)
             ? $rightSpecName <=> $leftSpecName
-            : $rightSequence <=> $leftSequence
+            : $leftSequence <=> $rightSequence
         );
     }
 
