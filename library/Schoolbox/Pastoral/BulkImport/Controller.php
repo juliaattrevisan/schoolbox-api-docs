@@ -21,6 +21,7 @@ use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Pastoral;
 use Schoolbox\Pastoral\TemplateDataHelper;
 use Schoolbox\Pastoral\Translator\VisibilityTranslator;
+use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
 use Schoolbox\Resource\Attachment\Zone;
 use Schoolbox\Resource\Exception as ResourceException;
@@ -108,7 +109,10 @@ class Controller extends Base
             ->setParam(self::PAGE_QUERY_STRING_PARAM)
             ->setTotal($importCount);
         $currentPage = $this->requestQuery->get(self::PAGE_QUERY_STRING_PARAM, 1);
-        $imports     = ($importCount > 0)
+
+        // Show x number of previous imports, and when they were imported, and
+        // their undo status.
+        $imports = ($importCount > 0)
             ? $this->pastoralBulkImportMapper->findAll([
                 'order'  => [
                     'created_at' => $this->pastoralBulkImportMapper::SORT_ORDER_DESC,
@@ -119,8 +123,6 @@ class Controller extends Base
             ])
             : $this->pastoralBulkImportMapper->createCollection();
 
-        // Show x number of previous imports, and when they were imported, and
-        // their undo status.
         $this->response = $this->responseFromTemplate(
             '@pastoralBulkImport/list.twig',
             [
@@ -174,7 +176,6 @@ class Controller extends Base
                     ->setReadOnly(false)
                     ->setFileVar('report')
                     ->setMulti(false)
-                    ->useImportExpiryDate()
                     ->getTwigContext(),
                 'moderator'        => $this->getUser()->hasServicePermission(
                     UserAccess::SERVICE_PASTORAL,
