@@ -8,7 +8,7 @@ import { animateRotation } from "@js/util/animateUtils";
 import { slideDownOnEnter, slideUpOnLeave } from "@schoolboxVue/transitions/transitions";
 import { useProfileEditorFieldsStore } from "./store/profileEditorFieldsStore";
 import PeFieldsActiveItemEdit from "./pe-fields-active-item-edit.vue";
-import PeFieldsActiveItemError from "./pe-fields-active-item-error.vue";
+import PePanelError from "./pe-panel-error.vue";
 import PeFieldsIcon from "./pe-fields-icon.vue";
 import type { ProfileEditorMandatoryField } from "./types/profileEditorTypes";
 
@@ -70,7 +70,7 @@ const fieldSaveError = window.Vue.computed(() => {
 
     <section>
         <Transition @enter="slideDownOnEnter" @leave="slideUpOnLeave">
-            <pe-fields-active-item-error v-if="fieldSaveError" :message="fieldSaveError" />
+            <pe-panel-error v-if="fieldSaveError" :message="fieldSaveError" type="field" />
         </Transition>
 
         <pe-fields-active-item-edit :field="props.field" :is-open="isEditPanelOpen" @close="isEditPanelOpen = false" />

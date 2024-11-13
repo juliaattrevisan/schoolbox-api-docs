@@ -5,6 +5,8 @@
 
 import { animateRotation } from "@js/util/animateUtils";
 import PeTabsTabEdit from "./pe-tabs-tab-edit.vue";
+import PePanelError from "./pe-panel-error.vue";
+import { useProfileEditorTabsStore } from "./store/profileEditorTabsStore";
 import type { ProfileEditorTab } from "./types/profileEditorTypes";
 
 interface Props {
@@ -15,6 +17,8 @@ interface Props {
 }
 
 const props = defineProps<Props>();
+const peTabsStore = useProfileEditorTabsStore();
+
 const editBtn = window.Vue.ref<HTMLElement | null>(null);
 
 const isEditPanelOpen = window.Vue.ref<boolean>(false);
@@ -34,6 +38,13 @@ window.Vue.watch(isEditPanelOpen, (isOpen) => {
         );
     }
 });
+
+/**
+ * The error message to display if there was a problem saving this tab
+ */
+const tabSaveError = window.Vue.computed(() => {
+    return peTabsStore.actionErrors[props.tab.id];
+});
 </script>
 
 <template>
@@ -51,6 +62,10 @@ window.Vue.watch(isEditPanelOpen, (isOpen) => {
         </div>
 
         <div class="pe-tabs-tab-panel">
+            <Transition @enter="slideDownOnEnter" @leave="slideUpOnLeave">
+                <pe-panel-error v-if="tabSaveError" :message="tabSaveError" type="tab" />
+            </Transition>
+
             <pe-tabs-tab-edit
                 :tab="props.tab"
                 :is-open="isEditPanelOpen && !props.dragging"
