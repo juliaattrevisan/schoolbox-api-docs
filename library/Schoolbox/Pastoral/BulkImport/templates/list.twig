@@ -36,6 +36,10 @@
                                 {% if undoRoute %}
                                     <form id="postUndoImport-{{ import.id }}" action="{{ undoRoute }}?{{ returnQueryString }}" method="post"></form>
                                 {% endif %}
+                                {% set deleteRoute = routeLookupIfAuthorized('pastoralBulkImport.postDeleteImport', {id: import.id, import: import}) %}
+                                {% if deleteRoute %}
+                                    <form id="postDeleteImport-{{ import.id }}" action="{{ deleteRoute }}?{{ returnQueryString }}" method="post"></form>
+                                {% endif %}
                                 <div class="list-item">
                                     <div class="card small-12">
                                         {% if getRoute %}
@@ -91,6 +95,10 @@
                                     {% if undoRoute %}
                                         <a class="icon-undo" data-action="undo" data-form-id="postUndoImport-{{ import.id }}" title="Undo import"></a>
                                     {% endif %}
+
+                                    {% if deleteRoute %}
+                                        <a class="icon-delete" data-action="delete" data-form-id="postDeleteImport-{{ import.id }}" title="Delete import"></a>
+                                    {% endif %}
                                 </nav>
                             </div>
                         </li>
@@ -115,29 +123,42 @@
 
 <script type="text/javascript">
     $(function() {
-        let $importList = $('#import-list');
+        let $importList = $('#import-list'),
+            confirmCallback = function (el) {
+                // Submit the element's form
+                let $form = $('#' + el.attr('data-form-id'));
+                $form.submit();
+            };
         $importList
             .on('click', '[data-action="run"]', function(event) {
                 event.preventDefault();
                 $(this).confirmDialog({
                     text: 'Are you sure you want to run this import? This will create pastoral records.',
-                    confirmEvent: function (el) {
-                        // Create a form and submit it?
-                        let $form = $('#' + el.attr('data-form-id'));
-                        $form.submit();
-                    }
+                    confirmEvent: confirmCallback,
                 });
             })
             .on('click', '[data-action="undo"]', function(event) {
                 event.preventDefault();
                 $(this).confirmDialog({
                     text: 'Are you sure you want to undo this import? This will delete any pastoral records which were created by this import.',
-                    confirmEvent: function (el) {
-                        // Create a form and submit it?
-                        let $form = $('#' + el.attr('data-form-id'));
-                        $form.submit();
-                    }
+                    confirmEvent: confirmCallback,
                 });
             })
+            .on('click', '[data-action="delete"]', function(event) {
+                event.preventDefault();
+                $(this).confirmDialog({
+                    text: `
+                        <p>Are you sure you want to delete this import?</p>
+                        <p>
+                            This will <i>not</i> delete any pastoral records which were created by this import: it will
+                            only delete the record of the import, and allow the space allocated to its ZIP file
+                            to be reclaimed.
+                        </p>
+                    `,
+                    format: 'html',
+                    confirmEvent: confirmCallback,
+                });
+            })
+        ;
     });
 </script>

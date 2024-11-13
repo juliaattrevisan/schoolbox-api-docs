@@ -244,6 +244,25 @@ class Controller extends Base
     }
 
     /**
+     * Delete the bulk import.
+     *
+     * This will _not_ delete any pastoral records created by the import:
+     * it will only remove the bulk import from the form.
+     *
+     * @api   POST /pastoral/bulk-import/delete
+     * @since 24.1
+     *
+     * @param Model $import
+     * @return void
+     * @throws MapperException
+     */
+    public function postDeleteImport(Model $import): void
+    {
+        $this->pastoralBulkImportMapper->delete($import);
+        $this->response = $this->redirectAfterPost($this->generateRedirectUrl($import)->__toString());
+    }
+
+    /**
      * Display the current state of `$import`, including whether or not it has
      * actually been imported.
      *

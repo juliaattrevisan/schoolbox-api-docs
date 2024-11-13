@@ -115,6 +115,13 @@ class Module extends BaseModule
             $undoPermission,
             $preload,
         );
+        $this->register(
+            self::METHOD_POST,
+            '/{id}/delete',
+            'postDeleteImport',
+            $permission,
+            $preload,
+        );
     }
 
     /**
