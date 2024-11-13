@@ -5,13 +5,13 @@
 
 import PeFields from "./pe-fields.vue";
 import PeButtons from "./pe-buttons.vue";
+import PeTabs from "./pe-tabs.vue";
 import PeRoleType from "./pe-role-type.vue";
 import PeNameFormat from "./pe-name-format.vue";
 import { useProfileEditorStore } from "./store/profileEditorStore";
-import type { ProfileEditorEndpoints, ProfileEditorPayload } from "./types/profileEditorTypes";
+import type { ProfileEditorPayload } from "./types/profileEditorTypes";
 
 interface Props {
-    endpoints: ProfileEditorEndpoints;
     payload: ProfileEditorPayload;
 }
 
@@ -19,7 +19,7 @@ const props = defineProps<Props>();
 const peStore = useProfileEditorStore();
 
 window.Vue.onMounted(() => {
-    peStore.init(props.endpoints, props.payload.data.roleTypes, props.payload.data.fieldSettings);
+    peStore.init(props.payload.data.roleTypes, props.payload.data.fieldSettings, props.payload.data.tabSettings);
 
     // Is there the url hash a valid role type? select it if so or fall back to the first role type
     const roleTypeViaHash = peStore.roleTypes.find((roleType) => roleType.roleType === window.location.hash.slice(1));
@@ -40,6 +40,7 @@ window.Vue.onMounted(() => {
     </div>
     <pe-fields />
     <pe-buttons />
+    <pe-tabs />
 </template>
 
 <style scoped></style>

@@ -2,13 +2,7 @@
  * Types used only by the profile editor
  */
 
-export type ProfileEditorEndpoints = {
-    adminProfileEditorPostFieldAdd: string;
-    adminProfileEditorPostFieldRemove: string;
-    adminProfileEditorPostFieldSettings: string;
-    adminProfileEditorPostFieldSequence: string;
-    adminProfileEditorPostNameFormat: string;
-};
+// #region FIELD SETTINGS
 
 export type ProfileEditorFieldSettingOption = {
     id: number | string;
@@ -22,6 +16,10 @@ export type ProfileEditorFieldSettingDefinition = {
     tooltip: string;
     options: ProfileEditorFieldSettingOption[];
 };
+
+// #endregion
+
+// #region FIELD TYPES
 
 export type ProfileEditorAvailableField = {
     field: string;
@@ -54,6 +52,10 @@ export type ProfileEditorMandatoryField = {
 // This is not a
 export type ProfileEditorActiveField = ProfileEditorSelectedField | ProfileEditorMandatoryField;
 
+// #endregion
+
+// #region BUTTONS
+
 // The buttons available on profiles, each with a link to the relevant modify page
 type ProfileEditorButton = {
     id: number;
@@ -64,6 +66,35 @@ type ProfileEditorButton = {
         modify: string;
     };
 };
+
+// #endregion
+
+// #region TABS
+
+export type ProfileEditorTabSettingOption = {
+    id: number | string;
+    name: string;
+    type: string; // currently unused, e.g. "campus" or "role"
+};
+
+export type ProfileEditorTabSettingKey = string;
+export type ProfileEditorTabSettingDefinition = {
+    displayAs: string;
+    tooltip: string;
+    options: ProfileEditorFieldSettingOption[];
+};
+
+// The tabs available on the profile editor for a role type
+export type ProfileEditorTab = {
+    id: string;
+    label: string;
+    // A map of each tab setting key relevant to the tab to an array of the ids of each selected option
+    tabSettings: Record<ProfileEditorTabSettingKey, ProfileEditorTabSettingOption["id"][]>;
+};
+
+// #endregion
+
+// #region ROLE TYPES
 
 export type ProfileEditorRoleType = {
     roleType: string; // only ever "student", "staff", or "parent" at the moment... for display purposes make Title Case if required
@@ -89,19 +120,35 @@ export type ProfileEditorRoleType = {
         mandatory: ProfileEditorMandatoryField[];
     };
     buttons: ProfileEditorButton[];
+    // These tabs are implicitly ordered by sequence any time the front- and back-end exchange payload data
+    tabs: ProfileEditorTab[];
     _links: {
         manageButtons: string; // The route to the relevant page for managing the buttons for this role type
     };
+    _routes: {
+        postNameFormat: string;
+        postFieldAdd: string;
+        postFieldRemove: string;
+        postFieldSettings: string;
+        postFieldSequence: string;
+        postTabSettings: string;
+        postTabSequence: string;
+    };
 };
+
+// #endregion
 
 /**
  * The initial payload for the profile editor including all role types and
- * the definition of each of the field settings that may be applied to a field
+ * the definition of each of the field/tab settings that may be applied to a field/tab
+ * Currently fieldSettings and tabSettings are identical, but this allows them to diverge in the future
  */
 export type ProfileEditorPayload = {
     data: {
         roleTypes: ProfileEditorRoleType[];
         // A map of each field setting key to its definition (display name and options)
         fieldSettings: Record<ProfileEditorFieldSettingKey, ProfileEditorFieldSettingDefinition>;
+        // A map of each tab setting key to its definition (display name and options)
+        tabSettings: Record<ProfileEditorFieldSettingKey, ProfileEditorFieldSettingDefinition>;
     };
 };

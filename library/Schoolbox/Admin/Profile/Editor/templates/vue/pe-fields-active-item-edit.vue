@@ -33,9 +33,11 @@ const isUpdating = window.Vue.ref(false);
  * When the user clicks the update button
  */
 async function onUpdateClicked(): Promise<void> {
-    isUpdating.value = true;
-    await peFieldsStore.saveFieldSettings(props.field.field);
-    isUpdating.value = false;
+    if (peFieldsStore.isFieldSettingsUnsaved(props.field.field)) {
+        isUpdating.value = true;
+        await peFieldsStore.saveFieldSettings(props.field.field);
+        isUpdating.value = false;
+    }
 
     emit("close");
 }
@@ -52,17 +54,13 @@ async function onUpdateClicked(): Promise<void> {
                     :field-setting-key="fieldSettingKey"
                 />
             </div>
-            <Transition @enter="slideDownOnEnter" @leave="slideUpOnLeave">
-                <div v-if="peFieldsStore.isFieldSettingsUnsaved(props.field.field)">
-                    <input
-                        type="submit"
-                        :value="isUpdating ? 'Updating...' : 'Update'"
-                        :disabled="isUpdating"
-                        :data-test="`${peFieldsStore.getFieldIdentifier(props.field)}-settings-confirm`"
-                        @click="onUpdateClicked"
-                    />
-                </div>
-            </Transition>
+            <input
+                type="submit"
+                :value="isUpdating ? 'Updating...' : 'Update'"
+                :disabled="isUpdating"
+                :data-test="`${peFieldsStore.getFieldIdentifier(props.field)}-settings-confirm`"
+                @click="onUpdateClicked"
+            />
         </div>
     </Transition>
 </template>

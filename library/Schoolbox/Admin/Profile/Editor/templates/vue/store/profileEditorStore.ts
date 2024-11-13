@@ -1,6 +1,6 @@
 import { defineStore } from "pinia";
 import { cloneDeep } from "lodash";
-import type { ProfileEditorRoleType, ProfileEditorEndpoints, ProfileEditorPayload } from "../types/profileEditorTypes";
+import type { ProfileEditorRoleType, ProfileEditorPayload } from "../types/profileEditorTypes";
 import { fetchProfileEditorEndpoint } from "./profileEditorUtils";
 
 export const useProfileEditorStore = defineStore("profileEditorStore", () => {
@@ -8,6 +8,7 @@ export const useProfileEditorStore = defineStore("profileEditorStore", () => {
     const roleTypes = window.Vue.ref<ProfileEditorPayload["data"]["roleTypes"]>([]);
     const savedRoleTypes = window.Vue.ref<typeof roleTypes.value>([]);
     const fieldSettings = window.Vue.ref<ProfileEditorPayload["data"]["fieldSettings"]>({});
+    const tabSettings = window.Vue.ref<ProfileEditorPayload["data"]["tabSettings"]>({});
     const selectedRoleType = window.Vue.ref<ProfileEditorRoleType | null>(null);
 
     const savedSelectedRoleType = window.Vue.computed<typeof selectedRoleType.value>(() => {
@@ -17,29 +18,21 @@ export const useProfileEditorStore = defineStore("profileEditorStore", () => {
         return savedRoleTypes.value.find((roleType) => roleType.roleType === currentRoleType.roleType) ?? null;
     });
 
-    const endpoints = window.Vue.ref<ProfileEditorEndpoints>({
-        adminProfileEditorPostFieldAdd: "",
-        adminProfileEditorPostFieldRemove: "",
-        adminProfileEditorPostFieldSettings: "",
-        adminProfileEditorPostFieldSequence: "", // TODO: replace and handle null for all these
-        adminProfileEditorPostNameFormat: "",
-    });
-
     /**
-     * Initialise the store with the relevant endpoints and data
-     * @param $endpoints - The endpoints required for the profile editor
+     * Initialise the store with the relevant data
      * @param $roleTypes - The current role types
-     * @param $fieldSettings - The current field settings
+     * @param $fieldSettings - The current field settings spec
+     * @param $tabSettings - The current tab settings spec
      */
     function init(
-        $endpoints: ProfileEditorEndpoints,
         $roleTypes: ProfileEditorPayload["data"]["roleTypes"],
         $fieldSettings: ProfileEditorPayload["data"]["fieldSettings"],
+        $tabSettings: ProfileEditorPayload["data"]["tabSettings"],
     ): void {
-        endpoints.value = $endpoints;
         roleTypes.value = $roleTypes;
         savedRoleTypes.value = cloneDeep($roleTypes);
         fieldSettings.value = $fieldSettings;
+        tabSettings.value = $tabSettings;
     }
 
     /**
@@ -62,12 +55,7 @@ export const useProfileEditorStore = defineStore("profileEditorStore", () => {
             return true;
         }
 
-        const endpoint = endpoints.value.adminProfileEditorPostNameFormat.replace(
-            "{roleType}",
-            selectedRoleType.value.roleType,
-        );
-
-        const response = await fetchProfileEditorEndpoint(endpoint, {
+        const response = await fetchProfileEditorEndpoint(selectedRoleType.value._routes.postNameFormat, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
@@ -85,10 +73,10 @@ export const useProfileEditorStore = defineStore("profileEditorStore", () => {
 
     return {
         init,
-        endpoints,
         isLoading,
         roleTypes,
         fieldSettings,
+        tabSettings,
         savedRoleTypes,
         selectedRoleType,
         savedSelectedRoleType,

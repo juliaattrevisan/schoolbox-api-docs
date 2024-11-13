@@ -11,7 +11,7 @@ import { useProfileEditorStore } from "./store/profileEditorStore";
 import { useProfileEditorFieldsStore } from "./store/profileEditorFieldsStore";
 import PeFieldsActiveItemEdit from "./pe-fields-active-item-edit.vue";
 import PeFieldsActiveItemRemove from "./pe-fields-active-item-remove.vue";
-import PeFieldsActiveItemError from "./pe-fields-active-item-error.vue";
+import PePanelError from "./pe-panel-error.vue";
 import PeFieldsIcon from "./pe-fields-icon.vue";
 import type { ProfileEditorAvailableField, ProfileEditorSelectedField } from "./types/profileEditorTypes";
 
@@ -163,7 +163,7 @@ const isSaving = window.Vue.computed(() => {
 
         <div class="pe-fields-selected-item-panel">
             <Transition @enter="slideDownOnEnter" @leave="slideUpOnLeave">
-                <pe-fields-active-item-error v-if="fieldSaveError" :message="fieldSaveError" />
+                <pe-panel-error v-if="fieldSaveError" :message="fieldSaveError" type="field" />
             </Transition>
 
             <pe-fields-active-item-edit

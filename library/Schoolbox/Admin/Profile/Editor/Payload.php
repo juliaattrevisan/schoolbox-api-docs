@@ -118,6 +118,7 @@ class Payload
         $payload = [
             'data' => [
                 'fieldSettings' => [],
+                'tabSettings' => [],
                 'roleTypes' => [],
             ]
         ];
@@ -171,6 +172,9 @@ class Payload
             self::VISIBILITY_NODE => $fieldSettingsRoleType
         ];
 
+        // tabSettings is currently identical to fieldSettings but this allows it to diverge in the future
+        $payload['data']['tabSettings'] = $payload['data']['fieldSettings'];
+
         /* Start processing the roleTypes node
          */
         foreach ($roleTypes as $roleType) {
@@ -183,10 +187,20 @@ class Payload
                     'mandatory' => []
                 ],
                 'buttons' => [],
+                'tabs' => [],
                 '_links' => [
                     'manageButtons' => $this->routeGenerator->generate('adminProfileButton.getIndex', [
                         'roleType' => $roleType
                     ]),
+                ],
+                '_routes' => [
+                    'postNameFormat' => $this->routeGenerator->generate('adminProfileEditor.postNameFormat', ['roleType' => $roleType]),
+                    'postFieldAdd' => $this->routeGenerator->generate('adminProfileEditor.postFieldAdd', ['roleType' => $roleType]),
+                    'postFieldRemove' => $this->routeGenerator->generate('adminProfileEditor.postFieldRemove', ['roleType' => $roleType]),
+                    'postFieldSettings' => $this->routeGenerator->generate('adminProfileEditor.postFieldSettings', ['roleType' => $roleType]),
+                    'postFieldSequence' => $this->routeGenerator->generate('adminProfileEditor.postFieldSequence', ['roleType' => $roleType]),
+                    'postTabSettings' => "/adminv2/profileEditor/tab/{$roleType}/{tabId}/settings", // TODO Tabs
+                    'postTabSequence' => "/adminv2/profileEditor/tab/{$roleType}/sequence", // TODO Tabs
                 ]
             ];
 
@@ -195,6 +209,7 @@ class Payload
             $buttons = $this->buttonMapper
                 ->findByColumn('roletype', $roleType)
                 ->sortBy('sortOrder', 'asc');
+
             foreach ($buttons as $button) {
                 $roleTypeSettings['buttons'][] = [
                     'id' => $button->getId(),
@@ -205,6 +220,32 @@ class Payload
                         'modify' => $this->routeGenerator->generate('adminProfileButton.getModify', [
                             'id' => $button->getId()
                         ]),
+                    ]
+                ];
+            }
+
+            /* TODO: Tabs
+             */
+            $tabs = [
+                ['id' => 'activity', 'label' => 'Activity Feed'],
+                ['id' => 'goals', 'label' => 'Goals'],
+                ['id' => 'achievements', 'label' => 'Achievements'],
+                ['id' => 'classes', 'label' => 'Classes'],
+                ['id' => 'groups', 'label' => 'Groups'],
+                ['id' => 'contacts', 'label' => 'Contacts'],
+            ];
+
+            foreach ($tabs as $tab) {
+                $roleTypeSettings['tabs'][] = [
+                    'id' => $tab['id'],
+                    'label' => $tab['label'],
+                    'tabSettings' => [
+                        /* Find the ids of the campuses for which this tab might be available
+                         */
+                        self::AVAILABILITY_NODE => [], // TODO Tabs
+                        /* Find the roletypes ("ids") for which this tab might be visible
+                         */
+                        self::VISIBILITY_NODE => [] // TODO Tabs
                     ]
                 ];
             }
