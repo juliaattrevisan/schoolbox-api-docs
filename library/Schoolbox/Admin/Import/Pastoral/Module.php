@@ -26,7 +26,6 @@ use Schoolbox\Permission\Access\UserAccess;
  */
 class Module extends BaseModule
 {
-
     /**
      * @inheritdoc
      */
