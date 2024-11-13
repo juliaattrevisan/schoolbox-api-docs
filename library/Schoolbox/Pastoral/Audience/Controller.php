@@ -202,7 +202,7 @@ class Controller extends Base
          */
         $adminRoute = $this->getRouteIfAuthorized('adminHome.getIndex');
         $firstBreadcrumb = [$pastoralCareProper, $this->routeGenerator->generate('pastoral.getIndex')];
-        if ($adminRoute) {
+        if ($this->user->hasServicePermission(UserAccess::SERVICE_PASTORAL, UserAccess::ACCESS_FULL)) {
             $firstBreadcrumb = ['Administration', $adminRoute];
         }
 
@@ -214,7 +214,7 @@ class Controller extends Base
             ['Pastoral Care', null],
             ["Manage {$pastoralCareProper} Record Settings", $this->routeGenerator->generate('pastoralAudience.getAudiences')],
         ]);
-        if ($adminRoute) {
+        if ($this->user->hasServicePermission(UserAccess::SERVICE_PASTORAL, UserAccess::ACCESS_FULL)) {
             $flyout->injectParentEntry([
                 $adminRoute => [
                     'name' => 'Back to Administration',

@@ -73,7 +73,7 @@ class Controller extends Base
         $pastoralCareProper = $this->rosettaStone->translate('pastoralCare', false, true);
         $adminRoute = $this->getRouteIfAuthorized('adminHome.getIndex');
         $firstBreadcrumb = [$pastoralCareProper, $this->routeGenerator->generate('pastoral.getIndex')];
-        if ($adminRoute) {
+        if ($this->user->hasServicePermission(UserAccess::SERVICE_PASTORAL, UserAccess::ACCESS_FULL)) {
             $firstBreadcrumb = ['Administration', $adminRoute];
         }
 
