@@ -202,7 +202,7 @@ HELP;
             foreach ($stats[self::ROLETYPE_STUDENT] as $key => $value) {
                 $this->getLogger()->info(sprintf(
                     '    %s %s: %s',
-                    $roletype,
+                    self::ROLETYPE_STUDENT,
                     $key,
                     $value
                 ));
