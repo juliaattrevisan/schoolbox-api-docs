@@ -1,6 +1,6 @@
 <?php
 
-namespace Schoolbox\Curriculum\Reports\Translator;
+namespace Schoolbox\Curriculum\Reports\Translator\Counts;
 
 use Alaress\Authorizer\Authorizer;
 use Alaress\Authorizer\GetRouteIfAuthorized;
@@ -8,7 +8,7 @@ use Aura\Router\Generator;
 use Schoolbox\Collection;
 use Schoolbox\Curriculum\Node\Model;
 use Schoolbox\User;
-use Schoolbox\Curriculum\Reports\Translator\CourseUsage as courseUsageTranslator;
+use Schoolbox\Curriculum\Reports\Translator\Counts\CourseUsage as courseUsageTranslator;
 
 /**
  * Curriculum node model to array translator for curriculum coverage report

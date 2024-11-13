@@ -1,13 +1,13 @@
 <?php
 
-namespace Schoolbox\Curriculum\Reports\Translator;
+namespace Schoolbox\Curriculum\Reports\Translator\Counts;
 
 use Alaress\Authorizer\Authorizer;
 use Alaress\Authorizer\GetRouteIfAuthorized;
 use Aura\Router\Generator;
 use Schoolbox\Curriculum\Node\Model as CurriculumNodeModel;
 use Schoolbox\Curriculum\Reports\Cursor;
-use Schoolbox\Curriculum\Reports\Translator\UnitAssessmentUsage as UnitAssessmentUsageTranslator;
+use Schoolbox\Curriculum\Reports\Translator\Counts\UnitAssessmentUsage as UnitAssessmentUsageTranslator;
 use Schoolbox\Learning\Course\DataModel\Specification\Model as CourseSpecificationModel;
 use Schoolbox\User;
 
