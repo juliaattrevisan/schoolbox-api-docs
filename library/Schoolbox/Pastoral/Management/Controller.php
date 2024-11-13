@@ -72,16 +72,20 @@ class Controller extends Base
          */
         $pastoralCareProper = $this->rosettaStone->translate('pastoralCare', false, true);
         $adminRoute = $this->getRouteIfAuthorized('adminHome.getIndex');
-        $firstBreadcrumb = [$pastoralCareProper, $this->routeGenerator->generate('pastoral.getIndex')];
-        if ($this->user->hasServicePermission(UserAccess::SERVICE_PASTORAL, UserAccess::ACCESS_FULL)) {
-            $firstBreadcrumb = ['Administration', $adminRoute];
-        }
-
         $breadcrumbs = [
-            $firstBreadcrumb,
-            [$pastoralCareProper, null],
+            [$pastoralCareProper, $this->routeGenerator->generate('pastoral.getIndex')],
             ["Groups Management", null],
         ];
+
+        /* Assuming the Pastoral moderator came from Admin > Pastoral, rather than directly from Pastoral
+         */
+        if ($this->user->hasServicePermission(UserAccess::SERVICE_PASTORAL, UserAccess::ACCESS_FULL)) {
+            $breadcrumbs = [
+                ['Administration', $adminRoute],
+                ['Pastoral Care', null],
+                ["Groups Management", null],
+            ];
+        }
 
         $this->response = $this->responseFromTemplate(
             '@pastoralManagement/groups.twig',

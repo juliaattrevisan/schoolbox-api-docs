@@ -201,19 +201,25 @@ class Controller extends Base
          * write+ > Administration Home
          */
         $adminRoute = $this->getRouteIfAuthorized('adminHome.getIndex');
-        $firstBreadcrumb = [$pastoralCareProper, $this->routeGenerator->generate('pastoral.getIndex')];
+        $breadcrumbs = [
+                [$pastoralCareProper, $this->routeGenerator->generate('pastoral.getIndex')],
+                ["Manage {$pastoralCareProper} Record Settings", $this->routeGenerator->generate('pastoralAudience.getAudiences')],
+            ];
+
+        /* Assuming the Pastoral moderator came from Admin > Pastoral, rather than directly from Pastoral
+         */
         if ($this->user->hasServicePermission(UserAccess::SERVICE_PASTORAL, UserAccess::ACCESS_FULL)) {
-            $firstBreadcrumb = ['Administration', $adminRoute];
+            $breadcrumbs = [
+                ['Administration', $adminRoute],
+                ['Pastoral Care', null],
+                ["Manage {$pastoralCareProper} Record Settings", $this->routeGenerator->generate('pastoralAudience.getAudiences')],
+            ];
         }
 
         $flyout = (new Flyout(
             $this->getConfigLoader(),
             new FlyoutNodes($this->routeGenerator, $this->pastoralTypeMapper)
-        ))->prefixBreadcrumbs([
-            $firstBreadcrumb,
-            ['Pastoral Care', null],
-            ["Manage {$pastoralCareProper} Record Settings", $this->routeGenerator->generate('pastoralAudience.getAudiences')],
-        ]);
+        ))->prefixBreadcrumbs($breadcrumbs);
         if ($this->user->hasServicePermission(UserAccess::SERVICE_PASTORAL, UserAccess::ACCESS_FULL)) {
             $flyout->injectParentEntry([
                 $adminRoute => [
