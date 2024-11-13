@@ -12,10 +12,10 @@ namespace Schoolbox\Curriculum\Reports;
 
 use Alaress\Web\Controller\Base;
 use Schoolbox\Curriculum\Node\Mapper as CurriculumMapper;
-use Schoolbox\Curriculum\Reports\Translator\ModelToArray as ModelToArrayTranslator;
-use Schoolbox\Curriculum\Reports\Translator\UnitAssessmentUsage as UnitAssessmentUsageTranslator;
-use Schoolbox\Curriculum\Reports\Translator\CourseUsage as CourseUsageTranslator;
-use Schoolbox\Curriculum\Reports\Translator\CourseStructureOnly as CourseStructureTranslator;
+use Schoolbox\Curriculum\Reports\Translator\Counts\ModelToArray as ModelToArrayTranslator;
+use Schoolbox\Curriculum\Reports\Translator\Counts\UnitAssessmentUsage as UnitAssessmentUsageTranslator;
+use Schoolbox\Curriculum\Reports\Translator\Counts\CourseUsage as CourseUsageTranslator;
+use Schoolbox\Curriculum\Reports\Translator\Counts\CourseStructureOnly as CourseStructureTranslator;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Mapper as CourseUnitSpecificationMapper;
 use Schoolbox\Learning\Course\DataModel\Specification\Mapper as CourseSpecificationMapper;
 use Schoolbox\Resource\Folder\Translator\ModelToArray\LinkOnly as FolderTranslator;
