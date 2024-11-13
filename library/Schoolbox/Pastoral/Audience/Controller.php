@@ -200,10 +200,10 @@ class Controller extends Base
          * write > Pastoral home
          * write+ > Administration Home
          */
-        $hasAdminAccess = $this->getRouteIfAuthorized('adminHome.getIndex');
+        $adminRoute = $this->getRouteIfAuthorized('adminHome.getIndex');
         $firstBreadcrumb = [$pastoralCareProper, $this->routeGenerator->generate('pastoral.getIndex')];
-        if ($hasAdminAccess) {
-            $firstBreadcrumb = ['Administration Home', '/adminv2/home'];
+        if ($adminRoute) {
+            $firstBreadcrumb = ['Administration', '/adminv2/home'];
         }
 
         $flyout = (new Flyout(
@@ -213,10 +213,10 @@ class Controller extends Base
             $firstBreadcrumb,
             ["Manage {$pastoralCareProper} Record Settings", $this->routeGenerator->generate('pastoralAudience.getAudiences')],
         ]);
-        if ($hasAdminAccess) {
+        if ($adminRoute) {
             $flyout->injectParentEntry([
-                '/adminv2/home' => [
-                    'name' => 'Back to Administration Home',
+                $adminRoute => [
+                    'name' => 'Back to Administration',
                     'visible' => true,
                     'hasBreadcrumbLink' => true,
                     'description' => '',
