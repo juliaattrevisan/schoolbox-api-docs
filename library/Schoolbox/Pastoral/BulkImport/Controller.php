@@ -13,7 +13,6 @@ use Alaress\Paginator;
 use Alaress\Web\Controller\Base;
 use Alaress_Date_Format;
 use League\Flysystem\FilesystemException;
-use Psr\Http\Message\UriInterface;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\L10n\RosettaStone;
 use Schoolbox\Learning\Assessment\Redirect;
@@ -30,6 +29,7 @@ use Schoolbox\Role;
 use Schoolbox\TokenReplacer;
 use Schoolbox\Url\Uri;
 use Schoolbox\UserMapper;
+use Symfony\Component\HttpFoundation\Response as HttpResponse;
 use ZipArchive;
 
 /**
@@ -290,7 +290,15 @@ class Controller extends Base
             $zipArchive       = null;
             $localZipFilename = null;
             try {
-                $zipStorage       = $import->getZip();
+                $zipStorage = $import->getZip();
+                if (!$zipStorage) {
+                    $this->sendError(
+                        'This import\'s ZIP file no longer exists.',
+                        ['Delete and recreate the import'],
+                        HttpResponse::HTTP_INTERNAL_SERVER_ERROR,
+                    );
+                    return;
+                }
                 $localZipFilename = $this->createLocalZipFile($zipStorage);
                 $zipArchive       = $this->createZipArchive($localZipFilename);
                 $import->setImportLog($this->generateImportLog($zipArchive, $import->getFilePathTemplate()));
@@ -330,7 +338,15 @@ class Controller extends Base
         $zipArchive       = null;
         $localZipFilename = null;
         try {
-            $zipStorage       = $import->getZip();
+            $zipStorage = $import->getZip();
+            if (!$zipStorage) {
+                $this->sendError(
+                    'This import\'s ZIP file no longer exists.',
+                    ['Delete and recreate the import'],
+                    HttpResponse::HTTP_INTERNAL_SERVER_ERROR,
+                );
+                return;
+            }
             $localZipFilename = $this->createLocalZipFile($zipStorage);
             $zipArchive       = $this->createZipArchive($localZipFilename);
             $importLog        = $this->generateImportLog($zipArchive, $import->getFilePathTemplate());
