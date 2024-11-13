@@ -187,6 +187,18 @@ class Controller extends BaseController
                 }
             ]);
 
+        /* Profile Buttons
+         */
+        $buttons = ProfileButtonMapper::getInstance()->findButtonsForUser($student, $this->getUser());
+
+        /* Profile Tabs
+         */
+        $tabs = \Schoolbox\Admin\Profile\Editor\Tab\Mapper::getInstance()->findRenderable($student, $this->getUser());
+
+
+        /* Old implementation below
+         */
+
         // Wrangle default colors
         $colors              = $this->timetableColourMapper->findAll()->reindex();
         $colorFactory        = new ColorFactory();
@@ -423,7 +435,7 @@ class Controller extends BaseController
             }
         }
 
-        $buttons = ProfileButtonMapper::getInstance()->findButtonsForUser($student, $this->getUser());
+
         $showDetails   = (new ValidDetailsVisible($this->externalUser, $this->getConfigLoader()))->isSatisfiedBy($student, $this->getUser());
         $showEmails    = (new ValidEmailVisible($this->externalUser, $this->getConfigLoader()))->isSatisfiedBy($student, $this->getUser());
 
@@ -515,6 +527,9 @@ class Controller extends BaseController
                  * custom buttons, as far as the end user is concerned
                  */
                 'buttons' => $buttons,
+                /* A sequenced list of tabs
+                 */
+                'possibleTabs' => $tabs,
 
                 /* Old implementation
                  */

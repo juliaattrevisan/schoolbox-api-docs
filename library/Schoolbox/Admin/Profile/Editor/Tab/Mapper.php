@@ -153,7 +153,7 @@ class Mapper extends \Schoolbox\Mapper
      * @throws Exception
      * @throws \UnexpectedValueException
      */
-    public function findRenderableTabs(\Schoolbox\User $viewee, \Schoolbox\User $viewer): GenericCollection
+    public function findRenderable(\Schoolbox\User $viewee, \Schoolbox\User $viewer): GenericCollection
     {
         $collection = $this->createCollection();
 

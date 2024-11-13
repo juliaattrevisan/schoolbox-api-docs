@@ -418,47 +418,17 @@
             'contacts': showContactsTab
         } %}
 
-        {% set possibleTabs = [
-            {
-                label: 'Activity Feed',
-                anchor: 'tab-activity',
-                visible: showActivityFeed
-            },
-            {
-                label: 'Goals',
-                anchor: 'tab-goals',
-                visible: showAchievementsTab
-            },
-            {
-                label: achievementsTabLabel | default('Achievements'),
-                anchor: 'tab-achievements',
-                visible: showAchievementsTab
-            },
-            {
-                label: 'Classes',
-                anchor: 'tab-classes',
-                visible: showClasses and showSubjects
-            },
-            {
-                label: 'Groups',
-                anchor: 'tab-groups',
-                visible: showGroups
-            },
-            {
-                label: 'Contacts',
-                anchor: 'tab-contacts',
-                visible: showContactsTab
-            }
-        ] %}
-
         {# Out of all the tabs that could possibly exist here, figure out
          # which one is currently active by default and remember it
          #}
         {% set activeTab = null %}
 
-        {% for data in possibleTabs %}
-            {% if data.visible and not activeTab %}
-                {% set activeTab = data.anchor %}
+        {% for tab in possibleTabs %}
+            {# Check additionalConstraints to really know if this tab should be on-screen #}
+            {% if additionalConstraints[tab.tab] ?? true %}
+                {% if not activeTab %}
+                    {% set activeTab = 'tab-' ~ tab.tab %}
+                {% endif %}
             {% endif %}
         {%  endfor %}
 
@@ -470,7 +440,7 @@
          # Visiting that url with a hash /search/user/...#classes for example,
          # will cause a javascript to run and switch the foundation tabs to the
          # one represented by the hash (in this case, #classes)
-        #}
+         #}
         {% if activeTab %}
             <dl class="tabs" data-tab>
 
@@ -478,8 +448,8 @@
                 {% set defaultCss = 'active' %}
 
                 {% for tab in possibleTabs %}
-                    {% if tab.visible %}
-                        <dd class="{{ defaultCss }}"><a href="#{{ tab.anchor }}">{{ tab.label }}</a></dd>
+                    {% if additionalConstraints[tab.tab] ?? true %}
+                        <dd class="{{ defaultCss }}"><a href="#tab-{{ tab.tab }}" data-tab="{{ tab.tab }}">{{ tab.displayAs }}</a></dd>
 
                         {# All subsequent tabs are not active by default #}
                         {% set defaultCss = '' %}
