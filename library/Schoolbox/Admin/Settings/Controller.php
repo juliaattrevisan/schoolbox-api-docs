@@ -43,11 +43,7 @@ class Controller extends ConfigController
             throw Mapper::getInstance()->generateException(Mapper::ERROR_PAGE_NOT_FOUND);
         }
 
-        $settingsCategory = $this->getSettingsCategoryFromTypeLabel($typeLabel);
-        // NOTE: $typeLabel is not passed to routeGenerator->generate() to avoid regex match error
-        //       E.g. "Parameter value for [typeLabel] did not match the regex `LMS%20Policy`"
-        $routeUrlTemplate = $this->routeGenerator->generate("settings.postSettings$settingsCategory");
-        $routeUrl = str_replace('{typeLabel}', $typeLabel, $routeUrlTemplate);
+        $routeUrl = $this->getRouteUrlFromTypeLabel($typeLabel);
         $configContext = $this->buildConfigContext(
             $this->buildConfigPredicate($typeLabel),
             $routeUrl,
@@ -240,12 +236,7 @@ class Controller extends ConfigController
             $this->oidcCache->clear();
         }
 
-        $settingsCategory = $this->getSettingsCategoryFromTypeLabel($typeLabel);
-        $routeUrlTemplate = $this->routeGenerator->generate("settings.getSettings$settingsCategory");
-        $routeUrl = str_replace('{typeLabel}', $typeLabel, $routeUrlTemplate);
-        $routeUrlDecoded = urldecode($routeUrl);
-
-        $this->response = $this->redirectAfterPost($routeUrlDecoded);
+        $this->response = $this->redirectAfterPost($this->getRouteUrlFromTypeLabel($typeLabel));
     }
 
     // Functions for routes accessible by Pastoral Moderators --------------------------------------------------------//
@@ -353,6 +344,27 @@ class Controller extends ConfigController
                    ->equals(ConfigMapper::COL_MODULE, ConfigMapper::MODULE_SETTINGS);
 
         return $pb;
+    }
+
+    /**
+     * @param string $typeLabel
+     * @return string
+     * @throws RouteNotFound
+     */
+    private function getRouteUrlFromTypeLabel(string $typeLabel): string
+    {
+        $settingsCategory = $this->getSettingsCategoryFromTypeLabel($typeLabel);
+
+        if ($settingsCategory === '') {
+            $routeUrl = $this->routeGenerator->generate('settings.getSettings', ['typeLabel' => $typeLabel]);
+        } else {
+            // NOTE: $typeLabel is not passed to routeGenerator->generate() to avoid regex match error
+            //       E.g. "Parameter value for [typeLabel] did not match the regex `LMS%20Policy`"
+            $routeUrlTemplate = $this->routeGenerator->generate("settings.getSettings$settingsCategory");
+            $routeUrl = str_replace('{typeLabel}', $typeLabel, $routeUrlTemplate);
+        }
+
+        return $routeUrl;
     }
 
     /**
