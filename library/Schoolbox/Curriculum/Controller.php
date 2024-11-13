@@ -293,7 +293,12 @@ class Controller extends Base
     {
         $node = $this->nodeMapper->loadDescendants($item, 'parent', 'children');
 
-        $filename = sprintf("CurriculumExport-%s-%s.csv", ConfigMapper::NAME_SITE_SCHOOL_CODE, \Alaress_Date_Format::now()->toIso8601String());
+        $filename = sprintf(
+            "CurriculumExport-%s-%s-%s.csv",
+            $item->getName(),
+            $this->getConfigLoader()->get(ConfigMapper::NAME_SITE_SCHOOL_CODE),
+            \Alaress_Date_Format::now()->toIso8601String()
+        );
 
         $fp = fopen('php://temp', 'w');
 
