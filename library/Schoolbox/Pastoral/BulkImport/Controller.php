@@ -176,6 +176,7 @@ class Controller extends Base
                     ->setReadOnly(false)
                     ->setFileVar('report')
                     ->setMulti(false)
+                    ->useImportExpiryDate()
                     ->getTwigContext(),
                 'moderator'        => $this->getUser()->hasServicePermission(
                     UserAccess::SERVICE_PASTORAL,
