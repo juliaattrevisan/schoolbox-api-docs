@@ -449,7 +449,7 @@
 
                 {% for tab in possibleTabs %}
                     {% if additionalConstraints[tab.tab] ?? true %}
-                        <dd class="{{ defaultCss }}"><a href="#tab-{{ tab.tab }}" data-tab="{{ tab.tab }}">{{ tab.displayAs }}</a></dd>
+                        <dd class="{{ defaultCss }}"><a href="#tab-{{ tab.tab }}">{{ tab.displayAs }}</a></dd>
 
                         {# All subsequent tabs are not active by default #}
                         {% set defaultCss = '' %}
