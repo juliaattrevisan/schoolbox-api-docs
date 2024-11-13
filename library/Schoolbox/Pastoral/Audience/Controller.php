@@ -203,16 +203,17 @@ class Controller extends Base
         $adminRoute = $this->getRouteIfAuthorized('adminHome.getIndex');
         $breadcrumbs = [
                 [$pastoralCareProper, $this->routeGenerator->generate('pastoral.getIndex')],
-                ["Manage {$pastoralCareProper} Record Settings", $this->routeGenerator->generate('pastoralAudience.getAudiences')],
+                ["{$pastoralCareProper} Record Settings", $this->routeGenerator->generate('pastoralAudience.getAudiences')],
             ];
 
         /* Assuming the Pastoral moderator came from Admin > Pastoral, rather than directly from Pastoral
+         * Note terminology translations are not used in the admin system.
          */
         if ($this->user->hasServicePermission(UserAccess::SERVICE_PASTORAL, UserAccess::ACCESS_FULL)) {
             $breadcrumbs = [
                 ['Administration', $adminRoute],
                 ['Pastoral Care', null],
-                ["Manage {$pastoralCareProper} Record Settings", $this->routeGenerator->generate('pastoralAudience.getAudiences')],
+                ["Pastoral Record Settings", $this->routeGenerator->generate('pastoralAudience.getAudiences')],
             ];
         }
 

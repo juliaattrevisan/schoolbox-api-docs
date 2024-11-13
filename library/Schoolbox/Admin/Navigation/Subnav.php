@@ -749,6 +749,15 @@ class Subnav
                         'children'    => [],
                         'description' => 'Manage Groups within the pastoral system',
                     ],
+                    '/pastoral/management/audience/' => [
+                        'name'        => 'Pastoral Record Settings',
+                        'visible'     => (
+                            $userHasServicePermissionPastoral &&
+                            $this->configLoader->get(ConfigMapper::NAME_PASTORAL_ENABLED)
+                        ),
+                        'children'    => [],
+                        'description' => 'Manage Flag, Audience and Template Defaults',
+                    ],
                     '/adminv2/lists/pastoral/pastoral-severity' => [
                         'name'        => 'Record Severity List',
                         'visible'     => (
@@ -804,15 +813,6 @@ class Subnav
                         'children'    => [],
                         'description' => 'Setup the types of pastoral records, to control visibility and categorisation..',
                     ],
-                    '/pastoral/management/audience/' => [
-                        'name'        => 'Manage Pastoral Care Record Settings',
-                        'visible'     => (
-                            $userHasServicePermissionPastoral &&
-                            $this->configLoader->get(ConfigMapper::NAME_PASTORAL_ENABLED)
-                        ),
-                        'children'    => [],
-                        'description' => 'Manage Flag, Audience and Template Defaults',
-                    ]
                 ]
             ],
             '/adminv2/dashboard' => [
