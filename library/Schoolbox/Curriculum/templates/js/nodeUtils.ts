@@ -44,6 +44,7 @@ export function getEmptyNode(): Node {
             getUsage: "",
             read: "",
             update: "",
+            getExport: "",
         },
         _usageCounts: {
             course: 0,

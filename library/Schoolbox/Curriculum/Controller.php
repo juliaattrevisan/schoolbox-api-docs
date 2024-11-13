@@ -11,7 +11,8 @@
 namespace Schoolbox\Curriculum;
 
 use Alaress\Web\Controller\Base;
-use Schoolbox\Curriculum\Node;
+use Schoolbox\Config\ConfigMapper;
+use Schoolbox\Curriculum\Node\Model;
 
 class Controller extends Base
 {
@@ -278,6 +279,64 @@ class Controller extends Base
             $this->response = $this->redirectAfterPost(
                 $this->getSession()->getHistory()
             );
+        }
+    }
+
+    /**
+     * Export all the curriculum nodes, in a format suitable for import.
+     * Must be Superuser or Curriculum Write+ users
+     *
+     * @api  GET /curriculum/export/{id}
+     * @since 24.1
+     */
+    public function getExport(Node\Model $item): void
+    {
+        $node = $this->nodeMapper->loadDescendants($item, 'parent', 'children');
+
+        $filename = sprintf(
+            "CurriculumExport-%s-%s-%s.csv",
+            $item->getName(),
+            $this->getConfigLoader()->get(ConfigMapper::NAME_SITE_SCHOOL_CODE),
+            \Alaress_Date_Format::now()->toIso8601String()
+        );
+
+        $fp = fopen('php://temp', 'w');
+
+        $this->response = $this->responseFromStream(new \GuzzleHttp\Psr7\Stream($fp), $filename, 'text/csv; charset=utf-8');
+
+        // output headers
+        fputcsv($fp, ['id', 'curriculum_node_parent_id', 'name', 'code', 'order', 'description', 'uuid']);
+
+        $this->csvChildren($fp, $node, true);
+    }
+
+    /**
+     * @param $fp
+     * @param Model $node
+     * @param bool $isFirst
+     * @return void
+     */
+    private function csvChildren($fp, Node\Model $node, bool $isFirst = false): void
+    {
+        $parent = $node->getParent() ? $node->getParent()->getId() : '';
+        if ($isFirst) {
+            $parent = '';
+        }
+        fputcsv($fp, [
+            $node->getId(),
+            $parent,
+            $node->getName(),
+            $node->getCode(),
+            $node->getOrder(),
+            $node->getDescription(),
+            $node->getUuid(),
+        ]);
+
+        /**
+         * for each of this node's children, csv output its children recursively
+         */
+        foreach ($node->getChildren() as $child) {
+            $this->csvChildren($fp, $child);
         }
     }
 }

@@ -43,6 +43,15 @@ function onUpdateToggleSelected(): void {
 </script>
 
 <template>
+    <a
+        v-if="node._links?.getExport && node.children?.length !== 0"
+        :href="node._links.getExport"
+        class="button-action-option icon-export"
+        :title="`Export ${props.title}`"
+        data-test-export
+    >
+        Export {{ props.title }}
+    </a>
     <button
         :class="`button-action-option ${props.isUpdating ? 'icon-close' : 'icon-modify'}`"
         :title="`Update ${props.title}`"

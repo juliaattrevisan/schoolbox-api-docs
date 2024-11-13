@@ -118,6 +118,10 @@ class ModelToArray
                     'curriculumApiUsage.getNodeUsage',
                     ['id' => $node->getId(), 'node' => $node],
                 ),
+                'getExport' => $this->getRouteIfAuthorized(
+                    'curriculum.getExport',
+                    ['id' => $node->getId(), 'item' => $node],
+                ),
             ],
         ];
     }
