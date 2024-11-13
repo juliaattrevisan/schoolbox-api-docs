@@ -51,10 +51,12 @@ class Module extends BaseModule
      */
     public function buildController(): Base
     {
+        $curriculumMapper = $this->getMapperFactory()->get(CurriculumMapper::class);
         return new Controller(
-            $this->getMapperFactory()->get(CurriculumMapper::class),
+            $curriculumMapper,
             $this->getMapperFactory()->get(CourseSpecificationMapper::class),
             $this->getMapperFactory()->get(CourseUnitSpecificationMapper::class),
+            new Helper($curriculumMapper),
         );
     }
 

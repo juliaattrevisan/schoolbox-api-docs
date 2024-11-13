@@ -16,6 +16,7 @@ use Schoolbox\Curriculum\Reports\Translator\Counts\ModelToArray as ModelToArrayT
 use Schoolbox\Curriculum\Reports\Translator\Counts\UnitAssessmentUsage as UnitAssessmentUsageTranslator;
 use Schoolbox\Curriculum\Reports\Translator\Counts\CourseUsage as CourseUsageTranslator;
 use Schoolbox\Curriculum\Reports\Translator\Counts\CourseStructureOnly as CourseStructureTranslator;
+use Schoolbox\Curriculum\Reports\Translator\DetailedUsage;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Mapper as CourseUnitSpecificationMapper;
 use Schoolbox\Learning\Course\DataModel\Specification\Mapper as CourseSpecificationMapper;
 use Schoolbox\Resource\Folder\Translator\ModelToArray\LinkOnly as FolderTranslator;
@@ -38,6 +39,7 @@ class Controller extends Base
         private CurriculumMapper $curriculumMapper,
         private CourseSpecificationMapper $courseSpecificationMapper,
         private CourseUnitSpecificationMapper $courseUnitSpecificationMapper,
+        private Helper $helper,
     ) {
     }
 
@@ -217,10 +219,42 @@ class Controller extends Base
         );
     }
 
+    /**
+     * Pay load for curriculum node usage within the selected course and unit
+     *
+     * @return void
+     */
     public function getCoverageUsage(): void
     {
         $response = [];
         $query = $this->requestQuery;
+        $courseId = $query->getInt('courseId');
+        $unitId = $query->getInt('unitId');
+        $nodeId = $query->getInt('nodeId');
+
+        if (null === $courseId) {}
+        if (null === $unitId) {}
+        if (null === $nodeId) {}
+
+        $pb = $this->courseUnitSpecificationMapper->getPredicateBuilder();
+        $pb
+            ->equals('folder_id', $unitId)
+            ->equals('course_specification_id', $courseId);
+        $courseUnitSpec = $this->courseUnitSpecificationMapper->findOneByPredicates($pb);
+
+        $result = $this->helper->getUsage(
+            $nodeId,
+            $courseId,
+            $unitId
+        );
+
+        $translator = new DetailedUsage(
+            $this->routeGenerator,
+            $this->authorizer,
+            $this->getUser(),
+        );
+
+        $response = $translator($courseUnitSpec, $result);
 
         $this->response = $this->responseAsJson(
             $response
