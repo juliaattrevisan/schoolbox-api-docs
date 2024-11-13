@@ -986,7 +986,7 @@ class Subnav
                 'visible'    => $userIsSuperuser,
                 'searchable' => false,
                 'children'   => [
-                    '/adminv2/setting/3rd%20Party%20Services' => [
+                    '/adminv2/setting/3rd Party Services' => [
                         'name'        => '3rd Party Services',
                         'visible'     => $userIsSuperuser && count($enabledConfigs[ConfigMapper::TYPE_3RD] ?? []) > 0,
                         'children'    => [],
@@ -1016,7 +1016,7 @@ class Subnav
                         'children'    => [],
                         'description' => '',
                     ],
-                    '/adminv2/setting/External%20DB' => [
+                    '/adminv2/setting/External DB' => [
                         'name'        => 'External DB',
                         'visible'     => $userIsSuperuser && count($enabledConfigs[ConfigMapper::TYPE_EXTERNAL] ?? []) > 0,
                         'children'    => [],
