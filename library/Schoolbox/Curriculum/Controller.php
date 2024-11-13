@@ -12,6 +12,7 @@ namespace Schoolbox\Curriculum;
 
 use Alaress\Web\Controller\Base;
 use Schoolbox\Config\ConfigMapper;
+use Schoolbox\Curriculum\Node\Model;
 
 class Controller extends Base
 {
@@ -288,26 +289,26 @@ class Controller extends Base
      * @api  GET /curriculum/export/{id}
      * @since 24.1
      */
-    public function getExport(Node\Model $item)
+    public function getExport(Node\Model $item): void
     {
         $node = $this->nodeMapper->loadDescendants($item, 'parent', 'children');
 
         $filename = sprintf("CurriculumExport-%s-%s.csv", ConfigMapper::NAME_SITE_SCHOOL_CODE, \Alaress_Date_Format::now()->toIso8601String());
 
-        header('Content-type: text/csv; charset=utf-8');
-        header("Content-Disposition: attachment; filename=\"$filename\"");
-        $fp = fopen("php://output", 'w');
+        $fp = fopen('php://temp', 'w');
+
+        $this->response = $this->responseFromStream(new \GuzzleHttp\Psr7\Stream($fp), $filename, 'text/csv; charset=utf-8');
 
         // output headers
         fputcsv($fp, ['id', 'curriculum_node_parent_id', 'name', 'code', 'order', 'description', 'uuid']);
 
         $this->csvChildren($fp, $node, true);
-        exit;
     }
 
     /**
      * @param $fp
-     * @param Node\Model $node
+     * @param Model $node
+     * @param bool $isFirst
      * @return void
      */
     private function csvChildren($fp, Node\Model $node, bool $isFirst = false): void

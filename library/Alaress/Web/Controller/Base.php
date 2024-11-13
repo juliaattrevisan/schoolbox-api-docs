@@ -26,6 +26,7 @@ use LogicException;
 use Psr\Container\ContainerInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
+use Psr\Http\Message\StreamInterface;
 use Schoolbox\IConfigLoader;
 use Schoolbox\User;
 use Sentry\State\HubInterface;
@@ -737,11 +738,27 @@ abstract class Base
      * string.
      *
      * @param string $content
+     * @param string|null $filename
+     * @param string|null $mimetype
      * @return ResponseInterface
      */
-    protected function responseFromContent(string $content): ResponseInterface
+    protected function responseFromContent(string $content, ?string $filename = null, ?string $mimetype = null): ResponseInterface
     {
-        return $this->responseFactory->buildFromContent($content);
+        return $this->responseFactory->buildFromContent($content, $filename, $mimetype);
+    }
+
+    /**
+     * Shortcut method for building a generic response from the content of a
+     * stream.
+     *
+     * @param StreamInterface $stream
+     * @param string|null $filename
+     * @param string|null $mimetype
+     * @return ResponseInterface
+     */
+    protected function responseFromStream(StreamInterface $stream, ?string $filename = null, ?string $mimetype = null): ResponseInterface
+    {
+        return $this->responseFactory->buildFromStream($stream, $filename, $mimetype);
     }
 
     /**

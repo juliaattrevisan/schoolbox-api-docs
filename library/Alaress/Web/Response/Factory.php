@@ -222,24 +222,42 @@ class Factory implements ResponseFactoryInterface
      * Build a response from the content of a string.
      *
      * @param string $content
+     * @param string|null $filename
+     * @param string|null $mimetype
      * @return ResponseInterface
      */
-    public function buildFromContent(string $content): ResponseInterface
+    public function buildFromContent(string $content, ?string $filename = null, ?string $mimetype = null): ResponseInterface
     {
-        return $this->buildFromStream($this->streamFactory->createStream($content));
+        return $this->buildFromStream($this->streamFactory->createStream($content), $filename, $mimetype);
     }
 
     /**
      * Build a response from a stream.
      *
      * @param StreamInterface $stream
+     * @param string|null $filename
+     * @param string|null $mimetype
      * @return ResponseInterface
      */
-    public function buildFromStream(StreamInterface $stream): ResponseInterface
+    public function buildFromStream(StreamInterface $stream, ?string $filename = null, ?string $mimetype = null): ResponseInterface
     {
-        return $this
-            ->createResponse()
+        $response = $this->createResponse()
             ->withBody($stream);
+
+        // If a filename is provided, set it.
+        if ($filename !== null) {
+            $response = $response
+                ->withoutHeader('content-disposition')
+                ->withHeader('content-disposition', 'attachment; filename="' . $filename . '"');
+        }
+
+        // If a mimetype is provided, set it.
+        if ($mimetype !== null) {
+            $response = $response
+                ->withoutHeader('content-type')
+                ->withHeader('content-type', $mimetype);
+        }
+        return $response;
     }
 
     /**
