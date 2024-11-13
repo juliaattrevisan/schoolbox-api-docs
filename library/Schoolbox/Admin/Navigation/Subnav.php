@@ -338,12 +338,6 @@ class Subnav
                 'visible'    => $userIsSuperuser,
                 'searchable' => false,
                 'children'   => [
-                    '/adminv2/import/pastoral' => [
-                        'name'        => 'Pastoral Care',
-                        'visible'     => $userIsSuperuser && $this->configLoader->get('external_type') === 'synergetic',
-                        'children'    => [],
-                        'description' => 'Import your pastoral care records from Synergetic.',
-                    ],
                     '/adminv2/import/photos/upload' => [
                         'name'        => 'Portrait Photos',
                         'visible'     => $userIsSuperuser,
@@ -791,6 +785,15 @@ class Subnav
                         ),
                         'children'    => [],
                         'description' => 'Optionally configure further sub types under your existing types for more detailed categorisation of pastoral records.',
+                    ],
+                    '/adminv2/import/pastoral' => [
+                        'name'        => 'Synergetic Import',
+                        'visible'     => (
+                            ($userIsSuperuser || $userHasServicePermissionPastoral)
+                            && $this->configLoader->get('external_type') === 'synergetic'
+                        ),
+                        'children'    => [],
+                        'description' => 'Import your pastoral care records from Synergetic.',
                     ],
                     '/adminv2/lists/pastoral/pastoral-type' => [
                         'name'        => 'Types List',
