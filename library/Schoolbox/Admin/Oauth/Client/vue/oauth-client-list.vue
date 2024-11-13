@@ -311,9 +311,7 @@ const onUserSearch = debounce((query: string, loading: (isLoading: boolean) => v
     }
     loading(true);
     const searchUrl = new URL(props.userSearchEndpoint, window.location.href);
-    searchUrl.search = new URLSearchParams(
-        Object.assign(userSearchAdditionalParams, {search: query})
-    ).toString();
+    searchUrl.search = new URLSearchParams(Object.assign(userSearchAdditionalParams, { search: query })).toString();
     fetch(searchUrl)
         .then((response) => response.json())
         .then((jsonResponse) => {
