@@ -33,7 +33,8 @@ class SchoolData implements INavigation
     {
         return [
             ['Administration', '/adminv2/home'],
-            ['School Data Import', $routeGenerator->generate('adminImportIndex.getSchoolDataIndex')],
+            ['School Data Import', null],
+            ['User Profiles', $routeGenerator->generate('adminImportIndex.getSchoolDataIndex')],
         ];
     }
 

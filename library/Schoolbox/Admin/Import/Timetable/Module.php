@@ -20,6 +20,7 @@ use Schoolbox\External\ClassPeriodMapper;
 use Schoolbox\External\TimetableCycleMapper;
 use Schoolbox\External\TimetablePeriodMapper;
 use Schoolbox\Import\ImporterFactory;
+use Schoolbox\Permission\Access\UserAccess;
 
 /**
  * Class Module
@@ -44,8 +45,11 @@ class Module extends BaseModule
     {
         $perms = new Rule\All(
             new Rule\IsLoggedIn(),
-            new Rule\IsSuperuser(),
-            new Rule\IsSchoolboxConnector($this->getConfig())
+            new Rule\IsSchoolboxConnector($this->getConfig()),
+            new Rule\Any(
+                new Rule\IsSuperuser(),
+                new Rule\HasServicePermission(UserAccess::SERVICE_TIMETABLE, UserAccess::ACCESS_FULL)
+            )
         );
 
         $this->register('GET', '', 'getUpload', $perms);
