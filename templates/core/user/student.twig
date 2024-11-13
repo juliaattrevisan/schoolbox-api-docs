@@ -407,7 +407,17 @@
          # The first button in the list is always selected by default
          # activeTab setting will override it later if appropriate to do so
          # based on the anchor in the url via javascript
-        #}
+         #}
+
+        {% set additionalConstraints = {
+            'activity': showActivityFeed,
+            'goals': showAchievementsTab,
+            'achievements': showAchievementsTab,
+            'classes': showClasses and showSubjects,
+            'groups': showGroups,
+            'contacts': showContactsTab
+        } %}
+
         {% set possibleTabs = [
             {
                 label: 'Activity Feed',
@@ -443,7 +453,7 @@
 
         {# Out of all the tabs that could possibly exist here, figure out
          # which one is currently active by default and remember it
-        #}
+         #}
         {% set activeTab = null %}
 
         {% for data in possibleTabs %}
