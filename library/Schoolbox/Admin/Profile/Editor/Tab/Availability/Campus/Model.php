@@ -39,7 +39,7 @@ class Model
 
 
     /**
-     * @param \Schoolbox\Admin\Profile\Editor\Tab\Model|null $field
+     * @param \Schoolbox\Admin\Profile\Editor\Tab\Model|null $tab
      * @return $this
      */
     public function setTab(?\Schoolbox\Admin\Profile\Editor\Tab\Model $tab): self
