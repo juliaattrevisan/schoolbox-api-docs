@@ -2,7 +2,7 @@
  * Types used only by the profile editor
  */
 
-// FIELD SETTINGS
+// #region FIELD SETTINGS
 
 export type ProfileEditorFieldSettingOption = {
     id: number | string;
@@ -17,7 +17,9 @@ export type ProfileEditorFieldSettingDefinition = {
     options: ProfileEditorFieldSettingOption[];
 };
 
-// FIELD TYPES
+// #endregion
+
+// #region FIELD TYPES
 
 export type ProfileEditorAvailableField = {
     field: string;
@@ -50,7 +52,9 @@ export type ProfileEditorMandatoryField = {
 // This is not a
 export type ProfileEditorActiveField = ProfileEditorSelectedField | ProfileEditorMandatoryField;
 
-// BUTTONS
+// #endregion
+
+// #region BUTTONS
 
 // The buttons available on profiles, each with a link to the relevant modify page
 type ProfileEditorButton = {
@@ -63,7 +67,9 @@ type ProfileEditorButton = {
     };
 };
 
-// TABS
+// #endregion
+
+// #region TABS
 
 export type ProfileEditorTabSettingOption = {
     id: number | string;
@@ -86,7 +92,9 @@ export type ProfileEditorTab = {
     tabSettings: Record<ProfileEditorTabSettingKey, ProfileEditorTabSettingOption["id"][]>;
 };
 
-// ROLE TYPES
+// #endregion
+
+// #region ROLE TYPES
 
 export type ProfileEditorRoleType = {
     roleType: string; // only ever "student", "staff", or "parent" at the moment... for display purposes make Title Case if required
@@ -127,6 +135,8 @@ export type ProfileEditorRoleType = {
         postTabSequence: string;
     };
 };
+
+// #endregion
 
 /**
  * The initial payload for the profile editor including all role types and
