@@ -75,27 +75,13 @@ $foundation-size-array: map.keys($foundation-breakpoint-map);
         grid-template-columns: repeat(4, 1fr);
     }
 
-    &--6-col {
-        grid-template-columns: repeat(6, 1fr);
-    }
-
     @each $size in $global-sizes {
         &-gap--#{$size} {
             grid-gap: var(--spacing-#{$size});
         }
     }
 
-    @media #{$large-down} {
-        &--6-col {
-            grid-template-columns: repeat(3, 1fr);
-        }
-    }
-
     @media #{$medium-down} {
-        &--6-col {
-            grid-template-columns: repeat(2, 1fr);
-        }
-
         &--4-col {
             grid-template-columns: repeat(2, 1fr);
         }
@@ -106,7 +92,6 @@ $foundation-size-array: map.keys($foundation-breakpoint-map);
     }
 
     @media #{$small-only} {
-        &--6-col,
         &--4-col,
         &--3-col,
         &--2-col {

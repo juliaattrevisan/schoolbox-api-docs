@@ -64,6 +64,7 @@ window.Vue.watch(isEditPanelOpen, (isOpen) => {
 .pe-tabs-tab {
     background-color: white;
     height: min-content; /* Prevent another tab from expanding this one */
+    min-width: 18rem; /* Prevent the tab from being too narrow */
 
     > .actions-small-1 {
         align-items: center;
@@ -77,6 +78,10 @@ window.Vue.watch(isEditPanelOpen, (isOpen) => {
         &::before {
             padding-right: 0; /* Override padding so the icon is positioned correctly */
         }
+    }
+
+    .list-item > .card {
+        padding: 0; /* Remove padding for compactness, there is padding already elsewhere */
     }
 
     /* To ensure the height of the title matches the card.compact height */
