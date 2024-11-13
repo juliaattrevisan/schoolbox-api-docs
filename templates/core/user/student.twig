@@ -376,19 +376,19 @@
         <script>
             $(function() {
                 switch (window.location.hash) {
-                    case '#activity':
-                    case '#achievements':
-                    case '#goals':
-                    case '#classes':
-                    case '#groups':
-                    case '#contacts':
+                    case '#tab-activity':
+                    case '#tab-achievements':
+                    case '#tab-goals':
+                    case '#tab-classes':
+                    case '#tab-groups':
+                    case '#tab-contacts':
                         $.fn.scrollToTop({
                             scrollOnInit: true,
                             scrollTo: '[data-tab]',
                             velocity: 250
                         });
 
-                        $('[data-tab] a[href="#tab-'+window.location.hash.substring(1)+'"]').trigger('click');
+                        $('[data-tab] a[href="#'+window.location.hash.substring(1)+'"]').trigger('click');
                         break;
 
                         {# If you visit this url directly without a hash, just do default behaviour
