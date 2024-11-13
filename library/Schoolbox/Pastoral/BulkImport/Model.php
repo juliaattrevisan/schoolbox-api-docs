@@ -61,9 +61,10 @@ class Model implements ISoftDeletable
      * The ZIP file from which to import files to attach to each pastoral
      * record created by this import.
      *
-     * This file may be temporary, as it's only useful as an import.
+     * This file may be temporary, as it's only useful as an import: if it's
+     * been cleaned up, it will be null.
      */
-    private StorageModel $zip;
+    private ?StorageModel $zip = null;
 
     /**
      * The template which is used to extract student external IDs from the files
@@ -182,18 +183,18 @@ class Model implements ISoftDeletable
     }
 
     /**
-     * @return StorageModel
+     * @return StorageModel|null
      */
-    public function getZip(): StorageModel
+    public function getZip(): ?StorageModel
     {
         return $this->zip;
     }
 
     /**
-     * @param StorageModel $zip
+     * @param StorageModel|null $zip
      * @return $this
      */
-    public function setZip(StorageModel $zip): self
+    public function setZip(?StorageModel $zip): self
     {
         $this->zip = $zip;
         return $this;
