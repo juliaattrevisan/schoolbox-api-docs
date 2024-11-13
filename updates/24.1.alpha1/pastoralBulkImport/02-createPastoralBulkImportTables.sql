@@ -2,7 +2,7 @@ create table pastoral_bulk_import
 (
     id                 int auto_increment primary key,
     owner_id           int unsigned               not null,
-    zip_hash           varchar(100) charset ascii not null,
+    zip_hash           varchar(100) charset ascii null,
     file_path_template varchar(255)               not null,
     severity_id        int                        null,
     type_id            int                        not null,
