@@ -203,7 +203,7 @@ class Controller extends Base
         $adminRoute = $this->getRouteIfAuthorized('adminHome.getIndex');
         $firstBreadcrumb = [$pastoralCareProper, $this->routeGenerator->generate('pastoral.getIndex')];
         if ($adminRoute) {
-            $firstBreadcrumb = ['Administration', '/adminv2/home'];
+            $firstBreadcrumb = ['Administration', $adminRoute];
         }
 
         $flyout = (new Flyout(
@@ -211,6 +211,7 @@ class Controller extends Base
             new FlyoutNodes($this->routeGenerator, $this->pastoralTypeMapper)
         ))->prefixBreadcrumbs([
             $firstBreadcrumb,
+            ['Pastoral Care', null],
             ["Manage {$pastoralCareProper} Record Settings", $this->routeGenerator->generate('pastoralAudience.getAudiences')],
         ]);
         if ($adminRoute) {
