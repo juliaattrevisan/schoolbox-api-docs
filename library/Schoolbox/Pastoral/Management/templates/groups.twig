@@ -1,10 +1,7 @@
 {% import '@pastoral/macros/profile.twig' as profile %}
 
 {% import 'sub/breadcrumbs.twig' as bread %}
-{{ bread.crumbs(
-[ locale.pastoralCare.proper,      routeLookup('pastoral.getIndex') ],
-[ 'Groups Management' ]
-) }}
+{{ bread.crumbsArray(breadcrumbs) }}
 
 <div class='row'>
     <div class='small-12 columns'>
