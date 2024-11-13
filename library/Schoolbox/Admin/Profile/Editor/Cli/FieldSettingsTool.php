@@ -17,7 +17,7 @@ class FieldSettingsTool extends CliTool\App
      * Make sure to add your locking script to the Lock Inspector tool
      * const LOCK_NAMES in Inspector.php
      */
-    public const LOCK_NAME = 'profileEditorDefaults';
+    public const LOCK_NAME = 'profileEditorFIeldDefaults';
 
 
     /**
@@ -63,12 +63,12 @@ class FieldSettingsTool extends CliTool\App
         if ($this->getOpt(self::OPT_LONG_HELP)) {
             echo <<<HELP
 
-Profile Editor Default Availability/Visibility
+Profile Editor Fields: Default Availability/Visibility
 
 Adds some default settings for the availability and visibility checkboxes that are
 as close to the original profile's settings as I can infer.
 
-Usage: php profileEditorDefaults.php -vvv --perform
+Usage: php field-settings.php -vvv --perform
 
 
 HELP;
@@ -87,7 +87,7 @@ HELP;
         }
 
         try {
-            $this->getLogger()->info('Profile Editor Default Settings.');
+            $this->getLogger()->info('Profile Editor Fields: Default Settings.');
             $this->getLogger()->info('');
 
             $settingsIndex = $this->buildSettingsIndex();

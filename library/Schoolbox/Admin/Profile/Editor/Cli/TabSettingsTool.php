@@ -68,7 +68,7 @@ Profile Editor Tabs: Default Availability/Visibility
 Adds some default settings for the availability and visibility checkboxes that are
 as close to the original profile's settings as I can infer.
 
-Usage: php profileEditorTabDefaults.php -vvv --perform
+Usage: php tab-settings.php -vvv --perform
 
 
 HELP;
