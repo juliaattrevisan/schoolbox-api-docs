@@ -103,7 +103,7 @@ export type ProfileEditorRoleType = {
     nameFormat: string; // The name format string for the role type (e.g. "{title} {firstname} {lastname")
     fields: {
         // Available Fields
-        // These should be sorted into alphabetical order
+        // These should be grouped by category, then grouped by .icon, then sorted alphabetically by .displayAs
         // and represent what could be dragged onto the profile screen's palette
         available: ProfileEditorAvailableField[];
         // Selected Fields

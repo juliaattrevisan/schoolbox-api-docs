@@ -48,6 +48,20 @@ const availableFieldsToShow = window.Vue.computed(() => {
     if (peStore.selectedRoleType === null) return [];
     const allFields = peStore.selectedRoleType.fields.available;
 
+    // Need to group the fields by icon then sort alphabetically
+    allFields.sort((a, b) => {
+        // First, sort by `.icon`, null values come last
+        if (a.icon === null && b.icon !== null) return 1;
+        if (a.icon !== null && b.icon === null) return -1;
+        if (a.icon !== null && b.icon !== null) {
+            if (a.icon < b.icon) return -1;
+            if (a.icon > b.icon) return 1;
+        }
+
+        // Then, sort by `.displayAs` alphabetically
+        return a.displayAs.localeCompare(b.displayAs);
+    });
+
     // If no category is selected, show all fields
     if (selectedCategory.value === null) {
         return allFields;
