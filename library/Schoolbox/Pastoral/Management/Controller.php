@@ -9,6 +9,8 @@
 namespace Schoolbox\Pastoral\Management;
 
 use Alaress\Web\Controller\Base;
+use Schoolbox\L10n\RosettaStone;
+use Schoolbox\Pastoral\Audience\FlyoutNodes;
 use Schoolbox\Pastoral\Group\Mapper as PastoralGroupMapper;
 use Schoolbox\Pastoral\Group\Model as PastoralGroup;
 use Schoolbox\Pastoral\Group\Member\Mapper as PastoralGroupMemberMapper;
@@ -16,6 +18,7 @@ use Schoolbox\Pastoral\Group\Member\Model as PastoralGroupMember;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Role;
 use Schoolbox\RoleMapper;
+use Schoolbox\Submenu\Flyout;
 use Schoolbox\UserMapper;
 
 class Controller extends Base
@@ -33,12 +36,14 @@ class Controller extends Base
      * @param RoleMapper                $roleMapper
      * @param PastoralGroupMapper       $pastoralGroupMapper
      * @param PastoralGroupMemberMapper $pastoralGroupMemberMapper
+     * @param RosettaStone $rosettaStone
      */
     public function __construct(
         private UserMapper $userMapper,
         private RoleMapper $roleMapper,
         private PastoralGroupMapper $pastoralGroupMapper,
-        private PastoralGroupMemberMapper $pastoralGroupMemberMapper
+        private PastoralGroupMemberMapper $pastoralGroupMemberMapper,
+        private RosettaStone $rosettaStone,
     ) {
     }
 
@@ -57,10 +62,38 @@ class Controller extends Base
             }
         );
 
+        /**
+         * both pastoral Write and Moderators access this page, and they can access via different directions.
+         * we should try to map the breadcrumbs to the most logical starting point
+         * and build the sidenav with admin if they have access
+         *
+         * write > Pastoral home
+         * write+ > Administration Home
+         */
+        $pastoralCareProper = $this->rosettaStone->translate('pastoralCare', false, true);
+        $adminRoute = $this->getRouteIfAuthorized('adminHome.getIndex');
+        $breadcrumbs = [
+            [$pastoralCareProper, $this->routeGenerator->generate('pastoral.getIndex')],
+            ["Groups Management", null],
+        ];
+
+        /* Assuming the Pastoral moderator came from Admin > Pastoral, rather than directly from Pastoral
+         */
+        if ($this->user->hasServicePermission(UserAccess::SERVICE_PASTORAL, UserAccess::ACCESS_FULL)) {
+            $breadcrumbs = [
+                ['Administration', $adminRoute],
+                ['Pastoral Care', null],
+                ["Groups Management", null],
+            ];
+        }
+
         $this->response = $this->responseFromTemplate(
             '@pastoralManagement/groups.twig',
             [
+                // Pastoral Moderators have access to other parts of the admin system, so they should see the admin nav menu.
+                'showAdminNavMenu' => $this->getUser()->hasServicePermission(UserAccess::SERVICE_PASTORAL, UserAccess::ACCESS_FULL),
                 'groups' => $groups,
+                'breadcrumbs' => $breadcrumbs,
             ],
             'Pastoral Group Management',
         );

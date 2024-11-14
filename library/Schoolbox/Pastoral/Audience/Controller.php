@@ -191,14 +191,47 @@ class Controller extends Base
          * part of the system where the flyout doesn't represent the full app hierarchy
          */
         $pastoralCareProper = $this->rosettaStone->translate('pastoralCare', false, true);
+
+        /**
+         * both pastoral Write and Moderators access this page, and they can access via different directions.
+         * we should try to map the breadcrumbs to the most logical starting point
+         * and build the sidenav with admin if they have access
+         *
+         * write > Pastoral home
+         * write+ > Administration Home
+         */
+        $adminRoute = $this->getRouteIfAuthorized('adminHome.getIndex');
+        $breadcrumbs = [
+                [$pastoralCareProper, $this->routeGenerator->generate('pastoral.getIndex')],
+                ["{$pastoralCareProper} Record Settings", $this->routeGenerator->generate('pastoralAudience.getAudiences')],
+            ];
+
+        /* Assuming the Pastoral moderator came from Admin > Pastoral, rather than directly from Pastoral
+         * Note terminology translations are not used in the admin system.
+         */
+        if ($this->user->hasServicePermission(UserAccess::SERVICE_PASTORAL, UserAccess::ACCESS_FULL)) {
+            $breadcrumbs = [
+                ['Administration', $adminRoute],
+                ['Pastoral Care', null],
+                ["Pastoral Record Settings", $this->routeGenerator->generate('pastoralAudience.getAudiences')],
+            ];
+        }
+
         $flyout = (new Flyout(
             $this->getConfigLoader(),
             new FlyoutNodes($this->routeGenerator, $this->pastoralTypeMapper)
-        ))->prefixBreadcrumbs([
-            [$pastoralCareProper, $this->routeGenerator->generate('pastoral.getIndex')],
-            ["Manage {$pastoralCareProper} Record Settings", $this->routeGenerator->generate('pastoralAudience.getAudiences')],
-        ]);
-
+        ))->prefixBreadcrumbs($breadcrumbs);
+        if ($this->user->hasServicePermission(UserAccess::SERVICE_PASTORAL, UserAccess::ACCESS_FULL)) {
+            $flyout->injectParentEntry([
+                $adminRoute => [
+                    'name' => 'Back to Administration',
+                    'visible' => true,
+                    'hasBreadcrumbLink' => true,
+                    'description' => '',
+                    'children' => [],
+                ]
+            ]);
+        }
 
         // Figure out a background color based on the record's color
         // (default color: black)

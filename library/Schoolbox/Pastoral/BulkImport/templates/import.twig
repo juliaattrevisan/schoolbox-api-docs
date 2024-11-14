@@ -1,6 +1,7 @@
 {% import 'sub/breadcrumbs.twig' as bread %}
 {{ bread.crumbs(
-    [ locale.pastoralCare.proper, routeLookup('pastoral.getIndex') ],
+    [ 'Administration', routeLookup('adminHome.getIndex') ],
+    [ 'Pastoral Care'],
     [ 'Bulk Import', routeLookup('pastoralBulkImport.getForm') ],
     [ 'Results' ],
 ) }}

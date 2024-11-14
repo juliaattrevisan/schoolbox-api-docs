@@ -1,16 +1,16 @@
 {% import 'sub/breadcrumbs.twig' as bread %}
 {{ bread.crumbs(
-    [ locale.pastoralCare.proper, routeLookup('pastoral.getIndex') ],
+    [ 'Administration', routeLookup('adminHome.getIndex') ],
+    [ 'Pastoral Care'],
     [ 'Bulk Import' ]
 ) }}
 
-<div class="actions-small-1 row">
-    <div class="list-item">
-        <div class="small-12 column">
-            <h1>{{ locale.pastoral.proper }} Bulk Import</h1>
-        </div>
-    </div>
-</div>
+<div class="admin-container row">
+
+{# Shared navigation menu #}
+{{ renderAdminNavigation(routeLookup('pastoralBulkImport.getForm')) }}
+
+<div class="admin-content">
 
 {# Can this user access summative reports? If so, they can go there and download one. #}
 
@@ -147,3 +147,6 @@
     subtypesIndex: subtypesIndex,
     subtypesIndexPrivate: subtypesIndexPrivate,
 } only %}
+
+    </div>
+</div>

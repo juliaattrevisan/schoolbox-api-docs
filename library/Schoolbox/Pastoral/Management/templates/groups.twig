@@ -1,16 +1,20 @@
 {% import '@pastoral/macros/profile.twig' as profile %}
 
 {% import 'sub/breadcrumbs.twig' as bread %}
-{{ bread.crumbs(
-[ locale.pastoralCare.proper,      routeLookup('pastoral.getIndex') ],
-[ 'Groups Management' ]
-) }}
+{{ bread.crumbsArray(breadcrumbs) }}
 
+{% if showAdminNavMenu%}
+<div class="admin-container row">
+    {{ renderAdminNavigation(routeLookup('pastoralManagement.getGroups')) }}
+    <div class="admin-content">
+        {# The divs opened above will be closed at the bottom of the page. #}
+{% else %}
 <div class='row'>
     <div class='small-12 columns'>
         <h1>{{ locale.pastoralCare.proper }} Groups</h1>
     </div>
 </div>
+{% endif %}
 
 <div class="row actions-small-1">
     <div class="list-item">
@@ -80,6 +84,11 @@
         {% endif %}
     </div>
 </div>
+
+{% if showAdminNavMenu %}
+    </div>
+</div>
+{% endif %}
 
 <form id="formDelete" class="hide" method="post" action="">
     <input type="hidden" name="id" value="{{ group.id ?? '' }}">

@@ -17,6 +17,7 @@ use Alaress\Web\Controller\Base;
 use InvalidArgumentException;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Pastoral\Log\Mapper;
+use Schoolbox\Permission\Access\UserAccess;
 
 /**
  * Class Module
@@ -25,7 +26,6 @@ use Schoolbox\Pastoral\Log\Mapper;
  */
 class Module extends BaseModule
 {
-
     /**
      * @inheritdoc
      */
@@ -42,7 +42,10 @@ class Module extends BaseModule
     {
         $perms = new Rule\All(
             new Rule\IsLoggedIn(),
-            new Rule\IsSuperuser()
+            new Rule\Any(
+                new Rule\IsSuperuser(),
+                new Rule\HasServicePermission(UserAccess::SERVICE_PASTORAL, UserAccess::ACCESS_WRITE)
+            )
         );
 
         $preload = function ($params) {

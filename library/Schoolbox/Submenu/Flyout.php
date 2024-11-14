@@ -21,7 +21,6 @@ use Schoolbox\IConfigLoader;
  */
 class Flyout
 {
-
     /**
      * For access to booleans that determine availability/visibility of certain menu
      * items based on plan, configuration, etc.
@@ -53,6 +52,13 @@ class Flyout
      * @var array
      */
     protected array $rootNode = [];
+
+    /**
+     * Optional injected parent node
+     *
+     * @var array
+     */
+    private array $parentNode = [];
 
 
     /**
@@ -183,6 +189,16 @@ class Flyout
      */
     public function generate(): array
     {
+        if ($this->parentNode) {
+            return array_merge($this->parentNode, $this->nodes->generate());
+        }
         return $this->nodes->generate();
+    }
+
+    public function injectParentEntry(array $parentNode): self
+    {
+        $this->parentNode = $parentNode;
+
+        return $this;
     }
 }

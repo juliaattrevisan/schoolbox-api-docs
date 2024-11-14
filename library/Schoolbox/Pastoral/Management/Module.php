@@ -56,6 +56,7 @@ class Module extends BaseModule
             $this->getMapperFactory()->get(RoleMapper::class),
             $this->getMapperFactory()->get(Pastoral\Group\Mapper::class),
             $this->getMapperFactory()->get(Pastoral\Group\Member\Mapper::class),
+            $this->injector->get('l10n'),
         );
     }
 
