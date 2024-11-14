@@ -39,7 +39,7 @@ const showExpandButton = window.Vue.computed(
 );
 const lastChildPadding = window.Vue.computed(() =>
     props.depth !== 0 && !hasChildren.value && !filtersStore.onlyShowGaps ? "2.75rem" : "0",
-);
+); // to add padding to the last child node to align better with the expand button
 
 /**
  * To toggle the expanded state of the node
