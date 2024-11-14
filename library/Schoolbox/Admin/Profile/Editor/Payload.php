@@ -77,24 +77,24 @@ class Payload
     public const FIELD_SETTINGS_META = [
         self::VISIBILITY_NODE => [
             self::ROLETYPE_SELF => [
-                Role::STUDENT => "The user themselves",
-                Role::STAFF => "The user themselves",
-                Role::PARENT => "The user themselves",
+                Role::STUDENT => "The user themself",
+                Role::STAFF => "The user themself",
+                Role::PARENT => "The user themself",
             ],
             Role::STUDENT => [
-                Role::STUDENT => "Users with the student role type",
-                Role::STAFF => "Users with the student role type",
-                Role::PARENT => "Users with the student role type",
+                Role::STUDENT => "All users with the student role type",
+                Role::STAFF => "All users with the student role type",
+                Role::PARENT => "All users with the student role type",
             ],
             Role::STAFF => [
-                Role::STUDENT => "Staff members with view profile access",
-                Role::STAFF => "Staff members with view profile access",
-                Role::PARENT => "Staff members with view profile access",
+                Role::STUDENT => "All users with the staff role type who have 'View Profile Access'",
+                Role::STAFF => "All users with the staff role type who have 'View Profile Access'",
+                Role::PARENT => "All users with the staff role type who have 'View Profile Access'",
             ],
             Role::PARENT => [
-                Role::STUDENT => "Parents of the student",
-                Role::STAFF => "Users with the parent role type",
-                Role::PARENT => "Users with the parent role type",
+                Role::STUDENT => "Parent users with a relationship to the student",
+                Role::STAFF => "All users with the parent role type",
+                Role::PARENT => "All users with the parent role type",
             ]
         ]
     ];
