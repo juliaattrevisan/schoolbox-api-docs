@@ -353,17 +353,19 @@ class Controller extends ConfigController
      */
     private function getRouteUrlFromTypeLabel(string $typeLabel): string
     {
-        $settingsCategory = $this->getSettingsCategoryFromTypeLabel($typeLabel);
+        $typeLabelEncoded = urlencode($typeLabel);
+        $routeUrlEncoded = $this->routeGenerator->generate(
+            'settings.getSettings' . $this->getSettingsCategoryFromTypeLabel($typeLabel),
+            // Due to the way route registration works, typeLabels must be encoded when doing lookups.
+            // This is important in settings pages because some typeLabels contain spaces.
+            // Example expected value for $typeLabel       : '3rd Party Services'
+            // Example expected value for $typeLabelEncoded: '3rd+Party+Services'
+            ['typeLabel' => $typeLabelEncoded]
+        );
 
-        if ($settingsCategory === '') {
-            $routeUrlEncoded = $this->routeGenerator->generate('settings.getSettings', ['typeLabel' => $typeLabel]);
-            $routeUrl = urldecode($routeUrlEncoded);
-        } else {
-            // NOTE: $typeLabel is not passed to routeGenerator->generate() to avoid regex match error
-            //       E.g. "Parameter value for [typeLabel] did not match the regex `LMS%20Policy`"
-            $routeUrlTemplate = $this->routeGenerator->generate("settings.getSettings$settingsCategory");
-            $routeUrl = str_replace('{typeLabel}', $typeLabel, $routeUrlTemplate);
-        }
+        // Example expected value for $routeUrlEncoded: /adminv2/setting/3rd%2BParty%2BServices
+        // Example expected value for $routeUrl       : /adminv2/setting/3rd+Party+Services
+        $routeUrl = urldecode($routeUrlEncoded);
 
         return $routeUrl;
     }
