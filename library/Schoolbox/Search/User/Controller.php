@@ -189,7 +189,7 @@ class Controller extends BaseController
 
         /* Profile Buttons
          */
-        $buttons = ProfileButtonMapper::getInstance()->findButtonsForUser($student, $this->getUser());
+        $buttons = $this->profileButtonMapper->findButtonsForUser($student, $this->getUser());
 
         /* Profile Tabs
          */
