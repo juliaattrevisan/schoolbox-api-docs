@@ -33,6 +33,10 @@ const hasChildren = window.Vue.ref(props.node.children && props.node.children.le
 
 const isExpanded = window.Vue.ref(props.depth < 1); // to hide any grandchild and below nodes by default
 const expandTitle = window.Vue.computed(() => (isExpanded.value ? "Collapse" : "Expand"));
+// don't show the expand button when the node is at the top level, has no children, or onlyShowGaps is active
+const showExpandButton = window.Vue.computed(
+    () => props.depth !== 0 && hasChildren.value && !filtersStore.onlyShowGaps,
+);
 
 /**
  * To toggle the expanded state of the node
@@ -202,13 +206,15 @@ function onChildTitleClicked(node: CurriculumCoverageNode): void {
             :style="{ paddingInlineStart: paddingStart }"
         >
             <button
-                v-if="props.depth !== 0 && hasChildren && !filtersStore.onlyShowGaps"
+                v-if="showExpandButton"
                 :class="`expand-button expander l-flex l-flex--center ${isExpanded ? 'icon-up-arrow' : 'icon-down-arrow'}`"
                 :aria-label="expandTitle"
                 :title="expandTitle"
                 @click="onExpandClicked"
             ></button>
-            <button class="title-button" @click="onTitleClicked">{{ title }}</button>
+            <button class="title-button" @click="onTitleClicked">
+                {{ title }}
+            </button>
         </td>
         <td class="u-border-left">
             <b>{{ getEntireUsageCount(props.node) }}</b>
