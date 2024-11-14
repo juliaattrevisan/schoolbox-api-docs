@@ -636,7 +636,7 @@ class Controller extends BaseController
             ->produce($parent, $this->getUser());
 
         try {
-            $buttons = ProfileButtonMapper::getInstance()->findButtonsForUser($parent, $this->getUser());
+            $buttons = $this->profileButtonMapper->findButtonsForUser($parent, $this->getUser());
         } catch (MapperException $e) {
             $buttons = [];
         }
