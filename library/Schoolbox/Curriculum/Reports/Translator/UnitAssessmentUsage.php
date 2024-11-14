@@ -56,6 +56,14 @@ class UnitAssessmentUsage
         $lessonPlanCount =
             ($unitUsage[Cursor::COURSE_ACTIVITY_LESSON_PLAN] ?? 0);
 
+        $rubricCount = array_sum(
+            [
+                ($unitUsage[Cursor::COURSE_UNIT_RUBRIC_CAPABILITY] ?? 0),
+                ($unitUsage[Cursor::COURSE_UNIT_RUBRIC_INDICATOR] ?? 0),
+                ($counts[$node->getId()][$unit->getCourse()->getId()][Cursor::COURSE_RUBRIC_CAPABILITY] ?? 0),
+                ($counts[$node->getId()][$unit->getCourse()->getId()][Cursor::COURSE_RUBRIC_INDICATOR] ?? 0),
+            ]
+        );
         $inUseRubricCount = $unitUsage[Cursor::COURSE_IN_USE_RUBRIC] ?? 0;
         return [
             'id'    => $unit->getFolder()->getId(),
@@ -71,6 +79,9 @@ class UnitAssessmentUsage
                     'count' => $lessonPlanCount
                 ],
                 'rubric' => [
+                    'count' => $rubricCount
+                ],
+                'inUseRubric' => [
                     'count' => $inUseRubricCount
                 ]
             ],
