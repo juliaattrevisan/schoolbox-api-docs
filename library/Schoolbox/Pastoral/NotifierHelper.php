@@ -104,7 +104,6 @@ class NotifierHelper
             Notifier::TRIGGER_CREATED_RELATED,
             Notifier::TRIGGER_UPDATED_RELATED,
             \Schoolbox\Pastoral\Comment\Notifier::TRIGGER_CREATED_RELATED,
-//            \Schoolbox\Pastoral\Comment\Notifier::TRIGGER_UPDATED_RELATED,
         ]);
 
         foreach ($accessRecords as $pastoralAccess) {
