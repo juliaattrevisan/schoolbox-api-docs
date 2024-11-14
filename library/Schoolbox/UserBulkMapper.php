@@ -149,6 +149,9 @@ class UserBulkMapper extends UserMapper
                 $users[$row['id']]['campuses'][] = $row['campus'];
             } else {
                 $user             = $row;
+                // retrieve user instance to get full name, @todo - this could be done in a better way
+                $instance = \Schoolbox\UserMapper::getInstance()->findById($row['id']);
+                $user['fullName'] = $instance->getFullName();
                 $user['campuses'] = [$row['campus']];
                 unset($user['campus']);
                 $users[$row['id']] = $user;
