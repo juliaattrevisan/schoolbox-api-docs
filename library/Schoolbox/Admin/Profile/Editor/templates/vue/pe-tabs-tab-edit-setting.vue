@@ -57,7 +57,7 @@ window.Vue.onMounted(() => {
 <template>
     <div>
         <label>
-            {{ tabSettingDefinition.displayAs }}:
+            {{ tabSettingDefinition.displayAs }}
             <span data-tooltip class="has-tip tip-top hint" :title="tabSettingDefinition.tooltip"> ? </span>
         </label>
         <div class="checklist">

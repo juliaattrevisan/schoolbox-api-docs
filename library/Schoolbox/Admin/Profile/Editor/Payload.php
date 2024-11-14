@@ -47,10 +47,10 @@ class Payload
      * Common nodes and human-readable name equivalents
      */
     private const AVAILABILITY_NODE = 'availability';
-    private const AVAILABILITY_NAME = 'Availability';
+    private const AVAILABILITY_NAME = 'Appears On';
     private const AVAILABILITY_TOOLTIP = 'Will appear on the selected campuses';
     private const VISIBILITY_NODE = 'visibility';
-    private const VISIBILITY_NAME = 'Visibility';
+    private const VISIBILITY_NAME = 'Visible For';
     private const VISIBILITY_TOOLTIP = 'Will appear for profile viewers in the selected role types';
 
     /**
