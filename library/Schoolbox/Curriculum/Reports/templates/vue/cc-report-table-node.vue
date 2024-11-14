@@ -3,6 +3,8 @@
  * A single node row in the curriculum coverage report.
  */
 
+import { useTemplateRef } from "vue";
+import { gsap } from "gsap/all";
 import { useNodeTitle } from "@schoolboxCurriculum/vue/composables/useNodeTitle";
 import type { Course } from "@schoolboxLibrary/types/Course";
 import type { Unit } from "@schoolboxLibrary/types/Unit";
@@ -17,51 +19,87 @@ interface Props {
 }
 const props = defineProps<Props>();
 
+const emit = defineEmits<{
+    titleClick: [node: CurriculumCoverageNode];
+}>();
+
 const reportStore = useReportStore();
 const filtersStore = useFiltersStore();
 const { title } = useNodeTitle(props.node);
+const paddingStart = window.Vue.ref(`calc(${props.depth * 0.5}rem + 0.5rem)`); // to gradually add more paddingStart to indicate node level depth
+const hasChildren = window.Vue.ref(Array.isArray(props.node.children) && props.node.children.length > 0);
+
+// #region expand/collapse
+
+const isExpanded = window.Vue.ref(props.depth < 1); // to hide any grandchild and below nodes by default
+const expandTitle = window.Vue.computed(() => (isExpanded.value ? "Collapse" : "Expand"));
+// don't show the expand button when the node is at the top level, has no children, or onlyShowGaps is active
+const showExpandButton = window.Vue.computed(
+    () => props.depth !== 0 && hasChildren.value && !filtersStore.onlyShowGaps,
+);
+const lastChildPadding = window.Vue.computed(() =>
+    props.depth !== 0 && !hasChildren.value && !filtersStore.onlyShowGaps ? "2.75rem" : "0",
+); // to add padding to the last child node to align better with the expand button
 
 /**
- * to gradually add more paddingStart to indicate node level depth
- * @returns - the paddingStart value
+ * To toggle the expanded state of the node
  */
-const paddingStart = window.Vue.computed(() => `calc(${props.depth * 0.75}rem + 0.625rem)`);
+function onExpandClicked(): void {
+    isExpanded.value = !isExpanded.value;
+}
+
+// #endregion
+
+// #region usage counts
 
 /**
  * Get the total usage count for a unit, with the selected report options considered
+ * @param node - the node to get the usage count for
  * @param $course - the course to get the usage count for
  * @param $unit - the unit to get the usage count for
  * @returns the total unit usage count
  */
-function getUnitUsageCount($course: Course, $unit: Unit): number {
-    if (props.node.usage === undefined) return 0;
-    const course = props.node.usage.courses.find((c) => c.id === $course.id);
+function getUnitUsageCount(node: CurriculumCoverageNode, $course: Course, $unit: Unit): number {
+    if (node.usage === undefined) return 0;
+    const course = node.usage.courses.find((c) => c.id === $course.id);
     if (course === undefined) return 0;
     const unit = course.units.find((u) => u.id === $unit.id);
     if (unit === undefined) return 0;
     const { usage } = unit;
     if (usage === undefined) return 0;
-    return filtersStore.selectedReportOptions.reduce((acc, option) => {
-        // always skip course option as it can't be assigned within a unit
+    const onNodeCount = filtersStore.selectedReportOptions.reduce((acc, option) => {
+        // always skip course and unit options as they can't be assigned within a unit
         if (option === ReportOptionValues.COURSE) return acc;
         if (usage[option] === undefined) return acc;
         return acc + usage[option].count;
     }, 0);
+    /**
+     * When the node has children and is not expanded, we want to show the usage count inclusive of children
+     * to show how many usages are linked to the node and its children
+     */
+    if (node.children && node.children.length > 0 && !isExpanded.value) {
+        const onChildrenCount = node.children.reduce((acc, child) => {
+            return acc + getUnitUsageCount(child, $course, $unit);
+        }, 0);
+        return onNodeCount + onChildrenCount;
+    }
+    return onNodeCount;
 }
 
 /**
  * Get the total usage count for a course, which is the
  * total usage count linked to the course, with the selected report options considered
+ * @param node - the node to get the usage count for
  * @param $course - the course to get the usage count for
  * @returns the total course usage count
  */
-function getCourseUsageCount($course: Course): number {
-    if (props.node.usage === undefined) return 0;
-    const course = props.node.usage.courses.find((c) => c.id === $course.id);
+function getCourseUsageCount(node: CurriculumCoverageNode, $course: Course): number {
+    if (node.usage === undefined) return 0;
+    const course = node.usage.courses.find((c) => c.id === $course.id);
     if (course === undefined) return 0;
     const { usage } = course;
     if (usage === undefined) return 0;
-    return filtersStore.selectedReportOptions.reduce((acc, option) => {
+    const onNodeCount = filtersStore.selectedReportOptions.reduce((acc, option) => {
         // always skip unit, learning activity and lesson plan options as they can't be assigned within a course
         if (
             option === ReportOptionValues.UNIT ||
@@ -74,21 +112,33 @@ function getCourseUsageCount($course: Course): number {
         if (usage[option] === undefined) return acc;
         return acc + usage[option].count;
     }, 0);
+    /**
+     * When the node has children and is not expanded, we want to show the usage count inclusive of children
+     * to show how many usages are linked to the node and its children
+     */
+    if (node.children && node.children.length > 0 && !isExpanded.value) {
+        const onChildrenCount = node.children.reduce((acc, child) => {
+            return acc + getCourseUsageCount(child, $course);
+        }, 0);
+        return onNodeCount + onChildrenCount;
+    }
+    return onNodeCount;
 }
 
 /**
- * Get the total node usage count for a course(s),
+ * Get the total node usage count for a course,
  * which is the total usage count linked to the course, and all units within the course
+ * @param node - the node to get the usage count for
  * @param $course - the course to get the usage count for
  * @returns the total node usage count for all selected course(s)
  */
-function getTotalUsageCount($course: Course): number {
-    if (props.node.usage === undefined) return 0;
-    const course = props.node.usage.courses.find((c) => c.id === $course.id);
+function getTotalUsageCount(node: CurriculumCoverageNode, $course: Course): number {
+    if (node.usage === undefined) return 0;
+    const course = node.usage.courses.find((c) => c.id === $course.id);
     if (course === undefined || course.units === undefined) return 0;
-    const courseUsageCount = getCourseUsageCount($course);
+    const courseUsageCount = getCourseUsageCount(node, $course);
     const unitUsageCount = course.units.reduce((acc, unit) => {
-        return acc + getUnitUsageCount(course, unit);
+        return acc + getUnitUsageCount(node, course, unit);
     }, 0);
     return courseUsageCount + unitUsageCount;
 }
@@ -96,42 +146,15 @@ function getTotalUsageCount($course: Course): number {
 /**
  * Get the total node usage count for a node,
  * which is the total usage count for all courses
+ * @param node - the node to get the usage count for
  * @returns the total node usage count
  */
-const nodeUsageCount = window.Vue.computed(() => {
-    if (props.node.usage === undefined) return 0;
-    return props.node.usage.courses.reduce((acc, course) => {
-        return acc + getTotalUsageCount(course);
+function getEntireUsageCount(node: CurriculumCoverageNode): number {
+    if (node.usage === undefined) return 0;
+    return node.usage.courses.reduce((acc, course) => {
+        return acc + getTotalUsageCount(node, course);
     }, 0);
-});
-
-/**
- * Whether the node contains any course usage counts that are 0
- * for the currently selected report options
- * @returns - whether the node has no course usages
- */
-const hasNoCourseUsages = window.Vue.computed(() => {
-    if (props.node.usage === undefined) return true;
-    // loop through every course, checking if any have a usage count of 0
-    return !reportStore.courses.every((course) => {
-        return getCourseUsageCount(course) !== 0;
-    });
-});
-
-/**
- * Whether the node contains any unit usage counts that are 0
- * for the currently selected report options
- * @returns - whether the node has no unit usages
- */
-const hasNoUnitUsages = window.Vue.computed(() => {
-    if (props.node.usage === undefined) return true;
-    // loop through every unit in every course, checking if any have a usage count of 0
-    return !reportStore.courses.every((course) => {
-        return course.units?.every((unit) => {
-            return getUnitUsageCount(course, unit) !== 0;
-        });
-    });
-});
+}
 
 /**
  * If has a unit with no usage, and only show gaps is selected, show the node
@@ -142,49 +165,99 @@ const showNode = window.Vue.computed(() => {
     if (!filtersStore.onlyShowGaps) {
         return true;
     }
-    // otherwise, only show the node if it has no usages
-    return (hasNoCourseUsages.value || hasNoUnitUsages.value) && filtersStore.onlyShowGaps;
+    // don't show nodes that can't have usage assigned when only show gaps is active
+    if ((filtersStore.onlyShowGaps && props.node.code === null) || props.node.code === "") {
+        return false;
+    }
+    return getEntireUsageCount(props.node) === 0 && filtersStore.onlyShowGaps;
 });
+
+// #endregion
+
+/**
+ * Fade in when shown to help provide context
+ */
+const nodeEl = useTemplateRef<HTMLElement | null>("nodeEl");
+window.Vue.onMounted(async () => {
+    // expand the node if it has no children
+    if (props.depth > 1 && showNode.value) {
+        await window.Vue.nextTick();
+        gsap.from(nodeEl.value, { opacity: 0, duration: 0.3 });
+    }
+});
+
+/**
+ * Emit to open up the node details modal
+ */
+function onTitleClicked(): void {
+    emit("titleClick", props.node);
+}
+
+/**
+ * Emit to open up the node details modal
+ * @param node - the node that was selected
+ */
+function onChildTitleClicked(node: CurriculumCoverageNode): void {
+    emit("titleClick", node);
+}
 </script>
 
 <template>
-    <tr v-if="showNode">
-        <th scope="row" class="node__name" :style="{ paddingInlineStart: paddingStart }">{{ title }}</th>
-        <template v-if="node.code">
-            <td :class="`u-key-bkg ${nodeUsageCount === 0 ? 'u-highlight' : ''}`">
-                {{ nodeUsageCount }}
+    <tr v-if="showNode" ref="nodeEl">
+        <td
+            class="node__name l-flex l-flex--align-center l-gap-s f-no-margins"
+            :style="{ paddingInlineStart: paddingStart }"
+        >
+            <button
+                v-if="showExpandButton"
+                :class="`expand-button expander l-flex l-flex--center ${isExpanded ? 'icon-up-arrow' : 'icon-down-arrow'}`"
+                :aria-label="expandTitle"
+                :title="expandTitle"
+                @click="onExpandClicked"
+            ></button>
+            <button class="title-button" :style="{ paddingLeft: lastChildPadding }" @click="onTitleClicked">
+                {{ title }}
+            </button>
+        </td>
+        <td class="u-border-left">
+            <b>{{ getEntireUsageCount(props.node) }}</b>
+        </td>
+        <!-- loop through each course/unit, retrieving the node usage or returning 0 for undefined usages -->
+        <template v-for="course in reportStore.courses" :key="course.id">
+            <td class="u-border-left">
+                {{ getCourseUsageCount(props.node, course) }}
             </td>
-            <!-- loop through each course/unit, retrieving the node usage or returning 0 for undefined usages -->
-            <template v-for="(course, index) in reportStore.courses" :key="course.id">
-                <td
-                    :class="`${index % 2 ? 'u-alt-bkg' : ''}  ${getCourseUsageCount(course) === 0 ? 'u-highlight' : ''}`"
-                >
-                    {{ getCourseUsageCount(course) }}
-                </td>
-                <td
-                    v-for="unit in course.units"
-                    :key="unit.id"
-                    :class="`${index % 2 ? 'u-alt-bkg' : ''} ${getUnitUsageCount(course, unit) === 0 ? 'u-highlight' : ''}`"
-                >
-                    {{ getUnitUsageCount(course, unit) }}
-                </td>
-                <td
-                    v-if="reportStore.hasMultipleCourses"
-                    :class="`${index % 2 ? 'u-alt-bkg' : ''} ${getTotalUsageCount(course) === 0 ? 'u-highlight' : ''}`"
-                >
-                    {{ getTotalUsageCount(course) }}
-                </td>
-            </template>
+            <td v-for="unit in course.units" :key="unit.id" :class="``">
+                {{ getUnitUsageCount(props.node, course, unit) }}
+            </td>
+            <td v-if="reportStore.hasMultipleCourses" :class="``">
+                {{ getTotalUsageCount(props.node, course) }}
+            </td>
         </template>
     </tr>
-    <template v-if="props.node.children && props.node.children.length > 0">
+    <template v-if="hasChildren && (isExpanded || filtersStore.onlyShowGaps)">
         <cc-report-table-node
             v-for="child in props.node.children"
             :key="child.id"
             :node="child"
             :depth="props.depth + 1"
+            @title-click="onChildTitleClicked"
         />
     </template>
 </template>
 
-<style scoped></style>
+<style scoped>
+tr:hover {
+    background-color: var(--accent-background); /* to help legibility */
+}
+
+.expand-button {
+    background: none;
+}
+
+.title-button {
+    background: none;
+    padding: 0;
+    text-align: left;
+}
+</style>

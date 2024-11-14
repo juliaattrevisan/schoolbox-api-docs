@@ -134,7 +134,7 @@ const currentResults = window.Vue.computed(() => {
 
 // #region loading default results
 
-const defaultResultsUrl = window.Vue.ref(`${props.endpoint}query=`); // query is currently required to due bug: https://schoolbox.atlassian.net/browse/SA-18815
+const defaultResultsUrl = window.Vue.ref(`${props.endpoint}`);
 const hasLoadedDefaultResults = window.Vue.ref(false); // to track if the default results have been loaded
 const isLoadingMore = window.Vue.ref(false); // to track if more results are being loaded
 

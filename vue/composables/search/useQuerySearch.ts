@@ -39,7 +39,12 @@ export function useQuerySearch(
     const query = window.Vue.ref(""); // current search term being typed
     const isActive = window.Vue.computed(() => query.value.length >= MIN_QUERY_LENGTH); // To only start showing search results once enough characters have been typed
     const url = window.Vue.computed(() => {
-        return `${endpoint}query=${query.value}`;
+        // check if we need to append ? to the endpoint
+        const lastCharacter = endpoint[endpoint.length - 1];
+        if (lastCharacter === "?" || lastCharacter === "&") {
+            return `${endpoint}query=${query.value}`;
+        }
+        return `${endpoint}?query=${query.value}`;
     });
     const hasSearched = window.Vue.ref(false); // to show that a search has been made
     const hasNoResults = window.Vue.computed(() => isActive.value && results.value.length === 0 && !isSearching.value); // To show that no results match the current search

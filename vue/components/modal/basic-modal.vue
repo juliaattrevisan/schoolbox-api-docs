@@ -8,6 +8,11 @@ import { useTemplateRef } from "vue";
 import { onKeyStroke } from "@vueuse/core";
 import { useFocusTrap } from "@vueuse/integrations/useFocusTrap";
 
+interface Props {
+    hasBackgroundClick?: boolean; // Whether to close the modal on background click
+}
+const props = defineProps<Props>();
+
 const modalEl = useTemplateRef<HTMLDivElement | null>("modalEl"); // to get the modal element
 const isOpen = defineModel<boolean>("is-open", { default: false }); // to open/close the modal
 const { activate, deactivate } = useFocusTrap(modalEl); // to keep focus within the modal when open
@@ -45,12 +50,22 @@ function onCloseClick(): void {
 onKeyStroke("Escape", () => {
     close();
 });
+
+/**
+ * To close the modal on background click
+ * @param event - the click event
+ */
+function onBackgroundClick(event: MouseEvent): void {
+    if (props.hasBackgroundClick && event.target === modalEl.value) {
+        close();
+    }
+}
 </script>
 
 <template>
     <teleport to="body">
         <transition>
-            <div v-if="isOpen" ref="modalEl" class="modal">
+            <div v-if="isOpen" ref="modalEl" class="modal" @click="onBackgroundClick">
                 <div class="modal__container">
                     <!-- @slot Reveal modal content goes into this slot -->
                     <slot></slot>

@@ -190,7 +190,8 @@ class Controller extends Base
             $this->routeGenerator,
             $this->authorizer,
             $this->getUser(),
-            $courseUnitSpecs
+            $courseUnitSpecs,
+            new FolderTranslator(0)
         );
 
         $usage = $data->map($reportTranslator);
