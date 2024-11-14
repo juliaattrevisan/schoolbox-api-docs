@@ -50,9 +50,9 @@ const fieldSaveError = window.Vue.computed(() => {
     <div class="row actions-small-1">
         <div class="list-item">
             <div class="small-12 island">
-                <h3 class="subheader" :title="props.field.displayAs">
+                <h3 class="subheader" :title="peFieldsStore.getFieldName(props.field)">
                     <pe-fields-icon :field="props.field" />
-                    {{ props.field.displayAs }}
+                    {{ peFieldsStore.getFieldName(props.field) }}
                 </h3>
             </div>
         </div>

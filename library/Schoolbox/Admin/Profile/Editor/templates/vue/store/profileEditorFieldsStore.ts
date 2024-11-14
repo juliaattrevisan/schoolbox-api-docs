@@ -1,6 +1,7 @@
 import { defineStore } from "pinia";
 import { cloneDeep } from "lodash";
 import { until } from "@vueuse/core";
+import locale from "@js/terminology/rosettaStone";
 import * as toast from "@schoolboxVue/components/toast/sbxToastEvent";
 import { useProfileEditorStore } from "./profileEditorStore";
 import { fetchProfileEditorEndpoint } from "./profileEditorUtils";
@@ -51,6 +52,21 @@ export const useProfileEditorFieldsStore = defineStore("profileEditorFieldsStore
 
     // A map of field keys to any errors that occurred while processing actions for that field
     const actionErrors = window.Vue.ref<{ [key: string]: string }>({});
+
+    /**
+     * Get the name of a field as it should be displayed in the UI
+     * If the field has a relevant terminology key, it will be translated,
+     * otherwise falls back to the displayAs property
+     * @param field - The field to get the display name of
+     * @returns The display name of the field
+     */
+    function getFieldName(field: ProfileEditorAvailableField | ProfileEditorActiveField): string {
+        if (field.terminology && locale[field.terminology]) {
+            return locale[field.terminology].proper();
+        }
+
+        return field.displayAs;
+    }
 
     /**
      * Get the type of an active field (selected or mandatory)
@@ -429,6 +445,7 @@ export const useProfileEditorFieldsStore = defineStore("profileEditorFieldsStore
     }
 
     return {
+        getFieldName,
         actionQueue,
         actionErrors,
         getActiveFieldType,

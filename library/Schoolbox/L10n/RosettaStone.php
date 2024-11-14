@@ -91,6 +91,16 @@ class RosettaStone
     }
 
     /**
+     * Return all terms as an array for use in the frontend
+     * See @js/terminology/l10n.ts
+     * @return array
+     */
+    public function getAllTermsArray()
+    {
+        return array_map(fn($term) => $this->dictionary[$term]->toArray(), $this->getAllTerms());
+    }
+
+    /**
      * This is for Twig access to translated words.
      * Example usages:
      *   {{ locale.news }} to return 'news'
