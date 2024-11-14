@@ -12,6 +12,7 @@ const MergeIntoSingleFilePlugin = require("webpack-merge-and-include-globally");
 
 module.exports = merge(common, {
     mode: "development",
+    devtool: "eval-source-map", // Add source maps for easier debugging
     plugins: [
         new VueLoaderPlugin(), // to handle .vue files
         new RemoveEmptyScriptsPlugin(), // to remove .js files that are empty after exporting css
