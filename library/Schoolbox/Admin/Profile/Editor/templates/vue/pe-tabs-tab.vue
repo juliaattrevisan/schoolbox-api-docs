@@ -77,10 +77,16 @@ const tabSaveError = window.Vue.computed(() => {
 </template>
 
 <style scoped lang="scss">
+$pe-tabs-width: 18rem; /* Prevent the tab from being too narrow */
+
 .pe-tabs-tab {
     background-color: white;
     height: min-content; /* Prevent another tab from expanding this one */
-    min-width: 18rem; /* Prevent the tab from being too narrow */
+    width: $pe-tabs-width;
+
+    @media screen and (max-width: ($pe-tabs-width * 2)) {
+        width: 100%; /* Full width when only one column can be shown */
+    }
 
     > .actions-small-1 {
         align-items: center;
