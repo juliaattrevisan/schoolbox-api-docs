@@ -79,6 +79,12 @@ class Module extends \Alaress\Module\Module
 
         // The rule for URL encoding of spaces is 'Use %20 before the ? and + after'.
         // https://stackoverflow.com/questions/1634271/url-encoding-the-space-character-or-20#answer-29948396
+        // Note when routes are matched in /vendor/aura/router/src/Matcher.php, the path to be matched against will have
+        // spaces encoded as '%20' regardless of whether '%20' or ' ' is used when registering routes here.
+        // (Test by visiting e.g. 'https://vagrant.dev.schoolbox.cloud/adminv2/setting/lms/Document Management' and
+        //  observing the path checked against in Matcher->match().)
+        // Therefore, if we want positive matches, we must encode spaces as '%20' here.
+        // See also Admin/Settings/Controller->getRouteUrlFromTypeLabel().
 
         // Routes to which users with service permission UserAccess::SERVICE_PASTORAL need access.
         $this->register('GET', '/pastoral/{typeLabel:Pastoral%20Care}', 'getSettingsPastoral', $rulePastoral);

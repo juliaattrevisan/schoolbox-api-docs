@@ -362,13 +362,17 @@ class Controller extends ConfigController
         // Example expected value for $typeLabelEncoded: '3rd%20Party%20Services'
         $typeLabelEncoded = str_replace(' ', '%20', $typeLabel);
 
+        // Note a double-encoded URL will be returned here.
+        // That seems to imply that when the route was registered, a decoded URL should have been used.  However, I
+        // could not get matching to work without encoding the URLs when registering the routes (see Admin/Settings/Module.php).
+        // So, we just have to deal with the double-encoding by decoding the returned value.
         $routeUrlDoubleEncoded = $this->routeGenerator->generate(
             'settings.getSettings' . $this->getSettingsCategoryFromTypeLabel($typeLabel),
             ['typeLabel' => $typeLabelEncoded]
         );
 
-        // Example expected value for $routeUrlEncoded: /adminv2/setting/3rd%2520Party%2520Services
-        // Example expected value for $routeUrl       : /adminv2/setting/3rd%20Party%20Services
+        // Example expected value for $routeUrlDoubleEncoded: /adminv2/setting/3rd%2520Party%2520Services
+        // Example expected value for $routeUrlEncoded      : /adminv2/setting/3rd%20Party%20Services
         $routeUrlEncoded = urldecode($routeUrlDoubleEncoded);
 
         return $routeUrlEncoded;
