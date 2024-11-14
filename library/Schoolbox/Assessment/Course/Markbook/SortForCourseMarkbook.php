@@ -126,7 +126,7 @@ class SortForCourseMarkbook implements IAssessableComparator
         return  (
             ($leftSequence === $rightSequence)
             ? \strnatcasecmp($leftSpecName, $rightSpecName)
-            : $leftSequence <=> $rightSequence
+            : $rightSequence <=> $leftSequence // Sort in descending order of sequence.
         );
     }
 
