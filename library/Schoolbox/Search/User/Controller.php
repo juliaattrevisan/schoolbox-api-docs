@@ -56,21 +56,22 @@ class Controller extends BaseController
 
     /**
      * Constructor
-     * @param UserMapper $userMapper
-     * @param RoleMapper $roleMapper
-     * @param FolderMapper $folderMapper
-     * @param Access $access
-     * @param External_UserInterface $externalUser
-     * @param External_ClassInterface $externalClass
-     * @param ProfileButtonMapper $profileButtonMapper
-     * @param Timetable_ColourMapper $timetableColourMapper
-     * @param ProfessionalDevelopmentMapper $professionalDevelopmentMapper
-     * @param PastoralTypeMapper $pastoralTypeMapper
-     * @param PastoralSubTypeMapper $pastoralSubTypeMapper
-     * @param PastoralDataSource $pastoralDataSource
-     * @param TermMapper $termMapper
-     * @param \Schoolbox\External\User $userRelationHydrator
-     * @param Mapper $fieldMapper
+     * @param UserMapper                                 $userMapper
+     * @param RoleMapper                                 $roleMapper
+     * @param FolderMapper                               $folderMapper
+     * @param Access                                     $access
+     * @param External_UserInterface                     $externalUser
+     * @param External_ClassInterface                    $externalClass
+     * @param ProfileButtonMapper                        $profileButtonMapper
+     * @param Timetable_ColourMapper                     $timetableColourMapper
+     * @param ProfessionalDevelopmentMapper              $professionalDevelopmentMapper
+     * @param PastoralTypeMapper                         $pastoralTypeMapper
+     * @param PastoralSubTypeMapper                      $pastoralSubTypeMapper
+     * @param PastoralDataSource                         $pastoralDataSource
+     * @param TermMapper                                 $termMapper
+     * @param \Schoolbox\External\User                   $userRelationHydrator
+     * @param Mapper                                     $fieldMapper
+     * @param \Schoolbox\Admin\Profile\Editor\Tab\Mapper $tabMapper
      */
     public function __construct(
         private UserMapper $userMapper,
@@ -88,6 +89,7 @@ class Controller extends BaseController
         private TermMapper $termMapper,
         private \Schoolbox\External\User $userRelationHydrator,
         private \Schoolbox\Admin\Profile\Editor\Field\Mapper $fieldMapper,
+        private \Schoolbox\Admin\Profile\Editor\Tab\Mapper $tabMapper,
     ) {
     }
 
@@ -186,6 +188,18 @@ class Controller extends BaseController
                     return [];
                 }
             ]);
+
+        /* Profile Buttons
+         */
+        $buttons = $this->profileButtonMapper->findButtonsForUser($student, $this->getUser());
+
+        /* Profile Tabs
+         */
+        $tabs = $this->tabMapper->findRenderable($student, $this->getUser());
+
+
+        /* Old implementation below
+         */
 
         // Wrangle default colors
         $colors              = $this->timetableColourMapper->findAll()->reindex();
@@ -423,7 +437,7 @@ class Controller extends BaseController
             }
         }
 
-        $buttons = ProfileButtonMapper::getInstance()->findButtonsForUser($student, $this->getUser());
+
         $showDetails   = (new ValidDetailsVisible($this->externalUser, $this->getConfigLoader()))->isSatisfiedBy($student, $this->getUser());
         $showEmails    = (new ValidEmailVisible($this->externalUser, $this->getConfigLoader()))->isSatisfiedBy($student, $this->getUser());
 
@@ -515,6 +529,9 @@ class Controller extends BaseController
                  * custom buttons, as far as the end user is concerned
                  */
                 'buttons' => $buttons,
+                /* A sequenced list of tabs
+                 */
+                'possibleTabs' => $tabs,
 
                 /* Old implementation
                  */
@@ -621,7 +638,7 @@ class Controller extends BaseController
             ->produce($parent, $this->getUser());
 
         try {
-            $buttons = ProfileButtonMapper::getInstance()->findButtonsForUser($parent, $this->getUser());
+            $buttons = $this->profileButtonMapper->findButtonsForUser($parent, $this->getUser());
         } catch (MapperException $e) {
             $buttons = [];
         }

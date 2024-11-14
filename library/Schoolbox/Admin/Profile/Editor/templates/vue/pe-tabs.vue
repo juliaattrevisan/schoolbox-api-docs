@@ -45,7 +45,7 @@ async function onResequenceTab(event: Sortable.SortableEvent): Promise<void> {
 </script>
 
 <template>
-    <div v-if="peStore.selectedRoleType" class="small-12 island">
+    <div v-if="peStore.selectedRoleType && peStore.selectedRoleType.tabs.length" class="small-12 island">
         <h3 class="subheader">Tabs</h3>
         <div>
             <sortable-wrapper

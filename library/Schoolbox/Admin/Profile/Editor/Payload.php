@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace Schoolbox\Admin\Profile\Editor;
 
 use Schoolbox\Admin\Profile\Editor\Field\Mapper as FieldMapper;
+use Schoolbox\Admin\Profile\Editor\Tab\Mapper as TabMapper;
 use Schoolbox\Profile\Button\Mapper as ButtonMapper;
 use Schoolbox\CampusMapper;
 use Schoolbox\Config\ConfigMapper;
@@ -73,6 +74,7 @@ class Payload
         private IConfigLoader $config,
         private Generator $routeGenerator,
         private FieldMapper $fieldMapper,
+        private TabMapper $tabMapper,
         private CampusMapper $campusMapper,
         private ButtonMapper $buttonMapper
     ) {
@@ -195,12 +197,12 @@ class Payload
                 ],
                 '_routes' => [
                     'postNameFormat' => $this->routeGenerator->generate('adminProfileEditor.postNameFormat', ['roleType' => $roleType]),
-                    'postFieldAdd' => $this->routeGenerator->generate('adminProfileEditor.postFieldAdd', ['roleType' => $roleType]),
-                    'postFieldRemove' => $this->routeGenerator->generate('adminProfileEditor.postFieldRemove', ['roleType' => $roleType]),
-                    'postFieldSettings' => $this->routeGenerator->generate('adminProfileEditor.postFieldSettings', ['roleType' => $roleType]),
-                    'postFieldSequence' => $this->routeGenerator->generate('adminProfileEditor.postFieldSequence', ['roleType' => $roleType]),
-                    'postTabSettings' => "/adminv2/profileEditor/tab/{$roleType}/{tabId}/settings", // TODO Tabs
-                    'postTabSequence' => "/adminv2/profileEditor/tab/{$roleType}/sequence", // TODO Tabs
+                    'postFieldAdd' => $this->routeGenerator->generate('adminProfileEditorField.postAdd', ['roleType' => $roleType]),
+                    'postFieldRemove' => $this->routeGenerator->generate('adminProfileEditorField.postRemove', ['roleType' => $roleType]),
+                    'postFieldSettings' => $this->routeGenerator->generate('adminProfileEditorField.postSettings', ['roleType' => $roleType]),
+                    'postFieldSequence' => $this->routeGenerator->generate('adminProfileEditorField.postSequence', ['roleType' => $roleType]),
+                    'postTabSettings' => $this->routeGenerator->generate('adminProfileEditorTab.postSettings', ['roleType' => $roleType]),
+                    'postTabSequence' => $this->routeGenerator->generate('adminProfileEditorTab.postSequence', ['roleType' => $roleType]),
                 ]
             ];
 
@@ -224,28 +226,28 @@ class Payload
                 ];
             }
 
-            /* TODO: Tabs
+            /* Load a set of tabs for the prescribed roletype
              */
-            $tabs = [
-                ['id' => 'activity', 'label' => 'Activity Feed'],
-                ['id' => 'goals', 'label' => 'Goals'],
-                ['id' => 'achievements', 'label' => 'Achievements'],
-                ['id' => 'classes', 'label' => 'Classes'],
-                ['id' => 'groups', 'label' => 'Groups'],
-                ['id' => 'contacts', 'label' => 'Contacts'],
-            ];
+            $tabs = $this->tabMapper->findByColumn('roletype', $roleType, [
+                'order' => [
+                    'sequence' => 'asc'
+                ]
+            ]);
 
             foreach ($tabs as $tab) {
                 $roleTypeSettings['tabs'][] = [
-                    'id' => $tab['id'],
-                    'label' => $tab['label'],
+                    'id' => $tab->getTab(),
+                    'label' => $tab->getDisplayAs(),
                     'tabSettings' => [
                         /* Find the ids of the campuses for which this tab might be available
                          */
-                        self::AVAILABILITY_NODE => [], // TODO Tabs
+                        self::AVAILABILITY_NODE => $tab->getAvailabilityCampus()?->indexByCallback(static function (\Schoolbox\Admin\Profile\Editor\Tab\Availability\Campus\Model $campus) {
+                            return $campus->getCampus()?->getId();
+                        })->keys(),
+
                         /* Find the roletypes ("ids") for which this tab might be visible
                          */
-                        self::VISIBILITY_NODE => [] // TODO Tabs
+                        self::VISIBILITY_NODE => $tab->getVisibility()?->indexBy('roleType')->keys()
                     ]
                 ];
             }

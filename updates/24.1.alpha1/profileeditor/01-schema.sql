@@ -48,5 +48,48 @@ CREATE TABLE `profile_field_roletype_visibility` (
     PRIMARY KEY (`id`),
     INDEX `profile_field_profile_field_roletype_visibility` (`profile_field_id` ASC),
     INDEX `fk_profile_field_roletype_visibility_idx` (`roletype` ASC)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+-- Profile Tabs are mostly very similar to Profile Fields' implementation
+
+CREATE TABLE `profile_tab` (
+    `id` int unsigned NOT NULL AUTO_INCREMENT,
+    `roletype` enum('staff','student','parent') NOT NULL,
+    `tab` varchar(255) NOT NULL,
+    `display_as` varchar(255) NOT NULL,
+    `sequence` int(10) unsigned NOT NULL,
+    PRIMARY KEY (`id`),
+    UNIQUE KEY `roletype_tab` (`roletype`,`tab`),
+    KEY `roletype` (`roletype`),
+    KEY `tab` (`tab`),
+    KEY `sequence` (`sequence`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- This records which Campuses were selected, for each field,
+-- to determine which profile pages they "Appear On" (synonymous with "Availability")
+
+CREATE TABLE `profile_tab_campus_availability` (
+     `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
+     `profile_tab_id` INT UNSIGNED NOT NULL,
+     `campus_id` TINYINT(4) UNSIGNED NOT NULL,
+     PRIMARY KEY (`id`),
+     INDEX `profile_tab_profile_tab_campus_availability` (`profile_tab_id` ASC),
+     INDEX `fk_profile_tab_campus_availability_campus_id_idx` (`campus_id` ASC),
+     CONSTRAINT `fk_profile_tab_campus_availability_campus_id`
+         FOREIGN KEY (`campus_id`)
+             REFERENCES `luCampus` (`id`)
+             ON DELETE NO ACTION
+             ON UPDATE NO ACTION
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- This records when Roletypes were selected, for each tab,
+-- to determine which viewer Role Types can see a tab
+
+CREATE TABLE `profile_tab_roletype_visibility` (
+     `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
+     `profile_tab_id` INT UNSIGNED NOT NULL,
+     `roletype` ENUM('staff', 'student', 'parent', 'self') NOT NULL,
+     PRIMARY KEY (`id`),
+     INDEX `profile_tab_profile_tab_roletype_visibility` (`profile_tab_id` ASC),
+     INDEX `fk_profile_tab_roletype_visibility_idx` (`roletype` ASC)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

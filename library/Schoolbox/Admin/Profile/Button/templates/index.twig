@@ -74,19 +74,35 @@
                                         </a>
 
                                         <p class="meta">
-                                            Available on profiles for
-                                            <strong>{{ macro.checkboxString(item, roles, roleAvailabilitySelected) }}</strong> role(s)
-                                            within
-                                            <strong>{{ macro.checkboxString(item, campuses, campusAvailabilitySelected) }}</strong>
-                                            campus
+                                            {% if roleAvailabilitySelected[item.id]|length and campusAvailabilitySelected[item.id]|length %}
+                                                Available on profiles for
+                                                <strong>{{ macro.checkboxString(item, roles, roleAvailabilitySelected) }}</strong> role(s)
+                                                within
+                                                <strong>{{ macro.checkboxString(item, campuses, campusAvailabilitySelected) }}</strong>
+                                                campus
+                                            {% elseif roleAvailabilitySelected[item.id]|length and not campusAvailabilitySelected[item.id]|length %}
+                                                This button won't appear on profile screens; no campus availability was selected.
+                                            {% elseif not roleAvailabilitySelected[item.id]|length and campusAvailabilitySelected[item.id]|length %}
+                                                This button won't appear on profile screens; no role availability was selected.
+                                            {% else %}
+                                                This button won't appear on profile screens; no campus/role availability was selected.
+                                            {% endif %}
                                         </p>
 
                                         <p class="meta">
-                                            Visible to viewers in
-                                            <strong>{{ macro.checkboxString(item, roles, roleVisibilitySelected) }}</strong> role(s)
-                                            within
-                                            <strong>{{ macro.checkboxString(item, campuses, campusVisibilitySelected) }}</strong>
-                                            campus
+                                            {% if roleVisibilitySelected[item.id]|length and campusVisibilitySelected[item.id]|length %}
+                                                Visible to viewers in
+                                                <strong>{{ macro.checkboxString(item, roles, roleVisibilitySelected) }}</strong> role(s)
+                                                within
+                                                <strong>{{ macro.checkboxString(item, campuses, campusVisibilitySelected) }}</strong>
+                                                campus
+                                            {% elseif roleVisibilitySelected[item.id]|length and not campusVisibilitySelected[item.id]|length %}
+                                                This button won't appear on profile screens; no campus visibility was selected.
+                                            {% elseif not roleVisibilitySelected[item.id]|length and campusVisibilitySelected[item.id]|length %}
+                                                This button won't appear on profile screens; no role visibility was selected.
+                                            {% else %}
+                                                This button won't appear on profile screens; no campus/role visibility was selected.
+                                            {% endif %}
                                         </p>
                                     </div>
                                 </div>
