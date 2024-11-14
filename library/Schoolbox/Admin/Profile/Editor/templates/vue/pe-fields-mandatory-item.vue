@@ -81,7 +81,7 @@ const fieldSaveError = window.Vue.computed(() => {
             src="/portrait.php?id=0&size=constrain200"
             srcset="/portrait.php?id=0&size=constrain200 200w, /portrait.php?id=0&size=constrain500 500w"
             sizes="(max-width: 1300px) 200px, 500px"
-            class="full-width hide-for-medium-down l-pad-m"
+            class="full-width hide-for-large-down l-pad-m"
         />
     </section>
 </template>
