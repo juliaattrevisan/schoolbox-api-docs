@@ -73,36 +73,6 @@ class Mapper extends \Schoolbox\Mapper
     /**
      * @inheritdoc
      *
-     * @return string
-     */
-    protected function getSelectString(): string
-    {
-        return "
-            SELECT {$this->getColumnString()},
-            {$this->getJoinColumnString('availabilityCampus', 'availabilityCampus')},
-            {$this->getJoinColumnString('visibility', 'visibility')}
-        ";
-    }
-
-
-    /**
-     * @inheritdoc
-     *
-     * @return string
-     */
-    protected function getFromString(): string
-    {
-        return "
-            FROM {$this->getTable()}
-            LEFT JOIN {$this->getJoinSql('availabilityCampus', null, 'availabilityCampus')}
-            LEFT JOIN {$this->getJoinSql('visibility', null, 'visibility')}
-        ";
-    }
-
-
-    /**
-     * @inheritdoc
-     *
      * @param \PDOStatement $statement
      * @return GenericCollection
      * @throws Exception
