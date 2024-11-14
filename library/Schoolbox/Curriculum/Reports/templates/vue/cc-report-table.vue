@@ -38,7 +38,7 @@ window.Vue.watch(isDetailsOpen, (isOpen) => {
         <table class="coverage-report">
             <thead>
                 <tr>
-                    <th rowspan="2" class="curriculum l-valign--bottom">Curriculum</th>
+                    <th rowspan="2" class="curriculum-column l-valign--bottom">Curriculum</th>
                     <th rowspan="2" class="u-border-left l-valign--bottom">Total</th>
                     <template v-for="course in reportStore.courses" :key="course.id">
                         <th class="u-border-left" style="border-right: none">Course</th>
@@ -82,22 +82,7 @@ window.Vue.watch(isDetailsOpen, (isOpen) => {
 </template>
 
 <style scoped>
-table {
-    border-left: 1px solid rgb(139, 139, 139);
-    border-top: 1px solid rgb(139, 139, 139);
-}
-
-table thead tr td {
-    font-weight: normal;
-}
-
-td,
-th {
-    border-bottom: 1px solid rgb(139, 139, 139);
-    border-right: 1px solid rgb(139, 139, 139);
-}
-
-.curriculum {
+.curriculum-column {
     min-width: 400px; /* fixed width for the curriculum column to prevent shifts on expand/collapse */
     width: 400px; /* fixed width for the curriculum column to prevent shifts on expand/collapse */
 }

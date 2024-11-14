@@ -238,17 +238,8 @@ function onChildTitleClicked(node: CurriculumCoverageNode): void {
 </template>
 
 <style scoped>
-tr:nth-child(odd) {
-    background-color: #f7f7f7; /* to help legibility */
-}
-
 tr:hover {
     background-color: var(--accent-background); /* to help legibility */
-}
-
-td {
-    border-bottom: 1px solid rgb(139, 139, 139);
-    border-right: 1px solid rgb(139, 139, 139);
 }
 
 .expand-button {
