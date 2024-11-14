@@ -32,6 +32,18 @@ function getLabelKeyForOption(tabSettingOption: ProfileEditorTabSettingOption): 
 }
 
 /**
+ * Get the meta text for a tab setting option
+ * @param tabSettingOption - the tab setting option
+ * @returns the meta text, or null if there is none
+ */
+function getMetaTextForOption(tabSettingOption: ProfileEditorTabSettingOption): string | null {
+    if (!peStore.selectedRoleType) return null;
+    if (!tabSettingOption.meta) return null;
+
+    return tabSettingOption.meta[peStore.selectedRoleType.roleType] || null;
+}
+
+/**
  * The tab setting definition for the current tab and tab setting key
  */
 const tabSettingDefinition = window.Vue.computed(() => {
@@ -76,6 +88,9 @@ window.Vue.onMounted(() => {
                         :data-test="getLabelKeyForOption(tabSettingOption)"
                     >
                         {{ tabSettingOption.name }}
+                        <p v-if="getMetaTextForOption(tabSettingOption)" class="meta">
+                            {{ getMetaTextForOption(tabSettingOption) }}
+                        </p>
                     </label>
                 </li>
             </ul>

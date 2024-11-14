@@ -63,6 +63,44 @@ class Payload
 
 
     /**
+     * Additional meta for each setting option that can be chosen
+     * to provide more context to the user for what they're actually choosing.
+     * The meta can change depending on the selected role type tab, so we need to have each separately.
+     *
+     * This is a nested array of the form:
+     *  [The relevent settings key], e.g. self::VISIBILITY_NODE or self::AVAILABILITY_NODE
+     *    ->[The option id to which the meta applies, e.g. self::ROLETYPE_SELF]
+     *      ->[The role type (tab) for which the meta applies, e.g. Role::STUDENT]
+     *
+     * If the meta is not present for a given option, it will be null.
+     */
+    public const FIELD_SETTINGS_META = [
+        self::VISIBILITY_NODE => [
+            self::ROLETYPE_SELF => [
+                Role::STUDENT => "The user themselves",
+                Role::STAFF => "The user themselves",
+                Role::PARENT => "The user themselves",
+            ],
+            Role::STUDENT => [
+                Role::STUDENT => "Users with the student role type",
+                Role::STAFF => "Users with the student role type",
+                Role::PARENT => "Users with the student role type",
+            ],
+            Role::STAFF => [
+                Role::STUDENT => "Staff members with view profile access",
+                Role::STAFF => "Staff members with view profile access",
+                Role::PARENT => "Staff members with view profile access",
+            ],
+            Role::PARENT => [
+                Role::STUDENT => "Parents of the student",
+                Role::STAFF => "Users with the parent role type",
+                Role::PARENT => "Users with the parent role type",
+            ]
+        ]
+    ];
+
+
+    /**
      * @param IConfigLoader $config
      * @param Generator $routeGenerator
      * @param FieldMapper $fieldMapper
@@ -141,7 +179,8 @@ class Payload
             $fieldSettingsCampus['options'][] = [
                 'type' => 'campus',
                 'id' => $campus->getId(),
-                'name' => $campus->getName()
+                'name' => $campus->getName(),
+                'meta' => null, // potentially overridden later by FIELD_SETTINGS_META
             ];
         }
 
@@ -154,7 +193,8 @@ class Payload
                 [
                     'type' => 'roleType',
                     'id' => self::ROLETYPE_SELF,
-                    'name' => ucwords(self::ROLETYPE_SELF)
+                    'name' => ucwords(self::ROLETYPE_SELF),
+                    'meta' => null, // potentially overridden later by FIELD_SETTINGS_META
                 ]
             ]
         ];
@@ -171,6 +211,17 @@ class Payload
             self::AVAILABILITY_NODE => $fieldSettingsCampus,
             self::VISIBILITY_NODE => $fieldSettingsRoleType
         ];
+
+        // Add meta to the field settings, if it exists
+        foreach ($payload['data']['fieldSettings'] as $node => &$settings) {
+            if (isset(self::FIELD_SETTINGS_META[$node])) {
+                foreach ($settings['options'] as &$option) {
+                    if (isset(self::FIELD_SETTINGS_META[$node][$option['id']])) {
+                        $option['meta'] = self::FIELD_SETTINGS_META[$node][$option['id']];
+                    }
+                }
+            }
+        }
 
         // tabSettings is currently identical to fieldSettings but this allows it to diverge in the future
         $payload['data']['tabSettings'] = $payload['data']['fieldSettings'];
