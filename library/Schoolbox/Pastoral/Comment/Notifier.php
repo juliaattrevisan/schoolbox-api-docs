@@ -233,48 +233,6 @@ class Notifier extends AbstractModuleNotifier
     }
 
     /**
-     * @deprecated Pastoral comments may not be modified once created, thus they
-     *             have no update notifications.
-     *             They may be deleted, but there is currently no source set up
-     *             for deleted comments.
-     *
-     * @param Model $model
-     * @param User  $effector
-     * @param array $diff
-     *
-     * @return Envelope
-     */
-    public function notifyUpdated(Model $model, User $effector, $diff = []): Envelope
-    {
-        trigger_error(
-            'Pastoral comments should never be updated, thus update notifications should never be raised',
-            E_USER_DEPRECATED,
-        );
-        return new Envelope();
-    }
-
-    /**
-     * @deprecated Pastoral comments may not be modified once created, thus they
-     *             have no update notifications.
-     *             They may be deleted, but there is currently no source set up
-     *             for deleted comments.
-     *
-     * @param Model $model
-     * @param User  $effector
-     * @param array $diff
-     *
-     * @return Envelope
-     */
-    public function notifyUpdatedRelated(Model $model, User $effector, $diff = []): Envelope
-    {
-        trigger_error(
-            'Pastoral comments should never be updated, thus update notifications should never be raised',
-            E_USER_DEPRECATED,
-        );
-        return new Envelope();
-    }
-
-    /**
      * @param Model      $model
      * @param User       $effector
      * @param array|null $diff
