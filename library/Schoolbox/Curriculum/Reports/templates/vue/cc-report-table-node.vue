@@ -27,7 +27,7 @@ const reportStore = useReportStore();
 const filtersStore = useFiltersStore();
 const { title } = useNodeTitle(props.node);
 const paddingStart = window.Vue.ref(`calc(${props.depth * 0.5}rem + 0.5rem)`); // to gradually add more paddingStart to indicate node level depth
-const hasChildren = window.Vue.ref(props.node.children && props.node.children.length > 0);
+const hasChildren = window.Vue.ref(Array.isArray(props.node.children) && props.node.children.length > 0);
 
 // #region expand/collapse
 
@@ -36,6 +36,9 @@ const expandTitle = window.Vue.computed(() => (isExpanded.value ? "Collapse" : "
 // don't show the expand button when the node is at the top level, has no children, or onlyShowGaps is active
 const showExpandButton = window.Vue.computed(
     () => props.depth !== 0 && hasChildren.value && !filtersStore.onlyShowGaps,
+);
+const lastChildPadding = window.Vue.computed(() =>
+    props.depth !== 0 && !hasChildren.value && !filtersStore.onlyShowGaps ? "2.75rem" : "0",
 );
 
 /**
@@ -212,7 +215,7 @@ function onChildTitleClicked(node: CurriculumCoverageNode): void {
                 :title="expandTitle"
                 @click="onExpandClicked"
             ></button>
-            <button class="title-button" @click="onTitleClicked">
+            <button class="title-button" :style="{ paddingLeft: lastChildPadding }" @click="onTitleClicked">
                 {{ title }}
             </button>
         </td>
