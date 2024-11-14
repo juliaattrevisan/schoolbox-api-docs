@@ -353,21 +353,25 @@ class Controller extends ConfigController
      */
     private function getRouteUrlFromTypeLabel(string $typeLabel): string
     {
-        $typeLabelEncoded = urlencode($typeLabel);
-        $routeUrlEncoded = $this->routeGenerator->generate(
+        // Encode the spaces in the typeLabel before passing to $this->routeGenerator->generate().
+        // Note replacing ' ' with '%20' is not the same as calling urlencode().  We want '%20', not '+', because
+        // the typeLabel in the URL will be to the left of the '?', and the rule for URL encoding of spaces is:
+        // 'Use %20 before the ? and + after'
+        // https://stackoverflow.com/questions/1634271/url-encoding-the-space-character-or-20#answer-29948396
+        // Example expected value for $typeLabel       : '3rd Party Services'
+        // Example expected value for $typeLabelEncoded: '3rd%20Party%20Services'
+        $typeLabelEncoded = str_replace(' ', '%20', $typeLabel);
+
+        $routeUrlDoubleEncoded = $this->routeGenerator->generate(
             'settings.getSettings' . $this->getSettingsCategoryFromTypeLabel($typeLabel),
-            // Due to the way route registration works, typeLabels must be encoded when doing lookups.
-            // This is important in settings pages because some typeLabels contain spaces.
-            // Example expected value for $typeLabel       : '3rd Party Services'
-            // Example expected value for $typeLabelEncoded: '3rd+Party+Services'
             ['typeLabel' => $typeLabelEncoded]
         );
 
-        // Example expected value for $routeUrlEncoded: /adminv2/setting/3rd%2BParty%2BServices
-        // Example expected value for $routeUrl       : /adminv2/setting/3rd+Party+Services
-        $routeUrl = urldecode($routeUrlEncoded);
+        // Example expected value for $routeUrlEncoded: /adminv2/setting/3rd%2520Party%2520Services
+        // Example expected value for $routeUrl       : /adminv2/setting/3rd%20Party%20Services
+        $routeUrlEncoded = urldecode($routeUrlDoubleEncoded);
 
-        return $routeUrl;
+        return $routeUrlEncoded;
     }
 
     /**

@@ -77,12 +77,15 @@ class Module extends \Alaress\Module\Module
             )
         );
 
+        // The rule for URL encoding of spaces is 'Use %20 before the ? and + after'.
+        // https://stackoverflow.com/questions/1634271/url-encoding-the-space-character-or-20#answer-29948396
+
         // Routes to which users with service permission UserAccess::SERVICE_PASTORAL need access.
-        $this->register('GET', '/pastoral/{typeLabel:Pastoral\+Care}', 'getSettingsPastoral', $rulePastoral);
-        $this->register('POST', '/pastoral/{typeLabel:Pastoral\+Care}', 'postSettingsPastoral', $rulePastoral);
+        $this->register('GET', '/pastoral/{typeLabel:Pastoral%20Care}', 'getSettingsPastoral', $rulePastoral);
+        $this->register('POST', '/pastoral/{typeLabel:Pastoral%20Care}', 'postSettingsPastoral', $rulePastoral);
 
         // Routes to which users with service permission UserAccess::SERVICE_LMS need access.
-        $lmsTypeLabelsRegex = '(Document\+Management|LMS\+Policy)';
+        $lmsTypeLabelsRegex = '(Document%20Management|LMS%20Policy)';
         $this->register('GET', "/lms/{typeLabel:$lmsTypeLabelsRegex}", 'getSettingsLms', $ruleLms);
         $this->register('POST', "/lms/{typeLabel:$lmsTypeLabelsRegex}", 'postSettingsLms', $ruleLms);
 
@@ -91,8 +94,8 @@ class Module extends \Alaress\Module\Module
         $this->register('POST', '/cms/{typeLabel:Resources}', 'postSettingsCms', $ruleCms);
 
         // Routes to which users with service permission UserAccess::SERVICE_DESIGN need access.
-        $this->register('GET', '/design/{typeLabel:Skin\+Config}', 'getSettingsDesign', $ruleDesign);
-        $this->register('POST', '/design/{typeLabel:Skin\+Config}', 'postSettingsDesign', $ruleDesign);
+        $this->register('GET', '/design/{typeLabel:Skin%20Config}', 'getSettingsDesign', $ruleDesign);
+        $this->register('POST', '/design/{typeLabel:Skin%20Config}', 'postSettingsDesign', $ruleDesign);
 
         // Routes to which all moderators as well as superusers need access.
         $this->register('GET', '/search', 'searchSettings', $ruleSuperuserOrModerator);
