@@ -119,7 +119,8 @@ class Inspector extends CliTool\App
         /* Profile Editor: Button Migration
          */
         \Schoolbox\Admin\Profile\Editor\Cli\FieldSettingsTool::LOCK_NAME => 'Profile Editor: Fields Default Settings',
-        \Schoolbox\Admin\Profile\Editor\Cli\MigrateButtonsTool::LOCK_NAME => 'Profile Editor: Button Migration'
+        \Schoolbox\Admin\Profile\Editor\Cli\MigrateButtonsTool::LOCK_NAME => 'Profile Editor: Button Migration',
+        \Schoolbox\Admin\Profile\Editor\Cli\TabSettingsTool::LOCK_NAME => 'Profile Editor: Tabs Default Settings',
     ];
 
 

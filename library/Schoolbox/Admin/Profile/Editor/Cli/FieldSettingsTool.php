@@ -17,7 +17,7 @@ class FieldSettingsTool extends CliTool\App
      * Make sure to add your locking script to the Lock Inspector tool
      * const LOCK_NAMES in Inspector.php
      */
-    public const LOCK_NAME = 'profileEditorFIeldDefaults';
+    public const LOCK_NAME = 'profileEditorFieldDefaults';
 
 
     /**
