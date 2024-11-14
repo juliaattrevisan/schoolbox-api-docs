@@ -90,6 +90,7 @@ class Controller extends Base
         $this->response = $this->responseFromTemplate(
             '@pastoralManagement/groups.twig',
             [
+                'showAdminNavMenu' => $this->getUser()->hasServicePermission(UserAccess::SERVICE_PASTORAL, UserAccess::ACCESS_FULL),
                 'groups' => $groups,
                 'breadcrumbs' => $breadcrumbs,
             ],
