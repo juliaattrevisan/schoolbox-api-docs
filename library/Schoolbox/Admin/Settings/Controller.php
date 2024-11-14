@@ -356,7 +356,8 @@ class Controller extends ConfigController
         $settingsCategory = $this->getSettingsCategoryFromTypeLabel($typeLabel);
 
         if ($settingsCategory === '') {
-            $routeUrl = $this->routeGenerator->generate('settings.getSettings', ['typeLabel' => $typeLabel]);
+            $routeUrlEncoded = $this->routeGenerator->generate('settings.getSettings', ['typeLabel' => $typeLabel]);
+            $routeUrl = urldecode($routeUrlEncoded);
         } else {
             // NOTE: $typeLabel is not passed to routeGenerator->generate() to avoid regex match error
             //       E.g. "Parameter value for [typeLabel] did not match the regex `LMS%20Policy`"
