@@ -326,6 +326,7 @@ export const useProfileEditorFieldsStore = defineStore("profileEditorFieldsStore
             displayAs: availableField.displayAs,
             icon: availableField.icon,
             css: availableField.css,
+            terminology: availableField.terminology,
             fieldSettings: emptyFieldSettings,
         });
 
