@@ -121,27 +121,31 @@ class Mapper extends \Schoolbox\Mapper
         $collection = $this->createCollection();
 
         while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
-            if ($collection->offsetExists($row[$idColumn])) {
-                $field = $collection->getOffset($row[$idColumn]);
-            } else {
-                $field = $this->hydrate($row);
+            $field = $this->hydrate($row);
 
-                $field->setAvailabilityCampus($availabilityMapper->createCollection());
-                $field->setVisibility($visibilityMapper->createCollection());
+            $field->setAvailabilityCampus($availabilityMapper->createCollection());
+            $field->setVisibility($visibilityMapper->createCollection());
 
-                $collection->setOffset($row[$idColumn], $field);
+            $collection->setOffset($row[$idColumn], $field);
+        }
+
+        /* Availabilities and Visibilities assigned separately
+         */
+        $campusAvailabilities = $availabilityMapper
+            ->findByColumn('profile_field_id', $collection->getPropertyValues('id'))
+            ->groupByCallback(fn (\Schoolbox\Admin\Profile\Editor\Field\Availability\Campus\Model $c) => $c->getField()->getId());
+
+        $roletypeVisibilities = $visibilityMapper
+            ->findByColumn('profile_field_id', $collection->getPropertyValues('id'))
+            ->groupByCallback(fn (\Schoolbox\Admin\Profile\Editor\Field\Visibility\Model $r) => $r->getField()->getId());
+
+        foreach ($collection as $field) {
+            if (isset($campusAvailabilities[$field->getId()])) {
+                $field->setAvailabilityCampus($campusAvailabilities[$field->getId()]);
             }
 
-            $availabilityCampus = $availabilityMapper->hydrate($row, 'availabilityCampus');
-
-            if ($availabilityCampus) {
-                $field->getAvailabilityCampus()->setOffset($availabilityCampus->getId(), $availabilityCampus);
-            }
-
-            $visibility = $visibilityMapper->hydrate($row, 'visibility');
-
-            if ($visibility) {
-                $field->getVisibility()->setOffset($visibility->getId(), $visibility);
+            if (isset($roletypeVisibilities[$field->getId()])) {
+                $field->setVisibility($roletypeVisibilities[$field->getId()]);
             }
         }
 
