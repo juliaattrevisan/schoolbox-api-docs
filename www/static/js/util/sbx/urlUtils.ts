@@ -8,7 +8,8 @@
  * @returns - the encoded returnUrl
  */
 export function getReturnUrl(url?: string | undefined): string {
-    const returnUrl = `returnUrl=${window.btoa(window.location.pathname)}`;
+    const currentPath = `${window.location.pathname}${window.location.search}${window.location.hash}`;
+    const returnUrl = `returnUrl=${window.btoa(currentPath)}`;
 
     if (url) {
         // Pick the correct separator in case the url already has a query string
