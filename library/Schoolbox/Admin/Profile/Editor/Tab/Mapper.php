@@ -72,9 +72,7 @@ class Mapper extends \Schoolbox\Mapper
     protected function getSelectString(): string
     {
         return "
-            SELECT {$this->getColumnString()},
-            {$this->getJoinColumnString('availabilityCampus', 'availabilityCampus')},
-            {$this->getJoinColumnString('visibility', 'visibility')}
+            SELECT {$this->getColumnString()}
         ";
     }
 
@@ -88,8 +86,6 @@ class Mapper extends \Schoolbox\Mapper
     {
         return "
             FROM {$this->getTable()}
-            LEFT JOIN {$this->getJoinSql('availabilityCampus', null, 'availabilityCampus')}
-            LEFT JOIN {$this->getJoinSql('visibility', null, 'visibility')}
         ";
     }
 
@@ -115,27 +111,31 @@ class Mapper extends \Schoolbox\Mapper
         $collection = $this->createCollection();
 
         while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
-            if ($collection->offsetExists($row[$idColumn])) {
-                $tab = $collection->getOffset($row[$idColumn]);
-            } else {
-                $tab = $this->hydrate($row);
+            $tab = $this->hydrate($row);
 
-                $tab->setAvailabilityCampus($availabilityMapper->createCollection());
-                $tab->setVisibility($visibilityMapper->createCollection());
+            $tab->setAvailabilityCampus($availabilityMapper->createCollection());
+            $tab->setVisibility($visibilityMapper->createCollection());
 
-                $collection->setOffset($row[$idColumn], $tab);
+            $collection->setOffset($row[$idColumn], $tab);
+        }
+
+        /* Availabilities and Visibilities assigned separately
+         */
+        $campusAvailabilities = $availabilityMapper
+            ->findByColumn('profile_tab_id', $collection->getPropertyValues('id'))
+            ->groupByCallback(fn (\Schoolbox\Admin\Profile\Editor\Tab\Availability\Campus\Model $c) => $c->getTab()->getId());
+
+        $roletypeVisibilities = $visibilityMapper
+            ->findByColumn('profile_tab_id', $collection->getPropertyValues('id'))
+            ->groupByCallback(fn (\Schoolbox\Admin\Profile\Editor\Tab\Visibility\Model $r) => $r->getTab()->getId());
+
+        foreach ($collection as $tab) {
+            if (isset($campusAvailabilities[$tab->getId()])) {
+                $tab->setAvailabilityCampus($campusAvailabilities[$tab->getId()]);
             }
 
-            $availabilityCampus = $availabilityMapper->hydrate($row, 'availabilityCampus');
-
-            if ($availabilityCampus) {
-                $tab->getAvailabilityCampus()->setOffset($availabilityCampus->getId(), $availabilityCampus);
-            }
-
-            $visibility = $visibilityMapper->hydrate($row, 'visibility');
-
-            if ($visibility) {
-                $tab->getVisibility()->setOffset($visibility->getId(), $visibility);
+            if (isset($roletypeVisibilities[$tab->getId()])) {
+                $tab->setVisibility($roletypeVisibilities[$tab->getId()]);
             }
         }
 
