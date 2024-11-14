@@ -90,6 +90,7 @@ class Controller extends Base
         $this->response = $this->responseFromTemplate(
             '@pastoralManagement/groups.twig',
             [
+                // Pastoral Moderators have access to other parts of the admin system, so they should see the admin nav menu.
                 'showAdminNavMenu' => $this->getUser()->hasServicePermission(UserAccess::SERVICE_PASTORAL, UserAccess::ACCESS_FULL),
                 'groups' => $groups,
                 'breadcrumbs' => $breadcrumbs,

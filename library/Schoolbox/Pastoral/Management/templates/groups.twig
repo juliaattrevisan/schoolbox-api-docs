@@ -3,7 +3,7 @@
 {% import 'sub/breadcrumbs.twig' as bread %}
 {{ bread.crumbsArray(breadcrumbs) }}
 
-{% if  showAdminNavMenu%}
+{% if showAdminNavMenu%}
 <div class="admin-container row">
     {{ renderAdminNavigation(routeLookup('pastoralManagement.getGroups')) }}
     <div class="admin-content">
