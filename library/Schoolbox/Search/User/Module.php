@@ -71,6 +71,7 @@ class Module extends BaseModule
                 $this->getMapperFactory()->get(UserMapper::class)
             ),
             $this->getMapperFactory()->get(\Schoolbox\Admin\Profile\Editor\Field\Mapper::class),
+            $this->getMapperFactory()->get(\Schoolbox\Admin\Profile\Editor\Tab\Mapper::class),
         );
     }
 
