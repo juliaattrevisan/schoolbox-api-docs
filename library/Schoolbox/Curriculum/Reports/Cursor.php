@@ -46,7 +46,9 @@ class Cursor implements ICursor
     public const COURSE_ACTIVITY_PROJECT = 'project';
     public const COURSE_ACTIVITY_LESSON_PLAN = 'lessonPlan';
     public const COURSE_RUBRIC_CAPABILITY = 'rubricCapability';
+    public const COURSE_UNIT_RUBRIC_CAPABILITY = 'unitRubricCapability';
     public const COURSE_RUBRIC_INDICATOR = 'rubricIndicator';
+    public const COURSE_UNIT_RUBRIC_INDICATOR = 'unitRubricIndicator';
     public const COURSE_IN_USE_RUBRIC = 'inUseRubric';
 
     public function __construct(
@@ -259,6 +261,7 @@ class Cursor implements ICursor
                 $coursePlaceHolder
             );
 
+            //Course level capabilities
             $rubricCapabilityCountQuery = sprintf(
                 "
                 SELECT
@@ -271,6 +274,7 @@ class Cursor implements ICursor
                 INNER JOIN curriculum_node_for_rubric_capability cnrc
                     ON rc.id = cnrc.rubric_capability_id AND cnrc.curriculum_node_id IN %s
                 INNER JOIN course_specification cs ON cs.folder_id = rc.parent_id AND cs.id IN %s
+                WHERE rc.deleted_at IS NULL
                 GROUP BY cnrc.curriculum_node_id, cs.id, cs.folder_id
                 ",
                 self::COURSE_RUBRIC_CAPABILITY,
@@ -278,6 +282,30 @@ class Cursor implements ICursor
                 $coursePlaceHolder,
             );
 
+            //Unit level capabilities
+            $unitRubricCapabilityCountQuery = sprintf(
+                "
+                SELECT
+                    '%s' type,
+                    cnrc.curriculum_node_id,
+                    cus.course_specification_id courseSpecId,
+                    cus.folder_id unitId,
+                    COUNT(*) AS count
+                FROM rubric_capability rc
+                INNER JOIN curriculum_node_for_rubric_capability cnrc
+                ON rc.id = cnrc.rubric_capability_id
+                AND cnrc.curriculum_node_id IN %s
+                INNER JOIN course_unit_specification cus
+                ON cus.folder_id = rc.parent_id AND cus.course_specification_id IN %s
+                WHERE rc.deleted_at IS NULL
+                GROUP BY cnrc.curriculum_node_id, cus.id, cus.folder_id;
+                ",
+                self::COURSE_UNIT_RUBRIC_CAPABILITY,
+                $nodesPlaceHolder,
+                $coursePlaceHolder,
+            );
+
+            //Course level indicators
             $rubricIndicatorCountQuery = sprintf(
                 "
                 SELECT
@@ -291,9 +319,33 @@ class Cursor implements ICursor
                     ON ri.id = cnri.rubric_indicator_id AND cnri.curriculum_node_id IN %s
                 INNER JOIN rubric_capability rc ON rc.id = ri.rubric_capability_id
                 INNER JOIN course_specification cs ON cs.folder_id = rc.parent_id AND cs.id IN %s
+                WHERE rc.deleted_at IS NULL
                 GROUP BY cnri.curriculum_node_id, cs.id, cs.folder_id
                 ",
                 self::COURSE_RUBRIC_INDICATOR,
+                $nodesPlaceHolder,
+                $coursePlaceHolder,
+            );
+
+            //Unit level indicators
+            $unitRubricIndicatorCountQuery = sprintf(
+                "
+                SELECT
+                    '%s' type,
+                    cnri.curriculum_node_id,
+                    cus.course_specification_id courseSpecId,
+                    cus.folder_id unitId,
+                    COUNT(*) AS count
+                FROM rubric_indicator ri
+                INNER JOIN curriculum_node_for_rubric_indicator cnri
+                    ON ri.id = cnri.rubric_indicator_id AND cnri.curriculum_node_id IN %s
+                INNER JOIN rubric_capability rc ON rc.id = ri.rubric_capability_id
+                INNER JOIN course_unit_specification cus
+                    ON cus.folder_id = rc.parent_id AND cus.course_specification_id IN %s
+                WHERE ri.deleted_at IS NULL
+                GROUP BY cnri.curriculum_node_id, cus.course_specification_id, cus.folder_id
+                ",
+                self::COURSE_UNIT_RUBRIC_INDICATOR,
                 $nodesPlaceHolder,
                 $coursePlaceHolder,
             );
@@ -345,7 +397,9 @@ class Cursor implements ICursor
                         $unitActivityCountQuery,
                         $unitLessonPlanCountQuery,
                         $rubricCapabilityCountQuery,
+                        $unitRubricCapabilityCountQuery,
                         $rubricIndicatorCountQuery,
+                        $unitRubricIndicatorCountQuery,
                         $inUseRubricCountQuery,
                     ]
                 ) . ' )';
