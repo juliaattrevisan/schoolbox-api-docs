@@ -359,7 +359,13 @@ class Cursor implements ICursor
                        rubric.folder_id,
                        COUNT(*) AS count
                     FROM (
-                        SELECT cnrc.curriculum_node_id, cus.course_specification_id, cus.folder_id, v.assessment_id
+                        SELECT
+                            cnrc.curriculum_node_id,
+                            cus.course_specification_id,
+                            cus.folder_id,
+                            v.assessment_id,
+                            v.capability_id id,
+                            v.capability_name title
                         FROM v_rubric v
                         INNER JOIN curriculum_node_for_rubric_capability cnrc
                             ON cnrc.rubric_capability_id = v.capability_id
@@ -369,7 +375,13 @@ class Cursor implements ICursor
                             ON cus.id = acus.course_unit_specification_id
                             AND cus.course_specification_id IN %s
                         UNION
-                        SELECT cnri.curriculum_node_id, cus.course_specification_id, cus.folder_id, v.assessment_id
+                        SELECT
+                            cnri.curriculum_node_id,
+                            cus.course_specification_id,
+                            cus.folder_id,
+                            v.assessment_id,
+                            v.indicator_id id,
+                            v.indicator_name title
                         FROM v_rubric v
                         INNER JOIN curriculum_node_for_rubric_indicator cnri
                             ON cnri.rubric_indicator_id = v.indicator_id
