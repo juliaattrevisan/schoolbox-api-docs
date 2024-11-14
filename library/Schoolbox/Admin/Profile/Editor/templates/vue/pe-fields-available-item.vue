@@ -28,7 +28,7 @@ const disabled = window.Vue.computed(() => peFieldsStore.getActiveFieldType(prop
         @click="peFieldsStore.enableField(props.field.field)"
     >
         <pe-fields-icon :field="props.field" />
-        {{ props.field.displayAs }}
+        {{ peFieldsStore.getFieldName(props.field) }}
     </div>
 </template>
 

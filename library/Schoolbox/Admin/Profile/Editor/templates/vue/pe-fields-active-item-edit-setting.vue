@@ -32,6 +32,17 @@ function getLabelKeyForOption(fieldSettingOption: ProfileEditorFieldSettingOptio
 }
 
 /**
+ * Get the meta text for a field setting option
+ * @param fieldSettingOption - the field setting option
+ * @returns the meta text, or null if there is none
+ */
+function getMetaTextForOption(fieldSettingOption: ProfileEditorFieldSettingOption): string | null {
+    if (!peStore.selectedRoleType) return null;
+    if (!fieldSettingOption.meta) return null;
+    return fieldSettingOption.meta[peStore.selectedRoleType.roleType] || null;
+}
+
+/**
  * The field setting definition for the current field and field setting key
  */
 const fieldSettingDefinition = window.Vue.computed(() => {
@@ -55,9 +66,9 @@ window.Vue.onMounted(() => {
 </script>
 
 <template>
-    <div class="small-12 medium-6">
+    <div class="l-flex__item--1-grow">
         <label>
-            {{ fieldSettingDefinition.displayAs }}:
+            {{ fieldSettingDefinition.displayAs }}
             <span data-tooltip class="has-tip tip-top hint" :title="fieldSettingDefinition.tooltip"> ? </span>
         </label>
         <div class="checklist">
@@ -76,6 +87,9 @@ window.Vue.onMounted(() => {
                         :data-test="getLabelKeyForOption(fieldSettingOption)"
                     >
                         {{ fieldSettingOption.name }}
+                        <p v-if="getMetaTextForOption(fieldSettingOption)" class="meta">
+                            {{ getMetaTextForOption(fieldSettingOption) }}
+                        </p>
                     </label>
                 </li>
             </ul>

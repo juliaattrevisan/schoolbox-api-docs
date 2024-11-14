@@ -8,6 +8,7 @@ export type ProfileEditorFieldSettingOption = {
     id: number | string;
     name: string;
     type: string; // currently unused, e.g. "campus" or "role"
+    meta: Record<ProfileEditorRoleType["roleType"], string> | null; // additional explanation about the option, if required
 };
 
 export type ProfileEditorFieldSettingKey = string;
@@ -26,6 +27,7 @@ export type ProfileEditorAvailableField = {
     displayAs: string;
     icon: string | null;
     css: string | null;
+    terminology: string | null; // The terminology key for the field, if it exists - maps to l10n
     category: string; // The category to show the field under (these are the tabs at the top of the field palette)
 };
 
@@ -34,6 +36,7 @@ export type ProfileEditorSelectedField = {
     displayAs: string;
     icon: string | null;
     css: string | null;
+    terminology: string | null; // The terminology key for the field, if it exists - maps to l10n
     // A map of each field setting key relevant to the field to an array of the ids of each selected option
     fieldSettings: Record<ProfileEditorFieldSettingKey, ProfileEditorFieldSettingOption["id"][]>;
 };
@@ -43,6 +46,7 @@ export type ProfileEditorMandatoryField = {
     displayAs: string;
     icon: string | null;
     css: string | null;
+    terminology: string | null; // The terminology key for the field, if it exists - maps to l10n
     // A map of each field setting key relevant to the field to an array of the ids of each selected option
     fieldSettings: Record<ProfileEditorFieldSettingKey, ProfileEditorFieldSettingOption["id"][]>;
 };
@@ -75,6 +79,7 @@ export type ProfileEditorTabSettingOption = {
     id: number | string;
     name: string;
     type: string; // currently unused, e.g. "campus" or "role"
+    meta: Record<ProfileEditorRoleType["roleType"], string> | null; // additional explanation about the option, if required
 };
 
 export type ProfileEditorTabSettingKey = string;
@@ -101,7 +106,7 @@ export type ProfileEditorRoleType = {
     nameFormat: string; // The name format string for the role type (e.g. "{title} {firstname} {lastname")
     fields: {
         // Available Fields
-        // These should be sorted into alphabetical order
+        // These should be grouped by category, then grouped by .icon, then sorted alphabetically by .displayAs
         // and represent what could be dragged onto the profile screen's palette
         available: ProfileEditorAvailableField[];
         // Selected Fields

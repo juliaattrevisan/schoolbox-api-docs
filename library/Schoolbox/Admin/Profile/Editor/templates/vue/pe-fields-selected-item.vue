@@ -136,9 +136,9 @@ const isSaving = window.Vue.computed(() => {
 
             <div class="list-item">
                 <div class="card small-12 compact">
-                    <h3 :title="props.field.displayAs">
+                    <h3 :title="peFieldsStore.getFieldName(props.field)">
                         <pe-fields-icon :field="props.field" />
-                        {{ props.field.displayAs }}
+                        {{ peFieldsStore.getFieldName(props.field) }}
                     </h3>
                 </div>
             </div>

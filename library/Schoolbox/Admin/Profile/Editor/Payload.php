@@ -48,10 +48,10 @@ class Payload
      * Common nodes and human-readable name equivalents
      */
     private const AVAILABILITY_NODE = 'availability';
-    private const AVAILABILITY_NAME = 'Availability';
+    private const AVAILABILITY_NAME = 'Appears On';
     private const AVAILABILITY_TOOLTIP = 'Will appear on the selected campuses';
     private const VISIBILITY_NODE = 'visibility';
-    private const VISIBILITY_NAME = 'Visibility';
+    private const VISIBILITY_NAME = 'Visible For';
     private const VISIBILITY_TOOLTIP = 'Will appear for profile viewers in the selected role types';
 
     /**
@@ -61,6 +61,44 @@ class Payload
      */
     private const FIELD_CATEGORY_INTERNAL = 'Internal Fields';
     private const FIELD_CATEGORY_EXTERNAL = 'External Fields';
+
+
+    /**
+     * Additional meta for each setting option that can be chosen
+     * to provide more context to the user for what they're actually choosing.
+     * The meta can change depending on the selected role type tab, so we need to have each separately.
+     *
+     * This is a nested array of the form:
+     *  [The relevent settings key], e.g. self::VISIBILITY_NODE or self::AVAILABILITY_NODE
+     *    ->[The option id to which the meta applies, e.g. self::ROLETYPE_SELF]
+     *      ->[The role type (tab) for which the meta applies, e.g. Role::STUDENT]
+     *
+     * If the meta is not present for a given option, it will be null.
+     */
+    public const FIELD_SETTINGS_META = [
+        self::VISIBILITY_NODE => [
+            self::ROLETYPE_SELF => [
+                Role::STUDENT => "The user themself",
+                Role::STAFF => "The user themself",
+                Role::PARENT => "The user themself",
+            ],
+            Role::STUDENT => [
+                Role::STUDENT => "All users with the student role type",
+                Role::STAFF => "All users with the student role type",
+                Role::PARENT => "All users with the student role type",
+            ],
+            Role::STAFF => [
+                Role::STUDENT => "All users with the staff role type who have 'View Profile Access'",
+                Role::STAFF => "All users with the staff role type who have 'View Profile Access'",
+                Role::PARENT => "All users with the staff role type who have 'View Profile Access'",
+            ],
+            Role::PARENT => [
+                Role::STUDENT => "Parent users with a relationship to the student",
+                Role::STAFF => "All users with the parent role type",
+                Role::PARENT => "All users with the parent role type",
+            ]
+        ]
+    ];
 
 
     /**
@@ -143,7 +181,8 @@ class Payload
             $fieldSettingsCampus['options'][] = [
                 'type' => 'campus',
                 'id' => $campus->getId(),
-                'name' => $campus->getName()
+                'name' => $campus->getName(),
+                'meta' => null, // potentially overridden later by FIELD_SETTINGS_META
             ];
         }
 
@@ -156,7 +195,8 @@ class Payload
                 [
                     'type' => 'roleType',
                     'id' => self::ROLETYPE_SELF,
-                    'name' => ucwords(self::ROLETYPE_SELF)
+                    'name' => ucwords(self::ROLETYPE_SELF),
+                    'meta' => null, // potentially overridden later by FIELD_SETTINGS_META
                 ]
             ]
         ];
@@ -173,6 +213,17 @@ class Payload
             self::AVAILABILITY_NODE => $fieldSettingsCampus,
             self::VISIBILITY_NODE => $fieldSettingsRoleType
         ];
+
+        // Add meta to the field settings, if it exists
+        foreach ($payload['data']['fieldSettings'] as $node => &$settings) {
+            if (isset(self::FIELD_SETTINGS_META[$node])) {
+                foreach ($settings['options'] as &$option) {
+                    if (isset(self::FIELD_SETTINGS_META[$node][$option['id']])) {
+                        $option['meta'] = self::FIELD_SETTINGS_META[$node][$option['id']];
+                    }
+                }
+            }
+        }
 
         // tabSettings is currently identical to fieldSettings but this allows it to diverge in the future
         $payload['data']['tabSettings'] = $payload['data']['fieldSettings'];
