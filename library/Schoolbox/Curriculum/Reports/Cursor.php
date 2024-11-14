@@ -298,7 +298,7 @@ class Cursor implements ICursor
                 INNER JOIN course_unit_specification cus
                 ON cus.folder_id = rc.parent_id AND cus.course_specification_id IN %s
                 WHERE rc.deleted_at IS NULL
-                GROUP BY cnrc.curriculum_node_id, cus.id, cus.folder_id;
+                GROUP BY cnrc.curriculum_node_id, cus.id, cus.folder_id
                 ",
                 self::COURSE_UNIT_RUBRIC_CAPABILITY,
                 $nodesPlaceHolder,
