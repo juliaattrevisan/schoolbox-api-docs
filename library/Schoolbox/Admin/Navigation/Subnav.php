@@ -290,7 +290,7 @@ class Subnav
                         'children'    => [],
                         'description' => 'Add and remove links to the hierarchical navigation menu on the left hand side of the screen.',
                     ],
-                    '/adminv2/setting/design/Skin Config' => [
+                    '/adminv2/setting/design/Skin%20Config' => [
                         'name'        => 'Skin Config',
                         'visible'     => $userIsSuperuser || $userHasServicePermissionDesign,
                         'children'    => [],
@@ -494,7 +494,7 @@ class Subnav
                         'children'    => [],
                         'description' => 'Configure the default and available filter options on the course markbook.',
                     ],
-                    '/adminv2/setting/lms/Document Management' => [
+                    '/adminv2/setting/lms/Document%20Management' => [
                         'name'        => 'Document Management',
                         'visible'     => (
                             ($userIsSuperuser || $userHasServicePermissionLms) &&
@@ -538,7 +538,7 @@ class Subnav
                         'children'    => [],
                         'description' => 'Configure ' . $rosettaStone->translate("lessonPlan", false, false) . ' templates.',
                     ],
-                    '/adminv2/setting/lms/LMS Policy' => [
+                    '/adminv2/setting/lms/LMS%20Policy' => [
                         'name'        => 'LMS Policy',
                         'visible'     => (
                             ($userIsSuperuser || $userHasServicePermissionLms) &&
@@ -766,7 +766,7 @@ class Subnav
                 'visible'    => $userIsSuperuser || $userHasServicePermissionPastoral,
                 'searchable' => false,
                 'children'   => [
-                    '/adminv2/setting/pastoral/Pastoral Care' => [
+                    '/adminv2/setting/pastoral/Pastoral%20Care' => [
                         'name'        => 'Settings / Policy',
                         'visible'     => (
                             ($userIsSuperuser || $userHasServicePermissionPastoral) &&

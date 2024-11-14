@@ -43,11 +43,7 @@ class Controller extends ConfigController
             throw Mapper::getInstance()->generateException(Mapper::ERROR_PAGE_NOT_FOUND);
         }
 
-        $settingsCategory = $this->getSettingsCategoryFromTypeLabel($typeLabel);
-        // NOTE: $typeLabel is not passed to routeGenerator->generate() to avoid regex match error
-        //       E.g. "Parameter value for [typeLabel] did not match the regex `LMS%20Policy`"
-        $routeUrlTemplate = $this->routeGenerator->generate("settings.postSettings$settingsCategory");
-        $routeUrl = str_replace('{typeLabel}', $typeLabel, $routeUrlTemplate);
+        $routeUrl = $this->getRouteUrlFromTypeLabel($typeLabel);
         $configContext = $this->buildConfigContext(
             $this->buildConfigPredicate($typeLabel),
             $routeUrl,
@@ -240,12 +236,7 @@ class Controller extends ConfigController
             $this->oidcCache->clear();
         }
 
-        $settingsCategory = $this->getSettingsCategoryFromTypeLabel($typeLabel);
-        $routeUrlTemplate = $this->routeGenerator->generate("settings.getSettings$settingsCategory");
-        $routeUrl = str_replace('{typeLabel}', $typeLabel, $routeUrlTemplate);
-        $routeUrlDecoded = urldecode($routeUrl);
-
-        $this->response = $this->redirectAfterPost($routeUrlDecoded);
+        $this->response = $this->redirectAfterPost($this->getRouteUrlFromTypeLabel($typeLabel));
     }
 
     // Functions for routes accessible by Pastoral Moderators --------------------------------------------------------//
@@ -353,6 +344,38 @@ class Controller extends ConfigController
                    ->equals(ConfigMapper::COL_MODULE, ConfigMapper::MODULE_SETTINGS);
 
         return $pb;
+    }
+
+    /**
+     * @param string $typeLabel
+     * @return string
+     * @throws RouteNotFound
+     */
+    private function getRouteUrlFromTypeLabel(string $typeLabel): string
+    {
+        // Encode the spaces in the typeLabel before passing to $this->routeGenerator->generate().
+        // Note replacing ' ' with '%20' is not the same as calling urlencode().  We want '%20', not '+', because
+        // the typeLabel in the URL will be to the left of the '?', and the rule for URL encoding of spaces is:
+        // 'Use %20 before the ? and + after'
+        // https://stackoverflow.com/questions/1634271/url-encoding-the-space-character-or-20#answer-29948396
+        // Example expected value for $typeLabel       : '3rd Party Services'
+        // Example expected value for $typeLabelEncoded: '3rd%20Party%20Services'
+        $typeLabelEncoded = str_replace(' ', '%20', $typeLabel);
+
+        // Note a double-encoded URL will be returned here.
+        // That seems to imply that when the route was registered, a decoded URL should have been used.  However, I
+        // could not get matching to work without encoding the URLs when registering the routes (see Admin/Settings/Module.php).
+        // So, we just have to deal with the double-encoding by decoding the returned value.
+        $routeUrlDoubleEncoded = $this->routeGenerator->generate(
+            'settings.getSettings' . $this->getSettingsCategoryFromTypeLabel($typeLabel),
+            ['typeLabel' => $typeLabelEncoded]
+        );
+
+        // Example expected value for $routeUrlDoubleEncoded: /adminv2/setting/3rd%2520Party%2520Services
+        // Example expected value for $routeUrlEncoded      : /adminv2/setting/3rd%20Party%20Services
+        $routeUrlEncoded = urldecode($routeUrlDoubleEncoded);
+
+        return $routeUrlEncoded;
     }
 
     /**
