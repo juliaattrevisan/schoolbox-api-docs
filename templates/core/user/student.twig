@@ -54,7 +54,6 @@
 %}
 {% set showSubjects = showDetails and subjects is not empty %}
 {% set showGroups = showDetails and groups is not empty %}
-{% set showTitle = user.hasPositionTitle() %}
 
 {% set shareLearningMomentUrl = routeLookupIfAuthorized(
     'learningMomentEvidence.getCreateForm',
