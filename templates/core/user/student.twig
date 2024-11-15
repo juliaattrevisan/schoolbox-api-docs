@@ -813,14 +813,7 @@
                             {% block contacts %}
                                 <h2 class="subheader">Contact Information</h2>
 
-                                {% if user.isShowContacts %}
-                                    {% if externalUser.ParentsSeparatedFlag ?? false %}
-                                        {% block parents_separated %}
-                                            <div class="alert-box highlight icon-info">Parents Separated</div>
-                                        {% endblock parents_separated %}
-                                    {% endif %}
-
-                                    {% if contacts|length %}
+                                {% if user.isShowContacts and contacts|length %}
                                     <section>
                                         <ul class="information-list expandable-card">
                                             {% for contact in contacts %}
