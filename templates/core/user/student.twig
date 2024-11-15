@@ -56,7 +56,6 @@
 {% set showGroups = showDetails and groups is not empty %}
 {% set showTitle = user.hasPositionTitle() %}
 
-{% set showAchievementsTab = config.badges_enabled and (isStaffWhoCanView or isSelf or isParentOfStudent) %}
 {% set shareLearningMomentUrl = routeLookupIfAuthorized(
     'learningMomentEvidence.getCreateForm',
     {
@@ -407,20 +406,19 @@
             });
         </script>
 
-        {# These are all the possible tab buttons that could exist
+        {# These are all the possible tabs that could exist
          # and the booleans which determine if they're currently available
          #
-         # The first button in the list is always selected by default
+         # The first tab in the list is always selected by default
          # activeTab setting will override it later if appropriate to do so
          # based on the anchor in the url via javascript
          #}
-
         {% set additionalConstraints = {
             'student': {
                 '_default': true,
                 'activity': (config.learning_moments_enabled and user.learningMomentsEnabled) or config.badges_enabled or config.grades_enabled,
-                'goals': showAchievementsTab,
-                'achievements': showAchievementsTab,
+                'goals': config.badges_enabled,
+                'achievements': config.badges_enabled,
                 'classes': showClasses and showSubjects,
                 'groups': showGroups,
                 'contacts': showContactsTab
@@ -428,20 +426,20 @@
             'parent': {
                 '_default': true,
                 'activity': (config.learning_moments_enabled and user.learningMomentsEnabled) or config.badges_enabled or config.grades_enabled,
-                'goals': showAchievementsTab,
-                'achievements': showAchievementsTab,
+                'goals': config.badges_enabled,
+                'achievements': config.badges_enabled,
                 'classes': showClasses and showSubjects,
                 'groups': showGroups,
                 'contacts': showContactsTab
             },
             'staff': {
-                '_default': true,
-                'activity': (config.learning_moments_enabled and user.learningMomentsEnabled) or config.badges_enabled or config.grades_enabled,
-                'goals': showAchievementsTab,
-                'achievements': showAchievementsTab,
-                'classes': showClasses and showSubjects,
-                'groups': showGroups,
-                'contacts': showContactsTab
+                '_default': USER.role.viewStudentProfile,
+                'activity': USER.role.viewStudentProfile and ((config.learning_moments_enabled and user.learningMomentsEnabled) or config.badges_enabled or config.grades_enabled),
+                'goals': USER.role.viewStudentProfile and config.badges_enabled,
+                'achievements': USER.role.viewStudentProfile and config.badges_enabled,
+                'classes': USER.role.viewStudentProfile and showClasses and showSubjects,
+                'groups': USER.role.viewStudentProfile and showGroups,
+                'contacts': USER.role.viewStudentProfile and showContactsTab
             },
         } %}
 
@@ -502,7 +500,7 @@
                 </div>
             {% endif %}
 
-            {% if showAchievementsTab %}
+            {% if additionalConstraints[USER.role.type]['achievements'] ?? additionalConstraints[USER.role.type]['_default'] %}
                 <div class="content no-pad {% if activeTab == 'goals' %}active{% endif %}" id="tab-goals">
                     <div id="goal-feed" class="goals-achievements">
                         <goal-feed
