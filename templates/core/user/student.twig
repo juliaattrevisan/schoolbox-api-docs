@@ -53,7 +53,6 @@
     or showEmergencyContacts
 %}
 {% set showSubjects = showDetails and subjects is not empty %}
-{% set showGroups = showDetails and groups is not empty %}
 
 {% set shareLearningMomentUrl = routeLookupIfAuthorized(
     'learningMomentEvidence.getCreateForm',
@@ -419,7 +418,6 @@
                 'goals': config.badges_enabled,
                 'achievements': config.badges_enabled,
                 'classes': showClasses and showSubjects,
-                'groups': showGroups,
                 'contacts': showContactsTab
             },
             'parent': {
@@ -428,7 +426,6 @@
                 'goals': config.badges_enabled,
                 'achievements': config.badges_enabled,
                 'classes': showClasses and showSubjects,
-                'groups': showGroups,
                 'contacts': showContactsTab
             },
             'staff': {
@@ -437,7 +434,6 @@
                 'goals': USER.role.viewStudentProfile and config.badges_enabled,
                 'achievements': USER.role.viewStudentProfile and config.badges_enabled,
                 'classes': USER.role.viewStudentProfile and showClasses and showSubjects,
-                'groups': USER.role.viewStudentProfile and showGroups,
                 'contacts': USER.role.viewStudentProfile and showContactsTab
             },
         } %}
@@ -499,7 +495,7 @@
                 </div>
             {% endif %}
 
-            {% if additionalConstraints[USER.role.type]['achievements'] ?? additionalConstraints[USER.role.type]['_default'] %}
+            {% if additionalConstraints[USER.role.type]['goals'] ?? additionalConstraints[USER.role.type]['_default'] %}
                 <div class="content no-pad {% if activeTab == 'goals' %}active{% endif %}" id="tab-goals">
                     <div id="goal-feed" class="goals-achievements">
                         <goal-feed
@@ -508,7 +504,9 @@
                         />
                     </div>
                 </div>
+            {% endif %}
 
+            {% if additionalConstraints[USER.role.type]['achievements'] ?? additionalConstraints[USER.role.type]['_default'] %}
                 <div class="content no-pad {% if activeTab == 'achievements' %}active{% endif %}" id="tab-achievements">
                     <div id="achievement-feed" class="goals-achievements">
                         <achievement-feed
@@ -729,98 +727,100 @@
                 </div>
             {% endif %}
 
-            {% if showGroups %}
-                <div class="content no-pad {% if activeTab == 'groups' %}active{% endif %}" id="tab-groups">
-                    <section>
-                        <h2 class="subheader content">Groups</h2>
-                        <section class="v-card-list classes-groups content">
-                            {% for groupKey, group in groups %}
-                                <div class="v-card">
-                                    {% if group.linkedToFolder %}
-                                    <a href="/homepage/{{ group.id }}">
-                                        {% endif %}
-                                        <div class="card-class-image"
-                                             style="border-bottom-width: 10px;
-                                                     border-bottom-style: solid;
-                                             {% if group.folder is defined and group.folder.colour %}
-                                                     background-color:{{ group.folder.colour }};
-                                                     border-bottom-color: {{ group.folder.colour }};
-                                             {% endif %}
-                                                {% if group.folder is defined and group.folder.coverImage %}
-                                                     background-image: url('/storage/image.php?hash={{ group.folder.coverImage.hash }}&size=cardImageLarge');
-                                                     background-size: cover;
-                                                     background-repeat: no-repeat;
-                                                     background-position: center;
-                                             {% endif %}"
-                                        >
-                                            {% if group.owners is defined %}
-                                                <div class="related groups">
-                                                    {# A card can't fit more than 5 group owners comfortably, so four are displayed,
-                                                with the remaining counted, and displayed in tool tip #}
-                                                    {% set maxOwnersToShowCount = 4 %}
-                                                    {% set ownersHead = group.owners[:maxOwnersToShowCount] %}
-                                                    {% for owner in ownersHead %}
-                                                        {% include 'include/portrait.twig' with {user: owner, description: owner.fullName} only %}
-                                                    {% endfor %}
-                                                    {% set ownersTail = group.owners[maxOwnersToShowCount:] %}
-                                                    {% if ownersTail|length %}
-                                                        {% set groupOwnersNames = '' %}
-                                                        {% for owner in ownersTail %}
-                                                            {% if loop.index == ownersTail|length %}
-                                                                {% set groupOwnersNames = groupOwnersNames ~ owner.formatName %}
-                                                            {% else %}
-                                                                {% set groupOwnersNames = groupOwnersNames ~ owner.formatName ~ '<br/>' %}
-                                                            {% endif %}
-                                                        {% endfor %}
-                                                        {% set remainingGroupOwnersCount = group.owners|length - maxOwnersToShowCount  %}
-                                                        <div class="plus-more" data-tooltip class="hint has-tip tip-top" title="{{ groupOwnersNames }}">+{{ remainingGroupOwnersCount }}</div>
-                                                    {% endif %}
-                                                </div>
-                                            {% endif %}
-                                        </div>
+            {% if additionalConstraints[USER.role.type]['groups'] ?? additionalConstraints[USER.role.type]['_default'] %}
+                {% if groups is not empty %}
+                    <div class="content no-pad {% if activeTab == 'groups' %}active{% endif %}" id="tab-groups">
+                        <section>
+                            <h2 class="subheader content">Groups</h2>
+                            <section class="v-card-list classes-groups content">
+                                {% for groupKey, group in groups %}
+                                    <div class="v-card">
                                         {% if group.linkedToFolder %}
-                                    </a>
-                                    {% endif %}
-
-                                    {% set hasOwnersWithEmail = false %}
-                                    {% if group.owners is defined and canEmailStaff %}
-                                        {% for owner in group.owners %}
-                                            {% if not owner.email is empty %}
-                                                {% set hasOwnersWithEmail = true %}
+                                        <a href="/homepage/{{ group.id }}">
                                             {% endif %}
-                                        {% endfor %}
-                                    {% endif %}
-                                    <div class="card-content classes groups actions-small-{{ hasOwnersWithEmail ? '1' : '0' }}">
-                                        <div class="list-item">
+                                            <div class="card-class-image"
+                                                 style="border-bottom-width: 10px;
+                                                         border-bottom-style: solid;
+                                                 {% if group.folder is defined and group.folder.colour %}
+                                                         background-color:{{ group.folder.colour }};
+                                                         border-bottom-color: {{ group.folder.colour }};
+                                                 {% endif %}
+                                                    {% if group.folder is defined and group.folder.coverImage %}
+                                                         background-image: url('/storage/image.php?hash={{ group.folder.coverImage.hash }}&size=cardImageLarge');
+                                                         background-size: cover;
+                                                         background-repeat: no-repeat;
+                                                         background-position: center;
+                                                 {% endif %}"
+                                            >
+                                                {% if group.owners is defined %}
+                                                    <div class="related groups">
+                                                        {# A card can't fit more than 5 group owners comfortably, so four are displayed,
+                                                    with the remaining counted, and displayed in tool tip #}
+                                                        {% set maxOwnersToShowCount = 4 %}
+                                                        {% set ownersHead = group.owners[:maxOwnersToShowCount] %}
+                                                        {% for owner in ownersHead %}
+                                                            {% include 'include/portrait.twig' with {user: owner, description: owner.fullName} only %}
+                                                        {% endfor %}
+                                                        {% set ownersTail = group.owners[maxOwnersToShowCount:] %}
+                                                        {% if ownersTail|length %}
+                                                            {% set groupOwnersNames = '' %}
+                                                            {% for owner in ownersTail %}
+                                                                {% if loop.index == ownersTail|length %}
+                                                                    {% set groupOwnersNames = groupOwnersNames ~ owner.formatName %}
+                                                                {% else %}
+                                                                    {% set groupOwnersNames = groupOwnersNames ~ owner.formatName ~ '<br/>' %}
+                                                                {% endif %}
+                                                            {% endfor %}
+                                                            {% set remainingGroupOwnersCount = group.owners|length - maxOwnersToShowCount  %}
+                                                            <div class="plus-more" data-tooltip class="hint has-tip tip-top" title="{{ groupOwnersNames }}">+{{ remainingGroupOwnersCount }}</div>
+                                                        {% endif %}
+                                                    </div>
+                                                {% endif %}
+                                            </div>
                                             {% if group.linkedToFolder %}
-                                                <a href="/homepage/{{ group.id }}">
+                                        </a>
+                                        {% endif %}
+
+                                        {% set hasOwnersWithEmail = false %}
+                                        {% if group.owners is defined and canEmailStaff %}
+                                            {% for owner in group.owners %}
+                                                {% if not owner.email is empty %}
+                                                    {% set hasOwnersWithEmail = true %}
+                                                {% endif %}
+                                            {% endfor %}
+                                        {% endif %}
+                                        <div class="card-content classes groups actions-small-{{ hasOwnersWithEmail ? '1' : '0' }}">
+                                            <div class="list-item">
+                                                {% if group.linkedToFolder %}
+                                                    <a href="/homepage/{{ group.id }}">
+                                                        <h3>{{ group.name }}</h3>
+                                                    </a>
+                                                {% else %}
                                                     <h3>{{ group.name }}</h3>
-                                                </a>
-                                            {% else %}
-                                                <h3>{{ group.name }}</h3>
+                                                {% endif %}
+                                            </div>
+                                            {% if hasOwnersWithEmail and canEmailStaff %}
+                                                <nav>
+                                                    <sbx-pop-out content-id="group-options-{{ groupKey }}"></sbx-pop-out>
+                                                </nav>
+                                                <ul id="group-options-{{ groupKey }}" class="f-dropdown" data-dropdown-content>
+                                                    {% for owner in group.owners %}
+                                                        {% if not owner.email is empty %}
+                                                            <li>
+                                                                {% set replyTo = owner.getFormattedEmailDisplay %}
+                                                                <a class="icon-email" href="{{ session.mailhandle }}{{ replyTo }}" title="Email {{ replyTo }}">Email {{ owner.formatName }}</a>
+                                                            </li>
+                                                        {% endif %}
+                                                    {% endfor %}
+                                                </ul>
                                             {% endif %}
                                         </div>
-                                        {% if hasOwnersWithEmail and canEmailStaff %}
-                                            <nav>
-                                                <sbx-pop-out content-id="group-options-{{ groupKey }}"></sbx-pop-out>
-                                            </nav>
-                                            <ul id="group-options-{{ groupKey }}" class="f-dropdown" data-dropdown-content>
-                                                {% for owner in group.owners %}
-                                                    {% if not owner.email is empty %}
-                                                        <li>
-                                                            {% set replyTo = owner.getFormattedEmailDisplay %}
-                                                            <a class="icon-email" href="{{ session.mailhandle }}{{ replyTo }}" title="Email {{ replyTo }}">Email {{ owner.formatName }}</a>
-                                                        </li>
-                                                    {% endif %}
-                                                {% endfor %}
-                                            </ul>
-                                        {% endif %}
                                     </div>
-                                </div>
-                            {% endfor %}
+                                {% endfor %}
+                            </section>
                         </section>
-                    </section>
-                </div>
+                    </div>
+                {% endif %}
             {% endif %}
 
             {% if showContactsTab %}
