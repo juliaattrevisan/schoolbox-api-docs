@@ -9,58 +9,78 @@ declare(strict_types=1);
 
 namespace Schoolbox\Pastoral\BulkImport;
 
+use Alaress\Paginator;
 use Alaress\Web\Controller\Base;
+use Alaress_Date_Format;
 use League\Flysystem\FilesystemException;
 use Schoolbox\Config\ConfigMapper;
-use Schoolbox\GenericCollection;
 use Schoolbox\L10n\RosettaStone;
+use Schoolbox\Learning\Assessment\Redirect;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Pastoral;
 use Schoolbox\Pastoral\TemplateDataHelper;
+use Schoolbox\Pastoral\Translator\VisibilityTranslator;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
 use Schoolbox\Resource\Attachment\Zone;
-use Schoolbox\Resource\Browser\NodeFactory;
 use Schoolbox\Resource\Exception as ResourceException;
 use Schoolbox\Resource\Storage;
 use Schoolbox\Role;
-use Schoolbox\RoleMapper;
-use Schoolbox\TokenReplacer\Simple;
-use Schoolbox\User;
+use Schoolbox\TokenReplacer;
+use Schoolbox\Url\Uri;
 use Schoolbox\UserMapper;
+use Symfony\Component\HttpFoundation\Response as HttpResponse;
 use ZipArchive;
 
 /**
  * Controller for bulk importation of pastoral records.
+ *
+ * @phpstan-import-type ImportLog from Model
  */
 class Controller extends Base
 {
     /**
+     * How many imports are shown per list page?
+     */
+    private const PAGE_SIZE = 10;
+
+    /**
+     * Which query string param is the page number in?
+     */
+    private const PAGE_QUERY_STRING_PARAM = 'page';
+
+    /**
      * Constructor
      *
-     * @param RosettaStone             $translator             Used for translating values used in the page title.
-     * @param Pastoral\DataSource      $pastoralDataSource     Used for creating pastoral records.
-     * @param Pastoral\SubType\Mapper  $pastoralSubTypeMapper  Used for loading and validating pastoral subtypes.
-     * @param Pastoral\Type\Mapper     $pastoralTypeMapper     Used for loading and validating pastoral types.
-     * @param Pastoral\Severity\Mapper $pastoralSeverityMapper Used for loading pastoral severities.
-     * @param Pastoral\Access\Mapper   $pastoralAccessMapper   Used for determining roles which may access records.
-     * @param Pastoral\Group\Mapper    $pastoralGroupMapper    Used for loading pastoral groups to select visibility.
-     * @param UserMapper               $userMapper             Used for loading pastoral moderators.
-     * @param Pastoral\Audience\Mapper $pastoralAudienceMapper Used for loading audiences for types and subtypes.
-     * @param Storage\FilesystemProxy  $filesystemProxy        Used for copying ZIP files from storage to local:
-     *                                                         required for working with ZIP files.
-     * @param Storage\Receiver         $receiver               Used for copying streams from inside the ZIP to storage.
-     * @param Pastoral\RecordProcessor $recordProcessor        Used for actually saving pastoral records according to
-     *                                                         form input.
+     * @param RosettaStone               $translator               For translating values used in the page title.
+     * @param Mapper                     $pastoralBulkImportMapper For creating bulk import records.
+     * @param Pastoral\DataSource        $pastoralDataSource       For creating pastoral records.
+     * @param Pastoral\SubType\Mapper    $pastoralSubTypeMapper    For loading and validating pastoral subtypes.
+     * @param Pastoral\Type\Mapper       $pastoralTypeMapper       For loading and validating pastoral types.
+     * @param Pastoral\Severity\Mapper   $pastoralSeverityMapper   For loading pastoral severities.
+     * @param Pastoral\Tag\Mapper        $pastoralTagMapper        For saving pastoral tags.
+     * @param Pastoral\Access\Mapper     $pastoralAccessMapper     For determining roles which may access records.
+     * @param Pastoral\Group\Mapper      $pastoralGroupMapper      For loading pastoral groups to select visibility.
+     * @param Pastoral\Attachment\Mapper $pastoralAttachmentMapper For creating pastoral attachments.
+     * @param UserMapper                 $userMapper               For loading pastoral moderators.
+     * @param Pastoral\Audience\Mapper   $pastoralAudienceMapper   For loading audiences for types and subtypes.
+     * @param Storage\FilesystemProxy    $filesystemProxy          For copying ZIP files from storage to local:
+     *                                                             required for working with ZIP files.
+     * @param Storage\Receiver           $receiver                 For copying streams from inside upload to storage.
+     * @param Pastoral\RecordProcessor   $recordProcessor          For actually saving pastoral records according to
+     *                                                             form input.
      */
     public function __construct(
         private RosettaStone $translator,
+        private Mapper $pastoralBulkImportMapper,
         private Pastoral\DataSource $pastoralDataSource,
         private Pastoral\SubType\Mapper $pastoralSubTypeMapper,
         private Pastoral\Type\Mapper $pastoralTypeMapper,
         private Pastoral\Severity\Mapper $pastoralSeverityMapper,
+        private Pastoral\Tag\Mapper $pastoralTagMapper,
         private Pastoral\Access\Mapper $pastoralAccessMapper,
         private Pastoral\Group\Mapper $pastoralGroupMapper,
+        private Pastoral\Attachment\Mapper $pastoralAttachmentMapper,
         private UserMapper $userMapper,
         private Pastoral\Audience\Mapper $pastoralAudienceMapper,
         private Storage\FilesystemProxy $filesystemProxy,
@@ -70,14 +90,64 @@ class Controller extends Base
     }
 
     /**
-     * Display form for creating a pastoral bulk import.
+     * Display list of previous imports.
      *
      * @api   GET /pastoral/bulk-import
      * @since 24.1
      *
      * @return void
      */
-    public function getForm(): void
+    public function getList(): void
+    {
+        // Set up pagination
+        $currentUrl  = $this->routeGenerator->generate('pastoralBulkImport.getList');
+        $importCount = $this->pastoralBulkImportMapper->countAll();
+        $paginator   = (new Paginator\UrlPaginator())
+            ->setUrl($currentUrl)
+            ->setPaginator(new Paginator\Paginator())
+            ->setPageSize(self::PAGE_SIZE)
+            ->setParam(self::PAGE_QUERY_STRING_PARAM)
+            ->setTotal($importCount);
+        $currentPage = $this->requestQuery->get(self::PAGE_QUERY_STRING_PARAM, 1);
+
+        // Show x number of previous imports, and when they were imported, and
+        // their undo status.
+        $imports = ($importCount > 0)
+            ? $this->pastoralBulkImportMapper->findAll([
+                'order'  => [
+                    'created_at' => $this->pastoralBulkImportMapper::SORT_ORDER_DESC,
+                    'id'         => $this->pastoralBulkImportMapper::SORT_ORDER_DESC,
+                ],
+                'limit'  => $paginator->getPageSize(),
+                'offset' => $paginator->getOffset($currentPage),
+            ])
+            : $this->pastoralBulkImportMapper->createCollection();
+
+        $this->response = $this->responseFromTemplate(
+            '@pastoralBulkImport/list.twig',
+            [
+                'imports'     => $imports,
+                'paginator'   => $paginator,
+                'currentPage' => $currentPage,
+
+                // Encode return URL separately, so that page number is included
+                'encodedReturnUrl' => Redirect::encode(
+                    (new Uri($currentUrl))
+                        ->withQuery(http_build_query([self::PAGE_QUERY_STRING_PARAM => $currentPage]))
+                ),
+            ],
+        );
+    }
+
+    /**
+     * Display form for creating a pastoral bulk import.
+     *
+     * @api   GET /pastoral/bulk-import/create
+     * @since 24.1
+     *
+     * @return void
+     */
+    public function getCreateImportForm(): void
     {
         // Make loading data a little easier
         $templateDataHelper = new TemplateDataHelper(
@@ -118,35 +188,132 @@ class Controller extends Base
     }
 
     /**
-     * Display preview of pastoral bulk import, after having posted the form
-     * above.
+     * Save the form import.
      *
-     * @api   POST /pastoral/bulk-import/preview
+     * @api   POST /pastoral/bulk-import/create
      * @since 24.1
      *
      * @return void
      */
-    public function postImportPreview(): void
+    public function postCreateImport(): void
     {
-        // Load the Zip file's contents, cleaning up once done.
-        $zipArchive       = null;
-        $localZipFilename = null;
-        try {
-            $zipStorage       = $this->loadZipFromStorage();
-            $localZipFilename = $this->createLocalZipFile($zipStorage);
-            $zipArchive       = $this->createZipArchive($localZipFilename);
-            $files            = $this->associateFilesWithUser($zipArchive);
-        } finally {
-            $this->cleanup($zipArchive, $localZipFilename);
+        // Save the import here, then redirect to a create page.
+        $zipStorage = $this->loadZipFromStorage();
+        $type       = $this->pastoralTypeMapper->findById($this->requestPost->get('typeId'));
+        $subType    = $this->requestPost->get('subtypeId')
+            ? $this->pastoralSubTypeMapper->findById($this->requestPost->get('subtypeId'))
+            : null;
+        $import     = $this->pastoralBulkImportMapper->createModel()
+            ->setOwner($this->getUser())
+            ->setZip($zipStorage)
+            ->setFilePathTemplate($this->requestPost->get('template'))
+            ->setSeverity(
+                $this->getConfigLoader()->get(ConfigMapper::NAME_PASTORAL_SEVERITY_ENABLED)
+                    ? $this->pastoralSeverityMapper->findById($this->requestPost->get('severityId'))
+                    : null
+            )
+            ->setType($this->pastoralTypeMapper->findById($this->requestPost->get('typeId')))
+            ->setSubtype($subType)
+            ->setHeading($this->requestPost->get('heading'))
+            ->setBodyPublic($this->requestPost->get('body_public'))
+            ->setPoints($this->requestPost->getFloat('points'))
+            ->setImportedAt(null)
+        ;
+
+        // Create tags
+        $import = $import->setTags(
+            $this->recordProcessor->prepareTags(
+                $this->requestPost->get('tags') ?? '',
+                $this->requestPost->get('tagNames') ?? ''
+            )
+        );
+
+        // Create access
+        $visibilityTranslator = new VisibilityTranslator(
+            $this->pastoralAccessMapper,
+            $this->pastoralGroupMapper,
+            $this->userMapper,
+            Access\Model::class,
+        );
+        $import = $import->setAccess($visibilityTranslator->prepareAccesses($this->requestPost, $subType ?? $type));
+
+        // And save
+        $this->pastoralBulkImportMapper->save($import);
+
+        // Then, redirect to a place where the fields are displayed
+        $this->response = $this->redirectAfterPost(
+            $this->generateRedirectUrl(
+                $import,
+                $this->routeGenerator->generate('pastoralBulkImport.getImport', ['id' => $import->getId()]),
+            ),
+        );
+    }
+
+    /**
+     * Delete the bulk import.
+     *
+     * This will _not_ delete any pastoral records created by the import:
+     * it will only remove the bulk import from the form.
+     *
+     * @api   POST /pastoral/bulk-import/delete
+     * @since 24.1
+     *
+     * @param Model $import
+     * @return void
+     * @throws MapperException
+     */
+    public function postDeleteImport(Model $import): void
+    {
+        $this->pastoralBulkImportMapper->delete($import);
+        $this->response = $this->redirectAfterPost(
+            $this->generateRedirectUrl(
+                $import,
+                $this->routeGenerator->generate('pastoralBulkImport.getList', ['id' => $import->getId()]),
+            ),
+        );
+    }
+
+    /**
+     * Display the current state of `$import`, including whether or not it has
+     * actually been imported.
+     *
+     * @api   GET /pastoral/bulk-import/{id}
+     * @since 24.1
+     *
+     * @param Model $import
+     * @return void
+     */
+    public function getImport(Model $import): void
+    {
+        if ($import->getImportLog() === null) {
+            // Generate the import log from the ZIP file's contents,
+            // cleaning up once done.
+            $zipArchive       = null;
+            $localZipFilename = null;
+            try {
+                $zipStorage = $import->getZip();
+                if (!$zipStorage) {
+                    $this->sendError(
+                        'This import\'s ZIP file no longer exists.',
+                        ['Delete and recreate the import'],
+                        HttpResponse::HTTP_INTERNAL_SERVER_ERROR,
+                    );
+                    return;
+                }
+                $localZipFilename = $this->createLocalZipFile($zipStorage);
+                $zipArchive       = $this->createZipArchive($localZipFilename);
+                $import->setImportLog($this->generateImportLog($zipArchive, $import->getFilePathTemplate()));
+            } finally {
+                $this->cleanup($zipArchive, $localZipFilename);
+            }
         }
 
         $this->response = $this->responseFromTemplate(
-            '@pastoralBulkImport/importPreview.twig',
+            '@pastoralBulkImport/import.twig',
             [
-                'files'     => $files,
                 'returnUrl' => $this->requestQuery->get('returnUrl')
                     ?? $this->routeGenerator->generate('pastoral.getIndex'),
-                'formVars'  => $this->requestPost->getArrayCopy(),
+                'import'    => $import,
             ],
         );
     }
@@ -154,80 +321,155 @@ class Controller extends Base
     /**
      * Actually perform the pastoral bulk import.
      *
-     * @api   POST /pastoral/bulk-import
+     * @api   POST /pastoral/bulk-import/{id}/run
      * @since 24.1
      *
+     * @param Model $import
      * @return void
      */
-    public function postImport(): void
+    public function postRunImport(Model $import): void
     {
+        if ($import->getImportedAt()) {
+            $this->sendError('This import has already been run, and cannot be run again.');
+            return;
+        }
+
         // Load the Zip file's contents, cleaning up only once all files have
         // been extracted from the ZIP.
         $zipArchive       = null;
         $localZipFilename = null;
         try {
-            $zipStorage       = $this->loadZipFromStorage();
+            $zipStorage = $import->getZip();
+            if (!$zipStorage) {
+                $this->sendError(
+                    'This import\'s ZIP file no longer exists.',
+                    ['Delete and recreate the import'],
+                    HttpResponse::HTTP_INTERNAL_SERVER_ERROR,
+                );
+                return;
+            }
             $localZipFilename = $this->createLocalZipFile($zipStorage);
             $zipArchive       = $this->createZipArchive($localZipFilename);
-            $files            = $this->associateFilesWithUser($zipArchive);
-
-            // Group files by user, so a single record is created for each user:
-            // possibly with multiple files
-            $pastoralRecordsToCreate = [];
-            foreach ($files as $file) {
-                if ($file['user']) {
-                    $pastoralRecordsToCreate[$file['user']->getId()]['fileNames'][] = $file['filename'];
-                }
-            }
+            $importLog        = $this->generateImportLog($zipArchive, $import->getFilePathTemplate());
 
             // Create the records
-            foreach ($pastoralRecordsToCreate as $userId => $pastoralRecords) {
-                // Finagle the post data for this user's record, so that each file
-                // in the ZIP for them is included in their post data.
-                $attachmentHashes = [];
-                foreach ($pastoralRecords['fileNames'] as $fileName) {
+            $tokenReplacer = new TokenReplacer\Student(new TokenReplacer\Simple());
+            foreach ($importLog['known'] as $i => $pastoralRecord) {
+                // First, create the record itself
+                $student = $this->userMapper->findById($pastoralRecord['user']['id']);
+                $record  = $this->pastoralDataSource->createModel()
+                    ->setOwner($this->getUser())
+                    ->setStudent($student)
+                    ->setModifiedBy($this->getUser())
+                    ->setHeading($import->getHeading())
+                    ->setType($import->getType())
+                    ->setSubtype($import->getSubtype())
+                    ->setSeverity($import->getSeverity())
+                    ->setPoints($import->getPoints())
+                    ->setTags($import->getTags())
+                    ->setBodyPublic($tokenReplacer->replace($import->getBodyPublic(), $student))
+                    ->setBodyPrivate('')
+                    ->setExternalId(null)
+                ;
+
+                // Create access
+                $accessModels = $this->pastoralAccessMapper->createCollection();
+                foreach ($import->getAccess() as $access) {
+                    /** @var Access\Model $access */
+                    $accessModels->add(
+                        $access->writeToPastoralAccess($this->pastoralAccessMapper->createModel()->setPastoral($record))
+                    );
+                }
+                $record->setAccess($accessModels);
+
+                // Create attachments
+                foreach ($pastoralRecord['files'] as $fileName) {
                     $attachment = $this->receiver->acceptStream(
                         basename($fileName),
                         $zipArchive->getStream($fileName),
                     );
-                    $attachmentHashes[] = NodeFactory::STORE . ':' . $attachment->getHash();
+                    $record->getAttachments()->add(
+                        (new Pastoral\Attachment\Model())
+                            ->setPastoral($record)
+                            ->setStorage($attachment)
+                            ->setPrivate(false)
+                            ->setExternalId(null)
+                            ->setRealname($attachment->getFilename())
+                    );
                 }
-                $requestPost = clone $this->requestPost;
-                $requestPost->offsetSet(
-                    Pastoral\Controller::ATTACHZONE_PUBLIC . '_attachments',
-                    $attachmentHashes,
-                );
 
-                // And create their records.
-                // There should be only a single record created for each user,
-                // so for simplicity's sake show only their first.
-                $pastoralRecordsToCreate[$userId]['record'] = $this->recordProcessor->processPastoralRecords(
-                    $this->getUser(),
-                    $userId,
-                    $requestPost,
-                )->first();
+                // And save: also writing a log I guess
+                $this->pastoralDataSource->save($record);
+
+                // In the log: set the record ID
+                $importLog['known'][$i]['record']['id'] = $record->getId();
+
+                // Save access, attachments and tags as well
+                $this->pastoralAccessMapper->save($record->getAccess());
+                $this->pastoralAttachmentMapper->save($record->getAttachments());
+                foreach ($import->getTags() as $tag) {
+                    $this->pastoralTagMapper->assignToRecord($record, $tag);
+                }
             }
         } finally {
             $this->cleanup($zipArchive, $localZipFilename);
         }
 
-        // Output a response for each file
-        foreach ($files as $i => $file) {
-            if ($file['user']) {
-                $files[$i]['record'] = $pastoralRecordsToCreate[$file['user']->getId()]['record'] ?? null;
-            } else {
-                $files[$i]['record'] = null;
+        // Save a record of the import, possibly including logs,
+        // and then redirect back to the main page.
+        $import = $import
+            ->setImportedBy($this->getUser())
+            ->setImportedAt(Alaress_Date_Format::now())
+            ->setImportLog($importLog);
+        $this->pastoralBulkImportMapper->save($import);
+
+        $this->response = $this->redirectAfterPost(
+            $this->generateRedirectUrl(
+                $import,
+                $this->routeGenerator->generate('pastoralBulkImport.getImport', ['id' => $import->getId()]),
+            ),
+        );
+    }
+
+    /**
+     * Undo a previously run import, by deleting any records which were created.
+     *
+     * @api   POST /pastoral/bulk-import/{id}/undo
+     * @since 24.1
+     *
+     * @param Model $import
+     * @return void
+     */
+    public function postUndoImport(Model $import): void
+    {
+        if (!$import->getImportedAt()) {
+            $this->sendError('This import has not been run, and cannot be undone.');
+            return;
+        }
+
+        // Investigate the log to find what was created:
+        // delete all of these.
+        foreach ($import->getImportLog()['known'] as $item) {
+            $recordId = $item['record']['id'] ?? null;
+            if (isset($recordId)) {
+                $this->pastoralDataSource->delete(
+                    $this->pastoralDataSource->findById($this->getUser(), $recordId),
+                );
             }
         }
 
-        // And show the results
-        $this->response = $this->responseFromTemplate(
-            '@pastoralBulkImport/import.twig',
-            [
-                'files'     => $files,
-                'typeId'    => $this->requestPost->get('typeId'),
-                'subtypeId' => $this->requestPost->get('subtypeId'),
-            ],
+        // Save undo fields
+        $import = $import
+            ->setUndoneBy($this->getUser())
+            ->setUndoneAt(Alaress_Date_Format::now());
+        $this->pastoralBulkImportMapper->save($import);
+
+        // Redirect
+        $this->response = $this->redirectAfterPost(
+            $this->generateRedirectUrl(
+                $import,
+                $this->routeGenerator->generate('pastoralBulkImport.getImport', ['id' => $import->getId()]),
+            ),
         );
     }
 
@@ -294,40 +536,66 @@ class Controller extends Base
     }
 
     /**
-     * Associate and group files in `$archive` with a user.
+     * Generate an import log for this archive: it will be written to the
+     * pastoral log import, and will be used to generate the preview and import
+     * result screens.
      *
      * @param ZipArchive $archive
-     * @return array<array{filename: string, user: ?User, externalId: ?string}>
+     * @param string     $template
+     * @return ImportLog
      */
-    private function associateFilesWithUser(ZipArchive $archive): array
+    private function generateImportLog(ZipArchive $archive, string $template): array
     {
-        $tokenReplacer = new Simple();
-        $files         = [];
-        $template      = $this->trimExtension($this->requestPost->get('template'));
+        $tokenReplacer  = new TokenReplacer\Simple();
+        $importLog      = ['known' => [], 'unknown' => []];
+        $template       = $this->trimExtension($template);
         for ($i = 0; $i < $archive->numFiles; $i++) {
-            $name = $archive->getNameIndex($i);
-            if ($name !== false) {
-                $tokens     = $tokenReplacer->extract($template, $this->trimExtension($name));
-                $user       = null;
-                $externalId = null;
+            $filename = $archive->getNameIndex($i);
+            if ($filename !== false) {
+                $tokens        = $tokenReplacer->extract($template, $this->trimExtension($filename));
+                $user          = null;
+                $externalId    = null;
+                $unknownReason = null;
                 if (isset($tokens['[externalId]'])) {
                     $externalId = $tokens['[externalId]'];
                     try {
                         $user = $this->userMapper->findByExternalId($externalId, Role::STUDENT);
-                    } catch (MapperException) {
+                    } catch (MapperException\Deleted) {
                         // noop: no user was found.
                         // This will show as a "no student found" message.
+                        $unknownReason = 'Student was deleted';
+                    } catch (MapperException $e) {
+                        $unknownReason = $e->getMessage();
                     }
+                } else {
+                    $unknownReason = 'External ID not found in filename';
                 }
-                $files[] = [
-                    'filename'   => $name,
-                    'user'       => $user,
-                    'externalId' => $externalId,
-                ];
+
+                if ($user) {
+                    // TODO use standard format for name?
+                    $importLog['known'][$user->getId()] ??= [
+                        'user'  => [
+                            'id'         => $user->getId(),
+                            'externalId' => $user->getExternalId() ?? '',
+                            'name'       => $user->formatName(),
+                        ],
+                        'files'  => [],
+                        'record' => null,
+                    ];
+                    $importLog['known'][$user->getId()]['files'][] = $filename;
+                } else {
+                    $importLog['unknown'][] = [
+                        'file'   => $filename,
+                        'reason' => $unknownReason,
+                        'user'   => ['externalId' => $externalId ?? null],
+                    ];
+                }
             }
         }
 
-        return $files;
+        // Strip keys from known users
+        $importLog['known'] = array_values($importLog['known']);
+        return $importLog;
     }
 
     /**
@@ -347,5 +615,24 @@ class Controller extends Base
             return substr($path, 0, -(strlen($extension) + 1));
         }
         return $path;
+    }
+
+    /**
+     * Generate a URL for post-import or post-preview redirect, including the
+     * return URL if it's in the query string.
+     *
+     * @param Model $import
+     * @return string
+     */
+    private function generateRedirectUrl(Model $import, string $redirectUrl): string
+    {
+        $returnQuery = [];
+        if ($this->requestQuery->get(Redirect::RETURN_URL)) {
+            $returnQuery[Redirect::RETURN_URL] = $this->requestQuery->get(Redirect::RETURN_URL);
+        }
+        return (new Uri())
+            ->withPath($redirectUrl)
+            ->withQuery(http_build_query($returnQuery))
+            ->__toString();
     }
 }

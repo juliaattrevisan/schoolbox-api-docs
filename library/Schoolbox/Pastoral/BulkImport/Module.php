@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\Pastoral\BulkImport;
 
+use Alaress\Authorizer\Failure;
 use Alaress\Authorizer\Rule;
 use Alaress\Module\Module as BaseModule;
 use Alaress\Twig\Loader\IChainLoader;
@@ -36,29 +37,90 @@ class Module extends BaseModule
     protected function registerRoutes(): void
     {
         $permission = new Rule\All(
-            new Rule\IsConfigOn(ConfigMapper::NAME_PASTORAL_BULK_UPLOAD_ENABLED, $this->getConfig()),
+            new Rule\IsConfigOn(ConfigMapper::NAME_PASTORAL_BULK_IMPORT_ENABLED, $this->getConfig()),
             new Rule\Any(
                 new Rule\IsSuperuser(),
                 new Rule\HasServicePermission(UserAccess::SERVICE_PASTORAL, UserAccess::ACCESS_WRITE),
             ),
         );
+
+        // Run permission: the import can't have already run
+        $runPermission = new Rule\All(
+            $permission,
+            new Rule\Callback(
+                function (array $params) {
+                    $import = $this->extractImportFromParams($params);
+                    if ($import->isImported()) {
+                        throw new Failure\InvalidPath('Import has already been run: cannot run again');
+                    }
+                }
+            ),
+        );
+
+        // Undo permission: the import must have already run
+        $undoPermission = new Rule\All(
+            $permission,
+            new Rule\Callback(
+                function (array $params) {
+                    $import = $this->extractImportFromParams($params);
+                    if (!$import->isImported()) {
+                        throw new Failure\InvalidPath('Import has not yet been run: cannot undo');
+                    }
+                    if ($import->isUndone()) {
+                        throw new Failure\InvalidPath('Import has already been undone: cannot undo again');
+                    }
+                }
+            ),
+        );
+
+        $preload = fn (array $params): array => [
+            'import' => $this->getMapperFactory()->get(Mapper::class)->findById($params['id']),
+        ];
         $this->register(
             self::METHOD_GET,
             '',
-            'getForm',
+            'getList',
+            $permission,
+        );
+        $this->register(
+            self::METHOD_GET,
+            '/create',
+            'getCreateImportForm',
             $permission,
         );
         $this->register(
             self::METHOD_POST,
-            '/preview',
-            'postImportPreview',
+            '/create',
+            'postCreateImport',
             $permission,
         );
         $this->register(
-            self::METHOD_POST,
-            '',
-            'postImport',
+            self::METHOD_GET,
+            '/{id}',
+            'getImport',
             $permission,
+            $preload,
+        );
+        $this->register(
+            self::METHOD_POST,
+            '/{id}/run',
+            'postRunImport',
+            $runPermission,
+            $preload,
+        );
+        $this->register(
+            self::METHOD_POST,
+            '/{id}/undo',
+            'postUndoImport',
+            $undoPermission,
+            $preload,
+        );
+        $this->register(
+            self::METHOD_POST,
+            '/{id}/delete',
+            'postDeleteImport',
+            $permission,
+            $preload,
         );
     }
 
@@ -93,17 +155,35 @@ class Module extends BaseModule
         );
         return new Controller(
             $this->injector->get('l10n'),
+            $this->getMapperFactory()->get(Mapper::class),
             $this->injector->get('pastoralDataSource'),
             $this->getMapperFactory()->get(Pastoral\SubType\Mapper::class),
             $this->getMapperFactory()->get(Pastoral\Type\Mapper::class),
             $this->getMapperFactory()->get(Pastoral\Severity\Mapper::class),
+            $this->getMapperFactory()->get(Pastoral\Tag\Mapper::class),
             $this->getMapperFactory()->get(Pastoral\Access\Mapper::class),
             $this->getMapperFactory()->get(Pastoral\Group\Mapper::class),
+            $this->getMapperFactory()->get(Pastoral\Attachment\Mapper::class),
             $this->getMapperFactory()->get(UserMapper::class),
             $this->getMapperFactory()->get(Pastoral\Audience\Mapper::class),
             $this->injector->get('filesystem.storageProxy'),
             $this->injector->get('filesystem.receiver'),
             $pastoralRecordProcessor,
         );
+    }
+
+    /**
+     * Helper method for permission checks: extracts import out of `$params`.
+     *
+     * @param array $params
+     * @return Model
+     * @throws Failure\InvalidPath if the import wasn't found
+     */
+    private function extractImportFromParams(array $params): Model
+    {
+        if (!($params['import'] ?? null) instanceof Model) {
+            throw new Failure\InvalidPath('No import was found');
+        }
+        return $params['import'];
     }
 }

@@ -320,6 +320,14 @@ class RelationalDelete implements IRelationalDelete
                 ['portrait'],
                 'portrait_hash'
             ),
+
+            // pastoral_bulk_import.zip_hash
+            new Nullable(
+                \Schoolbox\Pastoral\BulkImport\Mapper::getInstance(),
+                $this->logger,
+                ['zip'],
+                'zip_hash'
+            ),
         ];
     }
 }

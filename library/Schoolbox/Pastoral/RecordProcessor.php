@@ -489,7 +489,7 @@ class RecordProcessor
      * @return GenericCollection
      * @throws MapperException
      */
-    private function prepareTags(string $tagIdCsv, string $tagNameCsv): GenericCollection
+    public function prepareTags(string $tagIdCsv, string $tagNameCsv): GenericCollection
     {
         $tagNames = array_map('trim', array_filter(explode(',', $tagNameCsv)));
         // remove new tags set as string starting from 'new-'

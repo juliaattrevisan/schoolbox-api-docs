@@ -34,7 +34,7 @@ config:
   pastoral_create_tag_enable: {hide: true}
   pastoral_flag_count_period: {hide: true}
   pastoral_action_enable: {hide: true}
-  pastoral_bulk_upload_enabled: {hide: true}
+  pastoral_bulk_import_enabled: {hide: true}
 
   #Learning Moments
   evidence_parent_create: {hide: true}
