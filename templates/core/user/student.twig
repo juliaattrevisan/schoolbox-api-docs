@@ -52,7 +52,6 @@
     or showContactsAlert
     or showEmergencyContacts
 %}
-{% set showSubjects = showDetails and subjects is not empty %}
 
 {% set shareLearningMomentUrl = routeLookupIfAuthorized(
     'learningMomentEvidence.getCreateForm',
@@ -417,7 +416,7 @@
                 'activity': (config.learning_moments_enabled and user.learningMomentsEnabled) or config.badges_enabled or config.grades_enabled,
                 'goals': config.badges_enabled,
                 'achievements': config.badges_enabled,
-                'classes': showClasses and showSubjects,
+                'classes': showClasses,
                 'contacts': showContactsTab
             },
             'parent': {
@@ -425,7 +424,7 @@
                 'activity': (config.learning_moments_enabled and user.learningMomentsEnabled) or config.badges_enabled or config.grades_enabled,
                 'goals': config.badges_enabled,
                 'achievements': config.badges_enabled,
-                'classes': showClasses and showSubjects,
+                'classes': showClasses,
                 'contacts': showContactsTab
             },
             'staff': {
@@ -433,7 +432,7 @@
                 'activity': USER.role.viewStudentProfile and ((config.learning_moments_enabled and user.learningMomentsEnabled) or config.badges_enabled or config.grades_enabled),
                 'goals': USER.role.viewStudentProfile and config.badges_enabled,
                 'achievements': USER.role.viewStudentProfile and config.badges_enabled,
-                'classes': USER.role.viewStudentProfile and showClasses and showSubjects,
+                'classes': USER.role.viewStudentProfile and showClasses,
                 'contacts': USER.role.viewStudentProfile and showContactsTab
             },
         } %}
@@ -567,8 +566,9 @@
             {% endautoescape %}
             <script type="text/javascript" src="{{ CDN_PREFIX }}/js/bundle/userProfileFeeds.js?v={{ config.site_version }}"></script>
 
-            {% if showClasses and showSubjects %}
-                <div class="content no-pad {% if activeTab == 'classes' %}active{% endif %}" id="tab-classes">
+            {% if additionalConstraints[USER.role.type]['classes'] ?? additionalConstraints[USER.role.type]['_default'] %}
+                {% if subjects|length %}
+                    <div class="content no-pad {% if activeTab == 'classes' %}active{% endif %}" id="tab-classes">
                     <section>
 
                         {% for group, subjectGroup in subjects %}
@@ -725,10 +725,11 @@
                         {% endfor %}
                     </section>
                 </div>
+                {% endif %}
             {% endif %}
 
             {% if additionalConstraints[USER.role.type]['groups'] ?? additionalConstraints[USER.role.type]['_default'] %}
-                {% if groups is not empty %}
+                {% if groups|length %}
                     <div class="content no-pad {% if activeTab == 'groups' %}active{% endif %}" id="tab-groups">
                         <section>
                             <h2 class="subheader content">Groups</h2>
