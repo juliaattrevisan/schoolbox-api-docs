@@ -30,9 +30,9 @@ export function usePopOut(
     optimalPlacement: Placement = "bottom-end",
     isFullWidth: boolean = false,
     isCloseOnContentClick: boolean = false,
-    matchButtonColour: boolean = true,
     moveTo: HTMLElement | string | null = null,
     onClose: () => void = (): void => {},
+    matchButtonColour: boolean = true,
 ): {
     currentLabel: Ref<string>;
     isOpen: Ref<boolean>;
