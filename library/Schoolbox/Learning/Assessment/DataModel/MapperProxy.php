@@ -520,7 +520,13 @@ class MapperProxy
             if ($row['mark'] === null) {
                 $normMark = null;
             } elseif ($row['assessment_type'] === 'quiz' || $row['assessment_type'] === 'ltiAssessment') {
-                $normMark = IMarkScheme::NORMALISED_MARK_MAX * (float)$row['mark'] / (float)$row['max_mark'];
+                /* Absent students get a max_mark of 0.00, so prevent this and cast to null.
+                 */
+                if (0.00 === (float)$row['max_mark']) {
+                    $normMark = null;
+                } else {
+                    $normMark = IMarkScheme::NORMALISED_MARK_MAX * (float)$row['mark'] / (float)$row['max_mark'];
+                }
             } else {
                 $normMark = (float)$row['mark'];
             }
