@@ -12,11 +12,6 @@
 {% set isStaff = isSuperuser or USER.role.staff %}
 {% set isSelf = session.user.id == user.id %}
 
-{# medical: if allowed in config, and user is staff or parent of this child #}
-{% set showMedicalAlert = not config.protect_medicalspecial_profile and isStaffWhoCanView %}
-{% set showSpecialAlert = not config.protect_medicalspecial_profile and isStaffWhoCanView %}
-{% set showComments = config.synergetic_student_comment and isStaffWhoCanView %}
-
 {# contacts: su, staff or parent #}
 {# Should a student see their own contact details? I think so #}
 {% set showContacts = (isStaffWhoCanView or isParentOfStudent) and not hideContacts and contacts|length > 0 %}
