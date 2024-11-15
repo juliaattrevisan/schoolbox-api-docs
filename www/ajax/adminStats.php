@@ -61,7 +61,7 @@ switch ($_POST['module']) {
 
     case 'service_www':
         $context = \Proxy\Server::getInstance()->getContext();
-        if (@file_get_contents('https://repo.schoolbox.com.au/testfile.txt', null, $context)) {
+        if (@file_get_contents('https://repo.schoolbox.com.au/testfile.txt', false, $context)) {
             $output[] = array('WWW_LIGHT'  => 'success',
                               'WWW_STATUS' => 'Available'
             );
