@@ -140,6 +140,8 @@ export const usePopOutStore = defineStore(`ccPopOut`, () => {
 
     return {
         button,
+        isLoading,
+        hasLoadError,
         init,
         setActive,
     };

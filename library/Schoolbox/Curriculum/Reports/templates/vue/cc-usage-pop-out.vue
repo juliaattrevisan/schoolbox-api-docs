@@ -60,7 +60,17 @@ window.Vue.watch(
 
 <template>
     <div ref="popOutElement" class="pop-out" style="display: none">
-        <p>Hai</p>
+        <div v-if="popOutStore.hasLoadError" class="alert-box alert f-no-margins">
+            There was an error during data retrieval. Please
+            <a href="" title="refresh the page"> refresh the page </a>
+            to try again and contact your support if the problem persists
+        </div>
+        <div v-else-if="popOutStore.isLoading && !popOutStore.hasLoadError" class="pop-out-menu__loader">
+            <div class="loader"></div>
+        </div>
+        <div v-else>
+            <p>Hai</p>
+        </div>
     </div>
 </template>
 
@@ -69,16 +79,11 @@ window.Vue.watch(
     background-color: #fff;
     border-radius: 0.25rem;
     box-shadow: 0px 0px 6px rgba(0, 0, 0, 0.2);
+    max-width: 16rem;
     min-height: 8rem;
     min-width: 16rem;
-    padding: 0.5rem 0;
+    padding: var(--spacing-s);
     position: absolute;
     z-index: var(--sbx-depth-pop-over);
-
-    &__divider {
-        border: 1px solid rgba(255, 0, 0, 0.15);
-        margin-block-end: 0;
-        margin-block-start: 0.5rem;
-    }
 }
 </style>
