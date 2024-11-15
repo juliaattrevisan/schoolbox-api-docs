@@ -34,67 +34,73 @@ class SortForCourseMarkbook implements IAssessableComparator
      * Assumes that assessments reside in unit-impls or unit-specs.
      *
      * Sorts by:
-     * 1. Unit-spec name
-     * 2. AssessmentSpecs before AssessmentImpls
+     * 1. Unit-spec sequence (desc)
+     * 2. Unit-spec name (asc)
+     * 3. AssessmentSpecs before AssessmentImpls
      * if(both impl)
-     *     2a. course-import folder name
-     *     2b. course-import first unit-impl open date
-     *     2c. course-import id
-     * 3. Base-assessment sequence
-     * 4  Projects, then project sub-assessments by sequence
+     *     3a. course-import folder name
+     *     3b. course-import first unit-impl open date
+     *     3c. course-import id
+     * 4. Base-assessment sequence
+     * 5  Projects, then project sub-assessments by sequence
      *
      * @inheritdoc
      */
     public function getCallable(): callable
     {
         return function (IAssessable $left, IAssessable $right) {
-            // 1. Unit-spec sequence
-            $unitSpecNameCompare = $this->compareUnitSpecSequence($left, $right);
+            // 1. Unit-spec sequence (desc)
+            $unitSpecSequenceCompare = $this->compareUnitSpecSequence($left, $right);
+            if (0 !== $unitSpecSequenceCompare) {
+                return $unitSpecSequenceCompare;
+            }
 
+            // 2. Unit-spec name (asc)
+            $unitSpecNameCompare = $this->compareUnitSpecName($left, $right);
             if (0 !== $unitSpecNameCompare) {
                 return $unitSpecNameCompare;
             }
 
-            // 2. AssessmentSpecs before AssessmentImpls
+            // 3. AssessmentSpecs before AssessmentImpls
             $specImplCompare = $this->compareSpecImpl($left, $right);
             if (0 !== $specImplCompare) {
                 return $specImplCompare;
             }
 
             if ($left->isImplementation() && $right->isImplementation()) {
-                // 2a. course-import folder name
+                // 3a. course-import folder name
                 $specImplCompare = $this->compareCourseImportFolderName($left, $right);
                 if (0 !== $specImplCompare) {
                     return $specImplCompare;
                 }
 
-                // 2b. course-import first unit-impl open date
+                // 3b. course-import first unit-impl open date
                 $specImplCompare = $this->compareCourseImportFirstUnit($left, $right);
                 if (0 !== $specImplCompare) {
                     return $specImplCompare;
                 }
 
-                // 2c. course-import id
+                // 3c. course-import id
                 $courseImportId = $this->compareCourseImportId($left, $right);
                 if (0 !== $courseImportId) {
                     return $courseImportId;
                 }
             }
 
-            // 3. Base-assessment sequence
+            // 4. Base-assessment sequence
             $baseSequenceCompare = $this->compareBaseSequence($left, $right);
             if (0 !== $baseSequenceCompare) {
                 return $baseSequenceCompare;
             }
 
-            // 4  Projects, then project sub-assessments by sequence
+            // 5  Projects, then project sub-assessments by sequence
             return $this->compareIsProjectOrSubAssessable($left, $right);
         };
     }
 
 
     /**
-     * Sort by unit-spec folder sequence.
+     * Sort by unit-spec folder sequence (desc).
      *
      * Doesn't matter whether assessment is impl or spec. Always punches down to unit-spec.
      *
@@ -105,11 +111,11 @@ class SortForCourseMarkbook implements IAssessableComparator
     private function compareUnitSpecSequence(IAssessable $left, IAssessable $right): int
     {
         if ($left->isSpecification()) {
-            $leftSeqeunce = $left->getBaseContext()->getFolder()->getSequence();
+            $leftSequence = $left->getBaseContext()->getFolder()->getSequence();
         } else {
             /** @var UnitImplementation\Model $unitImpl */
             $unitImpl     = $left->getBaseContext();
-            $leftSeqeunce = $unitImpl->getSpecification()->getFolder()->getSequence();
+            $leftSequence = $unitImpl->getSpecification()->getFolder()->getSequence();
         }
         if ($right->isSpecification()) {
             $rightSequence = $right->getBaseContext()->getFolder()->getSequence();
@@ -119,7 +125,37 @@ class SortForCourseMarkbook implements IAssessableComparator
             $rightSequence = $unitImpl->getSpecification()->getFolder()->getSequence();
         }
 
-        return  $rightSequence <=> $leftSeqeunce;
+        return $rightSequence <=> $leftSequence; // Sort in descending order of sequence.
+    }
+
+
+    /**
+     * Sort by unit-spec folder name (asc).
+     *
+     * Doesn't matter whether assessment is impl or spec. Always punches down to unit-spec.
+     *
+     * @param IAssessable $left
+     * @param IAssessable $right
+     * @return int
+     */
+    private function compareUnitSpecName(IAssessable $left, IAssessable $right): int
+    {
+        if ($left->isSpecification()) {
+            $leftSpecName = $left->getBaseContext()->getTitle();
+        } else {
+            /** @var UnitImplementation\Model $unitImpl */
+            $unitImpl     = $left->getBaseContext();
+            $leftSpecName = $unitImpl->getSpecification()->getTitle();
+        }
+        if ($right->isSpecification()) {
+            $rightSpecName = $right->getBaseContext()->getTitle();
+        } else {
+            /** @var UnitImplementation\Model $unitImpl */
+            $unitImpl      = $right->getBaseContext();
+            $rightSpecName = $unitImpl->getSpecification()->getTitle();
+        }
+
+        return \strnatcasecmp($leftSpecName, $rightSpecName);
     }
 
 
