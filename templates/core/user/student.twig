@@ -395,7 +395,7 @@
                 'goals': config.badges_enabled,
                 'achievements': config.badges_enabled,
                 'classes': user.isShowTimetable,
-                'contacts': user.showContacts or isPrimaryCarer or hasEmergencyContacts
+                'contacts': (user.showContacts or isPrimaryCarer) and (contacts|length or hasEmergencyContacts)
             },
             'parent': {
                 '_default': true,
@@ -403,7 +403,7 @@
                 'goals': config.badges_enabled,
                 'achievements': config.badges_enabled,
                 'classes': user.isShowTimetable,
-                'contacts': user.showContacts or isPrimaryCarer or hasEmergencyContacts
+                'contacts': (user.showContacts or isPrimaryCarer) and (contacts|length or hasEmergencyContacts)
             },
             'staff': {
                 '_default': USER.role.viewStudentProfile,
@@ -411,7 +411,7 @@
                 'goals': USER.role.viewStudentProfile and config.badges_enabled,
                 'achievements': USER.role.viewStudentProfile and config.badges_enabled,
                 'classes': USER.role.viewStudentProfile and user.isShowTimetable,
-                'contacts': USER.role.viewStudentProfile and (user.showContacts or isPrimaryCarer or hasEmergencyContacts)
+                'contacts': USER.role.viewStudentProfile and (user.showContacts or isPrimaryCarer) and (contacts|length or hasEmergencyContacts)
             },
         } %}
 
@@ -445,7 +445,7 @@
                 {% set defaultCss = 'active' %}
 
                 {% for tab in possibleTabs %}
-                    {% if additionalConstraints[tab.tab] ?? true %}
+                    {% if additionalConstraints[USER.role.type][tab.tab] ?? additionalConstraints[USER.role.type]['_default'] %}
                         <dd class="{{ defaultCss }}"><a href="#tab-{{ tab.tab }}">{{ tab.displayAs }}</a></dd>
 
                         {# All subsequent tabs are not active by default #}
