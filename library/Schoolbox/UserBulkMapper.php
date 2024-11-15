@@ -43,9 +43,12 @@ class UserBulkMapper extends UserMapper
 
 
     /**
-     * @var UserMapper
+     * @param UserMapper $userMapper
      */
-    private \Schoolbox\UserMapper $userMapper;
+    public function __construct(private \Schoolbox\UserMapper $userMapper)
+    {
+        parent::__construct();
+    }
 
 
     /**
@@ -54,11 +57,6 @@ class UserBulkMapper extends UserMapper
     protected function postSetup()
     {
         $this->logger = new Logger();
-
-        /* TODO replace with an injection
-         *  This is currently spawned out of the abyss to minimise code change impact
-         */
-        $this->userMapper = \Schoolbox\UserMapper::getInstance();
     }
 
 

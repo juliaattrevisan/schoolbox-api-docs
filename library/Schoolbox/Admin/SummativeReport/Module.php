@@ -157,7 +157,7 @@ class Module extends BaseModule
             $this->injector->get('assessmentDataSource'),
             $this->getMapperFactory()->get(RubricDataSource::class),
             $this->getMapperFactory()->get(Access::class),
-            $this->getMapperFactory()->get(UserBulkMapper::class),
+            new \Schoolbox\UserBulkMapper($this->getMapperFactory()->get(\Schoolbox\UserMapper::class)),
             $this->getMapperFactory()->get(\Schoolbox\RoleMapper::class),
             $this->getMapperFactory()->get(ConfigMapper::class),
             new FieldStrategyFactory($this->getMapperFactory(), new CollectorFactory()),
