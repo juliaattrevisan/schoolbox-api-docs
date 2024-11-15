@@ -76,11 +76,13 @@ class Payload
      * If the meta is not present for a given option, it will be null.
      */
     public const FIELD_SETTINGS_META = [
+        /* A set of (viewer => viewee) metadata tuples
+         */
         self::VISIBILITY_NODE => [
             self::ROLETYPE_SELF => [
-                Role::STUDENT => "The user themself",
-                Role::STAFF => "The user themself",
-                Role::PARENT => "The user themself",
+                Role::STUDENT => "The user themselves",
+                Role::STAFF => "The user themselves",
+                Role::PARENT => "The user themselves",
             ],
             Role::STUDENT => [
                 Role::STUDENT => "All users with the student role type",
@@ -88,9 +90,9 @@ class Payload
                 Role::PARENT => "All users with the student role type",
             ],
             Role::STAFF => [
-                Role::STUDENT => "All users with the staff role type who have 'View Profile Access'",
-                Role::STAFF => "All users with the staff role type who have 'View Profile Access'",
-                Role::PARENT => "All users with the staff role type who have 'View Profile Access'",
+                Role::STUDENT => "All users with the staff role type who have the 'View Student Profile' role permission",
+                Role::STAFF => "All users with the staff role type",
+                Role::PARENT => "All users with the staff role type who have the 'View Parent Profile' role permission",
             ],
             Role::PARENT => [
                 Role::STUDENT => "Parent users with a relationship to the student",
