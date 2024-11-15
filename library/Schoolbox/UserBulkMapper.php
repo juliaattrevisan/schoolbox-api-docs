@@ -43,11 +43,22 @@ class UserBulkMapper extends UserMapper
 
 
     /**
+     * @var UserMapper
+     */
+    private \Schoolbox\UserMapper $userMapper;
+
+
+    /**
      * Construct the log system for bulk logging
      */
     protected function postSetup()
     {
         $this->logger = new Logger();
+
+        /* TODO replace with an injection
+         *  This is currently spawned out of the abyss to minimise code change impact
+         */
+        $this->userMapper = \Schoolbox\UserMapper::getInstance();
     }
 
 
@@ -144,14 +155,24 @@ class UserBulkMapper extends UserMapper
 
         $users = [];
 
+
+
         foreach ($statement as $row) {
             if (key_exists($row['id'], $users)) {
                 $users[$row['id']]['campuses'][] = $row['campus'];
             } else {
                 $user             = $row;
-                // retrieve user instance to get full name, @todo - this could be done in a better way
-                $instance = \Schoolbox\UserMapper::getInstance()->findById($row['id']);
-                $user['fullName'] = $instance->getFullName();
+                // retrieve user instance to get full name
+                /* Instead of summoning the fully hydrated user, just use a stub
+                 * and the pieces of their name so we can leverage getFullName()
+                 */
+                $user['fullName'] = $this->userMapper
+                    ->createModel()
+                    ->setFirstname($row['firstname'])
+                    ->setPreferredName($row['preferred_name'])
+                    ->setLastname($row['lastname'])
+                    ->getFullName();
+
                 $user['campuses'] = [$row['campus']];
                 unset($user['campus']);
                 $users[$row['id']] = $user;
