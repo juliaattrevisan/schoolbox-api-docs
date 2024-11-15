@@ -526,21 +526,32 @@ class Controller extends BaseController
                 /* A sequenced list of tabs
                  */
                 'possibleTabs' => $tabs,
+                /* Retain this old check
+                 */
+                'eportfolioAuth' => $this->eportfolioAuthenticator->canView(),
+                /* This is used for the calendar url, a dynamic set of args
+                 */
+                'now' => Alaress_Date_Format::now(),
+                /* Used for deciding whether you can see emails or not via its own idiosyncratic
+                 * heuristic beyond Availability/Visibility concepts
+                 */
+                'showEmail' => $showEmails,
+                /* Somehow this is important
+                 */
+                'isPrimaryCarer' => $isPrimaryCarer,
+                /* A set of contacts (if any) for this student
+                 */
+                'contacts' => $contacts,
+
 
                 /* Old implementation
                  */
                 'session' => $_SESSION,
-
-                'eportfolioAuth'           => $this->eportfolioAuthenticator->canView(),
-                'now'                      => Alaress_Date_Format::now(),
-                'contacts'                 => $contacts,
                 'subjects'                 => $subjects,
                 'groups'                   => $groups,
-                'isPrimaryCarer'           => $isPrimaryCarer,
                 'allTeacherIds'            => implode(',', $allTeacherIds),
                 'pdStates'                 => $this->professionalDevelopmentMapper->getStates(),
                 'pd'                       => $pd,
-                'showEmail'                => $showEmails,
                 'travelLogs'               => $travelLogs,
                 'learningMomentCanComment' => $learningMomentCanComment,
                 'isGeosnapshotAvailable'   => $isGeosnapshotAvailable,
