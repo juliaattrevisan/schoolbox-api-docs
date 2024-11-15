@@ -3,6 +3,7 @@
  * Displays the curriculum coverage report in a table format.
  */
 
+import { useTemplateRef } from "vue";
 import NodeDetails from "@schoolboxCurriculum/vue/node-details.vue";
 import BasicModal from "@schoolboxVue/components/modal/basic-modal.vue";
 import CcReportTableNode from "./cc-report-table-node.vue";
@@ -32,6 +33,29 @@ window.Vue.watch(isDetailsOpen, (isOpen) => {
     if (!isOpen) {
         selectedNodeId.value = null;
     }
+});
+
+const tbodyEl = useTemplateRef<HTMLTableSectionElement>("tbodyEl");
+const showEmpty = window.Vue.ref(false);
+
+window.Vue.onMounted(() => {
+    const lrnObserver = new MutationObserver((mutationsList) => {
+        if (!filtersStore.onlyShowGaps) {
+            showEmpty.value = false;
+            return;
+        }
+        mutationsList.forEach(() => {
+            if (!showEmpty.value && tbodyEl.value?.children && tbodyEl.value.children.length === 0) {
+                console.warn(tbodyEl.value.children.length);
+                showEmpty.value = true;
+            }
+        });
+    });
+    lrnObserver.observe(tbodyEl.value as HTMLTableSectionElement, {
+        subtree: false,
+        childList: true,
+        attributes: false,
+    });
 });
 </script>
 
@@ -67,7 +91,7 @@ window.Vue.watch(isDetailsOpen, (isOpen) => {
                     </template>
                 </tr>
             </thead>
-            <tbody>
+            <tbody ref="tbodyEl">
                 <cc-report-table-node
                     v-for="node in reportStore.nodes"
                     :key="node.id"
@@ -75,7 +99,7 @@ window.Vue.watch(isDetailsOpen, (isOpen) => {
                     :depth="0"
                     @title-click="onTitleClick"
                 />
-                <tr v-if="filtersStore.onlyShowGaps">
+                <tr v-if="showEmpty">
                     <td :colspan="reportStore.totalColumnCount" class="t-align-center">
                         No curriculum outcomes have a total usage count of 0
                     </td>
