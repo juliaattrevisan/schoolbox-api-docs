@@ -18,8 +18,14 @@ export type ReportError = {
 };
 
 export const usePopOutStore = defineStore(`ccPopOut`, () => {
+    const course = window.Vue.ref<Course | null>(null);
+    const unit = window.Vue.ref<Unit | null>(null);
+    const node = window.Vue.ref<CurriculumCoverageNode | null>(null);
+    const button = window.Vue.ref<HTMLButtonElement | null>(null);
+
     // #region search for a usage
 
+    let endpoint = ""; // the endpoint to use for the usage
     const isFetching = window.Vue.ref(false); // to notify that a fetch is taking place
     const isLoading = window.Vue.ref(false);
     const hasLoadError = window.Vue.ref(false); // To show that an error has occurred
@@ -27,12 +33,38 @@ export const usePopOutStore = defineStore(`ccPopOut`, () => {
     let controller: AbortController; // to allow aborting the previous search if a new one is started
 
     /**
+     * store any passed through properties
+     * @param $endpoint - the report api url
+     */
+    function init($endpoint: string): void {
+        endpoint = $endpoint;
+    }
+
+    /**
+     * To collect all the params to send to the search api
+     * @returns - the query params
+     */
+    function getQueryParams(): URLSearchParams {
+        const newQueryParams = new URLSearchParams();
+        newQueryParams.append("courseId", course.value?.id.toString() ?? "");
+        newQueryParams.append("unitId", unit.value?.id.toString() ?? "");
+        newQueryParams.append("nodeId", node.value?.id.toString() ?? "");
+        return newQueryParams;
+    }
+
+    /**
+     * To collect all the params to send to the search api
+     * @returns - the query params
+     */
+    function getEndpointWithParams(): string {
+        const newQueryParams = getQueryParams();
+        return `${endpoint}?${newQueryParams.toString()}`;
+    }
+
+    /**
      * search for the requested node usage
      */
     async function search(): Promise<void> {
-        // useInputStore().setActive();
-        // useQueryStore().setQueryParams();
-        // hasNotReported.value = false;
         // abort the previous search if it's still running
         if (isLoading.value) {
             controller.abort();
@@ -42,7 +74,7 @@ export const usePopOutStore = defineStore(`ccPopOut`, () => {
             isLoading.value = true;
             hasLoadError.value = false;
             controller = new AbortController();
-            const response = await fetch(useQueryStore().getEndpointWithParams(), {
+            const response = await fetch(getEndpointWithParams(), {
                 method: "GET",
                 signal: controller.signal,
                 headers: {
@@ -76,6 +108,10 @@ export const usePopOutStore = defineStore(`ccPopOut`, () => {
             // }
             isLoading.value = false;
         } catch (error) {
+            // ignore abort errors, as the previous search was cancelled
+            if (isAbortError(error)) {
+                return;
+            }
             // if the error is a DOMException, it's because the report has been aborted to start a new one
             if (typeof error === "string" && !error.includes("DOMException")) {
                 hasLoadError.value = true;
@@ -86,13 +122,6 @@ export const usePopOutStore = defineStore(`ccPopOut`, () => {
     }
 
     // #endregion
-
-    // #region set active to trigger the pop-out
-
-    const course = window.Vue.ref<Course | null>(null);
-    const unit = window.Vue.ref<Unit | null>(null);
-    const node = window.Vue.ref<CurriculumCoverageNode | null>(null);
-    const button = window.Vue.ref<HTMLButtonElement | null>(null);
 
     /**
      * report has been triggered so set the active course and nodes
@@ -109,10 +138,9 @@ export const usePopOutStore = defineStore(`ccPopOut`, () => {
         void search();
     }
 
-    // #endregion
-
     return {
         button,
+        init,
         setActive,
     };
 });
