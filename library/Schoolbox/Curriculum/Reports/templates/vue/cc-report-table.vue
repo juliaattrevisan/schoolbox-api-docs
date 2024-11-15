@@ -8,10 +8,11 @@ import BasicModal from "@schoolboxVue/components/modal/basic-modal.vue";
 import CcReportTableNode from "./cc-report-table-node.vue";
 import CcUsagePopOut from "./cc-usage-pop-out.vue";
 import { useReportStore } from "./store/ccReportStore";
+import { useFiltersStore } from "./store/ccFiltersStore";
 import type { CurriculumCoverageNode } from "../js/types/curriculumCoverageTypes";
 
 const reportStore = useReportStore();
-
+const filtersStore = useFiltersStore();
 const isDetailsOpen = window.Vue.ref(false);
 const selectedNodeId = window.Vue.ref<number | null>(null);
 
@@ -74,6 +75,11 @@ window.Vue.watch(isDetailsOpen, (isOpen) => {
                     :depth="0"
                     @title-click="onTitleClick"
                 />
+                <tr v-if="filtersStore.onlyShowGaps">
+                    <td :colspan="reportStore.totalColumnCount">
+                        No curriculum outcomes have a total usage count of 0
+                    </td>
+                </tr>
             </tbody>
         </table>
     </div>

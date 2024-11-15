@@ -30,10 +30,29 @@ export const useReportStore = defineStore("ccReport", () => {
 
     /**
      * Whether a search can be performed, can be if there's a change of course or node selection
-     * @returns {boolean} - whether a new report can be requested
+     * @returns - whether a new report can be requested
      */
     const canReport = window.Vue.computed(() => {
         return useInputStore().canReport;
+    });
+
+    /**
+     * The total number of columns to display in the report
+     * @returns - the total number of columns
+     */
+    const totalColumnCount = window.Vue.computed(() => {
+        let total = 2; // start with 2 for the node name and total
+        if (hasMultipleCourses.value) {
+            // when there are multiple courses, we need to add the total column
+            total += courses.value.reduce((acc, course) => {
+                // add 1 for the course name and 1 for the total, then the number of units
+                return acc + 1 + 1 + (course.units === undefined ? 0 : course.units.length);
+            }, 0);
+        } else {
+            // add 1 for the course name, then the number of units
+            total += 1 + (courses.value[0].units === undefined ? 0 : courses.value[0].units.length);
+        }
+        return total;
     });
 
     /**
@@ -101,5 +120,6 @@ export const useReportStore = defineStore("ccReport", () => {
         nodes,
         hasReport,
         canReport,
+        totalColumnCount,
     };
 });
