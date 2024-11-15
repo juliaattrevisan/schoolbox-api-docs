@@ -248,7 +248,7 @@ function onChildTitleClicked(node: CurriculumCoverageNode): void {
 
 <style scoped>
 tr:hover {
-    background-color: var(--accent-background); /* to help legibility */
+    background-color: #f4f3f3; /* to help legibility */
 }
 
 .expand-button {
