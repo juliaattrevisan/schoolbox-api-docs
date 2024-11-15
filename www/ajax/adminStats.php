@@ -34,24 +34,29 @@ $config = $kernel->get('config');
 switch ($_POST['module']) {
     // cases mirror categories listed
     case 'users':
-        $login         = new Login($kernel->get('databaseInternal'), $config->get('session_length'));
-        $summary       = $login->userSummary(null);
-        $totalUser     = 0;
-        $totalLogin    = 0;
+        if ($_SESSION['user']->isSuperuser()) {
+            $login      = new Login($kernel->get('databaseInternal'), $config->get('session_length'));
+            $summary    = $login->userSummary(null);
+            $totalUser  = 0;
+            $totalLogin = 0;
 
-        foreach ($summary as $group) {
-            $output[] = array( 'GROUP_ID'        => $group['id'],
-                               'GROUP_NAME'      => Scrub::text($group['name']),
-                               'GROUP_USER'      => $group['total'],
-                               'GROUP_LOGGED_IN' => $group['logged_in'] );
-            $totalUser += $group['total'];
-            $totalLogin += $group['logged_in'];
+            foreach ($summary as $group) {
+                $output[] = array(
+                    'GROUP_ID'        => $group['id'],
+                    'GROUP_NAME'      => Scrub::text($group['name']),
+                    'GROUP_USER'      => $group['total'],
+                    'GROUP_LOGGED_IN' => $group['logged_in'],
+                );
+                $totalUser += $group['total'];
+                $totalLogin += $group['logged_in'];
+            }
+            $output[] = array(
+                'GROUP_ID' => '',
+                'GROUP_NAME' => 'Total',
+                'GROUP_USER' => $totalUser,
+                'GROUP_LOGGED_IN' => $totalLogin,
+            );
         }
-        $output[] = array(  'GROUP_ID' => '',
-                            'GROUP_NAME' => 'Total',
-                            'GROUP_USER' => $totalUser,
-                            'GROUP_LOGGED_IN' => $totalLogin,);
-
         break;
 
     case 'service_www':
