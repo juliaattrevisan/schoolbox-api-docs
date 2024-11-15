@@ -174,6 +174,7 @@ class Controller extends Base
         $this->response = $this->responseFromTemplate(
             '@adminHome/index.twig',
             [
+                'userIsSuperuser' => $this->getUser()->isSuperuser(),
                 'pageCurrent' => $this->routeGenerator->generate('adminHome.getIndex'),
                 'allBreadcrumbs' => (new Subnav($this->getConfigLoader(), $this->getUser()))->generateBreadcrumbs($this->routeGenerator->generate('adminHome.getIndex')),
                 'usageInGraph' => $usageInGraph,
