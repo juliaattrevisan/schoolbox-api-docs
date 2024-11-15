@@ -7,15 +7,15 @@ import { useTemplateRef } from "vue";
 import NodeDetails from "@schoolboxCurriculum/vue/node-details.vue";
 import BasicModal from "@schoolboxVue/components/modal/basic-modal.vue";
 import CcReportTableNode from "./cc-report-table-node.vue";
+import CcReportTableNoNodes from "./cc-report-table-no-nodes.vue";
 import CcUsagePopOut from "./cc-usage-pop-out.vue";
 import { useReportStore } from "./store/ccReportStore";
-import { useFiltersStore } from "./store/ccFiltersStore";
 import type { CurriculumCoverageNode } from "../js/types/curriculumCoverageTypes";
 
 const reportStore = useReportStore();
-const filtersStore = useFiltersStore();
 const isDetailsOpen = window.Vue.ref(false);
 const selectedNodeId = window.Vue.ref<number | null>(null);
+const tbodyEl = useTemplateRef<HTMLTableSectionElement>("tbodyEl");
 
 /**
  * When a title is selected, show the details modal
@@ -33,29 +33,6 @@ window.Vue.watch(isDetailsOpen, (isOpen) => {
     if (!isOpen) {
         selectedNodeId.value = null;
     }
-});
-
-const tbodyEl = useTemplateRef<HTMLTableSectionElement>("tbodyEl");
-const showEmpty = window.Vue.ref(false);
-
-window.Vue.onMounted(() => {
-    const lrnObserver = new MutationObserver((mutationsList) => {
-        if (!filtersStore.onlyShowGaps) {
-            showEmpty.value = false;
-            return;
-        }
-        mutationsList.forEach(() => {
-            if (!showEmpty.value && tbodyEl.value?.children && tbodyEl.value.children.length === 0) {
-                console.warn(tbodyEl.value.children.length);
-                showEmpty.value = true;
-            }
-        });
-    });
-    lrnObserver.observe(tbodyEl.value as HTMLTableSectionElement, {
-        subtree: false,
-        childList: true,
-        attributes: false,
-    });
 });
 </script>
 
@@ -99,11 +76,7 @@ window.Vue.onMounted(() => {
                     :depth="0"
                     @title-click="onTitleClick"
                 />
-                <tr v-if="showEmpty">
-                    <td :colspan="reportStore.totalColumnCount" class="t-align-center">
-                        No curriculum outcomes have a total usage count of 0
-                    </td>
-                </tr>
+                <cc-report-table-no-nodes :tbody-el="tbodyEl" />
             </tbody>
         </table>
     </div>
