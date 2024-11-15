@@ -387,6 +387,10 @@
          # The first tab in the list is always selected by default
          # activeTab setting will override it later if appropriate to do so
          # based on the anchor in the url via javascript
+         #
+         # contacts: users must have showContacts truthy and have at least one contact
+         #           or the viewer is a primary carer and the viewee has at least one
+         #           emergency contact. This is really particular.
          #}
         {% set additionalConstraints = {
             'student': {
@@ -411,7 +415,7 @@
                 'goals': USER.role.viewStudentProfile and config.badges_enabled,
                 'achievements': USER.role.viewStudentProfile and config.badges_enabled,
                 'classes': USER.role.viewStudentProfile and user.isShowTimetable,
-                'contacts': USER.role.viewStudentProfile and (user.showContacts or isPrimaryCarer) and (contacts|length or hasEmergencyContacts)
+                'contacts': USER.role.viewStudentProfile and ((user.showContacts and contacts|length) or (isPrimaryCarer and hasEmergencyContacts))
             },
         } %}
 
