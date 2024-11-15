@@ -3,6 +3,7 @@
 <script type="text/javascript" src="{{ CDN_PREFIX }}/js/bundle/highcharts.js?v={{ config.site_version }}"></script>
 <script type="text/javascript" src="{{ CDN_PREFIX }}/js/server-usage/jquery.server-usage.js?v={{ config.site_version }}"></script>
 <script type="text/javascript">
+    window.userIsSuperuser = ('{{ userIsSuperuser }}' !== ''); // Convert twig boolean into Javascript boolean.
 
     $(function() {
         var allCategories = [];
@@ -63,24 +64,26 @@
 
         if (window.location.pathname.indexOf("nojscript") == -1)
         {
-            // Load the user statistics via ajax
-            $.post('/ajax/adminStats.php', { module : 'users' }, function(data)
-            {
-                for (i in data)
+            if (window.userIsSuperuser) {
+                // Load the user statistics via ajax
+                $.post('/ajax/adminStats.php', { module : 'users' }, function(data)
                 {
-                    var row = data[i];
+                    for (i in data)
+                    {
+                        var row = data[i];
 
-                    if(row.GROUP_ID > 0) {
-                        $('<tr><td><a href="/adminv2/reports/group/' + row.GROUP_ID + '">' + row.GROUP_NAME +
-                                '</a></td><td>' + row.GROUP_USER +
-                                '</td><td>' + row.GROUP_LOGGED_IN + '</td></tr>').appendTo($('#group-summary'));
-                    } else {
-                        $('<tr><td>' + row.GROUP_NAME +
-                                '</td><td>' + row.GROUP_USER +
-                                '</td><td>' + row.GROUP_LOGGED_IN + '</td></tr>').appendTo($('#group-summary'));
+                        if(row.GROUP_ID > 0) {
+                            $('<tr><td><a href="/adminv2/reports/group/' + row.GROUP_ID + '">' + row.GROUP_NAME +
+                                    '</a></td><td>' + row.GROUP_USER +
+                                    '</td><td>' + row.GROUP_LOGGED_IN + '</td></tr>').appendTo($('#group-summary'));
+                        } else {
+                            $('<tr><td>' + row.GROUP_NAME +
+                                    '</td><td>' + row.GROUP_USER +
+                                    '</td><td>' + row.GROUP_LOGGED_IN + '</td></tr>').appendTo($('#group-summary'));
+                        }
                     }
-                }
-            });
+                });
+            }
 
             // Replace the default www status 'untested' with 'testing'
             $('[data-light="www"]').html('Testing...');
@@ -242,20 +245,22 @@
             }
         });
         // get logs
-        $.ajax({
-            url: "/ajax/adminStats.php",
-            method: "POST",
-            data: {
-                "module": "logs"
-            },
-            success:function (data) {
-                let html = "";
-                for (let row in data){
-                    html += "<tr><td>" + data[row].date + "</td><td>"+ data[row].action + "</td><td>" + data[row].name + "</td></tr>"
+        if (window.userIsSuperuser) {
+            $.ajax({
+                url: "/ajax/adminStats.php",
+                method: "POST",
+                data: {
+                    "module": "logs"
+                },
+                success:function (data) {
+                    let html = "";
+                    for (let row in data){
+                        html += "<tr><td>" + data[row].date + "</td><td>"+ data[row].action + "</td><td>" + data[row].name + "</td></tr>"
+                    }
+                    $('tbody.logs').html(html);
                 }
-                $('tbody.logs').html(html);
-            }
-        });
+            });
+        }
         // get rabbitmq status
         $.ajax({
             url: "/ajax/adminStats.php",
