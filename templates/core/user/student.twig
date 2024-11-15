@@ -419,12 +419,33 @@
          #}
 
         {% set additionalConstraints = {
-            'activity': showActivityFeed,
-            'goals': showAchievementsTab,
-            'achievements': showAchievementsTab,
-            'classes': showClasses and showSubjects,
-            'groups': showGroups,
-            'contacts': showContactsTab
+            'student': {
+                '_default': true,
+                'activity': showActivityFeed,
+                'goals': showAchievementsTab,
+                'achievements': showAchievementsTab,
+                'classes': showClasses and showSubjects,
+                'groups': showGroups,
+                'contacts': showContactsTab
+            },
+            'parent': {
+                '_default': true,
+                'activity': showActivityFeed,
+                'goals': showAchievementsTab,
+                'achievements': showAchievementsTab,
+                'classes': showClasses and showSubjects,
+                'groups': showGroups,
+                'contacts': showContactsTab
+            },
+            'staff': {
+                '_default': true,
+                'activity': showActivityFeed,
+                'goals': showAchievementsTab,
+                'achievements': showAchievementsTab,
+                'classes': showClasses and showSubjects,
+                'groups': showGroups,
+                'contacts': showContactsTab
+            },
         } %}
 
         {# Out of all the tabs that could possibly exist here, figure out
@@ -434,7 +455,7 @@
 
         {% for tab in possibleTabs %}
             {# Check additionalConstraints to really know if this tab should be on-screen #}
-            {% if additionalConstraints[tab.tab] ?? true %}
+            {% if additionalConstraints[USER.role.type][tab.tab] ?? additionalConstraints[USER.role.type]['_default'] %}
                 {% if not activeTab %}
                     {% set activeTab = 'tab-' ~ tab.tab %}
                 {% endif %}
