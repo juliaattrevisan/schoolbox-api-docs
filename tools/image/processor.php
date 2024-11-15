@@ -24,7 +24,7 @@ const DEFAULT_ATTEMPTS_PER_TRANSFORM = 3;                    // default maximum 
 $opt                  = getopt('hv', ['help', 'verbose', 'retry-failed', 'time-interval:', 'max-workers:', 'limit:', 'max-attempts:']);
 $retryFailed          = array_key_exists('retry-failed', $opt);
 $timeInterval         = array_key_exists('time-interval', $opt) ? (int)$opt['time-interval'] : DEFAULT_TIME_INTERVAL_MINUTES;
-$workerCount          = array_key_exists('max-workers', $opt) ? (int)$opt['max-workers'] : (int)max(1, ((int)shell_exec('nproc') * 0.75));
+$workerCount          = array_key_exists('max-workers', $opt) ? (int)$opt['max-workers'] : (int)max(1, ((int)shell_exec('nproc') * 0.50));
 $imageCountLimit      = array_key_exists('limit', $opt) ? (int)$opt['limit'] : DEFAULT_IMAGE_COUNT_LIMIT;
 $attemptsPerTransform = array_key_exists('max-attempts', $opt) ? (int)$opt['max-attempts'] : DEFAULT_ATTEMPTS_PER_TRANSFORM;
 
