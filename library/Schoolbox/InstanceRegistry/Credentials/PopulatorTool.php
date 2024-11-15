@@ -126,7 +126,7 @@ abstract class PopulatorTool extends App
     {
         $client = new Client(['curl' => Server::getInstance()->buildCurlOptions()]);
 
-        /* This endpoint is listed here: https://manage.schoolbox.cloud/api/docs
+        /* This endpoint is listed here: https://manage.schoolbox.cloud/api/documentation
          */
         $endpoint = $this->generateEndpoint($irUrl, $puppetCert, $environment);
 
