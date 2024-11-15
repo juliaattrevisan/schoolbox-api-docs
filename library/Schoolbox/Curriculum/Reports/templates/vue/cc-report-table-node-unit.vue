@@ -4,21 +4,27 @@
  * with the ability to select the cell to reveal further details on the relevant usage
  */
 
+import type { Course } from "@schoolboxLibrary/types/Course";
+import type { Unit } from "@schoolboxLibrary/types/Unit";
 import type { CurriculumCoverageNode } from "../js/types/curriculumCoverageTypes";
+import { usePopOutStore } from "./store/ccPopOutStore";
 
 interface Props {
+    course: Course;
+    unit: Unit;
     node: CurriculumCoverageNode;
     count: number; // the usage number
 }
 const props = defineProps<Props>();
 
 const isCountZero = window.Vue.computed(() => props.count === 0); // don't need a button when it's zero
+const popOutStore = usePopOutStore();
 
 /**
- * Open the unit details pop out
+ * Open the pop out
  */
 function onClick(): void {
-    console.warn("click");
+    popOutStore.setActive(props.course, props.unit, props.node);
 }
 </script>
 

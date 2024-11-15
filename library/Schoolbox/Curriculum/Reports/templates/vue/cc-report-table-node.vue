@@ -231,6 +231,8 @@ function onChildTitleClicked(node: CurriculumCoverageNode): void {
             <cc-report-table-node-unit
                 v-for="unit in course.units"
                 :key="unit.id"
+                :course="course"
+                :unit="unit"
                 :node="props.node"
                 :count="getUnitUsageCount(props.node, course, unit)"
             />
