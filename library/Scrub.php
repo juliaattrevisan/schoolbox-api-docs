@@ -182,7 +182,7 @@ class Scrub
                 'onedrive.live.com/embed/',
                 'sway.com/',
                 'spark.adobe.com/',
-                '*.paperlyapp.com/',
+                '(?:.*?)\\.paperlyapp\\.com/',
             ];
 
             // Add any additional iframe sources as configured
