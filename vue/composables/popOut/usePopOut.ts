@@ -18,6 +18,7 @@ import { onClickOutside } from "@vueuse/core";
  * @param optimalPlacement - The optimal placement of the pop out content
  * @param isFullWidth - whether to display the pop out content has full width
  * @param isCloseOnContentClick - whether to close the pop out content when it's clicked
+ * @param matchButtonColour - whether to match the button colour to the content colour
  * @param moveTo - An optional element to move the pop out content to
  * @param onClose - An optional callback to run when the pop out is closed
  * @returns - The isOpen ref
@@ -29,6 +30,7 @@ export function usePopOut(
     optimalPlacement: Placement = "bottom-end",
     isFullWidth: boolean = false,
     isCloseOnContentClick: boolean = false,
+    matchButtonColour: boolean = true,
     moveTo: HTMLElement | string | null = null,
     onClose: () => void = (): void => {},
 ): {
@@ -63,9 +65,9 @@ export function usePopOut(
             }
 
             // reset the colour of the button to default after changing on open state
-            // if (button.value instanceof HTMLButtonElement) {
-            //     button.value.style.backgroundColor = "";
-            // }
+            if (button.value instanceof HTMLButtonElement) {
+                button.value.style.backgroundColor = "";
+            }
 
             cleanup();
             onClose();
@@ -169,11 +171,11 @@ export function usePopOut(
         contentElement.style.display = "block"; // The element must be visible to correctly compute its position
         contentElement.setAttribute("aria-hidden", "false");
         // the button will always match the colour of the content when open
-        // if (buttonElement instanceof HTMLButtonElement) {
-        //     buttonElement.style.backgroundColor = window
-        //         .getComputedStyle(contentElement)
-        //         .getPropertyValue("background-color");
-        // }
+        if (matchButtonColour && buttonElement instanceof HTMLButtonElement) {
+            buttonElement.style.backgroundColor = window
+                .getComputedStyle(contentElement)
+                .getPropertyValue("background-color");
+        }
         cleanup = autoUpdate(buttonElement, contentElement, () => {
             void updatePosition();
         });

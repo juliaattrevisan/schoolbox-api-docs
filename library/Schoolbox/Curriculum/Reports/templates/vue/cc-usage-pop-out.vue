@@ -30,6 +30,7 @@ const { onButtonSelected } = usePopOut(
     "right-start",
     undefined,
     undefined,
+    false,
     undefined,
     onPopOutClosed,
 );
