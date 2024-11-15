@@ -536,7 +536,6 @@ class Controller extends BaseController
                 'contacts'                 => $contacts,
                 'subjects'                 => $subjects,
                 'groups'                   => $groups,
-                'isParentOfStudent'        => $isParentOfStudent,
                 'isPrimaryCarer'           => $isPrimaryCarer,
                 'allTeacherIds'            => implode(',', $allTeacherIds),
                 'pdStates'                 => $this->professionalDevelopmentMapper->getStates(),
