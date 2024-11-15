@@ -532,7 +532,6 @@ class Controller extends BaseController
                 'session' => $_SESSION,
 
                 'eportfolioAuth'           => $this->eportfolioAuthenticator->canView(),
-                'hideContacts'             => $hideContacts,
                 'now'                      => Alaress_Date_Format::now(),
                 'contacts'                 => $contacts,
                 'subjects'                 => $subjects,
