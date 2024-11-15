@@ -6,7 +6,7 @@ import { defineStore } from "pinia";
 import type { Course } from "@schoolboxLibrary/types/Course";
 import type { Unit } from "@schoolboxLibrary/types/Unit";
 import { isAbortError } from "@js/util/errorUtils";
-import type { CurriculumCoverageNode } from "../../js/types/curriculumCoverageTypes";
+import type { CurriculumCoverageNode, IndividualUsagePayload } from "../../js/types/curriculumCoverageTypes";
 
 /**
  * What is returned when there is a search error
@@ -30,6 +30,7 @@ export const usePopOutStore = defineStore(`ccPopOut`, () => {
     const isLoading = window.Vue.ref(false);
     const hasLoadError = window.Vue.ref(false); // To show that an error has occurred
     const loadError = window.Vue.ref<ReportError | null>(null);
+    const usage = window.Vue.ref<IndividualUsagePayload | null>(null); // the usage to display in the pop-out
     let controller: AbortController; // to allow aborting the previous search if a new one is started
 
     /**
@@ -91,21 +92,19 @@ export const usePopOutStore = defineStore(`ccPopOut`, () => {
                 };
                 return;
             }
-            // const responseJson = (await response.json()) as CurriculumCoveragePayload | ReportError;
-            // if (typeof responseJson !== "object" || responseJson === null) {
-            //     hasLoadError.value = true;
-            //     return;
-            // }
-            // if ("status" in responseJson) {
-            //     hasLoadError.value = true;
-            //     loadError.value = responseJson;
-            //     return;
-            // }
-            // if ("data" in responseJson) {
-            //     courses.value = responseJson.data.courses;
-            //     nodes.value = responseJson.data.nodes;
-            //     hasReport.value = true;
-            // }
+            const responseJson = (await response.json()) as IndividualUsagePayload | ReportError;
+            if (typeof responseJson !== "object" || responseJson === null) {
+                hasLoadError.value = true;
+                return;
+            }
+            if ("status" in responseJson) {
+                hasLoadError.value = true;
+                loadError.value = responseJson;
+                return;
+            }
+            if ("data" in responseJson) {
+                usage.value = responseJson;
+            }
             isLoading.value = false;
         } catch (error) {
             // ignore abort errors, as the previous search was cancelled
