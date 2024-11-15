@@ -283,7 +283,7 @@
                                 '_default': USER.role.viewStudentProfile,
                                 'eportfolio': USER.role.viewStudentProfile and eportfolioAuth,
                                 'pastoral': USER.role.viewStudentProfile and showPastoral and pastoralUrl,
-                                'timetable': USER.role.viewStudentProfile and showClasses,
+                                'timetable': USER.role.viewStudentProfile and user.isShowTimetable,
                                 'pastoralsynergetic': USER.role.viewStudentProfile and config.external_type == 'synergetic' and config.external_staff_portal,
                                 'documentmanagement': USER.role.viewStudentProfile and config.external_document_report_enabled and config.external_document_button_enable,
                                 'geosnapshot': USER.role.viewStudentProfile and isGeosnapshotAvailable,
@@ -410,7 +410,7 @@
                 'activity': (config.learning_moments_enabled and user.learningMomentsEnabled) or config.badges_enabled or config.grades_enabled,
                 'goals': config.badges_enabled,
                 'achievements': config.badges_enabled,
-                'classes': showClasses,
+                'classes': user.isShowTimetable,
                 'contacts': showContactsTab
             },
             'parent': {
@@ -418,7 +418,7 @@
                 'activity': (config.learning_moments_enabled and user.learningMomentsEnabled) or config.badges_enabled or config.grades_enabled,
                 'goals': config.badges_enabled,
                 'achievements': config.badges_enabled,
-                'classes': showClasses,
+                'classes': user.isShowTimetable,
                 'contacts': showContactsTab
             },
             'staff': {
@@ -426,7 +426,7 @@
                 'activity': USER.role.viewStudentProfile and ((config.learning_moments_enabled and user.learningMomentsEnabled) or config.badges_enabled or config.grades_enabled),
                 'goals': USER.role.viewStudentProfile and config.badges_enabled,
                 'achievements': USER.role.viewStudentProfile and config.badges_enabled,
-                'classes': USER.role.viewStudentProfile and showClasses,
+                'classes': USER.role.viewStudentProfile and user.isShowTimetable,
                 'contacts': USER.role.viewStudentProfile and showContactsTab
             },
         } %}

@@ -454,12 +454,6 @@ class Controller extends BaseController
         $twig       = $this->getDi()->get('templateEngine');
         $travelLogs = $travelLogRenderer->render($twig, $student->getExternalId(), true);
 
-        /* For a student's classes tiles to be visible, they must pass the sis
-         * checks determined by $showDetails and their timetable must be visible
-         * via the Hide Timetable checkbox in their Modify User screen
-         */
-        $showClasses = $showDetails && !$student->getHideTimetable();
-
         /* Decide whether the current user can comment on this student's learning moments
          *
          * Staff and student can always comment
@@ -536,9 +530,7 @@ class Controller extends BaseController
                 /* Old implementation
                  */
                 'session' => $_SESSION,
-                /* This is mostly superseded by user.showTimetable in twig
-                 */
-                'showClasses' => $showClasses,
+
                 'eportfolioAuth'           => $this->eportfolioAuthenticator->canView(),
                 'hideContacts'             => $hideContacts,
                 'now'                      => Alaress_Date_Format::now(),
