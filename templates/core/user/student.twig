@@ -3,7 +3,7 @@
  #
  # showEmails   bool    Spec pattern to decide whether email address is visible
  # showDetails  bool    Spec patternt to decide whether details are visible
-#}
+ #}
 
 {# Permissions #}
 {% set isSuperuser = session.user.superUser %}
@@ -11,11 +11,6 @@
 {# Leaving isStaff for extended custom templates #}
 {% set isStaff = isSuperuser or USER.role.staff %}
 {% set isSelf = session.user.id == user.id %}
-
-{# contacts: su, staff or parent #}
-{# Should a student see their own contact details? I think so #}
-{% set showContacts = (isStaffWhoCanView or isParentOfStudent) and not hideContacts and contacts|length > 0 %}
-{% set showContactsAlert = config.synergetic_community_alerts and showContacts and isStaffWhoCanView and externalUser is defined %}
 
 {# Emergency Contact Information, due to non-normalisation, must be manually inspected
  # for contents in three possible places; name, phone, phone alt. Information can exist
@@ -26,7 +21,7 @@
  #
  # tbh I think that you need both a name and at least one phone number for this section
  # to be even remotely useful, but anyway I'll go with what was previously here...
-#}
+ #}
 {% set hasEmergencyContacts = false %}
 {% for i in 1..3 %}
     {% set index = (i == 1 ? '' : i) %}
@@ -35,17 +30,6 @@
         {% set hasEmergencyContacts = true %}
     {% endif %}
 {% endfor %}
-
-{% set showEmergencyContacts =
-    (isPrimaryCarer or isStaffWhoCanView)
-    and not hideContacts
-    and hasEmergencyContacts
-%}
-{% set showContactsTab =
-    showContacts
-    or showContactsAlert
-    or showEmergencyContacts
-%}
 
 {% set shareLearningMomentUrl = routeLookupIfAuthorized(
     'learningMomentEvidence.getCreateForm',
@@ -58,7 +42,7 @@
 {##
  # Is the current user viewing their own profile?
  # This affects some links and metadata displayed.
-#}
+ #}
 {% set isCurrentUser = user.id == USER.id %}
 
 <script type="text/javascript">
@@ -411,7 +395,7 @@
                 'goals': config.badges_enabled,
                 'achievements': config.badges_enabled,
                 'classes': user.isShowTimetable,
-                'contacts': showContactsTab
+                'contacts': user.showContacts or isPrimaryCarer or hasEmergencyContacts
             },
             'parent': {
                 '_default': true,
@@ -419,7 +403,7 @@
                 'goals': config.badges_enabled,
                 'achievements': config.badges_enabled,
                 'classes': user.isShowTimetable,
-                'contacts': showContactsTab
+                'contacts': user.showContacts or isPrimaryCarer or hasEmergencyContacts
             },
             'staff': {
                 '_default': USER.role.viewStudentProfile,
@@ -427,7 +411,7 @@
                 'goals': USER.role.viewStudentProfile and config.badges_enabled,
                 'achievements': USER.role.viewStudentProfile and config.badges_enabled,
                 'classes': USER.role.viewStudentProfile and user.isShowTimetable,
-                'contacts': USER.role.viewStudentProfile and showContactsTab
+                'contacts': USER.role.viewStudentProfile and (user.showContacts or isPrimaryCarer or hasEmergencyContacts)
             },
         } %}
 
@@ -818,21 +802,25 @@
                 {% endif %}
             {% endif %}
 
-            {% if showContactsTab %}
+            {% if additionalConstraints[USER.role.type]['contacts'] ?? additionalConstraints[USER.role.type]['_default'] %}
+                {# Only show this tab if there's any content here:
+                 # Viewee must allow you to see their main contacts,
+                 # or they have emergency contacts
+                 #}
                 <div class="content no-pad {% if activeTab == 'contacts' %}active{% endif %}" id="tab-contacts">
                     <section class="content">
                         {% block contacts_island %}
                             {% block contacts %}
                                 <h2 class="subheader">Contact Information</h2>
-                                {% if showContactsAlert %}
+
+                                {% if user.isShowContacts %}
                                     {% if externalUser.ParentsSeparatedFlag ?? false %}
                                         {% block parents_separated %}
                                             <div class="alert-box highlight icon-info">Parents Separated</div>
                                         {% endblock parents_separated %}
                                     {% endif %}
-                                {% endif %}
 
-                                {% if showContacts %}
+                                    {% if contacts|length %}
                                     <section>
                                         <ul class="information-list expandable-card">
                                             {% for contact in contacts %}
@@ -990,7 +978,7 @@
                                 {# up to 3 emergency contact blocks
                                  # show no header if no emergencies
                                  #}
-                                {% if showEmergencyContacts %}
+                                {% if hasEmergencyContacts %}
                                     <h2 class="subheader">Emergency Contact Information</h2>
                                     <section>
                                         <ul class="information-list expandable-card">
@@ -1048,7 +1036,7 @@
 {# TODO: Where to pus this?
  # https://stackoverflow.com/questions/23569705/zurb-foundation-prevent-empty-column-collapsing-to-zero-width
  # https://foundation.zurb.com/forum/posts/22995-empty-column
-#}
+ #}
 <style type="text/css">
     .columns, .column {
         min-height: 1px;
@@ -1060,7 +1048,7 @@
  # Modal for sharing a learning moment
  #
  # Only show "sharing on behalf of" if you're not viewing your own profile
-#}
+ #}
 {% if shareLearningMomentUrl %}
     {% include '@learningMomentEvidence/shareModal.twig' with {
         id:      "shareLearningMoment",
