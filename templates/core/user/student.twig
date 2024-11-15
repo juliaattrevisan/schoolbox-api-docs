@@ -17,7 +17,6 @@
 {% set showSpecialAlert = not config.protect_medicalspecial_profile and isStaffWhoCanView %}
 {% set showComments = config.synergetic_student_comment and isStaffWhoCanView %}
 
-{% set showButtons = showDetails %}
 {# contacts: su, staff or parent #}
 {# Should a student see their own contact details? I think so #}
 {% set showContacts = (isStaffWhoCanView or isParentOfStudent) and not hideContacts and contacts|length > 0 %}
@@ -826,7 +825,6 @@
 
             {% if showContactsTab %}
                 <div class="content no-pad {% if activeTab == 'contacts' %}active{% endif %}" id="tab-contacts">
-
                     <section class="content">
                         {% block contacts_island %}
                             {% block contacts %}
