@@ -11,10 +11,38 @@ interface Props {
     count: number; // the usage number
 }
 const props = defineProps<Props>();
+
+/**
+ * Open the unit details pop out
+ */
+function onClick(): void {
+    console.warn("click");
+}
 </script>
 
 <template>
-    <td>{{ props.count }}</td>
+    <td>
+        <button @click="onClick">{{ props.count }}</button>
+    </td>
 </template>
 
-<style scoped></style>
+<style lang="scss" scoped>
+td {
+    padding: 0; /* apply padding to the button  instead */
+    position: relative;
+}
+
+button {
+    background: none;
+    display: flex;
+    padding: 0.625rem;
+    position: absolute;
+    margin: 0;
+    height: 100%;
+    text-align: left;
+    width: 100%;
+    &:hover {
+        background-color: var(--accent-background);
+    }
+}
+</style>
