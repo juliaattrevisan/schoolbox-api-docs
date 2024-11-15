@@ -112,33 +112,45 @@
                      # rendering profile fields.
                      #}
                     {% set additionalConstraints = {
-                        'eportfolio': USER.role.viewParentProfile and eportfolioAuth,
-                        'calendar': USER.role.viewParentProfile,
+
                     } %}
 
-                    {% if showButtons %}
-                        {% for button in buttons %}
-                            {% if additionalConstraints[button.type] ?? true %}
-                                {% set text = button.text %}
+                    {% set additionalConstraints = {
+                        'student': {
+                            '_default': true,
+                            'eportfolio': eportfolioAuth,
+                        },
+                        'parent': {
+                            '_default': true,
+                            'eportfolio': eportfolioAuth,
+                        },
+                        'staff': {
+                            '_default': USER.role.viewParentProfile,
+                            'eportfolio': USER.role.viewParentProfile and eportfolioAuth,
+                        },
+                    } %}
 
-                                {# A standard button whose urls need to be dynamically determined #}
-                                {% set route = button.url %}
+                    {% for button in buttons %}
+                        {% if additionalConstraints[button.type] ?? true %}
+                            {% set text = button.text %}
 
-                                {# Unique derivations #}
-                                {% if button.type in ['calendar'] %}
-                                    {% set route = '/calendar/' ~  now.getURLDate() ~ '/' ~ user.id %}
-                                {% elseif button.type in ['timetable'] %}
-                                    {% set route = '/timetable/' ~ user.id %}
-                                {% endif %}
+                            {# A standard button whose urls need to be dynamically determined #}
+                            {% set route = button.url %}
 
-                                {% if route %}
-                                    <li>
-                                        <a href="{{ route }}" title="{{ button.title }}" class="icon-{{ button.icon }} {{ button.css }}" target="{{ button.target }}">{{ text }}</a>
-                                    </li>
-                                {% endif %}
+                            {# Unique derivations #}
+                            {% if button.type in ['calendar'] %}
+                                {% set route = '/calendar/' ~  now.getURLDate() ~ '/' ~ user.id %}
+                            {% elseif button.type in ['timetable'] %}
+                                {% set route = '/timetable/' ~ user.id %}
                             {% endif %}
-                        {% endfor %}
-                    {% endif %}
+
+                            {% if route %}
+                                <li>
+                                    <a href="{{ route }}" title="{{ button.title }}" class="icon-{{ button.icon }} {{ button.css }}" target="{{ button.target }}">{{ text }}</a>
+                                </li>
+                            {% endif %}
+                        {% endif %}
+                    {% endfor %}
                 {% endblock buttons %}
             </ul>
         </section>

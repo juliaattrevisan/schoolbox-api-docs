@@ -284,18 +284,29 @@
                          # rendering profile fields.
                          #}
                         {% set additionalConstraints = {
-                            'eportfolio': USER.role.viewStudentProfile and eportfolioAuth,
-                            'pastoral': USER.role.viewStudentProfile and showPastoral and pastoralUrl,
-                            'timetable': USER.role.viewStudentProfile and showClasses,
-                            'pastoralsynergetic': USER.role.viewStudentProfile and config.external_type == 'synergetic' and config.external_staff_portal,
-                            'documentmanagement': USER.role.viewStudentProfile and config.external_document_report_enabled and config.external_document_button_enable,
-                            'geosnapshot': USER.role.viewStudentProfile and isGeosnapshotAvailable,
-                            'emailstaff': USER.role.viewStudentProfile and config.mail_enable and config.email_all_staff and session.user.email,
-                            'emailparents': USER.role.viewStudentProfile and config.mail_enable and config.email_all_parents and session.user.email and not hideContacts
+                            'student': {
+                                '_default': true,
+                                'eportfolio': eportfolioAuth,
+                            },
+                            'parent': {
+                                '_default': true,
+                                'eportfolio': eportfolioAuth,
+                            },
+                            'staff': {
+                                '_default': USER.role.viewStudentProfile,
+                                'eportfolio': USER.role.viewStudentProfile and eportfolioAuth,
+                                'pastoral': USER.role.viewStudentProfile and showPastoral and pastoralUrl,
+                                'timetable': USER.role.viewStudentProfile and showClasses,
+                                'pastoralsynergetic': USER.role.viewStudentProfile and config.external_type == 'synergetic' and config.external_staff_portal,
+                                'documentmanagement': USER.role.viewStudentProfile and config.external_document_report_enabled and config.external_document_button_enable,
+                                'geosnapshot': USER.role.viewStudentProfile and isGeosnapshotAvailable,
+                                'emailstaff': USER.role.viewStudentProfile and config.mail_enable and config.email_all_staff and session.user.email,
+                                'emailparents': USER.role.viewStudentProfile and config.mail_enable and config.email_all_parents and session.user.email and not hideContacts
+                            }
                         } %}
 
                         {% for button in buttons %}
-                            {% if additionalConstraints[button.type] ?? true %}
+                            {% if additionalConstraints[USER.role.type][button.type] ?? additionalConstraints[USER.role.type]['_default']  %}
                                 {% set text = button.text %}
 
                                 {# Special cases: Email Teachers and Email Parents
@@ -550,10 +561,10 @@
                         {% for group, subjectGroup in subjects %}
 
                             {# Suffix all iterated identifiers
-                         # Tot menus and so on start exhiting interrelated behaviour when they share the same id
-                         # We can ensure uniqueness in iterations by suffixing with an index but we can do it by
-                         # taking advantage of a twig construct
-                            #}
+                             # Tot menus and so on start exhiting interrelated behaviour when they share the same id
+                             # We can ensure uniqueness in iterations by suffixing with an index but we can do it by
+                             # taking advantage of a twig construct
+                             #}
                             {% set groupIdentifier = loop.index %}
 
                             {# Keep a running total of all teachers emails in this group #}
@@ -601,12 +612,12 @@
                                 {% for subjectKey, subject in subjectGroup %}
 
                                     {# Suffix all iterated identifiers
-                                 # Tot menus and so on start exhibiting interrelated behaviour when they share the same id
-                                 # We can ensure uniqueness in iterations by suffixing with an index but we can do it by
-                                 # taking advantage of a twig construct
-                                 #
-                                 # You have multiple subjects per subject group so you need further uniquification
-                                    #}
+                                     # Tot menus and so on start exhibiting interrelated behaviour when they share the same id
+                                     # We can ensure uniqueness in iterations by suffixing with an index but we can do it by
+                                     # taking advantage of a twig construct
+                                     #
+                                     # You have multiple subjects per subject group so you need further uniquification
+                                     #}
                                     {% set subjectIdentifier = loop.index %}
 
                                     <div class="v-card">
@@ -968,8 +979,8 @@
                         {% block emergencyContacts_island %}
                             {% block emergencyContacts %}
                                 {# up to 3 emergency contact blocks
-                         # show no header if no emergencies
-                                #}
+                                 # show no header if no emergencies
+                                 #}
                                 {% if showEmergencyContacts %}
                                     <h2 class="subheader">Emergency Contact Information</h2>
                                     <section>

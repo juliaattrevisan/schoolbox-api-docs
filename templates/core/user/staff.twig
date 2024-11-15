@@ -111,11 +111,20 @@
                          # rendering profile fields.
                          #}
                         {% set additionalConstraints = {
-                            'eportfolio': eportfolioAuth,
+                            'student': {
+                                '_default': true,
+                            },
+                            'parent': {
+                                '_default': true,
+                            },
+                            'staff': {
+                                '_default': true,
+                                'eportfolio': eportfolioAuth,
+                            },
                         } %}
 
                         {% for button in buttons %}
-                            {% if additionalConstraints[button.type] ?? true %}
+                            {% if additionalConstraints[USER.role.type][button.type] ?? additionalConstraints[USER.role.type]['_default']  %}
                                 {% set text = button.text %}
 
                                 {# A standard button whose urls need to be dynamically determined #}
