@@ -56,9 +56,6 @@
 {% set showGroups = showDetails and groups is not empty %}
 {% set showTitle = user.hasPositionTitle() %}
 
-{% set showActivityFeed =
-    ((config.learning_moments_enabled and user.learningMomentsEnabled) or config.badges_enabled or config.grades_enabled)
-    and (isStaffWhoCanView or isSelf or isParentOfStudent) %}
 {% set showAchievementsTab = config.badges_enabled and (isStaffWhoCanView or isSelf or isParentOfStudent) %}
 {% set shareLearningMomentUrl = routeLookupIfAuthorized(
     'learningMomentEvidence.getCreateForm',
@@ -421,7 +418,7 @@
         {% set additionalConstraints = {
             'student': {
                 '_default': true,
-                'activity': showActivityFeed,
+                'activity': (config.learning_moments_enabled and user.learningMomentsEnabled) or config.badges_enabled or config.grades_enabled,
                 'goals': showAchievementsTab,
                 'achievements': showAchievementsTab,
                 'classes': showClasses and showSubjects,
@@ -430,7 +427,7 @@
             },
             'parent': {
                 '_default': true,
-                'activity': showActivityFeed,
+                'activity': (config.learning_moments_enabled and user.learningMomentsEnabled) or config.badges_enabled or config.grades_enabled,
                 'goals': showAchievementsTab,
                 'achievements': showAchievementsTab,
                 'classes': showClasses and showSubjects,
@@ -439,7 +436,7 @@
             },
             'staff': {
                 '_default': true,
-                'activity': showActivityFeed,
+                'activity': (config.learning_moments_enabled and user.learningMomentsEnabled) or config.badges_enabled or config.grades_enabled,
                 'goals': showAchievementsTab,
                 'achievements': showAchievementsTab,
                 'classes': showClasses and showSubjects,
@@ -489,7 +486,7 @@
         {% endif %}
 
         <div class="profile-tabs tabs-content">
-            {% if showActivityFeed %}
+            {% if additionalConstraints[USER.role.type]['activity'] ?? additionalConstraints[USER.role.type]['_default'] %}
                 <div class="content no-pad {% if activeTab == 'activity' %}active{% endif %}" id="tab-activity">
                     <div id="activity-feed">
                         <activity-feed
