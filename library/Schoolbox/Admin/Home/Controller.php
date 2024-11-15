@@ -93,16 +93,21 @@ class Controller extends Base
      */
     public function dismissUpgradeReminder()
     {
-        $latestVersionMajor = (new InstanceRegistry($this->getConfigLoader()))->getLatestVersionMajor();
-        $configDismissUpgradeReminder = $this->configMapper->findOneByColumn('name', 'dismiss_version');
+        $success = false;
 
-        //update the config item with the current instance major version
-        $configDismissUpgradeReminder->setValue($latestVersionMajor);
-        $this->configMapper->save($configDismissUpgradeReminder);
+        if ($this->getUser()->isSuperuser()) {
+            $latestVersionMajor = (new InstanceRegistry($this->getConfigLoader()))->getLatestVersionMajor();
+            $configDismissUpgradeReminder = $this->configMapper->findOneByColumn('name', 'dismiss_version');
+
+            //update the config item with the current instance major version
+            $configDismissUpgradeReminder->setValue($latestVersionMajor);
+            $this->configMapper->save($configDismissUpgradeReminder);
+            $success = true;
+        }
 
         $this->response = $this->responseAsJson(
             [
-                'success'  => true,
+                'success'  => $success,
                 'messages' => []
             ]
         )->withStatus(200);
