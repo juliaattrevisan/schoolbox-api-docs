@@ -39,8 +39,11 @@ const isSelected = window.Vue.computed(() => {
  * @param event - the click event
  */
 function onClick(event?: MouseEvent | undefined): void {
-    // ignore input label clicks, which get picked up due to the click listener on the parent div
-    if (event && event.target && (event.target as HTMLElement).nodeName === "LABEL") {
+    if (!event || !event.target) {
+        return;
+    }
+    // ignore input label and mark clicks, which get picked up due to the click listener on the parent div
+    if ((event.target as HTMLElement).nodeName === "LABEL" || (event.target as HTMLElement).nodeName === "MARK") {
         return;
     }
     if (isSelected.value && !props.isSingleSelect) {
