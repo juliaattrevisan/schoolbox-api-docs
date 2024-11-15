@@ -19,6 +19,7 @@ interface Props {
 const props = defineProps<Props>();
 
 const isCountZero = window.Vue.computed(() => props.count === 0); // don't need a button when it's zero
+const buttonId = window.Vue.computed(() => `usage-button-${props.course.id}-${props.unit.id}-${props.node.id}`);
 const buttonEl = useTemplateRef<HTMLButtonElement>("buttonEl");
 const popOutStore = usePopOutStore();
 
@@ -38,8 +39,9 @@ function onClick(): void {
         </template>
         <button
             v-else
-            :id="`usage-button-${props.course.id}-${props.unit.id}-${props.node.id}`"
+            :id="buttonId"
             ref="buttonEl"
+            :style="{ background: buttonId === popOutStore.button?.id ? 'var(--accent-background)' : '' }"
             @click="onClick"
         >
             {{ props.count }}
@@ -62,7 +64,7 @@ button {
     text-align: left;
     width: 100%;
     &:hover {
-        background-color: var(--accent-background);
+        background: var(--accent-background);
     }
 }
 </style>

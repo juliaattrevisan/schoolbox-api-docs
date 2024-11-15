@@ -63,9 +63,9 @@ export function usePopOut(
             }
 
             // reset the colour of the button to default after changing on open state
-            if (button.value instanceof HTMLButtonElement) {
-                button.value.style.backgroundColor = "";
-            }
+            // if (button.value instanceof HTMLButtonElement) {
+            //     button.value.style.backgroundColor = "";
+            // }
 
             cleanup();
             onClose();
@@ -169,11 +169,11 @@ export function usePopOut(
         contentElement.style.display = "block"; // The element must be visible to correctly compute its position
         contentElement.setAttribute("aria-hidden", "false");
         // the button will always match the colour of the content when open
-        if (buttonElement instanceof HTMLButtonElement) {
-            buttonElement.style.backgroundColor = window
-                .getComputedStyle(contentElement)
-                .getPropertyValue("background-color");
-        }
+        // if (buttonElement instanceof HTMLButtonElement) {
+        //     buttonElement.style.backgroundColor = window
+        //         .getComputedStyle(contentElement)
+        //         .getPropertyValue("background-color");
+        // }
         cleanup = autoUpdate(buttonElement, contentElement, () => {
             void updatePosition();
         });

@@ -12,11 +12,12 @@ const popOutStore = usePopOutStore();
 const button = window.Vue.ref<HTMLButtonElement | null>(null);
 
 /**
- * When the pop out is closed, clear out the selected state
+ * When the pop out is closed, clear out the selected button to allow
+ * for possible reselection of the same button
  */
 function onPopOutClosed(): void {
     // referenceElement.value?.classList.remove("is-selected");
-    // referenceElement.value = null;
+    popOutStore.button = null;
 }
 
 /**
@@ -48,7 +49,9 @@ async function openPopOut(): Promise<void> {
 window.Vue.watch(
     () => popOutStore.button,
     (newButton) => {
-        console.warn("change");
+        if (newButton === null) {
+            return;
+        }
         button.value = newButton;
         void openPopOut();
     },
