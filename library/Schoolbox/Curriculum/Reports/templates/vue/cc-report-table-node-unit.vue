@@ -12,6 +12,8 @@ interface Props {
 }
 const props = defineProps<Props>();
 
+const isCountZero = window.Vue.computed(() => props.count === 0); // don't need a button when it's zero
+
 /**
  * Open the unit details pop out
  */
@@ -21,22 +23,25 @@ function onClick(): void {
 </script>
 
 <template>
-    <td>
-        <button @click="onClick">{{ props.count }}</button>
+    <!-- padding will be on the button if count is not zeo -->
+    <td :style="{ padding: isCountZero ? '0.625rem' : '0' }">
+        <template v-if="isCountZero">
+            {{ props.count }}
+        </template>
+        <button v-else @click="onClick">{{ props.count }}</button>
     </td>
 </template>
 
 <style lang="scss" scoped>
 td {
-    padding: 0; /* apply padding to the button  instead */
     position: relative;
 }
 
 button {
     background: none;
-    display: flex;
+    display: flex; // to align the text to the top left
     padding: 0.625rem;
-    position: absolute;
+    position: absolute; // make the button fill the entire td cell
     margin: 0;
     height: 100%;
     text-align: left;
