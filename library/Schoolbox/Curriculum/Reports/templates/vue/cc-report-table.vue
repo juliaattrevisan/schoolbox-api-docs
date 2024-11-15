@@ -76,7 +76,7 @@ window.Vue.watch(isDetailsOpen, (isOpen) => {
                     @title-click="onTitleClick"
                 />
                 <tr v-if="filtersStore.onlyShowGaps">
-                    <td :colspan="reportStore.totalColumnCount">
+                    <td :colspan="reportStore.totalColumnCount" class="t-align-center">
                         No curriculum outcomes have a total usage count of 0
                     </td>
                 </tr>
