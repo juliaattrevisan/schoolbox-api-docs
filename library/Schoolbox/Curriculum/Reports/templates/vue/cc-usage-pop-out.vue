@@ -16,12 +16,11 @@ const button = window.Vue.ref<HTMLButtonElement | null>(null);
  * for possible reselection of the same button
  */
 function onPopOutClosed(): void {
-    // referenceElement.value?.classList.remove("is-selected");
     popOutStore.button = null;
 }
 
 /**
- *
+ * When the button is selected, open the pop out
  */
 const { onButtonSelected } = usePopOut(
     button,
@@ -70,8 +69,8 @@ window.Vue.watch(
     background-color: #fff;
     border-radius: 0.25rem;
     box-shadow: 0px 0px 6px rgba(0, 0, 0, 0.2);
-    min-width: 16rem;
     min-height: 8rem;
+    min-width: 16rem;
     padding: 0.5rem 0;
     position: absolute;
     z-index: var(--sbx-depth-pop-over);
