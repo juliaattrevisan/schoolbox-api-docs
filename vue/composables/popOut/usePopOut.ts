@@ -18,9 +18,9 @@ import { onClickOutside } from "@vueuse/core";
  * @param optimalPlacement - The optimal placement of the pop out content
  * @param isFullWidth - whether to display the pop out content has full width
  * @param isCloseOnContentClick - whether to close the pop out content when it's clicked
- * @param matchButtonColour - whether to match the button colour to the content colour
  * @param moveTo - An optional element to move the pop out content to
  * @param onClose - An optional callback to run when the pop out is closed
+ * @param matchButtonColour - whether to match the button colour to the content colour
  * @returns - The isOpen ref
  */
 export function usePopOut(
