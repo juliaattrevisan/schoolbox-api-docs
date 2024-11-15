@@ -12,6 +12,7 @@ import type { CurriculumCoverageNode } from "../js/types/curriculumCoverageTypes
 import { useReportStore } from "./store/ccReportStore";
 import { useFiltersStore } from "./store/ccFiltersStore";
 import { ReportOptionValues } from "../js/types/curriculumCoverageTypes";
+import ccReportTableNodeUnit from "./cc-report-table-node-unit.vue";
 
 interface Props {
     node: CurriculumCoverageNode;
@@ -227,9 +228,12 @@ function onChildTitleClicked(node: CurriculumCoverageNode): void {
             <td class="u-border-left">
                 {{ getCourseUsageCount(props.node, course) }}
             </td>
-            <td v-for="unit in course.units" :key="unit.id" :class="``">
-                {{ getUnitUsageCount(props.node, course, unit) }}
-            </td>
+            <cc-report-table-node-unit
+                v-for="unit in course.units"
+                :key="unit.id"
+                :node="props.node"
+                :count="getUnitUsageCount(props.node, course, unit)"
+            />
             <td v-if="reportStore.hasMultipleCourses" :class="``">
                 {{ getTotalUsageCount(props.node, course) }}
             </td>
