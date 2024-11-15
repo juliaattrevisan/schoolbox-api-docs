@@ -520,30 +520,32 @@
                         </ul>
                     </section>
 
-                    <!-- Role Statistics -->
+                    {% if userIsSuperuser %}
+                        <!-- Role Statistics -->
 
-                    <h2 class="subheader">Role Statistics</h2>
-                    <section>
-                        <div class="loading"></div>
-                        <div class="scrollable">
-                            <table id="group-summary">
-                                <colgroup>
-                                    <col width="50%" />
-                                    <col width="20%" />
-                                    <col width="30%" />
-                                </colgroup>
-                                <thead>
-                                <tr>
-                                    <th>Role</th>
-                                    <th>Total</th>
-                                    <th>Logged In</th>
-                                </tr>
-                                </thead>
-                                <tbody>
-                                </tbody>
-                            </table>
-                        </div>
-                    </section>
+                        <h2 class="subheader">Role Statistics</h2>
+                        <section>
+                            <div class="loading"></div>
+                            <div class="scrollable">
+                                <table id="group-summary">
+                                    <colgroup>
+                                        <col width="50%" />
+                                        <col width="20%" />
+                                        <col width="30%" />
+                                    </colgroup>
+                                    <thead>
+                                    <tr>
+                                        <th>Role</th>
+                                        <th>Total</th>
+                                        <th>Logged In</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </section>
+                    {% endif %}
                 </div>
 
                 <!-- Recent Log Entries -->
@@ -556,30 +558,32 @@
                             <p>Loading...</p>
                         </div>
                     </div>
-                    <div class="actions-small-2 row">
-                        <div class="list-item">
-                            <div class="small-12 columns">
-                                <h2 class="subheader">Recent Activity</h2>
+                    {% if userIsSuperuser %}
+                        <div class="actions-small-2 row">
+                            <div class="list-item">
+                                <div class="small-12 columns">
+                                    <h2 class="subheader">Recent Activity</h2>
+                                </div>
                             </div>
+                            <nav>
+                                <a href="/adminv2/reports/login/all" class="icon-progress" title="Login Report"></a>
+                                <a href="/adminv2/reports/activity/all" class="icon-list" title="Activity Report"></a>
+                            </nav>
                         </div>
-                        <nav>
-                            <a href="/adminv2/reports/login/all" class="icon-progress" title="Login Report"></a>
-                            <a href="/adminv2/reports/activity/all" class="icon-list" title="Activity Report"></a>
-                        </nav>
-                    </div>
-                    <section>
-                        <table>
-                            <thead>
-                            <tr>
-                                <th>Date</th>
-                                <th>Action</th>
-                                <th>User</th>
-                            </tr>
-                            </thead>
-                            <tbody class="logs">
-                            </tbody>
-                        </table>
-                    </section>
+                        <section>
+                            <table>
+                                <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Action</th>
+                                    <th>User</th>
+                                </tr>
+                                </thead>
+                                <tbody class="logs">
+                                </tbody>
+                            </table>
+                        </section>
+                    {% endif %}
                 </div>
 
             </div><!-- row -->
