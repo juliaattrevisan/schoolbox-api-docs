@@ -4,6 +4,7 @@
  * with the ability to select the cell to reveal further details on the relevant usage
  */
 
+import { useTemplateRef } from "vue";
 import type { Course } from "@schoolboxLibrary/types/Course";
 import type { Unit } from "@schoolboxLibrary/types/Unit";
 import type { CurriculumCoverageNode } from "../js/types/curriculumCoverageTypes";
@@ -18,13 +19,14 @@ interface Props {
 const props = defineProps<Props>();
 
 const isCountZero = window.Vue.computed(() => props.count === 0); // don't need a button when it's zero
+const buttonEl = useTemplateRef<HTMLButtonElement>("buttonEl");
 const popOutStore = usePopOutStore();
 
 /**
  * Open the pop out
  */
 function onClick(): void {
-    popOutStore.setActive(props.course, props.unit, props.node);
+    popOutStore.setActive(props.course, props.unit, props.node, buttonEl.value as HTMLButtonElement);
 }
 </script>
 
@@ -34,7 +36,14 @@ function onClick(): void {
         <template v-if="isCountZero">
             {{ props.count }}
         </template>
-        <button v-else @click="onClick">{{ props.count }}</button>
+        <button
+            v-else
+            :id="`usage-button-${props.course.id}-${props.unit.id}-${props.node.id}`"
+            ref="buttonEl"
+            @click="onClick"
+        >
+            {{ props.count }}
+        </button>
     </td>
 </template>
 

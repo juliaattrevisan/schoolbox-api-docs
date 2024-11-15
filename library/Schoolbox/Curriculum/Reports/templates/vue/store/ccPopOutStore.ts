@@ -11,22 +11,24 @@ export const usePopOutStore = defineStore(`ccPopOut`, () => {
     const course = window.Vue.ref<Course | null>(null);
     const unit = window.Vue.ref<Unit | null>(null);
     const node = window.Vue.ref<CurriculumCoverageNode | null>(null);
+    const button = window.Vue.ref<HTMLButtonElement | null>(null);
 
     /**
      * report has been triggered so set the active course and nodes
      * @param $course - the course to set as active
      * @param $unit - the unit to set as active
      * @param $node - the node to set as active
+     * @param $button - the button that triggered the action
      */
-    function setActive($course: Course, $unit: Unit, $node: CurriculumCoverageNode): void {
+    function setActive($course: Course, $unit: Unit, $node: CurriculumCoverageNode, $button: HTMLButtonElement): void {
         course.value = $course;
         unit.value = $unit;
         node.value = $node;
-        console.warn("setActive", course.value, unit.value, node.value);
+        button.value = $button;
     }
 
     return {
-        node,
+        button,
         setActive,
     };
 });

@@ -6,6 +6,7 @@
 import NodeDetails from "@schoolboxCurriculum/vue/node-details.vue";
 import BasicModal from "@schoolboxVue/components/modal/basic-modal.vue";
 import CcReportTableNode from "./cc-report-table-node.vue";
+import CcUsagePopOut from "./cc-usage-pop-out.vue";
 import { useReportStore } from "./store/ccReportStore";
 import type { CurriculumCoverageNode } from "../js/types/curriculumCoverageTypes";
 
@@ -79,6 +80,7 @@ window.Vue.watch(isDetailsOpen, (isOpen) => {
     <basic-modal v-model:is-open="isDetailsOpen" :has-background-click="true">
         <node-details v-if="selectedNodeId !== null" :node-id="selectedNodeId" />
     </basic-modal>
+    <cc-usage-pop-out />
 </template>
 
 <style scoped>
