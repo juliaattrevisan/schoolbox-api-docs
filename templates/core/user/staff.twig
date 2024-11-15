@@ -11,7 +11,6 @@
 {% set isSelf = session.user.getId() == user.getId() %}
 
 {% set showTitle = user.hasPositionTitle() %}
-{% set showButtons = isStaff or isSelf %}
 
 <div class="actions-small-{{ isSuperuser ? 1 : 0 }} row">
     <div class="list-item">
@@ -115,27 +114,25 @@
                             'eportfolio': eportfolioAuth,
                         } %}
 
-                        {% if showButtons %}
-                            {% for button in buttons %}
-                                {% if additionalConstraints[button.type] ?? true %}
-                                    {% set text = button.text %}
+                        {% for button in buttons %}
+                            {% if additionalConstraints[button.type] ?? true %}
+                                {% set text = button.text %}
 
-                                    {# A standard button whose urls need to be dynamically determined #}
-                                    {% set route = button.url %}
+                                {# A standard button whose urls need to be dynamically determined #}
+                                {% set route = button.url %}
 
-                                    {# Unique derivations #}
-                                    {% if button.type in ['calendar'] %}
-                                        {% set route = '/calendar/' ~  now.getURLDate() ~ '/' ~ user.id %}
-                                    {% endif %}
-
-                                    {% if route %}
-                                        <li>
-                                            <a href="{{ route }}" title="{{ button.title }}" class="icon-{{ button.icon }} {{ button.css }}" target="{{ button.target }}">{{ text }}</a>
-                                        </li>
-                                    {% endif %}
+                                {# Unique derivations #}
+                                {% if button.type in ['calendar'] %}
+                                    {% set route = '/calendar/' ~  now.getURLDate() ~ '/' ~ user.id %}
                                 {% endif %}
-                            {% endfor %}
-                        {% endif %}
+
+                                {% if route %}
+                                    <li>
+                                        <a href="{{ route }}" title="{{ button.title }}" class="icon-{{ button.icon }} {{ button.css }}" target="{{ button.target }}">{{ text }}</a>
+                                    </li>
+                                {% endif %}
+                            {% endif %}
+                        {% endfor %}
                     {% endblock buttons %}
                 </ul>
             {% endblock buttons_island %}
