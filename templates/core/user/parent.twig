@@ -112,7 +112,8 @@
                      # rendering profile fields.
                      #}
                     {% set additionalConstraints = {
-                        'eportfolio': eportfolioAuth,
+                        'eportfolio': USER.role.viewParentProfile and eportfolioAuth,
+                        'calendar': USER.role.viewParentProfile,
                     } %}
 
                     {% if showButtons %}

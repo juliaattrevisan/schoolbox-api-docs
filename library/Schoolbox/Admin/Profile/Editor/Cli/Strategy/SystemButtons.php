@@ -170,6 +170,7 @@ class SystemButtons
         ]);
 
         /* Staff profile page used to show only to themselves and other staff
+         * Parent details should only be visible to staff, I suppose
          */
         $staffRoleIds = $this->fetchRoleIds([\Schoolbox\Role::STAFF]);
 
@@ -493,11 +494,11 @@ class SystemButtons
                     ],
                     'availability' => [
                         'campus' => $this->campusIds,
-                        'role' => $this->roleIds
+                        'role' => $staffRoleIds
                     ],
                     'visibility' => [
                         'campus' => $this->campusIds,
-                        'role' => $this->roleIds
+                        'role' => $staffRoleIds
                     ],
                 ],
                 [
@@ -514,11 +515,11 @@ class SystemButtons
                     ],
                     'availability' => [
                         'campus' => $this->campusIds,
-                        'role' => $this->roleIds
+                        'role' => $staffRoleIds
                     ],
                     'visibility' => [
                         'campus' => $this->campusIds,
-                        'role' => $this->roleIds
+                        'role' => $staffRoleIds
                     ],
                 ],
             ]
