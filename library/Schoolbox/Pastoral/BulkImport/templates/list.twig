@@ -11,11 +11,6 @@
         {% set createRoute = routeLookupIfAuthorized('pastoralBulkImport.getCreateImportForm') %}
         {% set returnQueryString = RETURN_URL.name ~ '=' ~ (encodedReturnUrl ?? RETURN_URL.current) %}
         <div class="row actions-small-1">
-            <div class="list-item">
-                <div class="small-12 column">
-                    <h1>{{ locale.pastoral.proper }} Bulk Imports</h1>
-                </div>
-            </div>
             <nav>
                 {% if createRoute %}
                     <a href="{{ createRoute }}?{{ returnQueryString }}" class="icon-add" title="Add a summative report"></a>
