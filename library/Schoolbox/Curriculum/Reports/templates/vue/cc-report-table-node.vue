@@ -235,6 +235,7 @@ function onChildTitleClicked(node: CurriculumCoverageNode): void {
                 :unit="unit"
                 :node="props.node"
                 :count="getUnitUsageCount(props.node, course, unit)"
+                :is-expanded="isExpanded"
             />
             <td v-if="reportStore.hasMultipleCourses" :class="``">
                 {{ getTotalUsageCount(props.node, course) }}

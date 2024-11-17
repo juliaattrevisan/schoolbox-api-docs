@@ -69,7 +69,8 @@ window.Vue.watch(
             <div class="loader"></div>
         </div>
         <div v-else>
-            <p>Hai</p>
+            <p v-if="popOutStore.isNodeExpanded">Open</p>
+            <p v-else>Closed</p>
         </div>
     </div>
 </template>

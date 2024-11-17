@@ -15,6 +15,7 @@ interface Props {
     unit: Unit;
     node: CurriculumCoverageNode;
     count: number; // the usage number
+    isExpanded: boolean; // whether the node is expanded
 }
 const props = defineProps<Props>();
 
@@ -27,7 +28,7 @@ const popOutStore = usePopOutStore();
  * Open the pop out
  */
 function onClick(): void {
-    popOutStore.setActive(props.course, props.unit, props.node, buttonEl.value as HTMLButtonElement);
+    popOutStore.setActive(props.course, props.unit, props.node, buttonEl.value as HTMLButtonElement, props.isExpanded);
 }
 </script>
 

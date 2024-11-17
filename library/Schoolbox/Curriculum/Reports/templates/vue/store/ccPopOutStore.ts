@@ -29,6 +29,7 @@ export const usePopOutStore = defineStore(`ccPopOut`, () => {
     const unit = window.Vue.ref<Unit | null>(null);
     const node = window.Vue.ref<CurriculumCoverageNode | null>(null);
     const button = window.Vue.ref<HTMLButtonElement | null>(null);
+    const isNodeExpanded = window.Vue.ref<boolean>(false);
 
     // #region search for a usage
 
@@ -135,17 +136,26 @@ export const usePopOutStore = defineStore(`ccPopOut`, () => {
      * @param $unit - the unit to set as active
      * @param $node - the node to set as active
      * @param $button - the button that triggered the action
+     * @param $isNodeExpanded - whether the node is expanded
      */
-    function setActive($course: Course, $unit: Unit, $node: CurriculumCoverageNode, $button: HTMLButtonElement): void {
+    function setActive(
+        $course: Course,
+        $unit: Unit,
+        $node: CurriculumCoverageNode,
+        $button: HTMLButtonElement,
+        $isNodeExpanded: boolean,
+    ): void {
         course.value = $course;
         unit.value = $unit;
         node.value = $node;
         button.value = $button;
+        isNodeExpanded.value = $isNodeExpanded;
         void search();
     }
 
     return {
         button,
+        isNodeExpanded,
         isLoading,
         hasLoadError,
         init,
