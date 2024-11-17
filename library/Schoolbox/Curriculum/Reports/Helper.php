@@ -2,6 +2,7 @@
 
 namespace Schoolbox\Curriculum\Reports;
 
+use Schoolbox\Assessment\Rubric\DataModel\Capability\Mapper;
 use Schoolbox\Curriculum\Node\Mapper as CurriculumMapper;
 
 class Helper
@@ -23,7 +24,7 @@ class Helper
 
         $unitUsageQuery = sprintf(
             "
-            SELECT '%s' type, f.id, f.name title
+            SELECT '%s' type, cus.course_specification_id id, f.name title, cus.folder_id
             FROM course_unit_specification cus
             INNER JOIN curriculum_node_for_category cnfc
                 ON cnfc.category_id = cus.folder_id
@@ -40,7 +41,7 @@ class Helper
         $activityUsageQuery = sprintf(
             "
             SELECT
-                'activity' type, a.id, a.title
+                'activity' type, a.id, a.title, cus.folder_id
             FROM (
                  SELECT '%s' type, t.assessment_id
                  FROM task t
@@ -82,7 +83,7 @@ class Helper
         $lessonPlanUsageQuery = sprintf(
             "
             SELECT
-                activity.type, a.id, a.title
+                activity.type, a.id, a.title, cus.folder_id
             FROM (
                  SELECT '%s' type, lp.assessment_id
                  FROM lesson_plan lp
@@ -105,16 +106,71 @@ class Helper
             $unitId
         );
 
+        $rubricCapabilityUsageQuery = sprintf(
+            "
+            SELECT c.type, rc.id, rc.name title, c.folder_id
+                FROM rubric_capability rc
+                INNER JOIN curriculum_node_for_rubric_capability cnrc
+                    ON rc.id = cnrc.rubric_capability_id
+                    AND cnrc.curriculum_node_id = %d
+                INNER JOIN (
+                    SELECT '%s' type, cs.id, cs.folder_id
+                    FROM course_specification cs
+                    UNION
+                    SELECT '%s' type, cus.course_specification_id id, cus.folder_id
+                    FROM course_unit_specification cus
+                    WHERE cus.folder_id = %d
+                ) c ON c.folder_id = rc.parent_id AND c.id = %d
+                WHERE rc.deleted_at IS NULL
+            ",
+            $nodeId,
+            Cursor::COURSE_RUBRIC_CAPABILITY,
+            Cursor::COURSE_UNIT_RUBRIC_CAPABILITY,
+            $unitId,
+            $courseId
+        );
+
+        $rubricIndicatorUsageQuery = sprintf(
+            "
+            SELECT c.type, ri.id, ri.name title, c.folder_id
+            FROM rubric_indicator ri
+            INNER JOIN curriculum_node_for_rubric_indicator cnri
+                ON ri.id = cnri.rubric_indicator_id
+                AND cnri.curriculum_node_id = %d
+            INNER JOIN rubric_capability rc ON rc.id = ri.rubric_capability_id
+            INNER JOIN (
+                SELECT '%s' type, cs.id, cs.folder_id
+                FROM course_specification cs
+                UNION
+                SELECT '%s' type, cus.course_specification_id id, cus.folder_id
+                FROM course_unit_specification cus
+                WHERE cus.folder_id = %d
+            ) c ON c.folder_id = rc.parent_id AND c.id = %d
+            WHERE ri.deleted_at IS NULL
+            ",
+            $nodeId,
+            Cursor::COURSE_RUBRIC_INDICATOR,
+            Cursor::COURSE_UNIT_RUBRIC_INDICATOR,
+            $unitId,
+            $courseId
+        );
+
         $combinedUsageQuery = '( ' . implode(' UNION ', [
                 $unitUsageQuery,
                 $activityUsageQuery,
-                $lessonPlanUsageQuery
+                $lessonPlanUsageQuery,
+//                $rubricCapabilityUsageQuery,
+//                $rubricIndicatorUsageQuery,
         ]) . ' )';
 
         $statement = $db->executeQuery($combinedUsageQuery);
 
         while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
-                $usage[$row['type']][$row['id']] = $row['title'];
+            $usage[$row['type']][] = [
+                'id' => $row['id'],
+                'title' => $row['title'],
+                'folder_id' => $row['folder_id'],
+            ];
         }
 
         return $usage;

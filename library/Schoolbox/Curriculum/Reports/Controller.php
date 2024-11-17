@@ -19,6 +19,7 @@ use Schoolbox\Curriculum\Reports\Translator\Counts\CourseStructureOnly as Course
 use Schoolbox\Curriculum\Reports\Translator\DetailedUsage;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Mapper as CourseUnitSpecificationMapper;
 use Schoolbox\Learning\Course\DataModel\Specification\Mapper as CourseSpecificationMapper;
+use Schoolbox\Assessment\Rubric\DataModel\Indicator\Mapper as RubricIndicatorMapper;
 use Schoolbox\Resource\Folder\Translator\ModelToArray\LinkOnly as FolderTranslator;
 use Schoolbox\Learning\Course\DataModel\Specification\Translator\ModelToArray as CourseSpecTranslator;
 use Schoolbox\Curriculum\Api\Translator\ModelToArray as NodeTranslator;
@@ -31,14 +32,17 @@ class Controller extends Base
     /**
      * Controller constructor.
      *
-     * @param CurriculumMapper              $curriculumMapper
-     * @param CourseSpecificationMapper     $courseSpecificationMapper
+     * @param CurriculumMapper $curriculumMapper
+     * @param CourseSpecificationMapper $courseSpecificationMapper
      * @param CourseUnitSpecificationMapper $courseUnitSpecificationMapper
+     * @param RubricIndicatorMapper $rubricIndicatorMapper
+     * @param Helper $helper
      */
     public function __construct(
         private CurriculumMapper $curriculumMapper,
         private CourseSpecificationMapper $courseSpecificationMapper,
         private CourseUnitSpecificationMapper $courseUnitSpecificationMapper,
+        private RubricIndicatorMapper $rubricIndicatorMapper,
         private Helper $helper,
     ) {
     }
@@ -236,22 +240,48 @@ class Controller extends Base
         if (null === $unitId) {}
         if (null === $nodeId) {}
 
-        $pb = $this->courseUnitSpecificationMapper->getPredicateBuilder();
-        $pb
-            ->equals('folder_id', $unitId)
-            ->equals('course_specification_id', $courseId);
-        $courseUnitSpec = $this->courseUnitSpecificationMapper->findOneByPredicates($pb);
-
         $result = $this->helper->getUsage(
             $nodeId,
             $courseId,
             $unitId
         );
 
+        $pb = $this->courseUnitSpecificationMapper->getPredicateBuilder();
+        $pb
+            ->equals('folder_id', $unitId)
+            ->equals('course_specification_id', $courseId);
+        $courseUnitSpec = $this->courseUnitSpecificationMapper->findOneByPredicates($pb);
+
+        $pb = $this->rubricIndicatorMapper->getPredicateBuilder();
+
+//        $indicatorsArray = [];
+//        $indicatorIds = array_column($result[Cursor::COURSE_RUBRIC_INDICATOR], 'id');
+//        array_map(
+//            function ($cap) use (&$indicatorsArray, $pb, $indicatorIds) {
+//                $id = $cap['id'];
+//                $ipb = $pb->emptyClone();
+//                $ipb
+//                    ->equals('rubric_capability_id', $id)
+//                    ->in('id', $indicatorIds);
+//                $indicators = $this->rubricIndicatorMapper->findByPredicates($ipb)->reindex();
+//                $indicatorsArray[$id] = $indicators;
+//            },
+//            $result[Cursor::COURSE_RUBRIC_CAPABILITY] ?? []
+//        );
+
+//        $indicatorsArray = [];
+//        $this->rubricIndicatorMapper->findByColumn(
+//            'id',
+//            array_column($result[Cursor::COURSE_RUBRIC_INDICATOR], 'id')
+//        )->map(function($indicator) use (&$indicatorsArray) {
+//           $indicatorsArray[$indicator->getCapability()->getId()][$indicator->getId()] = $indicator;
+//        });
+
         $translator = new DetailedUsage(
             $this->routeGenerator,
             $this->authorizer,
             $this->getUser(),
+            $indicatorsArray ?? []
         );
 
         $response = $translator($courseUnitSpec, $result);

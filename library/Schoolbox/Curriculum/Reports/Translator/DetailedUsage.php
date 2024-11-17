@@ -5,6 +5,7 @@ namespace Schoolbox\Curriculum\Reports\Translator;
 use Alaress\Authorizer\Authorizer;
 use Alaress\Authorizer\GetRouteIfAuthorized;
 use Aura\Router\Generator;
+use Schoolbox\Curriculum\Reports\Cursor;
 use Schoolbox\User;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as CourseUnitModel;
 
@@ -16,6 +17,7 @@ class DetailedUsage
         protected Generator $routeGenerator,
         protected Authorizer $authorizer,
         protected User $currentUser,
+        private array $indicators
     ) {
     }
 
@@ -26,34 +28,53 @@ class DetailedUsage
 
     private function translate(CourseUnitModel $unit, array $usage): array
     {
+
         return [
             'onUnit'   => isset($usage['unit']),
             'activity' => array_map(
-                fn($activity, $key) => [
-                    'name'   => $activity,
+                fn($activity) => [
+                    'name'   => $activity['title'],
                     '_links' => [
                         'view' => $this->getRouteIfAuthorized(
                             'learningAssessment.getAssessment',
-                            ['assessmentId' => $key],
+                            ['assessmentId' => $activity['id']],
                         ),
                     ],
                 ],
-                $usage['activity'],
-                array_keys($usage['activity'])
+                $usage['activity'] ?? []
             ),
             'lessonPlan' => array_map(
-                fn($lp, $key) => [
-                    'name'   => $lp,
+                fn($lp) => [
+                    'name'   => $lp['title'],
                     '_links' => [
                         'view' => $this->getRouteIfAuthorized(
                             'learningAssessment.getAssessment',
-                            ['assessmentId' => $key],
+                            ['assessmentId' => $lp['id']],
                         ),
                     ],
                 ],
-                $usage['lessonPlan'],
-                array_keys($usage['lessonPlan'])
-            )
+                $usage[Cursor::COURSE_ACTIVITY_LESSON_PLAN] ?? []
+            ),
+//            'rubric' => [
+//                'course' => [
+//                    'capabilities' => [
+//                        'name'   => '',
+//                        array_map(
+//                        fn($capabilities) => [
+//                            'indicators' =>
+//
+//                        ],
+//                        $this->indicators,
+//                        ),
+//                        '_links' => [
+////                            'view' => $this->getRouteIfAuthorized(
+////                                'rubricManager.getForm',
+////                                ['folderId' => $capabilities['folder_id']],
+////                            ),
+//                        ]
+//                    ]
+//                ]
+//            ]
         ];
     }
 }
