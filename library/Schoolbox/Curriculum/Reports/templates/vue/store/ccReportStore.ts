@@ -4,7 +4,7 @@
 
 import { defineStore } from "pinia";
 import type { Course } from "@schoolboxLibrary/types/Course";
-import type { CurriculumCoveragePayload, CurriculumCoverageNode } from "../../js/types/curriculumCoverageTypes";
+import type { CurriculumCoverageNode } from "../../js/types/curriculumCoverageTypes";
 import { useQueryStore } from "./ccQueryStore";
 import { useInputStore } from "./ccInputStore";
 
@@ -15,6 +15,16 @@ export type ReportError = {
     title: string;
     type: string;
     status: number;
+};
+
+/**
+ * The expected payload for the curriculum coverage report
+ */
+type CurriculumCoveragePayload = {
+    data: {
+        courses: Course[];
+        nodes: CurriculumCoverageNode[];
+    };
 };
 
 export const useReportStore = defineStore("ccReport", () => {

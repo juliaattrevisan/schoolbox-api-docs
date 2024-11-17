@@ -70,16 +70,6 @@ export type CurriculumCoverageNode = Pick<Node, "id" | "name" | "code"> & {
 };
 
 /**
- * The expected payload for the curriculum coverage report
- */
-export type CurriculumCoveragePayload = {
-    data: {
-        courses: Course[];
-        nodes: CurriculumCoverageNode[];
-    };
-};
-
-/**
  * Used in activity and lesson plan
  */
 type Item = {
