@@ -118,7 +118,7 @@
                 {% if not import.undone %}
                     {% include '@pastoralBulkImport/fragments/userProfileLink.twig' with {
                         typeId:    import.type.id,
-                        subtypeId: import.subType.id,
+                        subtypeId: import.subType.id ?? null,
                     } only %}
                 {% endif %}
 
