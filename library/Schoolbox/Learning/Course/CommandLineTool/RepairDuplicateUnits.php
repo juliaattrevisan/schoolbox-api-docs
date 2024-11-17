@@ -41,7 +41,9 @@ class RepairDuplicateUnits extends App
             cui.course_unit_specification_id,
             count(*) AS c
         FROM course_unit_implementation cui
+        INNER JOIN course_implementation ci ON cui.course_implementation_id = ci.id
         WHERE cui.deleted_at IS NULL
+        -- add folder checks
         GROUP BY
             cui.course_implementation_id,
             cui.course_unit_specification_id
