@@ -16,8 +16,8 @@ const filtersStore = useFiltersStore();
 const isEmpty = window.Vue.ref(false);
 
 /**
- * When the component is mounted, observe the table body for changes to determine if it is empty.
- * We use this to avoid any more expensive checks, avoiding needing to loop through the nodes.
+ * When the component is mounted, observe the table body for changes to determine if it is empty and display the message.
+ * We use this to avoid any more expensive checks, avoiding needing to loop through the entire node on any change.
  */
 window.Vue.onMounted(async () => {
     await window.Vue.nextTick(); // allow the tbodyEl to be rendered
@@ -28,7 +28,6 @@ window.Vue.onMounted(async () => {
         }
         mutationsList.forEach(() => {
             if (!isEmpty.value && props.tbodyEl?.children && props.tbodyEl.children.length === 0) {
-                console.warn(props.tbodyEl.children.length);
                 isEmpty.value = true;
             } else if (isEmpty.value && props.tbodyEl?.children && props.tbodyEl.children.length > 1) {
                 isEmpty.value = false;
