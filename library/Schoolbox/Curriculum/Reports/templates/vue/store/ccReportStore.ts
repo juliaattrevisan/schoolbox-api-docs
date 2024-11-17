@@ -19,6 +19,7 @@ export type ReportError = {
 
 export const useReportStore = defineStore("ccReport", () => {
     const hasNotReported = window.Vue.ref(true); // to prompt a search if the user hasn't searched yet
+    const isFetching = window.Vue.ref(false);
     const isLoading = window.Vue.ref(false);
     const hasLoadError = window.Vue.ref(false);
     const loadError = window.Vue.ref<ReportError | null>(null);
@@ -63,10 +64,11 @@ export const useReportStore = defineStore("ccReport", () => {
         useQueryStore().setQueryParams();
         hasNotReported.value = false;
         // abort the previous search if it's still running
-        if (isLoading.value) {
+        if (isFetching.value) {
             controller.abort();
         }
         try {
+            isFetching.value = true;
             isLoading.value = true;
             hasLoadError.value = false;
             controller = new AbortController();
@@ -86,6 +88,7 @@ export const useReportStore = defineStore("ccReport", () => {
                 };
                 return;
             }
+            isFetching.value = false;
             const responseJson = (await response.json()) as CurriculumCoveragePayload | ReportError;
             if (typeof responseJson !== "object" || responseJson === null) {
                 hasLoadError.value = true;
