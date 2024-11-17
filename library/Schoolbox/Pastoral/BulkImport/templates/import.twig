@@ -9,96 +9,65 @@
 <div class="admin-container row">
     {{ renderAdminNavigation(routeLookup('pastoralBulkImport.getList')) }}
     <div class="admin-content">
-        <div class="actions-small-1 row">
-            <div class="list-item">
-                <div class="small-12 column">
-                    <h1>{{ locale.pastoral.proper }} Bulk Import Results</h1>
-                    <ul class="meta">
-                        <li class="icon-add">
-                            Created {{ import.createdAt.local }} by
-                            {% if import.owner.deleted -%}
-                            {{ report.owner.fullname }}
-                        {%- else -%}
-                            <a href="/search/user/{{ import.owner.id }}" title="{{ import.owner.fullname }}">{{ import.owner.fullname }}</a>
-                            {%- endif -%}.
-                        </li>
+        <div class="small-12 column">
+            <h2 class="subheader">{{ locale.pastoral.proper }} Bulk Import Results</h2>
+            <ul class="meta">
+                <li class="icon-add">
+                    Created {{ import.createdAt.local }} by
+                    {% if import.owner.deleted -%}
+                    {{ report.owner.fullname }}
+                {%- else -%}
+                    <a href="/search/user/{{ import.owner.id }}" title="{{ import.owner.fullname }}">{{ import.owner.fullname }}</a>
+                    {%- endif -%}.
+                </li>
 
-                        {% if import.imported %}
-                            <li class="icon-import">
-                                Imported {{ import.importedAt.local }} by
-                                {% if import.importedBy.deleted -%}
-                                {{ report.importedBy.fullname }}
-                            {%- else -%}
-                                <a href="/search/user/{{ import.owner.id }}" title="{{ import.importedBy.fullname }}">{{ import.importedBy.fullname }}</a>
-                                {%- endif -%}.
-                            </li>
-                        {% endif %}
+                {% if import.imported %}
+                    <li class="icon-import">
+                        Imported {{ import.importedAt.local }} by
+                        {% if import.importedBy.deleted -%}
+                        {{ report.importedBy.fullname }}
+                    {%- else -%}
+                        <a href="/search/user/{{ import.owner.id }}" title="{{ import.importedBy.fullname }}">{{ import.importedBy.fullname }}</a>
+                        {%- endif -%}.
+                    </li>
+                {% endif %}
 
-                        {% if import.undone %}
-                            <li class="icon-undo">
-                                Undone {{ import.undoneAt.local }} by
-                                {% if import.undoneBy.deleted -%}
-                                {{ report.undoneBy.fullname }}
-                            {%- else -%}
-                                <a href="/search/user/{{ import.owner.id }}" title="{{ import.undoneBy.fullname }}">{{ import.undoneBy.fullname }}</a>
-                                {%- endif -%}.
-                            </li>
-                        {% endif %}
-                    </ul>
-                </div>
-            </div>
+                {% if import.undone %}
+                    <li class="icon-undo">
+                        Undone {{ import.undoneAt.local }} by
+                        {% if import.undoneBy.deleted -%}
+                        {{ report.undoneBy.fullname }}
+                    {%- else -%}
+                        <a href="/search/user/{{ import.owner.id }}" title="{{ import.undoneBy.fullname }}">{{ import.undoneBy.fullname }}</a>
+                        {%- endif -%}.
+                    </li>
+                {% endif %}
+            </ul>
         </div>
 
-        <div class="row">
-            <div class="small-12 island">
-                <table>
-                    <thead>
-                    <tr>
-                        <th>Time</th>
-                        <th>File uploaded</th>
-                        <th>External ID</th>
-                        <th>Student</th>
-                        <th>Import Result</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    {% for data in import.importLog.known %}
-                        {% for file in data.files %}
-                            <tr {% if import.undone %}class="strike"{% endif %}>
-                                <td>
-                                    {% if import.importedAt %}
-                                        {{ import.importedAt.local }}
-                                    {% else %}
-                                        &mdash;
-                                    {% endif %}
-                                </td>
-                                <td>{{ file }}</td>
-                                <td>
-                                    {% if data.user.externalId %}
-                                        {{ data.user.externalId }}
-                                    {% else %}
-                                        &mdash;
-                                    {% endif %}
-                                </td>
-                                <td>
-                                    {{ data.user.name }}
-                                </td>
-                                <td>
-                                    {% if data.record ?? false %}
-                                        Created
-                                        (<a href="{{ routeLookup('pastoral.getStudentRecord', {studentId: data.user.id, recordId: data.record.id}) }}">#{{ data.record.id }}</a>)
-                                    {% else %}
-                                        &mdash;
-                                    {% endif %}
-                                </td>
-                            </tr>
-                        {% endfor %}
-                    {% endfor %}
-
-                    {% for data in import.importLog.unknown %}
+        <div class="small-12 island">
+            <table>
+                <thead>
+                <tr>
+                    <th>Time</th>
+                    <th>File uploaded</th>
+                    <th>External ID</th>
+                    <th>Student</th>
+                    <th>Import Result</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for data in import.importLog.known %}
+                    {% for file in data.files %}
                         <tr {% if import.undone %}class="strike"{% endif %}>
-                            <td>&mdash;</td>
-                            <td>{{ data.file }}</td>
+                            <td>
+                                {% if import.importedAt %}
+                                    {{ import.importedAt.local }}
+                                {% else %}
+                                    &mdash;
+                                {% endif %}
+                            </td>
+                            <td>{{ file }}</td>
                             <td>
                                 {% if data.user.externalId %}
                                     {{ data.user.externalId }}
@@ -106,44 +75,69 @@
                                     &mdash;
                                 {% endif %}
                             </td>
-                            <td>&mdash;</td>
                             <td>
-                                <i>{{ data.reason }}</i>
+                                {{ data.user.name }}
+                            </td>
+                            <td>
+                                {% if data.record ?? false %}
+                                    Created
+                                    (<a href="{{ routeLookup('pastoral.getStudentRecord', {studentId: data.user.id, recordId: data.record.id}) }}">#{{ data.record.id }}</a>)
+                                {% else %}
+                                    &mdash;
+                                {% endif %}
                             </td>
                         </tr>
                     {% endfor %}
-                    </tbody>
-                </table>
+                {% endfor %}
 
-                {% if not import.undone %}
-                    {% include '@pastoralBulkImport/fragments/userProfileLink.twig' with {
-                        typeId:    import.type.id,
-                        subtypeId: import.subType.id,
-                    } only %}
-                {% endif %}
+                {% for data in import.importLog.unknown %}
+                    <tr {% if import.undone %}class="strike"{% endif %}>
+                        <td>&mdash;</td>
+                        <td>{{ data.file }}</td>
+                        <td>
+                            {% if data.user.externalId %}
+                                {{ data.user.externalId }}
+                            {% else %}
+                                &mdash;
+                            {% endif %}
+                        </td>
+                        <td>&mdash;</td>
+                        <td>
+                            <i>{{ data.reason }}</i>
+                        </td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
 
-                <ul class="flex-list buttons">
-                    {% set runRoute = routeLookupIfAuthorized('pastoralBulkImport.postRunImport', {id: import.id, import: import}) %}
-                    {% if runRoute %}
-                        <li>
-                            <form class="top" method="post" action="{{ runRoute }}?{{ RETURN_URL.name }}={{ RETURN_URL.previous.encoded }}">
-                                <input type="submit" value="Import" />
-                            </form>
-                        </li>
-                    {% endif %}
-                    {% set undoRoute = routeLookupIfAuthorized('pastoralBulkImport.postUndoImport', {id: import.id, import: import}) %}
-                    {% if undoRoute %}
-                        <li>
-                            <form class="top" method="post" action="{{ undoRoute }}?{{ RETURN_URL.name }}={{ RETURN_URL.previous.encoded }}">
-                                <input type="submit" value="Undo Import" />
-                            </form>
-                        </li>
-                    {% endif %}
+            {% if not import.undone %}
+                {% include '@pastoralBulkImport/fragments/userProfileLink.twig' with {
+                    typeId:    import.type.id,
+                    subtypeId: import.subType.id ?? null,
+                } only %}
+            {% endif %}
+
+            <ul class="flex-list buttons">
+                {% set runRoute = routeLookupIfAuthorized('pastoralBulkImport.postRunImport', {id: import.id, import: import}) %}
+                {% if runRoute %}
                     <li>
-                        <a href="{{ RETURN_URL.previous.decoded ?? routeLookup('pastoralBulkImport.getList') }}">Return</a>
+                        <form class="top" method="post" action="{{ runRoute }}?{{ RETURN_URL.name }}={{ RETURN_URL.previous.encoded }}">
+                            <input type="submit" value="Import" />
+                        </form>
                     </li>
-                </ul>
-            </div>
+                {% endif %}
+                {% set undoRoute = routeLookupIfAuthorized('pastoralBulkImport.postUndoImport', {id: import.id, import: import}) %}
+                {% if undoRoute %}
+                    <li>
+                        <form class="top" method="post" action="{{ undoRoute }}?{{ RETURN_URL.name }}={{ RETURN_URL.previous.encoded }}">
+                            <input type="submit" value="Undo Import" />
+                        </form>
+                    </li>
+                {% endif %}
+                <li>
+                    <a href="{{ RETURN_URL.previous.decoded ?? routeLookup('pastoralBulkImport.getList') }}">Return</a>
+                </li>
+            </ul>
         </div>
     </div>
 </div>

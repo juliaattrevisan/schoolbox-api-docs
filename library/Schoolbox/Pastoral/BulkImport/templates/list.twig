@@ -10,120 +10,123 @@
     <div class="admin-content">
         {% set createRoute = routeLookupIfAuthorized('pastoralBulkImport.getCreateImportForm') %}
         {% set returnQueryString = RETURN_URL.name ~ '=' ~ (encodedReturnUrl ?? RETURN_URL.current) %}
-        <div class="row actions-small-1">
-            <div class="list-item">
-                <div class="small-12 column">
-                    <h1>{{ locale.pastoral.proper }} Bulk Imports</h1>
+
+        {% if imports is not empty %}
+            <div class="small-12 island">
+                {% set createRoute = routeLookupIfAuthorized('pastoralBulkImport.getCreateImportForm') %}
+                {% set returnQueryString = RETURN_URL.name ~ '=' ~ (encodedReturnUrl ?? RETURN_URL.current) %}
+                <div class="row actions-small-1">
+                    <div class="list-item">
+                        <div class="small-12 column">
+                            <h2 class="subheader">Previous {{ locale.pastoral.proper }} Bulk Imports</h2>
+                        </div>
+                    </div>
+                    <nav>
+                        {% if createRoute %}
+                            <a href="{{ createRoute }}?{{ returnQueryString }}" class="icon-add" title="Add a summative report"></a>
+                        {% endif %}
+                    </nav>
                 </div>
             </div>
-            <nav>
-                {% if createRoute %}
-                    <a href="{{ createRoute }}?{{ returnQueryString }}" class="icon-add" title="Add a summative report"></a>
-                {% endif %}
-            </nav>
-        </div>
 
-        <div class="row">
             <div class="small-12 island">
-                {% if imports is not empty %}
-                    <section>
-                        <ul class="information-list" id="import-list">
-                            {% for import in imports %}
-                                <li>
-                                    <div class="actions-small-2">
-                                        {% set getRoute = routeLookupIfAuthorized('pastoralBulkImport.getImport', {id: import.id, import: import}) %}
-                                        {% set runRoute = routeLookupIfAuthorized('pastoralBulkImport.postRunImport', {id: import.id, import: import}) %}
-                                        {% if runRoute %}
-                                            <form id="postRunImport-{{ import.id }}" action="{{ runRoute }}?{{ returnQueryString }}" method="post"></form>
-                                        {% endif %}
-                                        {% set undoRoute = routeLookupIfAuthorized('pastoralBulkImport.postUndoImport', {id: import.id, import: import}) %}
-                                        {% if undoRoute %}
-                                            <form id="postUndoImport-{{ import.id }}" action="{{ undoRoute }}?{{ returnQueryString }}" method="post"></form>
-                                        {% endif %}
-                                        {% set deleteRoute = routeLookupIfAuthorized('pastoralBulkImport.postDeleteImport', {id: import.id, import: import}) %}
-                                        {% if deleteRoute %}
-                                            <form id="postDeleteImport-{{ import.id }}" action="{{ deleteRoute }}?{{ returnQueryString }}" method="post"></form>
-                                        {% endif %}
-                                        <div class="list-item">
-                                            <div class="card small-12">
-                                                {% if getRoute %}
-                                                    <a href="{{ getRoute }}?{{ returnQueryString }}" {% if import.undone %}class="strike"{% endif %}><h3>{{ import.heading }}</h3></a>
-                                                {% else %}
-                                                    <span {% if import.undone %}class="strike"{% endif %}><h3>{{ import.heading }}</h3></span>
-                                                {% endif %}
-
-                                                {# Metadata: when it was imported, when it was undone #}
-                                                <p class="meta">
-                                                    Created {{ import.createdAt.local }} by
-                                                    {% if import.owner.deleted -%}
-                                                    {{ report.owner.fullname }}
-                                                {%- else -%}
-                                                    <a href="/search/user/{{ import.owner.id }}" title="{{ import.owner.fullname }}">{{ import.owner.fullname }}</a>
-                                                    {%- endif -%}.
-                                                </p>
-
-                                                <p class="meta">
-                                                    {% if import.imported %}
-                                                        Imported {{ import.importedAt.local }} by
-                                                        {% if import.importedBy.deleted -%}
-                                                            {{ report.importedBy.fullname }}
-                                                        {%- else -%}
-                                                            <a href="/search/user/{{ import.owner.id }}" title="{{ import.importedBy.fullname }}">{{ import.importedBy.fullname }}</a>
-                                                        {%- endif -%}
-
-                                                        {% if import.undone -%}
-                                                            , undone {{ import.undoneAt.local }} by
-                                                            {% if import.undoneBy.deleted -%}
-                                                                {{ report.undoneBy.fullname }}
-                                                            {%- else -%}
-                                                                <a href="/search/user/{{ import.owner.id }}" title="{{ import.undoneBy.fullname }}">{{ import.undoneBy.fullname }}</a>
-                                                            {%- endif -%}
-                                                        {%- endif -%}.
-                                                    {% else %}
-                                                        Not yet imported.
-                                                    {% endif %}
-                                                </p>
-                                            </div>
-                                        </div>
-
-                                        {# Buttons: run, undo, modify, archive?, delete? #}
-                                        <nav>
+                <section>
+                    <ul class="information-list" id="import-list">
+                        {% for import in imports %}
+                            <li>
+                                <div class="actions-small-2">
+                                    {% set getRoute = routeLookupIfAuthorized('pastoralBulkImport.getImport', {id: import.id, import: import}) %}
+                                    {% set runRoute = routeLookupIfAuthorized('pastoralBulkImport.postRunImport', {id: import.id, import: import}) %}
+                                    {% if runRoute %}
+                                        <form id="postRunImport-{{ import.id }}" action="{{ runRoute }}?{{ returnQueryString }}" method="post"></form>
+                                    {% endif %}
+                                    {% set undoRoute = routeLookupIfAuthorized('pastoralBulkImport.postUndoImport', {id: import.id, import: import}) %}
+                                    {% if undoRoute %}
+                                        <form id="postUndoImport-{{ import.id }}" action="{{ undoRoute }}?{{ returnQueryString }}" method="post"></form>
+                                    {% endif %}
+                                    {% set deleteRoute = routeLookupIfAuthorized('pastoralBulkImport.postDeleteImport', {id: import.id, import: import}) %}
+                                    {% if deleteRoute %}
+                                        <form id="postDeleteImport-{{ import.id }}" action="{{ deleteRoute }}?{{ returnQueryString }}" method="post"></form>
+                                    {% endif %}
+                                    <div class="list-item">
+                                        <div class="card small-12">
                                             {% if getRoute %}
-                                                <a class="icon-eye" href="{{ getRoute }}?{{ returnQueryString }}" title="{% if import.imported %}View import results{% else %}Preview import{% endif %}"></a>
+                                                <a href="{{ getRoute }}?{{ returnQueryString }}" {% if import.undone %}class="strike"{% endif %}><h3>{{ import.heading }}</h3></a>
+                                            {% else %}
+                                                <span {% if import.undone %}class="strike"{% endif %}><h3>{{ import.heading }}</h3></span>
                                             {% endif %}
 
-                                            {% if runRoute %}
-                                                <a class="icon-import" data-action="run" data-form-id="postRunImport-{{ import.id }}" title="Run import"></a>
-                                            {% endif %}
+                                            {# Metadata: when it was imported, when it was undone #}
+                                            <p class="meta">
+                                                Created {{ import.createdAt.local }} by
+                                                {% if import.owner.deleted -%}
+                                                {{ report.owner.fullname }}
+                                            {%- else -%}
+                                                <a href="/search/user/{{ import.owner.id }}" title="{{ import.owner.fullname }}">{{ import.owner.fullname }}</a>
+                                                {%- endif -%}.
+                                            </p>
 
-                                            {% if undoRoute %}
-                                                <a class="icon-undo" data-action="undo" data-form-id="postUndoImport-{{ import.id }}" title="Undo import"></a>
-                                            {% endif %}
+                                            <p class="meta">
+                                                {% if import.imported %}
+                                                    Imported {{ import.importedAt.local }} by
+                                                    {% if import.importedBy.deleted -%}
+                                                        {{ report.importedBy.fullname }}
+                                                    {%- else -%}
+                                                        <a href="/search/user/{{ import.owner.id }}" title="{{ import.importedBy.fullname }}">{{ import.importedBy.fullname }}</a>
+                                                    {%- endif -%}
 
-                                            {% if deleteRoute %}
-                                                <a class="icon-delete" data-action="delete" data-form-id="postDeleteImport-{{ import.id }}" title="Delete import"></a>
-                                            {% endif %}
-                                        </nav>
+                                                    {% if import.undone -%}
+                                                        , undone {{ import.undoneAt.local }} by
+                                                        {% if import.undoneBy.deleted -%}
+                                                            {{ report.undoneBy.fullname }}
+                                                        {%- else -%}
+                                                            <a href="/search/user/{{ import.owner.id }}" title="{{ import.undoneBy.fullname }}">{{ import.undoneBy.fullname }}</a>
+                                                        {%- endif -%}
+                                                    {%- endif -%}.
+                                                {% else %}
+                                                    Not yet imported.
+                                                {% endif %}
+                                            </p>
+                                        </div>
                                     </div>
-                                </li>
-                            {% endfor %}
-                        </ul>
-                        {% include 'sub/paginator.twig' with {
-                            paginator: paginator,
-                            page: currentPage,
-                        } %}
-                    </section>
-                {% else %}
-                    <div class="empty-state">
-                        <i class="icon-upload"></i>
-                        <p>No {{ locale.pastoral }} bulk imports have yet been performed.</p>
-                        {% if createRoute %}
-                            <p><a href="{{ createRoute }}">Click here</a> to perform a bulk import.</p>
-                        {% endif %}
-                    </div>
+
+                                    {# Buttons: run, undo, modify, archive?, delete? #}
+                                    <nav>
+                                        {% if getRoute %}
+                                            <a class="icon-eye" href="{{ getRoute }}?{{ returnQueryString }}" title="{% if import.imported %}View import results{% else %}Preview import{% endif %}"></a>
+                                        {% endif %}
+
+                                        {% if runRoute %}
+                                            <a class="icon-import" data-action="run" data-form-id="postRunImport-{{ import.id }}" title="Run import"></a>
+                                        {% endif %}
+
+                                        {% if undoRoute %}
+                                            <a class="icon-undo" data-action="undo" data-form-id="postUndoImport-{{ import.id }}" title="Undo import"></a>
+                                        {% endif %}
+
+                                        {% if deleteRoute %}
+                                            <a class="icon-delete" data-action="delete" data-form-id="postDeleteImport-{{ import.id }}" title="Delete import"></a>
+                                        {% endif %}
+                                    </nav>
+                                </div>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                </section>
+                {% include 'sub/paginator.twig' with {
+                    paginator: paginator,
+                    page: currentPage,
+                } %}
+            </div>
+        {% else %}
+            <div class="empty-state">
+                <i class="icon-upload"></i>
+                <p>No {{ locale.pastoral }} bulk imports have yet been performed.</p>
+                {% if createRoute %}
+                    <p><a href="{{ createRoute }}">Click here</a> to perform a bulk import.</p>
                 {% endif %}
             </div>
-        </div>
+        {% endif %}
 
         <script type="text/javascript">
             $(function() {
