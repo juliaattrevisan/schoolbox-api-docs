@@ -7,12 +7,10 @@
 ) }}
 
 <div class="admin-container row">
-
-    {# Shared navigation menu #}
     {{ renderAdminNavigation(routeLookup('pastoralBulkImport.getList')) }}
-
     <div class="admin-content">
         <div class="small-12 island">
+            <h2 class="subheader">Create {{ locale.pastoral.proper }} Bulk Import</h2>
             <form class="top" id="pastoralForm" method="post"
                   action="{{ routeLookupIfAuthorized('pastoralBulkImport.postCreateImport') }}?{{ RETURN_URL.name }}={{ RETURN_URL.previous.encoded }}">
                 <section>
