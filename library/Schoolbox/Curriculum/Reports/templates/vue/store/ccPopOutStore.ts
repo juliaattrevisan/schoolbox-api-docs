@@ -1,12 +1,12 @@
 /**
- * Manage the loading and state of the single cc-usage-pop-out
+ * Manage the loading and state of the single usage display, used to display the usage of a single node
  */
 
 import { defineStore } from "pinia";
 import type { Course } from "@schoolboxLibrary/types/Course";
 import type { Unit } from "@schoolboxLibrary/types/Unit";
 import { isAbortError } from "@js/util/errorUtils";
-import type { CurriculumCoverageNode, IndividualUsagePayload } from "../../js/types/curriculumCoverageTypes";
+import type { CurriculumCoverageNode, IndividualUsage } from "../../js/types/curriculumCoverageTypes";
 
 /**
  * What is returned when there is a search error
@@ -15,6 +15,13 @@ export type ReportError = {
     title: string;
     type: string;
     status: number;
+};
+
+/**
+ * The payload for the individual usage
+ */
+type IndividualUsagePayload = {
+    data: IndividualUsage;
 };
 
 export const usePopOutStore = defineStore(`ccPopOut`, () => {
@@ -30,7 +37,7 @@ export const usePopOutStore = defineStore(`ccPopOut`, () => {
     const isLoading = window.Vue.ref(false);
     const hasLoadError = window.Vue.ref(false); // To show that an error has occurred
     const loadError = window.Vue.ref<ReportError | null>(null);
-    const usage = window.Vue.ref<IndividualUsagePayload | null>(null); // the usage to display in the pop-out
+    const usage = window.Vue.ref<IndividualUsage | null>(null); // the usage to display in the pop-out
     let controller: AbortController; // to allow aborting the previous search if a new one is started
 
     /**
@@ -103,7 +110,7 @@ export const usePopOutStore = defineStore(`ccPopOut`, () => {
                 return;
             }
             if ("data" in responseJson) {
-                usage.value = responseJson;
+                usage.value = responseJson.data;
             }
             isLoading.value = false;
         } catch (error) {

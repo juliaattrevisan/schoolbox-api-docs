@@ -118,17 +118,15 @@ type InUseRubric = Item & {
 };
 
 /**
- * The expected payload for an individual usage
+ * The details of the individual usage of a curriculum node
  */
-export type IndividualUsagePayload = {
-    data: {
-        onUnit: boolean; // if the node is assigned to the unit
-        activity: Item[]; // the activities the node is assigned to
-        lessonPlan: Item[]; // the lesson plans the node is assigned to
-        rubric: {
-            course: Rubric;
-            unit: Rubric;
-        };
-        inUseRubric: InUseRubric[];
+export type IndividualUsage = {
+    onUnit: boolean; // if the node is assigned to the unit
+    activity: Item[]; // the activities the node is assigned to
+    lessonPlan: Item[]; // the lesson plans the node is assigned to
+    rubric: {
+        course: Rubric;
+        unit: Rubric;
     };
+    inUseRubric: InUseRubric[];
 };
