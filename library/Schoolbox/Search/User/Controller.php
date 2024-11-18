@@ -454,12 +454,6 @@ class Controller extends BaseController
         $twig       = $this->getDi()->get('templateEngine');
         $travelLogs = $travelLogRenderer->render($twig, $student->getExternalId(), true);
 
-        /* For a student's classes tiles to be visible, they must pass the sis
-         * checks determined by $showDetails and their timetable must be visible
-         * via the Hide Timetable checkbox in their Modify User screen
-         */
-        $showClasses = $showDetails && !$student->getHideTimetable();
-
         /* Decide whether the current user can comment on this student's learning moments
          *
          * Staff and student can always comment
@@ -532,25 +526,32 @@ class Controller extends BaseController
                 /* A sequenced list of tabs
                  */
                 'possibleTabs' => $tabs,
+                /* Retain this old check
+                 */
+                'eportfolioAuth' => $this->eportfolioAuthenticator->canView(),
+                /* This is used for the calendar url, a dynamic set of args
+                 */
+                'now' => Alaress_Date_Format::now(),
+                /* Used for deciding whether you can see emails or not via its own idiosyncratic
+                 * heuristic beyond Availability/Visibility concepts
+                 */
+                'showEmail' => $showEmails,
+                /* Somehow this is important
+                 */
+                'isPrimaryCarer' => $isPrimaryCarer,
+                /* A set of contacts (if any) for this student
+                 */
+                'contacts' => $contacts,
+
 
                 /* Old implementation
                  */
                 'session' => $_SESSION,
-                /* This is mostly superseded by user.showTimetable in twig
-                 */
-                'showClasses' => $showClasses,
-                'eportfolioAuth'           => $this->eportfolioAuthenticator->canView(),
-                'hideContacts'             => $hideContacts,
-                'now'                      => Alaress_Date_Format::now(),
-                'contacts'                 => $contacts,
                 'subjects'                 => $subjects,
                 'groups'                   => $groups,
-                'isParentOfStudent'        => $isParentOfStudent,
-                'isPrimaryCarer'           => $isPrimaryCarer,
                 'allTeacherIds'            => implode(',', $allTeacherIds),
                 'pdStates'                 => $this->professionalDevelopmentMapper->getStates(),
                 'pd'                       => $pd,
-                'showEmail'                => $showEmails,
                 'travelLogs'               => $travelLogs,
                 'learningMomentCanComment' => $learningMomentCanComment,
                 'isGeosnapshotAvailable'   => $isGeosnapshotAvailable,

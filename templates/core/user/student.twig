@@ -3,7 +3,7 @@
  #
  # showEmails   bool    Spec pattern to decide whether email address is visible
  # showDetails  bool    Spec patternt to decide whether details are visible
-#}
+ #}
 
 {# Permissions #}
 {% set isSuperuser = session.user.superUser %}
@@ -11,17 +11,6 @@
 {# Leaving isStaff for extended custom templates #}
 {% set isStaff = isSuperuser or USER.role.staff %}
 {% set isSelf = session.user.id == user.id %}
-
-{# medical: if allowed in config, and user is staff or parent of this child #}
-{% set showMedicalAlert = not config.protect_medicalspecial_profile and isStaffWhoCanView %}
-{% set showSpecialAlert = not config.protect_medicalspecial_profile and isStaffWhoCanView %}
-{% set showComments = config.synergetic_student_comment and isStaffWhoCanView %}
-
-{% set showButtons = showDetails %}
-{# contacts: su, staff or parent #}
-{# Should a student see their own contact details? I think so #}
-{% set showContacts = (isStaffWhoCanView or isParentOfStudent) and not hideContacts and contacts|length > 0 %}
-{% set showContactsAlert = config.synergetic_community_alerts and showContacts and isStaffWhoCanView and externalUser is defined %}
 
 {# Emergency Contact Information, due to non-normalisation, must be manually inspected
  # for contents in three possible places; name, phone, phone alt. Information can exist
@@ -32,7 +21,7 @@
  #
  # tbh I think that you need both a name and at least one phone number for this section
  # to be even remotely useful, but anyway I'll go with what was previously here...
-#}
+ #}
 {% set hasEmergencyContacts = false %}
 {% for i in 1..3 %}
     {% set index = (i == 1 ? '' : i) %}
@@ -42,24 +31,6 @@
     {% endif %}
 {% endfor %}
 
-{% set showEmergencyContacts =
-    (isPrimaryCarer or isStaffWhoCanView)
-    and not hideContacts
-    and hasEmergencyContacts
-%}
-{% set showContactsTab =
-    showContacts
-    or showContactsAlert
-    or showEmergencyContacts
-%}
-{% set showSubjects = showDetails and subjects is not empty %}
-{% set showGroups = showDetails and groups is not empty %}
-{% set showTitle = user.hasPositionTitle() %}
-
-{% set showActivityFeed =
-    ((config.learning_moments_enabled and user.learningMomentsEnabled) or config.badges_enabled or config.grades_enabled)
-    and (isStaffWhoCanView or isSelf or isParentOfStudent) %}
-{% set showAchievementsTab = config.badges_enabled and (isStaffWhoCanView or isSelf or isParentOfStudent) %}
 {% set shareLearningMomentUrl = routeLookupIfAuthorized(
     'learningMomentEvidence.getCreateForm',
     {
@@ -71,7 +42,7 @@
 {##
  # Is the current user viewing their own profile?
  # This affects some links and metadata displayed.
-#}
+ #}
 {% set isCurrentUser = user.id == USER.id %}
 
 <script type="text/javascript">
@@ -284,77 +255,86 @@
                          # rendering profile fields.
                          #}
                         {% set additionalConstraints = {
-                            'eportfolio': eportfolioAuth,
-                            'pastoral': showPastoral and pastoralUrl,
-                            'timetable': showClasses,
-                            'pastoralsynergetic': isStaffWhoCanView and config.external_type == 'synergetic' and config.external_staff_portal,
-                            'documentmanagement': config.external_document_report_enabled and config.external_document_button_enable,
-                            'geosnapshot': isGeosnapshotAvailable,
-                            'emailstaff': config.mail_enable and isStaffWhoCanView and config.email_all_staff and session.user.email,
-                            'emailparents': config.mail_enable and isStaffWhoCanView and config.email_all_parents and session.user.email and not hideContacts
+                            'student': {
+                                '_default': true,
+                                'eportfolio': eportfolioAuth,
+                            },
+                            'parent': {
+                                '_default': true,
+                                'eportfolio': eportfolioAuth,
+                            },
+                            'staff': {
+                                '_default': USER.role.viewStudentProfile,
+                                'eportfolio': USER.role.viewStudentProfile and eportfolioAuth,
+                                'pastoral': USER.role.viewStudentProfile and showPastoral and pastoralUrl,
+                                'timetable': USER.role.viewStudentProfile and user.isShowTimetable,
+                                'pastoralsynergetic': USER.role.viewStudentProfile and config.external_type == 'synergetic' and config.external_staff_portal,
+                                'documentmanagement': USER.role.viewStudentProfile and config.external_document_report_enabled and config.external_document_button_enable,
+                                'geosnapshot': USER.role.viewStudentProfile and isGeosnapshotAvailable,
+                                'emailstaff': USER.role.viewStudentProfile and config.mail_enable and config.email_all_staff and session.user.email,
+                                'emailparents': USER.role.viewStudentProfile and config.mail_enable and config.email_all_parents and session.user.email and user.isShowContacts
+                            }
                         } %}
 
-                        {% if showButtons %}
-                            {% for button in buttons %}
-                                {% if additionalConstraints[button.type] ?? true %}
-                                    {% set text = button.text %}
+                        {% for button in buttons %}
+                            {% if additionalConstraints[USER.role.type][button.type] ?? additionalConstraints[USER.role.type]['_default']  %}
+                                {% set text = button.text %}
 
-                                    {# Special cases: Email Teachers and Email Parents
-                                     # These submit a hidden form lol
-                                     #}
-                                    {% if button.type in ['emailstaff'] %}
+                                {# Special cases: Email Teachers and Email Parents
+                                 # These submit a hidden form lol
+                                 #}
+                                {% if button.type in ['emailstaff'] %}
+                                    <li>
+                                        <a class="icon-email" id="email-all-staff" title="Includes all teachers, year coordinator, head of house, tutor and coach.">{{ text }}</a>
+                                        <form id="email-all-form" action="{{ routeLookupIfAuthorized('mail.postCreateMail') }}" class="hide" method="post">
+                                            <input name="userIds" value="{{ allTeacherIds }}" type="hidden">
+                                            <input name="target" value="cc" type="hidden">
+                                            <input name="title" value="Email All Teachers" type="hidden">
+                                            <input name="studentId" value="{{ user.id }}" type="hidden">
+                                        </form>
+                                    </li>
+                                {% elseif button.type in ['emailparents'] %}
+                                    <li>
+                                        <a class="icon-email" id="email-all-parents" title="Emails the parents that have email addresses and can be contacted">{{ text }}</a>
+                                        <form action="{{ routeLookupIfAuthorized('mail.postCreateMail') }}" method="post" class="no-margin" id="email-contacts-form">
+                                            <input type="hidden" name="studentExternalIds" value="{{ user.externalId }}"/>
+                                            <input type="hidden" name="selectedGroups" value="parents_of"/>
+                                            <input name="studentId" value="{{ user.id }}" type="hidden">
+                                            <input name="title" value="Email Parents" type="hidden">
+                                        </form>
+                                    </li>
+                                {% else  %}
+                                    {# A standard button whose urls need to be dynamically determined #}
+                                    {% set route = button.url %}
+
+                                    {# Unique derivations #}
+                                    {% if button.type in ['duework'] %}
+                                        {% set route = routeLookupIfAuthorized('learningUpcoming.getUpcomingForStudent', {student: user, studentId: user.id}) %}
+                                    {% elseif button.type in ['grades'] %}
+                                        {% set route = routeLookupIfAuthorized('learningGrades.getGrades', {viewee: user, userId: user.id}) %}
+                                    {% elseif button.type in ['pastoral'] %}
+                                        {% set route = pastoralUrl %}
+                                    {% elseif button.type in ['calendar'] %}
+                                        {% set route = routeLookupIfAuthorized('calendar.getCalendar', {selectedDate: now.urlDate, userId: user.id, user: user}) %}
+                                    {% elseif button.type in ['documentmanagement'] %}
+                                        {% set route = routeLookupIfAuthorized('profileDocumentManagement.getIndex', {studentId: user.id}) %}
+                                    {% elseif button.type in ['geosnapshot'] %}
+                                        {% set route = routeLookupIfAuthorized('geosnapshotApi.getStudentPhotos', {id: user.id}) %}
+                                    {% elseif button.type in ['pastoralsynergetic'] %}
+                                        {% set route = config.external_staff_portal ~ '/stud.aspx?id=' ~ user.externalId %}
+                                    {% endif %}
+
+                                    {% if route %}
                                         <li>
-                                            <a class="icon-email" id="email-all-staff" title="Includes all teachers, year coordinator, head of house, tutor and coach.">{{ text }}</a>
-                                            <form id="email-all-form" action="{{ routeLookupIfAuthorized('mail.postCreateMail') }}" class="hide" method="post">
-                                                <input name="userIds" value="{{ allTeacherIds }}" type="hidden">
-                                                <input name="target" value="cc" type="hidden">
-                                                <input name="title" value="Email All Teachers" type="hidden">
-                                                <input name="studentId" value="{{ user.id }}" type="hidden">
-                                            </form>
+                                            <a href="{{ route }}" title="{{ button.title }}" class="icon-{{ button.icon }} {{ button.css }}" target="{{ button.target }}">{{ text }}</a>
                                         </li>
-                                    {% elseif button.type in ['emailparents'] %}
-                                        <li>
-                                            <a class="icon-email" id="email-all-parents" title="Emails the parents that have email addresses and can be contacted">{{ text }}</a>
-                                            <form action="{{ routeLookupIfAuthorized('mail.postCreateMail') }}" method="post" class="no-margin" id="email-contacts-form">
-                                                <input type="hidden" name="studentExternalIds" value="{{ user.externalId }}"/>
-                                                <input type="hidden" name="selectedGroups" value="parents_of"/>
-                                                <input name="studentId" value="{{ user.id }}" type="hidden">
-                                                <input name="title" value="Email Parents" type="hidden">
-                                            </form>
-                                        </li>
-                                    {% else  %}
-                                        {# A standard button whose urls need to be dynamically determined #}
-                                        {% set route = button.url %}
-
-                                        {# Unique derivations #}
-                                        {% if button.type in ['duework'] %}
-                                            {% set route = routeLookupIfAuthorized('learningUpcoming.getUpcomingForStudent', {student: user, studentId: user.id}) %}
-                                        {% elseif button.type in ['grades'] %}
-                                            {% set route = routeLookupIfAuthorized('learningGrades.getGrades', {viewee: user, userId: user.id}) %}
-                                        {% elseif button.type in ['pastoral'] %}
-                                            {% set route = pastoralUrl %}
-                                        {% elseif button.type in ['calendar'] %}
-                                            {% set route = routeLookupIfAuthorized('calendar.getCalendar', {selectedDate: now.urlDate, userId: user.id, user: user}) %}
-                                        {% elseif button.type in ['documentmanagement'] %}
-                                            {% set route = routeLookupIfAuthorized('profileDocumentManagement.getIndex', {studentId: user.id}) %}
-                                        {% elseif button.type in ['geosnapshot'] %}
-                                            {% set route = routeLookupIfAuthorized('geosnapshotApi.getStudentPhotos', {id: user.id}) %}
-                                        {% elseif button.type in ['pastoralsynergetic'] %}
-                                            {% set route = config.external_staff_portal ~ '/stud.aspx?id=' ~ user.externalId %}
-                                        {% endif %}
-
-                                        {% if route %}
-                                            <li>
-                                                <a href="{{ route }}" title="{{ button.title }}" class="icon-{{ button.icon }} {{ button.css }}" target="{{ button.target }}">{{ text }}</a>
-                                            </li>
-                                        {% endif %}
                                     {% endif %}
                                 {% endif %}
-                            {% endfor %}
+                            {% endif %}
+                        {% endfor %}
 
-                            {% block buttons_miscellaneous %}
-                            {% endblock buttons_miscellaneous %}
-                        {% endif %}
+                        {% block buttons_miscellaneous %}
+                        {% endblock buttons_miscellaneous %}
                     {% endblock buttons %}
                 </ul>
             {% endblock buttons_island %}
@@ -401,21 +381,42 @@
             });
         </script>
 
-        {# These are all the possible tab buttons that could exist
+        {# These are all the possible tabs that could exist
          # and the booleans which determine if they're currently available
          #
-         # The first button in the list is always selected by default
+         # The first tab in the list is always selected by default
          # activeTab setting will override it later if appropriate to do so
          # based on the anchor in the url via javascript
+         #
+         # contacts: users must have showContacts truthy and have at least one contact
+         #           or the viewer is a primary carer and the viewee has at least one
+         #           emergency contact. This is really particular.
          #}
-
         {% set additionalConstraints = {
-            'activity': showActivityFeed,
-            'goals': showAchievementsTab,
-            'achievements': showAchievementsTab,
-            'classes': showClasses and showSubjects,
-            'groups': showGroups,
-            'contacts': showContactsTab
+            'student': {
+                '_default': true,
+                'activity': (config.learning_moments_enabled and user.learningMomentsEnabled) or config.badges_enabled or config.grades_enabled,
+                'goals': config.badges_enabled,
+                'achievements': config.badges_enabled,
+                'classes': user.isShowTimetable,
+                'contacts': (user.showContacts or isPrimaryCarer) and (contacts|length or hasEmergencyContacts)
+            },
+            'parent': {
+                '_default': true,
+                'activity': (config.learning_moments_enabled and user.learningMomentsEnabled) or config.badges_enabled or config.grades_enabled,
+                'goals': config.badges_enabled,
+                'achievements': config.badges_enabled,
+                'classes': user.isShowTimetable,
+                'contacts': (user.showContacts or isPrimaryCarer) and (contacts|length or hasEmergencyContacts)
+            },
+            'staff': {
+                '_default': USER.role.viewStudentProfile,
+                'activity': USER.role.viewStudentProfile and ((config.learning_moments_enabled and user.learningMomentsEnabled) or config.badges_enabled or config.grades_enabled),
+                'goals': USER.role.viewStudentProfile and config.badges_enabled,
+                'achievements': USER.role.viewStudentProfile and config.badges_enabled,
+                'classes': USER.role.viewStudentProfile and user.isShowTimetable,
+                'contacts': USER.role.viewStudentProfile and ((user.showContacts and contacts|length) or (isPrimaryCarer and hasEmergencyContacts))
+            },
         } %}
 
         {# Out of all the tabs that could possibly exist here, figure out
@@ -425,7 +426,7 @@
 
         {% for tab in possibleTabs %}
             {# Check additionalConstraints to really know if this tab should be on-screen #}
-            {% if additionalConstraints[tab.tab] ?? true %}
+            {% if additionalConstraints[USER.role.type][tab.tab] ?? additionalConstraints[USER.role.type]['_default'] %}
                 {% if not activeTab %}
                     {% set activeTab = 'tab-' ~ tab.tab %}
                 {% endif %}
@@ -448,7 +449,7 @@
                 {% set defaultCss = 'active' %}
 
                 {% for tab in possibleTabs %}
-                    {% if additionalConstraints[tab.tab] ?? true %}
+                    {% if additionalConstraints[USER.role.type][tab.tab] ?? additionalConstraints[USER.role.type]['_default'] %}
                         <dd class="{{ defaultCss }}"><a href="#tab-{{ tab.tab }}">{{ tab.displayAs }}</a></dd>
 
                         {# All subsequent tabs are not active by default #}
@@ -459,7 +460,7 @@
         {% endif %}
 
         <div class="profile-tabs tabs-content">
-            {% if showActivityFeed %}
+            {% if additionalConstraints[USER.role.type]['activity'] ?? additionalConstraints[USER.role.type]['_default'] %}
                 <div class="content no-pad {% if activeTab == 'activity' %}active{% endif %}" id="tab-activity">
                     <div id="activity-feed">
                         <activity-feed
@@ -475,7 +476,7 @@
                 </div>
             {% endif %}
 
-            {% if showAchievementsTab %}
+            {% if additionalConstraints[USER.role.type]['goals'] ?? additionalConstraints[USER.role.type]['_default'] %}
                 <div class="content no-pad {% if activeTab == 'goals' %}active{% endif %}" id="tab-goals">
                     <div id="goal-feed" class="goals-achievements">
                         <goal-feed
@@ -484,7 +485,9 @@
                         />
                     </div>
                 </div>
+            {% endif %}
 
+            {% if additionalConstraints[USER.role.type]['achievements'] ?? additionalConstraints[USER.role.type]['_default'] %}
                 <div class="content no-pad {% if activeTab == 'achievements' %}active{% endif %}" id="tab-achievements">
                     <div id="achievement-feed" class="goals-achievements">
                         <achievement-feed
@@ -545,17 +548,18 @@
             {% endautoescape %}
             <script type="text/javascript" src="{{ CDN_PREFIX }}/js/bundle/userProfileFeeds.js?v={{ config.site_version }}"></script>
 
-            {% if showClasses and showSubjects %}
-                <div class="content no-pad {% if activeTab == 'classes' %}active{% endif %}" id="tab-classes">
+            {% if additionalConstraints[USER.role.type]['classes'] ?? additionalConstraints[USER.role.type]['_default'] %}
+                {% if subjects|length %}
+                    <div class="content no-pad {% if activeTab == 'classes' %}active{% endif %}" id="tab-classes">
                     <section>
 
                         {% for group, subjectGroup in subjects %}
 
                             {# Suffix all iterated identifiers
-                         # Tot menus and so on start exhiting interrelated behaviour when they share the same id
-                         # We can ensure uniqueness in iterations by suffixing with an index but we can do it by
-                         # taking advantage of a twig construct
-                            #}
+                             # Tot menus and so on start exhiting interrelated behaviour when they share the same id
+                             # We can ensure uniqueness in iterations by suffixing with an index but we can do it by
+                             # taking advantage of a twig construct
+                             #}
                             {% set groupIdentifier = loop.index %}
 
                             {# Keep a running total of all teachers emails in this group #}
@@ -603,12 +607,12 @@
                                 {% for subjectKey, subject in subjectGroup %}
 
                                     {# Suffix all iterated identifiers
-                                 # Tot menus and so on start exhibiting interrelated behaviour when they share the same id
-                                 # We can ensure uniqueness in iterations by suffixing with an index but we can do it by
-                                 # taking advantage of a twig construct
-                                 #
-                                 # You have multiple subjects per subject group so you need further uniquification
-                                    #}
+                                     # Tot menus and so on start exhibiting interrelated behaviour when they share the same id
+                                     # We can ensure uniqueness in iterations by suffixing with an index but we can do it by
+                                     # taking advantage of a twig construct
+                                     #
+                                     # You have multiple subjects per subject group so you need further uniquification
+                                     #}
                                     {% set subjectIdentifier = loop.index %}
 
                                     <div class="v-card">
@@ -703,118 +707,117 @@
                         {% endfor %}
                     </section>
                 </div>
+                {% endif %}
             {% endif %}
 
-            {% if showGroups %}
-                <div class="content no-pad {% if activeTab == 'groups' %}active{% endif %}" id="tab-groups">
-                    <section>
-                        <h2 class="subheader content">Groups</h2>
-                        <section class="v-card-list classes-groups content">
-                            {% for groupKey, group in groups %}
-                                <div class="v-card">
-                                    {% if group.linkedToFolder %}
-                                    <a href="/homepage/{{ group.id }}">
-                                        {% endif %}
-                                        <div class="card-class-image"
-                                             style="border-bottom-width: 10px;
-                                                     border-bottom-style: solid;
-                                             {% if group.folder is defined and group.folder.colour %}
-                                                     background-color:{{ group.folder.colour }};
-                                                     border-bottom-color: {{ group.folder.colour }};
-                                             {% endif %}
-                                                {% if group.folder is defined and group.folder.coverImage %}
-                                                     background-image: url('/storage/image.php?hash={{ group.folder.coverImage.hash }}&size=cardImageLarge');
-                                                     background-size: cover;
-                                                     background-repeat: no-repeat;
-                                                     background-position: center;
-                                             {% endif %}"
-                                        >
-                                            {% if group.owners is defined %}
-                                                <div class="related groups">
-                                                    {# A card can't fit more than 5 group owners comfortably, so four are displayed,
-                                                with the remaining counted, and displayed in tool tip #}
-                                                    {% set maxOwnersToShowCount = 4 %}
-                                                    {% set ownersHead = group.owners[:maxOwnersToShowCount] %}
-                                                    {% for owner in ownersHead %}
-                                                        {% include 'include/portrait.twig' with {user: owner, description: owner.fullName} only %}
-                                                    {% endfor %}
-                                                    {% set ownersTail = group.owners[maxOwnersToShowCount:] %}
-                                                    {% if ownersTail|length %}
-                                                        {% set groupOwnersNames = '' %}
-                                                        {% for owner in ownersTail %}
-                                                            {% if loop.index == ownersTail|length %}
-                                                                {% set groupOwnersNames = groupOwnersNames ~ owner.formatName %}
-                                                            {% else %}
-                                                                {% set groupOwnersNames = groupOwnersNames ~ owner.formatName ~ '<br/>' %}
-                                                            {% endif %}
-                                                        {% endfor %}
-                                                        {% set remainingGroupOwnersCount = group.owners|length - maxOwnersToShowCount  %}
-                                                        <div class="plus-more" data-tooltip class="hint has-tip tip-top" title="{{ groupOwnersNames }}">+{{ remainingGroupOwnersCount }}</div>
-                                                    {% endif %}
-                                                </div>
-                                            {% endif %}
-                                        </div>
+            {% if additionalConstraints[USER.role.type]['groups'] ?? additionalConstraints[USER.role.type]['_default'] %}
+                {% if groups|length %}
+                    <div class="content no-pad {% if activeTab == 'groups' %}active{% endif %}" id="tab-groups">
+                        <section>
+                            <h2 class="subheader content">Groups</h2>
+                            <section class="v-card-list classes-groups content">
+                                {% for groupKey, group in groups %}
+                                    <div class="v-card">
                                         {% if group.linkedToFolder %}
-                                    </a>
-                                    {% endif %}
-
-                                    {% set hasOwnersWithEmail = false %}
-                                    {% if group.owners is defined and canEmailStaff %}
-                                        {% for owner in group.owners %}
-                                            {% if not owner.email is empty %}
-                                                {% set hasOwnersWithEmail = true %}
+                                        <a href="/homepage/{{ group.id }}">
                                             {% endif %}
-                                        {% endfor %}
-                                    {% endif %}
-                                    <div class="card-content classes groups actions-small-{{ hasOwnersWithEmail ? '1' : '0' }}">
-                                        <div class="list-item">
+                                            <div class="card-class-image"
+                                                 style="border-bottom-width: 10px;
+                                                         border-bottom-style: solid;
+                                                 {% if group.folder is defined and group.folder.colour %}
+                                                         background-color:{{ group.folder.colour }};
+                                                         border-bottom-color: {{ group.folder.colour }};
+                                                 {% endif %}
+                                                    {% if group.folder is defined and group.folder.coverImage %}
+                                                         background-image: url('/storage/image.php?hash={{ group.folder.coverImage.hash }}&size=cardImageLarge');
+                                                         background-size: cover;
+                                                         background-repeat: no-repeat;
+                                                         background-position: center;
+                                                 {% endif %}"
+                                            >
+                                                {% if group.owners is defined %}
+                                                    <div class="related groups">
+                                                        {# A card can't fit more than 5 group owners comfortably, so four are displayed,
+                                                    with the remaining counted, and displayed in tool tip #}
+                                                        {% set maxOwnersToShowCount = 4 %}
+                                                        {% set ownersHead = group.owners[:maxOwnersToShowCount] %}
+                                                        {% for owner in ownersHead %}
+                                                            {% include 'include/portrait.twig' with {user: owner, description: owner.fullName} only %}
+                                                        {% endfor %}
+                                                        {% set ownersTail = group.owners[maxOwnersToShowCount:] %}
+                                                        {% if ownersTail|length %}
+                                                            {% set groupOwnersNames = '' %}
+                                                            {% for owner in ownersTail %}
+                                                                {% if loop.index == ownersTail|length %}
+                                                                    {% set groupOwnersNames = groupOwnersNames ~ owner.formatName %}
+                                                                {% else %}
+                                                                    {% set groupOwnersNames = groupOwnersNames ~ owner.formatName ~ '<br/>' %}
+                                                                {% endif %}
+                                                            {% endfor %}
+                                                            {% set remainingGroupOwnersCount = group.owners|length - maxOwnersToShowCount  %}
+                                                            <div class="plus-more" data-tooltip class="hint has-tip tip-top" title="{{ groupOwnersNames }}">+{{ remainingGroupOwnersCount }}</div>
+                                                        {% endif %}
+                                                    </div>
+                                                {% endif %}
+                                            </div>
                                             {% if group.linkedToFolder %}
-                                                <a href="/homepage/{{ group.id }}">
+                                        </a>
+                                        {% endif %}
+
+                                        {% set hasOwnersWithEmail = false %}
+                                        {% if group.owners is defined and canEmailStaff %}
+                                            {% for owner in group.owners %}
+                                                {% if not owner.email is empty %}
+                                                    {% set hasOwnersWithEmail = true %}
+                                                {% endif %}
+                                            {% endfor %}
+                                        {% endif %}
+                                        <div class="card-content classes groups actions-small-{{ hasOwnersWithEmail ? '1' : '0' }}">
+                                            <div class="list-item">
+                                                {% if group.linkedToFolder %}
+                                                    <a href="/homepage/{{ group.id }}">
+                                                        <h3>{{ group.name }}</h3>
+                                                    </a>
+                                                {% else %}
                                                     <h3>{{ group.name }}</h3>
-                                                </a>
-                                            {% else %}
-                                                <h3>{{ group.name }}</h3>
+                                                {% endif %}
+                                            </div>
+                                            {% if hasOwnersWithEmail and canEmailStaff %}
+                                                <nav>
+                                                    <sbx-pop-out content-id="group-options-{{ groupKey }}"></sbx-pop-out>
+                                                </nav>
+                                                <ul id="group-options-{{ groupKey }}" class="f-dropdown" data-dropdown-content>
+                                                    {% for owner in group.owners %}
+                                                        {% if not owner.email is empty %}
+                                                            <li>
+                                                                {% set replyTo = owner.getFormattedEmailDisplay %}
+                                                                <a class="icon-email" href="{{ session.mailhandle }}{{ replyTo }}" title="Email {{ replyTo }}">Email {{ owner.formatName }}</a>
+                                                            </li>
+                                                        {% endif %}
+                                                    {% endfor %}
+                                                </ul>
                                             {% endif %}
                                         </div>
-                                        {% if hasOwnersWithEmail and canEmailStaff %}
-                                            <nav>
-                                                <sbx-pop-out content-id="group-options-{{ groupKey }}"></sbx-pop-out>
-                                            </nav>
-                                            <ul id="group-options-{{ groupKey }}" class="f-dropdown" data-dropdown-content>
-                                                {% for owner in group.owners %}
-                                                    {% if not owner.email is empty %}
-                                                        <li>
-                                                            {% set replyTo = owner.getFormattedEmailDisplay %}
-                                                            <a class="icon-email" href="{{ session.mailhandle }}{{ replyTo }}" title="Email {{ replyTo }}">Email {{ owner.formatName }}</a>
-                                                        </li>
-                                                    {% endif %}
-                                                {% endfor %}
-                                            </ul>
-                                        {% endif %}
                                     </div>
-                                </div>
-                            {% endfor %}
+                                {% endfor %}
+                            </section>
                         </section>
-                    </section>
-                </div>
+                    </div>
+                {% endif %}
             {% endif %}
 
-            {% if showContactsTab %}
+            {% if additionalConstraints[USER.role.type]['contacts'] ?? additionalConstraints[USER.role.type]['_default'] %}
+                {# Only show this tab if there's any content here:
+                 # Viewee must allow you to see their main contacts,
+                 # or they have emergency contacts
+                 #}
                 <div class="content no-pad {% if activeTab == 'contacts' %}active{% endif %}" id="tab-contacts">
-
                     <section class="content">
                         {% block contacts_island %}
                             {% block contacts %}
                                 <h2 class="subheader">Contact Information</h2>
-                                {% if showContactsAlert %}
-                                    {% if externalUser.ParentsSeparatedFlag ?? false %}
-                                        {% block parents_separated %}
-                                            <div class="alert-box highlight icon-info">Parents Separated</div>
-                                        {% endblock parents_separated %}
-                                    {% endif %}
-                                {% endif %}
 
-                                {% if showContacts %}
+                                {% if user.isShowContacts and contacts|length %}
                                     <section>
                                         <ul class="information-list expandable-card">
                                             {% for contact in contacts %}
@@ -970,9 +973,9 @@
                         {% block emergencyContacts_island %}
                             {% block emergencyContacts %}
                                 {# up to 3 emergency contact blocks
-                         # show no header if no emergencies
-                                #}
-                                {% if showEmergencyContacts %}
+                                 # show no header if no emergencies
+                                 #}
+                                {% if hasEmergencyContacts %}
                                     <h2 class="subheader">Emergency Contact Information</h2>
                                     <section>
                                         <ul class="information-list expandable-card">
@@ -1030,7 +1033,7 @@
 {# TODO: Where to pus this?
  # https://stackoverflow.com/questions/23569705/zurb-foundation-prevent-empty-column-collapsing-to-zero-width
  # https://foundation.zurb.com/forum/posts/22995-empty-column
-#}
+ #}
 <style type="text/css">
     .columns, .column {
         min-height: 1px;
@@ -1042,7 +1045,7 @@
  # Modal for sharing a learning moment
  #
  # Only show "sharing on behalf of" if you're not viewing your own profile
-#}
+ #}
 {% if shareLearningMomentUrl %}
     {% include '@learningMomentEvidence/shareModal.twig' with {
         id:      "shareLearningMoment",
