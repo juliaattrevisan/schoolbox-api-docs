@@ -35,6 +35,12 @@ export default class Item {
 
     static readonly ELEMENT_ARTICLE = "article";
 
+    static readonly ADD_COMMENT = `button[class="show-ckeditor-button"]`;
+
+    static readonly DATA_TEST_ARTICLE_COMMENT = "ckeditor-add-comment-textarea-0";
+
+    static readonly DATA_TEST_SUBMIT_COMMENT = "ckeditor-add-comment-input-submit-for-comment-0";
+
     constructor(tester: AcceptanceTester, page: Page) {
         this.tester = tester;
         this.page = page;
@@ -95,6 +101,13 @@ export default class Item {
     }
 
     /**
+     * click publish news button
+     */
+    async clickPublishArticle(): Promise<void> {
+        await this.page.locator('input[id="article-submit"]').click();
+    }
+
+    /**
      * see the audience of the article
      * @param audience - The article to check
      */
@@ -109,5 +122,55 @@ export default class Item {
      */
     async seeArticleStatus(status: string): Promise<void> {
         await expect(this.page.locator(`span#status-new`)).toContainText(status);
+    }
+
+    /**
+     * check enable comment
+     */
+    async enableComment(): Promise<void> {
+        await this.page.locator('label[for="allow-comments"]').click();
+    }
+
+    /**
+     * click add comment button link
+     */
+    async clickAddComment(): Promise<void> {
+        await this.page.locator(Item.ADD_COMMENT).click();
+    }
+
+    /**
+     * type a comment
+     * @param comment - The comment entered by user
+     */
+    async typeComment(comment: string): Promise<void> {
+        const body = this.page.getByTestId(Item.DATA_TEST_ARTICLE_COMMENT);
+        await this.tester.fillCKEditorByLocator(body, comment);
+    }
+
+    /**
+     * post a comment
+     */
+    async postComment(): Promise<void> {
+        await this.page.getByTestId(Item.DATA_TEST_SUBMIT_COMMENT).click();
+    }
+
+    /**
+     * delete the news comment
+     */
+    async deleteComment(): Promise<void> {
+        await this.page.locator('a[href="#delete-comment"]').first().click();
+        await this.page.locator('button:has-text("Delete")').click();
+    }
+
+    /**
+     * delete the news article
+     * @param articleId - The article id to delete
+     */
+    async deleteArticle(articleId: number): Promise<void> {
+        await this.page.getByTestId(Item.DATA_TEST_DOT_MENU_BUTTON).click();
+        await this.page.locator(`a[href="/news/${articleId}/delete"]`).click();
+        await expect(this.page.locator("div.reveal-modal.small.open")).toBeVisible();
+        await this.page.getByTestId("confirm-dialog-confirm-button").click();
+        await expect(this.page.locator('div[id="news-component"]')).toBeVisible();
     }
 }
