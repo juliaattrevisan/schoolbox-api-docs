@@ -42,7 +42,7 @@ function onRemoveSelected(): void {
 
 <template>
     <div
-        :class="`selected-item l-flex-row l-flex--align-center l-pad-s l-gap-s ${
+        :class="`selected-item l-flex l-flex--align-center l-pad-s l-gap-s ${
             props.isSingleSelect ? 'l-flex__item--1' : ''
         }`"
         :data-test="`ss-selected-item-container-${props.item.id}`"
@@ -84,6 +84,7 @@ function onRemoveSelected(): void {
     &__name-button {
         background: none;
         margin: 0;
+        max-width: 30rem;
         min-height: 0;
         padding: 0;
         text-align: left;
@@ -93,6 +94,7 @@ function onRemoveSelected(): void {
         background: none;
         height: 1rem;
         min-height: 0;
+        min-width: 1.5rem;
         padding: 0;
     }
 }
