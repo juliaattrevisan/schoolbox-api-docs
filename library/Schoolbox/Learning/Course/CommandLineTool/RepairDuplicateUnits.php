@@ -11,6 +11,8 @@ namespace Schoolbox\Learning\Course\CommandLineTool;
 
 use Schoolbox\Application\CliKernelAbstract;
 use Schoolbox\Application\CliTool\App;
+use Schoolbox\Learning\Assessment\DataModel\MapperProxy;
+use Schoolbox\Learning\Assessment\IAssessable;
 use UnexpectedValueException;
 
 /**
@@ -51,12 +53,35 @@ class RepairDuplicateUnits extends App
         GROUP BY
             cui.course_implementation_id,
             cui.course_unit_specification_id,
-            cui.title,
-            ci.folder_id,
-            f.name
+            ci.folder_id
         HAVING c > 1
         ORDER BY ci.folder_id, cui.course_unit_specification_id
     SQL;
+
+    /**
+     * Query for finding duplicate unit IDs.
+     */
+    private const SELECT_DUPLICATE_UNITS_IN_COURSE_QUERY = <<<SQL
+        SELECT
+            id,
+            open_date,
+            due_date,
+            created_at
+        FROM course_unit_implementation
+        WHERE course_implementation_id = :courseImplementationId
+        AND course_unit_specification_id = :courseUnitSpecificationId
+    SQL;
+
+//    private const SELECT_ASSESSMENTS_IN_UNIT_QUERY = <<<SQL
+//        SELECT
+//            id,
+//            open_date,
+//            due_date,
+//            created_at
+//        FROM course_unit_implementation
+//        WHERE course_implementation_id = :courseImplementationId
+//        AND course_unit_specification_id = :courseUnitSpecificationId
+//    SQL;
 
     /**
      * @inheritdoc
@@ -86,6 +111,8 @@ class RepairDuplicateUnits extends App
      */
     public function run(): void
     {
+        /** @var MapperProxy $assessmentDataSource */
+        $assessmentDataSource = $this->getDi()->get('assessmentDataSource');
         if ($this->getOpt(self::OPT_LONG_HELP) || $this->getOpt(self::OPT_SHORT_HELP)) {
             $this->printHelp();
         }
@@ -105,21 +132,50 @@ class RepairDuplicateUnits extends App
             $pb = $pb->in('ci.folder_id', $folders);
         }
 
-        $query = $db->prepare(sprintf(self::SELECT_DUPLICATE_UNITS_QUERY, $pb->getWhereIntersect()));
-        $query->execute($pb->getParams());
-        $log->notice(sprintf('%s duplicate units found.', $query->rowCount()));
-        foreach ($query as $row) {
+        $duplicateUnitsInCourseQuery = $db->prepare(self::SELECT_DUPLICATE_UNITS_IN_COURSE_QUERY);
+        $duplicateUnitsQuery = $db->prepare(sprintf(self::SELECT_DUPLICATE_UNITS_QUERY, $pb->getWhereIntersect()));
+        $duplicateUnitsQuery->execute($pb->getParams());
+        $log->notice(sprintf('%s duplicate units found.', $duplicateUnitsQuery->rowCount()));
+        foreach ($duplicateUnitsQuery as $duplicateUnitsRow) {
             $log->notice(
                 sprintf(
-                    'Folder #%d (%s), unit #%d, course unit #%d (%s): %d duplicates',
-                    $row['folder_id'],
-                    $row['folder_title'],
-                    $row['course_implementation_id'],
-                    $row['course_unit_specification_id'],
-                    $row['unit_title'],
-                    $row['c'],
+                    'Folder #%d (%s), course impl #%d, unit spec #%d (%s): %d duplicates',
+                    $duplicateUnitsRow['folder_id'],
+                    $duplicateUnitsRow['folder_title'],
+                    $duplicateUnitsRow['course_implementation_id'],
+                    $duplicateUnitsRow['course_unit_specification_id'],
+                    $duplicateUnitsRow['unit_title'],
+                    $duplicateUnitsRow['c'],
                 ),
             );
+
+            // Now what to do with them?
+            $duplicateUnitsInCourseQuery->execute([
+                'courseImplementationId'    => $duplicateUnitsRow['course_implementation_id'],
+                'courseUnitSpecificationId' => $duplicateUnitsRow['course_unit_specification_id'],
+            ]);
+            foreach ($duplicateUnitsInCourseQuery as $duplicateUnitsInCourseQueryRow) {
+                $log->notice(
+                    sprintf(
+                        '- unit impl #%d, open %s, due %s',
+                        $duplicateUnitsInCourseQueryRow['id'],
+                        $duplicateUnitsInCourseQueryRow['open_date'],
+                        $duplicateUnitsInCourseQueryRow['due_date'],
+                    ),
+                );
+            }
+            foreach ($assessmentDataSource->findAllByUnitImplementationIds([$duplicateUnitsInCourseQueryRow['id']]) as $assessment) {
+                /** @var IAssessable $assessment */
+                $log->notice(
+                    sprintf(
+                        '  - assessment #%d (%s), open %s, due %s',
+                        $assessment->getId(),
+                        $assessment->getTitle(),
+                        $assessment->getOpenAt()->getDatabase(),
+                        $assessment->getDueAt()->getDatabase(),
+                    ),
+                );
+            }
         }
 
         exit(CliKernelAbstract::EXIT_STATUS_OK);
