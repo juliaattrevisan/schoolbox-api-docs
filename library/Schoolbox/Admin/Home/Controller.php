@@ -64,7 +64,6 @@ class Controller extends Base
      */
     protected ImportLogMapper $importLogMapper;
 
-
     /**
      * Constructor
      *
@@ -252,7 +251,6 @@ class Controller extends Base
         );
     }
 
-
     /**
      * Displays the 'Disaster Recovery Backups' page
      *
@@ -283,7 +281,6 @@ class Controller extends Base
             ),
         );
     }
-
 
     /**
      * Builds the context data for the Disaster Report
@@ -439,7 +436,6 @@ class Controller extends Base
 
         return $enabledData;
     }
-
 
     /**
      * Returns whether the disaster recovery backups feature is running on this instance
