@@ -2019,8 +2019,8 @@ class Handler
             ]
         ];
 
-        foreach (array_keys(get_object_vars($data)) as $getStudentID) {
-            $studentData = $data->$getStudentID;
+        foreach (array_keys((array)$data) as $getStudentID) {
+            $studentData = $data[$getStudentID];
 
             foreach ($studentData as $key => $value) {
                 if (
@@ -2133,7 +2133,7 @@ class Handler
                 $existingMedicalConditions = $this->getStudentMedicalConditions($getStudentID);
 
                 // Calculate the number of remaining conditions after deletion
-                $remainingConditions = count($existingMedicalConditions) - count($groupedData['medical_conditions']['delete'][$getStudentID]);
+                $remainingConditions = count($existingMedicalConditions) - count($groupedData['medical_conditions']['delete'][$getStudentID] ?? []);
 
                 // Set MedicalAlertFlag based on the conditions
                 if ($remainingConditions <= 0 && !$hasNewMedicalConditions) {
