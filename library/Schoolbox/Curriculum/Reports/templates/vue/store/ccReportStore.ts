@@ -4,6 +4,7 @@
 
 import { defineStore } from "pinia";
 import type { Course } from "@schoolboxLibrary/types/Course";
+import { isAbortError } from "@js/util/errorUtils";
 import type { CurriculumCoverageNode } from "../../js/types/curriculumCoverageTypes";
 import { useQueryStore } from "./ccQueryStore";
 import { useInputStore } from "./ccInputStore";
@@ -114,12 +115,15 @@ export const useReportStore = defineStore("ccReport", () => {
                 nodes.value = responseJson.data.nodes;
                 hasReport.value = true;
             }
-            isLoading.value = false;
         } catch (error) {
-            // if the error is a DOMException, it's because the report has been aborted to start a new one
-            if (typeof error === "string" && !error.includes("DOMException")) {
-                hasLoadError.value = true;
+            // ignore abort errors, as the previous report was cancelled
+            if (isAbortError(error)) {
+                return;
             }
+            console.error(error);
+            hasLoadError.value = true;
+        } finally {
+            isLoading.value = false;
         }
     }
 
