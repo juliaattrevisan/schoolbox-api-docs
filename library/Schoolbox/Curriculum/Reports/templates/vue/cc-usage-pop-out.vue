@@ -69,6 +69,11 @@ window.Vue.watch(
             <div class="loader"></div>
         </div>
         <div v-else class="l-flex-col l-gap-s">
+            <div v-if="!popOutStore.isNodeExpanded" class="usage__section">
+                <div data-alert="" class="alert-box f-no-margins l-pad-s">
+                    This outcome also includes the count of its children. Expand the outcome to view an accurate count.
+                </div>
+            </div>
             <div v-if="popOutStore.usage?.onUnit" class="usage__section">
                 <div class="l-flex l-gap-s">
                     <sbx-icon name="unit" />
@@ -108,7 +113,7 @@ window.Vue.watch(
     &__section {
         display: flex;
         flex-direction: column;
-        padding: var(--spacing-s);
+        // padding: var(--spacing-s);
     }
     &__section:not(:last-of-type) {
         border-bottom: 1px solid var(--body-background);
