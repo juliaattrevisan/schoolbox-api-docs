@@ -1835,6 +1835,9 @@ class Handler
                 return is_string($value);
             },
             'ConditionDetails' => function ($value) {
+                if (empty($value) || $value == 'null') {
+                    return true;
+                }
                 return is_string($value);
             },
             'ConsentSeq' => function ($value) {
@@ -1983,12 +1986,12 @@ class Handler
     /**
      * Handle student data update
      *
-     * @param object $data
+     * @param        $data
      * @param        $modifiedBy
      * @return void
      * @throws Exception
      */
-    private function handleUpdateStudentDataRequest(object $data, $modifiedBy): void
+    private function handleUpdateStudentDataRequest($data, $modifiedBy): void
     {
         $groupedData = $this->groupStudentDataByDatabaseTable($data);
         $this->processGroupedStudentData($groupedData, $modifiedBy);
@@ -1997,10 +2000,10 @@ class Handler
     /**
      * Grouping of the student data
      *
-     * @param object $data
+     * @param $data
      * @return array
      */
-    private function groupStudentDataByDatabaseTable(object $data): array
+    private function groupStudentDataByDatabaseTable($data): array
     {
         $groupedData = [
             'community' => [],
