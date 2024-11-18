@@ -79,6 +79,7 @@ export default {
                 "firstname",
                 "preferred_name",
                 "lastname",
+                "fullName",
                 "external_id",
                 "campuses",
                 "role",
@@ -147,6 +148,7 @@ export default {
                     token: "Token",
                     eportfolio_enabled: "ePortfolio",
                 },
+                hiddenColumns: ["fullName"], // to include the fullName column for use in searching
                 orderBy: {
                     ascending: false,
                     column: "Surname",

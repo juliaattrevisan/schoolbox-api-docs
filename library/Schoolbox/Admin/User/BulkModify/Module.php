@@ -12,11 +12,9 @@ use Alaress\Authorizer\Rule;
 use Alaress\Module\Module as BaseModule;
 use Alaress\Twig\Loader\IChainLoader;
 use Alaress\Web\Controller\Base;
-use Aura\Router\Map;
 use HouseMapper;
 use Schoolbox\CampusMapper;
 use Schoolbox\RoleMapper;
-use Schoolbox\UserBulkMapper;
 use Schoolbox\YearLevel;
 
 /**
@@ -58,7 +56,7 @@ class Module extends BaseModule
     {
         return new Controller(
             $this->injector->get('subscriptionCache'),
-            $this->getMapperFactory()->get(UserBulkMapper::class),
+            new \Schoolbox\UserBulkMapper($this->getMapperFactory()->get(\Schoolbox\UserMapper::class)),
             $this->getMapperFactory()->get(CampusMapper::class),
             $this->getMapperFactory()->get(RoleMapper::class),
             $this->getMapperFactory()->get(HouseMapper::class),
