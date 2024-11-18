@@ -68,19 +68,26 @@ window.Vue.watch(
         <div v-else-if="popOutStore.isLoading && !popOutStore.hasLoadError" class="usage__loader">
             <div class="loader"></div>
         </div>
-        <div v-else>
-            <div v-if="popOutStore.usage?.onUnit" class="usage__section l-flex-row l-gap-s">
-                <sbx-icon name="unit" />
-                <p class="f-no-margins">Assigned to Unit</p>
+        <div v-else class="l-flex-col l-gap-s">
+            <div v-if="popOutStore.usage?.onUnit" class="usage__section">
+                <div class="l-flex l-gap-s">
+                    <sbx-icon name="unit" />
+                    <p class="f-no-margins">Assigned to Unit</p>
+                </div>
             </div>
-            <div
-                v-if="popOutStore.usage?.activity && popOutStore.usage.activity.length > 0"
-                class="usage__section l-flex-row l-gap-s"
-            >
-                <template v-for="activity in popOutStore.usage.activity" :key="activity.link">
+            <div v-if="popOutStore.usage?.activity && popOutStore.usage.activity.length > 0" class="usage__section">
+                <template v-for="activity in popOutStore.usage.activity" :key="activity._links.view">
                     <a :href="activity._links.view" :title="`View ${activity.name}`" class="l-flex l-gap-s">
                         <sbx-icon name="project" />
                         <p class="f-no-margins">{{ activity.name }}</p>
+                    </a>
+                </template>
+            </div>
+            <div v-if="popOutStore.usage?.lessonPlan && popOutStore.usage.lessonPlan.length > 0" class="usage__section">
+                <template v-for="lessonPlan in popOutStore.usage.lessonPlan" :key="lessonPlan._links.view">
+                    <a :href="lessonPlan._links.view" :title="`View ${lessonPlan.name}`" class="l-flex l-gap-s">
+                        <sbx-icon name="lesson-plan" />
+                        <p class="f-no-margins">{{ lessonPlan.name }}</p>
                     </a>
                 </template>
             </div>
@@ -98,6 +105,11 @@ window.Vue.watch(
     padding: var(--spacing-s);
     position: absolute;
     z-index: var(--sbx-depth-pop-over);
+    &__section {
+        display: flex;
+        flex-direction: column;
+        padding: var(--spacing-s);
+    }
     &__section:not(:last-of-type) {
         border-bottom: 1px solid var(--body-background);
     }
