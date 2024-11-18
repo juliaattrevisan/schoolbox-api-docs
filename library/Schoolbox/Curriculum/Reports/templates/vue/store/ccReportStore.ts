@@ -4,6 +4,7 @@
 
 import { defineStore } from "pinia";
 import type { Course } from "@schoolboxLibrary/types/Course";
+import { usePrintDialog } from "@schoolboxVue/composables/print/usePrintDialog";
 import { isAbortError } from "@js/util/errorUtils";
 import type { CurriculumCoverageNode } from "../../js/types/curriculumCoverageTypes";
 import { useQueryStore } from "./ccQueryStore";
@@ -39,6 +40,7 @@ export const useReportStore = defineStore("ccReport", () => {
     const nodes = window.Vue.ref<CurriculumCoverageNode[]>([]); // the nodes to display in the report
     const hasReport = window.Vue.ref<boolean>(false); // whether the report has been generated
     let controller: AbortController; // to allow aborting the previous search if a new one is started
+    const { isPrinting } = usePrintDialog();
 
     /**
      * Whether a search can be performed, can be if there's a change of course or node selection
@@ -138,5 +140,6 @@ export const useReportStore = defineStore("ccReport", () => {
         hasReport,
         canReport,
         totalColumnCount,
+        isPrinting,
     };
 });

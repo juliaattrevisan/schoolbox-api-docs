@@ -27,6 +27,18 @@ export function usePrintDialog(): {
         isPrinting.value = false;
     });
 
+    // const mediaQueryList = window.matchMedia("print");
+
+    // mediaQueryList.addEventListener("change", (event) => {
+    //     if (event.matches) {
+    //         isPrinting.value = true;
+    //         console.warn("Printing");
+    //     } else {
+    //         isPrinting.value = false;
+    //         console.warn("Not Printing");
+    //     }
+    // });
+
     return {
         isPrinting,
     };
