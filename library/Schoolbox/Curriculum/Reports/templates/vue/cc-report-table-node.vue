@@ -219,7 +219,11 @@ function onChildTitleClicked(node: CurriculumCoverageNode): void {
                 <sbx-icon v-if="isExpanded" name="up-arrow" />
                 <sbx-icon v-else name="down-arrow" />
             </button>
-            <button class="title-button" :style="{ paddingLeft: lastChildPadding }" @click="onTitleClicked">
+            <button
+                class="title-button show-for-print"
+                :style="{ paddingLeft: lastChildPadding }"
+                @click="onTitleClicked"
+            >
                 {{ title }}
             </button>
         </td>

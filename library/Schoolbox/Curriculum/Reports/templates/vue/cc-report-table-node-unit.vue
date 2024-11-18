@@ -43,6 +43,7 @@ function onClick(): void {
             :id="buttonId"
             ref="buttonEl"
             :style="{ background: buttonId === popOutStore.button?.id ? 'var(--accent-background)' : '' }"
+            class="show-for-print"
             @click="onClick"
         >
             {{ props.count }}
