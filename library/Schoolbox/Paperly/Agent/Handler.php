@@ -1834,6 +1834,9 @@ class Handler
                 }
                 return is_string($value);
             },
+            'ConditionDetails' => function ($value) {
+                return is_string($value);
+            },
             'ConsentSeq' => function ($value) {
                 if (empty($value) || $value == 'null') {
                     return true;
