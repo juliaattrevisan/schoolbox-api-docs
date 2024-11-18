@@ -17,13 +17,6 @@ export type ReportError = {
     status: number;
 };
 
-/**
- * The payload for the individual usage
- */
-type IndividualUsagePayload = {
-    data: IndividualUsage;
-};
-
 export const usePopOutStore = defineStore(`ccPopOut`, () => {
     const course = window.Vue.ref<Course | null>(null);
     const unit = window.Vue.ref<Unit | null>(null);
@@ -100,7 +93,7 @@ export const usePopOutStore = defineStore(`ccPopOut`, () => {
                 };
                 return;
             }
-            const responseJson = (await response.json()) as IndividualUsagePayload | ReportError;
+            const responseJson = (await response.json()) as IndividualUsage | ReportError;
             if (typeof responseJson !== "object" || responseJson === null) {
                 hasLoadError.value = true;
                 return;
@@ -110,8 +103,8 @@ export const usePopOutStore = defineStore(`ccPopOut`, () => {
                 loadError.value = responseJson;
                 return;
             }
-            if ("data" in responseJson) {
-                usage.value = responseJson.data;
+            if ("onUnit" in responseJson) {
+                usage.value = responseJson;
             }
             isLoading.value = false;
         } catch (error) {
@@ -158,6 +151,7 @@ export const usePopOutStore = defineStore(`ccPopOut`, () => {
         isNodeExpanded,
         isLoading,
         hasLoadError,
+        usage,
         init,
         setActive,
     };
