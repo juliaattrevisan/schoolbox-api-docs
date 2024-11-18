@@ -1,9 +1,5 @@
 {% import 'sub/breadcrumbs.twig' as bread %}
-{{ bread.crumbs(
-    [ 'Administration', routeLookup('adminHome.getIndex') ],
-    [ 'Pastoral Care' ],
-    [ 'Bulk Import' ],
-) }}
+{{ bread.crumbsArray(breadcrumbs) }}
 
 <div class="admin-container row">
     {{ renderAdminNavigation(routeLookup('pastoralBulkImport.getList')) }}

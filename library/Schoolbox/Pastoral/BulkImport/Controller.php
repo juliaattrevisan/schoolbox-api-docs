@@ -137,8 +137,7 @@ class Controller extends Base
         $adminRoute = $this->getRouteIfAuthorized('adminHome.getIndex');
         $breadcrumbs = [
             [$pastoralCareProper, $this->routeGenerator->generate('pastoral.getIndex')],
-            ["Bulk Import", $this->getRouteIfAuthorized('pastoralBulkImport.getList')],
-            ["Create", null],
+            ["Bulk Import", null],
         ];
 
         /* Assuming the Pastoral moderator came from Admin > Pastoral, rather than directly from Pastoral
@@ -147,8 +146,7 @@ class Controller extends Base
             $breadcrumbs = [
                 ['Administration', $adminRoute],
                 ['Pastoral Care', null],
-                ["Bulk Import", $this->getRouteIfAuthorized('pastoralBulkImport.getList')],
-                ["Create", null],
+                ["Bulk Import", null],
             ];
         }
 
