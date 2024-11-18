@@ -41,14 +41,17 @@ class RepairDuplicateUnits extends App
         SELECT
             cui.course_implementation_id,
             cui.course_unit_specification_id,
+            ci.folder_id,
             count(*) AS c
         FROM course_unit_implementation cui
         INNER JOIN course_implementation ci ON cui.course_implementation_id = ci.id
         WHERE %s
         GROUP BY
             cui.course_implementation_id,
-            cui.course_unit_specification_id
-        HAVING c > 1;
+            cui.course_unit_specification_id,
+            ci.folder_id
+        HAVING c > 1
+        ORDER BY ci.folder_id, cui.course_unit_specification_id
     SQL;
 
     /**
@@ -101,6 +104,16 @@ class RepairDuplicateUnits extends App
         $query = $db->prepare(sprintf(self::SELECT_DUPLICATE_UNITS_QUERY, $pb->getWhereIntersect()));
         $query->execute($pb->getParams());
         $log->notice(sprintf('%s duplicate units found.', $query->rowCount()));
+        foreach ($query as $row) {
+            $log->notice(
+                sprintf(
+                    'Folder #%d, course unit #%d: %d duplicates',
+                    $row['folder_id'],
+                    $row['course_unit_specification_id'],
+                    $row['c'],
+                ),
+            );
+        }
 
         exit(CliKernelAbstract::EXIT_STATUS_OK);
     }
