@@ -64,7 +64,6 @@ class Controller extends Base
      */
     protected ImportLogMapper $importLogMapper;
 
-
     /**
      * Constructor
      *
@@ -93,12 +92,14 @@ class Controller extends Base
      */
     public function dismissUpgradeReminder()
     {
-        $latestVersionMajor = (new InstanceRegistry($this->getConfigLoader()))->getLatestVersionMajor();
-        $configDismissUpgradeReminder = $this->configMapper->findOneByColumn('name', 'dismiss_version');
+        if ($this->getUser()->isSuperuser()) {
+            $latestVersionMajor = (new InstanceRegistry($this->getConfigLoader()))->getLatestVersionMajor();
+            $configDismissUpgradeReminder = $this->configMapper->findOneByColumn('name', 'dismiss_version');
 
-        //update the config item with the current instance major version
-        $configDismissUpgradeReminder->setValue($latestVersionMajor);
-        $this->configMapper->save($configDismissUpgradeReminder);
+            //update the config item with the current instance major version
+            $configDismissUpgradeReminder->setValue($latestVersionMajor);
+            $this->configMapper->save($configDismissUpgradeReminder);
+        }
 
         $this->response = $this->responseAsJson(
             [
@@ -169,6 +170,7 @@ class Controller extends Base
         $this->response = $this->responseFromTemplate(
             '@adminHome/index.twig',
             [
+                'userIsSuperuser' => $this->getUser()->isSuperuser(),
                 'pageCurrent' => $this->routeGenerator->generate('adminHome.getIndex'),
                 'allBreadcrumbs' => (new Subnav($this->getConfigLoader(), $this->getUser()))->generateBreadcrumbs($this->routeGenerator->generate('adminHome.getIndex')),
                 'usageInGraph' => $usageInGraph,
@@ -249,7 +251,6 @@ class Controller extends Base
         );
     }
 
-
     /**
      * Displays the 'Disaster Recovery Backups' page
      *
@@ -280,7 +281,6 @@ class Controller extends Base
             ),
         );
     }
-
 
     /**
      * Builds the context data for the Disaster Report
@@ -436,7 +436,6 @@ class Controller extends Base
 
         return $enabledData;
     }
-
 
     /**
      * Returns whether the disaster recovery backups feature is running on this instance

@@ -1,23 +1,28 @@
+{% set dismissRouteUrl = routeLookupIfAuthorized('adminHome.dismissUpgradeReminder') %}
 <div class="row">
     <div class="small-12 island">
         <div data-alert id="alert-upgrade-reminder" class="alert-box warning">
             You are using an older version of Schoolbox({{ major_site_version }}). There is a new major version available.<br/>
             <strong><a href="https://schoolbox.youcanbook.me/">Book your upgrade to v{{ major_latest_version }}</a></strong> to use all the latest functionality.
-            <a href="#" class="close">×</a>
+            {% if dismissRouteUrl %}
+                <a href="#" class="close">×</a>
+            {% endif %}
         </div>
     </div>
 </div>
 
-<script type="text/javascript">
-    {% autoescape 'js' %}
-        $(window).on('load', function () {
-            const url = '{{ routeLookup('adminHome.dismissUpgradeReminder') }}';
+{% if dismissRouteUrl %}
+    <script type="text/javascript">
+        {% autoescape 'js' %}
+            $(window).on('load', function () {
+                const url = '{{ dismissRouteUrl }}';
 
-            {# if the user closes the upgrade reminder alert, lets make sure we
-            record the interaction to prevent the reminder from showing again #}
-            $('#alert-upgrade-reminder').on("close.fndtn.alert", function() {
-                $.get(url);
+                {# if the user closes the upgrade reminder alert, lets make sure we
+                record the interaction to prevent the reminder from showing again #}
+                $('#alert-upgrade-reminder').on("close.fndtn.alert", function() {
+                    $.get(url);
+                });
             });
-        });
-    {% endautoescape %}
-</script>
+        {% endautoescape %}
+    </script>
+{% endif %}

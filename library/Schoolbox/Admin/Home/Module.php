@@ -8,7 +8,6 @@
 
 namespace Schoolbox\Admin\Home;
 
-use Alaress\Authorizer\Authorizer;
 use Alaress\Authorizer\Rule;
 use Alaress\Module\Module as BaseModule;
 use Alaress\Twig\Loader\IChainLoader;
@@ -23,48 +22,39 @@ class Module extends BaseModule
     protected $basename = 'adminHome';
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
-    public function initRoutes(string $basePath)
+    public function registerRoutes()
     {
-        $this->addGetRoute('getIndex', $basePath, "");
-        $this->addGetRoute('getHealthcheck', $basePath, "/healthcheck");
-        $this->addGetRoute('getDisasterRecovery', $basePath, "/disaster-recovery");
-        $this->addGetRoute('dismissUpgradeReminder', $basePath, "/dismiss-upgrade-reminder");
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function initRoutePermissions(Authorizer $authorizer)
-    {
-        $this->addRoutePermission(
-            $authorizer,
-            '.*',
-            new Rule\All(
-                new Rule\IsLoggedIn(),
-                new Rule\Any(
-                    new Rule\IsSuperuser(),
-                    new Rule\HasServicePermission(UserAccess::SERVICE_NEWS, UserAccess::ACCESS_FULL),
-                    new Rule\HasServicePermission(UserAccess::SERVICE_CALENDAR, UserAccess::ACCESS_FULL),
-                    new Rule\HasServicePermission(UserAccess::SERVICE_PASTORAL, UserAccess::ACCESS_FULL),
-                    new Rule\HasServicePermission(UserAccess::SERVICE_LMS, UserAccess::ACCESS_FULL),
-                    new Rule\HasServicePermission(UserAccess::SERVICE_BADGE, UserAccess::ACCESS_FULL),
-                    new Rule\HasServicePermission(UserAccess::SERVICE_CMS, UserAccess::ACCESS_FULL),
-                    new Rule\HasServicePermission(UserAccess::SERVICE_DESIGN, UserAccess::ACCESS_FULL),
-                    new Rule\HasServicePermission(UserAccess::SERVICE_TIMETABLE, UserAccess::ACCESS_FULL),
-                )
-            )
+        $ruleSuperuser = new Rule\All(
+            new Rule\IsLoggedIn(),
+            new Rule\IsSuperuser(),
         );
 
-        $this->addRoutePermission(
-            $authorizer,
-            'getDisasterRecovery',
-            new Rule\All(
+        $ruleSuperuserOrModerator = new Rule\All(
+            new Rule\IsLoggedIn(),
+            new Rule\Any(
                 new Rule\IsSuperuser(),
-                new Rule\IsConfigOn(DisasterRecovery::CONFIG_DR_VISIBILITY, $this->getConfig())
+                new Rule\HasServicePermission(UserAccess::SERVICE_NEWS, UserAccess::ACCESS_FULL),
+                new Rule\HasServicePermission(UserAccess::SERVICE_CALENDAR, UserAccess::ACCESS_FULL),
+                new Rule\HasServicePermission(UserAccess::SERVICE_PASTORAL, UserAccess::ACCESS_FULL),
+                new Rule\HasServicePermission(UserAccess::SERVICE_LMS, UserAccess::ACCESS_FULL),
+                new Rule\HasServicePermission(UserAccess::SERVICE_BADGE, UserAccess::ACCESS_FULL),
+                new Rule\HasServicePermission(UserAccess::SERVICE_CMS, UserAccess::ACCESS_FULL),
+                new Rule\HasServicePermission(UserAccess::SERVICE_DESIGN, UserAccess::ACCESS_FULL),
+                new Rule\HasServicePermission(UserAccess::SERVICE_TIMETABLE, UserAccess::ACCESS_FULL),
             )
         );
+
+        $ruleDisasterRecovery = new Rule\All(
+            new Rule\IsSuperuser(),
+            new Rule\IsConfigOn(DisasterRecovery::CONFIG_DR_VISIBILITY, $this->getConfig())
+        );
+
+        $this->register('GET', '', 'getIndex', $ruleSuperuserOrModerator);
+        $this->register('GET', '/healthcheck', 'getHealthcheck', $ruleSuperuserOrModerator);
+        $this->register('GET', '/disaster-recovery', 'getDisasterRecovery', $ruleDisasterRecovery);
+        $this->register('GET', '/dismiss-upgrade-reminder', 'dismissUpgradeReminder', $ruleSuperuser);
     }
 
     /**

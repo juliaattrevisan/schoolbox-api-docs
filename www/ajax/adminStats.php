@@ -34,29 +34,34 @@ $config = $kernel->get('config');
 switch ($_POST['module']) {
     // cases mirror categories listed
     case 'users':
-        $login         = new Login($kernel->get('databaseInternal'), $config->get('session_length'));
-        $summary       = $login->userSummary(null);
-        $totalUser     = 0;
-        $totalLogin    = 0;
+        if ($_SESSION['user']->isSuperuser()) {
+            $login      = new Login($kernel->get('databaseInternal'), $config->get('session_length'));
+            $summary    = $login->userSummary(null);
+            $totalUser  = 0;
+            $totalLogin = 0;
 
-        foreach ($summary as $group) {
-            $output[] = array( 'GROUP_ID'        => $group['id'],
-                               'GROUP_NAME'      => Scrub::text($group['name']),
-                               'GROUP_USER'      => $group['total'],
-                               'GROUP_LOGGED_IN' => $group['logged_in'] );
-            $totalUser += $group['total'];
-            $totalLogin += $group['logged_in'];
+            foreach ($summary as $group) {
+                $output[] = array(
+                    'GROUP_ID'        => $group['id'],
+                    'GROUP_NAME'      => Scrub::text($group['name']),
+                    'GROUP_USER'      => $group['total'],
+                    'GROUP_LOGGED_IN' => $group['logged_in'],
+                );
+                $totalUser += $group['total'];
+                $totalLogin += $group['logged_in'];
+            }
+            $output[] = array(
+                'GROUP_ID' => '',
+                'GROUP_NAME' => 'Total',
+                'GROUP_USER' => $totalUser,
+                'GROUP_LOGGED_IN' => $totalLogin,
+            );
         }
-        $output[] = array(  'GROUP_ID' => '',
-                            'GROUP_NAME' => 'Total',
-                            'GROUP_USER' => $totalUser,
-                            'GROUP_LOGGED_IN' => $totalLogin,);
-
         break;
 
     case 'service_www':
         $context = \Proxy\Server::getInstance()->getContext();
-        if (@file_get_contents('https://repo.schoolbox.com.au/testfile.txt', null, $context)) {
+        if (@file_get_contents('https://repo.schoolbox.com.au/testfile.txt', false, $context)) {
             $output[] = array('WWW_LIGHT'  => 'success',
                               'WWW_STATUS' => 'Available'
             );
@@ -229,46 +234,48 @@ switch ($_POST['module']) {
         $output = ['diff' => abs($timestamp - time())];
         break;
     case 'logs':
-        $logsRecent = LogMapper::getInstance()->findRecent();
+        if ($_SESSION['user']->isSuperuser()) {
+            $logsRecent = LogMapper::getInstance()->findRecent();
 
-        foreach ($logsRecent as $log) {
-            $action = '';
+            foreach ($logsRecent as $log) {
+                $action = '';
 
-            switch ($log['action']) {
-                case '1':
-                    $action = 'Logged in';
-                    break;
-                case '0':
-                    $action = 'Failed login';
-                    break;
-                case 'modify':
-                    $action = 'Modified ' . $log['ip'];
-                    break;
-                case 'move':
-                    $action = 'Moved ' . $log['ip'];
-                    break;
-                case 'access':
-                    $action = 'Accessed ' . $log['ip'];
-                    break;
-                case 'create':
-                    $action = 'Added ' . $log['ip'];
-                    break;
-                case 'delete':
-                    $action = 'Deleted ' . $log['ip'];
-                    break;
+                switch ($log['action']) {
+                    case '1':
+                        $action = 'Logged in';
+                        break;
+                    case '0':
+                        $action = 'Failed login';
+                        break;
+                    case 'modify':
+                        $action = 'Modified ' . $log['ip'];
+                        break;
+                    case 'move':
+                        $action = 'Moved ' . $log['ip'];
+                        break;
+                    case 'access':
+                        $action = 'Accessed ' . $log['ip'];
+                        break;
+                    case 'create':
+                        $action = 'Added ' . $log['ip'];
+                        break;
+                    case 'delete':
+                        $action = 'Deleted ' . $log['ip'];
+                        break;
 
-                default:  //If unknown, skip output
-                    continue 2;
-            }
+                    default:  //If unknown, skip output
+                        continue 2;
+                }
 
-            if ($action !== '') {
-                $date = new Alaress_Date_Format($log['occurred'], Alaress_Date_Format::DATABASE_FORMAT);
+                if ($action !== '') {
+                    $date = new Alaress_Date_Format($log['occurred'], Alaress_Date_Format::DATABASE_FORMAT);
 
-                $output[] = [
-                    'date' => $date->getShort(),
-                    'action' => $action,
-                    'name' => \Scrub::text("{$log['firstname']} {$log['lastname']}")
-                ];
+                    $output[] = [
+                        'date' => $date->getShort(),
+                        'action' => $action,
+                        'name' => \Scrub::text("{$log['firstname']} {$log['lastname']}")
+                    ];
+                }
             }
         }
         break;
