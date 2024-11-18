@@ -36,6 +36,24 @@ const isSelected = window.Vue.computed(() => {
 
 /**
  * To toggle the selected state of the result
+ */
+function toggle(): void {
+    if (isSelected.value && !props.isSingleSelect) {
+        emit("remove", [props.result]);
+    } else {
+        emit("add", [props.result]);
+    }
+}
+
+/**
+ * When the user selects the result with the keyboard
+ */
+function onKeySelect(): void {
+    toggle();
+}
+
+/**
+ * To toggle the selected state of the result
  * @param event - the click event
  */
 function onClick(event?: MouseEvent | undefined): void {
@@ -46,11 +64,7 @@ function onClick(event?: MouseEvent | undefined): void {
     if ((event.target as HTMLElement).nodeName === "LABEL" || (event.target as HTMLElement).nodeName === "MARK") {
         return;
     }
-    if (isSelected.value && !props.isSingleSelect) {
-        emit("remove", [props.result]);
-    } else {
-        emit("add", [props.result]);
-    }
+    toggle();
 }
 
 /**
@@ -75,7 +89,7 @@ const { isActive } = useActiveIndex(
     resultEl,
     toRef(() => props.index),
     toRef(() => props.activeIndex),
-    onClick,
+    onKeySelect,
 );
 </script>
 
