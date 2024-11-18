@@ -6,13 +6,14 @@
 import { useTemplateRef } from "vue";
 import { gsap } from "gsap/all";
 import { useNodeTitle } from "@schoolboxCurriculum/vue/composables/useNodeTitle";
+import { usePrintDialog } from "@schoolboxVue/composables/print/usePrintDialog";
 import type { Course } from "@schoolboxLibrary/types/Course";
 import type { Unit } from "@schoolboxLibrary/types/Unit";
 import type { CurriculumCoverageNode } from "../js/types/curriculumCoverageTypes";
 import { useReportStore } from "./store/ccReportStore";
 import { useFiltersStore } from "./store/ccFiltersStore";
 import { ReportOptionValues } from "../js/types/curriculumCoverageTypes";
-import ccReportTableNodeUnit from "./cc-report-table-node-unit.vue";
+import CcReportTableNodeUnit from "./cc-report-table-node-unit.vue";
 
 interface Props {
     node: CurriculumCoverageNode;
@@ -27,6 +28,7 @@ const emit = defineEmits<{
 const reportStore = useReportStore();
 const filtersStore = useFiltersStore();
 const { title } = useNodeTitle(props.node);
+const { isPrinting } = usePrintDialog();
 const paddingStart = window.Vue.ref(`calc(${props.depth * 0.5}rem + 0.5rem)`); // to gradually add more paddingStart to indicate node level depth
 const hasChildren = window.Vue.ref(Array.isArray(props.node.children) && props.node.children.length > 0);
 
@@ -249,7 +251,7 @@ function onChildTitleClicked(node: CurriculumCoverageNode): void {
             </td>
         </template>
     </tr>
-    <template v-if="hasChildren && (isExpanded || filtersStore.onlyShowGaps)">
+    <template v-if="hasChildren && (isExpanded || filtersStore.onlyShowGaps || isPrinting)">
         <cc-report-table-node
             v-for="child in props.node.children"
             :key="child.id"
