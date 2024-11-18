@@ -9,8 +9,10 @@ declare(strict_types=1);
 
 namespace Schoolbox\Learning\Course\CommandLineTool;
 
+use Alaress\Database\Predicate\Builder;
 use Schoolbox\Application\CliKernelAbstract;
 use Schoolbox\Application\CliTool\App;
+use UnexpectedValueException;
 
 /**
  * Detect and optionally repair duplicate units within course imports.
@@ -42,8 +44,7 @@ class RepairDuplicateUnits extends App
             count(*) AS c
         FROM course_unit_implementation cui
         INNER JOIN course_implementation ci ON cui.course_implementation_id = ci.id
-        WHERE cui.deleted_at IS NULL
-        -- add folder checks
+        WHERE %s
         GROUP BY
             cui.course_implementation_id,
             cui.course_unit_specification_id
@@ -82,14 +83,24 @@ class RepairDuplicateUnits extends App
             $this->printHelp();
         }
 
-        $db    = $this->getDatabaseInternal();
-        $log   = $this->getLogger();
-        $query = $db->prepare(self::SELECT_DUPLICATE_UNITS_QUERY);
-        $query->execute();
-        $log->notice(sprintf('%s duplicate units found.', $query->rowCount()));
-        foreach ($query as $row) {
+        $db  = $this->getDatabaseInternal();
+        $log = $this->getLogger();
 
+        // Build the find units query
+        $pb      = $db->buildPredicateBuilder('cui')
+                      ->isNull('cui.deleted_at');
+        $folders = array_merge(
+            $this->extractFolderIdOpts($this->getOpt(self::OPT_LONG_FOLDER)),
+            $this->extractFolderIdOpts($this->getOpt(self::OPT_SHORT_FOLDER)),
+        );
+        if (!empty($folders)) {
+            $log->notice('Searching folders: ' . implode(', ', $folders));
+            $pb = $pb->in('ci.folder_id', $folders);
         }
+
+        $query = $db->prepare(sprintf(self::SELECT_DUPLICATE_UNITS_QUERY, $pb->getWhereIntersect()));
+        $query->execute($pb->getParams());
+        $log->notice(sprintf('%s duplicate units found.', $query->rowCount()));
 
         exit(CliKernelAbstract::EXIT_STATUS_OK);
     }
@@ -140,5 +151,41 @@ OPTIONS:
 HELP;
 
         exit(CliKernelAbstract::EXIT_STATUS_OK);
+    }
+
+    /**
+     * Extract folder IDs.
+     *
+     * @param mixed $folderIdOpts
+     * @return array<positive-int>
+     * @throws UnexpectedValueException if any folder ID is not a positive int
+     */
+    private function extractFolderIdOpts(mixed $folderIdOpts): array
+    {
+        // No folder options passed:
+        // return empty
+        if (empty($folderIdOpts)) {
+            return [];
+        }
+
+        // More than one folder option passed:
+        // extract IDs from all of them recursively
+        if (is_array($folderIdOpts)) {
+            return array_merge(...array_map($this->extractFolderIdOpts(...), $folderIdOpts));
+        }
+
+        // One folder option passed:
+        // Split into IDs by comma, raising error if any is not a positive int
+        $folderIds = [];
+        foreach (explode(',', $folderIdOpts) as $folderId) {
+            $folderIdInt = filter_var($folderId, FILTER_VALIDATE_INT, FILTER_NULL_ON_FAILURE);
+            if (!isset($folderIdInt) || $folderIdInt <= 0) {
+                throw new UnexpectedValueException(
+                    sprintf('Folder ID value "%s" is not a positive integer', $folderId)
+                );
+            }
+            $folderIds[] = (int)$folderIdInt;
+        }
+        return $folderIds;
     }
 }
