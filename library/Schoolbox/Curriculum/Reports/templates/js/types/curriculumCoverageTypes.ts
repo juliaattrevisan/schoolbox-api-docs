@@ -74,7 +74,10 @@ export type CurriculumCoverageNode = Pick<Node, "id" | "name" | "code"> & {
  */
 type Item = {
     name: string;
-    link: string;
+    icon?: string; // only for activity
+    _links: {
+        view: string;
+    };
 };
 
 /**
@@ -97,7 +100,9 @@ type RubricCapability = {
  */
 type Rubric = {
     capabilities: RubricCapability[];
-    link: string;
+    _links: {
+        view: string;
+    };
 };
 
 /**

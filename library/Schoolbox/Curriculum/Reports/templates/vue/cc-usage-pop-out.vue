@@ -78,7 +78,7 @@ window.Vue.watch(
                 class="usage__section l-flex-row l-gap-s"
             >
                 <template v-for="activity in popOutStore.usage.activity" :key="activity.link">
-                    <a :href="activity.link" :title="`View ${activity.name}`" class="l-flex l-gap-s">
+                    <a :href="activity._links.view" :title="`View ${activity.name}`" class="l-flex l-gap-s">
                         <sbx-icon name="project" />
                         <p class="f-no-margins">{{ activity.name }}</p>
                     </a>
