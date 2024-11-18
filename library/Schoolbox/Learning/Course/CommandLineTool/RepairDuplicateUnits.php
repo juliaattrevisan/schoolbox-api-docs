@@ -9,7 +9,6 @@ declare(strict_types=1);
 
 namespace Schoolbox\Learning\Course\CommandLineTool;
 
-use Alaress\Database\Predicate\Builder;
 use Schoolbox\Application\CliKernelAbstract;
 use Schoolbox\Application\CliTool\App;
 use UnexpectedValueException;
@@ -41,15 +40,20 @@ class RepairDuplicateUnits extends App
         SELECT
             cui.course_implementation_id,
             cui.course_unit_specification_id,
+            cui.title AS unit_title,
             ci.folder_id,
+            f.name AS folder_title,
             count(*) AS c
         FROM course_unit_implementation cui
         INNER JOIN course_implementation ci ON cui.course_implementation_id = ci.id
+        INNER JOIN folder f ON f.id = ci.folder_id
         WHERE %s
         GROUP BY
             cui.course_implementation_id,
             cui.course_unit_specification_id,
-            ci.folder_id
+            cui.title,
+            ci.folder_id,
+            f.name
         HAVING c > 1
         ORDER BY ci.folder_id, cui.course_unit_specification_id
     SQL;
@@ -107,9 +111,12 @@ class RepairDuplicateUnits extends App
         foreach ($query as $row) {
             $log->notice(
                 sprintf(
-                    'Folder #%d, course unit #%d: %d duplicates',
+                    'Folder #%d (%s), unit #%d, course unit #%d (%s): %d duplicates',
                     $row['folder_id'],
+                    $row['folder_title'],
+                    $row['course_implementation_id'],
                     $row['course_unit_specification_id'],
+                    $row['unit_title'],
                     $row['c'],
                 ),
             );
