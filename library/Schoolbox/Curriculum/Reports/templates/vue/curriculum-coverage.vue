@@ -22,10 +22,22 @@ const props = defineProps<Props>();
 
 useQueryStore().init(props.reportEndpoint); // pass through the report endpoint to the store
 usePopOutStore().init(props.usageEndpoint); // pass through the usage endpoint to the store
+
+/**
+ * When the print button is clicked, print the page
+ */
+function onPrintClicked(): void {
+    window.print();
+}
 </script>
 
 <template>
-    <h1>Curriculum Coverage Report</h1>
+    <div class="l-flex-row">
+        <h1 class="l-flex__item--1">Curriculum Coverage Report</h1>
+        <button class="l-flex l-flex--center f-no-bkg" aria-label="Print" title="Print" @click="onPrintClicked">
+            <sbx-icon name="print" />
+        </button>
+    </div>
     <div class="l-flex-col l-gap-m">
         <cc-input
             :courses-endpoint="props.coursesEndpoint"

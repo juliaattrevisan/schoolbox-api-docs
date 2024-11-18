@@ -211,11 +211,14 @@ function onChildTitleClicked(node: CurriculumCoverageNode): void {
         >
             <button
                 v-if="showExpandButton"
-                :class="`expand-button expander l-flex l-flex--center ${isExpanded ? 'icon-up-arrow' : 'icon-down-arrow'}`"
+                class="l-flex l-flex--center f-no-bkg"
                 :aria-label="expandTitle"
                 :title="expandTitle"
                 @click="onExpandClicked"
-            ></button>
+            >
+                <sbx-icon v-if="isExpanded" name="up-arrow" />
+                <sbx-icon v-else name="down-arrow" />
+            </button>
             <button class="title-button" :style="{ paddingLeft: lastChildPadding }" @click="onTitleClicked">
                 {{ title }}
             </button>
@@ -256,10 +259,6 @@ function onChildTitleClicked(node: CurriculumCoverageNode): void {
 <style scoped>
 tr:hover {
     background-color: #f4f3f3; /* to help legibility */
-}
-
-.expand-button {
-    background: none;
 }
 
 .title-button {
