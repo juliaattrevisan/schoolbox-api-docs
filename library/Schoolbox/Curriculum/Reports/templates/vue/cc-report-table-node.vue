@@ -220,7 +220,7 @@ function onChildTitleClicked(node: CurriculumCoverageNode): void {
                 <sbx-icon v-else name="down-arrow" />
             </button>
             <button
-                class="title-button show-for-print"
+                class="title-button f-always-show"
                 :style="{ paddingLeft: lastChildPadding }"
                 @click="onTitleClicked"
             >
