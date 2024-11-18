@@ -5,6 +5,7 @@
 
 import type { Course } from "@schoolboxLibrary/types/Course";
 import type { Node } from "@schoolboxCurriculum/types/Node";
+import CcHeader from "./cc-header.vue";
 import CcInput from "./cc-input.vue";
 import CcReport from "./cc-report.vue";
 import { useQueryStore } from "./store/ccQueryStore";
@@ -22,23 +23,11 @@ const props = defineProps<Props>();
 
 useQueryStore().init(props.reportEndpoint); // pass through the report endpoint to the store
 usePopOutStore().init(props.usageEndpoint); // pass through the usage endpoint to the store
-
-/**
- * When the print button is clicked, print the page
- */
-function onPrintClicked(): void {
-    window.print();
-}
 </script>
 
 <template>
-    <div class="l-flex-row">
-        <h1 class="l-flex__item--1">Curriculum Coverage Report</h1>
-        <button class="l-flex l-flex--center f-no-bkg" aria-label="Print" title="Print" @click="onPrintClicked">
-            <sbx-icon name="print" />
-        </button>
-    </div>
     <div class="l-flex-col l-gap-m">
+        <cc-header />
         <cc-input
             :courses-endpoint="props.coursesEndpoint"
             :curriculum-endpoint="props.curriculumEndpoint"
