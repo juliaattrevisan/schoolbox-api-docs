@@ -8,6 +8,7 @@ use Aura\Router\Generator;
 use Schoolbox\Curriculum\Reports\Cursor;
 use Schoolbox\User;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as CourseUnitModel;
+use Schoolbox\Collection;
 
 class DetailedUsage
 {
@@ -17,7 +18,8 @@ class DetailedUsage
         protected Generator $routeGenerator,
         protected Authorizer $authorizer,
         protected User $currentUser,
-        private array $indicators
+        private Collection $capabilities,
+        private Collection $unitCapabilities,
     ) {
     }
 
@@ -55,26 +57,50 @@ class DetailedUsage
                 ],
                 $usage[Cursor::COURSE_ACTIVITY_LESSON_PLAN] ?? []
             ),
-//            'rubric' => [
-//                'course' => [
-//                    'capabilities' => [
-//                        'name'   => '',
-//                        array_map(
-//                        fn($capabilities) => [
-//                            'indicators' =>
-//
-//                        ],
-//                        $this->indicators,
-//                        ),
-//                        '_links' => [
-////                            'view' => $this->getRouteIfAuthorized(
-////                                'rubricManager.getForm',
-////                                ['folderId' => $capabilities['folder_id']],
-////                            ),
-//                        ]
-//                    ]
-//                ]
-//            ]
+            'rubric' => [
+                'course' => [
+                    'capabilities' =>
+                        $this->capabilities->map(
+                            fn ($cap) =>
+                            [
+                                'name' => $cap->getName(),
+                                'indicators' => array_map(
+                                    fn($indicator) => [
+                                        'name' => $indicator['name'],
+                                    ],
+                                    $usage[Cursor::COURSE_RUBRIC_CAPABILITY][$cap->getId()]
+                                ),
+                                '_links' => [
+                                    'view' => $this->getRouteIfAuthorized(
+                                        'rubricManager.getForm',
+                                        ['folderId' => $cap->getParentId()],
+                                    )
+                                ]
+                            ]
+                        )
+                ],
+                'unit' => [
+                    'capabilities' =>
+                        $this->unitCapabilities->map(
+                            fn ($cap) =>
+                            [
+                                'name' => $cap->getName(),
+                                'indicators' => array_map(
+                                    fn($indicator) => [
+                                        'name' => $indicator['name'],
+                                    ],
+                                    $usage[Cursor::COURSE_UNIT_RUBRIC_CAPABILITY][$cap->getId()]
+                                ),
+                                '_links' => [
+                                    'view' => $this->getRouteIfAuthorized(
+                                        'rubricManager.getForm',
+                                        ['folderId' => $cap->getParentId()],
+                                    )
+                                ]
+                            ]
+                        )
+                ]
+            ]
         ];
     }
 }

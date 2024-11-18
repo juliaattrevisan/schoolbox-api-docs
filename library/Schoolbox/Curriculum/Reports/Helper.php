@@ -106,62 +106,11 @@ class Helper
             $unitId
         );
 
-        $rubricCapabilityUsageQuery = sprintf(
-            "
-            SELECT c.type, rc.id, rc.name title, c.folder_id
-                FROM rubric_capability rc
-                INNER JOIN curriculum_node_for_rubric_capability cnrc
-                    ON rc.id = cnrc.rubric_capability_id
-                    AND cnrc.curriculum_node_id = %d
-                INNER JOIN (
-                    SELECT '%s' type, cs.id, cs.folder_id
-                    FROM course_specification cs
-                    UNION
-                    SELECT '%s' type, cus.course_specification_id id, cus.folder_id
-                    FROM course_unit_specification cus
-                    WHERE cus.folder_id = %d
-                ) c ON c.folder_id = rc.parent_id AND c.id = %d
-                WHERE rc.deleted_at IS NULL
-            ",
-            $nodeId,
-            Cursor::COURSE_RUBRIC_CAPABILITY,
-            Cursor::COURSE_UNIT_RUBRIC_CAPABILITY,
-            $unitId,
-            $courseId
-        );
-
-        $rubricIndicatorUsageQuery = sprintf(
-            "
-            SELECT c.type, ri.id, ri.name title, c.folder_id
-            FROM rubric_indicator ri
-            INNER JOIN curriculum_node_for_rubric_indicator cnri
-                ON ri.id = cnri.rubric_indicator_id
-                AND cnri.curriculum_node_id = %d
-            INNER JOIN rubric_capability rc ON rc.id = ri.rubric_capability_id
-            INNER JOIN (
-                SELECT '%s' type, cs.id, cs.folder_id
-                FROM course_specification cs
-                UNION
-                SELECT '%s' type, cus.course_specification_id id, cus.folder_id
-                FROM course_unit_specification cus
-                WHERE cus.folder_id = %d
-            ) c ON c.folder_id = rc.parent_id AND c.id = %d
-            WHERE ri.deleted_at IS NULL
-            ",
-            $nodeId,
-            Cursor::COURSE_RUBRIC_INDICATOR,
-            Cursor::COURSE_UNIT_RUBRIC_INDICATOR,
-            $unitId,
-            $courseId
-        );
-
         $combinedUsageQuery = '( ' . implode(' UNION ', [
                 $unitUsageQuery,
                 $activityUsageQuery,
                 $lessonPlanUsageQuery,
-//                $rubricCapabilityUsageQuery,
-//                $rubricIndicatorUsageQuery,
-        ]) . ' )';
+            ]) . ' )';
 
         $statement = $db->executeQuery($combinedUsageQuery);
 
@@ -170,6 +119,46 @@ class Helper
                 'id' => $row['id'],
                 'title' => $row['title'],
                 'folder_id' => $row['folder_id'],
+            ];
+        }
+
+        $rubricUsageQuery = sprintf(
+            "
+            SELECT c.type, rc.id capId, rc.name capName, r.id indId, r.name indName, c.folder_id, c.parentId
+            FROM rubric_capability rc
+            LEFT JOIN curriculum_node_for_rubric_capability cnrc
+                ON (rc.id = cnrc.rubric_capability_id AND cnrc.curriculum_node_id = %d)
+            LEFT JOIN (
+                SELECT *
+                FROM rubric_indicator ri
+                INNER JOIN curriculum_node_for_rubric_indicator cnri
+                    ON (ri.id = cnri.rubric_indicator_id AND cnri.curriculum_node_id = %d)
+            ) r ON rc.id = r.rubric_capability_id
+            INNER JOIN (
+                SELECT '%s' type, cs.folder_id parentId, cus.folder_id, cs.id
+                FROM course_specification cs
+                INNER JOIN course_unit_specification cus ON cus.course_specification_id = cs.id
+                UNION
+                SELECT '%s' type, cus.folder_id parentId, cus.folder_id, cus.course_specification_id id
+                FROM course_unit_specification cus
+            ) c ON (c.parentId = rc.parent_id AND c.folder_id = %d AND c.id = %d)
+            WHERE
+                (cnrc.curriculum_node_id IS NOT NULL OR r.curriculum_node_id IS NOT NULL)
+                AND rc.deleted_at IS NULL AND r.deleted_at IS NULL
+            ",
+            $nodeId,
+            $nodeId,
+            Cursor::COURSE_RUBRIC_CAPABILITY,
+            Cursor::COURSE_UNIT_RUBRIC_CAPABILITY,
+            $unitId,
+            $courseId,
+        );
+
+        $statement = $db->executeQuery($rubricUsageQuery);
+
+        while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
+            $usage[$row['type']][$row['capId']][] = [
+                'name' => $row['indName']
             ];
         }
 
