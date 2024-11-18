@@ -69,6 +69,7 @@ class Controller extends Base
      * @param Storage\Receiver           $receiver                 For copying streams from inside upload to storage.
      * @param Pastoral\RecordProcessor   $recordProcessor          For actually saving pastoral records according to
      *                                                             form input.
+     * @param RosettaStone               $rosettaStone             For translating values used in the page title.
      */
     public function __construct(
         private RosettaStone $translator,
@@ -86,6 +87,7 @@ class Controller extends Base
         private Storage\FilesystemProxy $filesystemProxy,
         private Storage\Receiver $receiver,
         private Pastoral\RecordProcessor $recordProcessor,
+        private RosettaStone $rosettaStone
     ) {
     }
 
@@ -123,12 +125,40 @@ class Controller extends Base
             ])
             : $this->pastoralBulkImportMapper->createCollection();
 
+        /**
+         * both pastoral Write and Moderators access this page, and they can access via different directions.
+         * we should try to map the breadcrumbs to the most logical starting point
+         * and build the sidenav with admin if they have access
+         *
+         * write > Pastoral home
+         * write+ > Administration Home
+         */
+        $pastoralCareProper = $this->rosettaStone->translate('pastoralCare', false, true);
+        $adminRoute = $this->getRouteIfAuthorized('adminHome.getIndex');
+        $breadcrumbs = [
+            [$pastoralCareProper, $this->routeGenerator->generate('pastoral.getIndex')],
+            ["Bulk Import", $this->getRouteIfAuthorized('pastoralBulkImport.getList')],
+            ["Create", null],
+        ];
+
+        /* Assuming the Pastoral moderator came from Admin > Pastoral, rather than directly from Pastoral
+         */
+        if ($this->user->hasServicePermission(UserAccess::SERVICE_PASTORAL, UserAccess::ACCESS_FULL)) {
+            $breadcrumbs = [
+                ['Administration', $adminRoute],
+                ['Pastoral Care', null],
+                ["Bulk Import", $this->getRouteIfAuthorized('pastoralBulkImport.getList')],
+                ["Create", null],
+            ];
+        }
+
         $this->response = $this->responseFromTemplate(
             '@pastoralBulkImport/list.twig',
             [
                 'imports'     => $imports,
                 'paginator'   => $paginator,
                 'currentPage' => $currentPage,
+                'breadcrumbs' => $breadcrumbs,
 
                 // Encode return URL separately, so that page number is included
                 'encodedReturnUrl' => Redirect::encode(
@@ -161,9 +191,37 @@ class Controller extends Base
             $this->pastoralAudienceMapper,
         );
         $templateData = $templateDataHelper->loadTemplateData();
+
+        /**
+         * both pastoral Write and Moderators access this page, and they can access via different directions.
+         * we should try to map the breadcrumbs to the most logical starting point
+         * and build the sidenav with admin if they have access
+         *
+         * write > Pastoral home
+         * write+ > Administration Home
+         */
+        $pastoralCareProper = $this->rosettaStone->translate('pastoralCare', false, true);
+        $adminRoute = $this->getRouteIfAuthorized('adminHome.getIndex');
+        $breadcrumbs = [
+            [$pastoralCareProper, $this->routeGenerator->generate('pastoral.getIndex')],
+            ["Bulk Import", $this->getRouteIfAuthorized('pastoralBulkImport.getList')],
+            ["Create", null],
+        ];
+
+        /* Assuming the Pastoral moderator came from Admin > Pastoral, rather than directly from Pastoral
+         */
+        if ($this->user->hasServicePermission(UserAccess::SERVICE_PASTORAL, UserAccess::ACCESS_FULL)) {
+            $breadcrumbs = [
+                ['Administration', $adminRoute],
+                ['Pastoral Care', null],
+                ["Bulk Import", $this->getRouteIfAuthorized('pastoralBulkImport.getList')],
+                ["Create", null],
+            ];
+        }
         $this->response = $this->responseFromTemplate(
             '@pastoralBulkImport/form.twig',
             $templateData + [
+                'breadcrumbs'       => $breadcrumbs,
                 'returnUrl'        => $this->requestQuery->get('returnUrl')
                     ?? $this->routeGenerator->generate('pastoral.getIndex'),
                 'record'           => $this->pastoralDataSource->createModel()->setStudent(null),
