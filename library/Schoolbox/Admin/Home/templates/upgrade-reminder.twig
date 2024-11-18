@@ -1,21 +1,21 @@
+{% set dismissRouteUrl = routeLookupIfAuthorized('adminHome.dismissUpgradeReminder') %}
 <div class="row">
     <div class="small-12 island">
         <div data-alert id="alert-upgrade-reminder" class="alert-box warning">
             You are using an older version of Schoolbox({{ major_site_version }}). There is a new major version available.<br/>
             <strong><a href="https://schoolbox.youcanbook.me/">Book your upgrade to v{{ major_latest_version }}</a></strong> to use all the latest functionality.
-            {% if userIsSuperuser %}
-                {# Only superusers may dismiss the upgrade reminder. #}
+            {% if dismissRouteUrl %}
                 <a href="#" class="close">×</a>
             {% endif %}
         </div>
     </div>
 </div>
 
-{% if userIsSuperuser %}
+{% if dismissRouteUrl %}
     <script type="text/javascript">
         {% autoescape 'js' %}
             $(window).on('load', function () {
-                const url = '{{ routeLookup('adminHome.dismissUpgradeReminder') }}';
+                const url = '{{ dismissRouteUrl }}';
 
                 {# if the user closes the upgrade reminder alert, lets make sure we
                 record the interaction to prevent the reminder from showing again #}
