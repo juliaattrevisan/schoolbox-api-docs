@@ -59,33 +59,47 @@ window.Vue.watch(
 </script>
 
 <template>
-    <div ref="popOutElement" class="pop-out" style="display: none">
+    <div ref="popOutElement" class="usage" style="display: none">
         <div v-if="popOutStore.hasLoadError" class="alert-box alert f-no-margins">
             There was an error during data retrieval. Please
             <a href="" title="refresh the page"> refresh the page </a>
             to try again and contact your support if the problem persists
         </div>
-        <div v-else-if="popOutStore.isLoading && !popOutStore.hasLoadError" class="pop-out-menu__loader">
+        <div v-else-if="popOutStore.isLoading && !popOutStore.hasLoadError" class="usage__loader">
             <div class="loader"></div>
         </div>
         <div v-else>
-            <div v-if="popOutStore.usage?.onUnit" class="pop-out__section">
-                <p>Assigned to Unit</p>
+            <div v-if="popOutStore.usage?.onUnit" class="usage__section l-flex-row l-gap-s">
+                <sbx-icon name="unit" />
+                <p class="f-no-margins">Assigned to Unit</p>
+            </div>
+            <div
+                v-if="popOutStore.usage?.activity && popOutStore.usage.activity.length > 0"
+                class="usage__section l-flex-row l-gap-s"
+            >
+                <template v-for="activity in popOutStore.usage.activity" :key="activity.link">
+                    <a :href="activity.link" :title="`View ${activity.name}`" class="l-flex l-gap-s">
+                        <sbx-icon name="project" />
+                        <p class="f-no-margins">{{ activity.name }}</p>
+                    </a>
+                </template>
             </div>
         </div>
     </div>
 </template>
 
 <style lang="scss" scoped>
-.pop-out {
+.usage {
     background-color: #fff;
     border-radius: 0.25rem;
     box-shadow: 0px 0px 6px rgba(0, 0, 0, 0.2);
     max-width: 16rem;
-    min-height: 8rem;
     min-width: 16rem;
     padding: var(--spacing-s);
     position: absolute;
     z-index: var(--sbx-depth-pop-over);
+    &__section:not(:last-of-type) {
+        border-bottom: 1px solid var(--body-background);
+    }
 }
 </style>
