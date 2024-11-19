@@ -111,14 +111,53 @@ class Controller extends Base
         // Find staff roles with pastoral permission
         $roles = $this->roleMapper->findByColumnList(
             [
-                'group_type'      => Role::STAFF,
+                'group_type' => Role::STAFF,
                 'access_pastoral' => true,
             ]
         );
 
+        /**
+         * both pastoral Write and Moderators access this page, and they can access via different directions.
+         * we should try to map the breadcrumbs to the most logical starting point
+         * and build the sidenav with admin if they have access
+         *
+         * write > Pastoral home
+         * write+ > Administration Home
+         */
+        $pastoralCareProper = $this->rosettaStone->translate('pastoralCare', false, true);
+        $adminRoute = $this->getRouteIfAuthorized('adminHome.getIndex');
+        $breadcrumbs = [
+            [$pastoralCareProper, $this->routeGenerator->generate('pastoral.getIndex')],
+            ["Groups Management", $this->routeGenerator->generate('pastoralManagement.getGroups')],
+        ];
+
+        /* Assuming the Pastoral moderator came from Admin > Pastoral, rather than directly from Pastoral
+         */
+        if ($this->user->hasServicePermission(UserAccess::SERVICE_PASTORAL, UserAccess::ACCESS_FULL)) {
+            $breadcrumbs = [
+                ['Administration', $adminRoute],
+                ['Pastoral Care', null],
+                ["Groups Management", $this->routeGenerator->generate('pastoralManagement.getGroups')],
+            ];
+        }
+
+        /* if group has no ID (create) workout the action for breadcrumbs, headers, and buttons */
+        if (empty($group->getId())) {
+            $action = 'Create';
+        } else {
+            $action = 'Modify';
+        }
+        $breadcrumbs[] = [sprintf('%s %s Group', $action, $this->rosettaStone->translate('pastoralCare', false, true)), null];
+
+
         $this->response = $this->responseFromTemplate(
             '@pastoralManagement/groups_modify.twig',
             [
+                'heading'             => sprintf('%s %s Group', $action, $this->rosettaStone->translate('pastoralCare', false, true)),
+                'button'              => $group->getId() ? 'Save Changes' : 'Create Group',
+                'breadcrumbs'         => $breadcrumbs,
+                // Pastoral Moderators have access to other parts of the admin system, so they should see the admin nav menu.
+                'showAdminNavMenu'    => $this->getUser()->hasServicePermission(UserAccess::SERVICE_PASTORAL, UserAccess::ACCESS_FULL),
                 'group'               => $group,
                 'roleTypes'           => null,
                 'roles'               => $roles,

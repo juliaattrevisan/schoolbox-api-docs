@@ -2,37 +2,27 @@
 {% import '@pastoral/macros/profile.twig' as profile %}
 {% import '@pastoral/macros/user_search.twig' as userSearch %}
 
-{# Change a couple of labels depending on if we are creating/updating a group #}
+{% import 'sub/breadcrumbs.twig' as bread %}
+{{ bread.crumbsArray(breadcrumbs) }}
 
-{% if group is not empty %}
-    {% set heading = 'Modify ' ~ locale.pastoral.proper ~ ' Group' %}
-    {% set button = 'Save Changes' %}
+{% if showAdminNavMenu%}
+<div class="admin-container row">
+    {{ renderAdminNavigation(routeLookup('pastoralManagement.getGroups')) }}
+    <div class="admin-content">
+{# The divs opened above will be closed at the bottom of the page. #}
 {% else %}
-    {% set heading = 'Create ' ~ locale.pastoral.proper ~ ' Group' %}
-    {% set button = 'Create Group' %}
+<div class='row'>
+    <div class='small-12 columns'>
+        <h1>{{ locale.pastoralCare.proper }} Groups</h1>
+    </div>
+</div>
 {% endif %}
-
-{# ------------------------------------------------------------------------------------------------------------------------------------------------------ #}
-{# Breadcrumbs #}
-{# ------------------------------------------------------------------------------------------------------------------------------------------------------ #}
-
-{{ bread.crumbs(
-[ locale.pastoralCare.proper, routeLookup('pastoral.getIndex') ],
-[ 'Groups Management',  routeLookup('pastoralManagement.getGroups') ],
-[ heading ]
-) }}
 
 {# ------------------------------------------------------------------------------------------------------------------------------------------------------ #}
 {# We need a guid for the user select modal #}
 {# ------------------------------------------------------------------------------------------------------------------------------------------------------ #}
 
 {% set guid = getGuid() %}
-
-<div class="row">
-    <div class="small-12 columns">
-        <h1>{{ locale.pastoralCare.proper }}</h1>
-    </div>
-</div>
 
 <div class="row">
     <div class="small-12 columns">
@@ -138,6 +128,10 @@
     </div>
 </div>
 
+{% if showAdminNavMenu %}
+    </div>
+</div>
+{% endif %}
 <!--suppress JSUnusedLocalSymbols -->
 <script>
     $(function () {

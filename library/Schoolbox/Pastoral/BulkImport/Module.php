@@ -169,6 +169,7 @@ class Module extends BaseModule
             $this->injector->get('filesystem.storageProxy'),
             $this->injector->get('filesystem.receiver'),
             $pastoralRecordProcessor,
+            $this->injector->get('l10n'),
         );
     }
 
