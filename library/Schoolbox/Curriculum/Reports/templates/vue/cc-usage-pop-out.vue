@@ -72,7 +72,12 @@ window.Vue.watch(
             <div class="loader"></div>
         </div>
         <div v-else class="l-flex-col l-gap-s">
-            <div v-if="!popOutStore.isNodeExpanded" class="usage__section">
+            <div
+                v-if="
+                    popOutStore.node?.children && popOutStore.node?.children.length > 0 && !popOutStore.isNodeExpanded
+                "
+                class="usage__section"
+            >
                 <div data-alert="" class="alert-box f-no-margins l-pad-s">
                     This outcome also includes the count of its children. Expand the outcome to view an accurate count.
                 </div>
