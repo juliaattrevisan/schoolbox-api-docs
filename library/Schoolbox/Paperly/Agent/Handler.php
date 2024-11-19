@@ -2178,8 +2178,8 @@ class Handler
         }
 
         // Process student consents
-        foreach ($groupedData['consents']['delete'] as $consents) {
-            $this->deleteStudentConsents($consents, $modifiedBy);
+        foreach ($groupedData['consents']['delete'] as $studentID => $consents) {
+            $this->deleteStudentConsents($consents, $studentID, $modifiedBy);
         }
         foreach ($groupedData['consents']['create'] as $studentID => $consents) {
             $this->createOrUpdateStudentConsents($consents, $studentID, $modifiedBy);
@@ -2359,7 +2359,7 @@ class Handler
      * @return void
      * @throws Exception
      */
-    private function deleteStudentConsents($consents, $modifiedBy): void
+    private function deleteStudentConsents($consents, $studentID, $modifiedBy): void
     {
         if (!empty($consents)) {
             $selectedView = $this->viewSelector->getView(ViewSelector::PAPERLY_VIEW_STUDENT_CONSENT);
@@ -2375,8 +2375,8 @@ class Handler
                 $consentGivenBy = $consent['ConsentGivenBy'];
                 $consentSeq = $consent['ConsentSeq'];
 
-                $checkSQL = "SELECT * FROM {$selectedView} WHERE AND ConsentSeq = ?";
-                $statement = $this->externalDb->prepareQuery($checkSQL, [$consentSeq]);
+                $checkSQL = "SELECT * FROM {$selectedView} WHERE ID = ? AND ConsentSeq = ?";
+                $statement = $this->externalDb->prepareQuery($checkSQL, [$studentID, $consentSeq]);
                 $stmt = $statement->execute();
                 if ($stmt === false) {
                     throw new Exception(
