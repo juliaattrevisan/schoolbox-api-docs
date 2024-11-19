@@ -354,7 +354,8 @@ class Controller extends ConfigController
      * @param ?string $type - From database `lu_config_type`.`type`
      * @return boolean
      */
-    private function userHasAccessToConfigSetting(User $user, string $module, ?string $type): bool {
+    private function userHasAccessToConfigSetting(User $user, string $module, ?string $type): bool
+    {
         if ($user->isSuperuser()) {
             return true;
         }
