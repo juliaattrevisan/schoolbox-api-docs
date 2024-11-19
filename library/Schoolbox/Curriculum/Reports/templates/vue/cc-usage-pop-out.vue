@@ -99,6 +99,7 @@ window.Vue.watch(
                 "
                 class="usage__section"
             >
+                <h4 class="l-pad-xs--bottom f-no-margins">Learning Activities</h4>
                 <template v-for="activity in popOutStore.usage.activity" :key="activity._links.view">
                     <a :href="activity._links.view" :title="`View ${activity.name}`" class="l-flex l-gap-s">
                         <sbx-icon name="project" />
@@ -138,6 +139,12 @@ window.Vue.watch(
     &__section {
         display: flex;
         flex-direction: column;
+        gap: var(--spacing-s);
+        h4 {
+            border-bottom: 1px solid var(--body-background);
+            font-size: 0.8125rem;
+            font-weight: bold;
+        }
     }
     &__section:not(:last-of-type) {
         border-bottom: 1px solid var(--body-background);
