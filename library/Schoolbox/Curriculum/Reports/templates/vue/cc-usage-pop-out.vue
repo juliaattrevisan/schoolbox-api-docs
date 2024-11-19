@@ -62,7 +62,7 @@ window.Vue.watch(
     <div ref="popOutElement" class="usage" style="display: none">
         <div v-if="popOutStore.hasLoadError" class="alert-box alert f-no-margins">
             There was an error during usage retrieval. Please
-            <a href="" title="refresh the page"> refresh the page </a>
+            <a href="" title="refresh the page">refresh the page</a>
             to try again and contact your support if the problem persists
         </div>
         <div v-else-if="popOutStore.isLoading && !popOutStore.hasLoadError" class="usage__loader">

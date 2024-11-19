@@ -206,10 +206,7 @@ function onChildTitleClicked(node: CurriculumCoverageNode): void {
 
 <template>
     <tr v-if="showNode" ref="nodeEl">
-        <td
-            class="node__name l-flex l-flex--align-center l-gap-s f-no-margins"
-            :style="{ paddingInlineStart: paddingStart }"
-        >
+        <td class="l-flex l-flex--align-center l-gap-s f-no-margins" :style="{ paddingInlineStart: paddingStart }">
             <button
                 v-if="showExpandButton"
                 class="l-flex l-flex--center f-no-bkg"
@@ -221,7 +218,7 @@ function onChildTitleClicked(node: CurriculumCoverageNode): void {
                 <sbx-icon v-else name="down-arrow" />
             </button>
             <button
-                class="title-button f-always-show"
+                class="l-pad--0 t-align-left f-no-bkg f-always-show"
                 :style="{ paddingLeft: lastChildPadding }"
                 @click="onTitleClicked"
             >
@@ -264,11 +261,5 @@ function onChildTitleClicked(node: CurriculumCoverageNode): void {
 <style scoped>
 tr:hover {
     background-color: #f4f3f3; /* to help legibility */
-}
-
-.title-button {
-    background: none;
-    padding: 0;
-    text-align: left;
 }
 </style>
