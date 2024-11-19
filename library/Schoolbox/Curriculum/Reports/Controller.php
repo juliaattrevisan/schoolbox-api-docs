@@ -16,7 +16,8 @@ use Schoolbox\Curriculum\Reports\Translator\Counts\ModelToArray as ModelToArrayT
 use Schoolbox\Curriculum\Reports\Translator\Counts\UnitAssessmentUsage as UnitAssessmentUsageTranslator;
 use Schoolbox\Curriculum\Reports\Translator\Counts\CourseUsage as CourseUsageTranslator;
 use Schoolbox\Curriculum\Reports\Translator\Counts\CourseStructureOnly as CourseStructureTranslator;
-use Schoolbox\Curriculum\Reports\Translator\DetailedUsage;
+use Schoolbox\Curriculum\Reports\Translator\Usage\DetailedUsage;
+use Schoolbox\Curriculum\Reports\Translator\Usage\RubricUsage;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Mapper as CourseUnitSpecificationMapper;
 use Schoolbox\Learning\Course\DataModel\Specification\Mapper as CourseSpecificationMapper;
 use Schoolbox\Assessment\Rubric\DataModel\Indicator\Mapper as RubricIndicatorMapper;
@@ -45,7 +46,7 @@ class Controller extends Base
         private CourseSpecificationMapper $courseSpecificationMapper,
         private CourseUnitSpecificationMapper $courseUnitSpecificationMapper,
         private RubricIndicatorMapper $rubricIndicatorMapper,
-        private RubricCapabilityMapper  $rubricCapabilityMapper,
+        private RubricCapabilityMapper $rubricCapabilityMapper,
         private Helper $helper,
     ) {
     }
@@ -255,24 +256,30 @@ class Controller extends Base
             ->equals('course_specification_id', $courseId);
         $courseUnitSpec = $this->courseUnitSpecificationMapper->findOneByPredicates($pb);
 
-        $capabilities = $this->rubricCapabilityMapper
+        $courseCapabilities = $this->rubricCapabilityMapper
             ->findByColumn(
                 'id',
-                array_keys($result[Cursor::COURSE_RUBRIC_CAPABILITY])
-            );
+                array_keys($result[Cursor::COURSE_RUBRIC_CAPABILITY] ?? [])
+            )->reindex();
 
         $unitCapacities = $this->rubricCapabilityMapper
             ->findByColumn(
                 'id',
-                array_keys($result[Cursor::COURSE_UNIT_RUBRIC_CAPABILITY])
-            );
+                array_keys($result[Cursor::COURSE_UNIT_RUBRIC_CAPABILITY] ?? [])
+            )->reindex();
+
+        $rubricTranslator = new RubricUsage(
+            $this->routeGenerator,
+            $this->authorizer,
+            $this->getUser(),
+        );
 
         $translator = new DetailedUsage(
             $this->routeGenerator,
             $this->authorizer,
             $this->getUser(),
-            $capabilities,
-            $unitCapacities,
+            $rubricTranslator,
+            ['course' => $courseCapabilities, 'unit' => $unitCapacities]
         );
 
         $response = $translator($courseUnitSpec, $result);
