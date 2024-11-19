@@ -790,7 +790,6 @@ Pastoral,"Create a report",Student,https://vagrant.dev.schoolbox.cloud/pastoral/
 Pastoral,"Create a report",Parent,https://vagrant.dev.schoolbox.cloud/pastoral/report/insert,401
 Pastoral,"Create a report","Pastoral Moderator",https://vagrant.dev.schoolbox.cloud/pastoral/report/insert,200
 Pastoral,"View a report",Superuser,https://vagrant.dev.schoolbox.cloud/pastoral/report/results/1,401
-Pastoral,"View a report",Pastoral Moderator,https://vagrant.dev.schoolbox.cloud/pastoral/report/results/1,200
 Pastoral,"View a report",Teacher,https://vagrant.dev.schoolbox.cloud/pastoral/report/results/1,401
 Pastoral,"View a report",Student,https://vagrant.dev.schoolbox.cloud/pastoral/report/results/1,401
 Pastoral,"View a report",Parent,https://vagrant.dev.schoolbox.cloud/pastoral/report/results/1,401
