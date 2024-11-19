@@ -13,139 +13,139 @@
     </div>
 </div>
 {% endif %}
-        <div class="small-12 island">
-            <h2 class="subheader">Create {{ locale.pastoral.proper }} Bulk Import</h2>
-            <form class="top" id="pastoralForm" method="post"
-                  action="{{ routeLookupIfAuthorized('pastoralBulkImport.postCreateImport') }}?{{ RETURN_URL.name }}={{ RETURN_URL.previous.encoded }}">
-                <section>
-                    <fieldset class="content">
-                        <div class="small-12 columns">
-                            <label class="required" for="heading">Title</label>
-                            <p class="meta">Each {{ locale.pastoral }} record created will have this title.</p>
-                            <input type="text" name="heading" id="heading" size="35" maxlength="100" required/>
-                        </div>
-                        <div class="small-12 columns">
-                            <label class="required" for="ReportZone">ZIP File</label>
-                            <p class="meta">
-                                The ZIP file which contains the files to upload to the created records.
+<div class="small-12 island">
+    <h2 class="subheader">Create {{ locale.pastoral.proper }} Bulk Import</h2>
+    <form class="top" id="pastoralForm" method="post"
+          action="{{ routeLookupIfAuthorized('pastoralBulkImport.postCreateImport') }}?{{ RETURN_URL.name }}={{ RETURN_URL.previous.encoded }}">
+        <section>
+            <fieldset class="content">
+                <div class="small-12 columns">
+                    <label class="required" for="heading">Title</label>
+                    <p class="meta">Each {{ locale.pastoral }} record created will have this title.</p>
+                    <input type="text" name="heading" id="heading" size="35" maxlength="100" required/>
+                </div>
+                <div class="small-12 columns">
+                    <label class="required" for="ReportZone">ZIP File</label>
+                    <p class="meta">
+                        The ZIP file which contains the files to upload to the created records.
 
-                                Each file within this ZIP which may be attributed to a student will be attached to
-                                their {{ locale.pastoral }} record, as a generally available attachment.
-                            </p>
-                            {% include 'sub/attachzone.twig' with {attachzone: reportAttachzone} %}
-                            <input type="hidden" name="report-file" id="report-file"/>
-                        </div>
-                        <div class="small-12 columns">
-                            <label class="required" for="template">File path template</label>
-                            <p class="meta">
-                                The template which was used to generate paths for files within the ZIP file above.
+                        Each file within this ZIP which may be attributed to a student will be attached to
+                        their {{ locale.pastoral }} record, as a generally available attachment.
+                    </p>
+                    {% include 'sub/attachzone.twig' with {attachzone: reportAttachzone} %}
+                    <input type="hidden" name="report-file" id="report-file"/>
+                </div>
+                <div class="small-12 columns">
+                    <label class="required" for="template">File path template</label>
+                    <p class="meta">
+                        The template which was used to generate paths for files within the ZIP file above.
 
-                                [externalId] must be part of this template: that value is used to identify the
-                                student to which each file should be attributed.
-                            </p>
-                            <input type="text" name="template" id="template" size="35" maxlength="100" required pattern=".*\[externalId\].*"/>
-                        </div>
-                    </fieldset>
+                        [externalId] must be part of this template: that value is used to identify the
+                        student to which each file should be attributed.
+                    </p>
+                    <input type="text" name="template" id="template" size="35" maxlength="100" required pattern=".*\[externalId\].*"/>
+                </div>
+            </fieldset>
 
-                    <fieldset class="content">
-                        <div class="small-12 medium-6 columns">
-                            <label for="typeId" class="required">Type</label>
-                            <select name="typeId" id="typeId" required>
-                                <option disabled selected>Please select a type</option>
-                                {% for type in types %}
-                                    <option value="{{ type.id }}"
-                                            {% if not moderator %}data-visibility-locked="{{ type.visibilityLocked }}"{% endif %}
-                                    >{{ type.name }}</option>
-                                {% endfor %}
-                            </select>
-                        </div>
-                        <div class="small-12 medium-6 columns">
-                            <label for="subtypeId">Sub-Type</label>
-                            <select name="subtypeId" id="subtypeId">
-                                {% for subtype in subTypes %}
-                                    <option data-chained="{{ subtype.pastoralType.id }}"
-                                            class="{{ subtype.pastoralType.id }}"
-                                            value="{{ subtype.id }}"
-                                            {% if not moderator %}data-visibility-locked="{{ subtype.visibilityLocked }}"{% endif %}
-                                    >{{ subtype.name }}</option>
-                                {% endfor %}
-                            </select>
-                        </div>
-                        <div class="small-12 medium-6 columns">
-                            {% if severities | length %}
-                                <label for="severityId">{{ locale.severity.proper }}</label>
-                                <select name="severityId" id="severityId">
-                                    {% for severity in severities %}
-                                        <option value="{{ severity.id }}">{{ severity.name }}</option>
-                                    {% endfor %}
-                                </select>
-                            {% endif %}
-                        </div>
-                        <div class="small-12 medium-6 columns">
-                            <label for="points">Points</label>
-                            <input id="points"
-                                   type="number"
-                                   inputmode="numeric"
-                                   name="points"
-                                   size="35"
-                                   min="-1000000"
-                                   max="1000000"
-                            />
-                        </div>
-                        <div class="small-12 columns">
-                            <label for="tags">Tags</label>
-                            <p class="meta">
-                                Tags can be added to support {{ locale.pastoral }} reports and filtering.
-                            </p>
-                            <input id="tags" name="tags">
-                            <input id="tagNames" type="hidden" name="tagNames">
-                        </div>
-                    </fieldset>
+            <fieldset class="content">
+                <div class="small-12 medium-6 columns">
+                    <label for="typeId" class="required">Type</label>
+                    <select name="typeId" id="typeId" required>
+                        <option disabled selected>Please select a type</option>
+                        {% for type in types %}
+                            <option value="{{ type.id }}"
+                                    {% if not moderator %}data-visibility-locked="{{ type.visibilityLocked }}"{% endif %}
+                            >{{ type.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="small-12 medium-6 columns">
+                    <label for="subtypeId">Sub-Type</label>
+                    <select name="subtypeId" id="subtypeId">
+                        {% for subtype in subTypes %}
+                            <option data-chained="{{ subtype.pastoralType.id }}"
+                                    class="{{ subtype.pastoralType.id }}"
+                                    value="{{ subtype.id }}"
+                                    {% if not moderator %}data-visibility-locked="{{ subtype.visibilityLocked }}"{% endif %}
+                            >{{ subtype.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="small-12 medium-6 columns">
+                    {% if severities | length %}
+                        <label for="severityId">{{ locale.severity.proper }}</label>
+                        <select name="severityId" id="severityId">
+                            {% for severity in severities %}
+                                <option value="{{ severity.id }}">{{ severity.name }}</option>
+                            {% endfor %}
+                        </select>
+                    {% endif %}
+                </div>
+                <div class="small-12 medium-6 columns">
+                    <label for="points">Points</label>
+                    <input id="points"
+                           type="number"
+                           inputmode="numeric"
+                           name="points"
+                           size="35"
+                           min="-1000000"
+                           max="1000000"
+                    />
+                </div>
+                <div class="small-12 columns">
+                    <label for="tags">Tags</label>
+                    <p class="meta">
+                        Tags can be added to support {{ locale.pastoral }} reports and filtering.
+                    </p>
+                    <input id="tags" name="tags">
+                    <input id="tagNames" type="hidden" name="tagNames">
+                </div>
+            </fieldset>
 
-                    <fieldset>
-                        <div class="small-12 columns">
-                            <label for="body_public">General content</label>
-                            <p class="meta">
-                                Generally available content which will be added to each {{ locale.pastoral }} record
-                                created by this import.
+            <fieldset>
+                <div class="small-12 columns">
+                    <label for="body_public">General content</label>
+                    <p class="meta">
+                        Generally available content which will be added to each {{ locale.pastoral }} record
+                        created by this import.
 
-                                (Student detail tokens can be viewed when you press [.
-                                Tokens will be substituted with the student&rsquo;s details on creation.)
-                            </p>
-                            <textarea id="body_public" name="body_public"></textarea>
-                        </div>
-                    </fieldset>
-                </section>
+                        (Student detail tokens can be viewed when you press [.
+                        Tokens will be substituted with the student&rsquo;s details on creation.)
+                    </p>
+                    <textarea id="body_public" name="body_public"></textarea>
+                </div>
+            </fieldset>
+        </section>
 
-                {% include "@pastoral/modify_section_visibility.twig" with {
-                    record: record,
-                    allowIndividual: allowIndividual,
-                    groups: groups,
-                    allowParents: allowParents,
-                    allowStudents: allowStudents,
-                    roles: roles,
-                    roleTypes: roleTypes,
-                    roleUserCounts: roleUserCounts,
-                    moderatorIds: moderatorIds,
-                    bulkCreate: false,
-                    managePage: true,
-                    reportPage: false,
-                } only %}
-
-                <input type="submit" value="Preview">
-            </form>
-        </div>
-
-        {% include "@pastoral/modify_scripts.twig" with {
+        {% include "@pastoral/modify_section_visibility.twig" with {
             record: record,
-            canCreate: true,
-            students: '[]',
-            audiences: audiences,
-            typesIndex: typesIndex,
-            typesIndexPrivate: typesIndexPrivate,
-            subtypesIndex: subtypesIndex,
-            subtypesIndexPrivate: subtypesIndexPrivate,
+            allowIndividual: allowIndividual,
+            groups: groups,
+            allowParents: allowParents,
+            allowStudents: allowStudents,
+            roles: roles,
+            roleTypes: roleTypes,
+            roleUserCounts: roleUserCounts,
+            moderatorIds: moderatorIds,
+            bulkCreate: false,
+            managePage: true,
+            reportPage: false,
         } only %}
+
+        <input type="submit" value="Preview">
+    </form>
+</div>
+
+{% include "@pastoral/modify_scripts.twig" with {
+    record: record,
+    canCreate: true,
+    students: '[]',
+    audiences: audiences,
+    typesIndex: typesIndex,
+    typesIndexPrivate: typesIndexPrivate,
+    subtypesIndex: subtypesIndex,
+    subtypesIndexPrivate: subtypesIndexPrivate,
+} only %}
 
 {% if showAdminNavMenu %}
     </div>
