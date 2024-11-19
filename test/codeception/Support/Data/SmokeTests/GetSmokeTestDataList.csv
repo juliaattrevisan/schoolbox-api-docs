@@ -2,6 +2,7 @@ Admin,"Go admin dashboard",Superuser,https://vagrant.dev.schoolbox.cloud/adminv2
 Admin,"Go admin dashboard",Teacher,https://vagrant.dev.schoolbox.cloud/adminv2/home,401
 Admin,"Go admin dashboard",Student,https://vagrant.dev.schoolbox.cloud/adminv2/home,401
 Admin,"Go admin dashboard",Parent,https://vagrant.dev.schoolbox.cloud/adminv2/home,401
+Admin,"Go admin dashboard","Badge Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/home,401
 Admin,"Go admin dependencies",Superuser,https://vagrant.dev.schoolbox.cloud/adminv2/dependencies,200
 Admin,"Go admin dependencies",Teacher,https://vagrant.dev.schoolbox.cloud/adminv2/dependencies,401
 Admin,"Go admin dependencies",Student,https://vagrant.dev.schoolbox.cloud/adminv2/dependencies,401
@@ -254,6 +255,7 @@ Admin,"Lists Badge Category",Superuser,https://vagrant.dev.schoolbox.cloud/admin
 Admin,"Lists Badge Category",Teacher,https://vagrant.dev.schoolbox.cloud/adminv2/lists/achievement-category,401
 Admin,"Lists Badge Category",Student,https://vagrant.dev.schoolbox.cloud/adminv2/lists/achievement-category,401
 Admin,"Lists Badge Category",Parent,https://vagrant.dev.schoolbox.cloud/adminv2/lists/achievement-category,401
+Admin,"Lists Badge Category","Badge Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/lists/achievement-category,401
 Admin,"Review house list",Superuser,https://vagrant.dev.schoolbox.cloud/adminv2/lists/house,200
 Admin,"Review house list",Teacher,https://vagrant.dev.schoolbox.cloud/adminv2/lists/house,401
 Admin,"Review house list",Student,https://vagrant.dev.schoolbox.cloud/adminv2/lists/house,401
@@ -410,10 +412,12 @@ Admin,"Filters Badge List",Superuser,https://vagrant.dev.schoolbox.cloud/adminv2
 Admin,"Filters Badge List",Teacher,https://vagrant.dev.schoolbox.cloud/adminv2/filters/badgeList,401
 Admin,"Filters Badge List",Student,https://vagrant.dev.schoolbox.cloud/adminv2/filters/badgeList,401
 Admin,"Filters Badge List",Parent,https://vagrant.dev.schoolbox.cloud/adminv2/filters/badgeList,401
+Admin,"Filters Badge List","Badge Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/filters/badgeList,401
 Admin,"Filters Badge Report",Superuser,https://vagrant.dev.schoolbox.cloud/adminv2/filters/awardList,200
 Admin,"Filters Badge Report",Teacher,https://vagrant.dev.schoolbox.cloud/adminv2/filters/awardList,401
 Admin,"Filters Badge Report",Student,https://vagrant.dev.schoolbox.cloud/adminv2/filters/awardList,401
 Admin,"Filters Badge Report",Parent,https://vagrant.dev.schoolbox.cloud/adminv2/filters/awardList,401
+Admin,"Filters Badge Report","Badge Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/filters/awardList,401
 Admin,"Filters Class Markbook",Superuser,https://vagrant.dev.schoolbox.cloud/adminv2/filters/classMarkbook,200
 Admin,"Filters Class Markbook",Teacher,https://vagrant.dev.schoolbox.cloud/adminv2/filters/classMarkbook,401
 Admin,"Filters Class Markbook",Student,https://vagrant.dev.schoolbox.cloud/adminv2/filters/classMarkbook,401
