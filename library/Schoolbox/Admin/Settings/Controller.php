@@ -19,6 +19,8 @@ use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Error\Mapper;
 use Schoolbox\GenericCollection;
 use Alaress\Database\Predicate;
+use Schoolbox\Permission\Access\UserAccess;
+use Schoolbox\User;
 use Twig\Error\Error;
 
 class Controller extends ConfigController
@@ -141,26 +143,28 @@ class Controller extends ConfigController
         // Non-superusers who have access to the Admin system (e.g. News Moderators) will see only a small subset of
         // pages, so they should be able to find what they're looking for just by inspecting the few admin pages to
         // which they have access.
-        if ($this->user->isSuperuser()) {
-            foreach ($foundConfig as $config) {
-                /** @var Config $config */
-                $type = $config->getType() ? $config->getType()->getType() : '';
-                $url = isset($module[$config->getModule()])
-                    ? sprintf($module[$config->getModule()], $type)
-                    : sprintf("/adminv2/%s", $config->getModule());
+        foreach ($foundConfig as $config) {
+            /** @var Config $config */
+            $type = $config->getType() ? $config->getType()->getType() : '';
+            $url = isset($module[$config->getModule()])
+                ? sprintf($module[$config->getModule()], $type)
+                : sprintf("/adminv2/%s", $config->getModule());
 
-                if (in_array($url, $hiddenUrls)) {
-                    continue;
-                }
-
-                $jsonPayload[] = [
-                    'name'          => $config->getName(),
-                    'title'         => $config->getTitle(),
-                    'description'   => $config->getDescription(),
-                    'module'        => $config->getModule(),
-                    'url'           => $url . '#' . $config->getName()
-                ];
+            if (in_array($url, $hiddenUrls)) {
+                continue;
             }
+
+            if (!$this->userHasAccessToConfigSetting($this->user, $config->getModule(), $config->getType()?->getType())) {
+                continue;
+            }
+
+            $jsonPayload[] = [
+                'name'          => $config->getName(),
+                'title'         => $config->getTitle(),
+                'description'   => $config->getDescription(),
+                'module'        => $config->getModule(),
+                'url'           => $url . '#' . $config->getName()
+            ];
         }
 
         $this->response = $this->responseAsJson($jsonPayload);
@@ -344,6 +348,49 @@ class Controller extends ConfigController
                    ->equals(ConfigMapper::COL_MODULE, ConfigMapper::MODULE_SETTINGS);
 
         return $pb;
+    }
+
+    /**
+     * @param User   $user
+     * @param string $module
+     * @param ?string $type
+     * @return boolean
+     */
+    private function userHasAccessToConfigSetting(User $user, string $module, ?string $type): bool {
+        if ($user->isSuperuser()) {
+            return true;
+        }
+
+        if ($module === 'schoolData') {
+            // This is for the settings in 'Admin -> School Data Import -> Home'.
+            return $user->hasServicePermission(UserAccess::SERVICE_TIMETABLE, UserAccess::ACCESS_FULL);
+        }
+
+        if ($module === 'comms') {
+            // This is for the settings in 'Admin -> News -> Settings / Policy'.
+            return $user->hasServicePermission(UserAccess::SERVICE_NEWS, UserAccess::ACCESS_FULL);
+        }
+
+        if ($module === 'settings') {
+            switch ($type) {
+                case 'Resources':
+                    // This is for the settings in 'Admin -> Resources -> Resource Settings'.
+                    return $user->hasServicePermission(UserAccess::SERVICE_CMS, UserAccess::ACCESS_FULL);
+                case 'Skin Config':
+                    // This is for the settings in 'Admin -> Design -> Skin Config'.
+                    return $user->hasServicePermission(UserAccess::SERVICE_DESIGN, UserAccess::ACCESS_FULL);
+                case 'LMS Policy':
+                    // This is for the settings in 'Admin -> LMS -> LMS Policy'.
+                    return $user->hasServicePermission(UserAccess::SERVICE_LMS, UserAccess::ACCESS_FULL);
+                case 'Pastoral Care':
+                    // This is for the settings in 'Admin -> Pastoral Care -> Settings / Policy'.
+                    return $user->hasServicePermission(UserAccess::SERVICE_PASTORAL, UserAccess::ACCESS_FULL);
+                default:
+                    // Do nothing.
+            }
+        }
+
+        return false;
     }
 
     /**
