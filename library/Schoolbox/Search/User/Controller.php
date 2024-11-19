@@ -394,8 +394,6 @@ class Controller extends BaseController
 
         $protectStudentContacts = $this->getConfigLoader()->get('protect_student_contacts');
 
-        $hideContacts = $student->getHideContacts() ? 1 : 0;
-
         switch ($protectStudentContacts) {
             case Access::VISIBILITY_EVERYONE: // Everyone
                 break;
