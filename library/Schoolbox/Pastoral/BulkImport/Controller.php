@@ -157,6 +157,7 @@ class Controller extends Base
                 'paginator'   => $paginator,
                 'currentPage' => $currentPage,
                 'breadcrumbs' => $breadcrumbs,
+                'showAdminNavMenu'    => $this->user->isSuperuser() || $this->user->hasServicePermission(UserAccess::SERVICE_PASTORAL, UserAccess::ACCESS_FULL),
 
                 // Encode return URL separately, so that page number is included
                 'encodedReturnUrl' => Redirect::encode(
@@ -220,6 +221,7 @@ class Controller extends Base
             '@pastoralBulkImport/form.twig',
             $templateData + [
                 'breadcrumbs'       => $breadcrumbs,
+                'showAdminNavMenu'    => $this->user->isSuperuser() || $this->user->hasServicePermission(UserAccess::SERVICE_PASTORAL, UserAccess::ACCESS_FULL),
                 'returnUrl'        => $this->requestQuery->get('returnUrl')
                     ?? $this->routeGenerator->generate('pastoral.getIndex'),
                 'record'           => $this->pastoralDataSource->createModel()->setStudent(null),
@@ -395,6 +397,7 @@ class Controller extends Base
             '@pastoralBulkImport/import.twig',
             [
                 'breadcrumbs' => $breadcrumbs,
+                'showAdminNavMenu'    => $this->user->isSuperuser() || $this->user->hasServicePermission(UserAccess::SERVICE_PASTORAL, UserAccess::ACCESS_FULL),
                 'returnUrl' => $this->requestQuery->get('returnUrl')
                     ?? $this->routeGenerator->generate('pastoral.getIndex'),
                 'import'    => $import,

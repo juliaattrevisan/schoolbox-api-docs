@@ -1,9 +1,18 @@
 {% import 'sub/breadcrumbs.twig' as bread %}
 {{ bread.crumbsArray(breadcrumbs) }}
 
+{% if showAdminNavMenu%}
 <div class="admin-container row">
     {{ renderAdminNavigation(routeLookup('pastoralBulkImport.getList')) }}
     <div class="admin-content">
+        {# The divs opened above will be closed at the bottom of the page. #}
+{% else %}
+<div class='row'>
+    <div class='small-12 columns'>
+        <h1>{{ locale.pastoralCare.proper }} Groups</h1>
+    </div>
+</div>
+{% endif %}
         <div class="small-12 column">
             <h2 class="subheader">{{ locale.pastoral.proper }} Bulk Import Results</h2>
             <ul class="meta">
@@ -134,5 +143,7 @@
                 </li>
             </ul>
         </div>
+{% if showAdminNavMenu %}
     </div>
 </div>
+{% endif %}
