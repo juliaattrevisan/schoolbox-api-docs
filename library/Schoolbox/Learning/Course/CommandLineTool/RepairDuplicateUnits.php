@@ -13,6 +13,8 @@ use Schoolbox\Application\CliKernelAbstract;
 use Schoolbox\Application\CliTool\App;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy;
 use Schoolbox\Learning\Assessment\IAssessable;
+use Schoolbox\Learning\Assessment\Participant;
+use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Mapper as UnitImplementationMapper;
 use UnexpectedValueException;
 
 /**
@@ -27,12 +29,6 @@ class RepairDuplicateUnits extends App
     // Short and long folder options
     private const OPT_SHORT_FOLDER = 'f:';
     private const OPT_LONG_FOLDER = 'folder:';
-
-    // Which repair strategy to use? One of either:
-    // * delete assessments
-    // * move assessments out of unit
-    // * attempt to move into the newest copy of the unit?
-    private const OPT_LONG_STRATEGY = 'strategy:';
 
     /**
      * Query for finding the IDs of duplicate unit specs in a single
@@ -72,17 +68,6 @@ class RepairDuplicateUnits extends App
         AND course_unit_specification_id = :courseUnitSpecificationId
     SQL;
 
-//    private const SELECT_ASSESSMENTS_IN_UNIT_QUERY = <<<SQL
-//        SELECT
-//            id,
-//            open_date,
-//            due_date,
-//            created_at
-//        FROM course_unit_implementation
-//        WHERE course_implementation_id = :courseImplementationId
-//        AND course_unit_specification_id = :courseUnitSpecificationId
-//    SQL;
-
     /**
      * @inheritdoc
      */
@@ -105,24 +90,29 @@ class RepairDuplicateUnits extends App
         ];
     }
 
-
     /**
      * @return void
      */
     public function run(): void
     {
-        /** @var MapperProxy $assessmentDataSource */
-        $assessmentDataSource = $this->getDi()->get('assessmentDataSource');
+        $log = $this->getLogger();
+        if ($this->perform() && !$this->isInteractive()) {
+            $log->error('This tool requires an interactive session if performing changes.');
+            exit(CliKernelAbstract::EXIT_STATUS_KERNEL_ERROR);
+        }
+
         if ($this->getOpt(self::OPT_LONG_HELP) || $this->getOpt(self::OPT_SHORT_HELP)) {
             $this->printHelp();
         }
 
-        $db  = $this->getDatabaseInternal();
-        $log = $this->getLogger();
+        /** @var MapperProxy $assessmentDataSource */
+        $assessmentDataSource = $this->getDi()->get('assessmentDataSource');
+        $unitImplMapper       = UnitImplementationMapper::getInstance();
 
         // Build the find units query
-        $pb      = $db->buildPredicateBuilder('cui')
-                      ->isNull('cui.deleted_at');
+        $db = $this->getDatabaseInternal();
+        $pb = $db->buildPredicateBuilder('cui')
+                 ->isNull('cui.deleted_at');
         $folders = array_merge(
             $this->extractFolderIdOpts($this->getOpt(self::OPT_LONG_FOLDER)),
             $this->extractFolderIdOpts($this->getOpt(self::OPT_SHORT_FOLDER)),
@@ -137,6 +127,7 @@ class RepairDuplicateUnits extends App
         $duplicateUnitsQuery->execute($pb->getParams());
         $log->notice(sprintf('%s duplicate units found.', $duplicateUnitsQuery->rowCount()));
         foreach ($duplicateUnitsQuery as $duplicateUnitsRow) {
+            // Log the unit spec which is duplicated within each course impl
             $log->notice(
                 sprintf(
                     'Folder #%d (%s), course impl #%d, unit spec #%d (%s): %d duplicates',
@@ -154,8 +145,10 @@ class RepairDuplicateUnits extends App
                 'courseImplementationId'    => $duplicateUnitsRow['course_implementation_id'],
                 'courseUnitSpecificationId' => $duplicateUnitsRow['course_unit_specification_id'],
             ]);
+            $unitImplIds = [];
             foreach ($duplicateUnitsInCourseQuery as $duplicateUnitsInCourseQueryRow) {
-                $log->notice(
+                $unitImplIds[] = $duplicateUnitsInCourseQueryRow['id'];
+                $log->info(
                     sprintf(
                         '- unit impl #%d, open %s, due %s',
                         $duplicateUnitsInCourseQueryRow['id'],
@@ -163,18 +156,40 @@ class RepairDuplicateUnits extends App
                         $duplicateUnitsInCourseQueryRow['due_date'],
                     ),
                 );
+                /** @var IAssessable[] $assessment */
+                $assessments = $assessmentDataSource->findAllByUnitImplementationIds([$duplicateUnitsInCourseQueryRow['id']]);
+                $assessments = $assessmentDataSource->loadParticipantsIntoAssessmentCollection($assessments);
+                foreach ($assessments as $assessment) {
+                    $log->info(
+                        sprintf(
+                            '  - assessment #%d (%s), open %s, due %s, %d participants completed',
+                            $assessment->getId(),
+                            $assessment->getTitle(),
+                            $assessment->getOpenAt()->getDatabase(),
+                            $assessment->getDueAt()->getDatabase(),
+                            count($assessment->getAllParticipants()->filter(fn (Participant $p) => $p->hasPublishedFeedback())),
+                        ),
+                    );
+                }
             }
-            foreach ($assessmentDataSource->findAllByUnitImplementationIds([$duplicateUnitsInCourseQueryRow['id']]) as $assessment) {
-                /** @var IAssessable $assessment */
-                $log->notice(
-                    sprintf(
-                        '  - assessment #%d (%s), open %s, due %s',
-                        $assessment->getId(),
-                        $assessment->getTitle(),
-                        $assessment->getOpenAt()->getDatabase(),
-                        $assessment->getDueAt()->getDatabase(),
-                    ),
-                );
+
+            // Now ask which to preserve
+            if ($this->perform()) {
+                $log->info('---');
+                if (count($unitImplIds) <= 1) {
+                    $log->warning(sprintf('No duplicate units found in course'));
+                } else {
+                    $preservedUnitImplId = $this->readPreservedUnitImplId($unitImplIds);
+                    if (isset($preservedUnitImplId)) {
+                        $deletedUnitImplIds = array_diff($unitImplIds, [$preservedUnitImplId]);
+                        $log->notice(sprintf('Preserving unit impl: %s', $preservedUnitImplId));
+                        $log->notice(sprintf('Deleting unit impls: %s', implode(',', $deletedUnitImplIds)));
+                        $unitImplMapper->delete($unitImplMapper->findByColumn('id', $deletedUnitImplIds));
+                    } else {
+                        $log->notice('Skipping unit impl delete');
+                    }
+                }
+                $log->info('---');
             }
         }
 
@@ -217,6 +232,9 @@ OPTIONS:
 
     $yellow-p, --perform$white
         If set, performs repair: otherwise only detects broken data.
+
+        This tool repairs broken data by asking which unit implementation to preserve: all other duplicates will be
+        deleted. Therefore, this flag may not be provided if this tool is running in a non-interactive session.
 
     $yellow-f=FOLDERS, --folder=FOLDERS$white
         If provided, limit the detection to only courses imported into these folders.
@@ -263,5 +281,31 @@ HELP;
             $folderIds[] = (int)$folderIdInt;
         }
         return $folderIds;
+    }
+
+    /**
+     * Read one of the values from the command line, out of `$unitImplIds`.
+     *
+     * Keep attempting to read until one of `$unitImplIds` is read, or an empty
+     * string is read: in this case skip.
+     *
+     * @param array<int> $unitImplIds
+     * @return int|null
+     */
+    private function readPreservedUnitImplId(array $unitImplIds): ?int
+    {
+        $unitImplId = null;
+        while (!isset($unitImplId)) {
+            $unitImplId = $this->readLine(
+                sprintf('Enter unit impl ID to preserve (%s), or ENTER to skip: ', implode(', ', $unitImplIds))
+            );
+            if ($unitImplId === '') {
+                return null;
+            }
+            if (!in_array($unitImplId, $unitImplIds)) {
+                $unitImplId = null;
+            }
+        }
+        return (int)$unitImplId;
     }
 }
