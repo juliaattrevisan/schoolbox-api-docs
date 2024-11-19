@@ -58,7 +58,6 @@ class Module extends BaseModule
             $curriculumMapper,
             $this->getMapperFactory()->get(CourseSpecificationMapper::class),
             $this->getMapperFactory()->get(CourseUnitSpecificationMapper::class),
-            $this->getMapperFactory()->get(RubricIndicatorMapper::class),
             $this->getMapperFactory()->get(RubricCapabilityMapper::class),
             new Helper($curriculumMapper),
         );

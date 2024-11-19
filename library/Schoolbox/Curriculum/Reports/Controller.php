@@ -37,7 +37,6 @@ class Controller extends Base
      * @param CurriculumMapper              $curriculumMapper
      * @param CourseSpecificationMapper     $courseSpecificationMapper
      * @param CourseUnitSpecificationMapper $courseUnitSpecificationMapper
-     * @param RubricIndicatorMapper         $rubricIndicatorMapper
      * @param RubricCapabilityMapper        $rubricCapabilityMapper
      * @param Helper                        $helper
      */
@@ -45,7 +44,6 @@ class Controller extends Base
         private CurriculumMapper $curriculumMapper,
         private CourseSpecificationMapper $courseSpecificationMapper,
         private CourseUnitSpecificationMapper $courseUnitSpecificationMapper,
-        private RubricIndicatorMapper $rubricIndicatorMapper,
         private RubricCapabilityMapper $rubricCapabilityMapper,
         private Helper $helper,
     ) {
@@ -240,9 +238,28 @@ class Controller extends Base
         $unitId = $query->getInt('unitId');
         $nodeId = $query->getInt('nodeId');
 
-        if (null === $courseId) {}
-        if (null === $unitId) {}
-        if (null === $nodeId) {}
+        //TODO updating more validation for the query input
+        if (null === $courseId) {
+            $problem = (new ApiProblem("courseId must be defined"))
+                ->setStatus(400)
+                ->asArray();
+            $this->response = $this->responseAsJson($problem)->withStatus(400);
+            return;
+        }
+        if (null === $unitId) {
+            $problem = (new ApiProblem("unitId must be defined"))
+                ->setStatus(400)
+                ->asArray();
+            $this->response = $this->responseAsJson($problem)->withStatus(400);
+            return;
+        }
+        if (null === $nodeId) {
+            $problem = (new ApiProblem("nodeId must be defined"))
+                ->setStatus(400)
+                ->asArray();
+            $this->response = $this->responseAsJson($problem)->withStatus(400);
+            return;
+        }
 
         $result = $this->helper->getUsage(
             $nodeId,

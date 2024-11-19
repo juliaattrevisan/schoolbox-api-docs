@@ -70,7 +70,7 @@ class Helper
                 ON a.id = activity.assessment_id
                 AND a.deleted_at IS NULL
         ",
-        Cursor::COURSE_ACTIVITY_TASK,
+            Cursor::COURSE_ACTIVITY_TASK,
             Cursor::COURSE_ACTIVITY_QUIZ,
             Cursor::COURSE_ACTIVITY_LTI,
             Cursor::COURSE_ACTIVITY_DUE_WORK,
