@@ -201,4 +201,16 @@ test.describe("Create a News Article", () => {
         await index.goto("all");
         await index.dontSeeHeadline(headline);
     });
+
+    /**
+     * Clean up
+     */
+    test.afterAll(async ({ baseTester, db }) => {
+        baseTester.isGoingTo("update delete_at for the news article so it does not impact the news tests");
+        await db.updateInDatabase(
+            "comms_news_article",
+            { deleted_at: "2022-01-15 11:22:34" },
+            { "title like": "Acceptance Test News%", deleted_at: null },
+        );
+    });
 });
