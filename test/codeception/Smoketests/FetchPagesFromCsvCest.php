@@ -31,7 +31,8 @@ class FetchPagesFromCsvCest
     protected $users = [];
 
     /**
-     *
+     * Set up service permissions for moderator personas.
+     * @param IntegrationTester $i
      */
     public function _before(IntegrationTester $i): void
     {
