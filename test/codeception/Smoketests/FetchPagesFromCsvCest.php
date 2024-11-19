@@ -2,6 +2,7 @@
 
 namespace Tests\Smoketests;
 
+use Schoolbox\Permission\Access\UserAccess;
 use Tests\Support\IntegrationTester;
 use Tests\Support\Payload;
 use Codeception\Scenario;
@@ -16,13 +17,48 @@ class FetchPagesFromCsvCest
         'Teacher'                => ['username' => 'achan', 'password' => 'password'],
         'Student'                => ['username' => 'jreed', 'password' => 'password'],
         'Parent'                 => ['username' => 'jennireed01', 'password' => 'password'],
-        'Pastoral Moderator'     => ['username' => 'jcoles', 'password' => 'password'],
         'Fixtures Administrator' => ['username' => 'jcoles', 'password' => 'password'],
-        'News Moderator'         => ['username' => 'rwhite', 'password' => 'password'],
+        'Badges Moderator'       => ['username' => 'staff10', 'password' => 'password'], // -+- Permissions for these
+        'CMS Moderator'          => ['username' => 'staff11', 'password' => 'password'], //  |  are set up in the
+        'Calendar Moderator'     => ['username' => 'staff12', 'password' => 'password'], //  |  _before() function.
+        'Design Moderator'       => ['username' => 'staff13', 'password' => 'password'], //  |
+        'LMS Moderator'          => ['username' => 'staff14', 'password' => 'password'], //  |
+        'News Moderator'         => ['username' => 'staff15', 'password' => 'password'], //  |
+        'Pastoral Moderator'     => ['username' => 'staff16', 'password' => 'password'], //  |
+        'Timetable Moderator'    => ['username' => 'staff17', 'password' => 'password'], // /
     ];
 
     protected $users = [];
 
+    /**
+     *
+     */
+    public function _before(IntegrationTester $i): void
+    {
+        $serviceIdByPersonaName = [
+            'Badges Moderator'    => UserAccess::SERVICE_BADGE,
+            'CMS Moderator'       => UserAccess::SERVICE_CMS,
+            'Calendar Moderator'  => UserAccess::SERVICE_CALENDAR,
+            'Design Moderator'    => UserAccess::SERVICE_DESIGN,
+            'LMS Moderator'       => UserAccess::SERVICE_LMS,
+            'News Moderator'      => UserAccess::SERVICE_NEWS,
+            'Pastoral Moderator'  => UserAccess::SERVICE_PASTORAL,
+            'Timetable Moderator' => UserAccess::SERVICE_TIMETABLE,
+        ];
+
+        foreach ($serviceIdByPersonaName as $personaName => $serviceId) {
+            // Grant full service permission to persona.
+            $i->haveInDatabase(
+                'userAccess',
+                [
+                    'uid' => $i->grabFromDatabase('user', 'id', ['username' => $this->personas[$personaName]['username']]),
+                    'service' => $serviceId,
+                    'type' => UserAccess::ACCESS_FULL,
+                    'created_at' => date('Y-m-d H:i:s'),
+                ]
+            );
+        }
+    }
 
     /**
      * Fail test to ensure we can get a 404 response from schoolbox.
