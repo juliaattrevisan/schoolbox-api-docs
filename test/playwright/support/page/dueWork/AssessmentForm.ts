@@ -62,6 +62,8 @@ export default class AssessmentForm {
 
     static readonly SELECTOR_HOMEPAGE_TABS = "homepage-tabs";
 
+    static readonly DATATEST_MODIFY_PLANS = "sbx-pop-out-plan-options-button";
+
     // Work type constants
     static readonly WORKTYPE_ASSESSMENT_TASK = 1;
 
@@ -257,9 +259,14 @@ export default class AssessmentForm {
      * @param userId - The user ID to create a learning plan for
      * @param planName - The plan name to set
      * @param date - The date to set
+     * @param openSection - Whether to open the section
      */
-    async createLearningPlan(userId: number, planName: string, date: string): Promise<void> {
-        await this.page.getByTestId(AssessmentForm.SELECTOR_PARTICIPATION_LEGEND).click();
+    async createLearningPlan(openSection: boolean, userId: number, planName: string, date: string): Promise<void> {
+        if (openSection) {
+            await this.page.getByTestId(AssessmentForm.SELECTOR_PARTICIPATION_LEGEND).click();
+        }
+        await this.page.waitForTimeout(2000);
+
         await this.page.getByTestId(`${AssessmentForm.SELECTOR_PARTICIPATION_PARTICIPANT}-${userId}`).click();
 
         await this.page.getByTestId(AssessmentForm.SELECTOR_PARTICIPATION_CUSTOMISE_OPTIONS_POPOUT_BUTTON).click();
@@ -269,5 +276,12 @@ export default class AssessmentForm {
         await this.page.getByTestId(AssessmentForm.SELECTOR_PARTICIPATION_CUSTOMISE_MODAL_PLAN_DUE_DATE).fill(date);
 
         await this.page.getByTestId(AssessmentForm.SELECTOR_PARTICIPATION_BUTTON_SAVE).click();
+    }
+
+    /**
+     * Modify a learning plan
+     */
+    async clickModifyLearningPlan(): Promise<void> {
+        await this.page.getByTestId(AssessmentForm.DATATEST_MODIFY_PLANS).click();
     }
 }
