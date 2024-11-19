@@ -6,9 +6,12 @@
 import { useTemplateRef } from "vue";
 import { usePopOut } from "@schoolboxVue/composables/popOut/usePopOut";
 import { usePopOutStore } from "./store/ccPopOutStore";
+import { useFiltersStore } from "./store/ccFiltersStore";
+import { ReportOptionValues } from "../js/types/curriculumCoverageTypes";
 
 const popOutElement = useTemplateRef<HTMLDivElement>("popOutElement");
 const popOutStore = usePopOutStore();
+const filtersStore = useFiltersStore();
 const button = window.Vue.ref<HTMLButtonElement | null>(null);
 
 /**
@@ -74,13 +77,23 @@ window.Vue.watch(
                     This outcome also includes the count of its children. Expand the outcome to view an accurate count.
                 </div>
             </div>
-            <div v-if="popOutStore.usage?.onUnit" class="usage__section">
+            <div
+                v-if="filtersStore.selectedReportOptions.includes(ReportOptionValues.UNIT) && popOutStore.usage?.onUnit"
+                class="usage__section"
+            >
                 <div class="l-flex l-gap-s">
                     <sbx-icon name="unit" />
                     <p class="f-no-margins">Assigned to Unit</p>
                 </div>
             </div>
-            <div v-if="popOutStore.usage?.activity && popOutStore.usage.activity.length > 0" class="usage__section">
+            <div
+                v-if="
+                    filtersStore.selectedReportOptions.includes(ReportOptionValues.LEARNING_ACTIVITY) &&
+                    popOutStore.usage?.activity &&
+                    popOutStore.usage.activity.length > 0
+                "
+                class="usage__section"
+            >
                 <template v-for="activity in popOutStore.usage.activity" :key="activity._links.view">
                     <a :href="activity._links.view" :title="`View ${activity.name}`" class="l-flex l-gap-s">
                         <sbx-icon name="project" />
@@ -88,7 +101,14 @@ window.Vue.watch(
                     </a>
                 </template>
             </div>
-            <div v-if="popOutStore.usage?.lessonPlan && popOutStore.usage.lessonPlan.length > 0" class="usage__section">
+            <div
+                v-if="
+                    filtersStore.selectedReportOptions.includes(ReportOptionValues.LEARNING_ACTIVITY_LESSON_PLAN) &&
+                    popOutStore.usage?.lessonPlan &&
+                    popOutStore.usage.lessonPlan.length > 0
+                "
+                class="usage__section"
+            >
                 <template v-for="lessonPlan in popOutStore.usage.lessonPlan" :key="lessonPlan._links.view">
                     <a :href="lessonPlan._links.view" :title="`View ${lessonPlan.name}`" class="l-flex l-gap-s">
                         <sbx-icon name="lesson-plan" />
@@ -113,7 +133,6 @@ window.Vue.watch(
     &__section {
         display: flex;
         flex-direction: column;
-        // padding: var(--spacing-s);
     }
     &__section:not(:last-of-type) {
         border-bottom: 1px solid var(--body-background);
