@@ -10,12 +10,12 @@ declare(strict_types=1);
 
 namespace Schoolbox\Geosnapshot;
 
+use Alaress\Authorizer\Failure;
 use Alaress\Authorizer\Rule;
 use Alaress\Module\Module as BaseModule;
 use Alaress\Twig\Loader\IChainLoader;
 use Alaress\Web\Controller\Base;
 use InvalidArgumentException;
-use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Learning\Assessment\Redirect;
 use Schoolbox\Mapper;
@@ -58,7 +58,7 @@ class Module extends BaseModule
      * @param array $params
      * @return array
      * @throws InvalidArgumentException
-     * @throws NotFound
+     * @throws Failure\InvalidPath
      */
     private function preloadUserAndUrl(array $params): array
     {
@@ -68,7 +68,7 @@ class Module extends BaseModule
             /* Only students can be a viewee; parents and staff don't get pictures
              */
             if (!$user->getRole()->isStudent()) {
-                throw new NotFound();
+                throw new Failure\InvalidPath();
             }
             //hydrate parents on the $user so we can get them later
             (new \Schoolbox\External\User(
@@ -80,7 +80,7 @@ class Module extends BaseModule
         } catch (MapperException $e) {
             /* User doesn't really exist
              */
-            throw new NotFound();
+            throw new Failure\InvalidPath();
         }
 
         return [
@@ -102,12 +102,12 @@ class Module extends BaseModule
                 new Rule\IsLoggedIn(),
                 new Rule\Callback(function (array $params, \Schoolbox\User $sessionUser) {
                     if (!isset($params['id'])) {
-                        throw new NotFound();
+                        throw new Failure\InvalidPath();
                     }
                     try {
                         $viewee = $this->getUserMapper()->findById($params['id']);
                     } catch (MapperException $e) {
-                        throw new NotFound();
+                        throw new Failure\InvalidPath();
                     }
 
                     /* No Geosnapshot? No trabajo
@@ -124,7 +124,7 @@ class Module extends BaseModule
                         );
 
                     if (!$isGeosnapshotAvailable) {
-                        throw new NotFound();
+                        throw new Failure\InvalidPath();
                     }
 
                     return [
