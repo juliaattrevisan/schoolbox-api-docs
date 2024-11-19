@@ -139,10 +139,6 @@ class Controller extends ConfigController
             }
         }
 
-        // Add config settings to the searchable payload only for superusers.
-        // Non-superusers who have access to the Admin system (e.g. News Moderators) will see only a small subset of
-        // pages, so they should be able to find what they're looking for just by inspecting the few admin pages to
-        // which they have access.
         foreach ($foundConfig as $config) {
             /** @var Config $config */
             $type = $config->getType() ? $config->getType()->getType() : '';
@@ -351,9 +347,11 @@ class Controller extends ConfigController
     }
 
     /**
+     * Return true if the given user has access to the config settings with the given module and type.
+     *
      * @param User   $user
-     * @param string $module
-     * @param ?string $type
+     * @param string $module - From database `config`.`module`
+     * @param ?string $type - From database `lu_config_type`.`type`
      * @return boolean
      */
     private function userHasAccessToConfigSetting(User $user, string $module, ?string $type): bool {
