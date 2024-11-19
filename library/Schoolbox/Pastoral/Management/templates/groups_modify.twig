@@ -8,7 +8,7 @@
 {% if showAdminNavMenu%}
 <div class="admin-container row">
     {{ renderAdminNavigation(routeLookup('pastoralManagement.getGroups')) }}
-<div class="admin-content">
+    <div class="admin-content">
 {# The divs opened above will be closed at the bottom of the page. #}
 {% else %}
 <div class='row'>
@@ -128,6 +128,10 @@
     </div>
 </div>
 
+{% if showAdminNavMenu %}
+    </div>
+</div>
+{% endif %}
 <!--suppress JSUnusedLocalSymbols -->
 <script>
     $(function () {
