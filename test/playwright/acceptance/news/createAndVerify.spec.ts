@@ -278,7 +278,7 @@ test.describe("Create and Verify News Article Test", () => {
         await form.checkboxAudience("9A English (9ENGA)");
         await form.selectIncludeUsers("parents");
         await form.clickAddAudience();
-        // waiting to make sure the drat is created  - currently it takes 3 seconds
+        // waiting to make sure the draft is created  - currently it takes 3 seconds
         // when we get something better in the waitForDraftToast we can remove  the timeout
         await form.waitForDraftToast();
         await page.waitForTimeout(3000);
