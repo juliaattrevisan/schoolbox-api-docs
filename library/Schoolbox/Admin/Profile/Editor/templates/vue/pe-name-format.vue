@@ -46,8 +46,8 @@ async function onUpdateClicked(): Promise<void> {
     <section v-if="peStore.selectedRoleType" class="content">
         <label for="pe-name-format">Name Display Options</label>
         <p class="meta">
-            Insert a default format for how user names will be displayed. Can contain: {title}, {firstname},
-            {preferredname} (falls back to first name if empty), {lastname}, {pronoun}.
+            Insert a default format for how user names will be displayed on profile pages. Can contain: {title},
+            {firstname}, {preferredname} (falls back to first name if empty), {lastname}, {pronoun}.
         </p>
         <input
             id="pe-name-format"
