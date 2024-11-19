@@ -58,7 +58,7 @@ class Module extends BaseModule
      * @param array $params
      * @return array
      * @throws InvalidArgumentException
-     * @throws Failure\InvalidPath 
+     * @throws Failure\InvalidPath
      */
     private function preloadUserAndUrl(array $params): array
     {
