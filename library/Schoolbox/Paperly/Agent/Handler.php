@@ -439,7 +439,8 @@ class Handler
     public function handleGetStudentsMedicalRequest(array $data): array
     {
         $stuMedicalArr = [];
-        $params        = [date("Y")];
+//        $params        = [date("Y")];
+        $params        = [];
         $selectedView = $this->viewSelector->getView(ViewSelector::PAPERLY_VIEW_STUDENT_MEDICAL);
         $sql = "SELECT * FROM {$selectedView} WHERE 1=1";
 
@@ -2008,6 +2009,7 @@ class Handler
         $groupedData = [
             'community' => [],
             'students' => [],
+            'community_legal' => [],
             'medical_conditions' => [
                 'delete' => [],
                 'create' => []
@@ -2031,6 +2033,9 @@ class Handler
                             'MedicalConditions',
                             'DeletedStudentConsents',
                             'StudentConsents',
+                            'PhotoPromFlag',
+                            'PhotoPublicationFlag',
+                            'PhotoWebFlag',
                         ]
                     )
                 ) {
@@ -2280,7 +2285,7 @@ class Handler
         $selectedView = $this->viewSelector->getView(ViewSelector::PAPERLY_VIEW_STUDENT_MEDICAL);
         if (!empty($conditions)) {
             foreach ($conditions as $apiSeqId) {
-                $checkSQL = "SELECT * FROM {$selectedView} WHERE ID = ? AND MedicalConditionSeq = ?";
+                $checkSQL = "SELECT COUNT(*) count FROM {$selectedView} WHERE ID = ? AND MedicalConditionSeq = ?";
                 $statement = $this->externalDb->prepareQuery($checkSQL, [$studentID, $apiSeqId]);
                 $stmt = $statement->execute();
                 if ($stmt === false) {
@@ -2289,13 +2294,13 @@ class Handler
                     );
                 }
 
-                if ($statement->rowCount() === 1) {
+                if ($statement->fetch(\PDO::FETCH_ASSOC)['count'] === 1) {
                     $deleteSQL = "
                         UPDATE MedicalCondition
                         SET ActiveFlag = 0,
                             ConditionEndDate = GETDATE()
                         WHERE MedicalConditionSeq = ?";
-                    $stmt = $this->externalDb->prepareQuery($deleteSQL, [$studentID, $apiSeqId])->execute();
+                    $stmt = $this->externalDb->prepareQuery($deleteSQL, [$apiSeqId])->execute();
                     if ($stmt === false) {
                         throw new Exception(
                             print_r($this->externalDb->errorInfo(), true)
@@ -2375,7 +2380,7 @@ class Handler
                 $consentGivenBy = $consent['ConsentGivenBy'];
                 $consentSeq = $consent['ConsentSeq'];
 
-                $checkSQL = "SELECT * FROM {$selectedView} WHERE ID = ? AND ConsentSeq = ?";
+                $checkSQL = "SELECT COUNT(*) count FROM {$selectedView} WHERE ID = ? AND ConsentSeq = ?";
                 $statement = $this->externalDb->prepareQuery($checkSQL, [$studentID, $consentSeq]);
                 $stmt = $statement->execute();
                 if ($stmt === false) {
@@ -2383,8 +2388,7 @@ class Handler
                         print_r($this->externalDb->errorInfo(), true)
                     );
                 }
-
-                if ($statement->rowCount() === 1) {
+                if ($statement->fetch(\PDO::FETCH_ASSOC)['count'] === 1) {
                     $deleteSQL = "
                         UPDATE Consent
                         SET ActiveFlag = 0,
@@ -2440,8 +2444,9 @@ class Handler
                 }
 
                 // If the record exists and ActiveFlag is 0, update it
-                if ($statement->rowCount()) {
-                    while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
+                $results = $statement->fetchAll(\PDO::FETCH_ASSOC);
+                if (count($results)) {
+                    foreach ($results as $row) {
                         if ($row["ActiveFlag"] == 0) {
                             $updateSQL = "
                                 UPDATE Consent
