@@ -257,14 +257,17 @@
                         {% set additionalConstraints = {
                             'student': {
                                 '_default': true,
+                                'duework': config.lms_enabled,
                                 'eportfolio': eportfolioAuth,
                             },
                             'parent': {
                                 '_default': true,
+                                'duework': config.lms_enabled,
                                 'eportfolio': eportfolioAuth,
                             },
                             'staff': {
                                 '_default': USER.role.viewStudentProfile,
+                                'duework': USER.role.viewStduentProfile and config.lms_enabled,
                                 'eportfolio': USER.role.viewStudentProfile and eportfolioAuth,
                                 'pastoral': USER.role.viewStudentProfile and showPastoral and pastoralUrl,
                                 'timetable': USER.role.viewStudentProfile and user.isShowTimetable,
