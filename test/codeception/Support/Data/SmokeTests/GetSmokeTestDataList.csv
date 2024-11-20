@@ -5,6 +5,7 @@ Admin,"Go admin dashboard","Design Moderator",https://vagrant.dev.schoolbox.clou
 Admin,"Go admin dashboard","LMS Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/home,200
 Admin,"Go admin dashboard","News Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/home,200
 Admin,"Go admin dashboard","Pastoral Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/home,200
+Admin,"Go admin dashboard","Timetable Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/home,200
 Admin,"Go admin dashboard",Teacher,https://vagrant.dev.schoolbox.cloud/adminv2/home,401
 Admin,"Go admin dashboard",Student,https://vagrant.dev.schoolbox.cloud/adminv2/home,401
 Admin,"Go admin dashboard",Parent,https://vagrant.dev.schoolbox.cloud/adminv2/home,401
@@ -529,6 +530,11 @@ Admin,"Import photos",Superuser,https://vagrant.dev.schoolbox.cloud/adminv2/impo
 Admin,"Import photos",Teacher,https://vagrant.dev.schoolbox.cloud/adminv2/import/photos/upload,401
 Admin,"Import photos",Student,https://vagrant.dev.schoolbox.cloud/adminv2/import/photos/upload,401
 Admin,"Import photos",Parent,https://vagrant.dev.schoolbox.cloud/adminv2/import/photos/upload,401
+Admin,"Import profile",Superuser,https://vagrant.dev.schoolbox.cloud/adminv2/import/profile/upload,200
+Admin,"Import profile","Timetable Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/import/profile/upload,200
+Admin,"Import profile",Teacher,https://vagrant.dev.schoolbox.cloud/adminv2/import/profile/upload,401
+Admin,"Import profile",Student,https://vagrant.dev.schoolbox.cloud/adminv2/import/profile/upload,401
+Admin,"Import profile",Parent,https://vagrant.dev.schoolbox.cloud/adminv2/import/profile/upload,401
 Admin,"Modules Home",Superuser,https://vagrant.dev.schoolbox.cloud/adminv2/setting/Modules,200
 Admin,"Modules Home",Teacher,https://vagrant.dev.schoolbox.cloud/adminv2/setting/Modules,401
 Admin,"Modules Home",Student,https://vagrant.dev.schoolbox.cloud/adminv2/setting/Modules,401
@@ -547,6 +553,7 @@ Admin,"Modules Pastoral Care",Teacher,https://vagrant.dev.schoolbox.cloud/adminv
 Admin,"Modules Pastoral Care",Student,https://vagrant.dev.schoolbox.cloud/adminv2/setting/pastoral/Pastoral%20Care,401
 Admin,"Modules Pastoral Care",Parent,https://vagrant.dev.schoolbox.cloud/adminv2/setting/pastoral/Pastoral%20Care,401
 Admin,"Import school data",Superuser,https://vagrant.dev.schoolbox.cloud/adminv2/import/schoolDataImport,200
+Admin,"Import school data","Timetable Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/import/schoolDataImport,200
 Admin,"Import school data",Teacher,https://vagrant.dev.schoolbox.cloud/adminv2/import/schoolDataImport,401
 Admin,"Import school data",Student,https://vagrant.dev.schoolbox.cloud/adminv2/import/schoolDataImport,401
 Admin,"Import school data",Parent,https://vagrant.dev.schoolbox.cloud/adminv2/import/schoolDataImport,401
@@ -555,14 +562,17 @@ Admin,"Import import pastoral",Teacher,https://vagrant.dev.schoolbox.cloud/admin
 Admin,"Import import pastoral",Student,https://vagrant.dev.schoolbox.cloud/adminv2/import/pastoral,401
 Admin,"Import import pastoral",Parent,https://vagrant.dev.schoolbox.cloud/adminv2/import/pastoral,401
 Admin,"Import timetable Structure",Superuser,https://vagrant.dev.schoolbox.cloud/adminv2/import/timetableStructure,200
+Admin,"Import timetable Structure","Timetable Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/import/timetableStructure,200
 Admin,"Import timetable Structure",Teacher,https://vagrant.dev.schoolbox.cloud/adminv2/import/timetableStructure,401
 Admin,"Import timetable Structure",Student,https://vagrant.dev.schoolbox.cloud/adminv2/import/timetableStructure,401
 Admin,"Import timetable Structure",Parent,https://vagrant.dev.schoolbox.cloud/adminv2/import/timetableStructure,401
-Admin,"Import timetable ",Superuser,https://vagrant.dev.schoolbox.cloud/adminv2/import/timetable,200
-Admin,"Import timetable ",Teacher,https://vagrant.dev.schoolbox.cloud/adminv2/import/timetable,401
-Admin,"Import timetable ",Student,https://vagrant.dev.schoolbox.cloud/adminv2/import/timetable,401
-Admin,"Import timetable ",Parent,https://vagrant.dev.schoolbox.cloud/adminv2/import/timetable,401
+Admin,"Import timetable",Superuser,https://vagrant.dev.schoolbox.cloud/adminv2/import/timetable,200
+Admin,"Import timetable","Timetable Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/import/timetable,200
+Admin,"Import timetable",Teacher,https://vagrant.dev.schoolbox.cloud/adminv2/import/timetable,401
+Admin,"Import timetable",Student,https://vagrant.dev.schoolbox.cloud/adminv2/import/timetable,401
+Admin,"Import timetable",Parent,https://vagrant.dev.schoolbox.cloud/adminv2/import/timetable,401
 Admin,"Import timetable enrolment",Superuser,https://vagrant.dev.schoolbox.cloud/adminv2/import/timetableEnrolment,200
+Admin,"Import timetable enrolment","Timetable Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/import/timetableEnrolment,200
 Admin,"Import timetable enrolment",Teacher,https://vagrant.dev.schoolbox.cloud/adminv2/import/timetableEnrolment,401
 Admin,"Import timetable enrolment",Student,https://vagrant.dev.schoolbox.cloud/adminv2/import/timetableEnrolment,401
 Admin,"Import timetable enrolment",Parent,https://vagrant.dev.schoolbox.cloud/adminv2/import/timetableEnrolment,401
