@@ -131,28 +131,28 @@ class Controller extends ConfigController
            ->notEquals('module', 'custom');
         $foundConfig = $this->getConfigMapper()->findByPredicates($pb);
 
-        // Config settings are found in different pages depending on the module name and config type.
-        // This data structure mimics the structure of $this->userHasAccessToConfigSetting()
-        $urlTemplateByConfigTypeByModuleName = [
-            'settings'   => [
-                'Resources' => '/adminv2/setting/cms/%s',
-                'Skin Config' => '/adminv2/setting/design/%s',
-                'LMS Policy' => '/adminv2/setting/lms/%s',
-                'Pastoral Care' => '/adminv2/setting/pastoral/%s',
-            ],
-            'comms'      => ['' => '/adminv2/news'],
-            'schoolData' => ['' => '/adminv2/import/schoolDataImport'],
-        ];
-
         foreach ($foundConfig as $config) {
             /** @var Config $config */
             $type = $config->getType() ? $config->getType()->getType() : '';
-            $urlTemplateByConfigType = $urlTemplateByConfigTypeByModuleName[$config->getModule()] ?? null;
-            $url = (
-                ($urlTemplateByConfigType !== null && isset($urlTemplateByConfigType[$type]))
-                ? sprintf($urlTemplateByConfigType[$type], $type)
-                : sprintf("/adminv2/%s", $config->getModule())
-            );
+
+            // Config settings are found in different pages depending on the module name and config type.
+            // The code below mimics the structure of $this->userHasAccessToConfigSetting().
+            $urlTemplate = match ($config->getModule()) {
+                'settings' => (
+                    match ($type) {
+                        'Resources' => '/adminv2/setting/cms/%s',
+                        'Skin Config' => '/adminv2/setting/design/%s',
+                        'LMS Policy' => '/adminv2/setting/lms/%s',
+                        'Pastoral Care' => '/adminv2/setting/pastoral/%s',
+                        default => '/adminv2/%s',
+                    }
+                ),
+                'comms' => '/adminv2/news',
+                'schoolData' => '/adminv2/import/schoolDataImport',
+                default => '/adminv2/%s',
+            };
+
+            $url = sprintf($urlTemplate, $config->getModule());
 
             if (in_array($url, $hiddenUrls)) {
                 continue;
