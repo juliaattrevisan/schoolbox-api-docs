@@ -115,11 +115,35 @@ window.Vue.watch(
                 "
                 class="usage__section"
             >
+                <h4 class="l-pad-xs--bottom f-no-margins">Lesson Plans</h4>
                 <template v-for="lessonPlan in popOutStore.usage.lessonPlan" :key="lessonPlan._links.view">
                     <a :href="lessonPlan._links.view" :title="`View ${lessonPlan.name}`" class="l-flex l-gap-s">
                         <sbx-icon name="lesson-plan" />
                         <p class="f-no-margins">{{ lessonPlan.name }}</p>
                     </a>
+                </template>
+            </div>
+            <div
+                v-if="
+                    filtersStore.selectedReportOptions.includes(ReportOptionValues.RUBRIC) && popOutStore.usage?.rubric
+                "
+                class="usage__section"
+            >
+                <h4 class="l-pad-xs--bottom f-no-margins">Rubric Capabilities</h4>
+                <template
+                    v-if="popOutStore.usage.rubric.course && popOutStore.usage.rubric.course.capabilities.length > 0"
+                >
+                    <h5 class="l-pad-xs--bottom f-no-margins">Course Rubrics</h5>
+                    <div v-for="capability in popOutStore.usage.rubric.course.capabilities" :key="capability.name">
+                        <p class="f-no-margins">
+                            <b>{{ capability.name }}</b
+                            ><br />
+                            <template v-for="(indicator, index) in capability.indicators" :key="indicator.name">
+                                {{ indicator.name }}
+                                <template v-if="index < capability.indicators.length - 1"><br /></template>
+                            </template>
+                        </p>
+                    </div>
                 </template>
             </div>
         </div>
@@ -131,7 +155,7 @@ window.Vue.watch(
     background-color: #fff;
     border-radius: 0.25rem;
     box-shadow: 0px 0px 6px rgba(0, 0, 0, 0.2);
-    max-width: 16rem;
+    max-width: 24rem;
     min-width: 16rem;
     padding: var(--spacing-s);
     position: absolute;
@@ -141,13 +165,15 @@ window.Vue.watch(
         flex-direction: column;
         gap: var(--spacing-s);
         h4 {
+            border-bottom: 2px solid var(--body-background);
+            font-size: 0.875rem;
+            font-weight: bold;
+        }
+        h5 {
             border-bottom: 1px solid var(--body-background);
             font-size: 0.8125rem;
             font-weight: bold;
         }
-    }
-    &__section:not(:last-of-type) {
-        border-bottom: 1px solid var(--body-background);
     }
 }
 </style>
