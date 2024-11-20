@@ -139,7 +139,8 @@ HELP;
                     $this->getLogger(),
                     $this->getDi()->get('l10n'),
                     $this->fetchCampusIds(),
-                    trim((string)$this->getConfig()->get('external_staff_portal'))
+                    trim((string)$this->getConfig()->get('external_staff_portal')),
+                    trim((string)$this->getConfig()->get('external_document_button_enable'))
                 );
             }
 

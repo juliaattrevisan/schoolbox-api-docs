@@ -54,12 +54,13 @@ class SystemButtons
      *
      * Note that some system buttons depend on config vars
      *
-     * @param bool $perform
-     * @param IConnector $db
+     * @param bool            $perform
+     * @param IConnector      $db
      * @param LoggerInterface $log
-     * @param RosettaStone $rosettaStone
-     * @param array $campusIds
-     * @param string $externalStaffPortal
+     * @param RosettaStone    $rosettaStone
+     * @param array           $campusIds
+     * @param string          $externalStaffPortal
+     * @param string          $externalDocumentButtonEnable
      */
     public function __construct(
         private bool $perform,
@@ -67,7 +68,8 @@ class SystemButtons
         private LoggerInterface $log,
         private RosettaStone $rosettaStone,
         private array $campusIds,
-        private string $externalStaffPortal
+        private string $externalStaffPortal,
+        private string $externalDocumentButtonEnable,
     ) {
     }
 
@@ -344,7 +346,7 @@ class SystemButtons
                     ],
                     'visibility' => [
                         'campus' => $this->campusIds,
-                        'role' => $allRoleIds
+                        'role' => ('1' === $this->externalDocumentButtonEnable) ? $allRoleIds : []
                     ],
                 ],
                 [
@@ -663,7 +665,7 @@ class SystemButtons
         $params = Builder::getArrayParameters($roleType, 'roletype');
 
         $statement = $this->db->prepare("
-            SELECT id 
+            SELECT id
             FROM groups
             WHERE group_type IN {$placeholders}
         ");
