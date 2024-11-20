@@ -332,8 +332,6 @@
                                         {% set route = routeLookupIfAuthorized('profileDocumentManagement.getIndex', {studentId: user.id}) %}
                                     {% elseif button.type in ['geosnapshot'] %}
                                         {% set route = routeLookupIfAuthorized('geosnapshotApi.getStudentPhotos', {id: user.id}) %}
-                                    {% elseif button.type in ['pastoralsynergetic'] %}
-                                        {% set route = config.external_staff_portal ~ '/stud.aspx?id=' ~ user.externalId %}
                                     {% endif %}
 
                                     {% if route %}
