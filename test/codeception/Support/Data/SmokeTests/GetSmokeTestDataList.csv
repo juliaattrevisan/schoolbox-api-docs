@@ -191,7 +191,14 @@ Admin,"Deploy ePortfolio",Teacher,https://vagrant.dev.schoolbox.cloud/adminv2/ep
 Admin,"Deploy ePortfolio",Student,https://vagrant.dev.schoolbox.cloud/adminv2/eportfolio/deploy,401
 Admin,"Deploy ePortfolio",Parent,https://vagrant.dev.schoolbox.cloud/adminv2/eportfolio/deploy,401
 Admin,"Config News",Superuser,https://vagrant.dev.schoolbox.cloud/adminv2/news,200
+Admin,"Config News","Badges Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/news,401
+Admin,"Config News","CMS Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/news,401
+Admin,"Config News","Calendar Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/news,401
+Admin,"Config News","Design Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/news,401
+Admin,"Config News","LMS Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/news,401
 Admin,"Config News","News Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/news,200
+Admin,"Config News","Pastoral Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/news,401
+Admin,"Config News","Timetable Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/news,401
 Admin,"Config News",Teacher,https://vagrant.dev.schoolbox.cloud/adminv2/news,401
 Admin,"Config News",Student,https://vagrant.dev.schoolbox.cloud/adminv2/news,401
 Admin,"Config News",Parent,https://vagrant.dev.schoolbox.cloud/adminv2/news,401
@@ -528,7 +535,14 @@ Admin,"Review event types",Teacher,https://vagrant.dev.schoolbox.cloud/adminv2/l
 Admin,"Review event types",Student,https://vagrant.dev.schoolbox.cloud/adminv2/lists/calendar/event-type,401
 Admin,"Review event types",Parent,https://vagrant.dev.schoolbox.cloud/adminv2/lists/calendar/event-type,401
 Admin,"Review news topics",Superuser,https://vagrant.dev.schoolbox.cloud/adminv2/lists/news/news-topic,200
+Admin,"Review news topics","Badges Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/lists/news/news-topic,401
+Admin,"Review news topics","CMS Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/lists/news/news-topic,401
+Admin,"Review news topics","Calendar Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/lists/news/news-topic,401
+Admin,"Review news topics","Design Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/lists/news/news-topic,401
+Admin,"Review news topics","LMS Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/lists/news/news-topic,401
 Admin,"Review news topics","News Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/lists/news/news-topic,200
+Admin,"Review news topics","Pastoral Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/lists/news/news-topic,401
+Admin,"Review news topics","Timetable Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/lists/news/news-topic,401
 Admin,"Review news topics",Teacher,https://vagrant.dev.schoolbox.cloud/adminv2/lists/news/news-topic,401
 Admin,"Review news topics",Student,https://vagrant.dev.schoolbox.cloud/adminv2/lists/news/news-topic,401
 Admin,"Review news topics",Parent,https://vagrant.dev.schoolbox.cloud/adminv2/lists/news/news-topic,401
