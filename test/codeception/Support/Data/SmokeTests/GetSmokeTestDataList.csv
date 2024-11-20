@@ -129,11 +129,11 @@ Admin,"Configure security",Superuser,https://vagrant.dev.schoolbox.cloud/adminv2
 Admin,"Configure security",Teacher,https://vagrant.dev.schoolbox.cloud/adminv2/setting/Security,401
 Admin,"Configure security",Student,https://vagrant.dev.schoolbox.cloud/adminv2/setting/Security,401
 Admin,"Configure security",Parent,https://vagrant.dev.schoolbox.cloud/adminv2/setting/Security,401
-Admin,"Configure skin",Superuser,https://vagrant.dev.schoolbox.cloud/adminv2/setting/design/Skin+Config,200
-Admin,"Configure skin","Design Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/design/setting/Skin+Config,200
-Admin,"Configure skin",Teacher,https://vagrant.dev.schoolbox.cloud/adminv2/setting/design/Skin+Config,401
-Admin,"Configure skin",Student,https://vagrant.dev.schoolbox.cloud/adminv2/setting/design/Skin+Config,401
-Admin,"Configure skin",Parent,https://vagrant.dev.schoolbox.cloud/adminv2/setting/design/Skin+Config,401
+Admin,"Configure skin",Superuser,https://vagrant.dev.schoolbox.cloud/adminv2/setting/design/Skin%20Config,200
+Admin,"Configure skin","Design Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/setting/design/Skin%20Config,200
+Admin,"Configure skin",Teacher,https://vagrant.dev.schoolbox.cloud/adminv2/setting/design/Skin%20Config,401
+Admin,"Configure skin",Student,https://vagrant.dev.schoolbox.cloud/adminv2/setting/design/Skin%20Config,401
+Admin,"Configure skin",Parent,https://vagrant.dev.schoolbox.cloud/adminv2/setting/design/Skin%20Config,401
 Admin,"Configure Terminology",Superuser,https://vagrant.dev.schoolbox.cloud/adminv2/terminology,200
 Admin,"Configure Terminology","Design Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/terminology,200
 Admin,"Configure Terminology",Teacher,https://vagrant.dev.schoolbox.cloud/adminv2/terminology,401
