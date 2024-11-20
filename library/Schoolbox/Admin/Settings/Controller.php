@@ -85,27 +85,9 @@ class Controller extends ConfigController
      */
     public function searchSettings(): void
     {
-        $pb = $this->getConfigMapper()->getPredicateBuilder();
-        $pb->equals('hidden', 'false')
-            ->notEquals('module', 'custom');
-        $foundConfig = $this->getConfigMapper()->findByPredicates($pb);
-
         $jsonPayload = [];
 
-        // Config settings are found in different pages depending on the module name and config type.
-        // This data structure mimics the structure of $this->userHasAccessToConfigSetting()
-        $urlTemplateByConfigTypeByModuleName = [
-            'settings'   => [
-                'Resources' => '/adminv2/setting/cms/%s',
-                'Skin Config' => '/adminv2/setting/design/%s',
-                'LMS Policy' => '/adminv2/setting/lms/%s',
-                'Pastoral Care' => '/adminv2/setting/pastoral/%s',
-            ],
-            'comms'      => ['' => '/adminv2/news'],
-            'schoolData' => ['' => '/adminv2/import/schoolDataImport'],
-        ];
-
-        // Also include the navigation elements.
+        // Get search info for admin pages from the Subnav tree structure.
         $subnav = new Subnav($this->getConfigLoader(), $this->getUser());
         $pageList = $subnav->generate();
 
@@ -143,6 +125,24 @@ class Controller extends ConfigController
                 }
             }
         }
+
+        $pb = $this->getConfigMapper()->getPredicateBuilder();
+        $pb->equals('hidden', 'false')
+           ->notEquals('module', 'custom');
+        $foundConfig = $this->getConfigMapper()->findByPredicates($pb);
+
+        // Config settings are found in different pages depending on the module name and config type.
+        // This data structure mimics the structure of $this->userHasAccessToConfigSetting()
+        $urlTemplateByConfigTypeByModuleName = [
+            'settings'   => [
+                'Resources' => '/adminv2/setting/cms/%s',
+                'Skin Config' => '/adminv2/setting/design/%s',
+                'LMS Policy' => '/adminv2/setting/lms/%s',
+                'Pastoral Care' => '/adminv2/setting/pastoral/%s',
+            ],
+            'comms'      => ['' => '/adminv2/news'],
+            'schoolData' => ['' => '/adminv2/import/schoolDataImport'],
+        ];
 
         foreach ($foundConfig as $config) {
             /** @var Config $config */
