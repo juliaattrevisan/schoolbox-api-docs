@@ -1139,14 +1139,7 @@ EOTC,"EOTC Configurations Settings",Teacher,https://vagrant.dev.schoolbox.cloud/
 EOTC,"EOTC Configurations Settings",Student,https://vagrant.dev.schoolbox.cloud/modules/eotc/config/modify,400
 EOTC,"EOTC Configurations Settings",Parent,https://vagrant.dev.schoolbox.cloud/modules/eotc/config/modify,400
 LMS,"Visit pending asses",Superuser,https://vagrant.dev.schoolbox.cloud/learning/pending/,200
-LMS,"Visit pending asses","Badges Moderator",https://vagrant.dev.schoolbox.cloud/learning/pending/,401
-LMS,"Visit pending asses","CMS Moderator",https://vagrant.dev.schoolbox.cloud/learning/pending/,401
-LMS,"Visit pending asses","Calendar Moderator",https://vagrant.dev.schoolbox.cloud/learning/pending/,401
-LMS,"Visit pending asses","Design Moderator",https://vagrant.dev.schoolbox.cloud/learning/pending/,401
 LMS,"Visit pending asses","LMS Moderator",https://vagrant.dev.schoolbox.cloud/learning/pending/,200
-LMS,"Visit pending asses","News Moderator",https://vagrant.dev.schoolbox.cloud/learning/pending/,401
-LMS,"Visit pending asses","Pastoral Moderator",https://vagrant.dev.schoolbox.cloud/learning/pending/,401
-LMS,"Visit pending asses","Timetable Moderator",https://vagrant.dev.schoolbox.cloud/learning/pending/,401
 LMS,"Visit pending asses",Teacher,https://vagrant.dev.schoolbox.cloud/learning/pending/,200
 LMS,"Visit pending asses",Student,https://vagrant.dev.schoolbox.cloud/learning/pending/,401
 LMS,"Visit pending asses",Parent,https://vagrant.dev.schoolbox.cloud/learning/pending/,401
