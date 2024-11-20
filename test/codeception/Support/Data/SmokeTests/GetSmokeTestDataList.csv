@@ -196,7 +196,14 @@ Admin,"Config News",Teacher,https://vagrant.dev.schoolbox.cloud/adminv2/news,401
 Admin,"Config News",Student,https://vagrant.dev.schoolbox.cloud/adminv2/news,401
 Admin,"Config News",Parent,https://vagrant.dev.schoolbox.cloud/adminv2/news,401
 Admin,"Setup allowed files",Superuser,https://vagrant.dev.schoolbox.cloud/adminv2/allowed-file,200
+Admin,"Setup allowed files","Badges Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/allowed-file,401
 Admin,"Setup allowed files","CMS Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/allowed-file,200
+Admin,"Setup allowed files","Calendar Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/allowed-file,401
+Admin,"Setup allowed files","Design Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/allowed-file,401
+Admin,"Setup allowed files","LMS Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/allowed-file,401
+Admin,"Setup allowed files","News Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/allowed-file,401
+Admin,"Setup allowed files","Pastoral Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/allowed-file,401
+Admin,"Setup allowed files","Timetable Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/allowed-file,401
 Admin,"Setup allowed files",Teacher,https://vagrant.dev.schoolbox.cloud/adminv2/allowed-file,401
 Admin,"Setup allowed files",Student,https://vagrant.dev.schoolbox.cloud/adminv2/allowed-file,401
 Admin,"Setup allowed files",Parent,https://vagrant.dev.schoolbox.cloud/adminv2/allowed-file,401
@@ -504,17 +511,38 @@ Admin,"Setup LTI provider",Teacher,https://vagrant.dev.schoolbox.cloud/adminv2/l
 Admin,"Setup LTI provider",Student,https://vagrant.dev.schoolbox.cloud/adminv2/lti,401
 Admin,"Setup LTI provider",Parent,https://vagrant.dev.schoolbox.cloud/adminv2/lti,401
 Admin,"View storage usage",Superuser,https://vagrant.dev.schoolbox.cloud/adminv2/usage,200
+Admin,"View storage usage","Badges Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/usage,401
 Admin,"View storage usage","CMS Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/usage,200
+Admin,"View storage usage","Calendar Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/usage,401
+Admin,"View storage usage","Design Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/usage,401
+Admin,"View storage usage","LMS Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/usage,401
+Admin,"View storage usage","News Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/usage,401
+Admin,"View storage usage","Pastoral Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/usage,401
+Admin,"View storage usage","Timetable Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/usage,401
 Admin,"View storage usage",Teacher,https://vagrant.dev.schoolbox.cloud/adminv2/usage,401
 Admin,"View storage usage",Student,https://vagrant.dev.schoolbox.cloud/adminv2/usage,401
 Admin,"View storage usage",Parent,https://vagrant.dev.schoolbox.cloud/adminv2/usage,401
 Admin,"Resources Settings",Superuser,https://vagrant.dev.schoolbox.cloud/adminv2/setting/cms/Resources,200
+Admin,"Resources Settings","Badges Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/setting/cms/Resources,401
 Admin,"Resources Settings","CMS Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/setting/cms/Resources,200
+Admin,"Resources Settings","Calendar Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/setting/cms/Resources,401
+Admin,"Resources Settings","Design Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/setting/cms/Resources,401
+Admin,"Resources Settings","LMS Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/setting/cms/Resources,401
+Admin,"Resources Settings","News Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/setting/cms/Resources,401
+Admin,"Resources Settings","Pastoral Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/setting/cms/Resources,401
+Admin,"Resources Settings","Timetable Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/setting/cms/Resources,401
 Admin,"Resources Settings",Teacher,https://vagrant.dev.schoolbox.cloud/adminv2/setting/cms/Resources,401
 Admin,"Resources Settings",Student,https://vagrant.dev.schoolbox.cloud/adminv2/setting/cms/Resources,401
 Admin,"Resources Settings",Parent,https://vagrant.dev.schoolbox.cloud/adminv2/setting/cms/Resources,401
 Admin,"Resources Restore",Superuser,https://vagrant.dev.schoolbox.cloud/adminv2/restore,200
+Admin,"Resources Restore","Badges Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/restore,401
 Admin,"Resources Restore","CMS Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/restore,200
+Admin,"Resources Restore","Calendar Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/restore,401
+Admin,"Resources Restore","Design Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/restore,401
+Admin,"Resources Restore","LMS Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/restore,401
+Admin,"Resources Restore","News Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/restore,401
+Admin,"Resources Restore","Pastoral Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/restore,401
+Admin,"Resources Restore","Timetable Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/restore,401
 Admin,"Resources Restore",Teacher,https://vagrant.dev.schoolbox.cloud/adminv2/restore,401
 Admin,"Resources Restore",Student,https://vagrant.dev.schoolbox.cloud/adminv2/restore,401
 Admin,"Resources Restore",Parent,https://vagrant.dev.schoolbox.cloud/adminv2/restore,401
@@ -649,7 +677,14 @@ Admin,"User Management User Provisioning System Staff",Teacher,https://vagrant.d
 Admin,"User Management User Provisioning System Staff",Student,https://vagrant.dev.schoolbox.cloud/adminv2/ups/staff,401
 Admin,"User Management User Provisioning System Staff",Parent,https://vagrant.dev.schoolbox.cloud/adminv2/ups/staff,401
 Admin,"View Media Queue",Superuser,https://vagrant.dev.schoolbox.cloud/adminv2/video,200
+Admin,"View Media Queue","Badges Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/video,401
 Admin,"View Media Queue","CMS Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/video,200
+Admin,"View Media Queue","Calendar Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/video,401
+Admin,"View Media Queue","Design Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/video,401
+Admin,"View Media Queue","LMS Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/video,401
+Admin,"View Media Queue","News Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/video,401
+Admin,"View Media Queue","Pastoral Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/video,401
+Admin,"View Media Queue","Timetable Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/video,401
 Admin,"View Media Queue",Teacher,https://vagrant.dev.schoolbox.cloud/adminv2/video,401
 Admin,"View Media Queue",Student,https://vagrant.dev.schoolbox.cloud/adminv2/video,401
 Admin,"View Media Queue",Parent,https://vagrant.dev.schoolbox.cloud/adminv2/video,401
