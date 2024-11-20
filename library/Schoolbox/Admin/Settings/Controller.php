@@ -146,7 +146,7 @@ class Controller extends ConfigController
                         'Skin Config' => "/adminv2/setting/design/$type",
                         'LMS Policy' => "/adminv2/setting/lms/$type",
                         'Pastoral Care' => "/adminv2/setting/pastoral/$type",
-                        default => "/adminv2/$module",
+                        default => "/adminv2/setting/$type",
                     }
                 ),
                 'comms' => '/adminv2/news',
