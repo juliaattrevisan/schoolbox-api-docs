@@ -4,6 +4,7 @@ Admin,"Go admin dashboard","CMS Moderator",https://vagrant.dev.schoolbox.cloud/a
 Admin,"Go admin dashboard","Design Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/home,200
 Admin,"Go admin dashboard","LMS Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/home,200
 Admin,"Go admin dashboard","News Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/home,200
+Admin,"Go admin dashboard","Pastoral Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/home,200
 Admin,"Go admin dashboard",Teacher,https://vagrant.dev.schoolbox.cloud/adminv2/home,401
 Admin,"Go admin dashboard",Student,https://vagrant.dev.schoolbox.cloud/adminv2/home,401
 Admin,"Go admin dashboard",Parent,https://vagrant.dev.schoolbox.cloud/adminv2/home,401
@@ -350,26 +351,31 @@ Admin,"Lists User Titles",Superuser,https://vagrant.dev.schoolbox.cloud/adminv2/
 Admin,"Lists User Titles",Teacher,https://vagrant.dev.schoolbox.cloud/adminv2/lists/user-title,401
 Admin,"Lists User Titles",Student,https://vagrant.dev.schoolbox.cloud/adminv2/lists/user-title,401
 Admin,"Lists User Titles",Parent,https://vagrant.dev.schoolbox.cloud/adminv2/lists/user-title,401
-Admin,"Review pastoral types",Superuser,https://vagrant.dev.schoolbox.cloud/adminv2/lists/pastoral-type,200
-Admin,"Review pastoral types",Teacher,https://vagrant.dev.schoolbox.cloud/adminv2/lists/pastoral-type,401
-Admin,"Review pastoral types",Student,https://vagrant.dev.schoolbox.cloud/adminv2/lists/pastoral-type,401
-Admin,"Review pastoral types",Parent,https://vagrant.dev.schoolbox.cloud/adminv2/lists/pastoral-type,401
-Admin,"Review pastoral subtypes",Superuser,https://vagrant.dev.schoolbox.cloud/adminv2/lists/pastoral-category,200
-Admin,"Review pastoral subtypes",Teacher,https://vagrant.dev.schoolbox.cloud/adminv2/lists/pastoral-category,401
-Admin,"Review pastoral subtypes",Student,https://vagrant.dev.schoolbox.cloud/adminv2/lists/pastoral-category,401
-Admin,"Review pastoral subtypes",Parent,https://vagrant.dev.schoolbox.cloud/adminv2/lists/pastoral-category,401
-Admin,"Review pastoral sis docs",Superuser,https://vagrant.dev.schoolbox.cloud/adminv2/lists/pastoral-document-classification,200
-Admin,"Review pastoral sis docs",Teacher,https://vagrant.dev.schoolbox.cloud/adminv2/lists/pastoral-document-classification,401
-Admin,"Review pastoral sis docs",Student,https://vagrant.dev.schoolbox.cloud/adminv2/lists/pastoral-document-classification,401
-Admin,"Review pastoral sis docs",Parent,https://vagrant.dev.schoolbox.cloud/adminv2/lists/pastoral-document-classification,401
-Admin,"Review pastoral severity",Superuser,https://vagrant.dev.schoolbox.cloud/adminv2/lists/pastoral-severity,200
-Admin,"Review pastoral severity",Teacher,https://vagrant.dev.schoolbox.cloud/adminv2/lists/pastoral-severity,401
-Admin,"Review pastoral severity",Student,https://vagrant.dev.schoolbox.cloud/adminv2/lists/pastoral-severity,401
-Admin,"Review pastoral severity",Parent,https://vagrant.dev.schoolbox.cloud/adminv2/lists/pastoral-severity,401
-Admin,"Review pastoral tags",Superuser,https://vagrant.dev.schoolbox.cloud/adminv2/lists/pastoral-tags,200
-Admin,"Review pastoral tags",Teacher,https://vagrant.dev.schoolbox.cloud/adminv2/lists/pastoral-tags,401
-Admin,"Review pastoral tags",Student,https://vagrant.dev.schoolbox.cloud/adminv2/lists/pastoral-tags,401
-Admin,"Review pastoral tags",Parent,https://vagrant.dev.schoolbox.cloud/adminv2/lists/pastoral-tags,401
+Admin,"Review pastoral types",Superuser,https://vagrant.dev.schoolbox.cloud/adminv2/lists/pastoral/pastoral-type,200
+Admin,"Review pastoral types","Pastoral Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/lists/pastoral/pastoral-type,200
+Admin,"Review pastoral types",Teacher,https://vagrant.dev.schoolbox.cloud/adminv2/lists/pastoral/pastoral-type,401
+Admin,"Review pastoral types",Student,https://vagrant.dev.schoolbox.cloud/adminv2/lists/pastoral/pastoral-type,401
+Admin,"Review pastoral types",Parent,https://vagrant.dev.schoolbox.cloud/adminv2/lists/pastoral/pastoral-type,401
+Admin,"Review pastoral subtypes",Superuser,https://vagrant.dev.schoolbox.cloud/adminv2/lists/pastoral/pastoral-category,200
+Admin,"Review pastoral subtypes","Pastoral Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/lists/pastoral/pastoral-category,200
+Admin,"Review pastoral subtypes",Teacher,https://vagrant.dev.schoolbox.cloud/adminv2/lists/pastoral/pastoral-category,401
+Admin,"Review pastoral subtypes",Student,https://vagrant.dev.schoolbox.cloud/adminv2/lists/pastoral/pastoral-category,401
+Admin,"Review pastoral subtypes",Parent,https://vagrant.dev.schoolbox.cloud/adminv2/lists/pastoral/pastoral-category,401
+Admin,"Review pastoral sis docs",Superuser,https://vagrant.dev.schoolbox.cloud/adminv2/lists/pastoral/pastoral-document-classification,200
+Admin,"Review pastoral sis docs","Pastoral Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/lists/pastoral/pastoral-document-classification,200
+Admin,"Review pastoral sis docs",Teacher,https://vagrant.dev.schoolbox.cloud/adminv2/lists/pastoral/pastoral-document-classification,401
+Admin,"Review pastoral sis docs",Student,https://vagrant.dev.schoolbox.cloud/adminv2/lists/pastoral/pastoral-document-classification,401
+Admin,"Review pastoral sis docs",Parent,https://vagrant.dev.schoolbox.cloud/adminv2/lists/pastoral/pastoral-document-classification,401
+Admin,"Review pastoral severity",Superuser,https://vagrant.dev.schoolbox.cloud/adminv2/lists/pastoral/pastoral-severity,200
+Admin,"Review pastoral severity","Pastoral Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/lists/pastoral/pastoral-severity,200
+Admin,"Review pastoral severity",Teacher,https://vagrant.dev.schoolbox.cloud/adminv2/lists/pastoral/pastoral-severity,401
+Admin,"Review pastoral severity",Student,https://vagrant.dev.schoolbox.cloud/adminv2/lists/pastoral/pastoral-severity,401
+Admin,"Review pastoral severity",Parent,https://vagrant.dev.schoolbox.cloud/adminv2/lists/pastoral/pastoral-severity,401
+Admin,"Review pastoral tags",Superuser,https://vagrant.dev.schoolbox.cloud/adminv2/lists/pastoral/pastoral-tags,200
+Admin,"Review pastoral tags","Pastoral Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/lists/pastoral/pastoral-tags,200
+Admin,"Review pastoral tags",Teacher,https://vagrant.dev.schoolbox.cloud/adminv2/lists/pastoral/pastoral-tags,401
+Admin,"Review pastoral tags",Student,https://vagrant.dev.schoolbox.cloud/adminv2/lists/pastoral/pastoral-tags,401
+Admin,"Review pastoral tags",Parent,https://vagrant.dev.schoolbox.cloud/adminv2/lists/pastoral/pastoral-tags,401
 Admin,"Review year levels",Superuser,https://vagrant.dev.schoolbox.cloud/adminv2/lists/year-levels,200
 Admin,"Review year levels",Teacher,https://vagrant.dev.schoolbox.cloud/adminv2/lists/year-levels,401
 Admin,"Review year levels",Student,https://vagrant.dev.schoolbox.cloud/adminv2/lists/year-levels,401
@@ -466,10 +472,11 @@ Admin,"Filters Class Markbook","LMS Moderator",https://vagrant.dev.schoolbox.clo
 Admin,"Filters Class Markbook",Teacher,https://vagrant.dev.schoolbox.cloud/adminv2/filters/lms/classMarkbook,401
 Admin,"Filters Class Markbook",Student,https://vagrant.dev.schoolbox.cloud/adminv2/filters/lms/classMarkbook,401
 Admin,"Filters Class Markbook",Parent,https://vagrant.dev.schoolbox.cloud/adminv2/filters/lms/classMarkbook,401
-Admin,"Filters Class Pastoral",Superuser,https://vagrant.dev.schoolbox.cloud/adminv2/filters/classPastoral,200
-Admin,"Filters Class Pastoral",Teacher,https://vagrant.dev.schoolbox.cloud/adminv2/filters/classPastoral,401
-Admin,"Filters Class Pastoral",Student,https://vagrant.dev.schoolbox.cloud/adminv2/filters/classPastoral,401
-Admin,"Filters Class Pastoral",Parent,https://vagrant.dev.schoolbox.cloud/adminv2/filters/classPastoral,401
+Admin,"Filters Class Pastoral",Superuser,https://vagrant.dev.schoolbox.cloud/adminv2/filters/pastoral/classPastoral,200
+Admin,"Filters Class Pastoral","Pastoral Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/filters/pastoral/classPastoral,200
+Admin,"Filters Class Pastoral",Teacher,https://vagrant.dev.schoolbox.cloud/adminv2/filters/pastoral/classPastoral,401
+Admin,"Filters Class Pastoral",Student,https://vagrant.dev.schoolbox.cloud/adminv2/filters/pastoral/classPastoral,401
+Admin,"Filters Class Pastoral",Parent,https://vagrant.dev.schoolbox.cloud/adminv2/filters/pastoral/classPastoral,401
 Admin,"Filters Course Markbook",Superuser,https://vagrant.dev.schoolbox.cloud/adminv2/filters/courseMarkbook,200
 Admin,"Filters Course Markbook",Teacher,https://vagrant.dev.schoolbox.cloud/adminv2/filters/courseMarkbook,401
 Admin,"Filters Course Markbook",Student,https://vagrant.dev.schoolbox.cloud/adminv2/filters/courseMarkbook,401
@@ -534,10 +541,11 @@ Admin,"Modules Package",Superuser,https://vagrant.dev.schoolbox.cloud/adminv2/pa
 Admin,"Modules Package",Teacher,https://vagrant.dev.schoolbox.cloud/adminv2/package,401
 Admin,"Modules Package",Student,https://vagrant.dev.schoolbox.cloud/adminv2/package,401
 Admin,"Modules Package",Parent,https://vagrant.dev.schoolbox.cloud/adminv2/package,401
-Admin,"Modules Pastoral Care",Superuser,https://vagrant.dev.schoolbox.cloud/adminv2/setting/Pastoral+Care,200
-Admin,"Modules Pastoral Care",Teacher,https://vagrant.dev.schoolbox.cloud/adminv2/setting/Pastoral+Care,401
-Admin,"Modules Pastoral Care",Student,https://vagrant.dev.schoolbox.cloud/adminv2/setting/Pastoral+Care,401
-Admin,"Modules Pastoral Care",Parent,https://vagrant.dev.schoolbox.cloud/adminv2/setting/Pastoral+Care,401
+Admin,"Modules Pastoral Care",Superuser,https://vagrant.dev.schoolbox.cloud/adminv2/setting/pastoral/Pastoral%20Care,200
+Admin,"Modules Pastoral Care","Pastoral Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/setting/pastoral/Pastoral%20Care,200
+Admin,"Modules Pastoral Care",Teacher,https://vagrant.dev.schoolbox.cloud/adminv2/setting/pastoral/Pastoral%20Care,401
+Admin,"Modules Pastoral Care",Student,https://vagrant.dev.schoolbox.cloud/adminv2/setting/pastoral/Pastoral%20Care,401
+Admin,"Modules Pastoral Care",Parent,https://vagrant.dev.schoolbox.cloud/adminv2/setting/pastoral/Pastoral%20Care,401
 Admin,"Import school data",Superuser,https://vagrant.dev.schoolbox.cloud/adminv2/import/schoolDataImport,200
 Admin,"Import school data",Teacher,https://vagrant.dev.schoolbox.cloud/adminv2/import/schoolDataImport,401
 Admin,"Import school data",Student,https://vagrant.dev.schoolbox.cloud/adminv2/import/schoolDataImport,401
@@ -828,10 +836,15 @@ LMS,"QR Code page",Parent,https://vagrant.dev.schoolbox.cloud/qrcode/83,401
 "Resource Booking","View booking report",Student,https://vagrant.dev.schoolbox.cloud/resource-booking/report,401
 "Resource Booking","View booking report",Parent,https://vagrant.dev.schoolbox.cloud/resource-booking/report,401
 Pastoral,"View pastoral dashboard",Superuser,https://vagrant.dev.schoolbox.cloud/pastoral,200
+Pastoral,"View pastoral dashboard","Pastoral Moderator",https://vagrant.dev.schoolbox.cloud/pastoral,200
 Pastoral,"View pastoral dashboard",Teacher,https://vagrant.dev.schoolbox.cloud/pastoral,200
 Pastoral,"View pastoral dashboard",Student,https://vagrant.dev.schoolbox.cloud/pastoral,401
 Pastoral,"View pastoral dashboard",Parent,https://vagrant.dev.schoolbox.cloud/pastoral,401
-Pastoral,"View pastoral dashboard","Pastoral Moderator",https://vagrant.dev.schoolbox.cloud/pastoral,200
+Pastoral,"View pastoral bulk import",Superuser,https://vagrant.dev.schoolbox.cloud/pastoral/bulk-import,200
+Pastoral,"View pastoral bulk import","Pastoral Moderator",https://vagrant.dev.schoolbox.cloud/pastoral/bulk-import,200
+Pastoral,"View pastoral bulk import",Teacher,https://vagrant.dev.schoolbox.cloud/pastoral/bulk-import,200
+Pastoral,"View pastoral bulk import",Student,https://vagrant.dev.schoolbox.cloud/pastoral/bulk-import,401
+Pastoral,"View pastoral bulk import",Parent,https://vagrant.dev.schoolbox.cloud/pastoral/bulk-import,401
 Pastoral,"View all reports",Superuser,https://vagrant.dev.schoolbox.cloud/pastoral/report,200
 Pastoral,"View all reports",Teacher,https://vagrant.dev.schoolbox.cloud/pastoral/report,200
 Pastoral,"View all reports",Student,https://vagrant.dev.schoolbox.cloud/pastoral/report,401
@@ -848,10 +861,10 @@ Pastoral,"View a report",Student,https://vagrant.dev.schoolbox.cloud/pastoral/re
 Pastoral,"View a report",Parent,https://vagrant.dev.schoolbox.cloud/pastoral/report/results/1,401
 Pastoral,"View a report","Pastoral Moderator",https://vagrant.dev.schoolbox.cloud/pastoral/report/results/1,200
 Pastoral,"Group management",Superuser,https://vagrant.dev.schoolbox.cloud/pastoral/management/groups,403
+Pastoral,"Group management","Pastoral Moderator",https://vagrant.dev.schoolbox.cloud/pastoral/management/groups,200
 Pastoral,"Group management",Teacher,https://vagrant.dev.schoolbox.cloud/pastoral/management/groups,403
 Pastoral,"Group management",Student,https://vagrant.dev.schoolbox.cloud/pastoral/management/groups,403
 Pastoral,"Group management",Parent,https://vagrant.dev.schoolbox.cloud/pastoral/management/groups,403
-Pastoral,"Group management","Pastoral Moderator",https://vagrant.dev.schoolbox.cloud/pastoral/management/groups,200
 Pastoral,"Create a group",Superuser,https://vagrant.dev.schoolbox.cloud/pastoral/management/groups/modify,403
 Pastoral,"Create a group",Teacher,https://vagrant.dev.schoolbox.cloud/pastoral/management/groups/modify,403
 Pastoral,"Create a group",Student,https://vagrant.dev.schoolbox.cloud/pastoral/management/groups/modify,403
@@ -863,10 +876,10 @@ Pastoral,"Modify a group",Student,https://vagrant.dev.schoolbox.cloud/pastoral/m
 Pastoral,"Modify a group",Parent,https://vagrant.dev.schoolbox.cloud/pastoral/management/groups/modify/1,403
 Pastoral,"Modify a group","Pastoral Moderator",https://vagrant.dev.schoolbox.cloud/pastoral/management/groups/modify/1,200
 Pastoral,"Manage visibility",Superuser,https://vagrant.dev.schoolbox.cloud/pastoral/management/audience,403
+Pastoral,"Manage visibility","Pastoral Moderator",https://vagrant.dev.schoolbox.cloud/pastoral/management/audience,200
 Pastoral,"Manage visibility",Teacher,https://vagrant.dev.schoolbox.cloud/pastoral/management/audience,403
 Pastoral,"Manage visibility",Student,https://vagrant.dev.schoolbox.cloud/pastoral/management/audience,403
 Pastoral,"Manage visibility",Parent,https://vagrant.dev.schoolbox.cloud/pastoral/management/audience,403
-Pastoral,"Manage visibility","Pastoral Moderator",https://vagrant.dev.schoolbox.cloud/pastoral/management/audience,200
 Pastoral,"Create a record for student",Superuser,https://vagrant.dev.schoolbox.cloud/pastoral/student/25/record/insert,200
 Pastoral,"Create a record for student",Teacher,https://vagrant.dev.schoolbox.cloud/pastoral/student/25/record/insert,200
 Pastoral,"Create a record for student",Student,https://vagrant.dev.schoolbox.cloud/pastoral/student/25/record/insert,401
