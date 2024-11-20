@@ -138,6 +138,21 @@ window.Vue.watch(
                         </p>
                     </div>
                 </template>
+                <template v-if="popOutStore.usage.rubric.unit && popOutStore.usage.rubric.unit.capabilities.length > 0">
+                    <h5 class="l-pad-xs--bottom f-no-margins">
+                        <a :href="popOutStore.usage.rubric.unit._links.view">Unit Rubrics</a>
+                    </h5>
+                    <div v-for="capability in popOutStore.usage.rubric.unit.capabilities" :key="capability.name">
+                        <p class="f-no-margins">
+                            <b>{{ capability.name }}</b
+                            ><br />
+                            <template v-for="(indicator, index) in capability.indicators" :key="indicator.name">
+                                {{ indicator.name }}
+                                <template v-if="index < capability.indicators.length - 1"><br /></template>
+                            </template>
+                        </p>
+                    </div>
+                </template>
             </div>
         </div>
     </div>
