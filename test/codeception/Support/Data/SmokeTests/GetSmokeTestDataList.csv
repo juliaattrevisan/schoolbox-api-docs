@@ -177,7 +177,7 @@ Admin,"Setup grades",Teacher,https://vagrant.dev.schoolbox.cloud/adminv2/grades,
 Admin,"Setup grades",Student,https://vagrant.dev.schoolbox.cloud/adminv2/grades,401
 Admin,"Setup grades",Parent,https://vagrant.dev.schoolbox.cloud/adminv2/grades,401
 Admin,"Lesson Plan Templates",Superuser,https://vagrant.dev.schoolbox.cloud/adminv2/lesson-plan/template,200
-Admin,"Lesson Plan Templates","LMS Templates",https://vagrant.dev.schoolbox.cloud/adminv2/lesson-plan/template,200
+Admin,"Lesson Plan Templates","LMS Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/lesson-plan/template,200
 Admin,"Lesson Plan Templates",Teacher,https://vagrant.dev.schoolbox.cloud/adminv2/lesson-plan/template,401
 Admin,"Lesson Plan Templates",Student,https://vagrant.dev.schoolbox.cloud/adminv2/lesson-plan/template,401
 Admin,"Lesson Plan Templates",Parent,https://vagrant.dev.schoolbox.cloud/adminv2/lesson-plan/template,401
