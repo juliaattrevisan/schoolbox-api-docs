@@ -138,8 +138,11 @@ class Controller extends BaseController
         $viewer = $this->getUser();
 
         /* Pastoral Count injection
+         *
+         * Find out if Pastoral Care is enabled and that you have access to a student's pastoral care records
+         * If you do, remember its url
          */
-        $showPastoral = $this->getConfigLoader()->get(ConfigMapper::NAME_PASTORAL_ENABLED) && $this->getAuthorizer()->isPathAuthorizedForUser(
+        $pastoralUrl = $this->getAuthorizer()->isPathAuthorizedForUser(
             'pastoral.getStudent',
             [
                 'studentId' => $viewee->getId(),
@@ -147,6 +150,12 @@ class Controller extends BaseController
             ],
             $viewer
         );
+
+        $showPastoral = false;
+
+        if ($this->getConfigLoader()->get(ConfigMapper::NAME_PASTORAL_ENABLED) && $pastoralUrl) {
+            $showPastoral = true;
+        }
 
         $pastoralCountHelper = null;
         $pastoralCountPeriod = null;
@@ -526,7 +535,7 @@ class Controller extends BaseController
                  *
                  * We needed to keep this
                  */
-                'showPastoral' => $showPastoral,
+                'pastoralUrl' => $pastoralUrl,
                 /* This now includes system buttons - there's no longer really a distinction between system and
                  * custom buttons, as far as the end user is concerned
                  */

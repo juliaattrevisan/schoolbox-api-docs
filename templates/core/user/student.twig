@@ -38,7 +38,6 @@
         userIds: user.id
     }
 ) %}
-{% set pastoralUrl = showPastoral ? routeLookupIfAuthorized('pastoral.getStudent',{studentId: user.id}) : null %}
 {##
  # Is the current user viewing their own profile?
  # This affects some links and metadata displayed.
@@ -98,7 +97,9 @@
                      # settings and add fields to the payload that was provided by the backend.
                      #
                      # showEmail: This checked for role permissions, email existence, etc. we need to keep
-                     # showPastoral: This checked for permissions, routes, etc. we need to keep
+                     # pastoralUrl: A url for this student's records; it's set only if pastoral care is enabled
+                     #    and you can get there via a routeLookupIfAuthorized check in the backend. Supersedes
+                     #    the old usage of showPastoral+pastoralUrl
                      #}
                     {% set additionalConstraints = {
                         'student': {
@@ -113,7 +114,7 @@
                             'email': showEmail,
                             'formTeacher': USER.role.viewStudentProfile and user.isShowTimetable,
                             'hohTeacher': USER.role.viewStudentProfile and user.isShowTimetable,
-                            'pastoralCounts': USER.role.viewStudentProfile and showPastoral,
+                            'pastoralCounts': USER.role.viewStudentProfile and pastoralUrl,
                             'StudentForm': USER.role.viewStudentProfile and user.isShowTimetable,
                             'StudentTutorDescription': USER.role.viewStudentProfile and user.isShowTimetable,
                             'tutorTeacher': USER.role.viewStudentProfile and user.isShowTimetable
@@ -259,17 +260,20 @@
                                 '_default': true,
                                 'duework': config.lms_enabled,
                                 'eportfolio': eportfolioAuth,
+                                'grades': config.lms_enabled,
                             },
                             'parent': {
                                 '_default': true,
                                 'duework': config.lms_enabled,
                                 'eportfolio': eportfolioAuth,
+                                'grades': config.lms_enabled,
                             },
                             'staff': {
                                 '_default': USER.role.viewStudentProfile,
                                 'duework': USER.role.viewStduentProfile and config.lms_enabled,
                                 'eportfolio': USER.role.viewStudentProfile and eportfolioAuth,
-                                'pastoral': USER.role.viewStudentProfile and showPastoral and pastoralUrl,
+                                'grades': config.lms_enabled,
+                                'pastoral': USER.role.viewStudentProfile and pastoralUrl,
                                 'timetable': USER.role.viewStudentProfile and user.isShowTimetable,
                                 'pastoralsynergetic': USER.role.viewStudentProfile and config.external_type == 'synergetic' and config.external_staff_portal,
                                 'documentmanagement': USER.role.viewStudentProfile and config.external_document_report_enabled and config.external_document_button_enable,
