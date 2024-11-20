@@ -530,11 +530,11 @@ Admin,"Import photos",Superuser,https://vagrant.dev.schoolbox.cloud/adminv2/impo
 Admin,"Import photos",Teacher,https://vagrant.dev.schoolbox.cloud/adminv2/import/photos/upload,401
 Admin,"Import photos",Student,https://vagrant.dev.schoolbox.cloud/adminv2/import/photos/upload,401
 Admin,"Import photos",Parent,https://vagrant.dev.schoolbox.cloud/adminv2/import/photos/upload,401
-Admin,"Import profile",Superuser,https://vagrant.dev.schoolbox.cloud/adminv2/import/profile/upload,200
-Admin,"Import profile","Timetable Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/import/profile/upload,200
-Admin,"Import profile",Teacher,https://vagrant.dev.schoolbox.cloud/adminv2/import/profile/upload,401
-Admin,"Import profile",Student,https://vagrant.dev.schoolbox.cloud/adminv2/import/profile/upload,401
-Admin,"Import profile",Parent,https://vagrant.dev.schoolbox.cloud/adminv2/import/profile/upload,401
+Admin,"Import profile",Superuser,https://vagrant.dev.schoolbox.cloud/adminv2/import/profile,200
+Admin,"Import profile","Timetable Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/import/profile,200
+Admin,"Import profile",Teacher,https://vagrant.dev.schoolbox.cloud/adminv2/import/profile,401
+Admin,"Import profile",Student,https://vagrant.dev.schoolbox.cloud/adminv2/import/profile,401
+Admin,"Import profile",Parent,https://vagrant.dev.schoolbox.cloud/adminv2/import/profile,401
 Admin,"Modules Home",Superuser,https://vagrant.dev.schoolbox.cloud/adminv2/setting/Modules,200
 Admin,"Modules Home",Teacher,https://vagrant.dev.schoolbox.cloud/adminv2/setting/Modules,401
 Admin,"Modules Home",Student,https://vagrant.dev.schoolbox.cloud/adminv2/setting/Modules,401
