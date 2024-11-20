@@ -852,7 +852,7 @@ Pastoral,"View pastoral dashboard",Student,https://vagrant.dev.schoolbox.cloud/p
 Pastoral,"View pastoral dashboard",Parent,https://vagrant.dev.schoolbox.cloud/pastoral,401
 Pastoral,"View pastoral bulk import",Superuser,https://vagrant.dev.schoolbox.cloud/pastoral/bulk-import,200
 Pastoral,"View pastoral bulk import","Pastoral Moderator",https://vagrant.dev.schoolbox.cloud/pastoral/bulk-import,200
-Pastoral,"View pastoral bulk import",Teacher,https://vagrant.dev.schoolbox.cloud/pastoral/bulk-import,200
+Pastoral,"View pastoral bulk import",Teacher,https://vagrant.dev.schoolbox.cloud/pastoral/bulk-import,401
 Pastoral,"View pastoral bulk import",Student,https://vagrant.dev.schoolbox.cloud/pastoral/bulk-import,401
 Pastoral,"View pastoral bulk import",Parent,https://vagrant.dev.schoolbox.cloud/pastoral/bulk-import,401
 Pastoral,"View all reports",Superuser,https://vagrant.dev.schoolbox.cloud/pastoral/report,200
