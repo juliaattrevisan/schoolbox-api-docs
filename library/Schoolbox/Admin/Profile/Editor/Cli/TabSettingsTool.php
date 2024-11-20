@@ -276,7 +276,7 @@ HELP;
                 ],
                 'contacts' => [
                     'availability' => $campusIds,
-                    'visibility' => [self::ROLETYPE_SELF, self::ROLETYPE_PARENT, self::ROLETYPE_STAFF],
+                    'visibility' => [self::ROLETYPE_PARENT, self::ROLETYPE_STAFF],
                 ],
             ],
         ];
