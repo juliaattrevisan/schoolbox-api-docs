@@ -283,7 +283,7 @@
                                 'documentmanagement': USER.role.viewStudentProfile and config.external_document_report_enabled
                                 'geosnapshot': USER.role.viewStudentProfile and isGeosnapshotAvailable,
                                 'emailstaff': USER.role.viewStudentProfile and config.mail_enable and session.user.email,
-                                'emailparents': USER.role.viewStudentProfile and config.mail_enable and config.email_all_parents and session.user.email and user.isShowContacts
+                                'emailparents': USER.role.viewStudentProfile and config.mail_enable and session.user.email and user.isShowContacts
                             }
                         } %}
 
