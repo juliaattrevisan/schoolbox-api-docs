@@ -147,10 +147,12 @@ class Controller extends ConfigController
         foreach ($foundConfig as $config) {
             /** @var Config $config */
             $type = $config->getType() ? $config->getType()->getType() : '';
-            $urlTemplateByConfigType = $urlTemplateByConfigTypeByModuleName[$config->getModule()];
-            $url = isset($urlTemplateByConfigType[$type])
+            $urlTemplateByConfigType = $urlTemplateByConfigTypeByModuleName[$config->getModule()] ?? null;
+            $url = (
+                ($urlTemplateByConfigType !== null && isset($urlTemplateByConfigType[$type]))
                 ? sprintf($urlTemplateByConfigType[$type], $type)
-                : sprintf("/adminv2/%s", $config->getModule());
+                : sprintf("/adminv2/%s", $config->getModule())
+            );
 
             if (in_array($url, $hiddenUrls)) {
                 continue;
