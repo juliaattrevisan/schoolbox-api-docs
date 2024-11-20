@@ -339,14 +339,15 @@ class Controller extends ConfigController
     }
 
     /**
-     * @param string $module
-     * @param string $type
+     * Return the admin settings page URL given the $module and $config type.
+     *
+     * @param string $module - From `config`.`module` enum value.
+     * @param string $type   - From `lu_config_type`.`type`.
      * @return string
      */
     private function getSettingsPageUrl(string $module, string $type): string
     {
-        // Config settings are found in different pages depending on the module name and config type.
-        // The code below matches the structure of $this->userHasAccessToConfigSetting().
+        // The code structure below matches the structure of $this->userHasAccessToConfigSetting().
         return match ($module) {
             'settings' => (
                 match ($type) {
@@ -357,9 +358,9 @@ class Controller extends ConfigController
                     default         => "/adminv2/setting/$type",          // E.g. /adminv2/setting/Modules
                 }
             ),
-            'comms' => '/adminv2/news',
+            'comms'      => '/adminv2/news',
             'schoolData' => '/adminv2/import/schoolDataImport',
-            default => "/adminv2/$module", // E.g. /adminv2/lti
+            default      => "/adminv2/$module", // E.g. /adminv2/lti
         };
     }
 
