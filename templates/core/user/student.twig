@@ -265,12 +265,14 @@
                                 'duework': config.lms_enabled,
                                 'eportfolio': eportfolioAuth,
                                 'grades': config.lms_enabled,
+                                'timetable': config.lms_enabled and user.isShowTimetable,
                             },
                             'parent': {
                                 '_default': true,
                                 'duework': config.lms_enabled,
                                 'eportfolio': eportfolioAuth,
                                 'grades': config.lms_enabled,
+                                'timetable': config.lms_enabled and user.isShowTimetable,
                             },
                             'staff': {
                                 '_default': USER.role.viewStudentProfile,
@@ -278,7 +280,7 @@
                                 'eportfolio': USER.role.viewStudentProfile and eportfolioAuth,
                                 'grades': config.lms_enabled,
                                 'pastoral': USER.role.viewStudentProfile and pastoralUrl,
-                                'timetable': USER.role.viewStudentProfile and user.isShowTimetable,
+                                'timetable': USER.role.viewStudentProfile and config.lms_enabled and user.isShowTimetable,
                                 'pastoralsynergetic': USER.role.viewStudentProfile and config.external_type == 'synergetic' and config.external_staff_portal,
                                 'documentmanagement': USER.role.viewStudentProfile and config.external_document_report_enabled
                                 'geosnapshot': USER.role.viewStudentProfile and isGeosnapshotAvailable,
