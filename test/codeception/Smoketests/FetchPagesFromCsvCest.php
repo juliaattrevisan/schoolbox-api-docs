@@ -66,7 +66,6 @@ class FetchPagesFromCsvCest
      *
      * @param IntegrationTester $i
      *
-     */
     public function getFailure404(IntegrationTester $i)
     {
         #GIVEN
@@ -89,7 +88,7 @@ class FetchPagesFromCsvCest
      * @param IntegrationTester $i
      * @param Scenario          $scenario
      * @throws \JsonException
-     */
+     *
     public function getFailureSitePagePermissionDenied(IntegrationTester $i, Scenario $scenario): void
     {
         #GIVEN
@@ -124,7 +123,6 @@ class FetchPagesFromCsvCest
      *
      * @param IntegrationTester $i
      *
-     */
     public function getFailureAuraPermissionDenied(IntegrationTester $i, Scenario $scenario): void
     {
         $page                 = '/adminv2/setting';
