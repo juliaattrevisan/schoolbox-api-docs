@@ -142,16 +142,16 @@ class Controller extends ConfigController
             $url = match ($module) {
                 'settings' => (
                     match ($type) {
-                        'Resources' => sprintf('/adminv2/setting/cms/%s', $type),
-                        'Skin Config' => sprintf('/adminv2/setting/design/%s', $type),
-                        'LMS Policy' => sprintf('/adminv2/setting/lms/%s', $type),
-                        'Pastoral Care' => sprintf('/adminv2/setting/pastoral/%s', $type),
-                        default => sprintf('/adminv2/%s', $module),
+                        'Resources' => "/adminv2/setting/cms/$type",
+                        'Skin Config' => "/adminv2/setting/design/$type",
+                        'LMS Policy' => "/adminv2/setting/lms/$type",
+                        'Pastoral Care' => "/adminv2/setting/pastoral/$type",
+                        default => "/adminv2/$module",
                     }
                 ),
                 'comms' => '/adminv2/news',
                 'schoolData' => '/adminv2/import/schoolDataImport',
-                default => sprintf('/adminv2/%s', $module),
+                default => "/adminv2/$module",
             };
 
             if (in_array($url, $hiddenUrls)) {
