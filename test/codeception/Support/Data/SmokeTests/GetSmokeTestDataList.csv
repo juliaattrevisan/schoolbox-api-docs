@@ -1264,14 +1264,7 @@ LMS,"QR Code page",Parent,https://vagrant.dev.schoolbox.cloud/qrcode/83,401
 "Resource Booking","View booking report",Student,https://vagrant.dev.schoolbox.cloud/resource-booking/report,401
 "Resource Booking","View booking report",Parent,https://vagrant.dev.schoolbox.cloud/resource-booking/report,401
 Pastoral,"View pastoral dashboard",Superuser,https://vagrant.dev.schoolbox.cloud/pastoral,200
-Pastoral,"View pastoral dashboard","Badges Moderator",https://vagrant.dev.schoolbox.cloud/pastoral,401
-Pastoral,"View pastoral dashboard","CMS Moderator",https://vagrant.dev.schoolbox.cloud/pastoral,401
-Pastoral,"View pastoral dashboard","Calendar Moderator",https://vagrant.dev.schoolbox.cloud/pastoral,401
-Pastoral,"View pastoral dashboard","Design Moderator",https://vagrant.dev.schoolbox.cloud/pastoral,401
-Pastoral,"View pastoral dashboard","LMS Moderator",https://vagrant.dev.schoolbox.cloud/pastoral,401
-Pastoral,"View pastoral dashboard","News Moderator",https://vagrant.dev.schoolbox.cloud/pastoral,401
 Pastoral,"View pastoral dashboard","Pastoral Moderator",https://vagrant.dev.schoolbox.cloud/pastoral,200
-Pastoral,"View pastoral dashboard","Timetable Moderator",https://vagrant.dev.schoolbox.cloud/pastoral,401
 Pastoral,"View pastoral dashboard",Teacher,https://vagrant.dev.schoolbox.cloud/pastoral,200
 Pastoral,"View pastoral dashboard",Student,https://vagrant.dev.schoolbox.cloud/pastoral,401
 Pastoral,"View pastoral dashboard",Parent,https://vagrant.dev.schoolbox.cloud/pastoral,401
