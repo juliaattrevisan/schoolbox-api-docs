@@ -244,17 +244,38 @@ Admin,"Import a calendar",Teacher,https://vagrant.dev.schoolbox.cloud/adminv2/ca
 Admin,"Import a calendar",Student,https://vagrant.dev.schoolbox.cloud/adminv2/calendar,401
 Admin,"Import a calendar",Parent,https://vagrant.dev.schoolbox.cloud/adminv2/calendar,401
 Admin,"Import a calendar calendar/import",Superuser,https://vagrant.dev.schoolbox.cloud/adminv2/calendar/Import,200
+Admin,"Import a calendar calendar/import","Badges Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/calendar/Import,401
+Admin,"Import a calendar calendar/import","CMS Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/calendar/Import,401
 Admin,"Import a calendar calendar/import","Calendar Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/calendar/Import,200
+Admin,"Import a calendar calendar/import","Design Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/calendar/Import,401
+Admin,"Import a calendar calendar/import","LMS Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/calendar/Import,401
+Admin,"Import a calendar calendar/import","News Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/calendar/Import,401
+Admin,"Import a calendar calendar/import","Pastoral Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/calendar/Import,401
+Admin,"Import a calendar calendar/import","Timetable Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/calendar/Import,401
 Admin,"Import a calendar calendar/import",Teacher,https://vagrant.dev.schoolbox.cloud/adminv2/calendar/Import,401
 Admin,"Import a calendar calendar/import",Student,https://vagrant.dev.schoolbox.cloud/adminv2/calendar/Import,401
 Admin,"Import a calendar calendar/import",Parent,https://vagrant.dev.schoolbox.cloud/adminv2/calendar/Import,401
 Admin,"Subscribe to a calendar",Superuser,https://vagrant.dev.schoolbox.cloud/adminv2/calendar/Subscribe,200
+Admin,"Subscribe to a calendar","Badges Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/calendar/Subscribe,401
+Admin,"Subscribe to a calendar","CMS Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/calendar/Subscribe,401
 Admin,"Subscribe to a calendar","Calendar Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/calendar/Subscribe,200
+Admin,"Subscribe to a calendar","Design Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/calendar/Subscribe,401
+Admin,"Subscribe to a calendar","LMS Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/calendar/Subscribe,401
+Admin,"Subscribe to a calendar","News Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/calendar/Subscribe,401
+Admin,"Subscribe to a calendar","Pastoral Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/calendar/Subscribe,401
+Admin,"Subscribe to a calendar","Timetable Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/calendar/Subscribe,401
 Admin,"Subscribe to a calendar",Teacher,https://vagrant.dev.schoolbox.cloud/adminv2/calendar/Subscribe,401
 Admin,"Subscribe to a calendar",Student,https://vagrant.dev.schoolbox.cloud/adminv2/calendar/Subscribe,401
 Admin,"Subscribe to a calendar",Parent,https://vagrant.dev.schoolbox.cloud/adminv2/calendar/Subscribe,401
 Admin,"Cleanup calendar",Superuser,https://vagrant.dev.schoolbox.cloud/adminv2/calendar/Cleanup,200
+Admin,"Cleanup calendar","Badges Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/calendar/Cleanup,401
+Admin,"Cleanup calendar","CMS Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/calendar/Cleanup,401
 Admin,"Cleanup calendar","Calendar Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/calendar/Cleanup,200
+Admin,"Cleanup calendar","Design Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/calendar/Cleanup,401
+Admin,"Cleanup calendar","LMS Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/calendar/Cleanup,401
+Admin,"Cleanup calendar","News Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/calendar/Cleanup,401
+Admin,"Cleanup calendar","Pastoral Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/calendar/Cleanup,401
+Admin,"Cleanup calendar","Timetable Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/calendar/Cleanup,401
 Admin,"Cleanup calendar",Teacher,https://vagrant.dev.schoolbox.cloud/adminv2/calendar/Cleanup,401
 Admin,"Cleanup calendar",Student,https://vagrant.dev.schoolbox.cloud/adminv2/calendar/Cleanup,401
 Admin,"Cleanup calendar",Parent,https://vagrant.dev.schoolbox.cloud/adminv2/calendar/Cleanup,401
@@ -425,7 +446,14 @@ Admin,"Review campus list",Teacher,https://vagrant.dev.schoolbox.cloud/adminv2/l
 Admin,"Review campus list",Student,https://vagrant.dev.schoolbox.cloud/adminv2/lists/campus,401
 Admin,"Review campus list",Parent,https://vagrant.dev.schoolbox.cloud/adminv2/lists/campus,401
 Admin,"Review event types",Superuser,https://vagrant.dev.schoolbox.cloud/adminv2/lists/calendar/event-type,200
+Admin,"Review event types","Badges Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/lists/calendar/event-type,401
+Admin,"Review event types","CMS Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/lists/calendar/event-type,401
 Admin,"Review event types","Calendar Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/lists/calendar/event-type,200
+Admin,"Review event types","Design Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/lists/calendar/event-type,401
+Admin,"Review event types","LMS Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/lists/calendar/event-type,401
+Admin,"Review event types","News Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/lists/calendar/event-type,401
+Admin,"Review event types","Pastoral Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/lists/calendar/event-type,401
+Admin,"Review event types","Timetable Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/lists/calendar/event-type,401
 Admin,"Review event types",Teacher,https://vagrant.dev.schoolbox.cloud/adminv2/lists/calendar/event-type,401
 Admin,"Review event types",Student,https://vagrant.dev.schoolbox.cloud/adminv2/lists/calendar/event-type,401
 Admin,"Review event types",Parent,https://vagrant.dev.schoolbox.cloud/adminv2/lists/calendar/event-type,401
