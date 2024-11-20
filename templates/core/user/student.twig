@@ -281,7 +281,6 @@
                                 'grades': config.lms_enabled,
                                 'pastoral': USER.role.viewStudentProfile and pastoralUrl,
                                 'timetable': USER.role.viewStudentProfile and config.lms_enabled and user.isShowTimetable,
-                                'pastoralsynergetic': USER.role.viewStudentProfile and config.external_type == 'synergetic' and config.external_staff_portal,
                                 'documentmanagement': USER.role.viewStudentProfile and config.external_document_report_enabled,
                                 'geosnapshot': USER.role.viewStudentProfile and isGeosnapshotAvailable,
                                 'emailstaff': USER.role.viewStudentProfile and config.mail_enable and session.user.email,
