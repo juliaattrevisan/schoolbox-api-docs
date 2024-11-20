@@ -19,6 +19,10 @@ interface Props {
 }
 const props = defineProps<Props>();
 
+const emit = defineEmits<{
+    click: [course: Course, unit: Unit, buttonEl: HTMLButtonElement];
+}>();
+
 const isCountZero = window.Vue.computed(() => props.count === 0); // don't need a button when it's zero
 const buttonId = window.Vue.computed(() => `usage-button-${props.course.id}-${props.unit.id}-${props.node.id}`);
 const buttonEl = useTemplateRef<HTMLButtonElement>("buttonEl");
@@ -28,7 +32,7 @@ const popOutStore = usePopOutStore();
  * Open the pop out
  */
 function onClick(): void {
-    popOutStore.setActive(props.course, props.unit, props.node, buttonEl.value as HTMLButtonElement, props.isExpanded);
+    emit("click", props.course, props.unit, buttonEl.value as HTMLButtonElement);
 }
 </script>
 

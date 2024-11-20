@@ -11,6 +11,7 @@ import type { Unit } from "@schoolboxLibrary/types/Unit";
 import type { CurriculumCoverageNode } from "../js/types/curriculumCoverageTypes";
 import { useReportStore } from "./store/ccReportStore";
 import { useFiltersStore } from "./store/ccFiltersStore";
+import { usePopOutStore } from "./store/ccPopOutStore";
 import { ReportOptionValues } from "../js/types/curriculumCoverageTypes";
 import CcReportTableNodeUnit from "./cc-report-table-node-unit.vue";
 
@@ -202,6 +203,27 @@ function onTitleClicked(): void {
 function onChildTitleClicked(node: CurriculumCoverageNode): void {
     emit("titleClick", node);
 }
+
+// #region unit selection, open pop out
+
+const popOutStore = usePopOutStore();
+
+/**
+ * When a unit is clicked, open the pop out
+ * @param course - the course that was clicked
+ * @param unit - the unit that was clicked
+ * @param buttonEl - the button that was clicked
+ */
+function onUnitClicked(course: Course, unit: Unit, buttonEl: HTMLButtonElement): void {
+    // expand the node if it has children and is not expanded
+    // this is so the usage count only shows the count for the node and not its children
+    if (showExpandButton.value && !isExpanded.value) {
+        isExpanded.value = true;
+    }
+    popOutStore.setActive(course, unit, props.node, buttonEl);
+}
+
+// #endregion
 </script>
 
 <template>
@@ -241,6 +263,7 @@ function onChildTitleClicked(node: CurriculumCoverageNode): void {
                 :node="props.node"
                 :count="getUnitUsageCount(props.node, course, unit)"
                 :is-expanded="isExpanded"
+                @click="onUnitClicked"
             />
             <td v-if="reportStore.hasMultipleCourses" :class="``">
                 {{ getTotalUsageCount(props.node, course) }}
