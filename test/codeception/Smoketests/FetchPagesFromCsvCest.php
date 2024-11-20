@@ -53,6 +53,7 @@ class FetchPagesFromCsvCest
                 'userAccess',
                 [
                     'uid' => $i->grabFromDatabase('user', 'id', ['username' => $this->personas[$personaName]['username']]),
+                    'sid' => ($personaName === 'Calendar Moderator') ? 1 : 0, // The calendar service requires sid to link to luCampus.id.
                     'service' => $serviceId,
                     'type' => UserAccess::ACCESS_FULL,
                     'created_at' => date('Y-m-d H:i:s'),
