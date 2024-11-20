@@ -82,6 +82,7 @@
     <div class="small-12 island">
         <section class="no-pad">
             <div class="profile content">
+                {# Profile Editor: Fields #}
                 <div class="row no-margin">
                     {# Build a hash lookup of additional clauses and cross-reference them
                      # This list is your last opportunity to show/hide a field based on your
@@ -248,6 +249,9 @@
                 </div>
             </div>
 
+            {# Profile Editor: Buttons
+             # Note that these are configured in the Profile Buttons part of admin, separate to the Profile Editor
+             #}
             {% block buttons_island %}
                 <ul class='flex-list flex-wrap buttons'>
                     {% block buttons %}
@@ -352,8 +356,7 @@
     </div>
 </div>
 
-
-{# Tabs #}
+{# Profile Editor: Tabs #}
 <div class="row">
     <div class="small-12 island">
         {# Programmatically detect the anchor value and select that tab via foundation
