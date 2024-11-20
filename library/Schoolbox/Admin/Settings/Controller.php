@@ -133,26 +133,26 @@ class Controller extends ConfigController
 
         foreach ($foundConfig as $config) {
             /** @var Config $config */
+
+            $module = $config->getModule();
             $type = $config->getType() ? $config->getType()->getType() : '';
 
             // Config settings are found in different pages depending on the module name and config type.
             // The code below mimics the structure of $this->userHasAccessToConfigSetting().
-            $urlTemplate = match ($config->getModule()) {
+            $url = match ($module) {
                 'settings' => (
                     match ($type) {
-                        'Resources' => '/adminv2/setting/cms/%s',
-                        'Skin Config' => '/adminv2/setting/design/%s',
-                        'LMS Policy' => '/adminv2/setting/lms/%s',
-                        'Pastoral Care' => '/adminv2/setting/pastoral/%s',
-                        default => '/adminv2/%s',
+                        'Resources' => sprintf('/adminv2/setting/cms/%s', $type),
+                        'Skin Config' => sprintf('/adminv2/setting/design/%s', $type),
+                        'LMS Policy' => sprintf('/adminv2/setting/lms/%s', $type),
+                        'Pastoral Care' => sprintf('/adminv2/setting/pastoral/%s', $type),
+                        default => sprintf('/adminv2/%s', $module),
                     }
                 ),
                 'comms' => '/adminv2/news',
                 'schoolData' => '/adminv2/import/schoolDataImport',
-                default => '/adminv2/%s',
+                default => sprintf('/adminv2/%s', $module),
             };
-
-            $url = sprintf($urlTemplate, $config->getModule());
 
             if (in_array($url, $hiddenUrls)) {
                 continue;
