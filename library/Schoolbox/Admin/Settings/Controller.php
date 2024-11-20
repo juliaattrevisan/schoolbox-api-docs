@@ -92,15 +92,20 @@ class Controller extends ConfigController
 
         $jsonPayload = [];
 
-        // Configs which is in settings or has different url from the module name
-        // For the other configs, the url will be /adminv2/<module name>
-        $module = [
-            'settings'   => '/adminv2/setting/%s',
-            'comms'      => '/adminv2/news',
-            'schoolData' => '/adminv2/import/schoolDataImport',
+        // Config settings are found in different pages depending on the module name and config type.
+        // This data structure mimics the structure of $this->userHasAccessToConfigSetting()
+        $urlTemplateByConfigTypeByModuleName = [
+            'settings'   => [
+                'Resources' => '/adminv2/setting/cms/%s',
+                'Skin Config' => '/adminv2/setting/design/%s',
+                'LMS Policy' => '/adminv2/setting/lms/%s',
+                'Pastoral Care' => '/adminv2/setting/pastoral/%s',
+            ],
+            'comms'      => ['' => '/adminv2/news'],
+            'schoolData' => ['' => '/adminv2/import/schoolDataImport'],
         ];
 
-        //Also include the navigation elements
+        // Also include the navigation elements.
         $subnav = new Subnav($this->getConfigLoader(), $this->getUser());
         $pageList = $subnav->generate();
 
@@ -142,8 +147,9 @@ class Controller extends ConfigController
         foreach ($foundConfig as $config) {
             /** @var Config $config */
             $type = $config->getType() ? $config->getType()->getType() : '';
-            $url = isset($module[$config->getModule()])
-                ? sprintf($module[$config->getModule()], $type)
+            $urlTemplateByConfigType = $urlTemplateByConfigTypeByModuleName[$config->getModule()];
+            $url = isset($urlTemplateByConfigType[$type])
+                ? sprintf($urlTemplateByConfigType[$type], $type)
                 : sprintf("/adminv2/%s", $config->getModule());
 
             if (in_array($url, $hiddenUrls)) {
