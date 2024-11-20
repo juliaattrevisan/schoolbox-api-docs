@@ -140,6 +140,13 @@ class BindingLoader implements ILoader
             $bindings = $this->generator->generateBindingsForUser($this->userMapper->findById($userId));
         } catch (Exception $e) {
             // returning empty array to remove its subscription
+            $this->log->warning(
+                sprintf(
+                    'Could not get subscriptions for user %d (message: %s)',
+                    $userId,
+                    $e->getMessage(),
+                ),
+            );
             return [];
         }
 
