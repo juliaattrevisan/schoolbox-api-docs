@@ -75,7 +75,7 @@
         <a class="icon-class-list" href="{{ routeLookup('learnosity.getHorizontalMarking', { assessmentId: assessment.id }) }}">Review horizontally</a>
     </li>
     <li>
-        <a class="icon-download" href="{{ routeLookup('learnosity.getExportAttempts', { assessmentId: assessment.id }) }}">Download All</a>
+        <a class="icon-download" data-download="attempts" href="{{ routeLookup('learnosity.getExportAttempts', { assessmentId: assessment.id }) }}">Download All</a>
     </li>
     <li class="separator">Bulk Actions</li>
     <li>
@@ -541,6 +541,36 @@
                     const statusIcon = participantRow.find('.meta [data-status]');
                     statusIcon.removeClass('{{ statusIncomplete }}').addClass('{{ statusPending }}');
                     statusIcon.attr('title', '{{ labelPending }}');
+                });
+            });
+
+            {# download attempts delayed #}
+            $('[data-download]').click(function (e) {
+                e.preventDefault();
+                $(this).confirmDialog({
+                    header: 'Download all attempts?',
+                    format: 'html',
+                    text: `
+                                    <p>
+                                        Please be aware that your download will take some time
+                                        to complete, as we compile the students&rsquo; attempts.
+                                    </p>
+                                    {# to be included back when we go taskd for this download action
+                                    <p>
+                                        Feel free to move away from this page and continue
+                                        working: we will send you a notification when the file
+                                        is ready to download.
+                                    </p> #}
+                                    `,
+                    confirmEvent: function () {
+                        toast = $('.toast[data-save-draft]');
+                        // toast.toastActivate({text: 'Generating download...', css: 'info'});
+
+                        window.open('{{ routeLookup('learnosity.getExportAttempts', { assessmentId: assessment.id }) }}', '_blank');
+                        {#$.get('{{ routeLookup('learnosity.getExportAttempts', { assessmentId: assessment.id }) }}').done(function () {#}
+                        {#    toast.toastTimeout({text: 'Downloaded File', css: 'success'});#}
+                        {#})#}
+                    }
                 });
             });
         });
