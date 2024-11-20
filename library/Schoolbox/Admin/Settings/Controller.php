@@ -136,23 +136,7 @@ class Controller extends ConfigController
 
             $module = $config->getModule();
             $type = $config->getType() ? $config->getType()->getType() : '';
-
-            // Config settings are found in different pages depending on the module name and config type.
-            // The code below mimics the structure of $this->userHasAccessToConfigSetting().
-            $url = match ($module) {
-                'settings' => (
-                    match ($type) {
-                        'Resources' => "/adminv2/setting/cms/$type",
-                        'Skin Config' => "/adminv2/setting/design/$type",
-                        'LMS Policy' => "/adminv2/setting/lms/$type",
-                        'Pastoral Care' => "/adminv2/setting/pastoral/$type",
-                        default => "/adminv2/setting/$type",
-                    }
-                ),
-                'comms' => '/adminv2/news',
-                'schoolData' => '/adminv2/import/schoolDataImport',
-                default => "/adminv2/$module",
-            };
+            $url = $this->getSettingsPageUrl($module, $type);
 
             if (in_array($url, $hiddenUrls)) {
                 continue;
@@ -355,6 +339,31 @@ class Controller extends ConfigController
     }
 
     /**
+     * @param string $module
+     * @param string $type
+     * @return string
+     */
+    private function getSettingsPageUrl(string $module, string $type): string
+    {
+        // Config settings are found in different pages depending on the module name and config type.
+        // The code below matches the structure of $this->userHasAccessToConfigSetting().
+        return match ($module) {
+            'settings' => (
+                match ($type) {
+                    'Resources'     => "/adminv2/setting/cms/$type",      // E.g. /adminv2/setting/cms/Resources
+                    'Skin Config'   => "/adminv2/setting/design/$type",   // E.g. /adminv2/setting/design/Skin%20Config
+                    'LMS Policy'    => "/adminv2/setting/lms/$type",      // E.g. /adminv2/setting/lms/LMS%20Policy
+                    'Pastoral Care' => "/adminv2/setting/pastoral/$type", // E.g. /adminv2/setting/pastoral/Pastoral%20Care
+                    default         => "/adminv2/setting/$type",          // E.g. /adminv2/setting/Modules
+                }
+            ),
+            'comms' => '/adminv2/news',
+            'schoolData' => '/adminv2/import/schoolDataImport',
+            default => "/adminv2/$module", // E.g. /adminv2/lti
+        };
+    }
+
+    /**
      * Return true if the given user has access to the config settings with the given module and type.
      *
      * @param User   $user
@@ -367,6 +376,8 @@ class Controller extends ConfigController
         if ($user->isSuperuser()) {
             return true;
         }
+
+        // The if/else structure below matches the structure used in $this->getSettingsPageUrl().
 
         if ($module === 'schoolData') {
             // This is for the settings in 'Admin -> School Data Import -> Home'.
