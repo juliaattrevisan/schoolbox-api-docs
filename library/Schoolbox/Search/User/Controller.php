@@ -351,12 +351,22 @@ class Controller extends BaseController
                     // noop
                 }
 
-                // Only show the parent contacts to the parent themselves, hide divorced parents from each other
+                /* This is maybe a controversial change
+                 */
                 if (
-                    $this->getUser()->getRole()->isStaff()
-                    || ($this->getUser()->getRole()->isParent()
-                        && ($contact['StudentContactID'] == $this->getUser()->getExternalId()
-                            || $contact['StudentContactSpouseID'] == $this->getUser()->getExternalId()))
+                    /* Staff members can see contacts
+                     */
+                    $this->getUser()->getRole()->isStaff() ||
+                    /* The student viewing their own profile can see the contacts...
+                     * ...maybe. Why was this prohibited originally?
+                     */
+                    ($this->getUser()->getExternalId() === $student->getExternalId()) ||
+                    /* Parents can see their own details, but not the details of any other speece
+                     * A parent viewing this profile page might be the main person or the spouse
+                     * so you need to check both for a matching externalId
+                     */
+                    ($this->getUser()->getRole()->isParent() && $contact['StudentContactID'] === $this->getUser()->getExternalId()) ||
+                    ($this->getUser()->getRole()->isParent() && $contact['StudentContactSpouseID'] === $this->getUser()->getExternalId())
                 ) {
                     $contact['main']   = $main;
                     $contact['spouse'] = $spouse;
@@ -383,8 +393,6 @@ class Controller extends BaseController
 
 
         $protectStudentContacts = $this->getConfigLoader()->get('protect_student_contacts');
-
-        $hideContacts = $student->getHideContacts() ? 1 : 0;
 
         switch ($protectStudentContacts) {
             case Access::VISIBILITY_EVERYONE: // Everyone
