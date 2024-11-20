@@ -76,6 +76,7 @@ window.Vue.watch(
                 v-if="filtersStore.selectedReportOptions.includes(ReportOptionValues.UNIT) && popOutStore.usage?.onUnit"
                 class="usage__section"
             >
+                <h4 class="l-pad-xs--bottom f-no-margins">Unit</h4>
                 <div class="l-flex l-gap-s">
                     <sbx-icon name="unit" />
                     <p class="f-no-margins">Assigned to Unit</p>
@@ -119,11 +120,13 @@ window.Vue.watch(
                 "
                 class="usage__section"
             >
-                <h4 class="l-pad-xs--bottom f-no-margins">Rubric Capabilities</h4>
+                <h4 class="l-pad-xs--bottom f-no-margins">Rubric</h4>
                 <template
                     v-if="popOutStore.usage.rubric.course && popOutStore.usage.rubric.course.capabilities.length > 0"
                 >
-                    <h5 class="l-pad-xs--bottom f-no-margins">Course Rubrics</h5>
+                    <h5 class="l-pad-xs--bottom f-no-margins">
+                        <a :href="popOutStore.usage.rubric.course._links.view">Course Rubrics</a>
+                    </h5>
                     <div v-for="capability in popOutStore.usage.rubric.course.capabilities" :key="capability.name">
                         <p class="f-no-margins">
                             <b>{{ capability.name }}</b
