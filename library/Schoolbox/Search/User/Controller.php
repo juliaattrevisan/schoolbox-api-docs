@@ -12,6 +12,7 @@ namespace Schoolbox\Search\User;
 use Alaress\Color\ColorFactory;
 use Alaress\Web\Controller\Base as BaseController;
 use Alaress_Date_Format;
+use Aura\Router\Exception\RouteNotFound;
 use Custom;
 use Eportfolio_Authenticator;
 use External_ClassInterface;
@@ -142,14 +143,18 @@ class Controller extends BaseController
          * Find out if Pastoral Care is enabled and that you have access to a student's pastoral care records
          * If you do, remember its url
          */
-        $pastoralUrl = $this->getAuthorizer()->isPathAuthorizedForUser(
-            'pastoral.getStudent',
-            [
-                'studentId' => $viewee->getId(),
-                'student'   => $viewee,
-            ],
-            $viewer
-        );
+        try {
+            $pastoralUrl = $this->getRouteIfAuthorized(
+                'pastoral.getStudent',
+                [
+                    'studentId' => $viewee->getId(),
+                    'student'   => $viewee,
+                ],
+                $viewer
+            );
+        } catch (RouteNotFound) {
+            $pastoralUrl = false;
+        }
 
         $showPastoral = false;
 
