@@ -163,8 +163,10 @@ window.Vue.watch(
     background-color: #fff;
     border-radius: 0.25rem;
     box-shadow: 0px 0px 6px rgba(0, 0, 0, 0.2);
+    max-height: 50rem;
     max-width: 24rem;
     min-width: 16rem;
+    overflow-y: auto;
     padding: var(--spacing-s);
     position: absolute;
     z-index: var(--sbx-depth-pop-over);
