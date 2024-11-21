@@ -129,13 +129,13 @@ window.Vue.watch(
                     </h5>
                     <div v-for="capability in popOutStore.usage.rubric.course.capabilities" :key="capability.name">
                         <p class="f-no-margins">
-                            <b>{{ capability.name }}</b
-                            ><br />
-                            <template v-for="(indicator, index) in capability.indicators" :key="indicator.name">
-                                {{ indicator.name }}
-                                <template v-if="index < capability.indicators.length - 1"><br /></template>
-                            </template>
+                            <b>{{ capability.name }}</b>
                         </p>
+                        <ul>
+                            <li v-for="indicator in capability.indicators" :key="indicator.name">
+                                {{ indicator.name }}
+                            </li>
+                        </ul>
                     </div>
                 </template>
                 <template v-if="popOutStore.usage.rubric.unit && popOutStore.usage.rubric.unit.capabilities.length > 0">
@@ -144,13 +144,13 @@ window.Vue.watch(
                     </h5>
                     <div v-for="capability in popOutStore.usage.rubric.unit.capabilities" :key="capability.name">
                         <p class="f-no-margins">
-                            <b>{{ capability.name }}</b
-                            ><br />
-                            <template v-for="(indicator, index) in capability.indicators" :key="indicator.name">
-                                {{ indicator.name }}
-                                <template v-if="index < capability.indicators.length - 1"><br /></template>
-                            </template>
+                            <b>{{ capability.name }}</b>
                         </p>
+                        <ul>
+                            <li v-for="indicator in capability.indicators" :key="indicator.name">
+                                {{ indicator.name }}
+                            </li>
+                        </ul>
                     </div>
                 </template>
             </div>
