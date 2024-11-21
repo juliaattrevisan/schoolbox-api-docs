@@ -9,7 +9,6 @@
 namespace Schoolbox\Search\User;
 use Aura\Router\Exception\RouteNotFound;
 use Schoolbox\Geosnapshot\ValidStudentPhotosAvailable;
-use Schoolbox\Search\User\templates\button\Schoolbox;
 use Twig\Environment;
 
 class ButtonIslandRenderer
