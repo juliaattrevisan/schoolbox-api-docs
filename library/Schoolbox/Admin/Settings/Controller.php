@@ -93,7 +93,7 @@ class Controller extends ConfigController
 
         $hiddenUrls = [];
         foreach ($pageList as $parentUrl => $parentData) {
-            if (!($parentData['visible'] ?? false)) {
+            if (!($parentData['visible'] ?? true)) {
                 $hiddenUrls[] = $parentUrl;
                 continue;
             }
@@ -111,7 +111,7 @@ class Controller extends ConfigController
             }
 
             foreach ($parentData['children'] as $childUrl => $childData) {
-                if (!($childData['visible'] ?? false)) {
+                if (!($childData['visible'] ?? true)) {
                     $hiddenUrls[] = $childUrl;
                     continue;
                 }
