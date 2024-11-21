@@ -130,6 +130,10 @@ export const usePopOutStore = defineStore(`ccPopOut`, () => {
      * @param $button - the button that triggered the action
      */
     function setActive($course: Course, $unit: Unit, $node: CurriculumCoverageNode, $button: HTMLButtonElement): void {
+        // prevent selecting the same button again when already open
+        if ($button.id === button.value?.id) {
+            return;
+        }
         course.value = $course;
         unit.value = $unit;
         node.value = $node;
