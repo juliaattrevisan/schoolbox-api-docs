@@ -12,6 +12,7 @@ namespace Schoolbox\Search\User;
 use Alaress\Color\ColorFactory;
 use Alaress\Web\Controller\Base as BaseController;
 use Alaress_Date_Format;
+use Aura\Router\Exception\RouteNotFound;
 use Custom;
 use Eportfolio_Authenticator;
 use External_ClassInterface;
@@ -138,15 +139,28 @@ class Controller extends BaseController
         $viewer = $this->getUser();
 
         /* Pastoral Count injection
+         *
+         * Find out if Pastoral Care is enabled and that you have access to a student's pastoral care records
+         * If you do, remember its url
          */
-        $showPastoral = $this->getConfigLoader()->get(ConfigMapper::NAME_PASTORAL_ENABLED) && $this->getAuthorizer()->isPathAuthorizedForUser(
-            'pastoral.getStudent',
-            [
-                'studentId' => $viewee->getId(),
-                'student'   => $viewee,
-            ],
-            $viewer
-        );
+        try {
+            $pastoralUrl = $this->getRouteIfAuthorized(
+                'pastoral.getStudent',
+                [
+                    'studentId' => $viewee->getId(),
+                    'student'   => $viewee,
+                ],
+                $viewer
+            );
+        } catch (RouteNotFound) {
+            $pastoralUrl = false;
+        }
+
+        $showPastoral = false;
+
+        if ($this->getConfigLoader()->get(ConfigMapper::NAME_PASTORAL_ENABLED) && $pastoralUrl) {
+            $showPastoral = true;
+        }
 
         $pastoralCountHelper = null;
         $pastoralCountPeriod = null;
@@ -526,7 +540,7 @@ class Controller extends BaseController
                  *
                  * We needed to keep this
                  */
-                'showPastoral' => $showPastoral,
+                'pastoralUrl' => $pastoralUrl,
                 /* This now includes system buttons - there's no longer really a distinction between system and
                  * custom buttons, as far as the end user is concerned
                  */

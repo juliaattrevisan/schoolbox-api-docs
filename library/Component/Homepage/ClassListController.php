@@ -216,7 +216,6 @@ class Component_Homepage_ClassListController extends Component_Homepage_Controll
             if (
                 count($studentUserIds)
                 && $this->getContentPermission() > UserAccess::ACCESS_READ
-                && $this->getConfigLoader()->get('email_all_parents')
                 && $this->getConfigLoader()->get('mail_enable')
                 && $this->getUser()->hasEmail()
             ) {

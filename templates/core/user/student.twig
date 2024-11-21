@@ -38,7 +38,6 @@
         userIds: user.id
     }
 ) %}
-{% set pastoralUrl = showPastoral ? routeLookupIfAuthorized('pastoral.getStudent',{studentId: user.id}) : null %}
 {##
  # Is the current user viewing their own profile?
  # This affects some links and metadata displayed.
@@ -83,6 +82,7 @@
     <div class="small-12 island">
         <section class="no-pad">
             <div class="profile content">
+                {# Profile Editor: Fields #}
                 <div class="row no-margin">
                     {# Build a hash lookup of additional clauses and cross-reference them
                      # This list is your last opportunity to show/hide a field based on your
@@ -98,7 +98,9 @@
                      # settings and add fields to the payload that was provided by the backend.
                      #
                      # showEmail: This checked for role permissions, email existence, etc. we need to keep
-                     # showPastoral: This checked for permissions, routes, etc. we need to keep
+                     # pastoralUrl: A url for this student's records; it's set only if pastoral care is enabled
+                     #    and you can get there via a routeLookupIfAuthorized check in the backend. Supersedes
+                     #    the old usage of showPastoral+pastoralUrl
                      #}
                     {% set additionalConstraints = {
                         'student': {
@@ -113,7 +115,7 @@
                             'email': showEmail,
                             'formTeacher': USER.role.viewStudentProfile and user.isShowTimetable,
                             'hohTeacher': USER.role.viewStudentProfile and user.isShowTimetable,
-                            'pastoralCounts': USER.role.viewStudentProfile and showPastoral,
+                            'pastoralCounts': USER.role.viewStudentProfile and pastoralUrl,
                             'StudentForm': USER.role.viewStudentProfile and user.isShowTimetable,
                             'StudentTutorDescription': USER.role.viewStudentProfile and user.isShowTimetable,
                             'tutorTeacher': USER.role.viewStudentProfile and user.isShowTimetable
@@ -247,6 +249,9 @@
                 </div>
             </div>
 
+            {# Profile Editor: Buttons
+             # Note that these are configured in the Profile Buttons part of admin, separate to the Profile Editor
+             #}
             {% block buttons_island %}
                 <ul class='flex-list flex-wrap buttons'>
                     {% block buttons %}
@@ -257,22 +262,29 @@
                         {% set additionalConstraints = {
                             'student': {
                                 '_default': true,
+                                'duework': config.lms_enabled,
                                 'eportfolio': eportfolioAuth,
+                                'grades': config.lms_enabled,
+                                'timetable': config.lms_enabled and user.isShowTimetable,
                             },
                             'parent': {
                                 '_default': true,
+                                'duework': config.lms_enabled,
                                 'eportfolio': eportfolioAuth,
+                                'grades': config.lms_enabled,
+                                'timetable': config.lms_enabled and user.isShowTimetable,
                             },
                             'staff': {
                                 '_default': USER.role.viewStudentProfile,
+                                'duework': USER.role.viewStudentProfile and config.lms_enabled,
                                 'eportfolio': USER.role.viewStudentProfile and eportfolioAuth,
-                                'pastoral': USER.role.viewStudentProfile and showPastoral and pastoralUrl,
-                                'timetable': USER.role.viewStudentProfile and user.isShowTimetable,
-                                'pastoralsynergetic': USER.role.viewStudentProfile and config.external_type == 'synergetic' and config.external_staff_portal,
-                                'documentmanagement': USER.role.viewStudentProfile and config.external_document_report_enabled and config.external_document_button_enable,
+                                'grades': config.lms_enabled,
+                                'pastoral': USER.role.viewStudentProfile and pastoralUrl,
+                                'timetable': USER.role.viewStudentProfile and config.lms_enabled and user.isShowTimetable,
+                                'documentmanagement': USER.role.viewStudentProfile and config.external_document_report_enabled,
                                 'geosnapshot': USER.role.viewStudentProfile and isGeosnapshotAvailable,
-                                'emailstaff': USER.role.viewStudentProfile and config.mail_enable and config.email_all_staff and session.user.email,
-                                'emailparents': USER.role.viewStudentProfile and config.mail_enable and config.email_all_parents and session.user.email and user.isShowContacts
+                                'emailstaff': USER.role.viewStudentProfile and config.mail_enable and session.user.email,
+                                'emailparents': USER.role.viewStudentProfile and config.mail_enable and session.user.email and user.isShowContacts
                             }
                         } %}
 
@@ -320,8 +332,6 @@
                                         {% set route = routeLookupIfAuthorized('profileDocumentManagement.getIndex', {studentId: user.id}) %}
                                     {% elseif button.type in ['geosnapshot'] %}
                                         {% set route = routeLookupIfAuthorized('geosnapshotApi.getStudentPhotos', {id: user.id}) %}
-                                    {% elseif button.type in ['pastoralsynergetic'] %}
-                                        {% set route = config.external_staff_portal ~ '/stud.aspx?id=' ~ user.externalId %}
                                     {% endif %}
 
                                     {% if route %}
@@ -345,8 +355,7 @@
     </div>
 </div>
 
-
-{# Tabs #}
+{# Profile Editor: Tabs #}
 <div class="row">
     <div class="small-12 island">
         {# Programmatically detect the anchor value and select that tab via foundation
@@ -570,7 +579,7 @@
                                         <h2 class="subheader">{{ group }}</h2>
                                     </div>
                                 </div>
-                                {% if isStaffWhoCanView and config.email_all_staff and config.mail_enable %}
+                                {% if isStaffWhoCanView and config.mail_enable %}
                                     {% for subject in subjectGroup %}
                                         {% for teacher in subject.teachers %}
                                             {% if not teacher.email is empty and teacher.id not in teacherIdsToEmail %}
