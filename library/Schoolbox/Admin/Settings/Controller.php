@@ -403,6 +403,7 @@ class Controller extends ConfigController
                     default:
                         // Do nothing.
                 }
+                break;
 
             case 'comms':
                 // This is for the settings in 'Admin -> News -> Settings / Policy'.
