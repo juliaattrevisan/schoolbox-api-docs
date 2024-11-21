@@ -387,23 +387,21 @@ class Controller extends ConfigController
         // The nested switch structure below matches the structure used in $this->getSettingsPageUrl().
         switch ($module) {
             case 'settings':
-                switch ($type) {
-                    case 'Resources':
-                        // This is for the settings in 'Admin -> Resources -> Resource Settings'.
-                        return $user->hasServicePermission(UserAccess::SERVICE_CMS, UserAccess::ACCESS_FULL);
-                    case 'Skin Config':
-                        // This is for the settings in 'Admin -> Design -> Skin Config'.
-                        return $user->hasServicePermission(UserAccess::SERVICE_DESIGN, UserAccess::ACCESS_FULL);
-                    case 'LMS Policy':
-                        // This is for the settings in 'Admin -> LMS -> LMS Policy'.
-                        return $user->hasServicePermission(UserAccess::SERVICE_LMS, UserAccess::ACCESS_FULL);
-                    case 'Pastoral Care':
-                        // This is for the settings in 'Admin -> Pastoral Care -> Settings / Policy'.
-                        return $user->hasServicePermission(UserAccess::SERVICE_PASTORAL, UserAccess::ACCESS_FULL);
-                    default:
-                        // Do nothing.
-                }
-                break;
+                return match ($type) {
+                    // This is for the settings in 'Admin -> Resources -> Resource Settings'.
+                    'Resources' => $user->hasServicePermission(UserAccess::SERVICE_CMS, UserAccess::ACCESS_FULL),
+
+                    // This is for the settings in 'Admin -> Design -> Skin Config'.
+                    'Skin Config' => $user->hasServicePermission(UserAccess::SERVICE_DESIGN, UserAccess::ACCESS_FULL),
+
+                    // This is for the settings in 'Admin -> LMS -> LMS Policy' and 'Admin -> LMS -> Document Management'.
+                    'LMS Policy', 'Document Management' => $user->hasServicePermission(UserAccess::SERVICE_LMS, UserAccess::ACCESS_FULL),
+
+                    // This is for the settings in 'Admin -> Pastoral Care -> Settings / Policy'.
+                    'Pastoral Care' => $user->hasServicePermission(UserAccess::SERVICE_PASTORAL, UserAccess::ACCESS_FULL),
+
+                    default => false
+                };
 
             case 'comms':
                 // This is for the settings in 'Admin -> News -> Settings / Policy'.
