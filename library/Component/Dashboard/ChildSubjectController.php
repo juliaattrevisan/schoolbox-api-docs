@@ -109,6 +109,28 @@ class Component_Dashboard_ChildSubjectController extends Component_Dashboard_Con
 
             /* Output calendar date to show */
             $now = new Alaress_Date_Format($_SERVER['REQUEST_TIME'], 'U');
+
+            /* ePortfolio link
+             */
+            $authenticator = new \Eportfolio_Authenticator($_SESSION['user'], $userChild);
+
+            /* Profile Editor: Buttons
+             * Renders the button island the same way as on the profile screen
+             */
+            $buttonIslandRenderer = new \Schoolbox\Search\User\ButtonIslandRenderer(
+                $userChild,
+                $now,
+                $authenticator,
+                $this->getConfigLoader()->get('geosnapshot_api_key'),
+                $this->getConfigLoader()->get('geosnapshot_enabled'),
+                $this->getRouteGenerator(),
+                \Schoolbox\Profile\Button\Mapper::getInstance(),
+            );
+
+            $this->setVar([
+                'BUTTON_ISLAND' => $buttonIslandRenderer->render($this->getSitePage()->getTwig(), $userChild, true),
+            ]);
+
 //            $this->setVar('CAL_TODAY_DATE', $now->getURLDate());
 
 //            /* Hide Due Work link from parents, if Due Work access is restricted and module is disabled
@@ -138,9 +160,6 @@ class Component_Dashboard_ChildSubjectController extends Component_Dashboard_Con
 //                $this->parse('timetable_block', 'timetable');
 //            }
 
-            /* ePortfolio link
-             */
-            $authenticator = new \Eportfolio_Authenticator($_SESSION['user'], $userChild);
 
 //            if ($authenticator->canView()) {
 //                $this->parse('eportfolio_block', 'eportfolio');
@@ -195,15 +214,15 @@ class Component_Dashboard_ChildSubjectController extends Component_Dashboard_Con
                 }
             }
 
-            /* Decide whether the viewer can see the Geosnapshot button for the viewee
-             */
-            $isGeosnapshotAvailable = (new ValidStudentPhotosAvailable())
-                ->isSatisifiedBy(
-                    $this->getConfigLoader()->get('geosnapshot_api_key'),
-                    $this->getConfigLoader()->get('geosnapshot_enabled'),
-                    $this->getUser(),
-                    $userChild
-                );
+//            /* Decide whether the viewer can see the Geosnapshot button for the viewee
+//             */
+//            $isGeosnapshotAvailable = (new ValidStudentPhotosAvailable())
+//                ->isSatisifiedBy(
+//                    $this->getConfigLoader()->get('geosnapshot_api_key'),
+//                    $this->getConfigLoader()->get('geosnapshot_enabled'),
+//                    $this->getUser(),
+//                    $userChild
+//                );
 
 //            if ($isGeosnapshotAvailable) {
 //                $this->parse('geosnapshot_block', 'geosnapshot');
