@@ -92,10 +92,10 @@ window.Vue.watch(
             >
                 <h4 class="l-pad-xs--bottom f-no-margins">Learning Activities</h4>
                 <template v-for="activity in popOutStore.usage.activity" :key="activity._links.view">
-                    <a :href="activity._links.view" :title="`View ${activity.name}`" class="l-flex l-gap-s">
-                        <sbx-icon name="project" />
-                        <p class="f-no-margins">{{ activity.name }}</p>
-                    </a>
+                    <h5 class="l-flex l-gap-s l-pad-xs--bottom f-no-margins">
+                        <sbx-icon :name="activity.icon" />
+                        <a :href="activity._links.view" :title="`View ${activity.name}`">{{ activity.name }}</a>
+                    </h5>
                 </template>
             </div>
             <div
@@ -108,10 +108,10 @@ window.Vue.watch(
             >
                 <h4 class="l-pad-xs--bottom f-no-margins">Lesson Plans</h4>
                 <template v-for="lessonPlan in popOutStore.usage.lessonPlan" :key="lessonPlan._links.view">
-                    <a :href="lessonPlan._links.view" :title="`View ${lessonPlan.name}`" class="l-flex l-gap-s">
-                        <sbx-icon name="lesson-plan" />
-                        <p class="f-no-margins">{{ lessonPlan.name }}</p>
-                    </a>
+                    <h5 class="l-flex l-gap-s l-pad-xs--bottom f-no-margins">
+                        <sbx-icon :name="lessonPlan.icon" />
+                        <a :href="lessonPlan._links.view" :title="`View ${lessonPlan.name}`">{{ lessonPlan.name }}</a>
+                    </h5>
                 </template>
             </div>
             <div
@@ -164,10 +164,10 @@ window.Vue.watch(
             >
                 <h4 class="l-pad-xs--bottom f-no-margins">In-use Rubric</h4>
                 <template v-for="activity in popOutStore.usage.inUseRubric" :key="activity._links.view">
-                    <a :href="activity._links.view" :title="`View ${activity.name}`" class="l-flex l-gap-s">
-                        <sbx-icon name="project" />
-                        <h5 class="f-no-margins">{{ activity.name }}</h5>
-                    </a>
+                    <h5 class="l-flex l-gap-s l-pad-xs--bottom f-no-margins">
+                        <sbx-icon :name="activity.icon" />
+                        <a :href="activity._links.view" :title="`View ${activity.name}`">{{ activity.name }}</a>
+                    </h5>
                     <div v-for="capability in activity.rubric.capabilities" :key="capability.name">
                         <p class="f-no-margins">
                             <b>{{ capability.name }}</b>
