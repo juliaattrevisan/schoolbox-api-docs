@@ -2,7 +2,7 @@
 
 namespace Schoolbox\Curriculum\Reports;
 
-use Schoolbox\Assessment\Rubric\DataModel\Capability\Mapper;
+use Alaress\Database\Connector\IConnector;
 use Schoolbox\Curriculum\Node\Mapper as CurriculumMapper;
 
 class Helper
@@ -12,6 +12,14 @@ class Helper
     ) {
     }
 
+    /**
+     * Getting individual usage of curriculum in each section
+     *
+     * @param int $nodeId
+     * @param int $courseId
+     * @param int $unitId
+     * @return array
+     */
     public function getUsage(
         int $nodeId,
         int $courseId,
@@ -20,8 +28,37 @@ class Helper
 
         $db = $this->curriculumMapper->getDatabase();
 
-        $usage = [];
+        $unitUsage = $this->getUnitUsage($db, $nodeId, $courseId, $unitId);
 
+        $assessmentUsage = $this->getAssessmentUsage($db, $nodeId, $courseId, $unitId);
+
+        $rubricUsage = $this->getRubricUsage($db, $nodeId, $courseId, $unitId);
+
+        $inUseRubricUsage = $this->getInUseRubricUsage($db, $nodeId, $courseId, $unitId);
+
+        return array_merge(
+            $unitUsage,
+            $assessmentUsage,
+            $rubricUsage,
+            $inUseRubricUsage
+        );
+    }
+
+    /**
+     * Getting unit usage
+     *
+     * @param IConnector $db
+     * @param int $nodeId
+     * @param int $courseId
+     * @param int $unitId
+     * @return array
+     */
+    private function getUnitUsage(
+        IConnector $db,
+        int $nodeId,
+        int $courseId,
+        int $unitId
+    ): array {
         $unitUsageQuery = sprintf(
             "
             SELECT '%s' type, cus.course_specification_id id, f.name title, cus.folder_id
@@ -39,7 +76,7 @@ class Helper
         );
 
         $statement = $db->executeQuery($unitUsageQuery);
-
+        $usage = [];
         while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
             $usage[$row['type']][] = [
                 'id' => $row['id'],
@@ -47,7 +84,24 @@ class Helper
                 'folder_id' => $row['folder_id'],
             ];
         }
+        return $usage;
+    }
 
+    /**
+     * Getting assessment usage include all types of assessments
+     *
+     * @param IConnector $db
+     * @param int $nodeId
+     * @param int $courseId
+     * @param int $unitId
+     * @return array
+     */
+    private function getAssessmentUsage(
+        IConnector $db,
+        int $nodeId,
+        int $courseId,
+        int $unitId
+    ): array {
         $activityUsageQuery = sprintf(
             "
             SELECT
@@ -120,7 +174,7 @@ class Helper
             ]) . ' )';
 
         $statement = $db->executeQuery($combinedUsageQuery);
-
+        $usage = [];
         while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
             $usage[$row['type']][] = [
                 'id' => $row['id'],
@@ -130,6 +184,24 @@ class Helper
             ];
         }
 
+        return $usage;
+    }
+
+    /**
+     * Getting usage for the curriculum node in rubrics for both course and unit
+     *
+     * @param IConnector $db
+     * @param int $nodeId
+     * @param int $courseId
+     * @param int $unitId
+     * @return array
+     */
+    private function getRubricUsage(
+        IConnector $db,
+        int $nodeId,
+        int $courseId,
+        int $unitId
+    ): array {
         $rubricUsageQuery = sprintf(
             "
             SELECT c.type, rc.id capId, rc.name capName, r.id indId, r.name indName, c.folder_id, c.parentId
@@ -163,7 +235,7 @@ class Helper
         );
 
         $statement = $db->executeQuery($rubricUsageQuery);
-
+        $usage = [];
         while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
             $usage[$row['type']]['folderId'] = $row['parentId'];
             $usage[$row['type']][$row['capId']]['capabilities'] = $row['capName'];
@@ -174,7 +246,24 @@ class Helper
                 'name' => $row['indName']
             ];
         }
+        return $usage;
+    }
 
+    /**
+     * Get usage for the due works that uses the rubrics that contain the curriculum node
+     *
+     * @param IConnector $db
+     * @param int $nodeId
+     * @param int $courseId
+     * @param int $unitId
+     * @return array
+     */
+    private function getInUseRubricUsage(
+        IConnector $db,
+        int $nodeId,
+        int $courseId,
+        int $unitId
+    ): array {
         $inUseRubricUsageQuery = sprintf(
             "
             SELECT
@@ -211,6 +300,7 @@ class Helper
         );
 
         $statement = $db->executeQuery($inUseRubricUsageQuery);
+        $usage = [];
         while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
             $usage[$row['type']][$row['assessment_id']][$row['capability_id']]['name'] = $row['capability_name'];
             if ($row['rubric_indicator_id'] === null) {
@@ -220,7 +310,6 @@ class Helper
                 'name' => $row['indicator_name']
             ];
         }
-
         return $usage;
     }
 }
