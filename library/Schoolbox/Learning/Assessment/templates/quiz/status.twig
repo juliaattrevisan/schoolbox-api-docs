@@ -555,21 +555,19 @@
                                         Please be aware that your download will take some time
                                         to complete, as we compile the students&rsquo; attempts.
                                     </p>
-                                    {# to be included back when we go taskd for this download action
+
                                     <p>
                                         Feel free to move away from this page and continue
                                         working: we will send you a notification when the file
                                         is ready to download.
-                                    </p> #}
+                                    </p>
                                     `,
                     confirmEvent: function () {
                         toast = $('.toast[data-save-draft]');
-                        // toast.toastActivate({text: 'Generating download...', css: 'info'});
 
-                        window.open('{{ routeLookup('learnosity.getExportAttempts', { assessmentId: assessment.id }) }}', '_blank');
-                        {#$.get('{{ routeLookup('learnosity.getExportAttempts', { assessmentId: assessment.id }) }}').done(function () {#}
-                        {#    toast.toastTimeout({text: 'Downloaded File', css: 'success'});#}
-                        {#})#}
+                        $.post('{{ routeLookup('learnosity.getExportDownload', { assessmentId: assessment.id }) }}').done(function () {
+                            toast.toastTimeout({text: 'Generating download...', css: 'info'});
+                        })
                     }
                 });
             });

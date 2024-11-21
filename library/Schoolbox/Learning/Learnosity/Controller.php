@@ -46,9 +46,11 @@ use Schoolbox\Mapper\Exception\Deleted;
 use Schoolbox\Mapper\Exception\NotFound;
 use Schoolbox\TaskDaemon\Producer;
 use Schoolbox\TaskDaemon\Request\HttpRequest\MessageFactory;
+use Schoolbox\TaskDaemon\Request\DownloadPages\MessageFactory as DownloadPagesMessageFactory;
 use Schoolbox\TokenReplacer;
 use Schoolbox\Url\Factory;
 use Schoolbox\User;
+use Schoolbox\User\Translator\Author\ModelToArray;
 use Schoolbox\UserMapper;
 use Twig\Error\Error;
 
@@ -178,67 +180,6 @@ class Controller extends Base
      * @var QuizFetcher
      */
     private QuizFetcher $quizFetcher;
-
-
-    /**
-     * Controller constructor.
-     *
-     * @param Factory $urlFactory
-     * @param BreadcrumbFactory $bakery
-     * @param string $learnosityVersion
-     * @param string $learnosityConsumerKey
-     * @param string $learnosityConsumerSecret
-     * @param ErrorMapper $errorMapper
-     * @param AssessmentMapperProxy $assessmentDataSource
-     * @param Mapper $resultCacheMapper
-     * @param \Schoolbox\Learning\Quiz\Mapper $quizMapper
-     * @param \Schoolbox\Learning\Quiz\Attempt\Mapper $attemptMapper
-     * @param Feedback\Mapper $feedbackMapper
-     * @param UserMapper $userMapper
-     * @param StateMapper $stateMapper
-     * @param Psr17Factory $httpFactory for creating HTTP requests
-     * @param MessageFactory $messageFactory for creating messages to send to taskd
-     * @param Producer $messageProducer for sending messages to taskd
-     * @throws \DomainException
-     */
-    public function __construct(
-        \Schoolbox\Url\Factory $urlFactory,
-        protected BreadcrumbFactory $bakery,
-        private string $learnosityVersion,
-        #[\SensitiveParameter] private string $learnosityConsumerKey,
-        #[\SensitiveParameter] private string $learnosityConsumerSecret,
-        private \Schoolbox\Error\Mapper $errorMapper,
-        private AssessmentMapperProxy $assessmentDataSource,
-        private \Schoolbox\Learning\Assessment\Project\ResultCache\Mapper $resultCacheMapper,
-        private \Schoolbox\Learning\Quiz\Mapper $quizMapper,
-        private \Schoolbox\Learning\Quiz\Attempt\Mapper $attemptMapper,
-        private \Schoolbox\Learning\Learnosity\Feedback\Mapper $feedbackMapper,
-        private \Schoolbox\UserMapper $userMapper,
-        private StateMapper $stateMapper,
-        private Psr17Factory $httpFactory,
-        private MessageFactory $messageFactory,
-        private Producer $messageProducer,
-    ) {
-        /* Probably inject this one day, but for now,
-         * I want to avoid dumping Yet Another Thing into the kernel
-         * I don't have a convenient means to access SERVER_NAME except like this, sadly
-         */
-        $this->logger = new Logger(STDOUT, STDOUT, \Monolog\Logger::DEBUG, [], true, 'learnosity');
-
-        $this->api = new Api(
-            $urlFactory->buildFullyQualified()->getHost(),
-            $this->learnosityVersion,
-            $this->learnosityConsumerKey,
-            $this->learnosityConsumerSecret,
-            $this->logger
-        );
-
-        $this->helper = new Helper($this->api, $this->logger);
-
-        /* A convenient thing to have lying around
-         */
-        $this->quizFetcher = new QuizFetcher($this->quizMapper);
-    }
 
 
     /**
@@ -659,6 +600,69 @@ class Controller extends Base
                 'learnositySessionReference' => $attempt->getLearnosityReference()
             ]),
         ], "Attempt {$assessment->getTitle()}");
+    }
+
+
+    /**
+     * Controller constructor.
+     *
+     * @param Factory $urlFactory
+     * @param BreadcrumbFactory $bakery
+     * @param string $learnosityVersion
+     * @param string $learnosityConsumerKey
+     * @param string $learnosityConsumerSecret
+     * @param ErrorMapper $errorMapper
+     * @param AssessmentMapperProxy $assessmentDataSource
+     * @param Mapper $resultCacheMapper
+     * @param \Schoolbox\Learning\Quiz\Mapper $quizMapper
+     * @param \Schoolbox\Learning\Quiz\Attempt\Mapper $attemptMapper
+     * @param Feedback\Mapper $feedbackMapper
+     * @param UserMapper $userMapper
+     * @param StateMapper $stateMapper
+     * @param Psr17Factory $httpFactory for creating HTTP requests
+     * @param MessageFactory $messageFactory for creating messages to send to taskd
+     * @param Producer $messageProducer for sending messages to taskd
+     * @param DownloadPagesMessageFactory $downloadMessageFactory for creating download page messages to send to taskd
+     * @throws \DomainException
+     */
+    public function __construct(
+        \Schoolbox\Url\Factory $urlFactory,
+        protected BreadcrumbFactory $bakery,
+        private string $learnosityVersion,
+        #[\SensitiveParameter] private string $learnosityConsumerKey,
+        #[\SensitiveParameter] private string $learnosityConsumerSecret,
+        private \Schoolbox\Error\Mapper $errorMapper,
+        private AssessmentMapperProxy $assessmentDataSource,
+        private \Schoolbox\Learning\Assessment\Project\ResultCache\Mapper $resultCacheMapper,
+        private \Schoolbox\Learning\Quiz\Mapper $quizMapper,
+        private \Schoolbox\Learning\Quiz\Attempt\Mapper $attemptMapper,
+        private \Schoolbox\Learning\Learnosity\Feedback\Mapper $feedbackMapper,
+        private \Schoolbox\UserMapper $userMapper,
+        private StateMapper $stateMapper,
+        private Psr17Factory $httpFactory,
+        private MessageFactory $messageFactory,
+        private Producer $messageProducer,
+        private DownloadPagesMessageFactory $downloadMessageFactory,
+    ) {
+        /* Probably inject this one day, but for now,
+         * I want to avoid dumping Yet Another Thing into the kernel
+         * I don't have a convenient means to access SERVER_NAME except like this, sadly
+         */
+        $this->logger = new Logger(STDOUT, STDOUT, \Monolog\Logger::DEBUG, [], true, 'learnosity');
+
+        $this->api = new Api(
+            $urlFactory->buildFullyQualified()->getHost(),
+            $this->learnosityVersion,
+            $this->learnosityConsumerKey,
+            $this->learnosityConsumerSecret,
+            $this->logger
+        );
+
+        $this->helper = new Helper($this->api, $this->logger);
+
+        /* A convenient thing to have lying around
+         */
+        $this->quizFetcher = new QuizFetcher($this->quizMapper);
     }
 
 
@@ -2303,5 +2307,64 @@ class Controller extends Base
     public function getExportAttempts(QuizDomainObject $assessment): void
     {
         (new Processor($this->api, $this->quizFetcher, $this->attemptMapper))->export($assessment);
+    }
+
+    /**
+     * Hook to getExportAttempts route via taskd, so it backgrounds the job
+     *
+     * @param QuizDomainObject $assessment
+     * @return void
+     * @throws Error
+     */
+    public function getExportDownload(QuizDomainObject $assessment): void
+    {
+        $urlBase = (new \Schoolbox\Url\Factory($this->getConfigLoader()))->buildFullyQualified();
+
+        $filename = sprintf(
+            'exported_responses_%s.csv',
+            $assessment->getId()
+        );
+
+        $userSerializer = new ModelToArray();
+
+        $messageFactory = $this->downloadMessageFactory;
+        $messageFactory = $messageFactory->addFileContent(
+            $filename,
+            (string)$urlBase
+                ->withPath($this->getRouteIfAuthorized('learnosity.getExportAttempts', ['assessmentId' => $assessment->getId()]))
+        );
+
+        /* This $message instance is the payload that we send to taskd
+         * which it then unpacks, configures its Gotenberg client, and uses
+         * to generate the pdfs. This is the bridge between the systems
+         */
+        $message = $messageFactory
+            ->setUser($this->getUser())
+            ->setCallbackUrl(
+                (string)$urlBase
+                    ->withPath(
+                        $this->routeGenerator->generate(
+                            'apiusernotify.apiUserNotify',
+                            ['userId' => $this->getUser()->getId()]
+                        )
+                    )
+            )
+            ->setCallbackParams([
+                'message' => sprintf(
+                    'Attempts export for "%s" is ready to download',
+                    $assessment->getTitle(),
+                ),
+                'from'    => call_user_func($userSerializer, $this->getUser()),
+                'to'      => call_user_func($userSerializer, $this->getUser()),
+            ])
+            ->setOutfile(sprintf(
+                'exported_responses_%s.zip',
+                $assessment->getId()
+            ))
+            ->build();
+
+        /* Send it to task for async processing
+         */
+        $this->messageProducer->send($message);
     }
 }
