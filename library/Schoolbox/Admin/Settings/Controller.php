@@ -352,11 +352,12 @@ class Controller extends ConfigController
             case 'settings':
                 $typeEncoded = str_replace(' ', '%20', $type);
                 return match ($type) {
-                    'Resources'     => "/adminv2/setting/cms/$typeEncoded",      // E.g. /adminv2/setting/cms/Resources
-                    'Skin Config'   => "/adminv2/setting/design/$typeEncoded",   // E.g. /adminv2/setting/design/Skin%20Config
-                    'LMS Policy'    => "/adminv2/setting/lms/$typeEncoded",      // E.g. /adminv2/setting/lms/LMS%20Policy
-                    'Pastoral Care' => "/adminv2/setting/pastoral/$typeEncoded", // E.g. /adminv2/setting/pastoral/Pastoral%20Care
-                    default         => "/adminv2/setting/$typeEncoded",          // E.g. /adminv2/setting/Modules
+                    'Resources'           => "/adminv2/setting/cms/$typeEncoded",      // E.g. /adminv2/setting/cms/Resources
+                    'Skin Config'         => "/adminv2/setting/design/$typeEncoded",   // E.g. /adminv2/setting/design/Skin%20Config
+                    'LMS Policy',
+                    'Document Management' => "/adminv2/setting/lms/$typeEncoded",      // E.g. /adminv2/setting/lms/LMS%20Policy
+                    'Pastoral Care'       => "/adminv2/setting/pastoral/$typeEncoded", // E.g. /adminv2/setting/pastoral/Pastoral%20Care
+                    default               => "/adminv2/setting/$typeEncoded",          // E.g. /adminv2/setting/Modules
                 };
 
             case 'comms':
