@@ -15,7 +15,7 @@ const props = defineProps<Props>();
     <template v-for="item in props.items" :key="item._links.view">
         <h6 class="f-no-margins">
             <a :href="item._links.view" :title="`View ${item.name}`" class="l-flex l-gap-s">
-                <sbx-icon :name="item.icon" />
+                <sbx-icon :name="`${item.icon ? item.icon : 'lesson-plan'}`" />
                 {{ item.name }}
             </a>
         </h6>

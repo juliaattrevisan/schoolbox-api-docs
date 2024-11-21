@@ -87,7 +87,7 @@ window.Vue.watch(
             <div
                 v-if="
                     filtersStore.selectedReportOptions.includes(ReportOptionValues.LEARNING_ACTIVITY) &&
-                    popOutStore.usage?.activity &&
+                    popOutStore.usage &&
                     popOutStore.usage.activity.length > 0
                 "
                 class="usage__section"
