@@ -77,10 +77,12 @@ class DetailedUsage
             ];
         }
 
-
-        return [
+        $translation = [
             'onUnit'   => isset($usage['unit']),
-            'activity' => array_map(
+        ];
+
+        if (isset($usage['activity'])) {
+            $translation['activity'] = array_map(
                 fn($activity) => [
                     'name'   => $activity['title'],
                     'icon'   => $activity['icon'],
@@ -91,9 +93,12 @@ class DetailedUsage
                         ),
                     ],
                 ],
-                $usage['activity'] ?? []
-            ),
-            'lessonPlan' => array_map(
+                $usage['activity']
+            );
+        }
+
+        if (isset($usage[Cursor::COURSE_ACTIVITY_LESSON_PLAN])) {
+            $translation['lesson'] = array_map(
                 fn($lp) => [
                     'name'   => $lp['title'],
                     '_links' => [
@@ -103,10 +108,16 @@ class DetailedUsage
                         ),
                     ],
                 ],
-                $usage[Cursor::COURSE_ACTIVITY_LESSON_PLAN] ?? []
-            ),
-            'rubric' => $rubric,
-            'inUseRubric' => $this->inUseRubrics->map(
+                $usage[Cursor::COURSE_ACTIVITY_LESSON_PLAN]
+            );
+        }
+
+        if (!empty($rubric)) {
+            $translation['rubric'] = $rubric;
+        }
+
+        if ($this->inUseRubrics->count() > 0) {
+            $translation['inUseRubrics'] = $this->inUseRubrics->map(
                 fn($assessment) => [
                     'name' => $assessment->getTitle(),
                     'icon' => Cursor::ACTIVITY_ICON_LIST[Cursor::COURSE_ACTIVITY_DUE_WORK],
@@ -132,7 +143,9 @@ class DetailedUsage
                         )
                     ]
                 ]
-            )
-        ];
+            );
+        }
+
+        return $translation;
     }
 }
