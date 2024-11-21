@@ -240,57 +240,65 @@ class Controller extends Base
         $unitId = $query->getInt('unitId');
         $nodeId = $query->getInt('nodeId');
 
-        //TODO updating more validation for the query input
-        if (null === $courseId) {
-            $problem = (new ApiProblem("courseId must be defined"))
+        if (null === $courseId || $courseId <= 0) {
+            $problem = (new ApiProblem("courseId must be defined and greater than 0"))
                 ->setStatus(400)
                 ->asArray();
             $this->response = $this->responseAsJson($problem)->withStatus(400);
             return;
         }
-        if (null === $unitId) {
-            $problem = (new ApiProblem("unitId must be defined"))
+        if (null === $unitId || $unitId <= 0) {
+            $problem = (new ApiProblem("unitId must be defined and greater than 0"))
                 ->setStatus(400)
                 ->asArray();
             $this->response = $this->responseAsJson($problem)->withStatus(400);
             return;
         }
-        if (null === $nodeId) {
-            $problem = (new ApiProblem("nodeId must be defined"))
+        if (null === $nodeId || $nodeId <= 0) {
+            $problem = (new ApiProblem("nodeId must be defined and greater than 0"))
                 ->setStatus(400)
                 ->asArray();
             $this->response = $this->responseAsJson($problem)->withStatus(400);
             return;
         }
 
-        $result = $this->helper->getUsage(
-            $nodeId,
-            $courseId,
-            $unitId
-        );
+        try {
+            $courseUnitSpec = $this->courseUnitSpecificationMapper->findOneByColumnList(
+                [
+                    'course_specification_id' => $courseId,
+                    'folder_id' => $unitId,
+                ]
+            );
 
-        $pb = $this->courseUnitSpecificationMapper->getPredicateBuilder();
-        $pb
-            ->equals('folder_id', $unitId)
-            ->equals('course_specification_id', $courseId);
-        $courseUnitSpec = $this->courseUnitSpecificationMapper->findOneByPredicates($pb);
+            $result = $this->helper->getUsage(
+                $nodeId,
+                $courseId,
+                $unitId
+            );
 
-        $courseCapabilities = $this->rubricCapabilityMapper
-            ->findByColumn(
+            $courseCapabilities = $this->rubricCapabilityMapper
+                ->findByColumn(
+                    'id',
+                    array_keys($result[Cursor::COURSE_RUBRIC_CAPABILITY] ?? [])
+                )->reindex();
+
+            $unitCapacities = $this->rubricCapabilityMapper
+                ->findByColumn(
+                    'id',
+                    array_keys($result[Cursor::COURSE_UNIT_RUBRIC_CAPABILITY] ?? [])
+                )->reindex();
+
+            $inUseRubric = $this->assessmentMapper->findByColumn(
                 'id',
-                array_keys($result[Cursor::COURSE_RUBRIC_CAPABILITY] ?? [])
+                array_keys($result[Cursor::COURSE_IN_USE_RUBRIC] ?? [])
             )->reindex();
-
-        $unitCapacities = $this->rubricCapabilityMapper
-            ->findByColumn(
-                'id',
-                array_keys($result[Cursor::COURSE_UNIT_RUBRIC_CAPABILITY] ?? [])
-            )->reindex();
-
-        $inUseRubric = $this->assessmentMapper->findByColumn(
-            'id',
-            array_keys($result[Cursor::COURSE_IN_USE_RUBRIC] ?? [])
-        )->reindex();
+        } catch (\Exception $e) {
+            $problem = (new ApiProblem($e->getMessage()))
+                ->setStatus(400)
+                ->asArray();
+            $this->response = $this->responseAsJson($problem)->withStatus(400);
+            return;
+        }
 
         $rubricTranslator = new RubricUsage(
             $this->routeGenerator,
