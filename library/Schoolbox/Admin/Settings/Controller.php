@@ -412,8 +412,14 @@ class Controller extends ConfigController
                 // This is for the settings in 'Admin -> School Data Import -> Home'.
                 return $user->hasServicePermission(UserAccess::SERVICE_TIMETABLE, UserAccess::ACCESS_FULL);
 
+            case 'lti':
+                // This is for the settings in 'Admin -> LMS -> LTI Tools'.
+                return $user->hasServicePermission(UserAccess::SERVICE_LMS, UserAccess::ACCESS_FULL);
+
             default:
-                // Do nothing.
+                // Of the other possible values for `config`.`module`, only 'oauth' has a corresponding /adminv2/$module page.
+                // That page is accessible by superusers only, and superusers have been handled above.
+                // So do nothing here.
         }
 
         return false;
