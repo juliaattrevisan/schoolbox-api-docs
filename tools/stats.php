@@ -340,6 +340,11 @@ $app = new class extends CliTool\App {
             'badges'            => 'SELECT count(*) FROM badge WHERE deleted_at IS NULL',
             'badge_goals'       => 'SELECT count(*) FROM badge_user WHERE status = "goal" AND deleted_at IS NULL',
             'badge_achieved'       => 'SELECT count(*) FROM badge_user WHERE status = "achievement" AND deleted_at IS NULL',
+
+            //Whats new
+            'whats_new_started' => 'SELECT COUNT(*) FROM tour_status INNER JOIN tour ON tour_status.tour_uuid = tour.uuid WHERE tour.title like "%Release" AND tour.deleted_at IS NULL AND tour_status.status = "' . Schoolbox\Tour\Status\Model::STATUS_STARTED . '"',
+            'whats_new_dismissed' => 'SELECT COUNT(*) FROM tour_status INNER JOIN tour ON tour_status.tour_uuid = tour.uuid WHERE tour.title like "%Release" AND tour.deleted_at IS NULL AND tour_status.status = "' . Schoolbox\Tour\Status\Model::STATUS_DISMISSED . '"',
+            'whats_new_completed' => 'SELECT COUNT(*) FROM tour_status INNER JOIN tour ON tour_status.tour_uuid = tour.uuid WHERE tour.title like "%Release" AND tour.deleted_at IS NULL AND tour_status.status = "' . Schoolbox\Tour\Status\Model::STATUS_COMPLETED . '"',
         ];
 
         $result['instance_id'] = INSTANCE_ID;
