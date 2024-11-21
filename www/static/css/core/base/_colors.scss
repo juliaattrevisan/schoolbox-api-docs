@@ -2,13 +2,13 @@
 :root {
     --color-background: var(--body-background);
     --color-foreground-primary: white;
-    --color-foreground-secondary: rgb(244, 242, 242);
+    --color-foreground-secondary: #f4f2f2;
     --color-text-primary: rgb(0, 0, 0);
     --color-text-secondary: rgb(82, 82, 82);
     --color-form-elements: var(--form-border-color);
     --color-focus-form-elements: var(--form-border-color);
     --color-loading: rgb(235, 234, 234);
-    --color-alert: #d8201d;
+    --color-alert: #ea0a06;
     --color-success: #298129;
     --color-warning: #ff7d00;
     --color-buttons: var(--content-ui-foreground);

@@ -36,6 +36,12 @@ export const Default: Story = {
 </div>
             `,
     }),
+    parameters: {
+        design: {
+            type: "figma",
+            url: "https://www.figma.com/design/kcebwjgNDzqyTtXZzgQNMO/UI-Kit?node-id=378-175&t=k3aLa3OixG4ZXmYW-4",
+        },
+    },
 };
 
 export const Disabled: Story = {
@@ -47,6 +53,29 @@ export const Disabled: Story = {
 </div>
             `,
     }),
+    parameters: {
+        design: {
+            type: "figma",
+            url: "https://www.figma.com/design/kcebwjgNDzqyTtXZzgQNMO/UI-Kit?node-id=387-52&t=pOW7vFLg8WXZIutZ-4",
+        },
+    },
+};
+
+export const Error: Story = {
+    render: () => ({
+        template: `
+<div class="l-flex-row l-flex--align-center">
+    <input id="cbx2" type="checkbox" class="c-input-checkbox error"/>
+    <label for="cbx2" class="c-label l-pad-s--horiz">Checkbox</label>
+</div>
+            `,
+    }),
+    parameters: {
+        design: {
+            type: "figma",
+            url: "https://www.figma.com/design/kcebwjgNDzqyTtXZzgQNMO/UI-Kit?node-id=387-64&t=pOW7vFLg8WXZIutZ-4",
+        },
+    },
 };
 
 /**
@@ -60,7 +89,14 @@ export const Intermediate: Story = {
     <label for="cbx3" class="c-label l-pad-s--horiz">Checkbox</label>
 </div>
             `,
-    }),
+        }),
+        parameters: {
+            design: {
+                type: "figma",
+                url: "https://www.figma.com/design/kcebwjgNDzqyTtXZzgQNMO/UI-Kit?node-id=387-84&t=pOW7vFLg8WXZIutZ-4",
+            },
+        },
+
 };
 
 export const List: Story = {

@@ -7,7 +7,7 @@
     appearance: none; // Remove most all native input styles
     background-color: var(--color-foreground-primary); // For iOS < 15
     border: var(--size-form-element-border-width) solid var(--sbx-color-accent);
-    border-radius: var(--roundness-form-elements);
+    border-radius: var(--sbx-border-radius-normal);
     color: var(--sbx-color-accent);
     cursor: pointer;
     display: grid;
@@ -62,4 +62,8 @@
     display: unset; // ^foundation-fixes^ - won't need once _forms.scss is removed
     margin: 0; // ^foundation-fixes^ - won't need once _forms.scss is removed
     vertical-align: baseline; // ^foundation-fixes^ - won't need  once _forms.scss is removed
+}
+.c-input-checkbox.error {
+    border: var(--size-form-element-border-width) solid var(--color-alert);
+    border-radius: var(--sbx-border-radius-normal);
 }
