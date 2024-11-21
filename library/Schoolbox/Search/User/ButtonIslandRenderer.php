@@ -73,22 +73,17 @@ class ButtonIslandRenderer
          */
         $pastoralUrl = false;
 
-        if ($this->authorizer->isPathAuthorizedForUser(
-            'pastoral.getStudent',
-            [
-                'studentId' => $viewee->getId(),
-                'student'   => $viewee,
-            ],
-            $this->viewer
-        )) {
+        /* omg codesnuffler
+         */
+        $pastoralRoute = 'pastoral.getStudent';
+        $pastoralParams = [
+            'studentId' => $viewee->getId(),
+            'student'   => $viewee,
+        ];
+
+        if ($this->authorizer->isPathAuthorizedForUser($pastoralRoute, $pastoralParams, $this->viewer)) {
             try {
-                $pastoralUrl = $this->routeGenerator->generate(
-                    'pastoral.getStudent',
-                    [
-                        'studentId' => $viewee->getId(),
-                        'student'   => $viewee,
-                    ]
-                );
+                $pastoralUrl = $this->routeGenerator->generate($pastoralRoute, $pastoralParams);
             } catch (RouteNotFound) {
                 // noop
             }
