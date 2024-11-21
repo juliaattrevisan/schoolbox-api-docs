@@ -19,6 +19,8 @@ class DetailedUsage
         protected Authorizer $authorizer,
         protected User $currentUser,
         private RubricUsage $rubricUsageTranslator,
+        private Collection $activities,
+        private Collection $lessonPlans,
         private array $capabilities,
         private Collection $inUseRubrics,
     ) {
@@ -78,37 +80,37 @@ class DetailedUsage
         }
 
         $translation = [
-            'onUnit'   => isset($usage['unit']),
+            'onUnit' =>
+                isset($usage['unit']) &&
+                $unit->getFolder()->getId() == $usage['unit']['folderId'],
         ];
 
-        if (isset($usage['activity'])) {
-            $translation['activity'] = array_map(
+        if ($this->activities->count() > 0) {
+            $translation['activity'] = $this->activities->map(
                 fn($activity) => [
-                    'name'   => $activity['title'],
-                    'icon'   => $activity['icon'],
+                    'name'   => $activity->getTitle(),
+                    'icon'   => $usage['activity'][$activity->getId()]['icon'],
                     '_links' => [
                         'view' => $this->getRouteIfAuthorized(
                             'learningAssessment.getAssessment',
-                            ['assessmentId' => $activity['id']],
+                            ['assessmentId' => $activity->getId()],
                         ),
                     ],
-                ],
-                $usage['activity']
+                ]
             );
         }
 
-        if (isset($usage[Cursor::COURSE_ACTIVITY_LESSON_PLAN])) {
-            $translation['lesson'] = array_map(
-                fn($lp) => [
-                    'name'   => $lp['title'],
+        if ($this->lessonPlans->count() > 0) {
+            $translation['lessonPlan'] = $this->lessonPlans->map(
+                fn($lessaonPlan) => [
+                    'name'   => $lessaonPlan->getTitle(),
                     '_links' => [
                         'view' => $this->getRouteIfAuthorized(
                             'learningAssessment.getAssessment',
-                            ['assessmentId' => $lp['id']],
+                            ['assessmentId' => $lessaonPlan->getId()],
                         ),
                     ],
-                ],
-                $usage[Cursor::COURSE_ACTIVITY_LESSON_PLAN]
+                ]
             );
         }
 

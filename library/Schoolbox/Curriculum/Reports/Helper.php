@@ -78,10 +78,10 @@ class Helper
         $statement = $db->executeQuery($unitUsageQuery);
         $usage = [];
         while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
-            $usage[$row['type']][] = [
+            $usage[$row['type']] = [
                 'id' => $row['id'],
                 'title' => $row['title'],
-                'folder_id' => $row['folder_id'],
+                'folderId' => $row['folder_id'],
             ];
         }
         return $usage;
@@ -176,11 +176,9 @@ class Helper
         $statement = $db->executeQuery($combinedUsageQuery);
         $usage = [];
         while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
-            $usage[$row['type']][] = [
+            $usage[$row['type']][$row['id']] = [
                 'id' => $row['id'],
                 'icon' => Cursor::ACTIVITY_ICON_LIST[$row['assessmentType']],
-                'title' => $row['title'],
-                'folder_id' => $row['folder_id'],
             ];
         }
 

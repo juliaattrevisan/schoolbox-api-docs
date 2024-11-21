@@ -234,7 +234,6 @@ class Controller extends Base
      */
     public function getCoverageUsage(): void
     {
-        $response = [];
         $query = $this->requestQuery;
         $courseId = $query->getInt('courseId');
         $unitId = $query->getInt('unitId');
@@ -288,6 +287,16 @@ class Controller extends Base
                     array_keys($result[Cursor::COURSE_UNIT_RUBRIC_CAPABILITY] ?? [])
                 )->reindex();
 
+            $activities = $this->assessmentMapper->findByColumn(
+                'id',
+                array_keys($result['activity'] ?? [])
+            );
+
+            $lessonPlans = $this->assessmentMapper->findByColumn(
+                'id',
+                array_keys($result[Cursor::COURSE_ACTIVITY_LESSON_PLAN] ?? [])
+            );
+
             $inUseRubric = $this->assessmentMapper->findByColumn(
                 'id',
                 array_keys($result[Cursor::COURSE_IN_USE_RUBRIC] ?? [])
@@ -311,6 +320,8 @@ class Controller extends Base
             $this->authorizer,
             $this->getUser(),
             $rubricTranslator,
+            $activities,
+            $lessonPlans,
             ['course' => $courseCapabilities, 'unit' => $unitCapacities],
             $inUseRubric,
         );
