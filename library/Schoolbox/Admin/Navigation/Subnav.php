@@ -191,7 +191,6 @@ class Subnav
                 'children'   => [
                     '/adminv2/lists/badge/achievement-category' => [
                         'name'        => 'Categories List',
-                        'visible'     => true,
                         'children'    => [],
                         'description' => 'Configure the list of categories that badges can be defined within.',
                     ],
@@ -216,25 +215,21 @@ class Subnav
                 'children'   => [
                     '/adminv2/calendar/Cleanup' => [
                         'name'        => 'Cleanup',
-                        'visible'     => true,
                         'children'    => [],
                         'description' => 'A tool to bulk or individually remove events from personal or group calendars.',
                     ],
                     '/adminv2/calendar/Import' => [
                         'name'        => 'Import',
-                        'visible'     => true,
                         'children'    => [],
                         'description' => 'Import events into the school calendar via ICS or CSV.',
                     ],
                     '/adminv2/calendar/Subscribe' => [
                         'name'        => 'Subscribe',
-                        'visible'     => true,
                         'children'    => [],
                         'description' => 'Control which additional calendars are included into a users calendar. This includes VCAL events, modules and the SIS.',
                     ],
                     '/adminv2/lists/calendar/event-type' => [
                         'name'        => 'Event Types',
-                        'visible'     => true,
                         'children'    => [],
                         'description' => 'Setup the list of event types for filtering and colour coding.',
                     ],
@@ -247,61 +242,51 @@ class Subnav
                 'children'   => [
                     '/adminv2/lists/design/component-definition' => [
                         'name'        => 'Components List',
-                        'visible'     => true,
                         'children'    => [],
                         'description' => 'Control which components can be used on homepages, dashboards and ePortfolios.',
                     ],
                     '/adminv2/dashboard' => [
                         'name'        => 'Dashboard Templates',
-                        'visible'     => true,
                         'children'    => [],
                         'description' => 'Configure the layout of the initial landing page when you first login for each role.',
                     ],
                     '/adminv2/homepage' => [
                         'name'        => 'Homepage Templates',
-                        'visible'     => true,
                         'children'    => [],
                         'description' => 'Configure and setup the scaffolding templates that users can create homepages from.',
                     ],
                     '/adminv2/profile-button' => [
                         'name'        => 'Profile Buttons',
-                        'visible'     => true,
                         'children'    => [],
                         'description' => 'Add your own custom buttons to a users profile page.',
                     ],
                     '/adminv2/profile-editor' => [
                         'name'        => 'Profile Editor',
-                        'visible'     => true,
                         'children'    => [],
                         'description' => 'Customise the fields and buttons on the staff, student and parent profile screens.',
                     ],
                     '/adminv2/menu-side' => [
                         'name'        => 'Side Menu',
-                        'visible'     => true,
                         'children'    => [],
                         'description' => 'Add and remove links to the hierarchical navigation menu on the left hand side of the screen.',
                     ],
                     '/adminv2/setting/design/Skin%20Config' => [
                         'name'        => 'Skin Config',
-                        'visible'     => true,
                         'children'    => [],
                         'description' => 'Configure the look and feel of your system, including colours, images and logos.',
                     ],
                     '/adminv2/terminology' => [
                         'name'        => 'Terminology',
-                        'visible'     => true,
                         'children'    => [],
                         'description' => 'Localise the words used to describe key features to your own language.',
                     ],
                     '/adminv2/lists/design/timetable-colour' => [
                         'name'        => 'Timetable Colours List',
-                        'visible'     => true,
                         'children'    => [],
                         'description' => 'Configure the set of colours used to randomly colour the timetable.',
                     ],
                     '/adminv2/menu-top' => [
                         'name'        => 'Top Menu',
-                        'visible'     => true,
                         'children'    => [],
                         'description' => 'Configure the top menu navigation and give quick access to the most important features.',
                     ],
@@ -314,13 +299,11 @@ class Subnav
                 'children'   => [
                     '/adminv2/engagement/index/collaboration' => [
                         'name'        => 'Collaboration',
-                        'visible'     => true,
                         'children'    => [],
                         'description' => 'Statistics on how users are using the collaboration features like forums and social feeds.',
                     ],
                     '/adminv2/engagement/index/components' => [
                         'name'        => 'Component Usage',
-                        'visible'     => true,
                         'children'    => [],
                         'description' => 'Statistics on which homepage components are currently in use.',
                     ],
@@ -332,25 +315,21 @@ class Subnav
                     ],
                     '/adminv2/engagement/index/files' => [
                         'name'        => 'Files',
-                        'visible'     => true,
                         'children'    => [],
                         'description' => 'Statistics on how many files are being created and accessed by different roles within the system.',
                     ],
                     '/adminv2/engagement/index/fileTypes' => [
                         'name'        => 'Media',
-                        'visible'     => true,
                         'children'    => [],
                         'description' => 'Statistics on how many videos and images are being viewed within the system.',
                     ],
                     '/adminv2/engagement/index/links' => [
                         'name'        => 'Links',
-                        'visible'     => true,
                         'children'    => [],
                         'description' => 'Statistics on how many links are being created and accessed by different roles within the system.',
                     ],
                     '/adminv2/engagement/index/login' => [
                         'name'        => 'Login',
-                        'visible'     => true,
                         'children'    => [],
                         'description' => 'Statistics on the total logins by role and also the percentage of users who have logged in at all.',
                     ],
@@ -362,13 +341,11 @@ class Subnav
                     ],
                     '/adminv2/engagement/index/news' => [
                         'name'        => 'News Posted',
-                        'visible'     => true,
                         'children'    => [],
                         'description' => 'Statistics regarding the amount of news being created within the system.',
                     ],
                     '/adminv2/engagement/index/quiz' => [
                         'name'        => 'Quizzes',
-                        'visible'     => true,
                         'children'    => [],
                         'description' => 'Statistics on how many quizzes have been created and attempted.',
                     ],
@@ -381,19 +358,16 @@ class Subnav
                 'children'   => [
                     '/adminv2/setting/ePortfolio' => [
                         'name'        => 'Policy',
-                        'visible'     => true,
                         'children'    => [],
                         'description' => 'Configure policies relating to ePortfolio.',
                     ],
                     '/adminv2/eportfolio/deploy' => [
                         'name'        => 'Deployment',
-                        'visible'     => true,
                         'children'    => [],
                         'description' => 'Configure and setup the scaffolding templates that users can create ePortfolio pages from.',
                     ],
                     '/adminv2/eportfolio' => [
                         'name'        => 'Templates',
-                        'visible'     => true,
                         'children'    => [],
                         'description' => 'Clone and deploy an ePortfolio page from one user to many other users.',
                     ],
@@ -406,13 +380,11 @@ class Subnav
                 'children'   => [
                     '/adminv2/import/photos/upload' => [
                         'name'        => 'Portrait Photos',
-                        'visible'     => true,
                         'children'    => [],
                         'description' => 'Manually upload portrait photos for users when the SIS does not automatically provide them.',
                     ],
                     '/adminv2/import/userAccount' => [
                         'name'        => 'User Accounts',
-                        'visible'     => true,
                         'children'    => [],
                         'description' => 'Import user accounts via a CSV file.',
                     ],
@@ -452,7 +424,6 @@ class Subnav
                     ],
                     '/adminv2/rollover' => [
                         'name'        => 'Class Rollover',
-                        'visible'     => true,
                         'children'    => [],
                         'description' => 'At the end of the year or semester, archive your class pages so you can start fresh the following year.',
                     ],
@@ -497,7 +468,6 @@ class Subnav
                     ],
                     '/adminv2/import/folder' => [
                         'name'        => 'Import Pages',
-                        'visible'     => true,
                         'children'    => [],
                         'description' => 'Import all school class pages via a CSV file.',
                     ],
@@ -518,7 +488,6 @@ class Subnav
                     ],
                     '/adminv2/lti' => [
                         'name'        => 'LTI Tools',
-                        'visible'     => true,
                         'children'    => [],
                         'description' => 'Configure the 3rd party LTI integrations that you wish to make available for use in the LTI component.',
                     ],
@@ -579,7 +548,6 @@ class Subnav
                 'children'   => [
                     '/adminv2/lists/campus' => [
                         'name'        => 'Campus',
-                        'visible'     => true,
                         'children'    => [],
                         'description' => 'Setup the campus within the school and configure which timetables are used by the campus.',
                     ],
@@ -591,7 +559,6 @@ class Subnav
                     ],
                     '/adminv2/lists/house' => [
                         'name'        => 'Houses',
-                        'visible'     => true,
                         'children'    => [],
                         'description' => 'Setup the school pastoral houses.',
                     ],
@@ -603,31 +570,26 @@ class Subnav
                     ],
                     '/adminv2/lists/residential-house' => [
                         'name'        => 'Residential Houses',
-                        'visible'     => true,
                         'children'    => [],
                         'description' => 'Setup the residential boarding houses that students attend.',
                     ],
                     '/adminv2/lists/roles' => [
                         'name'        => 'Roles',
-                        'visible'     => true,
                         'children'    => [],
                         'description' => 'Configure user roles within the system, the type of access they have and permissions.',
                     ],
                     '/adminv2/lists/user-title' => [
                         'name'        => 'User Titles',
-                        'visible'     => true,
                         'children'    => [],
                         'description' => 'Configure the drop down list of titles available for users.',
                     ],
                     '/adminv2/lists/user-pronoun' => [
                         'name'        => 'User Pronouns',
-                        'visible'     => true,
                         'children'    => [],
                         'description' => 'Configure the drop down list of pronouns available for users.',
                     ],
                     '/adminv2/lists/year-levels' => [
                         'name'        => 'Year Levels',
-                        'visible'     => true,
                         'children'    => [],
                         'description' => 'Configure the year levels and the policy settings related to those year levels.',
                     ],
@@ -645,13 +607,11 @@ class Subnav
                     ],
                     '/adminv2/feature-tours' => [
                         'name'        => 'Feature Tours',
-                        'visible'     => true,
                         'children'    => [],
                         'description' => 'Review the current guides that help new users get used to the system.',
                     ],
                     '/adminv2/package' => [
                         'name'        => 'Packages',
-                        'visible'     => true,
                         'children'    => [],
                         'description' => 'Install optional content packages supplied to get you started.',
                     ],
@@ -670,13 +630,11 @@ class Subnav
                 'children'    => [
                     '/adminv2/news' => [
                         'name'        => 'Settings / Policy',
-                        'visible'     => true,
                         'children'    => [],
                         'description' => 'Configure moderation and default values when posting and modifying news.',
                     ],
                     '/adminv2/lists/news/news-topic' => [
                         'name'        => 'Topics List',
-                        'visible'     => true,
                         'children'    => [],
                         'description' => 'Configure the list of news topics to allow categorisation of news.',
                     ],
@@ -688,25 +646,21 @@ class Subnav
                 'children'   => [
                     '/adminv2/notifications' => [
                         'name'        => 'Home',
-                        'visible'     => true,
                         'children'    => [],
                         'description' => 'Preview emailed notifications, and set a schedule for the sending of digest notifications.',
                     ],
                     '/adminv2/notifications/apps' => [
                         'name'        => 'Delivery Providers',
-                        'visible'     => true,
                         'children'    => [],
                         'description' => 'Configure and review how push notifications are delivered to mobile phones.',
                     ],
                     '/adminv2/notifications/puush' => [
                         'name'        => 'Mobile App Registrations',
-                        'visible'     => true,
                         'children'    => [],
                         'description' => 'Review the list of mobile devices that have registered to receive notifications.',
                     ],
                     '/adminv2/notifications/configure' => [
                         'name'        => 'Settings',
-                        'visible'     => true,
                         'children'    => [],
                         'description' => 'Configure the global notification settings for all user roles, how messages will be delivered, and what options they can select.',
                     ],
@@ -722,7 +676,6 @@ class Subnav
                 'children'   => [
                     '/adminv2/setting/pastoral/Pastoral%20Care' => [
                         'name'        => 'Settings / Policy',
-                        'visible'     => true,
                         'children'    => [],
                         'description' => 'Configure policy settings related to the pastoral care module.',
                     ],
@@ -740,19 +693,16 @@ class Subnav
                     ],
                     '/pastoral/bulk-import' => [
                         'name'        => 'Bulk Import',
-                        'visible'     => true,
                         'children'    => [],
                         'description' => 'Import a large number of pastoral records from files within a ZIP',
                     ],
                     '/pastoral/management/groups' => [
                         'name'        => 'Groups Management',
-                        'visible'     => true,
                         'children'    => [],
                         'description' => 'Manage Groups within the pastoral system',
                     ],
                     '/pastoral/management/audience/' => [
                         'name'        => 'Pastoral Record Settings',
-                        'visible'     => true,
                         'children'    => [],
                         'description' => 'Manage Flag, Audience and Template Defaults',
                     ],
@@ -764,19 +714,16 @@ class Subnav
                     ],
                     '/adminv2/lists/pastoral/pastoral-tags' => [
                         'name'        => 'Record Tags List',
-                        'visible'     => true,
                         'children'    => [],
                         'description' => 'Maintain tags used on pastoral records, or if setup, lock this list to be the only tags available.',
                     ],
                     '/adminv2/lists/pastoral/pastoral-document-classification' => [
                         'name'        => 'SIS Document Classifications List',
-                        'visible'     => true,
                         'children'    => [],
                         'description' => 'Configure how file attachments in pastoral are synchronised back to DocMan in Synergetic.',
                     ],
                     '/adminv2/lists/pastoral/pastoral-category' => [
                         'name'        => 'Sub-Types List',
-                        'visible'     => true,
                         'children'    => [],
                         'description' => 'Optionally configure further sub types under your existing types for more detailed categorisation of pastoral records.',
                     ],
@@ -788,7 +735,6 @@ class Subnav
                     ],
                     '/adminv2/lists/pastoral/pastoral-type' => [
                         'name'        => 'Types List',
-                        'visible'     => true,
                         'children'    => [],
                         'description' => 'Setup the types of pastoral records, to control visibility and categorisation..',
                     ],
@@ -801,13 +747,11 @@ class Subnav
                 'children'   => [
                     '/adminv2/allowed-file' => [
                         'name'        => 'Allowed Files',
-                        'visible'     => true,
                         'children'    => [],
                         'description' => 'Define the file mime types that can be uploaded, the maximum filesize and the icon they will use.',
                     ],
                     '/adminv2/video' => [
                         'name'        => 'Media Queue',
-                        'visible'     => true,
                         'children'    => [],
                         'description' => 'A log of videos and audio that is currently being transcoded or failed to transcode.',
                     ],
@@ -819,13 +763,11 @@ class Subnav
                     ],
                     '/adminv2/restore' => [
                         'name'        => 'Restore',
-                        'visible'     => true,
                         'children'    => [],
                         'description' => 'Undelete pages, folders and assessments that were accidentally deleted recently.',
                     ],
                     '/adminv2/usage' => [
                         'name'        => 'Usage',
-                        'visible'     => true,
                         'children'    => [],
                         'description' => 'View what files have been uploaded, by whom and how much disk space they are using.',
                     ],
@@ -841,7 +783,6 @@ class Subnav
                 'children'   => [
                     '/adminv2/import/schoolDataImport' => [
                         'name'        => 'Home',
-                        'visible'     => true,
                         'children'    => [],
                         'description' => 'Configure your school data (SIS) import process.',
                     ],
@@ -930,13 +871,11 @@ class Subnav
                     ],
                     '/adminv2/oauth' => [
                         'name'        => 'oAuth Provider Configuration',
-                        'visible'     => true,
                         'children'    => [],
                         'description' => 'Configure an oAuth endpoint to validate tokens provided by mobile apps.',
                     ],
                     '/adminv2/oauth/client' => [
                         'name'        => 'oAuth Client Configuration',
-                        'visible'     => true,
                         'children'    => [],
                         'description' => 'Configure oAuth/OIDC clients which may use this Schoolbox instance as an identity provider.',
                     ],
@@ -984,55 +923,46 @@ class Subnav
                 'children'   => [
                     '/adminv2/user' => [
                         'name'        => 'Home',
-                        'visible'     => true,
                         'children'    => [],
                         'description' => 'Overview of user accounts and ability to modify and view service permissions.',
                     ],
                     '/adminv2/reports/activity/all' => [
                         'name'        => 'Activity Report',
-                        'visible'     => true,
                         'children'    => [],
                         'description' => 'Access recent CMS actions like delete, create and modify of files, folders and links.',
                     ],
                     '/adminv2/import/userAccount' => [
                         'name'        => 'Import CSV',
-                        'visible'     => true,
                         'children'    => [],
                         'description' => 'Make changes to user accounts on bulk by uploading a CSV file.',
                     ],
                     '/adminv2/user/bulk/modify' => [
                         'name'        => 'Bulk Modify',
-                        'visible'     => true,
                         'children'    => [],
                         'description' => 'Make changes to user accounts on bulk by searching on various account attributes.',
                     ],
                     '/adminv2/user/create' => [
                         'name'        => 'Create User',
-                        'visible'     => true,
                         'children'    => [],
                         'description' => 'Setup a new user account for use in the platform.',
                     ],
                     '/adminv2/reports/login/all' => [
                         'name'        => 'Login Log',
-                        'visible'     => true,
                         'children'    => [],
                         'description' => 'View a list of all the recent successful and unsuccessful login attempts to the system.',
                     ],
                     '/adminv2/shaps' => [
                         'name'        => 'Schoolbox Help',
-                        'visible'     => true,
                         'children'    => [],
                         'description' => 'Ensure your staff have access to our online training, guides and forums.',
                     ],
                     '/adminv2/user/stale' => [
                         'name'        => 'Remove Users',
-                        'visible'     => true,
                         'children'    => [],
                         'description' => 'View and remove users which have not logged into the platform for a while.',
                     ],
                     '/adminv2/ups' => [
                         'name'        => 'User Provisioning System',
-                        'visible'     => true,
                         'children'    => [
                             '/adminv2/ups/student' => [
                                 'name'        => 'Student',
