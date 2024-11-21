@@ -2,6 +2,7 @@
  # Note that these are configured in the Profile Buttons part of admin, separate to the Profile Editor
  #
  # @param Collection $buttons                        A set of profile button instances to render
+ # @param array $session                             The current user's session superglobal representation
  # @param \Alaress_Date_Foramt $now                  The current datetime (used for calendar button urls)
  # @param \Schoobox\User $user                       The viewee
  # @param \Eportfolio_Authenticator $eportfolioAuth  A class that determiens if you have access to viewee's eportfolio
@@ -27,6 +28,9 @@
             'eportfolio': eportfolioAuth,
             'grades': config.lms_enabled,
             'timetable': config.lms_enabled and user.isShowTimetable,
+            'geosnapshot': isGeosnapshotAvailable,
+            'emailstaff': emailFunctionsAvailable and config.mail_enable and session.user.email,
+            'emailparents': emailFunctionsAvailable and config.mail_enable and session.user.email and user.isShowContacts
         },
         'parent': {
             '_default': true,
@@ -34,6 +38,9 @@
             'eportfolio': eportfolioAuth,
             'grades': config.lms_enabled,
             'timetable': config.lms_enabled and user.isShowTimetable,
+            'geosnapshot': isGeosnapshotAvailable,
+            'emailstaff': emailFunctionsAvailable and config.mail_enable and session.user.email,
+            'emailparents': emailFunctionsAvailable and config.mail_enable and session.user.email and user.isShowContacts
         },
         'staff': {
             '_default': USER.role.viewStudentProfile,
@@ -44,8 +51,8 @@
             'timetable': USER.role.viewStudentProfile and config.lms_enabled and user.isShowTimetable,
             'documentmanagement': USER.role.viewStudentProfile and config.external_document_report_enabled,
             'geosnapshot': USER.role.viewStudentProfile and isGeosnapshotAvailable,
-            'emailstaff': USER.role.viewStudentProfile and config.mail_enable and session.user.email,
-            'emailparents': USER.role.viewStudentProfile and config.mail_enable and session.user.email and user.isShowContacts
+            'emailstaff': USER.role.viewStudentProfile and emailFunctionsAvailable and config.mail_enable and session.user.email,
+            'emailparents': USER.role.viewStudentProfile and emailFunctionsAvailable and config.mail_enable and session.user.email and user.isShowContacts
         }
     } %}
 

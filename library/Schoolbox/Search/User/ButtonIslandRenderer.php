@@ -8,7 +8,10 @@
 
 namespace Schoolbox\Search\User;
 use Aura\Router\Exception\RouteNotFound;
+use Aura\Router\Generator;
 use Schoolbox\Geosnapshot\ValidStudentPhotosAvailable;
+use Schoolbox\Profile\Button\Mapper;
+use Schoolbox\User;
 use Twig\Environment;
 
 class ButtonIslandRenderer
@@ -16,13 +19,14 @@ class ButtonIslandRenderer
     /**
      * Constructor.
      *
-     * @param \Schoolbox\User                  $viewer
-     * @param \Alaress_Date_Format             $now
-     * @param \Eportfolio_Authenticator        $eportfolioAuthenticator
-     * @param string                           $geosnapshotApiKey
-     * @param string                           $geosnapshotEnabled
-     * @param \Aura\Router\Generator           $routeGenerator
-     * @param \Schoolbox\Profile\Button\Mapper $profileButtonMapper
+     * @param User                      $viewer
+     * @param \Alaress_Date_Format      $now
+     * @param \Eportfolio_Authenticator $eportfolioAuthenticator
+     * @param string                    $geosnapshotApiKey
+     * @param string                    $geosnapshotEnabled
+     * @param bool                      $emailFunctionsAvailable
+     * @param Generator                 $routeGenerator
+     * @param Mapper                    $profileButtonMapper
      */
     public function __construct(
         private \Schoolbox\User $viewer,
@@ -30,8 +34,9 @@ class ButtonIslandRenderer
         private \Eportfolio_Authenticator $eportfolioAuthenticator,
         private string $geosnapshotApiKey,
         private string $geosnapshotEnabled,
+        private bool $emailFunctionsAvailable,
         private \Aura\Router\Generator $routeGenerator,
-        private \Schoolbox\Profile\Button\Mapper $profileButtonMapper
+        private \Schoolbox\Profile\Button\Mapper $profileButtonMapper,
     ) {
     }
 
@@ -82,6 +87,9 @@ class ButtonIslandRenderer
              * custom buttons, as far as the end user is concerned
              */
             'buttons' => $buttons,
+            /* The current user session - sadly a superglobal for portability reasons
+             */
+            'session' => $_SESSION,
             /* This is used for the calendar url, a dynamic set of args
              */
             'now' => $this->now,
@@ -102,10 +110,11 @@ class ButtonIslandRenderer
              */
             'isGeosnapshotAvailable' => $isGeosnapshotAvailable,
             /* Used for emailing staff (Email All Teachers)
-             * TODO This never used to show on this component: it was hardcoded
+             * This never used to show on this component: it was hardcoded
              *  to only show on the profile screen and is a mega derivation.
              */
             'allTeacherIds' => [],
+            'emailFunctionsAvailable' => $this->emailFunctionsAvailable
         ]);
     }
 }

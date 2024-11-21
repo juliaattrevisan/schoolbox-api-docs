@@ -570,10 +570,13 @@ class Controller extends BaseController
                 /* Used for emailing staff (Email All Teachers)
                  */
                 'allTeacherIds' => implode(',', $allTeacherIds),
+                /* The current user session - sadly a superglobal for portability reasons
+                 */
+                'session' => $_SESSION,
+
 
                 /* Old implementation
                  */
-                'session' => $_SESSION,
                 'subjects'                 => $subjects,
                 'groups'                   => $groups,
                 'pdStates'                 => $this->professionalDevelopmentMapper->getStates(),

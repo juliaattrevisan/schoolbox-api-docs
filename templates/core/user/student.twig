@@ -254,12 +254,14 @@
              #}
             {% include '@searchUser/button/button-island.twig' with {
                 buttons: buttons,
+                session: session,
                 now: now,
                 user: user,
                 eportfolioAuth: eportfolioAuth,
                 pastoralUrl: pastoralUrl,
                 isGeosnapshotAvailable: isGeosnapshotAvailable,
-                allTeacherIds: allTeacherIds
+                allTeacherIds: allTeacherIds,
+                emailFunctionsAvailable: true,
             } only %}
 
             {% block travel_logs %}
