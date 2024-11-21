@@ -42,6 +42,7 @@ class Module extends \Alaress\Module\Module
                 new Rule\HasServicePermission(UserAccess::SERVICE_BADGE, UserAccess::ACCESS_FULL),
                 new Rule\HasServicePermission(UserAccess::SERVICE_CMS, UserAccess::ACCESS_FULL),
                 new Rule\HasServicePermission(UserAccess::SERVICE_DESIGN, UserAccess::ACCESS_FULL),
+                new Rule\HasServicePermission(UserAccess::SERVICE_TIMETABLE, UserAccess::ACCESS_FULL),
             )
         );
 

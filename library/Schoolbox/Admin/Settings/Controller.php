@@ -93,7 +93,7 @@ class Controller extends ConfigController
 
         $hiddenUrls = [];
         foreach ($pageList as $parentUrl => $parentData) {
-            if (!($parentData['visible'] ?? false)) {
+            if (!($parentData['visible'] ?? true)) {
                 $hiddenUrls[] = $parentUrl;
                 continue;
             }
@@ -101,7 +101,7 @@ class Controller extends ConfigController
             // Some parent items are intended only as root nodes for the HTML
             // navigation: they are not designed to be navigable themselves.
             // Do not add these items to the searchable payload.
-            if ($parentData['searchable'] ?? $parentData['visible'] ?? false) {
+            if ($parentData['searchable'] ?? ($parentData['visible'] ?? true)) {
                 $jsonPayload[] = [
                     'name'        => $parentUrl,
                     'title'       => $parentData['name'] ?? '',
@@ -111,11 +111,11 @@ class Controller extends ConfigController
             }
 
             foreach ($parentData['children'] as $childUrl => $childData) {
-                if (!($childData['visible'] ?? false)) {
+                if (!($childData['visible'] ?? true)) {
                     $hiddenUrls[] = $childUrl;
                     continue;
                 }
-                if ($childData['searchable'] ?? $childData['visible'] ?? false) {
+                if ($childData['searchable'] ?? ($childData['visible'] ?? true)) {
                     $jsonPayload[] = [
                         'name'        => $childUrl,
                         'title'       => ($parentData['name'] ?? '') . ' › ' . ($childData['name'] ?? ''),
