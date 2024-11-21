@@ -158,11 +158,58 @@ class Helper
 
         while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
             $usage[$row['type']]['folderId'] = $row['parentId'];
+            $usage[$row['type']][$row['capId']]['capabilities'] = $row['capName'];
             if ($row['indName'] === null) {
                 continue;
             }
             $usage[$row['type']][$row['capId']]['indicators'][] = [
                 'name' => $row['indName']
+            ];
+        }
+
+        $inUseRubricUsageQuery = sprintf(
+            "
+            SELECT
+                '%s' type,
+                v.assessment_id,
+                v.assessment_title,
+                cnrc.rubric_capability_id,
+                cnri.rubric_indicator_id,
+                v.capability_id,
+                v.capability_name,
+                v.indicator_id,
+                v.indicator_name
+            FROM v_rubric v
+            LEFT JOIN curriculum_node_for_rubric_capability cnrc
+                ON cnrc.rubric_capability_id = v.capability_id
+                AND cnrc.curriculum_node_id = %d
+            LEFT JOIN curriculum_node_for_rubric_indicator cnri
+                ON cnri.rubric_indicator_id = v.indicator_id
+                AND cnri.curriculum_node_id = %d
+            INNER JOIN assessment_course_unit_specification acus
+                ON v.assessment_id = acus.assessment_id
+            INNER JOIN course_unit_specification cus
+                ON cus.id = acus.course_unit_specification_id
+                AND cus.course_specification_id = %d
+            WHERE
+                cus.folder_id = %d
+                AND (cnrc.curriculum_node_id IS NOT NULL OR cnri.curriculum_node_id IS NOT NULL)
+        ",
+            Cursor::COURSE_IN_USE_RUBRIC,
+            $nodeId,
+            $nodeId,
+            $courseId,
+            $unitId
+        );
+
+        $statement = $db->executeQuery($inUseRubricUsageQuery);
+        while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
+            $usage[$row['type']][$row['assessment_id']][$row['capability_id']]['name'] = $row['capability_name'];
+            if ($row['rubric_indicator_id'] === null) {
+                continue;
+            }
+            $usage[$row['type']][$row['assessment_id']][$row['capability_id']]['indicators'][] = [
+                'name' => $row['indicator_name']
             ];
         }
 

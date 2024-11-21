@@ -21,6 +21,7 @@ use Schoolbox\Curriculum\Reports\Translator\Usage\RubricUsage;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Mapper as CourseUnitSpecificationMapper;
 use Schoolbox\Learning\Course\DataModel\Specification\Mapper as CourseSpecificationMapper;
 use Schoolbox\Assessment\Rubric\DataModel\Indicator\Mapper as RubricIndicatorMapper;
+use Schoolbox\Learning\Assessment\DataModel\Mapper as AssessmentMapper;
 use Schoolbox\Assessment\Rubric\DataModel\Capability\Mapper as RubricCapabilityMapper;
 use Schoolbox\Resource\Folder\Translator\ModelToArray\LinkOnly as FolderTranslator;
 use Schoolbox\Learning\Course\DataModel\Specification\Translator\ModelToArray as CourseSpecTranslator;
@@ -45,6 +46,7 @@ class Controller extends Base
         private CourseSpecificationMapper $courseSpecificationMapper,
         private CourseUnitSpecificationMapper $courseUnitSpecificationMapper,
         private RubricCapabilityMapper $rubricCapabilityMapper,
+        private AssessmentMapper $assessmentMapper,
         private Helper $helper,
     ) {
     }
@@ -285,6 +287,11 @@ class Controller extends Base
                 array_keys($result[Cursor::COURSE_UNIT_RUBRIC_CAPABILITY] ?? [])
             )->reindex();
 
+        $inUseRubric = $this->assessmentMapper->findByColumn(
+            'id',
+            array_keys($result[Cursor::COURSE_IN_USE_RUBRIC] ?? [])
+        )->reindex();
+
         $rubricTranslator = new RubricUsage(
             $this->routeGenerator,
             $this->authorizer,
@@ -296,7 +303,8 @@ class Controller extends Base
             $this->authorizer,
             $this->getUser(),
             $rubricTranslator,
-            ['course' => $courseCapabilities, 'unit' => $unitCapacities]
+            ['course' => $courseCapabilities, 'unit' => $unitCapacities],
+            $inUseRubric,
         );
 
         $response = $translator($courseUnitSpec, $result);

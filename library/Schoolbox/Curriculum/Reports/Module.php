@@ -20,6 +20,7 @@ use Schoolbox\Learning\Course\DataModel\Specification\Unit\Mapper as CourseUnitS
 use Schoolbox\Learning\Course\DataModel\Specification\Mapper as CourseSpecificationMapper;
 use Schoolbox\Assessment\Rubric\DataModel\Indicator\Mapper as RubricIndicatorMapper;
 use Schoolbox\Assessment\Rubric\DataModel\Capability\Mapper as RubricCapabilityMapper;
+use Schoolbox\Learning\Assessment\DataModel\Mapper as AssessmentMapper;
 
 class Module extends BaseModule
 {
@@ -59,6 +60,7 @@ class Module extends BaseModule
             $this->getMapperFactory()->get(CourseSpecificationMapper::class),
             $this->getMapperFactory()->get(CourseUnitSpecificationMapper::class),
             $this->getMapperFactory()->get(RubricCapabilityMapper::class),
+            $this->getMapperFactory()->get(AssessmentMapper::class),
             new Helper($curriculumMapper),
         );
     }

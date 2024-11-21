@@ -5,6 +5,7 @@ namespace Schoolbox\Curriculum\Reports\Translator\Usage;
 use Alaress\Authorizer\Authorizer;
 use Alaress\Authorizer\GetRouteIfAuthorized;
 use Aura\Router\Generator;
+use Schoolbox\Collection;
 use Schoolbox\Curriculum\Reports\Cursor;
 use Schoolbox\User;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as CourseUnitModel;
@@ -19,6 +20,7 @@ class DetailedUsage
         protected User $currentUser,
         private RubricUsage $rubricUsageTranslator,
         private array $capabilities,
+        private Collection $inUseRubrics,
     ) {
     }
 
@@ -36,7 +38,7 @@ class DetailedUsage
                 return call_user_func(
                     $this->rubricUsageTranslator,
                     $cap,
-                    $usage[Cursor::COURSE_RUBRIC_CAPABILITY][$cap->getId()]['indicators']
+                    $usage[Cursor::COURSE_RUBRIC_CAPABILITY][$cap->getId()]['indicators'] ?? []
                 );
             }
         );
@@ -58,7 +60,7 @@ class DetailedUsage
                 return call_user_func(
                     $this->rubricUsageTranslator,
                     $cap,
-                    $usage[Cursor::COURSE_UNIT_RUBRIC_CAPABILITY][$cap->getId()]['indicators']
+                    $usage[Cursor::COURSE_UNIT_RUBRIC_CAPABILITY][$cap->getId()]['indicators'] ?? []
                 );
             }
         );
@@ -102,7 +104,32 @@ class DetailedUsage
                 ],
                 $usage[Cursor::COURSE_ACTIVITY_LESSON_PLAN] ?? []
             ),
-            'rubric' => $rubric
+            'rubric' => $rubric,
+            'inUseRubrics' => $this->inUseRubrics->map(
+                fn($assessment) => [
+                    'name' => $assessment->getTitle(),
+                    'rubric' => [
+                        'capabilities' => array_map(fn($cap) => [
+                            'name'       => $cap['name'],
+                            'indicators' => $cap['indicators'] ?? [],
+                        ],
+                            $usage[Cursor::COURSE_IN_USE_RUBRIC][$assessment->getId()]
+                        ),
+                        '_links' => [
+                            'view' => $this->getRouteIfAuthorized(
+                                'rubricManager.getForm',
+                                ['folderId' => $assessment->getContextUnitSpecification()->getFolder()->getId()],
+                            )
+                        ]
+                    ],
+                    '_links' => [
+                        'view' => $this->getRouteIfAuthorized(
+                            'learningAssessment.getAssessment',
+                            ['assessmentId' => $assessment->getId()],
+                        )
+                    ]
+                ]
+            )
         ];
     }
 }
