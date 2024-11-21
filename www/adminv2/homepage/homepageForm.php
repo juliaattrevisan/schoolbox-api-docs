@@ -1,7 +1,6 @@
 <?php
 
 /**
- *
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
@@ -9,6 +8,7 @@
 
 use Schoolbox\Application\Exception\Exception as SchoolboxException;
 use Schoolbox\Error\Mapper as ErrorMapper;
+use Schoolbox\Permission\Access\UserAccess;
 
 // we should not be in SitePage context for this
 if (isset($this)) {
@@ -23,8 +23,11 @@ $page = $kernel->get('sitePage');
 $page->initSession();
 
 // this is an admin function, so check user is super-awesome
-if (!isset($_SESSION['su']) || (!$_SESSION['su'])) {
-    throw ErrorMapper::getInstance()->generateException(ErrorMapper::ERROR_RESOURCE_NOT_FOUND);
+if (
+    !$_SESSION['user']->isSuperuser() &&
+    !$_SESSION['user']->hasServicePermission(UserAccess::SERVICE_DESIGN, UserAccess::ACCESS_FULL)
+) {
+    throw ErrorMapper::getInstance()->generateException(ErrorMapper::ERROR_PERM_PAGE_VIEW);
 }
 
 // action has to be set, and not empty
