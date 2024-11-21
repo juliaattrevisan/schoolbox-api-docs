@@ -73,10 +73,14 @@ class ButtonIslandRenderer
          */
         $pastoralUrl = false;
 
-        if ($this->authorizer->isPathAuthorizedForUser('pastoral.getStudent', [
-            'studentId' => $viewee->getId(),
-            'student'   => $viewee,
-        ], $this->viewer)) {
+        if ($this->authorizer->isPathAuthorizedForUser(
+            'pastoral.getStudent',
+            [
+                'studentId' => $viewee->getId(),
+                'student'   => $viewee,
+            ],
+            $this->viewer
+        )) {
             try {
                 $pastoralUrl = $this->routeGenerator->generate(
                     'pastoral.getStudent',
