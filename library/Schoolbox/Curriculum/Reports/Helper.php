@@ -158,7 +158,6 @@ class Helper
 
         while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
             $usage[$row['type']]['folderId'] = $row['parentId'];
-            $usage[$row['type']][$row['capId']]['indicators'] = [];
             if ($row['indName'] === null) {
                 continue;
             }
