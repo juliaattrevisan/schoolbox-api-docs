@@ -131,7 +131,7 @@ window.Vue.watch(
                         <p class="f-no-margins">
                             <b>{{ capability.name }}</b>
                         </p>
-                        <ul>
+                        <ul class="l-mar--0-bottom">
                             <li v-for="indicator in capability.indicators" :key="indicator.name">
                                 {{ indicator.name }}
                             </li>
@@ -146,7 +146,7 @@ window.Vue.watch(
                         <p class="f-no-margins">
                             <b>{{ capability.name }}</b>
                         </p>
-                        <ul>
+                        <ul class="l-mar--0-bottom">
                             <li v-for="indicator in capability.indicators" :key="indicator.name">
                                 {{ indicator.name }}
                             </li>
