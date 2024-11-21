@@ -80,7 +80,7 @@ class Component_Dashboard_ChildSubjectController extends Component_Dashboard_Con
              * Renders the button island the same way as on the profile screen
              */
             $buttonIslandRenderer = new \Schoolbox\Search\User\ButtonIslandRenderer(
-                $userChild,
+                $this->getUser(),
                 new Alaress_Date_Format($_SERVER['REQUEST_TIME'], 'U'),
                 new \Eportfolio_Authenticator($_SESSION['user'], $userChild),
                 $this->getConfigLoader()->get('geosnapshot_api_key'),
