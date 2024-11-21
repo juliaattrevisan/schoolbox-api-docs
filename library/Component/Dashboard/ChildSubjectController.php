@@ -86,6 +86,7 @@ class Component_Dashboard_ChildSubjectController extends Component_Dashboard_Con
                 $this->getConfigLoader()->get('geosnapshot_api_key'),
                 $this->getConfigLoader()->get('geosnapshot_enabled'),
                 false,
+                $this->getAuthorizer(),
                 $this->getRouteGenerator(),
                 \Schoolbox\Profile\Button\Mapper::getInstance(),
             );

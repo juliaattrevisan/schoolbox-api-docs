@@ -8,6 +8,7 @@
 
 namespace Schoolbox\Search\User;
 
+use Alaress\Authorizer\Authorizer;
 use Aura\Router\Exception\RouteNotFound;
 use Aura\Router\Generator;
 use Schoolbox\Geosnapshot\ValidStudentPhotosAvailable;
@@ -26,6 +27,7 @@ class ButtonIslandRenderer
      * @param string                    $geosnapshotApiKey
      * @param string                    $geosnapshotEnabled
      * @param bool                      $emailFunctionsAvailable
+     * @param Authorizer                $authorizer
      * @param Generator                 $routeGenerator
      * @param Mapper                    $profileButtonMapper
      */
@@ -36,6 +38,7 @@ class ButtonIslandRenderer
         private string $geosnapshotApiKey,
         private string $geosnapshotEnabled,
         private bool $emailFunctionsAvailable,
+        private \Alaress\Authorizer\Authorizer $authorizer,
         private \Aura\Router\Generator $routeGenerator,
         private \Schoolbox\Profile\Button\Mapper $profileButtonMapper,
     ) {
@@ -70,17 +73,22 @@ class ButtonIslandRenderer
          */
         $pastoralUrl = false;
 
-        try {
-            $pastoralUrl = $this->routeGenerator->generate(
-                'pastoral.getStudent',
-                [
-                    'studentId' => $viewee->getId(),
-                    'student'   => $viewee,
-                ],
-                $this->viewer
-            );
-        } catch (RouteNotFound) {
-            // noop
+        if ($this->authorizer->isPathAuthorizedForUser('pastoral.getStudent', [
+            'studentId' => $viewee->getId(),
+            'student'   => $viewee,
+        ], $this->viewer)) {
+            try {
+                $pastoralUrl = $this->routeGenerator->generate(
+                    'pastoral.getStudent',
+                    [
+                        'studentId' => $viewee->getId(),
+                        'student'   => $viewee,
+                    ],
+                    $this->viewer
+                );
+            } catch (RouteNotFound) {
+                // noop
+            }
         }
 
         return $twig->render('@searchUser/button/button-island.twig', [
