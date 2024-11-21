@@ -113,7 +113,7 @@ class DetailedUsage
                             'name'       => $cap['name'],
                             'indicators' => $cap['indicators'] ?? [],
                         ],
-                            $usage[Cursor::COURSE_IN_USE_RUBRIC][$assessment->getId()]
+                            array_values($usage[Cursor::COURSE_IN_USE_RUBRIC][$assessment->getId()])
                         ),
                         '_links' => [
                             'view' => $this->getRouteIfAuthorized(
