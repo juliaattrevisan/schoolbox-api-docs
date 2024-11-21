@@ -72,7 +72,7 @@ export type CurriculumCoverageNode = Pick<Node, "id" | "name" | "code"> & {
 /**
  * Used in activity and lesson plan
  */
-type Item = {
+export type Item = {
     name: string;
     icon?: string; // only for activity
     _links: {
@@ -98,7 +98,7 @@ type RubricCapability = {
 /**
  * The expected payload for a rubric
  */
-type Rubric = {
+export type Rubric = {
     capabilities: RubricCapability[];
     _links: {
         view: string;

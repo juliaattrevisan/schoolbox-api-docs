@@ -8,6 +8,8 @@ import { usePopOut } from "@schoolboxVue/composables/popOut/usePopOut";
 import { usePopOutStore } from "./store/ccPopOutStore";
 import { useFiltersStore } from "./store/ccFiltersStore";
 import { ReportOptionValues } from "../js/types/curriculumCoverageTypes";
+import CcUsagePopOutItems from "./cc-usage-pop-out-items.vue";
+import CcUsagePopOutRubric from "./cc-usage-pop-out-rubric.vue";
 
 const popOutElement = useTemplateRef<HTMLDivElement>("popOutElement");
 const popOutStore = usePopOutStore();
@@ -91,14 +93,7 @@ window.Vue.watch(
                 class="usage__section"
             >
                 <h5 class="section-title">Learning Activities</h5>
-                <template v-for="activity in popOutStore.usage.activity" :key="activity._links.view">
-                    <h6 class="f-no-margins">
-                        <a :href="activity._links.view" :title="`View ${activity.name}`" class="l-flex l-gap-s">
-                            <sbx-icon :name="activity.icon" />
-                            {{ activity.name }}
-                        </a>
-                    </h6>
-                </template>
+                <cc-usage-pop-out-items :items="popOutStore.usage.activity" />
             </div>
             <div
                 v-if="
@@ -109,14 +104,7 @@ window.Vue.watch(
                 class="usage__section"
             >
                 <h5 class="section-title">Lesson Plans</h5>
-                <template v-for="lessonPlan in popOutStore.usage.lessonPlan" :key="lessonPlan._links.view">
-                    <h6 class="f-no-margins">
-                        <a :href="lessonPlan._links.view" :title="`View ${lessonPlan.name}`" class="l-flex l-gap-s">
-                            <sbx-icon :name="lessonPlan.icon" />
-                            {{ lessonPlan.name }}
-                        </a>
-                    </h6>
-                </template>
+                <cc-usage-pop-out-items :items="popOutStore.usage.lessonPlan" />
             </div>
             <div
                 v-if="
@@ -131,31 +119,13 @@ window.Vue.watch(
                     <h6 class="section-sub-title">
                         <a :href="popOutStore.usage.rubric.course._links.view">Course Rubrics</a>
                     </h6>
-                    <div v-for="capability in popOutStore.usage.rubric.course.capabilities" :key="capability.name">
-                        <p class="f-no-margins">
-                            <b>{{ capability.name }}</b>
-                        </p>
-                        <ul class="l-mar--0-bottom">
-                            <li v-for="indicator in capability.indicators" :key="indicator.name">
-                                {{ indicator.name }}
-                            </li>
-                        </ul>
-                    </div>
+                    <cc-usage-pop-out-rubric :rubric="popOutStore.usage.rubric.course" />
                 </template>
                 <template v-if="popOutStore.usage.rubric.unit && popOutStore.usage.rubric.unit.capabilities.length > 0">
                     <h6 class="section-sub-title">
                         <a :href="popOutStore.usage.rubric.unit._links.view">Unit Rubrics</a>
                     </h6>
-                    <div v-for="capability in popOutStore.usage.rubric.unit.capabilities" :key="capability.name">
-                        <p class="f-no-margins">
-                            <b>{{ capability.name }}</b>
-                        </p>
-                        <ul class="l-mar--0-bottom">
-                            <li v-for="indicator in capability.indicators" :key="indicator.name">
-                                {{ indicator.name }}
-                            </li>
-                        </ul>
-                    </div>
+                    <cc-usage-pop-out-rubric :rubric="popOutStore.usage.rubric.unit" />
                 </template>
             </div>
             <div
@@ -174,16 +144,7 @@ window.Vue.watch(
                             {{ activity.name }}
                         </a>
                     </h6>
-                    <div v-for="capability in activity.rubric.capabilities" :key="capability.name">
-                        <p class="f-no-margins">
-                            <b>{{ capability.name }}</b>
-                        </p>
-                        <ul class="l-mar--0-bottom">
-                            <li v-for="indicator in capability.indicators" :key="indicator.name">
-                                {{ indicator.name }}
-                            </li>
-                        </ul>
-                    </div>
+                    <cc-usage-pop-out-rubric :rubric="activity.rubric" />
                 </template>
             </div>
         </div>
