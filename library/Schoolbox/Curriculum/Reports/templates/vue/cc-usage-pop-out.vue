@@ -154,6 +154,32 @@ window.Vue.watch(
                     </div>
                 </template>
             </div>
+            <div
+                v-if="
+                    filtersStore.selectedReportOptions.includes(ReportOptionValues.IN_USE_RUBRIC) &&
+                    popOutStore.usage?.inUseRubric &&
+                    popOutStore.usage.inUseRubric.length > 0
+                "
+                class="usage__section"
+            >
+                <h4 class="l-pad-xs--bottom f-no-margins">In-use Rubric</h4>
+                <template v-for="activity in popOutStore.usage.inUseRubric" :key="activity._links.view">
+                    <a :href="activity._links.view" :title="`View ${activity.name}`" class="l-flex l-gap-s">
+                        <sbx-icon name="project" />
+                        <h5 class="f-no-margins">{{ activity.name }}</h5>
+                    </a>
+                    <div v-for="capability in activity.rubric.capabilities" :key="capability.name">
+                        <p class="f-no-margins">
+                            <b>{{ capability.name }}</b>
+                        </p>
+                        <ul class="l-mar--0-bottom">
+                            <li v-for="indicator in capability.indicators" :key="indicator.name">
+                                {{ indicator.name }}
+                            </li>
+                        </ul>
+                    </div>
+                </template>
+            </div>
         </div>
     </div>
 </template>
