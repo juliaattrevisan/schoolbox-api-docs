@@ -87,8 +87,7 @@ class ButtonIslandRenderer
                     [
                         'studentId' => $viewee->getId(),
                         'student'   => $viewee,
-                    ],
-                    $this->viewer
+                    ]
                 );
             } catch (RouteNotFound) {
                 // noop
