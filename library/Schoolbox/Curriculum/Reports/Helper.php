@@ -38,10 +38,20 @@ class Helper
             $unitId
         );
 
+        $statement = $db->executeQuery($unitUsageQuery);
+
+        while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
+            $usage[$row['type']][] = [
+                'id' => $row['id'],
+                'title' => $row['title'],
+                'folder_id' => $row['folder_id'],
+            ];
+        }
+
         $activityUsageQuery = sprintf(
             "
             SELECT
-                'activity' type, a.id, a.title, cus.folder_id
+                'activity' type, activity.type assessmentType, a.id, a.title, cus.folder_id
             FROM (
                  SELECT '%s' type, t.assessment_id
                  FROM task t
@@ -83,13 +93,10 @@ class Helper
         $lessonPlanUsageQuery = sprintf(
             "
             SELECT
-                activity.type, a.id, a.title, cus.folder_id
-            FROM (
-                 SELECT '%s' type, lp.assessment_id
-                 FROM lesson_plan lp
-            ) activity
+                '%s' type, '%s' assessmentType, a.id, a.title, cus.folder_id
+            FROM lesson_plan lp
             INNER JOIN curriculum_node_for_assessment cnfa
-                ON cnfa.assessment_id = activity.assessment_id
+                ON cnfa.assessment_id = lp.assessment_id
                 AND cnfa.curriculum_node_id = %d
             INNER JOIN assessment_course_unit_specification acus ON acus.assessment_id = cnfa.assessment_id
             INNER JOIN course_unit_specification cus
@@ -97,9 +104,10 @@ class Helper
                 AND cus.course_specification_id = %d
                 AND cus.folder_id = %d
             INNER JOIN assessment a
-                ON a.id = activity.assessment_id
+                ON a.id = lp.assessment_id
                 AND a.deleted_at IS NULL
         ",
+            Cursor::COURSE_ACTIVITY_LESSON_PLAN,
             Cursor::COURSE_ACTIVITY_LESSON_PLAN,
             $nodeId,
             $courseId,
@@ -107,7 +115,6 @@ class Helper
         );
 
         $combinedUsageQuery = '( ' . implode(' UNION ', [
-                $unitUsageQuery,
                 $activityUsageQuery,
                 $lessonPlanUsageQuery,
             ]) . ' )';
@@ -117,6 +124,7 @@ class Helper
         while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
             $usage[$row['type']][] = [
                 'id' => $row['id'],
+                'icon' => Cursor::ACTIVITY_ICON_LIST[$row['assessmentType']],
                 'title' => $row['title'],
                 'folder_id' => $row['folder_id'],
             ];

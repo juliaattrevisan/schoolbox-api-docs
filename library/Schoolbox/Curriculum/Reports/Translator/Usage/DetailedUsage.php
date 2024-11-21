@@ -83,6 +83,7 @@ class DetailedUsage
             'activity' => array_map(
                 fn($activity) => [
                     'name'   => $activity['title'],
+                    'icon'   => $activity['icon'],
                     '_links' => [
                         'view' => $this->getRouteIfAuthorized(
                             'learningAssessment.getAssessment',
@@ -105,14 +106,16 @@ class DetailedUsage
                 $usage[Cursor::COURSE_ACTIVITY_LESSON_PLAN] ?? []
             ),
             'rubric' => $rubric,
-            'inUseRubrics' => $this->inUseRubrics->map(
+            'inUseRubric' => $this->inUseRubrics->map(
                 fn($assessment) => [
                     'name' => $assessment->getTitle(),
+                    'icon' => Cursor::ACTIVITY_ICON_LIST[Cursor::COURSE_ACTIVITY_DUE_WORK],
                     'rubric' => [
-                        'capabilities' => array_map(fn($cap) => [
-                            'name'       => $cap['name'],
-                            'indicators' => $cap['indicators'] ?? [],
-                        ],
+                        'capabilities' => array_map(
+                            fn($cap) => [
+                                'name'       => $cap['name'],
+                                'indicators' => $cap['indicators'] ?? [],
+                            ],
                             array_values($usage[Cursor::COURSE_IN_USE_RUBRIC][$assessment->getId()])
                         ),
                         '_links' => [
