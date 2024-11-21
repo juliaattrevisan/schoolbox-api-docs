@@ -79,7 +79,7 @@
                 {# Only link parent nodes if they have no children
                  # Otherwise rely entirely on the children
                  #}
-                {% set children = parentData.children | filter(childData => childData.visible) %}
+                {% set children = parentData.children | filter(childData => childData.visible|default(true)) %}
                 {% if children | length %}
                     <a>{{ parentData.name }}</a>
                 {% else %}
