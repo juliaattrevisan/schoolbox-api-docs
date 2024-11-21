@@ -117,11 +117,11 @@ type InUseRubric = Item & {
  */
 export type IndividualUsage = {
     onUnit: boolean; // if the node is assigned to the unit
-    activity: Item[]; // the activities the node is assigned to
-    lessonPlan: Item[]; // the lesson plans the node is assigned to
-    rubric: {
-        course: Rubric;
-        unit: Rubric;
+    activity?: Item[]; // the activities the node is assigned to
+    lessonPlan?: Item[]; // the lesson plans the node is assigned to
+    rubric?: {
+        course?: Rubric;
+        unit?: Rubric;
     };
-    inUseRubric: InUseRubric[];
+    inUseRubric?: InUseRubric[];
 };

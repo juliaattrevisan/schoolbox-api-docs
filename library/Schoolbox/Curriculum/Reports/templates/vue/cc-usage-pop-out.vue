@@ -73,7 +73,7 @@ window.Vue.watch(
         <div v-else-if="popOutStore.isLoading && !popOutStore.hasLoadError" class="usage__loader">
             <div class="loader"></div>
         </div>
-        <div v-else class="l-flex-col l-gap-s">
+        <div v-else-if="popOutStore.usage" class="l-flex-col l-gap-m">
             <div
                 v-if="filtersStore.selectedReportOptions.includes(ReportOptionValues.UNIT) && popOutStore.usage?.onUnit"
                 class="usage__section"
@@ -87,8 +87,7 @@ window.Vue.watch(
             <div
                 v-if="
                     filtersStore.selectedReportOptions.includes(ReportOptionValues.LEARNING_ACTIVITY) &&
-                    popOutStore.usage &&
-                    popOutStore.usage.activity.length > 0
+                    popOutStore.usage.activity
                 "
                 class="usage__section"
             >
@@ -98,8 +97,7 @@ window.Vue.watch(
             <div
                 v-if="
                     filtersStore.selectedReportOptions.includes(ReportOptionValues.LEARNING_ACTIVITY_LESSON_PLAN) &&
-                    popOutStore.usage?.lessonPlan &&
-                    popOutStore.usage.lessonPlan.length > 0
+                    popOutStore.usage.lessonPlan
                 "
                 class="usage__section"
             >
@@ -108,20 +106,18 @@ window.Vue.watch(
             </div>
             <div
                 v-if="
-                    filtersStore.selectedReportOptions.includes(ReportOptionValues.RUBRIC) && popOutStore.usage?.rubric
+                    filtersStore.selectedReportOptions.includes(ReportOptionValues.RUBRIC) && popOutStore.usage.rubric
                 "
                 class="usage__section"
             >
                 <h5 class="section-title">Rubric</h5>
-                <template
-                    v-if="popOutStore.usage.rubric.course && popOutStore.usage.rubric.course.capabilities.length > 0"
-                >
+                <template v-if="popOutStore.usage.rubric.course">
                     <h6 class="section-sub-title">
                         <a :href="popOutStore.usage.rubric.course._links.view">Course Rubrics</a>
                     </h6>
                     <cc-usage-pop-out-rubric :rubric="popOutStore.usage.rubric.course" />
                 </template>
-                <template v-if="popOutStore.usage.rubric.unit && popOutStore.usage.rubric.unit.capabilities.length > 0">
+                <template v-if="popOutStore.usage.rubric.unit">
                     <h6 class="section-sub-title">
                         <a :href="popOutStore.usage.rubric.unit._links.view">Unit Rubrics</a>
                     </h6>
@@ -131,8 +127,7 @@ window.Vue.watch(
             <div
                 v-if="
                     filtersStore.selectedReportOptions.includes(ReportOptionValues.IN_USE_RUBRIC) &&
-                    popOutStore.usage?.inUseRubric &&
-                    popOutStore.usage.inUseRubric.length > 0
+                    popOutStore.usage.inUseRubric
                 "
                 class="usage__section"
             >
