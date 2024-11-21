@@ -76,7 +76,7 @@ window.Vue.watch(
                 v-if="filtersStore.selectedReportOptions.includes(ReportOptionValues.UNIT) && popOutStore.usage?.onUnit"
                 class="usage__section"
             >
-                <h4 class="l-pad-xs--bottom f-no-margins">Unit</h4>
+                <h4 class="section-title">Unit</h4>
                 <div class="l-flex l-gap-s">
                     <sbx-icon name="unit" />
                     <p class="f-no-margins">Assigned to Unit</p>
@@ -90,12 +90,12 @@ window.Vue.watch(
                 "
                 class="usage__section"
             >
-                <h4 class="l-pad-xs--bottom f-no-margins">Learning Activities</h4>
+                <h4 class="section-title">Learning Activities</h4>
                 <template v-for="activity in popOutStore.usage.activity" :key="activity._links.view">
-                    <h5 class="l-flex l-gap-s l-pad-xs--bottom f-no-margins">
+                    <a :href="activity._links.view" :title="`View ${activity.name}`" class="section-sub-title">
                         <sbx-icon :name="activity.icon" />
-                        <a :href="activity._links.view" :title="`View ${activity.name}`">{{ activity.name }}</a>
-                    </h5>
+                        {{ activity.name }}
+                    </a>
                 </template>
             </div>
             <div
@@ -106,12 +106,12 @@ window.Vue.watch(
                 "
                 class="usage__section"
             >
-                <h4 class="l-pad-xs--bottom f-no-margins">Lesson Plans</h4>
+                <h4 class="section-title">Lesson Plans</h4>
                 <template v-for="lessonPlan in popOutStore.usage.lessonPlan" :key="lessonPlan._links.view">
-                    <h5 class="l-flex l-gap-s l-pad-xs--bottom f-no-margins">
+                    <a :href="lessonPlan._links.view" :title="`View ${lessonPlan.name}`" class="section-sub-title">
                         <sbx-icon :name="lessonPlan.icon" />
-                        <a :href="lessonPlan._links.view" :title="`View ${lessonPlan.name}`">{{ lessonPlan.name }}</a>
-                    </h5>
+                        {{ lessonPlan.name }}
+                    </a>
                 </template>
             </div>
             <div
@@ -120,13 +120,15 @@ window.Vue.watch(
                 "
                 class="usage__section"
             >
-                <h4 class="l-pad-xs--bottom f-no-margins">Rubric</h4>
+                <h4 class="section-title">Rubric</h4>
                 <template
                     v-if="popOutStore.usage.rubric.course && popOutStore.usage.rubric.course.capabilities.length > 0"
                 >
-                    <h5 class="l-pad-xs--bottom f-no-margins">
-                        <a :href="popOutStore.usage.rubric.course._links.view">Course Rubrics</a>
-                    </h5>
+                    <a
+                        :href="popOutStore.usage.rubric.course._links.view"
+                        class="section-sub-title section-sub-title--with-border"
+                        >Course Rubrics</a
+                    >
                     <div v-for="capability in popOutStore.usage.rubric.course.capabilities" :key="capability.name">
                         <p class="f-no-margins">
                             <b>{{ capability.name }}</b>
@@ -139,9 +141,11 @@ window.Vue.watch(
                     </div>
                 </template>
                 <template v-if="popOutStore.usage.rubric.unit && popOutStore.usage.rubric.unit.capabilities.length > 0">
-                    <h5 class="l-pad-xs--bottom f-no-margins">
-                        <a :href="popOutStore.usage.rubric.unit._links.view">Unit Rubrics</a>
-                    </h5>
+                    <a
+                        :href="popOutStore.usage.rubric.unit._links.view"
+                        class="section-sub-title section-sub-title--with-border"
+                        >Unit Rubrics</a
+                    >
                     <div v-for="capability in popOutStore.usage.rubric.unit.capabilities" :key="capability.name">
                         <p class="f-no-margins">
                             <b>{{ capability.name }}</b>
@@ -162,12 +166,16 @@ window.Vue.watch(
                 "
                 class="usage__section"
             >
-                <h4 class="l-pad-xs--bottom f-no-margins">In-use Rubric</h4>
+                <h4 class="section-title">In-use Rubric</h4>
                 <template v-for="activity in popOutStore.usage.inUseRubric" :key="activity._links.view">
-                    <h5 class="l-flex l-gap-s l-pad-xs--bottom f-no-margins">
+                    <a
+                        :href="activity._links.view"
+                        :title="`View ${activity.name}`"
+                        class="section-sub-title section-sub-title--with-border"
+                    >
                         <sbx-icon :name="activity.icon" />
-                        <a :href="activity._links.view" :title="`View ${activity.name}`">{{ activity.name }}</a>
-                    </h5>
+                        {{ activity.name }}
+                    </a>
                     <div v-for="capability in activity.rubric.capabilities" :key="capability.name">
                         <p class="f-no-margins">
                             <b>{{ capability.name }}</b>
@@ -193,23 +201,34 @@ window.Vue.watch(
     max-width: 24rem;
     min-width: 16rem;
     overflow-y: auto;
-    padding: var(--spacing-s);
+    padding: var(--spacing-m);
     position: absolute;
     z-index: var(--sbx-depth-pop-over);
     &__section {
         display: flex;
         flex-direction: column;
         gap: var(--spacing-s);
-        h4 {
-            border-bottom: 2px solid var(--body-background);
-            font-size: 0.875rem;
-            font-weight: bold;
-        }
-        h5 {
-            border-bottom: 1px solid var(--body-background);
-            font-size: 0.8125rem;
-            font-weight: bold;
-        }
+    }
+}
+
+.section-title,
+.section-sub-title {
+    display: flex;
+    font-weight: bold;
+    gap: var(--spacing-s);
+    padding-block-end: var(--spacing-xs);
+    margin: 0;
+}
+
+.section-title {
+    border-bottom: 2px solid var(--body-background);
+    font-size: 0.875rem;
+}
+
+.section-sub-title {
+    font-size: 0.8125rem;
+    &--with-border {
+        border-bottom: 1px solid var(--body-background);
     }
 }
 </style>
