@@ -186,7 +186,7 @@ class Subnav
                 'name'       => 'Badges',
                 'visible'    =>  (
                     ($userIsSuperuser || $userHasServicePermissionBadge) &&
-                    (bool)$this->configLoader->get(ConfigMapper::NAME_BADGES_ENABLED)
+                    $this->configLoader->get(ConfigMapper::NAME_BADGES_ENABLED)
                 ),
                 'searchable' => false,
                 'children'   => [
@@ -327,7 +327,7 @@ class Subnav
             ],
             '/adminv2/eportfolio' => [
                 'name'       => 'ePortfolio',
-                'visible'    => $userIsSuperuser && (bool)$this->configLoader->get(ConfigMapper::NAME_EPORTFOLIO_ENABLED),
+                'visible'    => $userIsSuperuser && $this->configLoader->get(ConfigMapper::NAME_EPORTFOLIO_ENABLED),
                 'searchable' => false,
                 'children'   => [
                     '/adminv2/setting/ePortfolio' => [
@@ -383,7 +383,7 @@ class Subnav
                         'name'        => $filterLabelBuilder->buildLabel(FilterPageModel::PAGE_CLASS_MARK_BOOK) . ' Filter',
                         'visible'     => (
                             $filterAvailabilityChecker->isAvailable(FilterPageModel::PAGE_CLASS_MARK_BOOK) &&
-                            (bool)$this->configLoader->get(ConfigMapper::NAME_LMS_ENABLED)
+                            $this->configLoader->get(ConfigMapper::NAME_LMS_ENABLED)
                         ),
                         'description' => 'Configure the default and available filter options on the class markbook.',
                     ],
@@ -400,7 +400,7 @@ class Subnav
                         'name'        => $filterLabelBuilder->buildLabel(FilterPageModel::PAGE_COURSE_MARK_BOOK) . ' Filter',
                         'visible'     => (
                             $filterAvailabilityChecker->isAvailable(FilterPageModel::PAGE_COURSE_MARK_BOOK) &&
-                            (bool)$this->configLoader->get(ConfigMapper::NAME_LMS_ENABLED)
+                            $this->configLoader->get(ConfigMapper::NAME_LMS_ENABLED)
                         ),
                         'description' => 'Configure the default and available filter options on the course markbook.',
                     ],
@@ -408,7 +408,7 @@ class Subnav
                         'name'        => 'Document Management',
                         'visible'     => (
                             count($enabledConfigs[ConfigMapper::TYPE_DOC_MANAGE] ?? []) > 0 &&
-                            (bool)$this->configLoader->get('external_type') === 'synergetic'
+                            $this->configLoader->get('external_type') === 'synergetic'
                         ),
                         'description' => 'Configure which Synergetic DocMan documents are visible via the Academic Reports button on the students profile.',
                     ],
@@ -421,7 +421,7 @@ class Subnav
                         'name'        => $filterLabelBuilder->buildLabel(FilterPageModel::PAGE_GRADES) . ' Filter',
                         'visible'     => (
                             $filterAvailabilityChecker->isAvailable(FilterPageModel::PAGE_GRADES) &&
-                            (bool)$this->configLoader->get(ConfigMapper::NAME_LMS_ENABLED)
+                            $this->configLoader->get(ConfigMapper::NAME_LMS_ENABLED)
                         ),
                         'description' => 'Configure the default and available filter options on the continuous report / class grades page.',
                     ],
@@ -438,7 +438,7 @@ class Subnav
                         'name'        => 'LMS Policy',
                         'visible'     => (
                             count($enabledConfigs[ConfigMapper::TYPE_LMS_POLICY] ?? []) > 0 &&
-                            (bool)$this->configLoader->get(ConfigMapper::NAME_LMS_ENABLED)
+                            $this->configLoader->get(ConfigMapper::NAME_LMS_ENABLED)
                         ),
                         'description' => 'Configure policy related to continuous reporting, grades, due work, assessment and feedback.',
                     ],
@@ -450,7 +450,7 @@ class Subnav
                         'name'        => $filterLabelBuilder->buildLabel(FilterPageModel::PAGE_UPCOMING_ASSESSMENTS) . ' Filter',
                         'visible'     => (
                             $filterAvailabilityChecker->isAvailable(FilterPageModel::PAGE_UPCOMING_ASSESSMENTS) &&
-                            (bool)$this->configLoader->get(ConfigMapper::NAME_LMS_ENABLED)
+                            $this->configLoader->get(ConfigMapper::NAME_LMS_ENABLED)
                         ),
                         'description' => 'Configure the default and available filter options on the students due work calendar.',
                     ],
@@ -463,7 +463,7 @@ class Subnav
                         'name'        => $filterLabelBuilder->buildLabel(FilterPageModel::PAGE_RUBRIC_MARK_BOOK) . ' Filter',
                         'visible'     => (
                             $filterAvailabilityChecker->isAvailable(FilterPageModel::PAGE_RUBRIC_MARK_BOOK) &&
-                            (bool)$this->configLoader->get(ConfigMapper::NAME_LMS_ENABLED)
+                            $this->configLoader->get(ConfigMapper::NAME_LMS_ENABLED)
                         ),
                         'description' => 'Configure the default and available filter options on the class rubric markbook.',
                     ],
@@ -575,7 +575,7 @@ class Subnav
             ],
             '/adminv2/notifications' => [
                 'name'       => 'Notifications',
-                'visible'    => $userIsSuperuser && (bool)$this->configLoader->get(ConfigMapper::NAME_NOTIFICATIONS_ENABLED),
+                'visible'    => $userIsSuperuser && $this->configLoader->get(ConfigMapper::NAME_NOTIFICATIONS_ENABLED),
                 'children'   => [
                     '/adminv2/notifications' => [
                         'name'        => 'Home',
@@ -599,7 +599,7 @@ class Subnav
                 'name'       => 'Pastoral Care',
                 'visible'    => (
                     ($userIsSuperuser || $userHasServicePermissionPastoral) &&
-                    (bool)$this->configLoader->get(ConfigMapper::NAME_PASTORAL_ENABLED)
+                    $this->configLoader->get(ConfigMapper::NAME_PASTORAL_ENABLED)
                 ),
                 'searchable' => false,
                 'children'   => [
@@ -648,7 +648,7 @@ class Subnav
                     ],
                     '/adminv2/import/pastoral' => [
                         'name'        => 'Synergetic Import',
-                        'visible'     => (bool)$this->configLoader->get('external_type') === 'synergetic',
+                        'visible'     => $this->configLoader->get('external_type') === 'synergetic',
                         'description' => 'Import your pastoral care records from Synergetic.',
                     ],
                     '/adminv2/lists/pastoral/pastoral-type' => [
@@ -689,7 +689,7 @@ class Subnav
                 'name'       => 'School Data Import',
                 'visible'    => (
                     ($userIsSuperuser || $userHasServicePermissionTimetable) &&
-                    (bool)$this->configLoader->get('external_type') === 'schoolbox'
+                    $this->configLoader->get('external_type') === 'schoolbox'
                 ),
                 'searchable' => false,
                 'children'   => [
@@ -703,22 +703,22 @@ class Subnav
                     // the order in which the import operations must be performed in order to avoid errors.
                     '/adminv2/import/profile' => [
                         'name'        => 'User Profiles',
-                        'visible'     => (bool)$this->configLoader->get('schooldata_import_data_source') === 'csv',
+                        'visible'     => $this->configLoader->get('schooldata_import_data_source') === 'csv',
                         'description' => 'Import staff, student, parent and relationship data via CSV files.',
                     ],
                     '/adminv2/import/timetableStructure' => [
                         'name'        => 'Timetable Structure',
-                        'visible'     => (bool)$this->configLoader->get('schooldata_import_data_source') === 'csv',
+                        'visible'     => $this->configLoader->get('schooldata_import_data_source') === 'csv',
                         'description' => 'Import timetable definition and structure via CSV.',
                     ],
                     '/adminv2/import/timetable' => [
                         'name'        => 'Timetable',
-                        'visible'     => (bool)$this->configLoader->get('schooldata_import_data_source') === 'csv',
+                        'visible'     => $this->configLoader->get('schooldata_import_data_source') === 'csv',
                         'description' => 'Import the classes and their periods via CSV.',
                     ],
                     '/adminv2/import/timetableEnrolment' => [
                         'name'        => 'Timetable Enrolment',
-                        'visible'     => (bool)$this->configLoader->get('schooldata_import_data_source') === 'csv',
+                        'visible'     => $this->configLoader->get('schooldata_import_data_source') === 'csv',
                         'description' => 'Import the students and teachers in classes via CSV.',
                     ],
                 ],
