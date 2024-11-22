@@ -94,9 +94,6 @@ class ButtonIslandRenderer
              * custom buttons, as far as the end user is concerned
              */
             'buttons' => $buttons,
-            /* The current user session - sadly a superglobal for portability reasons
-             */
-            'session' => $_SESSION,
             /* This is used for the calendar url, a dynamic set of args
              */
             'now' => $this->now,
