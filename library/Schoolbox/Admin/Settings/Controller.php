@@ -348,20 +348,27 @@ class Controller extends ConfigController
     private function getSettingsPageUrl(string $module, string $type): string
     {
         // The code structure below matches the structure of $this->userHasAccessToConfigSetting().
-        return match ($module) {
-            'settings' => (
-                match ($type) {
-                    'Resources'     => "/adminv2/setting/cms/$type",      // E.g. /adminv2/setting/cms/Resources
-                    'Skin Config'   => "/adminv2/setting/design/$type",   // E.g. /adminv2/setting/design/Skin%20Config
-                    'LMS Policy'    => "/adminv2/setting/lms/$type",      // E.g. /adminv2/setting/lms/LMS%20Policy
-                    'Pastoral Care' => "/adminv2/setting/pastoral/$type", // E.g. /adminv2/setting/pastoral/Pastoral%20Care
-                    default         => "/adminv2/setting/$type",          // E.g. /adminv2/setting/Modules
-                }
-            ),
-            'comms'      => '/adminv2/news',
-            'schoolData' => '/adminv2/import/schoolDataImport',
-            default      => "/adminv2/$module", // E.g. /adminv2/lti
-        };
+        switch ($module) {
+            case 'settings':
+                $typeEncoded = str_replace(' ', '%20', $type);
+                return match ($type) {
+                    'Resources'           => "/adminv2/setting/cms/$typeEncoded",      // E.g. /adminv2/setting/cms/Resources
+                    'Skin Config'         => "/adminv2/setting/design/$typeEncoded",   // E.g. /adminv2/setting/design/Skin%20Config
+                    'LMS Policy',
+                    'Document Management' => "/adminv2/setting/lms/$typeEncoded",      // E.g. /adminv2/setting/lms/LMS%20Policy
+                    'Pastoral Care'       => "/adminv2/setting/pastoral/$typeEncoded", // E.g. /adminv2/setting/pastoral/Pastoral%20Care
+                    default               => "/adminv2/setting/$typeEncoded",          // E.g. /adminv2/setting/Modules
+                };
+
+            case 'comms':
+                return '/adminv2/news';
+
+            case 'schoolData':
+                return '/adminv2/import/schoolDataImport';
+
+            default:
+                return "/adminv2/$module"; // E.g. /adminv2/lti
+        }
     }
 
     /**
@@ -378,35 +385,41 @@ class Controller extends ConfigController
             return true;
         }
 
-        // The if/else structure below matches the structure used in $this->getSettingsPageUrl().
-
-        if ($module === 'schoolData') {
-            // This is for the settings in 'Admin -> School Data Import -> Home'.
-            return $user->hasServicePermission(UserAccess::SERVICE_TIMETABLE, UserAccess::ACCESS_FULL);
-        }
-
-        if ($module === 'comms') {
-            // This is for the settings in 'Admin -> News -> Settings / Policy'.
-            return $user->hasServicePermission(UserAccess::SERVICE_NEWS, UserAccess::ACCESS_FULL);
-        }
-
-        if ($module === 'settings') {
-            switch ($type) {
-                case 'Resources':
+        // The nested switch structure below matches the structure used in $this->getSettingsPageUrl().
+        switch ($module) {
+            case 'settings':
+                return match ($type) {
                     // This is for the settings in 'Admin -> Resources -> Resource Settings'.
-                    return $user->hasServicePermission(UserAccess::SERVICE_CMS, UserAccess::ACCESS_FULL);
-                case 'Skin Config':
+                    'Resources' => $user->hasServicePermission(UserAccess::SERVICE_CMS, UserAccess::ACCESS_FULL),
+
                     // This is for the settings in 'Admin -> Design -> Skin Config'.
-                    return $user->hasServicePermission(UserAccess::SERVICE_DESIGN, UserAccess::ACCESS_FULL);
-                case 'LMS Policy':
-                    // This is for the settings in 'Admin -> LMS -> LMS Policy'.
-                    return $user->hasServicePermission(UserAccess::SERVICE_LMS, UserAccess::ACCESS_FULL);
-                case 'Pastoral Care':
+                    'Skin Config' => $user->hasServicePermission(UserAccess::SERVICE_DESIGN, UserAccess::ACCESS_FULL),
+
+                    // This is for the settings in 'Admin -> LMS -> LMS Policy' and 'Admin -> LMS -> Document Management'.
+                    'LMS Policy', 'Document Management' => $user->hasServicePermission(UserAccess::SERVICE_LMS, UserAccess::ACCESS_FULL),
+
                     // This is for the settings in 'Admin -> Pastoral Care -> Settings / Policy'.
-                    return $user->hasServicePermission(UserAccess::SERVICE_PASTORAL, UserAccess::ACCESS_FULL);
-                default:
-                    // Do nothing.
-            }
+                    'Pastoral Care' => $user->hasServicePermission(UserAccess::SERVICE_PASTORAL, UserAccess::ACCESS_FULL),
+
+                    default => false
+                };
+
+            case 'comms':
+                // This is for the settings in 'Admin -> News -> Settings / Policy'.
+                return $user->hasServicePermission(UserAccess::SERVICE_NEWS, UserAccess::ACCESS_FULL);
+
+            case 'schoolData':
+                // This is for the settings in 'Admin -> School Data Import -> Home'.
+                return $user->hasServicePermission(UserAccess::SERVICE_TIMETABLE, UserAccess::ACCESS_FULL);
+
+            case 'lti':
+                // This is for the settings in 'Admin -> LMS -> LTI Tools'.
+                return $user->hasServicePermission(UserAccess::SERVICE_LMS, UserAccess::ACCESS_FULL);
+
+            default:
+                // Of the other possible values for `config`.`module`, only 'oauth' has a corresponding /adminv2/$module page.
+                // That page is accessible by superusers only, and superusers have been handled above.
+                // So do nothing here.
         }
 
         return false;
