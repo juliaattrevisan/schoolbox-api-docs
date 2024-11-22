@@ -61,3 +61,6 @@
     margin: 0; // ^foundation-fixes^ - won't need once _forms.scss is removed
     vertical-align: baseline; // ^foundation-fixes^ - won't need  once _forms.scss is removed
 }
+.c-input-radio.error {
+    border: var(--size-form-element-border-width) solid var(--color-alert);
+}
