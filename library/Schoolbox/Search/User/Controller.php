@@ -564,19 +564,25 @@ class Controller extends BaseController
                 /* A set of contacts (if any) for this student
                  */
                 'contacts' => $contacts,
+                /* Decides if the Geosnapshot button could be accessed
+                 */
+                'isGeosnapshotAvailable' => $isGeosnapshotAvailable,
+                /* Used for emailing staff (Email All Teachers)
+                 */
+                'allTeacherIds' => implode(',', $allTeacherIds),
+                /* The current user session - sadly a superglobal for portability reasons
+                 */
+                'session' => $_SESSION,
 
 
                 /* Old implementation
                  */
-                'session' => $_SESSION,
                 'subjects'                 => $subjects,
                 'groups'                   => $groups,
-                'allTeacherIds'            => implode(',', $allTeacherIds),
                 'pdStates'                 => $this->professionalDevelopmentMapper->getStates(),
                 'pd'                       => $pd,
                 'travelLogs'               => $travelLogs,
                 'learningMomentCanComment' => $learningMomentCanComment,
-                'isGeosnapshotAvailable'   => $isGeosnapshotAvailable,
                 'canEmailStaff'            => $canEmailStaff,
                 'sharedCampuses'           => $sharedCampuses,
             ]
