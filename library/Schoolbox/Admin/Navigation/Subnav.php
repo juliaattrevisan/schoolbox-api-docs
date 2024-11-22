@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\Admin\Navigation;
 
+use PHPUnit\Event\InvalidArgumentException;
 use Schoolbox\Cdn\PrefixGenerator;
 use Schoolbox\Config\Config;
 use Schoolbox\Config\ConfigMapper;
@@ -174,11 +175,7 @@ class Subnav
          * and won't be explicitly stated as one of these urls, so be mindful
          * that there are multiple ways to match these urls
          */
-        return [
-            // Important note on 'visible' values
-            // ----------------------------------
-            // Values for 'visible' must be boolean.  If a null value is passed, it will be interpreted by Twig as not
-            // set, and a default value of true will be assumed.  This is probably the opposite of what you intend.
+        $configSettings = [
             '/adminv2/home' => [
                 'name'        => 'Home',
                 'visible'     => $userIsSuperuser || $userHasAnyModeratorServicePermission,
@@ -865,6 +862,30 @@ class Subnav
                 ],
             ],
         ];
+
+        $this->validateAllVisiblesAreBoolean($configSettings);
+
+        return $configSettings;
+    }
+
+    /**
+     * Values for 'visible' must be boolean.  If a null value is passed to Twig, it will be interpreted as not
+     * set, and a default value of true will be assumed.  This is probably the opposite of what you intend.
+     *
+     * @param $configSettings array
+     */
+    private function validateAllVisiblesAreBoolean(array $configSettings): void
+    {
+        foreach ($configSettings as $key => $value) {
+            if (array_key_exists('visible', $value)) {
+                if (!is_bool($value['visible'])) {
+                    throw new InvalidArgumentException("Parameter 'visible' must be a boolean for key '$key'.");
+                }
+            }
+            if (array_key_exists('children', $value)) {
+                $this->validateAllVisiblesAreBoolean($value['children']);
+            }
+        }
     }
 
     /**
