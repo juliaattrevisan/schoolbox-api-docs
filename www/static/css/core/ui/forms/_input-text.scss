@@ -4,7 +4,7 @@
 .c-input-text[type="text"] {
     background-color: var(--color-foreground-primary);
     border: var(--size-form-element-border-width) solid var(--sbx-color-accent);
-    border-radius: var(--roundness-form-elements);
+    border-radius: var(--sbx-border-radius-normal);
     color: var(--color-text-primary);
     font-size: max(16px, 1rem);
     font-family: inherit;

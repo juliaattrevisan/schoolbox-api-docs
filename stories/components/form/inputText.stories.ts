@@ -40,6 +40,12 @@ export const Default: Story = {
             <input id="news_default_expiry-field" class="c-input-text" type="text" required />
             `,
     }),
+    parameters: {
+        design: {
+            type: "figma",
+            url: "https://www.figma.com/design/kcebwjgNDzqyTtXZzgQNMO/UI-Kit?node-id=310-46&t=SxdVbY0TIHuqT7y1-4",
+        },
+    },
 };
 
 export const Disabled: Story = {
@@ -48,6 +54,12 @@ export const Disabled: Story = {
             <input id="news_default_expiry-field" class="c-input-text" type="text" value="I'm disabled" disabled />
             `,
     }),
+    parameters: {
+        design: {
+            type: "figma",
+            url: "https://www.figma.com/design/kcebwjgNDzqyTtXZzgQNMO/UI-Kit?node-id=310-45&t=SxdVbY0TIHuqT7y1-4",
+        },
+    },
 };
 
 export const ReadOnly: Story = {
