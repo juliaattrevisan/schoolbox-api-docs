@@ -18,7 +18,7 @@ class CustomButtons
      * Corresponds to a secondary identifier in the schema
      * so we can figure out custom buttons from system buttons
      */
-    private const CUSTOM = 'custom';
+    public const CUSTOM = 'custom';
 
 
     /* Some prepared statements that we'll often reuse
