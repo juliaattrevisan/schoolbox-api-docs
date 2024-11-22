@@ -276,7 +276,7 @@ HELP;
                 ],
                 'contacts' => [
                     'availability' => $campusIds,
-                    'visibility' => [self::ROLETYPE_SELF, self::ROLETYPE_PARENT, self::ROLETYPE_STAFF],
+                    'visibility' => [self::ROLETYPE_PARENT, self::ROLETYPE_STAFF],
                 ],
             ],
         ];
@@ -293,7 +293,7 @@ HELP;
     private function buildTabsIndex(): array
     {
         /* Find all the tabs' ids to build a relation; derive that from
-         * the array key which its its name in the mega array below
+         * the array key which is its name in the mega array below
          */
         $statement = $this->getDatabaseInternal()->prepare('SELECT id, roletype, tab, display_as FROM profile_tab');
         $statement->execute();
