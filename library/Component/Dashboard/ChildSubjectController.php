@@ -81,7 +81,7 @@ class Component_Dashboard_ChildSubjectController extends Component_Dashboard_Con
              */
             $buttonIslandRenderer = new \Schoolbox\Search\User\ButtonIslandRenderer(
                 $this->getUser(),
-                new Alaress_Date_Format($_SERVER['REQUEST_TIME'], 'U'),
+                \Alaress_Date_Format::now(),
                 new \Eportfolio_Authenticator($_SESSION['user'], $userChild),
                 $this->getConfigLoader()->get('geosnapshot_api_key'),
                 $this->getConfigLoader()->get('geosnapshot_enabled'),
