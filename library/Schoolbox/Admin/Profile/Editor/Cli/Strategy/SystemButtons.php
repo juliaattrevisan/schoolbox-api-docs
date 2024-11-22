@@ -33,7 +33,6 @@ class SystemButtons
     private const SYSTEM_PASTORAL = 'pastoral';
     private const SYSTEM_CALENDAR = 'calendar';
     private const SYSTEM_TIMETABLE = 'timetable';
-    private const SYSTEM_PASTORAL_SYNERGETIC = 'pastoralsynergetic';
     private const SYSTEM_DOCUMENT_MANAGEMENT = 'documentmanagement';
     private const SYSTEM_GEOSNAPSHOT = 'geosnapshot';
     private const SYSTEM_EMAIL_STAFF = 'emailstaff';
@@ -61,6 +60,8 @@ class SystemButtons
      * @param array           $campusIds
      * @param string          $externalStaffPortal
      * @param string          $externalDocumentButtonEnable
+     * @param string          $externalDb
+     * @param string          $externalStaffPortal
      */
     public function __construct(
         private bool $perform,
@@ -70,6 +71,7 @@ class SystemButtons
         private array $campusIds,
         private string $externalStaffPortal,
         private string $externalDocumentButtonEnable,
+        private string $externalDb,
     ) {
     }
 
@@ -307,30 +309,6 @@ class SystemButtons
                 [
                     'row' => [
                         'roletype' => \Schoolbox\Role::STUDENT,
-                        'type' => self::SYSTEM_PASTORAL_SYNERGETIC,
-                        'sort_order' => 7,
-                        'title' => 'Synweb',
-                        'text' => 'Synweb',
-                        'icon' => 'synergetic',
-                        'url' => sprintf(
-                            '%s/stud.aspx?id=[profileExternalId]',
-                            $this->externalStaffPortal
-                        ),
-                        'css' => null,
-                        'target' => '_blank',
-                    ],
-                    'availability' => [
-                        'campus' => $this->campusIds,
-                        'role' => $allRoleIds
-                    ],
-                    'visibility' => [
-                        'campus' => $this->campusIds,
-                        'role' => $allRoleIds
-                    ],
-                ],
-                [
-                    'row' => [
-                        'roletype' => \Schoolbox\Role::STUDENT,
                         'type' => self::SYSTEM_DOCUMENT_MANAGEMENT,
                         'sort_order' => 8,
                         'title' => $this->rosettaStone->translate('reports', false, true),
@@ -526,6 +504,41 @@ class SystemButtons
                 ],
             ]
         ];
+
+        /* Synweb was originally hardcoded into our templates, but only applies to a subset
+         * of the fleet. Its hardcoding suggests it be classified as a System Button, but
+         * its usage classifies it as a Custom Button. There isn't really a convenient place
+         * for this transformation to exist, so I'll just append it here.
+         *
+         * Only spawn a synweb if you're on synergetic,
+         * and if you have a meaningful staff portal host value
+         */
+        if (\External\IConnector::EXTERNAL_TYPE_SYNERGETIC === $this->externalDb && '' !== $this->externalStaffPortal) {
+            $candidates[\Schoolbox\Role::STUDENT][] = [
+                'row' => [
+                    'roletype' => \Schoolbox\Role::STUDENT,
+                    'type' => CustomButtons::CUSTOM,
+                    'sort_order' => 7,
+                    'title' => 'Synweb',
+                    'text' => 'Synweb',
+                    'icon' => 'synergetic',
+                    'url' => sprintf(
+                        '%s/stud.aspx?id=[profileExternalId]',
+                        $this->externalStaffPortal
+                    ),
+                    'css' => null,
+                    'target' => '_blank',
+                ],
+                'availability' => [
+                    'campus' => $this->campusIds,
+                    'role' => $allRoleIds
+                ],
+                'visibility' => [
+                    'campus' => $this->campusIds,
+                    'role' => $allRoleIds
+                ],
+            ];
+        }
 
         return $candidates;
     }
