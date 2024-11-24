@@ -4,8 +4,7 @@
  */
 
 import { toRef, useTemplateRef } from "vue";
-// import { onClickOutside, useFocusWithin } from "@vueuse/core";
-import { onClickOutside } from "@vueuse/core";
+import { onClickOutside, useFocusWithin, useMousePressed } from "@vueuse/core";
 import { useSelected } from "@schoolboxVue/composables/selected/useSelected";
 import { useQuerySearch } from "@schoolboxVue/composables/search/useQuerySearch";
 import type { SearchSelectItem } from "@schoolboxVue/composables/search/types/SearchSelectItem";
@@ -92,29 +91,6 @@ const { query, isActive, isSearching, hasNoResults, hasError } = useQuerySearch(
     onSearchSuccess,
 ); // to search for results
 
-const searchSelectEl = useTemplateRef<HTMLDivElement | null>("searchSelectEl"); // to clear the search results when clicking outside / not focused
-
-/**
- * To close the search results when clicking outside
- */
-window.Vue.onMounted(async () => {
-    await window.Vue.nextTick();
-    onClickOutside(searchSelectEl, () => {
-        query.value = "";
-    });
-});
-
-/**
- * To close the search results when the search select is not focused
- * Not working as expected currently, clicks in ss-results will trigger the query to be cleared
- */
-// const { focused } = useFocusWithin(searchSelectEl);
-// window.Vue.watch(focused, ($focused) => {
-//     if (!$focused) {
-//         query.value = "";
-//     }
-// });
-
 /**
  * To show the current search results, or the default results
  * if the search is not active
@@ -146,6 +122,46 @@ function onSelect(item: SearchSelectItem): void {
 function onButtonSelected(): void {
     emit("buttonSelect");
 }
+
+// #region close search results on lost focus / click outside
+
+const searchSelectEl = useTemplateRef<HTMLDivElement | null>("searchSelectEl"); // to clear the search results when clicking outside / not focused
+
+/**
+ * To close the search results
+ */
+function closeResults(): void {
+    query.value = "";
+}
+
+/**
+ * To close the search results when clicking outside the search select
+ */
+window.Vue.onMounted(async () => {
+    await window.Vue.nextTick();
+    onClickOutside(searchSelectEl, () => {
+        closeResults();
+    });
+});
+
+/**
+ * To track the last mouse/touch press on the search select
+ * This is used with useFocusWithin to determine if the search results should be closed
+ */
+const { pressed } = useMousePressed({ target: searchSelectEl });
+
+/**
+ * To close the search results when the search select is not focused
+ */
+const { focused } = useFocusWithin(searchSelectEl);
+window.Vue.watch(focused, ($focused) => {
+    // also need to ensure that focus was not lost due to a mouse/touch press
+    if (!$focused && !pressed.value) {
+        closeResults();
+    }
+});
+
+// #endregion
 
 // #region open/close results on escape key press
 
