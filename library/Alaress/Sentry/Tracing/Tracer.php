@@ -50,7 +50,7 @@ class Tracer
      * A set of stack changes, updated with `startSpan`, `finishSpan` and
      * `addBreadcrumb`.
      *
-     * @var array<Operation\Pop|Operation\Push|Operation\Breadcrumb>
+     * @var array<Operation\IOperation>
      */
     private array $stackChanges = [];
 
@@ -486,32 +486,7 @@ class Tracer
 
             // Apply each change to the actual transaction stack.
             foreach ($this->stackChanges as $stackChange) {
-                if ($stackChange instanceof Operation\Push) {
-                    // Start context in most recently added stack,
-                    // or transaction if there is no stack
-                    $currentSpan = !empty($spanStack)
-                        ? $spanStack[count($spanStack) - 1]
-                        : $transaction;
-
-                    $span = $currentSpan->startChild($stackChange->context);
-                    $hub->setSpan($span);
-                    $spanStack[] = $span;
-                } elseif ($stackChange instanceof Operation\Pop) {
-                    // Finish current stack, if there is one
-                    $currentSpan = array_pop($spanStack);
-                    if ($stackChange->context->getStatus()) {
-                        $currentSpan->setStatus($stackChange->context->getStatus());
-                    }
-                    $currentSpan->finish($stackChange->context->getEndTimestamp());
-
-                    $previousSpan = !empty($spanStack)
-                        ? $spanStack[count($spanStack) - 1]
-                        : $transaction;
-                    $hub->setSpan($previousSpan);
-                } elseif ($stackChange instanceof Operation\Breadcrumb) {
-                    // Add a breadcrumb at the current point
-                    $hub->addBreadcrumb($stackChange->breadcrumb);
-                }
+                $spanStack = $stackChange->operate($hub, $spanStack);
             }
 
             // End any leftover spans (including the autostarted span, if there)
