@@ -431,7 +431,10 @@ class Tracer
      */
     public function finishSpan(?float $endTimestamp = null, ?SpanStatus $status = null): void
     {
-        $this->stackChanges[] = new Operation\Pop($endTimestamp ?? microtime(true), $status);
+        $spanContext = new SpanContext();
+        $spanContext->setEndTimestamp($endTimestamp ?? microtime(true));
+        $spanContext->setStatus($status);
+        $this->stackChanges[] = new Operation\Pop($spanContext);
     }
 
     /**
@@ -496,7 +499,10 @@ class Tracer
                 } elseif ($stackChange instanceof Operation\Pop) {
                     // Finish current stack, if there is one
                     $currentSpan = array_pop($spanStack);
-                    $currentSpan->finish($stackChange->endTimestamp);
+                    if ($stackChange->context->getStatus()) {
+                        $currentSpan->setStatus($stackChange->context->getStatus());
+                    }
+                    $currentSpan->finish($stackChange->context->getEndTimestamp());
 
                     $previousSpan = !empty($spanStack)
                         ? $spanStack[count($spanStack) - 1]
