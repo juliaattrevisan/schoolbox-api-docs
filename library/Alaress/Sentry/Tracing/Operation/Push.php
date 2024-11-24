@@ -28,7 +28,8 @@ class Push implements IOperation
     }
 
     /**
-     * Push `$this->context` onto the hub, and add it to the returned stack.
+     * Push `$this->context` onto the hub (within the current span if there is
+     * one, otherwise on the base transaction), and add it to the span stack.
      *
      * @param HubInterface $hub
      * @param array<Span>  $spanStack

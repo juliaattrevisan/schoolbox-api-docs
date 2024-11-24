@@ -22,11 +22,7 @@ class Pop implements IOperation
     /**
      * Constructor
      *
-     * @param SpanContext $context The new context for the span: any values in
-     *                             this context which are set will override what
-     *                             was set in `Push`.
-     *                             Usually, at least the status and end
-     *                             timestamp will be overridden.
+     * @param SpanContext $context The new context for the most recent span.
      */
     public function __construct(public SpanContext $context)
     {
@@ -34,8 +30,8 @@ class Pop implements IOperation
 
     /**
      * Pop the most recent span off of `$spanStack`, and override its end
-     * timestamp (and optional status) with values `$this->context` before
-     * finishing that span and reverting to the previous span.
+     * timestamp (and optional status) with values from `$this->context`, before
+     * finishing that span and reverting to the previous span in the stack.
      *
      * @param HubInterface $hub
      * @param array<Span>  $spanStack
@@ -54,6 +50,8 @@ class Pop implements IOperation
             return [];
         }
 
+        // Modify the current span with whatever details are in this operation's
+        // context.
         if ($this->context->getStatus()) {
             $currentSpan->setStatus($this->context->getStatus());
         }

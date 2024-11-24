@@ -23,6 +23,8 @@ interface IOperation
      * @param HubInterface $hub       The Sentry interface to interact with: spans will be set on this object.
      * @param array<Span>  $spanStack The stack of spans added to the hub: this will be used to track the last added
      *                                span, so that it may be set as the hub's current span later on.
+     *                                (This needs to be tracked outside `$hub` because that object doesn't itself
+     *                                maintain a stack.)
      * @return array<Span>
      */
     public function operate(HubInterface $hub, array $spanStack): array;
