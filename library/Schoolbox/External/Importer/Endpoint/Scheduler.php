@@ -13,6 +13,7 @@ use Psr\Log\LoggerInterface;
 use RuntimeException;
 use Schoolbox\External\Connector\Log\Mapper as ImportLogMapper;
 use Schoolbox\Mapper\Exception;
+use Sentry\State\HubInterface;
 
 /**
  * Class Scheduler
@@ -84,6 +85,7 @@ class Scheduler
      * @param string|null $file Optional path to a file containing cached nodes that can be read instead of realtime endpoint access (nicer for development/debugging)
      * @param LoggerInterface $logger
      * @param ImportLogMapper $importLogMapper
+     * @param HubInterface    $sentry Sentry hub: exceptions are reported here
      */
     public function __construct(
         private string $frequency,
@@ -92,7 +94,8 @@ class Scheduler
         private string $type,
         private ?string $file,
         private LoggerInterface $logger,
-        private ImportLogMapper $importLogMapper
+        private ImportLogMapper $importLogMapper,
+        private HubInterface $sentry,
     ) {
     }
 
@@ -159,12 +162,14 @@ class Scheduler
                 $this->importLogMapper->prune();
             } catch (RuntimeException $e) {
                 $this->logger->critical("Cannot access api endpoint: {$e->getMessage()}");
+                $this->sentry->captureException($e);
 
                 /* Something happened with the api; log it
                  */
                 $this->importLogMapper->error($importLog, $e->getMessage());
             } catch (\Throwable | \Exception $e) {
                 $this->logger->critical("Cannot access api endpoint: {$e->getMessage()}");
+                $this->sentry->captureException($e);
 
                 /* Some kind of unexpected fatal; log it
                  */
