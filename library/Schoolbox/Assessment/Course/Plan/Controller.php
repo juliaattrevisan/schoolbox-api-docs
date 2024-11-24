@@ -274,6 +274,8 @@ class Controller extends Base
     /**
      * Get csv of all textboxes from all unit pages, to confirm they have the correct textbox title, component heading, and actually contain data
      *
+     * @api   GET /course/plan/audit
+     *
      * @return void
      */
     public function getAudit()
@@ -284,6 +286,7 @@ class Controller extends Base
         $rowHeadings = [
             'Course Title',
             'Course Homepage ID',
+            'Course ID',
             'Course Framework',
             'Unit Title',
             'Unit Homepage ID',
@@ -303,6 +306,7 @@ class Controller extends Base
         $courseUnitQuery = $this->rubricIndicatorMapper->getDatabase()->prepareQuery("select
             courseFolder.name as 'course.name',
             courseFolder.id as 'course.id',
+            course_specification.id as 'course_specification.id',
             unitFolder.name as 'unit.name',
             unitFolder.id as 'unit.id',
             courseTemplates.name as 'framework'
@@ -367,6 +371,7 @@ class Controller extends Base
          * $rowHeadings = [
          * 'Course Title',
          * 'Course Homepage ID',
+         * 'Course Specification ID',
          * 'Unit Title',
          * 'Unit Homepage ID',
          * 'Textbox Component Name',
@@ -392,6 +397,7 @@ class Controller extends Base
             fputcsv($fp, [
                 $units[$row['folder_id']]['course.name'],
                 $units[$row['folder_id']]['course.id'],
+                $units[$row['folder_id']]['course_specification.id'],
                 $units[$row['folder_id']]['framework'],
                 $units[$row['folder_id']]['unit.name'],
                 $units[$row['folder_id']]['unit.id'],
@@ -450,6 +456,7 @@ class Controller extends Base
             fputcsv($fp, [
                 $units[$row['folderId']]['course.name'],
                 $units[$row['folderId']]['course.id'],
+                $units[$row['folderId']]['course_specification.id'],
                 $units[$row['folderId']]['framework'],
                 $units[$row['folderId']]['unit.name'],
                 $units[$row['folderId']]['unit.id'],
