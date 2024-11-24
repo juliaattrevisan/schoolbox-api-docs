@@ -309,7 +309,7 @@ HELP;
                 ],
                 'countIndividualEducationPlans' => [
                     'availability' => $campusIds,
-                    'visibility' =>  [self::ROLETYPE_STAFF],
+                    'visibility' =>  [],
                 ],
                 /* NOTE: Decided by synergetic_student_comment
                  * By default it's visible to nobody
@@ -617,6 +617,14 @@ HELP;
          */
         if ($this->getConfig()->get('synergetic_student_comment')) {
             $roletypes[self::ROLETYPE_STUDENT]['Comment']['visibility'] = [self::ROLETYPE_STAFF];
+        }
+
+        /**
+         * Show Learning Plans.  This is basically a synergetic only feature and used to be enabled by a config in the
+         *  connector that is being removed and now the field will only show if it was enabled
+         */
+        if ($this->getConfig()->get('external_learning_plans')) {
+            $roletypes[self::ROLETYPE_STUDENT]['countIndividualEducationPlans']['visibility'] = [self::ROLETYPE_STAFF];
         }
 
         /* report_staff_access

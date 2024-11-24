@@ -24,18 +24,6 @@ class External_Synergetic_Smcs_User extends External_Synergetic_User
             return [];
         }
 
-        if ($this->config->get('external_learning_plans')) {
-            $learningPlanQuery = "(
-                            SELECT    COUNT(*)
-                            FROM      dbo.IndividualPlans IEP
-                            WHERE     IEP.ID = uvStudents.ID AND
-                            StartDate <= CURRENT_TIMESTAMP AND
-                            (EndDate >= CURRENT_TIMESTAMP OR EndDate IS NULL)
-                        ) AS countIndividualEducationPlans";
-        } else {
-            $learningPlanQuery = "0 AS countIndividualEducationPlans";
-        }
-
         $query =
             "
             SELECT      uvStudents.StudentID,
@@ -77,7 +65,13 @@ class External_Synergetic_Smcs_User extends External_Synergetic_User
                         '' AS StudentLeavingDate,
                         '' AS StudentIBFlag,
                         '' AS EnglishSecondFlag,
-                        $learningPlanQuery
+                        (
+                            SELECT    COUNT(*)
+                            FROM      dbo.IndividualPlans IEP
+                            WHERE     IEP.ID = uvStudents.ID AND
+                            StartDate <= CURRENT_TIMESTAMP AND
+                            (EndDate >= CURRENT_TIMESTAMP OR EndDate IS NULL)
+                        ) AS countIndividualEducationPlans
             FROM        dbo.uvStudents uvStudents
             LEFT JOIN   CommunityAlerts ON
                             CommunityAlerts.ID = StudentID AND
