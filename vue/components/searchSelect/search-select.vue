@@ -108,21 +108,6 @@ const currentResults = window.Vue.computed(() => {
 
 // #endregion
 
-/**
- * A selected item name has been selected
- * @param item - the items selected
- */
-function onSelect(item: SearchSelectItem): void {
-    emit("select", item);
-}
-
-/**
- * To notify of the button being selected
- */
-function onButtonSelected(): void {
-    emit("buttonSelect");
-}
-
 // #region close search results on lost focus / click outside
 
 const searchSelectEl = useTemplateRef<HTMLDivElement | null>("searchSelectEl"); // to clear the search results when clicking outside / not focused
@@ -185,6 +170,21 @@ window.Vue.watch(
 );
 
 // #endregion
+
+/**
+ * A selected item name has been selected
+ * @param item - the items selected
+ */
+function onSelect(item: SearchSelectItem): void {
+    emit("select", item);
+}
+
+/**
+ * To notify of the button being selected
+ */
+function onButtonSelected(): void {
+    emit("buttonSelect");
+}
 </script>
 
 <template>
