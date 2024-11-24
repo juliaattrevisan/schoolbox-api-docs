@@ -24,7 +24,7 @@ class Pop implements IOperation
      *
      * @param SpanContext $context The new context for the most recent span.
      */
-    public function __construct(public SpanContext $context)
+    public function __construct(private SpanContext $context)
     {
     }
 

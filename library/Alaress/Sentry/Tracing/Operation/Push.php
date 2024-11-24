@@ -23,7 +23,7 @@ class Push implements IOperation
      *
      * @param SpanContext $context The span context to push.
      */
-    public function __construct(public SpanContext $context)
+    public function __construct(private SpanContext $context)
     {
     }
 

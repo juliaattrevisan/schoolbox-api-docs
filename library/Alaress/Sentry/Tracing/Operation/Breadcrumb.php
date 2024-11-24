@@ -23,7 +23,7 @@ class Breadcrumb implements IOperation
      *
      * @param SentryBreadcrumb $breadcrumb The breadcrumb to add to the stack.
      */
-    public function __construct(public SentryBreadcrumb $breadcrumb)
+    public function __construct(private SentryBreadcrumb $breadcrumb)
     {
     }
 
