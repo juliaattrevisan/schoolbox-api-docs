@@ -7,9 +7,10 @@ use Schoolbox\Calendar\Component\Dashboard\ApiFactory;
 use Schoolbox\Calendar\Component\Dashboard\FilterCodec;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentDataSource;
+use Schoolbox\Permission\Access\UserAccess;
 
 /**
- * These are the checkbox selections that superusers can tick
+ * These are the checkbox selections that users can tick
  * to filter the calendar payload
  *
  * @author      Steve Chan <steve.chan@alaress.com.au>
@@ -76,6 +77,18 @@ class Component_Config_CalendarFilter extends Component_Config_Abstract
          */
         $page->setBlock($keyblock, 'calendarfilter_eventtype', 'calendarfilter_eventtype_block');
         $page->setVar('calendarfilter_eventtype_block', '');
+
+        $page->setVar(
+            'COMPONENT_CONFIG_CALENDARSUBSCRIBE_LINK',
+            (
+                // The permission checks here determine whether the link below is shown, and so must match the
+                // permission checks on the linked-to page.  See www/adminv2/calendar.php.
+                !$di->get('user')->isSuperuser() &&
+                !$di->get('user')->hasServicePermission(UserAccess::SERVICE_CALENDAR, UserAccess::ACCESS_FULL)
+            )
+            ? ''
+            : '<a href="/adminv2/calendar/Subscribe">Manage calendar subscriptions</a>'
+        );
 
         foreach ($eventTypes as $eventType) {
             $page->setVar([
