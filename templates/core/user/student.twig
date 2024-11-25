@@ -223,40 +223,39 @@
                                                  # The field name will always show at this point, though their values
                                                  # will need special treatment somehow
                                                  #}
-                                                    {% if selectedField.field in ['formTeacher', 'tutorTeacher', 'hohTeacher', 'coordTeacher', 'studentCoach'] %}
+                                                {% if selectedField.field in ['formTeacher', 'tutorTeacher', 'hohTeacher', 'coordTeacher', 'studentCoach'] %}
+                                                    <dt class="small-4 medium-3 columns">{{ macro.fieldName(selectedField) }}</dt>
+                                                    <dd class="small-8 medium-9 columns">
+                                                        {# These fields are Schoolbox\User instances and need special treatment #}
+                                                        {{ macro.email(session, selectedField.value.email, selectedField.value.formatName) }}
+                                                    </dd>
+                                                {% elseif selectedField.field in ['email'] %}
+                                                    <dt class="small-4 medium-3 columns">{{ macro.fieldName(selectedField) }}</dt>
+                                                    <dd class="small-8 medium-9 columns">
+                                                        {# Renders a mailto: hyperlink #}
+                                                        {{ macro.email(session, selectedField.value, selectedField.value) }}
+                                                    </dd>
+                                                {% elseif selectedField.field in ['StudentBirthDate'] %}
+                                                    <dt class="small-4 medium-3 columns">{{ macro.fieldName(selectedField) }}</dt>
+                                                    <dd class="small-8 medium-9 columns">
+                                                        {# Renders with date formatting #}
+                                                        {{ selectedField.value|date(dateFormats.shortDateOnlyFormat) }}
+                                                    </dd>
+                                                {% else %}
+                                                    {# A generic tuple (key, value) pair
+                                                     #
+                                                     # Also gives you a way to render a field specially when it isn't already
+                                                     # one of the treatments listed above...such as a custom work's field
+                                                     #
+                                                     # Some custom works require two data points to produce one field to represent them
+                                                     #}
+                                                    {% block profileFieldTuple %}
                                                         <dt class="small-4 medium-3 columns">{{ macro.fieldName(selectedField) }}</dt>
                                                         <dd class="small-8 medium-9 columns">
-                                                            {# These fields are Schoolbox\User instances and need special treatment #}
-                                                            {{ macro.email(session, selectedField.value.email, selectedField.value.formatName) }}
+                                                            {{ selectedField.value }}
                                                         </dd>
-                                                    {% elseif selectedField.field in ['email'] %}
-                                                        <dt class="small-4 medium-3 columns">{{ macro.fieldName(selectedField) }}</dt>
-                                                        <dd class="small-8 medium-9 columns">
-                                                            {# Renders a mailto: hyperlink #}
-                                                            {{ macro.email(session, selectedField.value, selectedField.value) }}
-                                                        </dd>
-                                                    {% elseif selectedField.field in ['StudentBirthDate'] %}
-                                                        <dt class="small-4 medium-3 columns">{{ macro.fieldName(selectedField) }}</dt>
-                                                        <dd class="small-8 medium-9 columns">
-                                                            {# Renders with date formatting #}
-                                                            {{ selectedField.value|date(dateFormats.shortDateOnlyFormat) }}
-                                                        </dd>
-                                                    {% else %}
-                                                        {# A generic tuple (key, value) pair
-                                                         #
-                                                         # Also gives you a way to render a field specially when it isn't already
-                                                         # one of the treatments listed above...such as a custom work's field
-                                                         #
-                                                         # Some custom works require two data points to produce one field to represent them
-                                                         #}
-                                                        {% block tuple %}
-                                                            <dt class="small-4 medium-3 columns">{{ macro.fieldName(selectedField) }}</dt>
-                                                            <dd class="small-8 medium-9 columns">
-                                                                {{ selectedField.value }}
-                                                            </dd>
-                                                        {% endblock %}
-                                                    {% endif %}
-                                                </dd>
+                                                    {% endblock %}
+                                                {% endif %}
                                             {% endif %}
                                         {% endif %}
                                     {% endif %}

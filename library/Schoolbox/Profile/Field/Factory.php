@@ -9,7 +9,6 @@ declare(strict_types=1);
 
 namespace Schoolbox\Profile\Field;
 
-use Alaress\Database\Predicate\InvalidColumnException;
 use Schoolbox\Admin\Profile\Editor\Field\Mapper;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Role;
