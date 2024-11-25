@@ -301,13 +301,12 @@ type InjectScriptsParams = {
 export async function injectScriptsIfNotLoaded(params: InjectScriptsParams): Promise<void> {
     // Scripts are injected sequentially here because often sets of scripts need to be added in a particular order.
     // Example: jstree.min.js must be added before jQuery.resourceTree.js.
-    await Promise.all(
-        params.srcList.map(async (src) => {
-            if (!isScriptLoaded(src)) {
-                await injectScript(src);
-            }
-        }),
-    );
+    await params.srcList.reduce(async (previousPromise, src) => {
+        await previousPromise;
+        if (!isScriptLoaded(src)) {
+            await injectScript(src);
+        }
+    }, Promise.resolve());
 
     if (params.onComplete !== undefined) {
         params.onComplete();
