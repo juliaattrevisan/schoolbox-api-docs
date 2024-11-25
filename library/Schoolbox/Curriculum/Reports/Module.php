@@ -55,13 +55,15 @@ class Module extends BaseModule
     public function buildController(): Base
     {
         $curriculumMapper = $this->getMapperFactory()->get(CurriculumMapper::class);
+        $rubricCapabilityMapper = $this->getMapperFactory()->get(RubricCapabilityMapper::class);
+        $assessmentMapper = $this->getMapperFactory()->get(AssessmentMapper::class);
         return new Controller(
             $curriculumMapper,
             $this->getMapperFactory()->get(CourseSpecificationMapper::class),
             $this->getMapperFactory()->get(CourseUnitSpecificationMapper::class),
-            $this->getMapperFactory()->get(RubricCapabilityMapper::class),
-            $this->getMapperFactory()->get(AssessmentMapper::class),
-            new Helper($curriculumMapper),
+            $rubricCapabilityMapper,
+            $assessmentMapper,
+            new Helper($curriculumMapper, $rubricCapabilityMapper, $assessmentMapper),
         );
     }
 

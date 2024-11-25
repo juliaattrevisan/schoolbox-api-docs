@@ -4,11 +4,15 @@ namespace Schoolbox\Curriculum\Reports;
 
 use Alaress\Database\Connector\IConnector;
 use Schoolbox\Curriculum\Node\Mapper as CurriculumMapper;
+use Schoolbox\Assessment\Rubric\DataModel\Capability\Mapper as RubricCapabilityMapper;
+use Schoolbox\Learning\Assessment\DataModel\Mapper as AssessmentMapper;
 
 class Helper
 {
     public function __construct(
         private CurriculumMapper $curriculumMapper,
+        private RubricCapabilityMapper $rubricCapabilityMapper,
+        private AssessmentMapper $assessmentMapper,
     ) {
     }
 
@@ -309,5 +313,41 @@ class Helper
             ];
         }
         return $usage;
+    }
+
+    public function findModelsForResults(array $usage): array
+    {
+        $result = [];
+        $result[Cursor::COURSE_RUBRIC_CAPABILITY] =
+            $this->rubricCapabilityMapper->findByColumn(
+                'id',
+                array_keys($usage[Cursor::COURSE_RUBRIC_CAPABILITY]),
+            )->reindex();
+
+        $result[Cursor::COURSE_UNIT_RUBRIC_CAPABILITY] =
+            $this->rubricCapabilityMapper->findByColumn(
+                'id',
+                array_keys($usage[Cursor::COURSE_UNIT_RUBRIC_CAPABILITY]),
+            )->reindex();
+
+        $result['activity'] =
+            $this->assessmentMapper->findByColumn(
+                'id',
+                array_keys($usage['activity']),
+            )->reindex();
+
+        $result[Cursor::COURSE_ACTIVITY_LESSON_PLAN] =
+            $this->assessmentMapper->findByColumn(
+                'id',
+                array_keys($usage[Cursor::COURSE_ACTIVITY_LESSON_PLAN]),
+            )->reindex();
+
+        $result[Cursor::COURSE_IN_USE_RUBRIC] =
+            $this->assessmentMapper->findByColumn(
+                'id',
+                array_keys($usage[Cursor::COURSE_IN_USE_RUBRIC]),
+            )->reindex();
+
+        return $result;
     }
 }

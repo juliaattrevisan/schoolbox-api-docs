@@ -18,11 +18,8 @@ class DetailedUsage
         protected Generator $routeGenerator,
         protected Authorizer $authorizer,
         protected User $currentUser,
+        private array $models,
         private RubricUsage $rubricUsageTranslator,
-        private Collection $activities,
-        private Collection $lessonPlans,
-        private array $capabilities,
-        private Collection $inUseRubrics,
     ) {
     }
 
@@ -35,7 +32,7 @@ class DetailedUsage
     {
         $rubric = [];
 
-        $rubricCourseCapabilities = $this->capabilities['course']->map(
+        $rubricCourseCapabilities = $this->models[Cursor::COURSE_RUBRIC_CAPABILITY]->map(
             function ($cap) use ($usage) {
                 return call_user_func(
                     $this->rubricUsageTranslator,
@@ -57,7 +54,7 @@ class DetailedUsage
             ];
         }
 
-        $rubricUnitCapabilities = $this->capabilities['unit']->map(
+        $rubricUnitCapabilities = $this->models[Cursor::COURSE_UNIT_RUBRIC_CAPABILITY]->map(
             function ($cap) use ($usage) {
                 return call_user_func(
                     $this->rubricUsageTranslator,
@@ -85,8 +82,8 @@ class DetailedUsage
                 $unit->getFolder()->getId() == $usage['unit']['folderId'],
         ];
 
-        if ($this->activities->count() > 0) {
-            $translation['activity'] = $this->activities->map(
+        if ($this->models['activity']->count() > 0) {
+            $translation['activity'] = $this->models['activity']->map(
                 fn($activity) => [
                     'name'   => $activity->getTitle(),
                     'icon'   => $usage['activity'][$activity->getId()]['icon'],
@@ -100,8 +97,8 @@ class DetailedUsage
             );
         }
 
-        if ($this->lessonPlans->count() > 0) {
-            $translation['lessonPlan'] = $this->lessonPlans->map(
+        if ($this->models[Cursor::COURSE_ACTIVITY_LESSON_PLAN]->count() > 0) {
+            $translation['lessonPlan'] = $this->models[Cursor::COURSE_ACTIVITY_LESSON_PLAN]->map(
                 fn($lessaonPlan) => [
                     'name'   => $lessaonPlan->getTitle(),
                     '_links' => [
@@ -118,8 +115,8 @@ class DetailedUsage
             $translation['rubric'] = $rubric;
         }
 
-        if ($this->inUseRubrics->count() > 0) {
-            $translation['inUseRubrics'] = $this->inUseRubrics->map(
+        if ($this->models[Cursor::COURSE_IN_USE_RUBRIC]->count() > 0) {
+            $translation['inUseRubrics'] = $this->models[Cursor::COURSE_IN_USE_RUBRIC]->map(
                 fn($assessment) => [
                     'name' => $assessment->getTitle(),
                     'icon' => Cursor::ACTIVITY_ICON_LIST[Cursor::COURSE_ACTIVITY_DUE_WORK],

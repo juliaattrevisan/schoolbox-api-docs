@@ -275,32 +275,7 @@ class Controller extends Base
                 $unitId
             );
 
-            $courseCapabilities = $this->rubricCapabilityMapper
-                ->findByColumn(
-                    'id',
-                    array_keys($result[Cursor::COURSE_RUBRIC_CAPABILITY] ?? [])
-                )->reindex();
-
-            $unitCapacities = $this->rubricCapabilityMapper
-                ->findByColumn(
-                    'id',
-                    array_keys($result[Cursor::COURSE_UNIT_RUBRIC_CAPABILITY] ?? [])
-                )->reindex();
-
-            $activities = $this->assessmentMapper->findByColumn(
-                'id',
-                array_keys($result['activity'] ?? [])
-            );
-
-            $lessonPlans = $this->assessmentMapper->findByColumn(
-                'id',
-                array_keys($result[Cursor::COURSE_ACTIVITY_LESSON_PLAN] ?? [])
-            );
-
-            $inUseRubric = $this->assessmentMapper->findByColumn(
-                'id',
-                array_keys($result[Cursor::COURSE_IN_USE_RUBRIC] ?? [])
-            )->reindex();
+            $models = $this->helper->findModelsForResults($result);
         } catch (\Exception $e) {
             $problem = (new ApiProblem($e->getMessage()))
                 ->setStatus(400)
@@ -319,11 +294,8 @@ class Controller extends Base
             $this->routeGenerator,
             $this->authorizer,
             $this->getUser(),
+            $models,
             $rubricTranslator,
-            $activities,
-            $lessonPlans,
-            ['course' => $courseCapabilities, 'unit' => $unitCapacities],
-            $inUseRubric,
         );
 
         $response = $translator($courseUnitSpec, $result);
