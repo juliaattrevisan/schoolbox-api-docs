@@ -45,6 +45,17 @@ class Mapper extends BaseMapper
      */
     public function findButtonsForUser(User $viewee, User $viewer): Collection
     {
+        /* If the viewer is a Parent, and the Viewee is a Student,
+         * and the viewer is *not* the parent of the student,
+         * return an empty set: families are prohibited from seeing another family's buttons
+         * (we don't have a "parents of student" impliit meaning in Profile Buttons)
+         */
+        if ($viewee->getRole()->isStudent() && $viewer->getRole()->isParent() && !$viewer->isParentOf($viewee)) {
+            return new Collection();
+        }
+
+        /* Otherwise, continue based upon campus and roles as per the ui
+         */
         $vieweeCampusList = $viewee->getCampusCollection()->indexBy('id')->keys();
 
         if (count($vieweeCampusList) < 1) {
