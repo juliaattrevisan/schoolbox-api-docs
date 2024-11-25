@@ -335,8 +335,6 @@ class External_Synergetic_User implements External_UserInterface
                         vStudentsAll.StudentIBFlag,
                         vStudentsAll.IndigenousFlag,
                         vStudentsAll.StudentTSIFlag,
-                        'cat' AS LECaseManagerName,
-                        117 AS LECaseManagerID,
                         $learningPlanQuery
             FROM        dbo.vStudentsAll vStudentsAll
             LEFT JOIN   CommunityAlerts ON
