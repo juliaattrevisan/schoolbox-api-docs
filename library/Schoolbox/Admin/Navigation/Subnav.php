@@ -675,12 +675,12 @@ class Subnav
                     ],
                     '/pastoral/management/groups' => [
                         'name'        => 'Groups Management',
-                        'visible'     => true,
+                        'visible'     => $userHasServicePermissionPastoral, // Note this page is special in that available to superusers who are not Pastoral Moderators.
                         'description' => 'Manage Groups within the pastoral system',
                     ],
                     '/pastoral/management/audience/' => [
                         'name'        => 'Pastoral Record Settings',
-                        'visible'     => true,
+                        'visible'     => $userHasServicePermissionPastoral, // Note this page is special in that available to superusers who are not Pastoral Moderators.
                         'description' => 'Manage Flag, Audience and Template Defaults',
                     ],
                     '/adminv2/lists/pastoral/pastoral-severity' => [
