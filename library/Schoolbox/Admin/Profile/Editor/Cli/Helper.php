@@ -29,7 +29,8 @@ class Helper
      * @param IConnector $db
      * @param bool       $perform
      */
-    public function __construct(private IConnector $db, private bool $perform) {
+    public function __construct(private IConnector $db, private bool $perform)
+    {
         $this->prepare();
     }
 
