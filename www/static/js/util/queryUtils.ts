@@ -5,7 +5,7 @@
 import { isArrayOfNumbers } from "./arrayUtils";
 
 type NestedObject = {
-    [key: string]: string | NestedObject;
+    [key: string]: string | NestedObject | number[];
 };
 
 /**
@@ -14,7 +14,7 @@ type NestedObject = {
  * @returns - Whether the value is a nested object
  */
 function isValueNestedObject(value: unknown): value is NestedObject {
-    return typeof value === "object" && value !== null && !Array.isArray(value);
+    return (typeof value === "object" && value !== null && !Array.isArray(value)) || isArrayOfNumbers(value);
 }
 
 /**
@@ -53,8 +53,6 @@ export function getKeyValuePairs(obj: NestedObject): Record<string, string> {
                 if (isValueNestedObject(value)) {
                     // Recursively call the function for nested objects
                     recurse(value, newKeyPath);
-                } else if (isArrayOfNumbers(value)) {
-                    console.warn("isArrayOfNumbers");
                 } else if (Array.isArray(value)) {
                     // If the value is an array, loop through the array and add an entry for each valueWithin
                     value.forEach((valueWithin: unknown, index) => {
