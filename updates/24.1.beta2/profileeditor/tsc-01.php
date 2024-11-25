@@ -262,7 +262,7 @@ HELP;
  * You should generally try to fix those, even though in some special cases php will throw notices
  * for its own expected behaviours which will inadvertently cause this to fail
  */
-$options = [CliTool\Kernel::OPTION_LEVEL => Monolog\Logger::DEBUG, CliTool\Kernel::OPTION_ERRORS => E_ALL,];
+$options = [CliTool\Kernel::OPTION_LEVEL => Monolog\Logger::INFO, CliTool\Kernel::OPTION_ERRORS => E_ALL,];
 
 /** @noinspection PhpUnhandledExceptionInspection */
 (new Schoolbox\Application\CliTool\Kernel($app, $options))->runApp();
