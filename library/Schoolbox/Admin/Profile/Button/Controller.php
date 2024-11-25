@@ -281,7 +281,7 @@ class Controller extends Base
 
         $this->campusAvailabilityMapper->deleteByColumn('profile_button_id', $item->getId());
 
-        if (\is_array($post['campusAvailability'])) {
+        if (\is_array($post['campusAvailability'] ?? null)) {
             foreach ($post['campusAvailability'] as $campusId) {
                 $profileButtonCampus = new Campus\Availability\Model();
                 $profileButtonCampus->setProfileButtonId($item->getId());
@@ -292,7 +292,7 @@ class Controller extends Base
 
         $this->roleAvailabilityMapper->deleteByColumn('profile_button_id', $item->getId());
 
-        if (\is_array($post['roleAvailability'])) {
+        if (\is_array($post['roleAvailability'] ?? null)) {
             foreach ($post['roleAvailability'] as $roleId) {
                 $profileButtonRole = new Role\Availability\Model();
                 $profileButtonRole->setProfileButtonId($item->getId());
@@ -303,7 +303,7 @@ class Controller extends Base
 
         $this->campusVisibilityMapper->deleteByColumn('profile_button_id', $item->getId());
 
-        if (\is_array($post['campusVisibility'])) {
+        if (\is_array($post['campusVisibility'] ?? null)) {
             foreach ($post['campusVisibility'] as $campusId) {
                 $profileButtonCampus = new Campus\Visibility\Model();
                 $profileButtonCampus->setProfileButtonId($item->getId());
@@ -314,7 +314,7 @@ class Controller extends Base
 
         $this->roleVisibilityMapper->deleteByColumn('profile_button_id', $item->getId());
 
-        if (\is_array($post['roleVisibility'])) {
+        if (\is_array($post['roleVisibility'] ?? null)) {
             foreach ($post['roleVisibility'] as $roleId) {
                 $profileButtonRole = new Role\Visibility\Model();
                 $profileButtonRole->setProfileButtonId($item->getId());
