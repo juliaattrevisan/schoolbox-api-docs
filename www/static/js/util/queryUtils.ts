@@ -4,8 +4,12 @@
 
 import { isArrayOfNumbers } from "./arrayUtils";
 
-type NestedObject = {
-    [key: string]: string | NestedObject | number[];
+/**
+ * A type representing either a nested object or an array of numbers
+ * These two are currently the only types we need to consider for query parameters
+ */
+type Nested = {
+    [key: string]: Nested | number[];
 };
 
 /**
@@ -13,7 +17,7 @@ type NestedObject = {
  * @param value - The value to be checked
  * @returns - Whether the value is a nested object
  */
-function isValueNestedObject(value: unknown): value is NestedObject {
+function isValueNested(value: unknown): value is Nested {
     return (typeof value === "object" && value !== null && !Array.isArray(value)) || isArrayOfNumbers(value);
 }
 
@@ -38,26 +42,26 @@ function setValue(value: unknown): string {
  * @param obj - The object to be converted to key-value pairs
  * @returns - The key-value pairs
  */
-export function getKeyValuePairs(obj: NestedObject): Record<string, string> {
+export function getKeyValuePairs(obj: Nested): Record<string, string> {
     const result: Record<string, string> = {};
     /**
      * Recursively converts an object to a collection of key-value pairs
      * @param curr - The current object
      * @param [keyPath] - The path of the current key
      */
-    function recurse(curr: NestedObject, keyPath?: string): void {
+    function recurse(curr: Nested, keyPath?: string): void {
         Object.keys(curr).forEach((key) => {
             if (Object.prototype.hasOwnProperty.call(curr, key)) {
                 const newKeyPath = keyPath ? `${keyPath}[${key}]` : key;
                 const value = curr[key];
-                if (isValueNestedObject(value)) {
+                if (isValueNested(value)) {
                     // Recursively call the function for nested objects
                     recurse(value, newKeyPath);
                 } else if (Array.isArray(value)) {
                     // If the value is an array, loop through the array and add an entry for each valueWithin
                     value.forEach((valueWithin: unknown, index) => {
                         const arrayKeyPath = `${newKeyPath}[${index}]`;
-                        if (isValueNestedObject(valueWithin)) {
+                        if (isValueNested(valueWithin)) {
                             // Recursively call the function for nested objects
                             recurse(valueWithin, arrayKeyPath);
                         } else {
@@ -79,7 +83,7 @@ export function getKeyValuePairs(obj: NestedObject): Record<string, string> {
  * @param obj - The object to be converted to a search param string
  * @returns - the URLSearchParams object as a string
  */
-export function getSearchString(obj: NestedObject): string {
+export function getSearchString(obj: Nested): string {
     // first convert the object to key-value pairs
     const keyValuePairs = getKeyValuePairs(obj);
     const searchParams = new URLSearchParams();
@@ -97,7 +101,7 @@ export function getSearchString(obj: NestedObject): string {
  * @param obj - The object to be converted to a FormData
  * @returns - the FormData object
  */
-export function getFormData(obj: NestedObject): FormData {
+export function getFormData(obj: Nested): FormData {
     // first convert the object to key-value pairs
     const keyValuePairs = getKeyValuePairs(obj);
     const formData = new FormData();
