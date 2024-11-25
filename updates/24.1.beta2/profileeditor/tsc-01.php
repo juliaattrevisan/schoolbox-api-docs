@@ -91,7 +91,7 @@ HELP;
         /* Exit early if you're doing this on the wrong school
          */
         if (self::SCHOOL_CODE !== $this->getConfig()->get('site_school_code')) {
-            $this->getLogger()->warning(sprintf(
+            $this->getLogger()->debug(sprintf(
                 'This customisation requires the %s school code; exiting.',
                 self::SCHOOL_CODE
             ));
