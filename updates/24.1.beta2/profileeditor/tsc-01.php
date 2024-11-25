@@ -242,7 +242,7 @@ HELP;
          */
         $profileButtonId = (int)$this->getDatabaseInternal()->lastInsertId();
 
-        $roleIds = $this->helper->fetchRoleIds([Role::PARENT, Role::STAFF]);
+        $roleIds = $this->helper->fetchRoleIds([Role::PARENT, Role::STAFF, Role::STUDENT]);
         $campusIds = $this->helper->fetchCampusIds();
 
         /* Assign relationships
