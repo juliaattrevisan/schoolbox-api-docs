@@ -11,6 +11,12 @@
  * @returns - the array with the item moved
  */
 export function moveArrayItem(array: unknown[], oldIndex: number, newIndex: number): unknown[] {
+    if (oldIndex < 0 || oldIndex >= array.length) {
+        return array;
+    }
+    if (newIndex < 0 || newIndex >= array.length) {
+        return array;
+    }
     if (newIndex >= array.length) {
         let k = newIndex - array.length + 1;
         while (k > 0) {
