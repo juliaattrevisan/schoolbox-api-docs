@@ -8,6 +8,7 @@
 
 declare(strict_types=1);
 
+use Schoolbox\Admin\Profile\Editor\Cli\Helper;
 use Schoolbox\Application\CliTool;
 
 require_once __DIR__ . '/../../../conf/core/require.php';
@@ -61,6 +62,14 @@ $app = new class extends CliTool\App {
 
 
     /**
+     * Somewhat convenient access to inconvenient queries
+     *
+     * @var Helper
+     */
+    private Helper $helper;
+
+
+    /**
      * @inheritdoc
      */
     public function getLongOpts(): array
@@ -107,6 +116,8 @@ HELP;
         } catch (\RuntimeException $e) {
             return;
         }
+
+        $this->helper = new Helper($this->getDatabaseInternal());
 
         $this->prepare();
         $this->insertCustomFields();
@@ -220,13 +231,28 @@ HELP;
          *
          * Find the button we just made in the surest way we know
          */
-        $buttonId = $this->getDatabaseInternal()->lastInsertId();
+        $profileButtonId = $this->getDatabaseInternal()->lastInsertId();
 
+        $roleIds = $this->helper->fetchRoleIds([\Schoolbox\Role::PARENT, \Schoolbox\Role::STAFF]);
+        $campuses = $this->helper->fetchCampusIds();
 
-
-        var_dump($buttonId);
+        /* Assign relationships
+         *
+         * Technically speaking, all these hardcoded system buttons would have
+         * been available in every campus for every role, subject to further
+         * checks by routeLookupIfAuthorized calls. Schools have the option to
+         * nip it in the bud if they want to prevent viewers from seeing a
+         * button by unticking their role(s) as per the ui
+         */
+        $this->createCampusAvailability($profileButtonId, $candidate['availability']['campus']);
+        $this->createCampusVisibility($profileButtonId, $candidate['visibility']['campus']);
+        $this->createRoleAvailability($profileButtonId, $candidate['availability']['role']);
+        $this->createRoleVisibility($profileButtonId, $candidate['visibility']['role']);
 
     }
+
+
+
 
 
     /**
@@ -239,7 +265,7 @@ HELP;
      */
     public function runAsRoot(): ?bool
     {
-        return parent::runAsRoot();
+        return null;
     }
 };
 
