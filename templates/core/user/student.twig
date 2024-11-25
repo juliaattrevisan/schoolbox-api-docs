@@ -235,8 +235,14 @@
                                                         {# Renders with date formatting #}
                                                         {{ selectedField.value|date(dateFormats.shortDateOnlyFormat) }}
                                                     {% else %}
-                                                        {# A generic tuple (key, value) pair #}
-                                                        {{ selectedField.value }}
+                                                        {# A generic tuple (key, value) pair
+                                                         #
+                                                         # Also gives you a way to render a field specially when it isn't already
+                                                         # one of the treatments listed above...such as a custom work's field
+                                                         #}
+                                                        {% block tuple %}
+                                                            {{ selectedField.value }} shoryuken
+                                                        {% endblock %}
                                                     {% endif %}
                                                 </dd>
                                             {% endif %}
