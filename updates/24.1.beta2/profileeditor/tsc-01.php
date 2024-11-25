@@ -2,7 +2,7 @@
 
 /**
  * @author      Steve Chan <steve.chan@schoolbox.com.au>
- * @copyright   Copyright 2019, Schoolbox Pty Ltd
+ * @copyright   Copyright 2024, Schoolbox Pty Ltd
  * @link        http://www.schoolbox.com.au/
  */
 
@@ -10,6 +10,7 @@ declare(strict_types=1);
 
 use Schoolbox\Admin\Profile\Editor\Cli\Helper;
 use Schoolbox\Application\CliTool;
+use Schoolbox\Role;
 
 require_once __DIR__ . '/../../../conf/core/require.php';
 
@@ -133,18 +134,9 @@ HELP;
      */
     private function createFields(): void
     {
-        $query = "
-            INSERT IGNORE INTO `profile_field`
-            (roletype, field, display_as, sequence, enabled, term, icon, css, click_to_reveal, is_external)
-            VALUES
-            ('student','LECaseManagerName','Learning Enrichment Case Manager',(
-            SELECT MAX(sequence)+1
-            FROM profile_field pf
-            WHERE roletype = 'student'
-            ),1,NULL,NULL,NULL,0,1);
-        ";
-
-        $this->getDatabaseInternal()->executeQuery($query);
+        /* We actually need to set perms on two fields here
+         */
+        $profileFieldIds = [];
 
         /* Despite this field existing, it'll never render to users: a customised student.twig
          * intercepts the default rendering
@@ -161,6 +153,58 @@ HELP;
         ";
 
         $this->getDatabaseInternal()->executeQuery($query);
+
+        /* Preset availability and visibility requirements
+         * By default it was visible to Parents of the student, and staff members
+         *
+         * Find the field we just made in the surest way we know
+         */
+        $profileFieldIds[] = (int)$this->getDatabaseInternal()->lastInsertId();
+
+        /* We use this in the ui
+         */
+        $query = "
+            INSERT IGNORE INTO `profile_field`
+            (roletype, field, display_as, sequence, enabled, term, icon, css, click_to_reveal, is_external)
+            VALUES
+            ('student','LECaseManagerName','Learning Enrichment Case Manager',(
+            SELECT MAX(sequence)+1
+            FROM profile_field pf
+            WHERE roletype = 'student'
+            ),1,NULL,NULL,NULL,0,1);
+        ";
+
+        $this->getDatabaseInternal()->executeQuery($query);
+
+        /* Preset availability and visibility requirements
+         * By default it was visible to Parents of the student, and staff members
+         *
+         * Find the field we just made in the surest way we know
+         */
+        $profileFieldIds[] = (int)$this->getDatabaseInternal()->lastInsertId();
+
+        $roletypes = [Role::STAFF, Role::PARENT];
+        $campusIds = $this->helper->fetchCampusIds();
+
+        /* Assign relationships
+         */
+        foreach ($profileFieldIds as $profileFieldId) {
+            $this->getLogger()->info(sprintf(
+                'Campus availability: assigning campus ids %s to profile field %s',
+                implode(',', $campusIds),
+                $profileFieldId
+            ));
+
+            $this->helper->createFieldCampusAvailability($profileFieldId, $campusIds);
+
+            $this->getLogger()->info(sprintf(
+                'Roletype visibility: assigning roletypes %s to profile field %s',
+                implode(',', $roletypes),
+                $profileFieldId
+            ));
+
+            $this->helper->createFieldRoletypeVisibility($profileFieldId, $roletypes);
+        }
     }
 
 
@@ -173,7 +217,7 @@ HELP;
     private function createButtons(): void
     {
         $query = "
-            INSERT INTO profile_button
+            INSERT IGNORE INTO profile_button
             (roletype, type, sort_order, title, text, icon, url)
             VALUES (
                 'student',
@@ -198,7 +242,7 @@ HELP;
          */
         $profileButtonId = (int)$this->getDatabaseInternal()->lastInsertId();
 
-        $roleIds = $this->helper->fetchRoleIds([\Schoolbox\Role::PARENT, \Schoolbox\Role::STAFF]);
+        $roleIds = $this->helper->fetchRoleIds([Role::PARENT, Role::STAFF]);
         $campusIds = $this->helper->fetchCampusIds();
 
         /* Assign relationships
@@ -215,7 +259,7 @@ HELP;
             $profileButtonId
         ));
 
-        $this->helper->createCampusAvailability($profileButtonId, $campusIds);
+        $this->helper->createButtonCampusAvailability($profileButtonId, $campusIds);
 
         $this->getLogger()->info(sprintf(
             'Campus visibility: assigning campus ids %s to profile button %s',
@@ -223,7 +267,7 @@ HELP;
             $profileButtonId
         ));
 
-        $this->helper->createCampusVisibility($profileButtonId, $campusIds);
+        $this->helper->createButtonCampusVisibility($profileButtonId, $campusIds);
 
         $this->getLogger()->info(sprintf(
             'Role availability: assigning role ids %s to profile button %s',
@@ -231,7 +275,7 @@ HELP;
             $profileButtonId
         ));
 
-        $this->helper->createRoleAvailability($profileButtonId, $roleIds);
+        $this->helper->createButtonRoleAvailability($profileButtonId, $roleIds);
 
         $this->getLogger()->info(sprintf(
             'Role visibility: assigning role ids %s to profile button %s',
@@ -239,7 +283,7 @@ HELP;
             $profileButtonId
         ));
 
-        $this->helper->createRoleVisibility($profileButtonId, $roleIds);
+        $this->helper->createButtonRoleVisibility($profileButtonId, $roleIds);
     }
 
 

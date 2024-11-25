@@ -1,5 +1,11 @@
 <?php
 
+/**
+ * @author      Steve Chan <steve.chan@schoolbox.com.au>
+ * @copyright   Copyright 2024, Schoolbox Pty Ltd
+ * @link        http://www.schoolbox.com.au/
+ */
+
 namespace Schoolbox\Admin\Profile\Editor\Cli;
 
 use Alaress\Database\Connector\IConnector;
@@ -7,13 +13,14 @@ use Alaress\Database\Predicate\Builder;
 
 class Helper
 {
-
     /* Some prepared statements that we'll often reuse
      */
-    private \PDOStatement $campusAvailabilityInsertStatement;
-    private \PDOStatement $campusVisibilityInsertStatement;
-    private \PDOStatement $roleAvailabilityInsertStatement;
-    private \PDOStatement $roleVisibilityInsertStatement;
+    private \PDOStatement $fieldCampusAvailabilityInsertStatement;
+    private \PDOStatement $fieldRoletypeVisibilityInsertStatement;
+    private \PDOStatement $buttonCampusAvailabilityInsertStatement;
+    private \PDOStatement $buttonCampusVisibilityInsertStatement;
+    private \PDOStatement $buttonRoleAvailabilityInsertStatement;
+    private \PDOStatement $buttonRoleVisibilityInsertStatement;
 
 
     /**
@@ -34,22 +41,36 @@ class Helper
      */
     private function prepare(): void
     {
-        $this->campusAvailabilityInsertStatement = $this->db->prepare("
+        /* Fields
+         */
+        $this->fieldCampusAvailabilityInsertStatement = $this->db->prepare("
+            INSERT INTO profile_field_campus_availability (profile_field_id, campus_id)
+            VALUES (:profileFieldId, :campusId)
+        ");
+
+        $this->fieldRoletypeVisibilityInsertStatement = $this->db->prepare("
+            INSERT INTO profile_field_roletype_visibility (profile_field_id, roletype)
+            VALUES (:profileFieldId, :roletype)
+        ");
+
+        /* Buttons
+         */
+        $this->buttonCampusAvailabilityInsertStatement = $this->db->prepare("
             INSERT INTO profile_button_campus_availability (profile_button_id, campus_id)
             VALUES (:profileButtonId, :campusId)
         ");
 
-        $this->campusVisibilityInsertStatement = $this->db->prepare("
+        $this->buttonCampusVisibilityInsertStatement = $this->db->prepare("
             INSERT INTO profile_button_campus_visibility (profile_button_id, campus_id)
             VALUES (:profileButtonId, :campusId)
         ");
 
-        $this->roleAvailabilityInsertStatement = $this->db->prepare("
+        $this->buttonRoleAvailabilityInsertStatement = $this->db->prepare("
             INSERT INTO profile_button_role_availability (profile_button_id, role_id)
             VALUES (:profileButtonId, :roleId)
         ");
 
-        $this->roleVisibilityInsertStatement = $this->db->prepare("
+        $this->buttonRoleVisibilityInsertStatement = $this->db->prepare("
             INSERT INTO profile_button_role_visibility (profile_button_id, role_id)
             VALUES (:profileButtonId, :roleId)
         ");
@@ -106,6 +127,52 @@ class Helper
     }
 
 
+    /* Fields
+     */
+
+    /**
+     * Recreate a relationship using $candidate's existing nodes and this new $profileFieldId
+     *
+     * @param int|null $profileFieldId
+     * @param array $campusIds
+     * @return void
+     */
+    public function createFieldCampusAvailability(?int $profileFieldId, array $campusIds): void
+    {
+        if ($this->perform) {
+            foreach ($campusIds as $campusId) {
+                $this->fieldCampusAvailabilityInsertStatement->execute([
+                    'profileFieldId' => $profileFieldId,
+                    'campusId' => $campusId
+                ]);
+            }
+        }
+    }
+
+
+    /**
+     * Recreate a relationship using $candidate's existing nodes and this new $profileFieldId
+     *
+     * @param int|null $profileFieldId
+     * @param array $roletypes
+     * @return void
+     */
+    public function createFieldRoletypeVisibility(?int $profileFieldId, array $roletypes): void
+    {
+        if ($this->perform) {
+            foreach ($roletypes as $roletype) {
+                $this->fieldRoletypeVisibilityInsertStatement->execute([
+                    'profileFieldId' => $profileFieldId,
+                    'roletype' => $roletype
+                ]);
+            }
+        }
+    }
+
+
+    /* Buttons
+     */
+
     /**
      * Recreate a relationship using $candidate's existing nodes and this new $profileButtonId
      *
@@ -113,11 +180,11 @@ class Helper
      * @param array $campusIds
      * @return void
      */
-    public function createCampusAvailability(?int $profileButtonId, array $campusIds): void
+    public function createButtonCampusAvailability(?int $profileButtonId, array $campusIds): void
     {
         if ($this->perform) {
             foreach ($campusIds as $campusId) {
-                $this->campusAvailabilityInsertStatement->execute([
+                $this->buttonCampusAvailabilityInsertStatement->execute([
                     'profileButtonId' => $profileButtonId,
                     'campusId' => $campusId
                 ]);
@@ -133,11 +200,11 @@ class Helper
      * @param array $campusIds
      * @return void
      */
-    public function createCampusVisibility(?int $profileButtonId, array $campusIds): void
+    public function createButtonCampusVisibility(?int $profileButtonId, array $campusIds): void
     {
         if ($this->perform) {
             foreach ($campusIds as $campusId) {
-                $this->campusVisibilityInsertStatement->execute([
+                $this->buttonCampusVisibilityInsertStatement->execute([
                     'profileButtonId' => $profileButtonId,
                     'campusId' => $campusId
                 ]);
@@ -153,11 +220,11 @@ class Helper
      * @param array $roleIds
      * @return void
      */
-    public function createRoleAvailability(?int $profileButtonId, array $roleIds): void
+    public function createButtonRoleAvailability(?int $profileButtonId, array $roleIds): void
     {
         if ($this->perform) {
             foreach ($roleIds as $roleId) {
-                $this->roleAvailabilityInsertStatement->execute([
+                $this->buttonRoleAvailabilityInsertStatement->execute([
                     'profileButtonId' => $profileButtonId,
                     'roleId' => $roleId
                 ]);
@@ -173,11 +240,11 @@ class Helper
      * @param array $roleIds
      * @return void
      */
-    public function createRoleVisibility(?int $profileButtonId, array $roleIds): void
+    public function createButtonRoleVisibility(?int $profileButtonId, array $roleIds): void
     {
         if ($this->perform) {
             foreach ($roleIds as $roleId) {
-                $this->roleVisibilityInsertStatement->execute([
+                $this->buttonRoleVisibilityInsertStatement->execute([
                     'profileButtonId' => $profileButtonId,
                     'roleId' => $roleId
                 ]);
