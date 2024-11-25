@@ -47,8 +47,8 @@ export const Disabled: Story = {
     Enable Curriculum Code Tagging
     <input id="tgl2" type="checkbox" class="c-toggle__input" checked disabled />
     <span class="c-toggle__display" hidden>
-        <sbx-icon name="approve" color="var(--color-foreground-primary)" />
-        <sbx-icon name="close" color="var(--sbx-color-accent)" />
+        <sbx-icon name="approve" color="var(--color-text-secondary)" />
+        <sbx-icon name="close" color="var(--color-text-secondary)" />
     </span>
 </label>
             `,

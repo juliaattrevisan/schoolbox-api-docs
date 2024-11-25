@@ -34,7 +34,7 @@
  */
 @mixin form-input-disabled {
     background-color: var(--color-foreground-secondary);
-    color: var(--color-text-primary) !important; // ^foundation-fixes^ - won't need once _forms.scss is removed
+    color: var(--color-text-secondary) !important; // ^foundation-fixes^ - won't need once _forms.scss is removed
     cursor: not-allowed;
     pointer-events: auto; // ^foundation-fixes^ - won't need once _forms.scss is removed
     & + label {
