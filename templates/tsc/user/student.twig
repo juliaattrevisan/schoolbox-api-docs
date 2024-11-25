@@ -1,12 +1,5 @@
 {% extends '@core/user/student.twig' %}
 
-{#{% block buttons %}#}
-{#    {{ parent() }}#}
-{#    {% if isParentOfStudent or isStaff %}#}
-{#        <li><a class="icon-result" href="https://dashboard.tsc.nsw.edu.au/login/index/{{user.id}}">Results</a></li>#}
-{#    {% endif %}#}
-{#{% endblock buttons %}#}
-
 {# Intercept default handling of a tuple. Custom Works' tuples must get dealt with specially here,
  # before falling back to just putting selectedField.value on screen
  #}
