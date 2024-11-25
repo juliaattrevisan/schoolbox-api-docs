@@ -82,11 +82,11 @@ class DetailedUsage
                 $unit->getFolder()->getId() == $usage['unit']['folderId'],
         ];
 
-        if ($this->models['activity']->count() > 0) {
-            $translation['activity'] = $this->models['activity']->map(
+        if ($this->models[Cursor::COURSE_ACTIVITY]->count() > 0) {
+            $translation[Cursor::COURSE_ACTIVITY] = $this->models[Cursor::COURSE_ACTIVITY]->map(
                 fn($activity) => [
                     'name'   => $activity->getTitle(),
-                    'icon'   => $usage['activity'][$activity->getId()]['icon'],
+                    'icon'   => $usage[Cursor::COURSE_ACTIVITY][$activity->getId()]['icon'],
                     '_links' => [
                         'view' => $this->getRouteIfAuthorized(
                             'learningAssessment.getAssessment',

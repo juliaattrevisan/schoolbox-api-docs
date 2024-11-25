@@ -109,7 +109,7 @@ class Helper
         $activityUsageQuery = sprintf(
             "
             SELECT
-                'activity' type, activity.type assessmentType, a.id, a.title, cus.folder_id
+                '%s' type, activity.type assessmentType, a.id, a.title, cus.folder_id
             FROM (
                  SELECT '%s' type, t.assessment_id
                  FROM task t
@@ -138,6 +138,7 @@ class Helper
                 ON a.id = activity.assessment_id
                 AND a.deleted_at IS NULL
         ",
+            Cursor::COURSE_ACTIVITY,
             Cursor::COURSE_ACTIVITY_TASK,
             Cursor::COURSE_ACTIVITY_QUIZ,
             Cursor::COURSE_ACTIVITY_LTI,
@@ -330,10 +331,10 @@ class Helper
                 array_keys($usage[Cursor::COURSE_UNIT_RUBRIC_CAPABILITY]),
             )->reindex();
 
-        $result['activity'] =
+        $result[Cursor::COURSE_ACTIVITY] =
             $this->assessmentMapper->findByColumn(
                 'id',
-                array_keys($usage['activity']),
+                array_keys($usage[Cursor::COURSE_ACTIVITY]),
             )->reindex();
 
         $result[Cursor::COURSE_ACTIVITY_LESSON_PLAN] =

@@ -45,6 +45,7 @@ class Cursor implements ICursor
     public const COURSE_ACTIVITY_DUE_WORK = 'dueWork';
     public const COURSE_ACTIVITY_PROJECT = 'project';
     public const COURSE_ACTIVITY_LESSON_PLAN = 'lessonPlan';
+    public const COURSE_ACTIVITY = 'activity';
     public const COURSE_RUBRIC_CAPABILITY = 'rubricCapability';
     public const COURSE_UNIT_RUBRIC_CAPABILITY = 'unitRubricCapability';
     public const COURSE_RUBRIC_INDICATOR = 'rubricIndicator';
