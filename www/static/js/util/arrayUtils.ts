@@ -28,6 +28,6 @@ export const moveArrayItem = (array, oldIndex, newIndex) => {
  * @param arr - array to check
  * @returns - true if all items in the array are numbers
  */
-export function isArrayOfNumbers(arr) {
+export function isArrayOfNumbers(arr: unknown): arr is number[] {
     return Array.isArray(arr) && arr.every((item) => typeof item === "number");
 }
