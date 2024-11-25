@@ -18,7 +18,6 @@ use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentDataSource;
  */
 class Component_Config_CalendarFilter extends Component_Config_Abstract
 {
-
     /**
      * Serialize multidimensional data so it can be persisted to the db
      *
@@ -30,14 +29,12 @@ class Component_Config_CalendarFilter extends Component_Config_Abstract
         return (new FilterCodec())->encode($value);
     }
 
-
     /**
      * @return void
      * @throws JsonException
      */
     public function parse(SitePage $page, $key, $keyblock, $configValue, Component_ControllerAbstract $component = null)
     {
-
         $di = $page->getDi();
 
         try {
