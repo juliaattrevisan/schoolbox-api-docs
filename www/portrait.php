@@ -80,7 +80,7 @@ try {
 
         $preSignedUrlDataObject = $preSignedUrlService->generate(
             $storageModel,
-            Alaress_Date_Format::now()->setTimezone('UTC')->addSeconds($config->get(ConfigMapper::NAME_BROWSER_CACHE_PORTRAIT_TIMEOUT)),
+            Alaress_Date_Format::now()->setTimezone('UTC')->addSeconds((int)$config->get(ConfigMapper::NAME_BROWSER_CACHE_PORTRAIT_TIMEOUT)),
             $portrait->getTranscodePath(
                 FilesystemProxy::getPathFromHash($storageModel->getHash()),
                 $cacheKey,

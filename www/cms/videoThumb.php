@@ -114,7 +114,7 @@ if (isset($type, $id)) {
 
                 $preSignedUrlDataObject = $preSignedUrlService->generate(
                     $videoQueue->getStorage()->setMimetype(new Mimetype()),
-                    Alaress_Date_Format::now()->setTimezone('UTC')->addSeconds($config->get(ConfigMapper::NAME_BROWSER_CACHE_PORTRAIT_TIMEOUT)),
+                    Alaress_Date_Format::now()->setTimezone('UTC')->addSeconds((int)$config->get(ConfigMapper::NAME_BROWSER_CACHE_IMAGE_TIMEOUT)),
                     $imageFilename,
                     ['private', 'must-revalidate'],
                     PreSignedUrlService::DISPOSITION_INLINE,
