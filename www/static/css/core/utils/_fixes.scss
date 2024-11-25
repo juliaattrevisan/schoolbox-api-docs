@@ -60,3 +60,10 @@
         // background: var(--content-ui-background);
     }
 }
+
+// to override styles on elements like buttons, to ensure they are always visible when printed
+.f-always-show {
+    @media print {
+        display: block !important;
+    }
+}

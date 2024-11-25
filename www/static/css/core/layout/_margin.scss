@@ -40,4 +40,16 @@
     &--0 {
         margin: 0;
     }
+    &--0-top {
+        margin-block-start: 0;
+    }
+    &--0-bottom {
+        margin-block-end: 0;
+    }
+    &--0-left {
+        margin-inline-start: 0;
+    }
+    &--0-right {
+        margin-inline-end: 0;
+    }
 }

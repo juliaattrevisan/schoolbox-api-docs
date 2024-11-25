@@ -3,16 +3,19 @@
  * Displays the curriculum coverage report in a table format.
  */
 
+import { useTemplateRef } from "vue";
 import NodeDetails from "@schoolboxCurriculum/vue/node-details.vue";
 import BasicModal from "@schoolboxVue/components/modal/basic-modal.vue";
 import CcReportTableNode from "./cc-report-table-node.vue";
+import CcReportTableNoNodes from "./cc-report-table-no-nodes.vue";
+import CcUsagePopOut from "./cc-usage-pop-out.vue";
 import { useReportStore } from "./store/ccReportStore";
 import type { CurriculumCoverageNode } from "../js/types/curriculumCoverageTypes";
 
 const reportStore = useReportStore();
-
 const isDetailsOpen = window.Vue.ref(false);
 const selectedNodeId = window.Vue.ref<number | null>(null);
+const tbodyEl = useTemplateRef<HTMLTableSectionElement>("tbodyEl");
 
 /**
  * When a title is selected, show the details modal
@@ -65,7 +68,7 @@ window.Vue.watch(isDetailsOpen, (isOpen) => {
                     </template>
                 </tr>
             </thead>
-            <tbody>
+            <tbody ref="tbodyEl">
                 <cc-report-table-node
                     v-for="node in reportStore.nodes"
                     :key="node.id"
@@ -73,12 +76,14 @@ window.Vue.watch(isDetailsOpen, (isOpen) => {
                     :depth="0"
                     @title-click="onTitleClick"
                 />
+                <cc-report-table-no-nodes :tbody-el="tbodyEl" />
             </tbody>
         </table>
     </div>
     <basic-modal v-model:is-open="isDetailsOpen" :has-background-click="true">
         <node-details v-if="selectedNodeId !== null" :node-id="selectedNodeId" />
     </basic-modal>
+    <cc-usage-pop-out />
 </template>
 
 <style scoped>

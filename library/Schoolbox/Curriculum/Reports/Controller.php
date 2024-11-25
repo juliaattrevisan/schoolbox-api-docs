@@ -12,12 +12,17 @@ namespace Schoolbox\Curriculum\Reports;
 
 use Alaress\Web\Controller\Base;
 use Schoolbox\Curriculum\Node\Mapper as CurriculumMapper;
-use Schoolbox\Curriculum\Reports\Translator\ModelToArray as ModelToArrayTranslator;
-use Schoolbox\Curriculum\Reports\Translator\UnitAssessmentUsage as UnitAssessmentUsageTranslator;
-use Schoolbox\Curriculum\Reports\Translator\CourseUsage as CourseUsageTranslator;
-use Schoolbox\Curriculum\Reports\Translator\CourseStructureOnly as CourseStructureTranslator;
+use Schoolbox\Curriculum\Reports\Translator\Counts\ModelToArray as ModelToArrayTranslator;
+use Schoolbox\Curriculum\Reports\Translator\Counts\UnitAssessmentUsage as UnitAssessmentUsageTranslator;
+use Schoolbox\Curriculum\Reports\Translator\Counts\CourseUsage as CourseUsageTranslator;
+use Schoolbox\Curriculum\Reports\Translator\Counts\CourseStructureOnly as CourseStructureTranslator;
+use Schoolbox\Curriculum\Reports\Translator\Usage\DetailedUsage;
+use Schoolbox\Curriculum\Reports\Translator\Usage\RubricUsage;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Mapper as CourseUnitSpecificationMapper;
 use Schoolbox\Learning\Course\DataModel\Specification\Mapper as CourseSpecificationMapper;
+use Schoolbox\Assessment\Rubric\DataModel\Indicator\Mapper as RubricIndicatorMapper;
+use Schoolbox\Learning\Assessment\DataModel\Mapper as AssessmentMapper;
+use Schoolbox\Assessment\Rubric\DataModel\Capability\Mapper as RubricCapabilityMapper;
 use Schoolbox\Resource\Folder\Translator\ModelToArray\LinkOnly as FolderTranslator;
 use Schoolbox\Learning\Course\DataModel\Specification\Translator\ModelToArray as CourseSpecTranslator;
 use Schoolbox\Curriculum\Api\Translator\ModelToArray as NodeTranslator;
@@ -33,11 +38,16 @@ class Controller extends Base
      * @param CurriculumMapper              $curriculumMapper
      * @param CourseSpecificationMapper     $courseSpecificationMapper
      * @param CourseUnitSpecificationMapper $courseUnitSpecificationMapper
+     * @param RubricCapabilityMapper        $rubricCapabilityMapper
+     * @param Helper                        $helper
      */
     public function __construct(
         private CurriculumMapper $curriculumMapper,
         private CourseSpecificationMapper $courseSpecificationMapper,
         private CourseUnitSpecificationMapper $courseUnitSpecificationMapper,
+        private RubricCapabilityMapper $rubricCapabilityMapper,
+        private AssessmentMapper $assessmentMapper,
+        private Helper $helper,
     ) {
     }
 
@@ -218,14 +228,109 @@ class Controller extends Base
     }
 
     /**
-     * fetch the coverage report
+     * Pay load for curriculum node usage within the selected course and unit
      *
      * @return void
-     * @throws TwigError
      */
-    public function postCoverage(): void
+    public function getCoverageUsage(): void
     {
-        $this->response = $this->responseFromTemplate('@curriculumreports/index.twig', ['var' => 'POST']);
+        $query = $this->requestQuery;
+        $courseId = $query->getInt('courseId');
+        $unitId = $query->getInt('unitId');
+        $nodeId = $query->getInt('nodeId');
+
+        if (null === $courseId || $courseId <= 0) {
+            $problem = (new ApiProblem("courseId must be defined and greater than 0"))
+                ->setStatus(400)
+                ->asArray();
+            $this->response = $this->responseAsJson($problem)->withStatus(400);
+            return;
+        }
+        if (null === $unitId || $unitId <= 0) {
+            $problem = (new ApiProblem("unitId must be defined and greater than 0"))
+                ->setStatus(400)
+                ->asArray();
+            $this->response = $this->responseAsJson($problem)->withStatus(400);
+            return;
+        }
+        if (null === $nodeId || $nodeId <= 0) {
+            $problem = (new ApiProblem("nodeId must be defined and greater than 0"))
+                ->setStatus(400)
+                ->asArray();
+            $this->response = $this->responseAsJson($problem)->withStatus(400);
+            return;
+        }
+
+        try {
+            $courseUnitSpec = $this->courseUnitSpecificationMapper->findOneByColumnList(
+                [
+                    'course_specification_id' => $courseId,
+                    'folder_id' => $unitId,
+                ]
+            );
+
+            $result = $this->helper->getUsage(
+                $nodeId,
+                $courseId,
+                $unitId
+            );
+
+            $courseCapabilities = $this->rubricCapabilityMapper
+                ->findByColumn(
+                    'id',
+                    array_keys($result[Cursor::COURSE_RUBRIC_CAPABILITY] ?? [])
+                )->reindex();
+
+            $unitCapacities = $this->rubricCapabilityMapper
+                ->findByColumn(
+                    'id',
+                    array_keys($result[Cursor::COURSE_UNIT_RUBRIC_CAPABILITY] ?? [])
+                )->reindex();
+
+            $activities = $this->assessmentMapper->findByColumn(
+                'id',
+                array_keys($result['activity'] ?? [])
+            );
+
+            $lessonPlans = $this->assessmentMapper->findByColumn(
+                'id',
+                array_keys($result[Cursor::COURSE_ACTIVITY_LESSON_PLAN] ?? [])
+            );
+
+            $inUseRubric = $this->assessmentMapper->findByColumn(
+                'id',
+                array_keys($result[Cursor::COURSE_IN_USE_RUBRIC] ?? [])
+            )->reindex();
+        } catch (\Exception $e) {
+            $problem = (new ApiProblem($e->getMessage()))
+                ->setStatus(400)
+                ->asArray();
+            $this->response = $this->responseAsJson($problem)->withStatus(400);
+            return;
+        }
+
+        $rubricTranslator = new RubricUsage(
+            $this->routeGenerator,
+            $this->authorizer,
+            $this->getUser(),
+        );
+
+        $translator = new DetailedUsage(
+            $this->routeGenerator,
+            $this->authorizer,
+            $this->getUser(),
+            $rubricTranslator,
+            $activities,
+            $lessonPlans,
+            ['course' => $courseCapabilities, 'unit' => $unitCapacities],
+            $inUseRubric,
+        );
+
+        $response = $translator($courseUnitSpec, $result);
+
+        $this->response = $this->responseAsJson(
+            $response
+        );
     }
 
     /**

@@ -20,6 +20,7 @@ import { onClickOutside } from "@vueuse/core";
  * @param isCloseOnContentClick - whether to close the pop out content when it's clicked
  * @param moveTo - An optional element to move the pop out content to
  * @param onClose - An optional callback to run when the pop out is closed
+ * @param matchButtonColour - whether to match the button colour to the content colour
  * @returns - The isOpen ref
  */
 export function usePopOut(
@@ -31,6 +32,7 @@ export function usePopOut(
     isCloseOnContentClick: boolean = false,
     moveTo: HTMLElement | string | null = null,
     onClose: () => void = (): void => {},
+    matchButtonColour: boolean = true,
 ): {
     currentLabel: Ref<string>;
     isOpen: Ref<boolean>;
@@ -169,7 +171,7 @@ export function usePopOut(
         contentElement.style.display = "block"; // The element must be visible to correctly compute its position
         contentElement.setAttribute("aria-hidden", "false");
         // the button will always match the colour of the content when open
-        if (buttonElement instanceof HTMLButtonElement) {
+        if (matchButtonColour && buttonElement instanceof HTMLButtonElement) {
             buttonElement.style.backgroundColor = window
                 .getComputedStyle(contentElement)
                 .getPropertyValue("background-color");

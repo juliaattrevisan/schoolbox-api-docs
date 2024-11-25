@@ -50,6 +50,14 @@ class Cursor implements ICursor
     public const COURSE_RUBRIC_INDICATOR = 'rubricIndicator';
     public const COURSE_UNIT_RUBRIC_INDICATOR = 'unitRubricIndicator';
     public const COURSE_IN_USE_RUBRIC = 'inUseRubric';
+    public const ACTIVITY_ICON_LIST = [
+        self::COURSE_ACTIVITY_DUE_WORK => 'due-work',
+        self::COURSE_ACTIVITY_TASK => 'task',
+        self::COURSE_ACTIVITY_QUIZ => 'quiz',
+        self::COURSE_ACTIVITY_LTI => 'lti',
+        self::COURSE_ACTIVITY_PROJECT => 'project',
+        self::COURSE_ACTIVITY_LESSON_PLAN => 'lesson-plan',
+    ];
 
     public function __construct(
         private CurriculumMapper $curriculumMapper,

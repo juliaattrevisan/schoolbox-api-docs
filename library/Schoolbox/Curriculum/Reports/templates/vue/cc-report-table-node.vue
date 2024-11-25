@@ -11,7 +11,9 @@ import type { Unit } from "@schoolboxLibrary/types/Unit";
 import type { CurriculumCoverageNode } from "../js/types/curriculumCoverageTypes";
 import { useReportStore } from "./store/ccReportStore";
 import { useFiltersStore } from "./store/ccFiltersStore";
+import { usePopOutStore } from "./store/ccPopOutStore";
 import { ReportOptionValues } from "../js/types/curriculumCoverageTypes";
+import CcReportTableNodeUnit from "./cc-report-table-node-unit.vue";
 
 interface Props {
     node: CurriculumCoverageNode;
@@ -26,6 +28,7 @@ const emit = defineEmits<{
 const reportStore = useReportStore();
 const filtersStore = useFiltersStore();
 const { title } = useNodeTitle(props.node);
+
 const paddingStart = window.Vue.ref(`calc(${props.depth * 0.5}rem + 0.5rem)`); // to gradually add more paddingStart to indicate node level depth
 const hasChildren = window.Vue.ref(Array.isArray(props.node.children) && props.node.children.length > 0);
 
@@ -200,22 +203,47 @@ function onTitleClicked(): void {
 function onChildTitleClicked(node: CurriculumCoverageNode): void {
     emit("titleClick", node);
 }
+
+// #region unit selection, open pop out
+
+const popOutStore = usePopOutStore();
+
+/**
+ * When a unit is clicked, open the pop out
+ * @param course - the course that was clicked
+ * @param unit - the unit that was clicked
+ * @param buttonEl - the button that was clicked
+ */
+function onUnitClicked(course: Course, unit: Unit, buttonEl: HTMLButtonElement): void {
+    // expand the node if it has children and is not expanded
+    // this is so the usage count only shows the count for the node and not its children
+    if (showExpandButton.value && !isExpanded.value) {
+        isExpanded.value = true;
+    }
+    popOutStore.setActive(course, unit, props.node, buttonEl);
+}
+
+// #endregion
 </script>
 
 <template>
     <tr v-if="showNode" ref="nodeEl">
-        <td
-            class="node__name l-flex l-flex--align-center l-gap-s f-no-margins"
-            :style="{ paddingInlineStart: paddingStart }"
-        >
+        <td class="l-flex l-flex--align-center l-gap-s f-no-margins" :style="{ paddingInlineStart: paddingStart }">
             <button
                 v-if="showExpandButton"
-                :class="`expand-button expander l-flex l-flex--center ${isExpanded ? 'icon-up-arrow' : 'icon-down-arrow'}`"
+                class="l-flex l-flex--center f-no-bkg"
                 :aria-label="expandTitle"
                 :title="expandTitle"
                 @click="onExpandClicked"
-            ></button>
-            <button class="title-button" :style="{ paddingLeft: lastChildPadding }" @click="onTitleClicked">
+            >
+                <sbx-icon v-if="isExpanded" name="up-arrow" />
+                <sbx-icon v-else name="down-arrow" />
+            </button>
+            <button
+                class="l-pad--0 t-align-left f-no-bkg f-always-show"
+                :style="{ paddingLeft: lastChildPadding }"
+                @click="onTitleClicked"
+            >
                 {{ title }}
             </button>
         </td>
@@ -227,15 +255,22 @@ function onChildTitleClicked(node: CurriculumCoverageNode): void {
             <td class="u-border-left">
                 {{ getCourseUsageCount(props.node, course) }}
             </td>
-            <td v-for="unit in course.units" :key="unit.id" :class="``">
-                {{ getUnitUsageCount(props.node, course, unit) }}
-            </td>
+            <cc-report-table-node-unit
+                v-for="unit in course.units"
+                :key="unit.id"
+                :course="course"
+                :unit="unit"
+                :node="props.node"
+                :count="getUnitUsageCount(props.node, course, unit)"
+                :is-expanded="isExpanded"
+                @click="onUnitClicked"
+            />
             <td v-if="reportStore.hasMultipleCourses" :class="``">
                 {{ getTotalUsageCount(props.node, course) }}
             </td>
         </template>
     </tr>
-    <template v-if="hasChildren && (isExpanded || filtersStore.onlyShowGaps)">
+    <template v-if="hasChildren && (isExpanded || filtersStore.onlyShowGaps || reportStore.isPrinting)">
         <cc-report-table-node
             v-for="child in props.node.children"
             :key="child.id"
@@ -248,16 +283,6 @@ function onChildTitleClicked(node: CurriculumCoverageNode): void {
 
 <style scoped>
 tr:hover {
-    background-color: var(--accent-background); /* to help legibility */
-}
-
-.expand-button {
-    background: none;
-}
-
-.title-button {
-    background: none;
-    padding: 0;
-    text-align: left;
+    background-color: #f4f3f3; /* to help legibility */
 }
 </style>

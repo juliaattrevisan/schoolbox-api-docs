@@ -176,7 +176,7 @@ async function loadDefaultResults(isMoreResults: boolean): Promise<void> {
  */
 function onAtResultsBottom(): void {
     if (nextResultsCursor.value) {
-        defaultResultsUrl.value = `${props.endpoint}query=&cursor=${nextResultsCursor.value}`;
+        defaultResultsUrl.value = `${props.endpoint}?query=&cursor=${nextResultsCursor.value}`;
         void loadDefaultResults(true);
     }
 }

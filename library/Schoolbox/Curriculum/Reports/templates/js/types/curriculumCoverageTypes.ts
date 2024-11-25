@@ -70,11 +70,58 @@ export type CurriculumCoverageNode = Pick<Node, "id" | "name" | "code"> & {
 };
 
 /**
- * The expected payload for the curriculum coverage report
+ * Used in activity and lesson plan
  */
-export type CurriculumCoveragePayload = {
-    data: {
-        courses: Course[];
-        nodes: CurriculumCoverageNode[];
+export type Item = {
+    name: string;
+    icon?: string; // only for activity
+    _links: {
+        view: string;
     };
+};
+
+/**
+ * A rubric capability indicator
+ */
+type RubricCapabilityIndicator = {
+    name: string;
+};
+
+/**
+ * A rubric capability
+ */
+type RubricCapability = {
+    name: string;
+    indicators: RubricCapabilityIndicator[];
+};
+
+/**
+ * The expected payload for a rubric
+ */
+export type Rubric = {
+    capabilities: RubricCapability[];
+    _links: {
+        view: string;
+    };
+};
+
+/**
+ * The expected payload for in-use rubric
+ */
+type InUseRubric = Item & {
+    rubric: Rubric;
+};
+
+/**
+ * The details of the individual usage of a curriculum node
+ */
+export type IndividualUsage = {
+    onUnit: boolean; // if the node is assigned to the unit
+    activity?: Item[]; // the activities the node is assigned to
+    lessonPlan?: Item[]; // the lesson plans the node is assigned to
+    rubric?: {
+        course?: Rubric;
+        unit?: Rubric;
+    };
+    inUseRubric?: InUseRubric[];
 };

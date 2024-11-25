@@ -1,6 +1,6 @@
 <?php
 
-namespace Schoolbox\Curriculum\Reports\Translator;
+namespace Schoolbox\Curriculum\Reports\Translator\Counts;
 
 use Alaress\Authorizer\Authorizer;
 use Alaress\Authorizer\GetRouteIfAuthorized;

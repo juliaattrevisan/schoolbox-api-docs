@@ -4,7 +4,9 @@
 
 import { defineStore } from "pinia";
 import type { Course } from "@schoolboxLibrary/types/Course";
-import type { CurriculumCoveragePayload, CurriculumCoverageNode } from "../../js/types/curriculumCoverageTypes";
+import { usePrintDialog } from "@schoolboxVue/composables/print/usePrintDialog";
+import { isAbortError } from "@js/util/errorUtils";
+import type { CurriculumCoverageNode } from "../../js/types/curriculumCoverageTypes";
 import { useQueryStore } from "./ccQueryStore";
 import { useInputStore } from "./ccInputStore";
 
@@ -17,8 +19,19 @@ export type ReportError = {
     status: number;
 };
 
+/**
+ * The expected payload for the curriculum coverage report
+ */
+type CurriculumCoveragePayload = {
+    data: {
+        courses: Course[];
+        nodes: CurriculumCoverageNode[];
+    };
+};
+
 export const useReportStore = defineStore("ccReport", () => {
     const hasNotReported = window.Vue.ref(true); // to prompt a search if the user hasn't searched yet
+    const isFetching = window.Vue.ref(false);
     const isLoading = window.Vue.ref(false);
     const hasLoadError = window.Vue.ref(false);
     const loadError = window.Vue.ref<ReportError | null>(null);
@@ -27,13 +40,33 @@ export const useReportStore = defineStore("ccReport", () => {
     const nodes = window.Vue.ref<CurriculumCoverageNode[]>([]); // the nodes to display in the report
     const hasReport = window.Vue.ref<boolean>(false); // whether the report has been generated
     let controller: AbortController; // to allow aborting the previous search if a new one is started
+    const { isPrinting } = usePrintDialog();
 
     /**
      * Whether a search can be performed, can be if there's a change of course or node selection
-     * @returns {boolean} - whether a new report can be requested
+     * @returns - whether a new report can be requested
      */
     const canReport = window.Vue.computed(() => {
         return useInputStore().canReport;
+    });
+
+    /**
+     * The total number of columns to display in the report
+     * @returns - the total number of columns
+     */
+    const totalColumnCount = window.Vue.computed(() => {
+        let total = 2; // start with 2 for the node name and total
+        if (hasMultipleCourses.value) {
+            // when there are multiple courses, we need to add the total column
+            total += courses.value.reduce((acc, course) => {
+                // add 1 for the course name and 1 for the total, then the number of units
+                return acc + 1 + 1 + (course.units === undefined ? 0 : course.units.length);
+            }, 0);
+        } else {
+            // add 1 for the course name, then the number of units
+            total += 1 + (courses.value[0].units === undefined ? 0 : courses.value[0].units.length);
+        }
+        return total;
     });
 
     /**
@@ -44,10 +77,11 @@ export const useReportStore = defineStore("ccReport", () => {
         useQueryStore().setQueryParams();
         hasNotReported.value = false;
         // abort the previous search if it's still running
-        if (isLoading.value) {
+        if (isFetching.value) {
             controller.abort();
         }
         try {
+            isFetching.value = true;
             isLoading.value = true;
             hasLoadError.value = false;
             controller = new AbortController();
@@ -67,6 +101,7 @@ export const useReportStore = defineStore("ccReport", () => {
                 };
                 return;
             }
+            isFetching.value = false;
             const responseJson = (await response.json()) as CurriculumCoveragePayload | ReportError;
             if (typeof responseJson !== "object" || responseJson === null) {
                 hasLoadError.value = true;
@@ -82,12 +117,15 @@ export const useReportStore = defineStore("ccReport", () => {
                 nodes.value = responseJson.data.nodes;
                 hasReport.value = true;
             }
-            isLoading.value = false;
         } catch (error) {
-            // if the error is a DOMException, it's because the report has been aborted to start a new one
-            if (typeof error === "string" && !error.includes("DOMException")) {
-                hasLoadError.value = true;
+            // ignore abort errors, as the previous report was cancelled
+            if (isAbortError(error)) {
+                return;
             }
+            console.error(error);
+            hasLoadError.value = true;
+        } finally {
+            isLoading.value = false;
         }
     }
 
@@ -101,5 +139,7 @@ export const useReportStore = defineStore("ccReport", () => {
         nodes,
         hasReport,
         canReport,
+        totalColumnCount,
+        isPrinting,
     };
 });

@@ -18,6 +18,11 @@ const reportStore = useReportStore();
         To generate a report, first select at least one Course and Curriculum.
     </div>
     <loading-table v-else-if="reportStore.isLoading" />
+    <div v-else-if="reportStore.hasLoadError" class="alert-box alert f-no-margins">
+        Sorry, there was an error during report retrieval. Please
+        <a href="" title="refresh the page"> refresh the page </a>
+        to try again and contact your support if the problem persists
+    </div>
     <div v-else-if="reportStore.hasReport" class="c-island l-pad-m">
         <div class="l-flex l-flex-col l-gap-s">
             <cc-report-filters />

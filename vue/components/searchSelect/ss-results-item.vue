@@ -36,18 +36,35 @@ const isSelected = window.Vue.computed(() => {
 
 /**
  * To toggle the selected state of the result
- * @param event - the click event
  */
-function onClick(event?: MouseEvent | undefined): void {
-    // ignore input label clicks, which get picked up due to the click listener on the parent div
-    if (event && event.target && (event.target as HTMLElement).nodeName === "LABEL") {
-        return;
-    }
+function toggle(): void {
     if (isSelected.value && !props.isSingleSelect) {
         emit("remove", [props.result]);
     } else {
         emit("add", [props.result]);
     }
+}
+
+/**
+ * When the user selects the result with the keyboard
+ */
+function onKeySelect(): void {
+    toggle();
+}
+
+/**
+ * To toggle the selected state of the result
+ * @param event - the click event
+ */
+function onClick(event?: MouseEvent | undefined): void {
+    if (!event || !event.target) {
+        return;
+    }
+    // ignore input label and mark clicks, which get picked up due to the click listener on the parent div
+    if ((event.target as HTMLElement).nodeName === "LABEL" || (event.target as HTMLElement).nodeName === "MARK") {
+        return;
+    }
+    toggle();
 }
 
 /**
@@ -72,7 +89,7 @@ const { isActive } = useActiveIndex(
     resultEl,
     toRef(() => props.index),
     toRef(() => props.activeIndex),
-    onClick,
+    onKeySelect,
 );
 </script>
 
