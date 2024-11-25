@@ -79,13 +79,19 @@ class Module extends BaseModule
             )
             ->addRoutePermission(
                 $authorizer,
-                '(getExport)|(?:edit|add|delete|create|update|replace)',
+                '(?:edit|add|delete|create|update|replace)',
                 new Rule\Any(
                     new Rule\IsSuperuser(),
                     new Rule\HasServicePermission(
                         UserAccess::SERVICE_CURRICULUM,
                         UserAccess::ACCESS_WRITE
                     )
+                )
+            )->addRoutePermission(
+                $authorizer,
+                '(getExport)', // Only allow alaress to export, as schools currently don't have access to import curriculum yet...
+                new Rule\Any(
+                    new Rule\IsSchoolboxAdmin()
                 )
             );
     }
