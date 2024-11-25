@@ -38,6 +38,12 @@ export const Default: Story = {
 </label>
             `,
     }),
+    parameters: {
+        design: {
+            type: "figma",
+            url: "https://www.figma.com/design/kcebwjgNDzqyTtXZzgQNMO/UI-Kit?node-id=408-152&t=4Qs8fQG0YilF3ACi-4",
+        },
+    },
 };
 
 export const Disabled: Story = {
@@ -53,6 +59,12 @@ export const Disabled: Story = {
 </label>
             `,
     }),
+    parameters: {
+        design: {
+            type: "figma",
+            url: "https://www.figma.com/design/kcebwjgNDzqyTtXZzgQNMO/UI-Kit?node-id=408-151&t=4Qs8fQG0YilF3ACi-4",
+        },
+    },
 };
 
 export const WithHint: Story = {
