@@ -99,7 +99,7 @@ class Subnav
      * PHPStan array shapes do not allow recursive definitions.
      * Note also that 'visible' is compulsory due to awkwardness in handling casting and null-coalescence in Twig.
      * See https://github.com/alaress/schoolbox/pull/31321.
-     * @return array<string, array{name: string, visible: boolean, searchable: boolean, description: string, children: array}>
+     * @return array<string, array{name: string, visible: boolean, searchable?: boolean, description?: string, children?: array}>
      */
     public function generate(): array
     {
