@@ -119,7 +119,7 @@ try {
         $storage                = (new Storage\Model())->setHash($hash);
         $preSignedUrlDataObject = $preSignedUrlService->generate(
             $storage,
-            Alaress_Date_Format::now()->setTimezone('UTC')->addSeconds($config->get($browserCacheTimeoutConfigName)),
+            Alaress_Date_Format::now()->setTimezone('UTC')->addSeconds((int)$config->get($browserCacheTimeoutConfigName)),
             $transforms->getTranscodePath(Storage\FilesystemProxy::getPathFromHash($hash), $cache_key),
             ['private', 'must-revalidate'],
             PreSignedUrlService::DISPOSITION_INLINE,

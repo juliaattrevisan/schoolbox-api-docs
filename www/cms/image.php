@@ -73,7 +73,7 @@ try {
 
         $preSignedUrlDataObject = $preSignedUrlService->generate(
             $resource,
-            Alaress_Date_Format::now()->setTimezone('UTC')->addSeconds($config->get(ConfigMapper::NAME_BROWSER_CACHE_IMAGE_TIMEOUT)),
+            Alaress_Date_Format::now()->setTimezone('UTC')->addSeconds((int)$config->get(ConfigMapper::NAME_BROWSER_CACHE_IMAGE_TIMEOUT)),
             $myImage->getTranscodePath($resourcePath, $cacheKey)
         );
 

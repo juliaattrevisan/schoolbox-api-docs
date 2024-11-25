@@ -93,7 +93,7 @@ try {
         $preSignedUrlService   = new PreSignedUrlService($config);
         $preSignedUrlDataObject = $preSignedUrlService->generate(
             $storage,
-            Alaress_Date_Format::now()->setTimezone('UTC')->addSeconds($config->get(ConfigMapper::NAME_BROWSER_CACHE_IMAGE_TIMEOUT)),
+            Alaress_Date_Format::now()->setTimezone('UTC')->addSeconds((int)$config->get(ConfigMapper::NAME_BROWSER_CACHE_IMAGE_TIMEOUT)),
             $transforms->getTranscodePath(
                 FilesystemProxy::getPathFromHash($storage->getHash()),
                 $transforms->getCacheKey($size),
