@@ -26,7 +26,7 @@
             'duework': config.lms_enabled,
             'eportfolio': eportfolioAuth,
             'grades': config.lms_enabled,
-            'timetable': config.lms_enabled and user.isShowTimetable,
+            'timetable': user.isShowTimetable,
             'geosnapshot': isGeosnapshotAvailable,
             'emailstaff': emailFunctionsAvailable and config.mail_enable and USER.email,
             'emailparents': emailFunctionsAvailable and config.mail_enable and USER.email and user.isShowContacts
@@ -36,7 +36,7 @@
             'duework': config.lms_enabled,
             'eportfolio': eportfolioAuth,
             'grades': config.lms_enabled,
-            'timetable': config.lms_enabled and user.isShowTimetable,
+            'timetable': user.isShowTimetable,
             'geosnapshot': isGeosnapshotAvailable,
             'emailstaff': emailFunctionsAvailable and config.mail_enable and USER.email,
             'emailparents': emailFunctionsAvailable and config.mail_enable and USER.email and user.isShowContacts
@@ -47,7 +47,7 @@
             'eportfolio': USER.role.viewStudentProfile and eportfolioAuth,
             'grades': config.lms_enabled,
             'pastoral': USER.role.viewStudentProfile and pastoralUrl,
-            'timetable': USER.role.viewStudentProfile and config.lms_enabled and user.isShowTimetable,
+            'timetable': USER.role.viewStudentProfile and user.isShowTimetable,
             'documentmanagement': USER.role.viewStudentProfile and config.external_document_report_enabled,
             'geosnapshot': USER.role.viewStudentProfile and isGeosnapshotAvailable,
             'emailstaff': USER.role.viewStudentProfile and emailFunctionsAvailable and config.mail_enable and USER.email,
