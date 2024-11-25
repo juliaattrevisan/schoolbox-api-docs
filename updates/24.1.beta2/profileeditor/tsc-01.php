@@ -24,7 +24,8 @@ require_once __DIR__ . '/../../../conf/core/require.php';
  *
  *     Example: php example.php 2> log.txt
  */
-$app = new class extends CliTool\App {
+$app = new class extends CliTool\App
+{
     /**
      * Make sure to add your locking script to the Lock Inspector tool
      * const LOCK_NAMES in Inspector.php
@@ -51,14 +52,6 @@ $app = new class extends CliTool\App {
      * This script requires a particular school code.
      */
     private const SCHOOL_CODE = 'tsc';
-
-
-    /* Some prepared statements that we'll often reuse
-     */
-    private \PDOStatement $campusAvailabilityInsertStatement;
-    private \PDOStatement $campusVisibilityInsertStatement;
-    private \PDOStatement $roleAvailabilityInsertStatement;
-    private \PDOStatement $roleVisibilityInsertStatement;
 
 
     /**
@@ -117,11 +110,10 @@ HELP;
             return;
         }
 
-        $this->helper = new Helper($this->getDatabaseInternal());
+        $this->helper = new Helper($this->getDatabaseInternal(), true);
 
-        $this->prepare();
-        $this->insertCustomFields();
-        $this->insertCustomButtons();
+        $this->createFields();
+        $this->createButtons();
 
         /* Announce lock release
           */
@@ -132,41 +124,12 @@ HELP;
 
 
     /**
-     * Set up some prepared statements
-     *
-     * @return void
-     */
-    private function prepare(): void
-    {
-        $this->campusAvailabilityInsertStatement = $this->getDatabaseInternal()->prepare("
-            INSERT INTO profile_button_campus_availability (profile_button_id, campus_id)
-            VALUES (:profileButtonId, :campusId)
-        ");
-
-        $this->campusVisibilityInsertStatement = $this->getDatabaseInternal()->prepare("
-            INSERT INTO profile_button_campus_visibility (profile_button_id, campus_id)
-            VALUES (:profileButtonId, :campusId)
-        ");
-
-        $this->roleAvailabilityInsertStatement = $this->getDatabaseInternal()->prepare("
-            INSERT INTO profile_button_role_availability (profile_button_id, role_id)
-            VALUES (:profileButtonId, :roleId)
-        ");
-
-        $this->roleVisibilityInsertStatement = $this->getDatabaseInternal()->prepare("
-            INSERT INTO profile_button_role_visibility (profile_button_id, role_id)
-            VALUES (:profileButtonId, :roleId)
-        ");
-    }
-
-
-    /**
      * Their connector surfaces LECaseManagerName, LECaseManagerUserId
      * optionally displaying it in the profile screens if they're meaningful
      *
      * @return void
      */
-    private function insertCustomFields(): void
+    private function createFields(): void
     {
         $query = "
             INSERT IGNORE INTO `profile_field`
@@ -205,7 +168,7 @@ HELP;
      *
      * @return void
      */
-    private function insertCustomButtons(): void
+    private function createButtons(): void
     {
         $query = "
             INSERT INTO profile_button
@@ -231,10 +194,10 @@ HELP;
          *
          * Find the button we just made in the surest way we know
          */
-        $profileButtonId = $this->getDatabaseInternal()->lastInsertId();
+        $profileButtonId = (int)$this->getDatabaseInternal()->lastInsertId();
 
         $roleIds = $this->helper->fetchRoleIds([\Schoolbox\Role::PARENT, \Schoolbox\Role::STAFF]);
-        $campuses = $this->helper->fetchCampusIds();
+        $campusIds = $this->helper->fetchCampusIds();
 
         /* Assign relationships
          *
@@ -244,15 +207,38 @@ HELP;
          * nip it in the bud if they want to prevent viewers from seeing a
          * button by unticking their role(s) as per the ui
          */
-        $this->createCampusAvailability($profileButtonId, $candidate['availability']['campus']);
-        $this->createCampusVisibility($profileButtonId, $candidate['visibility']['campus']);
-        $this->createRoleAvailability($profileButtonId, $candidate['availability']['role']);
-        $this->createRoleVisibility($profileButtonId, $candidate['visibility']['role']);
+        $this->getLogger()->info(sprintf(
+            'Campus availability: assigning campus ids %s to profile button %s',
+            implode(',', $campusIds),
+            $profileButtonId
+        ));
 
+        $this->helper->createCampusAvailability($profileButtonId, $campusIds);
+
+        $this->getLogger()->info(sprintf(
+            'Campus visibility: assigning campus ids %s to profile button %s',
+            implode(',', $campusIds),
+            $profileButtonId
+        ));
+
+        $this->helper->createCampusVisibility($profileButtonId, $campusIds);
+
+        $this->getLogger()->info(sprintf(
+            'Role availability: assigning role ids %s to profile button %s',
+            implode(',', $roleIds),
+            $profileButtonId
+        ));
+
+        $this->helper->createRoleAvailability($profileButtonId, $roleIds);
+
+        $this->getLogger()->info(sprintf(
+            'Role visibility: assigning role ids %s to profile button %s',
+            implode(',', $roleIds),
+            $profileButtonId
+        ));
+
+        $this->helper->createRoleVisibility($profileButtonId, $roleIds);
     }
-
-
-
 
 
     /**
