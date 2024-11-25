@@ -22,3 +22,12 @@ export const moveArrayItem = (array, oldIndex, newIndex) => {
     array.splice(newIndex, 0, array.splice(oldIndex, 1)[0]);
     return array;
 };
+
+/**
+ * To check if an array is made up of numbers
+ * @param arr - array to check
+ * @returns - true if all items in the array are numbers
+ */
+export function isArrayOfNumbers(arr) {
+    return Array.isArray(arr) && arr.every((item) => typeof item === "number");
+}
