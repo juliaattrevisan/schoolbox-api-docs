@@ -96,10 +96,11 @@ class Subnav
      * come from all over the place
      *
      * Note the returned array is a recursively defined structure where the type of each child is the same as the parent.
-     * PHPStan array shapes do not allow recursive definitions.
+     * PHPStan array shapes do not allow recursive definitions.  Using an array shape on the top-level only does more
+     * harm than good because it gives the illusion of type-safety when child items may not be safe.
      * Note also that 'visible' is compulsory due to awkwardness in handling casting and null-coalescence in Twig.
      * See https://github.com/alaress/schoolbox/pull/31321.
-     * @return array<string, array{name: string, visible: boolean, searchable?: boolean, description?: string, children?: array}>
+     * @return array (with keys: {name: string, visible: boolean, searchable?: boolean, description?: string, children?: array})
      */
     public function generate(): array
     {
