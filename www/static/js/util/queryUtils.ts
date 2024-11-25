@@ -2,6 +2,8 @@
  * Any utility functions related to processing query values for adding to requests
  */
 
+import { isArrayOfNumbers } from "./arrayUtils";
+
 type NestedObject = {
     [key: string]: string | NestedObject;
 };
@@ -51,6 +53,8 @@ export function getKeyValuePairs(obj: NestedObject): Record<string, string> {
                 if (isValueNestedObject(value)) {
                     // Recursively call the function for nested objects
                     recurse(value, newKeyPath);
+                } else if (isArrayOfNumbers(value)) {
+                    console.warn("isArrayOfNumbers");
                 } else if (Array.isArray(value)) {
                     // If the value is an array, loop through the array and add an entry for each valueWithin
                     value.forEach((valueWithin: unknown, index) => {

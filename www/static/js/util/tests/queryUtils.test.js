@@ -32,6 +32,10 @@ const numberArray = {
     userIds: [13, 14],
 };
 
+const nestedNumberArray = {
+    source: [[1, 2], [3], [4], [5, 6], [10]],
+};
+
 describe("getKeyValuePairs()", () => {
     test("converts simple object", () => {
         expect(getKeyValuePairs(simpleObject)).toStrictEqual({
@@ -57,6 +61,17 @@ describe("getKeyValuePairs()", () => {
         expect(getKeyValuePairs(numberArray)).toStrictEqual({
             "userIds[0]": "13",
             "userIds[1]": "14",
+        });
+    });
+    test("converts nested number array", () => {
+        expect(getKeyValuePairs(nestedNumberArray)).toStrictEqual({
+            "source[0][0]": "1",
+            "source[0][1]": "2",
+            "source[1][0]": "3",
+            "source[2][0]": "4",
+            "source[3][0]": "5",
+            "source[3][1]": "6",
+            "source[4][0]": "10",
         });
     });
 });
