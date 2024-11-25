@@ -47,19 +47,17 @@ $app = new class extends CliTool\App {
 
 
     /**
-     * --flag
-     *
-     * An example arg that's a boolean on/off
+     * This script requires a particular school code.
      */
-    private const OPT_LONG_FLAG = 'flag';
+    private const SCHOOL_CODE = 'tsc';
 
 
-    /**
-     * --input
-     *
-     * An example arg that has an actual value, denoted by the colon
+    /* Some prepared statements that we'll often reuse
      */
-    private const OPT_LONG_INPUT = 'input:';
+    private \PDOStatement $campusAvailabilityInsertStatement;
+    private \PDOStatement $campusVisibilityInsertStatement;
+    private \PDOStatement $roleAvailabilityInsertStatement;
+    private \PDOStatement $roleVisibilityInsertStatement;
 
 
     /**
@@ -69,8 +67,6 @@ $app = new class extends CliTool\App {
     {
         return [
             self::OPT_LONG_HELP,
-            self::OPT_LONG_FLAG,
-            self::OPT_LONG_INPUT
         ];
     }
 
@@ -90,6 +86,17 @@ HELP;
             return;
         }
 
+        /* Exit early if you're doing this on the wrong school
+         */
+        if (self::SCHOOL_CODE !== $this->getConfig()->get('site_school_code')) {
+            $this->getLogger()->warning(sprintf(
+                'This customisation requires the %s school code; exiting.',
+                self::SCHOOL_CODE
+            ));
+
+            return;
+        }
+
         /* Decide how loudly to announce lock acquisition failure
          *
          * Simply using $lock = $this->acquireLock() will keep you safe, even if you don't
@@ -101,6 +108,7 @@ HELP;
             return;
         }
 
+        $this->prepare();
         $this->insertCustomFields();
         $this->insertCustomButtons();
 
@@ -113,6 +121,35 @@ HELP;
 
 
     /**
+     * Set up some prepared statements
+     *
+     * @return void
+     */
+    private function prepare(): void
+    {
+        $this->campusAvailabilityInsertStatement = $this->getDatabaseInternal()->prepare("
+            INSERT INTO profile_button_campus_availability (profile_button_id, campus_id)
+            VALUES (:profileButtonId, :campusId)
+        ");
+
+        $this->campusVisibilityInsertStatement = $this->getDatabaseInternal()->prepare("
+            INSERT INTO profile_button_campus_visibility (profile_button_id, campus_id)
+            VALUES (:profileButtonId, :campusId)
+        ");
+
+        $this->roleAvailabilityInsertStatement = $this->getDatabaseInternal()->prepare("
+            INSERT INTO profile_button_role_availability (profile_button_id, role_id)
+            VALUES (:profileButtonId, :roleId)
+        ");
+
+        $this->roleVisibilityInsertStatement = $this->getDatabaseInternal()->prepare("
+            INSERT INTO profile_button_role_visibility (profile_button_id, role_id)
+            VALUES (:profileButtonId, :roleId)
+        ");
+    }
+
+
+    /**
      * Their connector surfaces LECaseManagerName, LECaseManagerUserId
      * optionally displaying it in the profile screens if they're meaningful
      *
@@ -121,7 +158,7 @@ HELP;
     private function insertCustomFields(): void
     {
         $query = "
-            INSERT INTO `profile_field`
+            INSERT IGNORE INTO `profile_field`
             (roletype, field, display_as, sequence, enabled, term, icon, css, click_to_reveal, is_external)
             VALUES
             ('student','LECaseManagerName','Learning Enrichment Case Manager',(
@@ -137,7 +174,7 @@ HELP;
          * intercepts the default rendering
          */
         $query = "
-            INSERT INTO `profile_field`
+            INSERT IGNORE INTO `profile_field`
             (roletype, field, display_as, sequence, enabled, term, icon, css, click_to_reveal, is_external)
             VALUES
             ('student','LECaseManagerID','Learning Enrichment Case Manager ID',(
@@ -159,6 +196,35 @@ HELP;
      */
     private function insertCustomButtons(): void
     {
+        $query = "
+            INSERT INTO profile_button
+            (roletype, type, sort_order, title, text, icon, url)
+            VALUES (
+                'student',
+                'custom',
+                (
+                    SELECT MAX(sort_order)+1
+                    FROM profile_button pb
+                    WHERE roletype = 'student'
+                ),
+                'Results',
+                'Results',
+                'result',
+                'https://dashboard.tsc.nsw.edu.au/login/index/[profileId]'
+            )";
+
+        $this->getDatabaseInternal()->executeQuery($query);
+
+        /* Preset availability and visibility requirements
+         * By default it was visible to Parents of the student, and staff members
+         *
+         * Find the button we just made in the surest way we know
+         */
+        $buttonId = $this->getDatabaseInternal()->lastInsertId();
+
+
+
+        var_dump($buttonId);
 
     }
 
