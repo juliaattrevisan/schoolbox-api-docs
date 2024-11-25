@@ -55,8 +55,7 @@ export default class AssessmentForm {
 
     static readonly SELECTOR_PARTICIPATION_CUSTOMISE_MODAL_PLAN_NAME = "participation-plan-customise-modal-input-name";
 
-    static readonly SELECTOR_PARTICIPATION_CUSTOMISE_MODAL_PLAN_DUE_DATE =
-        "participation-plan-customise-modal-input-due-date";
+    static readonly SELECTOR_PARTICIPATION_CUSTOMISE_MODAL_PLAN_DUE_DATE = `input[id="planDueDate"]`;
 
     static readonly SELECTOR_CONFIRM_DIALOG_BUTTON_CONFIRM = "confirm-dialog-confirm-button";
 
@@ -261,7 +260,7 @@ export default class AssessmentForm {
      * @param date - The date to set
      * @param openSection - Whether to open the section
      */
-    async createLearningPlan(openSection: boolean, userId: number, planName: string, date: string): Promise<void> {
+    async createLearningPlan(userId: number, planName: string, date: string, openSection: boolean): Promise<void> {
         if (openSection) {
             await this.page.getByTestId(AssessmentForm.SELECTOR_PARTICIPATION_LEGEND).click();
         }
@@ -273,8 +272,7 @@ export default class AssessmentForm {
         await this.page.getByTestId(AssessmentForm.SELECTOR_PARTICIPATION_CUSTOMISE_OPTIONS_CREATE).click();
 
         await this.page.getByTestId(AssessmentForm.SELECTOR_PARTICIPATION_CUSTOMISE_MODAL_PLAN_NAME).fill(planName);
-        await this.page.getByTestId(AssessmentForm.SELECTOR_PARTICIPATION_CUSTOMISE_MODAL_PLAN_DUE_DATE).fill(date);
-
+        await this.page.locator(AssessmentForm.SELECTOR_PARTICIPATION_CUSTOMISE_MODAL_PLAN_DUE_DATE).fill(date);
         await this.page.getByTestId(AssessmentForm.SELECTOR_PARTICIPATION_BUTTON_SAVE).click();
     }
 
