@@ -333,4 +333,26 @@ class Controller extends Base
             fn($id) => $id > 0
         );
     }
+
+    /**
+     * Export the current coverage report
+     *
+     * @param string|array|null $ids
+     * @return array
+     */
+    public function exportCoverage(): void
+    {
+        $filename = sprintf(
+            "test.csv",
+        );
+
+        $fp = fopen('php://temp', 'w');
+
+        $this->response = $this->responseFromStream(new \GuzzleHttp\Psr7\Stream($fp), $filename, 'text/csv; charset=utf-8');
+
+        // output headers
+        fputcsv($fp, ['test']);
+
+        fputcsv($fp, ['test2']);
+    }
 }
