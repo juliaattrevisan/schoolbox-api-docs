@@ -5,23 +5,22 @@
 /**
  * To move an item in an array to a new index
  * https://stackoverflow.com/questions/5306680/move-an-array-element-from-one-array-position-to-another
- *
- * @param { Array }
- * @param { Number }
- * @param { Number }
- *
- * @returns { Array }
+ * @param array - array to move item in
+ * @param oldIndex - index of item to move
+ * @param newIndex - index to move item to
+ * @returns - the array with the item moved
  */
-export const moveArrayItem = (array, oldIndex, newIndex) => {
+export function moveArrayItem(array: unknown[], oldIndex: number, newIndex: number): unknown[] {
     if (newIndex >= array.length) {
-        var k = newIndex - array.length + 1;
-        while (k--) {
+        let k = newIndex - array.length + 1;
+        while (k > 0) {
+            k -= 1;
             array.push(undefined);
         }
     }
     array.splice(newIndex, 0, array.splice(oldIndex, 1)[0]);
     return array;
-};
+}
 
 /**
  * To check if an array is made up of numbers
