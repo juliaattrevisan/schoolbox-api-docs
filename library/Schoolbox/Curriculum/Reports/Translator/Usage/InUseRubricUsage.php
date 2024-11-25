@@ -34,7 +34,13 @@ class InUseRubricUsage
             'icon' => Cursor::ACTIVITY_ICON_LIST[Cursor::COURSE_ACTIVITY_DUE_WORK],
             'rubric' => [
                 'capabilities' => $this->models['InUseCap']->map(
-                    fn ($cap) => call_user_func($this->rubricUsageTranslator, $cap),
+                    function ($cap) use ($usage, $assessment) {
+                        return call_user_func(
+                            $this->rubricUsageTranslator,
+                            $cap,
+                            $usage[Cursor::COURSE_IN_USE_RUBRIC][$assessment->getId()][$cap->getId()]['indicators'] ?? []
+                        );
+                    }
                 ),
                 '_links' => [
                     'view' => $this->getRouteIfAuthorized(
