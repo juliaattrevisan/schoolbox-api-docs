@@ -20,6 +20,7 @@ class DetailedUsage
         protected User $currentUser,
         private array $models,
         private RubricUsage $rubricUsageTranslator,
+        private InUseRubricUsage $inUseRubricTranslator,
     ) {
     }
 
@@ -117,31 +118,13 @@ class DetailedUsage
 
         if ($this->models[Cursor::COURSE_IN_USE_RUBRIC]->count() > 0) {
             $translation['inUseRubrics'] = $this->models[Cursor::COURSE_IN_USE_RUBRIC]->map(
-                fn($assessment) => [
-                    'name' => $assessment->getTitle(),
-                    'icon' => Cursor::ACTIVITY_ICON_LIST[Cursor::COURSE_ACTIVITY_DUE_WORK],
-                    'rubric' => [
-                        'capabilities' => array_map(
-                            fn($cap) => [
-                                'name'       => $cap['name'],
-                                'indicators' => $cap['indicators'] ?? [],
-                            ],
-                            array_values($usage[Cursor::COURSE_IN_USE_RUBRIC][$assessment->getId()])
-                        ),
-                        '_links' => [
-                            'view' => $this->getRouteIfAuthorized(
-                                'rubricManager.getForm',
-                                ['folderId' => $assessment->getContextUnitSpecification()->getFolder()->getId()],
-                            )
-                        ]
-                    ],
-                    '_links' => [
-                        'view' => $this->getRouteIfAuthorized(
-                            'learningAssessment.getAssessment',
-                            ['assessmentId' => $assessment->getId()],
-                        )
-                    ]
-                ]
+                function ($assessment) use ($usage) {
+                    return call_user_func(
+                        $this->inUseRubricTranslator,
+                        $assessment,
+                        $usage
+                    );
+                }
             );
         }
 

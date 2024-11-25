@@ -17,6 +17,7 @@ use Schoolbox\Curriculum\Reports\Translator\Counts\UnitAssessmentUsage as UnitAs
 use Schoolbox\Curriculum\Reports\Translator\Counts\CourseUsage as CourseUsageTranslator;
 use Schoolbox\Curriculum\Reports\Translator\Counts\CourseStructureOnly as CourseStructureTranslator;
 use Schoolbox\Curriculum\Reports\Translator\Usage\DetailedUsage;
+use Schoolbox\Curriculum\Reports\Translator\Usage\InUseRubricUsage;
 use Schoolbox\Curriculum\Reports\Translator\Usage\RubricUsage;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Mapper as CourseUnitSpecificationMapper;
 use Schoolbox\Learning\Course\DataModel\Specification\Mapper as CourseSpecificationMapper;
@@ -290,12 +291,21 @@ class Controller extends Base
             $this->getUser(),
         );
 
+        $inUseRubricTranslator = new InUseRubricUsage(
+            $this->routeGenerator,
+            $this->authorizer,
+            $this->getUser(),
+            $models,
+            $rubricTranslator,
+        );
+
         $translator = new DetailedUsage(
             $this->routeGenerator,
             $this->authorizer,
             $this->getUser(),
             $models,
             $rubricTranslator,
+            $inUseRubricTranslator,
         );
 
         $response = $translator($courseUnitSpec, $result);

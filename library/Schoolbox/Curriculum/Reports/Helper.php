@@ -349,6 +349,19 @@ class Helper
                 array_keys($usage[Cursor::COURSE_IN_USE_RUBRIC]),
             )->reindex();
 
+        $inUseCap = [];
+        array_walk(
+            $usage[Cursor::COURSE_IN_USE_RUBRIC],
+            function ($item, $key) use (&$inUseCap) {
+                $inUseCap[] = $key;
+            }
+        );
+        $result['InUseCap'] =
+            $this->rubricCapabilityMapper->findByColumn(
+                'id',
+                $inUseCap
+            )->reindex();
+
         return $result;
     }
 }
