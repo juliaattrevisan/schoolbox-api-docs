@@ -1091,12 +1091,10 @@ class Controller extends Assessment\Controller
                         $this->dueWorkResponseMapper->save($response);
 
                         // re save the kami file and submission file with all things attached
-                        if (isset($kamiModel, $kamiSubmissionFile)) {
-                            // force the worksheet to be true (we are a kami worksheet file), and this was being dropped, somehow..
-                            $kamiSubmissionFile->setIsWorksheet(true);
-                            $this->submissionFileMapper->save($kamiSubmissionFile);
-                            $this->kamiMapper->save($kamiModel->setStudentSubmissionFile($kamiSubmissionFile));
-                        }
+                        // force the worksheet to be true (we are a kami worksheet file), and this was being dropped, somehow..
+                        $kamiSubmissionFile->setIsWorksheet(true);
+                        $this->submissionFileMapper->save($kamiSubmissionFile);
+                        $this->kamiMapper->save($kamiModel->setStudentSubmissionFile($kamiSubmissionFile));
 
                         $latestResponse = $response;
                     }
