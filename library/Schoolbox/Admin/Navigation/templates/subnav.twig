@@ -61,7 +61,7 @@
     <a href="#" class="dropdown-btn" data-admin-subnav-dropdown>Go to...</a>
     <ul class="admin side-nav" role="navigation" data-admin>
 
-        {% for parentUrl, parentData in adminSubnav | filter(parentData => (parentData.visible ?? true)) %}
+        {% for parentUrl, parentData in adminSubnav | filter(parentData => parentData.visible) %}
 
             {# Decide if the current node is selected
              #
@@ -79,7 +79,7 @@
                 {# Only link parent nodes if they have no children
                  # Otherwise rely entirely on the children
                  #}
-                {% set children = parentData.children | filter(childData => (childData.visible ?? true)) %}
+                {% set children = parentData.children | filter(childData => childData.visible) %}
                 {% if children | length %}
                     <a>{{ parentData.name }}</a>
                 {% else %}
