@@ -18,6 +18,10 @@ use Sentry\Tracing\TransactionContext;
 use Sentry\Tracing\TransactionSource;
 use Throwable;
 
+use function Sentry\getBaggage;
+use function Sentry\getTraceparent;
+use function Sentry\getW3CTraceparent;
+
 /**
  * Defines a set of static methods for starting transactions and their stack,
  * and flushing them to Sentry.
@@ -479,9 +483,10 @@ class Tracer
                 $spanContext->setOp($transaction->getOp());
                 $spanContext->setOrigin($transaction->getOrigin());
                 $spanContext->setStartTimestamp($transaction->getStartTimestamp());
-                $span = $transaction->startChild($spanContext);
-                $hub->setSpan($span);
-                $spanStack[] = $span;
+                array_unshift(
+                    $this->stackChanges,
+                    new Operation\Push($spanContext),
+                );
             }
 
             // Apply each change to the actual transaction stack.
@@ -499,5 +504,44 @@ class Tracer
             $transaction->setStatus($status);
             $transaction->finish($endTimestamp);
         }
+    }
+
+    /**
+     * Write the transaction to date, then get the traceparent string.
+     *
+     * @see getTraceparent()
+     *
+     * @return string
+     */
+    public function getTraceparent(): string
+    {
+        // commit transaction to date, then:
+        return getTraceparent();
+    }
+
+    /**
+     * Write the transaction to date, then get the W3C traceparent string.
+     *
+     * @see getW3CTraceparent()
+     *
+     * @return string
+     */
+    public function getW3CTraceparent(): string
+    {
+        // commit transaction to date, then:
+        return getW3CTraceparent();
+    }
+
+    /**
+     * Write the transaction to date, then get the baggage string.
+     *
+     * @see getBaggage()
+     *
+     * @return string
+     */
+    public function getBaggage(): string
+    {
+        // commit transaction to date, then:
+        return getBaggage();
     }
 }
