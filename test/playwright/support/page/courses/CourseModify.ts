@@ -1,7 +1,11 @@
 import type { Page } from "@playwright/test";
+import { expect } from "@playwright/test";
+import type AcceptanceTester from "@schoolboxTest/playwright/support/AcceptanceTester";
 
 export default class CourseModify {
     private page: Page;
+
+    private tester: AcceptanceTester;
 
     static readonly URL = "/course/modify/{course_id}";
 
@@ -9,12 +13,13 @@ export default class CourseModify {
 
     static readonly SELECTOR_LOCATION = "[data-course-parent-selector]";
 
-    static readonly SELECTOR_USE_FOLDER = "[data-selection] [data-select]";
+    static readonly SELECTOR_USE_FOLDER = `[data-selection] [data-select]`;
 
     static readonly SELECTOR_SAVE_COURSE = "#update-course-form [type=submit][value='Save Course']";
 
-    constructor(page: Page) {
+    constructor(page: Page, tester: AcceptanceTester) {
         this.page = page;
+        this.tester = tester;
     }
 
     /**
@@ -49,5 +54,14 @@ export default class CourseModify {
      */
     async clickNewLessonPlanButton(buttonName: string): Promise<void> {
         await this.page.click(`a.button.icon-${buttonName}`);
+    }
+
+    /**
+     * Clicks select location
+     */
+    async clickSelectLocation(): Promise<void> {
+        await this.page.locator(CourseModify.SELECTOR_LOCATION).click();
+        // const useThisFolderButton = this.page.locator(CourseModify.SELECTOR_USE_FOLDER);
+        // await expect(useThisFolderButton).toBeEnabled();
     }
 }
