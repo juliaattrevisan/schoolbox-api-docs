@@ -243,11 +243,6 @@ class Subnav
                 'visible'    => $userIsSuperuser || $userHasServicePermissionDesign,
                 'searchable' => false,
                 'children'   => [
-                    '/adminv2/lists/design/component-definition' => [
-                        'name'        => 'Components List',
-                        'visible'     => true,
-                        'description' => 'Control which components can be used on homepages, dashboards and ePortfolios.',
-                    ],
                     '/adminv2/dashboard' => [
                         'name'        => 'Dashboard Templates',
                         'visible'     => true,
@@ -724,6 +719,11 @@ class Subnav
                         'name'        => 'Allowed Files',
                         'visible'     => true,
                         'description' => 'Define the file mime types that can be uploaded, the maximum filesize and the icon they will use.',
+                    ],
+                    '/adminv2/lists/cms/component-definition' => [
+                        'name'        => 'Components List',
+                        'visible'     => true,
+                        'description' => 'Control which components can be used on homepages, dashboards and ePortfolios.',
                     ],
                     '/adminv2/video' => [
                         'name'        => 'Media Queue',
