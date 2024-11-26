@@ -20,10 +20,6 @@ use Sentry\State\HubInterface;
 use Sentry\Tracing\SpanStatus;
 use Throwable;
 
-use function Sentry\getBaggage;
-use function Sentry\getTraceparent;
-use function Sentry\getW3CTraceparent;
-
 /**
  * `\Sentry\Tracing\GuzzleTracingMiddleware`, adapted to write to the default
  * trace container for later writing.
@@ -47,9 +43,9 @@ class GuzzleTracingMiddleware
                 // Add tracing headers if required
                 if (self::shouldAttachTracingHeaders($hub->getClient(), $request)) {
                     $request = $request
-                        ->withHeader('sentry-trace', getTraceparent())
-                        ->withHeader('traceparent', getW3CTraceparent())
-                        ->withHeader('baggage', getBaggage());
+                        ->withHeader('sentry-trace', $tracer->getTraceparent())
+                        ->withHeader('traceparent', $tracer->getW3CTraceparent())
+                        ->withHeader('baggage', $tracer->getBaggage());
                 }
 
                 // Build span/breadcrumb request data
