@@ -274,6 +274,8 @@ class BulkUpdater
 
         if (\count($statements['token']['update']['params'])) {
             $statements['token']['update']['statement']->execute($statements['token']['update']['params']);
+            $updated = true;
+
             /* Log the users we brutally updated en-masse
              */
             foreach ($statements['token']['update']['params'] as $key => $userId) {
