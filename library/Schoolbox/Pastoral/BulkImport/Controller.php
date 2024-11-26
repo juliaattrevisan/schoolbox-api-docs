@@ -422,6 +422,13 @@ class Controller extends Base
             return;
         }
 
+        // Save imported by/at immediately,
+        // so that mashing the import button doesn't create multiple imports.
+        $import = $import
+            ->setImportedBy($this->getUser())
+            ->setImportedAt(Alaress_Date_Format::now());
+        $this->pastoralBulkImportMapper->save($import);
+
         // Load the Zip file's contents, cleaning up only once all files have
         // been extracted from the ZIP.
         $zipArchive       = null;
@@ -503,12 +510,8 @@ class Controller extends Base
             $this->cleanup($zipArchive, $localZipFilename);
         }
 
-        // Save a record of the import, possibly including logs,
-        // and then redirect back to the main page.
-        $import = $import
-            ->setImportedBy($this->getUser())
-            ->setImportedAt(Alaress_Date_Format::now())
-            ->setImportLog($importLog);
+        // Save import logs, then redirect back to the main page.
+        $import = $import->setImportLog($importLog);
         $this->pastoralBulkImportMapper->save($import);
 
         $this->response = $this->redirectAfterPost(
