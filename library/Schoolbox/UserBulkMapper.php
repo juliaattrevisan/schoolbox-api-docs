@@ -48,6 +48,7 @@ class UserBulkMapper extends UserMapper
     public function __construct(private \Schoolbox\UserMapper $userMapper)
     {
         parent::__construct();
+        $this->postSetup();
     }
 
 

@@ -13,6 +13,7 @@ use Alaress\Database\Predicate\Builder;
 use Schoolbox\Application\Exception\Exception as SchoolboxException;
 use PDOException;
 use Schoolbox\Collection;
+use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\User;
 use Schoolbox\UserBulkMapper;
 
@@ -147,6 +148,7 @@ class BulkUpdater
      * @param string         $position
      * @param int            $displayGradeGraph
      * @param int            $revokeToken
+     * @param int            $clearGroups
      */
     public function __construct(
         User $sessionUser,
@@ -164,7 +166,8 @@ class BulkUpdater
         int $hideTimetable,
         string $position,
         int $displayGradeGraph,
-        int $revokeToken
+        int $revokeToken,
+        private int $clearGroups
     ) {
         $this->sessionUser    = $sessionUser;
         $this->userBulkMapper = $userBulkMapper;
@@ -282,6 +285,21 @@ class BulkUpdater
             }
         }
 
+        if (\count($statements['groups']['delete']['params'])) {
+            $statements['groups']['delete']['statement']->execute($statements['groups']['delete']['params']);
+
+            $updated = true;
+            /* Log the users we brutally updated en-masse
+             */
+            foreach ($statements['groups']['delete']['params'] as $key => $userId) {
+                if ($key === 'service') {
+                    // this is session user id
+                    continue;
+                }
+                $messages[] = "{$this->sessionUser->getFullname()} ({$this->sessionUser->getId()}) groups cleared for {$lookup[$userId]} ({$userId})";
+            }
+        }
+
         /* Log messages to this userBulkMapper log output thing
          *
          * Only care about unique messages because a user will have multiple messages associated
@@ -391,6 +409,12 @@ class BulkUpdater
             ],
             'token'  => [
                 'update' => [
+                    'statement' => null,
+                    'params'    => [],
+                ],
+            ],
+            'groups'  => [
+                'delete' => [
                     'statement' => null,
                     'params'    => [],
                 ],
@@ -540,6 +564,14 @@ class BulkUpdater
                 );
                 $statements['token']['update']['params']    = array_merge(['userId' => $this->sessionUser->getId()], $revokeTokenBindings->getParams());
             }
+        }
+
+        if ($this->clearGroups === 1) {
+            $clearGroupsBindings = Builder::getBindings($this->userIds, 'cg');
+            $statements['groups']['delete']['statement'] = $this->userBulkMapper->getDatabase()->prepare(
+                "DELETE FROM userAccess WHERE service = :service AND uid IN ({$clearGroupsBindings->getPlaceholder()})"
+            );
+            $statements['groups']['delete']['params']    = array_merge(['service' => UserAccess::SERVICE_HOMEPAGE], $clearGroupsBindings->getParams());
         }
 
         return $statements;

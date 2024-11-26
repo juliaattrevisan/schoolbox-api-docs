@@ -157,7 +157,7 @@ class Controller extends Base
         $this->extendExecutionTime();
 
         $message = "{$this->getUser()->getFullname()} ({$this->getUser()->getId()}) started a user bulk modify";
-        $this->userBulkMapper->log($message, false);
+        $this->userBulkMapper->log($message, true);
 
         try {
             $modified = (new BulkUpdater(
@@ -176,7 +176,8 @@ class Controller extends Base
                 (int)$params->get('hideTimetable'),
                 $params->get('positionTitle'),
                 (int)$params->get('displayGradeGraph'),
-                (int)$params->get('revokeToken')
+                (int)$params->get('revokeToken'),
+                (int)$params->get('clearGroups')
             ))->update();
         } catch (SchoolboxException $e) {
             $problem        = (new ApiProblem('Campus has been deleted or does not exist'))
