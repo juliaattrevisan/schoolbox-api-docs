@@ -70,15 +70,15 @@ export const useReportStore = defineStore("ccReport", () => {
     });
 
     /**
-     * Add the new course to the existing node.usage.courses[]
+     * Loop through and ddd the new course to the existing node.usage.courses[]
      * @param existingNode - the existing node to update
      * @param newNode - the new node that contains the new course to add
      */
-    function addChildren(existingNode: CurriculumCoverageNode, newNode: CurriculumCoverageNode): void {
+    function addCourseToChildren(existingNode: CurriculumCoverageNode, newNode: CurriculumCoverageNode): void {
         if (existingNode.children) {
             existingNode.children.forEach((child, index) => {
                 child.usage.courses = [...child.usage.courses, ...newNode.children![index].usage.courses];
-                addChildren(child, newNode.children![index]);
+                addCourseToChildren(child, newNode.children![index]);
             });
         }
     }
@@ -129,7 +129,7 @@ export const useReportStore = defineStore("ccReport", () => {
                     const newCourseNodes = responseJson.data.nodes;
                     nodes.value.forEach((node, index) => {
                         node.usage.courses = [...node.usage.courses, ...newCourseNodes[index].usage.courses];
-                        addChildren(node, newCourseNodes[index]);
+                        addCourseToChildren(node, newCourseNodes[index]);
                     });
                 }
             }
