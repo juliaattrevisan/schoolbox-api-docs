@@ -107,8 +107,7 @@ HELP;
         $amqp = $di->get('amqp');
 
         // we'll be using the mobile broker for receiving...
-        $tracer = Tracer::getDefaultTrace()->setHub($di->get('sentry'));
-        $broker = new Broker($instanceId, $amqp, $redis, $stomp, $tracer);
+        $broker = new Broker($instanceId, $amqp, $redis, $stomp, Tracer::getDefaultTrace());
 
         $forceProduction = isset($opts['force-production']);
         if ($forceProduction) {

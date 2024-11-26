@@ -55,8 +55,7 @@ $kernel->run(function (ContainerInterface $di, LoopInterface $loop, LoggerInterf
         $amqp = $di->get('amqp');
 
         // we'll be using the schedule broker for receiving...
-        $tracer         = Tracer::getDefaultTrace()->setHub($di->get('sentry'));
-        $scheduleBroker = new Broker(INSTANCE_ID, $amqp, $redis, $stomp, $tracer);
+        $scheduleBroker = new Broker(INSTANCE_ID, $amqp, $redis, $stomp, Tracer::getDefaultTrace());
 
         /** @var Routing\Cache\Redis\ReadCache $subscriptionCache */
         $subscriptionCache = $di->get('subscriptionCache.readonly');
