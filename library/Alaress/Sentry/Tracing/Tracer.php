@@ -42,11 +42,6 @@ class Tracer
     private static ?Tracer $defaultTrace = null;
 
     /**
-     * The Sentry hub to send to: may be set prior to or in `finishTransaction`.
-     */
-    private ?HubInterface $hub = null;
-
-    /**
      * The current transaction context, if there is one.
      */
     private ?TransactionContext $transactionContext = null;
@@ -163,16 +158,6 @@ class Tracer
     public function getTransactionContext(): ?TransactionContext
     {
         return $this->transactionContext;
-    }
-
-    /**
-     * @param HubInterface|null $hub
-     * @return $this
-     */
-    public function setHub(?HubInterface $hub): self
-    {
-        $this->hub = $hub;
-        return $this;
     }
 
     /**
@@ -511,20 +496,14 @@ class Tracer
      *
      * Also finishes any spans which may still be open.
      *
-     * @param HubInterface|null $hub          The hub to write the trace to:
-     *                                        falls back to `$this->hub` if set,
-     *                                        if not raises error.
      * @param float|null        $endTimestamp When the transactions is to be
      *                                        recorded as having finished.
      * @param SpanStatus|null   $status       The transaction status to set once
      *                                        it has finished.
      * @return void
      */
-    public function finishTransaction(
-        ?HubInterface $hub = null,
-        ?float $endTimestamp = null,
-        ?SpanStatus $status = null,
-    ): void {
+    public function finishTransaction(?float $endTimestamp = null, ?SpanStatus $status = null): void
+    {
         $this->flushTransaction(true, $endTimestamp, $status);
     }
 

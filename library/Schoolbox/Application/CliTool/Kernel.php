@@ -135,7 +135,6 @@ class Kernel extends CliKernelAbstract
                 // I don't even reliably have an error here, so leave status
                 // as empty.
                 Tracer::getDefaultTrace()->finishTransaction(
-                    $this->get('sentry'),
                     microtime(true),
                 );
             },

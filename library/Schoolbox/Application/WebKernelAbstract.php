@@ -269,7 +269,6 @@ abstract class WebKernelAbstract extends \Alaress\Application\Kernel
         );
         $this->getShutdownHandler()->registerFunction(function (): void {
             Tracer::getDefaultTrace()->finishTransaction(
-                $this->get('sentry'),
                 microtime(true),
                 SpanStatus::createFromHttpStatusCode(http_response_code()),
             );
