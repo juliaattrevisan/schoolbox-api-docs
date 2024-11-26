@@ -238,6 +238,11 @@ abstract class Kernel
      */
     public function __construct(bool $bypassMaintenanceModeCheck = false)
     {
+        Tracer::getDefaultTrace()->startSpan(
+            'kernel:' . get_class($this),
+            operation: 'app.bootstrap',
+            origin: 'auto.app.start',
+        );
         $this->di              = (new Di\ContainerBuilder())->newInstance();
         $this->shutdownHandler = new ShutdownHandler();
 
@@ -245,9 +250,15 @@ abstract class Kernel
         $this->registerErrorHandling();
         $this->registerExceptionHandling();
         $this->registerShutdownHandling();
+        Tracer::getDefaultTrace()->runWithinSpan(
+            fn () => static::installDependencies($this->di),
+           'kernel:' . get_class($this),
+            operation: 'app.bootstrap.di',
+        );
         static::installDependencies($this->di);
         $this->postInstallDependencies($bypassMaintenanceModeCheck);
         $this->checkServerApiEnvironment();
+        Tracer::getDefaultTrace()->finishSpan();
     }
 
     /**
