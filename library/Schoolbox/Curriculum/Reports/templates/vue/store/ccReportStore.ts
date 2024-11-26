@@ -6,7 +6,7 @@ import { defineStore } from "pinia";
 import type { Course } from "@schoolboxLibrary/types/Course";
 import { usePrintDialog } from "@schoolboxVue/composables/print/usePrintDialog";
 import { isAbortError } from "@js/util/errorUtils";
-import type { CourseWithCurriculumNodeUsage, CurriculumCoverageNode } from "../../js/types/curriculumCoverageTypes";
+import type { CurriculumCoverageNode } from "../../js/types/curriculumCoverageTypes";
 import { useQueryStore } from "./ccQueryStore";
 import { useInputStore } from "./ccInputStore";
 
@@ -70,9 +70,9 @@ export const useReportStore = defineStore("ccReport", () => {
     });
 
     /**
-     * To add the children to the nodes
-     * @param existingNode - the existing node
-     * @param newNode - the new node to add
+     * Add the new course to the existing node.usage.courses[]
+     * @param existingNode - the existing node to update
+     * @param newNode - the new node that contains the new course to add
      */
     function addChildren(existingNode: CurriculumCoverageNode, newNode: CurriculumCoverageNode): void {
         if (existingNode.children) {
@@ -84,9 +84,9 @@ export const useReportStore = defineStore("ccReport", () => {
     }
 
     /**
-     * search for nodes that match
-     * @param url - the url to search
-     * @param currentIndex - the current index
+     * Load the course/node data for a single course
+     * @param url - the url to load, linked to the single course and all curriculum
+     * @param currentIndex - the current load index
      */
     async function getCourse(url: string, currentIndex: number): Promise<void> {
         try {
@@ -117,12 +117,14 @@ export const useReportStore = defineStore("ccReport", () => {
                 return;
             }
             if ("data" in responseJson) {
+                // if it's the first course load, we can just set the courses and nodes
                 if (currentIndex === 0) {
                     courses.value = responseJson.data.courses;
                     nodes.value = responseJson.data.nodes;
                 } else {
+                    // otherwise we need to add the new courses to the existing courses
                     courses.value = [...courses.value, ...responseJson.data.courses];
-                    // need to run through nodes and add the new course within usage.courses
+                    // and need to run through nodes and add the new course within each node.usage.courses[]
                     // then if the node has children, we need to do the same for the children within
                     const newCourseNodes = responseJson.data.nodes;
                     nodes.value.forEach((node, index) => {
@@ -130,7 +132,6 @@ export const useReportStore = defineStore("ccReport", () => {
                         addChildren(node, newCourseNodes[index]);
                     });
                 }
-                console.warn(responseJson.data.courses);
             }
         } catch (error) {
             // ignore abort errors, as the previous report was cancelled
@@ -143,13 +144,13 @@ export const useReportStore = defineStore("ccReport", () => {
     }
 
     /**
-     * To generate the report
+     * In an attempt to reduce server load,
+     * the report is generated sequentially for each course
      */
     async function report(): Promise<void> {
         useInputStore().setActive();
         useQueryStore().setQueryParams();
         hasNotReported.value = false;
-        // isFetching.value = true;
         isLoading.value = true;
         hasLoadError.value = false;
         controller = new AbortController();
@@ -158,6 +159,7 @@ export const useReportStore = defineStore("ccReport", () => {
             controller.abort();
         }
         try {
+            isFetching.value = true;
             await useQueryStore()
                 .getQueryUrls()
                 .reduce(async (previousPromise, url, currentIndex) => {
@@ -171,7 +173,7 @@ export const useReportStore = defineStore("ccReport", () => {
             console.error(error);
             hasLoadError.value = true;
         } finally {
-            // isFetching.value = true;
+            isFetching.value = true;
             isLoading.value = false;
         }
     }
