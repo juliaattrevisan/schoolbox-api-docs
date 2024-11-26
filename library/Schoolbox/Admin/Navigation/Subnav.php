@@ -359,11 +359,6 @@ class Subnav
                 'visible'    => $userIsSuperuser,
                 'searchable' => false,
                 'children'   => [
-                    '/adminv2/import/photos/upload' => [
-                        'name'        => 'Portrait Photos',
-                        'visible'     => true,
-                        'description' => 'Manually upload portrait photos for users when the SIS does not automatically provide them.',
-                    ],
                     '/adminv2/import/userAccount' => [
                         'name'        => 'User Accounts',
                         'visible'     => true,
@@ -886,6 +881,11 @@ class Subnav
                         'name'        => 'Import CSV',
                         'visible'     => true,
                         'description' => 'Make changes to user accounts on bulk by uploading a CSV file.',
+                    ],
+                    '/adminv2/import/photos/upload' => [
+                        'name'        => 'Import Portraits',
+                        'visible'     => true,
+                        'description' => 'Manually upload portrait photos for users when the SIS does not automatically provide them.',
                     ],
                     '/adminv2/user/bulk/modify' => [
                         'name'        => 'Bulk Modify',
