@@ -71,21 +71,15 @@ export const useReportStore = defineStore("ccReport", () => {
 
     /**
      * search for nodes that match
+     * @param url - the url to search
      */
-    async function report(): Promise<void> {
-        useInputStore().setActive();
-        useQueryStore().setQueryParams();
-        hasNotReported.value = false;
-        // abort the previous search if it's still running
-        if (isFetching.value) {
-            controller.abort();
-        }
+    async function getCourse(url: string): Promise<void> {
         try {
             isFetching.value = true;
             isLoading.value = true;
             hasLoadError.value = false;
             controller = new AbortController();
-            const response = await fetch(useQueryStore().getEndpointWithParams(), {
+            const response = await fetch(url, {
                 method: "GET",
                 signal: controller.signal,
                 headers: {
@@ -113,15 +107,40 @@ export const useReportStore = defineStore("ccReport", () => {
                 return;
             }
             if ("data" in responseJson) {
-                courses.value = responseJson.data.courses;
-                nodes.value = responseJson.data.nodes;
-                hasReport.value = true;
+                // courses.value = responseJson.data.courses;
+                // nodes.value = responseJson.data.nodes;
+                // hasReport.value = true;
+                console.warn(responseJson.data.courses);
             }
         } catch (error) {
             // ignore abort errors, as the previous report was cancelled
             if (isAbortError(error)) {
                 return;
             }
+            console.error(error);
+            hasLoadError.value = true;
+        }
+    }
+
+    /**
+     * To generate the report
+     */
+    async function report(): Promise<void> {
+        useInputStore().setActive();
+        useQueryStore().setQueryParams();
+        hasNotReported.value = false;
+        // abort the previous search if it's still running
+        if (isFetching.value) {
+            controller.abort();
+        }
+        try {
+            await useQueryStore()
+                .getQueryUrls()
+                .reduce(async (previousPromise, url) => {
+                    await previousPromise;
+                    await getCourse(url);
+                }, Promise.resolve());
+        } catch (error) {
             console.error(error);
             hasLoadError.value = true;
         } finally {
