@@ -173,7 +173,7 @@ export const useReportStore = defineStore("ccReport", () => {
             console.error(error);
             hasLoadError.value = true;
         } finally {
-            isFetching.value = true;
+            isFetching.value = false;
             isLoading.value = false;
         }
     }
