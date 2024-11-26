@@ -61,7 +61,5 @@ export default class CourseModify {
      */
     async clickSelectLocation(): Promise<void> {
         await this.page.locator(CourseModify.SELECTOR_LOCATION).click();
-        // const useThisFolderButton = this.page.locator(CourseModify.SELECTOR_USE_FOLDER);
-        // await expect(useThisFolderButton).toBeEnabled();
     }
 }
