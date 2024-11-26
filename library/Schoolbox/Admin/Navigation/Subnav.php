@@ -382,11 +382,6 @@ class Subnav
                         ),
                         'description' => 'Configure the default and available filter options on the class markbook.',
                     ],
-                    '/adminv2/rollover' => [
-                        'name'        => 'Class Rollover',
-                        'visible'     => true,
-                        'description' => 'At the end of the year or semester, archive your class pages so you can start fresh the following year.',
-                    ],
                     '/adminv2/course-builder' => [
                         'name'        => 'Course Builder',
                         'visible'     => (bool)$this->configLoader->get(ConfigMapper::NAME_LMS_ENABLED),
@@ -687,6 +682,11 @@ class Subnav
                         'name'        => 'Allowed Files',
                         'visible'     => true,
                         'description' => 'Define the file mime types that can be uploaded, the maximum filesize and the icon they will use.',
+                    ],
+                    '/adminv2/rollover' => [
+                        'name'        => 'Class Rollover',
+                        'visible'     => true,
+                        'description' => 'At the end of the year or semester, archive your class pages so you can start fresh the following year.',
                     ],
                     '/adminv2/lists/cms/component-definition' => [
                         'name'        => 'Components List',
