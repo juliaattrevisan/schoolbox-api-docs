@@ -247,7 +247,8 @@ class Kernel extends WebKernelAbstract
     private function outputAuraContent(Route $route, ?User $authHeaderUser, bool $bypassIpTracking): void
     {
         // Track this thing
-        Tracer::getDefaultTrace()->setTransactionContextForAuraRoute($route->name);
+        $tracer = Tracer::getDefaultTrace();
+        $tracer->setTransactionContextForAuraRoute($route->name);
 
         // The route name's format:
         // "[controllerName].[action](:[label])"
@@ -366,7 +367,12 @@ class Kernel extends WebKernelAbstract
             );
         }
 
-        $method->invokeArgs($controller, $args);
+        $tracer->runWithinSpan(
+            fn () => $method->invokeArgs($controller, $args),
+            'controller invoke' . $route->name,
+            'app.controller.invoke',
+            'auto.http.aura.controller',
+        );
 
         // Process the response, using a blank one if there is none.
         $psr7Response = $controller->getResponse();
@@ -404,7 +410,12 @@ class Kernel extends WebKernelAbstract
         // Output whatever kind of response we have
         /** @var Outputter $outputter */
         $outputter = $this->di->get('httpResponseOutputter');
-        $outputter->output($psr7Response);
+        $tracer->runWithinSpan(
+            fn () => $outputter->output($psr7Response),
+            'controller render: ' . $route->name,
+            'app.controller.render',
+            'auto.http.aura.controller',
+        );
 
         // Output post-output callbacks
         $postOutputCallbacks = $controller->getPostOutputCallbacks();

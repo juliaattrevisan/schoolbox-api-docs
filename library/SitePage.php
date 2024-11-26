@@ -16,7 +16,6 @@ use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\IConfigLoader;
 use Schoolbox\L10n\RosettaStone;
 use Schoolbox\User;
-use Sentry\Tracing\TransactionSource;
 
 class SitePage
 {
@@ -73,6 +72,16 @@ class SitePage
      * The PHPLib templating engine SitePage uses.
      */
     public Template $template;
+
+    /**
+     * The template content file: this is the top-level template which is
+     * rendered when outputting the page.
+     *
+     * Maintained for tracing purposes.
+     *
+     * @var string
+     */
+    private string $templateContentFile = '';
 
     /**
      * Constructor
@@ -155,18 +164,31 @@ class SitePage
 
         $total = count($path);
 
+        $tracer = Tracer::getDefaultTrace();
         /* iterate backwards through the path */
         for ($i = 0; $i < $total; $i++) {
             $filename = rtrim(implode("/", $path), '/');
 
             // Start Sentry transaction here, now there's a path to include
             if (is_file(WEB_root . '/' . $filename . '.php') && $execute) {
-                Tracer::getDefaultTrace()->setTransactionContextForSitePage(WEB_root . '/' . $filename . '.php');
-                include WEB_root . '/' . $filename . '.php';
+                $filename = $filename . '.php';
+                $tracer->setTransactionContextForSitePage(WEB_root . '/' . $filename);
+                $tracer->runWithinSpan(
+                    fn () => include WEB_root . '/' . $filename,
+                    'controller invoke: ' . $filename,
+                    'app.controller.invoke',
+                    'auto.http.sitePage.controller',
+                );
                 return true;
             } elseif (is_file(WEB_root . '/' . $filename . '/index.php') && $execute) {
-                Tracer::getDefaultTrace()->setTransactionContextForSitePage(WEB_root . '/' . $filename . '/index.php');
-                include WEB_root . '/' . $filename . '/index.php';
+                $filename = $filename . '/index.php';
+                $tracer->setTransactionContextForSitePage(WEB_root . '/' . $filename);
+                $tracer->runWithinSpan(
+                    fn () => include WEB_root . '/' . $filename,
+                    'controller invoke: ' . $filename,
+                    'app.controller.invoke',
+                    'auto.http.sitePage.controller',
+                );
                 return true;
             }
 
@@ -282,7 +304,12 @@ class SitePage
         $responseFactory = $this->di->get('httpResponseFactory');
         $template = 'include/sitepageContent.twig';
         $data = [
-            'content' => $this->template->parse('finaloutput', TEMPLATE_body)
+            'content' => Tracer::getDefaultTrace()->runWithinSpan(
+                fn () => $this->template->parse('finaloutput', TEMPLATE_body),
+                'controller render: ' . $this->templateContentFile,
+                'app.controller.render',
+                'auto.http.sitePage.controller',
+            )
         ];
         $user = $this->user ?? new User();
         if (!$lite && !$this->lite) {
@@ -485,6 +512,7 @@ class SitePage
         }
 
         if ($handle == TEMPLATE_content) {
+            $this->templateContentFile = $file;
             $this->setBlock($handle, "custom_head", "custom_head_block");
             $this->setVar('custom_head_block', '');
         }
