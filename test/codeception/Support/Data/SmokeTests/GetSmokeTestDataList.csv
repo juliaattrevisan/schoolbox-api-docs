@@ -288,10 +288,10 @@ Admin,"Cleanup calendar",Student,https://vagrant.dev.schoolbox.cloud/adminv2/cal
 Admin,"Cleanup calendar",Parent,https://vagrant.dev.schoolbox.cloud/adminv2/calendar/Cleanup,401
 Admin,"Bulk add folders",Superuser,https://vagrant.dev.schoolbox.cloud/adminv2/import/folder,200
 Admin,"Bulk add folders","Badges Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/import/folder,401
-Admin,"Bulk add folders","CMS Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/import/folder,401
+Admin,"Bulk add folders","CMS Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/import/folder,200
 Admin,"Bulk add folders","Calendar Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/import/folder,401
 Admin,"Bulk add folders","Design Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/import/folder,401
-Admin,"Bulk add folders","LMS Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/import/folder,200
+Admin,"Bulk add folders","LMS Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/import/folder,401
 Admin,"Bulk add folders","News Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/import/folder,401
 Admin,"Bulk add folders","Pastoral Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/import/folder,401
 Admin,"Bulk add folders","Timetable Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/import/folder,401
