@@ -13,7 +13,6 @@ use Alaress\Module\Module as BaseModule;
 use Alaress\Authorizer\Rule;
 use Alaress\Web\Controller\Base;
 use Alaress\Twig\Loader\IChainLoader;
-use Schoolbox\Permission\Access\UserAccess;
 
 /**
  * The module for managing school terms through the admin section.
