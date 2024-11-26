@@ -114,7 +114,7 @@ Admin,"Create profile button",Superuser,https://vagrant.dev.schoolbox.cloud/admi
 Admin,"Create profile button","Badges Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/profile-button/create/student,401
 Admin,"Create profile button","CMS Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/profile-button/create/student,401
 Admin,"Create profile button","Calendar Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/profile-button/create/student,401
-Admin,"Create profile button","Design Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/profile-button/create/student,200
+Admin,"Create profile button","Design Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/profile-button/create/student,401
 Admin,"Create profile button","LMS Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/profile-button/create/student,401
 Admin,"Create profile button","News Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/profile-button/create/student,401
 Admin,"Create profile button","Pastoral Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/profile-button/create/student,401
@@ -126,7 +126,7 @@ Admin,"Create profile button",Superuser,https://vagrant.dev.schoolbox.cloud/admi
 Admin,"Create profile button","Badges Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/profile-button/create/staff,401
 Admin,"Create profile button","CMS Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/profile-button/create/staff,401
 Admin,"Create profile button","Calendar Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/profile-button/create/staff,401
-Admin,"Create profile button","Design Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/profile-button/create/staff,200
+Admin,"Create profile button","Design Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/profile-button/create/staff,401
 Admin,"Create profile button","LMS Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/profile-button/create/staff,401
 Admin,"Create profile button","News Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/profile-button/create/staff,401
 Admin,"Create profile button","Pastoral Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/profile-button/create/staff,401
@@ -138,7 +138,7 @@ Admin,"Create profile button",Superuser,https://vagrant.dev.schoolbox.cloud/admi
 Admin,"Create profile button","Badges Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/profile-button/create/parent,401
 Admin,"Create profile button","CMS Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/profile-button/create/parent,401
 Admin,"Create profile button","Calendar Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/profile-button/create/parent,401
-Admin,"Create profile button","Design Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/profile-button/create/parent,200
+Admin,"Create profile button","Design Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/profile-button/create/parent,401
 Admin,"Create profile button","LMS Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/profile-button/create/parent,401
 Admin,"Create profile button","News Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/profile-button/create/parent,401
 Admin,"Create profile button","Pastoral Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/profile-button/create/parent,401
