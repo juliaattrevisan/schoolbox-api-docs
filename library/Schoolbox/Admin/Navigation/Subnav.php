@@ -512,16 +512,6 @@ class Subnav
                         'visible'     => true,
                         'description' => 'Configure user roles within the system, the type of access they have and permissions.',
                     ],
-                    '/adminv2/lists/user-title' => [
-                        'name'        => 'User Titles',
-                        'visible'     => true,
-                        'description' => 'Configure the drop down list of titles available for users.',
-                    ],
-                    '/adminv2/lists/user-pronoun' => [
-                        'name'        => 'User Pronouns',
-                        'visible'     => true,
-                        'description' => 'Configure the drop down list of pronouns available for users.',
-                    ],
                     '/adminv2/lists/year-levels' => [
                         'name'        => 'Year Levels',
                         'visible'     => true,
@@ -895,15 +885,20 @@ class Subnav
                         'visible'     => true,
                         'description' => 'Add your own custom buttons to a users profile page.',
                     ],
+                    '/adminv2/user/stale' => [
+                        'name'        => 'Remove Users',
+                        'visible'     => true,
+                        'description' => 'View and remove users which have not logged into the platform for a while.',
+                    ],
                     '/adminv2/shaps' => [
                         'name'        => 'Schoolbox Help',
                         'visible'     => true,
                         'description' => 'Ensure your staff have access to our online training, guides and forums.',
                     ],
-                    '/adminv2/user/stale' => [
-                        'name'        => 'Remove Users',
+                    '/adminv2/lists/user-pronoun' => [
+                        'name'        => 'User Pronouns',
                         'visible'     => true,
-                        'description' => 'View and remove users which have not logged into the platform for a while.',
+                        'description' => 'Configure the drop down list of pronouns available for users.',
                     ],
                     '/adminv2/ups' => [
                         'name'        => 'User Provisioning System',
@@ -923,6 +918,11 @@ class Subnav
                                 'visible' => true,
                             ],
                         ],
+                    ],
+                    '/adminv2/lists/user-title' => [
+                        'name'        => 'User Titles',
+                        'visible'     => true,
+                        'description' => 'Configure the drop down list of titles available for users.',
                     ],
                 ],
             ],
