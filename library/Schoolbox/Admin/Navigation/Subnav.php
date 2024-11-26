@@ -263,11 +263,6 @@ class Subnav
                         'visible'     => true,
                         'description' => 'Configure the look and feel of your system, including colours, images and logos.',
                     ],
-                    '/adminv2/terminology' => [
-                        'name'        => 'Terminology',
-                        'visible'     => true,
-                        'description' => 'Localise the words used to describe key features to your own language.',
-                    ],
                     '/adminv2/lists/design/timetable-colour' => [
                         'name'        => 'Timetable Colours List',
                         'visible'     => true,
@@ -865,6 +860,11 @@ class Subnav
                         'name'        => 'Site',
                         'visible'     => count($enabledConfigs[ConfigMapper::TYPE_SITE] ?? []) > 0,
                         'description' => 'Setup and configure global settings related to the site, like name, domain and analytics.',
+                    ],
+                    '/adminv2/terminology' => [
+                        'name'        => 'Terminology',
+                        'visible'     => true,
+                        'description' => 'Localise the words used to describe key features to your own language.',
                     ],
                 ],
             ],
