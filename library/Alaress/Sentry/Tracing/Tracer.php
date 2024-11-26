@@ -11,7 +11,6 @@ namespace Alaress\Sentry\Tracing;
 
 use Sentry\Breadcrumb;
 use Sentry\SentrySdk;
-use Sentry\State\HubInterface;
 use Sentry\Tracing\Span;
 use Sentry\Tracing\SpanContext;
 use Sentry\Tracing\SpanStatus;
