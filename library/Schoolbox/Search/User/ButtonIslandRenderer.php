@@ -122,12 +122,12 @@ class ButtonIslandRenderer
 
             /* Compact Mode
              */
-            'mode' => 'compact',
-            'identifier' => sprintf(
-                '%s%s',
-                'row-options-childsubject-',
-                $viewee->getId()
-            )
+//            'mode' => 'compact',
+//            'identifier' => sprintf(
+//                '%s%s',
+//                'row-options-childsubject-',
+//                $viewee->getId()
+//            )
         ]);
     }
 }
