@@ -12,7 +12,7 @@ import SsResultsItem from "./ss-results-item.vue";
 interface Props {
     query: string; // the search query
     isActive: boolean; // whether the search is active
-    hasPressedEscape: boolean; // whether the escape key has been pressed (which closes the search, so any key events should be ignored)
+    hasPressedEscape?: boolean; // whether the escape key has been pressed (which closes the search, so any key events should be ignored)
     isSearching: boolean; // to notify of searching
     isLoadingMore?: boolean; // whether more results are being loaded
     allowPartialMatches?: boolean; // whether to allow partial matches, so can match part of a word
