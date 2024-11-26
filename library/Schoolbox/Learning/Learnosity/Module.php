@@ -239,6 +239,10 @@ class Module extends BaseModule
         /* CSV Export of students' most recent response
          */
         $this->register('GET', '/{assessmentId}/attempts/csv', 'getExportAttempts', $instructorPerms, $preloadAssessment);
+
+        /* taskd of the above endpoint
+         */
+        $this->register('POST', '/{assessmentId}/attempts/download', 'getExportDownload', $instructorPerms, $preloadAssessment);
         /* TODO: Miscellaneous endpoints that we can probably look at culling soon
          *  These were originally early explorations in how their api worked.
          */
@@ -763,6 +767,7 @@ class Module extends BaseModule
             $this->injector->get('httpFactory'),
             $this->injector->get('taskd.httpRequestMessageFactory'),
             $this->injector->get('taskd.messageProducer'),
+            $this->injector->get('taskd.downloadPagesMessageFactory'),
         );
     }
 

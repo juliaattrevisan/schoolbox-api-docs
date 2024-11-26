@@ -46,9 +46,11 @@ use Schoolbox\Mapper\Exception\Deleted;
 use Schoolbox\Mapper\Exception\NotFound;
 use Schoolbox\TaskDaemon\Producer;
 use Schoolbox\TaskDaemon\Request\HttpRequest\MessageFactory;
+use Schoolbox\TaskDaemon\Request\DownloadPages\MessageFactory as DownloadPagesMessageFactory;
 use Schoolbox\TokenReplacer;
 use Schoolbox\Url\Factory;
 use Schoolbox\User;
+use Schoolbox\User\Translator\Author\ModelToArray;
 use Schoolbox\UserMapper;
 use Twig\Error\Error;
 
@@ -199,6 +201,7 @@ class Controller extends Base
      * @param Psr17Factory $httpFactory for creating HTTP requests
      * @param MessageFactory $messageFactory for creating messages to send to taskd
      * @param Producer $messageProducer for sending messages to taskd
+     * @param DownloadPagesMessageFactory $downloadMessageFactory for creating download page messages to send to taskd
      * @throws \DomainException
      */
     public function __construct(
@@ -218,6 +221,7 @@ class Controller extends Base
         private Psr17Factory $httpFactory,
         private MessageFactory $messageFactory,
         private Producer $messageProducer,
+        private DownloadPagesMessageFactory $downloadMessageFactory,
     ) {
         /* Probably inject this one day, but for now,
          * I want to avoid dumping Yet Another Thing into the kernel
@@ -2303,5 +2307,64 @@ class Controller extends Base
     public function getExportAttempts(QuizDomainObject $assessment): void
     {
         (new Processor($this->api, $this->quizFetcher, $this->attemptMapper))->export($assessment);
+    }
+
+    /**
+     * Hook to getExportAttempts route via taskd, so it backgrounds the job
+     *
+     * @param QuizDomainObject $assessment
+     * @return void
+     * @throws Error
+     */
+    public function getExportDownload(QuizDomainObject $assessment): void
+    {
+        $urlBase = (new \Schoolbox\Url\Factory($this->getConfigLoader()))->buildFullyQualified();
+
+        $filename = sprintf(
+            'exported_responses_%s.csv',
+            $assessment->getId()
+        );
+
+        $userSerializer = new ModelToArray();
+
+        $messageFactory = $this->downloadMessageFactory;
+        $messageFactory = $messageFactory->addFileContent(
+            $filename,
+            (string)$urlBase
+                ->withPath($this->getRouteIfAuthorized('learnosity.getExportAttempts', ['assessmentId' => $assessment->getId()]))
+        );
+
+        /* This $message instance is the payload that we send to taskd
+         * which it then unpacks, configures its Gotenberg client, and uses
+         * to generate the pdfs. This is the bridge between the systems
+         */
+        $message = $messageFactory
+            ->setUser($this->getUser())
+            ->setCallbackUrl(
+                (string)$urlBase
+                    ->withPath(
+                        $this->routeGenerator->generate(
+                            'apiusernotify.apiUserNotify',
+                            ['userId' => $this->getUser()->getId()]
+                        )
+                    )
+            )
+            ->setCallbackParams([
+                'message' => sprintf(
+                    'Attempts export for "%s" is ready to download',
+                    $assessment->getTitle(),
+                ),
+                'from'    => call_user_func($userSerializer, $this->getUser()),
+                'to'      => call_user_func($userSerializer, $this->getUser()),
+            ])
+            ->setOutfile(sprintf(
+                'exported_responses_%s.zip',
+                $assessment->getId()
+            ))
+            ->build();
+
+        /* Send it to task for async processing
+         */
+        $this->messageProducer->send($message);
     }
 }
