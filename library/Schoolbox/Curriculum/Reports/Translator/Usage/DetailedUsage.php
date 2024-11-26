@@ -5,7 +5,6 @@ namespace Schoolbox\Curriculum\Reports\Translator\Usage;
 use Alaress\Authorizer\Authorizer;
 use Alaress\Authorizer\GetRouteIfAuthorized;
 use Aura\Router\Generator;
-use Schoolbox\Collection;
 use Schoolbox\Curriculum\Reports\Cursor;
 use Schoolbox\User;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as CourseUnitModel;
@@ -18,11 +17,9 @@ class DetailedUsage
         protected Generator $routeGenerator,
         protected Authorizer $authorizer,
         protected User $currentUser,
+        private array $models,
         private RubricUsage $rubricUsageTranslator,
-        private Collection $activities,
-        private Collection $lessonPlans,
-        private array $capabilities,
-        private Collection $inUseRubrics,
+        private InUseRubricUsage $inUseRubricTranslator,
     ) {
     }
 
@@ -35,7 +32,7 @@ class DetailedUsage
     {
         $rubric = [];
 
-        $rubricCourseCapabilities = $this->capabilities['course']->map(
+        $rubricCourseCapabilities = $this->models[Cursor::COURSE_RUBRIC_CAPABILITY]->map(
             function ($cap) use ($usage) {
                 return call_user_func(
                     $this->rubricUsageTranslator,
@@ -57,7 +54,7 @@ class DetailedUsage
             ];
         }
 
-        $rubricUnitCapabilities = $this->capabilities['unit']->map(
+        $rubricUnitCapabilities = $this->models[Cursor::COURSE_UNIT_RUBRIC_CAPABILITY]->map(
             function ($cap) use ($usage) {
                 return call_user_func(
                     $this->rubricUsageTranslator,
@@ -85,11 +82,11 @@ class DetailedUsage
                 $unit->getFolder()->getId() == $usage['unit']['folderId'],
         ];
 
-        if ($this->activities->count() > 0) {
-            $translation['activity'] = $this->activities->map(
+        if ($this->models[Cursor::COURSE_ACTIVITY]->count() > 0) {
+            $translation[Cursor::COURSE_ACTIVITY] = $this->models[Cursor::COURSE_ACTIVITY]->map(
                 fn($activity) => [
                     'name'   => $activity->getTitle(),
-                    'icon'   => $usage['activity'][$activity->getId()]['icon'],
+                    'icon'   => $usage[Cursor::COURSE_ACTIVITY][$activity->getId()]['icon'],
                     '_links' => [
                         'view' => $this->getRouteIfAuthorized(
                             'learningAssessment.getAssessment',
@@ -100,8 +97,8 @@ class DetailedUsage
             );
         }
 
-        if ($this->lessonPlans->count() > 0) {
-            $translation['lessonPlan'] = $this->lessonPlans->map(
+        if ($this->models[Cursor::COURSE_ACTIVITY_LESSON_PLAN]->count() > 0) {
+            $translation['lessonPlan'] = $this->models[Cursor::COURSE_ACTIVITY_LESSON_PLAN]->map(
                 fn($lessaonPlan) => [
                     'name'   => $lessaonPlan->getTitle(),
                     '_links' => [
@@ -118,33 +115,15 @@ class DetailedUsage
             $translation['rubric'] = $rubric;
         }
 
-        if ($this->inUseRubrics->count() > 0) {
-            $translation['inUseRubrics'] = $this->inUseRubrics->map(
-                fn($assessment) => [
-                    'name' => $assessment->getTitle(),
-                    'icon' => Cursor::ACTIVITY_ICON_LIST[Cursor::COURSE_ACTIVITY_DUE_WORK],
-                    'rubric' => [
-                        'capabilities' => array_map(
-                            fn($cap) => [
-                                'name'       => $cap['name'],
-                                'indicators' => $cap['indicators'] ?? [],
-                            ],
-                            array_values($usage[Cursor::COURSE_IN_USE_RUBRIC][$assessment->getId()])
-                        ),
-                        '_links' => [
-                            'view' => $this->getRouteIfAuthorized(
-                                'rubricManager.getForm',
-                                ['folderId' => $assessment->getContextUnitSpecification()->getFolder()->getId()],
-                            )
-                        ]
-                    ],
-                    '_links' => [
-                        'view' => $this->getRouteIfAuthorized(
-                            'learningAssessment.getAssessment',
-                            ['assessmentId' => $assessment->getId()],
-                        )
-                    ]
-                ]
+        if ($this->models[Cursor::COURSE_IN_USE_RUBRIC]->count() > 0) {
+            $translation['inUseRubrics'] = $this->models[Cursor::COURSE_IN_USE_RUBRIC]->map(
+                function ($assessment) use ($usage) {
+                    return call_user_func(
+                        $this->inUseRubricTranslator,
+                        $assessment,
+                        $usage
+                    );
+                }
             );
         }
 
