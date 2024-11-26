@@ -78,18 +78,6 @@ class Component_Config_CalendarFilter extends Component_Config_Abstract
         $page->setBlock($keyblock, 'calendarfilter_eventtype', 'calendarfilter_eventtype_block');
         $page->setVar('calendarfilter_eventtype_block', '');
 
-        $page->setVar(
-            'COMPONENT_CONFIG_CALENDARSUBSCRIBE_LINK',
-            (
-                // The permission checks here determine whether the link below is shown, and so must match the
-                // permission checks on the linked-to page.  See www/adminv2/calendar.php.
-                !$di->get('user')->isSuperuser() &&
-                !$di->get('user')->hasServicePermission(UserAccess::SERVICE_CALENDAR, UserAccess::ACCESS_FULL)
-            )
-            ? ''
-            : '<a href="/adminv2/calendar/Subscribe">Manage calendar subscriptions</a>'
-        );
-
         foreach ($eventTypes as $eventType) {
             $page->setVar([
                 'COMPONENT_CONFIG_CALENDARFILTER_VALUE'    => $eventType->getId(),
@@ -98,6 +86,19 @@ class Component_Config_CalendarFilter extends Component_Config_Abstract
             ]);
 
             $page->parse('calendarfilter_eventtype_block', 'calendarfilter_eventtype', true);
+        }
+
+        $page->setBlock($keyblock, 'calendarfilter_subscribe_link', 'calendarfilter_subscribe_link_block');
+
+        if (
+            // The permission checks here determine whether the link below is shown, and so must match the
+            // permission checks on the linked-to page.  See www/adminv2/calendar.php.
+            !$di->get('user')->isSuperuser() &&
+            !$di->get('user')->hasServicePermission(UserAccess::SERVICE_CALENDAR, UserAccess::ACCESS_FULL)
+        ) {
+            $page->setVar('calendarfilter_subscribe_link_block');
+        } else {
+            $page->parse('calendarfilter_subscribe_link_block', 'calendarfilter_subscribe_link');
         }
 
         $page->setBlock($keyblock, 'calendarfilter_source', 'calendarfilter_source_block');
