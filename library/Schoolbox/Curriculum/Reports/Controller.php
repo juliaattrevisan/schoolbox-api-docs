@@ -21,7 +21,6 @@ use Schoolbox\Curriculum\Reports\Translator\Usage\InUseRubricUsage;
 use Schoolbox\Curriculum\Reports\Translator\Usage\RubricUsage;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Mapper as CourseUnitSpecificationMapper;
 use Schoolbox\Learning\Course\DataModel\Specification\Mapper as CourseSpecificationMapper;
-use Schoolbox\Assessment\Rubric\DataModel\Indicator\Mapper as RubricIndicatorMapper;
 use Schoolbox\Learning\Assessment\DataModel\Mapper as AssessmentMapper;
 use Schoolbox\Assessment\Rubric\DataModel\Capability\Mapper as RubricCapabilityMapper;
 use Schoolbox\Resource\Folder\Translator\ModelToArray\LinkOnly as FolderTranslator;
@@ -39,15 +38,12 @@ class Controller extends Base
      * @param CurriculumMapper              $curriculumMapper
      * @param CourseSpecificationMapper     $courseSpecificationMapper
      * @param CourseUnitSpecificationMapper $courseUnitSpecificationMapper
-     * @param RubricCapabilityMapper        $rubricCapabilityMapper
      * @param Helper                        $helper
      */
     public function __construct(
         private CurriculumMapper $curriculumMapper,
         private CourseSpecificationMapper $courseSpecificationMapper,
         private CourseUnitSpecificationMapper $courseUnitSpecificationMapper,
-        private RubricCapabilityMapper $rubricCapabilityMapper,
-        private AssessmentMapper $assessmentMapper,
         private Helper $helper,
     ) {
     }
@@ -61,8 +57,6 @@ class Controller extends Base
      */
     public function getCoverage(): void
     {
-        $response = [];
-
         $query = $this->requestQuery;
         $courseId = $query->get('courseId');
         $nodeId = $query->get('nodeId');
@@ -104,6 +98,11 @@ class Controller extends Base
     }
 
 
+    /**
+     * Return the counts for the curriculum coverage
+     *
+     * @return void
+     */
     public function generateCoverage(): void
     {
         $query = $this->requestQuery;

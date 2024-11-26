@@ -326,6 +326,12 @@ class Helper
         return $usage;
     }
 
+    /**
+     * Finding models for the results
+     *
+     * @param array $usage
+     * @return array
+     */
     public function findModelsForResults(array $usage): array
     {
         $result = [];

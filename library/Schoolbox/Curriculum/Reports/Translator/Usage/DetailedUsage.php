@@ -5,7 +5,6 @@ namespace Schoolbox\Curriculum\Reports\Translator\Usage;
 use Alaress\Authorizer\Authorizer;
 use Alaress\Authorizer\GetRouteIfAuthorized;
 use Aura\Router\Generator;
-use Schoolbox\Collection;
 use Schoolbox\Curriculum\Reports\Cursor;
 use Schoolbox\User;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as CourseUnitModel;
