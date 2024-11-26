@@ -222,6 +222,7 @@ function onButtonSelected(): void {
                 v-if="isActive || (props.defaultResults && props.defaultResults.length > 0)"
                 :query="query"
                 :is-active="isActive"
+                :has-pressed-escape="hasPressedEscape"
                 :is-searching="isSearching"
                 :allow-partial-matches="props.allowPartialMatches"
                 :is-single-select="props.isSingleSelect"
