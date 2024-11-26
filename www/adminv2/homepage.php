@@ -1,11 +1,9 @@
 <?php
 
 /**
- *
  * @author      Alex Tworowsky <alex.tworowsky@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
- *
  */
 
 /** @var SitePage $this */
@@ -16,7 +14,7 @@ use Schoolbox\Permission\Access\UserAccess;
 
 if (
     !$_SESSION['user']->isSuperuser() &&
-    !$_SESSION['user']->hasServicePermission(UserAccess::SERVICE_DESIGN, UserAccess::ACCESS_FULL)
+    !$_SESSION['user']->hasServicePermission(UserAccess::SERVICE_CMS, UserAccess::ACCESS_FULL)
 ) {
     throw ErrorMapper::getInstance()->generateException(ErrorMapper::ERROR_PERM_PAGE_VIEW);
 }

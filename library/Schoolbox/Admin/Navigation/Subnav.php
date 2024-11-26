@@ -248,11 +248,6 @@ class Subnav
                         'visible'     => true,
                         'description' => 'Configure the layout of the initial landing page when you first login for each role.',
                     ],
-                    '/adminv2/homepage' => [
-                        'name'        => 'Homepage Templates',
-                        'visible'     => true,
-                        'description' => 'Configure and setup the scaffolding templates that users can create homepages from.',
-                    ],
                     '/adminv2/profile-editor' => [
                         'name'        => 'Profile Editor',
                         'visible'     => true,
@@ -719,6 +714,11 @@ class Subnav
                         'name'        => 'Components List',
                         'visible'     => true,
                         'description' => 'Control which components can be used on homepages, dashboards and ePortfolios.',
+                    ],
+                    '/adminv2/homepage' => [
+                        'name'        => 'Homepage Templates',
+                        'visible'     => true,
+                        'description' => 'Configure and setup the scaffolding templates that users can create homepages from.',
                     ],
                     '/adminv2/video' => [
                         'name'        => 'Media Queue',
