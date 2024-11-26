@@ -15,7 +15,6 @@ use Alaress\Module\Module as BaseModule;
 use Alaress\Twig\Loader\IChainLoader;
 use Alaress\Web\Controller\Base;
 use Schoolbox\Application\Exception\NotFound;
-use Schoolbox\Permission\Access\UserAccess;
 
 class Module extends BaseModule
 {
@@ -34,10 +33,7 @@ class Module extends BaseModule
     {
         $perms = new Rule\All(
             new Rule\IsLoggedIn(),
-            new Rule\Any(
-                new Rule\IsSuperuser(),
-                new Rule\HasServicePermission(UserAccess::SERVICE_DESIGN, UserAccess::ACCESS_FULL)
-            )
+            new Rule\IsSuperuser(),
         );
 
         $preloadRoleType = function ($params) {

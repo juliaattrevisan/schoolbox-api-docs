@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Schoolbox\Admin\Profile\Button;
 
-use Alaress\Authorizer\Authorizer;
 use Alaress\Module\Module as BaseModule;
 use Alaress\Authorizer\Rule;
 use Alaress\Web\Controller\Base;
@@ -13,7 +12,6 @@ use Schoolbox\Admin\Profile\Editor\Payload;
 use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Menu\Icon\Mapper as IconMapper;
-use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Profile\Button\Mapper as ProfileButtonMapper;
 use Schoolbox\Profile\Button\Campus;
 use Schoolbox\Profile\Button\Role;
@@ -38,10 +36,7 @@ class Module extends BaseModule
     {
         $perms = new Rule\All(
             new Rule\IsLoggedIn(),
-            new Rule\Any(
-                new Rule\IsSuperuser(),
-                new Rule\HasServicePermission(UserAccess::SERVICE_DESIGN, UserAccess::ACCESS_FULL)
-            )
+            new Rule\IsSuperuser(),
         );
 
         $preloadRoleType = function ($params) {
