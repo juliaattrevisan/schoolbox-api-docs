@@ -274,18 +274,6 @@ class External_Synergetic_User implements External_UserInterface
             return [];
         }
 
-        if ($this->config->get('external_learning_plans')) {
-            $learningPlanQuery = "(
-                            SELECT    COUNT(*)
-                            FROM      dbo.IndividualPlans IEP
-                            WHERE     IEP.ID = vStudentsAll.ID AND
-                            StartDate <= CURRENT_TIMESTAMP AND
-                            (EndDate >= CURRENT_TIMESTAMP OR EndDate IS NULL)
-                        ) AS countIndividualEducationPlans";
-        } else {
-            $learningPlanQuery = "0 AS countIndividualEducationPlans";
-        }
-
         /* Using this query may return multiple rows for a user.
          * That's because one row is slightly different than other rows, such as by its Alert Messages
          * or other parts of the join. Whatever result set we obtain, we collate all the data here
@@ -335,7 +323,13 @@ class External_Synergetic_User implements External_UserInterface
                         vStudentsAll.StudentIBFlag,
                         vStudentsAll.IndigenousFlag,
                         vStudentsAll.StudentTSIFlag,
-                        $learningPlanQuery
+                        (
+                            SELECT    COUNT(*)
+                            FROM      dbo.IndividualPlans IEP
+                            WHERE     IEP.ID = vStudentsAll.ID AND
+                            StartDate <= CURRENT_TIMESTAMP AND
+                            (EndDate >= CURRENT_TIMESTAMP OR EndDate IS NULL)
+                        ) AS countIndividualEducationPlans
             FROM        dbo.vStudentsAll vStudentsAll
             LEFT JOIN   CommunityAlerts ON
                             CommunityAlerts.ID = StudentID AND
