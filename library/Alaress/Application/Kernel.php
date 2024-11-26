@@ -252,7 +252,7 @@ abstract class Kernel
         $this->registerShutdownHandling();
         Tracer::getDefaultTrace()->runWithinSpan(
             fn () => static::installDependencies($this->di),
-           'kernel:' . get_class($this),
+            'kernel:' . get_class($this),
             operation: 'app.bootstrap.di',
         );
         static::installDependencies($this->di);
