@@ -135,11 +135,17 @@ class Tracer
     ): TransactionContext {
         // Continue trace from headers or vars if present:
         // otherwise create a new trace
+        $transactionContext = null;
         if (isset($this->serverVars['HTTP_SENTRY_TRACE'], $this->serverVars['HTTP_BAGGAGE'])) {
             $transactionContext = continueTrace($this->serverVars['HTTP_SENTRY_TRACE'], $this->serverVars['HTTP_BAGGAGE']);
         } else {
-            $transactionContext = new TransactionContext();
+            $envSentryTrace = getenv('SENTRY_TRACE', true);
+            $envBaggage     = getenv('BAGGAGE', true);
+            if ($envSentryTrace && $envBaggage) {
+                $transactionContext = continueTrace($envSentryTrace, $envBaggage);
+            }
         }
+        $transactionContext ??= new TransactionContext();
         $transactionContext->setName($name);
         $transactionContext->setOp($operation);
         $transactionContext->setOrigin($origin);
