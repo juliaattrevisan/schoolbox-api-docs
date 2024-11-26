@@ -569,11 +569,23 @@ class BulkUpdater
         }
 
         if ($this->clearGroups === 1) {
-            $clearGroupsBindings = Builder::getBindings($this->userIds, 'cg');
-            $statements['groups']['delete']['statement'] = $this->userBulkMapper->getDatabase()->prepare(
-                "DELETE FROM userAccess WHERE service = :service AND uid IN ({$clearGroupsBindings->getPlaceholder()})"
+            /* find out which users are actually in groups
+             */
+            $toDelete        = $this->userBulkMapper->getDatabase()->query(
+                "SELECT uid FROM userAccess WHERE service = :service AND uid IN ({$bindings->getPlaceholder()})",
+                array_merge(['service' => UserAccess::SERVICE_HOMEPAGE], $bindings->getParams())
             );
-            $statements['groups']['delete']['params']    = array_merge(['service' => UserAccess::SERVICE_HOMEPAGE], $clearGroupsBindings->getParams());
+            $deletingUserIds = $toDelete->fetchAll(\PDO::FETCH_COLUMN);
+
+            /* for the users who are members of groups, clear their memberships
+             */
+            if ($deletingUserIds) {
+                $clearGroupsBindings = Builder::getBindings($deletingUserIds, 'cg');
+                $statements['groups']['delete']['statement'] = $this->userBulkMapper->getDatabase()->prepare(
+                    "DELETE FROM userAccess WHERE service = :service AND uid IN ({$clearGroupsBindings->getPlaceholder()})"
+                );
+                $statements['groups']['delete']['params']    = array_merge(['service' => UserAccess::SERVICE_HOMEPAGE], $clearGroupsBindings->getParams());
+            }
         }
 
         return $statements;
