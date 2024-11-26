@@ -383,7 +383,7 @@ class Subnav
                         'description' => 'Configure the default and available filter options on the class markbook.',
                     ],
                     '/adminv2/course-builder' => [
-                        'name'        => 'Course Builder',
+                        'name'        => 'Course Framework',
                         'visible'     => (bool)$this->configLoader->get(ConfigMapper::NAME_LMS_ENABLED),
                         'description' => 'Configure the default page templates and permissions for course and unit pages.',
                     ],
