@@ -150,7 +150,7 @@ Admin,"Go to profile editor",Superuser,https://vagrant.dev.schoolbox.cloud/admin
 Admin,"Go to profile editor","Badges Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/profile-editor,401
 Admin,"Go to profile editor","CMS Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/profile-editor,401
 Admin,"Go to profile editor","Calendar Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/profile-editor,401
-Admin,"Go to profile editor","Design Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/profile-editor,200
+Admin,"Go to profile editor","Design Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/profile-editor,401
 Admin,"Go to profile editor","LMS Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/profile-editor,401
 Admin,"Go to profile editor","News Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/profile-editor,401
 Admin,"Go to profile editor","Pastoral Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/profile-editor,401
