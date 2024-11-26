@@ -343,7 +343,7 @@ class Controller extends Base
     public function exportCoverage(): void
     {
         $filename = sprintf(
-            "test.csv",
+            "curriculum-coverage-report.csv",
         );
 
         $fp = fopen('php://temp', 'w');
