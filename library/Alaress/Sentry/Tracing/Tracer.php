@@ -50,9 +50,21 @@ class Tracer
      * A set of stack changes, updated with `startSpan`, `finishSpan` and
      * `addBreadcrumb`.
      *
+     * This set of changes is able to be flushed at any point.
+     *
      * @var array<Operation\IOperation>
      */
     private array $stackChanges = [];
+
+    /**
+     * The set of spans within the current transaction.
+     *
+     * Unlike `$this->stackChanges`, this is not flushed: it must persist
+     * between flushes.
+     *
+     * @var array<Span>
+     */
+    private array $spanStack = [];
 
     /**
      * Any server vars to associate with the trace: these will be added
@@ -61,15 +73,6 @@ class Tracer
      * @var array
      */
     private array $serverVars = [];
-
-    /**
-     * Upon starting a transaction: should a span be automatically started which
-     * encompasses the entire transaction?
-     *
-     * (If a transaction is created without any spans, it shows in Sentry as a
-     *  transaction without any time span.)
-     */
-    private bool $autostartSpan = true;
 
     /**
      * Build and return the default trace object.
@@ -120,10 +123,6 @@ class Tracer
      * @param array                  $data           Additional data to add to the transaction: see
      *                                               https://develop.sentry.dev/sdk/telemetry/traces/span-data-conventions/
      *                                               for standard examples.
-     * @param bool                   $autostartSpan  If true: auto-start a root span with matching details for this
-     *                                               transaction, with matching details.
-     *                                               This prevents the transaction from closing when a manually created
-     *                                               span is closed.
      * @return TransactionContext
      */
     public function startTransaction(
@@ -133,10 +132,8 @@ class Tracer
         ?TransactionSource $source = null,
         ?float $startTimestamp = null,
         array $data = [],
-        bool $autostartSpan = true,
     ): TransactionContext {
-        $this->autostartSpan = $autostartSpan;
-        $transactionContext  = new TransactionContext();
+        $transactionContext = new TransactionContext();
         $transactionContext->setName($name);
         $transactionContext->setOp($operation);
         $transactionContext->setOrigin($origin);
@@ -148,6 +145,7 @@ class Tracer
 
         // Clear the current transaction state, before setting a new one.
         $this->stackChanges       = [];
+        $this->spanStack          = [];
         $this->transactionContext = $transactionContext;
         return $transactionContext;
     }
@@ -457,17 +455,16 @@ class Tracer
                     return;
                 }
 
-                // Autostart a span, if requested
-                if ($this->autostartSpan) {
-                    $spanContext = new SpanContext();
-                    $spanContext->setDescription($transaction->getName());
-                    $spanContext->setOp($transaction->getOp());
-                    $spanContext->setOrigin($transaction->getOrigin());
-                    $spanContext->setStartTimestamp($transaction->getStartTimestamp());
-                    $span = $transaction->startChild($spanContext);
-                    $hub->setSpan($span);
-                    $spanStack[] = $span;
-                }
+                // Autostart a span:
+                // close it only upon finishing the transaction
+                $spanContext = new SpanContext();
+                $spanContext->setDescription($transaction->getName());
+                $spanContext->setOp($transaction->getOp());
+                $spanContext->setOrigin($transaction->getOrigin());
+                $spanContext->setStartTimestamp($transaction->getStartTimestamp());
+                $span = $transaction->startChild($spanContext);
+                $hub->setSpan($span);
+                $this->spanStack[] = $span;
             }
 
             // Apply each change to the actual transaction stack.
@@ -479,8 +476,8 @@ class Tracer
             if ($finish) {
                 // End any leftover spans (including the autostarted span, if there)
                 $endTimestamp ??= microtime(true);
-                while (!empty($spanStack)) {
-                    $leftoverSpan = array_pop($spanStack);
+                while (!empty($this->spanStack)) {
+                    $leftoverSpan = array_pop($this->spanStack);
                     $leftoverSpan->finish($endTimestamp);
                 }
 
