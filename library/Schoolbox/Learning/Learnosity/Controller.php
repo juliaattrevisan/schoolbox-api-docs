@@ -183,6 +183,69 @@ class Controller extends Base
 
 
     /**
+     * Controller constructor.
+     *
+     * @param Factory $urlFactory
+     * @param BreadcrumbFactory $bakery
+     * @param string $learnosityVersion
+     * @param string $learnosityConsumerKey
+     * @param string $learnosityConsumerSecret
+     * @param ErrorMapper $errorMapper
+     * @param AssessmentMapperProxy $assessmentDataSource
+     * @param Mapper $resultCacheMapper
+     * @param \Schoolbox\Learning\Quiz\Mapper $quizMapper
+     * @param \Schoolbox\Learning\Quiz\Attempt\Mapper $attemptMapper
+     * @param Feedback\Mapper $feedbackMapper
+     * @param UserMapper $userMapper
+     * @param StateMapper $stateMapper
+     * @param Psr17Factory $httpFactory for creating HTTP requests
+     * @param MessageFactory $messageFactory for creating messages to send to taskd
+     * @param Producer $messageProducer for sending messages to taskd
+     * @param DownloadPagesMessageFactory $downloadMessageFactory for creating download page messages to send to taskd
+     * @throws \DomainException
+     */
+    public function __construct(
+        \Schoolbox\Url\Factory $urlFactory,
+        protected BreadcrumbFactory $bakery,
+        private string $learnosityVersion,
+        #[\SensitiveParameter] private string $learnosityConsumerKey,
+        #[\SensitiveParameter] private string $learnosityConsumerSecret,
+        private \Schoolbox\Error\Mapper $errorMapper,
+        private AssessmentMapperProxy $assessmentDataSource,
+        private \Schoolbox\Learning\Assessment\Project\ResultCache\Mapper $resultCacheMapper,
+        private \Schoolbox\Learning\Quiz\Mapper $quizMapper,
+        private \Schoolbox\Learning\Quiz\Attempt\Mapper $attemptMapper,
+        private \Schoolbox\Learning\Learnosity\Feedback\Mapper $feedbackMapper,
+        private \Schoolbox\UserMapper $userMapper,
+        private StateMapper $stateMapper,
+        private Psr17Factory $httpFactory,
+        private MessageFactory $messageFactory,
+        private Producer $messageProducer,
+        private DownloadPagesMessageFactory $downloadMessageFactory,
+    ) {
+        /* Probably inject this one day, but for now,
+         * I want to avoid dumping Yet Another Thing into the kernel
+         * I don't have a convenient means to access SERVER_NAME except like this, sadly
+         */
+        $this->logger = new Logger(STDOUT, STDOUT, \Monolog\Logger::DEBUG, [], true, 'learnosity');
+
+        $this->api = new Api(
+            $urlFactory->buildFullyQualified()->getHost(),
+            $this->learnosityVersion,
+            $this->learnosityConsumerKey,
+            $this->learnosityConsumerSecret,
+            $this->logger
+        );
+
+        $this->helper = new Helper($this->api, $this->logger);
+
+        /* A convenient thing to have lying around
+         */
+        $this->quizFetcher = new QuizFetcher($this->quizMapper);
+    }
+
+
+    /**
      * Edit the contents of $assessment using the Learnosity system
      *
      * @param QuizDomainObject $assessment
@@ -600,69 +663,6 @@ class Controller extends Base
                 'learnositySessionReference' => $attempt->getLearnosityReference()
             ]),
         ], "Attempt {$assessment->getTitle()}");
-    }
-
-
-    /**
-     * Controller constructor.
-     *
-     * @param Factory $urlFactory
-     * @param BreadcrumbFactory $bakery
-     * @param string $learnosityVersion
-     * @param string $learnosityConsumerKey
-     * @param string $learnosityConsumerSecret
-     * @param ErrorMapper $errorMapper
-     * @param AssessmentMapperProxy $assessmentDataSource
-     * @param Mapper $resultCacheMapper
-     * @param \Schoolbox\Learning\Quiz\Mapper $quizMapper
-     * @param \Schoolbox\Learning\Quiz\Attempt\Mapper $attemptMapper
-     * @param Feedback\Mapper $feedbackMapper
-     * @param UserMapper $userMapper
-     * @param StateMapper $stateMapper
-     * @param Psr17Factory $httpFactory for creating HTTP requests
-     * @param MessageFactory $messageFactory for creating messages to send to taskd
-     * @param Producer $messageProducer for sending messages to taskd
-     * @param DownloadPagesMessageFactory $downloadMessageFactory for creating download page messages to send to taskd
-     * @throws \DomainException
-     */
-    public function __construct(
-        \Schoolbox\Url\Factory $urlFactory,
-        protected BreadcrumbFactory $bakery,
-        private string $learnosityVersion,
-        #[\SensitiveParameter] private string $learnosityConsumerKey,
-        #[\SensitiveParameter] private string $learnosityConsumerSecret,
-        private \Schoolbox\Error\Mapper $errorMapper,
-        private AssessmentMapperProxy $assessmentDataSource,
-        private \Schoolbox\Learning\Assessment\Project\ResultCache\Mapper $resultCacheMapper,
-        private \Schoolbox\Learning\Quiz\Mapper $quizMapper,
-        private \Schoolbox\Learning\Quiz\Attempt\Mapper $attemptMapper,
-        private \Schoolbox\Learning\Learnosity\Feedback\Mapper $feedbackMapper,
-        private \Schoolbox\UserMapper $userMapper,
-        private StateMapper $stateMapper,
-        private Psr17Factory $httpFactory,
-        private MessageFactory $messageFactory,
-        private Producer $messageProducer,
-        private DownloadPagesMessageFactory $downloadMessageFactory,
-    ) {
-        /* Probably inject this one day, but for now,
-         * I want to avoid dumping Yet Another Thing into the kernel
-         * I don't have a convenient means to access SERVER_NAME except like this, sadly
-         */
-        $this->logger = new Logger(STDOUT, STDOUT, \Monolog\Logger::DEBUG, [], true, 'learnosity');
-
-        $this->api = new Api(
-            $urlFactory->buildFullyQualified()->getHost(),
-            $this->learnosityVersion,
-            $this->learnosityConsumerKey,
-            $this->learnosityConsumerSecret,
-            $this->logger
-        );
-
-        $this->helper = new Helper($this->api, $this->logger);
-
-        /* A convenient thing to have lying around
-         */
-        $this->quizFetcher = new QuizFetcher($this->quizMapper);
     }
 
 
