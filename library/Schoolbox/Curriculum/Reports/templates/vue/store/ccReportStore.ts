@@ -6,7 +6,7 @@ import { defineStore } from "pinia";
 import type { Course } from "@schoolboxLibrary/types/Course";
 import { usePrintDialog } from "@schoolboxVue/composables/print/usePrintDialog";
 import { isAbortError } from "@js/util/errorUtils";
-import type { CurriculumCoverageNode } from "../../js/types/curriculumCoverageTypes";
+import type { CourseWithCurriculumNodeUsage, CurriculumCoverageNode } from "../../js/types/curriculumCoverageTypes";
 import { useQueryStore } from "./ccQueryStore";
 import { useInputStore } from "./ccInputStore";
 
@@ -70,15 +70,26 @@ export const useReportStore = defineStore("ccReport", () => {
     });
 
     /**
+     * To add the children to the nodes
+     * @param existingNode - the existing node
+     * @param newNode - the new node to add
+     */
+    function addChildren(existingNode: CurriculumCoverageNode, newNode: CurriculumCoverageNode): void {
+        if (existingNode.children) {
+            existingNode.children.forEach((child, index) => {
+                child.usage.courses = [...child.usage.courses, ...newNode.children![index].usage.courses];
+                addChildren(child, newNode.children![index]);
+            });
+        }
+    }
+
+    /**
      * search for nodes that match
      * @param url - the url to search
+     * @param currentIndex - the current index
      */
-    async function getCourse(url: string): Promise<void> {
+    async function getCourse(url: string, currentIndex: number): Promise<void> {
         try {
-            isFetching.value = true;
-            isLoading.value = true;
-            hasLoadError.value = false;
-            controller = new AbortController();
             const response = await fetch(url, {
                 method: "GET",
                 signal: controller.signal,
@@ -95,7 +106,6 @@ export const useReportStore = defineStore("ccReport", () => {
                 };
                 return;
             }
-            isFetching.value = false;
             const responseJson = (await response.json()) as CurriculumCoveragePayload | ReportError;
             if (typeof responseJson !== "object" || responseJson === null) {
                 hasLoadError.value = true;
@@ -107,9 +117,19 @@ export const useReportStore = defineStore("ccReport", () => {
                 return;
             }
             if ("data" in responseJson) {
-                // courses.value = responseJson.data.courses;
-                // nodes.value = responseJson.data.nodes;
-                // hasReport.value = true;
+                if (currentIndex === 0) {
+                    courses.value = responseJson.data.courses;
+                    nodes.value = responseJson.data.nodes;
+                } else {
+                    courses.value = [...courses.value, ...responseJson.data.courses];
+                    // need to run through nodes and add the new course within usage.courses
+                    // then if the node has children, we need to do the same for the children within
+                    const newCourseNodes = responseJson.data.nodes;
+                    nodes.value.forEach((node, index) => {
+                        node.usage.courses = [...node.usage.courses, ...newCourseNodes[index].usage.courses];
+                        addChildren(node, newCourseNodes[index]);
+                    });
+                }
                 console.warn(responseJson.data.courses);
             }
         } catch (error) {
@@ -129,6 +149,10 @@ export const useReportStore = defineStore("ccReport", () => {
         useInputStore().setActive();
         useQueryStore().setQueryParams();
         hasNotReported.value = false;
+        // isFetching.value = true;
+        isLoading.value = true;
+        hasLoadError.value = false;
+        controller = new AbortController();
         // abort the previous search if it's still running
         if (isFetching.value) {
             controller.abort();
@@ -136,14 +160,18 @@ export const useReportStore = defineStore("ccReport", () => {
         try {
             await useQueryStore()
                 .getQueryUrls()
-                .reduce(async (previousPromise, url) => {
+                .reduce(async (previousPromise, url, currentIndex) => {
                     await previousPromise;
-                    await getCourse(url);
+                    if (!hasLoadError.value) {
+                        await getCourse(url, currentIndex);
+                    }
                 }, Promise.resolve());
+            hasReport.value = true;
         } catch (error) {
             console.error(error);
             hasLoadError.value = true;
         } finally {
+            // isFetching.value = true;
             isLoading.value = false;
         }
     }

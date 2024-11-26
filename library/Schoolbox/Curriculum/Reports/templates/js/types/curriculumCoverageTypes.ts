@@ -64,7 +64,7 @@ export type ReportOption = {
  */
 export type CurriculumCoverageNode = Pick<Node, "id" | "name" | "code"> & {
     children: CurriculumCoverageNode[] | null;
-    usage?: {
+    usage: {
         courses: CourseWithCurriculumNodeUsage[];
     };
 };
