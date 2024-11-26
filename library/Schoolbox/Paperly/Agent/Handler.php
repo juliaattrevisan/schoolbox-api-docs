@@ -459,7 +459,7 @@ class Handler
                 "MedicalConditionTypeDescription"     => $row["MedicalConditionTypeDescription"],
                 "MedicalConditionSeverityCode"        => $row["SeverityCode"],
                 "MedicalConditionSeverityDescription" => $row["SeverityDescription"],
-                "MedicalConditionDetails"             => htmlentities($row["ConditionDetails"]),
+                "MedicalConditionDetails"             => htmlentities($row["ConditionDetails"] ?? ''),
                 "EmergencyTreatmentDetails"           => $row["EmergencyTreatmentDetails"],
                 "OtherTreatmentDetails"               => $row["OtherTreatmentDetails"],
             ];
