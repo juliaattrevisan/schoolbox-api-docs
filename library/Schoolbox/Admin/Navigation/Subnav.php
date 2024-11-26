@@ -354,18 +354,6 @@ class Subnav
                     ],
                 ],
             ],
-            '/adminv2/import' => [
-                'name'       => 'Import',
-                'visible'    => $userIsSuperuser,
-                'searchable' => false,
-                'children'   => [
-                    '/adminv2/import/userAccount' => [
-                        'name'        => 'User Accounts',
-                        'visible'     => true,
-                        'description' => 'Import user accounts via a CSV file.',
-                    ],
-                ],
-            ],
             '/adminv2/lms' => [
                 'name'       => 'LMS',
                 'visible'    => $userIsSuperuser || $userHasServicePermissionLms,
