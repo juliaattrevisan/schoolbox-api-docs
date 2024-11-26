@@ -12,6 +12,7 @@ export const NODES_PARAM = "nodeId"; // the incoming param to check for initial 
 export const useInputStore = defineStore(`ccInput`, () => {
     const selectedCoursesStore = useCourseSelectorStore();
     const selectedNodesStore = useSelectedNodesStore();
+    const courseIds = window.Vue.computed(() => selectedCoursesStore.selectedIds);
     const coursesValue = window.Vue.computed(() => selectedCoursesStore.selectedIds.join(","));
     const nodesValue = window.Vue.computed(() => (selectedNodesStore.nodesIds as number[]).join(","));
     const activeCoursesValue = window.Vue.ref("");
@@ -36,6 +37,7 @@ export const useInputStore = defineStore(`ccInput`, () => {
     return {
         selectedCoursesStore,
         selectedNodesStore,
+        courseIds,
         coursesValue,
         nodesValue,
         setActive,

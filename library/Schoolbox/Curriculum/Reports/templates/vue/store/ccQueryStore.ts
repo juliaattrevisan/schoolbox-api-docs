@@ -48,9 +48,25 @@ export const useQueryStore = defineStore("ccQuery", () => {
         return `${endpoint}?${newQueryParams.toString()}`;
     }
 
+    /**
+     * Returns a list of query urls split by each course in an attempt to
+     * reduce the demand on the server
+     * @returns - the query urls
+     */
+    function getQueryUrls(): string[] {
+        const inputStore = useInputStore();
+        return inputStore.courseIds.map((courseId: number) => {
+            const newQueryParams = new URLSearchParams();
+            newQueryParams.append("courseId", courseId.toString());
+            newQueryParams.append("nodeId", useInputStore().nodesValue);
+            return `${endpoint}?${newQueryParams.toString()}`;
+        });
+    }
+
     return {
         init,
         setQueryParams,
         getEndpointWithParams,
+        getQueryUrls,
     };
 });
