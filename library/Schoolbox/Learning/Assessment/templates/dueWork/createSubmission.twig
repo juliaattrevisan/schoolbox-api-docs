@@ -84,6 +84,15 @@ Data:
         };
         let $submitButton = $("[data-action-save]");
 
+       $('#saveDraftButton').click(function (e) {
+            // Trigger autosave when the button is clicked
+            autosaveAjaxSubmit();
+
+            // Redirect the user after the draft has been saved
+            setTimeout(function () {
+                window.location.href = '{{ returnUrl }}';
+            }, 1000);  // Wait for 1 seconds to allow the AJAX call to complete before redirecting
+        });
         // The autosave submit method
         let autosaveAjaxSubmit = function () {
             /* Disable actual submit button
@@ -505,6 +514,11 @@ Data:
             {% if requiresReflection %}
                 {% include '@learningDueWorkResponse/inlineGrading/selfAssessment.twig' %}
             {% endif %}
+             <input type="button"
+                id="saveDraftButton"
+                value="Save as Draft"
+                class="button expand"
+                data-test="assessment-submission-save-draft" />
 
             <input type="submit"
                    value="{% if isSubmitOnBehalfOf %}Submit on behalf of {{ student.formatName }}{% else %}Submit for assessment{% endif %}"
