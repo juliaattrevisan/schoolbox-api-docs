@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace Alaress\Sentry\Tracing;
 
 use Sentry\Breadcrumb;
+use Sentry\SentrySdk;
 use Sentry\State\HubInterface;
 use Sentry\Tracing\Span;
 use Sentry\Tracing\SpanContext;
@@ -442,6 +443,69 @@ class Tracer
     }
 
     /**
+     * Flush all stack changes into Sentry's transaction.
+     *
+     * @param bool            $finish       If true, finish the transaction:
+     *                                      if false, keep it open for future
+     *                                      stack changes.
+     * @param float|null      $endTimestamp Timestamp to end the transaction on.
+     *                                      Only relevant if `$finish` is true.
+     * @param SpanStatus|null $status       Status of the transaction.
+     *                                      Only relevant if `$finish` is true.
+     * @return void
+     */
+    private function flushTransaction(
+        bool $finish,
+        ?float $endTimestamp = null,
+        ?SpanStatus $status = null,
+    ): void {
+        if ($this->transactionContext instanceof TransactionContext) {
+            $hub = SentrySdk::getCurrentHub();
+
+            /** @var array<Span> $spanStack */
+            $spanStack   = [];
+            $transaction = $hub->getTransaction();
+            if (!$transaction) {
+                // Create a new transaction
+                $transaction = $hub->startTransaction($this->transactionContext);
+                if (!$transaction->getSampled()) {
+                    return;
+                }
+
+                // Autostart a span, if requested
+                if ($this->autostartSpan) {
+                    $spanContext = new SpanContext();
+                    $spanContext->setDescription($transaction->getName());
+                    $spanContext->setOp($transaction->getOp());
+                    $spanContext->setOrigin($transaction->getOrigin());
+                    $spanContext->setStartTimestamp($transaction->getStartTimestamp());
+                    $span = $transaction->startChild($spanContext);
+                    $hub->setSpan($span);
+                    $spanStack[] = $span;
+                }
+            }
+
+            // Apply each change to the actual transaction stack.
+            foreach ($this->stackChanges as $stackChange) {
+                $spanStack = $stackChange->operate($hub, $spanStack);
+            }
+            $this->stackChanges = [];
+
+            if ($finish) {
+                // End any leftover spans (including the autostarted span, if there)
+                $endTimestamp ??= microtime(true);
+                while (!empty($spanStack)) {
+                    $leftoverSpan = array_pop($spanStack);
+                    $leftoverSpan->finish($endTimestamp);
+                }
+
+                $transaction->setStatus($status);
+                $transaction->finish($endTimestamp);
+            }
+        }
+    }
+
+    /**
      * Finish any existing transaction, if there is one, and writes its trace to
      * the Sentry hub.
      *
@@ -461,48 +525,7 @@ class Tracer
         ?float $endTimestamp = null,
         ?SpanStatus $status = null,
     ): void {
-        // Write the transaction and its spans into the hub
-        if ($this->transactionContext instanceof TransactionContext) {
-            $hub ??= $this->hub;
-            if (!$hub) {
-                // TODO error out
-                return;
-            }
-            $transaction = $hub->startTransaction($this->transactionContext);
-            if (!$transaction->getSampled()) {
-                return;
-            }
-
-            /** @var array<Span> $spanStack */
-            $spanStack = [];
-
-            // Autostart a span, if requested
-            if ($this->autostartSpan) {
-                $spanContext = new SpanContext();
-                $spanContext->setDescription($transaction->getName());
-                $spanContext->setOp($transaction->getOp());
-                $spanContext->setOrigin($transaction->getOrigin());
-                $spanContext->setStartTimestamp($transaction->getStartTimestamp());
-                $span = $transaction->startChild($spanContext);
-                $hub->setSpan($span);
-                $spanStack[] = $span;
-            }
-
-            // Apply each change to the actual transaction stack.
-            foreach ($this->stackChanges as $stackChange) {
-                $spanStack = $stackChange->operate($hub, $spanStack);
-            }
-
-            // End any leftover spans (including the autostarted span, if there)
-            $endTimestamp ??= microtime(true);
-            while (!empty($spanStack)) {
-                $leftoverSpan = array_pop($spanStack);
-                $leftoverSpan->finish($endTimestamp);
-            }
-
-            $transaction->setStatus($status);
-            $transaction->finish($endTimestamp);
-        }
+        $this->flushTransaction(true, $endTimestamp, $status);
     }
 
     /**
@@ -514,7 +537,7 @@ class Tracer
      */
     public function getTraceparent(): string
     {
-        // commit transaction to date, then:
+        $this->flushTransaction(false);
         return getTraceparent();
     }
 
@@ -527,7 +550,7 @@ class Tracer
      */
     public function getW3CTraceparent(): string
     {
-        // commit transaction to date, then:
+        $this->flushTransaction(false);
         return getW3CTraceparent();
     }
 
@@ -540,7 +563,7 @@ class Tracer
      */
     public function getBaggage(): string
     {
-        // commit transaction to date, then:
+        $this->flushTransaction(false);
         return getBaggage();
     }
 }
