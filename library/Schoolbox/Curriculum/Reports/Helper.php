@@ -63,23 +63,25 @@ class Helper
         int $courseId,
         int $unitId
     ): array {
-        $unitUsageQuery = sprintf(
+        $statement = $db->prepareQuery(
             "
-            SELECT '%s' type, cus.course_specification_id id, f.name title, cus.folder_id
+            SELECT :type type, cus.course_specification_id id, f.name title, cus.folder_id
             FROM course_unit_specification cus
             INNER JOIN curriculum_node_for_category cnfc
                 ON cnfc.category_id = cus.folder_id
-                AND cnfc.curriculum_node_id = %d
+                AND cnfc.curriculum_node_id = :nodeId
             INNER JOIN folder f ON f.id = cus.folder_id
-            WHERE cus.course_specification_id = %d AND cus.folder_id = %d
+            WHERE cus.course_specification_id = :courseId AND cus.folder_id = :unitId
             ",
-            Cursor::COURSE_UNIT,
-            $nodeId,
-            $courseId,
-            $unitId
+            [
+                'type' => Cursor::COURSE_UNIT,
+                'nodeId' => $nodeId,
+                'courseId' => $courseId,
+                'unitId' => $unitId
+            ]
         );
 
-        $statement = $db->executeQuery($unitUsageQuery);
+        $statement->execute();
         $usage = [];
         while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
             $usage[$row['type']] = [
@@ -106,79 +108,78 @@ class Helper
         int $courseId,
         int $unitId
     ): array {
-        $activityUsageQuery = sprintf(
+        $activityUsageQuery =
             "
             SELECT
-                '%s' type, activity.type assessmentType, a.id, a.title, cus.folder_id
+                :type type, activity.type assessmentType, a.id, a.title, cus.folder_id
             FROM (
-                 SELECT '%s' type, t.assessment_id
+                 SELECT :task type, t.assessment_id
                  FROM task t
                  UNION
-                 SELECT '%s' type, a.assessment_id
+                 SELECT :quiz type, a.assessment_id
                  FROM assess a
                  UNION
-                 SELECT '%s' type, lti.assessment_id
+                 SELECT :lti type, lti.assessment_id
                  FROM lti_assessment lti
                  UNION
-                 SELECT '%s' type, sbox.assessment_id
+                 SELECT :dueWork type, sbox.assessment_id
                  FROM submission_box sbox
                  UNION
-                 SELECT '%s' type, p.assessment_id
+                 SELECT :project type, p.assessment_id
                  FROM project p
             ) activity
             INNER JOIN curriculum_node_for_assessment cnfa
                 ON cnfa.assessment_id = activity.assessment_id
-                AND cnfa.curriculum_node_id = %d
+                AND cnfa.curriculum_node_id = :nodeId
             INNER JOIN assessment_course_unit_specification acus ON acus.assessment_id = cnfa.assessment_id
             INNER JOIN course_unit_specification cus
                 ON cus.id = acus.course_unit_specification_id
-                AND cus.course_specification_id = %d
-                AND cus.folder_id = %d
+                AND cus.course_specification_id = :courseId
+                AND cus.folder_id = :unitId
             INNER JOIN assessment a
                 ON a.id = activity.assessment_id
                 AND a.deleted_at IS NULL
-        ",
-            Cursor::COURSE_ACTIVITY,
-            Cursor::COURSE_ACTIVITY_TASK,
-            Cursor::COURSE_ACTIVITY_QUIZ,
-            Cursor::COURSE_ACTIVITY_LTI,
-            Cursor::COURSE_ACTIVITY_DUE_WORK,
-            Cursor::COURSE_ACTIVITY_PROJECT,
-            $nodeId,
-            $courseId,
-            $unitId
-        );
+        ";
 
-        $lessonPlanUsageQuery = sprintf(
+        $lessonPlanUsageQuery =
             "
             SELECT
-                '%s' type, '%s' assessmentType, a.id, a.title, cus.folder_id
+                :lpType type, :lpType assessmentType, a.id, a.title, cus.folder_id
             FROM lesson_plan lp
             INNER JOIN curriculum_node_for_assessment cnfa
                 ON cnfa.assessment_id = lp.assessment_id
-                AND cnfa.curriculum_node_id = %d
+                AND cnfa.curriculum_node_id = :nodeId
             INNER JOIN assessment_course_unit_specification acus ON acus.assessment_id = cnfa.assessment_id
             INNER JOIN course_unit_specification cus
                 ON cus.id = acus.course_unit_specification_id
-                AND cus.course_specification_id = %d
-                AND cus.folder_id = %d
+                AND cus.course_specification_id = :courseId
+                AND cus.folder_id = :unitId
             INNER JOIN assessment a
                 ON a.id = lp.assessment_id
                 AND a.deleted_at IS NULL
-        ",
-            Cursor::COURSE_ACTIVITY_LESSON_PLAN,
-            Cursor::COURSE_ACTIVITY_LESSON_PLAN,
-            $nodeId,
-            $courseId,
-            $unitId
-        );
+        ";
 
         $combinedUsageQuery = '( ' . implode(' UNION ', [
                 $activityUsageQuery,
                 $lessonPlanUsageQuery,
             ]) . ' )';
 
-        $statement = $db->executeQuery($combinedUsageQuery);
+
+        $param = [
+            'type' => Cursor::COURSE_ACTIVITY,
+            'task' => Cursor::COURSE_ACTIVITY_TASK,
+            'quiz' => Cursor::COURSE_ACTIVITY_QUIZ,
+            'lti' => Cursor::COURSE_ACTIVITY_LTI,
+            'dueWork' => Cursor::COURSE_ACTIVITY_DUE_WORK,
+            'project' => Cursor::COURSE_ACTIVITY_PROJECT,
+            'lpType' => Cursor::COURSE_ACTIVITY_LESSON_PLAN,
+            'nodeId' => $nodeId,
+            'courseId' => $courseId,
+            'unitId' => $unitId,
+        ];
+
+        $statement = $db->prepareQuery($combinedUsageQuery, $param);
+        $statement->execute();
         $usage = [];
         while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
             $usage[$row['type']][$row['id']] = [
@@ -205,39 +206,47 @@ class Helper
         int $courseId,
         int $unitId
     ): array {
-        $rubricUsageQuery = sprintf(
+        $statement = $db->prepareQuery(
             "
-            SELECT c.type, rc.id capId, rc.name capName, r.id indId, r.name indName, c.folder_id, c.parentId
+            SELECT
+                c.type,
+                rc.id capId,
+                rc.name capName,
+                r.id indId,
+                r.name indName,
+                c.folder_id,
+                c.parentId
             FROM rubric_capability rc
             LEFT JOIN curriculum_node_for_rubric_capability cnrc
-                ON (rc.id = cnrc.rubric_capability_id AND cnrc.curriculum_node_id = %d)
+                ON (rc.id = cnrc.rubric_capability_id AND cnrc.curriculum_node_id = :nodeId)
             LEFT JOIN (
                 SELECT *
                 FROM rubric_indicator ri
                 INNER JOIN curriculum_node_for_rubric_indicator cnri
-                    ON (ri.id = cnri.rubric_indicator_id AND cnri.curriculum_node_id = %d)
+                    ON (ri.id = cnri.rubric_indicator_id AND cnri.curriculum_node_id = :nodeId)
             ) r ON rc.id = r.rubric_capability_id
             INNER JOIN (
-                SELECT '%s' type, cs.folder_id parentId, cus.folder_id, cs.id
+                SELECT :courseSpecType type, cs.folder_id parentId, cus.folder_id, cs.id
                 FROM course_specification cs
                 INNER JOIN course_unit_specification cus ON cus.course_specification_id = cs.id
                 UNION
-                SELECT '%s' type, cus.folder_id parentId, cus.folder_id, cus.course_specification_id id
+                SELECT :courseUnitType type, cus.folder_id parentId, cus.folder_id, cus.course_specification_id id
                 FROM course_unit_specification cus
-            ) c ON (c.parentId = rc.parent_id AND c.folder_id = %d AND c.id = %d)
+            ) c ON (c.parentId = rc.parent_id AND c.folder_id = :unitId AND c.id = :courseId)
             WHERE
                 (cnrc.curriculum_node_id IS NOT NULL OR r.curriculum_node_id IS NOT NULL)
                 AND rc.deleted_at IS NULL AND r.deleted_at IS NULL
             ",
-            $nodeId,
-            $nodeId,
-            Cursor::COURSE_RUBRIC_CAPABILITY,
-            Cursor::COURSE_UNIT_RUBRIC_CAPABILITY,
-            $unitId,
-            $courseId,
+            [
+                'nodeId' => $nodeId,
+                'courseSpecType' => Cursor::COURSE_RUBRIC_CAPABILITY,
+                'courseUnitType' => Cursor::COURSE_UNIT_RUBRIC_CAPABILITY,
+                'unitId' => $unitId,
+                'courseId' => $courseId,
+            ]
         );
 
-        $statement = $db->executeQuery($rubricUsageQuery);
+        $statement->execute();
         $usage = [];
         while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
             $usage[$row['type']]['folderId'] = $row['parentId'];
@@ -267,10 +276,10 @@ class Helper
         int $courseId,
         int $unitId
     ): array {
-        $inUseRubricUsageQuery = sprintf(
+        $statement = $db->prepareQuery(
             "
             SELECT
-                '%s' type,
+                :type type,
                 v.assessment_id,
                 v.assessment_title,
                 cnrc.rubric_capability_id,
@@ -282,27 +291,28 @@ class Helper
             FROM v_rubric v
             LEFT JOIN curriculum_node_for_rubric_capability cnrc
                 ON cnrc.rubric_capability_id = v.capability_id
-                AND cnrc.curriculum_node_id = %d
+                AND cnrc.curriculum_node_id = :nodeId
             LEFT JOIN curriculum_node_for_rubric_indicator cnri
                 ON cnri.rubric_indicator_id = v.indicator_id
-                AND cnri.curriculum_node_id = %d
+                AND cnri.curriculum_node_id = :nodeId
             INNER JOIN assessment_course_unit_specification acus
                 ON v.assessment_id = acus.assessment_id
             INNER JOIN course_unit_specification cus
                 ON cus.id = acus.course_unit_specification_id
-                AND cus.course_specification_id = %d
+                AND cus.course_specification_id = :courseId
             WHERE
-                cus.folder_id = %d
+                cus.folder_id = :unitId
                 AND (cnrc.curriculum_node_id IS NOT NULL OR cnri.curriculum_node_id IS NOT NULL)
         ",
-            Cursor::COURSE_IN_USE_RUBRIC,
-            $nodeId,
-            $nodeId,
-            $courseId,
-            $unitId
+            [
+                'type' => Cursor::COURSE_IN_USE_RUBRIC,
+                ':nodeId' => $nodeId,
+                ':courseId' => $courseId,
+                ':unitId' => $unitId
+            ]
         );
 
-        $statement = $db->executeQuery($inUseRubricUsageQuery);
+        $statement->execute();
         $usage = [];
         while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
             $usage[$row['type']][$row['assessment_id']][$row['capability_id']]['name'] = $row['capability_name'];
@@ -322,36 +332,37 @@ class Helper
         $result[Cursor::COURSE_RUBRIC_CAPABILITY] =
             $this->rubricCapabilityMapper->findByColumn(
                 'id',
-                array_keys($usage[Cursor::COURSE_RUBRIC_CAPABILITY]),
+                array_keys($usage[Cursor::COURSE_RUBRIC_CAPABILITY] ?? []),
             )->reindex();
 
         $result[Cursor::COURSE_UNIT_RUBRIC_CAPABILITY] =
             $this->rubricCapabilityMapper->findByColumn(
                 'id',
-                array_keys($usage[Cursor::COURSE_UNIT_RUBRIC_CAPABILITY]),
+                array_keys($usage[Cursor::COURSE_UNIT_RUBRIC_CAPABILITY] ?? []),
             )->reindex();
 
         $result[Cursor::COURSE_ACTIVITY] =
             $this->assessmentMapper->findByColumn(
                 'id',
-                array_keys($usage[Cursor::COURSE_ACTIVITY]),
+                array_keys($usage[Cursor::COURSE_ACTIVITY] ?? []),
             )->reindex();
 
         $result[Cursor::COURSE_ACTIVITY_LESSON_PLAN] =
             $this->assessmentMapper->findByColumn(
                 'id',
-                array_keys($usage[Cursor::COURSE_ACTIVITY_LESSON_PLAN]),
+                array_keys($usage[Cursor::COURSE_ACTIVITY_LESSON_PLAN] ?? []),
             )->reindex();
 
         $result[Cursor::COURSE_IN_USE_RUBRIC] =
             $this->assessmentMapper->findByColumn(
                 'id',
-                array_keys($usage[Cursor::COURSE_IN_USE_RUBRIC]),
+                array_keys($usage[Cursor::COURSE_IN_USE_RUBRIC] ?? []),
             )->reindex();
 
         $inUseCap = [];
+        $inUse = $usage[Cursor::COURSE_IN_USE_RUBRIC] ?? [];
         array_walk(
-            $usage[Cursor::COURSE_IN_USE_RUBRIC],
+            $inUse,
             function ($item) use (&$inUseCap) {
                 $inUseCap = array_merge($inUseCap, array_keys($item));
             }
