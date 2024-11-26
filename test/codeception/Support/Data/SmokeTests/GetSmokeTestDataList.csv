@@ -300,10 +300,10 @@ Admin,"Bulk add folders",Student,https://vagrant.dev.schoolbox.cloud/adminv2/imp
 Admin,"Bulk add folders",Parent,https://vagrant.dev.schoolbox.cloud/adminv2/import/folder,401
 Admin,"Rollover folders",Superuser,https://vagrant.dev.schoolbox.cloud/adminv2/rollover,200
 Admin,"Rollover folders","Badges Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/rollover,401
-Admin,"Rollover folders","CMS Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/rollover,401
+Admin,"Rollover folders","CMS Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/rollover,200
 Admin,"Rollover folders","Calendar Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/rollover,401
 Admin,"Rollover folders","Design Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/rollover,401
-Admin,"Rollover folders","LMS Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/rollover,200
+Admin,"Rollover folders","LMS Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/rollover,401
 Admin,"Rollover folders","News Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/rollover,401
 Admin,"Rollover folders","Pastoral Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/rollover,401
 Admin,"Rollover folders","Timetable Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/rollover,401
