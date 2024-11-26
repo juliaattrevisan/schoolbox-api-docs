@@ -416,11 +416,6 @@ class Subnav
                         ),
                         'description' => 'Configure the default and available filter options on the continuous report / class grades page.',
                     ],
-                    '/adminv2/import/folder' => [
-                        'name'        => 'Import Pages',
-                        'visible'     => true,
-                        'description' => 'Import all school class pages via a CSV file.',
-                    ],
                     '/adminv2/lesson-plan/template' => [
                         'name'        => $rosettaStone->translate("lessonPlan", false, true) . ' Templates',
                         'visible'     => (bool)$this->configLoader->get(ConfigMapper::NAME_LMS_ENABLED),
@@ -697,6 +692,11 @@ class Subnav
                         'name'        => 'Homepage Templates',
                         'visible'     => true,
                         'description' => 'Configure and setup the scaffolding templates that users can create homepages from.',
+                    ],
+                    '/adminv2/import/folder' => [
+                        'name'        => 'Import Pages',
+                        'visible'     => true,
+                        'description' => 'Import all school class pages via a CSV file.',
                     ],
                     '/adminv2/video' => [
                         'name'        => 'Media Queue',
