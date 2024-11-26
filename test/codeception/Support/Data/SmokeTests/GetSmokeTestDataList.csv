@@ -172,9 +172,9 @@ Admin,"Setup dashboard",Student,https://vagrant.dev.schoolbox.cloud/adminv2/dash
 Admin,"Setup dashboard",Parent,https://vagrant.dev.schoolbox.cloud/adminv2/dashboard,401
 Admin,"Setup homepage templates",Superuser,https://vagrant.dev.schoolbox.cloud/adminv2/homepage,200
 Admin,"Setup homepage templates","Badges Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/homepage,401
-Admin,"Setup homepage templates","CMS Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/homepage,401
+Admin,"Setup homepage templates","CMS Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/homepage,200
 Admin,"Setup homepage templates","Calendar Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/homepage,401
-Admin,"Setup homepage templates","Design Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/homepage,200
+Admin,"Setup homepage templates","Design Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/homepage,401
 Admin,"Setup homepage templates","LMS Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/homepage,401
 Admin,"Setup homepage templates","News Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/homepage,401
 Admin,"Setup homepage templates","Pastoral Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/homepage,401
