@@ -18,6 +18,7 @@ use Sentry\Tracing\TransactionContext;
 use Sentry\Tracing\TransactionSource;
 use Throwable;
 
+use function Sentry\continueTrace;
 use function Sentry\getBaggage;
 use function Sentry\getTraceparent;
 use function Sentry\getW3CTraceparent;
@@ -132,7 +133,13 @@ class Tracer
         ?float $startTimestamp = null,
         array $data = [],
     ): TransactionContext {
-        $transactionContext = new TransactionContext();
+        // Continue trace from headers or vars if present:
+        // otherwise create a new trace
+        if (isset($this->serverVars['HTTP_SENTRY_TRACE'], $this->serverVars['HTTP_BAGGAGE'])) {
+            $transactionContext = continueTrace($this->serverVars['HTTP_SENTRY_TRACE'], $this->serverVars['HTTP_BAGGAGE']);
+        } else {
+            $transactionContext = new TransactionContext();
+        }
         $transactionContext->setName($name);
         $transactionContext->setOp($operation);
         $transactionContext->setOrigin($origin);
