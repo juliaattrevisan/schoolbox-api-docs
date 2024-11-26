@@ -483,10 +483,9 @@ class Tracer
                 $spanContext->setOp($transaction->getOp());
                 $spanContext->setOrigin($transaction->getOrigin());
                 $spanContext->setStartTimestamp($transaction->getStartTimestamp());
-                array_unshift(
-                    $this->stackChanges,
-                    new Operation\Push($spanContext),
-                );
+                $span = $transaction->startChild($spanContext);
+                $hub->setSpan($span);
+                $spanStack[] = $span;
             }
 
             // Apply each change to the actual transaction stack.
