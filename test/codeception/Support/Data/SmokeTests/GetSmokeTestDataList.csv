@@ -238,7 +238,7 @@ Admin,"Configure Terminology",Superuser,https://vagrant.dev.schoolbox.cloud/admi
 Admin,"Configure Terminology","Badges Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/terminology,401
 Admin,"Configure Terminology","CMS Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/terminology,401
 Admin,"Configure Terminology","Calendar Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/terminology,401
-Admin,"Configure Terminology","Design Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/terminology,200
+Admin,"Configure Terminology","Design Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/terminology,401
 Admin,"Configure Terminology","LMS Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/terminology,401
 Admin,"Configure Terminology","News Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/terminology,401
 Admin,"Configure Terminology","Pastoral Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/terminology,401
