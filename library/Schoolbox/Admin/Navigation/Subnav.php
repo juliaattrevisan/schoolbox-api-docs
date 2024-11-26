@@ -253,6 +253,11 @@ class Subnav
                         'visible'     => true,
                         'description' => 'Configure and setup the scaffolding templates that users can create homepages from.',
                     ],
+                    '/adminv2/profile-editor' => [
+                        'name'        => 'Profile Editor',
+                        'visible'     => true,
+                        'description' => 'Customise the fields and buttons on the staff, student and parent profile screens.',
+                    ],
                     '/adminv2/menu-side' => [
                         'name'        => 'Side Menu',
                         'visible'     => true,
@@ -901,11 +906,6 @@ class Subnav
                         'name'        => 'Profile Buttons',
                         'visible'     => true,
                         'description' => 'Add your own custom buttons to a users profile page.',
-                    ],
-                    '/adminv2/profile-editor' => [
-                        'name'        => 'Profile Editor',
-                        'visible'     => true,
-                        'description' => 'Customise the fields and buttons on the staff, student and parent profile screens.',
                     ],
                     '/adminv2/shaps' => [
                         'name'        => 'Schoolbox Help',
