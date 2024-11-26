@@ -118,7 +118,16 @@ class ButtonIslandRenderer
              *  to only show on the profile screen and is a mega derivation.
              */
             'allTeacherIds' => [],
-            'emailFunctionsAvailable' => $this->emailFunctionsAvailable
+            'emailFunctionsAvailable' => $this->emailFunctionsAvailable,
+
+            /* Compact Mode
+             */
+            'mode' => 'compact',
+            'identifier' => sprintf(
+                '%s%s',
+                'row-options-childsubject-',
+                $viewee->getId()
+            )
         ]);
     }
 }

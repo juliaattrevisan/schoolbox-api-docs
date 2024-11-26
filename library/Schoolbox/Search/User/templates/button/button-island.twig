@@ -8,6 +8,12 @@
  # @param bool $isGeosnapshotAvailable               Decides if Geosnapshot button could appear here
  # @param array $allTeacherIds                       A set of staff ids used for emailing them en-masse
  #
+ # Rendering mode
+ # Compact Mode requires an identifier to deconflict javascript-based elements
+ #
+ # @param string $mode                               'tot' renders buttons in a three-dot menu. Otherwise, as a generic wall of buttons
+ # @param string $id                                 Used to deconflict multiple tot menus
+ #
  # The following bools are used by the My Students component to explicitly prevent the mass-email
  # buttons from being available in that dashboard component. They never appeared here to begin with.
  # They also require an omega inspection of a big data struct that is probably very costly to pay
@@ -15,7 +21,11 @@
  #
  # @param bool $emailFunctionsAvailable  If true, emailstaff and emailparents buttons will render
  #}
+{% if mode is defined and 'compact' == mode %}
+<ul class="f-dropdown" data-dropdown-content="" id="{{ identifier }}" aria-hidden="true">
+{% else %}
 <ul class='flex-list flex-wrap buttons'>
+{% endif %}
     {# Special constraints that further reduce the payload I built
      # It uses the exact same philosophy as additionalConstraints for
      # rendering profile fields.
