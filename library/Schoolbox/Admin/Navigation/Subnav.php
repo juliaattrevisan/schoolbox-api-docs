@@ -507,11 +507,6 @@ class Subnav
                         'visible'     => true,
                         'description' => 'Setup the residential boarding houses that students attend.',
                     ],
-                    '/adminv2/lists/roles' => [
-                        'name'        => 'Roles',
-                        'visible'     => true,
-                        'description' => 'Configure user roles within the system, the type of access they have and permissions.',
-                    ],
                     '/adminv2/lists/year-levels' => [
                         'name'        => 'Year Levels',
                         'visible'     => true,
@@ -889,6 +884,11 @@ class Subnav
                         'name'        => 'Remove Users',
                         'visible'     => true,
                         'description' => 'View and remove users which have not logged into the platform for a while.',
+                    ],
+                    '/adminv2/lists/roles' => [
+                        'name'        => 'Roles',
+                        'visible'     => true,
+                        'description' => 'Configure user roles within the system, the type of access they have and permissions.',
                     ],
                     '/adminv2/shaps' => [
                         'name'        => 'Schoolbox Help',
