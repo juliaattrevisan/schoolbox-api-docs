@@ -35,6 +35,12 @@ $app = new class extends CliTool\App
 
 
     /**
+     * This script requires a particular school code.
+     */
+    private const SCHOOL_CODE = 'tsc';
+
+
+    /**
      * Decide how long this should be based on your usage
      * You might have to adjust it, but it should cover the cost of an iteration
      */
@@ -47,12 +53,6 @@ $app = new class extends CliTool\App
      * Print help text for those who don't know how to use this tool
      */
     private const OPT_LONG_HELP = 'help';
-
-
-    /**
-     * This script requires a particular school code.
-     */
-    private const SCHOOL_CODE = 'tsc';
 
 
     /**
@@ -246,12 +246,6 @@ HELP;
         $campusIds = $this->helper->fetchCampusIds();
 
         /* Assign relationships
-         *
-         * Technically speaking, all these hardcoded system buttons would have
-         * been available in every campus for every role, subject to further
-         * checks by routeLookupIfAuthorized calls. Schools have the option to
-         * nip it in the bud if they want to prevent viewers from seeing a
-         * button by unticking their role(s) as per the ui
          */
         $this->getLogger()->info(sprintf(
             'Campus availability: assigning campus ids %s to profile button %s',

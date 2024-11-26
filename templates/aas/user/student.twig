@@ -1,20 +1,20 @@
 {% extends '@core/user/student.twig' %}
 
-{% block buttons %}
-    {{ parent() }}
-    <li>
-        <a href="/synergetic/mydetails?id={{user.getExternalId()}}" class="icon-info">Medical</a>
-    </li>
+{#{% block buttons %}#}
+{#    {{ parent() }}#}
+{#    <li>#}
+{#        <a href="/synergetic/mydetails?id={{user.getExternalId()}}" class="icon-info">Medical</a>#}
+{#    </li>#}
 
-    <li>
-        <a href="/synergetic/absences?id={{user.getExternalId()}}" class="icon-user">Absences</a>
-    </li>
+{#    <li>#}
+{#        <a href="/synergetic/absences?id={{user.getExternalId()}}" class="icon-user">Absences</a>#}
+{#    </li>#}
 
-    <li>
-        <a href="/synergetic/PTI?id={{user.getExternalId()}}" class="icon-staff">Parent Teacher</a>
-    </li>
+{#    <li>#}
+{#        <a href="/synergetic/PTI?id={{user.getExternalId()}}" class="icon-staff">Parent Teacher</a>#}
+{#    </li>#}
 
-    <li>
-        <a href="/synergetic/StudentParentContacts?id={{user.getExternalId()}}" class="icon-directory">Parent Directory</a>
-    </li>
-{% endblock buttons %}
+{#    <li>#}
+{#        <a href="/synergetic/StudentParentContacts?id={{user.getExternalId()}}" class="icon-directory">Parent Directory</a>#}
+{#    </li>#}
+{#{% endblock buttons %}#}
