@@ -123,13 +123,18 @@ export const usePopOutStore = defineStore(`ccPopOut`, () => {
     // #endregion
 
     /**
-     * report has been triggered so set the active course and nodes
+     * a unit column has been selected, so retrieve the usage for that unit/node combination
      * @param $course - the course to set as active
      * @param $unit - the unit to set as active
      * @param $node - the node to set as active
      * @param $button - the button that triggered the action
      */
-    function setActive($course: Course, $unit: Unit, $node: CurriculumCoverageNode, $button: HTMLButtonElement): void {
+    function setActiveUnitColumn(
+        $course: Course,
+        $unit: Unit,
+        $node: CurriculumCoverageNode,
+        $button: HTMLButtonElement,
+    ): void {
         // prevent selecting the same button again when already open
         if ($button.id === button.value?.id) {
             return;
@@ -148,6 +153,6 @@ export const usePopOutStore = defineStore(`ccPopOut`, () => {
         hasLoadError,
         usage,
         init,
-        setActive,
+        setActiveUnitColumn,
     };
 });

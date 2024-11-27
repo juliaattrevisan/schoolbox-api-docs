@@ -125,7 +125,7 @@ function onUnitClicked(course: Course, unit: Unit, buttonEl: HTMLButtonElement):
     if (showExpandButton.value && !isExpanded.value) {
         isExpanded.value = true;
     }
-    popOutStore.setActive(course, unit, props.node, buttonEl);
+    popOutStore.setActiveUnitColumn(course, unit, props.node, buttonEl);
 }
 
 /**
