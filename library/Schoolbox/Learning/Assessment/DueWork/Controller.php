@@ -1028,6 +1028,12 @@ class Controller extends Assessment\Controller
             // kami string if needed.
             $worksheetName = sprintf(Kami\Document::WORKSHEET_TITLE, $assessment->getTitle(), $student->getFullName());
             $kamiGroup = sprintf(Kami\Document::WORKSHEET_GROUP, INSTANCE_ID, $assessment->getBaseContext()->getFolder()->getId(), $assessment->getId());
+            /**
+             * is this a latest response or existing? test for kami worksheet,
+             * If this is a kami doc and this is a fresh attempt, we need to save this initially before even sending data to the user,
+             * this is to prevent the user from creating multiple orphaned worksheets in kami
+             */
+            $newResponse = null;
 
             //if this is an existing attempt, then fetch the kami file
             if ($latestResponse) {
@@ -1037,6 +1043,16 @@ class Controller extends Assessment\Controller
                         $kamiFile = $file->getKami()?->getKamiDocumentId();
                     }
                 }
+            } else {
+                // Create a new response
+                $newResponse = $this->dueWorkResponseMapper->createModel()
+                    ->setSubmittedBy($this->getUser())
+                    ->setSubmittedOnBehalfOf($student)
+                    ->setCreatedAt(Alaress_Date_Format::now())
+                    ->setUpdatedAt(Alaress_Date_Format::now());
+                $newResponse->setAssessable($assessment);
+                // Replace files with what was actually submitted
+                $newResponse->setAllFiles(new Collection());
             }
             if (!$kamiFile) {
                 // the latest response has no kami worksheet, or there was no previous response.
@@ -1056,6 +1072,32 @@ class Controller extends Assessment\Controller
                 if (!$kamiFile) {
                     $kamiDoc = $this->kamiConnector->cloneWorksheet($worksheetName, $assessment->getKamiWorksheetTemplate()->getKamiDocumentId(), $kamiGroup);
                     $kamiFile = $kamiDoc->getId();
+                    if ($newResponse) {
+                        $kamiModel = $this->kamiMapper->createModel()
+                            ->setType(Kami\Model::TYPE_STUDENT_SUBMISSION_FILE_ANNOTATION)
+                            ->setKamiDocumentId($kamiFile)
+                            ->setStatusDone();
+                        $this->kamiMapper->save($kamiModel);
+                        /** @var SubmissionFile $kamiFile */
+                        $kamiSubmissionFile = $this->submissionFileMapper->createModel()
+                            ->setFilename($worksheetName)
+                            ->setKami($kamiModel)
+                            ->setIsWorksheet(true)
+                            ->setStorage($assessment->getWorksheetTemplate())
+                            ->setSubmission($newResponse);
+
+                        $newResponse->getAllFiles()->add($kamiSubmissionFile);
+                        // Save the response before attempting to save any feedback: we need a response ID to be able to attach the feedback
+                        $this->dueWorkResponseMapper->save($newResponse);
+
+                        // re save the kami file and submission file with all things attached
+                        // force the worksheet to be true (we are a kami worksheet file), and this was being dropped, somehow..
+                        $kamiSubmissionFile->setIsWorksheet(true);
+                        $this->submissionFileMapper->save($kamiSubmissionFile);
+                        $this->kamiMapper->save($kamiModel->setStudentSubmissionFile($kamiSubmissionFile));
+
+                        $latestResponse = $newResponse;
+                    }
                 } else {
                     /**
                      * kami file exists. 2 options
