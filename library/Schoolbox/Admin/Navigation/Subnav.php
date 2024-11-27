@@ -250,7 +250,7 @@ class Subnav
                     ],
                     '/adminv2/profile-editor' => [
                         'name'        => 'Profile Editor',
-                        'visible'     => true,
+                        'visible'     => $userIsSuperuser,
                         'description' => 'Customise the fields and buttons on the staff, student and parent profile screens.',
                     ],
                     '/adminv2/menu-side' => [
@@ -860,7 +860,7 @@ class Subnav
                     ],
                     '/adminv2/profile-button' => [
                         'name'        => 'Profile Buttons',
-                        'visible'     => true,
+                        'visible'     => $userIsSuperuser,
                         'description' => 'Add your own custom buttons to a users profile page.',
                     ],
                     '/adminv2/user/stale' => [
