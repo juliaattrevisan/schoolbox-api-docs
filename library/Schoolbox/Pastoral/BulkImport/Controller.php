@@ -667,7 +667,6 @@ class Controller extends Base
                 }
 
                 if ($imported) {
-                    // TODO use standard format for name?
                     $importLog['known'][$user->getId()] ??= [
                         'user'  => [
                             'id'         => $user->getId(),
