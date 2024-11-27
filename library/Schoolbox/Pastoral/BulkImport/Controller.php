@@ -28,6 +28,7 @@ use Schoolbox\Resource\Storage;
 use Schoolbox\Role;
 use Schoolbox\TokenReplacer;
 use Schoolbox\Url\Uri;
+use Schoolbox\User;
 use Schoolbox\UserMapper;
 use Symfony\Component\HttpFoundation\Response as HttpResponse;
 use ZipArchive;
@@ -643,22 +644,23 @@ class Controller extends Base
                 $user          = null;
                 $externalId    = null;
                 $unknownReason = null;
+                $imported      = false;
                 if (isset($tokens['[externalId]'])) {
                     $externalId = $tokens['[externalId]'];
                     try {
-                        $user = $this->userMapper->findByExternalId($externalId, Role::STUDENT);
-                    } catch (MapperException\Deleted) {
-                        // noop: no user was found.
-                        // This will show as a "no student found" message.
-                        $unknownReason = 'Student was deleted';
-                    } catch (MapperException $e) {
-                        $unknownReason = $e->getMessage();
+                        $user     = $this->userMapper->findByExternalId($externalId, Role::STUDENT);
+                        $imported = true;
+                    } catch (MapperException\Deleted $e) {
+                        $unknownReason = 'student has been deleted';
+                        $user          = $e->getDeletedObject() instanceof User ? $e->getDeletedObject() : null;
+                    } catch (MapperException) {
+                        $unknownReason = 'no matching student found';
                     }
                 } else {
-                    $unknownReason = 'External ID not found in filename';
+                    $unknownReason = 'external ID not found in filename';
                 }
 
-                if ($user) {
+                if ($imported) {
                     // TODO use standard format for name?
                     $importLog['known'][$user->getId()] ??= [
                         'user'  => [
@@ -674,7 +676,11 @@ class Controller extends Base
                     $importLog['unknown'][] = [
                         'file'   => $filename,
                         'reason' => $unknownReason,
-                        'user'   => ['externalId' => $externalId ?? null],
+                        'user'   => [
+                            'id'         => $user?->getId(),
+                            'externalId' => $externalId ?? null,
+                            'name'       => $user?->formatName(),
+                        ],
                     ];
                 }
             }
