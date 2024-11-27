@@ -18,7 +18,7 @@ interface Props {
 const props = defineProps<Props>();
 
 const emit = defineEmits<{
-    click: [course: Course, buttonEl: HTMLButtonElement];
+    click: [buttonEl: HTMLButtonElement];
 }>();
 
 const count = window.Vue.computed(() => {
@@ -33,7 +33,7 @@ const popOutStore = usePopOutStore();
  * Open the pop out
  */
 function onClick(): void {
-    emit("click", props.course, buttonEl.value as HTMLButtonElement);
+    emit("click", buttonEl.value as HTMLButtonElement);
 }
 </script>
 

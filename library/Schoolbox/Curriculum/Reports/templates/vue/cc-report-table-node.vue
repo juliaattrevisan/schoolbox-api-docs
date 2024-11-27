@@ -114,7 +114,7 @@ function onChildTitleClicked(node: CurriculumCoverageNode): void {
 const popOutStore = usePopOutStore();
 
 /**
- * When a unit is clicked, open the pop out
+ * When a unit column is clicked, open the pop out
  * @param course - the course that was clicked
  * @param unit - the unit that was clicked
  * @param buttonEl - the button that was clicked
@@ -129,17 +129,16 @@ function onUnitClicked(course: Course, unit: Unit, buttonEl: HTMLButtonElement):
 }
 
 /**
- * When a unit is clicked, open the pop out
- * @param course - the course that was clicked
+ * When a course column is clicked, open the pop out
  * @param buttonEl - the button that was clicked
  */
-function onCourseClicked(course: Course, buttonEl: HTMLButtonElement): void {
+function onCourseClicked(buttonEl: HTMLButtonElement): void {
     // expand the node if it has children and is not expanded
     // this is so the usage count only shows the count for the node and not its children
-    // if (showExpandButton.value && !isExpanded.value) {
-    //     isExpanded.value = true;
-    // }
-    // popOutStore.setActive(course, unit, props.node, buttonEl);
+    if (showExpandButton.value && !isExpanded.value) {
+        isExpanded.value = true;
+    }
+    popOutStore.setActiveCourseColumn(buttonEl);
 }
 
 // #endregion

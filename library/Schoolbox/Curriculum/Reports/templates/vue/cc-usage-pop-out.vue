@@ -83,7 +83,7 @@ window.Vue.watch(
             >
                 <h5 class="section-title">Course</h5>
                 <div class="l-flex l-gap-s">
-                    <sbx-icon name="course" />
+                    <sbx-icon name="course-builder" />
                     <p class="f-no-margins">Assigned to Course</p>
                 </div>
             </div>

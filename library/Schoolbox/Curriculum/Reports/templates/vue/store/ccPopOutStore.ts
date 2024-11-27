@@ -124,6 +124,22 @@ export const usePopOutStore = defineStore(`ccPopOut`, () => {
 
     /**
      * a unit column has been selected, so retrieve the usage for that unit/node combination
+     * @param $button - the button that triggered the action
+     */
+    function setActiveCourseColumn($button: HTMLButtonElement): void {
+        // prevent selecting the same button again when already open
+        if ($button.id === button.value?.id) {
+            return;
+        }
+        usage.value = {
+            onCourse: true,
+            onUnit: false,
+        };
+        button.value = $button;
+    }
+
+    /**
+     * a unit column has been selected, so retrieve the usage for that unit/node combination
      * @param $course - the course to set as active
      * @param $unit - the unit to set as active
      * @param $node - the node to set as active
@@ -153,6 +169,7 @@ export const usePopOutStore = defineStore(`ccPopOut`, () => {
         hasLoadError,
         usage,
         init,
+        setActiveCourseColumn,
         setActiveUnitColumn,
     };
 });
