@@ -63,7 +63,6 @@ function onExpandClicked(): void {
  * @returns the total unit usage count
  */
 function getUnitUsageCount(node: CurriculumCoverageNode, $course: Course, $unit: Unit): number {
-    if (node.usage === undefined) return 0;
     const course = node.usage.courses.find((c) => c.id === $course.id);
     if (course === undefined) return 0;
     const unit = course.units.find((u) => u.id === $unit.id);
@@ -71,7 +70,7 @@ function getUnitUsageCount(node: CurriculumCoverageNode, $course: Course, $unit:
     const { usage } = unit;
     if (usage === undefined) return 0;
     const onNodeCount = filtersStore.selectedReportOptions.reduce((acc, option) => {
-        // always skip course and unit options as they can't be assigned within a unit
+        // always skip course as it can't be assigned within a unit
         if (option === ReportOptionValues.COURSE) return acc;
         if (usage[option] === undefined) return acc;
         return acc + usage[option].count;
@@ -97,7 +96,6 @@ function getUnitUsageCount(node: CurriculumCoverageNode, $course: Course, $unit:
  * @returns the total course usage count
  */
 function getCourseUsageCount(node: CurriculumCoverageNode, $course: Course): number {
-    if (node.usage === undefined) return 0;
     const course = node.usage.courses.find((c) => c.id === $course.id);
     if (course === undefined) return 0;
     const { usage } = course;
@@ -136,7 +134,6 @@ function getCourseUsageCount(node: CurriculumCoverageNode, $course: Course): num
  * @returns the total node usage count for all selected course(s)
  */
 function getTotalUsageCount(node: CurriculumCoverageNode, $course: Course): number {
-    if (node.usage === undefined) return 0;
     const course = node.usage.courses.find((c) => c.id === $course.id);
     if (course === undefined || course.units === undefined) return 0;
     const courseUsageCount = getCourseUsageCount(node, $course);
@@ -153,7 +150,6 @@ function getTotalUsageCount(node: CurriculumCoverageNode, $course: Course): numb
  * @returns the total node usage count
  */
 function getEntireUsageCount(node: CurriculumCoverageNode): number {
-    if (node.usage === undefined) return 0;
     return node.usage.courses.reduce((acc, course) => {
         return acc + getTotalUsageCount(node, course);
     }, 0);

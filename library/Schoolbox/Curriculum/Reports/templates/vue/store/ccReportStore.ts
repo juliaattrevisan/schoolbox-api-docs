@@ -70,22 +70,27 @@ export const useReportStore = defineStore("ccReport", () => {
     });
 
     /**
-     * search for nodes that match
+     * Loop through and ddd the new course to the existing node.usage.courses[]
+     * @param existingNode - the existing node to update
+     * @param newNode - the new node that contains the new course to add
      */
-    async function report(): Promise<void> {
-        useInputStore().setActive();
-        useQueryStore().setQueryParams();
-        hasNotReported.value = false;
-        // abort the previous search if it's still running
-        if (isFetching.value) {
-            controller.abort();
+    function addCourseToChildren(existingNode: CurriculumCoverageNode, newNode: CurriculumCoverageNode): void {
+        if (existingNode.children) {
+            existingNode.children.forEach((child, index) => {
+                child.usage.courses = [...child.usage.courses, ...newNode.children![index].usage.courses];
+                addCourseToChildren(child, newNode.children![index]);
+            });
         }
+    }
+
+    /**
+     * Load the course/node data for a single course
+     * @param url - the url to load, linked to the single course and all curriculum
+     * @param currentIndex - the current load index
+     */
+    async function getCourse(url: string, currentIndex: number): Promise<void> {
         try {
-            isFetching.value = true;
-            isLoading.value = true;
-            hasLoadError.value = false;
-            controller = new AbortController();
-            const response = await fetch(useQueryStore().getEndpointWithParams(), {
+            const response = await fetch(url, {
                 method: "GET",
                 signal: controller.signal,
                 headers: {
@@ -101,7 +106,6 @@ export const useReportStore = defineStore("ccReport", () => {
                 };
                 return;
             }
-            isFetching.value = false;
             const responseJson = (await response.json()) as CurriculumCoveragePayload | ReportError;
             if (typeof responseJson !== "object" || responseJson === null) {
                 hasLoadError.value = true;
@@ -113,9 +117,21 @@ export const useReportStore = defineStore("ccReport", () => {
                 return;
             }
             if ("data" in responseJson) {
-                courses.value = responseJson.data.courses;
-                nodes.value = responseJson.data.nodes;
-                hasReport.value = true;
+                // if it's the first course load, we can just set the courses and nodes
+                if (currentIndex === 0) {
+                    courses.value = responseJson.data.courses;
+                    nodes.value = responseJson.data.nodes;
+                } else {
+                    // otherwise we need to add the new courses to the existing courses
+                    courses.value = [...courses.value, ...responseJson.data.courses];
+                    // and need to run through nodes and add the new course within each node.usage.courses[]
+                    // then if the node has children, we need to do the same for the children within
+                    const newCourseNodes = responseJson.data.nodes;
+                    nodes.value.forEach((node, index) => {
+                        node.usage.courses = [...node.usage.courses, ...newCourseNodes[index].usage.courses];
+                        addCourseToChildren(node, newCourseNodes[index]);
+                    });
+                }
             }
         } catch (error) {
             // ignore abort errors, as the previous report was cancelled
@@ -124,7 +140,40 @@ export const useReportStore = defineStore("ccReport", () => {
             }
             console.error(error);
             hasLoadError.value = true;
+        }
+    }
+
+    /**
+     * In an attempt to reduce server load,
+     * the report is generated sequentially for each course
+     */
+    async function report(): Promise<void> {
+        useInputStore().setActive();
+        useQueryStore().setQueryParams();
+        hasNotReported.value = false;
+        isLoading.value = true;
+        hasLoadError.value = false;
+        controller = new AbortController();
+        // abort the previous search if it's still running
+        if (isFetching.value) {
+            controller.abort();
+        }
+        try {
+            isFetching.value = true;
+            await useQueryStore()
+                .getQueryUrls()
+                .reduce(async (previousPromise, url, currentIndex) => {
+                    await previousPromise;
+                    if (!hasLoadError.value) {
+                        await getCourse(url, currentIndex);
+                    }
+                }, Promise.resolve());
+            hasReport.value = true;
+        } catch (error) {
+            console.error(error);
+            hasLoadError.value = true;
         } finally {
+            isFetching.value = false;
             isLoading.value = false;
         }
     }
