@@ -373,7 +373,12 @@ class Tracer
      * If the transaction does not exist at all (because it is not yet created,
      * or it was created but is not being sampled), this does nothing.
      *
-     * @param string      $description    A description of the span: e.g. a database query, route name, request URL.
+     * @param string      $description    A human-readable description of the span: e.g. a database query, route name,
+     *                                    request URL.
+     *                                    There should be enough detail within the description to relate this span back
+     *                                    to a root cause.
+     *                                    This relates back to the OpenTelemetry span's "name" concept:
+     *                                    https://develop.sentry.dev/sdk/telemetry/traces/opentelemetry/#span-protocol
      * @param string|null $operation      The operation which the span is tracking: see
      *                                    https://develop.sentry.dev/sdk/telemetry/traces/span-operations/
      *                                    for standard examples.

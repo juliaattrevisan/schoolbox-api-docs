@@ -316,9 +316,10 @@ class Base implements IConnector
     {
         return Tracer::getDefaultTrace()->runWithinSpan(
             fn () => $this->broker->getPdo()->exec($sql) !== false,
+            $sql,
             'db.sql.query',
             'auto.db',
-            data: ['db.system' => $this->broker->getDriver(),],
+            ['db.system' => $this->broker->getDriver(),],
         );
     }
 
