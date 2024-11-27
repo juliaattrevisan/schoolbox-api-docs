@@ -15,8 +15,8 @@ import { usePopOutStore } from "./store/ccPopOutStore";
 import {
     getFilteredTotalCount,
     getFilteredUnitColumnCount,
+    getFilteredCourseColumnCount,
     getFilteredCourseCount,
-    getCourseColumnColumnCount,
 } from "./util/countUtils";
 import CcReportTableNodeUnit from "./cc-report-table-node-unit.vue";
 
@@ -154,7 +154,7 @@ function onUnitClicked(course: Course, unit: Unit, buttonEl: HTMLButtonElement):
         <!-- loop through each course/unit, retrieving the node usage or returning 0 for undefined usages -->
         <template v-for="course in reportStore.courses" :key="course.id">
             <td class="u-border-left">
-                {{ getCourseColumnColumnCount(props.node, course, isExpanded) }}
+                {{ getFilteredCourseColumnCount(props.node, course, isExpanded) }}
             </td>
             <cc-report-table-node-unit
                 v-for="unit in course.units"
