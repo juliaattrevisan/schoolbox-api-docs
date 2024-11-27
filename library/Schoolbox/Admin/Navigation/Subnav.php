@@ -482,11 +482,6 @@ class Subnav
                 'visible'    => $userIsSuperuser,
                 'searchable' => false,
                 'children'   => [
-                    '/adminv2/lists/campus' => [
-                        'name'        => 'Campus',
-                        'visible'     => true,
-                        'description' => 'Setup the campus within the school and configure which timetables are used by the campus.',
-                    ],
                     '/adminv2/lists/webdav' => [
                         'name'        => 'Drives',
                         'visible'     => (bool)$this->configLoader->get(ConfigMapper::NAME_WEBDAV_ENABLED),
@@ -849,6 +844,11 @@ class Subnav
                         'name'        => 'Activity Report',
                         'visible'     => true,
                         'description' => 'Access recent CMS actions like delete, create and modify of files, folders and links.',
+                    ],
+                    '/adminv2/lists/campus' => [
+                        'name'        => 'Campuses',
+                        'visible'     => true,
+                        'description' => 'Setup the campus within the school and configure which timetables are used by the campus.',
                     ],
                     '/adminv2/import/userAccount' => [
                         'name'        => 'Import CSV',
