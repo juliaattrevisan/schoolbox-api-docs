@@ -155,6 +155,15 @@ HELP;
          * (roletype, field) being a unique tuple.
          */
 //        $this->createBarcode($statement);
+
+        /* Staff members get Staff Code enabled by default
+         * I guess this applies to the STAFF roletype by default,
+         * and the school can unlock it for other roletypes.
+         *
+         * SA-9327 doesn't describe the intended usage at all, other than "it exists"
+         */
+        $this->updateStaffCode();
+
     }
 
 
@@ -244,6 +253,59 @@ HELP;
 //
 //        $this->helper->createFieldRoletypeVisibility($profileFieldId, $roletypes);
 //    }
+
+
+    /**
+     * Creates a Student Mobile Phone field
+     *
+     * @return void
+     */
+    private function updateStaffCode(): void
+    {
+        /* Preset availability and visibility requirements
+         */
+        $statement = $this->getDatabaseInternal()->prepare("
+            SELECT id
+            FROM profile_field
+            WHERE roletype = :roletype 
+            AND field = :field
+        ");
+
+        $statement->execute([
+            'roletype' => 'staff',
+            'field' => 'SchoolStaffCode'
+        ]);
+
+        while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
+            $profileFieldId = $row['id'];
+        }
+
+        /* I suppose this was available to everyone initially but I don't really know for sure:
+         * imho it seems like it would have been used by the student themselves (not other students)
+         * and staff members, making roletypes STAFF and SELF.
+         */
+        $roletypes = [Role::STAFF, \Schoolbox\Admin\Profile\Editor\Payload::ROLETYPE_SELF];
+        $campusIds = $this->helper->fetchCampusIds();
+
+        /* Assign relationships
+         */
+        $this->getLogger()->info(sprintf(
+            'Campus availability: assigning campus ids %s to profile field %s',
+            implode(',', $campusIds),
+            $profileFieldId
+        ));
+
+        $this->helper->createFieldCampusAvailability($profileFieldId, $campusIds);
+
+        $this->getLogger()->info(sprintf(
+            'Roletype visibility: assigning roletypes %s to profile field %s',
+            implode(',', $roletypes),
+            $profileFieldId
+        ));
+
+        $this->helper->createFieldRoletypeVisibility($profileFieldId, $roletypes);
+    }
+
 
     /**
      * FIXME Decide whether this script must be run as root
