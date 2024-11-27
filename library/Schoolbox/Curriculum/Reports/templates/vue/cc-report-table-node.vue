@@ -12,7 +12,7 @@ import type { CurriculumCoverageNode } from "../js/types/curriculumCoverageTypes
 import { useReportStore } from "./store/ccReportStore";
 import { useFiltersStore } from "./store/ccFiltersStore";
 import { usePopOutStore } from "./store/ccPopOutStore";
-import { getFilteredTotalCount } from "./util/countUtils";
+import { getCourseCount, getFilteredTotalCount } from "./util/countUtils";
 import CcReportTableNodeTotalColumn from "./cc-report-table-node-total-column.vue";
 import CcReportTableNodeCourseColumn from "./cc-report-table-node-course-column.vue";
 import CcReportTableNodeUnitColumn from "./cc-report-table-node-unit-column.vue";
@@ -178,12 +178,23 @@ function onCourseClicked(course: Course, buttonEl: HTMLButtonElement): void {
                 :is-expanded="isExpanded"
                 @click="onUnitClicked"
             />
-            <cc-report-table-node-course-total-column
-                v-if="reportStore.hasMultipleCourses"
-                :node="props.node"
-                :course="course"
-                :is-expanded="isExpanded"
-            />
+            <template v-if="reportStore.hasMultipleCourses">
+                <!-- if the node and its children are completely empty, just hard set to 0 -->
+                <td
+                    v-if="
+                        getCourseCount(props.node, course, true) === 0 &&
+                        getCourseCount(props.node, course, false) === 0
+                    "
+                >
+                    0
+                </td>
+                <cc-report-table-node-course-total-column
+                    v-else
+                    :node="props.node"
+                    :course="course"
+                    :is-expanded="isExpanded"
+                />
+            </template>
         </template>
     </tr>
     <template v-if="hasChildren && (isExpanded || filtersStore.onlyShowGaps || reportStore.isPrinting)">
