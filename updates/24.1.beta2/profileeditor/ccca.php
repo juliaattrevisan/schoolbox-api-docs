@@ -126,7 +126,7 @@ HELP;
 
 
     /**
-     * Their connector surfaces LECaseManagerName, LECaseManagerUserId
+     * Their connector surfaces a barcode (external id) and a student mobile phone
      * optionally displaying it in the profile screens if they're meaningful
      *
      * @return void
@@ -212,7 +212,7 @@ HELP;
 //     */
 //    private function createBarcode(\PDOStatement $statement): void
 //    {
-//        /* Mobile phone was only available to staff
+//        /* Barcode was only available to staff
 //         */
 //        $statement->execute([
 //            'field' => 'externalId',
