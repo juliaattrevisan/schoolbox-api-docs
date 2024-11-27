@@ -12,12 +12,7 @@ import type { CurriculumCoverageNode } from "../js/types/curriculumCoverageTypes
 import { useReportStore } from "./store/ccReportStore";
 import { useFiltersStore } from "./store/ccFiltersStore";
 import { usePopOutStore } from "./store/ccPopOutStore";
-import {
-    getFilteredTotalCount,
-    getFilteredUnitColumnCount,
-    getFilteredCourseColumnCount,
-    getFilteredCourseCount,
-} from "./util/countUtils";
+import { getFilteredTotalCount, getFilteredCourseColumnCount, getFilteredCourseCount } from "./util/countUtils";
 import CcReportTableNodeUnit from "./cc-report-table-node-unit.vue";
 
 interface Props {
