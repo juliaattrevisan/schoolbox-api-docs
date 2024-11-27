@@ -175,6 +175,13 @@ class Subnav
          * Although, sometimes controllers get these values from a url parameter
          * and won't be explicitly stated as one of these urls, so be mindful
          * that there are multiple ways to match these urls
+         *
+         * Ordering of menu items
+         * ----------------------
+         * Menu items should be ordered according to the following rules:
+         *  - Items named 'Home' go at the top, whether in the main menu or sub-menus.
+         *  - Except for pages named 'Home', pages should be ordered alphabetically.
+         *  - Configurable terminology should not be used (because that would mess up alphabetical ordering).
          */
         return [
             '/adminv2/home' => [
