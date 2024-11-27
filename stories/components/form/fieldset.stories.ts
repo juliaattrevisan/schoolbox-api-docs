@@ -4,12 +4,12 @@ import StorybookSlot from "../../../vue/components/storybook-slot.vue";
 /**
  * ![draft](/draft.png)
  *
- * **Styles**: `www/static/css/core/ui/forms/_input-checkbox.scss`
+ * **Styles**: `www/static/css/core/ui/forms/_fieldset.scss`
  *
- * [**mdn**](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input/checkbox)
+ * [**mdn**](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/fieldset)
  *
  * **Usage notes**:
- * - Must always be accompanied by a `<label>` element.
+ * - Fieldset is used for grouping sets of input components. It is necessary to use a fieldset with radio and checkbox components..
  */
 const meta: Meta<typeof StorybookSlot> = {
     component: StorybookSlot,
