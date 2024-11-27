@@ -66,6 +66,10 @@ function onExpandClicked(): void {
 
 // #region usage counts
 
+const hasNoUsages = window.Vue.computed(
+    () => getTotalCount(props.node, true) === 0 && getTotalCount(props.node, false) === 0,
+);
+
 /**
  * If has a unit with no usage, and only show gaps is selected, show the node
  * @returns - whether to show the node
@@ -172,15 +176,16 @@ function onCourseClicked(buttonEl: HTMLButtonElement): void {
             </button>
         </td>
         <!-- if the node total and its children are completely empty, just hard set to 0 -->
-        <td v-if="getTotalCount(props.node, true) === 0 && getTotalCount(props.node, false) === 0">0</td>
+        <td v-if="hasNoUsages">0</td>
         <cc-report-table-node-total-column v-else :node="props.node" :is-expanded="isExpanded" />
         <!-- loop through each course/unit, retrieving the node usage or returning 0 for undefined usages -->
         <template v-for="course in props.node.usage.courses" :key="course.id">
             <!-- if the node course column and its children are completely empty, just hard set to 0 -->
             <td
                 v-if="
-                    getCourseColumnCount(props.node, course, true) === 0 &&
-                    getCourseColumnCount(props.node, course, false) === 0
+                    hasNoUsages ||
+                    (getCourseColumnCount(props.node, course, true) === 0 &&
+                        getCourseColumnCount(props.node, course, false) === 0)
                 "
             >
                 0
@@ -196,8 +201,9 @@ function onCourseClicked(buttonEl: HTMLButtonElement): void {
                 <!-- if the node unit column and its children are completely empty, just hard set to 0 -->
                 <td
                     v-if="
-                        getUnitColumnCount(props.node, unit, true) === 0 &&
-                        getUnitColumnCount(props.node, unit, false) === 0
+                        hasNoUsages ||
+                        (getUnitColumnCount(props.node, unit, true) === 0 &&
+                            getUnitColumnCount(props.node, unit, false) === 0)
                     "
                 >
                     0
@@ -215,8 +221,9 @@ function onCourseClicked(buttonEl: HTMLButtonElement): void {
                 <!-- if the node course and its children are completely empty, just hard set to 0 -->
                 <td
                     v-if="
-                        getCourseCount(props.node, course, true) === 0 &&
-                        getCourseCount(props.node, course, false) === 0
+                        hasNoUsages ||
+                        (getCourseCount(props.node, course, true) === 0 &&
+                            getCourseCount(props.node, course, false) === 0)
                     "
                 >
                     0
