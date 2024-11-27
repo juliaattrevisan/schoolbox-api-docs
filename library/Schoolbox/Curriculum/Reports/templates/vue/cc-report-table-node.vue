@@ -162,7 +162,6 @@ function onUnitClicked(course: Course, unit: Unit, buttonEl: HTMLButtonElement):
                 :course="course"
                 :unit="unit"
                 :node="props.node"
-                :count="getFilteredUnitColumnCount(props.node, course, unit, isExpanded)"
                 :is-expanded="isExpanded"
                 @click="onUnitClicked"
             />

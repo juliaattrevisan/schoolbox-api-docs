@@ -9,12 +9,12 @@ import type { Course } from "@schoolboxLibrary/types/Course";
 import type { Unit } from "@schoolboxLibrary/types/Unit";
 import type { CurriculumCoverageNode } from "../js/types/curriculumCoverageTypes";
 import { usePopOutStore } from "./store/ccPopOutStore";
+import { getFilteredUnitColumnCount } from "./util/countUtils";
 
 interface Props {
     course: Course;
     unit: Unit;
     node: CurriculumCoverageNode;
-    count: number; // the usage number
     isExpanded: boolean; // whether the node is expanded
 }
 const props = defineProps<Props>();
@@ -23,7 +23,10 @@ const emit = defineEmits<{
     click: [course: Course, unit: Unit, buttonEl: HTMLButtonElement];
 }>();
 
-const isCountZero = window.Vue.computed(() => props.count === 0); // don't need a button when it's zero
+const count = window.Vue.computed(() =>
+    getFilteredUnitColumnCount(props.node, props.course, props.unit, props.isExpanded),
+);
+const isCountZero = window.Vue.computed(() => count.value === 0); // don't need a button when it's zero
 const buttonId = window.Vue.computed(() => `usage-button-${props.course.id}-${props.unit.id}-${props.node.id}`);
 const buttonEl = useTemplateRef<HTMLButtonElement>("buttonEl");
 const popOutStore = usePopOutStore();
@@ -40,7 +43,7 @@ function onClick(): void {
     <!-- padding will be on the button if count is not zeo -->
     <td :style="{ padding: isCountZero ? '0.625rem' : '0' }">
         <template v-if="isCountZero">
-            {{ props.count }}
+            {{ count }}
         </template>
         <button
             v-else
@@ -50,7 +53,7 @@ function onClick(): void {
             class="f-always-show"
             @click="onClick"
         >
-            {{ props.count }}
+            {{ count }}
         </button>
     </td>
 </template>
