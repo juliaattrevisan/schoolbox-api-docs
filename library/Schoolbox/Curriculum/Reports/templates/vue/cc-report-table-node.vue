@@ -12,7 +12,8 @@ import type { CurriculumCoverageNode } from "../js/types/curriculumCoverageTypes
 import { useReportStore } from "./store/ccReportStore";
 import { useFiltersStore } from "./store/ccFiltersStore";
 import { usePopOutStore } from "./store/ccPopOutStore";
-import { getFilteredTotalCount, getFilteredCourseColumnCount } from "./util/countUtils";
+import { getFilteredTotalCount } from "./util/countUtils";
+import CcReportTableNodeCourseColumn from "./cc-report-table-node-course-column.vue";
 import CcReportTableNodeUnitColumn from "./cc-report-table-node-unit-column.vue";
 import CcReportTableNodeCourseTotalColumn from "./cc-report-table-node-course-total-column.vue";
 
@@ -120,6 +121,20 @@ function onUnitClicked(course: Course, unit: Unit, buttonEl: HTMLButtonElement):
     popOutStore.setActive(course, unit, props.node, buttonEl);
 }
 
+/**
+ * When a unit is clicked, open the pop out
+ * @param course - the course that was clicked
+ * @param buttonEl - the button that was clicked
+ */
+function onCourseClicked(course: Course, buttonEl: HTMLButtonElement): void {
+    // expand the node if it has children and is not expanded
+    // this is so the usage count only shows the count for the node and not its children
+    // if (showExpandButton.value && !isExpanded.value) {
+    //     isExpanded.value = true;
+    // }
+    // popOutStore.setActive(course, unit, props.node, buttonEl);
+}
+
 // #endregion
 </script>
 
@@ -149,9 +164,12 @@ function onUnitClicked(course: Course, unit: Unit, buttonEl: HTMLButtonElement):
         </td>
         <!-- loop through each course/unit, retrieving the node usage or returning 0 for undefined usages -->
         <template v-for="course in reportStore.courses" :key="course.id">
-            <td class="u-border-left">
-                {{ getFilteredCourseColumnCount(props.node, course, isExpanded) }}
-            </td>
+            <cc-report-table-node-course-column
+                :node="props.node"
+                :course="course"
+                :is-expanded="isExpanded"
+                @click="onCourseClicked"
+            />
             <cc-report-table-node-unit-column
                 v-for="unit in course.units"
                 :key="unit.id"
