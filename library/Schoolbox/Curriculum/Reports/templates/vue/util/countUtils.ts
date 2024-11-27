@@ -15,6 +15,33 @@ import { useFiltersStore } from "../store/ccFiltersStore";
 // #region usage counts
 
 /**
+ * Get the total usage count for a course, which is the
+ * total usage count linked to the course, with the selected report options considered
+ * @param node - the node to get the usage count for
+ * @param $course - the course to get the usage count for
+ * @param isExpanded - whether the node is expanded
+ * @returns the total course usage count
+ */
+export function getCourseColumnCount(node: CurriculumCoverageNode, $course: Course, isExpanded: boolean): number {
+    const course = node.usage.courses.find((c) => c.id === $course.id);
+    if (course === undefined) return 0;
+    const { usage } = course;
+    // only need to check for course usage on the course column
+    const onNodeCount = usage.course.count;
+    /**
+     * When the node has children and is not expanded, we want to show the usage count inclusive of children
+     * to show how many usages are linked to the node and its children
+     */
+    if (node.children && node.children.length > 0 && !isExpanded) {
+        const onChildrenCount = node.children.reduce((acc, child) => {
+            return acc + getCourseColumnCount(child, $course, isExpanded);
+        }, 0);
+        return onNodeCount + onChildrenCount;
+    }
+    return onNodeCount;
+}
+
+/**
  * Get the total usage count for a unit, with the selected report options considered
  * @param node - the node to get the usage count for
  * @param $course - the course to get the usage count for
@@ -46,33 +73,6 @@ export function getUnitColumnCount(
     if (node.children && node.children.length > 0 && !isExpanded) {
         const onChildrenCount = node.children.reduce((acc, child) => {
             return acc + getUnitColumnCount(child, $course, $unit, isExpanded);
-        }, 0);
-        return onNodeCount + onChildrenCount;
-    }
-    return onNodeCount;
-}
-
-/**
- * Get the total usage count for a course, which is the
- * total usage count linked to the course, with the selected report options considered
- * @param node - the node to get the usage count for
- * @param $course - the course to get the usage count for
- * @param isExpanded - whether the node is expanded
- * @returns the total course usage count
- */
-export function getCourseColumnCount(node: CurriculumCoverageNode, $course: Course, isExpanded: boolean): number {
-    const course = node.usage.courses.find((c) => c.id === $course.id);
-    if (course === undefined) return 0;
-    const { usage } = course;
-    // only need to check for course usage on the course column
-    const onNodeCount = usage.course.count;
-    /**
-     * When the node has children and is not expanded, we want to show the usage count inclusive of children
-     * to show how many usages are linked to the node and its children
-     */
-    if (node.children && node.children.length > 0 && !isExpanded) {
-        const onChildrenCount = node.children.reduce((acc, child) => {
-            return acc + getCourseColumnCount(child, $course, isExpanded);
         }, 0);
         return onNodeCount + onChildrenCount;
     }
@@ -115,6 +115,37 @@ export function getTotalCount(node: CurriculumCoverageNode, isExpanded: boolean)
 // #region filtered usage counts
 
 /**
+ * Get the total usage count for a course, which is the
+ * total usage count linked to the course, with the selected report options considered
+ * @param node - the node to get the usage count for
+ * @param $course - the course to get the usage count for
+ * @param isExpanded - whether the node is expanded
+ * @returns the total course usage count
+ */
+export function getFilteredCourseColumnCount(
+    node: CurriculumCoverageNode,
+    $course: Course,
+    isExpanded: boolean,
+): number {
+    const filtersStore = useFiltersStore();
+    const course = node.usage.courses.find((c) => c.id === $course.id) as CourseWithCurriculumNodeUsage; // assume course exists
+    const { usage } = course;
+    // only need to check for course usage on the course column
+    const onNodeCount = filtersStore.selectedReportOptions.includes(ReportOptionValues.COURSE) ? usage.course.count : 0;
+    /**
+     * When the node has children and is not expanded, we want to show the usage count inclusive of children
+     * to show how many usages are linked to the node and its children
+     */
+    if (node.children && node.children.length > 0 && !isExpanded) {
+        const onChildrenCount = node.children.reduce((acc, child) => {
+            return acc + getFilteredCourseColumnCount(child, $course, isExpanded);
+        }, 0);
+        return onNodeCount + onChildrenCount;
+    }
+    return onNodeCount;
+}
+
+/**
  * Get the total usage count for a unit, with the selected report options considered
  * @param node - the node to get the usage count for
  * @param $course - the course to get the usage count for
@@ -144,37 +175,6 @@ export function getFilteredUnitColumnCount(
     if (node.children && node.children.length > 0 && !isExpanded) {
         const onChildrenCount = node.children.reduce((acc, child) => {
             return acc + getFilteredUnitColumnCount(child, $course, $unit, isExpanded);
-        }, 0);
-        return onNodeCount + onChildrenCount;
-    }
-    return onNodeCount;
-}
-
-/**
- * Get the total usage count for a course, which is the
- * total usage count linked to the course, with the selected report options considered
- * @param node - the node to get the usage count for
- * @param $course - the course to get the usage count for
- * @param isExpanded - whether the node is expanded
- * @returns the total course usage count
- */
-export function getFilteredCourseColumnCount(
-    node: CurriculumCoverageNode,
-    $course: Course,
-    isExpanded: boolean,
-): number {
-    const filtersStore = useFiltersStore();
-    const course = node.usage.courses.find((c) => c.id === $course.id) as CourseWithCurriculumNodeUsage; // assume course exists
-    const { usage } = course;
-    // only need to check for course usage on the course column
-    const onNodeCount = filtersStore.selectedReportOptions.includes(ReportOptionValues.COURSE) ? usage.course.count : 0;
-    /**
-     * When the node has children and is not expanded, we want to show the usage count inclusive of children
-     * to show how many usages are linked to the node and its children
-     */
-    if (node.children && node.children.length > 0 && !isExpanded) {
-        const onChildrenCount = node.children.reduce((acc, child) => {
-            return acc + getFilteredCourseColumnCount(child, $course, isExpanded);
         }, 0);
         return onNodeCount + onChildrenCount;
     }
