@@ -648,7 +648,13 @@ class Controller extends Base
                 if (isset($tokens['[externalId]'])) {
                     $externalId = $tokens['[externalId]'];
                     try {
-                        $user     = $this->userMapper->findByExternalId($externalId, Role::STUDENT);
+                        // findByExternalId doesn't raise a deleted exception:
+                        // see SA-2288 for discussion.
+                        // For now just use standard find method.
+                        $user     = $this->userMapper->findOneByColumnList([
+                            'synergy_id'   => $externalId,
+                            'g.group_type' => Role::STUDENT,
+                        ]);
                         $imported = true;
                     } catch (MapperException\Deleted $e) {
                         $unknownReason = 'student has been deleted';
