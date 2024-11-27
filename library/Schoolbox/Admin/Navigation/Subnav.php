@@ -683,27 +683,26 @@ class Subnav
                         'visible'     => true,
                         'description' => 'Configure your school data (SIS) import process.',
                     ],
-                    // Non-standard ordering of menu items
-                    // -----------------------------------
-                    // The order of the menu items below is deliberately not alphabetical.  The ordering below matches
-                    // the order in which the import operations must be performed in order to avoid errors.
+                    // Note regarding ordering of School Data Import menu items
+                    // --------------------------------------------------------
+                    // The ordering below matches the order in which the import operations must be performed in order to avoid errors.
                     '/adminv2/import/profile' => [
-                        'name'        => 'User Profiles',
+                        'name'        => 'Step 1 - User Profiles',
                         'visible'     => $this->configLoader->get('schooldata_import_data_source') === 'csv',
                         'description' => 'Import staff, student, parent and relationship data via CSV files.',
                     ],
                     '/adminv2/import/timetableStructure' => [
-                        'name'        => 'Timetable Structure',
+                        'name'        => 'Step 2 - Timetable Structure',
                         'visible'     => $this->configLoader->get('schooldata_import_data_source') === 'csv',
                         'description' => 'Import timetable definition and structure via CSV.',
                     ],
                     '/adminv2/import/timetable' => [
-                        'name'        => 'Timetable',
+                        'name'        => 'Step 3 - Timetable',
                         'visible'     => $this->configLoader->get('schooldata_import_data_source') === 'csv',
                         'description' => 'Import the classes and their periods via CSV.',
                     ],
                     '/adminv2/import/timetableEnrolment' => [
-                        'name'        => 'Timetable Enrolment',
+                        'name'        => 'Step 4 - Timetable Enrolment',
                         'visible'     => $this->configLoader->get('schooldata_import_data_source') === 'csv',
                         'description' => 'Import the students and teachers in classes via CSV.',
                     ],
