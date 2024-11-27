@@ -12,7 +12,7 @@ import type { CurriculumCoverageNode } from "../js/types/curriculumCoverageTypes
 import { useReportStore } from "./store/ccReportStore";
 import { useFiltersStore } from "./store/ccFiltersStore";
 import { usePopOutStore } from "./store/ccPopOutStore";
-import { getCourseCount, getFilteredTotalCount } from "./util/countUtils";
+import { getCourseCount, getUnitColumnCount, getFilteredTotalCount } from "./util/countUtils";
 import CcReportTableNodeTotalColumn from "./cc-report-table-node-total-column.vue";
 import CcReportTableNodeCourseColumn from "./cc-report-table-node-course-column.vue";
 import CcReportTableNodeUnitColumn from "./cc-report-table-node-unit-column.vue";
@@ -169,15 +169,26 @@ function onCourseClicked(course: Course, buttonEl: HTMLButtonElement): void {
                 :is-expanded="isExpanded"
                 @click="onCourseClicked"
             />
-            <cc-report-table-node-unit-column
-                v-for="unit in course.units"
-                :key="unit.id"
-                :node="props.node"
-                :course="course"
-                :unit="unit"
-                :is-expanded="isExpanded"
-                @click="onUnitClicked"
-            />
+
+            <template v-for="unit in course.units" :key="unit.id">
+                <!-- if the node and its children are completely empty, just hard set to 0 -->
+                <td
+                    v-if="
+                        getUnitColumnCount(props.node, course, unit, true) === 0 &&
+                        getUnitColumnCount(props.node, course, unit, false) === 0
+                    "
+                >
+                    0
+                </td>
+                <cc-report-table-node-unit-column
+                    v-else
+                    :node="props.node"
+                    :course="course"
+                    :unit="unit"
+                    :is-expanded="isExpanded"
+                    @click="onUnitClicked"
+                />
+            </template>
             <template v-if="reportStore.hasMultipleCourses">
                 <!-- if the node and its children are completely empty, just hard set to 0 -->
                 <td

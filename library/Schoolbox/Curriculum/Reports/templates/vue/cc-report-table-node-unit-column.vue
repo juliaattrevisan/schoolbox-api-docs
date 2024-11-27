@@ -9,7 +9,7 @@ import type { Course } from "@schoolboxLibrary/types/Course";
 import type { Unit } from "@schoolboxLibrary/types/Unit";
 import type { CurriculumCoverageNode } from "../js/types/curriculumCoverageTypes";
 import { usePopOutStore } from "./store/ccPopOutStore";
-import { getUnitColumnCount, getFilteredUnitColumnCount } from "./util/countUtils";
+import { getFilteredUnitColumnCount } from "./util/countUtils";
 
 interface Props {
     node: CurriculumCoverageNode;
@@ -23,14 +23,7 @@ const emit = defineEmits<{
     click: [course: Course, unit: Unit, buttonEl: HTMLButtonElement];
 }>();
 
-const hasNoUsages = window.Vue.ref(getUnitColumnCount(props.node, props.course, props.unit, true) === 0); // no usage for the unit
-const hasNoUsagesWithChildren = window.Vue.ref(getUnitColumnCount(props.node, props.course, props.unit, false) === 0); // no usage for the unit and its children (if any)
-
 const count = window.Vue.computed(() => {
-    // to avoid unnecessary calculations when there are no usages, we return as early as possible
-    if (hasNoUsages.value && hasNoUsagesWithChildren.value) {
-        return 0;
-    }
     return getFilteredUnitColumnCount(props.node, props.course, props.unit, props.isExpanded);
 });
 const isCountZero = window.Vue.computed(() => count.value === 0); // don't need a button when it's zero
