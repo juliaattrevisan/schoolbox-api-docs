@@ -164,7 +164,7 @@ HELP;
         /* Mobile phone was only available to staff
          */
         $statement->execute([
-            'field' => 'barcode',
+            'field' => 'externalId',
             'displayAs' => 'Barcode',
         ]);
 
