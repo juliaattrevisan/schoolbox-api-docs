@@ -7,9 +7,10 @@ use Schoolbox\Calendar\Component\Dashboard\ApiFactory;
 use Schoolbox\Calendar\Component\Dashboard\FilterCodec;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentDataSource;
+use Schoolbox\Permission\Access\UserAccess;
 
 /**
- * These are the checkbox selections that superusers can tick
+ * These are the checkbox selections that users can tick
  * to filter the calendar payload
  *
  * @author      Steve Chan <steve.chan@alaress.com.au>
@@ -18,7 +19,6 @@ use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentDataSource;
  */
 class Component_Config_CalendarFilter extends Component_Config_Abstract
 {
-
     /**
      * Serialize multidimensional data so it can be persisted to the db
      *
@@ -30,14 +30,12 @@ class Component_Config_CalendarFilter extends Component_Config_Abstract
         return (new FilterCodec())->encode($value);
     }
 
-
     /**
      * @return void
      * @throws JsonException
      */
     public function parse(SitePage $page, $key, $keyblock, $configValue, Component_ControllerAbstract $component = null)
     {
-
         $di = $page->getDi();
 
         try {
@@ -88,6 +86,19 @@ class Component_Config_CalendarFilter extends Component_Config_Abstract
             ]);
 
             $page->parse('calendarfilter_eventtype_block', 'calendarfilter_eventtype', true);
+        }
+
+        $page->setBlock($keyblock, 'calendarfilter_subscribe_link', 'calendarfilter_subscribe_link_block');
+
+        if (
+            // The permission checks here determine whether the link below is shown, and so must match the
+            // permission checks on the linked-to page.  See www/adminv2/calendar.php.
+            !$di->get('user')->isSuperuser() &&
+            !$di->get('user')->hasServicePermission(UserAccess::SERVICE_CALENDAR, UserAccess::ACCESS_FULL)
+        ) {
+            $page->setVar('calendarfilter_subscribe_link_block');
+        } else {
+            $page->parse('calendarfilter_subscribe_link_block', 'calendarfilter_subscribe_link');
         }
 
         $page->setBlock($keyblock, 'calendarfilter_source', 'calendarfilter_source_block');
