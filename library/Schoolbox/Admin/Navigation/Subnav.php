@@ -492,11 +492,6 @@ class Subnav
                         'visible'     => (bool)$this->configLoader->get(ConfigMapper::NAME_LEARNING_MOMENTS_ENABLED),
                         'description' => 'Configure tags that can be used on learning moments when students capture evidence.',
                     ],
-                    '/adminv2/lists/residential-house' => [
-                        'name'        => 'Residential Houses',
-                        'visible'     => true,
-                        'description' => 'Setup the residential boarding houses that students attend.',
-                    ],
                     '/adminv2/lists/year-levels' => [
                         'name'        => 'Year Levels',
                         'visible'     => true,
@@ -884,6 +879,11 @@ class Subnav
                         'name'        => 'Remove Users',
                         'visible'     => true,
                         'description' => 'View and remove users which have not logged into the platform for a while.',
+                    ],
+                    '/adminv2/lists/residential-house' => [
+                        'name'        => 'Residential Houses',
+                        'visible'     => true,
+                        'description' => 'Setup the residential boarding houses that students attend.',
                     ],
                     '/adminv2/lists/roles' => [
                         'name'        => 'Roles',
