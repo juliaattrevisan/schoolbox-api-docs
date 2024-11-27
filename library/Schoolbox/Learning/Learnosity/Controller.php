@@ -2331,7 +2331,7 @@ class Controller extends Base
         $messageFactory = $messageFactory->addFileContent(
             $filename,
             (string)$urlBase
-                ->withPath($this->getRouteIfAuthorized('learnosity.getExportAttempts', ['assessmentId' => $assessment->getId()]))
+                ->withPath($this->getRouteIfAuthorized('learnosity.getExportAttempts', ['assessmentId' => $assessment->getId(), 'assessment' => $assessment]))
         );
 
         /* This $message instance is the payload that we send to taskd
