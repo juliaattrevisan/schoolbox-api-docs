@@ -12,9 +12,9 @@ import { usePopOutStore } from "./store/ccPopOutStore";
 import { getUnitColumnCount, getFilteredUnitColumnCount } from "./util/countUtils";
 
 interface Props {
+    node: CurriculumCoverageNode;
     course: Course;
     unit: Unit;
-    node: CurriculumCoverageNode;
     isExpanded: boolean; // whether the node is expanded
 }
 const props = defineProps<Props>();

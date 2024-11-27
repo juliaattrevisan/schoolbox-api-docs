@@ -172,9 +172,9 @@ function onCourseClicked(course: Course, buttonEl: HTMLButtonElement): void {
             <cc-report-table-node-unit-column
                 v-for="unit in course.units"
                 :key="unit.id"
+                :node="props.node"
                 :course="course"
                 :unit="unit"
-                :node="props.node"
                 :is-expanded="isExpanded"
                 @click="onUnitClicked"
             />
