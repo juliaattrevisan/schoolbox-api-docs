@@ -18,6 +18,7 @@ use Alaress\Database\Predicate\Builder;
 use Alaress\Database\Predicate\InvalidColumnException;
 use Alaress\Database\Quoter\IQuoter;
 use Alaress\DebugBar\Instance as DebugBar;
+use Alaress\Sentry\Tracing\Tracer;
 use Alaress_Date_Format;
 use InvalidArgumentException;
 use PDO;

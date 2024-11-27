@@ -28,6 +28,7 @@ if (isset($this)) {
 
 require_once __DIR__ . '/../../conf/core/require.php';
 $kernel = new Kernel();
+$kernel->setupSentryTrace(__FILE__);
 
 // You must at least be logged in to check file status
 $user = $kernel->get('user');

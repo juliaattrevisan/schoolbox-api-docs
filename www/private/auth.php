@@ -2,6 +2,7 @@
 
 require_once __DIR__ . '/../../conf/core/require.php';
 $kernel = new \Schoolbox\Application\BasicRequest\Kernel();
+$kernel->setupSentryTrace(__FILE__);
 
 if (!isset($_SESSION['user'])) {
     http_response_code(401);

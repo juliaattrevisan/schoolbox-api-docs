@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace Schoolbox\Application\CliTool;
 
 use Alaress\Lumberjack;
+use Alaress\Sentry\Tracing\Tracer;
 use Aura\Di\Exception;
 use Aura\Di\Exception\ContainerLocked;
 use Aura\Di\Exception\ServiceNotFound;
@@ -18,7 +19,6 @@ use ErrorException;
 use InvalidArgumentException;
 use Psr\Log\LoggerInterface;
 use Schoolbox\Application\CliKernelAbstract;
-use Schoolbox\Config\Loader as ConfigLoader;
 
 /**
  * This Kernel is designed for running CLI scripts/tools that are one-offs, for example:
@@ -121,6 +121,25 @@ class Kernel extends CliKernelAbstract
                 exit(self::EXIT_STATUS_KERNEL_ERROR);
             }
         }
+
+        // Instrument here
+        $trace = Tracer::getDefaultTrace();
+        $trace->setServerVars($_SERVER);
+        $trace->startTransaction(startTimestamp: microtime(true));
+        $trace->setTransactionContextForCommandLineTool(
+            $this->app->getToolFilenameAbsolute(),
+        );
+        $this->getShutdownHandler()->registerFunction(
+            function (): void {
+                // I don't believe it's possible to capture the exit code.
+                // I don't even reliably have an error here, so leave status
+                // as empty.
+                Tracer::getDefaultTrace()->finishTransaction(
+                    microtime(true),
+                );
+            },
+        );
+
         $perform = $forcePerform || $this->getKernelOpt(self::OPT_SHORT_PERFORM) || $this->getKernelOpt(self::OPT_LONG_PERFORM);
         $this->app->setup($this->appOpts, $this->getDependencyInjector(), $this->outStream, $this->logger(), $perform);
         $this->app->run();

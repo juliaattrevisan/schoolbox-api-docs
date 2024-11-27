@@ -14,6 +14,7 @@ use React\EventLoop\LoopInterface;
 use React\Promise\Deferred;
 use React\Promise\PromiseInterface;
 use React\Stream\DuplexResourceStream as Stream;
+use Schoolbox\Url\Uri;
 use Stomp\Exception\StompException;
 use Stomp\Protocol;
 use Stomp\Transport\Frame as BaseFrame;
@@ -262,5 +263,21 @@ class Connection
                 }
             }
         });
+    }
+
+    /**
+     * Piece together an identifier for this connection.
+     *
+     * @return string
+     */
+    public function getIdentifier(): string
+    {
+        return (new Uri())
+            ->withScheme('stomp')
+            ->withHost($this->host)
+            ->withPort($this->port)
+            ->withPath($this->vhost)
+            ->withUserInfo($this->login)
+            ->__toString();
     }
 }

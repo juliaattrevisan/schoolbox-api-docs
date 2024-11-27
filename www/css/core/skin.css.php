@@ -18,6 +18,7 @@ use Twig\Environment;
 
 require_once __DIR__ . '/../../../conf/core/require.php';
 $kernel = new \Schoolbox\Application\BasicRequest\Kernel();
+$kernel->setupSentryTrace(__FILE__);
 
 // Do stuff
 /** @var IConfigLoader $config */

@@ -13,6 +13,8 @@ use Alaress\HTMLPurifier\Adapter\ScrubAdapter;
 use Alaress\Image\ProcessorFactory;
 use Alaress\Redis\Cache\ItemPool;
 use Alaress\Redis\Cache\KeyGenerator;
+use Alaress\Sentry\Tracing\GuzzleTracingMiddleware;
+use Alaress\Sentry\Tracing\Tracer;
 use Cache\Bridge\SimpleCache\SimpleCacheBridge;
 use enshrined\svgSanitize\Sanitizer as BaseSvgSanitizer;
 use GuzzleHttp;
@@ -53,6 +55,8 @@ use Schoolbox\TaskDaemon\Request\MessageFactory;
 use Schoolbox\User\Token\Mapper as TokenMapper;
 use Schoolbox\UserMapper;
 use Schoolbox\Version\Version;
+use Sentry\Tracing\SpanStatus;
+use Sentry\Tracing\TransactionSource;
 use SitePage;
 use Twig\Environment;
 use Alaress\Twig\Method as TwigMethod;
@@ -268,7 +272,17 @@ class Kernel extends WebKernelAbstract
                 static function () use ($di) {
                     /** @var ProxyServer $proxyServer */
                     $proxyServer = $di->get('proxyServer');
-                    return new GuzzleHttp\Client(['curl' => $proxyServer->buildCurlOptions()]);
+
+                    // Add Sentry tracing middleware:
+                    // \Sentry\Tracing\GuzzleTracingMiddleware won't work, as
+                    // it adds the span directly to the transaction instead of
+                    // aggregating and adding later.
+                    $handlerStack = GuzzleHttp\HandlerStack::create();
+                    $handlerStack->push(GuzzleTracingMiddleware::trace($di->get('sentry'), Tracer::getDefaultTrace()));
+                    return new GuzzleHttp\Client([
+                        'curl'    => $proxyServer->buildCurlOptions(),
+                        'handler' => $handlerStack,
+                    ]);
                 }
             ),
         );
@@ -277,7 +291,7 @@ class Kernel extends WebKernelAbstract
         $di->set(
             'sentry',
             $di->lazy(
-                static function () use ($di) {
+                static function () use ($di, $config) {
                     $sentryToken   = defined('SENTRY_TOKEN') ? SENTRY_TOKEN : null;
                     $sentryProject = defined('SENTRY_PROJECT') ? SENTRY_PROJECT : null;
                     /** @var Instance $sb */
@@ -287,6 +301,7 @@ class Kernel extends WebKernelAbstract
                         Instance::APPLICATION_NAME,
                         $sentryToken,
                         $sentryProject,
+                        $config,
                     );
                 }
             )
@@ -408,7 +423,7 @@ class Kernel extends WebKernelAbstract
                                 'decoded' => isset($_REQUEST[Redirect::RETURN_URL])
                                     ? Redirect::decode($_REQUEST[Redirect::RETURN_URL])
                                     : null,
-                            ]
+                            ],
                         ]
                     );
 
@@ -573,5 +588,21 @@ class Kernel extends WebKernelAbstract
         );
 
         return $di;
+    }
+
+    /**
+     * Helper function for basic requests only to set up a Sentry trace:
+     * needs to be called manually with the filename of the script which created
+     * the basic request.
+     *
+     * @param string $path The full path of the script which was invoked:
+     *                     this path (minus the site root) will be used as the
+     *                     name of the trace's transaction.
+     * @return void
+     */
+    public function setupSentryTrace(string $path): void
+    {
+        $trace = Tracer::getDefaultTrace();
+        $trace->setTransactionContextForBasicRequest($path);
     }
 }

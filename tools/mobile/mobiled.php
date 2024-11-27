@@ -13,6 +13,7 @@ use Alaress\Async\Stomp\IClient;
 use Alaress\Date\Clock;
 use Alaress\Jitter\Jitter;
 use Alaress\Random\FloatGenerator;
+use Alaress\Sentry\Tracing\Tracer;
 use Alaress\WorkerCrew\Pooling\DefaultDispatchStrategy;
 use PhpAmqpLib\Exception\AMQPRuntimeException;
 use Predis\ClientInterface;
@@ -106,7 +107,7 @@ HELP;
         $amqp = $di->get('amqp');
 
         // we'll be using the mobile broker for receiving...
-        $broker = new Broker($instanceId, $amqp, $redis, $stomp);
+        $broker = new Broker($instanceId, $amqp, $redis, $stomp, Tracer::getDefaultTrace());
 
         $forceProduction = isset($opts['force-production']);
         if ($forceProduction) {

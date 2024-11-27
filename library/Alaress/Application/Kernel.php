@@ -23,6 +23,8 @@ use Alaress\Module\Registry;
 use Alaress\Redis;
 use Alaress\Redis\Cache\ItemPool;
 use Alaress\Redis\Cache\KeyGenerator;
+use Alaress\Sentry\Tracing\GuzzleTracingMiddleware;
+use Alaress\Sentry\Tracing\Tracer;
 use Alaress\Session\Factory;
 use Alaress\Session\Session;
 use Alaress\Twig\Loader\ChainLoader;
@@ -185,6 +187,10 @@ use Schoolbox\User\Token\Mapper as TokenMapper;
 use Schoolbox\UserMapper;
 use Schoolbox\Version\Version;
 use Scrub;
+use Sentry\State\HubInterface;
+use Sentry\Tracing\Transaction;
+use Sentry\Tracing\TransactionContext;
+use Sentry\Tracing\TransactionSource;
 use SitePage;
 use Symfony\Component\Lock\LockFactory;
 use Symfony\Component\Lock\Store\RedisStore;
@@ -232,6 +238,11 @@ abstract class Kernel
      */
     public function __construct(bool $bypassMaintenanceModeCheck = false)
     {
+        Tracer::getDefaultTrace()->startSpan(
+            'kernel:' . get_class($this),
+            operation: 'app.bootstrap',
+            origin: 'auto.app.start',
+        );
         $this->di              = (new Di\ContainerBuilder())->newInstance();
         $this->shutdownHandler = new ShutdownHandler();
 
@@ -239,9 +250,15 @@ abstract class Kernel
         $this->registerErrorHandling();
         $this->registerExceptionHandling();
         $this->registerShutdownHandling();
+        Tracer::getDefaultTrace()->runWithinSpan(
+            fn () => static::installDependencies($this->di),
+            'kernel:' . get_class($this),
+            operation: 'app.bootstrap.di',
+        );
         static::installDependencies($this->di);
         $this->postInstallDependencies($bypassMaintenanceModeCheck);
         $this->checkServerApiEnvironment();
+        Tracer::getDefaultTrace()->finishSpan();
     }
 
     /**
@@ -314,7 +331,10 @@ abstract class Kernel
      *
      * @return void
      */
-    abstract protected function registerShutdownHandling(): void;
+    protected function registerShutdownHandling(): void
+    {
+        register_shutdown_function($this->getShutdownHandler());
+    }
 
 
     /**
@@ -1637,7 +1657,17 @@ abstract class Kernel
                 static function () use ($di) {
                     /** @var ProxyServer $proxyServer */
                     $proxyServer = $di->get('proxyServer');
-                    return new GuzzleHttp\Client(['curl' => $proxyServer->buildCurlOptions()]);
+
+                    // Add Sentry tracing middleware:
+                    // \Sentry\Tracing\GuzzleTracingMiddleware won't work, as
+                    // it adds the span directly to the transaction instead of
+                    // aggregating and adding later.
+                    $handlerStack = GuzzleHttp\HandlerStack::create();
+                    $handlerStack->push(GuzzleTracingMiddleware::trace($di->get('sentry'), Tracer::getDefaultTrace()));
+                    return new GuzzleHttp\Client([
+                        'curl'    => $proxyServer->buildCurlOptions(),
+                        'handler' => $handlerStack,
+                    ]);
                 }
             ),
         );
@@ -1834,7 +1864,7 @@ abstract class Kernel
         $di->set(
             'sentry',
             $di->lazy(
-                static function () use ($di) {
+                static function () use ($di, $config) {
                     $sentryToken   = defined('SENTRY_TOKEN') ? SENTRY_TOKEN : null;
                     $sentryProject = defined('SENTRY_PROJECT') ? SENTRY_PROJECT : null;
                     /** @var Instance $sb */
@@ -1844,6 +1874,7 @@ abstract class Kernel
                         Instance::APPLICATION_NAME,
                         $sentryToken,
                         $sentryProject,
+                        $config,
                     );
                 }
             )

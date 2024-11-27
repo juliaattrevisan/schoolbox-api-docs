@@ -344,6 +344,12 @@ class ConfigMapper extends Mapper
     public const EXTERNAL_ISAMS_STUDENT_REGISTERS = 'external_isams_student_registers';
     public const EXTERNAL_ISAMS_FINANCIAL_REGISTERS = 'external_isams_financial_registers';
 
+
+    // Debugging settings
+    public const NAME_SENTRY_TRACE_DEFAULT_SAMPLE_RATE = 'sentry_trace_default_sample_rate';
+    public const NAME_SENTRY_TRACE_CUSTOM_SAMPLE_RATES = 'sentry_trace_custom_sample_rates';
+
+
     /**
      * Config settings which may affect the behaviour of the router daemon.
      *

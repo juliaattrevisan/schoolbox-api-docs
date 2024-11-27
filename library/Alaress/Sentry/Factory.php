@@ -11,6 +11,8 @@ namespace Alaress\Sentry;
 
 use Alaress\Authorizer\Failure\Base as BaseAuthorizationFailure;
 use Schoolbox\Application\Exception\Exception as SchoolboxException;
+use Schoolbox\Config\ConfigMapper;
+use Schoolbox\IConfigLoader;
 use Schoolbox\Instance;
 use Schoolbox\Mapper\Exception\Deleted;
 use Schoolbox\Mapper\Exception\NotFound;
@@ -44,16 +46,17 @@ class Factory
         string $applicationName,
         ?string $sentryToken,
         ?string $sentryProject,
+        IConfigLoader $configLoader,
     ): Sentry\State\HubInterface {
         if (!isset($sentryToken, $sentryProject) || $sentryToken === '' || $sentryProject === '') {
             return new NullHub();
         }
 
         Sentry\init([
-            'dsn'         => "https://{$sentryToken}@sentry.io/{$sentryProject}",
-            'environment' => $instance->getType(),
-            'release'     => $applicationName . '@' . $instance->getVersion(),
-            'before_send' => new CompositeFilter(
+            'dsn'               => "https://{$sentryToken}@sentry.io/{$sentryProject}",
+            'environment'       => $instance->getType(),
+            'release'           => $applicationName . '@' . $instance->getVersion(),
+            'before_send'       => new CompositeFilter(
                 new ExceptionFilter(
                     Deleted::class,
                     NotFound::class,
@@ -62,9 +65,36 @@ class Factory
                 ),
                 new DeprecationFilter(),
             ),
-            'error_types' => self::ERROR_REPORTING,
-            'send_default_pii' => true,
+            'error_types'       => self::ERROR_REPORTING,
+            'send_default_pii'  => true,
             'attach_stacktrace' => true,
+            'traces_sampler'    => function (Sentry\Tracing\SamplingContext $context) use ($configLoader): float {
+                // Maintenance mode: trace nothing, not even crons.
+                if ($configLoader->get(ConfigMapper::NAME_MAINTENANCE_MODE)) {
+                    return 0;
+                }
+
+                // Check custom sample rates list:
+                // if the current transaction's name matches the pattern in the
+                // CSV, then sample at that frequency.
+                $lines      = explode("\n", $configLoader->get(ConfigMapper::NAME_SENTRY_TRACE_CUSTOM_SAMPLE_RATES));
+                $sampleRate = null;
+                foreach ($lines as $line) {
+                    $row = str_getcsv($line);
+                    if (count($row) >= 2) {
+                        [$namePattern, $namePatternSampleRate] = $row;
+                        if (fnmatch($namePattern, $context->getTransactionContext()?->getName())) {
+                            $sampleRate = $namePatternSampleRate;
+                            break;
+                        }
+                    }
+                }
+
+                // No match in custom sample rates?
+                // Use the default sample rate.
+                $sampleRate ??= $configLoader->get(ConfigMapper::NAME_SENTRY_TRACE_DEFAULT_SAMPLE_RATE);
+                return min(1, max(0, floatval($sampleRate)));
+            },
         ]);
         Sentry\configureScope(static function (Sentry\State\Scope $scope) use ($instance): void {
             $scope->setTags([

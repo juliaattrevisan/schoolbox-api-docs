@@ -26,6 +26,7 @@ require_once __DIR__ . '/../../conf/core/require.php';
 [$width, $height] = MyImage::ensureDimensionsAreReasonable($_GET['width'] ?? null, $_GET['height'] ?? null);
 
 $kernel = new \Schoolbox\Application\BasicRequest\Kernel();
+$kernel->setupSentryTrace(__FILE__);
 $kernel->outputCacheControlMaxAgeHeaderFromConfig(ConfigMapper::NAME_BROWSER_CACHE_IMAGE_TIMEOUT);
 $kernel->getShutdownHandler()->registerFunction(
     new ResourceLimitExceededHandler(function () use ($width, $height) {

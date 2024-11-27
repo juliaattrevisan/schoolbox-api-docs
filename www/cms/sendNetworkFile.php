@@ -13,6 +13,7 @@
 //includes
 require_once __DIR__ . '/../../conf/core/require.php';
 $kernel = new \Schoolbox\Application\BasicRequest\Kernel();
+$kernel->setupSentryTrace(__FILE__);
 
 if (is_numeric($_GET['id']) && Config::get('webdav_enable')) {
     /** @var SitePage $page */

@@ -9,6 +9,7 @@ use Schoolbox\UserMapper;
 
 require_once __DIR__ . '/../../conf/core/require.php';
 $kernel = new \Schoolbox\Application\BasicRequest\Kernel();
+$kernel->setupSentryTrace(__FILE__);
 /** @var SitePage $page */
 $page = $kernel->get('sitePage');
 $page->initSession();
