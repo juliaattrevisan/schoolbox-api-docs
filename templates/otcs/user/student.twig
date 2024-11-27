@@ -1,8 +1,19 @@
 {% extends '@core/user/student.twig' %}
 
-{% block details_house %}
-    {% if externalUser.StudentHouseDescription %}
-        <dt class="small-4 medium-3 columns">Service:</dt>
-        <dd class="small-8 medium-9 columns">{{ externalUser.StudentHouseDescription }}</dd>
+{# Intercept default handling of a tuple. Custom Works' tuples must get dealt with specially here,
+ # before falling back to just putting selectedField.value on screen
+#}
+{% block profileFieldTuple %}
+    {% if selectedField.field == 'StudentHouseDescription' %}
+        {# StudentHouseDescription spawns something different that StudentHouse.
+         # Not entirely sure what that implies, but at any rate, has been used for something else.
+         #}
+        {% if selectedField.value ?? false %}
+            <dt class="small-4 medium-3 columns">Service</dt>
+            <dd class="small-8 medium-9 columns">{{ selectedField.value }}</dd>
+        {% endif %}
+    {% else %}
+        {# Default rendering: inherit from core template #}
+        {{ parent() }}
     {% endif %}
-{% endblock details_house %}
+{% endblock %}
