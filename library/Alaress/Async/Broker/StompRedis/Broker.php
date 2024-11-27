@@ -41,7 +41,6 @@ class Broker implements IBroker
      * @param ClientInterface $redis      an instance of the Predis client interface
      * @param IClient|null    $stomp      an instanceof the STOMP client interface
      *                                    (only needs to be supplied if attaching a consumer, otherwise can be omitted)
-     * @param Tracer|null     $tracer     The Sentry transaction tracer.
      */
     public function __construct(
         private string $queue,
@@ -49,7 +48,6 @@ class Broker implements IBroker
         private AMQPInterface $amqp,
         private ClientInterface $redis,
         private ?IClient $stomp = null,
-        private ?Tracer $tracer = null,
     ) {
         // ensure the queue requested exists so we can publish to it (via the default exchange)
         $amqp->declareQueue($this->queue);
@@ -72,8 +70,6 @@ class Broker implements IBroker
                 $this->queue,
                 IClient::ACK_MODE_CLIENT_INDIVIDUAL,
                 function (IFrame $frame, IAckResolver $resolver, Connection $conn, string $subscriptionId) use ($consumer): void {
-                    $this->tracer?->startTransaction();
-
                     $resolve = new Resolver($resolver);
 
                     try {
@@ -84,12 +80,14 @@ class Broker implements IBroker
                         $context = null;
                     }
 
-                    $this->tracer?->setTransactionContextForDaemon($conn->getIdentifier(), $subscriptionId, $key);
+                    $tracer = Tracer::getDefaultTrace();
+                    $tracer->startTransaction();
+                    $tracer->setTransactionContextForDaemon($conn->getIdentifier(), $subscriptionId, $key);
 
                     // payload from STOMP is a key for collecting a redis payload
                     if (!$this->redis->exists($key)) {
                         $consumer->onException(new PayloadMissingException($key, $resolve));
-                        $this->tracer?->finishTransaction(status: SpanStatus::internalError());
+                        $tracer->finishTransaction(status: SpanStatus::internalError());
                         return;
                     }
 
@@ -99,28 +97,28 @@ class Broker implements IBroker
                         if ($serial === false) {
                             // the payload is likely to be broken
                             $consumer->onException(new PayloadBrokenException($key, $resolve));
-                            $this->tracer?->finishTransaction(status: SpanStatus::internalError());
+                            $tracer->finishTransaction(status: SpanStatus::internalError());
                             return;
                         }
                         $payload = unserialize($serial);
                         if ($payload === false) {
                             // the payload is likely to be broken
                             $consumer->onException(new PayloadBrokenException($key, $resolve));
-                            $this->tracer?->finishTransaction(status: SpanStatus::internalError());
+                            $tracer->finishTransaction(status: SpanStatus::internalError());
                             return;
                         }
                     } catch (\TypeError $e) {
                         $consumer->onException(new PayloadBrokenException($key, $resolve, 0, $e));
-                        $this->tracer?->finishTransaction(status: SpanStatus::internalError());
+                        $tracer->finishTransaction(status: SpanStatus::internalError());
                         return;
                     } catch (\Exception $e) {
                         $consumer->onException($e);
-                        $this->tracer?->finishTransaction(status: SpanStatus::internalError());
+                        $tracer->finishTransaction(status: SpanStatus::internalError());
                         return;
                     }
 
                     $consumer->onMessage($payload, $resolve, $context);
-                    $this->tracer?->finishTransaction();
+                    $tracer->finishTransaction();
                 }
             );
         } catch (\Exception $e) {
