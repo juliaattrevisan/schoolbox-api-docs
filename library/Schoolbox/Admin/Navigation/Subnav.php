@@ -758,15 +758,15 @@ class Subnav
                         'visible'     => count($enabledConfigs[ConfigMapper::TYPE_LOCALISATION] ?? []) > 0,
                         'description' => 'Customise dates and other local formatting options.',
                     ],
-                    '/adminv2/oauth' => [
-                        'name'        => 'oAuth Provider Configuration',
-                        'visible'     => true,
-                        'description' => 'Configure an oAuth endpoint to validate tokens provided by mobile apps.',
-                    ],
                     '/adminv2/oauth/client' => [
                         'name'        => 'oAuth Client Configuration',
                         'visible'     => true,
                         'description' => 'Configure oAuth/OIDC clients which may use this Schoolbox instance as an identity provider.',
+                    ],
+                    '/adminv2/oauth' => [
+                        'name'        => 'oAuth Provider Configuration',
+                        'visible'     => true,
+                        'description' => 'Configure an oAuth endpoint to validate tokens provided by mobile apps.',
                     ],
                     '/adminv2/setting/Paths' => [
                         'name'        => 'Paths',
