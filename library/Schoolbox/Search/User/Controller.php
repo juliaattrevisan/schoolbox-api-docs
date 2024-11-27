@@ -189,7 +189,7 @@ class Controller extends BaseController
                  * ...but only if Pastoral Counts were a renderable field, as per admin
                  */
                 'pastoralCounts' => static function () use ($pastoralCountHelper, $pastoralCountPeriod, $viewee, $viewer) {
-                    if ($pastoralCountHelper && $pastoralCountPeriod) {
+                    if ($pastoralCountHelper) {
                         return $pastoralCountHelper->countStudentEventsByTypes(
                             $viewer,
                             $viewee,
