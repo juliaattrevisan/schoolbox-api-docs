@@ -422,7 +422,10 @@ class Subnav
                     ],
                     '/adminv2/lists/evidence-tag' => [
                         'name'        => 'Learning Moments',
-                        'visible'     => (bool)$this->configLoader->get(ConfigMapper::NAME_LEARNING_MOMENTS_ENABLED),
+                        'visible'     => (
+                            $userIsSuperuser &&
+                            $this->configLoader->get(ConfigMapper::NAME_LEARNING_MOMENTS_ENABLED)
+                        ),
                         'description' => 'Configure tags that can be used on learning moments when students capture evidence.',
                     ],
                     '/adminv2/lesson-plan/template' => [
