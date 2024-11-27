@@ -1,28 +1,12 @@
 {% extends '@core/user/student.twig' %}
 
-{#{% block extraDetails %}#}
-{#    {% if isStaff and externalUser.StudentMobilePhone is defined and externalUser.StudentMobilePhone %}#}
-{#        <dt class="small-4 medium-3 columns">Student Mobile:</dt>#}
-{#        <dd class="small-8 medium-9 columns">{{ externalUser.StudentMobilePhone }}</dd>#}
-{#    {% endif %}#}
-
-{#    #}{# Student External ID as Barcode #}
-{#    {% if user.externalId %}#}
-{#        <dd class="small-12 medium-12 columns">#}
-{#            <span class="barcode-39">*{{ user.externalId }}*</span>#}
-{#        </dd>#}
-{#    {% endif %}#}
-{#{% endblock extraDetails %}#}
-
-
-
 {# Intercept default handling of a tuple. Custom Works' tuples must get dealt with specially here,
  # before falling back to just putting selectedField.value on screen
-#}
+ #}
 {% block profileFieldTuple %}
     {# This requires a dupe of externalId field, then a special handling
-     # Otherwise, the core template will preclude this field: it has no intrinsic value (it's empty)
-     # displayAs is the only way to distinguish between the tw.
+     # The frontend and the schema generally prohibit dupes of (roletype, field) so we kind of have
+     # to piggyback off something that already exists.
      #}
     {% if selectedField.field == 'externalId' %}
         {{ parent() }}
