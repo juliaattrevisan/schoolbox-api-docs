@@ -86,6 +86,8 @@
                         {% if data.record ?? false %}
                             Created
                             (<a href="{{ routeLookup('pastoral.getStudentRecord', {studentId: data.user.id, recordId: data.record.id}) }}">#{{ data.record.id }}</a>)
+                        {% elseif not import.imported %}
+                            Will be created
                         {% else %}
                             &mdash;
                         {% endif %}
@@ -105,9 +107,9 @@
                         &mdash;
                     {% endif %}
                 </td>
-                <td>&mdash;</td>
+                <td>{{ data.user.name ?? '&mdash;' }}</td>
                 <td>
-                    <i>{{ data.reason }}</i>
+                    <i>{% if import.imported %}Not created{% else%}Will not be created{% endif%} ({{ data.reason }})</i>
                 </td>
             </tr>
         {% endfor %}
