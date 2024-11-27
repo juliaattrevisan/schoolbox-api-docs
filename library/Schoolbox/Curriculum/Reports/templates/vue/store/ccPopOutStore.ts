@@ -3,10 +3,13 @@
  */
 
 import { defineStore } from "pinia";
-import type { Course } from "@schoolboxLibrary/types/Course";
-import type { Unit } from "@schoolboxLibrary/types/Unit";
 import { isAbortError } from "@js/util/errorUtils";
-import type { CurriculumCoverageNode, IndividualUsage } from "../../js/types/curriculumCoverageTypes";
+import type {
+    CurriculumCoverageNode,
+    CourseWithCurriculumNodeUsage,
+    UnitWithCurriculumNodeUsage,
+    IndividualUsage,
+} from "../../js/types/curriculumCoverageTypes";
 
 /**
  * What is returned when there is a search error
@@ -18,8 +21,8 @@ export type ReportError = {
 };
 
 export const usePopOutStore = defineStore(`ccPopOut`, () => {
-    const course = window.Vue.ref<Course | null>(null);
-    const unit = window.Vue.ref<Unit | null>(null);
+    const course = window.Vue.ref<CourseWithCurriculumNodeUsage | null>(null);
+    const unit = window.Vue.ref<UnitWithCurriculumNodeUsage | null>(null);
     const node = window.Vue.ref<CurriculumCoverageNode | null>(null);
     const button = window.Vue.ref<HTMLButtonElement | null>(null);
 
@@ -146,8 +149,8 @@ export const usePopOutStore = defineStore(`ccPopOut`, () => {
      * @param $button - the button that triggered the action
      */
     function setActiveUnitColumn(
-        $course: Course,
-        $unit: Unit,
+        $course: CourseWithCurriculumNodeUsage,
+        $unit: UnitWithCurriculumNodeUsage,
         $node: CurriculumCoverageNode,
         $button: HTMLButtonElement,
     ): void {

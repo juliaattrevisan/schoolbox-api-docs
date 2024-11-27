@@ -6,9 +6,11 @@
 import { useTemplateRef } from "vue";
 import { gsap } from "gsap/all";
 import { useNodeTitle } from "@schoolboxCurriculum/vue/composables/useNodeTitle";
-import type { Course } from "@schoolboxLibrary/types/Course";
-import type { Unit } from "@schoolboxLibrary/types/Unit";
-import type { CurriculumCoverageNode } from "../js/types/curriculumCoverageTypes";
+import type {
+    CurriculumCoverageNode,
+    CourseWithCurriculumNodeUsage,
+    UnitWithCurriculumNodeUsage,
+} from "../js/types/curriculumCoverageTypes";
 import { useReportStore } from "./store/ccReportStore";
 import { useFiltersStore } from "./store/ccFiltersStore";
 import { usePopOutStore } from "./store/ccPopOutStore";
@@ -119,7 +121,11 @@ const popOutStore = usePopOutStore();
  * @param unit - the unit that was clicked
  * @param buttonEl - the button that was clicked
  */
-function onUnitClicked(course: Course, unit: Unit, buttonEl: HTMLButtonElement): void {
+function onUnitClicked(
+    course: CourseWithCurriculumNodeUsage,
+    unit: UnitWithCurriculumNodeUsage,
+    buttonEl: HTMLButtonElement,
+): void {
     // expand the node if it has children and is not expanded
     // this is so the usage count only shows the count for the node and not its children
     if (showExpandButton.value && !isExpanded.value) {
