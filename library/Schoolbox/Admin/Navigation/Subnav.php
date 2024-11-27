@@ -180,7 +180,7 @@ class Subnav
          * ----------------------
          * Menu items should be ordered according to the following rules:
          *  - Items named 'Home' go at the top, whether in the main menu or sub-menus.
-         *  - Except for pages named 'Home', pages should be ordered alphabetically.
+         *  - Except for items named 'Home', menu items should be ordered alphabetically.
          *  - Configurable terminology should not be used (because that would mess up alphabetical ordering).
          */
         return [
