@@ -68,11 +68,9 @@ function getUnitUsageCount(node: CurriculumCoverageNode, $course: Course, $unit:
     const unit = course.units.find((u) => u.id === $unit.id);
     if (unit === undefined) return 0;
     const { usage } = unit;
-    if (usage === undefined) return 0;
     const onNodeCount = filtersStore.selectedReportOptions.reduce((acc, option) => {
         // always skip course as it can't be assigned within a unit
         if (option === ReportOptionValues.COURSE) return acc;
-        if (usage[option] === undefined) return acc;
         return acc + usage[option].count;
     }, 0);
     /**
