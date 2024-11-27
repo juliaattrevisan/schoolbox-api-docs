@@ -62,7 +62,7 @@ function onExpandClicked(): void {
  * @param $unit - the unit to get the usage count for
  * @returns the total unit usage count
  */
-function getUnitUsageCount(node: CurriculumCoverageNode, $course: Course, $unit: Unit): number {
+function getFilteredUnitColumnCount(node: CurriculumCoverageNode, $course: Course, $unit: Unit): number {
     const course = node.usage.courses.find((c) => c.id === $course.id);
     if (course === undefined) return 0;
     const unit = course.units.find((u) => u.id === $unit.id);
@@ -79,7 +79,7 @@ function getUnitUsageCount(node: CurriculumCoverageNode, $course: Course, $unit:
      */
     if (node.children && node.children.length > 0 && !isExpanded.value) {
         const onChildrenCount = node.children.reduce((acc, child) => {
-            return acc + getUnitUsageCount(child, $course, $unit);
+            return acc + getFilteredUnitColumnCount(child, $course, $unit);
         }, 0);
         return onNodeCount + onChildrenCount;
     }
@@ -93,7 +93,7 @@ function getUnitUsageCount(node: CurriculumCoverageNode, $course: Course, $unit:
  * @param $course - the course to get the usage count for
  * @returns the total course usage count
  */
-function getCourseUsageCount(node: CurriculumCoverageNode, $course: Course): number {
+function getCourseColumnColumnCount(node: CurriculumCoverageNode, $course: Course): number {
     const course = node.usage.courses.find((c) => c.id === $course.id);
     if (course === undefined) return 0;
     const { usage } = course;
@@ -105,7 +105,7 @@ function getCourseUsageCount(node: CurriculumCoverageNode, $course: Course): num
      */
     if (node.children && node.children.length > 0 && !isExpanded.value) {
         const onChildrenCount = node.children.reduce((acc, child) => {
-            return acc + getCourseUsageCount(child, $course);
+            return acc + getCourseColumnColumnCount(child, $course);
         }, 0);
         return onNodeCount + onChildrenCount;
     }
@@ -119,12 +119,12 @@ function getCourseUsageCount(node: CurriculumCoverageNode, $course: Course): num
  * @param $course - the course to get the usage count for
  * @returns the total node usage count for all selected course(s)
  */
-function getTotalUsageCount(node: CurriculumCoverageNode, $course: Course): number {
+function getFilteredCourseCount(node: CurriculumCoverageNode, $course: Course): number {
     const course = node.usage.courses.find((c) => c.id === $course.id);
     if (course === undefined || course.units === undefined) return 0;
-    const courseUsageCount = getCourseUsageCount(node, $course);
+    const courseUsageCount = getCourseColumnColumnCount(node, $course);
     const unitUsageCount = course.units.reduce((acc, unit) => {
-        return acc + getUnitUsageCount(node, course, unit);
+        return acc + getFilteredUnitColumnCount(node, course, unit);
     }, 0);
     return courseUsageCount + unitUsageCount;
 }
@@ -135,9 +135,9 @@ function getTotalUsageCount(node: CurriculumCoverageNode, $course: Course): numb
  * @param node - the node to get the usage count for
  * @returns the total node usage count
  */
-function getEntireUsageCount(node: CurriculumCoverageNode): number {
+function getFilteredTotalCount(node: CurriculumCoverageNode): number {
     return node.usage.courses.reduce((acc, course) => {
-        return acc + getTotalUsageCount(node, course);
+        return acc + getFilteredCourseCount(node, course);
     }, 0);
 }
 
@@ -154,7 +154,7 @@ const showNode = window.Vue.computed(() => {
     if ((filtersStore.onlyShowGaps && props.node.code === null) || props.node.code === "") {
         return false;
     }
-    return getEntireUsageCount(props.node) === 0 && filtersStore.onlyShowGaps;
+    return getFilteredTotalCount(props.node) === 0 && filtersStore.onlyShowGaps;
 });
 
 // #endregion
@@ -230,12 +230,12 @@ function onUnitClicked(course: Course, unit: Unit, buttonEl: HTMLButtonElement):
             </button>
         </td>
         <td class="u-border-left">
-            <b>{{ getEntireUsageCount(props.node) }}</b>
+            <b>{{ getFilteredTotalCount(props.node) }}</b>
         </td>
         <!-- loop through each course/unit, retrieving the node usage or returning 0 for undefined usages -->
         <template v-for="course in reportStore.courses" :key="course.id">
             <td class="u-border-left">
-                {{ getCourseUsageCount(props.node, course) }}
+                {{ getCourseColumnColumnCount(props.node, course) }}
             </td>
             <cc-report-table-node-unit
                 v-for="unit in course.units"
@@ -243,12 +243,12 @@ function onUnitClicked(course: Course, unit: Unit, buttonEl: HTMLButtonElement):
                 :course="course"
                 :unit="unit"
                 :node="props.node"
-                :count="getUnitUsageCount(props.node, course, unit)"
+                :count="getFilteredUnitColumnCount(props.node, course, unit)"
                 :is-expanded="isExpanded"
                 @click="onUnitClicked"
             />
             <td v-if="reportStore.hasMultipleCourses" :class="``">
-                {{ getTotalUsageCount(props.node, course) }}
+                {{ getFilteredCourseCount(props.node, course) }}
             </td>
         </template>
     </tr>
