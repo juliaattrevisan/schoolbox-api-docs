@@ -13,6 +13,7 @@ import { useReportStore } from "./store/ccReportStore";
 import { useFiltersStore } from "./store/ccFiltersStore";
 import { usePopOutStore } from "./store/ccPopOutStore";
 import { getFilteredTotalCount } from "./util/countUtils";
+import CcReportTableNodeTotalColumn from "./cc-report-table-node-total-column.vue";
 import CcReportTableNodeCourseColumn from "./cc-report-table-node-course-column.vue";
 import CcReportTableNodeUnitColumn from "./cc-report-table-node-unit-column.vue";
 import CcReportTableNodeCourseTotalColumn from "./cc-report-table-node-course-total-column.vue";
@@ -159,9 +160,7 @@ function onCourseClicked(course: Course, buttonEl: HTMLButtonElement): void {
                 {{ title }}
             </button>
         </td>
-        <td class="u-border-left">
-            <b>{{ getFilteredTotalCount(props.node, isExpanded) }}</b>
-        </td>
+        <cc-report-table-node-total-column :node="props.node" :is-expanded="isExpanded" />
         <!-- loop through each course/unit, retrieving the node usage or returning 0 for undefined usages -->
         <template v-for="course in reportStore.courses" :key="course.id">
             <cc-report-table-node-course-column
