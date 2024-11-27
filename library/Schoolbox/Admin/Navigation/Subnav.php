@@ -334,15 +334,15 @@ class Subnav
                 'visible'    => $userIsSuperuser && $this->configLoader->get(ConfigMapper::NAME_EPORTFOLIO_ENABLED),
                 'searchable' => false,
                 'children'   => [
-                    '/adminv2/setting/ePortfolio' => [
-                        'name'        => 'Policy',
-                        'visible'     => true,
-                        'description' => 'Configure policies relating to ePortfolio.',
-                    ],
                     '/adminv2/eportfolio/deploy' => [
                         'name'        => 'Deployment',
                         'visible'     => true,
                         'description' => 'Configure and setup the scaffolding templates that users can create ePortfolio pages from.',
+                    ],
+                    '/adminv2/setting/ePortfolio' => [
+                        'name'        => 'Policy',
+                        'visible'     => true,
+                        'description' => 'Configure policies relating to ePortfolio.',
                     ],
                     '/adminv2/eportfolio' => [
                         'name'        => 'Templates',
