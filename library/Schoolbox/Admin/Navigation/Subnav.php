@@ -819,10 +819,20 @@ class Subnav
                         'visible'     => true,
                         'description' => 'Access recent CMS actions like delete, create and modify of files, folders and links.',
                     ],
+                    '/adminv2/user/bulk/modify' => [
+                        'name'        => 'Bulk Modify',
+                        'visible'     => true,
+                        'description' => 'Make changes to user accounts on bulk by searching on various account attributes.',
+                    ],
                     '/adminv2/lists/campus' => [
                         'name'        => 'Campuses',
                         'visible'     => true,
                         'description' => 'Setup the campus within the school and configure which timetables are used by the campus.',
+                    ],
+                    '/adminv2/user/create' => [
+                        'name'        => 'Create User',
+                        'visible'     => true,
+                        'description' => 'Setup a new user account for use in the platform.',
                     ],
                     '/adminv2/lists/house' => [
                         'name'        => 'Houses',
@@ -838,16 +848,6 @@ class Subnav
                         'name'        => 'Import Portraits',
                         'visible'     => true,
                         'description' => 'Manually upload portrait photos for users when the SIS does not automatically provide them.',
-                    ],
-                    '/adminv2/user/bulk/modify' => [
-                        'name'        => 'Bulk Modify',
-                        'visible'     => true,
-                        'description' => 'Make changes to user accounts on bulk by searching on various account attributes.',
-                    ],
-                    '/adminv2/user/create' => [
-                        'name'        => 'Create User',
-                        'visible'     => true,
-                        'description' => 'Setup a new user account for use in the platform.',
                     ],
                     '/adminv2/reports/login/all' => [
                         'name'        => 'Login Log',
