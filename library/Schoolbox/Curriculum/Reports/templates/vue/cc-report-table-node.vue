@@ -99,20 +99,8 @@ function getCourseUsageCount(node: CurriculumCoverageNode, $course: Course): num
     const course = node.usage.courses.find((c) => c.id === $course.id);
     if (course === undefined) return 0;
     const { usage } = course;
-    if (usage === undefined) return 0;
-    const onNodeCount = filtersStore.selectedReportOptions.reduce((acc, option) => {
-        // always skip unit, learning activity and lesson plan options as they can't be assigned within a course
-        if (
-            option === ReportOptionValues.UNIT ||
-            option === ReportOptionValues.LEARNING_ACTIVITY ||
-            option === ReportOptionValues.LEARNING_ACTIVITY_LESSON_PLAN ||
-            option === ReportOptionValues.RUBRIC ||
-            option === ReportOptionValues.IN_USE_RUBRIC
-        )
-            return acc;
-        if (usage[option] === undefined) return acc;
-        return acc + usage[option].count;
-    }, 0);
+    // only need to check for course usage on the course column
+    const onNodeCount = filtersStore.selectedReportOptions.includes(ReportOptionValues.COURSE) ? usage.course.count : 0;
     /**
      * When the node has children and is not expanded, we want to show the usage count inclusive of children
      * to show how many usages are linked to the node and its children
