@@ -32,6 +32,49 @@ use function Sentry\getW3CTraceparent;
 class Tracer
 {
     /**
+     * The server var which contains the value of the `sentry-trace` HTTP header
+     * for this request.
+     *
+     * Used along with the `baggage` header for passing and continuing a
+     * distributed trace.
+     *
+     * @see https://docs.sentry.io/platforms/javascript/tracing/trace-propagation/
+     */
+    public const SERVER_VAR_SENTRY_TRACE = 'HTTP_SENTRY_TRACE';
+
+    /**
+     * The server var which contains the value of the `baggage` HTTP header for
+     * this request.
+     *
+     * Used along with the `sentry-trace` header for passing and continuing a
+     * distributed trace.
+     *
+     * @see https://docs.sentry.io/platforms/javascript/tracing/trace-propagation/
+     */
+    public const SERVER_VAR_BAGGAGE = 'HTTP_BAGGAGE';
+
+    /**
+     * The environment var which contains the Sentry trace value for this
+     * process.
+     *
+     * Used along with the `BAGGAGE` env var for passing and continuing a
+     * distributed trace.
+     *
+     * @see https://docs.sentry.io/platforms/javascript/tracing/trace-propagation/
+     */
+    public const ENV_VAR_SENTRY_TRACE = 'SENTRY_TRACE';
+
+    /**
+     * The environment var which contains the baggage value for this process.
+     *
+     * Used along with the `SENTRY_TRACE` env var for passing and continuing a
+     * distributed trace.
+     *
+     * @see https://docs.sentry.io/platforms/javascript/tracing/trace-propagation/
+     */
+    public const ENV_VAR_BAGGAGE = 'BAGGAGE';
+
+    /**
      * A placeholder name for the transaction.
      */
     private const PLACEHOLDER_TRANSACTION_NAME = 'placeholder';
@@ -136,11 +179,14 @@ class Tracer
         // Continue trace from headers or vars if present:
         // otherwise create a new trace
         $transactionContext = null;
-        if (isset($this->serverVars['HTTP_SENTRY_TRACE'], $this->serverVars['HTTP_BAGGAGE'])) {
-            $transactionContext = continueTrace($this->serverVars['HTTP_SENTRY_TRACE'], $this->serverVars['HTTP_BAGGAGE']);
+        if (isset($this->serverVars[self::SERVER_VAR_SENTRY_TRACE], $this->serverVars[self::SERVER_VAR_BAGGAGE])) {
+            $transactionContext = continueTrace(
+                $this->serverVars[self::SERVER_VAR_SENTRY_TRACE],
+                $this->serverVars[self::SERVER_VAR_BAGGAGE],
+            );
         } else {
-            $envSentryTrace = getenv('SENTRY_TRACE', true);
-            $envBaggage     = getenv('BAGGAGE', true);
+            $envSentryTrace = getenv(self::ENV_VAR_SENTRY_TRACE, true);
+            $envBaggage     = getenv(self::ENV_VAR_BAGGAGE, true);
             if ($envSentryTrace && $envBaggage) {
                 $transactionContext = continueTrace($envSentryTrace, $envBaggage);
             }
