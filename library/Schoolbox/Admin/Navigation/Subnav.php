@@ -436,14 +436,6 @@ class Subnav
                         'visible'     => true,
                         'description' => 'Configure the 3rd party LTI integrations that you wish to make available for use in the LTI component.',
                     ],
-                    '/adminv2/filters/lms/dueWorkCal' => [
-                        'name'        => $filterLabelBuilder->buildLabel(FilterPageModel::PAGE_UPCOMING_ASSESSMENTS) . ' Filter',
-                        'visible'     => (
-                            $filterAvailabilityChecker->isAvailable(FilterPageModel::PAGE_UPCOMING_ASSESSMENTS) &&
-                            $this->configLoader->get(ConfigMapper::NAME_LMS_ENABLED)
-                        ),
-                        'description' => 'Configure the default and available filter options on the students due work calendar.',
-                    ],
                     '/adminv2/filters/lms/pending' => [
                         'name'        => $filterLabelBuilder->buildLabel(FilterPageModel::PAGE_PENDING_ASSESSMENTS) . ' Filter',
                         'visible'     => $filterAvailabilityChecker->isAvailable(FilterPageModel::PAGE_PENDING_ASSESSMENTS),
@@ -471,6 +463,14 @@ class Subnav
                         'name'        => 'Submission States List',
                         'visible'     => (bool)$this->configLoader->get(ConfigMapper::NAME_LMS_ENABLED),
                         'description' => 'Configure the alternative states an assessment can be in beyond being graded.',
+                    ],
+                    '/adminv2/filters/lms/dueWorkCal' => [
+                        'name'        => $filterLabelBuilder->buildLabel(FilterPageModel::PAGE_UPCOMING_ASSESSMENTS) . ' Filter',
+                        'visible'     => (
+                            $filterAvailabilityChecker->isAvailable(FilterPageModel::PAGE_UPCOMING_ASSESSMENTS) &&
+                            $this->configLoader->get(ConfigMapper::NAME_LMS_ENABLED)
+                        ),
+                        'description' => 'Configure the default and available filter options on the students due work calendar.',
                     ],
                     '/adminv2/lists/lms/submission-type' => [
                         'name'        => 'Work Types List',
