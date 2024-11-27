@@ -13,6 +13,7 @@ use Alaress\Database\Predicate\Builder;
 use Schoolbox\Application\Exception\Exception as SchoolboxException;
 use PDOException;
 use Schoolbox\Collection;
+use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\User;
 use Schoolbox\UserBulkMapper;
 
@@ -147,6 +148,7 @@ class BulkUpdater
      * @param string         $position
      * @param int            $displayGradeGraph
      * @param int            $revokeToken
+     * @param int            $clearGroups
      */
     public function __construct(
         User $sessionUser,
@@ -164,7 +166,8 @@ class BulkUpdater
         int $hideTimetable,
         string $position,
         int $displayGradeGraph,
-        int $revokeToken
+        int $revokeToken,
+        private int $clearGroups
     ) {
         $this->sessionUser    = $sessionUser;
         $this->userBulkMapper = $userBulkMapper;
@@ -271,6 +274,8 @@ class BulkUpdater
 
         if (\count($statements['token']['update']['params'])) {
             $statements['token']['update']['statement']->execute($statements['token']['update']['params']);
+            $updated = true;
+
             /* Log the users we brutally updated en-masse
              */
             foreach ($statements['token']['update']['params'] as $key => $userId) {
@@ -279,6 +284,21 @@ class BulkUpdater
                     continue;
                 }
                 $messages[] = "{$this->sessionUser->getFullname()} ({$this->sessionUser->getId()}) revoked token for {$lookup[$userId]} ({$userId})";
+            }
+        }
+
+        if (\count($statements['groups']['delete']['params'])) {
+            $statements['groups']['delete']['statement']->execute($statements['groups']['delete']['params']);
+
+            $updated = true;
+            /* Log the users we brutally updated en-masse
+             */
+            foreach ($statements['groups']['delete']['params'] as $key => $userId) {
+                if ($key === 'service') {
+                    // this is session user id
+                    continue;
+                }
+                $messages[] = "{$this->sessionUser->getFullname()} ({$this->sessionUser->getId()}) groups cleared for {$lookup[$userId]} ({$userId})";
             }
         }
 
@@ -391,6 +411,12 @@ class BulkUpdater
             ],
             'token'  => [
                 'update' => [
+                    'statement' => null,
+                    'params'    => [],
+                ],
+            ],
+            'groups'  => [
+                'delete' => [
                     'statement' => null,
                     'params'    => [],
                 ],
@@ -539,6 +565,26 @@ class BulkUpdater
                        AND deleted_at IS NULL"
                 );
                 $statements['token']['update']['params']    = array_merge(['userId' => $this->sessionUser->getId()], $revokeTokenBindings->getParams());
+            }
+        }
+
+        if ($this->clearGroups === 1) {
+            /* find out which users are actually in groups
+             */
+            $toDelete        = $this->userBulkMapper->getDatabase()->query(
+                "SELECT uid FROM userAccess WHERE service = :service AND uid IN ({$bindings->getPlaceholder()})",
+                array_merge(['service' => UserAccess::SERVICE_HOMEPAGE], $bindings->getParams())
+            );
+            $deletingUserIds = $toDelete->fetchAll(\PDO::FETCH_COLUMN);
+
+            /* for the users who are members of groups, clear their memberships
+             */
+            if ($deletingUserIds) {
+                $clearGroupsBindings = Builder::getBindings($deletingUserIds, 'cg');
+                $statements['groups']['delete']['statement'] = $this->userBulkMapper->getDatabase()->prepare(
+                    "DELETE FROM userAccess WHERE service = :service AND uid IN ({$clearGroupsBindings->getPlaceholder()})"
+                );
+                $statements['groups']['delete']['params']    = array_merge(['service' => UserAccess::SERVICE_HOMEPAGE], $clearGroupsBindings->getParams());
             }
         }
 

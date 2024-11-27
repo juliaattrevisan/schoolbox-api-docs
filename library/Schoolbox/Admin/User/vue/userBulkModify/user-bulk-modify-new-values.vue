@@ -72,6 +72,7 @@ export default {
                 positionTitle: "",
                 displayGradeGraph: -1,
                 revokeToken: -1,
+                clearGroups: -1,
             },
             updateFieldsOriginal: {}, //to reset to original values once an update is complete
             isProcessing: false,
@@ -206,6 +207,11 @@ export default {
                             }}</label>
                         </li>
                     </ul>
+                    <label for="clear_groups">Group Involvement</label>
+                    <select id="clear_groups" name="clear_groups" v-model="updateFields.clearGroups">
+                        <option value="-1">Unchanged</option>
+                        <option value="1">Remove from all groups</option>
+                    </select>
                     <label for="apply_role">Role</label>
                     <select id="apply_role" name="apply_role" v-model="updateFields.roleId">
                         <option value="-1">Unchanged</option>
