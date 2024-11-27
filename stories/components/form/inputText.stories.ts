@@ -85,9 +85,9 @@ export const HasError: Story = {
 export const WithButton: Story = {
     render: () => ({
         template: `
-<div class="c-form-element l-gap--0">
+<div class="c-form-element l-gap--0 inline-input-container">
     <input id="news_default_expiry-field" class="c-input-text c-input-text--with-button" type="text" />
-    <button class="c-button c-button--with-input l-width-100">
+    <button class="c-button c-button--with-input">
         <sbx-icon name="folder"></sbx-icon>
         <span>Browse Resources</span>
     </button>

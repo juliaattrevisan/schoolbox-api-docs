@@ -43,5 +43,9 @@
 }
 
 .c-input-text--with-button[type="text"] {
-    border-radius: var(--roundness-form-elements) var(--roundness-form-elements) 0 0;
+    border-radius: var(--sbx-border-radius-normal) 0 0 var(--sbx-border-radius-normal);
+}
+.inline-input-container {
+    flex-direction: row !important;
+    justify-content: flex-end;
 }
