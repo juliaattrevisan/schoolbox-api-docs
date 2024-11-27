@@ -3,13 +3,12 @@
  * To display a a single course total cell in the curriculum coverage report
  */
 
-import type { Course } from "@schoolboxLibrary/types/Course";
-import type { CurriculumCoverageNode } from "../js/types/curriculumCoverageTypes";
+import type { CurriculumCoverageNode, CourseWithCurriculumNodeUsage } from "../js/types/curriculumCoverageTypes";
 import { getFilteredCourseCount } from "./util/countUtils";
 
 interface Props {
     node: CurriculumCoverageNode;
-    course: Course;
+    course: CourseWithCurriculumNodeUsage;
     isExpanded: boolean; // whether the node is expanded
 }
 const props = defineProps<Props>();
