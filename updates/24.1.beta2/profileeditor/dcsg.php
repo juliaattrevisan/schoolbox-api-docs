@@ -92,7 +92,7 @@ $app = new class extends CliTool\App {
         if ($this->getOpt(self::OPT_LONG_HELP)) {
             echo <<<HELP
 
-Profile Editor: AAS Custom Work migration.
+Profile Editor: DCSG et al. Custom Work migration.
 
 
 HELP;
