@@ -290,7 +290,7 @@ class Factory
             'pastoralCounts' => null
         ];
 
-        return array_merge($externalUser, $referenceFields, ['StudentMobilePhone' => '912873987']);
+        return array_merge($externalUser, $referenceFields);
     }
 
 
