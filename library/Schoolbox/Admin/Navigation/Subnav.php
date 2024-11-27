@@ -487,11 +487,6 @@ class Subnav
                         'visible'     => (bool)$this->configLoader->get(ConfigMapper::NAME_WEBDAV_ENABLED),
                         'description' => 'Configure network drives that users will be able to browse inside the platform using the WebDAV protocol.',
                     ],
-                    '/adminv2/lists/house' => [
-                        'name'        => 'Houses',
-                        'visible'     => true,
-                        'description' => 'Setup the school pastoral houses.',
-                    ],
                     '/adminv2/lists/evidence-tag' => [
                         'name'        => 'Learning Moments',
                         'visible'     => (bool)$this->configLoader->get(ConfigMapper::NAME_LEARNING_MOMENTS_ENABLED),
@@ -849,6 +844,11 @@ class Subnav
                         'name'        => 'Campuses',
                         'visible'     => true,
                         'description' => 'Setup the campus within the school and configure which timetables are used by the campus.',
+                    ],
+                    '/adminv2/lists/house' => [
+                        'name'        => 'Houses',
+                        'visible'     => true,
+                        'description' => 'Setup the school pastoral houses.',
                     ],
                     '/adminv2/import/userAccount' => [
                         'name'        => 'Import CSV',
