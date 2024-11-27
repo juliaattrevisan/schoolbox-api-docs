@@ -169,8 +169,8 @@ HELP;
         /* Mobile phone was only available to staff
          */
         $statement->execute([
-            'field' => 'externalId',
-            'displayAs' => 'Barcode',
+            'field' => 'StudentMobilePhone',
+            'displayAs' => 'StudentMobilePhone',
         ]);
 
         /* Preset availability and visibility requirements
@@ -215,8 +215,8 @@ HELP;
 //        /* Mobile phone was only available to staff
 //         */
 //        $statement->execute([
-//            'field' => 'StudentMobilePhone',
-//            'displayAs' => 'StudentMobilePhone',
+//            'field' => 'externalId',
+//            'displayAs' => 'Barcode',
 //        ]);
 //
 //        /* Preset availability and visibility requirements
