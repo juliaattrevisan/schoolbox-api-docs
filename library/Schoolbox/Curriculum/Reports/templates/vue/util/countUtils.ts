@@ -4,7 +4,11 @@
 
 import type { Course } from "@schoolboxLibrary/types/Course";
 import type { Unit } from "@schoolboxLibrary/types/Unit";
-import type { CurriculumCoverageNode } from "../../js/types/curriculumCoverageTypes";
+import type {
+    CourseWithCurriculumNodeUsage,
+    CurriculumCoverageNode,
+    UnitWithCurriculumNodeUsage,
+} from "../../js/types/curriculumCoverageTypes";
 import { ReportOptionValues } from "../../js/types/curriculumCoverageTypes";
 import { useFiltersStore } from "../store/ccFiltersStore";
 
@@ -124,12 +128,9 @@ export function getFilteredUnitColumnCount(
     $unit: Unit,
     isExpanded: boolean,
 ): number {
-    if (getUnitColumnCount(node, $course, $unit, isExpanded) === 0) return 0; // no need to check if unit column has no usage
     const filtersStore = useFiltersStore();
-    const course = node.usage.courses.find((c) => c.id === $course.id);
-    if (course === undefined) return 0;
-    const unit = course.units.find((u) => u.id === $unit.id);
-    if (unit === undefined) return 0;
+    const course = node.usage.courses.find((c) => c.id === $course.id) as CourseWithCurriculumNodeUsage; // assume course exists
+    const unit = course.units.find((u) => u.id === $unit.id) as UnitWithCurriculumNodeUsage; // assume unit exists
     const { usage } = unit;
     const onNodeCount = filtersStore.selectedReportOptions.reduce((acc, option) => {
         // always skip course as it can't be assigned within a unit
@@ -162,10 +163,8 @@ export function getFilteredCourseColumnCount(
     $course: Course,
     isExpanded: boolean,
 ): number {
-    if (getCourseColumnCount(node, $course, isExpanded) === 0) return 0; // no need to check if course column has no usage
     const filtersStore = useFiltersStore();
-    const course = node.usage.courses.find((c) => c.id === $course.id);
-    if (course === undefined) return 0;
+    const course = node.usage.courses.find((c) => c.id === $course.id) as CourseWithCurriculumNodeUsage; // assume course exists
     const { usage } = course;
     // only need to check for course usage on the course column
     const onNodeCount = filtersStore.selectedReportOptions.includes(ReportOptionValues.COURSE) ? usage.course.count : 0;
@@ -191,9 +190,7 @@ export function getFilteredCourseColumnCount(
  * @returns the total node usage count for all selected course(s)
  */
 export function getFilteredCourseCount(node: CurriculumCoverageNode, $course: Course, isExpanded: boolean): number {
-    if (getCourseCount(node, $course, isExpanded) === 0) return 0; // no need to check if course has no usage
-    const course = node.usage.courses.find((c) => c.id === $course.id);
-    if (course === undefined || course.units === undefined) return 0;
+    const course = node.usage.courses.find((c) => c.id === $course.id) as CourseWithCurriculumNodeUsage; // assume course exists
     const courseUsageCount = getFilteredCourseColumnCount(node, $course, isExpanded);
     const unitUsageCount = course.units.reduce((acc, unit) => {
         return acc + getFilteredUnitColumnCount(node, course, unit, isExpanded);
@@ -209,7 +206,6 @@ export function getFilteredCourseCount(node: CurriculumCoverageNode, $course: Co
  * @returns the total node usage count
  */
 export function getFilteredTotalCount(node: CurriculumCoverageNode, isExpanded: boolean): number {
-    if (getTotalCount(node, isExpanded) === 0) return 0; // no need to check if node has no usage
     return node.usage.courses.reduce((acc, course) => {
         return acc + getFilteredCourseCount(node, course, isExpanded);
     }, 0);
