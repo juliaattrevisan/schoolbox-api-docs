@@ -416,6 +416,11 @@ class Subnav
                         ),
                         'description' => 'Configure the default and available filter options on the continuous report / class grades page.',
                     ],
+                    '/adminv2/lists/evidence-tag' => [
+                        'name'        => 'Learning Moments',
+                        'visible'     => (bool)$this->configLoader->get(ConfigMapper::NAME_LEARNING_MOMENTS_ENABLED),
+                        'description' => 'Configure tags that can be used on learning moments when students capture evidence.',
+                    ],
                     '/adminv2/lesson-plan/template' => [
                         'name'        => $rosettaStone->translate("lessonPlan", false, true) . ' Templates',
                         'visible'     => (bool)$this->configLoader->get(ConfigMapper::NAME_LMS_ENABLED),
@@ -486,11 +491,6 @@ class Subnav
                         'name'        => 'Drives',
                         'visible'     => (bool)$this->configLoader->get(ConfigMapper::NAME_WEBDAV_ENABLED),
                         'description' => 'Configure network drives that users will be able to browse inside the platform using the WebDAV protocol.',
-                    ],
-                    '/adminv2/lists/evidence-tag' => [
-                        'name'        => 'Learning Moments',
-                        'visible'     => (bool)$this->configLoader->get(ConfigMapper::NAME_LEARNING_MOMENTS_ENABLED),
-                        'description' => 'Configure tags that can be used on learning moments when students capture evidence.',
                     ],
                     '/adminv2/lists/year-levels' => [
                         'name'        => 'Year Levels',
