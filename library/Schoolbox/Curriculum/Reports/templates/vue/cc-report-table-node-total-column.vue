@@ -4,7 +4,7 @@
  */
 
 import type { CurriculumCoverageNode } from "../js/types/curriculumCoverageTypes";
-import { getTotalCount, getFilteredTotalCount } from "./util/countUtils";
+import { getFilteredTotalCount } from "./util/countUtils";
 
 interface Props {
     node: CurriculumCoverageNode;
@@ -12,14 +12,7 @@ interface Props {
 }
 const props = defineProps<Props>();
 
-const hasNoUsages = window.Vue.ref(getTotalCount(props.node, true) === 0); // no usage for the unit
-const hasNoUsagesWithChildren = window.Vue.ref(getTotalCount(props.node, false) === 0); // no usage for the unit and its children (if any)
-
 const count = window.Vue.computed(() => {
-    // to avoid unnecessary calculations when there are no usages, we return as early as possible
-    if (hasNoUsages.value && hasNoUsagesWithChildren.value) {
-        return 0;
-    }
     return getFilteredTotalCount(props.node, props.isExpanded);
 });
 </script>

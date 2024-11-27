@@ -12,7 +12,13 @@ import type { CurriculumCoverageNode } from "../js/types/curriculumCoverageTypes
 import { useReportStore } from "./store/ccReportStore";
 import { useFiltersStore } from "./store/ccFiltersStore";
 import { usePopOutStore } from "./store/ccPopOutStore";
-import { getCourseColumnCount, getUnitColumnCount, getCourseCount, getFilteredTotalCount } from "./util/countUtils";
+import {
+    getTotalCount,
+    getCourseColumnCount,
+    getUnitColumnCount,
+    getCourseCount,
+    getFilteredTotalCount,
+} from "./util/countUtils";
 import CcReportTableNodeTotalColumn from "./cc-report-table-node-total-column.vue";
 import CcReportTableNodeCourseColumn from "./cc-report-table-node-course-column.vue";
 import CcReportTableNodeUnitColumn from "./cc-report-table-node-unit-column.vue";
@@ -160,10 +166,12 @@ function onCourseClicked(course: Course, buttonEl: HTMLButtonElement): void {
                 {{ title }}
             </button>
         </td>
-        <cc-report-table-node-total-column :node="props.node" :is-expanded="isExpanded" />
+        <!-- if the node total and its children are completely empty, just hard set to 0 -->
+        <td v-if="getTotalCount(props.node, true) === 0 && getTotalCount(props.node, false) === 0">0</td>
+        <cc-report-table-node-total-column v-else :node="props.node" :is-expanded="isExpanded" />
         <!-- loop through each course/unit, retrieving the node usage or returning 0 for undefined usages -->
         <template v-for="course in reportStore.courses" :key="course.id">
-            <!-- if the node and its children are completely empty, just hard set to 0 -->
+            <!-- if the node course column and its children are completely empty, just hard set to 0 -->
             <td
                 v-if="
                     getCourseColumnCount(props.node, course, true) === 0 &&
@@ -180,7 +188,7 @@ function onCourseClicked(course: Course, buttonEl: HTMLButtonElement): void {
                 @click="onCourseClicked"
             />
             <template v-for="unit in course.units" :key="unit.id">
-                <!-- if the node and its children are completely empty, just hard set to 0 -->
+                <!-- if the node unit column and its children are completely empty, just hard set to 0 -->
                 <td
                     v-if="
                         getUnitColumnCount(props.node, course, unit, true) === 0 &&
@@ -199,7 +207,7 @@ function onCourseClicked(course: Course, buttonEl: HTMLButtonElement): void {
                 />
             </template>
             <template v-if="reportStore.hasMultipleCourses">
-                <!-- if the node and its children are completely empty, just hard set to 0 -->
+                <!-- if the node course and its children are completely empty, just hard set to 0 -->
                 <td
                     v-if="
                         getCourseCount(props.node, course, true) === 0 &&
