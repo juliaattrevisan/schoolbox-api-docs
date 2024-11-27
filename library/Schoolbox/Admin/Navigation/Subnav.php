@@ -250,7 +250,7 @@ class Subnav
                     ],
                     '/adminv2/profile-editor' => [
                         'name'        => 'Profile Editor',
-                        'visible'     => true,
+                        'visible'     => $userIsSuperuser,
                         'description' => 'Customise the fields and buttons on the staff, student and parent profile screens.',
                     ],
                     '/adminv2/menu-side' => [
