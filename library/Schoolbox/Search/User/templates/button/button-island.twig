@@ -110,6 +110,14 @@
         {% endif %}
     {% endfor %}
 
+    {# Arbitrarily spawn difficult-to-emulate custom button behaviour here,
+     # when it's not feasible to convert them into an actual Profile Button
+     # How we make a data struct for this - idk, but you'd need to follow
+     # the same idea of Additional Constraints.
+     #}
+    {% block custom_buttons %}
+    {% endblock custom_buttons %}
+
     {% block buttons_miscellaneous %}
     {% endblock buttons_miscellaneous %}
 </ul>

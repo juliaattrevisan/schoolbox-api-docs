@@ -1,27 +1,37 @@
 {% extends '@core/user/student.twig' %}
 
-{% block buttons %}
-    {{ parent() }}
-    {% if isParentOfStudent or isStaff %}
-        <li><a class="icon-result" href="https://dashboard.tsc.nsw.edu.au/login/index/{{user.id}}">Results</a></li>
-    {% endif %}
-{% endblock buttons %}
-
-{# This adds Learning Enrichment Case Manager field where a Coordinator
- # would otherwise be found. The base template doesn't use this
- # so I presume I can just hijack its spot. If there's no name,
- # hide this definition entirely (render nothing)
+{# Intercept default handling of a tuple. Custom Works' tuples must get dealt with specially here,
+ # before falling back to just putting selectedField.value on screen
  #}
-{% block details_coordTeacher %}
-    {{ parent() }}
-    {% if externalUser.LECaseManagerName ?? false %}
-        <dt class="no-margin small-6 medium-3">Learning Enrichment Case Manager:</dt>
-        <dd class="no-margin small-6 medium-9">
-            {% if externalUser.LECaseManagerUserId %}
-                <a href="/search/user/{{ externalUser.LECaseManagerUserId }}">{{ externalUser.LECaseManagerName }}</a>
-            {% else %}
-                {{ externalUser.LECaseManagerName }}
-            {% endif %}
-        </dd>
+{% block profileFieldTuple %}
+    {% if selectedField.field == 'LECaseManagerName' %}
+        {# This adds Learning Enrichment Case Manager field where a Coordinator
+         # would otherwise be found. The base template doesn't use this
+         # so I presume I can just hijack its spot. If there's no name,
+         # hide this definition entirely (render nothing)
+         #}
+        {% if selectedField.value ?? false %}
+            {# Find a field....hmm #}
+            {% set caseManagerField = externalUser.data.roleTypes.fields.selected|filter(selectedField => selectedField.field == 'LECaseManagerID')|first %}
+            {% set caseManagerId = caseManagerField.value %}
+
+            <dt class="small-4 medium-3 columns">Learning Enrichment Case Manager</dt>
+            <dd class="small-8 medium-9 columns">
+                {% if caseManagerId %}
+                    {# Display their name linked to their schoolbox user account #}
+                    <a href="/search/user/{{ caseManagerId }}">{{ selectedField.value }}</a>
+                {% else %}
+                    {# Display their name; they don't have a user account #}
+                    {{ selectedField.value }}
+                {% endif %}
+            </dd>
+        {% endif %}
+    {% elseif selectedField.field == 'LECaseManagerID' %}
+        {# noop: never render this by itself
+         # It's always used in in the LECaseManagerName context.
+         #}
+    {% else %}
+        {# Default rendering: inherit from core template #}
+        {{ parent() }}
     {% endif %}
-{% endblock details_coordTeacher %}
+{% endblock %}
