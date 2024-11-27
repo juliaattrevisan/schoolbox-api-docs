@@ -7,9 +7,15 @@
 import { useTemplateRef } from "vue";
 import type { Course } from "@schoolboxLibrary/types/Course";
 import type { Unit } from "@schoolboxLibrary/types/Unit";
-import type { CurriculumCoverageNode } from "../js/types/curriculumCoverageTypes";
+import type {
+    CurriculumCoverageNode,
+    CourseWithCurriculumNodeUsage,
+    UnitWithCurriculumNodeUsage,
+} from "../js/types/curriculumCoverageTypes";
+import { ReportOptionValues } from "../js/types/curriculumCoverageTypes";
 import { usePopOutStore } from "./store/ccPopOutStore";
 import { getFilteredUnitColumnCount } from "./util/countUtils";
+import { useFiltersStore } from "./store/ccFiltersStore";
 
 interface Props {
     node: CurriculumCoverageNode;
@@ -23,13 +29,44 @@ const emit = defineEmits<{
     click: [course: Course, unit: Unit, buttonEl: HTMLButtonElement];
 }>();
 
-const count = window.Vue.computed(() => {
-    return getFilteredUnitColumnCount(props.node, props.course, props.unit, props.isExpanded);
-});
-const isCountZero = window.Vue.computed(() => count.value === 0); // don't need a button when it's zero
+// const count = window.Vue.computed(() => {
+//     return getFilteredUnitColumnCount(props.node, props.course, props.unit, props.isExpanded);
+// });
+// const isCountZero = window.Vue.computed(() => count.value === 0); // don't need a button when it's zero
 const buttonId = window.Vue.computed(() => `usage-button-${props.course.id}-${props.unit.id}-${props.node.id}`);
 const buttonEl = useTemplateRef<HTMLButtonElement>("buttonEl");
 const popOutStore = usePopOutStore();
+const filtersStore = useFiltersStore();
+
+const course = props.node.usage.courses.find((c) => c.id === props.course.id) as CourseWithCurriculumNodeUsage;
+const unit = course.units.find((u) => u.id === props.unit.id) as UnitWithCurriculumNodeUsage;
+const unitUsage = unit.usage.unit.count;
+const activityUsage = unit.usage.activity.count;
+const lessonPlanUsage = unit.usage.lessonPlan.count;
+const rubricUsage = unit.usage.rubric.count;
+const inUseRubric = unit.usage.inUseRubric.count;
+
+const count = window.Vue.computed(() => {
+    let currentCount = 0;
+    if (filtersStore.selectedReportOptions.includes(ReportOptionValues.UNIT)) {
+        currentCount += unitUsage;
+    }
+    if (filtersStore.selectedReportOptions.includes(ReportOptionValues.LEARNING_ACTIVITY)) {
+        currentCount += activityUsage;
+    }
+    if (filtersStore.selectedReportOptions.includes(ReportOptionValues.LEARNING_ACTIVITY_LESSON_PLAN)) {
+        currentCount += lessonPlanUsage;
+    }
+    if (filtersStore.selectedReportOptions.includes(ReportOptionValues.RUBRIC)) {
+        currentCount += rubricUsage;
+    }
+    if (filtersStore.selectedReportOptions.includes(ReportOptionValues.IN_USE_RUBRIC)) {
+        currentCount += inUseRubric;
+    }
+    return currentCount;
+});
+
+const isCountZero = window.Vue.computed(() => count.value === 0); // don't need a button when it's zero
 
 /**
  * Open the pop out
