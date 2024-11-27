@@ -297,11 +297,6 @@ class Subnav
                         'visible'     => true,
                         'description' => 'Statistics on how many files are being created and accessed by different roles within the system.',
                     ],
-                    '/adminv2/engagement/index/fileTypes' => [
-                        'name'        => 'Media',
-                        'visible'     => true,
-                        'description' => 'Statistics on how many videos and images are being viewed within the system.',
-                    ],
                     '/adminv2/engagement/index/links' => [
                         'name'        => 'Links',
                         'visible'     => true,
@@ -311,6 +306,11 @@ class Subnav
                         'name'        => 'Login',
                         'visible'     => true,
                         'description' => 'Statistics on the total logins by role and also the percentage of users who have logged in at all.',
+                    ],
+                    '/adminv2/engagement/index/fileTypes' => [
+                        'name'        => 'Media',
+                        'visible'     => true,
+                        'description' => 'Statistics on how many videos and images are being viewed within the system.',
                     ],
                     '/adminv2/engagement/index/mobile' => [
                         'name'        => 'Mobile Apps',
