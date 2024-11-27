@@ -2,8 +2,6 @@
  * Any utility functions for counting node usages
  */
 
-import type { Course } from "@schoolboxLibrary/types/Course";
-import type { Unit } from "@schoolboxLibrary/types/Unit";
 import type {
     CourseWithCurriculumNodeUsage,
     CurriculumCoverageNode,
