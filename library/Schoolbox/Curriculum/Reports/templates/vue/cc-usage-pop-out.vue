@@ -75,6 +75,19 @@ window.Vue.watch(
         </div>
         <div v-else-if="popOutStore.usage" class="l-flex-col l-gap-m">
             <div
+                v-if="
+                    filtersStore.selectedReportOptions.includes(ReportOptionValues.COURSE) &&
+                    popOutStore.usage?.onCourse
+                "
+                class="usage__section"
+            >
+                <h5 class="section-title">Course</h5>
+                <div class="l-flex l-gap-s">
+                    <sbx-icon name="course" />
+                    <p class="f-no-margins">Assigned to Course</p>
+                </div>
+            </div>
+            <div
                 v-if="filtersStore.selectedReportOptions.includes(ReportOptionValues.UNIT) && popOutStore.usage?.onUnit"
                 class="usage__section"
             >
