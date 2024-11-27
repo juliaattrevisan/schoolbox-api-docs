@@ -860,7 +860,7 @@ class Subnav
                     ],
                     '/adminv2/profile-button' => [
                         'name'        => 'Profile Buttons',
-                        'visible'     => $userIsSuperuser,
+                        'visible'     => true,
                         'description' => 'Add your own custom buttons to a users profile page.',
                     ],
                     '/adminv2/user/stale' => [
