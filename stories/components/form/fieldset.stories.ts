@@ -86,16 +86,16 @@ export const InlineListOfCheckboxes: Story = {
         <div class="c-hint">Please select all that apply.</div>
         <div class="l-flex-row l-gap-m">
             <div class="l-flex-row l-flex--align-center">
-                <input id="cbx4a" type="checkbox" class="c-input-checkbox" />
-                <label for="cbx4a" class="c-label c-label--small l-pad-s--horiz">Checkbox 1</label>
+                <input id="cbx4b" type="checkbox" class="c-input-checkbox" />
+                <label for="cbx4b" class="c-label c-label--small l-pad-s--horiz">Checkbox 1</label>
             </div>
             <div class="l-flex-row l-flex--align-center">
-                <input id="cbx5a" type="checkbox" class="c-input-checkbox" />
-                <label for="cbx5a" class="c-label c-label--small l-pad-s--horiz">Checkbox 2</label>
+                <input id="cbx5b" type="checkbox" class="c-input-checkbox" />
+                <label for="cbx5b" class="c-label c-label--small l-pad-s--horiz">Checkbox 2</label>
             </div>
             <div class="l-flex-row l-flex--align-center">
-                <input id="cbx6a" type="checkbox" class="c-input-checkbox" />
-                <label for="cbx6a" class="c-label c-label--small l-pad-s--horiz">Checkbox 3</label>
+                <input id="cbx6b" type="checkbox" class="c-input-checkbox" />
+                <label for="cbx6b" class="c-label c-label--small l-pad-s--horiz">Checkbox 3</label>
             </div>
         </div>
     </div>
