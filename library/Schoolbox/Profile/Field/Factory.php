@@ -290,7 +290,7 @@ class Factory
             'pastoralCounts' => null
         ];
 
-        return array_merge($externalUser, $referenceFields, ['StudentStudiesCode' => 'dragon punch']);
+        return array_merge($externalUser, $referenceFields);
     }
 
 
