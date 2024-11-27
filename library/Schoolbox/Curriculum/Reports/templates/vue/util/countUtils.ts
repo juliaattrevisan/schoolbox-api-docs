@@ -110,7 +110,7 @@ export function getTotalCount(node: CurriculumCoverageNode, isExpanded: boolean)
     }, 0);
 }
 
-// #endregion filtered usage counts
+// #endregion
 
 // #region filtered usage counts
 
