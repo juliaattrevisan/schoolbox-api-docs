@@ -12,8 +12,9 @@ import type { CurriculumCoverageNode } from "../js/types/curriculumCoverageTypes
 import { useReportStore } from "./store/ccReportStore";
 import { useFiltersStore } from "./store/ccFiltersStore";
 import { usePopOutStore } from "./store/ccPopOutStore";
-import { getFilteredTotalCount, getFilteredCourseColumnCount, getFilteredCourseCount } from "./util/countUtils";
-import CcReportTableNodeUnit from "./cc-report-table-node-unit.vue";
+import { getFilteredTotalCount, getFilteredCourseColumnCount } from "./util/countUtils";
+import CcReportTableNodeUnitColumn from "./cc-report-table-node-unit-column.vue";
+import CcReportTableNodeCourseTotalColumn from "./cc-report-table-node-course-total-column.vue";
 
 interface Props {
     node: CurriculumCoverageNode;
@@ -151,7 +152,7 @@ function onUnitClicked(course: Course, unit: Unit, buttonEl: HTMLButtonElement):
             <td class="u-border-left">
                 {{ getFilteredCourseColumnCount(props.node, course, isExpanded) }}
             </td>
-            <cc-report-table-node-unit
+            <cc-report-table-node-unit-column
                 v-for="unit in course.units"
                 :key="unit.id"
                 :course="course"
@@ -160,9 +161,12 @@ function onUnitClicked(course: Course, unit: Unit, buttonEl: HTMLButtonElement):
                 :is-expanded="isExpanded"
                 @click="onUnitClicked"
             />
-            <td v-if="reportStore.hasMultipleCourses" :class="``">
-                {{ getFilteredCourseCount(props.node, course, isExpanded) }}
-            </td>
+            <cc-report-table-node-course-total-column
+                v-if="reportStore.hasMultipleCourses"
+                :node="props.node"
+                :course="course"
+                :is-expanded="isExpanded"
+            />
         </template>
     </tr>
     <template v-if="hasChildren && (isExpanded || filtersStore.onlyShowGaps || reportStore.isPrinting)">
