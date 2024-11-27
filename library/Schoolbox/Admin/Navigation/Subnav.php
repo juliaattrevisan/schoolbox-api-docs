@@ -218,6 +218,11 @@ class Subnav
                         'visible'     => true,
                         'description' => 'A tool to bulk or individually remove events from personal or group calendars.',
                     ],
+                    '/adminv2/lists/calendar/event-type' => [
+                        'name'        => 'Event Types',
+                        'visible'     => true,
+                        'description' => 'Setup the list of event types for filtering and colour coding.',
+                    ],
                     '/adminv2/calendar/Import' => [
                         'name'        => 'Import',
                         'visible'     => true,
@@ -227,11 +232,6 @@ class Subnav
                         'name'        => 'Subscribe',
                         'visible'     => true,
                         'description' => 'Control which additional calendars are included into a users calendar. This includes VCAL events, modules and the SIS.',
-                    ],
-                    '/adminv2/lists/calendar/event-type' => [
-                        'name'        => 'Event Types',
-                        'visible'     => true,
-                        'description' => 'Setup the list of event types for filtering and colour coding.',
                     ],
                 ],
             ],
