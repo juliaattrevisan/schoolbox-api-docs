@@ -1,15 +1,41 @@
 {% extends '@core/user/student.twig' %}
 
-{% block extraDetails %}
-    {% if isStaff and externalUser.StudentMobilePhone is defined and externalUser.StudentMobilePhone %}
-        <dt class="small-4 medium-3 columns">Student Mobile:</dt>
-        <dd class="small-8 medium-9 columns">{{ externalUser.StudentMobilePhone }}</dd>
-    {% endif %}
+{#{% block extraDetails %}#}
+{#    {% if isStaff and externalUser.StudentMobilePhone is defined and externalUser.StudentMobilePhone %}#}
+{#        <dt class="small-4 medium-3 columns">Student Mobile:</dt>#}
+{#        <dd class="small-8 medium-9 columns">{{ externalUser.StudentMobilePhone }}</dd>#}
+{#    {% endif %}#}
 
-    {# Student External ID as Barcode #}
-    {% if user.externalId %}
-        <dd class="small-12 medium-12 columns">
-            <span class="barcode-39">*{{ user.externalId }}*</span>
-        </dd>
+{#    #}{# Student External ID as Barcode #}
+{#    {% if user.externalId %}#}
+{#        <dd class="small-12 medium-12 columns">#}
+{#            <span class="barcode-39">*{{ user.externalId }}*</span>#}
+{#        </dd>#}
+{#    {% endif %}#}
+{#{% endblock extraDetails %}#}
+
+
+
+{# Intercept default handling of a tuple. Custom Works' tuples must get dealt with specially here,
+ # before falling back to just putting selectedField.value on screen
+#}
+{% block profileFieldTuple %}
+    {# This requires a dupe of externalId field, then a special handling
+     # Otherwise, the core template will preclude this field: it has no intrinsic value (it's empty)
+     # displayAs is the only way to distinguish between the tw.
+     #}
+    {% if selectedField.displayAs == 'barcode' %}
+        {# This renders an external id as a code39 barcode #}
+        {% if selectedField.value ?? false %}
+            <dd class="small-12 columns">
+                <span class="barcode-39">*{{ user.externalId }}*</span>
+            </dd>
+        {% endif %}
+    {% elseif selectedField.field == 'StudentMobilePhone' %}
+        <dt class="small-4 medium-3 columns">Student Mobile:</dt>
+        <dd class="small-8 medium-9 columns"><a href="tel:{{ selectedField.value }}">{{ selectedField.value }}</a></dd>
+    {% else %}
+        {# Default rendering: inherit from core template #}
+        {{ parent() }}
     {% endif %}
-{% endblock extraDetails %}
+{% endblock %}
