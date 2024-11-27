@@ -482,18 +482,6 @@ class Subnav
                     ],
                 ],
             ],
-            '/adminv2/lists' => [
-                'name'       => 'Lists',
-                'visible'    => $userIsSuperuser,
-                'searchable' => false,
-                'children'   => [
-                    '/adminv2/lists/webdav' => [
-                        'name'        => 'Drives',
-                        'visible'     => (bool)$this->configLoader->get(ConfigMapper::NAME_WEBDAV_ENABLED),
-                        'description' => 'Configure network drives that users will be able to browse inside the platform using the WebDAV protocol.',
-                    ],
-                ],
-            ],
             '/adminv2/setting/Modules' => [
                 'name'       => 'Modules',
                 'visible'    => $userIsSuperuser,
@@ -743,6 +731,11 @@ class Subnav
                         'name'        => 'Debugging',
                         'visible'     => count($enabledConfigs[ConfigMapper::TYPE_DEBUGGING] ?? []) > 0,
                         'description' => 'Enable developer features for debugging issues and tracing problems.',
+                    ],
+                    '/adminv2/lists/webdav' => [
+                        'name'        => 'Drives',
+                        'visible'     => (bool)$this->configLoader->get(ConfigMapper::NAME_WEBDAV_ENABLED),
+                        'description' => 'Configure network drives that users will be able to browse inside the platform using the WebDAV protocol.',
                     ],
                     '/adminv2/setting/Email' => [
                         'name'        => 'Email',
