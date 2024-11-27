@@ -202,7 +202,7 @@ class Controller extends BaseController
                     return [];
                 }
             ]);
-new \Alaress_Probe($externalUser);
+
         /* Profile Buttons
          */
         $buttons = $this->profileButtonMapper->findButtonsForUser($student, $this->getUser());

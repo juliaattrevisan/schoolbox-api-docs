@@ -149,7 +149,12 @@ HELP;
         /* We're going to make these two new fields
          */
         $this->createStudentMobilePhone($statement);
-        $this->createBarcode($statement);
+
+        /* This is combined with the default rendering of externalId instead.
+         * I tried to render them separately but the whole frontend seems to be geared towards
+         * (roletype, field) being a unique tuple.
+         */
+//        $this->createBarcode($statement);
     }
 
 
@@ -199,46 +204,46 @@ HELP;
     }
 
 
-    /**
-     * Creates a Barcode field that renders the external id as a code39 barcode
-     *
-     * @param PDOStatement $statement
-     * @return void
-     */
-    private function createBarcode(\PDOStatement $statement): void
-    {
-        /* Mobile phone was only available to staff
-         */
-        $statement->execute([
-            'field' => 'StudentMobilePhone',
-            'displayAs' => 'StudentMobilePhone',
-        ]);
-
-        /* Preset availability and visibility requirements
-         */
-        $profileFieldId = (int)$this->getDatabaseInternal()->lastInsertId();
-
-        $roletypes = [Role::STAFF];
-        $campusIds = $this->helper->fetchCampusIds();
-
-        /* Assign relationships
-         */
-        $this->getLogger()->info(sprintf(
-            'Campus availability: assigning campus ids %s to profile field %s',
-            implode(',', $campusIds),
-            $profileFieldId
-        ));
-
-        $this->helper->createFieldCampusAvailability($profileFieldId, $campusIds);
-
-        $this->getLogger()->info(sprintf(
-            'Roletype visibility: assigning roletypes %s to profile field %s',
-            implode(',', $roletypes),
-            $profileFieldId
-        ));
-
-        $this->helper->createFieldRoletypeVisibility($profileFieldId, $roletypes);
-    }
+//    /**
+//     * Creates a Barcode field that renders the external id as a code39 barcode
+//     *
+//     * @param PDOStatement $statement
+//     * @return void
+//     */
+//    private function createBarcode(\PDOStatement $statement): void
+//    {
+//        /* Mobile phone was only available to staff
+//         */
+//        $statement->execute([
+//            'field' => 'StudentMobilePhone',
+//            'displayAs' => 'StudentMobilePhone',
+//        ]);
+//
+//        /* Preset availability and visibility requirements
+//         */
+//        $profileFieldId = (int)$this->getDatabaseInternal()->lastInsertId();
+//
+//        $roletypes = [Role::STAFF];
+//        $campusIds = $this->helper->fetchCampusIds();
+//
+//        /* Assign relationships
+//         */
+//        $this->getLogger()->info(sprintf(
+//            'Campus availability: assigning campus ids %s to profile field %s',
+//            implode(',', $campusIds),
+//            $profileFieldId
+//        ));
+//
+//        $this->helper->createFieldCampusAvailability($profileFieldId, $campusIds);
+//
+//        $this->getLogger()->info(sprintf(
+//            'Roletype visibility: assigning roletypes %s to profile field %s',
+//            implode(',', $roletypes),
+//            $profileFieldId
+//        ));
+//
+//        $this->helper->createFieldRoletypeVisibility($profileFieldId, $roletypes);
+//    }
 
     /**
      * FIXME Decide whether this script must be run as root
