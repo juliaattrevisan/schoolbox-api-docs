@@ -556,16 +556,6 @@ class Subnav
                 ),
                 'searchable' => false,
                 'children'   => [
-                    '/adminv2/setting/pastoral/Pastoral%20Care' => [
-                        'name'        => 'Settings / Policy',
-                        'visible'     => true,
-                        'description' => 'Configure policy settings related to the pastoral care module.',
-                    ],
-                    '/adminv2/filters/pastoral/classPastoral' => [
-                        'name'        => $filterLabelBuilder->buildLabel(FilterPageModel::PAGE_CLASS_PASTORAL) . ' Filter',
-                        'visible'     => $filterAvailabilityChecker->isAvailable(FilterPageModel::PAGE_CLASS_PASTORAL),
-                        'description' => 'Configure the default and available filter options on the class pastoral report.',
-                    ],
                     '/adminv2/lists/pastoral/pastoral-action' => [
                         'name'        => 'Actions List',
                         'visible'     => (bool)$this->configLoader->get(ConfigMapper::NAME_PASTORAL_ACTION_ENABLED),
@@ -575,6 +565,11 @@ class Subnav
                         'name'        => 'Bulk Import',
                         'visible'     => true,
                         'description' => 'Import a large number of pastoral records from files within a ZIP',
+                    ],
+                    '/adminv2/filters/pastoral/classPastoral' => [
+                        'name'        => $filterLabelBuilder->buildLabel(FilterPageModel::PAGE_CLASS_PASTORAL) . ' Filter',
+                        'visible'     => $filterAvailabilityChecker->isAvailable(FilterPageModel::PAGE_CLASS_PASTORAL),
+                        'description' => 'Configure the default and available filter options on the class pastoral report.',
                     ],
                     '/pastoral/management/groups' => [
                         'name'        => 'Groups Management',
@@ -595,6 +590,11 @@ class Subnav
                         'name'        => 'Record Tags List',
                         'visible'     => true,
                         'description' => 'Maintain tags used on pastoral records, or if setup, lock this list to be the only tags available.',
+                    ],
+                    '/adminv2/setting/pastoral/Pastoral%20Care' => [
+                        'name'        => 'Settings / Policy',
+                        'visible'     => true,
+                        'description' => 'Configure policy settings related to the pastoral care module.',
                     ],
                     '/adminv2/lists/pastoral/pastoral-document-classification' => [
                         'name'        => 'SIS Document Classifications List',
