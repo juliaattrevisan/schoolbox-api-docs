@@ -127,9 +127,6 @@ class Subnav
                 }
             );
 
-        // Grab the rosettaStone for translations
-        $rosettaStone = (new RosettaStoneFactory())->build(L10nMapper::getInstance());
-
         $filterAvailabilityChecker = new AvailabilityChecker($this->configLoader);
         $filterLabelBuilder        = new LabelBuilder();
 
@@ -422,9 +419,9 @@ class Subnav
                         'description' => 'Configure tags that can be used on learning moments when students capture evidence.',
                     ],
                     '/adminv2/lesson-plan/template' => [
-                        'name'        => $rosettaStone->translate("lessonPlan", false, true) . ' Templates',
+                        'name'        => 'Lesson Plan Templates',
                         'visible'     => (bool)$this->configLoader->get(ConfigMapper::NAME_LMS_ENABLED),
-                        'description' => 'Configure ' . $rosettaStone->translate("lessonPlan", false, false) . ' templates.',
+                        'description' => 'Configure Lesson Plan Templates',
                     ],
                     '/adminv2/setting/lms/LMS%20Policy' => [
                         'name'        => 'LMS Policy',
