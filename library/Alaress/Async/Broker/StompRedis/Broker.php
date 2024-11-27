@@ -72,8 +72,6 @@ class Broker implements IBroker
                 $this->queue,
                 IClient::ACK_MODE_CLIENT_INDIVIDUAL,
                 function (IFrame $frame, IAckResolver $resolver, Connection $conn, string $subscriptionId) use ($consumer): void {
-                    $this->tracer?->startTransaction();
-
                     $resolve = new Resolver($resolver);
 
                     try {
@@ -84,6 +82,7 @@ class Broker implements IBroker
                         $context = null;
                     }
 
+                    $this->tracer?->startTransaction();
                     $this->tracer?->setTransactionContextForDaemon($conn->getIdentifier(), $subscriptionId, $key);
 
                     // payload from STOMP is a key for collecting a redis payload
