@@ -116,7 +116,7 @@ class DetailedUsage
         }
 
         if ($this->models[Cursor::COURSE_IN_USE_RUBRIC]->count() > 0) {
-            $translation['inUseRubrics'] = $this->models[Cursor::COURSE_IN_USE_RUBRIC]->map(
+            $translation['inUseRubric'] = $this->models[Cursor::COURSE_IN_USE_RUBRIC]->map(
                 function ($assessment) use ($usage) {
                     return call_user_func(
                         $this->inUseRubricTranslator,
