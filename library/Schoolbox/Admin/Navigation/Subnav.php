@@ -493,15 +493,15 @@ class Subnav
                         'visible'     => true,
                         'description' => 'Review the current guides that help new users get used to the system.',
                     ],
-                    '/adminv2/package' => [
-                        'name'        => 'Packages',
-                        'visible'     => true,
-                        'description' => 'Install optional content packages supplied to get you started.',
-                    ],
                     '/adminv2/intellischool/console' => [
                         'name'        => 'Intellischool Admin',
                         'visible'     => (bool)$this->configLoader->get(ConfigMapper::NAME_INTELLISCHOOL_DEPLOYMENT_ID),
                         'description' => 'Configure Intellischool Analytics Integration.',
+                    ],
+                    '/adminv2/package' => [
+                        'name'        => 'Packages',
+                        'visible'     => true,
+                        'description' => 'Install optional content packages supplied to get you started.',
                     ],
                 ],
             ],
