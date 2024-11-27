@@ -124,6 +124,7 @@ export function getFilteredUnitColumnCount(
     $unit: Unit,
     isExpanded: boolean,
 ): number {
+    if (getUnitColumnCount(node, $course, $unit, isExpanded) === 0) return 0; // no need to check if unit column has no usage
     const filtersStore = useFiltersStore();
     const course = node.usage.courses.find((c) => c.id === $course.id);
     if (course === undefined) return 0;
@@ -161,6 +162,7 @@ export function getFilteredCourseColumnCount(
     $course: Course,
     isExpanded: boolean,
 ): number {
+    if (getCourseColumnCount(node, $course, isExpanded) === 0) return 0; // no need to check if course column has no usage
     const filtersStore = useFiltersStore();
     const course = node.usage.courses.find((c) => c.id === $course.id);
     if (course === undefined) return 0;
@@ -189,6 +191,7 @@ export function getFilteredCourseColumnCount(
  * @returns the total node usage count for all selected course(s)
  */
 export function getFilteredCourseCount(node: CurriculumCoverageNode, $course: Course, isExpanded: boolean): number {
+    if (getCourseCount(node, $course, isExpanded) === 0) return 0; // no need to check if course has no usage
     const course = node.usage.courses.find((c) => c.id === $course.id);
     if (course === undefined || course.units === undefined) return 0;
     const courseUsageCount = getFilteredCourseColumnCount(node, $course, isExpanded);
@@ -206,6 +209,7 @@ export function getFilteredCourseCount(node: CurriculumCoverageNode, $course: Co
  * @returns the total node usage count
  */
 export function getFilteredTotalCount(node: CurriculumCoverageNode, isExpanded: boolean): number {
+    if (getTotalCount(node, isExpanded) === 0) return 0; // no need to check if node has no usage
     return node.usage.courses.reduce((acc, course) => {
         return acc + getFilteredCourseCount(node, course, isExpanded);
     }, 0);
