@@ -189,8 +189,10 @@
                                                             {# A string that displays on its own in a flag#}
                                                             {{ selectedField.value }}
                                                         {% elseif selectedField.field in ['ParentsSeparatedFlag'] %}
-                                                            {# A special flag that has a hardcoded text string #}
-                                                            Parents separated
+                                                            {% block parentsSeparated %}
+                                                                {# A special flag that has a hardcoded text string #}
+                                                                Parents separated
+                                                            {% endblock parentsSeparated %}
                                                         {% else %}
                                                             {# A generic flag which shows Display As/Terminology equivalent #}
                                                             {{ macro.fieldName(selectedField) }}
@@ -318,7 +320,7 @@
                     default:
                         $('[data-tab] a').first().trigger('click');
                         break;
-                }
+                %}
             });
         </script>
 
