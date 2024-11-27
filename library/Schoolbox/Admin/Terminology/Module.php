@@ -13,7 +13,6 @@ use Alaress\Module\Module as BaseModule;
 use Alaress\Authorizer\Rule;
 use Alaress\Web\Controller\Base;
 use Alaress\Twig\Loader\IChainLoader;
-use Schoolbox\Permission\Access\UserAccess;
 
 /**
  * The module for managing school terms through the admin section.
@@ -61,10 +60,7 @@ class Module extends BaseModule
             '.*',
             new Rule\All(
                 new Rule\IsLoggedIn(),
-                new Rule\Any(
-                    new Rule\IsSuperuser(),
-                    new Rule\HasServicePermission(UserAccess::SERVICE_DESIGN, UserAccess::ACCESS_FULL)
-                )
+                new Rule\IsSuperuser(),
             )
         );
     }

@@ -243,25 +243,10 @@ class Subnav
                 'visible'    => $userIsSuperuser || $userHasServicePermissionDesign,
                 'searchable' => false,
                 'children'   => [
-                    '/adminv2/lists/design/component-definition' => [
-                        'name'        => 'Components List',
-                        'visible'     => true,
-                        'description' => 'Control which components can be used on homepages, dashboards and ePortfolios.',
-                    ],
                     '/adminv2/dashboard' => [
                         'name'        => 'Dashboard Templates',
                         'visible'     => true,
                         'description' => 'Configure the layout of the initial landing page when you first login for each role.',
-                    ],
-                    '/adminv2/homepage' => [
-                        'name'        => 'Homepage Templates',
-                        'visible'     => true,
-                        'description' => 'Configure and setup the scaffolding templates that users can create homepages from.',
-                    ],
-                    '/adminv2/profile-button' => [
-                        'name'        => 'Profile Buttons',
-                        'visible'     => true,
-                        'description' => 'Add your own custom buttons to a users profile page.',
                     ],
                     '/adminv2/profile-editor' => [
                         'name'        => 'Profile Editor',
@@ -277,11 +262,6 @@ class Subnav
                         'name'        => 'Skin Config',
                         'visible'     => true,
                         'description' => 'Configure the look and feel of your system, including colours, images and logos.',
-                    ],
-                    '/adminv2/terminology' => [
-                        'name'        => 'Terminology',
-                        'visible'     => true,
-                        'description' => 'Localise the words used to describe key features to your own language.',
                     ],
                     '/adminv2/lists/design/timetable-colour' => [
                         'name'        => 'Timetable Colours List',
@@ -374,23 +354,6 @@ class Subnav
                     ],
                 ],
             ],
-            '/adminv2/import' => [
-                'name'       => 'Import',
-                'visible'    => $userIsSuperuser,
-                'searchable' => false,
-                'children'   => [
-                    '/adminv2/import/photos/upload' => [
-                        'name'        => 'Portrait Photos',
-                        'visible'     => true,
-                        'description' => 'Manually upload portrait photos for users when the SIS does not automatically provide them.',
-                    ],
-                    '/adminv2/import/userAccount' => [
-                        'name'        => 'User Accounts',
-                        'visible'     => true,
-                        'description' => 'Import user accounts via a CSV file.',
-                    ],
-                ],
-            ],
             '/adminv2/lms' => [
                 'name'       => 'LMS',
                 'visible'    => $userIsSuperuser || $userHasServicePermissionLms,
@@ -419,13 +382,8 @@ class Subnav
                         ),
                         'description' => 'Configure the default and available filter options on the class markbook.',
                     ],
-                    '/adminv2/rollover' => [
-                        'name'        => 'Class Rollover',
-                        'visible'     => true,
-                        'description' => 'At the end of the year or semester, archive your class pages so you can start fresh the following year.',
-                    ],
                     '/adminv2/course-builder' => [
-                        'name'        => 'Course Builder',
+                        'name'        => 'Course Framework',
                         'visible'     => (bool)$this->configLoader->get(ConfigMapper::NAME_LMS_ENABLED),
                         'description' => 'Configure the default page templates and permissions for course and unit pages.',
                     ],
@@ -458,10 +416,10 @@ class Subnav
                         ),
                         'description' => 'Configure the default and available filter options on the continuous report / class grades page.',
                     ],
-                    '/adminv2/import/folder' => [
-                        'name'        => 'Import Pages',
-                        'visible'     => true,
-                        'description' => 'Import all school class pages via a CSV file.',
+                    '/adminv2/lists/evidence-tag' => [
+                        'name'        => 'Learning Moments',
+                        'visible'     => (bool)$this->configLoader->get(ConfigMapper::NAME_LEARNING_MOMENTS_ENABLED),
+                        'description' => 'Configure tags that can be used on learning moments when students capture evidence.',
                     ],
                     '/adminv2/lesson-plan/template' => [
                         'name'        => $rosettaStone->translate("lessonPlan", false, true) . ' Templates',
@@ -521,58 +479,6 @@ class Subnav
                         'name'        => 'Work Types List',
                         'visible'     => (bool)$this->configLoader->get(ConfigMapper::NAME_LMS_ENABLED),
                         'description' => 'Setup the categorisation for assessments, useful for filtering and report creation.',
-                    ],
-                ],
-            ],
-            '/adminv2/lists' => [
-                'name'       => 'Lists',
-                'visible'    => $userIsSuperuser,
-                'searchable' => false,
-                'children'   => [
-                    '/adminv2/lists/campus' => [
-                        'name'        => 'Campus',
-                        'visible'     => true,
-                        'description' => 'Setup the campus within the school and configure which timetables are used by the campus.',
-                    ],
-                    '/adminv2/lists/webdav' => [
-                        'name'        => 'Drives',
-                        'visible'     => (bool)$this->configLoader->get(ConfigMapper::NAME_WEBDAV_ENABLED),
-                        'description' => 'Configure network drives that users will be able to browse inside the platform using the WebDAV protocol.',
-                    ],
-                    '/adminv2/lists/house' => [
-                        'name'        => 'Houses',
-                        'visible'     => true,
-                        'description' => 'Setup the school pastoral houses.',
-                    ],
-                    '/adminv2/lists/evidence-tag' => [
-                        'name'        => 'Learning Moments',
-                        'visible'     => (bool)$this->configLoader->get(ConfigMapper::NAME_LEARNING_MOMENTS_ENABLED),
-                        'description' => 'Configure tags that can be used on learning moments when students capture evidence.',
-                    ],
-                    '/adminv2/lists/residential-house' => [
-                        'name'        => 'Residential Houses',
-                        'visible'     => true,
-                        'description' => 'Setup the residential boarding houses that students attend.',
-                    ],
-                    '/adminv2/lists/roles' => [
-                        'name'        => 'Roles',
-                        'visible'     => true,
-                        'description' => 'Configure user roles within the system, the type of access they have and permissions.',
-                    ],
-                    '/adminv2/lists/user-title' => [
-                        'name'        => 'User Titles',
-                        'visible'     => true,
-                        'description' => 'Configure the drop down list of titles available for users.',
-                    ],
-                    '/adminv2/lists/user-pronoun' => [
-                        'name'        => 'User Pronouns',
-                        'visible'     => true,
-                        'description' => 'Configure the drop down list of pronouns available for users.',
-                    ],
-                    '/adminv2/lists/year-levels' => [
-                        'name'        => 'Year Levels',
-                        'visible'     => true,
-                        'description' => 'Configure the year levels and the policy settings related to those year levels.',
                     ],
                 ],
             ],
@@ -725,6 +631,26 @@ class Subnav
                         'visible'     => true,
                         'description' => 'Define the file mime types that can be uploaded, the maximum filesize and the icon they will use.',
                     ],
+                    '/adminv2/rollover' => [
+                        'name'        => 'Class Rollover',
+                        'visible'     => true,
+                        'description' => 'At the end of the year or semester, archive your class pages so you can start fresh the following year.',
+                    ],
+                    '/adminv2/lists/cms/component-definition' => [
+                        'name'        => 'Components List',
+                        'visible'     => true,
+                        'description' => 'Control which components can be used on homepages, dashboards and ePortfolios.',
+                    ],
+                    '/adminv2/homepage' => [
+                        'name'        => 'Homepage Templates',
+                        'visible'     => true,
+                        'description' => 'Configure and setup the scaffolding templates that users can create homepages from.',
+                    ],
+                    '/adminv2/import/folder' => [
+                        'name'        => 'Import Pages',
+                        'visible'     => true,
+                        'description' => 'Import all school class pages via a CSV file.',
+                    ],
                     '/adminv2/video' => [
                         'name'        => 'Media Queue',
                         'visible'     => true,
@@ -806,6 +732,11 @@ class Subnav
                         'visible'     => count($enabledConfigs[ConfigMapper::TYPE_DEBUGGING] ?? []) > 0,
                         'description' => 'Enable developer features for debugging issues and tracing problems.',
                     ],
+                    '/adminv2/lists/webdav' => [
+                        'name'        => 'Drives',
+                        'visible'     => (bool)$this->configLoader->get(ConfigMapper::NAME_WEBDAV_ENABLED),
+                        'description' => 'Configure network drives that users will be able to browse inside the platform using the WebDAV protocol.',
+                    ],
                     '/adminv2/setting/Email' => [
                         'name'        => 'Email',
                         'visible'     => count($enabledConfigs[ConfigMapper::TYPE_EMAIL] ?? []) > 0,
@@ -871,6 +802,11 @@ class Subnav
                         'visible'     => count($enabledConfigs[ConfigMapper::TYPE_SITE] ?? []) > 0,
                         'description' => 'Setup and configure global settings related to the site, like name, domain and analytics.',
                     ],
+                    '/adminv2/terminology' => [
+                        'name'        => 'Terminology',
+                        'visible'     => true,
+                        'description' => 'Localise the words used to describe key features to your own language.',
+                    ],
                 ],
             ],
             '/adminv2/user' => [
@@ -887,10 +823,25 @@ class Subnav
                         'visible'     => true,
                         'description' => 'Access recent CMS actions like delete, create and modify of files, folders and links.',
                     ],
+                    '/adminv2/lists/campus' => [
+                        'name'        => 'Campuses',
+                        'visible'     => true,
+                        'description' => 'Setup the campus within the school and configure which timetables are used by the campus.',
+                    ],
+                    '/adminv2/lists/house' => [
+                        'name'        => 'Houses',
+                        'visible'     => true,
+                        'description' => 'Setup the school pastoral houses.',
+                    ],
                     '/adminv2/import/userAccount' => [
                         'name'        => 'Import CSV',
                         'visible'     => true,
                         'description' => 'Make changes to user accounts on bulk by uploading a CSV file.',
+                    ],
+                    '/adminv2/import/photos/upload' => [
+                        'name'        => 'Import Portraits',
+                        'visible'     => true,
+                        'description' => 'Manually upload portrait photos for users when the SIS does not automatically provide them.',
                     ],
                     '/adminv2/user/bulk/modify' => [
                         'name'        => 'Bulk Modify',
@@ -907,15 +858,35 @@ class Subnav
                         'visible'     => true,
                         'description' => 'View a list of all the recent successful and unsuccessful login attempts to the system.',
                     ],
-                    '/adminv2/shaps' => [
-                        'name'        => 'Schoolbox Help',
+                    '/adminv2/profile-button' => [
+                        'name'        => 'Profile Buttons',
                         'visible'     => true,
-                        'description' => 'Ensure your staff have access to our online training, guides and forums.',
+                        'description' => 'Add your own custom buttons to a users profile page.',
                     ],
                     '/adminv2/user/stale' => [
                         'name'        => 'Remove Users',
                         'visible'     => true,
                         'description' => 'View and remove users which have not logged into the platform for a while.',
+                    ],
+                    '/adminv2/lists/residential-house' => [
+                        'name'        => 'Residential Houses',
+                        'visible'     => true,
+                        'description' => 'Setup the residential boarding houses that students attend.',
+                    ],
+                    '/adminv2/lists/roles' => [
+                        'name'        => 'Roles',
+                        'visible'     => true,
+                        'description' => 'Configure user roles within the system, the type of access they have and permissions.',
+                    ],
+                    '/adminv2/shaps' => [
+                        'name'        => 'Schoolbox Help',
+                        'visible'     => true,
+                        'description' => 'Ensure your staff have access to our online training, guides and forums.',
+                    ],
+                    '/adminv2/lists/user-pronoun' => [
+                        'name'        => 'User Pronouns',
+                        'visible'     => true,
+                        'description' => 'Configure the drop down list of pronouns available for users.',
                     ],
                     '/adminv2/ups' => [
                         'name'        => 'User Provisioning System',
@@ -935,6 +906,16 @@ class Subnav
                                 'visible' => true,
                             ],
                         ],
+                    ],
+                    '/adminv2/lists/user-title' => [
+                        'name'        => 'User Titles',
+                        'visible'     => true,
+                        'description' => 'Configure the drop down list of titles available for users.',
+                    ],
+                    '/adminv2/lists/year-levels' => [
+                        'name'        => 'Year Levels',
+                        'visible'     => true,
+                        'description' => 'Configure the year levels and the policy settings related to those year levels.',
                     ],
                 ],
             ],

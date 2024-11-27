@@ -215,6 +215,52 @@ class Controller extends Base
         $this->postDeleteSlave($table);
     }
 
+    // Functions for routes accessible by CMS Moderators -------------------------------------------------------------//
+
+    /**
+     * @param string|null $table
+     * @return void
+     * @throws RouteNotFound
+     * @throws ReflectionException|Error
+     */
+    public function getCmsIndex(?string $table): void
+    {
+        $this->getLists($table, false);
+    }
+
+    /**
+     * @param string|null $table
+     * @return void
+     * @throws RouteNotFound
+     * @throws ReflectionException
+     * @throws Error
+     */
+    public function getCmsData(?string $table): void
+    {
+        $this->getLists($table, true);
+    }
+
+    /**
+     * @param string $table
+     * @return void
+     * @throws Deleted
+     * @throws MapperException
+     * @throws RouteNotFound
+     */
+    public function postCmsSave(string $table): void
+    {
+        $this->postSaveSlave($table);
+    }
+
+    /**
+     * @param string $table
+     * @return void
+     */
+    public function postCmsDelete(string $table): void
+    {
+        $this->postDeleteSlave($table);
+    }
+
     // Functions for routes accessible by Pastoral Moderators --------------------------------------------------------//
 
     /**
@@ -1712,6 +1758,7 @@ class Controller extends Base
         return match ($table) {
             'news-topic' => 'News',
             'event-type' => 'Calendar',
+            'component-definition' => 'Cms',
             'pastoral-action',
             'pastoral-severity',
             'pastoral-tags',
@@ -1721,7 +1768,6 @@ class Controller extends Base
             'submission-type',
             'submission-errors' => 'Lms',
             'achievement-category' => 'Badge',
-            'component-definition',
             'timetable-colour' => 'Design',
             default => '',
         };

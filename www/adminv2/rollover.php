@@ -14,7 +14,7 @@ use Schoolbox\Error\Mapper as ErrorMapper;
 
 if (
     !$_SESSION['user']->isSuperuser() &&
-    !$_SESSION['user']->hasServicePermission(UserAccess::SERVICE_LMS, UserAccess::ACCESS_FULL)
+    !$_SESSION['user']->hasServicePermission(UserAccess::SERVICE_CMS, UserAccess::ACCESS_FULL)
 ) {
     throw ErrorMapper::getInstance()->generateException(ErrorMapper::ERROR_PERM_PAGE_VIEW);
 }

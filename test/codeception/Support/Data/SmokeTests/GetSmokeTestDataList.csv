@@ -102,7 +102,7 @@ Admin,"Go to profile button",Superuser,https://vagrant.dev.schoolbox.cloud/admin
 Admin,"Go to profile button","Badges Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/profile-button,401
 Admin,"Go to profile button","CMS Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/profile-button,401
 Admin,"Go to profile button","Calendar Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/profile-button,401
-Admin,"Go to profile button","Design Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/profile-button,200
+Admin,"Go to profile button","Design Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/profile-button,401
 Admin,"Go to profile button","LMS Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/profile-button,401
 Admin,"Go to profile button","News Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/profile-button,401
 Admin,"Go to profile button","Pastoral Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/profile-button,401
@@ -114,7 +114,7 @@ Admin,"Create profile button",Superuser,https://vagrant.dev.schoolbox.cloud/admi
 Admin,"Create profile button","Badges Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/profile-button/create/student,401
 Admin,"Create profile button","CMS Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/profile-button/create/student,401
 Admin,"Create profile button","Calendar Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/profile-button/create/student,401
-Admin,"Create profile button","Design Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/profile-button/create/student,200
+Admin,"Create profile button","Design Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/profile-button/create/student,401
 Admin,"Create profile button","LMS Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/profile-button/create/student,401
 Admin,"Create profile button","News Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/profile-button/create/student,401
 Admin,"Create profile button","Pastoral Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/profile-button/create/student,401
@@ -126,7 +126,7 @@ Admin,"Create profile button",Superuser,https://vagrant.dev.schoolbox.cloud/admi
 Admin,"Create profile button","Badges Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/profile-button/create/staff,401
 Admin,"Create profile button","CMS Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/profile-button/create/staff,401
 Admin,"Create profile button","Calendar Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/profile-button/create/staff,401
-Admin,"Create profile button","Design Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/profile-button/create/staff,200
+Admin,"Create profile button","Design Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/profile-button/create/staff,401
 Admin,"Create profile button","LMS Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/profile-button/create/staff,401
 Admin,"Create profile button","News Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/profile-button/create/staff,401
 Admin,"Create profile button","Pastoral Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/profile-button/create/staff,401
@@ -138,7 +138,7 @@ Admin,"Create profile button",Superuser,https://vagrant.dev.schoolbox.cloud/admi
 Admin,"Create profile button","Badges Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/profile-button/create/parent,401
 Admin,"Create profile button","CMS Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/profile-button/create/parent,401
 Admin,"Create profile button","Calendar Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/profile-button/create/parent,401
-Admin,"Create profile button","Design Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/profile-button/create/parent,200
+Admin,"Create profile button","Design Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/profile-button/create/parent,401
 Admin,"Create profile button","LMS Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/profile-button/create/parent,401
 Admin,"Create profile button","News Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/profile-button/create/parent,401
 Admin,"Create profile button","Pastoral Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/profile-button/create/parent,401
@@ -150,7 +150,7 @@ Admin,"Go to profile editor",Superuser,https://vagrant.dev.schoolbox.cloud/admin
 Admin,"Go to profile editor","Badges Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/profile-editor,401
 Admin,"Go to profile editor","CMS Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/profile-editor,401
 Admin,"Go to profile editor","Calendar Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/profile-editor,401
-Admin,"Go to profile editor","Design Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/profile-editor,200
+Admin,"Go to profile editor","Design Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/profile-editor,401
 Admin,"Go to profile editor","LMS Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/profile-editor,401
 Admin,"Go to profile editor","News Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/profile-editor,401
 Admin,"Go to profile editor","Pastoral Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/profile-editor,401
@@ -172,9 +172,9 @@ Admin,"Setup dashboard",Student,https://vagrant.dev.schoolbox.cloud/adminv2/dash
 Admin,"Setup dashboard",Parent,https://vagrant.dev.schoolbox.cloud/adminv2/dashboard,401
 Admin,"Setup homepage templates",Superuser,https://vagrant.dev.schoolbox.cloud/adminv2/homepage,200
 Admin,"Setup homepage templates","Badges Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/homepage,401
-Admin,"Setup homepage templates","CMS Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/homepage,401
+Admin,"Setup homepage templates","CMS Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/homepage,200
 Admin,"Setup homepage templates","Calendar Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/homepage,401
-Admin,"Setup homepage templates","Design Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/homepage,200
+Admin,"Setup homepage templates","Design Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/homepage,401
 Admin,"Setup homepage templates","LMS Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/homepage,401
 Admin,"Setup homepage templates","News Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/homepage,401
 Admin,"Setup homepage templates","Pastoral Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/homepage,401
@@ -238,7 +238,7 @@ Admin,"Configure Terminology",Superuser,https://vagrant.dev.schoolbox.cloud/admi
 Admin,"Configure Terminology","Badges Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/terminology,401
 Admin,"Configure Terminology","CMS Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/terminology,401
 Admin,"Configure Terminology","Calendar Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/terminology,401
-Admin,"Configure Terminology","Design Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/terminology,200
+Admin,"Configure Terminology","Design Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/terminology,401
 Admin,"Configure Terminology","LMS Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/terminology,401
 Admin,"Configure Terminology","News Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/terminology,401
 Admin,"Configure Terminology","Pastoral Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/terminology,401
@@ -288,10 +288,10 @@ Admin,"Cleanup calendar",Student,https://vagrant.dev.schoolbox.cloud/adminv2/cal
 Admin,"Cleanup calendar",Parent,https://vagrant.dev.schoolbox.cloud/adminv2/calendar/Cleanup,401
 Admin,"Bulk add folders",Superuser,https://vagrant.dev.schoolbox.cloud/adminv2/import/folder,200
 Admin,"Bulk add folders","Badges Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/import/folder,401
-Admin,"Bulk add folders","CMS Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/import/folder,401
+Admin,"Bulk add folders","CMS Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/import/folder,200
 Admin,"Bulk add folders","Calendar Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/import/folder,401
 Admin,"Bulk add folders","Design Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/import/folder,401
-Admin,"Bulk add folders","LMS Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/import/folder,200
+Admin,"Bulk add folders","LMS Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/import/folder,401
 Admin,"Bulk add folders","News Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/import/folder,401
 Admin,"Bulk add folders","Pastoral Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/import/folder,401
 Admin,"Bulk add folders","Timetable Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/import/folder,401
@@ -300,10 +300,10 @@ Admin,"Bulk add folders",Student,https://vagrant.dev.schoolbox.cloud/adminv2/imp
 Admin,"Bulk add folders",Parent,https://vagrant.dev.schoolbox.cloud/adminv2/import/folder,401
 Admin,"Rollover folders",Superuser,https://vagrant.dev.schoolbox.cloud/adminv2/rollover,200
 Admin,"Rollover folders","Badges Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/rollover,401
-Admin,"Rollover folders","CMS Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/rollover,401
+Admin,"Rollover folders","CMS Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/rollover,200
 Admin,"Rollover folders","Calendar Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/rollover,401
 Admin,"Rollover folders","Design Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/rollover,401
-Admin,"Rollover folders","LMS Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/rollover,200
+Admin,"Rollover folders","LMS Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/rollover,401
 Admin,"Rollover folders","News Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/rollover,401
 Admin,"Rollover folders","Pastoral Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/rollover,401
 Admin,"Rollover folders","Timetable Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/rollover,401
@@ -570,18 +570,18 @@ Admin,"Review submission states","Timetable Moderator",https://vagrant.dev.schoo
 Admin,"Review submission states",Teacher,https://vagrant.dev.schoolbox.cloud/adminv2/lists/lms/submission-errors,401
 Admin,"Review submission states",Student,https://vagrant.dev.schoolbox.cloud/adminv2/lists/lms/submission-errors,401
 Admin,"Review submission states",Parent,https://vagrant.dev.schoolbox.cloud/adminv2/lists/lms/submission-errors,401
-Admin,"Review components",Superuser,https://vagrant.dev.schoolbox.cloud/adminv2/lists/design/component-definition,200
-Admin,"Review components","Badges Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/lists/design/component-definition,401
-Admin,"Review components","CMS Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/lists/design/component-definition,401
-Admin,"Review components","Calendar Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/lists/design/component-definition,401
-Admin,"Review components","Design Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/lists/design/component-definition,200
-Admin,"Review components","LMS Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/lists/design/component-definition,401
-Admin,"Review components","News Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/lists/design/component-definition,401
-Admin,"Review components","Pastoral Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/lists/design/component-definition,401
-Admin,"Review components","Timetable Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/lists/design/component-definition,401
-Admin,"Review components",Teacher,https://vagrant.dev.schoolbox.cloud/adminv2/lists/design/component-definition,401
-Admin,"Review components",Student,https://vagrant.dev.schoolbox.cloud/adminv2/lists/design/component-definition,401
-Admin,"Review components",Parent,https://vagrant.dev.schoolbox.cloud/adminv2/lists/design/component-definition,401
+Admin,"Review components",Superuser,https://vagrant.dev.schoolbox.cloud/adminv2/lists/cms/component-definition,200
+Admin,"Review components","Badges Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/lists/cms/component-definition,401
+Admin,"Review components","CMS Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/lists/cms/component-definition,200
+Admin,"Review components","Calendar Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/lists/cms/component-definition,401
+Admin,"Review components","Design Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/lists/cms/component-definition,401
+Admin,"Review components","LMS Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/lists/cms/component-definition,401
+Admin,"Review components","News Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/lists/cms/component-definition,401
+Admin,"Review components","Pastoral Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/lists/cms/component-definition,401
+Admin,"Review components","Timetable Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/lists/cms/component-definition,401
+Admin,"Review components",Teacher,https://vagrant.dev.schoolbox.cloud/adminv2/lists/cms/component-definition,401
+Admin,"Review components",Student,https://vagrant.dev.schoolbox.cloud/adminv2/lists/cms/component-definition,401
+Admin,"Review components",Parent,https://vagrant.dev.schoolbox.cloud/adminv2/lists/cms/component-definition,401
 Admin,"Review timetable colours",Superuser,https://vagrant.dev.schoolbox.cloud/adminv2/lists/design/timetable-colour,200
 Admin,"Review timetable colours","Badges Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/lists/design/timetable-colour,401
 Admin,"Review timetable colours","CMS Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/lists/design/timetable-colour,401

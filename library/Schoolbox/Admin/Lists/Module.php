@@ -48,6 +48,14 @@ class Module extends BaseModule
             )
         );
 
+        $ruleCms = new Rule\All(
+            new Rule\IsLoggedIn(),
+            new Rule\Any(
+                new Rule\IsSuperuser(),
+                new Rule\HasServicePermission(UserAccess::SERVICE_CMS, UserAccess::ACCESS_FULL)
+            )
+        );
+
         $rulePastoral = new Rule\All(
             new Rule\IsLoggedIn(),
             new Rule\Any(
@@ -92,6 +100,12 @@ class Module extends BaseModule
         $this->register('POST', "/calendar/save/{table:event-type}", 'postCalendarSave', $ruleCalendar);
         $this->register('POST', "/calendar/delete/{table:event-type}", 'postCalendarDelete', $ruleCalendar);
 
+        // Routes to which users with service permission UserAccess::SERVICE_CMS need access.
+        $this->register('GET', "/cms/{table:component-definition}", 'getCmsIndex', $ruleCms);
+        $this->register('GET', "/cms/data/{table:component-definition}", 'getCmsData', $ruleCms);
+        $this->register('POST', "/cms/save/{table:component-definition}", 'postCmsSave', $ruleCms);
+        $this->register('POST', "/cms/delete/{table:component-definition}", 'postCmsDelete', $ruleCms);
+
         // Routes to which users with service permission UserAccess::SERVICE_PASTORAL need access.
         $pastoralTablesRegex = '(pastoral-action|pastoral-severity|pastoral-tags|pastoral-document-classification|pastoral-category|pastoral-type)';
         $this->register('GET', "/pastoral/{table:$pastoralTablesRegex}", 'getPastoralIndex', $rulePastoral);
@@ -113,11 +127,10 @@ class Module extends BaseModule
         $this->register('POST', "/badge/delete/{table:achievement-category}", 'postBadgeDelete', $ruleBadge);
 
         // Routes to which users with service permission UserAccess::SERVICE_DESIGN need access.
-        $designTablesRegex = '(component-definition|timetable-colour)';
-        $this->register('GET', "/design/{table:$designTablesRegex}", 'getDesignIndex', $ruleDesign);
-        $this->register('GET', "/design/data/{table:$designTablesRegex}", 'getDesignData', $ruleDesign);
-        $this->register('POST', "/design/save/{table:$designTablesRegex}", 'postDesignSave', $ruleDesign);
-        $this->register('POST', "/design/delete/{table:$designTablesRegex}", 'postDesignDelete', $ruleDesign);
+        $this->register('GET', "/design/{table:timetable-colour}", 'getDesignIndex', $ruleDesign);
+        $this->register('GET', "/design/data/{table:timetable-colour}", 'getDesignData', $ruleDesign);
+        $this->register('POST', "/design/save/{table:timetable-colour}", 'postDesignSave', $ruleDesign);
+        $this->register('POST', "/design/delete/{table:timetable-colour}", 'postDesignDelete', $ruleDesign);
 
         // Routes to which only superusers need access.
         $this->register('GET', "{/table}", 'getIndex', $ruleSuperuserOnly);
