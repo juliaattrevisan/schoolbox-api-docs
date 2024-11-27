@@ -8,7 +8,7 @@ import { useTemplateRef } from "vue";
 import type { Course } from "@schoolboxLibrary/types/Course";
 import type { CurriculumCoverageNode } from "../js/types/curriculumCoverageTypes";
 import { usePopOutStore } from "./store/ccPopOutStore";
-import { getCourseColumnCount, getFilteredCourseColumnCount } from "./util/countUtils";
+import { getFilteredCourseColumnCount } from "./util/countUtils";
 
 interface Props {
     node: CurriculumCoverageNode;
@@ -21,14 +21,7 @@ const emit = defineEmits<{
     click: [course: Course, buttonEl: HTMLButtonElement];
 }>();
 
-const hasNoUsages = window.Vue.ref(getCourseColumnCount(props.node, props.course, true) === 0); // no usage for the unit
-const hasNoUsagesWithChildren = window.Vue.ref(getCourseColumnCount(props.node, props.course, false) === 0); // no usage for the unit and its children (if any)
-
 const count = window.Vue.computed(() => {
-    // to avoid unnecessary calculations when there are no usages, we return as early as possible
-    if (hasNoUsages.value && hasNoUsagesWithChildren.value) {
-        return 0;
-    }
     return getFilteredCourseColumnCount(props.node, props.course, props.isExpanded);
 });
 const isCountZero = window.Vue.computed(() => count.value === 0); // don't need a button when it's zero

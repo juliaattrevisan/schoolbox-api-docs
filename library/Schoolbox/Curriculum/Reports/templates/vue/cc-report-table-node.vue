@@ -12,7 +12,7 @@ import type { CurriculumCoverageNode } from "../js/types/curriculumCoverageTypes
 import { useReportStore } from "./store/ccReportStore";
 import { useFiltersStore } from "./store/ccFiltersStore";
 import { usePopOutStore } from "./store/ccPopOutStore";
-import { getCourseCount, getUnitColumnCount, getFilteredTotalCount } from "./util/countUtils";
+import { getCourseColumnCount, getUnitColumnCount, getCourseCount, getFilteredTotalCount } from "./util/countUtils";
 import CcReportTableNodeTotalColumn from "./cc-report-table-node-total-column.vue";
 import CcReportTableNodeCourseColumn from "./cc-report-table-node-course-column.vue";
 import CcReportTableNodeUnitColumn from "./cc-report-table-node-unit-column.vue";
@@ -163,13 +163,22 @@ function onCourseClicked(course: Course, buttonEl: HTMLButtonElement): void {
         <cc-report-table-node-total-column :node="props.node" :is-expanded="isExpanded" />
         <!-- loop through each course/unit, retrieving the node usage or returning 0 for undefined usages -->
         <template v-for="course in reportStore.courses" :key="course.id">
+            <!-- if the node and its children are completely empty, just hard set to 0 -->
+            <td
+                v-if="
+                    getCourseColumnCount(props.node, course, true) === 0 &&
+                    getCourseColumnCount(props.node, course, false) === 0
+                "
+            >
+                0
+            </td>
             <cc-report-table-node-course-column
+                v-else
                 :node="props.node"
                 :course="course"
                 :is-expanded="isExpanded"
                 @click="onCourseClicked"
             />
-
             <template v-for="unit in course.units" :key="unit.id">
                 <!-- if the node and its children are completely empty, just hard set to 0 -->
                 <td
