@@ -492,11 +492,6 @@ class Subnav
                         'visible'     => (bool)$this->configLoader->get(ConfigMapper::NAME_WEBDAV_ENABLED),
                         'description' => 'Configure network drives that users will be able to browse inside the platform using the WebDAV protocol.',
                     ],
-                    '/adminv2/lists/year-levels' => [
-                        'name'        => 'Year Levels',
-                        'visible'     => true,
-                        'description' => 'Configure the year levels and the policy settings related to those year levels.',
-                    ],
                 ],
             ],
             '/adminv2/setting/Modules' => [
@@ -923,6 +918,11 @@ class Subnav
                         'name'        => 'User Titles',
                         'visible'     => true,
                         'description' => 'Configure the drop down list of titles available for users.',
+                    ],
+                    '/adminv2/lists/year-levels' => [
+                        'name'        => 'Year Levels',
+                        'visible'     => true,
+                        'description' => 'Configure the year levels and the policy settings related to those year levels.',
                     ],
                 ],
             ],
