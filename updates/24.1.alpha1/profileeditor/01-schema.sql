@@ -15,7 +15,7 @@ CREATE TABLE `profile_field` (
     `click_to_reveal` tinyint(4) NOT NULL DEFAULT 0,
     `is_external` boolean NOT NULL,
     PRIMARY KEY (`id`),
-    KEY `roletype_field` (`roletype`,`field`),
+    UNIQUE KEY `roletype_field` (`roletype`,`field`),
     KEY `roletype` (`roletype`),
     KEY `field` (`field`),
     KEY `sequence` (`sequence`)

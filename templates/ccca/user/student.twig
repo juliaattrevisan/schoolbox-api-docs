@@ -24,8 +24,10 @@
      # Otherwise, the core template will preclude this field: it has no intrinsic value (it's empty)
      # displayAs is the only way to distinguish between the tw.
      #}
-    {% if selectedField.displayAs == 'barcode' %}
-        {# This renders an external id as a code39 barcode #}
+    {% if selectedField.field == 'externalId' %}
+        {{ parent() }}
+
+        {# This renders an external id as a code39 barcode immediately below the external id #}
         {% if selectedField.value ?? false %}
             <dd class="small-12 columns">
                 <span class="barcode-39">*{{ user.externalId }}*</span>
