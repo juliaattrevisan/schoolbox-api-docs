@@ -252,11 +252,6 @@ class Subnav
                         'visible'     => true,
                         'description' => 'Configure the layout of the initial landing page when you first login for each role.',
                     ],
-                    '/adminv2/profile-editor' => [
-                        'name'        => 'Profile Editor',
-                        'visible'     => $userIsSuperuser,
-                        'description' => 'Customise the fields and buttons on the staff, student and parent profile screens.',
-                    ],
                     '/adminv2/menu-side' => [
                         'name'        => 'Side Menu',
                         'visible'     => true,
@@ -868,6 +863,11 @@ class Subnav
                         'name'        => 'Profile Buttons',
                         'visible'     => true,
                         'description' => 'Add your own custom buttons to a users profile page.',
+                    ],
+                    '/adminv2/profile-editor' => [
+                        'name'        => 'Profile Editor',
+                        'visible'     => true,
+                        'description' => 'Customise the fields and buttons on the staff, student and parent profile screens.',
                     ],
                     '/adminv2/user/stale' => [
                         'name'        => 'Remove Users',
