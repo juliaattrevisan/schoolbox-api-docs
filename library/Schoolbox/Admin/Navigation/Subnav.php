@@ -191,11 +191,6 @@ class Subnav
                 ),
                 'searchable' => false,
                 'children'   => [
-                    '/adminv2/lists/badge/achievement-category' => [
-                        'name'        => 'Categories List',
-                        'visible'     => true,
-                        'description' => 'Configure the list of categories that badges can be defined within.',
-                    ],
                     '/adminv2/filters/badge/badgeList' => [
                         'name'        => $filterLabelBuilder->buildLabel(FilterPageModel::PAGE_BADGE_LIST) . ' Filter',
                         'visible'     => $filterAvailabilityChecker->isAvailable(FilterPageModel::PAGE_BADGE_LIST),
@@ -205,6 +200,11 @@ class Subnav
                         'name'        => $filterLabelBuilder->buildLabel(FilterPageModel::PAGE_AWARD_LIST) . ' Filter',
                         'visible'     => $filterAvailabilityChecker->isAvailable(FilterPageModel::PAGE_AWARD_LIST),
                         'description' => 'Configure the default and available filter options on the goal and achievements search page.',
+                    ],
+                    '/adminv2/lists/badge/achievement-category' => [
+                        'name'        => 'Categories List',
+                        'visible'     => true,
+                        'description' => 'Configure the list of categories that badges can be defined within.',
                     ],
                 ]
             ],
