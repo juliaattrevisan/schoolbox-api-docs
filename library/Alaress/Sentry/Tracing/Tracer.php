@@ -507,7 +507,7 @@ class Tracer
             $spanStack   = [];
             $transaction = $hub->getTransaction();
             if (!$transaction) {
-                // Create a new transaction
+                // Create a new transaction, returning early if not sampled
                 $transaction = $hub->startTransaction($this->transactionContext);
                 if (!$transaction->getSampled()) {
                     return;
@@ -523,6 +523,12 @@ class Tracer
                 $span = $transaction->startChild($spanContext);
                 $hub->setSpan($span);
                 $this->spanStack[] = $span;
+            }
+
+            // Also return now if not sampled,
+            // in case the transaction was already started?
+            if (!$transaction->getSampled()) {
+                return;
             }
 
             // Apply each change to the actual transaction stack.
