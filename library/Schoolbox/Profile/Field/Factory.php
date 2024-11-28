@@ -290,11 +290,7 @@ class Factory
             'pastoralCounts' => null
         ];
 
-        return array_merge($externalUser, $referenceFields, [
-            'AbsenceFullDaysForYear' => 117,
-            'LateStartDaysForYear' => 230,
-            'EarlyLeaveDaysForYear' => 141
-        ]);
+        return array_merge($externalUser, $referenceFields);
     }
 
 
