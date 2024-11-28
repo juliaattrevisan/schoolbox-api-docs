@@ -514,16 +514,21 @@ Data:
             {% if requiresReflection %}
                 {% include '@learningDueWorkResponse/inlineGrading/selfAssessment.twig' %}
             {% endif %}
-             <input type="button"
-                id="saveDraftButton"
-                value="Save Draft"
-                class="button expand"
-                data-test="assessment-submission-save-draft" />
-
-            <input type="submit"
-                   value="{% if isSubmitOnBehalfOf %}Submit on behalf of {{ student.formatName }}{% else %}Submit for assessment{% endif %}"
-                   data-action-save
-                   data-test="assessment-submission-create-submit" />
+            <ul class="flex-list buttons">
+                <li>
+                    <input type="button"
+                        id="saveDraftButton"
+                        value="Save Draft"
+                        class="button expand"
+                        data-test="assessment-submission-save-draft" />
+                </li>
+                <li>
+                    <input type="submit"
+                    value="{% if isSubmitOnBehalfOf %}Submit on behalf of {{ student.formatName }}{% else %}Submit for assessment{% endif %}"
+                    data-action-save
+                    data-test="assessment-submission-create-submit" />
+                </li>
+            </ul>
 
             <div class="toast" data-alert data-save-draft></div>
 
