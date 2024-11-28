@@ -132,9 +132,9 @@ class TracedPdoStatement extends PDOStatement
         return $this->statement->getColumnMeta($column);
     }
 
-    public function setFetchMode($mode, $className = null, ...$params): bool
+    public function setFetchMode($mode, ...$args): bool
     {
-        return $this->statement->setFetchMode($mode, $className, ...$params);
+        return $this->statement->setFetchMode($mode, ...$args);
     }
 
     public function nextRowset(): bool
