@@ -70,6 +70,44 @@
             'emailparents': USER.role.viewStudentProfile and emailFunctionsAvailable and config.mail_enable and USER.email and user.isShowContacts
         }
     } %}
+        {# Special constraints that further reduce the payload I built
+         # It uses the exact same philosophy as additionalConstraints for
+         # rendering profile fields.
+         #}
+        {% set additionalConstraints = {
+            'student': {
+                '_default': true,
+                'duework': config.lms_enabled,
+                'eportfolio': eportfolioAuth,
+                'grades': config.lms_enabled,
+                'timetable': config.lms_enabled and user.isShowTimetable,
+                'geosnapshot': isGeosnapshotAvailable,
+                'emailstaff': emailFunctionsAvailable and config.mail_enable and USER.email,
+                'emailparents': emailFunctionsAvailable and config.mail_enable and USER.email and user.isShowContacts
+            },
+            'parent': {
+                '_default': true,
+                'duework': config.lms_enabled,
+                'eportfolio': eportfolioAuth,
+                'grades': config.lms_enabled,
+                'timetable': config.lms_enabled and user.isShowTimetable,
+                'geosnapshot': isGeosnapshotAvailable,
+                'emailstaff': emailFunctionsAvailable and config.mail_enable and USER.email,
+                'emailparents': emailFunctionsAvailable and config.mail_enable and USER.email and user.isShowContacts
+            },
+            'staff': {
+                '_default': USER.role.viewStudentProfile,
+                'duework': USER.role.viewStudentProfile and config.lms_enabled,
+                'eportfolio': USER.role.viewStudentProfile and eportfolioAuth,
+                'grades': config.lms_enabled,
+                'pastoral': USER.role.viewStudentProfile and pastoralUrl,
+                'timetable': USER.role.viewStudentProfile and config.lms_enabled and user.isShowTimetable,
+                'documentmanagement': USER.role.viewStudentProfile and config.external_document_report_enabled,
+                'geosnapshot': USER.role.viewStudentProfile and isGeosnapshotAvailable,
+                'emailstaff': USER.role.viewStudentProfile and emailFunctionsAvailable and config.mail_enable and USER.email,
+                'emailparents': USER.role.viewStudentProfile and emailFunctionsAvailable and config.mail_enable and USER.email and user.isShowContacts
+            }
+        } %}
 
         {% for button in buttons %}
             {% if additionalConstraints[USER.role.type][button.type] ?? additionalConstraints[USER.role.type]['_default']  %}
