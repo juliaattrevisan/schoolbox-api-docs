@@ -346,17 +346,12 @@ class Payload
                 'type' => 'campus',
                 'id' => $campus->getId(),
                 'name' => $campus->getName(),
-                'meta' => null, // potentially overridden later by FIELD_SETTINGS_META
+                'meta' => (
+                    (isset(self::FIELD_SETTINGS_META[self::AVAILABILITY_NODE][$campus->getId()]))
+                    ? self::FIELD_SETTINGS_META[self::AVAILABILITY_NODE][$campus->getId()]
+                    : null
+                )
             ];
-        }
-
-        // Add meta, if it exists.
-        if (isset(self::FIELD_SETTINGS_META[self::AVAILABILITY_NODE])) {
-            foreach ($settings['options'] as &$option) {
-                if (isset(self::FIELD_SETTINGS_META[self::AVAILABILITY_NODE][$option['id']])) {
-                    $option['meta'] = self::FIELD_SETTINGS_META[self::AVAILABILITY_NODE][$option['id']];
-                }
-            }
         }
 
         return $settings;
@@ -379,7 +374,11 @@ class Payload
                     'type' => 'roleType',
                     'id' => self::ROLETYPE_SELF,
                     'name' => ucwords(self::ROLETYPE_SELF),
-                    'meta' => null, // potentially overridden later by FIELD_SETTINGS_META
+                    'meta' => (
+                        (isset(self::FIELD_SETTINGS_META[self::VISIBILITY_NODE][self::ROLETYPE_SELF]))
+                        ? self::FIELD_SETTINGS_META[self::VISIBILITY_NODE][self::ROLETYPE_SELF]
+                        : null
+                    )
                 ]
             ]
         ];
@@ -392,17 +391,13 @@ class Payload
             $settings['options'][] = [
                 'type' => 'roleType',
                 'id' => $roleType,
-                'name' => ucwords($roleType)
+                'name' => ucwords($roleType),
+                'meta' => (
+                    (isset(self::FIELD_SETTINGS_META[self::VISIBILITY_NODE][$roleType]))
+                    ? self::FIELD_SETTINGS_META[self::VISIBILITY_NODE][$roleType]
+                    : null
+                )
             ];
-        }
-
-        // Add meta, if it exists.
-        if (isset(self::FIELD_SETTINGS_META[self::VISIBILITY_NODE])) {
-            foreach ($settings['options'] as &$option) {
-                if (isset(self::FIELD_SETTINGS_META[self::VISIBILITY_NODE][$option['id']])) {
-                    $option['meta'] = self::FIELD_SETTINGS_META[self::VISIBILITY_NODE][$option['id']];
-                }
-            }
         }
 
         return $settings;
