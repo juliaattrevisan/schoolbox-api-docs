@@ -69,7 +69,6 @@ export const Checked: Story = {
     },
 };
 
-
 export const Disabled: Story = {
     render: () => ({
         template: `

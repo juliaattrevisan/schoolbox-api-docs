@@ -27,7 +27,6 @@ const meta: Meta<typeof StorybookSlot> = {
 export default meta;
 type Story = StoryObj<typeof StorybookSlot>;
 
-
 export const ListOfCheckboxes: Story = {
     render: () => ({
         template: `

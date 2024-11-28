@@ -89,12 +89,11 @@ export const Intermediate: Story = {
     <label for="cbx3" class="c-label l-pad-s--horiz">Checkbox</label>
 </div>
             `,
-        }),
-        parameters: {
-            design: {
-                type: "figma",
-                url: "https://www.figma.com/design/kcebwjgNDzqyTtXZzgQNMO/UI-Kit?node-id=387-84&t=pOW7vFLg8WXZIutZ-4",
-            },
+    }),
+    parameters: {
+        design: {
+            type: "figma",
+            url: "https://www.figma.com/design/kcebwjgNDzqyTtXZzgQNMO/UI-Kit?node-id=387-84&t=pOW7vFLg8WXZIutZ-4",
         },
-
+    },
 };
