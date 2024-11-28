@@ -283,7 +283,6 @@ class Factory
             'tutorTeacher' => $tutorTeacher,
             'hohTeacher' => $hohTeacher,
             'coordTeacher' => $coordTeacher,
-            'studentCoach' => $studentCoach,
             /* Pastoral Counts was obtained specially in the controller cos it needs
              * a bunch of little bits and pieces; use the callback to populate it
              */
