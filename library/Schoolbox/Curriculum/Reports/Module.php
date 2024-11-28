@@ -14,6 +14,7 @@ use Alaress\Authorizer\Rule;
 use Alaress\Module\Module as BaseModule;
 use Alaress\Twig\Loader\IChainLoader;
 use Alaress\Web\Controller\Base;
+use Schoolbox\Permission\Access\Access;
 use Schoolbox\Role;
 use Schoolbox\Curriculum\Node\Mapper as CurriculumMapper;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Mapper as CourseUnitSpecificationMapper;
@@ -60,6 +61,7 @@ class Module extends BaseModule
             $curriculumMapper,
             $this->getMapperFactory()->get(CourseSpecificationMapper::class),
             $this->getMapperFactory()->get(CourseUnitSpecificationMapper::class),
+            $this->getMapperFactory()->get(Access::class),
             new Helper($curriculumMapper, $rubricCapabilityMapper, $assessmentMapper),
         );
     }
