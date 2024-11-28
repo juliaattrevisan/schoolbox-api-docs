@@ -1,5 +1,14 @@
 /**
  * Any utility functions for counting node usages
+ *
+ * The below is a visual example of the report row and how the functions are used to calculate the usage counts
+ * The non filtered functions are used to check whether there's no usages linked to the relevant course columns / unit columns,
+ * in which case any reactivity can be skipped.
+ * Where as the filtered functions are used to calculate the usage counts based on the selected report options
+ *
+ * | Total count | Course column count | Unit column count | Unit column count| Course count |
+ * | getTotalCount() | getCourseColumnCount() | getUnitColumnCount() | getUnitColumnCount() | getCourseCount() |
+ * | getFilteredTotalCount() | getFilteredCourseColumnCount() | getFilteredUnitColumnCount() | getFilteredUnitColumnCount() | getFilteredCourseCount() |
  */
 
 import type {
