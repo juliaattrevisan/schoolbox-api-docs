@@ -32,7 +32,6 @@ window.Vue.onMounted(() => {
 </script>
 
 <template>
-    <!--
     <div class="small-12 island">
         <pe-role-type />
     </div>
@@ -41,7 +40,6 @@ window.Vue.onMounted(() => {
     </div>
     <pe-fields />
     <pe-buttons />
--->
     <pe-tabs />
 </template>
 
