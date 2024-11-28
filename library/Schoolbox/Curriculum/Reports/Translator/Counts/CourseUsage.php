@@ -9,7 +9,6 @@ use Schoolbox\Curriculum\Node\Model as CurriculumNodeModel;
 use Schoolbox\Curriculum\Reports\Cursor;
 use Schoolbox\Curriculum\Reports\Translator\Counts\UnitAssessmentUsage as UnitAssessmentUsageTranslator;
 use Schoolbox\Learning\Course\DataModel\Specification\Model as CourseSpecificationModel;
-use Schoolbox\Mapper\Exception;
 use Schoolbox\User;
 
 /**
@@ -51,12 +50,6 @@ class CourseUsage
         return $this->translate($course, $node, $counts);
     }
 
-    /**
-     * @param CourseSpecificationModel $course
-     * @param CurriculumNodeModel      $node
-     * @param array                    $counts
-     * @return array
-     */
     private function translate(
         CourseSpecificationModel $course,
         CurriculumNodeModel $node,
