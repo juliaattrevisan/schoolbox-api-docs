@@ -37,9 +37,9 @@ class CourseUsage
     }
 
     /**
-     * @param CourseSpecificationModel  $course
-     * @param CurriculumNodeModel       $node
-     * @param array                     $counts
+     * @param CourseSpecificationModel $course
+     * @param CurriculumNodeModel      $node
+     * @param array                    $counts
      * @return array
      */
     public function __invoke(
@@ -57,7 +57,6 @@ class CourseUsage
     ): array {
 
         $courseCount = $counts[$node->getId()][$course->getId()][Cursor::COURSE_COURSE_SPECIFICATION] ?? 0;
-
         return [
             'id'    => $course->getId(),
             'name'  => $course->getTitle(),

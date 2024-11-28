@@ -23,6 +23,8 @@ use Schoolbox\Learning\Course\DataModel\Specification\Unit\Mapper as CourseUnitS
 use Schoolbox\Learning\Course\DataModel\Specification\Mapper as CourseSpecificationMapper;
 use Schoolbox\Learning\Assessment\DataModel\Mapper as AssessmentMapper;
 use Schoolbox\Assessment\Rubric\DataModel\Capability\Mapper as RubricCapabilityMapper;
+use Schoolbox\Permission\Access\Access;
+use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\Folder\Translator\ModelToArray\LinkOnly as FolderTranslator;
 use Schoolbox\Learning\Course\DataModel\Specification\Translator\ModelToArray as CourseSpecTranslator;
 use Schoolbox\Curriculum\Api\Translator\ModelToArray as NodeTranslator;
@@ -67,6 +69,7 @@ class Controller extends Base
         $courseSpecs = $this->courseSpecificationMapper->findByColumn('id', $courseId);
         $curriculumNodes = $this->curriculumMapper->findByColumn('id', $nodeId);
 
+        $filteredCourse = $this->helper->filterUserPermission($courseSpecs, $this->getUser());
         $folderTranslator = new FolderTranslator(0);
         $courseTranslator = new CourseSpecTranslator(
             $this->routeGenerator,
@@ -75,7 +78,7 @@ class Controller extends Base
             $folderTranslator
         );
 
-        $courses = $courseSpecs->map($courseTranslator);
+        $courses = $filteredCourse->map($courseTranslator);
 
         $nodeTranslator = new NodeTranslator(
             $this->routeGenerator,
@@ -166,9 +169,10 @@ class Controller extends Base
         array_map(
             function ($id) use (&$courseUnitSpecs) {
                 $courseUnitSpecs[$id] =
-                    $this->courseUnitSpecificationMapper
-                        ->findByColumn('course_specification_id', $id)
-                        ->reindex();
+                    $this->helper->filterUserPermission(
+                        $this->courseUnitSpecificationMapper->findByColumn('course_specification_id', $id),
+                        $this->getUser()
+                    );
             },
             $courseId
         );

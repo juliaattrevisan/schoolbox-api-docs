@@ -17,10 +17,11 @@ class CourseStructureOnly
     /**
      * Constructor
      *
-     * @param Generator  $routeGenerator
-     * @param Authorizer $authorizer
-     * @param User       $currentUser
-     * @param array      $courseUnitSpec
+     * @param Generator     $routeGenerator
+     * @param Authorizer    $authorizer
+     * @param User          $currentUser
+     * @param array         $courseUnitSpec
+     * @param IModelToArray $folderTranslator
      */
     public function __construct(
         protected Generator $routeGenerator,
