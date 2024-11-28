@@ -323,6 +323,10 @@ class Payload
     }
 
     /**
+     * Generate payload data for either:
+     *  - $payload['data']['fieldSettings'][self::AVAILABILITY_NODE] or
+     *  - $payload['data']['tabSettings'][self::AVAILABILITY_NODE]
+     *
      * @return array
      */
     private function getSettingsForAvailabilityNode(): array
@@ -358,8 +362,12 @@ class Payload
     }
 
     /**
+     * Generate payload data for either:
+     *  - $payload['data']['fieldSettings'][self::VISIBILITY_NODE] or
+     *  - $payload['data']['tabSettings'][self::VISIBILITY_NODE]
+     *
      * @param array  $roleTypes
-     * @param string $sectionName
+     * @param string $sectionName - either 'fieldSettings' or 'tabSettings'.
      * @return array
      */
     private function getSettingsForVisibilityNode(array $roleTypes, string $sectionName): array
