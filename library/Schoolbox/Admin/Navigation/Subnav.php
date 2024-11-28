@@ -127,9 +127,6 @@ class Subnav
                 }
             );
 
-        // Grab the rosettaStone for translations
-        $rosettaStone = (new RosettaStoneFactory())->build(L10nMapper::getInstance());
-
         $filterAvailabilityChecker = new AvailabilityChecker($this->configLoader);
         $filterLabelBuilder        = new LabelBuilder();
 
@@ -178,6 +175,13 @@ class Subnav
          * Although, sometimes controllers get these values from a url parameter
          * and won't be explicitly stated as one of these urls, so be mindful
          * that there are multiple ways to match these urls
+         *
+         * Ordering of menu items
+         * ----------------------
+         * Menu items should be ordered according to the following rules:
+         *  - Items named 'Home' go at the top, whether in the main menu or sub-menus.
+         *  - Except for items named 'Home', menu items should be ordered alphabetically.
+         *  - Configurable terminology should not be used (because that would mess up alphabetical ordering).
          */
         return [
             '/adminv2/home' => [
@@ -194,11 +198,6 @@ class Subnav
                 ),
                 'searchable' => false,
                 'children'   => [
-                    '/adminv2/lists/badge/achievement-category' => [
-                        'name'        => 'Categories List',
-                        'visible'     => true,
-                        'description' => 'Configure the list of categories that badges can be defined within.',
-                    ],
                     '/adminv2/filters/badge/badgeList' => [
                         'name'        => $filterLabelBuilder->buildLabel(FilterPageModel::PAGE_BADGE_LIST) . ' Filter',
                         'visible'     => $filterAvailabilityChecker->isAvailable(FilterPageModel::PAGE_BADGE_LIST),
@@ -208,6 +207,11 @@ class Subnav
                         'name'        => $filterLabelBuilder->buildLabel(FilterPageModel::PAGE_AWARD_LIST) . ' Filter',
                         'visible'     => $filterAvailabilityChecker->isAvailable(FilterPageModel::PAGE_AWARD_LIST),
                         'description' => 'Configure the default and available filter options on the goal and achievements search page.',
+                    ],
+                    '/adminv2/lists/badge/achievement-category' => [
+                        'name'        => 'Categories List',
+                        'visible'     => true,
+                        'description' => 'Configure the list of categories that badges can be defined within.',
                     ],
                 ]
             ],
@@ -221,6 +225,11 @@ class Subnav
                         'visible'     => true,
                         'description' => 'A tool to bulk or individually remove events from personal or group calendars.',
                     ],
+                    '/adminv2/lists/calendar/event-type' => [
+                        'name'        => 'Event Types',
+                        'visible'     => true,
+                        'description' => 'Setup the list of event types for filtering and colour coding.',
+                    ],
                     '/adminv2/calendar/Import' => [
                         'name'        => 'Import',
                         'visible'     => true,
@@ -230,11 +239,6 @@ class Subnav
                         'name'        => 'Subscribe',
                         'visible'     => true,
                         'description' => 'Control which additional calendars are included into a users calendar. This includes VCAL events, modules and the SIS.',
-                    ],
-                    '/adminv2/lists/calendar/event-type' => [
-                        'name'        => 'Event Types',
-                        'visible'     => true,
-                        'description' => 'Setup the list of event types for filtering and colour coding.',
                     ],
                 ],
             ],
@@ -300,11 +304,6 @@ class Subnav
                         'visible'     => true,
                         'description' => 'Statistics on how many files are being created and accessed by different roles within the system.',
                     ],
-                    '/adminv2/engagement/index/fileTypes' => [
-                        'name'        => 'Media',
-                        'visible'     => true,
-                        'description' => 'Statistics on how many videos and images are being viewed within the system.',
-                    ],
                     '/adminv2/engagement/index/links' => [
                         'name'        => 'Links',
                         'visible'     => true,
@@ -314,6 +313,11 @@ class Subnav
                         'name'        => 'Login',
                         'visible'     => true,
                         'description' => 'Statistics on the total logins by role and also the percentage of users who have logged in at all.',
+                    ],
+                    '/adminv2/engagement/index/fileTypes' => [
+                        'name'        => 'Media',
+                        'visible'     => true,
+                        'description' => 'Statistics on how many videos and images are being viewed within the system.',
                     ],
                     '/adminv2/engagement/index/mobile' => [
                         'name'        => 'Mobile Apps',
@@ -337,15 +341,15 @@ class Subnav
                 'visible'    => $userIsSuperuser && $this->configLoader->get(ConfigMapper::NAME_EPORTFOLIO_ENABLED),
                 'searchable' => false,
                 'children'   => [
-                    '/adminv2/setting/ePortfolio' => [
-                        'name'        => 'Policy',
-                        'visible'     => true,
-                        'description' => 'Configure policies relating to ePortfolio.',
-                    ],
                     '/adminv2/eportfolio/deploy' => [
                         'name'        => 'Deployment',
                         'visible'     => true,
                         'description' => 'Configure and setup the scaffolding templates that users can create ePortfolio pages from.',
+                    ],
+                    '/adminv2/setting/ePortfolio' => [
+                        'name'        => 'Policy',
+                        'visible'     => true,
+                        'description' => 'Configure policies relating to ePortfolio.',
                     ],
                     '/adminv2/eportfolio' => [
                         'name'        => 'Templates',
@@ -422,9 +426,9 @@ class Subnav
                         'description' => 'Configure tags that can be used on learning moments when students capture evidence.',
                     ],
                     '/adminv2/lesson-plan/template' => [
-                        'name'        => $rosettaStone->translate("lessonPlan", false, true) . ' Templates',
+                        'name'        => 'Lesson Plan Templates',
                         'visible'     => (bool)$this->configLoader->get(ConfigMapper::NAME_LMS_ENABLED),
-                        'description' => 'Configure ' . $rosettaStone->translate("lessonPlan", false, false) . ' templates.',
+                        'description' => 'Configure Lesson Plan Templates',
                     ],
                     '/adminv2/setting/lms/LMS%20Policy' => [
                         'name'        => 'LMS Policy',
@@ -438,14 +442,6 @@ class Subnav
                         'name'        => 'LTI Tools',
                         'visible'     => true,
                         'description' => 'Configure the 3rd party LTI integrations that you wish to make available for use in the LTI component.',
-                    ],
-                    '/adminv2/filters/lms/dueWorkCal' => [
-                        'name'        => $filterLabelBuilder->buildLabel(FilterPageModel::PAGE_UPCOMING_ASSESSMENTS) . ' Filter',
-                        'visible'     => (
-                            $filterAvailabilityChecker->isAvailable(FilterPageModel::PAGE_UPCOMING_ASSESSMENTS) &&
-                            $this->configLoader->get(ConfigMapper::NAME_LMS_ENABLED)
-                        ),
-                        'description' => 'Configure the default and available filter options on the students due work calendar.',
                     ],
                     '/adminv2/filters/lms/pending' => [
                         'name'        => $filterLabelBuilder->buildLabel(FilterPageModel::PAGE_PENDING_ASSESSMENTS) . ' Filter',
@@ -475,6 +471,14 @@ class Subnav
                         'visible'     => (bool)$this->configLoader->get(ConfigMapper::NAME_LMS_ENABLED),
                         'description' => 'Configure the alternative states an assessment can be in beyond being graded.',
                     ],
+                    '/adminv2/filters/lms/dueWorkCal' => [
+                        'name'        => $filterLabelBuilder->buildLabel(FilterPageModel::PAGE_UPCOMING_ASSESSMENTS) . ' Filter',
+                        'visible'     => (
+                            $filterAvailabilityChecker->isAvailable(FilterPageModel::PAGE_UPCOMING_ASSESSMENTS) &&
+                            $this->configLoader->get(ConfigMapper::NAME_LMS_ENABLED)
+                        ),
+                        'description' => 'Configure the default and available filter options on the students due work calendar.',
+                    ],
                     '/adminv2/lists/lms/submission-type' => [
                         'name'        => 'Work Types List',
                         'visible'     => (bool)$this->configLoader->get(ConfigMapper::NAME_LMS_ENABLED),
@@ -496,15 +500,15 @@ class Subnav
                         'visible'     => true,
                         'description' => 'Review the current guides that help new users get used to the system.',
                     ],
-                    '/adminv2/package' => [
-                        'name'        => 'Packages',
-                        'visible'     => true,
-                        'description' => 'Install optional content packages supplied to get you started.',
-                    ],
                     '/adminv2/intellischool/console' => [
                         'name'        => 'Intellischool Admin',
                         'visible'     => (bool)$this->configLoader->get(ConfigMapper::NAME_INTELLISCHOOL_DEPLOYMENT_ID),
                         'description' => 'Configure Intellischool Analytics Integration.',
+                    ],
+                    '/adminv2/package' => [
+                        'name'        => 'Packages',
+                        'visible'     => true,
+                        'description' => 'Install optional content packages supplied to get you started.',
                     ],
                 ],
             ],
@@ -559,16 +563,6 @@ class Subnav
                 ),
                 'searchable' => false,
                 'children'   => [
-                    '/adminv2/setting/pastoral/Pastoral%20Care' => [
-                        'name'        => 'Settings / Policy',
-                        'visible'     => true,
-                        'description' => 'Configure policy settings related to the pastoral care module.',
-                    ],
-                    '/adminv2/filters/pastoral/classPastoral' => [
-                        'name'        => $filterLabelBuilder->buildLabel(FilterPageModel::PAGE_CLASS_PASTORAL) . ' Filter',
-                        'visible'     => $filterAvailabilityChecker->isAvailable(FilterPageModel::PAGE_CLASS_PASTORAL),
-                        'description' => 'Configure the default and available filter options on the class pastoral report.',
-                    ],
                     '/adminv2/lists/pastoral/pastoral-action' => [
                         'name'        => 'Actions List',
                         'visible'     => (bool)$this->configLoader->get(ConfigMapper::NAME_PASTORAL_ACTION_ENABLED),
@@ -578,6 +572,11 @@ class Subnav
                         'name'        => 'Bulk Import',
                         'visible'     => true,
                         'description' => 'Import a large number of pastoral records from files within a ZIP',
+                    ],
+                    '/adminv2/filters/pastoral/classPastoral' => [
+                        'name'        => $filterLabelBuilder->buildLabel(FilterPageModel::PAGE_CLASS_PASTORAL) . ' Filter',
+                        'visible'     => $filterAvailabilityChecker->isAvailable(FilterPageModel::PAGE_CLASS_PASTORAL),
+                        'description' => 'Configure the default and available filter options on the class pastoral report.',
                     ],
                     '/pastoral/management/groups' => [
                         'name'        => 'Groups Management',
@@ -598,6 +597,11 @@ class Subnav
                         'name'        => 'Record Tags List',
                         'visible'     => true,
                         'description' => 'Maintain tags used on pastoral records, or if setup, lock this list to be the only tags available.',
+                    ],
+                    '/adminv2/setting/pastoral/Pastoral%20Care' => [
+                        'name'        => 'Settings / Policy',
+                        'visible'     => true,
+                        'description' => 'Configure policy settings related to the pastoral care module.',
                     ],
                     '/adminv2/lists/pastoral/pastoral-document-classification' => [
                         'name'        => 'SIS Document Classifications List',
@@ -686,27 +690,26 @@ class Subnav
                         'visible'     => true,
                         'description' => 'Configure your school data (SIS) import process.',
                     ],
-                    // Non-standard ordering of menu items
-                    // -----------------------------------
-                    // The order of the menu items below is deliberately not alphabetical.  The ordering below matches
-                    // the order in which the import operations must be performed in order to avoid errors.
+                    // Note regarding ordering of School Data Import menu items
+                    // --------------------------------------------------------
+                    // The ordering below matches the order in which the import operations must be performed in order to avoid errors.
                     '/adminv2/import/profile' => [
-                        'name'        => 'User Profiles',
+                        'name'        => 'Step 1 - User Profiles',
                         'visible'     => $this->configLoader->get('schooldata_import_data_source') === 'csv',
                         'description' => 'Import staff, student, parent and relationship data via CSV files.',
                     ],
                     '/adminv2/import/timetableStructure' => [
-                        'name'        => 'Timetable Structure',
+                        'name'        => 'Step 2 - Timetable Structure',
                         'visible'     => $this->configLoader->get('schooldata_import_data_source') === 'csv',
                         'description' => 'Import timetable definition and structure via CSV.',
                     ],
                     '/adminv2/import/timetable' => [
-                        'name'        => 'Timetable',
+                        'name'        => 'Step 3 - Timetable',
                         'visible'     => $this->configLoader->get('schooldata_import_data_source') === 'csv',
                         'description' => 'Import the classes and their periods via CSV.',
                     ],
                     '/adminv2/import/timetableEnrolment' => [
-                        'name'        => 'Timetable Enrolment',
+                        'name'        => 'Step 4 - Timetable Enrolment',
                         'visible'     => $this->configLoader->get('schooldata_import_data_source') === 'csv',
                         'description' => 'Import the students and teachers in classes via CSV.',
                     ],
@@ -762,15 +765,15 @@ class Subnav
                         'visible'     => count($enabledConfigs[ConfigMapper::TYPE_LOCALISATION] ?? []) > 0,
                         'description' => 'Customise dates and other local formatting options.',
                     ],
-                    '/adminv2/oauth' => [
-                        'name'        => 'oAuth Provider Configuration',
-                        'visible'     => true,
-                        'description' => 'Configure an oAuth endpoint to validate tokens provided by mobile apps.',
-                    ],
                     '/adminv2/oauth/client' => [
                         'name'        => 'oAuth Client Configuration',
                         'visible'     => true,
                         'description' => 'Configure oAuth/OIDC clients which may use this Schoolbox instance as an identity provider.',
+                    ],
+                    '/adminv2/oauth' => [
+                        'name'        => 'oAuth Provider Configuration',
+                        'visible'     => true,
+                        'description' => 'Configure an oAuth endpoint to validate tokens provided by mobile apps.',
                     ],
                     '/adminv2/setting/Paths' => [
                         'name'        => 'Paths',
@@ -823,10 +826,20 @@ class Subnav
                         'visible'     => true,
                         'description' => 'Access recent CMS actions like delete, create and modify of files, folders and links.',
                     ],
+                    '/adminv2/user/bulk/modify' => [
+                        'name'        => 'Bulk Modify',
+                        'visible'     => true,
+                        'description' => 'Make changes to user accounts on bulk by searching on various account attributes.',
+                    ],
                     '/adminv2/lists/campus' => [
                         'name'        => 'Campuses',
                         'visible'     => true,
                         'description' => 'Setup the campus within the school and configure which timetables are used by the campus.',
+                    ],
+                    '/adminv2/user/create' => [
+                        'name'        => 'Create User',
+                        'visible'     => true,
+                        'description' => 'Setup a new user account for use in the platform.',
                     ],
                     '/adminv2/lists/house' => [
                         'name'        => 'Houses',
@@ -842,16 +855,6 @@ class Subnav
                         'name'        => 'Import Portraits',
                         'visible'     => true,
                         'description' => 'Manually upload portrait photos for users when the SIS does not automatically provide them.',
-                    ],
-                    '/adminv2/user/bulk/modify' => [
-                        'name'        => 'Bulk Modify',
-                        'visible'     => true,
-                        'description' => 'Make changes to user accounts on bulk by searching on various account attributes.',
-                    ],
-                    '/adminv2/user/create' => [
-                        'name'        => 'Create User',
-                        'visible'     => true,
-                        'description' => 'Setup a new user account for use in the platform.',
                     ],
                     '/adminv2/reports/login/all' => [
                         'name'        => 'Login Log',
