@@ -6,7 +6,7 @@
 
 # Global constants
 readonly cache_dir='/usr/share/schoolbox/vagrantcache'
-readonly VAGRANT_TIMESTAMP_MIN=1660612589              # Box must have been built at or after this
+readonly VAGRANT_TIMESTAMP_MIN=1660612589 # Box must have been built at or after this
 
 # Global vars
 declare instance_registry_url_override
@@ -64,6 +64,10 @@ function setup_aws_cli() {
   rm -rf awscliv2.zip aws
 }
 
+function version_gte() {
+  echo -e "$1\n$2" | sort -rCV
+}
+
 function setup_aws_sso() {
   if [ -f /root/.aws/credentials ]; then
     if grep -q 'default' /root/.aws/credentials; then
@@ -81,10 +85,15 @@ region = ap-southeast-2
 
 [sso-session vagrant]
 sso_region = ap-southeast-2
-sso_start_url = $aws_start_url" > /root/.aws/config
-
-  if ! aws configure list > /dev/null; then
-    aws sso login --no-browser
+sso_start_url = $aws_start_url" >/root/.aws/config
+  params=()
+  params+=(--no-browser)
+  aws_version=$(aws --version 2>&1 | cut -d " " -f1 | cut -d "/" -f2)
+  if version_gte "$aws_version" "2.22.0"; then
+    params+=(--use-device-code)
+  fi
+  if ! aws configure list >/dev/null; then
+    aws sso login "${params[@]}"
   fi
 }
 
@@ -164,8 +173,8 @@ function deploy_nginx_ssl_cert() {
     filename='tls-wildcard.dev.schoolbox.cloud.tar.gz'
 
     if ! /usr/share/schoolbox/tools/download-s3-file.sh --data-source "https://s3-ap-southeast-2.amazonaws.com/schoolbox-cloud-tls" \
-        --file-name "certs/$filename" \
-        --cache-dir "$cache_dir"; then
+      --file-name "certs/$filename" \
+      --cache-dir "$cache_dir"; then
       echo "Unable to download wildcard certificate" >&2
       exit 1
     fi
