@@ -21,7 +21,7 @@ const emit = defineEmits<{
 }>();
 
 const count = window.Vue.computed(() => {
-    return getFilteredCourseColumnCount(props.node, props.course, props.isExpanded);
+    return getFilteredCourseColumnCount(props.node, props.course, !props.isExpanded);
 });
 const isCountZero = window.Vue.computed(() => count.value === 0); // don't need a button when it's zero
 const buttonId = window.Vue.computed(() => `usage-button-${props.course.id}-${props.node.id}`);

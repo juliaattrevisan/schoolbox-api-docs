@@ -75,9 +75,7 @@ function onTotalClicked(): void {
 
 // #region usage counts
 
-const hasNoUsages = window.Vue.computed(
-    () => getTotalCount(props.node, true) === 0 && getTotalCount(props.node, false) === 0,
-);
+const hasNoUsages = window.Vue.computed(() => getTotalCount(props.node, true) === 0);
 
 /**
  * If has a unit with no usage, and only show gaps is selected, show the node
@@ -92,7 +90,7 @@ const showNode = window.Vue.computed(() => {
     if ((filtersStore.onlyShowGaps && props.node.code === null) || props.node.code === "") {
         return false;
     }
-    return getFilteredTotalCount(props.node, isExpanded.value) === 0 && filtersStore.onlyShowGaps;
+    return getFilteredTotalCount(props.node, !isExpanded.value) === 0 && filtersStore.onlyShowGaps;
 });
 
 // #endregion
@@ -195,15 +193,7 @@ function onCourseClicked(buttonEl: HTMLButtonElement): void {
         <!-- loop through each course/unit, retrieving the node usage or returning 0 for undefined usages -->
         <template v-for="course in props.node.usage.courses" :key="course.id">
             <!-- if the node course column and its children are completely empty, just hard set to 0 -->
-            <td
-                v-if="
-                    hasNoUsages ||
-                    (getCourseColumnCount(props.node, course, true) === 0 &&
-                        getCourseColumnCount(props.node, course, false) === 0)
-                "
-            >
-                0
-            </td>
+            <td v-if="hasNoUsages || getCourseColumnCount(props.node, course, true) === 0">0</td>
             <cc-report-table-node-course-column
                 v-else
                 :node="props.node"
@@ -213,15 +203,7 @@ function onCourseClicked(buttonEl: HTMLButtonElement): void {
             />
             <template v-for="unit in course.units" :key="unit.id">
                 <!-- if the node unit column and its children are completely empty, just hard set to 0 -->
-                <td
-                    v-if="
-                        hasNoUsages ||
-                        (getUnitColumnCount(props.node, course, unit, true) === 0 &&
-                            getUnitColumnCount(props.node, course, unit, false) === 0)
-                    "
-                >
-                    0
-                </td>
+                <td v-if="hasNoUsages || getUnitColumnCount(props.node, course, unit, true) === 0">0</td>
                 <cc-report-table-node-unit-column
                     v-else
                     :node="props.node"
@@ -233,15 +215,7 @@ function onCourseClicked(buttonEl: HTMLButtonElement): void {
             </template>
             <template v-if="reportStore.hasMultipleCourses">
                 <!-- if the node course and its children are completely empty, just hard set to 0 -->
-                <td
-                    v-if="
-                        hasNoUsages ||
-                        (getCourseCount(props.node, course, true) === 0 &&
-                            getCourseCount(props.node, course, false) === 0)
-                    "
-                >
-                    0
-                </td>
+                <td v-if="hasNoUsages || getCourseCount(props.node, course, true) === 0">0</td>
                 <cc-report-table-node-course-total-column
                     v-else
                     :node="props.node"

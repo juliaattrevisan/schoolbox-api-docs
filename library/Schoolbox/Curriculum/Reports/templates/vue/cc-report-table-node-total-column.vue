@@ -17,7 +17,7 @@ const emit = defineEmits<{
 }>();
 
 const count = window.Vue.computed(() => {
-    return getFilteredTotalCount(props.node, props.isExpanded);
+    return getFilteredTotalCount(props.node, !props.isExpanded);
 });
 
 const canExpand = window.Vue.computed(() => props.node.children && props.node.children.length > 0 && !props.isExpanded);

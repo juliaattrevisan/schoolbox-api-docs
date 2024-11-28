@@ -18,7 +18,7 @@ const emit = defineEmits<{
 }>();
 
 const count = window.Vue.computed(() => {
-    return getFilteredCourseCount(props.node, props.course, props.isExpanded);
+    return getFilteredCourseCount(props.node, props.course, !props.isExpanded);
 });
 
 const canExpand = window.Vue.computed(() => props.node.children && props.node.children.length > 0 && !props.isExpanded);
