@@ -193,6 +193,7 @@ HELP;
         $query = "
             SELECT id, name, group_type
             FROM `groups`
+            WHERE group_type != 'guest'
         ";
 
         $statement = $db->prepare($query);
