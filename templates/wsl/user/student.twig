@@ -6,16 +6,6 @@
 {% block details_hohTeacher %}
 {% endblock details_hohTeacher %}
 
-{# Buttons - add intranet at start of list #}
-{% block buttons %}
-    {{ parent() }}
-    {# Change of information request can go here #}
-    <li>
-        <a href="{{ session.mailhandle }}changeofinformation@wenona.nsw.edu.au"
-           class="icon-email" title="Email Wenona about updates to your information">Email Updates</a>
-    </li>
-{% endblock buttons %}
-
 {% block buttons_dueWork %}
 {% endblock buttons_dueWork %}
 
