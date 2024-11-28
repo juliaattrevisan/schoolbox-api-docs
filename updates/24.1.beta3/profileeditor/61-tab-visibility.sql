@@ -6,3 +6,6 @@
 
 DELETE FROM profile_tab_roletype_visibility
 WHERE roletype = 'student';
+
+-- TabSettingsTool does not include any Student visibilties by default
+-- so no changes required there.
