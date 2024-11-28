@@ -109,16 +109,11 @@ class Controller extends Base
     public function generateCoverage(): void
     {
         $query = $this->requestQuery;
-        $courseId = $query->get('courseId');
-        $nodeId = $query->get('nodeId');
-        $limit = $query->getInt('limit', Cursor::LIMIT_DEFAULT);
         $encodedCursor = $query->get('cursor');
 
-        //Making sure both courseId and nodeId are given in the query
-        $courseId = $this->formatQueryIds($courseId);
-        $nodeId = $this->formatQueryIds($nodeId);
-
-        if (empty($courseId)) {
+        // Making sure both courseId and nodeId are given in the query
+        $courseIds = $this->extractCourseIdsFromQuery();
+        if (empty($courseIds)) {
             $problem = (new ApiProblem("courseId must be defined"))
                 ->setStatus(400)
                 ->asArray();
@@ -126,7 +121,8 @@ class Controller extends Base
             return;
         }
 
-        if (empty($nodeId)) {
+        $nodeIds = $this->extractNodeIdsFromQuery();
+        if (empty($nodeIds)) {
             $problem = (new ApiProblem("nodeId must be defined"))
                 ->setStatus(400)
                 ->asArray();
@@ -135,6 +131,7 @@ class Controller extends Base
         }
 
         //Early exit if limit is not of type int
+        $limit = $query->getInt('limit', Cursor::LIMIT_DEFAULT);
         if (null === $limit) {
             $problem = (new ApiProblem("Limit must be an positive integer"))
                 ->setStatus(400)
@@ -146,8 +143,8 @@ class Controller extends Base
         try {
             $cursor = new Cursor(
                 $this->curriculumMapper,
-                $courseId,
-                $nodeId,
+                $courseIds,
+                $nodeIds,
                 $limit,
             );
 
@@ -163,7 +160,7 @@ class Controller extends Base
         $usageCount = $cursor->retrieveUsageCount();
 
         $courseSpecs =
-            $this->courseSpecificationMapper->findByColumn('id', $courseId);
+            $this->courseSpecificationMapper->findByColumn('id', $courseIds);
 
         $courseUnitSpecs = [];
         array_map(
@@ -176,7 +173,7 @@ class Controller extends Base
                         $this->getUser()
                     );
             },
-            $courseId
+            $courseIds
         );
 
         $unitTranslator = new UnitAssessmentUsageTranslator(
@@ -354,5 +351,25 @@ class Controller extends Base
         fputcsv($fp, ['test']);
 
         fputcsv($fp, ['test2']);
+    }
+
+    /**
+     * Extract the course IDs from the query string.
+     *
+     * @return array
+     */
+    private function extractCourseIdsFromQuery(): array
+    {
+        return $this->formatQueryIds($this->requestQuery->get('courseId'));
+    }
+
+    /**
+     * Extract the curriculum node IDs from the query string.
+     *
+     * @return array
+     */
+    private function extractNodeIdsFromQuery(): array
+    {
+        return $this->formatQueryIds($this->requestQuery->get('nodeId'));
     }
 }
