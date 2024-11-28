@@ -331,7 +331,6 @@ class Payload
      */
     private function getSettingsForAvailabilityNode(): array
     {
-        $metadata = self::FIELD_SETTINGS_META[self::AVAILABILITY_NODE] ?? [];
         $campuses = $this->campusMapper->findAll();
 
         /* Field settings (groups of checkboxes) that you can tick
@@ -347,7 +346,7 @@ class Payload
                 'type' => 'campus',
                 'id' => $campus->getId(),
                 'name' => $campus->getName(),
-                'meta' => $metadata[$campus->getId()] ?? null
+                'meta' => null
             ];
         }
 
@@ -365,7 +364,7 @@ class Payload
      */
     private function getSettingsForVisibilityNode(array $roleTypes, string $sectionName): array
     {
-        $metadata = self::FIELD_SETTINGS_META[self::VISIBILITY_NODE] ?? [];
+        $metadata = self::FIELD_SETTINGS_META[self::VISIBILITY_NODE];
 
         /* Role types you can choose
          */
@@ -377,7 +376,7 @@ class Payload
                     'type' => 'roleType',
                     'id' => self::ROLETYPE_SELF,
                     'name' => ucwords(self::ROLETYPE_SELF),
-                    'meta' => $metadata[self::ROLETYPE_SELF] ?? null
+                    'meta' => $metadata[self::ROLETYPE_SELF]
                 ]
             ]
         ];
