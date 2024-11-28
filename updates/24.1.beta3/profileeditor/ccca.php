@@ -266,7 +266,7 @@ HELP;
         $statement = $this->getDatabaseInternal()->prepare("
             SELECT id
             FROM profile_field
-            WHERE roletype = :roletype 
+            WHERE roletype = :roletype
             AND field = :field
         ");
 
@@ -328,4 +328,4 @@ HELP;
 $options = [CliTool\Kernel::OPTION_LEVEL => Monolog\Logger::INFO, CliTool\Kernel::OPTION_ERRORS => E_ALL,];
 
 /** @noinspection PhpUnhandledExceptionInspection */
-(new Schoolbox\Application\CliTool\Kernel($app, $options))->runApp();
+(new Schoolbox\Application\CliTool\Kernel($app, $options, true))->runApp();
