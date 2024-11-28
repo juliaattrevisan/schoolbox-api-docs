@@ -143,7 +143,7 @@ HELP;
 
         $this->getDatabaseInternal()->executeQuery("
             UPDATE config
-            SET value = CONCAT(value, ' ', '\'s Learning Studdio')
+            SET value = CONCAT(value, '\'s Learning Studio')
             WHERE name = 'name_format_student'
             LIMIT 1
         ");
