@@ -117,6 +117,7 @@ HELP;
 
         $this->createFields();
         $this->renameFields();
+        $this->hideFields();
 
         /* Announce lock release
           */
@@ -202,6 +203,40 @@ HELP;
             WHERE field = 'formTeacher'
             LIMIT 1
         ");
+    }
+
+
+    /**
+     * This removes the Student Type field
+     *
+     * @return void
+     */
+    private function hideFields(): void
+    {
+        /* Remove Student Type field
+         */
+        $tables = [
+            'profile_field_campus_availability',
+            'profile_field_roletype_visibility',
+        ];
+
+        /* Un-assign relationships
+         */
+        foreach ($tables as $table) {
+            $this->getLogger()->info(sprintf(
+                'Removing relationships with Student Type field in %s',
+                $table
+            ));
+
+            $this->getDatabaseInternal()->executeQuery(sprintf("
+                DELETE FROM %s
+                WHERE profile_field_id = (SELECT id
+                FROM profile_field
+                WHERE field = 'StudentBoarder'
+                AND roletype = 'student'
+                LIMIT 1)
+            ", $table));
+        }
     }
 
 
