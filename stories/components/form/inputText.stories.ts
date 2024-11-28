@@ -40,6 +40,12 @@ export const Default: Story = {
             <input id="news_default_expiry-field" class="c-input-text" type="text" required />
             `,
     }),
+    parameters: {
+        design: {
+            type: "figma",
+            url: "https://www.figma.com/design/kcebwjgNDzqyTtXZzgQNMO/UI-Kit?node-id=310-46&t=SxdVbY0TIHuqT7y1-4",
+        },
+    },
 };
 
 export const Disabled: Story = {
@@ -48,6 +54,12 @@ export const Disabled: Story = {
             <input id="news_default_expiry-field" class="c-input-text" type="text" value="I'm disabled" disabled />
             `,
     }),
+    parameters: {
+        design: {
+            type: "figma",
+            url: "https://www.figma.com/design/kcebwjgNDzqyTtXZzgQNMO/UI-Kit?node-id=310-45&t=SxdVbY0TIHuqT7y1-4",
+        },
+    },
 };
 
 export const ReadOnly: Story = {
@@ -73,9 +85,9 @@ export const HasError: Story = {
 export const WithButton: Story = {
     render: () => ({
         template: `
-<div class="c-form-element l-gap--0">
+<div class="c-form-element l-gap--0 inline-input-container">
     <input id="news_default_expiry-field" class="c-input-text c-input-text--with-button" type="text" />
-    <button class="c-button c-button--with-input l-width-100">
+    <button class="c-button c-button--with-input">
         <sbx-icon name="folder"></sbx-icon>
         <span>Browse Resources</span>
     </button>

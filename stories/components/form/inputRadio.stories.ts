@@ -32,23 +32,41 @@ export const Default: Story = {
         template: `
 <fieldset class="c-fieldset">
     <div class="c-fieldset__container">
-        <legend class="c-label">List of options</legend>
-        <div class="l-flex-row l-flex--align-center">
-            <input id="rad1" name="list" type="radio" class="c-input-radio" checked />
-            <label for="rad1" class="c-label c-label--small l-pad-s--horiz">Radio 1</label>
-        </div>
         <div class="l-flex-row l-flex--align-center">
             <input id="rad2" name="list" type="radio" class="c-input-radio" />
-            <label for="rad2" class="c-label c-label--small l-pad-s--horiz">Radio 2</label>
-        </div>
-        <div class="l-flex-row l-flex--align-center">
-            <input id="rad3" name="list" type="radio" class="c-input-radio" />
-            <label for="rad3" class="c-label c-label--small l-pad-s--horiz">Radio 3</label>
+            <label for="rad2" class="c-label c-label--small l-pad-s--horiz">Radio</label>
         </div>
     </div>
 </fieldset>
             `,
     }),
+    parameters: {
+        design: {
+            type: "figma",
+            url: "https://www.figma.com/design/kcebwjgNDzqyTtXZzgQNMO/UI-Kit?node-id=342-73&t=sZv062qQ9kmTFg6a-4",
+        },
+    },
+};
+
+export const Checked: Story = {
+    render: () => ({
+        template: `
+<fieldset class="c-fieldset">
+    <div class="c-fieldset__container">
+        <div class="l-flex-row l-flex--align-center">
+            <input id="rad2" name="list" type="radio" class="c-input-radio" checked/>
+            <label for="rad2" class="c-label c-label--small l-pad-s--horiz">Radio</label>
+        </div>
+    </div>
+</fieldset>
+            `,
+    }),
+    parameters: {
+        design: {
+            type: "figma",
+            url: "https://www.figma.com/design/kcebwjgNDzqyTtXZzgQNMO/UI-Kit?node-id=342-71&t=9ot92RWJV6SUcGzU-4",
+        },
+    },
 };
 
 export const Disabled: Story = {
@@ -56,73 +74,37 @@ export const Disabled: Story = {
         template: `
 <fieldset class="c-fieldset">
     <div class="c-fieldset__container">
-        <legend class="c-label">List of options</legend>
-        <div class="l-flex-row l-flex--align-center">
-            <input id="rad4" name="list" type="radio" class="c-input-radio" checked />
-            <label for="rad4" class="c-label c-label--small l-pad-s--horiz">Radio 1</label>
-        </div>
-        <div class="l-flex-row l-flex--align-center">
-            <input id="rad5" name="list" type="radio" class="c-input-radio" />
-            <label for="rad5" class="c-label c-label--small l-pad-s--horiz">Radio 2</label>
-        </div>
         <div class="l-flex-row l-flex--align-center">
             <input id="rad6" name="list" type="radio" class="c-input-radio" disabled />
-            <label for="rad6" class="c-label c-label--small l-pad-s--horiz">Radio 3</label>
+            <label for="rad6" class="c-label c-label--small l-pad-s--horiz">Radio</label>
         </div>
     </div>
 </fieldset>
             `,
     }),
+    parameters: {
+        design: {
+            type: "figma",
+            url: "https://www.figma.com/design/kcebwjgNDzqyTtXZzgQNMO/UI-Kit?node-id=342-72&t=9ot92RWJV6SUcGzU-4",
+        },
+    },
 };
-
-export const WithHint: Story = {
+export const Error: Story = {
     render: () => ({
         template: `
 <fieldset class="c-fieldset">
-    <div class="c-fieldset__container">
-        <legend class="c-label">List of options</legend>
-        <div class="c-hint">Please select the correct option.</div>
         <div class="l-flex-row l-flex--align-center">
-            <input id="rad7" name="list" type="radio" class="c-input-radio" checked />
-            <label for="rad7" class="c-label c-label--small l-pad-s--horiz">Radio 1</label>
-        </div>
-        <div class="l-flex-row l-flex--align-center">
-            <input id="rad8" name="list" type="radio" class="c-input-radio" />
-            <label for="rad8" class="c-label c-label--small l-pad-s--horiz">Radio 2</label>
-        </div>
-        <div class="l-flex-row l-flex--align-center">
-            <input id="rad9" name="list" type="radio" class="c-input-radio" />
-            <label for="rad9" class="c-label c-label--small l-pad-s--horiz">Radio 3</label>
+            <input id="rad6" name="list" type="radio" class="c-input-radio error" />
+            <label for="rad6" class="c-label c-label--small l-pad-s--horiz">Radio</label>
         </div>
     </div>
 </fieldset>
             `,
     }),
-};
-
-export const Inline: Story = {
-    render: () => ({
-        template: `
-<fieldset class="c-fieldset">
-    <div class="c-fieldset__container">
-        <legend class="c-label">List of options</legend>
-        <div class="c-hint">Please select the scorrect option.</div>
-        <div class="l-flex-row l-gap-m">
-            <div class="l-flex-row l-flex--align-center">
-                <input id="rad7a" name="list" type="radio" class="c-input-radio" checked />
-                <label for="rad7a" class="c-label c-label--small l-pad-s--horiz">Radio 1</label>
-            </div>
-            <div class="l-flex-row l-flex--align-center">
-                <input id="rad8a" name="list" type="radio" class="c-input-radio" />
-                <label for="rad8a" class="c-label c-label--small l-pad-s--horiz">Radio 2</label>
-            </div>
-            <div class="l-flex-row l-flex--align-center">
-                <input id="rad9a" name="list" type="radio" class="c-input-radio" />
-                <label for="rad9a" class="c-label c-label--small l-pad-s--horiz">Radio 3</label>
-            </div>
-        </div>
-    </div>
-</fieldset>
-            `,
-    }),
+    parameters: {
+        design: {
+            type: "figma",
+            url: "https://www.figma.com/design/kcebwjgNDzqyTtXZzgQNMO/UI-Kit?node-id=342-70&t=9ot92RWJV6SUcGzU-4",
+        },
+    },
 };

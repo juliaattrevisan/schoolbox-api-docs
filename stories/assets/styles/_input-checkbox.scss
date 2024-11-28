@@ -1,12 +1,13 @@
 /**
- *  Input radio element
+ *   <input> elements of type checkbox are rendered by default as boxes that are checked (ticked) when activated
+ *   Styles primarily based from https://moderncss.dev/pure-css-custom-checkbox-style/
  */
-.c-input-radio {
+.c-input-checkbox {
     -webkit-appearance: none; // Add if not using autoprefixer
     appearance: none; // Remove most all native input styles
     background-color: var(--color-foreground-primary); // For iOS < 15
     border: var(--size-form-element-border-width) solid var(--sbx-color-accent);
-    border-radius: 50%;
+    border-radius: var(--sbx-border-radius-normal);
     color: var(--sbx-color-accent);
     cursor: pointer;
     display: grid;
@@ -28,12 +29,13 @@
     }
     &::before {
         background-color: CanvasText; // Windows High Contrast Mode, to ensure the tick is visible https://developer.mozilla.org/en-US/docs/Web/CSS/@media/forced-colors
-        border-radius: 50%;
         box-shadow: inset 1rem 1rem var(--sbx-color-accent); // using box-shadow will allow the tick to be visible when printed
         content: "";
+        clip-path: polygon(14% 44%, 0 65%, 50% 100%, 100% 16%, 80% 0%, 43% 62%);
         height: 1rem;
         transform: scale(0);
-        transition: var(--animation-form-input-change) transform ease-in-out;
+        transform-origin: bottom left;
+        transition: var(--animation-form-input-change) transform;
         width: 1rem;
     }
     &:checked::before {
@@ -55,9 +57,13 @@
     }
 }
 
-.c-input-radio[type="radio"] + label {
+.c-input-checkbox[type="checkbox"] + label {
     cursor: pointer;
     display: unset; // ^foundation-fixes^ - won't need once _forms.scss is removed
     margin: 0; // ^foundation-fixes^ - won't need once _forms.scss is removed
     vertical-align: baseline; // ^foundation-fixes^ - won't need  once _forms.scss is removed
+}
+.c-input-checkbox.error {
+    border: var(--size-form-element-border-width) solid var(--color-alert);
+    border-radius: var(--sbx-border-radius-normal);
 }

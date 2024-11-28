@@ -33,8 +33,8 @@
  *  Shared form input disabled styles
  */
 @mixin form-input-disabled {
-    background: var(--color-form-disabled-background);
-    color: var(--color-text-primary) !important; // ^foundation-fixes^ - won't need once _forms.scss is removed
+    background-color: var(--color-foreground-secondary);
+    color: var(--color-text-secondary) !important; // ^foundation-fixes^ - won't need once _forms.scss is removed
     cursor: not-allowed;
     pointer-events: auto; // ^foundation-fixes^ - won't need once _forms.scss is removed
     & + label {
@@ -82,12 +82,12 @@ hr {
     }
 }
 
-@import "../../../www/static/css/core/ui/forms/fieldset";
-@import "../../../www/static/css/core/ui/forms/label";
-@import "../../../www/static/css/core/ui/forms/hint";
-@import "../../../www/static/css/core/ui/forms/input-text";
-@import "../../../www/static/css/core/ui/forms/input-checkbox";
-@import "../../../www/static/css/core/ui/forms/input-toggle";
-@import "../../../www/static/css/core/ui/forms/input-radio";
-@import "../../../www/static/css/core/ui/forms/select";
-@import "../../../www/static/css/core/ui/forms/form-element";
+@import "fieldset";
+@import "label";
+@import "hint";
+@import "input-text";
+@import "input-checkbox";
+@import "input-toggle";
+@import "input-radio";
+@import "select";
+@import "form-element";

@@ -110,7 +110,12 @@ a.c-button {
         }
     }
     &--with-input {
-        border-radius: 0 0 var(--roundness-buttons) var(--roundness-buttons);
+        border-radius: 0 var(--sbx-border-radius-normal) var(--sbx-border-radius-normal) 0;
+        overflow: hidden;
+        height: 2.25rem;
+        span {
+            white-space: nowrap;
+        }
     }
     &--icon-only {
         border: none;

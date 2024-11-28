@@ -37,7 +37,7 @@
         align-items: center;
         background-color: var(--color-foreground-primary);
         border: 1px solid var(--sbx-color-accent);
-        border-radius: calc(var(--roundness-form-elements) * 2);
+        border-radius: var(--sbx-border-radius-normal);
         box-sizing: content-box;
         display: inline-flex;
         height: calc(var(--diameter) + var(--offset) * 2);
