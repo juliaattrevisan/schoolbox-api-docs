@@ -11,6 +11,7 @@ declare(strict_types=1);
 namespace Schoolbox\Admin\Profile\Editor\Tab;
 
 use Alaress\Web\Controller\Base;
+use Schoolbox\Role;
 
 class Controller extends Base
 {
@@ -101,6 +102,10 @@ class Controller extends Base
              */
             /** @var string[] $newRoleTypes */
             $newRoleTypes = $settings['visibility'] ?? [];
+
+            if (in_array(Role::STUDENT, $newRoleTypes)) {
+                throw new \InvalidArgumentException('Cannot set tab visibility for ' . Role::STUDENT . '.');
+            }
 
             if (\count($newRoleTypes)) {
                 foreach ($newRoleTypes as $newRoleType) {
