@@ -237,6 +237,23 @@ HELP;
                 LIMIT 1)
             ", $table));
         }
+
+        /* Remove all Parent fields
+         * This isn't exactly the most glamourous way to do it, but it's cheap and effective
+         */
+        $this->getDatabaseInternal()->executeQuery("
+            DELETE pfca
+            FROM profile_field_campus_availability pfca
+            INNER JOIN profile_field pf ON pfca.profile_field_id = pf.id
+            WHERE pf.roletype = 'parent'
+        ");
+
+        $this->getDatabaseInternal()->executeQuery("
+            DELETE pfrv
+            FROM profile_field_roletype_visibility pfrv
+            INNER JOIN profile_field pf ON pfrv.profile_field_id = pf.id
+            WHERE pf.roletype = 'parent'
+        ");
     }
 
 
