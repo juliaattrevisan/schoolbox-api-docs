@@ -387,7 +387,7 @@ abstract class App
      */
     public function getToolFilenameAbsolute(): string
     {
-        $workingDirectory = $_SERVER['PWD'];
+        $workingDirectory = getcwd();
         $scriptName       = $_SERVER['SCRIPT_NAME'];
         return realpath(strpos($scriptName, '/') === 0 ? $scriptName : "$workingDirectory/$scriptName");
     }
