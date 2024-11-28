@@ -116,6 +116,7 @@ HELP;
         $this->helper = new Helper($this->getDatabaseInternal(), true);
 
         $this->createButtons();
+        $this->hideFields();
 
         /* Announce lock release
           */
@@ -223,6 +224,36 @@ HELP;
         }
     }
 
+
+    /**
+     * They've hidden some fields here
+     *
+     * @return void
+     */
+    private function hideFields(): void
+    {
+        $this->getLogger()->debug('Removing availability/visibility for fields');
+
+        /* Remove medical alert, hoh teacher, and general alert/legal fields
+         * This seems like what the school originally intended by having
+         * medicalAlert, details_hohTeacher, contacts_alert blocks emptied.
+         */
+        $this->getDatabaseInternal()->executeQuery("
+            DELETE pfca
+            FROM profile_field_campus_availability pfca
+            INNER JOIN profile_field pf ON pfca.profile_field_id = pf.id
+            WHERE pf.roletype = 'student'
+            AND pf.field IN ('StudentMedicalAlert','hohTeacher','AlertMessages','AlertLegal')
+        ");
+
+        $this->getDatabaseInternal()->executeQuery("
+            DELETE pfrv
+            FROM profile_field_roletype_visibility pfrv
+            INNER JOIN profile_field pf ON pfrv.profile_field_id = pf.id
+            WHERE pf.roletype = 'student'
+            AND pf.field IN ('StudentMedicalAlert','hohTeacher','AlertMessages','AlertLegal')
+        ");
+    }
 
     /**
      * FIXME Decide whether this script must be run as root
