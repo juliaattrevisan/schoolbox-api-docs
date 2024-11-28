@@ -157,10 +157,10 @@ HELP;
 
         $customButtons = [
             [
-                'title' => 'Email Updates',
+                'title' => 'Email Wenona about updates to your information',
                 'text' => 'Email Updates',
                 'icon' => 'email',
-                'url' => 'mailtochangeofinformation@wenona.nsw.edu.au'
+                'url' => 'mailto:changeofinformation@wenona.nsw.edu.au'
             ],
         ];
 
