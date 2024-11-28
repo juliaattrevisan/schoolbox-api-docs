@@ -136,8 +136,21 @@
         {% if undoRoute %}
             <li>
                 <form class="top" method="post" action="{{ undoRoute }}?{{ RETURN_URL.name }}={{ RETURN_URL.previous.encoded }}">
-                    <input type="submit" value="Undo Import" />
+                    <input type="submit" value="Undo Import" data-action="undo" />
                 </form>
+
+                {# Add a dialog, to ensure that the user really wants to undo #}
+                <script type="text/javascript">
+                    $(function () {
+                        $('[data-action="undo"]').on('click', function(event) {
+                            event.preventDefault();
+                            $(this).confirmDialog({
+                                text: 'Are you sure you want to undo this import? This will delete any pastoral records which were created by this import.',
+                                confirmEvent: $.confirmDialog.submitForm,
+                            });
+                        })
+                    });
+                </script>
             </li>
         {% endif %}
         <li>
@@ -149,3 +162,5 @@
     </div>
 </div>
 {% endif %}
+
+{% include '@pastoralBulkImport/fragments/preventFormResubmit.twig' %}
