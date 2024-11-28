@@ -7,8 +7,10 @@ use Alaress\Authorizer\GetRouteIfAuthorized;
 use Aura\Router\Generator;
 use Schoolbox\Curriculum\Node\Model as CurriculumNodeModel;
 use Schoolbox\Curriculum\Reports\Cursor;
+use Schoolbox\Curriculum\Reports\Helper;
 use Schoolbox\Curriculum\Reports\Translator\Counts\UnitAssessmentUsage as UnitAssessmentUsageTranslator;
 use Schoolbox\Learning\Course\DataModel\Specification\Model as CourseSpecificationModel;
+use Schoolbox\Mapper\Exception;
 use Schoolbox\User;
 
 /**
@@ -24,6 +26,7 @@ class CourseUsage
      * @param Generator                     $routeGenerator
      * @param Authorizer                    $authorizer
      * @param User                          $currentUser
+     * @param Helper                        $helper
      * @param UnitAssessmentUsageTranslator $unitAssessmentUsageUsageTranslator
      * @param array                         $courseUnitSpec
      */
@@ -31,16 +34,18 @@ class CourseUsage
         protected Generator $routeGenerator,
         protected Authorizer $authorizer,
         protected User $currentUser,
+        private Helper $helper,
         private UnitAssessmentUsageTranslator $unitAssessmentUsageUsageTranslator,
         private array $courseUnitSpec,
     ) {
     }
 
     /**
-     * @param CourseSpecificationModel  $course
-     * @param CurriculumNodeModel       $node
-     * @param array                     $counts
+     * @param CourseSpecificationModel $course
+     * @param CurriculumNodeModel      $node
+     * @param array                    $counts
      * @return array
+     * @throws Exception
      */
     public function __invoke(
         CourseSpecificationModel $course,
@@ -50,6 +55,13 @@ class CourseUsage
         return $this->translate($course, $node, $counts);
     }
 
+    /**
+     * @param CourseSpecificationModel $course
+     * @param CurriculumNodeModel      $node
+     * @param array                    $counts
+     * @return array
+     * @throws Exception
+     */
     private function translate(
         CourseSpecificationModel $course,
         CurriculumNodeModel $node,
@@ -57,7 +69,6 @@ class CourseUsage
     ): array {
 
         $courseCount = $counts[$node->getId()][$course->getId()][Cursor::COURSE_COURSE_SPECIFICATION] ?? 0;
-
         return [
             'id'    => $course->getId(),
             'name'  => $course->getTitle(),
@@ -66,7 +77,10 @@ class CourseUsage
                     'count' => $courseCount
                 ]
             ],
-            'units' => $this->courseUnitSpec[$course->getId()]?->map(
+            'units' => $this->helper->filterUserPermission(
+                $this->courseUnitSpec[$course->getId()],
+                $this->currentUser
+            )?->map(
                 function ($unit) use ($node, $counts) {
                     return call_user_func($this->unitAssessmentUsageUsageTranslator, $unit, $node, $counts);
                 }

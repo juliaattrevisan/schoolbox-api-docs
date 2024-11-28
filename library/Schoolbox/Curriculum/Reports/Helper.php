@@ -6,6 +6,10 @@ use Alaress\Database\Connector\IConnector;
 use Schoolbox\Curriculum\Node\Mapper as CurriculumMapper;
 use Schoolbox\Assessment\Rubric\DataModel\Capability\Mapper as RubricCapabilityMapper;
 use Schoolbox\Learning\Assessment\DataModel\Mapper as AssessmentMapper;
+use Schoolbox\Permission\Access\UserAccess;
+use Schoolbox\Collection;
+use Schoolbox\User;
+use Schoolbox\Permission\Access\Access;
 
 class Helper
 {
@@ -13,6 +17,7 @@ class Helper
         private CurriculumMapper $curriculumMapper,
         private RubricCapabilityMapper $rubricCapabilityMapper,
         private AssessmentMapper $assessmentMapper,
+        private Access $access,
     ) {
     }
 
@@ -380,5 +385,25 @@ class Helper
             )->reindex();
 
         return $result;
+    }
+
+    /**
+     * Filter the collection for the ones that user doesn't have access to
+     *
+     * @param Collection|null $collection
+     * @param User            $user
+     * @return Collection|null
+     */
+    public function filterUserPermission(?Collection $collection, User $user): ?Collection
+    {
+        return $collection?->filter(
+            function ($item) use ($user) {
+                return
+                    $this->access->getFolderAccess(
+                        $user,
+                        $item->getFolder()->getId()
+                    ) > UserAccess::ACCESS_READ;
+            }
+        )->reindex();
     }
 }

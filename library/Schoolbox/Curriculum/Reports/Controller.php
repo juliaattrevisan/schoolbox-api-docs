@@ -46,7 +46,6 @@ class Controller extends Base
         private CurriculumMapper $curriculumMapper,
         private CourseSpecificationMapper $courseSpecificationMapper,
         private CourseUnitSpecificationMapper $courseUnitSpecificationMapper,
-        private Access $access,
         private Helper $helper,
     ) {
     }
@@ -70,16 +69,7 @@ class Controller extends Base
         $courseSpecs = $this->courseSpecificationMapper->findByColumn('id', $courseId);
         $curriculumNodes = $this->curriculumMapper->findByColumn('id', $nodeId);
 
-        $filteredCourse = $courseSpecs->filter(
-            function ($course) {
-                return
-                    $this->access->getFolderAccess(
-                        $this->user,
-                        $course->getFolder()->getId()
-                    ) > UserAccess::ACCESS_READ;
-            }
-        )->reindex();
-
+        $filteredCourse = $this->helper->filterUserPermission($courseSpecs, $this->getUser());
         $folderTranslator = new FolderTranslator(0);
         $courseTranslator = new CourseSpecTranslator(
             $this->routeGenerator,
@@ -196,6 +186,7 @@ class Controller extends Base
             $this->routeGenerator,
             $this->authorizer,
             $this->getUser(),
+            $this->helper,
             $unitTranslator,
             $courseUnitSpecs,
         );
@@ -213,6 +204,7 @@ class Controller extends Base
             $this->routeGenerator,
             $this->authorizer,
             $this->getUser(),
+            $this->helper,
             $courseUnitSpecs,
             new FolderTranslator(0)
         );
