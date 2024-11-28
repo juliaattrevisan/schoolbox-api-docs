@@ -57,12 +57,12 @@ class Module extends BaseModule
         $curriculumMapper = $this->getMapperFactory()->get(CurriculumMapper::class);
         $rubricCapabilityMapper = $this->getMapperFactory()->get(RubricCapabilityMapper::class);
         $assessmentMapper = $this->getMapperFactory()->get(AssessmentMapper::class);
+        $access = $this->getMapperFactory()->get(Access::class);
         return new Controller(
             $curriculumMapper,
             $this->getMapperFactory()->get(CourseSpecificationMapper::class),
             $this->getMapperFactory()->get(CourseUnitSpecificationMapper::class),
-            $this->getMapperFactory()->get(Access::class),
-            new Helper($curriculumMapper, $rubricCapabilityMapper, $assessmentMapper),
+            new Helper($curriculumMapper, $rubricCapabilityMapper, $assessmentMapper, $access),
         );
     }
 
