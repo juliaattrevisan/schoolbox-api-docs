@@ -7,7 +7,6 @@ use Alaress\Authorizer\GetRouteIfAuthorized;
 use Aura\Router\Generator;
 use Schoolbox\Curriculum\Node\Model as CurriculumNodeModel;
 use Schoolbox\Curriculum\Reports\Cursor;
-use Schoolbox\Curriculum\Reports\Helper;
 use Schoolbox\Curriculum\Reports\Translator\Counts\UnitAssessmentUsage as UnitAssessmentUsageTranslator;
 use Schoolbox\Learning\Course\DataModel\Specification\Model as CourseSpecificationModel;
 use Schoolbox\Mapper\Exception;
@@ -26,7 +25,6 @@ class CourseUsage
      * @param Generator                     $routeGenerator
      * @param Authorizer                    $authorizer
      * @param User                          $currentUser
-     * @param Helper                        $helper
      * @param UnitAssessmentUsageTranslator $unitAssessmentUsageUsageTranslator
      * @param array                         $courseUnitSpec
      */
@@ -34,7 +32,6 @@ class CourseUsage
         protected Generator $routeGenerator,
         protected Authorizer $authorizer,
         protected User $currentUser,
-        private Helper $helper,
         private UnitAssessmentUsageTranslator $unitAssessmentUsageUsageTranslator,
         private array $courseUnitSpec,
     ) {
@@ -77,10 +74,7 @@ class CourseUsage
                     'count' => $courseCount
                 ]
             ],
-            'units' => $this->helper->filterUserPermission(
-                $this->courseUnitSpec[$course->getId()],
-                $this->currentUser
-            )?->map(
+            'units' => $this->courseUnitSpec[$course->getId()]?->map(
                 function ($unit) use ($node, $counts) {
                     return call_user_func($this->unitAssessmentUsageUsageTranslator, $unit, $node, $counts);
                 }

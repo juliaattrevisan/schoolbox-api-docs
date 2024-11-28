@@ -169,9 +169,10 @@ class Controller extends Base
         array_map(
             function ($id) use (&$courseUnitSpecs) {
                 $courseUnitSpecs[$id] =
-                    $this->courseUnitSpecificationMapper
-                        ->findByColumn('course_specification_id', $id)
-                        ->reindex();
+                    $this->helper->filterUserPermission(
+                        $this->courseUnitSpecificationMapper->findByColumn('course_specification_id', $id),
+                        $this->getUser()
+                    );
             },
             $courseId
         );
@@ -186,7 +187,6 @@ class Controller extends Base
             $this->routeGenerator,
             $this->authorizer,
             $this->getUser(),
-            $this->helper,
             $unitTranslator,
             $courseUnitSpecs,
         );
@@ -204,7 +204,6 @@ class Controller extends Base
             $this->routeGenerator,
             $this->authorizer,
             $this->getUser(),
-            $this->helper,
             $courseUnitSpecs,
             new FolderTranslator(0)
         );

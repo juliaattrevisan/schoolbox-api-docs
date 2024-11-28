@@ -7,7 +7,6 @@ use Aura\Router\Generator;
 use Schoolbox\Learning\Course\DataModel\Specification\Model as Model;
 use Schoolbox\Resource\Folder\Translator\IModelToArray;
 use Schoolbox\User;
-use Schoolbox\Curriculum\Reports\Helper;
 
 /**
  *  This translator builds the response for the details and structure of the
@@ -21,7 +20,6 @@ class CourseStructureOnly
      * @param Generator     $routeGenerator
      * @param Authorizer    $authorizer
      * @param User          $currentUser
-     * @param Helper        $helper
      * @param array         $courseUnitSpec
      * @param IModelToArray $folderTranslator
      */
@@ -29,7 +27,6 @@ class CourseStructureOnly
         protected Generator $routeGenerator,
         protected Authorizer $authorizer,
         protected User $currentUser,
-        private Helper $helper,
         private array $courseUnitSpec,
         private IModelToArray $folderTranslator,
     ) {
@@ -50,10 +47,7 @@ class CourseStructureOnly
             'id' => $model->getId(),
             'name' => $model->getTitle(),
             'folder' => call_user_func($this->folderTranslator, $model->getFolder()),
-            'units' => $this->helper->filterUserPermission(
-                $this->courseUnitSpec[$model->getId()],
-                $this->currentUser
-            )?->map(
+            'units' => $this->courseUnitSpec[$model->getId()]?->map(
                 fn($unit) =>
                 [
                     'id' => $unit->getFolder()->getId(),
