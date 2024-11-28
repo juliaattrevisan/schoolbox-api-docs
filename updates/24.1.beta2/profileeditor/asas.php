@@ -153,8 +153,8 @@ HELP;
                 DELETE FROM %s
                 WHERE profile_button_id = (SELECT id
                 FROM profile_button
-                WHERE type = 'grades'
-                LIMIT 1)
+                WHERE type = 'grades' AND roletype = 'student'
+                )
             ", $table));
         }
     }
