@@ -163,7 +163,6 @@ HELP;
          * SA-9327 doesn't describe the intended usage at all, other than "it exists"
          */
         $this->updateStaffCode();
-
     }
 
 
