@@ -120,40 +120,20 @@ class Payload
     ) {
     }
 
-
-    /**
-     * Make a payload containing data for all the roletypes we support
-     *
-     * @return array|array[]
-     */
-    public function generateAll(): array
-    {
-        return $this->generate([
-            Role::STUDENT,
-            Role::STAFF,
-            Role::PARENT,
-        ]);
-    }
-
-
     /**
      * Generates a payload for rendering a list of fields for the super to choose,
      * and also a list of ones they've previously chosen,
      * to appear on the given $roleType's profile screen
-     *
-     * $roleTypes lets you specify the roletype whose payloads you want to
-     * construct: you can specify all of them, or a one-element array, etc
-     *
-     * @param array $roleTypes
-     * @return array
+
+     ** @return array
      */
-    public function generate(array $roleTypes): array
+    public function generateAll(): array
     {
-        /* Exit early when you didn't specify any roletypes by accident
-         */
-        if (!\count($roleTypes)) {
-            return [];
-        }
+        $roleTypes = [
+            Role::STUDENT,
+            Role::STAFF,
+            Role::PARENT,
+        ];
 
         /* Put it into the frontend payload format
          */
@@ -161,11 +141,11 @@ class Payload
             'data' => [
                 'fieldSettings' => [
                     self::AVAILABILITY_NODE => $this->getSettingsForAvailabilityNode(),
-                    self::VISIBILITY_NODE => $this->getSettingsForVisibilityNode($roleTypes, 'fieldSettings')
+                    self::VISIBILITY_NODE => $this->getSettingsForVisibilityNode($roleTypes)
                 ],
                 'tabSettings' => [
                     self::AVAILABILITY_NODE => $this->getSettingsForAvailabilityNode(),
-                    self::VISIBILITY_NODE => $this->getSettingsForVisibilityNode($roleTypes, 'tabSettings')
+                    self::VISIBILITY_NODE => $this->getSettingsForVisibilityNode([Role::STAFF, Role::PARENT,])
                 ],
                 'roleTypes' => [],
             ]
@@ -359,10 +339,9 @@ class Payload
      *  - $payload['data']['tabSettings'][self::VISIBILITY_NODE]
      *
      * @param array  $roleTypes
-     * @param string $sectionName - either 'fieldSettings' or 'tabSettings'.
      * @return array
      */
-    private function getSettingsForVisibilityNode(array $roleTypes, string $sectionName): array
+    private function getSettingsForVisibilityNode(array $roleTypes): array
     {
         $metadata = self::FIELD_SETTINGS_META[self::VISIBILITY_NODE];
 
@@ -382,10 +361,6 @@ class Payload
         ];
 
         foreach ($roleTypes as $roleType) {
-            if ($sectionName === 'tabSettings' && $roleType === Role::STUDENT) {
-                continue;
-            }
-
             $settings['options'][] = [
                 'type' => 'roleType',
                 'id' => $roleType,
