@@ -3,12 +3,49 @@
  */
 
 import type {
-    CourseWithCurriculumNodeUsage,
     CurriculumCoverageNode,
+    CourseWithCurriculumNodeUsage,
     UnitWithCurriculumNodeUsage,
 } from "../../js/types/curriculumCoverageTypes";
 import { ReportOptionValues } from "../../js/types/curriculumCoverageTypes";
 import { useFiltersStore } from "../store/ccFiltersStore";
+
+/**
+ * Get the child usage count for a course
+ * @param childNode - the node to get the usage count for
+ * @param parentCourse - the node to get the usage count for
+ * @returns the course usage
+ */
+function getChildCourseUsage(
+    childNode: CurriculumCoverageNode,
+    parentCourse: CourseWithCurriculumNodeUsage,
+): CourseWithCurriculumNodeUsage {
+    // loop through the node children and find the usage.courses[] that matches the same id
+    const childCourse = childNode.usage.courses.find(
+        (course) => course.id === parentCourse.id,
+    ) as CourseWithCurriculumNodeUsage;
+    return childCourse;
+}
+
+/**
+ * Get the child usage count for a unit
+ * @param childNode - the node to get the usage count for
+ * @param parentCourse - the node to get the usage count for
+ * @param parentUnit - the child node to get the usage count for
+ * @returns the unit usage
+ */
+function getChildUnitUsage(
+    childNode: CurriculumCoverageNode,
+    parentCourse: CourseWithCurriculumNodeUsage,
+    parentUnit: UnitWithCurriculumNodeUsage,
+): UnitWithCurriculumNodeUsage {
+    // loop through the node children and find the usage.courses[].units[] that matches the same id
+    const childCourse = childNode.usage.courses.find(
+        (course) => course.id === parentCourse.id,
+    ) as CourseWithCurriculumNodeUsage;
+    const childUnit = childCourse.units.find((unit) => unit.id === parentUnit.id) as UnitWithCurriculumNodeUsage;
+    return childUnit;
+}
 
 // #region usage counts
 
@@ -31,7 +68,7 @@ export function getCourseColumnCount(
      */
     if (node.children && node.children.length > 0 && !isExpanded) {
         const onChildrenCount = node.children.reduce((acc, child) => {
-            return acc + getCourseColumnCount(child, course, true);
+            return acc + getCourseColumnCount(child, getChildCourseUsage(child, course), true);
         }, 0);
         return course.usage.course.count + onChildrenCount;
     }
@@ -42,12 +79,14 @@ export function getCourseColumnCount(
 /**
  * Get the total usage count for a unit, with the selected report options considered
  * @param node - the node to get the usage count for
+ * @param course - the course to get the usage count for
  * @param unit - the unit to get the usage count for
  * @param isExpanded - whether the node is expanded
  * @returns the total unit usage count
  */
 export function getUnitColumnCount(
     node: CurriculumCoverageNode,
+    course: CourseWithCurriculumNodeUsage,
     unit: UnitWithCurriculumNodeUsage,
     isExpanded: boolean,
 ): number {
@@ -62,7 +101,7 @@ export function getUnitColumnCount(
      */
     if (node.children && node.children.length > 0 && !isExpanded) {
         const onChildrenCount = node.children.reduce((acc, child) => {
-            return acc + getUnitColumnCount(child, unit, true);
+            return acc + getUnitColumnCount(child, course, getChildUnitUsage(child, course, unit), true);
         }, 0);
         return onNodeCount + onChildrenCount;
     }
@@ -85,7 +124,7 @@ export function getCourseCount(
     return (
         getCourseColumnCount(node, course, isExpanded) +
         course.units.reduce((acc, unit) => {
-            return acc + getUnitColumnCount(node, unit, isExpanded);
+            return acc + getUnitColumnCount(node, course, unit, isExpanded);
         }, 0)
     );
 }
@@ -130,7 +169,7 @@ export function getFilteredCourseColumnCount(
      */
     if (node.children && node.children.length > 0 && !isExpanded) {
         const onChildrenCount = node.children.reduce((acc, child) => {
-            return acc + getFilteredCourseColumnCount(child, course, true);
+            return acc + getFilteredCourseColumnCount(child, getChildCourseUsage(child, course), true);
         }, 0);
         return course.usage.course.count + onChildrenCount;
     }
@@ -141,12 +180,14 @@ export function getFilteredCourseColumnCount(
 /**
  * Get the total usage count for a unit, with the selected report options considered
  * @param node - the node to get the usage count for
+ * @param course - the course to get the usage count for
  * @param unit - the unit to get the usage count for
  * @param isExpanded - whether the node is expanded
  * @returns the total unit usage count
  */
 export function getFilteredUnitColumnCount(
     node: CurriculumCoverageNode,
+    course: CourseWithCurriculumNodeUsage,
     unit: UnitWithCurriculumNodeUsage,
     isExpanded: boolean,
 ): number {
@@ -161,7 +202,7 @@ export function getFilteredUnitColumnCount(
      */
     if (node.children && node.children.length > 0 && !isExpanded) {
         const onChildrenCount = node.children.reduce((acc, child) => {
-            return acc + getFilteredUnitColumnCount(child, unit, true);
+            return acc + getFilteredUnitColumnCount(child, course, getChildUnitUsage(child, course, unit), true);
         }, 0);
         return onNodeCount + onChildrenCount;
     }
@@ -182,7 +223,7 @@ export function getFilteredCourseCount(
     isExpanded: boolean,
 ): number {
     const unitUsageCount = course.units.reduce((acc, unit) => {
-        return acc + getFilteredUnitColumnCount(node, unit, isExpanded);
+        return acc + getFilteredUnitColumnCount(node, course, unit, isExpanded);
     }, 0);
     return getFilteredCourseColumnCount(node, course, isExpanded) + unitUsageCount;
 }

@@ -202,8 +202,8 @@ function onCourseClicked(buttonEl: HTMLButtonElement): void {
                 <td
                     v-if="
                         hasNoUsages ||
-                        (getUnitColumnCount(props.node, unit, true) === 0 &&
-                            getUnitColumnCount(props.node, unit, false) === 0)
+                        (getUnitColumnCount(props.node, course, unit, true) === 0 &&
+                            getUnitColumnCount(props.node, course, unit, false) === 0)
                     "
                 >
                     0
