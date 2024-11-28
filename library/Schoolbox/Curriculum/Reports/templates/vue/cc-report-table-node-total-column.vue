@@ -19,7 +19,7 @@ const count = window.Vue.computed(() => {
 
 <template>
     <td class="u-border-left">
-        {{ count }}
+        <b>{{ count }}</b>
     </td>
 </template>
 

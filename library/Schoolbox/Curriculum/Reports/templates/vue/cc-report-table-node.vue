@@ -176,7 +176,7 @@ function onCourseClicked(buttonEl: HTMLButtonElement): void {
             </button>
         </td>
         <!-- if the node total and its children are completely empty, just hard set to 0 -->
-        <td v-if="hasNoUsages">0</td>
+        <td v-if="hasNoUsages"><b>0</b></td>
         <cc-report-table-node-total-column v-else :node="props.node" :is-expanded="isExpanded" />
         <!-- loop through each course/unit, retrieving the node usage or returning 0 for undefined usages -->
         <template v-for="course in props.node.usage.courses" :key="course.id">
