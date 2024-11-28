@@ -1,6 +1,6 @@
 <script setup lang="ts">
 /**
- * To display a a single course total cell in the curriculum coverage report
+ * To display a single total cell in the curriculum coverage report
  */
 
 import type { CurriculumCoverageNode } from "../js/types/curriculumCoverageTypes";
