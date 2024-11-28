@@ -165,70 +165,16 @@ class Payload
             ]
         ];
 
-        /* Field settings (groups of checkboxes) that you can tick
-         *
-         * Find the campuses you can choose
-         */
-        $campuses = $this->campusMapper->findAll();
-
-        /* Find available campuses
-         */
-        $fieldSettingsCampus = [
-            'displayAs' => self::AVAILABILITY_NAME,
-            'tooltip' => self::AVAILABILITY_TOOLTIP,
-            'options' => []
-        ];
-
-        foreach ($campuses as $campus) {
-            $fieldSettingsCampus['options'][] = [
-                'type' => 'campus',
-                'id' => $campus->getId(),
-                'name' => $campus->getName(),
-                'meta' => null, // potentially overridden later by FIELD_SETTINGS_META
-            ];
-        }
-
-        /* Find the roletypes you can choose
-         */
-        $fieldSettingsRoleType = [
-            'displayAs' => self::VISIBILITY_NAME,
-            'tooltip' => self::VISIBILITY_TOOLTIP,
-            'options' => [
-                [
-                    'type' => 'roleType',
-                    'id' => self::ROLETYPE_SELF,
-                    'name' => ucwords(self::ROLETYPE_SELF),
-                    'meta' => null, // potentially overridden later by FIELD_SETTINGS_META
-                ]
-            ]
-        ];
-
-        foreach ($roleTypes as $roleType) {
-            $fieldSettingsRoleType['options'][] = [
-                'type' => 'roleType',
-                'id' => $roleType,
-                'name' => ucWords($roleType)
-            ];
-        }
-
         $payload['data']['fieldSettings'] = [
-            self::AVAILABILITY_NODE => $fieldSettingsCampus,
-            self::VISIBILITY_NODE => $fieldSettingsRoleType
+            self::AVAILABILITY_NODE => $this->getSettingsForAvailabilityNode(),
+            self::VISIBILITY_NODE => $this->getSettingsForVisibilityNode($roleTypes, 'fieldSettings')
         ];
 
-        // Add meta to the field settings, if it exists
-        foreach ($payload['data']['fieldSettings'] as $node => &$settings) {
-            if (isset(self::FIELD_SETTINGS_META[$node])) {
-                foreach ($settings['options'] as &$option) {
-                    if (isset(self::FIELD_SETTINGS_META[$node][$option['id']])) {
-                        $option['meta'] = self::FIELD_SETTINGS_META[$node][$option['id']];
-                    }
-                }
-            }
-        }
-
-        // tabSettings is currently identical to fieldSettings but this allows it to diverge in the future
-        $payload['data']['tabSettings'] = $payload['data']['fieldSettings'];
+        // tabSettings is mostly the same as field settings.
+        $payload['data']['tabSettings'] = [
+            self::AVAILABILITY_NODE => $this->getSettingsForAvailabilityNode(),
+            self::VISIBILITY_NODE => $this->getSettingsForVisibilityNode($roleTypes, 'tabSettings')
+        ];
 
         /* Start processing the roleTypes node
          */
@@ -379,5 +325,91 @@ class Payload
         }
 
         return $payload;
+    }
+
+    /**
+     * @return array
+     */
+    private function getSettingsForAvailabilityNode(): array
+    {
+        /* Field settings (groups of checkboxes) that you can tick
+         *
+         * Find the campuses you can choose
+         */
+        $campuses = $this->campusMapper->findAll();
+
+        /* Find available campuses
+         */
+        $settings = [
+            'displayAs' => self::AVAILABILITY_NAME,
+            'tooltip' => self::AVAILABILITY_TOOLTIP,
+            'options' => []
+        ];
+
+        foreach ($campuses as $campus) {
+            $settings['options'][] = [
+                'type' => 'campus',
+                'id' => $campus->getId(),
+                'name' => $campus->getName(),
+                'meta' => null, // potentially overridden later by FIELD_SETTINGS_META
+            ];
+        }
+
+        // Add meta, if it exists.
+        if (isset(self::FIELD_SETTINGS_META[self::AVAILABILITY_NODE])) {
+            foreach ($settings['options'] as &$option) {
+                if (isset(self::FIELD_SETTINGS_META[self::AVAILABILITY_NODE][$option['id']])) {
+                    $option['meta'] = self::FIELD_SETTINGS_META[self::AVAILABILITY_NODE][$option['id']];
+                }
+            }
+        }
+
+        return $settings;
+    }
+
+    /**
+     * @param array  $roleTypes
+     * @param string $sectionName
+     * @return array
+     */
+    private function getSettingsForVisibilityNode(array $roleTypes, string $sectionName): array
+    {
+        /* Find the role types you can choose
+         */
+        $settings = [
+            'displayAs' => self::VISIBILITY_NAME,
+            'tooltip' => self::VISIBILITY_TOOLTIP,
+            'options' => [
+                [
+                    'type' => 'roleType',
+                    'id' => self::ROLETYPE_SELF,
+                    'name' => ucwords(self::ROLETYPE_SELF),
+                    'meta' => null, // potentially overridden later by FIELD_SETTINGS_META
+                ]
+            ]
+        ];
+
+        foreach ($roleTypes as $roleType) {
+            if ($sectionName === 'tabSettings' && $roleType === Role::STUDENT) {
+                continue;
+            }
+
+            $settings['options'][] = [
+                'type' => 'roleType',
+                'id' => $roleType,
+                'name' => ucwords($roleType)
+            ];
+        }
+
+        // Add meta, if it exists.
+        if (isset(self::FIELD_SETTINGS_META[self::VISIBILITY_NODE])) {
+            foreach ($settings['options'] as &$option) {
+                if (isset(self::FIELD_SETTINGS_META[self::VISIBILITY_NODE][$option['id']])) {
+                    $option['meta'] = self::FIELD_SETTINGS_META[self::VISIBILITY_NODE][$option['id']];
+                }
+            }
+        }
+
+        return $settings;
     }
 }
