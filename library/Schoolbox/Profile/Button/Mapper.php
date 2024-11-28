@@ -102,7 +102,6 @@ class Mapper extends BaseMapper
         /** @var Model $button */
         foreach ($buttons as $button) {
             // Primitive tokenization for URLs, allows injecting user IDs and possibly other variables
-
             $array_find = [
                 '[profileId]',
                 '[profileExternalId]',
@@ -122,6 +121,10 @@ class Mapper extends BaseMapper
                 '[Them]',
                 '[theirs]',
                 '[Theirs]',
+                /* This isn't revealed to most users, but is needed to surface a custom button
+                 * that does something with emails. Originated in custom work.
+                 */
+                '[session.mailhandle]'
             ];
 
             $vieweeEmail = empty($viewee->getEmail()) ? '' : $viewee->getEmail();
