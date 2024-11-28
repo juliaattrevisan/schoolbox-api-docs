@@ -375,11 +375,12 @@ class CustomButtons
 
             /* Identify the roletype
              */
-            $roletype = $this->roletypeLookup[$row['role_id']];
-
-            /* Add it to the list uniquely
-             */
-            $candidates[$row['id']]['_roletypes'][$roletype] = $roletype;
+            $roletype = $this->roletypeLookup[$row['role_id']] ?? null;
+            if (isset($roletype)) {
+                /* Add it to the list uniquely
+                 */
+                $candidates[$row['id']]['_roletypes'][$roletype] = $roletype;
+            }
         }
 
         return $candidates;
