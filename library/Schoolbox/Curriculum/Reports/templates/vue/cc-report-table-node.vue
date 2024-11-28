@@ -62,6 +62,15 @@ function onExpandClicked(): void {
     isExpanded.value = !isExpanded.value;
 }
 
+/**
+ * To toggle the expanded state of the node
+ */
+function onTotalClicked(): void {
+    if (!isExpanded.value) {
+        isExpanded.value = true;
+    }
+}
+
 // #endregion
 
 // #region usage counts
@@ -233,6 +242,7 @@ function onCourseClicked(buttonEl: HTMLButtonElement): void {
                     :node="props.node"
                     :course="course"
                     :is-expanded="isExpanded"
+                    @click="onTotalClicked"
                 />
             </template>
         </template>
