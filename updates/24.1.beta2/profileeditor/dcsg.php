@@ -114,8 +114,7 @@ HELP;
          */
         try {
             $lock = $this->acquireLock(self::LOCK_NAME, self::LOCK_TTL);
-        }
-        catch (\RuntimeException $e) {
+        } catch (\RuntimeException $e) {
             return;
         }
 
