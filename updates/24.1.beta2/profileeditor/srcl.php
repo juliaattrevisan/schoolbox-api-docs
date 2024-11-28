@@ -116,6 +116,7 @@ HELP;
         $this->helper = new Helper($this->getDatabaseInternal(), true);
 
         $this->createFields();
+        $this->updateTerminology();
 
         /* Announce lock release
           */
@@ -219,6 +220,27 @@ HELP;
 
             $this->helper->createFieldRoletypeVisibility($profileFieldId, $roletypes);
         }
+    }
+
+
+    /**
+     * This was renamed to LUI Number in the ui, but it's new and never used before
+     * in v24.1 so it's pretty safe to arbitrarily rename on the school's behalf.
+     *
+     * @return void
+     */
+    private function updateTerminology(): void
+    {
+        $this->getLogger()->debug('Renaming Govt Student Number to "LUI Number"');
+
+        $this->getDatabaseInternal()->executeQuery("
+            UPDATE localisation
+            SET title = 'LUI Number',
+                singular_form = 'LUI Number',
+                plural_form = 'LUI Numbers'
+            WHERE term = 'govtStudentNumber'
+            LIMIT 1
+        ");
     }
 
 
