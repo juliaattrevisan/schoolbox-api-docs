@@ -116,6 +116,7 @@ HELP;
         $this->helper = new Helper($this->getDatabaseInternal(), true);
 
         $this->createFields();
+        $this->updateFields();
 
         /* Announce lock release
           */
@@ -173,6 +174,34 @@ HELP;
         ));
 
         $this->helper->createFieldRoletypeVisibility($profileFieldId, $roletypes);
+    }
+
+
+    /**
+     * Change the default display_as value because these aren't supported in Terminology
+     * but are part of the core set of fields we support.
+     *
+     * @return void
+     */
+    private function updateFields(): void
+    {
+        $this->getLogger()->debug('Renaming "Tutor Group" to "Circle Class"');
+
+        $this->getDatabaseInternal()->executeQuery("
+            UPDATE profile_field
+            SET display_as = 'Circle Class'
+            WHERE field = 'StudentTutorDescription'
+            LIMIT 1
+        ");
+
+        $this->getLogger()->debug('Renaming "Class Teacher" to "Circle Teacher"');
+
+        $this->getDatabaseInternal()->executeQuery("
+            UPDATE profile_field
+            SET display_as = 'Circle Teacher'
+            WHERE field = 'formTeacher'
+            LIMIT 1
+        ");
     }
 
 
