@@ -160,7 +160,7 @@ HELP;
                 'title' => 'Email Updates',
                 'text' => 'Email Updates',
                 'icon' => 'email',
-                'url' => '[session.mailhandle]changeofinformation@wenona.nsw.edu.au'
+                'url' => 'mailtochangeofinformation@wenona.nsw.edu.au'
             ],
         ];
 
