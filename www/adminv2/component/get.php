@@ -1,11 +1,9 @@
 <?php
 
 /**
- *
  * @author      Alex Tworowsky <alex.tworowsky@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
- *
  */
 
 // require SitePage context
@@ -20,18 +18,22 @@ if (!isset($this)) {
 }
 
 /** @var SitePage $this */
+
+$context = $this->arg[0];
+$groupId = $this->arg[1];
+
 if (
-    !$_SESSION['user']->isSuperuser() &&
-    !$_SESSION['user']->hasServicePermission(UserAccess::SERVICE_DESIGN, UserAccess::ACCESS_FULL)
+    !(
+        $_SESSION['user']->isSuperuser() ||
+        ($_SESSION['user']->hasServicePermission(UserAccess::SERVICE_CMS, UserAccess::ACCESS_FULL) && $context === 'homepage') ||
+        ($_SESSION['user']->hasServicePermission(UserAccess::SERVICE_DESIGN, UserAccess::ACCESS_FULL) && $context === 'dashboard')
+    )
 ) {
     $this->error(\Schoolbox\Error\Mapper::ERROR_PERM_PAGE_VIEW, '', 403);
 }
 
 
 $this->setLite(true);
-
-$context = $this->arg[0];
-$groupId = $this->arg[1];
 
 if (empty($context) || empty($groupId)) {
     error(Mapper::ERROR_INFORMATION_MISSING, '', 400);

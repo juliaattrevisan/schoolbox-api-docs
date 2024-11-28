@@ -27,7 +27,7 @@ header('Content-Type: application/json');
 
 if (
     !$_SESSION['user']->isSuperuser() &&
-    !$_SESSION['user']->hasServicePermission(UserAccess::SERVICE_LMS, UserAccess::ACCESS_FULL)
+    !$_SESSION['user']->hasServicePermission(UserAccess::SERVICE_CMS, UserAccess::ACCESS_FULL)
 ) {
     respond("You are not authorised to perform that function.", 403);
 }

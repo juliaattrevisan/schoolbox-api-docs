@@ -59,7 +59,7 @@ abstract class Component_Homepage_ControllerAbstract extends Component_Controlle
             $userAccessLevel = (
                 // TODO: Instead of checking permissions using this ternary expression, create an 'isSatisfiedBy()' function
                 //       in a new class similar to Comms/News/ValidHasReadMore.php.
-                $this->getUser()->hasServicePermission(UserAccess::SERVICE_DESIGN, UserAccess::ACCESS_FULL)
+                $this->getUser()->hasServicePermission(UserAccess::SERVICE_CMS, UserAccess::ACCESS_FULL)
                 ? UserAccess::ACCESS_FULL
                 : $this->access->getFolderAccess($this->getUser(), $contextId)
             );
