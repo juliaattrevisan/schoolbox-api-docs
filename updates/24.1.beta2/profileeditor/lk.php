@@ -116,7 +116,7 @@ HELP;
         $this->helper = new Helper($this->getDatabaseInternal(), true);
 
         $this->createFields();
-        $this->updateFields();
+        $this->renameFields();
 
         /* Announce lock release
           */
@@ -183,7 +183,7 @@ HELP;
      *
      * @return void
      */
-    private function updateFields(): void
+    private function renameFields(): void
     {
         $this->getLogger()->debug('Renaming "Tutor Group" to "Circle Class"');
 
