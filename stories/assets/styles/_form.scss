@@ -82,12 +82,12 @@ hr {
     }
 }
 
-@import "../../../www/static/css/core/ui/forms/fieldset";
-@import "../../../www/static/css/core/ui/forms/label";
-@import "../../../www/static/css/core/ui/forms/hint";
-@import "../../../www/static/css/core/ui/forms/input-text";
-@import "../../../www/static/css/core/ui/forms/input-checkbox";
-@import "../../../www/static/css/core/ui/forms/input-toggle";
-@import "../../../www/static/css/core/ui/forms/input-radio";
-@import "../../../www/static/css/core/ui/forms/select";
+@import "fieldset";
+@import "label";
+@import "hint";
+@import "input-text";
+@import "input-checkbox";
+@import "input-toggle";
+@import "input-radio";
+@import "select";
 @import "../../../www/static/css/core/ui/forms/form-element";
