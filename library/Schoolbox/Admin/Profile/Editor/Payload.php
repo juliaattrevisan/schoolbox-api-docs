@@ -159,21 +159,16 @@ class Payload
          */
         $payload = [
             'data' => [
-                'fieldSettings' => [],
-                'tabSettings' => [],
+                'fieldSettings' => [
+                    self::AVAILABILITY_NODE => $this->getSettingsForAvailabilityNode(),
+                    self::VISIBILITY_NODE => $this->getSettingsForVisibilityNode($roleTypes, 'fieldSettings')
+                ],
+                'tabSettings' => [
+                    self::AVAILABILITY_NODE => $this->getSettingsForAvailabilityNode(),
+                    self::VISIBILITY_NODE => $this->getSettingsForVisibilityNode($roleTypes, 'tabSettings')
+                ],
                 'roleTypes' => [],
             ]
-        ];
-
-        $payload['data']['fieldSettings'] = [
-            self::AVAILABILITY_NODE => $this->getSettingsForAvailabilityNode(),
-            self::VISIBILITY_NODE => $this->getSettingsForVisibilityNode($roleTypes, 'fieldSettings')
-        ];
-
-        // tabSettings is mostly the same as field settings.
-        $payload['data']['tabSettings'] = [
-            self::AVAILABILITY_NODE => $this->getSettingsForAvailabilityNode(),
-            self::VISIBILITY_NODE => $this->getSettingsForVisibilityNode($roleTypes, 'tabSettings')
         ];
 
         /* Start processing the roleTypes node
