@@ -331,13 +331,10 @@ class Payload
      */
     private function getSettingsForAvailabilityNode(): array
     {
-        /* Field settings (groups of checkboxes) that you can tick
-         *
-         * Find the campuses you can choose
-         */
+        $metadata = self::FIELD_SETTINGS_META[self::AVAILABILITY_NODE] ?? [];
         $campuses = $this->campusMapper->findAll();
 
-        /* Find available campuses
+        /* Field settings (groups of checkboxes) that you can tick
          */
         $settings = [
             'displayAs' => self::AVAILABILITY_NAME,
@@ -350,11 +347,7 @@ class Payload
                 'type' => 'campus',
                 'id' => $campus->getId(),
                 'name' => $campus->getName(),
-                'meta' => (
-                    (isset(self::FIELD_SETTINGS_META[self::AVAILABILITY_NODE][$campus->getId()]))
-                    ? self::FIELD_SETTINGS_META[self::AVAILABILITY_NODE][$campus->getId()]
-                    : null
-                )
+                'meta' => $metadata[$campus->getId()] ?? null
             ];
         }
 
@@ -372,7 +365,9 @@ class Payload
      */
     private function getSettingsForVisibilityNode(array $roleTypes, string $sectionName): array
     {
-        /* Find the role types you can choose
+        $metadata = self::FIELD_SETTINGS_META[self::VISIBILITY_NODE] ?? [];
+
+        /* Role types you can choose
          */
         $settings = [
             'displayAs' => self::VISIBILITY_NAME,
@@ -382,11 +377,7 @@ class Payload
                     'type' => 'roleType',
                     'id' => self::ROLETYPE_SELF,
                     'name' => ucwords(self::ROLETYPE_SELF),
-                    'meta' => (
-                        (isset(self::FIELD_SETTINGS_META[self::VISIBILITY_NODE][self::ROLETYPE_SELF]))
-                        ? self::FIELD_SETTINGS_META[self::VISIBILITY_NODE][self::ROLETYPE_SELF]
-                        : null
-                    )
+                    'meta' => $metadata[self::ROLETYPE_SELF] ?? null
                 ]
             ]
         ];
@@ -400,11 +391,7 @@ class Payload
                 'type' => 'roleType',
                 'id' => $roleType,
                 'name' => ucwords($roleType),
-                'meta' => (
-                    (isset(self::FIELD_SETTINGS_META[self::VISIBILITY_NODE][$roleType]))
-                    ? self::FIELD_SETTINGS_META[self::VISIBILITY_NODE][$roleType]
-                    : null
-                )
+                'meta' => $metadata[$roleType] ?? null
             ];
         }
 
