@@ -150,11 +150,4 @@
 </div>
 {% endif %}
 
-<script type="text/javascript">
-    $(function() {
-        {# Disable form buttons upon submit #}
-        $('.admin-container form').on('submit', function () {
-            $(this).find(':submit').prop('disabled', true);
-        });
-    });
-</script>
+{% include '@pastoralBulkImport/fragments/preventFormResubmit.twig' %}
