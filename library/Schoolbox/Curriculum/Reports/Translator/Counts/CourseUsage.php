@@ -42,7 +42,6 @@ class CourseUsage
      * @param CurriculumNodeModel      $node
      * @param array                    $counts
      * @return array
-     * @throws Exception
      */
     public function __invoke(
         CourseSpecificationModel $course,
@@ -57,7 +56,6 @@ class CourseUsage
      * @param CurriculumNodeModel      $node
      * @param array                    $counts
      * @return array
-     * @throws Exception
      */
     private function translate(
         CourseSpecificationModel $course,
