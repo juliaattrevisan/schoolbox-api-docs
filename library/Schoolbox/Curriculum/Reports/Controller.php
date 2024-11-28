@@ -11,6 +11,7 @@ declare(strict_types=1);
 namespace Schoolbox\Curriculum\Reports;
 
 use Alaress\Web\Controller\Base;
+use Schoolbox\Collection;
 use Schoolbox\Curriculum\Node\Mapper as CurriculumMapper;
 use Schoolbox\Curriculum\Reports\Translator\Counts\ModelToArray as ModelToArrayTranslator;
 use Schoolbox\Curriculum\Reports\Translator\Counts\UnitAssessmentUsage as UnitAssessmentUsageTranslator;
@@ -19,6 +20,7 @@ use Schoolbox\Curriculum\Reports\Translator\Counts\CourseStructureOnly as Course
 use Schoolbox\Curriculum\Reports\Translator\Usage\DetailedUsage;
 use Schoolbox\Curriculum\Reports\Translator\Usage\InUseRubricUsage;
 use Schoolbox\Curriculum\Reports\Translator\Usage\RubricUsage;
+use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Mapper as CourseUnitSpecificationMapper;
 use Schoolbox\Learning\Course\DataModel\Specification\Mapper as CourseSpecificationMapper;
 use Schoolbox\Learning\Assessment\DataModel\Mapper as AssessmentMapper;
@@ -157,59 +159,10 @@ class Controller extends Base
             return;
         }
 
-        $usageCount = $cursor->retrieveUsageCount();
-
-        $courseSpecs =
-            $this->courseSpecificationMapper->findByColumn('id', $courseIds);
-
-        $courseUnitSpecs = [];
-        array_map(
-            function ($id) use (&$courseUnitSpecs) {
-                $courseUnitSpecs[$id] =
-                    $this->helper->filterUserPermission(
-                        $this->courseUnitSpecificationMapper->findByColumn('course_specification_id', $id, [
-                            'order' => ['f.sequence' => 'DESC']
-                        ]),
-                        $this->getUser()
-                    );
-            },
-            $courseIds
-        );
-
-        $unitTranslator = new UnitAssessmentUsageTranslator(
-            $this->routeGenerator,
-            $this->authorizer,
-            $this->getUser(),
-        );
-
-        $courseUsageTranslator = new CourseUsageTranslator(
-            $this->routeGenerator,
-            $this->authorizer,
-            $this->getUser(),
-            $unitTranslator,
-            $courseUnitSpecs,
-        );
-
-        $reportTranslator = new ModelToArrayTranslator(
-            $this->routeGenerator,
-            $this->authorizer,
-            $this->getUser(),
-            $courseUsageTranslator,
-            $courseSpecs,
-            $usageCount
-        );
-
-        $structureTranslator = new CourseStructureTranslator(
-            $this->routeGenerator,
-            $this->authorizer,
-            $this->getUser(),
-            $courseUnitSpecs,
-            new FolderTranslator(0)
-        );
-
-        $usage = $data->map($reportTranslator);
-
-        $structure = $courseSpecs->map($structureTranslator);
+        $courseSpecs     = $this->courseSpecificationMapper->findByColumn('id', $courseIds);
+        $courseUnitSpecs = $this->findCourseUnitSpecs($courseIds);
+        $usage           = $this->loadUsageStructure($courseSpecs, $courseUnitSpecs, $data, $cursor->retrieveUsageCount());
+        $structure       = $this->loadCourseStructure($courseSpecs, $courseUnitSpecs);
 
         $response =  [
             'data' => [
@@ -334,11 +287,29 @@ class Controller extends Base
     /**
      * Export the current coverage report
      *
-     * @param string|array|null $ids
-     * @return array
+     * @return void
      */
     public function exportCoverage(): void
     {
+        $courseIds = $this->extractCourseIdsFromQuery();
+        $nodeIds   = $this->extractNodeIdsFromQuery();
+
+        $cursor = new Cursor(
+            $this->curriculumMapper,
+            $courseIds,
+            $nodeIds,
+            Cursor::LIMIT_DEFAULT,
+        );
+        $data = $cursor->retrieveResults(null);
+
+        // Supporting data
+        $courseSpecs     = $this->courseSpecificationMapper->findByColumn('id', $courseIds);
+        $courseUnitSpecs = $this->findCourseUnitSpecs($courseIds);
+        $usage           = $this->loadUsageStructure($courseSpecs, $courseUnitSpecs, $data, $cursor->retrieveUsageCount());
+        $structure       = $this->loadCourseStructure($courseSpecs, $courseUnitSpecs);
+
+        // Now process $usage and $structure into a CSV
+
         $filename = sprintf(
             "curriculum-coverage-report.csv",
         );
@@ -371,5 +342,87 @@ class Controller extends Base
     private function extractNodeIdsFromQuery(): array
     {
         return $this->formatQueryIds($this->requestQuery->get('nodeId'));
+    }
+
+    /**
+     * Find course unit specs, given a set of course IDs.
+     *
+     * @param array $courseIds
+     * @return array
+     */
+    private function findCourseUnitSpecs(array $courseIds): array
+    {
+        $courseUnitSpecs = [];
+        array_map(
+            function ($id) use (&$courseUnitSpecs) {
+                $courseUnitSpecs[$id] = $this->helper->filterUserPermission(
+                    $this->courseUnitSpecificationMapper->findByColumn('course_specification_id', $id, [
+                        'order' => ['f.sequence' => 'DESC']
+                    ]),
+                    $this->getUser()
+                );
+            },
+            $courseIds,
+        );
+        return $courseUnitSpecs;
+    }
+
+    /**
+     * Load the course specs into a structure suitable for output and CSV
+     * processing.
+     *
+     * @param GenericCollection $courseSpecs
+     * @param array             $courseUnitSpecs
+     * @return Collection
+     */
+    private function loadCourseStructure(GenericCollection $courseSpecs, array $courseUnitSpecs): Collection
+    {
+        $structureTranslator = new CourseStructureTranslator(
+            $this->routeGenerator,
+            $this->authorizer,
+            $this->getUser(),
+            $courseUnitSpecs,
+            new FolderTranslator(0)
+        );
+        return $courseSpecs->map($structureTranslator);
+    }
+
+    /**
+     * Load the usage specs into a structure suitable for output and CSV
+     * processing.
+     *
+     * @param GenericCollection $courseSpecs
+     * @param array             $courseUnitSpecs
+     * @param Collection        $data
+     * @param array             $usageCount
+     * @return Collection
+     */
+    private function loadUsageStructure(GenericCollection $courseSpecs, array $courseUnitSpecs, Collection $data, array $usageCount): Collection
+    {
+        $unitTranslator = new UnitAssessmentUsageTranslator(
+            $this->routeGenerator,
+            $this->authorizer,
+            $this->getUser(),
+        );
+
+        $courseUsageTranslator = new CourseUsageTranslator(
+            $this->routeGenerator,
+            $this->authorizer,
+            $this->getUser(),
+            $unitTranslator,
+            $courseUnitSpecs,
+        );
+
+        $reportTranslator = new ModelToArrayTranslator(
+            $this->routeGenerator,
+            $this->authorizer,
+            $this->getUser(),
+            $courseUsageTranslator,
+            $courseSpecs,
+            $usageCount
+        );
+
+
+        return $data->map($reportTranslator);
     }
 }
