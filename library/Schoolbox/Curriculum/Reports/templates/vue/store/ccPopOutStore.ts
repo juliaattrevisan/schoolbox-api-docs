@@ -3,10 +3,13 @@
  */
 
 import { defineStore } from "pinia";
-import type { Course } from "@schoolboxLibrary/types/Course";
-import type { Unit } from "@schoolboxLibrary/types/Unit";
 import { isAbortError } from "@js/util/errorUtils";
-import type { CurriculumCoverageNode, IndividualUsage } from "../../js/types/curriculumCoverageTypes";
+import type {
+    CurriculumCoverageNode,
+    CourseWithCurriculumNodeUsage,
+    UnitWithCurriculumNodeUsage,
+    IndividualUsage,
+} from "../../js/types/curriculumCoverageTypes";
 
 /**
  * What is returned when there is a search error
@@ -18,8 +21,8 @@ export type ReportError = {
 };
 
 export const usePopOutStore = defineStore(`ccPopOut`, () => {
-    const course = window.Vue.ref<Course | null>(null);
-    const unit = window.Vue.ref<Unit | null>(null);
+    const course = window.Vue.ref<CourseWithCurriculumNodeUsage | null>(null);
+    const unit = window.Vue.ref<UnitWithCurriculumNodeUsage | null>(null);
     const node = window.Vue.ref<CurriculumCoverageNode | null>(null);
     const button = window.Vue.ref<HTMLButtonElement | null>(null);
 
@@ -123,13 +126,34 @@ export const usePopOutStore = defineStore(`ccPopOut`, () => {
     // #endregion
 
     /**
-     * report has been triggered so set the active course and nodes
+     * a unit column has been selected, so retrieve the usage for that unit/node combination
+     * @param $button - the button that triggered the action
+     */
+    function setActiveCourseColumn($button: HTMLButtonElement): void {
+        // prevent selecting the same button again when already open
+        if ($button.id === button.value?.id) {
+            return;
+        }
+        usage.value = {
+            onCourse: true,
+            onUnit: false,
+        };
+        button.value = $button;
+    }
+
+    /**
+     * a unit column has been selected, so retrieve the usage for that unit/node combination
      * @param $course - the course to set as active
      * @param $unit - the unit to set as active
      * @param $node - the node to set as active
      * @param $button - the button that triggered the action
      */
-    function setActive($course: Course, $unit: Unit, $node: CurriculumCoverageNode, $button: HTMLButtonElement): void {
+    function setActiveUnitColumn(
+        $course: CourseWithCurriculumNodeUsage,
+        $unit: UnitWithCurriculumNodeUsage,
+        $node: CurriculumCoverageNode,
+        $button: HTMLButtonElement,
+    ): void {
         // prevent selecting the same button again when already open
         if ($button.id === button.value?.id) {
             return;
@@ -148,6 +172,7 @@ export const usePopOutStore = defineStore(`ccPopOut`, () => {
         hasLoadError,
         usage,
         init,
-        setActive,
+        setActiveCourseColumn,
+        setActiveUnitColumn,
     };
 });

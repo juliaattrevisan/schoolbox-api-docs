@@ -1,30 +1,30 @@
 <script setup lang="ts">
 /**
- * To display a a single unit cell in the curriculum coverage report,
+ * To display a a single course cell in the curriculum coverage report,
  * with the ability to select the cell to reveal further details on the relevant usage
  */
 
 import { useTemplateRef } from "vue";
-import type { Course } from "@schoolboxLibrary/types/Course";
-import type { Unit } from "@schoolboxLibrary/types/Unit";
-import type { CurriculumCoverageNode } from "../js/types/curriculumCoverageTypes";
+import type { CurriculumCoverageNode, CourseWithCurriculumNodeUsage } from "../js/types/curriculumCoverageTypes";
 import { usePopOutStore } from "./store/ccPopOutStore";
+import { getFilteredCourseColumnCount } from "./util/countUtils";
 
 interface Props {
-    course: Course;
-    unit: Unit;
     node: CurriculumCoverageNode;
-    count: number; // the usage number
+    course: CourseWithCurriculumNodeUsage;
     isExpanded: boolean; // whether the node is expanded
 }
 const props = defineProps<Props>();
 
 const emit = defineEmits<{
-    click: [course: Course, unit: Unit, buttonEl: HTMLButtonElement];
+    click: [buttonEl: HTMLButtonElement];
 }>();
 
-const isCountZero = window.Vue.computed(() => props.count === 0); // don't need a button when it's zero
-const buttonId = window.Vue.computed(() => `usage-button-${props.course.id}-${props.unit.id}-${props.node.id}`);
+const count = window.Vue.computed(() => {
+    return getFilteredCourseColumnCount(props.node, props.course, !props.isExpanded);
+});
+const isCountZero = window.Vue.computed(() => count.value === 0); // don't need a button when it's zero
+const buttonId = window.Vue.computed(() => `usage-button-${props.course.id}-${props.node.id}`);
 const buttonEl = useTemplateRef<HTMLButtonElement>("buttonEl");
 const popOutStore = usePopOutStore();
 
@@ -32,15 +32,15 @@ const popOutStore = usePopOutStore();
  * Open the pop out
  */
 function onClick(): void {
-    emit("click", props.course, props.unit, buttonEl.value as HTMLButtonElement);
+    emit("click", buttonEl.value as HTMLButtonElement);
 }
 </script>
 
 <template>
     <!-- padding will be on the button if count is not zeo -->
-    <td :style="{ padding: isCountZero ? '0.625rem' : '0' }">
+    <td class="u-border-left" :style="{ padding: isCountZero ? '0.625rem' : '0' }">
         <template v-if="isCountZero">
-            {{ props.count }}
+            {{ count }}
         </template>
         <button
             v-else
@@ -50,7 +50,7 @@ function onClick(): void {
             class="f-always-show"
             @click="onClick"
         >
-            {{ props.count }}
+            {{ count }}
         </button>
     </td>
 </template>

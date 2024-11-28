@@ -7,20 +7,20 @@ import type { Node } from "@schoolboxCurriculum/types/Node";
  * items a curriculum node can be assigned to
  */
 export type UnitWithCurriculumNodeUsage = Pick<Unit, "id" | "name"> & {
-    usage?: {
-        unit?: {
+    usage: {
+        unit: {
             count: number;
         };
-        activity?: {
+        activity: {
             count: number;
         };
-        lessonPlan?: {
+        lessonPlan: {
             count: number;
         };
-        rubric?: {
+        rubric: {
             count: number;
         };
-        inUseRubric?: {
+        inUseRubric: {
             count: number;
         };
     };
@@ -31,8 +31,8 @@ export type UnitWithCurriculumNodeUsage = Pick<Unit, "id" | "name"> & {
  */
 export type CourseWithCurriculumNodeUsage = Pick<Course, "id" | "name"> & {
     units: UnitWithCurriculumNodeUsage[];
-    usage?: {
-        course?: {
+    usage: {
+        course: {
             count: number;
         };
     };
@@ -116,6 +116,7 @@ type InUseRubric = Item & {
  * The details of the individual usage of a curriculum node
  */
 export type IndividualUsage = {
+    onCourse?: boolean; // if the node is assigned to the course (this is handled internally, so doesn't require a fetch)
     onUnit: boolean; // if the node is assigned to the unit
     activity?: Item[]; // the activities the node is assigned to
     lessonPlan?: Item[]; // the lesson plans the node is assigned to
