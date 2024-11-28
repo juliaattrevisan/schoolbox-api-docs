@@ -31,7 +31,7 @@ export function getCourseColumnCount(
      */
     if (node.children && node.children.length > 0 && !isExpanded) {
         const onChildrenCount = node.children.reduce((acc, child) => {
-            return acc + getCourseColumnCount(child, course, isExpanded);
+            return acc + getCourseColumnCount(child, course, true);
         }, 0);
         return course.usage.course.count + onChildrenCount;
     }
@@ -62,7 +62,7 @@ export function getUnitColumnCount(
      */
     if (node.children && node.children.length > 0 && !isExpanded) {
         const onChildrenCount = node.children.reduce((acc, child) => {
-            return acc + getUnitColumnCount(child, unit, isExpanded);
+            return acc + getUnitColumnCount(child, unit, true);
         }, 0);
         return onNodeCount + onChildrenCount;
     }
@@ -130,7 +130,7 @@ export function getFilteredCourseColumnCount(
      */
     if (node.children && node.children.length > 0 && !isExpanded) {
         const onChildrenCount = node.children.reduce((acc, child) => {
-            return acc + getFilteredCourseColumnCount(child, course, isExpanded);
+            return acc + getFilteredCourseColumnCount(child, course, true);
         }, 0);
         return course.usage.course.count + onChildrenCount;
     }
@@ -161,7 +161,7 @@ export function getFilteredUnitColumnCount(
      */
     if (node.children && node.children.length > 0 && !isExpanded) {
         const onChildrenCount = node.children.reduce((acc, child) => {
-            return acc + getFilteredUnitColumnCount(child, unit, isExpanded);
+            return acc + getFilteredUnitColumnCount(child, unit, true);
         }, 0);
         return onNodeCount + onChildrenCount;
     }
