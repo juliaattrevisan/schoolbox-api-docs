@@ -244,9 +244,25 @@ class Handler
         $stfArr = [];
         $params = [];
         $selectedView = $this->viewSelector->getView(ViewSelector::PAPERLY_VIEW_ALL_STAFF);
-        $sql = "SELECT StaffID, StaffPreferred, StaffSurname, StaffEmail
+        $sql = "SELECT
+                    StaffID,
+                    StaffPreferred,
+                    StaffSurname,
+                    StaffEmail,
+                    ClassCode,
+                    ClassDescription,
+                    NormalYearLevel,
+                    NormalYearLevel2
                 FROM (
-                    SELECT StaffID, StaffPreferred, StaffSurname, StaffEmail, ClassCode, NormalYearLevel
+                    SELECT
+                        StaffID,
+                        StaffPreferred,
+                        StaffSurname,
+                        StaffEmail,
+                        ClassCode,
+                        ClassDescription,
+                        NormalYearLevel,
+                        NormalYearLevel2
                     FROM {$selectedView} WHERE 1=1
                 ";
 
@@ -265,9 +281,9 @@ class Handler
         if (isset($data['year_level'])) {
             $yls = is_array($data['year_level']) ? $data['year_level'] : explode(',', $data['year_level']);
             $placeholders = implode(',', array_fill(0, count($yls), '?'));
-            $params = array_merge($params, $yls);
+            $params = array_merge($params, $yls, $yls);
 
-            $sql .= " AND NormalYearLevel IN ($placeholders)";
+            $sql .= " AND NormalYearLevel IN ($placeholders) OR NormalYearLevel2 IN ($placeholders)";
         }
 
         if (isset($data['class_code'])) {
@@ -278,20 +294,39 @@ class Handler
         }
 
         $sql .= " ) filtered_results
-                GROUP BY StaffID, StaffPreferred, StaffSurname, StaffEmail
+                GROUP BY StaffID, StaffPreferred, StaffSurname, StaffEmail, ClassCode, ClassDescription, NormalYearLevel, NormalYearLevel2
                 ORDER BY StaffSurname";
 
         $stmt = $this->externalDb->executeQuery($sql, $params);
+        $staffs = [];
         foreach ($stmt as $row) {
-            $stfArr[] = [
-                "ID"         => $row["StaffID"],
-                "Preferred"  => $row["StaffPreferred"],
-                "Surname"    => $row["StaffSurname"],
-                "Email"      => $row["StaffEmail"],
-            ];
+            $staffId = $row["StaffID"];
+
+            if (!isset($staffs[$staffId])) {
+                $staffs[$staffId] = [
+                    "ID"               => $row["StaffID"],
+                    "Preferred"        => $row["StaffPreferred"],
+                    "Surname"          => $row["StaffSurname"],
+                    "Email"            => $row["StaffEmail"],
+                    "NormalYearLevel"  => $row["NormalYearLevel"],
+                    "NormalYearLevel2" => $row["NormalYearLevel2"],
+                    "Class"            => [
+                        [
+                            "ClassCode"        => $row["ClassCode"],
+                            "ClassDescription" => $row["ClassDescription"],
+                        ],
+                    ],
+                ];
+            } else {
+                $staffs[$staffId]["Class"][] = [
+                    "ClassCode"        => $row["ClassCode"],
+                    "ClassDescription" => $row["ClassDescription"],
+                ];
+            }
         }
 
-        return $stfArr;
+        // Convert associative array to indexed array
+        return array_values($staffs);
     }
 
     /**
@@ -1113,15 +1148,16 @@ class Handler
                     s.LegalCourtOrderType,
                     s.StudentMedicalAlertFlag
                 FROM {$selectedView} s
-                WHERE s.StudentID IN (?)
+                WHERE s.StudentID = ?
                 ";
 
             $params = [$stuID];
             $stmt   = $this->externalDb->executeQuery($sql, $params);
 
             foreach ($stmt as $sturow) {
+                $studentID = $sturow['StudentID'];
                 if ($sturow["LegalParentsSeparatedFlag"] == 1 || $sturow["LegalCourtOrderType"] !== '') {
-                    $authArr[] = ["Type" => "BLOCK"];
+                    $authArr[$studentID] = ["Type" => "BLOCK"];
                     continue;
                 }
 
@@ -1130,7 +1166,11 @@ class Handler
                     ? (\Alaress_Date_Format::newFromTimestamp(strtotime($birthDate)))->getUsingFormat('d-m-Y')
                     : null;
 
-                $authArr[] = [
+                if (isset($authArr[$studentID])) {
+                    continue;
+                }
+
+                $authArr[$studentID] = [
                     "Type"                        => "Student",
                     "ID"                          => $sturow["StudentID"],
                     "StudentLegalFullName"        => $sturow["StudentLegalFullName"],
@@ -1220,7 +1260,8 @@ class Handler
                 ];
             }
         }
-        return $authArr;
+        // Convert associative array to indexed array
+        return array_values($authArr);
     }
 
     /**
