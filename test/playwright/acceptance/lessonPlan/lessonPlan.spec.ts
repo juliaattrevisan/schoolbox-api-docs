@@ -159,7 +159,7 @@ test.describe("Lesson Plan Activity", () => {
      * create  lesson plan using the lesson plan template above
      */
     test("Create Lesson Plan", async ({ tester, page, db }) => {
-        const courseModify = new CourseModify(page);
+        const courseModify = new CourseModify(page, tester);
         const templateList = new TemplateList(tester, page);
         const createLessonPlan = new CreateLessonPlan(tester, page);
         // const createLessonPlanTemplate = new CreateLessonPlanTemplate(page, tester);

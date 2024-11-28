@@ -119,7 +119,7 @@ test.describe("Course import tests", () => {
      * - ensure the assessment is presented in that class
      */
     test("Copy activity into class", async ({ tester, page, db }) => {
-        const courseModify = new CourseModify(page);
+        const courseModify = new CourseModify(page, tester);
 
         const folderId = (await db.grabFromDatabase("folder", "id", {
             name: "Automation Course Import Folder1",
