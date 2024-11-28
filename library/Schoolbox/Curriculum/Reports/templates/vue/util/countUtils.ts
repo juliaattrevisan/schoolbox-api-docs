@@ -120,10 +120,10 @@ export function getFilteredCourseColumnCount(
     course: CourseWithCurriculumNodeUsage,
     isExpanded: boolean,
 ): number {
-    // only need to check for course usage on the course column
-    const onNodeCount = useFiltersStore().selectedReportOptions.includes(ReportOptionValues.COURSE)
-        ? course.usage.course.count
-        : 0;
+    // return early if course is not selected
+    if (!useFiltersStore().selectedReportOptions.includes(ReportOptionValues.COURSE)) {
+        return 0;
+    }
     /**
      * When the node has children and is not expanded, we want to show the usage count inclusive of children
      * to show how many usages are linked to the node and its children
@@ -132,9 +132,10 @@ export function getFilteredCourseColumnCount(
         const onChildrenCount = node.children.reduce((acc, child) => {
             return acc + getFilteredCourseColumnCount(child, course, isExpanded);
         }, 0);
-        return onNodeCount + onChildrenCount;
+        return course.usage.course.count + onChildrenCount;
     }
-    return onNodeCount;
+    // only need to check for course usage on the course column
+    return course.usage.course.count;
 }
 
 /**
