@@ -10,6 +10,8 @@ import type {
 import { ReportOptionValues } from "../../js/types/curriculumCoverageTypes";
 import { useFiltersStore } from "../store/ccFiltersStore";
 
+// #region get child usage
+
 /**
  * Get the child usage count for a course
  * @param childNode - the node to get the usage count for
@@ -21,10 +23,7 @@ function getChildCourseUsage(
     parentCourse: CourseWithCurriculumNodeUsage,
 ): CourseWithCurriculumNodeUsage {
     // loop through the node children and find the usage.courses[] that matches the same id
-    const childCourse = childNode.usage.courses.find(
-        (course) => course.id === parentCourse.id,
-    ) as CourseWithCurriculumNodeUsage;
-    return childCourse;
+    return childNode.usage.courses.find((course) => course.id === parentCourse.id) as CourseWithCurriculumNodeUsage;
 }
 
 /**
@@ -43,9 +42,10 @@ function getChildUnitUsage(
     const childCourse = childNode.usage.courses.find(
         (course) => course.id === parentCourse.id,
     ) as CourseWithCurriculumNodeUsage;
-    const childUnit = childCourse.units.find((unit) => unit.id === parentUnit.id) as UnitWithCurriculumNodeUsage;
-    return childUnit;
+    return childCourse.units.find((unit) => unit.id === parentUnit.id) as UnitWithCurriculumNodeUsage;
 }
+
+// #endregion
 
 // #region usage counts
 
