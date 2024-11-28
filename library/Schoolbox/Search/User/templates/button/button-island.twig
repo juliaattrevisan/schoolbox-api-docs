@@ -8,6 +8,12 @@
  # @param bool $isGeosnapshotAvailable               Decides if Geosnapshot button could appear here
  # @param array $allTeacherIds                       A set of staff ids used for emailing them en-masse
  #
+ # Rendering mode
+ # Compact Mode requires an identifier to deconflict javascript-based elements
+ #
+ # @param string $mode                               'tot' renders buttons in a three-dot menu. Otherwise, as a generic wall of buttons
+ # @param string $id                                 Used to deconflict multiple tot menus
+ #
  # The following bools are used by the My Students component to explicitly prevent the mass-email
  # buttons from being available in that dashboard component. They never appeared here to begin with.
  # They also require an omega inspection of a big data struct that is probably very costly to pay
@@ -15,7 +21,18 @@
  #
  # @param bool $emailFunctionsAvailable  If true, emailstaff and emailparents buttons will render
  #}
-<ul class='flex-list flex-wrap buttons'>
+
+{% if mode is defined and 'compact' == mode %}
+    {# Compact Mode compels all these buttons to go into a tot #}
+    <nav>
+        <sbx-pop-out content-id="{{ identifier }}"></sbx-pop-out>
+    </nav>
+
+    <ul class="f-dropdown" data-dropdown-content="" id="{{ identifier }}" aria-hidden="true">
+{% else %}
+    <ul class='flex-list flex-wrap buttons'>
+{% endif %}
+
     {# Special constraints that further reduce the payload I built
      # It uses the exact same philosophy as additionalConstraints for
      # rendering profile fields.
@@ -55,69 +72,69 @@
         }
     } %}
 
-    {% for button in buttons %}
-        {% if additionalConstraints[USER.role.type][button.type] ?? additionalConstraints[USER.role.type]['_default']  %}
-            {% set text = button.text %}
+        {% for button in buttons %}
+            {% if additionalConstraints[USER.role.type][button.type] ?? additionalConstraints[USER.role.type]['_default']  %}
+                {% set text = button.text %}
 
-            {# Special cases: Email Teachers and Email Parents
-             # These submit a hidden form lol
-             #}
-            {% if button.type in ['emailstaff'] %}
-                <li>
-                    <a class="icon-email" id="email-all-staff" title="Includes all teachers, year coordinator, head of house, tutor and coach.">{{ text }}</a>
-                    <form id="email-all-form" action="{{ routeLookupIfAuthorized('mail.postCreateMail') }}" class="hide" method="post">
-                        <input name="userIds" value="{{ allTeacherIds }}" type="hidden">
-                        <input name="target" value="cc" type="hidden">
-                        <input name="title" value="Email All Teachers" type="hidden">
-                        <input name="studentId" value="{{ user.id }}" type="hidden">
-                    </form>
-                </li>
-            {% elseif button.type in ['emailparents'] %}
-                <li>
-                    <a class="icon-email" id="email-all-parents" title="Emails the parents that have email addresses and can be contacted">{{ text }}</a>
-                    <form action="{{ routeLookupIfAuthorized('mail.postCreateMail') }}" method="post" class="no-margin" id="email-contacts-form">
-                        <input type="hidden" name="studentExternalIds" value="{{ user.externalId }}"/>
-                        <input type="hidden" name="selectedGroups" value="parents_of"/>
-                        <input name="studentId" value="{{ user.id }}" type="hidden">
-                        <input name="title" value="Email Parents" type="hidden">
-                    </form>
-                </li>
-            {% else  %}
-                {# A standard button whose urls need to be dynamically determined #}
-                {% set route = button.url %}
-
-                {# Unique derivations #}
-                {% if button.type in ['duework'] %}
-                    {% set route = routeLookupIfAuthorized('learningUpcoming.getUpcomingForStudent', {student: user, studentId: user.id}) %}
-                {% elseif button.type in ['grades'] %}
-                    {% set route = routeLookupIfAuthorized('learningGrades.getGrades', {viewee: user, userId: user.id}) %}
-                {% elseif button.type in ['pastoral'] %}
-                    {% set route = pastoralUrl %}
-                {% elseif button.type in ['calendar'] %}
-                    {% set route = routeLookupIfAuthorized('calendar.getCalendar', {selectedDate: now.urlDate, userId: user.id, user: user}) %}
-                {% elseif button.type in ['documentmanagement'] %}
-                    {% set route = routeLookupIfAuthorized('profileDocumentManagement.getIndex', {studentId: user.id}) %}
-                {% elseif button.type in ['geosnapshot'] %}
-                    {% set route = routeLookupIfAuthorized('geosnapshotApi.getStudentPhotos', {id: user.id}) %}
-                {% endif %}
-
-                {% if route %}
+                {# Special cases: Email Teachers and Email Parents
+                 # These submit a hidden form lol
+                 #}
+                {% if button.type in ['emailstaff'] %}
                     <li>
-                        <a href="{{ route }}" title="{{ button.title }}" class="icon-{{ button.icon }} {{ button.css }}" target="{{ button.target }}">{{ text }}</a>
+                        <a class="icon-email" id="email-all-staff" title="Includes all teachers, year coordinator, head of house, tutor and coach.">{{ text }}</a>
+                        <form id="email-all-form" action="{{ routeLookupIfAuthorized('mail.postCreateMail') }}" class="hide" method="post">
+                            <input name="userIds" value="{{ allTeacherIds }}" type="hidden">
+                            <input name="target" value="cc" type="hidden">
+                            <input name="title" value="Email All Teachers" type="hidden">
+                            <input name="studentId" value="{{ user.id }}" type="hidden">
+                        </form>
                     </li>
+                {% elseif button.type in ['emailparents'] %}
+                    <li>
+                        <a class="icon-email" id="email-all-parents" title="Emails the parents that have email addresses and can be contacted">{{ text }}</a>
+                        <form action="{{ routeLookupIfAuthorized('mail.postCreateMail') }}" method="post" class="no-margin" id="email-contacts-form">
+                            <input type="hidden" name="studentExternalIds" value="{{ user.externalId }}"/>
+                            <input type="hidden" name="selectedGroups" value="parents_of"/>
+                            <input name="studentId" value="{{ user.id }}" type="hidden">
+                            <input name="title" value="Email Parents" type="hidden">
+                        </form>
+                    </li>
+                {% else  %}
+                    {# A standard button whose urls need to be dynamically determined #}
+                    {% set route = button.url %}
+
+                    {# Unique derivations #}
+                    {% if button.type in ['duework'] %}
+                        {% set route = routeLookupIfAuthorized('learningUpcoming.getUpcomingForStudent', {student: user, studentId: user.id}) %}
+                    {% elseif button.type in ['grades'] %}
+                        {% set route = routeLookupIfAuthorized('learningGrades.getGrades', {viewee: user, userId: user.id}) %}
+                    {% elseif button.type in ['pastoral'] %}
+                        {% set route = pastoralUrl %}
+                    {% elseif button.type in ['calendar'] %}
+                        {% set route = routeLookupIfAuthorized('calendar.getCalendar', {selectedDate: now.urlDate, userId: user.id, user: user}) %}
+                    {% elseif button.type in ['documentmanagement'] %}
+                        {% set route = routeLookupIfAuthorized('profileDocumentManagement.getIndex', {studentId: user.id}) %}
+                    {% elseif button.type in ['geosnapshot'] %}
+                        {% set route = routeLookupIfAuthorized('geosnapshotApi.getStudentPhotos', {id: user.id}) %}
+                    {% endif %}
+
+                    {% if route %}
+                        <li>
+                            <a href="{{ route }}" title="{{ button.title }}" class="icon-{{ button.icon }} {{ button.css }}" target="{{ button.target }}">{{ text }}</a>
+                        </li>
+                    {% endif %}
                 {% endif %}
             {% endif %}
-        {% endif %}
-    {% endfor %}
+        {% endfor %}
 
-    {# Arbitrarily spawn difficult-to-emulate custom button behaviour here,
-     # when it's not feasible to convert them into an actual Profile Button
-     # How we make a data struct for this - idk, but you'd need to follow
-     # the same idea of Additional Constraints.
-     #}
-    {% block custom_buttons %}
-    {% endblock custom_buttons %}
+        {# Arbitrarily spawn difficult-to-emulate custom button behaviour here,
+         # when it's not feasible to convert them into an actual Profile Button
+         # How we make a data struct for this - idk, but you'd need to follow
+         # the same idea of Additional Constraints.
+         #}
+        {% block custom_buttons %}
+        {% endblock custom_buttons %}
 
-    {% block buttons_miscellaneous %}
-    {% endblock buttons_miscellaneous %}
-</ul>
+        {% block buttons_miscellaneous %}
+        {% endblock buttons_miscellaneous %}
+    </ul>
