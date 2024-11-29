@@ -31,13 +31,13 @@ $app = new class extends CliTool\App
      * Make sure to add your locking script to the Lock Inspector tool
      * const LOCK_NAMES in Inspector.php
      */
-    public const LOCK_NAME = 'profileEditor_customwork_otcs';
+    public const LOCK_NAME = 'profileEditor_customwork_sedawa';
 
 
     /**
      * This script requires a particular school code.
      */
-    private const SCHOOL_CODE = 'otcs';
+    private const SCHOOL_CODE = 'sedawa';
 
 
     /**
@@ -82,7 +82,7 @@ $app = new class extends CliTool\App
         if ($this->getOpt(self::OPT_LONG_HELP)) {
             echo <<<HELP
 
-Profile Editor: OTCS Custom Work migration.
+Profile Editor: SEDAWA Custom Work migration.
 
 
 HELP;
@@ -115,7 +115,7 @@ HELP;
          */
         $this->helper = new Helper($this->getDatabaseInternal(), true);
 
-        $this->createFields();
+        $this->createButtons();
 
         /* Announce lock release
           */
@@ -126,54 +126,97 @@ HELP;
 
 
     /**
-     * Their connector surfaces LECaseManagerName, LECaseManagerUserId
-     * optionally displaying it in the profile screens if they're meaningful
+     * Add custom buttons.
      *
      * @return void
      */
-    private function createFields(): void
+    private function createButtons(): void
     {
-        /* Despite this field existing, it'll never render to users: a customised student.twig
-         * intercepts the default rendering
+        /* We're gonna make some buttons with this prepared statement
          */
-        $query = "
-            INSERT IGNORE INTO `profile_field`
-            (roletype, field, display_as, sequence, enabled, term, icon, css, click_to_reveal, is_external)
-            VALUES
-            ('student','StudentHouseDescription','Service',(
-            SELECT MAX(sequence)+1
-                FROM profile_field pf
-                WHERE roletype = 'student'
-            ),1,NULL,NULL,NULL,0,1)
-        ";
+        $createButtonStatement = $this->getDatabaseInternal()->prepare("
+            INSERT IGNORE INTO profile_button
+            (roletype, type, sort_order, title, text, icon, url)
+            VALUES (
+                'student',
+                'custom',
+                (
+                    SELECT MAX(sort_order)+1
+                    FROM profile_button pb
+                    WHERE roletype = 'student'
+                ),
+                :title,
+                :text,
+                :icon,
+                :url
+            )
+        ");
 
-        $this->getDatabaseInternal()->executeQuery($query);
+        $customButtons = [
+            [
+                'title' => 'MyPLAN Meetings',
+                'text' => 'MyPLAN Meetings',
+                'icon' => 'staff',
+                'url' => '/synergetic/pti?id=[profileExternalId]'
+            ],
+        ];
 
-        /* Preset availability and visibility requirements
-         * By default it was visible to SELF and STAFF...I suppose
-         */
-        $profileFieldId = (int)$this->getDatabaseInternal()->lastInsertId();
+        foreach ($customButtons as $customButton) {
+            $createButtonStatement->execute([
+                'title' => $customButton['title'],
+                'text' => $customButton['text'],
+                'icon' => $customButton['icon'],
+                'url' => $customButton['url'],
+            ]);
 
-        $roletypes = [Role::STAFF, \Schoolbox\Admin\Profile\Editor\Payload::ROLETYPE_SELF];
-        $campusIds = $this->helper->fetchCampusIds();
+            /* Preset availability and visibility requirements
+             * By default it was visible to Parents of the student, and staff members
+             *
+             * Find the button we just made in the surest way we know
+             */
+            $profileButtonId = (int)$this->getDatabaseInternal()->lastInsertId();
 
-        /* Assign relationships
-         */
-        $this->getLogger()->info(sprintf(
-            'Campus availability: assigning campus ids %s to profile field %s',
-            implode(',', $campusIds),
-            $profileFieldId
-        ));
+            /* Available on all student profiles,
+             * Visible to parents of the student.
+             */
+            $availabilityRoleIds = $this->helper->fetchRoleIds([Role::PARENT, Role::STAFF, Role::STUDENT]);
+            $visibilityRoleIds = $this->helper->fetchRoleIds([Role::PARENT]);
+            $campusIds = $this->helper->fetchCampusIds();
 
-        $this->helper->createFieldCampusAvailability($profileFieldId, $campusIds);
+            /* Assign relationships
+             */
+            $this->getLogger()->info(sprintf(
+                'Campus availability: assigning campus ids %s to profile button %s',
+                implode(',', $campusIds),
+                $profileButtonId
+            ));
 
-        $this->getLogger()->info(sprintf(
-            'Roletype visibility: assigning roletypes %s to profile field %s',
-            implode(',', $roletypes),
-            $profileFieldId
-        ));
+            $this->helper->createButtonCampusAvailability($profileButtonId, $campusIds);
 
-        $this->helper->createFieldRoletypeVisibility($profileFieldId, $roletypes);
+            $this->getLogger()->info(sprintf(
+                'Campus visibility: assigning campus ids %s to profile button %s',
+                implode(',', $campusIds),
+                $profileButtonId
+            ));
+
+            $this->helper->createButtonCampusVisibility($profileButtonId, $campusIds);
+
+            $this->getLogger()->info(sprintf(
+                'Role availability: assigning role ids %s to profile button %s',
+                implode(',', $availabilityRoleIds),
+                $profileButtonId
+            ));
+
+            $this->helper->createButtonRoleAvailability($profileButtonId, $availabilityRoleIds);
+
+            $this->getLogger()->info(sprintf(
+                'Role visibility: assigning role ids %s to profile button %s',
+                implode(',', $visibilityRoleIds),
+                $profileButtonId
+            ));
+
+            $this->helper->createButtonRoleVisibility($profileButtonId, $visibilityRoleIds);
+        }
     }
 
 
@@ -199,4 +242,4 @@ HELP;
 $options = [CliTool\Kernel::OPTION_LEVEL => Monolog\Logger::INFO, CliTool\Kernel::OPTION_ERRORS => E_ALL,];
 
 /** @noinspection PhpUnhandledExceptionInspection */
-(new Schoolbox\Application\CliTool\Kernel($app, $options))->runApp();
+(new Schoolbox\Application\CliTool\Kernel($app, $options, true))->runApp();
