@@ -867,7 +867,7 @@ class Subnav
                     '/adminv2/profile-editor' => [
                         'name'        => 'Profile Editor',
                         'visible'     => true,
-                        'description' => 'Customise the fields and buttons on the staff, student and parent profile screens.',
+                        'description' => 'Customise the fields, buttons, and tabs, on the staff, student, and parent profile screens.',
                     ],
                     '/adminv2/user/stale' => [
                         'name'        => 'Remove Users',
