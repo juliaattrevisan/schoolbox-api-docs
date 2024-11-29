@@ -146,7 +146,7 @@ class Bulk_Folder
 
         /* Temporarily remove the post-save method for notifications cache refresh
          */
-        $this->folderMapper->unregisterCallback(\Schoolbox\Mapper::CALLBACK_POSTSAVE, 'refreshNotificationRedirects');
+        $this->folderMapper->unregisterCallback(\Schoolbox\Mapper::CALLBACK_POSTSAVE, [$this->folderMapper, 'refreshNotificationRedirects']);
 
         $rowIdx = 2; // We have already processed the header in row 1
         while (($row = fgetcsv($this->fp, 1000, ",")) !== false) {

@@ -4115,10 +4115,33 @@ abstract class Mapper implements IMapper
      *
      * @return $this
      */
-    public function registerCallback($point, $method)
+    public function registerCallback(string $point, callable $method): static
     {
-        $this->callback_queue[$point][] = $method;
+        is_callable($method, true, $callableName);
+
+        if (isset($this->callbacks[$point][$callableName])) {
+            throw new InvalidArgumentException(
+                "Callable $callableName already exists in callbacks list for $point."
+            );
+        } else {
+            $this->callback_queue[$point][$callableName] = $method;
+        }
+
         return $this;
+    }
+
+
+    /**
+     * Unregister the callback whose name matches the callback name of $method.
+     *
+     * @param string $point
+     * @param callable $method
+     * @return void
+     */
+    public function unregisterCallback(string $point, callable $method): void
+    {
+        is_callable($method, true, $callbackName);
+        unset($this->callback_queue[$point][$callbackName]);
     }
 
 
