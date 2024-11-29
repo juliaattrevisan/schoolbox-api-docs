@@ -1,199 +1,34 @@
 {% extends '@core/user/student.twig' %}
 
-{% block contacts %}
-    <h2 class="subheader">Contact Information</h2>
-    {% if showContactsAlert %}
-        {% for message in externalUser.AlertMessage ?? [] %}
-            {% block contacts_alert %}
-                {# Only staff may view contact alerts #}
-                <div class="alert-box alert icon-alert">
-                    {{ message | nl2br }}
-                </div>
-            {% endblock contacts_alert %}
-        {% endfor %}
-        {% if externalUser.ParentsSeparatedFlag ?? false %}
-            <div class="alert-box highlight icon-info">Parents Separated</div>
-        {% endif %}
-    {% endif %}
+{% block after_contact_details %}
+    <li class="actions-small-1">
+        <div class="list-item">
+            <div class="card small-12">
+                <span class="icon-home size-32"></span>
 
-    <section>
-        <ul class="information-list expandable-card">
-            {% for contact in contacts %}
-                {% if contact.StudentContactTitle or contact.StudentContactPreferred %}
-                    <li class="small-12">
-
-                        <!-- Expander -->
-                        <div class="list-item">
-                            <div class="expander" data-collapser="collap-contact-{{ loop.index }}"></div>
-                            <div class="compact card small-12">
-                                {% if contact.main %}
-                                    <a href="/search/user/{{ contact.main.id }}">
-                                        {% include 'include/portrait.twig' with {user: contact.main} only %}
-                                        <p>
-                                            {{ contact.StudentContactTitle }} {{ contact.StudentContactPreferred }} {{ contact.StudentContactSurname }}
-                                            <span class="pipe meta">{{ contact.StudentContactRelation }}</span>
-                                        </p>
-                                    </a>
-                                {% else %}
-                                    {% include 'include/portrait.twig' with {externalId: contact.StudentContactID} only %}
-                                    <p>
-                                        {{ contact.StudentContactTitle }} {{ contact.StudentContactPreferred }} {{ contact.StudentContactSurname }}
-                                        <span class="pipe meta">{{ contact.StudentContactRelation }}</span>
-                                    </p>
-                                {% endif %}
-                            </div>
-                        </div>
-
-                        <!-- Collapsable content -->
-                        {% if (contact.StudentContactPhoneActual and not contact.StudentContactSilentPhoneFlag) or contact.StudentContactMobilePhone or contact.StudentContactOccupPhone or contact.StudentContactDefaultEmail %}
-                            <div class="small-12 column content hide" data-collapse-state="collapsed" data-collapsable="collap-contact-{{ loop.index }}">
-                                <div class="list-item">
-                                    <div class="small-12">
-
-                                        {% if contact.StudentContactPhoneActual and not contact.StudentContactSilentPhoneFlag %}
-                                            <div class="row">
-                                                <div class="column small-12 medium-5"><strong>Home Phone: </strong></div>
-                                                <div class="column small-12 medium-7"><a href="tel:{{ contact.StudentContactPhoneActual }}" title="Call {{ contact.StudentContactPhoneActual }}">{{ contact.StudentContactPhoneActual }}</a></div>
-                                            </div>
-                                        {% endif %}
-
-                                        {% if contact.StudentContactMobilePhone %}
-                                            <div class="row">
-                                                <div class="column small-12 medium-5"><strong>Mobile Phone: </strong></div>
-                                                <div class="column small-12 medium-7"><a href="tel:{{ contact.StudentContactMobilePhone }}" title="Call {{ contact.StudentContactMobilePhone }}">{{ contact.StudentContactMobilePhone }}</a></div>
-                                            </div>
-                                        {% endif %}
-
-                                        {% if contact.StudentContactOccupPhone %}
-                                            <div class="row">
-                                                <div class="column small-12 medium-5"><strong>Work Phone: </strong></div>
-                                                <div class="column small-12 medium-7"><a href="tel:{{ contact.StudentContactOccupPhone }}" title="Call {{ contact.StudentContactOccupPhone }}">{{ contact.StudentContactOccupPhone }}</a></div>
-                                            </div>
-                                        {% endif %}
-
-                                        {% if contact.StudentContactDefaultEmail %}
-                                            <div class="row">
-                                                <div class="column small-12 medium-5"><strong>Email: </strong></div>
-                                                <div class="column small-12 medium-7"><a href="{{ session.mailhandle }}{{ contact.StudentContactDefaultEmail }}">{{ contact.StudentContactDefaultEmail }}</a></div>
-                                            </div>
-                                        {% endif %}
-                                    </div>
-                                </div>
-                            </div>
-                        {% else %}
-                            <div class="hide" data-collapse-state="collapsed" data-collapsable="collap-contact-{{ loop.index }}">
-                                <div class="empty-state small-12">
-                                    <p>No contact details found.</p>
-                                </div>
-                            </div>
-                        {% endif %}
-                    </li>
-
-                    {% if contact.StudentContactSpouseTitle or contact.StudentContactSpousePreferred %}
-                        <li class="small-12">
-
-                            <!-- Expander -->
-                            <div class="list-item">
-                                <div class="expander" data-collapser="collap-spouse-{{ loop.index }}"></div>
-                                <div class="compact card small-12">
-                                    {# need to know user's schoolbox info here #}
-                                    {% if contact.spouse %}
-                                        <a href="/search/user/{{ contact.spouse.id }}">
-                                            {% include 'include/portrait.twig' with {user: contact.spouse} only %}
-                                            <p>
-                                                {{ contact.StudentContactSpouseTitle }} {{ contact.StudentContactSpousePreferred }} {{ contact.StudentContactSpouseSurname }}
-                                                <span class="pipe meta">{{ contact.StudentContactSpouseRelation }}</span>
-                                            </p>
-                                        </a>
-                                    {% else %}
-                                        {% include 'include/portrait.twig' with {externalId: contact.StudentContactSpouseID} only %}
-                                        <p>
-                                            {{ contact.StudentContactSpouseTitle }} {{ contact.StudentContactSpousePreferred }} {{ contact.StudentContactSpouseSurname }}
-                                            <span class="pipe meta">{{ contact.StudentContactSpouseRelation }}</span>
-                                        </p>
-                                    {% endif %}
-                                </div>
-                            </div>
-
-                            {% if (contact.StudentContactPhoneActual and not contact.StudentContactSilentPhoneFlag) or contact.StudentContactSpouseMobilePhone or contact.StudentContactSpouseOccupPhone or contact.StudentContactSpouseDefaultEmail %}
-                                <!-- Collapsable content -->
-                                <div class="small-12 column content hide" data-collapse-state="collapsed" data-collapsable="collap-spouse-{{ loop.index }}">
-                                    <div class="list-item">
-                                        <div class="small-12">
-
-                                            {% if contact.StudentContactPhoneActual and not contact.StudentContactSilentPhoneFlag %}
-                                                <div class="row">
-                                                    <div class="column small-12 medium-5"><strong>Home Phone: </strong></div>
-                                                    <div class="column small-12 medium-7"><a href="tel:{{ contact.StudentContactPhoneActual }}" title="Call {{ contact.StudentContactPhoneActual }}">{{ contact.StudentContactPhoneActual }}</a></div>
-                                                </div>
-                                            {% endif %}
-
-                                            {% if contact.StudentContactSpouseMobilePhone %}
-                                                <div class="row">
-                                                    <div class="column small-12 medium-5"><strong>Mobile Phone: </strong></div>
-                                                    <div class="column small-12 medium-7"><a href="tel:{{ contact.StudentContactSpouseMobilePhone }}" title="Call {{ contact.StudentContactSpouseMobilePhone }}">{{ contact.StudentContactSpouseMobilePhone }}</a></div>
-                                                </div>
-                                            {% endif %}
-
-                                            {% if contact.StudentContactSpouseOccupPhone %}
-                                                <div class="row">
-                                                    <div class="column small-12 medium-5"><strong>Work Phone: </strong></div>
-                                                    <div class="column small-12 medium-7"><a href="tel:{{ contact.StudentContactSpouseOccupPhone }}" title="Call {{ contact.StudentContactSpouseOccupPhone }}">{{ contact.StudentContactSpouseOccupPhone }}</a></div>
-                                                </div>
-                                            {% endif %}
-
-                                            {% if contact.StudentContactSpouseDefaultEmail %}
-                                                <div class="row">
-                                                    <div class="column small-12 medium-5"><strong>Email: </strong></div>
-                                                    <div class="column small-12 medium-7"><a href="{{ session.mailhandle }}{{ contact.StudentContactSpouseDefaultEmail }}">{{ contact.StudentContactSpouseDefaultEmail }}</a></div>
-                                                </div>
-                                            {% endif %}
-                                        </div>
-                                    </div>
-                                </div>
-                            {% else %}
-                                <div class="hide" data-collapse-state="collapsed" data-collapsable="collap-spouse-{{ loop.index }}">
-                                    <div class="empty-state small-12">
-                                        <p>No contact details found.</p>
-                                    </div>
-                                </div>
-                            {% endif %}
-                        </li>
+                {# Only show the address fields which have a meaningful value
+                 # Otherwise hide them, so we don't show empty lines with only a comma
+                 #}
+                {% for field in ['StudentContactAddress1', 'StudentContactAddress2', 'StudentContactAddress3'] %}
+                    {% if contact[field] ?? ''|length %}
+                        <p>{{ contact[field] }}</p>
                     {% endif %}
+                {% endfor %}
 
-
-                    <li class="actions-small-1">
-                        <div class="list-item">
-                            <div class="card small-12">
-                                <span class="icon-home size-32"></span>
-
-                                {# Only show the address fields which have a meaningful value
-                                 # Otherwise hide them, so we don't show empty lines with only a comma
-                                 #}
-                                {% for field in ['StudentContactAddress1', 'StudentContactAddress2', 'StudentContactAddress3'] %}
-                                    {% if contact[field] ?? ''|length %}
-                                        <p>{{ contact[field] }}</p>
-                                    {% endif %}
-                                {% endfor %}
-
-                                {# Optional state and/or postcode piece of the address
-                                 # Only show this if at least one of those parts exist
-                                 #}
-                                <p>
-                                    {% for field in ['StudentContactSuburb', 'StudentContactState', 'StudentContactPostCode'] %}
-                                        {% if contact[field] ?? ''|length %}
-                                            {{ contact[field] }}
-                                        {% endif %}
-                                    {% endfor %}
-                                </p>
-                            </div>
-                        </div>
-                        <nav>
-                            <a class="icon-mobile" href="tel:{{ contact.StudentContactPhoneActual }}" title="Call {{ contact.StudentContactPhoneActual }}"></a>
-                        </nav>
-                    </li>
-                {% endif %}
-            {% endfor %}
-        </ul>
-    </section>
-{% endblock contacts %}
+                {# Optional state and/or postcode piece of the address
+                 # Only show this if at least one of those parts exist
+                 #}
+                <p>
+                    {% for field in ['StudentContactSuburb', 'StudentContactState', 'StudentContactPostCode'] %}
+                        {% if contact[field] ?? ''|length %}
+                            {{ contact[field] }}
+                        {% endif %}
+                    {% endfor %}
+                </p>
+            </div>
+        </div>
+        <nav>
+            <a class="icon-mobile" href="tel:{{ contact.StudentContactPhoneActual }}" title="Call {{ contact.StudentContactPhoneActual }}"></a>
+        </nav>
+    </li>
+{% endblock after_contact_details %}
