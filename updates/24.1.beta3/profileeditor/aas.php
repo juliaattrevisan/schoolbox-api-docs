@@ -199,7 +199,7 @@ HELP;
              * to parents of the student and staff members. This doesn't seem to
              * be very student-centric data for students to see.
              */
-            $availabilityRoleIds = $this->helper->fetchRoleIds([Role::PARENT, Role::STAFF, Role::STUDENT]);
+            $availabilityRoleIds = $this->helper->fetchRoleIds([Role::STUDENT]);
             $visibilityRoleIds = $this->helper->fetchRoleIds([Role::PARENT, Role::STAFF]);
             $campusIds = $this->helper->fetchCampusIds();
 

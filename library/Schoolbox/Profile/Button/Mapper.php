@@ -102,7 +102,6 @@ class Mapper extends BaseMapper
         /** @var Model $button */
         foreach ($buttons as $button) {
             // Primitive tokenization for URLs, allows injecting user IDs and possibly other variables
-
             $array_find = [
                 '[profileId]',
                 '[profileExternalId]',
