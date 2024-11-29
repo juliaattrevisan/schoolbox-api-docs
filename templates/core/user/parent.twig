@@ -79,10 +79,10 @@
                                     {# Now render each of the flags/tuples in some manner #}
 
                                     {# Note that some fields require special handling (different data structures)
-                                        #
-                                        # The field name will always show at this point, though their values
-                                        # will need special treatment somehow
-                                        #}
+                                     #
+                                     # The field name will always show at this point, though their values
+                                     # will need special treatment somehow
+                                     #}
                                     <dt class="small-4 medium-3 columns">{{ macro.fieldName(selectedField) }}</dt>
                                     <dd class="small-8 medium-9 columns">
                                         {% if selectedField.field in ['spouseName'] %}
@@ -92,8 +92,10 @@
                                             {# Renders a mailto: hyperlink #}
                                             {{ macro.email(session, selectedField.value, selectedField.value) }}
                                         {% else %}
-                                            {# A generic tuple (key, value) pair #}
-                                            {{ selectedField.value }}
+                                            {% block profileFieldTuple %}
+                                                {# A generic tuple (key, value) pair #}
+                                                {{ selectedField.value }}
+                                            {% endblock profileFieldTuple %}
                                         {% endif %}
                                     </dd>
                                 {% endif %}
@@ -108,10 +110,6 @@
                      # It uses the exact same philosophy as additionalConstraints for
                      # rendering profile fields.
                      #}
-                    {% set additionalConstraints = {
-
-                    } %}
-
                     {% set additionalConstraints = {
                         'student': {
                             '_default': true,
