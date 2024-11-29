@@ -16,16 +16,3 @@
     </dd>
     {% endif %}
 {% endblock home_address %}
-
-{% block details_email %}
-    {% if user.getEmail() %}
-        <dt class="small-12 medium-3">Email:</dt>
-        <dd class="small-12 medium-9">
-            <a href="{{ session.mailhandle }}{{ user.getEmail() }}">{{ user.getEmail() }}</a>
-        </dd>
-    {% endif %}
-    {% if user.externalId %}
-        <dt class="small-4 medium-3 columns">Parent ID:</dt>
-        <dd class="small-8 medium-9 columns">{{ user.externalId }}</dd>
-    {% endif %}
-{% endblock details_email %}

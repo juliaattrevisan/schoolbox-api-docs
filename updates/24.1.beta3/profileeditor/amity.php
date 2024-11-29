@@ -126,7 +126,7 @@ HELP;
 
 
     /**
-     * Unlock staff external id
+     * Unlock parent/staff external id
      *
      * @return void
      */
@@ -141,9 +141,8 @@ HELP;
         $result = $this->getDatabaseInternal()->executeQuery("
             SELECT id
             FROM profile_field
-            WHERE roletype = 'staff' 
+            WHERE (roletype = 'staff' OR roletype = 'parent') 
             AND field = 'externalId'
-            LIMIT 1
         ");
 
         while ($row = $result->fetch(\PDO::FETCH_ASSOC)) {
