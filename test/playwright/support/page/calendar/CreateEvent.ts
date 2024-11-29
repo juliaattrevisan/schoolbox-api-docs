@@ -50,6 +50,15 @@ export default class CreateEvent {
     }
 
     /**
+     * fill the date
+     * @param date - The date
+     */
+    async fillDate(date: string): Promise<void> {
+        await this.page.click("input#startDate");
+        await this.page.locator("input#startDate").fill(date);
+    }
+
+    /**
      * sets event level by passing its level: Personal, School, Group
      * @param levelType - The level type
      */
