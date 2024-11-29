@@ -905,6 +905,10 @@
                                                             {% endif %}
                                                         </li>
                                                     {% endif %}
+
+                                                    {# A place where you can add per-contact extra stuff #}
+                                                    {% block after_contact_details %}
+                                                    {% endblock after_contact_details %}
                                                 {% endif %}
                                             {% endfor %}
                                         </ul>
