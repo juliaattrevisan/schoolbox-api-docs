@@ -26,7 +26,7 @@ const filtersStore = useFiltersStore();
             </ul>
         </div>
         <div>
-            <label>Only show gaps</label>
+            <label>Only show unused curriculum</label>
             <p class="meta">Only show curriculum that has a total usage count of 0.</p>
             <div class="switch">
                 <input id="onlyShowGapsSwitch" v-model="filtersStore.onlyShowGaps" type="checkbox" />
