@@ -52,9 +52,14 @@ class UnitAssessmentUsage
             ($unitUsage[Cursor::COURSE_ACTIVITY_QUIZ] ?? 0) +
             ($unitUsage[Cursor::COURSE_ACTIVITY_LTI] ?? 0) +
             ($unitUsage[Cursor::COURSE_ACTIVITY_DUE_WORK] ?? 0) +
-            ($unitUsage[Cursor::COURSE_ACTIVITY_PROJECT] ?? 0);
+            ($unitUsage[Cursor::COURSE_ACTIVITY_PROJECT] ?? 0) +
+            ($unitUsage[Cursor::COURSE_PROJECT_ACTIVITY_TASK] ?? 0) +
+            ($unitUsage[Cursor::COURSE_PROJECT_ACTIVITY_QUIZ] ?? 0) +
+            ($unitUsage[Cursor::COURSE_PROJECT_ACTIVITY_LTI] ?? 0) +
+            ($unitUsage[Cursor::COURSE_PROJECT_ACTIVITY_DUE_WORK] ?? 0);
         $lessonPlanCount =
-            ($unitUsage[Cursor::COURSE_ACTIVITY_LESSON_PLAN] ?? 0);
+            ($unitUsage[Cursor::COURSE_ACTIVITY_LESSON_PLAN] ?? 0) +
+            ($unitUsage[Cursor::COURSE_PROJECT_ACTIVITY_LESSON_PLAN] ?? 0);
 
         $rubricCount = array_sum(
             [

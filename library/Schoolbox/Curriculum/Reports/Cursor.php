@@ -45,6 +45,11 @@ class Cursor implements ICursor
     public const COURSE_ACTIVITY_DUE_WORK = 'dueWork';
     public const COURSE_ACTIVITY_PROJECT = 'project';
     public const COURSE_ACTIVITY_LESSON_PLAN = 'lessonPlan';
+    public const COURSE_PROJECT_ACTIVITY_TASK = self::COURSE_ACTIVITY_PROJECT . "." . self::COURSE_ACTIVITY_TASK;
+    public const COURSE_PROJECT_ACTIVITY_QUIZ = self::COURSE_ACTIVITY_PROJECT . "." . self::COURSE_ACTIVITY_QUIZ;
+    public const COURSE_PROJECT_ACTIVITY_LTI = self::COURSE_ACTIVITY_PROJECT . "." . self::COURSE_ACTIVITY_LTI;
+    public const COURSE_PROJECT_ACTIVITY_DUE_WORK = self::COURSE_ACTIVITY_PROJECT . "." . self::COURSE_ACTIVITY_DUE_WORK;
+    public const COURSE_PROJECT_ACTIVITY_LESSON_PLAN = self::COURSE_ACTIVITY_PROJECT . "." . self::COURSE_ACTIVITY_LESSON_PLAN;
     public const COURSE_ACTIVITY = 'activity';
     public const COURSE_RUBRIC_CAPABILITY = 'rubricCapability';
     public const COURSE_UNIT_RUBRIC_CAPABILITY = 'unitRubricCapability';
@@ -246,26 +251,90 @@ class Cursor implements ICursor
             $unitLessonPlanCountQuery = sprintf(
                 "
                 SELECT
+                    '%s' type,
+                    cnfa.curriculum_node_id,
+                    cus.course_specification_id courseSpecId,
+                    cus.folder_id as unitId,
+                    COUNT(cnfa.curriculum_node_id) as count
+                FROM lesson_plan lp
+                INNER JOIN curriculum_node_for_assessment cnfa
+                    ON cnfa.assessment_id = lp.assessment_id
+                    AND cnfa.curriculum_node_id IN %s
+                INNER JOIN assessment_course_unit_specification acus ON acus.assessment_id = cnfa.assessment_id
+                INNER JOIN course_unit_specification cus
+                        ON cus.id = acus.course_unit_specification_id
+                        AND cus.course_specification_id IN %s
+                WHERE lp.deleted_at IS NULL
+                GROUP BY type, cnfa.curriculum_node_id, cus.course_specification_id, cus.folder_id
+            ",
+                self::COURSE_ACTIVITY_LESSON_PLAN,
+                $nodesPlaceHolder,
+                $coursePlaceHolder
+            );
+
+            $unitProjectActivityCountQuery = sprintf(
+                "
+                SELECT
                     activity.type,
                     cnfa.curriculum_node_id,
                     cus.course_specification_id courseSpecId,
                     cus.folder_id as unitId,
                     COUNT(cnfa.curriculum_node_id) as count
                 FROM (
-                     SELECT '%s' type, lp.assessment_id, lp.deleted_at
-                     FROM lesson_plan lp
+                     SELECT '%s' type, t.assessment_id
+                     FROM task t
+                     UNION
+                     SELECT '%s' type, a.assessment_id
+                     FROM assess a
+                     UNION
+                     SELECT '%s' type, lti.assessment_id
+                     FROM lti_assessment lti
+                     UNION
+                     SELECT '%s' type, sbox.assessment_id
+                     FROM submission_box sbox
                 ) activity
+                    INNER JOIN curriculum_node_for_assessment cnfa
+                        ON cnfa.assessment_id = activity.assessment_id
+                        AND cnfa.curriculum_node_id IN %s
+                    INNER JOIN project_assessment pa ON activity.assessment_id = pa.assessment_id
+                    INNER JOIN project p ON p.id = pa.project_id AND p.deleted_at IS NULL
+                    INNER JOIN assessment_course_unit_specification acus ON acus.assessment_id = p.assessment_id
+                    INNER JOIN course_unit_specification cus
+                        ON cus.id = acus.course_unit_specification_id
+                        AND cus.course_specification_id IN %s
+                    INNER JOIN assessment ass ON ass.id = activity.assessment_id AND ass.deleted_at IS NULL
+                GROUP BY type, cnfa.curriculum_node_id, cus.course_specification_id, cus.folder_id
+            ",
+                self::COURSE_PROJECT_ACTIVITY_TASK,
+                self::COURSE_PROJECT_ACTIVITY_QUIZ,
+                self::COURSE_PROJECT_ACTIVITY_LTI,
+                self::COURSE_PROJECT_ACTIVITY_DUE_WORK,
+                $nodesPlaceHolder,
+                $coursePlaceHolder
+            );
+
+            $unitProjectLessonPlanCountQuery = sprintf(
+                "
+                SELECT
+                    '%s' type,
+                    cnfa.curriculum_node_id,
+                    cus.course_specification_id courseSpecId,
+                    cus.folder_id as unitId,
+                    COUNT(cnfa.curriculum_node_id) as count
+                FROM lesson_plan lp
                 INNER JOIN curriculum_node_for_assessment cnfa
-                    ON cnfa.assessment_id = activity.assessment_id
+                    ON cnfa.assessment_id = lp.assessment_id
                     AND cnfa.curriculum_node_id IN %s
-                INNER JOIN assessment_course_unit_specification acus ON acus.assessment_id = cnfa.assessment_id
+                INNER JOIN project_assessment pa ON lp.assessment_id = pa.assessment_id
+                INNER JOIN project p ON p.id = pa.project_id AND p.deleted_at IS NULL
+                INNER JOIN assessment_course_unit_specification acus ON acus.assessment_id = p.assessment_id
                 INNER JOIN course_unit_specification cus
                         ON cus.id = acus.course_unit_specification_id
                         AND cus.course_specification_id IN %s
-                WHERE activity.deleted_at IS NULL
-                GROUP BY activity.type, cnfa.curriculum_node_id, cus.course_specification_id, cus.folder_id
+                WHERE lp.deleted_at IS NULL
+                GROUP BY type, cnfa.curriculum_node_id, cus.course_specification_id, cus.folder_id
             ",
-                self::COURSE_ACTIVITY_LESSON_PLAN,
+                self::COURSE_PROJECT_ACTIVITY_LESSON_PLAN,
                 $nodesPlaceHolder,
                 $coursePlaceHolder
             );
@@ -417,6 +486,8 @@ class Cursor implements ICursor
                         $unitCountQuery,
                         $unitActivityCountQuery,
                         $unitLessonPlanCountQuery,
+                        $unitProjectActivityCountQuery,
+                        $unitProjectLessonPlanCountQuery,
                         $rubricCapabilityCountQuery,
                         $unitRubricCapabilityCountQuery,
                         $rubricIndicatorCountQuery,
