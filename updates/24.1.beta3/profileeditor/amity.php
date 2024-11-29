@@ -115,7 +115,7 @@ HELP;
          */
         $this->helper = new Helper($this->getDatabaseInternal(), true);
 
-        $this->updateFields();
+        $this->exposeExternalId();
 
         /* Announce lock release
           */
@@ -130,7 +130,7 @@ HELP;
      *
      * @return void
      */
-    private function updateFields(): void
+    private function exposeExternalId(): void
     {
         /* We actually need to set perms on two fields here
          */
