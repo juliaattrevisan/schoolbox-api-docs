@@ -179,7 +179,7 @@ HELP;
             /* Available on all student profiles,
              * Visible to parents of the student.
              */
-            $availabilityRoleIds = $this->helper->fetchRoleIds([Role::PARENT, Role::STAFF, Role::STUDENT]);
+            $availabilityRoleIds = $this->helper->fetchRoleIds([Role::STUDENT]);
             $visibilityRoleIds = $this->helper->fetchRoleIds([Role::PARENT]);
             $campusIds = $this->helper->fetchCampusIds();
 
