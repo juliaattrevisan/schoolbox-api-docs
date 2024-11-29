@@ -249,8 +249,6 @@ class Handler
                     StaffPreferred,
                     StaffSurname,
                     StaffEmail,
-                    ClassCode,
-                    ClassDescription,
                     NormalYearLevel,
                     NormalYearLevel2
                 FROM (
@@ -260,7 +258,6 @@ class Handler
                         StaffSurname,
                         StaffEmail,
                         ClassCode,
-                        ClassDescription,
                         NormalYearLevel,
                         NormalYearLevel2
                     FROM {$selectedView} WHERE 1=1
@@ -294,7 +291,7 @@ class Handler
         }
 
         $sql .= " ) filtered_results
-                GROUP BY StaffID, StaffPreferred, StaffSurname, StaffEmail, ClassCode, ClassDescription, NormalYearLevel, NormalYearLevel2
+                GROUP BY StaffID, StaffPreferred, StaffSurname, StaffEmail, NormalYearLevel, NormalYearLevel2
                 ORDER BY StaffSurname";
 
         $stmt = $this->externalDb->executeQuery($sql, $params);
@@ -310,17 +307,6 @@ class Handler
                     "Email"            => $row["StaffEmail"],
                     "NormalYearLevel"  => $row["NormalYearLevel"],
                     "NormalYearLevel2" => $row["NormalYearLevel2"],
-                    "Class"            => [
-                        [
-                            "ClassCode"        => $row["ClassCode"],
-                            "ClassDescription" => $row["ClassDescription"],
-                        ],
-                    ],
-                ];
-            } else {
-                $staffs[$staffId]["Class"][] = [
-                    "ClassCode"        => $row["ClassCode"],
-                    "ClassDescription" => $row["ClassDescription"],
                 ];
             }
         }
@@ -2000,7 +1986,7 @@ class Handler
         foreach ($data as $key => $value) {
             $value = htmlspecialchars($value, ENT_QUOTES);
 
-            if (empty($value) || $value == 'null') {
+            if ($value == 'null') {
                 $communitySql .= "$key = NULL, ";
             } else {
                 if ($key == "BirthDate") {
@@ -2082,7 +2068,7 @@ class Handler
                 ) {
                     $value = htmlspecialchars($value, ENT_QUOTES);
 
-                    if (empty($value) || $value == 'null') {
+                    if ($value == 'null') {
                         $value = 'NULL';
                     }
                 }
