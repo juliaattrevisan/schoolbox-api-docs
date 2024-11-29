@@ -321,11 +321,6 @@ parameters:
 			path: library/Alaress/Routing/Trie.php
 
 		-
-			message: "#^Access to an undefined property Xml\\:\\:\\$channel\\.$#"
-			count: 1
-			path: library/Alaress/Rss/Strategy/Rss20.php
-
-		-
 			message: "#^Property Xml\\:\\:\\$xml \\(SimpleXMLElement\\) in isset\\(\\) is not nullable\\.$#"
 			count: 1
 			path: library/Alaress/Rss/Stream.php
