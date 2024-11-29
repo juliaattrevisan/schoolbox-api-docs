@@ -56,6 +56,7 @@ class Cursor implements ICursor
     public const COURSE_RUBRIC_INDICATOR = 'rubricIndicator';
     public const COURSE_UNIT_RUBRIC_INDICATOR = 'unitRubricIndicator';
     public const COURSE_IN_USE_RUBRIC = 'inUseRubric';
+    public const COURSE_PROJECT_IN_USE_RUBRIC = self::COURSE_ACTIVITY_PROJECT . "." . self::COURSE_IN_USE_RUBRIC;
     public const ACTIVITY_ICON_LIST = [
         self::COURSE_ACTIVITY_DUE_WORK => 'due-work',
         self::COURSE_ACTIVITY_TASK => 'task',
@@ -478,6 +479,60 @@ class Cursor implements ICursor
                 $coursePlaceHolder
             );
 
+            $inUseProjectRubricCountQuery = sprintf(
+                "
+                   SELECT
+                       '%s' type,
+                       rubric.curriculum_node_id,
+                       rubric.course_specification_id,
+                       rubric.folder_id,
+                       COUNT(*) AS count
+                    FROM (
+                        SELECT
+                            cnrc.curriculum_node_id,
+                            cus.course_specification_id,
+                            cus.folder_id,
+                            v.assessment_id,
+                            v.capability_id id,
+                            v.capability_name title
+                        FROM v_rubric v
+                        INNER JOIN curriculum_node_for_rubric_capability cnrc
+                            ON cnrc.rubric_capability_id = v.capability_id
+                            AND cnrc.curriculum_node_id IN %s
+                        INNER JOIN project_assessment pa ON v.assessment_id = pa.assessment_id
+                        INNER JOIN project p ON p.id = pa.project_id AND p.deleted_at IS NULL
+                        INNER JOIN assessment_course_unit_specification acus ON acus.assessment_id = p.assessment_id
+                        INNER JOIN course_unit_specification cus
+                            ON cus.id = acus.course_unit_specification_id
+                            AND cus.course_specification_id IN %s
+                        UNION
+                        SELECT
+                            cnri.curriculum_node_id,
+                            cus.course_specification_id,
+                            cus.folder_id,
+                            v.assessment_id,
+                            v.indicator_id id,
+                            v.indicator_name title
+                        FROM v_rubric v
+                        INNER JOIN curriculum_node_for_rubric_indicator cnri
+                            ON cnri.rubric_indicator_id = v.indicator_id
+                            AND cnri.curriculum_node_id IN %s
+                        INNER JOIN project_assessment pa ON v.assessment_id = pa.assessment_id
+                        INNER JOIN project p ON p.id = pa.project_id AND p.deleted_at IS NULL
+                        INNER JOIN assessment_course_unit_specification acus ON acus.assessment_id = p.assessment_id
+                        INNER JOIN course_unit_specification cus
+                            ON cus.id = acus.course_unit_specification_id
+                            AND cus.course_specification_id IN %s
+                    ) rubric
+                    GROUP BY rubric.curriculum_node_id, rubric.course_specification_id, rubric.folder_id
+                ",
+                self::COURSE_PROJECT_IN_USE_RUBRIC,
+                $nodesPlaceHolder,
+                $coursePlaceHolder,
+                $nodesPlaceHolder,
+                $coursePlaceHolder
+            );
+
             $megaQuery = '( ' .
                 implode(
                     ' ) UNION ( ',
@@ -493,6 +548,7 @@ class Cursor implements ICursor
                         $rubricIndicatorCountQuery,
                         $unitRubricIndicatorCountQuery,
                         $inUseRubricCountQuery,
+                        $inUseProjectRubricCountQuery
                     ]
                 ) . ' )';
 

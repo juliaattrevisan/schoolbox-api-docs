@@ -69,7 +69,13 @@ class UnitAssessmentUsage
                 ($counts[$node->getId()][$unit->getCourse()->getId()][Cursor::COURSE_RUBRIC_INDICATOR] ?? 0),
             ]
         );
-        $inUseRubricCount = $unitUsage[Cursor::COURSE_IN_USE_RUBRIC] ?? 0;
+        $inUseRubricCount = array_sum(
+            [
+                ($unitUsage[Cursor::COURSE_IN_USE_RUBRIC] ?? 0),
+                ($unitUsage[Cursor::COURSE_PROJECT_IN_USE_RUBRIC] ?? 0)
+            ]
+        );
+
         return [
             'id'    => $unit->getFolder()->getId(),
             'name'  => $unit->getTitle(),
