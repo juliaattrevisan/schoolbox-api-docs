@@ -267,6 +267,7 @@ class External_Synergetic_Amity_User extends External_Synergetic_User
                         END AS SpouseWorkPhone,
                         Spouse.DirectoryIncludeFlag SpouseDirectoryIncludeFlag,
                    -- the following columns are extra for Amity
+                        '1' AS ContactAddress,
                         Addresses.Address1,
                         Addresses.Address2,
                         Addresses.Address3,
