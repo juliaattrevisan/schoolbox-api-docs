@@ -26,7 +26,7 @@ class Alaress_Rss_Strategy_Rss20 implements Alaress_Rss_Strategy_Interface
         $data = [];
 
         /** @var SimpleXMLElement|null $allRss */
-        $allRss = $input->channel->item;
+        $allRss = $input->channel->item ?? null;
 
         /* the Channel and Item nodes don't exist in this xml
          * Nothing to parse and show; exit early
