@@ -1,14 +1,31 @@
 {% extends '@core/user/student.twig' %}
-{% block specialAlert %}
-    {% if isStaffWhoCanView and externalUser.IndigenousFlag ?? false %}
-        <div class="alert-box highlight">
-        <img src="{{ CDN_PREFIX }}/images/tcgi/aboriginal.jpeg" alt="Indigenous descent"> Indigenous descent
-        </div>
+
+{# Intercept default handling of a tuple. Custom Works' tuples must get dealt with specially here,
+ # before falling back to just putting selectedField.value on screen
+#}
+{% block profileFieldTuple %}
+    {# These two fields render as a flag, but evade our flag detection because they don't
+     # have an icon or css class associated with one of our standard icons.
+     # We'll just render them specially with the usual override sledgehammer
+     #}
+    {% if selectedField.field in ['IndigenousFlag'] %}
+        {% if selectedField.value ?? false %}
+            <dt class="full-width">
+                <div class="alert-box highlight">
+                    <img src="{{ CDN_PREFIX }}/images/tcgi/aboriginal.jpeg" alt="Indigenous descent"> Indigenous descent
+                </div>
+            </dt>
+        {% endif %}
+    {% elseif selectedField.field in ['StudentTSIFlag'] %}
+        {% if selectedField.value ?? false %}
+            <dt class="full-width">
+                <div class="alert-box highlight">
+                    <img src="{{ CDN_PREFIX }}/images/tcgi/tsiflag.bmp" alt="Torres Strait Islander descent"> Torres Strait Islander descent
+                </div>
+            </dt>
+        {% endif %}
+    {% else %}
+        {# Default rendering: inherit from core template #}
+        {{ parent() }}
     {% endif %}
-    {% if isStaffWhoCanView and externalUser.StudentTSIFlag ?? false %}
-        <div class="alert-box highlight">
-        <img src="{{ CDN_PREFIX }}/images/tcgi/tsiflag.bmp" alt="Torres Strait Islander descent"> Torres Strait Islander descent
-        </div>
-    {% endif %}
-    {{ parent() }}
-{% endblock specialAlert %}
+{% endblock %}
