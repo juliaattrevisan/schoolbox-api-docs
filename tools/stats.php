@@ -44,17 +44,17 @@ $app = new class extends CliTool\App {
             'superusers'        => 'SELECT count(*) FROM user u JOIN superusers s on u.id = s.id WHERE u.deleted_at IS NULL',
 
             //Moderators
-            'calendar_moderator'    => 'SELECT count(*) FROM user u JOIN userAccess uA on u.id = uA.uid WHERE service = ' . UserAccess::SERVICE_CALENDAR . ' AND type=3 GROUP BY u.id',
-            'news_moderator'        => 'SELECT count(*) FROM user u JOIN userAccess uA on u.id = uA.uid WHERE service = ' . UserAccess::SERVICE_NEWS . ' AND type=3',
-            'cms_moderator'         => 'SELECT count(*) FROM user u JOIN userAccess uA on u.id = uA.uid WHERE service = ' . UserAccess::SERVICE_CMS . ' AND type=3',
-            'curriculum_moderator'  => 'SELECT count(*) FROM user u JOIN userAccess uA on u.id = uA.uid WHERE service = ' . UserAccess::SERVICE_CURRICULUM . ' AND type=3',
-            'resources_moderator'   => 'SELECT count(*) FROM user u JOIN userAccess uA on u.id = uA.uid WHERE service = ' . UserAccess::SERVICE_RESOURCE_BOOKING . ' AND type=3',
-            'fixtures_moderator'    => 'SELECT count(*) FROM user u JOIN userAccess uA on u.id = uA.uid WHERE service = ' . UserAccess::SERVICE_SPORTS_ADMINISTRATOR . ' AND type=3',
-            'pastoral_moderator'    => 'SELECT count(*) FROM user u JOIN userAccess uA on u.id = uA.uid WHERE service = ' . UserAccess::SERVICE_PASTORAL . ' AND type=3',
-            'badge_moderator'       => 'SELECT count(*) FROM user u JOIN userAccess uA on u.id = uA.uid WHERE service = ' . UserAccess::SERVICE_BADGE . ' AND type=3',
-            'timetable_moderator'   => 'SELECT count(*) FROM user u JOIN userAccess uA on u.id = uA.uid WHERE service = ' . UserAccess::SERVICE_TIMETABLE . ' AND type=3',
-            'design_moderator'      => 'SELECT count(*) FROM user u JOIN userAccess uA on u.id = uA.uid WHERE service = ' . UserAccess::SERVICE_DESIGN . ' AND type=3',
-            'lms_moderator'         => 'SELECT count(*) FROM user u JOIN userAccess uA on u.id = uA.uid WHERE service = ' . UserAccess::SERVICE_LMS . ' AND type=3',
+            'calendar_moderator'    => 'SELECT count(*) FROM user u JOIN userAccess uA on u.id = uA.uid WHERE u.deleted_at is null and service = ' . UserAccess::SERVICE_CALENDAR . ' AND type=3 GROUP BY u.id ',
+            'news_moderator'        => 'SELECT count(*) FROM user u JOIN userAccess uA on u.id = uA.uid WHERE u.deleted_at is null and service = ' . UserAccess::SERVICE_NEWS . ' AND type=3 ',
+            'cms_moderator'         => 'SELECT count(*) FROM user u JOIN userAccess uA on u.id = uA.uid WHERE u.deleted_at is null and service = ' . UserAccess::SERVICE_CMS . ' AND type=3 ',
+            'curriculum_moderator'  => 'SELECT count(*) FROM user u JOIN userAccess uA on u.id = uA.uid WHERE u.deleted_at is null and service = ' . UserAccess::SERVICE_CURRICULUM . ' AND type=3 ',
+            'resources_moderator'   => 'SELECT count(*) FROM user u JOIN userAccess uA on u.id = uA.uid WHERE u.deleted_at is null and service = ' . UserAccess::SERVICE_RESOURCE_BOOKING . ' AND type=3 ',
+            'fixtures_moderator'    => 'SELECT count(*) FROM user u JOIN userAccess uA on u.id = uA.uid WHERE u.deleted_at is null and service = ' . UserAccess::SERVICE_SPORTS_ADMINISTRATOR . ' AND type=3 ',
+            'pastoral_moderator'    => 'SELECT count(*) FROM user u JOIN userAccess uA on u.id = uA.uid WHERE u.deleted_at is null and service = ' . UserAccess::SERVICE_PASTORAL . ' AND type=3 ',
+            'badge_moderator'       => 'SELECT count(*) FROM user u JOIN userAccess uA on u.id = uA.uid WHERE u.deleted_at is null and service = ' . UserAccess::SERVICE_BADGE . ' AND type=3 ',
+            'timetable_moderator'   => 'SELECT count(*) FROM user u JOIN userAccess uA on u.id = uA.uid WHERE u.deleted_at is null and service = ' . UserAccess::SERVICE_TIMETABLE . ' AND type=3 ',
+            'design_moderator'      => 'SELECT count(*) FROM user u JOIN userAccess uA on u.id = uA.uid WHERE u.deleted_at is null and service = ' . UserAccess::SERVICE_DESIGN . ' AND type=3 ',
+            'lms_moderator'         => 'SELECT count(*) FROM user u JOIN userAccess uA on u.id = uA.uid WHERE u.deleted_at is null and service = ' . UserAccess::SERVICE_LMS . ' AND type=3 ',
 
 
             //Logins
