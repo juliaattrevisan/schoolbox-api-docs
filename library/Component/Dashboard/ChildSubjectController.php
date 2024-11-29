@@ -83,7 +83,7 @@ class Component_Dashboard_ChildSubjectController extends Component_Dashboard_Con
                 $this->getUser(),
                 \Alaress_Date_Format::now(),
                 new \Eportfolio_Authenticator($_SESSION['user'], $userChild),
-                $this->getConfigLoader()->get('geosnapshot_api_key'),
+                $this->getConfigLoader()->get('geosnapshot_api_key') ?? '',
                 $this->getConfigLoader()->get('geosnapshot_enabled'),
                 false,
                 $this->getAuthorizer(),
