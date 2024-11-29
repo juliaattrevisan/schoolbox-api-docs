@@ -20,7 +20,7 @@ export default class Datepicker {
     }
 
     /**
-     * cliick event dialog modify button
+     * click event dialog modify button
      */
     async clickEventDialogModifyButton(): Promise<void> {
         await this.page.getByTestId("view-event-modal-modify-button").click();

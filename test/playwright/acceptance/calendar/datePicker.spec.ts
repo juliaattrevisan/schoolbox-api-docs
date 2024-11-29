@@ -4,9 +4,7 @@
  *
  * Steps:
  * 1. Provision sales.tar.gz data
- * 2. vagrant ssh
- * 3. Execute cd /usr/share/schoolbox && ./vendor/bin/codecept run --steps Acceptance DatepickerCest
- *
+ * 2. npx playwright test --ui test/playwright/acceptance/calendar/datePicker.spec.ts
  */
 
 import { test, expect } from "@schoolboxTest/playwright/support/integrations";
