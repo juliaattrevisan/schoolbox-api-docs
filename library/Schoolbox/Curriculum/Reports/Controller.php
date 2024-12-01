@@ -302,13 +302,21 @@ class Controller extends Base
         );
         $data = $cursor->retrieveResults(null);
 
-        // Supporting data
+        // Create export data
         $courseSpecs     = $this->courseSpecificationMapper->findByColumn('id', $courseIds);
         $courseUnitSpecs = $this->findCourseUnitSpecs($courseIds);
         $usage           = $this->loadUsageStructure($courseSpecs, $courseUnitSpecs, $data, $cursor->retrieveUsageCount());
         $structure       = $this->loadCourseStructure($courseSpecs, $courseUnitSpecs);
+        $exporter        = new Export\Csv(
+            $structure,
+            $usage,
+            $this->requestQuery->getBool('course', true),
+            $this->requestQuery->getBool('unit', true),
+            $this->requestQuery->getBool('activity', true),
+            $this->requestQuery->getBool('rubric', true),
+            $this->requestQuery->getBool('inUseRubric', true),
+        );
 
-        // Now process $usage and $structure into a CSV
 
         $filename = sprintf(
             "curriculum-coverage-report.csv",
@@ -317,77 +325,7 @@ class Controller extends Base
         $fp = fopen('php://temp', 'w');
 
         $this->response = $this->responseFromStream(new \GuzzleHttp\Psr7\Stream($fp), $filename, 'text/csv; charset=utf-8');
-
-        $this->outputHeaderRows($fp, $structure);
-        foreach ($usage as $node) {
-            $this->outputCurriculumNodeRows($fp, $structure, $node);
-        }
-    }
-
-    /**
-     * Output the headers for a set of courses and units as a set of CSV rows.
-     *
-     * @param resource   $fp        The file pointer to output to.
-     * @param Collection $structure The data structure which contains the
-     *                              courses and units to output.
-     * @return void
-     */
-    private function outputHeaderRows($fp, Collection $structure): void
-    {
-        $headerRows    = [''];
-        $subheaderRows = ['Curriculum'];
-        foreach ($structure as $course) {
-            $headerRows[]    = 'Course';
-            $subheaderRows[] = $course['name'];
-            $unitRowOutput   = false;
-            foreach ($course['units'] as $unit) {
-                $headerRows[]    = $unitRowOutput ? '' : 'Unit';
-                $subheaderRows[] = $unit['name'];
-                $unitRowOutput   = true;
-            }
-        }
-        fputcsv($fp, $headerRows);
-        fputcsv($fp, $subheaderRows);
-    }
-
-    /**
-     * Output a curriculum node and its children in a set of CSV rows.
-     *
-     * @param resource   $fp        The file pointer to output to.
-     * @param Collection $structure The data structure which contains the
-     *                              courses and units to output.
-     * @param array      $usage     The data structure which contains the usages
-     *                              to output.
-     *                              This also contains the course and unit
-     *                              structure, but not in a reliable order.
-     * @param int        $depth     The current depth of the curriculum node
-     *                              traversal: required for controlling the
-     *                              output of the curriculum node.
-     * @return void
-     */
-    private function outputCurriculumNodeRows($fp, Collection $structure, array $usage, int $depth = 0): void
-    {
-        $curriculumName = $usage['name'];
-        if ($depth > 0) {
-            $curriculumName = sprintf('%s %s', str_repeat('*', $depth), $curriculumName);
-        }
-        $row = [$curriculumName];
-
-        // Not assuming that courses in usage are in same order as in structure:
-        // instead, iterate the structure and extract usages from `$usage`
-        foreach ($structure as $course) {
-            $courseUsage = $usage['usage']['courses']->filter(fn ($c) => $course['id'] === $c['id'])->first();
-            $row[]       = $courseUsage['usage']['course']['count'] ?? 0;
-            foreach ($course['units'] as $unit) {
-                // Calculate item counts here, dependent on selected filters
-                $unitUsage = $courseUsage['units']->filter(fn ($u) => $unit['id'] === $u['id'])->first();
-                $row[]     = $unitUsage['usage']['unit']['count'] ?? 0;
-            }
-        }
-        fputcsv($fp, $row);
-        foreach ($usage['children'] ?? [] as $childNode) {
-            $this->outputCurriculumNodeRows($fp, $structure, $childNode, $depth + 1);
-        }
+        $exporter->export($fp);
     }
 
     /**
