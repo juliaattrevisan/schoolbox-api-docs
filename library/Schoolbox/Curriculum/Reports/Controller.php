@@ -373,19 +373,16 @@ class Controller extends Base
         }
         $row = [$curriculumName];
 
-        // Not assuming that courses in usage are in same order as in structure
+        // Not assuming that courses in usage are in same order as in structure:
+        // instead, iterate the structure and extract usages from `$usage`
         foreach ($structure as $course) {
             $courseUsage = $usage['usage']['courses']->filter(fn ($c) => $course['id'] === $c['id'])->first();
-            $unitCounts  = [];
+            $row[]       = $courseUsage['usage']['course']['count'] ?? 0;
             foreach ($course['units'] as $unit) {
-                // Calculate item counts here, dependent on selected filters?
-                $unitUsage    = $courseUsage['units']->filter(fn ($u) => $unit['id'] === $u['id'])->first();
-                $unitCount    = $unitUsage['usage']['unit']['count'] ?? 0;
-                $unitCounts[] = $unitCount;
+                // Calculate item counts here, dependent on selected filters
+                $unitUsage = $courseUsage['units']->filter(fn ($u) => $unit['id'] === $u['id'])->first();
+                $row[]     = $unitUsage['usage']['unit']['count'] ?? 0;
             }
-
-            // Shoehorn in the course count
-            $row = array_merge($row, [array_sum($unitCounts)], $unitCounts);
         }
         fputcsv($fp, $row);
         foreach ($usage['children'] ?? [] as $childNode) {
