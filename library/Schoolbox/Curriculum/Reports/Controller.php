@@ -313,6 +313,7 @@ class Controller extends Base
             $this->requestQuery->getBool('course', true),
             $this->requestQuery->getBool('unit', true),
             $this->requestQuery->getBool('activity', true),
+            $this->requestQuery->getBool('lessonPlan', true),
             $this->requestQuery->getBool('rubric', true),
             $this->requestQuery->getBool('inUseRubric', true),
         );

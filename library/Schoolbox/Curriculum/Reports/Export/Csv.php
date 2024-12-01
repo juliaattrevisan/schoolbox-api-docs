@@ -23,7 +23,10 @@ class Csv
      * @param Collection $usage              The data structure which contains the usages to output.
      * @param bool       $includeCourse      Should curriculum use on the course folder be included in count?
      * @param bool       $includeUnit        Should curriculum use on the unit folder be included in count?
-     * @param bool       $includeActivity    Should curriculum use on activities within the unt be included in count?
+     * @param bool       $includeActivity    Should curriculum use on activities (exc. lesson plans) within the unit be
+     *                                       included in count?
+     * @param bool       $includeLessonPlan  Should curriculum use on lesson plan activities within the unit be included
+     *                                       in count?
      * @param bool       $includeRubric      Should curriculum use on rubric capabilities and indicators within the unit
      *                                       be included in count?
      * @param bool       $includeInUseRubric Should curriculum use on rubric capabilities and indicators in use on
@@ -35,6 +38,7 @@ class Csv
         private bool $includeCourse,
         private bool $includeUnit,
         private bool $includeActivity,
+        private bool $includeLessonPlan,
         private bool $includeRubric,
         private bool $includeInUseRubric,
     ) {
@@ -104,14 +108,38 @@ class Csv
         // instead, iterate the structure and extract usages from `$usage`
         foreach ($this->structure as $course) {
             $courseUsage = $usage['usage']['courses']->filter(fn ($c) => $course['id'] === $c['id'])->first();
-            $row[]       = $courseUsage['usage']['course']['count'] ?? 0;
+
+            // Calculate course usage count
+            $courseUsageCount = $this->includeCourse
+                ? ($courseUsage['usage']['course']['count'] ?? 0)
+                : 0;
+            $row[] = $courseUsageCount;
+
+            // Calculate unit usage count, dependent on selected filters
             foreach ($course['units'] as $unit) {
-                // Calculate item counts here, dependent on selected filters
-                $unitUsage = $courseUsage['units']->filter(fn ($u) => $unit['id'] === $u['id'])->first();
-                $row[]     = $unitUsage['usage']['unit']['count'] ?? 0;
+                $unitUsage      = $courseUsage['units']->filter(fn ($u) => $unit['id'] === $u['id'])->first();
+                $unitUsageCount = 0;
+                if ($this->includeUnit) {
+                    $unitUsageCount += ($unitUsage['unit']['count'] ?? 0);
+                }
+                if ($this->includeActivity) {
+                    $unitUsageCount += ($unitUsage['activity']['count'] ?? 0);
+                }
+                if ($this->includeLessonPlan) {
+                    $unitUsageCount += ($unitUsage['lessonPlan']['count'] ?? 0);
+                }
+                if ($this->includeRubric) {
+                    $unitUsageCount += ($unitUsage['rubric']['count'] ?? 0);
+                }
+                if ($this->includeInUseRubric) {
+                    $unitUsageCount += ($unitUsage['inUseRubric']['count'] ?? 0);
+                }
+                $row[] = $unitUsageCount;
             }
         }
         fputcsv($fp, $row);
+
+        // And output usage for child nodes
         foreach ($usage['children'] ?? [] as $childNode) {
             $this->outputCurriculumNodeRows($fp, $childNode, $depth + 1);
         }
