@@ -326,6 +326,7 @@ class Controller extends Base
 
         $this->response = $this->responseFromStream(new \GuzzleHttp\Psr7\Stream($fp), $filename, 'text/csv; charset=utf-8');
         $exporter->export($fp);
+        fclose($fp);
     }
 
     /**
