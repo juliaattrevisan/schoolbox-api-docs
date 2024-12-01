@@ -99,6 +99,9 @@ class Csv
     private function outputCurriculumNodeRows($fp, array $usage, int $depth = 0): void
     {
         $curriculumName = $usage['name'];
+        if ($usage['code']) {
+            $curriculumName = sprintf('[%s] %s', $usage['code'], $curriculumName);
+        }
         if ($depth > 0) {
             $curriculumName = sprintf('%s %s', str_repeat('*', $depth), $curriculumName);
         }
