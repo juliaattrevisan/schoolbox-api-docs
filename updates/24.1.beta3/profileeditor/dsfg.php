@@ -237,6 +237,10 @@ HELP;
      */
     private function createButtons(): void
     {
+        $profileButtonIds = [];
+
+        /* Achievement Report
+         */
         $query = "
             INSERT IGNORE INTO profile_button
             (roletype, type, sort_order, title, text, icon, url)
@@ -256,46 +260,92 @@ HELP;
 
         $this->getDatabaseInternal()->executeQuery($query);
 
-        /* Preset availability and visibility requirements
-         */
-        $profileButtonId = (int)$this->getDatabaseInternal()->lastInsertId();
+        $profileButtonIds[] = (int)$this->getDatabaseInternal()->lastInsertId();
 
-        $campusIds = $this->helper->fetchCampusIds();
-        $roleIds = $this->helper->fetchRoleIds([Role::PARENT, Role::STAFF, Role::STUDENT]);
+        /* Contacts
+         */
+        $query = "
+            INSERT IGNORE INTO profile_button
+            (roletype, type, sort_order, title, text, icon, url)
+            VALUES (
+                'student',
+                'custom',
+                (
+                    SELECT MAX(sort_order)+1
+                    FROM profile_button pb
+                    WHERE roletype = 'student'
+                ),
+                'Contacts',
+                'Contacts',
+                'progress',
+                '/synergetic/contacts'
+            )";
+
+        $this->getDatabaseInternal()->executeQuery($query);
+
+        $profileButtonIds[] = (int)$this->getDatabaseInternal()->lastInsertId();
+
+        /* Attendances
+         */
+        $query = "
+            INSERT IGNORE INTO profile_button
+            (roletype, type, sort_order, title, text, icon, url)
+            VALUES (
+                'student',
+                'custom',
+                (
+                    SELECT MAX(sort_order)+1
+                    FROM profile_button pb
+                    WHERE roletype = 'student'
+                ),
+                'Attendance',
+                'Attendance',
+                'progress',
+                '/synergetic/attendances2'
+            )";
+
+        $this->getDatabaseInternal()->executeQuery($query);
+
+        $profileButtonIds[] = (int)$this->getDatabaseInternal()->lastInsertId();
 
         /* Assign relationships
          */
-        $this->getLogger()->info(sprintf(
-            'Campus availability: assigning campus ids %s to profile button %s',
-            implode(',', $campusIds),
-            $profileButtonId
-        ));
+        $campusIds = $this->helper->fetchCampusIds();
+        $roleIds = $this->helper->fetchRoleIds([Role::PARENT, Role::STAFF, Role::STUDENT]);
 
-        $this->helper->createButtonCampusAvailability($profileButtonId, $campusIds);
+        foreach ($profileButtonIds as $profileButtonId) {
+            $this->getLogger()->info(sprintf(
+                'Campus availability: assigning campus ids %s to profile button %s',
+                implode(',', $campusIds),
+                $profileButtonId
+            ));
 
-        $this->getLogger()->info(sprintf(
-            'Campus visibility: assigning campus ids %s to profile button %s',
-            implode(',', $campusIds),
-            $profileButtonId
-        ));
+            $this->helper->createButtonCampusAvailability($profileButtonId, $campusIds);
 
-        $this->helper->createButtonCampusVisibility($profileButtonId, $campusIds);
+            $this->getLogger()->info(sprintf(
+                'Campus visibility: assigning campus ids %s to profile button %s',
+                implode(',', $campusIds),
+                $profileButtonId
+            ));
 
-        $this->getLogger()->info(sprintf(
-            'Role availability: assigning role ids %s to profile button %s',
-            implode(',', $roleIds),
-            $profileButtonId
-        ));
+            $this->helper->createButtonCampusVisibility($profileButtonId, $campusIds);
 
-        $this->helper->createButtonRoleAvailability($profileButtonId, $roleIds);
+            $this->getLogger()->info(sprintf(
+                'Role availability: assigning role ids %s to profile button %s',
+                implode(',', $roleIds),
+                $profileButtonId
+            ));
 
-        $this->getLogger()->info(sprintf(
-            'Role visibility: assigning role ids %s to profile button %s',
-            implode(',', $roleIds),
-            $profileButtonId
-        ));
+            $this->helper->createButtonRoleAvailability($profileButtonId, $roleIds);
 
-        $this->helper->createButtonRoleVisibility($profileButtonId, $roleIds);
+            $this->getLogger()->info(sprintf(
+                'Role visibility: assigning role ids %s to profile button %s',
+                implode(',', $roleIds),
+                $profileButtonId
+            ));
+
+            $this->helper->createButtonRoleVisibility($profileButtonId, $roleIds);
+        }
     }
 
 

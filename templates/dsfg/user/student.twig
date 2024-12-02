@@ -1,14 +1,6 @@
 {% extends '@core/user/student.twig' %}
 {% set achievementsTabLabel = 'Achieved Badges' %}
 
-{% block buttons_miscellaneous %}
-    {% if showButtons %}
-        <!-- Start on School Grades page initially -->
-        <li><a href="/synergetic/contacts" class="icon-progress">Contacts</a></li>
-        <li><a href="/synergetic/attendances2" class="icon-progress">Attendance</a></li>
-    {% endif %}
-{% endblock buttons_miscellaneous %}
-
 {% block buttons_documents %}
     {% if showButtons and config.external_document_report_enabled %}
         {% set routeAcademicReports = routeLookupIfAuthorized('profileDocumentManagement.getIndex', {studentId: user.id}) %}
