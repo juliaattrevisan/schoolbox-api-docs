@@ -1,0 +1,148 @@
+{##
+ # Staff Profile
+ #
+ # showEmails   bool    Spec pattern to decide whether email address is visible
+ # showDetails  bool    Spec patternt to decide whether details are visible
+ #}
+
+{# Permissions #}
+{% set isSuperuser = session.user.isSuperUser() %}
+{% set isStaff = isSuperuser or session.user.getRole().isStaff() %}
+{% set isSelf = session.user.getId() == user.getId() %}
+
+<div class="actions-small-{{ isSuperuser ? 1 : 0 }} row">
+    <div class="list-item">
+        <div class="small-12 column">
+            <h1 data-test="user-profile-name">{{ user.formatName(nameFormat) }}</h1>
+        </div>
+    </div>
+    <nav>
+        {% if routeLookupIfAuthorized('adminUser.getModify') %}
+            <a
+                href="{{ routeLookup('adminUser.getModify', {'userId': user.id}) }}"
+                class="icon-modify"
+                title="Modify User"
+                data-test="user-profile-modify"
+            ></a>
+        {% endif %}
+    </nav>
+</div>
+<div class="row">
+    <div class="small-12 island">
+        <section class="no-pad">
+            <div class="profile content">
+                <div class="row no-margin">
+                    {# Build a hash lookup of additional clauses and cross-reference them
+                     # This list is your last opportunity to show/hide a field based on your
+                     # own boolean rather than the showDetails one I used
+                     #
+                     # Additional visibility constraints for the **viewer's** roletype
+                     # and the corresponding bool set by old twig implementation
+                     #
+                     # The "_default: true" definition means that you'll render the fields I provided to you
+                     # by default. The backend gives you the maximal set that you could possibly see based
+                     # on the Availability and Visibility settings in admin. $additionalConstraints only
+                     # serves to reduce this set further; it can't supersede the Availability and Visibility
+                     # settings and add fields to the payload that was provided by the backend.
+                     #}
+                    {% set additionalConstraints = {
+                        'student': {
+                            '_default': true,
+                        },
+                        'parent': {
+                            '_default': true,
+                        },
+                        'staff': {
+                            '_default': true,
+                        }
+                    } %}
+
+                    {% import '@searchUser/field/macro.twig' as macro %}
+
+                    <div class="small-12 medium-2 columns no-pad">
+                        {{ macro.portrait(user, externalUser, additionalConstraints) }}
+                    </div>
+
+                    <div class="small-12 medium-10 columns">
+                        <dl class="profile">
+                            {# Portrait is always element 0 at the moment: we can skip iterating
+                             # that array element here, because it's rendered elsewhere.
+                             #}
+                            {% for selectedField in externalUser.data.roleTypes.fields.selected|filter(selectedField => selectedField.field != 'portrait') %}
+                                {# Decide if the viewer can actually see this field, due to additional
+                                 # permissions, privacy and configuration settings that go well beyond
+                                 # the viewer's role type; if you can see it, show it. Otherwise skip it.
+                                 #}
+                                {% set viewerCanSeeField = additionalConstraints[USER.role.type][selectedField.field] ?? additionalConstraints[USER.role.type]['_default'] ?? true %}
+
+                                {# Make sure the field has a meaningful value before rendering anything out #}
+                                {% set fieldHasValue = selectedField.value is not null and (selectedField.value is iterable ? selectedField.value|length : selectedField.value) %}
+
+                                {% if viewerCanSeeField and fieldHasValue %}
+                                    {# Now render each of the flags/tuples in some manner #}
+
+                                    {# Note that some fields require special handling (different data structures)
+                                     #
+                                     # The field name will always show at this point, though their values
+                                     # will need special treatment somehow
+                                     #}
+                                    <dt class="small-4 medium-3 columns">{{ macro.fieldName(selectedField) }}</dt>
+                                    <dd class="small-8 medium-9 columns">
+                                        {% if selectedField.field in ['email'] %}
+                                            {{ macro.email(session, selectedField.value, selectedField.value) }}
+                                        {% else %}
+                                            {# A generic tuple (key, value) pair #}
+                                            {{ selectedField.value }}
+                                        {% endif %}
+                                    </dd>
+                                {% endif %}
+                            {% endfor %}
+                        </dl>
+                    </div>
+                </div>
+            </div>
+            {% block buttons_island %}
+                <ul class='flex-list flex-wrap buttons'>
+                    {% block buttons %}
+                        {# Special constraints that further reduce the payload I built
+                         # It uses the exact same philosophy as additionalConstraints for
+                         # rendering profile fields.
+                         #}
+                        {% set additionalConstraints = {
+                            'student': {
+                                '_default': true,
+                            },
+                            'parent': {
+                                '_default': true,
+                            },
+                            'staff': {
+                                '_default': true,
+                                'eportfolio': eportfolioAuth,
+                            },
+                        } %}
+
+                        {% for button in buttons %}
+                            {% if additionalConstraints[USER.role.type][button.type] ?? additionalConstraints[USER.role.type]['_default']  %}
+                                {% set text = button.text %}
+
+                                {# A standard button whose urls need to be dynamically determined #}
+                                {% set route = button.url %}
+
+                                {# Unique derivations #}
+                                {% if button.type in ['calendar'] %}
+                                    {% set route = '/calendar/' ~  now.getURLDate() ~ '/' ~ user.id %}
+                                {% endif %}
+
+                                {% if route %}
+                                    <li>
+                                        <a href="{{ route }}" title="{{ button.title }}" class="icon-{{ button.icon }} {{ button.css }}" target="{{ button.target }}">{{ text }}</a>
+                                    </li>
+                                {% endif %}
+                            {% endif %}
+                        {% endfor %}
+                    {% endblock buttons %}
+                </ul>
+            {% endblock buttons_island %}
+        </section>
+    </div>
+</div>
