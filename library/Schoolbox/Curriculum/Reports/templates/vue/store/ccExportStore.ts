@@ -3,6 +3,7 @@
  */
 
 import { defineStore } from "pinia";
+import { useQueryStore } from "./ccQueryStore";
 
 export const useExportStore = defineStore("ccExport", () => {
     const endpoint = window.Vue.ref(""); // the endpoint to use for the report
@@ -19,7 +20,8 @@ export const useExportStore = defineStore("ccExport", () => {
      *
      */
     async function exportReport(): Promise<void> {
-        await fetch(endpoint.value, {
+        const newQueryParams = useQueryStore().getQueryParams();
+        await fetch(`${endpoint.value}?${newQueryParams.toString()}`, {
             method: "GET",
             // signal: controller.signal,
             // headers: {
