@@ -91,7 +91,7 @@ HELP;
 
         /* Exit early if you're doing this on the wrong school
          */
-        if (self::SCHOOL_CODE !== $this->getConfig()->get('site_school_code')) {
+        if (self::SCHOOL_CODE !== strtolower($this->getConfig()->get('site_school_code'))) {
             $this->getLogger()->debug(sprintf(
                 'This customisation requires the %s school code; exiting.',
                 self::SCHOOL_CODE
@@ -305,7 +305,7 @@ HELP;
         $result = $this->getDatabaseInternal()->executeQuery("
             SELECT id
             FROM profile_field
-            WHERE (roletype = 'staff' OR roletype = 'parent') 
+            WHERE (roletype = 'staff' OR roletype = 'parent')
             AND field = 'externalId'
         ");
 
