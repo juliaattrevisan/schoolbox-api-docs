@@ -44,7 +44,7 @@ $app = new class extends CliTool\App {
             'superusers'        => 'SELECT count(*) FROM user u JOIN superusers s on u.id = s.id WHERE u.deleted_at IS NULL',
 
             //Moderators
-            'calendar_moderator' => 'SELECT count(distinct u.id) FROM user u JOIN userAccess uA on u.id = uA.uid WHERE service = ' . UserAccess::SERVICE_CALENDAR . ' AND type=3',
+            'calendar_moderator' => 'SELECT count(distinct u.id) FROM user u JOIN userAccess uA on u.id = uA.uid WHERE u.deleted_at is null and service = ' . UserAccess::SERVICE_CALENDAR . ' AND type=3',
             'news_moderator'        => 'SELECT count(*) FROM user u JOIN userAccess uA on u.id = uA.uid WHERE u.deleted_at is null and service = ' . UserAccess::SERVICE_NEWS . ' AND type=3 ',
             'cms_moderator'         => 'SELECT count(*) FROM user u JOIN userAccess uA on u.id = uA.uid WHERE u.deleted_at is null and service = ' . UserAccess::SERVICE_CMS . ' AND type=3 ',
             'curriculum_moderator'  => 'SELECT count(*) FROM user u JOIN userAccess uA on u.id = uA.uid WHERE u.deleted_at is null and service = ' . UserAccess::SERVICE_CURRICULUM . ' AND type=3 ',
