@@ -4,17 +4,8 @@
  */
 
 import { useFiltersStore } from "./store/ccFiltersStore";
-import { useExportStore } from "./store/ccExportStore";
 
 const filtersStore = useFiltersStore();
-const exportStore = useExportStore();
-
-/**
- * When the export button is clicked, export the report to CSV
- */
-// function onExportClicked(): void {
-//     useExportStore().exportReport();
-// }
 </script>
 
 <template>
@@ -47,14 +38,6 @@ const exportStore = useExportStore();
                 </div>
             </div>
         </div>
-        <!-- <button
-            class="l-flex f-no-bkg f-no-margins"
-            aria-label="Export to CSV"
-            title="Export to CSV"
-            @click="onExportClicked"
-        >
-            <sbx-icon name="export" />
-        </button> -->
         <a
             class="l-flex f-no-bkg f-no-margins"
             aria-label="Export to CSV"
