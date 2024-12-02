@@ -16,7 +16,7 @@
 
                 {# Only show the address fields which have a meaningful value
                  # Otherwise hide them, so we don't show empty lines with only a comma
-                #}
+                 #}
                 {% for field in ['StudentContactAddress1', 'StudentContactAddress2', 'StudentContactAddress3'] %}
                     {% if contact[field] ?? ''|length %}
                         <p>{{ contact[field] }}</p>
@@ -25,7 +25,7 @@
 
                 {# Optional state and/or postcode piece of the address
                  # Only show this if at least one of those parts exist
-                #}
+                 #}
                 <p>
                     {% for field in ['StudentContactSuburb', 'StudentContactState', 'StudentContactPostCode'] %}
                         {% if contact[field] ?? ''|length %}
