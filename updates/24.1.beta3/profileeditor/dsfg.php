@@ -263,6 +263,28 @@ HELP;
 
             $this->helper->createButtonRoleVisibility($profileButtonId, $roleIds);
         }
+
+        /* There's no real equivalent to this, but Documents (Academic Reports) was only
+         * meant to be visible to SELF, but we don't have that option in Profile Buttons.
+         * It's based on Roles.
+         */
+        $result = $this->getDatabaseInternal()->executeQuery("
+            SELECT id
+            FROM profile_button
+            WHERE type = 'documentmanagement'
+            AND roletype = 'student'
+            LIMIT 1
+        ");
+
+        $row = $result->fetch(PDO::FETCH_ASSOC);
+
+        $this->getLogger()->info(sprintf(
+            'Role visibility: assigning role ids %s to profile button %s',
+            implode(',', $roleIds),
+            $row['id']
+        ));
+
+        $this->helper->createButtonRoleVisibility($row['id'], $roleIds);
     }
 
 
