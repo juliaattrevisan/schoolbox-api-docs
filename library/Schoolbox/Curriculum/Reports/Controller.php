@@ -23,13 +23,13 @@ use Schoolbox\Curriculum\Reports\Translator\Usage\RubricUsage;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Mapper as CourseUnitSpecificationMapper;
 use Schoolbox\Learning\Course\DataModel\Specification\Mapper as CourseSpecificationMapper;
-use Schoolbox\Learning\Assessment\DataModel\Mapper as AssessmentMapper;
-use Schoolbox\Assessment\Rubric\DataModel\Capability\Mapper as RubricCapabilityMapper;
-use Schoolbox\Permission\Access\Access;
-use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\Folder\Translator\ModelToArray\LinkOnly as FolderTranslator;
 use Schoolbox\Learning\Course\DataModel\Specification\Translator\ModelToArray as CourseSpecTranslator;
 use Schoolbox\Curriculum\Api\Translator\ModelToArray as NodeTranslator;
+use Schoolbox\TaskDaemon\Producer;
+use Schoolbox\TaskDaemon\Request\DownloadPages\MessageFactory;
+use Schoolbox\Url\Factory as UrlFactory;
+use Schoolbox\User\Translator\Author\ModelToArray as UserTranslator;
 use Twig\Error\Error as TwigError;
 use ValueError;
 use Crell\ApiProblem\ApiProblem;
@@ -43,12 +43,16 @@ class Controller extends Base
      * @param CourseSpecificationMapper     $courseSpecificationMapper
      * @param CourseUnitSpecificationMapper $courseUnitSpecificationMapper
      * @param Helper                        $helper
+     * @param Producer                      $messageProducer
+     * @param MessageFactory                $messageFactory
      */
     public function __construct(
         private CurriculumMapper $curriculumMapper,
         private CourseSpecificationMapper $courseSpecificationMapper,
         private CourseUnitSpecificationMapper $courseUnitSpecificationMapper,
         private Helper $helper,
+        private Producer $messageProducer,
+        private MessageFactory $messageFactory,
     ) {
     }
 
@@ -291,6 +295,57 @@ class Controller extends Base
             is_array($ids) ? $ids : explode(',', $ids ?? ''),
             fn($id) => $id > 0
         );
+    }
+
+    /**
+     * Endpoint for requesting a coverage report to be downloaded via taskd.
+     *
+     * @api   GET /curriculum/reports/coverage/requestExport
+     * @since 24.1
+     *
+     * @return void
+     */
+    public function requestExportCoverage(): void
+    {
+        $baseUrl           = (new UrlFactory($this->getConfigLoader()))->buildFullyQualified();
+        $exportCoverageUrl = $baseUrl->withPath($this->routeGenerator->generate('curriculumreports.exportCoverage'));
+
+        // Split each course into a separate download
+        $courseIds = $this->extractCourseIdsFromQuery();
+        foreach ($courseIds as $courseId) {
+            $course = $this->courseSpecificationMapper->findById($courseId);
+            $query  = $this->requestQuery->getArrayCopy();
+            $query['courseId'] = $courseId;
+
+            $this->messageFactory = $this->messageFactory->addFileContent(
+                sprintf('%s-%d.csv', $course->getTitle(), $courseId),
+                $exportCoverageUrl->withQuery(http_build_query($query))->__toString(),
+            );
+        }
+
+        // Send it to taskd
+        $userSerializer = new UserTranslator();
+        $message        = $this->messageFactory
+            ->setUser($this->getUser())
+            ->setCallbackUrl(
+                (string)$baseUrl->withPath(
+                    $this->routeGenerator->generate(
+                        'apiusernotify.apiUserNotify',
+                        ['userId' => $this->getUser()->getId()]
+                    )
+                )
+            )
+            ->setCallbackParams([
+                'message' => 'Your curriculum coverage report is ready to download',
+                'from'    => call_user_func($userSerializer, $this->getUser()),
+                'to'      => call_user_func($userSerializer, $this->getUser()),
+            ])
+            ->setOutfile('curriculum-coverage-report.zip')
+            ->build();
+        $this->messageProducer->send($message);
+
+        // Once done, output empty
+        $this->response = $this->responseEmpty();
     }
 
     /**

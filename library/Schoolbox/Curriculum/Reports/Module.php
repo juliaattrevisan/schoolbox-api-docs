@@ -47,6 +47,7 @@ class Module extends BaseModule
         $this->register('GET', '/coverage', 'getCoverage', $staffPerms);
         $this->register('GET', '/coverage/generate', 'generateCoverage', $staffPerms);
         $this->register('GET', '/coverage/usage', 'getCoverageUsage', $staffPerms);
+        $this->register('GET', '/coverage/export/request', 'requestExportCoverage', $staffPerms);
         $this->register('GET', '/coverage/export', 'exportCoverage', $staffPerms);
     }
 
@@ -64,6 +65,8 @@ class Module extends BaseModule
             $this->getMapperFactory()->get(CourseSpecificationMapper::class),
             $this->getMapperFactory()->get(CourseUnitSpecificationMapper::class),
             new Helper($curriculumMapper, $rubricCapabilityMapper, $assessmentMapper, $access),
+            $this->injector->get('taskd.messageProducer'),
+            $this->injector->get('taskd.downloadPagesMessageFactory'),
         );
     }
 
