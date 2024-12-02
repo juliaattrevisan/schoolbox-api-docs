@@ -102,7 +102,7 @@ window.Vue.watch(
                 "
                 class="usage__section"
             >
-                <h5 class="section-title">Lesson Plans</h5>
+                <h5 class="section-title">{{ locale.lessonPlan.properPlural() }}</h5>
                 <cc-usage-pop-out-items :items="popOutStore.usage.lessonPlan" />
             </div>
             <div
