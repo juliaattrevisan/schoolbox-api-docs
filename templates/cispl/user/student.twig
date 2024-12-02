@@ -2,11 +2,19 @@
 
 {% block details_studentDates %}
     {% if isStaff %}
-    <dt class="small-12 medium-3">Enrolment Date:</dt>
-    <dd class="small-12 medium-9"> {{ externalUser.StudentEnrolmentDate|date(dateFormats.shortDateOnlyFormat) }}</dd>
+
     {% endif %}
 {% endblock %}
 
+{% block profileFieldTuple %}
+    {% if selectedField.field == 'StudentEnrolmentDate' %}
+        <dt class="small-12 medium-3">Enrolment Date:</dt>
+        <dd class="small-12 medium-9"> {{ selectedField.value|date(dateFormats.shortDateOnlyFormat) }}</dd>
+    {% else %}
+        {# Default rendering: inherit from core template #}
+        {{ parent() }}
+    {% endif %}
+{% endblock profileFieldTuple %}
 
 {% block contact_extra %}
     <li class="actions-small-1">

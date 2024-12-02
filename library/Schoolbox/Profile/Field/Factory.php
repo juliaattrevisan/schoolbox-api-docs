@@ -290,7 +290,7 @@ class Factory
             'pastoralCounts' => null
         ];
 
-        return array_merge($externalUser, $referenceFields);
+        return array_merge($externalUser, $referenceFields, ['StudentEnrolmentDate' => '2023-11-07']);
     }
 
 
