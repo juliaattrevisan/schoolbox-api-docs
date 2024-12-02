@@ -3,11 +3,14 @@
  * To be able to filter the report and control any other settings
  */
 
+import BasicModal from "@schoolboxVue/components/modal/basic-modal.vue";
 import { useFiltersStore } from "./store/ccFiltersStore";
 import { useExportStore } from "./store/ccExportStore";
 
 const filtersStore = useFiltersStore();
 const exportStore = useExportStore();
+
+const isModalOpen = window.Vue.ref(false); // to open/close the exporting to csv modal
 </script>
 
 <template>
@@ -45,10 +48,18 @@ const exportStore = useExportStore();
             aria-label="Export to CSV"
             title="Export to CSV"
             :href="exportStore.getEndpoint()"
+            @click="isModalOpen = true"
         >
             <sbx-icon name="export" />
         </a>
     </div>
+    <basic-modal v-model:is-open="isModalOpen">
+        <div class="l-flex-col l-gap-m f-no-margins">
+            <h2>Exporting to CSV</h2>
+            <p>Your report is being exported to CSV. You will be sent a notification when it is ready.</p>
+            <button @click="isModalOpen = false">Close</button>
+        </div>
+    </basic-modal>
 </template>
 
 <style scoped></style>
