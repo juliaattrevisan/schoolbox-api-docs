@@ -4,8 +4,10 @@
  */
 
 import { useFiltersStore } from "./store/ccFiltersStore";
+import { useExportStore } from "./store/ccExportStore";
 
 const filtersStore = useFiltersStore();
+const exportStore = useExportStore();
 </script>
 
 <template>
