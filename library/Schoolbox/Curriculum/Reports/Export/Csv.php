@@ -123,19 +123,19 @@ class Csv
                 $unitUsage      = $courseUsage['units']->filter(fn ($u) => $unit['id'] === $u['id'])->first();
                 $unitUsageCount = 0;
                 if ($this->includeUnit) {
-                    $unitUsageCount += ($unitUsage['unit']['count'] ?? 0);
+                    $unitUsageCount += ($unitUsage['usage']['unit']['count'] ?? 0);
                 }
                 if ($this->includeActivity) {
-                    $unitUsageCount += ($unitUsage['activity']['count'] ?? 0);
+                    $unitUsageCount += ($unitUsage['usage']['activity']['count'] ?? 0);
                 }
                 if ($this->includeLessonPlan) {
-                    $unitUsageCount += ($unitUsage['lessonPlan']['count'] ?? 0);
+                    $unitUsageCount += ($unitUsage['usage']['lessonPlan']['count'] ?? 0);
                 }
                 if ($this->includeRubric) {
-                    $unitUsageCount += ($unitUsage['rubric']['count'] ?? 0);
+                    $unitUsageCount += ($unitUsage['usage']['rubric']['count'] ?? 0);
                 }
                 if ($this->includeInUseRubric) {
-                    $unitUsageCount += ($unitUsage['inUseRubric']['count'] ?? 0);
+                    $unitUsageCount += ($unitUsage['usage']['inUseRubric']['count'] ?? 0);
                 }
                 $row[] = $unitUsageCount;
             }
