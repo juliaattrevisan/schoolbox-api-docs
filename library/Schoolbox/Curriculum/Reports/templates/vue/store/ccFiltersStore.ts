@@ -38,9 +38,20 @@ export const useFiltersStore = defineStore("ccFilters", () => {
     ]); // the currently selected report options, just the value list
     const onlyShowGaps = window.Vue.ref<boolean>(false); // whether to only show nodes that contain 0 usage counts
 
+    // to pass through to the csv export, to know which usages to include
+    const queryParams = window.Vue.computed(() => {
+        return allReportOptions.value.map((option) => {
+            return {
+                name: option.value,
+                value: selectedReportOptions.value.includes(option.value).toString(),
+            };
+        });
+    });
+
     return {
         allReportOptions,
         selectedReportOptions,
         onlyShowGaps,
+        queryParams,
     };
 });
