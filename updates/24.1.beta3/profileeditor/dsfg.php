@@ -285,6 +285,16 @@ HELP;
         ));
 
         $this->helper->createButtonRoleVisibility($row['id'], $roleIds);
+
+        /* Rename Documents button
+         */
+        $this->getDatabaseInternal()->executeQuery("
+            UPDATE profile_button
+            SET text = 'Documents', 
+                title =  'Documents'
+            WHERE type = 'documentmanagement'
+            AND roletype = 'student'
+        ");
     }
 
 
