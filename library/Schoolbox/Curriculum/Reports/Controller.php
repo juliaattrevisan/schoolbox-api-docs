@@ -56,6 +56,9 @@ class Controller extends Base
     /**
      * Get the coverage report
      *
+     * @api   GET /curriculum/reports/coverage
+     * @since 24.1
+     *
      * @return void
      * @throws TwigError
      */
@@ -105,6 +108,9 @@ class Controller extends Base
 
     /**
      * Return the counts for the curriculum coverage
+     *
+     * @api   GET /curriculum/reports/coverage/generate
+     * @since 24.1
      *
      * @return void
      */
@@ -185,6 +191,9 @@ class Controller extends Base
 
     /**
      * Pay load for curriculum node usage within the selected course and unit
+     *
+     * @api   GET /curriculum/reports/coverage/usage
+     * @since 24.1
      *
      * @return void
      */
@@ -285,7 +294,10 @@ class Controller extends Base
     }
 
     /**
-     * Export the current coverage report
+     * Export the current coverage report to a CSV.
+     *
+     * @api   GET /curriculum/reports/coverage/export
+     * @since 24.1
      *
      * @return void
      */
