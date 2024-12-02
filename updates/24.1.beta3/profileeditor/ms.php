@@ -249,7 +249,8 @@ HELP;
         $profileButtonId = (int)$this->getDatabaseInternal()->lastInsertId();
 
         $campusIds = $this->helper->fetchCampusIds();
-        $roleIds = $this->helper->fetchRoleIds([Role::PARENT, Role::STAFF]);
+        $availabilityRoleIds = $this->helper->fetchRoleIds([Role::STUDENT]);
+        $visibilityRoleIds = $this->helper->fetchRoleIds([Role::PARENT, Role::STAFF]);
 
         /* Assign relationships
          */
@@ -271,19 +272,19 @@ HELP;
 
         $this->getLogger()->info(sprintf(
             'Role availability: assigning role ids %s to profile button %s',
-            implode(',', $roleIds),
+            implode(',', $availabilityRoleIds),
             $profileButtonId
         ));
 
-        $this->helper->createButtonRoleAvailability($profileButtonId, $roleIds);
+        $this->helper->createButtonRoleAvailability($profileButtonId, $availabilityRoleIds);
 
         $this->getLogger()->info(sprintf(
             'Role visibility: assigning role ids %s to profile button %s',
-            implode(',', $roleIds),
+            implode(',', $visibilityRoleIds),
             $profileButtonId
         ));
 
-        $this->helper->createButtonRoleVisibility($profileButtonId, $roleIds);
+        $this->helper->createButtonRoleVisibility($profileButtonId, $visibilityRoleIds);
     }
 
 
