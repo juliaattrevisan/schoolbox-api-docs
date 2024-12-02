@@ -77,8 +77,9 @@ class Factory
                 // Check custom sample rates list:
                 // if the current transaction's name matches the pattern in the
                 // CSV, then sample at that frequency.
-                $lines      = explode("\n", $configLoader->get(ConfigMapper::NAME_SENTRY_TRACE_CUSTOM_SAMPLE_RATES));
-                $sampleRate = null;
+                $sampleRates = $configLoader->get(ConfigMapper::NAME_SENTRY_TRACE_CUSTOM_SAMPLE_RATES) ?? '';
+                $lines       = explode("\n", $sampleRates);
+                $sampleRate  = null;
                 foreach ($lines as $line) {
                     $row = str_getcsv($line);
                     if (count($row) >= 2) {
@@ -91,8 +92,8 @@ class Factory
                 }
 
                 // No match in custom sample rates?
-                // Use the default sample rate.
-                $sampleRate ??= $configLoader->get(ConfigMapper::NAME_SENTRY_TRACE_DEFAULT_SAMPLE_RATE);
+                // Use the default rate, or zero if not configured at all.
+                $sampleRate ??= $configLoader->get(ConfigMapper::NAME_SENTRY_TRACE_DEFAULT_SAMPLE_RATE) ?? 0;
                 return min(1, max(0, floatval($sampleRate)));
             },
         ]);
