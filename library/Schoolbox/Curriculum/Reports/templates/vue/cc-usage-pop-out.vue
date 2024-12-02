@@ -3,6 +3,7 @@
  * Shows a particular nodes usage in a pop out window
  */
 
+import locale from "@js/terminology/rosettaStone";
 import { useTemplateRef } from "vue";
 import { usePopOut } from "@schoolboxVue/composables/popOut/usePopOut";
 import { usePopOutStore } from "./store/ccPopOutStore";
@@ -78,10 +79,10 @@ window.Vue.watch(
                 v-if="filtersStore.selectedReportOptions.includes(ReportOptionValues.UNIT) && popOutStore.usage?.onUnit"
                 class="usage__section"
             >
-                <h5 class="section-title">Unit</h5>
+                <h5 class="section-title">{{ locale.unit.proper() }}</h5>
                 <div class="l-flex l-gap-s">
                     <sbx-icon name="unit" />
-                    <p class="f-no-margins">Assigned to Unit</p>
+                    <p class="f-no-margins">Assigned to {{ locale.unit.proper() }}</p>
                 </div>
             </div>
             <div
@@ -91,7 +92,7 @@ window.Vue.watch(
                 "
                 class="usage__section"
             >
-                <h5 class="section-title">Learning Activities</h5>
+                <h5 class="section-title">Learning {{ locale.activity.properPlural() }}</h5>
                 <cc-usage-pop-out-items :items="popOutStore.usage.activity" />
             </div>
             <div
@@ -110,16 +111,24 @@ window.Vue.watch(
                 "
                 class="usage__section"
             >
-                <h5 class="section-title">Rubric</h5>
+                <h5 class="section-title">
+                    {{ locale.rubricGroup.properPlural() }} & {{ locale.rubricCriterion.properPlural() }}
+                </h5>
                 <template v-if="popOutStore.usage.rubric.course">
                     <h6 class="section-sub-title">
-                        <a :href="popOutStore.usage.rubric.course._links.view">Course Rubrics</a>
+                        <a :href="popOutStore.usage.rubric.course._links.view"
+                            >Course {{ locale.rubricGroup.properPlural() }} &
+                            {{ locale.rubricCriterion.properPlural() }}</a
+                        >
                     </h6>
                     <cc-usage-pop-out-rubric :rubric="popOutStore.usage.rubric.course" />
                 </template>
                 <template v-if="popOutStore.usage.rubric.unit">
                     <h6 class="section-sub-title">
-                        <a :href="popOutStore.usage.rubric.unit._links.view">Unit Rubrics</a>
+                        <a :href="popOutStore.usage.rubric.unit._links.view"
+                            >{{ locale.unit.proper() }} {{ locale.rubricGroup.properPlural() }} &
+                            {{ locale.rubricCriterion.properPlural() }}</a
+                        >
                     </h6>
                     <cc-usage-pop-out-rubric :rubric="popOutStore.usage.rubric.unit" />
                 </template>
@@ -131,7 +140,7 @@ window.Vue.watch(
                 "
                 class="usage__section"
             >
-                <h5 class="section-title">In-use Rubric</h5>
+                <h5 class="section-title">Rubrics</h5>
                 <template v-for="activity in popOutStore.usage.inUseRubric" :key="activity._links.view">
                     <h6 class="section-sub-title">
                         <a :href="activity._links.view" :title="`View ${activity.name}`" class="l-flex l-gap-s">

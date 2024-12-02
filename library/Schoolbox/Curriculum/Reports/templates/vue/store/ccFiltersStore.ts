@@ -18,7 +18,7 @@ export const useFiltersStore = defineStore("ccFilters", () => {
         },
         {
             value: ReportOptionValues.LEARNING_ACTIVITY,
-            label: `${locale.activity.properPlural()}`,
+            label: `Learning ${locale.activity.properPlural()}`,
         },
         {
             value: ReportOptionValues.LEARNING_ACTIVITY_LESSON_PLAN,
