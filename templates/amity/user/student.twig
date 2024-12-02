@@ -1,6 +1,6 @@
 {% extends '@core/user/student.twig' %}
 
-{% block after_contact_details %}
+{% block contact_extra %}
     <li class="actions-small-1">
         <div class="list-item">
             <div class="card small-12">
@@ -31,4 +31,4 @@
             <a class="icon-mobile" href="tel:{{ contact.StudentContactPhoneActual }}" title="Call {{ contact.StudentContactPhoneActual }}"></a>
         </nav>
     </li>
-{% endblock after_contact_details %}
+{% endblock contact_extra %}
