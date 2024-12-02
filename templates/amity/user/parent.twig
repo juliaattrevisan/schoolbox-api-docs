@@ -1,31 +1,36 @@
 {% extends '@core/user/parent.twig' %}
-{% block home_address %}
-    {% if isStaff or isSelf %}
-    <dt class="small-12 medium-3">Address:</dt>
-    <dd class="small-12 medium-9">
-        {% for field in ['Address1', 'Address2', 'Address3'] %}
-            {% if externalUser[field] ?? ''|length %}
-                {{ externalUser[field] }}<br>
-            {% endif %}
-        {% endfor %}
-        {% for field in ['Suburb', 'State', 'PostCode'] %}
-            {% if externalUser[field] ?? ''|length %}
-                {{ externalUser[field] }}
-            {% endif %}
-        {% endfor %}
-    </dd>
-    {% endif %}
-{% endblock home_address %}
 
-{% block details_email %}
-    {% if user.getEmail() %}
-        <dt class="small-12 medium-3">Email:</dt>
-        <dd class="small-12 medium-9">
-            <a href="{{ session.mailhandle }}{{ user.getEmail() }}">{{ user.getEmail() }}</a>
-        </dd>
+{# Intercept default handling of a tuple. Custom Works' tuples must get dealt with specially here,
+ # before falling back to just putting selectedField.value on screen
+ #}
+{% block profileFieldTuple %}
+    {% if selectedField.field == 'ContactAddress' %}
+        {% set address1 = externalUser.data.roleTypes.fields.selected|filter(selectedField => selectedField.field == 'Address1')|first %}
+        {% set address2 = externalUser.data.roleTypes.fields.selected|filter(selectedField => selectedField.field == 'Address2')|first %}
+        {% set address3 = externalUser.data.roleTypes.fields.selected|filter(selectedField => selectedField.field == 'Address3')|first %}
+        {% set suburb = externalUser.data.roleTypes.fields.selected|filter(selectedField => selectedField.field == 'Suburb')|first %}
+        {% set state = externalUser.data.roleTypes.fields.selected|filter(selectedField => selectedField.field == 'State')|first %}
+        {% set postcode = externalUser.data.roleTypes.fields.selected|filter(selectedField => selectedField.field == 'PostCode')|first %}
+
+        {% if selectedField.value ?? false %}
+            <dt class="small-4 medium-3 columns">Address</dt>
+            <dd class="small-8 medium-9 columns">
+                {% for field in [address1, address2, address3] %}
+                    {% if field.value ?? ''|length %}
+                        {{ field.value }}<br>
+                    {% endif %}
+                {% endfor %}
+                {% for field in [suburb, state, postcode] %}
+                    {% if field.value ?? ''|length %}
+                        {{ field.value }}
+                    {% endif %}
+                {% endfor %}
+            </dd>
+        {% endif %}
+    {% elseif selectedField.field in ['Address1', 'Address2', 'Address3', 'Suburb', 'State', 'PostCode'] %}
+        {# noop: never render these separately #}
+    {% else %}
+        {# Default rendering: inherit from core template #}
+        {{ parent() }}
     {% endif %}
-    {% if user.externalId %}
-        <dt class="small-4 medium-3 columns">Parent ID:</dt>
-        <dd class="small-8 medium-9 columns">{{ user.externalId }}</dd>
-    {% endif %}
-{% endblock details_email %}
+{% endblock %}

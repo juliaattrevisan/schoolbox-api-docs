@@ -79,23 +79,37 @@
                                     {# Now render each of the flags/tuples in some manner #}
 
                                     {# Note that some fields require special handling (different data structures)
-                                        #
-                                        # The field name will always show at this point, though their values
-                                        # will need special treatment somehow
-                                        #}
-                                    <dt class="small-4 medium-3 columns">{{ macro.fieldName(selectedField) }}</dt>
-                                    <dd class="small-8 medium-9 columns">
-                                        {% if selectedField.field in ['spouseName'] %}
+                                     #
+                                     # The field name will always show at this point, though their values
+                                     # will need special treatment somehow
+                                     #}
+                                    {% if selectedField.field in ['spouseName'] %}
+                                        <dt class="small-4 medium-3 columns">{{ macro.fieldName(selectedField) }}</dt>
+                                        <dd class="small-8 medium-9 columns">
                                             {# A unique data structure, sadly #}
                                             <a href="/search/user/{{ selectedField.value.id }}">{{ selectedField.value.value }}</a>
-                                        {% elseif selectedField.field in ['email', 'SpouseEmail'] %}
+                                        </dd>
+                                    {% elseif selectedField.field in ['email', 'SpouseEmail'] %}
+                                        <dt class="small-4 medium-3 columns">{{ macro.fieldName(selectedField) }}</dt>
+                                        <dd class="small-8 medium-9 columns">
                                             {# Renders a mailto: hyperlink #}
                                             {{ macro.email(session, selectedField.value, selectedField.value) }}
-                                        {% else %}
-                                            {# A generic tuple (key, value) pair #}
-                                            {{ selectedField.value }}
-                                        {% endif %}
-                                    </dd>
+                                        </dd>
+                                    {% else %}
+                                        {# A generic tuple (key, value) pair
+                                         #
+                                         # Also gives you a way to render a field specially when it isn't already
+                                         # one of the treatments listed above...such as a custom work's field
+                                         #
+                                         # Some custom works require two data points to produce one field to represent them
+                                         #}
+                                        {% block profileFieldTuple %}
+                                            <dt class="small-4 medium-3 columns">{{ macro.fieldName(selectedField) }}</dt>
+                                            <dd class="small-8 medium-9 columns">
+                                                {{ selectedField.value }}
+                                            </dd>
+                                        {% endblock profileFieldTuple %}
+                                    {% endif %}
                                 {% endif %}
                             {% endfor %}
                         </dl>
@@ -108,10 +122,6 @@
                      # It uses the exact same philosophy as additionalConstraints for
                      # rendering profile fields.
                      #}
-                    {% set additionalConstraints = {
-
-                    } %}
-
                     {% set additionalConstraints = {
                         'student': {
                             '_default': true,
