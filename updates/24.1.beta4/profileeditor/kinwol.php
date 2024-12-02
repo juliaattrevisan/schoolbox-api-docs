@@ -91,7 +91,7 @@ HELP;
 
         /* Exit early if you're doing this on the wrong school
          */
-        if (self::SCHOOL_CODE !== $this->getConfig()->get('site_school_code')) {
+        if (self::SCHOOL_CODE !== strtolower($this->getConfig()->get('site_school_code'))) {
             $this->getLogger()->debug(sprintf(
                 'This customisation requires the %s school code; exiting.',
                 self::SCHOOL_CODE
@@ -139,13 +139,13 @@ HELP;
             UPDATE profile_field
             SET click_to_reveal = 1
             WHERE field IN (
-                'StudentSpecialNeedsFlag', 
-                'EnglishSecondFlag', 
-                'StudentMedicalAlert', 
+                'StudentSpecialNeedsFlag',
+                'EnglishSecondFlag',
+                'StudentMedicalAlert',
                 'countIndividualEducationPlans',
                 'Comment',
-                'AlertMessages', 
-                'AlertLegal', 
+                'AlertMessages',
+                'AlertLegal',
                 'ParentsSeparatedFlag'
            )
             AND roletype = 'student'
