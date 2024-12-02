@@ -265,7 +265,7 @@ HELP;
         /* Preset configuration
          */
         $campusIds = $this->helper->fetchCampusIds();
-        $roletypes = [Role::STAFF, Role::PARENT];
+        $roletypes = [Role::STAFF, \Schoolbox\Admin\Profile\Editor\Payload::ROLETYPE_SELF];
 
         /* Assign relationships
          */
