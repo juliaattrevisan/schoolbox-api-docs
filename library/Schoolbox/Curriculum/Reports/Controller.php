@@ -300,7 +300,7 @@ class Controller extends Base
     /**
      * Endpoint for requesting a coverage report to be downloaded via taskd.
      *
-     * @api   GET /curriculum/reports/coverage/requestExport
+     * @api   GET /curriculum/reports/coverage/export/request
      * @since 24.1
      *
      * @return void
