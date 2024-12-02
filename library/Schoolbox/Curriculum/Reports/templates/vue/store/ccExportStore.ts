@@ -17,6 +17,15 @@ export const useExportStore = defineStore("ccExport", () => {
     }
 
     /**
+     * Get the endpoint with the current query params
+     * @returns - the endpoint with the current query params
+     */
+    function getEndpoint(): string {
+        const newQueryParams = useQueryStore().getQueryParams();
+        return `${endpoint.value}?${newQueryParams.toString()}`;
+    }
+
+    /**
      *
      */
     async function exportReport(): Promise<void> {
@@ -32,7 +41,7 @@ export const useExportStore = defineStore("ccExport", () => {
 
     return {
         init,
-        endpoint,
+        getEndpoint,
         exportReport,
     };
 });

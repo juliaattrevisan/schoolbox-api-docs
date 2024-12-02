@@ -59,7 +59,7 @@ const exportStore = useExportStore();
             class="l-flex f-no-bkg f-no-margins"
             aria-label="Export to CSV"
             title="Export to CSV"
-            :href="exportStore.endpoint"
+            :href="exportStore.getEndpoint()"
         >
             <sbx-icon name="export" />
         </a>
