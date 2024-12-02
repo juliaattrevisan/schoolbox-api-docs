@@ -351,7 +351,14 @@ class Controller extends BaseController
         $contactList = [];
         if ($student->getExternalId()) {
             $contactList = $this->externalUser->getStudentContactList([$student->getExternalId()]);
+
             foreach ($contactList as $contact) {
+                $contact['StudentContactAddress1'] =  'cat 1';
+                $contact['StudentContactAddress2'] =  'cat 2';
+                $contact['StudentContactAddress3'] =  'cat 3';
+                $contact['StudentContactSuburb'] =  'cat suburb';
+                $contact['StudentContactState'] =  'cat state';
+                $contact['StudentContactPostCode'] =  'cat postcode';
                 $main = null;
                 try {
                     $main = $this->userMapper->findByExternalId($contact['StudentContactID'], Role::PARENT);

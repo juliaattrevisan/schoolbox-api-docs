@@ -7,98 +7,36 @@
     {% endif %}
 {% endblock %}
 
-{% block contacts %}
-    <h2 class="subheader">Contact Information</h2>
-    <section>
-        <div class="content no-pad">
-            <ul class="information-list">
-                {% for contact in contacts %}
-                    <li class="actions-small-1">
-                        <div class="list-item">
-                            <div class="card small-12">
-                                {% if contact.main %}
-                                    <a href="/search/user/{{ contact.main.getId() }}">
-                                        {% include 'include/portrait.twig' with {user: contact.main} only %}
-                                        <h3>{{ contact.StudentContactTitle }} {{ contact.StudentContactPreferred }} {{ contact.StudentContactSurname }}</h3>
-                                    </a>
-                                {% else %}
-                                    {% include 'include/portrait.twig' with {externalId: contact.StudentContactID} only %}
-                                    <h3>{{ contact.StudentContactTitle }} {{ contact.StudentContactPreferred }} {{ contact.StudentContactSurname }}</h3>
-                                {% endif %}
-                                <p class="meta">{{ contact.StudentContactRelation }}</p>
-                            </div>
-                        </div>
-                        <nav>
-                            <sbx-pop-out content-id="row-options-contact-{{ loop.index }}"></sbx-pop-out>
-                        </nav>
-                        <ul class="f-dropdown" data-dropdown-content id="row-options-contact-{{ loop.index }}">
-                            <li><a class="icon-modify" href="/homepage/4694">Update Contact Details</a></li>
-                            {% if contact.StudentContactDefaultEmail %}
-                                <li><a class="icon-email" href="{{ session.mailhandle }}{{ contact.StudentContactDefaultEmail }}">{{ contact.StudentContactDefaultEmail }}</a></li>
-                            {% endif %}
-                            {% if contact.StudentContactMobilePhone %}
-                                <li><a class="icon-mobile" href="tel:{{ contact.StudentContactMobilePhone }}">{{ contact.StudentContactMobilePhone }}</a></li>
-                            {% endif %}
-                            {% if contact.StudentContactOccupPhone %}
-                                <li><a class="icon-mobile" href="tel:{{ contact.StudentContactOccupPhone }}">{{ contact.StudentContactOccupPhone }}</a></li>
-                            {% endif %}
-                        </ul>
-                    </li>
 
-                    {# is there a spouse? #}
-                    {% if contact.StudentContactSpouseTitle or contact.StudentContactSpousePreferred %}
-                        <li class="actions-small-1">
-                            <div class="list-item">
-                                <div class="card small-12">
-                                    {# need to know user's schoolbox info here #}
-                                    {% if contact.spouse %}
-                                        <a href="/search/user/{{ contact.spouse.getId() }}">
-                                            {% include 'include/portrait.twig' with {user: contact.spouse} only %}
-                                            <h3>{{ contact.StudentContactSpouseTitle }} {{ contact.StudentContactSpousePreferred }} {{ contact.StudentContactSpouseSurname }}</h3>
-                                        </a>
-                                    {% else %}
-                                        {% include 'include/portrait.twig' with {externalId: contact.StudentContactSpouseID} only %}
-                                        <h3>{{ contact.StudentContactSpouseTitle }} {{ contact.StudentContactSpousePreferred }} {{ contact.StudentContactSpouseSurname }}</h3>
-                                    {% endif %}
-                                    <p class="meta">{{ contact.StudentContactSpouseRelation }}</p>
-                                </div>
-                            </div>
-                            <nav>
-                                <sbx-pop-out content-id="row-options-contact-{{ contact.StudentContactSpouseID }}"></sbx-pop-out>
-                            </nav>
-                            <ul class="f-dropdown" data-dropdown-content id="row-options-contact-{{ contact.StudentContactSpouseID }}">
-                                {% if contact.StudentContactSpouseDefaultEmail and contact.StudentContactSpouseUseEmail != 'N'%}
-                                    <li><a class="icon-email" href="{{ session.mailhandle }}{{ contact.StudentContactSpouseDefaultEmail }}">{{ contact.StudentContactSpouseDefaultEmail }}</a></li>
-                                {% endif %}
-                                {% if contact.StudentContactSpouseMobilePhone %}
-                                    <li><a class="icon-mobile" href="tel:{{ contact.StudentContactSpouseMobilePhone }}">{{ contact.StudentContactSpouseMobilePhone }}</a></li>
-                                {% endif %}
-                                {% if contact.StudentContactSpouseOccupPhone %}
-                                    <li><a class="icon-mobile" href="tel:{{ contact.StudentContactSpouseOccupPhone }}">{{ contact.StudentContactSpouseOccupPhone }}</a></li>
-                                {% endif %}
-                            </ul>
-                        </li>
+{% block contact_extra %}
+    <li class="actions-small-1">
+        <div class="list-item">
+            <div class="card small-12">
+                <span class="icon-home size-32"></span>
+
+                {# Only show the address fields which have a meaningful value
+                 # Otherwise hide them, so we don't show empty lines with only a comma
+                #}
+                {% for field in ['StudentContactAddress1', 'StudentContactAddress2', 'StudentContactAddress3'] %}
+                    {% if contact[field] ?? ''|length %}
+                        <p>{{ contact[field] }}</p>
                     {% endif %}
-
-                    <li class="actions-small-1">
-                        <div class="list-item">
-                            <div class="card small-12">
-                                <span class="icon-home size-32"></span>
-                                {% if contact.StudentContactAddress1 or contact.StudentContactAddress2 or contact.StudentContactAddress3 %}
-                                    <p>{{ contact.StudentContactAddress1 }}</p>
-                                    <p>{{ contact.StudentContactAddress2 }}</p>
-                                    <p>{{ contact.StudentContactAddress3 }}</p>
-                                    <p>{{ contact.StudentContactSuburb }},</p>
-                                    <p>{{ contact.StudentContactState }} {{ contact.StudentContactPostCode }}</p>
-                                {% endif %}
-                            </div>
-                        </div>
-                        <nav>
-                            <a class="icon-mobile" href="tel:{{ contact.StudentContactPhoneActual }}" title="Call {{ contact.StudentContactPhoneActual }}"></a>
-                        </nav>
-                    </li>
                 {% endfor %}
-            </ul>
+
+                {# Optional state and/or postcode piece of the address
+                 # Only show this if at least one of those parts exist
+                #}
+                <p>
+                    {% for field in ['StudentContactSuburb', 'StudentContactState', 'StudentContactPostCode'] %}
+                        {% if contact[field] ?? ''|length %}
+                            {{ contact[field] }}
+                        {% endif %}
+                    {% endfor %}
+                </p>
+            </div>
         </div>
-    </section>
-{% endblock contacts %}
+        <nav>
+            <a class="icon-mobile" href="tel:{{ contact.StudentContactPhoneActual }}" title="Call {{ contact.StudentContactPhoneActual }}"></a>
+        </nav>
+    </li>
+{% endblock contact_extra %}
