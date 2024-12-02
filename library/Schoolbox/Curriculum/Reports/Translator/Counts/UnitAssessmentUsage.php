@@ -52,14 +52,9 @@ class UnitAssessmentUsage
             ($unitUsage[Cursor::COURSE_ACTIVITY_QUIZ] ?? 0) +
             ($unitUsage[Cursor::COURSE_ACTIVITY_LTI] ?? 0) +
             ($unitUsage[Cursor::COURSE_ACTIVITY_DUE_WORK] ?? 0) +
-            ($unitUsage[Cursor::COURSE_ACTIVITY_PROJECT] ?? 0) +
-            ($unitUsage[Cursor::COURSE_PROJECT_ACTIVITY_TASK] ?? 0) +
-            ($unitUsage[Cursor::COURSE_PROJECT_ACTIVITY_QUIZ] ?? 0) +
-            ($unitUsage[Cursor::COURSE_PROJECT_ACTIVITY_LTI] ?? 0) +
-            ($unitUsage[Cursor::COURSE_PROJECT_ACTIVITY_DUE_WORK] ?? 0);
+            ($unitUsage[Cursor::COURSE_ACTIVITY_PROJECT] ?? 0);
         $lessonPlanCount =
-            ($unitUsage[Cursor::COURSE_ACTIVITY_LESSON_PLAN] ?? 0) +
-            ($unitUsage[Cursor::COURSE_PROJECT_ACTIVITY_LESSON_PLAN] ?? 0);
+            ($unitUsage[Cursor::COURSE_ACTIVITY_LESSON_PLAN] ?? 0);
 
         $rubricCount = array_sum(
             [
@@ -69,13 +64,7 @@ class UnitAssessmentUsage
                 ($counts[$node->getId()][$unit->getCourse()->getId()][Cursor::COURSE_RUBRIC_INDICATOR] ?? 0),
             ]
         );
-        $inUseRubricCount = array_sum(
-            [
-                ($unitUsage[Cursor::COURSE_IN_USE_RUBRIC] ?? 0),
-                ($unitUsage[Cursor::COURSE_PROJECT_IN_USE_RUBRIC] ?? 0)
-            ]
-        );
-
+        $inUseRubricCount = $unitUsage[Cursor::COURSE_IN_USE_RUBRIC] ?? 0;
         return [
             'id'    => $unit->getFolder()->getId(),
             'name'  => $unit->getTitle(),
