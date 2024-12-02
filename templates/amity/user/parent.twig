@@ -27,6 +27,8 @@
                 {% endfor %}
             </dd>
         {% endif %}
+    {% elseif selectedField.field in ['Address1', 'Address2', 'Address3', 'Suburb', 'State', 'PostCode'] %}
+        {# noop: never render these separately #}
     {% else %}
         {# Default rendering: inherit from core template #}
         {{ parent() }}

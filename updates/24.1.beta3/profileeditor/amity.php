@@ -260,6 +260,8 @@ HELP;
 
         $this->getDatabaseInternal()->executeQuery($query);
 
+        $profileFieldIds[] = (int)$this->getDatabaseInternal()->lastInsertId();
+
         /* Preset configuration
          */
         $campusIds = $this->helper->fetchCampusIds();
