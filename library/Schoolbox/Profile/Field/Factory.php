@@ -363,14 +363,7 @@ class Factory
             'spouseName' => $spouseNode,
         ];
 
-        return array_merge($externalUser, $referenceFields, [
-            'Address1' => 'cat street 1',
-            'Address2' => 'cat street 2',
-            'Address3' => 'cat street 3',
-            'Suburb' => 'cat suburb',
-            'State' => 'cat state',
-            'PostCode' => 'cat postcode',
-        ]);
+        return array_merge($externalUser, $referenceFields);
     }
 
 
