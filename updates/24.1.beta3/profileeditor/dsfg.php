@@ -117,7 +117,7 @@ HELP;
 
         $this->updateTerminology();
 //        $this->createFields();
-//        $this->createButtons();
+        $this->createButtons();
 
         /* Announce lock release
           */
@@ -248,23 +248,20 @@ HELP;
                     FROM profile_button pb
                     WHERE roletype = 'student'
                 ),
-                'Results',
-                'Results',
-                'result',
-                'https://dashboard.tsc.nsw.edu.au/login/index/[profileId]'
+                'Achievement',
+                'Achievement',
+                'progress',
+                '/modules/custom/diocesan/achievementreport/[profileExternalId]'
             )";
 
         $this->getDatabaseInternal()->executeQuery($query);
 
         /* Preset availability and visibility requirements
-         * By default it was visible to Parents of the student, and staff members
-         *
-         * Find the button we just made in the surest way we know
          */
         $profileButtonId = (int)$this->getDatabaseInternal()->lastInsertId();
 
-        $roleIds = $this->helper->fetchRoleIds([Role::PARENT, Role::STAFF, Role::STUDENT]);
         $campusIds = $this->helper->fetchCampusIds();
+        $roleIds = $this->helper->fetchRoleIds([Role::PARENT, Role::STAFF, Role::STUDENT]);
 
         /* Assign relationships
          */
