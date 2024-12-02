@@ -91,7 +91,7 @@ HELP;
 
         /* Exit early if you're doing this on the wrong school
          */
-        if (self::SCHOOL_CODE !== $this->getConfig()->get('site_school_code')) {
+        if (self::SCHOOL_CODE !== strtolower($this->getConfig()->get('site_school_code'))) {
             $this->getLogger()->debug(sprintf(
                 'This customisation requires the %s school code; exiting.',
                 self::SCHOOL_CODE
@@ -290,7 +290,7 @@ HELP;
          */
         $this->getDatabaseInternal()->executeQuery("
             UPDATE profile_button
-            SET text = 'Documents', 
+            SET text = 'Documents',
                 title =  'Documents'
             WHERE type = 'documentmanagement'
             AND roletype = 'student'
