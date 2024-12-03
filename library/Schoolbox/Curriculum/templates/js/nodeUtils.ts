@@ -147,22 +147,22 @@ export function removeId(children: Node[], id: number): Node[] {
 }
 
 /**
- * Include all children of the supplied nodes
- * @param nodes - the nodes to get all children of
+ * Include all children
+ * @param childNodes - the node.children to get all children of
  * @returns - all included children
  */
-export function includeChildren(nodes: Node[]): Node[] {
-    let selectedNodes = [...nodes];
-    selectedNodes.forEach((node) => {
-        if (node.children && node.children.length > 0) {
-            const childrenWithCodes = node.children.filter((child) => child.code && child.code !== "");
-            selectedNodes = [...selectedNodes, ...childrenWithCodes];
-            node.children.forEach((child) => {
-                selectedNodes = [...selectedNodes, ...includeChildren([child])];
-            });
+export function includeChildren(childNodes: Node[] | null): Node[] {
+    if (childNodes === null) {
+        return [];
+    }
+    const childrenWithCodes = childNodes.filter((child) => child.code && child.code !== "");
+    let children = [...childrenWithCodes];
+    children.forEach((child) => {
+        if (child.children && child.children.length > 0) {
+            children = [...children, ...includeChildren(child.children)];
         }
     });
-    return selectedNodes;
+    return children;
 }
 
 /**

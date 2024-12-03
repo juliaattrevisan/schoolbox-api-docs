@@ -95,7 +95,7 @@ export const useModalSelectedNodesStore = defineStore(`csModalSelectedNodes`, ()
     function add(nodeToAdd: Node): void {
         nodes.value = noChildrenOfNode(nodeToAdd); // strip out any children of the new node, as the parent now takes precedence
         if (useStore().includeChildren) {
-            nodes.value = [...nodes.value, ...includeChildren([nodeToAdd])]; // add the new node and all its children
+            nodes.value = [...nodes.value, nodeToAdd, ...includeChildren(nodeToAdd.children)]; // add the new node and all its children
         } else {
             nodes.value = [...nodes.value, nodeToAdd]; // or just add the new node
         }
@@ -110,7 +110,7 @@ export const useModalSelectedNodesStore = defineStore(`csModalSelectedNodes`, ()
     function addSingle(nodeToAdd: Node): void {
         nodes.value = noChildrenOfNode(nodeToAdd); // strip out any children of the new node, as the parent now takes precedence
         if (useStore().includeChildren) {
-            nodes.value = [...includeChildren([nodeToAdd])]; // add the new node and all its children
+            nodes.value = [nodeToAdd, ...includeChildren(nodeToAdd.children)]; // add the new node and all its children
         } else {
             nodes.value = [nodeToAdd]; // or just add the new node
         }
@@ -125,7 +125,7 @@ export const useModalSelectedNodesStore = defineStore(`csModalSelectedNodes`, ()
     function remove(nodeToRemove: Node): void {
         updateChildNodes(nodeToRemove, false, nodeToRemove.id);
         if (useStore().includeChildren) {
-            const idsToRemove = includeChildren([nodeToRemove]).map((node) => node.id); // get the id of the node to remove and all its children
+            const idsToRemove = [nodeToRemove, ...includeChildren(nodeToRemove.children)].map((node) => node.id); // get the id of the node to remove and all its children
             nodes.value = nodes.value.filter((node) => !idsToRemove.includes(node.id)); // remove the node and all its children
         } else {
             nodes.value = nodes.value.filter((node) => node.id !== nodeToRemove.id); // or just remove the node
