@@ -2,7 +2,7 @@
  * Store for the curriculum coverage filters,
  * so we can refine down what's shown in the report
  */
-
+import locale from "@js/terminology/rosettaStone";
 import { defineStore } from "pinia";
 import { ReportOptionValues, type ReportOption } from "../../js/types/curriculumCoverageTypes";
 
@@ -14,23 +14,23 @@ export const useFiltersStore = defineStore("ccFilters", () => {
         },
         {
             value: ReportOptionValues.UNIT,
-            label: "Unit",
+            label: `${locale.unit.proper()}`,
         },
         {
             value: ReportOptionValues.LEARNING_ACTIVITY,
-            label: "Learning Activities",
+            label: `Learning ${locale.activity.properPlural()}`,
         },
         {
             value: ReportOptionValues.LEARNING_ACTIVITY_LESSON_PLAN,
-            label: "Lesson Plans",
+            label: `${locale.lessonPlan.properPlural()}`,
         },
         {
             value: ReportOptionValues.RUBRIC,
-            label: "Rubric",
+            label: `${locale.rubricGroup.properPlural()} & ${locale.rubricCriterion.properPlural()}`,
         },
         {
             value: ReportOptionValues.IN_USE_RUBRIC,
-            label: "In-use Rubric",
+            label: "Rubrics",
         },
     ]); // all report options available
     const selectedReportOptions = window.Vue.ref<ReportOptionValues[]>([

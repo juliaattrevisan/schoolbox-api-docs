@@ -3,6 +3,7 @@
  * Displays the curriculum coverage report in a table format.
  */
 
+import locale from "@js/terminology/rosettaStone";
 import { useTemplateRef } from "vue";
 import NodeDetails from "@schoolboxCurriculum/vue/node-details.vue";
 import BasicModal from "@schoolboxVue/components/modal/basic-modal.vue";
@@ -50,7 +51,11 @@ window.Vue.watch(isDetailsOpen, (isOpen) => {
                             style="border-left: none"
                             :colspan="`${course.units && course.units.length ? (reportStore.hasMultipleCourses ? course.units.length + 1 : course.units.length) : 0}`"
                         >
-                            {{ course.units && course.units.length > 1 ? "Units" : "Unit" }}
+                            {{
+                                course.units && course.units.length > 1
+                                    ? locale.unit.properPlural()
+                                    : locale.unit.proper()
+                            }}
                         </th>
                     </template>
                 </tr>
