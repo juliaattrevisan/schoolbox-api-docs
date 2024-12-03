@@ -47,7 +47,7 @@ $app = new class extends CliTool\App {
             'calendar_moderator' => 'SELECT count(distinct u.id) FROM user u JOIN userAccess uA on u.id = uA.uid WHERE u.deleted_at is null and service = ' . UserAccess::SERVICE_CALENDAR . ' AND type=3',
             'news_moderator'        => 'SELECT count(*) FROM user u JOIN userAccess uA on u.id = uA.uid WHERE u.deleted_at is null and service = ' . UserAccess::SERVICE_NEWS . ' AND type=3 ',
             'cms_moderator'         => 'SELECT count(*) FROM user u JOIN userAccess uA on u.id = uA.uid WHERE u.deleted_at is null and service = ' . UserAccess::SERVICE_CMS . ' AND type=3 ',
-            'curriculum_moderator'  => 'SELECT count(*) FROM user u JOIN userAccess uA on u.id = uA.uid WHERE u.deleted_at is null and service = ' . UserAccess::SERVICE_CURRICULUM . ' AND type=3 ',
+            'curriculum_moderator'  => 'SELECT count(*) FROM user u JOIN userAccess uA on u.id = uA.uid WHERE u.deleted_at is null and service = ' . UserAccess::SERVICE_CURRICULUM . ' AND type=2', // 2 (write) as there is no curric mod as yet 24.1
             'resources_moderator'   => 'SELECT count(*) FROM user u JOIN userAccess uA on u.id = uA.uid WHERE u.deleted_at is null and service = ' . UserAccess::SERVICE_RESOURCE_BOOKING . ' AND type=3 ',
             'fixtures_moderator'    => 'SELECT count(*) FROM user u JOIN userAccess uA on u.id = uA.uid WHERE u.deleted_at is null and service = ' . UserAccess::SERVICE_SPORTS_ADMINISTRATOR . ' AND type=3 ',
             'pastoral_moderator'    => 'SELECT count(*) FROM user u JOIN userAccess uA on u.id = uA.uid WHERE u.deleted_at is null and service = ' . UserAccess::SERVICE_PASTORAL . ' AND type=3 ',
