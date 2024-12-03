@@ -461,15 +461,7 @@ HELP;
                     'availability' => $campusIds,
                     'visibility' =>  [self::ROLETYPE_SELF, self::ROLETYPE_STUDENT, self::ROLETYPE_PARENT, self::ROLETYPE_STAFF],
                 ],
-                'externalId' => [
-                    'availability' => [],
-                    'visibility' =>  [],
-                ],
                 'positionTitle' => [
-                    'availability' => $campusIds,
-                    'visibility' =>  [self::ROLETYPE_SELF, self::ROLETYPE_STUDENT, self::ROLETYPE_PARENT, self::ROLETYPE_STAFF],
-                ],
-                'pronoun' => [
                     'availability' => $campusIds,
                     'visibility' =>  [self::ROLETYPE_SELF, self::ROLETYPE_STUDENT, self::ROLETYPE_PARENT, self::ROLETYPE_STAFF],
                 ],
@@ -479,10 +471,6 @@ HELP;
                 'email' => [
                     'availability' => $campusIds,
                     'visibility' =>  [self::ROLETYPE_SELF, self::ROLETYPE_STAFF],
-                ],
-                'campusCollection' => [
-                    'availability' => [],
-                    'visibility' =>  [],
                 ],
                 /* NOTE: Decided by restrict_parent_emails
                  * By default it's visible to self, staff
