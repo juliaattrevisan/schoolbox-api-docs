@@ -12,7 +12,7 @@ import { useStore } from "@schoolboxCurriculum/vue/curriculumSelector/store/curr
 import { useSelectedNodesStore } from "@schoolboxCurriculum/vue/curriculumSelector/store/csSelectedNodesStore";
 import { useModalStore } from "@schoolboxCurriculum/vue/curriculumSelector/store/csModalStore";
 import { useNodeTitle } from "@schoolboxCurriculum/vue/composables/useNodeTitle";
-import { getEmptyNode } from "@schoolboxCurriculum/js/nodeUtils";
+import { getEmptyNode, includeChildren } from "@schoolboxCurriculum/js/nodeUtils";
 import CsModal from "@schoolboxCurriculum/vue/curriculumSelector/modal/cs-modal.vue";
 import SelectedNodeModal from "@schoolboxCurriculum/vue/selected-node-modal.vue";
 import type { Node } from "@schoolboxCurriculum/types/Node";
@@ -44,6 +44,7 @@ store.init({
     formValueName: "curriculumCodes[]",
     isSelectAll: true,
     canSelectChildren: false,
+    includeChildren: false,
 });
 const selectedStore = useSelectedNodesStore();
 selectedStore.add(props.preselected);
