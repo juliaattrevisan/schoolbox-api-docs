@@ -147,6 +147,25 @@ export function removeId(children: Node[], id: number): Node[] {
 }
 
 /**
+ * Include all children of the supplied nodes
+ * @param nodes - the nodes to get all children of
+ * @returns - all included children
+ */
+export function includeChildren(nodes: Node[]): Node[] {
+    let selectedNodes = [...nodes];
+    selectedNodes.forEach((node) => {
+        if (node.children && node.children.length > 0) {
+            const childrenWithCodes = node.children.filter((child) => child.code && child.code !== "");
+            selectedNodes = [...selectedNodes, ...childrenWithCodes];
+            node.children.forEach((child) => {
+                selectedNodes = [...selectedNodes, ...includeChildren([child])];
+            });
+        }
+    });
+    return selectedNodes;
+}
+
+/**
  * Recursively loop through the parents adding in a breadcrumb for each
  * @param node - the Node to traverse for breadcrumbs
  * @param currentBreadcrumbs - the current breadcrumbs
