@@ -166,7 +166,11 @@ HELP;
                  *
                  * "We are unable to log you into the TASS system. This is most likely because your account does not exist in TASS."
                  */
-                'url' => '/kiosk/login.cfm?go={"target":"student.profile","studcode":"[profileExternalId]","prod_menu":"Y"}'
+                'url' => sprintf(
+                    '%s/%s',
+                    rtrim($this->getConfig()->get('external_staff_portal'), '/'),
+                    'kiosk/login.cfm?go={"target":"student.profile","studcode":"[profileExternalId]","prod_menu":"Y"}'
+                )
             ],
         ];
 
