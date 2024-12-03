@@ -55,7 +55,7 @@ const isModalOpen = window.Vue.ref(false); // to open/close the exporting to csv
             </a>
         </div>
     </div>
-    <basic-modal v-model:is-open="isModalOpen">
+    <basic-modal v-model:is-open="isModalOpen" :has-background-click="true">
         <div class="l-flex-col l-gap-m f-no-margins">
             <h2>Export to CSV</h2>
             <p>
