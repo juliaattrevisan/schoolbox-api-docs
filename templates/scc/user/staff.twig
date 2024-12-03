@@ -1,8 +1,0 @@
-{% extends '@core/user/staff.twig' %}
-{% block details %}
-    {{ parent() }}
-    {% if externalUser.SchoolStaffCode is defined and externalUser.SchoolStaffCode %}
-        <dt class="small-12 medium-3">Staff Code:</dt>
-        <dd class="small-12 medium-9">{{ externalUser.SchoolStaffCode }}</dd>
-    {% endif %}
-{% endblock %}

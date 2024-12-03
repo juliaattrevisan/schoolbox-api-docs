@@ -116,6 +116,7 @@ HELP;
         $this->helper = new Helper($this->getDatabaseInternal(), true);
 
         $this->updateFlags();
+        $this->updateStaffCode();
 
         /* Announce lock release
           */
@@ -144,6 +145,59 @@ HELP;
             AND roletype = 'student'
         ");
     }
+
+
+    /**
+     * Makes Staff Code accessible
+     *
+     * @return void
+     */
+    private function updateStaffCode(): void
+    {
+        /* Preset availability and visibility requirements
+         */
+        $statement = $this->getDatabaseInternal()->prepare("
+            SELECT id
+            FROM profile_field
+            WHERE roletype = :roletype
+            AND field = :field
+        ");
+
+        $statement->execute([
+            'roletype' => 'staff',
+            'field' => 'SchoolStaffCode'
+        ]);
+
+        while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
+            $profileFieldId = $row['id'];
+        }
+
+        /* I suppose this was available to everyone initially but I don't really know for sure:
+         * imho it seems like it would have been used by the student themselves (not other students)
+         * and staff members, making roletypes STAFF and SELF.
+         */
+        $campusIds = $this->helper->fetchCampusIds();
+        $roletypes = [Role::STAFF, \Schoolbox\Admin\Profile\Editor\Payload::ROLETYPE_SELF];
+
+        /* Assign relationships
+         */
+        $this->getLogger()->info(sprintf(
+            'Campus availability: assigning campus ids %s to profile field %s',
+            implode(',', $campusIds),
+            $profileFieldId
+        ));
+
+        $this->helper->createFieldCampusAvailability($profileFieldId, $campusIds);
+
+        $this->getLogger()->info(sprintf(
+            'Roletype visibility: assigning roletypes %s to profile field %s',
+            implode(',', $roletypes),
+            $profileFieldId
+        ));
+
+        $this->helper->createFieldRoletypeVisibility($profileFieldId, $roletypes);
+    }
+
 
     /**
      * FIXME Decide whether this script must be run as root
