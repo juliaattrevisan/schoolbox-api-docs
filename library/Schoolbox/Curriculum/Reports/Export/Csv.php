@@ -88,7 +88,7 @@ class Csv
             $subheaderRows[] = $course['name'];
             $unitRowOutput   = false;
             foreach ($course['units'] as $unit) {
-                $headerRows[]    = $unitRowOutput ? '' : 'Unit';
+                $headerRows[]    = $unitRowOutput ? '' : $this->translator->translate('unit', capital: true);
                 $subheaderRows[] = $unit['name'];
                 $unitRowOutput   = true;
             }
