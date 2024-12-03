@@ -379,10 +379,12 @@ class Handler
                     "Gender"               => $row["StudentGender"],
                     "Email"                => $row["StudentEmail"],
                     "BirthDate"            => $formattedBirthDate,
+                    "Contact1ID"           => null,
                     "Contact1Surname"      => null,
                     "Contact1Name"         => null,
                     "Contact1Mobile"       => null,
                     "Contact1Email"        => null,
+                    "Contact2ID"           => null,
                     "Contact2Surname"      => null,
                     "Contact2Name"         => null,
                     "Contact2Mobile"       => null,
@@ -390,13 +392,15 @@ class Handler
                 ];
             }
 
-            // Determine if we should add the contact as Contact1 or Contact2
-            if (is_null($students[$studentId]["Contact1Surname"])) {
+            // Check if Contact1 is empty and fill it, otherwise fill Contact2
+            if (empty($students[$studentId]["Contact1ID"])) {
+                $students[$studentId]["Contact1ID"] = $row["ContactID"];
                 $students[$studentId]["Contact1Surname"] = $row["ContactSurname"];
                 $students[$studentId]["Contact1Name"] = $row["ContactPreferred"];
                 $students[$studentId]["Contact1Mobile"] = $row["ContactMobilePhone"];
                 $students[$studentId]["Contact1Email"] = $row["ContactDefaultEmail"];
-            } else if (is_null($students[$studentId]["Contact2Surname"])) {
+            } elseif (empty($students[$studentId]["Contact2ID"])) {
+                $students[$studentId]["Contact2ID"] = $row["ContactID"];
                 $students[$studentId]["Contact2Surname"] = $row["ContactSurname"];
                 $students[$studentId]["Contact2Name"] = $row["ContactPreferred"];
                 $students[$studentId]["Contact2Mobile"] = $row["ContactMobilePhone"];
