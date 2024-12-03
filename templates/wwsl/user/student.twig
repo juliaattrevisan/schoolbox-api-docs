@@ -1,10 +1,5 @@
 {% extends '@core/user/student.twig' %}
-{% block details_studentType %}
-    {% if boarderType %}
-        <dt class="small-4 medium-3 columns">Boarding Status:</dt>
-        <dd class="small-8 medium-9 columns">{{ boarderType }}</dd>
-    {% endif %}
-{% endblock details_studentType %}
+
 {% block extraDetails %}
     {% if externalUser.Suburb is defined and externalUser.Suburb %}
         <dt class="small-4 medium-3 columns">Suburb:</dt>
