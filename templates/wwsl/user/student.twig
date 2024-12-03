@@ -1,8 +1,0 @@
-{% extends '@core/user/student.twig' %}
-
-{% block extraDetails %}
-    {% if externalUser.Suburb is defined and externalUser.Suburb %}
-        <dt class="small-4 medium-3 columns">Suburb:</dt>
-        <dd class="small-8 medium-9 columns">{{ externalUser.Suburb | capitalize }}</dd>
-    {% endif %}
-{% endblock extraDetails %}
