@@ -23,6 +23,7 @@ export const useStore = defineStore(`curriculumSelector`, {
         isSelectAll: false, // to select any nodes, not just those that have a code
         canSelectChildren: true, // is able to select children of an already selected node
         includeWithoutCode: false, // set to true if curriculum nodes with blank codes need to be selectable
+        includeChildren: false, // When a node is selected, also select all its children
     }),
 
     getters: {
@@ -58,6 +59,7 @@ export const useStore = defineStore(`curriculumSelector`, {
             this.isSelectAll = props.isSelectAll;
             this.canSelectChildren = props.canSelectChildren;
             this.includeWithoutCode = props.includeWithoutCode;
+            this.includeChildren = props.includeChildren;
             if (!this.isReadOnly && props.dataEndpoint !== "") {
                 //only load when we need to
                 apiEndpoint = props.dataEndpoint;

@@ -111,7 +111,7 @@ const props = defineProps({
         default: "",
     },
     /**
-     * When an node is selected, also select all its children
+     * When a node is selected, also select all its children
      */
     includeChildren: {
         type: Boolean,

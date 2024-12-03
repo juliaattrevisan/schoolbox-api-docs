@@ -7,6 +7,7 @@
 import { defineStore } from "pinia";
 import type { Node } from "@schoolboxCurriculum/types/Node";
 import { findById } from "@schoolboxCurriculum/js/nodeUtils";
+import { useStore } from "./curriculumSelectorStore";
 import { useNodesStore } from "./csNodesStore";
 import { useSelectedNodesStore } from "./csSelectedNodesStore";
 
