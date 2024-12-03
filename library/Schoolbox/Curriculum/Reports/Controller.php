@@ -53,6 +53,7 @@ class Controller extends Base
         private Helper $helper,
         private Producer $messageProducer,
         private MessageFactory $messageFactory,
+        private Export\Csv $csvExporter,
     ) {
     }
 
@@ -374,7 +375,13 @@ class Controller extends Base
         $courseUnitSpecs = $this->findCourseUnitSpecs($courseIds);
         $usage           = $this->loadUsageStructure($courseSpecs, $courseUnitSpecs, $data, $cursor->retrieveUsageCount());
         $structure       = $this->loadCourseStructure($courseSpecs, $courseUnitSpecs);
-        $exporter        = new Export\Csv(
+        $filename        = "curriculum-coverage-report.csv";
+
+        $fp = fopen('php://temp', 'w');
+
+        $this->response = $this->responseFromStream(new \GuzzleHttp\Psr7\Stream($fp), $filename, 'text/csv; charset=utf-8');
+        $this->csvExporter->export(
+            $fp,
             $structure,
             $usage,
             $this->requestQuery->getBool('course', true),
@@ -384,16 +391,6 @@ class Controller extends Base
             $this->requestQuery->getBool('rubric', true),
             $this->requestQuery->getBool('inUseRubric', true),
         );
-
-
-        $filename = sprintf(
-            "curriculum-coverage-report.csv",
-        );
-
-        $fp = fopen('php://temp', 'w');
-
-        $this->response = $this->responseFromStream(new \GuzzleHttp\Psr7\Stream($fp), $filename, 'text/csv; charset=utf-8');
-        $exporter->export($fp);
     }
 
     /**

@@ -67,6 +67,7 @@ class Module extends BaseModule
             new Helper($curriculumMapper, $rubricCapabilityMapper, $assessmentMapper, $access),
             $this->injector->get('taskd.messageProducer'),
             $this->injector->get('taskd.downloadPagesMessageFactory'),
+            new Export\Csv($this->injector->get('l10n')),
         );
     }
 
