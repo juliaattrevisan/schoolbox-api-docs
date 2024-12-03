@@ -43,21 +43,38 @@ const isModalOpen = window.Vue.ref(false); // to open/close the exporting to csv
                 </div>
             </div>
         </div>
-        <a
-            class="l-flex f-no-bkg f-no-margins"
-            aria-label="Export to CSV"
-            title="Export to CSV"
-            :href="exportStore.getEndpoint()"
-            @click="isModalOpen = true"
-        >
-            <sbx-icon name="export" />
-        </a>
+        <div>
+            <a
+                class="l-flex-row l-gap-s f-no-bkg f-no-margins"
+                aria-label="Export to CSV"
+                title="Export to CSV"
+                @click="isModalOpen = true"
+            >
+                <sbx-icon name="export" />
+                Export to CSV
+            </a>
+        </div>
     </div>
     <basic-modal v-model:is-open="isModalOpen">
         <div class="l-flex-col l-gap-m f-no-margins">
-            <h2>Exporting to CSV</h2>
-            <p>Your report is being exported to CSV. You will be sent a notification when it is ready.</p>
-            <button @click="isModalOpen = false">Close</button>
+            <h2>Export to CSV</h2>
+            <p>
+                The usages exported will be the same as the currently selected options in the report. A zip file
+                containing a separate CSV for each course will be generated. You will be sent a notification when it is
+                ready.
+            </p>
+            <ul class="flex-list buttons">
+                <li><button type="button" class="button" @click="isModalOpen = false">Cancel</button></li>
+                <li>
+                    <a
+                        type="button"
+                        class="button submit"
+                        :href="exportStore.getEndpoint()"
+                        @click="isModalOpen = false"
+                        >Export</a
+                    >
+                </li>
+            </ul>
         </div>
     </basic-modal>
 </template>
