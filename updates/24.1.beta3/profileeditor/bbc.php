@@ -160,11 +160,6 @@ HELP;
                 'icon' => 'progress',
                 /* A deeplink to Student Profile in TASS
                  * https://github.com/TheAlphaSchoolSystemPTYLTD/deep-linking/blob/master/kiosk/student.profile.md
-                 *
-                 * This school's TASS Profile links are broken though, so I don't know what their domain might be:
-                 * maybe tassweb.bbc.nsw.edu.au?
-                 *
-                 * "We are unable to log you into the TASS system. This is most likely because your account does not exist in TASS."
                  */
                 'url' => sprintf(
                     '%s/%s',
