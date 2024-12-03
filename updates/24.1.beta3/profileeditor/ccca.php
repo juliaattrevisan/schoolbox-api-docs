@@ -255,7 +255,7 @@ HELP;
 
 
     /**
-     * Creates a Student Mobile Phone field
+     * Makes Staff Code accessible
      *
      * @return void
      */
@@ -283,8 +283,8 @@ HELP;
          * imho it seems like it would have been used by the student themselves (not other students)
          * and staff members, making roletypes STAFF and SELF.
          */
-        $roletypes = [Role::STAFF, \Schoolbox\Admin\Profile\Editor\Payload::ROLETYPE_SELF];
         $campusIds = $this->helper->fetchCampusIds();
+        $roletypes = [Role::STAFF, \Schoolbox\Admin\Profile\Editor\Payload::ROLETYPE_SELF];
 
         /* Assign relationships
          */
