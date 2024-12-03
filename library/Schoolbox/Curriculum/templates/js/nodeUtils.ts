@@ -152,15 +152,14 @@ export function removeId(children: Node[], id: number): Node[] {
  * @returns - all included children
  */
 export function includeChildren(childNodes: Node[] | null): Node[] {
-    if (childNodes === null) {
+    if (childNodes === undefined || childNodes === null) {
+        // ensure we have children
         return [];
     }
-    const childrenWithCodes = childNodes.filter((child) => child.code && child.code !== "");
+    const childrenWithCodes = childNodes.filter((child) => child.code && child.code !== ""); // only include children with codes
     let children = [...childrenWithCodes];
     children.forEach((child) => {
-        if (child.children && child.children.length > 0) {
-            children = [...children, ...includeChildren(child.children)];
-        }
+        children = [...children, ...includeChildren(child.children)];
     });
     return children;
 }
