@@ -47,10 +47,7 @@ class InUseRubricUsage
                 '_links' => [
                     'view' => $this->getRouteIfAuthorized(
                         'rubricManager.getForm',
-                        ['folderId' =>
-                             $assessment->getContextUnitSpecification()?->getFolder()->getId() ??
-                             $assessment->getContextProject()?->getFolder()->getId()
-                        ],
+                        ['folderId' => $assessment->getAssessmentContext()?->getFolder()->getId()],
                     )
                 ],
             ],
