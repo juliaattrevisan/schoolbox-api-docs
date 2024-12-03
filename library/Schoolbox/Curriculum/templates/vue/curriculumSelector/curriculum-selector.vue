@@ -93,7 +93,9 @@ const props = defineProps({
         default: false,
     },
     /**
-     * is able to select children of an already selected node
+     * is able to select children of an already selected node,
+     * typically used when includeChildren is false in the context of selecting
+     * curriculum for the coverage report or when isSingleSelect is true
      */
     canSelectChildren: {
         type: Boolean,
@@ -107,6 +109,14 @@ const props = defineProps({
         type: String,
         required: false,
         default: "",
+    },
+    /**
+     * When an node is selected, also select all its children
+     */
+    includeChildren: {
+        type: Boolean,
+        required: false,
+        default: false,
     },
 });
 
