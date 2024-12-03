@@ -101,7 +101,7 @@ HELP;
 
         /* Exit early if you're doing this on the wrong school
          */
-        if (!in_array($this->getConfig()->get('site_school_code'), self::SCHOOL_CODE)) {
+        if (!in_array(strtolower($this->getConfig()->get('site_school_code')), self::SCHOOL_CODE)) {
             $this->getLogger()->debug(sprintf('This customisation requires one of these school codes: %s; exiting.', implode(',', self::SCHOOL_CODE)));
 
             return;
