@@ -227,7 +227,15 @@ class Cursor implements ICursor
                 INNER JOIN curriculum_node_for_assessment cnfa
                     ON cnfa.assessment_id = activity.assessment_id
                     AND cnfa.curriculum_node_id IN %s
-                INNER JOIN assessment_course_unit_specification acus ON acus.assessment_id = cnfa.assessment_id
+                LEFT JOIN (
+                    SELECT p.assessment_id projectAssessmentId, pa.assessment_id
+                    FROM project_assessment pa
+                         INNER JOIN project p ON p.id = pa.project_id AND p.deleted_at IS NULL
+                ) pa ON activity.assessment_id = pa.assessment_id
+                 INNER JOIN assessment_course_unit_specification acus ON (
+                    acus.assessment_id = activity.assessment_id
+                        OR acus.assessment_id = pa.projectAssessmentId
+                )
                 INNER JOIN course_unit_specification cus
                         ON cus.id = acus.course_unit_specification_id
                         AND cus.course_specification_id IN %s
@@ -246,24 +254,29 @@ class Cursor implements ICursor
             $unitLessonPlanCountQuery = sprintf(
                 "
                 SELECT
-                    activity.type,
+                    '%s' type,
                     cnfa.curriculum_node_id,
                     cus.course_specification_id courseSpecId,
                     cus.folder_id as unitId,
                     COUNT(cnfa.curriculum_node_id) as count
-                FROM (
-                     SELECT '%s' type, lp.assessment_id, lp.deleted_at
-                     FROM lesson_plan lp
-                ) activity
+                FROM lesson_plan lp
                 INNER JOIN curriculum_node_for_assessment cnfa
-                    ON cnfa.assessment_id = activity.assessment_id
+                    ON cnfa.assessment_id = lp.assessment_id
                     AND cnfa.curriculum_node_id IN %s
-                INNER JOIN assessment_course_unit_specification acus ON acus.assessment_id = cnfa.assessment_id
+                LEFT JOIN (
+                    SELECT p.assessment_id projectAssessmentId, pa.assessment_id
+                    FROM project_assessment pa
+                         INNER JOIN project p ON p.id = pa.project_id AND p.deleted_at IS NULL
+                ) pa ON lp.assessment_id = pa.assessment_id
+                 INNER JOIN assessment_course_unit_specification acus ON (
+                    acus.assessment_id = lp.assessment_id
+                    OR acus.assessment_id = pa.projectAssessmentId
+                )
                 INNER JOIN course_unit_specification cus
                         ON cus.id = acus.course_unit_specification_id
                         AND cus.course_specification_id IN %s
-                WHERE activity.deleted_at IS NULL
-                GROUP BY activity.type, cnfa.curriculum_node_id, cus.course_specification_id, cus.folder_id
+                WHERE lp.deleted_at IS NULL
+                GROUP BY type, cnfa.curriculum_node_id, cus.course_specification_id, cus.folder_id
             ",
                 self::COURSE_ACTIVITY_LESSON_PLAN,
                 $nodesPlaceHolder,
@@ -379,7 +392,15 @@ class Cursor implements ICursor
                         INNER JOIN curriculum_node_for_rubric_capability cnrc
                             ON cnrc.rubric_capability_id = v.capability_id
                             AND cnrc.curriculum_node_id IN %s
-                        INNER JOIN assessment_course_unit_specification acus ON v.assessment_id = acus.assessment_id
+                        LEFT JOIN (
+                            SELECT p.assessment_id projectAssessmentId, pa.assessment_id
+                            FROM project_assessment pa
+                            INNER JOIN project p ON p.id = pa.project_id AND p.deleted_at IS NULL
+                        ) pa ON v.assessment_id = pa.assessment_id
+                            INNER JOIN assessment_course_unit_specification acus ON (
+                                acus.assessment_id = v.assessment_id
+                                OR acus.assessment_id = pa.projectAssessmentId
+                        )
                         INNER JOIN course_unit_specification cus
                             ON cus.id = acus.course_unit_specification_id
                             AND cus.course_specification_id IN %s
@@ -395,7 +416,15 @@ class Cursor implements ICursor
                         INNER JOIN curriculum_node_for_rubric_indicator cnri
                             ON cnri.rubric_indicator_id = v.indicator_id
                             AND cnri.curriculum_node_id IN %s
-                        INNER JOIN assessment_course_unit_specification acus ON v.assessment_id = acus.assessment_id
+                        LEFT JOIN (
+                            SELECT p.assessment_id projectAssessmentId, pa.assessment_id
+                            FROM project_assessment pa
+                            INNER JOIN project p ON p.id = pa.project_id AND p.deleted_at IS NULL
+                        ) pa ON v.assessment_id = pa.assessment_id
+                            INNER JOIN assessment_course_unit_specification acus ON (
+                                acus.assessment_id = v.assessment_id
+                                OR acus.assessment_id = pa.projectAssessmentId
+                        )
                         INNER JOIN course_unit_specification cus
                             ON cus.id = acus.course_unit_specification_id
                             AND cus.course_specification_id IN %s

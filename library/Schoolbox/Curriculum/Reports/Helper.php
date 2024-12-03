@@ -136,7 +136,15 @@ class Helper
             INNER JOIN curriculum_node_for_assessment cnfa
                 ON cnfa.assessment_id = activity.assessment_id
                 AND cnfa.curriculum_node_id = :nodeId
-            INNER JOIN assessment_course_unit_specification acus ON acus.assessment_id = cnfa.assessment_id
+            LEFT JOIN (
+                SELECT p.assessment_id projectAssessmentId, pa.assessment_id
+                FROM project_assessment pa
+                INNER JOIN project p ON p.id = pa.project_id AND p.deleted_at IS NULL
+            ) pa ON activity.assessment_id = pa.assessment_id
+            INNER JOIN assessment_course_unit_specification acus ON (
+                acus.assessment_id = cnfa.assessment_id
+                OR acus.assessment_id = pa.projectAssessmentId
+             )
             INNER JOIN course_unit_specification cus
                 ON cus.id = acus.course_unit_specification_id
                 AND cus.course_specification_id = :courseId
@@ -154,7 +162,15 @@ class Helper
             INNER JOIN curriculum_node_for_assessment cnfa
                 ON cnfa.assessment_id = lp.assessment_id
                 AND cnfa.curriculum_node_id = :nodeId
-            INNER JOIN assessment_course_unit_specification acus ON acus.assessment_id = cnfa.assessment_id
+            LEFT JOIN (
+                SELECT p.assessment_id projectAssessmentId, pa.assessment_id
+                FROM project_assessment pa
+                INNER JOIN project p ON p.id = pa.project_id AND p.deleted_at IS NULL
+            ) pa ON lp.assessment_id = pa.assessment_id
+            INNER JOIN assessment_course_unit_specification acus ON (
+                acus.assessment_id = cnfa.assessment_id
+                    OR acus.assessment_id = pa.projectAssessmentId
+            )
             INNER JOIN course_unit_specification cus
                 ON cus.id = acus.course_unit_specification_id
                 AND cus.course_specification_id = :courseId
@@ -300,8 +316,15 @@ class Helper
             LEFT JOIN curriculum_node_for_rubric_indicator cnri
                 ON cnri.rubric_indicator_id = v.indicator_id
                 AND cnri.curriculum_node_id = :nodeId
-            INNER JOIN assessment_course_unit_specification acus
-                ON v.assessment_id = acus.assessment_id
+            LEFT JOIN (
+                SELECT p.assessment_id projectAssessmentId, pa.assessment_id
+                FROM project_assessment pa
+                INNER JOIN project p ON p.id = pa.project_id AND p.deleted_at IS NULL
+            ) pa ON v.assessment_id = pa.assessment_id
+                INNER JOIN assessment_course_unit_specification acus ON (
+                    acus.assessment_id = v.assessment_id
+                    OR acus.assessment_id = pa.projectAssessmentId
+            )
             INNER JOIN course_unit_specification cus
                 ON cus.id = acus.course_unit_specification_id
                 AND cus.course_specification_id = :courseId
@@ -382,7 +405,7 @@ class Helper
             $this->rubricCapabilityMapper->findByColumn(
                 'id',
                 $inUseCap
-            )->reindex();
+            );
 
         return $result;
     }

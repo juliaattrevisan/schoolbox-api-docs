@@ -29,23 +29,25 @@ class InUseRubricUsage
 
     private function translate(AssessmentModel $assessment, array $usage): array
     {
+        $capabilities = $usage[Cursor::COURSE_IN_USE_RUBRIC][$assessment->getId()];
         return [
             'name' => $assessment->getTitle(),
             'icon' => Cursor::ACTIVITY_ICON_LIST[Cursor::COURSE_ACTIVITY_DUE_WORK],
             'rubric' => [
-                'capabilities' => $this->models['InUseCap']->map(
-                    function ($cap) use ($usage, $assessment) {
+                'capabilities' => array_map(
+                    function ($cap) use ($capabilities) {
                         return call_user_func(
                             $this->rubricUsageTranslator,
-                            $cap,
-                            $usage[Cursor::COURSE_IN_USE_RUBRIC][$assessment->getId()][$cap->getId()]['indicators'] ?? []
+                            $this->models['InUseCap'][$cap],
+                            $capabilities[$cap]['indicators'] ?? []
                         );
-                    }
+                    },
+                    array_keys($capabilities ?? [])
                 ),
                 '_links' => [
                     'view' => $this->getRouteIfAuthorized(
                         'rubricManager.getForm',
-                        ['folderId' => $assessment->getContextUnitSpecification()->getFolder()->getId()],
+                        ['folderId' => $assessment->getAssessmentContext()?->getFolder()->getId()],
                     )
                 ],
             ],
