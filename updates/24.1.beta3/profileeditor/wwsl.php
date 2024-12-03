@@ -185,13 +185,10 @@ HELP;
      */
     private function createFields(): void
     {
-        /* We actually need to set perms on two fields here
+        /* Set perms on these profile fields
          */
         $profileFieldIds = [];
 
-        /* Despite this field existing, it'll never render to users: a customised student.twig
-         * intercepts the default rendering
-         */
         $query = "
             INSERT IGNORE INTO `profile_field`
             (roletype, field, display_as, sequence, enabled, term, icon, css, click_to_reveal, is_external)
