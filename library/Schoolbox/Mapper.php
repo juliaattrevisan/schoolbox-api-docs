@@ -4164,9 +4164,6 @@ abstract class Mapper implements IMapper
      */
     public function registerPersistSearchIndexCallbacks(array $irrelevantFields = []): void
     {
-    if (count($irrelevantFields) > 0) {
-        $one = 1;
-    }
         $this->searchIndexIrrelevantFields = $irrelevantFields;
 
         $this->registerCallback(self::CALLBACK_POSTSAVE, [$this, 'persistSearchIndexCallback']);
