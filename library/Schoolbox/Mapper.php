@@ -352,7 +352,6 @@ abstract class Mapper implements IMapper
         ;
     }
 
-
     /**
      * @inheritdoc
      */
@@ -361,7 +360,6 @@ abstract class Mapper implements IMapper
         // Default behaviour is whether this mapper has a soft-delete column registered
         return (bool)$this->soft_delete_column;
     }
-
 
     /**
      * @deprecated under pain of death DO NOT USE THIS; refactor the Mapper instead
