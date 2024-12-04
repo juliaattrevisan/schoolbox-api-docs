@@ -21,64 +21,8 @@
                     </ul>
                 </div>
 
-                <div class="small-12 large-8 columns">
-                    <ul class="dio-buttons no-pad no-margin">
-                        <li>
-                            <a class="achievement" href="/modules/custom/diocesan/achievementreport/{STUDENT_EXTERNAL_ID}">Achievement</a>
-                        </li>
-
-                        <!-- BEGIN grades_button -->
-                        <!-- not required -->
-                        <!-- END grades_button -->
-
-                        <!-- BEGIN timetable -->
-                        <li>
-                            <a class="timetable" href="/timetable/{STUDENT_ID}">Timetable</a>
-                        </li>
-                        <!-- END timetable -->
-
-                        <li>
-                            <a class="attendance" href="/synergetic/attendances2?id={STUDENT_EXTERNAL_ID}">Attendance</a>
-                        </li>
-
-                        <!-- BEGIN due_work -->
-                        <li>
-                            <a class="duework" href="/learning/due/{STUDENT_ID}">{TPL_LOCAL_DUEWORK_PC}</a>
-                        </li>
-                        <!-- END due_work -->
-
-                        <li>
-                            <a class="calendar" href="/calendar/{CAL_TODAY_DATE}/{STUDENT_ID}">Calendar</a>
-                        </li>
-
-                        <!-- BEGIN eportfolio -->
-                        <li>
-                            <a class="eportfolio" href="/eportfolio/{STUDENT_ID}/profile">ePortfolio</a>
-                        </li>
-                        <!-- END eportfolio -->
-
-                        <!-- BEGIN achievements -->
-                        <li><a class="badge" href="/search/user/{STUDENT_ID}/#achievements">Achieved Badges</a></li>
-                        <!-- END achievements -->
-
-                        <!-- BEGIN reports -->
-
-                        <!-- END reports -->
-
-                        <li>
-                            <a class="contacts" href="/synergetic/contacts?id={STUDENT_EXTERNAL_ID}">Contacts</a>
-                        </li>
-
-                        <!-- BEGIN pastoral -->
-                        <li>
-                            <a class="pastoral" href="/pastoral/student/{STUDENT_ID}">{TPL_LOCAL_PASTORALCARE_PC}</a>
-                        </li>
-                        <!-- END pastoral -->
-
-                        <!-- BEGIN custom_buttons -->
-                        <li><a class="icon-{BUTTON_ICON} {BUTTON_CSS}" href="{BUTTON_HREF}" target="{BUTTON_TARGET}" title="{BUTTON_TITLE}">{BUTTON_TEXT}</a></li>
-                        <!-- END custom_buttons -->
-                    </ul>
+                <div class="dio-buttons small-12 large-8 columns">
+                    {BUTTON_ISLAND}
                 </div>
             </div>
         </section>
