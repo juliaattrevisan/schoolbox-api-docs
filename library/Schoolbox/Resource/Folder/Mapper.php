@@ -231,6 +231,28 @@ class Mapper extends AbstractFolderMapper implements ILocator
 
 
     /**
+     * Specifically unregisters a particular kind of callback whose method
+     * matches $method.
+     *
+     * @param string $callbackType
+     * @param string $method
+     * @return void
+     */
+    public function unregisterCallback(string $callbackType, string $method): void
+    {
+        $newStack = [];
+
+        foreach ($this->callback_queue[$callbackType] as $registeredCallback) {
+            if ($registeredCallback[1] !== $method) {
+                $newStack[] = $registeredCallback;
+            }
+        }
+
+        $this->callback_queue[$callbackType] = $newStack;
+    }
+
+
+    /**
      * Validate a course hasn't been moved into a course or unit folder.
      *
      * This would put the course structure into an invalid state, as it would be
