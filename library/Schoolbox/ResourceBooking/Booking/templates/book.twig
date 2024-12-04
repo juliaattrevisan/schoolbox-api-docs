@@ -361,7 +361,7 @@ $(function() {
 
             <section class="content">
                 <div class="resource-booking-item card small-12 columns">
-                    {% if resource.image.hash %}
+                    {% if resource.image and resource.image.hash %}
                         <img src="/storage/image.php?size=constrain200&hash={{ resource.image.hash|e('url') }}" />
                     {% endif %}
                     <article class="resource-content">{{ resource.description|purify }}</article>
