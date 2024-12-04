@@ -425,7 +425,7 @@ class Helper
                     $this->access->getFolderAccess(
                         $user,
                         $item->getFolder()->getId()
-                    ) > UserAccess::ACCESS_READ;
+                    ) >= UserAccess::ACCESS_READ;
             }
         )->reindex();
     }
