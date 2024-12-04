@@ -50,7 +50,7 @@
     <div class="small-12 island">
         <section class="content">
             <div class="resource-booking-item card small-12 columns">
-                {% if item.image.hash %}
+                {% if item.image and item.image.hash %}
                 <img src="/storage/image.php?size=constrain200&hash={{ item.image.hash|e('url') }}" />
                 {% endif %}
                 <article class="resource-content">{{ item.description|purify }}</article>
@@ -125,7 +125,7 @@
     <div class="row">
         <div class="small-12 medium-4 large-5 columns">
             <section class="content">
-                {% if item.image.hash %}
+                {% if item.image and item.image.hash %}
                     <img src="/storage/image.php?size=maxsize&hash={{ item.image.hash|e('url') }}" />
                 {% endif %}
             </section>

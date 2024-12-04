@@ -38,9 +38,9 @@ class Model implements ISoftDeletable, JsonSerializable
     protected $category;
 
     /**
-     * @var Storage\Model
+     * @var null|Storage\Model
      */
-    protected $image;
+    protected ?Storage\Model $image;
 
     /**
      * @var ModerationType\Model
@@ -314,7 +314,7 @@ class Model implements ISoftDeletable, JsonSerializable
     }
 
     /**
-     * @param  Storage\Model $image
+     * @param  null|Storage\Model $image
      * @return $this
      */
     public function setImage($image)
@@ -324,7 +324,7 @@ class Model implements ISoftDeletable, JsonSerializable
     }
 
     /**
-     * @return Storage\Model
+     * @return null|Storage\Model
      */
     public function getImage()
     {
