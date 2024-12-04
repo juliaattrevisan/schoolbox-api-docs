@@ -9,7 +9,6 @@
 
             <!-- BEGIN student_block -->
             <section class="actions-small-1">
-
                 <div class="list-item">
                     <div class="card small-12">
                         <a href="/search/user/{STUDENT_ID}">
@@ -19,52 +18,6 @@
                         <p class="meta">{STUDENT_YEAR}</p>
                     </div>
                 </div>
-
-                <nav>
-                    <sbx-pop-out content-id="row-options-childsubject-{STUDENT_ID}"></sbx-pop-out>
-                </nav>
-
-                <ul class="f-dropdown" data-dropdown-content="" id="row-options-childsubject-{STUDENT_ID}" aria-hidden="true">
-                    <!-- BEGIN timetable -->
-                    <li><a class="icon-timetable" href="/timetable/{STUDENT_ID}">Timetable</a></li>
-                    <!-- END timetable -->
-
-                    <li><a class="icon-calendar" href="/calendar/{CAL_TODAY_DATE}/{STUDENT_ID}">{TPL_LOCAL_CALENDAR_PC}</a></li>
-
-                    <!-- BEGIN due_work -->
-                    <li><a class="icon-due-work" href="/learning/due/{STUDENT_ID}">{TPL_LOCAL_DUEWORK_PC}</a></li>
-                    <!-- END due_work -->
-
-                    <!-- BEGIN grades_button -->
-                    <li><a class="icon-approve" href="/learning/grades/{STUDENT_ID}" title="View {TPL_LOCAL_GRADES_PLURAL_PC}">{TPL_LOCAL_GRADES_PLURAL_PC}</a></li>
-                    <!-- END grades_button -->
-
-                    <!-- BEGIN reports -->
-                    <li><a class="icon-document" href="/user/profile/documents/reports/{STUDENT_ID}">{TPL_LOCAL_REPORTS_PLURAL_PC}</a></li>
-                    <!-- END reports -->
-
-                    <!-- BEGIN pastoral -->
-                    <li><a class="icon-pastoral" href="/pastoral/student/{STUDENT_ID}">{TPL_LOCAL_PASTORALCARE_PC}</a></li>
-                    <!-- END pastoral -->
-
-                    <!-- BEGIN eportfolio -->
-                    <li><a class="icon-eportfolio" href="/eportfolio/{STUDENT_ID}/profile">ePortfolio</a></li>
-                    <!-- END eportfolio -->
-
-                    <!-- BEGIN achievements -->
-                    <li><a class="icon-trophy" href="/search/user/{STUDENT_ID}/#achievements">Achievements</a></li>
-                    <!-- END achievements -->
-
-                    <!-- BEGIN custom_buttons -->
-                    <li><a class="icon-{BUTTON_ICON} {BUTTON_CSS}" href="{BUTTON_HREF}" target="{BUTTON_TARGET}" title="{BUTTON_TITLE}">{BUTTON_TEXT}</a></li>
-                    <!-- END custom_buttons -->
-
-                    <li><a href="/synergetic/mydetails?id={STUDENT_EXTERNAL_ID}" class="icon-info">Medical</a></li>
-                    <li><a href="/synergetic/absences?id={STUDENT_EXTERNAL_ID}" class="icon-user">Absences</a></li>
-                    <li><a href="/synergetic/PTI?id={STUDENT_EXTERNAL_ID}" class="icon-staff">Parent Teacher</a></li>
-                    <li><a href="/synergetic/StudentParentContacts?id={STUDENT_EXTERNAL_ID}" class="icon-directory">Parent Directory</a></li>
-
-                </ul>
 
                 <ul class="action-list">
                     <!-- BEGIN subject_block -->
@@ -77,6 +30,7 @@
                     <!-- END subject_block -->
                 </ul>
 
+                {BUTTON_ISLAND}
             </section>
             <!-- END student_block -->
         </div>
