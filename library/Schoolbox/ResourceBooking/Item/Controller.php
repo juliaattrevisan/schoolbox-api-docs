@@ -400,7 +400,7 @@ class Controller extends Base
             ->setReadOnly(false)
             ->setMulti(false);
 
-        if ($model->getImage()->getHash()) {
+        if ($model->getImage()?->getHash()) {
             $zone->attachFiles([$model->getImage()]);
         }
         return $zone->getTwigContext();

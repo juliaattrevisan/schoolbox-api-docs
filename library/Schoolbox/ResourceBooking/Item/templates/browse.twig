@@ -74,7 +74,7 @@
                     <div class="list-item">
                         <div class="small-12 card">
                             <a href="{{ routeLookup('resourceItem.read', {id: item.id}) }}">
-                                {% if item.image.hash %}
+                                {% if item.image and item.image.hash %}
                                 <img src="/storage/image.php?size=square64&hash={{ item.image.hash|e('url') }}" />
                                 {% endif %}
 
