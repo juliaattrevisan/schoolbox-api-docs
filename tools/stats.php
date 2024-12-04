@@ -256,7 +256,7 @@ $app = new class extends CliTool\App {
             'groups_moderated'  => 'SELECT COUNT(*) FROM userGroups JOIN folder f on userGroups.cid = f.id WHERE userGroups.type = ' . \Schoolbox\Resource\Group::MODERATED_GROUP . ' AND f.deleted_at is null',
             'groups_private'    => 'SELECT COUNT(*) FROM userGroups JOIN folder f on userGroups.cid = f.id WHERE userGroups.type = ' . \Schoolbox\Resource\Group::PRIVATE_GROUP . ' AND f.deleted_at is null',
             'groups_members'     => 'SELECT COUNT(*) FROM userAccess WHERE service = ' . UserAccess::SERVICE_HOMEPAGE,
-            'groups_admin'       => 'SELECT COUNT(*) FROM userAccess WHERE service = ' . UserAccess::SERVICE_HOMEPAGE . ' AND type ='. UserAccess::ACCESS_FULL,
+            'groups_admin'       => 'SELECT COUNT(*) FROM userAccess WHERE service = ' . UserAccess::SERVICE_HOMEPAGE . ' AND type =' . UserAccess::ACCESS_FULL,
             'groups_favourite'   => 'SELECT COUNT(*) FROM userAccess WHERE service = ' . UserAccess::SERVICE_HOMEPAGE . ' AND favourite = 1',
             'views_total'       => 'SELECT SUM(hitcount) FROM homepage_log',
             'views_groups'      => 'SELECT SUM(hitcount) FROM homepage_log JOIN userGroups u on homepage_log.folder_id = u.cid',
