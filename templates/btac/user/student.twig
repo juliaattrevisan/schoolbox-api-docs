@@ -1,9 +1,0 @@
-{% extends '@core/user/student.twig' %}
-
-{% block buttons_miscellaneous %}
-    {% if showButtons %}
-        {% if USER.role.staff %}
-            <li><a href="{{ routeLookup('tassportal.studentProfile', {studentId: user.id}) }}" class="icon-progress" target="_blank">TASS Profile</a></li>
-        {% endif %}
-    {% endif %}
-{% endblock buttons_miscellaneous %}
