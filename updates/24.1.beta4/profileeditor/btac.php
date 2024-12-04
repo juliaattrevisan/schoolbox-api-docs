@@ -186,7 +186,7 @@ HELP;
              * and let the school unlock it in whatever way they want.
              */
             $availabilityRoleIds = $this->helper->fetchRoleIds([Role::STUDENT]);
-            $visibilityRoleIds = $this->helper->fetchRoleIds([Role::PARENT, Role::STAFF]);
+            $visibilityRoleIds = $this->helper->fetchRoleIds([Role::STAFF]);
             $campusIds = $this->helper->fetchCampusIds();
 
             /* Assign relationships
