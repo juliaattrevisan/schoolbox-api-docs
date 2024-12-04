@@ -180,10 +180,7 @@ HELP;
              */
             $profileButtonId = (int)$this->getDatabaseInternal()->lastInsertId();
 
-            /* I'm not sure how you translate this, but it seems mostly relevant
-             * to parents of the student and staff members. There's no real equivalent
-             * to SELF in Profile Buttons, so we'll restrict it to parents and staff
-             * and let the school unlock it in whatever way they want.
+            /* The button exists on student profiles for staff members to access
              */
             $availabilityRoleIds = $this->helper->fetchRoleIds([Role::STUDENT]);
             $visibilityRoleIds = $this->helper->fetchRoleIds([Role::STAFF]);
