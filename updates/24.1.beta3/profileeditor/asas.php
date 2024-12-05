@@ -113,7 +113,7 @@ HELP;
 
         /* Always runs in Perform mode
          */
-        $this->helper = new Helper($this->getDatabaseInternal(), true);
+        $this->helper = new Helper($this->getDatabaseInternal(), true, $this->getLogger());
 
         $this->removeButton();
 
