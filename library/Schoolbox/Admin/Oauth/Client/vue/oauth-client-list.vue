@@ -367,6 +367,19 @@ function onSearchResponse(json: unknown): void {
         });
     }
 }
+
+const selected = window.Vue.ref<Result[]>([]);
+
+/**
+ * Watch selected so the clientCredentialsUser object can be set
+ */
+window.Vue.watch(selected, (newSelected) => {
+    if (newSelected.length > 0) {
+        addingClient.value.clientCredentialsUser = newSelected[0];
+    } else {
+        addingClient.value.clientCredentialsUser = null;
+    }
+});
 </script>
 
 <template>
@@ -496,6 +509,7 @@ function onSearchResponse(json: unknown): void {
                         </template>
                     </v-select>
                     <search-select
+                        v-model:selected="selected"
                         v-model:results="results"
                         label="Client Credentials User"
                         label-id="creator"
