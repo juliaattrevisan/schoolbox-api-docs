@@ -266,7 +266,7 @@ class Controller extends Base
             ]
         ],
         UserAccess::SERVICE_PASTORAL => [
-            'name' => 'Pastoral Moderator',
+            'name' => 'Pastoral',
             'identifier' => self::IDENTIFIER_NONE,
             'availability' => [
                 'read' => true,
