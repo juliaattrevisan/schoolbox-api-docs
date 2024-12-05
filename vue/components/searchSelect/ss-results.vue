@@ -12,6 +12,7 @@ import SsResultsItem from "./ss-results-item.vue";
 interface Props {
     query: string; // the search query
     isActive: boolean; // whether the search is active
+    hasPressedEscape?: boolean; // whether the escape key has been pressed (which closes the search, so any key events should be ignored)
     isSearching: boolean; // to notify of searching
     isLoadingMore?: boolean; // whether more results are being loaded
     allowPartialMatches?: boolean; // whether to allow partial matches, so can match part of a word
@@ -53,6 +54,9 @@ const showSelectAll = window.Vue.computed(() => {
  * @param items - the items selected
  */
 function onAdd(items: SearchSelectItem[]): void {
+    if (props.hasPressedEscape) {
+        return;
+    }
     emit("add", items);
 }
 
@@ -61,6 +65,9 @@ function onAdd(items: SearchSelectItem[]): void {
  * @param items - the items deselected
  */
 function onRemove(items: SearchSelectItem[]): void {
+    if (props.hasPressedEscape) {
+        return;
+    }
     emit("remove", items);
 }
 
@@ -70,6 +77,9 @@ const activeIndex = window.Vue.ref(-1); // to be able to use keyboard navigation
  * Move down the search results
  */
 onKeyStroke("ArrowDown", () => {
+    if (props.hasPressedEscape) {
+        return;
+    }
     const maxIncrement = showSelectAll.value ? props.results.length : props.results.length - 1;
     if (activeIndex.value < maxIncrement) {
         activeIndex.value += 1;
@@ -80,6 +90,9 @@ onKeyStroke("ArrowDown", () => {
  * Move up the search results
  */
 onKeyStroke("ArrowUp", () => {
+    if (props.hasPressedEscape) {
+        return;
+    }
     if (activeIndex.value > 0) {
         activeIndex.value -= 1;
     }

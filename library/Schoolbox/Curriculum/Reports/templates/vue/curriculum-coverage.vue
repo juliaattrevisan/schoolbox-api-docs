@@ -10,6 +10,7 @@ import CcInput from "./cc-input.vue";
 import CcReport from "./cc-report.vue";
 import { useQueryStore } from "./store/ccQueryStore";
 import { usePopOutStore } from "./store/ccPopOutStore";
+import { useExportStore } from "./store/ccExportStore";
 
 interface Props {
     coursesEndpoint: string; // The courses api endpoint.
@@ -18,11 +19,13 @@ interface Props {
     selectedNodes: Node[]; // The pre selected nodes
     reportEndpoint: string; // The report api endpoint.
     usageEndpoint: string; // The usage api endpoint.
+    exportEndpoint: string; // The export endpoint.
 }
 const props = defineProps<Props>();
 
 useQueryStore().init(props.reportEndpoint); // pass through the report endpoint to the store
 usePopOutStore().init(props.usageEndpoint); // pass through the usage endpoint to the store
+useExportStore().init(props.exportEndpoint); // pass through the export endpoint to the store
 </script>
 
 <template>

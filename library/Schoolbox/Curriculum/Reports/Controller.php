@@ -11,6 +11,7 @@ declare(strict_types=1);
 namespace Schoolbox\Curriculum\Reports;
 
 use Alaress\Web\Controller\Base;
+use Schoolbox\Collection;
 use Schoolbox\Curriculum\Node\Mapper as CurriculumMapper;
 use Schoolbox\Curriculum\Reports\Translator\Counts\ModelToArray as ModelToArrayTranslator;
 use Schoolbox\Curriculum\Reports\Translator\Counts\UnitAssessmentUsage as UnitAssessmentUsageTranslator;
@@ -19,15 +20,16 @@ use Schoolbox\Curriculum\Reports\Translator\Counts\CourseStructureOnly as Course
 use Schoolbox\Curriculum\Reports\Translator\Usage\DetailedUsage;
 use Schoolbox\Curriculum\Reports\Translator\Usage\InUseRubricUsage;
 use Schoolbox\Curriculum\Reports\Translator\Usage\RubricUsage;
+use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Mapper as CourseUnitSpecificationMapper;
 use Schoolbox\Learning\Course\DataModel\Specification\Mapper as CourseSpecificationMapper;
-use Schoolbox\Learning\Assessment\DataModel\Mapper as AssessmentMapper;
-use Schoolbox\Assessment\Rubric\DataModel\Capability\Mapper as RubricCapabilityMapper;
-use Schoolbox\Permission\Access\Access;
-use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\Folder\Translator\ModelToArray\LinkOnly as FolderTranslator;
 use Schoolbox\Learning\Course\DataModel\Specification\Translator\ModelToArray as CourseSpecTranslator;
 use Schoolbox\Curriculum\Api\Translator\ModelToArray as NodeTranslator;
+use Schoolbox\TaskDaemon\Producer;
+use Schoolbox\TaskDaemon\Request\DownloadPages\MessageFactory;
+use Schoolbox\Url\Factory as UrlFactory;
+use Schoolbox\User\Translator\Author\ModelToArray as UserTranslator;
 use Twig\Error\Error as TwigError;
 use ValueError;
 use Crell\ApiProblem\ApiProblem;
@@ -41,18 +43,26 @@ class Controller extends Base
      * @param CourseSpecificationMapper     $courseSpecificationMapper
      * @param CourseUnitSpecificationMapper $courseUnitSpecificationMapper
      * @param Helper                        $helper
+     * @param Producer                      $messageProducer
+     * @param MessageFactory                $messageFactory
      */
     public function __construct(
         private CurriculumMapper $curriculumMapper,
         private CourseSpecificationMapper $courseSpecificationMapper,
         private CourseUnitSpecificationMapper $courseUnitSpecificationMapper,
         private Helper $helper,
+        private Producer $messageProducer,
+        private MessageFactory $messageFactory,
+        private Export\Csv $csvExporter,
     ) {
     }
 
 
     /**
      * Get the coverage report
+     *
+     * @api   GET /curriculum/reports/coverage
+     * @since 24.1
      *
      * @return void
      * @throws TwigError
@@ -104,21 +114,19 @@ class Controller extends Base
     /**
      * Return the counts for the curriculum coverage
      *
+     * @api   GET /curriculum/reports/coverage/generate
+     * @since 24.1
+     *
      * @return void
      */
     public function generateCoverage(): void
     {
         $query = $this->requestQuery;
-        $courseId = $query->get('courseId');
-        $nodeId = $query->get('nodeId');
-        $limit = $query->getInt('limit', Cursor::LIMIT_DEFAULT);
         $encodedCursor = $query->get('cursor');
 
-        //Making sure both courseId and nodeId are given in the query
-        $courseId = $this->formatQueryIds($courseId);
-        $nodeId = $this->formatQueryIds($nodeId);
-
-        if (empty($courseId)) {
+        // Making sure both courseId and nodeId are given in the query
+        $courseIds = $this->extractCourseIdsFromQuery();
+        if (empty($courseIds)) {
             $problem = (new ApiProblem("courseId must be defined"))
                 ->setStatus(400)
                 ->asArray();
@@ -126,7 +134,8 @@ class Controller extends Base
             return;
         }
 
-        if (empty($nodeId)) {
+        $nodeIds = $this->extractNodeIdsFromQuery();
+        if (empty($nodeIds)) {
             $problem = (new ApiProblem("nodeId must be defined"))
                 ->setStatus(400)
                 ->asArray();
@@ -135,6 +144,7 @@ class Controller extends Base
         }
 
         //Early exit if limit is not of type int
+        $limit = $query->getInt('limit', Cursor::LIMIT_DEFAULT);
         if (null === $limit) {
             $problem = (new ApiProblem("Limit must be an positive integer"))
                 ->setStatus(400)
@@ -146,8 +156,8 @@ class Controller extends Base
         try {
             $cursor = new Cursor(
                 $this->curriculumMapper,
-                $courseId,
-                $nodeId,
+                $courseIds,
+                $nodeIds,
                 $limit,
             );
 
@@ -160,59 +170,10 @@ class Controller extends Base
             return;
         }
 
-        $usageCount = $cursor->retrieveUsageCount();
-
-        $courseSpecs =
-            $this->courseSpecificationMapper->findByColumn('id', $courseId);
-
-        $courseUnitSpecs = [];
-        array_map(
-            function ($id) use (&$courseUnitSpecs) {
-                $courseUnitSpecs[$id] =
-                    $this->helper->filterUserPermission(
-                        $this->courseUnitSpecificationMapper->findByColumn('course_specification_id', $id, [
-                            'order' => ['f.sequence' => 'DESC']
-                        ]),
-                        $this->getUser()
-                    );
-            },
-            $courseId
-        );
-
-        $unitTranslator = new UnitAssessmentUsageTranslator(
-            $this->routeGenerator,
-            $this->authorizer,
-            $this->getUser(),
-        );
-
-        $courseUsageTranslator = new CourseUsageTranslator(
-            $this->routeGenerator,
-            $this->authorizer,
-            $this->getUser(),
-            $unitTranslator,
-            $courseUnitSpecs,
-        );
-
-        $reportTranslator = new ModelToArrayTranslator(
-            $this->routeGenerator,
-            $this->authorizer,
-            $this->getUser(),
-            $courseUsageTranslator,
-            $courseSpecs,
-            $usageCount
-        );
-
-        $structureTranslator = new CourseStructureTranslator(
-            $this->routeGenerator,
-            $this->authorizer,
-            $this->getUser(),
-            $courseUnitSpecs,
-            new FolderTranslator(0)
-        );
-
-        $usage = $data->map($reportTranslator);
-
-        $structure = $courseSpecs->map($structureTranslator);
+        $courseSpecs     = $this->courseSpecificationMapper->findByColumn('id', $courseIds);
+        $courseUnitSpecs = $this->findCourseUnitSpecs($courseIds);
+        $usage           = $this->loadUsageStructure($courseSpecs, $courseUnitSpecs, $data, $cursor->retrieveUsageCount());
+        $structure       = $this->loadCourseStructure($courseSpecs, $courseUnitSpecs);
 
         $response =  [
             'data' => [
@@ -235,6 +196,9 @@ class Controller extends Base
 
     /**
      * Pay load for curriculum node usage within the selected course and unit
+     *
+     * @api   GET /curriculum/reports/coverage/usage
+     * @since 24.1
      *
      * @return void
      */
@@ -332,5 +296,202 @@ class Controller extends Base
             is_array($ids) ? $ids : explode(',', $ids ?? ''),
             fn($id) => $id > 0
         );
+    }
+
+    /**
+     * Endpoint for requesting a coverage report to be downloaded via taskd.
+     *
+     * @api   GET /curriculum/reports/coverage/export/request
+     * @since 24.1
+     *
+     * @return void
+     */
+    public function requestExportCoverage(): void
+    {
+        $baseUrl           = (new UrlFactory($this->getConfigLoader()))->buildFullyQualified();
+        $exportCoverageUrl = $baseUrl->withPath($this->routeGenerator->generate('curriculumreports.exportCoverage'));
+
+        // Split each course into a separate download
+        $courseIds = $this->extractCourseIdsFromQuery();
+        foreach ($courseIds as $courseId) {
+            $course = $this->courseSpecificationMapper->findById($courseId);
+            $query  = $this->requestQuery->getArrayCopy();
+            $query['courseId'] = $courseId;
+
+            $this->messageFactory = $this->messageFactory->addFileContent(
+                sprintf('%s-%d.csv', $course->getTitle(), $courseId),
+                $exportCoverageUrl->withQuery(http_build_query($query))->__toString(),
+            );
+        }
+
+        // Send it to taskd
+        $userSerializer = new UserTranslator();
+        $message        = $this->messageFactory
+            ->setUser($this->getUser())
+            ->setCallbackUrl(
+                (string)$baseUrl->withPath(
+                    $this->routeGenerator->generate(
+                        'apiusernotify.apiUserNotify',
+                        ['userId' => $this->getUser()->getId()]
+                    )
+                )
+            )
+            ->setCallbackParams([
+                'message' => 'Your curriculum coverage report is ready to download',
+                'from'    => call_user_func($userSerializer, $this->getUser()),
+                'to'      => call_user_func($userSerializer, $this->getUser()),
+            ])
+            ->setOutfile('curriculum-coverage-report.zip')
+            ->build();
+        $this->messageProducer->send($message);
+
+        // Once done, output empty
+        $this->response = $this->responseEmpty();
+    }
+
+    /**
+     * Export the current coverage report to a CSV.
+     *
+     * @api   GET /curriculum/reports/coverage/export
+     * @since 24.1
+     *
+     * @return void
+     */
+    public function exportCoverage(): void
+    {
+        $courseIds = $this->extractCourseIdsFromQuery();
+        $nodeIds   = $this->extractNodeIdsFromQuery();
+
+        $cursor = new Cursor(
+            $this->curriculumMapper,
+            $courseIds,
+            $nodeIds,
+            Cursor::LIMIT_DEFAULT,
+        );
+        $data = $cursor->retrieveResults(null);
+
+        // Create export data
+        $courseSpecs     = $this->courseSpecificationMapper->findByColumn('id', $courseIds);
+        $courseUnitSpecs = $this->findCourseUnitSpecs($courseIds);
+        $usage           = $this->loadUsageStructure($courseSpecs, $courseUnitSpecs, $data, $cursor->retrieveUsageCount());
+        $structure       = $this->loadCourseStructure($courseSpecs, $courseUnitSpecs);
+        $filename        = "curriculum-coverage-report.csv";
+
+        $fp = fopen('php://temp', 'w');
+
+        $this->response = $this->responseFromStream(new \GuzzleHttp\Psr7\Stream($fp), $filename, 'text/csv; charset=utf-8');
+        $this->csvExporter->export(
+            $fp,
+            $structure,
+            $usage,
+            $this->requestQuery->getBool('course', true),
+            $this->requestQuery->getBool('unit', true),
+            $this->requestQuery->getBool('activity', true),
+            $this->requestQuery->getBool('lessonPlan', true),
+            $this->requestQuery->getBool('rubric', true),
+            $this->requestQuery->getBool('inUseRubric', true),
+        );
+    }
+
+    /**
+     * Extract the course IDs from the query string.
+     *
+     * @return array
+     */
+    private function extractCourseIdsFromQuery(): array
+    {
+        return $this->formatQueryIds($this->requestQuery->get('courseId'));
+    }
+
+    /**
+     * Extract the curriculum node IDs from the query string.
+     *
+     * @return array
+     */
+    private function extractNodeIdsFromQuery(): array
+    {
+        return $this->formatQueryIds($this->requestQuery->get('nodeId'));
+    }
+
+    /**
+     * Find course unit specs, given a set of course IDs.
+     *
+     * @param array $courseIds
+     * @return array
+     */
+    private function findCourseUnitSpecs(array $courseIds): array
+    {
+        $courseUnitSpecs = [];
+        array_map(
+            function ($id) use (&$courseUnitSpecs) {
+                $courseUnitSpecs[$id] = $this->helper->filterUserPermission(
+                    $this->courseUnitSpecificationMapper->findByColumn('course_specification_id', $id, [
+                        'order' => ['f.sequence' => 'DESC']
+                    ]),
+                    $this->getUser()
+                );
+            },
+            $courseIds,
+        );
+        return $courseUnitSpecs;
+    }
+
+    /**
+     * Load the course specs into a structure suitable for output and CSV
+     * processing.
+     *
+     * @param GenericCollection $courseSpecs
+     * @param array             $courseUnitSpecs
+     * @return Collection
+     */
+    private function loadCourseStructure(GenericCollection $courseSpecs, array $courseUnitSpecs): Collection
+    {
+        $structureTranslator = new CourseStructureTranslator(
+            $this->routeGenerator,
+            $this->authorizer,
+            $this->getUser(),
+            $courseUnitSpecs,
+            new FolderTranslator(0)
+        );
+        return $courseSpecs->map($structureTranslator);
+    }
+
+    /**
+     * Load the usage specs into a structure suitable for output and CSV
+     * processing.
+     *
+     * @param GenericCollection $courseSpecs
+     * @param array             $courseUnitSpecs
+     * @param Collection        $data
+     * @param array             $usageCount
+     * @return Collection
+     */
+    private function loadUsageStructure(GenericCollection $courseSpecs, array $courseUnitSpecs, Collection $data, array $usageCount): Collection
+    {
+        $unitTranslator = new UnitAssessmentUsageTranslator(
+            $this->routeGenerator,
+            $this->authorizer,
+            $this->getUser(),
+        );
+
+        $courseUsageTranslator = new CourseUsageTranslator(
+            $this->routeGenerator,
+            $this->authorizer,
+            $this->getUser(),
+            $unitTranslator,
+            $courseUnitSpecs,
+        );
+
+        $reportTranslator = new ModelToArrayTranslator(
+            $this->routeGenerator,
+            $this->authorizer,
+            $this->getUser(),
+            $courseUsageTranslator,
+            $courseSpecs,
+            $usageCount
+        );
+
+
+        return $data->map($reportTranslator);
     }
 }

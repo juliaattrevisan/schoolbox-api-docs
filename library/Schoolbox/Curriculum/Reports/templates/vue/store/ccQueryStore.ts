@@ -66,6 +66,7 @@ export const useQueryStore = defineStore("ccQuery", () => {
 
     return {
         init,
+        getQueryParams,
         setQueryParams,
         // getEndpointWithParams,
         getQueryUrls,
