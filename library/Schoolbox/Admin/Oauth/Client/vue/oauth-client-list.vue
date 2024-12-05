@@ -368,16 +368,46 @@ function onSearchResponse(json: unknown): void {
     }
 }
 
-const selected = window.Vue.ref<Result[]>([]);
+const addSelected = window.Vue.ref<Result[]>([]);
 
 /**
- * Watch selected so the clientCredentialsUser object can be set
+ * Watch addSelected so the clientCredentialsUser object can be set
  */
-window.Vue.watch(selected, (newSelected) => {
+window.Vue.watch(addSelected, (newSelected) => {
     if (newSelected.length > 0) {
         addingClient.value.clientCredentialsUser = newSelected[0];
     } else {
         addingClient.value.clientCredentialsUser = null;
+    }
+});
+
+const modifySelected = window.Vue.ref<Result[]>([]);
+
+/**
+ * Watch modifyingClient so we can pass the current clientCredentialsUser
+ * object to the search-select component
+ */
+window.Vue.watch(modifyingClient, (newModifyClient) => {
+    if (newModifyClient.clientCredentialsUser) {
+        modifySelected.value = [
+            {
+                ...newModifyClient.clientCredentialsUser,
+                name: newModifyClient.clientCredentialsUser?.fullName,
+            },
+        ];
+    } else {
+        modifySelected.value = [];
+    }
+});
+
+/**
+ * Watch modifyingClient so the clientCredentialsUser object can be set
+ */
+window.Vue.watch(modifySelected, (newSelected) => {
+    if (newSelected.length > 0) {
+        modifyingClient.value.clientCredentialsUser = newSelected[0];
+    } else {
+        modifyingClient.value.clientCredentialsUser = null;
     }
 });
 </script>
@@ -489,7 +519,7 @@ window.Vue.watch(selected, (newSelected) => {
                         instance, without interaction by an actual user) will be authenticated as this user; if no user
                         is set here, this client may not use client credentials requests.
                     </p>
-                    <v-select
+                    <!-- <v-select
                         v-model="addingClient.clientCredentialsUser"
                         label="fullName"
                         placeholder="Search for user, or leave empty for no user"
@@ -504,12 +534,12 @@ window.Vue.watch(selected, (newSelected) => {
                         <template #option="option">
                             <span class="d-center">{{ (option as VueSelectOption).fullName }}</span>
                         </template>
-                        <template #selected-option="option">
-                            <span class="selected d-center">{{ (option as VueSelectOption).fullName }}</span>
+                        <template #addSelected-option="option">
+                            <span class="addSelected d-center">{{ (option as VueSelectOption).fullName }}</span>
                         </template>
-                    </v-select>
+                    </v-select> -->
                     <search-select
-                        v-model:selected="selected"
+                        v-model:selected="addSelected"
                         v-model:results="results"
                         label="Client Credentials User"
                         label-id="creator"
@@ -590,7 +620,7 @@ window.Vue.watch(selected, (newSelected) => {
                         instance, without interaction by an actual user) will be authenticated as this user; if no user
                         is set here, this client may not use client credentials requests.
                     </p>
-                    <v-select
+                    <!-- <v-select
                         v-model="modifyingClient.clientCredentialsUser"
                         label="fullName"
                         placeholder="Search for user, or leave empty for no user"
@@ -605,12 +635,12 @@ window.Vue.watch(selected, (newSelected) => {
                         <template #option="option">
                             <span class="d-center">{{ (option as VueSelectOption).fullName }}</span>
                         </template>
-                        <template #selected-option="option">
-                            <span class="selected d-center">{{ (option as VueSelectOption).fullName }}</span>
+                        <template #addSelected-option="option">
+                            <span class="addSelected d-center">{{ (option as VueSelectOption).fullName }}</span>
                         </template>
-                    </v-select>
+                    </v-select> -->
                     <search-select
-                        v-model:selected="selected"
+                        v-model:selected="modifySelected"
                         v-model:results="results"
                         label="Client Credentials User"
                         label-id="creator"
