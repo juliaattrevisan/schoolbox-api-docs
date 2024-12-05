@@ -178,8 +178,8 @@ class Handler
         foreach ($stmt as $row) {
             if (!isset($classArr[$row["ClassCode"]])) {
                 $classArr[$row["ClassCode"]] = [
-                    "Code"        => $row["ClassCode"] ?? '',
-                    "Description" => $row["ClassDesc"] ?? '',
+                    "Code"        => $row["ClassCode"] ?? null,
+                    "Description" => $row["ClassDesc"] ?? null,
                 ];
             }
         }
@@ -215,11 +215,11 @@ class Handler
         $stmt = $this->externalDb->executeQuery($sql, $params);
         foreach ($stmt as $row) {
             $yearLevelArr[] = [
-                "ID"          => $row["ID"] ?? '',
-                "ClassCode"   => $row["ClassCode"] ?? '',
-                "ClassDesc"   => $row["ClassDesc"] ?? '',
-                "Surname"     => $row["Surname"] ?? '',
-                "Preferred"   => $row["Preferred"] ?? '',
+                "ID"          => $row["ID"] ?? null,
+                "ClassCode"   => $row["ClassCode"] ?? null,
+                "ClassDesc"   => $row["ClassDesc"] ?? null,
+                "Surname"     => $row["Surname"] ?? null,
+                "Preferred"   => $row["Preferred"] ?? null,
             ];
         }
 
@@ -301,12 +301,12 @@ class Handler
 
             if (!isset($staffs[$staffId])) {
                 $staffs[$staffId] = [
-                    "ID"               => $row["StaffID"] ?? '',
-                    "Preferred"        => $row["StaffPreferred"] ?? '',
-                    "Surname"          => $row["StaffSurname"] ?? '',
-                    "Email"            => $row["StaffEmail"] ?? '',
-                    "NormalYearLevel"  => $row["NormalYearLevel"] ?? '',
-                    "NormalYearLevel2" => $row["NormalYearLevel2"] ?? '',
+                    "ID"               => $row["StaffID"] ?? null,
+                    "Preferred"        => $row["StaffPreferred"] ?? null,
+                    "Surname"          => $row["StaffSurname"] ?? null,
+                    "Email"            => $row["StaffEmail"] ?? null,
+                    "NormalYearLevel"  => $row["NormalYearLevel"] ?? null,
+                    "NormalYearLevel2" => $row["NormalYearLevel2"] ?? null,
                 ];
             }
         }
@@ -359,7 +359,7 @@ class Handler
         $stmt = $this->externalDb->executeQuery($sql, $params);
         $students = [];
         foreach ($stmt as $row) {
-            $studentId = $row["StudentID"] ?? '';
+            $studentId = $row["StudentID"] ?? null;
             $birthDate = $row['StudentBirthDate'] ?? null;
             $formattedBirthDate = ($birthDate !== null)
                 ? (\Alaress_Date_Format::newFromTimestamp(strtotime($birthDate)))->getUsingFormat('Y-m-d')
@@ -368,16 +368,16 @@ class Handler
             if (!isset($students[$studentId])) {
                 $students[$studentId] = [
                     "ID"                   => $studentId,
-                    "Preferred"            => $row["StudentPreferred"] ?? '',
-                    "Surname"              => $row["StudentSurname"] ?? '',
-                    "YearLevelCode"        => $row["StudentYearLevel"] ?? '',
-                    "YearLevelDescription" => $row["StudentYearLevelDescription"] ?? '',
-                    "Boarder"              => $row["StudentBoarder"] ?? '',
-                    "RollGroup"            => $row["StudentTutor"] ?? '',
-                    "HouseCode"            => $row["StudentHouse"] ?? '',
-                    "HouseDescription"     => $row["StudentHouseDescription"] ?? '',
-                    "Gender"               => $row["StudentGender"] ?? '',
-                    "Email"                => $row["StudentEmail"] ?? '',
+                    "Preferred"            => $row["StudentPreferred"] ?? null,
+                    "Surname"              => $row["StudentSurname"] ?? null,
+                    "YearLevelCode"        => $row["StudentYearLevel"] ?? null,
+                    "YearLevelDescription" => $row["StudentYearLevelDescription"] ?? null,
+                    "Boarder"              => $row["StudentBoarder"] ?? null,
+                    "RollGroup"            => $row["StudentTutor"] ?? null,
+                    "HouseCode"            => $row["StudentHouse"] ?? null,
+                    "HouseDescription"     => $row["StudentHouseDescription"] ?? null,
+                    "Gender"               => $row["StudentGender"] ?? null,
+                    "Email"                => $row["StudentEmail"] ?? null,
                     "BirthDate"            => $formattedBirthDate,
                     "Contact1ID"           => null,
                     "Contact1Surname"      => null,
@@ -394,17 +394,17 @@ class Handler
 
             // Check if Contact1 is empty and fill it, otherwise fill Contact2
             if (empty($students[$studentId]["Contact1ID"])) {
-                $students[$studentId]["Contact1ID"] = $row["ContactID"] ?? '';
-                $students[$studentId]["Contact1Surname"] = $row["ContactSurname"] ?? '';
-                $students[$studentId]["Contact1Name"] = $row["ContactPreferred"] ?? '';
-                $students[$studentId]["Contact1Mobile"] = $row["ContactMobilePhone"] ?? '';
-                $students[$studentId]["Contact1Email"] = $row["ContactDefaultEmail"] ?? '';
+                $students[$studentId]["Contact1ID"] = $row["ContactID"] ?? null;
+                $students[$studentId]["Contact1Surname"] = $row["ContactSurname"] ?? null;
+                $students[$studentId]["Contact1Name"] = $row["ContactPreferred"] ?? null;
+                $students[$studentId]["Contact1Mobile"] = $row["ContactMobilePhone"] ?? null;
+                $students[$studentId]["Contact1Email"] = $row["ContactDefaultEmail"] ?? null;
             } elseif (empty($students[$studentId]["Contact2ID"])) {
-                $students[$studentId]["Contact2ID"] = $row["ContactID"] ?? '';
-                $students[$studentId]["Contact2Surname"] = $row["ContactSurname"] ?? '';
-                $students[$studentId]["Contact2Name"] = $row["ContactPreferred"] ?? '';
-                $students[$studentId]["Contact2Mobile"] = $row["ContactMobilePhone"] ?? '';
-                $students[$studentId]["Contact2Email"] = $row["ContactDefaultEmail"] ?? '';
+                $students[$studentId]["Contact2ID"] = $row["ContactID"] ?? null;
+                $students[$studentId]["Contact2Surname"] = $row["ContactSurname"] ?? null;
+                $students[$studentId]["Contact2Name"] = $row["ContactPreferred"] ?? null;
+                $students[$studentId]["Contact2Mobile"] = $row["ContactMobilePhone"] ?? null;
+                $students[$studentId]["Contact2Email"] = $row["ContactDefaultEmail"] ?? null;
             }
         }
 
@@ -443,9 +443,9 @@ class Handler
 
         $stmt = $this->externalDb->executeQuery($sql, $params);
         foreach ($stmt as $row) {
-            $photoColumn = $row[$columnToUse] ?? '';
+            $photoColumn = $row[$columnToUse] ?? null;
             $avatarArr[$row["ID"]] = [
-                "ID"     => $row["ID"] ?? '',
+                "ID"     => $row["ID"] ?? null,
                 "Avatar" => $photoColumn ? base64_encode($photoColumn) : '',
             ];
         }
@@ -479,14 +479,14 @@ class Handler
         $stmt = $this->externalDb->executeQuery($sql, $params);
         foreach ($stmt as $row) {
             $stuMedicalArr[$row["ID"]][] = [
-                "ID"                                  => $row["ID"] ?? '',
-                "MedicalConditionCode"                => $row["MedicalConditionCode"] ?? '',
-                "MedicalConditionTypeDescription"     => $row["MedicalConditionTypeDescription"] ?? '',
-                "MedicalConditionSeverityCode"        => $row["SeverityCode"] ?? '',
-                "MedicalConditionSeverityDescription" => $row["SeverityDescription"] ?? '',
+                "ID"                                  => $row["ID"] ?? null,
+                "MedicalConditionCode"                => $row["MedicalConditionCode"] ?? null,
+                "MedicalConditionTypeDescription"     => $row["MedicalConditionTypeDescription"] ?? null,
+                "MedicalConditionSeverityCode"        => $row["SeverityCode"] ?? null,
+                "MedicalConditionSeverityDescription" => $row["SeverityDescription"] ?? null,
                 "MedicalConditionDetails"             => htmlentities($row["ConditionDetails"] ?? ''),
-                "EmergencyTreatmentDetails"           => $row["EmergencyTreatmentDetails"] ?? '',
-                "OtherTreatmentDetails"               => $row["OtherTreatmentDetails"] ?? '',
+                "EmergencyTreatmentDetails"           => $row["EmergencyTreatmentDetails"] ?? null,
+                "OtherTreatmentDetails"               => $row["OtherTreatmentDetails"] ?? null,
             ];
         }
 
@@ -517,12 +517,12 @@ class Handler
         $stmt = $this->externalDb->executeQuery($sql, $params);
         foreach ($stmt as $row) {
             $stuArr[] = [
-                "ID"            => $row["StudentID"] ?? '',
-                "Surname"       => $row["StudentSurname"] ?? '',
-                "Preferred"     => $row["StudentPreferred"] ?? '',
-                "YearLevelCode" => $row["StudentYearLevel"] ?? '',
-                "Email"         => $row["StudentOccupEmail"] ?? '',
-                "TutorGroup"    => $row["StudentTutor"] ?? '',
+                "ID"            => $row["StudentID"] ?? null,
+                "Surname"       => $row["StudentSurname"] ?? null,
+                "Preferred"     => $row["StudentPreferred"] ?? null,
+                "YearLevelCode" => $row["StudentYearLevel"] ?? null,
+                "Email"         => $row["StudentOccupEmail"] ?? null,
+                "TutorGroup"    => $row["StudentTutor"] ?? null,
             ];
         }
 
@@ -560,11 +560,11 @@ class Handler
         $stmt = $this->externalDb->executeQuery($sql, $params);
         foreach ($stmt as $row) {
             $parentArr[] = [
-                "ID"        => $row["ID"] ?? '',
-                "Surname"   => $row["Surname"] ?? '',
-                "Preferred" => $row["Given1"] ?? '',
-                "Mobile"    => $row["MobilePhone"] ?? '',
-                "Email"     => $row["Email"] ?? '',
+                "ID"        => $row["ID"] ?? null,
+                "Surname"   => $row["Surname"] ?? null,
+                "Preferred" => $row["Given1"] ?? null,
+                "Mobile"    => $row["MobilePhone"] ?? null,
+                "Email"     => $row["Email"] ?? null,
             ];
         }
 
@@ -914,9 +914,9 @@ class Handler
 
         $stmt = $this->externalDb->executeQuery($sql, $params);
         foreach ($stmt as $row) {
-            $relatedData['studentIDs'][] = $row["StudentID"] ?? '';
-            $relatedData['linkedID']     = $row["ContactID"] ?? '';
-            $relatedData['linkedIDRel']  = $row["ContactRelationship"] ?? '';
+            $relatedData['studentIDs'][] = $row["StudentID"] ?? null;
+            $relatedData['linkedID']     = $row["ContactID"] ?? null;
+            $relatedData['linkedIDRel']  = $row["ContactRelationship"] ?? null;
         }
 
         $relatedData['studentIDs'] = array_values(array_unique($relatedData['studentIDs']));
@@ -951,53 +951,53 @@ class Handler
 
             $primaryData[] = [
                 "Type"                          => "Primary",
-                "ID"                            => $row["ID"] ?? '',
+                "ID"                            => $row["ID"] ?? null,
                 "Relationship"                  => $parentRel,
-                "Gender"                        => $row["Gender"] ?? '',
-                "Surname"                       => $row["Surname"] ?? '',
-                "Preferred"                     => $row["Preferred"] ?? '',
-                "Given1"                        => $row["Given1"] ?? '',
+                "Gender"                        => $row["Gender"] ?? null,
+                "Surname"                       => $row["Surname"] ?? null,
+                "Preferred"                     => $row["Preferred"] ?? null,
+                "Given1"                        => $row["Given1"] ?? null,
                 "BirthDate"                     => $formattedBirthDate,
-                "AddressID"                     => $row["AddressID"] ?? '',
-                "Address"                       => $row["HomeAddress1"] ?? '',
-                "Address2"                      => $row["HomeAddress2"] ?? '',
-                "Address3"                      => $row["HomeAddress3"] ?? '',
-                "Suburb"                        => $row["HomeSuburb"] ?? '',
-                "State"                         => $row["HomeState"] ?? '',
-                "Postcode"                      => $row["HomePostCode"] ?? '',
-                "SamePostal"                    => $row["HomeAddressSameFlag"] ?? '',
-                "PostalAddress"                 => $row["Address1"] ?? '',
-                "PostalAddress2"                => $row["Address2"] ?? '',
-                "PostalAddress3"                => $row["Address3"] ?? '',
-                "PostalSuburb"                  => $row["Suburb"] ?? '',
-                "PostalState"                   => $row["State"] ?? '',
-                "PostalPostcode"                => $row["PostCode"] ?? '',
-                "HomePhone"                     => $row["Phone"] ?? '',
-                "Mobile"                        => $row["MobilePhone"] ?? '',
-                "DefaultMobilePhoneCode"        => $row["DefaultMobilePhoneCode"] ?? '',
-                "Email"                         => $row["Email"] ?? '',
-                "OccupDesc"                     => $row["OccupDesc"] ?? '',
-                "OccupationPositionDescription" => $row["OccupationPositionDescription"] ?? '',
-                "OccupCompany"                  => $row["OccupCompany"] ?? '',
-                "OccupCode"                     => $row["OccupCode"] ?? '',
-                "OccupCountry"                  => $row["OccupCountryCode"] ?? '',
-                "OccupIndustryCode"             => $row["OccupIndustryCode"] ?? '',
-                "OccupPhone"                    => $row["OccupPhone"] ?? '',
-                "OccupEmail"                    => $row["OccupEmail"] ?? '',
-                "OccupAddress"                  => $row["OccupAddress1"] ?? '',
-                "OccupAddress2"                 => $row["OccupAddress2"] ?? '',
-                "OccupAddress3"                 => $row["OccupAddress3"] ?? '',
-                "OccupSuburb"                   => $row["OccupSuburb"] ?? '',
-                "OccupState"                    => $row["OccupState"] ?? '',
-                "OccupPostcode"                 => $row["OccupPostCode"] ?? '',
-                "ReligionDescription"           => $row["ReligionDescription"] ?? '',
-                "NationalityDescription"        => $row["NationalityDescription"] ?? '',
-                "CountryOfBirthDescription"     => $row["CountryOfBirthDescription"] ?? '',
-                "HomeLanguageDescription"       => $row["HomeLanguageDescription"] ?? '',
-                "HighestSecondaryYearLevel"     => $row["HighestSecondaryYearLevel"] ?? '',
-                "QualificationLevelDescription" => $row["QualificationLevelDescription"] ?? '',
-                "ReceiveMailFlag"               => $row["MailFlag"] ?? '',
-                "DefaultEmailCode"              => $row["DefaultEmailCode"] ?? '',
+                "AddressID"                     => $row["AddressID"] ?? null,
+                "Address"                       => $row["HomeAddress1"] ?? null,
+                "Address2"                      => $row["HomeAddress2"] ?? null,
+                "Address3"                      => $row["HomeAddress3"] ?? null,
+                "Suburb"                        => $row["HomeSuburb"] ?? null,
+                "State"                         => $row["HomeState"] ?? null,
+                "Postcode"                      => $row["HomePostCode"] ?? null,
+                "SamePostal"                    => $row["HomeAddressSameFlag"] ?? null,
+                "PostalAddress"                 => $row["Address1"] ?? null,
+                "PostalAddress2"                => $row["Address2"] ?? null,
+                "PostalAddress3"                => $row["Address3"] ?? null,
+                "PostalSuburb"                  => $row["Suburb"] ?? null,
+                "PostalState"                   => $row["State"] ?? null,
+                "PostalPostcode"                => $row["PostCode"] ?? null,
+                "HomePhone"                     => $row["Phone"] ?? null,
+                "Mobile"                        => $row["MobilePhone"] ?? null,
+                "DefaultMobilePhoneCode"        => $row["DefaultMobilePhoneCode"] ?? null,
+                "Email"                         => $row["Email"] ?? null,
+                "OccupDesc"                     => $row["OccupDesc"] ?? null,
+                "OccupationPositionDescription" => $row["OccupationPositionDescription"] ?? null,
+                "OccupCompany"                  => $row["OccupCompany"] ?? null,
+                "OccupCode"                     => $row["OccupCode"] ?? null,
+                "OccupCountry"                  => $row["OccupCountryCode"] ?? null,
+                "OccupIndustryCode"             => $row["OccupIndustryCode"] ?? null,
+                "OccupPhone"                    => $row["OccupPhone"] ?? null,
+                "OccupEmail"                    => $row["OccupEmail"] ?? null,
+                "OccupAddress"                  => $row["OccupAddress1"] ?? null,
+                "OccupAddress2"                 => $row["OccupAddress2"] ?? null,
+                "OccupAddress3"                 => $row["OccupAddress3"] ?? null,
+                "OccupSuburb"                   => $row["OccupSuburb"] ?? null,
+                "OccupState"                    => $row["OccupState"] ?? null,
+                "OccupPostcode"                 => $row["OccupPostCode"] ?? null,
+                "ReligionDescription"           => $row["ReligionDescription"] ?? null,
+                "NationalityDescription"        => $row["NationalityDescription"] ?? null,
+                "CountryOfBirthDescription"     => $row["CountryOfBirthDescription"] ?? null,
+                "HomeLanguageDescription"       => $row["HomeLanguageDescription"] ?? null,
+                "HighestSecondaryYearLevel"     => $row["HighestSecondaryYearLevel"] ?? null,
+                "QualificationLevelDescription" => $row["QualificationLevelDescription"] ?? null,
+                "ReceiveMailFlag"               => $row["MailFlag"] ?? null,
+                "DefaultEmailCode"              => $row["DefaultEmailCode"] ?? null,
             ];
         }
         return $primaryData;
@@ -1028,53 +1028,53 @@ class Handler
 
             $spouseData[] = [
                 "Type"                          => "Spouse",
-                "ID"                            => $row["ID"] ?? '',
+                "ID"                            => $row["ID"] ?? null,
                 "Relationship"                  => $spouseRel,
-                "Gender"                        => $row["Gender"] ?? '',
-                "Surname"                       => $row["Surname"] ?? '',
-                "Preferred"                     => $row["Preferred"] ?? '',
-                "Given1"                        => $row["Given1"] ?? '',
+                "Gender"                        => $row["Gender"] ?? null,
+                "Surname"                       => $row["Surname"] ?? null,
+                "Preferred"                     => $row["Preferred"] ?? null,
+                "Given1"                        => $row["Given1"] ?? null,
                 "BirthDate"                     => $formattedBirthDate,
-                "AddressID"                     => $row["AddressID"] ?? '',
-                "Address"                       => $row["HomeAddress1"] ?? '',
-                "Address2"                      => $row["HomeAddress2"] ?? '',
-                "Address3"                      => $row["HomeAddress3"] ?? '',
-                "Suburb"                        => $row["HomeSuburb"] ?? '',
-                "State"                         => $row["HomeState"] ?? '',
-                "Postcode"                      => $row["HomePostCode"] ?? '',
-                "SamePostal"                    => $row["HomeAddressSameFlag"] ?? '',
-                "PostalAddress"                 => $row["Address1"] ?? '',
-                "PostalAddress2"                => $row["Address2"] ?? '',
-                "PostalAddress3"                => $row["Address3"] ?? '',
-                "PostalSuburb"                  => $row["Suburb"] ?? '',
-                "PostalState"                   => $row["State"] ?? '',
-                "PostalPostcode"                => $row["PostCode"] ?? '',
-                "HomePhone"                     => $row["Phone"] ?? '',
-                "Mobile"                        => $row["MobilePhone"] ?? '',
-                "DefaultMobilePhoneCode"        => $row["DefaultMobilePhoneCode"] ?? '',
-                "Email"                         => $row["Email"] ?? '',
-                "OccupDesc"                     => $row["OccupDesc"] ?? '',
-                "OccupationPositionDescription" => $row["OccupationPositionDescription"] ?? '',
-                "OccupCompany"                  => $row["OccupCompany"] ?? '',
-                "OccupCode"                     => $row["OccupCode"] ?? '',
-                "OccupCountry"                  => $row["OccupCountryCode"] ?? '',
-                "OccupIndustryCode"             => $row["OccupIndustryCode"] ?? '',
-                "OccupPhone"                    => $row["OccupPhone"] ?? '',
-                "OccupEmail"                    => $row["OccupEmail"] ?? '',
-                "OccupAddress"                  => $row["OccupAddress1"] ?? '',
-                "OccupAddress2"                 => $row["OccupAddress2"] ?? '',
-                "OccupAddress3"                 => $row["OccupAddress3"] ?? '',
-                "OccupSuburb"                   => $row["OccupSuburb"] ?? '',
-                "OccupState"                    => $row["OccupState"] ?? '',
-                "OccupPostcode"                 => $row["OccupPostCode"] ?? '',
-                "ReligionDescription"           => $row["ReligionDescription"] ?? '',
-                "NationalityDescription"        => $row["NationalityDescription"] ?? '',
-                "CountryOfBirthDescription"     => $row["CountryOfBirthDescription"] ?? '',
-                "HomeLanguageDescription"       => $row["HomeLanguageDescription"] ?? '',
-                "HighestSecondaryYearLevel"     => $row["HighestSecondaryYearLevel"] ?? '',
-                "QualificationLevelDescription" => $row["QualificationLevelDescription"] ?? '',
-                "ReceiveMailFlag"               => $row["MailFlag"] ?? '',
-                "DefaultEmailCode"              => $row["DefaultEmailCode"] ?? '',
+                "AddressID"                     => $row["AddressID"] ?? null,
+                "Address"                       => $row["HomeAddress1"] ?? null,
+                "Address2"                      => $row["HomeAddress2"] ?? null,
+                "Address3"                      => $row["HomeAddress3"] ?? null,
+                "Suburb"                        => $row["HomeSuburb"] ?? null,
+                "State"                         => $row["HomeState"] ?? null,
+                "Postcode"                      => $row["HomePostCode"] ?? null,
+                "SamePostal"                    => $row["HomeAddressSameFlag"] ?? null,
+                "PostalAddress"                 => $row["Address1"] ?? null,
+                "PostalAddress2"                => $row["Address2"] ?? null,
+                "PostalAddress3"                => $row["Address3"] ?? null,
+                "PostalSuburb"                  => $row["Suburb"] ?? null,
+                "PostalState"                   => $row["State"] ?? null,
+                "PostalPostcode"                => $row["PostCode"] ?? null,
+                "HomePhone"                     => $row["Phone"] ?? null,
+                "Mobile"                        => $row["MobilePhone"] ?? null,
+                "DefaultMobilePhoneCode"        => $row["DefaultMobilePhoneCode"] ?? null,
+                "Email"                         => $row["Email"] ?? null,
+                "OccupDesc"                     => $row["OccupDesc"] ?? null,
+                "OccupationPositionDescription" => $row["OccupationPositionDescription"] ?? null,
+                "OccupCompany"                  => $row["OccupCompany"] ?? null,
+                "OccupCode"                     => $row["OccupCode"] ?? null,
+                "OccupCountry"                  => $row["OccupCountryCode"] ?? null,
+                "OccupIndustryCode"             => $row["OccupIndustryCode"] ?? null,
+                "OccupPhone"                    => $row["OccupPhone"] ?? null,
+                "OccupEmail"                    => $row["OccupEmail"] ?? null,
+                "OccupAddress"                  => $row["OccupAddress1"] ?? null,
+                "OccupAddress2"                 => $row["OccupAddress2"] ?? null,
+                "OccupAddress3"                 => $row["OccupAddress3"] ?? null,
+                "OccupSuburb"                   => $row["OccupSuburb"] ?? null,
+                "OccupState"                    => $row["OccupState"] ?? null,
+                "OccupPostcode"                 => $row["OccupPostCode"] ?? null,
+                "ReligionDescription"           => $row["ReligionDescription"] ?? null,
+                "NationalityDescription"        => $row["NationalityDescription"] ?? null,
+                "CountryOfBirthDescription"     => $row["CountryOfBirthDescription"] ?? null,
+                "HomeLanguageDescription"       => $row["HomeLanguageDescription"] ?? null,
+                "HighestSecondaryYearLevel"     => $row["HighestSecondaryYearLevel"] ?? null,
+                "QualificationLevelDescription" => $row["QualificationLevelDescription"] ?? null,
+                "ReceiveMailFlag"               => $row["MailFlag"] ?? null,
+                "DefaultEmailCode"              => $row["DefaultEmailCode"] ?? null,
             ];
         }
         return $spouseData;
@@ -1162,18 +1162,18 @@ class Handler
 
                 $authArr[$studentID] = [
                     "Type"                        => "Student",
-                    "ID"                          => $sturow["StudentID"] ?? '',
-                    "StudentLegalFullName"        => $sturow["StudentLegalFullName"] ?? '',
-                    "StudentPreferred"            => $sturow["StudentPreferred"] ?? '',
-                    "StudentGender"               => $sturow["StudentGender"] ?? '',
-                    "IndigenousFlag"              => $sturow["IndigenousFlag"] ?? '',
-                    "StudentTSIFlag"              => $sturow["StudentTSIFlag"] ?? '',
-                    "StudentHomeLanguageCode"     => $sturow["StudentHomeLanguageCode"] ?? '',
+                    "ID"                          => $sturow["StudentID"] ?? null,
+                    "StudentLegalFullName"        => $sturow["StudentLegalFullName"] ?? null,
+                    "StudentPreferred"            => $sturow["StudentPreferred"] ?? null,
+                    "StudentGender"               => $sturow["StudentGender"] ?? null,
+                    "IndigenousFlag"              => $sturow["IndigenousFlag"] ?? null,
+                    "StudentTSIFlag"              => $sturow["StudentTSIFlag"] ?? null,
+                    "StudentHomeLanguageCode"     => $sturow["StudentHomeLanguageCode"] ?? null,
                     "StudentBirthDate"            => $formattedBirthDate,
-                    "StudentYearLevelDescription" => $sturow["StudentYearLevelDescription"] ?? '',
-                    "StudentTutor"                => $sturow["StudentTutor"] ?? '',
-                    "StudentDoctorName"           => $sturow["StudentDoctorName"] ?? '',
-                    "StudentDoctorPhone"          => $sturow["StudentDoctorPhone"] ?? '',
+                    "StudentYearLevelDescription" => $sturow["StudentYearLevelDescription"] ?? null,
+                    "StudentTutor"                => $sturow["StudentTutor"] ?? null,
+                    "StudentDoctorName"           => $sturow["StudentDoctorName"] ?? null,
+                    "StudentDoctorPhone"          => $sturow["StudentDoctorPhone"] ?? null,
                     "StudentDoctorAddress"        => trim(
                         preg_replace(
                             '/\s+/',
@@ -1184,13 +1184,13 @@ class Handler
                                 str_replace(
                                     "'",
                                     "\'",
-                                    $sturow["StudentDoctorAddress"] ?? ''
+                                    $sturow["StudentDoctorAddress"] ?? null
                                 )
                             )
                         )
                     ),
-                    "StudentDentistName"          => $sturow["StudentDentistName"] ?? '',
-                    "StudentDentistPhone"         => $sturow["StudentDentistPhone"] ?? '',
+                    "StudentDentistName"          => $sturow["StudentDentistName"] ?? null,
+                    "StudentDentistPhone"         => $sturow["StudentDentistPhone"] ?? null,
                     "StudentDentistAddress"       => trim(
                         preg_replace(
                             '/\s+/',
@@ -1201,48 +1201,48 @@ class Handler
                                 str_replace(
                                     "'",
                                     "\'",
-                                    $sturow["StudentDentistAddress"] ?? ''
+                                    $sturow["StudentDentistAddress"] ?? null
                                 )
                             )
                         )
                     ),
-                    "StudentEmergencyName"        => $sturow["StudentEmergencyName"] ?? '',
+                    "StudentEmergencyName"        => $sturow["StudentEmergencyName"] ?? null,
                     "StudentEmergencyAddress"     => trim(
                         preg_replace(
                             '/\s\s+/',
                             ' ',
-                            $sturow["StudentEmergencyAddress"] ?? ''
+                            $sturow["StudentEmergencyAddress"] ?? null
                         )
                     ),
-                    "StudentEmergencyPhone"       => $sturow["StudentEmergencyPhone"] ?? '',
-                    "StudentEmergencyPhoneAlt"    => $sturow["StudentEmergencyPhoneAlt"] ?? '',
-                    "StudentEmergencyRelatDesc"   => $sturow["StudentEmergencyRelat"] ?? '',
-                    "StudentEmergency2Name"       => $sturow["StudentEmergency2Name"] ?? '',
+                    "StudentEmergencyPhone"       => $sturow["StudentEmergencyPhone"] ?? null,
+                    "StudentEmergencyPhoneAlt"    => $sturow["StudentEmergencyPhoneAlt"] ?? null,
+                    "StudentEmergencyRelatDesc"   => $sturow["StudentEmergencyRelat"] ?? null,
+                    "StudentEmergency2Name"       => $sturow["StudentEmergency2Name"] ?? null,
                     "StudentEmergency2Address"    => trim(
                         preg_replace(
                             '/\s\s+/',
                             ' ',
-                            $sturow["StudentEmergency2Address"] ?? ''
+                            $sturow["StudentEmergency2Address"] ?? null
                         )
                     ),
-                    "StudentEmergency2Phone"      => $sturow["StudentEmergency2Phone"] ?? '',
-                    "StudentEmergency2PhoneAlt"   => $sturow["StudentEmergency2PhoneAlt"] ?? '',
-                    "StudentEmergency2RelatDesc"  => $sturow["StudentEmergency2Relat"] ?? '',
-                    "StudentEmergency3Name"       => $sturow["StudentEmergency3Name"] ?? '',
+                    "StudentEmergency2Phone"      => $sturow["StudentEmergency2Phone"] ?? null,
+                    "StudentEmergency2PhoneAlt"   => $sturow["StudentEmergency2PhoneAlt"] ?? null,
+                    "StudentEmergency2RelatDesc"  => $sturow["StudentEmergency2Relat"] ?? null,
+                    "StudentEmergency3Name"       => $sturow["StudentEmergency3Name"] ?? null,
                     "StudentEmergency3Address"    => trim(
                         preg_replace(
                             '/\s\s+/',
                             ' ',
-                            $sturow["StudentEmergency3Address"] ?? ''
+                            $sturow["StudentEmergency3Address"] ?? null
                         )
                     ),
-                    "StudentEmergency3Phone"      => $sturow["StudentEmergency3Phone"] ?? '',
-                    "StudentEmergency3PhoneAlt"   => $sturow["StudentEmergency3PhoneAlt"] ?? '',
-                    "StudentEmergency3RelatDesc"  => $sturow["StudentEmergency3Relat"] ?? '',
-                    "DoNotUsePhoto"               => $sturow["LegalPhotoPublicationFlag"] ?? '',
-                    "DoNotPublishPhoto"           => $sturow["LegalPhotoPromFlag"] ?? '',
-                    "PhotoWebFlag"                => $sturow["LegalPhotoWebFlag"] ?? '',
-                    "StudentMedicalAlertFlag"     => $sturow["StudentMedicalAlertFlag"] ?? '',
+                    "StudentEmergency3Phone"      => $sturow["StudentEmergency3Phone"] ?? null,
+                    "StudentEmergency3PhoneAlt"   => $sturow["StudentEmergency3PhoneAlt"] ?? null,
+                    "StudentEmergency3RelatDesc"  => $sturow["StudentEmergency3Relat"] ?? null,
+                    "DoNotUsePhoto"               => $sturow["LegalPhotoPublicationFlag"] ?? null,
+                    "DoNotPublishPhoto"           => $sturow["LegalPhotoPromFlag"] ?? null,
+                    "PhotoWebFlag"                => $sturow["LegalPhotoWebFlag"] ?? null,
+                    "StudentMedicalAlertFlag"     => $sturow["StudentMedicalAlertFlag"] ?? null,
                     "StudentMedicalConditions"    => $smcArr,
                     "StudentAbilities"            => $abiArr,
                     "StudentConsents"             => $consentArr,
@@ -1272,14 +1272,14 @@ class Handler
 
         foreach ($stmt as $row) {
             $smcArr[] = [
-                "MedicalConditionSeq"                 => $row["MedicalConditionSeq"] ?? '',
-                "MedicalConditionCode"                => $row["MedicalConditionCode"] ?? '',
-                "MedicalConditionTypeDescription"     => $row["MedicalConditionTypeDescription"] ?? '',
-                "MedicalConditionSeverityCode"        => $row["SeverityCode"] ?? '',
-                "MedicalConditionSeverityDescription" => $row["SeverityDescription"] ?? '',
+                "MedicalConditionSeq"                 => $row["MedicalConditionSeq"] ?? null,
+                "MedicalConditionCode"                => $row["MedicalConditionCode"] ?? null,
+                "MedicalConditionTypeDescription"     => $row["MedicalConditionTypeDescription"] ?? null,
+                "MedicalConditionSeverityCode"        => $row["SeverityCode"] ?? null,
+                "MedicalConditionSeverityDescription" => $row["SeverityDescription"] ?? null,
                 "MedicalConditionDetails"             => htmlentities($row["ConditionDetails"] ?? ''),
-                "EmergencyTreatmentDetails"           => $row["EmergencyTreatmentDetails"] ?? '',
-                "OtherTreatmentDetails"               => $row["OtherTreatmentDetails"] ?? '',
+                "EmergencyTreatmentDetails"           => $row["EmergencyTreatmentDetails"] ?? null,
+                "OtherTreatmentDetails"               => $row["OtherTreatmentDetails"] ?? null,
             ];
         }
         return $smcArr;
@@ -1307,12 +1307,12 @@ class Handler
 //        $stmt = $this->externalDb->executeQuery($sql, $params);
 //        foreach ($stmt as $row) {
 //            $abiArr[] = [
-//                "AbilitySeq"              => $row["AbilitySeq"] ?? '',
-//                "AbilityTypeCode"         => $row["AbilityTypeCode"] ?? '',
-//                "AbilityTypeDesc"         => $row["TypeDesc"] ?? '',
-//                "AbilityLevel"            => $row["AbilityLevel"] ?? '',
-//                "AbilityLevelDescription" => $row["Description"] ?? '',
-//                "AbilityComment"          => $row["AbilityComment"] ?? '',
+//                "AbilitySeq"              => $row["AbilitySeq"] ?? null,
+//                "AbilityTypeCode"         => $row["AbilityTypeCode"] ?? null,
+//                "AbilityTypeDesc"         => $row["TypeDesc"] ?? null,
+//                "AbilityLevel"            => $row["AbilityLevel"] ?? null,
+//                "AbilityLevelDescription" => $row["Description"] ?? null,
+//                "AbilityComment"          => $row["AbilityComment"] ?? null,
 //            ];
 //        }
 
@@ -1359,10 +1359,10 @@ class Handler
         $stmt   = $this->externalDb->executeQuery($sql, $params);
         foreach ($stmt as $row) {
             $consentArr[] = [
-                "ConsentSeq"   => $row["ConsentSeq"] ?? '',
-                "ConsentCode"  => $row["Code"] ?? '',
-                "Consent"      => $row["Description"] ?? '',
-                "GivenConsent" => $row["GivenConsent"] ?? '',
+                "ConsentSeq"   => $row["ConsentSeq"] ?? null,
+                "ConsentCode"  => $row["Code"] ?? null,
+                "Consent"      => $row["Description"] ?? null,
+                "GivenConsent" => $row["GivenConsent"] ?? null,
             ];
         }
         return $consentArr;
@@ -1394,9 +1394,9 @@ class Handler
 
             // Determine if we should add the contact as Contact1 or Contact2
             if (empty($livesWithArr[$stuID]["Contact1"])) {
-                $livesWithArr[$stuID]["Contact1"] = $row["ContactID"] ?? '';
+                $livesWithArr[$stuID]["Contact1"] = $row["ContactID"] ?? null;
             } elseif (empty($livesWithArr[$stuID]["Contact2"])) {
-                $livesWithArr[$stuID]["Contact2"] = $row["ContactID"] ?? '';
+                $livesWithArr[$stuID]["Contact2"] = $row["ContactID"] ?? null;
             }
         }
         return array_values($livesWithArr);
