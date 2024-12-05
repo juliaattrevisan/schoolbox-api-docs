@@ -151,6 +151,12 @@ class Controller extends Base
      */
     private const SERVICE_MAPPING = [
         // Note this list should be sorted by the value of 'name' ascending.
+        //
+        // Description of fields in each item below:
+        //    'name'        : The text that appears in the dropdown list.
+        //    'identifier'  : The service identifier options to use: campus dropdown, house dropdown, nothing (none).
+        //    'availability': Access levels that you can choose; some services are Moderate-Only, but this way you can specify
+        //                    the available access levels more granularly e.g. write-only, if you ever needed that.
         UserAccess::SERVICE_BADGE => [
             'name' => 'Badge',
             'identifier' => self::IDENTIFIER_NONE,
@@ -161,17 +167,8 @@ class Controller extends Base
             ]
         ],
         UserAccess::SERVICE_CALENDAR => [
-            /* The text that appears in the dropdown list
-             */
             'name' => 'Calendar',
-
-            /* The service identifier options to use: campus dropdown, house dropdown, nothing (none)
-             */
             'identifier' => self::IDENTIFIER_CAMPUS,
-
-            /* Access levels that you can choose; some services are Moderate-Only, but this way you can specify
-             * the available access levels more granularly e.g. write-only, if you ever needed that
-             */
             'availability' => [
                 'read' => true,
                 'write' => true,
