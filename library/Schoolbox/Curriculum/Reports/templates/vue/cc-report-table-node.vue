@@ -93,7 +93,11 @@ const showNode = window.Vue.computed(() => {
     ) {
         return false;
     }
-    return getFilteredTotalCount(props.node, !isExpanded.value) === 0 && filtersStore.onlyShowGaps;
+    // always return true if gaps selected and the node has no usages at all
+    if (filtersStore.onlyShowGaps && hasNoUsages.value) {
+        return true;
+    }
+    return getFilteredTotalCount(props.node, false) === 0 && filtersStore.onlyShowGaps;
 });
 
 // #endregion
