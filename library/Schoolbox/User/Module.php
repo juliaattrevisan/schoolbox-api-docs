@@ -15,6 +15,7 @@ use Alaress\Module\Module as BaseModule;
 use Alaress\Web\Controller\Base;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Oidc\Server\RelyingParty\Mapper as RelyingPartyMapper;
+use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\UserMapper;
@@ -34,6 +35,7 @@ class Module extends BaseModule
         // Impersonate and recover routes
         $loggedInPermission    = new Rule\IsLoggedIn();
         $impersonatePermission = new Rule\Any(
+            new Rule\IsSuperuser(),
             new Rule\Callback(
                 function ($params, User $user) {
                     // Do not allow unlinked users to switch
@@ -45,7 +47,24 @@ class Module extends BaseModule
                     throw new Unauthorized();
                 }
             ),
-            new Rule\IsSuperuser()
+            new Rule\Callback(
+                function ($params, User $user) {
+                    $permissionToCheck = match ($params['user']->getRole()->getType()) {
+                        'staff' => UserAccess::SERVICE_IMPERSONATOR_OF_STAFF,
+                        'student' => UserAccess::SERVICE_IMPERSONATOR_OF_STUDENTS,
+                        'parent' => UserAccess::SERVICE_IMPERSONATOR_OF_PARENTS,
+                        'guest' => UserAccess::SERVICE_IMPERSONATOR_OF_GUESTS,
+                        default => null,
+                    };
+
+                    if (
+                        $permissionToCheck === null ||
+                        !$user->hasServicePermission($permissionToCheck, UserAccess::ACCESS_FULL)
+                    ) {
+                        throw new Unauthorized();
+                    }
+                }
+            )
         );
         $impersonatePreload = fn ($params) => [
             'user' => $this->getUserMapper()->findById($params['userId']),
