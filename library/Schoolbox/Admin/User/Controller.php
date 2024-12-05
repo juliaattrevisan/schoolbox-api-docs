@@ -262,6 +262,42 @@ class Controller extends Base
                 'moderate' => true
             ]
         ],
+        UserAccess::SERVICE_IMPERSONATOR_OF_STAFF => [
+            'name' => 'Impersonator of Staff',
+            'identifier' => self::IDENTIFIER_NONE,
+            'availability' => [
+                'read' => false,
+                'write' => false,
+                'moderate' => true
+            ]
+        ],
+        UserAccess::SERVICE_IMPERSONATOR_OF_STUDENTS => [
+            'name' => 'Impersonator of Students',
+            'identifier' => self::IDENTIFIER_NONE,
+            'availability' => [
+                'read' => false,
+                'write' => false,
+                'moderate' => true
+            ]
+        ],
+        UserAccess::SERVICE_IMPERSONATOR_OF_PARENTS => [
+            'name' => 'Impersonator of Parents',
+            'identifier' => self::IDENTIFIER_NONE,
+            'availability' => [
+                'read' => false,
+                'write' => false,
+                'moderate' => true
+            ]
+        ],
+        UserAccess::SERVICE_IMPERSONATOR_OF_GUESTS => [
+            'name' => 'Impersonator of Guests',
+            'identifier' => self::IDENTIFIER_NONE,
+            'availability' => [
+                'read' => false,
+                'write' => false,
+                'moderate' => true
+            ]
+        ],
     ];
 
     /**
