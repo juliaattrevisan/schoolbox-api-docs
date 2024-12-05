@@ -3,8 +3,8 @@
  * To input the search query
  */
 
-import { useTemplateRef } from "vue";
-import { useFocus, onKeyStroke } from "@vueuse/core";
+import { onKeyStroke } from "@vueuse/core";
+import { vOnKeyStroke } from "@vueuse/components";
 
 interface Props {
     labelId: string; // the label id
@@ -29,13 +29,9 @@ onKeyStroke(["Enter", "ArrowUp", "ArrowDown"], (event) => {
 /**
  * To close the search results when pressing Escape
  */
-const inputEl = useTemplateRef<HTMLInputElement | null>("inputEl");
-const { focused } = useFocus(inputEl);
-onKeyStroke(["Escape"], () => {
-    if (focused.value) {
-        emit("escape");
-    }
-});
+function onEscape(): void {
+    emit("escape");
+}
 </script>
 
 <template>
@@ -43,6 +39,7 @@ onKeyStroke(["Escape"], () => {
         :id="props.labelId"
         ref="inputEl"
         v-model="query"
+        v-on-key-stroke:Escape="onEscape"
         type="text"
         class="search-input f-no-margins"
         :placeholder="props.placeholder"
