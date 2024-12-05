@@ -1,7 +1,6 @@
 <?php
 
 /**
- *
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
@@ -20,84 +19,19 @@ class UserAccess implements IModel
     use CreatedAtDate;
 
     /**
-     * Value for $this->service:
-     * $this->user has $this->accessLevel permission for homepage $this->itemId.
+     * Service permission constants.  These correspond to IDs from the lu_service database table.
      */
     public const SERVICE_HOMEPAGE = 1;
-
-    /**
-     * Value for $this->service:
-     * $this->user has $this->accessLevel permission for the calendar for campus
-     * $this->itemId.
-     */
     public const SERVICE_CALENDAR = 2;
-
-    /**
-     * Value for $this->service:
-     * $this->user has $this->accessLevel permission for the calendar for campus
-     * $this->itemId.
-     */
     public const SERVICE_NEWS = 3;
-
-    /**
-     * Value for $this->service:
-     * $this->user has $this->accessLevel permission for all homepages.
-     *
-     * @todo confirm if this is the case
-     */
     public const SERVICE_CMS = 5;
-
-    /**
-     * Value for $this->service:
-     * $this->user has $this->accessLevel permission for the resource booking
-     * system.
-     */
     public const SERVICE_RESOURCE_BOOKING = 7;
-
-    /**
-     * Value for $this->service:
-     * $this->user has $this->accessLevel permission for the curriculum
-     * system.
-     */
     public const SERVICE_CURRICULUM = 8;
-
-    /**
-     * Value for $this->service:
-     * $this->user has $this->accessLevel permission for the pastoral care
-     * system.
-     */
     public const SERVICE_PASTORAL = 9;
-
-    /**
-     * Value for $this->service:
-     * $this->user has $this->accessLevel permission for the Sports Fixtures
-     * system.
-     */
     public const SERVICE_SPORTS_ADMINISTRATOR = 10;
-
-    /**
-     * Value for $this->service:
-     * $this->user has $this->accessLevel permission for the badge
-     * system.
-     */
     public const SERVICE_BADGE = 11;
-
-    /**
-     * Value for $this->service:
-     * $this->user has $this->accessLevel permission for the timetable system.
-     */
     public const SERVICE_TIMETABLE = 12;
-
-    /**
-     * Value for $this->service:
-     * $this->user has $this->accessLevel permission for the design system.
-     */
     public const SERVICE_DESIGN = 13;
-
-    /**
-     * Value for $this->service:
-     * $this->user has $this->accessLevel permission for the LMS system.
-     */
     public const SERVICE_LMS = 14;
 
     /**
@@ -171,7 +105,6 @@ class UserAccess implements IModel
     /** @var bool */
     protected bool $favourite = false;
 
-
     /**
      * Returns the set of all known access levels
      *
@@ -181,7 +114,6 @@ class UserAccess implements IModel
     {
         return [self::ACCESS_DENY, self::ACCESS_READ, self::ACCESS_WRITE, self::ACCESS_FULL,];
     }
-
 
     /**
      * Return all possible services
@@ -206,7 +138,6 @@ class UserAccess implements IModel
         ];
     }
 
-
     /**
      * Returns the services that require an identifier
      *
@@ -219,7 +150,6 @@ class UserAccess implements IModel
             self::SERVICE_CALENDAR,
         ];
     }
-
 
     /**
      * Returns the services that should not have an identifier
@@ -241,7 +171,6 @@ class UserAccess implements IModel
         return $this;
     }
 
-
     /**
      * @return User
      */
@@ -249,7 +178,6 @@ class UserAccess implements IModel
     {
         return $this->user;
     }
-
 
     /**
      * @param int $service
@@ -261,7 +189,6 @@ class UserAccess implements IModel
         return $this;
     }
 
-
     /**
      * @return int
      */
@@ -269,7 +196,6 @@ class UserAccess implements IModel
     {
         return $this->service;
     }
-
 
     /**
      * @param int $sid
@@ -281,7 +207,6 @@ class UserAccess implements IModel
         return $this;
     }
 
-
     /**
      * @return int
      */
@@ -289,7 +214,6 @@ class UserAccess implements IModel
     {
         return $this->sid;
     }
-
 
     /**
      * @param int $level
@@ -300,7 +224,6 @@ class UserAccess implements IModel
         $this->accessLevel = $level;
         return $this;
     }
-
 
     /**
      * @return int
