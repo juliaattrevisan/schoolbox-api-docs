@@ -6,7 +6,8 @@
 
 import { defineStore } from "pinia";
 import type { Node } from "@schoolboxCurriculum/types/Node";
-import { findById } from "@schoolboxCurriculum/js/nodeUtils";
+import { findById, includeChildren } from "@schoolboxCurriculum/js/nodeUtils";
+import { useStore } from "./curriculumSelectorStore";
 import { useNodesStore } from "./csNodesStore";
 import { useSelectedNodesStore } from "./csSelectedNodesStore";
 
@@ -92,8 +93,12 @@ export const useModalSelectedNodesStore = defineStore(`csModalSelectedNodes`, ()
      * @param nodeToAdd - the node to add
      */
     function add(nodeToAdd: Node): void {
-        nodes.value = noChildrenOfNode(nodeToAdd);
-        nodes.value = [...nodes.value, nodeToAdd];
+        nodes.value = noChildrenOfNode(nodeToAdd); // strip out any children of the new node, as the parent now takes precedence
+        if (useStore().includeChildren) {
+            nodes.value = [...nodes.value, nodeToAdd, ...includeChildren(nodeToAdd.children)]; // add the new node and all its children
+        } else {
+            nodes.value = [...nodes.value, nodeToAdd]; // or just add the new node
+        }
         childNodes.value = removeChildNodes();
         updateChildNodes(nodeToAdd, true, nodeToAdd.id);
     }
@@ -103,8 +108,12 @@ export const useModalSelectedNodesStore = defineStore(`csModalSelectedNodes`, ()
      * @param nodeToAdd - the node to add
      */
     function addSingle(nodeToAdd: Node): void {
-        nodes.value = noChildrenOfNode(nodeToAdd);
-        nodes.value = [nodeToAdd];
+        nodes.value = noChildrenOfNode(nodeToAdd); // strip out any children of the new node, as the parent now takes precedence
+        if (useStore().includeChildren) {
+            nodes.value = [nodeToAdd, ...includeChildren(nodeToAdd.children)]; // add the new node and all its children
+        } else {
+            nodes.value = [nodeToAdd]; // or just add the new node
+        }
         childNodes.value = removeChildNodes();
         updateChildNodes(nodeToAdd, true, nodeToAdd.id);
     }
@@ -115,7 +124,12 @@ export const useModalSelectedNodesStore = defineStore(`csModalSelectedNodes`, ()
      */
     function remove(nodeToRemove: Node): void {
         updateChildNodes(nodeToRemove, false, nodeToRemove.id);
-        nodes.value = nodes.value.filter((node) => node.id !== nodeToRemove.id);
+        if (useStore().includeChildren) {
+            const idsToRemove = [nodeToRemove, ...includeChildren(nodeToRemove.children)].map((node) => node.id); // get the id of the node to remove and all its children
+            nodes.value = nodes.value.filter((node) => !idsToRemove.includes(node.id)); // remove the node and all its children
+        } else {
+            nodes.value = nodes.value.filter((node) => node.id !== nodeToRemove.id); // or just remove the node
+        }
     }
 
     /**

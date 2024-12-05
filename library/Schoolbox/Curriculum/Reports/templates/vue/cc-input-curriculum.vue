@@ -44,6 +44,7 @@ store.init({
     formValueName: "curriculumCodes[]",
     isSelectAll: true,
     canSelectChildren: false,
+    includeChildren: false,
 });
 const selectedStore = useSelectedNodesStore();
 selectedStore.add(props.preselected);

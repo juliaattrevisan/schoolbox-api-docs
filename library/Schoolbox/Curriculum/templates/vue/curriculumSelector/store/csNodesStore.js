@@ -204,7 +204,8 @@ export const useNodesStore = defineStore(`csNodes`, {
         async loadChildren(id) {
             try {
                 this.isLoading = true;
-                const response = await fetch(`${apiEndpoint}/${id}?descendants=2&limit=50`); //we go two levels deep so we can check for children on two levels
+                const descendants = useStore().includeChildren ? 10 : 2; // if we're including children, load in all descendants, otherwise we just load in the next level to show the structure
+                const response = await fetch(`${apiEndpoint}/${id}?descendants=${descendants}&limit=50`);
                 if (response.ok) {
                     const newNode = await response.json();
                     newNode.children?.forEach((node) => useModalSelectedNodesStore().checkIfSelected(node));
