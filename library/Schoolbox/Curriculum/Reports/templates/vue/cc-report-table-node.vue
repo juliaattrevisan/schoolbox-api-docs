@@ -87,7 +87,10 @@ const showNode = window.Vue.computed(() => {
         return true;
     }
     // don't show nodes that can't have usage assigned when only show gaps is active
-    if ((filtersStore.onlyShowGaps && props.node.code === null) || props.node.code === "") {
+    if (
+        (filtersStore.onlyShowGaps && props.node.code === null) ||
+        (filtersStore.onlyShowGaps && props.node.code === "")
+    ) {
         return false;
     }
     return getFilteredTotalCount(props.node, !isExpanded.value) === 0 && filtersStore.onlyShowGaps;
