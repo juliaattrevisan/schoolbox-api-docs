@@ -342,6 +342,31 @@ function getEndpoint(): string {
     const searchParams = new URLSearchParams(userSearchAdditionalParams).toString();
     return `${searchUrl}?${searchParams}&`;
 }
+
+type Result = {
+    id: number;
+    name: string;
+    fullName: string;
+};
+
+const results = window.Vue.ref<Result[]>([]);
+
+/**
+ * To handle the search response to update the name to the full name
+ * @param json - the returned json
+ */
+function onSearchResponse(json: unknown): void {
+    if (typeof json === "object" && json !== null && "data" in json) {
+        const newResults = json.data as Result[];
+        results.value = newResults.map((result) => {
+            return {
+                ...result,
+                id: result.id,
+                name: result.fullName,
+            };
+        });
+    }
+}
 </script>
 
 <template>
@@ -471,11 +496,14 @@ function getEndpoint(): string {
                         </template>
                     </v-select>
                     <search-select
+                        v-model:results="results"
                         label="Client Credentials User"
                         label-id="creator"
                         :endpoint="getEndpoint()"
                         :is-single-select="true"
                         placeholder="Search for users..."
+                        :manage-search-response="true"
+                        @search-response="onSearchResponse"
                     />
                 </div>
             </div>
