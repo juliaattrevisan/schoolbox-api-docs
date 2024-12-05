@@ -193,18 +193,22 @@ HELP;
 
         /* Assign relationships
          */
+        $assignedCampusIds = implode(',', $campusIds);
+
         $this->getLogger()->info(sprintf(
             'Campus availability: assigning campus ids %s to profile field %s (%s)',
-            implode(',', $campusIds),
+            '' === $assignedCampusIds ? '(none)' : $assignedCampusIds,
             $field,
             $profileFieldId
         ));
 
         $this->helper->createFieldCampusAvailability($profileFieldId, $campusIds);
 
+        $assignedRoletypes = implode(',', $roletypes);
+
         $this->getLogger()->info(sprintf(
             'Roletype visibility: assigning roletypes %s to profile field %s (%s)',
-            implode(',', $roletypes),
+            '' === $assignedRoletypes ? '(none)' : $assignedRoletypes,
             $field,
             $profileFieldId
         ));
