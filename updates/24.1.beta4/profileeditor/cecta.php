@@ -118,16 +118,16 @@ HELP;
 
         /* Update field configuration
          *
-         * Hide staff extension from everyone
+         * Hide staff extension and staff mobile phone from everyone
          */
-        $campusIds = $this->helper->fetchCampusIds();
+        $campusIds = [];
         $roletypes = [];
 
         $this->updateField(Role::STAFF, 'StaffExtension', $campusIds, $roletypes);
         $this->updateField(Role::STAFF, 'StaffDefaultMobilePhone', $campusIds, $roletypes);
 
         $this->disableFields([
-            'staff' => ['StaffExtension', 'StaffDefaultMobilePhone'],
+            Role::STAFF => ['StaffExtension', 'StaffDefaultMobilePhone'],
         ]);
 
         /* Announce lock release
