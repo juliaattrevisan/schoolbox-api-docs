@@ -332,6 +332,16 @@ const onUserSearch = debounce((query: string, loading: (isLoading: boolean) => v
 window.Vue.onMounted(() => {
     void getData();
 });
+
+/**
+ * Get the endpoint for the user search
+ * @returns - The endpoint for the user search
+ */
+function getEndpoint(): string {
+    const searchUrl = new URL(props.userSearchEndpoint, window.location.href).toString();
+    const searchParams = new URLSearchParams(userSearchAdditionalParams).toString();
+    return `${searchUrl}?${searchParams}&`;
+}
 </script>
 
 <template>
@@ -463,7 +473,7 @@ window.Vue.onMounted(() => {
                     <search-select
                         label="Client Credentials User"
                         label-id="creator"
-                        endpoint="/ajax/user.php?groupID=0&"
+                        :endpoint="getEndpoint()"
                         :is-single-select="true"
                         placeholder="Search for users..."
                     />

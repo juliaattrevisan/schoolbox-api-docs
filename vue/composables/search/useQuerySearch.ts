@@ -42,9 +42,9 @@ export function useQuerySearch(
         // check if we need to append ? to the endpoint
         const lastCharacter = endpoint[endpoint.length - 1];
         if (lastCharacter === "?" || lastCharacter === "&") {
-            return `${endpoint}query=${query.value}`;
+            return `${endpoint}search=${query.value}`;
         }
-        return `${endpoint}?query=${query.value}`;
+        return `${endpoint}?search=${query.value}`;
     });
     const hasSearched = window.Vue.ref(false); // to show that a search has been made
     const hasNoResults = window.Vue.computed(() => isActive.value && results.value.length === 0 && !isSearching.value); // To show that no results match the current search
