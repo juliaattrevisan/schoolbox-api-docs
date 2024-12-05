@@ -63,6 +63,7 @@ function onClicked(event: Event): void {
     <component
         :is="props.tag"
         v-if="props.isSearching"
+        :type="props.tag === 'button' ? 'button' : undefined"
         :href="props.href ? props.href : undefined"
         :class="props.class ? props.class : false"
         :title="props.title ? props.title : undefined"
@@ -76,6 +77,7 @@ function onClicked(event: Event): void {
     <component
         :is="props.tag"
         v-else
+        :type="props.tag === 'button' ? 'button' : undefined"
         :href="props.href ? props.href : undefined"
         :class="props.class ? props.class : false"
         :title="props.title ? props.title : undefined"
