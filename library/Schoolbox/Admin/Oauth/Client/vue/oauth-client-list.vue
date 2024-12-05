@@ -7,6 +7,7 @@
 import debounce from "lodash/debounce";
 import vSelect from "vue-select";
 import "vue-select/dist/vue-select.css";
+import SearchSelect from "@schoolboxVue/components/searchSelect/search-select.vue";
 import { activate, timeout } from "@schoolboxVue/components/toast/sbxToastEvent";
 import RevealModal from "@schoolboxVue/components/reveal-modal.vue";
 import LoadingTable from "@schoolboxVue/components/loading/loading-table.vue";
@@ -459,6 +460,13 @@ window.Vue.onMounted(() => {
                             <span class="selected d-center">{{ (option as VueSelectOption).fullName }}</span>
                         </template>
                     </v-select>
+                    <search-select
+                        label="Client Credentials User"
+                        label-id="creator"
+                        endpoint="/ajax/user.php?groupID=0&"
+                        :is-single-select="true"
+                        placeholder="Search for users..."
+                    />
                 </div>
             </div>
             <div class="component-action">
