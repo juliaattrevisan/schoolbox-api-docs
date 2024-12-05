@@ -8,7 +8,7 @@ import { vOnKeyStroke } from "@vueuse/components";
 interface Props {
     labelId: string; // the label id
     placeholder: string; // the placeholder text
-    showResults: boolean; // whether to show the search results
+    showResults?: boolean; // whether to show the search results
 }
 const props = defineProps<Props>();
 
