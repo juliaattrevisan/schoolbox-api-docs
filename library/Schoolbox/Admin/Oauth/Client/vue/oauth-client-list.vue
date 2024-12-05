@@ -609,6 +609,17 @@ window.Vue.watch(selected, (newSelected) => {
                             <span class="selected d-center">{{ (option as VueSelectOption).fullName }}</span>
                         </template>
                     </v-select>
+                    <search-select
+                        v-model:selected="selected"
+                        v-model:results="results"
+                        label="Client Credentials User"
+                        label-id="creator"
+                        :endpoint="getEndpoint()"
+                        :is-single-select="true"
+                        placeholder="Search for users..."
+                        :manage-search-response="true"
+                        @search-response="onSearchResponse"
+                    />
                 </div>
             </div>
             <div class="component-action">
