@@ -18,7 +18,6 @@ use Alaress\Database\Predicate\Builder;
 use Alaress\Database\Predicate\InvalidColumnException;
 use Alaress\Database\Quoter\IQuoter;
 use Alaress\DebugBar\Instance as DebugBar;
-use Alaress\Sentry\Tracing\Tracer;
 use Alaress_Date_Format;
 use InvalidArgumentException;
 use PDO;
@@ -326,6 +325,13 @@ abstract class Mapper implements IMapper
     private static $di;
 
     /**
+     * This property exists so it can be used in persistSearchIndexCallback() when that function is registered as a callback.
+     *
+     * @var array
+     */
+    private array $searchIndexIrrelevantFields = [];
+
+    /**
      * @param ContainerInterface $di
      * @return void
      */
@@ -346,7 +352,6 @@ abstract class Mapper implements IMapper
         ;
     }
 
-
     /**
      * @inheritdoc
      */
@@ -355,7 +360,6 @@ abstract class Mapper implements IMapper
         // Default behaviour is whether this mapper has a soft-delete column registered
         return (bool)$this->soft_delete_column;
     }
-
 
     /**
      * @deprecated under pain of death DO NOT USE THIS; refactor the Mapper instead
@@ -4160,15 +4164,29 @@ abstract class Mapper implements IMapper
      */
     public function registerPersistSearchIndexCallbacks(array $irrelevantFields = []): void
     {
-        $callback = function (object $model, ?object $previous = null) use ($irrelevantFields) {
-            if ($this->hasModelChanged($model, $previous, $irrelevantFields)) {
-                $this->persistSearchIndex($model);
-            }
-        };
-        $this->registerCallback(self::CALLBACK_POSTSAVE, $callback);
-        $this->registerCallback(self::CALLBACK_POSTDELETE, $callback);
-        $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, $callback);
-        $this->registerCallback(self::CALLBACK_POSTRESTORE, $callback);
+        $this->searchIndexIrrelevantFields = $irrelevantFields;
+
+        $this->registerCallback(self::CALLBACK_POSTSAVE, [$this, 'persistSearchIndexCallback']);
+        $this->registerCallback(self::CALLBACK_POSTDELETE, [$this, 'persistSearchIndexCallback']);
+        $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, [$this, 'persistSearchIndexCallback']);
+        $this->registerCallback(self::CALLBACK_POSTRESTORE, [$this, 'persistSearchIndexCallback']);
+    }
+
+
+    /**
+     * A callback used by $this->registerPersistSearchIndexCallbacks().
+     * This function was made public (rather than being a Closure inside registerPersistSearchIndexCallback()),
+     * because of difficulties getting Folder/Mapper->unregisterCallback() to work with Closures.
+     *
+     * @param object      $model
+     * @param object|null $previous
+     * @throws Exception
+     */
+    public function persistSearchIndexCallback(object $model, ?object $previous = null): void
+    {
+        if ($this->hasModelChanged($model, $previous, $this->searchIndexIrrelevantFields)) {
+            $this->persistSearchIndex($model);
+        }
     }
 
 
