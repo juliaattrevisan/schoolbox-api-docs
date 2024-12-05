@@ -150,11 +150,17 @@ class Controller extends Base
      * @var array
      */
     private const SERVICE_MAPPING = [
-
-        /* For some historical reason, SERVICE_HOMEPAGE is no longer shown.
-         */
+        // Note this list should be sorted by the value of 'name' ascending.
+        UserAccess::SERVICE_BADGE => [
+            'name' => 'Badge',
+            'identifier' => self::IDENTIFIER_NONE,
+            'availability' => [
+                'read' => false,
+                'write' => true,
+                'moderate' => true
+            ]
+        ],
         UserAccess::SERVICE_CALENDAR => [
-
             /* The text that appears in the dropdown list
              */
             'name' => 'Calendar',
@@ -172,33 +178,6 @@ class Controller extends Base
                 'moderate' => true
             ]
         ],
-        UserAccess::SERVICE_NEWS => [
-            'name' => 'News',
-            'identifier' => self::IDENTIFIER_NONE,
-            'availability' => [
-                'read' => false,
-                'write' => true,
-                'moderate' => true
-            ]
-        ],
-        UserAccess::SERVICE_CMS => [
-            'name' => 'CMS',
-            'identifier' => self::IDENTIFIER_NONE,
-            'availability' => [
-                'read' => true,
-                'write' => true,
-                'moderate' => true
-            ]
-        ],
-        UserAccess::SERVICE_RESOURCE_BOOKING => [
-            'name' => 'Resource Booking',
-            'identifier' => self::IDENTIFIER_NONE,
-            'availability' => [
-                'read' => false,
-                'write' => false,
-                'moderate' => true
-            ]
-        ],
         UserAccess::SERVICE_CURRICULUM => [
             'name' => 'Curriculum',
             'identifier' => self::IDENTIFIER_NONE,
@@ -208,39 +187,12 @@ class Controller extends Base
                 'moderate' => false
             ]
         ],
-        UserAccess::SERVICE_PASTORAL => [
-            'name' => 'Pastoral Moderator',
+        UserAccess::SERVICE_CMS => [
+            'name' => 'CMS',
             'identifier' => self::IDENTIFIER_NONE,
             'availability' => [
                 'read' => true,
                 'write' => true,
-                'moderate' => true
-            ]
-        ],
-        UserAccess::SERVICE_SPORTS_ADMINISTRATOR => [
-            'name' => 'Fixtures',
-            'identifier' => self::IDENTIFIER_NONE,
-            'availability' => [
-                'read' => false,
-                'write' => false,
-                'moderate' => true
-            ]
-        ],
-        UserAccess::SERVICE_BADGE => [
-            'name' => 'Badge',
-            'identifier' => self::IDENTIFIER_NONE,
-            'availability' => [
-                'read' => false,
-                'write' => true,
-                'moderate' => true
-            ]
-        ],
-        UserAccess::SERVICE_TIMETABLE => [
-            'name' => 'Timetable',
-             'identifier' => self::IDENTIFIER_NONE,
-            'availability' => [
-                'read' => false,
-                'write' => false,
                 'moderate' => true
             ]
         ],
@@ -253,8 +205,26 @@ class Controller extends Base
                 'moderate' => true
             ]
         ],
-        UserAccess::SERVICE_LMS => [
-            'name' => 'LMS',
+        UserAccess::SERVICE_SPORTS_ADMINISTRATOR => [
+            'name' => 'Fixtures',
+            'identifier' => self::IDENTIFIER_NONE,
+            'availability' => [
+                'read' => false,
+                'write' => false,
+                'moderate' => true
+            ]
+        ],
+        UserAccess::SERVICE_IMPERSONATOR_OF_GUESTS => [
+            'name' => 'Impersonator of Guests',
+            'identifier' => self::IDENTIFIER_NONE,
+            'availability' => [
+                'read' => false,
+                'write' => false,
+                'moderate' => true
+            ]
+        ],
+        UserAccess::SERVICE_IMPERSONATOR_OF_PARENTS => [
+            'name' => 'Impersonator of Parents',
             'identifier' => self::IDENTIFIER_NONE,
             'availability' => [
                 'read' => false,
@@ -280,8 +250,8 @@ class Controller extends Base
                 'moderate' => true
             ]
         ],
-        UserAccess::SERVICE_IMPERSONATOR_OF_PARENTS => [
-            'name' => 'Impersonator of Parents',
+        UserAccess::SERVICE_LMS => [
+            'name' => 'LMS',
             'identifier' => self::IDENTIFIER_NONE,
             'availability' => [
                 'read' => false,
@@ -289,9 +259,36 @@ class Controller extends Base
                 'moderate' => true
             ]
         ],
-        UserAccess::SERVICE_IMPERSONATOR_OF_GUESTS => [
-            'name' => 'Impersonator of Guests',
+        UserAccess::SERVICE_NEWS => [
+            'name' => 'News',
             'identifier' => self::IDENTIFIER_NONE,
+            'availability' => [
+                'read' => false,
+                'write' => true,
+                'moderate' => true
+            ]
+        ],
+        UserAccess::SERVICE_PASTORAL => [
+            'name' => 'Pastoral Moderator',
+            'identifier' => self::IDENTIFIER_NONE,
+            'availability' => [
+                'read' => true,
+                'write' => true,
+                'moderate' => true
+            ]
+        ],
+        UserAccess::SERVICE_RESOURCE_BOOKING => [
+            'name' => 'Resource Booking',
+            'identifier' => self::IDENTIFIER_NONE,
+            'availability' => [
+                'read' => false,
+                'write' => false,
+                'moderate' => true
+            ]
+        ],
+        UserAccess::SERVICE_TIMETABLE => [
+            'name' => 'Timetable',
+             'identifier' => self::IDENTIFIER_NONE,
             'availability' => [
                 'read' => false,
                 'write' => false,
