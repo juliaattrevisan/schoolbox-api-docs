@@ -36,7 +36,7 @@ import { getTokensSettings } from "@js/editor/settings/tokensSettings";
 import { getWordCountSettings } from "@js/editor/settings/wordCountSettings";
 import { getHTMLSupportSettings } from "@js/editor/settings/htmlSupportSettings";
 import { getAISettings } from "@js/editor/settings/aiSettings";
-import type { SbxEditorConfig } from "@js/editor/types/editorTypes";
+import { EditorToolbar, type SbxEditorConfig } from "@js/editor/types/editorTypes";
 import Eqneditor5 from "@js/editor/plugin/eqnEditor/eqneditor5";
 import Resource from "@js/editor/plugin/resource/Resource";
 import UITweaks from "@js/editor/plugin/ui/UITweaks";
@@ -78,7 +78,7 @@ export function getConfig(config: SbxEditorConfig): EditorConfig & { sbConfig: S
             AIAssistant,
             OpenAITextAdapter,
         ],
-        extraPlugins: [UploadAdapterPlugin],
+        extraPlugins: config.toolbar !== EditorToolbar.SIMPLE ? [UploadAdapterPlugin] : [],
         licenseKey: window.sbProps.ckeditor5LicenseKey,
         toolbar: getToolbar(config),
         ...getLinkSettings(),
