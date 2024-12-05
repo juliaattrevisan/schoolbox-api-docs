@@ -10,6 +10,7 @@ namespace Schoolbox\Admin\Profile\Editor\Cli;
 
 use Alaress\Database\Connector\IConnector;
 use Alaress\Database\Predicate\Builder;
+use Psr\Log\LoggerInterface;
 
 class Helper
 {
@@ -27,9 +28,10 @@ class Helper
      * Constructor.
      *
      * @param IConnector $db
-     * @param bool       $perform
+     * @param bool $perform
+     * @param LoggerInterface $logger
      */
-    public function __construct(private IConnector $db, private bool $perform)
+    public function __construct(private IConnector $db, private bool $perform, private LoggerInterface $logger)
     {
         $this->prepare();
     }
@@ -251,5 +253,88 @@ class Helper
                 ]);
             }
         }
+    }
+
+    /**
+     * Update configuration for Studies Code on Student profile screen
+     *
+     * @param string $roletype
+     * @param string $field
+     * @param array $campusIds
+     * @param array $roletypes
+     * @return void
+     */
+    public function updateField(string $roletype, string $field, array $campusIds, array $roletypes): void
+    {
+        /* Preset availability and visibility requirements
+         */
+        $statement = $this->db->prepare("
+            SELECT id
+            FROM profile_field
+            WHERE roletype = :roletype
+            AND field = :field
+        ");
+
+        $statement->execute([
+            'roletype' => $roletype,
+            'field' => $field
+        ]);
+
+        $profileFieldId = null;
+
+        while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
+            $profileFieldId = $row['id'];
+        }
+
+        /* Un-assign relationships
+         */
+        $tables = [
+            'profile_field_campus_availability',
+            'profile_field_roletype_visibility',
+        ];
+
+        foreach ($tables as $table) {
+            $this->logger->info(sprintf(
+                'Removing relationships with %s field in %s',
+                $field,
+                $table
+            ));
+
+            $this->db->executeQuery(sprintf("
+                DELETE FROM %s
+                WHERE profile_field_id = (SELECT id
+                FROM profile_field
+                WHERE field = :field
+                AND roletype = :roletype
+                LIMIT 1)
+            ", $table), [
+                'field' => $field,
+                'roletype' => $roletype,
+            ]);
+        }
+
+        /* Assign relationships
+         */
+        $assignedCampusIds = implode(',', $campusIds);
+
+        $this->logger->info(sprintf(
+            'Campus availability: assigning campus ids %s to profile field %s (%s)',
+            '' === $assignedCampusIds ? '(none)' : $assignedCampusIds,
+            $field,
+            $profileFieldId
+        ));
+
+        $this->createFieldCampusAvailability($profileFieldId, $campusIds);
+
+        $assignedRoletypes = implode(',', $roletypes);
+
+        $this->logger->info(sprintf(
+            'Roletype visibility: assigning roletypes %s to profile field %s (%s)',
+            '' === $assignedRoletypes ? '(none)' : $assignedRoletypes,
+            $field,
+            $profileFieldId
+        ));
+
+        $this->createFieldRoletypeVisibility($profileFieldId, $roletypes);
     }
 }

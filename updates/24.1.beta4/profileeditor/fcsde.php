@@ -114,7 +114,7 @@ HELP;
 
         /* Always runs in Perform mode
          */
-        $this->helper = new Helper($this->getDatabaseInternal(), true);
+        $this->helper = new Helper($this->getDatabaseInternal(), true, $this->getLogger());
 
         /* Update field configuration
          *
@@ -123,7 +123,7 @@ HELP;
         $campusIds = [];
         $roletypes = [];
 
-        $this->updateField(Role::STUDENT, 'StudentBirthDate', $campusIds, $roletypes);
+        $this->helper->updateField(Role::STUDENT, 'StudentBirthDate', $campusIds, $roletypes);
 
         $this->disableFields([
             Role::STUDENT => ['StudentBirthDate'],
@@ -134,89 +134,6 @@ HELP;
         $this->getLogger()->debug('Releasing lock');
 
         $lock->release();
-    }
-
-    /**
-     * Update configuration for Studies Code on Student profile screen
-     *
-     * @param string $roletype
-     * @param string $field
-     * @param array $campusIds
-     * @param array $roletypes
-     * @return void
-     */
-    private function updateField(string $roletype, string $field, array $campusIds, array $roletypes): void
-    {
-        /* Preset availability and visibility requirements
-         */
-        $statement = $this->getDatabaseInternal()->prepare("
-            SELECT id
-            FROM profile_field
-            WHERE roletype = :roletype
-            AND field = :field
-        ");
-
-        $statement->execute([
-            'roletype' => $roletype,
-            'field' => $field
-        ]);
-
-        $profileFieldId = null;
-
-        while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
-            $profileFieldId = $row['id'];
-        }
-
-        /* Un-assign relationships
-         */
-        $tables = [
-            'profile_field_campus_availability',
-            'profile_field_roletype_visibility',
-        ];
-
-        foreach ($tables as $table) {
-            $this->getLogger()->info(sprintf(
-                'Removing relationships with %s field in %s',
-                $field,
-                $table
-            ));
-
-            $this->getDatabaseInternal()->executeQuery(sprintf("
-                DELETE FROM %s
-                WHERE profile_field_id = (SELECT id
-                FROM profile_field
-                WHERE field = :field
-                AND roletype = :roletype
-                LIMIT 1)
-            ", $table), [
-                'field' => $field,
-                'roletype' => $roletype,
-            ]);
-        }
-
-        /* Assign relationships
-         */
-        $assignedCampusIds = implode(',', $campusIds);
-
-        $this->getLogger()->info(sprintf(
-            'Campus availability: assigning campus ids %s to profile field %s (%s)',
-            '' === $assignedCampusIds ? '(none)' : $assignedCampusIds,
-            $field,
-            $profileFieldId
-        ));
-
-        $this->helper->createFieldCampusAvailability($profileFieldId, $campusIds);
-
-        $assignedRoletypes = implode(',', $roletypes);
-
-        $this->getLogger()->info(sprintf(
-            'Roletype visibility: assigning roletypes %s to profile field %s (%s)',
-            '' === $assignedRoletypes ? '(none)' : $assignedRoletypes,
-            $field,
-            $profileFieldId
-        ));
-
-        $this->helper->createFieldRoletypeVisibility($profileFieldId, $roletypes);
     }
 
 
