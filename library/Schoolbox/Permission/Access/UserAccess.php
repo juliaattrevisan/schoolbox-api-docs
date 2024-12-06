@@ -19,7 +19,7 @@ class UserAccess implements IModel
     use CreatedAtDate;
 
     /**
-     *raSA-13dsfService permission constants.  These correspond to IDs from the lu_service database table.
+     * Service permission constants.  These correspond to IDs from the lu_service database table.
      */
     public const SERVICE_HOMEPAGE = 1;
     public const SERVICE_CALENDAR = 2;
