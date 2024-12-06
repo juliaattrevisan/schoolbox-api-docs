@@ -192,7 +192,7 @@ class PDOStatement extends BasePDOStatement
      * @inheritdoc
      *
      * This is complaining about the declaration being incompatible with the interface. But the interface
-     * on the vagrant PHP seems to be different from whatever storm is expecting
+     * on the vagrant PHP seems to be different from whatever storm is expecting.
      *
      * Storm expects: public function fetchAll($fetch_style = null, $fetch_argument = null, array $ctor_args = array())
      */
