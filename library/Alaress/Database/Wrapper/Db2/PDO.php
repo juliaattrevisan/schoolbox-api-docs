@@ -124,18 +124,11 @@ class PDO extends BasePDO
      */
     public function exec($statement): false|int
     {
-        $resource = db2_prepare($this->getConnectionWithCheck(), $statement, ['cursor' => DB2_SCROLLABLE]);
-
-        if (!$resource) {
-            return false;
-        }
-
         // If the query execute successfully, return the number of affected rows
 
-        $this->lastStatement = new PDOStatement($this->getConnectionWithCheck(), $resource, $statement);
-
-        if (db2_execute($resource)) {
-            return db2_num_rows($resource);
+        $this->lastStatement = new PDOStatement($this->getConnectionWithCheck(), $statement);
+        if ($this->lastStatement->execute()) {
+            return $this->lastStatement->rowCount();
         }
 
         // If the query failed, return false
@@ -147,21 +140,13 @@ class PDO extends BasePDO
      * @inheritdoc
      * @return false|PDOStatement
      */
-    public function query($statement, $mode = BasePDO::ATTR_DEFAULT_FETCH_MODE, ...$ctorargs): PDOStatement|false
+    public function query($query, $fetchMode = BasePDO::ATTR_DEFAULT_FETCH_MODE, ...$ctorargs): PDOStatement|false
     {
-        $resource = db2_prepare($this->getConnectionWithCheck(), $statement, ['cursor' => DB2_SCROLLABLE]);
-
-        if (!$resource) {
-            return false;
-        }
-
-        $this->lastStatement = new PDOStatement($this->getConnectionWithCheck(), $resource, $statement);
-        $this->lastStatement->setFetchMode($mode);
-
-        if (db2_execute($resource)) {
+        $this->lastStatement = new PDOStatement($this->getConnectionWithCheck(), $query);
+        $this->lastStatement->setFetchMode($fetchMode, ...$ctorargs);
+        if ($this->lastStatement->execute()) {
             return $this->lastStatement;
         }
-
         return false;
     }
 
@@ -222,7 +207,7 @@ class PDO extends BasePDO
     /**
      * @inheritdoc
      */
-    public function quote($string, $parameter_type = BasePDO::PARAM_STR): false|string
+    public function quote($string, $type = BasePDO::PARAM_STR): false|string
     {
         return db2_escape_string($string);
     }

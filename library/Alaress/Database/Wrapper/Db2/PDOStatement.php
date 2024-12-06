@@ -22,9 +22,6 @@ class PDOStatement extends BasePDOStatement
     /** @var resource|bool $statement */
     protected $statement;
 
-    /** @var string $sql */
-    protected $sql;
-
     /** @var int $fetchStyleDefault */
     protected $fetchStyleDefault = BasePDO::FETCH_ASSOC;
 
@@ -39,7 +36,7 @@ class PDOStatement extends BasePDOStatement
      */
     public function __construct($connection, $sql, $fetchStyleDefault = BasePDO::FETCH_ASSOC)
     {
-        $this->sql = $sql;
+        $this->queryString = $sql;
         $this->connection = $connection;
         $this->fetchStyleDefault = $fetchStyleDefault;
     }
@@ -62,12 +59,12 @@ class PDOStatement extends BasePDOStatement
             // No parameters were passed, extract named parameters from the SQL statement and use the values
             // that should have been previously bound using the Db2/PDOStatement functions.
 
-            $parameters = preg_match_all('#:([A-Za-z0-9-_]+)#', $this->sql, $matches) ? $matches[1] : null;
+            $parameters = preg_match_all('#:([A-Za-z0-9-_]+)#', $this->queryString, $matches) ? $matches[1] : null;
         }
 
         // Replace the named parameters in the SQL string with anonymous '?' placeholder
 
-        $sql = preg_replace('#:[A-Za-z0-9-_]+#', '?', $this->sql);
+        $sql = preg_replace('#:[A-Za-z0-9-_]+#', '?', $this->queryString);
 
         // Create the prepared statement from the SQL with anonymous placeholders
 
@@ -195,7 +192,7 @@ class PDOStatement extends BasePDOStatement
      * @inheritdoc
      *
      * This is complaining about the declaration being incompatible with the interface. But the interface
-     * on the vagrant PHP seems to be different from whatever storm is expecting
+     * on the vagrant PHP seems to be different from whatever storm is expecting.
      *
      * Storm expects: public function fetchAll($fetch_style = null, $fetch_argument = null, array $ctor_args = array())
      */
