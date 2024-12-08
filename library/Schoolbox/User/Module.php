@@ -49,17 +49,14 @@ class Module extends BaseModule
             ),
             new Rule\Callback(
                 function ($params, User $user) {
-                    $permissionToCheck = match ($params['user']->getRole()->getType()) {
-                        'staff' => UserAccess::SERVICE_IMPERSONATOR_OF_STAFF,
-                        'student' => UserAccess::SERVICE_IMPERSONATOR_OF_STUDENTS,
-                        'parent' => UserAccess::SERVICE_IMPERSONATOR_OF_PARENTS,
-                        'guest' => UserAccess::SERVICE_IMPERSONATOR_OF_GUESTS,
-                        default => null,
-                    };
+                    $userToImpersonateRoleId = $params['user']->getRole()->getId();
 
                     if (
-                        $permissionToCheck === null ||
-                        !$user->hasServicePermission($permissionToCheck, UserAccess::ACCESS_FULL)
+                        $user->hasServicePermission(
+                            UserAccess::SERVICE_IMPERSONATOR,
+                            UserAccess::ACCESS_FULL,
+                            $userToImpersonateRoleId
+                        )
                     ) {
                         throw new Unauthorized();
                     }

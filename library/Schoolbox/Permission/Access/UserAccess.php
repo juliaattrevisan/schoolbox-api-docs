@@ -34,10 +34,7 @@ class UserAccess implements IModel
     public const SERVICE_TIMETABLE = 12;
     public const SERVICE_DESIGN = 13;
     public const SERVICE_LMS = 14;
-    public const SERVICE_IMPERSONATOR_OF_STAFF = 15;
-    public const SERVICE_IMPERSONATOR_OF_STUDENTS = 16;
-    public const SERVICE_IMPERSONATOR_OF_PARENTS = 17;
-    public const SERVICE_IMPERSONATOR_OF_GUESTS = 18;
+    public const SERVICE_IMPERSONATOR = 15;
 
     /**
      * Services that do not have service identifiers (sid) use this value
@@ -140,10 +137,7 @@ class UserAccess implements IModel
             self::SERVICE_TIMETABLE,
             self::SERVICE_DESIGN,
             self::SERVICE_LMS,
-            self::SERVICE_IMPERSONATOR_OF_STAFF,
-            self::SERVICE_IMPERSONATOR_OF_STUDENTS,
-            self::SERVICE_IMPERSONATOR_OF_PARENTS,
-            self::SERVICE_IMPERSONATOR_OF_GUESTS,
+            self::SERVICE_IMPERSONATOR,
         ];
     }
 
