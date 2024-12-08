@@ -151,6 +151,7 @@ class UserAccess implements IModel
         return [
             self::SERVICE_HOMEPAGE,
             self::SERVICE_CALENDAR,
+            self::SERVICE_IMPERSONATOR,
         ];
     }
 
