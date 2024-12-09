@@ -11,9 +11,11 @@ import CcReportTableNode from "./cc-report-table-node.vue";
 import CcReportTableNoNodes from "./cc-report-table-no-nodes.vue";
 import CcUsagePopOut from "./cc-usage-pop-out.vue";
 import { useReportStore } from "./store/ccReportStore";
+import { useCoursesStore } from "./store/ccCoursesStore";
 import type { CurriculumCoverageNode } from "../js/types/curriculumCoverageTypes";
 
 const reportStore = useReportStore();
+const coursesStore = useCoursesStore();
 const isDetailsOpen = window.Vue.ref(false);
 const selectedNodeId = window.Vue.ref<number | null>(null);
 const tbodyEl = useTemplateRef<HTMLTableSectionElement>("tbodyEl");
@@ -44,12 +46,12 @@ window.Vue.watch(isDetailsOpen, (isOpen) => {
                 <tr>
                     <th rowspan="2" class="curriculum-column l-valign--bottom">Curriculum</th>
                     <th rowspan="2" class="u-border-left l-valign--bottom">Total</th>
-                    <template v-for="course in reportStore.courses" :key="course.id">
+                    <template v-for="course in coursesStore.courses" :key="course.id">
                         <th class="u-border-left" style="border-right: none">Course</th>
                         <!-- colspan will be the number of units plus total if more than one course -->
                         <th
                             style="border-left: none"
-                            :colspan="`${course.units && course.units.length ? (reportStore.hasMultipleCourses ? course.units.length + 1 : course.units.length) : 0}`"
+                            :colspan="`${course.units && course.units.length ? (coursesStore.hasMultipleCourses ? course.units.length + 1 : course.units.length) : 0}`"
                         >
                             {{
                                 course.units && course.units.length > 1
@@ -60,7 +62,7 @@ window.Vue.watch(isDetailsOpen, (isOpen) => {
                     </template>
                 </tr>
                 <tr>
-                    <template v-for="course in reportStore.courses" :key="course.id">
+                    <template v-for="course in coursesStore.courses" :key="course.id">
                         <td class="u-border-left course-column">
                             <a v-if="course.folder" :href="course.folder._links.view">{{ course.name }}</a
                             ><template v-else>{{ course.name }}</template>
@@ -69,7 +71,7 @@ window.Vue.watch(isDetailsOpen, (isOpen) => {
                             <a v-if="unit.folder" :href="unit.folder._links.view">{{ unit.name }}</a
                             ><template v-else>{{ course.name }}</template>
                         </td>
-                        <td v-if="reportStore.hasMultipleCourses" class="l-valign--bottom"><b>Total</b></td>
+                        <td v-if="coursesStore.hasMultipleCourses" class="l-valign--bottom"><b>Total</b></td>
                     </template>
                 </tr>
             </thead>

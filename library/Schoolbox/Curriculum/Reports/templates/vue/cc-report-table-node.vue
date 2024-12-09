@@ -12,6 +12,7 @@ import type {
     UnitWithCurriculumNodeUsage,
 } from "../js/types/curriculumCoverageTypes";
 import { useReportStore } from "./store/ccReportStore";
+import { useCoursesStore } from "./store/ccCoursesStore";
 import { useFiltersStore } from "./store/ccFiltersStore";
 import { usePopOutStore } from "./store/ccPopOutStore";
 import {
@@ -37,6 +38,7 @@ const emit = defineEmits<{
 }>();
 
 const reportStore = useReportStore();
+const coursesStore = useCoursesStore();
 const filtersStore = useFiltersStore();
 const { title } = useNodeTitle(props.node);
 
@@ -213,7 +215,7 @@ function onCourseClicked(buttonEl: HTMLButtonElement): void {
                     @click="onUnitClicked"
                 />
             </template>
-            <template v-if="reportStore.hasMultipleCourses">
+            <template v-if="coursesStore.hasMultipleCourses">
                 <!-- if the node course and its children are completely empty, just hard set to 0 -->
                 <td v-if="hasNoUsages || getCourseCount(props.node, course, true) === 0">0</td>
                 <cc-report-table-node-course-total-column
