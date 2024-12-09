@@ -56,11 +56,12 @@ export const useReportStore = defineStore("ccReport", () => {
             if ("data" in responseJson && "metadata" in responseJson) {
                 const coursesStore = useCoursesStore();
                 const nodesStore = useNodesStore();
+                const loadMoreStore = useLoadMoreStore();
                 // if it's the first course load, we can just set the courses and nodes
                 if (currentIndex === 0) {
                     coursesStore.setCourses(responseJson.data.courses);
                     nodesStore.setNodes(responseJson.data.nodes);
-                    useLoadMoreStore().setNext(responseJson.metadata.cursor.next);
+                    loadMoreStore.setNext(responseJson.metadata.cursor.next);
                 } else {
                     // otherwise we need to add the new courses to the existing courses
                     coursesStore.addCourses(responseJson.data.courses);
@@ -68,6 +69,7 @@ export const useReportStore = defineStore("ccReport", () => {
                     // then if the node has children, we need to do the same for the children within
                     const newCourseNodes = responseJson.data.nodes;
                     nodesStore.addNodes(newCourseNodes);
+                    loadMoreStore.addNext(responseJson.metadata.cursor.next);
                 }
             } else {
                 throw new Error("Unexpected response format");

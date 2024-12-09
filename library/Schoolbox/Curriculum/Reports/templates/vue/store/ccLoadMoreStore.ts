@@ -10,8 +10,8 @@ import { useQueryStore } from "./ccQueryStore";
 import { useNodesStore } from "./ccNodesStore";
 
 export const useLoadMoreStore = defineStore("ccLoadMore", () => {
-    const next = window.Vue.ref<string | null>(null);
-    const hasMore = window.Vue.computed(() => next.value !== null);
+    const nextList = window.Vue.ref<string[]>([]);
+    const hasMore = window.Vue.computed(() => nextList.value.length > 0);
     const isFetching = window.Vue.ref(false);
     const isLoading = window.Vue.ref(false);
     const hasLoadError = window.Vue.ref(false);
@@ -19,11 +19,27 @@ export const useLoadMoreStore = defineStore("ccLoadMore", () => {
     let controller: AbortController; // to allow aborting the previous search if a new one is started
 
     /**
-     * Set the next cursor to load
+     * Set the a new cursor list to load
      * @param $next - the next url to load
      */
     function setNext($next: string | null): void {
-        next.value = $next;
+        if ($next !== null) {
+            nextList.value = [$next];
+        } else {
+            nextList.value = [];
+        }
+    }
+
+    /**
+     * Set the a new cursor list to load
+     * @param $next - the next url to load
+     */
+    function addNext($next: string | null): void {
+        if ($next !== null) {
+            nextList.value = [...nextList.value, $next];
+        } else {
+            nextList.value = [];
+        }
     }
 
     /**
@@ -58,6 +74,7 @@ export const useLoadMoreStore = defineStore("ccLoadMore", () => {
                     // and we also need to run through nodes and add the new course within each node.usage.courses[]
                     // then if the node has children, we need to do the same for the children within
                     nodesStore.addMoreNodes(responseJson.data.nodes);
+                    addNext(responseJson.metadata.cursor.next);
                 }
             } else {
                 throw new Error("Unexpected response format");
@@ -89,9 +106,10 @@ export const useLoadMoreStore = defineStore("ccLoadMore", () => {
         }
         try {
             isFetching.value = true;
+            // get the next set of nodes to load, setting the list of next cursors
             const queryUrls = useQueryStore()
                 .getQueryUrls()
-                .map((url) => `${url}&cursor=${next.value}`);
+                .map((url, index) => `${url}&cursor=${nextList.value[index]}`);
             await queryUrls.reduce(async (previousPromise, url, currentIndex) => {
                 await previousPromise;
                 if (!hasLoadError.value) {
@@ -109,6 +127,7 @@ export const useLoadMoreStore = defineStore("ccLoadMore", () => {
 
     return {
         setNext,
+        addNext,
         hasMore,
         isLoading,
         hasLoadError,
