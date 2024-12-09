@@ -10,12 +10,12 @@ import BasicModal from "@schoolboxVue/components/modal/basic-modal.vue";
 import CcReportTableNode from "./cc-report-table-node.vue";
 import CcReportTableNoNodes from "./cc-report-table-no-nodes.vue";
 import CcUsagePopOut from "./cc-usage-pop-out.vue";
-import { useReportStore } from "./store/ccReportStore";
 import { useCoursesStore } from "./store/ccCoursesStore";
+import { useNodesStore } from "./store/ccNodesStore";
 import type { CurriculumCoverageNode } from "../js/types/curriculumCoverageTypes";
 
-const reportStore = useReportStore();
 const coursesStore = useCoursesStore();
+const nodesStore = useNodesStore();
 const isDetailsOpen = window.Vue.ref(false);
 const selectedNodeId = window.Vue.ref<number | null>(null);
 const tbodyEl = useTemplateRef<HTMLTableSectionElement>("tbodyEl");
@@ -77,7 +77,7 @@ window.Vue.watch(isDetailsOpen, (isOpen) => {
             </thead>
             <tbody ref="tbodyEl">
                 <cc-report-table-node
-                    v-for="node in reportStore.nodes"
+                    v-for="node in nodesStore.nodes"
                     :key="node.id"
                     :node="node"
                     :depth="0"
