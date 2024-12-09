@@ -322,10 +322,6 @@ HELP;
                     'availability' => $campusIds,
                     'visibility' =>  [self::ROLETYPE_SELF, self::ROLETYPE_STUDENT, self::ROLETYPE_PARENT, self::ROLETYPE_STAFF],
                 ],
-                'pronoun' => [
-                    'availability' => $campusIds,
-                    'visibility' =>  [self::ROLETYPE_SELF, self::ROLETYPE_STUDENT, self::ROLETYPE_PARENT, self::ROLETYPE_STAFF],
-                ],
                 'email' => [
                     'availability' => $campusIds,
                     'visibility' =>  [self::ROLETYPE_SELF, self::ROLETYPE_STUDENT, self::ROLETYPE_PARENT, self::ROLETYPE_STAFF],
@@ -386,10 +382,6 @@ HELP;
                     'availability' => $campusIds,
                     'visibility' =>  [self::ROLETYPE_SELF, self::ROLETYPE_PARENT, self::ROLETYPE_STAFF],
                 ],
-                'StudentGovernmentStudentNumber' => [
-                    'availability' => $campusIds,
-                    'visibility' =>  [self::ROLETYPE_SELF, self::ROLETYPE_PARENT, self::ROLETYPE_STAFF],
-                ],
                 'StudentStudiesCode' => [
                     'availability' => $campusIds,
                     'visibility' =>  [self::ROLETYPE_SELF, self::ROLETYPE_PARENT, self::ROLETYPE_STAFF],
@@ -407,15 +399,7 @@ HELP;
                     'availability' => $campusIds,
                     'visibility' =>  [],
                 ],
-                'externalId' => [
-                    'availability' => [],
-                    'visibility' =>  [],
-                ],
                 'yearLevel' => [
-                    'availability' => [],
-                    'visibility' =>  [],
-                ],
-                'SchoolStaffCode' => [
                     'availability' => [],
                     'visibility' =>  [],
                 ],
@@ -423,17 +407,9 @@ HELP;
                     'availability' => $campusIds,
                     'visibility' =>  [self::ROLETYPE_SELF, self::ROLETYPE_STUDENT, self::ROLETYPE_PARENT, self::ROLETYPE_STAFF],
                 ],
-                'pronoun' => [
-                    'availability' => $campusIds,
-                    'visibility' =>  [self::ROLETYPE_SELF, self::ROLETYPE_STUDENT, self::ROLETYPE_PARENT, self::ROLETYPE_STAFF],
-                ],
                 'email' => [
                     'availability' => $campusIds,
                     'visibility' =>  [self::ROLETYPE_SELF, self::ROLETYPE_STAFF],
-                ],
-                'role' => [
-                    'availability' => [],
-                    'visibility' =>  [],
                 ],
                 /* NOTE: Decided by report_staff_access
                  * By default it's visible to self, staff
@@ -467,24 +443,9 @@ HELP;
                 /* NOTE: Decided by report_staff_access
                  * By default it's visible to self, staff
                  */
-                'StaffDefaultMobilePhone' => [
-                    'availability' => $campusIds,
-                    'visibility' =>  [self::ROLETYPE_SELF, self::ROLETYPE_STAFF],
-                ],
-                /* NOTE: Decided by report_staff_access
-                 * By default it's visible to self, staff
-                 */
                 'campusCollection' => [
                     'availability' => $campusIds,
                     'visibility' =>  [self::ROLETYPE_SELF, self::ROLETYPE_STAFF],
-                ],
-                'schoolHouse' => [
-                    'availability' => [],
-                    'visibility' =>  [],
-                ],
-                'residentialHouse' => [
-                    'availability' => [],
-                    'visibility' =>  [],
                 ],
             ],
             self::ROLETYPE_PARENT => [
@@ -492,15 +453,7 @@ HELP;
                     'availability' => $campusIds,
                     'visibility' =>  [self::ROLETYPE_SELF, self::ROLETYPE_STUDENT, self::ROLETYPE_PARENT, self::ROLETYPE_STAFF],
                 ],
-                'externalId' => [
-                    'availability' => [],
-                    'visibility' =>  [],
-                ],
                 'positionTitle' => [
-                    'availability' => $campusIds,
-                    'visibility' =>  [self::ROLETYPE_SELF, self::ROLETYPE_STUDENT, self::ROLETYPE_PARENT, self::ROLETYPE_STAFF],
-                ],
-                'pronoun' => [
                     'availability' => $campusIds,
                     'visibility' =>  [self::ROLETYPE_SELF, self::ROLETYPE_STUDENT, self::ROLETYPE_PARENT, self::ROLETYPE_STAFF],
                 ],
@@ -510,10 +463,6 @@ HELP;
                 'email' => [
                     'availability' => $campusIds,
                     'visibility' =>  [self::ROLETYPE_SELF, self::ROLETYPE_STAFF],
-                ],
-                'campusCollection' => [
-                    'availability' => [],
-                    'visibility' =>  [],
                 ],
                 /* NOTE: Decided by restrict_parent_emails
                  * By default it's visible to self, staff
@@ -637,7 +586,6 @@ HELP;
             $roletypes[self::ROLETYPE_STAFF]['campusCollection']['visibility'][] = self::ROLETYPE_PARENT;
             $roletypes[self::ROLETYPE_STAFF]['StaffDepartment']['visibility'][] = self::ROLETYPE_PARENT;
             $roletypes[self::ROLETYPE_STAFF]['StaffCategoryDescription']['visibility'][] = self::ROLETYPE_PARENT;
-            $roletypes[self::ROLETYPE_STAFF]['StaffDefaultMobilePhone']['visibility'][] = self::ROLETYPE_PARENT;
         }
 
         /* restrict_parent_emails
