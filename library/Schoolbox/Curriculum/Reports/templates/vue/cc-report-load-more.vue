@@ -39,7 +39,7 @@ async function onLoadMoreSelected(): Promise<void> {
         </div>
     </div>
     <button v-else-if="showLoadMore" data-test="sp-results-load-more-button" @click.prevent="onLoadMoreSelected">
-        Load more
+        Load more curriculum
     </button>
 </template>
 

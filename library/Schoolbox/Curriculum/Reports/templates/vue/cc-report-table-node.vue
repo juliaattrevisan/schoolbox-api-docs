@@ -181,7 +181,11 @@ function onCourseClicked(buttonEl: HTMLButtonElement): void {
                 :style="{ paddingLeft: lastChildPadding }"
                 @click="onTitleClicked"
             >
-                {{ title }}
+                <!-- bolden the selected curriculum node to help distinguish -->
+                <template v-if="props.depth === 0"
+                    ><b>{{ title }}</b></template
+                >
+                <template v-else>{{ title }}</template>
             </button>
         </td>
         <!-- if the node total and its children are completely empty, just hard set to 0 -->
