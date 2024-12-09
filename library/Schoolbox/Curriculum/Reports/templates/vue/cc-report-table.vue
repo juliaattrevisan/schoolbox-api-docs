@@ -61,11 +61,11 @@ window.Vue.watch(isDetailsOpen, (isOpen) => {
                 </tr>
                 <tr>
                     <template v-for="course in reportStore.courses" :key="course.id">
-                        <td class="u-border-left">
+                        <td class="u-border-left course-column">
                             <a v-if="course.folder" :href="course.folder._links.view">{{ course.name }}</a
                             ><template v-else>{{ course.name }}</template>
                         </td>
-                        <td v-for="unit in course.units" :key="unit.id">
+                        <td v-for="unit in course.units" :key="unit.id" class="unit-column">
                             <a v-if="unit.folder" :href="unit.folder._links.view">{{ unit.name }}</a
                             ><template v-else>{{ course.name }}</template>
                         </td>
@@ -92,6 +92,11 @@ window.Vue.watch(isDetailsOpen, (isOpen) => {
 </template>
 
 <style scoped>
+.course-column,
+.unit-column {
+    min-width: 175px; /* prevent the course/unit names from getting too small */
+}
+
 .curriculum-column {
     min-width: 400px; /* fixed width for the curriculum column to prevent shifts on expand/collapse */
     width: 400px; /* fixed width for the curriculum column to prevent shifts on expand/collapse */
