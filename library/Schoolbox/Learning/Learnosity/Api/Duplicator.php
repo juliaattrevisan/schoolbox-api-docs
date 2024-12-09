@@ -19,6 +19,7 @@ use Psr\Log\LoggerInterface;
 use Schoolbox\Learning\Assessment\Quiz\Model as QuizDomainModel;
 use Schoolbox\Learning\Learnosity\Api;
 use Schoolbox\Learning\Learnosity\Helper;
+use Schoolbox\Learning\Learnosity\Importer\Cli\CopyMissingQuizException;
 use Schoolbox\Learning\Learnosity\Importer\Cli\ImporterTool;
 use Schoolbox\Learning\Learnosity\Importer\Cli\SourceAssociationException;
 use Schoolbox\Learning\Learnosity\TagFactory;
@@ -81,6 +82,7 @@ class Duplicator
      * @throws \RuntimeException
      * @throws SourceAssociationException if `$source` has no Learnosity reference: an empty source can't be copied to
      *                                    a destination.
+     * @throws CopyMissingQuizException   if `$source`'s Learnosity reference doesn't match anything in Learnosity
      */
     public function copyQuizConstituents(QuizDomainModel $source, QuizDomainModel $destination): ?string
     {
@@ -113,72 +115,74 @@ class Duplicator
             ],
         );
 
-        /* Only try to clone activities with items;
-         * skip duplicating activities without items for now
-         * (You can still add items after this though)
-         */
-        if (\count($activity['data'])) {
-            /* Get the new learnosity reference and return that
-             *
-             * TODO We could either Poll Learnosity to find out when it's cloned,
-             *  or assign a random uuidv4() arbitrarily, and use that instead...
-             *  ...and hope that Learnosity is okay with it
-             */
-            $newLearnosityReference = Uuid::generate();
-
-            /* Make a massive assumption that this _just worked_
-             * You could lean on the polling system to find out when this cloning has finished,
-             * or just blindly assume the uuidv4() was unique
-             *
-             * TODO make this safer
-             */
-            $response = $this->api->dataSetRequest(
-                '/itembank/activities/duplicate',
-                [
-                    'activities' => [
-                        [
-                            'reference' => $oldLearnosityReference,
-                            'new_reference' => $newLearnosityReference
-                        ]
-                    ]
-                ],
+        // No data found in Learnosity: raise an error
+        if (!count($activity['data'])) {
+            throw new CopyMissingQuizException(
+                sprintf(
+                    'Source assessment Learnosity reference %s does not exist in Learnosity: cannot copy',
+                    $oldLearnosityReference,
+                ),
             );
-            $learnosityJobReference = $response['data']['job_reference'] ?? null;
-
-            // Assign and save Learnosity reference
-            /* FIXME projects need some special treatment of some kind,
-             *  getBaseAssessable() might return a Schoolbox\Learning\Assessment\Project
-             *  which won't have a Learnosity Reference field...weird behaviours
-             *  But Why?
-             */
-            $destination->setLearnosityReference($newLearnosityReference);
-            $destination->setLearnosityJobReference($learnosityJobReference);
-            if ($destination->getId()) {
-                $this->database->prepareQuery(
-                    "
-                        UPDATE assess
-                        SET learnosity_reference = ?,
-                            learnosity_job_reference = ?,
-                            learnosity_job_status = ?,
-                            learnosity_job_attempt_count = COALESCE(learnosity_job_attempt_count, 0) + 1,
-                            learnosity_source_assessment_id = ?
-                        WHERE assessment_id = ?
-                    ",
-                    [
-                        $newLearnosityReference,
-                        $learnosityJobReference,
-                        Helper::LEARNOSITY_PROCESS_STATUS_PROCESSING,
-                        $source->getId(),
-                        $destination->getId(),
-                    ],
-                )->execute();
-            }
-
-            // Return whatever the job ID from Learnosity was
-            return $learnosityJobReference;
         }
 
-        return null;
+        /* Get the new learnosity reference and return that
+         *
+         * TODO We could either Poll Learnosity to find out when it's cloned,
+         *  or assign a random uuidv4() arbitrarily, and use that instead...
+         *  ...and hope that Learnosity is okay with it
+         */
+        $newLearnosityReference = Uuid::generate();
+
+        /* Make a massive assumption that this _just worked_
+         * You could lean on the polling system to find out when this cloning has finished,
+         * or just blindly assume the uuidv4() was unique
+         *
+         * TODO make this safer
+         */
+        $response = $this->api->dataSetRequest(
+            '/itembank/activities/duplicate',
+            [
+                'activities' => [
+                    [
+                        'reference' => $oldLearnosityReference,
+                        'new_reference' => $newLearnosityReference
+                    ]
+                ]
+            ],
+        );
+        $learnosityJobReference = $response['data']['job_reference'] ?? null;
+
+        // Assign and save Learnosity reference
+        /* FIXME projects need some special treatment of some kind,
+         *  getBaseAssessable() might return a Schoolbox\Learning\Assessment\Project
+         *  which won't have a Learnosity Reference field...weird behaviours
+         *  But Why?
+         */
+        $destination->setLearnosityReference($newLearnosityReference);
+        $destination->setLearnosityJobReference($learnosityJobReference);
+        if ($destination->getId()) {
+            $this->database->prepareQuery(
+                "
+                    UPDATE assess
+                    SET learnosity_reference = ?,
+                        learnosity_job_reference = ?,
+                        learnosity_job_status = ?,
+                        learnosity_job_attempt_count = COALESCE(learnosity_job_attempt_count, 0) + 1,
+                        learnosity_source_assessment_id = ?
+                    WHERE assessment_id = ?
+                ",
+                [
+                    $newLearnosityReference,
+                    $learnosityJobReference,
+                    Helper::LEARNOSITY_PROCESS_STATUS_PROCESSING,
+                    $source->getId(),
+                    $destination->getId(),
+                ],
+            )->execute();
+        }
+
+        // Return whatever the job ID from Learnosity was
+        return $learnosityJobReference;
     }
 
     /**
