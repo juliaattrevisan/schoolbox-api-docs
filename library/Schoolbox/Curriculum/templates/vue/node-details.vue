@@ -3,24 +3,52 @@
  * To view all details including breadcrumbs and description on a curriculum node
  */
 
-import MediaArticle from "@schoolboxVue/components/media-article.vue";
 import { getBreadcrumbs, UNSET_ID } from "@schoolboxCurriculum/js/nodeUtils";
+import NodeUsageDetails from "@schoolboxCurriculum/vue/usage/node-usage-details.vue";
+import { ActivityTypes } from "@schoolboxCurriculum/types/Node";
 import type { Breadcrumb } from "@schoolboxCurriculum/types/Breadcrumb";
-import type { Node } from "@schoolboxCurriculum/types/Node";
+import type { Node, Usage } from "@schoolboxCurriculum/types/Node";
 
 interface Props {
     /**
      * the ID of the node to load and display
      */
     nodeId: number;
+    /**
+     * Whether to load and show the usage information for the node
+     * Defaults to false
+     */
+    includeUsage?: boolean;
 }
 
-const props = defineProps<Props>();
+const props = withDefaults(defineProps<Props>(), {
+    includeUsage: false,
+});
 
 const activeNode = window.Vue.ref<{ node: Node; breadcrumbs: Breadcrumb[] } | null>(null);
 
 const isLoading = window.Vue.ref(true);
 const hasLoadError = window.Vue.ref(false);
+
+/**
+ * Load all the node usage details for the current active node
+ */
+async function loadUsage(): Promise<void> {
+    if (activeNode.value === null) {
+        throw new Error("No active node to load usage for");
+    }
+
+    const usageResponse = await fetch(activeNode.value.node._links.getUsage);
+    if (usageResponse.ok) {
+        const usage = (await usageResponse.json()) as { data: Usage[] };
+        // we are not currently displaying folders in the usage list
+        const withoutFolders = usage.data.filter((item: Usage) => item.discriminator !== ActivityTypes.FOLDER);
+        activeNode.value.node.usage = withoutFolders;
+    } else {
+        console.error(usageResponse);
+        hasLoadError.value = true;
+    }
+}
 
 /**
  * load al the node details, retrieving the breadcrumbs by loading all the parents
@@ -37,6 +65,11 @@ async function load(nodeId: number): Promise<void> {
                 node: nodeWithParents,
                 breadcrumbs: getBreadcrumbs(nodeWithParents, []),
             };
+
+            // Now load the usage information for the active node if required
+            if (props.includeUsage) {
+                await loadUsage();
+            }
         } else {
             console.error(response);
             hasLoadError.value = true;
@@ -107,10 +140,11 @@ window.Vue.onMounted(() => {
     <div v-else-if="activeNode !== null">
         <h2>{{ title }}</h2>
         <p v-if="breadcrumbs.length > 0" class="meta">{{ breadcrumbs }}</p>
-        <media-article
-            v-if="activeNode.node.description !== null"
-            tag="div"
-            :content="activeNode.node.description"
-        ></media-article>
+        <node-usage-details
+            :node="activeNode.node"
+            :depth="0"
+            :is-processing="isLoading"
+            :has-load-error="hasLoadError"
+        />
     </div>
 </template>
