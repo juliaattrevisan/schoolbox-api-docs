@@ -799,8 +799,14 @@
 
         {# Put that array struct into something js can comprehend #}
         var serviceMapping = $.parseJSON('{{ serviceMapping|json_encode|purify }}');
+        var serviceSelector = $('#serviceSelect');
 
-        $("#serviceSelect").on('change', function() {
+        // Ensure no service is selected on page load.
+        // If this is not done, any option that was selected before a page refresh will remain selected after the page
+        // refresh.  If the serviceIdentifierDropdown is required by the selected service, it will not be visible.
+        serviceSelector.val('');
+
+        serviceSelector.on('change', function() {
 
             {# Enable submit button #}
             $('form[data-validatable-as="addService"]').find(':submit').prop('disabled', false);
