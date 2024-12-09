@@ -9,6 +9,8 @@ declare(strict_types=1);
 
 namespace Schoolbox\Clipboard\Hierarchy\Lookup;
 
+use Schoolbox\Role;
+
 /**
  * Get a list of (external_id, user_id) tuples
  *
@@ -17,7 +19,6 @@ namespace Schoolbox\Clipboard\Hierarchy\Lookup;
  */
 class Person
 {
-
     /**
      * @var \Schoolbox\UserMapper
      */
@@ -54,6 +55,18 @@ class Person
         }
 
         $lookup = [];
+        /* To check for user of role staff first to avoid mismatch
+         */
+        $pb = $this->userMapper->getPredicateBuilder();
+        $pb->equals('g.group_type', Role::STAFF)
+           ->isNull('deleted_at')
+           ->notNull('synergy_id');
+
+        $result = $this->userMapper->findByPredicates($pb);
+
+        foreach ($result as $user) {
+            $lookup[(string)$user->getExternalId()] = $user->getId();
+        }
 
         $statement = $this->userMapper->getDatabase()->query("
             SELECT synergy_id, id
@@ -65,9 +78,12 @@ class Person
         $statement->execute();
 
         while ($row = $statement->fetch()) {
-            $lookup[(string)$row['synergy_id']] = $row['id'];
+            /* Find the rest of the users
+             */
+            if (!isset($lookup[$row['synergy_id']])) {
+                $lookup[(string)$row['synergy_id']] = $row['id'];
+            }
         }
-
         /* Remember this for later
          */
         $this->lookup = $lookup;
