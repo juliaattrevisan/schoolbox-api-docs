@@ -16,8 +16,8 @@ VALUES (
                 SELECT value
                 FROM config
                 WHERE config.name = 'site_school_code'
-            ) IN ('tlc', 'TLC', 'ms', 'MS', 'imm', 'IMM', 'aas', 'AAS') THEN 1 ELSE 0 END)
-        )
+            ) IN ('tlc', 'TLC', 'ms', 'MS', 'imm', 'IMM', 'aas', 'AAS') THEN 1 ELSE 0 END
+        ),
         'Compact Mode',
         null
 );
