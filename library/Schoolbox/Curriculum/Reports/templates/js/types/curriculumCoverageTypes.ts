@@ -20,15 +20,6 @@ export type CurriculumCoveragePayload = {
 };
 
 /**
- * What is returned when there is a search error
- */
-export type ReportError = {
-    title: string;
-    type: string;
-    status: number;
-};
-
-/**
  * A unit with node usage counts for the different
  * items a curriculum node can be assigned to
  */

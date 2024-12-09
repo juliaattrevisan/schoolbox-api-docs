@@ -32,7 +32,10 @@ async function onLoadMoreSelected(): Promise<void> {
         <div class="alert-box alert f-no-margins">
             Sorry, there was an error during report retrieval. Please
             <a href="" title="refresh the page"> refresh the page </a>
-            to try again and contact your support if the problem persists
+            to try again and contact your support if the problem persists.
+            <template v-if="loadMoreStore.loadError"
+                ><em>Further support info: {{ loadMoreStore.loadError }}</em></template
+            >
         </div>
     </div>
     <button v-else-if="showLoadMore" data-test="sp-results-load-more-button" @click.prevent="onLoadMoreSelected">

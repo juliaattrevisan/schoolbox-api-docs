@@ -4,8 +4,9 @@
 
 import { defineStore } from "pinia";
 import { usePrintDialog } from "@schoolboxVue/composables/print/usePrintDialog";
-import { isAbortError } from "@js/util/errorUtils";
-import type { CurriculumCoveragePayload, ReportError } from "../../js/types/curriculumCoverageTypes";
+import { isAbortError, hasErrorMessage } from "@js/util/errorUtils";
+import { extractErrorMessage } from "@js/util/sbx/fetchUtils";
+import type { CurriculumCoveragePayload } from "../../js/types/curriculumCoverageTypes";
 import { useQueryStore } from "./ccQueryStore";
 import { useInputStore } from "./ccInputStore";
 import { useCoursesStore } from "./ccCoursesStore";
@@ -17,7 +18,7 @@ export const useReportStore = defineStore("ccReport", () => {
     const isFetching = window.Vue.ref(false);
     const isLoading = window.Vue.ref(false);
     const hasLoadError = window.Vue.ref(false);
-    const loadError = window.Vue.ref<ReportError | null>(null);
+    const loadError = window.Vue.ref<string | null>(null);
     const hasReport = window.Vue.ref<boolean>(false); // whether the report has been generated
     let controller: AbortController; // to allow aborting the previous search if a new one is started
     const { isPrinting } = usePrintDialog();
@@ -45,23 +46,12 @@ export const useReportStore = defineStore("ccReport", () => {
                 },
             });
             if (!response.ok) {
-                hasLoadError.value = true;
-                loadError.value = {
-                    title: "An error occurred",
-                    type: "error",
-                    status: response.status,
-                };
-                return;
+                const errorMessage = await extractErrorMessage(response);
+                throw new Error(errorMessage);
             }
-            const responseJson = (await response.json()) as CurriculumCoveragePayload | ReportError;
+            const responseJson = (await response.json()) as CurriculumCoveragePayload;
             if (typeof responseJson !== "object" || responseJson === null) {
-                hasLoadError.value = true;
-                return;
-            }
-            if ("status" in responseJson) {
-                hasLoadError.value = true;
-                loadError.value = responseJson;
-                return;
+                throw new Error("Unexpected response format");
             }
             if ("data" in responseJson && "metadata" in responseJson) {
                 const coursesStore = useCoursesStore();
@@ -79,11 +69,16 @@ export const useReportStore = defineStore("ccReport", () => {
                     const newCourseNodes = responseJson.data.nodes;
                     nodesStore.addNodes(newCourseNodes);
                 }
+            } else {
+                throw new Error("Unexpected response format");
             }
         } catch (error) {
             // ignore abort errors, as the previous report was cancelled
             if (isAbortError(error)) {
                 return;
+            }
+            if (error instanceof Error && hasErrorMessage(error)) {
+                loadError.value = error.message;
             }
             console.error(error);
             hasLoadError.value = true;
@@ -129,6 +124,7 @@ export const useReportStore = defineStore("ccReport", () => {
         hasNotReported,
         isLoading,
         hasLoadError,
+        loadError,
         report,
         hasReport,
         canReport,

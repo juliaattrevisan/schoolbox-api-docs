@@ -3,10 +3,10 @@
  */
 
 import { defineStore } from "pinia";
-import { isAbortError } from "@js/util/errorUtils";
-import type { CurriculumCoveragePayload, ReportError } from "../../js/types/curriculumCoverageTypes";
+import { isAbortError, hasErrorMessage } from "@js/util/errorUtils";
+import { extractErrorMessage } from "@js/util/sbx/fetchUtils";
+import type { CurriculumCoveragePayload } from "../../js/types/curriculumCoverageTypes";
 import { useQueryStore } from "./ccQueryStore";
-import { useCoursesStore } from "./ccCoursesStore";
 import { useNodesStore } from "./ccNodesStore";
 
 export const useLoadMoreStore = defineStore("ccLoadMore", () => {
@@ -15,7 +15,7 @@ export const useLoadMoreStore = defineStore("ccLoadMore", () => {
     const isFetching = window.Vue.ref(false);
     const isLoading = window.Vue.ref(false);
     const hasLoadError = window.Vue.ref(false);
-    const loadError = window.Vue.ref<ReportError | null>(null);
+    const loadError = window.Vue.ref<string | null>(null);
     let controller: AbortController; // to allow aborting the previous search if a new one is started
 
     /**
@@ -41,23 +41,12 @@ export const useLoadMoreStore = defineStore("ccLoadMore", () => {
                 },
             });
             if (!response.ok) {
-                hasLoadError.value = true;
-                loadError.value = {
-                    title: "An error occurred",
-                    type: "error",
-                    status: response.status,
-                };
-                return;
+                const errorMessage = await extractErrorMessage(response);
+                throw new Error(errorMessage);
             }
-            const responseJson = (await response.json()) as CurriculumCoveragePayload | ReportError;
+            const responseJson = (await response.json()) as CurriculumCoveragePayload;
             if (typeof responseJson !== "object" || responseJson === null) {
-                hasLoadError.value = true;
-                return;
-            }
-            if ("status" in responseJson) {
-                hasLoadError.value = true;
-                loadError.value = responseJson;
-                return;
+                throw new Error("Unexpected response format");
             }
             if ("data" in responseJson && "metadata" in responseJson) {
                 const nodesStore = useNodesStore();
@@ -70,11 +59,16 @@ export const useLoadMoreStore = defineStore("ccLoadMore", () => {
                     // then if the node has children, we need to do the same for the children within
                     nodesStore.addMoreNodes(responseJson.data.nodes);
                 }
+            } else {
+                throw new Error("Unexpected response format");
             }
         } catch (error) {
             // ignore abort errors, as the previous report was cancelled
             if (isAbortError(error)) {
                 return;
+            }
+            if (error instanceof Error && hasErrorMessage(error)) {
+                loadError.value = error.message;
             }
             console.error(error);
             hasLoadError.value = true;
@@ -118,6 +112,7 @@ export const useLoadMoreStore = defineStore("ccLoadMore", () => {
         hasMore,
         isLoading,
         hasLoadError,
+        loadError,
         report,
     };
 });

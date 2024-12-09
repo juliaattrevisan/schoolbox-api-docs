@@ -24,7 +24,10 @@ const reportStore = useReportStore();
         <div class="alert-box alert f-no-margins">
             Sorry, there was an error during report retrieval. Please
             <a href="" title="refresh the page"> refresh the page </a>
-            to try again and contact your support if the problem persists
+            to try again and contact your support if the problem persists.
+            <template v-if="reportStore.loadError"
+                ><em>Further support info: {{ reportStore.loadError }}</em></template
+            >
         </div>
     </div>
     <div v-else-if="reportStore.hasReport" class="c-island l-pad-m">
