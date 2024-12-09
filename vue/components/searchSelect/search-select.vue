@@ -32,6 +32,7 @@ interface Props {
     hasButton?: boolean; // whether to show a button next to the input
     buttonIcon?: string; // the icon to display on the button
     buttonTitle?: string; // the title of the button
+    meta?: string; // the meta text
 }
 const props = withDefaults(defineProps<Props>(), {
     defaultResults: undefined,
@@ -41,6 +42,7 @@ const props = withDefaults(defineProps<Props>(), {
     buttonIcon: "",
     buttonTitle: "Browse",
     queryKey: "query",
+    meta: "",
 });
 
 const emit = defineEmits<{
@@ -90,6 +92,7 @@ function onSearchSuccess(json: unknown): void {
 const { query, isActive, isSearching, hasNoResults, hasError } = useQuerySearch(
     props.endpoint,
     props.queryKey,
+    props.meta,
     results,
     onSearchSuccess,
 ); // to search for results
@@ -193,6 +196,7 @@ function onButtonSelected(): void {
 <template>
     <div ref="searchSelectEl">
         <label :for="props.labelId" :class="`${props.isRequired ? 'required' : ''}`">{{ props.label }}</label>
+        <p v-if="props.meta" class="meta">{{ props.meta }}</p>
         <label v-if="props.hasError" class="error" :for="props.labelId">{{ errorMessage }}</label>
         <ss-selected
             :selected="selected"

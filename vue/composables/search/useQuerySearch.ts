@@ -15,14 +15,16 @@ export const DEBOUNCE_AMOUNT = 350; // the amount in ms to hold off on searching
  * search for results that match the current query
  * @param endpoint - the endpoint to search for results
  * @param queryKey - the key to use for search something
+ * @returns isSearching, query, results, isActive, hasNoResults,  search
  * @param results - a reference to the results list
  * @param onSuccess - a callback to run when the search is successful
  * @param requiresQuery - whether the search requires a query to be active
- * @returns isSearching, query, results, isActive, hasNoResults,  search
+ * @param meta - the data (information) about input
  */
 export function useQuerySearch(
     endpoint: string,
     queryKey: string,
+    meta: string,
     results: Ref<SearchSelectItem[]>,
     onSuccess: (json: unknown, isActive: boolean) => void,
     requiresQuery: boolean = true,
