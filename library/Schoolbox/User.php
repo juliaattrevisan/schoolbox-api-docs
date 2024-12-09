@@ -1429,7 +1429,8 @@ class User implements Serializable, Linkable, ISoftDeletable, IModel
         $accessList = $this->getAccessList();
 
         foreach ($accessList->filterBy('service', $servicePermission) as $access) {
-            if ($access->getAccessLevel() >= $level && ($sId === null || $access['sid'] === $sId)) {
+            /** @var UserAccess $access */
+            if ($access->getAccessLevel() >= $level && ($sId === null || $access->getServiceIdentifier() === $sId)) {
                 return true;
             }
         }
