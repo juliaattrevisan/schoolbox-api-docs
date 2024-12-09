@@ -69,14 +69,13 @@ export const useLoadMoreStore = defineStore("ccLoadMore", () => {
             }
             if ("data" in responseJson && "metadata" in responseJson) {
                 const nodesStore = useNodesStore();
-                // if it's the first course load, we can just set the courses and nodes
+                // if it's the first course load, we can just set the courses, nodes, and next cursor
                 if (currentIndex === 0) {
                     nodesStore.setMoreNodes(responseJson.data.nodes);
                     setNext(responseJson.metadata.cursor.next);
                 } else {
-                    // and we also need to run through nodes and add the new course within each node.usage.courses[]
-                    // then if the node has children, we need to do the same for the children within
-                    nodesStore.addMoreNodes(responseJson.data.nodes);
+                    // otherwise we need to add the new to the existing
+                    nodesStore.addMoreCourseUsage(responseJson.data.nodes);
                     addNext(responseJson.metadata.cursor.next);
                 }
             } else {

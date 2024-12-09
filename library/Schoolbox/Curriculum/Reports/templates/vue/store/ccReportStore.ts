@@ -57,18 +57,16 @@ export const useReportStore = defineStore("ccReport", () => {
                 const coursesStore = useCoursesStore();
                 const nodesStore = useNodesStore();
                 const loadMoreStore = useLoadMoreStore();
-                // if it's the first course load, we can just set the courses and nodes
+                // if it's the first course load, we can just set the courses, nodes, and next cursor
                 if (currentIndex === 0) {
                     coursesStore.setCourses(responseJson.data.courses);
                     nodesStore.setNodes(responseJson.data.nodes);
                     loadMoreStore.setNext(responseJson.metadata.cursor.next);
                 } else {
-                    // otherwise we need to add the new courses to the existing courses
+                    // otherwise we need to add the new to the existing
                     coursesStore.addCourses(responseJson.data.courses);
-                    // and we also need to run through nodes and add the new course within each node.usage.courses[]
-                    // then if the node has children, we need to do the same for the children within
                     const newCourseNodes = responseJson.data.nodes;
-                    nodesStore.addNodes(newCourseNodes);
+                    nodesStore.addCourseUsage(newCourseNodes);
                     loadMoreStore.addNext(responseJson.metadata.cursor.next);
                 }
             } else {
