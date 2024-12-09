@@ -49,10 +49,8 @@ const hasChildren = window.Vue.ref(Array.isArray(props.node.children) && props.n
 
 const isExpanded = window.Vue.ref(props.depth < 1); // to hide any grandchild and below nodes by default
 const expandTitle = window.Vue.computed(() => (isExpanded.value ? "Collapse" : "Expand"));
-// don't show the expand button when the node is at the top level, has no children, or onlyShowGaps is active
-const showExpandButton = window.Vue.computed(
-    () => props.depth !== 0 && hasChildren.value && !filtersStore.onlyShowGaps,
-);
+// don't show the expand button when the node has no children, or onlyShowGaps is active
+const showExpandButton = window.Vue.computed(() => hasChildren.value && !filtersStore.onlyShowGaps);
 const lastChildPadding = window.Vue.computed(() =>
     props.depth !== 0 && !hasChildren.value && !filtersStore.onlyShowGaps ? "2.75rem" : "0",
 ); // to add padding to the last child node to align better with the expand button
