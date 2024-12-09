@@ -6,12 +6,15 @@ import { defineStore } from "pinia";
 import { isAbortError, hasErrorMessage } from "@js/util/errorUtils";
 import { extractErrorMessage } from "@js/util/sbx/fetchUtils";
 import type { CurriculumCoveragePayload } from "../../js/types/curriculumCoverageTypes";
+import { useInputStore } from "./ccInputStore";
 import { useQueryStore } from "./ccQueryStore";
 import { useNodesStore } from "./ccNodesStore";
 
 export const useLoadMoreStore = defineStore("ccLoadMore", () => {
     const nextList = window.Vue.ref<string[]>([]);
-    const hasMore = window.Vue.computed(() => nextList.value.length > 0);
+    const hasMore = window.Vue.computed(
+        () => useNodesStore().nodes.length < useInputStore().activeNodeCount && nextList.value.length > 0,
+    ); // don't load more if all nodes have been loaded or the next list is empty
     const isFetching = window.Vue.ref(false);
     const isLoading = window.Vue.ref(false);
     const hasLoadError = window.Vue.ref(false);
