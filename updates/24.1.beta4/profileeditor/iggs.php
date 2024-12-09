@@ -126,7 +126,7 @@ HELP;
         $this->helper->updateField(Role::STUDENT, 'StudentBirthDate', $campusIds, $roletypes);
         $this->helper->updateField(Role::STUDENT, 'StudentTutorDescription', $campusIds, $roletypes);
 
-        $this->disableFields([
+        $this->helper->disableFields([
             Role::STUDENT => [
                 'StudentBirthDate',
                 'StudentTutorDescription',
@@ -135,59 +135,13 @@ HELP;
 
         /* Renames Studies Code to Photo Permission
          */
-        $this->renameField();
+        $this->helper->renameField('studies_code', 'Photo Permission', 'Photo Permissions');
 
         /* Announce lock release
          */
         $this->getLogger()->debug('Releasing lock');
 
         $lock->release();
-    }
-
-
-    /**
-     * A (roletype, field) tuple whose enabled column should be set to 0
-     *
-     * @param array $tuples
-     * @return void
-     */
-    private function disableFields(array $tuples): void
-    {
-        $statement = $this->getDatabaseInternal()->prepare("
-            UPDATE profile_field
-            SET enabled = 0
-            WHERE roletype = :roletype
-            AND field = :field
-            LIMIT 1            
-        ");
-
-        foreach ($tuples as $roletype => $fields) {
-            foreach ($fields as $field) {
-                $statement->execute([
-                    'roletype' => $roletype,
-                    'field' => $field
-                ]);
-            }
-        }
-    }
-
-
-    /**
-     * Rename a field by changing its terminology value
-     *
-     * @return void
-     */
-    private function renameField(): void
-    {
-        $this->getLogger()->debug('Renaming Studies Code to Photo Permissions');
-
-        $this->getDatabaseInternal()->executeQuery("
-            UPDATE localisation
-            SET singular_form = 'Photo Permission',
-                plural_form = 'Photo Permissions'
-            WHERE term = 'studies_code'
-                
-        ");
     }
 
 
