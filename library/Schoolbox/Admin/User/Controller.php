@@ -402,9 +402,9 @@ class Controller extends Base
                     'Modify User'
                 ),
                 'method' => 'Update',
-                'yearLevels' => $this->yearLevelMapper->findAll(),
-                'campuses' => $this->campusMapper->findAll(),
-                'roles' => $this->roleMapper->findAll(),
+                'yearLevels' => $this->yearLevelMapper->findAll(['order' => ['sequence' => 'ASC', 'name' => 'ASC']]),
+                'campuses' => $this->campusMapper->findAll(['order' => ['sequence' => 'ASC', 'name' => 'ASC']]),
+                'roles' => $this->roleMapper->findAll(['order' => ['sequence' => 'ASC', 'name' => 'ASC']]),
                 'externalDatabase' => $connectorName,
                 'residentialHouses' => $this->houseResidentialMapper->findAll(),
                 'houses' => $this->houseMapper->findAll(),
