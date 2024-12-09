@@ -58,7 +58,7 @@ class Module extends BaseModule
                     }
 
                     if (
-                        $user->hasServicePermission(
+                        !$user->hasServicePermission(
                             UserAccess::SERVICE_IMPERSONATOR,
                             UserAccess::ACCESS_FULL,
                             $userToImpersonate->getRole()->getId()
