@@ -801,11 +801,6 @@
         var serviceMapping = $.parseJSON('{{ serviceMapping|json_encode|purify }}');
         var serviceSelector = $('#serviceSelect');
 
-        // Ensure no service is selected on page load.
-        // If this is not done, any option that was selected before a page refresh will remain selected after the page
-        // refresh.  If the serviceIdentifierDropdown is required by the selected service, it will not be visible.
-        serviceSelector.val('');
-
         serviceSelector.on('change', function() {
 
             {# Enable submit button #}
@@ -1079,6 +1074,12 @@
                 selectors.filter('[data-service-type="' + currentService + '"]').removeClass('hide').prop('disabled', false);
             }
         );
+
+        // If a service is selected, do the necessary things.
+        if (serviceSelector.val()) {
+            serviceSelector.trigger('change');
+            addServiceForm.trigger('change');
+        }
 
         {% endif %}
 
