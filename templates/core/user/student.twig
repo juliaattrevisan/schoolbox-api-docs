@@ -138,7 +138,7 @@
                                         fieldEl.addEventListener('click', function(event) {
                                             event.preventDefault();
 
-                                            // Toggle whether the content or the "Click to reveal" text is visible
+                                            // Toggle whether the content or the "View more" text is visible
                                             fieldEl.querySelectorAll('span, a').forEach(function(spanEl) {
                                                 spanEl.style.display = spanEl.style.display === 'none' ? '' : 'none';
                                             });
@@ -199,7 +199,7 @@
                                                         {% endif %}
                                                     </span>
                                                     {% if selectedField.clickToReveal %}
-                                                        <a href="#">Click to reveal</a>
+                                                        <a href="#">View more</a>
                                                     {% endif %}
                                                 </div>
                                             </dt>
