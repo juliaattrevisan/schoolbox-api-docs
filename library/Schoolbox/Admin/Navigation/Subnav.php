@@ -12,8 +12,6 @@ namespace Schoolbox\Admin\Navigation;
 use Schoolbox\Cdn\PrefixGenerator;
 use Schoolbox\Config\Config;
 use Schoolbox\Config\ConfigMapper;
-use Schoolbox\L10n\Mapper as L10nMapper;
-use Schoolbox\L10n\RosettaStoneFactory;
 use Schoolbox\Config\Type\Model as ConfigType;
 use Schoolbox\Filter\Page\AvailabilityChecker;
 use Schoolbox\Filter\Page\LabelBuilder;
