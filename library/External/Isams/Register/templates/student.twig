@@ -1,6 +1,6 @@
 <div class="small-12 island">
     <h2 class="subheader">{{ register.name }}</h2>
-        <div class="l-flex-col l-gap-m l-pad-m">
+        <div class="l-flex-col l-gap-m">
             {% for child in studentData %}
                 <div class="l-flex-col">
                     <div class="c-card">
@@ -19,7 +19,7 @@
                         </div>
                     </div>
                     {# Field Group details #}
-                    <div class="c-island l-pad-m--horiz">
+                    <div class="c-island l-pad-m--horiz overflow-auto">
                         {% if child.data.FieldGroup is defined %}
                             {% for group in child.data.FieldGroup %}
                                 <h2>{{ group.groupName }}</h2>
