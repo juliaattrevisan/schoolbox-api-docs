@@ -55,7 +55,7 @@ $app = new class extends CliTool\App {
             'timetable_moderator'   => 'SELECT count(*) FROM user u JOIN userAccess uA on u.id = uA.uid WHERE u.deleted_at is null and service = ' . UserAccess::SERVICE_TIMETABLE . ' AND type=' . UserAccess::ACCESS_FULL,
             'design_moderator'      => 'SELECT count(*) FROM user u JOIN userAccess uA on u.id = uA.uid WHERE u.deleted_at is null and service = ' . UserAccess::SERVICE_DESIGN . ' AND type=' . UserAccess::ACCESS_FULL,
             'lms_moderator'         => 'SELECT count(*) FROM user u JOIN userAccess uA on u.id = uA.uid WHERE u.deleted_at is null and service = ' . UserAccess::SERVICE_LMS . ' AND type=' . UserAccess::ACCESS_FULL,
-            'impersonator'          => 'SELECT count(*) FROM user u JOIN userAccess uA on u.id = uA.uid WHERE u.deleted_at is null and service = ' . UserAccess::SERVICE_IMPERSONATOR. ' AND type=' . UserAccess::ACCESS_FULL,
+            'impersonator'          => 'SELECT count(*) FROM user u JOIN userAccess uA on u.id = uA.uid WHERE u.deleted_at is null and service = ' . UserAccess::SERVICE_IMPERSONATOR . ' AND type=' . UserAccess::ACCESS_FULL,
 
 
             //Logins
