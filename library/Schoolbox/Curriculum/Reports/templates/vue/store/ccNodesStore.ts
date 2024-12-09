@@ -9,6 +9,14 @@ export const useNodesStore = defineStore("ccNodes", () => {
     const nodes = window.Vue.ref<CurriculumCoverageNode[]>([]); // the nodes to display in the report
 
     /**
+     * Set the nodes
+     * @param newNodes - the new nodes to set
+     */
+    function setNodes(newNodes: CurriculumCoverageNode[]): void {
+        nodes.value = newNodes;
+    }
+
+    /**
      * Loop through and add the new course to the existing node.usage.courses[]
      * @param existingNode - the existing node to update
      * @param newNode - the new node that contains the new course to add
@@ -20,14 +28,6 @@ export const useNodesStore = defineStore("ccNodes", () => {
                 addCourseToChildren(child, newNode.children![index]);
             });
         }
-    }
-
-    /**
-     * Set the nodes
-     * @param newNodes - the new nodes to set
-     */
-    function setNodes(newNodes: CurriculumCoverageNode[]): void {
-        nodes.value = newNodes;
     }
 
     /**
