@@ -497,6 +497,31 @@ class Helper
             ->setLearnosityPollCount(($existingAttempt->getLearnosityPollCount() ?? 0) + 1)
         ;
 
+        // grab and save the max_mark if it exists
+        // attempts that were timed out and the student didn't complete all questions, will never have a status of (completed)
+        // these broken attempts appear to have a status of 'Incomplete' and we should set a max_mark of something usable, so the teacher can mark the attempt correctly.
+        // the attempt mark may exist, but we will leave that out of the equation for now.
+        if ($status === self::LEARNOSITY_PROCESS_STATUS_PROCESSING) {
+            $resultData = $result['data'][0];
+            $sanitisedScore = (new SanitiseScores())->sanitise($resultData['score'], $resultData['max_score']);
+
+            $maxMark = $sanitisedScore['max_score'];
+
+            /* Fabricate an IResponse instance for existing mark scheme
+             *
+             * Note that $existingResponse might well be null for broken data somehow,
+             * but we have no means to recover from that...and it shouldn't really
+             * occur naturally
+             */
+            $existingResponse = $this->extractExistingResponse($assessment, $student, $existingAttempt);
+
+            // TODO What kind of error should we present to users? It's asynchronous
+            if (null === $existingResponse) {
+                return;
+            }
+
+            $this->assignMarksToAttempt($existingAttempt, $existingResponse, $assessment, null, $maxMark);
+        }
 
         // If the process hasn't completed yet: don't set mark
         if ($status === self::LEARNOSITY_PROCESS_STATUS_COMPLETED) {
