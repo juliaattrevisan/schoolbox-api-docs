@@ -128,11 +128,13 @@ class Controller extends Base
     private const IDENTIFIER_NONE = 'none';
     private const IDENTIFIER_CAMPUS = 'campus';
     private const IDENTIFIER_RESIDENTIAL_HOUSE = 'residentialHouse';
+    private const IDENTIFIER_ROLE = 'role';
 
     private const IDENTIFIERS = [
         'none' => self::IDENTIFIER_NONE,
         'campus' => self::IDENTIFIER_CAMPUS,
-        'residentialHouse' => self::IDENTIFIER_RESIDENTIAL_HOUSE
+        'residentialHouse' => self::IDENTIFIER_RESIDENTIAL_HOUSE,
+        'role' => self::IDENTIFIER_ROLE,
     ];
 
     /**
@@ -212,8 +214,8 @@ class Controller extends Base
             ]
         ],
         UserAccess::SERVICE_IMPERSONATOR => [
-            'name' => 'Impersonator of Guests',
-            'identifier' => self::IDENTIFIER_NONE,
+            'name' => 'Impersonator',
+            'identifier' => self::IDENTIFIER_ROLE,
             'availability' => [
                 'read' => false,
                 'write' => false,
