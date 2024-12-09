@@ -59,6 +59,8 @@
             {% endif %}
         </div>
         <div class="small-12 medium-6 columns">
+            {# This label is intentionally unusual, there exists custom JS that PST uses occasionally which targets
+             this <input> field, moving up one will break the form. See SA-18992 for more. #}
             <label> Points <input type="number" inputmode="numeric" name="points" size="35" min="-1000000" max="1000000" value="{{ record.points }}"/> </label>
         </div>
         <div class="small-12 medium-6 columns">
