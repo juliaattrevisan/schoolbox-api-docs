@@ -513,31 +513,6 @@ window.Vue.watch(modifySelected, (newSelected) => {
                     <input id="modifyItem-addClient" v-model="addingClient.backChannelLogoutUri" />
                 </div>
                 <div class="f-no-margins">
-                    <label for="addClient-clientCredentialsUser">Client Credentials User</label>
-                    <p class="meta">
-                        Any client credentials requests (i.e. requests made by the client backend to this Schoolbox
-                        instance, without interaction by an actual user) will be authenticated as this user; if no user
-                        is set here, this client may not use client credentials requests.
-                    </p>
-                    <!-- <v-select
-                        v-model="addingClient.clientCredentialsUser"
-                        label="fullName"
-                        placeholder="Search for user, or leave empty for no user"
-                        input-id="addClient-clientCredentialsUser"
-                        :options="searchUsers"
-                        class="schoolbox-vue-selectize"
-                        :clear-search-on-blur="() => true"
-                        :clear-search-on-select="true"
-                        :close-on-select="true"
-                        @search="onUserSearch"
-                    >
-                        <template #option="option">
-                            <span class="d-center">{{ (option as VueSelectOption).fullName }}</span>
-                        </template>
-                        <template #addSelected-option="option">
-                            <span class="addSelected d-center">{{ (option as VueSelectOption).fullName }}</span>
-                        </template>
-                    </v-select> -->
                     <search-select
                         v-model:selected="addSelected"
                         v-model:results="results"
@@ -616,31 +591,6 @@ window.Vue.watch(modifySelected, (newSelected) => {
                     <input id="modifyItem-backChannelLogoutUri" v-model="modifyingClient.backChannelLogoutUri" />
                 </div>
                 <div class="f-no-margins">
-                    <label for="modifyItem-clientCredentialsUser">Client Credentials User</label>
-                    <p class="meta">
-                        Any client credentials requests (i.e. requests made by the client backend to this Schoolbox
-                        instance, without interaction by an actual user) will be authenticated as this user; if no user
-                        is set here, this client may not use client credentials requests.
-                    </p>
-                    <!-- <v-select
-                        v-model="modifyingClient.clientCredentialsUser"
-                        label="fullName"
-                        placeholder="Search for user, or leave empty for no user"
-                        input-id="modifyItem-clientCredentialsUser"
-                        :options="searchUsers"
-                        class="schoolbox-vue-selectize"
-                        :clear-search-on-blur="() => true"
-                        :clear-search-on-select="true"
-                        :close-on-select="true"
-                        @search="onUserSearch"
-                    >
-                        <template #option="option">
-                            <span class="d-center">{{ (option as VueSelectOption).fullName }}</span>
-                        </template>
-                        <template #addSelected-option="option">
-                            <span class="addSelected d-center">{{ (option as VueSelectOption).fullName }}</span>
-                        </template>
-                    </v-select> -->
                     <search-select
                         v-model:selected="modifySelected"
                         v-model:results="results"
