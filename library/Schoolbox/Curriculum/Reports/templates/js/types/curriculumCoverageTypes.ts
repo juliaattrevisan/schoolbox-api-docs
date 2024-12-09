@@ -3,6 +3,32 @@ import type { Unit } from "@schoolboxLibrary/types/Unit";
 import type { Node } from "@schoolboxCurriculum/types/Node";
 
 /**
+ * The expected payload for the curriculum coverage report
+ */
+export type CurriculumCoveragePayload = {
+    data: {
+        courses: Course[];
+        nodes: CurriculumCoverageNode[];
+    };
+    metadata: {
+        count: number;
+        cursor: {
+            current: string | null;
+            next: string | null;
+        };
+    };
+};
+
+/**
+ * What is returned when there is a search error
+ */
+export type ReportError = {
+    title: string;
+    type: string;
+    status: number;
+};
+
+/**
  * A unit with node usage counts for the different
  * items a curriculum node can be assigned to
  */

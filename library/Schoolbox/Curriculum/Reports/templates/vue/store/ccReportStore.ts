@@ -6,35 +6,13 @@ import { defineStore } from "pinia";
 import type { Course } from "@schoolboxLibrary/types/Course";
 import { usePrintDialog } from "@schoolboxVue/composables/print/usePrintDialog";
 import { isAbortError } from "@js/util/errorUtils";
-import type { CurriculumCoverageNode } from "../../js/types/curriculumCoverageTypes";
+import type {
+    CurriculumCoveragePayload,
+    ReportError,
+    CurriculumCoverageNode,
+} from "../../js/types/curriculumCoverageTypes";
 import { useQueryStore } from "./ccQueryStore";
 import { useInputStore } from "./ccInputStore";
-
-/**
- * What is returned when there is a search error
- */
-export type ReportError = {
-    title: string;
-    type: string;
-    status: number;
-};
-
-/**
- * The expected payload for the curriculum coverage report
- */
-type CurriculumCoveragePayload = {
-    data: {
-        courses: Course[];
-        nodes: CurriculumCoverageNode[];
-    };
-    metadata: {
-        count: number;
-        cursor: {
-            current: string | null;
-            next: string | null;
-        };
-    };
-};
 
 export const useReportStore = defineStore("ccReport", () => {
     const hasNotReported = window.Vue.ref(true); // to prompt a search if the user hasn't searched yet
