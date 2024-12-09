@@ -1,4 +1,6 @@
 -- Adds a Compact Mode component config to My Students dashboard component
+-- Assigns default value to case-insensitive school codes that had custom work
+-- which implemented tot menus
 
 INSERT INTO component_config_definition (component_definition_id, `key`, default_value, label, description)
 VALUES (
@@ -14,7 +16,7 @@ VALUES (
                 SELECT value
                 FROM config
                 WHERE config.name = 'site_school_code'
-            ) IN ('vagrant') THEN 1 ELSE 0 END)
+            ) IN ('tlc', 'TLC', 'ms', 'MS', 'imm', 'IMM', 'aas', 'AAS') THEN 1 ELSE 0 END)
         )
         'Compact Mode',
         null
