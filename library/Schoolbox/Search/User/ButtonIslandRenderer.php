@@ -21,15 +21,16 @@ class ButtonIslandRenderer
     /**
      * Constructor.
      *
-     * @param User                      $viewer
-     * @param \Alaress_Date_Format      $now
+     * @param User $viewer
+     * @param \Alaress_Date_Format $now
      * @param \Eportfolio_Authenticator $eportfolioAuthenticator
-     * @param string                    $geosnapshotApiKey
-     * @param string                    $geosnapshotEnabled
-     * @param bool                      $emailFunctionsAvailable
-     * @param Authorizer                $authorizer
-     * @param Generator                 $routeGenerator
-     * @param Mapper                    $profileButtonMapper
+     * @param string $geosnapshotApiKey
+     * @param string $geosnapshotEnabled
+     * @param bool $compactMode
+     * @param bool $emailFunctionsAvailable
+     * @param Authorizer $authorizer
+     * @param Generator $routeGenerator
+     * @param Mapper $profileButtonMapper
      */
     public function __construct(
         private \Schoolbox\User $viewer,
@@ -37,6 +38,7 @@ class ButtonIslandRenderer
         private \Eportfolio_Authenticator $eportfolioAuthenticator,
         private string $geosnapshotApiKey,
         private string $geosnapshotEnabled,
+        private bool $compactMode,
         private bool $emailFunctionsAvailable,
         private \Alaress\Authorizer\Authorizer $authorizer,
         private \Aura\Router\Generator $routeGenerator,
@@ -89,7 +91,7 @@ class ButtonIslandRenderer
             }
         }
 
-        return $twig->render('@searchUser/button/button-island.twig', [
+        $params = [
             /* This now includes system buttons - there's no longer really a distinction between system and
              * custom buttons, as far as the end user is concerned
              */
@@ -119,15 +121,24 @@ class ButtonIslandRenderer
              */
             'allTeacherIds' => [],
             'emailFunctionsAvailable' => $this->emailFunctionsAvailable,
+        ];
 
-            /* Compact Mode
-             */
-//            'mode' => 'compact',
-//            'identifier' => sprintf(
-//                '%s%s',
-//                'row-options-childsubject-',
-//                $viewee->getId()
-//            )
-        ]);
+        /* Add some extra settings for compact mode where we display
+         * buttons in a tot
+         */
+        if ($this->compactMode) {
+            $compactMode = [
+                'mode' => 'compact',
+                'identifier' => sprintf(
+                    '%s%s',
+                    'row-options-childsubject-',
+                    $viewee->getId()
+                )
+            ];
+
+            $params = array_merge($params, $compactMode);
+        }
+
+        return $twig->render('@searchUser/button/button-island.twig', $params);
     }
 }
