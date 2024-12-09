@@ -1,5 +1,5 @@
 /**
- *
+ * Hold the list of selected courses
  */
 
 import { defineStore } from "pinia";

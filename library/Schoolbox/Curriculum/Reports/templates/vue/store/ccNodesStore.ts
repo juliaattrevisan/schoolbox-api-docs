@@ -1,5 +1,5 @@
 /**
- *
+ * Hold the list of selected nodes (curriculum)
  */
 
 import { defineStore } from "pinia";

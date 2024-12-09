@@ -10,6 +10,7 @@ import { useQueryStore } from "./ccQueryStore";
 import { useInputStore } from "./ccInputStore";
 import { useCoursesStore } from "./ccCoursesStore";
 import { useNodesStore } from "./ccNodesStore";
+import { useLoadMoreStore } from "./ccLoadMoreStore";
 
 export const useReportStore = defineStore("ccReport", () => {
     const hasNotReported = window.Vue.ref(true); // to prompt a search if the user hasn't searched yet
@@ -69,6 +70,7 @@ export const useReportStore = defineStore("ccReport", () => {
                 if (currentIndex === 0) {
                     coursesStore.setCourses(responseJson.data.courses);
                     nodesStore.setNodes(responseJson.data.nodes);
+                    useLoadMoreStore().setNext(responseJson.metadata.cursor.next);
                 } else {
                     // otherwise we need to add the new courses to the existing courses
                     coursesStore.addCourses(responseJson.data.courses);
