@@ -57,6 +57,11 @@ class Module extends BaseModule
                         throw new Unauthorized();
                     }
 
+                    if ($userToImpersonate->getRole()->getId() === null) {
+                        // If the user to impersonate does not have a role (perhaps due to a hydrating problem), deny.
+                        throw new Unauthorized();
+                    }
+
                     if (
                         !$user->hasServicePermission(
                             UserAccess::SERVICE_IMPERSONATOR,
