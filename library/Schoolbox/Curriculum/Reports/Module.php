@@ -41,7 +41,10 @@ class Module extends BaseModule
          */
         $staffPerms = new Rule\All(
             new Rule\IsLoggedIn(),
-            new Rule\HasRole(Role::STAFF)
+            new Rule\Any(
+                new Rule\IsSuperuser(),
+                new Rule\HasRole(Role::STAFF)
+            )
         );
 
         $this->register('GET', '/coverage', 'getCoverage', $staffPerms);
