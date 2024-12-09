@@ -11,7 +11,7 @@ import { useNodesStore } from "./ccNodesStore";
 
 export const useLoadMoreStore = defineStore("ccLoadMore", () => {
     const next = window.Vue.ref<string | null>(null);
-    const canLoadMore = window.Vue.computed(() => next.value !== null);
+    const hasMore = window.Vue.computed(() => next.value !== null);
     const isFetching = window.Vue.ref(false);
     const isLoading = window.Vue.ref(false);
     const hasLoadError = window.Vue.ref(false);
@@ -59,12 +59,17 @@ export const useLoadMoreStore = defineStore("ccLoadMore", () => {
                 loadError.value = responseJson;
                 return;
             }
-            if ("data" in responseJson) {
-                const coursesStore = useCoursesStore();
+            if ("data" in responseJson && "metadata" in responseJson) {
                 const nodesStore = useNodesStore();
-                debugger;
-                // nodesStore.addNodes(newCourseNodes);
-                // setNext(responseJson.metadata.cursor.next);
+                // if it's the first course load, we can just set the courses and nodes
+                if (currentIndex === 0) {
+                    nodesStore.setMoreNodes(responseJson.data.nodes);
+                    setNext(responseJson.metadata.cursor.next);
+                } else {
+                    // and we also need to run through nodes and add the new course within each node.usage.courses[]
+                    // then if the node has children, we need to do the same for the children within
+                    nodesStore.addMoreNodes(responseJson.data.nodes);
+                }
             }
         } catch (error) {
             // ignore abort errors, as the previous report was cancelled
@@ -110,7 +115,7 @@ export const useLoadMoreStore = defineStore("ccLoadMore", () => {
 
     return {
         setNext,
-        canLoadMore,
+        hasMore,
         isLoading,
         hasLoadError,
         report,

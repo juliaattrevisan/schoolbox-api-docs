@@ -5,6 +5,7 @@
 
 import CcReportFilters from "./cc-report-filters.vue";
 import CcReportTable from "./cc-report-table.vue";
+import CcReportLoadMore from "./cc-report-load-more.vue";
 
 import { useReportStore } from "./store/ccReportStore";
 
@@ -30,6 +31,7 @@ const reportStore = useReportStore();
         <div class="l-flex l-flex-col l-gap-s">
             <cc-report-filters />
             <cc-report-table />
+            <cc-report-load-more />
         </div>
     </div>
 </template>

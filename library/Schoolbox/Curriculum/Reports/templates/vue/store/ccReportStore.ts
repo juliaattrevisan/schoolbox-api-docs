@@ -63,7 +63,7 @@ export const useReportStore = defineStore("ccReport", () => {
                 loadError.value = responseJson;
                 return;
             }
-            if ("data" in responseJson) {
+            if ("data" in responseJson && "metadata" in responseJson) {
                 const coursesStore = useCoursesStore();
                 const nodesStore = useNodesStore();
                 // if it's the first course load, we can just set the courses and nodes

@@ -24,7 +24,7 @@ export const useNodesStore = defineStore("ccNodes", () => {
 
     /**
      * Set the nodes
-     * @param newNodes - the new courses to set
+     * @param newNodes - the new nodes to set
      */
     function setNodes(newNodes: CurriculumCoverageNode[]): void {
         nodes.value = newNodes;
@@ -32,10 +32,31 @@ export const useNodesStore = defineStore("ccNodes", () => {
 
     /**
      * Add nodes to the existing nodes
-     * @param newNodes - the new courses to add
+     * @param newNodes - the new nodes to add
      */
     function addNodes(newNodes: CurriculumCoverageNode[]): void {
         nodes.value.forEach((node, index) => {
+            node.usage.courses = [...node.usage.courses, ...newNodes[index].usage.courses];
+            addCourseToChildren(node, newNodes[index]);
+        });
+    }
+
+    /**
+     *
+     * @param newNodes - the new nodes to set
+     */
+    function setMoreNodes(newNodes: CurriculumCoverageNode[]): void {
+        nodes.value = [...nodes.value, ...newNodes];
+    }
+
+    /**
+     *
+     * @param newNodes - the new nodes to add
+     */
+    function addMoreNodes(newNodes: CurriculumCoverageNode[]): void {
+        const newNodeIds = newNodes.map((node) => node.id);
+        const nodesToUpdate = nodes.value.filter((node) => newNodeIds.includes(node.id));
+        nodesToUpdate.forEach((node, index) => {
             node.usage.courses = [...node.usage.courses, ...newNodes[index].usage.courses];
             addCourseToChildren(node, newNodes[index]);
         });
@@ -45,5 +66,7 @@ export const useNodesStore = defineStore("ccNodes", () => {
         nodes,
         setNodes,
         addNodes,
+        setMoreNodes,
+        addMoreNodes,
     };
 });
