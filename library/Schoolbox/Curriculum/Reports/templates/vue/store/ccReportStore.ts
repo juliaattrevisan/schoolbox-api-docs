@@ -27,6 +27,13 @@ type CurriculumCoveragePayload = {
         courses: Course[];
         nodes: CurriculumCoverageNode[];
     };
+    metadata: {
+        count: number;
+        cursor: {
+            current: string | null;
+            next: string | null;
+        };
+    };
 };
 
 export const useReportStore = defineStore("ccReport", () => {
