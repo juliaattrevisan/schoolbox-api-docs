@@ -520,12 +520,19 @@ window.Vue.watch(modifySelected, (newSelected) => {
                         label-id="creator"
                         :endpoint="getEndpoint()"
                         query-key="search"
-                        meta="Any client credentials requests (i.e. requests made by the client backend to this Schoolbox instance, without interaction by an actual user) will be authenticated as this user; if no user is set here, this client may not use client credentials requests."
                         :is-single-select="true"
                         placeholder="Search for users..."
                         :manage-search-response="true"
                         @search-response="onSearchResponse"
-                    />
+                    >
+                        <template #meta>
+                            <div class="meta">
+                                Any client credentials requests (i.e. requests made by the client backend to this
+                                Schoolbox instance, without interaction by an actual user) will be authenticated as this
+                                user; if no user is set here, this client may not use client credentials requests.
+                            </div>
+                        </template>
+                    </search-select>
                 </div>
             </div>
             <div class="component-action">
@@ -598,12 +605,19 @@ window.Vue.watch(modifySelected, (newSelected) => {
                         label-id="creator"
                         :endpoint="getEndpoint()"
                         query-key="search"
-                        meta="Any client credentials requests (i.e. requests made by the client backend to this Schoolbox instance, without interaction by an actual user) will be authenticated as this user; if no user is set here, this client may not use client credentials requests."
                         :is-single-select="true"
                         placeholder="Search for users..."
                         :manage-search-response="true"
                         @search-response="onSearchResponse"
-                    />
+                    >
+                        <template #meta>
+                            <div class="meta">
+                                Any client credentials requests (i.e. requests made by the client backend to this
+                                Schoolbox instance, without interaction by an actual user) will be authenticated as this
+                                user; if no user is set here, this client may not use client credentials requests.
+                            </div>
+                        </template>
+                    </search-select>
                 </div>
             </div>
             <div class="component-action">
