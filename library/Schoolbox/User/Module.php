@@ -49,13 +49,19 @@ class Module extends BaseModule
             ),
             new Rule\Callback(
                 function ($params, User $user) {
-                    $userToImpersonateRoleId = $params['user']->getRole()->getId();
+                    $userToImpersonate = $params['user'];
+
+                    if ($userToImpersonate->isSuperuser()) {
+                        // Superusers may not be impersonated by non-superusers.
+                        // Note this function should be called only if the logged-in user is not a superuser.
+                        throw new Unauthorized();
+                    }
 
                     if (
                         $user->hasServicePermission(
                             UserAccess::SERVICE_IMPERSONATOR,
                             UserAccess::ACCESS_FULL,
-                            $userToImpersonateRoleId
+                            $userToImpersonate->getRole()->getId()
                         )
                     ) {
                         throw new Unauthorized();
