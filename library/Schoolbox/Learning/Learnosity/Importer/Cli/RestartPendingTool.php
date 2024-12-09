@@ -91,7 +91,7 @@ class RestartPendingTool extends BaseTool
             if ($this->perform()) {
                 $this->restartCopyProcess($sourceQuiz, $quiz);
             }
-        } catch (SourceAssociationException $e) {
+        } catch (SourceAssociationException | CopyMissingQuizException $e) {
             // This pending quiz couldn't be associated with a source:
             // mark it as unprocessable.
             $this->getLogger()->warning(
