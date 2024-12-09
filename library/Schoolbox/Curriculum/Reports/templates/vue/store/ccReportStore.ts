@@ -55,7 +55,7 @@ export const useReportStore = defineStore("ccReport", () => {
     });
 
     /**
-     * Loop through and ddd the new course to the existing node.usage.courses[]
+     * Loop through and add the new course to the existing node.usage.courses[]
      * @param existingNode - the existing node to update
      * @param newNode - the new node that contains the new course to add
      */
@@ -109,7 +109,7 @@ export const useReportStore = defineStore("ccReport", () => {
                 } else {
                     // otherwise we need to add the new courses to the existing courses
                     courses.value = [...courses.value, ...responseJson.data.courses];
-                    // and need to run through nodes and add the new course within each node.usage.courses[]
+                    // and we also need to run through nodes and add the new course within each node.usage.courses[]
                     // then if the node has children, we need to do the same for the children within
                     const newCourseNodes = responseJson.data.nodes;
                     nodes.value.forEach((node, index) => {
