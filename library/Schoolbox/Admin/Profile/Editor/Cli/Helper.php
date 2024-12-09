@@ -337,4 +337,61 @@ class Helper
 
         $this->createFieldRoletypeVisibility($profileFieldId, $roletypes);
     }
+
+
+    /**
+     * A (roletype, [field]) tuple whose enabled column should be set to 0
+     *
+     * @param array $tuples
+     * @return void
+     */
+    public function disableFields(array $tuples): void
+    {
+        $statement = $this->db->prepare("
+            UPDATE profile_field
+            SET enabled = 0
+            WHERE roletype = :roletype
+            AND field = :field
+            LIMIT 1            
+        ");
+
+        foreach ($tuples as $roletype => $fields) {
+            foreach ($fields as $field) {
+                $statement->execute([
+                    'roletype' => $roletype,
+                    'field' => $field
+                ]);
+            }
+        }
+    }
+
+
+    /**
+     * Rename a field by changing its terminology value
+     *
+     * @param string $term
+     * @param string $singular
+     * @param string $plural
+     * @return void
+     */
+    public function renameField(string $term, string $singular, string $plural): void
+    {
+        $this->logger->info(sprintf(
+            'Renaming %s to %s/%s',
+            $term,
+            $singular,
+            $plural
+        ));
+
+        $this->db->executeQuery("
+            UPDATE localisation
+            SET singular_form = :singular,
+                plural_form = :plural
+            WHERE term = :term
+        ", [
+            'singular' => $singular,
+            'plural' => $plural,
+            'term' => $term
+        ]);
+    }
 }
