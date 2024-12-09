@@ -133,6 +133,10 @@ HELP;
             ],
         ]);
 
+        /* Renames Studies Code to Photo Permission
+         */
+        $this->renameField();
+
         /* Announce lock release
          */
         $this->getLogger()->debug('Releasing lock');
@@ -144,7 +148,7 @@ HELP;
     /**
      * A (roletype, field) tuple whose enabled column should be set to 0
      *
-     * @param array $fields
+     * @param array $tuples
      * @return void
      */
     private function disableFields(array $tuples): void
@@ -165,6 +169,25 @@ HELP;
                 ]);
             }
         }
+    }
+
+
+    /**
+     * Rename a field by changing its terminology value
+     *
+     * @return void
+     */
+    private function renameField(): void
+    {
+        $this->getLogger()->debug('Renaming Studies Code to Photo Permissions');
+
+        $this->getDatabaseInternal()->executeQuery("
+            UPDATE localisation
+            SET singular_form = 'Photo Permission',
+                plural_form = 'Photo Permissions'
+            WHERE term = 'studies_code'
+                
+        ");
     }
 
 
