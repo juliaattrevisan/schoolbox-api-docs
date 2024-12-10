@@ -1075,13 +1075,6 @@
             }
         );
 
-        // If a service is selected on page load, do the necessary things.
-        // To test this, select a service that requires a service identifier, then refresh the page.
-        if (serviceSelector.val()) {
-            serviceSelector.trigger('change');
-            addServiceForm.trigger('change');
-        }
-
         {% endif %}
 
         $('#sendAlertForm').alaressValidate({
