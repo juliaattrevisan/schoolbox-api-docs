@@ -44,18 +44,18 @@ $app = new class extends CliTool\App {
             'superusers'        => 'SELECT count(*) FROM user u JOIN superusers s on u.id = s.id WHERE u.deleted_at IS NULL',
 
             //Moderators
-            'calendar_moderator'    => 'SELECT count(distinct u.id) FROM user u JOIN userAccess uA on u.id = uA.uid WHERE u.deleted_at is null and service = ' . UserAccess::SERVICE_CALENDAR . ' AND type=' . UserAccess::ACCESS_FULL, // distinct u.id, so we can see the count of humans, not calendar mods, as a single user can mod multiple calendar campuses
-            'news_moderator'        => 'SELECT count(*) FROM user u JOIN userAccess uA on u.id = uA.uid WHERE u.deleted_at is null and service = ' . UserAccess::SERVICE_NEWS . ' AND type=' . UserAccess::ACCESS_FULL,
-            'cms_moderator'         => 'SELECT count(*) FROM user u JOIN userAccess uA on u.id = uA.uid WHERE u.deleted_at is null and service = ' . UserAccess::SERVICE_CMS . ' AND type=' . UserAccess::ACCESS_FULL,
-            'curriculum_moderator'  => 'SELECT count(*) FROM user u JOIN userAccess uA on u.id = uA.uid WHERE u.deleted_at is null and service = ' . UserAccess::SERVICE_CURRICULUM . ' AND type=' . UserAccess::ACCESS_WRITE, // write as there is no curric mod as yet 24.1
-            'resources_moderator'   => 'SELECT count(*) FROM user u JOIN userAccess uA on u.id = uA.uid WHERE u.deleted_at is null and service = ' . UserAccess::SERVICE_RESOURCE_BOOKING . ' AND type=' . UserAccess::ACCESS_FULL,
-            'fixtures_moderator'    => 'SELECT count(*) FROM user u JOIN userAccess uA on u.id = uA.uid WHERE u.deleted_at is null and service = ' . UserAccess::SERVICE_SPORTS_ADMINISTRATOR . ' AND type=' . UserAccess::ACCESS_FULL,
-            'pastoral_moderator'    => 'SELECT count(*) FROM user u JOIN userAccess uA on u.id = uA.uid WHERE u.deleted_at is null and service = ' . UserAccess::SERVICE_PASTORAL . ' AND type=' . UserAccess::ACCESS_FULL,
-            'badge_moderator'       => 'SELECT count(*) FROM user u JOIN userAccess uA on u.id = uA.uid WHERE u.deleted_at is null and service = ' . UserAccess::SERVICE_BADGE . ' AND type=' . UserAccess::ACCESS_FULL,
-            'timetable_moderator'   => 'SELECT count(*) FROM user u JOIN userAccess uA on u.id = uA.uid WHERE u.deleted_at is null and service = ' . UserAccess::SERVICE_TIMETABLE . ' AND type=' . UserAccess::ACCESS_FULL,
-            'design_moderator'      => 'SELECT count(*) FROM user u JOIN userAccess uA on u.id = uA.uid WHERE u.deleted_at is null and service = ' . UserAccess::SERVICE_DESIGN . ' AND type=' . UserAccess::ACCESS_FULL,
-            'lms_moderator'         => 'SELECT count(*) FROM user u JOIN userAccess uA on u.id = uA.uid WHERE u.deleted_at is null and service = ' . UserAccess::SERVICE_LMS . ' AND type=' . UserAccess::ACCESS_FULL,
-            'impersonator'          => 'SELECT count(*) FROM user u JOIN userAccess uA on u.id = uA.uid WHERE u.deleted_at is null and service = ' . UserAccess::SERVICE_IMPERSONATOR . ' AND type=' . UserAccess::ACCESS_FULL,
+            'calendar_moderator'     => 'SELECT count(distinct u.id) FROM user u JOIN userAccess uA on u.id = uA.uid WHERE u.deleted_at is null and service = ' . UserAccess::SERVICE_CALENDAR . ' AND type=' . UserAccess::ACCESS_FULL, // distinct u.id, so we can see the count of humans, not service permissions.  A single human can have multiple Calendar service permissions.
+            'news_moderator'         => 'SELECT count(*) FROM user u JOIN userAccess uA on u.id = uA.uid WHERE u.deleted_at is null and service = ' . UserAccess::SERVICE_NEWS . ' AND type=' . UserAccess::ACCESS_FULL,
+            'cms_moderator'          => 'SELECT count(*) FROM user u JOIN userAccess uA on u.id = uA.uid WHERE u.deleted_at is null and service = ' . UserAccess::SERVICE_CMS . ' AND type=' . UserAccess::ACCESS_FULL,
+            'curriculum_moderator'   => 'SELECT count(*) FROM user u JOIN userAccess uA on u.id = uA.uid WHERE u.deleted_at is null and service = ' . UserAccess::SERVICE_CURRICULUM . ' AND type=' . UserAccess::ACCESS_WRITE, // write as there is no curric mod as yet 24.1
+            'resources_moderator'    => 'SELECT count(*) FROM user u JOIN userAccess uA on u.id = uA.uid WHERE u.deleted_at is null and service = ' . UserAccess::SERVICE_RESOURCE_BOOKING . ' AND type=' . UserAccess::ACCESS_FULL,
+            'fixtures_moderator'     => 'SELECT count(*) FROM user u JOIN userAccess uA on u.id = uA.uid WHERE u.deleted_at is null and service = ' . UserAccess::SERVICE_SPORTS_ADMINISTRATOR . ' AND type=' . UserAccess::ACCESS_FULL,
+            'pastoral_moderator'     => 'SELECT count(*) FROM user u JOIN userAccess uA on u.id = uA.uid WHERE u.deleted_at is null and service = ' . UserAccess::SERVICE_PASTORAL . ' AND type=' . UserAccess::ACCESS_FULL,
+            'badge_moderator'        => 'SELECT count(*) FROM user u JOIN userAccess uA on u.id = uA.uid WHERE u.deleted_at is null and service = ' . UserAccess::SERVICE_BADGE . ' AND type=' . UserAccess::ACCESS_FULL,
+            'timetable_moderator'    => 'SELECT count(*) FROM user u JOIN userAccess uA on u.id = uA.uid WHERE u.deleted_at is null and service = ' . UserAccess::SERVICE_TIMETABLE . ' AND type=' . UserAccess::ACCESS_FULL,
+            'design_moderator'       => 'SELECT count(*) FROM user u JOIN userAccess uA on u.id = uA.uid WHERE u.deleted_at is null and service = ' . UserAccess::SERVICE_DESIGN . ' AND type=' . UserAccess::ACCESS_FULL,
+            'lms_moderator'          => 'SELECT count(*) FROM user u JOIN userAccess uA on u.id = uA.uid WHERE u.deleted_at is null and service = ' . UserAccess::SERVICE_LMS . ' AND type=' . UserAccess::ACCESS_FULL,
+            'impersonator_moderator' => 'SELECT count(distinct u.id) FROM user u JOIN userAccess uA on u.id = uA.uid WHERE u.deleted_at is null and service = ' . UserAccess::SERVICE_IMPERSONATOR . ' AND type=' . UserAccess::ACCESS_FULL, // distinct u.id, so we can see the count of humans, not service permissions.  A single human can have multiple Impersonator service permissions.
 
 
             //Logins
