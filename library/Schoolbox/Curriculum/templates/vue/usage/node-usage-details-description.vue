@@ -13,7 +13,7 @@ const props = defineProps<Props>();
 </script>
 
 <template>
-    <media-article tag="div" :content="props.node.description as string"></media-article>
+    <media-article tag="div" :content="props.node.description || ''"></media-article>
 </template>
 
 <style scoped></style>

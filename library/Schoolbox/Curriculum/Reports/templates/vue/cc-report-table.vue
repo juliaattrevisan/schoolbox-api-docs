@@ -86,7 +86,7 @@ window.Vue.watch(isDetailsOpen, (isOpen) => {
         </table>
     </div>
     <basic-modal v-model:is-open="isDetailsOpen" :has-background-click="true">
-        <node-details v-if="selectedNodeId !== null" :node-id="selectedNodeId" />
+        <node-details v-if="selectedNodeId !== null" :node-id="selectedNodeId" :include-usage="true" />
     </basic-modal>
     <cc-usage-pop-out />
 </template>
