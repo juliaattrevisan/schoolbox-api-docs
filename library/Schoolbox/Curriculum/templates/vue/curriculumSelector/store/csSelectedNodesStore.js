@@ -55,14 +55,10 @@ export const useSelectedNodesStore = defineStore(`csSelectedNodes`, {
         /**
          * add a node
          *
-         * @param { Object or Array } either a single node, or multiple can be added
+         * @param { Object } a single node
          */
         add(nodeToAdd) {
-            if (Array.isArray(nodeToAdd)) {
-                this.nodes = [...this.nodes, ...nodeToAdd];
-            } else {
-                this.nodes = [...this.nodes, nodeToAdd];
-            }
+            this.nodes = [...this.nodes, nodeToAdd];
         },
 
         /**

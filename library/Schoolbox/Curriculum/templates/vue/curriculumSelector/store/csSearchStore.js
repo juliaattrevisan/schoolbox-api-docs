@@ -104,7 +104,7 @@ export const useSearchStore = defineStore(`csSearch`, {
                 //check if the node isn't in the list already
                 return !selectedNodesStore.nodes.some((selectedNode) => selectedNode.id === newSelectedNode.id); //don't add in those that match
             });
-            selectedNodesStore.add(newSelectedNodes);
+            newSelectedNodes.forEach((newSelectedNode) => selectedNodesStore.add(newSelectedNode));
         },
 
         /**
