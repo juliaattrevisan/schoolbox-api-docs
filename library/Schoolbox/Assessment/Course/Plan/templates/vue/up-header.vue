@@ -16,6 +16,7 @@ interface Props {
     courseTitle: string;
     courseId: number;
     folderId: number;
+    routeCurriculumCoverage: string | 'null';
 }
 const props = defineProps<Props>();
 // const addUnitStore = useAddUnitStore();
@@ -63,8 +64,8 @@ function onPrintSelected(): void {
         <li>
             <a :href="`/learning/courseMarkbook/${props.courseId}`" class="icon-curriculum">Course Markbook</a>
         </li>
-        <li>
-            <a :href="`/curriculum/reports/coverage?courseId=${props.courseId}`" class="icon-report"
+        <li v-if="routeCurriculumCoverage">
+            <a :href="`${props.routeCurriculumCoverage}?courseId=${props.courseId}`" class="icon-report"
                 >Curriculum Coverage</a
             >
         </li>

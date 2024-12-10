@@ -23,6 +23,7 @@ interface Props {
     routeFolderSequence: string | null;
     ltiAssessmentsEnabled: boolean;
     template: UnitTemplate; // the course framework template that units are linked to
+    routeCurriculumCoverage: string | null;
 }
 
 const props = defineProps<Props>();
@@ -151,7 +152,7 @@ window.Vue.onUnmounted(() => {
     <up-unit-cell-textbox-content-placeholder
         v-if="store.units.some((u) => u.textboxes._routes.createTextbox !== null)"
     />
-    <up-header :course-title="props.courseTitle" :course-id="store.courseId" :folder-id="props.folderId" />
+    <up-header :course-title="props.courseTitle" :course-id="store.courseId" :folder-id="props.folderId" :route-curriculum-coverage="props.routeCurriculumCoverage"/>
     <up-empty-state v-if="store.units.length === 0" :course-id="store.courseId" />
     <div v-else class="row">
         <div class="small-12 island">
