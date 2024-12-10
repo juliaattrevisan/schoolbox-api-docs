@@ -34,7 +34,7 @@ class UserAccess implements IModel
     public const SERVICE_TIMETABLE = 12;
     public const SERVICE_DESIGN = 13;
     public const SERVICE_LMS = 14;
-    public const SERVICE_IMPERSONATOR = 15;
+    public const SERVICE_IMPERSONATOR = 15; // Note SERVICE_IMPERSONATOR is special, in that it requires a roleId to be set in userAccess.sid.
 
     /**
      * Services that do not have service identifiers (sid) use this value
