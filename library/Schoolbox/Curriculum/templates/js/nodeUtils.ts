@@ -3,6 +3,7 @@
  */
 
 import type { Ref } from "vue";
+import { unref } from "vue";
 import type {
     Node,
     Usage,
@@ -173,7 +174,8 @@ export function includeChildren(childNodes: Node[] | null): Node[] {
  * @returns - no children of selected nodes
  */
 export function noChildrenOfNode(nodes: Ref<Node[]>, nodeToAdd: Node): Node[] {
-    const updatedNodes = nodes.value.filter((selectedNode) => {
+    const unrefNodes = unref(nodes); // to allow both composition (nodes) and options (this.nodes) APIs, as they return different types
+    const updatedNodes = unrefNodes.filter((selectedNode) => {
         if (nodeToAdd.children) {
             // only if the children have loaded
             const node = findById(nodeToAdd.children, selectedNode.id);
