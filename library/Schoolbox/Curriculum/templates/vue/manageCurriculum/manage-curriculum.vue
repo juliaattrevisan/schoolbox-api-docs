@@ -42,6 +42,10 @@ const props = defineProps({
         required: true,
         default: 0,
     },
+    /**
+     * route for the curriculum coverage report
+     */
+    routeCurriculumCoverage: String | null,
 });
 
 const store = useStore();
@@ -93,7 +97,7 @@ function onSelectedNodeModalClosed(): void {
 </script>
 
 <template>
-    <mc-header />
+    <mc-header :route-curriculum-coverage="routeCurriculumCoverage" />
     <mc-view />
     <mc-selected-nodes />
     <mc-enable-nodes />

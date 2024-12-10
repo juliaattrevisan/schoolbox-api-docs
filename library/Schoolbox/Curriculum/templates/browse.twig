@@ -3,6 +3,8 @@
         data-endpoint="{{ routeLookup('curriculumApi.searchNode') }}"
         :is-read-only="{{ readonly ? 'true' : 'false' }}"
         :ui-limit="{{ uiLimit }}"
+        {% set routeCurriculumReport = routeLookupIfAuthorized('curriculumreports.getCoverage') %}
+        :route-curriculum-coverage="{{ routeCurriculumReport ? (routeCurriculumReport|json_encode) : 'null' }}"
     />
 </div>
 <script src="{{ CDN_PREFIX }}/js/bundle/manageCurriculum.js?v={{ config.site_version }}"></script>
