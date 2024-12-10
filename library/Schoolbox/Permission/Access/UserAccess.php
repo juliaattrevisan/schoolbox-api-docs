@@ -22,7 +22,7 @@ class UserAccess implements IModel
      * Service permission constants.
      * These are the possible values of $this->service, and correspond to IDs from the lu_service database table.
      */
-    public const SERVICE_HOMEPAGE = 1; // Note for some historical reason, SERVICE_HOMEPAGE is no longer selectable on the Modify User page.
+    public const SERVICE_HOMEPAGE = 1; // Note SERVICE_HOMEPAGE is used to define group membership.  See User->isGroupMember().
     public const SERVICE_CALENDAR = 2; // Note SERVICE_CALENDAR is special, in that it requires a campusId to be set in userAccess.sid.
     public const SERVICE_NEWS = 3;
     public const SERVICE_CMS = 5;
