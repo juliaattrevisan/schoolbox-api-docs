@@ -82,15 +82,9 @@
                     {% endif %}
                 </div>
                 <div class="small-12 medium-6 columns">
-                    <label for="points">Points</label>
-                    <input id="points"
-                           type="number"
-                           inputmode="numeric"
-                           name="points"
-                           size="35"
-                           min="-1000000"
-                           max="1000000"
-                    />
+                    {# This label is intentionally unusual, there exists custom JS that PST uses occasionally which targets
+                     this <input> field, moving up one will break the form. See SA-18992 for more. #}
+                    <label> Points <input type="number" inputmode="numeric" name="points" size="35" min="-1000000" max="1000000" /> </label>
                 </div>
                 <div class="small-12 columns">
                     <label for="tags">Tags</label>
