@@ -2,6 +2,7 @@
  * Various utils related to managing curriculum nodes
  */
 
+import type { Ref } from "vue";
 import type {
     Node,
     Usage,
@@ -162,6 +163,26 @@ export function includeChildren(childNodes: Node[] | null): Node[] {
         children = [...children, ...includeChildren(child.children)];
     });
     return children;
+}
+
+/**
+ * we need to check if a new parent has been selected of any existing children,
+ * if it has the children should be removed as the parent now takes precedence
+ * @param nodes - the nodes to check
+ * @param nodeToAdd - the Node to add
+ * @returns - no children of selected nodes
+ */
+export function noChildrenOfNode(nodes: Ref<Node[]>, nodeToAdd: Node): Node[] {
+    const updatedNodes = nodes.value.filter((selectedNode) => {
+        if (nodeToAdd.children) {
+            // only if the children have loaded
+            const node = findById(nodeToAdd.children, selectedNode.id);
+            return node === undefined; // only keep those nodes that aren't a child of the new node
+        }
+        // otherwise no existing nodes will be children, as they haven't been loaded and so couldn't have been selected
+        return true;
+    });
+    return updatedNodes;
 }
 
 /**
