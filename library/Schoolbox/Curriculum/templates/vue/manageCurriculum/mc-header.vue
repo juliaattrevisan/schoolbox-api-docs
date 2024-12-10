@@ -38,7 +38,7 @@ function onCreateNewSelected(): void {
             <nav>
                 <a
                     v-if="props.routeCurriculumCoverage"
-                    :href=props.routeCurriculumCoverage
+                    :href="props.routeCurriculumCoverage"
                     class="icon-report"
                     title="View Curriculum Coverage Report"
                 ></a>
