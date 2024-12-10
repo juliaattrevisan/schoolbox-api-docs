@@ -72,7 +72,11 @@ export const useSelectedNodesStore = defineStore(`csSelectedNodes`, {
          * @param { Object or Array } add a single node, removing any previously selected
          */
         addSingle(nodeToAdd) {
-            this.nodes = [nodeToAdd];
+            if (useStore().includeChildren) {
+                this.nodes = [nodeToAdd, ...includeChildren(nodeToAdd.children)]; // add the new node and all its children
+            } else {
+                this.nodes = [nodeToAdd]; // or just add the new node
+            }
         },
 
         /**
