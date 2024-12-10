@@ -19,7 +19,7 @@
                         </div>
                     </div>
                     {# Field Group details #}
-                    <div class="c-island l-pad-m--horiz overflow-auto">
+                    <div class="c-island l-pad-m--horiz scrollable">
                         {% if child.data.FieldGroup is defined %}
                             {% for group in child.data.FieldGroup %}
                                 <h2>{{ group.groupName }}</h2>
