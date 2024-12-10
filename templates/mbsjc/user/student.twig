@@ -1,8 +1,0 @@
-{% extends '@core/user/student.twig' %}
-
-{% block details_studiesCode %}
-    {% if externalUser.StudentStudiesCode %}
-    <dt class="small-6 medium-3 columns">NESA Student Number:</dt>
-    <dd class="small-6 medium-9 columns">{{ externalUser.StudentStudiesCode }}</dd>
-    {% endif %}
-{% endblock details_studiesCode %}
