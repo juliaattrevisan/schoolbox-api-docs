@@ -12,6 +12,7 @@ import { useModalViewNodesStore, DIRECTION } from "../store/csModalViewNodesStor
 import { useModalStore } from "../store/csModalStore";
 import { useModalNodeUsageStore } from "../store/csModalNodeUsageStore";
 import { useModalActiveNodeStore } from "../store/csModalActiveNodeStore";
+import { useModalSearchStore } from "../store/csModalSearchStore";
 import CsModalNodeRadio from "./cs-modal-node-radio.vue";
 import CsModalNodeCheckbox from "./cs-modal-node-checkbox.vue";
 import CsModalNodeName from "./cs-modal-node-name.vue";
@@ -31,6 +32,7 @@ const modalStore = useModalStore();
 const modalViewNodesStore = useModalViewNodesStore();
 const modalActiveNodeStore = useModalActiveNodeStore();
 const modalNodeUsageStore = useModalNodeUsageStore();
+const modalSearchStore = useModalSearchStore();
 const viewNodeEl = window.Vue.ref(null); // to animate the node
 
 /**
@@ -72,7 +74,7 @@ const marginLeft = window.Vue.computed(() => `calc(${props.depth * 2}rem)`);
  * @returns {boolean} - whether the children should be displayed or not
  */
 const showChildren = window.Vue.computed(
-    () => props.node.children && props.node.children.length > 0 && props.depth + 1 < 2,
+    () => !modalSearchStore.isActive && props.node.children && props.node.children.length > 0 && props.depth + 1 < 2,
 );
 
 /**
