@@ -59,9 +59,8 @@ const isModalOpen = window.Vue.ref(false); // to open/close the exporting to csv
         <div class="l-flex-col l-gap-m f-no-margins">
             <h2>Export to CSV</h2>
             <p>
-                The usages exported will be the same as the currently selected options in the report. A zip file
-                containing a separate CSV for each course will be generated. You will be sent a notification when it is
-                ready.
+                The exported data will match the options currently selected in the report. A ZIP file with separate CSV
+                files for each course will be generated, and you'll receive a notification when it's ready.
             </p>
             <ul class="flex-list buttons">
                 <li><button type="button" class="button" @click="isModalOpen = false">Cancel</button></li>
