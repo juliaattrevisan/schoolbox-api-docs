@@ -170,3 +170,9 @@
         {% endfor %}
     {% endfor %}
 </table>
+<style>
+/* Adjust Highcharts tooltip z-index to match our pop-over depth */
+.highcharts-tooltip-container {
+    z-index: var(--sbx-depth-pop-over)!important;
+}
+</style>
