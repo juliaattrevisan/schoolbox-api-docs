@@ -68,9 +68,10 @@ export const useModalSearchStore = defineStore(`csModalSearch`, {
             try {
                 const store = useStore();
                 const modalViewNodesStore = useModalViewNodesStore();
+                const includeWithoutCode = store.includeWithoutCode ? 1 : 0; // search for nodes without a code
+                const descendants = store.includeChildren ? 10 : 0; // if we're including children, load in all descendants, otherwise we just load in the next level to show the structure
                 const response = await fetch(
-                    `${apiEndpoint}?parentId=${modalViewNodesStore.current.id}&query=${this.query}&enabled=1&limit=50` +
-                        (store.includeWithoutCode ? "&includeWithoutCode=1" : ""),
+                    `${apiEndpoint}?parentId=${modalViewNodesStore.current.id}&query=${this.query}&enabled=1&limit=50&includeWithoutCode=${includeWithoutCode}&descendants=${descendants}`,
                     {
                         method: "GET",
                         headers: {
