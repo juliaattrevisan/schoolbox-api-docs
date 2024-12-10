@@ -86,7 +86,12 @@ export const useSelectedNodesStore = defineStore(`csSelectedNodes`, {
          * @param { Object } remove a single node
          */
         remove(nodeToRemove) {
-            this.nodes = this.nodes.filter((node) => node.id !== nodeToRemove.id);
+            if (useStore().includeChildren) {
+                const idsToRemove = [nodeToRemove, ...includeChildren(nodeToRemove.children)].map((node) => node.id); // get the id of the node to remove and all its children
+                this.nodes = this.nodes.filter((node) => !idsToRemove.includes(node.id)); // remove the node and all its children
+            } else {
+                this.nodes = this.nodes.filter((node) => node.id !== nodeToRemove.id); // or just remove the node
+            }
         },
 
         /**
