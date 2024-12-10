@@ -22,7 +22,7 @@ test.describe("Participant Tests", () => {
     /**
      * creates a due work, remove participants and check the excluded user for that activity is no longer presented in the class markbook
      */
-    test("Participant", async ({ tester, page }) => {
+    test("Participant", async ({ tester, page, db }) => {
         const classId = Common.CLASS_ID_DEMO2.toString();
         const studentId = Common.USER_ID_LOUISASMITH;
         const teacher = Common.USER_JACKCOLES;
@@ -71,7 +71,7 @@ test.describe("Participant Tests", () => {
         await page.getByTestId("assessment-summary-create-button").click();
 
         await submitForm.setContents(Common.genText(200));
-        await submitForm.setAttachment(filename);
+        await submitForm.setAttachment(db, filename);
         await submitForm.submit();
         await expect(page.locator(`h2.subheader:has-text("Submission History")`)).toBeVisible();
 

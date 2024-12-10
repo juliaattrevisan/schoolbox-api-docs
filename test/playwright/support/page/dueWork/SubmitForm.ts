@@ -2,6 +2,7 @@ import path from "path";
 import type { Page } from "@playwright/test";
 import { expect } from "@playwright/test";
 import type AcceptanceTester from "@schoolboxTest/playwright/support/AcceptanceTester";
+import type DatabaseHelper from "@schoolboxTest/playwright/support/DatabaseHelper";
 
 export default class SubmitForm {
     private tester: AcceptanceTester;
@@ -47,11 +48,12 @@ export default class SubmitForm {
 
     /**
      * Attaches a file to the form
+     * @param db - The DatabaseHelper instance
      * @param filePath - The file to attach
      */
-    async setAttachment(filePath: string): Promise<void> {
+    async setAttachment(db: DatabaseHelper, filePath: string): Promise<void> {
         const attachZone = this.page.locator("#files-zone");
-        await this.tester.dragAndDropFile(attachZone, filePath);
+        await this.tester.dragAndDropFile(db, attachZone, filePath);
         this.filePath = filePath;
     }
 
