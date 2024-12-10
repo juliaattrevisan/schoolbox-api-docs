@@ -91,7 +91,7 @@ function onSelectedNodeModalClosed(): void {
 </script>
 
 <template>
-    <mc-header :route-curriculum-coverage="routeCurriculumCoverage" />
+    <mc-header :route-curriculum-coverage="props.routeCurriculumCoverage" />
     <mc-view />
     <mc-selected-nodes />
     <mc-enable-nodes />

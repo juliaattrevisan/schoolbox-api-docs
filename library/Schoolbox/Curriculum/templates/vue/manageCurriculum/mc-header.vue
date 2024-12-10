@@ -37,7 +37,7 @@ function onCreateNewSelected(): void {
         <template v-if="store.hasLoadedOk && !store.isReadOnly">
             <nav>
                 <a
-                    v-if="routeCurriculumCoverage"
+                    v-if="props.routeCurriculumCoverage"
                     href="/curriculum/reports/coverage" class="icon-report" title="View Curriculum Coverage Report"
                 ></a>
                 <a
