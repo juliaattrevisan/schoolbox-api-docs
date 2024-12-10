@@ -75,6 +75,7 @@ export default class ResourcesMyFilesPicker {
      */
     async clickFile(folderTitle: string): Promise<void> {
         const file = await this.findFile(folderTitle);
+        await file.scrollIntoViewIfNeeded();
         await file.click();
         await this.tester.common.waitForModalToBeClosed();
     }
