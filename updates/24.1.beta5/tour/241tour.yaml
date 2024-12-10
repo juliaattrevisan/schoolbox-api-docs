@@ -14,7 +14,7 @@ tour:
         content: "<img src='{CDN_PREFIX}/images/tour/24.1/1_todo_get_step_1_image.jpg' style='width:100%;margin-bottom:16px;'>
                   <h3>User Profile Builder</h3>
                   <p>Customise User Profile pages with tailored fields, layouts, and role-based privacy controls.</p>
-                  <p>To learn more, see the <a href='https://sso/send?returnUrl=/homepage/5227#textBoxBody5472'>release notes</a>.</p>"
+                  <p>To learn more, see the <a href='/help/sso/send?returnUrl=/homepage/5227#textBoxBody5472'>release notes</a>.</p>"
         class: introjs-whatsnewmodal
     - step:
         title: What's New
