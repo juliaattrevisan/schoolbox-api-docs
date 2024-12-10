@@ -129,7 +129,9 @@ export default class Eqneditor5 extends Plugin {
         const view = new EqnEditorView(editor.locale);
 
         this.listenTo(view, "submit", () => {
-            const viewFragment = this.editor.data.processor.toView(this.output.exportAs("html"));
+            const viewFragment = this.editor.data.processor.toView(
+                "<img src='" + this.output.exportAs("urlencoded") + "' alt='Math formula'>",
+            );
             const modelFragment = this.editor.data.toModel(viewFragment);
             this.editor.model.insertContent(modelFragment);
 
