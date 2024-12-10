@@ -16,7 +16,7 @@ interface Props {
     courseTitle: string;
     courseId: number;
     folderId: number;
-    routeCurriculumCoverage: string | 'null';
+    routeCurriculumCoverage: string | null;
 }
 const props = defineProps<Props>();
 // const addUnitStore = useAddUnitStore();
