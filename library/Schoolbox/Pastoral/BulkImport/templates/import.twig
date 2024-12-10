@@ -127,7 +127,7 @@
         {% set runRoute = routeLookupIfAuthorized('pastoralBulkImport.postRunImport', {id: import.id, import: import}) %}
         {% if runRoute %}
             <li>
-                <form class="top" method="post" action="{{ runRoute }}?{{ RETURN_URL.name }}={{ RETURN_URL.previous.encoded }}">
+                <form class="top" method="post" data-disable-on-submit action="{{ runRoute }}?{{ RETURN_URL.name }}={{ RETURN_URL.previous.encoded }}">
                     <input type="submit" value="Import" />
                 </form>
             </li>
@@ -135,7 +135,7 @@
         {% set undoRoute = routeLookupIfAuthorized('pastoralBulkImport.postUndoImport', {id: import.id, import: import}) %}
         {% if undoRoute %}
             <li>
-                <form class="top" method="post" action="{{ undoRoute }}?{{ RETURN_URL.name }}={{ RETURN_URL.previous.encoded }}">
+                <form class="top" method="post" data-disable-on-submit action="{{ undoRoute }}?{{ RETURN_URL.name }}={{ RETURN_URL.previous.encoded }}">
                     <input type="submit" value="Undo Import" data-action="undo" />
                 </form>
 
@@ -163,4 +163,11 @@
 </div>
 {% endif %}
 
-{% include '@pastoralBulkImport/fragments/preventFormResubmit.twig' %}
+<script type="text/javascript">
+    $(function() {
+        {# Disable form buttons upon submit #}
+        $('.admin-container form[data-disable-on-submit]').on('submit', function () {
+            $(this).find('input:submit').prop('disabled', true);
+        });
+    });
+</script>
