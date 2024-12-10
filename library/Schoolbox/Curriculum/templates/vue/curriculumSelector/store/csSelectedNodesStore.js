@@ -83,16 +83,10 @@ export const useSelectedNodesStore = defineStore(`csSelectedNodes`, {
         /**
          * remove a node
          *
-         * @param { Object }
+         * @param { Object } remove a single node
          */
         remove(nodeToRemove) {
-            if (Array.isArray(nodeToRemove)) {
-                nodeToRemove.forEach((node) => {
-                    this.nodes = this.nodes.filter((selectedNode) => selectedNode.id !== node.id);
-                });
-            } else {
-                this.nodes = this.nodes.filter((node) => node.id !== nodeToRemove.id);
-            }
+            this.nodes = this.nodes.filter((node) => node.id !== nodeToRemove.id);
         },
 
         /**

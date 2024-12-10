@@ -104,7 +104,7 @@ export const useSearchStore = defineStore(`csSearch`, {
                 //check if the node isn't in the list already
                 return !selectedNodesStore.nodes.some((selectedNode) => selectedNode.id === newSelectedNode.id); //don't add in those that match
             });
-            newSelectedNodes.forEach((newSelectedNode) => selectedNodesStore.add(newSelectedNode));
+            newSelectedNodes.forEach((node) => selectedNodesStore.add(node));
         },
 
         /**
@@ -116,7 +116,7 @@ export const useSearchStore = defineStore(`csSearch`, {
                 //check if the node is in the list already
                 return selectedNodesStore.nodes.some((selectedNode) => selectedNode.id === matchedSelectedNode.id); //add in those that match
             });
-            selectedNodesStore.remove(matchedSelectedNodes);
+            matchedSelectedNodes.forEach((node) => selectedNodesStore.remove(node));
         },
     },
 });
