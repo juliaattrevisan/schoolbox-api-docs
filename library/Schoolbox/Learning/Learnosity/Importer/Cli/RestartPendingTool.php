@@ -14,6 +14,8 @@ use LearnositySdk\Exceptions\ValidationException;
 use Schoolbox\Learning\Assessment\Quiz\Model as QuizDomainModel;
 use Schoolbox\Learning\Learnosity\Helper;
 use Schoolbox\Mapper\Exception as MapperException;
+use Schoolbox\MapperFactory;
+use Schoolbox\UserMapper;
 
 /**
  * CLI tool for restarting sync of Learnosity data for quizzes in the pending
@@ -91,7 +93,7 @@ class RestartPendingTool extends BaseTool
             if ($this->perform()) {
                 $this->restartCopyProcess($sourceQuiz, $quiz);
             }
-        } catch (SourceAssociationException $e) {
+        } catch (SourceAssociationException | CopyMissingQuizException $e) {
             // This pending quiz couldn't be associated with a source:
             // mark it as unprocessable.
             $this->getLogger()->warning(
@@ -332,6 +334,17 @@ DESC;
     private function restartCopyProcess(QuizDomainModel $source, QuizDomainModel $destination): void
     {
         $this->duplicator->copyQuizConstituents($source, $destination);
+
+        // Reload quiz's creator if required
+        $quizCreator = $destination->getCreator();
+        if (!$quizCreator->getUsername()) {
+            /** @var MapperFactory $mapperFactory */
+            $mapperFactory = $this->getDi()->get('mapperFactory');
+            $quizCreator   = $mapperFactory->get(UserMapper::class)->findById($quizCreator->getId());
+            $destination->setCreator($quizCreator);
+        }
+
+        // And poll
         $this->duplicator->initiatePollingForQuizStatus($destination->getCreator(), $destination);
     }
 }

@@ -37,6 +37,7 @@ use Schoolbox\Learning\Learnosity\Cli\RescoreProcessor;
 use Schoolbox\Learning\Learnosity\Codec\UserIdentifier;
 use Schoolbox\Learning\Learnosity\Export\Csv\Processor;
 use Schoolbox\Learning\Learnosity\Feedback\SanitiseScores;
+use Schoolbox\Learning\Learnosity\Importer\Cli\CopyMissingQuizException;
 use Schoolbox\Learning\Learnosity\Importer\Cli\SourceAssociationException;
 use Schoolbox\Learning\MarkScheme\TotalMarkFractional;
 use Schoolbox\Learning\Quiz\Attempt\Model;
@@ -1826,7 +1827,7 @@ class Controller extends Base
         $duplicator = $this->buildDuplicator();
         try {
             $jobId = $duplicator->copyQuizConstituents($source, $destination);
-        } catch (SourceAssociationException $e) {
+        } catch (SourceAssociationException | CopyMissingQuizException $e) {
             // Not able to be associated?
             // Set destination as unprocessable, save and rethrow exception
             $destination->setLearnosityJobStatus(Helper::LEARNOSITY_PROCESS_STATUS_UNPROCESSABLE);
