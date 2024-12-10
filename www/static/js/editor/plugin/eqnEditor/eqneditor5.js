@@ -130,6 +130,10 @@ export default class Eqneditor5 extends Plugin {
 
         this.listenTo(view, "submit", () => {
             const viewFragment = this.editor.data.processor.toView(
+                // The output.exportAs() function has an 'html' export format, but that format uses an unencoded
+                // URL in its <img> element.  This causes problems when the HTML is saved by the CKEditor.
+                // To work around this bug in the 'html' export format, we must create our own html export.
+                // @see https://editor.codecogs.com/docs/2-API.php#exportAs
                 "<img src='" + this.output.exportAs("urlencoded") + "' alt='Math formula'>",
             );
             const modelFragment = this.editor.data.toModel(viewFragment);
