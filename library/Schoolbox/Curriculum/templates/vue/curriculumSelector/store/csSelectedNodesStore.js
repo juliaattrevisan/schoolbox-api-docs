@@ -3,7 +3,8 @@
  */
 
 import { defineStore } from "pinia";
-import { UNSET_ID } from "@schoolboxCurriculum/js/nodeUtils";
+import { UNSET_ID, includeChildren } from "@schoolboxCurriculum/js/nodeUtils";
+import { useStore } from "./curriculumSelectorStore";
 
 export const useSelectedNodesStore = defineStore(`csSelectedNodes`, {
     state: () => ({
@@ -58,7 +59,11 @@ export const useSelectedNodesStore = defineStore(`csSelectedNodes`, {
          * @param { Object } a single node
          */
         add(nodeToAdd) {
-            this.nodes = [...this.nodes, nodeToAdd];
+            if (useStore().includeChildren) {
+                this.nodes = [...this.nodes, nodeToAdd, ...includeChildren(nodeToAdd.children)]; // add the new node and all its children
+            } else {
+                this.nodes = [...this.nodes, nodeToAdd]; // or just add the new node
+            }
         },
 
         /**
