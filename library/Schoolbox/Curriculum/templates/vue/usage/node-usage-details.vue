@@ -3,6 +3,7 @@
  * to view a nodes description and all the activities the node is linked to in the curriculum
  */
 
+import locale from "@js/terminology/rosettaStone";
 import type { Node, Usage } from "@schoolboxCurriculum/types/Node";
 import { ActivityTypes } from "@schoolboxCurriculum/types/Node";
 import { getSpecificUsages } from "@schoolboxCurriculum/js/nodeUtils";
@@ -65,14 +66,14 @@ const activeUsages = window.Vue.computed(() => {
     }
     if (props.node._usageCounts.unit > 0) {
         usages.push({
-            title: "Units",
+            title: locale.unit.properPlural(),
             count: props.node._usageCounts.unit,
             usages: getSpecificUsages(props.node.usage as Usage[], ActivityTypes.UNIT),
         });
     }
     if (props.node._usageCounts.assessment > 0) {
         usages.push({
-            title: "Learning Activities",
+            title: `Learning ${locale.activity.properPlural()}`,
             count: props.node._usageCounts.assessment,
             usages: getSpecificUsages(props.node.usage as Usage[], ActivityTypes.LEARNING_ACTIVITY),
         });
@@ -95,9 +96,9 @@ const activeUsages = window.Vue.computed(() => {
             <fieldset class="content">
                 <div class="alert-box alert">
                     Sorry, we are currently unable to load the Curriculum usage data. Please
-                    <a href="#refresh-page" title="refresh the page" @click.prevent="onRefreshSelected"
-                        >refresh the page</a
-                    >
+                    <a href="#refresh-page" title="refresh the page" @click.prevent="onRefreshSelected">
+                        refresh the page
+                    </a>
                     to try again and contact your support if the problem persists.
                 </div>
             </fieldset>

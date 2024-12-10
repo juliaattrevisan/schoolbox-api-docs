@@ -144,6 +144,12 @@
     <script src="/service-worker.js?v={{ config.site_version }}"></script>
     <script src="{{ CDN_PREFIX }}/js/browser/browser-redirect.js?v={{ config.site_version }}"></script>
 
+    <script>
+        {# Add terminology that is available everywhere #}
+        window.sbProps.l10n.addTerm({{ locale.unit.toArray |json_encode |raw }});
+        window.sbProps.l10n.addTerm({{ locale.activity.toArray |json_encode |raw }});
+    </script>
+
     {% if config.site_usage_tracking %}
     {% autoescape 'js' %}
     <!-- Google Tag Manager -->

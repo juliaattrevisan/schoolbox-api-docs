@@ -11,9 +11,7 @@
 </div>
 <script>
     {# Add required locales for the Curriculum coverage #}
-    window.sbProps.l10n.addTerm({{ locale.activity.toArray |json_encode |raw }});
     window.sbProps.l10n.addTerm({{ locale.lessonPlan.toArray |json_encode |raw }});
-    window.sbProps.l10n.addTerm({{ locale.unit.toArray |json_encode |raw }});
     window.sbProps.l10n.addTerm({{ locale.rubricGroup.toArray |json_encode |raw }});
     window.sbProps.l10n.addTerm({{ locale.rubricCriterion.toArray |json_encode |raw }});
 </script>
