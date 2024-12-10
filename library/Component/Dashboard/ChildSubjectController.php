@@ -85,6 +85,7 @@ class Component_Dashboard_ChildSubjectController extends Component_Dashboard_Con
                 new \Eportfolio_Authenticator($_SESSION['user'], $userChild),
                 $this->getConfigLoader()->get('geosnapshot_api_key') ?? '',
                 $this->getConfigLoader()->get('geosnapshot_enabled'),
+                (bool)$this->getConfig('compactMode'),
                 false,
                 $this->getAuthorizer(),
                 $this->getRouteGenerator(),
