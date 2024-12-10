@@ -178,7 +178,76 @@ class Controller extends Base
                     'route' => null,
                 ],
             ],
-        ]
+        ],
+        // OLC 25
+        2025 => [
+            // 1. Fundamentals
+            '139' => [
+                Candidacy::SUPERSTAR => [
+                    'id' => 78,
+                    'route' => null,
+                ],
+                Candidacy::STAR => [
+                    'id' => 77,
+                    'route' => null,
+                ],
+            ],
+            // 2. Teaching & Learning
+            '138' => [
+                Candidacy::SUPERSTAR => [
+                    'id' => 80,
+                    'route' => null,
+                ],
+                Candidacy::STAR => [
+                    'id' => 79,
+                    'route' => null,
+                ],
+            ],
+            // 3. Marcomms
+            '142' => [
+                Candidacy::SUPERSTAR => [
+                    'id' => 81,
+                    'route' => null,
+                ],
+                Candidacy::STAR => [
+                    'id' => 85,
+                    'route' => null,
+                ],
+            ],
+            // 4. Pastoral Care
+            '141' => [
+                Candidacy::SUPERSTAR => [
+                    'id' => 82,
+                    'route' => null,
+                ],
+                Candidacy::STAR => [
+                    'id' => 86,
+                    'route' => null,
+                ],
+            ],
+            // 5. Extra-Curricular
+            '140' => [
+                Candidacy::SUPERSTAR => [
+                    'id' => 83,
+                    'route' => null,
+                ],
+                Candidacy::STAR => [
+                    'id' => 88,
+                    'route' => null,
+                ],
+            ],
+            // 6. Superuser
+            '137' => [
+                Candidacy::SUPERSTAR => [
+                    'id' => 84,
+                    'route' => null,
+                ],
+                Candidacy::STAR => [
+                    'id' => 87,
+                    'route' => null,
+                ],
+            ],
+        ],
     ];
 
 
