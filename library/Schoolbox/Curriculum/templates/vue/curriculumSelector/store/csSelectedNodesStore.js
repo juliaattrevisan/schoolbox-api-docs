@@ -3,8 +3,7 @@
  */
 
 import { defineStore } from "pinia";
-import { apiEndpoint } from "./curriculumSelectorStore";
-import { UNSET_ID, getBreadcrumbs } from "@schoolboxCurriculum/js/nodeUtils";
+import { UNSET_ID } from "@schoolboxCurriculum/js/nodeUtils";
 
 export const useSelectedNodesStore = defineStore(`csSelectedNodes`, {
     state: () => ({
@@ -56,7 +55,7 @@ export const useSelectedNodesStore = defineStore(`csSelectedNodes`, {
         /**
          * add a node
          *
-         * @param { Object or Array } either a single node, or mulitple can be added
+         * @param { Object or Array } either a single node, or multiple can be added
          */
         add(nodeToAdd) {
             if (Array.isArray(nodeToAdd)) {
