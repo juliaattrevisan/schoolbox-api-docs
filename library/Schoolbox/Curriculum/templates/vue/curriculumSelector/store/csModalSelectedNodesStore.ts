@@ -89,7 +89,6 @@ export const useModalSelectedNodesStore = defineStore(`csModalSelectedNodes`, ()
      * @param nodeToAdd - the node to add
      */
     function addSingle(nodeToAdd: Node): void {
-        nodes.value = noChildrenOfNode(nodes, nodeToAdd); // strip out any children of the new node, as the parent now takes precedence
         if (useStore().includeChildren) {
             nodes.value = [nodeToAdd, ...includeChildren(nodeToAdd.children)]; // add the new node and all its children
         } else {

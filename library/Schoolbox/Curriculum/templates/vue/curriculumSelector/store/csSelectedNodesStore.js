@@ -3,7 +3,7 @@
  */
 
 import { defineStore } from "pinia";
-import { UNSET_ID, includeChildren } from "@schoolboxCurriculum/js/nodeUtils";
+import { UNSET_ID, includeChildren, noChildrenOfNode } from "@schoolboxCurriculum/js/nodeUtils";
 import { useStore } from "./curriculumSelectorStore";
 
 export const useSelectedNodesStore = defineStore(`csSelectedNodes`, {
@@ -59,6 +59,7 @@ export const useSelectedNodesStore = defineStore(`csSelectedNodes`, {
          * @param { Object } a single node
          */
         add(nodeToAdd) {
+            this.nodes = noChildrenOfNode(this.nodes, nodeToAdd); // strip out any children of the new node, as the parent now takes precedence
             if (useStore().includeChildren) {
                 this.nodes = [...this.nodes, nodeToAdd, ...includeChildren(nodeToAdd.children)]; // add the new node and all its children
             } else {
