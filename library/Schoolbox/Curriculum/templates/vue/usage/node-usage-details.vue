@@ -87,10 +87,15 @@ const activeUsages = window.Vue.computed(() => {
     }
     return usages;
 });
+
+/**
+ * Whether there is useful usage content to display
+ */
+const hasContent = window.Vue.computed(() => hasUsage.value || props.node.description);
 </script>
 
 <template>
-    <div class="node-container" :style="{ marginLeft: marginLeft }">
+    <div :class="{ 'node-container': hasContent }" :style="{ marginLeft: marginLeft }">
         <loading-table v-if="props.isProcessing" :rows="2" />
         <section v-else-if="props.hasLoadError">
             <fieldset class="content">
@@ -103,7 +108,7 @@ const activeUsages = window.Vue.computed(() => {
                 </div>
             </fieldset>
         </section>
-        <section v-else>
+        <section v-else-if="hasContent">
             <fieldset class="content">
                 <node-usage-details-description :node="props.node" />
                 <div v-if="hasUsage" class="usage-list-container">
