@@ -463,10 +463,15 @@
                                                     {% for campus in campuses |filter(campus => campus.id == permission.serviceIdentifier) %}
                                                         {{ campus.name }}
                                                     {% endfor %}
-                                                {% elseif serviceMapping[permission.service].identifier ==  identifiers.residentialHouse %}
+                                                {% elseif serviceMapping[permission.service].identifier == identifiers.residentialHouse %}
                                                     House:
                                                     {% for residentialHouse in residentialHouses | filter( residentialHouse => residentialHouse.id == permission.serviceIdentifier) %}
                                                         {{ residentialHouse.house }}
+                                                    {% endfor %}
+                                                {% elseif serviceMapping[permission.service].identifier == identifiers.role %}
+                                                    Role:
+                                                    {% for role in roles | filter( role => role.id == permission.serviceIdentifier) %}
+                                                        {{ role.name }}
                                                     {% endfor %}
                                                 {% endif %}
                                             </div>
@@ -516,6 +521,12 @@
                                             <option value="" disabled selected>Select Residential House</option>
                                             {% for residentialHouse in residentialHouses %}
                                                 <option value="{{ residentialHouse.id }}">{{ residentialHouse.house }}</option>
+                                            {% endfor %}
+                                        </select>
+                                        <select data-service-type="{{ identifiers.role }}" name="sid" id="roleSelect" class="hide" disabled required>
+                                            <option value="" disabled selected>Select Role</option>
+                                            {% for role in roles %}
+                                                <option value="{{ role.id }}">{{ role.name }}</option>
                                             {% endfor %}
                                         </select>
                                         <select data-service-type="{{ identifiers.none }}" name="sid" id="serviceIdentifierSelect" style="display:none">
@@ -788,8 +799,9 @@
 
         {# Put that array struct into something js can comprehend #}
         var serviceMapping = $.parseJSON('{{ serviceMapping|json_encode|purify }}');
+        var serviceSelector = $('#serviceSelect');
 
-        $("#serviceSelect").on('change', function() {
+        serviceSelector.on('change', function() {
 
             {# Enable submit button #}
             $('form[data-validatable-as="addService"]').find(':submit').prop('disabled', false);

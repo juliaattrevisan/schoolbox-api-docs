@@ -15,6 +15,7 @@ use Alaress\Module\Module as BaseModule;
 use Alaress\Web\Controller\Base;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Oidc\Server\RelyingParty\Mapper as RelyingPartyMapper;
+use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\UserMapper;
@@ -34,6 +35,7 @@ class Module extends BaseModule
         // Impersonate and recover routes
         $loggedInPermission    = new Rule\IsLoggedIn();
         $impersonatePermission = new Rule\Any(
+            new Rule\IsSuperuser(),
             new Rule\Callback(
                 function ($params, User $user) {
                     // Do not allow unlinked users to switch
@@ -45,7 +47,32 @@ class Module extends BaseModule
                     throw new Unauthorized();
                 }
             ),
-            new Rule\IsSuperuser()
+            new Rule\Callback(
+                function ($params, User $user) {
+                    $userToImpersonate = $params['user'];
+
+                    if ($userToImpersonate->isSuperuser()) {
+                        // Superusers may not be impersonated by non-superusers.
+                        // Note this function should be called only if the logged-in user is not a superuser.
+                        throw new Unauthorized();
+                    }
+
+                    if ($userToImpersonate->getRole()->getId() === null) {
+                        // If the user to impersonate does not have a role (perhaps due to a hydrating problem), deny.
+                        throw new Unauthorized();
+                    }
+
+                    if (
+                        !$user->hasServicePermission(
+                            UserAccess::SERVICE_IMPERSONATOR,
+                            UserAccess::ACCESS_FULL,
+                            $userToImpersonate->getRole()->getId()
+                        )
+                    ) {
+                        throw new Unauthorized();
+                    }
+                }
+            )
         );
         $impersonatePreload = fn ($params) => [
             'user' => $this->getUserMapper()->findById($params['userId']),

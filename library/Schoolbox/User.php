@@ -1421,12 +1421,16 @@ class User implements Serializable, Linkable, ISoftDeletable, IModel
      *
      * @param int $servicePermission - One of UserAccess::SERVICE_NEWS, UserAccess::SERVICE_CALENDAR, etc.
      * @param int $level - One of UserAccess::ACCESS_READ, UserAccess::ACCESS_WRITE, etc.
+     * @param ?int $sId - Required for some service permissions (see Schoolbox/Permission/Access/README.md).
      * @return bool
      */
-    public function hasServicePermission(int $servicePermission, int $level): bool
+    public function hasServicePermission(int $servicePermission, int $level, ?int $sId = null): bool
     {
-        foreach ($this->getAccessList()->filterBy('service', $servicePermission) as $access) {
-            if ($access->getAccessLevel() >= $level) {
+        $accessList = $this->getAccessList();
+
+        foreach ($accessList->filterBy('service', $servicePermission) as $access) {
+            /** @var UserAccess $access */
+            if ($access->getAccessLevel() >= $level && ($sId === null || $access->getServiceIdentifier() === $sId)) {
                 return true;
             }
         }

@@ -51,6 +51,7 @@ Where:
  * 'sid' refers to different things based on the value of 'service':
     * for 'service'=1 (Homepage), 'sid' refers to folder.id
     * for 'service'=2 (Calendar), 'sid' refers to luCampus.id
+    * for 'service'=15 (Impersonator), 'sid' refers to groups.id (also known as roleId)
     * for other values of 'service', 'sid' is ignored (but should always be 0).
   * 'type' refers to the type of access (see UserAccess.php):
     * 0 => none

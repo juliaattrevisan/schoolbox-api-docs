@@ -128,11 +128,13 @@ class Controller extends Base
     private const IDENTIFIER_NONE = 'none';
     private const IDENTIFIER_CAMPUS = 'campus';
     private const IDENTIFIER_RESIDENTIAL_HOUSE = 'residentialHouse';
+    private const IDENTIFIER_ROLE = 'role';
 
     private const IDENTIFIERS = [
         'none' => self::IDENTIFIER_NONE,
         'campus' => self::IDENTIFIER_CAMPUS,
-        'residentialHouse' => self::IDENTIFIER_RESIDENTIAL_HOUSE
+        'residentialHouse' => self::IDENTIFIER_RESIDENTIAL_HOUSE,
+        'role' => self::IDENTIFIER_ROLE,
     ];
 
     /**
@@ -150,25 +152,82 @@ class Controller extends Base
      * @var array
      */
     private const SERVICE_MAPPING = [
-
-        /* For some historical reason, SERVICE_HOMEPAGE is no longer shown.
-         */
+        // Note this list should be sorted by the value of 'name' ascending.
+        //
+        // Description of fields in each item below:
+        //    'name'        : The text that appears in the dropdown list.
+        //    'identifier'  : The service identifier options to use: campus dropdown, house dropdown, nothing (none).
+        //    'availability': Access levels that you can choose; some services are Moderate-Only, but this way you can specify
+        //                    the available access levels more granularly e.g. write-only, if you ever needed that.
+        UserAccess::SERVICE_BADGE => [
+            'name' => 'Badge',
+            'identifier' => self::IDENTIFIER_NONE,
+            'availability' => [
+                'read' => false,
+                'write' => true,
+                'moderate' => true
+            ]
+        ],
         UserAccess::SERVICE_CALENDAR => [
-
-            /* The text that appears in the dropdown list
-             */
             'name' => 'Calendar',
-
-            /* The service identifier options to use: campus dropdown, house dropdown, nothing (none)
-             */
             'identifier' => self::IDENTIFIER_CAMPUS,
-
-            /* Access levels that you can choose; some services are Moderate-Only, but this way you can specify
-             * the available access levels more granularly e.g. write-only, if you ever needed that
-             */
             'availability' => [
                 'read' => true,
                 'write' => true,
+                'moderate' => true
+            ]
+        ],
+        UserAccess::SERVICE_CURRICULUM => [
+            'name' => 'Curriculum',
+            'identifier' => self::IDENTIFIER_NONE,
+            'availability' => [
+                'read' => false,
+                'write' => true,
+                'moderate' => false
+            ]
+        ],
+        UserAccess::SERVICE_CMS => [
+            'name' => 'CMS',
+            'identifier' => self::IDENTIFIER_NONE,
+            'availability' => [
+                'read' => true,
+                'write' => true,
+                'moderate' => true
+            ]
+        ],
+        UserAccess::SERVICE_DESIGN => [
+            'name' => 'Design',
+            'identifier' => self::IDENTIFIER_NONE,
+            'availability' => [
+                'read' => false,
+                'write' => false,
+                'moderate' => true
+            ]
+        ],
+        UserAccess::SERVICE_SPORTS_ADMINISTRATOR => [
+            'name' => 'Fixtures',
+            'identifier' => self::IDENTIFIER_NONE,
+            'availability' => [
+                'read' => false,
+                'write' => false,
+                'moderate' => true
+            ]
+        ],
+        UserAccess::SERVICE_IMPERSONATOR => [
+            'name' => 'Impersonator',
+            'identifier' => self::IDENTIFIER_ROLE,
+            'availability' => [
+                'read' => false,
+                'write' => false,
+                'moderate' => true
+            ]
+        ],
+        UserAccess::SERVICE_LMS => [
+            'name' => 'LMS',
+            'identifier' => self::IDENTIFIER_NONE,
+            'availability' => [
+                'read' => false,
+                'write' => false,
                 'moderate' => true
             ]
         ],
@@ -181,8 +240,8 @@ class Controller extends Base
                 'moderate' => true
             ]
         ],
-        UserAccess::SERVICE_CMS => [
-            'name' => 'CMS',
+        UserAccess::SERVICE_PASTORAL => [
+            'name' => 'Pastoral',
             'identifier' => self::IDENTIFIER_NONE,
             'availability' => [
                 'read' => true,
@@ -199,63 +258,9 @@ class Controller extends Base
                 'moderate' => true
             ]
         ],
-        UserAccess::SERVICE_CURRICULUM => [
-            'name' => 'Curriculum',
-            'identifier' => self::IDENTIFIER_NONE,
-            'availability' => [
-                'read' => false,
-                'write' => true,
-                'moderate' => false
-            ]
-        ],
-        UserAccess::SERVICE_PASTORAL => [
-            'name' => 'Pastoral Moderator',
-            'identifier' => self::IDENTIFIER_NONE,
-            'availability' => [
-                'read' => true,
-                'write' => true,
-                'moderate' => true
-            ]
-        ],
-        UserAccess::SERVICE_SPORTS_ADMINISTRATOR => [
-            'name' => 'Fixtures',
-            'identifier' => self::IDENTIFIER_NONE,
-            'availability' => [
-                'read' => false,
-                'write' => false,
-                'moderate' => true
-            ]
-        ],
-        UserAccess::SERVICE_BADGE => [
-            'name' => 'Badge',
-            'identifier' => self::IDENTIFIER_NONE,
-            'availability' => [
-                'read' => false,
-                'write' => true,
-                'moderate' => true
-            ]
-        ],
         UserAccess::SERVICE_TIMETABLE => [
             'name' => 'Timetable',
              'identifier' => self::IDENTIFIER_NONE,
-            'availability' => [
-                'read' => false,
-                'write' => false,
-                'moderate' => true
-            ]
-        ],
-        UserAccess::SERVICE_DESIGN => [
-            'name' => 'Design',
-            'identifier' => self::IDENTIFIER_NONE,
-            'availability' => [
-                'read' => false,
-                'write' => false,
-                'moderate' => true
-            ]
-        ],
-        UserAccess::SERVICE_LMS => [
-            'name' => 'LMS',
-            'identifier' => self::IDENTIFIER_NONE,
             'availability' => [
                 'read' => false,
                 'write' => false,

@@ -1,7 +1,6 @@
 <?php
 
 /**
- *
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
@@ -20,85 +19,22 @@ class UserAccess implements IModel
     use CreatedAtDate;
 
     /**
-     * Value for $this->service:
-     * $this->user has $this->accessLevel permission for homepage $this->itemId.
+     * Service permission constants.
+     * These are the possible values of $this->service, and correspond to IDs from the lu_service database table.
      */
-    public const SERVICE_HOMEPAGE = 1;
-
-    /**
-     * Value for $this->service:
-     * $this->user has $this->accessLevel permission for the calendar for campus
-     * $this->itemId.
-     */
-    public const SERVICE_CALENDAR = 2;
-
-    /**
-     * Value for $this->service:
-     * $this->user has $this->accessLevel permission for the calendar for campus
-     * $this->itemId.
-     */
+    public const SERVICE_HOMEPAGE = 1; // Note SERVICE_HOMEPAGE is used to define group membership.  See User->isGroupMember().
+    public const SERVICE_CALENDAR = 2; // Note SERVICE_CALENDAR is special, in that it requires a campusId to be set in userAccess.sid.
     public const SERVICE_NEWS = 3;
-
-    /**
-     * Value for $this->service:
-     * $this->user has $this->accessLevel permission for all homepages.
-     *
-     * @todo confirm if this is the case
-     */
     public const SERVICE_CMS = 5;
-
-    /**
-     * Value for $this->service:
-     * $this->user has $this->accessLevel permission for the resource booking
-     * system.
-     */
     public const SERVICE_RESOURCE_BOOKING = 7;
-
-    /**
-     * Value for $this->service:
-     * $this->user has $this->accessLevel permission for the curriculum
-     * system.
-     */
     public const SERVICE_CURRICULUM = 8;
-
-    /**
-     * Value for $this->service:
-     * $this->user has $this->accessLevel permission for the pastoral care
-     * system.
-     */
     public const SERVICE_PASTORAL = 9;
-
-    /**
-     * Value for $this->service:
-     * $this->user has $this->accessLevel permission for the Sports Fixtures
-     * system.
-     */
-    public const SERVICE_SPORTS_ADMINISTRATOR = 10;
-
-    /**
-     * Value for $this->service:
-     * $this->user has $this->accessLevel permission for the badge
-     * system.
-     */
+    public const SERVICE_SPORTS_ADMINISTRATOR = 10; // This pertains to the Fixtures section.
     public const SERVICE_BADGE = 11;
-
-    /**
-     * Value for $this->service:
-     * $this->user has $this->accessLevel permission for the timetable system.
-     */
     public const SERVICE_TIMETABLE = 12;
-
-    /**
-     * Value for $this->service:
-     * $this->user has $this->accessLevel permission for the design system.
-     */
     public const SERVICE_DESIGN = 13;
-
-    /**
-     * Value for $this->service:
-     * $this->user has $this->accessLevel permission for the LMS system.
-     */
     public const SERVICE_LMS = 14;
+    public const SERVICE_IMPERSONATOR = 15; // Note SERVICE_IMPERSONATOR is special, in that it requires a roleId to be set in userAccess.sid.
 
     /**
      * Services that do not have service identifiers (sid) use this value
@@ -171,7 +107,6 @@ class UserAccess implements IModel
     /** @var bool */
     protected bool $favourite = false;
 
-
     /**
      * Returns the set of all known access levels
      *
@@ -181,7 +116,6 @@ class UserAccess implements IModel
     {
         return [self::ACCESS_DENY, self::ACCESS_READ, self::ACCESS_WRITE, self::ACCESS_FULL,];
     }
-
 
     /**
      * Return all possible services
@@ -203,9 +137,9 @@ class UserAccess implements IModel
             self::SERVICE_TIMETABLE,
             self::SERVICE_DESIGN,
             self::SERVICE_LMS,
+            self::SERVICE_IMPERSONATOR,
         ];
     }
-
 
     /**
      * Returns the services that require an identifier
@@ -217,9 +151,9 @@ class UserAccess implements IModel
         return [
             self::SERVICE_HOMEPAGE,
             self::SERVICE_CALENDAR,
+            self::SERVICE_IMPERSONATOR,
         ];
     }
-
 
     /**
      * Returns the services that should not have an identifier
@@ -241,7 +175,6 @@ class UserAccess implements IModel
         return $this;
     }
 
-
     /**
      * @return User
      */
@@ -249,7 +182,6 @@ class UserAccess implements IModel
     {
         return $this->user;
     }
-
 
     /**
      * @param int $service
@@ -261,7 +193,6 @@ class UserAccess implements IModel
         return $this;
     }
 
-
     /**
      * @return int
      */
@@ -269,7 +200,6 @@ class UserAccess implements IModel
     {
         return $this->service;
     }
-
 
     /**
      * @param int $sid
@@ -281,7 +211,6 @@ class UserAccess implements IModel
         return $this;
     }
 
-
     /**
      * @return int
      */
@@ -289,7 +218,6 @@ class UserAccess implements IModel
     {
         return $this->sid;
     }
-
 
     /**
      * @param int $level
@@ -300,7 +228,6 @@ class UserAccess implements IModel
         $this->accessLevel = $level;
         return $this;
     }
-
 
     /**
      * @return int
