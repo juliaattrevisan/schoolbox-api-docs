@@ -28,6 +28,20 @@ describe("includeChildren()", () => {
         const selectedNodes = [node, ...includeChildren(node.children)];
         expect(selectedNodes).toHaveLength(3);
     });
+    test("only adds enabled children", () => {
+        const node = {
+            id: 1,
+            name: "Node 1",
+            code: "C",
+            children: [
+                { id: 2, name: "Node Child 1", code: "C1", enabled: true },
+                { id: 3, name: "Node Child 2", code: "C1", enabled: false },
+                { id: 4, name: "Node Child 3", code: "C2", enabled: false },
+            ],
+        };
+        const selectedNodes = [node, ...includeChildren(node.children)];
+        expect(selectedNodes).toHaveLength(2);
+    });
     test("manages children multi levels deep", () => {
         const node = {
             id: 1,
