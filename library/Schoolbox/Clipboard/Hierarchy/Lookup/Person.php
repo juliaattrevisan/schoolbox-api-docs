@@ -57,15 +57,20 @@ class Person
         $lookup = [];
         /* To check for user of role staff first to avoid mismatch
          */
-        $pb = $this->userMapper->getPredicateBuilder();
-        $pb->equals('g.group_type', Role::STAFF)
-           ->isNull('deleted_at')
-           ->notNull('synergy_id');
+        $statement = $this->userMapper->getDatabase()->executeQuery("
+            SELECT u.synergy_id, u.id
+            FROM {$this->userMapper->getTable()} u
+            INNER JOIN groups g ON g.id = u.group_id
+            WHERE g.group_type = :group_type
+            AND u.deleted_at IS NULL
+            AND u.synergy_id IS NOT NULL
+        ",
+        [
+            'group_type' => Role::STAFF
+        ]);
 
-        $result = $this->userMapper->findByPredicates($pb);
-
-        foreach ($result as $user) {
-            $lookup[(string)$user->getExternalId()] = $user->getId();
+        foreach ($statement as $user) {
+            $lookup[(string)$user['synergy_id']] = $user['id'];
         }
 
         $statement = $this->userMapper->getDatabase()->query("
