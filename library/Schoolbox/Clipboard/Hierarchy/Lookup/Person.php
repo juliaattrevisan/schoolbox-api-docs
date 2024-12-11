@@ -57,7 +57,8 @@ class Person
         $lookup = [];
         /* To check for user of role staff first to avoid mismatch
          */
-        $statement = $this->userMapper->getDatabase()->executeQuery("
+        $statement = $this->userMapper->getDatabase()->executeQuery(
+            "
             SELECT u.synergy_id, u.id
             FROM {$this->userMapper->getTable()} u
             INNER JOIN groups g ON g.id = u.group_id
@@ -65,9 +66,10 @@ class Person
             AND u.deleted_at IS NULL
             AND u.synergy_id IS NOT NULL
         ",
-        [
-            'group_type' => Role::STAFF
-        ]);
+            [
+                'group_type' => Role::STAFF
+            ]
+        );
 
         foreach ($statement as $user) {
             $lookup[(string)$user['synergy_id']] = $user['id'];
