@@ -115,7 +115,8 @@
         "steverhoades/oauth2-openid-connect-server": "^2.6",
         "google/common-protos": "^4.8",
         "ext-xmlreader": "*",
-        "ext-dom": "*"
+        "ext-dom": "*",
+        "violet/streaming-json-encoder": "^1.1"
     },
     "autoload-dev": {
       "psr-4": {
