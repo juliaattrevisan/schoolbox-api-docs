@@ -127,11 +127,12 @@ HELP;
 
         /* Re-enable this field if it hasn't already been enabled
          */
-        $this->getLogger()->info('Re-enabling Staff Code');
+        $this->getLogger()->info('Re-enabling Staff Code and assigning terminology');
 
         $this->getDatabaseInternal()->executeQuery("
             UPDATE profile_field
-            SET enabled = 1
+            SET enabled = 1,
+                term = 'staffCode'
             WHERE roletype = :roletype
             AND field = :field
             LIMIT 1            
@@ -162,9 +163,10 @@ HELP;
         $this->getLogger()->debug('Renaming "Staff Code" to "Staff ID"');
 
         $this->getDatabaseInternal()->executeQuery("
-            UPDATE profile_field
-            SET display_as = 'Staff ID'
-            WHERE field = 'SchoolStaffCode'
+            UPDATE localisation
+            SET singular_form = 'staff ID',
+                plural_form = 'staff IDs'
+            WHERE term = 'staffCode'
             LIMIT 1
         ");
     }
