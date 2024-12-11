@@ -74,7 +74,18 @@ class Module extends BaseModule
                 '(.*)|(!getExport)',
                 new Rule\All(
                     new Rule\IsLoggedIn(),
-                    new Rule\HasRole(Role::STAFF)
+                    new Rule\Any(
+                        new Rule\IsSuperuser(),
+                        new Rule\HasRole(Role::STAFF),
+                        new Rule\HasServicePermission(
+                            UserAccess::SERVICE_CURRICULUM,
+                            UserAccess::ACCESS_WRITE
+                        ),
+                        new Rule\HasServicePermission(
+                            UserAccess::SERVICE_LMS,
+                            UserAccess::ACCESS_FULL
+                        )
+                    )
                 ),
             )
             ->addRoutePermission(
@@ -85,6 +96,10 @@ class Module extends BaseModule
                     new Rule\HasServicePermission(
                         UserAccess::SERVICE_CURRICULUM,
                         UserAccess::ACCESS_WRITE
+                    ),
+                    new Rule\HasServicePermission(
+                        UserAccess::SERVICE_LMS,
+                        UserAccess::ACCESS_FULL
                     )
                 )
             )->addRoutePermission(
