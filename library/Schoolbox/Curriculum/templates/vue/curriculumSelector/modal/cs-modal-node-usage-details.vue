@@ -36,6 +36,7 @@ function onUsageSelected(usage: Usage): void {
             :depth="props.depth"
             :is-processing="modalNodeUsageStore.isProcessing"
             :has-load-error="modalNodeUsageStore.hasLoadError"
+            :show-courses="true"
             @select="onUsageSelected"
         />
     </div>
