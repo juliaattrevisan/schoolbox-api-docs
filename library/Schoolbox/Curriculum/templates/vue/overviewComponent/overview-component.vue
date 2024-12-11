@@ -6,7 +6,7 @@
 
 import { watchIgnorable } from "@vueuse/core";
 import type { Node } from "@schoolboxCurriculum/types/Node";
-import { UNSET_ID } from "@schoolboxCurriculum/js/nodeUtils";
+import { includeChildren, UNSET_ID } from "@schoolboxCurriculum/js/nodeUtils";
 import { useStore as useSelectorStore } from "@schoolboxCurriculum/vue/curriculumSelector/store/curriculumSelectorStore";
 import { useSelectedNodesStore } from "@schoolboxCurriculum/vue/curriculumSelector/store/csSelectedNodesStore";
 import CurriculumDetailsModal from "@schoolboxCurriculum/vue/curriculumDetailsModal/curriculum-details-modal.vue";
@@ -61,6 +61,7 @@ window.Vue.onMounted(() => {
             formValueName: "", // not required in this context
             dataEndpoint: props.dataEndpoint,
             selectedNodes: props.selectedNodes, // so the modal displays the latest selected nodes
+            includeChildren: true, // include all children in selections
         });
     });
 });
