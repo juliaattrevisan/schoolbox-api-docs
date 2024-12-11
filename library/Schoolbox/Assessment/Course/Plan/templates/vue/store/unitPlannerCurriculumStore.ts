@@ -34,6 +34,7 @@ export const useUnitPlannerCurriculumStore = defineStore(`unitPlannerCurriculum`
             formValueName: "", // not required in this context
             dataEndpoint: "/api/curriculum",
             selectedNodes: [], // so the modal displays the latest selected nodes
+            includeChildren: true, // include all children in selections
         });
     }
 
