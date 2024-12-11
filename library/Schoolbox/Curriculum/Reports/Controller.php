@@ -172,7 +172,13 @@ class Controller extends Base
 
         $courseSpecs     = $this->courseSpecificationMapper->findByColumn('id', $courseIds);
         $courseUnitSpecs = $this->findCourseUnitSpecs($courseIds);
-        $usage           = $this->loadUsageStructure($courseSpecs, $courseUnitSpecs, $data, $cursor->retrieveUsageCount());
+        $usage           = $this->loadUsageStructure(
+            $courseSpecs,
+            $courseUnitSpecs,
+            $data,
+            $cursor->retrieveUsageCount(),
+            false,
+        );
         $structure       = $this->loadCourseStructure($courseSpecs, $courseUnitSpecs);
 
         $response =  [
@@ -397,7 +403,13 @@ class Controller extends Base
         // Create export data
         $courseSpecs     = $this->courseSpecificationMapper->findByColumn('id', $courseIds);
         $courseUnitSpecs = $this->findCourseUnitSpecs($courseIds);
-        $usage           = $this->loadUsageStructure($courseSpecs, $courseUnitSpecs, $data, $cursor->retrieveUsageCount());
+        $usage           = $this->loadUsageStructure(
+            $courseSpecs,
+            $courseUnitSpecs,
+            $data,
+            $cursor->retrieveUsageCount(),
+            true,
+        );
         $structure       = $this->loadCourseStructure($courseSpecs, $courseUnitSpecs);
         $filename        = "curriculum-coverage-report.csv";
 
@@ -488,10 +500,17 @@ class Controller extends Base
      * @param array             $courseUnitSpecs
      * @param Collection        $data
      * @param array             $usageCount
+     * @param bool              $streamChildren  true: output each node's children as a generator;
+     *                                           false: output each node's children as an array.
      * @return Collection
      */
-    private function loadUsageStructure(GenericCollection $courseSpecs, array $courseUnitSpecs, Collection $data, array $usageCount): Collection
-    {
+    private function loadUsageStructure(
+        GenericCollection $courseSpecs,
+        array $courseUnitSpecs,
+        Collection $data,
+        array $usageCount,
+        bool $streamChildren,
+    ): Collection {
         $unitTranslator = new UnitAssessmentUsageTranslator(
             $this->routeGenerator,
             $this->authorizer,
@@ -512,7 +531,8 @@ class Controller extends Base
             $this->getUser(),
             $courseUsageTranslator,
             $courseSpecs,
-            $usageCount
+            $usageCount,
+            $streamChildren,
         );
 
 

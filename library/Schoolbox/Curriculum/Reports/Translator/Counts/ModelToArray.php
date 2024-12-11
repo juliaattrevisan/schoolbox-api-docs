@@ -25,7 +25,9 @@ class ModelToArray
      * @param User                  $currentUser
      * @param CourseUsageTranslator $courseUsageTranslator
      * @param Collection            $courseSpec
-     * @param array                 $counts A set of usage counts for each node to be translated.
+     * @param array                 $counts         A set of usage counts for each node to be translated.
+     * @param bool                  $streamChildren Are children output in a generator to be streamed, or in an array
+     *                                              structure for output via JSON?
      */
     public function __construct(
         protected Generator $routeGenerator,
@@ -33,7 +35,8 @@ class ModelToArray
         protected User $currentUser,
         private CourseUsageTranslator $courseUsageTranslator,
         private Collection $courseSpec,
-        private array $counts
+        private array $counts,
+        private bool $streamChildren,
     ) {
     }
 
@@ -55,21 +58,17 @@ class ModelToArray
      */
     private function translate(Model $node): array
     {
-        $children = null;
-        //Find all descendants
-        if ($node->getChildren()->count() > 0) {
-            $children = [];
-            foreach ($node->getChildren() as $child) {
-                // Translate the children, but never with the full parent record
-                $children[] = $this->translate($child);
-            }
-        }
+        // Output children either as a generator for memory efficiency,
+        // or as an array for json_encode compatibility.
+        $children = $this->streamChildren
+            ? $this->translateChildrenAsGenerator($node)
+            : $this->translateChildrenAsArray($node);
 
         return [
-            'id'            => $node->getId(),
-            'name'          => $node->getName(),
-            'code'          => $node->getCode(),
-            'usage'         => [
+            'id'       => $node->getId(),
+            'name'     => $node->getName(),
+            'code'     => $node->getCode(),
+            'usage'    => [
                 'courses' =>
                     $this->courseSpec->map(
                         function ($course) use ($node) {
@@ -77,17 +76,17 @@ class ModelToArray
                         }
                     )
             ],
-            'children'      => $children,
-            '_links'        => [
-                'read' => $this->getRouteIfAuthorized(
+            'children' => $children,
+            '_links'   => [
+                'read'     => $this->getRouteIfAuthorized(
                     'curriculumApi.getNode',
                     ['id' => $node->getId(), 'node' => $node],
                 ),
-                'update' => $this->getRouteIfAuthorized(
+                'update'   => $this->getRouteIfAuthorized(
                     'curriculumApi.putNode',
                     ['id' => $node->getId(), 'node' => $node],
                 ),
-                'delete' => $this->getRouteIfAuthorized(
+                'delete'   => $this->getRouteIfAuthorized(
                     'curriculumApi.deleteNode',
                     ['id' => $node->getId(), 'node' => $node],
                 ),
@@ -97,5 +96,42 @@ class ModelToArray
                 ),
             ],
         ];
+    }
+
+    /**
+     * Translate the node's children as an array, calling `translate`
+     * immediately.
+     *
+     * @param Model $node
+     * @return array|null
+     */
+    private function translateChildrenAsArray(Model $node): ?array
+    {
+        $children = null;
+        if ($node->getChildren()->count() > 0) {
+            $children = [];
+            foreach ($node->getChildren() as $child) {
+                // Translate the children, but never with the full parent record
+                $children[] = $this->translate($child);
+            }
+        }
+        return $children;
+    }
+
+    /**
+     * Translate the node's children as a generator, calling `translate`
+     * only when the generator is iterated.
+     *
+     * @param Model $node
+     * @return iterable|null
+     */
+    private function translateChildrenAsGenerator(Model $node): ?iterable
+    {
+        if ($node->getChildren()->count() === 0) {
+            return null;
+        }
+        foreach ($node->getChildren() as $child) {
+            yield $this->translate($child);
+        }
     }
 }
