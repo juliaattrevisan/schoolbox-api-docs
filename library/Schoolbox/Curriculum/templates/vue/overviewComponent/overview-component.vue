@@ -6,7 +6,7 @@
 
 import { watchIgnorable } from "@vueuse/core";
 import type { Node } from "@schoolboxCurriculum/types/Node";
-import { includeChildren, UNSET_ID } from "@schoolboxCurriculum/js/nodeUtils";
+import { UNSET_ID } from "@schoolboxCurriculum/js/nodeUtils";
 import { useStore as useSelectorStore } from "@schoolboxCurriculum/vue/curriculumSelector/store/curriculumSelectorStore";
 import { useSelectedNodesStore } from "@schoolboxCurriculum/vue/curriculumSelector/store/csSelectedNodesStore";
 import CurriculumDetailsModal from "@schoolboxCurriculum/vue/curriculumDetailsModal/curriculum-details-modal.vue";
