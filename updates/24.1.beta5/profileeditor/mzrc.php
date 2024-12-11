@@ -143,7 +143,7 @@ HELP;
 
         /* Rename Staff Code to Staff ID. There's no terminology row, but we can hack display_as instead.
          */
-       $this->renameField();
+        $this->renameField();
 
         /* Announce lock release
          */
