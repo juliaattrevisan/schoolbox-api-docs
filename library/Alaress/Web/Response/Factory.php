@@ -20,6 +20,8 @@ use Schoolbox\User;
 use Symfony\Component\HttpFoundation\Response;
 use Twig\Environment;
 use Twig\Error\Error as TwigError;
+use Violet\StreamingJsonEncoder\BufferJsonEncoder;
+use Violet\StreamingJsonEncoder\JsonStream;
 
 /**
  * Factory for building various variants of a response.
@@ -93,15 +95,23 @@ class Factory implements ResponseFactoryInterface
     /**
      * Builds a JSON response.
      *
-     * @param mixed $data
+     * @param mixed $data   The data to output.
+     * @param bool  $buffer If true: encode using a buffered stream instead of
+     *                      `json_encode`, for memory efficiency and
+     *                      compatibility with generators (`yield` statements
+     *                      and callables) in `$data`.
      * @return ResponseInterface
      */
-    public function buildJson(mixed $data): ResponseInterface
+    public function buildJson(mixed $data, bool $buffer = false): ResponseInterface
     {
+        $body = $buffer
+            ? new JsonStream(new BufferJsonEncoder($data))
+            : $this->streamFactory->createStream(json_encode($data));
+
         return $this
             ->createResponse()
             ->withHeader('content-type', 'application/json')
-            ->withBody($this->streamFactory->createStream(json_encode($data)));
+            ->withBody($body);
     }
 
     /**

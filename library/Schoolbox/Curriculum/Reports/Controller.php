@@ -177,7 +177,7 @@ class Controller extends Base
             $courseUnitSpecs,
             $data,
             $cursor->retrieveUsageCount(),
-            false,
+            true,
         );
         $structure       = $this->loadCourseStructure($courseSpecs, $courseUnitSpecs);
 
@@ -195,9 +195,7 @@ class Controller extends Base
             ]
         ];
 
-        $this->response = $this->responseAsJson(
-            $response
-        );
+        $this->response = $this->responseAsJson($response, buffer: true);
     }
 
     /**

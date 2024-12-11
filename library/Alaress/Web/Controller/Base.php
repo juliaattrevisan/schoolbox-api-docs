@@ -523,12 +523,16 @@ abstract class Base
     /**
      * Build a JSON response from `$data`.
      *
-     * @param mixed $data
+     * @param mixed $data   The data to output.
+     * @param bool  $buffer If true: encode using a buffered stream instead of
+     *                      `json_encode`, for memory efficiency and
+     *                      compatibility with generators (`yield` statements
+     *                      and callables) in `$data`.
      * @return ResponseInterface
      */
-    protected function responseAsJson(mixed $data): ResponseInterface
+    protected function responseAsJson(mixed $data, bool $buffer = false): ResponseInterface
     {
-        return $this->responseFactory->buildJson($data);
+        return $this->responseFactory->buildJson($data, $buffer);
     }
 
     /**
