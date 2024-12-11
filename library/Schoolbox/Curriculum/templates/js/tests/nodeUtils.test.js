@@ -70,4 +70,29 @@ describe("includeChildren()", () => {
         const selectedNodes = [node, ...includeChildren(node.children)];
         expect(selectedNodes).toHaveLength(5);
     });
+    test("can skip over children without codes to grandchildren", () => {
+        const node = {
+            id: 1,
+            name: "Node 1",
+            code: "C",
+            children: [
+                {
+                    id: 2,
+                    name: "No Code Node Child 1",
+                    enabled: true,
+                    children: [
+                        {
+                            id: 5,
+                            name: "Node Child 1.1",
+                            code: "C1.1",
+                            enabled: true,
+                            children: [{ id: 6, name: "Node Child 1.1.1", code: "C1.1.1", enabled: true }],
+                        },
+                    ],
+                },
+            ],
+        };
+        const selectedNodes = [node, ...includeChildren(node.children)];
+        expect(selectedNodes).toHaveLength(2);
+    });
 });
