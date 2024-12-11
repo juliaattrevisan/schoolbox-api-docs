@@ -9,6 +9,8 @@ declare(strict_types=1);
 
 namespace Schoolbox\Clipboard\Hierarchy\Lookup;
 
+use Schoolbox\Role;
+
 /**
  * Get a list of (external_id, user_id) tuples
  *
@@ -17,7 +19,6 @@ namespace Schoolbox\Clipboard\Hierarchy\Lookup;
  */
 class Person
 {
-
     /**
      * @var \Schoolbox\UserMapper
      */
@@ -54,6 +55,25 @@ class Person
         }
 
         $lookup = [];
+        /* To check for user of role staff first to avoid mismatch
+         */
+        $statement = $this->userMapper->getDatabase()->executeQuery(
+            "
+            SELECT u.synergy_id, u.id
+            FROM {$this->userMapper->getTable()} u
+            INNER JOIN groups g ON g.id = u.group_id
+            WHERE g.group_type = :group_type
+            AND u.deleted_at IS NULL
+            AND u.synergy_id IS NOT NULL
+        ",
+            [
+                'group_type' => Role::STAFF
+            ]
+        );
+
+        foreach ($statement as $user) {
+            $lookup[(string)$user['synergy_id']] = $user['id'];
+        }
 
         $statement = $this->userMapper->getDatabase()->query("
             SELECT synergy_id, id
@@ -65,9 +85,12 @@ class Person
         $statement->execute();
 
         while ($row = $statement->fetch()) {
-            $lookup[(string)$row['synergy_id']] = $row['id'];
+            /* Find the rest of the users
+             */
+            if (!isset($lookup[$row['synergy_id']])) {
+                $lookup[(string)$row['synergy_id']] = $row['id'];
+            }
         }
-
         /* Remember this for later
          */
         $this->lookup = $lookup;
