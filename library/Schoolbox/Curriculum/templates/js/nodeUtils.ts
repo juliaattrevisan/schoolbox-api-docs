@@ -159,7 +159,8 @@ export function includeChildren(childNodes: Node[] | null): Node[] {
         return [];
     }
     const childrenWithCodes = childNodes.filter((child) => child.code && child.code !== ""); // only include children with codes
-    let children = [...childrenWithCodes];
+    const enabledChildren = childrenWithCodes.filter((child) => child.enabled); // only include enabled children
+    let children = [...enabledChildren];
     children.forEach((child) => {
         children = [...children, ...includeChildren(child.children)];
     });
