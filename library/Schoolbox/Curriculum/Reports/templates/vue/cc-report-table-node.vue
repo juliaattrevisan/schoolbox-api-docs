@@ -97,7 +97,7 @@ const showNode = window.Vue.computed(() => {
     if (filtersStore.onlyShowGaps && hasNoUsages.value) {
         return true;
     }
-    return getFilteredTotalCount(props.node, false) === 0 && filtersStore.onlyShowGaps;
+    return getFilteredTotalCount(props.node, !isExpanded.value) === 0 && filtersStore.onlyShowGaps;
 });
 
 // #endregion
