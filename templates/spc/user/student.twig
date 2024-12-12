@@ -1,13 +1,5 @@
 {% extends '@core/user/student.twig' %}
 
-{% block individualEducationPlan %}
-    {% if isStaff and externalUser.countIndividualEducationPlans > 0 %}
-        <div class="alert-box warning icon-bell">
-            Individual Plan
-        </div>
-    {% endif %}
-{% endblock individualEducationPlan %}
-
 {% block details_gender %}
     {% if externalUser.StudentGender and isStaff %}
         <dt class="small-4 medium-3 columns">Gender:</dt>
