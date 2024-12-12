@@ -41,21 +41,21 @@ const reportStore = useReportStore();
 const coursesStore = useCoursesStore();
 const filtersStore = useFiltersStore();
 const { title } = useNodeTitle(props.node);
-
-const paddingStart = window.Vue.computed(() =>
-    filtersStore.onlyShowGaps ? "0.5rem" : `calc(${props.depth * 0.5}rem + 0.5rem)`,
-); // to gradually add more paddingStart to indicate node level depth
 const hasChildren = window.Vue.ref(Array.isArray(props.node.children) && props.node.children.length > 0);
+const paddingStart = window.Vue.computed(() =>
+    // to gradually add more paddingStart to indicate node level depth
+    filtersStore.onlyShowGaps ? "0.5rem" : `calc(${props.depth * 0.5}rem + 0.5rem)`,
+);
+const lastChildPadding = window.Vue.computed(() =>
+    // to add padding to the last child node to align better with the expand button
+    props.depth !== 0 && !hasChildren.value && !filtersStore.onlyShowGaps ? "2.75rem" : "0",
+);
 
 // #region expand/collapse
 
 const isExpanded = window.Vue.ref(props.depth < 1); // to hide any grandchild and below nodes by default
 const expandTitle = window.Vue.computed(() => (isExpanded.value ? "Collapse" : "Expand"));
-// don't show the expand button when the node has no children, or onlyShowGaps is active
-const showExpandButton = window.Vue.computed(() => hasChildren.value && !filtersStore.onlyShowGaps);
-const lastChildPadding = window.Vue.computed(() =>
-    props.depth !== 0 && !hasChildren.value && !filtersStore.onlyShowGaps ? "2.75rem" : "0",
-); // to add padding to the last child node to align better with the expand button
+const showExpandButton = window.Vue.computed(() => hasChildren.value && !filtersStore.onlyShowGaps); // don't show the expand button when the node has no children, or onlyShowGaps is active
 
 /**
  * To toggle the expanded state of the node
