@@ -78,7 +78,7 @@ function onTotalClicked(): void {
 
 // #region usage counts
 
-const hasNoUsages = window.Vue.computed(() => getTotalCount(props.node, true) === 0);
+// const hasNoUsages = window.Vue.computed(() => getTotalCount(props.node, true) === 0);
 
 // #endregion
 
@@ -175,7 +175,7 @@ function onCourseClicked(buttonEl: HTMLButtonElement): void {
             </button>
         </td>
         <!-- if the node total and its children are completely empty, just hard set to 0 -->
-        <td v-if="hasNoUsages"><b>0</b></td>
+        <td v-if="props.node.hasNoUsages"><b>0</b></td>
         <cc-report-table-node-total-column
             v-else
             :node="props.node"
@@ -185,7 +185,7 @@ function onCourseClicked(buttonEl: HTMLButtonElement): void {
         <!-- loop through each course/unit, retrieving the node usage or returning 0 for undefined usages -->
         <template v-for="course in props.node.usage.courses" :key="course.id">
             <!-- if the node course column and its children are completely empty, just hard set to 0 -->
-            <td v-if="hasNoUsages || getCourseColumnCount(props.node, course, true) === 0">0</td>
+            <td v-if="props.node.hasNoUsages || getCourseColumnCount(props.node, course, true) === 0">0</td>
             <cc-report-table-node-course-column
                 v-else
                 :node="props.node"
@@ -195,7 +195,7 @@ function onCourseClicked(buttonEl: HTMLButtonElement): void {
             />
             <template v-for="unit in course.units" :key="unit.id">
                 <!-- if the node unit column and its children are completely empty, just hard set to 0 -->
-                <td v-if="hasNoUsages || getUnitColumnCount(props.node, course, unit, true) === 0">0</td>
+                <td v-if="props.node.hasNoUsages || getUnitColumnCount(props.node, course, unit, true) === 0">0</td>
                 <cc-report-table-node-unit-column
                     v-else
                     :node="props.node"
@@ -207,7 +207,7 @@ function onCourseClicked(buttonEl: HTMLButtonElement): void {
             </template>
             <template v-if="coursesStore.hasMultipleCourses">
                 <!-- if the node course and its children are completely empty, just hard set to 0 -->
-                <td v-if="hasNoUsages || getCourseCount(props.node, course, true) === 0">0</td>
+                <td v-if="props.node.hasNoUsages || getCourseCount(props.node, course, true) === 0">0</td>
                 <cc-report-table-node-course-total-column
                     v-else
                     :node="props.node"

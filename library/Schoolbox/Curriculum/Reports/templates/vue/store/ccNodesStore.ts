@@ -74,6 +74,15 @@ export const useNodesStore = defineStore("ccNodes", () => {
     }
 
     /**
+     * Set the hasNoUsages property for the nodes
+     */
+    function setHasNoUsages(): void {
+        flattenedNodes.value.forEach((node) => {
+            node.hasNoUsages = getTotalCount(node, true) === 0;
+        });
+    }
+
+    /**
      * Set new nodes
      * @param newNodes - the new nodes to set
      */
@@ -81,6 +90,7 @@ export const useNodesStore = defineStore("ccNodes", () => {
         nodes.value = newNodes;
         setDefaultIsVisible();
         setDefaultIsExpanded();
+        setHasNoUsages();
     }
 
     /**
@@ -116,6 +126,7 @@ export const useNodesStore = defineStore("ccNodes", () => {
         nodes.value = [...nodes.value, ...newNodes];
         setDefaultIsVisible();
         setDefaultIsExpanded();
+        setHasNoUsages();
     }
 
     /**
@@ -167,7 +178,7 @@ export const useNodesStore = defineStore("ccNodes", () => {
                     (node) => getFilteredTotalCount(node, false) === 0,
                 );
                 onlyNodesWithNoUsage.forEach((node, index) => {
-                    node.isVisible = index < 100;
+                    node.isVisible = index < 50;
                 });
             } else {
                 flattenedNodes.value.forEach((node) => {

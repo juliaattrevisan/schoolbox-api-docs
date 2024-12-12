@@ -87,6 +87,7 @@ export type CurriculumCoverageNode = Pick<Node, "id" | "name" | "code"> & {
     isVisible: boolean; // to track if the node is visible in the report
     previousIsVisible: boolean; // to track if the node was visible in the previous report (used when moving between only show gaps toggle)
     isExpanded: boolean; // to track if the node is expanded in the report
+    hasNoUsages: boolean; // to track if the node has no usages
 };
 
 /**
