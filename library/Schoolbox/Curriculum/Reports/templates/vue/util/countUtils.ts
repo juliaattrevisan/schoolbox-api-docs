@@ -75,7 +75,7 @@ export function getCourseColumnCount(
      * When the node has children and is not expanded, we want to show the usage count inclusive of children
      * to show how many usages are linked to the node and its children
      */
-    if (includeChildren && node.children && node.children.length > 0) {
+    if (includeChildren && node.children) {
         const onChildrenCount = node.children.reduce((acc, child) => {
             return acc + getCourseColumnCount(child, getChildCourseUsage(child, course), true);
         }, 0);
@@ -108,7 +108,7 @@ export function getUnitColumnCount(
      * When the node has children and is not expanded, we want to show the usage count inclusive of children
      * to show how many usages are linked to the node and its children
      */
-    if (includeChildren && node.children && node.children.length > 0) {
+    if (includeChildren && node.children) {
         const onChildrenCount = node.children.reduce((acc, child) => {
             return acc + getUnitColumnCount(child, course, getChildUnitUsage(child, course, unit), true);
         }, 0);
@@ -176,7 +176,7 @@ export function getFilteredCourseColumnCount(
      * When the node has children and is not expanded, we want to show the usage count inclusive of children
      * to show how many usages are linked to the node and its children
      */
-    if (includeChildren && node.children && node.children.length > 0) {
+    if (includeChildren && node.children) {
         const onChildrenCount = node.children.reduce((acc, child) => {
             return acc + getFilteredCourseColumnCount(child, getChildCourseUsage(child, course), true);
         }, 0);
@@ -209,7 +209,7 @@ export function getFilteredUnitColumnCount(
      * When the node has children and is not expanded, we want to show the usage count inclusive of children
      * to show how many usages are linked to the node and its children
      */
-    if (includeChildren && node.children && node.children.length > 0) {
+    if (includeChildren && node.children) {
         const onChildrenCount = node.children.reduce((acc, child) => {
             return acc + getFilteredUnitColumnCount(child, course, getChildUnitUsage(child, course, unit), true);
         }, 0);
