@@ -9,11 +9,54 @@ export const useNodesStore = defineStore("ccNodes", () => {
     const nodes = window.Vue.ref<CurriculumCoverageNode[]>([]); // the nodes to display in the report
 
     /**
+     * Flatten the nodes into a single array for faster filtering
+     * @param node - the node to flatten
+     * @param flattenedNodes - the array to add the flattened nodes to
+     * @returns - the flattened nodes
+     */
+    function flattenNodes(
+        node: CurriculumCoverageNode,
+        flattenedNodes: CurriculumCoverageNode[] = [],
+    ): CurriculumCoverageNode[] {
+        flattenedNodes.push(node);
+        if (node.children && node.children.length > 0) {
+            node.children.forEach((child) => {
+                flattenNodes(child, flattenedNodes);
+            });
+        }
+        return flattenedNodes;
+    }
+
+    const flattenedNodes = window.Vue.computed(() => {
+        return nodes.value.reduce((acc, node) => {
+            return [...acc, ...flattenNodes(node)];
+        }, [] as CurriculumCoverageNode[]);
+    });
+
+    /**
+     * Set the default isExpanded property for the nodes, setting the first two levels as visible
+     */
+    function setDefaultIsExpanded(): void {
+        flattenedNodes.value.forEach((node) => {
+            node.isExpanded = false;
+        });
+        nodes.value.forEach((node) => {
+            if (node.children) {
+                node.isExpanded = true;
+                node.children.forEach((child) => {
+                    child.isExpanded = true;
+                });
+            }
+        });
+    }
+
+    /**
      * Set new nodes
      * @param newNodes - the new nodes to set
      */
     function setNodes(newNodes: CurriculumCoverageNode[]): void {
         nodes.value = newNodes;
+        setDefaultIsExpanded();
     }
 
     /**
@@ -61,31 +104,6 @@ export const useNodesStore = defineStore("ccNodes", () => {
             addCourseToChildren(node, newNodes[index]);
         });
     }
-
-    /**
-     * Flatten the nodes into a single array for faster filtering
-     * @param node - the node to flatten
-     * @param flattenedNodes - the array to add the flattened nodes to
-     * @returns - the flattened nodes
-     */
-    function flattenNodes(
-        node: CurriculumCoverageNode,
-        flattenedNodes: CurriculumCoverageNode[] = [],
-    ): CurriculumCoverageNode[] {
-        flattenedNodes.push(node);
-        if (node.children && node.children.length > 0) {
-            node.children.forEach((child) => {
-                flattenNodes(child, flattenedNodes);
-            });
-        }
-        return flattenedNodes;
-    }
-
-    const flattenedNodes = window.Vue.computed(() => {
-        return nodes.value.reduce((acc, node) => {
-            return [...acc, ...flattenNodes(node)];
-        }, [] as CurriculumCoverageNode[]);
-    });
 
     return {
         nodes,
