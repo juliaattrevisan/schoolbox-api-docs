@@ -94,6 +94,10 @@ window.Vue.watch(isDetailsOpen, (isOpen) => {
 </template>
 
 <style scoped>
+.scrollable {
+    max-height: 1400px;
+}
+
 .course-column,
 .unit-column {
     min-width: 175px; /* prevent the course/unit names from getting too small */
