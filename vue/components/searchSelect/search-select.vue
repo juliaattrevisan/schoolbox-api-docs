@@ -196,9 +196,7 @@ function onButtonSelected(): void {
 <template>
     <div ref="searchSelectEl">
         <label :for="props.labelId" :class="`${props.isRequired ? 'required' : ''}`">{{ props.label }}</label>
-        <slot name="meta">
-            <p v-if="props.meta" class="meta">{{ props.meta }}</p>
-        </slot>
+        <slot name="meta"></slot>
         <label v-if="props.hasError" class="error" :for="props.labelId">{{ errorMessage }}</label>
         <ss-selected
             :selected="selected"

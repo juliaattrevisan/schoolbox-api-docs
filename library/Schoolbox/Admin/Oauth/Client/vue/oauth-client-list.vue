@@ -516,11 +516,11 @@ window.Vue.watch(modifySelected, (newSelected) => {
                         @search-response="onSearchResponse"
                     >
                         <template #meta>
-                            <div class="meta">
+                            <p class="meta">
                                 Any client credentials requests (i.e. requests made by the client backend to this
                                 Schoolbox instance, without interaction by an actual user) will be authenticated as this
                                 user; if no user is set here, this client may not use client credentials requests.
-                            </div>
+                            </p>
                         </template>
                     </search-select>
                 </div>
@@ -601,11 +601,11 @@ window.Vue.watch(modifySelected, (newSelected) => {
                         @search-response="onSearchResponse"
                     >
                         <template #meta>
-                            <div class="meta">
+                            <p class="meta">
                                 Any client credentials requests (i.e. requests made by the client backend to this
                                 Schoolbox instance, without interaction by an actual user) will be authenticated as this
                                 user; if no user is set here, this client may not use client credentials requests.
-                            </div>
+                            </p>
                         </template>
                     </search-select>
                 </div>
