@@ -79,6 +79,9 @@ export const useNodesStore = defineStore("ccNodes", () => {
     function setHasNoUsages(): void {
         flattenedNodes.value.forEach((node) => {
             node.hasNoUsages = getTotalCount(node, true) === 0;
+            node.usage.courses.forEach((course) => {
+                course.hasNoUsages = getCourseColumnCount(node, course, true) === 0;
+            });
         });
     }
 

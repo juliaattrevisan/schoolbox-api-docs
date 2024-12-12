@@ -53,6 +53,7 @@ export type CourseWithCurriculumNodeUsage = Pick<Course, "id" | "name"> & {
             count: number;
         };
     };
+    hasNoUsages: boolean; // to track if the course has no usages
 };
 
 /**
