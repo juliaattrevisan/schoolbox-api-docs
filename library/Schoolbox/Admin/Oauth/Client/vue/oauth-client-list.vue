@@ -4,7 +4,6 @@
  * Displays a list of clients, allows adding, modifying, regenerating, and deleting clients.
  */
 
-import debounce from "lodash/debounce";
 import SearchSelect from "@schoolboxVue/components/searchSelect/search-select.vue";
 import { activate, timeout } from "@schoolboxVue/components/toast/sbxToastEvent";
 import RevealModal from "@schoolboxVue/components/reveal-modal.vue";
@@ -13,8 +12,6 @@ import DataLoadError from "@schoolboxVue/components/error/data-load-error.vue";
 import { extractErrorMessage } from "@js/util/sbx/fetchUtils";
 import { getEmptyOAuthClient } from "../js/types/OAuthClient";
 import { ActionType } from "../js/ActionType";
-
-const SEARCH_RESULT_RETRIEVE_DELAY = 350; // The number of milliseconds to wait between the user's input and a search for users.
 
 interface Props {
     getListEndpoint: string; // The endpoint for fetching the list of items.
