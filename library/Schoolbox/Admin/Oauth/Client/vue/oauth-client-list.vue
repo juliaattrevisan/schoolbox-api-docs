@@ -34,6 +34,7 @@ const currentAction = window.Vue.ref<ActionType>(ActionType.ADD);
 const modalEl = window.Vue.ref<typeof RevealModal | null>(null);
 const hasNoName = window.Vue.ref(false);
 const hasNoRedirect = window.Vue.ref(false);
+const addSelected = window.Vue.ref<Result[]>([]);
 
 /**
  * Fetch the current list of clients from the server.
@@ -56,6 +57,7 @@ function showAddModal(): void {
     saveError.value = null;
     addingClient.value = getEmptyOAuthClient();
     currentAction.value = ActionType.ADD;
+    addSelected.value = [];
     if (modalEl.value) {
         // eslint-disable-next-line @typescript-eslint/no-unsafe-call -- RevealModal is untyped
         modalEl.value.open();
@@ -354,8 +356,6 @@ function onSearchResponse(json: unknown): void {
         });
     }
 }
-
-const addSelected = window.Vue.ref<Result[]>([]);
 
 /**
  * Watch addSelected so the clientCredentialsUser object can be set

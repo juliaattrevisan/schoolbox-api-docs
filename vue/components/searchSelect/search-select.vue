@@ -90,7 +90,6 @@ function onSearchSuccess(json: unknown): void {
 const { query, isActive, isSearching, hasNoResults, hasError } = useQuerySearch(
     props.endpoint,
     props.queryKey,
-    props.meta,
     results,
     onSearchSuccess,
 ); // to search for results
