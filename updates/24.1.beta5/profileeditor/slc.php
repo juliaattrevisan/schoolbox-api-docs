@@ -125,6 +125,21 @@ HELP;
 
         $this->helper->updateField(Role::STAFF, 'SchoolStaffCode', $campusIds, $roletypes);
 
+        /* Re-enable this field if it hasn't already been enabled
+         */
+        $this->getLogger()->info('Re-enabling Staff Code');
+
+        $this->getDatabaseInternal()->executeQuery("
+            UPDATE profile_field
+            SET enabled = 1
+            WHERE roletype = :roletype
+            AND field = :field
+            LIMIT 1            
+        ", [
+            'roletype' => Role::STAFF,
+            'field' => 'SchoolStaffCode',
+        ]);
+
         /* Rename FormTeacher to Mentor
          */
         $this->renameField();
@@ -144,7 +159,7 @@ HELP;
      */
     private function renameField(): void
     {
-        $this->getLogger()->debug('Renaming "Class Teacher" to "Mentor"');
+        $this->getLogger()->info('Renaming "Class Teacher" to "Mentor"');
 
         $this->getDatabaseInternal()->executeQuery("
             UPDATE localisation
