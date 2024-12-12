@@ -310,4 +310,11 @@ OPTIONS
 
 HELP;
     }
+
+    /** @inheritDoc */
+    public function runAsRoot(): ?bool
+    {
+        // can be either root or not, there are no log files to write to, or changes to files
+        return null;
+    }
 }
