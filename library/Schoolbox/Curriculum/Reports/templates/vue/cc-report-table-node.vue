@@ -179,7 +179,7 @@ function onCourseClicked(buttonEl: HTMLButtonElement): void {
         <!-- loop through each course/unit, retrieving the node usage or returning 0 for undefined usages -->
         <template v-for="course in props.node.usage.courses" :key="course.id">
             <!-- if the node course column and its children are completely empty, just hard set to 0 -->
-            <td v-if="props.node.hasNoUsages || course.hasNoUsages">0</td>
+            <td v-if="props.node.hasNoUsages || course.hasNoCourseUsages">0</td>
             <cc-report-table-node-course-column
                 v-else
                 :node="props.node"
