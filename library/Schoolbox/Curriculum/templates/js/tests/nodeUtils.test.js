@@ -93,6 +93,6 @@ describe("includeChildren()", () => {
             ],
         };
         const selectedNodes = [node, ...includeChildren(node.children)];
-        expect(selectedNodes).toHaveLength(2);
+        expect(selectedNodes).toHaveLength(3);
     });
 });

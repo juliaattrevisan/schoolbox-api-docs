@@ -149,6 +149,24 @@ export function removeId(children: Node[], id: number): Node[] {
 }
 
 /**
+ * Get all enabled children
+ * @param childNodes - the node.children to get all children of
+ * @returns - all included, enabled children
+ */
+function getAllEnabledChildren(childNodes: Node[] | null): Node[] {
+    if (childNodes === undefined || childNodes === null) {
+        // ensure we have children
+        return [];
+    }
+    const enabledChildren = childNodes.filter((child) => child.enabled); // only include enabled children
+    let children = [...enabledChildren];
+    children.forEach((child) => {
+        children = [...children, ...getAllEnabledChildren(child.children)];
+    });
+    return children;
+}
+
+/**
  * Include all children
  * @param childNodes - the node.children to get all children of
  * @returns - all included children
@@ -158,13 +176,8 @@ export function includeChildren(childNodes: Node[] | null): Node[] {
         // ensure we have children
         return [];
     }
-    const childrenWithCodes = childNodes.filter((child) => child.code && child.code !== ""); // only include children with codes
-    const enabledChildren = childrenWithCodes.filter((child) => child.enabled); // only include enabled children
-    let children = [...enabledChildren];
-    children.forEach((child) => {
-        children = [...children, ...includeChildren(child.children)];
-    });
-    return children;
+    const enabledChildren = [...getAllEnabledChildren(childNodes)]; // get all enabled children
+    return enabledChildren.filter((child) => child.code && child.code !== ""); // then only include children with codes
 }
 
 /**
