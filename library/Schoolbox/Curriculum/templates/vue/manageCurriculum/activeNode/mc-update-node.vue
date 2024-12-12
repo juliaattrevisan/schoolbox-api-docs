@@ -135,6 +135,7 @@ function onCancelSelected(): void {
                         <ul class="flex-list">
                             <li>
                                 <button
+                                    type="button"
                                     class="button icon-close"
                                     :disabled="updateNodeStore.isProcessing"
                                     @click.prevent="onCancelSelected"
@@ -145,6 +146,7 @@ function onCancelSelected(): void {
                             <li>
                                 <button
                                     ref="updateButton"
+                                    type="submit"
                                     class="button icon-modify submit"
                                     data-test-update-node
                                     :data-submit-button-for="ckeditorIdAttr"

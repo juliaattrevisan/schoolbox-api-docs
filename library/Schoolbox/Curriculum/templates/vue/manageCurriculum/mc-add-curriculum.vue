@@ -117,8 +117,9 @@ function onCancelSelected(): void {
                             <ul class="flex-list">
                                 <li>
                                     <button
-                                        :disabled="addCurriculumStore.isProcessing"
+                                        type="button"
                                         class="button icon-close"
+                                        :disabled="addCurriculumStore.isProcessing"
                                         @click.prevent="onCancelSelected"
                                     >
                                         Cancel
@@ -127,6 +128,7 @@ function onCancelSelected(): void {
                                 <li>
                                     <button
                                         ref="addButton"
+                                        type="submit"
                                         class="button icon-add submit"
                                         data-test-add-curriculum
                                         :data-submit-button-for="ckeditorIdAttr"
