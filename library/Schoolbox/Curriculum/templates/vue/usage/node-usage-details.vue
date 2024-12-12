@@ -16,7 +16,6 @@ interface Props {
     depth: number; // to gradually add more marginLeft to indicate node level depth
     isProcessing: boolean; // whether we are currently loading the node usage
     hasLoadError: boolean; // whether there was an error loading the node usage
-    showCourses: boolean; // whether to show the courses
 }
 
 const props = defineProps<Props>();
@@ -58,7 +57,7 @@ type ActiveUsageType = {
  */
 const activeUsages = window.Vue.computed(() => {
     const usages: ActiveUsageType[] = [];
-    if (props.node._usageCounts.course > 0 && props.showCourses) {
+    if (props.node._usageCounts.course > 0) {
         usages.push({
             title: "Courses",
             count: props.node._usageCounts.course,

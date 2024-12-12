@@ -52,7 +52,6 @@ function onDetailModalClosed(): void {
             :depth="props.depth"
             :is-processing="nodeUsageStore.isProcessing"
             :has-load-error="nodeUsageStore.hasLoadError"
-            :show-courses="true"
             @select="onUsageSelected"
         />
         <badge-modal :is-open="isBadgeModalOpen" :badge="currentBadge" @closed="onDetailModalClosed" />

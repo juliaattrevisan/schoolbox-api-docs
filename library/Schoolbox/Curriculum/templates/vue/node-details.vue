@@ -145,7 +145,6 @@ window.Vue.onMounted(() => {
             :depth="0"
             :is-processing="isLoading"
             :has-load-error="hasLoadError"
-            :show-courses="false"
         />
     </div>
 </template>
