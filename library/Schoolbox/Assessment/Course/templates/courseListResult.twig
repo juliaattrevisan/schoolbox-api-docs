@@ -124,9 +124,12 @@ Usage:
         {% if unitPlannerUrl %}
             <li><a href="{{ unitPlannerUrl }}" class="icon-project">Unit Planner</a></li>
         {% endif %}
+        {% set curriculumCoverageUrl = routeLookupIfAuthorized('curriculumreports.getCoverage') %}
+        {% if curriculumCoverageUrl %}
         <li>
             <a href="/curriculum/reports/coverage?courseId={{ courseSpec.id }}" class="icon-report">Curriculum Coverage</a>
         </li>
+        {% endif %}
         {% if folderAccess[courseSpec.folder.id] ?? false %}
             {% set modifyCourseUrl = routeLookupIfAuthorized('course.modifyCourse', {id: courseSpec.id, course: courseSpec }) %}
             {% if modifyCourseUrl %}

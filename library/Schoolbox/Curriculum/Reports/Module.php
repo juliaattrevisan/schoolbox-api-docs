@@ -15,6 +15,7 @@ use Alaress\Module\Module as BaseModule;
 use Alaress\Twig\Loader\IChainLoader;
 use Alaress\Web\Controller\Base;
 use Schoolbox\Permission\Access\Access;
+use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Role;
 use Schoolbox\Curriculum\Node\Mapper as CurriculumMapper;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Mapper as CourseUnitSpecificationMapper;
@@ -41,7 +42,11 @@ class Module extends BaseModule
          */
         $staffPerms = new Rule\All(
             new Rule\IsLoggedIn(),
-            new Rule\HasRole(Role::STAFF)
+            new Rule\Any(
+                new Rule\IsSuperuser(),
+                new Rule\HasRole(Role::STAFF),
+                new Rule\HasServicePermission(UserAccess::SERVICE_LMS, UserAccess::ACCESS_FULL)
+            )
         );
 
         $this->register('GET', '/coverage', 'getCoverage', $staffPerms);

@@ -8,6 +8,8 @@
         :units="{{ units |json_encode }}"
         :lti-assessments-enabled="{{ config.lti_assessments_enable ? 'true' : 'false' }}"
         :template="{{ template |json_encode }}"
+        {% set routeCurriculumReport = routeLookupIfAuthorized('curriculumreports.getCoverage') %}
+        :route-curriculum-coverage="{{ routeCurriculumReport ? (routeCurriculumReport|json_encode) : 'null' }}"
     ></unit-planner>
 </div>
 <script>

@@ -17,31 +17,29 @@ import McEnableNodes from "./selectedNodes/mc-enable-nodes.vue";
 import McDeleteNodes from "./selectedNodes/mc-delete-nodes.vue";
 import SelectedNodeModal from "../selected-node-modal.vue";
 
-const props = defineProps({
+interface Props {
     /**
      * the endpoint to retrieve all the group data from
      */
-    dataEndpoint: {
-        type: String,
-        required: true,
-        default: "",
-    },
+    dataEndpoint: string;
     /**
      * can only view the currently selected codes, not edit them
      */
-    isReadOnly: {
-        type: Boolean,
-        required: true,
-        default: true,
-    },
+    isReadOnly: boolean;
     /**
      * number of nodes to retrieve from the endpoint
      */
-    uiLimit: {
-        type: Number,
-        required: true,
-        default: 0,
-    },
+    uiLimit: number;
+    /**
+     * route for the curriculum coverage report
+     */
+    routeCurriculumCoverage: string | null;
+}
+
+const props = withDefaults(defineProps<Props>(), {
+    dataEndpoint: "",
+    isReadOnly: true,
+    uiLimit: 0,
 });
 
 const store = useStore();
@@ -93,7 +91,7 @@ function onSelectedNodeModalClosed(): void {
 </script>
 
 <template>
-    <mc-header />
+    <mc-header :route-curriculum-coverage="props.routeCurriculumCoverage" />
     <mc-view />
     <mc-selected-nodes />
     <mc-enable-nodes />
