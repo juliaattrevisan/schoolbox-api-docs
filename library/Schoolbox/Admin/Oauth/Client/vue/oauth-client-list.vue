@@ -35,7 +35,8 @@ const currentAction = window.Vue.ref<ActionType>(ActionType.ADD);
 const modalEl = window.Vue.ref<typeof RevealModal | null>(null);
 const hasNoName = window.Vue.ref(false);
 const hasNoRedirect = window.Vue.ref(false);
-const addSelected = window.Vue.ref<Result[]>([]);
+const addSelected = window.Vue.ref<Result[]>([]); // to add the selected Client Credentials User
+const modifySelected = window.Vue.ref<Result[]>([]); // to modify the selected Client Credentials User
 
 /**
  * Fetch the current list of clients from the server.
@@ -332,8 +333,6 @@ window.Vue.watch(addSelected, (newSelected) => {
         addingClient.value.clientCredentialsUser = null;
     }
 });
-
-const modifySelected = window.Vue.ref<Result[]>([]);
 
 /**
  * Watch modifyingClient so we can pass the current clientCredentialsUser
