@@ -60,12 +60,11 @@ class ManageCurriculumCest
         $i->amGoingTo('ensure the add button is disabled until I add a name');
         $addNew->seeAddButtonIsDisabled();
         $addNew->fillName('Party Town');
-        $addNew->fillCode('PT');
         $addNew->clickAddButton();
         $i->amGoingTo('ensure the toast message is shown');
         $i->canSee('Curriculum successfully added');
         $i->amGoingTo('ensure I can see the new curriculum');
-        $i->canSee('[PT] Party Town');
+        $i->canSee('Party Town');
     }
 
     /**
@@ -161,13 +160,12 @@ class ManageCurriculumCest
         $updateNode = new UpdateNode($i);
         $updateNode->clickDisplay('Year 9 History');
         $updateNode->fillName('Year 9 Ancient History');
-        $updateNode->fillCode('9AH');
         $updateNode->fillDescription('1', 'Here we will focus mainly on the Romans, Egyptians and Babylonians');
         $updateNode->clickUpdateButton();
         $i->amGoingTo('ensure the toast message is shown');
         $i->canSee('Outcome successfully updated');
         $i->amGoingTo('ensure the updated node displays correctly');
-        $i->canSee('[9AH] Year 9 Ancient History');
+        $i->canSee('Year 9 Ancient History');
     }
 
     /**
@@ -211,9 +209,9 @@ class ManageCurriculumCest
         $i->reloadPage();
         $expectedOrder = array(
             'Year 4 History',
-            '[9AH] Year 9 Ancient History',
-            '[PT] Party Town',
             'English',
+            'Party Town',
+            'Year 9 Ancient History',
             'Years 9 and 10 French'
         );
         $i->amGoingTo('loop through the Curricula children, ensuring the correct order');

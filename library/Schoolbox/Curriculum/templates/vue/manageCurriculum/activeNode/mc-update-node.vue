@@ -36,6 +36,8 @@ const ckeditorIdAttr = window.Vue.computed(() => `description-${activeNodeStore.
 
 const isMaxCharCountExceeded = window.Vue.ref<boolean>(false);
 
+const showCodeField = window.Vue.computed(() => activeNodeStore.node.parent !== null); // only show code field if it's not a root node
+
 /**
  * To update the button text as the component state changes.
  * @returns { string }
@@ -123,7 +125,7 @@ function onCancelSelected(): void {
                             type="text"
                         />
                     </div>
-                    <div class="small-12 columns">
+                    <div v-if="showCodeField" class="small-12 columns">
                         <label for="code">Code</label>
                         <input id="code" v-model="updateNodeStore.activeNodeCopy.code" type="text" maxlength="64" />
                     </div>

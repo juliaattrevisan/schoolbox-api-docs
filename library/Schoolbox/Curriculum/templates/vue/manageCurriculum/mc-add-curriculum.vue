@@ -1,6 +1,6 @@
 <script setup lang="ts">
 /**
- * to show further info in a modal on a code that's been selected
+ * To add a new root curriculum node
  */
 
 import * as toast from "@schoolboxVue/components/toast/sbxToastEvent";
@@ -104,10 +104,6 @@ function onCancelSelected(): void {
                                 required
                                 type="text"
                             />
-                        </div>
-                        <div class="small-12 columns">
-                            <label for="code">Code</label>
-                            <input id="code" v-model="addCurriculumStore.curriculum.code" type="text" maxlength="64" />
                         </div>
                         <div class="small-12 columns">
                             <label for="description">Description</label>
