@@ -1,8 +1,0 @@
-{% extends '@core/user/student.twig' %}
-                                    {% block details_studiesCode %}
-                                        {% if not USER.role.parent and (externalUser.StudentStudiesCode ?? false) %}
-                                            <dt class="no-margin small-6 medium-3">{{ locale.studies_code.proper }}:
-                                            </dt>
-                                            <dd class="no-margin small-6 medium-9">{{ externalUser.StudentStudiesCode }}</dd>
-                                        {% endif %}
-                                    {% endblock details_studiesCode %}
