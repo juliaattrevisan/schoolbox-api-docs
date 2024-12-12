@@ -98,6 +98,13 @@ window.Vue.watch(isDetailsOpen, (isOpen) => {
     max-height: 1400px;
 }
 
+thead {
+    /** fix the head to stay at the top when scrolling */
+    position: sticky;
+    top: 0;
+    z-index: var(--sbx-depth-ui-sticky);
+}
+
 .course-column,
 .unit-column {
     min-width: 175px; /* prevent the course/unit names from getting too small */
