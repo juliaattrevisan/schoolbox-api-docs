@@ -3,9 +3,11 @@
  */
 
 import { defineStore } from "pinia";
+import { useFiltersStore } from "./ccFiltersStore";
 import type { CurriculumCoverageNode } from "../../js/types/curriculumCoverageTypes";
 
 export const useNodesStore = defineStore("ccNodes", () => {
+    const filtersStore = useFiltersStore();
     const nodes = window.Vue.ref<CurriculumCoverageNode[]>([]); // the nodes to display in the report
 
     /**
@@ -139,6 +141,25 @@ export const useNodesStore = defineStore("ccNodes", () => {
             });
         }
     }
+
+    /**
+     * Watch the onlyShowGaps filter and update the nodes visibility accordingly
+     */
+    window.Vue.watch(
+        () => filtersStore.onlyShowGaps,
+        () => {
+            if (filtersStore.onlyShowGaps) {
+                flattenedNodes.value.forEach((node) => {
+                    node.previousIsVisible = node.isVisible;
+                    node.isVisible = node.usage.courses.length === 0;
+                });
+            } else {
+                flattenedNodes.value.forEach((node) => {
+                    node.isVisible = node.previousIsVisible;
+                });
+            }
+        },
+    );
 
     return {
         nodes,
