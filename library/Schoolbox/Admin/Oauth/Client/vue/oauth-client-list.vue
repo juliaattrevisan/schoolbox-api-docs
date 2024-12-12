@@ -4,32 +4,15 @@
  * Displays a list of clients, allows adding, modifying, regenerating, and deleting clients.
  */
 
-import debounce from "lodash/debounce";
-import vSelect from "vue-select";
-import "vue-select/dist/vue-select.css";
+import SearchSelect from "@schoolboxVue/components/searchSelect/search-select.vue";
 import { activate, timeout } from "@schoolboxVue/components/toast/sbxToastEvent";
 import RevealModal from "@schoolboxVue/components/reveal-modal.vue";
 import LoadingTable from "@schoolboxVue/components/loading/loading-table.vue";
 import DataLoadError from "@schoolboxVue/components/error/data-load-error.vue";
-import Deselect from "@schoolboxVue/components/selectize/Deselect.vue";
 import { extractErrorMessage } from "@js/util/sbx/fetchUtils";
 import { getEmptyOAuthClient } from "../js/types/OAuthClient";
 import { ActionType } from "../js/ActionType";
-import type { OAuthClient } from "../js/types/OAuthClient";
-
-// @ts-expect-error - This is expected as per https://vue-select.org/guide/components.html#vue-3x
-vSelect.props.components.default = (): void => ({ Deselect });
-
-type VueSelectData = {
-    // the loaded user search results
-    data: VueSelectOption[];
-};
-type VueSelectOption = {
-    // The type of the options for the user search (what selectize is expecting)
-    fullName: string;
-};
-
-const SEARCH_RESULT_RETRIEVE_DELAY = 350; // The number of milliseconds to wait between the user's input and a search for users.
+import type { OAuthClient, OAuthClientCredentialsUser } from "../js/types/OAuthClient";
 
 interface Props {
     getListEndpoint: string; // The endpoint for fetching the list of items.
@@ -46,13 +29,14 @@ const addingClient = window.Vue.ref<OAuthClient>(getEmptyOAuthClient());
 const modifyingClient = window.Vue.ref<OAuthClient>(getEmptyOAuthClient());
 const regeneratingClient = window.Vue.ref<OAuthClient>(getEmptyOAuthClient());
 const deletingClient = window.Vue.ref<OAuthClient>(getEmptyOAuthClient());
-const searchUsers = window.Vue.ref<VueSelectOption[]>([]);
 const saveError = window.Vue.ref<string | null>(null);
 const userSearchAdditionalParams = { filter: JSON.stringify({ roleType: "staff" }) };
 const currentAction = window.Vue.ref<ActionType>(ActionType.ADD);
 const modalEl = window.Vue.ref<typeof RevealModal | null>(null);
 const hasNoName = window.Vue.ref(false);
 const hasNoRedirect = window.Vue.ref(false);
+const addSelected = window.Vue.ref<Result[]>([]); // to add the selected Client Credentials User
+const modifySelected = window.Vue.ref<Result[]>([]); // to modify the selected Client Credentials User
 
 /**
  * Fetch the current list of clients from the server.
@@ -75,6 +59,7 @@ function showAddModal(): void {
     saveError.value = null;
     addingClient.value = getEmptyOAuthClient();
     currentAction.value = ActionType.ADD;
+    addSelected.value = [];
     if (modalEl.value) {
         // eslint-disable-next-line @typescript-eslint/no-unsafe-call -- RevealModal is untyped
         modalEl.value.open();
@@ -299,37 +284,82 @@ async function deleteClient(client: OAuthClient): Promise<void> {
 }
 
 /**
- * Search callback for the user selectize.
- * This method is debounced so that the search doesn't trigger until
- * the user has stopped typing for `SEARCH_RESULT_RETRIEVE_DELAY` milliseconds.
- * @param {string} query -The search string
- * @param {Function} loading - A function to call when the loading state changes (accepts a Boolean)
- */
-const onUserSearch = debounce((query: string, loading: (isLoading: boolean) => void) => {
-    if (query.length < 3) {
-        return;
-    }
-    loading(true);
-    const searchUrl = new URL(props.userSearchEndpoint, window.location.href);
-    searchUrl.search = new URLSearchParams(Object.assign(userSearchAdditionalParams, { search: query })).toString();
-    fetch(searchUrl)
-        .then((response) => response.json())
-        .then((jsonResponse) => {
-            searchUsers.value = (jsonResponse as VueSelectData).data as { fullName: string }[];
-        })
-        .catch(() => {
-            timeout({ text: "An unexpected error occurred", isSuccess: false });
-        })
-        .finally(() => {
-            loading(false);
-        });
-}, SEARCH_RESULT_RETRIEVE_DELAY);
-
-/**
  * Load the oauth client config list
  */
 window.Vue.onMounted(() => {
     void getData();
+});
+
+/**
+ * Get the endpoint for the user search
+ * @returns - The endpoint for the user search
+ */
+function getEndpoint(): string {
+    const searchUrl = new URL(props.userSearchEndpoint, window.location.href).toString();
+    const searchParams = new URLSearchParams(userSearchAdditionalParams).toString();
+    return `${searchUrl}?${searchParams}&`;
+}
+
+type Result = OAuthClientCredentialsUser & {
+    name: string;
+};
+
+const results = window.Vue.ref<Result[]>([]);
+
+/**
+ * To handle the search response to update the name to the full name
+ * @param json - the returned json
+ */
+function onSearchResponse(json: unknown): void {
+    if (typeof json === "object" && json !== null && "data" in json) {
+        const newResults = json.data as Result[];
+        results.value = newResults.map((result) => {
+            return {
+                ...result,
+                id: result.id,
+                name: result.fullName,
+            };
+        });
+    }
+}
+
+/**
+ * Watch addSelected so the clientCredentialsUser object can be set
+ */
+window.Vue.watch(addSelected, (newSelected) => {
+    if (newSelected.length > 0) {
+        [addingClient.value.clientCredentialsUser] = newSelected;
+    } else {
+        addingClient.value.clientCredentialsUser = null;
+    }
+});
+
+/**
+ * Watch modifyingClient so we can pass the current clientCredentialsUser
+ * object to the search-select component
+ */
+window.Vue.watch(modifyingClient, (newModifyClient) => {
+    if (newModifyClient.clientCredentialsUser) {
+        modifySelected.value = [
+            {
+                ...newModifyClient.clientCredentialsUser,
+                name: newModifyClient.clientCredentialsUser?.fullName,
+            },
+        ];
+    } else {
+        modifySelected.value = [];
+    }
+});
+
+/**
+ * Watch modifyingClient so the clientCredentialsUser object can be set
+ */
+window.Vue.watch(modifySelected, (newSelected) => {
+    if (newSelected.length > 0) {
+        [modifyingClient.value.clientCredentialsUser] = newSelected;
+    } else {
+        modifyingClient.value.clientCredentialsUser = null;
+    }
 });
 </script>
 
@@ -434,31 +464,26 @@ window.Vue.onMounted(() => {
                     <input id="modifyItem-addClient" v-model="addingClient.backChannelLogoutUri" />
                 </div>
                 <div class="f-no-margins">
-                    <label for="addClient-clientCredentialsUser">Client Credentials User</label>
-                    <p class="meta">
-                        Any client credentials requests (i.e. requests made by the client backend to this Schoolbox
-                        instance, without interaction by an actual user) will be authenticated as this user; if no user
-                        is set here, this client may not use client credentials requests.
-                    </p>
-                    <v-select
-                        v-model="addingClient.clientCredentialsUser"
-                        label="fullName"
-                        placeholder="Search for user, or leave empty for no user"
-                        input-id="addClient-clientCredentialsUser"
-                        :options="searchUsers"
-                        class="schoolbox-vue-selectize"
-                        :clear-search-on-blur="() => true"
-                        :clear-search-on-select="true"
-                        :close-on-select="true"
-                        @search="onUserSearch"
+                    <search-select
+                        v-model:selected="addSelected"
+                        v-model:results="results"
+                        label="Client Credentials User"
+                        label-id="creator"
+                        :endpoint="getEndpoint()"
+                        query-key="search"
+                        :is-single-select="true"
+                        placeholder="Search for users..."
+                        :manage-search-response="true"
+                        @search-response="onSearchResponse"
                     >
-                        <template #option="option">
-                            <span class="d-center">{{ (option as VueSelectOption).fullName }}</span>
+                        <template #meta>
+                            <p class="meta">
+                                Any client credentials requests (i.e. requests made by the client backend to this
+                                Schoolbox instance, without interaction by an actual user) will be authenticated as this
+                                user; if no user is set here, this client may not use client credentials requests.
+                            </p>
                         </template>
-                        <template #selected-option="option">
-                            <span class="selected d-center">{{ (option as VueSelectOption).fullName }}</span>
-                        </template>
-                    </v-select>
+                    </search-select>
                 </div>
             </div>
             <div class="component-action">
@@ -524,31 +549,26 @@ window.Vue.onMounted(() => {
                     <input id="modifyItem-backChannelLogoutUri" v-model="modifyingClient.backChannelLogoutUri" />
                 </div>
                 <div class="f-no-margins">
-                    <label for="modifyItem-clientCredentialsUser">Client Credentials User</label>
-                    <p class="meta">
-                        Any client credentials requests (i.e. requests made by the client backend to this Schoolbox
-                        instance, without interaction by an actual user) will be authenticated as this user; if no user
-                        is set here, this client may not use client credentials requests.
-                    </p>
-                    <v-select
-                        v-model="modifyingClient.clientCredentialsUser"
-                        label="fullName"
-                        placeholder="Search for user, or leave empty for no user"
-                        input-id="modifyItem-clientCredentialsUser"
-                        :options="searchUsers"
-                        class="schoolbox-vue-selectize"
-                        :clear-search-on-blur="() => true"
-                        :clear-search-on-select="true"
-                        :close-on-select="true"
-                        @search="onUserSearch"
+                    <search-select
+                        v-model:selected="modifySelected"
+                        v-model:results="results"
+                        label="Client Credentials User"
+                        label-id="creator"
+                        :endpoint="getEndpoint()"
+                        query-key="search"
+                        :is-single-select="true"
+                        placeholder="Search for users..."
+                        :manage-search-response="true"
+                        @search-response="onSearchResponse"
                     >
-                        <template #option="option">
-                            <span class="d-center">{{ (option as VueSelectOption).fullName }}</span>
+                        <template #meta>
+                            <p class="meta">
+                                Any client credentials requests (i.e. requests made by the client backend to this
+                                Schoolbox instance, without interaction by an actual user) will be authenticated as this
+                                user; if no user is set here, this client may not use client credentials requests.
+                            </p>
                         </template>
-                        <template #selected-option="option">
-                            <span class="selected d-center">{{ (option as VueSelectOption).fullName }}</span>
-                        </template>
-                    </v-select>
+                    </search-select>
                 </div>
             </div>
             <div class="component-action">

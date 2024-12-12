@@ -17,6 +17,7 @@ interface Props {
     label: string; // the label text
     labelId: string; // the label id
     endpoint: string; // the search api endpoint, expects an endpoint without a `query` parameter, which will be added via useQuerySearch
+    queryKey?: string; // the key to use for seaech
     manageSearchResponse?: boolean; // whether to manage the response internally, or dispatch an emit to manage it externally
     isRequired?: boolean; // whether the input requires a value
     defaultResults?: SearchSelectItem[]; // show selection options when the search input is empty
@@ -39,6 +40,7 @@ const props = withDefaults(defineProps<Props>(), {
     errorMessage: "This field is required",
     buttonIcon: "",
     buttonTitle: "Browse",
+    queryKey: "query",
 });
 
 const emit = defineEmits<{
@@ -87,6 +89,7 @@ function onSearchSuccess(json: unknown): void {
 }
 const { query, isActive, isSearching, hasNoResults, hasError } = useQuerySearch(
     props.endpoint,
+    props.queryKey,
     results,
     onSearchSuccess,
 ); // to search for results
@@ -190,6 +193,7 @@ function onButtonSelected(): void {
 <template>
     <div ref="searchSelectEl">
         <label :for="props.labelId" :class="`${props.isRequired ? 'required' : ''}`">{{ props.label }}</label>
+        <slot name="meta"></slot>
         <label v-if="props.hasError" class="error" :for="props.labelId">{{ errorMessage }}</label>
         <ss-selected
             :selected="selected"

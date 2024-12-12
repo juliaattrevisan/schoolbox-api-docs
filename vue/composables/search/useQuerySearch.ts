@@ -14,6 +14,7 @@ export const DEBOUNCE_AMOUNT = 350; // the amount in ms to hold off on searching
 /**
  * search for results that match the current query
  * @param endpoint - the endpoint to search for results
+ * @param queryKey - the key to use for search something
  * @param results - a reference to the results list
  * @param onSuccess - a callback to run when the search is successful
  * @param requiresQuery - whether the search requires a query to be active
@@ -21,6 +22,7 @@ export const DEBOUNCE_AMOUNT = 350; // the amount in ms to hold off on searching
  */
 export function useQuerySearch(
     endpoint: string,
+    queryKey: string,
     results: Ref<SearchSelectItem[]>,
     onSuccess: (json: unknown, isActive: boolean) => void,
     requiresQuery: boolean = true,
@@ -42,9 +44,9 @@ export function useQuerySearch(
         // check if we need to append ? to the endpoint
         const lastCharacter = endpoint[endpoint.length - 1];
         if (lastCharacter === "?" || lastCharacter === "&") {
-            return `${endpoint}query=${query.value}`;
+            return `${endpoint}${queryKey}=${query.value}`;
         }
-        return `${endpoint}?query=${query.value}`;
+        return `${endpoint}?${queryKey}=${query.value}`;
     });
     const hasSearched = window.Vue.ref(false); // to show that a search has been made
     const hasNoResults = window.Vue.computed(() => isActive.value && results.value.length === 0 && !isSearching.value); // To show that no results match the current search
