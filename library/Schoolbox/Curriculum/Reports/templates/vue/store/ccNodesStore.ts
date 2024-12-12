@@ -114,6 +114,8 @@ export const useNodesStore = defineStore("ccNodes", () => {
      */
     function setMoreNodes(newNodes: CurriculumCoverageNode[]): void {
         nodes.value = [...nodes.value, ...newNodes];
+        setDefaultIsVisible();
+        setDefaultIsExpanded();
     }
 
     /**
