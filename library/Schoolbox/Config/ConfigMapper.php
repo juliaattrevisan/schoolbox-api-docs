@@ -212,6 +212,8 @@ class ConfigMapper extends Mapper
     public const NAME_GOOGLEAPPS_CLIENT_ID   = 'googleapps_client_id';
     public const NAME_MAX_FILE_SIZE = 'max_file_size';
 
+    public const NAME_RUBRIC_MAX_LEVELS = 'rubric_max_levels';
+
     public const NAME_LMS_SEB_ENABLED = 'lms_seb_enable';
 
     public const NAME_INTELLISCHOOL_JWT_PRIVATE_KEY                   = 'intellischool_jwt_private_key';

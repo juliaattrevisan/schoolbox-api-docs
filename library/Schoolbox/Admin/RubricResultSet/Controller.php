@@ -12,16 +12,13 @@ namespace Schoolbox\Admin\RubricResultSet;
 use Alaress\Web\Controller\Base;
 use Aura\Router\Exception\RouteNotFound;
 use Schoolbox\Admin\Navigation\Subnav;
+use Schoolbox\Config\ConfigMapper;
 
 /**
  * RubricResultSet controller class.
  */
 class Controller extends Base
 {
-    // The number of rows corresponds to the number of levels in a rubric grid.
-    // Our ui limits it arbitrarily to 11, despite the schema design permitting you to have more than that.
-    public const MAX_ROWS_PER_RESULT_SET = 11;
-
     // This limit has been arbitrarily chosen.  The database schema allows many more characters, but rubric result
     // labels should only be a few words, so a sensible limit is enforced at the client and server sides.
     public const MAX_CHARS_PER_LABEL = 64;
@@ -100,7 +97,8 @@ class Controller extends Base
             '@adminRubricResultSet/create.twig',
             [
                 'maxCharsPerLabel'    => self::MAX_CHARS_PER_LABEL,
-                'maxRowsPerResultSet' => self::MAX_ROWS_PER_RESULT_SET,
+                // The number of rows corresponds to the number of levels in a rubric grid
+                'maxRowsPerResultSet' => $this->getConfigLoader()->get(ConfigMapper::NAME_RUBRIC_MAX_LEVELS),
                 'pageCurrent'         => $this->routeGenerator->generate('adminRubricResultSet.getList'),
                 'resultSetId'         => $resultSetId,
                 'rubricResultRows'    => (($resultSetId === null) ? [] : $this->mapper->findRows($resultSetId)),
@@ -124,9 +122,9 @@ class Controller extends Base
         $indexedLabels = [];
 
         foreach ($postedData['rubricResultLabels'] as $value => $label) {
-            // The client should not send more than self::MAX_ROWS_PER_RESULT_SET to be saved.
+            // The client should not send more than RUBRIC_MAX_LEVELS to be saved.
             // In any case, we apply this limit at the server, and if it is surpassed we just ignore the excess rows.
-            if (count($indexedLabels) < self::MAX_ROWS_PER_RESULT_SET) {
+            if (count($indexedLabels) < $this->getConfigLoader()->get(ConfigMapper::NAME_RUBRIC_MAX_LEVELS)) {
                 $indexedLabels[$value] = $label;
             }
         }
