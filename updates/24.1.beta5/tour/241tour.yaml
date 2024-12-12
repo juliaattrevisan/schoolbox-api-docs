@@ -27,7 +27,7 @@ tour:
     - step:
         title: What's New
         type: modal
-        content: "<img src='{CDN_PREFIX}/images/tour/24.1/2_curriculum_coverage_report.png' style='width:100%;margin-bottom:16px;'>
+        content: "<img src='{CDN_PREFIX}/images/tour/24.1/3_curriculum_coverage_report.png' style='width:100%;margin-bottom:16px;'>
                   <h3>Curriculum Coverage Report</h3>
                   <p>Use the new Curriculum Coverage Report to get insights into how each unit, lesson plan, assessment, and activity aligns with the school’s curriculum standards.</p>
                   <p>To learn more, see the <a href='/help/sso/send?returnUrl=/homepage/5227#textBoxBody5474' target='_blank'>release notes</a>.</p>"
