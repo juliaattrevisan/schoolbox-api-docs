@@ -149,9 +149,9 @@ export const useNodesStore = defineStore("ccNodes", () => {
         () => filtersStore.onlyShowGaps,
         () => {
             if (filtersStore.onlyShowGaps) {
-                flattenedNodes.value.forEach((node) => {
+                flattenedNodes.value.forEach((node, index) => {
                     node.previousIsVisible = node.isVisible;
-                    node.isVisible = node.usage.courses.length === 0;
+                    node.isVisible = index < 100;
                 });
             } else {
                 flattenedNodes.value.forEach((node) => {

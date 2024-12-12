@@ -112,7 +112,7 @@ const showNode = window.Vue.computed(() => {
 const nodeEl = useTemplateRef<HTMLElement | null>("nodeEl");
 window.Vue.onMounted(async () => {
     // expand the node if it has no children
-    if (props.depth > 1 && showNode.value) {
+    if (props.depth > 1 && props.node.isVisible) {
         await window.Vue.nextTick();
         gsap.from(nodeEl.value, { opacity: 0, duration: 0.3 });
     }
@@ -243,7 +243,7 @@ function onCourseClicked(buttonEl: HTMLButtonElement): void {
         </template>
     </tr>
     <!-- <template v-if="hasChildren && (isExpanded || filtersStore.onlyShowGaps || reportStore.isPrinting)"> -->
-    <template v-if="hasChildren && props.node.isExpanded">
+    <template v-if="hasChildren">
         <cc-report-table-node
             v-for="child in props.node.children"
             :key="child.id"
