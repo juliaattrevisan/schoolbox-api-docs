@@ -21,45 +21,43 @@ $app = new class extends CliTool\App {
 
         $now = (\Alaress_Date_Format::now())->getDatabase();
         foreach ($titles as $title) {
-            $tourUuid = $this->getDatabaseInternal()->executeQuery(
+            $tourUuids = $this->getDatabaseInternal()->executeQuery(
                 "SELECT uuid FROM tour WHERE title = :title",
                 ['title' => $title]
-            )->fetchColumn();
+            )->fetchAll(PDO::FETCH_COLUMN);
 
-            if (!$tourUuid) {
-                continue;
-            }
+            foreach ($tourUuids as $tourUuid) {
+                // 'UPDATE SET deleted_at' commands for all tour tables containing deleted_at columns.
+                $sqlCommands = [
+                    "UPDATE tour_step
+                     SET deleted_at = :now
+                     WHERE tour_uuid = :uuid",
+                    "UPDATE tour_step_event
+                     SET deleted_at = :now
+                     WHERE tour_step_uuid IN (
+                         SELECT uuid FROM tour_step WHERE tour_uuid = :uuid
+                     )",
+                    "UPDATE tour_step_modal
+                     SET deleted_at = :now
+                     WHERE tour_step_uuid IN (
+                         SELECT uuid FROM tour_step WHERE tour_uuid = :uuid
+                     )",
+                    "UPDATE tour_step_tooltip
+                     SET deleted_at = :now
+                     WHERE tour_step_uuid IN (
+                         SELECT uuid FROM tour_step WHERE tour_uuid = :uuid
+                     )",
+                    "UPDATE tour_trigger
+                     SET deleted_at = :now
+                     WHERE tour_uuid = :uuid",
+                    "UPDATE tour
+                     SET deleted_at = :now
+                     WHERE uuid = :uuid",
+                ];
 
-            // 'UPDATE SET deleted_at' commands for all tour tables containing deleted_at columns.
-            $sqlCommands = [
-                "UPDATE tour_step
-                 SET deleted_at = :now
-                 WHERE tour_uuid = :uuid",
-                "UPDATE tour_step_event
-                 SET deleted_at = :now
-                 WHERE tour_step_uuid IN (
-                     SELECT uuid FROM tour_step WHERE tour_uuid = :uuid
-                 )",
-                "UPDATE tour_step_modal
-                 SET deleted_at = :now
-                 WHERE tour_step_uuid IN (
-                     SELECT uuid FROM tour_step WHERE tour_uuid = :uuid
-                 )",
-                "UPDATE tour_step_tooltip
-                 SET deleted_at = :now
-                 WHERE tour_step_uuid IN (
-                     SELECT uuid FROM tour_step WHERE tour_uuid = :uuid
-                 )",
-                "UPDATE tour_trigger
-                 SET deleted_at = :now
-                 WHERE tour_uuid = :uuid",
-                "UPDATE tour
-                 SET deleted_at = :now
-                 WHERE uuid = :uuid",
-            ];
-
-            foreach ($sqlCommands as $sqlCommand) {
-                $this->getDatabaseInternal()->prepareQuery($sqlCommand)->execute(['uuid' => $tourUuid, 'now' => $now]);
+                foreach ($sqlCommands as $sqlCommand) {
+                    $this->getDatabaseInternal()->prepareQuery($sqlCommand)->execute(['uuid' => $tourUuid, 'now' => $now]);
+                }
             }
         }
     }
