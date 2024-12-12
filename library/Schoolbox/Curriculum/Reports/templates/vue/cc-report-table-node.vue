@@ -13,6 +13,7 @@ import type {
 } from "../js/types/curriculumCoverageTypes";
 import { useReportStore } from "./store/ccReportStore";
 import { useCoursesStore } from "./store/ccCoursesStore";
+import { useNodesStore } from "./store/ccNodesStore";
 import { useFiltersStore } from "./store/ccFiltersStore";
 import { usePopOutStore } from "./store/ccPopOutStore";
 import {
@@ -39,6 +40,7 @@ const emit = defineEmits<{
 
 const reportStore = useReportStore();
 const coursesStore = useCoursesStore();
+const nodesStore = useNodesStore();
 const filtersStore = useFiltersStore();
 const { title } = useNodeTitle(props.node);
 const hasChildren = window.Vue.ref(Array.isArray(props.node.children) && props.node.children.length > 0);
@@ -53,23 +55,23 @@ const lastChildPadding = window.Vue.computed(() =>
 
 // #region expand/collapse
 
-const isExpanded = window.Vue.ref(props.depth < 1); // to hide any grandchild and below nodes by default
-const expandTitle = window.Vue.computed(() => (isExpanded.value ? "Collapse" : "Expand"));
+// const isExpanded = window.Vue.ref(props.depth < 1); // to hide any grandchild and below nodes by default
+const expandTitle = window.Vue.computed(() => (props.node.isExpanded ? "Collapse" : "Expand"));
 const showExpandButton = window.Vue.computed(() => hasChildren.value && !filtersStore.onlyShowGaps); // don't show the expand button when the node has no children, or onlyShowGaps is active
 
 /**
  * To toggle the expanded state of the node
  */
 function onExpandClicked(): void {
-    isExpanded.value = !isExpanded.value;
+    nodesStore.toggleNodeExpand(props.node);
 }
 
 /**
  * To toggle the expanded state of the node
  */
 function onTotalClicked(): void {
-    if (!isExpanded.value) {
-        isExpanded.value = true;
+    if (!props.node.isExpanded) {
+        nodesStore.toggleNodeExpand(props.node);
     }
 }
 
@@ -99,7 +101,7 @@ const showNode = window.Vue.computed(() => {
     if (filtersStore.onlyShowGaps && hasNoUsages.value) {
         return true;
     }
-    return getFilteredTotalCount(props.node, !isExpanded.value) === 0 && filtersStore.onlyShowGaps;
+    return getFilteredTotalCount(props.node, !props.node.isExpanded) === 0 && filtersStore.onlyShowGaps;
 });
 
 // #endregion
@@ -148,8 +150,8 @@ function onUnitClicked(
 ): void {
     // expand the node if it has children and is not expanded
     // this is so the usage count only shows the count for the node and not its children
-    if (showExpandButton.value && !isExpanded.value) {
-        isExpanded.value = true;
+    if (showExpandButton.value && !props.node.isExpanded) {
+        nodesStore.toggleNodeExpand(props.node);
     }
     popOutStore.setActiveUnitColumn(course, unit, props.node, buttonEl);
 }
@@ -161,8 +163,8 @@ function onUnitClicked(
 function onCourseClicked(buttonEl: HTMLButtonElement): void {
     // expand the node if it has children and is not expanded
     // this is so the usage count only shows the count for the node and not its children
-    if (showExpandButton.value && !isExpanded.value) {
-        isExpanded.value = true;
+    if (showExpandButton.value && !props.node.isExpanded) {
+        nodesStore.toggleNodeExpand(props.node);
     }
     popOutStore.setActiveCourseColumn(buttonEl);
 }
@@ -181,7 +183,7 @@ function onCourseClicked(buttonEl: HTMLButtonElement): void {
                 :title="expandTitle"
                 @click="onExpandClicked"
             >
-                <sbx-icon v-if="isExpanded" name="up-arrow" />
+                <sbx-icon v-if="props.node.isExpanded" name="up-arrow" />
                 <sbx-icon v-else name="down-arrow" />
             </button>
             <button
@@ -201,7 +203,7 @@ function onCourseClicked(buttonEl: HTMLButtonElement): void {
         <cc-report-table-node-total-column
             v-else
             :node="props.node"
-            :is-expanded="isExpanded"
+            :is-expanded="props.node.isExpanded"
             @click="onTotalClicked"
         />
         <!-- loop through each course/unit, retrieving the node usage or returning 0 for undefined usages -->
@@ -212,7 +214,7 @@ function onCourseClicked(buttonEl: HTMLButtonElement): void {
                 v-else
                 :node="props.node"
                 :course="course"
-                :is-expanded="isExpanded"
+                :is-expanded="props.node.isExpanded"
                 @click="onCourseClicked"
             />
             <template v-for="unit in course.units" :key="unit.id">
@@ -223,7 +225,7 @@ function onCourseClicked(buttonEl: HTMLButtonElement): void {
                     :node="props.node"
                     :course="course"
                     :unit="unit"
-                    :is-expanded="isExpanded"
+                    :is-expanded="props.node.isExpanded"
                     @click="onUnitClicked"
                 />
             </template>
@@ -234,7 +236,7 @@ function onCourseClicked(buttonEl: HTMLButtonElement): void {
                     v-else
                     :node="props.node"
                     :course="course"
-                    :is-expanded="isExpanded"
+                    :is-expanded="props.node.isExpanded"
                     @click="onTotalClicked"
                 />
             </template>

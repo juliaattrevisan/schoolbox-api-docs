@@ -120,6 +120,18 @@ export const useNodesStore = defineStore("ccNodes", () => {
         });
     }
 
+    /**
+     * Toggle the nodes isExpanded property
+     * @param node
+     */
+    function toggleNodeExpand(node: CurriculumCoverageNode): void {
+        if (node.isExpanded) {
+            node.isExpanded = false;
+        } else {
+            node.isExpanded = true;
+        }
+    }
+
     return {
         nodes,
         setNodes,
@@ -127,5 +139,6 @@ export const useNodesStore = defineStore("ccNodes", () => {
         setMoreNodes,
         addMoreCourseUsage,
         flattenedNodes,
+        toggleNodeExpand,
     };
 });
