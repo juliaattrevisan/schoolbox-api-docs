@@ -9,6 +9,7 @@
 declare(strict_types=1);
 
 use Schoolbox\Admin\Profile\Editor\Cli\Helper;
+use Schoolbox\Admin\Profile\Editor\Payload;
 use Schoolbox\Application\CliTool;
 use Schoolbox\Role;
 
@@ -119,8 +120,36 @@ HELP;
          */
         $this->removeButton();
 
+        /* Update field configuration
+         *
+         * Staff viewing staff: accept default settings
+         * Students viewing staff: only show title/department/email
+         * Parents viewing staff: only show title/department/email
+         */
+        $campusIds = $this->helper->fetchCampusIds();
+        $staffRoletypes = [Role::STAFF, Payload::ROLETYPE_SELF];
+        $allRoletypes = [Role::STAFF, Payload::ROLETYPE_SELF, Role::STUDENT, Role::PARENT];
+
+        $this->helper->updateField(Role::STAFF, 'portrait', $campusIds, $staffRoletypes);
+        $this->helper->updateField(Role::STAFF, 'externalId', $campusIds, $staffRoletypes);
+        $this->helper->updateField(Role::STAFF, 'SchoolStaffCode', $campusIds, []);
+        $this->helper->updateField(Role::STAFF, 'positionTitle', $campusIds, $allRoletypes);
+        $this->helper->updateField(Role::STAFF, 'pronoun', $campusIds, []);
+        $this->helper->updateField(Role::STAFF, 'email', $campusIds, $allRoletypes);
+        $this->helper->updateField(Role::STAFF, 'role', $campusIds, []);
+        $this->helper->updateField(Role::STAFF, 'StaffDepartment', $campusIds, $allRoletypes);
+        $this->helper->updateField(Role::STAFF, 'StaffCategoryDescription', $campusIds, $staffRoletypes);
+        $this->helper->updateField(Role::STAFF, 'StaffBuilding', $campusIds, $staffRoletypes);
+        $this->helper->updateField(Role::STAFF, 'StaffRoom', $campusIds, $staffRoletypes);
+        $this->helper->updateField(Role::STAFF, 'StaffExtension', $campusIds, $staffRoletypes);
+        $this->helper->updateField(Role::STAFF, 'StaffDefaultMobilePhone', $campusIds, $staffRoletypes);
+        $this->helper->updateField(Role::STAFF, 'campusCollection', $campusIds, $staffRoletypes);
+        $this->helper->updateField(Role::STAFF, 'schoolHouse', $campusIds, []);
+        $this->helper->updateField(Role::STAFF, 'residentialHouse', $campusIds, []);
+        $this->helper->updateField(Role::STAFF, 'yearLevel', $campusIds, $staffRoletypes);
+
         /* Announce lock release
-          */
+         */
         $this->getLogger()->debug('Releasing lock');
 
         $lock->release();
