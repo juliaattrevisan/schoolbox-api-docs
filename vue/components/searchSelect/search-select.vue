@@ -32,7 +32,6 @@ interface Props {
     hasButton?: boolean; // whether to show a button next to the input
     buttonIcon?: string; // the icon to display on the button
     buttonTitle?: string; // the title of the button
-    meta?: string; // the meta text
 }
 const props = withDefaults(defineProps<Props>(), {
     defaultResults: undefined,
@@ -42,7 +41,6 @@ const props = withDefaults(defineProps<Props>(), {
     buttonIcon: "",
     buttonTitle: "Browse",
     queryKey: "query",
-    meta: "",
 });
 
 const emit = defineEmits<{

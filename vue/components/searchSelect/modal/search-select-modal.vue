@@ -19,6 +19,7 @@ interface Props {
     labelId: string; // the label id
     title: string; // the title of the modal
     endpoint: string; // the search api endpoint
+    queryKey?: string; // the key to use for seaech
     manageSearchResponse?: boolean; // whether to manage the response internally, or dispatch an emit to manage it externally
     isSingleSelect?: boolean; // whether only one result can be selected
     allowPartialMatches?: boolean; // whether to allow partial matches, so can match part of a word
@@ -28,6 +29,7 @@ interface Props {
 const props = withDefaults(defineProps<Props>(), {
     placeholder: "Search...",
     defaultResults: undefined,
+    queryKey: "query",
 });
 
 const emit = defineEmits<{
@@ -88,6 +90,7 @@ function onSearchSuccess(json: unknown, isActive: boolean, isNextResults: boolea
 
 const { query, isActive, isSearching, hasNoResults, hasError } = useQuerySearch(
     props.endpoint,
+    props.queryKey,
     results,
     onSearchSuccess,
     false,
