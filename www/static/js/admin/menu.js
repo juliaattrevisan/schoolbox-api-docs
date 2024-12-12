@@ -139,11 +139,39 @@
                  */
                 $("[data-admin-subnav-flyout]").removeAttr("style");
 
+                $("[data-parent-item] > a").on("click", function (event) {
+                    //to expand menu items
+                    event.preventDefault();
+
+                    let $target = $(this).closest("[data-parent-item]");
+
+                    // collapse any other force-expanded flyouts that aren't this target
+                    $target
+                        .closest(".side-nav")
+                        .find("[data-parent-item].flyout-expanded")
+                        .not($target)
+                        .removeClass("flyout-expanded");
+
+                    // toggle the .flyout-expanded class on the parent item
+                    $target.toggleClass("flyout-expanded");
+                });
+
                 /**
                  * Ensure the flyout menu is fully visible when active
                  */
                 flyoutMenuList.forEach((flyoutMenu) => {
                     intersectionObserver.observe(flyoutMenu);
+                });
+
+                // Close flyouts when clicking outside
+                $(document).on("click", function (event) {
+                    // Check if the click was outside the flyout menus
+                    if (
+                        !$(event.target).closest("[data-parent-item]").length &&
+                        !$(event.target).closest("[data-admin-subnav-flyout]").length
+                    ) {
+                        $("[data-parent-item].flyout-expanded").removeClass("flyout-expanded");
+                    }
                 });
             }
         }
