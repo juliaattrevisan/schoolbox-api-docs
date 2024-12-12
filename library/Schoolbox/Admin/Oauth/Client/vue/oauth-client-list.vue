@@ -12,6 +12,7 @@ import DataLoadError from "@schoolboxVue/components/error/data-load-error.vue";
 import { extractErrorMessage } from "@js/util/sbx/fetchUtils";
 import { getEmptyOAuthClient } from "../js/types/OAuthClient";
 import { ActionType } from "../js/ActionType";
+import type { OAuthClient, OAuthClientCredentialsUser } from "../js/types/OAuthClient";
 
 interface Props {
     getListEndpoint: string; // The endpoint for fetching the list of items.
@@ -303,43 +304,7 @@ type Result = OAuthClientCredentialsUser & {
 };
 
 const results = window.Vue.ref<Result[]>([]);
-/**
- * Any client credentials requests (i.e. requests made by the client backend to this Schoolbox instance, without interaction by an actual user) will be authenticated as this user;
- */
-export type OAuthClientCredentialsUser = {
-    id: number;
-    _links: {
-        profile: string;
-        avatar: string;
-    };
-    title: string;
-    firstName: string;
-    preferredName: string;
-    pronoun: string;
-    lastName: string;
-    fullName: string;
-    isDeleted: boolean;
-};
 
-/**
- * A single OAuth client entry
- */
-export type OAuthClient = {
-    id?: number;
-    name: string;
-    clientId?: string;
-    clientSecret?: string;
-    redirectUri: string; // When the user approves a request to share details, where should they be redirected to?
-    backChannelLogoutUri?: string; // On logging out of Schoolbox: send logout requests here
-    clientCredentialsUser?: OAuthClientCredentialsUser | null;
-    _links?: {
-        // action links
-        put: string;
-        patch: string;
-        delete: string;
-        regenerate: string;
-    };
-};
 /**
  * To handle the search response to update the name to the full name
  * @param json - the returned json
