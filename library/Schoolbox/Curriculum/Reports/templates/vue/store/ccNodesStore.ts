@@ -34,7 +34,24 @@ export const useNodesStore = defineStore("ccNodes", () => {
     });
 
     /**
-     * Set the default isExpanded property for the nodes, setting the first two levels as visible
+     * Set the default isVisible property for the nodes, setting the first two levels as visible
+     */
+    function setDefaultIsVisible(): void {
+        flattenedNodes.value.forEach((node) => {
+            node.isVisible = false;
+        });
+        nodes.value.forEach((node) => {
+            if (node.children) {
+                node.isVisible = true;
+                node.children.forEach((child) => {
+                    child.isVisible = true;
+                });
+            }
+        });
+    }
+
+    /**
+     * Set the default isExpanded property for the nodes, setting the first two levels as expanded
      */
     function setDefaultIsExpanded(): void {
         flattenedNodes.value.forEach((node) => {
@@ -43,9 +60,6 @@ export const useNodesStore = defineStore("ccNodes", () => {
         nodes.value.forEach((node) => {
             if (node.children) {
                 node.isExpanded = true;
-                node.children.forEach((child) => {
-                    child.isExpanded = true;
-                });
             }
         });
     }
@@ -56,6 +70,7 @@ export const useNodesStore = defineStore("ccNodes", () => {
      */
     function setNodes(newNodes: CurriculumCoverageNode[]): void {
         nodes.value = newNodes;
+        setDefaultIsVisible();
         setDefaultIsExpanded();
     }
 

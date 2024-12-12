@@ -171,7 +171,8 @@ function onCourseClicked(buttonEl: HTMLButtonElement): void {
 </script>
 
 <template>
-    <tr v-if="showNode" ref="nodeEl">
+    <!-- <tr v-if="showNode" ref="nodeEl"> -->
+    <tr v-if="props.node.isVisible" ref="nodeEl">
         <td class="l-flex l-flex--align-center l-gap-s f-no-margins" :style="{ paddingInlineStart: paddingStart }">
             <button
                 v-if="showExpandButton"
@@ -239,7 +240,8 @@ function onCourseClicked(buttonEl: HTMLButtonElement): void {
             </template>
         </template>
     </tr>
-    <template v-if="hasChildren && (isExpanded || filtersStore.onlyShowGaps || reportStore.isPrinting)">
+    <!-- <template v-if="hasChildren && (isExpanded || filtersStore.onlyShowGaps || reportStore.isPrinting)"> -->
+    <template v-if="hasChildren && props.node.isExpanded">
         <cc-report-table-node
             v-for="child in props.node.children"
             :key="child.id"
