@@ -144,6 +144,10 @@ HELP;
          */
         $this->renameField();
 
+        /* Surface StudentGender, visible only to staffs
+         */
+        $this->createFields();
+
         /* Announce lock release
          */
         $this->getLogger()->debug('Releasing lock');
@@ -168,6 +172,58 @@ HELP;
             WHERE term = 'individualEducationPlans'
             LIMIT 1
         ");
+    }
+
+
+    /**
+     * Their connector surfaces StudentGender
+     * optionally displaying it in the profile screens if they're meaningful
+     *
+     * @return void
+     */
+    private function createFields(): void
+    {
+        /* Despite this field existing, it'll never render to users: a customised student.twig
+         * intercepts the default rendering
+         */
+        $query = "
+            INSERT IGNORE INTO `profile_field`
+            (roletype, field, display_as, sequence, enabled, term, icon, css, click_to_reveal, is_external)
+            VALUES
+            ('student','StudentGender','Gender',(
+            SELECT MAX(sequence)+1
+                FROM profile_field pf
+                WHERE roletype = 'student'
+            ),1,NULL,NULL,NULL,0,1)
+        ";
+
+        $this->getDatabaseInternal()->executeQuery($query);
+
+        $profileFieldId = (int)$this->getDatabaseInternal()->lastInsertId();
+
+        /* Preset availability and visibility requirements
+         * By default it was visible to SELF and STAFF...I suppose
+         */
+        $campusIds = $this->helper->fetchCampusIds();
+        $roletypes = [Role::STAFF];
+
+        /* Assign relationships
+         */
+        $this->getLogger()->info(sprintf(
+            'Campus availability: assigning campus ids %s to profile field %s',
+            implode(',', $campusIds),
+            $profileFieldId
+        ));
+
+        $this->helper->createFieldCampusAvailability($profileFieldId, $campusIds);
+
+        $this->getLogger()->info(sprintf(
+            'Roletype visibility: assigning roletypes %s to profile field %s',
+            implode(',', $roletypes),
+            $profileFieldId
+        ));
+
+        $this->helper->createFieldRoletypeVisibility($profileFieldId, $roletypes);
     }
 
 
