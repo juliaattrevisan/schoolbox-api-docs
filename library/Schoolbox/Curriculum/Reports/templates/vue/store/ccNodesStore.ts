@@ -158,6 +158,7 @@ export const useNodesStore = defineStore("ccNodes", () => {
             if (filtersStore.onlyShowGaps) {
                 flattenedNodes.value.forEach((node) => {
                     node.previousIsVisible = node.isVisible;
+                    node.isVisible = false;
                 });
                 const onlyNodesWithCodes = flattenedNodes.value.filter((node) => node.code);
                 const onlyNodesWithNoUsage = onlyNodesWithCodes.filter(
