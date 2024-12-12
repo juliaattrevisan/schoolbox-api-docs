@@ -41,6 +41,7 @@ export type UnitWithCurriculumNodeUsage = Pick<Unit, "id" | "name"> & {
             count: number;
         };
     };
+    hasNoUsages: boolean; // to track if the unit has no usages
 };
 
 /**

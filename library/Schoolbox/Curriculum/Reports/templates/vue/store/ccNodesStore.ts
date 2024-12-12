@@ -81,6 +81,9 @@ export const useNodesStore = defineStore("ccNodes", () => {
             node.hasNoUsages = getTotalCount(node, true) === 0;
             node.usage.courses.forEach((course) => {
                 course.hasNoUsages = getCourseColumnCount(node, course, true) === 0;
+                course.units.forEach((unit) => {
+                    unit.hasNoUsages = getUnitColumnCount(node, course, unit, true) === 0;
+                });
             });
         });
     }
