@@ -5,6 +5,13 @@
 import { defineStore } from "pinia";
 import { useFiltersStore } from "./ccFiltersStore";
 import type { CurriculumCoverageNode } from "../../js/types/curriculumCoverageTypes";
+import {
+    getTotalCount,
+    getCourseColumnCount,
+    getUnitColumnCount,
+    getCourseCount,
+    getFilteredTotalCount,
+} from "../util/countUtils";
 
 export const useNodesStore = defineStore("ccNodes", () => {
     const filtersStore = useFiltersStore();
@@ -149,8 +156,14 @@ export const useNodesStore = defineStore("ccNodes", () => {
         () => filtersStore.onlyShowGaps,
         () => {
             if (filtersStore.onlyShowGaps) {
-                flattenedNodes.value.forEach((node, index) => {
+                flattenedNodes.value.forEach((node) => {
                     node.previousIsVisible = node.isVisible;
+                });
+                const onlyNodesWithCodes = flattenedNodes.value.filter((node) => node.code);
+                const onlyNodesWithNoUsage = onlyNodesWithCodes.filter(
+                    (node) => getFilteredTotalCount(node, false) === 0,
+                );
+                onlyNodesWithNoUsage.forEach((node, index) => {
                     node.isVisible = index < 100;
                 });
             } else {
