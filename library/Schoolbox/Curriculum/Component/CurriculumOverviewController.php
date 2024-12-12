@@ -81,19 +81,21 @@ class CurriculumOverviewController extends Component_Homepage_ControllerAbstract
         /** @var Folder\Model $context */
         $context = $this->getContext();
         if ($context->getCurriculumNodes()->count()) {
-            $nodeIds = [];
-            foreach ($context->getCurriculumNodes() as $node) {
-                $nodeIds[] = $node->getId();
-            }
+            $directNodeIds = $context->getCurriculumNodes()->getPropertyValues('id');
 
             // Fetch every node which is an ancestor or descendant of one of this folder's nodes, whether enabled or disabled.
             // A previously set curriculum node should remain on a folder even if the node has subsequently been disabled.
-            $nodeIds = $nodeMapper->findFamilyTreeIds($nodeIds, 'curriculum_node_parent_id');
+            $nodeIds = $nodeMapper->findFamilyTreeIds($directNodeIds, 'curriculum_node_parent_id');
+
+            // Then find all the nodes and filter out disabled nodes that aren't directly mapped to this folder
+            // This is because we still want to show disabled nodes if they are still directly mapped to aid in transitioning curriculum
+            $curriculumNodes = $nodeMapper->findByColumnList(['id' => $nodeIds])->filter(
+                fn ($node) => $node->getEnabled() || in_array($node->getId(), $directNodeIds)
+            );
 
             // Then, sort the entire list of nodes into a tree structure.
-            $this->curriculumNodes = $nodeMapper->getCollectionAsTree(
-                $nodeMapper->findByColumnList(['id' => $nodeIds]),
-            );
+            Node\Mapper::sortNodes($curriculumNodes, 0);
+            $this->curriculumNodes = $nodeMapper->getCollectionAsTree($curriculumNodes);
         } elseif ($this->getContentPermission() <= UserAccess::ACCESS_READ) {
             return false;
         }
@@ -101,10 +103,6 @@ class CurriculumOverviewController extends Component_Homepage_ControllerAbstract
         // if no nodes left after removing disabled node, do not render for read only user
         if ((!$this->curriculumNodes || !$this->curriculumNodes->count()) && ($this->getContentPermission() <= UserAccess::ACCESS_READ)) {
             return false;
-        }
-
-        if ($this->curriculumNodes && $this->curriculumNodes->count()) {
-            Node\Mapper::sortNodes($this->curriculumNodes, 0);
         }
 
         // This should be unnecessary but PHPStan complains otherwise
