@@ -134,14 +134,12 @@ $border-bottom-width: 2px;
             padding: 0.5rem 0.75rem;
             display: block;
             border-left: $border-bottom-width solid transparent;
-        }
-
-        @media #{$mediumwide-up} {
-            //ensure isn't applied on mobile
-            &.flyout-expanded > a,
-            a:hover {
-                border-left: $border-bottom-width solid $content-ui-hover;
-                color: $side-nav-link-color-hover;
+            @media #{$mediumwide-up} {
+                //ensure isn't applied on mobile
+                &:hover {
+                    border-left: $border-bottom-width solid $content-ui-hover;
+                    color: $side-nav-link-color-hover;
+                }
             }
         }
 
@@ -182,14 +180,8 @@ $border-bottom-width: 2px;
         }
         @media #{$mediumwide-up} {
             //ensure isn't applied on mobile
-            &:hover > ul.flyout,
-            &.flyout-expanded > ul.flyout {
-                display: block;
-            }
-
-            // For the currently hovered item, make sure it's on top of other flyouts
             &:hover > ul.flyout {
-                z-index: calc(var(--sbx-depth-pop-over) + 1);
+                display: block;
             }
         }
         &.parent-item > a:after {
