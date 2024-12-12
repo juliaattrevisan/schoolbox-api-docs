@@ -42,7 +42,9 @@ const coursesStore = useCoursesStore();
 const filtersStore = useFiltersStore();
 const { title } = useNodeTitle(props.node);
 
-const paddingStart = window.Vue.ref(`calc(${props.depth * 0.5}rem + 0.5rem)`); // to gradually add more paddingStart to indicate node level depth
+const paddingStart = window.Vue.computed(() =>
+    filtersStore.onlyShowGaps ? "0.5rem" : `calc(${props.depth * 0.5}rem + 0.5rem)`,
+); // to gradually add more paddingStart to indicate node level depth
 const hasChildren = window.Vue.ref(Array.isArray(props.node.children) && props.node.children.length > 0);
 
 // #region expand/collapse
