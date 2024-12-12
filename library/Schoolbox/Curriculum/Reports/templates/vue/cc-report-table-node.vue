@@ -55,7 +55,6 @@ const lastChildPadding = window.Vue.computed(() =>
 
 // #region expand/collapse
 
-// const isExpanded = window.Vue.ref(props.depth < 1); // to hide any grandchild and below nodes by default
 const expandTitle = window.Vue.computed(() => (props.node.isExpanded ? "Collapse" : "Expand"));
 const showExpandButton = window.Vue.computed(() => hasChildren.value && !filtersStore.onlyShowGaps); // don't show the expand button when the node has no children, or onlyShowGaps is active
 
@@ -81,29 +80,6 @@ function onTotalClicked(): void {
 
 const hasNoUsages = window.Vue.computed(() => getTotalCount(props.node, true) === 0);
 
-/**
- * If has a unit with no usage, and only show gaps is selected, show the node
- * @returns - whether to show the node
- */
-const showNode = window.Vue.computed(() => {
-    // always show the node when onlyShowGaps is false
-    if (!filtersStore.onlyShowGaps) {
-        return true;
-    }
-    // don't show nodes that can't have usage assigned when only show gaps is active
-    if (
-        (filtersStore.onlyShowGaps && props.node.code === null) ||
-        (filtersStore.onlyShowGaps && props.node.code === "")
-    ) {
-        return false;
-    }
-    // always return true if gaps selected and the node has no usages at all
-    if (filtersStore.onlyShowGaps && hasNoUsages.value) {
-        return true;
-    }
-    return getFilteredTotalCount(props.node, !props.node.isExpanded) === 0 && filtersStore.onlyShowGaps;
-});
-
 // #endregion
 
 /**
@@ -112,7 +88,7 @@ const showNode = window.Vue.computed(() => {
 const nodeEl = useTemplateRef<HTMLElement | null>("nodeEl");
 window.Vue.onMounted(async () => {
     // expand the node if it has no children
-    if (props.depth > 1 && props.node.isVisible) {
+    if (props.node.isVisible) {
         await window.Vue.nextTick();
         gsap.from(nodeEl.value, { opacity: 0, duration: 0.3 });
     }
