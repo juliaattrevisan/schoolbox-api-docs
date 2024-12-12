@@ -36,6 +36,9 @@ export const useNodesStore = defineStore("ccNodes", () => {
         return flattenedNodes;
     }
 
+    /**
+     * The flattened nodes, to be used for looping through all nodes without having to loop through the hierarchy
+     */
     const flattenedNodes = window.Vue.computed(() => {
         return nodes.value.reduce((acc, node) => {
             return [...acc, ...flattenNodes(node)];
@@ -168,6 +171,27 @@ export const useNodesStore = defineStore("ccNodes", () => {
             });
         }
     }
+
+    /**
+     * Watch the selectedReportOptions filter and update the nodes visibility accordingly
+     */
+    window.Vue.watch(
+        () => filtersStore.selectedReportOptions,
+        () => {
+            if (filtersStore.onlyShowGaps) {
+                flattenedNodes.value.forEach((node) => {
+                    node.isVisible = false;
+                });
+                const onlyNodesWithCodes = flattenedNodes.value.filter((node) => node.code);
+                const onlyNodesWithNoUsage = onlyNodesWithCodes.filter(
+                    (node) => getFilteredTotalCount(node, false) === 0,
+                );
+                onlyNodesWithNoUsage.forEach((node, index) => {
+                    node.isVisible = index < 50;
+                });
+            }
+        },
+    );
 
     /**
      * Watch the onlyShowGaps filter and update the nodes visibility accordingly
