@@ -368,7 +368,31 @@ class Controller extends Base
             $nodeIds,
             Cursor::LIMIT_DEFAULT,
         );
-        $data = $cursor->retrieveResults(null);
+
+        // Load all requested data,
+        // even if it requires more than one request to the cursor.
+        $nextCursor = null;
+        $i          = 0;
+        $data       = new Collection();
+        while (true) {
+            // Avoid infinite loops
+            if ($i++ >= 100) {
+                break;
+            }
+
+            // Load page of results
+            $dataPage = $cursor->retrieveResults($nextCursor);
+            if ($dataPage->count() === 0) {
+                break;
+            }
+            $data = $data->merge($dataPage);
+
+            // Set cursor for next page of results
+            $nextCursor = $cursor->next($dataPage);
+            if ($nextCursor === null) {
+                break;
+            }
+        }
 
         // Create export data
         $courseSpecs     = $this->courseSpecificationMapper->findByColumn('id', $courseIds);
