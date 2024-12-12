@@ -61,6 +61,7 @@ window.Vue.onMounted(() => {
             formValueName: "", // not required in this context
             dataEndpoint: props.dataEndpoint,
             selectedNodes: props.selectedNodes, // so the modal displays the latest selected nodes
+            includeChildren: true, // include all children in selections
         });
     });
 });

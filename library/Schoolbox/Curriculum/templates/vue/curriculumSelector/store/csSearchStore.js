@@ -65,9 +65,10 @@ export const useSearchStore = defineStore(`csSearch`, {
         async search() {
             try {
                 const store = useStore();
+                const includeWithoutCode = store.includeWithoutCode ? 1 : 0; // search for nodes without a code
+                const descendants = store.includeChildren ? 10 : 0; // if we're including children, load in all descendants, otherwise we just load in the next level to show the structure
                 const response = await fetch(
-                    `${apiEndpoint}?query=${this.query}&enabled=1&limit=50` +
-                        (store.includeWithoutCode ? "&includeWithoutCode=1" : ""),
+                    `${apiEndpoint}?query=${this.query}&enabled=1&limit=50&includeWithoutCode=${includeWithoutCode}&descendants=${descendants}`,
                     {
                         method: "GET",
                         headers: {
@@ -103,7 +104,7 @@ export const useSearchStore = defineStore(`csSearch`, {
                 //check if the node isn't in the list already
                 return !selectedNodesStore.nodes.some((selectedNode) => selectedNode.id === newSelectedNode.id); //don't add in those that match
             });
-            selectedNodesStore.add(newSelectedNodes);
+            newSelectedNodes.forEach((node) => selectedNodesStore.add(node));
         },
 
         /**
@@ -115,7 +116,7 @@ export const useSearchStore = defineStore(`csSearch`, {
                 //check if the node is in the list already
                 return selectedNodesStore.nodes.some((selectedNode) => selectedNode.id === matchedSelectedNode.id); //add in those that match
             });
-            selectedNodesStore.remove(matchedSelectedNodes);
+            matchedSelectedNodes.forEach((node) => selectedNodesStore.remove(node));
         },
     },
 });

@@ -10,7 +10,7 @@
 
 import { defineStore } from "pinia";
 import { useNodesStore } from "@schoolboxCurriculum/vue/manageCurriculum/store/mcNodesStore";
-import { UNSET_ID, findById, getEmptyNode } from "@schoolboxCurriculum/js/nodeUtils";
+import { UNSET_ID, findById, getEmptyNode, noChildrenOfNode } from "@schoolboxCurriculum/js/nodeUtils";
 import { useEnableNodesStore } from "@schoolboxCurriculum/vue/manageCurriculum/selectedNodes/store/mcEnableNodesStore";
 import type { Node } from "@schoolboxCurriculum/types/Node";
 
@@ -99,25 +99,6 @@ export const useSelectedNodesStore = defineStore("mcSelectedNodes", () => {
     const hasActiveNode = window.Vue.computed(() => activeNode.value.id !== UNSET_ID);
 
     /**
-     * we need to check if a new parent has been selected of any existing children,
-     * if it has the children should be removed as the parent now takes precedence
-     * @param nodeToAdd - the Node to add
-     * @returns - no children of selected nodes
-     */
-    function noChildrenOfNode(nodeToAdd: Node): Node[] {
-        const updatedNodes = nodes.value.filter((selectedNode) => {
-            if (nodeToAdd.children) {
-                // only if the children have loaded
-                const node = findById(nodeToAdd.children, selectedNode.id);
-                return node === undefined; // only keep those nodes that aren't a child of the new node
-            }
-            // otherwise no existing nodes will be children, as they haven't been loaded and so couldn't have been selected
-            return true;
-        });
-        return updatedNodes;
-    }
-
-    /**
      * remove any existing child nodes that don't have a .selectedParentId that is an id contained in nodes
      * @returns - the list of Nodes with children removed
      */
@@ -158,7 +139,7 @@ export const useSelectedNodesStore = defineStore("mcSelectedNodes", () => {
      * @param nodeToAdd - the Node to add
      */
     function add(nodeToAdd: Node): void {
-        nodes.value = noChildrenOfNode(nodeToAdd);
+        nodes.value = noChildrenOfNode(nodes, nodeToAdd);
         nodes.value = [...nodes.value, nodeToAdd];
         childNodes.value = removeChildNodes();
         updateChildNodes(nodeToAdd, true, nodeToAdd.id);

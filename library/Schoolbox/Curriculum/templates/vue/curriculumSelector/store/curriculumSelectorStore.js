@@ -67,7 +67,8 @@ export const useStore = defineStore(`curriculumSelector`, {
             }
             if (props.selectedNodes?.length > 0) {
                 //add in any nodes that have been selected previously
-                useSelectedNodesStore().add(props.selectedNodes);
+                const selectedNodesStore = useSelectedNodesStore();
+                props.selectedNodes.forEach((node) => selectedNodesStore.add(node));
             }
         },
 

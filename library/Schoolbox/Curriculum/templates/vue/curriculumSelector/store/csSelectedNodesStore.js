@@ -3,8 +3,8 @@
  */
 
 import { defineStore } from "pinia";
-import { apiEndpoint } from "./curriculumSelectorStore";
-import { UNSET_ID, getBreadcrumbs } from "@schoolboxCurriculum/js/nodeUtils";
+import { UNSET_ID, includeChildren, noChildrenOfNode } from "@schoolboxCurriculum/js/nodeUtils";
+import { useStore } from "./curriculumSelectorStore";
 
 export const useSelectedNodesStore = defineStore(`csSelectedNodes`, {
     state: () => ({
@@ -56,13 +56,14 @@ export const useSelectedNodesStore = defineStore(`csSelectedNodes`, {
         /**
          * add a node
          *
-         * @param { Object or Array } either a single node, or mulitple can be added
+         * @param { Object } a single node
          */
         add(nodeToAdd) {
-            if (Array.isArray(nodeToAdd)) {
-                this.nodes = [...this.nodes, ...nodeToAdd];
+            this.nodes = noChildrenOfNode(this.nodes, nodeToAdd); // strip out any children of the new node, as the parent now takes precedence
+            if (useStore().includeChildren) {
+                this.nodes = [...this.nodes, nodeToAdd, ...includeChildren(nodeToAdd.children)]; // add the new node and all its children
             } else {
-                this.nodes = [...this.nodes, nodeToAdd];
+                this.nodes = [...this.nodes, nodeToAdd]; // or just add the new node
             }
         },
 
@@ -72,21 +73,24 @@ export const useSelectedNodesStore = defineStore(`csSelectedNodes`, {
          * @param { Object or Array } add a single node, removing any previously selected
          */
         addSingle(nodeToAdd) {
-            this.nodes = [nodeToAdd];
+            if (useStore().includeChildren) {
+                this.nodes = [nodeToAdd, ...includeChildren(nodeToAdd.children)]; // add the new node and all its children
+            } else {
+                this.nodes = [nodeToAdd]; // or just add the new node
+            }
         },
 
         /**
          * remove a node
          *
-         * @param { Object }
+         * @param { Object } remove a single node
          */
         remove(nodeToRemove) {
-            if (Array.isArray(nodeToRemove)) {
-                nodeToRemove.forEach((node) => {
-                    this.nodes = this.nodes.filter((selectedNode) => selectedNode.id !== node.id);
-                });
+            if (useStore().includeChildren) {
+                const idsToRemove = [nodeToRemove, ...includeChildren(nodeToRemove.children)].map((node) => node.id); // get the id of the node to remove and all its children
+                this.nodes = this.nodes.filter((node) => !idsToRemove.includes(node.id)); // remove the node and all its children
             } else {
-                this.nodes = this.nodes.filter((node) => node.id !== nodeToRemove.id);
+                this.nodes = this.nodes.filter((node) => node.id !== nodeToRemove.id); // or just remove the node
             }
         },
 

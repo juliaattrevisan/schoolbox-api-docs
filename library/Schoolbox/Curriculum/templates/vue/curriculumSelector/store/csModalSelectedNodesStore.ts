@@ -6,7 +6,7 @@
 
 import { defineStore } from "pinia";
 import type { Node } from "@schoolboxCurriculum/types/Node";
-import { findById, includeChildren } from "@schoolboxCurriculum/js/nodeUtils";
+import { findById, includeChildren, noChildrenOfNode } from "@schoolboxCurriculum/js/nodeUtils";
 import { useStore } from "./curriculumSelectorStore";
 import { useNodesStore } from "./csNodesStore";
 import { useSelectedNodesStore } from "./csSelectedNodesStore";
@@ -32,25 +32,6 @@ export const useModalSelectedNodesStore = defineStore(`csModalSelectedNodes`, ()
      * @returns { number[] }
      */
     const childNodesIds = window.Vue.computed(() => childNodes.value.map((node) => node.id));
-
-    /**
-     * we need to check if a new parent has been selected of any existing children,
-     * if it has the children should be removed as the parent now takes precedence
-     * @param nodeToAdd - the Node to add
-     * @returns - no children of selected nodes
-     */
-    function noChildrenOfNode(nodeToAdd: Node): Node[] {
-        const updatedNodes = nodes.value.filter((selectedNode) => {
-            if (nodeToAdd.children) {
-                // only if the children have loaded
-                const node = findById(nodeToAdd.children, selectedNode.id);
-                return node === undefined; // only keep those nodes that aren't a child of the new node
-            }
-            // otherwise no existing nodes will be children, as they haven't been loaded and so couldn't have been selected
-            return true;
-        });
-        return updatedNodes;
-    }
 
     /**
      * remove any existing child nodes that don't have a .selectedParentId that is an id contained in nodes
@@ -93,7 +74,7 @@ export const useModalSelectedNodesStore = defineStore(`csModalSelectedNodes`, ()
      * @param nodeToAdd - the node to add
      */
     function add(nodeToAdd: Node): void {
-        nodes.value = noChildrenOfNode(nodeToAdd); // strip out any children of the new node, as the parent now takes precedence
+        nodes.value = noChildrenOfNode(nodes, nodeToAdd); // strip out any children of the new node, as the parent now takes precedence
         if (useStore().includeChildren) {
             nodes.value = [...nodes.value, nodeToAdd, ...includeChildren(nodeToAdd.children)]; // add the new node and all its children
         } else {
@@ -108,7 +89,6 @@ export const useModalSelectedNodesStore = defineStore(`csModalSelectedNodes`, ()
      * @param nodeToAdd - the node to add
      */
     function addSingle(nodeToAdd: Node): void {
-        nodes.value = noChildrenOfNode(nodeToAdd); // strip out any children of the new node, as the parent now takes precedence
         if (useStore().includeChildren) {
             nodes.value = [nodeToAdd, ...includeChildren(nodeToAdd.children)]; // add the new node and all its children
         } else {

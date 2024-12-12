@@ -21,22 +21,20 @@ test("should not display when there is no codes", () => {
 
 test("should display when there is codes", async () => {
     const selectedNodesStore = useSelectedNodesStore();
-    await selectedNodesStore.add([
-        {
-            id: 1,
-            code: "C1",
-            name: "Code 1",
-            description: "",
-            _usageCounts: { course: 0, unit: 0, assessment: 0, badge: 0 },
-        },
-        {
-            id: 2,
-            code: "C2",
-            name: "Code 2",
-            description: "",
-            _usageCounts: { course: 0, unit: 0, assessment: 0, badge: 0 },
-        },
-    ]);
+    await selectedNodesStore.add({
+        id: 1,
+        code: "C1",
+        name: "Code 1",
+        description: "",
+        _usageCounts: { course: 0, unit: 0, assessment: 0, badge: 0 },
+    });
+    await selectedNodesStore.add({
+        id: 2,
+        code: "C2",
+        name: "Code 2",
+        description: "",
+        _usageCounts: { course: 0, unit: 0, assessment: 0, badge: 0 },
+    });
     expect(wrapper.findAll("[data-test-node]")).toHaveLength(2); //should be two items in the dom now
 });
 
@@ -44,22 +42,20 @@ test("should not display when had codes but has been emptied", async () => {
     const store = useStore();
     store.$patch({ isReadOnly: false });
     const selectedNodesStore = useSelectedNodesStore();
-    await selectedNodesStore.add([
-        {
-            id: 1,
-            code: "C1",
-            name: "Code 1",
-            description: "",
-            _usageCounts: { course: 0, unit: 0, assessment: 0, badge: 0 },
-        },
-        {
-            id: 2,
-            code: "C2",
-            name: "Code 2",
-            description: "",
-            _usageCounts: { course: 0, unit: 0, assessment: 0, badge: 0 },
-        },
-    ]);
+    await selectedNodesStore.add({
+        id: 1,
+        code: "C1",
+        name: "Code 1",
+        description: "",
+        _usageCounts: { course: 0, unit: 0, assessment: 0, badge: 0 },
+    });
+    await selectedNodesStore.add({
+        id: 2,
+        code: "C2",
+        name: "Code 2",
+        description: "",
+        _usageCounts: { course: 0, unit: 0, assessment: 0, badge: 0 },
+    });
     const selectedNodes = wrapper.findAllComponents("[data-test-node]");
     selectedNodes.forEach((node, index) => {
         const nodeItem = selectedNodes.at(index);
