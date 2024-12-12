@@ -19,7 +19,7 @@
          * user doesn't have to scroll further down the page to see all items
          */
         const flyoutMenuList = document.querySelectorAll("[data-admin-subnav-flyout]");
-        const defaultMarginTop = 35;
+        const defaultMarginTop = 0;
         const extraPadding = 20;
         const intersectionObserver = new IntersectionObserver((entries) => {
             entries.forEach((entry) => {
@@ -100,7 +100,7 @@
 
             /* Recalculate whether to use the small viewport approach or not
              */
-            if (mq.matches) {
+            if (true) {
                 /* This is the small viewport so you don't need the flyout menu
                  * You only need the slideDown menu
                  */
@@ -112,10 +112,17 @@
 
                     let $target = $(this)
                         .closest("[data-parent-item]")
+                        .toggleClass("flyout-expanded") //add class to indicate it's expanded
                         .find("[data-admin-subnav-flyout]")
                         .slideToggle(); //toggle selected
 
                     $("[data-admin-subnav-flyout]").not($target).slideUp(); //and ensure all others are closed
+
+                    // remove the expanded class from all other parent items
+                    $("[data-admin-subnav-flyout]")
+                        .not($target)
+                        .closest("[data-parent-item]")
+                        .removeClass("flyout-expanded");
                 });
 
                 /* This is only available for the small viewport
