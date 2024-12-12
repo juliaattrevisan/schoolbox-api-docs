@@ -3,26 +3,16 @@
  * A single node row in the curriculum coverage report.
  */
 
-import { useTemplateRef } from "vue";
-import { gsap } from "gsap/all";
 import { useNodeTitle } from "@schoolboxCurriculum/vue/composables/useNodeTitle";
 import type {
     CurriculumCoverageNode,
     CourseWithCurriculumNodeUsage,
     UnitWithCurriculumNodeUsage,
 } from "../js/types/curriculumCoverageTypes";
-import { useReportStore } from "./store/ccReportStore";
 import { useCoursesStore } from "./store/ccCoursesStore";
 import { useNodesStore } from "./store/ccNodesStore";
 import { useFiltersStore } from "./store/ccFiltersStore";
 import { usePopOutStore } from "./store/ccPopOutStore";
-import {
-    getTotalCount,
-    getCourseColumnCount,
-    getUnitColumnCount,
-    getCourseCount,
-    getFilteredTotalCount,
-} from "./util/countUtils";
 import CcReportTableNodeTotalColumn from "./cc-report-table-node-total-column.vue";
 import CcReportTableNodeCourseColumn from "./cc-report-table-node-course-column.vue";
 import CcReportTableNodeUnitColumn from "./cc-report-table-node-unit-column.vue";
@@ -38,7 +28,6 @@ const emit = defineEmits<{
     titleClick: [node: CurriculumCoverageNode];
 }>();
 
-const reportStore = useReportStore();
 const coursesStore = useCoursesStore();
 const nodesStore = useNodesStore();
 const filtersStore = useFiltersStore();
@@ -75,18 +64,6 @@ function onTotalClicked(): void {
 }
 
 // #endregion
-
-/**
- * Fade in when shown to help provide context
- */
-const nodeEl = useTemplateRef<HTMLElement | null>("nodeEl");
-window.Vue.onMounted(async () => {
-    // expand the node if it has no children
-    if (props.node.isVisible) {
-        await window.Vue.nextTick();
-        gsap.from(nodeEl.value, { opacity: 0, duration: 0.3 });
-    }
-});
 
 /**
  * Emit to open up the node details modal
@@ -144,7 +121,7 @@ function onCourseClicked(buttonEl: HTMLButtonElement): void {
 
 <template>
     <!-- <tr v-if="showNode" ref="nodeEl"> -->
-    <tr v-if="props.node.isVisible" ref="nodeEl">
+    <tr v-if="props.node.isVisible">
         <td class="l-flex l-flex--align-center l-gap-s f-no-margins" :style="{ paddingInlineStart: paddingStart }">
             <button
                 v-if="showExpandButton"
