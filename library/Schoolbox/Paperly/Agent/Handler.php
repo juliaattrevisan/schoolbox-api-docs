@@ -241,7 +241,6 @@ class Handler
      */
     public function handleAllStaffsRequest(array $data): array
     {
-        $stfArr = [];
         $params = [];
         $selectedView = $this->viewSelector->getView(ViewSelector::PAPERLY_VIEW_ALL_STAFF);
         $sql = "SELECT
@@ -249,8 +248,9 @@ class Handler
                     StaffPreferred,
                     StaffSurname,
                     StaffEmail,
-                    NormalYearLevel,
-                    NormalYearLevel2
+                    ClassCode,
+                    ClassDescription,
+                    YearLevelCode
                 FROM (
                     SELECT
                         StaffID,
@@ -258,8 +258,8 @@ class Handler
                         StaffSurname,
                         StaffEmail,
                         ClassCode,
-                        NormalYearLevel,
-                        NormalYearLevel2
+                        ClassDescription,
+                        YearLevelCode
                     FROM {$selectedView} WHERE 1=1
                 ";
 
@@ -278,9 +278,9 @@ class Handler
         if (isset($data['year_level'])) {
             $yls = is_array($data['year_level']) ? $data['year_level'] : explode(',', $data['year_level']);
             $placeholders = implode(',', array_fill(0, count($yls), '?'));
-            $params = array_merge($params, $yls, $yls);
+            $params = array_merge($params, $yls);
 
-            $sql .= " AND NormalYearLevel IN ($placeholders) OR NormalYearLevel2 IN ($placeholders)";
+            $sql .= " AND YearLevelCode IN ($placeholders)";
         }
 
         if (isset($data['class_code'])) {
@@ -291,7 +291,7 @@ class Handler
         }
 
         $sql .= " ) filtered_results
-                GROUP BY StaffID, StaffPreferred, StaffSurname, StaffEmail, NormalYearLevel, NormalYearLevel2
+                GROUP BY StaffID, StaffPreferred, StaffSurname, StaffEmail, ClassCode, ClassDescription, YearLevelCode
                 ORDER BY StaffSurname";
 
         $stmt = $this->externalDb->executeQuery($sql, $params);
@@ -305,8 +305,20 @@ class Handler
                     "Preferred"        => $row["StaffPreferred"] ?? null,
                     "Surname"          => $row["StaffSurname"] ?? null,
                     "Email"            => $row["StaffEmail"] ?? null,
-                    "NormalYearLevel"  => $row["NormalYearLevel"] ?? null,
-                    "NormalYearLevel2" => $row["NormalYearLevel2"] ?? null,
+                    "Classes" => [
+                        [
+                            "ClassCode" => $row["ClassCode"],
+                            "ClassDescription" => $row["ClassDescription"],
+                            "YearLevelCode" => $row["YearLevelCode"],
+
+                        ]
+                    ]
+                ];
+            } else {
+                $staffs[$staffId]["Classes"][] = [
+                    "ClassCode" => $row["ClassCode"],
+                    "ClassDescription" => $row["ClassDescription"],
+                    "YearLevelCode" => $row["YearLevelCode"],
                 ];
             }
         }
