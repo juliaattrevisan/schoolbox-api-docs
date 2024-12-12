@@ -5,30 +5,14 @@
  */
 
 import debounce from "lodash/debounce";
-import vSelect from "vue-select";
-import "vue-select/dist/vue-select.css";
 import SearchSelect from "@schoolboxVue/components/searchSelect/search-select.vue";
 import { activate, timeout } from "@schoolboxVue/components/toast/sbxToastEvent";
 import RevealModal from "@schoolboxVue/components/reveal-modal.vue";
 import LoadingTable from "@schoolboxVue/components/loading/loading-table.vue";
 import DataLoadError from "@schoolboxVue/components/error/data-load-error.vue";
-import Deselect from "@schoolboxVue/components/selectize/Deselect.vue";
 import { extractErrorMessage } from "@js/util/sbx/fetchUtils";
 import { getEmptyOAuthClient } from "../js/types/OAuthClient";
 import { ActionType } from "../js/ActionType";
-import type { OAuthClient } from "../js/types/OAuthClient";
-
-// @ts-expect-error - This is expected as per https://vue-select.org/guide/components.html#vue-3x
-vSelect.props.components.default = (): void => ({ Deselect });
-
-type VueSelectData = {
-    // the loaded user search results
-    data: VueSelectOption[];
-};
-type VueSelectOption = {
-    // The type of the options for the user search (what selectize is expecting)
-    fullName: string;
-};
 
 const SEARCH_RESULT_RETRIEVE_DELAY = 350; // The number of milliseconds to wait between the user's input and a search for users.
 
@@ -47,7 +31,6 @@ const addingClient = window.Vue.ref<OAuthClient>(getEmptyOAuthClient());
 const modifyingClient = window.Vue.ref<OAuthClient>(getEmptyOAuthClient());
 const regeneratingClient = window.Vue.ref<OAuthClient>(getEmptyOAuthClient());
 const deletingClient = window.Vue.ref<OAuthClient>(getEmptyOAuthClient());
-const searchUsers = window.Vue.ref<VueSelectOption[]>([]);
 const saveError = window.Vue.ref<string | null>(null);
 const userSearchAdditionalParams = { filter: JSON.stringify({ roleType: "staff" }) };
 const currentAction = window.Vue.ref<ActionType>(ActionType.ADD);
@@ -300,33 +283,6 @@ async function deleteClient(client: OAuthClient): Promise<void> {
 }
 
 /**
- * Search callback for the user selectize.
- * This method is debounced so that the search doesn't trigger until
- * the user has stopped typing for `SEARCH_RESULT_RETRIEVE_DELAY` milliseconds.
- * @param {string} query -The search string
- * @param {Function} loading - A function to call when the loading state changes (accepts a Boolean)
- */
-const onUserSearch = debounce((query: string, loading: (isLoading: boolean) => void) => {
-    if (query.length < 3) {
-        return;
-    }
-    loading(true);
-    const searchUrl = new URL(props.userSearchEndpoint, window.location.href);
-    searchUrl.search = new URLSearchParams(Object.assign(userSearchAdditionalParams, { search: query })).toString();
-    fetch(searchUrl)
-        .then((response) => response.json())
-        .then((jsonResponse) => {
-            searchUsers.value = (jsonResponse as VueSelectData).data as { fullName: string }[];
-        })
-        .catch(() => {
-            timeout({ text: "An unexpected error occurred", isSuccess: false });
-        })
-        .finally(() => {
-            loading(false);
-        });
-}, SEARCH_RESULT_RETRIEVE_DELAY);
-
-/**
  * Load the oauth client config list
  */
 window.Vue.onMounted(() => {
@@ -343,14 +299,48 @@ function getEndpoint(): string {
     return `${searchUrl}?${searchParams}&`;
 }
 
-type Result = {
-    id: number;
+type Result = OAuthClientCredentialsUser & {
     name: string;
-    fullName: string;
 };
 
 const results = window.Vue.ref<Result[]>([]);
+/**
+ * Any client credentials requests (i.e. requests made by the client backend to this Schoolbox instance, without interaction by an actual user) will be authenticated as this user;
+ */
+export type OAuthClientCredentialsUser = {
+    id: number;
+    _links: {
+        profile: string;
+        avatar: string;
+    };
+    title: string;
+    firstName: string;
+    preferredName: string;
+    pronoun: string;
+    lastName: string;
+    fullName: string;
+    isDeleted: boolean;
+};
 
+/**
+ * A single OAuth client entry
+ */
+export type OAuthClient = {
+    id?: number;
+    name: string;
+    clientId?: string;
+    clientSecret?: string;
+    redirectUri: string; // When the user approves a request to share details, where should they be redirected to?
+    backChannelLogoutUri?: string; // On logging out of Schoolbox: send logout requests here
+    clientCredentialsUser?: OAuthClientCredentialsUser | null;
+    _links?: {
+        // action links
+        put: string;
+        patch: string;
+        delete: string;
+        regenerate: string;
+    };
+};
 /**
  * To handle the search response to update the name to the full name
  * @param json - the returned json
@@ -375,7 +365,7 @@ const addSelected = window.Vue.ref<Result[]>([]);
  */
 window.Vue.watch(addSelected, (newSelected) => {
     if (newSelected.length > 0) {
-        addingClient.value.clientCredentialsUser = newSelected[0];
+        [addingClient.value.clientCredentialsUser] = newSelected;
     } else {
         addingClient.value.clientCredentialsUser = null;
     }
@@ -405,7 +395,7 @@ window.Vue.watch(modifyingClient, (newModifyClient) => {
  */
 window.Vue.watch(modifySelected, (newSelected) => {
     if (newSelected.length > 0) {
-        modifyingClient.value.clientCredentialsUser = newSelected[0];
+        [modifyingClient.value.clientCredentialsUser] = newSelected;
     } else {
         modifyingClient.value.clientCredentialsUser = null;
     }
