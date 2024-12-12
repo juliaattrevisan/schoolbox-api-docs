@@ -122,13 +122,21 @@ export const useNodesStore = defineStore("ccNodes", () => {
 
     /**
      * Toggle the nodes isExpanded property
-     * @param node
+     * @param node - the node to toggle
      */
     function toggleNodeExpand(node: CurriculumCoverageNode): void {
         if (node.isExpanded) {
             node.isExpanded = false;
+            // hide the next level of children
+            node.children?.forEach((child) => {
+                child.isVisible = false;
+            });
         } else {
             node.isExpanded = true;
+            // show the next level of children
+            node.children?.forEach((child) => {
+                child.isVisible = true;
+            });
         }
     }
 
