@@ -81,6 +81,8 @@ class CurriculumOverviewController extends Component_Homepage_ControllerAbstract
         /** @var Folder\Model $context */
         $context = $this->getContext();
         if ($context->getCurriculumNodes()->count()) {
+            // Note this logic is duplicated in Curriculum/Api/Usage/Folder/Controller::buildTreeResponse
+
             $directNodeIds = $context->getCurriculumNodes()->getPropertyValues('id');
 
             // Fetch every node which is an ancestor or descendant of one of this folder's nodes, whether enabled or disabled.
