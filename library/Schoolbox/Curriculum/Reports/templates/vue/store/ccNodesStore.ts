@@ -62,11 +62,37 @@ export const useNodesStore = defineStore("ccNodes", () => {
         });
     }
 
+    /**
+     * Flatten the nodes into a single array for faster filtering
+     * @param node - the node to flatten
+     * @param flattenedNodes - the array to add the flattened nodes to
+     * @returns - the flattened nodes
+     */
+    function flattenNodes(
+        node: CurriculumCoverageNode,
+        flattenedNodes: CurriculumCoverageNode[] = [],
+    ): CurriculumCoverageNode[] {
+        flattenedNodes.push(node);
+        if (node.children && node.children.length > 0) {
+            node.children.forEach((child) => {
+                flattenNodes(child, flattenedNodes);
+            });
+        }
+        return flattenedNodes;
+    }
+
+    const flattenedNodes = window.Vue.computed(() => {
+        return nodes.value.reduce((acc, node) => {
+            return [...acc, ...flattenNodes(node)];
+        }, [] as CurriculumCoverageNode[]);
+    });
+
     return {
         nodes,
         setNodes,
         addCourseUsage,
         setMoreNodes,
         addMoreCourseUsage,
+        flattenedNodes,
     };
 });
