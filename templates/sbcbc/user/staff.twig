@@ -1,8 +1,0 @@
-{% extends "@core/user/staff.twig" %}
-
-{% block house %}
-    {% if externalUser.StaffHouseDescription %}
-        <dt class="small-12 medium-3">House:</dt>
-        <dd class="small-12 medium-9">{{ externalUser.StaffHouseDescription }}</dd>
-    {% endif %}
-{% endblock %}
