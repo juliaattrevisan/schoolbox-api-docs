@@ -56,6 +56,13 @@ export const useNodesStore = defineStore("ccNodes", () => {
     });
 
     /**
+     * The total number of valid empty nodes (nodes with a code and no usages)
+     */
+    const nodesWithNoFilteredUsages = window.Vue.computed(() => {
+        return flattenedNodes.value.filter((node) => node.code && getFilteredTotalCount(node, false) === 0);
+    });
+
+    /**
      * Has more nodes to show
      */
     const hasMore = window.Vue.computed(() => {
@@ -224,12 +231,11 @@ export const useNodesStore = defineStore("ccNodes", () => {
                 flattenedNodes.value.forEach((node) => {
                     node.isVisible = false;
                 });
-                const onlyNodesWithCodes = flattenedNodes.value.filter((node) => node.code);
-                const onlyNodesWithNoUsage = onlyNodesWithCodes.filter(
-                    (node) => getFilteredTotalCount(node, false) === 0,
-                );
-                onlyNodesWithNoUsage.forEach((node, index) => {
-                    node.isVisible = index < 50;
+                const nodesToShow = nodesWithNoFilteredUsages.value.filter(
+                    (node, index) => index < isVisibleBatchCount,
+                ); // just get the first batch of nodes to show
+                nodesToShow.forEach((node) => {
+                    node.isVisible = true;
                 });
             }
         },
@@ -246,13 +252,11 @@ export const useNodesStore = defineStore("ccNodes", () => {
                     node.previousIsVisible = node.isVisible;
                     node.isVisible = false;
                 });
-                const onlyNodesWithCodes = flattenedNodes.value.filter((node) => node.code);
-                const onlyNodesWithNoUsage = onlyNodesWithCodes.filter(
-                    (node) => getFilteredTotalCount(node, false) === 0,
-                );
-                const nodesToShow = onlyNodesWithNoUsage.filter((node, index) => index < isVisibleBatchCount); // just get the first batch of nodes to show
-                nodesToShow.forEach((node, index) => {
-                    node.isVisible = index < isVisibleBatchCount;
+                const nodesToShow = nodesWithNoFilteredUsages.value.filter(
+                    (node, index) => index < isVisibleBatchCount,
+                ); // just get the first batch of nodes to show
+                nodesToShow.forEach((node) => {
+                    node.isVisible = true;
                 });
                 currentIsVisibleCount.value = isVisibleBatchCount;
             } else {
@@ -268,9 +272,7 @@ export const useNodesStore = defineStore("ccNodes", () => {
      */
     function showMore(): void {
         const isVisibleBatchCountNext = currentIsVisibleCount.value + isVisibleBatchCount;
-        const onlyNodesWithCodes = flattenedNodes.value.filter((node) => node.code);
-        const onlyNodesWithNoUsage = onlyNodesWithCodes.filter((node) => getFilteredTotalCount(node, false) === 0);
-        const nodesToShow = onlyNodesWithNoUsage.filter(
+        const nodesToShow = nodesWithNoFilteredUsages.value.filter(
             (node, index) => index <= isVisibleBatchCountNext && index >= currentIsVisibleCount.value, // get the next batch of nodes to show
         );
         nodesToShow.forEach((node) => {
