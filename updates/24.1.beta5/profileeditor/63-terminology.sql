@@ -59,8 +59,14 @@ VALUES (
     'houses',
     1,
     'a'
-)
-;
+), (
+    'studentTutorDescription',
+    'Tutor Group',
+    'tutor group',
+    'tutor groups',
+    1,
+    'a'
+);
 
 -- Assign terminology to profile fields
 
@@ -109,5 +115,11 @@ LIMIT 1;
 UPDATE profile_field
 SET term = 'schoolHouse'
 WHERE field = 'schoolHouse'
+AND roletype = 'student'
+LIMIT 1;
+
+UPDATE profile_field
+SET term = 'studentTutorDescription'
+WHERE field = 'StudentTutorDescription'
 AND roletype = 'student'
 LIMIT 1;
