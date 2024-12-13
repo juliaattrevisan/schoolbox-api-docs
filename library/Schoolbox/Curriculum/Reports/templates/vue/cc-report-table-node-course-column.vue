@@ -38,7 +38,7 @@ function onClick(): void {
 
 <template>
     <!-- padding will be on the button if count is not zeo -->
-    <td class="u-border-left" :style="{ padding: isCountZero ? '0.625rem' : '0' }">
+    <td class="u-border-left usage-cell">
         <template v-if="isCountZero">
             {{ count }}
         </template>
@@ -47,7 +47,7 @@ function onClick(): void {
             :id="buttonId"
             ref="buttonEl"
             :style="{ background: buttonId === popOutStore.button?.id ? 'var(--accent-background)' : '' }"
-            class="f-always-show"
+            class="f-always-show usage-button"
             @click="onClick"
         >
             {{ count }}
@@ -56,11 +56,15 @@ function onClick(): void {
 </template>
 
 <style lang="scss" scoped>
-td {
+.usage-cell {
     position: relative;
 }
 
-button {
+.usage-cell:has(.usage-button) {
+    padding: 0;
+}
+
+.usage-button {
     background: none;
     display: flex; // to align the text to the top left
     padding: 0.625rem;
