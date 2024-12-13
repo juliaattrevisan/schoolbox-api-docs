@@ -364,6 +364,7 @@ class Component_Homepage_ManageClassController extends Component_Homepage_Contro
             $coverageLink .= '?courseId=' . $this->getContext()->getCourseSpecification()->getId();
             $this->setVar('CURRICULUM_COVERAGE_LINK', $coverageLink);
             $this->parse('curriculum_coverage_block', 'curriculum_coverage');
+            $hasClassActions = true;
         } else {
             $this->setVar('curriculum_coverage_block');
         }
