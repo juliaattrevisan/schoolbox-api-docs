@@ -13,8 +13,9 @@ import { useCoursesStore } from "./store/ccCoursesStore";
 import { useNodesStore } from "./store/ccNodesStore";
 import { useFiltersStore } from "./store/ccFiltersStore";
 import { usePopOutStore } from "./store/ccPopOutStore";
+import { getFilteredCourseColumnCount } from "./util/countUtils";
 import CcReportTableNodeTotalColumn from "./cc-report-table-node-total-column.vue";
-import CcReportTableNodeCourseColumn from "./cc-report-table-node-course-column.vue";
+// import CcReportTableNodeCourseColumn from "./cc-report-table-node-course-column.vue";
 import CcReportTableNodeUnitColumn from "./cc-report-table-node-unit-column.vue";
 import CcReportTableNodeCourseTotalColumn from "./cc-report-table-node-course-total-column.vue";
 
@@ -134,13 +135,28 @@ function onCourseClicked(buttonEl: HTMLButtonElement): void {
         <template v-for="course in props.node.usage.courses" :key="course.id">
             <!-- if the node course column and its children are completely empty, just hard set to 0 -->
             <td v-if="props.node.hasNoUsages || course.hasNoCourseUsages">0</td>
-            <cc-report-table-node-course-column
-                v-else
-                :node="props.node"
-                :course="course"
-                :is-expanded="props.node.isExpanded"
-                @click="onCourseClicked"
-            />
+            <td
+                v-else-if="getFilteredCourseColumnCount(props.node, course, !props.node.isExpanded) === 0"
+                class="u-border-left usage-cell"
+            >
+                {{ getFilteredCourseColumnCount(props.node, course, !props.node.isExpanded) }}
+            </td>
+            <td v-else class="u-border-left usage-cell">
+                <button
+                    :id="`usage-button-${course.id}-${props.node.id}`"
+                    ref="buttonEl"
+                    :style="{
+                        background:
+                            `usage-button-${course.id}-${props.node.id}` === popOutStore.button?.id
+                                ? 'var(--accent-background)'
+                                : '',
+                    }"
+                    class="f-always-show usage-button"
+                    @click="(event) => onCourseClicked(event.target as HTMLButtonElement)"
+                >
+                    {{ getFilteredCourseColumnCount(props.node, course, !props.node.isExpanded) }}
+                </button>
+            </td>
             <template v-for="unit in course.units" :key="unit.id">
                 <!-- if the node unit column and its children are completely empty, just hard set to 0 -->
                 <td v-if="props.node.hasNoUsages || unit.hasNoUsages">0</td>
@@ -177,8 +193,30 @@ function onCourseClicked(buttonEl: HTMLButtonElement): void {
     </template>
 </template>
 
-<style scoped>
+<style lang="scss" scoped>
 tr:hover {
     background-color: #f4f3f3; /* to help legibility */
+}
+
+.usage-cell {
+    position: relative;
+}
+
+.usage-cell:has(.usage-button) {
+    padding: 0;
+}
+
+.usage-button {
+    background: none;
+    display: flex; // to align the text to the top left
+    padding: 0.625rem;
+    position: absolute; // make the button fill the entire td cell
+    margin: 0;
+    height: 100%;
+    text-align: left;
+    width: 100%;
+    &:hover {
+        background: var(--accent-background);
+    }
 }
 </style>
