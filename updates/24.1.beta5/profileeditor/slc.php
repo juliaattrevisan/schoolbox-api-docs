@@ -125,11 +125,34 @@ HELP;
 
         $this->helper->updateField(Role::STAFF, 'SchoolStaffCode', $campusIds, $roletypes);
 
+        /* Rename FormTeacher to Mentor
+         */
+        $this->renameField();
+
         /* Announce lock release
          */
         $this->getLogger()->debug('Releasing lock');
 
         $lock->release();
+    }
+
+
+    /**
+     * This was renamed to Mentor in the ui
+     *
+     * @return void
+     */
+    private function renameField(): void
+    {
+        $this->getLogger()->debug('Renaming "Class Teacher" to "Mentor"');
+
+        $this->getDatabaseInternal()->executeQuery("
+            UPDATE localisation
+            SET singular_form = 'mentor',
+                plural_form = 'mentors'
+            WHERE term = 'formTeacher'
+            LIMIT 1
+        ");
     }
 
 
