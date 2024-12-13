@@ -28,7 +28,6 @@ const emit = defineEmits<{
     titleClick: [node: CurriculumCoverageNode];
 }>();
 
-const coursesStore = useCoursesStore();
 const nodesStore = useNodesStore();
 const filtersStore = useFiltersStore();
 const { title } = useNodeTitle(props.node);
@@ -55,14 +54,6 @@ function onTotalClicked(): void {
 }
 
 // #endregion
-
-/**
- * Emit to open up the node details modal
- * @param node - the node that was selected
- */
-function onChildTitleClicked(node: CurriculumCoverageNode): void {
-    emit("titleClick", node);
-}
 
 // #region unit selection, open pop out
 
@@ -160,7 +151,7 @@ function onCourseClicked(buttonEl: HTMLButtonElement): void {
                     @click="onUnitClicked"
                 />
             </template>
-            <template v-if="coursesStore.hasMultipleCourses">
+            <template v-if="useCoursesStore().hasMultipleCourses">
                 <!-- if the node course and its children are completely empty, just hard set to 0 -->
                 <td v-if="props.node.hasNoUsages || course.hasNoTotalUsages">0</td>
                 <cc-report-table-node-course-total-column
@@ -179,7 +170,7 @@ function onCourseClicked(buttonEl: HTMLButtonElement): void {
             :key="child.id"
             :node="child"
             :depth="props.depth + 1"
-            @title-click="onChildTitleClicked"
+            @title-click="(node) => emit('titleClick', node)"
         />
     </template>
 </template>
