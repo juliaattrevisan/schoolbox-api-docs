@@ -58,13 +58,6 @@ function onTotalClicked(): void {
 
 /**
  * Emit to open up the node details modal
- */
-function onTitleClicked(): void {
-    emit("titleClick", props.node);
-}
-
-/**
- * Emit to open up the node details modal
  * @param node - the node that was selected
  */
 function onChildTitleClicked(node: CurriculumCoverageNode): void {
@@ -127,7 +120,7 @@ function onCourseClicked(buttonEl: HTMLButtonElement): void {
             <button
                 class="l-pad--0 t-align-left f-no-bkg f-always-show"
                 :style="{ paddingLeft: lastChildPadding }"
-                @click="onTitleClicked"
+                @click="emit('titleClick', props.node)"
             >
                 <!-- bolden the selected curriculum node to help distinguish -->
                 <template v-if="props.depth === 0"
