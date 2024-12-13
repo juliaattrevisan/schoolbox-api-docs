@@ -37,10 +37,34 @@ window.Vue.watch(isDetailsOpen, (isOpen) => {
         selectedNodeId.value = null;
     }
 });
+
+// #region scrollable height
+
+const maxScrollableHeight = window.Vue.ref<string>(`${window.innerHeight - 100}px`); // 100px chosen to give some breathing room
+
+/**
+ * Set the max height to allow the thead to use sticky position
+ * and to incrementally display large row lists on scroll
+ */
+function setScrollableHeight(): void {
+    maxScrollableHeight.value = `${window.innerHeight - 100}px`;
+}
+
+/**
+ * Start setting the scrollable height on any window resize change
+ */
+window.Vue.onMounted(() => {
+    setScrollableHeight();
+    window.addEventListener("resize", () => {
+        setScrollableHeight();
+    });
+});
+
+// #endregion
 </script>
 
 <template>
-    <div class="scrollable">
+    <div class="scrollable" :style="{ maxHeight: maxScrollableHeight }">
         <table class="coverage-report">
             <thead>
                 <tr>
@@ -94,10 +118,6 @@ window.Vue.watch(isDetailsOpen, (isOpen) => {
 </template>
 
 <style scoped>
-.scrollable {
-    max-height: 1400px;
-}
-
 thead {
     /** fix the head to stay at the top when scrolling */
     position: sticky;
