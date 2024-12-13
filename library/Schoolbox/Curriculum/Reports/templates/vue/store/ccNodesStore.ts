@@ -76,7 +76,7 @@ export const useNodesStore = defineStore("ccNodes", () => {
     /**
      * Set the default isVisible property for the nodes, setting the first two levels as visible
      */
-    function setDefaultIsVisible(): void {
+    function setIsVisible(): void {
         flattenedNodes.value.forEach((node) => {
             node.isVisible = false;
         });
@@ -93,7 +93,7 @@ export const useNodesStore = defineStore("ccNodes", () => {
     /**
      * Set the default isExpanded property for the nodes, setting the first two levels as expanded
      */
-    function setDefaultIsExpanded(): void {
+    function setIsExpanded(): void {
         flattenedNodes.value.forEach((node) => {
             node.isExpanded = false;
         });
@@ -126,8 +126,8 @@ export const useNodesStore = defineStore("ccNodes", () => {
      */
     function setNodes(newNodes: CurriculumCoverageNode[]): void {
         nodes.value = newNodes;
-        setDefaultIsVisible();
-        setDefaultIsExpanded();
+        setIsVisible();
+        setIsExpanded();
         setHasNoUsages();
     }
 
@@ -162,8 +162,8 @@ export const useNodesStore = defineStore("ccNodes", () => {
      */
     function setMoreNodes(newNodes: CurriculumCoverageNode[]): void {
         nodes.value = [...nodes.value, ...newNodes];
-        setDefaultIsVisible();
-        setDefaultIsExpanded();
+        setIsVisible();
+        setIsExpanded();
         setHasNoUsages();
     }
 
@@ -219,6 +219,15 @@ export const useNodesStore = defineStore("ccNodes", () => {
             node.isExpanded = true;
             showChildren(node.children);
         }
+    }
+
+    /**
+     * Set the default values for the nodes
+     */
+    function setDefaults(): void {
+        setIsVisible();
+        setIsExpanded();
+        setHasNoUsages();
     }
 
     /**
@@ -289,6 +298,7 @@ export const useNodesStore = defineStore("ccNodes", () => {
         addMoreCourseUsage,
         flattenedNodes,
         toggleNodeExpand,
+        setDefaults,
         hasMore,
         showMore,
     };

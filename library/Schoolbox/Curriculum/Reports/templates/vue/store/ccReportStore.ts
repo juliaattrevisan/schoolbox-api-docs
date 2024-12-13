@@ -69,6 +69,9 @@ export const useReportStore = defineStore("ccReport", () => {
                     nodesStore.addCourseUsage(newCourseNodes);
                     loadMoreStore.addNext(responseJson.metadata.cursor.next);
                 }
+                if (currentIndex === useQueryStore().getQueryUrls().length - 1) {
+                    nodesStore.setDefaults();
+                }
             } else {
                 throw new Error("Unexpected response format");
             }
