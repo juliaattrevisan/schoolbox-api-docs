@@ -2,9 +2,8 @@
     /**
      * AdminMenu
      *
-     * Provide the slideDown menu or the Flyout menu depending on the
-     * current dimensions of the viewport. Note that users can resize
-     * their browser window and the menu should change accordingly
+     * Provide a slide down menu interface for the admin area
+     * Only one menu item can be expanded at a time
      *
      * @param options
      */
