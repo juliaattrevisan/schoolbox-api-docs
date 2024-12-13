@@ -16,7 +16,6 @@ use Schoolbox\Mapper\DefinitionException;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Assessment\Term;
 use Schoolbox\Resource\Folder;
-use Symfony\Component\Routing\Exception\RouteNotFoundException;
 
 /**
  * @method Folder\Model getContext()
@@ -354,43 +353,22 @@ class Component_Homepage_ManageClassController extends Component_Homepage_Contro
             $this->setVar('unit_planner_block');
         }
 
-        $curriculumCoverageUrl = $this->getCurriculumCoverageUrl();
-
         // Curriculum coverage report should show for Course pages.
         if (
             $lmsEnabled &&
             $isCoursePage &&
             $this->getContentPermission() >= UserAccess::ACCESS_READ &&
-            $curriculumCoverageUrl !== null
+            $this->getAuthorizer()->isPathAuthorizedForUser('curriculumreports.getCoverage', [], $this->getUser())
         ) {
-            $this->setVar('CURRICULUM_COVERAGE_LINK', $curriculumCoverageUrl);
+            $coverageLink = $this->getRouteGenerator()->generate('curriculumreports.getCoverage');
+            $coverageLink .= '?courseId=' . $this->getContext()->getCourseSpecification()->getId();
+            $this->setVar('CURRICULUM_COVERAGE_LINK', $coverageLink);
             $this->parse('curriculum_coverage_block', 'curriculum_coverage');
         } else {
             $this->setVar('curriculum_coverage_block');
         }
 
         return $hasClassActions;
-    }
-
-    /**
-     * Return the URL of the Curriculum Coverage Report if the user has permission to view it, otherwise null.
-     * @return string|null
-     */
-    private function getCurriculumCoverageUrl(): ?string
-    {
-        $route = 'curriculumreports.getCoverage';
-        $url = null;
-
-        try {
-            if ($this->getAuthorizer()->isPathAuthorizedForUser($route, [], $this->getUser())) {
-                $url = $this->getRouteGenerator()->generate($route);
-                $url .= '?courseId=' . $this->getContext()->getCourseSpecification()->getId();
-            }
-        } catch (RouteNotFound | ContainerExceptionInterface) {
-            // Do nothing.  Leave $url as null.
-        }
-
-        return $url;
     }
 
     /**
