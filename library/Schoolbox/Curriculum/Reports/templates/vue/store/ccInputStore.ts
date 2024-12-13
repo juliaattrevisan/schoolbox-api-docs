@@ -17,6 +17,7 @@ export const useInputStore = defineStore(`ccInput`, () => {
     const nodesValue = window.Vue.computed(() => (selectedNodesStore.nodesIds as number[]).join(","));
     const activeCoursesValue = window.Vue.ref("");
     const activeNodesValue = window.Vue.ref("");
+    const activeNodeCount = window.Vue.ref<number>(0); // the total selected curriculum nodes, used to determine if all nodes have been loaded
 
     /**
      * report has been triggered so set the active course and nodes
@@ -24,6 +25,7 @@ export const useInputStore = defineStore(`ccInput`, () => {
     function setActive(): void {
         activeCoursesValue.value = coursesValue.value;
         activeNodesValue.value = nodesValue.value;
+        activeNodeCount.value = selectedNodesStore.nodes.length;
     }
 
     /**
@@ -40,6 +42,7 @@ export const useInputStore = defineStore(`ccInput`, () => {
         courseIds,
         coursesValue,
         nodesValue,
+        activeNodeCount,
         setActive,
         canReport,
     };

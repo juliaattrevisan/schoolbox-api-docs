@@ -3,7 +3,7 @@
  * Displayed when show only gaps is selected, and there are no nodes to display.
  */
 
-import { useReportStore } from "./store/ccReportStore";
+import { useCoursesStore } from "./store/ccCoursesStore";
 import { useFiltersStore } from "./store/ccFiltersStore";
 
 interface Props {
@@ -11,7 +11,7 @@ interface Props {
 }
 const props = defineProps<Props>();
 
-const reportStore = useReportStore();
+const coursesStore = useCoursesStore();
 const filtersStore = useFiltersStore();
 const isEmpty = window.Vue.ref(false);
 
@@ -44,7 +44,7 @@ window.Vue.onMounted(async () => {
 
 <template>
     <tr v-if="isEmpty">
-        <td :colspan="reportStore.totalColumnCount" class="t-align-center">
+        <td :colspan="coursesStore.totalColumnCount" class="t-align-center">
             <em>No curriculum has a total usage count of 0.</em>
         </td>
     </tr>

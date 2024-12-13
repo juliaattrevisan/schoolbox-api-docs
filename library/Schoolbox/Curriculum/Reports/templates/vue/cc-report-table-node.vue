@@ -12,6 +12,7 @@ import type {
     UnitWithCurriculumNodeUsage,
 } from "../js/types/curriculumCoverageTypes";
 import { useReportStore } from "./store/ccReportStore";
+import { useCoursesStore } from "./store/ccCoursesStore";
 import { useFiltersStore } from "./store/ccFiltersStore";
 import { usePopOutStore } from "./store/ccPopOutStore";
 import {
@@ -37,6 +38,7 @@ const emit = defineEmits<{
 }>();
 
 const reportStore = useReportStore();
+const coursesStore = useCoursesStore();
 const filtersStore = useFiltersStore();
 const { title } = useNodeTitle(props.node);
 
@@ -47,10 +49,8 @@ const hasChildren = window.Vue.ref(Array.isArray(props.node.children) && props.n
 
 const isExpanded = window.Vue.ref(props.depth < 1); // to hide any grandchild and below nodes by default
 const expandTitle = window.Vue.computed(() => (isExpanded.value ? "Collapse" : "Expand"));
-// don't show the expand button when the node is at the top level, has no children, or onlyShowGaps is active
-const showExpandButton = window.Vue.computed(
-    () => props.depth !== 0 && hasChildren.value && !filtersStore.onlyShowGaps,
-);
+// don't show the expand button when the node has no children, or onlyShowGaps is active
+const showExpandButton = window.Vue.computed(() => hasChildren.value && !filtersStore.onlyShowGaps);
 const lastChildPadding = window.Vue.computed(() =>
     props.depth !== 0 && !hasChildren.value && !filtersStore.onlyShowGaps ? "2.75rem" : "0",
 ); // to add padding to the last child node to align better with the expand button
@@ -87,10 +87,17 @@ const showNode = window.Vue.computed(() => {
         return true;
     }
     // don't show nodes that can't have usage assigned when only show gaps is active
-    if ((filtersStore.onlyShowGaps && props.node.code === null) || props.node.code === "") {
+    if (
+        (filtersStore.onlyShowGaps && props.node.code === null) ||
+        (filtersStore.onlyShowGaps && props.node.code === "")
+    ) {
         return false;
     }
-    return getFilteredTotalCount(props.node, !isExpanded.value) === 0 && filtersStore.onlyShowGaps;
+    // always return true if gaps selected and the node has no usages at all
+    if (filtersStore.onlyShowGaps && hasNoUsages.value) {
+        return true;
+    }
+    return getFilteredTotalCount(props.node, false) === 0 && filtersStore.onlyShowGaps;
 });
 
 // #endregion
@@ -179,7 +186,11 @@ function onCourseClicked(buttonEl: HTMLButtonElement): void {
                 :style="{ paddingLeft: lastChildPadding }"
                 @click="onTitleClicked"
             >
-                {{ title }}
+                <!-- bolden the selected curriculum node to help distinguish -->
+                <template v-if="props.depth === 0"
+                    ><b>{{ title }}</b></template
+                >
+                <template v-else>{{ title }}</template>
             </button>
         </td>
         <!-- if the node total and its children are completely empty, just hard set to 0 -->
@@ -213,7 +224,7 @@ function onCourseClicked(buttonEl: HTMLButtonElement): void {
                     @click="onUnitClicked"
                 />
             </template>
-            <template v-if="reportStore.hasMultipleCourses">
+            <template v-if="coursesStore.hasMultipleCourses">
                 <!-- if the node course and its children are completely empty, just hard set to 0 -->
                 <td v-if="hasNoUsages || getCourseCount(props.node, course, true) === 0">0</td>
                 <cc-report-table-node-course-total-column

@@ -5,6 +5,7 @@
 
 import CcReportFilters from "./cc-report-filters.vue";
 import CcReportTable from "./cc-report-table.vue";
+import CcReportLoadMore from "./cc-report-load-more.vue";
 
 import { useReportStore } from "./store/ccReportStore";
 
@@ -23,13 +24,17 @@ const reportStore = useReportStore();
         <div class="alert-box alert f-no-margins">
             Sorry, there was an error during report retrieval. Please
             <a href="" title="refresh the page"> refresh the page </a>
-            to try again and contact your support if the problem persists
+            to try again and contact your support if the problem persists.
+            <template v-if="reportStore.loadError"
+                ><em>Further support info: {{ reportStore.loadError }}</em></template
+            >
         </div>
     </div>
     <div v-else-if="reportStore.hasReport" class="c-island l-pad-m">
         <div class="l-flex l-flex-col l-gap-s">
             <cc-report-filters />
             <cc-report-table />
+            <cc-report-load-more />
         </div>
     </div>
 </template>

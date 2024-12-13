@@ -172,6 +172,22 @@ window.Vue.watch(
     },
 );
 
+/**
+ * Whether or not to show the search results
+ */
+const showResults = window.Vue.computed(() => {
+    if (hasPressedEscape.value) {
+        return false;
+    }
+    if (isActive.value) {
+        return true;
+    }
+    if (props.defaultResults && props.defaultResults.length > 0) {
+        return true;
+    }
+    return false;
+});
+
 // #endregion
 
 /**
@@ -210,6 +226,7 @@ function onButtonSelected(): void {
                 v-model:query="query"
                 :label-id="props.labelId"
                 :placeholder="props.placeholder"
+                :show-results="showResults"
                 @escape="onEscapeInput"
             />
             <button
@@ -221,9 +238,9 @@ function onButtonSelected(): void {
                 {{ props.buttonTitle }}
             </button>
         </div>
-        <div v-show="!hasPressedEscape" class="results-container">
+        <div class="results-container">
             <ss-results
-                v-if="isActive || (props.defaultResults && props.defaultResults.length > 0)"
+                v-if="showResults"
                 :query="query"
                 :is-active="isActive"
                 :has-pressed-escape="hasPressedEscape"

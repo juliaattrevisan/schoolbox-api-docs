@@ -40,16 +40,6 @@ export const useQueryStore = defineStore("ccQuery", () => {
     }
 
     /**
-     * To collect all the params to send to the search api
-     * Commented out for now as we've giving loading each course individually a go
-     * @returns - the query params
-     */
-    // function getEndpointWithParams(): string {
-    //     const newQueryParams = getQueryParams();
-    //     return `${endpoint}?${newQueryParams.toString()}`;
-    // }
-
-    /**
      * Returns a list of query urls split by each course in an attempt to
      * reduce the demand on the server
      * @returns - the query urls
@@ -68,7 +58,6 @@ export const useQueryStore = defineStore("ccQuery", () => {
         init,
         getQueryParams,
         setQueryParams,
-        // getEndpointWithParams,
         getQueryUrls,
     };
 });

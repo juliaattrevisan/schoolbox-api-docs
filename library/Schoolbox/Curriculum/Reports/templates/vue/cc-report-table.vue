@@ -10,10 +10,12 @@ import BasicModal from "@schoolboxVue/components/modal/basic-modal.vue";
 import CcReportTableNode from "./cc-report-table-node.vue";
 import CcReportTableNoNodes from "./cc-report-table-no-nodes.vue";
 import CcUsagePopOut from "./cc-usage-pop-out.vue";
-import { useReportStore } from "./store/ccReportStore";
+import { useCoursesStore } from "./store/ccCoursesStore";
+import { useNodesStore } from "./store/ccNodesStore";
 import type { CurriculumCoverageNode } from "../js/types/curriculumCoverageTypes";
 
-const reportStore = useReportStore();
+const coursesStore = useCoursesStore();
+const nodesStore = useNodesStore();
 const isDetailsOpen = window.Vue.ref(false);
 const selectedNodeId = window.Vue.ref<number | null>(null);
 const tbodyEl = useTemplateRef<HTMLTableSectionElement>("tbodyEl");
@@ -44,12 +46,12 @@ window.Vue.watch(isDetailsOpen, (isOpen) => {
                 <tr>
                     <th rowspan="2" class="curriculum-column l-valign--bottom">Curriculum</th>
                     <th rowspan="2" class="u-border-left l-valign--bottom">Total</th>
-                    <template v-for="course in reportStore.courses" :key="course.id">
+                    <template v-for="course in coursesStore.courses" :key="course.id">
                         <th class="u-border-left" style="border-right: none">Course</th>
                         <!-- colspan will be the number of units plus total if more than one course -->
                         <th
                             style="border-left: none"
-                            :colspan="`${course.units && course.units.length ? (reportStore.hasMultipleCourses ? course.units.length + 1 : course.units.length) : 0}`"
+                            :colspan="`${course.units && course.units.length ? (coursesStore.hasMultipleCourses ? course.units.length + 1 : course.units.length) : 0}`"
                         >
                             {{
                                 course.units && course.units.length > 1
@@ -60,22 +62,22 @@ window.Vue.watch(isDetailsOpen, (isOpen) => {
                     </template>
                 </tr>
                 <tr>
-                    <template v-for="course in reportStore.courses" :key="course.id">
-                        <td class="u-border-left">
+                    <template v-for="course in coursesStore.courses" :key="course.id">
+                        <td class="u-border-left course-column">
                             <a v-if="course.folder" :href="course.folder._links.view">{{ course.name }}</a
                             ><template v-else>{{ course.name }}</template>
                         </td>
-                        <td v-for="unit in course.units" :key="unit.id">
+                        <td v-for="unit in course.units" :key="unit.id" class="unit-column">
                             <a v-if="unit.folder" :href="unit.folder._links.view">{{ unit.name }}</a
                             ><template v-else>{{ course.name }}</template>
                         </td>
-                        <td v-if="reportStore.hasMultipleCourses" class="l-valign--bottom"><b>Total</b></td>
+                        <td v-if="coursesStore.hasMultipleCourses" class="l-valign--bottom"><b>Total</b></td>
                     </template>
                 </tr>
             </thead>
             <tbody ref="tbodyEl">
                 <cc-report-table-node
-                    v-for="node in reportStore.nodes"
+                    v-for="node in nodesStore.nodes"
                     :key="node.id"
                     :node="node"
                     :depth="0"
@@ -92,6 +94,11 @@ window.Vue.watch(isDetailsOpen, (isOpen) => {
 </template>
 
 <style scoped>
+.course-column,
+.unit-column {
+    min-width: 175px; /* prevent the course/unit names from getting too small */
+}
+
 .curriculum-column {
     min-width: 400px; /* fixed width for the curriculum column to prevent shifts on expand/collapse */
     width: 400px; /* fixed width for the curriculum column to prevent shifts on expand/collapse */
