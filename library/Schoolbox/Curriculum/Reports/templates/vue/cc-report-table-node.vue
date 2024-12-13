@@ -215,10 +215,9 @@ tr:hover {
 
 .usage-cell {
     position: relative;
-}
-
-.usage-cell:has(.usage-button) {
-    padding: 0;
+    &:has(.usage-button) {
+        padding: 0; // padding is handled by the button instead
+    }
 }
 
 .usage-button {
