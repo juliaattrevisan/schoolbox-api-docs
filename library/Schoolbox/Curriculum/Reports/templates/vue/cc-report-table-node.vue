@@ -13,10 +13,15 @@ import { useCoursesStore } from "./store/ccCoursesStore";
 import { useNodesStore } from "./store/ccNodesStore";
 import { useFiltersStore } from "./store/ccFiltersStore";
 import { usePopOutStore } from "./store/ccPopOutStore";
-import { getFilteredTotalCount, getFilteredCourseColumnCount, getFilteredCourseCount } from "./util/countUtils";
+import {
+    getFilteredTotalCount,
+    getFilteredCourseColumnCount,
+    getFilteredUnitColumnCount,
+    getFilteredCourseCount,
+} from "./util/countUtils";
 // import CcReportTableNodeTotalColumn from "./cc-report-table-node-total-column.vue";
 // import CcReportTableNodeCourseColumn from "./cc-report-table-node-course-column.vue";
-import CcReportTableNodeUnitColumn from "./cc-report-table-node-unit-column.vue";
+// import CcReportTableNodeUnitColumn from "./cc-report-table-node-unit-column.vue";
 // import CcReportTableNodeCourseTotalColumn from "./cc-report-table-node-course-total-column.vue";
 
 interface Props {
@@ -161,14 +166,28 @@ function onCourseClicked(buttonEl: HTMLButtonElement): void {
             <template v-for="unit in course.units" :key="unit.id">
                 <!-- if the node unit column and its children are completely empty, just hard set to 0 -->
                 <td v-if="props.node.hasNoUsages || unit.hasNoUsages">0</td>
-                <cc-report-table-node-unit-column
-                    v-else
-                    :node="props.node"
-                    :course="course"
-                    :unit="unit"
-                    :is-expanded="props.node.isExpanded"
-                    @click="onUnitClicked"
-                />
+                <td
+                    v-else-if="getFilteredUnitColumnCount(props.node, course, unit, !props.node.isExpanded) === 0"
+                    class="u-border-left usage-cell"
+                >
+                    {{ getFilteredUnitColumnCount(props.node, course, unit, !props.node.isExpanded) }}
+                </td>
+                <td v-else class="u-border-left usage-cell">
+                    <button
+                        :id="`usage-button-${course.id}-${unit.id}-${props.node.id}`"
+                        ref="buttonEl"
+                        :style="{
+                            background:
+                                `usage-button-${course.id}-${unit.id}-${props.node.id}` === popOutStore.button?.id
+                                    ? 'var(--accent-background)'
+                                    : '',
+                        }"
+                        class="f-always-show usage-button"
+                        @click="(event) => onUnitClicked(course, unit, event.target as HTMLButtonElement)"
+                    >
+                        {{ getFilteredUnitColumnCount(props.node, course, unit, !props.node.isExpanded) }}
+                    </button>
+                </td>
             </template>
             <template v-if="useCoursesStore().hasMultipleCourses">
                 <!-- if the node course and its children are completely empty, just hard set to 0 -->
