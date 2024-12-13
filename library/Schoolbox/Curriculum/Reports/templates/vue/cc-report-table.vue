@@ -3,8 +3,9 @@
  * Displays the curriculum coverage report in a table format.
  */
 
+import { useTemplateRef, toRefs } from "vue";
+import { useScroll } from "@vueuse/core";
 import locale from "@js/terminology/rosettaStone";
-import { useTemplateRef } from "vue";
 import NodeDetails from "@schoolboxCurriculum/vue/node-details.vue";
 import BasicModal from "@schoolboxVue/components/modal/basic-modal.vue";
 import CcReportTableNode from "./cc-report-table-node.vue";
@@ -61,10 +62,24 @@ window.Vue.onMounted(() => {
 });
 
 // #endregion
+
+const scrollableEl = useTemplateRef<HTMLDivElement>("scrollableEl");
+
+/**
+ * To display more nodes when there's lots to display and the user has scrolled to the bottom
+ */
+const { arrivedState } = useScroll(scrollableEl);
+const { bottom } = toRefs(arrivedState);
+window.Vue.watch(bottom, (isAtBottom) => {
+    // if (isAtBottom && currentHeight.value === maxResultsHeight - 2) {
+    if (isAtBottom) {
+        console.warn("eh");
+    }
+});
 </script>
 
 <template>
-    <div class="scrollable" :style="{ maxHeight: maxScrollableHeight }">
+    <div class="scrollable" ref="scrollableEl" :style="{ maxHeight: maxScrollableHeight }">
         <table class="coverage-report">
             <thead>
                 <tr>

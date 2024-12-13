@@ -13,9 +13,12 @@ import {
     getFilteredTotalCount,
 } from "../util/countUtils";
 
+const nodesToShow = 50;
+
 export const useNodesStore = defineStore("ccNodes", () => {
     const filtersStore = useFiltersStore();
     const nodes = window.Vue.ref<CurriculumCoverageNode[]>([]); // the nodes to display in the report
+    const currentIsVisibleCount = window.Vue.ref(0); // the current number of visible nodes
 
     /**
      * Flatten the nodes into a single array for faster filtering
@@ -50,6 +53,17 @@ export const useNodesStore = defineStore("ccNodes", () => {
      */
     const totalCount = window.Vue.computed(() => {
         return flattenedNodes.value.length;
+    });
+
+    /**
+     * Has more nodes to show
+     */
+    const hasMore = window.Vue.computed(() => {
+        // this check will only every apply if the onlyShowGaps filter is on
+        if (filtersStore.onlyShowGaps) {
+            return currentIsVisibleCount.value < totalCount.value;
+        }
+        return false;
     });
 
     /**
@@ -216,8 +230,9 @@ export const useNodesStore = defineStore("ccNodes", () => {
                     (node) => getFilteredTotalCount(node, false) === 0,
                 );
                 onlyNodesWithNoUsage.forEach((node, index) => {
-                    node.isVisible = index < 50;
+                    node.isVisible = index < nodesToShow;
                 });
+                currentIsVisibleCount.value = nodesToShow;
             } else {
                 flattenedNodes.value.forEach((node) => {
                     node.isVisible = node.previousIsVisible;
@@ -225,6 +240,19 @@ export const useNodesStore = defineStore("ccNodes", () => {
             }
         },
     );
+
+    /**
+     * Show the next set of nodesToShow when called
+     */
+    function showMore(): void {
+        const nodesToShowNext = currentIsVisibleCount.value + nodesToShow;
+        const onlyNodesWithCodes = flattenedNodes.value.filter((node) => node.code);
+        const onlyNodesWithNoUsage = onlyNodesWithCodes.filter((node) => getFilteredTotalCount(node, false) === 0);
+        onlyNodesWithNoUsage.forEach((node, index) => {
+            node.isVisible = index < nodesToShowNext;
+        });
+        currentIsVisibleCount.value = nodesToShowNext;
+    }
 
     return {
         nodes,
@@ -234,5 +262,7 @@ export const useNodesStore = defineStore("ccNodes", () => {
         addMoreCourseUsage,
         flattenedNodes,
         toggleNodeExpand,
+        hasMore,
+        showMore,
     };
 });
