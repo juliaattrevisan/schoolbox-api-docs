@@ -86,15 +86,26 @@
                                      # The field name will always show at this point, though their values
                                      # will need special treatment somehow
                                      #}
-                                    <dt class="small-4 medium-3 columns">{{ macro.fieldName(selectedField) }}</dt>
-                                    <dd class="small-8 medium-9 columns">
-                                        {% if selectedField.field in ['email'] %}
+                                    {% if selectedField.field in ['email'] %}
+                                        <dt class="small-4 medium-3 columns">{{ macro.fieldName(selectedField) }}</dt>
+                                        <dd class="small-8 medium-9 columns">
                                             {{ macro.email(session, selectedField.value, selectedField.value) }}
-                                        {% else %}
-                                            {# A generic tuple (key, value) pair #}
-                                            {{ selectedField.value }}
-                                        {% endif %}
-                                    </dd>
+                                        </dd>
+                                    {% else %}
+                                        {# A generic tuple (key, value) pair
+                                         #
+                                         # Also gives you a way to render a field specially when it isn't already
+                                         # one of the treatments listed above...such as a custom work's field
+                                         #
+                                         # Some custom works require two data points to produce one field to represent them
+                                         #}
+                                        {% block profileFieldTuple %}
+                                            <dt class="small-4 medium-3 columns">{{ macro.fieldName(selectedField) }}</dt>
+                                            <dd class="small-8 medium-9 columns">
+                                                {{ selectedField.value }}
+                                            </dd>
+                                        {% endblock %}
+                                    {% endif %}
                                 {% endif %}
                             {% endfor %}
                         </dl>
