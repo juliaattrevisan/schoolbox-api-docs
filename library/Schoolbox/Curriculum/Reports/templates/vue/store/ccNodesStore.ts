@@ -13,12 +13,8 @@ import {
     getFilteredTotalCount,
 } from "../util/countUtils";
 
-const isVisibleBatchCount = 50; // the number of nodes to show at a time, when onlyShowGaps is true
-
 export const useNodesStore = defineStore("ccNodes", () => {
-    const filtersStore = useFiltersStore();
     const nodes = window.Vue.ref<CurriculumCoverageNode[]>([]); // the nodes to display in the report
-    const currentIsVisibleCount = window.Vue.ref(0); // the current number of visible nodes
 
     /**
      * Flatten the nodes into a single array for faster filtering
@@ -31,7 +27,7 @@ export const useNodesStore = defineStore("ccNodes", () => {
         flattenedNodes: CurriculumCoverageNode[] = [],
     ): CurriculumCoverageNode[] {
         flattenedNodes.push(node);
-        if (node.children && node.children.length > 0) {
+        if (node.children) {
             node.children.forEach((child) => {
                 flattenNodes(child, flattenedNodes);
             });
@@ -48,30 +44,65 @@ export const useNodesStore = defineStore("ccNodes", () => {
         }, [] as CurriculumCoverageNode[]);
     });
 
-    /**
-     * The total number of nodes
-     */
-    const totalCount = window.Vue.computed(() => {
-        return flattenedNodes.value.length;
-    });
+    // #region set nodes
 
     /**
-     * The total number of valid empty nodes (nodes with a code and no usages)
+     * Set new nodes
+     * @param newNodes - the new nodes to set
      */
-    const nodesWithNoFilteredUsages = window.Vue.computed(() => {
-        return flattenedNodes.value.filter((node) => node.code && getFilteredTotalCount(node, false) === 0);
-    });
+    function setNodes(newNodes: CurriculumCoverageNode[]): void {
+        nodes.value = newNodes;
+    }
 
     /**
-     * Has more nodes to show
+     * Loop through and add the new course to the existing node.usage.courses[]
+     * @param existingNode - the existing node to update
+     * @param newNode - the new node that contains the new course to add
      */
-    const hasMore = window.Vue.computed(() => {
-        // this check will only every apply if the onlyShowGaps filter is on
-        if (filtersStore.onlyShowGaps) {
-            return currentIsVisibleCount.value < totalCount.value;
+    function addCourseToChildren(existingNode: CurriculumCoverageNode, newNode: CurriculumCoverageNode): void {
+        if (existingNode.children) {
+            existingNode.children.forEach((child, index) => {
+                child.usage.courses = [...child.usage.courses, ...newNode.children![index].usage.courses];
+                addCourseToChildren(child, newNode.children![index]);
+            });
         }
-        return false;
-    });
+    }
+
+    /**
+     * Add more course usages to the existing nodes
+     * @param newNodes - the new nodes to add
+     */
+    function addCourseUsage(newNodes: CurriculumCoverageNode[]): void {
+        nodes.value.forEach((node, index) => {
+            node.usage.courses = [...node.usage.courses, ...newNodes[index].usage.courses];
+            addCourseToChildren(node, newNodes[index]);
+        });
+    }
+
+    /**
+     * Add in more nodes to the existing nodes
+     * @param newNodes - the new nodes to set
+     */
+    function setMoreNodes(newNodes: CurriculumCoverageNode[]): void {
+        nodes.value = [...nodes.value, ...newNodes];
+    }
+
+    /**
+     * Add more course usages to the existing nodes
+     * @param newNodes - the new nodes to add
+     */
+    function addMoreCourseUsage(newNodes: CurriculumCoverageNode[]): void {
+        const newNodeIds = newNodes.map((node) => node.id);
+        const nodesToUpdate = nodes.value.filter((node) => newNodeIds.includes(node.id)); // to target only the nodes to that need updating (which are those last set in setMoreNodes)
+        nodesToUpdate.forEach((node, index) => {
+            node.usage.courses = [...node.usage.courses, ...newNodes[index].usage.courses];
+            addCourseToChildren(node, newNodes[index]);
+        });
+    }
+
+    // #endregion
+
+    // #region set defaults
 
     /**
      * Set the default isVisible property for the nodes, setting the first two levels as visible
@@ -121,64 +152,18 @@ export const useNodesStore = defineStore("ccNodes", () => {
     }
 
     /**
-     * Set new nodes
-     * @param newNodes - the new nodes to set
+     * Add the additional front end properties to the nodes,
+     * to track visibility and expansion of the nodes
      */
-    function setNodes(newNodes: CurriculumCoverageNode[]): void {
-        nodes.value = newNodes;
+    function setDefaults(): void {
         setIsVisible();
         setIsExpanded();
         setHasNoUsages();
     }
 
-    /**
-     * Loop through and add the new course to the existing node.usage.courses[]
-     * @param existingNode - the existing node to update
-     * @param newNode - the new node that contains the new course to add
-     */
-    function addCourseToChildren(existingNode: CurriculumCoverageNode, newNode: CurriculumCoverageNode): void {
-        if (existingNode.children) {
-            existingNode.children.forEach((child, index) => {
-                child.usage.courses = [...child.usage.courses, ...newNode.children![index].usage.courses];
-                addCourseToChildren(child, newNode.children![index]);
-            });
-        }
-    }
+    // #endregion
 
-    /**
-     * Add more course usages to the existing nodes
-     * @param newNodes - the new nodes to add
-     */
-    function addCourseUsage(newNodes: CurriculumCoverageNode[]): void {
-        nodes.value.forEach((node, index) => {
-            node.usage.courses = [...node.usage.courses, ...newNodes[index].usage.courses];
-            addCourseToChildren(node, newNodes[index]);
-        });
-    }
-
-    /**
-     * Add in more nodes to the existing nodes
-     * @param newNodes - the new nodes to set
-     */
-    function setMoreNodes(newNodes: CurriculumCoverageNode[]): void {
-        nodes.value = [...nodes.value, ...newNodes];
-        setIsVisible();
-        setIsExpanded();
-        setHasNoUsages();
-    }
-
-    /**
-     * Add more course usages to the existing nodes
-     * @param newNodes - the new nodes to add
-     */
-    function addMoreCourseUsage(newNodes: CurriculumCoverageNode[]): void {
-        const newNodeIds = newNodes.map((node) => node.id);
-        const nodesToUpdate = nodes.value.filter((node) => newNodeIds.includes(node.id)); // to target only the nodes to that need updating (which are those last set in setMoreNodes)
-        nodesToUpdate.forEach((node, index) => {
-            node.usage.courses = [...node.usage.courses, ...newNodes[index].usage.courses];
-            addCourseToChildren(node, newNodes[index]);
-        });
-    }
+    // #region expand / collapse
 
     /**
      * Loop through and hide the children of the node
@@ -221,14 +206,20 @@ export const useNodesStore = defineStore("ccNodes", () => {
         }
     }
 
+    // #endregion
+
+    // #region filter changes
+
+    const filtersStore = useFiltersStore();
+    let currentIsVisibleCount = 0; // the current number of visible nodes
+    const isVisibleBatchCount = 50; // the number of nodes to show at a time, when onlyShowGaps is true
+
     /**
-     * Set the default values for the nodes
+     * The total number of valid empty nodes (nodes with a code and no usages)
      */
-    function setDefaults(): void {
-        setIsVisible();
-        setIsExpanded();
-        setHasNoUsages();
-    }
+    const nodesWithNoFilteredUsages = window.Vue.computed(() => {
+        return flattenedNodes.value.filter((node) => node.code && getFilteredTotalCount(node, false) === 0);
+    });
 
     /**
      * Watch the selectedReportOptions filter and update the nodes visibility accordingly
@@ -267,7 +258,7 @@ export const useNodesStore = defineStore("ccNodes", () => {
                 nodesToShow.forEach((node) => {
                     node.isVisible = true;
                 });
-                currentIsVisibleCount.value = isVisibleBatchCount;
+                currentIsVisibleCount = isVisibleBatchCount;
             } else {
                 flattenedNodes.value.forEach((node) => {
                     node.isVisible = node.previousIsVisible;
@@ -276,19 +267,36 @@ export const useNodesStore = defineStore("ccNodes", () => {
         },
     );
 
+    // #endregion
+
+    // #region show more
+
+    /**
+     * Has more nodes to show
+     */
+    const hasMore = window.Vue.computed(() => {
+        // this check will only every apply if the onlyShowGaps filter is on
+        if (filtersStore.onlyShowGaps) {
+            return currentIsVisibleCount < flattenedNodes.value.length;
+        }
+        return false;
+    });
+
     /**
      * Show the next set of isVisibleBatchCount when called
      */
     function showMore(): void {
-        const isVisibleBatchCountNext = currentIsVisibleCount.value + isVisibleBatchCount;
+        const isVisibleBatchCountNext = currentIsVisibleCount + isVisibleBatchCount;
         const nodesToShow = nodesWithNoFilteredUsages.value.filter(
-            (node, index) => index <= isVisibleBatchCountNext && index >= currentIsVisibleCount.value, // get the next batch of nodes to show
+            (node, index) => index <= isVisibleBatchCountNext && index >= currentIsVisibleCount, // get the next batch of nodes to show
         );
         nodesToShow.forEach((node) => {
             node.isVisible = true;
         });
-        currentIsVisibleCount.value = isVisibleBatchCountNext;
+        currentIsVisibleCount = isVisibleBatchCountNext;
     }
+
+    // #endregion
 
     return {
         nodes,
