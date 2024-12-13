@@ -43,7 +43,6 @@ const lastChildPadding = window.Vue.computed(() =>
 
 // #region expand/collapse
 
-const expandTitle = window.Vue.computed(() => (props.node.isExpanded ? "Collapse" : "Expand"));
 const showExpandButton = window.Vue.computed(() => props.node.children && !filtersStore.onlyShowGaps); // don't show the expand button when the node has no children, or onlyShowGaps is active
 
 /**
@@ -125,8 +124,8 @@ function onCourseClicked(buttonEl: HTMLButtonElement): void {
             <button
                 v-if="showExpandButton"
                 class="l-flex l-flex--center f-no-bkg"
-                :aria-label="expandTitle"
-                :title="expandTitle"
+                :aria-label="props.node.isExpanded ? 'Collapse' : 'Expand'"
+                :title="props.node.isExpanded ? 'Collapse' : 'Expand'"
                 @click="onExpandClicked"
             >
                 <sbx-icon v-if="props.node.isExpanded" name="up-arrow" />
