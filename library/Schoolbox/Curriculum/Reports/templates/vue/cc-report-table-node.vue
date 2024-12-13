@@ -31,14 +31,6 @@ const emit = defineEmits<{
 const nodesStore = useNodesStore();
 const filtersStore = useFiltersStore();
 const { title } = useNodeTitle(props.node);
-const paddingStart = window.Vue.computed(() =>
-    // to gradually add more paddingStart to indicate node level depth
-    filtersStore.onlyShowGaps ? "0.5rem" : `calc(${props.depth * 0.5}rem + 0.5rem)`,
-);
-const lastChildPadding = window.Vue.computed(() =>
-    // to add padding to the last child node to align better with the expand button
-    props.depth !== 0 && !props.node.children && !filtersStore.onlyShowGaps ? "2.75rem" : "0",
-);
 
 // #region expand/collapse
 
@@ -97,7 +89,13 @@ function onCourseClicked(buttonEl: HTMLButtonElement): void {
 <template>
     <!-- <tr v-if="showNode" ref="nodeEl"> -->
     <tr v-if="props.node.isVisible">
-        <td class="l-flex l-flex--align-center l-gap-s f-no-margins" :style="{ paddingInlineStart: paddingStart }">
+        <!-- to gradually add more paddingStart to indicate node level depth -->
+        <td
+            class="l-flex l-flex--align-center l-gap-s f-no-margins"
+            :style="{
+                paddingInlineStart: filtersStore.onlyShowGaps ? '0.5rem' : `calc(${props.depth * 0.5}rem + 0.5rem)`,
+            }"
+        >
             <button
                 v-if="showExpandButton"
                 class="l-flex l-flex--center f-no-bkg"
@@ -108,9 +106,13 @@ function onCourseClicked(buttonEl: HTMLButtonElement): void {
                 <sbx-icon v-if="props.node.isExpanded" name="up-arrow" />
                 <sbx-icon v-else name="down-arrow" />
             </button>
+            <!-- add paddingLeft to the last child node to align better with the expand button -->
             <button
                 class="l-pad--0 t-align-left f-no-bkg f-always-show"
-                :style="{ paddingLeft: lastChildPadding }"
+                :style="{
+                    paddingLeft:
+                        props.depth !== 0 && !props.node.children && !filtersStore.onlyShowGaps ? '2.75rem' : '0',
+                }"
                 @click="emit('titleClick', props.node)"
             >
                 <!-- bolden the selected curriculum node to help distinguish -->
