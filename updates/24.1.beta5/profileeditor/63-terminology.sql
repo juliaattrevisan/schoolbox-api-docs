@@ -24,7 +24,36 @@ VALUES (
     'individual education plans',
     1,
     'a'
-);
+), (
+    'staffDepartment',
+    'Staff Department',
+    'department',
+    'departments',
+    1,
+    'a'
+), (
+    'staffType',
+    'Staff Type',
+    'type',
+    'types',
+    1,
+    'a'
+), (
+    'staffBuilding',
+    'Staff Building',
+    'building',
+    'buildings',
+    1,
+    'a'
+), (
+    'staffRoom',
+    'Staff Room',
+    'room',
+    'rooms',
+    1,
+    'a'
+)
+;
 
 -- Assign terminology to profile fields
 
@@ -44,4 +73,28 @@ UPDATE profile_field
 SET term = 'individualEducationPlans'
 WHERE field = 'countIndividualEducationPlans'
 AND roletype = 'student'
+LIMIT 1;
+
+UPDATE profile_field
+SET term = 'staffDepartment'
+WHERE field = 'StaffDepartment'
+AND roletype = 'staff'
+LIMIT 1;
+
+UPDATE profile_field
+SET term = 'staffType'
+WHERE field = 'StaffCategoryDescription'
+AND roletype = 'staff'
+LIMIT 1;
+
+UPDATE profile_field
+SET term = 'staffBuilding'
+WHERE field = 'StaffBuilding'
+AND roletype = 'staff'
+LIMIT 1;
+
+UPDATE profile_field
+SET term = 'staffRoom'
+WHERE field = 'StaffRoom'
+AND roletype = 'staff'
 LIMIT 1;
