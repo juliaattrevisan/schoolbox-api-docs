@@ -160,7 +160,7 @@ HELP;
      */
     private function renameField(): void
     {
-        $this->getLogger()->debug('Renaming "Staff Code" to "Staff ID"');
+        $this->getLogger()->info('Renaming "Staff Code" to "Staff ID"');
 
         $this->getDatabaseInternal()->executeQuery("
             UPDATE localisation

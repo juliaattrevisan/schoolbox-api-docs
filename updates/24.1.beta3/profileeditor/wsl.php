@@ -233,7 +233,7 @@ HELP;
      */
     private function hideFields(): void
     {
-        $this->getLogger()->debug('Removing availability/visibility for fields');
+        $this->getLogger()->info('Removing availability/visibility for fields');
 
         /* Remove medical alert, hoh teacher, and general alert/legal fields
          * This seems like what the school originally intended by having
@@ -264,7 +264,7 @@ HELP;
      */
     private function hideButtons(): void
     {
-        $this->getLogger()->debug('Removing availability/visibility for buttons');
+        $this->getLogger()->info('Removing availability/visibility for buttons');
 
         /* Remove Grades button
          */
