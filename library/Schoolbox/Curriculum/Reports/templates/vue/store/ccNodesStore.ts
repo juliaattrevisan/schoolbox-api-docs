@@ -136,7 +136,8 @@ export const useNodesStore = defineStore("ccNodes", () => {
     }
 
     /**
-     * Set the hasNoUsages property for the nodes
+     * When a node has no usages, we can set the hasNoUsages property to true
+     * so we never have to loop through and calculate it again
      */
     function setHasNoUsages(): void {
         flattenedNodes.value.forEach((node) => {

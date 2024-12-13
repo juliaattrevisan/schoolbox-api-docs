@@ -9,6 +9,7 @@ import { extractErrorMessage } from "@js/util/sbx/fetchUtils";
 import type { CurriculumCoveragePayload } from "../../js/types/curriculumCoverageTypes";
 import { useQueryStore } from "./ccQueryStore";
 import { useInputStore } from "./ccInputStore";
+import { useFiltersStore } from "./ccFiltersStore";
 import { useCoursesStore } from "./ccCoursesStore";
 import { useNodesStore } from "./ccNodesStore";
 import { useLoadMoreStore } from "./ccLoadMoreStore";
@@ -95,6 +96,7 @@ export const useReportStore = defineStore("ccReport", () => {
     async function report(): Promise<void> {
         useInputStore().setActive();
         useQueryStore().setQueryParams();
+        useFiltersStore().reset();
         hasNotReported.value = false;
         isLoading.value = true;
         hasLoadError.value = false;

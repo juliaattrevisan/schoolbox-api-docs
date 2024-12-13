@@ -48,10 +48,19 @@ export const useFiltersStore = defineStore("ccFilters", () => {
         });
     });
 
+    /**
+     * Reset the filters to their default state
+     */
+    function reset(): void {
+        selectedReportOptions.value = [...allReportOptions.value.map((option) => option.value)];
+        onlyShowGaps.value = false;
+    }
+
     return {
         allReportOptions,
         selectedReportOptions,
         onlyShowGaps,
         queryParams,
+        reset,
     };
 });
