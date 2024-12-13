@@ -174,22 +174,43 @@ export const useNodesStore = defineStore("ccNodes", () => {
     }
 
     /**
+     * Loop through and hide the children of the node
+     * @param children - the children to hide
+     */
+    function hideChildren(children: CurriculumCoverageNode[] | null): void {
+        if (children) {
+            children.forEach((child) => {
+                child.isVisible = false;
+                child.isExpanded = false;
+                hideChildren(child.children);
+            });
+        }
+    }
+
+    /**
+     * Loop through and show the children of the node
+     * @param children - the children to show
+     */
+    function showChildren(children: CurriculumCoverageNode[] | null): void {
+        if (children) {
+            children.forEach((child) => {
+                child.isVisible = true;
+                hideChildren(child.children);
+            });
+        }
+    }
+
+    /**
      * Toggle the nodes isExpanded property
      * @param node - the node to toggle
      */
     function toggleNodeExpand(node: CurriculumCoverageNode): void {
         if (node.isExpanded) {
             node.isExpanded = false;
-            // hide the next level of children
-            node.children?.forEach((child) => {
-                child.isVisible = false;
-            });
+            hideChildren(node.children);
         } else {
             node.isExpanded = true;
-            // show the next level of children
-            node.children?.forEach((child) => {
-                child.isVisible = true;
-            });
+            showChildren(node.children);
         }
     }
 
