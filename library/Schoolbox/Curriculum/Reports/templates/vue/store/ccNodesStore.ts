@@ -46,6 +46,13 @@ export const useNodesStore = defineStore("ccNodes", () => {
     });
 
     /**
+     * The total number of nodes
+     */
+    const totalCount = window.Vue.computed(() => {
+        return flattenedNodes.value.length;
+    });
+
+    /**
      * Set the default isVisible property for the nodes, setting the first two levels as visible
      */
     function setDefaultIsVisible(): void {
