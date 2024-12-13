@@ -19,10 +19,6 @@ import {
     getFilteredUnitColumnCount,
     getFilteredCourseCount,
 } from "./util/countUtils";
-// import CcReportTableNodeTotalColumn from "./cc-report-table-node-total-column.vue";
-// import CcReportTableNodeCourseColumn from "./cc-report-table-node-course-column.vue";
-// import CcReportTableNodeUnitColumn from "./cc-report-table-node-unit-column.vue";
-// import CcReportTableNodeCourseTotalColumn from "./cc-report-table-node-course-total-column.vue";
 
 interface Props {
     node: CurriculumCoverageNode;
@@ -94,7 +90,6 @@ function onCourseClicked(buttonEl: HTMLButtonElement): void {
 
 <template>
     <tr v-if="props.node.isVisible">
-        <!-- to gradually add more paddingStart to indicate node level depth -->
         <td
             class="l-flex l-flex--align-center l-gap-s f-no-margins"
             :style="{
@@ -120,14 +115,13 @@ function onCourseClicked(buttonEl: HTMLButtonElement): void {
                 }"
                 @click="emit('titleClick', props.node)"
             >
-                <!-- bolden the selected curriculum node to help distinguish -->
-                <template v-if="props.depth === 0"
-                    ><b>{{ title }}</b></template
-                >
+                <template v-if="props.depth === 0">
+                    <b>{{ title }}</b>
+                </template>
                 <template v-else>{{ title }}</template>
             </button>
         </td>
-        <!-- if the node total and its children are completely empty, just hard set to 0 -->
+        <!-- add the total cell -->
         <td v-if="props.node.hasNoUsages"><b>0</b></td>
         <td v-else-if="props.node.children && !props.node.isExpanded" class="u-border-left usage-cell">
             <button class="f-always-show usage-button" @click="onTotalClicked">
@@ -137,9 +131,9 @@ function onCourseClicked(buttonEl: HTMLButtonElement): void {
         <td v-else class="usage-cell">
             <b>{{ getFilteredTotalCount(props.node, !props.node.isExpanded) }}</b>
         </td>
-        <!-- loop through each course/unit, retrieving the node usage or returning 0 for undefined usages -->
+        <!-- loop through each course/unit, retrieving the node usage or returning 0 no usages -->
         <template v-for="course in props.node.usage.courses" :key="course.id">
-            <!-- if the node course column and its children are completely empty, just hard set to 0 -->
+            <!-- add the course cell -->
             <td v-if="props.node.hasNoUsages || course.hasNoCourseUsages">0</td>
             <td
                 v-else-if="getFilteredCourseColumnCount(props.node, course, !props.node.isExpanded) === 0"
@@ -163,8 +157,8 @@ function onCourseClicked(buttonEl: HTMLButtonElement): void {
                     {{ getFilteredCourseColumnCount(props.node, course, !props.node.isExpanded) }}
                 </button>
             </td>
+            <!-- loop through the unit cells -->
             <template v-for="unit in course.units" :key="unit.id">
-                <!-- if the node unit column and its children are completely empty, just hard set to 0 -->
                 <td v-if="props.node.hasNoUsages || unit.hasNoUsages">0</td>
                 <td
                     v-else-if="getFilteredUnitColumnCount(props.node, course, unit, !props.node.isExpanded) === 0"
@@ -189,8 +183,8 @@ function onCourseClicked(buttonEl: HTMLButtonElement): void {
                     </button>
                 </td>
             </template>
+            <!-- add the total course cell if there's multiple courses -->
             <template v-if="useCoursesStore().hasMultipleCourses">
-                <!-- if the node course and its children are completely empty, just hard set to 0 -->
                 <td v-if="props.node.hasNoUsages || course.hasNoTotalUsages">0</td>
                 <td v-else-if="props.node.children && !props.node.isExpanded" class="usage-cell">
                     <button class="f-always-show usage-button" @click="onTotalClicked">
