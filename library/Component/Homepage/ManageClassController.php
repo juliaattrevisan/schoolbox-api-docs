@@ -386,7 +386,7 @@ class Component_Homepage_ManageClassController extends Component_Homepage_Contro
                 $url = $this->getRouteGenerator()->generate($route);
                 $url .= '?courseId=' . $this->getContext()->getCourseSpecification()->getId();
             }
-        } catch (RouteNotFound|ContainerExceptionInterface) {
+        } catch (RouteNotFound | ContainerExceptionInterface) {
             // Do nothing.  Leave $url as null.
         }
 
