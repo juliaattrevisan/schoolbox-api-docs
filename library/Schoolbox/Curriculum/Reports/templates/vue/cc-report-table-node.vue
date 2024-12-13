@@ -13,11 +13,11 @@ import { useCoursesStore } from "./store/ccCoursesStore";
 import { useNodesStore } from "./store/ccNodesStore";
 import { useFiltersStore } from "./store/ccFiltersStore";
 import { usePopOutStore } from "./store/ccPopOutStore";
-import { getFilteredCourseColumnCount } from "./util/countUtils";
+import { getFilteredCourseColumnCount, getFilteredCourseCount } from "./util/countUtils";
 import CcReportTableNodeTotalColumn from "./cc-report-table-node-total-column.vue";
 // import CcReportTableNodeCourseColumn from "./cc-report-table-node-course-column.vue";
 import CcReportTableNodeUnitColumn from "./cc-report-table-node-unit-column.vue";
-import CcReportTableNodeCourseTotalColumn from "./cc-report-table-node-course-total-column.vue";
+// import CcReportTableNodeCourseTotalColumn from "./cc-report-table-node-course-total-column.vue";
 
 interface Props {
     node: CurriculumCoverageNode;
@@ -172,13 +172,14 @@ function onCourseClicked(buttonEl: HTMLButtonElement): void {
             <template v-if="useCoursesStore().hasMultipleCourses">
                 <!-- if the node course and its children are completely empty, just hard set to 0 -->
                 <td v-if="props.node.hasNoUsages || course.hasNoTotalUsages">0</td>
-                <cc-report-table-node-course-total-column
-                    v-else
-                    :node="props.node"
-                    :course="course"
-                    :is-expanded="props.node.isExpanded"
-                    @click="onTotalClicked"
-                />
+                <td v-else-if="props.node.children && !props.node.isExpanded" class="usage-cell">
+                    <button class="f-always-show usage-button" @click="onTotalClicked">
+                        {{ getFilteredCourseCount(props.node, course, !props.node.isExpanded) }}
+                    </button>
+                </td>
+                <td v-else>
+                    {{ getFilteredCourseCount(props.node, course, !props.node.isExpanded) }}
+                </td>
             </template>
         </template>
     </tr>
