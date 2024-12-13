@@ -67,14 +67,13 @@ const scrollableEl = useTemplateRef<HTMLDivElement>("scrollableEl");
 
 /**
  * To display more nodes when there's lots to display and the user has scrolled to the bottom
+ * This avoids a heavy computation for the DOM when there's lots of nodes to display
  */
 const { arrivedState } = useScroll(scrollableEl);
 const { bottom } = toRefs(arrivedState);
 window.Vue.watch(bottom, (isAtBottom) => {
-    // if (isAtBottom && currentHeight.value === maxResultsHeight - 2) {
     if (isAtBottom && nodesStore.hasMore) {
         nodesStore.showMore();
-        console.warn("show more");
     }
 });
 </script>
