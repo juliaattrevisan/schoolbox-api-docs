@@ -139,8 +139,16 @@ class Handler
             $params       = array_merge($params, $codes);
         }
 
-        $stmt = $this->externalDb->executeQuery($sql, $params);
-        foreach ($stmt as $row) {
+        $statement = $this->externalDb->prepareQuery($sql, $params);
+        $stmt = $statement->execute();
+
+        if ($stmt === false) {
+            throw new Exception(
+                print_r($this->externalDb->errorInfo(), true)
+            );
+        }
+
+        while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
             $yearLevelArr[] = [
                 "Code"        => $row["Code"],
                 "Description" => $row["Description"],
