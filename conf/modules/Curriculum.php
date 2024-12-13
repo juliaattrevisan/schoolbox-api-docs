@@ -11,6 +11,7 @@
 namespace Config\Modules;
 
 use Psr\Container\ContainerInterface;
+use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Curriculum\Api\Module as ApiModule;
 use Schoolbox\Curriculum\Api\Usage\Module as ApiUsageModule;
 use Schoolbox\Curriculum\Api\Usage\Folder\Module as ApiUsageFolderModule;
@@ -27,8 +28,10 @@ class Curriculum implements ModuleConfigInterface
         $module = new Module($di);
         $module->registerModule('/curriculum');
 
-        $reportsModule = new ReportsModule($di);
-        $reportsModule->registerModule('/curriculum/reports');
+        if ($di->get('config')->get(ConfigMapper::NAME_CURRICULUM_COVERAGE_REPORT_ENABLED)) {
+            $reportsModule = new ReportsModule($di);
+            $reportsModule->registerModule('/curriculum/reports');
+        }
 
         $apiModule = new ApiModule($di);
         $apiModule->registerModule('/api/curriculum');
