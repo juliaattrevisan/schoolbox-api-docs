@@ -91,7 +91,7 @@ function onCourseClicked(buttonEl: HTMLButtonElement): void {
 <template>
     <tr v-if="props.node.isVisible">
         <td
-            class="l-flex l-flex--align-center l-gap-s f-no-margins"
+            class="l-flex l-flex--align-center l-gap-s f-no-margins name-cell"
             :style="{
                 paddingInlineStart: filtersStore.onlyShowGaps ? '0.5rem' : `calc(${props.depth * 0.5}rem + 0.5rem)`,
             }"
@@ -211,6 +211,13 @@ function onCourseClicked(buttonEl: HTMLButtonElement): void {
 <style lang="scss" scoped>
 tr:hover {
     background-color: #f4f3f3; /* to help legibility */
+}
+
+.name-cell {
+    background: white;
+    left: 0;
+    position: sticky;
+    z-index: var(--sbx-depth-ui-sticky);
 }
 
 .usage-cell {
