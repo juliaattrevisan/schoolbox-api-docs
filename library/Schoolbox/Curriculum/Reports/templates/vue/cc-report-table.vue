@@ -72,14 +72,15 @@ const { arrivedState } = useScroll(scrollableEl);
 const { bottom } = toRefs(arrivedState);
 window.Vue.watch(bottom, (isAtBottom) => {
     // if (isAtBottom && currentHeight.value === maxResultsHeight - 2) {
-    if (isAtBottom) {
-        console.warn("eh");
+    if (isAtBottom && nodesStore.hasMore) {
+        nodesStore.showMore();
+        console.warn("show more");
     }
 });
 </script>
 
 <template>
-    <div class="scrollable" ref="scrollableEl" :style="{ maxHeight: maxScrollableHeight }">
+    <div ref="scrollableEl" class="scrollable" :style="{ maxHeight: maxScrollableHeight }">
         <table class="coverage-report">
             <thead>
                 <tr>

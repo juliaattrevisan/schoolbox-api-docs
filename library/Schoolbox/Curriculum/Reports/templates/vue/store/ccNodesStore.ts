@@ -13,7 +13,7 @@ import {
     getFilteredTotalCount,
 } from "../util/countUtils";
 
-const nodesToShow = 50;
+const isVisibleBatchCount = 50; // the number of nodes to show at a time, when onlyShowGaps is true
 
 export const useNodesStore = defineStore("ccNodes", () => {
     const filtersStore = useFiltersStore();
@@ -229,10 +229,11 @@ export const useNodesStore = defineStore("ccNodes", () => {
                 const onlyNodesWithNoUsage = onlyNodesWithCodes.filter(
                     (node) => getFilteredTotalCount(node, false) === 0,
                 );
-                onlyNodesWithNoUsage.forEach((node, index) => {
-                    node.isVisible = index < nodesToShow;
+                const nodesToShow = onlyNodesWithNoUsage.filter((node, index) => index < isVisibleBatchCount); // just get the first batch of nodes to show
+                nodesToShow.forEach((node, index) => {
+                    node.isVisible = index < isVisibleBatchCount;
                 });
-                currentIsVisibleCount.value = nodesToShow;
+                currentIsVisibleCount.value = isVisibleBatchCount;
             } else {
                 flattenedNodes.value.forEach((node) => {
                     node.isVisible = node.previousIsVisible;
@@ -242,16 +243,19 @@ export const useNodesStore = defineStore("ccNodes", () => {
     );
 
     /**
-     * Show the next set of nodesToShow when called
+     * Show the next set of isVisibleBatchCount when called
      */
     function showMore(): void {
-        const nodesToShowNext = currentIsVisibleCount.value + nodesToShow;
+        const isVisibleBatchCountNext = currentIsVisibleCount.value + isVisibleBatchCount;
         const onlyNodesWithCodes = flattenedNodes.value.filter((node) => node.code);
         const onlyNodesWithNoUsage = onlyNodesWithCodes.filter((node) => getFilteredTotalCount(node, false) === 0);
-        onlyNodesWithNoUsage.forEach((node, index) => {
-            node.isVisible = index < nodesToShowNext;
+        const nodesToShow = onlyNodesWithNoUsage.filter(
+            (node, index) => index <= isVisibleBatchCountNext && index >= currentIsVisibleCount.value, // get the next batch of nodes to show
+        );
+        nodesToShow.forEach((node) => {
+            node.isVisible = true;
         });
-        currentIsVisibleCount.value = nodesToShowNext;
+        currentIsVisibleCount.value = isVisibleBatchCountNext;
     }
 
     return {
