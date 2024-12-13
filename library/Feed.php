@@ -257,9 +257,8 @@ class Feed
                 }
             }
             if (count($foldersWithWriteAccess) > 0) {
-                $sivoClause = " OR assess.category_id IN ("
-                    . Builder::getArrayPlaceholders($foldersWithWriteAccess, 'writeFolderId')
-                    . ')';
+                $sivoClause = " OR assess.category_id IN "
+                    . Builder::getArrayPlaceholders($foldersWithWriteAccess, 'writeFolderId');
                 $params += Builder::getArrayParameters($foldersWithWriteAccess, 'writeFolderId');
             } else {
                 $sivoClause = '';
