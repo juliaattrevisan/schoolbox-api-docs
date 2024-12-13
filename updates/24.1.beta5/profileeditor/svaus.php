@@ -160,8 +160,18 @@ HELP;
         $this->getDatabaseInternal()->executeQuery("
             UPDATE localisation
             SET singular_form = 'state',
-                plural_form = 'state'
+                plural_form = 'states'
             WHERE term = 'staffBuilding'
+            LIMIT 1
+        ");
+
+        $this->getLogger()->info('Renaming "House" to "Hub"');
+
+        $this->getDatabaseInternal()->executeQuery("
+            UPDATE localisation
+            SET singular_form = 'hub',
+                plural_form = 'hubs'
+            WHERE term = 'schoolHouse'
             LIMIT 1
         ");
     }

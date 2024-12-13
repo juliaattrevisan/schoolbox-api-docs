@@ -52,6 +52,13 @@ VALUES (
     'rooms',
     1,
     'a'
+), (
+    'schoolHouse',
+    'House',
+    'house',
+    'houses',
+    1,
+    'a'
 )
 ;
 
@@ -97,4 +104,10 @@ UPDATE profile_field
 SET term = 'staffRoom'
 WHERE field = 'StaffRoom'
 AND roletype = 'staff'
+LIMIT 1;
+
+UPDATE profile_field
+SET term = 'schoolHouse'
+WHERE field = 'schoolHouse'
+AND roletype = 'student'
 LIMIT 1;
