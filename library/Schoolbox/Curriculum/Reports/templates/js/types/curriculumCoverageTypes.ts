@@ -88,9 +88,13 @@ export type CurriculumCoverageNode = Pick<Node, "id" | "name" | "code"> & {
         courses: CourseWithCurriculumNodeUsage[];
     };
     isVisible: boolean; // to track if the node is visible in the report
-    previousIsVisible: boolean; // to track if the node was visible in the previous report (used when moving between only show gaps toggle)
+    previousIsVisible: boolean; // to track if the node was visible previously (used when moving between the only show gaps toggle)
     isExpanded: boolean; // to track if the node is expanded in the report
     hasNoUsages: boolean; // to track if the node has no usages (including on children nodes)
+    storedUsages: {
+        // to store saved usages for the node
+        [key: string]: number;
+    };
 };
 
 /**

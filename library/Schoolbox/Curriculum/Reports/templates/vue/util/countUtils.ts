@@ -168,10 +168,14 @@ export function getFilteredCourseColumnCount(
     course: CourseWithCurriculumNodeUsage,
     includeChildren: boolean,
 ): number {
-    // return early if course is not selected
-    if (!useFiltersStore().selectedReportOptions.includes(ReportOptionValues.COURSE)) {
-        return 0;
+    const key = `column-nodeId-${node.id}-courseId-${course.id}-includeChildren-${includeChildren}`;
+    if (node.storedUsages[key]) {
+        return node.storedUsages[key];
     }
+    // return early if course is not selected
+    // if (!useFiltersStore().selectedReportOptions.includes(ReportOptionValues.COURSE)) {
+    //     return 0;
+    // }
     /**
      * When the node has children and is not expanded, we want to show the usage count inclusive of children
      * to show how many usages are linked to the node and its children
@@ -180,10 +184,12 @@ export function getFilteredCourseColumnCount(
         const onChildrenCount = node.children.reduce((acc, child) => {
             return acc + getFilteredCourseColumnCount(child, getChildCourseUsage(child, course), true);
         }, 0);
-        return course.usage.course.count + onChildrenCount;
+        node.storedUsages[key] = course.usage.course.count + onChildrenCount;
+        return node.storedUsages[key];
     }
     // only need to check for course usage on the course column
-    return course.usage.course.count;
+    node.storedUsages[key] = course.usage.course.count;
+    return node.storedUsages[key];
 }
 
 /**
@@ -200,6 +206,10 @@ export function getFilteredUnitColumnCount(
     unit: UnitWithCurriculumNodeUsage,
     includeChildren: boolean,
 ): number {
+    const key = `unit-nodeId-${node.id}-courseId-${course.id}-unitId-${unit.id}-includeChildren-${includeChildren}`;
+    if (node.storedUsages[key]) {
+        return node.storedUsages[key];
+    }
     const onNodeCount = useFiltersStore().selectedReportOptions.reduce((acc, option) => {
         // always skip course as it can't be assigned within a unit
         if (option === ReportOptionValues.COURSE) return acc;
@@ -213,9 +223,11 @@ export function getFilteredUnitColumnCount(
         const onChildrenCount = node.children.reduce((acc, child) => {
             return acc + getFilteredUnitColumnCount(child, course, getChildUnitUsage(child, course, unit), true);
         }, 0);
-        return onNodeCount + onChildrenCount;
+        node.storedUsages[key] = onNodeCount + onChildrenCount;
+        return node.storedUsages[key];
     }
-    return onNodeCount;
+    node.storedUsages[key] = onNodeCount;
+    return node.storedUsages[key];
 }
 
 /**
@@ -231,10 +243,16 @@ export function getFilteredCourseCount(
     course: CourseWithCurriculumNodeUsage,
     includeChildren: boolean,
 ): number {
+    const key = `course-total-nodeId-${node.id}-courseId-${course.id}-includeChildren-${includeChildren}`;
+    if (node.storedUsages[key]) {
+        return node.storedUsages[key];
+    }
     const unitUsageCount = course.units.reduce((acc, unit) => {
         return acc + getFilteredUnitColumnCount(node, course, unit, includeChildren);
     }, 0);
-    return getFilteredCourseColumnCount(node, course, includeChildren) + unitUsageCount;
+    const courseCount = getFilteredCourseColumnCount(node, course, includeChildren) + unitUsageCount;
+    node.storedUsages[key] = courseCount;
+    return node.storedUsages[key];
 }
 
 /**
@@ -245,9 +263,15 @@ export function getFilteredCourseCount(
  * @returns the total node usage count
  */
 export function getFilteredTotalCount(node: CurriculumCoverageNode, includeChildren: boolean): number {
-    return node.usage.courses.reduce((acc, course) => {
+    const key = `total-nodeId-${node.id}-includeChildren-${includeChildren}`;
+    if (node.storedUsages[key]) {
+        return node.storedUsages[key];
+    }
+    const usage = node.usage.courses.reduce((acc, course) => {
         return acc + getFilteredCourseCount(node, course, includeChildren);
     }, 0);
+    node.storedUsages[key] = usage;
+    return node.storedUsages[key];
 }
 
 // #endregion filtered usage counts

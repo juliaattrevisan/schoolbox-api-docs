@@ -149,6 +149,7 @@ export const useNodesStore = defineStore("ccNodes", () => {
                 });
                 course.hasNoTotalUsages = getCourseCount(node, course, true) === 0;
             });
+            node.storedUsages = {};
         });
     }
 
