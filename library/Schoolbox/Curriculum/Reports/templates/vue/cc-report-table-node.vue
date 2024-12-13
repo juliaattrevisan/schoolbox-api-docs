@@ -13,8 +13,8 @@ import { useCoursesStore } from "./store/ccCoursesStore";
 import { useNodesStore } from "./store/ccNodesStore";
 import { useFiltersStore } from "./store/ccFiltersStore";
 import { usePopOutStore } from "./store/ccPopOutStore";
-import { getFilteredCourseColumnCount, getFilteredCourseCount } from "./util/countUtils";
-import CcReportTableNodeTotalColumn from "./cc-report-table-node-total-column.vue";
+import { getFilteredTotalCount, getFilteredCourseColumnCount, getFilteredCourseCount } from "./util/countUtils";
+// import CcReportTableNodeTotalColumn from "./cc-report-table-node-total-column.vue";
 // import CcReportTableNodeCourseColumn from "./cc-report-table-node-course-column.vue";
 import CcReportTableNodeUnitColumn from "./cc-report-table-node-unit-column.vue";
 // import CcReportTableNodeCourseTotalColumn from "./cc-report-table-node-course-total-column.vue";
@@ -88,7 +88,6 @@ function onCourseClicked(buttonEl: HTMLButtonElement): void {
 </script>
 
 <template>
-    <!-- <tr v-if="showNode" ref="nodeEl"> -->
     <tr v-if="props.node.isVisible">
         <!-- to gradually add more paddingStart to indicate node level depth -->
         <td
@@ -125,12 +124,14 @@ function onCourseClicked(buttonEl: HTMLButtonElement): void {
         </td>
         <!-- if the node total and its children are completely empty, just hard set to 0 -->
         <td v-if="props.node.hasNoUsages"><b>0</b></td>
-        <cc-report-table-node-total-column
-            v-else
-            :node="props.node"
-            :is-expanded="props.node.isExpanded"
-            @click="onTotalClicked"
-        />
+        <td v-else-if="props.node.children && !props.node.isExpanded" class="u-border-left usage-cell">
+            <button class="f-always-show usage-button" @click="onTotalClicked">
+                <b>{{ getFilteredTotalCount(props.node, !props.node.isExpanded) }}</b>
+            </button>
+        </td>
+        <td v-else class="usage-cell">
+            <b>{{ getFilteredTotalCount(props.node, !props.node.isExpanded) }}</b>
+        </td>
         <!-- loop through each course/unit, retrieving the node usage or returning 0 for undefined usages -->
         <template v-for="course in props.node.usage.courses" :key="course.id">
             <!-- if the node course column and its children are completely empty, just hard set to 0 -->
