@@ -48,13 +48,6 @@ const showExpandButton = window.Vue.computed(() => props.node.children && !filte
 /**
  * To toggle the expanded state of the node
  */
-function onExpandClicked(): void {
-    nodesStore.toggleNodeExpand(props.node);
-}
-
-/**
- * To toggle the expanded state of the node
- */
 function onTotalClicked(): void {
     if (!props.node.isExpanded) {
         nodesStore.toggleNodeExpand(props.node);
@@ -126,7 +119,7 @@ function onCourseClicked(buttonEl: HTMLButtonElement): void {
                 class="l-flex l-flex--center f-no-bkg"
                 :aria-label="props.node.isExpanded ? 'Collapse' : 'Expand'"
                 :title="props.node.isExpanded ? 'Collapse' : 'Expand'"
-                @click="onExpandClicked"
+                @click="nodesStore.toggleNodeExpand(props.node)"
             >
                 <sbx-icon v-if="props.node.isExpanded" name="up-arrow" />
                 <sbx-icon v-else name="down-arrow" />
