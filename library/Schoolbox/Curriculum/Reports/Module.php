@@ -14,7 +14,6 @@ use Alaress\Authorizer\Rule;
 use Alaress\Module\Module as BaseModule;
 use Alaress\Twig\Loader\IChainLoader;
 use Alaress\Web\Controller\Base;
-use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Role;
@@ -39,24 +38,22 @@ class Module extends BaseModule
      */
     protected function registerRoutes(): void
     {
-        if ($this->getConfig()->get(ConfigMapper::NAME_CURRICULUM_COVERAGE_REPORT_ENABLED)) {
-            /* Only staff
-             */
-            $staffPerms = new Rule\All(
-                new Rule\IsLoggedIn(),
-                new Rule\Any(
-                    new Rule\IsSuperuser(),
-                    new Rule\HasRole(Role::STAFF),
-                    new Rule\HasServicePermission(UserAccess::SERVICE_LMS, UserAccess::ACCESS_FULL)
-                )
-            );
+        /* Only staff
+         */
+        $staffPerms = new Rule\All(
+            new Rule\IsLoggedIn(),
+            new Rule\Any(
+                new Rule\IsSuperuser(),
+                new Rule\HasRole(Role::STAFF),
+                new Rule\HasServicePermission(UserAccess::SERVICE_LMS, UserAccess::ACCESS_FULL)
+            )
+        );
 
-            $this->register('GET', '/coverage', 'getCoverage', $staffPerms);
-            $this->register('GET', '/coverage/generate', 'generateCoverage', $staffPerms);
-            $this->register('GET', '/coverage/usage', 'getCoverageUsage', $staffPerms);
-            $this->register('GET', '/coverage/export/request', 'requestExportCoverage', $staffPerms);
-            $this->register('GET', '/coverage/export', 'exportCoverage', $staffPerms);
-        }
+        $this->register('GET', '/coverage', 'getCoverage', $staffPerms);
+        $this->register('GET', '/coverage/generate', 'generateCoverage', $staffPerms);
+        $this->register('GET', '/coverage/usage', 'getCoverageUsage', $staffPerms);
+        $this->register('GET', '/coverage/export/request', 'requestExportCoverage', $staffPerms);
+        $this->register('GET', '/coverage/export', 'exportCoverage', $staffPerms);
     }
 
     /**
