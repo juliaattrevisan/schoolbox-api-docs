@@ -137,11 +137,50 @@ HELP;
             ],
         ]);
 
+        /* Remove Due Work button
+         */
+        $this->removeButton();
+
         /* Announce lock release
          */
         $this->getLogger()->debug('Releasing lock');
 
         $lock->release();
+    }
+
+
+    /**
+     * This removes a System Button by destroying all its availability/visibility relationships
+     *
+     * @return void
+     */
+    private function removeButton(): void
+    {
+        /* Remove Grades button
+         */
+        $tables = [
+            'profile_button_campus_availability',
+            'profile_button_campus_visibility',
+            'profile_button_role_availability',
+            'profile_button_role_visibility',
+        ];
+
+        /* Un-assign relationships
+         */
+        foreach ($tables as $table) {
+            $this->getLogger()->info(sprintf(
+                'Removing relationships with Due Work system button in %s',
+                $table
+            ));
+
+            $this->getDatabaseInternal()->executeQuery(sprintf("
+                DELETE FROM %s
+                WHERE profile_button_id = (SELECT id
+                FROM profile_button
+                WHERE type = 'duework' AND roletype = 'student'
+                )
+            ", $table));
+        }
     }
 
 
