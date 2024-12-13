@@ -85,6 +85,40 @@
     });
     lrnObserver.observe(document.getElementById("quiz-container"), { subtree: true, childList: true });
 
+    {# example method to save the learner session responses into the Learnosity database.
+     # https://help.learnosity.com/hc/en-us/articles/16461106552477-save-Methods-Items-API
+     #}
+    function saveAttempt(){
+        var saveSettings = {
+            // Receives an array of response_ids (strings) of the saved session responses
+            success: function (response_ids) {
+                console.log("Save was successful", response_ids);
+                completeAttempt();
+
+            },
+
+            // Allows you to immediately handle a save error event
+            error: function (event) {
+                console.log("Save has failed", event);
+            },
+
+            // Capture the progress of the current submit operation
+            progress: function (event) {
+                console.log("Current progress", event);
+                // The event object provides additional progress information, e.g.
+                /*
+                    {
+                        state: 'saving',
+                        percentage: 50,
+                        bytesTotal: 1234,
+                        bytesUploaded: 567
+                    }
+                */
+            }
+        };
+
+        itemsApp.save(saveSettings);
+    }
     /**
      * So we can add browser state when moving between items (cards)
      */
@@ -241,8 +275,7 @@
         const dialogs = document.querySelector("#learnosity_assess .dialogs");
         const newModal = document.querySelector("template[data-template='time-up']").content.cloneNode(true);
         dialogs.appendChild(newModal);
-
-        completeAttempt();
+        saveAttempt();
     });
 </script>
 <style>

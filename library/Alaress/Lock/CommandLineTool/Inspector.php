@@ -22,6 +22,7 @@ use Schoolbox\Learning\InlineGrader\Kami\CommandLineTool\ErrorRequeuer;
 use Schoolbox\Learning\InlineGrader\Kami\CommandLineTool\StatusChecker;
 use Schoolbox\Learning\InlineGrader\Kami\CommandLineTool\Uploader;
 use Schoolbox\Learning\Learnosity\Cli\AutoscoreAttemptsTool;
+use Schoolbox\Learning\Learnosity\Cli\MaxZeroAttemptsTool;
 use Schoolbox\Learning\Learnosity\Importer\Cli\PollProcessingTool;
 use Schoolbox\Learning\Learnosity\Importer\Cli\ResetFailedTool;
 use Schoolbox\Learning\Learnosity\Importer\Cli\RestartPendingTool;
@@ -111,6 +112,7 @@ class Inspector extends CliTool\App
         PollProcessingTool::LOCK_NAME    => 'Poll processing quiz duplication (./tools/learnosity/poll-processing.php)',
         ResetFailedTool::LOCK_NAME       => 'Reset failed quiz duplication (./tools/learnosity/reset-failed.php)',
         AutoscoreAttemptsTool::LOCK_NAME => 'Poll processing quiz attempts (./tools/learnosity/autoscore-attempts.php)',
+        MaxZeroAttemptsTool::LOCK_NAME   => 'Poll processing quiz attempts (./tools/learnosity/maxzero-attempts.php)',
 
         /* Penola Semester 2, 2023 Vic Curric Progression Points importer
          */
