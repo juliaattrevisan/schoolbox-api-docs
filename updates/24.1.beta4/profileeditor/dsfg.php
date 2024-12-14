@@ -133,7 +133,7 @@ HELP;
      */
     private function updateTerminology(): void
     {
-        $this->getLogger()->debug('Renaming Studies Code to NSN');
+        $this->getLogger()->info('Renaming Studies Code to NSN');
 
         $this->getDatabaseInternal()->executeQuery("
             UPDATE localisation

@@ -186,7 +186,7 @@ HELP;
      */
     private function renameFields(): void
     {
-        $this->getLogger()->debug('Renaming "Tutor Group" to "Circle Class"');
+        $this->getLogger()->info('Renaming "Tutor Group" to "Circle Class"');
 
         $this->getDatabaseInternal()->executeQuery("
             UPDATE profile_field
@@ -195,7 +195,7 @@ HELP;
             LIMIT 1
         ");
 
-        $this->getLogger()->debug('Renaming "Class Teacher" to "Circle Teacher"');
+        $this->getLogger()->info('Renaming "Class Teacher" to "Circle Teacher"');
 
         $this->getDatabaseInternal()->executeQuery("
             UPDATE profile_field

@@ -231,7 +231,7 @@ HELP;
      */
     private function updateTerminology(): void
     {
-        $this->getLogger()->debug('Renaming Govt Student Number to "LUI Number"');
+        $this->getLogger()->info('Renaming Govt Student Number to "LUI Number"');
 
         $this->getDatabaseInternal()->executeQuery("
             UPDATE localisation

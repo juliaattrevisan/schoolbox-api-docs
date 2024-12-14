@@ -102,7 +102,10 @@ HELP;
         /* Exit early if you're doing this on the wrong school
          */
         if (!in_array(strtolower($this->getConfig()->get('site_school_code')), self::SCHOOL_CODE)) {
-            $this->getLogger()->debug(sprintf('This customisation requires one of these school codes: %s; exiting.', implode(',', self::SCHOOL_CODE)));
+            $this->getLogger()->debug(sprintf(
+                'This customisation requires one of these school codes: %s; exiting.',
+                implode(',', self::SCHOOL_CODE)
+            ));
 
             return;
         }
@@ -139,7 +142,7 @@ HELP;
      */
     private function updateNameFormat(): void
     {
-        $this->getLogger()->debug('Updating student profile name format');
+        $this->getLogger()->info('Updating student profile name format');
 
         $this->getDatabaseInternal()->executeQuery("
             UPDATE config

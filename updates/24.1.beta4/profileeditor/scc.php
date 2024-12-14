@@ -134,7 +134,7 @@ HELP;
      */
     private function updateFlags(): void
     {
-        $this->getLogger()->debug('Updating multiple alerts/flags to use click-to-reveal.');
+        $this->getLogger()->info('Updating multiple alerts/flags to use click-to-reveal.');
 
         $this->getDatabaseInternal()->executeQuery("
             UPDATE profile_field
