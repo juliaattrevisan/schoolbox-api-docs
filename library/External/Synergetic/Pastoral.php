@@ -859,16 +859,15 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
         }
 
         // Insert new actionSeqs (not removing, as we don't want to remove actions created via Synergetic
-        $newSeqs    = array_column($luPastoralCareActions, 'luPastoralCareActionSeq');
-
+        $newSeqs     = array_column($luPastoralCareActions, 'luPastoralCareActionSeq');
         $insertQuery = "
             INSERT INTO PastoralCareActions (PastoralCareSeq, luPastoralCareActionSeq, IndexOrder)
-                 VALUES (
-                             :PastoralCareSeq,
-                             :luPastoralCareActionSeq,
-                             COALESCE((SELECT MAX(IndexOrder) + 1 FROM PastoralCareActions WHERE PastoralCareSeq = :PastoralCareSeq2), 1)
-                         )
-                 ";
+            VALUES (
+                :PastoralCareSeq,
+                :luPastoralCareActionSeq,
+                (SELECT COALESCE(MAX(IndexOrder), 0) + 1 FROM PastoralCareActions WHERE PastoralCareSeq = :PastoralCareSeq2)
+            )
+        ";
         foreach ($newSeqs as $newSeq) {
             $insertParams = [
                 'PastoralCareSeq'         => $pastoral->getExternalId(),
