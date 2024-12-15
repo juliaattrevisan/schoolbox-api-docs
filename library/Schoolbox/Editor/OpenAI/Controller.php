@@ -35,7 +35,7 @@ class Controller extends Base
     /**
      * Controller constructor.
      */
-    public function __construct(private Client $client)
+    public function __construct(private Client $client, private Log\Mapper $logMapper)
     {
     }
 
@@ -52,6 +52,13 @@ class Controller extends Base
             return;
         }
 
+        /**
+         * @var $log Log\Model
+         */
+        $log = $this->logMapper->createModel();
+        $log->setUser($this->user);
+        $log->setPrompt($this->request->getBody()->getContents());
+
         try {
             $openAiRequest = new Request('POST', $this->getEndpoint(), array_merge(
                 $this->getAuthorization(),
@@ -62,8 +69,10 @@ class Controller extends Base
 
             // Handle the response when it arrives
             $promise->then(
-                function ($response): void {
+                function ($response) use ($log): void {
                     http_response_code(200);
+                    $log->setReturnCode(200);
+
                     //header('X-Accel-Buffering: no');
                     header('Content-Type: application/json');
                     header('Content-Encoding: none');
@@ -80,10 +89,13 @@ class Controller extends Base
                         //flush();
                     }
                 },
-                function ($reason): void {
+                function ($reason) use ($log): void {
                     /* @var ClientException $reason */
                     http_response_code($reason->getCode());
                     echo $reason->getMessage();
+
+                    $log->setReturnCode($reason->getCode());
+                    $log->setErrorMessage($reason->getMessage());
                 }
             );
 
@@ -91,6 +103,9 @@ class Controller extends Base
         } catch (GuzzleException $e) {
             $this->generateException(ErrorMapper::ERROR_DATABASE_UNAVAILABLE);
         }
+
+        $this->logMapper->save($log);
+
         die();
     }
 
