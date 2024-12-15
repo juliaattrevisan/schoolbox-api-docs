@@ -168,14 +168,10 @@ export function getFilteredCourseColumnCount(
     course: CourseWithCurriculumNodeUsage,
     includeChildren: boolean,
 ): number {
-    const key = `column-nodeId-${node.id}-courseId-${course.id}-includeChildren-${includeChildren}`;
+    const key = `column-${node.id}-${course.id}-${includeChildren}-${useFiltersStore().selectedReportOptionsKey}`;
     if (node.storedUsages[key]) {
         return node.storedUsages[key];
     }
-    // return early if course is not selected
-    // if (!useFiltersStore().selectedReportOptions.includes(ReportOptionValues.COURSE)) {
-    //     return 0;
-    // }
     /**
      * When the node has children and is not expanded, we want to show the usage count inclusive of children
      * to show how many usages are linked to the node and its children
@@ -206,7 +202,7 @@ export function getFilteredUnitColumnCount(
     unit: UnitWithCurriculumNodeUsage,
     includeChildren: boolean,
 ): number {
-    const key = `unit-nodeId-${node.id}-courseId-${course.id}-unitId-${unit.id}-includeChildren-${includeChildren}`;
+    const key = `unit-${node.id}-${course.id}-${unit.id}-${includeChildren}-${useFiltersStore().selectedReportOptionsKey}`;
     if (node.storedUsages[key]) {
         return node.storedUsages[key];
     }
@@ -243,7 +239,7 @@ export function getFilteredCourseCount(
     course: CourseWithCurriculumNodeUsage,
     includeChildren: boolean,
 ): number {
-    const key = `course-total-nodeId-${node.id}-courseId-${course.id}-includeChildren-${includeChildren}`;
+    const key = `course-total-${node.id}-${course.id}-${includeChildren}-${useFiltersStore().selectedReportOptionsKey}`;
     if (node.storedUsages[key]) {
         return node.storedUsages[key];
     }
@@ -263,7 +259,7 @@ export function getFilteredCourseCount(
  * @returns the total node usage count
  */
 export function getFilteredTotalCount(node: CurriculumCoverageNode, includeChildren: boolean): number {
-    const key = `total-nodeId-${node.id}-includeChildren-${includeChildren}`;
+    const key = `total-${node.id}-${includeChildren}-${useFiltersStore().selectedReportOptionsKey}`;
     if (node.storedUsages[key]) {
         return node.storedUsages[key];
     }
