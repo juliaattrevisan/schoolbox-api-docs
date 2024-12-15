@@ -947,7 +947,7 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
                 sprintf(
                     'Pastoral record %d owner external ID "%s" is invalid',
                     $pastoral->getId(),
-                    $pastoral->getStudent()->getExternalId(),
+                    $pastoral->getOwner()->getExternalId(),
                 )
             );
         }
