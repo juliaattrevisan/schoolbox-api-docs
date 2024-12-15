@@ -111,7 +111,7 @@ function onCourseClicked(buttonEl: HTMLButtonElement): void {
                 class="l-pad--0 t-align-left f-no-bkg f-always-show"
                 :style="{
                     paddingLeft:
-                        props.depth !== 0 && !props.node.children && !filtersStore.onlyShowGaps ? '2.75rem' : '0',
+                        props.depth !== 0 && !props.node.children && !filtersStore.onlyShowGaps ? '2.5rem' : '0',
                 }"
                 @click="emit('titleClick', props.node)"
             >
