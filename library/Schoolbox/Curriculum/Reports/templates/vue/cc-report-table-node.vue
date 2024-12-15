@@ -217,7 +217,10 @@ tr:hover {
     background: white;
     left: 0;
     position: sticky;
-    z-index: var(--sbx-depth-ui-sticky);
+    z-index: calc(var(--sbx-depth-ui-sticky) - 1);
+    @media (max-width: 1000px) {
+        position: static; // prevent the cell from sticking on smaller screens
+    }
 }
 
 .usage-cell {

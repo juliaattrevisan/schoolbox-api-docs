@@ -134,7 +134,7 @@ window.Vue.watch(bottom, (isAtBottom) => {
 
 <style scoped>
 thead {
-    /** fix the head to stay at the top when scrolling */
+    /* fix the head to stay at the top when scrolling */
     position: sticky;
     top: 0;
     z-index: var(--sbx-depth-ui-sticky);
