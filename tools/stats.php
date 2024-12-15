@@ -360,6 +360,7 @@ $app = new class extends CliTool\App {
         $result['type'] = $config->get('site_type');
         $result['version'] = $config->get(ConfigMapper::NAME_SITE_VERSION);
         $result['plan'] = strtolower($config->get(ConfigMapper::NAME_SITE_PLAN));
+        $result['timezone'] = $config->get('date_timezone');
 
         $db->executeDirectly('SET MAX_STATEMENT_TIME=300');
 
