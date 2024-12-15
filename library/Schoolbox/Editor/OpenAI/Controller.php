@@ -57,13 +57,15 @@ class Controller extends Base
          */
         $log = $this->logMapper->createModel();
         $log->setUser($this->user);
-        $log->setPrompt($this->request->getBody()->getContents());
 
         try {
+            $prompt =  $this->request->getBody()->getContents();
+
             $openAiRequest = new Request('POST', $this->getEndpoint(), array_merge(
                 $this->getAuthorization(),
                 ['Content-Type'  => 'application/json'],
-            ), $this->request->getBody()->getContents());
+            ), $prompt);
+            $log->setPrompt($prompt);
 
             $promise = $this->client->sendAsync($openAiRequest, ['stream' => true]);
 
@@ -72,6 +74,7 @@ class Controller extends Base
                 function ($response) use ($log): void {
                     http_response_code(200);
                     $log->setReturnCode(200);
+                    $log->setErrorMessage('');
 
                     //header('X-Accel-Buffering: no');
                     header('Content-Type: application/json');
