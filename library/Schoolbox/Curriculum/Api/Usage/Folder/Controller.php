@@ -154,24 +154,35 @@ class Controller extends Base
      */
     private function buildTreeResponse(Folder\Model $folder): ResponseInterface
     {
-        $curriculumNodes = $this->nodeMapper->findByColumnList([
-            'id' => $this->nodeMapper->findFamilyTreeIds(
-                $folder->getCurriculumNodes()->getPropertyValues('id'),
-                'curriculum_node_parent_id',
-                min(
-                    self::MAX_ANCESTORS,
-                    max(0, $this->requestQuery->getInt('ancestors', self::MAX_ANCESTORS)),
-                ),
-                min(
-                    self::MAX_DESCENDANTS,
-                    max(0, $this->requestQuery->getInt('descendants', self::MAX_DESCENDANTS)),
-                ),
+        // Note this logic is duplicated in CurriculumOverviewController::execute
+
+        $directNodeIds = $folder->getCurriculumNodes()->getPropertyValues('id');
+
+        // Fetch every node which is an ancestor or descendant of one of this folder's nodes, whether enabled or disabled.
+        // A previously set curriculum node should remain on a folder even if the node has subsequently been disabled.
+        $nodeIds = $this->nodeMapper->findFamilyTreeIds(
+            $directNodeIds,
+            'curriculum_node_parent_id',
+            min(
+                self::MAX_ANCESTORS,
+                max(0, $this->requestQuery->getInt('ancestors', self::MAX_ANCESTORS)),
             ),
-            'enabled' => true,
-        ]);
+            min(
+                self::MAX_DESCENDANTS,
+                max(0, $this->requestQuery->getInt('descendants', self::MAX_DESCENDANTS)),
+            ),
+        );
 
+        // Then find all the nodes and filter out disabled nodes that aren't directly mapped to this folder
+        // This is because we still want to show disabled nodes if they are still directly mapped to aid in transitioning curriculum
+        $curriculumNodes = $this->nodeMapper->findByColumnList(['id' => $nodeIds])->filter(
+            fn ($node) => $node->getEnabled() || in_array($node->getId(), $directNodeIds)
+        );
+
+        // Then, sort the entire list of nodes into a tree structure.
         Node\Mapper::sortNodes($curriculumNodes, 0);
+        $curriculumNodes = $this->nodeMapper->getCollectionAsTree($curriculumNodes);
 
-        return $this->responseAsJson($this->nodeMapper->getCollectionAsTree($curriculumNodes));
+        return $this->responseAsJson($curriculumNodes);
     }
 }
