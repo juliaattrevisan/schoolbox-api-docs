@@ -1,35 +1,49 @@
 {% extends '@core/user/student.twig' %}
 
-{# turn off specific sections for year 6-12 students#}
-{% set isUpperYears = externalUser.StudentYearLevel in [6,7,8,9,10,11,12] %}
-{% set showHeadOfHouse = externalUser.StudentYearLevel in [9,10,11,12] %}
-{% set showCoordTeacher = externalUser.StudentYearLevel in [6,7,8] %}
+{% import '@searchUser/field/macro.twig' as macro %}
 
+{# Sometimes humans get their profile field names changed to something really
+ # particular to their school, or to a set of circumstances, that aren't easily
+ # implemented by Profile Editor. This block allows you to custom-render humans,
+ # defaulting to the core template's original behaviur.
+#}
+{% block profileFieldPeople %}
+    {% if selectedField.field in ['hohTeacher'] %}
+        {# Head of House only applies to certain year levels #}
+        {% set showHeadOfHouse = externalUser.StudentYearLevel in [9,10,11,12] %}
 
-{% block details_hohTeacher %}
-    {% if showClasses %}
-        {% if showHeadOfHouse and hohTeacher %}
-            <dt class="small-4 medium-3 columns">Head of House:</dt>
+        {% if showHeadOfHouse %}
+            <dt class="small-4 medium-3 columns">Head of House</dt>
             <dd class="small-8 medium-9 columns">
-                {% if hohTeacher.id %}
-                    <a href="{{ session.mailhandle }}{{ hohTeacher.email }}">{{ hohTeacher.formatName }}</a>
-                {% else %}
-                    {{ hohTeacher.formatName }}
-                {% endif %}
+                {# These fields are Schoolbox\User instances and need special treatment #}
+                {{ macro.email(session, selectedField.value.email, selectedField.value.formatName) }}
             </dd>
         {% endif %}
-        {% if showCoordTeacher and coordTeacher %}
-            <dt class="no-margin small-6 medium-3">Head of Year {{ externalUser.StudentYearLevel }}:</dt>
-            <dd class="no-margin small-6 medium-9">
-                {% if coordTeacher.id %}
-                    <a href="{{ session.mailhandle }}{{ coordTeacher.email }}">{{ coordTeacher.formatName }}</a>
-                {% else %}
-                    {{ coordTeacher.formatName }}
-                {% endif %}
+    {% elseif selectedField.field in ['coordTeacher'] %}
+        {# Coord Teacher only applies to certain year levels #}
+        {% set showCoordTeacher = externalUser.StudentYearLevel in [6,7,8] %}
+
+        {% if showCoordTeacher %}
+            <dt class="small-4 medium-3 columns">Head of Year {{ externalUser.StudentYearLevel }}</dt>
+            <dd class="small-8 medium-9 columns">
+                {# These fields are Schoolbox\User instances and need special treatment #}
+                {{ macro.email(session, selectedField.value.email, selectedField.value.formatName) }}
             </dd>
         {% endif %}
     {% endif %}
-{% endblock details_hohTeacher %}
+{% endblock %}
+
+
+
+
+
+
+
+{# turn off specific sections for year 6-12 students#}
+{% set isUpperYears = externalUser.StudentYearLevel in [6,7,8,9,10,11,12] %}
+{% set showCoordTeacher = externalUser.StudentYearLevel in [6,7,8] %}
+
+
 
 {% block details_formTeacher %}
     {% if showClasses %}
