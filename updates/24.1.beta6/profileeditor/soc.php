@@ -122,12 +122,11 @@ HELP;
 
         /* Update field configuration
          *
-         * Hide tutorTeacher, StudentForm, StudentTutorDescription
+         * Hide StudentForm, StudentTutorDescription
          */
         $campusIds = [];
         $roletypes = [];
 
-        $this->helper->updateField(Role::STUDENT, 'tutorTeacher', $campusIds, $roletypes);
         $this->helper->updateField(Role::STUDENT, 'StudentForm', $campusIds, $roletypes);
         $this->helper->updateField(Role::STUDENT, 'StudentTutorDescription', $campusIds, $roletypes);
 
