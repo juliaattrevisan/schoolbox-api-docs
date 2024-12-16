@@ -104,25 +104,3 @@
         {{ parent() }}
     {% endif %}
 {% endblock %}
-
-
-
-
-
-
-
-{% block buttons_dueWork %}
-    {% if not (config.restrict_parent_duework_access and session.user.isParent()) %}
-        <li>
-            <a href="/learning/due/{{ user.getId() }}" class="icon-due-work">Tasks/Assessments Due</a>
-        </li>
-    {% endif %}
-{% endblock %}
-
-{% block buttons_grades %}
-    {% if not (config.restrict_parent_grades and session.user.isParent()) %}
-        <li>
-            <a href="/learning/grades/{{ user.getId() }}" class="icon-tick">Assessments</a>
-        </li>
-    {% endif %}
-{% endblock %}

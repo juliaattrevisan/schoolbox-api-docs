@@ -131,6 +131,28 @@ HELP;
         $this->helper->updateField(Role::STUDENT, 'StudentForm', $campusIds, $roletypes);
         $this->helper->updateField(Role::STUDENT, 'StudentTutorDescription', $campusIds, $roletypes);
 
+        /* Rename some buttons
+         */
+        $this->getLogger()->info('Renaming Due Work system button to "Tasks/Assessments Due"');
+
+        $this->getDatabaseInternal()->executeQuery("
+            UPDATE profile_button
+            SET text = 'Tasks/Assessments Due',
+                title =  'Tasks/Assessments Due'
+            WHERE type = 'duework'
+            AND roletype = 'student'
+        ");
+
+        $this->getLogger()->info('Renaming Grades system button to "Assessments"');
+
+        $this->getDatabaseInternal()->executeQuery("
+            UPDATE profile_button
+            SET text = 'Assessments',
+                title =  'Assessments'
+            WHERE type = 'grades'
+            AND roletype = 'student'
+        ");
+
         /* Announce lock release
          */
         $this->getLogger()->debug('Releasing lock');
