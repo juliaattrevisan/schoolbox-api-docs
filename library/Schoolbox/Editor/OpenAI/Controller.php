@@ -53,7 +53,7 @@ class Controller extends Base
         }
 
         /**
-         * @var $log Log\Model
+         * @var Log\Model $log
          */
         $log = $this->logMapper->createModel();
         $log->setUser($this->user);
