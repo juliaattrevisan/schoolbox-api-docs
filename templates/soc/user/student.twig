@@ -35,6 +35,40 @@
                 {{ macro.email(session, selectedField.value.email, selectedField.value.formatName) }}
             </dd>
         {% endif %}
+    {% elseif selectedField.field in ['tutorTeacher'] %}
+        {# turn off specific sections for year 6-12 students#}
+        {% set isUpperYears = externalUser.StudentYearLevel in [6,7,8,9,10,11,12] %}
+
+        {% if not isUpperYears  %}
+            <dt class="small-4 medium-3 columns">Horizontal Tutor</dt>
+            <dd class="small-8 medium-9 columns">
+                {# These fields are Schoolbox\User instances and need special treatment #}
+                {{ macro.email(session, selectedField.value.email, selectedField.value.formatName) }}
+            </dd>
+        {% endif %}
+    {% else %}
+        {# Default behaviour specified in core template #}
+        {{ parent() }}
+    {% endif %}
+{% endblock %}
+
+{# Intercept default handling of a tuple. Custom Works' tuples must get dealt with specially here,
+ # before falling back to just putting selectedField.value on screen
+ #}
+{% block profileFieldTuple %}
+    {% if selectedField.field in ['StudentTutorDescription'] %}
+        {# turn off specific sections for year 6-12 students#}
+        {% set isUpperYears = externalUser.StudentYearLevel in [6,7,8,9,10,11,12] %}
+
+        {% if not isUpperYears %}
+            <dt class="small-4 medium-3 columns">Horizontal Tutor Group</dt>
+            <dd class="small-8 medium-9 columns">
+                {{ selectedField.value }}
+            </dd>
+        {% endif %}
+    {% else %}
+        {# Default behaviour specified in core template #}
+        {{ parent() }}
     {% endif %}
 {% endblock %}
 
@@ -44,29 +78,25 @@
 
 
 
-{# turn off specific sections for year 6-12 students#}
-{% set isUpperYears = externalUser.StudentYearLevel in [6,7,8,9,10,11,12] %}
-
-
 
 {% block details_formTeacher %}
     {% if showClasses %}
         {# Horizontal Tutor #}
-        {% if tutorTeacher and not isUpperYears %}
-            <dt class="small-4 medium-3 columns">Horizontal Tutor:</dt>
-            <dd class="small-8 medium-9 columns">
-                {% if tutorTeacher.id %}
-                    <a href="{{ session.mailhandle }}{{ tutorTeacher.email }}">{{ tutorTeacher.formatName }}</a>
-                {% else %}
-                    {{ tutorTeacher.formatName }}
-                {% endif %}
-            </dd>
-        {% endif %}
+{#        {% if tutorTeacher and not isUpperYears %}#}
+{#            <dt class="small-4 medium-3 columns">Horizontal Tutor:</dt>#}
+{#            <dd class="small-8 medium-9 columns">#}
+{#                {% if tutorTeacher.id %}#}
+{#                    <a href="{{ session.mailhandle }}{{ tutorTeacher.email }}">{{ tutorTeacher.formatName }}</a>#}
+{#                {% else %}#}
+{#                    {{ tutorTeacher.formatName }}#}
+{#                {% endif %}#}
+{#            </dd>#}
+{#        {% endif %}#}
 
-        {% if externalUser.StudentTutorDescription ?? false and not isUpperYears %}
-            <dt class="small-4 medium-3 columns">Horizontal Tutor Group:</dt>
-            <dd class="small-8 medium-9 columns">{{ externalUser.StudentTutorDescription }}</dd>
-        {% endif %}
+{#        {% if externalUser.StudentTutorDescription ?? false and not isUpperYears %}#}
+{#            <dt class="small-4 medium-3 columns">Horizontal Tutor Group:</dt>#}
+{#            <dd class="small-8 medium-9 columns">{{ externalUser.StudentTutorDescription }}</dd>#}
+{#        {% endif %}#}
 
         {# Vertical Tutor #}
         {% if formTeacher %}
