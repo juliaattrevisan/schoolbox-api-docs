@@ -127,11 +127,90 @@ HELP;
         $this->helper->updateField(Role::STUDENT, 'yearLevel', $campusIds, $roletypes);
         $this->helper->updateField(Role::STUDENT, 'externalId', $campusIds, $roletypes);
 
+        /* Add StudentHouseDescription
+         */
+        $this->createFields();
+
+        /* Rename terminology
+         */
+        $this->renameFields();
+
         /* Announce lock release
          */
         $this->getLogger()->debug('Releasing lock');
 
         $lock->release();
+    }
+
+
+    /**
+     * Change localisation for Tutor
+     *
+     * @return void
+     */
+    private function renameFields(): void
+    {
+        $this->getLogger()->info('Renaming "Tutor" to "Learning Designer"');
+
+        $this->getDatabaseInternal()->executeQuery("
+            UPDATE localisation
+            SET singular_form = 'Learning Designer',
+                plural_form = 'Learning Designers'
+            WHERE term = 'tutor'
+            LIMIT 1
+        ");
+    }
+
+
+    /**
+     * Their connector surfaces StudentHouseDescription
+     * optionally displaying it in the profile screens if they're meaningful
+     *
+     * @return void
+     */
+    private function createFields(): void
+    {
+        /* Despite this field existing, it'll never render to users: a customised student.twig
+         * intercepts the default rendering
+         */
+        $query = "
+            INSERT IGNORE INTO `profile_field`
+            (roletype, field, display_as, sequence, enabled, term, icon, css, click_to_reveal, is_external)
+            VALUES
+            ('student','StudentHouseDescription','Cohort',(
+            SELECT MAX(sequence)+1
+                FROM profile_field pf
+                WHERE roletype = 'student'
+            ),1,NULL,NULL,NULL,0,1)
+        ";
+
+        $this->getDatabaseInternal()->executeQuery($query);
+
+        $profileFieldId = (int)$this->getDatabaseInternal()->lastInsertId();
+
+        /* Preset availability and visibility requirements
+         * By default it was visible to SELF and STAFF...I suppose
+         */
+        $campusIds = $this->helper->fetchCampusIds();
+        $roletypes = [Role::STAFF, Payload::ROLETYPE_SELF];
+
+        /* Assign relationships
+         */
+        $this->getLogger()->info(sprintf(
+            'Campus availability: assigning campus ids %s to profile field %s',
+            implode(',', $campusIds),
+            $profileFieldId
+        ));
+
+        $this->helper->createFieldCampusAvailability($profileFieldId, $campusIds);
+
+        $this->getLogger()->info(sprintf(
+            'Roletype visibility: assigning roletypes %s to profile field %s',
+            implode(',', $roletypes),
+            $profileFieldId
+        ));
+
+        $this->helper->createFieldRoletypeVisibility($profileFieldId, $roletypes);
     }
 
 

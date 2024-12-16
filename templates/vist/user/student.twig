@@ -2,27 +2,6 @@
 
 
 
-{% block details_tutorTeacher %}
-    {% if showClasses %}
-                {% if tutorTeacher %}
-                    <dt class="small-4 medium-3 columns">Learning Designer:</dt>
-                    <dd class="small-8 medium-9 columns">
-                        {% if tutorTeacher.id %}
-                            <a href="{{ session.mailhandle }}{{ tutorTeacher.email }}">{{ tutorTeacher.formatName }}</a>
-                        {% else %}
-                            {{ tutorTeacher.formatName }}
-                        {% endif %}
-                        </dd>
-            {% endif %}
-        {% endif %}
-{% endblock details_tutorTeacher %}
-
-{% block details_house %}
-    {% if externalUser.StudentHouseDescription ?? false %}
-        <dt class="small-4 medium-3 columns">Cohort:</dt>
-        <dd class="small-8 medium-9 columns">{{ externalUser.StudentHouseDescription }}</dd>
-    {% endif %}
-{% endblock details_house %}
 
 {% block details_hohTeacher %}
     {% if showClasses %}
