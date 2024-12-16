@@ -178,14 +178,14 @@ $border-bottom-width: 2px;
         &.parent-item {
             > a:after {
                 font-family: $font-family-icon;
-                content: "\e64b"; //.icon-next
+                content: "\e901"; //.icon-down-arrow
                 float: right;
-                transform: rotate(90deg); // Default icon is pointing down when collapsed
+                transform: rotate(0deg); // Default icon is pointing down when collapsed
                 transition: transform 0.3s;
             }
 
             &.flyout-expanded > a:after {
-                transform: rotate(-90deg); // Icon should point up when expanded
+                transform: rotate(180deg); // Icon should point up when expanded
             }
         }
     }
