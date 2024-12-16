@@ -118,7 +118,7 @@ test.describe("Create and Verify News Article Test", () => {
         await form.fillHeadline(headline);
         await form.fillArticle(article);
         await form.fillBlurb(blurb);
-        await form.attachFeatureImage(image);
+        await form.attachFeatureImage(db, image);
         await form.fillTopic(topic);
         await form.selectAudienceOption("Roles");
         await form.checkboxAudience(role);

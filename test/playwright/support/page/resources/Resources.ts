@@ -4,6 +4,8 @@ import type { Page } from "@playwright/test";
 export default class Resources {
     private page: Page;
 
+    static readonly RESOURCE_BROWSER = ".resource-browser";
+
     /**
      * cancel button on modal dialogs
      */
@@ -16,11 +18,21 @@ export default class Resources {
     }
 
     /**
+     * Asserts if a file is visible in the resources page
+     * @param fileName - The file title
+     */
+    async seeFile(fileName: string): Promise<void> {
+        const file = this.page.locator(`${Resources.RESOURCE_BROWSER} a.jstree-anchor`).filter({ hasText: fileName });
+        await expect(file).toBeVisible();
+    }
+
+    /**
      * clicks a folder in the resources page by folder id
      * @param folderId - The folder ID
      */
     async clickFolder(folderId: number): Promise<void> {
-        await this.page.locator(`a#${folderId}_anchor`).click();
+        // Need to use [id=""] since the ID starts with a number
+        await this.page.locator(`${Resources.RESOURCE_BROWSER} a[id="${folderId}_anchor"]`).click();
     }
 
     /**
@@ -28,8 +40,11 @@ export default class Resources {
      * @param folderName - The folder name
      */
     async clickFolderName(folderName: string): Promise<void> {
-        await this.page.locator(`a.jstree-anchor:has-text("${folderName}")`).click();
-        await expect(this.page.locator(`.meta-preview h3`)).toContainText(folderName);
+        await this.page
+            .locator(`${Resources.RESOURCE_BROWSER} a.jstree-anchor`)
+            .filter({ hasText: folderName })
+            .click();
+        await expect(this.page.locator(`${Resources.RESOURCE_BROWSER} .meta-preview h3`)).toContainText(folderName);
     }
 
     /**
@@ -38,7 +53,7 @@ export default class Resources {
      * @param menuItem - The menu item to click
      */
     async clickMenuItem(menuItem: string): Promise<void> {
-        await this.page.locator(`#meta a.icon-${menuItem}`).click();
+        await this.page.locator(`${Resources.RESOURCE_BROWSER} #meta a.icon-${menuItem}`).click();
     }
 
     /**

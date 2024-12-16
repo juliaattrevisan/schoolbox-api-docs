@@ -19,7 +19,7 @@ test.describe("Feedback Tests", () => {
      * Creates and submits a due work, marks it via the inline grader,
      * and checks notifications for it at each step
      */
-    test("due work via inline grader", async ({ tester, page }) => {
+    test("due work via inline grader", async ({ tester, page, db }) => {
         const className = Common.CLASS_9AENG;
         const classId = Common.CLASS_ID_9AENG;
         const student = Common.USER_LOUISASMITH;
@@ -59,7 +59,7 @@ test.describe("Feedback Tests", () => {
         tester.isGoingTo("create submission");
         const submitForm = new SubmitForm(tester, page);
         await submitForm.setContents(Common.genText(200));
-        await submitForm.setAttachment(filename);
+        await submitForm.setAttachment(db, filename);
         await submitForm.submit();
 
         tester.isGoingTo("As Jack Coles, check the notification");

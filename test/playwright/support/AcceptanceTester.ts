@@ -5,6 +5,7 @@ import { expect } from "@playwright/test";
 import LoginPage from "@schoolboxTest/playwright/support/page/LoginPage";
 import BaseTester from "@schoolboxTest/playwright/support/BaseTester";
 import Common from "@schoolboxTest/playwright/support/page/Common";
+import type DatabaseHelper from "@schoolboxTest/playwright/support/DatabaseHelper";
 
 /**
  * AcceptanceTester class to provide common functionality for acceptance tests
@@ -187,22 +188,41 @@ export default class AcceptanceTester extends BaseTester {
 
     /**
      * Attach a file to an attachzone, by simulating drag and drop
+     * @param db - The DatabaseHelper instance
      * @param locator - the locator of the attachzone (usually an element with class "attachzone")
      * @param filePath - the path to the file to attach
      */
-    async dragAndDropFile(locator: Locator, filePath: string): Promise<void> {
-        // Create a DataTransfer object with the file so we can simulate drag and drop
+    async dragAndDropFile(db: DatabaseHelper, locator: Locator, filePath: string): Promise<void> {
         const buffer = readFileSync(filePath);
+        const fileName = path.basename(filePath);
+        const fileExtension = path.extname(filePath).slice(1);
+
+        // Fetch the MIME type from the instance's file extension list
+        this.isGoingTo(`Find the MIME type for the file extension: ${fileExtension}`);
+        const fileTypeID = await db.grabFromDatabase("allowedFileExtension", "fileTypeID", {
+            extension: fileExtension,
+        });
+        if (typeof fileTypeID !== "number") {
+            throw new Error(`File type ID not found for extension: ${fileExtension}`);
+        }
+        const mimeType = await db.grabFromDatabase("allowedFileTypes", "mime", { fileTypeID });
+        if (typeof mimeType !== "string") {
+            throw new Error(`MIME type not found for file type ID: ${fileTypeID}`);
+        }
+
+        // Create a DataTransfer object with the file to simulate drag and drop
+        this.isGoingTo(`Simulate drag and drop of file: ${fileName} with MIME type: ${mimeType}`);
         const dataTransfer = await this.page.evaluateHandle(
-            ({ data, fileName }) => {
+            ({ _data, _fileName, _mimeType }) => {
                 const dt = new DataTransfer();
-                const file = new File([Uint8Array.from(atob(data), (c) => c.charCodeAt(0))], fileName, {
-                    type: "image/png",
+                // We need to include the mime type in the file object, otherwise the file will not be accepted
+                const file = new File([Uint8Array.from(atob(_data), (c) => c.charCodeAt(0))], _fileName, {
+                    type: _mimeType,
                 });
                 dt.items.add(file);
                 return dt;
             },
-            { data: buffer.toString("base64"), fileName: path.basename(filePath), mimeType: "image/png" },
+            { _data: buffer.toString("base64"), _fileName: fileName, _mimeType: mimeType },
         );
 
         // Then, dispatch a drop event on the dropzone element

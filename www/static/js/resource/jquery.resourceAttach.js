@@ -433,28 +433,24 @@
     };
 
     ResourceAttach.prototype.open = function () {
-        $("body").append(singletonModal); //add to the DOM
-
         var self = this;
 
         if (singletonModal == null) {
-            // this will construct a modal VIA the cache
-            this.cacheModal(function () {
-                singletonModal
-                    .html(singletonModal.data("content"))
-                    .foundation("reveal", "open")
-                    .off("closed.fndtn.reveal.attach")
-                    .on("closed.fndtn.reveal.attach", self.reopenParentReveal.bind(self));
-            });
-        } else {
-            // ensure the return points to the right element
-            singletonModal
-                .data("rtn", this)
-                .html(singletonModal.data("content"))
-                .foundation("reveal", "open")
-                .off("closed.fndtn.reveal.attach")
-                .on("closed.fndtn.reveal.attach", self.reopenParentReveal.bind(self));
+            // this will construct a modal VIA the cache, then recurse when done
+            this.cacheModal(this.open);
+            return;
         }
+
+        // add to the DOM
+        $("body").append(singletonModal);
+
+        // ensure the return points to the right element
+        singletonModal
+            .data("rtn", this)
+            .html(singletonModal.data("content"))
+            .foundation("reveal", "open")
+            .off("closed.fndtn.reveal.attach")
+            .on("closed.fndtn.reveal.attach", self.reopenParentReveal.bind(self));
 
         this.initAttachmentBrowser();
 

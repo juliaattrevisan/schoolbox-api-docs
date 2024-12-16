@@ -1,5 +1,6 @@
-import type AcceptanceTester from "@schoolboxTest/playwright/support/AcceptanceTester";
 import type { Page } from "@playwright/test";
+import type AcceptanceTester from "@schoolboxTest/playwright/support/AcceptanceTester";
+import type DatabaseHelper from "@schoolboxTest/playwright/support/DatabaseHelper";
 import { expect } from "@playwright/test";
 import Common from "@schoolboxTest/playwright/support/page/Common";
 
@@ -106,17 +107,23 @@ export default class Form {
 
     /**
      * fill feature image
+     * @param db - The DatabaseHelper instance
      * @param filePath - The filename to fill
      */
-    async attachFeatureImage(filePath: string): Promise<void> {
+    async attachFeatureImage(db: DatabaseHelper, filePath: string): Promise<void> {
         const attachZone = this.page.locator("#featureImage-zone");
-        await this.tester.dragAndDropFile(attachZone, filePath);
+        await this.tester.dragAndDropFile(db, attachZone, filePath);
         this.filePath = filePath;
     }
 
-    async setAttachment(filePath: string): Promise<void> {
+    /**
+     * fill attachment
+     * @param db - The DatabaseHelper instance
+     * @param filePath - The filename to fill
+     */
+    async setAttachment(db: DatabaseHelper, filePath: string): Promise<void> {
         const attachZone = this.page.locator("#FileZone");
-        await this.tester.dragAndDropFile(attachZone, filePath);
+        await this.tester.dragAndDropFile(db, attachZone, filePath);
         this.filePath = filePath;
     }
 
