@@ -11,8 +11,11 @@
  * @link        https://schoolbox.com.au/
  */
 
+use Alaress\Exception\UnreachableException;
 use Alaress\Image;
 use Alaress\Image\Exception\ConcurrentTransformationException;
+use Psr\Container\ContainerExceptionInterface;
+use Psr\Container\NotFoundExceptionInterface;
 use Schoolbox\Application\ResourceLimitExceededHandler;
 use Schoolbox\Application\WebRequest\ShutdownHandler;
 use Schoolbox\Config\ConfigMapper;
@@ -21,6 +24,7 @@ use Schoolbox\Resource\FilesystemFactory;
 use Schoolbox\Resource\Storage\FilesystemProxy;
 use Schoolbox\Resource\Storage\S3\InvalidPresignedUrlDurationExecption;
 use Schoolbox\Resource\Storage\S3\PreSignedUrlService;
+use Sentry\State\HubInterface;
 
 require_once __DIR__ . '/../conf/core/require.php';
 $kernel = new \Schoolbox\Application\BasicRequest\Kernel();
@@ -115,5 +119,16 @@ try {
     /* All other exceptions
     * BadMethodCallException
     */
+
+    // Log the exception
+    try {
+        /** @var HubInterface $sentry */
+        $sentry = $kernel->getDependencyInjector()->get('sentry');
+    } catch (NotFoundExceptionInterface | ContainerExceptionInterface $e) {
+        // It should not be possible to generate this exception because we checked DI has Sentry a few lines above
+        //noop sentry should exist...
+    }
+    $sentry->captureException($e);
+
     SitePage::redirectToBrokenImageWithTransform('portrait', $_GET['size']);
 }
