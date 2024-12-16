@@ -245,6 +245,11 @@
                                                         {# Renders with date formatting #}
                                                         {{ selectedField.value|date(dateFormats.shortDateOnlyFormat) }}
                                                     </dd>
+                                                {% elseif selectedField.field in ['barcode'] %}
+                                                    <dd class="small-12 columns barcode-39">
+                                                        {# Renders as a code39 barcode, does not show a title #}
+                                                        {{ selectedField.value }}
+                                                    </dd>
                                                 {% else %}
                                                     {# A generic tuple (key, value) pair
                                                      #

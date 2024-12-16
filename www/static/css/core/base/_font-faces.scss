@@ -23,5 +23,8 @@
     font-family: LibreBarcode39;
     width: 100%;
     font-size: 100px;
-    line-height: 100px;
+    // This line-height/margin-top combo ensures the barcode is centered vertically
+    // The font has a bunch of whitespace below the visible area, so we need to tweak it
+    line-height: 25px;
+    margin-top: 40px;
 }
