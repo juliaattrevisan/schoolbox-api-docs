@@ -127,6 +127,10 @@ HELP;
         $this->helper->updateField(Role::STUDENT, 'yearLevel', $campusIds, $roletypes);
         $this->helper->updateField(Role::STUDENT, 'externalId', $campusIds, $roletypes);
 
+        $this->helper->disableFields([
+            Role::STUDENT => ['formTeacher', 'yearLevel', 'externalId'],
+        ]);
+
         /* Add StudentHouseDescription
          */
         $this->createFields();
