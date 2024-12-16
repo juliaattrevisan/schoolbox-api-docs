@@ -287,7 +287,10 @@ class Factory
             /* Pastoral Counts was obtained specially in the controller cos it needs
              * a bunch of little bits and pieces; use the callback to populate it
              */
-            'pastoralCounts' => null
+            'pastoralCounts' => null,
+            /* Typically the external id, but could be anything really
+             */
+            'barcode' => $viewee->getExternalId(),
         ];
 
         return array_merge($externalUser, $referenceFields);
