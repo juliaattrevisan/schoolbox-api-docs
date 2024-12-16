@@ -258,7 +258,7 @@ class Factory
         if ($viewee->getCampusCollection()) {
             $campusNames = implode(', ', $viewee->getCampusCollection()->indexBy('name')->keys());
         }
-
+$hohTeacher = $this->userMapper->findById(23);
         /* Hybrid Theory
          */
         $referenceFields = [
