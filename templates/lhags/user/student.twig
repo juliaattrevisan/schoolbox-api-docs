@@ -1,54 +1,81 @@
 {% extends '@core/user/student.twig' %}
 
-{% block details_formTeacher %}
-    {% if showClasses %}
-        {% if formTeacher %}
-            {% set inSeniorCampus = false %}
+{% import '@searchUser/field/macro.twig' as macro %}
 
-            {% for campus in user.campusCollection %}
-                {% if campus.extTimetableCode == 'SEN' %}
-                    {% set inSeniorCampus = true %}
-                {% endif %}
-            {% endfor %}
+{# Sometimes humans get their profile field names changed to something really
+ # particular to their school, or to a set of circumstances, that aren't easily
+ # implemented by Profile Editor. This block allows you to custom-render humans,
+ # defaulting to the core template's original behaviur.
+#}
+{% block profileFieldPeople %}
+    {# Profile fields' names change depending on what campus someone is in
+     # so we can't just use Terminology
+     #
+     # TODO Maybe move this into a macro somehwo
+    #}
+    {% set inSeniorCampus = false %}
 
-            <dt class="small-4 medium-3 columns">
-                {% if inSeniorCampus %}
-                    Home Group Teacher:
-                {% else %}
-                    Class Teacher:
-                {% endif %}
-            </dt>
+    {% for campus in user.campusCollection %}
+        {% if campus.extTimetableCode == 'SEN' %}
+            {% set inSeniorCampus = true %}
+        {% endif %}
+    {% endfor %}
+
+    {% if selectedField.field in ['formTeacher'] %}
+        {% if inSeniorCampus %}
+            <dt class="small-4 medium-3 columns">Home Group Teacher</dt>
             <dd class="small-8 medium-9 columns">
-                {% if formTeacher.id %}
-                    <a href="{{ session.mailhandle }}{{ formTeacher.email }}">{{ formTeacher.formatName }}</a>
-                {% else %}
-                    {{ formTeacher.formatName }}
-                {% endif %}
+                {# These fields are Schoolbox\User instances and need special treatment #}
+                {{ macro.email(session, selectedField.value.email, selectedField.value.formatName) }}
+            </dd>
+        {% else %}
+            <dt class="small-4 medium-3 columns">Class Teacher</dt>
+            <dd class="small-8 medium-9 columns">
+                {# These fields are Schoolbox\User instances and need special treatment #}
+                {{ macro.email(session, selectedField.value.email, selectedField.value.formatName) }}
             </dd>
         {% endif %}
+    {% else %}
+        {# Default behaviour specified in core template #}
+        {{ parent() }}
     {% endif %}
-{% endblock details_formTeacher %}
+{% endblock %}
 
-{% block details_studentForm %}
-    {% if showClasses %}
-        {% if externalUser.StudentForm %}
 
-            {% set inSeniorCampus = false %}
+{# Intercept default handling of a tuple. Custom Works' tuples must get dealt with specially here,
+ # before falling back to just putting selectedField.value on screen
+ #}
+{% block profileFieldTuple %}
+    {# Profile fields' names change depending on what campus someone is in
+     # so we can't just use Terminology
+     #
+     # TODO Maybe move this into a macro somehwo
+     #}
+    {% set inSeniorCampus = false %}
 
-            {% for campus in user.campusCollection %}
-                {% if campus.extTimetableCode == 'SEN' %}
-                    {% set inSeniorCampus = true %}
-                {% endif %}
-            {% endfor %}
-
-            <dt class="small-4 medium-3 columns">
-                {% if inSeniorCampus %}
-                    Home Group:
-                {% else %}
-                    Class:
-                {% endif %}
-            </dt>
-            <dd class="small-8 medium-9 columns">{{ externalUser.StudentForm }}</dd>
+    {% for campus in user.campusCollection %}
+        {% if campus.extTimetableCode == 'SEN' %}
+            {% set inSeniorCampus = true %}
         {% endif %}
+    {% endfor %}
+
+    {% if selectedField.field in ['StudentForm'] %}
+        {# It's "Home Group" if viewee is in the senior campus
+         # Otherwise, it's just "Class"
+         #}
+        {% if inSeniorCampus %}
+            <dt class="small-4 medium-3 columns">Home Group</dt>
+            <dd class="small-8 medium-9 columns">
+                {{ selectedField.value }}
+            </dd>
+        {% else %}
+            <dt class="small-4 medium-3 columns">Class</dt>
+            <dd class="small-8 medium-9 columns">
+                {{ selectedField.value }}
+            </dd>
+        {% endif %}
+    {% else %}
+        {# Default behaviour specified in core template #}
+        {{ parent() }}
     {% endif %}
-{% endblock details_studentForm %}
+{% endblock %}
