@@ -121,13 +121,9 @@ try {
     */
 
     // Log the exception
-    try {
-        /** @var HubInterface $sentry */
-        $sentry = $kernel->getDependencyInjector()->get('sentry');
-    } catch (NotFoundExceptionInterface | ContainerExceptionInterface $e) {
-        // It should not be possible to generate this exception because we checked DI has Sentry a few lines above
-        //noop sentry should exist...
-    }
+
+    /** @var HubInterface $sentry */
+    $sentry = $kernel->getDependencyInjector()->get('sentry');
     $sentry->captureException($e);
 
     SitePage::redirectToBrokenImageWithTransform('portrait', $_GET['size']);
