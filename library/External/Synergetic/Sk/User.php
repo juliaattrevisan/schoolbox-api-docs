@@ -65,7 +65,7 @@ class External_Synergetic_Sk_User extends External_Synergetic_User
                         vStudentsAll.StudentIBFlag,
                         vStudentsAll.IndigenousFlag,
                         vStudentsAll.StudentTSIFlag,
-                        'cat' as StudentNonResidentFlag,
+                        vStudentsAll.StudentNonResidentFlag,
                         (
                             SELECT    COUNT(*)
                             FROM      dbo.IndividualPlans IEP
