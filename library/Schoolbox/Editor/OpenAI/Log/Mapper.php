@@ -15,10 +15,6 @@ use Schoolbox\UserMapper;
 
 class Mapper extends BaseMapper
 {
-
-    /**
-     * @inheritdoc
-     */
     protected function mapping()
     {
         $this->hasTable('openai_log');
@@ -34,12 +30,9 @@ class Mapper extends BaseMapper
 
 
     /**
-     * @inheritdoc
-     *
-     * @return string
      * @throws BaseMapper\DefinitionException
      */
-    protected function getSelectString()
+    protected function getSelectString(): string
     {
         $userMapper = $this->getJoinMapper('user');
 
@@ -52,12 +45,9 @@ class Mapper extends BaseMapper
 
 
     /**
-     * @inheritdoc
-     *
-     * @return string
      * @throws BaseMapper\DefinitionException
      */
-    protected function getFromString()
+    protected function getFromString(): string
     {
         return "
             FROM `{$this->table}`
@@ -65,10 +55,6 @@ class Mapper extends BaseMapper
         ";
     }
 
-
-    /**
-     * @inheritdoc
-     */
     protected function hydrateSelect(\PDOStatement $statement)
     {
         $userMapper = $this->getJoinMapper('user');

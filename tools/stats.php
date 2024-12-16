@@ -266,14 +266,14 @@ $app = new class extends CliTool\App {
             'views_course_unit_specifications' => 'SELECT SUM(hitcount) FROM homepage_log JOIN course_unit_specification ON course_unit_specification.folder_id = homepage_log.folder_id',
 
             //News
-            'news_posts'    => 'SELECT count(*) FROM comms_news_article WHERE deleted_at is null',
+            'news_posts'         => 'SELECT count(*) FROM comms_news_article WHERE deleted_at is null',
             'news_posts_comments_allowed'   => 'SELECT COUNT(*) FROM discussion_thread dt INNER JOIN comms_news_article cna ON dt.id = cna.discussion_thread_id WHERE cna.deleted_at IS NULL AND dt.open IS TRUE',
-            'news_comments' => 'SELECT count(*) FROM comms_news_article JOIN discussion_thread ON discussion_thread_id = discussion_thread.id AND comms_news_article.deleted_at is null JOIN discussion_thread_comment ON discussion_thread.id = discussion_thread_comment.discussion_thread_id WHERE discussion_thread_comment.deleted_at IS NULL',
-            'news_saveforlater' => 'SELECT count(*) FROM comms_news_saveforlater WHERE deleted_at IS NULL',
-            'news_files'        => 'SELECT count(*) FROM comms_news_article_file WHERE deleted_at IS NULL',
-            'news_views_staff'  => 'SELECT sum(num) FROM comms_news_article_statistics_cumulative WHERE deleted_at IS NULL AND role_type = "staff"',
-            'news_views_parent' => 'SELECT sum(num) FROM comms_news_article_statistics_cumulative WHERE deleted_at IS NULL AND role_type = "parent"',
-            'news_views_student'=> 'SELECT sum(num) FROM comms_news_article_statistics_cumulative WHERE deleted_at IS NULL AND role_type = "student"',
+            'news_comments'      => 'SELECT count(*) FROM comms_news_article JOIN discussion_thread ON discussion_thread_id = discussion_thread.id AND comms_news_article.deleted_at is null JOIN discussion_thread_comment ON discussion_thread.id = discussion_thread_comment.discussion_thread_id WHERE discussion_thread_comment.deleted_at IS NULL',
+            'news_saveforlater'  => 'SELECT count(*) FROM comms_news_saveforlater WHERE deleted_at IS NULL',
+            'news_files'         => 'SELECT count(*) FROM comms_news_article_file WHERE deleted_at IS NULL',
+            'news_views_staff'   => 'SELECT sum(num) FROM comms_news_article_statistics_cumulative WHERE deleted_at IS NULL AND role_type = "staff"',
+            'news_views_parent'  => 'SELECT sum(num) FROM comms_news_article_statistics_cumulative WHERE deleted_at IS NULL AND role_type = "parent"',
+            'news_views_student' => 'SELECT sum(num) FROM comms_news_article_statistics_cumulative WHERE deleted_at IS NULL AND role_type = "student"',
 
             //ePortfolio
             'eportfolio_pages'  => 'SELECT count(*) FROM `eportfolio_page` WHERE deleted_at IS NULL',
