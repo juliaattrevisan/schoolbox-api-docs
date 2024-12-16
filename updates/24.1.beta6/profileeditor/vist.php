@@ -166,7 +166,7 @@ HELP;
             UPDATE localisation
             SET singular_form = 'Cohort Leader',
                 plural_form = 'Cohort Leaders'
-            WHERE term = 'hohTeacher'
+            WHERE term = 'headOfHouse'
             LIMIT 1
         ");
     }
