@@ -49,9 +49,9 @@
             },
             'parent': {
                 '_default': true,
-                'duework': config.lms_enabled,
+                'duework': config.lms_enabled and not config.restrict_parent_duework_access,
                 'eportfolio': eportfolioAuth,
-                'grades': config.lms_enabled,
+                'grades': config.lms_enabled and not restrict_parent_grades,
                 'timetable': user.isShowTimetable,
                 'geosnapshot': isGeosnapshotAvailable,
                 'emailstaff': emailFunctionsAvailable and config.mail_enable and USER.email,
