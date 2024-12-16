@@ -6,7 +6,7 @@ INSERT INTO
 VALUES (
         'student',
         'barcode',
-        'Barcode',
+        'Barcode (Student ID)',
         (
             SELECT MAX(sequence) + 1
             FROM profile_field pf
