@@ -132,6 +132,10 @@ HELP;
         $this->helper->updateField(Role::STUDENT, 'StudentBoarder', $campusIds, $roletypes);
         $this->helper->updateField(Role::STUDENT, 'StudentForm', $campusIds, $roletypes);
 
+        $this->helper->disableFields([
+            Role::STUDENT => ['StudentBoarder', 'StudentForm'],
+        ]);
+
         /* Chesed Hours custom profile field
          */
         $this->createFields();
