@@ -94,44 +94,6 @@
     {% endif %}
 {% endblock details_formTeacher %}
 
-{#{% block details_tutorTeacher %}#}
-{#    {% if showClasses %}#}
-{#        {% if tutorTeacher %}#}
-{#            <dt class="small-4 medium-3 columns">#}
-{#                {% if inSeniorCampus %}#}
-{#                    Mentor:#}
-{#                {% else %}#}
-{#                    Class Teacher:#}
-{#                {% endif %}#}
-{#            </dt>#}
-{#            <dd class="small-8 medium-9 columns">#}
-{#                {% if tutorTeacher.id %}#}
-{#                    <a href="{{ session.mailhandle }}{{ tutorTeacher.email }}">{{ tutorTeacher.formatName }}</a>#}
-{#                {% else %}#}
-{#                    {{ tutorTeacher.formatName }}#}
-{#                {% endif %}#}
-{#            </dd>#}
-{#        {% endif %}#}
-{#    {% endif %}#}
-{#{% endblock details_tutorTeacher %}#}
-
-{#{% block details_tutorGroup %}#}
-{#    {% if showClasses %}#}
-{#        {% if externalUser.StudentTutorDescription %}#}
-
-{#            #}{# Remove usage of "Class" which only occurs with people outside#}
-{#             # the Senior Campus. Presumably "Mentor Group" is still in usage#}
-{#             #}
-{#            {% if inSeniorCampus %}#}
-{#            <dt class="small-4 medium-3 columns">#}
-{#                Mentor Group:#}
-{#            </dt>#}
-{#            <dd class="small-8 medium-9 columns">{{ externalUser.StudentTutorDescription }}</dd>#}
-{#            {% endif %}#}
-
-{#        {% endif %}#}
-{#    {% endif %}#}
-{#{% endblock details_tutorGroup %}#}
 
 {# Disable this block #}
 {% block details_studentType %}
