@@ -290,8 +290,12 @@
                 emailFunctionsAvailable: true,
             } only %}
 
-            {% block travel_logs %}
-            {% endblock travel_logs %}
+            {# A generic region where you can inject stuff
+             # As the name suggests, this is a no-man's-land that appears
+             # after Profile Buttons, as part of the island
+             #}
+            {% block afterButtons %}
+            {% endblock afterButtons %}
         </section>
     </div>
 </div>

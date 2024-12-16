@@ -1,55 +1,8 @@
 {% extends '@core/user/student.twig' %}
 
-{% block details_studentId %}
-{% endblock details_studentId %}
-
-{% block details_formTeacher %}
-{% endblock details_formTeacher %}
-
-{% block details_yearLevel %}
-{% endblock details_yearLevel %}
-
-{% block details_tutorTeacher %}
-    {% if showClasses %}
-                {% if tutorTeacher %}
-                    <dt class="small-4 medium-3 columns">Learning Designer:</dt>
-                    <dd class="small-8 medium-9 columns">
-                        {% if tutorTeacher.id %}
-                            <a href="{{ session.mailhandle }}{{ tutorTeacher.email }}">{{ tutorTeacher.formatName }}</a>
-                        {% else %}
-                            {{ tutorTeacher.formatName }}
-                        {% endif %}
-                        </dd>
-            {% endif %}
-        {% endif %}
-{% endblock details_tutorTeacher %}
-
-{% block details_house %}
-    {% if externalUser.StudentHouseDescription ?? false %}
-        <dt class="small-4 medium-3 columns">Cohort:</dt>
-        <dd class="small-8 medium-9 columns">{{ externalUser.StudentHouseDescription }}</dd>
-    {% endif %}
-{% endblock details_house %}
-
-{% block details_hohTeacher %}
-    {% if showClasses %}
-        {% if hohTeacher %}
-            <dt class="small-4 medium-3 columns">Cohort Leader:</dt>
-            <dd class="small-8 medium-9 columns">
-            {% if hohTeacher.id %}
-                <a href="{{ session.mailhandle }}{{ hohTeacher.email }}">{{ hohTeacher.formatName }}</a>
-            {% else %}
-                {{ hohTeacher.formatName }}
-            {% endif %}
-            </dd>
-        {% endif %}
-    {% endif %}
-{% endblock details_hohTeacher %}
-
-
-
-{% block travel_logs %}
+{# Display the student's Travel Log in the afterButtons area #}
+{% block afterButtons %}
     {% if showDetails %}
         {{ travelLogs | raw }}
     {% endif %}
-{% endblock travel_logs %}
+{% endblock afterButtons %}
