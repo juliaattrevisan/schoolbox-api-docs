@@ -396,11 +396,11 @@ class External_Synergetic_User implements External_UserInterface
                     \External_UserInterface::COURT_ORDER_PREFIX,
                     $courtOrderType
                 );
-            } else {
-                /* Some kind of generic alert message
-                 */
-                $student['AlertMessage'][] = $row['AlertMessage'];
             }
+
+            /* Some kind of generic alert message
+                */
+            $student['AlertMessage'][] = $row['AlertMessage'];
         }
 
         /* Uniquify both AlertMessage and AlertLegal nodes since they might dupe
