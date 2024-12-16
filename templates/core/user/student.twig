@@ -226,11 +226,13 @@
                                                  # will need special treatment somehow
                                                  #}
                                                 {% if selectedField.field in ['formTeacher', 'tutorTeacher', 'hohTeacher', 'coordTeacher', 'studentCoach'] %}
-                                                    <dt class="small-4 medium-3 columns">{{ macro.fieldName(selectedField) }}</dt>
-                                                    <dd class="small-8 medium-9 columns">
-                                                        {# These fields are Schoolbox\User instances and need special treatment #}
-                                                        {{ macro.email(session, selectedField.value.email, selectedField.value.formatName) }}
-                                                    </dd>
+                                                    {% block profileFieldPeople %}
+                                                        <dt class="small-4 medium-3 columns">{{ macro.fieldName(selectedField) }}</dt>
+                                                        <dd class="small-8 medium-9 columns">
+                                                            {# These fields are Schoolbox\User instances and need special treatment #}
+                                                            {{ macro.email(session, selectedField.value.email, selectedField.value.formatName) }}
+                                                        </dd>
+                                                    {% endblock %}
                                                 {% elseif selectedField.field in ['email'] %}
                                                     <dt class="small-4 medium-3 columns">{{ macro.fieldName(selectedField) }}</dt>
                                                     <dd class="small-8 medium-9 columns">
