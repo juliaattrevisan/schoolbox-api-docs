@@ -46,11 +46,29 @@
                 {{ macro.email(session, selectedField.value.email, selectedField.value.formatName) }}
             </dd>
         {% endif %}
+    {% elseif selectedField.field in ['formTeacher'] %}
+        {# turn off specific sections for year 6-12 students#}
+        {% set isUpperYears = externalUser.StudentYearLevel in [6,7,8,9,10,11,12] %}
+
+        {% if isUpperYears %}
+            <dt class="small-4 medium-3 columns">Mentor</dt>
+            <dd class="small-8 medium-9 columns">
+                {# These fields are Schoolbox\User instances and need special treatment #}
+                {{ macro.email(session, selectedField.value.email, selectedField.value.formatName) }}
+            </dd>
+        {% else %}
+            <dt class="small-4 medium-3 columns">Class Teacher</dt>
+            <dd class="small-8 medium-9 columns">
+                {# These fields are Schoolbox\User instances and need special treatment #}
+                {{ macro.email(session, selectedField.value.email, selectedField.value.formatName) }}
+            </dd>
+        {% endif %}
     {% else %}
         {# Default behaviour specified in core template #}
         {{ parent() }}
     {% endif %}
 {% endblock %}
+
 
 {# Intercept default handling of a tuple. Custom Works' tuples must get dealt with specially here,
  # before falling back to just putting selectedField.value on screen
@@ -100,18 +118,18 @@
 
         {# Vertical Tutor #}
         {% if formTeacher %}
-            {% if isUpperYears %}
-                <dt class="small-12 medium-3">Mentor:</dt>
-            {% else %}
-                <dt class="small-12 medium-3">Class Teacher:</dt>
-            {% endif %}
-            <dd class="small-12 medium-9">
-                {% if formTeacher.id %}
-                    <a href="{{ session.mailhandle }}{{ formTeacher.email }}">{{ formTeacher.formatName }}</a>
-                {% else %}
-                    {{ formTeacher.formatName }}
-                {% endif %}
-            </dd>
+{#            {% if isUpperYears %}#}
+{#                <dt class="small-12 medium-3">Mentor:</dt>#}
+{#            {% else %}#}
+{#                <dt class="small-12 medium-3">Class Teacher:</dt>#}
+{#            {% endif %}#}
+{#            <dd class="small-12 medium-9">#}
+{#                {% if formTeacher.id %}#}
+{#                    <a href="{{ session.mailhandle }}{{ formTeacher.email }}">{{ formTeacher.formatName }}</a>#}
+{#                {% else %}#}
+{#                    {{ formTeacher.formatName }}#}
+{#                {% endif %}#}
+{#            </dd>#}
 
             {% if externalUser.StudentForm %}
                 {% if isUpperYears %}
