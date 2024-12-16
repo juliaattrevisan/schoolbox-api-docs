@@ -266,11 +266,14 @@ $app = new class extends CliTool\App {
             'views_course_unit_specifications' => 'SELECT SUM(hitcount) FROM homepage_log JOIN course_unit_specification ON course_unit_specification.folder_id = homepage_log.folder_id',
 
             //News
-            'news_posts'    => 'SELECT count(*) FROM comms_news_article WHERE deleted_at is null',
+            'news_posts'         => 'SELECT count(*) FROM comms_news_article WHERE deleted_at is null',
             'news_posts_comments_allowed'   => 'SELECT COUNT(*) FROM discussion_thread dt INNER JOIN comms_news_article cna ON dt.id = cna.discussion_thread_id WHERE cna.deleted_at IS NULL AND dt.open IS TRUE',
-            'news_comments' => 'SELECT count(*) FROM comms_news_article JOIN discussion_thread ON discussion_thread_id = discussion_thread.id AND comms_news_article.deleted_at is null JOIN discussion_thread_comment ON discussion_thread.id = discussion_thread_comment.discussion_thread_id WHERE discussion_thread_comment.deleted_at IS NULL',
-            'news_saveforlater' => 'SELECT count(*) FROM comms_news_saveforlater WHERE deleted_at IS NULL',
-            'news_files'        => 'SELECT count(*) FROM comms_news_article_file WHERE deleted_at IS NULL',
+            'news_comments'      => 'SELECT count(*) FROM comms_news_article JOIN discussion_thread ON discussion_thread_id = discussion_thread.id AND comms_news_article.deleted_at is null JOIN discussion_thread_comment ON discussion_thread.id = discussion_thread_comment.discussion_thread_id WHERE discussion_thread_comment.deleted_at IS NULL',
+            'news_saveforlater'  => 'SELECT count(*) FROM comms_news_saveforlater WHERE deleted_at IS NULL',
+            'news_files'         => 'SELECT count(*) FROM comms_news_article_file WHERE deleted_at IS NULL',
+            'news_views_staff'   => 'SELECT sum(num) FROM comms_news_article_statistics_cumulative WHERE deleted_at IS NULL AND role_type = "staff"',
+            'news_views_parent'  => 'SELECT sum(num) FROM comms_news_article_statistics_cumulative WHERE deleted_at IS NULL AND role_type = "parent"',
+            'news_views_student' => 'SELECT sum(num) FROM comms_news_article_statistics_cumulative WHERE deleted_at IS NULL AND role_type = "student"',
 
             //ePortfolio
             'eportfolio_pages'  => 'SELECT count(*) FROM `eportfolio_page` WHERE deleted_at IS NULL',
@@ -340,12 +343,16 @@ $app = new class extends CliTool\App {
             //Badges
             'badges'            => 'SELECT count(*) FROM badge WHERE deleted_at IS NULL',
             'badge_goals'       => 'SELECT count(*) FROM badge_user WHERE status = "goal" AND deleted_at IS NULL',
-            'badge_achieved'       => 'SELECT count(*) FROM badge_user WHERE status = "achievement" AND deleted_at IS NULL',
+            'badge_achieved'    => 'SELECT count(*) FROM badge_user WHERE status = "achievement" AND deleted_at IS NULL',
 
             //Whats new
             'whats_new_started' => 'SELECT COUNT(*) FROM tour_status INNER JOIN tour ON tour_status.tour_uuid = tour.uuid WHERE tour.title like "%Release" AND tour.deleted_at IS NULL AND tour_status.status = "' . Schoolbox\Tour\Status\Model::STATUS_STARTED . '"',
             'whats_new_dismissed' => 'SELECT COUNT(*) FROM tour_status INNER JOIN tour ON tour_status.tour_uuid = tour.uuid WHERE tour.title like "%Release" AND tour.deleted_at IS NULL AND tour_status.status = "' . Schoolbox\Tour\Status\Model::STATUS_DISMISSED . '"',
             'whats_new_completed' => 'SELECT COUNT(*) FROM tour_status INNER JOIN tour ON tour_status.tour_uuid = tour.uuid WHERE tour.title like "%Release" AND tour.deleted_at IS NULL AND tour_status.status = "' . Schoolbox\Tour\Status\Model::STATUS_COMPLETED . '"',
+
+            //AI Usage
+            'openai_success'    => 'SELECT COUNT(*) FROM openai_log WHERE return_code = 200',
+            'openai_error'      => 'SELECT COUNT(*) FROM openai_log WHERE return_code != 200',
         ];
 
         $result['instance_id'] = INSTANCE_ID;
@@ -353,6 +360,7 @@ $app = new class extends CliTool\App {
         $result['type'] = $config->get('site_type');
         $result['version'] = $config->get(ConfigMapper::NAME_SITE_VERSION);
         $result['plan'] = strtolower($config->get(ConfigMapper::NAME_SITE_PLAN));
+        $result['timezone'] = $config->get('date_timezone');
 
         $db->executeDirectly('SET MAX_STATEMENT_TIME=300');
 
