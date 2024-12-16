@@ -4,20 +4,7 @@
  # before falling back to just putting selectedField.value on screen
  #}
 {% block profileFieldTuple %}
-    {# This requires a dupe of externalId field, then a special handling
-     # The frontend and the schema generally prohibit dupes of (roletype, field) so we kind of have
-     # to piggyback off something that already exists.
-     #}
-    {% if selectedField.field == 'externalId' %}
-        {{ parent() }}
-
-        {# This renders an external id as a code39 barcode immediately below the external id #}
-        {% if selectedField.value ?? false %}
-            <dd class="small-12 columns">
-                <span class="barcode-39">*{{ user.externalId }}*</span>
-            </dd>
-        {% endif %}
-    {% elseif selectedField.field == 'StudentMobilePhone' %}
+    {% if selectedField.field == 'StudentMobilePhone' %}
         <dt class="small-4 medium-3 columns">Student Mobile:</dt>
         <dd class="small-8 medium-9 columns"><a href="tel:{{ selectedField.value }}">{{ selectedField.value }}</a></dd>
     {% else %}
