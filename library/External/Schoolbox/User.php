@@ -140,6 +140,11 @@ class External_Schoolbox_User implements External_UserInterface
          */
         $student['AlertMessage'] = array_unique(array_filter([$student['AlertMessage']]));
 
+        /* Initialise this stack for consistency,
+         * in External_Schoolbox_User there would only ever be either 0 or 1 legal alerts
+         */
+        $student['AlertLegal'] = [];
+
         /* Legal Alerts are distinguished by their CourtOrderType node.
          * If that CourtOrderType node was meaningful, then it's a Legal Alert and gets special treatment.
          * Otherwise it's a generic alert.
@@ -149,16 +154,12 @@ class External_Schoolbox_User implements External_UserInterface
         if ('' !== $courtOrderType) {
             /* A specially-crafted AlertLegal message about legal matters.
              */
-            $student['AlertLegal'] = [sprintf(
+            $student['AlertLegal'][] = sprintf(
                 '%s - %s',
                 \External_UserInterface::COURT_ORDER_PREFIX,
                 $courtOrderType
-            )];
+            );
         }
-
-        /* Some kind of generic alert message
-            */
-        $student['AlertLegal'] = [];
 
         return $student;
     }
