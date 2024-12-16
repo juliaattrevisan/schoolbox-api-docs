@@ -91,6 +91,11 @@
                                         <dd class="small-8 medium-9 columns">
                                             {{ macro.email(session, selectedField.value, selectedField.value) }}
                                         </dd>
+                                    {% elseif selectedField.field in ['barcode'] %}
+                                        <dd class="small-12 columns barcode-39">
+                                            {# Renders as a code39 barcode, does not show a title #}
+                                            {{ selectedField.value }}
+                                        </dd>
                                     {% else %}
                                         {# A generic tuple (key, value) pair
                                          #

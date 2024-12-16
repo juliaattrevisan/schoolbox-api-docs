@@ -409,6 +409,9 @@ class Factory
             'residentialHouse' => $viewee->getResidentialHouse()?->getHouse(),
             'yearLevel' => $viewee->getYear()?->getName() ?? '',
             'campusCollection' => $campusNames,
+            /* Typically the external id, but could be anything really
+             */
+            'barcode' => $viewee->getExternalId(),
         ];
 
         return array_merge($externalUser, $referenceFields);
