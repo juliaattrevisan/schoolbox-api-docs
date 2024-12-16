@@ -2,32 +2,6 @@
 
 {# Display the student's Travel Log in the afterButtons area #}
 {% block afterButtons %}
-    <table>
-        <thead>
-            <tr>
-                <th>TYPE</th>
-                <th>ACTION & LOCATION</th>
-                <th>TIME</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr>
-                <td>aaaaaaaa</td>
-                <td>bbbbbbbbbbbbbbbb</td>
-                <td>ccccccccc</td>
-            </tr>
-            <tr>
-                <td>dddd</td>
-                <td>eeeeeeee</td>
-                <td>fff</td>
-            </tr>
-            <tr>
-                <td>gggggggggggggggg</td>
-                <td>hh</td>
-                <td>iiiiiiiii</td>
-            </tr>
-        </tbody>
-    </table>
     {% if showDetails %}
         {{ travelLogs | raw }}
     {% endif %}
