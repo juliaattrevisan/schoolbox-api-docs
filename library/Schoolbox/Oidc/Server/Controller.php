@@ -220,6 +220,7 @@ class Controller extends Base
         preg_match('/^Bearer\\s+(.*)/i', $authHeader, $matches);
         if (!$matches) {
             $this->sendJsonError('Access token must be provided as a Bearer token', Response::HTTP_BAD_REQUEST);
+            return;
         }
         [, $accessToken] = $matches;
 
