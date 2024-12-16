@@ -130,6 +130,10 @@ HELP;
         $this->helper->updateField(Role::STUDENT, 'StudentForm', $campusIds, $roletypes);
         $this->helper->updateField(Role::STUDENT, 'StudentTutorDescription', $campusIds, $roletypes);
 
+        $this->helper->disableFields([
+            Role::STUDENT => ['StudentForm', 'StudentTutorDescription'],
+        ]);
+
         /* Rename some buttons
          */
         $this->getLogger()->info('Renaming Due Work system button to "Tasks/Assessments Due"');
