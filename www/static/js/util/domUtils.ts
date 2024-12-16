@@ -305,7 +305,7 @@ export async function injectScriptsIfNotLoaded(params: InjectScriptsParams): Pro
         if (document.readyState === "complete") {
             resolve(true);
         } else {
-            window.addEventListener("DOMContentLoaded", resolve);
+            window.addEventListener("load", resolve);
         }
     });
 
