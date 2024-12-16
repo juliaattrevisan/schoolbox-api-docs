@@ -68,6 +68,7 @@ class Controller extends Base
         // Check IP address
         if (!IpUtils::checkIp(Session::getIP(), $this->ipWhitelist)) {
             $this->sendJsonError('Access denied', Response::HTTP_UNAUTHORIZED);
+            return;
         }
 
         // Check secret
