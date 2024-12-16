@@ -154,9 +154,11 @@ class External_Schoolbox_User implements External_UserInterface
                 \External_UserInterface::COURT_ORDER_PREFIX,
                 $courtOrderType
             )];
-        } else {
-            $student['AlertLegal'] = [];
         }
+
+        /* Some kind of generic alert message
+            */
+        $student['AlertLegal'] = [];
 
         return $student;
     }
