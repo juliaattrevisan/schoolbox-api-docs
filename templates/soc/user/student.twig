@@ -1,113 +1,106 @@
 {% extends '@core/user/student.twig' %}
 
-{# turn off specific sections for year 6-12 students#}
-{% set isUpperYears = externalUser.StudentYearLevel in [6,7,8,9,10,11,12] %}
-{% set showHeadOfHouse = externalUser.StudentYearLevel in [9,10,11,12] %}
-{% set showCoordTeacher = externalUser.StudentYearLevel in [6,7,8] %}
+{% import '@searchUser/field/macro.twig' as macro %}
 
-{# Turn off these tutor blocks
- # All the tutor stuff is dealt with in details_formTeacher
- # because Form and Tutor both represent Tutor data now
+{# Sometimes humans get their profile field names changed to something really
+ # particular to their school, or to a set of circumstances, that aren't easily
+ # implemented by Profile Editor. This block allows you to custom-render humans,
+ # defaulting to the core template's original behaviur.
+#}
+{% block profileFieldPeople %}
+    {# Sadly this is still kind of fiddly #}
+    {% set yearLevel = externalUser.data.roleTypes.fields.selected|filter(selectedField => selectedField.field == 'yearLevel')|first %}
+
+    {# turn off specific sections for year 6-12 students#}
+    {% set isUpperYears = yearLevel.value in [6,7,8,9,10,11,12] %}
+
+    {% if selectedField.field in ['hohTeacher'] %}
+        {# Head of House only applies to certain year levels #}
+        {% set showHeadOfHouse = yearLevel.value in [9,10,11,12] %}
+
+        {% if showHeadOfHouse %}
+            <dt class="small-4 medium-3 columns">{{ macro.fieldName(selectedField) }}</dt>
+            <dd class="small-8 medium-9 columns">
+                {# These fields are Schoolbox\User instances and need special treatment #}
+                {{ macro.email(session, selectedField.value.email, selectedField.value.formatName) }}
+            </dd>
+        {% endif %}
+    {% elseif selectedField.field in ['coordTeacher'] %}
+        {# Coord Teacher only applies to certain year levels #}
+        {% set showCoordTeacher = yearLevel.value in [6,7,8] %}
+
+        {% if showCoordTeacher %}
+            {# In their prod terminology, this is still Year Level Coordinator
+             # so I'm...not sure if that was supposed to be renamed, or if this
+             # is a unique contextual usage here. I'll keep it close to the original
+             # implementation for now.
+             #}
+            <dt class="small-4 medium-3 columns">Head of Year {{ yearLevel.value }}</dt>
+            <dd class="small-8 medium-9 columns">
+                {# These fields are Schoolbox\User instances and need special treatment #}
+                {{ macro.email(session, selectedField.value.email, selectedField.value.formatName) }}
+            </dd>
+        {% endif %}
+    {% elseif selectedField.field in ['tutorTeacher'] %}
+        {% if not isUpperYears %}
+            <dt class="small-4 medium-3 columns">Horizontal Tutor</dt>
+            <dd class="small-8 medium-9 columns">
+                {# These fields are Schoolbox\User instances and need special treatment #}
+                {{ macro.email(session, selectedField.value.email, selectedField.value.formatName) }}
+            </dd>
+        {% endif %}
+    {% elseif selectedField.field in ['formTeacher'] %}
+        {% if isUpperYears %}
+            <dt class="small-4 medium-3 columns">Mentor</dt>
+            <dd class="small-8 medium-9 columns">
+                {# These fields are Schoolbox\User instances and need special treatment #}
+                {{ macro.email(session, selectedField.value.email, selectedField.value.formatName) }}
+            </dd>
+        {% else %}
+            <dt class="small-4 medium-3 columns">Class Teacher</dt>
+            <dd class="small-8 medium-9 columns">
+                {# These fields are Schoolbox\User instances and need special treatment #}
+                {{ macro.email(session, selectedField.value.email, selectedField.value.formatName) }}
+            </dd>
+        {% endif %}
+    {% else %}
+        {# Default behaviour specified in core template #}
+        {{ parent() }}
+    {% endif %}
+{% endblock %}
+
+
+{# Intercept default handling of a tuple. Custom Works' tuples must get dealt with specially here,
+ # before falling back to just putting selectedField.value on screen
  #}
-{% block details_tutorTeacher %}
-{% endblock %}
+{% block profileFieldTuple %}
+    {% if selectedField.field in ['StudentTutorDescription'] %}
+        {# turn off specific sections for year 6-12 students#}
+        {% set isUpperYears = externalUser.StudentYearLevel in [6,7,8,9,10,11,12] %}
 
-{% block details_studentForm %}
-{% endblock %}
-
-{% block details_tutorGroup %}
-{% endblock %}
-
-{% block details_hohTeacher %}
-    {% if showClasses %}
-        {% if showHeadOfHouse and hohTeacher %}
-            <dt class="small-4 medium-3 columns">Head of House:</dt>
+        {% if not isUpperYears %}
+            <dt class="small-4 medium-3 columns">Horizontal Tutor Group</dt>
             <dd class="small-8 medium-9 columns">
-                {% if hohTeacher.id %}
-                    <a href="{{ session.mailhandle }}{{ hohTeacher.email }}">{{ hohTeacher.formatName }}</a>
-                {% else %}
-                    {{ hohTeacher.formatName }}
-                {% endif %}
+                {{ selectedField.value }}
             </dd>
         {% endif %}
-        {% if showCoordTeacher and coordTeacher %}
-            <dt class="no-margin small-6 medium-3">Head of Year {{ externalUser.StudentYearLevel }}:</dt>
-            <dd class="no-margin small-6 medium-9">
-                {% if coordTeacher.id %}
-                    <a href="{{ session.mailhandle }}{{ coordTeacher.email }}">{{ coordTeacher.formatName }}</a>
-                {% else %}
-                    {{ coordTeacher.formatName }}
-                {% endif %}
-            </dd>
-        {% endif %}
-    {% endif %}
-{% endblock details_hohTeacher %}
+    {% elseif selectedField.field in ['StudentForm'] %}
+        {# turn off specific sections for year 6-12 students#}
+        {% set isUpperYears = externalUser.StudentYearLevel in [6,7,8,9,10,11,12] %}
 
-{% block details_formTeacher %}
-    {% if showClasses %}
-        {# Horizontal Tutor #}
-        {% if tutorTeacher and not isUpperYears %}
-            <dt class="small-4 medium-3 columns">Horizontal Tutor:</dt>
+        {% if isUpperYears %}
+            <dt class="small-4 medium-3 columns">Mentor Group</dt>
             <dd class="small-8 medium-9 columns">
-                {% if tutorTeacher.id %}
-                    <a href="{{ session.mailhandle }}{{ tutorTeacher.email }}">{{ tutorTeacher.formatName }}</a>
-                {% else %}
-                    {{ tutorTeacher.formatName }}
-                {% endif %}
+                {{ selectedField.value }}
+            </dd>
+        {% else %}
+            <dt class="small-4 medium-3 columns">Class Group</dt>
+            <dd class="small-8 medium-9 columns">
+                {{ selectedField.value }}
             </dd>
         {% endif %}
-
-        {% if externalUser.StudentTutorDescription ?? false and not isUpperYears %}
-            <dt class="small-4 medium-3 columns">Horizontal Tutor Group:</dt>
-            <dd class="small-8 medium-9 columns">{{ externalUser.StudentTutorDescription }}</dd>
-        {% endif %}
-
-        {# Vertical Tutor #}
-        {% if formTeacher %}
-            {% if isUpperYears %}
-                <dt class="small-12 medium-3">Mentor:</dt>
-            {% else %}
-                <dt class="small-12 medium-3">Class Teacher:</dt>
-            {% endif %}
-            <dd class="small-12 medium-9">
-                {% if formTeacher.id %}
-                    <a href="{{ session.mailhandle }}{{ formTeacher.email }}">{{ formTeacher.formatName }}</a>
-                {% else %}
-                    {{ formTeacher.formatName }}
-                {% endif %}
-            </dd>
-
-            {% if externalUser.StudentForm %}
-                {% if isUpperYears %}
-                    <dt class="small-12 medium-3">Mentor Group:</dt>
-                {% else %}
-                    <dt class="small-12 medium-3">Class Group:</dt>
-                {% endif %}
-                <dd class="small-12 medium-9">{{ externalUser.StudentForm }}</dd>
-            {% endif %}
-        {% endif %}
-    {% endif %}
-{% endblock %}
-
-{% block details_studiesCode %}
-    {% if externalUser.StudentStudiesCode %}
-    <dt class="small-12 medium-3">TASC Code:</dt>
-    <dd class="small-12 medium-9">{{ externalUser.StudentStudiesCode }}</dd>
-    {% endif %}
-{% endblock %}
-
-{% block buttons_dueWork %}
-    {% if not (config.restrict_parent_duework_access and session.user.isParent()) %}
-        <li>
-            <a href="/learning/due/{{ user.getId() }}" class="icon-due-work">Tasks/Assessments Due</a>
-        </li>
-    {% endif %}
-{% endblock %}
-
-{% block buttons_grades %}
-    {% if not (config.restrict_parent_grades and session.user.isParent()) %}
-        <li>
-            <a href="/learning/grades/{{ user.getId() }}" class="icon-tick">Assessments</a>
-        </li>
+    {% else %}
+        {# Default behaviour specified in core template #}
+        {{ parent() }}
     {% endif %}
 {% endblock %}
