@@ -65,7 +65,7 @@ class External_Synergetic_Sk_User extends External_Synergetic_User
                         vStudentsAll.StudentIBFlag,
                         vStudentsAll.IndigenousFlag,
                         vStudentsAll.StudentTSIFlag,
-                        vStudentsAll.StudentNonResidentFlag,
+                        'cat' as StudentNonResidentFlag,
                         (
                             SELECT    COUNT(*)
                             FROM      dbo.IndividualPlans IEP
@@ -118,6 +118,12 @@ class External_Synergetic_Sk_User extends External_Synergetic_User
                 /* Forcibly re-evaluate boarderlyness using this connector's specific interpretation
                  */
                 $student['StudentBoarder'] = $this->determineBoarderType((string)$student['StudentBoarder']);
+
+                /* A special appendage
+                 */
+                if ('' !== trim((string)$row['StudentNonResidentFlag'])) {
+                    $student['StudentBoarder'] .= ' International Student';
+                }
 
                 /* Initialise stacks
                  */
