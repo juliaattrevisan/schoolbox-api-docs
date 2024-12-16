@@ -20,6 +20,7 @@ use enshrined\svgSanitize\Sanitizer as BaseSvgSanitizer;
 use GuzzleHttp;
 use League\Flysystem\Filesystem;
 use Proxy\Server as ProxyServer;
+use Psr\Log\NullLogger;
 use Psr\SimpleCache\CacheInterface;
 use Schoolbox\API\Token\Jwt;
 use Schoolbox\API\Token\JwtParser;
@@ -50,6 +51,7 @@ use Schoolbox\Resource\Storage\HashGenerator;
 use Schoolbox\Resource\Storage\Mapper as StorageMapper;
 use Schoolbox\Resource\Storage\Receiver;
 use Schoolbox\Resource\Storage\Sanitizer;
+use Schoolbox\Search;
 use Schoolbox\TaskDaemon\ProducerFactory;
 use Schoolbox\TaskDaemon\Request\MessageFactory;
 use Schoolbox\User\Token\Mapper as TokenMapper;
@@ -585,6 +587,50 @@ class Kernel extends WebKernelAbstract
                     return new ProcessorFactory($storage, new HashGenerator());
                 }
             ),
+        );
+
+        // Search dependencies
+        $di->set(
+            'search.indexBuilder',
+            $di->lazy(
+                function () use ($di) {
+                    /** @var SchoolboxDatabaseFactory $dbFactory */
+                    $dbFactory = $di->get('databaseFactory');
+
+                    // Should this return write database always?
+                    $dbi = $dbFactory->getInternalDatabase();
+
+                    // What sort of logger should this use?
+                    // The CLI variant should use the kernel's logger:
+                    // otherwise, use a null logger.
+                    $logger = new NullLogger();
+                    return new Search\Api\Database\Index\CompositeBuilder(
+                        new Search\Api\Database\ResultType\Assessment\IndexBuilder($dbi, $logger),
+                        new Search\Api\Database\ResultType\Badge\IndexBuilder($dbi, $logger),
+                        new Search\Api\Database\ResultType\Blog\IndexBuilder($dbi, $logger),
+                        new Search\Api\Database\ResultType\Event\IndexBuilder($dbi, $logger),
+                        new Search\Api\Database\ResultType\File\IndexBuilder($dbi, $logger),
+                        new Search\Api\Database\ResultType\Forum\IndexBuilder($dbi, $logger),
+                        new Search\Api\Database\ResultType\Link\IndexBuilder($dbi, $logger),
+                        new Search\Api\Database\ResultType\News\IndexBuilder($dbi, $logger),
+                        new Search\Api\Database\ResultType\Textbox\IndexBuilder($dbi, $logger),
+                        new Search\Api\Database\ResultType\Page\IndexBuilder($dbi, $logger),
+                        new Search\Api\Database\ResultType\Tile\IndexBuilder($dbi, $logger),
+                        new Search\Api\Database\ResultType\User\IndexBuilder($dbi, $logger),
+                    );
+                }
+            )
+        );
+
+        $di->set(
+            'search.indexPersistor',
+            $di->lazyNew(
+                Search\Api\Database\Index\Persistor::class,
+                [
+                    'builder'      => $di->lazyGet('search.indexBuilder'),
+                    'dbConnection' => $di->lazyGet('databaseInternal'),
+                ]
+            )
         );
 
         return $di;
