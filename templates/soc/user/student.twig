@@ -8,9 +8,12 @@
  # defaulting to the core template's original behaviur.
 #}
 {% block profileFieldPeople %}
+    {# Sadly this is still kind of fiddly #}
+    {% set yearLevel = externalUser.data.roleTypes.fields.selected|filter(selectedField => selectedField.field == 'yearLevel') %}
+
     {% if selectedField.field in ['hohTeacher'] %}
         {# Head of House only applies to certain year levels #}
-        {% set showHeadOfHouse = externalUser.StudentYearLevel in [9,10,11,12] %}
+        {% set showHeadOfHouse = yearLevel in [9,10,11,12] %}
 
         {% if showHeadOfHouse %}
             <dt class="small-4 medium-3 columns">{{ macro.fieldName(selectedField) }}</dt>
@@ -21,7 +24,7 @@
         {% endif %}
     {% elseif selectedField.field in ['coordTeacher'] %}
         {# Coord Teacher only applies to certain year levels #}
-        {% set showCoordTeacher = externalUser.StudentYearLevel in [6,7,8] %}
+        {% set showCoordTeacher = yearLevel in [6,7,8] %}
 
         {% if showCoordTeacher %}
             {# In their prod terminology, this is still Year Level Coordinator
@@ -29,7 +32,7 @@
              # is a unique contextual usage here. I'll keep it close to the original
              # implementation for now.
              #}
-            <dt class="small-4 medium-3 columns">Head of Year {{ externalUser.StudentYearLevel }}</dt>
+            <dt class="small-4 medium-3 columns">Head of Year {{ yearLevel }}</dt>
             <dd class="small-8 medium-9 columns">
                 {# These fields are Schoolbox\User instances and need special treatment #}
                 {{ macro.email(session, selectedField.value.email, selectedField.value.formatName) }}
@@ -37,7 +40,7 @@
         {% endif %}
     {% elseif selectedField.field in ['tutorTeacher'] %}
         {# turn off specific sections for year 6-12 students#}
-        {% set isUpperYears = externalUser.StudentYearLevel in [6,7,8,9,10,11,12] %}
+        {% set isUpperYears = yearLevel in [6,7,8,9,10,11,12] %}
 
         {% if not isUpperYears  %}
             <dt class="small-4 medium-3 columns">Horizontal Tutor</dt>
@@ -48,7 +51,7 @@
         {% endif %}
     {% elseif selectedField.field in ['formTeacher'] %}
         {# turn off specific sections for year 6-12 students#}
-        {% set isUpperYears = externalUser.StudentYearLevel in [6,7,8,9,10,11,12] %}
+        {% set isUpperYears = yearLevel in [6,7,8,9,10,11,12] %}
 
         {% if isUpperYears %}
             <dt class="small-4 medium-3 columns">Mentor</dt>
