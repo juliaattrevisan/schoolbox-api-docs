@@ -58,10 +58,7 @@ const isModalOpen = window.Vue.ref(false); // to open/close the exporting to csv
     <basic-modal v-model:is-open="isModalOpen" :has-background-click="true">
         <div class="l-flex-col l-gap-m f-no-margins">
             <h2>Export to CSV</h2>
-            <p>
-                The exported data will match the options currently selected in the report. A ZIP file with separate CSV
-                files for each course will be generated, and you'll receive a notification when it's ready.
-            </p>
+            <p>The exported data will match the options currently selected in the report.</p>
             <ul class="flex-list buttons">
                 <li><button type="button" class="button" @click="isModalOpen = false">Cancel</button></li>
                 <li>

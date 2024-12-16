@@ -6,7 +6,7 @@
         :selected-nodes="{{ (selectedNodes ?? []) | json_encode }}"
         report-endpoint="{{ routeLookup('curriculumreports.generateCoverage') }}"
         usage-endpoint="{{ routeLookup('curriculumreports.getCoverageUsage') }}"
-        export-endpoint="{{ routeLookup('curriculumreports.requestExportCoverage') }}"
+        export-endpoint="{{ routeLookup('curriculumreports.exportCoverage') }}"
     />
 </div>
 <script>

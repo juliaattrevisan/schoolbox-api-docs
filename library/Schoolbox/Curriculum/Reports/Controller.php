@@ -26,10 +26,6 @@ use Schoolbox\Learning\Course\DataModel\Specification\Mapper as CourseSpecificat
 use Schoolbox\Resource\Folder\Translator\ModelToArray\LinkOnly as FolderTranslator;
 use Schoolbox\Learning\Course\DataModel\Specification\Translator\ModelToArray as CourseSpecTranslator;
 use Schoolbox\Curriculum\Api\Translator\ModelToArray as NodeTranslator;
-use Schoolbox\TaskDaemon\Producer;
-use Schoolbox\TaskDaemon\Request\DownloadPages\MessageFactory;
-use Schoolbox\Url\Factory as UrlFactory;
-use Schoolbox\User\Translator\Author\ModelToArray as UserTranslator;
 use Twig\Error\Error as TwigError;
 use ValueError;
 use Crell\ApiProblem\ApiProblem;
@@ -43,16 +39,13 @@ class Controller extends Base
      * @param CourseSpecificationMapper     $courseSpecificationMapper
      * @param CourseUnitSpecificationMapper $courseUnitSpecificationMapper
      * @param Helper                        $helper
-     * @param Producer                      $messageProducer
-     * @param MessageFactory                $messageFactory
+     * @param Export\Csv                    $csvExporter
      */
     public function __construct(
         private CurriculumMapper $curriculumMapper,
         private CourseSpecificationMapper $courseSpecificationMapper,
         private CourseUnitSpecificationMapper $courseUnitSpecificationMapper,
         private Helper $helper,
-        private Producer $messageProducer,
-        private MessageFactory $messageFactory,
         private Export\Csv $csvExporter,
     ) {
     }
@@ -172,7 +165,13 @@ class Controller extends Base
 
         $courseSpecs     = $this->courseSpecificationMapper->findByColumn('id', $courseIds);
         $courseUnitSpecs = $this->findCourseUnitSpecs($courseIds);
-        $usage           = $this->loadUsageStructure($courseSpecs, $courseUnitSpecs, $data, $cursor->retrieveUsageCount());
+        $usage           = $this->loadUsageStructure(
+            $courseSpecs,
+            $courseUnitSpecs,
+            $data,
+            $cursor->retrieveUsageCount(),
+            true,
+        );
         $structure       = $this->loadCourseStructure($courseSpecs, $courseUnitSpecs);
 
         $response =  [
@@ -189,9 +188,7 @@ class Controller extends Base
             ]
         ];
 
-        $this->response = $this->responseAsJson(
-            $response
-        );
+        $this->response = $this->responseAsJson($response, buffer: true);
     }
 
     /**
@@ -299,57 +296,6 @@ class Controller extends Base
     }
 
     /**
-     * Endpoint for requesting a coverage report to be downloaded via taskd.
-     *
-     * @api   GET /curriculum/reports/coverage/export/request
-     * @since 24.1
-     *
-     * @return void
-     */
-    public function requestExportCoverage(): void
-    {
-        $baseUrl           = (new UrlFactory($this->getConfigLoader()))->buildFullyQualified();
-        $exportCoverageUrl = $baseUrl->withPath($this->routeGenerator->generate('curriculumreports.exportCoverage'));
-
-        // Split each course into a separate download
-        $courseIds = $this->extractCourseIdsFromQuery();
-        foreach ($courseIds as $courseId) {
-            $course = $this->courseSpecificationMapper->findById($courseId);
-            $query  = $this->requestQuery->getArrayCopy();
-            $query['courseId'] = $courseId;
-
-            $this->messageFactory = $this->messageFactory->addFileContent(
-                sprintf('%s-%d.csv', $course->getTitle(), $courseId),
-                $exportCoverageUrl->withQuery(http_build_query($query))->__toString(),
-            );
-        }
-
-        // Send it to taskd
-        $userSerializer = new UserTranslator();
-        $message        = $this->messageFactory
-            ->setUser($this->getUser())
-            ->setCallbackUrl(
-                (string)$baseUrl->withPath(
-                    $this->routeGenerator->generate(
-                        'apiusernotify.apiUserNotify',
-                        ['userId' => $this->getUser()->getId()]
-                    )
-                )
-            )
-            ->setCallbackParams([
-                'message' => 'Your curriculum coverage report is ready to download',
-                'from'    => call_user_func($userSerializer, $this->getUser()),
-                'to'      => call_user_func($userSerializer, $this->getUser()),
-            ])
-            ->setOutfile('curriculum-coverage-report.zip')
-            ->build();
-        $this->messageProducer->send($message);
-
-        // Once done, output empty
-        $this->response = $this->responseEmpty();
-    }
-
-    /**
      * Export the current coverage report to a CSV.
      *
      * @api   GET /curriculum/reports/coverage/export
@@ -397,7 +343,13 @@ class Controller extends Base
         // Create export data
         $courseSpecs     = $this->courseSpecificationMapper->findByColumn('id', $courseIds);
         $courseUnitSpecs = $this->findCourseUnitSpecs($courseIds);
-        $usage           = $this->loadUsageStructure($courseSpecs, $courseUnitSpecs, $data, $cursor->retrieveUsageCount());
+        $usage           = $this->loadUsageStructure(
+            $courseSpecs,
+            $courseUnitSpecs,
+            $data,
+            $cursor->retrieveUsageCount(),
+            true,
+        );
         $structure       = $this->loadCourseStructure($courseSpecs, $courseUnitSpecs);
         $filename        = "curriculum-coverage-report.csv";
 
@@ -488,10 +440,17 @@ class Controller extends Base
      * @param array             $courseUnitSpecs
      * @param Collection        $data
      * @param array             $usageCount
+     * @param bool              $streamChildren  true: output each node's children as a generator;
+     *                                           false: output each node's children as an array.
      * @return Collection
      */
-    private function loadUsageStructure(GenericCollection $courseSpecs, array $courseUnitSpecs, Collection $data, array $usageCount): Collection
-    {
+    private function loadUsageStructure(
+        GenericCollection $courseSpecs,
+        array $courseUnitSpecs,
+        Collection $data,
+        array $usageCount,
+        bool $streamChildren,
+    ): Collection {
         $unitTranslator = new UnitAssessmentUsageTranslator(
             $this->routeGenerator,
             $this->authorizer,
@@ -512,7 +471,8 @@ class Controller extends Base
             $this->getUser(),
             $courseUsageTranslator,
             $courseSpecs,
-            $usageCount
+            $usageCount,
+            $streamChildren,
         );
 
 

@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "353f032089a994a0167f717c3e480e34",
+    "content-hash": "78430b21889a92dd2c6d98a3187ed60a",
     "packages": [
         {
             "name": "0x46616c6b/etherpad-lite-client",
@@ -10802,6 +10802,55 @@
             "time": "2024-11-06T18:17:38+00:00"
         },
         {
+            "name": "violet/streaming-json-encoder",
+            "version": "v1.1.5",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/violet-php/streaming-json-encoder.git",
+                "reference": "5cc3d506ba7768f8db8ad3d21dcd251a64598805"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/violet-php/streaming-json-encoder/zipball/5cc3d506ba7768f8db8ad3d21dcd251a64598805",
+                "reference": "5cc3d506ba7768f8db8ad3d21dcd251a64598805",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.6.0",
+                "psr/http-message": "^1.0"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Violet\\StreamingJsonEncoder\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Riikka Kalliomäki",
+                    "email": "riikka.kalliomaki@gmail.com",
+                    "homepage": "http://riimu.net"
+                }
+            ],
+            "description": "Library for iteratively encoding large JSON documents piece by piece",
+            "homepage": "http://violet.riimu.net",
+            "keywords": [
+                "encoder",
+                "json",
+                "psr-7",
+                "streaming"
+            ],
+            "support": {
+                "issues": "https://github.com/violet-php/streaming-json-encoder/issues",
+                "source": "https://github.com/violet-php/streaming-json-encoder/tree/v1.1.5"
+            },
+            "time": "2022-12-09T15:47:21+00:00"
+        },
+        {
             "name": "webmozart/assert",
             "version": "1.11.0",
             "source": {
@@ -15535,5 +15584,5 @@
         "ext-dom": "*"
     },
     "platform-dev": [],
-    "plugin-api-version": "2.6.0"
+    "plugin-api-version": "2.3.0"
 }
