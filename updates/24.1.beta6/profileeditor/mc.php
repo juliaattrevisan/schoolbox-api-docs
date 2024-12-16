@@ -122,6 +122,16 @@ HELP;
          */
         $this->helper->renameField('formTeacher', 'Head of Year', 'Heads of Year');
 
+        /* Update field configuration
+         *
+         * Hide StudentBoarder and StudentForm from everyone
+         */
+        $campusIds = [];
+        $roletypes = [];
+
+        $this->helper->updateField(Role::STUDENT, 'StudentBoarder', $campusIds, $roletypes);
+        $this->helper->updateField(Role::STUDENT, 'StudentForm', $campusIds, $roletypes);
+
         /* Announce lock release
          */
         $this->getLogger()->debug('Releasing lock');
