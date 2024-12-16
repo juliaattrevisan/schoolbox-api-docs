@@ -1,24 +1,5 @@
 {% extends '@core/user/student.twig' %}
 
-
-
-
-{% block details_hohTeacher %}
-    {% if showClasses %}
-        {% if hohTeacher %}
-            <dt class="small-4 medium-3 columns">Cohort Leader:</dt>
-            <dd class="small-8 medium-9 columns">
-            {% if hohTeacher.id %}
-                <a href="{{ session.mailhandle }}{{ hohTeacher.email }}">{{ hohTeacher.formatName }}</a>
-            {% else %}
-                {{ hohTeacher.formatName }}
-            {% endif %}
-            </dd>
-        {% endif %}
-    {% endif %}
-{% endblock details_hohTeacher %}
-
-
 {# Display the student's Travel Log in the afterButtons area #}
 {% block afterButtons %}
     <table>

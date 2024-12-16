@@ -159,6 +159,16 @@ HELP;
             WHERE term = 'tutor'
             LIMIT 1
         ");
+
+        $this->getLogger()->info('Renaming "Head of House" to "Cohort Leader"');
+
+        $this->getDatabaseInternal()->executeQuery("
+            UPDATE localisation
+            SET singular_form = 'Cohort Leader',
+                plural_form = 'Cohort Leaders'
+            WHERE term = 'hohTeacher'
+            LIMIT 1
+        ");
     }
 
 
