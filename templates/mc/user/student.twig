@@ -69,6 +69,9 @@
                 {{ selectedField.value }}
             </dd>
         {% endif %}
+    {% else %}
+        {# Default behaviour specified in core template #}
+        {{ parent() }}
     {% endif %}
 {% endblock %}
 
@@ -81,13 +84,13 @@
 
 
 {# Customisation SA-12128 #}
-{% block extraDetails %}
+{#{% block extraDetails %}#}
 
-    {# Community Service hours are only available to student and their parents #}
-    {% if externalUser.ChesedHours and (isStaff or isSelf or isParentOfStudent) %}
-        <dt class="small-4 medium-3 columns">
-            Chesed Hours:
-        </dt>
-        <dd class="small-8 medium-9 columns">{{ externalUser.ChesedHours }}</dd>
-    {% endif %}
-{% endblock %}
+{#    #}{# Community Service hours are only available to student and their parents #}
+{#    {% if externalUser.ChesedHours and (isStaff or isSelf or isParentOfStudent) %}#}
+{#        <dt class="small-4 medium-3 columns">#}
+{#            Chesed Hours:#}
+{#        </dt>#}
+{#        <dd class="small-8 medium-9 columns">{{ externalUser.ChesedHours }}</dd>#}
+{#    {% endif %}#}
+{#{% endblock %}#}
