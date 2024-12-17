@@ -120,6 +120,19 @@ HELP;
          */
         $this->createFields();
 
+        /* Update field configuration
+         *
+         * Discontinue previous campus lol
+         */
+        $campusIds = [];
+        $roletypes = [];
+
+        $this->helper->updateField(Role::STAFF, 'campusCollection', $campusIds, $roletypes);
+
+        $this->helper->disableFields([
+            Role::STAFF => ['campusCollection'],
+        ]);
+
         /* Announce lock release
          */
         $this->getLogger()->debug('Releasing lock');
