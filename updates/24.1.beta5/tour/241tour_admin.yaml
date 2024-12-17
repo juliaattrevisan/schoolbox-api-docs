@@ -4,7 +4,7 @@ tour:
   roles:
     - staff
   trigger:
-    urlRegex: '^/adminvs/home'
+    urlRegex: '^/adminv2/home'
     selector: body
     event: tourReady
   steps:
