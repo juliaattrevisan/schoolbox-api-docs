@@ -215,10 +215,12 @@ export const useNodesStore = defineStore("ccNodes", () => {
      */
     function setIsVisible(): void {
         flattenedNodes.value.forEach((node) => {
-            node.isVisible = false;
+            if (node.hasDefaultsSet === undefined) {
+                node.isVisible = false;
+            }
         });
         nodes.value.forEach((node) => {
-            if (node.children) {
+            if (node.hasDefaultsSet === undefined && node.children) {
                 node.isVisible = true;
                 node.children.forEach((child) => {
                     child.isVisible = true;
@@ -232,10 +234,12 @@ export const useNodesStore = defineStore("ccNodes", () => {
      */
     function setIsExpanded(): void {
         flattenedNodes.value.forEach((node) => {
-            node.isExpanded = false;
+            if (node.hasDefaultsSet === undefined) {
+                node.isExpanded = false;
+            }
         });
         nodes.value.forEach((node) => {
-            if (node.children) {
+            if (node.hasDefaultsSet === undefined && node.children) {
                 node.isExpanded = true;
             }
         });
@@ -247,15 +251,28 @@ export const useNodesStore = defineStore("ccNodes", () => {
      */
     function setHasNoUsages(): void {
         flattenedNodes.value.forEach((node) => {
-            node.hasNoUsages = getTotalCount(node, true) === 0;
-            node.usage.courses.forEach((course) => {
-                course.hasNoCourseUsages = getCourseColumnCount(node, course, true) === 0;
-                course.units.forEach((unit) => {
-                    unit.hasNoUsages = getUnitColumnCount(node, course, unit, true) === 0;
+            if (node.hasDefaultsSet === undefined) {
+                node.hasNoUsages = getTotalCount(node, true) === 0;
+                node.usage.courses.forEach((course) => {
+                    course.hasNoCourseUsages = getCourseColumnCount(node, course, true) === 0;
+                    course.units.forEach((unit) => {
+                        unit.hasNoUsages = getUnitColumnCount(node, course, unit, true) === 0;
+                    });
+                    course.hasNoTotalUsages = getCourseCount(node, course, true) === 0;
                 });
-                course.hasNoTotalUsages = getCourseCount(node, course, true) === 0;
-            });
-            node.storedUsages = {};
+                node.storedUsages = {};
+            }
+        });
+    }
+
+    /**
+     * Set the default isExpanded property for the nodes, setting the first two levels as expanded
+     */
+    function setHasDefaults(): void {
+        flattenedNodes.value.forEach((node) => {
+            if (node.hasDefaultsSet === undefined) {
+                node.hasDefaultsSet = true;
+            }
         });
     }
 
@@ -267,6 +284,7 @@ export const useNodesStore = defineStore("ccNodes", () => {
         setIsVisible();
         setIsExpanded();
         setHasNoUsages();
+        setHasDefaults();
     }
 
     // #endregion

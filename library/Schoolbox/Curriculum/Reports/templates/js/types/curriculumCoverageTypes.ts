@@ -87,6 +87,7 @@ export type CurriculumCoverageNode = Pick<Node, "id" | "name" | "code"> & {
     usage: {
         courses: CourseWithCurriculumNodeUsage[];
     };
+    hasDefaultsSet?: boolean; // to track if the node has defaults set
     isVisible: boolean; // to track if the node is visible in the report
     previousIsVisible: boolean; // to track if the node was visible previously (used when moving between the only show gaps toggle)
     isExpanded: boolean; // to track if the node is expanded in the report
