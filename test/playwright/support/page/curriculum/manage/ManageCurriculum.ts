@@ -53,7 +53,9 @@ export default class ManageCurriculum {
      */
     async checkNode(name: string): Promise<void> {
         const node = await this.locateNode(name);
-        await node.locator("input[type=checkbox]").check();
+        const checkboxId = await node.locator("input[type=checkbox]").getAttribute("id");
+        const checkboxLabel = node.locator(`label[for=${checkboxId}]`);
+        await checkboxLabel.click();
     }
 
     /**

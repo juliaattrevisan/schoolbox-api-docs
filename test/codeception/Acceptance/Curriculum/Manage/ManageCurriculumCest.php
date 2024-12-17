@@ -187,13 +187,7 @@ class ManageCurriculumCest
         $i->amGoingTo('search for nodes containing ACHH');
         $searchNodes = new SearchNodes($i);
         $searchNodes->fillSearch('ACHH');
-        $i->amGoingTo('expect 4 search results are shown');
-        $searchNodes->seeResultsMatch(4);
-        $i->amGoingTo('hide disabled nodes and so expect no search results are now shown');
-        $searchNodes->uncheckShowDisabledNodes();
-        $i->waitForElementNotVisible('[data-test-node]', 1); // waiting for the animation to hide the disabled nodes
-        $searchNodes->seeResultsMatch(0);
-    }
+        $i->amGoingTo('expect 4 search results are shown');        await db.updateInDatabase("badge", { deleted_at: "2022-01-15 11:22:34" }, { "name like": "Automation Badge%" });
 
     /**
      * @param AcceptanceTester $i

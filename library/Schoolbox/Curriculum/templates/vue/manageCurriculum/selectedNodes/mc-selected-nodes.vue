@@ -67,7 +67,7 @@ function onDeleteNodesSelected(): void {
                 <li v-if="selectedNodesStore.allNodesEnabled">
                     <button
                         class="button icon-view-hollow"
-                        data-test-disable-nodes
+                        data-test="disable-nodes"
                         @click.prevent="onEnableNodesSelected(false)"
                     >
                         Disable {{ selectedNodesSummary }}

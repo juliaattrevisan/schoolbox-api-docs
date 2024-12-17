@@ -112,7 +112,7 @@ function onModalClosed(): void {
             <li>
                 <button
                     class="button icon-approve submit"
-                    data-test-confirm-enable-nodes
+                    data-test="confirm-enable-nodes"
                     :disabled="enableNodesStore.isProcessing"
                     @click.prevent="onEnableSelected"
                 >
