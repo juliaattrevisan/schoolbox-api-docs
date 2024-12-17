@@ -4,9 +4,9 @@ name       ='curriculum_coverage_report_enabled',
 value      ='0',
 title      ='Enable Curriculum Coverage Report',
 description='If ON, the Curriculum Coverage Report is available.', # TODO: Add location.
-field_id   =3, # Boolean.
+field_id   =(SELECT id FROM lu_config_field WHERE field = 'boolean'),
 options    =NULL,
-type_id    =11, # Modules.
+type_id    =(SELECT id FROM lu_config_type WHERE type = 'Modules'),
 editable   ='false',
 hidden     ='false',
 required   ='false',
