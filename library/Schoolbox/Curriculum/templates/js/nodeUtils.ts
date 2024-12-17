@@ -202,6 +202,22 @@ export function noChildrenOfNode(nodes: Ref<Node[]>, nodeToAdd: Node): Node[] {
 }
 
 /**
+ * check if all children are disabled
+ * @param node - the nodes to check
+ * @returns - whether all children are disabled or not
+ */
+export function allChildrenDisabled(node: Node): boolean {
+    if (node.children === null) {
+        return true;
+    }
+    const enabledChildren = node.children.filter((child) => child.enabled);
+    if (enabledChildren.length === 0) {
+        return true;
+    }
+    return false;
+}
+
+/**
  * Recursively loop through the parents adding in a breadcrumb for each
  * @param node - the Node to traverse for breadcrumbs
  * @param currentBreadcrumbs - the current breadcrumbs

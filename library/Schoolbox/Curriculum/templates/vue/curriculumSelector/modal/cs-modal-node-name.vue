@@ -5,7 +5,7 @@
  */
 
 import type { Node } from "@schoolboxCurriculum/types/Node";
-import { getEmptyNode } from "@schoolboxCurriculum/js/nodeUtils";
+import { getEmptyNode, allChildrenDisabled } from "@schoolboxCurriculum/js/nodeUtils";
 import ShowMatches from "@schoolboxVue/components/search/show-matches.vue";
 import { useNodesStore } from "../store/csNodesStore";
 import { useModalViewNodesStore } from "../store/csModalViewNodesStore";
@@ -71,6 +71,10 @@ const isButton = window.Vue.computed(() => {
     }
     if (props.node.children?.length === 0) {
         // there's no children to display, so no point going further
+        return false;
+    }
+    if (allChildrenDisabled(props.node)) {
+        // all children are disabled, so no point going further
         return false;
     }
     return true;

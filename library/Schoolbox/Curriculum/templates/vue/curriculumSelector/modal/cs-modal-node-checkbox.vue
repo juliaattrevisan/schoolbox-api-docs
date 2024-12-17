@@ -45,7 +45,11 @@ const isVisible = window.Vue.computed(() => {
  * @returns { boolean } whether the checkbox should be disabled
  */
 const isDisabled = window.Vue.computed(() => {
-    return !store.canSelectChildren && modalSelectedNodesStore.childNodesIds.includes(props.node.id);
+    return (
+        !store.includeChildren &&
+        !store.canSelectChildren &&
+        modalSelectedNodesStore.childNodesIds.includes(props.node.id)
+    );
 });
 
 /**
@@ -55,7 +59,9 @@ const isDisabled = window.Vue.computed(() => {
 const isChecked = window.Vue.computed(() => {
     return (
         modalSelectedNodesStore.isSelected(props.node) ||
-        (!store.canSelectChildren && modalSelectedNodesStore.childNodesIds.includes(props.node.id))
+        (!store.includeChildren &&
+            !store.canSelectChildren &&
+            modalSelectedNodesStore.childNodesIds.includes(props.node.id))
     );
 });
 
