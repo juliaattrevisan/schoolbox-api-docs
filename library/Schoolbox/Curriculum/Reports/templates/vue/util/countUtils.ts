@@ -263,7 +263,6 @@ export function getFilteredTotalCount(node: CurriculumCoverageNode, includeChild
     if (node.storedUsages[key]) {
         return node.storedUsages[key];
     }
-    console.warn("getFilteredTotalCount");
     const usage = node.usage.courses.reduce((acc, course) => {
         return acc + getFilteredCourseCount(node, course, includeChildren);
     }, 0);
