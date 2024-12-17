@@ -1,0 +1,15 @@
+{% extends '@searchUser:core/button/button-island.twig' %}
+{% block custom_buttons %}
+    <li>
+        <a href="{{ routeLookup('customStkOleReport.reportList', {studentId: user.id}) }}" class="icon-document">Reports</a>
+    </li>
+
+    {# Obey access rules for non-ib students #}
+    {% set nceaRoute = routeLookupIfAuthorized('nceaReport.getReport', {userId: user.id, year: 'now'|date('Y'), user: user}) %}
+
+    {% if nceaRoute %}
+        <li>
+            <a href="{{ nceaRoute }}" class="icon-progress">NCEA Progress</a>
+        </li>
+    {% endif %}
+{% endblock custom_buttons %}
