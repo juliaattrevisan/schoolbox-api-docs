@@ -117,8 +117,24 @@ HELP;
 
         $this->createButtons();
 
+        /* Apply Compact Mode
+         * Find the My Students components, then update its default value
+         * I guess that's a bit dirty but doesn't really matter
+         */
+        $this->getDatabaseInternal()->executeQuery("
+            UPDATE component_config_definition
+            SET default_value = 1
+            WHERE component_definition_id = (
+                SELECT id
+                FROM component_definition
+                WHERE `class` = 'Component_Dashboard_ChildSubjectController'
+                LIMIT 1
+            )
+            AND `key` = 'compactMode'
+        ");
+
         /* Announce lock release
-          */
+         */
         $this->getLogger()->debug('Releasing lock');
 
         $lock->release();
