@@ -356,7 +356,7 @@ class Component_Homepage_ManageClassController extends Component_Homepage_Contro
 
         $curriculumCoverageUrl = $this->getCurriculumCoverageUrl();
 
-        // Curriculum coverage report should shown for Course pages.
+        // Curriculum coverage report should show for Course pages.
         if (
             $lmsEnabled &&
             $isCoursePage &&
