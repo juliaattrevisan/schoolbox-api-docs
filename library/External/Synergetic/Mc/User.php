@@ -124,9 +124,8 @@ class External_Synergetic_Mc_User extends External_Synergetic_User
                 $student['AlertLegal'] = [];
             }
 
-            /* Legal Alerts are distinguished by their CourtOrderType node.
-             * If that CourtOrderType node was meaningful, then it's a Legal Alert and gets special treatment.
-             * Otherwise it's a generic alert.
+            /* Legal Alerts are distinguished by their CourtOrderType, it is not related to AlertMessage.
+             * If CourtOrderType is meaningful, then we add only it's type to the LegalAlert stack.
              */
             $courtOrderType = trim((string)($row['CourtOrderType'] ?? null));
 
@@ -141,7 +140,7 @@ class External_Synergetic_Mc_User extends External_Synergetic_User
             }
 
             /* Some kind of generic alert message
-                */
+             */
             $student['AlertMessage'][] = $row['AlertMessage'];
         }
 
