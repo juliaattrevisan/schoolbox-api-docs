@@ -102,69 +102,6 @@ export const useNodesStore = defineStore("ccNodes", () => {
 
     // #endregion
 
-    // #region set defaults
-
-    /**
-     * Set the default isVisible property for the nodes, setting the first two levels as visible
-     */
-    function setIsVisible(): void {
-        flattenedNodes.value.forEach((node) => {
-            node.isVisible = false;
-        });
-        nodes.value.forEach((node) => {
-            if (node.children) {
-                node.isVisible = true;
-                node.children.forEach((child) => {
-                    child.isVisible = true;
-                });
-            }
-        });
-    }
-
-    /**
-     * Set the default isExpanded property for the nodes, setting the first two levels as expanded
-     */
-    function setIsExpanded(): void {
-        flattenedNodes.value.forEach((node) => {
-            node.isExpanded = false;
-        });
-        nodes.value.forEach((node) => {
-            if (node.children) {
-                node.isExpanded = true;
-            }
-        });
-    }
-
-    /**
-     * When a node has no usages, we can set the hasNoUsages property to true
-     * so we never have to loop through and calculate it again
-     */
-    function setHasNoUsages(): void {
-        flattenedNodes.value.forEach((node) => {
-            node.hasNoUsages = getTotalCount(node, true) === 0;
-            node.usage.courses.forEach((course) => {
-                course.hasNoCourseUsages = getCourseColumnCount(node, course, true) === 0;
-                course.units.forEach((unit) => {
-                    unit.hasNoUsages = getUnitColumnCount(node, course, unit, true) === 0;
-                });
-                course.hasNoTotalUsages = getCourseCount(node, course, true) === 0;
-            });
-            node.storedUsages = {};
-        });
-    }
-
-    /**
-     * Add the additional front end properties to the nodes,
-     * to track visibility and expansion of the nodes
-     */
-    function setDefaults(): void {
-        setIsVisible();
-        setIsExpanded();
-        setHasNoUsages();
-    }
-
-    // #endregion
-
     // #region expand / collapse
 
     /**
@@ -268,6 +205,69 @@ export const useNodesStore = defineStore("ccNodes", () => {
             }
         },
     );
+
+    // #endregion
+
+    // #region set defaults
+
+    /**
+     * Set the default isVisible property for the nodes, setting the first two levels as visible
+     */
+    function setIsVisible(): void {
+        flattenedNodes.value.forEach((node) => {
+            node.isVisible = false;
+        });
+        nodes.value.forEach((node) => {
+            if (node.children) {
+                node.isVisible = true;
+                node.children.forEach((child) => {
+                    child.isVisible = true;
+                });
+            }
+        });
+    }
+
+    /**
+     * Set the default isExpanded property for the nodes, setting the first two levels as expanded
+     */
+    function setIsExpanded(): void {
+        flattenedNodes.value.forEach((node) => {
+            node.isExpanded = false;
+        });
+        nodes.value.forEach((node) => {
+            if (node.children) {
+                node.isExpanded = true;
+            }
+        });
+    }
+
+    /**
+     * When a node has no usages, we can set the hasNoUsages property to true
+     * so we never have to loop through and calculate it again
+     */
+    function setHasNoUsages(): void {
+        flattenedNodes.value.forEach((node) => {
+            node.hasNoUsages = getTotalCount(node, true) === 0;
+            node.usage.courses.forEach((course) => {
+                course.hasNoCourseUsages = getCourseColumnCount(node, course, true) === 0;
+                course.units.forEach((unit) => {
+                    unit.hasNoUsages = getUnitColumnCount(node, course, unit, true) === 0;
+                });
+                course.hasNoTotalUsages = getCourseCount(node, course, true) === 0;
+            });
+            node.storedUsages = {};
+        });
+    }
+
+    /**
+     * Add the additional front end properties to the nodes,
+     * to track visibility and expansion of the nodes
+     */
+    function setDefaults(): void {
+        setIsVisible();
+        setIsExpanded();
+        setHasNoUsages();
+    }
 
     // #endregion
 
