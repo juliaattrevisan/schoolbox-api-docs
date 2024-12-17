@@ -132,5 +132,20 @@
          # the same idea of Additional Constraints.
          #}
         {% block custom_buttons %}
+            {# Sorry - there's no easy way to replace this #}
+            {% if 'sk' == config.site_school_code|lower %}
+                <li>
+                    <a href="{{ routeLookup('customStkOleReport.reportList', {studentId: user.id}) }}" class="icon-document">Reports</a>
+                </li>
+
+                {# Obey access rules for non-ib students #}
+                {% set nceaRoute = routeLookupIfAuthorized('nceaReport.getReport', {userId: user.id, year: 'now'|date('Y'), user: user}) %}
+
+                {% if nceaRoute %}
+                    <li>
+                        <a href="{{ nceaRoute }}" class="icon-progress">NCEA Progress</a>
+                    </li>
+                {% endif %}
+            {% endif %}
         {% endblock custom_buttons %}
     </ul>
