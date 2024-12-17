@@ -98,7 +98,7 @@ function onModalClosed(): void {
             <li>
                 <button
                     class="button icon-approve submit"
-                    data-test-confirm-delete-node
+                    data-test="confirm-delete-node"
                     :disabled="deleteNodesStore.isProcessing"
                     @click.prevent="onDeleteSelected"
                 >

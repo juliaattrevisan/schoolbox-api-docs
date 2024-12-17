@@ -85,7 +85,7 @@ function onDeleteNodesSelected(): void {
                 <li>
                     <button
                         class="button icon-delete alert"
-                        data-test-delete-nodes
+                        data-test="delete-nodes"
                         @click.prevent="onDeleteNodesSelected"
                     >
                         Delete {{ selectedNodesSummary }}
