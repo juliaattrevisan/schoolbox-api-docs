@@ -1,0 +1,9 @@
+{% extends '@searchUser:core/button/button-island.twig' %}
+{% block custom_buttons %}
+    {% set routeParticipationReport = routeLookupIfAuthorized('tigsParticipationReport.getReport', { userId: user.id, user: user }) %}
+    {% if routeParticipationReport %}
+        <li>
+            <a href="{{ routeParticipationReport }}" class="icon-report">Awards & Attendance</a>
+        </li>
+    {% endif %}
+{% endblock custom_buttons %}
