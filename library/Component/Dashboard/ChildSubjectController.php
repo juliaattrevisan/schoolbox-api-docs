@@ -5,13 +5,9 @@
  * @link        https://schoolbox.com.au/
  */
 
-use Schoolbox\Config\ConfigMapper;
 use Schoolbox\GenericCollection;
-use Schoolbox\Geosnapshot\ValidStudentPhotosAvailable;
 use Schoolbox\Permission\Access\UserAccess;
 use Custom\Dsfg\ValidJuniorSchoolStudent;
-use Schoolbox\Mapper\Exception as MapperException;
-use Schoolbox\Profile\Button\Mapper as ProfileButtonMapper;
 use Custom\Vist\TravelLog\Renderer;
 
 class Component_Dashboard_ChildSubjectController extends Component_Dashboard_ControllerAbstract
@@ -105,20 +101,6 @@ class Component_Dashboard_ChildSubjectController extends Component_Dashboard_Con
                 $this->setVar([
                     'subject_item' => '',
                 ]);
-            }
-
-            /* TIGS Participation Report
-             */
-            if ('TIGS' === $this->getConfigLoader()->get('site_school_code')) {
-                $this->setBlock('student_block', 'continuous_report', 'continuous_report_block');
-                $route  = 'tigsParticipationReport.getReport';
-                $params = ['userId' => $userChild->getId(), 'user' => $userChild,];
-                if ($this->getAuthorizer()->isPathAuthorizedForUser($route, $params, $this->getUser())) {
-                    $this->setVar('HREF_CONTINUOUS_REPORT', $this->getRouteGenerator()->generate($route, $params));
-                    $this->parse('continuous_report_block', 'continuous_report');
-                } else {
-                    $this->setVar('continuous_report_block');
-                }
             }
 
             // Parse the parent block
