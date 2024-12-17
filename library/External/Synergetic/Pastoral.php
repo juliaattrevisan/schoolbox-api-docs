@@ -865,7 +865,7 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
             VALUES (
                 :PastoralCareSeq,
                 :luPastoralCareActionSeq,
-                (SELECT COALESCE(MAX(IndexOrder), 0) + 1 FROM PastoralCareActions WHERE PastoralCareSeq = :PastoralCareSeq2)
+                COALESCE((SELECT MAX(IndexOrder) + 1 FROM PastoralCareActions WHERE PastoralCareSeq = :PastoralCareSeq2), 1)
             )
         ";
 
