@@ -23,7 +23,7 @@ $app = new class extends CliTool\App {
         passthru('php ' . __DIR__ . '/../../../tools/tour/install.php --perform ' . __DIR__ . '/241tour_admin.yaml', $returnVar);
 
         if ($this->getConfig()->get(ConfigMapper::NAME_SITE_PLAN) === 'Elite') {
-            passthru('php ' . __DIR__ . '/../../../tools/tour/install.php --perform ' . __DIR__ . '/241tour_lms_enhanced.yaml', $returnVar);
+            passthru('php ' . __DIR__ . '/../../../tools/tour/install.php --perform ' . __DIR__ . '/241tour_elite.yaml', $returnVar);
         }
     }
 
