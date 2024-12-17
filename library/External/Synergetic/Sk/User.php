@@ -119,6 +119,12 @@ class External_Synergetic_Sk_User extends External_Synergetic_User
                  */
                 $student['StudentBoarder'] = $this->determineBoarderType((string)$student['StudentBoarder']);
 
+                /* A special appendage
+                 */
+                if ('' !== trim((string)$row['StudentNonResidentFlag'])) {
+                    $student['StudentBoarder'] .= ' International Student';
+                }
+
                 /* Initialise stacks
                  */
                 $student['AlertMessage'] = [];
