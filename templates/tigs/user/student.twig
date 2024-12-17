@@ -1,22 +1,22 @@
 {% extends '@core/user/student.twig' %}
 
-{% block buttons %}
-    {{ parent() }}
-    {% set routeParticipationReport = routeLookupIfAuthorized('tigsParticipationReport.getReport', { userId: user.id, user: user }) %}
-    {% if routeParticipationReport %}
-        <li>
-            <a href="{{ routeParticipationReport }}" class="icon-report">Awards & Attendance</a>
-        </li>
-    {% endif %}
-{% endblock buttons %}
-{% set routeSubjectReport = routeLookupIfAuthorized('tigsSubjectReport.getReport', { userId: user.id, user: user, folderId: subject.folder.id, folder: subject.folder }) %}
-
+{# This is actually inside another loop in the parent template.
+ # It crashes unless I move the routeSubjectReport var inside theze blocks
+ # Odd. I wonder how this worked in prod?
+ #}
 {% block folderListItemClasses -%}
+    {# For some reason I need to do this here, and twice #}
+    {% set routeSubjectReport = routeLookupIfAuthorized('tigsSubjectReport.getReport', { userId: user.id, user: user, folderId: subject.folder.id, folder: subject.folder }) %}
+
     {%- if routeSubjectReport %}actions-small-1{% endif -%}
 {%- endblock %}
 
+
 {% block folderListItemActions %}
-    {% if routeSubjectReport or hasTeachersWithEmail  %}
+    {# For some reason I need to do this here, and twice #}
+    {% set routeSubjectReport = routeLookupIfAuthorized('tigsSubjectReport.getReport', { userId: user.id, user: user, folderId: subject.folder.id, folder: subject.folder }) %}
+
+    {% if routeSubjectReport or hasTeachersWithEmail %}
     <nav>
         <sbx-pop-out content-id="class-options-{{ groupIdentifier }}-{{ subjectIdentifier }}"></sbx-pop-out>
     </nav>
