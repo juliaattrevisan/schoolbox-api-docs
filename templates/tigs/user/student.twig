@@ -1,14 +1,5 @@
 {% extends '@core/user/student.twig' %}
 
-{% block buttons %}
-    {{ parent() }}
-    {% set routeParticipationReport = routeLookupIfAuthorized('tigsParticipationReport.getReport', { userId: user.id, user: user }) %}
-    {% if routeParticipationReport %}
-        <li>
-            <a href="{{ routeParticipationReport }}" class="icon-report">Awards & Attendance</a>
-        </li>
-    {% endif %}
-{% endblock buttons %}
 {% set routeSubjectReport = routeLookupIfAuthorized('tigsSubjectReport.getReport', { userId: user.id, user: user, folderId: subject.folder.id, folder: subject.folder }) %}
 
 {% block folderListItemClasses -%}

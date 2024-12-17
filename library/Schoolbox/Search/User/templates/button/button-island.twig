@@ -146,6 +146,13 @@
                         <a href="{{ nceaRoute }}" class="icon-progress">NCEA Progress</a>
                     </li>
                 {% endif %}
+            {% elseif 'tigs' == config.site_school_code|lower %}
+                {% set routeParticipationReport = routeLookupIfAuthorized('tigsParticipationReport.getReport', { userId: user.id, user: user }) %}
+                {% if routeParticipationReport %}
+                    <li>
+                        <a href="{{ routeParticipationReport }}" class="icon-report">Awards & Attendance</a>
+                    </li>
+                {% endif %}
             {% endif %}
         {% endblock custom_buttons %}
     </ul>
