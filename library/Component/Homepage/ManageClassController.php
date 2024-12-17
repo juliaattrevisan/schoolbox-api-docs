@@ -356,7 +356,7 @@ class Component_Homepage_ManageClassController extends Component_Homepage_Contro
 
         $curriculumCoverageUrl = $this->getCurriculumCoverageUrl();
 
-        // Curriculum coverage report should show for Course pages.
+        // Curriculum coverage report should shown for Course pages.
         if (
             $lmsEnabled &&
             $isCoursePage &&
@@ -382,7 +382,10 @@ class Component_Homepage_ManageClassController extends Component_Homepage_Contro
         $url = null;
 
         try {
-            if ($this->getAuthorizer()->isPathAuthorizedForUser($route, [], $this->getUser())) {
+            if (
+                $this->getContext()->hasCourseSpecification() &&
+                $this->getAuthorizer()->isPathAuthorizedForUser($route, [], $this->getUser())
+            ) {
                 $url = $this->getRouteGenerator()->generate($route);
                 $url .= '?courseId=' . $this->getContext()->getCourseSpecification()->getId();
             }
