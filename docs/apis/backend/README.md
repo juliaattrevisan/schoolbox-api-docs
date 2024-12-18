@@ -112,26 +112,60 @@ Instances of this translator generally extend the
 implements several helper methods for defining a translation. Like the model to
 array translator, instances should also implement `__invoke`.
 
-## Running the tests
+## Running the example
+
+### Setup
 
 First, copy this example and the one in `../../mvc/example` to the base
 Schoolbox folder:
 
 ```shell
 # in the base Schoolbox folder:
-cp -R docs/apis/backend/example/library .
-cp -R docs/mvc/example/library .
+cp -R docs/apis/backend/example/* .
+cp -R docs/mvc/example/* .
 ```
 
-Then, run the tests in `library/Schoolbox/Example/Api` either in your IDE, or
-via the command line:
+And then refresh the module cache:
 ```shell
 vagrant ssh
 cd /usr/share/schoolbox
-vendor/bin/phpunit library/Schoolbox/Example/Api
+tools/module/refresh-cache.php
 ```
+
+And create a table for the mapper:
+
+```sql
+create table example
+(
+    id         int auto_increment primary key,
+    user_id    int unsigned not null,
+    created_at datetime     not null,
+    updated_at datetime     not null,
+    deleted_at datetime     null,
+    constraint example_user_id_fk
+        foreign key (user_id) references user (id)
+);
+```
+
+### Viewing the example
+
+Visit https://vagrant.dev.schoolbox.cloud/example/api to view a list of example
+objects.
+
+### Running tests
+
+Run the tests in `library/Schoolbox/Example` either in your IDE, or via the CLI:
+command line:
+```shell
+# in Vagrant
+vendor/bin/phpunit library/Schoolbox/Example
+```
+
+### Teardown
 
 Once done, clean up:
 ```shell
+rm conf/modules/Example.php
+rm conf/modules/ExampleApi.php
 rm -rf library/Schoolbox/Example/
 ```
