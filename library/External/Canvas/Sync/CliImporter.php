@@ -220,6 +220,8 @@ class CliImporter extends CliTool\App
             if ($this->getOpt(self::OPT_LONG_SKIP_FETCH)) {
                 $this->getLogger()->notice("File download skipped");
             } else {
+                // Clear the old files before downloading new ones to avoid data duplication
+                $this->cleanupTempDir($tempDir);
                 $canvasApi->fetchCanvasDataFilesFromApi(self::TABLES_TO_IMPORT, $tempDir, $this->perform());
             }
             $dataRestorer = new Data2Restorer(
@@ -258,6 +260,8 @@ class CliImporter extends CliTool\App
             if ($this->getOpt(self::OPT_LONG_SKIP_FETCH)) {
                 $this->getLogger()->notice("File download skipped");
             } else {
+                // Clear the old files before downloading new ones to avoid data duplication
+                $this->cleanupTempDir($tempDir);
                 $dataFiles = $canvasApi->fetchCanvasDataFilesFromApi($tempDir, $schemaFile);
                 $this->downloadDataFiles($dataFiles, $tempDir, self::TABLES_TO_IMPORT_DEPRECATED);
             }
@@ -492,14 +496,24 @@ class CliImporter extends CliTool\App
         if (!is_dir($tempDir) && !mkdir($tempDir) && !is_dir($tempDir)) {
             throw new RuntimeException(sprintf('Directory "%s" was not created', $tempDir));
         }
-        // remove existing files
-        $files = glob($tempDir);
+        return $tempDir;
+    }
+
+
+    /**
+     * Cleans up the existing files in the temp directory
+     *
+     * @param string $tempDir
+     * @return void
+     */
+    private function cleanupTempDir(string $tempDir): void
+    {
+        $files = glob("$tempDir/*");
         foreach ($files as $file) {
             if (is_file($file)) {
                 unlink($file);
             }
         }
-        return $tempDir;
     }
 
 
