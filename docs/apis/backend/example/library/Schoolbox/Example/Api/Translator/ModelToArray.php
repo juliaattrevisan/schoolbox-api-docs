@@ -70,13 +70,15 @@ class ModelToArray
             // Sub-models within a model should be translated using a translator
             // specific to the sub-model.
             // In this case, one already exists.
-            'user' => $this->userTranslator->__invoke($model->getUser()),
+            'user' => $model->getUser()
+                ? $this->userTranslator->__invoke($model->getUser())
+                : null,
 
             // Dates should be output in the standard JSON schema date format:
             // https://json-schema.org/understanding-json-schema/reference/string#dates-and-times
-            'updatedAt' => $model->getUpdatedAt()->toRfc3339String(),
-            'deletedAt' => $model->getDeletedAt()->toRfc3339String(),
-            'createdAt' => $model->getCreatedAt()->toRfc3339String(),
+            'updatedAt' => $model->getUpdatedAt()?->toRfc3339String(),
+            'deletedAt' => $model->getDeletedAt()?->toRfc3339String(),
+            'createdAt' => $model->getCreatedAt()?->toRfc3339String(),
 
             // Links: various links relevant to the model.
             // These are the reason the `GetRouteIfAuthorized` trait is
