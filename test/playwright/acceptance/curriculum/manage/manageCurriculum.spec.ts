@@ -11,6 +11,7 @@ import AddNewCurriculum from "@schoolboxTest/playwright/support/page/curriculum/
 import AddNewSubsection from "@schoolboxTest/playwright/support/page/curriculum/manage/action/AddNewSubsection";
 import DisableNodes from "@schoolboxTest/playwright/support/page/curriculum/manage/action/DisableNodes";
 import DeleteNode from "@schoolboxTest/playwright/support/page/curriculum/manage/action/DeleteNode";
+import SearchNodes from "@schoolboxTest/playwright/support/page/curriculum/manage/action/SearchNodes";
 
 test.describe("Manage Curriculum Tests", () => {
     let mc: ManageCurriculum;
@@ -99,6 +100,18 @@ test.describe("Manage Curriculum Tests", () => {
 
         tester.isGoingTo("ensure the toast message is shown");
         await expect(page.getByTestId("toast")).toContainText("Outcome successfully deleted");
+    });
+
+    test("Search Nodes", async ({ tester, page }) => {
+        tester.isGoingTo("search for nodes containing 'historical' in Year 4 History");
+        const manageCurriculum = new ManageCurriculum(page, tester);
+        await manageCurriculum.clickNode("Year 4 History");
+
+        const searchNodes = new SearchNodes(page, tester);
+        await searchNodes.fillSearch("historical");
+
+        tester.isGoingTo("expect 4 search results are shown");
+        await searchNodes.seeResultsMatch(4);
     });
 
     test.afterEach(async ({ tester }) => {

@@ -27,5 +27,5 @@ test("clear search button should be visible when search is active", async () => 
 
 test("search input is disabled when prop isDisabled is true", async () => {
     await wrapper.setProps({ isDisabled: true });
-    expect(wrapper.find("[data-test-search-input]").element).toBeDisabled();
+    expect(wrapper.find('[data-test="search-input"]').element).toBeDisabled();
 });
