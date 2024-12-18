@@ -13,6 +13,7 @@ use Alaress\Web\Controller\Base;
 use Schoolbox\API\Cursor\MapperCursor;
 use Schoolbox\Example\Mapper;
 use Schoolbox\Example\Model;
+use Schoolbox\User;
 
 /**
  * Controller for the example API.
@@ -41,30 +42,57 @@ class Controller extends Base
                 'id'         => $this->mapper::SORT_ORDER_DESC,
             ]
         );
-        // TODO add model-to-array
     }
 
     public function getItem(Model $model): void
     {
-        $this->response = $this->responseAsJson([]);
+        $modelToArray   = $this->buildModelToArrayTranslator();
+        $this->response = $this->responseAsJson($modelToArray($model));
     }
 
     public function postItem(): void
     {
-        // TODO add array-to-model
+        $arrayToModel = new Translator\ArrayToModel();
+        $model        = $arrayToModel($this->request->getParsedBody());
+        $this->mapper->save($model);
+
+        $modelToArray   = $this->buildModelToArrayTranslator();
+        $this->response = $this->responseAsJson($modelToArray($model));
     }
 
     public function putItem(Model $model): void
     {
+        $arrayToModel = new Translator\ArrayToModel();
+        $model        = $arrayToModel($this->request->getParsedBody(), $this->mapper->createModel($model->getId()));
+        $this->mapper->save($model);
+
+        $modelToArray   = $this->buildModelToArrayTranslator();
+        $this->response = $this->responseAsJson($modelToArray($model));
     }
 
     public function patchItem(Model $model): void
     {
+        $arrayToModel = new Translator\ArrayToModel();
+        $model        = $arrayToModel($this->request->getParsedBody(), $model);
+        $this->mapper->save($model);
+
+        $modelToArray   = $this->buildModelToArrayTranslator();
+        $this->response = $this->responseAsJson($modelToArray($model));
     }
 
     public function deleteItem(Model $model): void
     {
         $this->mapper->delete($model);
         $this->response = $this->responseEmpty();
+    }
+
+    private function buildModelToArrayTranslator(): Translator\ModelToArray
+    {
+        return new Translator\ModelToArray(
+            $this->getRouteGenerator(),
+            $this->authorizer,
+            $this->getUser(),
+            new User\Translator\Author\ModelToArray(),
+        );
     }
 }
