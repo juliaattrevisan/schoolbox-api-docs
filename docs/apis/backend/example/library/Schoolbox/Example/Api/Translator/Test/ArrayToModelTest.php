@@ -138,6 +138,21 @@ class ArrayToModelTest extends TestCase
                 ->setUpdatedAt(Alaress_Date_Format::newDatabaseDate('2024-02-01 00:00:00', new DateTimeZone('UTC')))
                 ->setDeletedAt(Alaress_Date_Format::newDatabaseDate('2024-03-01 00:00:00', new DateTimeZone('UTC'))),
         ];
+        yield 'array with null dates, model with null dates' => [
+            [
+                'createdAt' => '2024-01-01T00:00:00Z',
+                'updatedAt' => '2024-02-01T00:00:00Z',
+                'deletedAt' => null,
+            ],
+            (clone $baseModel)
+                ->setCreatedAt(Alaress_Date_Format::newDatabaseDate('2023-01-01 00:00:00', new DateTimeZone('UTC')))
+                ->setUpdatedAt(Alaress_Date_Format::newDatabaseDate('2023-02-01 00:00:00', new DateTimeZone('UTC')))
+                ->setDeletedAt(null),
+            (clone $baseModel)
+                ->setCreatedAt(Alaress_Date_Format::newDatabaseDate('2024-01-01 00:00:00', new DateTimeZone('UTC')))
+                ->setUpdatedAt(Alaress_Date_Format::newDatabaseDate('2024-02-01 00:00:00', new DateTimeZone('UTC')))
+                ->setDeletedAt(null),
+        ];
     }
 
     /**
