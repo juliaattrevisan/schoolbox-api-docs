@@ -83,8 +83,10 @@ window.Vue.watch(bottom, (isAtBottom) => {
         <table class="coverage-report">
             <thead>
                 <tr>
-                    <th rowspan="2" class="curriculum-column l-valign--bottom">Curriculum</th>
-                    <th rowspan="2" class="u-border-left l-valign--bottom">Total</th>
+                    <th rowspan="2" class="u-border-right curriculum-column l-valign--bottom cc-sticky-left">
+                        Curriculum
+                    </th>
+                    <th rowspan="2" class="l-valign--bottom">Total</th>
                     <template v-for="course in coursesStore.courses" :key="course.id">
                         <th class="u-border-left" style="border-right: none">Course</th>
                         <!-- colspan will be the number of units plus total if more than one course -->
@@ -132,12 +134,20 @@ window.Vue.watch(bottom, (isAtBottom) => {
     <cc-usage-pop-out />
 </template>
 
-<style scoped>
+<style scoped lang="scss">
 thead {
     /* fix the head to stay at the top when scrolling */
     position: sticky;
     top: 0;
     z-index: var(--sbx-depth-ui-sticky);
+
+    /* make the top left cell sticky, so it doesn't scroll out of view (as the left column is sticky) */
+    .cc-sticky-left {
+        background: #ffffff; /* Also needs a background to prevent the sticky from being transparent */
+        left: 0;
+        position: sticky;
+        z-index: var(--sbx-depth-ui-sticky);
+    }
 }
 
 .course-column,

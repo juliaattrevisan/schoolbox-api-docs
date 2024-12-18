@@ -91,7 +91,7 @@ function onCourseClicked(buttonEl: HTMLButtonElement): void {
 <template>
     <tr v-if="props.node.isVisible">
         <td
-            class="l-flex l-flex--align-center l-gap-s f-no-margins name-cell"
+            class="l-flex l-flex--align-center l-gap-s f-no-margins name-cell u-border-right"
             :style="{
                 paddingInlineStart: filtersStore.onlyShowGaps ? '0.5rem' : `calc(${props.depth * 0.5}rem + 0.5rem)`,
             }"
