@@ -10,8 +10,6 @@ declare(strict_types=1);
 namespace Schoolbox\Example\Api\Translator\Test;
 
 use Alaress\Authorizer\Authorizer;
-use Alaress\Authorizer\Failure\Unauthenticated;
-use Alaress\Authorizer\Failure\Unauthorized;
 use Alaress_Date_Format;
 use Aura\Router\Generator;
 use DateTimeZone;
@@ -98,16 +96,45 @@ class ModelToArrayTest extends TestCase
                 'delete' => null,
             ],
         ];
-        yield 'empty array, empty model, no permissions' => [
+        yield 'empty model, no permissions' => [
             clone $baseModel,
             false,
             $baseExpected,
         ];
-        yield 'empty array, empty model, permissions' => [
+        yield 'empty model, permissions' => [
             clone $baseModel,
             true,
             [
                 '_links' => [
+                    'read'   => '/example/api/read/1',
+                    'update' => '/example/api/update/1',
+                    'delete' => '/example/api/delete/1',
+                ]
+            ] + $baseExpected,
+        ];
+        yield 'user, permissions' => [
+            (clone $baseModel)->setUser((new User())->setId(2)),
+            true,
+            [
+                'user'   => ['id' => 2],
+                '_links' => [
+                    'read'   => '/example/api/read/1',
+                    'update' => '/example/api/update/1',
+                    'delete' => '/example/api/delete/1',
+                ]
+            ] + $baseExpected,
+        ];
+        yield 'dates, permissions' => [
+            (clone $baseModel)
+                ->setCreatedAt(Alaress_Date_Format::newDatabaseDate('2024-01-01 00:00:00', new DateTimeZone('UTC')))
+                ->setUpdatedAt(Alaress_Date_Format::newDatabaseDate('2024-02-01 00:00:00', new DateTimeZone('UTC')))
+                ->setDeletedAt(Alaress_Date_Format::newDatabaseDate('2024-03-01 00:00:00', new DateTimeZone('UTC'))),
+            true,
+            [
+                'createdAt' => '2024-01-01T00:00:00+00:00',
+                'updatedAt' => '2024-02-01T00:00:00+00:00',
+                'deletedAt' => '2024-03-01T00:00:00+00:00',
+                '_links'    => [
                     'read'   => '/example/api/read/1',
                     'update' => '/example/api/update/1',
                     'delete' => '/example/api/delete/1',
