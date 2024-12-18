@@ -177,6 +177,19 @@ class Controller extends Base
      */
     public function getCreate(string $roleType): void
     {
+        /* Roles that are relevant to the roletype for the $button that we're editing
+         * sorted alphabetically for niceness
+         */
+        $rolesAvailability = $this->roleMapper->findByColumn('group_type', $roleType, [
+            'order' => [
+                'name' => 'asc'
+            ]
+        ]);
+
+        /* People outside of this button's roletype could still see it
+         */
+        $rolesVisibility = $this->roleMapper->findAll()->sortBy('name', 'asc');
+
         $this->response = $this->responseFromTemplate(
             '@adminProfileButton/modify.twig',
             [
@@ -186,7 +199,8 @@ class Controller extends Base
                     [['Create', null]]
                 ),
                 'icons' => $this->iconMapper->findAll()->sortBy('title', 'asc'),
-                'roles' => $this->roleMapper->findAll()->sortBy('name', 'asc'),
+                'rolesAvailability' => $rolesAvailability,
+                'rolesVisibility' => $rolesVisibility,
                 'campuses' => $this->campusMapper->findAll()->sortBy('name', 'asc'),
                 'roleType' => $roleType,
                 'returnUrl' => null
