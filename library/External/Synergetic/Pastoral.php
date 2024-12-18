@@ -859,16 +859,22 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
         }
 
         // Insert new actionSeqs (not removing, as we don't want to remove actions created via Synergetic
-        $newSeqs    = array_column($luPastoralCareActions, 'luPastoralCareActionSeq');
-
+        $newSeqs     = array_column($luPastoralCareActions, 'luPastoralCareActionSeq');
         $insertQuery = "
             INSERT INTO PastoralCareActions (PastoralCareSeq, luPastoralCareActionSeq, IndexOrder)
-                 VALUES (
-                             :PastoralCareSeq,
-                             :luPastoralCareActionSeq,
-                             COALESCE((SELECT MAX(IndexOrder) + 1 FROM PastoralCareActions WHERE PastoralCareSeq = :PastoralCareSeq2), 1)
-                         )
-                 ";
+            VALUES (
+                :PastoralCareSeq,
+                :luPastoralCareActionSeq,
+                COALESCE((SELECT MAX(IndexOrder) + 1 FROM PastoralCareActions WHERE PastoralCareSeq = :PastoralCareSeq2), 1)
+            )
+        ";
+
+        // Switch on ANSI_WARNINGS for this place only
+        $isAnsiWarningsOn = (bool)$this->connector->executeQuery('SELECT (@@OPTIONS & 8)')->fetchColumn();
+        if (!$isAnsiWarningsOn) {
+            $this->connector->executeDirectly('SET ANSI_WARNINGS ON');
+        }
+
         foreach ($newSeqs as $newSeq) {
             $insertParams = [
                 'PastoralCareSeq'         => $pastoral->getExternalId(),
@@ -876,6 +882,11 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
                 'luPastoralCareActionSeq' => $newSeq,
             ];
             $this->connector->executeQuery($insertQuery, $insertParams);
+        }
+
+        // And switch them off again
+        if (!$isAnsiWarningsOn) {
+            $this->connector->executeDirectly('SET ANSI_WARNINGS OFF');
         }
 
         // Get PastoralCareActionSeq and update SB pastoral record action external_id
@@ -948,7 +959,7 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
                 sprintf(
                     'Pastoral record %d owner external ID "%s" is invalid',
                     $pastoral->getId(),
-                    $pastoral->getStudent()->getExternalId(),
+                    $pastoral->getOwner()->getExternalId(),
                 )
             );
         }
