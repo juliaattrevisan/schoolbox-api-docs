@@ -17,6 +17,7 @@ $app = new class extends CliTool\App {
             '23.0 Release',
             '23.1 Release',
             '24.0 Release',
+            '24.1 Release',
         ];
 
         $now = (\Alaress_Date_Format::now())->getDatabase();
