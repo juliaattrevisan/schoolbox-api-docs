@@ -94,7 +94,7 @@
                             <span data-tooltip class="has-tip hint" title="The button will appear on the profiles of the users in the selected roles and campuses.">?</span>
                         </legend>
 
-                        <div class="small-12 medium-6 columns">
+                        <div class="small-12 medium-4 columns">
                             <fieldset>
                                 <label>Campuses</label>
                                 <div class="checklist">
@@ -113,7 +113,7 @@
                                 </div>
                             </fieldset>
                         </div>
-                        <div class="small-12 medium-6 columns">
+                        <div class="small-12 medium-4 columns">
                             <fieldset>
                                 <label>Roles</label>
                                 <div class="checklist">
@@ -132,6 +132,9 @@
                                 </div>
                             </fieldset>
                         </div>
+                        <div class="small-12 medium-4 columns">
+                            &nbsp;
+                        </div>
                     </fieldset>
 
                     <fieldset class="content" id="profile-button-user-visibility-selections">
@@ -140,7 +143,7 @@
                             <span data-tooltip class="has-tip hint" title="The button will appear for profile viewers in the selected roles and campuses.">?</span>
                         </legend>
 
-                        <div class="small-12 medium-6 columns">
+                        <div class="small-12 medium-4 columns">
                             <fieldset>
                                 <label>Campuses</label>
                                 <div class="checklist">
@@ -159,7 +162,7 @@
                                 </div>
                             </fieldset>
                         </div>
-                        <div class="small-12 medium-6 columns">
+                        <div class="small-12 medium-4 columns">
                             <fieldset>
                                 <label>Roles</label>
                                 <div class="checklist">
@@ -174,6 +177,20 @@
                                                 <label for="role-visibility-{{ role.id }}">{{ role.name }}</label>
                                             </li>
                                         {% endfor %}
+                                    </ul>
+                                </div>
+                            </fieldset>
+                        </div>
+                        <div class="small-12 medium-4 columns">
+                            <fieldset>
+                                <label>Role Type</label>
+                                <p class="meta">This setting also allows the viewee to see the button when they're viewing their own profile</p>
+                                <div class="checklist">
+                                    <ul class="option-list">
+                                        <li>
+                                            <input name="roleVisibility[]" type="checkbox" data-role-visibility id="cat">
+                                            <label for="cat">Self</label>
+                                        </li>
                                     </ul>
                                 </div>
                             </fieldset>
