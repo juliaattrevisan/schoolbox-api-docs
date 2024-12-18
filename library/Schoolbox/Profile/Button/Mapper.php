@@ -88,7 +88,11 @@ class Mapper extends BaseMapper
             (
                 SELECT DISTINCT {$this->getColumnString()}
                 FROM profile_button
-                WHERE self_enabled = 1 
+                INNER JOIN profile_button_campus_availability ca ON profile_button.id = ca.profile_button_id
+                INNER JOIN profile_button_role_availability ra ON profile_button.id = ra.profile_button_id
+                WHERE ca.campus_id IN " . $this->getPredicateBuilder()->getArrayPlaceholders($vieweeCampusList, 'vieweecampus') . "
+                AND ra.role_id = :availabilityRoleId
+                AND self_enabled = 1 
                 AND :vieweeId = :viewerId
                 AND profile_button.deleted_at IS NULL
                 AND profile_button.roletype = :roletype
