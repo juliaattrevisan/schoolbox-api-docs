@@ -218,6 +218,35 @@ export const useNodesStore = defineStore("ccNodes", () => {
 
     // #endregion
 
+    // #region show more
+
+    /**
+     * Has more nodes to show
+     */
+    const hasMore = window.Vue.computed(() => {
+        // this check will only ever apply if the onlyShowGaps filter is on
+        if (filtersStore.onlyShowGaps) {
+            return currentIsVisibleCount < flattenedNodes.value.length;
+        }
+        return false;
+    });
+
+    /**
+     * Show the next set of isVisibleBatchCount when called
+     */
+    function showMore(): void {
+        const isVisibleBatchCountNext = currentIsVisibleCount + isVisibleBatchCount;
+        const nodesToShow = nodesWithNoFilteredUsages.value.filter(
+            (node, index) => index <= isVisibleBatchCountNext && index >= currentIsVisibleCount, // get the next batch of nodes to show
+        );
+        nodesToShow.forEach((node) => {
+            node.isVisible = true;
+        });
+        currentIsVisibleCount = isVisibleBatchCountNext;
+    }
+
+    // #endregion
+
     // #region set defaults
 
     /**
@@ -289,35 +318,6 @@ export const useNodesStore = defineStore("ccNodes", () => {
             });
             currentIsVisibleCount = isVisibleBatchCount;
         }
-    }
-
-    // #endregion
-
-    // #region show more
-
-    /**
-     * Has more nodes to show
-     */
-    const hasMore = window.Vue.computed(() => {
-        // this check will only ever apply if the onlyShowGaps filter is on
-        if (filtersStore.onlyShowGaps) {
-            return currentIsVisibleCount < flattenedNodes.value.length;
-        }
-        return false;
-    });
-
-    /**
-     * Show the next set of isVisibleBatchCount when called
-     */
-    function showMore(): void {
-        const isVisibleBatchCountNext = currentIsVisibleCount + isVisibleBatchCount;
-        const nodesToShow = nodesWithNoFilteredUsages.value.filter(
-            (node, index) => index <= isVisibleBatchCountNext && index >= currentIsVisibleCount, // get the next batch of nodes to show
-        );
-        nodesToShow.forEach((node) => {
-            node.isVisible = true;
-        });
-        currentIsVisibleCount = isVisibleBatchCountNext;
     }
 
     // #endregion
