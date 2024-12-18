@@ -32,13 +32,13 @@ $app = new class extends CliTool\App
      * Make sure to add your locking script to the Lock Inspector tool
      * const LOCK_NAMES in Inspector.php
      */
-    public const LOCK_NAME = 'profileEditor_customwork_brgs';
+    public const LOCK_NAME = 'profileEditor_customwork_brgrs';
 
 
     /**
      * This script requires a particular school code.
      */
-    private const SCHOOL_CODE = 'brgs';
+    private const SCHOOL_CODE = 'brgrs';
 
 
     /**
@@ -83,7 +83,7 @@ $app = new class extends CliTool\App
         if ($this->getOpt(self::OPT_LONG_HELP)) {
             echo <<<HELP
 
-Profile Editor: BRGS Custom Work migration.
+Profile Editor: BRGRS Custom Work migration.
 
 
 HELP;
