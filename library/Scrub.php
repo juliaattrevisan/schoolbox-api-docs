@@ -436,9 +436,13 @@ class Scrub
         if (!self::$linkifyConverter instanceof CommonMark\ConverterInterface) {
             $environment = new CommonMark\Environment\Environment(
                 [
-                    'html_input'         => CommonMark\Util\HtmlFilter::STRIP,
-                    'allow_unsafe_links' => false,
-                    'max_nesting_level'  => 10,
+                    'html_input'              => CommonMark\Util\HtmlFilter::STRIP,
+                    'allow_unsafe_links'      => false,
+                    'max_nesting_level'       => 10,
+                    'max_delimiters_per_line' => 100,
+                    'table'                   => [
+                        'max_autocompleted_cells' => 100,
+                    ],
                 ],
             );
             // Need to add InlinesOnly, as adding only Autolink causes an error
@@ -474,9 +478,13 @@ class Scrub
         if (!self::$markdownConverter instanceof CommonMark\ConverterInterface) {
             $environment = new CommonMark\Environment\Environment(
                 [
-                    'html_input'         => CommonMark\Util\HtmlFilter::STRIP,
-                    'allow_unsafe_links' => false,
-                    'max_nesting_level'  => 10,
+                    'html_input'              => CommonMark\Util\HtmlFilter::STRIP,
+                    'allow_unsafe_links'      => false,
+                    'max_nesting_level'       => 10,
+                    'max_delimiters_per_line' => 100,
+                    'table'                   => [
+                        'max_autocompleted_cells' => 100,
+                    ],
                 ]
             );
             $environment->addExtension(new CommonMark\Extension\CommonMark\CommonMarkCoreExtension());
