@@ -11,4 +11,4 @@ editable   = 'false',
 hidden     = 'false',
 required   = 'false',
 module     = 'settings',
-sequence   = (SELECT MAX(sequence) + 1 FROM config WHERE type_id = (SELECT id FROM lu_config_type WHERE type = 'Modules'));
+sequence   = (SELECT MAX(sequence) + 1 FROM config as config2 WHERE type_id = (SELECT id FROM lu_config_type WHERE type = 'Modules'));
