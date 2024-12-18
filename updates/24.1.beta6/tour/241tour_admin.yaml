@@ -23,5 +23,5 @@ tour:
                   <h3>Grant Access Levels</h3>
                   <p>Assign different types of admin access to the relevant staff, limiting access to only what’s necessary.</p>
                   <p>For more details, see the <a href='/help/sso/send?returnUrl=/homepage/5227#textBoxBody5473' target='_blank'>release notes</a>.</p>
-                  <p>To find out your access levels, contact your school's IT Admin.</p>"
+                  <p>To find out your access levels, ask a Schoolbox Superuser.</p>"
         class: introjs-whatsnewmodal
