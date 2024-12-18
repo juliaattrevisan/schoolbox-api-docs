@@ -111,3 +111,19 @@ Instances of this translator generally extend the
 `\Schoolbox\API\Translator\ArrayToModel\Base` abstract class: this class
 implements several helper methods for defining a translation. Like the model to
 array translator, instances should also implement `__invoke`.
+
+## Running the examples
+
+First, copy this example and the one in `../../mvc/example` to the base
+Schoolbox folder:
+
+```shell
+# in the base Schoolbox folder:
+cp -R docs/apis/backend/example .
+cp -R docs/mvc/example .
+```
+
+Once done, clean up:
+```shell
+
+```
