@@ -19,6 +19,7 @@ config:
   lms_enabled: {value: true}
   qr_login_enabled: {value: true, edit: true}
   summative_report_enabled: {edit: true}
+  curriculum_coverage_report_enabled: {value: true, edit: true}
 
   #Pastoral
   external_pastoral: {hide: false}

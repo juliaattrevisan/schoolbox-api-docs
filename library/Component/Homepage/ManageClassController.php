@@ -16,6 +16,7 @@ use Schoolbox\Mapper\DefinitionException;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Assessment\Term;
 use Schoolbox\Resource\Folder;
+use Symfony\Component\Routing\Exception\RouteNotFoundException;
 
 /**
  * @method Folder\Model getContext()
@@ -358,11 +359,14 @@ class Component_Homepage_ManageClassController extends Component_Homepage_Contro
             $lmsEnabled &&
             $isCoursePage &&
             $this->getContentPermission() >= UserAccess::ACCESS_READ &&
+            $this->getConfigLoader()->get(ConfigMapper::NAME_CURRICULUM_COVERAGE_REPORT_ENABLED) &&
             $this->getAuthorizer()->isPathAuthorizedForUser('curriculumreports.getCoverage', [], $this->getUser())
         ) {
-            $coverageLink = $this->getRouteGenerator()->generate('curriculumreports.getCoverage');
-            $coverageLink .= '?courseId=' . $this->getContext()->getCourseSpecification()->getId();
-            $this->setVar('CURRICULUM_COVERAGE_LINK', $coverageLink);
+            $this->setVar(
+                'CURRICULUM_COVERAGE_LINK',
+                $this->getRouteGenerator()->generate('curriculumreports.getCoverage') .
+                '?courseId=' . $this->getContext()->getCourseSpecification()->getId()
+            );
             $this->parse('curriculum_coverage_block', 'curriculum_coverage');
             $hasClassActions = true;
         } else {
