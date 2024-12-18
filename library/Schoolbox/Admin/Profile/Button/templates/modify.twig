@@ -122,7 +122,7 @@
                                             <input id="role-availability-all" type="checkbox">
                                             <label for="role-availability-all">Select All</label>
                                         </li>
-                                        {% for role in roles %}
+                                        {% for role in rolesAvailability %}
                                             <li>
                                                 <input name="roleAvailability[]" data-role-availability id="role-availability-{{ role.id }}" type="checkbox" {% if roleAvailabilitySelected[role.id] ?? false %}checked{% endif %} value="{{ role.id }}">
                                                 <label for="role-availability-{{ role.id }}">{{ role.name }}</label>
@@ -168,7 +168,7 @@
                                             <input id="role-visibility-all" type="checkbox">
                                             <label for="role-visibility-all">Select All</label>
                                         </li>
-                                        {% for role in roles %}
+                                        {% for role in rolesVisibility %}
                                             <li>
                                                 <input name="roleVisibility[]" data-role-visibility id="role-visibility-{{ role.id }}" type="checkbox" {% if roleVisibilitySelected[role.id] ?? false %}checked{% endif %} value="{{ role.id }}">
                                                 <label for="role-visibility-{{ role.id }}">{{ role.name }}</label>
