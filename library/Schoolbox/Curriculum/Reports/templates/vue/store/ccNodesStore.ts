@@ -14,6 +14,7 @@ import {
 } from "../util/countUtils";
 
 export const useNodesStore = defineStore("ccNodes", () => {
+    const newNodes = window.Vue.ref<CurriculumCoverageNode[]>([]); // the newly added nodes to display, used to set up the default properties
     const nodes = window.Vue.ref<CurriculumCoverageNode[]>([]); // the nodes to display in the report
 
     /**
@@ -48,10 +49,11 @@ export const useNodesStore = defineStore("ccNodes", () => {
 
     /**
      * Set new nodes
-     * @param newNodes - the new nodes to set
+     * @param $newNodes - the new nodes to set
      */
-    function setNodes(newNodes: CurriculumCoverageNode[]): void {
-        nodes.value = newNodes;
+    function setNodes($newNodes: CurriculumCoverageNode[]): void {
+        newNodes.value = $newNodes;
+        nodes.value = $newNodes;
     }
 
     /**
@@ -70,33 +72,32 @@ export const useNodesStore = defineStore("ccNodes", () => {
 
     /**
      * Add more course usages to the existing nodes
-     * @param newNodes - the new nodes to add
+     * @param $newNodes - the new nodes to add
      */
-    function addCourseUsage(newNodes: CurriculumCoverageNode[]): void {
+    function addCourseUsage($newNodes: CurriculumCoverageNode[]): void {
         nodes.value.forEach((node, index) => {
-            node.usage.courses = [...node.usage.courses, ...newNodes[index].usage.courses];
-            addCourseToChildren(node, newNodes[index]);
+            node.usage.courses = [...node.usage.courses, ...$newNodes[index].usage.courses];
+            addCourseToChildren(node, $newNodes[index]);
         });
     }
 
     /**
      * Add in more nodes to the existing nodes
-     * @param newNodes - the new nodes to set
+     * @param $newNodes - the new nodes to set
      */
-    function setMoreNodes(newNodes: CurriculumCoverageNode[]): void {
-        nodes.value = [...nodes.value, ...newNodes];
+    function setMoreNodes($newNodes: CurriculumCoverageNode[]): void {
+        newNodes.value = $newNodes;
+        nodes.value = [...nodes.value, ...$newNodes];
     }
 
     /**
      * Add more course usages to the existing nodes
-     * @param newNodes - the new nodes to add
+     * @param $newNodes - the new nodes to add
      */
-    function addMoreCourseUsage(newNodes: CurriculumCoverageNode[]): void {
-        const newNodeIds = newNodes.map((node) => node.id);
-        const nodesToUpdate = nodes.value.filter((node) => newNodeIds.includes(node.id)); // to target only the nodes to that need updating (which are those last set in setMoreNodes)
-        nodesToUpdate.forEach((node, index) => {
-            node.usage.courses = [...node.usage.courses, ...newNodes[index].usage.courses];
-            addCourseToChildren(node, newNodes[index]);
+    function addMoreCourseUsage($newNodes: CurriculumCoverageNode[]): void {
+        newNodes.value.forEach((node, index) => {
+            node.usage.courses = [...node.usage.courses, ...$newNodes[index].usage.courses];
+            addCourseToChildren(node, $newNodes[index]);
         });
     }
 
