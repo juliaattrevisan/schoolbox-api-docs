@@ -72,6 +72,10 @@ provides a discussion on the pros and cons of both approaches; in summary:
 The purpose of Translator classes is to convert object representations from one
 format to another.
 
+Both the model to array and array to model translators are expected to have
+minimal external dependencies, and should thus be able to be covered by unit
+tests.
+
 #### Model To Array
 
 This translator is intended to convert a mapper's model into an array, so that
