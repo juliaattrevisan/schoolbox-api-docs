@@ -7,7 +7,6 @@ import CcReportFilters from "./cc-report-filters.vue";
 import CcReportTable from "./cc-report-table.vue";
 import CcReportLoadMore from "./cc-report-load-more.vue";
 import { useReportStore } from "./store/ccReportStore";
-import { useFiltersStore } from "./store/ccFiltersStore";
 
 const reportStore = useReportStore();
 </script>
@@ -34,7 +33,7 @@ const reportStore = useReportStore();
         <div class="l-flex l-flex-col l-gap-s">
             <cc-report-filters />
             <cc-report-table />
-            <cc-report-load-more v-if="!useFiltersStore().onlyShowGaps" />
+            <cc-report-load-more />
         </div>
     </div>
 </template>
