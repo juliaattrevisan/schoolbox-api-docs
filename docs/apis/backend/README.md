@@ -53,7 +53,9 @@ implementations, it contains an encoded reference to the last item in the result
 set, so that the cursor knows how to formulate a query which will only retrieve
 items after it in the result set.
 
-All cursor classes are expected to implement `\Schoolbox\API\Cursor\ICursor`.
+All cursor classes are expected to implement `\Schoolbox\API\Cursor\ICursor`:
+there also exists a standardised `\Schoolbox\API\Cursor\MapperCursor` which
+cursors queries to a mapper.
 
 #### Alternative: limit/offset pagination
 
