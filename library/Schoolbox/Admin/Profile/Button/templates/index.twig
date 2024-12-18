@@ -91,11 +91,17 @@
 
                                         <p class="meta">
                                             {% if roleVisibilitySelected[item.id]|length and campusVisibilitySelected[item.id]|length %}
-                                                Visible to viewers in
+                                                Visible to
+                                                {% if item.selfEnabled %}
+                                                    <strong>users for their own profile</strong> and
+                                                {% endif %}
+                                                viewers in
                                                 <strong>{{ macro.checkboxString(item, roles, roleVisibilitySelected) }}</strong> role(s)
                                                 within
                                                 <strong>{{ macro.checkboxString(item, campuses, campusVisibilitySelected) }}</strong>
                                                 campus
+                                            {% elseif item.selfEnabled %}
+                                                Visible to <strong>users for their own profile</strong> only.
                                             {% elseif roleVisibilitySelected[item.id]|length and not campusVisibilitySelected[item.id]|length %}
                                                 This button won't appear on profile screens; no campus visibility was selected.
                                             {% elseif not roleVisibilitySelected[item.id]|length and campusVisibilitySelected[item.id]|length %}
