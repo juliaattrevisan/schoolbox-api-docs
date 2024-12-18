@@ -186,6 +186,12 @@ $(function () {
 
                 // Fire the tour
                 tourCurrent.start();
+
+                // If a tour is started before the page has fully loaded, it will not be positioned correctly.
+                // This will refresh the tour which triggers it to reposition itself when loaded.
+                if (document.readyState !== "complete") {
+                    window.addEventListener("load", () => tourCurrent.refresh());
+                }
             } else {
                 console.log("Unknown feature tour requested: " + uuid);
             }
