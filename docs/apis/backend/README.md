@@ -112,18 +112,26 @@ Instances of this translator generally extend the
 implements several helper methods for defining a translation. Like the model to
 array translator, instances should also implement `__invoke`.
 
-## Running the examples
+## Running the tests
 
 First, copy this example and the one in `../../mvc/example` to the base
 Schoolbox folder:
 
 ```shell
 # in the base Schoolbox folder:
-cp -R docs/apis/backend/example .
-cp -R docs/mvc/example .
+cp -R docs/apis/backend/example/library .
+cp -R docs/mvc/example/library .
+```
+
+Then, run the tests in `library/Schoolbox/Example/Api` either in your IDE, or
+via the command line:
+```shell
+vagrant ssh
+cd /usr/share/schoolbox
+vendor/bin/phpunit library/Schoolbox/Example/Api
 ```
 
 Once done, clean up:
 ```shell
-
+rm -rf library/Schoolbox/Example/
 ```
