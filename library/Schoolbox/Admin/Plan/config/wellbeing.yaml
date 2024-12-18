@@ -115,12 +115,12 @@ topMenu:
     - /learning/pending
     - /learning/due
     - /learning/grades
-    - /learning/badge
     - /course/list
   show:
     - /eportfolio
     - /fixtures
     - /pastoral
+    - /learning/badge
 components:
   hide:
    - Schoolbox\Learning\Component\Dashboard\UpcomingWorkController
