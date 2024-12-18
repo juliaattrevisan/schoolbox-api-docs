@@ -10,6 +10,7 @@
 declare(strict_types=1);
 
 use Schoolbox\Application\CliTool;
+use Schoolbox\Config\ConfigMapper;
 
 require_once __DIR__ . '/../../../conf/core/require.php';
 
@@ -19,7 +20,11 @@ require_once __DIR__ . '/../../../conf/core/require.php';
 $app = new class extends CliTool\App {
     public function run(): void
     {
-        passthru('php ' . __DIR__ . '/../../../tools/tour/install.php --perform ' . __DIR__ . '/241tour.yaml', $returnVar);
+        passthru('php ' . __DIR__ . '/../../../tools/tour/install.php --perform ' . __DIR__ . '/241tour_admin.yaml', $returnVar);
+
+        if ($this->getConfig()->get(ConfigMapper::NAME_SITE_PLAN) === 'Elite') {
+            passthru('php ' . __DIR__ . '/../../../tools/tour/install.php --perform ' . __DIR__ . '/241tour_elite.yaml', $returnVar);
+        }
     }
 
     public function runAsRoot(): ?bool
