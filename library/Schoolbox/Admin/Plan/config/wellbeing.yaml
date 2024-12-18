@@ -7,7 +7,7 @@ config:
   curriculum_tagging_enabled: {value: false, edit: false}
   eotc_enabled: {value: false, edit: false}
   learning_moments_enabled : {edit: true}
-  badges_enabled : {value: false, edit: false}
+  badges_enabled : {edit: true}
   fixtures_enabled: {edit: true}
   clipboard_enabled: {edit: true}
   pastoral_enabled : {edit: true}
