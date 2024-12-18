@@ -212,6 +212,7 @@ export const useNodesStore = defineStore("ccNodes", () => {
                 flattenedNodes.value.forEach((node) => {
                     node.isVisible = node.previousIsVisible;
                 });
+                currentIsVisibleCount = 0; // reset the current visible count
             }
         },
     );
@@ -243,6 +244,10 @@ export const useNodesStore = defineStore("ccNodes", () => {
             node.isVisible = true;
         });
         currentIsVisibleCount = isVisibleBatchCountNext;
+        // don't let the currentIsVisibleCount go over the total number of nodes
+        if (currentIsVisibleCount >= flattenedNodes.value.length) {
+            currentIsVisibleCount = flattenedNodes.value.length;
+        }
     }
 
     // #endregion
@@ -300,7 +305,7 @@ export const useNodesStore = defineStore("ccNodes", () => {
 
     /**
      * Add the additional front end properties to the nodes,
-     * to track visibility and expansion of the nodes
+     * to track visibility, expansion of the nodes and if they have no usages
      */
     function setDefaults(): void {
         setIsVisible();
@@ -308,15 +313,17 @@ export const useNodesStore = defineStore("ccNodes", () => {
         setHasNoUsages();
         // if only show gaps is active when new nodes are added, we need to update their visibility straight away
         if (filtersStore.onlyShowGaps) {
+            // hide the newly added nodes, may be visible again if they have no usages
             flattenedNewNodes.value.forEach((node) => {
                 node.previousIsVisible = node.isVisible;
                 node.isVisible = false;
             });
-            const nodesToShow = nodesWithNoFilteredUsages.value.filter((node, index) => index < isVisibleBatchCount); // just get the first batch of nodes to show
-            nodesToShow.forEach((node) => {
-                node.isVisible = true;
-            });
-            currentIsVisibleCount = isVisibleBatchCount;
+        }
+        // and if there's now more empty nodes to show, add the next batch in straight away
+        // even if this new batch has no empty usages, triggering here will help show that a load has taken place,
+        // even if the next batch of empty nodes is only from the previously loaded nodes
+        if (filtersStore.onlyShowGaps && hasMore.value) {
+            showMore();
         }
     }
 
