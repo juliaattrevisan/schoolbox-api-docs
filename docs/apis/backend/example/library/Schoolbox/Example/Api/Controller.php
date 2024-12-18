@@ -33,15 +33,25 @@ class Controller extends Base
 
     public function getList(): void
     {
-        // TODO add search+cursor for this item
         $cursor = new MapperCursor(
             $this->mapper,
             self::LIMIT,
             [
                 'created_at' => $this->mapper::SORT_ORDER_DESC,
                 'id'         => $this->mapper::SORT_ORDER_DESC,
-            ]
+            ],
         );
+        $results        = $cursor->retrieveResults($this->requestQuery->get('cursor'));
+        $this->response = $this->responseAsJson([
+            'data'     => $results->map($this->buildModelToArrayTranslator()),
+            'metadata' => [
+                'cursor' => [
+                    'current' => $cursor->current($results),
+                    'next'    => $cursor->next($results),
+                ],
+                'count' => $cursor->retrieveResultCount(),
+            ],
+        ]);
     }
 
     public function getItem(Model $model): void
