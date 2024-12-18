@@ -216,10 +216,13 @@ tr:hover {
 }
 
 .name-cell {
-    background: white;
+    background-color: white;
     left: 0;
     position: sticky;
     z-index: calc(var(--sbx-depth-ui-sticky) - 1);
+    &:hover {
+        background-color: #f4f3f3; /* to help legibility */
+    }
     @media (max-width: 1000px) {
         position: static; // prevent the cell from sticking on smaller screens
     }
