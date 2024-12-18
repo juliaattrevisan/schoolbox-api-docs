@@ -277,6 +277,18 @@ export const useNodesStore = defineStore("ccNodes", () => {
         setIsVisible();
         setIsExpanded();
         setHasNoUsages();
+        // if only show gaps is active when new nodes are added, we need to update their visibility straight away
+        if (filtersStore.onlyShowGaps) {
+            flattenedNewNodes.value.forEach((node) => {
+                node.previousIsVisible = node.isVisible;
+                node.isVisible = false;
+            });
+            const nodesToShow = nodesWithNoFilteredUsages.value.filter((node, index) => index < isVisibleBatchCount); // just get the first batch of nodes to show
+            nodesToShow.forEach((node) => {
+                node.isVisible = true;
+            });
+            currentIsVisibleCount = isVisibleBatchCount;
+        }
     }
 
     // #endregion
@@ -287,7 +299,7 @@ export const useNodesStore = defineStore("ccNodes", () => {
      * Has more nodes to show
      */
     const hasMore = window.Vue.computed(() => {
-        // this check will only every apply if the onlyShowGaps filter is on
+        // this check will only ever apply if the onlyShowGaps filter is on
         if (filtersStore.onlyShowGaps) {
             return currentIsVisibleCount < flattenedNodes.value.length;
         }
