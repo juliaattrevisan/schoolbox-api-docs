@@ -376,14 +376,6 @@ class Component_Homepage_ManageClassController extends Component_Homepage_Contro
     }
 
     /**
-     * Return the URL of the Curriculum Coverage Report if the user has permission to view it, otherwise null.
-     * @return string|null
-     */
-    private function getCurriculumCoverageUrl(): ?string
-    {
-    }
-
-    /**
      * Build a link to the markbook, if this controller's user has permission to
      * view it.
      *
