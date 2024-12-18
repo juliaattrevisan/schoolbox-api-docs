@@ -33,5 +33,8 @@
 
             $("[data-admin]").slideToggle();
         });
+
+        // If there's a tab that is currently selected on page load, expand the parent menu item
+        $("[data-parent-item].active").addClass("flyout-expanded").find("[data-admin-subnav-flyout]").slideDown(0);
     };
 })(jQuery);
