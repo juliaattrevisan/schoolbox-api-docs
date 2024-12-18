@@ -113,7 +113,7 @@ function onCourseClicked(buttonEl: HTMLButtonElement): void {
             <button
                 class="l-pad--0 t-align-left f-no-bkg f-always-show"
                 :style="{
-                    paddingLeft: !showExpandButton ? '2.5rem' : '0',
+                    paddingLeft: filtersStore.onlyShowGaps || showExpandButton ? '0' : '2.5rem',
                 }"
                 @click="emit('titleClick', props.node)"
             >
