@@ -45,6 +45,15 @@ class Model implements ISoftDeletable
 
 
     /**
+     * This button is Visible to the SELF pseudo-roletype,
+     * just like in profile fields/tabs
+     *
+     * @var int|null
+     */
+    private ?int $selfEnabled;
+
+
+    /**
      * One of student, staff, parent;
      * denotes a roletype to which a button belongs
      *
@@ -251,6 +260,26 @@ class Model implements ISoftDeletable
     public function setRoleType(string $roleType): self
     {
         $this->roleType = $roleType;
+        return $this;
+    }
+
+
+    /**
+     * @return int|null
+     */
+    public function getSelfEnabled(): ?int
+    {
+        return $this->selfEnabled;
+    }
+
+
+    /**
+     * @param int|null $selfEnabled
+     * @return $this
+     */
+    public function setSelfEnabled(?int $selfEnabled): self
+    {
+        $this->selfEnabled = $selfEnabled;
         return $this;
     }
 }

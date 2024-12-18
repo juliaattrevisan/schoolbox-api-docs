@@ -27,6 +27,7 @@ class Mapper extends BaseMapper
         $this->uses('roletype', self::TYPE_STRING);
         $this->uses('type', self::TYPE_STRING);
         $this->uses('sort_order', self::TYPE_INTEGER);
+        $this->uses('self_enabled', self::TYPE_INTEGER);
         $this->uses('title', self::TYPE_STRING);
         $this->uses('text', self::TYPE_STRING);
         $this->uses('icon', self::TYPE_STRING);
