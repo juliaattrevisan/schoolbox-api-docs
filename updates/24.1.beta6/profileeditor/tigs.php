@@ -173,7 +173,7 @@ HELP;
                 'title' => 'Achievements',
                 'text' => 'Achievements',
                 'icon' => 'trophy',
-                'url' => '/search/user/[profileId]/#achievements'
+                'url' => '/search/user/[profileId]/#tab-achievements'
             ],
             [
                 'title' => 'Absences',
