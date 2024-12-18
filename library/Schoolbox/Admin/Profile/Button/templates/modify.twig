@@ -188,7 +188,7 @@
                                 <div class="checklist">
                                     <ul class="option-list">
                                         <li>
-                                            <input name="selfEnabled" type="checkbox" id="selfEnabled">
+                                            <input name="selfEnabled" type="checkbox" id="selfEnabled" {% if item.selfEnabled %}checked="checked"{% endif %} value="1">
                                             <label for="selfEnabled">Self</label>
                                         </li>
                                     </ul>

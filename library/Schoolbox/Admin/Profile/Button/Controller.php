@@ -283,6 +283,7 @@ class Controller extends Base
             throw $this->errorMapper->generateException(\Schoolbox\Error\Mapper::ERROR_INFORMATION_MISSING);
         }
 
+        $item->setSelfEnabled((int)$post['selfEnabled']);
         $item->setText(trim((string)$post['text']));
         $item->setTitle(trim((string)$post['title']));
         $item->setIcon(trim((string)$post['icon']));
