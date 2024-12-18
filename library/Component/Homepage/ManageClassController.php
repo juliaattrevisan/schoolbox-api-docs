@@ -354,16 +354,19 @@ class Component_Homepage_ManageClassController extends Component_Homepage_Contro
             $this->setVar('unit_planner_block');
         }
 
-        $curriculumCoverageUrl = $this->getCurriculumCoverageUrl();
-
         // Curriculum coverage report should show for Course pages.
         if (
             $lmsEnabled &&
             $isCoursePage &&
             $this->getContentPermission() >= UserAccess::ACCESS_READ &&
-            $curriculumCoverageUrl !== null
+            $this->getConfigLoader()->get(ConfigMapper::NAME_CURRICULUM_COVERAGE_REPORT_ENABLED) &&
+            $this->getAuthorizer()->isPathAuthorizedForUser('curriculumreports.getCoverage', [], $this->getUser())
         ) {
-            $this->setVar('CURRICULUM_COVERAGE_LINK', $curriculumCoverageUrl);
+            $this->setVar(
+                'CURRICULUM_COVERAGE_LINK',
+                $this->getRouteGenerator()->generate('curriculumreports.getCoverage') .
+                '?courseId=' . $this->getContext()->getCourseSpecification()->getId()
+            );
             $this->parse('curriculum_coverage_block', 'curriculum_coverage');
         } else {
             $this->setVar('curriculum_coverage_block');
@@ -378,22 +381,6 @@ class Component_Homepage_ManageClassController extends Component_Homepage_Contro
      */
     private function getCurriculumCoverageUrl(): ?string
     {
-        $route = 'curriculumreports.getCoverage';
-        $url = null;
-
-        try {
-            if (
-                $this->getContext()->hasCourseSpecification() &&
-                $this->getAuthorizer()->isPathAuthorizedForUser($route, [], $this->getUser())
-            ) {
-                $url = $this->getRouteGenerator()->generate($route);
-                $url .= '?courseId=' . $this->getContext()->getCourseSpecification()->getId();
-            }
-        } catch (RouteNotFound | ContainerExceptionInterface) {
-            // Do nothing.  Leave $url as null.
-        }
-
-        return $url;
     }
 
     /**
