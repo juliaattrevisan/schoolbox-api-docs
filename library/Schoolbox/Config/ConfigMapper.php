@@ -406,6 +406,7 @@ class ConfigMapper extends Mapper
         self::NAME_OAUTH_ENABLE_SSO,
         self::NAME_MAIL_ENABLED,
         self::NAME_PWA_ENABLED,
+        self::NAME_CURRICULUM_COVERAGE_REPORT_ENABLED,
     ];
 
     /**
