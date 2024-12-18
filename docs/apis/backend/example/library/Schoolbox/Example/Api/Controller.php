@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace Schoolbox\Example\Api;
 
 use Alaress\Web\Controller\Base;
+use Schoolbox\API\Cursor\MapperCursor;
 use Schoolbox\Example\Mapper;
 use Schoolbox\Example\Model;
 
@@ -18,6 +19,8 @@ use Schoolbox\Example\Model;
  */
 class Controller extends Base
 {
+    private const LIMIT = 10;
+
     /**
      * Constructor
      *
@@ -30,6 +33,14 @@ class Controller extends Base
     public function getList(): void
     {
         // TODO add search+cursor for this item
+        $cursor = new MapperCursor(
+            $this->mapper,
+            self::LIMIT,
+            [
+                'created_at' => $this->mapper::SORT_ORDER_DESC,
+                'id'         => $this->mapper::SORT_ORDER_DESC,
+            ]
+        );
         // TODO add model-to-array
     }
 
