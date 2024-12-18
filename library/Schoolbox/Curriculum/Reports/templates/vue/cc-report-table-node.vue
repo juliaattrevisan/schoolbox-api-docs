@@ -36,7 +36,10 @@ const { title } = useNodeTitle(props.node);
 
 // #region expand/collapse
 
-const showExpandButton = window.Vue.computed(() => props.node.children && !filtersStore.onlyShowGaps); // don't show the expand button when the node has no children, or onlyShowGaps is active
+// don't show the expand button when the node has no children, and onlyShowGaps is not active
+const showExpandButton = window.Vue.computed(
+    () => props.node.children && props.node.children.length > 0 && !filtersStore.onlyShowGaps,
+);
 
 /**
  * To toggle the expanded state of the node
@@ -110,8 +113,7 @@ function onCourseClicked(buttonEl: HTMLButtonElement): void {
             <button
                 class="l-pad--0 t-align-left f-no-bkg f-always-show"
                 :style="{
-                    paddingLeft:
-                        props.depth !== 0 && !props.node.children && !filtersStore.onlyShowGaps ? '2.5rem' : '0',
+                    paddingLeft: !showExpandButton ? '2.5rem' : '0',
                 }"
                 @click="emit('titleClick', props.node)"
             >
