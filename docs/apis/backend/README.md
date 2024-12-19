@@ -149,8 +149,64 @@ create table example
 
 ### Viewing the example
 
-Visit https://vagrant.dev.schoolbox.cloud/example/api to view a list of example
-objects.
+Visit https://vagrant.dev.schoolbox.cloud as a logged-in user.
+
+Then, you may use the following API calls in the JS console, and view their
+results:
+
+```js
+// Default headers
+headers = {
+    'Content-Type': 'application/json',
+    'Accept': 'application/json',
+}
+
+// View all items
+fetch(
+    '/example/api',
+    {
+        method: 'GET',
+        headers: headers,
+    },
+);
+
+// Create an item
+post = await fetch(
+    '/example/api',
+    {
+        method: 'POST',
+        body: JSON.stringify({
+            "user": {
+                "id": 1
+            }
+        }),
+        headers: headers,
+    },
+);
+
+// Update an item:
+// * copy its update link
+// * copy the response from the create request, and change its user's ID.
+newItem = await post.json();
+newItem.user.id = 2;
+fetch(
+    newItem._links.update,
+    {
+        method: 'PUT',
+        body: JSON.stringify(newItem),
+        headers: headers,
+    },
+);
+
+// Delete the item:
+fetch(
+    newItem._links.delete,
+    {
+        method: 'DELETE',
+        headers: headers,
+    },
+);
+```
 
 ### Running tests
 

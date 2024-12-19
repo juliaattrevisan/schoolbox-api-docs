@@ -54,45 +54,51 @@ class Controller extends Base
         ]);
     }
 
-    public function getItem(Model $model): void
+    public function getItem(Model $item): void
     {
         $modelToArray   = $this->buildModelToArrayTranslator();
-        $this->response = $this->responseAsJson($modelToArray($model));
+        $this->response = $this->responseAsJson($modelToArray($item));
     }
 
     public function postItem(): void
     {
         $arrayToModel = new Translator\ArrayToModel();
-        $model        = $arrayToModel($this->request->getParsedBody());
+        $model        = $arrayToModel(
+            $this->request->getParsedBody(),
+            $this->mapper->createModel()->setUser(new User())
+        );
         $this->mapper->save($model);
 
         $modelToArray   = $this->buildModelToArrayTranslator();
         $this->response = $this->responseAsJson($modelToArray($model));
     }
 
-    public function putItem(Model $model): void
+    public function putItem(Model $item): void
     {
         $arrayToModel = new Translator\ArrayToModel();
-        $model        = $arrayToModel($this->request->getParsedBody(), $this->mapper->createModel($model->getId()));
-        $this->mapper->save($model);
+        $item         = $arrayToModel(
+            $this->request->getParsedBody(),
+            $this->mapper->createModel($item->getId())->setUser(new User())
+        );
+        $this->mapper->save($item);
 
         $modelToArray   = $this->buildModelToArrayTranslator();
-        $this->response = $this->responseAsJson($modelToArray($model));
+        $this->response = $this->responseAsJson($modelToArray($item));
     }
 
-    public function patchItem(Model $model): void
+    public function patchItem(Model $item): void
     {
         $arrayToModel = new Translator\ArrayToModel();
-        $model        = $arrayToModel($this->request->getParsedBody(), $model);
-        $this->mapper->save($model);
+        $item         = $arrayToModel($this->request->getParsedBody(), $item);
+        $this->mapper->save($item);
 
         $modelToArray   = $this->buildModelToArrayTranslator();
-        $this->response = $this->responseAsJson($modelToArray($model));
+        $this->response = $this->responseAsJson($modelToArray($item));
     }
 
-    public function deleteItem(Model $model): void
+    public function deleteItem(Model $item): void
     {
-        $this->mapper->delete($model);
+        $this->mapper->delete($item);
         $this->response = $this->responseEmpty();
     }
 
