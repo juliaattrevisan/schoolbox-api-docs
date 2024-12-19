@@ -117,6 +117,10 @@ HELP;
 
         $this->updateButtons();
 
+        /* Remove student role visibilities in favour of SELF pseudo roletype
+         */
+        $this->clearStudentRoles();
+
         /* Announce lock release
          */
         $this->getLogger()->debug('Releasing lock');
@@ -158,6 +162,75 @@ HELP;
             $updateButtonStatement->execute([
                 'text' => $customButton['text'],
             ]);
+        }
+    }
+
+
+
+    /**
+     * Recreate visibilities
+     *
+     * @return void
+     */
+    private function clearStudentRoles(): void
+    {
+        /* One statement to fetch them,
+         * And in the delete statement bind them
+         */
+        $statement = $this->getDatabaseInternal()->prepare("
+            SELECT id
+            FROM profile_button
+            WHERE roletype = :roletype
+            AND text = :text
+        ");
+
+        $deleteStatement = $this->getDatabaseInternal()->prepare("
+            DELETE FROM profile_button_role_visibility
+            WHERE profile_button_id = :profileButtonId
+        ");
+
+        /* These buttons need their student roles removed
+         */
+        $buttons = [
+            [
+                'roletype' => 'student',
+                'text' => 'Results'
+            ]
+        ];
+
+        $profileButtonIds = [];
+
+        /* Find all the button ids matching the ones we needed
+         */
+        foreach ($buttons as $button) {
+            $statement->execute($button);
+
+            while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
+                $profileButtonIds[$row['id']] = $row['id'];
+            }
+        }
+
+        foreach ($profileButtonIds as $profileButtonId) {
+            $this->getLogger()->info(sprintf(
+                'Role visibility: clearing student role ids from profile button %s',
+                $profileButtonId
+            ));
+
+            $deleteStatement->execute([
+                'profileButtonId' => $profileButtonId
+            ]);
+
+            /* Recreate them
+             */
+            $roleIds = $this->helper->fetchRoleIds([Role::PARENT, Role::STAFF]);
+
+            $this->getLogger()->info(sprintf(
+                'Role visibility: assigning role ids %s to profile button %s',
+                implode(',', $roleIds),
+                $profileButtonId
+            ));
+
+            $this->helper->createButtonRoleVisibility((int)$profileButtonId, $roleIds);
         }
     }
 
