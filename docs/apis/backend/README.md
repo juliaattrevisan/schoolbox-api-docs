@@ -37,6 +37,15 @@ In addition, if the request body is supplied then it is accessed with the
 $requestBody = $this->request->getParsedBody();
 ```
 
+> Note that in order for `getParsedBody` to be parsed as an array, the
+> `Content-Type: application/json` header must be set in the request if passing
+> a JSON-encoded request body.
+>
+> This method should also work if the data is sent as a form submission
+> (e.g. with the `application/x-www-form-urlencoded` or `multipart/form-data`
+> `Content-Type` headers), as `getParsedBody` will contain the contents of the
+> `$_POST` superglobal.
+
 ## Supporting Classes
 
 The key difference between API and MVC backends is in the supporting classes:
