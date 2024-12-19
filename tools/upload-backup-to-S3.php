@@ -15,6 +15,7 @@ $app    = new class extends CliTool\App {
     private string $s3Region;
     private string $s3Version;
     private string $s3Bucket;
+    private string $s3Host;
     private S3Client $client;
     private const WEEKLY_UPLOAD_DAY              = "Saturday";
     private const MONTHLY_UPLOAD_DAY             = "01";
@@ -32,37 +33,42 @@ $app    = new class extends CliTool\App {
         $this->s3Region     = trim($this->getConfig()->get(ConfigMapper::NAME_OTFS_S3_REGION) ?? "");
         $this->s3Version    = trim($this->getConfig()->get(ConfigMapper::NAME_OTFS_S3_VERSION) ?? "");
         $this->s3Bucket     = trim($this->getConfig()->get(ConfigMapper::NAME_OTFS_S3_BUCKET) ?? "");
+        $this->s3Host       = trim($this->getConfig()->get(ConfigMapper::NAME_OTFS_S3_HOST) ?? "");
     }
 
     private function buildS3Client(): void
     {
-        $this->client = new S3Client([
-                                         'credentials' => [
-                                             'key'    => $this->s3CredKey,
-                                             'secret' => $this->s3CredSecret,
-                                         ],
-                                         'region'      => $this->s3Region,
-                                         'version'     => $this->s3Version,
-                                     ]);
+        $cfg = [
+            'credentials' => [
+                'key'    => $this->s3CredKey,
+                'secret' => $this->s3CredSecret,
+            ],
+            'region'      => $this->s3Region,
+            'version'     => $this->s3Version,
+        ];
+        if (!empty($this->s3Host)) {
+            $cfg['endpoint'] = $this->s3Host;
+        }
+        $this->client = new S3Client($cfg);
     }
 
     private function createBackupDirectoriesInS3(): void
     {
         $this->client->putObject([
-                                     'Bucket' => $this->s3Bucket,
-                                     'Key'    => self::DAILY_PREFIX,
-                                     'Body'   => '',
-                                 ]);
+            'Bucket' => $this->s3Bucket,
+            'Key'    => self::DAILY_PREFIX,
+            'Body'   => '',
+        ]);
         $this->client->putObject([
-                                     'Bucket' => $this->s3Bucket,
-                                     'Key'    => self::WEEKLY_PREFIX,
-                                     'Body'   => '',
-                                 ]);
+            'Bucket' => $this->s3Bucket,
+            'Key'    => self::WEEKLY_PREFIX,
+            'Body'   => '',
+        ]);
         $this->client->putObject([
-                                     'Bucket' => $this->s3Bucket,
-                                     'Key'    => self::MONTHLY_PREFIX,
-                                     'Body'   => '',
-                                 ]);
+            'Bucket' => $this->s3Bucket,
+            'Key'    => self::MONTHLY_PREFIX,
+            'Body'   => '',
+        ]);
     }
 
     private function generateDailyBackup(): array
@@ -81,18 +87,18 @@ $app    = new class extends CliTool\App {
     private function uploadFileToS3($key, $sourceFile): void
     {
         $this->client->putObject([
-                                     'Bucket'     => $this->s3Bucket,
-                                     'Key'        => $key,
-                                     // e.g., backups/weekly/instanceId_schoolbox_2024-03-14.sql.gz
-                                     'SourceFile' => $sourceFile,
-                                     // e.g., /var/lib/schoolbox/instanceId/backups/weekly/instanceId_schoolbox_2024-03-14.sql.gz
-                                 ]);
+            'Bucket'     => $this->s3Bucket,
+            'Key'        => $key,
+            // e.g., backups/weekly/instanceId_schoolbox_2024-03-14.sql.gz
+            'SourceFile' => $sourceFile,
+            // e.g., /var/lib/schoolbox/instanceId/backups/weekly/instanceId_schoolbox_2024-03-14.sql.gz
+        ]);
         // check if file upload was successful
         try {
             $fileInS3 = $this->client->getObject([
-                                                     'Bucket' => $this->s3Bucket,
-                                                     'Key'    => $key,
-                                                 ]);
+                'Bucket' => $this->s3Bucket,
+                'Key'    => $key,
+            ]);
         } catch (Aws\S3\Exception\S3Exception) {
             $this->getLogger()->error("Failed to back up database of instance " . INSTANCE_ID . " to S3.");
             exit(1);
@@ -118,9 +124,9 @@ $app    = new class extends CliTool\App {
                 if ($backupDate < $cutoffDate) {
                     $this->getLogger()->info("Pruning old backup: {$file['Key']}.");
                     $this->client->deleteObject([
-                                                    'Bucket' => $this->s3Bucket,
-                                                    'Key'    => $file['Key'],
-                                                ]);
+                        'Bucket' => $this->s3Bucket,
+                        'Key'    => $file['Key'],
+                    ]);
                 }
             }
         }

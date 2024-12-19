@@ -37,6 +37,7 @@ trait AwsS3AppTrait
         $s3Region    = trim($config->get('otfs_s3_region') ?? "");
         $s3Version   = trim($config->get('otfs_s3_version') ?? "");
         $s3Bucket    = trim($config->get('otfs_s3_bucket') ?? "");
+        $s3Host      = trim($config->get('otfs_s3_host') ?? "");
 
         $log->debug(sprintf("OTFS Adapter: '%s'", $config->get(ConfigMapper::NAME_OTFS_ADAPTER)));
         $log->debug("S3 Access Key: '$s3AccessKey'");
@@ -49,15 +50,20 @@ trait AwsS3AppTrait
             $log->error("Error: S3 config appears invalid");
             exit(CliKernelAbstract::EXIT_STATUS_APP_ERROR);
         }
-
-        return new S3Client([
+        $cfg = [
             'credentials' => [
                 'key'    => $s3AccessKey,
                 'secret' => $s3SecretKey,
             ],
             'region'      => $s3Region,
             'version'     => $s3Version,
-        ]);
+        ];
+
+        if (!empty($s3Host)) {
+            $cfg['endpoint'] = $s3Host;
+        }
+
+        return new S3Client($cfg);
     }
 
 

@@ -135,8 +135,9 @@ class FilesystemFactory
         $otfs_s3_region      = trim($config->get('otfs_s3_region') ?? "");
         $otfs_s3_version     = trim($config->get('otfs_s3_version') ?? "");
         $otfs_s3_bucket      = trim($config->get('otfs_s3_bucket') ?? "");
+        $otfs_s3_host        = trim($config->get('otfs_s3_host') ?? "");
 
-        $client = new S3Client([
+        $cfg = [
             'credentials' => [
                 'key'    => $otfs_s3_cred_key,
                 'secret' => $otfs_s3_cred_secret,
@@ -146,7 +147,11 @@ class FilesystemFactory
             'http'    => [
                 GuzzleHttp\RequestOptions::CONNECT_TIMEOUT => self::getConnectTimeout(),
             ],
-        ]);
+        ];
+        if (!empty($otfs_s3_host)) {
+            $cfg['endpoint'] = $otfs_s3_host;
+        }
+        $client = new S3Client($cfg);
 
         // Register the S3 stream wrapper, so that the S3 filesystem adapter
         // may use it

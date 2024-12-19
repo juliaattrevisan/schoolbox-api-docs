@@ -181,7 +181,7 @@ class FileNester extends CliTool\App
         $this->getLogger()->log(
             $this->actionMode === self::ACTION_MOVE ? Logger::WARNING : Logger::NOTICE,
             "Action mode: '{$this->actionMode}' - original file will be " .
-            ($this->actionMode === self::ACTION_MOVE ? 'DELETED' : 'RETAINED')
+                ($this->actionMode === self::ACTION_MOVE ? 'DELETED' : 'RETAINED')
         );
     }
 
@@ -198,6 +198,7 @@ class FileNester extends CliTool\App
         $s3Region    = trim($this->getConfig()->get('otfs_s3_region') ?? "");
         $s3Version   = trim($this->getConfig()->get('otfs_s3_version') ?? "");
         $this->bucketName = trim($this->getConfig()->get('otfs_s3_bucket') ?? "");
+        $s3Host      = trim($this->getConfig()->get('otfs_s3_host') ?? "");
 
         $otfsAdapter = $this->getConfig()->get(ConfigMapper::NAME_OTFS_ADAPTER);
         $this->getLogger()->debug(sprintf("OTFS Adapter: '%s'", $otfsAdapter));
@@ -228,14 +229,18 @@ class FileNester extends CliTool\App
             }
         }
 
-        $this->s3Client = new S3Client([
+        $cfg = [
             'credentials' => [
                 'key'    => $s3AccessKey,
                 'secret' => $s3SecretKey,
             ],
             'region'      => $s3Region,
             'version'     => $s3Version,
-        ]);
+        ];
+        if (!empty($s3Host)) {
+            $cfg['endpoint'] = $s3Host;
+        }
+        $this->s3Client = new S3Client($cfg);
     }
 
 

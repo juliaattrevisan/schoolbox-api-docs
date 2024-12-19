@@ -76,16 +76,21 @@ class Seeder extends App
     private function buildDependencies(): Seeder
     {
         $config = $this->getConfig();
+        $s3Host = $config->get('otfs_s3_host');
 
+        $cfg = [
+            'credentials' => [
+                'key'    => trim($config->get('otfs_s3_cred_key') ?? ''),
+                'secret' => trim($config->get('otfs_s3_cred_secret') ?? ''),
+            ],
+            'region'      => trim($config->get('otfs_s3_region') ?? ''),
+            'version'     => trim($config->get('otfs_s3_version') ?? ''),
+        ];
+        if (!empty($s3Host)) {
+            $cfg['endpoint'] = $s3Host;
+        }
         $this->s3Client = new S3Client(
-            [
-                'credentials' => [
-                    'key'    => trim($config->get('otfs_s3_cred_key') ?? ''),
-                    'secret' => trim($config->get('otfs_s3_cred_secret') ?? ''),
-                ],
-                'region'      => trim($config->get('otfs_s3_region') ?? ''),
-                'version'     => trim($config->get('otfs_s3_version') ?? ''),
-            ]
+            $cfg
         );
 
         $this->bucket         = trim($config->get('otfs_s3_bucket') ?? '');

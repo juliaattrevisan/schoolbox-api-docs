@@ -37,7 +37,7 @@ readonly PRESERVED_CONFIG=(
   "ldap_enable" "ldap_host" "ldap_user" "ldap_pass" "ldap_base" "ldap_host_alt" "ldap_user_alt" "ldap_base_alt" "ldap_username"
 
   # OTFS config
-  "otfs_adapter" "otfs_s3_cred_key" "otfs_s3_cred_secret" "otfs_verify_previous_file"
+  "otfs_adapter" "otfs_s3_cred_key" "otfs_s3_cred_secret" "otfs_verify_previous_file" "otfs_s3_host"
 
   # DR S3 backups
   "aws_s3_dr_backup_enabled" "aws_s3_dr_backup_visibility" "aws_s3_dr_sync_status"

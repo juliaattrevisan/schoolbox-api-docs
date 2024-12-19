@@ -178,7 +178,7 @@ class Controller extends Base
                 'major_site_version'   => $version->getMajor(),
                 'major_latest_version' => (new InstanceRegistry($this->getConfigLoader()))->getLatestVersionMajor(),
                 'disk_used' => $disk_used,
-            //                    'disk_used' => Alaress_Byte_Format::bytesToString($disk_total - $disk_free),
+                //                    'disk_used' => Alaress_Byte_Format::bytesToString($disk_total - $disk_free),
                 'disk_total' => Alaress_Byte_Format::bytesToString($disk_total),
                 'disk_percentage' => Alaress_Byte_Format::bytesToString($disk_percentage),
                 'memory_used' => Alaress_Byte_Format::bytesToString($memory_used),
@@ -298,6 +298,7 @@ class Controller extends Base
         $s3Region    = trim($this->getConfigLoader()->get('otfs_s3_region') ?? "");
         $s3Version   = trim($this->getConfigLoader()->get('otfs_s3_version') ?? "");
         $s3Bucket    = trim($this->getConfigLoader()->get('otfs_s3_bucket') ?? "");
+        $s3Host      = trim($this->getConfigLoader()->get('otfs_s3_host') ?? "");
 
         $s3CredentialsMissing =
             $s3AccessKey === '' ||
@@ -362,18 +363,20 @@ class Controller extends Base
 
         $objectCount = (new CloudWatchMetrics($cloudWatchClient))->getNumberOfObjects($s3Bucket);
 
+        $cfg = [
+            'credentials' => [
+                'key'    => $s3AccessKey,
+                'secret' => $s3SecretKey,
+            ],
+            'region'      => $s3Region,
+            'version'     => $s3Version,
+        ];
+
+        if (!empty($s3Host)) {
+            $cfg['endpoint'] = $s3Host;
+        }
         $s3Client = new S3Client(
-            [
-                'credentials' => [
-                    'key'    => $s3AccessKey,
-                    'secret' => $s3SecretKey,
-                ],
-                'region'      => $s3Region,
-                'version'     => $s3Version,
-                'http'        => [
-                    GuzzleHttp\RequestOptions::CONNECT_TIMEOUT => FilesystemFactory::getConnectTimeout(),
-                ],
-            ]
+            $cfg
         );
         $objects = $s3Client->getIterator('ListObjects', [
             'Bucket' => $s3Bucket,

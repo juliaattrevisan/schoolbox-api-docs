@@ -43,10 +43,11 @@ class Stream
         $key     = $config->get('otfs_s3_cred_key');
         $secret  = $config->get('otfs_s3_cred_secret');
         $bucket  = $config->get('otfs_s3_bucket');
+        $host    = $config->get('otfs_s3_host');
 
         // Connect to Amazon S3
 
-        $client = new S3Client([
+        $cfg = [
             'version'     => $version,
             'region'      => $region,
             'credentials' => [
@@ -56,7 +57,12 @@ class Stream
             'http'    => [
                 GuzzleHttp\RequestOptions::CONNECT_TIMEOUT => FilesystemFactory::getConnectTimeout(),
             ],
-        ]);
+        ];
+
+        if (!empty($host)) {
+            $cfg['endpoint'] = $host;
+        }
+        $client = new S3Client($cfg);
 
         $client->registerStreamWrapper();
 

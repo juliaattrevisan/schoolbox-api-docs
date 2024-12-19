@@ -43,7 +43,7 @@ class PreSignedUrlService
      */
     public function __construct(IConfigLoader $config)
     {
-        $this->s3Client = new S3Client([
+        $cfg = [
             'credentials' => [
                 'key'    => trim($config->get('otfs_s3_cred_key') ?? ''),
                 'secret' => trim($config->get('otfs_s3_cred_secret') ?? ''),
@@ -53,7 +53,12 @@ class PreSignedUrlService
             'http'    => [
                 GuzzleHttp\RequestOptions::CONNECT_TIMEOUT => FilesystemFactory::getConnectTimeout(),
             ],
-        ]);
+        ];
+        $host = trim($config->get('otfs_s3_host') ?? '');
+        if (!empty($host)) {
+            $cfg['endpoint'] = $host;
+        }
+        $this->s3Client = new S3Client($cfg);
         $this->bucket   = trim($config->get('otfs_s3_bucket') ?? '');
     }
 
@@ -139,9 +144,9 @@ class PreSignedUrlService
     private function fileExistsInVideoQueue(string $hash): bool
     {
         return VideoQueueMapper::getInstance()->countByColumnList([
-                'hash'      => $hash,
-                'status'    => VideoQueueMapper::STATUS_COMPLETED,
-            ]) > 0;
+            'hash'      => $hash,
+            'status'    => VideoQueueMapper::STATUS_COMPLETED,
+        ]) > 0;
     }
 
     /**

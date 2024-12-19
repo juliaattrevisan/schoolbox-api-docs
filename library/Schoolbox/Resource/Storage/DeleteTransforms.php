@@ -285,6 +285,7 @@ class DeleteTransforms extends CliTool\App
         $s3Version   = trim($this->getConfig()->get('otfs_s3_version') ?? "");
         $s3AccessKey = trim($this->getConfig()->get('otfs_s3_cred_key') ?? "");
         $s3SecretKey = trim($this->getConfig()->get('otfs_s3_cred_secret') ?? "");
+        $s3Host      = trim($this->getConfig()->get('otfs_s3_cred_host') ?? "");
 
         $badConfig = empty($s3AccessKey) || empty($s3SecretKey) || empty($s3Region) || empty($s3Version) || empty($bucketName);
         if ($badConfig) {
@@ -292,14 +293,18 @@ class DeleteTransforms extends CliTool\App
             return null;
         }
 
-        return new S3Client([
+        $cfg = [
             'credentials' => [
                 'key'    => $s3AccessKey,
                 'secret' => $s3SecretKey,
             ],
             'region'      => $s3Region,
             'version'     => $s3Version,
-        ]);
+        ];
+        if (!empty($s3Host)) {
+            $cfg['endpoint'] = $s3Host;
+        }
+        return new S3Client($cfg);
     }
 
 
