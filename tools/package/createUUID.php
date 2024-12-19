@@ -41,7 +41,7 @@ if (($handle = fopen($argv[1], "r")) !== false) {
         }
         // if data doesn't exist in the uuid column, generate
         $uuid_column = array_search(UUID_FIELD, $firstRow);
-        if (!($row[$uuid_column] ?? false)) {
+        if (!($row[$uuid_column] ?? false) || ( 'NULL' === $row[$uuid_column])) {
             $row[$uuid_column] = (string)Uuid::uuid4();
         }
         displayRow($row);
