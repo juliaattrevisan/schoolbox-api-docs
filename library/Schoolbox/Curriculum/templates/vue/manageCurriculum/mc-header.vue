@@ -41,25 +41,24 @@ const buttonCount = window.Vue.computed(() => {
                 <h1>Manage Curriculum</h1>
             </div>
         </div>
-        <template v-if="store.hasLoadedOk && !store.isReadOnly">
-            <nav>
-                <a
-                    v-if="props.routeCurriculumCoverage"
-                    :href="props.routeCurriculumCoverage"
-                    class="icon-report"
-                    title="View Curriculum Coverage Report"
-                ></a>
-                <a
-                    href="#create-curriculum"
-                    data-interaction="create-curriculum"
-                    data-test="toggle-create-curriculum"
-                    :class="`icon ${addCurriculumStore.isOpen ? 'icon-close' : 'icon-add'}`"
-                    title="Create New Curriculum"
-                    @click.prevent="onCreateNewSelected"
-                >
-                </a>
-            </nav>
-        </template>
+        <nav v-if="store.hasLoadedOk && buttonCount > 0">
+            <a
+                v-if="props.routeCurriculumCoverage"
+                :href="props.routeCurriculumCoverage"
+                class="icon-report"
+                title="View Curriculum Coverage Report"
+            ></a>
+            <a
+                v-if="!store.isReadOnly"
+                href="#create-curriculum"
+                data-interaction="create-curriculum"
+                data-test="toggle-create-curriculum"
+                :class="`icon ${addCurriculumStore.isOpen ? 'icon-close' : 'icon-add'}`"
+                title="Create New Curriculum"
+                @click.prevent="onCreateNewSelected"
+            >
+            </a>
+        </nav>
     </div>
     <Transition @enter="slideDownOnEnter" @leave="slideUpOnLeave">
         <mc-add-curriculum v-if="addCurriculumStore.isOpen" />
