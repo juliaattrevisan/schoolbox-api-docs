@@ -243,7 +243,6 @@ HELP;
     }
 
 
-
     /**
      * FIXME Decide whether this script must be run as root
      *  By default, this returns false (see CliTool\App) but if you're using methods that require

@@ -166,7 +166,6 @@ HELP;
     }
 
 
-
     /**
      * Recreate visibilities
      *
