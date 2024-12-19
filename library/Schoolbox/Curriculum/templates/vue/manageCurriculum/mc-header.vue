@@ -25,34 +25,40 @@ function onCreateNewSelected(): void {
         addCurriculumStore.prompt();
     }
 }
+
+const buttonCount = window.Vue.computed(() => {
+    let count = 0;
+    if (props.routeCurriculumCoverage) count += 1;
+    if (!store.isReadOnly) count += 1;
+    return count;
+});
 </script>
 
 <template>
-    <div :class="`row ${store.isReadOnly ? '' : 'actions-small-2 actions-medium-2'}`">
+    <div :class="`row ${buttonCount > 1 ? '' : `actions-small-${buttonCount} actions-medium-${buttonCount}`}`">
         <div class="list-item">
             <div class="small-12 column">
                 <h1>Manage Curriculum</h1>
             </div>
         </div>
-        <template v-if="store.hasLoadedOk && !store.isReadOnly">
-            <nav>
-                <a
-                    v-if="props.routeCurriculumCoverage"
-                    :href="props.routeCurriculumCoverage"
-                    class="icon-report"
-                    title="View Curriculum Coverage Report"
-                ></a>
-                <a
-                    href="#create-curriculum"
-                    data-interaction="create-curriculum"
-                    data-test-toggle-create-curriculum
-                    :class="`icon ${addCurriculumStore.isOpen ? 'icon-close' : 'icon-add'}`"
-                    title="Create New Curriculum"
-                    @click.prevent="onCreateNewSelected"
-                >
-                </a>
-            </nav>
-        </template>
+        <nav v-if="store.hasLoadedOk && buttonCount > 0">
+            <a
+                v-if="props.routeCurriculumCoverage"
+                :href="props.routeCurriculumCoverage"
+                class="icon-report"
+                title="View Curriculum Coverage Report"
+            ></a>
+            <a
+                v-if="!store.isReadOnly"
+                href="#create-curriculum"
+                data-interaction="create-curriculum"
+                data-test-toggle-create-curriculum
+                :class="`icon ${addCurriculumStore.isOpen ? 'icon-close' : 'icon-add'}`"
+                title="Create New Curriculum"
+                @click.prevent="onCreateNewSelected"
+            >
+            </a>
+        </nav>
     </div>
     <Transition @enter="slideDownOnEnter" @leave="slideUpOnLeave">
         <mc-add-curriculum v-if="addCurriculumStore.isOpen" />
