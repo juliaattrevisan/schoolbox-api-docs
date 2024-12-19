@@ -158,9 +158,9 @@ test.describe("Manage Curriculum Tests", () => {
         await page.reload();
         const expectedOrder = [
             "Year 4 History",
-            "Year 9 Ancient History",
-            "Party Town",
             "English",
+            "Party Town",
+            "Year 9 Ancient History",
             "Years 9 and 10 French",
         ];
         const nodeNames: string[] = await page.getByTestId("view-node-name").allInnerTexts();
