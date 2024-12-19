@@ -223,6 +223,13 @@ class External_Schooledge_User implements External_UserInterface
             $i++;
         }
 
+        /* Schooledge uses "None" to indicate an empty StudentMedicalAlert field,
+         * so override this with an empty string
+         */
+        if ($result['StudentMedicalAlert'] === 'None') {
+            $result['StudentMedicalAlert'] = '';
+        }
+
         /* Forcibly re-evaluate boarderlyness using this connector's specific interpretation
          */
         $result['StudentBoarder'] = $this->determineBoarderType((string)$result['StudentBoarder']);
