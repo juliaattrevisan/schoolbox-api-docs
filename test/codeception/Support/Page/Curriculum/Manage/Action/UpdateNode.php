@@ -10,7 +10,7 @@ class UpdateNode
     public const NAME_FIELD = '#name';
     public const CODE_FIELD = '#code';
     public const DESCRIPTION_FIELD = 'description-';
-    public const UPDATE_BUTTON = '[data-test-update-node]';
+    public const UPDATE_BUTTON = '[data-test="update-node"]';
     private AcceptanceTester $tester;
 
     /**

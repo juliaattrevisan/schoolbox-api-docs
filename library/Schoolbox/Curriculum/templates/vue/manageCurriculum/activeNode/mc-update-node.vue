@@ -150,7 +150,7 @@ function onCancelSelected(): void {
                                     ref="updateButton"
                                     type="submit"
                                     class="button icon-modify submit"
-                                    data-test-update-node
+                                    data-test="update-node"
                                     :data-submit-button-for="ckeditorIdAttr"
                                     :disabled="isUpdateDisabled"
                                     @click.prevent="onUpdateSelected"

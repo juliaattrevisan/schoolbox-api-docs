@@ -12,6 +12,7 @@ import AddNewSubsection from "@schoolboxTest/playwright/support/page/curriculum/
 import DisableNodes from "@schoolboxTest/playwright/support/page/curriculum/manage/action/DisableNodes";
 import DeleteNode from "@schoolboxTest/playwright/support/page/curriculum/manage/action/DeleteNode";
 import SearchNodes from "@schoolboxTest/playwright/support/page/curriculum/manage/action/SearchNodes";
+import UpdateNode from "@schoolboxTest/playwright/support/page/curriculum/manage/action/UpdateNode";
 
 test.describe("Manage Curriculum Tests", () => {
     let mc: ManageCurriculum;
@@ -112,6 +113,106 @@ test.describe("Manage Curriculum Tests", () => {
 
         tester.isGoingTo("expect 4 search results are shown");
         await searchNodes.seeResultsMatch(4);
+    });
+
+    test("Update Node", async ({ tester, page }) => {
+        tester.isGoingTo("update Year 9 History");
+        const updateNode = new UpdateNode(page, tester);
+        await updateNode.clickDisplay("Year 9 History");
+        await updateNode.fillName("Year 9 Ancient History");
+        await updateNode.fillCode("9AH");
+        await updateNode.fillDescription("1", "Here we will focus mainly on the Romans, Egyptians and Babylonians");
+        await updateNode.clickUpdateButton();
+
+        tester.isGoingTo("ensure the toast message is shown");
+        await expect(page.getByTestId("toast")).toContainText("Outcome successfully updated");
+
+        tester.isGoingTo("ensure the updated node displays correctly");
+        await expect(page.getByTestId("mc-view-nodes-list")).toContainText("[9AH] Year 9 Ancient History");
+    });
+
+    test("hideDisabledNodesAndSearch", async ({ tester, page }) => {
+        tester.isGoingTo("navigate to First Contacts in Year 4 History");
+        const manageCurriculum = new ManageCurriculum(page, tester);
+        await manageCurriculum.clickNode("Year 4 History");
+        await manageCurriculum.clickNode("Year 4");
+        await manageCurriculum.clickNode("Historical Knowledge and Understanding");
+        await manageCurriculum.clickNode("First Contacts");
+
+        tester.isGoingTo("search for nodes containing ACHH");
+        const searchNodes = new SearchNodes(page, tester);
+        await searchNodes.fillSearch("ACHH");
+
+        tester.isGoingTo("expect 4 search results are shown");
+        await searchNodes.seeResultsMatch(4);
+
+        tester.isGoingTo("hide disabled nodes and so expect no search results are now shown");
+        await searchNodes.uncheckShowDisabledNodes();
+        await page.waitForSelector("[data-test-node]", { state: "hidden" });
+
+        await searchNodes.seeResultsMatch(0);
+    });
+
+    test("Check Node Sort", async ({ tester, page, db }) => {
+        tester.isGoingTo("check nodes are sorted by order, code, then name");
+        tester.isGoingTo("add order: 1 to Year 4 History so it appears at the top of the list");
+        await db.updateInDatabase("curriculum_node", { "`order`": 1 }, { "name like": "Year 4 History" });
+        await page.reload();
+        const expectedOrder = [
+            "Year 4 History",
+            "[9AH] Year 9 Ancient History",
+            "[PT] Party Town",
+            "English",
+            "Years 9 and 10 French",
+        ];
+        const nodeNames: string[] = await page.getByTestId("view-node-name").allInnerTexts();
+        // Skip the first node as it is the curriculum node
+        for (let i = 1; i < expectedOrder.length; i += 1) {
+            expect(nodeNames[i]).toContain(expectedOrder[i - 1]);
+        }
+    });
+
+    test("Navigate With Browser Buttons", async ({ tester, page }) => {
+        tester.isGoingTo("use the browser backward and forward buttons to traverse the curriculum");
+        tester.isGoingTo(
+            "traverse to 'Curricula > English > Year 9 > Literature > Creating literature' and ensure 'ACELT1773' is visible",
+        );
+        const manageCurriculum = new ManageCurriculum(page, tester);
+        await manageCurriculum.clickNode("English");
+        await manageCurriculum.clickNode("Year 9");
+        await manageCurriculum.clickNode("Literature");
+        await manageCurriculum.clickNode("Creating literature");
+        await expect(page.getByTestId("mc-view-nodes-list")).toContainText("ACELT1773");
+
+        await page.goBack();
+        await page.goBack();
+        await expect(page.getByTestId("mc-view-nodes-list")).toContainText("Achievement standard");
+
+        await page.goBack();
+        await page.goBack();
+        await expect(page.getByTestId("mc-view-nodes-list")).toContainText("Years 9 and 10 French");
+
+        await page.goForward();
+        await page.goForward();
+        await page.goForward();
+        await expect(page.getByTestId("mc-view-nodes-list")).toContainText("Responding to literature");
+
+        await page.goBack();
+        await page.goBack();
+
+        const searchNodes = new SearchNodes(page, tester);
+        await searchNodes.fillSearch("ACELT1638");
+        await manageCurriculum.clickNode(
+            "[ACELT1638] Experiment with the ways that language features, image and sound can be adapted in literary texts, for example the effects of stereotypical characters and settings, the playfulness of humour and pun and the use of hyperlink",
+            true,
+        );
+        await expect(page.getByTestId("mc-view-nodes-list")).toContainText("ELBE1201");
+
+        await page.goBack();
+        await expect(page.getByTestId("mc-view-nodes-list")).toContainText("Year 9");
+
+        await page.goForward();
+        await expect(page.getByTestId("mc-view-nodes-list")).toContainText("ELBE1202");
     });
 
     test.afterEach(async ({ tester }) => {

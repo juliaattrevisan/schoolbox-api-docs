@@ -13,6 +13,8 @@ export default class ManageCurriculum {
 
     static readonly NODES = "[data-test-node]:not([data-test-view-node])";
 
+    static readonly ALL_NODES = "[data-test-node]";
+
     static readonly DATATEST_NODE_NAME = "view-node-name";
 
     static readonly DATATEST_MC_VIEW_NODES_LIST = "mc-view-nodes-list";
@@ -32,16 +34,18 @@ export default class ManageCurriculum {
     /**
      * Locate a given node's row by its name
      * @param name - The name of the node
+     * @param matchAllNodes - Whether to include base nodes
      * @returns The locator of the node
      */
-    async locateNode(name: string): Promise<Locator> {
+    async locateNode(name: string, matchAllNodes: boolean = false): Promise<Locator> {
         // The name container elements that match the text
         const matchingNameContainer = this.page
             .getByTestId(ManageCurriculum.DATATEST_NODE_NAME)
             .filter({ hasText: name });
 
         // Filter the full node rows by the matching name container
-        const nodeRow = this.page.locator(ManageCurriculum.NODES).filter({ has: matchingNameContainer });
+        const nodeSelector = matchAllNodes ? ManageCurriculum.ALL_NODES : ManageCurriculum.NODES;
+        const nodeRow = this.page.locator(nodeSelector).filter({ has: matchingNameContainer });
         await expect(nodeRow).toHaveCount(1);
 
         return nodeRow;
@@ -61,9 +65,10 @@ export default class ManageCurriculum {
     /**
      * select the node to navigate next to
      * @param value - The locator of the node
+     * @param matchAllNodes - Whether to include base nodes
      */
-    async clickNode(value: string): Promise<void> {
-        const node = await this.locateNode(value);
+    async clickNode(value: string, matchAllNodes: boolean = false): Promise<void> {
+        const node = await this.locateNode(value, matchAllNodes);
         await node.getByTestId(ManageCurriculum.DATATEST_NODE_NAME).click();
     }
 }
