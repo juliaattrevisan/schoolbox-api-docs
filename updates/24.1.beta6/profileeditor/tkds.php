@@ -169,6 +169,7 @@ HELP;
                 'text' => $customButton['text'],
                 'icon' => $customButton['icon'],
                 'url' => $customButton['url'],
+                'selfEnabled' => $customButton['selfEnabled'],
             ]);
 
             /* Preset availability and visibility requirements
