@@ -6,7 +6,6 @@
 import CcReportFilters from "./cc-report-filters.vue";
 import CcReportTable from "./cc-report-table.vue";
 import CcReportLoadMore from "./cc-report-load-more.vue";
-
 import { useReportStore } from "./store/ccReportStore";
 
 const reportStore = useReportStore();

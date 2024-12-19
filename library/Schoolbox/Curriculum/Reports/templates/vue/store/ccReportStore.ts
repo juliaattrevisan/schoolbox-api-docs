@@ -3,12 +3,12 @@
  */
 
 import { defineStore } from "pinia";
-import { usePrintDialog } from "@schoolboxVue/composables/print/usePrintDialog";
 import { isAbortError, hasErrorMessage } from "@js/util/errorUtils";
 import { extractErrorMessage } from "@js/util/sbx/fetchUtils";
 import type { CurriculumCoveragePayload } from "../../js/types/curriculumCoverageTypes";
 import { useQueryStore } from "./ccQueryStore";
 import { useInputStore } from "./ccInputStore";
+import { useFiltersStore } from "./ccFiltersStore";
 import { useCoursesStore } from "./ccCoursesStore";
 import { useNodesStore } from "./ccNodesStore";
 import { useLoadMoreStore } from "./ccLoadMoreStore";
@@ -21,7 +21,6 @@ export const useReportStore = defineStore("ccReport", () => {
     const loadError = window.Vue.ref<string | null>(null);
     const hasReport = window.Vue.ref<boolean>(false); // whether the report has been generated
     let controller: AbortController; // to allow aborting the previous search if a new one is started
-    const { isPrinting } = usePrintDialog();
 
     /**
      * Whether a search can be performed, can be if there's a change of course or node selection
@@ -69,6 +68,9 @@ export const useReportStore = defineStore("ccReport", () => {
                     nodesStore.addCourseUsage(newCourseNodes);
                     loadMoreStore.addNext(responseJson.metadata.cursor.next);
                 }
+                if (currentIndex === useQueryStore().getQueryUrls().length - 1) {
+                    nodesStore.setDefaults();
+                }
             } else {
                 throw new Error("Unexpected response format");
             }
@@ -92,6 +94,7 @@ export const useReportStore = defineStore("ccReport", () => {
     async function report(): Promise<void> {
         useInputStore().setActive();
         useQueryStore().setQueryParams();
+        useFiltersStore().reset();
         hasNotReported.value = false;
         isLoading.value = true;
         hasLoadError.value = false;
@@ -128,6 +131,5 @@ export const useReportStore = defineStore("ccReport", () => {
         report,
         hasReport,
         canReport,
-        isPrinting,
     };
 });

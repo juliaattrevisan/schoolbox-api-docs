@@ -44,7 +44,7 @@ window.Vue.onMounted(async () => {
 
 <template>
     <tr v-if="isEmpty">
-        <td :colspan="coursesStore.totalColumnCount" class="t-align-center">
+        <td :colspan="coursesStore.totalColumnCount">
             <em>No curriculum has a total usage count of 0.</em>
         </td>
     </tr>

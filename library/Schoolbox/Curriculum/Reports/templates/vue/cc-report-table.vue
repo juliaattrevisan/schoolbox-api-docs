@@ -3,8 +3,9 @@
  * Displays the curriculum coverage report in a table format.
  */
 
+import { useTemplateRef, toRefs } from "vue";
+import { useScroll } from "@vueuse/core";
 import locale from "@js/terminology/rosettaStone";
-import { useTemplateRef } from "vue";
 import NodeDetails from "@schoolboxCurriculum/vue/node-details.vue";
 import BasicModal from "@schoolboxVue/components/modal/basic-modal.vue";
 import CcReportTableNode from "./cc-report-table-node.vue";
@@ -37,15 +38,55 @@ window.Vue.watch(isDetailsOpen, (isOpen) => {
         selectedNodeId.value = null;
     }
 });
+
+// #region scrollable height
+
+const maxScrollableHeight = window.Vue.ref<string>(`${window.innerHeight - 100}px`); // 100px chosen to give some breathing room
+
+/**
+ * Set the max height to allow the thead to use sticky position
+ * and to incrementally display large row lists on scroll
+ */
+function setScrollableHeight(): void {
+    maxScrollableHeight.value = `${window.innerHeight - 100}px`;
+}
+
+/**
+ * Start setting the scrollable height on any window resize change
+ */
+window.Vue.onMounted(() => {
+    setScrollableHeight();
+    window.addEventListener("resize", () => {
+        setScrollableHeight();
+    });
+});
+
+// #endregion
+
+const scrollableEl = useTemplateRef<HTMLDivElement>("scrollableEl");
+
+/**
+ * To display more nodes when there's lots to display and the user has scrolled to the bottom
+ * This avoids a heavy computation for the DOM when there's lots of nodes to display
+ */
+const { arrivedState } = useScroll(scrollableEl);
+const { bottom } = toRefs(arrivedState);
+window.Vue.watch(bottom, (isAtBottom) => {
+    if (isAtBottom && nodesStore.hasMore) {
+        nodesStore.showMore();
+    }
+});
 </script>
 
 <template>
-    <div class="scrollable">
+    <div ref="scrollableEl" class="scrollable" :style="{ maxHeight: maxScrollableHeight }">
         <table class="coverage-report">
             <thead>
                 <tr>
-                    <th rowspan="2" class="curriculum-column l-valign--bottom">Curriculum</th>
-                    <th rowspan="2" class="u-border-left l-valign--bottom">Total</th>
+                    <th rowspan="2" class="u-border-right curriculum-column l-valign--bottom cc-sticky-left">
+                        Curriculum
+                    </th>
+                    <th rowspan="2" class="l-valign--bottom">Total</th>
                     <template v-for="course in coursesStore.courses" :key="course.id">
                         <th class="u-border-left" style="border-right: none">Course</th>
                         <!-- colspan will be the number of units plus total if more than one course -->
@@ -93,7 +134,22 @@ window.Vue.watch(isDetailsOpen, (isOpen) => {
     <cc-usage-pop-out />
 </template>
 
-<style scoped>
+<style scoped lang="scss">
+thead {
+    /* fix the head to stay at the top when scrolling */
+    position: sticky;
+    top: 0;
+    z-index: var(--sbx-depth-ui-sticky);
+
+    /* make the top left cell sticky, so it doesn't scroll out of view (as the left column is sticky) */
+    .cc-sticky-left {
+        background: #ffffff; /* Also needs a background to prevent the sticky from being transparent */
+        left: 0;
+        position: sticky;
+        z-index: var(--sbx-depth-ui-sticky);
+    }
+}
+
 .course-column,
 .unit-column {
     min-width: 175px; /* prevent the course/unit names from getting too small */

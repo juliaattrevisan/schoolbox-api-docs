@@ -41,6 +41,7 @@ export type UnitWithCurriculumNodeUsage = Pick<Unit, "id" | "name"> & {
             count: number;
         };
     };
+    hasNoUsages: boolean; // to track if the unit has no usages (including on children nodes)
 };
 
 /**
@@ -53,6 +54,8 @@ export type CourseWithCurriculumNodeUsage = Pick<Course, "id" | "name"> & {
             count: number;
         };
     };
+    hasNoCourseUsages: boolean; // to track if the course has no course column usages (including on children nodes)
+    hasNoTotalUsages: boolean; // to track if the course has no total usages (including on children nodes)
 };
 
 /**
@@ -83,6 +86,14 @@ export type CurriculumCoverageNode = Pick<Node, "id" | "name" | "code"> & {
     children: CurriculumCoverageNode[] | null;
     usage: {
         courses: CourseWithCurriculumNodeUsage[];
+    };
+    isVisible: boolean; // to track if the node is visible in the report
+    previousIsVisible: boolean; // to track if the node was visible previously (used when moving between the only show gaps toggle)
+    isExpanded: boolean; // to track if the node is expanded in the report
+    hasNoUsages: boolean; // to track if the node has no usages (including on children nodes)
+    storedUsages: {
+        // to store saved usages for the node
+        [key: string]: number;
     };
 };
 

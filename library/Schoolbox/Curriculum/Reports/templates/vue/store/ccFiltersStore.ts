@@ -7,6 +7,7 @@ import { defineStore } from "pinia";
 import { ReportOptionValues, type ReportOption } from "../../js/types/curriculumCoverageTypes";
 
 export const useFiltersStore = defineStore("ccFilters", () => {
+    // all report options available
     const allReportOptions = window.Vue.ref<ReportOption[]>([
         {
             value: ReportOptionValues.COURSE,
@@ -32,10 +33,24 @@ export const useFiltersStore = defineStore("ccFilters", () => {
             value: ReportOptionValues.IN_USE_RUBRIC,
             label: "Rubrics",
         },
-    ]); // all report options available
+    ]);
+
+    // the currently selected report options, just the value list, used by cc-report-filters
     const selectedReportOptions = window.Vue.ref<ReportOptionValues[]>([
         ...allReportOptions.value.map((option) => option.value),
-    ]); // the currently selected report options, just the value list
+    ]);
+
+    // loop through the selected report options and join them together to create a key
+    const selectedReportOptionsKey = window.Vue.computed(() => {
+        let key = "";
+        allReportOptions.value.forEach((option) => {
+            if (selectedReportOptions.value.includes(option.value)) {
+                key += `${option.value}-`;
+            }
+        });
+        return key;
+    });
+
     const onlyShowGaps = window.Vue.ref<boolean>(false); // whether to only show nodes that contain 0 usage counts
 
     // to pass through to the csv export, to know which usages to include
@@ -48,10 +63,20 @@ export const useFiltersStore = defineStore("ccFilters", () => {
         });
     });
 
+    /**
+     * Reset the filters to their default state
+     */
+    function reset(): void {
+        selectedReportOptions.value = [...allReportOptions.value.map((option) => option.value)];
+        onlyShowGaps.value = false;
+    }
+
     return {
         allReportOptions,
         selectedReportOptions,
+        selectedReportOptionsKey,
         onlyShowGaps,
         queryParams,
+        reset,
     };
 });
