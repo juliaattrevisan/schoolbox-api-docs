@@ -152,7 +152,7 @@ HELP;
          */
         $createButtonStatement = $this->getDatabaseInternal()->prepare("
             INSERT IGNORE INTO profile_button
-            (roletype, type, sort_order, title, text, icon, url)
+            (roletype, type, sort_order, self_enabled, title, text, icon, url)
             VALUES (
                 'student',
                 'custom',
@@ -161,6 +161,7 @@ HELP;
                     FROM profile_button pb
                     WHERE roletype = 'student'
                 ),
+                :selfEnabled,
                 :title,
                 :text,
                 :icon,
@@ -173,19 +174,22 @@ HELP;
                 'title' => 'Achievements',
                 'text' => 'Achievements',
                 'icon' => 'trophy',
-                'url' => '/search/user/[profileId]/#tab-achievements'
+                'url' => '/search/user/[profileId]/#tab-achievements',
+                'selfEnabled' => true
             ],
             [
                 'title' => 'Absences',
                 'text' => 'Absences',
                 'icon' => 'user',
-                'url' => '/synergetic/absences?id=[profileExternalId]'
+                'url' => '/synergetic/absences?id=[profileExternalId]',
+                'selfEnabled' => true
             ],
             [
                 'title' => 'Finance',
                 'text' => 'Finance',
                 'icon' => 'itineraryitem',
-                'url' => '/synergetic/fin?id=[profileExternalId]'
+                'url' => '/synergetic/fin?id=[profileExternalId]',
+                'selfEnabled' => true
             ],
         ];
 
@@ -195,6 +199,7 @@ HELP;
                 'text' => $customButton['text'],
                 'icon' => $customButton['icon'],
                 'url' => $customButton['url'],
+                'selfEnabled' => $customButton['selfEnabled'],
             ]);
 
             /* Preset availability and visibility requirements
