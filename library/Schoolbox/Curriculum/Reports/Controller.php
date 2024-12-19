@@ -402,7 +402,7 @@ class Controller extends Base
             function ($id) use (&$courseUnitSpecs) {
                 $courseUnitSpecs[$id] = $this->helper->filterUserPermission(
                     $this->courseUnitSpecificationMapper->findByColumn('course_specification_id', $id, [
-                        'order' => ['f.sequence' => 'DESC']
+                        'order' => ['f.sequence' => 'DESC', 'f.id' => 'ASC']
                     ]),
                     $this->getUser()
                 );
