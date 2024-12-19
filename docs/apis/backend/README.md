@@ -161,15 +161,6 @@ headers = {
     'Accept': 'application/json',
 }
 
-// View all items
-fetch(
-    '/example/api',
-    {
-        method: 'GET',
-        headers: headers,
-    },
-);
-
 // Create an item
 post = await fetch(
     '/example/api',
@@ -206,6 +197,45 @@ fetch(
         headers: headers,
     },
 );
+
+// Create a whole bunch of items, so that the cursor may be tested:
+for (i = 0; i < 20; i++) {
+    fetch(
+        '/example/api',
+        {
+            method: 'POST',
+            body: JSON.stringify({
+                "user": {
+                    "id": 1
+                }
+            }),
+            headers: headers,
+        },
+    );
+}
+
+// Get items
+get = await fetch(
+    '/example/api',
+    {
+        method: 'GET',
+        headers: headers,
+    },
+);
+response = await get.json();
+
+// Check the IDs in the response
+
+get = await fetch(
+    '/example/api?cursor=' + response.metadata.cursor.next,
+    {
+        method: 'GET',
+        headers: headers,
+    },
+);
+response = await get.json();
+
+// Check the IDs in the response: they ought to be the next page of results
 ```
 
 ### Running tests
