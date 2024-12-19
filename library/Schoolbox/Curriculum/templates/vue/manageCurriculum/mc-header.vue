@@ -35,7 +35,7 @@ const buttonCount = window.Vue.computed(() => {
 </script>
 
 <template>
-    <div :class="`row ${buttonCount > 1 ? '' : `actions-small-${buttonCount} actions-medium-${buttonCount}`}`">
+    <div :class="`row ${buttonCount === 0 ? '' : `actions-small-${buttonCount} actions-medium-${buttonCount}`}`">
         <div class="list-item">
             <div class="small-12 column">
                 <h1>Manage Curriculum</h1>
