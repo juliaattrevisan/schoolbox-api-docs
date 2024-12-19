@@ -27,6 +27,7 @@ class Mapper extends BaseMapper
         $this->uses('roletype', self::TYPE_STRING);
         $this->uses('type', self::TYPE_STRING);
         $this->uses('sort_order', self::TYPE_INTEGER);
+        $this->uses('self_enabled', self::TYPE_INTEGER);
         $this->uses('title', self::TYPE_STRING);
         $this->uses('text', self::TYPE_STRING);
         $this->uses('icon', self::TYPE_STRING);
@@ -69,6 +70,7 @@ class Mapper extends BaseMapper
         }
 
         $query = "
+            (
                 SELECT DISTINCT {$this->getColumnString()}
                 FROM profile_button
                 INNER JOIN profile_button_campus_availability ca ON profile_button.id = ca.profile_button_id
@@ -81,7 +83,21 @@ class Mapper extends BaseMapper
                 AND rv.role_id = :visibilityRoleId
                 AND profile_button.deleted_at IS NULL
                 AND profile_button.roletype = :roletype
-                ORDER BY sort_order ASC
+            )
+            UNION
+            (
+                SELECT DISTINCT {$this->getColumnString()}
+                FROM profile_button
+                INNER JOIN profile_button_campus_availability ca ON profile_button.id = ca.profile_button_id
+                INNER JOIN profile_button_role_availability ra ON profile_button.id = ra.profile_button_id
+                WHERE ca.campus_id IN " . $this->getPredicateBuilder()->getArrayPlaceholders($vieweeCampusList, 'vieweecampus') . "
+                AND ra.role_id = :availabilityRoleId
+                AND self_enabled = 1 
+                AND :vieweeId = :viewerId
+                AND profile_button.deleted_at IS NULL
+                AND profile_button.roletype = :roletype
+            )
+            ORDER BY sort_order ASC
         ";
 
         $vieweeParams = $this->getPredicateBuilder()->getArrayParameters($vieweeCampusList, 'vieweecampus');
@@ -90,7 +106,9 @@ class Mapper extends BaseMapper
         $params = array_merge($vieweeParams, $viewerParams, [
             'availabilityRoleId' => $viewee->getRole()->getId(),
             'visibilityRoleId' => $viewer->getRole()->getId(),
-            'roletype' => $viewee->getRole()->getType()
+            'roletype' => $viewee->getRole()->getType(),
+            'vieweeId' => $viewee->getId(),
+            'viewerId' => $viewer->getId()
         ]);
 
         $statement = $this->getDatabase()->prepare($query);

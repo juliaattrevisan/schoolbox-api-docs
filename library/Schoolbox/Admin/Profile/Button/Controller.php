@@ -129,6 +129,23 @@ class Controller extends Base
             Redirect::decode($this->requestQuery->get(Redirect::RETURN_URL))
             : null;
 
+        /* The profile button we're editing
+         */
+        $button = $this->profileButtonMapper->findOneByColumn($this->profileButtonMapper->getIdentifierColumn(), $id, [ 'cache' => false ]);
+
+        /* Roles that are relevant to the roletype for the $button that we're editing
+         * sorted alphabetically for niceness
+         */
+        $rolesAvailability = $this->roleMapper->findByColumn('group_type', $button->getRoleType(), [
+            'order' => [
+                'name' => 'asc'
+            ]
+        ]);
+
+        /* People outside of this button's roletype could still see it
+         */
+        $rolesVisibility = $this->roleMapper->findAll()->sortBy('name', 'asc');
+
         $this->response = $this->responseFromTemplate(
             '@adminProfileButton/modify.twig',
             [
@@ -137,9 +154,10 @@ class Controller extends Base
                     (new Subnav($this->getConfigLoader(), $this->getUser()))->generateBreadcrumbs($this->routeGenerator->generate('adminProfileButton.getIndex')),
                     [['Modify', null]]
                 ),
-                'item' => $this->profileButtonMapper->findOneByColumn($this->profileButtonMapper->getIdentifierColumn(), $id, [ 'cache' => false ]),
+                'item' => $button,
                 'icons' => $this->iconMapper->findAll()->sortBy('title', 'asc'),
-                'roles' => $this->roleMapper->findAll()->sortBy('name', 'asc'),
+                'rolesAvailability' => $rolesAvailability,
+                'rolesVisibility' => $rolesVisibility,
                 'campuses' => $this->campusMapper->findAll()->sortBy('name', 'asc'),
                 'roleAvailabilitySelected' => $roleAvailabilitySelected,
                 'campusAvailabilitySelected' => $campusAvailabilitySelected,
@@ -151,6 +169,7 @@ class Controller extends Base
         );
     }
 
+
     /**
      * Display create screen
      *
@@ -158,6 +177,19 @@ class Controller extends Base
      */
     public function getCreate(string $roleType): void
     {
+        /* Roles that are relevant to the roletype for the $button that we're editing
+         * sorted alphabetically for niceness
+         */
+        $rolesAvailability = $this->roleMapper->findByColumn('group_type', $roleType, [
+            'order' => [
+                'name' => 'asc'
+            ]
+        ]);
+
+        /* People outside of this button's roletype could still see it
+         */
+        $rolesVisibility = $this->roleMapper->findAll()->sortBy('name', 'asc');
+
         $this->response = $this->responseFromTemplate(
             '@adminProfileButton/modify.twig',
             [
@@ -167,7 +199,8 @@ class Controller extends Base
                     [['Create', null]]
                 ),
                 'icons' => $this->iconMapper->findAll()->sortBy('title', 'asc'),
-                'roles' => $this->roleMapper->findAll()->sortBy('name', 'asc'),
+                'rolesAvailability' => $rolesAvailability,
+                'rolesVisibility' => $rolesVisibility,
                 'campuses' => $this->campusMapper->findAll()->sortBy('name', 'asc'),
                 'roleType' => $roleType,
                 'returnUrl' => null
@@ -264,6 +297,7 @@ class Controller extends Base
             throw $this->errorMapper->generateException(\Schoolbox\Error\Mapper::ERROR_INFORMATION_MISSING);
         }
 
+        $item->setSelfEnabled((int)$post['selfEnabled']);
         $item->setText(trim((string)$post['text']));
         $item->setTitle(trim((string)$post['title']));
         $item->setIcon(trim((string)$post['icon']));
