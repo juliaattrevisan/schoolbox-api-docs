@@ -255,3 +255,7 @@ rm conf/modules/Example.php
 rm conf/modules/ExampleApi.php
 rm -rf library/Schoolbox/Example/
 ```
+
+```sql
+drop table example;
+```
