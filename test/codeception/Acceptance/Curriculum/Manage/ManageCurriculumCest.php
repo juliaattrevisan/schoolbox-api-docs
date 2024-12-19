@@ -215,7 +215,7 @@ class ManageCurriculumCest
             'Years 9 and 10 French'
         );
         $i->amGoingTo('loop through the Curricula children, ensuring the correct order');
-        $nodeList = $i->grabMultiple('[data-test-view-node-name]');
+        $nodeList = $i->grabMultiple('[data-test="view-node-name"]');
         for ($index = 1; $index <= count($nodeList) - 1; $index++) {
             $i->assertStringContainsString($expectedOrder[$index - 1], $nodeList[$index]);
         }

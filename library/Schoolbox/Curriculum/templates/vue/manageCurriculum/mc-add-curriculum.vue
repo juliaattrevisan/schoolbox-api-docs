@@ -126,7 +126,7 @@ function onCancelSelected(): void {
                                         ref="addButton"
                                         type="submit"
                                         class="button icon-add submit"
-                                        data-test-add-curriculum
+                                        data-test="add-curriculum"
                                         :data-submit-button-for="ckeditorIdAttr"
                                         :disabled="isAddDisabled"
                                         @click.prevent="onAddSubsectionSelected"

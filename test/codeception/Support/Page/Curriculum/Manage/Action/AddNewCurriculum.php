@@ -6,10 +6,10 @@ use Tests\Support\AcceptanceTester;
 
 class AddNewCurriculum
 {
-    public const DISPLAY_TOGGLE = '[data-test-toggle-create-curriculum]';
+    public const DISPLAY_TOGGLE = '[data-test="toggle-create-curriculum"]';
     public const NAME_FIELD = '#name';
     public const CODE_FIELD = '#code';
-    public const ADD_BUTTON = '[data-test-add-curriculum]';
+    public const ADD_BUTTON = '[data-test="add-curriculum"]';
     private AcceptanceTester $tester;
 
     /**
