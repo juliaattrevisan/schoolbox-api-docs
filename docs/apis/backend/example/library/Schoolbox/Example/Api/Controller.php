@@ -31,6 +31,11 @@ class Controller extends Base
     {
     }
 
+    /**
+     * Retrieve a list of example objects.
+     *
+     * @return void
+     */
     public function getList(): void
     {
         $cursor = new MapperCursor(
@@ -54,12 +59,23 @@ class Controller extends Base
         ]);
     }
 
+    /**
+     * Retrieve a single example object.
+     *
+     * @param Model $item
+     * @return void
+     */
     public function getItem(Model $item): void
     {
         $modelToArray   = $this->buildModelToArrayTranslator();
         $this->response = $this->responseAsJson($modelToArray($item));
     }
 
+    /**
+     * Create an example object.
+     *
+     * @return void
+     */
     public function postItem(): void
     {
         $arrayToModel = new Translator\ArrayToModel();
@@ -73,6 +89,12 @@ class Controller extends Base
         $this->response = $this->responseAsJson($modelToArray($model));
     }
 
+    /**
+     * Update an example object.
+     *
+     * @param Model $item
+     * @return void
+     */
     public function putItem(Model $item): void
     {
         $arrayToModel = new Translator\ArrayToModel();
@@ -86,6 +108,12 @@ class Controller extends Base
         $this->response = $this->responseAsJson($modelToArray($item));
     }
 
+    /**
+     * Partially update an example object.
+     *
+     * @param Model $item
+     * @return void
+     */
     public function patchItem(Model $item): void
     {
         $arrayToModel = new Translator\ArrayToModel();
@@ -96,12 +124,23 @@ class Controller extends Base
         $this->response = $this->responseAsJson($modelToArray($item));
     }
 
+    /**
+     * Delete an example object.
+     *
+     * @param Model $item
+     * @return void
+     */
     public function deleteItem(Model $item): void
     {
         $this->mapper->delete($item);
         $this->response = $this->responseEmpty();
     }
 
+    /**
+     * Helper function for building a model-to-array translator.
+     *
+     * @return Translator\ModelToArray
+     */
     private function buildModelToArrayTranslator(): Translator\ModelToArray
     {
         return new Translator\ModelToArray(
