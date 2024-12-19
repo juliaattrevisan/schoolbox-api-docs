@@ -32,14 +32,13 @@ test.describe("Manage Curriculum Tests", () => {
         tester.isGoingTo("ensure the add button is disabled until I add a name");
         await addNewCurriculum.seeAddButtonIsDisabled();
         await addNewCurriculum.fillName("Party Town");
-        await addNewCurriculum.fillCode("PT");
         await addNewCurriculum.clickAddButton();
 
         tester.isGoingTo("ensure the toast message is shown");
         await expect(page.getByTestId("toast")).toContainText("Curriculum successfully added");
 
         tester.isGoingTo("ensure I can see the new curriculum");
-        await addNewCurriculum.seeCurriculumExists("[PT] Party Town");
+        await addNewCurriculum.seeCurriculumExists("Party Town");
     });
 
     test("Add New Subsection", async ({ tester, page }) => {
@@ -120,7 +119,6 @@ test.describe("Manage Curriculum Tests", () => {
         const updateNode = new UpdateNode(page, tester);
         await updateNode.clickDisplay("Year 9 History");
         await updateNode.fillName("Year 9 Ancient History");
-        await updateNode.fillCode("9AH");
         await updateNode.fillDescription("1", "Here we will focus mainly on the Romans, Egyptians and Babylonians");
         await updateNode.clickUpdateButton();
 
@@ -128,7 +126,7 @@ test.describe("Manage Curriculum Tests", () => {
         await expect(page.getByTestId("toast")).toContainText("Outcome successfully updated");
 
         tester.isGoingTo("ensure the updated node displays correctly");
-        await expect(page.getByTestId("mc-view-nodes-list")).toContainText("[9AH] Year 9 Ancient History");
+        await expect(page.getByTestId("mc-view-nodes-list")).toContainText("Year 9 Ancient History");
     });
 
     test("hideDisabledNodesAndSearch", async ({ tester, page }) => {
@@ -160,8 +158,8 @@ test.describe("Manage Curriculum Tests", () => {
         await page.reload();
         const expectedOrder = [
             "Year 4 History",
-            "[9AH] Year 9 Ancient History",
-            "[PT] Party Town",
+            "Year 9 Ancient History",
+            "Party Town",
             "English",
             "Years 9 and 10 French",
         ];
