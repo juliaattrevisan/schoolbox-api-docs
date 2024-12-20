@@ -104,17 +104,28 @@ HELP;
          */
         $this->helper = new Helper($this->getDatabaseInternal(), true, $this->getLogger());
 
+        /* The current school
+         */
+        $schoolCode = strtolower($this->getConfig()->get('site_school_code'));
+
         /* Staff users, and parents of the student
          */
-        $staffParentRoleIds = [];
+        $staffParentRoleIds = $this->helper->fetchRoleIds([
+            Role::STAFF,
+            Role::PARENT
+        ]);
 
-        /* Parents of the student = [];
+        /* Parents of the student;
          */
-        $parentRoleIds = [];
+        $parentRoleIds = $this->helper->fetchRoleIds([
+            Role::PARENT,
+        ]);
 
         /* Staff only
          */
-        $staffRoleIds = [];
+        $staffRoleIds = $this->helper->fetchRoleIds([
+            Role::STAFF
+        ]);
 
         /* For every system button,
          * Reset student visibilities
@@ -126,56 +137,56 @@ HELP;
             [
                 'roletype' => Role::STUDENT,
                 'type' => 'eportfolio',
-                'selfEnabled' => true,
+                'selfEnabled' => 1,
                 'visibilities' => $staffParentRoleIds,
                 'exclusions' => [],
             ],
             [
                 'roletype' => Role::STUDENT,
                 'type' => 'duework',
-                'selfEnabled' => true,
+                'selfEnabled' => 1,
                 'visibilities' => $staffParentRoleIds,
                 'exclusions' => [],
             ],
             [
                 'roletype' => Role::STUDENT,
                 'type' => 'grades',
-                'selfEnabled' => true,
+                'selfEnabled' => 1,
                 'visibilities' => $staffParentRoleIds,
                 'exclusions' => [],
             ],
             [
                 'roletype' => Role::STUDENT,
                 'type' => 'pastoral',
-                'selfEnabled' => true,
+                'selfEnabled' => 1,
                 'visibilities' => $staffParentRoleIds,
                 'exclusions' => [],
             ],
             [
                 'roletype' => Role::STUDENT,
                 'type' => 'calendar',
-                'selfEnabled' => true,
+                'selfEnabled' => 1,
                 'visibilities' => $staffParentRoleIds,
                 'exclusions' => [],
             ],
             [
                 'roletype' => Role::STUDENT,
                 'type' => 'timetable',
-                'selfEnabled' => true,
+                'selfEnabled' => 1,
                 'visibilities' => $staffParentRoleIds,
                 'exclusions' => [],
             ],
             [
                 'roletype' => Role::STUDENT,
                 'type' => 'documentmanagement',
-                'selfEnabled' => true,
+                'selfEnabled' => 1,
                 'visibilities' => $staffParentRoleIds,
                 'exclusions' => [],
             ],
             [
                 'roletype' => Role::STUDENT,
                 'type' => 'geosnapshot',
-                'selfEnabled' => true,
+                'selfEnabled' => 1,
                 'visibilities' => $staffParentRoleIds,
                 'exclusions' => [],
             ],
@@ -186,7 +197,7 @@ HELP;
             [
                 'roletype' => Role::STUDENT,
                 'type' => 'emailstaff',
-                'selfEnabled' => false,
+                'selfEnabled' => 0,
                 'visibilities' => $staffRoleIds,
                 'exclusions' => [],
             ],
@@ -196,7 +207,7 @@ HELP;
             [
                 'roletype' => Role::STUDENT,
                 'type' => 'emailparents',
-                'selfEnabled' => false,
+                'selfEnabled' => 0,
                 'visibilities' => $staffRoleIds,
                 'exclusions' => [],
             ],
@@ -206,21 +217,21 @@ HELP;
             [
                 'roletype' => Role::STAFF,
                 'type' => 'eportfolio',
-                'selfEnabled' => false,
+                'selfEnabled' => 0,
                 'visibilities' => $staffRoleIds,
                 'exclusions' => [],
             ],
             [
                 'roletype' => Role::STAFF,
                 'type' => 'calendar',
-                'selfEnabled' => true,
+                'selfEnabled' => 1,
                 'visibilities' => $staffRoleIds,
                 'exclusions' => [],
             ],
             [
                 'roletype' => Role::STAFF,
                 'type' => 'timetable',
-                'selfEnabled' => true,
+                'selfEnabled' => 1,
                 'visibilities' => $staffRoleIds,
                 'exclusions' => [],
             ],
@@ -231,7 +242,7 @@ HELP;
             [
                 'roletype' => Role::PARENT,
                 'type' => 'eportfolio',
-                'selfEnabled' => true,
+                'selfEnabled' => 1,
                 'visibilities' => $parentRoleIds,
                 'exclusions' => [],
             ],
@@ -241,21 +252,63 @@ HELP;
             [
                 'roletype' => Role::PARENT,
                 'type' => 'calendar',
-                'selfEnabled' => true,
+                'selfEnabled' => 1,
                 'visibilities' => [],
                 'exclusions' => [],
             ],
         ];
 
-        /* EXCEPT WHEN you're a school with a custom work that removed this button entirely
-         * then ensure that we maintain that change.
-         */
-
         /* Remove all student role visibilities
+         * and enable SELF pseudo-roletype
          */
+        $profileButtonMapper = \Schoolbox\Profile\Button\Mapper::getInstance();
 
-        /* Enable SELF pseudo-roletype
+        /* A purger
          */
+        $deleteStatement = $this->getDatabaseInternal()->prepare("
+            DELETE FROM profile_button_role_visibility
+            WHERE profile_button_id = :profileButtonId
+        ");
+
+        foreach ($systemButtons as $systemButton) {
+            /* EXCEPT WHEN you're a school with a custom work that removed this button entirely
+             * then ensure that we maintain that change.
+             */
+            if (\in_array($schoolCode, $systemButton['exclusions'], true)) {
+                $this->getLogger()->info(sprintf(
+                    'System button %s had a custom work: skipping default reassignment',
+                    $systemButton['type']
+                ));
+
+                continue;
+            }
+
+            $this->getLogger()->info(sprintf(
+                'System button %s receiving SELF reassignment',
+                $systemButton['type']
+            ));
+
+            /* Update visibility to include SELF etc.
+             */
+            $button = $profileButtonMapper->findOneByColumnList([
+                'roletype' => $systemButton['roletype'],
+                'type' => $systemButton['type']
+            ]);
+
+            $button->setSelfEnabled($systemButton['selfEnabled']);
+
+            $profileButtonMapper->save($button);
+
+            /* Remove student visibilities
+             */
+            $deleteStatement->execute([
+                'profileButtonId' => $button->getId()
+            ]);
+
+            $profileButtonId = $button->getId();
+
+            $this->helper->createButtonRoleVisibility($profileButtonId, $systemButton['visibilities']);
+        }
 
         /* Announce lock release
          */

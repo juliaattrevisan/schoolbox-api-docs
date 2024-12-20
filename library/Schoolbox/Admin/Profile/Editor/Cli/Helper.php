@@ -158,7 +158,7 @@ class Helper
      *
      * @param int|null $profileFieldId
      * @param array $roletypes
-     * @return void
+     * @return void skipping default
      */
     public function createFieldRoletypeVisibility(?int $profileFieldId, array $roletypes): void
     {
