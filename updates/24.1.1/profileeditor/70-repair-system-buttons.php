@@ -325,60 +325,6 @@ HELP;
 
 
     /**
-     * Their connector surfaces StaffVoiceMail,
-     * optionally displaying it in the profile screens if they're meaningful
-     *
-     * @return void
-     */
-    private function createFields(): void
-    {
-        /* We actually need to set perms on two fields here
-         */
-        $profileFieldIds = [];
-
-        $query = "
-            INSERT IGNORE INTO `profile_field`
-            (roletype, field, display_as, sequence, enabled, term, icon, css, click_to_reveal, is_external)
-            VALUES
-            ('staff','StaffCampusDescription','Campus',(
-            SELECT MAX(sequence)+1
-                FROM profile_field pf
-                WHERE roletype = 'staff'
-            ),1,NULL,NULL,NULL,0,1)
-        ";
-
-        $this->getDatabaseInternal()->executeQuery($query);
-
-        $profileFieldIds[] = (int)$this->getDatabaseInternal()->lastInsertId();
-
-        /* Preset availability and visibility requirements
-         */
-        $campusIds = $this->helper->fetchCampusIds();
-        $roletypes = [Role::STAFF, Role::PARENT, Payload::ROLETYPE_SELF];
-
-        /* Assign relationships
-         */
-        foreach ($profileFieldIds as $profileFieldId) {
-            $this->getLogger()->info(sprintf(
-                'Campus availability: assigning campus ids %s to profile field %s',
-                implode(',', $campusIds),
-                $profileFieldId
-            ));
-
-            $this->helper->createFieldCampusAvailability($profileFieldId, $campusIds);
-
-            $this->getLogger()->info(sprintf(
-                'Roletype visibility: assigning roletypes %s to profile field %s',
-                implode(',', $roletypes),
-                $profileFieldId
-            ));
-
-            $this->helper->createFieldRoletypeVisibility($profileFieldId, $roletypes);
-        }
-    }
-
-
-    /**
      * FIXME Decide whether this script must be run as root
      *  By default, this returns false (see CliTool\App) but if you're using methods that require
      *  access to special folders (such as when you're creating files) you need to run this as root.
