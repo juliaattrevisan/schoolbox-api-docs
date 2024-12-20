@@ -13,10 +13,13 @@
                 <section>
                     <fieldset class="content">
                         <div class="small-12 columns">
-                            <label for="tours-enabled" class="inline-block">Enabled<span data-tooltip class="hint has-tip tip-bottom" title="Enable or disable all feature tours system-wide.">?</span></label>
+                            <label id="tours_enabled" class="inline-block" for="tours_enabled-field">
+                                <span class="required-with-tip">Enable Feature Tours</span>
+                                <span data-tooltip class="hint has-tip tip-bottom" title="Enable or disable all feature tours system-wide.">?</span>
+                            </label>
                             <div class="switch">
-                                <input id="tours-enabled" type="checkbox" name="enabled" {% if toursEnabled %}checked{% endif %}/>
-                                <label for="tours-enabled">
+                                <input id="tours_enabled-field" type="checkbox" name="enabled" {% if toursEnabled %}checked{% endif %}/>
+                                <label for="tours_enabled">
                                     <span>On</span>
                                     <span>Off</span>
                                 </label>
@@ -60,7 +63,7 @@
 
 <script>
     // On change of global enable/disable - toggle show/hide of options
-    $('#tours-enabled').change(function() {
+    $('#tours_enabled-field').change(function() {
         if ($(this).is(':checked')) {
             $('#available-tours').removeClass('hide');
         } else {
