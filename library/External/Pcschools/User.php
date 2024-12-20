@@ -92,7 +92,7 @@ class External_Pcschools_User implements External_UserInterface
         /* Filter out ' ' and falsey values so we don't show empty alerts.
          * PCSchools seems to send us a ' ' for empty alerts.
          */
-        $row['AlertMessage'] = array_unique(array_filter(array_map('trim', $row['AlertMessage'])));
+        $row['AlertMessage'] = array_filter([trim((string)$row['AlertMessage'])]);
         $row['AlertLegal'] = [];
 
         return $row;
