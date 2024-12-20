@@ -1,0 +1,33 @@
+<script type="text/javascript">
+    $(function() {
+        /**
+         * checks if a search result has been selected from #admin-settings-search.vue
+         * so can highlight and scroll to the result accordingly
+         *
+         * @return {DOMElement} selected setting highlighted
+         */
+        const checkForAdminSearchHighlight = () => {
+            const hash = window.location.hash.substr(1);
+            const element = document.getElementById(hash);
+            if (element) {
+                element.parentElement.classList.add('highlight-selection');
+                setTimeout(() => {
+                    element.parentElement.classList.remove('highlight-selection');
+                }, 5000);
+            }
+            return element;
+        }
+        let currentHighlightedElement = checkForAdminSearchHighlight();
+
+        /**
+         * to handle additional search results selected that exist
+         * on the same page, dispatched from #admin-settings-search.vue
+         */
+        document.addEventListener('admin-settings-search__on-result-selected', (event) => {
+            if (currentHighlightedElement) {
+                currentHighlightedElement.parentElement.classList.remove('highlight-selection');
+            }
+            currentHighlightedElement = checkForAdminSearchHighlight();
+        });
+    });
+</script>
