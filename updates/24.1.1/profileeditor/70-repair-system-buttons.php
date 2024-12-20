@@ -104,9 +104,133 @@ HELP;
          */
         $this->helper = new Helper($this->getDatabaseInternal(), true, $this->getLogger());
 
+        /* Staff users, and parents of the student
+         */
+        $staffParentRoleIds = [];
+
+        /* Parents of the student = [];
+         */
+        $parentRoleIds = [];
+
+        /* Staff only
+         */
+        $staffRoleIds = [];
+
         /* For every system button,
          * Reset student visibilities
          */
+        $systemButtons = [
+            /**
+             * Student profile buttons
+             */
+            [
+                'roletype' => Role::STUDENT,
+                'type' => 'eportfolio',
+                'selfEnabled' => true,
+                'visibilities' => $staffParentRoleIds
+            ],
+            [
+                'roletype' => Role::STUDENT,
+                'type' => 'duework',
+                'selfEnabled' => true,
+                'visibilities' => $staffParentRoleIds
+            ],
+            [
+                'roletype' => Role::STUDENT,
+                'type' => 'grades',
+                'selfEnabled' => true,
+                'visibilities' => $staffParentRoleIds
+            ],
+            [
+                'roletype' => Role::STUDENT,
+                'type' => 'pastoral',
+                'selfEnabled' => true,
+                'visibilities' => $staffParentRoleIds
+            ],
+            [
+                'roletype' => Role::STUDENT,
+                'type' => 'calendar',
+                'selfEnabled' => true,
+                'visibilities' => $staffParentRoleIds
+            ],
+            [
+                'roletype' => Role::STUDENT,
+                'type' => 'timetable',
+                'selfEnabled' => true,
+                'visibilities' => $staffParentRoleIds
+            ],
+            [
+                'roletype' => Role::STUDENT,
+                'type' => 'documentmanagement',
+                'selfEnabled' => true,
+                'visibilities' => $staffParentRoleIds
+            ],
+            [
+                'roletype' => Role::STUDENT,
+                'type' => 'geosnapshot',
+                'selfEnabled' => true,
+                'visibilities' => $staffParentRoleIds
+            ],
+            /* Should not have self,
+             * Students can't email all staff,
+             * and parents shouldn't email all staff.
+             */
+            [
+                'roletype' => Role::STUDENT,
+                'type' => 'emailstaff',
+                'selfEnabled' => false,
+                'visibilities' => $staffRoleIds
+            ],
+            /* Should not have self,
+             * Parents can't email all parents.
+             */
+            [
+                'roletype' => Role::STUDENT,
+                'type' => 'emailparents',
+                'selfEnabled' => false,
+                'visibilities' => $staffRoleIds
+            ],
+
+            /** Staff profile buttons
+             */
+            [
+                'roletype' => Role::STAFF,
+                'type' => 'eportfolio',
+                'selfEnabled' => false,
+                'visibilities' => $staffRoleIds
+            ],
+            [
+                'roletype' => Role::STAFF,
+                'type' => 'calendar',
+                'selfEnabled' => true,
+                'visibilities' => $staffRoleIds
+            ],
+            [
+                'roletype' => Role::STAFF,
+                'type' => 'timetable',
+                'selfEnabled' => true,
+                'visibilities' => $staffRoleIds
+            ],
+
+            /**
+             * Parent profile buttons
+             */
+            [
+                'roletype' => Role::PARENT,
+                'type' => 'eportfolio',
+                'selfEnabled' => true,
+                'visibilities' => $parentRoleIds
+            ],
+            /* Parents see their own calendar, but nobody else's
+             * I suppose.........
+             */
+            [
+                'roletype' => Role::PARENT,
+                'type' => 'calendar',
+                'selfEnabled' => true,
+                'visibilities' => []
+            ],
+        ];
 
         /* EXCEPT WHEN you're a school with a custom work that removed this button entirely
          * then ensure that we maintain that change.
