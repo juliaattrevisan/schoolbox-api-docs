@@ -341,12 +341,6 @@ HELP;
 
             $profileButtonMapper->save($customButton);
 
-            /* Remove student visibilities
-             */
-            $deleteStatement->execute([
-                'profileButtonId' => $customButton->getId()
-            ]);
-
             $profileButtonId = $customButton->getId();
 
             /* Remove all student roles
