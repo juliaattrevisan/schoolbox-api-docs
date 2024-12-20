@@ -146,14 +146,18 @@ HELP;
                 'type' => 'duework',
                 'selfEnabled' => 1,
                 'visibilities' => $staffParentRoleIds,
-                'exclusions' => [],
+                'exclusions' => [
+                    'geegrs', 'lgs', 'staloy'
+                ],
             ],
             [
                 'roletype' => Role::STUDENT,
                 'type' => 'grades',
                 'selfEnabled' => 1,
                 'visibilities' => $staffParentRoleIds,
-                'exclusions' => [],
+                'exclusions' => [
+                    'wsl', 'geegrs', 'lgs'
+                ],
             ],
             [
                 'roletype' => Role::STUDENT,
@@ -174,7 +178,9 @@ HELP;
                 'type' => 'timetable',
                 'selfEnabled' => 1,
                 'visibilities' => $staffParentRoleIds,
-                'exclusions' => [],
+                'exclusions' => [
+                    'scecgs'
+                ],
             ],
             [
                 'roletype' => Role::STUDENT,
