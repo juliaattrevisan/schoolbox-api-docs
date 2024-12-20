@@ -108,6 +108,14 @@ HELP;
          */
         $schoolCode = strtolower($this->getConfig()->get('site_school_code'));
 
+        /* Everyone
+         */
+        $allRoleIds = $this->helper->fetchRoleIds([
+            Role::STAFF,
+            Role::PARENT,
+            Role::STUDENT
+        ]);
+
         /* Staff users, and parents of the student
          */
         $staffParentRoleIds = $this->helper->fetchRoleIds([
@@ -138,7 +146,7 @@ HELP;
                 'roletype' => Role::STUDENT,
                 'type' => 'eportfolio',
                 'selfEnabled' => 1,
-                'visibilities' => $staffParentRoleIds,
+                'visibilities' => $allRoleIds,
                 'exclusions' => [],
             ],
             [
@@ -224,7 +232,7 @@ HELP;
                 'roletype' => Role::STAFF,
                 'type' => 'eportfolio',
                 'selfEnabled' => 0,
-                'visibilities' => $staffRoleIds,
+                'visibilities' => $allRoleIds,
                 'exclusions' => [],
             ],
             [
@@ -249,7 +257,7 @@ HELP;
                 'roletype' => Role::PARENT,
                 'type' => 'eportfolio',
                 'selfEnabled' => 1,
-                'visibilities' => $parentRoleIds,
+                'visibilities' => $allRoleIds,
                 'exclusions' => [],
             ],
             /* Parents see their own calendar, but nobody else's
@@ -315,6 +323,47 @@ HELP;
 
             $this->helper->createButtonRoleVisibility($profileButtonId, $systemButton['visibilities']);
         }
+
+        $customButtons = $profileButtonMapper->findByColumnList([
+            'roletype' => Role::STUDENT,
+            'type' => 'custom'
+        ]);
+
+        foreach ($customButtons as $customButton) {
+            $this->getLogger()->info(sprintf(
+                'Custom button %s receiving SELF reassignment',
+                $customButton->getText()
+            ));
+
+            /* Update visibility to include SELF etc.
+             */
+            $customButton->setSelfEnabled(1);
+
+            $profileButtonMapper->save($customButton);
+
+            /* Remove student visibilities
+             */
+            $deleteStatement->execute([
+                'profileButtonId' => $customButton->getId()
+            ]);
+
+            $profileButtonId = $customButton->getId();
+
+            /* Remove all student roles
+             */
+            $roleIds = implode(',', $this->helper->fetchRoleIds([
+                Role::STUDENT
+            ]));
+
+            if ('' !== $roleIds) {
+                $this->getDatabaseInternal()->executeQuery("
+                    DELETE FROM profile_button_role_visibility
+                    WHERE profile_button_id = {$profileButtonId}
+                    AND role_id IN ({$roleIds})
+                ");
+            }
+        }
+
 
         /* Announce lock release
          */
