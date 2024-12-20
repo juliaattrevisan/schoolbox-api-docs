@@ -127,49 +127,57 @@ HELP;
                 'roletype' => Role::STUDENT,
                 'type' => 'eportfolio',
                 'selfEnabled' => true,
-                'visibilities' => $staffParentRoleIds
+                'visibilities' => $staffParentRoleIds,
+                'exclusions' => [],
             ],
             [
                 'roletype' => Role::STUDENT,
                 'type' => 'duework',
                 'selfEnabled' => true,
-                'visibilities' => $staffParentRoleIds
+                'visibilities' => $staffParentRoleIds,
+                'exclusions' => [],
             ],
             [
                 'roletype' => Role::STUDENT,
                 'type' => 'grades',
                 'selfEnabled' => true,
-                'visibilities' => $staffParentRoleIds
+                'visibilities' => $staffParentRoleIds,
+                'exclusions' => [],
             ],
             [
                 'roletype' => Role::STUDENT,
                 'type' => 'pastoral',
                 'selfEnabled' => true,
-                'visibilities' => $staffParentRoleIds
+                'visibilities' => $staffParentRoleIds,
+                'exclusions' => [],
             ],
             [
                 'roletype' => Role::STUDENT,
                 'type' => 'calendar',
                 'selfEnabled' => true,
-                'visibilities' => $staffParentRoleIds
+                'visibilities' => $staffParentRoleIds,
+                'exclusions' => [],
             ],
             [
                 'roletype' => Role::STUDENT,
                 'type' => 'timetable',
                 'selfEnabled' => true,
-                'visibilities' => $staffParentRoleIds
+                'visibilities' => $staffParentRoleIds,
+                'exclusions' => [],
             ],
             [
                 'roletype' => Role::STUDENT,
                 'type' => 'documentmanagement',
                 'selfEnabled' => true,
-                'visibilities' => $staffParentRoleIds
+                'visibilities' => $staffParentRoleIds,
+                'exclusions' => [],
             ],
             [
                 'roletype' => Role::STUDENT,
                 'type' => 'geosnapshot',
                 'selfEnabled' => true,
-                'visibilities' => $staffParentRoleIds
+                'visibilities' => $staffParentRoleIds,
+                'exclusions' => [],
             ],
             /* Should not have self,
              * Students can't email all staff,
@@ -179,7 +187,8 @@ HELP;
                 'roletype' => Role::STUDENT,
                 'type' => 'emailstaff',
                 'selfEnabled' => false,
-                'visibilities' => $staffRoleIds
+                'visibilities' => $staffRoleIds,
+                'exclusions' => [],
             ],
             /* Should not have self,
              * Parents can't email all parents.
@@ -188,7 +197,8 @@ HELP;
                 'roletype' => Role::STUDENT,
                 'type' => 'emailparents',
                 'selfEnabled' => false,
-                'visibilities' => $staffRoleIds
+                'visibilities' => $staffRoleIds,
+                'exclusions' => [],
             ],
 
             /** Staff profile buttons
@@ -197,19 +207,22 @@ HELP;
                 'roletype' => Role::STAFF,
                 'type' => 'eportfolio',
                 'selfEnabled' => false,
-                'visibilities' => $staffRoleIds
+                'visibilities' => $staffRoleIds,
+                'exclusions' => [],
             ],
             [
                 'roletype' => Role::STAFF,
                 'type' => 'calendar',
                 'selfEnabled' => true,
-                'visibilities' => $staffRoleIds
+                'visibilities' => $staffRoleIds,
+                'exclusions' => [],
             ],
             [
                 'roletype' => Role::STAFF,
                 'type' => 'timetable',
                 'selfEnabled' => true,
-                'visibilities' => $staffRoleIds
+                'visibilities' => $staffRoleIds,
+                'exclusions' => [],
             ],
 
             /**
@@ -219,7 +232,8 @@ HELP;
                 'roletype' => Role::PARENT,
                 'type' => 'eportfolio',
                 'selfEnabled' => true,
-                'visibilities' => $parentRoleIds
+                'visibilities' => $parentRoleIds,
+                'exclusions' => [],
             ],
             /* Parents see their own calendar, but nobody else's
              * I suppose.........
@@ -228,7 +242,8 @@ HELP;
                 'roletype' => Role::PARENT,
                 'type' => 'calendar',
                 'selfEnabled' => true,
-                'visibilities' => []
+                'visibilities' => [],
+                'exclusions' => [],
             ],
         ];
 
