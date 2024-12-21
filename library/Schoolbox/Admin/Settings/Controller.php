@@ -417,8 +417,8 @@ class Controller extends ConfigController
                 return $user->hasServicePermission(UserAccess::SERVICE_LMS, UserAccess::ACCESS_FULL);
 
             default:
-                // Of the other possible values for `config`.`module`, only 'oauth' has a corresponding /adminv2/$module page.
-                // That page is accessible by superusers only, and superusers have been handled above.
+                // Of the other possible values for `config`.`module`, only 'oauth' and 'feature-tours' have a corresponding /adminv2/$module page.
+                // Both those pages are accessible by superusers only, and superusers have been handled above.
                 // So do nothing here.
         }
 
