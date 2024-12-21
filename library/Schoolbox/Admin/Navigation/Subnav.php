@@ -771,11 +771,6 @@ class Subnav
                         'visible'     => true,
                         'description' => 'Configure an oAuth endpoint to validate tokens provided by mobile apps.',
                     ],
-                    '/adminv2/setting/Paths' => [
-                        'name'        => 'Paths',
-                        'visible'     => count($enabledConfigs[ConfigMapper::TYPE_PATHS] ?? []) > 0,
-                        'description' => 'Displays the location where files are stored on disk.',
-                    ],
                     '/adminv2/setting/Policy' => [
                         'name'        => 'Policy',
                         'visible'     => count($enabledConfigs[ConfigMapper::TYPE_POLICY] ?? []) > 0,

@@ -4,3 +4,5 @@ UPDATE config SET module='feature-tours' WHERE name='tours_enabled';
 
 # Hide two options that do not exist on any Admin pages.
 UPDATE config SET hidden='true' WHERE name IN ('purifier_cache_dir', 'twig_cache_dir');
+
+UPDATE config SET hidden='true' WHERE type_id = (SELECT id FROM lu_config_type WHERE type = 'Paths');
