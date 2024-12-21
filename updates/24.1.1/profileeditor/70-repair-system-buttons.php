@@ -324,6 +324,9 @@ HELP;
             $this->helper->createButtonRoleVisibility($profileButtonId, $systemButton['visibilities']);
         }
 
+        /* Process all the user-manufactured custom buttons, enabling SELF
+         * instead of all the student roles which we did mistakenly
+         */
         $customButtons = $profileButtonMapper->findByColumnList([
             'roletype' => Role::STUDENT,
             'type' => 'custom'
@@ -350,6 +353,12 @@ HELP;
             ]));
 
             if ('' !== $roleIds) {
+                $this->getLogger()->info(sprintf(
+                    'Custom button %s removing role ids %s from visibilities',
+                    $customButton->getText(),
+                    $roleIds
+                ));
+
                 $this->getDatabaseInternal()->executeQuery("
                     DELETE FROM profile_button_role_visibility
                     WHERE profile_button_id = {$profileButtonId}
@@ -357,7 +366,6 @@ HELP;
                 ");
             }
         }
-
 
         /* Announce lock release
          */
