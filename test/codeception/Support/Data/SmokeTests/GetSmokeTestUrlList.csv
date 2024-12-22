@@ -51,7 +51,6 @@ Admin,System Settings External DB,https://vagrant.dev.schoolbox.cloud/adminv2/se
 Admin,System Settings LDAP,https://vagrant.dev.schoolbox.cloud/adminv2/setting/LDAP
 Admin,System Settings Localisation,https://vagrant.dev.schoolbox.cloud/adminv2/setting/Localisation
 Admin,Configure oAuth providers,https://vagrant.dev.schoolbox.cloud/adminv2/oauth
-Admin,System Settings Paths,https://vagrant.dev.schoolbox.cloud/adminv2/setting/Paths
 Admin,System Settings Policy,https://vagrant.dev.schoolbox.cloud/adminv2/setting/Policy
 Admin,System Settings Proxy,https://vagrant.dev.schoolbox.cloud/adminv2/setting/Proxy
 Admin,System Settings SAML,https://vagrant.dev.schoolbox.cloud/adminv2/setting/SAML

@@ -454,10 +454,6 @@ Admin,"Configure oAuth providers",Superuser,https://vagrant.dev.schoolbox.cloud/
 Admin,"Configure oAuth providers",Teacher,https://vagrant.dev.schoolbox.cloud/adminv2/oauth,401
 Admin,"Configure oAuth providers",Student,https://vagrant.dev.schoolbox.cloud/adminv2/oauth,401
 Admin,"Configure oAuth providers",Parent,https://vagrant.dev.schoolbox.cloud/adminv2/oauth,401
-Admin,"System Settings Paths",Superuser,https://vagrant.dev.schoolbox.cloud/adminv2/setting/Paths,200
-Admin,"System Settings Paths",Teacher,https://vagrant.dev.schoolbox.cloud/adminv2/setting/Paths,401
-Admin,"System Settings Paths",Student,https://vagrant.dev.schoolbox.cloud/adminv2/setting/Paths,401
-Admin,"System Settings Paths",Parent,https://vagrant.dev.schoolbox.cloud/adminv2/setting/Paths,401
 Admin,"System Settings Policy",Superuser,https://vagrant.dev.schoolbox.cloud/adminv2/setting/Policy,200
 Admin,"System Settings Policy",Teacher,https://vagrant.dev.schoolbox.cloud/adminv2/setting/Policy,401
 Admin,"System Settings Policy",Student,https://vagrant.dev.schoolbox.cloud/adminv2/setting/Policy,401
