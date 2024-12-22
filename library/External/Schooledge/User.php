@@ -234,7 +234,7 @@ class External_Schooledge_User implements External_UserInterface
          */
         $result['StudentBoarder'] = $this->determineBoarderType((string)$result['StudentBoarder']);
 
-        /* Forcibly obey External_UserInterface
+        /* There are no alerts in Schooledge, just initialise the stacks
          */
         $result['AlertMessage'] = [];
         $result['AlertLegal'] = [];

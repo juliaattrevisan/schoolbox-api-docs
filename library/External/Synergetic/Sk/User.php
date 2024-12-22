@@ -7,6 +7,8 @@
 
 declare(strict_types=1);
 
+use Schoolbox\External\Connector\AllMeaningfulValues;
+
 /**
  * Gets the international student data in sk
  */
@@ -154,13 +156,8 @@ class External_Synergetic_Sk_User extends External_Synergetic_User
         /* Uniquify both AlertMessage and AlertLegal nodes since they might dupe
          * as a result of those left joins in the mega query
          */
-        if (!empty($student) && is_array($student['AlertMessage'])) {
-            $student['AlertMessage'] = array_unique(array_filter($student['AlertMessage']));
-        }
-
-        if (!empty($student) && is_array($student['AlertLegal'])) {
-            $student['AlertLegal'] = array_unique(array_filter($student['AlertLegal']));
-        }
+        $student['AlertMessage'] = array_unique(AllMeaningfulValues::find($student['AlertMessage']));
+        $student['AlertLegal'] = array_unique(AllMeaningfulValues::find($student['AlertLegal']));
 
         // Remove Synergetic's annoying 'Not Selected' default value for lookups
 

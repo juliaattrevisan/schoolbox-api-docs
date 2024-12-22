@@ -12,6 +12,7 @@ declare(strict_types=1);
 
 use Alaress\Database\Connector\IConnector;
 use Schoolbox\Database\Factory;
+use Schoolbox\External\Connector\AllMeaningfulValues;
 use Schoolbox\External\Connector\Pcschools\QueryHelper;
 use Schoolbox\External\Connector\Pcschools\QueryHelper\Freedom;
 use Schoolbox\External\Connector\Pcschools\QueryHelper\IQueryHelper;
@@ -86,13 +87,10 @@ class External_Pcschools_User implements External_UserInterface
             $row['StudentBoarder'] = in_array($row['StudentBoarder'], $boarderCodes) ? 'Y' : 'N';
         }
 
-        /* Forcibly obey External_UserInterface
+        /* Assign alert messages to the right places and filter out empty values
+         * There can only be one AlertMessage in this connector per user
          */
-
-        /* Filter out ' ' and falsey values so we don't show empty alerts.
-         * PCSchools seems to send us a ' ' for empty alerts.
-         */
-        $row['AlertMessage'] = array_filter([trim((string)$row['AlertMessage'])]);
+        $row['AlertMessage'] = AllMeaningfulValues::find([$row['AlertMessage']]);
         $row['AlertLegal'] = [];
 
         return $row;

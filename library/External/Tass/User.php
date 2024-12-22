@@ -213,7 +213,7 @@ class External_Tass_User implements External_UserInterface
          */
         $student['StudentBoarder'] = $this->determineBoarderType((string)$student['StudentBoarder']);
 
-        /* Forcibly obey External_UserInterface
+        /* There are no alert messages in Tass, just initialise the stacks
          */
         $student['AlertMessage'] = [];
         $student['AlertLegal'] = [];
