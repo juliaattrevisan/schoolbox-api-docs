@@ -365,7 +365,8 @@ export default class Common {
      * @param text - the text to verify
      */
     async assertNotifNotExists(text: string): Promise<void> {
-        const notification = await this.findNotification(text, false);
+        // only retry once, since we're expecting it to not exist
+        const notification = await this.findNotification(text, false, 1);
         await expect(notification).toHaveCount(0);
     }
 
