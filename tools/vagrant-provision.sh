@@ -464,3 +464,6 @@ fi
 
 # update all dates to current time
 "$SITE_ROOT"/tools/increment-instance-dates.php;
+
+# Clean up vcal cache
+"$SITE_ROOT"/tools/redis/removeVcalCache.php;
