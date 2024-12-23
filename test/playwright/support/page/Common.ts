@@ -406,4 +406,32 @@ export default class Common {
 
         return formattedDate;
     }
+
+    /**
+     * Convert a Date object to a string in the format "dd-mm-yyyy" or "dd-mm-yyyy HH:mm:ss"
+     * This is the expected format for the database of schoolbox
+     * @param date - the date to convert
+     * @param includeTime - whether to include the time in the string
+     * @returns - the formatted date/datetime string
+     */
+    static formatDateDB(date: Date, includeTime: boolean): string {
+        const zeroPad = (num: number): string => num.toString().padStart(2, "0");
+
+        const day = zeroPad(date.getDate());
+        const month = zeroPad(date.getMonth() + 1); // getMonth() returns 0-11
+        const year = date.getFullYear();
+
+        let formattedDate = `${year}-${month}-${day}`;
+
+        if (includeTime) {
+            const hours = zeroPad(date.getHours());
+            const minutes = zeroPad(date.getMinutes());
+            const seconds = zeroPad(date.getSeconds());
+
+            const formattedTime = `${hours}:${minutes}:${seconds}`;
+            formattedDate += ` ${formattedTime}`;
+        }
+
+        return formattedDate;
+    }
 }
