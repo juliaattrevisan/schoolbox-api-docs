@@ -197,13 +197,13 @@ abstract class Evaluation_Section extends DeprecatedModel
      * Gets the first Section in this Assess.
      *
      * @param int $assess_id
-     * @return array
+     * @return array|null
      */
     public function getFirst($assess_id)
     {
         $allSections = $this->getList($assess_id);
 
-        return $allSections[0];
+        return $allSections[0] ?? null;
     }
 
     /**
