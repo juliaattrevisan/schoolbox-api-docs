@@ -10,6 +10,7 @@ namespace Schoolbox\Curriculum\Api\Usage;
 use Alaress\Authorizer\Rule;
 use Alaress\Module\Module as BaseModule;
 use Alaress\Web\Controller\Base;
+use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Curriculum\Node\Mapper;
 use Schoolbox\Learning\Course\DataModel\Specification as CourseSpec;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit as UnitSpec;
@@ -52,11 +53,12 @@ class Module extends BaseModule
     {
         return new Controller(
             $this->injector->get('databaseInternal'),
+            $this->getMapperFactory()->get(ConfigMapper::class),
             $this->getMapperFactory()->get(Folder\Mapper::class),
             $this->getMapperFactory()->get(CourseSpec\Mapper::class),
             $this->getMapperFactory()->get(UnitSpec\Mapper::class),
             $this->injector->get('assessmentDataSource'),
-            new Counter($this->injector->get('databaseInternal')),
+            new Counter($this->injector->get('databaseInternal'), $this->getMapperFactory()->get(ConfigMapper::class)),
             $this->getMapperFactory()->get(\Schoolbox\Learning\Badge\Mapper::class),
         );
     }

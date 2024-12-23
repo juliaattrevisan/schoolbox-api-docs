@@ -11,6 +11,7 @@ namespace Schoolbox\Curriculum\Api\Usage;
 
 use Alaress\Database\Connector\IConnector;
 use Alaress\Database\Predicate\Builder;
+use Schoolbox\Config\ConfigMapper;
 
 /**
  * Counter class for fetching counts of curriculum node usages.
@@ -22,7 +23,7 @@ class Counter
      *
      * @param IConnector $database The database connection to fetch from.
      */
-    public function __construct(private IConnector $database)
+    public function __construct(private IConnector $database, private ConfigMapper $configMapper)
     {
     }
 
@@ -99,6 +100,9 @@ class Counter
                 JOIN badge b on (cb.badge_id = b.id AND b.deleted_at IS NULL)
                 WHERE cb.curriculum_node_id IN "
             . Builder::getArrayPlaceholders($ids, Cursor::DISCRIMINATOR_BADGE)
+            . " AND (
+                    SELECT value FROM {$this->configMapper->getTable()} WHERE name = :badgesEnabled AND value = 1
+                ) IS NOT NULL"
             . " GROUP BY cb.curriculum_node_id, discriminator",
         ];
         $queryString = '(' . implode(') UNION ALL (', $selectParts) . ')';
@@ -111,6 +115,7 @@ class Counter
             'assessmentDiscriminator' => Cursor::DISCRIMINATOR_ASSESSMENT,
             'folderDiscriminator'     => Cursor::DISCRIMINATOR_FOLDER,
             'badgeDiscriminator'      => Cursor::DISCRIMINATOR_BADGE,
+            'badgesEnabled'           => $this->configMapper::NAME_BADGES_ENABLED,
         ];
         $params += Builder::getArrayParameters($ids, Cursor::DISCRIMINATOR_COURSE);
         $params += Builder::getArrayParameters($ids, Cursor::DISCRIMINATOR_UNIT);

@@ -15,6 +15,7 @@ use Alaress\Database\Connector\IConnector;
 use PDO;
 use Schoolbox\API\Cursor\ICursor;
 use Schoolbox\Collection;
+use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Curriculum\Node;
 use ValueError;
 
@@ -90,6 +91,7 @@ class Cursor implements ICursor
      */
     public function __construct(
         private IConnector $database,
+        private ConfigMapper $configMapper,
         private Node\Model $node,
         private Counter $counter,
         private int $limit,
@@ -195,7 +197,9 @@ class Cursor implements ICursor
                     b.name AS name
                 FROM curriculum_badge cb
                 JOIN badge b on (cb.badge_id = b.id AND b.deleted_at IS NULL)
-                WHERE cb.curriculum_node_id = :badgeCurriculumNodeId
+                WHERE cb.curriculum_node_id = :badgeCurriculumNodeId AND (
+                    SELECT value FROM {$this->configMapper->getTable()} WHERE name = :badgesEnabled AND value = 1
+                ) IS NOT NULL
             ",
             "
                 SELECT
@@ -226,6 +230,7 @@ class Cursor implements ICursor
             'folderCurriculumNodeId'     => $this->node->getId(),
             'badgeDiscriminator'         => self::DISCRIMINATOR_BADGE,
             'badgeCurriculumNodeId'      => $this->node->getId(),
+            'badgesEnabled'              => $this->configMapper::NAME_BADGES_ENABLED,
         ];
 
         // Figure out a WHERE part
