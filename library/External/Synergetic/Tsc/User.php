@@ -152,8 +152,8 @@ class External_Synergetic_Tsc_User extends External_Synergetic_User
         /* Uniquify both AlertMessage and AlertLegal nodes since they might dupe
          * as a result of those left joins in the mega query
          */
-        $student['AlertMessage'] = AllMeaningfulValues::findUnique($student['AlertMessage']);
-        $student['AlertLegal'] = AllMeaningfulValues::findUnique($student['AlertLegal']);
+        $student['AlertMessage'] = AllMeaningfulValues::findUnique($student['AlertMessage'] ?? []);
+        $student['AlertLegal'] = AllMeaningfulValues::findUnique($student['AlertLegal'] ?? []);
 
         /* Arbitrarily find the Learning Enrichment Case Manager via
          * their external id so we can link them to a profile screen
