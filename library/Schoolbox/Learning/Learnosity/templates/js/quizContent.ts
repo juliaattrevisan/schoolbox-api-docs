@@ -143,7 +143,7 @@ const authorAppCallback = {
             }
         });
 
-        if (window.sbProps.authorApp.sitePlan === "elite") {
+        if (window.sbProps.authorApp.sitePlan !== "elite") {
             authorApp.on("widgetedit:editor:ready", function (event) {
                 /* Artificially wait for their dom
                  */
