@@ -125,7 +125,7 @@ class Controller extends AbstractController
         try {
             $post = $this->requestPost;
 
-            $positions = $this->transposePositionPost($post['positions'] ?? []);
+            $positions = $this->transposePositionPost($post->get('positions', []));
 
             $this->saveSport($entity, $post['name'], $post['url'], $positions);
 
