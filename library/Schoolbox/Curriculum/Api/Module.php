@@ -10,7 +10,6 @@ namespace Schoolbox\Curriculum\Api;
 use Alaress\Authorizer\Rule;
 use Alaress\Module\Module as BaseModule;
 use Alaress\Web\Controller\Base;
-use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Curriculum\Node\Mapper;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Curriculum\Node\Mapper as NodeMapper;
