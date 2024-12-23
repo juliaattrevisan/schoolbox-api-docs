@@ -23,7 +23,6 @@ require __DIR__ . '/../../conf/core/require.php';
  * These keys are temporary, so they can be disposed of safely
  */
 $app = new class extends CliTool\App {
-
     private const PROGRESS_INCREMENTS = 10000;
 
     private int $countVcalCacheDeleted = 0;
