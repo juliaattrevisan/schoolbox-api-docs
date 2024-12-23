@@ -287,6 +287,14 @@
             if (numItems) {
                 $empty.addClass("hide");
                 $list.removeClass("hide");
+
+                /**
+                 * So that on first load, the user can add more items without
+                 * having to modify one first.
+                 */
+                if (canSpawnRow()) {
+                    spawnNewRow();
+                }
             } else {
                 $empty.removeClass("hide");
                 $list.addClass("hide");

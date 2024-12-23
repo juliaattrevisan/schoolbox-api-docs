@@ -180,10 +180,31 @@ export default class Fixture {
         const now = new Date();
         const startAt = Common.formatDate(now, true);
 
-        await this.page.locator("[data-item-add]").click();
-        await this.page.locator('[data-item-list] li input[type="text"]').nth(3).fill(startAt);
-        await this.page.locator('[data-item-list] li input[type="text"]').nth(4).fill("lalala");
-        await this.page.locator("[data-item-add]").click();
+        const initialRowCount = await this.page.locator("[data-item-list] li[data-item]:visible").count();
+
+        // Add itinerary if there are no rows (click the empty state's add button)
+        if (initialRowCount === 0) {
+            await this.page.locator("[data-item-add]").click();
+        }
+
+        const lastDateRow = this.page.locator('[data-item-list] li input[name="itinerary[date][]"]').last();
+        const lastDescriptionRow = this.page
+            .locator('[data-item-list] li input[name="itinerary[description][]"]')
+            .last();
+
+        // Rows should be empty
+        await expect(lastDateRow).toHaveText("");
+        await expect(lastDescriptionRow).toHaveText("");
+
+        // Fill the date and description
+        await lastDateRow.click();
+        await this.page.keyboard.type(startAt);
+        await lastDescriptionRow.click();
+        await this.page.keyboard.type("lalala");
+        await this.page.keyboard.press("Escape");
+
+        // Wait for another row to be added to the itinerary
+        await expect(this.page.locator("[data-item-list] li[data-item]")).toHaveCount(initialRowCount + 1);
 
         await this.page.click('#matchForm [type=submit][value="Modify Match"]');
         await expect(this.page.locator("h1").filter({ hasText: "Seasons" })).toBeVisible();
