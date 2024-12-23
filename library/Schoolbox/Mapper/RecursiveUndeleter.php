@@ -29,6 +29,7 @@ use Alaress\Lumberjack\Logger;
 use Alaress_Date_Format;
 use Component\Eportfolio as ComponentEportfolio;
 use Eportfolio;
+use Schoolbox\Learning\Moment\Evidence\Model;
 use UnexpectedValueException;
 use OutOfBoundsException;
 use Psr\Log\LoggerInterface;
@@ -67,6 +68,7 @@ use Schoolbox\Learning\Quiz\Attempt\Answer as QuizAnswer;
 use Schoolbox\Learning\Quiz\Section as QuizSection;
 use Schoolbox\Learning\Quiz\Section\Question as QuizQuestion;
 use Schoolbox\Learning\Quiz\Section\Question\Solution as QuizSolution;
+use Schoolbox\Learning\Moment\Evidence as Evidence;
 use Schoolbox\Mapper;
 use Schoolbox\Pastoral;
 use Schoolbox\Resource\File;
@@ -271,6 +273,7 @@ class RecursiveUndeleter
         ],
         Discussion\Comment\Mapper::class    => [],
         Eportfolio\PageMapper::class        => [],
+        Evidence\Mapper::class              => [],
         Blog\Homepage\Post\Mapper::class                => [
             Blog\Homepage\Comment\Mapper::class,
             Blog\Homepage\Image\Mapper::class,
