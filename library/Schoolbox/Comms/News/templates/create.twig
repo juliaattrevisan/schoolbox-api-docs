@@ -600,7 +600,7 @@
                             Expiry Date
                         </label>
                         <p class="meta">This article is automatically archived once this expiry date is reached.</p>
-                        <input type="text" name="expiresAt" id="expiresAt" data-datepicker-time data-datesync-startdate="#publishAt" maxlength="50" value="{{ article.expiresAt.local }}" />
+                        <input type="text" name="expiresAt" id="expiresAt" data-datepicker-time data-datesync-startdate="#publishAt" maxlength="50" value="{{ article.expiresAt.local ?? null }}" />
                     </div>
                 </fieldset>
             </section>
