@@ -1,12 +1,11 @@
 # Integration and Smoke Tests
 
-All Codeception integration tests go in this folder. Smoke tests also live here as they do not need the
- webdriver used in acceptance tests.
+All Codeception integration tests go in this folder. Smoke tests also live here.
 
 ## Structure
 
-Same as the structure in acceptance tests, you can see it here:
-[Acceptance Tests](../acceptance/README.md).
+Same as the structure in smoke tests, you can see it here:
+[Smoke Tests](../Smoketests/README.md).
 
 Smoke tests currently live in SmokeTests/
 
@@ -20,9 +19,8 @@ This is to increase the speed of tests.
 
 ### Configuration
 
-Same as acceptance tests as they are all based on the same framework.
-Found in documentation here: [Acceptance Tests](../acceptance/README.md).
-
+Same as smoke tests as they are all based on the same framework.
+Found in documentation here: [Smoke Tests](../Smoketests/README.md).
 
 ### What is covered by the smoke tests
 
@@ -149,4 +147,3 @@ eg.
         $loginPayload->setUsername("fred");
         $loginPayload->setPassword("fredHasAPassword");
         $i->sendCurlRequest($loginPayload, false, "Some message about the action we just took");
-

@@ -126,7 +126,7 @@ For full information on the build process of making a APT package and deploying 
   * [For Aura modules](./docs/custom/custom-templates-for-aura-modules.md)
   * [Outside Aura modules](./docs/custom/custom-templates-outside-aura-modules.md)
 * Testing:
-  * [Acceptance Tests](./test/codeception/Acceptance/README.md)
+  * [Acceptance Tests](./test/playwright/README.md)
   * [Smoke Tests](./test/codeception/Smoketests/README.md)
   * [Behaviour Tests](./test/behavior/README.md)
   * [Unit Tests](./docs/unit-test.md)

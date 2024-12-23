@@ -221,7 +221,7 @@ Note it is also fine to place what failed directly under the test that failed. A
 ## Tools that help
 
 There are quite a few tests available that can be done as part of the manual QA:
-  * [Acceptance Tests](../../test/codeception/acceptance/README.md)
+  * [Acceptance Tests](../../test/playwright/README.md)
   * [Smoke Tests](../../test/codeception/integration/README.md)
   * [Behaviour Tests](../../test/behavior/README.md)
   * [Unit Tests](../../docs/unit-test.md)

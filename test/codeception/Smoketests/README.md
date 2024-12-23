@@ -1,12 +1,16 @@
 # Smoke Tests
 
-All Codeception integration tests go in this folder. Smoke tests also live here as they do not need the
- webdriver used in acceptance tests.
+All Codeception smoke tests go in this folder. Integration tests also live here.
 
 ## Structure
 
-Same as the structure in acceptance tests, you can see it here:
-[Acceptance Tests](./test/codeception/acceptance/README.md).
+    ../_data/ # not sure yet
+    ../_output/ # logs and screenshots of runs
+    ../_support/ # custom steps for scenarios?
+    ../bin/
+        phantomjs/ # created by phantomjs-server.sh
+        phantomjs-server.sh
+    *Cest.php # individual test scenarios
 
 ## Running tests
 
@@ -14,8 +18,21 @@ Currently smoke tests use the Integration set of helpers and modules, needs to b
 
 ### Configuration
 
-Same as acceptance tests as they are all based on the same framework.
-Found in documentation here: [Acceptance Tests](./test/codeception/acceptance/README.md).
+Base configuration is stored in `codeception.dist.yml` within the project's
+root folder.
+
+You may provide your own overrides by adding them to `codeception.yml`. This
+file is in `.gitignore`, so should not be committed to the base repository.
+
+> An example override is if you do not want to delete records of successful
+  test runs:
+>
+>     extensions:
+>         enabled:
+>             - Codeception\Extension\Recorder:
+>                 delete_successful: false
+
+### What is covered by the smoke tests
 
 ### Codeception test
 
