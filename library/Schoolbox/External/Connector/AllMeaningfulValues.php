@@ -27,7 +27,7 @@ namespace Schoolbox\External\Connector;
 class AllMeaningfulValues
 {
     /**
-     * Find the first meaningful value from a given set of scalars
+     * Find all meaningful values from a given set of scalars
      *
      * Returns all values as trimmed strings, ready for ramming into suds
      *
@@ -63,5 +63,16 @@ class AllMeaningfulValues
         /* Return the filtered list, possibly empty
          */
         return $temp;
+    }
+
+    /**
+     * Find all unique meaningful values from a given set of scalars
+     *
+     * @param array $values
+     * @return array
+     */
+    public static function findUnique(array $values): array
+    {
+        return array_unique(self::find($values));
     }
 }

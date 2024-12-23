@@ -149,8 +149,8 @@ class External_Synergetic_Mc_User extends External_Synergetic_User
         /* Uniquify both AlertMessage and AlertLegal nodes since they might dupe
          * as a result of those left joins in the mega query
          */
-        $student['AlertMessage'] = array_unique(AllMeaningfulValues::find($student['AlertMessage']));
-        $student['AlertLegal'] = array_unique(AllMeaningfulValues::find($student['AlertLegal']));
+        $student['AlertMessage'] = AllMeaningfulValues::findUnique($student['AlertMessage']);
+        $student['AlertLegal'] = AllMeaningfulValues::findUnique($student['AlertLegal']);
 
         /* Get the Chesed Community Service data separately
          * Sometimes it's one row, sometimes not, plus it's easier to debug

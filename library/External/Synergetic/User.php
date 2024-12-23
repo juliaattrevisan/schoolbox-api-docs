@@ -406,8 +406,8 @@ class External_Synergetic_User implements External_UserInterface
         /* Uniquify both AlertMessage and AlertLegal nodes since they might dupe
          * as a result of those left joins in the mega query
          */
-        $student['AlertMessage'] = array_unique(AllMeaningfulValues::find($student['AlertMessage']));
-        $student['AlertLegal'] = array_unique(AllMeaningfulValues::find($student['AlertLegal']));
+        $student['AlertMessage'] = AllMeaningfulValues::findUnique($student['AlertMessage']);
+        $student['AlertLegal'] = AllMeaningfulValues::findUnique($student['AlertLegal']);
 
         // Remove Synergetic's annoying 'Not Selected' default value for lookups
 

@@ -37,12 +37,14 @@ class AllMeaningfulValuesTest extends TestCase
 {
     /**
      * @param array  $input
-     * @param array $expected
+     * @param array $expectedA - Use ::find() to find all meaningful values
+     * @param array $expectedB - Use ::findUnique() to find all unique meaningful values
      */
     #[\PHPUnit\Framework\Attributes\DataProvider('providerValidMeaningfulValue')]
-    public function testValidMeaningfulValue(array $input, array $expected)
+    public function testValidMeaningfulValue(array $input, array $expectedA, array $expectedB)
     {
-        $this->assertEquals($expected, AllMeaningfulValues::find($input));
+        $this->assertEquals($expectedA, AllMeaningfulValues::find($input));
+        $this->assertEquals($expectedB, AllMeaningfulValues::findUnique($input));
     }
 
 
@@ -59,33 +61,45 @@ class AllMeaningfulValuesTest extends TestCase
              */
             'Valid Example 1' => [
                 [],
+                [],
                 []
             ],
 
             'Valid Example 2' => [
                 [ null, null, '', '     ' ],
+                [],
                 []
             ],
 
             'Valid Example 3' => [
                 [ null, null, '', '     ', 0 ],
+                [ '0' ],
                 [ '0' ]
             ],
 
             'Valid Example 4' => [
                 [ null, null, '', '     ', 0, 'cat', 'horse', '0' ],
-                [ '0', 'cat', 'horse', '0' ]
+                [ '0', 'cat', 'horse', '0' ],
+                [ '0', 'cat', 'horse' ]
             ],
 
             'Valid Example 5' => [
                 [ null, null, '', '     ', 'cat', 'horse', 19478 ],
+                [ 'cat', 'horse', '19478' ],
                 [ 'cat', 'horse', '19478' ]
             ],
 
             'Valid Example 6' => [
                 [ 'cat', 'blue russian cat', 'horse', 19478 ],
+                [ 'cat', 'blue russian cat', 'horse', '19478' ],
                 [ 'cat', 'blue russian cat', 'horse', '19478' ]
             ],
+
+            'Valid Example 7' => [
+                [ 'a', 'a', 'a', 'a' ],
+                [ 'a', 'a', 'a', 'a' ],
+                [ 'a' ]
+            ]
         ];
     }
 }
