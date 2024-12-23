@@ -96,7 +96,7 @@ class Component_Homepage_PinterestController extends Component_Homepage_Controll
                     'empty_state_block'         => '',
                     'has_pinterest_user_block'  => '',
                     'has_pinterest_board_block' => '',
-                    'PINTEREST_URL'             => $this->getConfig('url'),
+                    'PINTEREST_URL'             => Scrub::text($this->getConfig('url')),
                 ]
             );
 
