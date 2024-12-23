@@ -3,13 +3,4 @@
     value:         string
     required:      bool
 #}
-{% extends '@settings/fieldTypeBase.twig' %}
-{% block inputElement %}
-    <input id="{{ name }}-field"
-        {{ required ? 'required ' }}
-        type="{{ inputType ?? 'text' }}"
-        name="{{ name }}"
-        value="{{ value }}"
-        {% if not editable %}disabled="disabled"{% endif %}
-    />
-{% endblock %}
+{% extends '@settings/fieldType/input.twig' %}
