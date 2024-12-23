@@ -11,7 +11,6 @@ use Alaress\Database\Connector\IConnector;
 use Alaress\HTMLPurifier\Adapter\ScrubAdapter;
 use Alaress\Web\Controller\Base;
 use Schoolbox\Cdn\PrefixGenerator;
-use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Curriculum\Node;
 use Schoolbox\Learning\Assessment;
 use Schoolbox\Learning\Badge\Translator\Links as BadgeLinksTranslator;
@@ -37,7 +36,6 @@ class Controller extends Base
      */
     public function __construct(
         private IConnector $database,
-        private ConfigMapper $configMapper,
         private Folder\Mapper $folderMapper,
         private CourseSpec\Mapper $courseSpecMapper,
         private UnitSpec\Mapper $unitSpecMapper,
@@ -61,7 +59,7 @@ class Controller extends Base
         // Fetch usage
         $encodedCursor = $this->requestQuery->get('cursor');
         $limit         = $this->requestQuery->getInt('limit', Cursor::LIMIT_DEFAULT);
-        $cursor        = new Cursor($this->database, $this->configMapper, $node, $this->counter, $limit, null);
+        $cursor        = new Cursor($this->database, $this->getConfigLoader(), $node, $this->counter, $limit, null);
         $data          = $cursor->retrieveResults($encodedCursor);
 
         // I can't create this in the module because a user object is required,

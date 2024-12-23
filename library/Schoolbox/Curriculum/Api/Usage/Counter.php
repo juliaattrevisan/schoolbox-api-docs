@@ -12,6 +12,7 @@ namespace Schoolbox\Curriculum\Api\Usage;
 use Alaress\Database\Connector\IConnector;
 use Alaress\Database\Predicate\Builder;
 use Schoolbox\Config\ConfigMapper;
+use Schoolbox\IConfigLoader;
 
 /**
  * Counter class for fetching counts of curriculum node usages.
@@ -21,9 +22,10 @@ class Counter
     /**
      * Constructor
      *
-     * @param IConnector $database The database connection to fetch from.
+     * @param IConnector    $database     The database connection to fetch from.
+     * @param IConfigLoader $configLoader The config settings
      */
-    public function __construct(private IConnector $database, private ConfigMapper $configMapper)
+    public function __construct(private IConnector $database, private IConfigLoader $configLoader)
     {
     }
 
@@ -92,36 +94,37 @@ class Counter
                 AND cnfc.curriculum_node_id IN "
                 . Builder::getArrayPlaceholders($ids, Cursor::DISCRIMINATOR_FOLDER)
                 . " GROUP BY id, discriminator",
-            " SELECT
+        ];
+        $params = [];
+        if ($this->configLoader->get(ConfigMapper::NAME_BADGES_ENABLED)) {
+            $selectParts[] = " SELECT
                     cb.curriculum_node_id AS id,
                     :badgeDiscriminator AS discriminator,
                     COUNT(*) AS count
                 FROM curriculum_badge cb
                 JOIN badge b on (cb.badge_id = b.id AND b.deleted_at IS NULL)
                 WHERE cb.curriculum_node_id IN "
-            . Builder::getArrayPlaceholders($ids, Cursor::DISCRIMINATOR_BADGE)
-            . " AND (
-                    SELECT value FROM {$this->configMapper->getTable()} WHERE name = :badgesEnabled AND value = 1
-                ) IS NOT NULL"
-            . " GROUP BY cb.curriculum_node_id, discriminator",
-        ];
+                . Builder::getArrayPlaceholders($ids, Cursor::DISCRIMINATOR_BADGE)
+                . " GROUP BY cb.curriculum_node_id, discriminator";
+
+            $params += ["badgeDiscriminator" => Cursor::DISCRIMINATOR_BADGE];
+            $params += Builder::getArrayParameters($ids, Cursor::DISCRIMINATOR_BADGE);
+        }
         $queryString = '(' . implode(') UNION ALL (', $selectParts) . ')';
         $query       = $this->database->prepareQuery($queryString);
 
         // Parameters for the query
-        $params = [
+        $params += [
             'courseDiscriminator'     => Cursor::DISCRIMINATOR_COURSE,
             'unitDiscriminator'       => Cursor::DISCRIMINATOR_UNIT,
             'assessmentDiscriminator' => Cursor::DISCRIMINATOR_ASSESSMENT,
             'folderDiscriminator'     => Cursor::DISCRIMINATOR_FOLDER,
-            'badgeDiscriminator'      => Cursor::DISCRIMINATOR_BADGE,
-            'badgesEnabled'           => $this->configMapper::NAME_BADGES_ENABLED,
         ];
+
         $params += Builder::getArrayParameters($ids, Cursor::DISCRIMINATOR_COURSE);
         $params += Builder::getArrayParameters($ids, Cursor::DISCRIMINATOR_UNIT);
         $params += Builder::getArrayParameters($ids, Cursor::DISCRIMINATOR_ASSESSMENT);
         $params += Builder::getArrayParameters($ids, Cursor::DISCRIMINATOR_FOLDER);
-        $params += Builder::getArrayParameters($ids, Cursor::DISCRIMINATOR_BADGE);
 
         // Run query and compile result
         $result = array_fill_keys(
