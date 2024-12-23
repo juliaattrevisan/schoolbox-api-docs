@@ -21,29 +21,26 @@
             <fieldset class="content">
                 <div class="small-12 columns">
                     <label class="required" for="heading">Title</label>
-                    <p class="meta">Each {{ locale.pastoral }} record created will have this title.</p>
                     <input type="text" name="heading" id="heading" size="35" maxlength="100" required/>
                 </div>
                 <div class="small-12 columns">
                     <label class="required" for="ReportZone">ZIP File</label>
                     <p class="meta">
-                        The ZIP file which contains the files to upload to the created records.
-
-                        Each file within this ZIP which may be attributed to a student will be attached to
-                        their {{ locale.pastoral }} record, as a generally available attachment.
+                        A {{ locale.pastoral }} record will be created for each unique student identifiable within the uploaded ZIP file.
+                        If multiple files provided for a single student, they will be attached together in a single record.
                     </p>
                     {% include 'sub/attachzone.twig' with {attachzone: reportAttachzone} %}
                     <input type="hidden" name="report-file" id="report-file"/>
                 </div>
                 <div class="small-12 columns">
-                    <label class="required" for="template">File path template</label>
+                    <label class="required" for="template">Filename pattern</label>
                     <p class="meta">
-                        The template which was used to generate paths for files within the ZIP file above.
+                        The pattern which was used to generate paths for files within the ZIP file above.
 
-                        [externalId] must be part of this template: that value is used to identify the
+                        [externalId] must be part of this pattern: that value is used to identify the
                         student to which each file should be attributed.
                     </p>
-                    <input type="text" name="template" id="template" size="35" maxlength="100" required pattern=".*\[externalId\].*"/>
+                    <input type="text" name="template" id="template" size="35" maxlength="100" required pattern=".*\[externalId\].*" value="[externalId]/Semester Report - [firstname] [surname].pdf"/>
                 </div>
             </fieldset>
 
