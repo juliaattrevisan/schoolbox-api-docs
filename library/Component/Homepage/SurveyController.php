@@ -129,24 +129,29 @@ class Component_Homepage_SurveyController extends Component_Homepage_ControllerA
                             $attemptStartTime     = strtotime($attempt['start']);
                             $attemptTimeRemaining = $attemptStartTime + $currentSurvey['duration'] - time();
                             $numAttempts  = $attemptHandler->userHasAttempted($currentSurvey['assess_id'], $_SESSION['id']);
+
+                            /* An array containing information about the first viable section in a quiz.
+                             * This might actually be null if there was an attempt, but then the only section that exists
+                             * was deleted afterwards.
+                             */
                             $firstSection = $sectionHandler->getFirst($currentSurvey['assess_id']);
 
                             // If the last assess is not completed provide resume link
-                            if (
-                                !$attempt['finish']
-                                && ($attemptTimeRemaining < 0
-                                    || $currentSurvey['duration'] == Evaluation_Main::UNLIMITED_DURATION
-                                )
-                            ) {
-                                $this->setVar(
-                                    [
+                            if (!$attempt['finish'] && ($attemptTimeRemaining < 0 || $currentSurvey['duration'] == Evaluation_Main::UNLIMITED_DURATION)) {
+                                if ($firstSection) {
+                                    $this->setVar([
                                         'SURVEY_ASSESS_ID'   => $currentSurvey['assess_id'],
                                         'SURVEY_SECTION_ID'  => $firstSection['section_id'],
                                         'SURVEY_FINISH_DATE' => 'In progress',
-                                    ]
-                                );
+                                    ]);
 
-                                $this->parse('resumeLink_block', 'resumeLink');
+                                    $this->parse('resumeLink_block', 'resumeLink');
+                                } else {
+                                    /* Can't resume a quiz whose only section was deleted
+                                     */
+                                    $this->setVar('resumeLink_block', '');
+                                }
+
                                 $this->setVar('surveyLink_block', '');
                                 $this->setVar('surveyNoLink_block', '');
                             } elseif (!(($currentSurvey['max_attempts'] > 0) && ($numAttempts + 1 > $currentSurvey['max_attempts']))) {
@@ -166,14 +171,18 @@ class Component_Homepage_SurveyController extends Component_Homepage_ControllerA
                             /* Find out if you have recently completed an attempt - if so
                              * allow you to review what you just did
                              */
-                            $this->setVar(
-                                [
+                            if ($firstSection) {
+                                $this->setVar([
                                     'SURVEY_ATTEMPT_ID' => $attempt['attempt_id'],
                                     'SURVEY_SECTION_ID' => $firstSection['section_id'],
-                                ]
-                            );
+                                ]);
 
-                            $this->parse('reviewLink_block', 'reviewLink');
+                                $this->parse('reviewLink_block', 'reviewLink');
+                            } else {
+                                /* The $firstSection was deleted: I suppose you can't review this anymore
+                                 */
+                                $this->setVar('reviewLink_block', '');
+                            }
                         } else {
                             // show to everyone unless expired
                             if ((int)strtotime($currentSurvey['finish']) < time()) {

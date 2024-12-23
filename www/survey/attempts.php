@@ -47,6 +47,8 @@ $this->setBlock(TEMPLATE_content, 'attempt', 'attempt_block');
 $this->setBlock(TEMPLATE_content, 'respondent_heading', 'respondent_heading_block');
 $this->setBlock('attempt', 'respondent_name', 'respondent_name_block');
 $this->setBlock('attempt', 'respondent_name_no_link', 'respondent_name_no_link_block');
+$this->setBlock('attempt', 'attempt_review_link', 'attempt_review_link_block');
+$this->setBlock('attempt', 'attempt_review_no_link', 'attempt_review_no_link_block');
 
 /* If not using Anonymous Result, set respondent details
  */
@@ -101,13 +103,27 @@ if (is_array($allAttempts) && count($allAttempts)) {
             'ATTEMPT_FINISH'           => $finishDateValue,
             'ATTEMPT_FINISH_TIMESTAMP' => $finishDate instanceof Alaress_Date_Format ? $finishDate->getUnixTimeStamp() : 0,
             'ATTEMPT_ASSESS_ID'        => $this->arg[0],
-            'ATTEMPT_SECTION_ID'       => $firstSection['section_id'],
             'ATTEMPT_ATTEMPT_ID'       => $currentAttempt['attempt_id'],
             'ON_OFF'                   => $i % 2 ? 'dark' : '',
         ]);
 
+        /* If there's a meaningful attempt, provide a link to it
+         * Otherwise the attempt was invalid or its sections have since been deleted
+         */
+        if ($firstSection) {
+            $this->setVar([
+                'ATTEMPT_SECTION_ID' => $firstSection['section_id'],
+            ]);
+
+            $this->parse('attempt_review_link_block', 'attempt_review_link');
+            $this->setVar('attempt_review_no_link_block', '');
+        } else {
+            $this->setVar('attempt_review_link_block', '');
+            $this->parse('attempt_review_no_link_block', 'attempt_review_no_link');
+        }
+
         /* If not using Anonymous Result, set respondent details
-           */
+         */
         if ($survey['anonymous_result']) {
             $this->setVar('respondent_name_block', '');
             $this->setVar('respondent_name_no_link_block', '');
@@ -125,8 +141,10 @@ if (is_array($allAttempts) && count($allAttempts)) {
         $this->parse('attempt_block', 'attempt', true);
 
         /* Clear children after parsing out the parent
-           */
+         */
         $this->setVar('respondent_name_block', '');
+        $this->setVar('attempt_review_no_link_block', '');
+        $this->setVar('attempt_review_link_block', '');
     }
 } else {
     $this->setBlock(TEMPLATE_content, 'checkbox', 'checkbox_block');
