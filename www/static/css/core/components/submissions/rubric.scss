@@ -435,7 +435,9 @@ table.rb {
 select.letter-grade-select {
     margin-bottom: 0;
 }
-
+.rubric-levels-mobile {
+    display: none; // Hides rubric levels by default in big screens
+}
 @media not print {
     @media #{$medium-down} {
         table.rb.markable {
@@ -542,6 +544,9 @@ select.letter-grade-select {
             .sequencer {
                 margin-bottom: 0.5rem;
             }
+        }
+        .rubric-levels-mobile {
+            display: block !important; // Shows rubric levels in small screens
         }
     }
 
