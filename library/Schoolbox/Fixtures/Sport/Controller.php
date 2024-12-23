@@ -125,7 +125,7 @@ class Controller extends AbstractController
         try {
             $post = $this->requestPost;
 
-            $positions = $this->transposePositionPost($post['positions']);
+            $positions = $this->transposePositionPost($post['positions'] ?? []);
 
             $this->saveSport($entity, $post['name'], $post['url'], $positions);
 
@@ -146,7 +146,7 @@ class Controller extends AbstractController
     {
         $c = $this->getPositionMapper()->createCollection();
 
-        $pCount = count($posPost['id']);
+        $pCount = count($posPost['id'] ?? []);
 
         for ($i = 0; $i < $pCount; ++$i) {
             if (empty($posPost['name'][$i])) {
