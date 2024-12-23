@@ -6,8 +6,8 @@ use Tests\Support\AcceptanceTester;
 
 class DisableNodes
 {
-    public const DISABLE_BUTTON = '[data-test-disable-nodes]';
-    public const CONFIRM_BUTTON = '[data-test-confirm-enable-nodes]';
+    public const DISABLE_BUTTON = '[data-test="disable-nodes"]';
+    public const CONFIRM_BUTTON = '[data-test="confirm-enable-nodes"]';
     private AcceptanceTester $tester;
 
     /**

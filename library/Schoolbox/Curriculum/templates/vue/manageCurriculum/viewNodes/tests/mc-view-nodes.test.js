@@ -52,7 +52,7 @@ beforeEach(async () => {
 });
 
 test("should show only nodes two levels deep", async () => {
-    expect(wrapper.findAllComponents("[data-test-view-node-name]")).toHaveLength(2);
+    expect(wrapper.findAllComponents("[data-test='view-node-name']")).toHaveLength(2);
 });
 
 test("should not show nodes while nodes is loading", async () => {
@@ -97,12 +97,12 @@ test("should show nodes in search results when search is active", async () => {
             },
         ],
     });
-    expect(wrapper.findAllComponents("[data-test-view-node-name]")).toHaveLength(3);
+    expect(wrapper.findAllComponents("[data-test='view-node-name']")).toHaveLength(3);
 });
 
 test("should show currently selected node when search results are cleared", async () => {
     await useSearchStore().$patch({ query: "test query" }); // we just simulate this as results will be empty
     expect(wrapper.element).toHaveTextContent("No Curriculum matches your current search.");
     await wrapper.find("[data-test-clear-search]").trigger("click");
-    expect(wrapper.findAllComponents("[data-test-view-node-name]")).toHaveLength(2);
+    expect(wrapper.findAllComponents("[data-test='view-node-name']")).toHaveLength(2);
 });

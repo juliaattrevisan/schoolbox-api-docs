@@ -52,7 +52,7 @@ const buttonCount = window.Vue.computed(() => {
                 v-if="!store.isReadOnly"
                 href="#create-curriculum"
                 data-interaction="create-curriculum"
-                data-test-toggle-create-curriculum
+                data-test="toggle-create-curriculum"
                 :class="`icon ${addCurriculumStore.isOpen ? 'icon-close' : 'icon-add'}`"
                 title="Create New Curriculum"
                 @click.prevent="onCreateNewSelected"

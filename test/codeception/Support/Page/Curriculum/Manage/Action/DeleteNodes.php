@@ -6,8 +6,8 @@ use Tests\Support\AcceptanceTester;
 
 class DeleteNodes
 {
-    public const DELETE_BUTTON = '[data-test-delete-nodes]';
-    public const CONFIRM_BUTTON = '[data-test-confirm-delete-node]';
+    public const DELETE_BUTTON = '[data-test="delete-nodes"]';
+    public const CONFIRM_BUTTON = '[data-test="confirm-delete-node"]';
     private AcceptanceTester $tester;
 
     /**

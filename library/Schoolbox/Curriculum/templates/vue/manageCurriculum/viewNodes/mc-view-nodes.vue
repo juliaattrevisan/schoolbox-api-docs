@@ -50,7 +50,7 @@ window.Vue.watch(
                 Clear search
             </button>
         </div>
-        <div v-else ref="nodesContainerEl">
+        <div v-else ref="nodesContainerEl" data-test="mc-view-nodes-list">
             <mc-view-node
                 v-for="node in viewNodesStore.nodes"
                 :key="node.id"

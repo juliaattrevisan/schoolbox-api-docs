@@ -227,7 +227,7 @@ const showUsage = window.Vue.computed(() => props.node.id !== UNSET_ID);
                         :depth="props.depth"
                         :title="title"
                         :is-active="isActive"
-                        data-test-view-node-name
+                        data-test="view-node-name"
                     />
                 </div>
                 <div class="inner-containers">
@@ -264,7 +264,7 @@ const showUsage = window.Vue.computed(() => props.node.id !== UNSET_ID);
                     :key="viewNode.id"
                     :node="viewNode"
                     :depth="props.depth + 1"
-                    data-test-view-node
+                    :data-test="`view-node-${viewNode.id}`"
                 />
             </div>
         </div>

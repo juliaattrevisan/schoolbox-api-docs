@@ -75,7 +75,7 @@ function onClearSearchSelected(): void {
                 type="text"
                 :disabled="isDisabled"
                 :placeholder="placeholder"
-                data-test-search-input
+                data-test="search-input"
                 @input="searchStore.query = ($event.target as HTMLInputElement).value /* Fix Android events SA-12170 */"
             />
             <button
@@ -97,10 +97,9 @@ function onClearSearchSelected(): void {
                 id="show-only-enabled"
                 v-model="viewNodesStore.showDisabled"
                 type="checkbox"
-                data-test-show-only-enabled
                 :disabled="props.isDisabled"
             />
-            <label for="show-only-enabled">
+            <label for="show-only-enabled" data-test="show-only-enabled">
                 <span>Shown</span>
                 <span>Hidden</span>
             </label>
