@@ -4,7 +4,7 @@
 import { test } from "@schoolboxTest/playwright/support/integrations";
 import Fixture from "@schoolboxTest/playwright/support/page/fixture/Fixture";
 
-test.describe("Fixture tests", () => {
+test.describe("Fixture match notification tests", () => {
     test.beforeEach(async ({ tester }) => {
         tester.isGoingTo("clear all notifications");
         await tester.runShellCommand(
@@ -13,7 +13,7 @@ test.describe("Fixture tests", () => {
         await tester.loginAsAdmin();
     });
 
-    test("Match Notifications", async ({ tester, page, db }) => {
+    test("Match in the past", async ({ tester, page, db }) => {
         const fixture = new Fixture(tester, page);
 
         tester.isGoingTo("create a match in the past and expect no notification");
@@ -22,11 +22,11 @@ test.describe("Fixture tests", () => {
         const pastFinishDate = new Date(pastStartDate);
         pastFinishDate.setMinutes(pastFinishDate.getMinutes() + 60);
 
-        const matchName1 = "First Test Match";
+        const matchName = "First Test Match";
         await fixture.createMatch(
             db,
             {
-                [Fixture.SELECTOR_NAME]: matchName1,
+                [Fixture.SELECTOR_NAME]: matchName,
                 [Fixture.SELECTOR_START_AT]: pastStartDate,
                 [Fixture.SELECTOR_FINISH_AT]: pastFinishDate,
             },
@@ -38,19 +38,23 @@ test.describe("Fixture tests", () => {
         );
 
         tester.isGoingTo("expect not to recieve a notification as the match is in the past");
-        await fixture.assertNotifNotExists(`You have an upcoming Basketball match ${matchName1}`);
+        await fixture.assertNotifNotExists(`You have an upcoming Basketball match ${matchName}`);
+    });
+
+    test("Match in 24 hours", async ({ tester, page, db }) => {
+        const fixture = new Fixture(tester, page);
 
         tester.isGoingTo("create a match in 24 hours and expect notification");
-        const matchName2 = "Second Test Match";
+        const matchName = "Second Test Match";
         const futureStartDate = new Date();
         futureStartDate.setMinutes(futureStartDate.getMinutes() + 30);
         const futureFinishDate = new Date(futureStartDate);
         futureFinishDate.setMinutes(futureFinishDate.getMinutes() + 90);
 
-        const matchIdA = await fixture.createMatch(
+        const matchId = await fixture.createMatch(
             db,
             {
-                [Fixture.SELECTOR_NAME]: matchName2,
+                [Fixture.SELECTOR_NAME]: matchName,
                 [Fixture.SELECTOR_START_AT]: futureStartDate,
                 [Fixture.SELECTOR_FINISH_AT]: futureFinishDate,
             },
@@ -61,36 +65,40 @@ test.describe("Fixture tests", () => {
             },
         );
 
-        await fixture.assertNotifExists(`You have an upcoming Basketball match ${matchName2}`);
+        await fixture.assertNotifExists(`You have an upcoming Basketball match ${matchName}`);
 
         tester.isGoingTo("match in 24 hours - no change and save - expect no notification");
-        await fixture.updateMatch(matchIdA, {});
-        await fixture.assertNotifNotExists(`Your upcoming Basketball match ${matchName2} has been updated`);
+        await fixture.updateMatch(matchId, {});
+        await fixture.assertNotifNotExists(`Your upcoming Basketball match ${matchName} has been updated`);
 
         tester.isGoingTo("match in 24 hours - change title and save - expect notification");
-        const matchName3 = "Updated Test Match";
-        await fixture.updateMatch(matchIdA, { [Fixture.SELECTOR_NAME]: matchName3 });
-        await fixture.assertNotifExists(`Your upcoming Basketball match ${matchName3} has been updated`);
+        const newMatchName = "Updated Test Match";
+        await fixture.updateMatch(matchId, { [Fixture.SELECTOR_NAME]: newMatchName });
+        await fixture.assertNotifExists(`Your upcoming Basketball match ${newMatchName} has been updated`);
 
         tester.isGoingTo("match in 24 hours - change start time and save - expect notification");
         const updatedStartDateA = new Date();
         updatedStartDateA.setMinutes(updatedStartDateA.getMinutes() + 45);
-        await fixture.updateMatch(matchIdA, { [Fixture.SELECTOR_START_AT]: updatedStartDateA });
-        await fixture.assertNotifExists(`Your upcoming Basketball match ${matchName3} has a new start time`);
+        await fixture.updateMatch(matchId, { [Fixture.SELECTOR_START_AT]: updatedStartDateA });
+        await fixture.assertNotifExists(`Your upcoming Basketball match ${newMatchName} has a new start time`);
+    });
+
+    test("Match in 24 hours - add itinerary", async ({ tester, page, db }) => {
+        const fixture = new Fixture(tester, page);
 
         tester.isGoingTo("match in 24 hours - add itinerary and save - expect notification");
-        const matchName4 = "Fourth Test Match";
-        const startDate4 = new Date();
-        startDate4.setMinutes(startDate4.getMinutes() + 30);
-        const finishDate4 = new Date(startDate4);
-        finishDate4.setMinutes(finishDate4.getMinutes() + 120);
+        const matchName = "Fourth Test Match";
+        const startDate = new Date();
+        startDate.setMinutes(startDate.getMinutes() + 30);
+        const finishDate = new Date(startDate);
+        finishDate.setMinutes(finishDate.getMinutes() + 120);
 
         const matchId4 = await fixture.createMatch(
             db,
             {
-                [Fixture.SELECTOR_NAME]: matchName4,
-                [Fixture.SELECTOR_START_AT]: startDate4,
-                [Fixture.SELECTOR_FINISH_AT]: finishDate4,
+                [Fixture.SELECTOR_NAME]: matchName,
+                [Fixture.SELECTOR_START_AT]: startDate,
+                [Fixture.SELECTOR_FINISH_AT]: finishDate,
             },
             {
                 [Fixture.SELECTOR_JS_VENUE]: Fixture.VENUE_OAKLEIGH_RECREATION,
@@ -100,21 +108,25 @@ test.describe("Fixture tests", () => {
         );
 
         await fixture.addItinerary(matchId4);
-        await fixture.assertNotifExists(`Your upcoming Basketball match ${matchName4} itinerary has been changed`);
+        await fixture.assertNotifExists(`Your upcoming Basketball match ${matchName} itinerary has been changed`);
+    });
+
+    test("Match in 24 hours - remove itinerary", async ({ tester, page, db }) => {
+        const fixture = new Fixture(tester, page);
 
         tester.isGoingTo("match in 24 hours - remove itinerary and save - expect notification");
-        const matchName5 = "Fifth Test Match";
-        const startDate5 = new Date();
-        startDate5.setMinutes(startDate5.getMinutes() + 30);
-        const finishDate5 = new Date(startDate5);
-        finishDate5.setMinutes(finishDate5.getMinutes() + 120);
+        const matchName = "Fifth Test Match";
+        const startDate = new Date();
+        startDate.setMinutes(startDate.getMinutes() + 30);
+        const finishDate = new Date(startDate);
+        finishDate.setMinutes(finishDate.getMinutes() + 120);
 
         const matchId5 = await fixture.createMatch(
             db,
             {
-                [Fixture.SELECTOR_NAME]: matchName5,
-                [Fixture.SELECTOR_START_AT]: startDate5,
-                [Fixture.SELECTOR_FINISH_AT]: finishDate5,
+                [Fixture.SELECTOR_NAME]: matchName,
+                [Fixture.SELECTOR_START_AT]: startDate,
+                [Fixture.SELECTOR_FINISH_AT]: finishDate,
             },
             {
                 [Fixture.SELECTOR_JS_VENUE]: Fixture.VENUE_OAKLEIGH_RECREATION,
@@ -124,22 +136,26 @@ test.describe("Fixture tests", () => {
         );
 
         await fixture.deleteItinerary(matchId5);
-        await fixture.assertNotifExists(`Your upcoming Basketball match ${matchName5} itinerary has been changed`);
+        await fixture.assertNotifExists(`Your upcoming Basketball match ${matchName} itinerary has been changed`);
+    });
+
+    test("Match in the future", async ({ tester, page, db }) => {
+        const fixture = new Fixture(tester, page);
 
         tester.isGoingTo("create a match in the future and expect no immediate notification");
-        const matchName6 = "Sixth Test Match";
-        const futureStartDateB = new Date();
-        futureStartDateB.setDate(futureStartDateB.getDate() + 1);
-        futureStartDateB.setMinutes(futureStartDateB.getMinutes() + 10);
-        const futureFinishDateB = new Date(futureStartDateB);
+        const matchName = "Sixth Test Match";
+        const futureStartDate = new Date();
+        futureStartDate.setDate(futureStartDate.getDate() + 1);
+        futureStartDate.setMinutes(futureStartDate.getMinutes() + 10);
+        const futureFinishDateB = new Date(futureStartDate);
         futureFinishDateB.setDate(futureFinishDateB.getDate() + 1);
         futureFinishDateB.setMinutes(futureFinishDateB.getMinutes() + 120);
 
         const matchId6 = await fixture.createMatch(
             db,
             {
-                [Fixture.SELECTOR_NAME]: matchName6,
-                [Fixture.SELECTOR_START_AT]: futureStartDateB,
+                [Fixture.SELECTOR_NAME]: matchName,
+                [Fixture.SELECTOR_START_AT]: futureStartDate,
                 [Fixture.SELECTOR_FINISH_AT]: futureFinishDateB,
             },
             {
@@ -149,21 +165,21 @@ test.describe("Fixture tests", () => {
             },
         );
 
-        await fixture.assertNotifNotExists(`You have an upcoming Basketball match ${matchName6}`);
+        await fixture.assertNotifNotExists(`You have an upcoming Basketball match ${matchName}`);
 
         tester.isGoingTo("update the future match and expect no immediate notification");
         await fixture.updateMatch(matchId6, {});
-        await fixture.assertNotifNotExists(`Your upcoming Basketball match ${matchName6} has been updated`);
+        await fixture.assertNotifNotExists(`Your upcoming Basketball match ${matchName} has been updated`);
 
         tester.isGoingTo("change the title and expect no immediate notification");
         const modifiedMatchName = "Modified Sixth Test Match";
-        const futureStartDateC = new Date();
-        futureStartDateC.setDate(futureStartDateC.getDate() + 1);
-        futureStartDateC.setMinutes(futureStartDateC.getMinutes() + 1);
+        const newFutureStartDate = new Date();
+        newFutureStartDate.setDate(newFutureStartDate.getDate() + 1);
+        newFutureStartDate.setMinutes(newFutureStartDate.getMinutes() + 1);
 
         await fixture.updateMatch(matchId6, {
             [Fixture.SELECTOR_NAME]: modifiedMatchName,
-            [Fixture.SELECTOR_START_AT]: futureStartDateC,
+            [Fixture.SELECTOR_START_AT]: newFutureStartDate,
         });
 
         await fixture.assertNotifNotExists(`Your upcoming Basketball match ${modifiedMatchName} has been updated`);
