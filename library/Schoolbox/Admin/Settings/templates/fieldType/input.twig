@@ -7,7 +7,7 @@
 {% block inputElement %}
     <input id="{{ name }}-field"
         {{ required ? 'required ' }}
-        type="{% block inputType %}text{% endblock %}"
+        type="{{ inputType ?? 'text' }}"
         name="{{ name }}"
         value="{{ value }}"
         {% if maxlength ?? false %}maxlength="{{ maxlength }}"{% endif %}

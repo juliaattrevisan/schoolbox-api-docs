@@ -9,7 +9,7 @@
 #}
 {% extends '@settings/fieldType/input.twig' %}
 {% block extraWrapperClasses %}c-form-element c-input-range{% endblock %}
-{% block inputType %}range{% endblock %}
+{% set inputType = 'range' %}
 {% block extraInputAttributes %}
     min="{{ min }}"
     max="{{ max }}"
