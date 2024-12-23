@@ -8,90 +8,10 @@
 
 namespace Tests\Support\Page;
 
-use Tests\Support\AcceptanceTester;
-use SensitiveParameter;
-
 /**
  * Login page object
  */
 class Login
 {
     const URL                  = '/login/';
-    const FIELD_USERNAME       = 'username';
-    const FIELD_PASSWORD       = 'password';
-    const SAML_FIELD_USERNAME  = 'UserName';
-    const SAML_FIELD_PASSWORD  = 'Password';
-    const CHECKBOX_REMEMBER_ME = '#rememberme';
-    const BUTTON_LOGIN         = 'Submit';
-    const SAML_BUTTON          = 'Login using Single Sign-On';
-    const SAML_LOGIN_BUTTON    = ['xpath' => '//span[text()="Sign in"]'];
-
-    /**
-     * @var AcceptanceTester
-     */
-    protected $tester;
-
-    /**
-     * Constructor
-     *
-     * @param AcceptanceTester $i
-     */
-    public function __construct(AcceptanceTester $i)
-    {
-        $this->tester = $i;
-    }
-
-    /**
-     * Log in as this user via SAML
-     *
-     * @param string $username
-     * @param string $password
-     * @throws \Exception
-     */
-    public function loginSAML(string $username, #[SensitiveParameter] string $password): void
-    {
-        $this->tester->click(self::SAML_BUTTON);
-        $this->tester->waitForText("ADFS Schoolbox", 5);
-        $this->tester->fillField(self::SAML_FIELD_USERNAME, $username);
-        $this->tester->fillField(self::SAML_FIELD_PASSWORD, $password);
-        $this->tester->click(self::SAML_LOGIN_BUTTON);
-    }
-
-    /**
-     * Log in as this user
-     *
-     * @param $username
-     * @param $password
-     * @param $rememberMe
-     */
-    public function login($username, #[SensitiveParameter] $password, $rememberMe)
-    {
-        $this->tester->fillField(self::FIELD_USERNAME, $username);
-        $this->tester->fillField(self::FIELD_PASSWORD, $password);
-        if ($rememberMe) {
-            $this->tester->checkOption(self::CHECKBOX_REMEMBER_ME);
-        } else {
-            $this->tester->uncheckOption(self::CHECKBOX_REMEMBER_ME);
-        }
-        $this->tester->click(self::BUTTON_LOGIN);
-    }
-
-    /**
-     * Test that this user is logged in.
-     */
-    public function verifyLoginSuccess()
-    {
-        $this->tester->see("NEWS HEADLINES");
-    }
-
-    /**
-     * Test that this user is not logged in.
-     *
-     * @param string|null $failureMessage If provided, look for a message other
-     *                                    than the default.
-     */
-    public function verifyLoginFailure(string $failureMessage = null)
-    {
-        $this->tester->see($failureMessage ?? "The username or password you typed is incorrect, please try again.");
-    }
 }
