@@ -10,6 +10,7 @@ declare(strict_types=1);
 use Alaress\Database\Connector\IConnector;
 use Schoolbox\Database\Factory;
 use Schoolbox\External\Normalise\TupleStack;
+use Schoolbox\External\Connector\AllMeaningfulValues;
 use Schoolbox\Resource\Storage;
 use Schoolbox\User;
 
@@ -413,9 +414,10 @@ class External_Doublefirst_User implements External_UserInterface
          */
         $student['StudentBoarder'] = $this->determineBoarderType((string)$student['StudentBoarder']);
 
-        /* Forcibly obey External_UserInterface
+        /* Assign alert messages to the right places and filter out empty values
+         * There can only be one AlertMessage in this connector per user
          */
-        $student['AlertMessage'] = [$student['AlertMessage']];
+        $student['AlertMessage'] = AllMeaningfulValues::find([$student['AlertMessage']]);
         $student['AlertLegal'] = [];
 
         return $student;

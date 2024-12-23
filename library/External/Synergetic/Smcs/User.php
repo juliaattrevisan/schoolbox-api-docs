@@ -12,6 +12,7 @@ declare(strict_types=1);
 use Schoolbox\Resource\Storage;
 use Schoolbox\User;
 use Alaress\Database\Predicate\Builder;
+use Schoolbox\External\Connector\AllMeaningfulValues;
 
 class External_Synergetic_Smcs_User extends External_Synergetic_User
 {
@@ -147,13 +148,8 @@ class External_Synergetic_Smcs_User extends External_Synergetic_User
         /* Uniquify both AlertMessage and AlertLegal nodes since they might dupe
          * as a result of those left joins in the mega query
          */
-        if (!empty($student) && is_array($student['AlertMessage'])) {
-            $student['AlertMessage'] = array_unique(array_filter($student['AlertMessage']));
-        }
-
-        if (!empty($student) && is_array($student['AlertLegal'])) {
-            $student['AlertLegal'] = array_unique(array_filter($student['AlertLegal']));
-        }
+        $student['AlertMessage'] = AllMeaningfulValues::findUnique($student['AlertMessage'] ?? []);
+        $student['AlertLegal'] = AllMeaningfulValues::findUnique($student['AlertLegal'] ?? []);
 
         // Remove Synergetic's annoying 'Not Selected' default value for lookups
 

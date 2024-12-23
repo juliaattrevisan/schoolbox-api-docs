@@ -12,6 +12,7 @@ use Alaress\Database\Connector\IConnector;
 use Alaress\Database\Predicate\Builder as PredicateBuilder;
 use Schoolbox\Database\Factory as DatabaseFactory;
 use Schoolbox\External\Normalise\TupleStack;
+use Schoolbox\External\Connector\AllMeaningfulValues;
 use Schoolbox\Resource\Storage;
 use Schoolbox\User;
 
@@ -136,9 +137,10 @@ class External_Schoolbox_User implements External_UserInterface
          */
         $student['StudentBoarder'] = $this->determineBoarderType((string)$student['StudentBoarder']);
 
-        /* Forcibly obey External_UserInterface
+        /* Assign alert messages to the right places and filter out empty values
+         * There can only be one AlertMessage in this connector per user
          */
-        $student['AlertMessage'] = array_unique(array_filter([$student['AlertMessage']]));
+        $student['AlertMessage'] = AllMeaningfulValues::find([$student['AlertMessage']]);
 
         /* Initialise this stack for consistency,
          * in External_Schoolbox_User there would only ever be either 0 or 1 legal alerts
