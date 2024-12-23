@@ -307,7 +307,7 @@
         function spawnNewRow() {
             var $element = $(config.element),
                 $list = $element.find(config.listSelector),
-                clone = $element.find(config.templateSelector).clone(),
+                clone = $element.find(config.templateSelector).contents().clone(),
                 last = config.templateSelector.split(" ").pop(),
                 selector = last.match(/([a-z]+)?([^a-z][a-z-_0-9]+)/).pop(),
                 sstring = selector.substr(1),

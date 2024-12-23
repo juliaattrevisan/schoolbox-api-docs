@@ -41,8 +41,8 @@
     <p>There is no itinerary for {{ match.name | default('this match') }}.</p>
     <p><a data-item-add>Create an itinerary</a></p>
 </div>
-<ul class="information-list hide">
-    <li data-template class="actions-small-1" data-item>
+<template data-template>
+    <li class="actions-small-1" data-item>
         {% include '@sportsfixturesItineraryItem/listItem.twig' %}
     </li>
-</ul>
+</template>

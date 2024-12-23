@@ -25,6 +25,8 @@ export default class Fixture {
 
     static readonly SELECTOR_JS_AWAY_TEAM = "#awayTeam-selectized";
 
+    static readonly SELECTOR_DELETE_ITINERARY = "[data-item-list] [data-delete]:visible";
+
     static readonly VENUE_OAKLEIGH_RECREATION = 2;
 
     static readonly TEAM_WARRIORS = 1;
@@ -218,8 +220,55 @@ export default class Fixture {
         await this.page.goto(Fixture.getUpdateMatchUrl(matchId));
         await expect(this.page.locator("h2.subheader").filter({ hasText: "MODIFY MATCH" })).toBeVisible();
 
-        await this.page.locator("[data-item-list] [data-delete]").nth(1).click();
-        await this.page.click('#matchForm [type=submit][value="Modify Match"]');
+        // Click all delete buttons so the empty state is shown
+        const deleteButtons = await this.page.locator(Fixture.SELECTOR_DELETE_ITINERARY).all();
+        await deleteButtons.reduce(async (promise) => {
+            await promise;
+            // Find the first one, since it might change after each click
+            await this.page.locator(Fixture.SELECTOR_DELETE_ITINERARY).first().click();
+        }, Promise.resolve());
+
+        await this.page.locator('#matchForm [type=submit][value="Modify Match"]').click();
         await expect(this.page.locator("h1").filter({ hasText: "Seasons" })).toBeVisible();
+    }
+
+    /**
+     * Assert that a notification exists for Jana Reed and not the current user
+     * - Expects the notification not to exist for the current user
+     * - Logs in as Jana Reed and expects the notification to exist
+     * - Logs back in as the current user
+     * @param text the text to verify
+     */
+    async assertNotifExists(text: string): Promise<void> {
+        this.tester.isGoingTo("expect the notification to not exist for the current user (admin)");
+        await this.tester.common.assertNotifNotExists(text);
+
+        this.tester.isGoingTo("login as Jana Reed and expect the notification to exist");
+        await this.tester.impersonateViaModifyUserPage("Ms Jana Reed");
+        await this.tester.common.assertNotifExists(text);
+
+        this.tester.isGoingTo("login back as the current user (admin)");
+        await this.tester.logout();
+        await this.tester.loginAsAdmin();
+    }
+
+    /**
+     * Assert that a notification does not exist for the current user or Jana Reed
+     * - Expects the notification not to exist for the current user
+     * - Logs in as Jana Reed and expects the notification not to exist
+     * - Logs back in as the current user
+     * @param text the text to verify
+     */
+    async assertNotifNotExists(text: string): Promise<void> {
+        this.tester.isGoingTo("expect the notification to not exist for the current user (admin)");
+        await this.tester.common.assertNotifNotExists(text);
+
+        this.tester.isGoingTo("login as Jana Reed and expect the notification to not exist");
+        await this.tester.impersonateViaModifyUserPage("Ms Jana Reed");
+        await this.tester.common.assertNotifNotExists(text);
+
+        this.tester.isGoingTo("login back as the current user (admin)");
+        await this.tester.logout();
+        await this.tester.loginAsAdmin();
     }
 }

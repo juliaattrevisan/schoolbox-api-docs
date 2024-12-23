@@ -32,8 +32,8 @@
     <p>There are currently no positions for {{ sport.name | default('this sport') }}.</p>
     <p><a data-item-add>Add a position</a></p>
 </div>
-<ul class="information-list hide">
-    <li data-template class="actions-small-1" data-item>
+<template data-template>
+    <li class="actions-small-1" data-item>
         {% include '@sportsfixturesPosition/listItem.twig' %}
     </li>
-</ul>
+</template>
