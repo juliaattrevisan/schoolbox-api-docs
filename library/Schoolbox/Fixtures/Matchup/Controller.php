@@ -355,7 +355,7 @@ class Controller extends AbstractController
         $notes = $this->requestPost->get('notes');
 
         // Itinerary
-        $itinerary = $this->transposeItineraryPost($this->requestPost->get('itinerary'));
+        $itinerary = $this->transposeItineraryPost($this->requestPost->get('itinerary', []));
 
         $this->saveMatch($entity, $division, $name, $season, $startAt, $finishAt, $homeTeam, $awayTeam, $homeSchool, $awaySchool, $venue, $notes, $itinerary);
 
@@ -375,7 +375,7 @@ class Controller extends AbstractController
     {
         $c = $this->getItineraryItemMapper()->createCollection();
 
-        $itCount = count($itPost['matchId']);
+        $itCount = count($itPost['matchId'] ?? []);
 
         for ($i = 0; $i < $itCount; ++$i) {
             if (empty($itPost['description'][$i])) {

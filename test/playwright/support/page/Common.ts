@@ -365,7 +365,8 @@ export default class Common {
      * @param text - the text to verify
      */
     async assertNotifNotExists(text: string): Promise<void> {
-        const notification = await this.findNotification(text, false);
+        // only retry once, since we're expecting it to not exist
+        const notification = await this.findNotification(text, false, 1);
         await expect(notification).toHaveCount(0);
     }
 
@@ -401,6 +402,34 @@ export default class Common {
             const ampm = date.getHours() >= 12 ? "pm" : "am";
 
             const formattedTime = `${hours}:${minutes}${ampm}`;
+            formattedDate += ` ${formattedTime}`;
+        }
+
+        return formattedDate;
+    }
+
+    /**
+     * Convert a Date object to a string in the format "dd-mm-yyyy" or "dd-mm-yyyy HH:mm:ss"
+     * This is the expected format for the database of schoolbox
+     * @param date - the date to convert
+     * @param includeTime - whether to include the time in the string
+     * @returns - the formatted date/datetime string
+     */
+    static formatDateDB(date: Date, includeTime: boolean): string {
+        const zeroPad = (num: number): string => num.toString().padStart(2, "0");
+
+        const day = zeroPad(date.getDate());
+        const month = zeroPad(date.getMonth() + 1); // getMonth() returns 0-11
+        const year = date.getFullYear();
+
+        let formattedDate = `${year}-${month}-${day}`;
+
+        if (includeTime) {
+            const hours = zeroPad(date.getHours());
+            const minutes = zeroPad(date.getMinutes());
+            const seconds = zeroPad(date.getSeconds());
+
+            const formattedTime = `${hours}:${minutes}:${seconds}`;
             formattedDate += ` ${formattedTime}`;
         }
 
