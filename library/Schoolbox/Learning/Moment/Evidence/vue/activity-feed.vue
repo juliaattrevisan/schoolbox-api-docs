@@ -796,10 +796,12 @@ export default {
                                             <p class="meta">
                                                 Reviewed by
                                                 <a
+                                                    v-if="evidence.object.instructor"
                                                     :href="evidence.object.instructor._links.profile"
                                                     title="View Profile"
                                                     >{{ evidence.object.instructor.fullName }}</a
                                                 >
+                                                <span v-else>Unknown</span>
                                                 in {{ evidence.object.assessment.folderName }} |
                                                 <time
                                                     class="meta"

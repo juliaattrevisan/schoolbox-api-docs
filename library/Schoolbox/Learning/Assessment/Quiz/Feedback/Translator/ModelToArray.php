@@ -54,13 +54,19 @@ class ModelToArray
         }
         $this->linkDecorator->decorate([], $model->getReviewer());
 
+        if ($model->getReviewer()) {
+            $instructor = call_user_func($this->userTranslator, $model->getReviewer());
+        } else {
+            $instructor = null;
+        }
+
         return [
             'id'             => $model->getId(),
             'mark'           => $model->getHumanReadableMark(),
             'normalisedMark' => $model->getNormalisedMark(),
             'comment'        => $this->purifier->purify($model->getComment()),
             'publishedAt'    => $model->getPublishedAt()->getUsingFormat(DATE_ATOM),
-            'instructor'     => call_user_func($this->userTranslator, $model->getReviewer()),
+            'instructor'     => $instructor,
             'assessment'     => $assessment,
             '_links'         => call_user_func($this->linkTranslator, $model->getAssessable(), $model->getReviewee()),
         ];
