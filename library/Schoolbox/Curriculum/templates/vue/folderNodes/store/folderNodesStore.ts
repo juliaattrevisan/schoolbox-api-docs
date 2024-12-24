@@ -42,13 +42,16 @@ export const useStore = (folderId: number, componentInstanceId: number) =>
             try {
                 activate("Updating...");
                 isProcessing.value = true;
-                const response = await fetch(`/api/curriculum/usage/folder/${folderId}?returnFormat=tree&descendants=0`, {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
+                const response = await fetch(
+                    `/api/curriculum/usage/folder/${folderId}?returnFormat=tree&descendants=0`,
+                    {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json",
+                        },
+                        body: JSON.stringify([...selectedNodes.value]),
                     },
-                    body: JSON.stringify([...selectedNodes.value]),
-                });
+                );
                 if (response.ok) {
                     const newNodes = (await response.json()) as Node[];
                     nodes.value = newNodes;
