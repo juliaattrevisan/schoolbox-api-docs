@@ -7,9 +7,11 @@
 {% block inputElement %}
     <input id="{{ name }}-field"
         {{ required ? 'required ' }}
-        type="{% block inputType %}text{% endblock %}"
+        type="{{ inputType ?? 'text' }}"
         name="{{ name }}"
         value="{{ value }}"
+        {# If the type is password, set autocomplete to new-password to avoid autofill overriding it #}
+        {% if (inputType ?? false) == 'password' %}autocomplete="new-password"{% endif %}
         {% if maxlength ?? false %}maxlength="{{ maxlength }}"{% endif %}
         {% if not editable %}disabled="disabled"{% endif %}
         {% block extraInputAttributes %}{% endblock %}
