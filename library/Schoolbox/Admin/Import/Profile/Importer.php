@@ -581,6 +581,7 @@ class Importer
                 ->setPositionTitle($row['Position Title'])
                 ->setDepartment($row['Department'])
                 ->setPhone($row['Work Phone'])
+                ->setHouseName($row['House'])
                 ->setRoom($row['Room'])
                 ->setBuilding($row['Building'])
                 ->setCampusName($row['Campus'])

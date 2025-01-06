@@ -127,6 +127,7 @@ class Mapping
         'Department' => 'department',
         'Building' => 'building',
         'Room' => 'room',
+        'House' => 'house_name'
     ];
 
 
