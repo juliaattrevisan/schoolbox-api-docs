@@ -275,8 +275,8 @@ class Controller extends BaseController
     {
         $post                = $this->requestPost;
         $provider            = $post->get('provider');
-        $appId               = trim($post->get('app'));
-        $key                 = trim($post->get('key'));
+        $appId               = trim($post->get('app') ?? "");
+        $key                 = trim($post->get('key') ?? "");
         $publicConfiguration = null;
         $webPushPublicKey    = null;
         $certificate         = null;
@@ -339,7 +339,7 @@ class Controller extends BaseController
 
                 break;
             default:
-                $this->sendError('Service does not exist');
+                $this->sendError('Please select a valid service provider.');
                 return;
         }
 
