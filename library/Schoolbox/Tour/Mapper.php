@@ -243,7 +243,7 @@ class Mapper extends BaseMapper
         // ...
 
         // --------------------------------------------------------------------------------------------------------
-        // Concatenate all of the predicates into an OR query and return the SQL in an array along with bindings
+        // Concatenate all the predicates into an OR query and return the SQL in an array along with bindings
         // --------------------------------------------------------------------------------------------------------
 
         $query = "({$tourNotDeletedClause} AND (" . implode(" OR ", $predicates) . "))";
