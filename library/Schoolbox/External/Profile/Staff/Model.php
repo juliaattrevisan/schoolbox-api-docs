@@ -63,6 +63,13 @@ class Model
      */
     private $campusName;
 
+
+    /**
+     * @var string|null
+     */
+    private ?string $house = null;
+
+
     /**
      * @var ProfileModel
      */
@@ -140,6 +147,27 @@ class Model
     {
         return $this->campusName;
     }
+
+
+    /**
+     * @return string|null
+     */
+    public function getHouse(): ?string
+    {
+        return $this->house;
+    }
+
+
+    /**
+     * @param string|null $house
+     * @return $this
+     */
+    public function setHouse(?string $house): self
+    {
+        $this->house = $house;
+        return $this;
+    }
+
 
     /**
      * @return ProfileModel
