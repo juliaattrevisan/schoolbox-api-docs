@@ -1116,6 +1116,8 @@ class Profile implements IStrategy
              */
             $email = $this->findDetailsField($staff['staffDetails'], 'organisationUserEmail');
 
+            $house = '';
+
             /* The "Phone" field in compass ui ends up mapping to homePhoneNumber
              * so it's actually a generic Phone Number field.
              *
@@ -1177,6 +1179,7 @@ class Profile implements IStrategy
                 ->setCategory($category)
                 ->setDepartment($department)
                 ->setEmail($email)
+                ->setHouse($house)
                 ->setPhone($phone)
                 ->setPositionTitle($positionTitle)
                 ->setRoom($room)
