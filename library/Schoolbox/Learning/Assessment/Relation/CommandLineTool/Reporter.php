@@ -275,7 +275,7 @@ HELP;
         foreach ($assessmentIds as $assessmentId) {
             $actualAssessmentData   = $keyedActualData[$assessmentId] ?? null;
             $expectedAssessmentData = $keyedExpectedData[$assessmentId] ?? null;
-            if ($expectedAssessmentData !== $actualAssessmentData) {
+            if ((int)$expectedAssessmentData !== (int)$actualAssessmentData) {
                 $differentRows[] = $assessmentId;
                 $logger->debug(
                     sprintf(
