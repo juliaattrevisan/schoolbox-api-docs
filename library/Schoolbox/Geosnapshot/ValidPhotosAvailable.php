@@ -55,8 +55,24 @@ class ValidPhotosAvailable extends ValidGeosnapshotAvailable
          */
 
         /* $viewer is a student, and they're viewing themselves
+         * $viewer is a staff, and they're viewing themselves
+         *
+         * I guess parents don't get a say in this
          */
-        if ($viewer->getRole()->isStudent() && $viewer->getId() === $viewee->getId()) {
+        if ($viewer->getId() === $viewee->getId()) {
+            if ($viewer->getRole()->isStaff()) {
+                return true;
+            }
+
+            if ($viewer->getRole()->isStudent()) {
+                return true;
+            }
+        }
+
+        /* $viewee is a staff;
+         * Only staff can find staff pictures - students and parents aren't allowed
+         */
+        if ($viewee->getRole()->isStaff() && $viewer->getRole()->isStaff()) {
             return true;
         }
 
