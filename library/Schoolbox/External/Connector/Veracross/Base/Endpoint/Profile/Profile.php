@@ -703,6 +703,7 @@ class Profile implements IStrategy
                 $category = trim((string)$staffLookup['faculty_type'][$staff['faculty_type']]);
                 $department = trim((string)$staffLookup['department'][$staff['department']]);
                 $email = trim((string)$staff['email_1']);
+                $house = '';
                 $phone = trim((string)($contactInfoLookup[$staff['id']]['business_phone'] ?? ''));
                 $positionTitle = trim((string)$staff['job_title']);
                 $room = '';
@@ -751,6 +752,7 @@ class Profile implements IStrategy
                     ->setCategory($category)
                     ->setDepartment($department)
                     ->setEmail($email)
+                    ->setHouse($house)
                     ->setPhone($phone)
                     ->setPositionTitle($positionTitle)
                     ->setRoom($room)
