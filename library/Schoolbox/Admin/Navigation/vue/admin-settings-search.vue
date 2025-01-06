@@ -8,8 +8,6 @@ import { gsap } from "gsap/all";
 import ScrollFadeWrapper from "@schoolboxVue/components/scroll-fade-wrapper.vue";
 import AdminSettingsSearchResult from "./admin-settings-search-result.vue";
 
-const SB_SETTINGS_LIST = "sb_settingsList";
-
 interface SBSettingsListItem {
     title: string;
     name: string;
@@ -26,21 +24,13 @@ export default window.Vue.defineComponent({
 
     data() {
         return {
-            settingsList: [],
+            settingsList: [] as SBSettingsListItem[],
             isLoaded: false,
             hasLoadError: false,
             query: "",
             minQueryLength: 3,
             resultsShownLimit: 6,
             activeIndex: 0, // to track which index is selected
-        } as {
-            settingsList: SBSettingsListItem[];
-            isLoaded: boolean;
-            hasLoadError: boolean;
-            query: string;
-            minQueryLength: number;
-            resultsShownLimit: number;
-            activeIndex: number;
         };
     },
 
@@ -109,7 +99,7 @@ export default window.Vue.defineComponent({
     mounted() {
         this.initKeyboardEvents();
         this.initMouseEvents();
-        void this.loadSettings();
+        void this.loadRemoteSettings();
     },
 
     methods: {
@@ -231,31 +221,6 @@ export default window.Vue.defineComponent({
         },
 
         /**
-         * check if already loaded and saved, or load up
-         */
-        async loadSettings() {
-            if (sessionStorage.getItem(`${SB_SETTINGS_LIST}-${window.schoolboxUser.id}`)) {
-                this.loadSessionSettings();
-            } else {
-                await this.loadRemoteSettings();
-            }
-        },
-
-        /**
-         * pull the settings from local storage
-         */
-        loadSessionSettings() {
-            const sessionStorageSettingsList = sessionStorage.getItem(`${SB_SETTINGS_LIST}-${window.schoolboxUser.id}`);
-
-            if (sessionStorageSettingsList === null) {
-                this.settingsList = [];
-            } else {
-                this.settingsList = JSON.parse(sessionStorageSettingsList) as SBSettingsListItem[]; // convert the saved string var back to JSON
-            }
-            this.isLoaded = true;
-        },
-
-        /**
          * load the settings for possible retrieval
          */
         async loadRemoteSettings() {
@@ -263,12 +228,6 @@ export default window.Vue.defineComponent({
                 const response = await fetch("/adminv2/setting/search");
                 const responseJson = (await response.json()) as SBSettingsListItem[];
                 this.settingsList = responseJson;
-                sessionStorage.setItem(
-                    // Index by userId so that for example if a superuser logs out and then a non-superuser moderator
-                    // logs in using the same browser tab, the moderator will not see the superuser's search index.
-                    `${SB_SETTINGS_LIST}-${window.schoolboxUser.id}`,
-                    JSON.stringify(this.settingsList),
-                ); // session storage vars need to be saved as strings only
             } catch (error) {
                 this.hasLoadError = true; // hide search bar in the dom
             } finally {
