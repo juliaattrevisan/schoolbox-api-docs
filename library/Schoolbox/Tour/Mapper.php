@@ -298,4 +298,45 @@ class Mapper extends BaseMapper
         $triggerMapper->deleteByColumn('tour_uuid', $model->getUuid());
         return true;
     }
+
+    /**
+     * Return the audience role names for the given tour UUID.
+     *
+     * @param string $tourUuid
+     * @return array<string>
+     */
+    public function getAudienceRoleNames(string $tourUuid): array
+    {
+        return $this->database->executeQuery(
+            'SELECT DISTINCT g.name
+            FROM tour_audience_role tar
+            JOIN groups g ON g.id = tar.role_id
+            WHERE tar.tour_uuid = ?
+            ORDER BY g.name ASC',
+            [$tourUuid]
+        )->fetchColumnArray('name');
+    }
+
+    /**
+     * Return an array of arrays of audience role names, indexed by tour UUID.
+     *
+     * @return array<string, array<string>>
+     */
+    public function getAudienceRoleNamesByUuid(): array
+    {
+        $tourUuids = $this->database->executeQuery(
+            'SELECT uuid
+            FROM tour
+            WHERE deleted_at IS NULL
+            AND active = 1'
+        )->fetchColumnArray('uuid');
+
+        $roleNamesByUuid = [];
+
+        foreach ($tourUuids as $tourUuid) {
+            $roleNamesByUuid[$tourUuid] = $this->getAudienceRoleNames($tourUuid);
+        }
+
+        return $roleNamesByUuid;
+    }
 }

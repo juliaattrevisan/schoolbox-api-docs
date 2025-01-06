@@ -34,8 +34,9 @@
                             <div class="small-12 columns">
                                 <label for="tour-enable-{{ tour.uuid }}">
                                     {{ tour.title }}
-                                    <span class="pipe meta" title="Will be seen by Staff">
-                                        Staff
+                                    {% set audienceRoleNames = tourAudienceRoleNamesByUuid[tour.uuid] %}
+                                    <span class="pipe meta" title="The tour will display for these roles only.">
+                                        {{ audienceRoleNames|join(', ') }}
                                     </span>
                                 </label>
                                 <div class="switch">
