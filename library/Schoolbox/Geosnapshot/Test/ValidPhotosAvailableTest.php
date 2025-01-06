@@ -146,6 +146,16 @@ class ValidPhotosAvailableTest extends TestCase
                 false
             ],
 
+            /* Parents can't search for staff pictures
+             */
+            'Parent views staff' => [
+                'abcd-1234-QWERTY-10000', // API Key set
+                true, // Feature is enabled in current plan
+                $jenniReed,
+                $jackColes,
+                false
+            ],
+
             /* Staff can see anyone
              */
             'Staff member viewing a student 1' => [
