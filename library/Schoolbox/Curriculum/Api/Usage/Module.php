@@ -56,7 +56,7 @@ class Module extends BaseModule
             $this->getMapperFactory()->get(CourseSpec\Mapper::class),
             $this->getMapperFactory()->get(UnitSpec\Mapper::class),
             $this->injector->get('assessmentDataSource'),
-            new Counter($this->injector->get('databaseInternal')),
+            new Counter($this->injector->get('databaseInternal'), $this->getConfig()),
             $this->getMapperFactory()->get(\Schoolbox\Learning\Badge\Mapper::class),
         );
     }

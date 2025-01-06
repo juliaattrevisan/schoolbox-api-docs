@@ -65,7 +65,7 @@ class Module extends BaseModule
     {
         return new Controller(
             $this->getMapperFactory()->get(NodeMapper::class),
-            new Usage\Counter($this->injector->get('databaseInternal')),
+            new Usage\Counter($this->injector->get('databaseInternal'), $this->getConfig()),
         );
     }
 }

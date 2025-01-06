@@ -59,7 +59,7 @@ class Controller extends Base
         // Fetch usage
         $encodedCursor = $this->requestQuery->get('cursor');
         $limit         = $this->requestQuery->getInt('limit', Cursor::LIMIT_DEFAULT);
-        $cursor        = new Cursor($this->database, $node, $this->counter, $limit, null);
+        $cursor        = new Cursor($this->database, $this->getConfigLoader(), $node, $this->counter, $limit, null);
         $data          = $cursor->retrieveResults($encodedCursor);
 
         // I can't create this in the module because a user object is required,

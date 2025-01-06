@@ -15,7 +15,9 @@ use Alaress\Database\Connector\IConnector;
 use PDO;
 use Schoolbox\API\Cursor\ICursor;
 use Schoolbox\Collection;
+use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Curriculum\Node;
+use Schoolbox\IConfigLoader;
 use ValueError;
 
 /**
@@ -82,14 +84,16 @@ class Cursor implements ICursor
     /**
      * Constructor
      *
-     * @param IConnector  $database The database connection to retrieve from.
-     * @param Node\Model  $node     The node to fetch usages for.
-     * @param Counter     $counter  The counter used for fetching usage counts in an efficient manner.
-     * @param int         $limit    Max number of results to fetch at once
-     * @param ICodec|null $codec    If provided: use this codec for encoding/decoding cursors
+     * @param IConnector    $database     The database connection to retrieve from.
+     * @param IConfigLoader $configLoader The config settings
+     * @param Node\Model    $node         The node to fetch usages for.
+     * @param Counter       $counter      The counter used for fetching usage counts in an efficient manner.
+     * @param int           $limit        Max number of results to fetch at once
+     * @param ICodec|null   $codec        If provided: use this codec for encoding/decoding cursors
      */
     public function __construct(
         private IConnector $database,
+        private IConfigLoader $configLoader,
         private Node\Model $node,
         private Counter $counter,
         private int $limit,
@@ -189,16 +193,6 @@ class Cursor implements ICursor
             ",
             "
                 SELECT
-                    4 AS discriminator_order,
-                    :badgeDiscriminator AS discriminator,
-                    b.id AS id,
-                    b.name AS name
-                FROM curriculum_badge cb
-                JOIN badge b on (cb.badge_id = b.id AND b.deleted_at IS NULL)
-                WHERE cb.curriculum_node_id = :badgeCurriculumNodeId
-            ",
-            "
-                SELECT
                     5 AS discriminator_order,
                     :folderDiscriminator AS discriminator,
                     f.id AS id,
@@ -212,10 +206,30 @@ class Cursor implements ICursor
                 AND cnfc.curriculum_node_id = :folderCurriculumNodeId
             ",
         ];
+
+        $params = [];
+        if ($this->configLoader->get(ConfigMapper::NAME_BADGES_ENABLED)) {
+            $selectParts[] = "
+                SELECT
+                    4 AS discriminator_order,
+                    :badgeDiscriminator AS discriminator,
+                    b.id AS id,
+                    b.name AS name
+                FROM curriculum_badge cb
+                JOIN badge b on (cb.badge_id = b.id AND b.deleted_at IS NULL)
+                WHERE cb.curriculum_node_id = :badgeCurriculumNodeId
+        ";
+            $params += [
+                'badgeDiscriminator'         => self::DISCRIMINATOR_BADGE,
+                'badgeCurriculumNodeId'      => $this->node->getId(),
+            ];
+        }
+
         $queryString = 'SELECT * FROM (('
             . implode(') UNION ALL (', $selectParts)
             . ')) AS combined';
-        $params = [
+
+        $params += [
             'courseDiscriminator'        => self::DISCRIMINATOR_COURSE,
             'courseCurriculumNodeId'     => $this->node->getId(),
             'unitDiscriminator'          => self::DISCRIMINATOR_UNIT,
@@ -224,8 +238,6 @@ class Cursor implements ICursor
             'assessmentCurriculumNodeId' => $this->node->getId(),
             'folderDiscriminator'        => self::DISCRIMINATOR_FOLDER,
             'folderCurriculumNodeId'     => $this->node->getId(),
-            'badgeDiscriminator'         => self::DISCRIMINATOR_BADGE,
-            'badgeCurriculumNodeId'      => $this->node->getId(),
         ];
 
         // Figure out a WHERE part
