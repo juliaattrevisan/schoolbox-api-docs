@@ -316,7 +316,7 @@ class Profile implements IStrategy
 
                 /* Fish out a House
                  */
-                $academicHouse = $this->findHouse($studentBaseProfile, $student);
+                $academicHouse = $this->findStudentHouse($student);
 
                 /* Fish out alert comments
                  */
@@ -720,41 +720,30 @@ class Profile implements IStrategy
     /**
      * Find a House name for this person
      *
-     * @param UserProfile\Model $studentBaseProfile
      * @param array             $student
      * @return string|null
      */
-    private function findHouse(UserProfile\Model $studentBaseProfile, array $student): ?string
+    private function findStudentHouse(array $student): ?string
     {
-        /* Find another endpoint who can tell us the answer
-         */
-        $endpoint = $student['relationships']['primaryEnrolment']['data']['relationships']['house']['links']['related'];
-
-        /* Sentral provides endpoints that result in guaranteed failure
-         * ie. endpoints to ids that don't exist
-         *
-         * Instead of dying irrecoverably, alert with warning log that this record
-         * might be a bit broken; house can't be found, and will become null
-         */
-        try {
-            $payload = $this->api->retrieveDocument($endpoint);
-        } catch (\InvalidArgumentException $e) {
-            $this->log->warning($e->getMessage());
-
+        if (!isset($student['relationships']['primaryEnrolment'])) {
+            $this->log->debug('Relationships primaryEnrolment data does not exist.');
             return null;
         }
 
-        $houseName = $payload['data']['attributes']['name'] ?? '';
+        $enrolment = $student['relationships']['primaryEnrolment']['data'];
 
-        $this->log->debug(sprintf(
-            'Secondary api inspection at %s for House belonging to %s (user %s) - found %s',
-            $endpoint,
-            trim("{$studentBaseProfile->getFirstname()} {$studentBaseProfile->getLastname()}"),
-            $studentBaseProfile->getExternalId(),
-            $houseName
-        ));
+        /* "house" might not be a node in the relationships;
+         * This student doesn't have a house.
+         */
+        if (isset($enrolment['relationships']['house']['data'])) {
+            $houseId = $enrolment['relationships']['house']['data']['id'] ?? null;
 
-        return (string)$houseName;
+            if (null !== $houseId) {
+                return $this->houses[$houseId];
+            }
+        }
+
+        return null;
     }
 
 
