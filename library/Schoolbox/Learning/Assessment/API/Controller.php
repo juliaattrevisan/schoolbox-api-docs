@@ -17,6 +17,11 @@ use Crell\ApiProblem\ApiProblem;
 class Controller extends Base
 {
     /**
+     * The maximum number of assessments returned in response to an API request.
+     */
+    const MAX_LIMIT = 1000;
+
+    /**
      * Constructor
      *
      * @param Helper $assessmentHelper Helper class for looking up assessments
@@ -83,6 +88,10 @@ class Controller extends Base
                 ->asArray();
             $this->response = $this->responseAsJson($problem)->withStatus(400);
             return; //exit early if the limit is either 0 or a negative value
+        }
+
+        if ($limit > self::MAX_LIMIT) {
+            $limit = self::MAX_LIMIT;
         }
 
         if (null === $filter) {
