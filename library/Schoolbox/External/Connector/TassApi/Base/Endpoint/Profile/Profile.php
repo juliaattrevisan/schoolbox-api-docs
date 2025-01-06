@@ -1102,6 +1102,7 @@ class Profile implements IStrategy
              */
             $firstnamePreferred = trim((string)($staff['preferred_name'] ?? null));
 
+            $house = '';
             $lastname = trim((string)$staff['surname']);
             $phone = trim((string)($staff['work_phone'] ?? ''));
             $position = trim((string)($staff['position'] ?? ''));
@@ -1151,6 +1152,7 @@ class Profile implements IStrategy
                 ->setCategory($category)
                 ->setDepartment($department)
                 ->setEmail($email)
+                ->setHouse($house)
                 ->setPhone($phone)
                 ->setPositionTitle($position)
                 ->setRoom($room)
