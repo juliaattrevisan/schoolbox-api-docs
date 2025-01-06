@@ -166,6 +166,12 @@ class Profile implements IStrategy
 
 
     /**
+     * @var array
+     */
+    private array $houses;
+
+
+    /**
      * Profile constructor.
      *
      * @param ValidStrats                     $validStrats
@@ -216,6 +222,10 @@ class Profile implements IStrategy
         /* Grab a list of campuses
          */
         $this->campuses = (new Lookup\Campus($this->api))->generate();
+
+        /* Grab a list of houses
+         */
+        $this->houses = (new Lookup\House($this->api))->generate();
 
         /* Import students' profile data
          * Import their specific parents' profile data
@@ -1265,6 +1275,7 @@ class Profile implements IStrategy
                 $category = trim((string)$staff['attributes']['employmentClassification']);
                 $department = '';
                 $email = trim((string)$staff['relationships']['person']['data']['attributes']['email']);
+                $house = $this->findStaffHouse($staff);
                 $lastname = trim((string)$staff['relationships']['person']['data']['attributes']['lastName']);
                 $positionTitle = trim((string)($staff['attributes']['jobTitle'] ?? ''));
                 $room = '';
@@ -1381,6 +1392,7 @@ class Profile implements IStrategy
                     ->setCategory($category)
                     ->setDepartment($department)
                     ->setEmail($email)
+                    ->setHouse($house)
                     ->setPhone($phone)
                     ->setPositionTitle($positionTitle)
                     ->setRoom($room)
@@ -1423,6 +1435,43 @@ class Profile implements IStrategy
              */
             $nextUrl = $payload['links']['next'] ?? null;
         }
+    }
+
+
+    /**
+     * Staff don't get Houses as a sideload, so you have to fetch them the hard way.
+     *
+     * @param array $staff
+     * @return string|null
+     */
+    private function findStaffHouse(array $staff): ?string
+    {
+        /* Find the first employment data and accept that as canon
+         */
+        // 'employments' may not exist for invalid data
+        if (!isset($staff['relationships']['employments'])) {
+            $this->log->debug('Relationships employments data does not exist.');
+            return null;
+        }
+
+        foreach ($staff['relationships']['employments']['data'] as $employment) {
+            if ('staffEmployment' === $employment['type']) {
+                /* "house" might not be a node in the relationships;
+                 * This staff member doesn't have a house.
+                 */
+                if (isset($employment['relationships']['house']['data'])) {
+                    $houseId = $employment['relationships']['house']['data']['id'] ?? null;
+
+                    /* This was added for Queenwood, might not appear anywhere else
+                     */
+                    if (null !== $houseId) {
+                        return $this->houses[$houseId];
+                    }
+                }
+            }
+        }
+
+        return null;
     }
 
 
