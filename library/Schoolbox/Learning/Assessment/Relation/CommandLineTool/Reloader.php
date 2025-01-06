@@ -243,4 +243,12 @@ OPTIONS
 
 HELP;
     }
+
+    /**
+     * @inheritDoc
+     */
+    public function runAsRoot(): ?bool
+    {
+        return null;
+    }
 }
