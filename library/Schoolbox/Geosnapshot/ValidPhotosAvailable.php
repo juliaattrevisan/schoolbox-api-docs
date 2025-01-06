@@ -13,14 +13,14 @@ use Schoolbox\User;
 use SensitiveParameter;
 
 /**
- * Class StudentPhotosAvailable
+ * Class ValidPhotosAvailable
  *
  * Decide whether Geosnapshot integration was correctly set up and available
  * to make requests to the third party, for photos of a particular guy
  *
  * @package Schoolbox\Geosnapshot
  */
-class ValidStudentPhotosAvailable extends ValidGeosnapshotAvailable
+class ValidPhotosAvailable extends ValidGeosnapshotAvailable
 {
     /**
      * Geosnapshot integration is decided by two config vars and two users
@@ -34,7 +34,6 @@ class ValidStudentPhotosAvailable extends ValidGeosnapshotAvailable
      */
     public function isSatisifiedBy(#[SensitiveParameter] ?string $apiKey, bool $featureFlag, User $viewer, User $viewee): bool
     {
-
         /* Invalid API key; exit early
          * No connectivity allowed
          *

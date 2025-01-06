@@ -14,16 +14,16 @@ use Schoolbox\Resource\Storage\FilesystemProxy;
 use Schoolbox\User;
 
 /**
- * Class StudentPhoto
+ * Class Photo
  *
- * This payload is specifically used to obtain pictures of a particular student
+ * This payload is specifically used to obtain pictures of a particular person
  * by sending Geosnapshot a sample upon which to perform their AI matching
  *
  * The user should have a portrait picture, otherwise this can't work
  *
  * @package Schoolbox\Geosnapshot\Payload
  */
-class StudentPhoto
+class Photo
 {
     /**
      * Constructor

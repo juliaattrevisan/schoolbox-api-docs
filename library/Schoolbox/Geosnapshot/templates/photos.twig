@@ -1,7 +1,7 @@
 {##
- # studentPhotos
+ # photos
  #
- # Display all the photos associated with a given student $viewee
+ # Display all the photos associated with a given person $viewee
  #
  # @param array $allBreadcrumbs  A trail of crumbularity
  # @param User $viewee           The person being viewed
@@ -13,7 +13,7 @@
 {# Null payload prevents this from rendering
  # Used while we're developing and testing with random base64 images
  #}
-{% include '@geosnapshotApi/studentPhotosDiagnostic.twig' with {
+{% include '@geosnapshotApi/photosDiagnostic.twig' with {
     payload: payload ?? null
 } %}
 

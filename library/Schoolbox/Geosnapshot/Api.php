@@ -16,7 +16,7 @@ use GuzzleHttp\RequestOptions;
 use League\Flysystem\FilesystemException;
 use Schoolbox\Geosnapshot\Payload\EventPhoto;
 use Schoolbox\Geosnapshot\Payload\RedactedPhotoList;
-use Schoolbox\Geosnapshot\Payload\StudentPhoto;
+use Schoolbox\Geosnapshot\Payload\Photo;
 use Schoolbox\Resource\Storage\FilesystemProxy;
 use Schoolbox\User;
 use SensitiveParameter;
@@ -105,9 +105,9 @@ class Api
      * @throws \JsonException
      * @throws \RuntimeException
      */
-    public function retrieveStudentPhotos(User $viewee, User $viewer, FilesystemProxy $filesystemProxy): array
+    public function retrievePhotos(User $viewee, User $viewer, FilesystemProxy $filesystemProxy): array
     {
-        return $this->retrieve(self::GEOSNAPSHOT_ENDPOINT, (new StudentPhoto($filesystemProxy))->build($viewee, $viewer));
+        return $this->retrieve(self::GEOSNAPSHOT_ENDPOINT, (new Photo($filesystemProxy))->build($viewee, $viewer));
     }
 
 

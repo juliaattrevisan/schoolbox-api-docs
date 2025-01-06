@@ -1,7 +1,7 @@
 <?php
 
 /**
- * ValidStudentPhotosAvailableTest
+ * ValidPhotosAvailableTest
  *
  * See SD-10 for usages
  *
@@ -16,15 +16,15 @@ declare(strict_types=1);
 namespace Schoolbox\Geosnapshot\Test;
 
 use PHPUnit\Framework\TestCase;
-use Schoolbox\Geosnapshot\ValidStudentPhotosAvailable;
+use Schoolbox\Geosnapshot\ValidPhotosAvailable;
 use Schoolbox\Role;
 
 /**
- * Class ValidStudentPhotosAvailableTest
+ * Class ValidPhotosAvailableTest
  *
  * @package Schoolbox\Example\Test
  */
-class ValidStudentPhotosAvailableTest extends TestCase
+class ValidPhotosAvailableTest extends TestCase
 {
     /**
      * @param null|string $apiKey
@@ -34,11 +34,10 @@ class ValidStudentPhotosAvailableTest extends TestCase
      * @param int $expected
      * @throws \PHPUnit\Framework\ExpectationFailedException
      */
-    #[\PHPUnit\Framework\Attributes\DataProvider('provider_validStudentPhotosAvailable')]
-    public function testValidStudentPhotosAvailable($apiKey, $featureFlag, $viewer, $viewee, $expected)
+    #[\PHPUnit\Framework\Attributes\DataProvider('provider_validPhotosAvailable')]
+    public function testValidPhotosAvailable($apiKey, $featureFlag, $viewer, $viewee, $expected)
     {
-
-        $outcome = (new ValidStudentPhotosAvailable())
+        $outcome = (new ValidPhotosAvailable())
             ->isSatisifiedBy($apiKey, $featureFlag, $viewer, $viewee);
 
         /* There are other assertions that you can try (ctrl-click to follow)
@@ -47,11 +46,11 @@ class ValidStudentPhotosAvailableTest extends TestCase
     }
 
     /**
-     * Data provider for testValidStudentPhotosAvailable
+     * Data provider for testValidPhotosAvailable
      *
      * @return array
      */
-    public static function provider_validStudentPhotosAvailable(): array
+    public static function provider_validPhotosAvailable(): array
     {
 
         /* A classically-correct user
