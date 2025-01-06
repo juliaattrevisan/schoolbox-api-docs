@@ -24,21 +24,13 @@ export default window.Vue.defineComponent({
 
     data() {
         return {
-            settingsList: [],
+            settingsList: [] as SBSettingsListItem[],
             isLoaded: false,
             hasLoadError: false,
             query: "",
             minQueryLength: 3,
             resultsShownLimit: 6,
             activeIndex: 0, // to track which index is selected
-        } as {
-            settingsList: SBSettingsListItem[];
-            isLoaded: boolean;
-            hasLoadError: boolean;
-            query: string;
-            minQueryLength: number;
-            resultsShownLimit: number;
-            activeIndex: number;
         };
     },
 
