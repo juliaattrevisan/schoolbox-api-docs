@@ -36,7 +36,11 @@
                                     {{ tour.title }}
                                     {% set audienceRoleNames = tourAudienceRoleNamesByUuid[tour.uuid] %}
                                     <span class="pipe meta" title="The tour will display for these roles only.">
-                                        {{ audienceRoleNames|join(', ') }}
+                                        {% if audienceRoleNames|length > 0 %}
+                                            {{ audienceRoleNames|join(', ') }}
+                                        {% else %}
+                                            No roles targeted
+                                        {% endif %}
                                     </span>
                                 </label>
                                 <div class="switch">
