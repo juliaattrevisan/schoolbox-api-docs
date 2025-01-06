@@ -37,6 +37,9 @@ $app = new class extends CliTool\App {
     /** @inheritDoc */
     public function run(): void
     {
+        if (!$this->perform()) {
+            $this->getLogger()->error("This is a dry run, no changes will be made");
+        }
         $redis = $this->getRedisService();
         $this->deleteVcalCache($redis);
         $this->printResults();
@@ -70,10 +73,13 @@ $app = new class extends CliTool\App {
             if ($this->countVcalCacheDeleted % self::PROGRESS_INCREMENTS === 0 && $this->countVcalCacheDeleted) {
                 $this->getLogger()->info("$this->countVcalCacheDeleted...");
             }
-            $this->getLogger()->debug("Removing vcal object: $key");
+
             $this->countVcalCacheDeleted++;
             if ($this->perform()) {
+                $this->getLogger()->debug("Removing vcal object: $key");
                 $redis->del($key);
+            } else {
+                $this->getLogger()->debug("Would remove vcal object: $key");
             }
         }
     }

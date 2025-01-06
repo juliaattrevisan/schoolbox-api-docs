@@ -466,4 +466,4 @@ fi
 "$SITE_ROOT"/tools/increment-instance-dates.php;
 
 # Clean up vcal cache
-"$SITE_ROOT"/tools/redis/removeVcalCache.php;
+"$SITE_ROOT"/tools/redis/removeVcalCache.php -p;
