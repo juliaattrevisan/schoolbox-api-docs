@@ -74,7 +74,7 @@ class Model
     /**
      * @var string|null
      */
-    private ?string $house = null;
+    private ?string $houseName = null;
 
 
     /**
@@ -266,19 +266,19 @@ class Model
     /**
      * @return string|null
      */
-    public function getHouse(): ?string
+    public function getHouseName(): ?string
     {
-        return $this->house;
+        return $this->houseName;
     }
 
 
     /**
-     * @param string|null $house
+     * @param string|null $houseName
      * @return $this
      */
-    public function setHouse(?string $house): self
+    public function setHouseName(?string $houseName): self
     {
-        $this->house = $house;
+        $this->houseName = $houseName;
         return $this;
     }
 

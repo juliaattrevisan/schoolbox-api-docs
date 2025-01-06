@@ -44,7 +44,7 @@ class Mapper extends \Schoolbox\Mapper
         $this->uses('room', self::TYPE_STRING);
         $this->uses('building', self::TYPE_STRING);
         $this->uses('campus_name', self::TYPE_STRING);
-        $this->uses('house', self::TYPE_STRING);
+        $this->uses('house_name', self::TYPE_STRING);
         $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
         $this->uses('updated_at', self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP);
     }

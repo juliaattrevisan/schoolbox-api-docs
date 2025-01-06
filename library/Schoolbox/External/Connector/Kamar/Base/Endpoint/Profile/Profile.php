@@ -654,7 +654,7 @@ class Profile implements IStrategy
                 ->setCategory($category)
                 ->setDepartment(implode(', ', $departments))
                 ->setEmail($email)
-                ->setHouse($house)
+                ->setHouseName($house)
                 ->setPhone($phone)
                 ->setPositionTitle($position)
                 ->setRoom(null)

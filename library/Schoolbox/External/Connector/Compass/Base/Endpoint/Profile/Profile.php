@@ -1179,7 +1179,7 @@ class Profile implements IStrategy
                 ->setCategory($category)
                 ->setDepartment($department)
                 ->setEmail($email)
-                ->setHouse($house)
+                ->setHouseName($house)
                 ->setPhone($phone)
                 ->setPositionTitle($positionTitle)
                 ->setRoom($room)
