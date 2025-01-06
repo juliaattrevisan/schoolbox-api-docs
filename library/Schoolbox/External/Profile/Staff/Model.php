@@ -9,7 +9,6 @@ declare(strict_types=1);
 
 namespace Schoolbox\External\Profile\Staff;
 
-use Schoolbox\ISoftDeletable;
 use Schoolbox\Mapper\Traits\Model as ModelTrait;
 use Schoolbox\External\Profile\Model as ProfileModel;
 
@@ -21,47 +20,55 @@ class Model
     /**
      * @var string|null
      */
-    private $username;
+    private ?string $username = null;
+
 
     /**
      * @var string|null
      */
-    private $email;
+    private ?string $email = null;
+
 
     /**
      * @var string|null
      */
-    private $category;
+    private ?string $category = null;
+
 
     /**
      * @var string|null
      */
-    private $positionTitle;
+    private ?string $positionTitle = null;
+
 
     /**
      * @var string|null
      */
-    private $department;
+    private ?string $department = null;
+
 
     /**
      * @var string|null
      */
-    private $phone;
+    private ?string $phone = null;
+
 
     /**
      * @var string|null
      */
-    private $room;
+    private ?string $room = null;
+
 
     /**
      * @var string|null
      */
-    private $building;
+    private ?string $building = null;
+
 
     /**
      * @var string|null
      */
-    private $campusName;
+    private ?string $campusName = null;
 
 
     /**
@@ -71,9 +78,9 @@ class Model
 
 
     /**
-     * @var ProfileModel
+     * @var ProfileModel|null
      */
-    private $baseProfile;
+    private ?ProfileModel $baseProfile = null;
 
 
     /**
