@@ -150,35 +150,6 @@ class Model
 
 
     /**
-     * @return string|null
-     */
-    public function getHouse(): ?string
-    {
-        return $this->house;
-    }
-
-
-    /**
-     * @param string|null $house
-     * @return $this
-     */
-    public function setHouse(?string $house): self
-    {
-        $this->house = $house;
-        return $this;
-    }
-
-
-    /**
-     * @return ProfileModel
-     */
-    public function getBaseProfile(): ProfileModel
-    {
-        return $this->baseProfile;
-    }
-
-
-    /**
      * @param string|null $username
      * @return Model
      */
@@ -267,6 +238,36 @@ class Model
         $this->campusName = $campusName;
         return $this;
     }
+
+
+    /**
+     * @return string|null
+     */
+    public function getHouse(): ?string
+    {
+        return $this->house;
+    }
+
+
+    /**
+     * @param string|null $house
+     * @return $this
+     */
+    public function setHouse(?string $house): self
+    {
+        $this->house = $house;
+        return $this;
+    }
+
+
+    /**
+     * @return ProfileModel
+     */
+    public function getBaseProfile(): ProfileModel
+    {
+        return $this->baseProfile;
+    }
+
 
     /**
      * @param ProfileModel|null $baseProfile
