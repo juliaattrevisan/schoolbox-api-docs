@@ -91,70 +91,6 @@ class Model
         return $this->username;
     }
 
-    /**
-     * @return string|null
-     */
-    public function getEmail(): ?string
-    {
-        return $this->email;
-    }
-
-    /**
-     * @return string|null
-     */
-    public function getCategory(): ?string
-    {
-        return $this->category;
-    }
-
-    /**
-     * @return string|null
-     */
-    public function getPositionTitle(): ?string
-    {
-        return $this->positionTitle;
-    }
-
-    /**
-     * @return string|null
-     */
-    public function getDepartment(): ?string
-    {
-        return $this->department;
-    }
-
-    /**
-     * @return string|null
-     */
-    public function getPhone(): ?string
-    {
-        return $this->phone;
-    }
-
-    /**
-     * @return string|null
-     */
-    public function getRoom(): ?string
-    {
-        return $this->room;
-    }
-
-    /**
-     * @return string|null
-     */
-    public function getBuilding(): ?string
-    {
-        return $this->building;
-    }
-
-    /**
-     * @return string|null
-     */
-    public function getCampusName(): ?string
-    {
-        return $this->campusName;
-    }
-
 
     /**
      * @param string|null $username
@@ -166,6 +102,16 @@ class Model
         return $this;
     }
 
+
+    /**
+     * @return string|null
+     */
+    public function getEmail(): ?string
+    {
+        return $this->email;
+    }
+
+
     /**
      * @param string|null $email
      * @return Model
@@ -175,6 +121,16 @@ class Model
         $this->email = $email;
         return $this;
     }
+
+
+    /**
+     * @return string|null
+     */
+    public function getCategory(): ?string
+    {
+        return $this->category;
+    }
+
 
     /**
      * @param string|null $category
@@ -186,6 +142,16 @@ class Model
         return $this;
     }
 
+
+    /**
+     * @return string|null
+     */
+    public function getPositionTitle(): ?string
+    {
+        return $this->positionTitle;
+    }
+
+
     /**
      * @param string|null $positionTitle
      * @return Model
@@ -195,6 +161,16 @@ class Model
         $this->positionTitle = $positionTitle;
         return $this;
     }
+
+
+    /**
+     * @return string|null
+     */
+    public function getDepartment(): ?string
+    {
+        return $this->department;
+    }
+
 
     /**
      * @param string|null $department
@@ -206,6 +182,16 @@ class Model
         return $this;
     }
 
+
+    /**
+     * @return string|null
+     */
+    public function getPhone(): ?string
+    {
+        return $this->phone;
+    }
+
+
     /**
      * @param string|null $phone
      * @return Model
@@ -215,6 +201,16 @@ class Model
         $this->phone = $phone;
         return $this;
     }
+
+
+    /**
+     * @return string|null
+     */
+    public function getRoom(): ?string
+    {
+        return $this->room;
+    }
+
 
     /**
      * @param string|null $room
@@ -226,6 +222,16 @@ class Model
         return $this;
     }
 
+
+    /**
+     * @return string|null
+     */
+    public function getBuilding(): ?string
+    {
+        return $this->building;
+    }
+
+
     /**
      * @param string|null $building
      * @return Model
@@ -235,6 +241,16 @@ class Model
         $this->building = $building;
         return $this;
     }
+
+
+    /**
+     * @return string|null
+     */
+    public function getCampusName(): ?string
+    {
+        return $this->campusName;
+    }
+
 
     /**
      * @param string|null $campusName
