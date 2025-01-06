@@ -292,7 +292,7 @@ class CliImporter extends CliTool\App
 
         $this->getLogger()->notice('Canvas data import complete.');
 
-        $this->getLogger()->notice('Next line: `Delete and insert counts do not match:` This is expected as we have just cleaned up the old data');
+        $this->getLogger()->notice('Reloading materialized view of assessment relations. Warning related to broken counts expected due to data import');
 
         // hook into the mv_assessment_relation reloader to cleanup the old data
         $app     = new Reloader();
