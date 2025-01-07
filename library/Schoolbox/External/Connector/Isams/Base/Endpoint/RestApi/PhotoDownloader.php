@@ -1,8 +1,8 @@
 <?php
 
 /**
- * @copyright   Copyright 2022, Schoolbox Pty Ltd
- * @link        https://schoolbox.com.au/
+ * @copyright   Copyright 2025, Schoolbox Pty Ltd
+ * @link        https://schoolbox.education/
  */
 
 declare(strict_types=1);
@@ -16,17 +16,13 @@ use SensitiveParameter;
 /**
  * Class PhotoDownloader
  *
- * Downloads a zip file containing profile pictures, from isams
- * For some reason the Guzzle implementation results in isams
- * stopping you:
+ * Downloads each users full size picture from isams
+ * Following the now used RestApi system
  *
- * "iSAMS blocked the request as it came from an unknown source."
- *
- * The Alaress curl url lets you in though.
  */
 class PhotoDownloader implements IPhotoDownloader
 {
-    private RestApi $Api;
+    private RestApi $api;
 
     /**
      * @inheritDoc
@@ -36,7 +32,7 @@ class PhotoDownloader implements IPhotoDownloader
         /* Store this locally just once
          */
         $credentials = (new DSN())->decode($dsn);
-        $this->Api = new RestApi($credentials['modules'][DSN::MODULE_RESTAPIHOST]['key'], $credentials['modules'][DSN::MODULE_RESTAPICLIENTID]['key'], $credentials['modules'][DSN::MODULE_RESTAPICLIENTSECRET]['key']);
+        $this->api = new RestApi($credentials['modules'][DSN::MODULE_RESTAPIHOST]['key'], $credentials['modules'][DSN::MODULE_RESTAPICLIENTID]['key'], $credentials['modules'][DSN::MODULE_RESTAPICLIENTSECRET]['key']);
     }
 
     /**
@@ -47,10 +43,10 @@ class PhotoDownloader implements IPhotoDownloader
         switch ($roleType) {
             case self::ROLE_STUDENT:
                 $url = sprintf('Main/api/students/%s/photos/current', $externalId);
-                return $this->Api->request($url, 'GET', raw: true);
+                return $this->api->request($url, 'GET', raw: true);
             case self::ROLE_STAFF:
                 $url = sprintf('Main/api/humanresources/employees/%s/photos/current', $externalId);
-                return $this->Api->request($url, 'GET', raw: true);
+                return $this->api->request($url, 'GET', raw: true);
             default:
                 return null;
         }
