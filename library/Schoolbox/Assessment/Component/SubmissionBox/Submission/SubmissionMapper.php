@@ -28,7 +28,6 @@ use Schoolbox\Assessment\Participant;
  */
 class SubmissionMapper extends BaseMapper
 {
-
     /**
      * @var Participant\Plan\InteractionIntegrityChecker
      */
