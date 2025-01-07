@@ -124,8 +124,8 @@ class Factory
 
         // if batch API exists, use that for photos, else fallback to batchxml thumbnails
         $credentials = (new DSN())->decode($this->key);
-        if ($credentials['modules'][DSN::MODULE_BATCHAPIHOST]['key'] !== '') {
-            $photoDownloader = new IsamsApiEndpoint\Profile\PhotoDownloader($this->host, $this->key, $this->zipDir);
+        if ($credentials['modules'][DSN::MODULE_RESTAPIHOST]['key'] !== '') {
+            $photoDownloader = new RestApi\PhotoDownloader($this->host, $this->key, $this->zipDir);
         } else {
             /* This lets you shank down zip files containing everyone's profile pictures
          */

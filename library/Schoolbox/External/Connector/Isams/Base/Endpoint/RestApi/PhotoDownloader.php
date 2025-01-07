@@ -7,11 +7,10 @@
 
 declare(strict_types=1);
 
-namespace Schoolbox\External\Connector\IsamsApi\Base\Endpoint\Profile;
+namespace Schoolbox\External\Connector\Isams\Base\Endpoint\RestApi;
 
-use Schoolbox\External\Connector\Isams\Base\Endpoint\Profile\IPhotoDownloader;
 use Schoolbox\External\Connector\Isams\Base\Endpoint\Codec\DSN;
-use Schoolbox\External\Connector\IsamsApi\Base\Endpoint\Batchapi;
+use Schoolbox\External\Connector\Isams\Base\Endpoint\Profile\IPhotoDownloader;
 use SensitiveParameter;
 
 /**
@@ -27,7 +26,7 @@ use SensitiveParameter;
  */
 class PhotoDownloader implements IPhotoDownloader
 {
-    private Batchapi $Api;
+    private RestApi $Api;
 
     /**
      * @inheritDoc
@@ -37,7 +36,7 @@ class PhotoDownloader implements IPhotoDownloader
         /* Store this locally just once
          */
         $credentials = (new DSN())->decode($dsn);
-        $this->Api = new Batchapi($credentials['modules'][DSN::MODULE_BATCHAPIHOST]['key'], $credentials['modules'][DSN::MODULE_BATCHAPICLIENTID]['key'], $credentials['modules'][DSN::MODULE_BATCHAPICLIENTSECRET]['key']);
+        $this->Api = new RestApi($credentials['modules'][DSN::MODULE_RESTAPIHOST]['key'], $credentials['modules'][DSN::MODULE_RESTAPICLIENTID]['key'], $credentials['modules'][DSN::MODULE_RESTAPICLIENTSECRET]['key']);
     }
 
     /**
@@ -62,7 +61,7 @@ class PhotoDownloader implements IPhotoDownloader
      */
     public function downloadStudentPhotos(): void
     {
-        // unused for batchapi
+        // unused for RestApi
     }
 
     /**
@@ -70,7 +69,7 @@ class PhotoDownloader implements IPhotoDownloader
      */
     public function downloadStaffPhotos(): void
     {
-        // unused for batchapi
+        // unused for RestApi
     }
 
     /**
@@ -78,10 +77,10 @@ class PhotoDownloader implements IPhotoDownloader
      */
     public function cleanup(): void
     {
-        // unused for batchapi
+        // unused for RestApi
     }
     public function whichSystem(): string
     {
-        return 'batchAPI';
+        return 'restAPI';
     }
 }

@@ -8,7 +8,7 @@
 
 declare(strict_types=1);
 
-namespace Schoolbox\External\Connector\IsamsApi\Base\Endpoint;
+namespace Schoolbox\External\Connector\Isams\Base\Endpoint\RestApi;
 
 use GuzzleHttp\Client as HttpClient;
 use GuzzleHttp\Exception\GuzzleException;

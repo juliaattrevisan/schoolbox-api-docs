@@ -8,23 +8,23 @@
 
 declare(strict_types=1);
 
-namespace Schoolbox\External\Connector\IsamsApi\Base\Endpoint;
+namespace Schoolbox\External\Connector\Isams\Base\Endpoint\RestApi;
 
 use GuzzleHttp\Client as HttpClient;
 use GuzzleHttp\Exception\GuzzleException;
 use GuzzleHttp\RequestOptions;
 use Psr\Http\Client\ClientExceptionInterface;
 use Psr\SimpleCache\InvalidArgumentException;
-use SensitiveParameter;
 use Schoolbox\Url\Uri;
+use SensitiveParameter;
 
-class Batchapi
+class RestApi
 {
     private array $jwks = [];
-     private Api $api;
+    private Api $api;
 
     /**
-     * Batchapi constructor.
+     * RestApi constructor.
      *
      */
     public function __construct(
