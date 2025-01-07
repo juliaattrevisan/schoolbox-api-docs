@@ -27,25 +27,61 @@ use SensitiveParameter;
  */
 class PhotoDownloader implements IPhotoDownloader
 {
-
     private Batchapi $Api;
 
     /**
      * @inheritDoc
      */
-    public function __construct(string $host, #[SensitiveParameter] string $dsn, string $zipDir, string $zipDir)
+    public function __construct(string $host, #[SensitiveParameter] string $dsn, string $zipDir)
     {
         /* Store this locally just once
          */
         $credentials = (new DSN())->decode($dsn);
-        $this->Api = new Batchapi($credentials[DSN::MODULE_BATCHAPIHOST], $credentials[DSN::MODULE_BATCHAPICLIENTID], DSN::MODULE_BATCHAPICLIENTSECRET);
+        $this->Api = new Batchapi($credentials['modules'][DSN::MODULE_BATCHAPIHOST]['key'], $credentials['modules'][DSN::MODULE_BATCHAPICLIENTID]['key'], $credentials['modules'][DSN::MODULE_BATCHAPICLIENTSECRET]['key']);
     }
 
     /**
      * @inheritDoc
      */
-    public function getPhoto(string $personId): ?string
+    public function getPhoto(string $personId, string $roleType = self::ROLE_STUDENT, ?string $externalId = null): ?string
     {
-        return null;
+        switch ($roleType) {
+            case self::ROLE_STUDENT:
+                $url = sprintf('Main/api/students/%s/photos/current', $externalId);
+                return $this->Api->request($url, 'GET', raw: true);
+            case self::ROLE_STAFF:
+                $url = sprintf('Main/api/humanresources/employees/%s/photos/current', $externalId);
+                return $this->Api->request($url, 'GET', raw: true);
+            default:
+                return null;
+        }
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function downloadStudentPhotos(): void
+    {
+        // unused for batchapi
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function downloadStaffPhotos(): void
+    {
+        // unused for batchapi
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function cleanup(): void
+    {
+        // unused for batchapi
+    }
+    public function whichSystem(): string
+    {
+        return 'batchAPI';
     }
 }

@@ -70,7 +70,7 @@ class Api
      * @throws GuzzleException
      * @throws \JsonException
      */
-    public function request(string $path, string $method, array $options = [], #[SensitiveParameter] ?string $token = null): mixed
+    public function request(string $path, string $method, array $options = [], #[SensitiveParameter] ?string $token = null, bool $raw = false): mixed
     {
         // if we have a bearer token, then use it.
         if ($token) {
@@ -106,6 +106,9 @@ class Api
                  * what happens next and how those errors might be logged/presented to users
                  */
                 if (\in_array($response->getStatusCode(), [200, 201, 202], true)) {
+                    if ($raw) {
+                        return $response->getBody()->getContents();
+                    }
                     return json_decode($response->getBody()->getContents(), true, 512, JSON_THROW_ON_ERROR);
                 }
 

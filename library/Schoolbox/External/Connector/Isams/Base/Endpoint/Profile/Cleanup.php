@@ -73,9 +73,9 @@ class Cleanup implements IStrategy
 
 
     /**
-     * @var PhotoDownloader
+     * @var IPhotoDownloader
      */
-    private PhotoDownloader $photoDownloader;
+    private IPhotoDownloader $photoDownloader;
 
 
     /**
@@ -89,7 +89,7 @@ class Cleanup implements IStrategy
      * @param UserProfile\Parent\Mapper       $parentProfileMapper
      * @param UserProfile\Staff\Mapper        $staffProfileMapper
      * @param UserProfile\Relationship\Mapper $relationshipMapper
-     * @param PhotoDownloader                 $photoDownloader
+     * @param IPhotoDownloader                 $photoDownloader
      */
     public function __construct(
         LoggerInterface $log,
@@ -100,7 +100,7 @@ class Cleanup implements IStrategy
         UserProfile\Parent\Mapper $parentProfileMapper,
         UserProfile\Staff\Mapper $staffProfileMapper,
         UserProfile\Relationship\Mapper $relationshipMapper,
-        PhotoDownloader $photoDownloader
+        IPhotoDownloader $photoDownloader
     ) {
         $this->log = $log;
         $this->perform = $perform;

@@ -109,9 +109,9 @@ class Profile implements IStrategy
 
 
     /**
-     * @var PhotoDownloader
+     * @var IPhotoDownloader
      */
-    private PhotoDownloader $photoDownloader;
+    private IPhotoDownloader $photoDownloader;
 
 
     /**
@@ -158,7 +158,7 @@ class Profile implements IStrategy
      * @param bool                            $perform
      * @param array                           $api
      * @param bool                            $includePhoto
-     * @param PhotoDownloader                 $photoDownloader
+     * @param IPhotoDownloader                 $photoDownloader
      * @param UserProfile\Mapper              $baseProfileMapper
      * @param UserProfile\Student\Mapper      $studentProfileMapper
      * @param UserProfile\Parent\Mapper       $parentProfileMapper
@@ -172,7 +172,7 @@ class Profile implements IStrategy
         bool $perform,
         array $api,
         bool $includePhoto,
-        PhotoDownloader $photoDownloader,
+        IPhotoDownloader $photoDownloader,
         UserProfile\Mapper $baseProfileMapper,
         UserProfile\Student\Mapper $studentProfileMapper,
         UserProfile\Parent\Mapper $parentProfileMapper,
@@ -459,7 +459,7 @@ class Profile implements IStrategy
 
             /* Import photos from sis
              */
-            $this->importPortrait($studentBaseProfile, $personId);
+            $this->importPortrait($studentBaseProfile, $personId, IPhotoDownloader::ROLE_STUDENT);
 
             try {
                 /* Then save it
@@ -490,9 +490,10 @@ class Profile implements IStrategy
      *
      * @param Model  $baseProfile
      * @param string $personId
+     * @param string $roleType should be one of the IPhotoDownloader::ROLE_* constants
      * @return void
      */
-    private function importPortrait(UserProfile\Model $baseProfile, string $personId): void
+    private function importPortrait(UserProfile\Model $baseProfile, string $personId, string $roleType): void
     {
         /* Check if config setting allows photos from sis
          * If it's enabled, continue importing pics
@@ -505,7 +506,7 @@ class Profile implements IStrategy
          *
          * file_info node might not exist; if it doesn't, skip it
          */
-        $photoContents = $this->photoDownloader->getPhoto($personId);
+        $photoContents = $this->photoDownloader->getPhoto($personId, $roleType, $baseProfile->getExternalId());
 
         if (null === $photoContents) {
             $this->log->debug(sprintf(
@@ -547,12 +548,13 @@ class Profile implements IStrategy
              */
             if (!$baseProfile->getPortrait() || ($baseProfile->getPortrait()->getHash() !== $portrait->getHash())) {
                 $this->log->debug(sprintf(
-                    'Profile picture: %s %s (%s) has profile hash %s derived from %s.png',
+                    'Profile picture: %s %s (%s) has profile hash %s derived from %s.png via %s',
                     $baseProfile->getFirstname(),
                     $baseProfile->getLastname(),
                     $baseProfile->getExternalId(),
                     $portrait->getHash(),
-                    $personId
+                    $personId,
+                    $this->photoDownloader->whichSystem(),
                 ));
 
                 $baseProfile->setPortrait($portrait);
@@ -1176,7 +1178,7 @@ class Profile implements IStrategy
 
             /* Import photos from sis
              */
-            $this->importPortrait($staffBaseProfile, $personId);
+            $this->importPortrait($staffBaseProfile, $personId, IPhotoDownloader::ROLE_STAFF);
 
             try {
                 /* Then save it

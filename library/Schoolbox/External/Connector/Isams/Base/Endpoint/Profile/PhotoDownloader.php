@@ -181,9 +181,11 @@ class PhotoDownloader implements IPhotoDownloader
      * All isams pictures seem to be pngs in a zip (god knows why)
      *
      * @param string $personId
+     * @param string $roleType
+     * @param ?string $externalId = null
      * @return string|null
      */
-    public function getPhoto(string $personId): ?string
+    public function getPhoto(string $personId, string $roleType = self::ROLE_STUDENT, ?string $externalId = null): ?string
     {
         $path = "{$this->cacheDir}/{$personId}.png";
 
@@ -211,5 +213,10 @@ class PhotoDownloader implements IPhotoDownloader
                 unlink($source);
             }
         }
+    }
+
+    public function whichSystem(): string
+    {
+        return 'batchXML';
     }
 }

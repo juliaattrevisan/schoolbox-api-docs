@@ -11,6 +11,7 @@ declare(strict_types=1);
 namespace Schoolbox\External\Connector\IsamsApi\Base\Endpoint;
 
 use GuzzleHttp\Client as HttpClient;
+use GuzzleHttp\Exception\GuzzleException;
 use GuzzleHttp\RequestOptions;
 use Psr\Http\Client\ClientExceptionInterface;
 use Psr\SimpleCache\InvalidArgumentException;
@@ -73,14 +74,13 @@ class Batchapi
      * @param string $path
      * @param string $method
      * @param array $options
+     * @param bool $raw // return the raw response body, NOT json decoded
      * @return mixed
-     * @throws ClientExceptionInterface
-     * @throws InvalidArgumentException
-     * @throws \GuzzleHttp\Exception\GuzzleException
+     * @throws GuzzleException
      * @throws \JsonException
      */
-    public function request(string $path, string $method, array $options = []): mixed
+    public function request(string $path, string $method, array $options = [], bool $raw = false): mixed
     {
-        return $this->api->request($path, $method, $options, $this->getToken());
+        return $this->api->request($path, $method, $options, $this->getToken(), $raw);
     }
 }
