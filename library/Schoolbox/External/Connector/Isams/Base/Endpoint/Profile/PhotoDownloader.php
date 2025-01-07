@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\External\Connector\Isams\Base\Endpoint\Profile;
 
+use Psr\SimpleCache\CacheInterface;
 use Schoolbox\Url\Uri;
 use Schoolbox\External\Connector\Isams\Base\Endpoint\Codec\DSN;
 use SensitiveParameter;
@@ -25,7 +26,7 @@ use ZipArchive;
  *
  * The Alaress curl url lets you in though.
  */
-class PhotoDownloader
+class PhotoDownloader implements IPhotoDownloader
 {
     /**
      * All downloads have this prefix

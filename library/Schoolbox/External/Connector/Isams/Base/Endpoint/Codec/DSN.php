@@ -28,6 +28,9 @@ class DSN implements IDSN
      */
     public const MODULE_BATCHXML = 'batchxml';
 
+    public const MODULE_BATCHAPIHOST = 'batchapihost';
+    public const MODULE_BATCHAPICLIENTID = 'batchapiclientid';
+    public const MODULE_BATCHAPICLIENTSECRET = 'batchapiclientsecret';
 
     /**
      * Each module const has a corresponding path which isn't conveniently known,

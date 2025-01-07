@@ -14,6 +14,7 @@ use Schoolbox\External\ClassEntryMapper;
 use Schoolbox\External\ClassInvolvementMapper;
 use Schoolbox\External\ClassPeriodMapper;
 use Schoolbox\External\Connector\Isams\Base\Endpoint\Codec\DSN;
+use Schoolbox\External\Connector\IsamsApi\Base\Endpoint as IsamsApiEndpoint;
 use Schoolbox\External\Connector\ValidStrats;
 use Schoolbox\External\Importer\Endpoint\IStrategy;
 use Schoolbox\External\Profile as UserProfile;
@@ -121,9 +122,15 @@ class Factory
             ];
         }
 
-        /* This lets you shank down zip files containing everyone's profile pictures
+        // if batch API exists, use that for photos, else fallback to batchxml thumbnails
+        $credentials = (new DSN())->decode($this->key);
+        if ($credentials['modules'][DSN::MODULE_BATCHAPIHOST]['key'] !== '') {
+            $photoDownloader = new IsamsApiEndpoint\Profile\PhotoDownloader($this->host, $this->key, $this->zipDir);
+        } else {
+            /* This lets you shank down zip files containing everyone's profile pictures
          */
-        $photoDownloader = new Profile\PhotoDownloader($this->host, $this->key, $this->zipDir);
+            $photoDownloader = new Profile\PhotoDownloader($this->host, $this->key, $this->zipDir);
+        }
 
         /* Purge previously-imported profile relationships and classes
          */

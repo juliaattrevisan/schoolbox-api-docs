@@ -47,6 +47,24 @@
                         </select>
                     </div>
                 </div>
+                <div class="row">
+                    <div class="small-12 columns">
+                        <span>Batch API, if needing fullsize profile images</span>
+                    </div>
+                    <div class="small-4 columns">
+                        <label >Batch API Host</label>
+                        <input type="text" class='suds-crypto' name="dsn[isams][modules][batchapihost][key]" value="{{ modules.batchapihost.key ?? ''}}" />
+                    </div>
+                    <div class="small-4 columns">
+                        <label >Batch API Client ID</label>
+                        <input type="text" class='suds-crypto' name="dsn[isams][modules][batchapiclientid][key]" value="{{ modules.batchapiclientid.key ?? ''}}" />
+                    </div>
+                    <div class="small-4 columns">
+                        <label >Batch API Client Secret</label>
+                        <input type="text" class='suds-crypto' name="dsn[isams][modules][batchapiclientsecret][key]" value="{{ modules.batchapiclientsecret.key ?? ''}}" />
+                    </div>
+
+                </div>
             </div>
         </fieldset>
     </section>
