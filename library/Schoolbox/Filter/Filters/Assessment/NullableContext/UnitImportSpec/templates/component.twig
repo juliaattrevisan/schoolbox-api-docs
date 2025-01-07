@@ -31,7 +31,7 @@
                 {% set roleSelection = roleSelections[unit.id] %}
                 {% include '@filters/_selectionCheckbox.twig' with {
                     roleSelection:      roleSelection,
-                    userSelection:      userSelections[unit.id],
+                    userSelection:      userSelections[unit.id] ?? null,
                     label:              unit.title,
                     disabled:           isDisabled
                 } only %}
