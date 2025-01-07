@@ -590,7 +590,16 @@ class Notifier extends AbstractModuleNotifier
             $pushBanner = "/storage/image.php?hash=$hash&size=pushNotificationBanner";
         } else {
             $icon  = $this->getUserIcon($author);
-            $thumb = $this->prefixGenerator->generate() . '/images/emails/spacer.gif';
+            $fallbackSelected = $this->conf->get('comms_news_article_list_fallback_image');
+            if ($fallbackSelected == 'school-logo') {
+                $thumb = "/images/logo.php?logo=skin_logo_large&size=normal";
+            } else if ($fallbackSelected == 'author') {
+                $user = $article->getAuthor();
+                $thumb = "/portrait.php?id={$user->getId()}&size=square200";
+            } else {
+                /** No fallback image, fill the empty space to maintain layout */
+                $thumb = $this->prefixGenerator->generate() . '/images/emails/spacer.gif';
+            }
             $pushBanner = null;
         }
 
