@@ -459,7 +459,7 @@ class Profile implements IStrategy
 
             /* Import photos from sis
              */
-            $this->importPortrait($studentBaseProfile, $personId, IPhotoDownloader::ROLE_STUDENT);
+            $this->importPortrait($studentBaseProfile, $personId, Role::STUDENT);
 
             try {
                 /* Then save it
@@ -1178,7 +1178,7 @@ class Profile implements IStrategy
 
             /* Import photos from sis
              */
-            $this->importPortrait($staffBaseProfile, $personId, IPhotoDownloader::ROLE_STAFF);
+            $this->importPortrait($staffBaseProfile, $personId, Role::STAFF);
 
             try {
                 /* Then save it

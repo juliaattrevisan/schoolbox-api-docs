@@ -9,28 +9,16 @@ declare(strict_types=1);
 
 namespace Schoolbox\External\Connector\Isams\Base\Endpoint\Profile;
 
-use Psr\SimpleCache\CacheInterface;
-use Schoolbox\Url\Uri;
-use Schoolbox\External\Connector\Isams\Base\Endpoint\Codec\DSN;
+use Schoolbox\Role;
 use SensitiveParameter;
-use ZipArchive;
 
 /**
- * Class PhotoDownloader
+ * Class IPhotoDownloader
  *
- * Downloads a zip file containing profile pictures, from isams
- * For some reason the Guzzle implementation results in isams
- * stopping you:
- *
- * "iSAMS blocked the request as it came from an unknown source."
- *
- * The Alaress curl url lets you in though.
+ * Downloads profile pictures from isams
  */
 interface IPhotoDownloader
 {
-    public const ROLE_STUDENT = 'student';
-    public const ROLE_STAFF = 'staff';
-
     /**
      * Constructor.
      *
@@ -68,7 +56,7 @@ interface IPhotoDownloader
      * @param null|string $externalId
      * @return string|null
      */
-    public function getPhoto(string $personId, string $roleType = self::ROLE_STUDENT, ?string $externalId = null): ?string;
+    public function getPhoto(string $personId, string $roleType = Role::STUDENT, ?string $externalId = null): ?string;
 
     /**
      * Removes all the photo-related files from the isams cache dir

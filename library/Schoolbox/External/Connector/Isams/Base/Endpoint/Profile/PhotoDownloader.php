@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace Schoolbox\External\Connector\Isams\Base\Endpoint\Profile;
 
 use Psr\SimpleCache\CacheInterface;
+use Schoolbox\Role;
 use Schoolbox\Url\Uri;
 use Schoolbox\External\Connector\Isams\Base\Endpoint\Codec\DSN;
 use SensitiveParameter;
@@ -185,7 +186,7 @@ class PhotoDownloader implements IPhotoDownloader
      * @param ?string $externalId = null
      * @return string|null
      */
-    public function getPhoto(string $personId, string $roleType = self::ROLE_STUDENT, ?string $externalId = null): ?string
+    public function getPhoto(string $personId, string $roleType = Role::STUDENT, ?string $externalId = null): ?string
     {
         $path = "{$this->cacheDir}/{$personId}.png";
 

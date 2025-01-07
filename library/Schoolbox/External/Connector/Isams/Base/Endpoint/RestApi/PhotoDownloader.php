@@ -11,6 +11,7 @@ namespace Schoolbox\External\Connector\Isams\Base\Endpoint\RestApi;
 
 use Schoolbox\External\Connector\Isams\Base\Endpoint\Codec\DSN;
 use Schoolbox\External\Connector\Isams\Base\Endpoint\Profile\IPhotoDownloader;
+use Schoolbox\Role;
 use SensitiveParameter;
 
 /**
@@ -38,13 +39,13 @@ class PhotoDownloader implements IPhotoDownloader
     /**
      * @inheritDoc
      */
-    public function getPhoto(string $personId, string $roleType = self::ROLE_STUDENT, ?string $externalId = null): ?string
+    public function getPhoto(string $personId, string $roleType = Role::STUDENT, ?string $externalId = null): ?string
     {
         switch ($roleType) {
-            case self::ROLE_STUDENT:
+            case Role::STUDENT:
                 $url = sprintf('Main/api/students/%s/photos/current', $externalId);
                 return $this->api->request($url, 'GET', raw: true);
-            case self::ROLE_STAFF:
+            case Role::STAFF:
                 $url = sprintf('Main/api/humanresources/employees/%s/photos/current', $externalId);
                 return $this->api->request($url, 'GET', raw: true);
             default:
