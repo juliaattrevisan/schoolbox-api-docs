@@ -65,9 +65,9 @@ class Module extends BaseModule
         try {
             $user = $this->getUserMapper()->findById($params['id']);
 
-            /* Only students can be a viewee; parents and staff don't get pictures
+            /* Only students and staff can be a viewee; parents don't get pictures
              */
-            if (!$user->getRole()->isStudent()) {
+            if (!$user->getRole()->isStudent() && !$user->getRole()->isStaff()) {
                 throw new Failure\InvalidPath();
             }
             //hydrate parents on the $user so we can get them later
