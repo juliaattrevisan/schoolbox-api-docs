@@ -312,6 +312,7 @@ class Mapper extends BaseMapper
             FROM tour_audience_role tar
             JOIN groups g ON g.id = tar.role_id
             WHERE tar.tour_uuid = ?
+            AND g.is_deleted IS NULL
             ORDER BY g.name ASC',
             [$tourUuid]
         )->fetchColumnArray('name');
