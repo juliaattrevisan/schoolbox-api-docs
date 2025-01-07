@@ -24,18 +24,6 @@ test.describe("Search functionality tests", () => {
 
     test("Valid no-filter keyword search shows correct results count and all loaded message", async ({ tester }) => {
         tester.isGoingTo("input a valid keyword and click the search button");
-        await searchPage.inputKeyword("vce");
-        await searchPage.clickSearchButton();
-
-        tester.isGoingTo("expect to see 5 results");
-        await searchPage.verifyResultsCount(5);
-
-        tester.isGoingTo("expect to see the 'all results loaded' element");
-        await searchPage.verifyAllResultsLoaded();
-    });
-
-    test("Valid no-filter keyword search with sub-results allows loading more", async ({ tester }) => {
-        tester.isGoingTo("input a valid keyword, clear all filters, and search");
         await searchPage.inputKeyword("Reed");
         await searchPage.clearFilters();
         await searchPage.clickSearchButton();
@@ -43,12 +31,22 @@ test.describe("Search functionality tests", () => {
         tester.isGoingTo("expect to see 10 results");
         await searchPage.verifyResultsCount(10);
 
-        tester.isGoingTo("load more sub results under Admin Help and expect to see 6 sub results");
-        await searchPage.inputKeyword("help");
+        tester.isGoingTo("expect to see the 'all results loaded' element");
+        await searchPage.verifyAllResultsLoaded();
+    });
+
+    test("Valid no-filter keyword search with sub-results allows loading more", async ({ tester }) => {
+        tester.isGoingTo("input a valid keyword and click the search button");
+        await searchPage.inputKeyword("lesson");
         await searchPage.clearFilters();
         await searchPage.clickSearchButton();
-        await searchPage.clickLoadMoreSubResults(168);
-        await searchPage.verifySubResultsCount(168, 6);
+
+        tester.isGoingTo("expect to initially see 7 sub results results for 9A French");
+        await searchPage.verifySubResultsCount(52, 7);
+
+        tester.isGoingTo("load more sub results under 9A French and expect to see 12 sub results");
+        await searchPage.clickLoadMoreSubResults(52);
+        await searchPage.verifySubResultsCount(52, 12);
     });
 
     test("Filter search by type news and verify results", async ({ tester }) => {
