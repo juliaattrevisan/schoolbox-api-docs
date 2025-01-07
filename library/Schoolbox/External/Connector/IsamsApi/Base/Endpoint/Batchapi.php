@@ -20,6 +20,7 @@ use Schoolbox\Url\Uri;
 
 class Batchapi
 {
+    private array $jwks = [];
      private Api $api;
 
     /**
@@ -51,8 +52,11 @@ class Batchapi
      */
     public function getToken(): string
     {
+        if (!empty($this->jwks) && $this->jwks['expires'] > time()) {
+            return $this->jwks['access_token'];
+        }
         // first, need to exchange client id/secret for an access token
-        $jwks = $this->api->request(
+        $this->jwks = $this->api->request(
             '/auth/connect/token',
             'POST',
             [
@@ -65,7 +69,9 @@ class Batchapi
             ]
         );
 
-        return $jwks['access_token'];
+        $this->jwks['expires'] = time() + $this->jwks['expires_in'];
+
+        return $this->jwks['access_token'];
     }
 
     /**
