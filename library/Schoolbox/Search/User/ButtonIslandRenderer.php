@@ -11,7 +11,7 @@ namespace Schoolbox\Search\User;
 use Alaress\Authorizer\Authorizer;
 use Aura\Router\Exception\RouteNotFound;
 use Aura\Router\Generator;
-use Schoolbox\Geosnapshot\ValidStudentPhotosAvailable;
+use Schoolbox\Geosnapshot\ValidPhotosAvailable;
 use Schoolbox\Profile\Button\Mapper;
 use Schoolbox\User;
 use Twig\Environment;
@@ -62,7 +62,7 @@ class ButtonIslandRenderer
         /* Decide whether View Photos (Geosnapshots) is available for this student
          * If you're allowed to make this request...
          */
-        $isGeosnapshotAvailable = (new ValidStudentPhotosAvailable())
+        $isGeosnapshotAvailable = (new ValidPhotosAvailable())
             ->isSatisifiedBy(
                 $this->geosnapshotApiKey,
                 $this->geosnapshotEnabled,
