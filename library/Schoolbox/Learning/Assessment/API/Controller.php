@@ -19,7 +19,7 @@ class Controller extends Base
     /**
      * The maximum number of assessments returned in response to an API request.
      */
-    const MAX_LIMIT = 500;
+    private const MAX_LIMIT = 500;
 
     /**
      * Constructor
