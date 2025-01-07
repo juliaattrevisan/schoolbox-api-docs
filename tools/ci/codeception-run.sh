@@ -5,9 +5,6 @@ case "$TEST_SUITE" in
     smoketests)
       TEST_ARGS="Smoketests"
       ;;
-    acceptance)
-      TEST_ARGS="Acceptance LoginCest.php"
-      ;;
     api)
       TEST_ARGS="Api"
       ;;
@@ -15,7 +12,7 @@ case "$TEST_SUITE" in
       TEST_ARGS="Smoketests,Api"
       ;;
     *)
-      echo "{Smoketests|Acceptance|Api|Ci}"
+      echo "{Smoketests|Api|Ci}"
       exit 1
 esac
 

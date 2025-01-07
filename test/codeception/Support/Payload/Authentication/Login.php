@@ -17,9 +17,11 @@ class Login extends Request
 {
     use PostTrait;
 
+    const LOGIN_URL = '/login/';
+
     public function __construct()
     {
-        $this->setReferer(\Tests\Support\Page\Login::URL);
+        $this->setReferer(self::LOGIN_URL);
 
         $this->setFormParam('page', '/login/');
         $this->setFormParam('username', '');
