@@ -62,10 +62,11 @@ class Api
     /**
      * actually hit the API and do some basic error checking and return data sanitization
      *
-     * @param string      $path
-     * @param string      $method
-     * @param array       $options
+     * @param string $path
+     * @param string $method
+     * @param array $options
      * @param string|null $token
+     * @param bool $raw - return raw data, not json decoded
      * @return mixed
      * @throws GuzzleException
      * @throws \JsonException
@@ -158,6 +159,16 @@ class Api
                 sleep($napTime);
 
                 continue;
+            } catch (GuzzleException $e) {
+                /* 404 Not Found for images (raw mode), we should just return null, not throw an exception
+                 */
+                if ($raw && $e->getCode() === 404) {
+                    return null;
+                }
+
+                /* Guzzle failed for some reason
+                 */
+                throw $e;
             }
         }
 
