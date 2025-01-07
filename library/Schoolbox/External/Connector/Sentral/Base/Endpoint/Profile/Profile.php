@@ -92,77 +92,15 @@ class Profile implements IStrategy
 
 
     /**
-     * @var ValidStrats
-     */
-    private ValidStrats $validStrats;
-
-
-    /**
-     * @var LoggerInterface
-     */
-    private LoggerInterface $log;
-
-
-    /**
-     * The "perform" flag from the cli tool
-     *
-     * @var bool
-     */
-    private bool $perform;
-
-
-    /**
-     * @var IApi
-     */
-    private IApi $api;
-
-
-    /**
-     * @var Registry
-     */
-    private Registry $registry;
-
-
-    /**
-     * @var UserProfile\Mapper
-     */
-    private UserProfile\Mapper $baseProfileMapper;
-
-
-    /**
-     * @var UserProfile\Student\Mapper
-     */
-    private UserProfile\Student\Mapper $studentProfileMapper;
-
-
-    /**
-     * @var UserProfile\Parent\Mapper
-     */
-    private UserProfile\Parent\Mapper $parentProfileMapper;
-
-
-    /**
-     * @var UserProfile\Staff\Mapper
-     */
-    private UserProfile\Staff\Mapper $staffProfileMapper;
-
-
-    /**
-     * @var UserProfile\Relationship\Mapper
-     */
-    private UserProfile\Relationship\Mapper $relationshipMapper;
-
-
-    /**
-     * @var array
-     */
-    private array $watchlist;
-
-
-    /**
      * @var array
      */
     private array $campuses;
+
+
+    /**
+     * @var array
+     */
+    private array $houses;
 
 
     /**
@@ -181,30 +119,18 @@ class Profile implements IStrategy
      * @param UserProfile\Relationship\Mapper $relationshipMapper
      */
     public function __construct(
-        ValidStrats $validStrats,
-        LoggerInterface $log,
-        bool $perform,
-        IApi $api,
-        array $watchlist,
-        Registry $registry,
-        UserProfile\Mapper $baseProfileMapper,
-        UserProfile\Student\Mapper $studentProfileMapper,
-        UserProfile\Parent\Mapper $parentProfileMapper,
-        UserProfile\Staff\Mapper $staffProfileMapper,
-        UserProfile\Relationship\Mapper $relationshipMapper
+        private ValidStrats $validStrats,
+        private LoggerInterface $log,
+        private bool $perform,
+        private IApi $api,
+        private array $watchlist,
+        private Registry $registry,
+        private UserProfile\Mapper $baseProfileMapper,
+        private UserProfile\Student\Mapper $studentProfileMapper,
+        private UserProfile\Parent\Mapper $parentProfileMapper,
+        private UserProfile\Staff\Mapper $staffProfileMapper,
+        private UserProfile\Relationship\Mapper $relationshipMapper
     ) {
-        $this->validStrats = $validStrats;
-        $this->log = $log;
-        $this->perform = $perform;
-        $this->api = $api;
-        $this->watchlist = $watchlist;
-        $this->registry = $registry;
-
-        $this->baseProfileMapper = $baseProfileMapper;
-        $this->studentProfileMapper = $studentProfileMapper;
-        $this->parentProfileMapper = $parentProfileMapper;
-        $this->staffProfileMapper = $staffProfileMapper;
-        $this->relationshipMapper = $relationshipMapper;
     }
 
 
@@ -216,6 +142,10 @@ class Profile implements IStrategy
         /* Grab a list of campuses
          */
         $this->campuses = (new Lookup\Campus($this->api))->generate();
+
+        /* Grab a list of houses
+         */
+        $this->houses = (new Lookup\House($this->api))->generate();
 
         /* Import students' profile data
          * Import their specific parents' profile data
@@ -386,7 +316,7 @@ class Profile implements IStrategy
 
                 /* Fish out a House
                  */
-                $academicHouse = $this->findHouse($studentBaseProfile, $student);
+                $academicHouse = $this->findStudentHouse($student);
 
                 /* Fish out alert comments
                  */
@@ -790,41 +720,30 @@ class Profile implements IStrategy
     /**
      * Find a House name for this person
      *
-     * @param UserProfile\Model $studentBaseProfile
      * @param array             $student
      * @return string|null
      */
-    private function findHouse(UserProfile\Model $studentBaseProfile, array $student): ?string
+    private function findStudentHouse(array $student): ?string
     {
-        /* Find another endpoint who can tell us the answer
-         */
-        $endpoint = $student['relationships']['primaryEnrolment']['data']['relationships']['house']['links']['related'];
-
-        /* Sentral provides endpoints that result in guaranteed failure
-         * ie. endpoints to ids that don't exist
-         *
-         * Instead of dying irrecoverably, alert with warning log that this record
-         * might be a bit broken; house can't be found, and will become null
-         */
-        try {
-            $payload = $this->api->retrieveDocument($endpoint);
-        } catch (\InvalidArgumentException $e) {
-            $this->log->warning($e->getMessage());
-
+        if (!isset($student['relationships']['primaryEnrolment'])) {
+            $this->log->debug('Relationships primaryEnrolment data does not exist.');
             return null;
         }
 
-        $houseName = $payload['data']['attributes']['name'] ?? '';
+        $enrolment = $student['relationships']['primaryEnrolment']['data'];
 
-        $this->log->debug(sprintf(
-            'Secondary api inspection at %s for House belonging to %s (user %s) - found %s',
-            $endpoint,
-            trim("{$studentBaseProfile->getFirstname()} {$studentBaseProfile->getLastname()}"),
-            $studentBaseProfile->getExternalId(),
-            $houseName
-        ));
+        /* "house" might not be a node in the relationships;
+         * This student doesn't have a house.
+         */
+        if (isset($enrolment['relationships']['house']['data'])) {
+            $houseId = $enrolment['relationships']['house']['data']['id'] ?? null;
 
-        return (string)$houseName;
+            if (null !== $houseId) {
+                return $this->houses[$houseId];
+            }
+        }
+
+        return null;
     }
 
 
@@ -1265,6 +1184,7 @@ class Profile implements IStrategy
                 $category = trim((string)$staff['attributes']['employmentClassification']);
                 $department = '';
                 $email = trim((string)$staff['relationships']['person']['data']['attributes']['email']);
+                $house = $this->findStaffHouse($staff);
                 $lastname = trim((string)$staff['relationships']['person']['data']['attributes']['lastName']);
                 $positionTitle = trim((string)($staff['attributes']['jobTitle'] ?? ''));
                 $room = '';
@@ -1381,6 +1301,7 @@ class Profile implements IStrategy
                     ->setCategory($category)
                     ->setDepartment($department)
                     ->setEmail($email)
+                    ->setHouseName($house)
                     ->setPhone($phone)
                     ->setPositionTitle($positionTitle)
                     ->setRoom($room)
@@ -1423,6 +1344,43 @@ class Profile implements IStrategy
              */
             $nextUrl = $payload['links']['next'] ?? null;
         }
+    }
+
+
+    /**
+     * Staff don't get Houses as a sideload, so you have to fetch them the hard way.
+     *
+     * @param array $staff
+     * @return string|null
+     */
+    private function findStaffHouse(array $staff): ?string
+    {
+        /* Find the first employment data and accept that as canon
+         */
+        // 'employments' may not exist for invalid data
+        if (!isset($staff['relationships']['employments'])) {
+            $this->log->debug('Relationships employments data does not exist.');
+            return null;
+        }
+
+        foreach ($staff['relationships']['employments']['data'] as $employment) {
+            if ('staffEmployment' === $employment['type']) {
+                /* "house" might not be a node in the relationships;
+                 * This staff member doesn't have a house.
+                 */
+                if (isset($employment['relationships']['house']['data'])) {
+                    $houseId = $employment['relationships']['house']['data']['id'] ?? null;
+
+                    /* This was added for Queenwood, might not appear anywhere else
+                     */
+                    if (null !== $houseId) {
+                        return $this->houses[$houseId];
+                    }
+                }
+            }
+        }
+
+        return null;
     }
 
 

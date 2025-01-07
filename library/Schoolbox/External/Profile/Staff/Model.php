@@ -9,7 +9,6 @@ declare(strict_types=1);
 
 namespace Schoolbox\External\Profile\Staff;
 
-use Schoolbox\ISoftDeletable;
 use Schoolbox\Mapper\Traits\Model as ModelTrait;
 use Schoolbox\External\Profile\Model as ProfileModel;
 
@@ -21,52 +20,67 @@ class Model
     /**
      * @var string|null
      */
-    private $username;
+    private ?string $username = null;
+
 
     /**
      * @var string|null
      */
-    private $email;
+    private ?string $email = null;
+
 
     /**
      * @var string|null
      */
-    private $category;
+    private ?string $category = null;
+
 
     /**
      * @var string|null
      */
-    private $positionTitle;
+    private ?string $positionTitle = null;
+
 
     /**
      * @var string|null
      */
-    private $department;
+    private ?string $department = null;
+
 
     /**
      * @var string|null
      */
-    private $phone;
+    private ?string $phone = null;
+
 
     /**
      * @var string|null
      */
-    private $room;
+    private ?string $room = null;
+
 
     /**
      * @var string|null
      */
-    private $building;
+    private ?string $building = null;
+
 
     /**
      * @var string|null
      */
-    private $campusName;
+    private ?string $campusName = null;
+
 
     /**
-     * @var ProfileModel
+     * @var string|null
      */
-    private $baseProfile;
+    private ?string $houseName = null;
+
+
+    /**
+     * @var ProfileModel|null
+     */
+    private ?ProfileModel $baseProfile = null;
 
 
     /**
@@ -75,78 +89,6 @@ class Model
     public function getUsername(): ?string
     {
         return $this->username;
-    }
-
-    /**
-     * @return string|null
-     */
-    public function getEmail(): ?string
-    {
-        return $this->email;
-    }
-
-    /**
-     * @return string|null
-     */
-    public function getCategory(): ?string
-    {
-        return $this->category;
-    }
-
-    /**
-     * @return string|null
-     */
-    public function getPositionTitle(): ?string
-    {
-        return $this->positionTitle;
-    }
-
-    /**
-     * @return string|null
-     */
-    public function getDepartment(): ?string
-    {
-        return $this->department;
-    }
-
-    /**
-     * @return string|null
-     */
-    public function getPhone(): ?string
-    {
-        return $this->phone;
-    }
-
-    /**
-     * @return string|null
-     */
-    public function getRoom(): ?string
-    {
-        return $this->room;
-    }
-
-    /**
-     * @return string|null
-     */
-    public function getBuilding(): ?string
-    {
-        return $this->building;
-    }
-
-    /**
-     * @return string|null
-     */
-    public function getCampusName(): ?string
-    {
-        return $this->campusName;
-    }
-
-    /**
-     * @return ProfileModel
-     */
-    public function getBaseProfile(): ProfileModel
-    {
-        return $this->baseProfile;
     }
 
 
@@ -160,6 +102,16 @@ class Model
         return $this;
     }
 
+
+    /**
+     * @return string|null
+     */
+    public function getEmail(): ?string
+    {
+        return $this->email;
+    }
+
+
     /**
      * @param string|null $email
      * @return Model
@@ -169,6 +121,16 @@ class Model
         $this->email = $email;
         return $this;
     }
+
+
+    /**
+     * @return string|null
+     */
+    public function getCategory(): ?string
+    {
+        return $this->category;
+    }
+
 
     /**
      * @param string|null $category
@@ -180,6 +142,16 @@ class Model
         return $this;
     }
 
+
+    /**
+     * @return string|null
+     */
+    public function getPositionTitle(): ?string
+    {
+        return $this->positionTitle;
+    }
+
+
     /**
      * @param string|null $positionTitle
      * @return Model
@@ -189,6 +161,16 @@ class Model
         $this->positionTitle = $positionTitle;
         return $this;
     }
+
+
+    /**
+     * @return string|null
+     */
+    public function getDepartment(): ?string
+    {
+        return $this->department;
+    }
+
 
     /**
      * @param string|null $department
@@ -200,6 +182,16 @@ class Model
         return $this;
     }
 
+
+    /**
+     * @return string|null
+     */
+    public function getPhone(): ?string
+    {
+        return $this->phone;
+    }
+
+
     /**
      * @param string|null $phone
      * @return Model
@@ -209,6 +201,16 @@ class Model
         $this->phone = $phone;
         return $this;
     }
+
+
+    /**
+     * @return string|null
+     */
+    public function getRoom(): ?string
+    {
+        return $this->room;
+    }
+
 
     /**
      * @param string|null $room
@@ -220,6 +222,16 @@ class Model
         return $this;
     }
 
+
+    /**
+     * @return string|null
+     */
+    public function getBuilding(): ?string
+    {
+        return $this->building;
+    }
+
+
     /**
      * @param string|null $building
      * @return Model
@@ -230,6 +242,16 @@ class Model
         return $this;
     }
 
+
+    /**
+     * @return string|null
+     */
+    public function getCampusName(): ?string
+    {
+        return $this->campusName;
+    }
+
+
     /**
      * @param string|null $campusName
      * @return Model
@@ -239,6 +261,36 @@ class Model
         $this->campusName = $campusName;
         return $this;
     }
+
+
+    /**
+     * @return string|null
+     */
+    public function getHouseName(): ?string
+    {
+        return $this->houseName;
+    }
+
+
+    /**
+     * @param string|null $houseName
+     * @return $this
+     */
+    public function setHouseName(?string $houseName): self
+    {
+        $this->houseName = $houseName;
+        return $this;
+    }
+
+
+    /**
+     * @return ProfileModel
+     */
+    public function getBaseProfile(): ProfileModel
+    {
+        return $this->baseProfile;
+    }
+
 
     /**
      * @param ProfileModel|null $baseProfile

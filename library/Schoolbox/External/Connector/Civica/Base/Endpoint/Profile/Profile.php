@@ -881,6 +881,7 @@ class Profile implements IStrategy
                 $category = '';
                 $department = '';
                 $email = trim((string)$staff['workEmail']);
+                $house = '';
                 $phone = trim((string)$staff['workPhoneNumber']);
                 $positionTitle = $this->findPositions($currentSchool['positions']);
                 $room = '';
@@ -935,6 +936,7 @@ class Profile implements IStrategy
                     ->setCategory($category)
                     ->setDepartment($department)
                     ->setEmail($email)
+                    ->setHouseName($house)
                     ->setPhone($phone)
                     ->setPositionTitle($positionTitle)
                     ->setRoom($room)

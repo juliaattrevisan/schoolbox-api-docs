@@ -1068,6 +1068,8 @@ class Profile implements IStrategy
              */
             $fullname = trim("{$firstname} {$lastname}");
 
+            $house = '';
+
             /* Find out if this externalId already has a staff profile
              * If one already exists, load it, update it, then save it
              * Otherwise make a new one for the given id
@@ -1157,6 +1159,7 @@ class Profile implements IStrategy
                 ->setCategory($category)
                 ->setDepartment(null)
                 ->setEmail(trim((string)$staff->SchoolEmailAddress))
+                ->setHouseName($house)
                 ->setPhone(trim((string)$staff->SchoolMobileNumber))
                 ->setPositionTitle($positionTitle)
                 ->setRoom(null)

@@ -899,6 +899,8 @@ class Profile implements IStrategy
                     $staff['contact_details']['data']['emails']['email'],
                 ]);
 
+                $house = '';
+
                 /* FIXME Controversial - maybe never include phone numbers at all?
                  */
                 $phone = trim((string)$staff['contact_details']['data']['phones']['work']);
@@ -958,6 +960,7 @@ class Profile implements IStrategy
                     ->setCategory($category)
                     ->setDepartment($department)
                     ->setEmail($email)
+                    ->setHouseName($house)
                     ->setPhone($phone)
                     ->setPositionTitle($positionTitle)
                     ->setRoom($room)
