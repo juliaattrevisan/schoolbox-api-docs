@@ -31,6 +31,7 @@ use Schoolbox\Config\ConfigMapper;
 use Schoolbox\External\Exception;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Learning\Assessment\DataModel as Assessment;
+use Schoolbox\Learning\Assessment\Relation\CommandLineTool\Reloader;
 use Schoolbox\Learning\Assessment\WorkType;
 use Schoolbox\Assessment\Participant;
 use Schoolbox\Learning\Course\DataModel\Implementation as CourseImpl;
@@ -288,6 +289,16 @@ class CliImporter extends CliTool\App
 
         $this->syncStagingDataWithSchoolbox($canvasDb);
         $this->logStats();
+
+        $this->getLogger()->notice('Canvas data import complete.');
+
+        $this->getLogger()->notice('Reloading materialized view of assessment relations. Warning related to broken counts expected due to data import');
+
+        // hook into the mv_assessment_relation reloader to cleanup the old data
+        $app     = new Reloader();
+        $options = [CliTool\Kernel::OPTION_LEVEL => \Monolog\Logger::INFO, CliTool\Kernel::OPTION_ERRORS => E_ALL,];
+
+        (new CliTool\Kernel($app, $options))->runApp();
     }
 
 
