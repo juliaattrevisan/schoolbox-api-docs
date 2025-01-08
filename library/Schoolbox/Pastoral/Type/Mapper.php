@@ -32,6 +32,7 @@ class Mapper extends BaseMapper
         $this->hasModel(Model::class);
         $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
         $this->joins('pastoral_document_classification_id', DocumentClassificationMapper::class, 'id', null, null, 'documentClassification', 'documentClassification');
+        $this->joins('pastoral_document_classification_confidential_id', DocumentClassificationMapper::class, 'id', null, null, 'documentClassificationConfidential', 'documentClassificationConfidential');
         $this->uses('name', self::TYPE_STRING);
         $this->uses('template', self::TYPE_STRING);
         $this->uses('template_private', self::TYPE_STRING);
