@@ -33,15 +33,14 @@ class Prepare implements IStrategy
         // if batch API exists, use that for photos, else fallback to batchxml thumbnails
         $credentials = (new DSN())->decode($this->key);
         if ($credentials['modules'][DSN::MODULE_RESTAPIHOST]['key'] === '') {
-
             $photoDownloader = new BatchPhotoDownloader($this->host, $this->key, $this->zipDir);
+
             /* Download a zip containing everyone's profile pictures, and extract them
             * It uses isams internal ids, not external ids
             */
             $this->log->info('Downloading student profile photos (this might take a while)');
 
             $photoDownloader->downloadStudentPhotos();
-
 
             /* Download a zip containing everyone's profile pictures, and extract them
              * It uses isams internal ids, not external ids
