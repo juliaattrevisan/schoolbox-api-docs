@@ -307,7 +307,7 @@ class Mapper extends BaseMapper
      */
     public function getAudienceRoleNamesCommaSeparatedByUuid(bool $includeDisabledTours): array
     {
-        $rolesCommaSepByUuid = $this->database->executeQuery(
+        return $this->database->executeQuery(
             'SELECT t.uuid, GROUP_CONCAT(DISTINCT g.name SEPARATOR ", ") AS groupNames
             FROM tour_audience_role tar
             JOIN groups g ON tar.role_id = g.id
@@ -317,8 +317,6 @@ class Mapper extends BaseMapper
             ' . ($includeDisabledTours ? '' : 'AND t.active = 1') . '
             GROUP BY t.uuid'
         )->fetchColumnArray('groupNames', 'uuid');
-
-        return $rolesCommaSepByUuid;
     }
 
     /**
