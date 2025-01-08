@@ -300,46 +300,25 @@ class Mapper extends BaseMapper
     }
 
     /**
-     * Return the audience role names for the given tour UUID.
-     *
-     * @param string $tourUuid
-     * @return array<string>
-     */
-    public function getAudienceRoleNames(string $tourUuid): array
-    {
-        return $this->database->executeQuery(
-            'SELECT DISTINCT g.name
-            FROM tour_audience_role tar
-            JOIN groups g ON g.id = tar.role_id
-            WHERE tar.tour_uuid = ?
-            AND g.deleted_at IS NULL
-            ORDER BY g.name ASC',
-            [$tourUuid]
-        )->fetchColumnArray('name');
-    }
-
-    /**
      * Return an array of arrays of audience role names, indexed by tour UUID.
      *
-     * @param bool $includeDisabled Whether to include rows in which `active` is 0.
-     * @return array<string, array<string>>
+     * @param bool $includeDisabledTours If true, include all tours.  If false, include only tours with active=1.
+     * @return array<string, string>
      */
-    public function getAudienceRoleNamesByUuid(bool $includeDisabled): array
+    public function getAudienceRoleNamesCommaSeparatedByUuid(bool $includeDisabledTours): array
     {
-        $tourUuids = $this->database->executeQuery(
-            'SELECT uuid
-            FROM tour
-            WHERE deleted_at IS NULL' .
-            ($includeDisabled ? '' : ' AND active = 1')
-        )->fetchColumnArray('uuid');
+        $rolesCommaSepByUuid = $this->database->executeQuery(
+            'SELECT t.uuid, GROUP_CONCAT(DISTINCT g.name SEPARATOR ", ") AS groupNames
+            FROM tour_audience_role tar
+            JOIN groups g ON tar.role_id = g.id
+            JOIN tour t ON tar.tour_uuid = t.uuid
+            WHERE t.deleted_at IS NULL
+            AND g.deleted_at IS NULL
+            ' . ($includeDisabledTours ? '' : 'AND t.active = 1') . '
+            GROUP BY t.uuid'
+        )->fetchColumnArray('groupNames', 'uuid');
 
-        $roleNamesByUuid = [];
-
-        foreach ($tourUuids as $tourUuid) {
-            $roleNamesByUuid[$tourUuid] = $this->getAudienceRoleNames($tourUuid);
-        }
-
-        return $roleNamesByUuid;
+        return $rolesCommaSepByUuid;
     }
 
     /**

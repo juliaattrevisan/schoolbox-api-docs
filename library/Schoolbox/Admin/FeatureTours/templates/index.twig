@@ -34,10 +34,10 @@
                             <div class="small-12 columns">
                                 <label for="tour-enable-{{ tour.uuid }}">
                                     {{ tour.title }}
-                                    {% set audienceRoleNames = tourAudienceRoleNamesByUuid[tour.uuid] %}
                                     <span class="pipe meta" title="The tour will display for these roles only.">
-                                        {% if audienceRoleNames|length > 0 %}
-                                            {{ audienceRoleNames|join(', ') }}
+                                        {% if tourAudienceRoleNamesCommaSeparatedByUuid[tour.uuid] is defined %}
+                                            {% set audienceRoleNamesCommaSeparated = tourAudienceRoleNamesCommaSeparatedByUuid[tour.uuid] %}
+                                            {{ audienceRoleNamesCommaSeparated }}
                                         {% else %}
                                             No roles targeted
                                         {% endif %}
