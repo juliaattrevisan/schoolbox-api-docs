@@ -321,15 +321,16 @@ class Mapper extends BaseMapper
     /**
      * Return an array of arrays of audience role names, indexed by tour UUID.
      *
+     * @param bool $includeDisabled Whether to include rows in which `active` is 0.
      * @return array<string, array<string>>
      */
-    public function getAudienceRoleNamesByUuid(): array
+    public function getAudienceRoleNamesByUuid(bool $includeDisabled): array
     {
         $tourUuids = $this->database->executeQuery(
             'SELECT uuid
             FROM tour
-            WHERE deleted_at IS NULL
-            AND active = 1'
+            WHERE deleted_at IS NULL' .
+            ($includeDisabled ? '' : ' AND active = 1')
         )->fetchColumnArray('uuid');
 
         $roleNamesByUuid = [];

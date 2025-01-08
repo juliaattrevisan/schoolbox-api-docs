@@ -42,7 +42,7 @@ class Controller extends Base
             'pageCurrent' => $this->routeGenerator->generate('featureTours.render'),
             'allBreadcrumbs' => (new Subnav($this->getConfigLoader(), $this->getUser()))->generateBreadcrumbs($this->routeGenerator->generate('featureTours.render')),
             'tours' => $this->tourMapper->findAll(),
-            'tourAudienceRoleNamesByUuid' => $this->tourMapper->getAudienceRoleNamesByUuid()
+            'tourAudienceRoleNamesByUuid' => $this->tourMapper->getAudienceRoleNamesByUuid(true) // Note disabled tours need to be rendered.
         ];
 
         $this->response = $this->responseFromTemplate("@featureTours/index.twig", $twigData);
