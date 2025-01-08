@@ -138,9 +138,18 @@ switch ($this->arg[0]) {
             } catch (\Schoolbox\Mapper\Exception $e) {
                 $image = '/images/icon.php?size=192&icon=' . NSMapper::NS_NEWS;
 
-                /** @var PrefixGenerator $prefixGenerator */
-                $prefixGenerator = $this->getDi()->get('cdnPrefixGenerator');
-                $thumb           = $prefixGenerator->generate() . '/images/emails/spacer.gif';
+                $fallbackSelected = $this->getDi()->get('config')->get('comms_news_article_list_fallback_image');
+                if ($fallbackSelected == 'school-logo') {
+                    $thumb = "/images/logo.php?logo=skin_logo_large&size=normal";
+                } else if ($fallbackSelected == 'author') {
+                    $avatarHash = $article->getAuthor()->getPortrait()->getHash();
+                    $thumb = "/storage/image.php?hash=$avatarHash&size=constrain200";
+                } else {
+                    /** No fallback image, fill the empty space to maintain layout */
+                    /** @var PrefixGenerator $prefixGenerator */
+                    $prefixGenerator = $this->getDi()->get('cdnPrefixGenerator');
+                    $thumb           = $prefixGenerator->generate() . '/images/emails/spacer.gif';
+                }
             }
 
             $decorator->appendInstance($bob
