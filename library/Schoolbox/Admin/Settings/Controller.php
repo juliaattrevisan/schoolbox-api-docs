@@ -405,7 +405,7 @@ class Controller extends ConfigController
                 };
 
             case 'comms':
-                // This is for the settings in 'Admin -> News -> Settings / Policy'.
+                // This is for the settings in 'Admin -> News -> Policy'.
                 return $user->hasServicePermission(UserAccess::SERVICE_NEWS, UserAccess::ACCESS_FULL);
 
             case 'schoolData':
