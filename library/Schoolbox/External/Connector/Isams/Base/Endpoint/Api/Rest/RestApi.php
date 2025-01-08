@@ -28,7 +28,7 @@ class RestApi
      *
      */
     public function __construct(
-        private string $apiHost,
+        string $apiHost,
         private string $clientId,
         #[SensitiveParameter] private string $clientSecret,
     ) {

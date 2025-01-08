@@ -20,8 +20,7 @@ use SensitiveParameter;
 
 class Download implements IStrategy
 {
-
-    private iPhotoDownloader $photoDownloader;
+    private IPhotoDownloader $photoDownloader;
 
     public function __construct(
         private LoggerInterface $log,

@@ -36,13 +36,6 @@ class Cleanup implements IStrategy
      */
     private bool $perform;
 
-
-    /**
-     * @var bool
-     */
-    private bool $includePhoto;
-
-
     /**
      * @var UserProfile\Mapper
      */
@@ -72,19 +65,11 @@ class Cleanup implements IStrategy
      */
     private UserProfile\Relationship\Mapper $relationshipMapper;
 
-
-    /**
-     * @var IPhotoDownloader
-     */
-    private IPhotoDownloader $photoDownloader;
-
-
     /**
      * Cleanup constructor.
      *
      * @param LoggerInterface                 $log
      * @param bool                            $perform
-     * @param bool                            $includePhoto
      * @param Mapper                          $baseProfileMapper
      * @param UserProfile\Student\Mapper      $studentProfileMapper
      * @param UserProfile\Parent\Mapper       $parentProfileMapper
@@ -94,7 +79,6 @@ class Cleanup implements IStrategy
     public function __construct(
         LoggerInterface $log,
         bool $perform,
-        bool $includePhoto,
         UserProfile\Mapper $baseProfileMapper,
         UserProfile\Student\Mapper $studentProfileMapper,
         UserProfile\Parent\Mapper $parentProfileMapper,
@@ -103,7 +87,6 @@ class Cleanup implements IStrategy
     ) {
         $this->log = $log;
         $this->perform = $perform;
-        $this->includePhoto = $includePhoto;
         $this->baseProfileMapper = $baseProfileMapper;
         $this->studentProfileMapper = $studentProfileMapper;
         $this->parentProfileMapper = $parentProfileMapper;

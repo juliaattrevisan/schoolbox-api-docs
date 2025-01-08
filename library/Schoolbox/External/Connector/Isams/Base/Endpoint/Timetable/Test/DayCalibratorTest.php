@@ -16,9 +16,9 @@ declare(strict_types=1);
 namespace Schoolbox\External\Connector\Isams\Base\Endpoint\Timetable\Test;
 
 use PHPUnit\Framework\TestCase;
-use Schoolbox\External\Connector\Isams\Base\Endpoint\Batchxml;
+use Schoolbox\External\Connector\Isams\Base\Endpoint\Api\Batch\Batchxml;
 use Schoolbox\External\Connector\Isams\Base\Endpoint\Codec\DSN;
-use Schoolbox\External\Connector\Isams\Base\Endpoint\MockFragmentApi;
+use Schoolbox\External\Connector\Isams\Base\Endpoint\Api\Batch\MockFragmentApi;
 use Schoolbox\External\Connector\Isams\Base\Endpoint\Timetable\DayCalibrator;
 
 /**
