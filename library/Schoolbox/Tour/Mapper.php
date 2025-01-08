@@ -341,4 +341,12 @@ class Mapper extends BaseMapper
 
         return $roleNamesByUuid;
     }
+
+    /**
+     * @inheritDoc
+     */
+    protected function getDefaultOrderByParams(): array
+    {
+        return ['title' => 'ASC', 'uuid' => 'ASC']; // Note uuid is included so sort order is always consistent.
+    }
 }
