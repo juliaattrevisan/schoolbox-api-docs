@@ -7,8 +7,8 @@
 
 declare(strict_types=1);
 
-namespace Schoolbox\External\Connector\Isams\Base\Endpoint\RestApi;
+namespace Schoolbox\Application\Exception;
 
-class RateLimitException extends \RuntimeException
+class ApiException extends \RuntimeException
 {
 }

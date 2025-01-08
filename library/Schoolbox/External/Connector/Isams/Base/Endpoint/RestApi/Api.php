@@ -13,6 +13,8 @@ namespace Schoolbox\External\Connector\Isams\Base\Endpoint\RestApi;
 use GuzzleHttp\Client as HttpClient;
 use GuzzleHttp\Exception\GuzzleException;
 use GuzzleHttp\RequestOptions;
+use Schoolbox\Application\Exception\ApiException;
+use Schoolbox\Application\Exception\RateLimitException;
 use Schoolbox\Url\Uri;
 use SensitiveParameter;
 
