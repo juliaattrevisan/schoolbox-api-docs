@@ -25,7 +25,8 @@
 
 Notes:
  * The pastoral_document_classification_ids point to names that match classification names in Synergetic.  These determine
-   which types of Synergetic users have access to content exported from Schoolbox.
+   which types of Synergetic users have access to content exported from Schoolbox.  The confidential id applies to the
+   parts of pastoral records labelled as 'confidential' in Schoolbox.
    Refer to [External Document Classification](../DocumentClassification/README.MD) documentation.
 
 ## lu_pastoral_subtype
