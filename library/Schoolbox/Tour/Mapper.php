@@ -300,7 +300,7 @@ class Mapper extends BaseMapper
     }
 
     /**
-     * Return an array of arrays of audience role names, indexed by tour UUID.
+     * Return an array of comma-separated role names, indexed by tour UUID.
      *
      * @param bool $includeDisabledTours If true, include all tours.  If false, include only tours with active=1.
      * @return array<string, string>
