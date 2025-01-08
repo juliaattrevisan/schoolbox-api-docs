@@ -18,10 +18,10 @@ use SensitiveParameter;
 class Prepare implements IStrategy
 {
     public function __construct(
-        private LoggerInterface              $log,
-        private string                       $host,
+        private LoggerInterface $log,
+        private  $host,
         #[SensitiveParameter] private string $key,
-        private string                       $zipDir
+        private string $zipDir
     ) {
     }
 
