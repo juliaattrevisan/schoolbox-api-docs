@@ -8,7 +8,7 @@
 
 declare(strict_types=1);
 
-namespace Schoolbox\External\Connector\Isams\Base\Endpoint;
+namespace Schoolbox\External\Connector\Isams\Base\Endpoint\Api\Batch;
 
 use Schoolbox\External\Connector\Isams\Base\Endpoint\Codec\DSN;
 
@@ -18,7 +18,7 @@ use Schoolbox\External\Connector\Isams\Base\Endpoint\Codec\DSN;
  * A version of Api that can be used in unit tests
  * Loads an isams xml from somewhere instead of their actual endpoint
  *
- * @package Schoolbox\External\Connector\Isams\Base\Endpoint
+ * @package Schoolbox\External\Connector\Isams\Base\Endpoint\Api\Batch
  */
 class MockFragmentApi implements IApi
 {

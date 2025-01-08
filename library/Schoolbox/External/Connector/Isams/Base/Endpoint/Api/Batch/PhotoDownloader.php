@@ -7,12 +7,12 @@
 
 declare(strict_types=1);
 
-namespace Schoolbox\External\Connector\Isams\Base\Endpoint\Profile;
+namespace Schoolbox\External\Connector\Isams\Base\Endpoint\Api\Batch;
 
-use Psr\SimpleCache\CacheInterface;
+use Schoolbox\External\Connector\Isams\Base\Endpoint\Codec\DSN;
+use Schoolbox\External\Connector\Isams\Base\Endpoint\Profile\IPhotoDownloader;
 use Schoolbox\Role;
 use Schoolbox\Url\Uri;
-use Schoolbox\External\Connector\Isams\Base\Endpoint\Codec\DSN;
 use SensitiveParameter;
 use ZipArchive;
 

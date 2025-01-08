@@ -8,7 +8,7 @@
 
 declare(strict_types=1);
 
-namespace Schoolbox\External\Connector\Isams\Base\Endpoint;
+namespace Schoolbox\External\Connector\Isams\Base\Endpoint\Api\Batch;
 
 use Alaress_Curl_Url;
 use RuntimeException;
@@ -19,7 +19,7 @@ use SensitiveParameter;
 /**
  * Class Api
  *
- * @package Schoolbox\External\Connector\Isams\Base\Endpoint
+ * @package Schoolbox\External\Connector\Isams\Base\Endpoint\Api\Batch
  */
 class Api implements IApi
 {

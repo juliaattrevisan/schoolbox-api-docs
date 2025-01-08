@@ -14,7 +14,6 @@ use Schoolbox\External\ClassEntryMapper;
 use Schoolbox\External\ClassInvolvementMapper;
 use Schoolbox\External\ClassPeriodMapper;
 use Schoolbox\External\Connector\Isams\Base\Endpoint\Codec\DSN;
-use Schoolbox\External\Connector\IsamsApi\Base\Endpoint as IsamsApiEndpoint;
 use Schoolbox\External\Connector\ValidStrats;
 use Schoolbox\External\Importer\Endpoint\IStrategy;
 use Schoolbox\External\Profile as UserProfile;
@@ -110,7 +109,7 @@ class Factory
              * Only the xml files can/should be stored and read locally afaict
              */
             $api = [
-                DSN::MODULE_BATCHXML => new Batchxml(new MockFileApi($this->file, $this->key)),
+                DSN::MODULE_BATCHXML => new Api\Batch\Batchxml(new Api\Batch\MockFileApi($this->file, $this->key)),
             ];
         } else {
             $this->log->info('Accessing api endpoint');
@@ -118,18 +117,18 @@ class Factory
             /* Connect and shank data for all the modules we know about
              */
             $api = [
-                DSN::MODULE_BATCHXML => new Batchxml(new Api($this->host, $this->key, DSN::MODULE_BATCHXML)),
+                DSN::MODULE_BATCHXML => new Api\Batch\Batchxml(new Api\Batch\Api($this->host, $this->key, DSN::MODULE_BATCHXML)),
             ];
         }
 
         // if batch API exists, use that for photos, else fallback to batchxml thumbnails
         $credentials = (new DSN())->decode($this->key);
         if ($credentials['modules'][DSN::MODULE_RESTAPIHOST]['key'] !== '') {
-            $photoDownloader = new RestApi\PhotoDownloader($this->host, $this->key, $this->zipDir);
+            $photoDownloader = new Api\Rest\PhotoDownloader($this->host, $this->key, $this->zipDir);
         } else {
             /* This lets you shank down zip files containing everyone's profile pictures
          */
-            $photoDownloader = new Profile\PhotoDownloader($this->host, $this->key, $this->zipDir);
+            $photoDownloader = new Api\Batch\PhotoDownloader($this->host, $this->key, $this->zipDir);
         }
 
         /* Purge previously-imported profile relationships and classes

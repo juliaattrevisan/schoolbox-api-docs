@@ -234,8 +234,8 @@ class Specification implements ISpecification
         $batchxmls = [];
 
         foreach ($modules as $module => $paths) {
-            $api = new Api($this->host, $this->dsn, $module);
-            $batchxml = new Batchxml($api);
+            $api = new Api\Batch\Api($this->host, $this->dsn, $module);
+            $batchxml = new Api\Batch\Batchxml($api);
 
             /* Remember this for later, because we do a particular inspection
              */

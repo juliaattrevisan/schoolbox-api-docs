@@ -7,7 +7,7 @@
 
 declare(strict_types=1);
 
-namespace Schoolbox\External\Connector\Isams\Base\Endpoint;
+namespace Schoolbox\External\Connector\Isams\Base\Endpoint\Api\Batch;
 
 /**
  * Interface IApi

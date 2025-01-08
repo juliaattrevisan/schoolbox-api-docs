@@ -58,7 +58,7 @@ class Status implements IStatus
          *
          * Use an ultra cheep way at the cost of some neatness
          */
-        $api = new Api($this->host, $this->dsn, Codec\DSN::MODULE_BATCHXML);
+        $api = new Api\Batch\Api($this->host, $this->dsn, Codec\DSN::MODULE_BATCHXML);
 
         $result = @get_headers((string)$api->getUrl());
 
