@@ -26,6 +26,7 @@ class ValidStrats
     public const STUDENT = 'student';
     public const FAMILIES = 'families';
     public const TIMETABLE = 'timetable';
+    public const PHOTO = 'photo';
 
     /**
      * These are valid as csv values in the arg
@@ -45,7 +46,11 @@ class ValidStrats
 
         /* Loads all timetable-related stuff
          */
-        'timetable'
+        'timetable',
+
+        /* Loads all photos
+         */
+        'photo',
     ];
 
     /**
@@ -163,6 +168,17 @@ class ValidStrats
     public function isTimetableStratEnabled(): bool
     {
         return $this->isStratEnabled(self::TIMETABLE);
+    }
+
+
+    /**
+     * A convenience method that checks if the Photo strat is in the result set
+     *
+     * @return bool
+     */
+    public function isPhotoStratEnabled(): bool
+    {
+        return $this->isStratEnabled(self::PHOTO);
     }
 
 

@@ -7,10 +7,10 @@
 
 declare(strict_types=1);
 
-namespace Schoolbox\External\Connector\Isams\Base\Endpoint\Api\Rest;
+namespace Schoolbox\External\Connector\Isams\Base\Endpoint\ProfileImages;
 
+use Schoolbox\External\Connector\Isams\Base\Endpoint\Api\Rest\RestApi;
 use Schoolbox\External\Connector\Isams\Base\Endpoint\Codec\DSN;
-use Schoolbox\External\Connector\Isams\Base\Endpoint\Profile\IPhotoDownloader;
 use Schoolbox\Role;
 use SensitiveParameter;
 
@@ -21,14 +21,17 @@ use SensitiveParameter;
  * Following the now used RestApi system
  *
  */
-class PhotoDownloader implements IPhotoDownloader
+class RestPhotoDownloader implements IPhotoDownloader
 {
     private RestApi $api;
 
     /**
-     * @inheritDoc
+     * Constructor.
+     *
+     * @param string $dsn
+     * @throws \DomainException
      */
-    public function __construct(string $host, #[SensitiveParameter] string $dsn, string $zipDir)
+    public function __construct(#[SensitiveParameter] string $dsn)
     {
         /* Store this locally just once
          */

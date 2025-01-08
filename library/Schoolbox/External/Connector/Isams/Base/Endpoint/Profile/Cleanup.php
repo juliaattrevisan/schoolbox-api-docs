@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\External\Connector\Isams\Base\Endpoint\Profile;
 
+use External\Connector\Isams\Base\Endpoint\ProfileImages\IPhotoDownloader;
 use Psr\Log\LoggerInterface;
 use Schoolbox\Admin\Import\Profile\OrphanRemover;
 use Schoolbox\External\Importer\Endpoint\IStrategy;
@@ -89,7 +90,6 @@ class Cleanup implements IStrategy
      * @param UserProfile\Parent\Mapper       $parentProfileMapper
      * @param UserProfile\Staff\Mapper        $staffProfileMapper
      * @param UserProfile\Relationship\Mapper $relationshipMapper
-     * @param IPhotoDownloader                 $photoDownloader
      */
     public function __construct(
         LoggerInterface $log,
@@ -100,7 +100,6 @@ class Cleanup implements IStrategy
         UserProfile\Parent\Mapper $parentProfileMapper,
         UserProfile\Staff\Mapper $staffProfileMapper,
         UserProfile\Relationship\Mapper $relationshipMapper,
-        IPhotoDownloader $photoDownloader
     ) {
         $this->log = $log;
         $this->perform = $perform;
@@ -110,7 +109,6 @@ class Cleanup implements IStrategy
         $this->parentProfileMapper = $parentProfileMapper;
         $this->staffProfileMapper = $staffProfileMapper;
         $this->relationshipMapper = $relationshipMapper;
-        $this->photoDownloader = $photoDownloader;
     }
 
 
@@ -140,15 +138,6 @@ class Cleanup implements IStrategy
             ))->remove();
 
             $this->log->info("Removed {$orphans} orphaned profiles.");
-
-            /* Only try to clean up photos if we actually tried to import them
-             * Otherwise leave this place untouched
-             */
-            if ($this->includePhoto) {
-                $this->photoDownloader->cleanup();
-
-                $this->log->info("Removed residual photos and zip files from isams cache dir.");
-            }
         }
     }
 }

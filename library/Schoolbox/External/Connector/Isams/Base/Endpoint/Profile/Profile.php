@@ -16,11 +16,11 @@ use Psr\Log\LoggerInterface;
 use RuntimeException;
 use Schoolbox\External\Connector\FirstMeaningfulValue;
 use Schoolbox\External\Connector\Isams\Base\Endpoint\Codec\DSN;
+use Schoolbox\External\Connector\Isams\Base\Endpoint\Registry;
 use Schoolbox\External\Connector\ValidStrats;
 use Schoolbox\External\Importer\Endpoint\IStrategy;
 use Schoolbox\External\Normalise\User\Common\Campus;
 use Schoolbox\External\Profile as UserProfile;
-use Schoolbox\External\Profile\Model;
 use Schoolbox\Mapper;
 use Schoolbox\Mapper\Exception;
 use Schoolbox\Resource\Storage\Mapper as StorageMapper;
@@ -91,13 +91,6 @@ class Profile implements IStrategy
      */
     private array $api;
 
-
-    /**
-     * @var bool
-     */
-    private bool $includePhoto;
-
-
     /**
      * A list of (strat, externalid) tuples that each have one or more error messages
      * caused by some random reason such as overflows, incompatible types, etc
@@ -106,13 +99,6 @@ class Profile implements IStrategy
      * @var array
      */
     private array $errors = [];
-
-
-    /**
-     * @var IPhotoDownloader
-     */
-    private IPhotoDownloader $photoDownloader;
-
 
     /**
      * @var UserProfile\Mapper
@@ -143,13 +129,6 @@ class Profile implements IStrategy
      */
     private UserProfile\Relationship\Mapper $relationshipMapper;
 
-
-    /**
-     * @var StorageMapper
-     */
-    private StorageMapper $storageMapper;
-
-
     /**
      * Profile constructor.
      *
@@ -157,41 +136,34 @@ class Profile implements IStrategy
      * @param LoggerInterface                 $log
      * @param bool                            $perform
      * @param array                           $api
-     * @param bool                            $includePhoto
-     * @param IPhotoDownloader                 $photoDownloader
      * @param UserProfile\Mapper              $baseProfileMapper
      * @param UserProfile\Student\Mapper      $studentProfileMapper
      * @param UserProfile\Parent\Mapper       $parentProfileMapper
      * @param UserProfile\Staff\Mapper        $staffProfileMapper
      * @param UserProfile\Relationship\Mapper $relationshipMapper
-     * @param StorageMapper                   $storageMapper
+     * @param Registry                        $registry
      */
     public function __construct(
         ValidStrats $validStrats,
         LoggerInterface $log,
         bool $perform,
         array $api,
-        bool $includePhoto,
-        IPhotoDownloader $photoDownloader,
         UserProfile\Mapper $baseProfileMapper,
         UserProfile\Student\Mapper $studentProfileMapper,
         UserProfile\Parent\Mapper $parentProfileMapper,
         UserProfile\Staff\Mapper $staffProfileMapper,
         UserProfile\Relationship\Mapper $relationshipMapper,
-        StorageMapper $storageMapper
+        private Registry $registry
     ) {
         $this->validStrats = $validStrats;
         $this->log = $log;
         $this->perform = $perform;
         $this->api = $api;
-        $this->includePhoto = $includePhoto;
-        $this->photoDownloader = $photoDownloader;
         $this->baseProfileMapper = $baseProfileMapper;
         $this->studentProfileMapper = $studentProfileMapper;
         $this->parentProfileMapper = $parentProfileMapper;
         $this->staffProfileMapper = $staffProfileMapper;
         $this->relationshipMapper = $relationshipMapper;
-        $this->storageMapper = $storageMapper;
     }
 
 
@@ -211,15 +183,6 @@ class Profile implements IStrategy
          * Import their specific parents' profile data
          */
         if ($this->validStrats->isStudentStratEnabled() || $this->validStrats->isFamiliesStratEnabled()) {
-            /* Download a zip containing everyone's profile pictures, and extract them
-             * It uses isams internal ids, not external ids
-             */
-            if ($this->includePhoto) {
-                $this->log->info('Downloading student profile photos (this might take a while)');
-
-                $this->photoDownloader->downloadStudentPhotos();
-            }
-
             $this->log->info('Processing students and their parents.');
 
             $this->importStudents();
@@ -228,15 +191,6 @@ class Profile implements IStrategy
         /* Import staff profile data
          */
         if ($this->validStrats->isStaffStratEnabled()) {
-            /* Download a zip containing everyone's profile pictures, and extract them
-             * It uses isams internal ids, not external ids
-             */
-            if ($this->includePhoto) {
-                $this->log->info('Downloading staff profile photos (this might take a while)');
-
-                $this->photoDownloader->downloadStaffPhotos();
-            }
-
             $this->log->info('Processing staff.');
 
             $this->importStaff();
@@ -457,10 +411,6 @@ class Profile implements IStrategy
                 $externalId
             ));
 
-            /* Import photos from sis
-             */
-            $this->importPortrait($studentBaseProfile, $personId, Role::STUDENT);
-
             try {
                 /* Then save it
                  */
@@ -476,98 +426,24 @@ class Profile implements IStrategy
             } catch (\Exception $e) {
                 $this->rememberError(Role::STUDENT, $externalId, $e->getMessage());
             }
-        }
-    }
 
-
-    /**
-     * Import a profile picture for the given $baseProfile
-     *
-     * Importing a profile picture requires you to enable photo_from_sis config var
-     * ("Load Photos From SIS" needs to be on)
-     *
-     * This populates the portrait_hash in $baseProfile
-     *
-     * @param Model  $baseProfile
-     * @param string $personId
-     * @param string $roleType should be one of the IPhotoDownloader::ROLE_* constants
-     * @return void
-     */
-    private function importPortrait(UserProfile\Model $baseProfile, string $personId, string $roleType): void
-    {
-        /* Check if config setting allows photos from sis
-         * If it's enabled, continue importing pics
-         */
-        if (!$this->includePhoto) {
-            return;
-        }
-
-        /* Start validating the contents of $fileInfo to ensure we have what we need
-         *
-         * file_info node might not exist; if it doesn't, skip it
-         */
-        $photoContents = $this->photoDownloader->getPhoto($personId, $roleType, $baseProfile->getExternalId());
-
-        if (null === $photoContents) {
-            $this->log->debug(sprintf(
-                'Profile picture: no data found for %s %s (%s)',
-                $baseProfile->getFirstname(),
-                $baseProfile->getLastname(),
-                $baseProfile->getExternalId()
-            ));
-
-            return;
-        }
-
-        /* Start the part where we save the image
-         */
-        $this->log->debug(sprintf(
-            'Importing profile picture for %s %s (%s)',
-            $baseProfile->getFirstname(),
-            $baseProfile->getLastname(),
-            $baseProfile->getExternalId()
-        ));
-
-        /* Only try to persist images if perform mode is activated
-         */
-        if (!$this->perform) {
-            return;
-        }
-
-        /* Otherwise, all the parts are here and valid; continue with the persistence
-         * to storage and assignation to the $baseProfile by reference
-         *
-         * Not using $fileInfo['file_name'] and $fileInfo['mime_type'] for now
-         */
-        try {
-            $portrait = $this->storageMapper->acceptStream($baseProfile->getExternalId() . '.jpg', $photoContents);
-
-            /* You get a picture if any of the following occur:
-             *     - you don't have a portrait yet; you can get one added
-             *     - your existing picture is different to the one we just got; update it
+            /* Remember that we saw a particular student id
+             *
+             * We may need to get each dude's photos separately via some other api endpoint
+             * and we won't encounter this id again unless we remember it here
              */
-            if (!$baseProfile->getPortrait() || ($baseProfile->getPortrait()->getHash() !== $portrait->getHash())) {
-                $this->log->debug(sprintf(
-                    'Profile picture: %s %s (%s) has profile hash %s derived from %s.png via %s',
-                    $baseProfile->getFirstname(),
-                    $baseProfile->getLastname(),
-                    $baseProfile->getExternalId(),
-                    $portrait->getHash(),
-                    $personId,
-                    $this->photoDownloader->whichSystem(),
-                ));
-
-                $baseProfile->setPortrait($portrait);
-            }
-        } catch (\Exception $e) {
-            // noop, but warn the cli that something unusual has transpired
-            $this->log->warning(sprintf(
-                'Profile picture: exception thrown. %s',
-                $e->getMessage()
-            ));
+            $this->registry->remember($externalId, [
+                'person' => [
+                    'type' => Role::STUDENT,
+                    'personId' => $personId,
+                    'externalId' => $externalId,
+                    'firstname' => $studentBaseProfile->getFirstname(),
+                    'firstnamePreferred' => $studentBaseProfile->getFirstnamePreferred(),
+                    'lastname' => $studentBaseProfile->getLastname()
+                ],
+            ]);
         }
     }
-
 
     /**
      * Find campus name
@@ -1176,10 +1052,6 @@ class Profile implements IStrategy
                 $externalId
             ));
 
-            /* Import photos from sis
-             */
-            $this->importPortrait($staffBaseProfile, $personId, Role::STAFF);
-
             try {
                 /* Then save it
                  */
@@ -1195,6 +1067,22 @@ class Profile implements IStrategy
             } catch (\Exception $e) {
                 $this->rememberError(Role::STAFF, $externalId, $e->getMessage());
             }
+
+            /* Remember that we saw a particular student id
+             *
+             * We may need to get each dude's photos separately via some other api endpoint
+             * and we won't encounter this id again unless we remember it here
+             */
+            $this->registry->remember($externalId, [
+                'person' => [
+                    'type' => Role::STAFF,
+                    'personId' => $personId,
+                    'externalId' => $externalId,
+                    'firstname' => $staffBaseProfile->getFirstname(),
+                    'firstnamePreferred' => $staffBaseProfile->getFirstnamePreferred(),
+                    'lastname' => $staffBaseProfile->getLastname()
+                ],
+            ]);
         }
     }
 

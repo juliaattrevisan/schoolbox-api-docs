@@ -7,10 +7,9 @@
 
 declare(strict_types=1);
 
-namespace Schoolbox\External\Connector\Isams\Base\Endpoint\Api\Batch;
+namespace Schoolbox\External\Connector\Isams\Base\Endpoint\ProfileImages;
 
 use Schoolbox\External\Connector\Isams\Base\Endpoint\Codec\DSN;
-use Schoolbox\External\Connector\Isams\Base\Endpoint\Profile\IPhotoDownloader;
 use Schoolbox\Role;
 use Schoolbox\Url\Uri;
 use SensitiveParameter;
@@ -27,7 +26,7 @@ use ZipArchive;
  *
  * The Alaress curl url lets you in though.
  */
-class PhotoDownloader implements IPhotoDownloader
+class BatchPhotoDownloader implements IPhotoDownloader
 {
     /**
      * All downloads have this prefix

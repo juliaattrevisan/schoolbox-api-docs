@@ -121,15 +121,9 @@ class Factory
             ];
         }
 
-        // if batch API exists, use that for photos, else fallback to batchxml thumbnails
-        $credentials = (new DSN())->decode($this->key);
-        if ($credentials['modules'][DSN::MODULE_RESTAPIHOST]['key'] !== '') {
-            $photoDownloader = new Api\Rest\PhotoDownloader($this->host, $this->key, $this->zipDir);
-        } else {
-            /* This lets you shank down zip files containing everyone's profile pictures
+        /* A list of user ids that we previously imported
          */
-            $photoDownloader = new Api\Batch\PhotoDownloader($this->host, $this->key, $this->zipDir);
-        }
+        $registry = new Registry();
 
         /* Purge previously-imported profile relationships and classes
          */
@@ -151,14 +145,12 @@ class Factory
                     $this->log,
                     $this->perform,
                     $api,
-                    $this->includePhoto,
-                    $photoDownloader,
                     $this->baseProfileMapper,
                     $this->studentProfileMapper,
                     $this->parentProfileMapper,
                     $this->staffProfileMapper,
                     $this->relationshipMapper,
-                    $this->storageMapper
+                    $registry
                 ))
                 ->add(new Profile\Cleanup(
                     $this->log,
@@ -169,7 +161,29 @@ class Factory
                     $this->parentProfileMapper,
                     $this->staffProfileMapper,
                     $this->relationshipMapper,
-                    $photoDownloader
+                ));
+        }
+        if ($this->includePhoto && $this->validStrats->isPhotoStratEnabled()) {
+            $bus
+                ->add(new ProfileImages\Prepare(
+                    $this->log,
+                    $this->host,
+                    $this->key,
+                    $this->zipDir,
+                ))->add(new ProfileImages\Download(
+                    $this->log,
+                    $this->perform,
+                    $registry,
+                    $this->host,
+                    $this->key,
+                    $this->zipDir,
+                    $this->baseProfileMapper,
+                    $this->storageMapper
+                ))
+                ->add(new ProfileImages\Cleanup(
+                    $this->log,
+                    $this->key,
+                    $this->zipDir,
                 ));
         }
 

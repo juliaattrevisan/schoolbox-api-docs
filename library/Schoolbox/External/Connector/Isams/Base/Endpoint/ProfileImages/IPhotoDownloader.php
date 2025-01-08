@@ -1,13 +1,15 @@
 <?php
 
-/**
- * @copyright   Copyright 2025, Schoolbox Pty Ltd
- * @link        https://schoolbox.education/
+/*
+ * *
+ *  * @copyright   Copyright 2025, Schoolbox Pty Ltd
+ *  * @link        https://schoolbox.education/
+ *
  */
 
 declare(strict_types=1);
 
-namespace Schoolbox\External\Connector\Isams\Base\Endpoint\Profile;
+namespace Schoolbox\External\Connector\Isams\Base\Endpoint\ProfileImages;
 
 use Schoolbox\Role;
 use SensitiveParameter;
@@ -19,16 +21,6 @@ use SensitiveParameter;
  */
 interface IPhotoDownloader
 {
-    /**
-     * Constructor.
-     *
-     * @param string $host
-     * @param string $dsn
-     * @param string $zipDir
-     * @throws \DomainException
-     */
-    public function __construct(string $host, #[SensitiveParameter] string $dsn, string $zipDir);
-
     /**
      * Download student photos
      *
