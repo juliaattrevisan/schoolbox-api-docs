@@ -138,7 +138,7 @@ export const useUnitPlannerCurriculumStore = defineStore(`unitPlannerCurriculum`
                 (component) => component.heading === column.label,
             )?.filter;
 
-            const configSearchParams = new URLSearchParams();
+            const configSearchParams = new FormData();
             configSearchParams.append("cid", unit.folderId.toString());
             configSearchParams.append("type", "config");
             configSearchParams.append("component", createResponseJSON.instanceID.toString());
@@ -147,9 +147,10 @@ export const useUnitPlannerCurriculumStore = defineStore(`unitPlannerCurriculum`
 
             // Then create the component
             const configResponse = await fetch(
-                `${unit.curriculum._routes.createComponent}?${configSearchParams.toString()}`,
+                `${unit.curriculum._routes.createComponent}`,
                 {
                     method: "POST",
+                    body: configSearchParams,
                     headers: {
                         Accept: "application/json",
                     },
