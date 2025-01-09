@@ -17,7 +17,7 @@ class Controller extends Base
      *
      * This file is cached for a day to avoid unnecessary requests.
      *
-     * @api GET /l10n.js
+     * @api GET /l10n
      * @since 25.0
      *
      * @return void
