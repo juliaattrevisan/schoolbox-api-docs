@@ -13,6 +13,7 @@ use Alaress\Paginator;
 use Alaress\Web\Controller\Base;
 use Alaress_Date_Format;
 use League\Flysystem\FilesystemException;
+use Schoolbox\Application\Exception\Exception as SchoolboxException;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\L10n\RosettaStone;
 use Schoolbox\Learning\Assessment\Redirect;
@@ -259,10 +260,32 @@ class Controller extends Base
         // Save the import here, then redirect to a create page.
         $zipStorage = $this->loadZipFromStorage();
         $type       = $this->pastoralTypeMapper->findById($this->requestPost->get('typeId'));
-        $subType    = $this->requestPost->get('subtypeId')
-            ? $this->pastoralSubTypeMapper->findById($this->requestPost->get('subtypeId'))
-            : null;
-        $import     = $this->pastoralBulkImportMapper->createModel()
+
+        /* Try fetching the prescribed subtype from the post payload. Due to multiplayer schoolbox
+         * this id might or might not exist at runtime. I don't think we should try to assign a deleted
+         * subtype, so error out somewhat-meaningfully instead.
+         */
+        $subtypeId = $this->requestPost->get('subtypeId');
+
+        /* A pastoral Type exists, but all its subtypes were deleted
+         * $subtypeId will be null in this circumstance and we default to assuming
+         * an instance of $type instead
+         */
+        $subType = null;
+
+        /* A subtypeId was provided, but might not actually exist at runtime
+         */
+        if (null !== $subtypeId) {
+            try {
+                $subType = $this->pastoralSubTypeMapper->findById($subtypeId);
+            } catch (\Schoolbox\Mapper\Exception $e) {
+                /* Recycle the same error from RecordProcessor
+                 */
+                throw new SchoolboxException("Pastoral subtype with ID {$subtypeId} cannot be found");
+            }
+        }
+
+        $import = $this->pastoralBulkImportMapper->createModel()
             ->setOwner($this->getUser())
             ->setZip($zipStorage)
             ->setFilePathTemplate($this->requestPost->get('template'))
@@ -294,6 +317,7 @@ class Controller extends Base
             $this->userMapper,
             Access\Model::class,
         );
+
         $import = $import->setAccess($visibilityTranslator->prepareAccesses($this->requestPost, $subType ?? $type));
 
         // And save
