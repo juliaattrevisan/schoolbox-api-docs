@@ -78,6 +78,8 @@
 
                         <td data-header="{{ level.name }}" {% if isMarkDisplayed %}class="rb-selected"{% endif %}>
                             <div>
+                                {# This container displays rubric levels for the mobile view. #}
+                                <div class="rubric-levels-mobile l-pad-m"><p><b>{{ level.name | markdown }}</b><p></div>
                                 <span class="rb-description markdown">
                                     {# Self-Assessment #}
                                     {% if selfAssessmentIndicatorMark and selfAssessmentIndicatorMark.descriptor.id == descriptor.id %}

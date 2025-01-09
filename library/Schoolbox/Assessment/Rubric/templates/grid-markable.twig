@@ -87,6 +87,8 @@
                             {% set blindMode            = blindMode %}
 
                             <td>
+                                {# This container displays rubric levels for the mobile view. #}
+                                <div class="rubric-levels-mobile l-pad-m"><p><b>{{ level.name | markdown }}</b><p></div>
                                 {% include '@rubric/descriptor-markable.twig' %}
                             </td>
 
