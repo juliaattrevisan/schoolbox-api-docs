@@ -28,7 +28,7 @@ class IFrame extends Base
      */
     public function test(): ?array
     {
-        if ($this->item->getMimetype()->getInline() && in_array($this->item->getExtension(), self::CONTENT_TYPES)) {
+        if (in_array($this->item->getExtension(), self::CONTENT_TYPES)) {
             return [
                 'type' => 'iframe',
                 'src' => $this->url,
