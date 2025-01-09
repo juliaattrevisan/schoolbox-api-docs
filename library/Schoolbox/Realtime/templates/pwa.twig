@@ -109,3 +109,8 @@
     </div>
     {% endif %}
 </div>
+
+<div data-vue-app="pwa-menu">
+    <pwa-menu page="{{ pwaPage }}" site-title="{{ config.title }}"/>
+</div>
+<script src="{{ CDN_PREFIX }}/js/bundle/pwa.js?v={{ config.site_version }}"></script>

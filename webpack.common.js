@@ -117,6 +117,9 @@ module.exports = {
         headerSearch: "./templates/core/include/vue/headerSearch.ts",
         searchPage: "./library/Schoolbox/Search/templates/vue/searchPage.ts",
 
+        // PWA
+        pwa: "./www/static/js/pwa/pwa.ts",
+
         // Toast
         sbxToast: "./vue/components/toast/sbxToast.ts",
 
