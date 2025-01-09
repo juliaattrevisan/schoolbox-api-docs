@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { getUserPlatform, isPWA } from "@js/util/browserUtils";
 import PwaMenuInstall from "./pwa-menu-install.vue";
 import PwaMenuNotifications from "./pwa-menu-notifications.vue";
 
@@ -17,17 +18,40 @@ interface Props {
 }
 
 const props = defineProps<Props>();
+
+// The type of installation prompt to show
+// - iOS : If on iOS and the digistorm app exists
+// - Android : If on Android and the digistorm app exists
+// - PWA : If PWA is enabled, we are outside of it, and the above are not true
+const pwaPromptType = window.Vue.computed(() => {
+    if (props.installApple && getUserPlatform() === "iOS") {
+        return { id: "iOS", url: props.installApple };
+    }
+
+    if (props.installGoogle && getUserPlatform() === "Android") {
+        return { id: "Android", url: props.installGoogle };
+    }
+
+    if (props.pwaEnabled && !isPWA()) {
+        return { id: "Browser", url: null };
+    }
+
+    return { id: null, url: null };
+});
 </script>
+
 <template>
-    <div class="l-flex-col l-gap-m f-no-margins" :data-pwa-page="props.page">
+    <div class="l-flex-col l-gap-m f-no-margins">
         <p>
             To receive push notifications and enjoy a better experience, install the {{ props.siteTitle }} web app on
             your device.
         </p>
-        <a v-if="installApple" class="button" :href="installApple">Install</a>
-        <a v-if="installGoogle" class="button" :href="installGoogle">Install</a>
-        <pwa-menu-install v-if="pwaEnabled" :page="props.page" :site-title="props.siteTitle" />
+
+        <a v-if="pwaPromptType.url" class="button" :href="pwaPromptType.url">Install</a>
+        <pwa-menu-install v-else-if="pwaPromptType.id === 'Browser'" :page="props.page" :site-title="props.siteTitle" />
+
         <pwa-menu-notifications v-if="notificationsEnabled" :page="props.page" :site-title="props.siteTitle" />
     </div>
 </template>
+
 <style scoped></style>
