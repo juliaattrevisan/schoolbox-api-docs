@@ -213,28 +213,6 @@ class Mimetype implements ISoftDeletable
     }
 
     /**
-     * Set inline
-     *
-     * @param bool $inline
-     * @return $this
-     */
-    public function setInline($inline): self
-    {
-        $this->inline = $inline;
-        return $this;
-    }
-
-    /**
-     * Get inline
-     *
-     * @return bool
-     */
-    public function getInline()
-    {
-        return $this->inline;
-    }
-
-    /**
      * Set mime type
      *
      * @param string $mime

@@ -42,7 +42,7 @@ if (is_numeric($_GET['delete'] ?? null)) {
 
 /* Check that all the required fields were submitted
  */
-foreach (['description', 'mime', 'extension', 'inline'] as $current) {
+foreach (['description', 'mime', 'extension'] as $current) {
     if (!strlen(trim($_POST[$current]))) {
         throw ErrorMapper::getInstance()->generateException(ErrorMapper::ERROR_INFORMATION_MISSING);
     }
@@ -105,7 +105,6 @@ try {
 $mime->setDescription($_POST["description"]);
 $mime->setMime($_POST["mime"]);
 $mime->setIconFile($_POST["iconFile"]);
-$mime->setInline($_POST["inline"] === 'true');
 $mime->setEnable($_POST["enable"] === 'true');
 $mime->setMaxFileSize($_POST["max_file_size"]);
 $mime->setDeleted(false);

@@ -30,7 +30,7 @@ try {
         $page->initSession();
 
         $resource = Schoolbox\Resource\Storage\Mapper::getInstance()->findByHash($_GET['hash']);
-        $disposition = (!$resource->getMimetype()->getInline() || ($_GET['save'] ?? false))
+        $disposition = ($_GET['save'] ?? false)
             ? PreSignedUrlService::DISPOSITION_ATTACHMENT
             : PreSignedUrlService::DISPOSITION_INLINE;
         $contentType = ($resource->getMime()) ?: 'application/octet-stream';

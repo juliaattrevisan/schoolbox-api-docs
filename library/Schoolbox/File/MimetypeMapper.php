@@ -130,7 +130,6 @@ class MimetypeMapper extends Schoolbox\Mapper
         $mimeType = new Mimetype();
         $mimeType->setDescription('Binary Data (Unknown)');
         $mimeType->setMime('application/octet-stream');
-        $mimeType->setInline(false);
         $mimeType->setEnable(true);
         $mimeType->setIconFile('application-octet-stream.svg');
         $mimeType->setMaxFileSize(0);

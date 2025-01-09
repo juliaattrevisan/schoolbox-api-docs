@@ -237,9 +237,6 @@
                                     <div class="small-12 medium-2 columns no-pad">
                                         <span class="meta">{FILE_MAXSIZE}</span>
                                     </div>
-                                    <div class="small-12 medium-3 columns no-pad">
-                                        <span class="meta">{FILE_INLINE}</span>
-                                    </div>
                                     <!-- BEGIN enabled -->
                                     <div class="small-12 columns no-pad">
                                         <span class="label status alert">Disabled</span>
@@ -292,19 +289,10 @@
                                             <input id="mime-{FILE_ID}" type="text" class="text-input" name="mime" value="{FILE_MIME}"/>
                                         </div>
                                     </div>
-                                    <div class="max_size column large-3">
+                                    <div class="max_size column large-6">
                                         <div>
                                             <label for="max_file_size-{FILE_ID}">Max Size<span data-tooltip class="hint has-tip tip-bottom" title="Files above 2GB cannot be uploaded">?</span></label>
                                             <input id="max_file_size-{FILE_ID}" type="text" class="text-input" name="max_file_size" placeholder="{FILE_MAXSIZE_PLACEHOLDER}" value="{FILE_MAXSIZE_INPUT}"/>
-                                        </div>
-                                    </div>
-                                    <div class="inline column large-3">
-                                        <div>
-                                            <label for="inline-{FILE_ID}">Inline</label>
-                                            <select name="inline" id="inline-{FILE_ID}">
-                                                <option value="true">Inline</option>
-                                                <option value="false" {FILE_EXTERN_CHECKED}>External</option>
-                                            </select>
                                         </div>
                                     </div>
                                 </div>
