@@ -20,7 +20,7 @@ class Module extends BaseModule
     protected function registerRoutes(): void
     {
         $perms = new Rule\IsLoggedIn();
-        $this->register('GET', '.js', 'getLocale', $perms);
+        $this->register('GET', '', 'getLocale', $perms);
     }
 
 

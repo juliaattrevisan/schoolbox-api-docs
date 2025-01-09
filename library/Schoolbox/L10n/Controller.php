@@ -6,6 +6,8 @@ use Alaress\Web\Controller\Base;
 
 class Controller extends Base
 {
+    private const MAX_AGE = 86400; // 1 day
+
     /**
      * Provides the current locale as a JavaScript file that allows the frontend to use it
      *
@@ -27,7 +29,6 @@ class Controller extends Base
             ->responseFromTemplateUnthemed('@l10n/l10n.js.twig', [])
             ->withHeader('Content-Type', 'application/javascript')
             ->withHeader('Pragma', ' ')
-            ->withHeader('Cache-Control', 'public, max-age=86400') // 1 day
-        ;
+            ->withHeader('Cache-Control', 'public, max-age=' . self::MAX_AGE);
     }
 }
