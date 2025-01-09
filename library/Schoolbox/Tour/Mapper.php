@@ -302,19 +302,19 @@ class Mapper extends BaseMapper
     /**
      * Return an array of comma-separated role names, indexed by tour UUID.
      *
-     * @param bool $includeDisabledTours If true, include all tours.  If false, include only tours with active=1.
      * @return array<string, string>
      */
-    public function getAudienceRoleNamesCommaSeparatedByUuid(bool $includeDisabledTours): array
+    public function getAudienceRoleNamesCommaSeparatedByUuid(): array
     {
         return $this->database->executeQuery(
+            // This query deliberately includes inactive rows because both inactive (disabled) and
+            // active (enabled) tours need to be displayed on the Admin > Modules > Feature Tours page.
             'SELECT t.uuid, GROUP_CONCAT(DISTINCT g.name SEPARATOR ", ") AS groupNames
             FROM tour_audience_role tar
             JOIN groups g ON tar.role_id = g.id
             JOIN tour t ON tar.tour_uuid = t.uuid
             WHERE t.deleted_at IS NULL
             AND g.deleted_at IS NULL
-            ' . ($includeDisabledTours ? '' : 'AND t.active = 1') . '
             GROUP BY t.uuid'
         )->fetchColumnArray('groupNames', 'uuid');
     }
