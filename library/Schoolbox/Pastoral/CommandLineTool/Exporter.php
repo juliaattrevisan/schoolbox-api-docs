@@ -219,10 +219,12 @@ class Exporter extends CliTool\App
             }
         }
 
-        $log->info("$nRecordsExported pastoral records exported successfully.");
+        if ($this->perform()) {
+            $log->info("$nRecordsExported pastoral records exported successfully.");
 
-        if (count($failedPastoralIds) > 0) {
-            $log->info("PastoralIds that failed to export: " . implode(', ', $failedPastoralIds));
+            if (count($failedPastoralIds) > 0) {
+                $log->info("PastoralIds that failed to export: " . implode(', ', $failedPastoralIds));
+            }
         }
     }
 
