@@ -22,13 +22,13 @@ if (!empty($_POST)) {
 
     $questionHandler = $factory->createQuestionModel($_POST['type_id']);
     $answerHandler = $factory->createAnswerModel($_POST['type_id']);
-/* If configuration was provided
+    /* If configuration was provided
      */
     $config = null;
     if (isset($_POST['configuration'])) {
         $allConfiguration = json_decode($_POST['configuration']);
         $config = array();
-    /* Compress checkboxes
+        /* Compress checkboxes
          */
         foreach ($allConfiguration as $currentConfiguration) {
             $config[$currentConfiguration->name] = $currentConfiguration->value;
@@ -39,7 +39,7 @@ if (!empty($_POST)) {
      */
     $data = $_POST;
     $data['config'] = json_encode($config);
-/* Because questions and answers aren't stored in separate tables
+    /* Because questions and answers aren't stored in separate tables
      * in the QuestionBank context, so this had to get decomposed a bit
      * which is severely unfortunate
     *
@@ -57,11 +57,11 @@ if (!empty($_POST)) {
     }
 
     $data['answer'] = $encoded;
-/* Context-specific questionHandler, for the QuestionBank
+    /* Context-specific questionHandler, for the QuestionBank
      */
     $questionBank = new Survey_Question_Bank();
     $questionBank->getQuestionHandler()->update($data);
-/* Find the Survey summary page
+    /* Find the Survey summary page
      */
     $this->backToTheFuture(2);
 } else {
@@ -81,10 +81,10 @@ if (!empty($_POST)) {
     $questionBank = new Survey_Question_Bank();
     $question = $questionBank->getByID($this->arg[0]);
     $answerHandler = $factory->createAnswerModel($question['type_id']);
-/* Show question type options. For the Modify, preselect whichever it was
+    /* Show question type options. For the Modify, preselect whichever it was
      */
     $currentQuestionType = $questionBank->getQuestionHandler()->getQuestionType($question['type_id']);
-/* Question-specific answer configuration
+    /* Question-specific answer configuration
     *
   * Load answer configurations template into answer_configuration_form_fragment
   * block if there are configuration options available
@@ -120,7 +120,7 @@ if (!empty($_POST)) {
     $trail = new Breadcrumbs();
     $trail->renderIntoSitePage($this, 'BREADCRUMB', [
         [
-            'text'  => 'Survey Questionbank',
+            'text'  => 'Survey Question Bank',
             'href'  => '#',
             'class' => ''
         ],
