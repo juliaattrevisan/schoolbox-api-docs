@@ -268,6 +268,9 @@ class Profile implements IStrategy
         $campusMapping = $this->prefetchCampuses();
 
         $students = $this->api[DSN::MODULE_BATCHXML]->fetchXml('/iSAMS/PupilManager/CurrentPupils/Pupil');
+//        $log = new \Alaress_Log_File('/tmp/alaress.log');
+//        $log->log('test_', $students);
+//        die();
 
         /* $student is a stdclass derived from xml data,
          * it's not a Normalised Data Structure object here
@@ -275,7 +278,8 @@ class Profile implements IStrategy
         foreach ($students as $student) {
             $externalId = trim((string)$student->SchoolId);
             $academicHouse = trim((string)$student->AcademicHouse);
-            $boardingHouseName = '';
+            $boardingStatus = isset($student->xpath('@BoardingHouseId')[0]);
+            $boardingHouseName = trim((string)$student->BoardingHouse);
             $dob = strtotime(trim((string)$student->DOB));
             $firstname = trim((string)$student->Forename);
 
@@ -432,7 +436,7 @@ class Profile implements IStrategy
                  * We can't check for this effectively unless we predetermine what these
                  * statuses could contain and what those statuses mean
                  */
-                ->setBoardingStatus(false)
+                ->setBoardingStatus($boardingStatus)
                 ->setEsl(null)
                 ->setIb(null)
                 ->setIndividualLearningPlans(null)
