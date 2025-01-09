@@ -23,7 +23,7 @@ class Controller extends Base
     /**
      * Lets build this thing!
      */
-    public function __construct()
+    public function __construct(private \Schoolbox\Config\ConfigMapper $configMapper)
     {
         $this->l10nMapper = L10nMapper::getInstance();
     }
@@ -61,6 +61,11 @@ class Controller extends Base
                     ->setIndefiniteArticle(trim($post['indefiniteArticle'][$term]));
 
                 $this->l10nMapper->save($localisation);
+
+                // Update the last modified time so the cache can be invalidated
+                $lastModified = $this->configMapper->findOneByColumn("name", "terminology_last_modified");
+                $lastModified->setValue(time());
+                $this->configMapper->save($lastModified);
             }
         } catch (MapperException $e) {
             // noop, I guess? skip unknown terminologies
