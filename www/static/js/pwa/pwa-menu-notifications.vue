@@ -94,6 +94,21 @@ const prompt = window.Vue.computed<PromptType | null>(() => {
     // If the user hasn't been prompted yet, show the enable notifications prompt
     return PromptType.ENABLE_NOTIF_PROMPT;
 });
+
+/**
+ * on iOS, Notification.permission is completely unreliable until we have used
+ * Notification.requestPermission at least once. If a user initially denies notifications,
+ * but then turns them on in settings, iOS will still return 'denied' for Notification.permission
+ * even if you navigate between pages or refresh the whole app sometimes...
+ * We can't just auto re-request permission because Notification.requestPermission() requires a user gesture
+ *
+ * To work around this, we provide a button on the blocked message that the user can click to
+ * trigger Notification.requestPermission() again and then reload the page to get the reflected UI changes
+ */
+async function onRetryNotifPrompt(): Promise<void> {
+    await Notification.requestPermission();
+    window.location.reload();
+}
 </script>
 <template>
     <div v-if="prompt === PromptType.IMPERSONATING_USER" class="alert-box warning">
@@ -108,7 +123,7 @@ const prompt = window.Vue.computed<PromptType | null>(() => {
     <div v-else-if="prompt === PromptType.NOTIF_BLOCKED" class="alert-box warning">
         You've blocked notifications on this device. To enable notifications, you must go to your device settings and
         set <b>Allow notifications</b>.
-        <a href="#" class="pwa-retry-notif-prompt">Try again</a>
+        <a href="#" class="pwa-retry-notif-prompt" @click.prevent="onRetryNotifPrompt">Try again</a>
     </div>
 
     <div v-else-if="prompt === PromptType.NOTIF_ENABLED_MESSAGE" class="alert-box success">
