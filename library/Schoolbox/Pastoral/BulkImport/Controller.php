@@ -267,12 +267,20 @@ class Controller extends Base
          */
         $subtypeId = $this->requestPost->get('subtypeId');
 
-        try {
-            $subType = $this->pastoralSubTypeMapper->findById($subtypeId);
-        } catch (\Schoolbox\Mapper\Exception $e) {
-            /* Recycle the same error from RecordProcessor
-             */
-            throw new SchoolboxException("Pastoral subtype with ID {$subtypeId} cannot be found");
+        /* A pastoral Type exists, but all its subtypes were deleted
+         * $subtypeId will be null in this circumstance and we default to assuming
+         * an instance of $type instead
+         */
+        if (null === $subtypeId) {
+            $subType = null;
+        } else {
+            try {
+                $subType = $this->pastoralSubTypeMapper->findById($subtypeId);
+            } catch (\Schoolbox\Mapper\Exception $e) {
+                /* Recycle the same error from RecordProcessor
+                 */
+                throw new SchoolboxException("Pastoral subtype with ID {$subtypeId} cannot be found");
+            }
         }
 
         $import     = $this->pastoralBulkImportMapper->createModel()
@@ -307,6 +315,7 @@ class Controller extends Base
             $this->userMapper,
             Access\Model::class,
         );
+
         $import = $import->setAccess($visibilityTranslator->prepareAccesses($this->requestPost, $subType ?? $type));
 
         // And save
