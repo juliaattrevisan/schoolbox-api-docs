@@ -187,19 +187,19 @@ $allow-notification-stash: $xlarge-up;
     }
 }
 
-#pwaPrompt {
+.pwa-side-panel {
     background: white; // to ensure the pwa prompt is visible if the skin config has a different var(--off-canvas-background);
     border-bottom: 1px solid var(--body-background); // to separate pwa section from rest of the notification bar
     .alert-box.warning {
         padding-right: 0.875rem; // reduce the padding that allows the close button to be visible, as we don't have it here
     }
-    #installDelayPrompt {
+    .install-delay-prompt {
         margin-top: 1rem;
     }
     .notifOn {
         font-size: 0.8125rem; // keep it consistent with existing labels
     }
 }
-a#installDelayPrompt {
+a.install-delay-prompt {
     padding: 0.5rem 1rem !important;
 }

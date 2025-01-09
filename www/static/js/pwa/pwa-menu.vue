@@ -1,11 +1,13 @@
 <script setup lang="ts">
 import { getUserPlatform, isPWA } from "@js/util/browserUtils";
+import PwaMenuPanelSettings from "./pwa-menu-panel-settings.vue";
+import PwaMenuPanelSidebar from "./pwa-menu-panel-sidebar.vue";
 import PwaMenuInstall from "./pwa-menu-install.vue";
 import PwaMenuNotifications from "./pwa-menu-notifications.vue";
 
 interface Props {
-    // if in chrome (messages sidebar) or in the notifications setting page
-    page: "chrome" | "settings";
+    // if this component is located in the sidebar or the notifications setting page
+    page: "sidebar" | "settings";
     // site title, to show "[title] web app" in the message
     siteTitle: string;
     // the digistorm prompt for google/apple, if it exists
@@ -41,22 +43,31 @@ const pwaPromptType = window.Vue.computed(() => {
 </script>
 
 <template>
-    <div class="l-flex-col l-gap-m f-no-margins">
-        <p>
-            To receive push notifications and enjoy a better experience, install the {{ props.siteTitle }} web app on
-            your device.
-        </p>
+    <component
+        :is="props.page === 'settings' ? PwaMenuPanelSettings : PwaMenuPanelSidebar"
+        :site-title="props.siteTitle"
+    >
+        <div class="l-flex-col l-gap-m f-no-margins">
+            <p>
+                To receive push notifications and enjoy a better experience, install the {{ props.siteTitle }} web app
+                on your device.
+            </p>
 
-        <a v-if="pwaPromptType.url" class="button" :href="pwaPromptType.url">Install</a>
-        <pwa-menu-install v-else-if="pwaPromptType.id === 'Browser'" :page="props.page" :site-title="props.siteTitle" />
+            <a v-if="pwaPromptType.url" class="button" :href="pwaPromptType.url">Install</a>
+            <pwa-menu-install
+                v-else-if="pwaPromptType.id === 'Browser'"
+                :page="props.page"
+                :site-title="props.siteTitle"
+            />
 
-        <pwa-menu-notifications
-            v-if="notificationsEnabled"
-            :page="props.page"
-            :site-title="props.siteTitle"
-            :pwa-enabled="props.pwaEnabled"
-        />
-    </div>
+            <pwa-menu-notifications
+                v-if="notificationsEnabled"
+                :page="props.page"
+                :site-title="props.siteTitle"
+                :pwa-enabled="props.pwaEnabled"
+            />
+        </div>
+    </component>
 </template>
 
 <style scoped></style>

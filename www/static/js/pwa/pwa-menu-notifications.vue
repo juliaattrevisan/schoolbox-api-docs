@@ -2,8 +2,8 @@
 import { getUserPlatform, isPWA, supportsNotifications } from "@js/util/browserUtils";
 
 interface Props {
-    // if in chrome (messages sidebar) or in the notifications setting page
-    page: "chrome" | "settings";
+    // if this component is located in the sidebar or the notifications setting page
+    page: "sidebar" | "settings";
     // site title, to show "[title] web app" in the message
     siteTitle: string;
     // whether the PWA app can be installed
