@@ -255,7 +255,7 @@ $menu-slide: "transform 500ms ease" !default;
     li {
         // All links in the off-canvas menu except for the retryNotifPrompt should look like buttons
         // The retryNotifPrompt is a special case where we want an inline <a> link instead.
-        a:not([data-pwa-action="retryNotifPrompt"]) {
+        a:not(.pwa-retry-notif-prompt) {
             // Avoid specificity overwrite with .button.load-more, as it has no background, we do actually want a border
             &:not(.button.load-more) {
                 border-bottom: $off-canvas-link-border-bottom;

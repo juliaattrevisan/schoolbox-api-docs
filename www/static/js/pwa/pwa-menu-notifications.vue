@@ -17,7 +17,7 @@ const props = defineProps<Props>();
     <div data-pwa-notif="notifBlocked" class="alert-box warning">
         You've blocked notifications on this device. To enable notifications, you must go to your device settings and
         set <b>Allow notifications</b>.
-        <a data-pwa-action="retryNotifPrompt" href="#">Try again</a>
+        <a data-pwa-action="retryNotifPrompt" class="pwa-retry-notif-prompt" href="#">Try again</a>
     </div>
 
     <div data-pwa-notif="notifDisabledImpersonate" class="alert-box warning">
