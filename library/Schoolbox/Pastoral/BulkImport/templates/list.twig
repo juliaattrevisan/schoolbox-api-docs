@@ -42,11 +42,16 @@
                         <div class="actions-small-2">
                             {% set getRoute = routeLookupIfAuthorized('pastoralBulkImport.getImport', {id: import.id, import: import}) %}
                             {% set runRoute = routeLookupIfAuthorized('pastoralBulkImport.postRunImport', {id: import.id, import: import}) %}
-                            {% if runRoute %}
+
+                            {# Also check that this import has a zip file from which an import can be conducted
+                             # or whether its log can be viewed. Abandoning an import halfway and having the zip
+                             # file naturally expire leads to a dead end.
+                             #}
+                            {% if runRoute and import.zip %}
                                 <form id="postRunImport-{{ import.id }}" action="{{ runRoute }}?{{ returnQueryString }}" method="post"></form>
                             {% endif %}
                             {% set undoRoute = routeLookupIfAuthorized('pastoralBulkImport.postUndoImport', {id: import.id, import: import}) %}
-                            {% if undoRoute %}
+                            {% if undoRoute and import.zip %}
                                 <form id="postUndoImport-{{ import.id }}" action="{{ undoRoute }}?{{ returnQueryString }}" method="post"></form>
                             {% endif %}
                             {% set deleteRoute = routeLookupIfAuthorized('pastoralBulkImport.postDeleteImport', {id: import.id, import: import}) %}
@@ -55,7 +60,7 @@
                             {% endif %}
                             <div class="list-item">
                                 <div class="card small-12">
-                                    {% if getRoute %}
+                                    {% if getRoute and import.zip %}
                                         <a href="{{ getRoute }}?{{ returnQueryString }}" {% if import.undone %}class="strike"{% endif %}><h3>{{ import.heading }}</h3></a>
                                     {% else %}
                                         <span {% if import.undone %}class="strike"{% endif %}><h3>{{ import.heading }}</h3></span>
@@ -97,15 +102,15 @@
 
                             {# Buttons: run, undo, modify, archive?, delete? #}
                             <nav>
-                                {% if getRoute %}
+                                {% if getRoute and import.zip %}
                                     <a class="icon-eye" href="{{ getRoute }}?{{ returnQueryString }}" title="{% if import.imported %}View import results{% else %}Preview import{% endif %}"></a>
                                 {% endif %}
 
-                                {% if runRoute %}
+                                {% if runRoute and import.zip %}
                                     <a class="icon-import" data-action="run" data-form-id="postRunImport-{{ import.id }}" title="Run import"></a>
                                 {% endif %}
 
-                                {% if undoRoute %}
+                                {% if undoRoute and import.zip %}
                                     <a class="icon-undo" data-action="undo" data-form-id="postUndoImport-{{ import.id }}" title="Undo import"></a>
                                 {% endif %}
 
