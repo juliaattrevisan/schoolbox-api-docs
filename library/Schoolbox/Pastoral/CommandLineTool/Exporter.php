@@ -164,7 +164,7 @@ class Exporter extends CliTool\App
                     try {
                         $syncSucceeded = $externalPastoral->syncPastoral($pastoralRecord, $this->getConfig()->get('external_pastoral_title_include'));
                     } catch (\Exception $e) {
-                        $log->debug("Could not sync pastoral record (Pastoral ID #{$pastoralRecord->getId()}).  Error: {$e->getMessage()}");
+                        $log->debug("Pastoral record with external ID {$pastoralRecord->getExternalId()} could not be synced.  Error: {$e->getMessage()}");
                         $failedPastoralIds[] = $pastoralRecord->getId();
                         continue;
                     }
@@ -174,7 +174,7 @@ class Exporter extends CliTool\App
                         $failedPastoralIds[] = $pastoralRecord->getId();
                         continue;
                     }
-                    $log->debug("Pastoral record synced with external ID {$pastoralRecord->getExternalId()} was synced.");
+                    $log->debug("Pastoral record with external ID {$pastoralRecord->getExternalId()} was synced.");
                 }
 
                 $nRecordsExported++;
