@@ -49,14 +49,6 @@ class Mimetype implements ISoftDeletable
     protected $iconFile;
 
     /**
-     * String true/false depending on whether the filetype can be opened
-     * inline within the browser
-     *
-     * @var bool
-     */
-    protected $inline;
-
-    /**
      * String true/false depending on whether this allowed filetype is enabled
      * (that is, allowed to be uploaded)
      *
