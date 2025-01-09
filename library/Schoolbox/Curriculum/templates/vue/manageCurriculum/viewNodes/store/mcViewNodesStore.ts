@@ -8,6 +8,9 @@
 import { defineStore } from "pinia";
 import { useNodesStore } from "@schoolboxCurriculum/vue/manageCurriculum/store/mcNodesStore";
 import { useSearchStore } from "@schoolboxCurriculum/vue/manageCurriculum/store/mcSearchStore";
+import { useAddSubsectionStore } from "@schoolboxCurriculum/vue/manageCurriculum/activeNode/store/mcAddSubsectionStore";
+import { useUpdateNodeStore } from "@schoolboxCurriculum/vue/manageCurriculum/activeNode/store/mcUpdateNodeStore";
+import { useAddCurriculumStore } from "@schoolboxCurriculum/vue/manageCurriculum/store/mcAddCurriculumStore";
 import { UNSET_ID, findById } from "@schoolboxCurriculum/js/nodeUtils";
 import type { Node } from "@schoolboxCurriculum/types/Node";
 import type { Breadcrumb } from "@schoolboxCurriculum/types/Breadcrumb";
@@ -142,6 +145,11 @@ export const useViewNodesStore = defineStore("mcViewNodes", () => {
      * @param id - the id of the selected Node
      */
     function setSelected(depth: number, id: number = UNSET_ID): void {
+        // Close any open modify menus when traversing the tree
+        useAddSubsectionStore().cancel();
+        useUpdateNodeStore().cancel();
+        useAddCurriculumStore().cancel();
+
         useSearchStore().clear(); // clear the search results when traversing
         if (depth === 0) {
             // pulling back to no node selection at all, the root level
