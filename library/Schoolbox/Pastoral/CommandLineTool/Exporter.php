@@ -266,7 +266,7 @@ OPTIONS
         If provided, only attempt to export records which have been recorded as exported to the external pastoral care system, but don't exist within it:
         this attempts to repair exports which might have worked only partially.
 
-        Mutually exclusive with $yellow--unsynced-only$white.
+        Mutually exclusive with $yellow--unexported-only$white: if neither is provided, all records will be exported.
 
     $yellow--from=FROM_DATE$white
         If provided, only export records created from {$yellow}FROM_DATE{$white} onward.
