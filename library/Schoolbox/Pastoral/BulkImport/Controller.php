@@ -271,9 +271,11 @@ class Controller extends Base
          * $subtypeId will be null in this circumstance and we default to assuming
          * an instance of $type instead
          */
-        if (null === $subtypeId) {
-            $subType = null;
-        } else {
+        $subType = null;
+
+        /* A subtypeId was provided, but might not actually exist at runtime
+         */
+        if (null !== $subtypeId) {
             try {
                 $subType = $this->pastoralSubTypeMapper->findById($subtypeId);
             } catch (\Schoolbox\Mapper\Exception $e) {
@@ -283,7 +285,7 @@ class Controller extends Base
             }
         }
 
-        $import     = $this->pastoralBulkImportMapper->createModel()
+        $import = $this->pastoralBulkImportMapper->createModel()
             ->setOwner($this->getUser())
             ->setZip($zipStorage)
             ->setFilePathTemplate($this->requestPost->get('template'))
