@@ -38,12 +38,12 @@ class User extends AbstractImporter
     /**
      * @var Service
      */
-    protected $passwordService;
+    protected Service $passwordService;
 
     /**
      * @var UserMapper
      */
-    protected $userMapper;
+    protected UserMapper $userMapper;
 
     /**
      * @var array|RoleModel[]
@@ -93,7 +93,7 @@ class User extends AbstractImporter
 
     /**
      * Caches new user's usernames so we can detect multi new users
-     * with the the same username during dry-run.
+     * with the same username during dry-run.
      *
      * Maps 'username' => 'externalId'
      *
@@ -104,7 +104,6 @@ class User extends AbstractImporter
     /**
      * Documentation function for expected format
      *
-     * @return array
      */
     public static function getFormat()
     {
@@ -333,7 +332,7 @@ class User extends AbstractImporter
      * Updates a user record.
      *
      */
-    protected function updateUser(User $user, User $originalUser)
+    protected function updateUser(UserModel $user, UserModel $originalUser)
     {
         $diff = $this->userMapper->diff($originalUser, $user);
         if ($this->performUpdate) {
