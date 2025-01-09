@@ -1151,14 +1151,6 @@ class External_Synergetic_User implements External_UserInterface
      */
     public function getCampusFromTimetable(string $staffID): array
     {
-        // Was unable to hit this in testing, but running in isolation returned
-        //
-        //    /usr/share/schoolbox/library/External/Synergetic/User.php:440:
-        //    array (size=1)
-        //      0 =>
-        //          array (size=1)
-        //              'campus' => string 'S' (length=1)
-
         if (!$this->isExternalIdValid($staffID)) {
             return [];
         }
