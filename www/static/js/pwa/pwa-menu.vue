@@ -50,7 +50,12 @@ const pwaPromptType = window.Vue.computed(() => {
         <a v-if="pwaPromptType.url" class="button" :href="pwaPromptType.url">Install</a>
         <pwa-menu-install v-else-if="pwaPromptType.id === 'Browser'" :page="props.page" :site-title="props.siteTitle" />
 
-        <pwa-menu-notifications v-if="notificationsEnabled" :page="props.page" :site-title="props.siteTitle" />
+        <pwa-menu-notifications
+            v-if="notificationsEnabled"
+            :page="props.page"
+            :site-title="props.siteTitle"
+            :pwa-enabled="props.pwaEnabled"
+        />
     </div>
 </template>
 

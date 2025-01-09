@@ -368,7 +368,7 @@
                         {% set installGoogle = config.digistorm_google_play_store_link ?? '' %}
                         {% set installApple = config.digistorm_apple_app_store_link ?? '' %}
                         {% if config.pwa_enable or config.web_push_notifications_enabled or installGoogle is not empty or installApple is not empty %}
-                        <li id="pwaPrompt" data-pwa="sidebarPrompt" class="content hide">
+                        <li id="pwaPrompt" data-pwa="sidebarPrompt" class="content">
                             {% include '@notifications/pwa.twig' with { notifButton : 'notifOn', pwaPage: 'chrome' } %}
                             <a id="installDelayPrompt" data-pwa="sidebarPromptDelay" class="button load-more expand" href="#">Later</a>
                         </li>

@@ -29,3 +29,10 @@ export function isPWA(): boolean {
     return window.matchMedia("(display-mode: standalone)").matches;
 }
 
+/**
+ * Whether the browser supports notifications
+ * @returns True if the browser supports notifications, false otherwise
+ */
+export function supportsNotifications(): boolean {
+    return "Notification" in window;
+}

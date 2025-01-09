@@ -62,6 +62,7 @@ declare global {
         schoolboxUser: {
             id: number;
             name: string;
+            impersonated: boolean;
         };
         siteVersion: string;
         STORYBOOK_ENV: string;
