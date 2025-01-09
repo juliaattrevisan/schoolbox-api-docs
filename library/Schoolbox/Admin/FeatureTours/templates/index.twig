@@ -36,8 +36,7 @@
                                     {{ tour.title }}
                                     <span class="pipe meta" title="The tour will display for these roles only.">
                                         {% if tourAudienceRoleNamesCommaSeparatedByUuid[tour.uuid] is defined %}
-                                            {% set audienceRoleNamesCommaSeparated = tourAudienceRoleNamesCommaSeparatedByUuid[tour.uuid] %}
-                                            {{ audienceRoleNamesCommaSeparated }}
+                                            {{ tourAudienceRoleNamesCommaSeparatedByUuid[tour.uuid] }}
                                         {% else %}
                                             No roles targeted
                                         {% endif %}
