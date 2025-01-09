@@ -159,22 +159,23 @@ class Exporter extends CliTool\App
                 }
 
                 // Otherwise sync
-                $log->debug("Syncing pastoral record (Pastoral ID #{$pastoralRecord->getId()})...");
                 if ($this->perform()) {
                     try {
                         $syncSucceeded = $externalPastoral->syncPastoral($pastoralRecord, $this->getConfig()->get('external_pastoral_title_include'));
                     } catch (\Exception $e) {
-                        $log->debug("Pastoral record with external ID {$pastoralRecord->getExternalId()} could not be synced.  Error: {$e->getMessage()}");
+                        $log->debug("Pastoral record with id #{$pastoralRecord->getId()}, external_id " . ($pastoralRecord->getExternalId() ?? 'null') . " could not be synced.  Error: {$e->getMessage()}");
                         $failedPastoralIds[] = $pastoralRecord->getId();
                         continue;
                     }
 
                     if (!$syncSucceeded) {
-                        $log->debug("Pastoral record with external ID {$pastoralRecord->getExternalId()} could not be synced.");
+                        $log->debug("Pastoral record with id #{$pastoralRecord->getId()}, external_id " . ($pastoralRecord->getExternalId() ?? 'null') . " could not be synced.");
                         $failedPastoralIds[] = $pastoralRecord->getId();
                         continue;
                     }
-                    $log->debug("Pastoral record with external ID {$pastoralRecord->getExternalId()} was synced.");
+                    $log->debug("Pastoral record with id #{$pastoralRecord->getId()}, external_id " . ($pastoralRecord->getExternalId() ?? 'null') . " was synced.");
+                } else {
+                    $log->debug("Would have attempted to sync pastoral record with id #{$pastoralRecord->getId()}, external_id " . ($pastoralRecord->getExternalId() ?? 'null') . " if in perform mode");
                 }
 
                 $nRecordsExported++;
@@ -190,12 +191,8 @@ class Exporter extends CliTool\App
                     'private'     => false,
                 ]);
                 if (count($attachments)) {
-                    $log->debug(sprintf("Syncing %d pastoral record attachments", count($attachments)));
+                    $log->debug(' * Found ' . count($attachments) . ' attachments');;
                     foreach ($attachments as $attachment) {
-                        $log->debug(
-                            sprintf('Syncing pastoral record attachment "%s"', $attachment->getStorage()->getBasename())
-                        );
-
                         if ($this->perform()) {
                             // Only re-sync if it's not already in the Q
                             $queueCount = $pastoralUploadQueueMapper->countByColumnList([
@@ -203,8 +200,13 @@ class Exporter extends CliTool\App
                                 'hash'        => $attachment->getStorage()->getHash(),
                             ]);
                             if ($queueCount === 0) {
+                                $log->debug(" * Attachment '{$attachment->getStorage()->getBasename()}' added to sync queue");
                                 $pastoralAttachmentMapper->syncToPastoralUploadQueue($attachment, null);
+                            } else {
+                                $log->debug(" * Attachment '{$attachment->getStorage()->getBasename()}' is already in sync queue");
                             }
+                        } else {
+                            $log->debug(" * Would have attempted to add attachment '{$attachment->getStorage()->getBasename()}' to sync queue if in perform mode");
                         }
                     }
                 }
