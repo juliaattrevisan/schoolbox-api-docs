@@ -12,6 +12,7 @@ use Alaress\Authorizer\Authorizer;
 use Alaress\Module\Module as BaseModule;
 use Alaress\Authorizer\Rule;
 use Alaress\Web\Controller\Base;
+use Schoolbox\L10n\Mapper as L10nMapper;
 use Alaress\Twig\Loader\IChainLoader;
 
 /**
@@ -71,7 +72,8 @@ class Module extends BaseModule
     public function buildController(): Base
     {
         return new Controller(
-            $this->getMapperFactory()->get(\Schoolbox\Config\ConfigMapper::class)
+            $this->getMapperFactory()->get(\Schoolbox\Config\ConfigMapper::class),
+            L10nMapper::getInstance()
         );
     }
 
