@@ -7,6 +7,9 @@ interface Props {
     page: "chrome" | "settings";
     // site title, to show "[title] web app" in the message
     siteTitle: string;
+    // the digistorm prompt for google/apple, if it exists
+    installApple: string | null;
+    installGoogle: string | null;
 }
 
 const props = defineProps<Props>();
@@ -17,8 +20,8 @@ const props = defineProps<Props>();
             To receive push notifications and enjoy a better experience, install the {{ props.siteTitle }} web app on
             your device.
         </p>
-        <pwa-menu-install :page="props.page" :site-title="props.siteTitle" />
-        <pwa-menu-notifications :page="props.page" :site-title="props.siteTitle" />
+        <a v-if="installApple" class="button" :href="installApple">Install</a>
+        <a v-if="installGoogle" class="button" :href="installGoogle">Install</a>
     </div>
 </template>
 <style scoped></style>

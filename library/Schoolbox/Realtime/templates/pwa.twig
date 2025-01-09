@@ -111,6 +111,28 @@
 </div>
 
 <div data-vue-app="pwa-menu">
-    <pwa-menu page="{{ pwaPage }}" site-title="{{ config.title }}"/>
+    {# Install PWA if not any of the following:
+        config.digistorm_store_link* is not set
+        config.digistorm_store_link* is set, but the current user is not in a sepcified role type in config.digistorm_role_type
+    #}
+    {% set installGoogle = config.digistorm_google_play_store_link ?? null %}
+    {% set installApple = config.digistorm_apple_app_store_link ?? null %}
+
+    {# If the prompt has been restricted, ensure the user is in the specified role.
+       otherwise all users are redirected to the store link
+    #}
+    {% if (config.digistorm_role_install_prompt ?? []) is not empty %}
+        {% if (USER.role.type | capitalize) not in config.digistorm_role_install_prompt %}
+            {% set installGoogle = null %}
+            {% set installApple = null %}
+        {% endif %}
+    {% endif %}
+
+    <pwa-menu
+        page="{{ pwaPage }}"
+        :site-title="{{ config.title | json_encode }}"
+        :install-google="{{ installGoogle | json_encode }}"
+        :install-apple="{{ installApple | json_encode }}"
+    />
 </div>
 <script src="{{ CDN_PREFIX }}/js/bundle/pwa.js?v={{ config.site_version }}"></script>

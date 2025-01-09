@@ -11,8 +11,6 @@ interface Props {
 const props = defineProps<Props>();
 </script>
 <template>
-    <a data-pwa-action="installApple" class="button hide" href="{{ installApple }}">Install</a>
-    <a data-pwa-action="installGoogle" class="button hide" href="{{ installGoogle }}">Install</a>
     <a data-pwa-action="installPWA" class="button hide" href="#">Install</a>
     <a data-pwa-action="installPWAiOS" data-reveal-id="PWAiOSAddToHomescreenReveal-{{ pwaPage }}" class="button hide"
         >Install</a
