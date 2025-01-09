@@ -10,6 +10,10 @@ interface Props {
     // the digistorm prompt for google/apple, if it exists
     installApple: string | null;
     installGoogle: string | null;
+    // whether the PWA app can be installed
+    pwaEnabled: boolean;
+    // whether notifications are enabled
+    notificationsEnabled: boolean;
 }
 
 const props = defineProps<Props>();
@@ -22,6 +26,8 @@ const props = defineProps<Props>();
         </p>
         <a v-if="installApple" class="button" :href="installApple">Install</a>
         <a v-if="installGoogle" class="button" :href="installGoogle">Install</a>
+        <pwa-menu-install v-if="pwaEnabled" :page="props.page" :site-title="props.siteTitle" />
+        <pwa-menu-notifications v-if="notificationsEnabled" :page="props.page" :site-title="props.siteTitle" />
     </div>
 </template>
 <style scoped></style>

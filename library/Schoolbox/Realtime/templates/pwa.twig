@@ -133,6 +133,8 @@
         :site-title="{{ config.title | json_encode }}"
         :install-google="{{ installGoogle | json_encode }}"
         :install-apple="{{ installApple | json_encode }}"
+        :pwa-enable="{{ config.pwa_enable | json_encode }}"
+        :notifications-enabled="{{ config.web_push_notifications_enabled | json_encode }}"
     />
 </div>
 <script src="{{ CDN_PREFIX }}/js/bundle/pwa.js?v={{ config.site_version }}"></script>
