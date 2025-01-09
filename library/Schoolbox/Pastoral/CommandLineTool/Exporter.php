@@ -191,7 +191,7 @@ class Exporter extends CliTool\App
                     'private'     => false,
                 ]);
                 if (count($attachments)) {
-                    $log->debug(' * Found ' . count($attachments) . ' attachments');;
+                    $log->debug(' * Found ' . count($attachments) . ' attachments');
                     foreach ($attachments as $attachment) {
                         if ($this->perform()) {
                             // Only re-sync if it's not already in the Q
