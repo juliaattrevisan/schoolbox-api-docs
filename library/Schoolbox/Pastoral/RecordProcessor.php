@@ -124,6 +124,7 @@ class RecordProcessor
         // Prepare subtype. No database change.
         $subtypeId = $post->get('subtypeId');
         $subtype   = null;
+
         if (!empty($subtypeId)) {
             try {
                 $subtype = $this->pastoralSubTypeMapper->findById($subtypeId);
@@ -215,7 +216,14 @@ class RecordProcessor
             $record->setType($type);
 
             // If subtype was deleted, allow it to be saved only when it's not changed.
-            if ($subtype && $subtype->isDeleted() && ($record->getSubType()->getId() !== $subtype->getId())) {
+            /* Note that at this point, $record might not actually have a subtype instance: it was deleted
+             * via another tab or multiplayer schoolbox, or $record is a whole new instance that's trying to
+             * assign a deleted subtype (a new $record instance won't have a subtype at this point)
+             *
+             * This throws what seems to be a pre-existing message that sounds (for its era)
+             * like something that's user-facing.
+             */
+            if ($subtype && $subtype->isDeleted() && ($record->getSubType()?->getId() !== $subtype->getId())) {
                 $db->rollback();
                 throw new SchoolboxException("Pastoral subtype with ID {$subtype->getId()} cannot be found");
             }
