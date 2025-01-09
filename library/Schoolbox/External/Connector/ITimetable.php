@@ -41,12 +41,4 @@ interface ITimetable
      * @return int|null
      */
     function getCurrentYear($externalId = null);
-
-    /**
-     * Get a list of lessons (aka. classes) for the specified users
-     *
-     * @param int|string|int[]|string[] $externalIds
-     * @return Collection
-     */
-    function getLessons($externalIds);
 }

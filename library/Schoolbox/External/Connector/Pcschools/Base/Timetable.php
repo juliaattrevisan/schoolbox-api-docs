@@ -31,12 +31,4 @@ class Timetable extends Base implements ITimetable
     {
         return null;
     }
-
-    /**
-     * @inheritdoc
-     */
-    public function getLessons($externalIds)
-    {
-        return new Collection();
-    }
 }
