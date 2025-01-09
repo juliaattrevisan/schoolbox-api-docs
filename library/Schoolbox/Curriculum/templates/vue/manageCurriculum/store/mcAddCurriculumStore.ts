@@ -2,6 +2,8 @@
  * Add a new curriculum
  */
 
+/* eslint-disable import/no-cycle -- Disable dependency cycle warning temporarily [SA-18428] */
+
 import { defineStore } from "pinia";
 import { useStore } from "@schoolboxCurriculum/vue/manageCurriculum/store/manageCurriculumStore";
 import { useNodesStore } from "@schoolboxCurriculum/vue/manageCurriculum/store/mcNodesStore";
