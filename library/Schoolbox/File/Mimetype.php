@@ -23,48 +23,48 @@ class Mimetype implements ISoftDeletable
     /**
      * Allowed File id
      *
-     * @var int
+     * @var int|null
      */
-    protected $fileTypeID;
+    protected ?int $fileTypeID = null;
 
     /**
      * Description for this mime type
      *
-     * @var string
+     * @var string|null
      */
-    protected $description;
+    protected ?string $description = null;
 
     /**
      * Mime type
      *
-     * @var string
+     * @var string|null
      */
-    protected $mime;
+    protected ?string $mime = null;
 
     /**
      * Filename representing this mime type
      *
-     * @var string
+     * @var string|null
      */
-    protected $iconFile;
+    protected ?string $iconFile = null;
 
     /**
      * String true/false depending on whether this allowed filetype is enabled
      * (that is, allowed to be uploaded)
      *
-     * @var bool
+     * @var bool|null
      */
-    protected $enable;
+    protected ?bool $enable = null;
 
     /**
      * Max file size allowed for mime
      *
-     * @var int
+     * @var int|null
      */
-    protected $maxFileSize;
+    protected ?int $maxFileSize = null;
 
     /** @var bool */
-    protected $deleted;
+    protected ?bool $deleted = null;
 
     /**
      * Get icon class by deriving it from the iconFile
@@ -73,7 +73,7 @@ class Mimetype implements ISoftDeletable
      *
      * @return string
      */
-    public function getClass()
+    public function getClass(): string
     {
         return preg_replace('/[^a-zA-Z]/', '', substr(strtolower($this->getIconFile()), 0, strrpos($this->getIconFile(), ".")));
     }
@@ -87,7 +87,7 @@ class Mimetype implements ISoftDeletable
      * @param string $description
      * @return $this
      */
-    public function setDescription($description): self
+    public function setDescription(string $description): self
     {
         $this->description = $description;
         return $this;
@@ -96,9 +96,9 @@ class Mimetype implements ISoftDeletable
     /**
      * Get description
      *
-     * @return string
+     * @return string|null
      */
-    public function getDescription()
+    public function getDescription(): ?string
     {
         return $this->description;
     }
@@ -109,7 +109,7 @@ class Mimetype implements ISoftDeletable
      * @param bool $enable
      * @return $this
      */
-    public function setEnable($enable): self
+    public function setEnable(bool $enable): self
     {
         $this->enable = $enable;
         return $this;
@@ -118,9 +118,9 @@ class Mimetype implements ISoftDeletable
     /**
      * Get enable
      *
-     * @return bool
+     * @return bool|null
      */
-    public function getEnable()
+    public function getEnable(): ?bool
     {
         return $this->enable;
     }
@@ -131,7 +131,7 @@ class Mimetype implements ISoftDeletable
      * @param int $fileTypeID
      * @return $this
      */
-    public function setFileTypeID($fileTypeID): self
+    public function setFileTypeID(int $fileTypeID): self
     {
         $this->fileTypeID = $fileTypeID;
         return $this;
@@ -140,9 +140,9 @@ class Mimetype implements ISoftDeletable
     /**
      * Get file type id
      *
-     * @return int
+     * @return int|null
      */
-    public function getFileTypeID()
+    public function getFileTypeID(): ?int
     {
         return $this->fileTypeID;
     }
@@ -153,7 +153,7 @@ class Mimetype implements ISoftDeletable
      * @param int $id
      * @return $this
      */
-    public function setId($id): self
+    public function setId(int $id): self
     {
         $this->setFileTypeID($id);
         return $this;
@@ -162,9 +162,9 @@ class Mimetype implements ISoftDeletable
     /**
      * Alias method
      *
-     * @return int
+     * @return int|null
      */
-    public function getId()
+    public function getId(): ?int
     {
         return $this->getFileTypeID();
     }
@@ -175,7 +175,7 @@ class Mimetype implements ISoftDeletable
      * @param string $iconFile
      * @return $this
      */
-    public function setIconFile($iconFile): self
+    public function setIconFile(string $iconFile): self
     {
         $this->iconFile = $iconFile;
         return $this;
@@ -184,9 +184,9 @@ class Mimetype implements ISoftDeletable
     /**
      * Get icon file
      *
-     * @return string
+     * @return string|null
      */
-    public function getIconFile()
+    public function getIconFile(): ?string
     {
         return $this->iconFile;
     }
@@ -194,9 +194,9 @@ class Mimetype implements ISoftDeletable
     /**
      * Gets the CSS class for this icon.
      *
-     * @return string
+     * @return string|null
      */
-    public function getIconClass()
+    public function getIconClass(): ?string
     {
         // Old code in `AllowedFile->getClass()`
 //        $url = new \Url(substr($iconFile, 0, strrpos($iconFile, ".")));
@@ -210,7 +210,7 @@ class Mimetype implements ISoftDeletable
      * @param string $mime
      * @return $this
      */
-    public function setMime($mime): self
+    public function setMime(string $mime): self
     {
         $this->mime = $mime;
         return $this;
@@ -221,7 +221,7 @@ class Mimetype implements ISoftDeletable
      *
      * @return string|null
      */
-    public function getMime()
+    public function getMime(): ?string
     {
         return $this->mime;
     }
@@ -233,7 +233,7 @@ class Mimetype implements ISoftDeletable
      * @param int $maxFileSize
      * @return $this
      */
-    public function setMaxFileSize($maxFileSize): self
+    public function setMaxFileSize(int $maxFileSize): self
     {
         $this->maxFileSize = $maxFileSize;
         return $this;
@@ -247,9 +247,9 @@ class Mimetype implements ISoftDeletable
      *
      * @return int
      */
-    public function getActualMaxFileSize()
+    public function getActualMaxFileSize(): int
     {
-        return ($this->maxFileSize > 0) ? $this->maxFileSize : Config::get('max_file_size');
+        return ($this->maxFileSize > 0) ? $this->maxFileSize : (int)Config::get('max_file_size');
     }
 
     /**
@@ -258,18 +258,19 @@ class Mimetype implements ISoftDeletable
      * Unlike `getActualMaxFileSize()`, this does not return the global default max
      * file size if this mimetype has none.
      *
-     * @return int
+     * @return int|null
      */
-    public function getMaxFileSize()
+    public function getMaxFileSize(): ?int
     {
         return $this->maxFileSize;
     }
 
     /**
      * Is mime type allowed
-     * @return bool
+     *
+     * @return bool|null
      */
-    public function isEnabled()
+    public function isEnabled(): ?bool
     {
         return $this->getEnable();
     }
@@ -277,9 +278,10 @@ class Mimetype implements ISoftDeletable
 
     /**
      * @deprecated mapper compat method
-     * @return bool
+     *
+     * @return bool|null
      */
-    public function getDeleted()
+    public function getDeleted(): ?bool
     {
         return $this->isDeleted();
     }
@@ -294,10 +296,10 @@ class Mimetype implements ISoftDeletable
 
 
     /**
-     * @param boolean $deleted
+     * @param bool $deleted
      * @return $this
      */
-    public function setDeleted($deleted): self
+    public function setDeleted(bool $deleted): self
     {
         $this->deleted = $deleted;
         return $this;
@@ -319,13 +321,9 @@ class Mimetype implements ISoftDeletable
      *
      * @return bool
      */
-    public function isAudio()
+    public function isAudio(): bool
     {
-        if (preg_match('#^audio/#', $this->getMime())) {
-            return true;
-        }
-
-        return false;
+        return str_starts_with($this->getMime(), 'audio/');
     }
 
     /**
@@ -333,13 +331,9 @@ class Mimetype implements ISoftDeletable
      *
      * @return bool
      */
-    public function isVideo()
+    public function isVideo(): bool
     {
-        if (preg_match('#^video/#', $this->getMime())) {
-            return true;
-        }
-
-        return false;
+        return str_starts_with($this->getMime(), 'video/');
     }
 
     /**
@@ -347,13 +341,9 @@ class Mimetype implements ISoftDeletable
      *
      * @return bool
      */
-    public function isImage()
+    public function isImage(): bool
     {
-        if (preg_match('#^image/#', $this->getMime())) {
-            return true;
-        }
-
-        return false;
+        return str_starts_with($this->getMime(), 'image/');
     }
 
 
@@ -393,7 +383,7 @@ class Mimetype implements ISoftDeletable
      *                           "image/jpeg,image/png", "image/*" or "{star}/*"
      * @return bool
      */
-    public function matches($mimeFilter)
+    public function matches(string $mimeFilter): bool
     {
         // if the filter can loosely evaluate to false, it's considered no filter therefore match
         if (!($mimeFilter)) {
