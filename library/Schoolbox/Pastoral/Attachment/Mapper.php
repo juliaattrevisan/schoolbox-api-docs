@@ -117,14 +117,13 @@ class Mapper extends BaseMapper
      *
      * @param Model      $model
      * @param Model|null $previous
+     * @return bool True if model was added to queue, false otherwise.
      */
-    public function syncToPastoralUploadQueue(Model $model, Model $previous = null)
+    public function syncToPastoralUploadQueue(Model $model, Model $previous = null): bool
     {
-        // Do NOT sync private attachments for now, for privacy reasons
         // TODO move this restriction to the pastoral upload Q
         if (
             !$previous instanceof Model
-            && !$model->getPrivate()
             && $this->getConfigLoader()->get(ConfigMapper::NAME_PASTORAL_EXTERNAL_UPLOAD)
         ) {
             // Queue file for upload to Synergetic DocMan
@@ -139,7 +138,11 @@ class Mapper extends BaseMapper
             $queue->setStatus(PastoralUploadQueueMapper::UPLOAD_STATUS_PENDING);
             $queue->setPastoralAttachmentId($model->getId());
             $pastoralUploadQueueMapper->save($queue);
+
+            return true;
         }
+
+        return false;
     }
 
     /**

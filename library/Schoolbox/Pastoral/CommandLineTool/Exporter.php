@@ -200,8 +200,11 @@ class Exporter extends CliTool\App
                                 'hash'        => $attachment->getStorage()->getHash(),
                             ]);
                             if ($queueCount === 0) {
-                                $log->debug(" * Attachment '{$attachment->getStorage()->getBasename()}' added to pastoral_upload_queue");
-                                $pastoralAttachmentMapper->syncToPastoralUploadQueue($attachment, null);
+                                if ($pastoralAttachmentMapper->syncToPastoralUploadQueue($attachment)) {
+                                    $log->debug(" * Attachment '{$attachment->getStorage()->getBasename()}' added to pastoral_upload_queue");
+                                } else {
+                                    $log->debug(" * Attachment '{$attachment->getStorage()->getBasename()}' was not added to pastoral_upload_queue");
+                                }
                             } else {
                                 $log->debug(" * Attachment '{$attachment->getStorage()->getBasename()}' is already in pastoral_upload_queue");
                             }
