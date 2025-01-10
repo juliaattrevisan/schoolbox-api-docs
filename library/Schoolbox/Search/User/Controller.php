@@ -28,7 +28,6 @@ use Schoolbox\Pastoral\SubType\Mapper as PastoralSubTypeMapper;
 use Schoolbox\Pastoral\Type\Mapper as PastoralTypeMapper;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
-use Schoolbox\ProfessionalDevelopment\Mapper as ProfessionalDevelopmentMapper;
 use Schoolbox\Profile\Button\Mapper as ProfileButtonMapper;
 use Schoolbox\Profile\ValidDetailsVisible;
 use Schoolbox\Profile\ValidEmailVisible;
@@ -65,7 +64,6 @@ class Controller extends BaseController
      * @param External_ClassInterface                    $externalClass
      * @param ProfileButtonMapper                        $profileButtonMapper
      * @param Timetable_ColourMapper                     $timetableColourMapper
-     * @param ProfessionalDevelopmentMapper              $professionalDevelopmentMapper
      * @param PastoralTypeMapper                         $pastoralTypeMapper
      * @param PastoralSubTypeMapper                      $pastoralSubTypeMapper
      * @param PastoralDataSource                         $pastoralDataSource
@@ -83,7 +81,6 @@ class Controller extends BaseController
         private External_ClassInterface $externalClass,
         private ProfileButtonMapper $profileButtonMapper,
         private Timetable_ColourMapper $timetableColourMapper,
-        private ProfessionalDevelopmentMapper $professionalDevelopmentMapper,
         private PastoralTypeMapper $pastoralTypeMapper,
         private PastoralSubTypeMapper $pastoralSubTypeMapper,
         private PastoralDataSource $pastoralDataSource,
@@ -448,18 +445,6 @@ class Controller extends BaseController
         }
         $allTeacherIds = array_unique(array_filter($allTeacherIds));
 
-        $pd = null;
-        if (strtolower($this->getConfigLoader()->get('site_school_code')) === 'help') {
-            /* Load Professional Development details if they exist
-             */
-            try {
-                $pd = $this->professionalDevelopmentMapper->findOneByColumn('user_id', $student->getId());
-            } catch (MapperException $e) {
-                // noop
-            }
-        }
-
-
         $showDetails   = (new ValidDetailsVisible($this->externalUser, $this->getConfigLoader()))->isSatisfiedBy($student, $this->getUser());
         $showEmails    = (new ValidEmailVisible($this->externalUser, $this->getConfigLoader()))->isSatisfiedBy($student, $this->getUser());
 
@@ -579,8 +564,6 @@ class Controller extends BaseController
                  */
                 'subjects'                 => $subjects,
                 'groups'                   => $groups,
-                'pdStates'                 => $this->professionalDevelopmentMapper->getStates(),
-                'pd'                       => $pd,
                 'travelLogs'               => $travelLogs,
                 'learningMomentCanComment' => $learningMomentCanComment,
                 'canEmailStaff'            => $canEmailStaff,
