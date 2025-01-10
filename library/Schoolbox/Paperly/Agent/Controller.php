@@ -85,6 +85,9 @@ class Controller extends Base
         } catch (AlaressDatabaseException $e) {
             //Catching external database exception and return useful message in json
             $this->sendJsonError($e->getMessage(), Response::HTTP_INTERNAL_SERVER_ERROR);
+        } catch (\Exception $e) {
+            //Catching the other errors
+            $this->sendJsonError($e->getMessage(), Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
 }
