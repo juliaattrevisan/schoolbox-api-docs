@@ -2,6 +2,7 @@
 // Ignore this file for ESLint checks for now (SA-18376)
 /* eslint-disable */
 /* eslint-enable vue/no-v-html */
+import SearchSelect from "@schoolboxVue/components/searchSelect/search-select.vue";
 import axios from "axios";
 import BadgeImage from "../../vue/badge-image";
 import Toast from "@schoolboxVue/components/toast";
@@ -52,6 +53,7 @@ export default {
         BadgeImage,
         Toast,
         vSelect,
+        SearchSelect,
     },
     /**
      * Props.
@@ -324,7 +326,6 @@ export default {
         @binding {Date|null} expiryDate An actual expiry date object
         -->
         <slot name="expiryMessage" :expiryDate="expiryDate"></slot>
-
         <v-select
             class="schoolbox-vue-selectize"
             :options="filteredOptions"
@@ -352,6 +353,29 @@ export default {
                 </span>
             </template>
         </v-select>
+        <search-select
+            v-model:selected="selected"
+            :results="filteredOptions"
+            label="Search for users to award achievement to"
+            label-id="creator"
+            endpoint="https://vagrant.dev.schoolbox.cloud/api/user"
+            query-key="search"
+            :is-single-select="false"
+            placeholder="Search for users..."
+            :manage-search-response="true"
+            @search="onSearch"
+        >
+            <template #option="{ option }">
+                <span class="d-center">
+                    {{ option.name }}
+                </span>
+            </template>
+            <template #selected-option="{ option }">
+                <span class="selected d-center">
+                    {{ option.name }}
+                </span>
+            </template>
+        </search-select>
         <div class="component-action">
             <section>
                 <a
