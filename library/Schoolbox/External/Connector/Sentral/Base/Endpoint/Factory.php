@@ -177,6 +177,7 @@ class Factory
      * @param ClassPeriodMapper                          $classPeriodMapper
      * @param TimetablePeriodMapper                      $periodMapper
      * @param \Schoolbox\External\Event\Overrides\Mapper $overridesMapper
+     * @param \Schoolbox\Resource\Storage\Mapper         $storageMapper
      */
     public function __construct(
         ValidStrats $validStrats,
@@ -185,6 +186,7 @@ class Factory
         string $host,
         #[SensitiveParameter] string $key,
         array $watchlist,
+        private bool $includePhoto,
         /* Profile pieces */
         UserProfile\Mapper $baseProfileMapper,
         UserProfile\Student\Mapper $studentProfileMapper,
@@ -197,7 +199,8 @@ class Factory
         ClassInvolvementMapper $classInvolvementMapper,
         ClassPeriodMapper $classPeriodMapper,
         TimetablePeriodMapper $periodMapper,
-        \Schoolbox\External\Event\Overrides\Mapper $overridesMapper
+        \Schoolbox\External\Event\Overrides\Mapper $overridesMapper,
+        private \Schoolbox\Resource\Storage\Mapper $storageMapper,
     ) {
         $this->validStrats = $validStrats;
         $this->log = $log;
@@ -263,12 +266,14 @@ class Factory
                     $this->perform,
                     $api,
                     $this->watchlist,
+                    $this->includePhoto,
                     $registry,
                     $this->baseProfileMapper,
                     $this->studentProfileMapper,
                     $this->parentProfileMapper,
                     $this->staffProfileMapper,
-                    $this->relationshipMapper
+                    $this->relationshipMapper,
+                    $this->storageMapper,
                 ))
                 ->add(new Profile\Cleanup(
                     $this->log,

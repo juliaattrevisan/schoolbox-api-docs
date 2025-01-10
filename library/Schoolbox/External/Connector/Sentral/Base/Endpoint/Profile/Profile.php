@@ -24,6 +24,7 @@ use Schoolbox\Mapper;
 use Schoolbox\Mapper\DefinitionException;
 use Schoolbox\Mapper\Exception;
 use UnexpectedValueException;
+use \Schoolbox\Resource\Storage\Mapper as StorageMapper;
 
 /**
  * Class Profile
@@ -51,7 +52,7 @@ class Profile implements IStrategy
     /**
      * Prevent infinite loop of api calls
      */
-    private const MAX_CALLS = 100;
+    private const MAX_CALLS = 1;
 
 
     /**
@@ -111,12 +112,14 @@ class Profile implements IStrategy
      * @param bool                            $perform
      * @param IApi                            $api
      * @param array                           $watchlist
+     * @param bool                            $includePhoto
      * @param Registry                        $registry
      * @param UserProfile\Mapper              $baseProfileMapper
      * @param UserProfile\Student\Mapper      $studentProfileMapper
      * @param UserProfile\Parent\Mapper       $parentProfileMapper
      * @param UserProfile\Staff\Mapper        $staffProfileMapper
      * @param UserProfile\Relationship\Mapper $relationshipMapper
+     * @param StorageMapper                   $storageMapper
      */
     public function __construct(
         private ValidStrats $validStrats,
@@ -124,12 +127,14 @@ class Profile implements IStrategy
         private bool $perform,
         private IApi $api,
         private array $watchlist,
+        private bool $includePhoto,
         private Registry $registry,
         private UserProfile\Mapper $baseProfileMapper,
         private UserProfile\Student\Mapper $studentProfileMapper,
         private UserProfile\Parent\Mapper $parentProfileMapper,
         private UserProfile\Staff\Mapper $staffProfileMapper,
-        private UserProfile\Relationship\Mapper $relationshipMapper
+        private UserProfile\Relationship\Mapper $relationshipMapper,
+        private StorageMapper $storageMapper,
     ) {
     }
 
@@ -198,11 +203,12 @@ class Profile implements IStrategy
          * Process multiple pages until there are none remaining, or if something is really stuffed,
          * until MAX_CALLS is reached, to prevent infinite calls to a third party.
          */
-        $nextUrl = "enrolments/student?include=person,primaryEnrolment,contacts,specialNeedsPrograms&academicPeriodIds={$academicPeriodIds}&limit=200";
+        $nextUrl = "enrolments/student?include=person,primaryEnrolment,contacts,specialNeedsPrograms&academicPeriodIds={$academicPeriodIds}&limit=1";
 
         for ($i = 0; $nextUrl && $i < self::MAX_CALLS; $i++) {
             $payload = $this->api->retrieveDocument($nextUrl);
-
+//            $log = new \Alaress_Log_File('/tmp/alaress.log');
+//            $log->log('test', $payload);
             foreach ($payload['data'] as $student) {
                 $externalId = (string)$student['attributes']['studentCode'];
 
@@ -304,6 +310,13 @@ class Profile implements IStrategy
                     ->setFirstnamePreferred($firstnamePreferred)
                     ->setLastname($lastname);
 
+                /* Shank another endpoint to find email data
+                 * We need their personId first
+                 */
+                $personId = (string)$student['relationships']['person']['data']['id'];
+
+                $this->importPortrait($studentBaseProfile, "3069");
+
                 /* Then save it
                  */
                 if ($this->perform) {
@@ -358,11 +371,6 @@ class Profile implements IStrategy
                  */
                 $enrolment = $this->findDate($enrolmentDate);
                 $leaving = $this->findDate($leavingDate);
-
-                /* Shank another endpoint to find email data
-                 * We need their personId first
-                 */
-                $personId = (string)$student['relationships']['person']['data']['id'];
 
                 /* Access the endpoint and if the personId doesn't exist
                  * or if they're broken, just ignore it - they go in without
@@ -504,6 +512,50 @@ class Profile implements IStrategy
         }
     }
 
+    private function importPortrait(UserProfile\Model $baseProfile, string $id): void
+    {
+        /* Check if config setting allows photos from sis
+         * If it's enabled, continue importing pics
+         */
+        if (!$this->includePhoto) {
+            return;
+        }
+        $endpoint = "enrolments/student/$id/photo?width=500&height=500";
+        $photoContents = $this->api->retrievePortrait($endpoint);
+
+        /* Only try to persist images if perform mode is activated
+         */
+        if (!$this->perform) {
+            return;
+        }
+
+        try {
+            $portrait = $this->storageMapper->acceptStream($baseProfile->getExternalId() . '.jpg', $photoContents);
+
+            /* You get a picture if any of the following occur:
+             *     - you don't have a portrait yet; you can get one added
+             *     - your existing picture is different to the one we just got; update it
+             */
+            if (!$baseProfile->getPortrait() || ($baseProfile->getPortrait()->getHash() !== $portrait->getHash())) {
+                $this->log->debug(sprintf(
+                  'Profile picture: %s %s (%s) has profile hash %s derived from %s.png',
+                  $baseProfile->getFirstname(),
+                  $baseProfile->getLastname(),
+                  $baseProfile->getExternalId(),
+                  $portrait->getHash(),
+                  $id
+                ));
+
+                $baseProfile->setPortrait($portrait);
+            }
+        } catch (\Exception $e) {
+            // noop, but warn the cli that something unusual has transpired
+            $this->log->warning(sprintf(
+                'Profile picture: exception thrown. %s',
+                $e->getMessage()
+            ));
+        }
+    }
 
     /**
      * Find the Academic Period instances relevant to $date

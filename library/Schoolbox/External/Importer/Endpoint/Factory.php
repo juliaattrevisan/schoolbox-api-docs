@@ -196,6 +196,7 @@ class Factory implements IFactory
                 $this->host,
                 $this->key,
                 $this->watchlist,
+                Loader::getInstance()->get('photo_sis_import'),
                 /* Profile pieces
                  */
                 UserProfile\Mapper::getInstance()->disableCache(),
@@ -210,7 +211,8 @@ class Factory implements IFactory
                 ClassInvolvementMapper::getInstance()->disableCache(),
                 ClassPeriodMapper::getInstance()->disableCache(),
                 TimetablePeriodMapper::getInstance()->disableCache(),
-                \Schoolbox\External\Event\Overrides\Mapper::getInstance()->disableCache()
+                \Schoolbox\External\Event\Overrides\Mapper::getInstance()->disableCache(),
+                StorageMapper::getInstance()->disableCache(),
             ))->produce(),
 
             self::TASS_API => (new TassApiEndpoint\Factory(
