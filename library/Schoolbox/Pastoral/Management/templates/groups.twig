@@ -22,7 +22,7 @@
             <h2 class="subheader">Your Groups</h2>
         </div>
     </div>
-    <nav>
+    <nav class="no-margin-right">
         {# Pastoral moderators can manage pastoral groups #}
         {% if isRouteAuthorized('pastoralManagement.getGroupsModify') %}
             <a href="{{ routeLookup('pastoralManagement.getGroupsModify') }}" class="icon-add" title="Add {{ locale.pastoral.proper }} Group"></a>

@@ -98,6 +98,9 @@
                 right: 0;
             }
         }
+        nav.no-margin-right {
+            margin-right: 0 !important;
+        }
     }
     // A unique situation where h2 actions need to exist inside a form
     form.row .row.actions-small-#{$i} {
