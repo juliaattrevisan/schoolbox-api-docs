@@ -379,11 +379,11 @@ class Mimetype implements ISoftDeletable
     /**
      * Compares this mimetype against the given filter. Returns true if ANY are matched.
      *
-     * @param string $mimeFilter in the format:
+     * @param string|null $mimeFilter in the format:
      *                           "image/jpeg,image/png", "image/*" or "{star}/*"
      * @return bool
      */
-    public function matches(string $mimeFilter): bool
+    public function matches(?string $mimeFilter): bool
     {
         // if the filter can loosely evaluate to false, it's considered no filter therefore match
         if (!($mimeFilter)) {
