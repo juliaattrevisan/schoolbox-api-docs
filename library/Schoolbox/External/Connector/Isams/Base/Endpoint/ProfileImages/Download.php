@@ -135,6 +135,8 @@ class Download implements IStrategy
                 ));
 
                 $baseProfile->setPortrait($portrait);
+
+                $this->baseProfileMapper->save($baseProfile);
             }
         } catch (\Exception $e) {
             // noop, but warn the cli that something unusual has transpired
