@@ -435,6 +435,9 @@ class Profile implements IStrategy
                  *
                  * We can't check for this effectively unless we predetermine what these
                  * statuses could contain and what those statuses mean
+                 *
+                 * Update 10/01/2025:
+                 * We are now assuming boarding status can be determined by BoardingHouseId in attribute
                  */
                 ->setBoardingStatus($boardingStatus)
                 ->setEsl(null)
