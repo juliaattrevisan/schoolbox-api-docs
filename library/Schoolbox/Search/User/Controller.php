@@ -20,7 +20,7 @@ use External_UserInterface;
 use Schoolbox\Admin\Profile\Editor\Field\Mapper;
 use Schoolbox\Assessment\Term\Mapper as TermMapper;
 use Schoolbox\Config\ConfigMapper;
-use Schoolbox\Geosnapshot\ValidStudentPhotosAvailable;
+use Schoolbox\Geosnapshot\ValidPhotosAvailable;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Pastoral\Count\Helper as PastoralCountHelper;
 use Schoolbox\Pastoral\DataSource as PastoralDataSource;
@@ -489,7 +489,7 @@ class Controller extends BaseController
         /* Decide whether View Photos (Geosnapshots) is available for this student
          * If you're allowed to make this request...
          */
-        $isGeosnapshotAvailable = (new ValidStudentPhotosAvailable())
+        $isGeosnapshotAvailable = (new ValidPhotosAvailable())
             ->isSatisifiedBy(
                 $this->getConfigLoader()->get('geosnapshot_api_key'),
                 $this->getConfigLoader()->get('geosnapshot_enabled'),
