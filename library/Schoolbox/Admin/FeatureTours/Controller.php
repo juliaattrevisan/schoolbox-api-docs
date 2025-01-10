@@ -41,7 +41,8 @@ class Controller extends Base
             'toursEnabled' => $this->getConfigLoader()->get('tours_enabled'),
             'pageCurrent' => $this->routeGenerator->generate('featureTours.render'),
             'allBreadcrumbs' => (new Subnav($this->getConfigLoader(), $this->getUser()))->generateBreadcrumbs($this->routeGenerator->generate('featureTours.render')),
-            'tours' => $this->tourMapper->findAll()
+            'tours' => $this->tourMapper->findAll(),
+            'tourAudienceRoleNamesCommaSeparatedByUuid' => $this->tourMapper->getAudienceRoleNamesCommaSeparatedByUuid()
         ];
 
         $this->response = $this->responseFromTemplate("@featureTours/index.twig", $twigData);

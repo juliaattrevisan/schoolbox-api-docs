@@ -243,7 +243,7 @@ class Mapper extends BaseMapper
         // ...
 
         // --------------------------------------------------------------------------------------------------------
-        // Concatenate all of the predicates into an OR query and return the SQL in an array along with bindings
+        // Concatenate all the predicates into an OR query and return the SQL in an array along with bindings
         // --------------------------------------------------------------------------------------------------------
 
         $query = "({$tourNotDeletedClause} AND (" . implode(" OR ", $predicates) . "))";
@@ -297,5 +297,33 @@ class Mapper extends BaseMapper
         $tourStepMapper->deleteByColumn('tour_uuid', $model->getUuid());
         $triggerMapper->deleteByColumn('tour_uuid', $model->getUuid());
         return true;
+    }
+
+    /**
+     * Return an array of comma-separated role names, indexed by tour UUID.
+     *
+     * @return array<string, string>
+     */
+    public function getAudienceRoleNamesCommaSeparatedByUuid(): array
+    {
+        return $this->database->executeQuery(
+            // This query deliberately includes inactive rows because both inactive (disabled) and
+            // active (enabled) tours need to be displayed on the Admin > Modules > Feature Tours page.
+            'SELECT t.uuid, GROUP_CONCAT(DISTINCT g.name SEPARATOR ", ") AS groupNames
+            FROM tour_audience_role tar
+            JOIN groups g ON tar.role_id = g.id
+            JOIN tour t ON tar.tour_uuid = t.uuid
+            WHERE t.deleted_at IS NULL
+            AND g.deleted_at IS NULL
+            GROUP BY t.uuid'
+        )->fetchColumnArray('groupNames', 'uuid');
+    }
+
+    /**
+     * @inheritDoc
+     */
+    protected function getDefaultOrderByParams(): array
+    {
+        return ['title' => 'ASC', 'uuid' => 'ASC']; // Note uuid is included so sort order is always consistent.
     }
 }
