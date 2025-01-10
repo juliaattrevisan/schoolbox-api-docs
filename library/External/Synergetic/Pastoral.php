@@ -1515,7 +1515,7 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
                         ->findById(
                             $pastoral->getType()->getDocumentClassification()->getId()
                         );
-                    $documentClassificationCode = $documentClassification->getExternalCode();
+                    $documentClassificationCode = $documentClassification->getExternalCode() ?? '';
                 } catch (MapperException $e) {
                     $documentClassificationCode = '';
                 }
