@@ -18,10 +18,7 @@ class IFrame extends Base
      * Content Types for this strategy
      */
     private const CONTENT_TYPES = [
-        'html', 'htm', 'txt', 'swf',
-
-        /* TODO Add more browser-supported filetypes here
-         */
+        'html', 'htm', 'txt', 'pdf', 'swf',
     ];
 
     /**
