@@ -185,11 +185,11 @@ class Exporter extends CliTool\App
                     continue;
                 }
 
-                // Note that only public attachments get synced
-                $attachments = $pastoralAttachmentMapper->findByColumnList([
-                    'pastoral_id' => $pastoralRecord->getId(),
-                    'private'     => false,
-                ]);
+                // Note that both public and private attachments get synced.
+                // Private attachments get different permissions in the external system (Synergetic only)
+                // TODO: Confirm external systems other than Synergetic will not get private attachments.
+                // due to lu_pastoral_type.pastoral_document_classification_confidential_id.
+                $attachments = $pastoralAttachmentMapper->findByColumnList(['pastoral_id' => $pastoralRecord->getId()]);
                 if (count($attachments)) {
                     $log->debug(' * Found ' . count($attachments) . ' rows in pastoral_attachment');
                     foreach ($attachments as $attachment) {
