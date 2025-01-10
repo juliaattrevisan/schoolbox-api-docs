@@ -128,7 +128,9 @@ HELP;
     private function uploadPending(): void
     {
         $success = $failed = 0;
-        foreach ($this->pastoralUploadQueueMapper->getPending() as $pendingUpload) {
+        $pendingUploads = $this->pastoralUploadQueueMapper->getPending();
+        $this->getLogger()->debug('Found ' . count($pendingUploads) . ' pending uploads');
+        foreach ($pendingUploads as $pendingUpload) {
             try {
                 $this->processPendingUpload($pendingUpload) ? $success++ : $failed++;
             } catch (PDOException $e) {
