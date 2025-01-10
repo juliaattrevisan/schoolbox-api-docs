@@ -28,7 +28,6 @@ use Schoolbox\Assessment\Participant;
  */
 class SubmissionMapper extends BaseMapper
 {
-
     /**
      * @var Participant\Plan\InteractionIntegrityChecker
      */
@@ -220,7 +219,7 @@ class SubmissionMapper extends BaseMapper
         $existingFiles = $joinMapper->findByColumn('student_submission_id', $object->getId());
         $removedFiles  = $existingFiles->diffBy($object->getFiles(), 'hash');
         $addedFiles    = $object->getFiles()->diffBy($existingFiles, 'hash');
-        $joinMapper->hardDelete($removedFiles);
+        $joinMapper->softDelete($removedFiles);
 
         /* Save only files that are new
          */
