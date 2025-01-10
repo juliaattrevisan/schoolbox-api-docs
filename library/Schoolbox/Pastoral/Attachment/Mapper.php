@@ -139,10 +139,10 @@ class Mapper extends BaseMapper
             $queue->setPastoralAttachmentId($model->getId());
             $pastoralUploadQueueMapper->save($queue);
 
-            return true;
+            return true; // Added to queue.
         }
 
-        return false;
+        return false; // Not added to queue.
     }
 
     /**
