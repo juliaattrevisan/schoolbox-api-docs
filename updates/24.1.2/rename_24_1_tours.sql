@@ -3,7 +3,8 @@ SET @tourUuidAdmin = (
     FROM tour t
     JOIN tour_trigger tt ON tt.tour_uuid = t.uuid
     WHERE t.title = '24.1 Release'
-    AND tt.url_regex LIKE "%adminv2%"
+    AND tt.url_regex = '^/adminv2/home'
+    AND t.deleted_at IS NULL
 );
 
 UPDATE tour SET
