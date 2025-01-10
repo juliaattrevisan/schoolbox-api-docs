@@ -13,6 +13,7 @@ use Alaress\Database\Connector\IConnector;
 use OutOfBoundsException;
 use InvalidArgumentException;
 use Exception;
+use Alaress\Database\Exception as AlaressDatabaseException;
 
 /**
  * Handler for the various actions the Paperly agent may perform.
@@ -143,7 +144,7 @@ class Handler
         $stmt = $statement->execute();
 
         if ($stmt === false) {
-            throw new Exception(
+            throw new AlaressDatabaseException(
                 print_r($this->externalDb->errorInfo(), true)
             );
         }
@@ -1998,7 +1999,7 @@ class Handler
 
             $stmt = $this->externalDb->prepareQuery($sql, $params)->execute();
             if ($stmt === false) {
-                throw new Exception(
+                throw new AlaressDatabaseException(
                     print_r($this->externalDb->errorInfo(), true)
                 );
             }
@@ -2028,7 +2029,7 @@ class Handler
 
             $stmt = $this->externalDb->prepareQuery($primaryCommunitySQL, $params)->execute();
             if ($stmt === false) {
-                throw new Exception(
+                throw new AlaressDatabaseException(
                     print_r($this->externalDb->errorInfo(), true)
                 );
             }
@@ -2261,7 +2262,7 @@ class Handler
             $updateSQL = "UPDATE Community SET $updateFields WHERE ID = ?";
             $stmt = $this->externalDb->prepareQuery($updateSQL, $params)->execute();
             if ($stmt === false) {
-                throw new Exception(
+                throw new AlaressDatabaseException(
                     print_r($this->externalDb->errorInfo(), true)
                 );
             }
@@ -2287,7 +2288,7 @@ class Handler
             $updateSQL = "UPDATE Students SET $updateFields WHERE ID = ?";
             $stmt = $this->externalDb->prepareQuery($updateSQL, $params)->execute();
             if ($stmt === false) {
-                throw new Exception(
+                throw new AlaressDatabaseException(
                     print_r($this->externalDb->errorInfo(), true)
                 );
             }
@@ -2316,7 +2317,7 @@ class Handler
             $updateSQL = "UPDATE CommunityLegal SET $updateFields, ModifiedBy = ?, ModifiedDate = ? WHERE ID = ?";
             $stmt = $this->externalDb->prepareQuery($updateSQL, $params)->execute();
             if ($stmt === false) {
-                throw new Exception(
+                throw new AlaressDatabaseException(
                     print_r($this->externalDb->errorInfo(), true)
                 );
             }
@@ -2340,7 +2341,7 @@ class Handler
                 $statement = $this->externalDb->prepareQuery($checkSQL, [$studentID, $apiSeqId]);
                 $stmt = $statement->execute();
                 if ($stmt === false) {
-                    throw new Exception(
+                    throw new AlaressDatabaseException(
                         print_r($this->externalDb->errorInfo(), true)
                     );
                 }
@@ -2353,7 +2354,7 @@ class Handler
                         WHERE MedicalConditionSeq = ?";
                     $stmt = $this->externalDb->prepareQuery($deleteSQL, [$apiSeqId])->execute();
                     if ($stmt === false) {
-                        throw new Exception(
+                        throw new AlaressDatabaseException(
                             print_r($this->externalDb->errorInfo(), true)
                         );
                     }
@@ -2399,7 +2400,7 @@ class Handler
                 $params = [$studentID, $code, $details, $severity, $modifiedBy];
                 $stmt = $this->externalDb->prepareQuery($insertSQL, $params)->execute();
                 if ($stmt === false) {
-                    throw new Exception(
+                    throw new AlaressDatabaseException(
                         print_r($this->externalDb->errorInfo(), true)
                     );
                 }
@@ -2435,7 +2436,7 @@ class Handler
                 $statement = $this->externalDb->prepareQuery($checkSQL, [$studentID, $consentSeq]);
                 $stmt = $statement->execute();
                 if ($stmt === false) {
-                    throw new Exception(
+                    throw new AlaressDatabaseException(
                         print_r($this->externalDb->errorInfo(), true)
                     );
                 }
@@ -2451,7 +2452,7 @@ class Handler
                     $params = [$consentGivenBy, $modifiedBy, $consentSeq];
                     $stmt = $this->externalDb->prepareQuery($deleteSQL, $params)->execute();
                     if ($stmt === false) {
-                        throw new Exception(
+                        throw new AlaressDatabaseException(
                             print_r($this->externalDb->errorInfo(), true)
                         );
                     }
@@ -2489,7 +2490,7 @@ class Handler
                 $statement = $this->externalDb->prepareQuery($checkSQL, [$consentCode, $studentID]);
                 $stmt = $statement->execute();
                 if ($stmt === false) {
-                    throw new Exception(
+                    throw new AlaressDatabaseException(
                         print_r($this->externalDb->errorInfo(), true)
                     );
                 }
@@ -2511,7 +2512,7 @@ class Handler
                             $params = [$consentGivenBy, $modifiedBy, $row["ConsentSeq"]];
                             $stmt = $this->externalDb->prepareQuery($updateSQL, $params)->execute();
                             if ($stmt === false) {
-                                throw new Exception(
+                                throw new AlaressDatabaseException(
                                     print_r($this->externalDb->errorInfo(), true)
                                 );
                             }
@@ -2534,7 +2535,7 @@ class Handler
                     $params = [$studentID, $consentCode, $consentGivenBy, $modifiedBy];
                     $stmt = $this->externalDb->prepareQuery($insertSQL, $params)->execute();
                     if ($stmt === false) {
-                        throw new Exception(
+                        throw new AlaressDatabaseException(
                             print_r($this->externalDb->errorInfo(), true)
                         );
                     }
