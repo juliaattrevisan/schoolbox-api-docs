@@ -1,5 +1,5 @@
 tour:
-  title: '24.1 Release (displayed to staff users on login)'
+  title: '24.1 Release'
   description: 'Introduce staff to the new features of the 24.1 release'
   roles:
     - staff

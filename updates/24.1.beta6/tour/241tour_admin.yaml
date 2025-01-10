@@ -1,5 +1,5 @@
 tour:
-  title: '24.1 Release (displayed on Admin Home page only)'
+  title: '24.1 Admin Release'
   description: 'Introduce superusers and moderators to the new admin features of the 24.1 release'
   roles:
     - staff
