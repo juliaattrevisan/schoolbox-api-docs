@@ -193,6 +193,7 @@ class Exporter extends CliTool\App
                 if (count($attachments)) {
                     $log->debug(' * Found ' . count($attachments) . ' rows in pastoral_attachment');
                     foreach ($attachments as $attachment) {
+                        $attachment->setPastoral($pastoralRecord); // Ensure pastoral is hydrated in $attachment.
                         if ($this->perform()) {
                             // Only re-sync if it's not already in the Q
                             $queueCount = $pastoralUploadQueueMapper->countByColumnList([
