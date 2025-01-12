@@ -548,6 +548,9 @@ select.letter-grade-select {
         .rubric-levels-mobile {
             display: block !important; // Shows rubric levels in small screens
         }
+        .rubric-levels-mobile-hidden {
+            display: none !important; // Hides rubric levels in small screens
+        }
     }
 
     // Rubric progression graph
