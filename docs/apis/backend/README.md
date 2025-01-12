@@ -88,7 +88,8 @@ tests.
 #### Model To Array
 
 This translator is intended to convert a mapper's model into an array, so that
-the array may be output using standard JSON encoding methods.
+the array may be output using standard JSON encoding methods in the HTTP
+response body.
 
 There's no standard interface for these classes, but by convention they
 implement the magic `__invoke` method, thus making them callable and thus usable
@@ -113,13 +114,26 @@ in `array_map` and `\Schoolbox\Collection::map`.
 #### Array To Model
 
 This translator converts in the opposite direction: it converts an array
-representation of an object into a model, ready to be persisted using the
-model's mapper.
+representation of an object (as retrieved from the HTTP request body) into a
+model, ready to be persisted using the model's mapper.
 
 Instances of this translator generally extend the
 `\Schoolbox\API\Translator\ArrayToModel\Base` abstract class: this class
 implements several helper methods for defining a translation. Like the model to
 array translator, instances should also implement `__invoke`.
+
+### Validation
+
+There's not yet a defined process for validating input data.
+
+It's possible to validate a model at save time using its mapper's pre-save
+callback: if the value to be saved is invalid, it should raise a
+`RuntimeException` instance. It's also possible to write custom validation
+classes, which raise `RuntimeException` instances if their validation fails.
+
+In either case: if a `RuntimeException` is uncaught, the response will be an API
+Problem compliant JSON document:
+see https://datatracker.ietf.org/doc/html/rfc7807.
 
 ## Running the example
 
