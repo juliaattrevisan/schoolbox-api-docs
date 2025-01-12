@@ -46,6 +46,11 @@ $requestBody = $this->request->getParsedBody();
 > `Content-Type` headers), as `getParsedBody` will contain the contents of the
 > `$_POST` superglobal.
 
+By convention, controller method names are derived from:
+- the HTTP method
+- `list` if the method works with a collection, `item` if the method works on a
+  single item
+
 ## Supporting Classes
 
 The key difference between API and MVC backends is in the supporting classes:
@@ -134,6 +139,21 @@ classes, which raise `RuntimeException` instances if their validation fails.
 In either case: if a `RuntimeException` is uncaught, the response will be an API
 Problem compliant JSON document:
 see https://datatracker.ietf.org/doc/html/rfc7807.
+
+If you wish to further control the response, you can use `ApiProblem` directly:
+```php
+// Create an ApiProblem object
+$problem = (new \Crell\ApiProblem\ApiProblem())
+    ->setTitle('An error occurred')
+    ->setStatus(400);
+
+// For example, you may wish to set custom fields
+$problem['custom'] = 'Custom field';
+
+// And then create a JSON response
+$this->response = $this->responseAsJson($problem->asArray())
+                       ->withStatus($problem->getStatus());
+```
 
 ## Running the example
 
