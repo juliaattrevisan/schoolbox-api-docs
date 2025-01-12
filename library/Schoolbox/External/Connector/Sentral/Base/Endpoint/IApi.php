@@ -24,6 +24,13 @@ interface IApi
      */
     public function retrieveDocument(string $endpoint): array;
 
+    /**
+     * Retrieves portrait from an endpoint
+     *
+     * @param string $endpoint
+     * @return string
+     */
+    public function retrievePortrait(string $endpoint): string;
 
     /**
      * The statistics object which remembers how much you accessed the api

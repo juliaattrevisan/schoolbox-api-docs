@@ -269,6 +269,8 @@ class Api implements IApi
     }
 
     /**
+     * Retrieves endpoint data representing the portrait from the API call.
+     *
      * @param string $endpoint
      * @return string
      */
@@ -310,6 +312,15 @@ class Api implements IApi
 
             return $response->getBody()->getContents();
         }
+
+        /* We got here because $fails exceeded a number of retries
+         */
+        throw new InvalidArgumentException(sprintf(
+            'Sentral Endpoint error at endpoint %s: could not establish connection to server after %s retries. %s',
+            $endpoint,
+            self::NUM_RETRY,
+            $lastGuzzleError
+        ));
     }
 
     /**

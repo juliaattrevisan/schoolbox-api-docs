@@ -24,7 +24,7 @@ use Schoolbox\Mapper;
 use Schoolbox\Mapper\DefinitionException;
 use Schoolbox\Mapper\Exception;
 use UnexpectedValueException;
-use \Schoolbox\Resource\Storage\Mapper as StorageMapper;
+use Schoolbox\Resource\Storage\Mapper as StorageMapper;
 
 /**
  * Class Profile
@@ -538,12 +538,12 @@ class Profile implements IStrategy
              */
             if (!$baseProfile->getPortrait() || ($baseProfile->getPortrait()->getHash() !== $portrait->getHash())) {
                 $this->log->debug(sprintf(
-                  'Profile picture: %s %s (%s) has profile hash %s derived from %s.png',
-                  $baseProfile->getFirstname(),
-                  $baseProfile->getLastname(),
-                  $baseProfile->getExternalId(),
-                  $portrait->getHash(),
-                  $id
+                    'Profile picture: %s %s (%s) has profile hash %s derived from %s.png',
+                    $baseProfile->getFirstname(),
+                    $baseProfile->getLastname(),
+                    $baseProfile->getExternalId(),
+                    $portrait->getHash(),
+                    $id
                 ));
 
                 $baseProfile->setPortrait($portrait);
