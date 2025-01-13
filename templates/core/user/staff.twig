@@ -125,17 +125,22 @@
                         {# Special constraints that further reduce the payload I built
                          # It uses the exact same philosophy as additionalConstraints for
                          # rendering profile fields.
+                         #
+                         # Geosnapshot isn't available for parents/students viewing staff
                          #}
                         {% set additionalConstraints = {
                             'student': {
                                 '_default': true,
+                                'geosnapshot': false,
                             },
                             'parent': {
                                 '_default': true,
+                                'geosnapshot': false,
                             },
                             'staff': {
                                 '_default': true,
                                 'eportfolio': eportfolioAuth,
+                                'geosnapshot': isGeosnapshotAvailable,
                             },
                         } %}
 
