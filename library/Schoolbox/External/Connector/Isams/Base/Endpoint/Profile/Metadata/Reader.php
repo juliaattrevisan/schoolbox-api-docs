@@ -14,11 +14,11 @@ class Reader
     /**
      * Extract the sisPhotoId from the metadata
      *
-     * @param array|string $metadata
+     * @param array|string|null $metadata
      * @return string|null
      * @throws \JsonException
      */
-    public function getProfileSisPhotoId(array|string $metadata): ?string
+    public function getProfileSisPhotoId(array|string|null $metadata): ?string
     {
         return $this->deserialize($metadata)['profile']['sisPhotoId'] ?? null;
     }
@@ -29,13 +29,13 @@ class Reader
      * for interchangeability. You could be working with either the
      * mapper-decoded version or the db-encoded versions...
      *
-     * @param array|string $metadata
+     * @param array|string|null $metadata
      * @return array
      * @throws \JsonException
      */
-    private function deserialize(array|string $metadata): array
+    private function deserialize(array|string|null $metadata): array
     {
-        $deserialized = $metadata;
+        $deserialized = $metadata ?? [];
 
         if (is_string($metadata)) {
             $deserialized = json_decode($deserialized, true, 512, JSON_THROW_ON_ERROR);
