@@ -88,7 +88,7 @@ class Download implements IStrategy
                 $baseProfile = $this->baseProfileMapper->findOneByColumn('external_id', $externalId);
 
                 // seeing as we are updating the photo, we need to remember this
-                $baseProfile->setMetadata(json_encode(['sisPhotoId' => $sisPhotoId]));
+                $baseProfile->setMetadata(['sisPhotoId' => $sisPhotoId]);
 
                 $this->importPortrait($baseProfile, $data);
             } else {
