@@ -10,12 +10,14 @@ declare(strict_types=1);
 
 namespace Schoolbox\External\Connector\Isams\Base\Endpoint\ProfileImages;
 
+use GuzzleHttp\Exception\GuzzleException;
 use Psr\Log\LoggerInterface;
 use Schoolbox\External\Connector\Isams\Base\Endpoint\Codec\DSN;
 use Schoolbox\External\Connector\Isams\Base\Endpoint\Registry;
 use Schoolbox\External\Importer\Endpoint\IStrategy;
 use Schoolbox\External\Profile as UserProfile;
 use Schoolbox\Resource\Storage\Mapper as StorageMapper;
+use Schoolbox\Role;
 use SensitiveParameter;
 
 class Download implements IStrategy
@@ -58,9 +60,30 @@ class Download implements IStrategy
         }
 
         foreach ($this->registry->recallAll() as $externalId => $data) {
-            $this->log->info('Downloading profile photo for ' . $externalId);
-            $baseProfile = $this->baseProfileMapper->findOneByColumn('external_id', $externalId);
-            $this->importPortrait($baseProfile, $data['person']['personId'], $data['person']['type']);
+            /**
+             * we are only wanting to update the profile photo if
+             * the sis photo has been updated,
+             * we don't have a photo for the user yet
+             */
+            // check if the sis photo has been updated...
+            try {
+                $sisPhotoId = $this->photoDownloader->getLatestPhotoID($data['person']['type'], $externalId);
+            } catch (GuzzleException $e) {
+                if ($e->getCode() === 404) {
+                    // this shouldn't happen, the user existed in the BatchXML but they don't in the RestAPI... weird...
+                    $this->log->warning(sprintf("Profile picture: no user found for '%s' %s.",$externalId, $data['person']['type']));
+                    continue;
+                }
+            }
+            if (null === $data['person']['portrait'] || $sisPhotoId !== $data['person']['sisPhotoId']) {
+                $this->log->info('Downloading profile photo for ' . $externalId);
+                $baseProfile = $this->baseProfileMapper->findOneByColumn('external_id', $externalId);
+
+                // seeing as we are updating the photo, we need to remember this
+                $baseProfile->setMetadata(json_encode(['sisPhotoId' => $sisPhotoId]));
+
+                $this->importPortrait($baseProfile, $data);
+            }
         }
     }
 
@@ -73,24 +96,23 @@ class Download implements IStrategy
      * This populates the portrait_hash in $baseProfile
      *
      * @param UserProfile\Model  $baseProfile
-     * @param string $personId
-     * @param string $roleType should be one of the Role::[STAFF,STUDENT] constants
+     * @param array $data // registry cache of the human
      * @return void
      */
-    private function importPortrait(UserProfile\Model $baseProfile, string $personId, string $roleType): void
+    private function importPortrait(UserProfile\Model $baseProfile, array $data): void
     {
         /* Start validating the contents of $fileInfo to ensure we have what we need
          *
          * file_info node might not exist; if it doesn't, skip it
          */
-        $photoContents = $this->photoDownloader->getPhoto($personId, $roleType, $baseProfile->getExternalId());
+        $photoContents = $this->photoDownloader->getPhoto($data['person']['personId'], $data['person']['type'], $baseProfile->getExternalId());
 
         if (null === $photoContents) {
             $this->log->debug(sprintf(
                 'Profile picture: no data found for %s %s (%s)',
                 $baseProfile->getFirstname(),
                 $baseProfile->getLastname(),
-                $personId
+                $data['person']['personId']
             ));
 
             return;
@@ -130,7 +152,7 @@ class Download implements IStrategy
                     $baseProfile->getLastname(),
                     $baseProfile->getExternalId(),
                     $portrait->getHash(),
-                    $personId,
+                    $data['person']['personId'],
                     $this->photoDownloader->whichSystem(),
                 ));
 

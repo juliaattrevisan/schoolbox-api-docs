@@ -37,6 +37,7 @@ class Mapper extends \Schoolbox\Mapper
         $this->uses('preferred_firstname', self::TYPE_STRING, null, 'firstnamePreferred');
         $this->uses('lastname', self::TYPE_STRING);
         $this->joins('portrait_hash', Storage\Mapper::class, 'hash', null, null, 'portrait', 'portrait');
+        $this->uses('metadata', self::TYPE_STRING);
         $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
         $this->uses('updated_at', self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP);
     }

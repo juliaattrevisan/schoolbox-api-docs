@@ -219,4 +219,9 @@ class BatchPhotoDownloader implements IPhotoDownloader
     {
         return 'batchXML';
     }
+
+    public function getLatestPhotoID(string $roleType = Role::STUDENT, string|int|null $externalId = null): ?int
+    {
+        return null;
+    }
 }

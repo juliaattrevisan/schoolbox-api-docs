@@ -33,7 +33,13 @@ class Registry
      */
     public function remember(string $key, array $data): void
     {
-        $this->registry[$key] = $data;
+        if (isset($this->registry[$key])) {
+            // merge the array
+            $this->registry[$key] = array_merge($this->registry[$key], $data);
+        } else {
+            // set the array
+            $this->registry[$key] = $data;
+        }
     }
 
 

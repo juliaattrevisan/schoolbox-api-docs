@@ -56,4 +56,6 @@ interface IPhotoDownloader
     public function cleanup(): void;
 
     public function whichSystem(): string;
+
+    public function getLatestPhotoID(string $roleType = Role::STUDENT, string|int|null $externalId = null): ?int;
 }

@@ -83,4 +83,29 @@ class RestPhotoDownloader implements IPhotoDownloader
     {
         return 'restAPI';
     }
+
+    /**
+     * @param string $roleType
+     * @param string|int|null $externalId
+     * @return int|null
+     * @throws \GuzzleHttp\Exception\GuzzleException
+     * @throws \JsonException
+     */
+    public function getLatestPhotoID(string $roleType = Role::STUDENT, string|int|null $externalId = null): ?int
+    {
+        $userObj = null;
+        switch ($roleType) {
+            case Role::STUDENT:
+                $url = sprintf('Main/api/students/%s', $externalId);
+                $userObj =  $this->api->request($url, 'GET');
+                break;
+            case Role::STAFF:
+                $url = sprintf('Main/api/humanresources/employees/%s', $externalId);
+                $userObj =  $this->api->request($url, 'GET');
+                break;
+            default:
+                return null;
+        }
+        return $userObj['latestPhotoId'];
+    }
 }

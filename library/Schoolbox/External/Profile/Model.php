@@ -55,6 +55,8 @@ class Model
      */
     private ?Storage\Model $portrait = null;
 
+    private ?string $metadata = null;
+
 
     /**
      * @return string $externalId
@@ -172,6 +174,17 @@ class Model
     public function setPortrait(?Storage\Model $portrait): self
     {
         $this->portrait = $portrait;
+        return $this;
+    }
+
+    public function getMetadata(): ?string
+    {
+        return $this->metadata;
+    }
+
+    public function setMetadata(?string $metadata): self
+    {
+        $this->metadata = $metadata;
         return $this;
     }
 }

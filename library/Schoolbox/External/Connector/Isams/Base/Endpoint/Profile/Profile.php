@@ -436,6 +436,8 @@ class Profile implements IStrategy
                 'person' => [
                     'type' => Role::STUDENT,
                     'personId' => $personId,
+                    'portrait'  => $studentBaseProfile->getPortrait(),
+                    'sisPhotoId' => $studentBaseProfile->getMetadata()['sisPhotoId'] ?? null,
                     'externalId' => $externalId,
                     'firstname' => $studentBaseProfile->getFirstname(),
                     'firstnamePreferred' => $studentBaseProfile->getFirstnamePreferred(),
@@ -1077,6 +1079,8 @@ class Profile implements IStrategy
                 'person' => [
                     'type' => Role::STAFF,
                     'personId' => $personId,
+                    'portrait'  => $staffBaseProfile->getPortrait(),
+                    'sisPhotoId' => $staffBaseProfile->getMetadata()['sisPhotoId'] ?? null,
                     'externalId' => $externalId,
                     'firstname' => $staffBaseProfile->getFirstname(),
                     'firstnamePreferred' => $staffBaseProfile->getFirstnamePreferred(),
