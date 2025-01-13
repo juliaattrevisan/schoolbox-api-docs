@@ -22,17 +22,17 @@ class Builder
     /**
      * Builds profile specific metadata such as photo ids etc.
      *
-     * @param array $classInstance
+     * @param array $profileInstance
      * @return array
      */
-    public function build(array $classInstance): array
+    public function build(array $profileInstance): array
     {
         /* Each event contains this additional metadata struct,
          * for extra info that you might need later
          */
         return [
             'profile' => [
-                'sisPhotoId' => $classInstance['attributes']['rollMarkingUrl'] ?? null
+                'sisPhotoId' => $profileInstance['profile']['sisPhotoId'] ?? null
             ]
         ];
     }
