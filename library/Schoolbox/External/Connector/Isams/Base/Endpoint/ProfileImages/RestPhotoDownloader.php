@@ -23,7 +23,6 @@ use SensitiveParameter;
  */
 class RestPhotoDownloader implements IPhotoDownloader
 {
-
     private array $photoCache = [];
     private RestApi $api;
 
