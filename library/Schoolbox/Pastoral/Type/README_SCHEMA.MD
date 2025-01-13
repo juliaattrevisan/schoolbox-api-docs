@@ -10,18 +10,18 @@
 | pastoral_document_classification_id              | See note below                                                     |
 | pastoral_document_classification_confidential_id | See note below                                                     |
 | name                                             | Name of the type                                                   |
-| template                                         | TODO: Add explanation                                              |
+| template                                         | Template for general comments on records with no subtype           |
 | color                                            |                                                                    |
 | icon                                             |                                                                    |
 | external_code                                    | The external SIS code for this pastoral type (used when exporting) |
-| visibility_locked                                | TODO: Add explanation                                              |
+| visibility_locked                                | Whether users may modify visibility of records of this type        |
 | sentiment                                        | Positive, neutral, or negative (enumerated values)                 |
 | sequence                                         | Integer defining the display order                                 |
 | updated_by                                       | User ID of most recent updater                                     |
 | created_at                                       |                                                                    |
 | updated_at                                       |                                                                    |
 | deleted_at                                       |                                                                    |
-| template_private                                 | TODO: Add explanation                                              |
+| template_private                                 | Template for confidential comments on records with no subtype      |
 
 Notes:
  * The pastoral_document_classification_ids point to names that match classification names in Synergetic.  These determine
@@ -36,15 +36,15 @@ Notes:
 | id                | Unique row identifier                                                 |
 | pastoral_type_id  | The ID of the pastoral type to which this subtype is a child          |
 | name              | Name of the subtype                                                   |
-| template          | TODO: Add explanation                                                 |
+| template          | Template for general comments on records with this subtype            |
 | color             |                                                                       |
 | icon              |                                                                       |
 | external_code     | The external SIS code for this pastoral subtype (used when exporting) |
-| visibility_locked | TODO: Add explanation                                                 |
+| visibility_locked | Whether users may modify visibility of records of this subtype        |
 | sentiment         | Positive, neutral, or negative (enumerated values)                    |
 | sequence          | Integer defining the display order                                    |
 | updated_by        | User ID of most recent updater                                        |
 | created_at        |                                                                       |
 | updated_at        |                                                                       |
 | deleted_at        |                                                                       |
-| template_private  | TODO: Add explanation                                                 |
+| template_private  | Tempalte for confidential comments on records with no subtype         |
