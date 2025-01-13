@@ -17,6 +17,9 @@ use Psr\Log\LoggerInterface;
 use Schoolbox\Application\CliTool;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Pastoral;
+use Schoolbox\Pastoral\Mapper as PastoralMapper;
+use Schoolbox\Pastoral\DocumentClassification\Mapper as PastoralDocumentClassificationMapper;
+use Schoolbox\Pastoral\Attachment\Mapper as PastoralAttachmentMapper;
 use Symfony\Component\Lock\Exception\LockAcquiringException;
 use Symfony\Component\Lock\Exception\LockConflictedException;
 use Symfony\Component\Lock\LockInterface;
@@ -176,6 +179,30 @@ HELP;
         // Mark file as processing so another daemon get started and try to duplicate processing
         $pendingUpload->setStatus(Pastoral\UploadQueue\Mapper::UPLOAD_STATUS_PROCESSING);
         $this->pastoralUploadQueueMapper->save($pendingUpload);
+
+        // If in debug mode, output extra information.
+        if (count($this->getToolArguments()) > 0 && $this->getToolArguments()[0] === '-vvv') {
+            $pastoralMapper = PastoralMapper::getInstance();
+            $pastoralAttachmentMapper = PastoralAttachmentMapper::getInstance();
+            $pastoralDocumentClassificationMapper = PastoralDocumentClassificationMapper::getInstance();
+            $pastoral = $pastoralMapper->findById($pendingUpload->getPastoral()->getId());
+            $pastoralType = $pastoral->getType();
+            $pastoralAttachment = $pastoralAttachmentMapper->findById($pendingUpload->getPastoralAttachmentId());
+            $documentClassification = $pastoralDocumentClassificationMapper->findById(
+                (
+                    $pastoralAttachment->getPrivate()
+                    ? $pastoralType->getDocumentClassificationConfidential()->getId()
+                    : $pastoralType->getDocumentClassification()->getId()
+                )
+            );
+            $this->getLogger()->debug(' * pastoral_type.name is ' . $pastoralType->getName());
+            $this->getLogger()->debug(' * pastoral_attachment.id is ' . $pastoralAttachment->getId());
+            $this->getLogger()->debug(
+                ' * pastoral_attachment.private is ' . ($pastoralAttachment->getPrivate() ? 'true' : 'false') .
+                    ", so document classification has name '" . $documentClassification->getName() . "'" .
+                    " and external_code '" . $documentClassification->getExternalCode() . "'"
+            );
+        }
 
         // Upload file to DocMan
         try {
