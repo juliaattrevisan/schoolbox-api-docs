@@ -57,5 +57,14 @@ interface IPhotoDownloader
 
     public function whichSystem(): string;
 
+    /**
+     * Get the latest photo ID for the user from the rest API
+     *
+     * @param string $roleType
+     * @param string|int|null $externalId
+     * @return int|null
+     * @throws \GuzzleHttp\Exception\GuzzleException
+     * @throws \JsonException
+     */
     public function getLatestPhotoID(string $roleType = Role::STUDENT, string|int|null $externalId = null): ?int;
 }

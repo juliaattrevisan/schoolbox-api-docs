@@ -24,7 +24,6 @@ class Registry
      */
     private array $registry = [];
 
-
     /**
      * Remember $data via $key
      *
@@ -42,7 +41,6 @@ class Registry
         }
     }
 
-
     /**
      * Recall $data via $key
      *
@@ -53,7 +51,6 @@ class Registry
     {
         return $this->registry[$key] ?? null;
     }
-
 
     /**
      * Return all the entire stack
@@ -75,7 +72,6 @@ class Registry
         return count($this->registry);
     }
 
-
     /**
      * Just call the Captain Keyes that you remembered in this instance
      *
@@ -84,27 +80,5 @@ class Registry
     public function keys(): array
     {
         return array_keys($this->registry);
-    }
-
-
-    /**
-     * Find a staff member in the registry whose person id === $id
-     * (Used as a reverse lookup)
-     *
-     * @param int    $id
-     * @param string $type
-     * @return array|null
-     */
-    public function findById(int $id, string $type): ?array
-    {
-        /* Note that $data['person']['id'] might not have been an int when it went in here
-         */
-        foreach ($this->registry as $key => $data) {
-            if ((int)$data['person']['id'] === $id && $data['person']['type'] === $type) {
-                return $data;
-            }
-        }
-
-        return null;
     }
 }

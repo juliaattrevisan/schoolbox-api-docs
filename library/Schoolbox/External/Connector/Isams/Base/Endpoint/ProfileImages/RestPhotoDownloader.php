@@ -23,6 +23,8 @@ use SensitiveParameter;
  */
 class RestPhotoDownloader implements IPhotoDownloader
 {
+
+    private array $photoCache = [];
     private RestApi $api;
 
     /**
@@ -46,10 +48,18 @@ class RestPhotoDownloader implements IPhotoDownloader
     {
         switch ($roleType) {
             case Role::STUDENT:
-                $url = sprintf('Main/api/students/%s/photos/current', $externalId);
+                if (!isset($this->photoCache[$externalId])) {
+                    $url = sprintf('Main/api/students/%s/photos/current', $externalId);
+                } else {
+                    $url = sprintf('Main/api/students/%s/photos/%s', $externalId, $this->photoCache[$externalId]);
+                }
                 return $this->api->request($url, 'GET', raw: true);
             case Role::STAFF:
-                $url = sprintf('Main/api/humanresources/employees/%s/photos/current', $externalId);
+                if (!isset($this->photoCache[$externalId])) {
+                    $url = sprintf('Main/api/humanresources/employees/%s/photos/current', $externalId);
+                } else {
+                    $url = sprintf('Main/api/humanresources/employees/%s/photos/%s', $externalId, $this->photoCache[$externalId]);
+                }
                 return $this->api->request($url, 'GET', raw: true);
             default:
                 return null;
@@ -85,11 +95,7 @@ class RestPhotoDownloader implements IPhotoDownloader
     }
 
     /**
-     * @param string $roleType
-     * @param string|int|null $externalId
-     * @return int|null
-     * @throws \GuzzleHttp\Exception\GuzzleException
-     * @throws \JsonException
+     * @inheritDoc
      */
     public function getLatestPhotoID(string $roleType = Role::STUDENT, string|int|null $externalId = null): ?int
     {
@@ -106,6 +112,7 @@ class RestPhotoDownloader implements IPhotoDownloader
             default:
                 return null;
         }
+        $this->photoCache[$externalId] = $userObj['latestPhotoId'];
         return $userObj['latestPhotoId'];
     }
 }
