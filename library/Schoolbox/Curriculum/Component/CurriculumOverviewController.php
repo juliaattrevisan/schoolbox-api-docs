@@ -87,7 +87,7 @@ class CurriculumOverviewController extends Component_Homepage_ControllerAbstract
 
             // Fetch every node which is an ancestor or descendant of one of this folder's nodes, whether enabled or disabled.
             // A previously set curriculum node should remain on a folder even if the node has subsequently been disabled.
-            $nodeIds = $nodeMapper->findFamilyTreeIds($directNodeIds, 'curriculum_node_parent_id');
+            $nodeIds = $nodeMapper->findFamilyTreeIds($directNodeIds, 'curriculum_node_parent_id', 50, 0);
 
             // Then find all the nodes and filter out disabled nodes that aren't directly mapped to this folder
             // This is because we still want to show disabled nodes if they are still directly mapped to aid in transitioning curriculum
