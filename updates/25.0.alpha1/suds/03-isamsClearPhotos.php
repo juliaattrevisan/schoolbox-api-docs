@@ -38,6 +38,7 @@ $app = new class extends CliTool\App
             &&
             $this->getConfig()->get(ConfigMapper::NAME_EXTERNAL_TYPE) === \External\IConnector::EXTERNAL_TYPE_SCHOOLBOX
         ) {
+            $this->getLogger()->notice('Clearing all isams portraits');
             $this->getDatabaseInternal()->query("UPDATE sis_user_profile SET portrait_hash = NULL");
         }
     }
