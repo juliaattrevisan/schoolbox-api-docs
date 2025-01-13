@@ -311,11 +311,6 @@ class Profile implements IStrategy
                     ->setFirstnamePreferred($firstnamePreferred)
                     ->setLastname($lastname);
 
-                /* Shank another endpoint to find email data
-                 * We need their personId first
-                 */
-                $personId = (string)$student['relationships']['person']['data']['id'];
-
                 $this->importPortrait($studentBaseProfile, (string)$student['links']['photo']);
 
                 /* Then save it
@@ -372,6 +367,11 @@ class Profile implements IStrategy
                  */
                 $enrolment = $this->findDate($enrolmentDate);
                 $leaving = $this->findDate($leavingDate);
+
+                /* Shank another endpoint to find email data
+                 * We need their personId first
+                 */
+                $personId = (string)$student['relationships']['person']['data']['id'];
 
                 /* Access the endpoint and if the personId doesn't exist
                  * or if they're broken, just ignore it - they go in without
