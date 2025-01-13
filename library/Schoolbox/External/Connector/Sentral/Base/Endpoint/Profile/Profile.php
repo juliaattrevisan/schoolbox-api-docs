@@ -210,6 +210,7 @@ class Profile implements IStrategy
 //            $log = new \Alaress_Log_File('/tmp/alaress.log');
 //            $log->log('test', $payload);
             foreach ($payload['data'] as $student) {
+                new \Alaress_Log_Probe($student);
                 $externalId = (string)$student['attributes']['studentCode'];
 
                 /* Only import data for externalIds in $watchlist, if provided
@@ -315,7 +316,7 @@ class Profile implements IStrategy
                  */
                 $personId = (string)$student['relationships']['person']['data']['id'];
 
-                $this->importPortrait($studentBaseProfile, "3069");
+                $this->importPortrait($studentBaseProfile, (string)$student['links']['photo']);
 
                 /* Then save it
                  */
@@ -512,7 +513,7 @@ class Profile implements IStrategy
         }
     }
 
-    private function importPortrait(UserProfile\Model $baseProfile, string $id): void
+    private function importPortrait(UserProfile\Model $baseProfile, string $photoEndpoint): void
     {
         /* Check if config setting allows photos from sis
          * If it's enabled, continue importing pics
@@ -520,7 +521,7 @@ class Profile implements IStrategy
         if (!$this->includePhoto) {
             return;
         }
-        $endpoint = "enrolments/student/$id/photo?width=500&height=500";
+        $endpoint = "$photoEndpoint?width=500&height=500";
         $photoContents = $this->api->retrievePortrait($endpoint);
 
         /* Only try to persist images if perform mode is activated
@@ -530,7 +531,8 @@ class Profile implements IStrategy
         }
 
         try {
-            $portrait = $this->storageMapper->acceptStream($baseProfile->getExternalId() . '.jpg', $photoContents);
+            $externalId = $baseProfile->getExternalId();
+            $portrait = $this->storageMapper->acceptStream($externalId . '.jpg', $photoContents);
 
             /* You get a picture if any of the following occur:
              *     - you don't have a portrait yet; you can get one added
@@ -541,9 +543,9 @@ class Profile implements IStrategy
                     'Profile picture: %s %s (%s) has profile hash %s derived from %s.png',
                     $baseProfile->getFirstname(),
                     $baseProfile->getLastname(),
-                    $baseProfile->getExternalId(),
+                    $externalId,
                     $portrait->getHash(),
-                    $id
+                    $externalId,
                 ));
 
                 $baseProfile->setPortrait($portrait);
