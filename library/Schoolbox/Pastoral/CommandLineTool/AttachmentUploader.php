@@ -188,19 +188,26 @@ HELP;
             $pastoral = $pastoralMapper->findById($pendingUpload->getPastoral()->getId());
             $pastoralType = $pastoral->getType();
             $pastoralAttachment = $pastoralAttachmentMapper->findById($pendingUpload->getPastoralAttachmentId());
-            $documentClassification = $pastoralDocumentClassificationMapper->findById(
-                (
-                    $pastoralAttachment->getPrivate()
-                    ? $pastoralType->getDocumentClassificationConfidential()->getId()
-                    : $pastoralType->getDocumentClassification()->getId()
-                )
+            $documentClassificationId = (
+                $pastoralAttachment->getPrivate()
+                ? $pastoralType->getDocumentClassificationConfidential()?->getId()
+                : $pastoralType->getDocumentClassification()?->getId()
+            );
+            $documentClassification = (
+                $documentClassificationId === null
+                ? null
+                : $pastoralDocumentClassificationMapper->findById($documentClassificationId)
             );
             $this->getLogger()->debug(' * pastoral_type.name is ' . $pastoralType->getName());
             $this->getLogger()->debug(' * pastoral_attachment.id is ' . $pastoralAttachment->getId());
             $this->getLogger()->debug(
                 ' * pastoral_attachment.private is ' . ($pastoralAttachment->getPrivate() ? 'true' : 'false') .
-                    ", so document classification has name '" . $documentClassification->getName() . "'" .
-                    " and external_code '" . $documentClassification->getExternalCode() . "'"
+                ", so document classification " .
+                (
+                    $documentClassification === null
+                    ? 'is null'
+                    : "has name '" . $documentClassification->getName() . "' and external_code '" . $documentClassification->getExternalCode() . "'"
+                )
             );
         }
 
