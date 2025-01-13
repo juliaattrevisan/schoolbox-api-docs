@@ -36,7 +36,7 @@ class RestPhotoDownloader implements IPhotoDownloader
         /* Store this locally just once
          */
         $credentials = (new DSN())->decode($dsn);
-        $this->api = new RestApi($credentials['modules'][DSN::MODULE_RESTAPIHOST]['key'], $credentials['modules'][DSN::MODULE_RESTAPICLIENTID]['key'], $credentials['modules'][DSN::MODULE_RESTAPICLIENTSECRET]['key']);
+        $this->api = new RestApi(trim($credentials['modules'][DSN::MODULE_RESTAPIHOST]['key']), trim($credentials['modules'][DSN::MODULE_RESTAPICLIENTID]['key']), trim($credentials['modules'][DSN::MODULE_RESTAPICLIENTSECRET]['key']));
     }
 
     /**

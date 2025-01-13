@@ -31,7 +31,7 @@ class Cleanup implements IStrategy
     {
         // if batch API exists, no photos to clean up
         $credentials = (new DSN())->decode($this->key);
-        if ($credentials['modules'][DSN::MODULE_RESTAPIHOST]['key'] === '') {
+        if (trim($credentials['modules'][DSN::MODULE_RESTAPIHOST]['key']) === '') {
             /* Only try to clean up photos if we actually tried to import them
              * Otherwise leave this place untouched
              */
