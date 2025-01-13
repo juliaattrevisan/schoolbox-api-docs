@@ -73,7 +73,7 @@ class Module extends BaseModule
     {
         return new Controller(
             $this->getMapperFactory()->get(\Schoolbox\Config\ConfigMapper::class),
-            L10nMapper::getInstance()
+            $this->getMapperFactory()->get(L10nMapper::class),
         );
     }
 
