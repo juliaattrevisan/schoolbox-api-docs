@@ -16,6 +16,7 @@ use Psr\Container\ContainerInterface;
 use Psr\Log\LoggerInterface;
 use Schoolbox\Application\CliTool;
 use Schoolbox\Config\ConfigMapper;
+use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Pastoral;
 use Schoolbox\Pastoral\Mapper as PastoralMapper;
 use Schoolbox\Pastoral\DocumentClassification\Mapper as PastoralDocumentClassificationMapper;
@@ -193,11 +194,14 @@ HELP;
                 ? $pastoralType->getDocumentClassificationConfidential()?->getId()
                 : $pastoralType->getDocumentClassification()?->getId()
             );
-            $documentClassification = (
-                $documentClassificationId === null
-                ? null
-                : $pastoralDocumentClassificationMapper->findById($documentClassificationId)
-            );
+            $documentClassification = null;
+            if ($documentClassificationId !== null) {
+                try {
+                    $documentClassification = $pastoralDocumentClassificationMapper->findById($documentClassificationId);
+                } catch (MapperException) {
+                    // Do nothing.  Leave $documentClassification as null.
+                }
+            }
             $this->getLogger()->debug(' * pastoral_type.name is ' . $pastoralType->getName());
             $this->getLogger()->debug(' * pastoral_attachment.id is ' . $pastoralAttachment->getId());
             $this->getLogger()->debug(
