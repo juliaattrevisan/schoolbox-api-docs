@@ -14,10 +14,10 @@ use GuzzleHttp\Exception\GuzzleException;
 use Psr\Log\LoggerInterface;
 use Schoolbox\External\Connector\Isams\Base\Endpoint\Codec\DSN;
 use Schoolbox\External\Connector\Isams\Base\Endpoint\Registry;
+use Schoolbox\External\Connector\Isams\Base\Endpoint\Profile\Metadata;
 use Schoolbox\External\Importer\Endpoint\IStrategy;
 use Schoolbox\External\Profile as UserProfile;
 use Schoolbox\Resource\Storage\Mapper as StorageMapper;
-use Schoolbox\Role;
 use SensitiveParameter;
 
 class Download implements IStrategy
@@ -88,7 +88,9 @@ class Download implements IStrategy
                 $baseProfile = $this->baseProfileMapper->findOneByColumn('external_id', $externalId);
 
                 // seeing as we are updating the photo, we need to remember this
-                $baseProfile->setMetadata(['sisPhotoId' => $sisPhotoId]);
+                $baseProfile->setMetadata((new Metadata\Builder())->build(['profile' => [
+                    'sisPhotoId' => $sisPhotoId
+                ]]));
 
                 $this->importPortrait($baseProfile, $data);
             } else {

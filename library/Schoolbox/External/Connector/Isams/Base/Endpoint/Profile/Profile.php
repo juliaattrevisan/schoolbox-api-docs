@@ -16,6 +16,7 @@ use Psr\Log\LoggerInterface;
 use RuntimeException;
 use Schoolbox\External\Connector\FirstMeaningfulValue;
 use Schoolbox\External\Connector\Isams\Base\Endpoint\Codec\DSN;
+use Schoolbox\External\Connector\Isams\Base\Endpoint\Profile\Metadata\Reader;
 use Schoolbox\External\Connector\Isams\Base\Endpoint\Registry;
 use Schoolbox\External\Connector\ValidStrats;
 use Schoolbox\External\Importer\Endpoint\IStrategy;
@@ -437,7 +438,7 @@ class Profile implements IStrategy
                     'type' => Role::STUDENT,
                     'personId' => $personId,
                     'portrait'  => $studentBaseProfile->getPortrait(),
-                    'sisPhotoId' => $studentBaseProfile->getMetadata()['sisPhotoId'] ?? null,
+                    'sisPhotoId' => (new Reader())->getProfileSisPhotoId($studentBaseProfile->getMetadata()),
                     'externalId' => $externalId,
                     'firstname' => $studentBaseProfile->getFirstname(),
                     'firstnamePreferred' => $studentBaseProfile->getFirstnamePreferred(),
@@ -1080,7 +1081,7 @@ class Profile implements IStrategy
                     'type' => Role::STAFF,
                     'personId' => $personId,
                     'portrait'  => $staffBaseProfile->getPortrait(),
-                    'sisPhotoId' => $staffBaseProfile->getMetadata()['sisPhotoId'] ?? null,
+                    'sisPhotoId' => (new Reader())->getProfileSisPhotoId($staffBaseProfile->getMetadata()),
                     'externalId' => $externalId,
                     'firstname' => $staffBaseProfile->getFirstname(),
                     'firstnamePreferred' => $staffBaseProfile->getFirstnamePreferred(),
