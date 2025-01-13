@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { getUserPlatform, isPWA } from "@js/util/browserUtils";
 import PwaMenuPanelSettings from "./pwa-menu-panel-settings.vue";
 import PwaMenuPanelSidebar from "./pwa-menu-panel-sidebar.vue";
 import PwaMenuInstall from "./pwa-menu-install.vue";
@@ -21,24 +20,20 @@ interface Props {
 
 const props = defineProps<Props>();
 
-// The type of installation prompt to show
-// - iOS : If on iOS and the digistorm app exists
-// - Android : If on Android and the digistorm app exists
-// - PWA : If PWA is enabled, we are outside of it, and the above are not true
-const pwaPromptType = window.Vue.computed(() => {
-    if (props.installApple && getUserPlatform() === "iOS") {
-        return { id: "iOS", url: props.installApple };
-    }
+// Each sub-menu component so we can see if they have any visible content
+const pwaMenuInstallRef = window.Vue.useTemplateRef<InstanceType<typeof PwaMenuInstall>>("pwaMenuInstallRef");
+const pwaMenuNotifRef = window.Vue.useTemplateRef<InstanceType<typeof PwaMenuNotifications>>("pwaMenuNotifRef");
 
-    if (props.installGoogle && getUserPlatform() === "Android") {
-        return { id: "Android", url: props.installGoogle };
-    }
+/**
+ * Whether at least one of the buttons is visible so we can hide the entire panel if not
+ * Note: When hiding the panel, we must keep the components mounted so they can still reflect the PWA state
+ */
+const hasVisibleContent = window.Vue.computed(() => {
+    // Each component must expose a 'hasVisibleContent' computed property
+    const pwaMenuVisible = pwaMenuInstallRef.value?.hasVisibleContent || false;
+    const notifMenuVisible = pwaMenuNotifRef.value?.hasVisibleContent || false;
 
-    if (props.pwaEnabled && !isPWA()) {
-        return { id: "Browser", url: null };
-    }
-
-    return { id: null, url: null };
+    return pwaMenuVisible || notifMenuVisible;
 });
 </script>
 
@@ -46,22 +41,21 @@ const pwaPromptType = window.Vue.computed(() => {
     <component
         :is="props.page === 'settings' ? PwaMenuPanelSettings : PwaMenuPanelSidebar"
         :site-title="props.siteTitle"
+        :has-visible-content="hasVisibleContent"
     >
         <div class="l-flex-col l-gap-m f-no-margins">
-            <p>
-                To receive push notifications and enjoy a better experience, install the {{ props.siteTitle }} web app
-                on your device.
-            </p>
-
-            <a v-if="pwaPromptType.url" class="button" :href="pwaPromptType.url">Install</a>
             <pwa-menu-install
-                v-else-if="pwaPromptType.id === 'Browser'"
+                ref="pwaMenuInstallRef"
                 :page="props.page"
                 :site-title="props.siteTitle"
+                :install-apple="props.installApple"
+                :install-google="props.installGoogle"
+                :pwa-enabled="props.pwaEnabled"
             />
 
             <pwa-menu-notifications
                 v-if="notificationsEnabled"
+                ref="pwaMenuNotifRef"
                 :page="props.page"
                 :site-title="props.siteTitle"
                 :pwa-enabled="props.pwaEnabled"

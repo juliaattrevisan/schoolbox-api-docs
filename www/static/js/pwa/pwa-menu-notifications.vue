@@ -109,6 +109,15 @@ async function onRetryNotifPrompt(): Promise<void> {
     await Notification.requestPermission();
     window.location.reload();
 }
+
+/**
+ * To tell the parent whether we are showing any content or not
+ */
+const hasVisibleContent = window.Vue.computed(() => {
+    return prompt.value !== null;
+});
+
+defineExpose({ hasVisibleContent });
 </script>
 <template>
     <div v-if="prompt === PromptType.IMPERSONATING_USER" class="alert-box warning">

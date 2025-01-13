@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { getUserPlatform, isPWA } from "@js/util/browserUtils";
 import PwaMenuShareIcon from "./pwa-menu-share-icon.vue";
 
 interface Props {
@@ -6,15 +7,52 @@ interface Props {
     page: "sidebar" | "settings";
     // site title, to show "[title] web app" in the message
     siteTitle: string;
+    // the digistorm prompt for google/apple, if it exists
+    installApple: string | null;
+    installGoogle: string | null;
+    // whether the PWA app can be installed
+    pwaEnabled: boolean;
 }
 
 const props = defineProps<Props>();
+
+// The type of installation prompt to show
+const pwaPromptType = window.Vue.computed(() => {
+    // - If on iOS and the digistorm app exists
+    if (props.installApple && getUserPlatform() === "iOS") {
+        return { id: "iOS", url: props.installApple };
+    }
+
+    // - If on Android and the digistorm app exists
+    if (props.installGoogle && getUserPlatform() === "Android") {
+        return { id: "Android", url: props.installGoogle };
+    }
+
+    // - If PWA is enabled, we are outside of it, and the above are not true
+    if (props.pwaEnabled && !isPWA()) {
+        return { id: "Browser", url: null };
+    }
+
+    return { id: null, url: null };
+});
+
+/**
+ * To tell the parent whether we are showing any content or not
+ */
+const hasVisibleContent = window.Vue.computed(() => {
+    return pwaPromptType.value.id !== null;
+});
+
+defineExpose({ hasVisibleContent });
 </script>
 <template>
-    <a data-pwa-action="installPWA" class="button hide" href="#">Install</a>
-    <a data-pwa-action="installPWAiOS" data-reveal-id="PWAiOSAddToHomescreenReveal-{{ pwaPage }}" class="button hide"
-        >Install</a
-    >
+    <p v-if="pwaPromptType.id !== null">
+        To receive push notifications and enjoy a better experience, install the {{ props.siteTitle }} web app on your
+        device.
+    </p>
+
+    <a v-if="pwaPromptType.url" class="button" :href="pwaPromptType.url">Install</a>
+    <a v-else-if="pwaPromptType.id !== null" data-pwa-action="installPWA" class="button" href="#">Install</a>
 
     <div data-reveal class="reveal-modal">
         <h1>Add the {{ props.siteTitle }} web app to your home screen</h1>
