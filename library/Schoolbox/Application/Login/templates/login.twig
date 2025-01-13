@@ -150,7 +150,7 @@
                 </div>
                 {# Only show default login fields if Site settings allow it #}
                 <div class="small-12 column" {% if not config.show_default_login %}style="display:none"{% endif %} data-default-login>
-                    <input type="text" name="username" id="username" data-test="login-username" placeholder="Username" />
+                    <input type="text" name="username" id="username" data-test="login-username" placeholder="Username" maxlength="225" />
                     <input type="password" name="password" id="password" data-test="login-password" placeholder="Password" />
                 </div>
             </div>
