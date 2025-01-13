@@ -616,6 +616,17 @@ class Controller extends BaseController
             $buttons = [];
         }
 
+        /* Decide whether View Photos (Geosnapshots) is available for this student
+         * If you're allowed to make this request...
+         */
+        $isGeosnapshotAvailable = (new ValidPhotosAvailable())
+            ->isSatisifiedBy(
+                $this->getConfigLoader()->get('geosnapshot_api_key'),
+                $this->getConfigLoader()->get('geosnapshot_enabled'),
+                $this->getUser(),
+                $staff
+            );
+
         $this->response = $this->responseFromTemplate(
             'user/staff.twig',
             [
@@ -632,6 +643,9 @@ class Controller extends BaseController
                  * custom buttons, as far as the end user is concerned
                  */
                 'buttons'  => $buttons,
+                /* Decides if the Geosnapshot button could be accessed
+                 */
+                'isGeosnapshotAvailable' => $isGeosnapshotAvailable,
 
                 /* Old implementation
                  */
