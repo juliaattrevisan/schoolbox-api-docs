@@ -71,9 +71,11 @@ class Download implements IStrategy
             } catch (GuzzleException $e) {
                 if ($e->getCode() === 404) {
                     // this shouldn't happen, the user existed in the BatchXML but they don't in the RestAPI... weird...
-                    $this->log->warning(sprintf("Profile picture: no user found for '%s' %s.",$externalId, $data['person']['type']));
+                    $this->log->warning(sprintf("Profile picture: no user found for '%s' %s.", $externalId, $data['person']['type']));
                     continue;
                 }
+                // don't know what this was, let it bubble
+                throw $e;
             }
             if (null === $data['person']['portrait'] || $sisPhotoId !== $data['person']['sisPhotoId']) {
                 $this->log->info('Downloading profile photo for ' . $externalId);
