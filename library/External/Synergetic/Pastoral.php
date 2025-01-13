@@ -1189,7 +1189,6 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
         $pastoral = $this->pastoralMapper->findById($upload->getPastoral()->getId());
         $storage = $upload->getStorage();
 
-
         $pastoralAttachment = $this->pastoralAttachmentMapper->findById($upload->getPastoralAttachmentId());
         $documentClassification = (
             $pastoralAttachment->getPrivate()
@@ -1201,7 +1200,7 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
             try {
                 // Replace unhydrated object with hydrated object.
                 $documentClassification = $this->pastoralDocumentClassificationMapper->findById(
-                    $pastoral->getType()->getDocumentClassification()->getId()
+                    $documentClassification->getId()
                 );
             } catch (BaseMapper\Exception $e) {
                 // noop: leave document classification as null
