@@ -13,6 +13,7 @@ use Alaress\Database\Connector\IConnector;
 use OutOfBoundsException;
 use InvalidArgumentException;
 use Exception;
+use Alaress\Database\Exception as AlaressDatabaseException;
 
 /**
  * Handler for the various actions the Paperly agent may perform.
@@ -139,8 +140,16 @@ class Handler
             $params       = array_merge($params, $codes);
         }
 
-        $stmt = $this->externalDb->executeQuery($sql, $params);
-        foreach ($stmt as $row) {
+        $statement = $this->externalDb->prepareQuery($sql, $params);
+        $stmt = $statement->execute();
+
+        if ($stmt === false) {
+            throw new AlaressDatabaseException(
+                print_r($this->externalDb->errorInfo(), true)
+            );
+        }
+
+        while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
             $yearLevelArr[] = [
                 "Code"        => $row["Code"],
                 "Description" => $row["Description"],
@@ -241,7 +250,6 @@ class Handler
      */
     public function handleAllStaffsRequest(array $data): array
     {
-        $stfArr = [];
         $params = [];
         $selectedView = $this->viewSelector->getView(ViewSelector::PAPERLY_VIEW_ALL_STAFF);
         $sql = "SELECT
@@ -249,8 +257,9 @@ class Handler
                     StaffPreferred,
                     StaffSurname,
                     StaffEmail,
-                    NormalYearLevel,
-                    NormalYearLevel2
+                    ClassCode,
+                    ClassDescription,
+                    YearLevelCode
                 FROM (
                     SELECT
                         StaffID,
@@ -258,8 +267,8 @@ class Handler
                         StaffSurname,
                         StaffEmail,
                         ClassCode,
-                        NormalYearLevel,
-                        NormalYearLevel2
+                        ClassDescription,
+                        YearLevelCode
                     FROM {$selectedView} WHERE 1=1
                 ";
 
@@ -278,9 +287,9 @@ class Handler
         if (isset($data['year_level'])) {
             $yls = is_array($data['year_level']) ? $data['year_level'] : explode(',', $data['year_level']);
             $placeholders = implode(',', array_fill(0, count($yls), '?'));
-            $params = array_merge($params, $yls, $yls);
+            $params = array_merge($params, $yls);
 
-            $sql .= " AND NormalYearLevel IN ($placeholders) OR NormalYearLevel2 IN ($placeholders)";
+            $sql .= " AND YearLevelCode IN ($placeholders)";
         }
 
         if (isset($data['class_code'])) {
@@ -291,7 +300,7 @@ class Handler
         }
 
         $sql .= " ) filtered_results
-                GROUP BY StaffID, StaffPreferred, StaffSurname, StaffEmail, NormalYearLevel, NormalYearLevel2
+                GROUP BY StaffID, StaffPreferred, StaffSurname, StaffEmail, ClassCode, ClassDescription, YearLevelCode
                 ORDER BY StaffSurname";
 
         $stmt = $this->externalDb->executeQuery($sql, $params);
@@ -305,8 +314,20 @@ class Handler
                     "Preferred"        => $row["StaffPreferred"] ?? null,
                     "Surname"          => $row["StaffSurname"] ?? null,
                     "Email"            => $row["StaffEmail"] ?? null,
-                    "NormalYearLevel"  => $row["NormalYearLevel"] ?? null,
-                    "NormalYearLevel2" => $row["NormalYearLevel2"] ?? null,
+                    "Classes" => [
+                        [
+                            "ClassCode" => $row["ClassCode"],
+                            "ClassDescription" => $row["ClassDescription"],
+                            "YearLevelCode" => $row["YearLevelCode"],
+
+                        ]
+                    ]
+                ];
+            } else {
+                $staffs[$staffId]["Classes"][] = [
+                    "ClassCode" => $row["ClassCode"],
+                    "ClassDescription" => $row["ClassDescription"],
+                    "YearLevelCode" => $row["YearLevelCode"],
                 ];
             }
         }
@@ -1978,7 +1999,7 @@ class Handler
 
             $stmt = $this->externalDb->prepareQuery($sql, $params)->execute();
             if ($stmt === false) {
-                throw new Exception(
+                throw new AlaressDatabaseException(
                     print_r($this->externalDb->errorInfo(), true)
                 );
             }
@@ -2008,7 +2029,7 @@ class Handler
 
             $stmt = $this->externalDb->prepareQuery($primaryCommunitySQL, $params)->execute();
             if ($stmt === false) {
-                throw new Exception(
+                throw new AlaressDatabaseException(
                     print_r($this->externalDb->errorInfo(), true)
                 );
             }
@@ -2241,7 +2262,7 @@ class Handler
             $updateSQL = "UPDATE Community SET $updateFields WHERE ID = ?";
             $stmt = $this->externalDb->prepareQuery($updateSQL, $params)->execute();
             if ($stmt === false) {
-                throw new Exception(
+                throw new AlaressDatabaseException(
                     print_r($this->externalDb->errorInfo(), true)
                 );
             }
@@ -2267,7 +2288,7 @@ class Handler
             $updateSQL = "UPDATE Students SET $updateFields WHERE ID = ?";
             $stmt = $this->externalDb->prepareQuery($updateSQL, $params)->execute();
             if ($stmt === false) {
-                throw new Exception(
+                throw new AlaressDatabaseException(
                     print_r($this->externalDb->errorInfo(), true)
                 );
             }
@@ -2296,7 +2317,7 @@ class Handler
             $updateSQL = "UPDATE CommunityLegal SET $updateFields, ModifiedBy = ?, ModifiedDate = ? WHERE ID = ?";
             $stmt = $this->externalDb->prepareQuery($updateSQL, $params)->execute();
             if ($stmt === false) {
-                throw new Exception(
+                throw new AlaressDatabaseException(
                     print_r($this->externalDb->errorInfo(), true)
                 );
             }
@@ -2320,7 +2341,7 @@ class Handler
                 $statement = $this->externalDb->prepareQuery($checkSQL, [$studentID, $apiSeqId]);
                 $stmt = $statement->execute();
                 if ($stmt === false) {
-                    throw new Exception(
+                    throw new AlaressDatabaseException(
                         print_r($this->externalDb->errorInfo(), true)
                     );
                 }
@@ -2333,7 +2354,7 @@ class Handler
                         WHERE MedicalConditionSeq = ?";
                     $stmt = $this->externalDb->prepareQuery($deleteSQL, [$apiSeqId])->execute();
                     if ($stmt === false) {
-                        throw new Exception(
+                        throw new AlaressDatabaseException(
                             print_r($this->externalDb->errorInfo(), true)
                         );
                     }
@@ -2379,7 +2400,7 @@ class Handler
                 $params = [$studentID, $code, $details, $severity, $modifiedBy];
                 $stmt = $this->externalDb->prepareQuery($insertSQL, $params)->execute();
                 if ($stmt === false) {
-                    throw new Exception(
+                    throw new AlaressDatabaseException(
                         print_r($this->externalDb->errorInfo(), true)
                     );
                 }
@@ -2415,7 +2436,7 @@ class Handler
                 $statement = $this->externalDb->prepareQuery($checkSQL, [$studentID, $consentSeq]);
                 $stmt = $statement->execute();
                 if ($stmt === false) {
-                    throw new Exception(
+                    throw new AlaressDatabaseException(
                         print_r($this->externalDb->errorInfo(), true)
                     );
                 }
@@ -2431,7 +2452,7 @@ class Handler
                     $params = [$consentGivenBy, $modifiedBy, $consentSeq];
                     $stmt = $this->externalDb->prepareQuery($deleteSQL, $params)->execute();
                     if ($stmt === false) {
-                        throw new Exception(
+                        throw new AlaressDatabaseException(
                             print_r($this->externalDb->errorInfo(), true)
                         );
                     }
@@ -2469,7 +2490,7 @@ class Handler
                 $statement = $this->externalDb->prepareQuery($checkSQL, [$consentCode, $studentID]);
                 $stmt = $statement->execute();
                 if ($stmt === false) {
-                    throw new Exception(
+                    throw new AlaressDatabaseException(
                         print_r($this->externalDb->errorInfo(), true)
                     );
                 }
@@ -2491,7 +2512,7 @@ class Handler
                             $params = [$consentGivenBy, $modifiedBy, $row["ConsentSeq"]];
                             $stmt = $this->externalDb->prepareQuery($updateSQL, $params)->execute();
                             if ($stmt === false) {
-                                throw new Exception(
+                                throw new AlaressDatabaseException(
                                     print_r($this->externalDb->errorInfo(), true)
                                 );
                             }
@@ -2514,7 +2535,7 @@ class Handler
                     $params = [$studentID, $consentCode, $consentGivenBy, $modifiedBy];
                     $stmt = $this->externalDb->prepareQuery($insertSQL, $params)->execute();
                     if ($stmt === false) {
-                        throw new Exception(
+                        throw new AlaressDatabaseException(
                             print_r($this->externalDb->errorInfo(), true)
                         );
                     }
