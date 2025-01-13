@@ -187,7 +187,6 @@ class Exporter extends CliTool\App
 
                 // Note that both public and private attachments get synced.
                 // Private attachments get different permissions in the external system (Synergetic only)
-                // TODO: Confirm external systems other than Synergetic will not get private attachments.
                 // due to lu_pastoral_type.pastoral_document_classification_confidential_id.
                 $attachments = $pastoralAttachmentMapper->findByColumnList(['pastoral_id' => $pastoralRecord->getId()]);
                 if (count($attachments)) {
