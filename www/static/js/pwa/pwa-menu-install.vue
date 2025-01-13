@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { getUserPlatform, isPWA } from "@js/util/browserUtils";
 import PwaMenuShareIcon from "./pwa-menu-share-icon.vue";
+import { usePwaStore } from "./store/pwaStore";
 
 interface Props {
     // if this component is located in the sidebar or the notifications setting page
@@ -15,22 +16,40 @@ interface Props {
 }
 
 const props = defineProps<Props>();
+const pwaStore = usePwaStore();
 
 // The type of installation prompt to show
 const pwaPromptType = window.Vue.computed(() => {
     // - If on iOS and the digistorm app exists
     if (props.installApple && getUserPlatform() === "iOS") {
-        return { id: "iOS", url: props.installApple };
+        return { id: "iOS-digistorm", url: props.installApple };
     }
 
     // - If on Android and the digistorm app exists
     if (props.installGoogle && getUserPlatform() === "Android") {
-        return { id: "Android", url: props.installGoogle };
+        return { id: "Android-digistorm", url: props.installGoogle };
     }
 
     // - If PWA is enabled, we are outside of it, and the above are not true
     if (props.pwaEnabled && !isPWA()) {
-        return { id: "Browser", url: null };
+        /**
+         * We can't use beforeinstallprompt on iOS, so we'll show our own prompt and
+         * guide the user with instructions on how to add to home screen instead...
+         */
+        if (getUserPlatform() === "iOS") {
+            return { id: "iOS", url: null };
+        }
+
+        /**
+         * Otherwise, rely on beforeinstallprompt to detect browser compatibility before showing the install button
+         * This event is not widely supported, so we either need to provide a manual guide (e.g. iOS, see above)
+         * or wait for the event to tell us that the browser is capable of installing the PWA.
+         *
+         * If we don't do this, the install button will end up showing on browsers that don't support it, and do nothing upon click...
+         */
+        if (pwaStore.deferredPrompt !== null) {
+            return { id: "Browser", url: null };
+        }
     }
 
     return { id: null, url: null };
@@ -54,7 +73,7 @@ defineExpose({ hasVisibleContent });
     <a v-if="pwaPromptType.url" class="button" :href="pwaPromptType.url">Install</a>
     <a v-else-if="pwaPromptType.id !== null" data-pwa-action="installPWA" class="button" href="#">Install</a>
 
-    <div data-reveal class="reveal-modal">
+    <div v-if="pwaPromptType.id === 'iOS'" data-reveal class="reveal-modal">
         <h1>Add the {{ props.siteTitle }} web app to your home screen</h1>
         <a class="close-reveal-modal" aria-label="Close">&#215;</a>
         <p>
