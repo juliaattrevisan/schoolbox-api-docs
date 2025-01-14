@@ -1,16 +1,19 @@
 <script setup lang="ts">
+import { usePwaConfigStore } from "./store/pwaConfigStore";
+
 interface Props {
     // whether the panel has any visible content to show in it
     hasVisibleContent: boolean;
 }
 
 const props = defineProps<Props>();
+const pwaConfigStore = usePwaConfigStore();
 
 /**
  * When the user clicks "Later" on the sidebar prompt, store it in the pwaConfig
  */
 function onDismissPrompt(): void {
-    window.sbProps.pwaConfig.user.hasClickedInstallLater = true;
+    pwaConfigStore.user.hasClickedInstallLater = true;
 }
 
 /**
@@ -18,7 +21,7 @@ function onDismissPrompt(): void {
  * and the user has not dismissed it before
  */
 const showPanel = window.Vue.computed(() => {
-    if (window.sbProps.pwaConfig.user.hasClickedInstallLater === true) {
+    if (pwaConfigStore.user.hasClickedInstallLater === true) {
         return false;
     }
     return props.hasVisibleContent;

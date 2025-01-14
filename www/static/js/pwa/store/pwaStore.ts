@@ -1,13 +1,15 @@
 /**
  * Handles the state of the PWA and notifications across all pwa components on the page
  */
-
+import { defineStore } from "pinia";
 import { denyNotif, requestNotif } from "@js/firebase/firebaseInit";
 import { getUserPlatform, supportsNotifications } from "@js/util/browserUtils";
 import type { BeforeInstallPromptEvent } from "@js/util/browserUtils";
-import { defineStore } from "pinia";
+import { usePwaConfigStore } from "./pwaConfigStore";
 
 export const usePwaStore = defineStore(`pwa`, () => {
+    const pwaConfigStore = usePwaConfigStore();
+
     // #region PWA APP
 
     // Whether the iOS pwa modal is open or not
@@ -71,7 +73,7 @@ export const usePwaStore = defineStore(`pwa`, () => {
     if (
         getUserPlatform() === "iOS" &&
         currentNotifPermission.value === "default" &&
-        ![null, "removing"].includes(window.sbProps.pwaConfig.user.notificationState)
+        ![null, "removing"].includes(pwaConfigStore.user.notificationState)
     ) {
         // Treat "default" as "granted" on iOS if the user has allowed notifications in the past
         currentNotifPermission.value = "granted";
@@ -90,7 +92,7 @@ export const usePwaStore = defineStore(`pwa`, () => {
      * We keep the old notificationToken in the config so if the user logs in again, we can clean up the old token in
      * the schoolbox mobile app registration database. See firebaseInit for more details about this scenario.
      */
-    Object.entries(window.sbProps.pwaConfig.config.users).forEach(([userId, pwaUserConfig]) => {
+    Object.entries(pwaConfigStore.config.users).forEach(([userId, pwaUserConfig]) => {
         if (userId.toString() !== window.schoolboxUser.id.toString()) {
             pwaUserConfig.notificationState = null;
         }
@@ -101,16 +103,16 @@ export const usePwaStore = defineStore(`pwa`, () => {
          * If this device is now allowing notifications but we haven't registered it yet,
          * then attempt to register the device now...
          */
-        if (window.sbProps.pwaConfig.user.notificationState !== "registered") {
-            window.sbProps.pwaConfig.user.notificationState = "registering";
+        if (pwaConfigStore.user.notificationState !== "registered") {
+            pwaConfigStore.user.notificationState = "registering";
         }
     } else if (initialNotifPermission === "denied") {
         /**
          * As the user has now blocked notifications,
          * set the notification state to removing so firebase can clean up on page load
          */
-        if (window.sbProps.pwaConfig.user.notificationState !== null) {
-            window.sbProps.pwaConfig.user.notificationState = "removing";
+        if (pwaConfigStore.user.notificationState !== null) {
+            pwaConfigStore.user.notificationState = "removing";
         }
     }
 
@@ -130,7 +132,7 @@ export const usePwaStore = defineStore(`pwa`, () => {
          */
         if (
             currentNotifPermission.value !== "granted" ||
-            window.sbProps.pwaConfig.user.notificationState === "removing" // or if we are in the process of removing already
+            pwaConfigStore.user.notificationState === "removing" // or if we are in the process of removing already
         ) {
             // Tell firebase and schoolbox that the user denied notifications
             denyNotif();
@@ -138,7 +140,7 @@ export const usePwaStore = defineStore(`pwa`, () => {
         }
 
         // If the user has granted permission, attempt to register the device
-        window.sbProps.pwaConfig.user.notificationState = "registering";
+        pwaConfigStore.user.notificationState = "registering";
 
         // Attempt to register the device for notifications
         // note this may take some time, so we don't await it
@@ -163,7 +165,7 @@ export const usePwaStore = defineStore(`pwa`, () => {
             currentNotifPermission.value = "denied";
         }
 
-        window.sbProps.pwaConfig.user.notificationState = null; // Reset the state since it was a user action
+        pwaConfigStore.user.notificationState = null; // Reset the state since it was a user action
         handleNotifPermissionChange();
 
         /**
@@ -198,12 +200,12 @@ export const usePwaStore = defineStore(`pwa`, () => {
      */
     function handleInitialNotificationState(): void {
         // If we were registering notifications, try again
-        if (window.sbProps.pwaConfig.user.notificationState === "registering") {
+        if (pwaConfigStore.user.notificationState === "registering") {
             handleNotifPermissionChange();
         }
 
         // If we were removing notifications, try again
-        if (window.sbProps.pwaConfig.user.notificationState === "removing") {
+        if (pwaConfigStore.user.notificationState === "removing") {
             handleNotifPermissionChange();
         }
     }
