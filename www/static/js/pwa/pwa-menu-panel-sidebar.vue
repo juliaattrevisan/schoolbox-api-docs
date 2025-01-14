@@ -29,16 +29,9 @@ const showPanel = window.Vue.computed(() => {
 </script>
 
 <template>
-    <li v-show="showPanel" data-pwa="sidebarPrompt" class="content pwa-side-panel">
+    <li v-show="showPanel" class="content pwa-side-panel">
         <slot></slot>
-        <a
-            data-pwa="sidebarPromptDelay"
-            class="button load-more expand install-delay-prompt"
-            href="#"
-            @click.prevent="onDismissPrompt"
-        >
-            Later
-        </a>
+        <a class="button load-more expand install-delay-prompt" href="#" @click.prevent="onDismissPrompt"> Later </a>
     </li>
 </template>
 
