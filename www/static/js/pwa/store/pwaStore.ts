@@ -2,7 +2,7 @@
  * Handles the state of the PWA and notifications across all pwa components on the page
  */
 
-import { denyNotif, requestNotif } from "@js/firebase/firebase-init";
+import { denyNotif, requestNotif } from "@js/firebase/firebaseInit";
 import { getUserPlatform, supportsNotifications } from "@js/util/browserUtils";
 import type { BeforeInstallPromptEvent } from "@js/util/browserUtils";
 import { defineStore } from "pinia";
@@ -88,7 +88,7 @@ export const usePwaStore = defineStore(`pwa`, () => {
      * NOTE: We should NOT run denyNotif() in this case, as it will de-register the current user too!
      *
      * We keep the old notificationToken in the config so if the user logs in again, we can clean up the old token in
-     * the schoolbox mobile app registration database. See firebase-init for more details about this scenario.
+     * the schoolbox mobile app registration database. See firebaseInit for more details about this scenario.
      */
     Object.entries(window.sbProps.pwaConfig.config.users).forEach(([userId, pwaUserConfig]) => {
         if (userId.toString() !== window.schoolboxUser.id.toString()) {
