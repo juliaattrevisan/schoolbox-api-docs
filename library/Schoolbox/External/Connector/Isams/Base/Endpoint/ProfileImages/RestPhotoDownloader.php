@@ -9,7 +9,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\External\Connector\Isams\Base\Endpoint\ProfileImages;
 
-use Schoolbox\External\Connector\Isams\Base\Endpoint\Api\Rest\RestApi;
+use Schoolbox\External\Connector\Isams\Base\Endpoint\Api\Rest\Api;
 use Schoolbox\External\Connector\Isams\Base\Endpoint\Codec\DSN;
 use Schoolbox\Role;
 use SensitiveParameter;
@@ -24,7 +24,7 @@ use SensitiveParameter;
 class RestPhotoDownloader implements IPhotoDownloader
 {
     private array $photoCache = [];
-    private RestApi $api;
+    private Api $api;
 
     /**
      * Constructor.
@@ -37,7 +37,7 @@ class RestPhotoDownloader implements IPhotoDownloader
         /* Store this locally just once
          */
         $credentials = (new DSN())->decode($dsn);
-        $this->api = new RestApi(trim($credentials['modules'][DSN::MODULE_RESTAPIHOST]['key']), trim($credentials['modules'][DSN::MODULE_RESTAPICLIENTID]['key']), trim($credentials['modules'][DSN::MODULE_RESTAPICLIENTSECRET]['key']));
+        $this->api = new Api(trim($credentials['modules'][DSN::MODULE_RESTAPIHOST]['key']), trim($credentials['modules'][DSN::MODULE_RESTAPICLIENTID]['key']), trim($credentials['modules'][DSN::MODULE_RESTAPICLIENTSECRET]['key']));
     }
 
     /**
