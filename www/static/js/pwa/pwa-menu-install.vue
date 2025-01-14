@@ -55,6 +55,20 @@ const pwaPromptType = window.Vue.computed(() => {
 });
 
 /**
+ * When the user clicks "Install" on the PWA prompt
+ */
+async function onInstallPwa(): Promise<void> {
+    // If showing the iOS prompt, show the modal
+    if (pwaPromptType.value.id === "iOS") {
+        // TODO
+        return;
+    }
+
+    // Otherwise, trigger the browser install
+    await pwaStore.onInstallPwa();
+}
+
+/**
  * To tell the parent whether we are showing any content or not
  */
 const hasVisibleContent = window.Vue.computed(() => {
@@ -64,13 +78,13 @@ const hasVisibleContent = window.Vue.computed(() => {
 defineExpose({ hasVisibleContent });
 </script>
 <template>
-    <p>
+    <p v-if="pwaPromptType.id !== null">
         To receive push notifications and enjoy a better experience, install the {{ sbProps.siteTitle }} web app on your
         device.
     </p>
 
     <a v-if="pwaPromptType.url" class="button" :href="pwaPromptType.url">Install</a>
-    <a v-else-if="pwaPromptType.id !== null" data-pwa-action="installPWA" class="button" href="#">Install</a>
+    <a v-else-if="pwaPromptType.id !== null" class="button" href="#" @click="onInstallPwa">Install</a>
 
     <div v-if="pwaPromptType.id === 'iOS'" data-reveal class="reveal-modal">
         <h1>Add the {{ sbProps.siteTitle }} web app to your home screen</h1>

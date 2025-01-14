@@ -30,6 +30,22 @@ export const usePwaStore = defineStore(`pwa`, () => {
         deferredPrompt.value = null;
     });
 
+    /**
+     * When the user clicks "Install" on the PWA prompt, trigger the deferred prompt
+     */
+    async function onInstallPwa(): Promise<void> {
+        if (deferredPrompt.value === null) {
+            console.warn("Tried to install PWA but no deferred prompt was available");
+            return;
+        }
+
+        // Show the install prompt
+        await deferredPrompt.value.prompt();
+
+        // We can only call prompt() once, so clear the deferred prompt
+        deferredPrompt.value = null;
+    }
+
     // #endregion
 
     // #region NOTIFICATIONS
@@ -191,6 +207,7 @@ export const usePwaStore = defineStore(`pwa`, () => {
 
     return {
         deferredPrompt,
+        onInstallPwa,
         currentNotifPermission,
         initialNotifPermission,
         onEnableNotifications,
