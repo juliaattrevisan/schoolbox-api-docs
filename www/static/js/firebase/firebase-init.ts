@@ -202,6 +202,7 @@ function denyNotif(): void {
                 })
                 .catch((error) => {
                     console.error(`Error on getting token: ${error}`);
+                    window.sbProps.pwaConfig.user.notificationState = null; // Avoid repetatively requesting notifications from the user
                 });
         }
     });
