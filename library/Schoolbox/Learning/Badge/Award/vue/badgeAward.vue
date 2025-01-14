@@ -6,30 +6,14 @@ import SearchSelect from "@schoolboxVue/components/searchSelect/search-select.vu
 import axios from "axios";
 import BadgeImage from "../../vue/badge-image";
 import Toast from "@schoolboxVue/components/toast";
-
-// Vue-select boilerplate
-// TODO consider wrapping in our own component
-import vSelect from "vue-select";
-import debounce from "lodash/debounce";
-import "vue-select/dist/vue-select.css";
 import cdnPrefixMixin from "@schoolboxVue/components/cdn-prefix-mixin";
 import { generateAwardWithEvidenceUrl } from "../js/awardBadgeUtils";
-
-// Render a custom template for the deselect icon.
-// Partially documented on https://github.com/sagalbot/vue-select/issues/994
-import Deselect from "@schoolboxVue/components/selectize/Deselect";
-vSelect.props.components.default = () => ({ Deselect });
-
 import { calculateExpiryDate } from "../../vue/expiry-helper";
 
 const EVENTS = {
     done: "done",
     cancel: "cancel",
 };
-
-// The number of milliseconds to wait between the user's input and a search for
-// users.
-const SEARCH_RESULT_RETRIEVE_DELAY = 350;
 
 // There's no official method for documenting a component's events,
 // https://forum.vuejs.org/t/how-to-document-events-for-components/35541/3
@@ -52,7 +36,6 @@ export default {
     components: {
         BadgeImage,
         Toast,
-        vSelect,
         SearchSelect,
     },
     /**
@@ -90,15 +73,6 @@ export default {
         },
 
         /**
-         * The query string parameter to submit the user search parameter
-         * within, when performing a user search.
-         */
-        userSearchQueryParam: {
-            type: String,
-            default: "query",
-        },
-
-        /**
          * Any additional query string parameters to submit to the user search
          * endpoint.
          *
@@ -109,15 +83,6 @@ export default {
             default: () => {
                 return { roleTypeID: "student" };
             },
-        },
-
-        /**
-         * Placeholder text to display in the form's v-select input, before any
-         * users are selected.
-         */
-        placeholder: {
-            type: String,
-            default: "Search for users to award achievement to",
         },
 
         /**
@@ -205,46 +170,17 @@ export default {
             const userIdList = this.selected.map((user) => user.id);
             return userIdList.join(",");
         },
-
-        /**
-         * return a list of options that are not already selected
-         * @returns {Array} - the list of options that are not already selected
-         */
-        filteredOptions() {
-            return this.options.filter((option) => {
-                return !this.selected.some((selected) => selected.id === option.id);
-            });
-        },
     },
     methods: {
         /**
-         * Search callback for the selectize.
-         *
-         * This method is debounced so that the search doesn't trigger until
-         * the user has stopped typing for `SEARCH_RESULT_RETRIEVE_DELAY`
-         * milliseconds.
-         *
-         * @param {String}   query   The search string
-         * @param {Function} loading A function to call when the loading state
-         *                           changes (accepts a Boolean)
+         * Get the endpoint for the user search
+         * @returns {String}- The endpoint for the user search
          */
         getEndpoint() {
             const searchUrl = new URL(this.userSearchEndpoint, window.location.href).toString();
             const searchParams = new URLSearchParams(this.userSearchAdditionalParams).toString();
             return `${searchUrl}?${searchParams}&`;
         },
-        onSearch: debounce(function (query, loading) {
-            if (query.length < 3) {
-                return;
-            }
-            loading(true);
-            let params = this.userSearchAdditionalParams;
-            params[this.userSearchQueryParam] = query;
-            axios
-                .get(this.userSearchEndpoint, { params: params })
-                .then((response) => (this.options = response.data))
-                .finally(() => loading(false));
-        }, SEARCH_RESULT_RETRIEVE_DELAY),
 
         /**
          * Callback for when the badge award form is submitted.
@@ -331,41 +267,17 @@ export default {
         @binding {Date|null} expiryDate An actual expiry date object
         -->
         <slot name="expiryMessage" :expiryDate="expiryDate"></slot>
-        <v-select
-            class="schoolbox-vue-selectize"
-            :options="filteredOptions"
-            :clear-search-on-blur="
-                function () {
-                    return true;
-                }
-            "
-            :clear-search-on-select="true"
-            :close-on-select="false"
-            multiple
-            @search="onSearch"
-            label="name"
-            :placeholder="placeholder"
-            v-model="selected"
-        >
-            <template #option="option">
-                <span class="d-center">
-                    {{ option.name }}
-                </span>
-            </template>
-            <template #selected-option="option">
-                <span class="selected d-center">
-                    {{ option.name }}
-                </span>
-            </template>
-        </v-select>
         <search-select
             v-model:selected="selected"
-            :results="filteredOptions"
-            label="Search for users to award achievement to"
+            label="Search"
             label-id="users"
             :endpoint="getEndpoint()"
-            placeholder="Search for users..."
-        />
+            placeholder=""
+        >
+            <template #meta>
+                <div class="meta">Search for users to award achievement to</div>
+            </template>
+        </search-select>
         <div class="component-action">
             <section>
                 <a
