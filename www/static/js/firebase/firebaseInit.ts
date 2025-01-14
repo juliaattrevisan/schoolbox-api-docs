@@ -1,5 +1,6 @@
 import { initializeApp } from "@firebase/app";
 import { getMessaging, getToken, deleteToken, onMessage } from "@firebase/messaging";
+import { supportsNotifications } from "@js/util/browserUtils";
 
 // See /library/Alaress/Async/Notification/Cloud/Firebase/Service.php::propagate
 interface SbxFirebaseNotificationPayload {
@@ -27,50 +28,61 @@ interface SbxNotificationOptions extends NotificationOptions {
     renotify?: boolean;
 }
 
-window.sbProps.firebaseApps.forEach((app) => {
-    if (app.publicConfiguration && app.webPushPublicKey && app.appIdentifier) {
+/**
+ * Initialise firebase apps/messaging for each app in window.sbProps.firebaseApps
+ * This should only be called once per page load.
+ */
+export function initFirebaseApps(): void {
+    // If the browser doesn't support notifications, nothing to do
+    if (!supportsNotifications()) {
+        return;
+    }
+
+    window.sbProps.firebaseApps.forEach((app) => {
+        const validApp = app.publicConfiguration && app.webPushPublicKey && app.appIdentifier;
+        if (!validApp) {
+            return; // Skip this app if it doesn't have the required configuration.
+        }
+
         const firebaseApp = initializeApp(app.publicConfiguration);
 
-        // Check if the browser supports notifications
-        if ("Notification" in window) {
-            // Retrieve the current Firebase Messaging instance.
-            const messaging = getMessaging(firebaseApp);
+        // Retrieve the current Firebase Messaging instance.
+        const messaging = getMessaging(firebaseApp);
 
-            // Receipt of a message
-            onMessage(messaging, (payload) => {
-                const notificationPayload = (payload as unknown as SbxFirebaseNotificationPayload).notification; // We don't use firebase's standard payload format
-                if (notificationPayload === undefined) {
-                    return; // No notification to display
-                }
+        // Receipt of a message
+        onMessage(messaging, (payload) => {
+            const notificationPayload = (payload as unknown as SbxFirebaseNotificationPayload).notification; // We don't use firebase's standard payload format
+            if (notificationPayload === undefined) {
+                return; // No notification to display
+            }
 
-                const notificationOptions: SbxNotificationOptions = {
-                    body: notificationPayload.body,
-                    icon: "/images/logo.php?logo=skin_logo_square&size=apple72",
-                    image: notificationPayload.icon ?? "/images/logo.php?logo=skin_logo_square&size=apple72",
-                    badge: "/images/logo.php?logo=skin_logo_square&size=apple72",
-                    renotify: false,
-                };
+            const notificationOptions: SbxNotificationOptions = {
+                body: notificationPayload.body,
+                icon: "/images/logo.php?logo=skin_logo_square&size=apple72",
+                image: notificationPayload.icon ?? "/images/logo.php?logo=skin_logo_square&size=apple72",
+                badge: "/images/logo.php?logo=skin_logo_square&size=apple72",
+                renotify: false,
+            };
 
-                if (notificationPayload.timestamp !== 0) {
-                    notificationOptions.timestamp = notificationPayload.timestamp;
-                }
+            if (notificationPayload.timestamp !== 0) {
+                notificationOptions.timestamp = notificationPayload.timestamp;
+            }
 
-                // TODO: Fall back to site name instead of "Notification" if no title is provided
-                const notificationTitle: string = notificationPayload.title ?? "Notification";
+            // TODO: Fall back to site name instead of "Notification" if no title is provided
+            const notificationTitle: string = notificationPayload.title ?? "Notification";
 
-                const notif = new Notification(notificationTitle, notificationOptions);
-                notif.onclick = (event): void => {
-                    event.preventDefault(); // prevent the browser from focusing the Notification's tab
-                    // some notifications have a href, some don't just load the dashboard for those missing hrefs.
-                    const notifHref: string = notificationPayload.href ?? "/";
+            const notif = new Notification(notificationTitle, notificationOptions);
+            notif.onclick = (event): void => {
+                event.preventDefault(); // prevent the browser from focusing the Notification's tab
+                // some notifications have a href, some don't just load the dashboard for those missing hrefs.
+                const notifHref: string = notificationPayload.href ?? "/";
 
-                    // open the notification destination
-                    window.open(notifHref, "_blank");
-                };
-            });
-        }
-    }
-});
+                // open the notification destination
+                window.open(notifHref, "_blank");
+            };
+        });
+    });
+}
 
 /**
  * Respond to a request to allow notifications, send both to firebase, and schoolbox
