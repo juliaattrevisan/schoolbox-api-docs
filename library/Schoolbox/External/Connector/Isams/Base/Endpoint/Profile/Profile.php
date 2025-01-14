@@ -437,7 +437,7 @@ class Profile implements IStrategy
                 'person' => [
                     'type' => Role::STUDENT,
                     'personId' => $personId,
-                    'portrait'  => $studentBaseProfile->getPortrait(),
+                    'portrait'  => $studentBaseProfile->getPortrait()?->getHash(),
                     'sisPhotoId' => (new Reader())->getProfileSisPhotoId($studentBaseProfile->getMetadata()),
                     'externalId' => $externalId,
                     'firstname' => $studentBaseProfile->getFirstname(),
@@ -1080,7 +1080,7 @@ class Profile implements IStrategy
                 'person' => [
                     'type' => Role::STAFF,
                     'personId' => $personId,
-                    'portrait'  => $staffBaseProfile->getPortrait(),
+                    'portrait'  => $staffBaseProfile->getPortrait()?->getHash(),
                     'sisPhotoId' => (new Reader())->getProfileSisPhotoId($staffBaseProfile->getMetadata()),
                     'externalId' => $externalId,
                     'firstname' => $staffBaseProfile->getFirstname(),
