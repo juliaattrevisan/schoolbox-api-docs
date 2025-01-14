@@ -16,9 +16,6 @@
         <div id="profile-editor-container">
             <profile-editor :payload="{{ payload |json_encode }}" />
         </div>
-
-        {# Make all terminology to the frontend l10n, since the fields may arbitrarily refer to it #}
-        <script>window.sbProps.l10n.addTerms({{ locale.allTermsArray |json_encode |raw }})</script>
         <script src="{{ CDN_PREFIX }}/js/bundle/profileEditor.js?v={{ config.site_version }}"></script>
     </div>
 </div>

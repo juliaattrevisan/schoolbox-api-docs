@@ -16,16 +16,12 @@ use Schoolbox\L10n\Mapper as L10nMapper;
 class Controller extends Base
 {
     /**
-     * @var L10nMapper
-     */
-    protected $l10nMapper;
-
-    /**
      * Lets build this thing!
      */
-    public function __construct()
-    {
-        $this->l10nMapper = L10nMapper::getInstance();
+    public function __construct(
+        protected \Schoolbox\Config\ConfigMapper $configMapper,
+        protected L10nMapper $l10nMapper
+    ) {
     }
 
     /**
@@ -61,6 +57,12 @@ class Controller extends Base
                     ->setIndefiniteArticle(trim($post['indefiniteArticle'][$term]));
 
                 $this->l10nMapper->save($localisation);
+
+                // Update the last modified time so the cache can be invalidated
+                // Fetching the model so it can be updated since iConfigLoader is read-only
+                $lastModified = $this->configMapper->findOneByColumn("name", "terminology_last_modified");
+                $lastModified->setValue(time());
+                $this->configMapper->save($lastModified);
             }
         } catch (MapperException $e) {
             // noop, I guess? skip unknown terminologies

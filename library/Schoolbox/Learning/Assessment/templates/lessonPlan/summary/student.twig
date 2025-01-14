@@ -112,9 +112,6 @@
                     :grade-gradient-enable='{{ config.grade_gradient_enable ? 'true' : 'false' }}'
                 />
             </div>
-            <script>
-                window.sbProps.l10n.addTerm({{ locale.lessonPlan.toArray |json_encode |raw }});
-            </script>
             <script src="{{ CDN_PREFIX }}/js/bundle/linkedActivities.js?v={{ config.site_version }}"></script>
         </div>
     {% endif %}
