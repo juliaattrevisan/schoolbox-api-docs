@@ -255,9 +255,6 @@ module.exports = {
         // Birthday pop up
         birthdaySurprise: "./vue/components/birthday/birthdaySurprise.ts",
 
-        // Firebase
-        firebaseMessaging: "./www/static/js/firebase/firebaseMessaging.ts",
-
         //Sass (leave at the bottom)
         core: "./www/static/css/core/core.scss",
         schoolboxCkStyles: "./www/static/css/core/schoolbox-ck-content.scss",
