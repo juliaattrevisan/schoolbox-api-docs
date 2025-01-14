@@ -149,27 +149,6 @@ export const usePwaStore = defineStore(`pwa`, () => {
                 },
             }),
         );
-
-        /**
-         * Show a sample notification, if we have the ability to do so
-         * iOS requires notifications to be dispatched from inside a service worker, so send it there
-         */
-        if ("serviceWorker" in navigator && navigator.serviceWorker.controller) {
-            navigator.serviceWorker.controller.postMessage({
-                type: "SHOW_NOTIFICATION",
-                title: window.sbProps.siteTitle,
-                options: {
-                    body: `Welcome! Your notifications are powered by the ${window.sbProps.siteTitle} web app`,
-                    icon: "/images/logo.php?logo=skin_logo_square&size=apple72",
-                    image: "/images/logo.php?logo=skin_logo_square&size=apple72",
-                    badge: "/images/logo.php?logo=skin_logo_square&size=apple72",
-                    renotify: false,
-                    data: {
-                        href: "/settings/notifications",
-                    },
-                },
-            });
-        }
     }
 
     /**
@@ -186,6 +165,31 @@ export const usePwaStore = defineStore(`pwa`, () => {
 
         window.sbProps.pwaConfig.user.notificationState = null; // Reset the state since it was a user action
         handleNotifPermissionChange();
+
+        /**
+         * Show a sample notification if the user has just enabled notifs via the button and we have the ability to do so.
+         * iOS requires notifications to be dispatched from inside a service worker, so send it there
+         */
+        if (
+            currentNotifPermission.value === "granted" &&
+            "serviceWorker" in navigator &&
+            navigator.serviceWorker.controller
+        ) {
+            navigator.serviceWorker.controller.postMessage({
+                type: "SHOW_NOTIFICATION",
+                title: window.sbProps.siteTitle,
+                options: {
+                    body: `Welcome! Your notifications are powered by the ${window.sbProps.siteTitle} web app`,
+                    icon: "/images/logo.php?logo=skin_logo_square&size=apple72",
+                    image: "/images/logo.php?logo=skin_logo_square&size=apple72",
+                    badge: "/images/logo.php?logo=skin_logo_square&size=apple72",
+                    renotify: false,
+                    data: {
+                        href: "/settings/notifications",
+                    },
+                },
+            });
+        }
     }
 
     /**
