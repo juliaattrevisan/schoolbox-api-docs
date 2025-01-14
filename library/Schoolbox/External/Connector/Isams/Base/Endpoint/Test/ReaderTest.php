@@ -19,7 +19,7 @@ class ReaderTest extends TestCase
         $reader = new Reader();
         $metadata = [
             'profile' => [
-                'sisPhotoId' => '12345'
+                'sisPhotoId' => 12345
             ]
         ];
         $this->assertEquals('12345', $reader->getProfileSisPhotoId($metadata));
@@ -28,7 +28,7 @@ class ReaderTest extends TestCase
     public function testGetProfileSisPhotoIdWithJsonString()
     {
         $reader = new Reader();
-        $metadata = '{"profile":{"sisPhotoId":"12345"}}';
+        $metadata = '{"profile":{"sisPhotoId":12345}}';
         $this->assertEquals('12345', $reader->getProfileSisPhotoId($metadata));
     }
 

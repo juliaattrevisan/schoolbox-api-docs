@@ -27,9 +27,6 @@ class Builder
      */
     public function build(array $profileInstance): array
     {
-        /* Each event contains this additional metadata struct,
-         * for extra info that you might need later
-         */
         return [
             'profile' => [
                 'sisPhotoId' => $profileInstance['profile']['sisPhotoId'] ?? null

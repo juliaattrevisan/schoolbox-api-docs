@@ -15,10 +15,10 @@ class Reader
      * Extract the sisPhotoId from the metadata
      *
      * @param array|string|null $metadata
-     * @return string|null
+     * @return int|null
      * @throws \JsonException
      */
-    public function getProfileSisPhotoId(array|string|null $metadata): ?string
+    public function getProfileSisPhotoId(array|string|null $metadata): ?int
     {
         return $this->deserialize($metadata)['profile']['sisPhotoId'] ?? null;
     }

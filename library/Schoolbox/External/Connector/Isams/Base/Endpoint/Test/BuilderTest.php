@@ -17,14 +17,12 @@ class BuilderTest extends TestCase
     public function testBuildWithValidProfileInstance()
     {
         $builder = new Builder();
-        $profileInstance = [
-            'profile' => [
-                'sisPhotoId' => '12345'
-            ]
-        ];
+        $profileInstance = ['profile' => [
+            'sisPhotoId' => 12345
+        ]];
         $expected = [
             'profile' => [
-                'sisPhotoId' => '12345'
+                'sisPhotoId' => 12345
             ]
         ];
         $this->assertEquals($expected, $builder->build($profileInstance));
