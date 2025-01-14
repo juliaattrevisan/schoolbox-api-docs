@@ -30,6 +30,7 @@ use Alaress_Date_Format;
 use Component\Eportfolio as ComponentEportfolio;
 use Eportfolio;
 use Schoolbox\Learning\Moment\Evidence\Model;
+use SocialStream\PostMapper;
 use UnexpectedValueException;
 use OutOfBoundsException;
 use Psr\Log\LoggerInterface;
@@ -322,6 +323,7 @@ class RecursiveUndeleter
         Forum\PostMapper::class                         => [],
         News\Mapper::class                              => [],
         \Schoolbox\User\Token\Mapper::class => [],
+        PostMapper::class => []
     ];
 
 
