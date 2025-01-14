@@ -163,6 +163,12 @@ export const usePwaStore = defineStore(`pwa`, () => {
         // Use await instead of .then to avoid iOS treating as a non-interaction and failing
         currentNotifPermission.value = await Notification.requestPermission();
 
+        // If we got "default", then treat it as "denied" since the user either blocked or ignored the prompt
+        // sometimes chrome will return "default" if it decides to auto-block the prompt for some reason
+        if (currentNotifPermission.value === "default") {
+            currentNotifPermission.value = "denied";
+        }
+
         window.sbProps.pwaConfig.user.notificationState = null; // Reset the state since it was a user action
         handleNotifPermissionChange();
 
