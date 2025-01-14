@@ -72,3 +72,15 @@ Repeat step 3 to simulate what a crontab might do. The cycle assignation and tim
  If a cycle already exists for the given `PublishedTimetable` identifier (an integer) then that cycle gets reused. Otherwise, it'll truncate `sis_timetable_cycle` and create a new cycle, to prevent the accumulation of empty cycles that have since been obsoleted. If I didn't do that, someone would have to manually assign cycles every time the importer ran (nightly) which is, of course, an absurd requirement. Now you only need to manually assign it if the timetable changes, typically at school rollover times like when a term ends; that's when a new `PublishedTimetable` integer is defined and it's stored in `sis_timetable_cycle.cycle_identifier`.
 
 Cycles are associated with Campuses via `luCampus.ext_timetable_code`. This field is synonymous with `sis_timetable_cycle.cycle_identifier` and both can be used to join data to each other.
+
+## 7. Portraits
+
+We now have 2 methods for importing portraits as of (25.0)
+
+BatchXML (Pre 25.0) this downloads a zip for each role type (staff/student) containing a collection of images each named with the 'personID' of the user.
+We then import that and clean the temp files.
+
+RestApi (25.0) this now hits unique endpoints for staff/student confirms the latest photo ID from the sis
+matches this ID against the metadata field in sis_user_profile. If these differ we download the image, update the profile and cache the latest photo ID
+
+This can be called with its on --strats=photos (if there are any profiles that have been imported) (must include --strats students/staff)
