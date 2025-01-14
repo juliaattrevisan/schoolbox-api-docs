@@ -94,7 +94,7 @@ class Download implements IStrategy
             if (null === $data['person']['portrait'] || $sisPhotoId !== $data['person']['sisPhotoId']) {
                 $this->log->info('Downloading profile photo for ' . $externalId);
                 /** @var UserProfile\Model $baseProfile */
-                $baseProfile = $users->getBy('external_id', $externalId);
+                $baseProfile = $users->getBy('externalId', $externalId);
 
                 // seeing as we are updating the photo, we need to remember this
                 $baseProfile->setMetadata((new Metadata\Builder())->build(['profile' => [
