@@ -135,6 +135,16 @@ export default {
                             }
                         };
                     },
+                    external_id: (ascending) => {
+                        // Sort external_id naturally
+                        return (a, b) => {
+                            if (ascending) {
+                                return this.collator.compare(a.external_id, b.external_id);
+                            } else {
+                                return this.collator.compare(b.external_id, a.external_id);
+                            }
+                        };
+                    },
                 },
                 debounce: 100, //faster debounce as data is stored on the client side,
                 headings: {
