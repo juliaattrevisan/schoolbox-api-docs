@@ -64,7 +64,7 @@ const hasVisibleContent = window.Vue.computed(() => {
 defineExpose({ hasVisibleContent });
 </script>
 <template>
-    <p v-if="pwaPromptType.id !== null">
+    <p>
         To receive push notifications and enjoy a better experience, install the {{ sbProps.siteTitle }} web app on your
         device.
     </p>

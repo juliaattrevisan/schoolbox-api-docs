@@ -1,16 +1,17 @@
 <script setup lang="ts">
+import { sbProps } from "@js/util/sbx/pageUtils";
 import { getUserPlatform, isPWA, supportsNotifications } from "@js/util/browserUtils";
+import { usePwaStore } from "./store/pwaStore";
 
 interface Props {
     // if this component is located in the sidebar or the notifications setting page
     page: "sidebar" | "settings";
-    // site title, to show "[title] web app" in the message
-    siteTitle: string;
     // whether the PWA app can be installed
     pwaEnabled: boolean;
 }
 
 const props = defineProps<Props>();
+const pwaStore = usePwaStore();
 
 enum PromptType {
     IMPERSONATING_USER,
@@ -19,31 +20,6 @@ enum PromptType {
     NOTIF_ENABLED_MESSAGE,
     ENABLE_NOTIF_PROMPT,
 }
-
-// ---------------------- TODO: This stuff should be moved elsewhere, but it's here for now
-
-// The browser's current notification permission status
-const currentPermission = window.Vue.ref<"default" | "granted" | "denied">("default");
-
-/**
- * As Notification.permission cannot be trusted on iOS, we can use the PWA config to determine
- * if we should avoid showing "Enable Notifications" again when the user has already enabled them
- *
- * If the browser is saying notifications are blocked, respect that, even though it may be wrong
- * as we handle this separately by providing a button to re-request permission instead.
- */
-if (
-    getUserPlatform() === "iOS" &&
-    currentPermission.value === "default" &&
-    ![null, "removing"].includes(window.sbProps.pwaConfig.user.notificationState)
-) {
-    // Treat "default" as "granted" on iOS if the user has allowed notifications in the past
-    currentPermission.value = "granted";
-}
-
-// To keep track of the initial permission state when the page was loaded so we can show the correct prompt
-const initialPermission = window.Vue.ref<"default" | "granted" | "denied">(currentPermission.value);
-// ------------------
 
 /**
  * The prompt to show, if any
@@ -76,18 +52,18 @@ const prompt = window.Vue.computed<PromptType | null>(() => {
     }
 
     // If the user has allowed notifications
-    if (currentPermission.value === "granted") {
+    if (pwaStore.currentNotifPermission === "granted") {
         // show the enabled message if:
         // - this is the settings page
         // - or if the user has just enabled notifications this page session
-        if (props.page === "settings" || initialPermission.value !== "granted") {
+        if (props.page === "settings" || pwaStore.initialNotifPermission !== "granted") {
             return PromptType.NOTIF_ENABLED_MESSAGE;
         }
         return null;
     }
 
     // If the user has blocked notifications, show the blocked message
-    if (currentPermission.value === "denied") {
+    if (pwaStore.currentNotifPermission === "denied") {
         return PromptType.NOTIF_BLOCKED;
     }
 
@@ -125,7 +101,7 @@ defineExpose({ hasVisibleContent });
     </div>
 
     <div v-else-if="prompt === PromptType.IOS_HOME_PROMPT" class="alert-box warning">
-        To enable notifications on your iOS device, you must install the {{ props.siteTitle }} web app on your device
+        To enable notifications on your iOS device, you must install the {{ sbProps.siteTitle }} web app on your device
         and add it to your device's home screen.
     </div>
 
@@ -141,7 +117,15 @@ defineExpose({ hasVisibleContent });
 
     <div v-else-if="prompt === PromptType.ENABLE_NOTIF_PROMPT" class="l-flex-col l-gap-s f-no-margins">
         <p>Enable notifications on your device:</p>
-        <a data-pwa-action="enableNotif" class="button" href="#">Enable Notifications</a>
+        <a
+            data-pwa-action="enableNotif"
+            class="button"
+            href="#"
+            :disabled="pwaStore.hasPromptedForNotif || undefined"
+            @click="pwaStore.onEnableNotifications"
+        >
+            Enable Notifications
+        </a>
     </div>
 
     <p v-if="props.page === 'settings'" class="notifNote">
