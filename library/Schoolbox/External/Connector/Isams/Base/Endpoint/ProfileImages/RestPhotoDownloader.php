@@ -48,18 +48,24 @@ class RestPhotoDownloader implements IPhotoDownloader
         switch ($roleType) {
             case Role::STUDENT:
                 if (!isset($this->photoCache[$externalId])) {
+                    // fetch the latest portrait
                     $url = sprintf('Main/api/students/%s/photos/current', $externalId);
                 } else {
+                    // fetch a specific portrait
                     $url = sprintf('Main/api/students/%s/photos/%s', $externalId, $this->photoCache[$externalId]);
                 }
                 return $this->api->request($url, 'GET', raw: true);
+
             case Role::STAFF:
                 if (!isset($this->photoCache[$externalId])) {
+                    // fetch the latest portrait
                     $url = sprintf('Main/api/humanresources/employees/%s/photos/current', $externalId);
                 } else {
+                    // fetch a specific portrait
                     $url = sprintf('Main/api/humanresources/employees/%s/photos/%s', $externalId, $this->photoCache[$externalId]);
                 }
                 return $this->api->request($url, 'GET', raw: true);
+
             default:
                 return null;
         }
@@ -106,6 +112,11 @@ class RestPhotoDownloader implements IPhotoDownloader
             default:
                 return null;
         }
+
+        /**
+         * ignore all user data other than the latestPhotoId
+         * In time we may need / want to use the rest of this payload, but for now we can just leave it.
+         */
         $this->photoCache[$externalId] = $userObj['latestPhotoId'];
         return $userObj['latestPhotoId'];
     }
