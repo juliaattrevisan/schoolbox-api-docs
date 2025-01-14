@@ -256,7 +256,6 @@ module.exports = {
         birthdaySurprise: "./vue/components/birthday/birthdaySurprise.ts",
 
         // Firebase
-        firebaseInit: "./www/static/js/firebase/firebaseInit.ts",
         firebaseMessaging: "./www/static/js/firebase/firebaseMessaging.ts",
 
         //Sass (leave at the bottom)
