@@ -94,7 +94,6 @@ class RestPhotoDownloader implements IPhotoDownloader
      */
     public function getLatestPhotoID(string $roleType = Role::STUDENT, string|int|null $externalId = null): ?int
     {
-        $userObj = null;
         switch ($roleType) {
             case Role::STUDENT:
                 $url = sprintf('Main/api/students/%s', $externalId);
