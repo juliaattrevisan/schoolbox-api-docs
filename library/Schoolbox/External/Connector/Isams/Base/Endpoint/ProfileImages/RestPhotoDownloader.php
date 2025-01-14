@@ -88,10 +88,6 @@ class RestPhotoDownloader implements IPhotoDownloader
     {
         // unused for RestApi
     }
-    public function whichSystem(): string
-    {
-        return 'restAPI';
-    }
 
     /**
      * @inheritDoc

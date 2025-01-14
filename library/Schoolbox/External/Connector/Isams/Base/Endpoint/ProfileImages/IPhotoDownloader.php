@@ -55,8 +55,6 @@ interface IPhotoDownloader
      */
     public function cleanup(): void;
 
-    public function whichSystem(): string;
-
     /**
      * Get the latest photo ID for the user from the rest API
      *

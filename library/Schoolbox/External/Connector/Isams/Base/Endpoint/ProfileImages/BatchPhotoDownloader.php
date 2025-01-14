@@ -215,11 +215,6 @@ class BatchPhotoDownloader implements IPhotoDownloader
         }
     }
 
-    public function whichSystem(): string
-    {
-        return 'batchXML';
-    }
-
     /**
      * @inheritDoc
      */

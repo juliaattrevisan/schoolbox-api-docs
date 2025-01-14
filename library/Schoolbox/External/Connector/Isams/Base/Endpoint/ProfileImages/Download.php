@@ -180,7 +180,7 @@ class Download implements IStrategy
                     $baseProfile->getExternalId(),
                     $portrait->getHash(),
                     $data['person']['personId'],
-                    $this->photoDownloader->whichSystem(),
+                    get_class($this->photoDownloader),
                 ));
 
                 $baseProfile->setPortrait($portrait);
