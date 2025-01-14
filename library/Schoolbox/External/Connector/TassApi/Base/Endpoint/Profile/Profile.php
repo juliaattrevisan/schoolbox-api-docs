@@ -896,6 +896,9 @@ class Profile implements IStrategy
             $teacher['category'] = self::TEACHER;
 
             if ('' !== (string)$teacher['employee_code']) {
+                /* Appending campus data to the teaching staff
+                 */
+                $teacher['campuses'] = $employeeSetDedupe[$teacher['employee_code']]['campuses'] ?? [];
                 unset($employeeSetDedupe[$teacher['employee_code']]);
 
                 $this->log->debug(sprintf(
@@ -953,6 +956,7 @@ class Profile implements IStrategy
                 'teacher_photo' => $teacherPhoto,
                 'position' => $position,
                 'work_phone' => '',
+                'campuses' => $employee['campuses'],
             ];
         }
 
@@ -1056,7 +1060,11 @@ class Profile implements IStrategy
             }
 
             $building = '';
-            $campusName = '';
+            /* Multiple campuses will be converted to string with separated by commas
+             */
+            $campusName = isset($staff['campuses']) ?
+                implode(',', array_column($staff['campuses'], 'CAM_DESC'))
+                : '';
             $category = $staff['category'];
             $department = trim((string)$staff['department']);
 
