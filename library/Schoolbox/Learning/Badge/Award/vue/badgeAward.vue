@@ -3,7 +3,6 @@
 /* eslint-disable */
 /* eslint-enable vue/no-v-html */
 import SearchSelect from "@schoolboxVue/components/searchSelect/search-select.vue";
-import axios from "axios";
 import BadgeImage from "../../vue/badge-image";
 import Toast from "@schoolboxVue/components/toast";
 import cdnPrefixMixin from "@schoolboxVue/components/cdn-prefix-mixin";
@@ -195,8 +194,13 @@ export default {
             this.isFormSubmitActive = true;
             this.$refs.toast.activate(this.toastActivateMessage);
 
-            axios
-                .post(this.endpoint, { users: this.selected })
+            fetch(this.endpoint, {
+                method: "POST",
+                body: JSON.stringify({ users: this.selected }),
+                headers: {
+                    "Content-Type": "application/json",
+                },
+            })
                 .then(() => {
                     // Clear the select, so they don't show next time this opens
                     this.selected = [];
