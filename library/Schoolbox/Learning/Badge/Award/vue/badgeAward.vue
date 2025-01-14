@@ -2,33 +2,17 @@
 // Ignore this file for ESLint checks for now (SA-18376)
 /* eslint-disable */
 /* eslint-enable vue/no-v-html */
-import axios from "axios";
+import SearchSelect from "@schoolboxVue/components/searchSelect/search-select.vue";
 import BadgeImage from "../../vue/badge-image";
 import Toast from "@schoolboxVue/components/toast";
-
-// Vue-select boilerplate
-// TODO consider wrapping in our own component
-import vSelect from "vue-select";
-import debounce from "lodash/debounce";
-import "vue-select/dist/vue-select.css";
 import cdnPrefixMixin from "@schoolboxVue/components/cdn-prefix-mixin";
 import { generateAwardWithEvidenceUrl } from "../js/awardBadgeUtils";
-
-// Render a custom template for the deselect icon.
-// Partially documented on https://github.com/sagalbot/vue-select/issues/994
-import Deselect from "@schoolboxVue/components/selectize/Deselect";
-vSelect.props.components.default = () => ({ Deselect });
-
 import { calculateExpiryDate } from "../../vue/expiry-helper";
 
 const EVENTS = {
     done: "done",
     cancel: "cancel",
 };
-
-// The number of milliseconds to wait between the user's input and a search for
-// users.
-const SEARCH_RESULT_RETRIEVE_DELAY = 350;
 
 // There's no official method for documenting a component's events,
 // https://forum.vuejs.org/t/how-to-document-events-for-components/35541/3
@@ -51,7 +35,7 @@ export default {
     components: {
         BadgeImage,
         Toast,
-        vSelect,
+        SearchSelect,
     },
     /**
      * Props.
@@ -88,15 +72,6 @@ export default {
         },
 
         /**
-         * The query string parameter to submit the user search parameter
-         * within, when performing a user search.
-         */
-        userSearchQueryParam: {
-            type: String,
-            default: "query",
-        },
-
-        /**
          * Any additional query string parameters to submit to the user search
          * endpoint.
          *
@@ -107,15 +82,6 @@ export default {
             default: () => {
                 return { roleTypeID: "student" };
             },
-        },
-
-        /**
-         * Placeholder text to display in the form's v-select input, before any
-         * users are selected.
-         */
-        placeholder: {
-            type: String,
-            default: "Search for users to award achievement to",
         },
 
         /**
@@ -203,41 +169,17 @@ export default {
             const userIdList = this.selected.map((user) => user.id);
             return userIdList.join(",");
         },
-
-        /**
-         * return a list of options that are not already selected
-         * @returns {Array} - the list of options that are not already selected
-         */
-        filteredOptions() {
-            return this.options.filter((option) => {
-                return !this.selected.some((selected) => selected.id === option.id);
-            });
-        },
     },
     methods: {
         /**
-         * Search callback for the selectize.
-         *
-         * This method is debounced so that the search doesn't trigger until
-         * the user has stopped typing for `SEARCH_RESULT_RETRIEVE_DELAY`
-         * milliseconds.
-         *
-         * @param {String}   query   The search string
-         * @param {Function} loading A function to call when the loading state
-         *                           changes (accepts a Boolean)
+         * Get the endpoint for the user search
+         * @returns {String}- The endpoint for the user search
          */
-        onSearch: debounce(function (query, loading) {
-            if (query.length < 3) {
-                return;
-            }
-            loading(true);
-            let params = this.userSearchAdditionalParams;
-            params[this.userSearchQueryParam] = query;
-            axios
-                .get(this.userSearchEndpoint, { params: params })
-                .then((response) => (this.options = response.data))
-                .finally(() => loading(false));
-        }, SEARCH_RESULT_RETRIEVE_DELAY),
+        getEndpoint() {
+            const searchUrl = new URL(this.userSearchEndpoint, window.location.href).toString();
+            const searchParams = new URLSearchParams(this.userSearchAdditionalParams).toString();
+            return `${searchUrl}?${searchParams}&`;
+        },
 
         /**
          * Callback for when the badge award form is submitted.
@@ -252,8 +194,13 @@ export default {
             this.isFormSubmitActive = true;
             this.$refs.toast.activate(this.toastActivateMessage);
 
-            axios
-                .post(this.endpoint, { users: this.selected })
+            fetch(this.endpoint, {
+                method: "POST",
+                body: JSON.stringify({ users: this.selected }),
+                headers: {
+                    "Content-Type": "application/json",
+                },
+            })
                 .then(() => {
                     // Clear the select, so they don't show next time this opens
                     this.selected = [];
@@ -324,34 +271,17 @@ export default {
         @binding {Date|null} expiryDate An actual expiry date object
         -->
         <slot name="expiryMessage" :expiryDate="expiryDate"></slot>
-
-        <v-select
-            class="schoolbox-vue-selectize"
-            :options="filteredOptions"
-            :clear-search-on-blur="
-                function () {
-                    return true;
-                }
-            "
-            :clear-search-on-select="true"
-            :close-on-select="false"
-            multiple
-            @search="onSearch"
-            label="name"
-            :placeholder="placeholder"
-            v-model="selected"
+        <search-select
+            v-model:selected="selected"
+            label="Search"
+            label-id="users"
+            :endpoint="getEndpoint()"
+            placeholder=""
         >
-            <template #option="option">
-                <span class="d-center">
-                    {{ option.name }}
-                </span>
+            <template #meta>
+                <div class="meta">Search for users to award achievement to</div>
             </template>
-            <template #selected-option="option">
-                <span class="selected d-center">
-                    {{ option.name }}
-                </span>
-            </template>
-        </v-select>
+        </search-select>
         <div class="component-action">
             <section>
                 <a
