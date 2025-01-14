@@ -70,6 +70,9 @@ class Api
     ) {
         $this->httpClient = new HttpClient();
         $this->host = new Uri($apiHost);
+
+        // get the token
+        $this->getToken();
     }
 
     /**
@@ -82,7 +85,7 @@ class Api
      * @throws \JsonException
      * @phpstan-ignore-next-line - InvalidArgumentException IS throwable
      */
-    public function getToken(): string
+    private function getToken(): string
     {
         if (!empty($this->jwks) && $this->jwks['expires'] > time()) {
             return $this->jwks['access_token'];
@@ -98,7 +101,8 @@ class Api
                     'grant_type' => 'client_credentials',
                     'scope' => 'restapi',
                 ],
-            ]
+            ],
+            true,
         );
 
         $this->jwks['expires'] = time() + $this->jwks['expires_in'];
@@ -112,21 +116,21 @@ class Api
      * @param string $path
      * @param string $method
      * @param array $options
-     * @param string|null $token
+     * @param bool $ignoreToken
      * @param bool $raw - return raw data, not json decoded
      * @return mixed
      * @throws GuzzleException
      * @throws \JsonException
      */
-    public function request(string $path, string $method, array $options = [], #[SensitiveParameter] ?string $token = null, bool $raw = false): mixed
+    public function request(string $path, string $method, array $options = [], bool $ignoreToken = false, bool $raw = false): mixed
     {
         // if we have a bearer token, then use it.
-        if ($token) {
+        if (!$ignoreToken) {
             $options = array_merge(
                 $options,
                 [
                     RequestOptions::HEADERS => [
-                        'Authorization' => 'Bearer ' . $token,
+                        'Authorization' => 'Bearer ' . $this->getToken(),
                     ]
                 ]
             );
