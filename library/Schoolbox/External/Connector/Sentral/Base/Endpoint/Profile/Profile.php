@@ -52,7 +52,7 @@ class Profile implements IStrategy
     /**
      * Prevent infinite loop of api calls
      */
-    private const MAX_CALLS = 1;
+    private const MAX_CALLS = 100;
 
 
     /**
@@ -203,7 +203,7 @@ class Profile implements IStrategy
          * Process multiple pages until there are none remaining, or if something is really stuffed,
          * until MAX_CALLS is reached, to prevent infinite calls to a third party.
          */
-        $nextUrl = "enrolments/student?include=person,primaryEnrolment,contacts,specialNeedsPrograms&academicPeriodIds={$academicPeriodIds}&limit=1";
+        $nextUrl = "enrolments/student?include=person,primaryEnrolment,contacts,specialNeedsPrograms&academicPeriodIds={$academicPeriodIds}&limit=200";
 
         for ($i = 0; $nextUrl && $i < self::MAX_CALLS; $i++) {
             $payload = $this->api->retrieveDocument($nextUrl);
