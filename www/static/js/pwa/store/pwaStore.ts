@@ -2,7 +2,7 @@
  * Handles the state of the PWA and notifications across all pwa components on the page
  */
 
-import { denyNotif, initFirebaseApps, requestNotif } from "@js/firebase/firebaseInit";
+import { denyNotif, requestNotif } from "@js/firebase/firebaseInit";
 import { getUserPlatform, supportsNotifications } from "@js/util/browserUtils";
 import type { BeforeInstallPromptEvent } from "@js/util/browserUtils";
 import { defineStore } from "pinia";
@@ -55,10 +55,6 @@ export const usePwaStore = defineStore(`pwa`, () => {
     // #endregion
 
     // #region NOTIFICATIONS
-
-    // Trigger firebase to be initialised
-    // Since there's only ever one pwaStore, we can safely call this here
-    initFirebaseApps();
 
     // The browser's current notification permission status
     const currentNotifPermission = window.Vue.ref<NotificationPermission | null>(
