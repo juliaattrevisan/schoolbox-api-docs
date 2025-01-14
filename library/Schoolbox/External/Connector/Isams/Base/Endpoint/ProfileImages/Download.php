@@ -64,6 +64,9 @@ class Download implements IStrategy
             get_class($this->photoDownloader)
         ));
 
+        // cache found users, so we can update their profile photos
+        $users = $this->baseProfileMapper->findByColumn('external_id', $this->registry->keys());
+
         foreach ($this->registry->recallAll() as $externalId => $data) {
             /**
              * we are only wanting to update the profile photo if
@@ -90,7 +93,8 @@ class Download implements IStrategy
             }
             if (null === $data['person']['portrait'] || $sisPhotoId !== $data['person']['sisPhotoId']) {
                 $this->log->info('Downloading profile photo for ' . $externalId);
-                $baseProfile = $this->baseProfileMapper->findOneByColumn('external_id', $externalId);
+                /** @var UserProfile\Model $baseProfile */
+                $baseProfile = $users->getBy('external_id', $externalId);
 
                 // seeing as we are updating the photo, we need to remember this
                 $baseProfile->setMetadata((new Metadata\Builder())->build(['profile' => [
