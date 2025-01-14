@@ -228,6 +228,11 @@ export default {
          * @param {Function} loading A function to call when the loading state
          *                           changes (accepts a Boolean)
          */
+        getEndpoint() {
+            const searchUrl = new URL(this.userSearchEndpoint, window.location.href).toString();
+            const searchParams = new URLSearchParams(this.userSearchAdditionalParams).toString();
+            return `${searchUrl}?${searchParams}&`;
+        },
         onSearch: debounce(function (query, loading) {
             if (query.length < 3) {
                 return;
@@ -357,25 +362,10 @@ export default {
             v-model:selected="selected"
             :results="filteredOptions"
             label="Search for users to award achievement to"
-            label-id="creator"
-            endpoint="https://vagrant.dev.schoolbox.cloud/api/user"
-            query-key="search"
-            :is-single-select="false"
+            label-id="users"
+            :endpoint="getEndpoint()"
             placeholder="Search for users..."
-            :manage-search-response="true"
-            @search="onSearch"
-        >
-            <template #option="{ option }">
-                <span class="d-center">
-                    {{ option.name }}
-                </span>
-            </template>
-            <template #selected-option="{ option }">
-                <span class="selected d-center">
-                    {{ option.name }}
-                </span>
-            </template>
-        </search-select>
+        />
         <div class="component-action">
             <section>
                 <a
