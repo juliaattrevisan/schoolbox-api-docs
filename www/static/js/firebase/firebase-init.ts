@@ -1,7 +1,5 @@
 import { initializeApp } from "@firebase/app";
 import { getMessaging, getToken, deleteToken, onMessage } from "@firebase/messaging";
-import { PWA_NOTIFICATION_ALLOW, PWA_NOTIFICATION_DENY } from "./firebaseEvent";
-import type { FirebaseRequestNotifEvent } from "./firebaseEvent";
 
 // See /library/Alaress/Async/Notification/Cloud/Firebase/Service.php::propagate
 interface SbxFirebaseNotificationPayload {
@@ -76,9 +74,9 @@ window.sbProps.firebaseApps.forEach((app) => {
 
 /**
  * Respond to a request to allow notifications, send both to firebase, and schoolbox
- * @param event - Information about the event.
+ * @param deviceId - An identifier for this device to allow de-duplication of registrations
  */
-async function requestNotif(event: FirebaseRequestNotifEvent): Promise<void> {
+export async function requestNotif(deviceId: "iOS" | "Android" | "Browser"): Promise<void> {
     /**
      * Currently there'll usually only be at most one Firebase app, but if we start supporting
      * multiple apps, then we may need to start indexing the pwaConfig by app.appIdentifier too...
@@ -141,7 +139,7 @@ async function requestNotif(event: FirebaseRequestNotifEvent): Promise<void> {
                     const formData = new FormData();
                     formData.append("appId", app.appIdentifier);
                     formData.append("token", currentToken);
-                    formData.append("deviceId", event.detail.deviceId);
+                    formData.append("deviceId", deviceId);
 
                     // Post this token to Schoolbox,
                     // registering it for the current user.
@@ -162,7 +160,7 @@ async function requestNotif(event: FirebaseRequestNotifEvent): Promise<void> {
 /**
  * Respond to a request to allow notifications, send both to firebase, and schoolbox
  */
-function denyNotif(): void {
+export function denyNotif(): void {
     window.sbProps.firebaseApps.forEach((app) => {
         if (app.publicConfiguration && app.webPushPublicKey && app.appIdentifier) {
             const firebaseApp = initializeApp(app.publicConfiguration);
@@ -207,9 +205,3 @@ function denyNotif(): void {
         }
     });
 }
-
-document.addEventListener(PWA_NOTIFICATION_ALLOW, (event) => {
-    void requestNotif(event);
-});
-
-document.addEventListener(PWA_NOTIFICATION_DENY, denyNotif);

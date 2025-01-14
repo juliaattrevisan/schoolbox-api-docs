@@ -2,8 +2,7 @@
  * Handles the state of the PWA and notifications across all pwa components on the page
  */
 
-import { PWA_NOTIFICATION_ALLOW, PWA_NOTIFICATION_DENY } from "@js/firebase/firebaseEvent";
-import type { FirebaseDenyEvent, FirebaseRequestNotifEvent } from "@js/firebase/firebaseEvent";
+import { denyNotif, requestNotif } from "@js/firebase/firebase-init";
 import { getUserPlatform, supportsNotifications } from "@js/util/browserUtils";
 import type { BeforeInstallPromptEvent } from "@js/util/browserUtils";
 import { defineStore } from "pinia";
@@ -86,7 +85,7 @@ export const usePwaStore = defineStore(`pwa`, () => {
      * Check if any users that aren't the current logged in user have (according to pwaConfig) previously been registered
      * and if so, invalidate their registration locally so we can re-register them when they next log in.
      *
-     * NOTE: We should NOT send PWA_NOTIFICATION_DENY in this case, as it will de-register the current user too!
+     * NOTE: We should NOT run denyNotif() in this case, as it will de-register the current user too!
      *
      * We keep the old notificationToken in the config so if the user logs in again, we can clean up the old token in
      * the schoolbox mobile app registration database. See firebase-init for more details about this scenario.
@@ -134,7 +133,7 @@ export const usePwaStore = defineStore(`pwa`, () => {
             window.sbProps.pwaConfig.user.notificationState === "removing" // or if we are in the process of removing already
         ) {
             // Tell firebase and schoolbox that the user denied notifications
-            document.dispatchEvent(new CustomEvent<FirebaseDenyEvent["detail"]>(PWA_NOTIFICATION_DENY));
+            denyNotif();
             return;
         }
 
@@ -142,13 +141,8 @@ export const usePwaStore = defineStore(`pwa`, () => {
         window.sbProps.pwaConfig.user.notificationState = "registering";
 
         // Attempt to register the device for notifications
-        document.dispatchEvent(
-            new CustomEvent<FirebaseRequestNotifEvent["detail"]>(PWA_NOTIFICATION_ALLOW, {
-                detail: {
-                    deviceId: getUserPlatform(),
-                },
-            }),
-        );
+        // note this may take some time, so we don't await it
+        void requestNotif(getUserPlatform());
     }
 
     /**
