@@ -12,6 +12,7 @@ namespace Schoolbox\External\Connector\Isams\Base\Endpoint\ProfileImages;
 
 use Psr\Log\LoggerInterface;
 use Schoolbox\External\Connector\Isams\Base\Endpoint\Codec\DSN;
+use Schoolbox\External\Connector\ValidStrats;
 use Schoolbox\External\Importer\Endpoint\IStrategy;
 use SensitiveParameter;
 
@@ -21,7 +22,8 @@ class Prepare implements IStrategy
         private LoggerInterface $log,
         private $host,
         #[SensitiveParameter] private string $key,
-        private string $zipDir
+        private string $zipDir,
+        private ValidStrats $validStrats
     ) {
     }
 
@@ -35,19 +37,23 @@ class Prepare implements IStrategy
         if (trim($credentials['modules'][DSN::MODULE_RESTAPIHOST]['key'] ?? '') === '') {
             $photoDownloader = new BatchPhotoDownloader($this->host, $this->key, $this->zipDir);
 
-            /* Download a zip containing everyone's profile pictures, and extract them
-            * It uses isams internal ids, not external ids
-            */
-            $this->log->info('Downloading student profile photos (this might take a while)');
+            if ($this->validStrats->isStudentStratEnabled()) {
+                /* Download a zip containing everyone's profile pictures, and extract them
+                * It uses isams internal ids, not external ids
+                */
+                $this->log->info('Downloading student profile photos (this might take a while)');
 
-            $photoDownloader->downloadStudentPhotos();
+                $photoDownloader->downloadStudentPhotos();
+            }
 
-            /* Download a zip containing everyone's profile pictures, and extract them
-             * It uses isams internal ids, not external ids
-             */
-            $this->log->info('Downloading staff profile photos (this might take a while)');
+            if ($this->validStrats->isStaffStratEnabled()) {
+                /* Download a zip containing everyone's profile pictures, and extract them
+                 * It uses isams internal ids, not external ids
+                 */
+                $this->log->info('Downloading staff profile photos (this might take a while)');
 
-            $photoDownloader->downloadStaffPhotos();
+                $photoDownloader->downloadStaffPhotos();
+            }
         }
     }
 }

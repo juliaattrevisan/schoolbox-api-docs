@@ -169,6 +169,7 @@ class Factory
                     $this->host,
                     $this->key,
                     $this->zipDir,
+                    $this->validStrats
                 ))->add(new ProfileImages\Download(
                     $this->log,
                     $this->perform,
