@@ -11,6 +11,13 @@ import { defineStore } from "pinia";
 export const usePwaStore = defineStore(`pwa`, () => {
     // #region PWA APP
 
+    // Whether the iOS pwa modal is open or not
+    const isPwaIOSModalOpen = window.Vue.ref<boolean>(false);
+
+    // Whether a component with the iOS pwa modal has been mounted
+    // This allows us to prevent other components from duplicating the modal (essentially a singleton)
+    const hasMountedPwaIOSModal = window.Vue.ref<boolean>(false);
+
     // The deferred PWA prompt event that can be used to trigger the install prompt
     // Depending on the browser, this may never be set to a value
     const deferredPrompt = window.Vue.ref<BeforeInstallPromptEvent | null>(null);
@@ -206,6 +213,8 @@ export const usePwaStore = defineStore(`pwa`, () => {
     // #endregion
 
     return {
+        isPwaIOSModalOpen,
+        hasMountedPwaIOSModal,
         deferredPrompt,
         onInstallPwa,
         currentNotifPermission,

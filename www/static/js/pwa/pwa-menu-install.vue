@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { sbProps } from "@js/util/sbx/pageUtils";
 import { getUserPlatform, isPWA } from "@js/util/browserUtils";
-import PwaMenuShareIcon from "./pwa-menu-share-icon.vue";
 import { usePwaStore } from "./store/pwaStore";
+import PwaMenuInstallModalIos from "./pwa-menu-install-modal-ios.vue";
 
 interface Props {
     // if this component is located in the sidebar or the notifications setting page
@@ -60,7 +60,7 @@ const pwaPromptType = window.Vue.computed(() => {
 async function onInstallPwa(): Promise<void> {
     // If showing the iOS prompt, show the modal
     if (pwaPromptType.value.id === "iOS") {
-        // TODO
+        pwaStore.isPwaIOSModalOpen = true;
         return;
     }
 
@@ -86,29 +86,6 @@ defineExpose({ hasVisibleContent });
     <a v-if="pwaPromptType.url" class="button" :href="pwaPromptType.url">Install</a>
     <a v-else-if="pwaPromptType.id !== null" class="button" href="#" @click="onInstallPwa">Install</a>
 
-    <div v-if="pwaPromptType.id === 'iOS'" data-reveal class="reveal-modal">
-        <h1>Add the {{ sbProps.siteTitle }} web app to your home screen</h1>
-        <a class="close-reveal-modal" aria-label="Close">&#215;</a>
-        <p>
-            To receive push notifications and enjoy a better experience, install the {{ sbProps.siteTitle }} web app on
-            your Apple device.
-        </p>
-
-        <ol>
-            <li>Select the <pwa-menu-share-icon /> <strong> Share </strong> button in the menu bar of your browser.</li>
-            <li>From the list of options, select <strong>Add to Home Screen</strong>.</li>
-        </ol>
-
-        <p>
-            If 'Add to Home Screen' option doesn't exist, you can scroll down the list and select
-            <strong>Edit Actions</strong> and then <strong>Add to Home Screen</strong>.
-        </p>
-
-        <p>
-            Once you've added the {{ sbProps.siteTitle }} web app to your home screen, you must then go to the web app
-            on your home screen to enable notifications.
-        </p>
-        <p>If you're still unable to add it to your home screen, please contact your support team.</p>
-    </div>
+    <pwa-menu-install-modal-ios />
 </template>
 <style scoped></style>
