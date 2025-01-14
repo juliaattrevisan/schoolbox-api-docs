@@ -95,24 +95,20 @@ export const usePwaStore = defineStore(`pwa`, () => {
     const hasPromptedForNotif = window.Vue.ref(false);
 
     /**
-     * Handle the user clicking the "Enable Notifications" button
+     * Handle the user's decision to allow or deny notifications
+     * or when the page loads and the device was mid-registration/deregistration
      */
-    async function onEnableNotifications(): Promise<void> {
-        if (hasPromptedForNotif.value) {
-            return;
-        }
-        hasPromptedForNotif.value = true;
-
-        // Use await instead of .then to avoid iOS treating as a non-interaction and failing
-        currentNotifPermission.value = await Notification.requestPermission();
-
+    function handleNotifPermissionChange(): void {
         /**
          * If the user didn't grant permission, we can't do anything else here.
          *
          * This may be "denied" or "default", but in the case of "default" - we should treat as "denied" as per
          * https://developer.mozilla.org/en-US/docs/Web/API/Notification/requestPermission_static#return_value
          */
-        if (currentNotifPermission.value !== "granted") {
+        if (
+            currentNotifPermission.value !== "granted" ||
+            window.sbProps.pwaConfig.user.notificationState === "removing" // or if we are in the process of removing already
+        ) {
             // Tell firebase and schoolbox that the user denied notifications
             document.dispatchEvent(new CustomEvent<FirebaseDenyEvent["detail"]>(PWA_NOTIFICATION_DENY));
             return;
@@ -150,6 +146,44 @@ export const usePwaStore = defineStore(`pwa`, () => {
                 },
             });
         }
+    }
+
+    /**
+     * Handle the user clicking the "Enable Notifications" button
+     */
+    async function onEnableNotifications(): Promise<void> {
+        if (hasPromptedForNotif.value) {
+            return;
+        }
+        hasPromptedForNotif.value = true;
+
+        // Use await instead of .then to avoid iOS treating as a non-interaction and failing
+        currentNotifPermission.value = await Notification.requestPermission();
+
+        window.sbProps.pwaConfig.user.notificationState = null; // Reset the state since it was a user action
+        handleNotifPermissionChange();
+    }
+
+    /**
+     * Sometimes the service worker is not running when we prompt attempt to register notifications, try again if we failed..
+     * This could also be if we were registering notifications and it was interrupted by a page reload or similar
+     */
+    function handleInitialNotificationState(): void {
+        // If we were registering notifications, try again
+        if (window.sbProps.pwaConfig.user.notificationState === "registering") {
+            handleNotifPermissionChange();
+        }
+
+        // If we were removing notifications, try again
+        if (window.sbProps.pwaConfig.user.notificationState === "removing") {
+            handleNotifPermissionChange();
+        }
+    }
+
+    if (document.readyState !== "loading") {
+        handleInitialNotificationState();
+    } else {
+        document.addEventListener("DOMContentLoaded", handleInitialNotificationState);
     }
 
     // #endregion
