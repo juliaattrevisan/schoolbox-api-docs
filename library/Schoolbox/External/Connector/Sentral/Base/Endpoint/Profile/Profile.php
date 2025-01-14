@@ -41,6 +41,7 @@ class Profile implements IStrategy
      */
     public const TYPE_STUDENT = 'student';
     public const TYPE_STAFF = 'staff';
+    public const STAFF_PHOTO_ENDPOINT = 'enrolments/staff/%s/photo';
 
 
     /**
@@ -527,6 +528,11 @@ class Profile implements IStrategy
      */
     private function importPortrait(UserProfile\Model $baseProfile, string $photoEndpoint, string $updatedAtTime): void
     {
+        /* Skipping if the url is not provided
+         */
+        if (!$photoEndpoint) {
+            return;
+        }
         /* Check if config setting allows photos from sis
          * If it's enabled, continue importing pics
          */
@@ -540,14 +546,13 @@ class Profile implements IStrategy
             /* Check if the user was modified since the last update
              * If yes, the photo could also have been updated, let's grab it
              */
-            $db         = $this->baseProfileMapper->getDatabase();
             $updated_at = $this->findDate($updatedAtTime)?->getDatabase();
-            $stmt       = $db->executeQuery(
+            $stmt       = $this->baseProfileMapper->getDatabase()->executeQuery(
                 "
-            SELECT external_id
-            FROM {$this->baseProfileMapper->getTable()}
+            SELECT updated_at
+            FROM {$this->baseProfileMapper->getBaseTableName()}
             WHERE external_id = :externalId
-            AND updated_at > :updatedAt
+            AND updated_at < :updatedAt
         ",
                 [
                     'externalId' => $baseProfile->getExternalId(),
@@ -1249,15 +1254,19 @@ class Profile implements IStrategy
 
                 /* Find the first meaningful value out of this set
                  */
-                $firstname = (new FirstMeaningfulValue())->find([
-                                                                    $staff['relationships']['person']['data']['attributes']['firstName'],
-                                                                    $staff['relationships']['person']['data']['attributes']['givenNames']
-                                                                ]);
+                $firstname = (new FirstMeaningfulValue())->find(
+                    [
+                        $staff['relationships']['person']['data']['attributes']['firstName'],
+                        $staff['relationships']['person']['data']['attributes']['givenNames']
+                    ]
+                );
 
-                $firstnamePreferred = (new FirstMeaningfulValue())->find([
-                                                                             $staff['relationships']['person']['data']['attributes']['preferredName'],
-                                                                             $firstname
-                                                                         ]);
+                $firstnamePreferred = (new FirstMeaningfulValue())->find(
+                    [
+                        $staff['relationships']['person']['data']['attributes']['preferredName'],
+                        $firstname
+                    ]
+                );
 
                 $building = '';
 
@@ -1389,6 +1398,12 @@ class Profile implements IStrategy
                     ->setFirstname($firstname)
                     ->setFirstnamePreferred($firstnamePreferred)
                     ->setLastname($lastname);
+
+                $this->importPortrait(
+                    $staffBaseProfile,
+                    sprintf(self::STAFF_PHOTO_ENDPOINT, (string)$staff['id']),
+                    (string)$staff['attributes']['updatedAt']['iso8601']
+                );
 
                 /* Then save it
                  */
