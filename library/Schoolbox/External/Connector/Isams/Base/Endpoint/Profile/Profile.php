@@ -24,7 +24,6 @@ use Schoolbox\External\Normalise\User\Common\Campus;
 use Schoolbox\External\Profile as UserProfile;
 use Schoolbox\Mapper;
 use Schoolbox\Mapper\Exception;
-use Schoolbox\Resource\Storage\Mapper as StorageMapper;
 use Schoolbox\Role;
 use UnexpectedValueException;
 

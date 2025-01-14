@@ -10,7 +10,6 @@ declare(strict_types=1);
 namespace Schoolbox\External\Connector\Isams\Base\Endpoint\ProfileImages;
 
 use Schoolbox\Role;
-use SensitiveParameter;
 
 /**
  * Class IPhotoDownloader

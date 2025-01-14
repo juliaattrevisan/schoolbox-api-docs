@@ -9,7 +9,6 @@ declare(strict_types=1);
 
 namespace Schoolbox\External\Connector\Isams\Base\Endpoint\Profile;
 
-use External\Connector\Isams\Base\Endpoint\ProfileImages\IPhotoDownloader;
 use Psr\Log\LoggerInterface;
 use Schoolbox\Admin\Import\Profile\OrphanRemover;
 use Schoolbox\External\Importer\Endpoint\IStrategy;
