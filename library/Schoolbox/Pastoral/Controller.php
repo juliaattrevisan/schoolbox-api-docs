@@ -788,12 +788,6 @@ class Controller extends Base
      */
     public function getStudentRecordAttachment(PastoralAttachmentModel $attachment): void
     {
-        if (!$attachment->getStorage()->getMimetype()->getInline()) {
-            $attach = "attachment;";
-        } else {
-            $attach = "";
-        }
-
         // Send headers
 
         if ($attachment->getStorage()->getMime()) {
@@ -807,7 +801,7 @@ class Controller extends Base
         header("Pragma: ");
         header("Cache-control: private");
         header("Content-Ranges: none");
-        header("Content-Disposition: $attach filename=\"$basename\"");
+        header("Content-Disposition: filename=\"$basename\"");
         header("Content-Length: " . $this->filesystemProxy->fileSize($attachment->getStorage()));
         fpassthru($this->filesystemProxy->readStream($attachment->getStorage()));
 

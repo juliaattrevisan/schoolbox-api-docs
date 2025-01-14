@@ -706,7 +706,7 @@ class Controller extends Base
                 'fileContent' => $this->filesystemProxy->read($file),
             ],
         );
-        if (!$file->getMimetype()->getInline() || $this->requestQuery->get('save')) {
+        if ($this->requestQuery->get('save')) {
             $this->response = $this->response->withHeader(
                 'Content-Disposition',
                 sprintf('attachment; filename="%s"', $file->getBasename()),

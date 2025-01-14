@@ -85,7 +85,6 @@ class Controller extends Base
      */
     public function preview($params)
     {
-
         /* Test safeness of requested url via Cyberhound blacklist
          */
         $translator = new Translator(

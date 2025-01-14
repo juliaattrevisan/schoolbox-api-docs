@@ -55,12 +55,6 @@ class MimetypeMapper extends Schoolbox\Mapper
         ));
 
         $this->hasMap(array(
-            'column'     => 'inline',
-            'property'   => 'inline',
-            'type'       => self::TYPE_BOOL_ENUM,
-        ));
-
-        $this->hasMap(array(
             'column'     => 'enable',
             'property'   => 'enable',
             'type'       => self::TYPE_BOOL_ENUM,
@@ -130,7 +124,6 @@ class MimetypeMapper extends Schoolbox\Mapper
         $mimeType = new Mimetype();
         $mimeType->setDescription('Binary Data (Unknown)');
         $mimeType->setMime('application/octet-stream');
-        $mimeType->setInline(false);
         $mimeType->setEnable(true);
         $mimeType->setIconFile('application-octet-stream.svg');
         $mimeType->setMaxFileSize(0);

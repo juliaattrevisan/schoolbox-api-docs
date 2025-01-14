@@ -194,7 +194,6 @@ if (is_string($_POST['description'] ?? null) && isset($_POST['category'])) {
                     'iconFile'          => $file->getStorage()->getMimetype()->getIconFile(),
                     'description'       => $file->getStorage()->getMimetype()->getDescription(),
                     'url'               => '/images/mime/' . $file->getStorage()->getMimetype()->getIconFile(),
-                    'inline'            => $file->getStorage()->getMimetype()->getInline()
                 ],
                 'hidden'                => $file->isHidden(),
                 'type'                  => $file->getStorage()->getMimetype()->getType(),
