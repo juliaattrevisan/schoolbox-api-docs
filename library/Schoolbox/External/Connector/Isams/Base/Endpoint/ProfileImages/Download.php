@@ -59,6 +59,11 @@ class Download implements IStrategy
             $this->photoDownloader = new RestPhotoDownloader($this->key);
         }
 
+        $this->log->debug(sprintf(
+            'Using %s for profile photos.',
+            get_class($this->photoDownloader)
+        ));
+
         foreach ($this->registry->recallAll() as $externalId => $data) {
             /**
              * we are only wanting to update the profile photo if
