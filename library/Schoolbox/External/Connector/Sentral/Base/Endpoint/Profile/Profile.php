@@ -207,10 +207,7 @@ class Profile implements IStrategy
 
         for ($i = 0; $nextUrl && $i < self::MAX_CALLS; $i++) {
             $payload = $this->api->retrieveDocument($nextUrl);
-//            $log = new \Alaress_Log_File('/tmp/alaress.log');
-//            $log->log('test', $payload);
             foreach ($payload['data'] as $student) {
-                new \Alaress_Log_Probe($student);
                 $externalId = (string)$student['attributes']['studentCode'];
 
                 /* Only import data for externalIds in $watchlist, if provided
@@ -240,14 +237,14 @@ class Profile implements IStrategy
                 /* Find the first meaningful value out of this set
                  */
                 $firstname = (new FirstMeaningfulValue())->find([
-                    $student['relationships']['person']['data']['attributes']['firstName'],
-                    $student['relationships']['person']['data']['attributes']['givenNames']
-                ]);
+                                                                    $student['relationships']['person']['data']['attributes']['firstName'],
+                                                                    $student['relationships']['person']['data']['attributes']['givenNames']
+                                                                ]);
 
                 $firstnamePreferred = (new FirstMeaningfulValue())->find([
-                    $student['relationships']['person']['data']['attributes']['preferredName'],
-                    $firstname
-                ]);
+                                                                             $student['relationships']['person']['data']['attributes']['preferredName'],
+                                                                             $firstname
+                                                                         ]);
 
                 $form = (string)$student['relationships']['primaryEnrolment']['data']['attributes']['rollClass'];
                 $gender = (string)$student['relationships']['person']['data']['attributes']['gender'];
@@ -311,7 +308,11 @@ class Profile implements IStrategy
                     ->setFirstnamePreferred($firstnamePreferred)
                     ->setLastname($lastname);
 
-                $this->importPortrait($studentBaseProfile, (string)$student['links']['photo']);
+                $this->importPortrait(
+                    $studentBaseProfile,
+                    (string)$student['links']['photo'],
+                    (string)$student['attributes']['updatedAt']['iso8601']
+                );
 
                 /* Then save it
                  */
@@ -513,7 +514,18 @@ class Profile implements IStrategy
         }
     }
 
-    private function importPortrait(UserProfile\Model $baseProfile, string $photoEndpoint): void
+    /**
+     * Import a profile picture for the given $baseProfile
+     *
+     * Importing a profile picture requires you to enable photo_from_sis config var
+     * ("Load Photos From SIS" needs to be on)
+     *
+     * @param UserProfile\Model $baseProfile
+     * @param string            $photoEndpoint
+     * @param string            $updatedAtTime
+     * @return void
+     */
+    private function importPortrait(UserProfile\Model $baseProfile, string $photoEndpoint, string $updatedAtTime): void
     {
         /* Check if config setting allows photos from sis
          * If it's enabled, continue importing pics
@@ -521,6 +533,41 @@ class Profile implements IStrategy
         if (!$this->includePhoto) {
             return;
         }
+
+        /* Does user already have a portrait? If not let's try to find and update
+         */
+        if ($baseProfile->getPortrait() !== null) {
+            /* Check if the user was modified since the last update
+             * If yes, the photo could also have been updated, let's grab it
+             */
+            $db         = $this->baseProfileMapper->getDatabase();
+            $updated_at = $this->findDate($updatedAtTime)?->getDatabase();
+            $stmt       = $db->executeQuery(
+                "
+            SELECT external_id
+            FROM {$this->baseProfileMapper->getTable()}
+            WHERE external_id = :externalId
+            AND updated_at > :updatedAt
+        ",
+                [
+                    'externalId' => $baseProfile->getExternalId(),
+                    'updatedAt'  => $updated_at,
+                ]
+            );
+
+            if ($stmt->rowCount() === 0) {
+                $this->log->debug(
+                    sprintf(
+                        'Portrait of %s %s (%s) appears to be up to date. Skipping.',
+                        $baseProfile->getFirstname(),
+                        $baseProfile->getLastname(),
+                        $baseProfile->getExternalId()
+                    )
+                );
+                return;
+            }
+        }
+
         $endpoint = "$photoEndpoint?width=500&height=500";
         $photoContents = $this->api->retrievePortrait($endpoint);
 
@@ -1032,14 +1079,14 @@ class Profile implements IStrategy
             /* Find the first meaningful value out of this set
              */
             $firstname = (new FirstMeaningfulValue())->find([
-                $parent['data']['attributes']['firstName'],
-                $parent['data']['attributes']['givenNames']
-            ]);
+                                                                $parent['data']['attributes']['firstName'],
+                                                                $parent['data']['attributes']['givenNames']
+                                                            ]);
 
             $firstnamePreferred = (new FirstMeaningfulValue())->find([
-                $parent['data']['attributes']['preferredName'],
-                $firstname
-            ]);
+                                                                         $parent['data']['attributes']['preferredName'],
+                                                                         $firstname
+                                                                     ]);
 
             $lastname = (string)$parent['data']['attributes']['lastName'];
             $phoneHome = $numbers[self::HOME_TELEPHONE_NUMBER] ?? '';
@@ -1155,9 +1202,9 @@ class Profile implements IStrategy
              */
             if ($this->perform) {
                 $relationship = $this->relationshipMapper->createModel()
-                    ->setUserProfile($parentBaseProfile)
-                    ->setChildProfile($studentBaseProfile)
-                    ->setType($relationshipName);
+                                                         ->setUserProfile($parentBaseProfile)
+                                                         ->setChildProfile($studentBaseProfile)
+                                                         ->setType($relationshipName);
 
                 $this->relationshipMapper->save($relationship);
             }
@@ -1203,14 +1250,14 @@ class Profile implements IStrategy
                 /* Find the first meaningful value out of this set
                  */
                 $firstname = (new FirstMeaningfulValue())->find([
-                    $staff['relationships']['person']['data']['attributes']['firstName'],
-                    $staff['relationships']['person']['data']['attributes']['givenNames']
-                ]);
+                                                                    $staff['relationships']['person']['data']['attributes']['firstName'],
+                                                                    $staff['relationships']['person']['data']['attributes']['givenNames']
+                                                                ]);
 
                 $firstnamePreferred = (new FirstMeaningfulValue())->find([
-                    $staff['relationships']['person']['data']['attributes']['preferredName'],
-                    $firstname
-                ]);
+                                                                             $staff['relationships']['person']['data']['attributes']['preferredName'],
+                                                                             $firstname
+                                                                         ]);
 
                 $building = '';
 
