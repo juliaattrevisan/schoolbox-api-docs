@@ -5,6 +5,7 @@
 import { PWA_NOTIFICATION_ALLOW, PWA_NOTIFICATION_DENY } from "@js/firebase/firebaseEvent";
 import type { FirebaseDenyEvent, FirebaseRequestNotifEvent } from "@js/firebase/firebaseEvent";
 import { getUserPlatform, supportsNotifications } from "@js/util/browserUtils";
+import type { BeforeInstallPromptEvent } from "@js/util/browserUtils";
 import { defineStore } from "pinia";
 
 export const usePwaStore = defineStore(`pwa`, () => {
@@ -12,7 +13,7 @@ export const usePwaStore = defineStore(`pwa`, () => {
 
     // The deferred PWA prompt event that can be used to trigger the install prompt
     // Depending on the browser, this may never be set to a value
-    const deferredPrompt = window.Vue.ref<Event | null>(null);
+    const deferredPrompt = window.Vue.ref<BeforeInstallPromptEvent | null>(null);
 
     // If the browser supports the beforeinstallprompt event, store it
     // https://web.dev/articles/codelab-make-installable
@@ -21,7 +22,7 @@ export const usePwaStore = defineStore(`pwa`, () => {
         event.preventDefault();
 
         // Stash the event so it can be triggered by the user later
-        deferredPrompt.value = event;
+        deferredPrompt.value = event as BeforeInstallPromptEvent;
     });
 
     // When the app is installed, clear the deferred prompt
