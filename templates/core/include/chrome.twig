@@ -82,6 +82,8 @@
         // Ensure window.sbProps exists before we try to add to it
         window.sbProps = window.sbProps || {};
 
+        window.sbProps.siteTitle = "{{ config.title }}";
+
         window.sbProps.imageLightboxLicenseKey = "{{ config.image_lightbox_license_key }}";
         window.sbProps.ckeditor5LicenseKey = "{{ config.ckeditor5_license_key }}";
         window.sbProps.iframelyLicenseKey = "{{ config.iframely_license_key_public ?? null }}";

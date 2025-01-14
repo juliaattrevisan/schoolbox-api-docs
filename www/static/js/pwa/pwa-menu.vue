@@ -7,8 +7,6 @@ import PwaMenuNotifications from "./pwa-menu-notifications.vue";
 interface Props {
     // if this component is located in the sidebar or the notifications setting page
     page: "sidebar" | "settings";
-    // site title, to show "[title] web app" in the message
-    siteTitle: string;
     // the digistorm prompt for google/apple, if it exists
     installApple: string | null;
     installGoogle: string | null;
@@ -40,14 +38,12 @@ const hasVisibleContent = window.Vue.computed(() => {
 <template>
     <component
         :is="props.page === 'settings' ? PwaMenuPanelSettings : PwaMenuPanelSidebar"
-        :site-title="props.siteTitle"
         :has-visible-content="hasVisibleContent"
     >
         <div class="l-flex-col l-gap-m f-no-margins">
             <pwa-menu-install
                 ref="pwaMenuInstallRef"
                 :page="props.page"
-                :site-title="props.siteTitle"
                 :install-apple="props.installApple"
                 :install-google="props.installGoogle"
                 :pwa-enabled="props.pwaEnabled"
@@ -57,7 +53,6 @@ const hasVisibleContent = window.Vue.computed(() => {
                 v-if="notificationsEnabled"
                 ref="pwaMenuNotifRef"
                 :page="props.page"
-                :site-title="props.siteTitle"
                 :pwa-enabled="props.pwaEnabled"
             />
         </div>

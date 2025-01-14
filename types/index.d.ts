@@ -31,6 +31,7 @@ declare global {
         sbProps: {
             ckeditor5LicenseKey: string;
             iframelyLicenseKey: string;
+            siteTitle: string;
             colourDefaults: {
                 skin: string[];
                 skinUnique: string[];

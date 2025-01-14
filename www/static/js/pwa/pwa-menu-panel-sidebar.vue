@@ -2,8 +2,6 @@
 interface Props {
     // whether the panel has any visible content to show in it
     hasVisibleContent: boolean;
-    // site title, to show "[title] web app" in the message
-    siteTitle: string;
 }
 
 const props = defineProps<Props>();

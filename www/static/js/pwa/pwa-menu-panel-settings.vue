@@ -1,9 +1,9 @@
 <script setup lang="ts">
+import { sbProps } from "@js/util/sbx/pageUtils";
+
 interface Props {
     // whether the panel has any visible content to show in it
     hasVisibleContent: boolean;
-    // site title, to show "[title] web app" in the message
-    siteTitle: string;
 }
 
 const props = defineProps<Props>();
@@ -21,7 +21,7 @@ const showPanel = window.Vue.computed(() => {
         <div class="row actions-small-1">
             <div class="list-item">
                 <div class="small-12 columns">
-                    <h2 class="subheader">Setup {{ props.siteTitle }} web app</h2>
+                    <h2 class="subheader">Setup {{ sbProps.siteTitle }} web app</h2>
                 </div>
             </div>
         </div>

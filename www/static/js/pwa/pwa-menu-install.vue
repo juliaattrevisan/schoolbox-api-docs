@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { sbProps } from "@js/util/sbx/pageUtils";
 import { getUserPlatform, isPWA } from "@js/util/browserUtils";
 import PwaMenuShareIcon from "./pwa-menu-share-icon.vue";
 import { usePwaStore } from "./store/pwaStore";
@@ -6,8 +7,6 @@ import { usePwaStore } from "./store/pwaStore";
 interface Props {
     // if this component is located in the sidebar or the notifications setting page
     page: "sidebar" | "settings";
-    // site title, to show "[title] web app" in the message
-    siteTitle: string;
     // the digistorm prompt for google/apple, if it exists
     installApple: string | null;
     installGoogle: string | null;
@@ -66,7 +65,7 @@ defineExpose({ hasVisibleContent });
 </script>
 <template>
     <p v-if="pwaPromptType.id !== null">
-        To receive push notifications and enjoy a better experience, install the {{ props.siteTitle }} web app on your
+        To receive push notifications and enjoy a better experience, install the {{ sbProps.siteTitle }} web app on your
         device.
     </p>
 
@@ -74,10 +73,10 @@ defineExpose({ hasVisibleContent });
     <a v-else-if="pwaPromptType.id !== null" data-pwa-action="installPWA" class="button" href="#">Install</a>
 
     <div v-if="pwaPromptType.id === 'iOS'" data-reveal class="reveal-modal">
-        <h1>Add the {{ props.siteTitle }} web app to your home screen</h1>
+        <h1>Add the {{ sbProps.siteTitle }} web app to your home screen</h1>
         <a class="close-reveal-modal" aria-label="Close">&#215;</a>
         <p>
-            To receive push notifications and enjoy a better experience, install the {{ props.siteTitle }} web app on
+            To receive push notifications and enjoy a better experience, install the {{ sbProps.siteTitle }} web app on
             your Apple device.
         </p>
 
@@ -92,8 +91,8 @@ defineExpose({ hasVisibleContent });
         </p>
 
         <p>
-            Once you've added the {{ props.siteTitle }} web app to your home screen, you must then go to the web app on
-            your home screen to enable notifications.
+            Once you've added the {{ sbProps.siteTitle }} web app to your home screen, you must then go to the web app
+            on your home screen to enable notifications.
         </p>
         <p>If you're still unable to add it to your home screen, please contact your support team.</p>
     </div>
