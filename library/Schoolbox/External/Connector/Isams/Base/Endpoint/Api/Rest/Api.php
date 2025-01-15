@@ -102,7 +102,7 @@ class Api
                     'scope' => 'restapi',
                 ],
             ],
-            true,
+            false,
         );
 
         $this->jwks['expires'] = time() + $this->jwks['expires_in'];
@@ -116,16 +116,18 @@ class Api
      * @param string $path
      * @param string $method
      * @param array $options
-     * @param bool $ignoreToken
+     * @param bool $requireToken
      * @param bool $raw - return raw data, not json decoded
      * @return mixed
      * @throws GuzzleException
      * @throws \JsonException
+     * @throws ClientExceptionInterface
+     * @throws InvalidArgumentException
      */
-    public function request(string $path, string $method, array $options = [], bool $ignoreToken = false, bool $raw = false): mixed
+    public function request(string $path, string $method, array $options = [], bool $requireToken = true, bool $raw = false): mixed
     {
         // if we have a bearer token, then use it.
-        if (!$ignoreToken) {
+        if ($requireToken) {
             $options = array_merge(
                 $options,
                 [
