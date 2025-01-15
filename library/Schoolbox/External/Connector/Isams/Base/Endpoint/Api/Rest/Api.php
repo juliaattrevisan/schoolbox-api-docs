@@ -71,7 +71,12 @@ class Api
         $this->httpClient = new HttpClient();
         $this->host = new Uri($this->apiHost);
 
-        // get the token
+        /* Incur a first-use cost upon construction. Normally we wouldn't be doing that here,
+         * instead incurring the cost upon first-time usage of $this->>getRequest() in order
+         * to reduce the workload of an instance of this class. I suppose it was justified by
+         * this class having no purpose other than to make api requests - except that you will,
+         * in some circumstances, have obtained a token without needing to do an api request.
+         */
         $this->getToken();
     }
 
