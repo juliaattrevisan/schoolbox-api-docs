@@ -34,8 +34,9 @@ class Prepare implements IStrategy
     {
         // if batch API exists, use that for photos, else fallback to batchxml thumbnails
         $credentials = (new DSN())->decode($this->key);
-        if (trim($credentials['modules'][DSN::MODULE_RESTAPIHOST]['key'] ?? '') === '') {
-            $photoDownloader = new BatchPhotoDownloader($this->host, $this->key, $this->zipDir);
+
+        if (trim($credentials['modules'][DSN::MODULE_RESTAPI]['host'] ?? '') === '') {
+            $photoDownloader = new BatchPhotoDownloader($this->host, $credentials, $this->zipDir);
 
             if ($this->validStrats->isStudentStratEnabled()) {
                 /* Download a zip containing everyone's profile pictures, and extract them

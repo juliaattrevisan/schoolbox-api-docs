@@ -29,17 +29,17 @@ use ZipArchive;
 class BatchPhotoDownloader implements IPhotoDownloader
 {
     /**
-     * All downloads have this prefix
-     */
-    private const DOWNLOAD_PREFIX = 'isams_profiles_';
-
-
-    /**
      * A subfolder of $zipDir gets created forcibly
      *
      * @var string
      */
     public const ISAMS_CACHE_DIR = 'isams';
+
+
+    /**
+     * All downloads have this prefix
+     */
+    private const DOWNLOAD_PREFIX = 'isams_profiles_';
 
 
     /**

@@ -27,10 +27,8 @@ class DSN implements IDSN
      * (Each module is an array key in the decoded DSN)
      */
     public const MODULE_BATCHXML = 'batchxml';
+    public const MODULE_RESTAPI = 'restapi';
 
-    public const MODULE_RESTAPIHOST = 'restapihost';
-    public const MODULE_RESTAPICLIENTID = 'restapiclientid';
-    public const MODULE_RESTAPICLIENTSECRET = 'restapiclientsecret';
 
     /**
      * Each module const has a corresponding path which isn't conveniently known,
@@ -112,9 +110,13 @@ class DSN implements IDSN
             $matches = [];
             preg_match(self::DSN_FORMAT, $dsnPart, $matches);
 
-            $struct['modules'][$matches[1]] = [
-                'key' => $matches[2]
-            ];
+            /* Conduct count when dsn format changes
+             */
+            if (\count($matches)) {
+                $struct['modules'][$matches[1]] = [
+                    'key' => $matches[2]
+                ];
+            }
         }
 
         /* Have a look at the options which may or may not exist

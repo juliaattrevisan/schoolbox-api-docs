@@ -70,7 +70,7 @@ class Download implements IStrategy
          */
         $credentials = (new DSN())->decode($this->key);
 
-        if (trim($credentials['modules'][DSN::MODULE_RESTAPIHOST]['key'] ?? '') === '') {
+        if (trim($credentials['modules'][DSN::MODULE_RESTAPI]['host'] ?? '') === '') {
             /* This lets you shank down zip files containing everyone's profile pictures
              */
             $this->photoDownloader = new BatchPhotoDownloader($this->host, $credentials, $this->zipDir);

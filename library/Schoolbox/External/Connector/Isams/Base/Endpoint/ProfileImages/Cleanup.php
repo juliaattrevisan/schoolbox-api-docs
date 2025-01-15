@@ -17,6 +17,16 @@ use SensitiveParameter;
 
 class Cleanup implements IStrategy
 {
+    private string $cacheDir;
+
+
+    /**
+     * Be circumspect with this, because it runs regardless of which photo downloader
+     * (batch or rest))
+     * @param LoggerInterface $log
+     * @param string $key
+     * @param string $zipDir
+     */
     public function __construct(
         private LoggerInterface $log,
         #[SensitiveParameter] private string $key,
@@ -31,7 +41,7 @@ class Cleanup implements IStrategy
     {
         // if batch API exists, no photos to clean up
         $credentials = (new DSN())->decode($this->key);
-        if (trim($credentials['modules'][DSN::MODULE_RESTAPIHOST]['key'] ?? '') === '') {
+        if (trim($credentials['modules'][DSN::MODULE_RESTAPI]['host'] ?? '') === '') {
             /* Only try to clean up photos if we actually tried to import them
              * Otherwise leave this place untouched
              */
@@ -48,11 +58,20 @@ class Cleanup implements IStrategy
      */
     private function cleanup(): void
     {
-        $dirhandle = opendir($this->zipDir);
+        $cacheDir = $this->zipDir . '/' . BatchPhotoDownloader::ISAMS_CACHE_DIR;
+
+        $dirhandle = opendir($cacheDir);
 
         while ($file = readdir($dirhandle)) {
-            if ($file !== '.' && $file !== '..') {
-                $source = "{$this->zipDir}/{$file}";
+            /* There might not actually be any profile pictures here
+             */
+            if ($file !== '.' && $file !== '..' && $file !== '') {
+                $source = "{$cacheDir}/{$file}";
+
+                $this->log->debug(sprintf(
+                    'Unlinking zip remnants: %s',
+                    $source
+                ));
 
                 unlink($source);
             }

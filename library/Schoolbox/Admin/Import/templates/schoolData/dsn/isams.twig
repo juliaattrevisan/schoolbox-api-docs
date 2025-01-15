@@ -59,15 +59,15 @@
                 <div class="row">
                     <div class="small-12 medium-4 columns">
                         <label>Host</label>
-                        <input type="text" class='suds-crypto' name="dsn[isams][modules][restapihost][key]" value="{{ modules.restapihost.key ?? ''}}" />
+                        <input type="text" class='suds-crypto' name="dsn[isams][modules][restapi][host]" value="{{ modules.restapi.host ?? ''}}" />
                     </div>
                     <div class="small-12 medium-4 columns">
                         <label>Client ID</label>
-                        <input type="text" class='suds-crypto' name="dsn[isams][modules][restapiclientid][key]" value="{{ modules.restapiclientid.key ?? ''}}" />
+                        <input type="text" class='suds-crypto' name="dsn[isams][modules][restapi][clientid]" value="{{ modules.restapi.clientid ?? ''}}" />
                     </div>
                     <div class="small-12 medium-4 columns">
                         <label>Client Secret</label>
-                        <input type="text" class='suds-crypto' name="dsn[isams][modules][restapiclientsecret][key]" value="{{ modules.restapiclientsecret.key ?? ''}}" />
+                        <input type="text" class='suds-crypto' name="dsn[isams][modules][restapi][clientsecret]" value="{{ modules.restapi.clientsecret ?? ''}}" />
                     </div>
                 </div>
             </div>
