@@ -8,7 +8,7 @@
 
 declare(strict_types=1);
 
-namespace Schoolbox\External\Connector\Isams\Base\Endpoint\ProfileImages;
+namespace Schoolbox\External\Connector\Isams\Base\Endpoint\Profile\Images;
 
 use Psr\Log\LoggerInterface;
 use Schoolbox\External\Connector\Isams\Base\Endpoint\Codec\DSN;
@@ -16,8 +16,20 @@ use Schoolbox\External\Connector\ValidStrats;
 use Schoolbox\External\Importer\Endpoint\IStrategy;
 use SensitiveParameter;
 
+/**
+ * This prefetches student and staff portrait photos where possible.
+ * cli arg --strats is obeyed here so you only fetch what you intended
+ * to actually use.
+ */
 class Prepare implements IStrategy
 {
+    /**
+     * @param LoggerInterface $log
+     * @param $host
+     * @param string $key
+     * @param string $zipDir
+     * @param ValidStrats $validStrats
+     */
     public function __construct(
         private LoggerInterface $log,
         private $host,

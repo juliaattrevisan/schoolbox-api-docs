@@ -7,7 +7,7 @@
 
 declare(strict_types=1);
 
-namespace Schoolbox\External\Connector\Isams\Base\Endpoint\ProfileImages;
+namespace Schoolbox\External\Connector\Isams\Base\Endpoint\Profile\Images;
 
 use Schoolbox\External\Connector\Isams\Base\Endpoint\Api\Rest\Api;
 use Schoolbox\External\Connector\Isams\Base\Endpoint\Codec\DSN;

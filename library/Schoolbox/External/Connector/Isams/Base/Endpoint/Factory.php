@@ -164,13 +164,13 @@ class Factory
         }
         if ($this->includePhoto && $this->validStrats->isPhotoStratEnabled()) {
             $bus
-                ->add(new ProfileImages\Prepare(
+                ->add(new Profile\Images\Prepare(
                     $this->log,
                     $this->host,
                     $this->key,
                     $this->zipDir,
                     $this->validStrats
-                ))->add(new ProfileImages\Download(
+                ))->add(new Profile\Images\Download(
                     $this->log,
                     $this->perform,
                     $registry,
@@ -180,7 +180,7 @@ class Factory
                     $this->baseProfileMapper,
                     $this->storageMapper
                 ))
-                ->add(new ProfileImages\Cleanup(
+                ->add(new Profile\Images\Cleanup(
                     $this->log,
                     $this->key,
                     $this->zipDir,
