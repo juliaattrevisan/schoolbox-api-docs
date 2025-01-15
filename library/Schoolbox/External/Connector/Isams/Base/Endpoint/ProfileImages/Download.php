@@ -96,8 +96,16 @@ class Download implements IStrategy
                     ));
                     continue;
                 }
-                // don't know what this was, let it bubble
-                throw $e;
+
+                $this->log->warning(sprintf(
+                    'Could not obtain portrait picture for %s %s (%s): %s. Skipping',
+                    $data['person']['firstname'],
+                    $data['person']['lastname'],
+                    $externalId,
+                    $e->getMessage()
+                ));
+
+                continue;
             }
             if (null === $data['person']['portrait'] || $sisPhotoId !== $data['person']['sisPhotoId']) {
                 $this->log->info(sprintf(
