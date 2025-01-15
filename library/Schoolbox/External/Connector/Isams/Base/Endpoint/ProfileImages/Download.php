@@ -24,6 +24,20 @@ class Download implements IStrategy
 {
     private IPhotoDownloader $photoDownloader;
 
+    /**
+     * The photo downloader chooses between the BatchXML zip archive and
+     * interrogating the iSAMS REST API per-person to obtain their profile
+     * picture. The BatchXML zip will be used if REST API isn't configured.
+     *
+     * @param LoggerInterface $log
+     * @param bool $perform
+     * @param Registry $registry
+     * @param string $host
+     * @param string $key
+     * @param string $zipDir
+     * @param UserProfile\Mapper $baseProfileMapper
+     * @param StorageMapper $storageMapper
+     */
     public function __construct(
         private LoggerInterface $log,
         private bool $perform,
@@ -35,6 +49,7 @@ class Download implements IStrategy
         private StorageMapper $storageMapper
     ) {
     }
+
 
     /**
      * @inheritDoc
