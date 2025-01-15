@@ -76,8 +76,11 @@ class DSN implements IDSN
      * followed by a colon
      * followed by key-value pairs
      * separated by comma
+     *
+     * Note: somewhat obsoleted by isams needing different data structs
+     * for storing batchxml and restapi credentials differently.
      */
-    private const DSN_FORMAT = '/([^:]+):key=([^;]*)/';
+    private const DSN_FORMAT = '/([^:]+):[([^=]+)=([^;]*)]*/';
 
 
     /**
@@ -104,18 +107,26 @@ class DSN implements IDSN
 
         /* Break apart module config
          */
-        $dsnParts = explode(self::MODULE_SEPARATOR, $credentials);
+        $modules = explode(self::MODULE_SEPARATOR, $credentials);
 
-        foreach ($dsnParts as $dsnPart) {
-            $matches = [];
-            preg_match(self::DSN_FORMAT, $dsnPart, $matches);
-
-            /* Conduct count when dsn format changes
+        foreach ($modules as $module) {
+            /* Snap the module's configuration tuples out
+             *
+             * Note that the restapi host contains a :, because it's a url with
+             * https:// scheme out the front there. Treat it a bit specially
              */
-            if (\count($matches)) {
-                $struct['modules'][$matches[1]] = [
-                    'key' => $matches[2]
-                ];
+            $moduleParts = explode(':', $module, 2);
+
+            /* Tuples are in $moduleParts[1] and the module name itself
+             * is in $moduleParts[0]
+             */
+            $dsnParts = explode(self::TUPLE_SEPARATOR, $moduleParts[1]);
+
+            foreach ($dsnParts as $dsnPart) {
+                $matches = [];
+                preg_match(self::OPTION_FORMAT, $dsnPart, $matches);
+
+                $struct['modules'][$moduleParts[0]][$matches[1]] = $matches[2];
             }
         }
 
