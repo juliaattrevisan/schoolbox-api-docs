@@ -47,23 +47,28 @@
                         </select>
                     </div>
                 </div>
+
+                <hr />
+
+                <h4 class="no-margin">REST API Configuration</h4>
+
+                <p class="meta">
+                    If configured, the iSAMS REST API will be used to obtain higher-quality profile images.
+                </p>
+
                 <div class="row">
-                    <div class="small-12 columns">
-                        <span>Rest API, if needing fullsize profile images</span>
-                    </div>
-                    <div class="small-4 columns">
-                        <label >Rest API Host</label>
+                    <div class="small-12 medium-4 columns">
+                        <label>Host</label>
                         <input type="text" class='suds-crypto' name="dsn[isams][modules][restapihost][key]" value="{{ modules.restapihost.key ?? ''}}" />
                     </div>
-                    <div class="small-4 columns">
-                        <label >Rest API Client ID</label>
+                    <div class="small-12 medium-4 columns">
+                        <label>Client ID</label>
                         <input type="text" class='suds-crypto' name="dsn[isams][modules][restapiclientid][key]" value="{{ modules.restapiclientid.key ?? ''}}" />
                     </div>
-                    <div class="small-4 columns">
-                        <label >Rest API Client Secret</label>
+                    <div class="small-12 medium-4 columns">
+                        <label>Client Secret</label>
                         <input type="text" class='suds-crypto' name="dsn[isams][modules][restapiclientsecret][key]" value="{{ modules.restapiclientsecret.key ?? ''}}" />
                     </div>
-
                 </div>
             </div>
         </fieldset>
