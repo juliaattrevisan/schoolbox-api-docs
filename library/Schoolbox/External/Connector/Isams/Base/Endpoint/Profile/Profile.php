@@ -19,6 +19,7 @@ use Schoolbox\External\Connector\Isams\Base\Endpoint\Codec\DSN;
 use Schoolbox\External\Connector\Isams\Base\Endpoint\Profile\Metadata\Reader;
 use Schoolbox\External\Connector\Isams\Base\Endpoint\Registry;
 use Schoolbox\External\Connector\ValidStrats;
+use Schoolbox\External\Connector\Watchlist;
 use Schoolbox\External\Importer\Endpoint\IStrategy;
 use Schoolbox\External\Normalise\User\Common\Campus;
 use Schoolbox\External\Profile as UserProfile;
@@ -83,6 +84,7 @@ class Profile implements IStrategy
      * @param LoggerInterface                 $log
      * @param bool                            $perform
      * @param array                           $api
+     * @param array                           $watchlist
      * @param UserProfile\Mapper              $baseProfileMapper
      * @param UserProfile\Student\Mapper      $studentProfileMapper
      * @param UserProfile\Parent\Mapper       $parentProfileMapper
@@ -95,6 +97,7 @@ class Profile implements IStrategy
         private LoggerInterface $log,
         private bool $perform,
         private array $api,
+        private array $watchlist,
         private UserProfile\Mapper $baseProfileMapper,
         private UserProfile\Student\Mapper $studentProfileMapper,
         private UserProfile\Parent\Mapper $parentProfileMapper,
@@ -166,6 +169,13 @@ class Profile implements IStrategy
          */
         foreach ($students as $student) {
             $externalId = trim((string)$student->SchoolId);
+
+            /* Only import data for externalIds in $watchlist, if provided
+             */
+            if (!(new Watchlist())->isOnWatchlist($externalId, $this->watchlist)) {
+                continue;
+            }
+
             $academicHouse = trim((string)$student->AcademicHouse);
             $boardingHouseName = '';
             $dob = strtotime(trim((string)$student->DOB));
@@ -865,6 +875,13 @@ class Profile implements IStrategy
          */
         foreach ($staffs as $staff) {
             $externalId = trim((string)$staff->xpath('@PersonId')[0]->PersonId);
+
+            /* Only import data for externalIds in $watchlist, if provided
+             */
+            if (!(new Watchlist())->isOnWatchlist($externalId, $this->watchlist)) {
+                continue;
+            }
+
             $username = trim((string)$staff->UserName);
             $firstname = trim((string)$staff->Forename);
 

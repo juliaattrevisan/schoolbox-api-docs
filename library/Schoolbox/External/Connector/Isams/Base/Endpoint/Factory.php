@@ -145,6 +145,7 @@ class Factory
                     $this->log,
                     $this->perform,
                     $api,
+                    $this->watchlist,
                     $this->baseProfileMapper,
                     $this->studentProfileMapper,
                     $this->parentProfileMapper,

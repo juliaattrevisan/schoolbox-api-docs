@@ -116,7 +116,9 @@ class Download implements IStrategy
              */
             if (null === $data['person']['portrait'] || $sisPhotoId !== $data['person']['sisPhotoId']) {
                 $this->log->info(sprintf(
-                    'Downloading profile photo for %s',
+                    'Downloading profile photo for %s %s (%s)',
+                    $data['person']['firstname'],
+                    $data['person']['lastname'],
                     $externalId
                 ));
 
