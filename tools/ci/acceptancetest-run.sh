@@ -47,10 +47,20 @@ echo "Slow web/image requests:"
 cat /var/log/php-fpm.schoolbox.slow.log
 cat /var/log/php-fpm.schoolbox-images.slow.log
 
-
 ## After the test is run we need to shut down the services
 cd $initialdir;
 "$fullpath"/smoketest-teardown.sh $PHP_VERSION
+
+## Output Artifacts
+
+echo "Creating artifact directory";
+mkdir -vp $initialdir/built-artifacts;
+
+echo "Creating artifact";
+tar czf $initialdir/built-artifacts/"$branch"-acceptancetest.tar.gz test/playwright/_output;
+
+echo "Artifact List: `readlink -f $initialdir/built-artifacts/`";
+ls -lhR $initialdir/built-artifacts/;
 
 ## Then we need to close off our test with a return value, just to ensure the script closes properly.
 if [ $testResult -ne 0 ];
