@@ -79,7 +79,9 @@ class Download implements IStrategy
              * the sis photo has been updated,
              * we don't have a photo for the user yet
              */
-            // check if the sis photo has been updated...
+            /* We can detect when an identifier is different in isams than what we previously knew.
+             * This gives us a clue as to when a profile picture is different than before.
+             */
             try {
                 $sisPhotoId = $this->photoDownloader->getLatestPhotoID($data['person']['type'], $externalId);
             } catch (GuzzleException $e) {
