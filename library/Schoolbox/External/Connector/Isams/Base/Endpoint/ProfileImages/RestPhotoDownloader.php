@@ -29,15 +29,18 @@ class RestPhotoDownloader implements IPhotoDownloader
     /**
      * Constructor.
      *
-     * @param string $dsn
+     * @param array $credentials
      * @throws \DomainException
      */
-    public function __construct(#[SensitiveParameter] string $dsn)
+    public function __construct(#[SensitiveParameter] array $credentials)
     {
         /* Store this locally just once
          */
-        $credentials = (new DSN())->decode($dsn);
-        $this->api = new Api(trim($credentials['modules'][DSN::MODULE_RESTAPIHOST]['key']), trim($credentials['modules'][DSN::MODULE_RESTAPICLIENTID]['key']), trim($credentials['modules'][DSN::MODULE_RESTAPICLIENTSECRET]['key']));
+        $this->api = new Api(
+            trim((string)($credentials['modules'][DSN::MODULE_RESTAPIHOST]['key'] ?? '')),
+            trim((string)($credentials['modules'][DSN::MODULE_RESTAPICLIENTID]['key'] ?? '')),
+            trim((string)($credentials['modules'][DSN::MODULE_RESTAPICLIENTSECRET]['key'] ?? ''))
+        );
     }
 
     /**

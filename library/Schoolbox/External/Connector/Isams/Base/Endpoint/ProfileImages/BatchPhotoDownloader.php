@@ -66,18 +66,16 @@ class BatchPhotoDownloader implements IPhotoDownloader
      * Constructor.
      *
      * @param string $host
-     * @param string $dsn
+     * @param array $credentials
      * @param string $zipDir
      * @throws \DomainException
      */
-    public function __construct(string $host, #[SensitiveParameter] string $dsn, string $zipDir)
+    public function __construct(string $host, #[SensitiveParameter] array $credentials, string $zipDir)
     {
         $this->host = $host;
 
         /* Store this locally just once
          */
-        $credentials = (new DSN())->decode($dsn);
-
         $this->key = $credentials['modules'][DSN::MODULE_BATCHXML]['key'];
 
         $this->cacheDir = $zipDir . '/' . self::ISAMS_CACHE_DIR;

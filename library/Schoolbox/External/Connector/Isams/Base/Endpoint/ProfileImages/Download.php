@@ -49,14 +49,20 @@ class Download implements IStrategy
             return;
         }
 
-        // if batch API exists, use that for photos, else fallback to batchxml thumbnails
-        $credentials = (new DSN())->decode($this->key);
-        if (trim($credentials['modules'][DSN::MODULE_RESTAPIHOST]['key'] ?? '') === '') {
-            $this->photoDownloader = new BatchPhotoDownloader($this->host, $this->key, $this->zipDir);
-        } else {
-            /* This lets you shank down zip files containing everyone's profile pictures
+        /* Optionally use the iSAMS REST API to fetch higher-quality portrait images since the batchxml
+         * gives you low res thumbnails - this will be the fallback if schools don't configure their
+         * iSAMS REST API.
          */
-            $this->photoDownloader = new RestPhotoDownloader($this->key);
+        $credentials = (new DSN())->decode($this->key);
+
+        if (trim($credentials['modules'][DSN::MODULE_RESTAPIHOST]['key'] ?? '') === '') {
+            /* This lets you shank down zip files containing everyone's profile pictures
+             */
+            $this->photoDownloader = new BatchPhotoDownloader($this->host, $credentials, $this->zipDir);
+        } else {
+            /* Obtain each person's photo individually
+             */
+            $this->photoDownloader = new RestPhotoDownloader($credentials);
         }
 
         $this->log->debug(sprintf(
