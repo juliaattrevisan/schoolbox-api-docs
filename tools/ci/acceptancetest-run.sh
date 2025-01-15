@@ -32,7 +32,7 @@ cd /usr/share/schoolbox
 echo "cd into vagrant"
 
 ## Extract the NPM build
-tar xzf "$initialdir"/assets-artifact/*-assets.tar.gz;
+tar xzf "$initialdir"/npm-artifact/*-npm.tar.gz;
 
 ## Install playwright for the test
 npx playwright install
