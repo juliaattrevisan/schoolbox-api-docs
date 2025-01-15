@@ -268,9 +268,6 @@ class Profile implements IStrategy
         $campusMapping = $this->prefetchCampuses();
 
         $students = $this->api[DSN::MODULE_BATCHXML]->fetchXml('/iSAMS/PupilManager/CurrentPupils/Pupil');
-//        $log = new \Alaress_Log_File('/tmp/alaress.log');
-//        $log->log('test_', $students);
-//        die();
 
         /* $student is a stdclass derived from xml data,
          * it's not a Normalised Data Structure object here
