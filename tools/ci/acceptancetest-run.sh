@@ -27,15 +27,18 @@ fi
 ## We pretty much need the same configuration, then just install playwright afterwards
 "$fullpath"/smoketest-setup.sh $PHP_VERSION
 echo "${TEST_SUITE} tests setup"
+
 cd /usr/share/schoolbox
 echo "cd into vagrant"
 
-npm ci
-echo "npm ci complete"
+## Extract the NPM build
+tar xzf "$initialdir"/assets-artifact/*-assets.tar.gz;
 
-npm install playwright
+## Install playwright for the test
+npm playwright install
 echo "playwright installed"
 
+## Run tests
 INSTANCE_ID=acceptancetest npx playwright test
 
 testResult=$?;
