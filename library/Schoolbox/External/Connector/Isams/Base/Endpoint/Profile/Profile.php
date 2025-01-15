@@ -67,31 +67,6 @@ class Profile implements IStrategy
 
 
     /**
-     * @var ValidStrats
-     */
-    private ValidStrats $validStrats;
-
-
-    /**
-     * @var LoggerInterface
-     */
-    private LoggerInterface $log;
-
-
-    /**
-     * The "perform" flag from the cli tool
-     *
-     * @var bool
-     */
-    private bool $perform;
-
-
-    /**
-     * @var array
-     */
-    private array $api;
-
-    /**
      * A list of (strat, externalid) tuples that each have one or more error messages
      * caused by some random reason such as overflows, incompatible types, etc
      * since it captures root-level \Exception instances
@@ -100,34 +75,6 @@ class Profile implements IStrategy
      */
     private array $errors = [];
 
-    /**
-     * @var UserProfile\Mapper
-     */
-    private UserProfile\Mapper $baseProfileMapper;
-
-
-    /**
-     * @var UserProfile\Student\Mapper
-     */
-    private UserProfile\Student\Mapper $studentProfileMapper;
-
-
-    /**
-     * @var UserProfile\Parent\Mapper
-     */
-    private UserProfile\Parent\Mapper $parentProfileMapper;
-
-
-    /**
-     * @var UserProfile\Staff\Mapper
-     */
-    private UserProfile\Staff\Mapper $staffProfileMapper;
-
-
-    /**
-     * @var UserProfile\Relationship\Mapper
-     */
-    private UserProfile\Relationship\Mapper $relationshipMapper;
 
     /**
      * Profile constructor.
@@ -144,26 +91,17 @@ class Profile implements IStrategy
      * @param Registry                        $registry
      */
     public function __construct(
-        ValidStrats $validStrats,
-        LoggerInterface $log,
-        bool $perform,
-        array $api,
-        UserProfile\Mapper $baseProfileMapper,
-        UserProfile\Student\Mapper $studentProfileMapper,
-        UserProfile\Parent\Mapper $parentProfileMapper,
-        UserProfile\Staff\Mapper $staffProfileMapper,
-        UserProfile\Relationship\Mapper $relationshipMapper,
+        private ValidStrats $validStrats,
+        private LoggerInterface $log,
+        private bool $perform,
+        private array $api,
+        private UserProfile\Mapper $baseProfileMapper,
+        private UserProfile\Student\Mapper $studentProfileMapper,
+        private UserProfile\Parent\Mapper $parentProfileMapper,
+        private UserProfile\Staff\Mapper $staffProfileMapper,
+        private UserProfile\Relationship\Mapper $relationshipMapper,
         private Registry $registry
     ) {
-        $this->validStrats = $validStrats;
-        $this->log = $log;
-        $this->perform = $perform;
-        $this->api = $api;
-        $this->baseProfileMapper = $baseProfileMapper;
-        $this->studentProfileMapper = $studentProfileMapper;
-        $this->parentProfileMapper = $parentProfileMapper;
-        $this->staffProfileMapper = $staffProfileMapper;
-        $this->relationshipMapper = $relationshipMapper;
     }
 
 
