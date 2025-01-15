@@ -98,7 +98,11 @@ class Download implements IStrategy
                 throw $e;
             }
             if (null === $data['person']['portrait'] || $sisPhotoId !== $data['person']['sisPhotoId']) {
-                $this->log->info('Downloading profile photo for ' . $externalId);
+                $this->log->info(sprintf(
+                    'Downloading profile photo for %s',
+                    $externalId
+                ));
+
                 /** @var UserProfile\Model $baseProfile */
                 $baseProfile = $users->getBy('externalId', $externalId);
 
@@ -179,15 +183,29 @@ class Download implements IStrategy
              *     - your existing picture is different to the one we just got; update it
              */
             if (!$baseProfile->getPortrait() || ($baseProfile->getPortrait()->getHash() !== $portrait->getHash())) {
-                $this->log->debug(sprintf(
-                    'Profile picture: %s %s (%s) has profile hash %s derived from %s.png via %s',
-                    $baseProfile->getFirstname(),
-                    $baseProfile->getLastname(),
-                    $baseProfile->getExternalId(),
-                    $portrait->getHash(),
-                    $data['person']['personId'],
-                    get_class($this->photoDownloader),
-                ));
+                if ($this->photoDownloader instanceof RestPhotoDownloader) {
+                    /* REST API portrait images come from one of four endpoints
+                     * which we don't know from here
+                     */
+                    $this->log->debug(sprintf(
+                        'Profile picture: %s %s (%s) has profile hash %s via REST API',
+                        $baseProfile->getFirstname(),
+                        $baseProfile->getLastname(),
+                        $baseProfile->getExternalId(),
+                        $portrait->getHash(),
+                    ));
+                } else {
+                    /* BatchXML portrait images come from files in a zip, so we can directly correlate them
+                     */
+                    $this->log->debug(sprintf(
+                        'Profile picture: %s %s (%s) has profile hash %s derived from %s.png via BatchXML zip',
+                        $baseProfile->getFirstname(),
+                        $baseProfile->getLastname(),
+                        $baseProfile->getExternalId(),
+                        $portrait->getHash(),
+                        $data['person']['personId'],
+                    ));
+                }
 
                 $baseProfile->setPortrait($portrait);
 
