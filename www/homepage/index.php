@@ -419,12 +419,14 @@ $this->setVar(array(
     ]),
 ));
 
-// Only include google_script_block if Google Drive is configured.
 if (
+    // This condition matches isGoogleEnabled() in GoogleFile/Component/Homepage/Controller.php
     $this->getDi()->get('config')->get(ConfigMapper::NAME_GOOGLEDRIVE_ENABLED) &&
     $this->getDi()->get('config')->get(ConfigMapper::NAME_GOOGLEAPPS_CLIENT_ID)
 ) {
     $this->parse('google_script_block', 'google_script', true);
+} else {
+    $this->setVar('google_script_block');
 }
 
 // Colors (original)
