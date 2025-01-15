@@ -12,10 +12,11 @@ export default class DatabaseHelper {
      * Initialises the database connection pool
      */
     constructor() {
+        // There are different connection details for CI vs local vagrant
         this.pool = createPool({
-            host: process.env.CI ? "localhost" : "vagrant.dev.schoolbox.cloud",
-            user: "root",
-            password: "tnp879",
+            host: "vagrant.dev.schoolbox.cloud",
+            user: process.env.CI ? "schoolboxvagrant" : "root",
+            password: process.env.CI ? "abc123" : "tnp879",
             database: "schoolbox",
             waitForConnections: true,
             connectionLimit: 10,
