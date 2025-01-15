@@ -58,6 +58,9 @@ class Cleanup implements IStrategy
      */
     private function cleanup(): void
     {
+        /* FIXME Arguably this should be passed in through the Factorys at the uppermost levels
+         *  It's too easy to neglect the ISAMS_CACHE_DIR subfolder
+         */
         $cacheDir = $this->zipDir . '/' . BatchPhotoDownloader::ISAMS_CACHE_DIR;
 
         $dirhandle = opendir($cacheDir);
