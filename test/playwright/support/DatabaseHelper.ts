@@ -13,7 +13,7 @@ export default class DatabaseHelper {
      */
     constructor() {
         this.pool = createPool({
-            host: "vagrant.dev.schoolbox.cloud",
+            host: process.env.CI ? "localhost" : "vagrant.dev.schoolbox.cloud",
             user: "root",
             password: "tnp879",
             database: "schoolbox",

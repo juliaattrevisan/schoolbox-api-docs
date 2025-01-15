@@ -39,7 +39,7 @@ npx playwright install
 echo "playwright installed"
 
 ## Run tests
-INSTANCE_ID=acceptancetest npx playwright test
+INSTANCE_ID=acceptancetest CI=true npx playwright test
 
 testResult=$?;
 

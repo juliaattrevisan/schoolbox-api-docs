@@ -17,10 +17,15 @@ export default defineConfig({
     /* Timeout a test if it takes longer than 5 minutes - Value is in milliseconds */
     timeout: 5 * 60 * 1000,
     /* Reporter to use. See https://playwright.dev/docs/test-reporters */
-    reporter: [
-        ["html", { outputFolder: "./test/playwright/_output/html/", port: 10081, host: "0.0.0.0" }],
-        ["list", { printSteps: true }],
-    ],
+    reporter: process.env.CI
+        ? [
+              ["html", { outputFolder: "./test/playwright/_output/html/", open: "never" }],
+              ["list", { printSteps: true }],
+          ]
+        : [
+              ["html", { outputFolder: "./test/playwright/_output/html/", port: 10081, host: "0.0.0.0" }],
+              ["list", { printSteps: true }],
+          ],
     /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
     use: {
         /* Base URL to use in actions like `await page.goto('/')`. */
@@ -46,6 +51,9 @@ export default defineConfig({
 
         /* Set the default timeout for page.goto to be 30 seconds - Value is in milliseconds */
         navigationTimeout: 30 * 1000,
+
+        /* Ignore HTTPS errors when on CI */
+        ignoreHTTPSErrors: process.env.CI ? true : undefined,
     },
     expect: {
         /* Set the default timeout for all the expect assertions to be 10 seconds - Value is in milliseconds */
