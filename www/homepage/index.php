@@ -191,6 +191,7 @@ $this->setTitle($folder->getName());
 //     * 'manage_class'
 //  * 'readonly_switch_off'
 //  * 'readonly_switch_on'
+$this->setBlock('custom_head', 'google_script', 'google_script_block');
 $this->setBlock('custom_head', 'colour_list', 'colour_list_block');
 $this->setBlock('custom_head', 'modify_layout', 'modify_layout_block');
 $this->setBlock(TEMPLATE_content, 'customise_page', 'customise_page_block');
@@ -417,6 +418,16 @@ $this->setVar(array(
         'folderId' => $folder->getId()
     ]),
 ));
+
+if (
+    // This condition matches isGoogleEnabled() in GoogleFile/Component/Homepage/Controller.php
+    $this->getDi()->get('config')->get(ConfigMapper::NAME_GOOGLEDRIVE_ENABLED) &&
+    $this->getDi()->get('config')->get(ConfigMapper::NAME_GOOGLEAPPS_CLIENT_ID)
+) {
+    $this->parse('google_script_block', 'google_script', true);
+} else {
+    $this->setVar('google_script_block');
+}
 
 // Colors (original)
 $this->setVar('COLOUR_ARRAY', 'original');
