@@ -35,7 +35,7 @@ echo "cd into vagrant"
 tar xzf "$initialdir"/assets-artifact/*-assets.tar.gz;
 
 ## Install playwright for the test
-npm playwright install
+npx playwright install
 echo "playwright installed"
 
 ## Run tests
