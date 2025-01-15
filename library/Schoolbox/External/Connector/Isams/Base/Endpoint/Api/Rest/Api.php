@@ -64,12 +64,12 @@ class Api
      * @param string $clientSecret
      */
     public function __construct(
-        string $apiHost,
+        private string $apiHost,
         private string $clientId,
         #[SensitiveParameter] private string $clientSecret,
     ) {
         $this->httpClient = new HttpClient();
-        $this->host = new Uri($apiHost);
+        $this->host = new Uri($this->apiHost);
 
         // get the token
         $this->getToken();
