@@ -49,6 +49,9 @@ class Controller extends Base
         $post = $this->requestPost;
 
         try {
+            // Fetching the model so it can be updated since iConfigLoader is read-only
+            $lastModified = $this->configMapper->findOneByColumn("name", "terminology_last_modified");
+
             foreach ($post['singularForm'] as $term => $singularForm) {
                 $localisation = $this->l10nMapper->findById($term)
                     ->setSingularForm(trim($singularForm))
@@ -59,11 +62,10 @@ class Controller extends Base
                 $this->l10nMapper->save($localisation);
 
                 // Update the last modified time so the cache can be invalidated
-                // Fetching the model so it can be updated since iConfigLoader is read-only
-                $lastModified = $this->configMapper->findOneByColumn("name", "terminology_last_modified");
                 $lastModified->setValue(time());
-                $this->configMapper->save($lastModified);
             }
+
+            $this->configMapper->save($lastModified);
         } catch (MapperException $e) {
             // noop, I guess? skip unknown terminologies
         }
