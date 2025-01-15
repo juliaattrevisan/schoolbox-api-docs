@@ -323,7 +323,9 @@ class RecursiveUndeleter
         Forum\PostMapper::class                         => [],
         News\Mapper::class                              => [],
         \Schoolbox\User\Token\Mapper::class => [],
-        PostMapper::class => []
+        PostMapper::class => [
+            PostMapper::class => 'parent_id'
+        ]
     ];
 
 
