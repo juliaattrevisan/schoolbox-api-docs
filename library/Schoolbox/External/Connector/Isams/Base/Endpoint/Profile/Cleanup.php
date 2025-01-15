@@ -25,46 +25,6 @@ use Schoolbox\External\Profile\Mapper;
 class Cleanup implements IStrategy
 {
     /**
-     * @var LoggerInterface
-     */
-    private LoggerInterface $log;
-
-
-    /**
-     * @var bool
-     */
-    private bool $perform;
-
-    /**
-     * @var UserProfile\Mapper
-     */
-    private UserProfile\Mapper $baseProfileMapper;
-
-
-    /**
-     * @var UserProfile\Student\Mapper
-     */
-    private UserProfile\Student\Mapper $studentProfileMapper;
-
-
-    /**
-     * @var UserProfile\Parent\Mapper
-     */
-    private UserProfile\Parent\Mapper $parentProfileMapper;
-
-
-    /**
-     * @var UserProfile\Staff\Mapper
-     */
-    private UserProfile\Staff\Mapper $staffProfileMapper;
-
-
-    /**
-     * @var UserProfile\Relationship\Mapper
-     */
-    private UserProfile\Relationship\Mapper $relationshipMapper;
-
-    /**
      * Cleanup constructor.
      *
      * @param LoggerInterface                 $log
@@ -76,21 +36,14 @@ class Cleanup implements IStrategy
      * @param UserProfile\Relationship\Mapper $relationshipMapper
      */
     public function __construct(
-        LoggerInterface $log,
-        bool $perform,
-        UserProfile\Mapper $baseProfileMapper,
-        UserProfile\Student\Mapper $studentProfileMapper,
-        UserProfile\Parent\Mapper $parentProfileMapper,
-        UserProfile\Staff\Mapper $staffProfileMapper,
-        UserProfile\Relationship\Mapper $relationshipMapper,
+        private LoggerInterface $log,
+        private bool $perform,
+        private UserProfile\Mapper $baseProfileMapper,
+        private UserProfile\Student\Mapper $studentProfileMapper,
+        private UserProfile\Parent\Mapper $parentProfileMapper,
+        private UserProfile\Staff\Mapper $staffProfileMapper,
+        private UserProfile\Relationship\Mapper $relationshipMapper,
     ) {
-        $this->log = $log;
-        $this->perform = $perform;
-        $this->baseProfileMapper = $baseProfileMapper;
-        $this->studentProfileMapper = $studentProfileMapper;
-        $this->parentProfileMapper = $parentProfileMapper;
-        $this->staffProfileMapper = $staffProfileMapper;
-        $this->relationshipMapper = $relationshipMapper;
     }
 
 
