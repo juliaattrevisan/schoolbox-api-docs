@@ -22,6 +22,13 @@ else
     exit 1;
 fi
 
+branch='master';
+if [ ! -z $2 ];
+then
+	branch="$2";
+fi
+
+echo "Branch: $branch";
 
 ## Run the smoke test setup script to get the environment ready
 ## We pretty much need the same configuration, then just install playwright afterwards
