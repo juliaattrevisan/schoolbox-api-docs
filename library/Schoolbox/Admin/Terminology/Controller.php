@@ -49,9 +49,6 @@ class Controller extends Base
         $post = $this->requestPost;
 
         try {
-            // Fetching the model so it can be updated since iConfigLoader is read-only
-            $lastModified = $this->configMapper->findOneByColumn("name", "terminology_last_modified");
-
             // Find all the terms that the user is trying to update
             $terms = array_keys($post['singularForm']);
             $localisations = $this->l10nMapper->findByColumn('term', $terms);
@@ -66,11 +63,12 @@ class Controller extends Base
                     ->setIndefiniteArticle(trim($post['indefiniteArticle'][$term]));
 
                 $this->l10nMapper->save($localisation);
-
-                // Update the last modified time so the cache can be invalidated
-                $lastModified->setValue(time());
             }
 
+            // Fetching the model so it can be updated since iConfigLoader is read-only
+            // Update the last modified time so the cache can be invalidated
+            $lastModified = $this->configMapper->findOneByColumn("name", "terminology_last_modified");
+            $lastModified->setValue(time());
             $this->configMapper->save($lastModified);
         } catch (MapperException $e) {
             // noop, I guess? skip unknown terminologies
