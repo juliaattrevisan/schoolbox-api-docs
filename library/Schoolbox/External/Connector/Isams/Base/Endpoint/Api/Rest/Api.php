@@ -125,9 +125,6 @@ class Api
      * @param bool $raw - return raw data, not json decoded
      * @return mixed
      * @throws GuzzleException
-     * @throws \JsonException
-     * @throws ClientExceptionInterface
-     * @throws InvalidArgumentException
      */
     public function request(string $path, string $method, array $options = [], bool $requireToken = true, bool $raw = false): mixed
     {

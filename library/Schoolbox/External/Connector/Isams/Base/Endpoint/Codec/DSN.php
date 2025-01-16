@@ -80,7 +80,7 @@ class DSN implements IDSN
      * Note: somewhat obsoleted by isams needing different data structs
      * for storing batchxml and restapi credentials differently.
      */
-    private const DSN_FORMAT = '/([^:]+):[([^=]+)=([^;]*)]*/';
+//    private const DSN_FORMAT = '/([^:]+):[([^=]+)=([^;]*)]*/';
 
 
     /**

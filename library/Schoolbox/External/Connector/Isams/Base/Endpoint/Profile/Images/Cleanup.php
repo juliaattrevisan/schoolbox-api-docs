@@ -17,9 +17,6 @@ use SensitiveParameter;
 
 class Cleanup implements IStrategy
 {
-    private string $cacheDir;
-
-
     /**
      * Be circumspect with this, because it runs regardless of which photo downloader
      * (batch or rest))
