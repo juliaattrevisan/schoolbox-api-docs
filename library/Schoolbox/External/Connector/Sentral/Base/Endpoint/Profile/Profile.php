@@ -24,6 +24,7 @@ use Schoolbox\Mapper;
 use Schoolbox\Mapper\DefinitionException;
 use Schoolbox\Mapper\Exception;
 use UnexpectedValueException;
+use Schoolbox\Resource\Storage\Mapper as StorageMapper;
 
 /**
  * Class Profile
@@ -40,6 +41,7 @@ class Profile implements IStrategy
      */
     public const TYPE_STUDENT = 'student';
     public const TYPE_STAFF = 'staff';
+    public const STAFF_PHOTO_ENDPOINT = 'enrolments/staff/%s/photo';
 
 
     /**
@@ -111,12 +113,14 @@ class Profile implements IStrategy
      * @param bool                            $perform
      * @param IApi                            $api
      * @param array                           $watchlist
+     * @param bool                            $includePhoto
      * @param Registry                        $registry
      * @param UserProfile\Mapper              $baseProfileMapper
      * @param UserProfile\Student\Mapper      $studentProfileMapper
      * @param UserProfile\Parent\Mapper       $parentProfileMapper
      * @param UserProfile\Staff\Mapper        $staffProfileMapper
      * @param UserProfile\Relationship\Mapper $relationshipMapper
+     * @param StorageMapper                   $storageMapper
      */
     public function __construct(
         private ValidStrats $validStrats,
@@ -124,12 +128,14 @@ class Profile implements IStrategy
         private bool $perform,
         private IApi $api,
         private array $watchlist,
+        private bool $includePhoto,
         private Registry $registry,
         private UserProfile\Mapper $baseProfileMapper,
         private UserProfile\Student\Mapper $studentProfileMapper,
         private UserProfile\Parent\Mapper $parentProfileMapper,
         private UserProfile\Staff\Mapper $staffProfileMapper,
-        private UserProfile\Relationship\Mapper $relationshipMapper
+        private UserProfile\Relationship\Mapper $relationshipMapper,
+        private StorageMapper $storageMapper,
     ) {
     }
 
@@ -202,7 +208,6 @@ class Profile implements IStrategy
 
         for ($i = 0; $nextUrl && $i < self::MAX_CALLS; $i++) {
             $payload = $this->api->retrieveDocument($nextUrl);
-
             foreach ($payload['data'] as $student) {
                 $externalId = (string)$student['attributes']['studentCode'];
 
@@ -233,14 +238,14 @@ class Profile implements IStrategy
                 /* Find the first meaningful value out of this set
                  */
                 $firstname = (new FirstMeaningfulValue())->find([
-                    $student['relationships']['person']['data']['attributes']['firstName'],
-                    $student['relationships']['person']['data']['attributes']['givenNames']
-                ]);
+                                                                    $student['relationships']['person']['data']['attributes']['firstName'],
+                                                                    $student['relationships']['person']['data']['attributes']['givenNames']
+                                                                ]);
 
                 $firstnamePreferred = (new FirstMeaningfulValue())->find([
-                    $student['relationships']['person']['data']['attributes']['preferredName'],
-                    $firstname
-                ]);
+                                                                             $student['relationships']['person']['data']['attributes']['preferredName'],
+                                                                             $firstname
+                                                                         ]);
 
                 $form = (string)$student['relationships']['primaryEnrolment']['data']['attributes']['rollClass'];
                 $gender = (string)$student['relationships']['person']['data']['attributes']['gender'];
@@ -303,6 +308,12 @@ class Profile implements IStrategy
                     ->setFirstname($firstname)
                     ->setFirstnamePreferred($firstnamePreferred)
                     ->setLastname($lastname);
+
+                $this->importPortrait(
+                    $studentBaseProfile,
+                    (string)$student['links']['photo'],
+                    (string)$student['attributes']['updatedAt']['iso8601']
+                );
 
                 /* Then save it
                  */
@@ -504,6 +515,101 @@ class Profile implements IStrategy
         }
     }
 
+    /**
+     * Import a profile picture for the given $baseProfile
+     *
+     * Importing a profile picture requires you to enable photo_from_sis config var
+     * ("Load Photos From SIS" needs to be on)
+     *
+     * @param UserProfile\Model $baseProfile
+     * @param string            $photoEndpoint
+     * @param string            $updatedAtTime
+     * @return void
+     */
+    private function importPortrait(UserProfile\Model $baseProfile, string $photoEndpoint, string $updatedAtTime): void
+    {
+        /* Skipping if the url is not provided
+         */
+        if (!$photoEndpoint) {
+            return;
+        }
+        /* Check if config setting allows photos from sis
+         * If it's enabled, continue importing pics
+         */
+        if (!$this->includePhoto) {
+            return;
+        }
+
+        /* Does user already have a portrait? If not let's try to find and update
+         */
+        if ($baseProfile->getPortrait() !== null) {
+            /* Check if the user was modified since the last update
+             * If yes, the photo could also have been updated, let's grab it
+             */
+            $updated_at = $this->findDate($updatedAtTime)?->getDatabase();
+            $stmt       = $this->baseProfileMapper->getDatabase()->executeQuery(
+                "
+            SELECT updated_at
+            FROM {$this->baseProfileMapper->getBaseTableName()}
+            WHERE external_id = :externalId
+            AND updated_at < :updatedAt
+        ",
+                [
+                    'externalId' => $baseProfile->getExternalId(),
+                    'updatedAt'  => $updated_at,
+                ]
+            );
+
+            if ($stmt->rowCount() === 0) {
+                $this->log->debug(
+                    sprintf(
+                        'Portrait of %s %s (%s) appears to be up to date. Skipping.',
+                        $baseProfile->getFirstname(),
+                        $baseProfile->getLastname(),
+                        $baseProfile->getExternalId()
+                    )
+                );
+                return;
+            }
+        }
+
+        $endpoint = "$photoEndpoint?width=500&height=500";
+        $photoContents = $this->api->retrievePortrait($endpoint);
+
+        /* Only try to persist images if perform mode is activated
+         */
+        if (!$this->perform) {
+            return;
+        }
+
+        try {
+            $externalId = $baseProfile->getExternalId();
+            $portrait = $this->storageMapper->acceptStream($externalId . '.jpg', $photoContents);
+
+            /* You get a picture if any of the following occur:
+             *     - you don't have a portrait yet; you can get one added
+             *     - your existing picture is different to the one we just got; update it
+             */
+            if (!$baseProfile->getPortrait() || ($baseProfile->getPortrait()->getHash() !== $portrait->getHash())) {
+                $this->log->debug(sprintf(
+                    'Profile picture: %s %s (%s) has profile hash %s derived from %s.png',
+                    $baseProfile->getFirstname(),
+                    $baseProfile->getLastname(),
+                    $externalId,
+                    $portrait->getHash(),
+                    $externalId,
+                ));
+
+                $baseProfile->setPortrait($portrait);
+            }
+        } catch (\Exception $e) {
+            // noop, but warn the cli that something unusual has transpired
+            $this->log->warning(sprintf(
+                'Profile picture: exception thrown. %s',
+                $e->getMessage()
+            ));
+        }
+    }
 
     /**
      * Find the Academic Period instances relevant to $date
@@ -978,14 +1084,14 @@ class Profile implements IStrategy
             /* Find the first meaningful value out of this set
              */
             $firstname = (new FirstMeaningfulValue())->find([
-                $parent['data']['attributes']['firstName'],
-                $parent['data']['attributes']['givenNames']
-            ]);
+                                                                $parent['data']['attributes']['firstName'],
+                                                                $parent['data']['attributes']['givenNames']
+                                                            ]);
 
             $firstnamePreferred = (new FirstMeaningfulValue())->find([
-                $parent['data']['attributes']['preferredName'],
-                $firstname
-            ]);
+                                                                         $parent['data']['attributes']['preferredName'],
+                                                                         $firstname
+                                                                     ]);
 
             $lastname = (string)$parent['data']['attributes']['lastName'];
             $phoneHome = $numbers[self::HOME_TELEPHONE_NUMBER] ?? '';
@@ -1101,9 +1207,9 @@ class Profile implements IStrategy
              */
             if ($this->perform) {
                 $relationship = $this->relationshipMapper->createModel()
-                    ->setUserProfile($parentBaseProfile)
-                    ->setChildProfile($studentBaseProfile)
-                    ->setType($relationshipName);
+                                                         ->setUserProfile($parentBaseProfile)
+                                                         ->setChildProfile($studentBaseProfile)
+                                                         ->setType($relationshipName);
 
                 $this->relationshipMapper->save($relationship);
             }
@@ -1148,15 +1254,19 @@ class Profile implements IStrategy
 
                 /* Find the first meaningful value out of this set
                  */
-                $firstname = (new FirstMeaningfulValue())->find([
-                    $staff['relationships']['person']['data']['attributes']['firstName'],
-                    $staff['relationships']['person']['data']['attributes']['givenNames']
-                ]);
+                $firstname = (new FirstMeaningfulValue())->find(
+                    [
+                        $staff['relationships']['person']['data']['attributes']['firstName'],
+                        $staff['relationships']['person']['data']['attributes']['givenNames']
+                    ]
+                );
 
-                $firstnamePreferred = (new FirstMeaningfulValue())->find([
-                    $staff['relationships']['person']['data']['attributes']['preferredName'],
-                    $firstname
-                ]);
+                $firstnamePreferred = (new FirstMeaningfulValue())->find(
+                    [
+                        $staff['relationships']['person']['data']['attributes']['preferredName'],
+                        $firstname
+                    ]
+                );
 
                 $building = '';
 
@@ -1288,6 +1398,12 @@ class Profile implements IStrategy
                     ->setFirstname($firstname)
                     ->setFirstnamePreferred($firstnamePreferred)
                     ->setLastname($lastname);
+
+                $this->importPortrait(
+                    $staffBaseProfile,
+                    sprintf(self::STAFF_PHOTO_ENDPOINT, (string)$staff['id']),
+                    (string)$staff['attributes']['updatedAt']['iso8601']
+                );
 
                 /* Then save it
                  */
