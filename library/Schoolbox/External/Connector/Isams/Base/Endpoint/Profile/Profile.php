@@ -275,7 +275,8 @@ class Profile implements IStrategy
         foreach ($students as $student) {
             $externalId = trim((string)$student->SchoolId);
             $academicHouse = trim((string)$student->AcademicHouse);
-            $boardingHouseName = '';
+            $boardingStatus = isset($student->xpath('@BoardingHouseId')[0]);
+            $boardingHouseName = trim((string)$student->BoardingHouse);
             $dob = strtotime(trim((string)$student->DOB));
             $firstname = trim((string)$student->Forename);
 
@@ -431,8 +432,11 @@ class Profile implements IStrategy
                  *
                  * We can't check for this effectively unless we predetermine what these
                  * statuses could contain and what those statuses mean
+                 *
+                 * Update 10/01/2025:
+                 * We are now assuming boarding status can be determined by BoardingHouseId in attribute
                  */
-                ->setBoardingStatus(false)
+                ->setBoardingStatus($boardingStatus)
                 ->setEsl(null)
                 ->setIb(null)
                 ->setIndividualLearningPlans(null)
