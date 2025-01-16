@@ -111,7 +111,7 @@ export default {
          * @returns {String} - The endpoint for the user search
          */
         getEndpoint() {
-            const searchUrl = new URL(this.badge._links.achievementRecipients, window.location.href);
+            const searchUrl = new URL(this.badge._links.goalRecipients, window.location.href);
             const searchParams = new URLSearchParams(this.userSearchAdditionalParams).toString();
             return searchParams ? `${searchUrl}?${searchParams}` : searchUrl.toString();
         },
