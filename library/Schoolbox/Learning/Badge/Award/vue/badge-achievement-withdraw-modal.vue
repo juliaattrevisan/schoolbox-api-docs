@@ -82,8 +82,7 @@ export default {
          */
         getEndpoint() {
             const searchUrl = new URL(this.badge._links.achievementRecipients, window.location.href);
-            const searchParams = new URLSearchParams(this.userSearchAdditionalParams).toString();
-            return searchParams ? `${searchUrl}?${searchParams}` : searchUrl.toString();
+            return searchUrl.toString();
         },
         /**
          * Open this modal.
@@ -177,11 +176,11 @@ export default {
             </div>
 
             <search-select
+                class="l-pad-m--bottom"
                 v-model:selected="selected"
                 label="Search"
-                label-id="users"
+                label-id="usersAchievement"
                 :endpoint="getEndpoint()"
-                :is-single-select="true"
                 placeholder=""
             >
                 <template #meta>
