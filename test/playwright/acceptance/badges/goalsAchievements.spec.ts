@@ -54,7 +54,7 @@ test.describe("Goals and Achievements tests", () => {
         await badges.clickBadgeDropdown(badgeId);
         await badges.clickDropdownOptionFirstElement(badgeId, "goal");
         tester.isGoingTo("search and select Jana Reed on the modal");
-        await badges.selectStudentSetGoal(student);
+        await badges.selectStudentSetGoalOrAchievement(student);
         tester.isGoingTo("click Set Goal button on the modal");
 
         await badges.clickSetGoalorAwardAchievement("Set goal");
@@ -96,7 +96,7 @@ test.describe("Goals and Achievements tests", () => {
         await badges.clickBadgeDropdown(badgeId);
         await badges.clickDropdownOptionFirstElement(badgeId, "achievement");
         tester.isGoingTo("search and select Jana Reed on the modal");
-        await badges.selectStudentAwardAchievement(student);
+        await badges.selectStudentSetGoalOrAchievement(student);
         tester.isGoingTo("click Award achievement button on the modal");
         await badges.clickSetGoalorAwardAchievement("Award");
         tester.isGoingTo("check the achievement is presented on Jana Reed activity feed");
@@ -179,7 +179,7 @@ test.describe("Goals and Achievements tests", () => {
         await badges.clickBadgeDropdown(badgeId);
         await badges.clickDropdownOptionFirstElement(badgeId, "goal");
         tester.isGoingTo("search and select Jana Reed on the modal");
-        await badges.selectStudentSetGoal(student);
+        await badges.selectStudentSetGoalOrAchievement(student);
         tester.isGoingTo("click Set Goal button on the modal");
         await badges.clickSetGoalorAwardAchievement("Set goal");
 
