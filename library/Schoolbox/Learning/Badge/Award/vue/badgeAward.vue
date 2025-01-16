@@ -274,7 +274,7 @@ export default {
         <search-select
             v-model:selected="selected"
             label="Search"
-            label-id="usersAward"
+            :label-id="`usersAward-${type}`"
             :endpoint="getEndpoint()"
             placeholder=""
         >
