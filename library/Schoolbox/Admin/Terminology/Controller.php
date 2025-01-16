@@ -52,9 +52,15 @@ class Controller extends Base
             // Fetching the model so it can be updated since iConfigLoader is read-only
             $lastModified = $this->configMapper->findOneByColumn("name", "terminology_last_modified");
 
-            foreach ($post['singularForm'] as $term => $singularForm) {
-                $localisation = $this->l10nMapper->findById($term)
-                    ->setSingularForm(trim($singularForm))
+            // Find all the terms that the user is trying to update
+            $terms = array_keys($post['singularForm']);
+            $localisations = $this->l10nMapper->findByColumn('term', $terms);
+
+            foreach ($localisations as $localisation) {
+                $term = $localisation->getTerm();
+
+                $localisation
+                    ->setSingularForm(trim($post['singularForm'][$term]))
                     ->setPluralForm(trim($post['pluralForm'][$term]))
                     ->setCapitaliseFirst(!empty($post['capitaliseFirst'][$term]))
                     ->setIndefiniteArticle(trim($post['indefiniteArticle'][$term]));
