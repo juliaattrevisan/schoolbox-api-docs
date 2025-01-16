@@ -35,6 +35,9 @@ echo "Branch: $branch";
 "$fullpath"/smoketest-setup.sh $PHP_VERSION
 echo "${TEST_SUITE} tests setup"
 
+# Start rabbitmq
+service rabbitmq-server start
+
 cd /usr/share/schoolbox
 echo "cd into vagrant"
 
@@ -57,6 +60,8 @@ cat /var/log/php-fpm.schoolbox-images.slow.log
 ## After the test is run we need to shut down the services
 cd $initialdir;
 "$fullpath"/smoketest-teardown.sh $PHP_VERSION
+
+service rabbitmq-server stop
 
 ## Output Artifacts
 
