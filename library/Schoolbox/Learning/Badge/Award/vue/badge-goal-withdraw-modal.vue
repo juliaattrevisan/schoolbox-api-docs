@@ -2,6 +2,7 @@
 // Ignore this file for ESLint checks for now (SA-18376)
 /* eslint-disable */
 /* eslint-enable vue/no-v-html */
+import SearchSelect from "@schoolboxVue/components/searchSelect/search-select.vue";
 import debounce from "lodash/debounce";
 import BadgeImage from "../../vue/badge-image";
 import RevealModal from "@schoolboxVue/components/reveal-modal";
@@ -55,6 +56,7 @@ export default {
         BadgeImage,
         RevealModal,
         vSelect,
+        SearchSelect,
     },
 
     /**
@@ -104,6 +106,15 @@ export default {
      * other ordinary javascript that you might have written before.
      */
     methods: {
+        /**
+         * Get the endpoint for the user search
+         * @returns {String} - The endpoint for the user search
+         */
+        getEndpoint() {
+            const searchUrl = new URL(this.badge._links.achievementRecipients, window.location.href);
+            const searchParams = new URLSearchParams(this.userSearchAdditionalParams).toString();
+            return searchParams ? `${searchUrl}?${searchParams}` : searchUrl.toString();
+        },
         /**
          * Open this modal.
          */
@@ -249,6 +260,15 @@ export default {
                     </div>
                 </template>
             </v-select>
+
+            <search-select
+                v-model:selected="selected"
+                label="Search"
+                label-id="users"
+                :endpoint="getEndpoint()"
+                :is-single-select="true"
+                placeholder=""
+            ></search-select>
 
             <ul class="flex-list buttons">
                 <li>
