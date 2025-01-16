@@ -39,7 +39,7 @@ npx playwright install
 echo "playwright installed"
 
 ## Run tests
-INSTANCE_ID=acceptancetest CI=true npx playwright test --max-failures=5 # TEMPORARY: FAIL AFTER A FEW ERRORS
+INSTANCE_ID=acceptancetest CI=true npx playwright test
 
 testResult=$?;
 
@@ -57,7 +57,12 @@ echo "Creating artifact directory";
 mkdir -vp $initialdir/built-artifacts;
 
 echo "Creating artifact";
-tar czf $initialdir/built-artifacts/"$branch"-acceptancetest.tar.gz test/playwright/_output;
+artifactsDir="/usr/share/schoolbox/test/playwright/_output/artifacts"
+if [ -d "$artifactsDir" ]; then
+    tar czf "$initialdir/built-artifacts/$branch-acceptancetest.tar.gz" "$artifactsDir";
+else
+    echo "No playwright artifacts found";
+fi
 
 echo "Artifact List: `readlink -f $initialdir/built-artifacts/`";
 ls -lhR $initialdir/built-artifacts/;
