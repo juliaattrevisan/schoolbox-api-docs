@@ -15,13 +15,9 @@ export default class Badges {
 
     static readonly BUTTON_CONFIRM_DELETE = "a.button.submit";
 
-    static readonly LIST_BOX_GOAL = "input[aria-controls='vs2__listbox']";
+    static readonly DATATEST_LIST_BOX_GOAL_ACHIEVEMENT = "ss-query-input";
 
-    static readonly LIST_BOX_AWARD = "input[aria-controls='vs1__listbox']";
-
-    static readonly USER_DROPDOWN = "ul[class='vs__dropdown-menu']";
-
-    static readonly SELECTED_STUDENT = "span.d-center";
+    static readonly DATATEST_SELECTED_STUDENT = "ss-results-item-container"; // append -[userId]
 
     static readonly DATA_TEST_MODAL_BUTTON_SET_GOAL_ACHIEVEMENT = "badge-award-confirm";
 
@@ -111,27 +107,21 @@ export default class Badges {
     }
 
     /**
-     * search and select a student on goal the modal
+     * search and select a student on the set goal or award achievement modal
      * @param studentName - The student name
      */
-    async selectStudentSetGoal(studentName: string): Promise<void> {
-        await this.page.fill(Badges.LIST_BOX_GOAL, studentName);
-        await this.page.waitForSelector(Badges.USER_DROPDOWN);
-        await this.page.press(Badges.LIST_BOX_GOAL, "Enter");
-        await this.page.click(Badges.SELECTED_STUDENT);
-        await this.page.keyboard.press("Tab");
-    }
-
-    /**
-     * search and select a student on goal the modal
-     * @param studentName - The student name
-     */
-    async selectStudentAwardAchievement(studentName: string): Promise<void> {
-        await this.page.fill(Badges.LIST_BOX_AWARD, studentName);
-        await this.page.waitForSelector(Badges.USER_DROPDOWN);
-        await this.page.press(Badges.LIST_BOX_AWARD, "Enter");
-        await this.page.click(Badges.SELECTED_STUDENT);
-        await this.page.keyboard.press("Tab");
+    async selectStudentSetGoalOrAchievement(studentName: string): Promise<void> {
+        const openModal = await this.tester.common.waitForModalToBeOpen();
+        await openModal.getByTestId(Badges.DATATEST_LIST_BOX_GOAL_ACHIEVEMENT).fill(studentName);
+        // Find the student in the list and click it (need to generalise the data-test as it's dynamic)
+        await openModal
+            .locator(`[data-test^="${Badges.DATATEST_SELECTED_STUDENT}"]`) // (starts with)
+            .filter({
+                hasText: studentName,
+            })
+            .click();
+        // Click on the <h2> of the modal to make sure the search select is not focused anymore
+        await openModal.locator("h2").click();
     }
 
     /**
@@ -146,6 +136,7 @@ export default class Badges {
             .getByTestId(Badges.DATA_TEST_MODAL_BUTTON_SET_GOAL_ACHIEVEMENT)
             .filter({ hasText: set })
             .click();
+        await this.tester.common.waitForModalToBeClosed();
     }
 
     /**
