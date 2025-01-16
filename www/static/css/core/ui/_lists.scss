@@ -191,6 +191,7 @@ $inline-list-default-float-list-margin: rem-calc($base-font-size);
     }
     .card {
         flex: 1 100%;
+        min-width: 0; /* Allows the item to shrink when linked to parent using display:flex  */
     }
     // <article> immediately follows <nav> has a special layout rule to display content
     .list-item ~ article,
