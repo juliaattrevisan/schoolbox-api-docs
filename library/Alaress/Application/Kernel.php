@@ -1369,38 +1369,6 @@ abstract class Kernel
             );
         }));
 
-        // Register external NDS object services
-
-        $di->set('externalNDSUser', $di->lazy(function () use ($di) {
-            /** @var IConfigLoader $config */
-            $config = $di->get('config');
-
-            /** @var array|IConnector $databaseExternal */
-            $databaseExternal = $di->get('databaseExternal');
-
-            $factory = new ExternalConnectorFactory();
-            return $factory->build(
-                $config,
-                $databaseExternal,
-                ExternalConnectorFactory::EXTERNAL_USER
-            );
-        }));
-
-        $di->set('externalNDSTimetable', $di->lazy(function () use ($di) {
-            /** @var IConfigLoader $config */
-            $config = $di->get('config');
-
-            /** @var array|IConnector $databaseExternal */
-            $databaseExternal = $di->get('databaseExternal');
-
-            $factory = new ExternalConnectorFactory();
-            return $factory->build(
-                $config,
-                $databaseExternal,
-                ExternalConnectorFactory::EXTERNAL_TIMETABLE
-            );
-        }));
-
         // LTI Provider mapper
         $di->set('providerMapper', $di->lazyNew(LTIProviderMapper::class));
 

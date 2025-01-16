@@ -18,9 +18,6 @@ use UnexpectedValueException;
 class Factory
 {
     // Types of external objects this thing can construct
-
-    public const EXTERNAL_USER = 'User';
-    public const EXTERNAL_TIMETABLE = 'Timetable';
     public const EXTERNAL_SYNC = 'Sync';
     public const EXTERNAL_EVENTS = 'ExternalEvents';
     public const EXTERNAL_COMMUNITY_PORTAL = 'CommunityPortal';
