@@ -54,6 +54,9 @@ export default defineConfig({
 
         /* Ignore HTTPS errors when on CI */
         ignoreHTTPSErrors: process.env.CI ? true : undefined,
+
+        /* Make sure the timezone is right */
+        timezoneId: "Australia/Melbourne",
     },
     expect: {
         /* Set the default timeout for all the expect assertions to be 10 seconds - Value is in milliseconds */
