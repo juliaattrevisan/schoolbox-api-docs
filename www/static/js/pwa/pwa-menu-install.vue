@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { sbProps } from "@js/util/sbx/pageUtils";
-import { getUserPlatform, isPWA } from "@js/util/browserUtils";
+import { getUserPlatform, isPWA, Platform } from "@js/util/browserUtils";
 import { usePwaStore } from "./store/pwaStore";
 import PwaMenuInstallModalIos from "./pwa-menu-install-modal-ios.vue";
 
@@ -20,12 +20,12 @@ const pwaStore = usePwaStore();
 // The type of installation prompt to show
 const pwaPromptType = window.Vue.computed(() => {
     // - If on iOS and the digistorm app exists
-    if (props.installApple && getUserPlatform() === "iOS") {
+    if (props.installApple && getUserPlatform() === Platform.iOS) {
         return { id: "iOS-digistorm", url: props.installApple };
     }
 
     // - If on Android and the digistorm app exists
-    if (props.installGoogle && getUserPlatform() === "Android") {
+    if (props.installGoogle && getUserPlatform() === Platform.Android) {
         return { id: "Android-digistorm", url: props.installGoogle };
     }
 
@@ -35,7 +35,7 @@ const pwaPromptType = window.Vue.computed(() => {
          * We can't use beforeinstallprompt on iOS, so we'll show our own prompt and
          * guide the user with instructions on how to add to home screen instead...
          */
-        if (getUserPlatform() === "iOS") {
+        if (getUserPlatform() === Platform.iOS) {
             return { id: "iOS", url: null };
         }
 

@@ -3,7 +3,7 @@
  */
 import { defineStore } from "pinia";
 import { denyNotif, requestNotif } from "@js/firebase/firebaseInit";
-import { getUserPlatform, supportsNotifications } from "@js/util/browserUtils";
+import { getUserPlatform, supportsNotifications, Platform } from "@js/util/browserUtils";
 import type { BeforeInstallPromptEvent } from "@js/util/browserUtils";
 import { usePwaConfigStore } from "./pwaConfigStore";
 
@@ -71,7 +71,7 @@ export const usePwaStore = defineStore(`pwa`, () => {
      * as we handle this separately by providing a button to re-request permission instead.
      */
     if (
-        getUserPlatform() === "iOS" &&
+        getUserPlatform() === Platform.iOS &&
         currentNotifPermission.value === "default" &&
         ![null, "removing"].includes(pwaConfigStore.user.notificationState)
     ) {

@@ -1,8 +1,14 @@
+export enum Platform {
+    iOS = "iOS",
+    Android = "Android",
+    Browser = "Browser",
+}
+
 /**
  * To determine if the user is on an iOS or Android device (or neither)
  * @returns The device platform of the user
  */
-export function getUserPlatform(): "iOS" | "Android" | "Browser" {
+export function getUserPlatform(): Platform {
     // iOS
     const iOSValidPlatforms = ["iPad Simulator", "iPhone Simulator", "iPod Simulator", "iPad", "iPhone", "iPod"];
     if (
@@ -10,15 +16,15 @@ export function getUserPlatform(): "iOS" | "Android" | "Browser" {
         // iPad on iOS 13 detection
         (navigator.userAgent.includes("Mac") && "ontouchend" in document)
     ) {
-        return "iOS";
+        return Platform.iOS;
     }
 
     // ANDROID
     if (/android/i.test(navigator.userAgent)) {
-        return "Android";
+        return Platform.Android;
     }
 
-    return "Browser";
+    return Platform.Browser;
 }
 
 /**

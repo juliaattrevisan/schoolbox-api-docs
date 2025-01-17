@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { sbProps } from "@js/util/sbx/pageUtils";
-import { getUserPlatform, isPWA, supportsNotifications } from "@js/util/browserUtils";
+import { getUserPlatform, isPWA, supportsNotifications, Platform } from "@js/util/browserUtils";
 import { usePwaStore } from "./store/pwaStore";
 
 interface Props {
@@ -41,7 +41,7 @@ const prompt = window.Vue.computed<PromptType | null>(() => {
      * iOS requires the user to be in the PWA to before enabling notifications.
      * Only show if PWA is enabled in admin.
      */
-    if (getUserPlatform() === "iOS" && !isPWA()) {
+    if (getUserPlatform() === Platform.iOS && !isPWA()) {
         // Only show the iOS home prompt if PWA is enabled
         return props.pwaEnabled ? PromptType.IOS_HOME_PROMPT : null;
     }
