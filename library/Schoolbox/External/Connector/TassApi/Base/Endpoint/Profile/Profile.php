@@ -253,7 +253,7 @@ class Profile implements IStrategy
             /* TASS API sometimes won't have this field (optional in its return payload)
              * Disgusting
              */
-            $boardingHouseName = trim((string)($student['other_school_details']['residential_house']));
+            $boardingHouseName = trim((string)($student['other_school_details']['residential_house'] ?? ''));
 
             $boardingStatus = trim((string)$student['school_details']['boarder']) === self::BOARDER;
             $campusName = trim((string)$student['school_details']['campus']);
@@ -276,7 +276,7 @@ class Profile implements IStrategy
 
             $medicalAlert = $this->findMedicalAlert($externalId);
             $mobile = trim((string)$student['general_details']['mobile_phone']);
-            $specialNeeds = trim((string)$student['other_school_details']['learning_support']) === self::SPECIAL_NEEDS;
+            $specialNeeds = trim((string)($student['other_school_details']['learning_support'] ?? '')) === self::SPECIAL_NEEDS;
             $studiesCode = $this->findStudiesCode($student);
             $title = '';
             $tutorGroup = trim((string)$student['school_details']['pc_tutor_group']);
