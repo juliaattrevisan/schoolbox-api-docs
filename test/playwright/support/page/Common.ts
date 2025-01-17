@@ -380,57 +380,64 @@ export default class Common {
         return today;
     }
 
-    /**
-     * Convert a Date object to a string in the format "dd/mm/yyyy" or "dd/mm/yyyy h:mm[am/pm]"
-     * This is the expected format for date inputs around schoolbox
-     * @param date - the date to convert
-     * @param includeTime - whether to include the time in the string
-     * @returns - the formatted date/datetime string
-     */
     static formatDate(date: Date, includeTime: boolean): string {
-        const zeroPad = (num: number): string => num.toString().padStart(2, "0");
+        const options: Intl.DateTimeFormatOptions = {
+            timeZone: "Australia/Melbourne",
+            year: "numeric",
+            month: "2-digit",
+            day: "2-digit",
+            hour: includeTime ? "numeric" : undefined,
+            minute: includeTime ? "numeric" : undefined,
+            hour12: true,
+        };
 
-        const day = zeroPad(date.getDate());
-        const month = zeroPad(date.getMonth() + 1); // getMonth() returns 0-11
-        const year = date.getFullYear();
+        const formatter = new Intl.DateTimeFormat("en-AU", options);
+        const parts = formatter.formatToParts(date).reduce(
+            (acc, part) => {
+                if (part.type !== "literal") {
+                    acc[part.type] = part.value;
+                }
+                return acc;
+            },
+            {} as Record<Intl.DateTimeFormatPartTypes, string>,
+        );
 
-        let formattedDate = `${day}/${month}/${year}`;
+        let formattedDate = `${parts.day}/${parts.month}/${parts.year}`;
 
         if (includeTime) {
-            const hours = date.getHours() % 12 || 12;
-            const minutes = zeroPad(date.getMinutes());
-            const ampm = date.getHours() >= 12 ? "pm" : "am";
-
-            const formattedTime = `${hours}:${minutes}${ampm}`;
-            formattedDate += ` ${formattedTime}`;
+            formattedDate += ` ${parts.hour}:${parts.minute}${parts.dayPeriod}`;
         }
 
         return formattedDate;
     }
 
-    /**
-     * Convert a Date object to a string in the format "dd-mm-yyyy" or "dd-mm-yyyy HH:mm:ss"
-     * This is the expected format for the database of schoolbox
-     * @param date - the date to convert
-     * @param includeTime - whether to include the time in the string
-     * @returns - the formatted date/datetime string
-     */
     static formatDateDB(date: Date, includeTime: boolean): string {
-        const zeroPad = (num: number): string => num.toString().padStart(2, "0");
+        const options: Intl.DateTimeFormatOptions = {
+            timeZone: "Australia/Melbourne",
+            year: "numeric",
+            month: "2-digit",
+            day: "2-digit",
+            hour: includeTime ? "2-digit" : undefined,
+            minute: includeTime ? "2-digit" : undefined,
+            second: includeTime ? "2-digit" : undefined,
+            hour12: false,
+        };
 
-        const day = zeroPad(date.getDate());
-        const month = zeroPad(date.getMonth() + 1); // getMonth() returns 0-11
-        const year = date.getFullYear();
+        const formatter = new Intl.DateTimeFormat("en-AU", options);
+        const parts = formatter.formatToParts(date).reduce(
+            (acc, part) => {
+                if (part.type !== "literal") {
+                    acc[part.type] = part.value;
+                }
+                return acc;
+            },
+            {} as Record<Intl.DateTimeFormatPartTypes, string>,
+        );
 
-        let formattedDate = `${year}-${month}-${day}`;
+        let formattedDate = `${parts.year}-${parts.month}-${parts.day}`;
 
         if (includeTime) {
-            const hours = zeroPad(date.getHours());
-            const minutes = zeroPad(date.getMinutes());
-            const seconds = zeroPad(date.getSeconds());
-
-            const formattedTime = `${hours}:${minutes}:${seconds}`;
-            formattedDate += ` ${formattedTime}`;
+            formattedDate += ` ${parts.hour}:${parts.minute}:${parts.second}`;
         }
 
         return formattedDate;
