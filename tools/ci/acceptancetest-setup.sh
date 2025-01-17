@@ -1,3 +1,6 @@
+#!/bin/bash
+
+initialdir=$(pwd);                      # eg "/tmp/build/6963e648"
 
 export INSTANCE_ID=smoketest
 
