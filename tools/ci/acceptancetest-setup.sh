@@ -57,3 +57,6 @@ echo "starting mobiled"
 
 echo "refreshing binding cache"
 tools/notif/route/refresh-binding-cache.php
+
+## Finish where we started.
+cd "$initialdir"

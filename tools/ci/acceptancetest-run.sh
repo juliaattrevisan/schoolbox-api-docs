@@ -38,6 +38,8 @@ echo "${TEST_SUITE} tests setup"
 "$fullpath"/acceptancetest-setup.sh
 echo "acceptancetest setup"
 
+cd /usr/share/schoolbox
+
 ## Run tests
 INSTANCE_ID=smoketest CI=true npx playwright test
 
