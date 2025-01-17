@@ -871,11 +871,6 @@ parameters:
 			path: library/Custom/Help/CourseParticipation/Handler.php
 
 		-
-			message: "#^Method Custom\\\\Help\\\\Nesa\\\\Selector\\:\\:generate\\(\\) should return iterable\\<Schoolbox\\\\Assessment\\\\Rubric\\\\DataModel\\\\Descriptor\\\\Model\\>&Schoolbox\\\\GenericCollection but returns array\\<int\\|string, Schoolbox\\\\Assessment\\\\Rubric\\\\DataModel\\\\Descriptor\\\\Model\\>\\.$#"
-			count: 1
-			path: library/Custom/Help/Nesa/Selector.php
-
-		-
 			message: "#^Unreachable statement \\- code above always terminates\\.$#"
 			count: 1
 			path: library/Custom/Sk/NCEA/Availability.php
@@ -2376,46 +2371,6 @@ parameters:
 			path: library/Schoolbox/External/Connector/Doublefirst/Base/Sync.php
 
 		-
-			message: "#^Method Schoolbox\\\\External\\\\Connector\\\\Doublefirst\\\\Base\\\\User\\:\\:getCampusInvolvement\\(\\) should return iterable\\<Schoolbox\\\\External\\\\Normalise\\\\User\\\\Common\\\\Campus\\>&Schoolbox\\\\GenericCollection but returns Schoolbox\\\\Collection\\.$#"
-			count: 1
-			path: library/Schoolbox/External/Connector/Doublefirst/Base/User.php
-
-		-
-			message: "#^Method Schoolbox\\\\External\\\\Connector\\\\Doublefirst\\\\Base\\\\User\\:\\:getGuardianDirectory\\(\\) should return iterable\\<Schoolbox\\\\External\\\\Normalise\\\\User\\\\Student\\>&Schoolbox\\\\GenericCollection but returns Schoolbox\\\\Collection\\.$#"
-			count: 1
-			path: library/Schoolbox/External/Connector/Doublefirst/Base/User.php
-
-		-
-			message: "#^Method Schoolbox\\\\External\\\\Connector\\\\Doublefirst\\\\Base\\\\User\\:\\:getGuardians\\(\\) should return iterable\\<Schoolbox\\\\External\\\\Normalise\\\\User\\\\Guardian\\>&Schoolbox\\\\GenericCollection but returns Schoolbox\\\\Collection\\.$#"
-			count: 1
-			path: library/Schoolbox/External/Connector/Doublefirst/Base/User.php
-
-		-
-			message: "#^Method Schoolbox\\\\External\\\\Connector\\\\Doublefirst\\\\Base\\\\User\\:\\:getStaff\\(\\) should return iterable\\<Schoolbox\\\\External\\\\Normalise\\\\User\\\\Staff\\>&Schoolbox\\\\GenericCollection but returns Schoolbox\\\\Collection\\.$#"
-			count: 1
-			path: library/Schoolbox/External/Connector/Doublefirst/Base/User.php
-
-		-
-			message: "#^Method Schoolbox\\\\External\\\\Connector\\\\Doublefirst\\\\Base\\\\User\\:\\:getStaffDirectory\\(\\) should return iterable\\<Schoolbox\\\\External\\\\Normalise\\\\User\\\\Staff\\>&Schoolbox\\\\GenericCollection but returns Schoolbox\\\\Collection\\.$#"
-			count: 1
-			path: library/Schoolbox/External/Connector/Doublefirst/Base/User.php
-
-		-
-			message: "#^Method Schoolbox\\\\External\\\\Connector\\\\Doublefirst\\\\Base\\\\User\\:\\:getStudents\\(\\) should return iterable\\<Schoolbox\\\\External\\\\Normalise\\\\User\\\\Student\\>&Schoolbox\\\\GenericCollection but returns Schoolbox\\\\Collection\\.$#"
-			count: 1
-			path: library/Schoolbox/External/Connector/Doublefirst/Base/User.php
-
-		-
-			message: "#^Method Schoolbox\\\\External\\\\Connector\\\\Doublefirst\\\\Base\\\\User\\:\\:getStudentsAccessible\\(\\) should return iterable\\<Schoolbox\\\\External\\\\Normalise\\\\User\\\\Student\\>&Schoolbox\\\\GenericCollection but returns Schoolbox\\\\Collection\\.$#"
-			count: 1
-			path: library/Schoolbox/External/Connector/Doublefirst/Base/User.php
-
-		-
-			message: "#^Method Schoolbox\\\\External\\\\Connector\\\\Doublefirst\\\\Base\\\\User\\:\\:getTutors\\(\\) should return iterable\\<Schoolbox\\\\External\\\\Normalise\\\\User\\\\Tutor\\>&Schoolbox\\\\GenericCollection but returns Schoolbox\\\\Collection\\.$#"
-			count: 1
-			path: library/Schoolbox/External/Connector/Doublefirst/Base/User.php
-
-		-
 			message: "#^Method Schoolbox\\\\External\\\\Connector\\\\Edumate\\\\Base\\\\Sync\\:\\:findAllParents\\(\\) should return array\\<Schoolbox\\\\External\\\\Normalise\\\\User\\\\Guardian\\> but returns Schoolbox\\\\Sync\\\\Iterator\\\\Guardian\\.$#"
 			count: 1
 			path: library/Schoolbox/External/Connector/Edumate/Base/Sync.php
@@ -2429,46 +2384,6 @@ parameters:
 			message: "#^Method Schoolbox\\\\External\\\\Connector\\\\Edumate\\\\Base\\\\Sync\\:\\:findAllStudents\\(\\) should return array\\<Schoolbox\\\\External\\\\Normalise\\\\User\\\\Student\\> but returns Schoolbox\\\\Sync\\\\Iterator\\\\Student\\.$#"
 			count: 1
 			path: library/Schoolbox/External/Connector/Edumate/Base/Sync.php
-
-		-
-			message: "#^Method Schoolbox\\\\External\\\\Connector\\\\Edumate\\\\Base\\\\User\\:\\:getCampusInvolvement\\(\\) should return iterable\\<Schoolbox\\\\External\\\\Normalise\\\\User\\\\Common\\\\Campus\\>&Schoolbox\\\\GenericCollection but returns Schoolbox\\\\Collection\\.$#"
-			count: 1
-			path: library/Schoolbox/External/Connector/Edumate/Base/User.php
-
-		-
-			message: "#^Method Schoolbox\\\\External\\\\Connector\\\\Edumate\\\\Base\\\\User\\:\\:getGuardianDirectory\\(\\) should return iterable\\<Schoolbox\\\\External\\\\Normalise\\\\User\\\\Student\\>&Schoolbox\\\\GenericCollection but returns Schoolbox\\\\Collection\\.$#"
-			count: 1
-			path: library/Schoolbox/External/Connector/Edumate/Base/User.php
-
-		-
-			message: "#^Method Schoolbox\\\\External\\\\Connector\\\\Edumate\\\\Base\\\\User\\:\\:getGuardians\\(\\) should return iterable\\<Schoolbox\\\\External\\\\Normalise\\\\User\\\\Guardian\\>&Schoolbox\\\\GenericCollection but returns Schoolbox\\\\Collection\\.$#"
-			count: 1
-			path: library/Schoolbox/External/Connector/Edumate/Base/User.php
-
-		-
-			message: "#^Method Schoolbox\\\\External\\\\Connector\\\\Edumate\\\\Base\\\\User\\:\\:getStaff\\(\\) should return iterable\\<Schoolbox\\\\External\\\\Normalise\\\\User\\\\Staff\\>&Schoolbox\\\\GenericCollection but returns Schoolbox\\\\Collection\\.$#"
-			count: 1
-			path: library/Schoolbox/External/Connector/Edumate/Base/User.php
-
-		-
-			message: "#^Method Schoolbox\\\\External\\\\Connector\\\\Edumate\\\\Base\\\\User\\:\\:getStaffDirectory\\(\\) should return iterable\\<Schoolbox\\\\External\\\\Normalise\\\\User\\\\Staff\\>&Schoolbox\\\\GenericCollection but returns Schoolbox\\\\Collection\\.$#"
-			count: 1
-			path: library/Schoolbox/External/Connector/Edumate/Base/User.php
-
-		-
-			message: "#^Method Schoolbox\\\\External\\\\Connector\\\\Edumate\\\\Base\\\\User\\:\\:getStudents\\(\\) should return iterable\\<Schoolbox\\\\External\\\\Normalise\\\\User\\\\Student\\>&Schoolbox\\\\GenericCollection but returns Schoolbox\\\\Collection\\.$#"
-			count: 1
-			path: library/Schoolbox/External/Connector/Edumate/Base/User.php
-
-		-
-			message: "#^Method Schoolbox\\\\External\\\\Connector\\\\Edumate\\\\Base\\\\User\\:\\:getStudentsAccessible\\(\\) should return iterable\\<Schoolbox\\\\External\\\\Normalise\\\\User\\\\Student\\>&Schoolbox\\\\GenericCollection but returns Schoolbox\\\\Collection\\.$#"
-			count: 1
-			path: library/Schoolbox/External/Connector/Edumate/Base/User.php
-
-		-
-			message: "#^Method Schoolbox\\\\External\\\\Connector\\\\Edumate\\\\Base\\\\User\\:\\:getTutors\\(\\) should return iterable\\<Schoolbox\\\\External\\\\Normalise\\\\User\\\\Tutor\\>&Schoolbox\\\\GenericCollection but returns Schoolbox\\\\Collection\\.$#"
-			count: 1
-			path: library/Schoolbox/External/Connector/Edumate/Base/User.php
 
 		-
 			message: "#^Property Schoolbox\\\\External\\\\Connector\\\\Isams\\\\Base\\\\Endpoint\\\\Timetable\\\\Identifier\\:\\:\\$perform is never read, only written\\.$#"
@@ -2501,46 +2416,6 @@ parameters:
 			path: library/Schoolbox/External/Connector/Liss/Base/Endpoint/Helper.php
 
 		-
-			message: "#^Method Schoolbox\\\\External\\\\Connector\\\\Offline\\\\Base\\\\User\\:\\:getCampusInvolvement\\(\\) should return iterable\\<Schoolbox\\\\External\\\\Normalise\\\\User\\\\Common\\\\Campus\\>&Schoolbox\\\\GenericCollection but returns Schoolbox\\\\Collection\\.$#"
-			count: 1
-			path: library/Schoolbox/External/Connector/Offline/Base/User.php
-
-		-
-			message: "#^Method Schoolbox\\\\External\\\\Connector\\\\Offline\\\\Base\\\\User\\:\\:getGuardianDirectory\\(\\) should return iterable\\<Schoolbox\\\\External\\\\Normalise\\\\User\\\\Student\\>&Schoolbox\\\\GenericCollection but returns Schoolbox\\\\Collection\\.$#"
-			count: 1
-			path: library/Schoolbox/External/Connector/Offline/Base/User.php
-
-		-
-			message: "#^Method Schoolbox\\\\External\\\\Connector\\\\Offline\\\\Base\\\\User\\:\\:getGuardians\\(\\) should return iterable\\<Schoolbox\\\\External\\\\Normalise\\\\User\\\\Guardian\\>&Schoolbox\\\\GenericCollection but returns Schoolbox\\\\Collection\\.$#"
-			count: 1
-			path: library/Schoolbox/External/Connector/Offline/Base/User.php
-
-		-
-			message: "#^Method Schoolbox\\\\External\\\\Connector\\\\Offline\\\\Base\\\\User\\:\\:getStaff\\(\\) should return iterable\\<Schoolbox\\\\External\\\\Normalise\\\\User\\\\Staff\\>&Schoolbox\\\\GenericCollection but returns Schoolbox\\\\Collection\\.$#"
-			count: 1
-			path: library/Schoolbox/External/Connector/Offline/Base/User.php
-
-		-
-			message: "#^Method Schoolbox\\\\External\\\\Connector\\\\Offline\\\\Base\\\\User\\:\\:getStaffDirectory\\(\\) should return iterable\\<Schoolbox\\\\External\\\\Normalise\\\\User\\\\Staff\\>&Schoolbox\\\\GenericCollection but returns Schoolbox\\\\Collection\\.$#"
-			count: 1
-			path: library/Schoolbox/External/Connector/Offline/Base/User.php
-
-		-
-			message: "#^Method Schoolbox\\\\External\\\\Connector\\\\Offline\\\\Base\\\\User\\:\\:getStudents\\(\\) should return iterable\\<Schoolbox\\\\External\\\\Normalise\\\\User\\\\Student\\>&Schoolbox\\\\GenericCollection but returns Schoolbox\\\\Collection\\.$#"
-			count: 1
-			path: library/Schoolbox/External/Connector/Offline/Base/User.php
-
-		-
-			message: "#^Method Schoolbox\\\\External\\\\Connector\\\\Offline\\\\Base\\\\User\\:\\:getStudentsAccessible\\(\\) should return iterable\\<Schoolbox\\\\External\\\\Normalise\\\\User\\\\Student\\>&Schoolbox\\\\GenericCollection but returns Schoolbox\\\\Collection\\.$#"
-			count: 1
-			path: library/Schoolbox/External/Connector/Offline/Base/User.php
-
-		-
-			message: "#^Method Schoolbox\\\\External\\\\Connector\\\\Offline\\\\Base\\\\User\\:\\:getTutors\\(\\) should return iterable\\<Schoolbox\\\\External\\\\Normalise\\\\User\\\\Tutor\\>&Schoolbox\\\\GenericCollection but returns Schoolbox\\\\Collection\\.$#"
-			count: 1
-			path: library/Schoolbox/External/Connector/Offline/Base/User.php
-
-		-
 			message: "#^Method Schoolbox\\\\External\\\\Connector\\\\Pcschools\\\\Base\\\\Sync\\:\\:findAllParents\\(\\) should return array\\<Schoolbox\\\\External\\\\Normalise\\\\User\\\\Guardian\\> but returns Schoolbox\\\\Sync\\\\Iterator\\\\Guardian\\.$#"
 			count: 1
 			path: library/Schoolbox/External/Connector/Pcschools/Base/Sync.php
@@ -2554,46 +2429,6 @@ parameters:
 			message: "#^Method Schoolbox\\\\External\\\\Connector\\\\Pcschools\\\\Base\\\\Sync\\:\\:findAllStudents\\(\\) should return array\\<Schoolbox\\\\External\\\\Normalise\\\\User\\\\Student\\> but returns Schoolbox\\\\Sync\\\\Iterator\\\\Student\\.$#"
 			count: 1
 			path: library/Schoolbox/External/Connector/Pcschools/Base/Sync.php
-
-		-
-			message: "#^Method Schoolbox\\\\External\\\\Connector\\\\Pcschools\\\\Base\\\\User\\:\\:getCampusInvolvement\\(\\) should return iterable\\<Schoolbox\\\\External\\\\Normalise\\\\User\\\\Common\\\\Campus\\>&Schoolbox\\\\GenericCollection but returns Schoolbox\\\\Collection\\.$#"
-			count: 1
-			path: library/Schoolbox/External/Connector/Pcschools/Base/User.php
-
-		-
-			message: "#^Method Schoolbox\\\\External\\\\Connector\\\\Pcschools\\\\Base\\\\User\\:\\:getGuardianDirectory\\(\\) should return iterable\\<Schoolbox\\\\External\\\\Normalise\\\\User\\\\Student\\>&Schoolbox\\\\GenericCollection but returns Schoolbox\\\\Collection\\.$#"
-			count: 1
-			path: library/Schoolbox/External/Connector/Pcschools/Base/User.php
-
-		-
-			message: "#^Method Schoolbox\\\\External\\\\Connector\\\\Pcschools\\\\Base\\\\User\\:\\:getGuardians\\(\\) should return iterable\\<Schoolbox\\\\External\\\\Normalise\\\\User\\\\Guardian\\>&Schoolbox\\\\GenericCollection but returns Schoolbox\\\\Collection\\.$#"
-			count: 1
-			path: library/Schoolbox/External/Connector/Pcschools/Base/User.php
-
-		-
-			message: "#^Method Schoolbox\\\\External\\\\Connector\\\\Pcschools\\\\Base\\\\User\\:\\:getStaff\\(\\) should return iterable\\<Schoolbox\\\\External\\\\Normalise\\\\User\\\\Staff\\>&Schoolbox\\\\GenericCollection but returns Schoolbox\\\\Collection\\.$#"
-			count: 1
-			path: library/Schoolbox/External/Connector/Pcschools/Base/User.php
-
-		-
-			message: "#^Method Schoolbox\\\\External\\\\Connector\\\\Pcschools\\\\Base\\\\User\\:\\:getStaffDirectory\\(\\) should return iterable\\<Schoolbox\\\\External\\\\Normalise\\\\User\\\\Staff\\>&Schoolbox\\\\GenericCollection but returns Schoolbox\\\\Collection\\.$#"
-			count: 1
-			path: library/Schoolbox/External/Connector/Pcschools/Base/User.php
-
-		-
-			message: "#^Method Schoolbox\\\\External\\\\Connector\\\\Pcschools\\\\Base\\\\User\\:\\:getStudents\\(\\) should return iterable\\<Schoolbox\\\\External\\\\Normalise\\\\User\\\\Student\\>&Schoolbox\\\\GenericCollection but returns Schoolbox\\\\Collection\\.$#"
-			count: 1
-			path: library/Schoolbox/External/Connector/Pcschools/Base/User.php
-
-		-
-			message: "#^Method Schoolbox\\\\External\\\\Connector\\\\Pcschools\\\\Base\\\\User\\:\\:getStudentsAccessible\\(\\) should return iterable\\<Schoolbox\\\\External\\\\Normalise\\\\User\\\\Student\\>&Schoolbox\\\\GenericCollection but returns Schoolbox\\\\Collection\\.$#"
-			count: 1
-			path: library/Schoolbox/External/Connector/Pcschools/Base/User.php
-
-		-
-			message: "#^Method Schoolbox\\\\External\\\\Connector\\\\Pcschools\\\\Base\\\\User\\:\\:getTutors\\(\\) should return iterable\\<Schoolbox\\\\External\\\\Normalise\\\\User\\\\Tutor\\>&Schoolbox\\\\GenericCollection but returns Schoolbox\\\\Collection\\.$#"
-			count: 1
-			path: library/Schoolbox/External/Connector/Pcschools/Base/User.php
 
 		-
 			message: "#^Constant Schoolbox\\\\External\\\\Connector\\\\Pcschools\\\\QueryHelper\\\\Freedom\\:\\:CONTACT_LEVEL_NONE is unused\\.$#"
@@ -2634,71 +2469,6 @@ parameters:
 			message: "#^Method Schoolbox\\\\External\\\\Connector\\\\Schoolbox\\\\Base\\\\Sync\\:\\:findAllStudents\\(\\) should return array\\<Schoolbox\\\\External\\\\Normalise\\\\User\\\\Student\\> but returns Schoolbox\\\\Sync\\\\Iterator\\\\Student\\.$#"
 			count: 1
 			path: library/Schoolbox/External/Connector/Schoolbox/Base/Sync.php
-
-		-
-			message: "#^Call to an undefined method Schoolbox\\\\External\\\\Normalise\\\\User\\\\Student\\:\\:setLocker\\(\\)\\.$#"
-			count: 1
-			path: library/Schoolbox/External/Connector/Schoolbox/Base/User.php
-
-		-
-			message: "#^Method Schoolbox\\\\External\\\\Connector\\\\Schoolbox\\\\Base\\\\User\\:\\:getCampusInvolvement\\(\\) should return iterable\\<Schoolbox\\\\External\\\\Normalise\\\\User\\\\Common\\\\Campus\\>&Schoolbox\\\\GenericCollection but returns Schoolbox\\\\Collection\\.$#"
-			count: 1
-			path: library/Schoolbox/External/Connector/Schoolbox/Base/User.php
-
-		-
-			message: "#^Method Schoolbox\\\\External\\\\Connector\\\\Schoolbox\\\\Base\\\\User\\:\\:getGuardianDirectory\\(\\) should return iterable\\<Schoolbox\\\\External\\\\Normalise\\\\User\\\\Student\\>&Schoolbox\\\\GenericCollection but returns Schoolbox\\\\Collection\\.$#"
-			count: 1
-			path: library/Schoolbox/External/Connector/Schoolbox/Base/User.php
-
-		-
-			message: "#^Method Schoolbox\\\\External\\\\Connector\\\\Schoolbox\\\\Base\\\\User\\:\\:getGuardians\\(\\) should return iterable\\<Schoolbox\\\\External\\\\Normalise\\\\User\\\\Guardian\\>&Schoolbox\\\\GenericCollection but returns Schoolbox\\\\Collection\\.$#"
-			count: 1
-			path: library/Schoolbox/External/Connector/Schoolbox/Base/User.php
-
-		-
-			message: "#^Method Schoolbox\\\\External\\\\Connector\\\\Schoolbox\\\\Base\\\\User\\:\\:getGuardians\\(\\) should return iterable\\<Schoolbox\\\\External\\\\Normalise\\\\User\\\\Guardian\\>&Schoolbox\\\\GenericCollection but returns Schoolbox\\\\External\\\\Normalise\\\\User\\\\Guardian\\.$#"
-			count: 1
-			path: library/Schoolbox/External/Connector/Schoolbox/Base/User.php
-
-		-
-			message: "#^Method Schoolbox\\\\External\\\\Connector\\\\Schoolbox\\\\Base\\\\User\\:\\:getStaff\\(\\) should return iterable\\<Schoolbox\\\\External\\\\Normalise\\\\User\\\\Staff\\>&Schoolbox\\\\GenericCollection but returns Schoolbox\\\\Collection\\.$#"
-			count: 1
-			path: library/Schoolbox/External/Connector/Schoolbox/Base/User.php
-
-		-
-			message: "#^Method Schoolbox\\\\External\\\\Connector\\\\Schoolbox\\\\Base\\\\User\\:\\:getStaff\\(\\) should return iterable\\<Schoolbox\\\\External\\\\Normalise\\\\User\\\\Staff\\>&Schoolbox\\\\GenericCollection but returns Schoolbox\\\\External\\\\Normalise\\\\User\\\\Staff\\.$#"
-			count: 1
-			path: library/Schoolbox/External/Connector/Schoolbox/Base/User.php
-
-		-
-			message: "#^Method Schoolbox\\\\External\\\\Connector\\\\Schoolbox\\\\Base\\\\User\\:\\:getStaffDirectory\\(\\) should return iterable\\<Schoolbox\\\\External\\\\Normalise\\\\User\\\\Staff\\>&Schoolbox\\\\GenericCollection but returns Schoolbox\\\\Collection\\.$#"
-			count: 1
-			path: library/Schoolbox/External/Connector/Schoolbox/Base/User.php
-
-		-
-			message: "#^Method Schoolbox\\\\External\\\\Connector\\\\Schoolbox\\\\Base\\\\User\\:\\:getStudents\\(\\) should return iterable\\<Schoolbox\\\\External\\\\Normalise\\\\User\\\\Student\\>&Schoolbox\\\\GenericCollection but returns Schoolbox\\\\Collection\\.$#"
-			count: 1
-			path: library/Schoolbox/External/Connector/Schoolbox/Base/User.php
-
-		-
-			message: "#^Method Schoolbox\\\\External\\\\Connector\\\\Schoolbox\\\\Base\\\\User\\:\\:getStudents\\(\\) should return iterable\\<Schoolbox\\\\External\\\\Normalise\\\\User\\\\Student\\>&Schoolbox\\\\GenericCollection but returns Schoolbox\\\\External\\\\Normalise\\\\User\\\\Student\\.$#"
-			count: 1
-			path: library/Schoolbox/External/Connector/Schoolbox/Base/User.php
-
-		-
-			message: "#^Method Schoolbox\\\\External\\\\Connector\\\\Schoolbox\\\\Base\\\\User\\:\\:getStudentsAccessible\\(\\) should return iterable\\<Schoolbox\\\\External\\\\Normalise\\\\User\\\\Student\\>&Schoolbox\\\\GenericCollection but returns Schoolbox\\\\Collection\\.$#"
-			count: 1
-			path: library/Schoolbox/External/Connector/Schoolbox/Base/User.php
-
-		-
-			message: "#^Method Schoolbox\\\\External\\\\Connector\\\\Schoolbox\\\\Base\\\\User\\:\\:getTutors\\(\\) should return iterable\\<Schoolbox\\\\External\\\\Normalise\\\\User\\\\Tutor\\>&Schoolbox\\\\GenericCollection but returns Schoolbox\\\\Collection\\.$#"
-			count: 1
-			path: library/Schoolbox/External/Connector/Schoolbox/Base/User.php
-
-		-
-			message: "#^Method Schoolbox\\\\External\\\\Connector\\\\Schoolbox\\\\Base\\\\User\\:\\:getTutors\\(\\) should return iterable\\<Schoolbox\\\\External\\\\Normalise\\\\User\\\\Tutor\\>&Schoolbox\\\\GenericCollection but returns false\\.$#"
-			count: 1
-			path: library/Schoolbox/External/Connector/Schoolbox/Base/User.php
 
 		-
 			message: "#^Method Schoolbox\\\\External\\\\Connector\\\\Schooledge\\\\Base\\\\Sync\\:\\:findAllParents\\(\\) should return array\\<Schoolbox\\\\External\\\\Normalise\\\\User\\\\Guardian\\> but returns Schoolbox\\\\Sync\\\\Iterator\\\\Guardian\\.$#"
@@ -2751,46 +2521,6 @@ parameters:
 			path: library/Schoolbox/External/Connector/Schoolpro/Base/Sync.php
 
 		-
-			message: "#^Method Schoolbox\\\\External\\\\Connector\\\\Schoolpro\\\\Base\\\\User\\:\\:getCampusInvolvement\\(\\) should return iterable\\<Schoolbox\\\\External\\\\Normalise\\\\User\\\\Common\\\\Campus\\>&Schoolbox\\\\GenericCollection but returns Schoolbox\\\\Collection\\.$#"
-			count: 1
-			path: library/Schoolbox/External/Connector/Schoolpro/Base/User.php
-
-		-
-			message: "#^Method Schoolbox\\\\External\\\\Connector\\\\Schoolpro\\\\Base\\\\User\\:\\:getGuardianDirectory\\(\\) should return iterable\\<Schoolbox\\\\External\\\\Normalise\\\\User\\\\Student\\>&Schoolbox\\\\GenericCollection but returns Schoolbox\\\\Collection\\.$#"
-			count: 1
-			path: library/Schoolbox/External/Connector/Schoolpro/Base/User.php
-
-		-
-			message: "#^Method Schoolbox\\\\External\\\\Connector\\\\Schoolpro\\\\Base\\\\User\\:\\:getGuardians\\(\\) should return iterable\\<Schoolbox\\\\External\\\\Normalise\\\\User\\\\Guardian\\>&Schoolbox\\\\GenericCollection but returns Schoolbox\\\\Collection\\.$#"
-			count: 1
-			path: library/Schoolbox/External/Connector/Schoolpro/Base/User.php
-
-		-
-			message: "#^Method Schoolbox\\\\External\\\\Connector\\\\Schoolpro\\\\Base\\\\User\\:\\:getStaff\\(\\) should return iterable\\<Schoolbox\\\\External\\\\Normalise\\\\User\\\\Staff\\>&Schoolbox\\\\GenericCollection but returns Schoolbox\\\\Collection\\.$#"
-			count: 1
-			path: library/Schoolbox/External/Connector/Schoolpro/Base/User.php
-
-		-
-			message: "#^Method Schoolbox\\\\External\\\\Connector\\\\Schoolpro\\\\Base\\\\User\\:\\:getStaffDirectory\\(\\) should return iterable\\<Schoolbox\\\\External\\\\Normalise\\\\User\\\\Staff\\>&Schoolbox\\\\GenericCollection but returns Schoolbox\\\\Collection\\.$#"
-			count: 1
-			path: library/Schoolbox/External/Connector/Schoolpro/Base/User.php
-
-		-
-			message: "#^Method Schoolbox\\\\External\\\\Connector\\\\Schoolpro\\\\Base\\\\User\\:\\:getStudents\\(\\) should return iterable\\<Schoolbox\\\\External\\\\Normalise\\\\User\\\\Student\\>&Schoolbox\\\\GenericCollection but returns Schoolbox\\\\Collection\\.$#"
-			count: 1
-			path: library/Schoolbox/External/Connector/Schoolpro/Base/User.php
-
-		-
-			message: "#^Method Schoolbox\\\\External\\\\Connector\\\\Schoolpro\\\\Base\\\\User\\:\\:getStudentsAccessible\\(\\) should return iterable\\<Schoolbox\\\\External\\\\Normalise\\\\User\\\\Student\\>&Schoolbox\\\\GenericCollection but returns Schoolbox\\\\Collection\\.$#"
-			count: 1
-			path: library/Schoolbox/External/Connector/Schoolpro/Base/User.php
-
-		-
-			message: "#^Method Schoolbox\\\\External\\\\Connector\\\\Schoolpro\\\\Base\\\\User\\:\\:getTutors\\(\\) should return iterable\\<Schoolbox\\\\External\\\\Normalise\\\\User\\\\Tutor\\>&Schoolbox\\\\GenericCollection but returns Schoolbox\\\\Collection\\.$#"
-			count: 1
-			path: library/Schoolbox/External/Connector/Schoolpro/Base/User.php
-
-		-
 			message: "#^Constant Schoolbox\\\\External\\\\Connector\\\\Sentral\\\\Base\\\\Endpoint\\\\Api\\:\\:DEFAULT_LIMIT is unused\\.$#"
 			count: 1
 			path: library/Schoolbox/External/Connector/Sentral/Base/Endpoint/Api.php
@@ -2826,46 +2556,6 @@ parameters:
 			path: library/Schoolbox/External/Connector/Synergetic/Base/Sync.php
 
 		-
-			message: "#^Method Schoolbox\\\\External\\\\Connector\\\\Synergetic\\\\Base\\\\User\\:\\:getCampusInvolvement\\(\\) should return iterable\\<Schoolbox\\\\External\\\\Normalise\\\\User\\\\Common\\\\Campus\\>&Schoolbox\\\\GenericCollection but returns Schoolbox\\\\Collection\\.$#"
-			count: 1
-			path: library/Schoolbox/External/Connector/Synergetic/Base/User.php
-
-		-
-			message: "#^Method Schoolbox\\\\External\\\\Connector\\\\Synergetic\\\\Base\\\\User\\:\\:getGuardianDirectory\\(\\) should return iterable\\<Schoolbox\\\\External\\\\Normalise\\\\User\\\\Student\\>&Schoolbox\\\\GenericCollection but returns Schoolbox\\\\Collection\\.$#"
-			count: 1
-			path: library/Schoolbox/External/Connector/Synergetic/Base/User.php
-
-		-
-			message: "#^Method Schoolbox\\\\External\\\\Connector\\\\Synergetic\\\\Base\\\\User\\:\\:getGuardians\\(\\) should return iterable\\<Schoolbox\\\\External\\\\Normalise\\\\User\\\\Guardian\\>&Schoolbox\\\\GenericCollection but returns Schoolbox\\\\Collection\\.$#"
-			count: 1
-			path: library/Schoolbox/External/Connector/Synergetic/Base/User.php
-
-		-
-			message: "#^Method Schoolbox\\\\External\\\\Connector\\\\Synergetic\\\\Base\\\\User\\:\\:getStaff\\(\\) should return iterable\\<Schoolbox\\\\External\\\\Normalise\\\\User\\\\Staff\\>&Schoolbox\\\\GenericCollection but returns Schoolbox\\\\Collection\\.$#"
-			count: 1
-			path: library/Schoolbox/External/Connector/Synergetic/Base/User.php
-
-		-
-			message: "#^Method Schoolbox\\\\External\\\\Connector\\\\Synergetic\\\\Base\\\\User\\:\\:getStaffDirectory\\(\\) should return iterable\\<Schoolbox\\\\External\\\\Normalise\\\\User\\\\Staff\\>&Schoolbox\\\\GenericCollection but returns Schoolbox\\\\Collection\\.$#"
-			count: 1
-			path: library/Schoolbox/External/Connector/Synergetic/Base/User.php
-
-		-
-			message: "#^Method Schoolbox\\\\External\\\\Connector\\\\Synergetic\\\\Base\\\\User\\:\\:getStudents\\(\\) should return iterable\\<Schoolbox\\\\External\\\\Normalise\\\\User\\\\Student\\>&Schoolbox\\\\GenericCollection but returns Schoolbox\\\\Collection\\.$#"
-			count: 1
-			path: library/Schoolbox/External/Connector/Synergetic/Base/User.php
-
-		-
-			message: "#^Method Schoolbox\\\\External\\\\Connector\\\\Synergetic\\\\Base\\\\User\\:\\:getStudentsAccessible\\(\\) should return iterable\\<Schoolbox\\\\External\\\\Normalise\\\\User\\\\Student\\>&Schoolbox\\\\GenericCollection but returns Schoolbox\\\\Collection\\.$#"
-			count: 1
-			path: library/Schoolbox/External/Connector/Synergetic/Base/User.php
-
-		-
-			message: "#^Method Schoolbox\\\\External\\\\Connector\\\\Synergetic\\\\Base\\\\User\\:\\:getTutors\\(\\) should return iterable\\<Schoolbox\\\\External\\\\Normalise\\\\User\\\\Tutor\\>&Schoolbox\\\\GenericCollection but returns Schoolbox\\\\Collection\\.$#"
-			count: 1
-			path: library/Schoolbox/External/Connector/Synergetic/Base/User.php
-
-		-
 			message: "#^Method Schoolbox\\\\External\\\\Connector\\\\Synergetic\\\\Smcs\\\\Sync\\:\\:findAllStudents\\(\\) should return array\\<Schoolbox\\\\External\\\\Normalise\\\\User\\\\Student\\> but returns Schoolbox\\\\Sync\\\\Iterator\\\\Student\\.$#"
 			count: 1
 			path: library/Schoolbox/External/Connector/Synergetic/Smcs/Sync.php
@@ -2899,46 +2589,6 @@ parameters:
 			message: "#^Method Schoolbox\\\\External\\\\Connector\\\\Tass\\\\Base\\\\Sync\\:\\:findAllStudents\\(\\) should return array\\<Schoolbox\\\\External\\\\Normalise\\\\User\\\\Student\\> but returns Schoolbox\\\\Sync\\\\Iterator\\\\Student\\.$#"
 			count: 1
 			path: library/Schoolbox/External/Connector/Tass/Base/Sync.php
-
-		-
-			message: "#^Method Schoolbox\\\\External\\\\Connector\\\\Tass\\\\Base\\\\User\\:\\:getCampusInvolvement\\(\\) should return iterable\\<Schoolbox\\\\External\\\\Normalise\\\\User\\\\Common\\\\Campus\\>&Schoolbox\\\\GenericCollection but returns Schoolbox\\\\Collection\\.$#"
-			count: 1
-			path: library/Schoolbox/External/Connector/Tass/Base/User.php
-
-		-
-			message: "#^Method Schoolbox\\\\External\\\\Connector\\\\Tass\\\\Base\\\\User\\:\\:getGuardianDirectory\\(\\) should return iterable\\<Schoolbox\\\\External\\\\Normalise\\\\User\\\\Student\\>&Schoolbox\\\\GenericCollection but returns Schoolbox\\\\Collection\\.$#"
-			count: 1
-			path: library/Schoolbox/External/Connector/Tass/Base/User.php
-
-		-
-			message: "#^Method Schoolbox\\\\External\\\\Connector\\\\Tass\\\\Base\\\\User\\:\\:getGuardians\\(\\) should return iterable\\<Schoolbox\\\\External\\\\Normalise\\\\User\\\\Guardian\\>&Schoolbox\\\\GenericCollection but returns Schoolbox\\\\Collection\\.$#"
-			count: 1
-			path: library/Schoolbox/External/Connector/Tass/Base/User.php
-
-		-
-			message: "#^Method Schoolbox\\\\External\\\\Connector\\\\Tass\\\\Base\\\\User\\:\\:getStaff\\(\\) should return iterable\\<Schoolbox\\\\External\\\\Normalise\\\\User\\\\Staff\\>&Schoolbox\\\\GenericCollection but returns Schoolbox\\\\Collection\\.$#"
-			count: 1
-			path: library/Schoolbox/External/Connector/Tass/Base/User.php
-
-		-
-			message: "#^Method Schoolbox\\\\External\\\\Connector\\\\Tass\\\\Base\\\\User\\:\\:getStaffDirectory\\(\\) should return iterable\\<Schoolbox\\\\External\\\\Normalise\\\\User\\\\Staff\\>&Schoolbox\\\\GenericCollection but returns Schoolbox\\\\Collection\\.$#"
-			count: 1
-			path: library/Schoolbox/External/Connector/Tass/Base/User.php
-
-		-
-			message: "#^Method Schoolbox\\\\External\\\\Connector\\\\Tass\\\\Base\\\\User\\:\\:getStudents\\(\\) should return iterable\\<Schoolbox\\\\External\\\\Normalise\\\\User\\\\Student\\>&Schoolbox\\\\GenericCollection but returns Schoolbox\\\\Collection\\.$#"
-			count: 1
-			path: library/Schoolbox/External/Connector/Tass/Base/User.php
-
-		-
-			message: "#^Method Schoolbox\\\\External\\\\Connector\\\\Tass\\\\Base\\\\User\\:\\:getStudentsAccessible\\(\\) should return iterable\\<Schoolbox\\\\External\\\\Normalise\\\\User\\\\Student\\>&Schoolbox\\\\GenericCollection but returns Schoolbox\\\\Collection\\.$#"
-			count: 1
-			path: library/Schoolbox/External/Connector/Tass/Base/User.php
-
-		-
-			message: "#^Method Schoolbox\\\\External\\\\Connector\\\\Tass\\\\Base\\\\User\\:\\:getTutors\\(\\) should return iterable\\<Schoolbox\\\\External\\\\Normalise\\\\User\\\\Tutor\\>&Schoolbox\\\\GenericCollection but returns Schoolbox\\\\Collection\\.$#"
-			count: 1
-			path: library/Schoolbox/External/Connector/Tass/Base/User.php
 
 		-
 			message: "#^Method Schoolbox\\\\External\\\\Connector\\\\Tass\\\\Bbc\\\\Sync\\:\\:findAllParents\\(\\) should return array\\<Schoolbox\\\\External\\\\Normalise\\\\User\\\\Guardian\\> but returns Schoolbox\\\\Sync\\\\Iterator\\\\Guardian\\.$#"
@@ -2979,56 +2629,6 @@ parameters:
 			message: "#^Variable \\$value in isset\\(\\) always exists and is not nullable\\.$#"
 			count: 1
 			path: library/Schoolbox/External/Importer/User/Hydrator/ToggleField.php
-
-		-
-			message: "#^Property Schoolbox\\\\External\\\\Normalise\\\\Timetable\\\\Day\\:\\:\\$number \\(int\\) does not accept default value of type string\\.$#"
-			count: 1
-			path: library/Schoolbox/External/Normalise/Timetable/Day.php
-
-		-
-			message: "#^Argument of an invalid type null supplied for foreach, only iterables are supported\\.$#"
-			count: 1
-			path: library/Schoolbox/External/Normalise/Timetable/Definition.php
-
-		-
-			message: "#^Cannot call method add\\(\\) on null\\.$#"
-			count: 1
-			path: library/Schoolbox/External/Normalise/Timetable/Definition.php
-
-		-
-			message: "#^Cannot call method count\\(\\) on null\\.$#"
-			count: 1
-			path: library/Schoolbox/External/Normalise/Timetable/Definition.php
-
-		-
-			message: "#^Method Schoolbox\\\\External\\\\Normalise\\\\Timetable\\\\Definition\\:\\:getAllPeriods\\(\\) should return null but returns Schoolbox\\\\Collection\\.$#"
-			count: 1
-			path: library/Schoolbox/External/Normalise/Timetable/Definition.php
-
-		-
-			message: "#^Property Schoolbox\\\\External\\\\Normalise\\\\Timetable\\\\Definition\\:\\:\\$allPeriods \\(Schoolbox\\\\Collection\\) does not accept null\\.$#"
-			count: 1
-			path: library/Schoolbox/External/Normalise/Timetable/Definition.php
-
-		-
-			message: "#^Property Schoolbox\\\\External\\\\Normalise\\\\Timetable\\\\Lesson\\:\\:\\$id \\(int\\) does not accept default value of type string\\.$#"
-			count: 1
-			path: library/Schoolbox/External/Normalise/Timetable/Lesson.php
-
-		-
-			message: "#^Method Schoolbox\\\\External\\\\Normalise\\\\Timetable\\\\Period\\\\Base\\:\\:getNumber\\(\\) should return string but returns int\\.$#"
-			count: 1
-			path: library/Schoolbox/External/Normalise/Timetable/Period/Base.php
-
-		-
-			message: "#^Property Schoolbox\\\\External\\\\Normalise\\\\Timetable\\\\Period\\\\Base\\:\\:\\$number \\(int\\) does not accept default value of type string\\.$#"
-			count: 1
-			path: library/Schoolbox/External/Normalise/Timetable/Period/Base.php
-
-		-
-			message: "#^Property Schoolbox\\\\External\\\\Normalise\\\\Timetable\\\\Period\\\\Base\\:\\:\\$number \\(int\\) does not accept string\\.$#"
-			count: 1
-			path: library/Schoolbox/External/Normalise/Timetable/Period/Base.php
 
 		-
 			message: "#^Call to an undefined method External_UserInterface\\:\\:getStudentBoarderContactListExtended\\(\\)\\.$#"
@@ -4814,11 +4414,6 @@ parameters:
 			message: "#^Empty array passed to foreach\\.$#"
 			count: 1
 			path: library/Schoolbox/Picker/DateTime/Module.php
-
-		-
-			message: "#^Variable \\$pd in PHPDoc tag @var does not exist\\.$#"
-			count: 1
-			path: library/Schoolbox/ProfessionalDevelopment/Repository.php
 
 		-
 			message: "#^Method Schoolbox\\\\Profile\\\\ValidDetailsVisible\\:\\:isSatisfiedBy\\(\\) invoked with 4 parameters, 2 required\\.$#"

@@ -38,12 +38,12 @@ class User extends AbstractImporter
     /**
      * @var Service
      */
-    protected $passwordService;
+    protected Service $passwordService;
 
     /**
      * @var UserMapper
      */
-    protected $userMapper;
+    protected UserMapper $userMapper;
 
     /**
      * @var array|RoleModel[]
@@ -93,7 +93,7 @@ class User extends AbstractImporter
 
     /**
      * Caches new user's usernames so we can detect multi new users
-     * with the the same username during dry-run.
+     * with the same username during dry-run.
      *
      * Maps 'username' => 'externalId'
      *
@@ -104,7 +104,6 @@ class User extends AbstractImporter
     /**
      * Documentation function for expected format
      *
-     * @return array
      */
     public static function getFormat()
     {
@@ -278,30 +277,23 @@ class User extends AbstractImporter
                 continue;
             }
 
-            $userResult = new User\Result();
-            $userResult->setOriginalUser(clone $user);
+            $originalUser = clone $user;
 
-            // Step 2: are they deleted?
+            // Step 2: update user based on fields
+            $this->hydrateUser($row, $user);
+
+            // Step 3: save user
             if ($this->parseStringBoolean($row['Delete?'] ?? 'false')) {
-                $userResult->setIsUserDeleted(true);
-            }
-
-            // Step 3: update user based on fields
-            $userResult->setUser($this->hydrateUser($row, $user));
-
-            // Step 4: save user
-            if ($userResult->isUserDeleted()) {
-                $this->deleteUser($userResult);
+                $this->deleteUser($user);
             } else {
-                $user = $userResult->getUser();
                 if (empty($user->getId())) {
-                    $this->createUser($userResult);
+                    $this->createUser($user);
                 } else {
-                    $this->updateUser($userResult);
+                    $this->updateUser($user, $originalUser);
                 }
             }
 
-            unset($userResult);
+            unset($originalUser);
             unset($user);
         }
     }
@@ -309,11 +301,9 @@ class User extends AbstractImporter
     /**
      * Creates a user record.
      *
-     * @param User\Result $userResult
      */
-    protected function createUser(User\Result $userResult)
+    protected function createUser(UserModel $user)
     {
-        $user = $userResult->getUser();
         if ($this->performUpdate) {
             try {
                 if (!$this->userMapper->save($user)) {
@@ -341,12 +331,10 @@ class User extends AbstractImporter
     /**
      * Updates a user record.
      *
-     * @param User\Result $userResult
      */
-    protected function updateUser(User\Result $userResult)
+    protected function updateUser(UserModel $user, UserModel $originalUser)
     {
-        $user = $userResult->getUser();
-        $diff = $this->userMapper->diff($userResult->getOriginalUser(), $user);
+        $diff = $this->userMapper->diff($originalUser, $user);
         if ($this->performUpdate) {
             try {
                 if (!$this->userMapper->save($user)) {
@@ -374,11 +362,9 @@ class User extends AbstractImporter
     /**
      * Deletes this user record.
      *
-     * @param User\Result $userResult
      */
-    protected function deleteUser(User\Result $userResult)
+    protected function deleteUser(UserModel $user)
     {
-        $user = $userResult->getUser();
         if (!$user->getId()) {
             $this->log->warning(
                 sprintf(

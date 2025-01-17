@@ -113,7 +113,6 @@ For full information on the build process of making a APT package and deploying 
   * [Bell Daemon](./tools/notif/bell/README.md)
   * [Curriculum](./library/Schoolbox/Curriculum/README.md)
   * [EOTC](./www/modules/eotc/README.md)
-  * [NESA](./docs/nesa.md)
   * [Notifications](./docs/notifications/README.md)
   * [ResourceBooking](./library/Schoolbox/ResourceBooking/README.md)
   * [Task Daemon](./library/Schoolbox/TaskDaemon/README.md)
