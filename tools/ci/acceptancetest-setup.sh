@@ -4,16 +4,6 @@ initialdir=$(pwd);                      # eg "/tmp/build/6963e648"
 
 export INSTANCE_ID=smoketest
 
-cd /usr/share/schoolbox
-echo "cd into vagrant"
-
-## Extract the NPM build
-tar xzf "$initialdir"/npm-artifact/*-npm.tar.gz;
-
-## Install playwright for the test
-npx playwright install
-echo "playwright installed"
-
 ## RABBITMQ
 
 service rabbitmq-server start
@@ -44,19 +34,35 @@ logdir=/var/log/schoolbox/smoketest
 
 echo "starting socketd"
 /usr/share/schoolbox/tools/socket/socketd.php --porcelain -vvv > $logdir/socketd.log 2>&1 &
+# kill -HUP $(pgrep -f socketd.php)
 
 echo "starting scheduled"
 /usr/share/schoolbox/tools/mq/schedule-safe-restart.php -vvv --perform --no-delay
 /usr/share/schoolbox/tools/mq/scheduled.php --porcelain -vvv --pid > $logdir/scheduled.log 2>&1 &
+# kill -HUP $(pgrep -f scheduled.php)
 
 echo "starting digestd"
 /usr/share/schoolbox/tools/digest/digestd.php --porcelain -vvv --pid > $logdir/digestd.log 2>&1 &
+# kill -HUP $(pgrep -f digestd.php)
 
 echo "starting mobiled"
 /usr/share/schoolbox/tools/mobile/mobiled.php --porcelain -vvv --pid > $logdir/mobiled.log 2>&1 &
+# kill -HUP $(pgrep -f mobiled.php)
 
 echo "refreshing binding cache"
-tools/notif/route/refresh-binding-cache.php
+/usr/share/schoolbox/tools/notif/route/refresh-binding-cache.php
+
+## ACCEPTANCE TESTS
+
+cd /usr/share/schoolbox
+echo "cd into vagrant"
+
+## Extract the NPM build
+tar xzf "$initialdir"/npm-artifact/*-npm.tar.gz;
+
+## Install playwright for the test
+npx playwright install
+echo "playwright installed"
 
 ## Finish where we started.
 cd "$initialdir"
