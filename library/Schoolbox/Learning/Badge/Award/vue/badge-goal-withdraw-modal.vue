@@ -2,23 +2,11 @@
 // Ignore this file for ESLint checks for now (SA-18376)
 /* eslint-disable */
 /* eslint-enable vue/no-v-html */
-import debounce from "lodash/debounce";
+import SearchSelect from "@schoolboxVue/components/searchSelect/search-select.vue";
 import BadgeImage from "../../vue/badge-image";
 import RevealModal from "@schoolboxVue/components/reveal-modal";
 import toastMixin from "@schoolboxVue/components/toast-mixin";
 import { getFormData, getSearchString } from "@js/util/queryUtils";
-
-/* Vue select
- */
-import vSelect from "vue-select";
-import "vue-select/dist/vue-select.css";
-
-/* Render custom template for Deselect icon/button
- * It's not well documented, but you can trawl through closed PRs to figger out how
- * https://github.com/sagalbot/vue-select/issues/994
- */
-import Deselect from "@schoolboxVue/components/selectize/Deselect";
-vSelect.props.components.default = () => ({ Deselect });
 
 /**
  * Modal for withdrawing a single goal from a single student.
@@ -54,7 +42,7 @@ export default {
     components: {
         BadgeImage,
         RevealModal,
-        vSelect,
+        SearchSelect,
     },
 
     /**
@@ -76,22 +64,6 @@ export default {
     },
 
     /**
-     * Computed properties.
-     * Access the results of a function as if they were a property of an object.
-     */
-    computed: {
-        /**
-         * return a list of options that are not already selected
-         * @returns {Array} - the list of options that are not already selected
-         */
-        filteredOptions() {
-            return this.options.filter((option) => {
-                return !this.selected.some((selected) => selected.id === option.id);
-            });
-        },
-    },
-
-    /**
      * Mounted.
      * Basically, when vue has done all its inits and is ready to go
      * kind of like window.onload
@@ -104,6 +76,14 @@ export default {
      * other ordinary javascript that you might have written before.
      */
     methods: {
+        /**
+         * Get the endpoint for the user search
+         * @returns {String} - The endpoint for the user search
+         */
+        getEndpoint() {
+            const searchUrl = new URL(this.badge._links.achievementRecipients, window.location.href);
+            return searchUrl.toString();
+        },
         /**
          * Open this modal.
          */
@@ -124,32 +104,6 @@ export default {
         close() {
             this.$refs.modal.close();
         },
-
-        /**
-         * Start searching for keyword
-         *
-         * @param query
-         * @param loading
-         */
-        onSearch(query, loading) {
-            if (query.length < 3) {
-                return;
-            }
-            loading(true);
-            this.search(loading, query, this);
-        },
-
-        /**
-         * Perform async request and load results into component
-         */
-        search: debounce(function (loading, query, vm) {
-            fetch(`${this.badge._links.goalRecipients}?${getSearchString({ query })}`)
-                .then((response) => response.json())
-                .then(function (response) {
-                    vm.options = response;
-                    loading(false);
-                });
-        }, 350),
 
         /**
          * Perform goal withdrawal from selected users
@@ -222,33 +176,18 @@ export default {
                 </div>
             </div>
 
-            <v-select
-                class="schoolbox-vue-selectize"
-                :options="filteredOptions"
-                :clear-search-on-blur="
-                    function () {
-                        return true;
-                    }
-                "
-                :clear-search-on-select="true"
-                :close-on-select="false"
-                multiple
-                @search="onSearch"
-                label="name"
-                placeholder="Search for users to remove goal from"
-                v-model="selected"
+            <search-select
+                class="l-pad-m--bottom"
+                v-model:selected="selected"
+                label="Search"
+                label-id="usersGoalWithdraw"
+                :endpoint="getEndpoint()"
+                placeholder=""
             >
-                <template #option="option">
-                    <div class="d-center">
-                        {{ option.name }}
-                    </div>
-                </template>
-                <template #selected-option="option">
-                    <div class="selected d-center">
-                        {{ option.name }}
-                    </div>
-                </template>
-            </v-select>
+                <template #meta>
+                    <div class="meta">Search for users to remove goal from</div>
+                </template></search-select
+            >
 
             <ul class="flex-list buttons">
                 <li>
