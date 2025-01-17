@@ -1,4 +1,8 @@
 <script setup lang="ts">
+/**
+ * Wrapper for the PWA contents when shown in the sidebar
+ * This also controls whether the entire panel is shown or not based on the content inside
+ */
 import { usePwaConfigStore } from "./store/pwaConfigStore";
 
 interface Props {

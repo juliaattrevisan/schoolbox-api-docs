@@ -1,4 +1,8 @@
 <script setup lang="ts">
+/**
+ * Wrapper for the PWA contents when shown in the notification settings page
+ * This also controls whether the entire panel is shown or not based on the content inside
+ */
 import { sbProps } from "@js/util/sbx/pageUtils";
 
 interface Props {
