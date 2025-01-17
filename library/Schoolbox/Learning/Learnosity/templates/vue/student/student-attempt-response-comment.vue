@@ -135,7 +135,7 @@ window.Vue.onUnmounted(async () => {
         </div>
         <template v-else>
             <label :for="editorId">Comment</label>
-            <textarea :id="editorId" v-model="comment" rows="3" class="f-no-margins"></textarea>
+            <textarea :id="editorId" v-model="comment" rows="3" class="comment-input f-no-margins"></textarea>
             <div class="save-container l-grid">
                 <div class="save-container__inner-container">
                     <div :class="`alert-box f-no-margins ${hasSaved ? 'success' : ''} ${hasError ? 'alert' : ''}`">
@@ -148,6 +148,10 @@ window.Vue.onUnmounted(async () => {
 </template>
 
 <style lang="scss" scoped>
+.comment-input {
+    resize: vertical; // only allow the textarea to be resized vertically
+}
+
 .save-container {
     grid-template-rows: v-bind(saveContainerHeight);
     transition: grid-template-rows 300ms;
