@@ -31,7 +31,7 @@ foreach ($componentCollection as $component) {
 
         $component->setup();
 
-        if ($component->execute()) {
+        if ($component->executeWithinSpan()) {
             $component->parseConfig();
 
             if ($component->renderTemplate($templateHandle) !== false) {

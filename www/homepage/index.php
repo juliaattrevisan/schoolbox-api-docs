@@ -380,14 +380,14 @@ if ($virtualPermission >= UserAccess::ACCESS_WRITE) {
 $manageFolderController = new Component_Homepage_ManageFolderController(new Component_Instance(), $sessionUser, $this);
 $manageFolderController->setMaximumPermission($virtualPermission);
 $manageFolderController->setup($folder);
-$manageFolderController->execute();
+$manageFolderController->executeWithinSpan();
 $manageFolderController->renderTemplate('page_controls');
 
 // Setup class action buttons (in 3-dot menu).
 $manageClassController = new Component_Homepage_ManageClassController(new Component_Instance(), $sessionUser, $this);
 $manageClassController->setMaximumPermission($virtualPermission);
 $manageClassController->setup($folder);
-$manageClassController->execute();
+$manageClassController->executeWithinSpan();
 if ($manageClassController->renderTemplate('manage_class')) {
     $this->parse('manage_class_block', 'manage_class');
 } else {
@@ -477,7 +477,7 @@ foreach ($componentCollection as $component) {
 
         $component->setup($folder);
 
-        if ($component->execute() && $component->renderTemplate($templateHandle) !== false) {
+        if ($component->executeWithinSpan() && $component->renderTemplate($templateHandle) !== false) {
             if (!in_array($instance->getPosition(), $occupiedPositionList)) {
                 $occupiedPositionList[] = $instance->getPosition();
             }

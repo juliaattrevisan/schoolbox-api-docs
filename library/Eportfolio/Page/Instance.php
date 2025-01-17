@@ -283,7 +283,7 @@ class Eportfolio_Page_Instance extends Eportfolio_Page_Abstract
                 $templateHandle = "component_{$component->getInstance()->getId()}";
 
                 $component->setup($this);
-                if ($component->execute() !== false) {
+                if ($component->executeWithinSpan() !== false) {
                     if ($component->renderTemplate($templateHandle) !== false) {
                         if (!in_array($component->getInstance()->getPosition(), $occupiedPositionList)) {
                             $occupiedPositionList[] = $component->getInstance()->getPosition();

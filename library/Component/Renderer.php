@@ -114,7 +114,7 @@ class Component_Renderer
 
         $component->setup($folder);
 
-        if ($component->execute() !== false) {
+        if ($component->executeWithinSpan() !== false) {
             $component->parseConfig();
 
             if ($component->renderTemplate($templateHandle) !== false) {
@@ -154,7 +154,7 @@ class Component_Renderer
         $templateHandle = 'component_' . $component->getInstance()->getId();
 
         $component->setup($eportfolioPage);
-        if ($component->execute() !== false) {
+        if ($component->executeWithinSpan() !== false) {
             $component->parseConfig();
             if ($component->renderTemplate($templateHandle) !== false) {
                 $component->setVar('COMPONENT_NAME', $component->getConfig('componentname'));
