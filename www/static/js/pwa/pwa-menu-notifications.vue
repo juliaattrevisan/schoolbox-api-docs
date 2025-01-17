@@ -108,7 +108,7 @@ defineExpose({ hasVisibleContent });
     <div v-else-if="prompt === PromptType.NOTIF_BLOCKED" class="alert-box warning">
         You've blocked notifications on this device. To enable notifications, you must go to your device settings and
         set <b>Allow notifications</b>.
-        <a href="#" class="pwa-retry-notif-prompt" @click.prevent="onRetryNotifPrompt">Try again</a>
+        <a href="#" data-pwa-action="retryNotifPrompt" @click.prevent="onRetryNotifPrompt">Try again</a>
     </div>
 
     <div v-else-if="prompt === PromptType.NOTIF_ENABLED_MESSAGE" class="alert-box success">
