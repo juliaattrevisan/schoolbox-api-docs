@@ -23,9 +23,9 @@ else
 fi
 
 branch='master';
-if [ ! -z $2 ];
+if [ ! -z $1 ];
 then
-	branch="$2";
+	branch="$1";
 fi
 
 echo "Branch: $branch";
@@ -35,21 +35,11 @@ echo "Branch: $branch";
 "$fullpath"/smoketest-setup.sh $PHP_VERSION
 echo "${TEST_SUITE} tests setup"
 
-# Start rabbitmq
-service rabbitmq-server start
-
-cd /usr/share/schoolbox
-echo "cd into vagrant"
-
-## Extract the NPM build
-tar xzf "$initialdir"/npm-artifact/*-npm.tar.gz;
-
-## Install playwright for the test
-npx playwright install
-echo "playwright installed"
+"$fullpath"/acceptancetest-setup.sh
+echo "acceptancetest setup"
 
 ## Run tests
-INSTANCE_ID=acceptancetest CI=true npx playwright test
+INSTANCE_ID=smoketest CI=true npx playwright test
 
 testResult=$?;
 

@@ -7,9 +7,12 @@ import Fixture from "@schoolboxTest/playwright/support/page/fixture/Fixture";
 test.describe("Fixture match notification tests", () => {
     test.beforeEach(async ({ tester }) => {
         tester.isGoingTo("clear all notifications");
+        // Run a special script if on CI since the machine is built differently
+        const destroyFile = process.env.CI ? "destroy-rabbit-data-ci.php" : "destroy-rabbit-data.php";
         await tester.runShellCommand(
-            "cd /usr/share/schoolbox/tools/notif; sudo php /usr/share/schoolbox/test/socket/destroy-rabbit-data.php",
+            `cd /usr/share/schoolbox/tools/notif; sudo php /usr/share/schoolbox/test/socket/${destroyFile}`,
         );
+
         await tester.loginAsAdmin();
     });
 
