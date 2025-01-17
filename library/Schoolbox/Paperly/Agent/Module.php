@@ -44,6 +44,12 @@ class Module extends BaseModule
             'getAgentRequest',
             $permission,
         );
+        $this->register(
+            self::METHOD_POST,
+            '/proxy',
+            'postAgentProxyRequest',
+            $permission,
+        );
     }
 
     /**
