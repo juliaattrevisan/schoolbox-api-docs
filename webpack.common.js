@@ -117,6 +117,9 @@ module.exports = {
         headerSearch: "./templates/core/include/vue/headerSearch.ts",
         searchPage: "./library/Schoolbox/Search/templates/vue/searchPage.ts",
 
+        // PWA
+        pwa: "./www/static/js/pwa/pwa.ts",
+
         // Toast
         sbxToast: "./vue/components/toast/sbxToast.ts",
 
@@ -251,10 +254,6 @@ module.exports = {
 
         // Birthday pop up
         birthdaySurprise: "./vue/components/birthday/birthdaySurprise.ts",
-
-        // Firebase
-        firebaseInit: "./www/static/js/firebase/firebase-init.ts",
-        firebaseMessaging: "./www/static/js/firebase/firebase-messaging.ts",
 
         //Sass (leave at the bottom)
         core: "./www/static/css/core/core.scss",

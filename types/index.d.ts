@@ -12,7 +12,6 @@ import type { DefineComponent } from "vue";
 import type { SbxEditor } from "@js/editor/types/editorTypes";
 import type { RosettaStone } from "@js/terminology/rosettaStone";
 import type { injectScriptsIfNotLoaded } from "@js/util/domUtils";
-import type { pwaConfig } from "@js/global/pwaConfig";
 import type { SbxGlobalDocumentEventHandlerMap, SbxGlobalElementEventHandlerMap } from "./sbxEvents";
 
 declare global {
@@ -31,6 +30,7 @@ declare global {
         sbProps: {
             ckeditor5LicenseKey: string;
             iframelyLicenseKey: string;
+            siteTitle: string;
             colourDefaults: {
                 skin: string[];
                 skinUnique: string[];
@@ -49,7 +49,6 @@ declare global {
             MAX_BYTES_MYSQL_TEXT: number;
             MAX_BYTES_MYSQL_MEDIUMTEXT: number;
             l10n: RosettaStone;
-            pwaConfig: typeof pwaConfig;
             firebaseApps: Array<{
                 appIdentifier: string;
                 publicConfiguration: { [key: string]: unknown };
@@ -62,6 +61,7 @@ declare global {
         schoolboxUser: {
             id: number;
             name: string;
+            impersonated: boolean;
         };
         siteVersion: string;
         STORYBOOK_ENV: string;

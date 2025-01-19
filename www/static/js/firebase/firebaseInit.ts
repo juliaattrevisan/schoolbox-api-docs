@@ -1,7 +1,7 @@
 import { initializeApp } from "@firebase/app";
 import { getMessaging, getToken, deleteToken, onMessage } from "@firebase/messaging";
-import { PWA_NOTIFICATION_ALLOW, PWA_NOTIFICATION_DENY } from "./firebaseEvent";
-import type { FirebaseRequestNotifEvent } from "./firebaseEvent";
+import { supportsNotifications } from "@js/util/browserUtils";
+import { usePwaConfigStore } from "@js/pwa/store/pwaConfigStore";
 
 // See /library/Alaress/Async/Notification/Cloud/Firebase/Service.php::propagate
 interface SbxFirebaseNotificationPayload {
@@ -29,56 +29,69 @@ interface SbxNotificationOptions extends NotificationOptions {
     renotify?: boolean;
 }
 
-window.sbProps.firebaseApps.forEach((app) => {
-    if (app.publicConfiguration && app.webPushPublicKey && app.appIdentifier) {
+/**
+ * Initialise firebase apps/messaging for each app in window.sbProps.firebaseApps
+ * This should only be called once per page load.
+ */
+export function initFirebaseApps(): void {
+    // If the browser doesn't support notifications, nothing to do
+    if (!supportsNotifications()) {
+        return;
+    }
+
+    window.sbProps.firebaseApps.forEach((app) => {
+        const validApp = app.publicConfiguration && app.webPushPublicKey && app.appIdentifier;
+        if (!validApp) {
+            return; // Skip this app if it doesn't have the required configuration.
+        }
+
         const firebaseApp = initializeApp(app.publicConfiguration);
 
-        // Check if the browser supports notifications
-        if ("Notification" in window) {
-            // Retrieve the current Firebase Messaging instance.
-            const messaging = getMessaging(firebaseApp);
+        // Retrieve the current Firebase Messaging instance.
+        const messaging = getMessaging(firebaseApp);
 
-            // Receipt of a message
-            onMessage(messaging, (payload) => {
-                const notificationPayload = (payload as unknown as SbxFirebaseNotificationPayload).notification; // We don't use firebase's standard payload format
-                if (notificationPayload === undefined) {
-                    return; // No notification to display
-                }
+        // Receipt of a message
+        onMessage(messaging, (payload) => {
+            const notificationPayload = (payload as unknown as SbxFirebaseNotificationPayload).notification; // We don't use firebase's standard payload format
+            if (notificationPayload === undefined) {
+                return; // No notification to display
+            }
 
-                const notificationOptions: SbxNotificationOptions = {
-                    body: notificationPayload.body,
-                    icon: "/images/logo.php?logo=skin_logo_square&size=apple72",
-                    image: notificationPayload.icon ?? "/images/logo.php?logo=skin_logo_square&size=apple72",
-                    badge: "/images/logo.php?logo=skin_logo_square&size=apple72",
-                    renotify: false,
-                };
+            const notificationOptions: SbxNotificationOptions = {
+                body: notificationPayload.body,
+                icon: "/images/logo.php?logo=skin_logo_square&size=apple72",
+                image: notificationPayload.icon ?? "/images/logo.php?logo=skin_logo_square&size=apple72",
+                badge: "/images/logo.php?logo=skin_logo_square&size=apple72",
+                renotify: false,
+            };
 
-                if (notificationPayload.timestamp !== 0) {
-                    notificationOptions.timestamp = notificationPayload.timestamp;
-                }
+            if (notificationPayload.timestamp !== 0) {
+                notificationOptions.timestamp = notificationPayload.timestamp;
+            }
 
-                // TODO: Fall back to site name instead of "Notification" if no title is provided
-                const notificationTitle: string = notificationPayload.title ?? "Notification";
+            // TODO: Fall back to site name instead of "Notification" if no title is provided
+            const notificationTitle: string = notificationPayload.title ?? "Notification";
 
-                const notif = new Notification(notificationTitle, notificationOptions);
-                notif.onclick = (event): void => {
-                    event.preventDefault(); // prevent the browser from focusing the Notification's tab
-                    // some notifications have a href, some don't just load the dashboard for those missing hrefs.
-                    const notifHref: string = notificationPayload.href ?? "/";
+            const notif = new Notification(notificationTitle, notificationOptions);
+            notif.onclick = (event): void => {
+                event.preventDefault(); // prevent the browser from focusing the Notification's tab
+                // some notifications have a href, some don't just load the dashboard for those missing hrefs.
+                const notifHref: string = notificationPayload.href ?? "/";
 
-                    // open the notification destination
-                    window.open(notifHref, "_blank");
-                };
-            });
-        }
-    }
-});
+                // open the notification destination
+                window.open(notifHref, "_blank");
+            };
+        });
+    });
+}
 
 /**
  * Respond to a request to allow notifications, send both to firebase, and schoolbox
- * @param event - Information about the event.
+ * @param deviceId - An identifier for this device to allow de-duplication of registrations
  */
-async function requestNotif(event: FirebaseRequestNotifEvent): Promise<void> {
+export async function requestNotif(deviceId: "iOS" | "Android" | "Browser"): Promise<void> {
+    const pwaConfigStore = usePwaConfigStore();
+
     /**
      * Currently there'll usually only be at most one Firebase app, but if we start supporting
      * multiple apps, then we may need to start indexing the pwaConfig by app.appIdentifier too...
@@ -98,25 +111,25 @@ async function requestNotif(event: FirebaseRequestNotifEvent): Promise<void> {
              * previously had a token, and if so, remove it from Schoolbox. This should be sufficient to
              * clean up the majority of old registratons but will leave at least one behind per device.
              */
-            if (window.sbProps.pwaConfig.user.notificationToken) {
+            if (pwaConfigStore.user.notificationToken) {
                 // It's possible Schoolbox already realised this token was invalid and removed it,
                 // so this may throw a 400 "Unable to find app registration", but that's fine.
                 await fetch("/api/register/Firebase", {
                     method: "DELETE",
                     body: JSON.stringify({
                         appId: app.appIdentifier,
-                        token: window.sbProps.pwaConfig.user.notificationToken,
+                        token: pwaConfigStore.user.notificationToken,
                     }),
                     headers: {
                         "Content-Type": "application/json",
                     },
                 });
 
-                window.sbProps.pwaConfig.user.notificationToken = null;
+                pwaConfigStore.user.notificationToken = null;
             }
 
             // Set the current user's notification state to "registering" so we can retry if the page is reloaded before the registration is complete.
-            window.sbProps.pwaConfig.user.notificationState = "registering";
+            pwaConfigStore.user.notificationState = "registering";
 
             // Then, register the user's device with Firebase and Schoolbox.
             const firebaseApp = initializeApp(app.publicConfiguration);
@@ -125,13 +138,13 @@ async function requestNotif(event: FirebaseRequestNotifEvent): Promise<void> {
             // mobile app registration.
             getToken(messaging, { vapidKey: app.webPushPublicKey })
                 .then(async (currentToken) => {
-                    if (window.sbProps.pwaConfig.user.notificationState === "removing") {
+                    if (pwaConfigStore.user.notificationState === "removing") {
                         // If notification blocked while requesting, should stop registering attempt
-                        window.sbProps.pwaConfig.user.notificationState = null;
+                        pwaConfigStore.user.notificationState = null;
                         throw new Error("Notification blocked. Stop registering attempts.");
                     }
 
-                    window.sbProps.pwaConfig.user.notificationToken = currentToken;
+                    pwaConfigStore.user.notificationToken = currentToken;
 
                     // The Firebase app may one day be a separate
                     // service to the other mobile apps: should that
@@ -141,7 +154,7 @@ async function requestNotif(event: FirebaseRequestNotifEvent): Promise<void> {
                     const formData = new FormData();
                     formData.append("appId", app.appIdentifier);
                     formData.append("token", currentToken);
-                    formData.append("deviceId", event.detail.deviceId);
+                    formData.append("deviceId", deviceId);
 
                     // Post this token to Schoolbox,
                     // registering it for the current user.
@@ -150,7 +163,7 @@ async function requestNotif(event: FirebaseRequestNotifEvent): Promise<void> {
                         body: formData,
                     });
 
-                    window.sbProps.pwaConfig.user.notificationState = "registered";
+                    pwaConfigStore.user.notificationState = "registered";
                 })
                 .catch((error) => {
                     console.error(`Error on getting token: ${error}`);
@@ -162,7 +175,9 @@ async function requestNotif(event: FirebaseRequestNotifEvent): Promise<void> {
 /**
  * Respond to a request to allow notifications, send both to firebase, and schoolbox
  */
-function denyNotif(): void {
+export function denyNotif(): void {
+    const pwaConfigStore = usePwaConfigStore();
+
     window.sbProps.firebaseApps.forEach((app) => {
         if (app.publicConfiguration && app.webPushPublicKey && app.appIdentifier) {
             const firebaseApp = initializeApp(app.publicConfiguration);
@@ -174,10 +189,10 @@ function denyNotif(): void {
                     void deleteToken(messaging);
 
                     // delete the local cache token for the user
-                    window.sbProps.pwaConfig.user.notificationToken = null;
+                    pwaConfigStore.user.notificationToken = null;
 
                     // Set notificationState to "removing" so if the page is reloaded we can re-trigger the event
-                    window.sbProps.pwaConfig.user.notificationState = "removing";
+                    pwaConfigStore.user.notificationState = "removing";
 
                     // The Firebase app may one day be a separate
                     // service to the other mobile apps: should that
@@ -198,17 +213,12 @@ function denyNotif(): void {
                         },
                     });
 
-                    window.sbProps.pwaConfig.user.notificationState = null;
+                    pwaConfigStore.user.notificationState = null;
                 })
                 .catch((error) => {
                     console.error(`Error on getting token: ${error}`);
+                    pwaConfigStore.user.notificationState = null; // Avoid repetatively requesting notifications from the user
                 });
         }
     });
 }
-
-document.addEventListener(PWA_NOTIFICATION_ALLOW, (event) => {
-    void requestNotif(event);
-});
-
-document.addEventListener(PWA_NOTIFICATION_DENY, denyNotif);
