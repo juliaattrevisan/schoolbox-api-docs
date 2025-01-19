@@ -332,9 +332,45 @@ HELP;
             'type' => 'custom'
         ]);
 
+        /* All student roles
+         */
+        $studentRoleIds = implode(',', $this->helper->fetchRoleIds([
+            Role::STUDENT
+        ]));
+
         foreach ($customButtons as $customButton) {
+            $profileButtonId = $customButton->getId();
+
+            /**
+             * If there is no visibility for any student role currently, skip this button
+             * We don't want to make buttons visible to students that previously weren't
+             */
+
+            if ('' === $studentRoleIds) {
+                continue; // no student roles, nothing to do
+            }
+
+            $existingStudentVisibilities = $this->getDatabaseInternal()->executeQuery("
+                SELECT role_id
+                FROM profile_button_role_visibility
+                WHERE profile_button_id = {$profileButtonId}
+                AND role_id IN ({$studentRoleIds})
+            ");
+
+            if ($existingStudentVisibilities->rowCount() === 0) {
+                $this->getLogger()->info(sprintf(
+                    'Custom button %s NOT receiving SELF reassignment (no student visibilities)',
+                    $customButton->getText()
+                ));
+                continue;
+            }
+
+            /**
+             * Since we have student visibilities, we need to remove them and enable SELF instead
+             */
+
             $this->getLogger()->info(sprintf(
-                'Custom button %s receiving SELF reassignment',
+                'Custom button %s receiving SELF reassignment (has student visibilities)',
                 $customButton->getText()
             ));
 
@@ -344,27 +380,19 @@ HELP;
 
             $profileButtonMapper->save($customButton);
 
-            $profileButtonId = $customButton->getId();
-
             /* Remove all student roles
              */
-            $roleIds = implode(',', $this->helper->fetchRoleIds([
-                Role::STUDENT
-            ]));
+            $this->getLogger()->info(sprintf(
+                'Custom button %s removing role ids %s from visibilities',
+                $customButton->getText(),
+                $studentRoleIds
+            ));
 
-            if ('' !== $roleIds) {
-                $this->getLogger()->info(sprintf(
-                    'Custom button %s removing role ids %s from visibilities',
-                    $customButton->getText(),
-                    $roleIds
-                ));
-
-                $this->getDatabaseInternal()->executeQuery("
-                    DELETE FROM profile_button_role_visibility
-                    WHERE profile_button_id = {$profileButtonId}
-                    AND role_id IN ({$roleIds})
-                ");
-            }
+            $this->getDatabaseInternal()->executeQuery("
+                DELETE FROM profile_button_role_visibility
+                WHERE profile_button_id = {$profileButtonId}
+                AND role_id IN ({$studentRoleIds})
+            ");
         }
 
         /* Announce lock release
