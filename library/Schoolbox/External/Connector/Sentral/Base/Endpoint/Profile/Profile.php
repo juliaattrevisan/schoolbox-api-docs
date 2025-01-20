@@ -309,6 +309,10 @@ class Profile implements IStrategy
                  */
                 $metadata = $studentBaseProfile->getMetadata() ?? [];
 
+                /* Remember the type of person this is
+                 */
+                $metadata['type'] = Profile::TYPE_STUDENT;
+
                 /* This is used to obtain timetables
                  */
                 $metadata['studentId'] = $student['id'];
@@ -316,6 +320,7 @@ class Profile implements IStrategy
                 /* This is used to obtain medical stuff
                  */
                 $metadata['personId'] = $student['relationships']['person']['data']['id'];
+
 
                 $studentBaseProfile
                     ->setExternalId($externalId)
@@ -1414,6 +1419,10 @@ class Profile implements IStrategy
                  * Note that this is shared
                  */
                 $metadata = $staffBaseProfile->getMetadata() ?? [];
+
+                /* Remember the type of person this is
+                 */
+                $metadata['type'] = Profile::TYPE_STAFF;
 
                 /* This is used to obtain timetables
                  */

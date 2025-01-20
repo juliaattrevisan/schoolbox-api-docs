@@ -22,6 +22,7 @@ use Schoolbox\GenericCollection;
 use SensitiveParameter;
 use UnexpectedValueException;
 
+
 /**
  * Class Factory
  *
@@ -302,7 +303,11 @@ class Factory
                     $this->log,
                     $this->perform,
                     $api,
-                    $registry,
+                    new Lookup\Users(
+                        $this->baseProfileMapper,
+                        $this->studentProfileMapper,
+                        $this->staffProfileMapper
+                    ),
                     $this->eventMapper,
                     $this->overridesMapper,
                     $this->classEntryMapper,

@@ -7,7 +7,7 @@
 
 declare(strict_types=1);
 
-namespace External\Connector\Sentral\Base\Endpoint\Lookup;
+namespace Schoolbox\External\Connector\Sentral\Base\Endpoint\Lookup;
 
 /**
  * Class Lookup

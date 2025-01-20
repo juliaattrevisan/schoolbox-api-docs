@@ -13,6 +13,7 @@ use Psr\Log\LoggerInterface;
 use Schoolbox\External\ClassEntry;
 use Schoolbox\External\ClassEntryMapper;
 use Schoolbox\External\ClassInvolvementMapper;
+use Schoolbox\External\Connector\Base\Metadata\Reader;
 use Schoolbox\External\Connector\ClassCode;
 use Schoolbox\External\Connector\Sentral\Base\Endpoint\IApi;
 use Schoolbox\External\Connector\Sentral\Base\Endpoint\Profile\Profile;
@@ -21,6 +22,7 @@ use Schoolbox\External\Event\Mapper;
 use Schoolbox\External\Event\Model;
 use Schoolbox\External\Importer\Endpoint\IStrategy;
 use Schoolbox\Mapper\Exception;
+use Schoolbox\External\Connector\Sentral\Base\Endpoint\Lookup\Users as UserLookup;
 
 /**
  * Import all the classes for a student, saving them as sis_event records
@@ -46,12 +48,6 @@ class Classes implements IStrategy
      * @var IApi
      */
     private IApi $api;
-
-
-    /**
-     * @var Registry
-     */
-    private Registry $registry;
 
 
     /**
@@ -124,7 +120,7 @@ class Classes implements IStrategy
      * @param LoggerInterface                            $log
      * @param bool                                       $perform
      * @param IApi                                       $api
-     * @param Registry                                   $registry
+     * @param UserLookup                                 $userLookup
      * @param Mapper                                     $eventMapper
      * @param \Schoolbox\External\Event\Overrides\Mapper $overridesMapper
      * @param ClassEntryMapper                           $classEntryMapper
@@ -136,7 +132,7 @@ class Classes implements IStrategy
         LoggerInterface $log,
         bool $perform,
         IApi $api,
-        Registry $registry,
+        private UserLookup $userLookup,
         \Schoolbox\External\Event\Mapper $eventMapper,
         \Schoolbox\External\Event\Overrides\Mapper $overridesMapper,
         ClassEntryMapper $classEntryMapper,
@@ -147,7 +143,6 @@ class Classes implements IStrategy
         $this->log = $log;
         $this->perform = $perform;
         $this->api = $api;
-        $this->registry = $registry;
         $this->eventMapper = $eventMapper;
         $this->overridesMapper = $overridesMapper;
         $this->classEntryMapper = $classEntryMapper;
@@ -167,8 +162,30 @@ class Classes implements IStrategy
     {
         $this->log->info('Processing timetables.');
 
-        foreach ($this->registry->recallAll() as $externalId => $data) {
-            $name = trim("{$data['person']['firstname']} {$data['person']['lastname']}");
+        /* Spawn a list of people whom we need
+         */
+        $userLookup = $this->userLookup->generate();
+
+        $metadataReader = new Reader();
+
+        foreach ($userLookup as $externalId => $data) {
+            $name = trim("{$data['firstname']} {$data['lastname']}");
+
+            /* Unpack all those ids
+             */
+            $metadata = $metadataReader->deserialize($data['metadata']);
+
+            /* Construct an amalgamation of $data and $metadata, compliant with everything
+             * we used to obtain from the Registry instance
+             */
+            $struct = [
+                'person' => [
+                    'externalId' => trim((string)$externalId),
+                    'firstname' => trim((string)$data['firstname']),
+                    'lastname' => trim((string)$data['lastname']),
+                    'type' => trim((string)$metadata['type'])
+                ]
+            ];
 
             /* Decide which endpoint to consume
              *
@@ -181,20 +198,27 @@ class Classes implements IStrategy
              * be teaching a subject and having an empty period at the same time). This superposition
              * should theoretically obtain staff classes that don't involve students...
              */
-            if (Profile::TYPE_STUDENT === $data['person']['type']) {
-                $endpoint = "timetables/student/{$data['person']['id']}/timetable-lessons?fromDate={$this->fromDate}&toDate={$this->toDate}";
-            } elseif (Profile::TYPE_STAFF === $data['person']['type']) {
-                $endpoint = "timetables/staff/{$data['person']['id']}/timetable-lessons?fromDate={$this->fromDate}&toDate={$this->toDate}";
+            if (isset($metadata['studentId'])) {
+                $endpoint = "timetables/student/{$metadata['studentId']}/timetable-lessons?fromDate={$this->fromDate}&toDate={$this->toDate}";
+
+                $struct['person']['id'] = $metadata['studentId'];
+            } elseif (isset($metadata['staffId'])) {
+                $endpoint = "timetables/staff/{$metadata['staffId']}/timetable-lessons?fromDate={$this->fromDate}&toDate={$this->toDate}";
+
+                $struct['person']['id'] = $metadata['staffId'];
             } else {
                 $this->log->warning(sprintf(
-                    'Unknown profile type for %s; skipping timetable preload.',
-                    $name
+                    'Unknown profile type for %s (%s); skipping timetable preload.',
+                    $name,
+                    $externalId
                 ));
 
                 continue;
             }
 
-            $this->consumeTimetable($endpoint, $data, $name);
+
+
+            $this->consumeTimetable($endpoint, $struct, $name);
         }
     }
 
