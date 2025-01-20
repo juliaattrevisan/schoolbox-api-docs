@@ -37,6 +37,9 @@ class Profile implements IStrategy
     /**
      * These consts, used to denote what type of person we're processing,
      * also help us decide which timetable-lessons endpoint to access later
+     *
+     * These consts correspond to Sentral's values, not our Role ones.
+     * It just so happens they're the same for now.
      */
     public const TYPE_STUDENT = 'student';
     public const TYPE_STAFF = 'staff';
