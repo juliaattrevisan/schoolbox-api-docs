@@ -1235,6 +1235,10 @@ LMS,"QR Code page",Superuser,https://vagrant.dev.schoolbox.cloud/qrcode/83,200
 LMS,"QR Code page",Teacher,https://vagrant.dev.schoolbox.cloud/qrcode/83,400
 LMS,"QR Code page",Student,https://vagrant.dev.schoolbox.cloud/qrcode/83,401
 LMS,"QR Code page",Parent,https://vagrant.dev.schoolbox.cloud/qrcode/83,401
+LMS,"Curriculum Coverage",Superuser,https://vagrant.dev.schoolbox.cloud/curriculum/reports/coverage,200
+LMS,"Curriculum Coverage",Teacher,https://vagrant.dev.schoolbox.cloud/curriculum/reports/coverage,200
+LMS,"Curriculum Coverage",Student,https://vagrant.dev.schoolbox.cloud/curriculum/reports/coverage,403
+LMS,"Curriculum Coverage",Parent,https://vagrant.dev.schoolbox.cloud/curriculum/reports/coverage,403
 "Resource Booking","View all resources",Superuser,https://vagrant.dev.schoolbox.cloud/resource-booking/item,200
 "Resource Booking","View all resources",Teacher,https://vagrant.dev.schoolbox.cloud/resource-booking/item,200
 "Resource Booking","View all resources",Student,https://vagrant.dev.schoolbox.cloud/resource-booking/item,200
