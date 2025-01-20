@@ -211,7 +211,10 @@ class Controller extends Base
 
         // Get the state and nonce generated for you and store them in a cookie
         $cookieStore = new CookieStore();
-        $cookieStore->set($oidcProvider->getState(), $oidcProvider->getPkceCode(), $nonce);
+        $cookieStore
+            ->setState($oidcProvider->getState())
+            ->setPkceCode($oidcProvider->getPkceCode())
+            ->setNonce($nonce);
 
         // Redirect the user to the authorization URL
         $this->response = $this->redirectTemporary($authorizationUrl);

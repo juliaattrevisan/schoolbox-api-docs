@@ -50,21 +50,57 @@ class CookieStore
     ];
 
     /**
-     * Set the cookie which contains the state, PKCE code and nonce.
+     * Set the cookie which contains the state.
      *
      * @param string $state
+     * @return $this
+     */
+    public function setState(string $state): self
+    {
+        $this->setCookie(self::STATE_COOKIE, $state);
+        return $this;
+    }
+
+    /**
+     * Set the cookie which contains the PKCE code.
+     *
      * @param string $pkceCode
+     * @return $this
+     */
+    public function setPkceCode(string $pkceCode): self
+    {
+        $this->setCookie(self::PKCE_CODE_COOKIE, $pkceCode);
+        return $this;
+    }
+
+    /**
+     * Set the cookie which contains the nonce.
+     *
      * @param string $nonce
+     * @return $this
+     */
+    public function setNonce(string $nonce): self
+    {
+        $this->setCookie(self::NONCE_COOKIE, $nonce);
+        return $this;
+    }
+
+    /**
+     * Internal set cookie method.
+     *
+     * @param string $cookie
+     * @param string $value
      * @return void
      */
-    public function set(string $state, string $pkceCode, string $nonce): void
+    private function setCookie(string $cookie, string $value): void
     {
-        $cookieParams = self::COOKIE_PARAMS + [
-            'expires'  => Alaress_Date_Format::now()->addSeconds(self::COOKIE_EXPIRY)->getUnixTimeStamp(),
-        ];
-        setcookie(self::STATE_COOKIE, $state, $cookieParams);
-        setcookie(self::PKCE_CODE_COOKIE, $pkceCode, $cookieParams);
-        setcookie(self::NONCE_COOKIE, $nonce, $cookieParams);
+        setcookie(
+            $cookie,
+            $value,
+            self::COOKIE_PARAMS + [
+               'expires' => Alaress_Date_Format::now()->addSeconds(self::COOKIE_EXPIRY)->getUnixTimeStamp(),
+            ],
+        );
     }
 
     /**
