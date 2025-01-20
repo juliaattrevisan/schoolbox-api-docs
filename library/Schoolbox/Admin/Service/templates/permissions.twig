@@ -23,9 +23,9 @@
                             <div class="compact card small-12">
                                 <a href="/adminv2/user/{{ user.id }}/modify">
                                     {% include 'include/portrait.twig' with {user: user} only %}
-                                    <div>
-                                        <span class='fixed-width-username'>{{ user.fullname }}</span>
-                                        <span title='Access type'>({{ accessTypeByServiceNameByUserId[user.id][serviceName] }})</span>
+                                    <div class='l-grid l-gap l-grid--2-col'>
+                                        <div>{{ user.fullname }}</div>
+                                        <div title='Access type'>({{ accessTypeByServiceNameByUserId[user.id][serviceName] }})</div>
                                     </div>
                                 </a>
                             </div>
@@ -46,9 +46,3 @@
     </div>
 </div>
 {% endfor %}
-<style>
-*.fixed-width-username {
-    display: inline-block;
-    width: 300px;
-}
-</style>
