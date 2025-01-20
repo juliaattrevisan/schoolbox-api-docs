@@ -80,6 +80,16 @@ export default {
                     throw new Error(`Download request failed: ${response.status}`);
                 }
 
+                // If the response URL contains /manifest/offline then we got the offline page
+                if (response.url.startsWith(`${this.window.location.origin}/manifest/offline`)) {
+                    throw new Error("You appear to be offline, check your internet connection and try again");
+                }
+
+                // If we didn't get a CSV back, something went wrong
+                if (!response.headers.get("content-type").includes("text/csv")) {
+                    throw new Error("Unable to download CSV, please try again later");
+                }
+
                 // Build a blob from the response and download it
                 const blob = await response.blob();
                 const url = window.URL.createObjectURL(blob);
