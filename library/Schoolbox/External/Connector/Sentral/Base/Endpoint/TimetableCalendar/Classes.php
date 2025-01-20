@@ -17,7 +17,6 @@ use Schoolbox\External\Connector\Base\Metadata\Reader;
 use Schoolbox\External\Connector\ClassCode;
 use Schoolbox\External\Connector\Sentral\Base\Endpoint\IApi;
 use Schoolbox\External\Connector\Sentral\Base\Endpoint\Profile\Profile;
-use Schoolbox\External\Connector\Sentral\Base\Endpoint\Registry;
 use Schoolbox\External\Event\Mapper;
 use Schoolbox\External\Event\Model;
 use Schoolbox\External\Importer\Endpoint\IStrategy;

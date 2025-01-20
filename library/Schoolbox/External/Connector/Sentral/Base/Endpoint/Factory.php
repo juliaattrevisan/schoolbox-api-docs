@@ -239,10 +239,6 @@ class Factory
     {
         $api = new Api($this->host, $this->key);
 
-        /* A list of student ids that we previously imported
-         */
-        $registry = new Registry();
-
         /* Date range
          */
         $from = \Alaress_Date_Format::now()->addWeeks(self::FROM)->getDatabaseDate();
@@ -268,7 +264,6 @@ class Factory
                     $api,
                     $this->watchlist,
                     $this->includePhoto,
-                    $registry,
                     $this->baseProfileMapper,
                     $this->studentProfileMapper,
                     $this->parentProfileMapper,

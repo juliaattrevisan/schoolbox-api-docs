@@ -15,7 +15,6 @@ use PDOException;
 use Psr\Log\LoggerInterface;
 use Schoolbox\External\Connector\FirstMeaningfulValue;
 use Schoolbox\External\Connector\Sentral\Base\Endpoint\IApi;
-use Schoolbox\External\Connector\Sentral\Base\Endpoint\Registry;
 use Schoolbox\External\Connector\Sentral\Base\Endpoint\Watchlist;
 use Schoolbox\External\Connector\ValidStrats;
 use Schoolbox\External\Importer\Endpoint\IStrategy;
@@ -114,7 +113,6 @@ class Profile implements IStrategy
      * @param IApi                            $api
      * @param array                           $watchlist
      * @param bool                            $includePhoto
-     * @param Registry                        $registry
      * @param UserProfile\Mapper              $baseProfileMapper
      * @param UserProfile\Student\Mapper      $studentProfileMapper
      * @param UserProfile\Parent\Mapper       $parentProfileMapper
@@ -129,7 +127,6 @@ class Profile implements IStrategy
         private IApi $api,
         private array $watchlist,
         private bool $includePhoto,
-        private Registry $registry,
         private UserProfile\Mapper $baseProfileMapper,
         private UserProfile\Student\Mapper $studentProfileMapper,
         private UserProfile\Parent\Mapper $parentProfileMapper,
@@ -511,23 +508,6 @@ class Profile implements IStrategy
                 if ($this->validStrats->isFamiliesStratEnabled()) {
                     $this->importParentsOfStudent($studentBaseProfile, $student['relationships']['contacts']['data']);
                 }
-
-                /* Remember that we saw a particular student id
-                 * (-not- their externalId, the primary key in sentral for this student)
-                 *
-                 * We need to get each dude's timetable separately via some other api endpoint
-                 * and we won't encounter this id again unless we remember it here
-                 */
-                $this->registry->remember($externalId, [
-                    'person' => [
-                        'id' => $student['id'],
-                        'type' => self::TYPE_STUDENT,
-                        'externalId' => $externalId,
-                        'firstname' => $studentBaseProfile->getFirstname(),
-                        'firstnamePreferred' => $studentBaseProfile->getFirstnamePreferred(),
-                        'lastname' => $studentBaseProfile->getLastname()
-                    ],
-                ]);
             }
 
             /* Prepare for next page if it exists
@@ -1478,23 +1458,6 @@ class Profile implements IStrategy
                 if ($this->perform) {
                     $this->staffProfileMapper->save($staffProfile);
                 }
-
-                /* Remember that we saw a particular staff id
-                 * (-not- their externalId, the primary key in sentral for this staff)
-                 *
-                 * We need to get each dude's timetable separately via some other api endpoint
-                 * and we won't encounter this id again unless we remember it here
-                 */
-                $this->registry->remember($externalId, [
-                    'person' => [
-                        'id' => $staff['id'],
-                        'type' => self::TYPE_STAFF,
-                        'externalId' => $externalId,
-                        'firstname' => $staffBaseProfile->getFirstname(),
-                        'firstnamePreferred' => $staffBaseProfile->getFirstnamePreferred(),
-                        'lastname' => $staffBaseProfile->getLastname()
-                    ],
-                ]);
             }
 
             /* Prepare for next page if it exists
