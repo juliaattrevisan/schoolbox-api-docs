@@ -592,12 +592,11 @@ class Profile implements IStrategy
              */
             if (!$baseProfile->getPortrait() || ($baseProfile->getPortrait()->getHash() !== $portrait->getHash())) {
                 $this->log->debug(sprintf(
-                    'Profile picture: %s %s (%s) has profile hash %s derived from %s.png',
+                    'Profile picture: %s %s (%s) has profile picture updated to hash %s',
                     $baseProfile->getFirstname(),
                     $baseProfile->getLastname(),
                     $externalId,
                     $portrait->getHash(),
-                    $externalId,
                 ));
 
                 $baseProfile->setPortrait($portrait);
