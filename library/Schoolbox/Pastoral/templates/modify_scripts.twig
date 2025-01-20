@@ -442,10 +442,16 @@
                 }
             }
 
-            /**
-             * Update the entry tip based on current type / subtype selection
-             */
-             const entryTipContainer = document.getElementById("entry-tip-container");
+            updateEntryTip(entryTip);
+
+        }
+
+        /**
+         * Update the entry tip based on current type / subtype selection
+         * @param entryTip
+         */
+        function updateEntryTip (entryTip) {
+            const entryTipContainer = document.getElementById("entry-tip-container");
              if (entryTipContainer === null) {
                  return;
              }
