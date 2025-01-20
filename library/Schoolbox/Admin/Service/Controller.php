@@ -24,7 +24,6 @@ class Controller extends Base
      */
     private $userAccessMapper;
 
-
     /**
      * Controller constructor.
      * @param ErrorMapper             $errorMapper
@@ -35,7 +34,6 @@ class Controller extends Base
         $this->errorMapper = $errorMapper;
         $this->userAccessMapper = $userAccessMapper;
     }
-
 
     /**
      * A list of services and the people in them
