@@ -39,8 +39,32 @@ class Permissions
 
 
     /**
+     * Return an array of service names indexed by serviceId.
+     * The services returned are those that should be listed on the 'Admin > Service Permissions' page.
+     * @return array<int, string>
+     */
+    public function getServiceNameById()
+    {
+        /* We don't need to list the HOMEPAGE service (1) here
+         * The TUTORIAL service (4) got deleted at some point
+         */
+        return $this->userAccessMapper->getDatabase()->executeQuery(
+            'SELECT id, name
+            FROM lu_service
+            WHERE id NOT IN (:homepageConst, :tutorialConst)
+            ORDER BY name',
+            [
+                'homepageConst' => UserAccess::SERVICE_HOMEPAGE,
+                'tutorialConst' => self::SERVICE_TUTORIAL
+            ]
+        )->fetchColumnArray('name', 'id');
+    }
+
+
+    /**
      * Generate the list
      *
+     * @param $serviceNameById array<int, string> An array of service names indexed by serviceId.
      * @return array
      * @throws \Alaress\Database\Predicate\InvalidColumnException
      * @throws \ReflectionException
@@ -49,29 +73,13 @@ class Permissions
      * @throws \UnexpectedValueException
      * @throws \PDOException
      */
-    public function getUsersByServiceName(): array
+    public function getUsersByServiceName(array $serviceNameById): array
     {
-        /* We don't need to list the HOMEPAGE service (1) here
-         * The TUTORIAL service (4) got deleted at some point
-         */
-        $query = '
-            SELECT id, name
-            FROM lu_service
-            WHERE id NOT IN (:homepageConst, :tutorialConst)
-            ORDER BY name
-        ';
-
-        $statement = $this->userAccessMapper->getDatabase()->prepare($query);
-        $statement->execute([
-            'homepageConst' => UserAccess::SERVICE_HOMEPAGE,
-            'tutorialConst' => self::SERVICE_TUTORIAL
-        ]);
-
         $usersByServiceName = [];
 
-        while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
-            $usersByServiceName[$row['name']] = (
-                $this->userAccessMapper->findUsersForService($row['id'])->getUnique('id')->indexBy('id')
+        foreach ($serviceNameById as $serviceId => $serviceName) {
+            $usersByServiceName[$serviceName] = (
+                $this->userAccessMapper->findUsersForService($serviceId)->getUnique('id')->indexBy('id')
             );
         }
 

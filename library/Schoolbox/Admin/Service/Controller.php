@@ -11,6 +11,7 @@ namespace Schoolbox\Admin\Service;
 use Alaress\Web\Controller\Base;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Permission\Access;
+use Schoolbox\Permission\Access\UserAccess;
 
 class Controller extends Base
 {
@@ -49,8 +50,11 @@ class Controller extends Base
      */
     public function getRoster()
     {
+        $permissions = new Permissions($this->userAccessMapper);
+        $serviceNameById = $permissions->getServiceNameById();
+
         $this->response = $this->responseFromTemplate('@service/permissions.twig', [
-            'usersByServiceName' => (new Permissions($this->userAccessMapper))->getUsersByServiceName(),
+            'usersByServiceName' => $permissions->getUsersByServiceName($serviceNameById),
             'pageCurrent' => 'user',
         ]);
     }
