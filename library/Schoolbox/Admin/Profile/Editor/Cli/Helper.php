@@ -85,19 +85,23 @@ class Helper
      * corresponding to the roletypes specified in $roleType
      *
      * @param array $roleType
+     * @param bool $includeDeleted - Whether to include deleted roles
      * @return array
      */
-    public function fetchRoleIds(array $roleType): array
+    public function fetchRoleIds(array $roleType, bool $includeDeleted = true): array
     {
         $ids = [];
 
         $placeholders = Builder::getArrayPlaceholders($roleType, 'roletype');
         $params = Builder::getArrayParameters($roleType, 'roletype');
 
+        $includeDeletedString = $includeDeleted ? '' : ' AND deleted IS NULL';
+
         $statement = $this->db->prepare("
             SELECT id
             FROM groups
             WHERE group_type IN {$placeholders}
+            $includeDeletedString
         ");
 
         $statement->execute($params);
@@ -352,7 +356,7 @@ class Helper
             SET enabled = 0
             WHERE roletype = :roletype
             AND field = :field
-            LIMIT 1            
+            LIMIT 1
         ");
 
         foreach ($tuples as $roletype => $fields) {

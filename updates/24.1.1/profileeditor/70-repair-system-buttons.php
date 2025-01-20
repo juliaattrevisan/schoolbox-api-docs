@@ -336,7 +336,7 @@ HELP;
          */
         $studentRoleIds = implode(',', $this->helper->fetchRoleIds([
             Role::STUDENT
-        ]));
+        ], false));
 
         foreach ($customButtons as $customButton) {
             $profileButtonId = $customButton->getId();
@@ -347,7 +347,7 @@ HELP;
              */
 
             if ('' === $studentRoleIds) {
-                continue; // no student roles, nothing to do
+                break; // no student roles, nothing to do
             }
 
             $existingStudentVisibilities = $this->getDatabaseInternal()->executeQuery("
