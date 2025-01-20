@@ -24,7 +24,7 @@ class ApiUsage
      *
      * @var array
      */
-    private $usage = [];
+    private array $usage = [];
 
 
     /**

@@ -30,66 +30,6 @@ use Schoolbox\External\Connector\Sentral\Base\Endpoint\Lookup\Users as UserLooku
 class Classes implements IStrategy
 {
     /**
-     * @var LoggerInterface
-     */
-    private LoggerInterface $log;
-
-
-    /**
-     * The "perform" flag from the cli tool
-     *
-     * @var bool
-     */
-    private bool $perform;
-
-
-    /**
-     * @var IApi
-     */
-    private IApi $api;
-
-
-    /**
-     * @var \Schoolbox\External\Event\Mapper
-     */
-    private \Schoolbox\External\Event\Mapper $eventMapper;
-
-
-    /**
-     * @var \Schoolbox\External\Event\Overrides\Mapper
-     */
-    private \Schoolbox\External\Event\Overrides\Mapper $overridesMapper;
-
-
-    /**
-     * @var ClassEntryMapper
-     */
-    private ClassEntryMapper $classEntryMapper;
-
-
-    /**
-     * @var ClassInvolvementMapper
-     */
-    private ClassInvolvementMapper $classInvolvementMapper;
-
-
-    /**
-     * A date string in the format Y-m-d e.g. 2020-10-12
-     *
-     * @var string
-     */
-    private string $fromDate;
-
-
-    /**
-     * A date string in the format Y-m-d e.g. 2020-10-12
-     *
-     * @var string
-     */
-    private string $toDate;
-
-
-    /**
      * A list of event guids that we saw previously
      *
      * @var array
@@ -116,6 +56,8 @@ class Classes implements IStrategy
     /**
      * Constructor.
      *
+     * From and To dates are date string in the format Y-m-d e.g. 2020-10-12
+     *
      * @param LoggerInterface                            $log
      * @param bool                                       $perform
      * @param IApi                                       $api
@@ -128,26 +70,17 @@ class Classes implements IStrategy
      * @param string                                     $toDate
      */
     public function __construct(
-        LoggerInterface $log,
-        bool $perform,
-        IApi $api,
+        private LoggerInterface $log,
+        private bool $perform,
+        private IApi $api,
         private UserLookup $userLookup,
-        \Schoolbox\External\Event\Mapper $eventMapper,
-        \Schoolbox\External\Event\Overrides\Mapper $overridesMapper,
-        ClassEntryMapper $classEntryMapper,
-        ClassInvolvementMapper $classInvolvementMapper,
-        string $fromDate,
-        string $toDate
+        private \Schoolbox\External\Event\Mapper $eventMapper,
+        private \Schoolbox\External\Event\Overrides\Mapper $overridesMapper,
+        private ClassEntryMapper $classEntryMapper,
+        private ClassInvolvementMapper $classInvolvementMapper,
+        private string $fromDate,
+        private string $toDate
     ) {
-        $this->log = $log;
-        $this->perform = $perform;
-        $this->api = $api;
-        $this->eventMapper = $eventMapper;
-        $this->overridesMapper = $overridesMapper;
-        $this->classEntryMapper = $classEntryMapper;
-        $this->classInvolvementMapper = $classInvolvementMapper;
-        $this->fromDate = $fromDate;
-        $this->toDate = $toDate;
     }
 
 
