@@ -189,7 +189,7 @@
         {% include '@resourceBrowser/actionBar.twig' with { id: 'folder-actions', list: actionBarList, sizing: { small: 1, medium: 2, large: 2, xlarge: 4, xxlarge: 4 } } %}
 
     <div class="reveal-modal" id="modal-folder-{{ folder.id }}" data-reveal>
-        <h2>{{ folder.name }}</h2>
+        <h1>{{ folder.name }}</h1>
         {% set showGroupAdmin = folder.group is defined and admin is defined %}
         {% set showTeachers = folder.codeString is defined and folder.teachers|length > 0 %}
         {% if showGroupAdmin or showTeachers %}
