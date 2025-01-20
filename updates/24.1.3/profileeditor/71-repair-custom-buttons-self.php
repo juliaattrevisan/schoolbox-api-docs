@@ -172,7 +172,7 @@ HELP;
         /* Exit early if you're doing this on a school
          */
         if (!in_array(strtoupper($this->getConfig()->get('site_school_code')), self::SCHOOL_CODES, true)) {
-            $this->getLogger()->debug('This customisation does not apply to this school code; exiting.');
+            $this->getLogger()->info('This customisation does not apply to this school code; exiting.');
 
             return;
         }
