@@ -95,7 +95,7 @@ class Controller extends Base
         if (isset($idToken)) {
             $cookieState = $cookieStore->getState($this->request);
             $cookieNonce = $cookieStore->getNonce($this->request);
-            $cookieStore->clear();
+            $cookieStore->clearAll();
             if (!$this->verifyState($requestState, $cookieState)) {
                 return;
             }
@@ -110,7 +110,7 @@ class Controller extends Base
         $accessToken = $this->requestPost->get('access_token') ?? $this->requestQuery->get('access_token');
         if (isset($accessToken)) {
             $cookieState = $cookieStore->getState($this->request);
-            $cookieStore->clear();
+            $cookieStore->clearAll();
             if (!$this->verifyState($requestState, $cookieState)) {
                 return;
             }
@@ -138,7 +138,7 @@ class Controller extends Base
             $cookieState    = $cookieStore->getState($this->request);
             $cookiePkceCode = $cookieStore->getPkceCode($this->request);
             $cookieNonce    = $cookieStore->getNonce($this->request);
-            $cookieStore->clear();
+            $cookieStore->clearAll();
             if (!$this->verifyState($requestState, $cookieState)) {
                 return;
             }

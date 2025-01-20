@@ -13,16 +13,20 @@ use Alaress_Date_Format;
 use Psr\Http\Message\ServerRequestInterface;
 
 /**
- * Store OIDC client related values (state, nonce, PKCE token) in a cookie which
- * is not the standard session cookie, and is able to be accessed cross-domain.
+ * Store OIDC client related values (state, nonce, PKCE token) in a set of
+ * cookies which are not the standard session cookie.
+ *
+ * These cookies are designed to be sent as part of POST requests that an OIDC
+ * provider sends back to Schoolbox, and thus have the `SameSite=None` setting.
  */
 class CookieStore
 {
-    private const COOKIE_NAME = 'oidcClient';
-
-    private const STATE_KEY     = 'state';
-    private const PKCE_CODE_KEY = 'pkceCode';
-    private const NONCE_KEY     = 'nonce';
+    /**
+     * Cookie names.
+     */
+    private const STATE_COOKIE     = 'oidcClient:state';
+    private const PKCE_CODE_COOKIE = 'oidcClient:pkceCode';
+    private const NONCE_COOKIE     = 'oidcClient:nonce';
 
     /**
      * Cookie expiry: for now, hardcode to 10 minutes.
@@ -31,6 +35,19 @@ class CookieStore
      * `\Schoolbox\Oidc\Server\Module::buildController`.
      */
     private const COOKIE_EXPIRY = 60 * 10;
+
+    /**
+     * Default cookie parameters:
+     * * `SameSite=None` so that it's included in POST requests from other
+     *   domains
+     * * `Secure` so that it's only accessible in HTTPS requests
+     * * `Http-Only` so that it's not accessible via JavaScript code
+     */
+    private const COOKIE_PARAMS = [
+        'samesite' => 'None',
+        'secure'   => true,
+        'httponly' => true,
+    ];
 
     /**
      * Set the cookie which contains the state, PKCE code and nonce.
@@ -42,20 +59,12 @@ class CookieStore
      */
     public function set(string $state, string $pkceCode, string $nonce): void
     {
-        setcookie(
-            self::COOKIE_NAME,
-            json_encode([
-                self::STATE_KEY     => $state,
-                self::PKCE_CODE_KEY => $pkceCode,
-                self::NONCE_KEY     => $nonce,
-            ]),
-            [
-                'expires'  => Alaress_Date_Format::now()->addSeconds(self::COOKIE_EXPIRY),
-                'samesite' => 'None',
-                'secure'   => true,
-                'httponly' => true,
-            ]
-        );
+        $cookieParams = self::COOKIE_PARAMS + [
+            'expires'  => Alaress_Date_Format::now()->addSeconds(self::COOKIE_EXPIRY)->getUnixTimeStamp(),
+        ];
+        setcookie(self::STATE_COOKIE, $state, $cookieParams);
+        setcookie(self::PKCE_CODE_COOKIE, $pkceCode, $cookieParams);
+        setcookie(self::NONCE_COOKIE, $nonce, $cookieParams);
     }
 
     /**
@@ -66,7 +75,7 @@ class CookieStore
      */
     public function getState(ServerRequestInterface $request): ?string
     {
-        return $request->getCookieParams()[self::STATE_KEY] ?? null;
+        return $request->getCookieParams()[self::STATE_COOKIE] ?? null;
     }
 
     /**
@@ -77,7 +86,7 @@ class CookieStore
      */
     public function getPkceCode(ServerRequestInterface $request): ?string
     {
-        return $request->getCookieParams()[self::PKCE_CODE_KEY] ?? null;
+        return $request->getCookieParams()[self::PKCE_CODE_COOKIE] ?? null;
     }
 
     /**
@@ -88,16 +97,18 @@ class CookieStore
      */
     public function getNonce(ServerRequestInterface $request): ?string
     {
-        return $request->getCookieParams()[self::NONCE_KEY] ?? null;
+        return $request->getCookieParams()[self::NONCE_COOKIE] ?? null;
     }
 
     /**
-     * Clear the cookie completely.
+     * Clear the cookies completely.
      *
      * @return void
      */
-    public function clear(): void
+    public function clearAll(): void
     {
-        setcookie(self::COOKIE_NAME, '', 0);
+        setcookie(self::STATE_COOKIE, '', 0);
+        setcookie(self::PKCE_CODE_COOKIE, '', 0);
+        setcookie(self::NONCE_COOKIE, '', 0);
     }
 }
