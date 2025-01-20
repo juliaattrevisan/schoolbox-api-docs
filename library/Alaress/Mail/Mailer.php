@@ -23,6 +23,7 @@ use Symfony\Component\Mailer\Exception\TransportException;
 use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
 use Symfony\Component\Mailer\Mailer as SymfonyMailer;
 use Symfony\Component\Mailer\MailerInterface;
+use Symfony\Component\Mailer\Transport;
 use Symfony\Component\Mailer\Transport\NullTransport;
 use Symfony\Component\Mailer\Transport\Smtp\EsmtpTransport;
 use Symfony\Component\Mailer\Transport\TransportInterface;
@@ -182,7 +183,7 @@ class Mailer
     public function setFrom(Address $address): void
     {
         $this->email->from($address);
-        $this->email->returnPath($address);
+        $this->email->returnPath($address->getEncodedAddress()); // The name should not be passed in return path so we only set the email address in return path
     }
 
     /**
@@ -342,7 +343,26 @@ class Mailer
     {
         // create transport and send email
         try {
-            $mailer = new SymfonyMailer(self::getConfiguredTransport($this->config, $reinitialise));
+
+            // Check if the SES config exists, if yes, use SES transporter
+            if(!empty($this->config->get('amazon_ses_username')) && !empty($this->config->get('amazon_ses_password')) && !empty($this->config->get('amazon_ses_region'))) {
+                $username = $this->config->get('amazon_ses_username');
+                $password = $this->config->get('amazon_ses_password');
+                $region = $this->config->get('amazon_ses_region');
+                $endpoint = 'email-smtp.' . $region . '.amazonaws.com';
+
+                $transport = new EsmtpTransport($endpoint, 587);
+                $transport->setUsername($username);
+                $transport->setPassword($password);
+                $transport->setLocalDomain($endpoint);
+
+                $mailer = new SymfonyMailer($transport);
+
+
+            } else {
+                $mailer = new SymfonyMailer(self::getConfiguredTransport($this->config, $reinitialise));
+            }
+
             $this->configureMailer($mailer);
 
             // get all recipients before signing
@@ -459,7 +479,7 @@ class Mailer
             ) {
                 $this->email->addReplyTo($from);
             }
-            $replaceFrom[] = new Address($this->systemFrom->getAddress(), $from->getName());
+            $replaceFrom[] = new Address($this->systemFrom->getAddress(), $this->systemFrom->getName());
         }
         foreach ($replaceFrom as $i => $replace) {
             if ($i === 0) {
