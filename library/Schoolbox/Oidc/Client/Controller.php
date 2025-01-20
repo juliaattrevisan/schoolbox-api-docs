@@ -199,10 +199,17 @@ class Controller extends Base
         $oidcProvider     = $this->buildOidcProvider();
         $authorizationUrl = $oidcProvider->getAuthorizationUrl($oauthOptions);
 
-        // Get the state and nonce generated for you and store it to the session
-        $this->session->set(self::SESSION_STATE_KEY, $oidcProvider->getState());
-        $this->session->set(self::SESSION_PKCE_CODE_KEY, $oidcProvider->getPkceCode());
-        $this->session->set(self::SESSION_NONCE_KEY, $nonce);
+        // Get the state and nonce generated for you and store them in a cookie
+//        $this->session->set(self::SESSION_STATE_KEY, $oidcProvider->getState());
+//        $this->session->set(self::SESSION_PKCE_CODE_KEY, $oidcProvider->getPkceCode());
+//        $this->session->set(self::SESSION_NONCE_KEY, $nonce);
+        $cookieOptions = [
+            'samesite' => 'None',
+            'secure'   => true,
+        ];
+        setcookie(self::SESSION_STATE_KEY, $oidcProvider->getState(), $cookieOptions);
+        setcookie(self::SESSION_PKCE_CODE_KEY, $oidcProvider->getPkceCode(), $cookieOptions);
+        setcookie(self::SESSION_NONCE_KEY, $nonce, $cookieOptions);
 
         // Redirect the user to the authorization URL
         $this->response = $this->redirectTemporary($authorizationUrl);
@@ -308,7 +315,8 @@ class Controller extends Base
         // convert auth code to access token, checking PKCE code along the way
         /** @phpstan-ignore-next-line - setPkceCode returns the same object buildOidcProvider builds */
         return $this->buildOidcProvider()
-            ->setPkceCode($this->session->get(self::SESSION_PKCE_CODE_KEY))
+//            ->setPkceCode($this->session->get(self::SESSION_PKCE_CODE_KEY))
+            ->setPkceCode($this->request->getCookieParams()[self::SESSION_PKCE_CODE_KEY])
             ->getAccessToken('authorization_code', ['code' => $code]);
     }
 
@@ -368,8 +376,10 @@ class Controller extends Base
      */
     private function verifyState(?string $requestState): bool
     {
-        $sessionState = $this->session->get(self::SESSION_STATE_KEY);
-        $this->session->set(self::SESSION_STATE_KEY, null);
+//        $sessionState = $this->session->get(self::SESSION_STATE_KEY);
+//        $this->session->set(self::SESSION_STATE_KEY, null);
+        $sessionState = $this->request->getCookieParams()[self::SESSION_STATE_KEY];
+        setcookie(self::SESSION_STATE_KEY, '', 0);
         if (!isset($requestState, $sessionState) || $requestState !== $sessionState) {
             $this->sendError('State sent to and received from OIDC provider do not match');
             return false;
@@ -388,8 +398,10 @@ class Controller extends Base
         // check nonce in ID token
         // TODO this should be done in $loginUri, but that's too disruptive
         //      a change right now
-        $sessionNonce = $this->session->get(self::SESSION_NONCE_KEY);
-        $this->session->set(self::SESSION_NONCE_KEY, null);
+//        $sessionNonce = $this->session->get(self::SESSION_NONCE_KEY);
+//        $this->session->set(self::SESSION_NONCE_KEY, null);
+        $sessionNonce = $this->request->getCookieParams()[self::SESSION_NONCE_KEY];
+        setcookie(self::SESSION_NONCE_KEY, '', 0);
         if (!isset($nonce, $sessionNonce) || $nonce !== $sessionNonce) {
             $this->sendError('Nonce sent to and received from OIDC provider do not match');
             return false;
