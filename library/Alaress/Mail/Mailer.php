@@ -345,11 +345,12 @@ class Mailer
         try {
 
             // Check if the SES config exists, if yes, use SES transporter
-            if(!empty($this->config->get('amazon_ses_username')) && !empty($this->config->get('amazon_ses_password')) && !empty($this->config->get('amazon_ses_region'))) {
-                $username = $this->config->get('amazon_ses_username');
-                $password = $this->config->get('amazon_ses_password');
-                $region = $this->config->get('amazon_ses_region');
-                $endpoint = 'email-smtp.' . $region . '.amazonaws.com';
+            $configKeys = ['amazon_ses_username', 'amazon_ses_password', 'amazon_ses_region'];
+            $configValues = array_map(fn($key) => $this->config->get($key), $configKeys);
+
+            if (array_filter($configValues)) {
+                [$username, $password, $region] = $configValues;
+                $endpoint = sprintf('email-smtp.%s.amazonaws.com', $region);
 
                 $transport = new EsmtpTransport($endpoint, 587);
                 $transport->setUsername($username);
@@ -357,8 +358,6 @@ class Mailer
                 $transport->setLocalDomain($endpoint);
 
                 $mailer = new SymfonyMailer($transport);
-
-
             } else {
                 $mailer = new SymfonyMailer(self::getConfiguredTransport($this->config, $reinitialise));
             }
