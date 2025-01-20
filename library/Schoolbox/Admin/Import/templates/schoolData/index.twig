@@ -182,12 +182,14 @@
         $('[data-perform-update]').click(function(e) {
             e.preventDefault();
 
+            let strats = $(this).attr('data-perform-update');
+
             $(this).confirmDialog({
                 header: 'Warning! Live School Data Sync Selected',
                 format: 'html',
                 text: '<div class="alert-box warning">You have selected to perform a live School Data Sync. This will update profile and timetable data with the latest from your SIS.</div><p>Are you sure you wish to proceed?</p>',
                 confirmEvent: function () {
-                    window.location.href = '{{ routeLookup('adminImportIndex.getPerformUpdate') }}';
+                    window.location.href = '{{ routeLookup('adminImportIndex.getPerformUpdate') }}?strats=' + strats;
                 }
             });
         });
@@ -233,7 +235,9 @@
                         <sbx-pop-out content-id="suds-options"></sbx-pop-out>
                     </nav>
                     <ul id="suds-options" class="f-dropdown" data-dropdown-content>
-                        <li><a data-perform-update href='#' class="icon-export" title="Perform Live Update">Perform Live Update</a></li>
+                        <li><a data-perform-update="families,staff,timetable" href='#' class="icon-export" title="Perform Live Update (Full)">Perform Live Update (Full)</a></li>
+                        <li><a data-perform-update="families,staff" href='#' class="icon-export" title="Perform Live Update (Profiles)">Perform Live Update (Profiles)</a></li>
+                        <li><a data-perform-update="timetable" href='#' class="icon-export" title="Perform Live Update (Timetables)">Perform Live Update (Timetables)</a></li>
                     </ul>
                     {% endif %}
                 </div>

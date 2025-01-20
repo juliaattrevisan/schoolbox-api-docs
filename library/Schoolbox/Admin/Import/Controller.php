@@ -344,7 +344,8 @@ class Controller extends ConfigController
          */
         if (0 === $queuedRequests->count()) {
             $importQueue = $this->importQueueMapper->createModel()
-                ->setUser($this->getUser());
+                ->setUser($this->getUser())
+                ->setStrats($this->requestQuery->get('strats'));
 
             $this->importQueueMapper->save($importQueue);
         }

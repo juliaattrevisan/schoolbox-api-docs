@@ -17,6 +17,7 @@
             <tr>
                 <th>Data Source</th>
                 <th>User</th>
+                <th>Strats</th>
                 <th>Requested</th>
             </tr>
             </thead>
@@ -24,6 +25,7 @@
                 <tr>
                     <td>{{ importQueue.script }}</td>
                     <td>{{ importQueue.instance.user.fullname }}</td>
+                    <td>{{ importQueue.instance.strats }}</td>
                     <td>{{ importQueue.instance.createdAt.local }}</td>
                 </tr>
             </tbody>

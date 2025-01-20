@@ -25,9 +25,9 @@ class Model
 
 
     /**
-     * @var string
+     * @var string|null
      */
-    private string $strats;
+    private ?string $strats = null;
 
 
     /**
@@ -52,19 +52,19 @@ class Model
 
 
     /**
-     * @return string
+     * @return string|null
      */
-    public function getStrats(): string
+    public function getStrats(): ?string
     {
         return $this->strats;
     }
 
 
     /**
-     * @param string $strats
+     * @param string|null $strats
      * @return $this
      */
-    public function setStrats(string $strats): self
+    public function setStrats(?string $strats): self
     {
         $this->strats = $strats;
         return $this;
