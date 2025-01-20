@@ -95,7 +95,7 @@ class Helper
         $placeholders = Builder::getArrayPlaceholders($roleType, 'roletype');
         $params = Builder::getArrayParameters($roleType, 'roletype');
 
-        $includeDeletedString = $includeDeleted ? '' : ' AND deleted IS NULL';
+        $includeDeletedString = $includeDeleted ? '' : ' AND deleted_at IS NULL';
 
         $statement = $this->db->prepare("
             SELECT id
