@@ -1,0 +1,21 @@
+<input type="text" name="height" value="{COMPONENT_CONFIG_HEIGHT}" />
+<script>
+    // Add a tooltip to the height field to explain that it is only available when the display ratio is set to 'Auto'
+    (function() {
+        const currentHeightInput = document.querySelector('#component{COMPONENT_INSTANCE_ID} input[name="height"]');
+        if (!currentHeightInput) {
+            return;
+        }
+        currentHeightInput.parentNode.insertAdjacentHTML('beforeBegin',
+            `<span
+                class="hint has-tip tip-top"
+                data-tooltip title="To customise the display height of the component"
+            >?</span>`
+        )
+
+        // As we are adding a new tooltip, we need to trigger foundation to find the new one
+        setTimeout(function() {
+            $(document).foundation('tooltip', 'reflow');
+        }, 500);
+    })();
+</script>
