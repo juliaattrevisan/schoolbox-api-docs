@@ -4,7 +4,7 @@
  # @param string|null $url  A url from Geosnapshots, contains all the image galleries
  #}
 {% if url %}
-<iframe src="{{ url }}"></iframe>
+<iframe src="{{ url }}" style="height: {{ height }}px"></iframe>
 {% else %}
 <div class="empty-state">
     <i class="icon-geosnapshot"></i>

@@ -27,6 +27,10 @@ class Controller extends Component_Homepage_ControllerAbstract
      */
     private ?string $url;
 
+    /**
+     * @var int|null
+     */
+    private ?int $height;
 
     /**
      * Only render this component if Geosnapshot has been set up
@@ -66,6 +70,10 @@ class Controller extends Component_Homepage_ControllerAbstract
              */
             $this->url = $response['url'];
 
+            /* Get the height set in the component's configuration settings
+             */
+            $this->height = $this->getConfig('height');
+
             return true;
         }
 
@@ -91,7 +99,8 @@ class Controller extends Component_Homepage_ControllerAbstract
     public function renderTemplate($templateHandle): bool
     {
         return $this->renderTwigTemplate($templateHandle, '@geosnapshotHomepage/component.twig', [
-            'url' => $this->url
+            'url' => $this->url,
+            'height' => $this->height
         ]);
     }
 }
