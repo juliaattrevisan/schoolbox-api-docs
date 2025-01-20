@@ -190,9 +190,11 @@
 
     <div class="reveal-modal" id="modal-folder-{{ folder.id }}" data-reveal>
         <h2>{{ folder.name }}</h2>
-        <dl class="inline-dl">
-        {% if (folder.codeString is defined and folder.teachers|length > 0) or folder.group is defined %}
-            {% if folder.group is defined and admin is defined %}
+        {% set showGroupAdmin = folder.group is defined and admin is defined %}
+        {% set showTeachers = folder.codeString is defined and folder.teachers|length > 0 %}
+        {% if showGroupAdmin or showTeachers %}
+            <dl class="inline-dl">
+            {% if showGroupAdmin %}
                 <dt class="small-12 medium-4">Group Administrator</dt>
                 <dd class="small-12 medium-8">
                     <div class="card tiny">
@@ -203,8 +205,8 @@
                     </div>
                 </dd>
             {% endif %}
-            {% if folder.teachers %}
-            <dt class="small-12 medium-4">Teacher{{ folder.teachers.count == 1 ? '' : 's' }}</dt>
+            {% if showTeachers %}
+                <dt class="small-12 medium-4">Teacher{{ folder.teachers.count == 1 ? '' : 's' }}</dt>
                 {% for i, teacher in folder.teachers %}
                 <dd class="small-12 medium-8{% if i > 0 %} medium-offset-4{% endif %}">
                     <div class="card tiny">
@@ -216,8 +218,8 @@
                 </dd>
                 {% endfor %}
             {% endif %}
+            </dl>
         {% endif %}
-        </dl>
 
         {% if namespace == 'resourceBrowser' %}
             <h3>Permissions</h3>
