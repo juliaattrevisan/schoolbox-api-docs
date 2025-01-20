@@ -193,11 +193,11 @@
                     {% endif %}
                     <fieldset class="content">
                         <div class="small-12 columns">
-                            <label for="pastoralEntryTip">Pastoral Entry Tip</label>
+                            <label for="entryTip">Pastoral Entry Tip</label>
                             <p class="meta">
                                 This will appear on the pastoral record creation screen to provide additional information when creating a record of this Type / Sub-Type
                             </p>
-                            <textarea id="pastoralEntryTip"></textarea>
+                            <textarea id="entryTip"></textarea>
                         </div>
                     </fieldset>
                     <fieldset class="content">
@@ -218,7 +218,7 @@
                                     document.dispatchEvent(new CustomEvent("EDITOR__CREATE", {
                                         detail : {
                                             maxCharCount: window.sbProps.MAX_BYTES_MYSQL_MEDIUMTEXT,
-                                            targetElements: ["#template", "#templatePrivate", "#pastoralEntryTip"],
+                                            targetElements: ["#template", "#templatePrivate", "#entryTip"],
                                             hasTokens: true
                                         }
                                     }))
