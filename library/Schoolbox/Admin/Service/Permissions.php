@@ -65,7 +65,7 @@ class Permissions
      * Return an array of (array of User objects), indexed by service name.
      *
      * @param $serviceNameById array<int, string> An array of service names indexed by serviceId.
-     * @return array<string, <array<User>>
+     * @return array<string, array<User>>
      * @throws \Alaress\Database\Predicate\InvalidColumnException
      * @throws \ReflectionException
      * @throws \Schoolbox\Mapper\DefinitionException
@@ -91,7 +91,7 @@ class Permissions
      * Return an array of (array of accessType names indexed by service name), indexed by userId.
      *
      * @param array<int, string> $serviceNameById
-     * @return array<int, <array<string, string>>>
+     * @return array<int, array<string, string>>
      */
     public function getAccessTypeByServiceNameByUserId(array $serviceNameById): array
     {
