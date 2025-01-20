@@ -75,7 +75,7 @@ This also imports calendar events from a third party endpoint, if it exists
 
 This always performs updates; there is no dry-run mode for the cron task.
 
-Usage: userinitiated.php
+Usage: userInitiated.php
 
 
 HELP;
@@ -172,7 +172,7 @@ HELP;
          *
          * TODO this will be chosen via the ui somehow and provided here, in a future ticket
          */
-        if (\in_array($type, [Factory::TASS_API, Factory::COMPASS], true)) {
+        if (\in_array($type, [Factory::SENTRAL, Factory::TASS_API, Factory::COMPASS], true)) {
             $splitStrats = [
                 ValidStrats::FAMILIES . ',' . ValidStrats::STAFF,
                 ValidStrats::TIMETABLE

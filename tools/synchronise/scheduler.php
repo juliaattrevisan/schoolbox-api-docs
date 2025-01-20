@@ -169,7 +169,7 @@ HELP;
         /* Split the transaction in half for suds connectors that can actually do that
          * Otherwise just import everything like it always did
          */
-        if (\in_array($type, [Factory::TASS_API, Factory::COMPASS], true)) {
+        if (\in_array($type, [Factory::SENTRAL, Factory::TASS_API, Factory::COMPASS], true)) {
             $splitStrats = [
                 ValidStrats::FAMILIES . ',' . ValidStrats::STAFF,
                 ValidStrats::TIMETABLE
