@@ -189,7 +189,7 @@ class Profile implements IStrategy
                 $today
             ));
 
-            exit();
+            return;
         }
 
         /* Collapse this var's contents; we won't use it again
@@ -318,7 +318,6 @@ class Profile implements IStrategy
                  */
                 $metadata['personId'] = $student['relationships']['person']['data']['id'];
 
-
                 $studentBaseProfile
                     ->setExternalId($externalId)
                     ->setTitle($title)
@@ -339,8 +338,8 @@ class Profile implements IStrategy
                     $this->baseProfileMapper->save($studentBaseProfile);
                 }
 
-                /*  Maintain the methods' return signature for easiest resolution
-                 *  though you are free to customise it as you see fit
+                /* Maintain the methods' return signature for easiest resolution
+                 * though you are free to customise it as you see fit
                  */
 
                 /* Fish out a House
@@ -554,12 +553,10 @@ class Profile implements IStrategy
                 FROM {$this->baseProfileMapper->getBaseTableName()}
                 WHERE external_id = :externalId
                 AND updated_at < :updatedAt
-                ",
-                [
-                    'externalId' => $baseProfile->getExternalId(),
-                    'updatedAt'  => $updated_at,
-                ]
-            );
+            ", [
+                'externalId' => $baseProfile->getExternalId(),
+                'updatedAt'  => $updated_at,
+            ]);
 
             if ($stmt->rowCount() === 0) {
                 $this->log->debug(
