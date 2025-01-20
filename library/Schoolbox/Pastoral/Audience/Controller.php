@@ -353,6 +353,7 @@ class Controller extends Base
 
         /* Save the "General Template" content
          */
+        $currentType->setEntryTip($post['entryTip']);
         $currentType->setTemplate($post['template']);
         $currentType->setTemplatePrivate($post['templatePrivate']);
         $currentType->setIcon($post['icon'] ?: null);
