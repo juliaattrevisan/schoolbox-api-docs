@@ -11,6 +11,7 @@ declare(strict_types=1);
 use Schoolbox\Admin\Profile\Editor\Cli\Helper;
 use Schoolbox\Admin\Profile\Editor\Payload;
 use Schoolbox\Application\CliTool;
+use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Role;
 
 require_once __DIR__ . '/../../../conf/core/require.php';
@@ -171,7 +172,7 @@ HELP;
 
         /* Exit early if you're doing this on a school
          */
-        if (!in_array(strtoupper($this->getConfig()->get('site_school_code')), self::SCHOOL_CODES, true)) {
+        if (!in_array(strtoupper($this->getConfig()->get(ConfigMapper::NAME_SITE_SCHOOL_CODE)), self::SCHOOL_CODES, true)) {
             $this->getLogger()->info('This customisation does not apply to this school code; exiting.');
 
             return;
