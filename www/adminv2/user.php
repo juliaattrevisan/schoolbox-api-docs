@@ -46,7 +46,8 @@ if (is_array($superuserList)) {
     }
 }
 
-$serviceUserList = (new Permissions(new UserAccessMapper()))->generate();
+$permissions = new Permissions(new UserAccessMapper());
+$serviceUserList = $permissions->getUsersByServiceName($permissions->getServiceNameById());
 foreach ($serviceUserList as $service => $serviceUsers) {
     $this->setVar(['SERVICE_NAME' => $service,
                    'SERVICE_COUNT' => count($serviceUsers)]);
