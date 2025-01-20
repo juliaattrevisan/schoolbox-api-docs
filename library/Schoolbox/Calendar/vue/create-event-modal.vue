@@ -2,6 +2,7 @@
 // Ignore this file for ESLint checks for now (SA-18376)
 /* eslint-disable */
 /* eslint-enable vue/no-v-html */
+import SearchSelect from "@schoolboxVue/components/searchSelect/search-select.vue";
 import RevealModal from "@schoolboxVue/components/reveal-modal";
 import Toast from "@schoolboxVue/components/toast.vue";
 import debounce from "lodash/debounce";
@@ -30,6 +31,7 @@ export default {
         RevealModal,
         Toast,
         vSelect,
+        SearchSelect,
     },
 
     props: [
@@ -111,6 +113,15 @@ export default {
     },
 
     methods: {
+        /**
+         * Get the endpoint for the user search
+         * @returns {String}- The endpoint for the user search
+         */
+        getEndpoint() {
+            const searchUrl = new URL(this.ENDPOINTS.URL_SELECTIZE, window.location.href).toString();
+            const searchParams = new URLSearchParams({ query: "", groupID: 0 }).toString();
+            return `${searchUrl}?${searchParams}&`;
+        },
         /**
          * Open this modal.
          */
@@ -315,6 +326,18 @@ export default {
                                     </span>
                                 </template>
                             </v-select>
+                            <search-select
+                                class="l-pad-m--bottom"
+                                v-model:selected="selected"
+                                :endpoint="getEndpoint()"
+                                label="Search"
+                                label-id="userInvite"
+                                placeholder=""
+                            >
+                                <template #meta>
+                                    <div class="meta">Search for people to invite guests</div>
+                                </template></search-select
+                            >
                             <input type="hidden" name="guests" :value="compileAttendeeIds" />
                         </template>
                     </section>
