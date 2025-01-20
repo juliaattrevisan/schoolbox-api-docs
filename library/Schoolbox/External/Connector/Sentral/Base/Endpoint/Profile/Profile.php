@@ -588,16 +588,15 @@ class Profile implements IStrategy
 
             /* You get a picture if any of the following occur:
              *     - you don't have a portrait yet; you can get one added
-             *     - your existing picture is different to the one we just got; update it
+             *     - your user profile has recently been updated; let's assume the photo has also been updated
              */
             if (!$baseProfile->getPortrait() || ($baseProfile->getPortrait()->getHash() !== $portrait->getHash())) {
                 $this->log->debug(sprintf(
-                    'Profile picture: %s %s (%s) has profile hash %s derived from %s.png',
+                    'Profile picture: %s %s (%s) has profile picture updated to hash %s',
                     $baseProfile->getFirstname(),
                     $baseProfile->getLastname(),
                     $externalId,
                     $portrait->getHash(),
-                    $externalId,
                 ));
 
                 $baseProfile->setPortrait($portrait);
