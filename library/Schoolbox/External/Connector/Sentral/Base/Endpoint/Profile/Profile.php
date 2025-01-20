@@ -302,12 +302,28 @@ class Profile implements IStrategy
                     $studentProfile->setBaseProfile($studentBaseProfile);
                 }
 
+                /* Metadata about a person
+                 *
+                 * Remember something useful about this person using the metadata column
+                 * Note that this is shared
+                 */
+                $metadata = $studentBaseProfile->getMetadata() ?? [];
+
+                /* This is used to obtain timetables
+                 */
+                $metadata['studentId'] = $student['id'];
+
+                /* This is used to obtain medical stuff
+                 */
+                $metadata['personId'] = $student['relationships']['person']['data']['id'];
+
                 $studentBaseProfile
                     ->setExternalId($externalId)
                     ->setTitle($title)
                     ->setFirstname($firstname)
                     ->setFirstnamePreferred($firstnamePreferred)
-                    ->setLastname($lastname);
+                    ->setLastname($lastname)
+                    ->setMetadata($metadata);
 
                 $this->importPortrait(
                     $studentBaseProfile,
