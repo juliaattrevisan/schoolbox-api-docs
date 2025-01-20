@@ -24,8 +24,8 @@
                                 <a href="/adminv2/user/{{ user.id }}/modify">
                                     {% include 'include/portrait.twig' with {user: user} only %}
                                     <div>
-                                        <span>{{ user.fullname }}</span>
-                                        <span>({{ accessTypeByServiceNameByUserId[user.id][serviceName] }})</span>
+                                        <span class='fixed-width-username'>{{ user.fullname }}</span>
+                                        <span title='Access type'>({{ accessTypeByServiceNameByUserId[user.id][serviceName] }})</span>
                                     </div>
                                 </a>
                             </div>
@@ -46,3 +46,9 @@
     </div>
 </div>
 {% endfor %}
+<style>
+*.fixed-width-username {
+    display: inline-block;
+    width: 300px;
+}
+</style>
