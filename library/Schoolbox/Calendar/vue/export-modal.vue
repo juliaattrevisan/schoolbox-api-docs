@@ -3,6 +3,7 @@
 /* eslint-disable */
 /* eslint-enable vue/no-v-html */
 import RevealModal from "@schoolboxVue/components/reveal-modal";
+import * as toast from "@schoolboxVue/components/toast/sbxToastEvent";
 import { getSearchString } from "@js/util/queryUtils";
 import ExportUrlModal from "./export-url-modal";
 
@@ -68,6 +69,7 @@ export default {
         },
 
         async beginDownload() {
+            toast.activate("Downloading CSV...");
             this.isDownloading = true;
             try {
                 const response = await fetch(`${this.exportUrl}&format=csv`, {
@@ -103,8 +105,11 @@ export default {
                 // clean up
                 document.body.removeChild(link);
                 window.URL.revokeObjectURL(url);
+
+                toast.timeout({ text: "CSV Downloaded Successfully", isSuccess: true });
             } catch (error) {
                 console.error(error);
+                toast.timeout({ text: error.message, isSuccess: false });
             }
             this.isDownloading = false;
         },
