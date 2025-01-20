@@ -18,7 +18,6 @@ namespace Schoolbox\External\Connector\Sentral\Base\Endpoint;
  */
 class ApiUsage
 {
-
     /**
      * A list of (endpoint, count) tuples
      *

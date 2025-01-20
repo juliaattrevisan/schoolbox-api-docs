@@ -22,7 +22,6 @@ use Schoolbox\GenericCollection;
 use SensitiveParameter;
 use UnexpectedValueException;
 
-
 /**
  * Class Factory
  *
