@@ -238,14 +238,14 @@ class Profile implements IStrategy
                 /* Find the first meaningful value out of this set
                  */
                 $firstname = (new FirstMeaningfulValue())->find([
-                                                                    $student['relationships']['person']['data']['attributes']['firstName'],
-                                                                    $student['relationships']['person']['data']['attributes']['givenNames']
-                                                                ]);
+                    $student['relationships']['person']['data']['attributes']['firstName'],
+                    $student['relationships']['person']['data']['attributes']['givenNames']
+                ]);
 
                 $firstnamePreferred = (new FirstMeaningfulValue())->find([
-                                                                             $student['relationships']['person']['data']['attributes']['preferredName'],
-                                                                             $firstname
-                                                                         ]);
+                    $student['relationships']['person']['data']['attributes']['preferredName'],
+                    $firstname
+                ]);
 
                 $form = (string)$student['relationships']['primaryEnrolment']['data']['attributes']['rollClass'];
                 $gender = (string)$student['relationships']['person']['data']['attributes']['gender'];
@@ -533,6 +533,7 @@ class Profile implements IStrategy
         if (!$photoEndpoint) {
             return;
         }
+
         /* Check if config setting allows photos from sis
          * If it's enabled, continue importing pics
          */
@@ -547,13 +548,12 @@ class Profile implements IStrategy
              * If yes, the photo could also have been updated, let's grab it
              */
             $updated_at = $this->findDate($updatedAtTime)?->getDatabase();
-            $stmt       = $this->baseProfileMapper->getDatabase()->executeQuery(
-                "
-            SELECT updated_at
-            FROM {$this->baseProfileMapper->getBaseTableName()}
-            WHERE external_id = :externalId
-            AND updated_at < :updatedAt
-        ",
+            $stmt = $this->baseProfileMapper->getDatabase()->executeQuery("
+                SELECT updated_at
+                FROM {$this->baseProfileMapper->getBaseTableName()}
+                WHERE external_id = :externalId
+                AND updated_at < :updatedAt
+                ",
                 [
                     'externalId' => $baseProfile->getExternalId(),
                     'updatedAt'  => $updated_at,
@@ -569,6 +569,7 @@ class Profile implements IStrategy
                         $baseProfile->getExternalId()
                     )
                 );
+
                 return;
             }
         }
@@ -1083,14 +1084,14 @@ class Profile implements IStrategy
             /* Find the first meaningful value out of this set
              */
             $firstname = (new FirstMeaningfulValue())->find([
-                                                                $parent['data']['attributes']['firstName'],
-                                                                $parent['data']['attributes']['givenNames']
-                                                            ]);
+                $parent['data']['attributes']['firstName'],
+                $parent['data']['attributes']['givenNames']
+            ]);
 
             $firstnamePreferred = (new FirstMeaningfulValue())->find([
-                                                                         $parent['data']['attributes']['preferredName'],
-                                                                         $firstname
-                                                                     ]);
+                $parent['data']['attributes']['preferredName'],
+                $firstname
+            ]);
 
             $lastname = (string)$parent['data']['attributes']['lastName'];
             $phoneHome = $numbers[self::HOME_TELEPHONE_NUMBER] ?? '';
@@ -1206,9 +1207,9 @@ class Profile implements IStrategy
              */
             if ($this->perform) {
                 $relationship = $this->relationshipMapper->createModel()
-                                                         ->setUserProfile($parentBaseProfile)
-                                                         ->setChildProfile($studentBaseProfile)
-                                                         ->setType($relationshipName);
+                    ->setUserProfile($parentBaseProfile)
+                    ->setChildProfile($studentBaseProfile)
+                    ->setType($relationshipName);
 
                 $this->relationshipMapper->save($relationship);
             }
