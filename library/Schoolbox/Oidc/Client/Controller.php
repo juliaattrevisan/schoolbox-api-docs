@@ -43,13 +43,6 @@ use Schoolbox\Url\Uri;
 class Controller extends Base
 {
     /**
-     * Session keys in which the OIDC state, PKCE and nonce are stored.
-     */
-    private const SESSION_STATE_KEY     = 'oidcState';
-    private const SESSION_PKCE_CODE_KEY = 'oidcPkceCode';
-    private const SESSION_NONCE_KEY     = 'oidcNonce';
-
-    /**
      * Constructor
      *
      * @param Client         $httpClient Required for querying discovery URL
