@@ -197,7 +197,7 @@
                             <p class="meta">
                                 This will appear on the pastoral record creation screen to provide additional information when creating a record of this Type / Sub-Type
                             </p>
-                            <textarea id="entryTip">{% if subtype %}{{ subtype.entryTip }}{% elseif type %}{{ type.entryTip }}{% endif %}</textarea>
+                            <textarea id="entryTip" name="entryTip">{% if subtype %}{{ subtype.entryTip }}{% elseif type %}{{ type.entryTip }}{% endif %}</textarea>
                         </div>
                     </fieldset>
                     <fieldset class="content">
