@@ -50,7 +50,7 @@ class Controller extends Base
     public function getRoster()
     {
         $this->response = $this->responseFromTemplate('@service/permissions.twig', [
-            'services' => (new Permissions($this->userAccessMapper))->generate(),
+            'usersByServiceName' => (new Permissions($this->userAccessMapper))->getUsersByServiceName(),
             'pageCurrent' => 'user',
         ]);
     }

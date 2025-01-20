@@ -49,10 +49,8 @@ class Permissions
      * @throws \UnexpectedValueException
      * @throws \PDOException
      */
-    public function generate(): array
+    public function getUsersByServiceName(): array
     {
-        $services = [];
-
         /* We don't need to list the HOMEPAGE service (1) here
          * The TUTORIAL service (4) got deleted at some point
          */
@@ -69,10 +67,14 @@ class Permissions
             'tutorialConst' => self::SERVICE_TUTORIAL
         ]);
 
+        $usersByServiceName = [];
+
         while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
-            $services[$row['name']] = $this->userAccessMapper->findUsersForService($row['id'])->getUnique('id')->indexBy('id');
+            $usersByServiceName[$row['name']] = (
+                $this->userAccessMapper->findUsersForService($row['id'])->getUnique('id')->indexBy('id')
+            );
         }
 
-        return $services;
+        return $usersByServiceName;
     }
 }

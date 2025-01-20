@@ -10,21 +10,21 @@
     </div>
 </div>
 
-{% for service, people in services %}
+{% for service, users in usersByServiceName %}
 <div class="row">
     <div class="small-12 island">
         <h2 class="subheader" id="{{ service }}">{{ service }}</h2>
-        {% if people|length %}
+        {% if users|length %}
         <section>
             <ul class="information-list">
-                {% for person in people %}
+                {% for user in users %}
                     <li class="actions-small-1">
                         <div class="list-item">
                             <div class="compact card small-12">
-                                <a href="/adminv2/user/{{ person.id }}/modify">
-                                    {% include 'include/portrait.twig' with {user: person} only %}
+                                <a href="/adminv2/user/{{ user.id }}/modify">
+                                    {% include 'include/portrait.twig' with {user: user} only %}
                                     <p>
-                                        {{ person.fullname }}
+                                        {{ user.fullname }}
                                     </p>
                                 </a>
                             </div>
