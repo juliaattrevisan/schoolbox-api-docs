@@ -21,6 +21,7 @@ export default {
                 group: "",
                 event_type: "",
             },
+            isDownloading: false,
         };
     },
 
@@ -66,6 +67,38 @@ export default {
             this.$refs.modal.open();
         },
 
+        async beginDownload() {
+            this.isDownloading = true;
+            try {
+                const response = await fetch(`${this.exportUrl}&format=csv`, {
+                    method: "GET",
+                    headers: {
+                        Accept: "text/csv",
+                    },
+                });
+                if (!response.ok) {
+                    throw new Error(`Download request failed: ${response.status}`);
+                }
+
+                // Build a blob from the response and download it
+                const blob = await response.blob();
+                const url = window.URL.createObjectURL(blob);
+
+                const link = document.createElement("a");
+                link.href = url;
+                link.download = "calendar.csv";
+                document.body.appendChild(link);
+                link.click();
+
+                // clean up
+                document.body.removeChild(link);
+                window.URL.revokeObjectURL(url);
+            } catch (error) {
+                console.error(error);
+            }
+            this.isDownloading = false;
+        },
+
         checkDropdownRequirement() {
             let values = Object.assign({}, this.form);
 
@@ -78,17 +111,17 @@ export default {
             /* Non-dropdown options don't need additional checking
              */
             if (TYPE_CAMPUS !== values.export && TYPE_GROUP !== values.export && TYPE_EVENTTYPE !== values.export) {
-                this.$refs.exportForm.submit();
+                this.beginDownload();
             }
 
             /* Check a dropdown option was provided
              */
             if (TYPE_GROUP === values.export && "" !== values.group.toString()) {
-                this.$refs.exportForm.submit();
+                this.beginDownload();
             } else if (TYPE_CAMPUS === values.export && "" !== values.campus.toString()) {
-                this.$refs.exportForm.submit();
+                this.beginDownload();
             } else if (TYPE_EVENTTYPE === values.export && "" !== values.event_type.toString()) {
-                this.$refs.exportForm.submit();
+                this.beginDownload();
             }
 
             /* Do nothing for now
@@ -240,7 +273,16 @@ export default {
 
             <ul class="flex-list buttons">
                 <li><button @click.prevent="$refs.feedUrlModal.open">Generate URL</button></li>
-                <li><input type="submit" value="Download CSV" @click.prevent="checkDropdownRequirement" /></li>
+                <li>
+                    <button
+                        class="button submit"
+                        type="button"
+                        :disabled="isDownloading"
+                        @click.prevent="checkDropdownRequirement"
+                    >
+                        {{ isDownloading ? "Downloading... Please Wait" : "Download CSV" }}
+                    </button>
+                </li>
             </ul>
         </form>
 
