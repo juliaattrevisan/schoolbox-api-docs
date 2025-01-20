@@ -307,10 +307,6 @@ abstract class WebKernelAbstract extends \Alaress\Application\Kernel
         if (!$session->isStarted()) {
             $session->start();
         }
-
-        // initialise Sentry without doing anything with it just yet:
-        // required so that stack traces always go through to Sentry.
-        Tracer::getDefaultTrace()->setHub($this->di->get('sentry'));
     }
 
     /** @inheritDoc */
