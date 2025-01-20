@@ -55,7 +55,6 @@ class Controller extends Base
         $this->response = $this->responseFromTemplate('@service/permissions.twig', [
             'usersByServiceName' => $permissions->getUsersByServiceName($serviceNameById),
             'accessTypeByServiceNameByUserId' => $permissions->getAccessTypeByServiceNameByUserId($serviceNameById),
-            'pageCurrent' => 'user',
         ]);
     }
 }
