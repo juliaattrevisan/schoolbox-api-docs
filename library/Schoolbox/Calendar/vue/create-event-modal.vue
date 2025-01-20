@@ -37,6 +37,7 @@ export default {
     data() {
         return {
             event: {},
+            isProcessing: false, //to disable on form submission to prevent rapid fire
             selected: [],
         };
     },
@@ -100,7 +101,7 @@ export default {
          */
         getEndpoint() {
             const searchUrl = new URL(this.ENDPOINTS.URL_SELECTIZE, window.location.href).toString();
-            const searchParams = new URLSearchParams({ query: "", groupID: 0 }).toString();
+            const searchParams = new URLSearchParams({ groupID: 0 }).toString();
             return `${searchUrl}?${searchParams}&`;
         },
 
@@ -253,12 +254,12 @@ export default {
                                 class="l-pad-m--bottom"
                                 v-model:selected="selected"
                                 :endpoint="getEndpoint()"
-                                label="Search"
+                                label="Invite Guests"
                                 label-id="userInvite"
                                 placeholder=""
                             >
                                 <template #meta>
-                                    <div class="meta">Search for people to invite guests</div>
+                                    <div class="meta">Search for people to invite</div>
                                 </template></search-select
                             >
                             <input type="hidden" name="guests" :value="compileAttendeeIds" />
