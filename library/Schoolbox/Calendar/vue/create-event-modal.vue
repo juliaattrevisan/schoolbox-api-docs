@@ -249,7 +249,6 @@ export default {
                         </label>
 
                         <template v-if="canInvite">
-                            <label>Invite Guests</label>
                             <search-select
                                 class="l-pad-m--bottom"
                                 v-model:selected="selected"
