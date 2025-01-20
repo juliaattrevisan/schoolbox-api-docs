@@ -255,7 +255,6 @@ abstract class Kernel
             'kernel:' . get_class($this),
             operation: 'app.bootstrap.di',
         );
-        static::installDependencies($this->di);
         $this->postInstallDependencies($bypassMaintenanceModeCheck);
         $this->checkServerApiEnvironment();
         Tracer::getDefaultTrace()->finishSpan();
