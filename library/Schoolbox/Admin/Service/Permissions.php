@@ -10,7 +10,7 @@
 
 namespace Schoolbox\Admin\Service;
 
-use Schoolbox\User;
+use Schoolbox\Collection;
 use Schoolbox\Permission\Access;
 use Schoolbox\Permission\Access\UserAccess;
 
@@ -62,10 +62,10 @@ class Permissions
 
 
     /**
-     * Return an array of (array of User objects), indexed by service name.
+     * Return an array of (Collection of User objects), indexed by service name.
      *
      * @param $serviceNameById array<int, string> An array of service names indexed by serviceId.
-     * @return array<string, array<User>>
+     * @return array<string, Collection>
      * @throws \Alaress\Database\Predicate\InvalidColumnException
      * @throws \ReflectionException
      * @throws \Schoolbox\Mapper\DefinitionException
