@@ -2,26 +2,13 @@
 // Ignore this file for ESLint checks for now (SA-18376)
 /* eslint-disable */
 /* eslint-enable vue/no-v-html */
+import SearchSelect from "@schoolboxVue/components/searchSelect/search-select.vue";
 import RevealModal from "@schoolboxVue/components/reveal-modal";
 import Toast from "@schoolboxVue/components/toast.vue";
-import debounce from "lodash/debounce";
 import { ENDPOINTS } from "@schoolboxCalendarEvent/endpoints";
-
-/* Vue select
- */
-import vSelect from "vue-select";
-import "vue-select/dist/vue-select.css";
-
-/* Render custom template for Deselect icon/button
- * It's not well documented, but you can trawl through closed PRs to figger out how
- * https://github.com/sagalbot/vue-select/issues/994
- */
-import Deselect from "@schoolboxVue/components/selectize/Deselect";
 import { injectScript, isScriptAdded } from "@js/util/domUtils";
 import { EditorEvent } from "@js/editor/event/editorEvent";
 import { EditorToolbar } from "@js/editor/types/editorTypes";
-
-vSelect.props.components.default = () => ({ Deselect });
 
 export default {
     name: "create-event-modal",
@@ -29,7 +16,7 @@ export default {
     components: {
         RevealModal,
         Toast,
-        vSelect,
+        SearchSelect,
     },
 
     props: [
@@ -51,9 +38,6 @@ export default {
         return {
             event: {},
             isProcessing: false, //to disable on form submission to prevent rapid fire
-            /* Vue Select
-             */
-            options: [],
             selected: [],
         };
     },
@@ -112,6 +96,16 @@ export default {
 
     methods: {
         /**
+         * Get the endpoint for the user search
+         * @returns {String}- The endpoint for the user search
+         */
+        getEndpoint() {
+            const searchUrl = new URL(this.ENDPOINTS.URL_SELECTIZE, window.location.href).toString();
+            const searchParams = new URLSearchParams({ groupID: 0 }).toString();
+            return `${searchUrl}?${searchParams}&`;
+        },
+
+        /**
          * Open this modal.
          */
         open(event) {
@@ -126,37 +120,6 @@ export default {
              */
             this.selected = [];
         },
-
-        /**
-         * Start searching for keyword
-         *
-         * @param query
-         * @param loading
-         */
-        onSearch(query, loading) {
-            if (query.length < 3) {
-                return;
-            }
-            loading(true);
-            this.search(loading, query, this);
-        },
-
-        /**
-         * Perform async request and load results into component
-         */
-        search: debounce(function (loading, query, vm) {
-            const queryParams = new URLSearchParams();
-            queryParams.append("query", query);
-            queryParams.append("groupID", 0);
-
-            fetch(`${ENDPOINTS.URL_SELECTIZE}?${queryParams.toString()}`)
-                .then((response) => response.json())
-                .then((data) => {
-                    vm.options = data;
-                    loading(false);
-                })
-                .catch((error) => console.log(error));
-        }, 350),
 
         /**
          * Post the event creation form.
@@ -287,34 +250,18 @@ export default {
                         </label>
 
                         <template v-if="canInvite">
-                            <label>Invite Guests</label>
-                            <v-select
-                                class="schoolbox-vue-selectize"
-                                :options="options"
-                                :clear-search-on-blur="
-                                    function () {
-                                        return true;
-                                    }
-                                "
-                                :clear-search-on-select="true"
-                                :close-on-select="false"
-                                multiple
-                                @search="onSearch"
-                                label="name"
-                                placeholder="Search for people to invite"
-                                v-model="selected"
+                            <search-select
+                                class="l-pad-m--bottom"
+                                v-model:selected="selected"
+                                :endpoint="getEndpoint()"
+                                label="Invite Guests"
+                                label-id="userInvite"
+                                placeholder=""
                             >
-                                <template slot="option" slot-scope="option">
-                                    <span class="d-center">
-                                        {{ option.name }}
-                                    </span>
-                                </template>
-                                <template slot="selected-option" slot-scope="option">
-                                    <span class="selected d-center">
-                                        {{ option.first_name }} {{ option.last_name }}
-                                    </span>
-                                </template>
-                            </v-select>
+                                <template #meta>
+                                    <div class="meta">Search for people to invite</div>
+                                </template></search-select
+                            >
                             <input type="hidden" name="guests" :value="compileAttendeeIds" />
                         </template>
                     </section>
