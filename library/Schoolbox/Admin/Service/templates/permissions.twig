@@ -10,10 +10,10 @@
     </div>
 </div>
 
-{% for service, users in usersByServiceName %}
+{% for serviceName, users in usersByServiceName %}
 <div class="row">
     <div class="small-12 island">
-        <h2 class="subheader" id="{{ service }}">{{ service }}</h2>
+        <h2 class="subheader" id="{{ serviceName }}">{{ serviceName }}</h2>
         {% if users|length %}
         <section>
             <ul class="information-list">
@@ -23,9 +23,10 @@
                             <div class="compact card small-12">
                                 <a href="/adminv2/user/{{ user.id }}/modify">
                                     {% include 'include/portrait.twig' with {user: user} only %}
-                                    <p>
-                                        {{ user.fullname }}
-                                    </p>
+                                    <div>
+                                        <span>{{ user.fullname }}</span>
+                                        <span>({{ accessTypeByServiceNameByUserId[user.id][serviceName] }})</span>
+                                    </div>
                                 </a>
                             </div>
                         </div>

@@ -11,7 +11,6 @@ namespace Schoolbox\Admin\Service;
 use Alaress\Web\Controller\Base;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Permission\Access;
-use Schoolbox\Permission\Access\UserAccess;
 
 class Controller extends Base
 {
@@ -55,6 +54,7 @@ class Controller extends Base
 
         $this->response = $this->responseFromTemplate('@service/permissions.twig', [
             'usersByServiceName' => $permissions->getUsersByServiceName($serviceNameById),
+            'accessTypeByServiceNameByUserId' => $permissions->getAccessTypeByServiceNameByUserId($serviceNameById),
             'pageCurrent' => 'user',
         ]);
     }
