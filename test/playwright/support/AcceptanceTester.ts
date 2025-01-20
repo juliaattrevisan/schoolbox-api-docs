@@ -31,6 +31,9 @@ export default class AcceptanceTester extends BaseTester {
      * Logout the user and verify that the user is logged out
      */
     async logout(): Promise<void> {
+        // TEMPORARY: Force the test to fail to test CI
+        expect("Forced failure").toEqual("");
+
         const loginPage = new LoginPage(this.page);
         await loginPage.logout();
         await loginPage.verifyLogoutSuccess();
@@ -43,6 +46,9 @@ export default class AcceptanceTester extends BaseTester {
      * @param password - The password to login with
      */
     async login(username: string, password: string): Promise<void> {
+        // TEMPORARY: Force the test to fail to test CI
+        expect("Forced failure").toEqual("");
+
         const loginPage = new LoginPage(this.page);
         await loginPage.login(username, password, true);
         await this.skipWhatsNewTour();
