@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\Application;
 
+use Alaress\Sentry\Tracing\Tracer;
 use Aura\Di\Container;
 use Alaress\Exception\IO\IOException;
 use ErrorException;
@@ -100,6 +101,10 @@ abstract class CliKernelAbstract extends \Alaress\Application\Kernel implements 
         if (!$bypassMaintenanceModeCheck) {
             self::dieGracefullyIfInMaintenanceMode($this->di->get('config'));
         }
+
+        // initialise Sentry without doing anything with it just yet:
+        // required so that stack traces always go through to Sentry.
+        Tracer::getDefaultTrace()->setHub($this->di->get('sentry'));
 
         $this->initRoutes();
         $this->initModules();
