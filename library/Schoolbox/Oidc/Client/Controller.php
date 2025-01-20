@@ -91,12 +91,16 @@ class Controller extends Base
     {
         $idToken      = $this->requestPost->get('id_token') ?? $this->requestQuery->get('id_token');
         $requestState = $this->requestPost->get('state') ?? $this->requestQuery->get('state');
+        $cookieStore  = new CookieStore();
         if (isset($idToken)) {
-            if (!$this->verifyState($requestState)) {
+            $cookieState = $cookieStore->getState($this->request);
+            $cookieNonce = $cookieStore->getNonce($this->request);
+            $cookieStore->clear();
+            if (!$this->verifyState($requestState, $cookieState)) {
                 return;
             }
             $decodedIdToken = $this->decodeAccessToken($idToken);
-            if (!$this->verifyNonce($decodedIdToken['nonce'] ?? null)) {
+            if (!$this->verifyNonce($decodedIdToken['nonce'] ?? null, $cookieNonce)) {
                 return;
             }
             $this->redirectToSessionInit($requestState, $idToken);
@@ -105,7 +109,9 @@ class Controller extends Base
 
         $accessToken = $this->requestPost->get('access_token') ?? $this->requestQuery->get('access_token');
         if (isset($accessToken)) {
-            if (!$this->verifyState($requestState)) {
+            $cookieState = $cookieStore->getState($this->request);
+            $cookieStore->clear();
+            if (!$this->verifyState($requestState, $cookieState)) {
                 return;
             }
 
@@ -129,13 +135,17 @@ class Controller extends Base
 
         $code = $this->requestPost->get('code') ?? $this->requestQuery->get('code');
         if (isset($code)) {
-            if (!$this->verifyState($requestState)) {
+            $cookieState    = $cookieStore->getState($this->request);
+            $cookiePkceCode = $cookieStore->getPkceCode($this->request);
+            $cookieNonce    = $cookieStore->getNonce($this->request);
+            $cookieStore->clear();
+            if (!$this->verifyState($requestState, $cookieState)) {
                 return;
             }
 
             // Exchange auth code for access token
-            $decodedAccessToken = $this->exchangeAuthorizationCodeForAccessToken($code);
-            if (!$this->verifyNonce($decodedAccessToken->getIdToken()->claims()->get('nonce'))) {
+            $decodedAccessToken = $this->exchangeAuthorizationCodeForAccessToken($code, $cookiePkceCode);
+            if (!$this->verifyNonce($decodedAccessToken->getIdToken()->claims()->get('nonce'), $cookieNonce)) {
                 return;
             }
             $this->redirectToSessionInit($requestState, $decodedAccessToken->getIdToken()->toString());
@@ -294,7 +304,8 @@ class Controller extends Base
     /**
      * Exchange a given auth code for an access token.
      *
-     * @param string $code
+     * @param string      $code
+     * @param string|null $pkceCode
      * @return AccessToken
      * @throws ClientExceptionInterface
      * @throws GuzzleException
@@ -302,12 +313,12 @@ class Controller extends Base
      * @throws JWKToPEM\Exception\JWKConverterException
      * @throws RouteNotFound
      */
-    private function exchangeAuthorizationCodeForAccessToken(string $code): AccessToken
+    private function exchangeAuthorizationCodeForAccessToken(string $code, ?string $pkceCode): AccessToken
     {
         // convert auth code to access token, checking PKCE code along the way
         /** @phpstan-ignore-next-line - setPkceCode returns the same object buildOidcProvider builds */
         return $this->buildOidcProvider()
-            ->setPkceCode($this->request->getCookieParams()[self::SESSION_PKCE_CODE_KEY])
+            ->setPkceCode($pkceCode)
             ->getAccessToken('authorization_code', ['code' => $code]);
     }
 
@@ -363,13 +374,12 @@ class Controller extends Base
      * session.
      *
      * @param string|null $requestState
+     * @param string|null $cookieState
      * @return bool
      */
-    private function verifyState(?string $requestState): bool
+    private function verifyState(?string $requestState, ?string $cookieState): bool
     {
-        $sessionState = $this->request->getCookieParams()[self::SESSION_STATE_KEY];
-        setcookie(self::SESSION_STATE_KEY, '', 0);
-        if (!isset($requestState, $sessionState) || $requestState !== $sessionState) {
+        if (!isset($requestState, $cookieState) || $requestState !== $cookieState) {
             $this->sendError('State sent to and received from OIDC provider do not match');
             return false;
         }
@@ -379,17 +389,16 @@ class Controller extends Base
     /**
      * Verify that the nonce value from ID token matches what's in the session.
      *
-     * @param string|null $nonce
+     * @param string|null $tokenNonce
+     * @param string|null $cookieNonce
      * @return bool
      */
-    private function verifyNonce(?string $nonce): bool
+    private function verifyNonce(?string $tokenNonce, ?string $cookieNonce): bool
     {
         // check nonce in ID token
         // TODO this should be done in $loginUri, but that's too disruptive
         //      a change right now
-        $sessionNonce = $this->request->getCookieParams()[self::SESSION_NONCE_KEY];
-        setcookie(self::SESSION_NONCE_KEY, '', 0);
-        if (!isset($nonce, $sessionNonce) || $nonce !== $sessionNonce) {
+        if (!isset($tokenNonce, $cookieNonce) || $tokenNonce !== $cookieNonce) {
             $this->sendError('Nonce sent to and received from OIDC provider do not match');
             return false;
         }
