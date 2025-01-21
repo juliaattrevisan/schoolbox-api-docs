@@ -2,6 +2,7 @@
  # Geosnapshot Homepage component
  #
  # @param string|null $url  A url from Geosnapshots, contains all the image galleries
+ # @param int|null $height  The height of the component
  #}
 {% if url %}
 <iframe src="{{ url }}" style="height: {{ height }}px"></iframe>
