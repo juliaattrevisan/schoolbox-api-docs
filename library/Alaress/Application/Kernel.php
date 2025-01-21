@@ -506,7 +506,7 @@ abstract class Kernel
                     $tokenBuilder = $di->get('user.tokenBuilder');
 
                     /** @var TokenMapper $tokenMapper */
-                    $tokenMapper = $mapperFactory->getLazy(TokenMapper::class);
+                    $tokenMapper = $mapperFactory->get(TokenMapper::class);
 
                     return (new HttpRequestMessageFactory($instance, $tokenBuilder, $tokenMapper))
                         ->setTokenExpiry(Alaress_Date_Format::now()->addDays(1));
