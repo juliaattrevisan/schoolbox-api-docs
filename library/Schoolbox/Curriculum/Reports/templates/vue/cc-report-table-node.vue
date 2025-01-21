@@ -125,7 +125,7 @@ function onCourseClicked(buttonEl: HTMLButtonElement): void {
         </td>
         <!-- add the total cell -->
         <td v-if="props.node.hasNoUsages"><b>0</b></td>
-        <td v-else-if="props.node.children && !props.node.isExpanded" class="u-border-left usage-cell">
+        <td v-else-if="showExpandButton" class="u-border-left usage-cell">
             <button class="f-always-show usage-button" @click="onTotalClicked">
                 <b>{{ getFilteredTotalCount(props.node, !props.node.isExpanded) }}</b>
             </button>
