@@ -89,15 +89,24 @@ class Controller extends Base
         }
     }
 
-    public function getAgentProxyRequest(): void
-    {
-        $this->handlePaperlyProxyRequest($this->request->getQueryParams());
-    }
+
+    /**
+     * @api   POST /paperly/agent/proxy
+     * @since 25.0.0
+     *
+     * @return void
+     */
     public function postAgentProxyRequest(): void
     {
         $this->handlePaperlyProxyRequest($this->request->getParsedBody());
     }
 
+    /**
+     * Handle paperly SQL queries
+     *
+     * @param array $data
+     * @return void
+     */
     private function handlePaperlyProxyRequest(array $data): void
     {
         // Check IP address
