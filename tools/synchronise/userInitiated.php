@@ -177,13 +177,24 @@ HELP;
          */
         $splitStrats = [$syncRequest->getStrats()];
 
+        /* A list of splittable suds connectors.
+         * These can, in one way or another, support importing just profile data or just timetable data.
+         */
+        $splittables = [
+            Factory::ISAMS,
+            Factory::SENTRAL,
+            Factory::TASS_API,
+            Factory::COMPASS,
+            Factory::VERACROSS
+        ];
+
         /* A nerdier and sequence-independent way would be
          *
          * $strats = explode(',', $syncRequest->getStrats());
          * array_intersect(ValidStrats::STRATS_FULL, $strats) == ValidStrats::STRATS_FULL
          */
         if (implode(',', ValidStrats::STRATS_FULL) === $syncRequest->getStrats()) {
-            if (\in_array($type, [Factory::SENTRAL, Factory::TASS_API, Factory::COMPASS], true)) {
+            if (\in_array($type, $splittables, true)) {
                 /* Split the transaction in half for suds connectors that can actually do that
                  * Otherwise just import everything like it always did
                  */
