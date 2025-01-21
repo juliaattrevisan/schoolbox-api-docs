@@ -46,7 +46,7 @@ class Proxy
             )
         ) {
             'SELECT' => true,
-            'UPDATE', 'DELETE', 'INSERT' => false,
+            'UPDATE', 'INSERT' => false,
             default => throw new OutOfBoundsException(
                 'Invalid SQL statement. Please use a valid SQL operator.'
             ),
