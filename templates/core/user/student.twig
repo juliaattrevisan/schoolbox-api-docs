@@ -180,7 +180,7 @@
                                                             # This is often a set of strings that need to be output sequentially
                                                             #}
                                                             {% for message in selectedField.value %}
-                                                                {{ message|nl2br }}
+                                                                {{ message|nl2br }}<br />
                                                             {% endfor %}
                                                         {% elseif selectedField.field in ['StudentMedicalAlert'] %}
                                                             {# A string with a special prefix that displays in a flag #}
