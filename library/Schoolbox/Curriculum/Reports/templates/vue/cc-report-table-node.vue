@@ -124,19 +124,19 @@ function onCourseClicked(buttonEl: HTMLButtonElement): void {
             </button>
         </td>
         <!-- add the total cell -->
-        <td v-if="props.node.hasNoUsages"><b>0</b></td>
+        <td v-if="props.node.hasNoUsages" class="u-border-left"><b>0</b></td>
         <td v-else-if="showExpandButton" class="u-border-left usage-cell">
             <button class="f-always-show usage-button" @click="onTotalClicked">
                 <b>{{ getFilteredTotalCount(props.node, !props.node.isExpanded) }}</b>
             </button>
         </td>
-        <td v-else class="usage-cell">
+        <td v-else class="u-border-left usage-cell">
             <b>{{ getFilteredTotalCount(props.node, !props.node.isExpanded) }}</b>
         </td>
         <!-- loop through each course/unit, retrieving the node usage or returning 0 no usages -->
         <template v-for="course in props.node.usage.courses" :key="course.id">
             <!-- add the course cell -->
-            <td v-if="props.node.hasNoUsages || course.hasNoCourseUsages">0</td>
+            <td v-if="props.node.hasNoUsages || course.hasNoCourseUsages" class="u-border-left">0</td>
             <td
                 v-else-if="getFilteredCourseColumnCount(props.node, course, !props.node.isExpanded) === 0"
                 class="u-border-left usage-cell"
@@ -164,11 +164,11 @@ function onCourseClicked(buttonEl: HTMLButtonElement): void {
                 <td v-if="props.node.hasNoUsages || unit.hasNoUsages">0</td>
                 <td
                     v-else-if="getFilteredUnitColumnCount(props.node, course, unit, !props.node.isExpanded) === 0"
-                    class="u-border-left usage-cell"
+                    class="usage-cell"
                 >
                     {{ getFilteredUnitColumnCount(props.node, course, unit, !props.node.isExpanded) }}
                 </td>
-                <td v-else class="u-border-left usage-cell">
+                <td v-else class="usage-cell">
                     <button
                         :id="`usage-button-${course.id}-${unit.id}-${props.node.id}`"
                         ref="buttonEl"
