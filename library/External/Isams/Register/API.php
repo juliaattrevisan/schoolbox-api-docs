@@ -144,7 +144,7 @@ class API
                  */
                 $napTime = self::NAP_TIMEOUT + pow(2, $fails) + $jitter;
 
-                /* Nack to sleep Jeffrey
+                /* Back to sleep Jeffrey
                  */
                 sleep($napTime);
 

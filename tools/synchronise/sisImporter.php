@@ -96,7 +96,7 @@ Usage: sisImporter.php [--file] [--watchlist] [--perform]
 
         --watchlist     A csv of externalIds e.g. 123,456,789
 
-        --strats        A csv of strats to import: student staff families timetable
+        --strats        A csv of strats to import: student staff families timetable photos(isams only)
                         e.g. import only profile-related stuff: sisImporter.php --strats=student,staff,families
                         e.g. import only timetable-related stuff: sisImporter.php --strats=timetable
 

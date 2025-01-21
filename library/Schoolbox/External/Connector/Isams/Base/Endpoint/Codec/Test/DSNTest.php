@@ -134,6 +134,33 @@ class DSNTest extends TestCase
                     ]
                 ]
             ],
+
+            /* BatchXML, Staff Photos, Student Photos, REST API
+             */
+            'Valid DSN 5' => [
+                'batchxml:key=920zfddd-x9u7-gg654-glhf-d9j25nf9h72h,staffphoto:key=zka7ght5-pp91-k28dy-zm28g-e1janv9777,studentphoto:key=aadg4551-bnn7-a0098c-ja52-zpp0ooqp554a,restapi:host=https://www.schoolbox.com.au;clientid=123456;clientsecret=abcd-1F2G3H-444555?dayNumberOffset=-3',
+                [
+                    'modules' => [
+                        'batchxml' => [
+                            'key' => '920zfddd-x9u7-gg654-glhf-d9j25nf9h72h',
+                        ],
+                        'staffphoto' => [
+                            'key' => 'zka7ght5-pp91-k28dy-zm28g-e1janv9777',
+                        ],
+                        'studentphoto' => [
+                            'key' => 'aadg4551-bnn7-a0098c-ja52-zpp0ooqp554a'
+                        ],
+                        'restapi' => [
+                            'host' => 'https://www.schoolbox.com.au',
+                            'clientid' => '123456',
+                            'clientsecret' => 'abcd-1F2G3H-444555'
+                        ]
+                    ],
+                    'options' => [
+                        'dayNumberOffset' => -3
+                    ]
+                ]
+            ],
         ];
     }
 
@@ -165,6 +192,13 @@ class DSNTest extends TestCase
             'Valid DSN Re-encode 1' => [
                 'batchxml:key=920zfddd-x9u7-gg654-glhf-d9j25nf9h72h,staffphoto:key=zka7ght5-pp91-k28dy-zm28g-e1janv9777,studentphoto:key=aadg4551-bnn7-a0098c-ja52-zpp0ooqp554a',
                 'batchxml:key=920zfddd-x9u7-gg654-glhf-d9j25nf9h72h,staffphoto:key=zka7ght5-pp91-k28dy-zm28g-e1janv9777,studentphoto:key=aadg4551-bnn7-a0098c-ja52-zpp0ooqp554a'
+            ],
+
+            /* With optional restapi configs
+             */
+            'Valid DSN Re-encode 2' => [
+                'batchxml:key=920zfddd-x9u7-gg654-glhf-d9j25nf9h72h,staffphoto:key=zka7ght5-pp91-k28dy-zm28g-e1janv9777,studentphoto:key=aadg4551-bnn7-a0098c-ja52-zpp0ooqp554a,restapi:host=https://www.schoolbox.com.au;clientid=123456;clientsecret=abcd-1F2G3H-444555?dayNumberOffset=-3',
+                'batchxml:key=920zfddd-x9u7-gg654-glhf-d9j25nf9h72h,staffphoto:key=zka7ght5-pp91-k28dy-zm28g-e1janv9777,studentphoto:key=aadg4551-bnn7-a0098c-ja52-zpp0ooqp554a,restapi:host=https://www.schoolbox.com.au;clientid=123456;clientsecret=abcd-1F2G3H-444555?dayNumberOffset=-3'
             ],
         ];
     }

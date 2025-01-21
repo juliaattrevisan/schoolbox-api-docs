@@ -55,6 +55,16 @@ class Model
      */
     private ?Storage\Model $portrait = null;
 
+    /**
+     * A json string corresponding to usually-idiosyncratic connector-specific data
+     * (stuff like portrait ids, random misc ids, etc)
+     *
+     * Each connector will implement a metadata payload specially
+     *
+     * @var array|null
+     */
+    private ?array $metadata = null;
+
 
     /**
      * @return string $externalId
@@ -172,6 +182,25 @@ class Model
     public function setPortrait(?Storage\Model $portrait): self
     {
         $this->portrait = $portrait;
+        return $this;
+    }
+
+    /**
+     * @return array|null
+     */
+    public function getMetadata(): ?array
+    {
+        return $this->metadata;
+    }
+
+
+    /**
+     * @param array|null $metadata
+     * @return Model
+     */
+    public function setMetadata(?array $metadata): self
+    {
+        $this->metadata = $metadata;
         return $this;
     }
 }

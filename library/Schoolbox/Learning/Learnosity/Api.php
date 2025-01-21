@@ -436,7 +436,7 @@ class Api
             $napTime
         ));
 
-        /* Nack to sleep Jeffrey
+        /* Back to sleep Jeffrey
          */
         sleep($napTime);
     }

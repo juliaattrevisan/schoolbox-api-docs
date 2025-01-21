@@ -7,10 +7,11 @@
 
 declare(strict_types=1);
 
-namespace Schoolbox\External\Connector\Isams\Base\Endpoint\Profile;
+namespace Schoolbox\External\Connector\Isams\Base\Endpoint\Profile\Images;
 
-use Schoolbox\Url\Uri;
 use Schoolbox\External\Connector\Isams\Base\Endpoint\Codec\DSN;
+use Schoolbox\Role;
+use Schoolbox\Url\Uri;
 use SensitiveParameter;
 use ZipArchive;
 
@@ -25,20 +26,20 @@ use ZipArchive;
  *
  * The Alaress curl url lets you in though.
  */
-class PhotoDownloader
+class BatchPhotoDownloader implements IPhotoDownloader
 {
-    /**
-     * All downloads have this prefix
-     */
-    private const DOWNLOAD_PREFIX = 'isams_profiles_';
-
-
     /**
      * A subfolder of $zipDir gets created forcibly
      *
      * @var string
      */
     public const ISAMS_CACHE_DIR = 'isams';
+
+
+    /**
+     * All downloads have this prefix
+     */
+    private const DOWNLOAD_PREFIX = 'isams_profiles_';
 
 
     /**
@@ -65,18 +66,16 @@ class PhotoDownloader
      * Constructor.
      *
      * @param string $host
-     * @param string $dsn
+     * @param array $credentials
      * @param string $zipDir
      * @throws \DomainException
      */
-    public function __construct(string $host, #[SensitiveParameter] string $dsn, string $zipDir)
+    public function __construct(string $host, #[SensitiveParameter] array $credentials, string $zipDir)
     {
         $this->host = $host;
 
         /* Store this locally just once
          */
-        $credentials = (new DSN())->decode($dsn);
-
         $this->key = $credentials['modules'][DSN::MODULE_BATCHXML]['key'];
 
         $this->cacheDir = $zipDir . '/' . self::ISAMS_CACHE_DIR;
@@ -180,9 +179,11 @@ class PhotoDownloader
      * All isams pictures seem to be pngs in a zip (god knows why)
      *
      * @param string $personId
+     * @param string $roleType
+     * @param ?string $externalId = null
      * @return string|null
      */
-    public function getPhoto(string $personId): ?string
+    public function getPhoto(string $personId, string $roleType = Role::STUDENT, ?string $externalId = null): ?string
     {
         $path = "{$this->cacheDir}/{$personId}.png";
 
@@ -210,5 +211,13 @@ class PhotoDownloader
                 unlink($source);
             }
         }
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getLatestPhotoID(string $roleType = Role::STUDENT, string|int|null $externalId = null): ?int
+    {
+        return null;
     }
 }
