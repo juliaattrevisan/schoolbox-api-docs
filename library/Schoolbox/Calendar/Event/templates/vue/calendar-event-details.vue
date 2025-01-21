@@ -2,6 +2,7 @@
 // Ignore this file for ESLint checks for now (SA-18376)
 /* eslint-disable */
 /* eslint-enable vue/no-v-html */
+import SearchSelect from "@schoolboxVue/components/searchSelect/search-select.vue";
 import AudiencesModal from "./audiences-modal";
 import MediaArticle from "@schoolboxVue/components/media-article";
 import debounce from "lodash/debounce";
@@ -37,6 +38,7 @@ export default {
         AudiencesModal,
         MediaArticle,
         vSelect,
+        SearchSelect,
     },
 
     /* All props form a one-way-down binding between the child property and the parent one:
@@ -119,9 +121,9 @@ export default {
     },
 
     watch: {
-        selected: function () {
-            if (this.selected.id) {
-                this.rsvpCreate(this.selected.id, this.selected.first_name + " " + this.selected.last_name);
+        selected() {
+            if (this.selected.length > 0) {
+                this.rsvpCreate(this.selected[0].id, `${this.selected[0].first_name} ${this.selected[0].last_name}`);
             }
         },
     },
@@ -142,6 +144,16 @@ export default {
     },
 
     methods: {
+        /**
+         * Get the endpoint for the user search
+         * @returns {String} - The endpoint for the user search
+         */
+        getEndpoint() {
+            const searchUrl = new URL(this.ENDPOINTS.URL_SELECTIZE, window.location.href).toString();
+            const searchParams = new URLSearchParams({ groupID: 0 }).toString();
+            return `${searchUrl}?${searchParams}&`;
+        },
+
         /**
          * Update attendance counts from Payload data
          *
@@ -613,6 +625,19 @@ export default {
                                     </div>
                                 </template>
                             </v-select>
+                            <search-select
+                                class="l-pad-m--bottom"
+                                v-model:selected="selected"
+                                :is-single-select="true"
+                                :endpoint="getEndpoint()"
+                                label="Invite Guests"
+                                label-id="userInvite"
+                                placeholder=""
+                            >
+                                <template #meta>
+                                    <div class="meta">Search for people to invite</div>
+                                </template>
+                            </search-select>
                         </template>
                     </div>
 
