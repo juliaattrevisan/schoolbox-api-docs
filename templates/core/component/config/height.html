@@ -9,7 +9,7 @@
         currentHeightInput.parentNode.insertAdjacentHTML('beforeBegin',
             `<span
                 class="hint has-tip tip-top"
-                data-tooltip title="To customise the display height of the component"
+                data-tooltip title="To customise the display height of the component. Only whole numbers are allowed."
             >?</span>`
         )
 
@@ -17,5 +17,11 @@
         setTimeout(function() {
             $(document).foundation('tooltip', 'reflow');
         }, 500);
+
+        // Add an event listener to the height input to restrict the input to whole numbers only
+        currentHeightInput.addEventListener("input", (event) => {
+            const value = event.target.value;
+            event.target.value = value.replace(/[^0-9]/g, ""); // Remove non-numeric characters
+        });
     })();
 </script>
