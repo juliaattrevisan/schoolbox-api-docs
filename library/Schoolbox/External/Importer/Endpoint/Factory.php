@@ -92,6 +92,20 @@ class Factory implements IFactory
 
 
     /**
+     * A list of splittable suds connectors.
+     *
+     * These can, in one way or another, support importing just profile data or just timetable data.
+     */
+    public const SPLITTABLE = [
+        Factory::ISAMS,
+        Factory::SENTRAL,
+        Factory::TASS_API,
+        Factory::COMPASS,
+        Factory::VERACROSS
+    ];
+
+
+    /**
      * Factory constructor.
      *
      * @param string $host
