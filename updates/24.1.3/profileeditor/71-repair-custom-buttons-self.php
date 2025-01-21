@@ -8,8 +8,6 @@
 
 declare(strict_types=1);
 
-use Schoolbox\Admin\Profile\Editor\Cli\Helper;
-use Schoolbox\Admin\Profile\Editor\Payload;
 use Schoolbox\Application\CliTool;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Role;
@@ -189,27 +187,27 @@ HELP;
             return;
         }
 
-        /* For all custom student buttons, we need to disable SELF
+        /* For the sake of logging and knowing what happened to instances, find affected buttons
          */
-        $profileButtonMapper = \Schoolbox\Profile\Button\Mapper::getInstance();
+        $whereClause = "WHERE `self_enabled` = 1 AND `roletype` = :roletype AND `type` = :type";
+        $params = [ 'roletype' => Role::STUDENT, 'type' => 'custom' ];
+        $customButtonsWithSelf = $this->getDatabaseInternal()
+            ->executeQuery("SELECT `id`, `text` FROM `profile_button` $whereClause", $params);
 
-        $customButtons = $profileButtonMapper->findByColumnList([
-            'roletype' => Role::STUDENT,
-            'type' => 'custom'
-        ]);
-
-        foreach ($customButtons as $customButton) {
-            if ($customButton->getSelfEnabled() === 0) {
-                continue; // Nothing to do
+        if ($customButtonsWithSelf->rowCount() > 0) {
+            while ($customButton = $customButtonsWithSelf->fetch(\PDO::FETCH_ASSOC)) {
+                $this->getLogger()->info(sprintf(
+                    'Custom button "%s" has SELF enabled; disabling it.',
+                    $customButton['text']
+                ));
             }
 
-            $this->getLogger()->info(sprintf(
-                'Custom button %s has SELF enabled; disabling it.',
-                $customButton->getText()
-            ));
-
-            $customButton->setSelfEnabled(0);
-            $profileButtonMapper->save($customButton);
+            /* Now actually update the buttons
+            */
+            $this->getDatabaseInternal()
+                ->executeQuery("UPDATE `profile_button` SET `self_enabled` = 0 $whereClause", $params);
+        } else {
+            $this->getLogger()->info('No custom buttons with SELF enabled found, nothing to do.');
         }
 
         /* Announce lock release
