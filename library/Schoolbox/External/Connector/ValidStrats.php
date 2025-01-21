@@ -28,6 +28,35 @@ class ValidStrats
     public const TIMETABLE = 'timetable';
     public const PHOTO = 'photo';
 
+
+    /**
+     * This represents the full synchronisation of all data
+     */
+    public const STRATS_FULL = [
+        self::FAMILIES,
+        self::STAFF,
+        self::TIMETABLE
+    ];
+
+
+    /**
+     * These strats fulfil everyone's profile data
+     */
+    public const STRATS_PROFILE = [
+        self::FAMILIES,
+        self::STAFF,
+    ];
+
+
+    /**
+     * These strats fulfil everyone's timetable data
+     * Note that the Daily Org strats will probably appear here
+     */
+    public const STRATS_TIMETABLE = [
+        self::TIMETABLE,
+    ];
+
+
     /**
      * These are valid as csv values in the arg
      */

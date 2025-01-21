@@ -192,13 +192,11 @@ class Controller extends ConfigController
                  *
                  * They've been aliased for convenience, though these were originally diagnostic
                  * so they might sound a bit funny to be on the ui if you're used to them.
-                 *
-                 * FIXME Maybe move these aliases into ValidStrats itself, for SPOC
                  */
                 'strats' => [
-                    'full' => implode(',', [ValidStrats::FAMILIES, ValidStrats::STAFF, ValidStrats::TIMETABLE]),
-                    'profiles' => implode(',', [ValidStrats::FAMILIES, ValidStrats::STAFF]),
-                    'timetable' => ValidStrats::TIMETABLE
+                    'full' => implode(',', ValidStrats::STRATS_FULL),
+                    'profiles' => implode(',', ValidStrats::STRATS_PROFILE),
+                    'timetable' => implode(',', ValidStrats::STRATS_TIMETABLE),
                 ],
                 /* Decide if the current suds selection uses the cyclic grid
                  */
