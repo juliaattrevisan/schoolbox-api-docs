@@ -367,6 +367,26 @@ class Controller extends ConfigController
     }
 
 
+    /**
+     * This lets you cancel a user-initiated sync if you're quick enough. For time-critical moments
+     * such as daily org, this might save you minutes of processing.
+     *
+     * Maybe controversially: for this reason there's no confirmation when cancelling a user-initiated
+     * request to sync data. You can always enact one if you cancel it: you don't lose any data etc.
+     *
+     * @return void
+     * @throws Exception
+     */
+    public function postCancelUpdate(): void
+    {
+        $instances = $this->importQueueMapper->findAll();
+
+        foreach ($instances as $instance) {
+            $this->importQueueMapper->delete($instance);
+        }
+    }
+
+
     /* Lock Acquisition
      * cloned from cli land because we can perhaps give user feedback here
      */
