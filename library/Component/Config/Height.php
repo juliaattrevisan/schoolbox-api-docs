@@ -1,6 +1,10 @@
 <?php
 
-
+/**
+ * Class Component_Config_Height
+ *
+ * To set a custom height on a component
+ */
 class Component_Config_Height extends Component_Config_Abstract
 {
 
