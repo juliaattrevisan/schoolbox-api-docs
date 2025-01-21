@@ -50,6 +50,12 @@ class Module extends BaseModule
             'postAgentProxyRequest',
             $permission,
         );
+        $this->register(
+            self::METHOD_GET,
+            '/proxy',
+            'getAgentProxyRequest',
+            $permission,
+        );
     }
 
     /**
@@ -66,11 +72,13 @@ class Module extends BaseModule
 
         $connection = (new ConnectionFactory(new Factory(), $this->getConfig()))->build();
         $handler    = new Handler($connection, new ViewSelector($connection));
+        $proxy      = new Proxy($connection);
 
         return new Controller(
             $ipWhitelist,
             $this->getConfig()->get(ConfigMapper::NAME_PAPERLY_AGENT_SECRET) ?? '',
             $handler,
+            $proxy
         );
     }
 }

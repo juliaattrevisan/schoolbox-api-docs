@@ -32,6 +32,7 @@ class Controller extends Base
         private array $ipWhitelist,
         private string $secret,
         private Handler $handler,
+        private Proxy $proxy,
     ) {
     }
 
@@ -84,6 +85,61 @@ class Controller extends Base
             $this->sendJsonError($e->getMessage(), Response::HTTP_NOT_FOUND);
         } catch (AlaressDatabaseException | \Exception $e) {
             //Catching external database exception and return useful message in json
+            $this->sendJsonError($e->getMessage(), Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    public function getAgentProxyRequest(): void
+    {
+        $this->handlePaperlyProxyRequest($this->request->getQueryParams());
+    }
+    public function postAgentProxyRequest(): void
+    {
+        $this->handlePaperlyProxyRequest($this->request->getParsedBody());
+    }
+
+    private function handlePaperlyProxyRequest(array $data): void
+    {
+        // Check IP address
+        if (!IpUtils::checkIp(Session::getIP(), $this->ipWhitelist)) {
+            $this->sendJsonError('Access denied', Response::HTTP_UNAUTHORIZED);
+            return;
+        }
+
+        // Check secret
+        $secret = $data['v'] ?? null;
+        if (!isset($secret) || $this->secret !== $secret) {
+            $this->sendJsonError('Access denied', Response::HTTP_UNAUTHORIZED);
+            return;
+        }
+
+        $sql = $data['sql'] ?? null;
+        $params = $data['params'] ?? null;
+
+        if ($sql === null) {
+            $this->sendJsonError('Payload malformed. Query missing.', Response::HTTP_BAD_REQUEST);
+            return;
+        }
+
+        try {
+            $response = [];
+            $shouldReturn = $this->proxy->shouldReturnResults($sql);
+            $stmt = $this->proxy->executeQuery($sql, $params);
+
+            if ($shouldReturn) {
+                while ($row = $stmt->fetch(\PDO::FETCH_ASSOC)) {
+                    $response[] = $row;
+                }
+            }
+            $this->response = $this->responseAsJson(
+                $response
+            );
+        } catch (AlaressDatabaseException $e) {
+            //Catching external database exception and return useful message in json
+            $this->sendJsonError($e->getMessage(), Response::HTTP_BAD_REQUEST);
+        } catch (OutOfBoundsException $e) {
+            $this->sendJsonError($e->getMessage(), Response::HTTP_METHOD_NOT_ALLOWED);
+        } catch (\Exception $e) {
             $this->sendJsonError($e->getMessage(), Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
