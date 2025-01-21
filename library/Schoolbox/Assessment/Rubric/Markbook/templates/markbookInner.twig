@@ -18,16 +18,16 @@
     <nav class="c-nav-actions l-flex-row">
         <sbx-pop-out content-id="header-options"></sbx-pop-out>
     </nav>
-    <ul id="header-options" class="f-dropdown" data-dropdown-content>
-        <li>
-            <a href='{{ routeLookup('rubricMarkbook.getMarkbookExport', {folder: folder, folderId: folder.id} ) }}?{{ queryArgs }}'
-               data-download-spreadsheet
-               class='icon-download'>Download Rubric Points</a>
-        <li><a href='{{ routeLookup('rubricMarkbook.getMarkbookExport', {folder: folder, folderId: folder.id} ) }}?{{ queryArgs }}&descriptorsOnly=true'
-               data-download-spreadsheet
-               class='icon-download'>Download Rubric Descriptors</a>
-    </ul>
 </div>
+<ul id="header-options" class="f-dropdown" data-dropdown-content>
+    <li>
+        <a href='{{ routeLookup('rubricMarkbook.getMarkbookExport', {folder: folder, folderId: folder.id} ) }}?{{ queryArgs }}'
+            data-download-spreadsheet
+            class='icon-download'>Download Rubric Points</a>
+    <li><a href='{{ routeLookup('rubricMarkbook.getMarkbookExport', {folder: folder, folderId: folder.id} ) }}?{{ queryArgs }}&descriptorsOnly=true'
+            data-download-spreadsheet
+            class='icon-download'>Download Rubric Descriptors</a>
+</ul>
 
 <div class="row">
     <div class="small-12 columns">
