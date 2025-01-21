@@ -58,7 +58,7 @@ class External_Synergetic_Srcl_User extends External_Synergetic_User
                 vStudents.StudentGovernmentStudentNumber,
                 AlertMessage,
                 vStudents.LegalCourtOrderType AS CourtOrderType,
-                vStudents.StudentBoarder,
+                luBoarder.Description AS StudentBoarder,
                 vStudents.StudentsComment as Comment,
                 '' AS StudentEnrolmentDate,
                 '' AS StudentLeavingDate,
@@ -101,6 +101,7 @@ class External_Synergetic_Srcl_User extends External_Synergetic_User
                             Semester.SystemCurrentFlag = 1
             LEFT JOIN   uStudentProgressiveAbsenceCount ON uStudentProgressiveAbsenceCount.ID = vStudents.StudentID
                             AND uStudentProgressiveAbsenceCount.FileYear = vStudents.FileYear
+            LEFT JOIN luBoarder ON luBoarder.Code = vStudents.StudentBoarder
             WHERE       vStudents.StudentID = :externalId
         ";
 
@@ -122,7 +123,7 @@ class External_Synergetic_Srcl_User extends External_Synergetic_User
 
                 /* Forcibly re-evaluate boarderlyness using this connector's specific interpretation
                  */
-                $student['StudentBoarder'] = $this->determineBoarderType((string)$student['StudentBoarder']);
+                // $student['StudentBoarder'] = $this->determineBoarderType((string)$student['StudentBoarder']);
 
                 /* Initialise stacks
                  */

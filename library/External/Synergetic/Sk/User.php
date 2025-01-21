@@ -60,7 +60,7 @@ class External_Synergetic_Sk_User extends External_Synergetic_User
                         AlertMessage,
                         vStudentsAll.LegalCourtOrderType AS CourtOrderType,
                         vStudentsAll.LegalParentsSeparatedFlag AS ParentsSeparatedFlag,
-                        vStudentsAll.StudentBoarder,
+                        luBoarder.Description AS StudentBoarder,
                         vStudentsAll.StudentsComment as Comment,
                         '' AS StudentEnrolmentDate,
                         '' AS StudentLeavingDate,
@@ -98,6 +98,7 @@ class External_Synergetic_Sk_User extends External_Synergetic_User
                             Semester.FileSemester = vStudentsAll.FileSemester AND
                             Semester.FileYear = vStudentsAll.FileYear AND
                             Semester.SystemCurrentFlag = 1
+            LEFT JOIN luBoarder ON luBoarder.Code = vStudentsAll.StudentBoarder
             WHERE       vStudentsAll.StudentID = :externalId
         ";
 
@@ -119,7 +120,7 @@ class External_Synergetic_Sk_User extends External_Synergetic_User
 
                 /* Forcibly re-evaluate boarderlyness using this connector's specific interpretation
                  */
-                $student['StudentBoarder'] = $this->determineBoarderType((string)$student['StudentBoarder']);
+                // $student['StudentBoarder'] = $this->determineBoarderType((string)$student['StudentBoarder']);
 
                 /* A special appendage
                  */
