@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Class Component_Config_Height
  *
