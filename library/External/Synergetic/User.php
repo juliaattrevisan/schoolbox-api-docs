@@ -317,7 +317,7 @@ class External_Synergetic_User implements External_UserInterface
                         AlertMessage,
                         vStudentsAll.LegalCourtOrderType AS CourtOrderType,
                         vStudentsAll.LegalParentsSeparatedFlag AS ParentsSeparatedFlag,
-                        vStudentsAll.StudentBoarder,
+                        luBoarder.Description AS StudentBoarder,
                         vStudentsAll.StudentsComment as Comment,
                         '' AS StudentEnrolmentDate,
                         '' AS StudentLeavingDate,
@@ -354,6 +354,7 @@ class External_Synergetic_User implements External_UserInterface
                             Semester.FileSemester = vStudentsAll.FileSemester AND
                             Semester.FileYear = vStudentsAll.FileYear AND
                             Semester.SystemCurrentFlag = 1
+            LEFT JOIN luBoarder ON luBoarder.Code = vStudentsAll.StudentBoarder
             WHERE       vStudentsAll.StudentID = :externalId
         ";
 
@@ -375,7 +376,7 @@ class External_Synergetic_User implements External_UserInterface
 
                 /* Forcibly re-evaluate boarderlyness using this connector's specific interpretation
                  */
-                $student['StudentBoarder'] = $this->determineBoarderType((string)$student['StudentBoarder']);
+                // $student['StudentBoarder'] = $this->determineBoarderType((string)$student['StudentBoarder']);
 
                 /* Initialise stacks
                  */
@@ -1177,14 +1178,7 @@ class External_Synergetic_User implements External_UserInterface
      */
     public function determineBoarderType(?string $boarderValue): string
     {
-        if (empty($boarderValue)) {
-            return '';
-        }
-
-        return $this->getConnector()->executeQuery(
-            "SELECT Description FROM luBoarder WHERE Code = :code",
-            ['code' => $boarderValue]
-        )->fetchColumn() ?: '';
+        return '';
     }
 
     /**
