@@ -31,7 +31,7 @@ class ValidStrats
     /**
      * These are valid as csv values in the arg
      */
-    private const STRATS = [
+    private const STRATS_WHITELIST = [
         /* Loads staff profiles
          */
         self::STAFF,
@@ -75,7 +75,7 @@ class ValidStrats
 
     /**
      * Decide what values of the csv string $csvArgs are valid strats
-     * Anything outside of self::STRATS is ignored
+     * Anything outside of self::STRATS_WHITELIST is ignored
      *
      * You can end up with an empty set which is assumed to mean
      * "import everything"
@@ -103,10 +103,10 @@ class ValidStrats
          */
         $temp = array_map('trim', $temp);
 
-        /* Remove anything that doesn't also appear in self::STRATS
+        /* Remove anything that doesn't also appear in self::STRATS_WHITELIST
          * and ignore those
          */
-        $temp = array_intersect(self::STRATS, $temp);
+        $temp = array_intersect(self::STRATS_WHITELIST, $temp);
 
         /* Return only the valid strats chosen
          * Each factory interprets this as desired
