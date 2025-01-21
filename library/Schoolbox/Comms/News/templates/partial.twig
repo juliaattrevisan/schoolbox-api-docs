@@ -18,7 +18,7 @@
 {% if articles|length %}
     {% import '@commsNews/macro/newsBlurb.twig' as macro %}
 
-    <ul class="information-list">
+    <ul class="information-list news-list">
         {% for article in articles %}
             <li class="actions-small-2 {{ article.sticky ? 'sticky' : '' }}">
                 <div class="list-item">
