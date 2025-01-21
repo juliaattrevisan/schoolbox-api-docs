@@ -27,7 +27,7 @@
 
                         {% if article.featureImage %}
                             <a href="{{ articleURL }}">
-                                <img src="/storage/image.php?hash={{ article.featureImage.hash }}&size=square64">
+                                <img src="/storage/image.php?hash={{ article.featureImage.hash }}&size=constrain200">
                             </a>
                         {% elseif fallbackImage.type == 'school-logo' %}
                             <a href="{{ articleURL }}">
@@ -36,7 +36,7 @@
                         {% elseif fallbackImage.type == 'author' %}
                             {% if article.author.portrait and article.author.portrait.hash %}
                                 <a href="{{ articleURL }}">
-                                    <img src="/storage/image.php?hash={{ article.author.portrait.hash }}&size=square64">
+                                    <img src="/storage/image.php?hash={{ article.author.portrait.hash }}&size=constrain200">
                                 </a>
                             {% endif %}
                         {% endif %}
