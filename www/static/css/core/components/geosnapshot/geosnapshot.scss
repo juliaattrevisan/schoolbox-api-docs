@@ -4,11 +4,5 @@
         /* Hide a random overhang of island
          */
         line-height: 0;
-
-        /* Don't let this render in a tiny skinny window
-         */
-        iframe {
-            min-height: 500px;
-        }
     }
 }
