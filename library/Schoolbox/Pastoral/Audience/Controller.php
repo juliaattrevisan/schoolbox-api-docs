@@ -259,6 +259,7 @@ class Controller extends Base
                 'typeActions'     => $subType ? $subType->getTypeActions() : $type->getTypeActions(),
                 'icons'           => $this->iconMapper->findAll()->sortNaturally('title'),
                 'sentiments'      => Pastoral\Type\TypeAbstract::SENTIMENT_VALUES,
+                'defaultExpiry'   => Pastoral\Type\TypeAbstract::PASTORAL_EXPIRY,
                 'flagColors'  => [
                     'foreground' => ($foregroundColor === null) ? null : $foregroundColor->getAsRgba(),
                     'background' => ($backgroundColor === null) ? null : $backgroundColor->getAsRgba(),

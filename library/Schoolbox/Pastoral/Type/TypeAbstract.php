@@ -38,6 +38,21 @@ abstract class TypeAbstract implements ISoftDeletable, Sequential, \JsonSerializ
         self::SENTIMENT_NEGATIVE,
     ];
 
+    /**
+     * Pastoral Expiry
+     */
+    public const PASTORAL_EXPIRY_DEFAULT = 'never';
+    public const PASTORAL_EXPIRY = [
+        self::PASTORAL_EXPIRY_DEFAULT,
+        '1 week',
+        '2 weeks',
+        '1 month',
+        '6 months',
+        '12 months',
+        'academic period',
+        'academic year',
+    ];
+
     /** @var string|null */
     protected ?string $name = null;
 
@@ -78,6 +93,12 @@ abstract class TypeAbstract implements ISoftDeletable, Sequential, \JsonSerializ
      * Sentiment 'positive', 'neutral', 'negative'
      */
     protected string $sentiment = Model::SENTIMENT_NEUTRAL;
+
+    /**
+     * Pastoral expiry period
+     * @var string
+     */
+    protected string $expiry = Model::PASTORAL_EXPIRY_DEFAULT;
 
     /** @var GenericCollection */
     protected GenericCollection $typeActions;
@@ -262,5 +283,23 @@ abstract class TypeAbstract implements ISoftDeletable, Sequential, \JsonSerializ
             'id'   => $this->getId(),
             'name' => $this->getName(),
         ];
+    }
+
+    /**
+     * @return string
+     */
+    public function getExpiry(): string
+    {
+        return $this->expiry;
+    }
+
+    /**
+     * @param string $expiry
+     * @return static
+     */
+    public function setExpiry(string $expiry): self
+    {
+        $this->expiry = $expiry;
+        return $this;
     }
 }
