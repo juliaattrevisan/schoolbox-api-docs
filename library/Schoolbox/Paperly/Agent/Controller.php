@@ -126,12 +126,18 @@ class Controller extends Base
         $params = $data['params'] ?? null;
 
         if ($sql === null) {
-            $this->sendJsonError('Payload malformed. Query missing.', Response::HTTP_BAD_REQUEST);
+            $this->sendJsonError(
+                'Payload malformed. Query missing.',
+                Response::HTTP_BAD_REQUEST
+            );
             return;
         }
 
-        if (!is_array($params)) {
-            $this->sendJsonError('Payload malformed. Params must be of type array.', Response::HTTP_BAD_REQUEST);
+        if (!is_array($params) && !is_null($params)) {
+            $this->sendJsonError(
+                'Payload malformed. Params must be of type array.',
+                Response::HTTP_BAD_REQUEST
+            );
             return;
         }
 

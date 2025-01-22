@@ -15,7 +15,14 @@ class Proxy
     ) {
     }
 
-    public function executeQuery(string $sql, array $params = []): IQuery|Base
+    /**
+     * Query execution
+     *
+     * @param string     $sql
+     * @param array|null $params
+     * @return IQuery|Base
+     */
+    public function executeQuery(string $sql, ?array $params = []): IQuery|Base
     {
         $statement = $this->externalDb->prepareQuery($sql, $params);
         $stmt = $statement->execute();
