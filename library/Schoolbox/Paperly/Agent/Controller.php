@@ -143,6 +143,10 @@ class Controller extends Base
                 while ($row = $stmt->fetch(\PDO::FETCH_ASSOC)) {
                     $response[] = $row;
                 }
+            } else {
+                $response = [
+                    'success' => true
+                ];
             }
             $this->response = $this->responseAsJson(
                 $response
