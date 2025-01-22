@@ -95,6 +95,12 @@ HELP;
             exit(1);
         }
 
+        /* A special check for exact timing
+         *
+         * TODO: Compare with ui value to decide if we exit early
+         */
+
+
         $type        = $this->getConfig()->get('schooldata_import_data_source') ?: Endpoint\Factory::CSV;
         $customHours = [];
         $file        = null;
