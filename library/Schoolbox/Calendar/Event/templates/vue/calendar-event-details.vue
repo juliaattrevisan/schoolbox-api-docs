@@ -107,11 +107,8 @@ export default {
     },
 
     watch: {
-        guests: {
-            handler() {
-                this.filterSearchResults(this.options);
-            },
-            deep: true,
+        guests() {
+            this.filterSearchResults(this.options);
         },
         selected() {
             if (this.selected.length > 0) {
