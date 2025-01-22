@@ -50,12 +50,6 @@ class Module extends BaseModule
             'postAgentProxyRequest',
             $permission,
         );
-        $this->register(
-            self::METHOD_GET,
-            '/proxy',
-            'getAgentProxyRequest',
-            $permission,
-        );
     }
 
     /**
