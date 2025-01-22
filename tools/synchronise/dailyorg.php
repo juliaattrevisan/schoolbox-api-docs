@@ -84,7 +84,7 @@ HELP;
 
         /* Detect frequency. "select an option" and "none" mean we should just exit early
          */
-        $frequency = (string)$this->getConfig()->get('schooldata_import_frequency');
+        $frequency = trim((string)$this->getConfig()->get('schooldata_import_frequency'));
 
         if ('' === $frequency || Endpoint\Scheduler::NONE === $frequency) {
             $this->getLogger()->debug(sprintf(
@@ -96,10 +96,19 @@ HELP;
         }
 
         /* A special check for exact timing
-         *
-         * TODO: Compare with ui value to decide if we exit early
          */
+        $dailyOrgFrequency = trim((string)$this->getConfig()->get('schooldata_import_dailyorg_time'));
+        $currentTime = date('H:i');
 
+        if ($currentTime !== $dailyOrgFrequency) {
+            $this->getLogger()->debug(sprintf(
+                'Daily Org Frequency set to %s but the current time is %s',
+                $dailyOrgFrequency,
+                $currentTime
+            ));
+
+            exit(1);
+        }
 
         $type        = $this->getConfig()->get('schooldata_import_data_source') ?: Endpoint\Factory::CSV;
         $customHours = [];
