@@ -70,9 +70,9 @@ class Controller extends Component_Homepage_ControllerAbstract
              */
             $this->url = $response['url'];
 
-            /* Get the height set in the component's configuration settings
+            /* Get the height set in the component's configuration settings, setting to a min of 500 if not set
              */
-            $this->height = $this->getConfig('height');
+            $this->height = is_numeric($this->getConfig('height')) ? $this->getConfig('height') : 500;
 
             return true;
         }
