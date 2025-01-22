@@ -108,7 +108,7 @@ export default {
 
     watch: {
         guests: {
-            handler(newGuests) {
+            handler() {
                 this.filterSearchResults(this.options);
             },
             deep: true,
