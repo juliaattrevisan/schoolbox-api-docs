@@ -52,7 +52,7 @@ class Controller extends Base
 
         $this->response = $this->responseFromTemplate('@service/permissions.twig', [
             'usersByServiceName' => $permissions->getUsersByServiceName($serviceNameById),
-            'uaStructsByServiceNameByUserId' => $permissions->getUaStructsByServiceNameByUserId($serviceNameById),
+            'userAccessInfoByUserId' => $permissions->getUserAccessInfoByUserId($serviceNameById),
         ]);
     }
 }

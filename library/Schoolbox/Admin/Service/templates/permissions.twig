@@ -23,20 +23,20 @@
                             <div class="compact card small-12">
                                 <span>
                                     {% include 'include/portrait.twig' with {user: user} only %}
-                                    {% set uaStructs = uaStructsByServiceNameByUserId[user.id][serviceName] %}
+                                    {% set rows = userAccessInfoByUserId[user.id][serviceName] %}
                                     {% set userNameDisplayed = false %}
                                     <table class='info-table'>
-                                        {% for uaStruct in uaStructs %}
+                                        {% for row in rows %}
                                             <tr>
                                                 {% if not userNameDisplayed %}
-                                                    <td class='user-name' rowspan='{{ uaStructs|length }}'>
+                                                    <td class='user-name' rowspan='{{ rows|length }}'>
                                                         <a href="/adminv2/user/{{ user.id }}/modify">{{ user.fullname }}</a>
                                                     </td>
                                                     {% set userNameDisplayed = true %}
                                                 {% endif %}
-                                                <td title='Access type'>{{ uaStruct['accessType'] }}</td>
-                                                <td{% if uaStruct['sidLabel'] %} title='Service details'{% endif %}>
-                                                    {% if uaStruct['sidLabel'] %}({{ uaStruct['sidLabel'] }}: {{ uaStruct['sidDisplayValue'] }}){% endif %}
+                                                <td title='Access type'>{{ row['accessType'] }}</td>
+                                                <td{% if row['sidLabel'] %} title='Service details'{% endif %}>
+                                                    {% if row['sidLabel'] %}({{ row['sidLabel'] }}: {{ row['sidDisplayValue'] }}){% endif %}
                                                 </td>
                                             </tr>
                                         {% endfor %}

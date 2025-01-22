@@ -88,12 +88,12 @@ class Permissions
 
 
     /**
-     * Return an array of (array of accessType names indexed by service name), indexed by userId.
+     * Return an array containing information from the userAccess table, indexed by userId.
      *
      * @param array<int, string> $serviceNameById
      * @return array<int, array<string, array{accessType: string, sidLabel: string, sidDisplayValue: string}>>
      */
-    public function getUaStructsByServiceNameByUserId(array $serviceNameById): array
+    public function getUserAccessInfoByUserId(array $serviceNameById): array
     {
         $userAccessRows = $this->userAccessMapper->getDatabase()->executeQuery(
             // Note accessTypeNames in the ua.type lookup below come from Permission/Access/README.md
