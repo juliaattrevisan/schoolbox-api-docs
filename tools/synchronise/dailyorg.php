@@ -110,6 +110,11 @@ HELP;
             exit(1);
         }
 
+        /* Forcibly mutate $frequency to be HOURLY to bypass all the usual timings so that
+         * we can run this on demand (arguably there'd be a special const to denote that)
+         */
+        $frequency = Endpoint\Scheduler::HOURLY;
+
         $type        = $this->getConfig()->get('schooldata_import_data_source') ?: Endpoint\Factory::CSV;
         $customHours = [];
         $file        = null;
