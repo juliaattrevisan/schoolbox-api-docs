@@ -65,7 +65,7 @@
                     <fieldset class="content">
                         <div class="small-12 columns">
                             <label for="defaultExpiry">Default Expiry</label>
-                            {% set currentExpiry  = (subtype ? subtype.expiry : type.expiry) %}
+                            {% set currentDefaultExpiry  = (subtype ? subtype.defaultExpiry : type.defaultExpiry) %}
                             <p class="meta">
                                 Set the default expiry period for this record type. The selected Default Expiry will be
                                 automatically applied upon selection of this type when creating a pastoral care record
@@ -76,7 +76,7 @@
                                         {% for expiry in defaultExpiry %}
                                             <option value="{{ expiry }}"
                                                     label="{{ expiry | capitalize }}"
-                                                    {% if expiry == currentExpiry %}selected{% endif %}
+                                                    {% if expiry == currentDefaultExpiry %}selected{% endif %}
                                             >{{ expiry | capitalize }}</option>
                                         {% endfor %}
                                     </select>

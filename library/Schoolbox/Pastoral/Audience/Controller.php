@@ -359,6 +359,9 @@ class Controller extends Base
         if (in_array($post['sentiment'], Pastoral\Type\TypeAbstract::SENTIMENT_VALUES)) {
             $currentType->setSentiment($post['sentiment']);
         }
+        if (in_array($post['defaultExpiry'], Pastoral\Type\TypeAbstract::PASTORAL_EXPIRY)) {
+            $currentType->setDefaultExpiry($post['defaultExpiry']);
+        }
         $currentType->setColor(!empty($post['color']) ? $this->colorFactory->build($post['color']) : null);
         $currentType->setVisibilityLocked($isVisibilityLocked);
         if ($isSubType) {
