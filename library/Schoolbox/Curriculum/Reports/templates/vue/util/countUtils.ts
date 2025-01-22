@@ -180,11 +180,16 @@ export function getFilteredCourseColumnCount(
         const onChildrenCount = node.children.reduce((acc, child) => {
             return acc + getFilteredCourseColumnCount(child, getChildCourseUsage(child, course), true);
         }, 0);
-        node.storedUsages[key] = course.usage.course.count + onChildrenCount;
+        // only need to check for course usage on the course column
+        node.storedUsages[key] = useFiltersStore().selectedReportOptions.includes(ReportOptionValues.COURSE)
+            ? course.usage.course.count + onChildrenCount
+            : 0;
         return node.storedUsages[key];
     }
     // only need to check for course usage on the course column
-    node.storedUsages[key] = course.usage.course.count;
+    node.storedUsages[key] = useFiltersStore().selectedReportOptions.includes(ReportOptionValues.COURSE)
+        ? course.usage.course.count
+        : 0;
     return node.storedUsages[key];
 }
 
