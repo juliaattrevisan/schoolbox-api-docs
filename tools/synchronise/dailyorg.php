@@ -96,7 +96,7 @@ HELP;
         }
 
         $type        = $this->getConfig()->get('schooldata_import_data_source') ?: Endpoint\Factory::CSV;
-        $customHours = explode(Renderer::VALUE_DELIMITER, $this->getConfig()->get('schooldata_import_managed_hours') ?? '');
+        $customHours = [];
         $file        = null;
         $timeout     = (float)($this->getConfig()->get('schooldata_import_timeout') ?: Endpoint\Scheduler::DEFAULT_TIMEOUT);
 
