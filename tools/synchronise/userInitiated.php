@@ -23,18 +23,8 @@ require_once __DIR__ . '/../../conf/core/require.php';
 /**
  * Profile/Timetable Importer
  *
- * Imports from an xml file and populates the following local sis tables:
- *   sis_user_profile
- *   sis_user_profile_staff
- *   sis_user_profile_student
- *   sis_user_profile_parent
- *   sis_user_profile_relation
- *   sis_class
- *   sis_class_period
- *   sis_class_user
- *   sis_timetable_campus
- *   sis_timetable_cycle
- *   sis_timetable_period
+ * Imports data from the sis into suds, a local data cache for profile and timetable data.
+ * This is a landing zone for UPS data.
  */
 $app = new class extends CliTool\App
 {
