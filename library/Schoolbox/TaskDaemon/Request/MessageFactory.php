@@ -86,7 +86,7 @@ class MessageFactory
         }
         $tokenUser = $this->tokenMapper->generateForUser($effector, $effector, \Alaress_Date_Format::now()->addSeconds(JWT::API_JWT_TIMEOUT));
         // Convert the instance to an intermediary format
-        $token = $effector ? $this->tokenBuilder->generate($effector, $tokenUser->getJwtId(), $tokenExpiry) : null;
+        $token = $this->tokenBuilder->generate($effector, $tokenUser->getJwtId(), $tokenExpiry);
         return new Message(
             $task,
             $params,
