@@ -108,6 +108,7 @@
 
                                             {% for event in currentEvents %}
                                                 {% if hasMultipleEvents %}<li>{% endif %}
+                                                <span {% if event.periodCancelled %}class="strike" title="This period has been cancelled"{% endif %}>
                                                     {{ event.location }}
                                                     -
                                                     {{ event.title }}
@@ -123,6 +124,7 @@
                                                             {% endif %}
                                                         {% endif %}
                                                     {% endfor %}
+                                                </span>
                                                 {% if hasMultipleEvents %}</li>{% endif %}
                                             {% endfor %}
 
