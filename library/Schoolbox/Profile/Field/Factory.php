@@ -110,7 +110,7 @@ class Factory
                 );
 
                 // Filter down the events to just the ones that are currently happening
-                $now = Alaress_Date_Format::now()->addMinutes(-400);
+                $now = Alaress_Date_Format::now();
                 $currentEvents = $dayEvents->filter(function ($event) use ($now): bool {
                     $startIsBeforeNow = $event->getStartTime()->compare($now) <= 0;
                     $endIsAfterNow = $event->getEndTime()->compare($now) >= 0;
