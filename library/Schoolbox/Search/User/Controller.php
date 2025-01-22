@@ -615,7 +615,7 @@ class Controller extends BaseController
         // todo also remove the jank getDi() call
 
         $timetableCalendarApi = $this->getDi()->get('calendarApiFactory')
-            ->produceForTimetableCalendar($staff, $this->getUser());
+            ->produceForTimetableEvents($staff, $this->getUser());
 
         // Find all the events for the current user for today only (getEvents returns the entire day regardless of the timestamps)
         $dayEvents = $timetableCalendarApi->getEvents(

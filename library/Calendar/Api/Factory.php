@@ -258,6 +258,63 @@ class Calendar_Api_Factory
 
 
     /**
+     * Only show the Timetable related subscriptions except for TimetableDays_External_Default
+     * This is used when we only want actual scheduled events and not the days, e.g. for determining
+     * a physical location that a user is scheduled to be at.
+     *
+     * This factory retrieves subscriptions whether or not they exist or are
+     * enabled: this is because the timetable calendar shouldn't depend on the
+     * standard calendar subscription status.
+     *
+     * @param User $user
+     * @param User $viewer
+     * @return Calendar_Api_EventType_Interface
+     * @throws PDOException
+     * @throws UnexpectedValueException
+     * @throws \Schoolbox\Mapper\Exception
+     */
+    public function produceForTimetableEvents(User $user, User $viewer): Calendar_Api_EventType_Interface
+    {
+        $composite = new Calendar_Api_Composite();
+
+        /* Combine all the timetable-related sources of data all together
+         * This means you could potentially run both Schedule and Cyclic
+         * timetable data sets concurrently. Wild.
+         */
+        $composite->add(
+            new Calendar_Api_EventType_SudsTimetable_Schoolbox_Default(
+                Calendar_Api_Config_Mapper::CONFIGURATION_NONE,
+                $user,
+                $viewer,
+                null,
+                $this->configLoader,
+                \Schoolbox\Calendar\EventTypeMapper::getInstance(),
+                \Schoolbox\External\ClassEntryMapper::getInstance(),
+                \Schoolbox\External\ClassInvolvementMapper::getInstance(),
+                \Schoolbox\External\Event\Mapper::getInstance(),
+                \Schoolbox\External\Event\Overrides\Mapper::getInstance(),
+                \Timetable_ColourMapper::getInstance(),
+                \Schoolbox\External\Profile\Staff\Mapper::getInstance(),
+                Access::getInstance()
+            )
+        );
+
+        $composite->add(
+            new Calendar_Api_EventType_Timetable_ExternalConstrained_Default(
+                Calendar_Api_Config_Mapper::CONFIGURATION_NONE,
+                $user,
+                $viewer,
+                $this->configLoader,
+                \Schoolbox\Calendar\EventTypeMapper::getInstance(),
+                Access::getInstance(),
+            )
+        );
+
+        return $composite;
+    }
+
+
+    /**
      * Handle unique construction logic for each variant of the calendar connector.
      *
      * @param Calendar_Api_Config_Record $config
