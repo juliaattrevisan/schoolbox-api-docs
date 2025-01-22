@@ -112,16 +112,18 @@
                                                     {{ event.location }}
                                                     -
                                                     {{ event.title }}
+                                                    {% set hasShownStaff = false %}
                                                     {% for staffId, staffName in event.staff %}
                                                         {# Only show "with" if it's a different user (i.e. don't show a teacher is with themselves) #}
                                                         {% if staffId != user.id %}
                                                             {% set staffProfileRoute = routeLookupIfAuthorized('searchUser.getProfile', {userId: staffId, user: user.id}) %}
-                                                            with
+                                                            {% if hasShownStaff %}/{% else %}with{% endif %}
                                                             {% if staffProfileRoute %}
                                                                 <a href="{{ staffProfileRoute }}">{{ staffName }}</a>
                                                             {% else %}
                                                                 {{ staffName }}
                                                             {% endif %}
+                                                            {% set hasShownStaff = true %}
                                                         {% endif %}
                                                     {% endfor %}
                                                 </span>
