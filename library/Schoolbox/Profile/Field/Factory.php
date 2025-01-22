@@ -81,6 +81,7 @@ class Factory
         if (!isset($mutatorIndex['currentLocation'])) {
             $mutatorIndex['currentLocation'] = function () use ($viewee, $viewer) {
                 // Use the same permission check as the normal calendar view
+                // todo: perhaps we don't actually want this? what if a school wants students to *only* be able to see current location, not full timetable, of another user
                 try {
                     Calendar_Layout_Full_Ajax_JSON::permissionCheck($viewee, $viewer);
                 } catch (\Exception $e) {
@@ -88,8 +89,11 @@ class Factory
                 }
 
                 // If the viewee's Hide Timetable is set, hide it from everyone (as per the calendar)
-                // OR if the viewer's viewStudentProfile is not set, hide the timetable from them
-                if ($viewee->getHideTimetable() || !$viewer->getRole()->getViewStudentProfile()) {
+                if ($viewee->getHideTimetable()) {
+                    return [];
+                }
+                // if the viewer is staff and the viewer's viewStudentProfile is not set, hide the timetable from them
+                if ($viewer->getRole()->isStaff() && !$viewer->getRole()->getViewStudentProfile()) {
                     return [];
                 }
 
@@ -102,7 +106,7 @@ class Factory
                 );
 
                 // Filter down the events to just the ones that are currently happening
-                $now = Alaress_Date_Format::now();
+                $now = Alaress_Date_Format::now()->addMinutes(-400);
                 $currentEvents = $dayEvents->filter(function ($event) use ($now): bool {
                     $startIsBeforeNow = $event->getStartTime()->compare($now) <= 0;
                     $endIsAfterNow = $event->getEndTime()->compare($now) >= 0;
