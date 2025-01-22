@@ -21,7 +21,7 @@ VALUES (
         'currentLocation',
         'Current Location',
         (SELECT MAX(sequence) + 1 FROM profile_field pf WHERE roletype = 'staff'),
-        1, -- enabled by default
+        0, -- disabled by default
         NULL,
         NULL,
         NULL,
@@ -29,14 +29,14 @@ VALUES (
         0
     );
 
--- Appears on all student and staff profiles
+-- FOR STUDENTS
+-- Appears on all student profiles
 INSERT INTO profile_field_campus_availability (profile_field_id, campus_id)
     SELECT pf.id, lc.id
     FROM profile_field pf
     JOIN luCampus lc
-    WHERE pf.field = 'currentLocation';
+    WHERE pf.roletype = 'student' AND pf.field = 'currentLocation';
 
--- FOR STUDENTS
 -- Visible for all staff with 'View Student Profile', parents of the student, and the user themself
 INSERT INTO profile_field_roletype_visibility (profile_field_id, roletype)
     SELECT pf.id, rt.roletype
@@ -45,9 +45,4 @@ INSERT INTO profile_field_roletype_visibility (profile_field_id, roletype)
     WHERE pf.roletype = 'student' AND pf.field = 'currentLocation';
 
 -- FOR STAFF
--- Visible for all staff, and the user themself
-INSERT INTO profile_field_roletype_visibility (profile_field_id, roletype)
-    SELECT pf.id, rt.roletype
-    FROM profile_field pf
-    JOIN (SELECT 'staff' as roletype UNION SELECT 'self') AS rt
-    WHERE pf.roletype = 'staff' AND pf.field = 'currentLocation';
+-- Disabled by default, so nothing to do here
