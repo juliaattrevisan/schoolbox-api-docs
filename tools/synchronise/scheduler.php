@@ -239,11 +239,11 @@ HELP;
 
                 /* Importer strat gets suffixed onto the end
                  */
-                $subtitle = '';
-
-                if ('' !== $currentStrat) {
-                    $subtitle = " ({$currentStrat})";
-                }
+                $logTitle = sprintf(
+                    '%s - (%s)',
+                    Endpoint\Scheduler::SCHEDULER_SIS_SCRIPT_NAME,
+                    $currentStrat
+                );
 
                 (new Endpoint\Scheduler(
                     $frequency,
@@ -254,7 +254,7 @@ HELP;
                     $this->getLogger(),
                     \Schoolbox\External\Connector\Log\Mapper::getInstance(),
                     $this->getDi()->get('sentry'),
-                ))->run($time, $runId, Endpoint\Scheduler::SCHEDULER_SIS_SCRIPT_NAME . $subtitle);
+                ))->run($time, $runId, $logTitle);
             }
         }
 

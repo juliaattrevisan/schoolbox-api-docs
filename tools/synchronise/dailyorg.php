@@ -190,7 +190,11 @@ HELP;
 
         /* Importer strat gets suffixed onto the end
          */
-        $subtitle = " ({$currentStrat} - scheduled daily org)";
+        $logTitle = sprintf(
+            '%s - (%s)',
+            Endpoint\Scheduler::SCHEDULER_SIS_SCRIPT_NAME,
+            'scheduled daily org'
+        );
 
         (new Endpoint\Scheduler(
             $frequency,
@@ -201,7 +205,7 @@ HELP;
             $this->getLogger(),
             \Schoolbox\External\Connector\Log\Mapper::getInstance(),
             $this->getDi()->get('sentry'),
-        ))->run($time, $runId, Endpoint\Scheduler::SCHEDULER_SIS_SCRIPT_NAME . $subtitle);
+        ))->run($time, $runId, $logTitle);
 
         /* Announce lock release
          */
