@@ -10,7 +10,7 @@ INSERT INTO `config`
 (`name`, `value`, `title`, `description`, `options`, `field_id`, `type_id`, `editable`, `hidden`, `required`, `module`, `sequence`)
 VALUES (
     'schooldata_import_dailyorg_time',
-    '',
+    '08:30',
     'Daily Org Import Time',
     'Decide at what time the timetable-only import runs. This occurs on a daily basis, each day of the week.',
     '',
