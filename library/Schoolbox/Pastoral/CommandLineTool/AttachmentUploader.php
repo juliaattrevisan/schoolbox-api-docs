@@ -182,6 +182,8 @@ HELP;
         $this->pastoralUploadQueueMapper->save($pendingUpload);
 
         // If in debug mode, output extra information.
+        // This extra info describes what happens in External/Synergetic/Pastoral->uploadPastoralDocument().
+        // The info is added here instead of there because no Logger object is available in that function.
         if (count($this->getToolArguments()) > 0 && $this->getToolArguments()[0] === '-vvv') {
             $pastoralMapper = PastoralMapper::getInstance();
             $pastoralAttachmentMapper = PastoralAttachmentMapper::getInstance();
