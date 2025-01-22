@@ -91,7 +91,7 @@ class Permissions
      * Return an array containing information from the userAccess table, indexed by userId.
      *
      * @param array<int, string> $serviceNameById
-     * @return array<int, array<string, array{accessType: string, sidLabel: string, sidDisplayValue: string}>>
+     * @return array<int, non-empty-array<string, array{accessType: string, sidLabel: string, sidDisplayValue: string}>>
      */
     public function getUserAccessInfoByUserId(array $serviceNameById): array
     {
@@ -132,7 +132,7 @@ class Permissions
         $uaStructsByServiceNameByUserId = [];
 
         foreach ($userAccessRows as $row) {
-            $userId = $row['userId'];
+            $userId = (int)$row['userId'];
             $serviceName = $row['serviceName'];
 
             if (!array_key_exists($userId, $uaStructsByServiceNameByUserId)) {
