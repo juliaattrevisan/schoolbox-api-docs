@@ -17,6 +17,7 @@ use Custom;
 use Eportfolio_Authenticator;
 use External_ClassInterface;
 use External_UserInterface;
+use Calendar_Api_Factory;
 use Schoolbox\Admin\Profile\Editor\Field\Mapper;
 use Schoolbox\Assessment\Term\Mapper as TermMapper;
 use Schoolbox\Config\ConfigMapper;
@@ -71,6 +72,7 @@ class Controller extends BaseController
      * @param \Schoolbox\External\User                   $userRelationHydrator
      * @param Mapper                                     $fieldMapper
      * @param \Schoolbox\Admin\Profile\Editor\Tab\Mapper $tabMapper
+     * @param Calendar_Api_Factory                         $calendarApiFactory
      */
     public function __construct(
         private UserMapper $userMapper,
@@ -88,6 +90,7 @@ class Controller extends BaseController
         private \Schoolbox\External\User $userRelationHydrator,
         private \Schoolbox\Admin\Profile\Editor\Field\Mapper $fieldMapper,
         private \Schoolbox\Admin\Profile\Editor\Tab\Mapper $tabMapper,
+        private Calendar_Api_Factory $calendarApiFactory
     ) {
     }
 
@@ -180,8 +183,12 @@ class Controller extends BaseController
          * Note this uses a callback to inject some data halfway through the compilation algorithm
          * to service this extra widgety thing, Pastoral Counts
          */
-        $externalUser = (new \Schoolbox\Profile\Field\Factory($this->fieldMapper, $this->userMapper, $this->externalUser))
-            ->produce($student, $this->getUser(), [
+        $externalUser = (new \Schoolbox\Profile\Field\Factory(
+            $this->fieldMapper,
+            $this->userMapper,
+            $this->externalUser,
+            $this->calendarApiFactory,
+        ))->produce($student, $this->getUser(), [
                 /* Inject pastoral counts so it executes in proper place deeper in the Factory
                  * ...but only if Pastoral Counts were a renderable field, as per admin
                  */
@@ -590,8 +597,12 @@ class Controller extends BaseController
          * Note this uses a callback to inject some data halfway through the compilation algorithm
          * to service this extra widgety thing, Pastoral Counts
          */
-        $externalUser = (new \Schoolbox\Profile\Field\Factory($this->fieldMapper, $this->userMapper, $this->externalUser))
-            ->produce($staff, $this->getUser());
+        $externalUser = (new \Schoolbox\Profile\Field\Factory(
+            $this->fieldMapper,
+            $this->userMapper,
+            $this->externalUser,
+            $this->calendarApiFactory,
+        ))->produce($staff, $this->getUser());
 
         try {
             $buttons = $this->profileButtonMapper->findButtonsForUser($staff, $this->getUser());
@@ -609,66 +620,6 @@ class Controller extends BaseController
                 $this->getUser(),
                 $staff
             );
-
-
-        // todo: permission checks and only do this if the field exists
-        // todo also remove the jank getDi() call
-
-        $timetableCalendarApi = $this->getDi()->get('calendarApiFactory')
-            ->produceForTimetableEvents($staff, $this->getUser());
-
-        // Find all the events for the current user for today only (getEvents returns the entire day regardless of the timestamps)
-        $dayEvents = $timetableCalendarApi->getEvents(
-            Alaress_Date_Format::now()->startOfDay()->getUnixTimeStamp(),
-            Alaress_Date_Format::now()->endOfDay()->getUnixTimeStamp(),
-        );
-
-        // Filter down the events to just the ones that are currently happening
-        $now = Alaress_Date_Format::now();
-        $currentEvents = $dayEvents->filter(function ($event) use ($now): bool {
-            // todo all day events?
-            $startIsBeforeNow = $event->getStartTime()->compare($now) <= 0;
-            $endIsAfterNow = $event->getEndTime()->compare($now) >= 0;
-
-            return $startIsBeforeNow && $endIsAfterNow;
-        });
-
-        // todo restrict to school hours only? or are after-school clubs relevant too...
-
-        // Then map to only the data twig needs to render them
-        $currentEvents = $currentEvents->map(function ($event) {
-            // There are two possible event types, each has a different set of fields
-
-            // SUDS timetable event
-            if ($event instanceof \Calendar\Event\Type\SudsTimetable\Event) {
-                return [
-                    'title' => $event->getTitle(),
-                    'periodName' => $event->getPeriod(),
-                    'periodCancelled' => $event->getPeriodCancelled(),
-                    'location' => $event->getLocation(),
-                    'staff' => $event->getStaff(), // [id => name][]
-                    'startTime' => $event->getStartTime(),
-                    'endTime' => $event->getEndTime(),
-                ];
-            }
-            // Timetable event
-            if ($event instanceof \Calendar\Event\Type\Timetable\Event) {
-                return [
-                    'title' => $event->getTitle(),
-                    'periodName' => $event->getPeriodName(),
-                    'periodCancelled' => $event->getPeriodCancelled(),
-                    'location' => $event->getLocation(),
-                    // these events only support 1 teacher
-                    'staff' => [
-                        $event->getAuthorId() => $event->getAuthorName(),
-                    ],
-                    'startTime' => $event->getStartTime(),
-                    'endTime' => $event->getEndTime(),
-                ];
-            }
-            // otherwise, it's an unknown event type (we should never get here)
-            throw new \UnexpectedValueException('Unknown event type: ' . get_class($event));
-        });
 
         $this->response = $this->responseFromTemplate(
             'user/staff.twig',
@@ -689,10 +640,6 @@ class Controller extends BaseController
                 /* Decides if the Geosnapshot button could be accessed
                  */
                 'isGeosnapshotAvailable' => $isGeosnapshotAvailable,
-                /* A list of events that the user is currently involved in right now
-                 * Used by the currentLocation field to show the user's current location
-                 */
-                'currentEvents' => $currentEvents,
 
                 /* Old implementation
                  */
@@ -724,8 +671,12 @@ class Controller extends BaseController
          * Note this uses a callback to inject some data halfway through the compilation algorithm
          * to service this extra widgety thing, Pastoral Counts
          */
-        $externalUser = (new \Schoolbox\Profile\Field\Factory($this->fieldMapper, $this->userMapper, $this->externalUser))
-            ->produce($parent, $this->getUser());
+        $externalUser = (new \Schoolbox\Profile\Field\Factory(
+            $this->fieldMapper,
+            $this->userMapper,
+            $this->externalUser,
+            $this->calendarApiFactory,
+        ))->produce($parent, $this->getUser());
 
         try {
             $buttons = $this->profileButtonMapper->findButtonsForUser($parent, $this->getUser());

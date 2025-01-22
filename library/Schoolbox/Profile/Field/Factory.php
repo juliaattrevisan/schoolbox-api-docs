@@ -14,6 +14,8 @@ use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Role;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
+use Alaress_Date_Format;
+use Calendar_Api_Factory;
 
 class Factory
 {
@@ -23,11 +25,13 @@ class Factory
      * @param Mapper $fieldMapper
      * @param UserMapper $userMapper
      * @param \External_UserInterface $externalUser
+     * @param Calendar_Api_Factory $calendarApiFactory
      */
     public function __construct(
         private \Schoolbox\Admin\Profile\Editor\Field\Mapper $fieldMapper,
         private \Schoolbox\UserMapper $userMapper,
-        private \External_UserInterface $externalUser
+        private \External_UserInterface $externalUser,
+        private Calendar_Api_Factory $calendarApiFactory
     ) {
     }
 
@@ -67,6 +71,73 @@ class Factory
         /* Fields that $viewer can actually see on screen
          */
         $renderableFields = $this->fieldMapper->findRenderableFields($viewee, $viewer);
+
+        /* Override the currentLocation field's value with all the data needed to render it
+         * This adds to mutatorIndex so it is only executed if the currentLocation field is renderable
+         * to avoid unnecessary generation of calendar data if the field is not visible
+         * Don't override if mutatorIndex already has a callback for currentLocation
+         */
+        if (!isset($mutatorIndex['currentLocation'])) {
+            $mutatorIndex['currentLocation'] = function () use ($viewee, $viewer) {
+                // todo: permission checks
+
+                $timetableCalendarApi = $this->calendarApiFactory->produceForTimetableEvents($viewee, $viewer);
+
+                // Find all the events for the current user for today only (getEvents returns the entire day regardless of the timestamps)
+                $dayEvents = $timetableCalendarApi->getEvents(
+                    Alaress_Date_Format::now()->startOfDay()->getUnixTimeStamp(),
+                    Alaress_Date_Format::now()->endOfDay()->getUnixTimeStamp(),
+                );
+
+                // Filter down the events to just the ones that are currently happening
+                $now = Alaress_Date_Format::now();
+                $currentEvents = $dayEvents->filter(function ($event) use ($now): bool {
+                    $startIsBeforeNow = $event->getStartTime()->compare($now) <= 0;
+                    $endIsAfterNow = $event->getEndTime()->compare($now) >= 0;
+
+                    return $startIsBeforeNow && $endIsAfterNow;
+                });
+
+                // todo restrict to school hours only? or are after-school clubs relevant too...
+
+                // Then map to only the data twig needs to render them
+                $currentEvents = $currentEvents->map(function ($event) {
+                    // There are two possible event types, each has a different set of fields
+
+                    // SUDS timetable event
+                    if ($event instanceof \Calendar\Event\Type\SudsTimetable\Event) {
+                        return [
+                            'title' => $event->getTitle(),
+                            'periodName' => $event->getPeriod(),
+                            'periodCancelled' => $event->getPeriodCancelled(),
+                            'location' => $event->getLocation(),
+                            'staff' => $event->getStaff(), // [id => name][]
+                            'startTime' => $event->getStartTime(),
+                            'endTime' => $event->getEndTime(),
+                        ];
+                    }
+                    // Timetable event
+                    if ($event instanceof \Calendar\Event\Type\Timetable\Event) {
+                        return [
+                            'title' => $event->getTitle(),
+                            'periodName' => $event->getPeriodName(),
+                            'periodCancelled' => $event->getPeriodCancelled(),
+                            'location' => $event->getLocation(),
+                            // these events only support 1 teacher
+                            'staff' => [
+                                $event->getAuthorId() => $event->getAuthorName(),
+                            ],
+                            'startTime' => $event->getStartTime(),
+                            'endTime' => $event->getEndTime(),
+                        ];
+                    }
+                    // otherwise, it's an unknown event type (we should never get here)
+                    throw new \UnexpectedValueException('Unknown event type: ' . get_class($event));
+                });
+
+                return $currentEvents;
+            };
+        }
 
         /** @var \Schoolbox\Admin\Profile\Editor\Field\Model $renderableField */
         foreach ($renderableFields as $renderableField) {
