@@ -637,16 +637,37 @@ class Controller extends BaseController
 
         // Then map to only the data twig needs to render them
         $currentEvents = $currentEvents->map(function ($event) {
-            return [
-                'title' => $event->getTitle(),
-                'periodName' => $event->getPeriodName(),
-                'periodCancelled' => $event->getPeriodCancelled(),
-                'location' => $event->getLocation(),
-                'teacherName' => $event->getAuthorName(),
-                'teacherId' => $event->getAuthorId(),
-                'startTime' => $event->getStartTime(),
-                'endTime' => $event->getEndTime(),
-            ];
+            // There are two possible event types, each has a different set of fields
+
+            // SUDS timetable event
+            if ($event instanceof \Calendar\Event\Type\SudsTimetable\Event) {
+                return [
+                    'title' => $event->getTitle(),
+                    'periodName' => $event->getPeriod(),
+                    'periodCancelled' => $event->getPeriodCancelled(),
+                    'location' => $event->getLocation(),
+                    'staff' => $event->getStaff(), // [id => name][]
+                    'startTime' => $event->getStartTime(),
+                    'endTime' => $event->getEndTime(),
+                ];
+            }
+            // Timetable event
+            if ($event instanceof \Calendar\Event\Type\Timetable\Event) {
+                return [
+                    'title' => $event->getTitle(),
+                    'periodName' => $event->getPeriodName(),
+                    'periodCancelled' => $event->getPeriodCancelled(),
+                    'location' => $event->getLocation(),
+                    // these events only support 1 teacher
+                    'staff' => [
+                        $event->getAuthorId() => $event->getAuthorName(),
+                    ],
+                    'startTime' => $event->getStartTime(),
+                    'endTime' => $event->getEndTime(),
+                ];
+            }
+            // otherwise, it's an unknown event type (we should never get here)
+            throw new \UnexpectedValueException('Unknown event type: ' . get_class($event));
         });
 
         $this->response = $this->responseFromTemplate(

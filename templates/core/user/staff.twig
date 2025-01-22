@@ -111,16 +111,18 @@
                                                     {{ event.location }}
                                                     -
                                                     {{ event.title }}
-                                                    {# Only show "with" if it's a different user (i.e. don't show a teacher is with themselves) #}
-                                                    {% if event.teacherId == user.id %} {# todo remove debug make this != #}
-                                                        {% set teacherRoute = routeLookupIfAuthorized('searchUser.getProfile', {userId: event.teacherId, user: user.id}) %}
-                                                        with
-                                                        {% if teacherRoute %}
-                                                            <a href="{{ teacherRoute }}">{{ event.teacherName }}</a>
-                                                        {% else %}
-                                                            {{ event.teacherName }}
+                                                    {% for staffId, staffName in event.staff %}
+                                                        {# Only show "with" if it's a different user (i.e. don't show a teacher is with themselves) #}
+                                                        {% if staffId != user.id %}
+                                                            {% set staffProfileRoute = routeLookupIfAuthorized('searchUser.getProfile', {userId: staffId, user: user.id}) %}
+                                                            with
+                                                            {% if staffProfileRoute %}
+                                                                <a href="{{ staffProfileRoute }}">{{ staffName }}</a>
+                                                            {% else %}
+                                                                {{ staffName }}
+                                                            {% endif %}
                                                         {% endif %}
-                                                    {% endif %}
+                                                    {% endfor %}
                                                 {% if hasMultipleEvents %}</li>{% endif %}
                                             {% endfor %}
 
