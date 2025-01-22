@@ -5,7 +5,7 @@
  # @param int|null $height  The height of the component
  #}
 {% if url %}
-<iframe src="{{ url }}" style="height: {{ height }}px"></iframe>
+<iframe src="{{ url }}" {% if height %}style="height: {{ height }}px"{% endif %}></iframe>
 {% else %}
 <div class="empty-state">
     <i class="icon-geosnapshot"></i>
