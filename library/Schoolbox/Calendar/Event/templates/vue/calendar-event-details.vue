@@ -598,6 +598,7 @@ export default {
                                 label-id="userInvite"
                                 placeholder=""
                                 :manage-search-response="true"
+                                :show-selected="false"
                                 @search-response="onSearchResponse"
                             >
                                 <template #meta>
