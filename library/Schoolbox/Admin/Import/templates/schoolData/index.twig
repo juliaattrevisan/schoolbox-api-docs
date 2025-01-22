@@ -18,7 +18,7 @@
         {# These config elements can be either hidden or shown, contextually
          # csv is a special subset
          #}
-        let sisConfigElements = $('#schooldata_import_endpoint_host, #schooldata_import_endpoint_key, #schooldata_import_frequency, #schooldata_import_managed_hours, #schooldata_import_managed_hours-field, #schooldata_import_timeout');
+        let sisConfigElements = $('#schooldata_import_endpoint_host, #schooldata_import_endpoint_key, #schooldata_import_frequency, #schooldata_import_dailyorg_time, #schooldata_import_dailyorg_time-field, #schooldata_import_managed_hours, #schooldata_import_managed_hours-field, #schooldata_import_timeout');
         let csvConfigElements = $('#schooldata_import_frequency, #schooldata_import_managed_hours, #schooldata_import_managed_hours-field, #schooldata_import_timeout');
 
         {# On document.ready, using dataSource, decide which island to show:
@@ -99,7 +99,7 @@
                 $('#status-island').show();
                 hideConfig(sisConfigElements);
                 showConfig(csvConfigElements);
-            } else  {
+            } else {
                 $('#status-island').show();
                 showConfig(sisConfigElements);
             }
@@ -116,18 +116,29 @@
             const dataSource = $('#schooldata_import_data_source-field').val();
             const importFrequency = $('#schooldata_import_frequency-field').val();
             const importFrequencyContainer = $('#schooldata_import_managed_hours-field').parent('div');
+            const dailyOrgFrequencyContainer = $('#schooldata_import_dailyorg_time-field').parent('div');
 
             /* Hide it by default
              */
             importFrequencyContainer.hide();
+            dailyOrgFrequencyContainer.hide();
 
             /* If your data source is not Select An Option and not None,
              * And the import frequency is sb,
              * Show the options
              */
             if ([''].indexOf(dataSource) === -1) {
+                /* If 'sb' was selected, reveal the custom hours
+                 */
                 if ('sb' === importFrequency) {
                     importFrequencyContainer.show();
+                }
+
+                /* If '' and 'none' were selected, let daily org import time stay hidden
+                 * Otherwise reveal it
+                 */
+                if (['', 'none'].indexOf(importFrequency) === -1) {
+                    dailyOrgFrequencyContainer.show();
                 }
             }
         }
