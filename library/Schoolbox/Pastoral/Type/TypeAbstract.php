@@ -98,7 +98,7 @@ abstract class TypeAbstract implements ISoftDeletable, Sequential, \JsonSerializ
      * Pastoral expiry period
      * @var string
      */
-    protected string $expiry = Model::PASTORAL_EXPIRY_DEFAULT;
+    protected string $defaultExpiry = Model::PASTORAL_EXPIRY_DEFAULT;
 
     /** @var GenericCollection */
     protected GenericCollection $typeActions;
@@ -288,18 +288,18 @@ abstract class TypeAbstract implements ISoftDeletable, Sequential, \JsonSerializ
     /**
      * @return string
      */
-    public function getExpiry(): string
+    public function getDefaultExpiry(): string
     {
-        return $this->expiry;
+        return $this->defaultExpiry;
     }
 
     /**
-     * @param string $expiry
+     * @param string $defaultExpiry
      * @return static
      */
-    public function setExpiry(string $expiry): self
+    public function setDefaultExpiry(string $defaultExpiry): self
     {
-        $this->expiry = $expiry;
+        $this->defaultExpiry = $defaultExpiry;
         return $this;
     }
 }
