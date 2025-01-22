@@ -130,6 +130,11 @@ class Controller extends Base
             return;
         }
 
+        if (!is_array($params)) {
+            $this->sendJsonError('Payload malformed. Params must be of type array.', Response::HTTP_BAD_REQUEST);
+            return;
+        }
+
         /* Only allowing first query being executed
          */
         $sql = explode(';', $sql)[0];
