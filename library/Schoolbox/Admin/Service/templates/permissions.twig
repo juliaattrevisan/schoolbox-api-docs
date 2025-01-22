@@ -24,10 +24,16 @@
                                 <span>
                                     {% include 'include/portrait.twig' with {user: user} only %}
                                     {% set uaStructs = uaStructsByServiceNameByUserId[user.id][serviceName] %}
+                                    {% set userNameDisplayed = false %}
                                     <table class='info-table'>
                                         {% for uaStruct in uaStructs %}
                                             <tr>
-                                                <td><a href="/adminv2/user/{{ user.id }}/modify">{{ user.fullname }}</a></td>
+                                                {% if not userNameDisplayed %}
+                                                    <td class='user-name' rowspan='{{ uaStructs|length }}'>
+                                                        <a href="/adminv2/user/{{ user.id }}/modify">{{ user.fullname }}</a>
+                                                    </td>
+                                                    {% set userNameDisplayed = true %}
+                                                {% endif %}
                                                 <td title='Access type'>{{ uaStruct['accessType'] }}</td>
                                                 <td{% if uaStruct['sidLabel'] %} title='Service details'{% endif %}>
                                                     {% if uaStruct['sidLabel'] %}({{ uaStruct['sidLabel'] }}: {{ uaStruct['sidDisplayValue'] }}){% endif %}
@@ -57,6 +63,10 @@
 
 .info-table tr > td {
     width: 33%;
+}
+
+.info-table tr > td.user-name {
+    vertical-align: middle;
 }
 </style>
 {% endfor %}
