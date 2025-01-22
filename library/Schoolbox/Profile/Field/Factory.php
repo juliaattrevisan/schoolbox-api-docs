@@ -110,7 +110,7 @@ class Factory
                 );
 
                 // Filter down the events to just the ones that are currently happening
-                $now = Alaress_Date_Format::newFromTimestamp(1737500400);
+                $now = Alaress_Date_Format::now();
                 $currentEvents = $dayEvents->filter(function ($event) use ($now): bool {
                     // If it's an all-day event, show it (e.g. sports carnival sort of things?)
                     if ($event->getAllDay()) {
