@@ -23,10 +23,20 @@
                             <div class="compact card small-12">
                                 <a href="/adminv2/user/{{ user.id }}/modify">
                                     {% include 'include/portrait.twig' with {user: user} only %}
-                                    <div class='l-grid l-gap l-grid--2-col'>
-                                        <div>{{ user.fullname }}</div>
-                                        <div title='Access type'>({{ accessTypeByServiceNameByUserId[user.id][serviceName] }})</div>
-                                    </div>
+                                    {% set uaStructs = uaStructsByServiceNameByUserId[user.id][serviceName] %}
+                                    <table class='info-table'>
+                                        {% for uaStruct in uaStructs %}
+                                            <tr>
+                                                <td>
+                                                    {{ user.fullname }}
+                                                </td>
+                                                <td title='Access type'>{{ uaStruct['accessType'] }}</td>
+                                                <td{% if uaStruct['sidLabel'] %} title='Service details'{% endif %}>
+                                                    {% if uaStruct['sidLabel'] %}({{ uaStruct['sidLabel'] }}: {{ uaStruct['sidDisplayValue'] }}){% endif %}
+                                                </td>
+                                            </tr>
+                                        {% endfor %}
+                                    </table>
                                 </a>
                             </div>
                         </div>
@@ -45,4 +55,13 @@
         {% endif %}
     </div>
 </div>
+<style>
+.info-table {
+    margin-bottom: 0;
+}
+
+.info-table tr > td {
+    width: 33%;
+}
+</style>
 {% endfor %}

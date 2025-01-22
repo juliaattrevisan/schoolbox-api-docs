@@ -91,14 +91,15 @@ class Permissions
      * Return an array of (array of accessType names indexed by service name), indexed by userId.
      *
      * @param array<int, string> $serviceNameById
-     * @return array<int, array<string, string>>
+     * @return array<int, array<string, array{accessType: string, sidLabel: string, sidDisplayValue: string}>>
      */
-    public function getAccessTypeByServiceNameByUserId(array $serviceNameById): array
+    public function getUaStructsByServiceNameByUserId(array $serviceNameById): array
     {
         $userAccessRows = $this->userAccessMapper->getDatabase()->executeQuery(
             // Note accessTypeNames in the ua.type lookup below come from Permission/Access/README.md
             'SELECT
             ua.service AS serviceId,
+            ua.sid,
             lus.name AS serviceName,
             ua.uid AS userId,
             (
@@ -108,22 +109,55 @@ class Permissions
                     WHEN 2 THEN "Write"
                     WHEN 3 THEN "Moderate"
                 END
-            ) AS accessTypeName
+            ) AS accessType
             FROM userAccess ua
             JOIN lu_service lus ON ua.service = lus.id
-            WHERE lus.id IN (' . implode(',', array_map('intval', array_keys($serviceNameById))) . ')'
+            JOIN user u ON ua.uid = u.id
+            WHERE u.deleted_at IS NULL
+            AND lus.id IN (' . implode(',', array_map('intval', array_keys($serviceNameById))) . ')'
         )->fetchAll();
 
-        $accessTypeByServiceNameByUserId = [];
+        $roleNameById = $this->userAccessMapper->getDatabase()->executeQuery(
+            'SELECT id, name
+            FROM groups
+            WHERE deleted_at IS NULL'
+        )->fetchColumnArray('name', 'id');
+
+        $campusNameById = $this->userAccessMapper->getDatabase()->executeQuery(
+            'SELECT id, name
+            FROM luCampus
+            WHERE deleted_at IS NULL'
+        )->fetchColumnArray('name', 'id');
+
+        $uaStructsByServiceNameByUserId = [];
 
         foreach ($userAccessRows as $row) {
-            if (!array_key_exists($row['userId'], $accessTypeByServiceNameByUserId)) {
-                $accessTypeByServiceNameByUserId[$row['userId']] = [];
+            $userId = $row['userId'];
+            $serviceName = $row['serviceName'];
+
+            if (!array_key_exists($userId, $uaStructsByServiceNameByUserId)) {
+                $uaStructsByServiceNameByUserId[$userId] = [];
             }
 
-            $accessTypeByServiceNameByUserId[$row['userId']][$row['serviceName']] = $row['accessTypeName'];
+            if (!array_key_exists($serviceName, $uaStructsByServiceNameByUserId[$userId])) {
+                $uaStructsByServiceNameByUserId[$userId][$serviceName] = [];
+            }
+
+            $uaStructsByServiceNameByUserId[$userId][$serviceName][] = [
+                'accessType' => $row['accessType'],
+                'sidLabel' => match ($serviceName) {
+                    'Calendar' => 'Campus',
+                    'Impersonator' => 'Role',
+                    default => null
+                },
+                'sidDisplayValue' => match ($serviceName) {
+                    'Calendar' => $campusNameById[$row['sid']] ?? '',
+                    'Impersonator' => $roleNameById[$row['sid']] ?? '',
+                    default => null
+                },
+            ];
         }
 
-        return $accessTypeByServiceNameByUserId;
+        return $uaStructsByServiceNameByUserId;
     }
 }
