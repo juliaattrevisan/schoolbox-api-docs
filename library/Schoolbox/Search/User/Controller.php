@@ -610,6 +610,45 @@ class Controller extends BaseController
                 $staff
             );
 
+
+        // todo: permission checks and only do this if the field exists
+        // todo also remove the jank getDi() call
+
+        $timetableCalendarApi = $this->getDi()->get('calendarApiFactory')
+            ->produceForTimetableCalendar($staff, $this->getUser());
+
+        // Find all the events for the current user for today only (getEvents returns the entire day regardless of the timestamps)
+        $dayEvents = $timetableCalendarApi->getEvents(
+            Alaress_Date_Format::now()->startOfDay()->getUnixTimeStamp(),
+            Alaress_Date_Format::now()->endOfDay()->getUnixTimeStamp(),
+        );
+
+        // Filter down the events to just the ones that are currently happening
+        $now = Alaress_Date_Format::now();
+        $currentEvents = $dayEvents->filter(function ($event) use ($now): bool {
+            // todo all day events?
+            $startIsBeforeNow = $event->getStartTime()->compare($now) <= 0;
+            $endIsAfterNow = $event->getEndTime()->compare($now) >= 0;
+
+            return $startIsBeforeNow && $endIsAfterNow;
+        });
+
+        // todo restrict to school hours only? or are after-school clubs relevant too...
+
+        // Then map to only the data twig needs to render them
+        $currentEvents = $currentEvents->map(function ($event) {
+            return [
+                'title' => $event->getTitle(),
+                'periodName' => $event->getPeriodName(),
+                'periodCancelled' => $event->getPeriodCancelled(),
+                'location' => $event->getLocation(),
+                'teacherName' => $event->getAuthorName(),
+                'teacherId' => $event->getAuthorId(),
+                'startTime' => $event->getStartTime(),
+                'endTime' => $event->getEndTime(),
+            ];
+        });
+
         $this->response = $this->responseFromTemplate(
             'user/staff.twig',
             [
@@ -629,6 +668,10 @@ class Controller extends BaseController
                 /* Decides if the Geosnapshot button could be accessed
                  */
                 'isGeosnapshotAvailable' => $isGeosnapshotAvailable,
+                /* A list of events that the user is currently involved in right now
+                 * Used by the currentLocation field to show the user's current location
+                 */
+                'currentEvents' => $currentEvents,
 
                 /* Old implementation
                  */

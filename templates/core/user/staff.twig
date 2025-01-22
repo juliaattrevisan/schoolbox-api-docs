@@ -98,6 +98,34 @@
                                                 #}
                                             *{{ selectedField.value }}*
                                         </dd>
+                                    {% elseif selectedField.field in ['currentLocation'] %}
+                                        <dt class="small-4 medium-3 columns">{{ macro.fieldName(selectedField) }}</dt>
+                                        <dd class="small-8 medium-9 columns">
+                                            {# If there are more than 1 possible locations, make it a list #}
+                                            {% set hasMultipleEvents = currentEvents|length > 1 %}
+
+                                            {% if hasMultipleEvents %}<ul>{% endif %}
+
+                                            {% for event in currentEvents %}
+                                                {% if hasMultipleEvents %}<li>{% endif %}
+                                                    {{ event.location }}
+                                                    -
+                                                    {{ event.title }}
+                                                    {# Only show "with" if it's a different user (i.e. don't show a teacher is with themselves) #}
+                                                    {% if event.teacherId == user.id %} {# todo remove debug make this != #}
+                                                        {% set teacherRoute = routeLookupIfAuthorized('searchUser.getProfile', {userId: event.teacherId, user: user.id}) %}
+                                                        with
+                                                        {% if teacherRoute %}
+                                                            <a href="{{ teacherRoute }}">{{ event.teacherName }}</a>
+                                                        {% else %}
+                                                            {{ event.teacherName }}
+                                                        {% endif %}
+                                                    {% endif %}
+                                                {% if hasMultipleEvents %}</li>{% endif %}
+                                            {% endfor %}
+
+                                            {% if hasMultipleEvents %}</ul>{% endif %}
+                                        </dd>
                                     {% else %}
                                         {# A generic tuple (key, value) pair
                                          #
