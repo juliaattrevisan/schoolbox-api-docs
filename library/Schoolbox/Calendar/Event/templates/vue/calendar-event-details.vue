@@ -5,7 +5,6 @@
 import SearchSelect from "@schoolboxVue/components/searchSelect/search-select.vue";
 import AudiencesModal from "./audiences-modal";
 import MediaArticle from "@schoolboxVue/components/media-article";
-import debounce from "lodash/debounce";
 
 /* Path aliases like @schoolboxCalendarEvent are defined in webpack.common.js
  */
@@ -13,18 +12,6 @@ import { ATTENDANCE_STATUS } from "@schoolboxCalendarEvent/attendance-status";
 import { ATTENDANCE_LEVELS } from "@schoolboxCalendarEvent/attendance-levels";
 import { ENDPOINTS } from "@schoolboxCalendarEvent/endpoints";
 import checks from "@schoolboxCalendarEvent/checks";
-
-/* Vue select
- */
-import vSelect from "vue-select";
-import "vue-select/dist/vue-select.css";
-
-/* Render custom template for Deselect icon/button
- * It's not well documented, but you can trawl through closed PRs to figger out how
- * https://github.com/sagalbot/vue-select/issues/994
- */
-import Deselect from "@schoolboxVue/components/selectize/Deselect";
-vSelect.props.components.default = () => ({ Deselect });
 
 const FORMAT_LONG_DATE = "dddd, MMMM DD, YYYY"; // Monday, October 01, 2019
 const FORMAT_LONG_DATE_WITH_TIME = "dddd, MMMM DD, YYYY h:mma"; // Monday, October 01, 2019 02:30pm
@@ -37,7 +24,6 @@ export default {
     components: {
         AudiencesModal,
         MediaArticle,
-        vSelect,
         SearchSelect,
     },
 
@@ -462,36 +448,6 @@ export default {
             return this.event.attendance.level.current === ATTENDANCE_LEVELS.NONE;
         },
 
-        /**
-         * Start searching for keyword
-         *
-         * @param query
-         * @param loading
-         */
-        onSearch(query, loading) {
-            loading(true);
-            this.search(loading, query, this);
-        },
-
-        /**
-         * Perform async request and load results into component
-         */
-        search: debounce(function (loading, query, vm) {
-            fetch(
-                ENDPOINTS.URL_SELECTIZE +
-                    "?" +
-                    new URLSearchParams({
-                        query: query,
-                        groupID: 0,
-                    }),
-            )
-                .then((response) => response.json())
-                .then((data) => {
-                    vm.options = data;
-                    loading(false);
-                });
-        }, 350),
-
         showAudiencesModal() {
             this.$refs.audiencesModal.open();
         },
@@ -633,25 +589,6 @@ export default {
                         </span>
 
                         <template v-if="canInviteAttendees()">
-                            <v-select
-                                id="createAttendanceForm"
-                                :options="options"
-                                @search="onSearch"
-                                label="name"
-                                placeholder="Search for people to invite"
-                                v-model="selected"
-                            >
-                                <template #option="option">
-                                    <div class="d-center">
-                                        {{ option.name }}
-                                    </div>
-                                </template>
-                                <template #selected-option="option">
-                                    <div class="selected d-center">
-                                        {{ option.name }}
-                                    </div>
-                                </template>
-                            </v-select>
                             <search-select
                                 v-model:selected="selected"
                                 v-model:results="options"
