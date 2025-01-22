@@ -43,7 +43,7 @@ class Permissions
      * The services returned are those that should be listed on the 'Admin > Service Permissions' page.
      * @return array<int, string>
      */
-    public function getServiceNameById()
+    public function getServiceNameById(): array
     {
         /* We don't need to list the HOMEPAGE service (1) here
          * The TUTORIAL service (4) got deleted at some point
@@ -67,7 +67,6 @@ class Permissions
      * @param $serviceNameById array<int, string> An array of service names indexed by serviceId.
      * @return array<string, Collection>
      * @throws \Alaress\Database\Predicate\InvalidColumnException
-     * @throws \ReflectionException
      * @throws \Schoolbox\Mapper\DefinitionException
      * @throws \Schoolbox\Mapper\Exception
      * @throws \UnexpectedValueException
@@ -91,7 +90,7 @@ class Permissions
      * Return an array containing information from the userAccess table, indexed by userId.
      *
      * @param array<int, string> $serviceNameById
-     * @return array<int, non-empty-array<string, array{accessType: string, sidLabel: string, sidDisplayValue: string}>>
+     * @return array<int, array<string, array<int, array{accessType: string, sidLabel: string, sidDisplayValue: string}>>>
      */
     public function getUserAccessInfoByUserId(array $serviceNameById): array
     {
