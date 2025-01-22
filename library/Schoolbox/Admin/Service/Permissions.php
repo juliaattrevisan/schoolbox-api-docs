@@ -90,7 +90,7 @@ class Permissions
      * Return an array containing information from the userAccess table, indexed by userId.
      *
      * @param array<int, string> $serviceNameById
-     * @return array<int, array<string, array<int, array{accessType: string, sidLabel: string, sidDisplayValue: string}>>>
+     * @return array<int, array<string, list<array{accessType: string, sidLabel: string, sidDisplayValue: string}>>>
      */
     public function getUserAccessInfoByUserId(array $serviceNameById): array
     {
