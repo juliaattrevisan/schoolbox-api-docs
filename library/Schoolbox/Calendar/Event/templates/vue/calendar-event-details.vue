@@ -121,6 +121,12 @@ export default {
     },
 
     watch: {
+        guests: {
+            handler(newGuests) {
+                this.filterSearchResults(this.options);
+            },
+            deep: true,
+        },
         selected() {
             if (this.selected.length > 0) {
                 this.rsvpCreate(this.selected[0].id, `${this.selected[0].first_name} ${this.selected[0].last_name}`);
@@ -164,6 +170,27 @@ export default {
             this.numPending = payload.attendees.pending;
             this.numAccepted = payload.attendees.accepted;
             this.numDeclined = payload.attendees.declined;
+        },
+
+        /**
+         * Filter search results by excluding already added guests
+         * @param results - the raw search results
+         */
+        filterSearchResults(results) {
+            const guestIds = this.guests.map((guest) => guest.id);
+            this.options = results.filter((result) => !guestIds.includes(result.id));
+        },
+
+        /**
+         * To handle the search results, filter out the selected users,
+         * and return the filtered list.
+         * @param json - the returned json
+         * @returns {Array} - filtered list of users
+         */
+        onSearchResponse(json) {
+            if (Array.isArray(json) && json.length > 0) {
+                this.filterSearchResults(json);
+            }
         },
 
         /**
@@ -626,13 +653,15 @@ export default {
                                 </template>
                             </v-select>
                             <search-select
-                                class="l-pad-m--bottom"
                                 v-model:selected="selected"
+                                v-model:results="options"
                                 :is-single-select="true"
                                 :endpoint="getEndpoint()"
                                 label="Invite Guests"
                                 label-id="userInvite"
                                 placeholder=""
+                                :manage-search-response="true"
+                                @search-response="onSearchResponse"
                             >
                                 <template #meta>
                                     <div class="meta">Search for people to invite</div>
