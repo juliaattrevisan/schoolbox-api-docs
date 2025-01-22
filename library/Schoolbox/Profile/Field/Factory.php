@@ -110,8 +110,6 @@ class Factory
                     return $startIsBeforeNow && $endIsAfterNow;
                 });
 
-                // todo restrict to school hours only? or are after-school clubs relevant too...
-
                 // Then map to only the data twig needs to render them
                 $currentEvents = $currentEvents->map(function ($event) {
                     // There are two possible event types, each has a different set of fields
