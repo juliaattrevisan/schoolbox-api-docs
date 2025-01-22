@@ -45,16 +45,16 @@ class Permissions
      */
     public function getServiceNameById(): array
     {
-        /* We don't need to list the HOMEPAGE service (1) here
-         * The TUTORIAL service (4) got deleted at some point
-         */
         return $this->userAccessMapper->getDatabase()->executeQuery(
             'SELECT id, name
             FROM lu_service
             WHERE id NOT IN (:homepageConst, :tutorialConst)
             ORDER BY name',
             [
+                // Exclude SERVICE_HOMEPAGE because it is special in that userAccess rows for SERVICE_HOMEPAGE represent
+                // group permissions, not service permissions (see User/Controller->getModify()).
                 'homepageConst' => UserAccess::SERVICE_HOMEPAGE,
+                // Exclude SERVICE_TUTORIAL because it is no longer used in code (but still exists in the database).
                 'tutorialConst' => self::SERVICE_TUTORIAL
             ]
         )->fetchColumnArray('name', 'id');
