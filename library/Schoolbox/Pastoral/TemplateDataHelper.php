@@ -86,6 +86,7 @@ class TemplateDataHelper
             'severities' => $this->config->get(ConfigMapper::NAME_PASTORAL_SEVERITY_ENABLED)
                 ? $this->pastoralSeverityMapper->findAll()
                 : [],
+            'expires'    => Pastoral\Type\TypeAbstract::PASTORAL_EXPIRY,
 
             // Requirements for displaying visibility inputs
             'allowIndividual' => $allowIndividual,
