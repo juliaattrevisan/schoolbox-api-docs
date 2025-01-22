@@ -56,10 +56,8 @@ $app = new class extends CliTool\App
 
 cron variant of sisImporter.php
 
-Import user profile data from third party endpoint into local schema.
-This is used by UPS to create user accounts.
-
-This also imports timetable data from third party endpoint into local schema.
+Import user profile and timetable data from third party endpoint into local schema.
+This is used by UPS to create user accounts and timetable information.
 
 This also imports calendar events from a third party endpoint, if it exists
 
