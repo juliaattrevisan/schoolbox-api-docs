@@ -16,6 +16,7 @@ use Schoolbox\User;
 use Schoolbox\UserMapper;
 use Alaress_Date_Format;
 use Calendar_Api_Factory;
+use Calendar_Layout_Full_Ajax_JSON;
 
 class Factory
 {
@@ -79,7 +80,18 @@ class Factory
          */
         if (!isset($mutatorIndex['currentLocation'])) {
             $mutatorIndex['currentLocation'] = function () use ($viewee, $viewer) {
-                // todo: permission checks
+                // Use the same permission check as the normal calendar view
+                try {
+                    Calendar_Layout_Full_Ajax_JSON::permissionCheck($viewee, $viewer);
+                } catch (\Exception $e) {
+                    return [];
+                }
+
+                // If the viewee's Hide Timetable is set, hide it from everyone (as per the calendar)
+                // OR if the viewer's viewStudentProfile is not set, hide the timetable from them
+                if ($viewee->getHideTimetable() || !$viewer->getRole()->getViewStudentProfile()) {
+                    return [];
+                }
 
                 $timetableCalendarApi = $this->calendarApiFactory->produceForTimetableEvents($viewee, $viewer);
 
