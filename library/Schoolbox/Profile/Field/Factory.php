@@ -80,8 +80,12 @@ class Factory
          */
         if (!isset($mutatorIndex['currentLocation'])) {
             $mutatorIndex['currentLocation'] = function () use ($viewee, $viewer) {
-                // Use the same permission check as the normal calendar view
-                // todo: perhaps we don't actually want this? what if a school wants students to *only* be able to see current location, not full timetable, of another user
+                /* Use the same permission check as the normal calendar view
+                 *
+                 * Notably this check prevents students or parents from ever seeing a staff's location,
+                 * since we have no way to allow them to see a full staff timetable...
+                 * The "student" and "parent" options in the profile editor are hence meaningless for staff profiles
+                 */
                 try {
                     Calendar_Layout_Full_Ajax_JSON::permissionCheck($viewee, $viewer);
                 } catch (\Exception $e) {
