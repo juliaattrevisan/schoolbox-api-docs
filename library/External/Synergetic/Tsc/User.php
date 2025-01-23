@@ -72,7 +72,7 @@ class External_Synergetic_Tsc_User extends External_Synergetic_User
                             WHERE     IEP.ID = vStudentsAll.ID AND
                             StartDate <= CURRENT_TIMESTAMP AND
                             (EndDate >= CURRENT_TIMESTAMP OR EndDate IS NULL)
-                        ) AS countIndividualEducationPlans
+                        ) AS countIndividualEducationPlans,
                         uLECaseManager.LECaseManagerID,
                         uLECaseManager.LECaseManagerName,
                         uLECaseManager.*
