@@ -13,6 +13,7 @@ parameters:
     excludePaths:
         - test/*/_generated/*
     inferPrivatePropertyTypeFromConstructor: true
+    treatPhpDocTypesAsCertain: false
 
 rules:
     - Alaress\PhpStan\Rule\PhpUnitTestName
