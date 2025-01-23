@@ -31,11 +31,6 @@ parameters:
 			path: library/Alaress/Async/Notification/Cloud/Google/GCM.php
 
 		-
-			message: "#^Call to function is_int\\(\\) with array\\<string\\> will always evaluate to false\\.$#"
-			count: 1
-			path: library/Alaress/Async/Notification/Cloud/Google/Response.php
-
-		-
 			message: "#^Comparison operation \"\\=\\=\" between \\(array\\|float\\|int\\) and 0 results in an error\\.$#"
 			count: 1
 			path: library/Alaress/Async/Notification/Cloud/Google/Response.php
@@ -44,16 +39,6 @@ parameters:
 			message: "#^PHPDoc tag @throws with type PHPUnit_Framework_AssertionFailedError is not subtype of Throwable$#"
 			count: 1
 			path: library/Alaress/Async/Test/Subscription.php
-
-		-
-			message: "#^Negated boolean expression is always false\\.$#"
-			count: 1
-			path: library/Alaress/Authorizer/Rule/IsUser.php
-
-		-
-			message: "#^Negated boolean expression is always false\\.$#"
-			count: 1
-			path: library/Alaress/Authorizer/Rule/LazyCallback.php
 
 		-
 			message: "#^Method Alaress\\\\Database\\\\Broker\\\\Base\\:\\:prepareQuery\\(\\) should return Alaress\\\\Database\\\\Statement\\\\Query\\\\IQuery but returns Alaress\\\\Database\\\\Statement\\\\Query\\\\Base\\.$#"
@@ -69,11 +54,6 @@ parameters:
 			message: "#^Method Alaress\\\\Database\\\\Connector\\\\Base\\:\\:getPort\\(\\) should return string but returns null\\.$#"
 			count: 1
 			path: library/Alaress/Database/Connector/Base.php
-
-		-
-			message: "#^Else branch is unreachable because previous condition is always true\\.$#"
-			count: 1
-			path: library/Alaress/Database/Iterator/Base.php
 
 		-
 			message: "#^Method Alaress\\\\Database\\\\Predicate\\\\Builder\\:\\:equals\\(\\) should return \\$this\\(Alaress\\\\Database\\\\Predicate\\\\Builder\\) but returns Alaress\\\\Database\\\\Predicate\\\\Builder\\.$#"
@@ -126,16 +106,6 @@ parameters:
 			path: library/Alaress/Database/Predicate/Builder.php
 
 		-
-			message: "#^Ternary operator condition is always true\\.$#"
-			count: 1
-			path: library/Alaress/Database/Quoter/Base.php
-
-		-
-			message: "#^Else branch is unreachable because previous condition is always true\\.$#"
-			count: 1
-			path: library/Alaress/Database/Statement/Base.php
-
-		-
 			message: "#^Property Alaress\\\\Database\\\\Statement\\\\Base\\:\\:\\$statement \\(PDOStatement\\) in empty\\(\\) is not falsy\\.$#"
 			count: 1
 			path: library/Alaress/Database/Statement/Base.php
@@ -154,11 +124,6 @@ parameters:
 			message: "#^Property Alaress\\\\Date\\\\DilatedClock\\:\\:\\$start \\(int\\) does not accept float\\.$#"
 			count: 1
 			path: library/Alaress/Date/DilatedClock.php
-
-		-
-			message: "#^Call to function is_null\\(\\) with DateTimeZone will always evaluate to false\\.$#"
-			count: 1
-			path: library/Alaress/Date/Format.php
 
 		-
 			message: "#^Method Alaress_Date_Format\\:\\:get12Hour\\(\\) should return int but returns string\\.$#"
@@ -203,11 +168,6 @@ parameters:
 		-
 			message: "#^Unsafe usage of new static\\(\\)\\.$#"
 			count: 6
-			path: library/Alaress/Date/Format.php
-
-		-
-			message: "#^Variable \\$inputDateFormat in isset\\(\\) always exists and is not nullable\\.$#"
-			count: 1
 			path: library/Alaress/Date/Format.php
 
 		-
@@ -256,11 +216,6 @@ parameters:
 			path: library/Alaress/Json/Decorator/Test/PropertyDecoratorTest.php
 
 		-
-			message: "#^Negated boolean expression is always false\\.$#"
-			count: 1
-			path: library/Alaress/Module/Module.php
-
-		-
 			message: "#^Method Alaress\\\\OAuth2\\\\Client\\\\Provider\\\\Office365\\:\\:createResourceOwner\\(\\) should return League\\\\OAuth2\\\\Client\\\\Provider\\\\ResourceOwnerInterface but return statement is missing\\.$#"
 			count: 1
 			path: library/Alaress/OAuth2/Client/Provider/Office365.php
@@ -271,11 +226,6 @@ parameters:
 			path: library/Alaress/OAuth2/Client/Provider/Office365.php
 
 		-
-			message: "#^Call to function is_int\\(\\) with string will always evaluate to false\\.$#"
-			count: 1
-			path: library/Alaress/ObjectReader.php
-
-		-
 			message: "#^Call to an undefined method DebugBar\\\\DataCollector\\\\DataCollectorInterface\\:\\:addMessage\\(\\)\\.$#"
 			count: 1
 			path: library/Alaress/Probe.php
@@ -284,11 +234,6 @@ parameters:
 			message: "#^Constructor of class Alaress_Probe has an unused parameter \\$_\\.$#"
 			count: 1
 			path: library/Alaress/Probe.php
-
-		-
-			message: "#^If condition is always true\\.$#"
-			count: 1
-			path: library/Alaress/Redis/Async/Client.php
 
 		-
 			message: "#^Method Alaress\\\\Redis\\\\Async\\\\Client\\:\\:castEvent\\(\\) should return Alaress\\\\Redis\\\\Async\\\\Event\\\\IEvent but returns null\\.$#"
@@ -331,16 +276,6 @@ parameters:
 			path: library/Alaress/Rules/Condition.php
 
 		-
-			message: "#^Else branch is unreachable because ternary operator condition is always true\\.$#"
-			count: 1
-			path: library/Alaress/Rules/Condition/In.php
-
-		-
-			message: "#^Call to function is_array\\(\\) with string will always evaluate to false\\.$#"
-			count: 1
-			path: library/Alaress/Rules/Token/Tokenizer.php
-
-		-
 			message: "#^Call to an undefined method Predis\\\\ClientInterface\\:\\:transaction\\(\\)\\.$#"
 			count: 1
 			path: library/Alaress/Scheduler/Cache/RedisCache.php
@@ -354,11 +289,6 @@ parameters:
 			message: "#^Method Alaress\\\\Scheduler\\\\Event\\\\BlankEvent\\:\\:getObject\\(\\) should return object but returns null\\.$#"
 			count: 1
 			path: library/Alaress/Scheduler/Event/BlankEvent.php
-
-		-
-			message: "#^Right side of && is always true\\.$#"
-			count: 1
-			path: library/Alaress/Scheduler/Trigger/AbstractTrigger.php
 
 		-
 			message: "#^Method Alaress\\\\Scheduler\\\\Trigger\\\\CancelTrigger\\:\\:getTimestamp\\(\\) should return int but returns null\\.$#"
@@ -376,19 +306,9 @@ parameters:
 			path: library/Alaress/Session/BaseSessionSegment.php
 
 		-
-			message: "#^Variable \\$name in isset\\(\\) always exists and is not nullable\\.$#"
-			count: 1
-			path: library/Alaress/Session/SegmentFactory.php
-
-		-
 			message: "#^Comparison operation \"\\<\" between \\(array\\|float\\|int\\) and int results in an error\\.$#"
 			count: 1
 			path: library/Alaress/Session/Session.php
-
-		-
-			message: "#^Unreachable statement \\- code above always terminates\\.$#"
-			count: 1
-			path: library/Alaress/Specification/NotEmpty.php
 
 		-
 			message: "#^Call to an undefined method DebugBar\\\\DataCollector\\\\DataCollectorInterface\\:\\:addMessage\\(\\)\\.$#"
@@ -431,19 +351,9 @@ parameters:
 			path: library/Alaress/WorkerCrew/Worker/Worker.php
 
 		-
-			message: "#^Right side of && is always true\\.$#"
-			count: 1
-			path: library/Alaress/WorkerCrew/Worker/Worker.php
-
-		-
 			message: "#^Return type \\(Alaress\\\\WorkerCrew\\\\Worker\\\\Worker\\) of method Alaress\\\\WorkerCrew\\\\Worker\\\\WorkerArray\\:\\:getPidWhere\\(\\) should be compatible with return type \\(int\\) of method Alaress\\\\WorkerCrew\\\\Worker\\\\WorkerBundleInterface\\:\\:getPidWhere\\(\\)$#"
 			count: 1
 			path: library/Alaress/WorkerCrew/Worker/WorkerArray.php
-
-		-
-			message: "#^Call to function is_scalar\\(\\) with array will always evaluate to false\\.$#"
-			count: 1
-			path: library/Alaress/Xml/Filter/Path.php
 
 		-
 			message: "#^Return type \\(SimpleXMLElement\\) of method Alaress\\\\Xml\\\\Map\\\\SimpleXml\\:\\:current\\(\\) should be compatible with return type \\(Alaress\\\\Xml\\\\State\\) of method Alaress\\\\Xml\\\\Map\\\\Base\\:\\:current\\(\\)$#"
@@ -479,11 +389,6 @@ parameters:
 			message: "#^Call to an undefined method Evaluation\\\\Import\\\\Parser\\\\IParser\\:\\:getWorkType\\(\\)\\.$#"
 			count: 2
 			path: library/Assess/Import/Xml.php
-
-		-
-			message: "#^Call to function is_numeric\\(\\) with bool will always evaluate to false\\.$#"
-			count: 1
-			path: library/Assess/Main.php
 
 		-
 			message: "#^Method Calendar\\:\\:delete\\(\\) should return bool but return statement is missing\\.$#"
@@ -569,11 +474,6 @@ parameters:
 			message: "#^Return type \\(null\\) of method Calendar\\\\Event\\\\Type\\\\EventBase\\:\\:getAuthorName\\(\\) should be compatible with return type \\(string\\) of method Calendar\\\\Event\\\\Type\\\\EventInterface\\:\\:getAuthorName\\(\\)$#"
 			count: 1
 			path: library/Calendar/Event/Type/EventBase.php
-
-		-
-			message: "#^Else branch is unreachable because previous condition is always true\\.$#"
-			count: 1
-			path: library/Calendar/Event/Type/ResourceBooking/Renderer/Javascript.php
 
 		-
 			message: "#^Access to an undefined property Sabre\\\\VObject\\\\Component\\\\VEvent\\:\\:\\$CATEGORIES\\.$#"
@@ -666,16 +566,6 @@ parameters:
 			path: library/Component/DefinitionMapper.php
 
 		-
-			message: "#^Left side of && is always true\\.$#"
-			count: 1
-			path: library/Component/Eportfolio/FileListController.php
-
-		-
-			message: "#^Right side of && is always true\\.$#"
-			count: 1
-			path: library/Component/Eportfolio/FileListController.php
-
-		-
 			message: "#^Ternary operator condition is always true\\.$#"
 			count: 1
 			path: library/Component/Eportfolio/FileListController.php
@@ -686,11 +576,6 @@ parameters:
 			path: library/Component/Homepage/EtherpadController.php
 
 		-
-			message: "#^Ternary operator condition is always true\\.$#"
-			count: 3
-			path: library/Component/Homepage/FileListController.php
-
-		-
 			message: "#^Call to an undefined method Schoolbox\\\\Mapper\\:\\:findForFolders\\(\\)\\.$#"
 			count: 1
 			path: library/Component/Homepage/ImageController.php
@@ -698,16 +583,6 @@ parameters:
 		-
 			message: "#^Access to an undefined property Xml\\:\\:\\$channel\\.$#"
 			count: 4
-			path: library/Component/Homepage/PodcastController.php
-
-		-
-			message: "#^Access to an undefined property object\\:\\:\\$description\\.$#"
-			count: 1
-			path: library/Component/Homepage/PodcastController.php
-
-		-
-			message: "#^Access to an undefined property object\\:\\:\\$title\\.$#"
-			count: 3
 			path: library/Component/Homepage/PodcastController.php
 
 		-
@@ -764,16 +639,6 @@ parameters:
 			message: "#^Variable \\$url might not be defined\\.$#"
 			count: 1
 			path: library/Component/Homepage/WolframController.php
-
-		-
-			message: "#^If condition is always true\\.$#"
-			count: 1
-			path: library/Component/InstanceMapper.php
-
-		-
-			message: "#^Left side of && is always true\\.$#"
-			count: 1
-			path: library/Custom/Dsfg/AchievementReport/Authorizer/Rule/IsExternalUser.php
 
 		-
 			message: "#^Property Custom\\\\Dsfg\\\\AchievementReport\\\\Base\\:\\:\\$currentYear \\(string\\) does not accept default value of type int\\.$#"
@@ -871,11 +736,6 @@ parameters:
 			path: library/Custom/Help/CourseParticipation/Handler.php
 
 		-
-			message: "#^Unreachable statement \\- code above always terminates\\.$#"
-			count: 1
-			path: library/Custom/Sk/NCEA/Availability.php
-
-		-
 			message: "#^Property Custom\\\\Sk\\\\NCEA\\\\Controller\\:\\:\\$errorMapper is never read, only written\\.$#"
 			count: 1
 			path: library/Custom/Sk/NCEA/Controller.php
@@ -884,11 +744,6 @@ parameters:
 			message: "#^PHPDoc tag @return with type Schoolbox\\\\Mapper is not subtype of native type Schoolbox\\\\UserMapper\\.$#"
 			count: 1
 			path: library/Custom/Tigs/Summative/ParticipationReport/Module.php
-
-		-
-			message: "#^If condition is always true\\.$#"
-			count: 1
-			path: library/Custom/Tigs/Summative/SubjectReport/Components/AbstractMatrix.php
 
 		-
 			message: "#^PHPDoc tag @var above a method has no effect\\.$#"
@@ -942,11 +797,6 @@ parameters:
 
 		-
 			message: "#^PHPDoc tag @return with type Schoolbox\\\\Mapper is not subtype of native type Schoolbox\\\\UserMapper\\.$#"
-			count: 1
-			path: library/Custom/Tigs/Summative/SubjectReport/Module.php
-
-		-
-			message: "#^Strict comparison using \\=\\=\\= between null and int\\|string will always evaluate to false\\.$#"
 			count: 1
 			path: library/Custom/Tigs/Summative/SubjectReport/Module.php
 
@@ -1036,27 +886,12 @@ parameters:
 			path: library/EOTC/EventConnector.php
 
 		-
-			message: "#^Instanceof between Schoolbox\\\\Calendar\\\\Relation\\\\Role and Schoolbox\\\\Role will always evaluate to false\\.$#"
-			count: 1
-			path: library/EOTC/EventMapper.php
-
-		-
 			message: "#^Binary operation \"\\*\" between \\-1 and string results in an error\\.$#"
 			count: 2
 			path: library/EOTC/EventMetadataNotifier.php
 
 		-
 			message: "#^Call to function is_numeric\\(\\) with null will always evaluate to false\\.$#"
-			count: 1
-			path: library/EOTC/Excursion/Connector.php
-
-		-
-			message: "#^If condition is always true\\.$#"
-			count: 1
-			path: library/EOTC/Excursion/Connector.php
-
-		-
-			message: "#^Unreachable statement \\- code above always terminates\\.$#"
 			count: 1
 			path: library/EOTC/Excursion/Connector.php
 
@@ -1081,24 +916,9 @@ parameters:
 			path: library/EOTC/ListGroup/PriorityChain.php
 
 		-
-			message: "#^If condition is always true\\.$#"
-			count: 1
-			path: library/EOTC/ListGroup/Type/Approved.php
-
-		-
 			message: "#^Method EOTC\\\\ListGroup\\\\Type\\\\Approved\\:\\:determine\\(\\) should return \\$this\\(EOTC\\\\ListGroup\\\\Type\\\\Approved\\)\\|null but returns EOTC\\\\ListGroup\\\\Response\\.$#"
 			count: 1
 			path: library/EOTC/ListGroup/Type/Approved.php
-
-		-
-			message: "#^Unreachable statement \\- code above always terminates\\.$#"
-			count: 1
-			path: library/EOTC/ListGroup/Type/Approved.php
-
-		-
-			message: "#^If condition is always true\\.$#"
-			count: 1
-			path: library/EOTC/ListGroup/Type/AwaitingFinalApproval.php
 
 		-
 			message: "#^Method EOTC\\\\ListGroup\\\\Type\\\\AwaitingFinalApproval\\:\\:determine\\(\\) should return \\$this\\(EOTC\\\\ListGroup\\\\Type\\\\AwaitingFinalApproval\\)\\|null but returns EOTC\\\\ListGroup\\\\Response\\.$#"
@@ -1106,59 +926,14 @@ parameters:
 			path: library/EOTC/ListGroup/Type/AwaitingFinalApproval.php
 
 		-
-			message: "#^Unreachable statement \\- code above always terminates\\.$#"
-			count: 1
-			path: library/EOTC/ListGroup/Type/AwaitingFinalApproval.php
-
-		-
-			message: "#^If condition is always true\\.$#"
-			count: 1
-			path: library/EOTC/ListGroup/Type/ConfirmRAMs.php
-
-		-
 			message: "#^Method EOTC\\\\ListGroup\\\\Type\\\\ConfirmRAMs\\:\\:determine\\(\\) should return \\$this\\(EOTC\\\\ListGroup\\\\Type\\\\ConfirmRAMs\\)\\|null but returns EOTC\\\\ListGroup\\\\Response\\.$#"
 			count: 1
 			path: library/EOTC/ListGroup/Type/ConfirmRAMs.php
 
 		-
-			message: "#^Unreachable statement \\- code above always terminates\\.$#"
-			count: 1
-			path: library/EOTC/ListGroup/Type/ConfirmRAMs.php
-
-		-
-			message: "#^If condition is always true\\.$#"
-			count: 1
-			path: library/EOTC/ListGroup/Type/PendingDetails.php
-
-		-
 			message: "#^Method EOTC\\\\ListGroup\\\\Type\\\\PendingDetails\\:\\:setAlternateNextStatusId\\(\\) is unused\\.$#"
 			count: 1
 			path: library/EOTC/ListGroup/Type/PendingDetails.php
-
-		-
-			message: "#^Unreachable statement \\- code above always terminates\\.$#"
-			count: 1
-			path: library/EOTC/ListGroup/Type/PendingDetails.php
-
-		-
-			message: "#^If condition is always true\\.$#"
-			count: 1
-			path: library/EOTC/ListGroup/Type/PendingInPrincipleReview.php
-
-		-
-			message: "#^Unreachable statement \\- code above always terminates\\.$#"
-			count: 1
-			path: library/EOTC/ListGroup/Type/PendingInPrincipleReview.php
-
-		-
-			message: "#^If condition is always true\\.$#"
-			count: 1
-			path: library/EOTC/ListGroup/Type/Rejected.php
-
-		-
-			message: "#^Unreachable statement \\- code above always terminates\\.$#"
-			count: 1
-			path: library/EOTC/ListGroup/Type/Rejected.php
 
 		-
 			message: "#^Return type \\(EOTC\\\\ListGroup\\\\Response\\) of method EOTC\\\\ListGroup\\\\Type\\\\Urgent\\:\\:determine\\(\\) should be compatible with return type \\(EOTC\\\\ListGroup\\\\Type\\\\Base\\) of method EOTC\\\\ListGroup\\\\Type\\\\Base\\:\\:determine\\(\\)$#"
@@ -1176,16 +951,6 @@ parameters:
 			path: library/Email.php
 
 		-
-			message: "#^Strict comparison using \\!\\=\\= between null and null will always evaluate to false\\.$#"
-			count: 1
-			path: library/Email.php
-
-		-
-			message: "#^Else branch is unreachable because previous condition is always true\\.$#"
-			count: 1
-			path: library/Eportfolio.php
-
-		-
 			message: "#^Method Eportfolio\\:\\:getSettingsPageId\\(\\) should return bool but returns int\\.$#"
 			count: 1
 			path: library/Eportfolio.php
@@ -1196,27 +961,12 @@ parameters:
 			path: library/Eportfolio.php
 
 		-
-			message: "#^Offset 'left_column_width' on array\\{left_column_width\\: float, right_column_width\\: float\\} in isset\\(\\) always exists and is not nullable\\.$#"
-			count: 1
-			path: library/Eportfolio.php
-
-		-
-			message: "#^Offset 'right_column_width' on array\\{left_column_width\\: float, right_column_width\\: float\\} in isset\\(\\) always exists and is not nullable\\.$#"
-			count: 1
-			path: library/Eportfolio.php
-
-		-
 			message: "#^Method Eportfolio_Page_Instance\\:\\:getColours\\(\\) should return array but returns null\\.$#"
 			count: 1
 			path: library/Eportfolio/Page/Instance.php
 
 		-
 			message: "#^Property Eportfolio_Page_Instance\\:\\:\\$colours \\(null\\) does not accept array\\.$#"
-			count: 1
-			path: library/Eportfolio/Page/Instance.php
-
-		-
-			message: "#^Variable \\$tabList in isset\\(\\) always exists and is not nullable\\.$#"
 			count: 1
 			path: library/Eportfolio/Page/Instance.php
 
@@ -1311,16 +1061,6 @@ parameters:
 			path: library/Evaluation/Answer/Signature.php
 
 		-
-			message: "#^Result of \\|\\| is always false\\.$#"
-			count: 1
-			path: library/Evaluation/Attempt.php
-
-		-
-			message: "#^If condition is always true\\.$#"
-			count: 1
-			path: library/Evaluation/Export/Graph.php
-
-		-
 			message: "#^Property Evaluation_Export_Graph\\:\\:\\$filterByQuestion \\(bool\\) does not accept int\\.$#"
 			count: 1
 			path: library/Evaluation/Export/Graph.php
@@ -1346,16 +1086,6 @@ parameters:
 			path: library/Evaluation/Question/Bank.php
 
 		-
-			message: "#^Result of && is always true\\.$#"
-			count: 1
-			path: library/Evaluation/Question/Category.php
-
-		-
-			message: "#^Negated boolean expression is always false\\.$#"
-			count: 1
-			path: library/External/Canvas/Sync/CliDatabaseCreator.php
-
-		-
 			message: "#^Ternary operator condition is always true\\.$#"
 			count: 1
 			path: library/External/Canvas/Sync/CliImporter.php
@@ -1364,16 +1094,6 @@ parameters:
 			message: "#^Property External\\\\Canvas\\\\Sync\\\\ImportStage\\\\CourseAssignments\\:\\:\\$accountBridge is unused\\.$#"
 			count: 1
 			path: library/External/Canvas/Sync/ImportStage/CourseAssignments.php
-
-		-
-			message: "#^Result of \\|\\| is always true\\.$#"
-			count: 2
-			path: library/External/Canvas/Sync/ImportStage/CourseQuiz.php
-
-		-
-			message: "#^Negated boolean expression is always false\\.$#"
-			count: 1
-			path: library/External/Canvas/Sync/ImportStage/SectionAssessmentAbstract.php
 
 		-
 			message: "#^Method External\\\\Canvas\\\\Sync\\\\ImportStage\\\\SectionQuiz\\:\\:findAssessableImpl\\(\\) should return Schoolbox\\\\Assessment\\\\Component\\\\SubmissionBox\\|null but returns Schoolbox\\\\Learning\\\\Quiz\\\\Model\\.$#"
@@ -1412,11 +1132,6 @@ parameters:
 
 		-
 			message: "#^Method External_Doublefirst_User\\:\\:setDatabase\\(\\) is unused\\.$#"
-			count: 1
-			path: library/External/Doublefirst/User.php
-
-		-
-			message: "#^Unreachable statement \\- code above always terminates\\.$#"
 			count: 1
 			path: library/External/Doublefirst/User.php
 
@@ -1461,19 +1176,9 @@ parameters:
 			path: library/External/Pcschools/User.php
 
 		-
-			message: "#^Unreachable statement \\- code above always terminates\\.$#"
-			count: 1
-			path: library/External/Schoolbox/Timetable.php
-
-		-
 			message: "#^Return type \\(bool\\) of method External_Schoolpro_Timetable\\:\\:getDayNumber\\(\\) should be compatible with return type \\(int\\) of method External_TimetableInterface\\:\\:getDayNumber\\(\\)$#"
 			count: 1
 			path: library/External/Schoolpro/Timetable.php
-
-		-
-			message: "#^Else branch is unreachable because ternary operator condition is always true\\.$#"
-			count: 2
-			path: library/External/Synergetic/Class.php
 
 		-
 			message: "#^Method External_Synergetic_Class\\:\\:setDatabase\\(\\) is unused\\.$#"
@@ -1489,31 +1194,6 @@ parameters:
 			message: "#^Constant External_Synergetic_Markbook\\:\\:NORMALISED is unused\\.$#"
 			count: 1
 			path: library/External/Synergetic/Markbook.php
-
-		-
-			message: "#^If condition is always true\\.$#"
-			count: 1
-			path: library/External/Synergetic/Pastoral.php
-
-		-
-			message: "#^Negated boolean expression is always false\\.$#"
-			count: 1
-			path: library/External/Synergetic/Pastoral.php
-
-		-
-			message: "#^Unreachable statement \\- code above always terminates\\.$#"
-			count: 1
-			path: library/External/Synergetic/Pastoral.php
-
-		-
-			message: "#^Else branch is unreachable because ternary operator condition is always true\\.$#"
-			count: 1
-			path: library/External/Synergetic/Scc/Class.php
-
-		-
-			message: "#^Else branch is unreachable because ternary operator condition is always true\\.$#"
-			count: 1
-			path: library/External/Synergetic/Smcs/Class.php
 
 		-
 			message: "#^Method External_Synergetic_Timetable\\:\\:setDatabase\\(\\) is unused\\.$#"
@@ -1532,11 +1212,6 @@ parameters:
 
 		-
 			message: "#^Static property External_Synergetic_User\\:\\:\\$fileYearSemesterDefault \\(array\\) in isset\\(\\) is not nullable\\.$#"
-			count: 1
-			path: library/External/Synergetic/User.php
-
-		-
-			message: "#^Unreachable statement \\- code above always terminates\\.$#"
 			count: 1
 			path: library/External/Synergetic/User.php
 
@@ -1561,16 +1236,6 @@ parameters:
 			path: library/External/Tass/Api/ModelFactory.php
 
 		-
-			message: "#^Strict comparison using \\=\\=\\= between array and 'Y' will always evaluate to false\\.$#"
-			count: 1
-			path: library/External/Tass/Api/ModelFactory.php
-
-		-
-			message: "#^Strict comparison using \\=\\=\\= between null and int\\|string will always evaluate to false\\.$#"
-			count: 2
-			path: library/External/Tass/Api/ModelFactory.php
-
-		-
 			message: "#^Method External_Tass_Helper\\:\\:setDatabase\\(\\) is unused\\.$#"
 			count: 1
 			path: library/External/Tass/Helper.php
@@ -1581,34 +1246,9 @@ parameters:
 			path: library/External/Tass/Helper.php
 
 		-
-			message: "#^Else branch is unreachable because previous condition is always true\\.$#"
-			count: 1
-			path: library/External/Tass/User.php
-
-		-
-			message: "#^Negated boolean expression is always false\\.$#"
-			count: 1
-			path: library/External/Timetable.php
-
-		-
-			message: "#^Strict comparison using \\=\\=\\= between int and false will always evaluate to false\\.$#"
-			count: 1
-			path: library/External/Timetable.php
-
-		-
-			message: "#^Strict comparison using \\=\\=\\= between int and false will always evaluate to false\\.$#"
-			count: 1
-			path: library/External/TimetableDatePeriod.php
-
-		-
 			message: "#^PHPDoc tag @var above a method has no effect\\.$#"
 			count: 1
 			path: library/External/UserInterface.php
-
-		-
-			message: "#^Else branch is unreachable because ternary operator condition is always true\\.$#"
-			count: 5
-			path: library/Feed.php
 
 		-
 			message: "#^Parameter \\#3 \\$previous \\(null\\) of method HouseMapper\\:\\:raiseNotification\\(\\) should be compatible with parameter \\$previous \\(object\\) of method Schoolbox\\\\Mapper\\:\\:raiseNotification\\(\\)$#"
@@ -1619,11 +1259,6 @@ parameters:
 			message: "#^Parameter \\#3 \\$previous \\(null\\) of method HouseResidentialMapper\\:\\:raiseNotification\\(\\) should be compatible with parameter \\$previous \\(object\\) of method Schoolbox\\\\Mapper\\:\\:raiseNotification\\(\\)$#"
 			count: 1
 			path: library/HouseResidentialMapper.php
-
-		-
-			message: "#^Call to function is_array\\(\\) with string will always evaluate to false\\.$#"
-			count: 1
-			path: library/HtmlTemplate.php
 
 		-
 			message: "#^Method HtmlTemplate\\:\\:_filename\\(\\) should return string but returns bool\\.$#"
@@ -1641,11 +1276,6 @@ parameters:
 			path: library/HtmlTemplate.php
 
 		-
-			message: "#^Unreachable statement \\- code above always terminates\\.$#"
-			count: 1
-			path: library/PortfolioWebDAV.php
-
-		-
 			message: "#^Variable \\$response might not be defined\\.$#"
 			count: 1
 			path: library/PortfolioWebDAV.php
@@ -1659,11 +1289,6 @@ parameters:
 			message: "#^Method Proxy\\\\Server\\:\\:isAuthenticated\\(\\) should return bool but returns null\\.$#"
 			count: 1
 			path: library/Proxy/Server.php
-
-		-
-			message: "#^Strict comparison using \\=\\=\\= between null and string will always evaluate to false\\.$#"
-			count: 1
-			path: library/ReCaptcha.php
 
 		-
 			message: "#^Method Report_Abstract\\:\\:getExternalUserHandler\\(\\) should return External_UserInterface but returns null\\.$#"
@@ -1736,11 +1361,6 @@ parameters:
 			path: library/Report/Login.php
 
 		-
-			message: "#^Strict comparison using \\=\\=\\= between array and false will always evaluate to false\\.$#"
-			count: 1
-			path: library/Report/Parent.php
-
-		-
 			message: "#^If condition is always true\\.$#"
 			count: 1
 			path: library/Schoolbox/API/Translator/ArrayToModel/Base.php
@@ -1749,6 +1369,11 @@ parameters:
 			message: "#^Binary operation \"\\*\" between string and 1024 results in an error\\.$#"
 			count: 1
 			path: library/Schoolbox/Admin/Home/Controller.php
+
+		-
+			message: "#^Property Schoolbox\\\\Admin\\\\Service\\\\Controller\\:\\:\\$errorMapper is never read, only written\\.$#"
+			count: 1
+			path: library/Schoolbox/Admin/Service/Controller.php
 
 		-
 			message: "#^If condition is always true\\.$#"
@@ -1781,16 +1406,6 @@ parameters:
 			path: library/Schoolbox/Application/CliTool/Kernel.php
 
 		-
-			message: "#^Negated boolean expression is always false\\.$#"
-			count: 1
-			path: library/Schoolbox/Application/CliTool/PdfGenerator/App.php
-
-		-
-			message: "#^Call to function is_null\\(\\) with bool will always evaluate to false\\.$#"
-			count: 1
-			path: library/Schoolbox/Application/WebRequest/Kernel.php
-
-		-
 			message: "#^Method Schoolbox\\\\Assessment\\\\Component\\\\SubmissionBox\\\\ReturnedWorkMapper\\:\\:getSubmissionBoxMapper\\(\\) should return Schoolbox\\\\Assessment\\\\Component\\\\SubmissionBoxMapper but returns Schoolbox\\\\Mapper\\.$#"
 			count: 1
 			path: library/Schoolbox/Assessment/Component/SubmissionBox/ReturnedWorkMapper.php
@@ -1812,11 +1427,6 @@ parameters:
 
 		-
 			message: "#^PHPDoc tag @return with type Schoolbox\\\\Mapper is not subtype of native type Schoolbox\\\\Assessment\\\\Component\\\\SubmissionBoxMapper\\.$#"
-			count: 1
-			path: library/Schoolbox/Assessment/Component/SubmissionBox/Submission/SubmissionMapper.php
-
-		-
-			message: "#^Strict comparison using \\=\\=\\= between iterable\\<Schoolbox\\\\Assessment\\\\Component\\\\SubmissionBox\\\\Submission\\\\SingleFile\\\\Model\\>&Schoolbox\\\\Collection and null will always evaluate to false\\.$#"
 			count: 1
 			path: library/Schoolbox/Assessment/Component/SubmissionBox/Submission/SubmissionMapper.php
 
@@ -1876,11 +1486,6 @@ parameters:
 			path: library/Schoolbox/Assessment/Course/Import/DataTransferObject.php
 
 		-
-			message: "#^Strict comparison using \\=\\=\\= between null and int will always evaluate to false\\.$#"
-			count: 1
-			path: library/Schoolbox/Assessment/Course/Import/DataTransferObject.php
-
-		-
 			message: "#^Method Schoolbox\\\\Assessment\\\\Course\\\\Markbook\\\\CourseMarkbook\\:\\:getAssessmentImplAverages\\(\\) should return array\\<array\\<float\\>\\> but returns array\\<float\\>\\.$#"
 			count: 1
 			path: library/Schoolbox/Assessment/Course/Markbook/CourseMarkbook.php
@@ -1891,19 +1496,9 @@ parameters:
 			path: library/Schoolbox/Assessment/Course/Markbook/CourseMarkbook.php
 
 		-
-			message: "#^Negated boolean expression is always false\\.$#"
-			count: 1
-			path: library/Schoolbox/Assessment/Course/Markbook/CourseMarkbook.php
-
-		-
 			message: "#^PHPDoc tag @return with type Schoolbox\\\\Mapper is not subtype of native type Schoolbox\\\\Learning\\\\Course\\\\DataModel\\\\Specification\\\\Mapper\\.$#"
 			count: 1
 			path: library/Schoolbox/Assessment/Course/Markbook/Module.php
-
-		-
-			message: "#^Negated boolean expression is always false\\.$#"
-			count: 2
-			path: library/Schoolbox/Assessment/Course/Markbook/SortForCourseMarkbook.php
 
 		-
 			message: "#^Variable \\$userMapper in PHPDoc tag @var does not exist\\.$#"
@@ -1946,11 +1541,6 @@ parameters:
 			path: library/Schoolbox/Assessment/Rubric/DataModel/Result/Model.php
 
 		-
-			message: "#^Else branch is unreachable because ternary operator condition is always true\\.$#"
-			count: 1
-			path: library/Schoolbox/Assessment/Rubric/Grid/Importer/AbstractCsvImporterFactory.php
-
-		-
 			message: "#^Property Schoolbox\\\\Assessment\\\\Rubric\\\\Grid\\\\Importer\\\\GenericImporter\\:\\:\\$capabilities \\(array\\) in isset\\(\\) is not nullable\\.$#"
 			count: 1
 			path: library/Schoolbox/Assessment/Rubric/Grid/Importer/GenericImporter.php
@@ -1959,11 +1549,6 @@ parameters:
 			message: "#^Ternary operator condition is always true\\.$#"
 			count: 1
 			path: library/Schoolbox/Assessment/Rubric/Grid/Importer/GenericImporter.php
-
-		-
-			message: "#^If condition is always true\\.$#"
-			count: 1
-			path: library/Schoolbox/Assessment/Rubric/MarkedGrid/Test/Generator.php
 
 		-
 			message: "#^Method Schoolbox\\\\Assessment\\\\Term\\\\Model\\:\\:getYearLevels\\(\\) should return \\(iterable\\<Schoolbox\\\\YearLevel\\\\Model\\>&Schoolbox\\\\GenericCollection\\)\\|null but returns array\\<Schoolbox\\\\YearLevel\\\\Model\\>\\|null\\.$#"
@@ -2021,37 +1606,12 @@ parameters:
 			path: library/Schoolbox/Calendar/Event.php
 
 		-
-			message: "#^If condition is always true\\.$#"
-			count: 2
-			path: library/Schoolbox/Calendar/Event/Access.php
-
-		-
 			message: "#^Property Schoolbox\\\\Calendar\\\\EventLevel\\:\\:\\$id \\(int\\) does not accept default value of type string\\.$#"
 			count: 1
 			path: library/Schoolbox/Calendar/EventLevel.php
 
 		-
-			message: "#^Else branch is unreachable because previous condition is always true\\.$#"
-			count: 1
-			path: library/Schoolbox/Calendar/EventMapper.php
-
-		-
-			message: "#^Instanceof between Schoolbox\\\\Calendar\\\\Relation\\\\Role and Schoolbox\\\\Role will always evaluate to false\\.$#"
-			count: 1
-			path: library/Schoolbox/Calendar/EventMapper.php
-
-		-
-			message: "#^Else branch is unreachable because ternary operator condition is always true\\.$#"
-			count: 1
-			path: library/Schoolbox/Calendar/EventNotifier.php
-
-		-
 			message: "#^If condition is always true\\.$#"
-			count: 1
-			path: library/Schoolbox/Calendar/EventNotifier.php
-
-		-
-			message: "#^Result of \\|\\| is always true\\.$#"
 			count: 1
 			path: library/Schoolbox/Calendar/EventNotifier.php
 
@@ -2106,44 +1666,9 @@ parameters:
 			path: library/Schoolbox/Collection.php
 
 		-
-			message: "#^Strict comparison using \\=\\=\\= between float\\|null and '' will always evaluate to false\\.$#"
-			count: 1
-			path: library/Schoolbox/Column/Decimal.php
-
-		-
-			message: "#^Negated boolean expression is always false\\.$#"
-			count: 1
-			path: library/Schoolbox/Column/Model.php
-
-		-
-			message: "#^Variable \\$id_property in isset\\(\\) always exists and is not nullable\\.$#"
-			count: 3
-			path: library/Schoolbox/Column/Model.php
-
-		-
 			message: "#^Method Schoolbox\\\\Comms\\\\News\\\\Audience\\\\Mapper\\:\\:getInstance\\(\\) should return static\\(Schoolbox\\\\Comms\\\\News\\\\Audience\\\\Mapper\\) but returns Schoolbox\\\\Comms\\\\News\\\\Audience\\\\Mapper\\.$#"
 			count: 1
 			path: library/Schoolbox/Comms/News/Audience/Mapper.php
-
-		-
-			message: "#^Negated boolean expression is always false\\.$#"
-			count: 1
-			path: library/Schoolbox/Comms/News/Audience/Mapper.php
-
-		-
-			message: "#^Negated boolean expression is always false\\.$#"
-			count: 1
-			path: library/Schoolbox/Comms/News/Audience/Segment/Strategy/Folder.php
-
-		-
-			message: "#^Strict comparison using \\=\\=\\= between HouseResidential and null will always evaluate to false\\.$#"
-			count: 1
-			path: library/Schoolbox/Comms/News/Audience/Segment/Strategy/ResHouse.php
-
-		-
-			message: "#^Ternary operator condition is always true\\.$#"
-			count: 1
-			path: library/Schoolbox/Comms/News/Audience/Segment/Strategy/RoleType.php
 
 		-
 			message: "#^Parameter \\#1 \\$users \\(iterable\\<Schoolbox\\\\Comms\\\\News\\\\Audience\\\\Segment\\\\Strategy\\\\User\\>&Schoolbox\\\\GenericCollection\\) of method Schoolbox\\\\Comms\\\\News\\\\Audience\\\\Segment\\\\Strategy\\\\User\\:\\:getValues\\(\\) should be compatible with parameter \\$users \\(iterable\\<Schoolbox\\\\User\\>&Schoolbox\\\\GenericCollection\\) of method Schoolbox\\\\Comms\\\\News\\\\Audience\\\\Segment\\\\ISimpleStrategy\\:\\:getValues\\(\\)$#"
@@ -2226,16 +1751,6 @@ parameters:
 			path: library/Schoolbox/Comms/News/Module.php
 
 		-
-			message: "#^Negated boolean expression is always false\\.$#"
-			count: 2
-			path: library/Schoolbox/Comms/News/Notifier.php
-
-		-
-			message: "#^Result of && is always false\\.$#"
-			count: 1
-			path: library/Schoolbox/Comms/News/Notifier.php
-
-		-
 			message: "#^Method Schoolbox\\\\Comms\\\\News\\\\Querystring\\:\\:toArray\\(\\) should return array\\<string\\|null\\> but returns ArrayAccess\\.$#"
 			count: 1
 			path: library/Schoolbox/Comms/News/Querystring.php
@@ -2244,11 +1759,6 @@ parameters:
 			message: "#^Property Schoolbox\\\\Comms\\\\News\\\\Querystring\\:\\:\\$querystring \\(ArrayAccess\\) does not accept array\\<string, mixed\\>\\.$#"
 			count: 1
 			path: library/Schoolbox/Comms/News/Querystring.php
-
-		-
-			message: "#^Left side of && is always true\\.$#"
-			count: 1
-			path: library/Schoolbox/Comms/News/Statistics/Interactions.php
 
 		-
 			message: "#^Variable \\$statistic might not be defined\\.$#"
@@ -2319,16 +1829,6 @@ parameters:
 			message: "#^Property Schoolbox\\\\Discussion\\\\Comment\\\\Controller\\:\\:\\$threadMapper is never read, only written\\.$#"
 			count: 1
 			path: library/Schoolbox/Discussion/Comment/Controller.php
-
-		-
-			message: "#^If condition is always true\\.$#"
-			count: 1
-			path: library/Schoolbox/Discussion/Comment/Model.php
-
-		-
-			message: "#^Negated boolean expression is always false\\.$#"
-			count: 2
-			path: library/Schoolbox/Discussion/Thread/Controller.php
 
 		-
 			message: "#^Dead catch \\- RuntimeException is never thrown in the try block\\.$#"
@@ -2491,16 +1991,6 @@ parameters:
 			path: library/Schoolbox/External/Connector/Schoolpro/Base/StaffIterator.php
 
 		-
-			message: "#^Call to function is_array\\(\\) with int will always evaluate to false\\.$#"
-			count: 1
-			path: library/Schoolbox/External/Connector/Schoolpro/Base/StudentIterator.php
-
-		-
-			message: "#^Unreachable statement \\- code above always terminates\\.$#"
-			count: 1
-			path: library/Schoolbox/External/Connector/Schoolpro/Base/StudentIterator.php
-
-		-
 			message: "#^Method Schoolbox\\\\External\\\\Connector\\\\Schoolpro\\\\Base\\\\Sync\\:\\:findAllParents\\(\\) should return array\\<Schoolbox\\\\External\\\\Normalise\\\\User\\\\Guardian\\> but returns Schoolbox\\\\External\\\\Connector\\\\Schoolpro\\\\Base\\\\GuardianIterator\\.$#"
 			count: 1
 			path: library/Schoolbox/External/Connector/Schoolpro/Base/Sync.php
@@ -2621,11 +2111,6 @@ parameters:
 			path: library/Schoolbox/External/Importer/User/Hydrator/ToggleField.php
 
 		-
-			message: "#^Variable \\$value in isset\\(\\) always exists and is not nullable\\.$#"
-			count: 1
-			path: library/Schoolbox/External/Importer/User/Hydrator/ToggleField.php
-
-		-
 			message: "#^Call to an undefined method External_UserInterface\\:\\:getStudentBoarderContactListExtended\\(\\)\\.$#"
 			count: 1
 			path: library/Schoolbox/External/Normalise/User/Adapter.php
@@ -2634,11 +2119,6 @@ parameters:
 			message: "#^Method Schoolbox\\\\External\\\\Normalise\\\\User\\\\Adapter\\:\\:getCurrentYear\\(\\) should return int but returns string\\|null\\.$#"
 			count: 1
 			path: library/Schoolbox/External/Normalise/User/Adapter.php
-
-		-
-			message: "#^Else branch is unreachable because ternary operator condition is always true\\.$#"
-			count: 1
-			path: library/Schoolbox/External/Normalise/User/Base.php
 
 		-
 			message: "#^Property Schoolbox\\\\External\\\\Normalise\\\\User\\\\Base\\:\\:\\$email \\(Schoolbox\\\\Collection\\) does not accept default value of type string\\.$#"
@@ -2676,51 +2156,6 @@ parameters:
 			path: library/Schoolbox/External/Normalise/User/Staff.php
 
 		-
-			message: "#^If condition is always true\\.$#"
-			count: 1
-			path: library/Schoolbox/External/Profile/Parent/Mapper.php
-
-		-
-			message: "#^Left side of && is always true\\.$#"
-			count: 1
-			path: library/Schoolbox/External/Profile/Parent/Mapper.php
-
-		-
-			message: "#^Right side of && is always true\\.$#"
-			count: 1
-			path: library/Schoolbox/External/Profile/Parent/Mapper.php
-
-		-
-			message: "#^If condition is always true\\.$#"
-			count: 1
-			path: library/Schoolbox/External/Profile/Staff/Mapper.php
-
-		-
-			message: "#^Left side of && is always true\\.$#"
-			count: 1
-			path: library/Schoolbox/External/Profile/Staff/Mapper.php
-
-		-
-			message: "#^Right side of && is always true\\.$#"
-			count: 1
-			path: library/Schoolbox/External/Profile/Staff/Mapper.php
-
-		-
-			message: "#^If condition is always true\\.$#"
-			count: 1
-			path: library/Schoolbox/External/Profile/Student/Mapper.php
-
-		-
-			message: "#^Left side of && is always true\\.$#"
-			count: 1
-			path: library/Schoolbox/External/Profile/Student/Mapper.php
-
-		-
-			message: "#^Right side of && is always true\\.$#"
-			count: 1
-			path: library/Schoolbox/External/Profile/Student/Mapper.php
-
-		-
 			message: "#^Unsafe usage of new static\\(\\)\\.$#"
 			count: 1
 			path: library/Schoolbox/Filter/AbstractIdFinder.php
@@ -2729,16 +2164,6 @@ parameters:
 			message: "#^Method Schoolbox\\\\Filter\\\\BaseComponent\\:\\:toContext\\(\\) should return array\\<Schoolbox\\\\Filter\\\\Selection\\\\Model\\> but returns array\\<string, array\\|bool\\|\\(iterable\\<Schoolbox\\\\Filter\\\\Selection\\\\Model\\>&Schoolbox\\\\GenericCollection\\)\\|Schoolbox\\\\Filter\\\\IDefinition\\>\\.$#"
 			count: 1
 			path: library/Schoolbox/Filter/BaseComponent.php
-
-		-
-			message: "#^Instanceof between array\\<Schoolbox\\\\Filter\\\\Selection\\\\Model\\> and Schoolbox\\\\Collection will always evaluate to false\\.$#"
-			count: 1
-			path: library/Schoolbox/Filter/Codec.php
-
-		-
-			message: "#^Unreachable statement \\- code above always terminates\\.$#"
-			count: 1
-			path: library/Schoolbox/Filter/Codec.php
 
 		-
 			message: "#^Property Schoolbox\\\\Filter\\\\Controller\\:\\:\\$rosettaStone is never read, only written\\.$#"
@@ -2791,21 +2216,6 @@ parameters:
 			path: library/Schoolbox/Filter/Filters/Assessment/Folder/KeyConverter.php
 
 		-
-			message: "#^Instanceof between array\\<int\\>\\|null and Schoolbox\\\\Collection will always evaluate to false\\.$#"
-			count: 23
-			path: library/Schoolbox/Filter/Filters/Assessment/IdFinder.php
-
-		-
-			message: "#^Result of && is always false\\.$#"
-			count: 26
-			path: library/Schoolbox/Filter/Filters/Assessment/IdFinder.php
-
-		-
-			message: "#^Strict comparison using \\=\\=\\= between null and int will always evaluate to false\\.$#"
-			count: 1
-			path: library/Schoolbox/Filter/Filters/Assessment/IdFinder.php
-
-		-
 			message: "#^Property Schoolbox\\\\Filter\\\\Filters\\\\Assessment\\\\MarkPerCap\\\\Definition\\:\\:\\$rosettaStone is never read, only written\\.$#"
 			count: 1
 			path: library/Schoolbox/Filter/Filters/Assessment/MarkPerCap/Definition.php
@@ -2826,11 +2236,6 @@ parameters:
 			path: library/Schoolbox/Filter/Filters/Assessment/RubricUsage/Component.php
 
 		-
-			message: "#^Left side of && is always true\\.$#"
-			count: 4
-			path: library/Schoolbox/Filter/Filters/Assessment/Term/Component.php
-
-		-
 			message: "#^Property Schoolbox\\\\Filter\\\\Filters\\\\Assessment\\\\Term\\\\KeyConverter\\:\\:\\$termIds \\(iterable\\<int\\>&Schoolbox\\\\GenericCollection\\) does not accept iterable\\<int\\>&Schoolbox\\\\Collection\\.$#"
 			count: 1
 			path: library/Schoolbox/Filter/Filters/Assessment/Term/KeyConverter.php
@@ -2839,11 +2244,6 @@ parameters:
 			message: "#^Property Schoolbox\\\\Filter\\\\Filters\\\\Badge\\\\CurriculumNode\\\\Factory\\:\\:\\$curriculumTaggingEnabled is never read, only written\\.$#"
 			count: 1
 			path: library/Schoolbox/Filter/Filters/Badge/CurriculumNode/Factory.php
-
-		-
-			message: "#^Strict comparison using \\=\\=\\= between Schoolbox\\\\Collection and null will always evaluate to false\\.$#"
-			count: 2
-			path: library/Schoolbox/Filter/Filters/Event/Matcher.php
 
 		-
 			message: "#^PHPDoc tag @var above a method has no effect\\.$#"
@@ -2871,11 +2271,6 @@ parameters:
 			path: library/Schoolbox/Fixtures/Landing/Module.php
 
 		-
-			message: "#^Else branch is unreachable because previous condition is always true\\.$#"
-			count: 1
-			path: library/Schoolbox/Fixtures/Matchup/Notifier.php
-
-		-
 			message: "#^Call to an undefined method Alaress\\\\Async\\\\Notification\\\\Instance\\\\BuilderInterface\\:\\:setNamespace\\(\\)\\.$#"
 			count: 1
 			path: library/Schoolbox/Fixtures/Matchup/Notifier/Helper.php
@@ -2886,24 +2281,9 @@ parameters:
 			path: library/Schoolbox/Fixtures/Sport/Controller.php
 
 		-
-			message: "#^Strict comparison using \\=\\=\\= between iterable\\<Schoolbox\\\\Fixtures\\\\Position\\\\Model\\>&Schoolbox\\\\Collection and null will always evaluate to false\\.$#"
-			count: 1
-			path: library/Schoolbox/Fixtures/Sport/Mapper.php
-
-		-
 			message: "#^Method Schoolbox\\\\Fixtures\\\\Team\\\\Helper\\\\Translator\\:\\:collectPlayers\\(\\) should return array\\<Schoolbox\\\\User\\> but returns iterable\\<Schoolbox\\\\User\\>&Schoolbox\\\\Collection\\.$#"
 			count: 1
 			path: library/Schoolbox/Fixtures/Team/Helper/Translator.php
-
-		-
-			message: "#^Else branch is unreachable because previous condition is always true\\.$#"
-			count: 1
-			path: library/Schoolbox/Fixtures/Team/Metadata/Metadata.php
-
-		-
-			message: "#^Instanceof between Schoolbox\\\\Fixtures\\\\Team\\\\Position\\\\Model and Schoolbox\\\\Fixtures\\\\Team\\\\Position\\\\Participant\\\\Model will always evaluate to false\\.$#"
-			count: 1
-			path: library/Schoolbox/Fixtures/Team/Metadata/Metadata.php
 
 		-
 			message: "#^Variable \\$teamMapper in PHPDoc tag @var does not exist\\.$#"
@@ -2971,11 +2351,6 @@ parameters:
 			path: library/Schoolbox/Learning/Analytics/CohortAnalysis.php
 
 		-
-			message: "#^Left side of && is always true\\.$#"
-			count: 1
-			path: library/Schoolbox/Learning/Assessment/AbstractAssessment.php
-
-		-
 			message: "#^Unsafe usage of new static\\(\\)\\.$#"
 			count: 1
 			path: library/Schoolbox/Learning/Assessment/AssessmentContextType.php
@@ -3001,11 +2376,6 @@ parameters:
 			path: library/Schoolbox/Learning/Assessment/Controller.php
 
 		-
-			message: "#^Left side of && is always true\\.$#"
-			count: 1
-			path: library/Schoolbox/Learning/Assessment/DataModel/Mapper.php
-
-		-
 			message: "#^Method Schoolbox\\\\Learning\\\\Assessment\\\\DataModel\\\\Mapper\\:\\:findAllForFolderId\\(\\) should return iterable\\<Schoolbox\\\\Learning\\\\Assessment\\\\DataModel\\\\Model\\>&Schoolbox\\\\Collection but returns iterable\\<Schoolbox\\\\Learning\\\\Assessment\\\\IAssessable\\>&Schoolbox\\\\GenericCollection\\.$#"
 			count: 1
 			path: library/Schoolbox/Learning/Assessment/DataModel/Mapper.php
@@ -3016,19 +2386,9 @@ parameters:
 			path: library/Schoolbox/Learning/Assessment/DataModel/Mapper.php
 
 		-
-			message: "#^Unreachable statement \\- code above always terminates\\.$#"
-			count: 1
-			path: library/Schoolbox/Learning/Assessment/DataModel/Mapper.php
-
-		-
 			message: "#^Method Schoolbox\\\\Learning\\\\Assessment\\\\DataModel\\\\Model\\:\\:getWeight\\(\\) should return int but returns float\\.$#"
 			count: 1
 			path: library/Schoolbox/Learning/Assessment/DataModel/Model.php
-
-		-
-			message: "#^Strict comparison using \\=\\=\\= between array and null will always evaluate to false\\.$#"
-			count: 1
-			path: library/Schoolbox/Learning/Assessment/DataModel/NotifierProxy.php
 
 		-
 			message: "#^Call to an undefined method Schoolbox\\\\Learning\\\\Assessment\\\\DataModel\\\\IAssessableDataModel\\:\\:addAttachment\\(\\)\\.$#"
@@ -3456,26 +2816,6 @@ parameters:
 			path: library/Schoolbox/Learning/Assessment/DataModel/Translator/DueWork.php
 
 		-
-			message: "#^Strict comparison using \\=\\=\\= between null and Schoolbox\\\\User will always evaluate to false\\.$#"
-			count: 1
-			path: library/Schoolbox/Learning/Assessment/DataModel/Translator/DueWork.php
-
-		-
-			message: "#^Strict comparison using \\=\\=\\= between null and float will always evaluate to false\\.$#"
-			count: 1
-			path: library/Schoolbox/Learning/Assessment/DataModel/Translator/DueWork.php
-
-		-
-			message: "#^Strict comparison using \\=\\=\\= between null and int will always evaluate to false\\.$#"
-			count: 1
-			path: library/Schoolbox/Learning/Assessment/DataModel/Translator/DueWork.php
-
-		-
-			message: "#^Strict comparison using \\=\\=\\= between null and string will always evaluate to false\\.$#"
-			count: 2
-			path: library/Schoolbox/Learning/Assessment/DataModel/Translator/DueWork.php
-
-		-
 			message: "#^PHPDoc tag @var above a method has no effect\\.$#"
 			count: 1
 			path: library/Schoolbox/Learning/Assessment/DataModel/Translator/IAssessmentTypeTranslator.php
@@ -3621,11 +2961,6 @@ parameters:
 			path: library/Schoolbox/Learning/Assessment/DataModel/Translator/LessonPlan.php
 
 		-
-			message: "#^Strict comparison using \\=\\=\\= between null and Schoolbox\\\\User will always evaluate to false\\.$#"
-			count: 1
-			path: library/Schoolbox/Learning/Assessment/DataModel/Translator/Project.php
-
-		-
 			message: "#^Call to an undefined method Schoolbox\\\\Learning\\\\Assessment\\\\DataModel\\\\IAssessableDataModel\\:\\:getAttachments\\(\\)\\.$#"
 			count: 3
 			path: library/Schoolbox/Learning/Assessment/DataModel/Translator/Task.php
@@ -3706,21 +3041,6 @@ parameters:
 			path: library/Schoolbox/Learning/Assessment/DueWork/Feedback/Factory.php
 
 		-
-			message: "#^Strict comparison using \\=\\=\\= between string and null will always evaluate to false\\.$#"
-			count: 1
-			path: library/Schoolbox/Learning/Assessment/DueWork/Feedback/Factory.php
-
-		-
-			message: "#^Strict comparison using \\=\\=\\= between string and null will always evaluate to false\\.$#"
-			count: 2
-			path: library/Schoolbox/Learning/Assessment/DueWork/Feedback/Model.php
-
-		-
-			message: "#^Unreachable statement \\- code above always terminates\\.$#"
-			count: 1
-			path: library/Schoolbox/Learning/Assessment/DueWork/Feedback/Module.php
-
-		-
 			message: "#^Method Schoolbox\\\\Learning\\\\Assessment\\\\DueWork\\\\Response\\\\ValidSelfAssessable\\:\\:getDueWork\\(\\) should return Schoolbox\\\\Learning\\\\Assessment\\\\DueWork\\\\Model but returns Schoolbox\\\\Learning\\\\Assessment\\\\IAssessable\\.$#"
 			count: 1
 			path: library/Schoolbox/Learning/Assessment/DueWork/Response/ValidSelfAssessable.php
@@ -3736,34 +3056,9 @@ parameters:
 			path: library/Schoolbox/Learning/Assessment/Exporter/Exporter.php
 
 		-
-			message: "#^If condition is always true\\.$#"
-			count: 1
-			path: library/Schoolbox/Learning/Assessment/Factory.php
-
-		-
 			message: "#^Method Schoolbox\\\\Learning\\\\Assessment\\\\Feedback\\\\SubSource\\\\AbstractSubSource\\:\\:createModel\\(\\) should return Schoolbox\\\\Learning\\\\Assessment\\\\IFeedback but returns null\\.$#"
 			count: 1
 			path: library/Schoolbox/Learning/Assessment/Feedback/SubSource/AbstractSubSource.php
-
-		-
-			message: "#^If condition is always true\\.$#"
-			count: 1
-			path: library/Schoolbox/Learning/Assessment/FeedbackStrategy/FavourFloating.php
-
-		-
-			message: "#^Negated boolean expression is always false\\.$#"
-			count: 1
-			path: library/Schoolbox/Learning/Assessment/FeedbackStrategy/FavourFloating.php
-
-		-
-			message: "#^Unreachable statement \\- code above always terminates\\.$#"
-			count: 1
-			path: library/Schoolbox/Learning/Assessment/FeedbackStrategy/FavourFloating.php
-
-		-
-			message: "#^Negated boolean expression is always false\\.$#"
-			count: 1
-			path: library/Schoolbox/Learning/Assessment/FeedbackStrategy/NoFavour.php
 
 		-
 			message: "#^PHPDoc tag @param for parameter \\$gradeGroup with type Schoolbox\\\\Assessment\\\\Component\\\\SubmissionBox\\\\GradeLevel\\\\Group\\\\Model\\|null is not subtype of native type Schoolbox\\\\Assessment\\\\Component\\\\SubmissionBox\\\\GradeLevel\\\\Group\\\\Model\\.$#"
@@ -3824,11 +3119,6 @@ parameters:
 			message: "#^PHPDoc tag @param for parameter \\$participants with type Schoolbox\\\\GenericCollection\\|Schoolbox\\\\Learning\\\\Assessment\\\\Participant is not subtype of native type Schoolbox\\\\GenericCollection\\.$#"
 			count: 1
 			path: library/Schoolbox/Learning/Assessment/Plan.php
-
-		-
-			message: "#^Left side of && is always true\\.$#"
-			count: 1
-			path: library/Schoolbox/Learning/Assessment/Project.php
 
 		-
 			message: "#^Method Schoolbox\\\\Learning\\\\Assessment\\\\Project\\:\\:cloneForCopy\\(\\) should return static\\(Schoolbox\\\\Learning\\\\Assessment\\\\Project\\) but returns Schoolbox\\\\Learning\\\\Assessment\\\\Project\\.$#"
@@ -3896,11 +3186,6 @@ parameters:
 			path: library/Schoolbox/Learning/Assessment/Quiz/Model.php
 
 		-
-			message: "#^Negated boolean expression is always false\\.$#"
-			count: 1
-			path: library/Schoolbox/Learning/Assessment/Quiz/Model.php
-
-		-
 			message: "#^Method Schoolbox\\\\Learning\\\\Assessment\\\\Summator\\\\Average\\:\\:calculateTotalWeight\\(\\) should return int but returns null\\.$#"
 			count: 1
 			path: library/Schoolbox/Learning/Assessment/Summator/Average.php
@@ -3931,11 +3216,6 @@ parameters:
 			path: library/Schoolbox/Learning/Assessment/Summator/StandardDeviation.php
 
 		-
-			message: "#^Call to function is_null\\(\\) with float will always evaluate to false\\.$#"
-			count: 1
-			path: library/Schoolbox/Learning/Assessment/Summator/WeightedAverage.php
-
-		-
 			message: "#^Call to an undefined method Schoolbox\\\\Learning\\\\Assessment\\\\IAssessable\\:\\:getUrl\\(\\)\\.$#"
 			count: 2
 			path: library/Schoolbox/Learning/Assessment/Task/Controller.php
@@ -3951,16 +3231,6 @@ parameters:
 			path: library/Schoolbox/Learning/Assessment/Task/Controller.php
 
 		-
-			message: "#^Left side of && is always true\\.$#"
-			count: 3
-			path: library/Schoolbox/Learning/Assessment/Task/Model.php
-
-		-
-			message: "#^Negated boolean expression is always false\\.$#"
-			count: 1
-			path: library/Schoolbox/Learning/Assessment/Task/Model.php
-
-		-
 			message: "#^Strict comparison using \\=\\=\\= between null and int will always evaluate to false\\.$#"
 			count: 1
 			path: library/Schoolbox/Learning/Assessment/Test/DataModel/Translator/DueWorkTest.php
@@ -3971,11 +3241,6 @@ parameters:
 			path: library/Schoolbox/Learning/Assessment/Test/DataModel/TranslatorTest.php
 
 		-
-			message: "#^Unreachable statement \\- code above always terminates\\.$#"
-			count: 1
-			path: library/Schoolbox/Learning/Assessment/Timeline/Full.php
-
-		-
 			message: "#^Negated boolean expression is always false\\.$#"
 			count: 1
 			path: library/Schoolbox/Learning/Authorizer/Rule/CanPreview.php
@@ -3984,11 +3249,6 @@ parameters:
 			message: "#^Result of && is always false\\.$#"
 			count: 1
 			path: library/Schoolbox/Learning/Authorizer/Rule/CanPreview.php
-
-		-
-			message: "#^Negated boolean expression is always false\\.$#"
-			count: 1
-			path: library/Schoolbox/Learning/Badge/Award/Notifier.php
 
 		-
 			message: "#^PHPDoc tag @var above a method has no effect\\.$#"
@@ -4036,11 +3296,6 @@ parameters:
 			path: library/Schoolbox/Learning/InlineGrader/Kami/ReQueueErrors.php
 
 		-
-			message: "#^Method Schoolbox\\\\Learning\\\\InlineGrader\\\\Kami\\\\Test\\\\ConnectorTest\\:\\:providerInvalidSiteSchoolCode\\(\\) should return array\\<string\\|null\\> but returns array\\<int, array\\<int, string\\|null\\>\\>\\.$#"
-			count: 1
-			path: library/Schoolbox/Learning/InlineGrader/Kami/Test/ConnectorTest.php
-
-		-
 			message: "#^PHPDoc tag @throws with type PHPUnit_Framework_AssertionFailedError is not subtype of Throwable$#"
 			count: 2
 			path: library/Schoolbox/Learning/InlineGrader/Kami/Test/ConnectorTest.php
@@ -4049,26 +3304,6 @@ parameters:
 			message: "#^PHPDoc tag @throws with type PHPUnit_Framework_AssertionFailedError\\|Schoolbox\\\\Learning\\\\InlineGrader\\\\Kami\\\\Exception\\\\ResponseDecodeException is not subtype of Throwable$#"
 			count: 1
 			path: library/Schoolbox/Learning/InlineGrader/Kami/Test/ConnectorTest.php
-
-		-
-			message: "#^Negated boolean expression is always false\\.$#"
-			count: 1
-			path: library/Schoolbox/Learning/InlineGrader/StudentCarousel/Blind.php
-
-		-
-			message: "#^If condition is always true\\.$#"
-			count: 1
-			path: library/Schoolbox/Learning/InlineGrader/StudentCarousel/Standard.php
-
-		-
-			message: "#^Result of \\|\\| is always true\\.$#"
-			count: 1
-			path: library/Schoolbox/Learning/MarkScheme/AbstractMarkScheme.php
-
-		-
-			message: "#^Strict comparison using \\=\\=\\= between null and Schoolbox\\\\Assessment\\\\Component\\\\SubmissionBox\\\\MarkType will always evaluate to false\\.$#"
-			count: 2
-			path: library/Schoolbox/Learning/MarkScheme/Factory.php
 
 		-
 			message: "#^If condition is always false\\.$#"
@@ -4151,11 +3386,6 @@ parameters:
 			path: library/Schoolbox/Learning/Quiz/Model.php
 
 		-
-			message: "#^If condition is always true\\.$#"
-			count: 1
-			path: library/Schoolbox/Learning/Quiz/Section/Question/Mapper.php
-
-		-
 			message: "#^Property Schoolbox\\\\Learning\\\\Quiz\\\\Section\\\\Question\\\\Solution\\\\Model\\:\\:\\$question \\(Schoolbox\\\\Learning\\\\Quiz\\\\Section\\\\Question\\\\Model\\) does not accept null\\.$#"
 			count: 1
 			path: library/Schoolbox/Learning/Quiz/Section/Question/Solution/Model.php
@@ -4186,21 +3416,6 @@ parameters:
 			path: library/Schoolbox/LearningAnalytics/Module.php
 
 		-
-			message: "#^Else branch is unreachable because ternary operator condition is always true\\.$#"
-			count: 1
-			path: library/Schoolbox/Mapper.php
-
-		-
-			message: "#^Negated boolean expression is always false\\.$#"
-			count: 2
-			path: library/Schoolbox/Mapper.php
-
-		-
-			message: "#^Offset 'type' on array in isset\\(\\) always exists and is not nullable\\.$#"
-			count: 1
-			path: library/Schoolbox/Mapper.php
-
-		-
 			message: "#^Property Schoolbox\\\\Mapper\\:\\:\\$propagator \\(Schoolbox\\\\Realtime\\\\Schedule\\\\Trigger\\\\Propagator\\) does not accept Schoolbox\\\\Realtime\\\\Schedule\\\\Trigger\\\\IPropagator\\.$#"
 			count: 1
 			path: library/Schoolbox/Mapper.php
@@ -4223,11 +3438,6 @@ parameters:
 		-
 			message: "#^Property Schoolbox\\\\Mapper\\:\\:\\$propagatorSuppressed \\(Schoolbox\\\\Realtime\\\\Schedule\\\\Trigger\\\\Propagator\\) in isset\\(\\) is not nullable\\.$#"
 			count: 1
-			path: library/Schoolbox/Mapper.php
-
-		-
-			message: "#^Ternary operator condition is always true\\.$#"
-			count: 2
 			path: library/Schoolbox/Mapper.php
 
 		-
@@ -4256,11 +3466,6 @@ parameters:
 			path: library/Schoolbox/Mapper/RecursiveUndeleterCli.php
 
 		-
-			message: "#^Else branch is unreachable because previous condition is always true\\.$#"
-			count: 1
-			path: library/Schoolbox/Mapper/RecursiveUndeleterCli.php
-
-		-
 			message: "#^Property Schoolbox\\\\Mapper\\\\RecursiveUndeleterCli\\:\\:\\$logger \\(Alaress\\\\Lumberjack\\\\Logger\\) does not accept Psr\\\\Log\\\\LoggerInterface\\.$#"
 			count: 1
 			path: library/Schoolbox/Mapper/RecursiveUndeleterCli.php
@@ -4269,16 +3474,6 @@ parameters:
 			message: "#^Method Schoolbox\\\\Module\\\\RestfulModule\\:\\:findById\\(\\) should return object but returns null\\.$#"
 			count: 1
 			path: library/Schoolbox/Module/RestfulModule.php
-
-		-
-			message: "#^Strict comparison using \\=\\=\\= between string and false will always evaluate to false\\.$#"
-			count: 1
-			path: library/Schoolbox/Notif/Formatter/CompressedFormatter.php
-
-		-
-			message: "#^Call to function is_null\\(\\) with string will always evaluate to false\\.$#"
-			count: 1
-			path: library/Schoolbox/Notif/MQ/Connector.php
 
 		-
 			message: "#^Method Schoolbox\\\\Notif\\\\MQ\\\\Test\\\\MockAMQPConnector\\:\\:readFromQueue\\(\\) should return PhpAmqpLib\\\\Message\\\\AMQPMessage but returns null\\.$#"
@@ -4306,11 +3501,6 @@ parameters:
 			path: library/Schoolbox/Notif/Queue/Bindings/Generator.php
 
 		-
-			message: "#^If condition is always true\\.$#"
-			count: 1
-			path: library/Schoolbox/Notif/Queue/Bindings/Generator.php
-
-		-
 			message: "#^Method Schoolbox\\\\Notif\\\\Queue\\\\Bindings\\\\Generator\\:\\:getCategoryMapper\\(\\) should return Schoolbox\\\\Resource\\\\Folder\\\\Mapper but returns Schoolbox\\\\Mapper\\.$#"
 			count: 1
 			path: library/Schoolbox/Notif/Queue/Bindings/Generator.php
@@ -4331,19 +3521,9 @@ parameters:
 			path: library/Schoolbox/Notif/Queue/Bindings/Generator.php
 
 		-
-			message: "#^Negated boolean expression is always false\\.$#"
-			count: 5
-			path: library/Schoolbox/Notif/Queue/Bindings/Generator.php
-
-		-
 			message: "#^Property Schoolbox\\\\Notif\\\\StoredisLogger\\:\\:\\$client \\(Predis\\\\Client\\) does not accept Predis\\\\ClientInterface\\.$#"
 			count: 1
 			path: library/Schoolbox/Notif/StoredisLogger.php
-
-		-
-			message: "#^Strict comparison using \\=\\=\\= between Schoolbox\\\\Resource\\\\Storage\\\\IStorage and null will always evaluate to false\\.$#"
-			count: 1
-			path: library/Schoolbox/Pastoral/CommandLineTool/AttachmentUploader.php
 
 		-
 			message: "#^Call to an undefined method Schoolbox\\\\ISoftDeletable\\:\\:getId\\(\\)\\.$#"
@@ -4357,11 +3537,6 @@ parameters:
 
 		-
 			message: "#^Method Schoolbox\\\\Permission\\\\Access\\\\Access\\:\\:getInstance\\(\\) should return static\\(Schoolbox\\\\Permission\\\\Access\\\\Access\\) but returns Schoolbox\\\\Permission\\\\Access\\\\Access\\.$#"
-			count: 1
-			path: library/Schoolbox/Permission/Access/Access.php
-
-		-
-			message: "#^Negated boolean expression is always false\\.$#"
 			count: 1
 			path: library/Schoolbox/Permission/Access/Access.php
 
@@ -4441,28 +3616,13 @@ parameters:
 			path: library/Schoolbox/Realtime/Admin/Controller.php
 
 		-
-			message: "#^Ternary operator condition is always true\\.$#"
-			count: 5
-			path: library/Schoolbox/Realtime/Admin/Controller.php
-
-		-
 			message: "#^Variable \\$source might not be defined\\.$#"
 			count: 1
 			path: library/Schoolbox/Realtime/Admin/Controller.php
 
 		-
-			message: "#^Result of \\|\\| is always false\\.$#"
-			count: 1
-			path: library/Schoolbox/Realtime/Config.php
-
-		-
 			message: "#^Property Schoolbox\\\\Realtime\\\\Controller\\:\\:\\$config \\(Schoolbox\\\\Realtime\\\\Config\\) in empty\\(\\) is not falsy\\.$#"
 			count: 1
-			path: library/Schoolbox/Realtime/Controller.php
-
-		-
-			message: "#^Ternary operator condition is always true\\.$#"
-			count: 7
 			path: library/Schoolbox/Realtime/Controller.php
 
 		-
@@ -4551,64 +3711,14 @@ parameters:
 			path: library/Schoolbox/Resource/AbstractFileMapper.php
 
 		-
-			message: "#^Left side of && is always true\\.$#"
-			count: 1
-			path: library/Schoolbox/Resource/AbstractFileMapper.php
-
-		-
 			message: "#^Return type \\(Schoolbox\\\\Resource\\\\Storage\\\\IStorage\\|null\\) of method Schoolbox\\\\Resource\\\\AbstractFolder\\:\\:getCoverImage\\(\\) should be compatible with return type \\(string\\) of method Schoolbox\\\\Resource\\\\Folder\\\\IFolder\\:\\:getCoverImage\\(\\)$#"
 			count: 1
 			path: library/Schoolbox/Resource/AbstractFolder.php
 
 		-
-			message: "#^Strict comparison using \\=\\=\\= between false and string will always evaluate to false\\.$#"
-			count: 1
-			path: library/Schoolbox/Resource/Attachment/AbstractController.php
-
-		-
-			message: "#^If condition is always true\\.$#"
-			count: 1
-			path: library/Schoolbox/Resource/Attachment/Collector/ExternalFileSystemHandler.php
-
-		-
-			message: "#^Unreachable statement \\- code above always terminates\\.$#"
-			count: 1
-			path: library/Schoolbox/Resource/Attachment/Collector/ExternalFileSystemHandler.php
-
-		-
-			message: "#^If condition is always true\\.$#"
-			count: 1
-			path: library/Schoolbox/Resource/Attachment/Collector/FileSystemHandler.php
-
-		-
-			message: "#^Unreachable statement \\- code above always terminates\\.$#"
-			count: 1
-			path: library/Schoolbox/Resource/Attachment/Collector/FileSystemHandler.php
-
-		-
-			message: "#^If condition is always true\\.$#"
-			count: 1
-			path: library/Schoolbox/Resource/Attachment/Collector/StorageHandler.php
-
-		-
-			message: "#^Unreachable statement \\- code above always terminates\\.$#"
-			count: 1
-			path: library/Schoolbox/Resource/Attachment/Collector/StorageHandler.php
-
-		-
 			message: "#^Method Schoolbox\\\\Resource\\\\Attachment\\\\Filesystem\\\\Teams\\\\ValidTeamsMeetingUrl\\:\\:isSatisifiedBy\\(\\) should return int\\|false but returns bool\\.$#"
 			count: 1
 			path: library/Schoolbox/Resource/Attachment/Filesystem/Teams/ValidTeamsMeetingUrl.php
-
-		-
-			message: "#^Call to function is_null\\(\\) with string will always evaluate to false\\.$#"
-			count: 1
-			path: library/Schoolbox/Resource/Attachment/Filesystem/UploadController.php
-
-		-
-			message: "#^Call to function is_null\\(\\) with string will always evaluate to false\\.$#"
-			count: 1
-			path: library/Schoolbox/Resource/Attachment/Filesystem/UsermediaController.php
 
 		-
 			message: "#^Constructor of class Schoolbox\\\\Resource\\\\Attachment\\\\NavigatorController has an unused parameter \\$conf\\.$#"
@@ -4621,22 +3731,12 @@ parameters:
 			path: library/Schoolbox/Resource/Attachment/NavigatorController.php
 
 		-
-			message: "#^Strict comparison using \\=\\=\\= between false and string will always evaluate to false\\.$#"
-			count: 1
-			path: library/Schoolbox/Resource/Attachment/NavigatorController.php
-
-		-
 			message: "#^Property Schoolbox\\\\Resource\\\\Attachment\\\\Zone\\:\\:\\$mapper \\(Schoolbox\\\\Resource\\\\Storage\\\\Mapper\\) does not accept Schoolbox\\\\Mapper\\.$#"
 			count: 1
 			path: library/Schoolbox/Resource/Attachment/Zone.php
 
 		-
 			message: "#^Property Schoolbox\\\\Resource\\\\Attachment\\\\Zone\\:\\:\\$mimeFilter \\(string\\) does not accept null\\.$#"
-			count: 1
-			path: library/Schoolbox/Resource/Attachment/Zone.php
-
-		-
-			message: "#^Strict comparison using \\=\\=\\= between string and false will always evaluate to false\\.$#"
 			count: 1
 			path: library/Schoolbox/Resource/Attachment/Zone.php
 
@@ -4659,21 +3759,6 @@ parameters:
 			message: "#^Method Schoolbox\\\\Resource\\\\Browser\\\\AbstractNode\\:\\:setFolderLocator\\(\\) should return Schoolbox\\\\Resource\\\\Browser\\\\AbstractNode but return statement is missing\\.$#"
 			count: 1
 			path: library/Schoolbox/Resource/Browser/AbstractNode.php
-
-		-
-			message: "#^Strict comparison using \\=\\=\\= between string and false will always evaluate to false\\.$#"
-			count: 1
-			path: library/Schoolbox/Resource/Browser/AbstractNode.php
-
-		-
-			message: "#^Else branch is unreachable because previous condition is always true\\.$#"
-			count: 1
-			path: library/Schoolbox/Resource/Browser/AbstractTreeBuilder.php
-
-		-
-			message: "#^If condition is always true\\.$#"
-			count: 1
-			path: library/Schoolbox/Resource/Browser/AbstractTreeBuilder.php
 
 		-
 			message: "#^Unreachable statement \\- code above always terminates\\.$#"
@@ -4716,47 +3801,7 @@ parameters:
 			path: library/Schoolbox/Resource/Browser/Resources/TreeBuilder.php
 
 		-
-			message: "#^If condition is always true\\.$#"
-			count: 1
-			path: library/Schoolbox/Resource/Browser/Resources/TreeBuilder.php
-
-		-
-			message: "#^Negated boolean expression is always false\\.$#"
-			count: 1
-			path: library/Schoolbox/Resource/Browser/Resources/TreeBuilder.php
-
-		-
-			message: "#^Unreachable statement \\- code above always terminates\\.$#"
-			count: 1
-			path: library/Schoolbox/Resource/Browser/Resources/TreeBuilder.php
-
-		-
-			message: "#^Negated boolean expression is always false\\.$#"
-			count: 1
-			path: library/Schoolbox/Resource/Browser/WebDav/Node.php
-
-		-
-			message: "#^If condition is always true\\.$#"
-			count: 1
-			path: library/Schoolbox/Resource/Browser/WebDav/TreeBuilder.php
-
-		-
-			message: "#^Unreachable statement \\- code above always terminates\\.$#"
-			count: 1
-			path: library/Schoolbox/Resource/Browser/WebDav/TreeBuilder.php
-
-		-
-			message: "#^Negated boolean expression is always false\\.$#"
-			count: 1
-			path: library/Schoolbox/Resource/File/Notifier.php
-
-		-
 			message: "#^Method Schoolbox\\\\Resource\\\\Folder\\\\Ancestry\\:\\:getInstance\\(\\) should return static\\(Schoolbox\\\\Resource\\\\Folder\\\\Ancestry\\) but returns Schoolbox\\\\Resource\\\\Folder\\\\Ancestry\\.$#"
-			count: 1
-			path: library/Schoolbox/Resource/Folder/Ancestry.php
-
-		-
-			message: "#^Negated boolean expression is always false\\.$#"
 			count: 1
 			path: library/Schoolbox/Resource/Folder/Ancestry.php
 
@@ -4776,22 +3821,12 @@ parameters:
 			path: library/Schoolbox/Resource/Folder/Component/Dashboard/GroupController.php
 
 		-
-			message: "#^Expression on left side of \\?\\? is not nullable\\.$#"
-			count: 1
-			path: library/Schoolbox/Resource/Folder/Controller.php
-
-		-
 			message: "#^Parameter \\#3 \\$previous \\(null\\) of method Schoolbox\\\\Resource\\\\Folder\\\\Log\\\\Mapper\\:\\:raiseNotification\\(\\) should be compatible with parameter \\$previous \\(object\\) of method Schoolbox\\\\Mapper\\:\\:raiseNotification\\(\\)$#"
 			count: 1
 			path: library/Schoolbox/Resource/Folder/Log/Mapper.php
 
 		-
 			message: "#^Method Schoolbox\\\\Resource\\\\Folder\\\\Mapper\\:\\:findAllBySubjectList\\(\\) should return iterable\\<Schoolbox\\\\Resource\\\\Folder\\\\Model\\>&Schoolbox\\\\GenericCollection but returns iterable\\<Schoolbox\\\\Resource\\\\Folder\\\\Model\\>&Schoolbox\\\\Collection\\.$#"
-			count: 1
-			path: library/Schoolbox/Resource/Folder/Mapper.php
-
-		-
-			message: "#^Strict comparison using \\=\\=\\= between int\\<min, \\-1\\>\\|int\\<1, max\\> and '0' will always evaluate to false\\.$#"
 			count: 1
 			path: library/Schoolbox/Resource/Folder/Mapper.php
 
@@ -4807,11 +3842,6 @@ parameters:
 
 		-
 			message: "#^Method Schoolbox\\\\Resource\\\\Folder\\\\NNIAN\\:\\:getInstance\\(\\) should return static\\(Schoolbox\\\\Resource\\\\Folder\\\\NNIAN\\) but returns Schoolbox\\\\Resource\\\\Folder\\\\NNIAN\\.$#"
-			count: 1
-			path: library/Schoolbox/Resource/Folder/NNIAN.php
-
-		-
-			message: "#^Negated boolean expression is always false\\.$#"
 			count: 1
 			path: library/Schoolbox/Resource/Folder/NNIAN.php
 
@@ -4841,19 +3871,9 @@ parameters:
 			path: library/Schoolbox/Resource/Storage/GC/GarbageCollector.php
 
 		-
-			message: "#^Else branch is unreachable because previous condition is always true\\.$#"
-			count: 1
-			path: library/Schoolbox/Resource/Storage/Model.php
-
-		-
 			message: "#^Method Schoolbox\\\\Resource\\\\Storage\\\\Model\\:\\:setBasename\\(\\) should return \\$this\\(Schoolbox\\\\Resource\\\\Storage\\\\Model\\) but returns Schoolbox\\\\Resource\\\\Storage\\\\Model\\.$#"
 			count: 1
 			path: library/Schoolbox/Resource/Storage/Model.php
-
-		-
-			message: "#^If condition is always true\\.$#"
-			count: 1
-			path: library/Schoolbox/Resource/Storage/Translator/ModelToArray.php
 
 		-
 			message: "#^Property Schoolbox\\\\Resource\\\\Test\\\\CategoryMapperTest\\:\\:\\$object \\(Schoolbox\\\\Resource\\\\Test\\\\FileMapper\\) does not accept Schoolbox\\\\Resource\\\\Folder\\\\Mapper\\.$#"
@@ -4866,11 +3886,6 @@ parameters:
 			path: library/Schoolbox/Resource/Test/CategoryMapperTest.php
 
 		-
-			message: "#^Else branch is unreachable because previous condition is always true\\.$#"
-			count: 1
-			path: library/Schoolbox/ResourceBooking/Booking/Series.php
-
-		-
 			message: "#^Call to method DateTime\\:\\:format\\(\\) on a separate line has no effect\\.$#"
 			count: 1
 			path: library/Schoolbox/ResourceBooking/Booking/Validation.php
@@ -4879,11 +3894,6 @@ parameters:
 			message: "#^Dead catch \\- Schoolbox\\\\Application\\\\Exception\\\\NotFound is never thrown in the try block\\.$#"
 			count: 1
 			path: library/Schoolbox/ResourceBooking/Item/Controller.php
-
-		-
-			message: "#^If condition is always true\\.$#"
-			count: 3
-			path: library/Schoolbox/ResourceBooking/Item/Mapper.php
 
 		-
 			message: "#^Method Schoolbox\\\\ResourceBooking\\\\Item\\\\Model\\:\\:addModerator\\(\\) should return \\$this\\(Schoolbox\\\\ResourceBooking\\\\Item\\\\Model\\) but returns iterable\\<Schoolbox\\\\User\\>&Schoolbox\\\\Collection\\.$#"
@@ -4906,16 +3916,6 @@ parameters:
 			path: library/Schoolbox/Statistics/DataSource.php
 
 		-
-			message: "#^Strict comparison using \\!\\=\\= between null and null will always evaluate to false\\.$#"
-			count: 1
-			path: library/Schoolbox/Statistics/DataSource.php
-
-		-
-			message: "#^If condition is always true\\.$#"
-			count: 1
-			path: library/Schoolbox/Survey/Mapper.php
-
-		-
 			message: "#^Method Schoolbox\\\\Sync\\\\Effect\\\\Fragment\\\\Factory\\:\\:produce\\(\\) invoked with 2 parameters, 1 required\\.$#"
 			count: 1
 			path: library/Schoolbox/Sync/Effect/Controller.php
@@ -4931,31 +3931,6 @@ parameters:
 			path: library/Schoolbox/Sync/Effect/Type/Model.php
 
 		-
-			message: "#^Call to function is_array\\(\\) with string will always evaluate to false\\.$#"
-			count: 1
-			path: library/Schoolbox/Sync/Grammar/Rule.php
-
-		-
-			message: "#^Method Schoolbox\\\\Sync\\\\Grammar\\\\Rule\\:\\:getObjectOutput\\(\\) should return string but returns mixed\\.$#"
-			count: 1
-			path: library/Schoolbox/Sync/Grammar/Rule.php
-
-		-
-			message: "#^Strict comparison using \\=\\=\\= between string and false will always evaluate to false\\.$#"
-			count: 1
-			path: library/Schoolbox/Sync/Grammar/Rule.php
-
-		-
-			message: "#^Strict comparison using \\=\\=\\= between string and null will always evaluate to false\\.$#"
-			count: 1
-			path: library/Schoolbox/Sync/Grammar/Rule.php
-
-		-
-			message: "#^Strict comparison using \\=\\=\\= between string and true will always evaluate to false\\.$#"
-			count: 1
-			path: library/Schoolbox/Sync/Grammar/Rule.php
-
-		-
 			message: "#^If condition is always true\\.$#"
 			count: 1
 			path: library/Schoolbox/Sync/Grammar/Ruleset.php
@@ -4969,11 +3944,6 @@ parameters:
 			message: "#^Anonymous function has an unused use \\$key\\.$#"
 			count: 1
 			path: library/Schoolbox/Sync/Grammar/Tokenizer.php
-
-		-
-			message: "#^Negated boolean expression is always false\\.$#"
-			count: 1
-			path: library/Schoolbox/Sync/Hydrator/Custom/AbstractLoggableHydrator.php
 
 		-
 			message: "#^Property Schoolbox\\\\Sync\\\\Hydrator\\\\Custom\\\\AddParentToStudentClasses\\:\\:\\$campusMapper is never read, only written\\.$#"
@@ -5021,21 +3991,6 @@ parameters:
 			path: library/Schoolbox/Tile/Controller.php
 
 		-
-			message: "#^Variable \\$order in isset\\(\\) always exists and is not nullable\\.$#"
-			count: 1
-			path: library/Schoolbox/Tile/Mapper.php
-
-		-
-			message: "#^If condition is always true\\.$#"
-			count: 1
-			path: library/Schoolbox/Tour/Mapper.php
-
-		-
-			message: "#^Else branch is unreachable because previous condition is always true\\.$#"
-			count: 1
-			path: library/Schoolbox/User.php
-
-		-
 			message: "#^Method Schoolbox\\\\User\\:\\:getAccessList\\(\\) should return iterable\\<Schoolbox\\\\Permission\\\\Access\\\\UserAccess\\>&Schoolbox\\\\GenericCollection but returns iterable\\<Schoolbox\\\\Permission\\\\Access\\\\UserAccess\\>&Schoolbox\\\\Collection\\.$#"
 			count: 1
 			path: library/Schoolbox/User.php
@@ -5044,46 +3999,6 @@ parameters:
 			message: "#^Property Schoolbox\\\\User\\:\\:\\$accessList \\(iterable\\<Schoolbox\\\\Permission\\\\Access\\\\UserAccess\\>&Schoolbox\\\\Collection\\) in isset\\(\\) is not nullable\\.$#"
 			count: 1
 			path: library/Schoolbox/User.php
-
-		-
-			message: "#^Left side of && is always true\\.$#"
-			count: 1
-			path: library/Schoolbox/User/Password/Reset/Controller.php
-
-		-
-			message: "#^Strict comparison using \\=\\=\\= between Schoolbox\\\\User and null will always evaluate to false\\.$#"
-			count: 1
-			path: library/Schoolbox/User/Password/Reset/Controller.php
-
-		-
-			message: "#^If condition is always true\\.$#"
-			count: 3
-			path: library/Schoolbox/UserMapper.php
-
-		-
-			message: "#^Strict comparison using \\=\\=\\= between bool and null will always evaluate to false\\.$#"
-			count: 3
-			path: library/Schoolbox/UserMapper.php
-
-		-
-			message: "#^Strict comparison using \\=\\=\\= between string and null will always evaluate to false\\.$#"
-			count: 1
-			path: library/Schoolbox/UserMapper.php
-
-		-
-			message: "#^Variable \\$superuserStatus in isset\\(\\) always exists and is not nullable\\.$#"
-			count: 1
-			path: library/Schoolbox/UserMapper.php
-
-		-
-			message: "#^Call to function is_null\\(\\) with Schoolbox\\\\User will always evaluate to false\\.$#"
-			count: 2
-			path: library/Schoolbox/UserNotifier.php
-
-		-
-			message: "#^Else branch is unreachable because previous condition is always true\\.$#"
-			count: 1
-			path: library/Schoolbox/Video/ResourceVideo.php
 
 		-
 			message: "#^Call to an undefined method Schoolbox\\\\Mapper\\:\\:getUnknownUser\\(\\)\\.$#"
@@ -5121,31 +4036,6 @@ parameters:
 			path: library/Schoolbox/WebDav/FileServer/Folder.php
 
 		-
-			message: "#^If condition is always true\\.$#"
-			count: 1
-			path: library/Schoolbox/WebDav/Model.php
-
-		-
-			message: "#^Left side of && is always true\\.$#"
-			count: 1
-			path: library/Schoolbox/WebDav/Model.php
-
-		-
-			message: "#^Negated boolean expression is always false\\.$#"
-			count: 2
-			path: library/Schoolbox/WebDav/Model.php
-
-		-
-			message: "#^Right side of \\|\\| is always true\\.$#"
-			count: 2
-			path: library/Schoolbox/WebDav/Model.php
-
-		-
-			message: "#^Call to function is_array\\(\\) with Alaress\\\\Rules\\\\Lang\\\\Construct\\|string will always evaluate to false\\.$#"
-			count: 1
-			path: library/Schoolbox/WebDav/Rules/Ruleset.php
-
-		-
 			message: "#^Property Schoolbox\\\\WebDav\\\\SubjectServer\\\\Server\\:\\:\\$user \\(Schoolbox\\\\User\\) in isset\\(\\) is not nullable\\.$#"
 			count: 1
 			path: library/Schoolbox/WebDav/SubjectServer/Server.php
@@ -5159,11 +4049,6 @@ parameters:
 			message: "#^Return type \\(iterable\\<Schoolbox\\\\Wiki\\\\Wiki\\>&Schoolbox\\\\Collection\\) of method Schoolbox\\\\Wiki\\\\WikiMapper\\:\\:findForFeed\\(\\) should be compatible with return type \\(iterable\\<Alaress\\\\Async\\\\Notification\\\\Instance\\\\Instance\\>&Schoolbox\\\\Collection\\) of method Schoolbox\\\\Feed\\\\FeedableMapperInterface\\:\\:findForFeed\\(\\)$#"
 			count: 1
 			path: library/Schoolbox/Wiki/WikiMapper.php
-
-		-
-			message: "#^Else branch is unreachable because ternary operator condition is always true\\.$#"
-			count: 2
-			path: library/SitePage.php
 
 		-
 			message: "#^Method SocialStream\\\\Authenticator\\:\\:getNewPost\\(\\) should return SocialStream_Post_Abstract but returns null\\.$#"
@@ -5256,34 +4141,9 @@ parameters:
 			path: library/Survey/Import/Xml.php
 
 		-
-			message: "#^Call to function is_numeric\\(\\) with bool will always evaluate to false\\.$#"
-			count: 1
-			path: library/Survey/Main.php
-
-		-
-			message: "#^Right side of && is always true\\.$#"
-			count: 2
-			path: library/Url.php
-
-		-
-			message: "#^Call to function is_numeric\\(\\) with bool will always evaluate to false\\.$#"
-			count: 1
-			path: library/Wiki.php
-
-		-
-			message: "#^Result of && is always false\\.$#"
-			count: 1
-			path: library/Wiki.php
-
-		-
 			message: "#^Return type \\(void\\) of method Wiki\\:\\:update\\(\\) should be compatible with return type \\(bool\\) of method DeprecatedModel\\:\\:update\\(\\)$#"
 			count: 1
 			path: library/Wiki.php
-
-		-
-			message: "#^Call to function is_array\\(\\) with bool will always evaluate to false\\.$#"
-			count: 1
-			path: library/ZipFileUpload.php
 
 		-
 			message: "#^Variable \\$assessmentDataSource in PHPDoc tag @var does not exist\\.$#"
@@ -5291,17 +4151,7 @@ parameters:
 			path: tools/assessment/csv.php
 
 		-
-			message: "#^Constant class@anonymous/tools/custom/wes/changeType\\.php\\:11\\:\\:ACCESS_LEVEL_PRIVATE is unused\\.$#"
-			count: 1
-			path: tools/custom/wes/changeType.php
-
-		-
 			message: "#^If condition is always true\\.$#"
-			count: 1
-			path: tools/custom/wes/changeType.php
-
-		-
-			message: "#^Method class@anonymous/tools/custom/wes/changeType\\.php\\:11\\:\\:getRecordIdsFromTypeName\\(\\) is unused\\.$#"
 			count: 1
 			path: tools/custom/wes/changeType.php
 
@@ -5309,21 +4159,6 @@ parameters:
 			message: "#^Variable \\$addParamsShort might not be defined\\.$#"
 			count: 1
 			path: tools/markbook/sync.php
-
-		-
-			message: "#^Constant class@anonymous/tools/mq/list\\-redis\\-routes\\.php\\:21\\:\\:TTL_NOT_SET is unused\\.$#"
-			count: 1
-			path: tools/mq/list-redis-routes.php
-
-		-
-			message: "#^Negated boolean expression is always false\\.$#"
-			count: 1
-			path: tools/mq/list-redis.php
-
-		-
-			message: "#^Left side of && is always true\\.$#"
-			count: 1
-			path: tools/mq/remove-old-triggers.php
 
 		-
 			message: "#^Argument of an invalid type DateInterval supplied for foreach, only iterables are supported\\.$#"
