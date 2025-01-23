@@ -65,9 +65,9 @@ class Permissions
 
         $statement = $this->userAccessMapper->getDatabase()->prepare($query);
         $statement->execute([
-                                'homepageConst' => UserAccess::SERVICE_HOMEPAGE,
-                                'tutorialConst' => self::SERVICE_TUTORIAL
-                            ]);
+            'homepageConst' => UserAccess::SERVICE_HOMEPAGE,
+            'tutorialConst' => self::SERVICE_TUTORIAL
+        ]);
 
         while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
             $services[$row['name']] = $this->userAccessMapper->findUsersForService($row['id'])->getUnique('id')->indexBy('id');
