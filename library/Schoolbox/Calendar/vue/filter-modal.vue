@@ -29,6 +29,19 @@ export default {
         },
 
         /**
+         * Check if selected is empty
+         */
+        isSelectedEmpty() {
+            let isEmpty = true;
+            for (const key in this.selected) {
+                if (Array.isArray(this.selected[key]) && this.selected[key].length > 0) {
+                    isEmpty = false;
+                }
+            }
+            return isEmpty;
+        },
+
+        /**
          * Apply the selected filters, and close the modal.
          */
         applyFilters() {
@@ -37,10 +50,6 @@ export default {
             // The events are already loaded regardless of whether the
             // filters exclude them: the event's visibility just needs to be
             // updated.
-
-            // Hopefully selectedFilters isn't passed by reference:
-            // I don't want to apply filters till I click this button.
-            // (Turns out they are: I'll have to think of something else)
             this.$emit(FILTER_CHANGED, this.selected);
             this.$refs.modal.close();
         },
