@@ -41,13 +41,11 @@ class Permissions
     }
 
     /**
-     * Return an array of service names indexed by serviceId.
-     * The services returned are those that should be listed on the 'Admin > Service Permissions' page.
-     * @return array<int, string>
+     * @return array<string, list<array{user: User, accessName: string, sidLabel: string, sidDisplayValue: string}>>
      */
-    public function getServiceNameById(): array
+    public function getServicePermissionTablesData(): array
     {
-        return $this->userAccessMapper->getDatabase()->executeQuery(
+        $serviceNameLookup = $this->userAccessMapper->getDatabase()->executeQuery(
             'SELECT id, name
             FROM lu_service
             WHERE id NOT IN (:homepageConst, :tutorialConst)
@@ -60,15 +58,6 @@ class Permissions
                 'tutorialConst' => self::SERVICE_TUTORIAL
             ]
         )->fetchColumnArray('name', 'id');
-    }
-
-    /**
-     * @return array<string, list<array{user: User, accessName: string, sidLabel: string, sidDisplayValue: string}>>
-     */
-    public function getServicePermissionTablesData(): array
-    {
-        // TODO: Get services using mapper instead of above function.
-        $serviceNameLookup = $this->getServiceNameById();
 
         $userAccessRows = $this->userAccessMapper->getDatabase()->executeQuery(
             'SELECT
