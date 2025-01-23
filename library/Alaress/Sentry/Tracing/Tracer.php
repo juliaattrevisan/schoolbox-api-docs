@@ -10,7 +10,7 @@ declare(strict_types=1);
 namespace Alaress\Sentry\Tracing;
 
 use Sentry\Breadcrumb;
-use Sentry\SentrySdk;
+use Sentry\State\HubInterface;
 use Sentry\Tracing\Span;
 use Sentry\Tracing\SpanContext;
 use Sentry\Tracing\SpanStatus;
@@ -85,6 +85,11 @@ class Tracer
     private static ?Tracer $defaultTrace = null;
 
     /**
+     * The Sentry hub to which this tracer reports.
+     */
+    private HubInterface $hub;
+
+    /**
      * The current transaction context, if there is one.
      */
     private ?TransactionContext $transactionContext = null;
@@ -126,6 +131,18 @@ class Tracer
     {
         self::$defaultTrace ??= new Tracer();
         return self::$defaultTrace;
+    }
+
+    /**
+     * Set the default hub to use.
+     *
+     * @param HubInterface $hub
+     * @return $this
+     */
+    public function setHub(HubInterface $hub): self
+    {
+        $this->hub = $hub;
+        return $this;
     }
 
     /**
@@ -506,14 +523,12 @@ class Tracer
         ?SpanStatus $status = null,
     ): void {
         if ($this->transactionContext instanceof TransactionContext) {
-            $hub = SentrySdk::getCurrentHub();
-
             /** @var array<Span> $spanStack */
             $spanStack   = [];
-            $transaction = $hub->getTransaction();
+            $transaction = $this->hub->getTransaction();
             if (!$transaction) {
                 // Create a new transaction, returning early if not sampled
-                $transaction = $hub->startTransaction($this->transactionContext);
+                $transaction = $this->hub->startTransaction($this->transactionContext);
                 if (!$transaction->getSampled()) {
                     return;
                 }
@@ -526,7 +541,7 @@ class Tracer
                 $spanContext->setOrigin($transaction->getOrigin());
                 $spanContext->setStartTimestamp($transaction->getStartTimestamp());
                 $span = $transaction->startChild($spanContext);
-                $hub->setSpan($span);
+                $this->hub->setSpan($span);
                 $this->spanStack[] = $span;
             }
 
@@ -538,7 +553,7 @@ class Tracer
 
             // Apply each change to the actual transaction stack.
             foreach ($this->stackChanges as $stackChange) {
-                $spanStack = $stackChange->operate($hub, $spanStack);
+                $spanStack = $stackChange->operate($this->hub, $spanStack);
             }
             $this->stackChanges = [];
 

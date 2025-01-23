@@ -27,6 +27,7 @@ use Schoolbox\Deprecation\Registry;
 use Schoolbox\IConfigLoader;
 use Alaress\Web\Request\IsJson;
 use Schoolbox\User;
+use Sentry\State\HubInterface;
 use Sentry\Tracing\SpanStatus;
 use Throwable;
 

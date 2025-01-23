@@ -255,7 +255,6 @@ abstract class Kernel
             'kernel:' . get_class($this),
             operation: 'app.bootstrap.di',
         );
-        static::installDependencies($this->di);
         $this->postInstallDependencies($bypassMaintenanceModeCheck);
         $this->checkServerApiEnvironment();
         Tracer::getDefaultTrace()->finishSpan();
@@ -307,6 +306,10 @@ abstract class Kernel
         } catch (Di\Exception\ServiceNotFound $e) {
             throw new LogicException("The 'config' dependency should have been installed.");
         }
+
+        // initialise Sentry without doing anything with it just yet:
+        // required so that stack traces always go through to Sentry.
+        Tracer::getDefaultTrace()->setHub($this->di->get('sentry'));
 
         self::dieGracefullyIfInMaintenanceMode($config);
         session_save_path(PipeManager::getSessionSavePath($config->get(ConfigMapper::NAME_REDIS_URL), INSTANCE_ID));
