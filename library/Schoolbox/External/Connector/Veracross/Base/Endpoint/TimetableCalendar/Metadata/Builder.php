@@ -51,7 +51,7 @@ class Builder
         return sprintf(
             'https://portals.veracross.com/%s/%s/class/%s/attendance',
             $credentials['schoolroute'],
-            $credentials['portal_access_name'],
+            $credentials['portalaccessname'],
             $class['id']
         );
     }
