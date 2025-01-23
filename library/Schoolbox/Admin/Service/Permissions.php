@@ -36,8 +36,7 @@ class Permissions
         private readonly Access\UserAccessMapper $userAccessMapper,
         private readonly CampusMapper $campusMapper,
         private readonly RoleMapper $roleMapper
-    )
-    {
+    ) {
     }
 
     /**

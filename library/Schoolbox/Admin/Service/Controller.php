@@ -14,6 +14,7 @@ use Schoolbox\Permission\Access;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\RoleMapper;
 use Schoolbox\UserMapper;
+use Twig\Error\Error;
 
 class Controller extends Base
 {
@@ -29,19 +30,16 @@ class Controller extends Base
         private readonly UserMapper $userMapper,
         private readonly CampusMapper $campusMapper,
         private readonly RoleMapper $roleMapper
-    )
-    {
+    ) {
     }
 
     /**
      * A list of services and the people in them
      *
      * @throws \Alaress\Database\Predicate\InvalidColumnException
-     * @throws \Psr\Container\NotFoundExceptionInterface|\Psr\Container\ContainerExceptionInterface
-     * @throws \ReflectionException
      * @throws \Schoolbox\Mapper\DefinitionException
-     * @throws \Schoolbox\Mapper\Exception
      * @throws \UnexpectedValueException
+     * @throws Error
      */
     public function getRoster(): void
     {
