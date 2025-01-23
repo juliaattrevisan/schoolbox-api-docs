@@ -1276,7 +1276,7 @@ abstract class Kernel
                         /** @var IConfigLoader $config */
                         $config = $di->get('config');
 
-                        /** @var array|IConnector $databaseExternal */
+                        /** @var IConnector $databaseExternal */
                         $databaseExternal = $di->get('databaseExternal');
                         $databaseExternal = ($databaseExternal instanceof NullConnector) ? null : $databaseExternal;
 
@@ -1310,7 +1310,7 @@ abstract class Kernel
             /** @var IConfigLoader $config */
             $config = $di->get('config');
 
-            /** @var array|IConnector $databaseExternal */
+            /** @var IConnector $databaseExternal */
             $databaseExternal = $di->get('databaseExternal');
 
             // Create the external connection to community portal
@@ -1360,7 +1360,7 @@ abstract class Kernel
             /** @var IConfigLoader $config */
             $config = $di->get('config');
 
-            /** @var array|IConnector $databaseExternal */
+            /** @var IConnector $databaseExternal */
             $databaseExternal = $di->get('databaseExternal');
 
             // Create the external connection to docman
