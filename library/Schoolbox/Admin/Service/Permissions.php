@@ -116,6 +116,12 @@ class Permissions
 
         $servicePermissionTablesData = [];
 
+        // Use 'moderate' for full access instead of UserAccess::MEMBERSHIP_ADMIN.
+        // This is to ensure service permission terminology matches that used on the Modify User page.
+        // TODO: Fix the UserAccess constants so this will not be necessary.
+        $accessLevelToNameModified = UserAccess::ACCESS_LEVEL_TO_NAME;
+        $accessLevelToNameModified[UserAccess::ACCESS_FULL] = 'moderate';
+
         foreach ($userAccessRows as $row) {
             $serviceName = $serviceNameLookup[$row['serviceId']];
 
@@ -125,7 +131,7 @@ class Permissions
 
             $servicePermissionTablesData[$serviceName][] = [
                 'user' => $users->getBy('id', $row['userId']),
-                'accessName' => ucfirst(UserAccess::ACCESS_LEVEL_TO_NAME[$row['accessLevel']]), // TODO: Change ACCESS_LEVEL_TO_NAME so that 'Moderator' is returned instead of 'Admin'.
+                'accessName' => ucfirst($accessLevelToNameModified[$row['accessLevel']]),
                 'sidLabel' => match ($serviceName) {
                     'Calendar' => 'Campus',
                     'Impersonator' => 'Role',
