@@ -1751,11 +1751,6 @@ parameters:
 			path: library/Schoolbox/Admin/Home/Controller.php
 
 		-
-			message: "#^Property Schoolbox\\\\Admin\\\\Service\\\\Controller\\:\\:\\$errorMapper is never read, only written\\.$#"
-			count: 1
-			path: library/Schoolbox/Admin/Service/Controller.php
-
-		-
 			message: "#^If condition is always true\\.$#"
 			count: 1
 			path: library/Schoolbox/Admin/Settings/FieldType/FileMulti/Renderer.php
