@@ -170,9 +170,9 @@ class Builder
 
 
     /**
-     * @var Client|null
+     * @var Client
      */
-    private ?Client $client;
+    private Client $client;
 
 
     /**

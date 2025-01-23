@@ -77,8 +77,8 @@ class Model implements ISoftDeletable, IModel
 
     private User $modifiedBy;
 
-    /** @var GenericCollection<Access\Model>|null */
-    private ?GenericCollection $access;
+    /** @var GenericCollection<Access\Model> */
+    private GenericCollection $access;
 
     /** @var GenericCollection<Comment\Model> */
     private GenericCollection $comments;
