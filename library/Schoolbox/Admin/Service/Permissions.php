@@ -11,8 +11,8 @@
 namespace Schoolbox\Admin\Service;
 
 use Schoolbox\CampusMapper;
-use Schoolbox\Permission\Access;
 use Schoolbox\Permission\Access\UserAccess;
+use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\RoleMapper;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
@@ -27,16 +27,53 @@ class Permissions
     /**
      * Constructor.
      * @param UserMapper $userMapper
-     * @param Access\UserAccessMapper $userAccessMapper
+     * @param UserAccessMapper $userAccessMapper
      * @param CampusMapper $campusMapper
      * @param RoleMapper $roleMapper
      */
     public function __construct(
         private readonly UserMapper $userMapper,
-        private readonly Access\UserAccessMapper $userAccessMapper,
+        private readonly UserAccessMapper $userAccessMapper,
         private readonly CampusMapper $campusMapper,
         private readonly RoleMapper $roleMapper
     ) {
+    }
+
+    /**
+     * Generate the list
+     *
+     * @return array
+     * @throws \Alaress\Database\Predicate\InvalidColumnException
+     * @throws \Schoolbox\Mapper\DefinitionException
+     * @throws \Schoolbox\Mapper\Exception
+     * @throws \UnexpectedValueException
+     * @throws \PDOException
+     */
+    public function generate(): array
+    {
+        $services = [];
+
+        /* We don't need to list the HOMEPAGE service (1) here
+         * The TUTORIAL service (4) got deleted at some point
+         */
+        $query = '
+            SELECT id, name
+            FROM lu_service
+            WHERE id NOT IN (:homepageConst, :tutorialConst)
+            ORDER BY name
+        ';
+
+        $statement = $this->userAccessMapper->getDatabase()->prepare($query);
+        $statement->execute([
+                                'homepageConst' => UserAccess::SERVICE_HOMEPAGE,
+                                'tutorialConst' => self::SERVICE_TUTORIAL
+                            ]);
+
+        while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
+            $services[$row['name']] = $this->userAccessMapper->findUsersForService($row['id'])->getUnique('id')->indexBy('id');
+        }
+
+        return $services;
     }
 
     /**
