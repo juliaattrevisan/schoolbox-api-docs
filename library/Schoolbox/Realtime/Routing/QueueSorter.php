@@ -125,12 +125,12 @@ class QueueSorter implements FilterInterface
                         break;
 
                     case RoutePermission::INSTANT:
-                        $this->pushToQueue($this->listFactory->instant($userId), $instance);
+                        $this->pushToQueue($this->listFactory->instant($userId), $instance, delayable: true);
                         $processed = true;
                         break;
 
                     case RoutePermission::PUSH:
-                        $this->pushToQueue($this->listFactory->mobile($userId), $instance);
+                        $this->pushToQueue($this->listFactory->mobile($userId), $instance, delayable: true);
                         $processed = true;
                         break;
 
@@ -302,13 +302,58 @@ class QueueSorter implements FilterInterface
     /**
      * Push to a queue, with retry on rate-limit.
      *
-     * @param QueueInterface $queue
-     * @param Instance       $instance
-     * @param int            $attemptNum
+     * @param QueueInterface $queue      The queue to push to.
+     * @param Instance       $instance   The message instance to push.
+     * @param int            $attemptNum What attempt number is this? Starts at 0, increments until jitter algorithm
+     *                                   rejects it.
+     * @param bool           $delayable  If true, this delivery may be delayed until after the configured quiet time has
+     *                                   passed.
+     *                                   Alert delivery instances may not be delayed: otherwise this will be true for
+     *                                   instant delivery types (so that users aren't notified within the quiet time).
+     *
      * @return void
      */
-    private function pushToQueue(QueueInterface $queue, Instance $instance, int $attemptNum = 0): void
-    {
+    private function pushToQueue(
+        QueueInterface $queue,
+        Instance $instance,
+        int $attemptNum = 0,
+        bool $delayable = false,
+    ): void {
+        if ($delayable) {
+            if ($instance->retrieveDeliveryMethod() === Instance::DELIVERY_ALERT) {
+                $this->log->notice('Delivery type is alert: not attempting to delay');
+            } else {
+                // Is the current time within the quiet period?
+                $quietStart  = '15:15:00';
+                $quietEnd    = '15:42:00';
+                $now         = \Alaress_Date_Format::now();
+                $currentTime = $now->getUsingFormat('H:i:s');
+
+                if ($quietStart <= $quietEnd) {
+                    // Start time < end time:
+                    // the quiet period does not overlap 00:00
+                    $quiet = ($currentTime >= $quietStart && $currentTime <= $quietEnd);
+                } else {
+                    // Start time > end time:
+                    // the quiet period overlaps 00:00
+                    $quiet = ($currentTime >= $quietStart || $currentTime <= $quietEnd);
+                }
+                if ($quiet) {
+                    // How many seconds to go until quiet time expires?
+                    $delay = strtotime($quietEnd) - strtotime($currentTime) + random_int(1, 60);
+                    $this->log->notice(sprintf('Delivery is delayed %ss until at least %s (it is now %s)', $delay, $quietEnd, $currentTime));
+                    $this->loop->addTimer(
+                        $delay,
+                        fn () => $this->pushToQueue($queue, $instance, $attemptNum, $delayable),
+                    );
+                    return;
+                } else {
+                    $this->log->notice('Delivery is not delayed');
+                }
+            }
+        }
+
+
         try {
             $queue->push($instance);
         } catch (RateLimitException) {
@@ -330,7 +375,7 @@ class QueueSorter implements FilterInterface
             );
             $this->loop->addTimer(
                 $wait / 1000,
-                fn () => $this->pushToQueue($queue, $instance, $attemptNum + 1),
+                fn () => $this->pushToQueue($queue, $instance, $attemptNum + 1, $delayable),
             );
         }
     }
