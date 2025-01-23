@@ -1,2 +1,2 @@
-ALTER TABLE lu_pastoral_type ADD COLUMN default_expiry enum ('never', '1 week', '2 weeks', '1 month', '6 months', '12 months', 'academic period', 'academic year') default 'never' not null after sentiment;
-ALTER TABLE lu_pastoral_subtype ADD COLUMN default_expiry enum ('never', '1 week', '2 weeks', '1 month', '6 months', '12 months', 'academic period', 'academic year') default 'never' not null after sentiment;
+ALTER TABLE lu_pastoral_type ADD COLUMN default_expiry varchar(255) after sentiment;
+ALTER TABLE lu_pastoral_subtype ADD COLUMN default_expiry varchar(255) after sentiment;
