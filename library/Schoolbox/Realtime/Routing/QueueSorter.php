@@ -321,11 +321,13 @@ class QueueSorter implements FilterInterface
     ): void {
         if ($delayable) {
             if ($instance->retrieveDeliveryMethod() === Instance::DELIVERY_ALERT) {
-                $this->log->notice('Delivery type is alert: not attempting to delay');
+                $this->log->notice(
+                    sprintf('Message %s delivery type is alert: not attempting to delay', $instance->getBaseHash())
+                );
             } else {
                 // Is the current time within the quiet period?
-                $quietStart  = '15:15:00';
-                $quietEnd    = '15:42:00';
+                $quietStart  = '23:50:00';
+                $quietEnd    = '16:00:00';
                 $now         = \Alaress_Date_Format::now();
                 $currentTime = $now->getUsingFormat('H:i:s');
 
@@ -341,14 +343,28 @@ class QueueSorter implements FilterInterface
                 if ($quiet) {
                     // How many seconds to go until quiet time expires?
                     $delay = strtotime($quietEnd) - strtotime($currentTime) + random_int(1, 60);
-                    $this->log->notice(sprintf('Delivery is delayed %ss until at least %s (it is now %s)', $delay, $quietEnd, $currentTime));
+                    $this->log->notice(
+                        sprintf(
+                            'Message %s delivery is delayed %ss until end of quiet period (%s-%s)',
+                            $instance->getBaseHash(),
+                            $delay,
+                            $quietStart,
+                            $quietEnd,
+                        )
+                    );
                     $this->loop->addTimer(
                         $delay,
                         fn () => $this->pushToQueue($queue, $instance, $attemptNum, $delayable),
                     );
+                    // Need to ensure this stays on the queue
                     return;
                 } else {
-                    $this->log->notice('Delivery is not delayed');
+                    $this->log->notice(
+                        sprintf(
+                            'Message %s delivery is not delayed',
+                            $instance->getBaseHash(),
+                        )
+                    );
                 }
             }
         }
