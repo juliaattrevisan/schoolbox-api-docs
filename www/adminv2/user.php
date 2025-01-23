@@ -1,12 +1,14 @@
 <?php
 
 use Schoolbox\Admin\Navigation\Subnav;
+use Schoolbox\CampusMapper;
 use Schoolbox\Collection;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Role;
 use Schoolbox\RoleMapper;
 use Schoolbox\Admin\Service\Permissions;
 use Schoolbox\Permission\Access\UserAccessMapper;
+use Schoolbox\UserMapper;
 
 /** @var SitePage $this */
 
@@ -46,10 +48,15 @@ if (is_array($superuserList)) {
     }
 }
 
-$permissions = new Permissions(new UserAccessMapper());
-$usersByServiceName = $permissions->getUsersByServiceName($permissions->getServiceNameById());
-foreach ($usersByServiceName as $serviceName => $serviceUsers) {
-    $this->setVar(['SERVICE_NAME' => $serviceName,
+$permissions = new Permissions(
+    new UserMapper(),
+    new UserAccessMapper(),
+    new CampusMapper(),
+    new RoleMapper(),
+);
+$serviceUserList = $permissions->generate();
+foreach ($serviceUserList as $service => $serviceUsers) {
+    $this->setVar(['SERVICE_NAME' => $service,
                    'SERVICE_COUNT' => count($serviceUsers)]);
     $this->parse('service_block', 'service', true);
 }
