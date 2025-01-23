@@ -297,12 +297,12 @@ parameters:
 
 		-
 			message: "#^Method Alaress\\\\Session\\\\BaseSessionSegment\\:\\:clear\\(\\) should return null but return statement is missing\\.$#"
-			count: 1
+			count: 2
 			path: library/Alaress/Session/BaseSessionSegment.php
 
 		-
 			message: "#^Method Alaress\\\\Session\\\\BaseSessionSegment\\:\\:load\\(\\) should return null but return statement is missing\\.$#"
-			count: 1
+			count: 2
 			path: library/Alaress/Session/BaseSessionSegment.php
 
 		-

@@ -335,8 +335,7 @@ HELP;
      *
      * @param string $filepath
      *
-     @ @phpstan-ignore-next-line: I don't know how this never returns false
-     * @return false|string
+     * @return string
      */
     private function getFilename(string $filepath)
     {

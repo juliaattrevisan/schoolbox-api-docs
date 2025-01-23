@@ -194,8 +194,7 @@ $kernel = new CliTool\Kernel(new class extends CliTool\App
             case -2:
                 return "expired";
             default:
-                // @phpstan-ignore-next-line: date can return false
-                return date('Y-m-d H:i:s', time() + $ttl) ?: '';
+                return date('Y-m-d H:i:s', time() + $ttl);
         }
     }
 }, [CliTool\Kernel::OPTION_LEVEL => Monolog\Logger::INFO, CliTool\Kernel::OPTION_ERRORS => E_ALL]);
