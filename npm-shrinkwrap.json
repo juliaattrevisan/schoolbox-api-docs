@@ -95,7 +95,6 @@
         "v-tables-3-select-rows": "~0.4.9",
         "videojs-record": "~4.8.0",
         "vue": "~3.5.12",
-        "vue-select": "~4.0.0-beta.6",
         "vuejs-paginate-next": "~1.0.2"
       },
       "devDependencies": {
@@ -28360,14 +28359,6 @@
         "node": ">=8"
       }
     },
-    "node_modules/vue-select": {
-      "version": "4.0.0-beta.6",
-      "resolved": "https://registry.npmjs.org/vue-select/-/vue-select-4.0.0-beta.6.tgz",
-      "integrity": "sha512-K+zrNBSpwMPhAxYLTCl56gaMrWZGgayoWCLqe5rWwkB8aUbAUh7u6sXjIR7v4ckp2WKC7zEEUY27g6h1MRsIHw==",
-      "peerDependencies": {
-        "vue": "3.x"
-      }
-    },
     "node_modules/vue-style-loader": {
       "version": "4.1.3",
       "resolved": "https://registry.npmjs.org/vue-style-loader/-/vue-style-loader-4.1.3.tgz",
@@ -50079,12 +50070,6 @@
           }
         }
       }
-    },
-    "vue-select": {
-      "version": "4.0.0-beta.6",
-      "resolved": "https://registry.npmjs.org/vue-select/-/vue-select-4.0.0-beta.6.tgz",
-      "integrity": "sha512-K+zrNBSpwMPhAxYLTCl56gaMrWZGgayoWCLqe5rWwkB8aUbAUh7u6sXjIR7v4ckp2WKC7zEEUY27g6h1MRsIHw==",
-      "requires": {}
     },
     "vue-style-loader": {
       "version": "4.1.3",
