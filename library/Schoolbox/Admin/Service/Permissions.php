@@ -107,7 +107,8 @@ class Permissions
             JOIN lu_service AS lus ON ua.service = lus.id
             WHERE u.deleted_at IS NULL
             AND ua.service IN (' . implode(',', array_map('intval', array_keys($serviceNameLookup))) . ')
-            ORDER BY lus.name ASC, u.firstname ASC, u.lastname ASC, accessLevel DESC' // AccessLevel DESC ensures 'Moderate' is at top.
+            ORDER BY lus.name ASC, u.firstname ASC, u.lastname ASC, accessLevel DESC, sid ASC'
+            // Order by sid ensures ordering has no ambiguity, so ordering is consistent on every page load.
         )->fetchAll();
 
         $userIds = array_unique(array_column($userAccessRows, 'userId'));
