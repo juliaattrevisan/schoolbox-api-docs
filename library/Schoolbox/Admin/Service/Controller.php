@@ -18,26 +18,6 @@ use Schoolbox\UserMapper;
 class Controller extends Base
 {
     /**
-     * @var \Schoolbox\UserMapper
-     */
-    private $userMapper;
-
-    /**
-     * @var Access\UserAccessMapper
-     */
-    private $userAccessMapper;
-
-    /**
-     * @var CampusMapper
-     */
-    private $campusMapper;
-
-    /**
-     * @var RoleMapper
-     */
-    private $roleMapper;
-
-    /**
      * Controller constructor.
      * @param UserAccessMapper $userAccessMapper
      * @param UserMapper       $userMapper
@@ -45,17 +25,12 @@ class Controller extends Base
      * @param RoleMapper       $roleMapper
      */
     public function __construct(
-        // TODO: Use compact constructor format.
-        Access\UserAccessMapper $userAccessMapper,
-        UserMapper $userMapper,
-        CampusMapper $campusMapper,
-        RoleMapper $roleMapper
+        private readonly Access\UserAccessMapper $userAccessMapper,
+        private readonly UserMapper $userMapper,
+        private readonly CampusMapper $campusMapper,
+        private readonly RoleMapper $roleMapper
     )
     {
-        $this->userMapper = $userMapper;
-        $this->userAccessMapper = $userAccessMapper;
-        $this->campusMapper = $campusMapper;
-        $this->roleMapper = $roleMapper;
     }
 
     /**
