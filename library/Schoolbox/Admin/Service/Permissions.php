@@ -96,33 +96,24 @@ class Permissions
             ]
         )->fetchColumnArray('name', 'id');
 
-        $userAccessObjects = $this->userAccessMapper->findByColumn('service', array_keys($serviceNameLookup));
-        $usersWithDuplicates = $userAccessObjects->map(function ($uaObj) {return $uaObj->getUser();});
-        $userIds = array_unique($usersWithDuplicates->getPropertyValues('id'));
+        $userAccessRows = $this->userAccessMapper->getDatabase()->executeQuery(
+            'SELECT
+            ua.service AS serviceId,
+            ua.sid,
+            ua.uid AS userId,
+            ua.type AS accessLevel
+            FROM userAccess ua
+            JOIN user u ON ua.uid = u.id
+            JOIN lu_service AS lus ON ua.service = lus.id
+            WHERE u.deleted_at IS NULL
+            AND ua.service IN (' . implode(',', array_map('intval', array_keys($serviceNameLookup))) . ')
+            ORDER BY lus.name ASC, u.firstname ASC, u.lastname ASC, accessLevel DESC' // AccessLevel DESC ensures 'Moderate' is at top.
+        )->fetchAll();
+
+        $userIds = array_unique(array_column($userAccessRows, 'userId'));
         $users = $this->userMapper->findByColumn('id', $userIds);
         $campuses = $this->campusMapper->findAll();
         $roles = $this->roleMapper->findAll();
-
-        $userAccessObjects->sortByCallback(
-            function (UserAccess $a, UserAccess $b) use ($serviceNameLookup, $users, $campuses, $roles) {
-                $serviceNameA = $serviceNameLookup[$a->getService()];
-                $serviceNameB = $serviceNameLookup[$b->getService()];
-                $userA = $users->getBy('id', $a->getUser()->getId());
-                $userB = $users->getBy('id', $b->getUser()->getId());
-
-                // ORDER BY serviceName ASC, fullName ASC, accessLevel DESC, serviceIdentifier ASC.
-                if ($serviceNameA === $serviceNameB) {
-                    if ($userA->getFullName() === $userB->getFullName()) {
-                        if ($a->getAccessLevel() === $b->getAccessLevel()) {
-                            return $a->getServiceIdentifier() <=> $b->getServiceIdentifier();
-                        }
-                        return $b->getAccessLevel() <=> $a->getAccessLevel();
-                    }
-                    return $userA->getFullName() <=> $userB->getFullName();
-                }
-                return strtolower($serviceNameA) <=> strtolower($serviceNameB); // String to lower to mimic SQL ORDER BY behaviour.
-            }
-        );
 
         $servicePermissionTablesData = [];
 
@@ -132,24 +123,24 @@ class Permissions
         $accessLevelToNameModified = UserAccess::ACCESS_LEVEL_TO_NAME;
         $accessLevelToNameModified[UserAccess::ACCESS_FULL] = 'moderate';
 
-        foreach ($userAccessObjects as $uaObj) {
-            $serviceName = $serviceNameLookup[$uaObj->getService()];
+        foreach ($userAccessRows as $row) {
+            $serviceName = $serviceNameLookup[$row['serviceId']];
 
             if (!array_key_exists($serviceName, $servicePermissionTablesData)) {
                 $servicePermissionTablesData[$serviceName] = [];
             }
 
             $servicePermissionTablesData[$serviceName][] = [
-                'user' => $users->getBy('id', $uaObj->getUser()->getId()), // Note $uaObj->user is not hydrated.
-                'accessName' => ucfirst($accessLevelToNameModified[$uaObj->getAccessLevel()]),
+                'user' => $users->getBy('id', $row['userId']),
+                'accessName' => ucfirst($accessLevelToNameModified[$row['accessLevel']]),
                 'sidLabel' => match ($serviceName) {
                     'Calendar' => 'Campus',
                     'Impersonator' => 'Role',
                     default => ''
                 },
                 'sidDisplayValue' => match ($serviceName) {
-                    'Calendar' => $campuses->getBy('id', $uaObj->getServiceIdentifier())->getName(),
-                    'Impersonator' => $roles->getBy('id', $uaObj->getServiceIdentifier())->getName(),
+                    'Calendar' => $campuses->getBy('id', $row['sid'])->getName(),
+                    'Impersonator' => $roles->getBy('id', $row['sid'])->getName(),
                     default => ''
                 },
             ];
