@@ -259,6 +259,7 @@ class Controller extends Base
                 'typeActions'     => $subType ? $subType->getTypeActions() : $type->getTypeActions(),
                 'icons'           => $this->iconMapper->findAll()->sortNaturally('title'),
                 'sentiments'      => Pastoral\Type\TypeAbstract::SENTIMENT_VALUES,
+                'defaultExpiry'   => Pastoral\Type\TypeAbstract::PASTORAL_EXPIRY,
                 'flagColors'  => [
                     'foreground' => ($foregroundColor === null) ? null : $foregroundColor->getAsRgba(),
                     'background' => ($backgroundColor === null) ? null : $backgroundColor->getAsRgba(),
@@ -357,6 +358,9 @@ class Controller extends Base
         $currentType->setIcon($post['icon'] ?: null);
         if (in_array($post['sentiment'], Pastoral\Type\TypeAbstract::SENTIMENT_VALUES)) {
             $currentType->setSentiment($post['sentiment']);
+        }
+        if (in_array($post['defaultExpiry'], Pastoral\Type\TypeAbstract::PASTORAL_EXPIRY)) {
+            $currentType->setDefaultExpiry($post['defaultExpiry']);
         }
         $currentType->setColor(!empty($post['color']) ? $this->colorFactory->build($post['color']) : null);
         $currentType->setVisibilityLocked($isVisibilityLocked);
