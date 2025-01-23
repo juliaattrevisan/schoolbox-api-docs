@@ -52,7 +52,7 @@ class Controller extends Base
 
         $this->response = $this->responseFromTemplate(
             '@service/permissions.twig',
-            ['servicePermissionTablesData' => $permissions->getServicePermissionTablesData()]
+            ['servicePermissionTablesData' => $permissions->getReportTablesData()]
         );
     }
 }

@@ -79,7 +79,7 @@ class Permissions
     /**
      * @return array<string, list<array{user: User, accessName: string, sidLabel: string, sidDisplayValue: string}>>
      */
-    public function getServicePermissionTablesData(): array
+    public function getReportTablesData(): array
     {
         $serviceNameLookup = $this->userAccessMapper->getDatabase()->executeQuery(
             'SELECT id, name
