@@ -219,9 +219,6 @@ class Controller extends AbstractController
             $admins         = UserAccessMapper::getInstance()->findAdminsInCategory($folder);
             if ($admins->count()) {
                 $data['admin'] = $this->userMapper->findById($admins->first()->getId());
-            } else {
-                $data['admin'] = new User();
-                $data['admin']->setFirstname('Nobody');
             }
         } else {
             $access       = Access::getInstance();
