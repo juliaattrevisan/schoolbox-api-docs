@@ -24,31 +24,6 @@ class Permissions
      */
     private const SERVICE_TUTORIAL = 4;
 
-
-    /**
-     * @var Access\UserAccessMapper
-     */
-    private $userAccessMapper;
-
-
-    /**
-     * @var UserMapper
-     */
-    private $userMapper;
-
-
-    /**
-     * @var CampusMapper
-     */
-    private $campusMapper;
-
-
-    /**
-     * @var RoleMapper
-     */
-    private $roleMapper;
-
-
     /**
      * Constructor.
      * @param UserMapper $userMapper
@@ -57,19 +32,13 @@ class Permissions
      * @param RoleMapper $roleMapper
      */
     public function __construct(
-        UserMapper $userMapper,
-        Access\UserAccessMapper $userAccessMapper,
-        CampusMapper $campusMapper,
-        RoleMapper $roleMapper
+        private readonly UserMapper $userMapper,
+        private readonly Access\UserAccessMapper $userAccessMapper,
+        private readonly CampusMapper $campusMapper,
+        private readonly RoleMapper $roleMapper
     )
     {
-        // TODO: Use compact constructor format.
-        $this->userMapper = $userMapper;
-        $this->userAccessMapper = $userAccessMapper;
-        $this->campusMapper = $campusMapper;
-        $this->roleMapper = $roleMapper;
     }
-
 
     /**
      * Return an array of service names indexed by serviceId.
@@ -92,7 +61,6 @@ class Permissions
             ]
         )->fetchColumnArray('name', 'id');
     }
-
 
     /**
      * @return array<string, list<array{user: User, accessName: string, sidLabel: string, sidDisplayValue: string}>>
