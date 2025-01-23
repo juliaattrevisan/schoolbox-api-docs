@@ -15,39 +15,27 @@
     <div class="small-12 island">
         <h2 class="subheader" id="{{ serviceName }}">{{ serviceName }}</h2>
         {% if users|length %}
-        <section>
-            <ul class="information-list">
-                {% for user in users %}
-                    <li class="actions-small-1">
-                        <div class="list-item">
-                            <div class="compact card small-12">
-                                <span>
-                                    {% include 'include/portrait.twig' with {user: user} only %}
-                                    {% set rows = userAccessInfoByUserId[user.id][serviceName] %}
-                                    {% set userNameDisplayed = false %}
-                                    <table class='info-table'>
-                                        {% for row in rows %}
-                                            <tr>
-                                                {% if not userNameDisplayed %}
-                                                    <td class='user-name' rowspan='{{ rows|length }}'>
-                                                        <a href="/adminv2/user/{{ user.id }}/modify">{{ user.fullname }}</a>
-                                                    </td>
-                                                    {% set userNameDisplayed = true %}
-                                                {% endif %}
-                                                <td title='Access type'>{{ row['accessType'] }}</td>
-                                                <td{% if row['sidLabel'] %} title='Service details'{% endif %}>
-                                                    {% if row['sidLabel'] %}({{ row['sidLabel'] }}: {{ row['sidDisplayValue'] }}){% endif %}
-                                                </td>
-                                            </tr>
-                                        {% endfor %}
-                                    </table>
-                                </span>
-                            </div>
-                        </div>
-                    </li>
-                {% endfor %}
-            </ul>
-        </section>
+            <section>
+                <table class='info-table'>
+                    <tbody>
+                        {% for user in users %}
+                            {% set rows = userAccessInfoByUserId[user.id][serviceName] %}
+                            {% for row in rows %}
+                                <tr>
+                                    <td>
+                                        {% include 'include/portrait.twig' with {user: user, sizeParameter: 'tiny'} only %}
+                                        <a href="/adminv2/user/{{ user.id }}/modify">{{ user.fullname }}</a>
+                                    </td>
+                                    <td title='Access type'>{{ row['accessType'] }}</td>
+                                    <td{% if row['sidLabel'] %} title='Service details'{% endif %}>
+                                        {% if row['sidLabel'] %}({{ row['sidLabel'] }}: {{ row['sidDisplayValue'] }}){% endif %}
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </section>
         {% else %}
             <div class="empty-state">
                 <i class="icon-staff-students"></i>
@@ -56,18 +44,4 @@
         {% endif %}
     </div>
 </div>
-<style>
-.info-table {
-    margin-bottom: 0;
-}
-
-.info-table tr > td {
-    border: none;
-    width: 33%;
-}
-
-.info-table tr > td.user-name {
-    vertical-align: middle;
-}
-</style>
 {% endfor %}
