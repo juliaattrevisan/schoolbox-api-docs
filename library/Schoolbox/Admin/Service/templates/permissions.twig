@@ -23,8 +23,10 @@
                             {% for row in rows %}
                                 <tr>
                                     <td>
-                                        {% include 'include/portrait.twig' with {user: user, sizeParameter: 'tiny'} only %}
-                                        <a href="/adminv2/user/{{ user.id }}/modify">{{ user.fullname }}</a>
+                                        <a href="/adminv2/user/{{ user.id }}/modify">
+                                            {% include 'include/portrait.twig' with {user: user, render: 'tiny'} only %}
+                                            {{ user.fullname }}
+                                        </a>
                                     </td>
                                     <td title='Access type'>{{ row['accessType'] }}</td>
                                     <td{% if row['sidLabel'] %} title='Service details'{% endif %}>
