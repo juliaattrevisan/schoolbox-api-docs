@@ -156,6 +156,54 @@ class Scheduler extends AbstractScheduler implements IConsumer
                 $attemptNum,
             )
         );
+
+        // Delay delivery
+        if ($payload->retrieveDeliveryMethod() === Instance::DELIVERY_ALERT) {
+            $this->log->notice(
+                sprintf(
+                    'Message %s:%s delivery type is alert: not attempting to delay',
+                    $payload->getBaseHash(),
+                    $payload->getParamHash(),
+                )
+            );
+        } else {
+            // Is the current time within the quiet period?
+            $quietStart  = '23:50:00';
+            $quietEnd    = '09:29:00';
+            $now         = \Alaress_Date_Format::now();
+            $currentTime = $now->getUsingFormat('H:i:s');
+
+            if ($quietStart <= $quietEnd) {
+                // Start time < end time:
+                // the quiet period does not overlap 00:00
+                $quiet = ($currentTime >= $quietStart && $currentTime <= $quietEnd);
+            } else {
+                // Start time > end time:
+                // the quiet period overlaps 00:00
+                $quiet = ($currentTime >= $quietStart || $currentTime <= $quietEnd);
+            }
+            if ($quiet) {
+                // How many seconds to go until quiet time expires?
+                $delay = strtotime($quietEnd) - strtotime($currentTime) + random_int(1, 60);
+                $this->log->notice(
+                    sprintf(
+                        'Message %s:%s delivery delayed %ss until end of quiet period (%s-%s)',
+                        $payload->getBaseHash(),
+                        $payload->getParamHash(),
+                        $delay,
+                        $quietStart,
+                        $quietEnd,
+                    )
+                );
+
+                $this->loop->addTimer(
+                    $delay,
+                    fn () => $this->attemptPush($instanceId, $userId, $payload, $resolver, 0),
+                );
+                return;
+            }
+        }
+
         try {
             $this->serviceManager->push($userId, $payload);
             $resolver->acknowledge();
