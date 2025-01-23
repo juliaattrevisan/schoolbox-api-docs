@@ -10,32 +10,36 @@
     </div>
 </div>
 
-{% for service, people in services %}
+{% for serviceName, tableData in servicePermissionTablesData %}
 <div class="row">
     <div class="small-12 island">
-        <h2 class="subheader" id="{{ service }}">{{ service }}</h2>
-        {% if people|length %}
-        <section>
-            <ul class="information-list">
-                {% for person in people %}
-                    <li class="actions-small-1">
-                        <div class="list-item">
-                            <div class="compact card small-12">
-                                <a href="/adminv2/user/{{ person.id }}/modify">
-                                    {% include 'include/portrait.twig' with {user: person} only %}
-                                    <p>
-                                        {{ person.fullname }}
-                                    </p>
+        {% if servicePermissionTablesData|length %}
+            <h2 class="subheader" id="{{ serviceName }}">{{ serviceName }}</h2>
+            <section>
+                <table class='service-permissions'>
+                    <thead>
+                        <tr>
+                            <th>User</th>
+                            <th>Service Identifier</th>
+                            <th>Access</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    {% for row in tableData %}
+                        <tr>
+                            <td>
+                                <a href="/adminv2/user/{{ row.user.id }}/modify">
+                                    {% include 'include/portrait.twig' with {user: row.user, render: 'tiny'} only %}
+                                    {{ row.user.fullname }}
                                 </a>
-                            </div>
-                        </div>
-                        <nav>
-                            <!-- <a class="icon-delete no-text" href="#" title="Delete"></a> -->
-                        </nav>
-                    </li>
-                {% endfor %}
-            </ul>
-        </section>
+                            </td>
+                            <td>{% if row['sidLabel'] %}{{ row['sidLabel'] }}: {{ row['sidDisplayValue'] }}{% endif %}</td>
+                            <td>{{ row['accessName'] }}</td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </section>
         {% else %}
             <div class="empty-state">
                 <i class="icon-staff-students"></i>
@@ -45,3 +49,15 @@
     </div>
 </div>
 {% endfor %}
+<style>
+/* Set column widths so columns in all tables line up vertically. */
+table.service-permissions td:nth-child(1) {
+   width: 45%;
+}
+table.service-permissions td:nth-child(2) {
+    width: 35%;
+}
+table.service-permissions td:nth-child(3) {
+    width: 20%;
+}
+</style>

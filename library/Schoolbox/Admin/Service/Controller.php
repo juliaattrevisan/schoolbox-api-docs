@@ -9,49 +9,50 @@
 namespace Schoolbox\Admin\Service;
 
 use Alaress\Web\Controller\Base;
-use Schoolbox\Error\Mapper as ErrorMapper;
+use Schoolbox\CampusMapper;
 use Schoolbox\Permission\Access;
+use Schoolbox\Permission\Access\UserAccessMapper;
+use Schoolbox\RoleMapper;
+use Schoolbox\UserMapper;
+use Twig\Error\Error;
 
 class Controller extends Base
 {
     /**
-     * @var \Schoolbox\Error\Mapper
-     */
-    private $errorMapper;
-
-    /**
-     * @var Access\UserAccessMapper
-     */
-    private $userAccessMapper;
-
-
-    /**
      * Controller constructor.
-     * @param ErrorMapper             $errorMapper
-     * @param Access\UserAccessMapper $userAccessMapper
+     * @param UserAccessMapper $userAccessMapper
+     * @param UserMapper       $userMapper
+     * @param CampusMapper     $campusMapper
+     * @param RoleMapper       $roleMapper
      */
-    public function __construct(ErrorMapper $errorMapper, Access\UserAccessMapper $userAccessMapper)
-    {
-        $this->errorMapper = $errorMapper;
-        $this->userAccessMapper = $userAccessMapper;
+    public function __construct(
+        private readonly Access\UserAccessMapper $userAccessMapper,
+        private readonly UserMapper $userMapper,
+        private readonly CampusMapper $campusMapper,
+        private readonly RoleMapper $roleMapper
+    ) {
     }
-
 
     /**
      * A list of services and the people in them
      *
      * @throws \Alaress\Database\Predicate\InvalidColumnException
-     * @throws \Psr\Container\NotFoundExceptionInterface|\Psr\Container\ContainerExceptionInterface
-     * @throws \ReflectionException
      * @throws \Schoolbox\Mapper\DefinitionException
-     * @throws \Schoolbox\Mapper\Exception
      * @throws \UnexpectedValueException
+     * @throws Error
      */
-    public function getRoster()
+    public function getRoster(): void
     {
-        $this->response = $this->responseFromTemplate('@service/permissions.twig', [
-            'services' => (new Permissions($this->userAccessMapper))->generate(),
-            'pageCurrent' => 'user',
-        ]);
+        $permissions = new Permissions(
+            $this->userMapper,
+            $this->userAccessMapper,
+            $this->campusMapper,
+            $this->roleMapper
+        );
+
+        $this->response = $this->responseFromTemplate(
+            '@service/permissions.twig',
+            ['servicePermissionTablesData' => $permissions->getReportTablesData()]
+        );
     }
 }
