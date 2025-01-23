@@ -20,16 +20,10 @@ export default {
         };
     },
 
-    methods: {
-        /**
-         * Open the modal.
-         */
-        open() {
-            this.$refs.modal.open();
-        },
-
+    computed: {
         /**
          * Check if selected is empty
+         * @returns {boolean} - whether the selected object is empty
          */
         isSelectedEmpty() {
             let isEmpty = true;
@@ -39,6 +33,15 @@ export default {
                 }
             }
             return isEmpty;
+        },
+    },
+
+    methods: {
+        /**
+         * Open the modal.
+         */
+        open() {
+            this.$refs.modal.open();
         },
 
         /**
