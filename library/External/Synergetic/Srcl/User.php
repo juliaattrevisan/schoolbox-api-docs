@@ -71,7 +71,7 @@ class External_Synergetic_Srcl_User extends External_Synergetic_User
                 (
                     SELECT    COUNT(*)
                     FROM      dbo.IndividualPlans IEP
-                    WHERE     IEP.ID = vStudentsAll.ID AND
+                    WHERE     IEP.ID = vStudents.ID AND
                     StartDate <= CURRENT_TIMESTAMP AND
                     (EndDate >= CURRENT_TIMESTAMP OR EndDate IS NULL)
                 ) AS countIndividualEducationPlans
