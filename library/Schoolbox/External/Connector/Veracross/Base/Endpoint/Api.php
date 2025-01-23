@@ -94,6 +94,15 @@ class Api implements IApi
 
 
     /**
+     * Cache the decoded credentials here, because other parts of the veracross
+     * connector needs something from here to build attendance links etc.
+     *
+     * @var array
+     */
+    private array $credentials = [];
+
+
+    /**
      * Constructor.
      *
      * @param string       $host
@@ -130,7 +139,9 @@ class Api implements IApi
      */
     private function initClient(string $host, #[SensitiveParameter] string $dsn, int $timeout): Client
     {
-        $credentials = (new Codec\DSN())->decode($dsn);
+        /* You need these parts when build attendance links
+         */
+        $this->credentials = (new Codec\DSN())->decode($this->apiKey);
 
         /* Enforce slash in the endpoint prefix
          *
@@ -142,15 +153,15 @@ class Api implements IApi
         $this->baseUri = sprintf(
             '%s/%s/v3/',
             rtrim($host, '/'),
-            $credentials['schoolroute'],
+            $this->credentials['schoolroute'],
         );
 
         /* Access Token Generator
          */
         $this->accessTokenGenerator = new AccessTokenGenerator(
-            $credentials['schoolroute'],
-            $credentials['clientid'],
-            $credentials['clientsecret']
+            $this->credentials['schoolroute'],
+            $this->credentials['clientid'],
+            $this->credentials['clientsecret']
         );
 
         return new Client([
@@ -365,5 +376,14 @@ class Api implements IApi
     public function getUsage(): ApiUsage
     {
         return $this->apiUsage;
+    }
+
+
+    /**
+     * @return array
+     */
+    public function getCredentials(): array
+    {
+        return $this->credentials;
     }
 }

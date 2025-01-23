@@ -1,7 +1,7 @@
 <?php
 
 /**
- * @copyright   Copyright 2022, Schoolbox Pty Ltd
+ * @copyright   Copyright 2025, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
 
@@ -11,6 +11,7 @@ namespace Schoolbox\External\Connector\Veracross\Base\Endpoint\Codec;
 
 use Schoolbox\External\Connector\IAttendanceLink;
 use Schoolbox\External\Connector\Veracross\Base\Endpoint\Factory;
+use Schoolbox\External\Connector\Veracross\Base\Endpoint\TimetableCalendar\Metadata\Reader;
 use Schoolbox\External\Event\Model;
 use Schoolbox\User;
 
@@ -29,9 +30,10 @@ class AttendanceLink implements IAttendanceLink
 
     /**
      * @param Model $event
-     * @param User  $user
+     * @param User $user
      * @return string
      * @throws \InvalidArgumentException
+     * @throws \JsonException
      */
     public function generate(
         \Schoolbox\External\Event\Model $event,
@@ -41,16 +43,21 @@ class AttendanceLink implements IAttendanceLink
             return '';
         }
 
-//        /* Only generate links where possible
-//         */
-//        if (!$this->isEnabled($classCode, $user, $startAtADF)) {
-//            return '';
-//        }
+        /* We needed this for an identifier obtained during timetable import
+         */
+        $metadata = $event->getMetadata();
 
-        $deepLinkParams = [
-        ];
+        if (!isset($metadata)) {
+            return '';
+        }
 
-        return '';
+        /* Only generate links where possible
+         */
+        if (!$this->isEnabled($event->getCode(), $user, $event->getStartAt())) {
+            return '';
+        }
+
+        return (string)(new Reader())->getAttendanceLink($event->getMetadata());
     }
 
 
