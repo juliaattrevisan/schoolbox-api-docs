@@ -10,34 +10,33 @@
     </div>
 </div>
 
-{% for serviceName, users in usersByServiceName %}
+{% for serviceName, tableData in servicePermissionTablesData %}
 <div class="row">
     <div class="small-12 island">
-        <h2 class="subheader" id="{{ serviceName }}">{{ serviceName }}</h2>
-        {% if users|length %}
+        {% if servicePermissionTablesData|length %}
+            <h2 class="subheader" id="{{ serviceName }}">{{ serviceName }}</h2>
             <section>
                 <table>
                     <thead>
-                        <th>User</th>
-                        <th>Service Identifier</th>
-                        <th>Access</th>
+                        <tr>
+                            <th>User</th>
+                            <th>Service Identifier</th>
+                            <th>Access</th>
+                        </tr>
                     </thead>
                     <tbody>
-                        {% for user in users %}
-                            {% set rows = userAccessInfoByUserId[user.id][serviceName] %}
-                            {% for row in rows %}
-                                <tr>
-                                    <td>
-                                        <a href="/adminv2/user/{{ user.id }}/modify">
-                                            {% include 'include/portrait.twig' with {user: user, render: 'tiny'} only %}
-                                            {{ user.fullname }}
-                                        </a>
-                                    </td>
-                                    <td>{% if row['sidLabel'] %}{{ row['sidLabel'] }}: {{ row['sidDisplayValue'] }}{% endif %}</td>
-                                    <td>{{ row['accessType'] }}</td>
-                                </tr>
-                            {% endfor %}
-                        {% endfor %}
+                    {% for row in tableData %}
+                        <tr>
+                            <td>
+                                <a href="/adminv2/user/{{ row.user.id }}/modify">
+                                    {% include 'include/portrait.twig' with {user: row.user, render: 'tiny'} only %}
+                                    {{ row.user.fullname }}
+                                </a>
+                            </td>
+                            <td>{% if row['sidLabel'] %}{{ row['sidLabel'] }}: {{ row['sidDisplayValue'] }}{% endif %}</td>
+                            <td>{{ row['accessName'] }}</td>
+                        </tr>
+                    {% endfor %}
                     </tbody>
                 </table>
             </section>

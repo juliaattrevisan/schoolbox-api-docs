@@ -9,15 +9,24 @@
 namespace Schoolbox\Admin\Service;
 
 use Alaress\Web\Controller\Base;
+use Schoolbox\CampusMapper;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Permission\Access;
+use Schoolbox\Permission\Access\UserAccessMapper;
+use Schoolbox\RoleMapper;
+use Schoolbox\UserMapper;
 
 class Controller extends Base
 {
     /**
      * @var \Schoolbox\Error\Mapper
      */
-    private $errorMapper;
+    private $errorMapper; // TODO: Remove unused mapper.
+
+    /**
+     * @var \Schoolbox\UserMapper
+     */
+    private $userMapper;
 
     /**
      * @var Access\UserAccessMapper
@@ -25,14 +34,37 @@ class Controller extends Base
     private $userAccessMapper;
 
     /**
-     * Controller constructor.
-     * @param ErrorMapper             $errorMapper
-     * @param Access\UserAccessMapper $userAccessMapper
+     * @var CampusMapper
      */
-    public function __construct(ErrorMapper $errorMapper, Access\UserAccessMapper $userAccessMapper)
+    private $campusMapper;
+
+    /**
+     * @var RoleMapper
+     */
+    private $roleMapper;
+
+    /**
+     * Controller constructor.
+     * @param ErrorMapper      $errorMapper
+     * @param UserAccessMapper $userAccessMapper
+     * @param UserMapper       $userMapper
+     * @param CampusMapper     $campusMapper
+     * @param RoleMapper       $roleMapper
+     */
+    public function __construct(
+        // TODO: Use compact constructor format.
+        ErrorMapper $errorMapper,
+        Access\UserAccessMapper $userAccessMapper,
+        UserMapper $userMapper,
+        CampusMapper $campusMapper,
+        RoleMapper $roleMapper
+    )
     {
         $this->errorMapper = $errorMapper;
+        $this->userMapper = $userMapper;
         $this->userAccessMapper = $userAccessMapper;
+        $this->campusMapper = $campusMapper;
+        $this->roleMapper = $roleMapper;
     }
 
     /**
@@ -47,12 +79,16 @@ class Controller extends Base
      */
     public function getRoster()
     {
-        $permissions = new Permissions($this->userAccessMapper);
-        $serviceNameById = $permissions->getServiceNameById();
+        $permissions = new Permissions(
+            $this->userMapper,
+            $this->userAccessMapper,
+            $this->campusMapper,
+            $this->roleMapper
+        );
 
-        $this->response = $this->responseFromTemplate('@service/permissions.twig', [
-            'usersByServiceName' => $permissions->getUsersByServiceName($serviceNameById),
-            'userAccessInfoByUserId' => $permissions->getUserAccessInfoByUserId($serviceNameById),
-        ]);
+        $this->response = $this->responseFromTemplate(
+            '@service/permissions.twig',
+            ['servicePermissionTablesData' => $permissions->getServicePermissionTablesData()]
+        );
     }
 }

@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Roster
+ * Permissions
  *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
@@ -10,9 +10,12 @@
 
 namespace Schoolbox\Admin\Service;
 
-use Schoolbox\Collection;
+use Schoolbox\CampusMapper;
 use Schoolbox\Permission\Access;
 use Schoolbox\Permission\Access\UserAccess;
+use Schoolbox\RoleMapper;
+use Schoolbox\User;
+use Schoolbox\UserMapper;
 
 class Permissions
 {
@@ -29,12 +32,42 @@ class Permissions
 
 
     /**
-     * Roster constructor.
-     * @param Access\UserAccessMapper $userAccessMapper
+     * @var UserMapper
      */
-    public function __construct(Access\UserAccessMapper $userAccessMapper)
+    private $userMapper;
+
+
+    /**
+     * @var CampusMapper
+     */
+    private $campusMapper;
+
+
+    /**
+     * @var RoleMapper
+     */
+    private $roleMapper;
+
+
+    /**
+     * Constructor.
+     * @param UserMapper $userMapper
+     * @param Access\UserAccessMapper $userAccessMapper
+     * @param CampusMapper $campusMapper
+     * @param RoleMapper $roleMapper
+     */
+    public function __construct(
+        UserMapper $userMapper,
+        Access\UserAccessMapper $userAccessMapper,
+        CampusMapper $campusMapper,
+        RoleMapper $roleMapper
+    )
     {
+        // TODO: Use compact constructor format.
+        $this->userMapper = $userMapper;
         $this->userAccessMapper = $userAccessMapper;
+        $this->campusMapper = $campusMapper;
+        $this->roleMapper = $roleMapper;
     }
 
 
@@ -62,101 +95,57 @@ class Permissions
 
 
     /**
-     * Return an array of (Collection of User objects), indexed by service name.
-     *
-     * @param $serviceNameById array<int, string> An array of service names indexed by serviceId.
-     * @return array<string, Collection>
-     * @throws \Alaress\Database\Predicate\InvalidColumnException
-     * @throws \Schoolbox\Mapper\DefinitionException
-     * @throws \Schoolbox\Mapper\Exception
-     * @throws \UnexpectedValueException
-     * @throws \PDOException
+     * @return array<string, list<array{user: User, accessName: string, sidLabel: string, sidDisplayValue: string}>>
      */
-    public function getUsersByServiceName(array $serviceNameById): array
+    public function getServicePermissionTablesData(): array
     {
-        $usersByServiceName = [];
+        // TODO: Get services using mapper instead of above function.
+        $serviceNameLookup = $this->getServiceNameById();
 
-        foreach ($serviceNameById as $serviceId => $serviceName) {
-            $usersByServiceName[$serviceName] = (
-                $this->userAccessMapper->findUsersForService($serviceId)->getUnique('id')->indexBy('id')
-            );
-        }
-
-        return $usersByServiceName;
-    }
-
-
-    /**
-     * Return an array containing information from the userAccess table, indexed by userId.
-     *
-     * @param array<int, string> $serviceNameById
-     * @return array<int, array<string, list<array{accessType: string, sidLabel: string, sidDisplayValue: string}>>>
-     */
-    public function getUserAccessInfoByUserId(array $serviceNameById): array
-    {
         $userAccessRows = $this->userAccessMapper->getDatabase()->executeQuery(
-            // Note accessTypeNames in the ua.type lookup below come from Permission/Access/README.md
             'SELECT
             ua.service AS serviceId,
             ua.sid,
-            lus.name AS serviceName,
             ua.uid AS userId,
-            (
-                CASE ua.type
-                    WHEN 0 THEN "None"
-                    WHEN 1 THEN "Read"
-                    WHEN 2 THEN "Write"
-                    WHEN 3 THEN "Moderate"
-                END
-            ) AS accessType
+            ua.type AS accessLevel
             FROM userAccess ua
-            JOIN lu_service lus ON ua.service = lus.id
             JOIN user u ON ua.uid = u.id
+            JOIN lu_service AS lus ON ua.service = lus.id
             WHERE u.deleted_at IS NULL
-            AND lus.id IN (' . implode(',', array_map('intval', array_keys($serviceNameById))) . ')'
+            AND ua.service IN (' . implode(',', array_map('intval', array_keys($serviceNameLookup))) . ')
+            ORDER BY lus.name ASC, u.firstname ASC, u.lastname ASC'
         )->fetchAll();
 
-        $roleNameById = $this->userAccessMapper->getDatabase()->executeQuery(
-            'SELECT id, name
-            FROM groups
-            WHERE deleted_at IS NULL'
-        )->fetchColumnArray('name', 'id');
+        $userIds = array_unique(array_column($userAccessRows, 'userId'));
+        $users = $this->userMapper->findByColumn('id', $userIds);
+        $campuses = $this->campusMapper->findAll();
+        $roles = $this->roleMapper->findAll();
 
-        $campusNameById = $this->userAccessMapper->getDatabase()->executeQuery(
-            'SELECT id, name
-            FROM luCampus
-            WHERE deleted_at IS NULL'
-        )->fetchColumnArray('name', 'id');
-
-        $uaStructsByServiceNameByUserId = [];
+        $servicePermissionTablesData = [];
 
         foreach ($userAccessRows as $row) {
-            $userId = (int)$row['userId'];
-            $serviceName = $row['serviceName'];
+            $serviceName = $serviceNameLookup[$row['serviceId']];
 
-            if (!array_key_exists($userId, $uaStructsByServiceNameByUserId)) {
-                $uaStructsByServiceNameByUserId[$userId] = [];
+            if (!array_key_exists($serviceName, $servicePermissionTablesData)) {
+                $servicePermissionTablesData[$serviceName] = [];
             }
 
-            if (!array_key_exists($serviceName, $uaStructsByServiceNameByUserId[$userId])) {
-                $uaStructsByServiceNameByUserId[$userId][$serviceName] = [];
-            }
-
-            $uaStructsByServiceNameByUserId[$userId][$serviceName][] = [
-                'accessType' => $row['accessType'],
+            $servicePermissionTablesData[$serviceName][] = [
+                'user' => $users->getBy('id', $row['userId']),
+                'accessName' => ucfirst(UserAccess::ACCESS_LEVEL_TO_NAME[$row['accessLevel']]), // TODO: Change ACCESS_LEVEL_TO_NAME so that 'Moderator' is returned instead of 'Admin'.
                 'sidLabel' => match ($serviceName) {
                     'Calendar' => 'Campus',
                     'Impersonator' => 'Role',
-                    default => null
+                    default => ''
                 },
                 'sidDisplayValue' => match ($serviceName) {
-                    'Calendar' => $campusNameById[$row['sid']] ?? '',
-                    'Impersonator' => $roleNameById[$row['sid']] ?? '',
-                    default => null
+                    'Calendar' => $campuses->getBy('id', $row['sid'])->getName(),
+                    'Impersonator' => $roles->getBy('id', $row['sid'])->getName(),
+                    default => ''
                 },
             ];
         }
 
-        return $uaStructsByServiceNameByUserId;
+        return $servicePermissionTablesData;
     }
 }
