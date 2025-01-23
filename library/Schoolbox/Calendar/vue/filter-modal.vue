@@ -53,6 +53,11 @@ export default {
             // The events are already loaded regardless of whether the
             // filters exclude them: the event's visibility just needs to be
             // updated.
+
+            // prevent the form from submitting when there are no filters selected
+            if (this.isSelectedEmpty) {
+                return;
+            }
             this.$emit(FILTER_CHANGED, this.selected);
             this.$refs.modal.close();
         },
@@ -269,6 +274,7 @@ export default {
                     </div>
                 </fieldset>
             </section>
+            <div v-if="isSelectedEmpty" class="alert-box alert">Please select at least one filter.</div>
             <input type="submit" value="Apply Filters" />
         </form>
     </reveal-modal>
