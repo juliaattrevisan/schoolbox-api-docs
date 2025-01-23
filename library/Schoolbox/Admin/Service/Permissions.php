@@ -81,6 +81,7 @@ class Permissions
      */
     public function getReportTablesData(): array
     {
+        // Note there is no Service/Mapper.  Even if there was, mappers don't have a convenient way to get all records except two.
         $serviceNameLookup = $this->userAccessMapper->getDatabase()->executeQuery(
             'SELECT id, name
             FROM lu_service
