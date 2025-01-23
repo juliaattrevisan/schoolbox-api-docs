@@ -52,7 +52,8 @@
         <div class="small-12 medium-6 columns">
             {% if expires | length %}
                 <label for="expiry">Expiry
-                    <span class="hint has-tip tip-top" data-tooltip title="Select when the record will expire. selecting “Default Expiry” will apply the settings configured by your {{ locale.pastoralCare|title}} administrator">?</span>
+                    <span class="hint has-tip tip-top" data-tooltip title="Select when the record will expire. selecting “Default Expiry” will
+                    apply the settings configured by your {{ locale.pastoralCare|title}} administrator">?</span>
                     <select name="expiry" id="expiry">
                         {% for expiry in expires %}
                             <option {% if expiry == record.expiry ?? '' %}selected{% endif %} value="{{ expiry }}">{{ expiry|capitalize }}</option>
