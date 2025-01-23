@@ -10,7 +10,6 @@ namespace Schoolbox\Admin\Service;
 
 use Alaress\Web\Controller\Base;
 use Schoolbox\CampusMapper;
-use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Permission\Access;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\RoleMapper;
@@ -18,11 +17,6 @@ use Schoolbox\UserMapper;
 
 class Controller extends Base
 {
-    /**
-     * @var \Schoolbox\Error\Mapper
-     */
-    private $errorMapper; // TODO: Remove unused mapper.
-
     /**
      * @var \Schoolbox\UserMapper
      */
@@ -45,7 +39,6 @@ class Controller extends Base
 
     /**
      * Controller constructor.
-     * @param ErrorMapper      $errorMapper
      * @param UserAccessMapper $userAccessMapper
      * @param UserMapper       $userMapper
      * @param CampusMapper     $campusMapper
@@ -53,14 +46,12 @@ class Controller extends Base
      */
     public function __construct(
         // TODO: Use compact constructor format.
-        ErrorMapper $errorMapper,
         Access\UserAccessMapper $userAccessMapper,
         UserMapper $userMapper,
         CampusMapper $campusMapper,
         RoleMapper $roleMapper
     )
     {
-        $this->errorMapper = $errorMapper;
         $this->userMapper = $userMapper;
         $this->userAccessMapper = $userAccessMapper;
         $this->campusMapper = $campusMapper;
@@ -77,7 +68,7 @@ class Controller extends Base
      * @throws \Schoolbox\Mapper\Exception
      * @throws \UnexpectedValueException
      */
-    public function getRoster()
+    public function getRoster(): void
     {
         $permissions = new Permissions(
             $this->userMapper,
