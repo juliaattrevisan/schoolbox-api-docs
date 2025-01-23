@@ -32,6 +32,7 @@ interface Props {
     hasButton?: boolean; // whether to show a button next to the input
     buttonIcon?: string; // the icon to display on the button
     buttonTitle?: string; // the title of the button
+    showSelected?: boolean; // whether to show the selected items
 }
 const props = withDefaults(defineProps<Props>(), {
     defaultResults: undefined,
@@ -41,6 +42,7 @@ const props = withDefaults(defineProps<Props>(), {
     buttonIcon: "",
     buttonTitle: "Browse",
     queryKey: "query",
+    showSelected: true,
 });
 
 const emit = defineEmits<{
@@ -192,6 +194,7 @@ function onButtonSelected(): void {
         <slot name="meta"></slot>
         <label v-if="props.hasError" class="error" :for="props.labelId">{{ errorMessage }}</label>
         <ss-selected
+            v-if="props.showSelected"
             :selected="selected"
             :form-value-name="props.formValueName"
             :is-single-select="props.isSingleSelect"
