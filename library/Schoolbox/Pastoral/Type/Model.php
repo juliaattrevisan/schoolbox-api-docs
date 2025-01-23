@@ -23,6 +23,7 @@ class Model extends TypeAbstract
      * @var DocumentClassification|int|null
      */
     protected int | DocumentClassification | null $documentClassification = null;
+    protected int | DocumentClassification | null $documentClassificationConfidential = null;
 
     public function __construct()
     {
@@ -66,5 +67,24 @@ class Model extends TypeAbstract
     public function getDocumentClassification(): DocumentClassification | int | null
     {
         return $this->documentClassification;
+    }
+
+    /**
+     * @return DocumentClassification|int|null
+     */
+    public function getDocumentClassificationConfidential(): DocumentClassification | int | null
+    {
+        return $this->documentClassificationConfidential;
+    }
+
+    /**
+     * @param int|DocumentClassification|null $documentClassification
+     *
+     * @return self
+     */
+    public function setDocumentClassificationConfidential(DocumentClassification | int | null $documentClassification): self
+    {
+        $this->documentClassificationConfidential = $documentClassification;
+        return $this;
     }
 }
