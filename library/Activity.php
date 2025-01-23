@@ -43,7 +43,7 @@ class Activity
         );
         $result = $query->fetch();
 
-        if (false !== $result && $result['datetime']) {
+        if ($result['datetime'] ?? false) {
             return $result['datetime'];
         }
 
