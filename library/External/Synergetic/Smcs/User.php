@@ -96,7 +96,7 @@ class External_Synergetic_Smcs_User extends External_Synergetic_User
                             Semester.FileSemester = uvStudents.FileSemester AND
                             Semester.FileYear = uvStudents.FileYear AND
                             Semester.SystemCurrentFlag = 1
-            LEFT JOIN luBoarder ON luBoarder.Code = uvStudentsAll.StudentBoarder
+            LEFT JOIN luBoarder ON luBoarder.Code = uvStudents.StudentBoarder
             WHERE       uvStudents.StudentID = :externalId
         ";
 
