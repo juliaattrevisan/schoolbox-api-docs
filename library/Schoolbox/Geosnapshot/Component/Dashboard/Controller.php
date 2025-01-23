@@ -26,6 +26,11 @@ class Controller extends Component_Dashboard_ControllerAbstract
      */
     private string $url;
 
+    /**
+     * @var int|null
+     */
+    private ?int $height;
+
 
     /**
      * Only render this component if Geosnapshot has been set up
@@ -61,6 +66,10 @@ class Controller extends Component_Dashboard_ControllerAbstract
              */
             $this->url = $response['url'];
 
+            /* Get the height set in the component's configuration settings, setting to a min of 500 if not set
+             */
+            $this->height = is_numeric($this->getConfig('height')) ? $this->getConfig('height') : 500;
+
             return true;
         }
 
@@ -78,7 +87,8 @@ class Controller extends Component_Dashboard_ControllerAbstract
     public function renderTemplate($templateHandle): bool
     {
         return $this->renderTwigTemplate($templateHandle, '@geosnapshotDashboard/component.twig', [
-            'url' => $this->url
+            'url' => $this->url,
+            'height' => $this->height
         ], false, false, true);
     }
 }
