@@ -45,6 +45,10 @@
                     {% endfor %}
                 </select> </label>
         </div>
+        <!-- the entry tip will only be shown when a tip is set for the current type/subtype selection -->
+        <div id="entry-tip-container" class="small-12 columns" style="display: none;">
+            <div id="entry-tip-input" class="alert-box"></div>
+        </div>
         <div class="small-12 medium-6 columns">
             {% if severities | length %}
                 <label for="severityId">{{ locale.severity.proper }}</label>
