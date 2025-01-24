@@ -25,6 +25,7 @@ class Controller extends ConfigController
      */
     public function postConfig(): void
     {
+        // These settings should restart the mobile daemon
         $this->updateConfig(
             $this->requestPost->getArrayCopy(),
             $this->getConfigMapper()->getPredicateBuilder()->in(
