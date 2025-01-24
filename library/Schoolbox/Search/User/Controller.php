@@ -17,6 +17,7 @@ use Custom;
 use Eportfolio_Authenticator;
 use External_ClassInterface;
 use External_UserInterface;
+use Calendar_Api_Factory;
 use Schoolbox\Admin\Profile\Editor\Field\Mapper;
 use Schoolbox\Assessment\Term\Mapper as TermMapper;
 use Schoolbox\Config\ConfigMapper;
@@ -71,6 +72,7 @@ class Controller extends BaseController
      * @param \Schoolbox\External\User                   $userRelationHydrator
      * @param Mapper                                     $fieldMapper
      * @param \Schoolbox\Admin\Profile\Editor\Tab\Mapper $tabMapper
+     * @param Calendar_Api_Factory                         $calendarApiFactory
      */
     public function __construct(
         private UserMapper $userMapper,
@@ -88,6 +90,7 @@ class Controller extends BaseController
         private \Schoolbox\External\User $userRelationHydrator,
         private \Schoolbox\Admin\Profile\Editor\Field\Mapper $fieldMapper,
         private \Schoolbox\Admin\Profile\Editor\Tab\Mapper $tabMapper,
+        private Calendar_Api_Factory $calendarApiFactory
     ) {
     }
 
@@ -180,8 +183,12 @@ class Controller extends BaseController
          * Note this uses a callback to inject some data halfway through the compilation algorithm
          * to service this extra widgety thing, Pastoral Counts
          */
-        $externalUser = (new \Schoolbox\Profile\Field\Factory($this->fieldMapper, $this->userMapper, $this->externalUser))
-            ->produce($student, $this->getUser(), [
+        $externalUser = (new \Schoolbox\Profile\Field\Factory(
+            $this->fieldMapper,
+            $this->userMapper,
+            $this->externalUser,
+            $this->calendarApiFactory,
+        ))->produce($student, $this->getUser(), [
                 /* Inject pastoral counts so it executes in proper place deeper in the Factory
                  * ...but only if Pastoral Counts were a renderable field, as per admin
                  */
@@ -590,8 +597,12 @@ class Controller extends BaseController
          * Note this uses a callback to inject some data halfway through the compilation algorithm
          * to service this extra widgety thing, Pastoral Counts
          */
-        $externalUser = (new \Schoolbox\Profile\Field\Factory($this->fieldMapper, $this->userMapper, $this->externalUser))
-            ->produce($staff, $this->getUser());
+        $externalUser = (new \Schoolbox\Profile\Field\Factory(
+            $this->fieldMapper,
+            $this->userMapper,
+            $this->externalUser,
+            $this->calendarApiFactory,
+        ))->produce($staff, $this->getUser());
 
         try {
             $buttons = $this->profileButtonMapper->findButtonsForUser($staff, $this->getUser());
@@ -660,8 +671,12 @@ class Controller extends BaseController
          * Note this uses a callback to inject some data halfway through the compilation algorithm
          * to service this extra widgety thing, Pastoral Counts
          */
-        $externalUser = (new \Schoolbox\Profile\Field\Factory($this->fieldMapper, $this->userMapper, $this->externalUser))
-            ->produce($parent, $this->getUser());
+        $externalUser = (new \Schoolbox\Profile\Field\Factory(
+            $this->fieldMapper,
+            $this->userMapper,
+            $this->externalUser,
+            $this->calendarApiFactory,
+        ))->produce($parent, $this->getUser());
 
         try {
             $buttons = $this->profileButtonMapper->findButtonsForUser($parent, $this->getUser());
