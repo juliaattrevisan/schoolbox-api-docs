@@ -26,7 +26,7 @@ INSERT INTO `config` (
     (SELECT c.sequence + 1 FROM config c WHERE c.module = 'settings' LIMIT 1)
 ), (
     'notification_blackout_start_time',
-    '0',
+    '',
     'Notification Blackout Start Time',
     'If Notification Blackout is enabled, mobile and browser notifications raised between this and Notification Blackout End Time will be delayed until shortly after the end time.',
     '',
@@ -39,7 +39,7 @@ INSERT INTO `config` (
     (SELECT c.sequence + 1 FROM config c WHERE c.module = 'settings' LIMIT 1)
 ), (
     'notification_blackout_end_time',
-    '0',
+    '',
     'Notification Blackout End Time',
     'If Notification Blackout is enabled, mobile and browser notifications raised between Notification Blackout Start Time and this will be delayed until shortly after this time.',
     '',
