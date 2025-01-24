@@ -259,7 +259,32 @@
                             </div>
 
                             <section class="content {% if not blackoutEnabled %}hide{% endif %}" id="blackoutInputContainer">
-                                <p>Notifications triggered after xxx will be delayed until yyy (the following day, if applicable).</p>
+                                <p>
+                                    Notifications triggered after
+                                    <input type="time"
+                                           name="blackoutStartTime"
+                                           value="{{ blackoutStartTime }}"
+                                           list="blackoutTimeSteps"
+                                           style="width: auto; display: inline-block"
+                                    />
+                                    will be delayed until
+                                    <input type="time"
+                                           name="blackoutEndTime"
+                                           value="{{ blackoutEndTime }}"
+                                           list="blackoutTimeSteps"
+                                           style="width: auto; display: inline-block"
+                                    />
+                                    (the following day, if applicable).
+
+                                    <datalist id="blackoutTimeSteps">
+                                        {% for hour in 0..23 %}
+                                            {% for minute in [0, 15, 30, 45] %}
+                                                {% set value = '%02d:%02d' | format(hour, minute) %}
+                                                <option value="{{ value }}">{{ value }}</option>
+                                            {% endfor %}
+                                        {% endfor %}
+                                    </datalist>
+                                </p>
                             </section>
                         </div>
                     </div>
