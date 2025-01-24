@@ -21,6 +21,7 @@ use Psr\Container\ContainerInterface;
 use Psr\Log\LoggerInterface;
 use React\EventLoop\LoopInterface;
 use Schoolbox\Application\Daemon;
+use Schoolbox\Config\ConfigMapper;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Instance;
 use Schoolbox\MobileApp\RegistryMapper;
@@ -154,8 +155,28 @@ HELP;
         );
 
         // Dispatch to mobile queue
+        $blackoutEnabled   = (bool)$config->get(ConfigMapper::NAME_NOTIFICATION_BLACKOUT_ENABLED);
+        $blackoutStartTime = null;
+        $blackoutEndTime   = null;
+        if ($blackoutEnabled) {
+            $blackoutStartTime = $config->get(ConfigMapper::NAME_NOTIFICATION_BLACKOUT_START_TIME);
+            $blackoutEndTime   = $config->get(ConfigMapper::NAME_NOTIFICATION_BLACKOUT_END_TIME);
+            $log->notice(sprintf('Blackout period enabled: %s to %s', $blackoutStartTime, $blackoutEndTime));
+        } else {
+            $log->notice('Blackout period not enabled');
+        }
+
         $strat     = new DefaultDispatchStrategy($flags);
-        $scheduler = new Scheduler($loop, $strat, $log, $clock, $serviceManager, $jitter);
+        $scheduler = new Scheduler(
+            $loop,
+            $strat,
+            $log,
+            $clock,
+            $serviceManager,
+            $jitter,
+            $blackoutStartTime,
+            $blackoutEndTime,
+        );
 
         // This daemon does not need to restore its messages from the Redis
         // cache, like scheduled does.

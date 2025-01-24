@@ -18,6 +18,7 @@ use Alaress\Jitter\IJitter;
 use Alaress\Scheduler\AbstractScheduler;
 use Alaress\WorkerCrew\Pooling\DefaultDispatchStrategy;
 use Alaress\WorkerCrew\Pooling\DispatchStrategyInterface;
+use Alaress_Date_Format;
 use DateTime;
 use DateTimeInterface;
 use Psr\Log\LoggerInterface;
@@ -38,11 +39,17 @@ class Scheduler extends AbstractScheduler implements IConsumer
      * @param DispatchStrategyInterface $dispatchStrategy
      * @param LoggerInterface           $log
      * @param IClock                    $clock
-     * @param ServiceManager            $serviceManager   The mobile app service manager: used to send messages to
-     *                                                    mobile apps.
-     * @param IJitter                   $jitter           Jitter: used to determine how many times to retry send of a
-     *                                                    mobile notification, and also of how long to wait between
-     *                                                    retries.
+     * @param ServiceManager            $serviceManager    The mobile app service manager: used to send messages to
+     *                                                     mobile apps.
+     * @param IJitter                   $jitter            Jitter: used to determine how many times to retry send of a
+     *                                                     mobile notification, and also of how long to wait between
+     *                                                     retries.
+     * @param ?string                   $blackoutStartTime If set, defer messages sent between this and $blackoutEndTime
+     *                                                     until after $blackoutEndTime.
+     *                                                     Expected in "HH:MM" format if set, otherwise treated as null.
+     * @param ?string                   $blackoutEndTime   If set, defer messages sent after $blackoutStartTime until
+     *                                                     after this time.
+     *                                                     Expected in "HH:MM" format if set, otherwise treated as null.
      */
     public function __construct(
         private LoopInterface $loop,
@@ -51,6 +58,8 @@ class Scheduler extends AbstractScheduler implements IConsumer
         IClock $clock,
         private ServiceManager $serviceManager,
         private IJitter $jitter,
+        private ?string $blackoutStartTime,
+        private ?string $blackoutEndTime,
     ) {
         parent::__construct($this->loop, $dispatchStrategy, $log, $clock);
     }
@@ -158,49 +167,49 @@ class Scheduler extends AbstractScheduler implements IConsumer
         );
 
         // Delay delivery
-        if ($payload->retrieveDeliveryMethod() === Instance::DELIVERY_ALERT) {
-            $this->log->notice(
-                sprintf(
-                    'Message %s:%s delivery type is alert: not attempting to delay',
-                    $payload->getBaseHash(),
-                    $payload->getParamHash(),
-                )
-            );
-        } else {
-            // Is the current time within the quiet period?
-            $quietStart  = '23:50:00';
-            $quietEnd    = '09:29:00';
-            $now         = \Alaress_Date_Format::now();
-            $currentTime = $now->getUsingFormat('H:i:s');
-
-            if ($quietStart <= $quietEnd) {
-                // Start time < end time:
-                // the quiet period does not overlap 00:00
-                $quiet = ($currentTime >= $quietStart && $currentTime <= $quietEnd);
-            } else {
-                // Start time > end time:
-                // the quiet period overlaps 00:00
-                $quiet = ($currentTime >= $quietStart || $currentTime <= $quietEnd);
-            }
-            if ($quiet) {
-                // How many seconds to go until quiet time expires?
-                $delay = strtotime($quietEnd) - strtotime($currentTime) + random_int(1, 60);
+        if ($this->blackoutStartTime && $this->blackoutEndTime) {
+            if ($payload->retrieveDeliveryMethod() === Instance::DELIVERY_ALERT) {
                 $this->log->notice(
                     sprintf(
-                        'Message %s:%s delivery delayed %ss until end of quiet period (%s-%s)',
+                        'Message %s:%s delivery type is alert: not attempting to delay',
                         $payload->getBaseHash(),
                         $payload->getParamHash(),
-                        $delay,
-                        $quietStart,
-                        $quietEnd,
                     )
                 );
+            } else {
+                // Is the current time within the quiet period?
+                $now         = Alaress_Date_Format::now();
+                $currentTime = $now->getUsingFormat('H:i');
 
-                $this->loop->addTimer(
-                    $delay,
-                    fn () => $this->attemptPush($instanceId, $userId, $payload, $resolver, 0),
-                );
-                return;
+                if ($this->blackoutStartTime <= $this->blackoutEndTime) {
+                    // Start time < end time:
+                    // the quiet period does not overlap 00:00
+                    $quiet = ($currentTime >= $this->blackoutStartTime && $currentTime <= $this->blackoutEndTime);
+                } else {
+                    // Start time > end time:
+                    // the quiet period overlaps 00:00
+                    $quiet = ($currentTime >= $this->blackoutStartTime || $currentTime <= $this->blackoutEndTime);
+                }
+                if ($quiet) {
+                    // How many seconds to go until quiet time expires?
+                    $delay = strtotime($this->blackoutEndTime) - strtotime($currentTime) + random_int(1, 60);
+                    $this->log->notice(
+                        sprintf(
+                            'Message %s:%s delivery delayed %ss until end of quiet period (%s-%s)',
+                            $payload->getBaseHash(),
+                            $payload->getParamHash(),
+                            $delay,
+                            $this->blackoutStartTime,
+                            $this->blackoutEndTime,
+                        )
+                    );
+
+                    $this->loop->addTimer(
+                        $delay,
+                        fn () => $this->attemptPush($instanceId, $userId, $payload, $resolver, 0),
+                    );
+                    return;
+                }
             }
         }
 
