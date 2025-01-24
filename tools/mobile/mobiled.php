@@ -180,7 +180,7 @@ HELP;
             $broker->registerConsumer($scheduler);
             $log->debug('Consuming amqp://' . Broker::QUEUE);
 
-            $topic = 'scheduled.' . INSTANCE_ID . '.*';
+            $topic = 'mobiled.' . INSTANCE_ID . '.*';
 
             $asyncRedis->psubscribe($topic, $scheduler);
             $log->info("Listening on redis://$topic");

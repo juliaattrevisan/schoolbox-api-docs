@@ -11,6 +11,7 @@ namespace Schoolbox\Realtime\Admin\Config;
 
 use Alaress\Authorizer\Rule\IsSuperuser;
 use Alaress\Module\Module as BaseModule;
+use Alaress\Redis;
 use Alaress\Web\Controller\Base as BaseController;
 use Schoolbox\Admin\Settings\FieldStrategyFactory;
 use Schoolbox\Config\ConfigMapper;
@@ -42,6 +43,7 @@ class Module extends BaseModule
             new FieldStrategyFactory($this->getMapperFactory(), new CollectorFactory()),
             $this->injector->get('moduleCache.rebuilder'),
             $this->injector->get('oidc.cache'),
+            Redis::getSignalQueueClientInstance(),
         );
     }
 }

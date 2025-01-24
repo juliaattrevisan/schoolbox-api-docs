@@ -179,6 +179,7 @@ class Controller extends ConfigController
         // Do any changed settings necessitate a reload of any processes?
         $reloadRouteDaemon    = false;
         $reloadScheduleDaemon = false;
+        $reloadMobileDaemon   = false;
         $rebuildModules       = false;
         $clearOidcCache       = false;
 
@@ -199,6 +200,9 @@ class Controller extends ConfigController
                 if (\in_array($name, ConfigMapper::SETTINGS_AFFECTING_SCHEDULED, true)) {
                     $reloadScheduleDaemon = true;
                 }
+                if (\in_array($name, ConfigMapper::SETTINGS_AFFECTING_MOBILED, true)) {
+                    $reloadMobileDaemon = true;
+                }
                 if (\in_array($name, ConfigMapper::SETTINGS_AFFECTING_MODULES, true)) {
                     $rebuildModules = true;
                 }
@@ -210,13 +214,16 @@ class Controller extends ConfigController
             }
         }
 
-        if ($reloadRouteDaemon || $reloadScheduleDaemon) {
+        if ($reloadRouteDaemon || $reloadScheduleDaemon || $reloadMobileDaemon) {
             $redisClient = Redis::getSignalQueueClientInstance();
             if ($redisClient && $reloadRouteDaemon) {
                 $redisClient->publish('scheduled.' . INSTANCE_ID . '.reload', '');
             }
             if ($redisClient && $reloadScheduleDaemon) {
                 $redisClient->publish('scheduled.' . INSTANCE_ID . '.refreshConfiguration', '');
+            }
+            if ($redisClient && $reloadMobileDaemon) {
+                $redisClient->publish('mobiled.' . INSTANCE_ID . '.refreshConfiguration', '');
             }
         }
         if ($rebuildModules) {

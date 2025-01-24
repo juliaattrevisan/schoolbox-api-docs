@@ -389,6 +389,18 @@ class ConfigMapper extends Mapper
     ];
 
     /**
+     * Config settings which may affect the behaviour of the mobile daemon.
+     *
+     * If any of these settings change: send a refresh configuration message
+     * to the mobile daemon.
+     */
+    public const SETTINGS_AFFECTING_MOBILED = [
+        self::NAME_NOTIFICATION_BLACKOUT_ENABLED,
+        self::NAME_NOTIFICATION_BLACKOUT_START_TIME,
+        self::NAME_NOTIFICATION_BLACKOUT_END_TIME,
+    ];
+
+    /**
      * Config settings which affect the modules and routes available to this
      * instance.
      *
