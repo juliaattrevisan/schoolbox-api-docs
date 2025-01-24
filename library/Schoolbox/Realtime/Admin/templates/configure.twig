@@ -184,15 +184,28 @@
         $blackoutEndTimeInput.on('change', blackoutTimeChange);
 
         // Save blackout form
-        let blackoutForm = document.getElementById('blackoutForm'),
-            formSubmit   = function () {
-                fetch(
+        let $toast       = $('#toast'),
+            blackoutForm = document.getElementById('blackoutForm'),
+            formSubmit   = async function () {
+                $toast.toastActivate();
+                let response = await fetch(
                     blackoutForm.action,
                     {
                         method:  blackoutForm.method,
                         body:    new FormData(blackoutForm),
                     }
-                )
+                );
+                if (response.ok) {
+                    $toast.toastTimeout({
+                        text: "Settings saved",
+                        css:  "success",
+                    });
+                } else {
+                    $toast.toastTimeout({
+                        text: "Could not save settings",
+                        css:  "alert",
+                    });
+                }
             };
         $(blackoutForm).on('change', ':input', _.debounce(formSubmit, 1000));
     });
@@ -376,3 +389,5 @@
 
     <a class="close-reveal-modal">&#215;</a>
 </div>
+
+<div id="toast" class="toast"></div>
