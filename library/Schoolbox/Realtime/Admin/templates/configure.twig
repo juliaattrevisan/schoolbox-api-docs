@@ -184,6 +184,17 @@
         $blackoutEndTimeInput.on('change', blackoutTimeChange);
 
         // Save blackout form
+        let blackoutForm = document.getElementById('blackoutForm'),
+            formSubmit   = function () {
+                fetch(
+                    blackoutForm.action,
+                    {
+                        method:  blackoutForm.method,
+                        body:    new FormData(blackoutForm),
+                    }
+                )
+            };
+        $(blackoutForm).on('change', ':input', _.debounce(formSubmit, 1000));
     });
 
     function customiserCallback(data) {
@@ -269,7 +280,7 @@
                                 <div class="switch">
                                     <input name="blackoutEnabled" value="0" type="hidden">
                                     <input id="blackoutEnabledInput"
-                                           name="blackoutEnabled"
+                                           name="notification_blackout_enabled"
                                            {% if blackoutEnabled %}checked="checked"{% endif %}
                                            value="1"
                                            type="checkbox"
@@ -285,7 +296,7 @@
                                         Notifications triggered after
                                         <input id="blackoutStartTimeInput"
                                                type="time"
-                                               name="blackoutStartTime"
+                                               name="notification_blackout_start_time"
                                                value="{{ blackoutStartTime }}"
                                                list="blackoutTimeSteps"
                                                style="width: auto; display: inline-block"
@@ -293,7 +304,7 @@
                                         each day will be delayed until
                                         <input id="blackoutEndTimeInput"
                                                type="time"
-                                               name="blackoutEndTime"
+                                               name="notification_blackout_end_time"
                                                value="{{ blackoutEndTime }}"
                                                list="blackoutTimeSteps"
                                                style="width: auto; display: inline-block"
