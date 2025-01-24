@@ -14,6 +14,7 @@ use Alaress\Lumberjack\Logger;
 use Alaress\Web\Controller\Base as BaseController;
 use Schoolbox\Admin\Navigation\Subnav;
 use Schoolbox\Collection;
+use Schoolbox\Config\ConfigMapper;
 use Schoolbox\MobileApp\Service;
 use Schoolbox\Realtime\Config;
 use Schoolbox\Realtime\Message\NS;
@@ -466,14 +467,17 @@ class Controller extends BaseController
         $this->response = $this->responseFromTemplate(
             '@adminNotifications/configure.twig',
             [
-                'pageCurrent' => $this->routeGenerator->generate('adminNotifications.configure'),
-                'allBreadcrumbs' => (new Subnav($this->getConfigLoader(), $this->getUser()))->generateBreadcrumbs($this->routeGenerator->generate('adminNotifications.configure')),
-                'filters' => $filters,
-                'roles'   => $roles,
-                'ns'      => $ns,
-                'sources' => $sources,
-                'perms'   => $this->getConfig()->getPermissionList(),
-                'msgConfig'  => $this->getConfig()->find($rolec->getPropertyValues('id')),
+                'pageCurrent'       => $this->routeGenerator->generate('adminNotifications.configure'),
+                'allBreadcrumbs'    => (new Subnav($this->getConfigLoader(), $this->getUser()))->generateBreadcrumbs($this->routeGenerator->generate('adminNotifications.configure')),
+                'filters'           => $filters,
+                'roles'             => $roles,
+                'ns'                => $ns,
+                'sources'           => $sources,
+                'perms'             => $this->getConfig()->getPermissionList(),
+                'msgConfig'         => $this->getConfig()->find($rolec->getPropertyValues('id')),
+                'blackoutEnabled'   => $this->getConfigLoader()->get(ConfigMapper::NAME_NOTIFICATION_BLACKOUT_ENABLED),
+                'blackoutStartTime' => $this->getConfigLoader()->get(ConfigMapper::NAME_NOTIFICATION_BLACKOUT_START_TIME),
+                'blackoutEndTime'   => $this->getConfigLoader()->get(ConfigMapper::NAME_NOTIFICATION_BLACKOUT_END_TIME),
             ],
             'Global Message Configuration',
         );

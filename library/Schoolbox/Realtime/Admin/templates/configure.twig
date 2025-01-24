@@ -228,7 +228,23 @@
                     <div class="row">
                         <div class="small-12 columns">
                             <h2 class="subheader">Notification Blackout</h2>
-                            <section class="content">
+
+                            <div class="switch">
+                                <input name="blackoutEnabled" value="0" type="hidden">
+                                <input id="blackoutEnabled-field"
+                                       name="blackoutEnabled"
+                                       {% if blackoutEnabled %}checked="checked"{% endif %}
+                                       value="1"
+                                       type="checkbox"
+                                       data-collapser="blackoutInputs"
+                                />
+                                <label for="blackoutEnabled-field">
+                                    <span>On</span>
+                                    <span>Off</span>
+                                </label>
+                            </div>
+
+                            <section class="content" data-collapsable="blackoutInputs" data-collapse-state="{{ blackoutEnabled ? 'uncollapsed' : 'collapsed' }}">
                                 <p>Notifications triggered after xxx will be delayed until yyy (the following day, if applicable).</p>
                             </section>
                         </div>
