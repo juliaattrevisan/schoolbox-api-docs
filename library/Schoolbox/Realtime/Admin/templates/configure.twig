@@ -167,13 +167,18 @@
             }
         });
 
-        // Show/hide next day
+        // Show/hide next day if blackout start time is before end time:
+        // it's assumed that this means the blackout starts the evening before,
+        // and ends at the end time the next morning.
         let $blackoutStartTimeInput     = $('#blackoutStartTimeInput'),
             $blackoutEndTimeInput       = $('#blackoutEndTimeInput'),
             $blackoutDescriptionNextDay = $('#blackoutDescriptionNextDay'),
             blackoutTimeChange          = function () {
-                let showNextDayDescription = false;
-                console.log($blackoutStartTimeInput.val(), $blackoutEndTimeInput.val());
+                let blackoutStartTime      = $blackoutStartTimeInput.val(),
+                    blackoutEndTime        = $blackoutEndTimeInput.val(),
+                    showNextDayDescription =
+                        blackoutStartTime && blackoutEndTime && blackoutStartTime > blackoutEndTime;
+                $blackoutDescriptionNextDay.toggleClass('hide', !showNextDayDescription);
             };
         $blackoutStartTimeInput.on('change', blackoutTimeChange);
         $blackoutEndTimeInput.on('change', blackoutTimeChange);
