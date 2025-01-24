@@ -45,6 +45,12 @@ class Proxy
      */
     public function shouldReturnResults(string $sql): bool
     {
+        //Reject requests that contains semicolons as we only accept one query at a time
+        if (str_contains($sql, ';')) {
+            throw new OutOfBoundsException(
+                'Invalid query statement. Query should not contain semicolons(;).'
+            );
+        }
         /* Trying to discern the type of sql query the user wants to execute
          */
         return match (

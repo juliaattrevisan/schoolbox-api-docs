@@ -32,10 +32,6 @@ class ValidSQLOperationTest extends TestCase
     {
         return [
             'Simple SELECT query' => [
-                'SELECT * FROM luYearLevel;',
-                true
-            ],
-            'Simple SELECT query without semi-colon' => [
                 'SELECT * FROM luYearLevel',
                 true
             ],
@@ -46,7 +42,7 @@ class ValidSQLOperationTest extends TestCase
             'Simple INSERT INTO query' => [
                 'INSERT INTO dbo.Students (ID,CreatedDate,CreatedBy,ModifiedDate,ModifiedBy,Operator,StudiesCode,TertiaryRegistrationCode,TimeTableCode,AltCode,DebtorID,DebtorIDSeq,N16StuCode,N16ParCode,N16DebCode,AgeYearsJan,AgeMonthsJan,FamilyPosition,EldestFlag,YoungestFlag,EntryDate,EntryCampus,EntryYearLevel,EnquirySource,EnquirySourceComment,PreviousSchool,MedicalAlert,ExternalStudentFlag,EnglishSecondFlag,DisabilityFlag,FullFeeFlag,TuitionVariationType,TuitionNoSibFlag,DoctorName,DoctorPhone,DoctorPhoneAlt,DoctorAddress,DoctorSpecialisation,Doctor2Name,Doctor2Phone,Doctor2PhoneAlt,Doctor2Address,Doctor2Specialisation,DentistName,DentistPhone,DentistPhoneAlt,DentistAddress,EmergencyName,EmergencyAddress,EmergencyPhone,EmergencyPhoneAlt,EmergencyRelat,Emergency2Name,Emergency2Address,Emergency2Phone,Emergency2PhoneAlt,Emergency2Relat,LastLessonRcvdDate,BirthCertificateFlag,NonResidentFlag,CrecheFlag,BeforeSchoolCareFlag,AfterSchoolCareFlag,VisaType,VisaExpiryDate,PassportNo,Comment,CommentWarningFlag,BaptismFlag,BaptismDate,ReconciliationFlag,ReconciliationDate,CommunionFlag,CommunionDate,ConfirmationFlag,ConfirmationDate,AustudyFlag,IndigenousFlag,NaturalisationDate,DebtorPrimaryOnlyFlag,StudentBillingFlag,AllowAutoTuitionFlag,AllowAutoChargesFlag,VisaNumber,PassportCountryCode,PassportExpiryDate,ApplicationDate,Emergency3Name,Emergency3Address,Emergency3Phone,Emergency3PhoneAlt,Emergency3Relat,MedicalAlertFlag,SpecialNeedsFlag,SpecialBillingType,StudyAtHomeFlag,TSIFlag,ESLProficiencyLevel, PreEntryComment, EnquiryDate, IntendsTertiaryFlag,PassportIssuedDate,VisaIssuedDate,EmergencyID,Emergency2ID,Emergency3ID,LastRequestedDetailsDate)
                  VALUES
-                     (54,2002-08-27 16:43:45.677,sa,2025-01-21 12:45:05.130,paperly,sa,,,,,22,0,,,,0,0,0,0,0,NULL,,NULL,,,,,0,0,0,0,,0,,,,,,,,,,,,,,,TEST44,,,,,,,,,,NULL,0,0,0,0,0,,NULL,,NULL,0,0,NULL,0,NULL,0,NULL,0,NULL,0,0,NULL,0,0,1,1,,,NULL,NULL,,,,,,0,0,,0,0,,NULL,NULL,0,NULL,NULL,0,0,0,NULL);',
+                     (54,2002-08-27 16:43:45.677,sa,2025-01-21 12:45:05.130,paperly,sa,,,,,22,0,,,,0,0,0,0,0,NULL,,NULL,,,,,0,0,0,0,,0,,,,,,,,,,,,,,,TEST44,,,,,,,,,,NULL,0,0,0,0,0,,NULL,,NULL,0,0,NULL,0,NULL,0,NULL,0,NULL,0,0,NULL,0,0,1,1,,,NULL,NULL,,,,,,0,0,,0,0,,NULL,NULL,0,NULL,NULL,0,0,0,NULL)',
                 false
             ],
             'Nesting SELECT query' => [
@@ -58,7 +54,7 @@ class ValidSQLOperationTest extends TestCase
                 true
             ],
             'SELECT with spaces' => [
-                '        SELECT * FROM luYearLevel; ',
+                '        SELECT * FROM luYearLevel ',
                 true
             ],
         ];
@@ -84,25 +80,29 @@ class ValidSQLOperationTest extends TestCase
     public static function providerInvalidSQLOperation(): array
     {
         return [
+            'Simple SELECT query with semi-colon' => [
+                'SELECT * FROM luYearLevel;',
+                true
+            ],
             'Simple SELECT query with leading semi-colon' => [
                 ';SELECT * FROM luYearLevel;'
             ],
             'Simple DELETE query' => [
-                'DELETE FROM dbo.Students WHERE ID = 54;',
+                'DELETE FROM dbo.Students WHERE ID = 54',
                 false
             ],
             'Simple DROP query' => [
-                'DROP TABLE luYearLevel;'
+                'DROP TABLE luYearLevel'
             ],
             'Simple TRUNCATE query' => [
-                'TRUNCATE TABLE luYearLevel;',
+                'TRUNCATE TABLE luYearLevel',
             ],
             'Simple ALTER query' => [
-                'ALTER TABLE luYearLevel DROP COLUMN Code;',
+                'ALTER TABLE luYearLevel DROP COLUMN Code',
             ],
             'Random string' => [
-                'SELECERTER EFED ADSLl;'
-            ],
+                'SELECERTER EFED ADSLl'
+            ]
         ];
     }
 }

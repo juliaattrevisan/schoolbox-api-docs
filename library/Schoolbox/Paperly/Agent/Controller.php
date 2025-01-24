@@ -141,10 +141,6 @@ class Controller extends Base
             return;
         }
 
-        /* Only allowing first query being executed
-         */
-        $sql = explode(';', $sql)[0];
-
         try {
             $response = [];
             $shouldReturn = $this->proxy->shouldReturnResults($sql);
