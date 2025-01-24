@@ -244,48 +244,52 @@
                         <div class="small-12 columns">
                             <h2 class="subheader">Notification Blackout</h2>
 
-                            <div class="switch">
-                                <input name="blackoutEnabled" value="0" type="hidden">
-                                <input id="blackoutEnabled-input"
-                                       name="blackoutEnabled"
-                                       {% if blackoutEnabled %}checked="checked"{% endif %}
-                                       value="1"
-                                       type="checkbox"
-                                />
-                                <label for="blackoutEnabled-input">
-                                    <span>On</span>
-                                    <span>Off</span>
-                                </label>
-                            </div>
-
-                            <section class="content {% if not blackoutEnabled %}hide{% endif %}" id="blackoutInputContainer">
-                                <p>
-                                    Notifications triggered after
-                                    <input type="time"
-                                           name="blackoutStartTime"
-                                           value="{{ blackoutStartTime }}"
-                                           list="blackoutTimeSteps"
-                                           style="width: auto; display: inline-block"
+                            <form method="post" action="{{ routeLookupIfAuthorized('adminNotificationsConfig.postConfig') }}">
+                                <div class="switch">
+                                    <input name="blackoutEnabled" value="0" type="hidden">
+                                    <input id="blackoutEnabled-input"
+                                           name="blackoutEnabled"
+                                           {% if blackoutEnabled %}checked="checked"{% endif %}
+                                           value="1"
+                                           type="checkbox"
                                     />
-                                    will be delayed until
-                                    <input type="time"
-                                           name="blackoutEndTime"
-                                           value="{{ blackoutEndTime }}"
-                                           list="blackoutTimeSteps"
-                                           style="width: auto; display: inline-block"
-                                    />
-                                    (the following day, if applicable).
+                                    <label for="blackoutEnabled-input">
+                                        <span>On</span>
+                                        <span>Off</span>
+                                    </label>
+                                </div>
 
-                                    <datalist id="blackoutTimeSteps">
-                                        {% for hour in 0..23 %}
-                                            {% for minute in [0, 15, 30, 45] %}
-                                                {% set value = '%02d:%02d' | format(hour, minute) %}
-                                                <option value="{{ value }}">{{ value }}</option>
+                                <section class="content {% if not blackoutEnabled %}hide{% endif %}" id="blackoutInputContainer">
+                                    <p>
+                                        Notifications triggered after
+                                        <input type="time"
+                                               name="blackoutStartTime"
+                                               value="{{ blackoutStartTime }}"
+                                               list="blackoutTimeSteps"
+                                               style="width: auto; display: inline-block"
+                                        />
+                                        each day will be delayed until
+                                        <input type="time"
+                                               name="blackoutEndTime"
+                                               value="{{ blackoutEndTime }}"
+                                               list="blackoutTimeSteps"
+                                               style="width: auto; display: inline-block"
+                                        />
+                                        <span id="blackoutDescription-nextDay"
+                                              {% if not (blackoutStartTime and blackoutEndTime and blackoutStartTime <= blackoutEndTime) %}class="hide"{% endif %}
+                                        >the next day</span>.
+
+                                        <datalist id="blackoutTimeSteps">
+                                            {% for hour in 0..23 %}
+                                                {% for minute in [0, 15, 30, 45] %}
+                                                    {% set value = '%02d:%02d' | format(hour, minute) %}
+                                                    <option value="{{ value }}">{{ value }}</option>
+                                                {% endfor %}
                                             {% endfor %}
-                                        {% endfor %}
-                                    </datalist>
-                                </p>
-                            </section>
+                                        </datalist>
+                                    </p>
+                                </section>
+                            </form>
                         </div>
                     </div>
 

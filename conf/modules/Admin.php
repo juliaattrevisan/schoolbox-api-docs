@@ -104,6 +104,7 @@ class Admin extends ModuleLoader
 
         // Notifications
         $this->loadModule($di, \Schoolbox\Realtime\Admin\Module::class, '/adminv2/notifications');
+        $this->loadModule($di, \Schoolbox\Realtime\Admin\Config\Module::class, '/adminv2/notifications/config');
 
         // Filters
         $this->loadModule($di, FilterModule::class, '/adminv2/filters');
