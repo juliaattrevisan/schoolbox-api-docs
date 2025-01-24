@@ -153,8 +153,8 @@
         $('[data-collapser]').collapsable();
 
         // Show/hide blackout input container
-        let $blackoutInputContainer = $('#blackoutInputContainer');
-        $('#blackoutEnabled-input').on('change', function() {
+        $('#blackoutEnabledInput').on('change', function () {
+            let $blackoutInputContainer = $('#blackoutInputContainer');
             $blackoutInputContainer
                 .stop()
                 .removeClass('hide')
@@ -166,6 +166,19 @@
                 $blackoutInputContainer.addClass('hide')
             }
         });
+
+        // Show/hide next day
+        let $blackoutStartTimeInput     = $('#blackoutStartTimeInput'),
+            $blackoutEndTimeInput       = $('#blackoutEndTimeInput'),
+            $blackoutDescriptionNextDay = $('#blackoutDescriptionNextDay'),
+            blackoutTimeChange          = function () {
+                let showNextDayDescription = false;
+                console.log($blackoutStartTimeInput.val(), $blackoutEndTimeInput.val());
+            };
+        $blackoutStartTimeInput.on('change', blackoutTimeChange);
+        $blackoutEndTimeInput.on('change', blackoutTimeChange);
+
+        // Save blackout form
     });
 
     function customiserCallback(data) {
@@ -244,16 +257,19 @@
                         <div class="small-12 columns">
                             <h2 class="subheader">Notification Blackout</h2>
 
-                            <form method="post" action="{{ routeLookupIfAuthorized('adminNotificationsConfig.postConfig') }}">
+                            <form id="blackoutForm"
+                                  method="post"
+                                  action="{{ routeLookupIfAuthorized('adminNotificationsConfig.postConfig') }}"
+                            >
                                 <div class="switch">
                                     <input name="blackoutEnabled" value="0" type="hidden">
-                                    <input id="blackoutEnabled-input"
+                                    <input id="blackoutEnabledInput"
                                            name="blackoutEnabled"
                                            {% if blackoutEnabled %}checked="checked"{% endif %}
                                            value="1"
                                            type="checkbox"
                                     />
-                                    <label for="blackoutEnabled-input">
+                                    <label for="blackoutEnabledInput">
                                         <span>On</span>
                                         <span>Off</span>
                                     </label>
@@ -262,20 +278,22 @@
                                 <section class="content {% if not blackoutEnabled %}hide{% endif %}" id="blackoutInputContainer">
                                     <p>
                                         Notifications triggered after
-                                        <input type="time"
+                                        <input id="blackoutStartTimeInput"
+                                               type="time"
                                                name="blackoutStartTime"
                                                value="{{ blackoutStartTime }}"
                                                list="blackoutTimeSteps"
                                                style="width: auto; display: inline-block"
                                         />
                                         each day will be delayed until
-                                        <input type="time"
+                                        <input id="blackoutEndTimeInput"
+                                               type="time"
                                                name="blackoutEndTime"
                                                value="{{ blackoutEndTime }}"
                                                list="blackoutTimeSteps"
                                                style="width: auto; display: inline-block"
                                         />
-                                        <span id="blackoutDescription-nextDay"
+                                        <span id="blackoutDescriptionNextDay"
                                               {% if not (blackoutStartTime and blackoutEndTime and blackoutStartTime <= blackoutEndTime) %}class="hide"{% endif %}
                                         >the next day</span>.
 
