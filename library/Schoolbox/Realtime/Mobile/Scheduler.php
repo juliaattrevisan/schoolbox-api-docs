@@ -62,6 +62,42 @@ class Scheduler extends AbstractScheduler implements IConsumer
         private ?string $blackoutEndTime,
     ) {
         parent::__construct($this->loop, $dispatchStrategy, $log, $clock);
+
+        // Either both blackout start and end must be set, or neither
+        if (isset($this->blackoutStartTime) xor isset($this->blackoutEndTime)) {
+            $this->log->warning(
+                'Either both or neither $blackoutStartTime of $blackoutEndTime must be set: disabling blackout time',
+            );
+            $this->blackoutStartTime = null;
+            $this->blackoutEndTime   = null;
+        }
+
+        // Validate blackout start and end, clearing if invalid
+        if ($this->blackoutStartTime && !$this->validateTimeValue($this->blackoutStartTime)) {
+            $this->log->warning(
+                sprintf(
+                    '$blackoutStartTime value %s must be a HH:MM time: disabling blackout time',
+                    $this->blackoutStartTime
+                ),
+            );
+            $this->blackoutStartTime = null;
+        }
+        if ($this->blackoutEndTime && !$this->validateTimeValue($this->blackoutEndTime)) {
+            $this->log->warning(
+                sprintf(
+                    '$blackoutEndTime value %s must be a HH:MM time: disabling blackout time',
+                    $this->blackoutEndTime
+                ),
+            );
+            $this->blackoutEndTime = null;
+        }
+
+        // If one of the above steps cleared blackout start or end,
+        // ensure both are cleared
+        if (!isset($this->blackoutStartTime, $this->blackoutEndTime)) {
+            $this->blackoutStartTime = null;
+            $this->blackoutEndTime   = null;
+        }
     }
 
     /**
@@ -288,5 +324,21 @@ class Scheduler extends AbstractScheduler implements IConsumer
             $resolver->acknowledge();
             return;
         }
+    }
+
+    /**
+     * Validates `$value` is a `HH:MM` time.
+     *
+     * @param string $value
+     * @return bool
+     */
+    private function validateTimeValue(string $value): bool
+    {
+        if (!preg_match('/^(?P<hour>\d+):(?P<minute>\d+)$/', $value, $matches)) {
+            return false;
+        }
+        $hour   = intval($matches['hour']);
+        $minute = intval($matches['minute']);
+        return ($hour >= 0 && $hour <= 23 && $minute >= 0 && $minute <= 59);
     }
 }
