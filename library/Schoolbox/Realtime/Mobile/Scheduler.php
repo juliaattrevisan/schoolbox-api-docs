@@ -15,6 +15,9 @@ use Alaress\Async\Notification\Cloud\RateLimitException;
 use Alaress\Async\Notification\Instance\Instance;
 use Alaress\Date\IClock;
 use Alaress\Jitter\IJitter;
+use Alaress\Redis\Async\Event\IEvent;
+use Alaress\Redis\Async\Event\Message;
+use Alaress\Redis\Async\EventListener;
 use Alaress\Scheduler\AbstractScheduler;
 use Alaress\WorkerCrew\Pooling\DefaultDispatchStrategy;
 use Alaress\WorkerCrew\Pooling\DispatchStrategyInterface;
@@ -23,6 +26,8 @@ use DateTime;
 use DateTimeInterface;
 use Psr\Log\LoggerInterface;
 use React\EventLoop\LoopInterface;
+use Schoolbox\Config\ConfigMapper;
+use Schoolbox\IConfigLoader;
 use Schoolbox\Mapper\Exception;
 use Schoolbox\MobileApp\ServiceManager;
 
@@ -30,8 +35,38 @@ use Schoolbox\MobileApp\ServiceManager;
  * The mobile app scheduler: responsible for forwarding notifications to mobile
  * apps.
  */
-class Scheduler extends AbstractScheduler implements IConsumer
+class Scheduler extends AbstractScheduler implements IConsumer, EventListener
 {
+    /**
+     * Is the blackout setting enabled?
+     *
+     * This controls the times during which mobile app notifications are sent:
+     * if this is disabled, notifications may be sent at any time.
+     */
+    private bool $blackoutEnabled = false;
+
+    /**
+     * If this is set, and `$this->blackoutEnabled`: notifications won't be sent
+     * after this time each day.
+     */
+    private ?string $blackoutStartTime = null;
+
+    /**
+     * If this is set, and `$this->blackoutEnabled`: notifications scheduled to
+     * be sent after `$this->blackoutStartTime` will be sent at this time.
+     *
+     * If this is before `$this->blackoutStartTime`, this will be interpreted as
+     * sending the notification at this time the next day.
+     */
+    private ?string $blackoutEndTime = null;
+
+    /**
+     * Instead of sending all queued notifications immediately after
+     * `$this->blackoutEndTime`: jitter the send by this number of seconds to
+     * protect against overwhelming notification services.
+     */
+    private const BLACKOUT_END_JITTER = 60;
+
     /**
      * Constructor
      *
@@ -44,12 +79,9 @@ class Scheduler extends AbstractScheduler implements IConsumer
      * @param IJitter                   $jitter            Jitter: used to determine how many times to retry send of a
      *                                                     mobile notification, and also of how long to wait between
      *                                                     retries.
-     * @param ?string                   $blackoutStartTime If set, defer messages sent between this and $blackoutEndTime
-     *                                                     until after $blackoutEndTime.
-     *                                                     Expected in "HH:MM" format if set, otherwise treated as null.
-     * @param ?string                   $blackoutEndTime   If set, defer messages sent after $blackoutStartTime until
-     *                                                     after this time.
-     *                                                     Expected in "HH:MM" format if set, otherwise treated as null.
+     * @param IConfigLoader             $config            Config loader: used to load blackout settings.
+     *                                                     These settings may be changed externally: in that case, the
+     *                                                     config will be reloaded.
      */
     public function __construct(
         private LoopInterface $loop,
@@ -58,46 +90,10 @@ class Scheduler extends AbstractScheduler implements IConsumer
         IClock $clock,
         private ServiceManager $serviceManager,
         private IJitter $jitter,
-        private ?string $blackoutStartTime,
-        private ?string $blackoutEndTime,
+        private IConfigLoader $config,
     ) {
         parent::__construct($this->loop, $dispatchStrategy, $log, $clock);
-
-        // Either both blackout start and end must be set, or neither
-        if (isset($this->blackoutStartTime) xor isset($this->blackoutEndTime)) {
-            $this->log->warning(
-                'Either both or neither $blackoutStartTime of $blackoutEndTime must be set: disabling blackout time',
-            );
-            $this->blackoutStartTime = null;
-            $this->blackoutEndTime   = null;
-        }
-
-        // Validate blackout start and end, clearing if invalid
-        if ($this->blackoutStartTime && !$this->validateTimeValue($this->blackoutStartTime)) {
-            $this->log->warning(
-                sprintf(
-                    '$blackoutStartTime value %s must be a HH:MM time: disabling blackout time',
-                    $this->blackoutStartTime
-                ),
-            );
-            $this->blackoutStartTime = null;
-        }
-        if ($this->blackoutEndTime && !$this->validateTimeValue($this->blackoutEndTime)) {
-            $this->log->warning(
-                sprintf(
-                    '$blackoutEndTime value %s must be a HH:MM time: disabling blackout time',
-                    $this->blackoutEndTime
-                ),
-            );
-            $this->blackoutEndTime = null;
-        }
-
-        // If one of the above steps cleared blackout start or end,
-        // ensure both are cleared
-        if (!isset($this->blackoutStartTime, $this->blackoutEndTime)) {
-            $this->blackoutStartTime = null;
-            $this->blackoutEndTime   = null;
-        }
+        $this->loadBlackoutSettings();
     }
 
     /**
@@ -180,6 +176,28 @@ class Scheduler extends AbstractScheduler implements IConsumer
     }
 
     /**
+     * Handle the given redis event
+     *
+     * @param IEvent $event
+     * @return void
+     */
+    public function handle(IEvent $event)
+    {
+        if (!$event instanceof Message) {
+            // ignore pings
+            return;
+        }
+
+        // comes in the form 'mobiled.vagrantx.reload'
+        [, , $action] = explode('.', $event->getChannel());
+        if ($action === 'refreshConfiguration') {
+            $this->log->debug('Dropping config cache');
+            $this->config->dropCache();
+            $this->loadBlackoutSettings();
+        }
+    }
+
+    /**
      * Internal method for attempting push of messages to service manager.
      *
      * @param string    $instanceId
@@ -203,7 +221,7 @@ class Scheduler extends AbstractScheduler implements IConsumer
         );
 
         // Delay delivery
-        if ($this->blackoutStartTime && $this->blackoutEndTime) {
+        if ($this->blackoutEnabled && $this->blackoutStartTime && $this->blackoutEndTime) {
             if ($payload->retrieveDeliveryMethod() === Instance::DELIVERY_ALERT) {
                 $this->log->notice(
                     sprintf(
@@ -228,7 +246,9 @@ class Scheduler extends AbstractScheduler implements IConsumer
                 }
                 if ($quiet) {
                     // How many seconds to go until quiet time expires?
-                    $delay = strtotime($this->blackoutEndTime) - strtotime($currentTime) + random_int(1, 60);
+                    $delay = strtotime($this->blackoutEndTime)
+                        - strtotime($currentTime)
+                        + random_int(0, self::BLACKOUT_END_JITTER);
                     $this->log->notice(
                         sprintf(
                             'Message %s:%s delivery delayed %ss until end of quiet period (%s-%s)',
@@ -324,6 +344,59 @@ class Scheduler extends AbstractScheduler implements IConsumer
             $resolver->acknowledge();
             return;
         }
+    }
+
+    /**
+     * Load blackout settings from config
+     *
+     * @return void
+     */
+    private function loadBlackoutSettings(): void
+    {
+        $blackoutEnabled   = (bool)$this->config->get(ConfigMapper::NAME_NOTIFICATION_BLACKOUT_ENABLED);
+        $blackoutStartTime = $this->config->get(ConfigMapper::NAME_NOTIFICATION_BLACKOUT_START_TIME);
+        $blackoutEndTime   = $this->config->get(ConfigMapper::NAME_NOTIFICATION_BLACKOUT_END_TIME);
+        if ($blackoutEnabled) {
+            // Either both blackout start and end must be set, or neither
+            if (isset($blackoutStartTime) xor isset($blackoutEndTime)) {
+                $this->log->warning(
+                    'Either both or neither $blackoutStartTime of $blackoutEndTime must be set: disabling blackout time',
+                );
+                $blackoutStartTime = null;
+                $blackoutEndTime   = null;
+            }
+
+            // Validate blackout start and end, clearing if invalid
+            if ($blackoutStartTime && !$this->validateTimeValue($blackoutStartTime)) {
+                $this->log->warning(
+                    sprintf(
+                        '$blackoutStartTime value %s must be a HH:MM time: disabling blackout time',
+                        $blackoutStartTime
+                    ),
+                );
+                $blackoutStartTime = null;
+            }
+            if ($blackoutEndTime && !$this->validateTimeValue($blackoutEndTime)) {
+                $this->log->warning(
+                    sprintf(
+                        '$blackoutEndTime value %s must be a HH:MM time: disabling blackout time',
+                        $blackoutEndTime
+                    ),
+                );
+                $blackoutEndTime = null;
+            }
+
+            // If one of the above steps cleared blackout start or end,
+            // ensure both are cleared
+            if (!isset($blackoutStartTime, $blackoutEndTime)) {
+                $blackoutStartTime = null;
+                $blackoutEndTime   = null;
+            }
+        }
+
+        $this->blackoutEnabled   = $blackoutEnabled;
+        $this->blackoutStartTime = $blackoutStartTime;
+        $this->blackoutEndTime   = $blackoutEndTime;
     }
 
     /**

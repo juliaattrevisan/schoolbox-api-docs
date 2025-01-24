@@ -13,7 +13,7 @@ use Alaress\Async\Stomp\IClient;
 use Alaress\Date\Clock;
 use Alaress\Jitter\Jitter;
 use Alaress\Random\FloatGenerator;
-use Alaress\Sentry\Tracing\Tracer;
+use Alaress\Redis\Async;
 use Alaress\WorkerCrew\Pooling\DefaultDispatchStrategy;
 use PhpAmqpLib\Exception\AMQPRuntimeException;
 use Predis\ClientInterface;
@@ -21,7 +21,6 @@ use Psr\Container\ContainerInterface;
 use Psr\Log\LoggerInterface;
 use React\EventLoop\LoopInterface;
 use Schoolbox\Application\Daemon;
-use Schoolbox\Config\ConfigMapper;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Instance;
 use Schoolbox\MobileApp\RegistryMapper;
@@ -154,18 +153,6 @@ HELP;
             $config,
         );
 
-        // Dispatch to mobile queue
-        $blackoutEnabled   = (bool)$config->get(ConfigMapper::NAME_NOTIFICATION_BLACKOUT_ENABLED);
-        $blackoutStartTime = null;
-        $blackoutEndTime   = null;
-        if ($blackoutEnabled) {
-            $blackoutStartTime = $config->get(ConfigMapper::NAME_NOTIFICATION_BLACKOUT_START_TIME);
-            $blackoutEndTime   = $config->get(ConfigMapper::NAME_NOTIFICATION_BLACKOUT_END_TIME);
-            $log->notice(sprintf('Blackout period enabled: %s to %s', $blackoutStartTime, $blackoutEndTime));
-        } else {
-            $log->notice('Blackout period not enabled');
-        }
-
         $strat     = new DefaultDispatchStrategy($flags);
         $scheduler = new Scheduler(
             $loop,
@@ -174,8 +161,7 @@ HELP;
             $clock,
             $serviceManager,
             $jitter,
-            $blackoutStartTime,
-            $blackoutEndTime,
+            $config,
         );
 
         // This daemon does not need to restore its messages from the Redis
@@ -184,12 +170,20 @@ HELP;
         // (thus removing them from the queue) and then defer processing of them
         // using a React loop (thus losing that message if the daemon fails).
 
+        /** @var Async\Client $asyncRedis */
+        $asyncRedis = $di->get('redis.signalQueue.sub');
+
         // due to the async nature of STOMP:
         // only register consumer once the connection is actually established
-        $stomp->connect()->then(function () use ($broker, $scheduler, $log) {
+        $stomp->connect()->then(function () use ($broker, $scheduler, $log, $asyncRedis) {
             $log->info('Connected to STOMP', ['char' => '+']);
             $broker->registerConsumer($scheduler);
             $log->debug('Consuming amqp://' . Broker::QUEUE);
+
+            $topic = 'scheduled.' . INSTANCE_ID . '.*';
+
+            $asyncRedis->psubscribe($topic, $scheduler);
+            $log->info("Listening on redis://$topic");
         });
     } catch (ConnectionException $e) {
         $log->alert('AMQP server is offline or STOMP misconfigured: ' . $e->getMessage(), ['exception' => $e]);
