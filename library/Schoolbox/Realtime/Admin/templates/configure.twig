@@ -151,6 +151,21 @@
         });
 
         $('[data-collapser]').collapsable();
+
+        // Show/hide blackout input container
+        let $blackoutInputContainer = $('#blackoutInputContainer');
+        $('#blackoutEnabled-input').on('change', function() {
+            $blackoutInputContainer
+                .stop()
+                .removeClass('hide')
+                .slideUp(1);
+
+            if (this.checked) {
+                $blackoutInputContainer.slideDown();
+            } else {
+                $blackoutInputContainer.addClass('hide')
+            }
+        });
     });
 
     function customiserCallback(data) {
@@ -231,20 +246,19 @@
 
                             <div class="switch">
                                 <input name="blackoutEnabled" value="0" type="hidden">
-                                <input id="blackoutEnabled-field"
+                                <input id="blackoutEnabled-input"
                                        name="blackoutEnabled"
                                        {% if blackoutEnabled %}checked="checked"{% endif %}
                                        value="1"
                                        type="checkbox"
-                                       data-collapser="blackoutInputs"
                                 />
-                                <label for="blackoutEnabled-field">
+                                <label for="blackoutEnabled-input">
                                     <span>On</span>
                                     <span>Off</span>
                                 </label>
                             </div>
 
-                            <section class="content" data-collapsable="blackoutInputs" data-collapse-state="{{ blackoutEnabled ? 'uncollapsed' : 'collapsed' }}">
+                            <section class="content {% if not blackoutEnabled %}hide{% endif %}" id="blackoutInputContainer">
                                 <p>Notifications triggered after xxx will be delayed until yyy (the following day, if applicable).</p>
                             </section>
                         </div>
