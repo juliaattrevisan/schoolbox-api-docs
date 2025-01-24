@@ -1437,7 +1437,7 @@ class Controller extends Base
                     'popOutList' => 'displayOptions',
                 ],
                 'displayGradePage'         => [
-                    'caption'    => 'Display Grade Page',
+                    'caption'    => 'Display Class Grades Page',
                     'checkbox'   => true,
                     'mandatory'  => true,
                     'default'    => false,
