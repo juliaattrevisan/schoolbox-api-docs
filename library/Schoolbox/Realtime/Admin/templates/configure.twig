@@ -291,7 +291,7 @@
                                   action="{{ routeLookupIfAuthorized('adminNotificationsConfig.postConfig') }}"
                             >
                                 <div class="switch">
-                                    <input name="blackoutEnabled" value="0" type="hidden">
+                                    <input name="notification_blackout_enabled" value="0" type="hidden">
                                     <input id="blackoutEnabledInput"
                                            name="notification_blackout_enabled"
                                            {% if blackoutEnabled %}checked="checked"{% endif %}
