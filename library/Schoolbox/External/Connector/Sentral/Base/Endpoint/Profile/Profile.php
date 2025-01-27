@@ -315,7 +315,7 @@ class Profile implements IStrategy
 
                 /* This is used to obtain timetables
                  */
-                $metadata['studentId'] = $student['id'];
+                $metadata['id'] = $student['id'];
 
                 /* This is used to obtain medical stuff
                  */
@@ -1406,7 +1406,7 @@ class Profile implements IStrategy
 
                 /* This is used to obtain timetables
                  */
-                $metadata['staffId'] = $staff['id'];
+                $metadata['id'] = $staff['id'];
 
                 /* This is used to obtain medical stuff
                  */

@@ -115,7 +115,8 @@ class Classes implements IStrategy
                     'externalId' => trim((string)$externalId),
                     'firstname' => trim((string)$data['firstname']),
                     'lastname' => trim((string)$data['lastname']),
-                    'type' => trim((string)$metadata['type'])
+                    'id' => trim((string)$metadata['id']),
+                    'type' => trim((string)$metadata['type']),
                 ]
             ];
 
@@ -130,14 +131,10 @@ class Classes implements IStrategy
              * be teaching a subject and having an empty period at the same time). This superposition
              * should theoretically obtain staff classes that don't involve students...
              */
-            if (isset($metadata['studentId'])) {
-                $endpoint = "timetables/student/{$metadata['studentId']}/timetable-lessons?fromDate={$this->fromDate}&toDate={$this->toDate}";
-
-                $struct['person']['id'] = $metadata['studentId'];
-            } elseif (isset($metadata['staffId'])) {
-                $endpoint = "timetables/staff/{$metadata['staffId']}/timetable-lessons?fromDate={$this->fromDate}&toDate={$this->toDate}";
-
-                $struct['person']['id'] = $metadata['staffId'];
+            if (Profile::TYPE_STUDENT === $metadata['type']) {
+                $endpoint = "timetables/student/{$metadata['id']}/timetable-lessons?fromDate={$this->fromDate}&toDate={$this->toDate}";
+            } elseif (Profile::TYPE_STAFF === $metadata['id']) {
+                $endpoint = "timetables/staff/{$metadata['id']}/timetable-lessons?fromDate={$this->fromDate}&toDate={$this->toDate}";
             } else {
                 $this->log->warning(sprintf(
                     'Unknown profile type for %s (%s); skipping timetable preload.',
@@ -147,8 +144,6 @@ class Classes implements IStrategy
 
                 continue;
             }
-
-
 
             $this->consumeTimetable($endpoint, $struct, $name);
         }
