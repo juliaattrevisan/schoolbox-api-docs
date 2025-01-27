@@ -150,7 +150,7 @@ class Classes implements IStrategy
              */
             if (Profile::TYPE_STUDENT === $metadata['type']) {
                 $endpoint = "timetables/student/{$metadata['id']}/timetable-lessons?fromDate={$this->fromDate}&toDate={$this->toDate}";
-            } elseif (Profile::TYPE_STAFF === $metadata['id']) {
+            } elseif (Profile::TYPE_STAFF === $metadata['type']) {
                 $endpoint = "timetables/staff/{$metadata['id']}/timetable-lessons?fromDate={$this->fromDate}&toDate={$this->toDate}";
             } else {
                 $this->log->warning(sprintf(
@@ -162,7 +162,7 @@ class Classes implements IStrategy
                 continue;
             }
 
-            $this->consumeTimetable($endpoint, $struct, $name);
+            // $this->consumeTimetable($endpoint, $struct, $name);
         }
     }
 
