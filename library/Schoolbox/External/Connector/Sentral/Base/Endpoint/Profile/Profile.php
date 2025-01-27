@@ -1314,7 +1314,7 @@ class Profile implements IStrategy
                 /* Disregard unemployed staff
                  */
                 if (!$isEmployed) {
-                    $this->log->warning(sprintf(
+                    $this->log->info(sprintf(
                         'Skipping base profile for staff %s - staff is not currently employed',
                         $fullname
                     ));
@@ -1325,7 +1325,7 @@ class Profile implements IStrategy
                 /* Disregard inactive staff
                  */
                 if (!(int)$staff['attributes']['isActive']) {
-                    $this->log->warning(sprintf(
+                    $this->log->info(sprintf(
                         'Skipping base profile for staff %s - staff is inactive',
                         $fullname
                     ));
