@@ -59,6 +59,11 @@ abstract class TypeAbstract implements ISoftDeletable, Sequential, \JsonSerializ
     /**
      * @var string|null
      */
+    protected ?string $entryTip = null;
+
+    /**
+     * @var string|null
+     */
     protected ?string $template = null;
 
     /**
@@ -146,6 +151,24 @@ abstract class TypeAbstract implements ISoftDeletable, Sequential, \JsonSerializ
     public function getExternalCode(): ?string
     {
         return $this->externalCode;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getEntryTip(): ?string
+    {
+        return $this->entryTip;
+    }
+
+    /**
+     * @param string|null $entryTip
+     * @return static
+     */
+    public function setEntryTip(?string $entryTip): self
+    {
+        $this->entryTip = $entryTip;
+        return $this;
     }
 
     /**

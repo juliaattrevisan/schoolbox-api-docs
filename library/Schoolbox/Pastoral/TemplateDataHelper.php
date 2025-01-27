@@ -72,8 +72,10 @@ class TemplateDataHelper
 
         $typesIndex           = $types->map(fn (Pastoral\Type\Model $model) => $model->getTemplate());
         $typesIndexPrivate    = $types->map(fn (Pastoral\Type\Model $model) => $model->getTemplatePrivate());
+        $typesIndexEntryTip   = $types->map(fn (Pastoral\Type\Model $model) => $model->getEntryTip());
         $subtypesIndex        = $subtypes->map(fn (Pastoral\SubType\Model $model) => $model->getTemplate());
         $subtypesIndexPrivate = $subtypes->map(fn (Pastoral\SubType\Model $model) => $model->getTemplatePrivate());
+        $subtypesIndexEntryTip = $subtypes->map(fn (Pastoral\SubType\Model $model) => $model->getEntryTip());
 
         $audienceDefaults = $this->loadTypeAndSubtypeDefaults($types, $typeAudiences, $subtypes, $subtypeAudiences);
 
@@ -99,7 +101,9 @@ class TemplateDataHelper
             // Requirements for displaying scripts
             'audiences'            => $audienceDefaults,
             'typesIndexPrivate'    => $typesIndexPrivate,
+            'typesIndexEntryTip'    => $typesIndexEntryTip,
             'typesIndex'           => $typesIndex,
+            'subtypesIndexEntryTip' => $subtypesIndexEntryTip,
             'subtypesIndexPrivate' => $subtypesIndexPrivate,
             'subtypesIndex'        => $subtypesIndex,
         ];
@@ -197,6 +201,7 @@ class TemplateDataHelper
         foreach ($types as $type) {
             $typesIndex[$type->getId()]        = $type->getTemplate();
             $typesIndexPrivate[$type->getId()] = $type->getTemplatePrivate();
+            $typesIndexEntryTip[$type->getId()] = $type->getEntryTip();
             if (key_exists($type->getId(), $typeAudiences) || $type->getVisibilityLocked()) {
                 $audienceDefaults[] = [
                     'typeId'    => $type->getId(),
@@ -209,6 +214,7 @@ class TemplateDataHelper
         foreach ($subtypes as $subtype) {
             $subtypesIndex[$subtype->getId()]        = $subtype->getTemplate();
             $subtypesIndexPrivate[$subtype->getId()] = $subtype->getTemplatePrivate();
+            $typesIndexEntryTip[$subtype->getId()] = $subtype->getEntryTip();
             if (key_exists($subtype->getId(), $subtypeAudiences) || $subtype->getVisibilityLocked()) {
                 $audienceDefaults[] = [
                     'typeId'    => $subtype->getPastoralType()->getId(),

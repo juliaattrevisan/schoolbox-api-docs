@@ -193,6 +193,15 @@
                     {% endif %}
                     <fieldset class="content">
                         <div class="small-12 columns">
+                            <label for="entryTip">Entry Tip</label>
+                            <p class="meta">
+                                This will appear on the pastoral record creation screen to provide additional information when creating a record of this Type / Sub-Type.
+                            </p>
+                            <textarea id="entryTip" name="entryTip">{% if subtype %}{{ subtype.entryTip }}{% elseif type %}{{ type.entryTip }}{% endif %}</textarea>
+                        </div>
+                    </fieldset>
+                    <fieldset class="content">
+                        <div class="small-12 columns">
                             <label for="template">General Template</label>
 
                             <p class="meta">
@@ -212,7 +221,15 @@
                                             targetElements: ["#template", "#templatePrivate"],
                                             hasTokens: true
                                         }
-                                    }))
+                                    }));
+
+                                    document.dispatchEvent(new CustomEvent("EDITOR__CREATE", {
+                                        detail : {
+                                            maxCharCount: window.sbProps.MAX_BYTES_MYSQL_MEDIUMTEXT,
+                                            targetElements: ["#entryTip"],
+                                            toolbar: "simple",
+                                        }
+                                    }));
 
                                     let colorInput = document.getElementById('pastoralColor'),
                                         iconSelect = document.getElementById('pastoralIcon'),
