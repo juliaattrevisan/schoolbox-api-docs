@@ -162,7 +162,7 @@ class Classes implements IStrategy
                 continue;
             }
 
-            // $this->consumeTimetable($endpoint, $struct, $name);
+             $this->consumeTimetable($endpoint, $struct, $name);
         }
     }
 
