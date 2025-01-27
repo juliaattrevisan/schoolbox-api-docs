@@ -20,6 +20,22 @@ export default {
         };
     },
 
+    computed: {
+        /**
+         * Check if selected is empty
+         * @returns {boolean} - whether the selected object is empty
+         */
+        isSelectedEmpty() {
+            let isEmpty = true;
+            for (const key in this.selected) {
+                if (Array.isArray(this.selected[key]) && this.selected[key].length > 0) {
+                    isEmpty = false;
+                }
+            }
+            return isEmpty;
+        },
+    },
+
     methods: {
         /**
          * Open the modal.
@@ -38,9 +54,10 @@ export default {
             // filters exclude them: the event's visibility just needs to be
             // updated.
 
-            // Hopefully selectedFilters isn't passed by reference:
-            // I don't want to apply filters till I click this button.
-            // (Turns out they are: I'll have to think of something else)
+            // prevent the form from submitting when there are no filters selected
+            if (this.isSelectedEmpty) {
+                return;
+            }
             this.$emit(FILTER_CHANGED, this.selected);
             this.$refs.modal.close();
         },
@@ -257,6 +274,7 @@ export default {
                     </div>
                 </fieldset>
             </section>
+            <div v-if="isSelectedEmpty" class="alert-box alert">Please select at least one filter.</div>
             <input type="submit" value="Apply Filters" />
         </form>
     </reveal-modal>
