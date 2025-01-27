@@ -103,6 +103,23 @@ class Classes implements IStrategy
         foreach ($userLookup as $externalId => $data) {
             $name = trim("{$data['firstname']} {$data['lastname']}");
 
+            /* Check user's metadata: it might not exist if you tried to sync timetables
+             * prior to profiles. This should be rare due to the way schools will have set
+             * up their importers, but it could be possible if it was disabled (such as between
+             * academic periods/years/holidays), you get the upgrade, then try it out straight
+             * away because you're so excited about what I did here. Profiles won't have metadata
+             * and this will die immediately.
+             */
+            if (null === $data['metadata']) {
+                $this->log->debug(sprintf(
+                    'No timetable metadata for %s (%s) - perhaps user profiles need to be reimported. Skipping',
+                    $name,
+                    $externalId
+                ));
+
+                continue;
+            }
+
             /* Unpack all those ids
              */
             $metadata = $metadataReader->deserialize($data['metadata']);
