@@ -62,7 +62,7 @@ class Users
      */
     private function initStudentLookup(): array
     {
-        $userStatement = $this->baseProfileMapper->getDatabase()->query("
+        $result = $this->baseProfileMapper->getDatabase()->executeQuery("
             SELECT external_id, firstname, lastname, metadata
             FROM {$this->userProfileTable} sup
             INNER JOIN {$this->studentProfileTable} sups ON sup.id = sups.sis_user_profile_id
@@ -71,7 +71,7 @@ class Users
 
         $students = [];
 
-        foreach ($userStatement as $row) {
+        while ($row = $result->fetch(\PDO::FETCH_ASSOC)) {
             $students[(string)$row['external_id']] = $row;
         }
 
@@ -86,7 +86,7 @@ class Users
      */
     private function initStaffLookup(): array
     {
-        $userStatement = $this->baseProfileMapper->getDatabase()->query("
+        $result = $this->baseProfileMapper->getDatabase()->executeQuery("
             SELECT external_id, firstname, lastname, metadata
             FROM {$this->userProfileTable} sup
             INNER JOIN {$this->staffProfileTable} sups ON sup.id = sups.sis_user_profile_id
@@ -95,7 +95,7 @@ class Users
 
         $staff = [];
 
-        foreach ($userStatement as $row) {
+        while ($row = $result->fetch(\PDO::FETCH_ASSOC)) {
             $staff[(string)$row['external_id']] = $row;
         }
 
