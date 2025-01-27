@@ -8,6 +8,19 @@ set iconClassnames = {
     'Email': 'email'
 }
 %}
+{# Overrides for display names
+ # Since the keys are meaningful in the backend/database, we need to override
+ # them for frontend display purposes when they change
+ #}
+{%
+set labelDisplayNames = {
+    'Muted': 'Mute',
+    'Digest': 'News',
+    'Instant': 'Notifications',
+    'Mobile': 'Device',
+    'Email': 'Email'
+}
+%}
 
 {% for level, perm in perms %}
     <span data-perm-container data-perm="{{ level }}">
@@ -18,7 +31,7 @@ set iconClassnames = {
                 {% if perm[1] | slice(0, 2) | upper not in role.mask %}disabled="disabled"{% endif %}
         />
         <label for="{{ mode }}-{{ ns[namespace.id].slug ?: 0 }}-{{ source.id ?: 0 }}{%if role %}-{{ role.id }}{% endif %}-{{ level }}"
-               title="{{ perm[1] }}{% if perm[1] | slice(0, 2) | upper not in role.mask %} (disabled){% endif %}"
+               title="{{ labelDisplayNames[perm[1]] }}{% if perm[1] | slice(0, 2) | upper not in role.mask %} (disabled){% endif %}"
                class="input-toggle">
             <span class="icon-{{ iconClassnames[perm[1]] }}"></span>
         </label>
@@ -29,4 +42,3 @@ set iconClassnames = {
     </span>
     {% endif %}
 {% endfor %}
-
