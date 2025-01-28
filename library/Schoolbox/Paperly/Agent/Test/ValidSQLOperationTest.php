@@ -57,6 +57,10 @@ class ValidSQLOperationTest extends TestCase
                 '        SELECT * FROM luYearLevel ',
                 true
             ],
+            'Ignore leading non-alphabetical characters' => [
+                '(SELECT * FROM luYearLevel)',
+                true
+            ]
         ];
     }
 

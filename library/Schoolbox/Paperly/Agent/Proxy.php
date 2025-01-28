@@ -51,11 +51,18 @@ class Proxy
                 'Invalid query statement. Query should not contain semicolons(;).'
             );
         }
+
+        /* Ignoring the leading non-alphabetical characters such as open-bracket
+         * in case the user wants to use brackets
+         */
+        $regex = "/[^a-zA-Z]*(?<sqlOperator>\w+)/";
+        preg_match($regex, $sql, $matches);
+
         /* Trying to discern the type of sql query the user wants to execute
          */
         return match (
             strtoupper(
-                explode(' ', trim($sql))[0]
+                trim($matches['sqlOperator'])
             )
         ) {
             'SELECT' => true,
