@@ -73,11 +73,11 @@
                             <div class="row">
                                 <div class="small-12 columns">
                                     <select id="defaultExpiry" name="defaultExpiry">
-                                        {% for expiry in defaultExpiry %}
+                                        {% for key, expiry in defaultExpiry %}
                                             <option value="{{ expiry }}"
-                                                    label="{{ expiry | capitalize }}"
+                                                    label="{{ key | title }}"
                                                     {% if expiry == currentDefaultExpiry %}selected{% endif %}
-                                            >{{ expiry | capitalize }}</option>
+                                            >{{ key | title }}</option>
                                         {% endfor %}
                                     </select>
                                 </div>

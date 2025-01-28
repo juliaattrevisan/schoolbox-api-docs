@@ -41,16 +41,17 @@ abstract class TypeAbstract implements ISoftDeletable, Sequential, \JsonSerializ
     /**
      * Pastoral Expiry
      */
-    public const PASTORAL_EXPIRY_DEFAULT = 'never';
+    public const PASTORAL_EXPIRY_DEFAULT = null;
     public const PASTORAL_EXPIRY = [
-        self::PASTORAL_EXPIRY_DEFAULT,
-        '1 week',
-        '2 weeks',
-        '1 month',
-        '6 months',
-        '12 months',
-        'academic period',
-        'academic year',
+        'never'           => self::PASTORAL_EXPIRY_DEFAULT,
+        '1 week'          => '1 week',
+        '2 weeks'         => '2 weeks',
+        '1 month'         => '1 month',
+        '6 months'        => '6 months',
+        '12 months'       => '12 months',
+        'calendar year'   => 'calendar year',
+        'academic period' => 'academic period',
+        'academic year'   => 'academic year',
     ];
 
     /** @var string|null */
@@ -101,9 +102,9 @@ abstract class TypeAbstract implements ISoftDeletable, Sequential, \JsonSerializ
 
     /**
      * Pastoral expiry period
-     * @var string
+     * @var ?string
      */
-    protected string $defaultExpiry = Model::PASTORAL_EXPIRY_DEFAULT;
+    protected ?string $defaultExpiry = Model::PASTORAL_EXPIRY_DEFAULT;
 
     /** @var GenericCollection */
     protected GenericCollection $typeActions;
@@ -309,18 +310,18 @@ abstract class TypeAbstract implements ISoftDeletable, Sequential, \JsonSerializ
     }
 
     /**
-     * @return string
+     * @return ?string
      */
-    public function getDefaultExpiry(): string
+    public function getDefaultExpiry(): ?string
     {
         return $this->defaultExpiry;
     }
 
     /**
-     * @param string $defaultExpiry
+     * @param ?string $defaultExpiry
      * @return static
      */
-    public function setDefaultExpiry(string $defaultExpiry): self
+    public function setDefaultExpiry(?string $defaultExpiry): self
     {
         $this->defaultExpiry = $defaultExpiry;
         return $this;
