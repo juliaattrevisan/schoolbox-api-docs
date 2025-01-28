@@ -111,26 +111,59 @@ HELP;
 
             /* Fetch a list of quizzes that haven't concluded yet
              * (finish is in the future, regardless of whenever it started)
+             *
+             * TODO maybe parameterise this date range
+             * TODO convert var to mvar
              */
-            $quizMapper = \Schoolbox\Learning\Quiz\Mapper::getInstance();
+            $statement = $this->getDatabaseInternal()->prepare("
+                SELECT
+                    a.assessment_id,
+                    a.title,
+                    a.finish,
+                    a.learnosity_reference,
+                    var.folder_id,
+                    f.name AS folder_name,
+                    var.course_implementation_id,
+                    var.course_unit_implementation_id,
+                    var.course_specification_id,
+                    var.course_unit_specification_id
+                FROM assess a
+                INNER JOIN v_assessment_relation var ON a.assessment_id = var.assessment_id
+                INNER JOIN folder f ON var.folder_id = f.id
+                WHERE a.finish >= NOW() OR a.finish IS NULL
+            ");
 
-            /* TODO But what about specification assessments? Those won't have a due date
-             */
-            $pb = $quizMapper->getPredicateBuilder()
-                ->greaterThanOrEqualTo('finish', \Alaress_Date_Format::now()->getDatabase());
-
-            $quizzes = $quizMapper->findByPredicates($pb);
+            $statement->execute();
 
             /* Store some info about them
              */
             $candidates = [];
 
-            foreach ($quizzes as $quiz) {
+            while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
+                /* A spec or an impl?
+                 */
+                if ((null !== $row['course_implementation_id']) || (null !== $row['course_unit_implementation_id'])) {
+                    $type = 'implementation';
+                } elseif ((null !== $row['course_specification_id']) || (null !== $row['course_unit_specification_id'])) {
+                    $type = 'specification';
+                } else {
+                    $type = 'implementation (not in a course)';
+                }
+
                 $candidates[] = [
-                    'assessment_id' => $quiz->getAssessmentModel()->getId(),
-                    'title' => $quiz->getAssessmentModel()->getTitle(),
-                    'finish' => $quiz->getAssessmentModel()->getDueDate()->getDatabase(),
-                    'reference' => $quiz->getLearnosityReference()
+                    /* Spittin' facts
+                     */
+                    'assessment_id' => $row['assessment_id'],
+                    'title' => $row['title'],
+                    'finish' => $row['finish'],
+                    'reference' => $row['learnosity_reference'],
+                    /* A spec or an impl?
+                     */
+                    'type' => $type,
+                    /* Some info about where you might find it in the browzer
+                     */
+                    'folder_id' => $row['folder_id'],
+                    'folder_name' => $row['folder_name']
                 ];
             }
 
