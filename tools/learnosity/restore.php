@@ -114,13 +114,11 @@ HELP;
             return;
         }
 
+        $this->getLogger()->info('');
         $this->getLogger()->info('Learnosity Activity Restore');
         $this->getLogger()->info('');
 
         try {
-            $this->getLogger()->debug('Fetching quizzes that are still ongoing...');
-            $this->getLogger()->debug('');
-
             /* Fetch a list of quizzes that haven't concluded yet
              * (finish is in the future, regardless of whenever it started)
              *
@@ -256,7 +254,7 @@ HELP;
                  */
                 $this->getLogger()->info('');
                 $this->getLogger()->info('');
-                
+
                 $this->getLogger()->info(sprintf(
                     "[%s/%s] %s",
                     $i,
@@ -265,8 +263,19 @@ HELP;
                 ));
 
                 $this->getLogger()->info(sprintf(
-                    '/learning/assessments/%s',
+                    'Assessment: /learning/assessments/%s',
                     $candidate['assessment_id'],
+                ));
+
+                $this->getLogger()->info(sprintf(
+                    'Context: "%s" /homepage/%s',
+                    $candidate['folder_name'],
+                    $candidate['folder_id']
+                ));
+
+                $this->getLogger()->info(sprintf(
+                    'Type: %s',
+                    $candidate['type']
                 ));
 
                 $this->getLogger()->info(sprintf(
