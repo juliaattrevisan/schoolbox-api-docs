@@ -10,7 +10,6 @@ declare(strict_types=1);
 namespace Schoolbox\Realtime\Admin\Config;
 
 use Alaress\Module\Cache\Rebuilder;
-use Alaress\Redis;
 use Alaress\Web\Controller\ConfigController;
 use Predis\ClientInterface;
 use Psr\SimpleCache\CacheInterface;
