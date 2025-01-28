@@ -10,6 +10,8 @@ use OutOfBoundsException;
 
 class Proxy
 {
+    private const MAX_RESULTS = 100;
+
     public function __construct(
         private IConnector $externalDb,
     ) {
@@ -71,5 +73,33 @@ class Proxy
                 'Invalid SQL statement. Please use a valid SQL operator.'
             ),
         };
+    }
+
+    /**
+     * Retrieving results from the database
+     *
+     * @param IQuery|Base $stmt
+     * @return array
+     * @throws AlaressDatabaseException
+     */
+    public function retrieveResults(IQuery|Base $stmt): array
+    {
+        $results = [];
+        $data = $stmt->fetchAll(\PDO::FETCH_ASSOC);
+
+        if (count($data) > self::MAX_RESULTS) {
+            throw new AlaressDatabaseException(
+                sprintf(
+                    "Maximum number of results exceeded. Please limit the number of results in query to be below %d.",
+                    self::MAX_RESULTS
+                )
+            );
+        }
+
+        foreach ($data as $row) {
+            $results[] = $row;
+        }
+
+        return $results;
     }
 }

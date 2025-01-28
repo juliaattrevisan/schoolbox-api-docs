@@ -147,9 +147,7 @@ class Controller extends Base
             $stmt = $this->proxy->executeQuery($sql, $params);
 
             if ($shouldReturn) {
-                while ($row = $stmt->fetch(\PDO::FETCH_ASSOC)) {
-                    $response[] = $row;
-                }
+                $response = $this->proxy->retrieveResults($stmt);
             } else {
                 $response = [
                     'success' => true
