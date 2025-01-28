@@ -119,7 +119,7 @@ HELP;
 
         try {
             $this->getLogger()->debug('Fetching quizzes that are still ongoing...');
-            $this->getLogger()->info('');
+            $this->getLogger()->debug('');
 
             /* Fetch a list of quizzes that haven't concluded yet
              * (finish is in the future, regardless of whenever it started)
