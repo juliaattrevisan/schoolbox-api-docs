@@ -118,6 +118,9 @@ HELP;
             /* Fetch a list of quizzes that haven't concluded yet
              * (finish is in the future, regardless of whenever it started)
              *
+             * Note that it's possible for learnosity_reference to be null or empty,
+             * or otherwise bad: exclude those from the get-go
+             *
              * TODO maybe parameterise this date range
              * TODO convert var to mvar
              */
@@ -136,7 +139,9 @@ HELP;
                 FROM assess a
                 INNER JOIN v_assessment_relation var ON a.assessment_id = var.assessment_id
                 INNER JOIN folder f ON var.folder_id = f.id
-                WHERE a.finish >= NOW() OR a.finish IS NULL
+                WHERE a.learnosity_reference IS NOT NULL
+                AND a.learnosity_reference != ''
+                AND (a.finish >= NOW() OR a.finish IS NULL)
             ");
 
             $statement->execute();
@@ -158,7 +163,7 @@ HELP;
                     $type = 'implementation (not in a course)';
                 }
 
-                $candidates[] = [
+                $candidates[$row['learnosity_reference']] = [
                     /* Spittin' facts
                      */
                     'assessment_id' => $row['assessment_id'],
@@ -219,13 +224,12 @@ HELP;
             }
 
             /* Collate some facts from learnosity's perspective
+             *
              * Note that learnosity might give you a malformed data set for some reason or other
-             * Store them in a hash lookup for quick cross-referencing
+             * Store them in a hash lookup for quick cross-referencing anyway
              */
-            $learnosityStatus = [];
-
             foreach (($result['data'] ?? []) as $learnosityQuiz) {
-                $learnosityStatus[$learnosityQuiz['reference']] = $learnosityQuiz['status'];
+                $candidates[$learnosityQuiz['reference']]['status'] = $learnosityQuiz['status'];
             }
 
             /* Planning mode; just show the facts, then leave
@@ -235,6 +239,10 @@ HELP;
 
             foreach ($candidates as $candidate) {
                 $this->refreshLock($lock);
+
+                /* Remember this candidate quiz' status
+                 */
+                $status = $learnosityStatus[$candidate['learnosity_reference']] ?? 'unknown';
 
                 $i++;
 
@@ -263,7 +271,7 @@ HELP;
 
                 $this->getLogger()->info(sprintf(
                     'Status: %s',
-                    $learnosityStatus[$candidate['learnosity_reference']] ?? 'unknown'
+                    $status
                 ));
 
                 /* In Perform mode, perform the restoration of either the one(s) specified
@@ -272,10 +280,13 @@ HELP;
                 if ($this->perform()) {
                     $this->refreshLock($lock);
 
-                    /* Definitely an invalid learnosity reference - skip it
+                    /* If a quiz is already published, nothing to change
                      */
-                    if ('' === trim((string)$candidate['learnosity_reference'])) {
-                        $this->getLogger()->warning('    This learnosity reference is invalid: skipping');
+                    if (Helper::LEARNOSITY_ITEM_STATUS_PUBLISHED === $status) {
+                        $this->getLogger()->debug(sprintf(
+                            '    This quiz status is already %s; nothing to change.',
+                            Helper::LEARNOSITY_ITEM_STATUS_PUBLISHED
+                        ));
 
                         continue;
                     }
@@ -287,7 +298,7 @@ HELP;
 
                     /* Perform "unarchive"
                      */
-                    $this->getLogger()->debug(sprintf(
+                    $this->getLogger()->info(sprintf(
                         '    Requesting update to %s...',
                         $candidate['learnosity_reference']
                     ));
