@@ -292,7 +292,7 @@ HELP;
                         $candidate['learnosity_reference']
                     ));
 
-//                    $helper->restore($candidate['learnosity_reference']);
+                    $helper->restore($candidate['learnosity_reference']);
 
                     /* Log status of the ones we just changed, requesting their current state
                      * from learnosity as a confirmation
