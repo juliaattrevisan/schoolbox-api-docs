@@ -298,10 +298,7 @@ HELP;
 
                     /* Perform "unarchive"
                      */
-                    $this->getLogger()->info(sprintf(
-                        '    Requesting update to %s...',
-                        $candidate['learnosity_reference']
-                    ));
+                    $this->getLogger()->info('    Requesting update...');
 
                     $helper->restore($candidate['learnosity_reference']);
 
