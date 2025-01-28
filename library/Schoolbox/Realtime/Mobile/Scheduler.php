@@ -93,6 +93,7 @@ class Scheduler extends AbstractScheduler implements IConsumer, EventListener
         private IConfigLoader $config,
     ) {
         parent::__construct($this->loop, $dispatchStrategy, $log, $clock);
+        $this->log->notice('Loading blackout period settings');
         $this->loadBlackoutSettings();
     }
 
@@ -191,7 +192,7 @@ class Scheduler extends AbstractScheduler implements IConsumer, EventListener
         // comes in the form 'mobiled.vagrantx.reload'
         [, , $action] = explode('.', $event->getChannel());
         if ($action === 'refreshConfiguration') {
-            $this->log->debug('Dropping config cache');
+            $this->log->notice('refreshConfiguration signal received: reloading blackout period settings');
             $this->config->dropCache();
             $this->loadBlackoutSettings();
         }
@@ -353,19 +354,12 @@ class Scheduler extends AbstractScheduler implements IConsumer, EventListener
      */
     private function loadBlackoutSettings(): void
     {
-        $this->log->notice('Reloading blackout period settings...');
-        $blackoutEnabled = (bool)$this->config->get(ConfigMapper::NAME_NOTIFICATION_BLACKOUT_ENABLED);
-        if ($blackoutEnabled) {
-            $this->log->notice('Blackout period enabled: loading and verifying start/end time');
-        } else {
-            $this->log->notice('Blackout period not enabled');
-        }
-
+        $blackoutEnabled   = (bool)$this->config->get(ConfigMapper::NAME_NOTIFICATION_BLACKOUT_ENABLED);
         $blackoutStartTime = $this->config->get(ConfigMapper::NAME_NOTIFICATION_BLACKOUT_START_TIME);
         $blackoutEndTime   = $this->config->get(ConfigMapper::NAME_NOTIFICATION_BLACKOUT_END_TIME);
 
         if ($blackoutEnabled) {
-            $this->log->notice(sprintf('Blackout period: start: %s, end: %s', $blackoutStartTime, $blackoutEndTime));
+            $this->log->notice(sprintf('Blackout period enabled (start: %s, end: %s)', $blackoutStartTime, $blackoutEndTime));
 
             // Either both blackout start and end must be set, or neither
             if (isset($blackoutStartTime) xor isset($blackoutEndTime)) {
@@ -402,6 +396,10 @@ class Scheduler extends AbstractScheduler implements IConsumer, EventListener
                 $blackoutStartTime = null;
                 $blackoutEndTime   = null;
             }
+        } else {
+            $this->log->notice('Blackout period not enabled');
+            $blackoutStartTime = null;
+            $blackoutEndTime   = null;
         }
 
         $this->blackoutEnabled   = $blackoutEnabled;
