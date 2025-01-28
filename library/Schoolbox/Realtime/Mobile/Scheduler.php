@@ -247,17 +247,19 @@ class Scheduler extends AbstractScheduler implements IConsumer, EventListener
                 }
                 if ($quiet) {
                     // How many seconds to go until quiet time expires?
-                    $delay = strtotime($this->blackoutEndTime)
-                        - strtotime($currentTime)
-                        + random_int(0, self::BLACKOUT_END_JITTER);
+                    $jitter           = random_int(0, self::BLACKOUT_END_JITTER);
+                    $delayTimestamp   = strtotime($this->blackoutEndTime) + $jitter;
+                    $currentTimestamp = strtotime($currentTime);
+                    $delay            = $delayTimestamp - $currentTimestamp;
                     $this->log->notice(
                         sprintf(
-                            'Message %s:%s delivery delayed %ss until end of quiet period (%s-%s)',
+                            'Message %s:%s delivery delayed until %ss after end of quiet period (%s-%s) (exact time: %s)',
                             $payload->getBaseHash(),
                             $payload->getParamHash(),
-                            $delay,
+                            $jitter,
                             $this->blackoutStartTime,
                             $this->blackoutEndTime,
+                            Alaress_Date_Format::newFromTimestamp($delayTimestamp)->toRfc3339String(),
                         )
                     );
 
