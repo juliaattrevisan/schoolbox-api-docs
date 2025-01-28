@@ -363,17 +363,8 @@ class Scheduler extends AbstractScheduler implements IConsumer, EventListener
         if ($blackoutEnabled) {
             $this->log->notice(sprintf('Blackout period enabled (start: %s, end: %s)', $blackoutStartTime, $blackoutEndTime));
 
-            // Either both blackout start and end must be set, or neither
-            if (isset($blackoutStartTime) xor isset($blackoutEndTime)) {
-                $this->log->warning(
-                    'Either both or neither blackout start or end must be set: disabling blackout period',
-                );
-                $blackoutStartTime = null;
-                $blackoutEndTime   = null;
-            }
-
             // Validate blackout start and end, clearing if invalid
-            if ($blackoutStartTime && !$this->validateTimeValue($blackoutStartTime)) {
+            if (!$this->validateTimeValue($blackoutStartTime)) {
                 $this->log->warning(
                     sprintf(
                         'Blackout start %s must be a HH:MM time: disabling blackout period',
@@ -382,7 +373,7 @@ class Scheduler extends AbstractScheduler implements IConsumer, EventListener
                 );
                 $blackoutStartTime = null;
             }
-            if ($blackoutEndTime && !$this->validateTimeValue($blackoutEndTime)) {
+            if (!$this->validateTimeValue($blackoutEndTime)) {
                 $this->log->warning(
                     sprintf(
                         'Blackout end value %s must be a HH:MM time: disabling blackout period',
