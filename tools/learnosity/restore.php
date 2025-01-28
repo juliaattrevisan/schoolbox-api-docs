@@ -60,6 +60,12 @@ $app = new class extends CliTool\App
 
 
     /**
+     * A placeholder for the status of a quiz prior to finding out from Learnosity
+     */
+    private const STATUS_UNKNOWN = 'unknown';
+
+
+    /**
      * @inheritdoc
      */
     public function getLongOpts(): array
@@ -176,7 +182,10 @@ HELP;
                     /* Some info about where you might find it in the browzer
                      */
                     'folder_id' => $row['folder_id'],
-                    'folder_name' => $row['folder_name']
+                    'folder_name' => $row['folder_name'],
+                    /* These get updated as we discover information/facts from Learnosity itself
+                     */
+                    'status' => self::STATUS_UNKNOWN
                 ];
             }
 
@@ -237,12 +246,8 @@ HELP;
             $n = \count($candidates);
             $i = 0;
 
-            foreach ($candidates as $candidate) {
+            foreach ($candidates as $learnosityReference => $candidate) {
                 $this->refreshLock($lock);
-
-                /* Remember this candidate quiz' status
-                 */
-                $status = $learnosityStatus[$candidate['learnosity_reference']] ?? 'unknown';
 
                 $i++;
 
@@ -271,7 +276,7 @@ HELP;
 
                 $this->getLogger()->info(sprintf(
                     'Status: %s',
-                    $status
+                    $candidate['status'],
                 ));
 
                 /* In Perform mode, perform the restoration of either the one(s) specified
@@ -282,11 +287,20 @@ HELP;
 
                     /* If a quiz is already published, nothing to change
                      */
-                    if (Helper::LEARNOSITY_ITEM_STATUS_PUBLISHED === $status) {
-                        $this->getLogger()->debug(sprintf(
-                            '    This quiz status is already %s; nothing to change.',
+                    if (Helper::LEARNOSITY_ITEM_STATUS_PUBLISHED === $candidate['status']) {
+                        $this->getLogger()->info(sprintf(
+                            '    This quiz status is already %s; nothing to change. Skipping',
                             Helper::LEARNOSITY_ITEM_STATUS_PUBLISHED
                         ));
+
+                        continue;
+                    }
+
+                    /* We can't...really restore quizzes learnosity doesn't understand.
+                     * I'm not sure why it exists: might only be in vagrant demo data
+                     */
+                    if (self::STATUS_UNKNOWN === $candidate['status']) {
+                        $this->getLogger()->info('    Learnosity cannot figure out this quiz. Skipping');
 
                         continue;
                     }
@@ -333,6 +347,8 @@ HELP;
 
         /* Announce conclusion
          */
+        $this->getLogger()->info('');
+
         if (!$this->perform()) {
             $this->getLogger()->info('Planning finished.');
         }
