@@ -11,6 +11,7 @@ declare(strict_types=1);
 use LearnositySdk\Exceptions\ValidationException;
 use Schoolbox\Application\CliTool;
 use Schoolbox\Learning\Learnosity\Api as LearnosityApi;
+use Schoolbox\Learning\Learnosity\Helper;
 use Schoolbox\Url\Factory;
 
 require_once __DIR__ . '/../../conf/core/require.php';
@@ -108,9 +109,11 @@ HELP;
         }
 
         $this->getLogger()->info('Learnosity Activity Restore');
+        $this->getLogger()->info('');
 
         try {
             $this->getLogger()->debug('Fetching quizzes that are still ongoing...');
+            $this->getLogger()->info('');
 
             /* Fetch a list of quizzes that haven't concluded yet
              * (finish is in the future, regardless of whenever it started)
@@ -198,6 +201,10 @@ HELP;
                 $this->getLogger(),
             );
 
+            /* For access to the restore() mechanism
+             */
+            $helper = (new Helper($api, $this->getLogger()));
+
             /* Ask them about the learnosity references we obtained. If we die for any reason,
              * probably have to exit out: we can't really continue from here
              */
@@ -231,13 +238,31 @@ HELP;
 
                 $i++;
 
+                /* Yeah, formatting etc
+                 * Logs never look nice for humans
+                 */
+                $this->getLogger()->info('');
+                $this->getLogger()->info('');
+                
                 $this->getLogger()->info(sprintf(
-                    "[%s/%s] %s\n/learning/assessments/%s\nReference: %s\nStatus: %s\n\n",
+                    "[%s/%s] %s",
                     $i,
                     $n,
                     $candidate['title'],
+                ));
+
+                $this->getLogger()->info(sprintf(
+                    '/learning/assessments/%s',
                     $candidate['assessment_id'],
+                ));
+
+                $this->getLogger()->info(sprintf(
+                    'Reference: %s',
                     $candidate['learnosity_reference'],
+                ));
+
+                $this->getLogger()->info(sprintf(
+                    'Status: %s',
                     $learnosityStatus[$candidate['learnosity_reference']] ?? 'unknown'
                 ));
 
@@ -245,18 +270,50 @@ HELP;
                  * with --reference, or alternatively, all the ones we just found.
                  */
                 if ($this->perform()) {
-                    /* TODO fill this in with a mutation
-                     */
-                    return;
-                }
-            }
+                    $this->refreshLock($lock);
 
-            /* Log status of the ones we just changed, requesting their current state
-             * from learnosity as a confirmation
-             */
-            if ($this->perform()) {
-                /* TODO Get the current state of affairs
-                 */
+                    /* Definitely an invalid learnosity reference - skip it
+                     */
+                    if ('' === trim((string)$candidate['learnosity_reference'])) {
+                        $this->getLogger()->warning('    This learnosity reference is invalid: skipping');
+
+                        continue;
+                    }
+
+                    /* Otherwise a learnosity reference might have an alphanumeric value, but still
+                     * be invalid - someone might have just made that whole thing up, so skip over
+                     * those if we encounter them. Maybe it's bad data; either way, can't do much
+                     */
+
+                    /* Perform "unarchive"
+                     */
+                    $this->getLogger()->debug(sprintf(
+                        '    Requesting update to %s...',
+                        $candidate['learnosity_reference']
+                    ));
+
+//                    $helper->restore($candidate['learnosity_reference']);
+
+                    /* Log status of the ones we just changed, requesting their current state
+                     * from learnosity as a confirmation
+                     */
+                    try {
+                        $confirmation = $api->dataGetRequest('/itembank/activities', [
+                            'references' => [
+                                $candidate['learnosity_reference']
+                            ]
+                        ]);
+                    } catch (JsonException | ValidationException $e) {
+                        $this->getLogger()->error('Request to /itembank/activities failed.  ' . $e->getMessage());
+
+                        return;
+                    }
+
+                    $this->getLogger()->info(sprintf(
+                        '    New status: %s',
+                        $confirmation['data'][0]['status'] ?? 'unknown'
+                    ));
+                }
             }
 
             $this->refreshLock($lock);
@@ -265,7 +322,6 @@ HELP;
              */
             return;
         }
-
 
         /* Announce conclusion
          */
