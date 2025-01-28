@@ -143,6 +143,8 @@ HELP;
             $candidates = [];
 
             while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
+                $this->refreshLock($lock);
+
                 /* A spec or an impl?
                  */
                 if ((null !== $row['course_implementation_id']) || (null !== $row['course_unit_implementation_id'])) {
@@ -199,6 +201,8 @@ HELP;
             /* Ask them about the learnosity references we obtained. If we die for any reason,
              * probably have to exit out: we can't really continue from here
              */
+            $this->refreshLock($lock);
+
             try {
                 $result = $api->dataGetRequest('/itembank/activities', ['references' => $activityReferences]);
             } catch (JsonException | ValidationException $e) {
@@ -219,26 +223,41 @@ HELP;
 
             /* Planning mode; just show the facts, then leave
              */
-            if (!$this->perform()) {
-                foreach ($candidates as $candidate) {
-                    if ('' !== trim((string)$candidate['learnosity_reference'])) {
+            $n = \count($candidates);
+            $i = 0;
 
-                    } else {
+            foreach ($candidates as $candidate) {
+                $this->refreshLock($lock);
 
-                    }
+                $i++;
 
-                    print_r($candidate);
-                    print_r($learnosityStatus[$candidate['learnosity_reference']]);
+                $this->getLogger()->info(sprintf(
+                    "[%s/%s] %s\n/learning/assessments/%s\nReference: %s\nStatus: %s\n\n",
+                    $i,
+                    $n,
+                    $candidate['title'],
+                    $candidate['assessment_id'],
+                    $candidate['learnosity_reference'],
+                    $learnosityStatus[$candidate['learnosity_reference']] ?? 'unknown'
+                ));
+
+                /* In Perform mode, perform the restoration of either the one(s) specified
+                 * with --reference, or alternatively, all the ones we just found.
+                 */
+                if ($this->perform()) {
+                    /* TODO fill this in with a mutation
+                     */
+                    return;
                 }
             }
-
-            /* In Perform mode, perform the restoration of either the one(s) specified
-             * with --reference, or alternatively, all the ones we just found.
-             */
 
             /* Log status of the ones we just changed, requesting their current state
              * from learnosity as a confirmation
              */
+            if ($this->perform()) {
+                /* TODO Get the current state of affairs
+                 */
+            }
 
             $this->refreshLock($lock);
         } catch (\Alaress\Lock\LockRefreshException $e) {
@@ -255,7 +274,7 @@ HELP;
         }
 
         /* Announce lock release
-          */
+         */
         $this->getLogger()->debug('Releasing lock');
 
         $lock->release();
