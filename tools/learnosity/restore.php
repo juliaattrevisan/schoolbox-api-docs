@@ -110,8 +110,35 @@ HELP;
             $this->getLogger()->debug('Fetching quizzes that are still ongoing...');
 
             /* Fetch a list of quizzes that haven't concluded yet
-             * (finish_at is in the future, regardless of whenever it started)
+             * (finish is in the future, regardless of whenever it started)
              */
+            $quizMapper = \Schoolbox\Learning\Quiz\Mapper::getInstance();
+
+            $pb = $quizMapper->getPredicateBuilder()
+                ->greaterThanOrEqualTo('finish', \Alaress_Date_Format::now()->getDatabase());
+
+            $quizzes = $quizMapper->findByPredicates($pb);
+
+            /* Store some info about them
+             */
+            $candidates = [];
+
+            foreach ($quizzes as $quiz) {
+                $candidates[] = [
+                    'assessment_id' => $quiz->getAssessmentModel()->getId(),
+                    'title' => $quiz->getAssessmentModel()->getTitle(),
+                    'finish' => $quiz->getAssessmentModel()->getDueDate()->getDatabase(),
+                    'reference' => $quiz->getLearnosityReference()
+                ];
+            }
+
+            /* No candidates? No trabajo
+             */
+            if (!\count($candidates)) {
+                $this->getLogger()->info('No candidate quizzes found; nothing to do. Exiting');
+
+                return;
+            }
 
             /* Find the learnosity details about each one. Learnosity only allows 1000
              * so you'll have to chunk them before compiling them...if you have that many
