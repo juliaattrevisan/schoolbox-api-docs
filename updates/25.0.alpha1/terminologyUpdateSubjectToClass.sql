@@ -10,7 +10,7 @@ WHERE
 UPDATE config
 SET
     title = 'Display Assessment Graph on Class Grades Page By Default',
-    description = 'If toggled to ‘ON’, the box plot graph will be displayed on student’s class grades pages. The year level of the class page and the user’s profile setup may also affect the visibility. The graph is always visible to staff.'
+    description = 'If toggled to ‘ON’, the box plot graph will be displayed on students’ class grades pages. The year level of the class page and the user’s profile setup may also affect the visibility. The graph is always visible to staff.'
 WHERE
     name = 'display_grade_graph';
 
