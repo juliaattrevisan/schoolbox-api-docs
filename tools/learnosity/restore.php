@@ -104,21 +104,28 @@ HELP;
             return;
         }
 
-        /* FIXME Main algorithm goes here
-         */
-        $this->getLogger()->info('Script commencing.');
+        $this->getLogger()->info('Learnosity Activity Restore');
 
-        /* TODO Implement your iterations here, refreshing lock each time
-         *  This will grant you LOCK_TTL more seconds to do another iteration,
-         *  until the script unlocks itself
-         */
         try {
-            for ($i = 0; $i < 10; $i++) {
-                $this->refreshLock($lock);
+            $this->getLogger()->debug('Fetching quizzes that are still ongoing...');
 
-                /* Your logic goes here
-                 */
-            }
+            /* Fetch a list of quizzes that haven't concluded yet
+             * (finish_at is in the future, regardless of whenever it started)
+             */
+
+            /* Find the learnosity details about each one. Learnosity only allows 1000
+             * so you'll have to chunk them before compiling them...if you have that many
+             */
+
+            /* In Perform mode, perform the restoration of either the one(s) specified
+             * with --reference, or alternatively, all the ones we just found.
+             */
+
+            /* Log status of the ones we just changed, requesting their current state
+             * from learnosity as a confirmation
+             */
+
+            $this->refreshLock($lock);
         } catch (\Alaress\Lock\LockRefreshException $e) {
             /* Lock TTL expired; just leave politely
              */
