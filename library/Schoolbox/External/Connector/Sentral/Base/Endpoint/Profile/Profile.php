@@ -15,7 +15,6 @@ use PDOException;
 use Psr\Log\LoggerInterface;
 use Schoolbox\External\Connector\FirstMeaningfulValue;
 use Schoolbox\External\Connector\Sentral\Base\Endpoint\IApi;
-use Schoolbox\External\Connector\Sentral\Base\Endpoint\Registry;
 use Schoolbox\External\Connector\Sentral\Base\Endpoint\Watchlist;
 use Schoolbox\External\Connector\ValidStrats;
 use Schoolbox\External\Importer\Endpoint\IStrategy;
@@ -38,6 +37,9 @@ class Profile implements IStrategy
     /**
      * These consts, used to denote what type of person we're processing,
      * also help us decide which timetable-lessons endpoint to access later
+     *
+     * These consts correspond to Sentral's values, not our Role ones.
+     * It just so happens they're the same for now.
      */
     public const TYPE_STUDENT = 'student';
     public const TYPE_STAFF = 'staff';
@@ -114,7 +116,6 @@ class Profile implements IStrategy
      * @param IApi                            $api
      * @param array                           $watchlist
      * @param bool                            $includePhoto
-     * @param Registry                        $registry
      * @param UserProfile\Mapper              $baseProfileMapper
      * @param UserProfile\Student\Mapper      $studentProfileMapper
      * @param UserProfile\Parent\Mapper       $parentProfileMapper
@@ -129,7 +130,6 @@ class Profile implements IStrategy
         private IApi $api,
         private array $watchlist,
         private bool $includePhoto,
-        private Registry $registry,
         private UserProfile\Mapper $baseProfileMapper,
         private UserProfile\Student\Mapper $studentProfileMapper,
         private UserProfile\Parent\Mapper $parentProfileMapper,
@@ -192,7 +192,7 @@ class Profile implements IStrategy
                 $today
             ));
 
-            exit();
+            return;
         }
 
         /* Collapse this var's contents; we won't use it again
@@ -238,14 +238,14 @@ class Profile implements IStrategy
                 /* Find the first meaningful value out of this set
                  */
                 $firstname = (new FirstMeaningfulValue())->find([
-                                                                    $student['relationships']['person']['data']['attributes']['firstName'],
-                                                                    $student['relationships']['person']['data']['attributes']['givenNames']
-                                                                ]);
+                    $student['relationships']['person']['data']['attributes']['firstName'],
+                    $student['relationships']['person']['data']['attributes']['givenNames']
+                ]);
 
                 $firstnamePreferred = (new FirstMeaningfulValue())->find([
-                                                                             $student['relationships']['person']['data']['attributes']['preferredName'],
-                                                                             $firstname
-                                                                         ]);
+                    $student['relationships']['person']['data']['attributes']['preferredName'],
+                    $firstname
+                ]);
 
                 $form = (string)$student['relationships']['primaryEnrolment']['data']['attributes']['rollClass'];
                 $gender = (string)$student['relationships']['person']['data']['attributes']['gender'];
@@ -302,12 +302,32 @@ class Profile implements IStrategy
                     $studentProfile->setBaseProfile($studentBaseProfile);
                 }
 
+                /* Metadata about a person
+                 *
+                 * Remember something useful about this person using the metadata column
+                 * Note that this is shared
+                 */
+                $metadata = $studentBaseProfile->getMetadata() ?? [];
+
+                /* Remember the type of person this is
+                 */
+                $metadata['type'] = Profile::TYPE_STUDENT;
+
+                /* This is used to obtain timetables
+                 */
+                $metadata['id'] = $student['id'];
+
+                /* This is used to obtain medical stuff
+                 */
+                $metadata['personId'] = $student['relationships']['person']['data']['id'];
+
                 $studentBaseProfile
                     ->setExternalId($externalId)
                     ->setTitle($title)
                     ->setFirstname($firstname)
                     ->setFirstnamePreferred($firstnamePreferred)
-                    ->setLastname($lastname);
+                    ->setLastname($lastname)
+                    ->setMetadata($metadata);
 
                 $this->importPortrait(
                     $studentBaseProfile,
@@ -321,8 +341,8 @@ class Profile implements IStrategy
                     $this->baseProfileMapper->save($studentBaseProfile);
                 }
 
-                /*  Maintain the methods' return signature for easiest resolution
-                 *  though you are free to customise it as you see fit
+                /* Maintain the methods' return signature for easiest resolution
+                 * though you are free to customise it as you see fit
                  */
 
                 /* Fish out a House
@@ -490,23 +510,6 @@ class Profile implements IStrategy
                 if ($this->validStrats->isFamiliesStratEnabled()) {
                     $this->importParentsOfStudent($studentBaseProfile, $student['relationships']['contacts']['data']);
                 }
-
-                /* Remember that we saw a particular student id
-                 * (-not- their externalId, the primary key in sentral for this student)
-                 *
-                 * We need to get each dude's timetable separately via some other api endpoint
-                 * and we won't encounter this id again unless we remember it here
-                 */
-                $this->registry->remember($externalId, [
-                    'person' => [
-                        'id' => $student['id'],
-                        'type' => self::TYPE_STUDENT,
-                        'externalId' => $externalId,
-                        'firstname' => $studentBaseProfile->getFirstname(),
-                        'firstnamePreferred' => $studentBaseProfile->getFirstnamePreferred(),
-                        'lastname' => $studentBaseProfile->getLastname()
-                    ],
-                ]);
             }
 
             /* Prepare for next page if it exists
@@ -533,6 +536,7 @@ class Profile implements IStrategy
         if (!$photoEndpoint) {
             return;
         }
+
         /* Check if config setting allows photos from sis
          * If it's enabled, continue importing pics
          */
@@ -547,18 +551,15 @@ class Profile implements IStrategy
              * If yes, the photo could also have been updated, let's grab it
              */
             $updated_at = $this->findDate($updatedAtTime)?->getDatabase();
-            $stmt       = $this->baseProfileMapper->getDatabase()->executeQuery(
-                "
-            SELECT updated_at
-            FROM {$this->baseProfileMapper->getBaseTableName()}
-            WHERE external_id = :externalId
-            AND updated_at < :updatedAt
-        ",
-                [
-                    'externalId' => $baseProfile->getExternalId(),
-                    'updatedAt'  => $updated_at,
-                ]
-            );
+            $stmt = $this->baseProfileMapper->getDatabase()->executeQuery("
+                SELECT updated_at
+                FROM {$this->baseProfileMapper->getBaseTableName()}
+                WHERE external_id = :externalId
+                AND updated_at < :updatedAt
+            ", [
+                'externalId' => $baseProfile->getExternalId(),
+                'updatedAt'  => $updated_at,
+            ]);
 
             if ($stmt->rowCount() === 0) {
                 $this->log->debug(
@@ -569,6 +570,7 @@ class Profile implements IStrategy
                         $baseProfile->getExternalId()
                     )
                 );
+
                 return;
             }
         }
@@ -1083,14 +1085,14 @@ class Profile implements IStrategy
             /* Find the first meaningful value out of this set
              */
             $firstname = (new FirstMeaningfulValue())->find([
-                                                                $parent['data']['attributes']['firstName'],
-                                                                $parent['data']['attributes']['givenNames']
-                                                            ]);
+                $parent['data']['attributes']['firstName'],
+                $parent['data']['attributes']['givenNames']
+            ]);
 
             $firstnamePreferred = (new FirstMeaningfulValue())->find([
-                                                                         $parent['data']['attributes']['preferredName'],
-                                                                         $firstname
-                                                                     ]);
+                $parent['data']['attributes']['preferredName'],
+                $firstname
+            ]);
 
             $lastname = (string)$parent['data']['attributes']['lastName'];
             $phoneHome = $numbers[self::HOME_TELEPHONE_NUMBER] ?? '';
@@ -1206,9 +1208,9 @@ class Profile implements IStrategy
              */
             if ($this->perform) {
                 $relationship = $this->relationshipMapper->createModel()
-                                                         ->setUserProfile($parentBaseProfile)
-                                                         ->setChildProfile($studentBaseProfile)
-                                                         ->setType($relationshipName);
+                    ->setUserProfile($parentBaseProfile)
+                    ->setChildProfile($studentBaseProfile)
+                    ->setType($relationshipName);
 
                 $this->relationshipMapper->save($relationship);
             }
@@ -1312,7 +1314,7 @@ class Profile implements IStrategy
                 /* Disregard unemployed staff
                  */
                 if (!$isEmployed) {
-                    $this->log->warning(sprintf(
+                    $this->log->info(sprintf(
                         'Skipping base profile for staff %s - staff is not currently employed',
                         $fullname
                     ));
@@ -1323,7 +1325,7 @@ class Profile implements IStrategy
                 /* Disregard inactive staff
                  */
                 if (!(int)$staff['attributes']['isActive']) {
-                    $this->log->warning(sprintf(
+                    $this->log->info(sprintf(
                         'Skipping base profile for staff %s - staff is inactive',
                         $fullname
                     ));
@@ -1391,12 +1393,32 @@ class Profile implements IStrategy
                     $staffProfile->setBaseProfile($staffBaseProfile);
                 }
 
+                /* Metadata about a person
+                 *
+                 * Remember something useful about this person using the metadata column
+                 * Note that this is shared
+                 */
+                $metadata = $staffBaseProfile->getMetadata() ?? [];
+
+                /* Remember the type of person this is
+                 */
+                $metadata['type'] = Profile::TYPE_STAFF;
+
+                /* This is used to obtain timetables
+                 */
+                $metadata['id'] = $staff['id'];
+
+                /* This is used to obtain medical stuff
+                 */
+                $metadata['personId'] = $staff['relationships']['person']['data']['id'];
+
                 $staffBaseProfile
                     ->setExternalId($externalId)
                     ->setTitle($title)
                     ->setFirstname($firstname)
                     ->setFirstnamePreferred($firstnamePreferred)
-                    ->setLastname($lastname);
+                    ->setLastname($lastname)
+                    ->setMetadata($metadata);
 
                 $this->importPortrait(
                     $staffBaseProfile,
@@ -1436,23 +1458,6 @@ class Profile implements IStrategy
                 if ($this->perform) {
                     $this->staffProfileMapper->save($staffProfile);
                 }
-
-                /* Remember that we saw a particular staff id
-                 * (-not- their externalId, the primary key in sentral for this staff)
-                 *
-                 * We need to get each dude's timetable separately via some other api endpoint
-                 * and we won't encounter this id again unless we remember it here
-                 */
-                $this->registry->remember($externalId, [
-                    'person' => [
-                        'id' => $staff['id'],
-                        'type' => self::TYPE_STAFF,
-                        'externalId' => $externalId,
-                        'firstname' => $staffBaseProfile->getFirstname(),
-                        'firstnamePreferred' => $staffBaseProfile->getFirstnamePreferred(),
-                        'lastname' => $staffBaseProfile->getLastname()
-                    ],
-                ]);
             }
 
             /* Prepare for next page if it exists

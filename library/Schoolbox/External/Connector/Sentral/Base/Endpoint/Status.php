@@ -21,18 +21,6 @@ use SensitiveParameter;
 class Status implements IStatus
 {
     /**
-     * @var string
-     */
-    private string $host;
-
-
-    /**
-     * @var string
-     */
-    private string $key;
-
-
-    /**
      * Status constructor.
      *
      * @param string $host
@@ -40,10 +28,8 @@ class Status implements IStatus
      * @throws \DomainException
      * @throws \InvalidArgumentException
      */
-    public function __construct(string $host, #[SensitiveParameter] string $key)
+    public function __construct(private string $host, #[SensitiveParameter] private string $key)
     {
-        $this->host = $host;
-        $this->key = $key;
     }
 
 

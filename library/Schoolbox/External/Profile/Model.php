@@ -55,11 +55,16 @@ class Model
      */
     private ?Storage\Model $portrait = null;
 
+
     /**
      * A json string corresponding to usually-idiosyncratic connector-specific data
-     * (stuff like portrait ids, random misc ids, etc)
+     * (stuff like random misc ids, etc)
      *
-     * Each connector will implement a metadata payload specially
+     * At the moment nobody needed this except sentral to store an identifier, but
+     * I am expecting that every connector will end up needing its own structured
+     * and predictable json payload. At the moment I'm letting each connector just
+     * slap an associative array in here, in whatever way it wants, with no real
+     * assertion about its actual structure. That might be enough.
      *
      * @var array|null
      */
@@ -184,6 +189,7 @@ class Model
         $this->portrait = $portrait;
         return $this;
     }
+
 
     /**
      * @return array|null

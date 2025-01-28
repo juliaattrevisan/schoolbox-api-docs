@@ -21,27 +21,13 @@ use Schoolbox\User;
 class AttendanceLink implements IAttendanceLink
 {
     /**
-     * @var bool
-     */
-    private bool $attendanceEnabled;
-
-
-    /**
-     * @var int
-     */
-    private int $externalAttendanceDays;
-
-
-    /**
      * Constructor
      *
      * @param bool $attendanceEnabled
      * @param int  $externalAttendanceDays
      */
-    public function __construct(bool $attendanceEnabled, int $externalAttendanceDays)
+    public function __construct(private bool $attendanceEnabled, private int $externalAttendanceDays)
     {
-        $this->attendanceEnabled = $attendanceEnabled;
-        $this->externalAttendanceDays = $externalAttendanceDays;
     }
 
 
@@ -68,9 +54,11 @@ class AttendanceLink implements IAttendanceLink
 
         // Only generate links if metadata exists
         $metadata = $event->getMetadata();
+
         if (!isset($metadata)) {
             return '';
         }
+
         return (new Reader())->getAttendanceLink($metadata);
     }
 
