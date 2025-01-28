@@ -238,10 +238,9 @@ class RecordProcessor
             $record->setSeverity($severity);
             $record->setModifiedBy($user);
             $record->setHeading($heading);
-            $occurredOn = null;
             if ($post->offsetExists('occurredOn')) {
                 if ((string)$post->get('occurredOn') === '') {
-                    $record->setOccurredOn($occurredOn);
+                    $record->setOccurredOn(null);
                 } else {
                     try {
                         $occurredOn = \Alaress_Date_Format::newLocalShort($post->get('occurredOn'))->startOfDay();
