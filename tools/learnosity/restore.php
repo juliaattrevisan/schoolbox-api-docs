@@ -8,7 +8,10 @@
 
 declare(strict_types=1);
 
+use LearnositySdk\Exceptions\ValidationException;
 use Schoolbox\Application\CliTool;
+use Schoolbox\Learning\Learnosity\Api as LearnosityApi;
+use Schoolbox\Url\Factory;
 
 require_once __DIR__ . '/../../conf/core/require.php';
 
@@ -156,7 +159,7 @@ HELP;
                     'assessment_id' => $row['assessment_id'],
                     'title' => $row['title'],
                     'finish' => $row['finish'],
-                    'reference' => $row['learnosity_reference'],
+                    'learnosity_reference' => $row['learnosity_reference'],
                     /* A spec or an impl?
                      */
                     'type' => $type,
@@ -177,7 +180,57 @@ HELP;
 
             /* Find the learnosity details about each one. Learnosity only allows 1000
              * so you'll have to chunk them before compiling them...if you have that many
+             *
+             * In demo data, the learnosity_reference may actually be null which we should skip;
+             * I'm not sure why. Obviously we can't ask Learnosity about more info about those ones
              */
+            $activityReferences = array_values(array_filter(array_column($candidates, 'learnosity_reference')));
+
+            /* Build dependencies
+             */
+            $api = new LearnosityApi(
+                (new Factory($this->getConfig()))->buildFullyQualified()->getHost(),
+                $this->getConfig()->get('learnosity_version'),
+                $this->getConfig()->get('learnosity_consumer_key'),
+                $this->getConfig()->get('learnosity_consumer_secret'),
+                $this->getLogger(),
+            );
+
+            /* Ask them about the learnosity references we obtained. If we die for any reason,
+             * probably have to exit out: we can't really continue from here
+             */
+            try {
+                $result = $api->dataGetRequest('/itembank/activities', ['references' => $activityReferences]);
+            } catch (JsonException | ValidationException $e) {
+                $this->getLogger()->error('Request to /itembank/activities failed.  ' . $e->getMessage());
+
+                return;
+            }
+
+            /* Collate some facts from learnosity's perspective
+             * Note that learnosity might give you a malformed data set for some reason or other
+             * Store them in a hash lookup for quick cross-referencing
+             */
+            $learnosityStatus = [];
+
+            foreach (($result['data'] ?? []) as $learnosityQuiz) {
+                $learnosityStatus[$learnosityQuiz['reference']] = $learnosityQuiz['status'];
+            }
+
+            /* Planning mode; just show the facts, then leave
+             */
+            if (!$this->perform()) {
+                foreach ($candidates as $candidate) {
+                    if ('' !== trim((string)$candidate['learnosity_reference'])) {
+
+                    } else {
+
+                    }
+
+                    print_r($candidate);
+                    print_r($learnosityStatus[$candidate['learnosity_reference']]);
+                }
+            }
 
             /* In Perform mode, perform the restoration of either the one(s) specified
              * with --reference, or alternatively, all the ones we just found.
