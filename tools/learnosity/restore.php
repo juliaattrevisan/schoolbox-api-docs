@@ -92,12 +92,13 @@ counterparts, along with the Learnosity status, so you can find ones that have b
 inadvertently archived in Learnosity.
 
 Quizzes that have yet to finish will appear in this list. Already-expired quizzes will not.
-Specify one(s) to restore with the cli arg(s) --reference and/or --restore-all
+Specify one(s) to restore with the cli arg --reference
+
+If you use --perform without a --reference, this tool updates the status of everything it found.
  
 
 Usage: restore.php [--reference] 
         --reference      A Learnosity activity reference to restore
-        --restore-all    Restores all Learnosity activities to active status            
 
 HELP;
             return;
