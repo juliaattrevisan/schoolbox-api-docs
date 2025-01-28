@@ -114,6 +114,8 @@ HELP;
              */
             $quizMapper = \Schoolbox\Learning\Quiz\Mapper::getInstance();
 
+            /* TODO But what about specification assessments? Those won't have a due date
+             */
             $pb = $quizMapper->getPredicateBuilder()
                 ->greaterThanOrEqualTo('finish', \Alaress_Date_Format::now()->getDatabase());
 
