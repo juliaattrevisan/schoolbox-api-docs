@@ -32,6 +32,7 @@ use Schoolbox\Pastoral\Tag\Mapper as PastoralTagMapper;
 use Schoolbox\Pastoral\Tag\Model as PastoralTagsModel;
 use Schoolbox\Pastoral\Translator\VisibilityTranslator;
 use Schoolbox\Pastoral\Type\Mapper as PastoralTypeMapper;
+use Schoolbox\Pastoral\Type\TypeAbstract;
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
 use Schoolbox\Resource\Storage\Model as Storage;
 use Schoolbox\TokenReplacer;
@@ -237,9 +238,10 @@ class RecordProcessor
             $record->setSeverity($severity);
             $record->setModifiedBy($user);
             $record->setHeading($heading);
+            $occurredOn = null;
             if ($post->offsetExists('occurredOn')) {
                 if ((string)$post->get('occurredOn') === '') {
-                    $record->setOccurredOn(null);
+                    $record->setOccurredOn($occurredOn);
                 } else {
                     try {
                         $occurredOn = \Alaress_Date_Format::newLocalShort($post->get('occurredOn'))->startOfDay();
@@ -250,6 +252,27 @@ class RecordProcessor
                     }
                 }
             }
+
+//            $expiry = $post->get('expiry');
+//            $expiresAt = null;
+//            if ($occurredOn === null) {
+//                $occurredOn = \Alaress_Date_Format::now()->startOfDay();
+//            }
+//            if (!in_array($expiry, TypeAbstract::PASTORAL_EXPIRY)) {
+//                throw new SchoolboxException("Pastoral expiry needs to be a valid date");
+//            }
+//
+//            if ($expiry === TypeAbstract::PASTORAL_EXPIRY_DEFAULT) {
+//                //noop
+//            } else if ($expiry === 'academic period') {
+//
+//            } else if ($expiry === 'academic year') {
+//
+//            } else {
+//                $expiresAt = (new \Alaress_Date_Format($occurredOn))->modify('+' . $expiry);
+//            }
+            $record->setExpiresAt(\Alaress_Date_Format::now()->startOfDay());
+
             if ($post->get('points')) {
                 $points = $post->getFloat('points');
                 if (!is_numeric($post->get('points')) || $points < -1000000 || $points > 1000000) {

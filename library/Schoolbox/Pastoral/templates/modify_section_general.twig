@@ -50,17 +50,12 @@
             <input type="text" name="occurredOn" id="occurredOn" data-datepicker maxlength="50" value="{{ record.occurredOn ? record.occurredOn.localShort : null }}" />
         </div>
         <div class="small-12 medium-6 columns">
-            {% if expires | length %}
-                <label for="expiry">Expiry
-                    <span class="hint has-tip tip-top" data-tooltip title="Select when the record will expire. selecting “Default Expiry” will
-                    apply the settings configured by your {{ locale.pastoralCare|title}} administrator">?</span>
-                    <select name="expiry" id="expiry">
-                        {% for expiry in expires %}
-                            <option {% if expiry == record.expiry ?? '' %}selected{% endif %} value="{{ expiry }}">{{ expiry|capitalize }}</option>
-                        {% endfor %}
-                    </select>
-                </label>
-            {% endif %}
+            <label for="expiresAt">
+                Expires At
+                <span class="hint has-tip tip-top" data-tooltip title="Select when the record will expire.
+                Expired records will move to an archived state">?</span>
+            </label>
+            <input type="text" name="expiresAt" id="expiresAt" data-datepicker maxlength="50" value="{{ record.expiresAt ? record.expiresAt.localShort : null }}" />
         </div>
         <div class="small-12 medium-6 columns">
             {% if severities | length %}

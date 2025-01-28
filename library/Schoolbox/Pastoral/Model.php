@@ -99,6 +99,7 @@ class Model implements ISoftDeletable, IModel
     private GenericCollection $revisions;
 
     private ?Alaress_Date_Format $occurredOn = null;
+    private ?Alaress_Date_Format $expiresAt = null;
 
     /**
      * Model constructor
@@ -563,6 +564,24 @@ class Model implements ISoftDeletable, IModel
     public function setOccurredOn(?Alaress_Date_Format $occurredOn): self
     {
         $this->occurredOn = $occurredOn;
+        return $this;
+    }
+
+    /**
+     * @return Alaress_Date_Format|null
+     */
+    public function getExpiresAt(): ?Alaress_Date_Format
+    {
+        return $this->expiresAt;
+    }
+
+    /**
+     * @param Alaress_Date_Format|null $expiresAt
+     * @return static
+     */
+    public function setExpiresAt(?Alaress_Date_Format $expiresAt): self
+    {
+        $this->expiresAt = $expiresAt;
         return $this;
     }
 
