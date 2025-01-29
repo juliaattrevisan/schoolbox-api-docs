@@ -101,25 +101,35 @@ In Planning mode, this will tell you about all the active schoolbox quizzes and 
 counterparts, along with the Learnosity status, so you can find ones that have been somehow
 inadvertently archived in Learnosity.
 
-Quizzes that have yet to finish will appear in this list. Already-expired quizzes will not.
-Specify one(s) to restore with the cli arg --reference
+Note that an active quiz is considered to be:
+* A quiz implementation whose finish datetime is in the future
+* A quiz specification that's in a course somewhere (their finish dates are null)
+* Not soft deleted in the schoolbox.assess table
 
-If you use --perform without a --reference, this tool updates the status of everything it found.
+--reference
+You can choose a particular quiz whose status you want to manipulate by specifying its activity reference.
+Omitting this will cause this tool to manipulate statuses en masse for all the quizzes it finds.
+
+--perform
+This makes a request to Learnosity to change the status of a quiz in their system. If combined with
+verbose mode -vvv you'll get a breakdown of all the items it changed as well. 
+
+--status
+You can arbitrarily decide which state to apply to a Learnosity quiz: "archived" or "published"
+by using the --status arg. If omitted, it will assume you meant to assign "published".
+To reverse this, you can use --status=archived.
+
+// Restores abcd-123-efgh-5678 to an undeleted (published) state in Learnosity
+restore.php --reference=abcd-123-efgh-5678 --status=published --perform -vvv
+restore.php --reference=abcd-123-efgh-5678 --perform -vvv
+
+// Put abcd-123-efgh-5678 into a deleted (archived) state in Learnosity
+restore.php --reference=abcd-123-efgh-5678 --status=archived --perform -vvv
  
-You can arbitrarily decide which state to apply to a Learnosity quiz: :archived: or :published"
-by using the --status arg. This allows you to assign "published" if you omit it. To reverse this,
-you can use --status=archived.
 
-// Restores abcd123 to an undeleted (published) state in Learnosity
-restore.php --reference=abcd123 --status=published --perform -vvv
-
-// Put abcd123 into a deleted (archived) state in Learnosity
-restore.php --reference=abcd123 --status=archived --perform -vvv
- 
-
-Usage: restore.php [--reference] [--status] [--perform]
+Usage: restore.php [--reference] [--status] [--perform] -vvv
         --reference      A Learnosity activity reference to restore
-        --status         Arbitrarily assign "archived" or "published" (if ommitted, assumes "published")
+        --status         Arbitrarily assign "archived" or "published" (if omitted, assumes "published")
 
 
 HELP;
@@ -145,7 +155,7 @@ HELP;
          */
         $newStatus = trim((string)$this->getOpt(self::OPT_LONG_NEW_STATUS));
 
-        /* If ommited, assume "published"
+        /* If omitted, assume "published"
          */
         if ('' === $newStatus) {
             $newStatus = Helper::LEARNOSITY_ITEM_STATUS_PUBLISHED;
@@ -347,7 +357,7 @@ HELP;
                 if ($this->perform()) {
                     $this->refreshLock($lock);
 
-                    /* If a quiz is already published, nothing to change
+                    /* If a quiz is already in the state requested, nothing to change
                      */
                     if ($newStatus === $candidate['status']) {
                         $this->getLogger()->info(sprintf(
@@ -372,7 +382,7 @@ HELP;
                      * those if we encounter them. Maybe it's bad data; either way, can't do much
                      */
 
-                    /* Perform "unarchive"
+                    /* Perform change to status: either to "archived" or "published"
                      */
                     $this->getLogger()->info(sprintf(
                         '    Requesting change to new status "%s"...',
