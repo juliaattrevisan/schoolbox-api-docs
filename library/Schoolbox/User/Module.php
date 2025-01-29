@@ -63,8 +63,9 @@ class Module extends BaseModule
 
                     if (
                         // If the logged-in user does not have permission to impersonate the role of the user to impersonate, deny.
-                        // (Make doubly sure $userToImpersonate's role is not null, because if it is, perhaps due to improper
-                        //  hydration, $user->hasServicePermission() will return true regardless of $userToImpersonate's true role.)
+                        // (Make doubly sure $userToImpersonate's role is not null, because if it is, $user->hasServicePermission()
+                        //  will return true regardless of $userToImpersonate's true role.  This is a protection against unknown
+                        //  bugs elsewhere in the codebase inadvertently allowing improper impersonation.)
                         $userToImpersonate->getRole()?->getId() !== null &&
                         !$user->hasServicePermission(
                             UserAccess::SERVICE_IMPERSONATOR,
