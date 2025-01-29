@@ -358,6 +358,7 @@
         const typesIndex = {{ typesIndex|json_encode|raw }};
         const typesIndexPrivate = {{ typesIndexPrivate|json_encode|raw }};
         const typesIndexEntryTip = {{ typesIndexEntryTip|json_encode|raw }};
+        const expiresAt = {{ record.expiresAt ?? 'null' }};
 
         /* Some convenient selectors
          */
@@ -376,8 +377,10 @@
          */
         if (subtypeDropdown.val() === null) {
             updateEntryTip($.trim(typesIndexEntryTip[typeDropdown.val()]));
+            updateExpiresAt($.trim(typesIndexEntryTip[typeDropdown.val()]));
         } else {
             updateEntryTip($.trim(subtypesIndexEntryTip[subtypeDropdown.val()]));
+            updateExpiresAt($.trim(subtypesIndexEntryTip[subtypeDropdown.val()]));
         }
         {% endif %}
 
@@ -453,6 +456,7 @@
             }
 
             updateEntryTip(entryTip);
+            updateExpiresAt(expiresAt);
 
         }
 
@@ -475,6 +479,15 @@
                  entryTipInput.innerHTML = entryTip; // display the tip
              }
         }
+
+        /**
+         * Update the expires at date based on current type / subtype selection
+         * @param date
+         */
+        function updateExpiresAt (date) {
+            console.warn(date);
+        }
+
     });
 </script>
 {% endautoescape %}
