@@ -188,6 +188,10 @@ class Factory
             $payload['roleTypes']['fields']['selected'][] = $node;
         }
 
+        /* Put emergency contacts into this special place for now
+         */
+        $payload['roleTypes']['tabs']['emergencyContacts'] = $referenceFields['emergencyContacts'];
+
         /* The preprocessed payload that frontend can just use
          */
         return [
@@ -353,6 +357,24 @@ class Factory
             $campusNames = implode(', ', $viewee->getCampusCollection()->indexBy('name')->keys());
         }
 
+        /* Collect Emergency Contacts from the sis, using the awfully-named nodes
+         */
+        $emergencyContacts = [];
+
+        foreach (['StudentEmergency', 'StudentEmergency2', 'StudentEmergency3'] as $node) {
+            /* Go with the usual "if you have a name, you can be on the ui" idea
+             */
+            $name = trim((string)$externalUser[$node . 'Name']);
+
+            if ('' !== $name) {
+                $emergencyContacts[] = [
+                    'name' => $name,
+                    'phone' => $externalUser[$node . 'Phone'],
+                    'phoneAlt' => $externalUser[$node . 'PhoneAlt'],
+                ];
+            }
+        }
+
         /* Hybrid Theory
          */
         $referenceFields = [
@@ -385,6 +407,9 @@ class Factory
             /* Typically the external id, but could be anything really
              */
             'barcode' => $viewee->getExternalId(),
+            /* Emergency Contacts
+             */
+            'emergencyContacts' => $emergencyContacts
         ];
 
         return array_merge($externalUser, $referenceFields);
