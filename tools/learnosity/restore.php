@@ -133,8 +133,7 @@ HELP;
          */
         try {
             $lock = $this->acquireLock(self::MY_TOOL_LOCK_NAME, self::LOCK_TTL);
-        }
-        catch (\RuntimeException $e) {
+        } catch (\RuntimeException $e) {
             return;
         }
 
