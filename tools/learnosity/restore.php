@@ -97,7 +97,7 @@ Specify one(s) to restore with the cli arg --reference
 If you use --perform without a --reference, this tool updates the status of everything it found.
  
 
-Usage: restore.php [--reference] 
+Usage: restore.php [--reference] [--perform]
         --reference      A Learnosity activity reference to restore
 
 HELP;
@@ -129,7 +129,7 @@ HELP;
              * TODO maybe parameterise this date range
              * TODO convert var to mvar
              */
-            $statement = $this->getDatabaseInternal()->prepare("
+            $query = "
                 SELECT
                     a.assessment_id,
                     a.title,
@@ -147,8 +147,17 @@ HELP;
                 WHERE a.learnosity_reference IS NOT NULL
                 AND a.learnosity_reference != ''
                 AND (a.finish >= NOW() OR a.finish IS NULL)
-            ");
+            ";
 
+            /* Filter to a specific reference, if provided
+             */
+            $specificReference = trim((string)$this->getOpt(self::OPT_LONG_REFERENCE));
+
+            if ('' !== $specificReference) {
+                $query .= " AND a.learnosity_reference = '{$specificReference}'";
+            }
+
+            $statement = $this->getDatabaseInternal()->prepare($query);
             $statement->execute();
 
             /* Store some info about them
