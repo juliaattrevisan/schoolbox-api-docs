@@ -339,11 +339,10 @@ class Mailer
      * @return bool
      * @throws TransportExceptionInterface if not send after `$retries` attempts
      */
-    private function trySend($retries = 0, $reinitialise = false): bool
+    private function trySend(int $retries = 0, bool $reinitialise = false): bool
     {
         // create transport and send email
         try {
-
             // Check if the SES config exists, if yes, use SES transporter
             $configKeys = ['amazon_ses_username', 'amazon_ses_password', 'amazon_ses_region'];
             $configValues = array_map(fn($key) => $this->config->get($key), $configKeys);
