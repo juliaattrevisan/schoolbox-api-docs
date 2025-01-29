@@ -82,8 +82,19 @@ class Module extends BaseModule
                     }
 
                     if ($userToImpersonate->hasServicePermission(UserAccess::SERVICE_PASTORAL, UserAccess::ACCESS_READ)) {
-                        // Pastoral moderators may not be impersonated by non-superusers.
-                        throw new Unauthorized();
+                        // Only allow impersonation if the non-superuser impersonator has equal or higher access on the pastoral service permission.
+
+                        $userAccessLevel = (
+                            $user->getServicePermissionAccessLevel(UserAccess::SERVICE_PASTORAL, UserAccess::ACCESS_READ)
+                        );
+                        $userToImpersonateAccessLevel = (
+                            $user->getServicePermissionAccessLevel(UserAccess::SERVICE_PASTORAL, UserAccess::ACCESS_READ)
+                        );
+
+                        if ($userAccessLevel < $userToImpersonateAccessLevel) {
+                            // Pastoral moderators may not be impersonated by non-superusers who have lower level pastoral access.
+                            throw new Unauthorized();
+                        }
                     }
                 }
             )
