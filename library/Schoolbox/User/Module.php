@@ -54,7 +54,10 @@ class Module extends BaseModule
                 /*
                  * User-to-impersonate's role is impersonateable by logged-in-user AND
                  * User-to-impersonate is not a superuser AND
-                 * User-to-impersonate is not a pastoral moderator at any level of access
+                 * User-to-impersonate (
+                 *    is not a pastoral moderator at any level of access OR
+                 *    is a pastoral moderator at an equal or lower level than logged-in-user
+                 * )
                  */
                 function ($params, User $user) {
                     // In this function, the logged-in user is a non-superuser (because of Rule\Any(Rule\isSuperuser, ..., [thisRule]).
@@ -80,10 +83,10 @@ class Module extends BaseModule
                         // Only allow impersonation if the non-superuser impersonator has equal or higher access on the pastoral service permission.
 
                         $userAccessLevel = (
-                            $user->getServicePermissionAccessLevel(UserAccess::SERVICE_PASTORAL, $user->getRole()->getId())
+                            $user->getServicePermissionAccessLevel(UserAccess::SERVICE_PASTORAL)
                         );
                         $userToImpersonateAccessLevel = (
-                            $user->getServicePermissionAccessLevel(UserAccess::SERVICE_PASTORAL, $userToImpersonate->getRole()->getId())
+                            $userToImpersonate->getServicePermissionAccessLevel(UserAccess::SERVICE_PASTORAL)
                         );
 
                         if ($userAccessLevel < $userToImpersonateAccessLevel) {
