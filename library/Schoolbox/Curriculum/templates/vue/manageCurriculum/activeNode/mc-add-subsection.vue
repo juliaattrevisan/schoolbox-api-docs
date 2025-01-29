@@ -87,22 +87,16 @@ async function onAddSubsectionSelected(): Promise<void> {
  * to display the toast on subsection added / failed
  */
 addSubsectionStore.$onAction(({ name, after, onError }) => {
-    console.info("mc-add-subsection.vue addSubsectionStore.onAction() e");
-    console.info("mc-add-subsection.vue addSubsectionStore.onAction() name: ", name);
     if (name === "add") {
         toast.activate("Adding...");
 
         after((result) => {
-            console.info("mc-add-subsection.vue addSubsectionStore.onAction() after() result: ", result);
             toast.timeout({ text: result.message, isSuccess: true });
         });
         onError((error) => {
-            console.info("mc-add-subsection.vue addSubsectionStore.onError() error: ", error);
-            console.error("Unable to add subsection", error);
             toast.timeout({ text: "Unable to add subsection", isSuccess: false });
         });
     }
-    console.info("mc-add-subsection.vue addSubsectionStore.onAction() x");
 });
 
 /**
