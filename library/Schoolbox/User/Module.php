@@ -80,10 +80,10 @@ class Module extends BaseModule
                         // Only allow impersonation if the non-superuser impersonator has equal or higher access on the pastoral service permission.
 
                         $userAccessLevel = (
-                            $user->getServicePermissionAccessLevel(UserAccess::SERVICE_PASTORAL, UserAccess::ACCESS_READ)
+                            $user->getServicePermissionAccessLevel(UserAccess::SERVICE_PASTORAL, $user->getRole()->getId())
                         );
                         $userToImpersonateAccessLevel = (
-                            $user->getServicePermissionAccessLevel(UserAccess::SERVICE_PASTORAL, UserAccess::ACCESS_READ)
+                            $user->getServicePermissionAccessLevel(UserAccess::SERVICE_PASTORAL, $userToImpersonate->getRole()->getId())
                         );
 
                         if ($userAccessLevel < $userToImpersonateAccessLevel) {
