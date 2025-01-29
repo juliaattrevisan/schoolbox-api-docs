@@ -127,7 +127,6 @@ HELP;
              * or otherwise bad: exclude those from the get-go
              *
              * TODO maybe parameterise this date range
-             * TODO convert var to mvar
              */
             $query = "
                 SELECT
@@ -135,18 +134,19 @@ HELP;
                     a.title,
                     a.finish,
                     a.learnosity_reference,
-                    var.folder_id,
+                    mvar.folder_id,
                     f.name AS folder_name,
-                    var.course_implementation_id,
-                    var.course_unit_implementation_id,
-                    var.course_specification_id,
-                    var.course_unit_specification_id
+                    mvar.course_implementation_id,
+                    mvar.course_unit_implementation_id,
+                    mvar.course_specification_id,
+                    mvar.course_unit_specification_id
                 FROM assess a
-                INNER JOIN v_assessment_relation var ON a.assessment_id = var.assessment_id
-                INNER JOIN folder f ON var.folder_id = f.id
+                INNER JOIN mv_assessment_relation mvar ON a.assessment_id = mvar.assessment_id
+                INNER JOIN folder f ON mvar.folder_id = f.id
                 WHERE a.learnosity_reference IS NOT NULL
                 AND a.learnosity_reference != ''
                 AND (a.finish >= NOW() OR a.finish IS NULL)
+                AND a.deleted_at IS NULL
             ";
 
             /* Filter to a specific reference, if provided
