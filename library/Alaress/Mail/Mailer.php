@@ -343,23 +343,7 @@ class Mailer
     {
         // create transport and send email
         try {
-            // Check if the SES config exists, if yes, use SES transporter
-            $configKeys = ['amazon_ses_username', 'amazon_ses_password', 'amazon_ses_region'];
-            $configValues = array_map(fn($key) => $this->config->get($key), $configKeys);
-
-            if (array_filter($configValues)) {
-                [$username, $password, $region] = $configValues;
-                $endpoint = sprintf('email-smtp.%s.amazonaws.com', $region);
-
-                $transport = new EsmtpTransport($endpoint, 587);
-                $transport->setUsername($username);
-                $transport->setPassword($password);
-                $transport->setLocalDomain($endpoint);
-
-                $mailer = new SymfonyMailer($transport);
-            } else {
-                $mailer = new SymfonyMailer(self::getConfiguredTransport($this->config, $reinitialise));
-            }
+            $mailer = new SymfonyMailer(self::getConfiguredTransport($this->config, $reinitialise));
 
             $this->configureMailer($mailer);
 
@@ -416,10 +400,22 @@ class Mailer
      * @param bool          $reinitialise
      * @return TransportInterface
      */
-    public static function getConfiguredTransport($conf, $reinitialise = false)
+    public static function getConfiguredTransport($conf, $reinitialise = false): TransportInterface
     {
         if (!(isset(self::$transport)) || $reinitialise) {
-            if ($conf->get('mail_smtp_host') && $conf->get('mail_smtp_port')) {
+            // Check if the SES config exists, if yes, use SES transporter
+            $configKeys = [ConfigMapper::AMAZON_SES_USERNAME, ConfigMapper::AMAZON_SES_PASSWORD, ConfigMapper::AMAZON_SES_REGION];
+            $configValues = array_map(fn($key) => $conf->get($key), $configKeys);
+
+            // Check if all three config values are present for SES
+            if (count(array_filter($configValues)) === count($configKeys)) {
+                [$username, $password, $region] = $configValues;
+                $endpoint = sprintf('email-smtp.%s.amazonaws.com', $region);
+                self::$transport = new EsmtpTransport($endpoint, 587);
+                self::$transport->setUsername($username);
+                self::$transport->setPassword($password);
+                self::$transport->setLocalDomain($endpoint);
+            } else if ($conf->get('mail_smtp_host') && $conf->get('mail_smtp_port')) {
                 self::$transport = new EsmtpTransport(
                     $conf->get('mail_smtp_host'),
                     $conf->get('mail_smtp_port')
