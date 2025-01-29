@@ -189,8 +189,12 @@ class Factory
         }
 
         /* Put emergency contacts into this special place for now
+         * Parents and staff never use this yet, only students use this;
+         * their emergencyContacts node will be null in that case
+         *
+         * TODO Think about separating these by roletypes somehow
          */
-        $payload['roleTypes']['tabs']['emergencyContacts'] = $referenceFields['emergencyContacts'];
+        $payload['roleTypes']['tabs']['emergencyContacts'] = $referenceFields['emergencyContacts'] ?? null;
 
         /* The preprocessed payload that frontend can just use
          */
