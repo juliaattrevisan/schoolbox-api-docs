@@ -60,6 +60,15 @@ $app = new class extends CliTool\App
 
 
     /**
+     * Arbitrarily assign a status (either "archived" or "published")
+     * to the quizzes.
+     *
+     * Used to change state via the cli without needing to edit this tool
+     */
+    private const OPT_LONG_NEW_STATUS = 'status:';
+
+
+    /**
      * A placeholder for the status of a quiz prior to finding out from Learnosity
      */
     private const STATUS_UNKNOWN = 'unknown';
@@ -73,6 +82,7 @@ $app = new class extends CliTool\App
         return [
             self::OPT_LONG_HELP,
             self::OPT_LONG_REFERENCE,
+            self::OPT_LONG_NEW_STATUS
         ];
     }
 
@@ -96,9 +106,21 @@ Specify one(s) to restore with the cli arg --reference
 
 If you use --perform without a --reference, this tool updates the status of everything it found.
  
+You can arbitrarily decide which state to apply to a Learnosity quiz: :archived: or :published"
+by using the --status arg. This allows you to assign "published" if you omit it. To reverse this,
+you can use --status=archived.
 
-Usage: restore.php [--reference] [--perform]
+// Restores abcd123 to an undeleted (published) state in Learnosity
+restore.php --reference=abcd123 --status=published --perform -vvv
+
+// Put abcd123 into a deleted (archived) state in Learnosity
+restore.php --reference=abcd123 --status=archived --perform -vvv
+ 
+
+Usage: restore.php [--reference] [--status] [--perform]
         --reference      A Learnosity activity reference to restore
+        --status         Arbitrarily assign "archived" or "published" (if ommitted, assumes "published")
+
 
 HELP;
             return;
@@ -111,13 +133,35 @@ HELP;
          */
         try {
             $lock = $this->acquireLock(self::MY_TOOL_LOCK_NAME, self::LOCK_TTL);
-        } catch (\RuntimeException $e) {
+        }
+        catch (\RuntimeException $e) {
             return;
         }
 
         $this->getLogger()->info('');
         $this->getLogger()->info('Learnosity Activity Restore');
         $this->getLogger()->info('');
+
+        /* Choose which state to assign to the quizzes
+         */
+        $newStatus = trim((string)$this->getOpt(self::OPT_LONG_NEW_STATUS));
+
+        /* If ommited, assume "published"
+         */
+        if ('' === $newStatus) {
+            $newStatus = Helper::LEARNOSITY_ITEM_STATUS_PUBLISHED;
+        }
+
+        /* Otherwise check that it's one of the allowed state; if not, get out of here
+         */
+        if (!in_array($newStatus, [Helper::LEARNOSITY_ITEM_STATUS_PUBLISHED, Helper::LEARNOSITY_ITEM_STATUS_ARCHIVED])) {
+            $this->getLogger()->warning(sprintf(
+                'Unknown status: %s. Exiting',
+                $newStatus
+            ));
+
+            return;
+        }
 
         try {
             /* Fetch a list of quizzes that haven't concluded yet
@@ -306,10 +350,10 @@ HELP;
 
                     /* If a quiz is already published, nothing to change
                      */
-                    if (Helper::LEARNOSITY_ITEM_STATUS_PUBLISHED === $candidate['status']) {
+                    if ($newStatus === $candidate['status']) {
                         $this->getLogger()->info(sprintf(
-                            '    This quiz status is already %s; nothing to change. Skipping',
-                            Helper::LEARNOSITY_ITEM_STATUS_PUBLISHED
+                            '    This quiz status is already "%s"; nothing to change. Skipping',
+                            $newStatus
                         ));
 
                         continue;
@@ -331,9 +375,16 @@ HELP;
 
                     /* Perform "unarchive"
                      */
-                    $this->getLogger()->info('    Requesting update...');
+                    $this->getLogger()->info(sprintf(
+                        '    Requesting change to new status "%s"...',
+                        $newStatus
+                    ));
 
-                    $helper->restore($candidate['learnosity_reference']);
+                    if (Helper::LEARNOSITY_ITEM_STATUS_PUBLISHED === $newStatus) {
+                        $helper->restore($candidate['learnosity_reference']);
+                    } elseif (Helper::LEARNOSITY_ITEM_STATUS_ARCHIVED === $newStatus) {
+                        $helper->archive($candidate['learnosity_reference']);
+                    }
 
                     /* Log status of the ones we just changed, requesting their current state
                      * from learnosity as a confirmation
@@ -351,7 +402,7 @@ HELP;
                     }
 
                     $this->getLogger()->info(sprintf(
-                        '    New status: %s',
+                        '    Updated status: %s',
                         $confirmation['data'][0]['status'] ?? 'unknown'
                     ));
                 }
