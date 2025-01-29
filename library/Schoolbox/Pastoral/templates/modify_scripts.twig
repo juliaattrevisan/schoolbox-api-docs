@@ -358,7 +358,7 @@
         const typesIndex = {{ typesIndex|json_encode|raw }};
         const typesIndexPrivate = {{ typesIndexPrivate|json_encode|raw }};
         const typesIndexEntryTip = {{ typesIndexEntryTip|json_encode|raw }};
-        const expiresAt = {{ record.expiresAt ?? 'null' }};
+        const expiresAt = '{{ record.expiresAt ? record.expiresAt.localShort : null }}';
 
         /* Some convenient selectors
          */
