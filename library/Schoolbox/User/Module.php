@@ -52,7 +52,6 @@ class Module extends BaseModule
             ),
             new Rule\Callback(
                 /*
-                 * User-to-impersonate has a role AND
                  * User-to-impersonate's role is impersonateable by logged-in-user AND
                  * User-to-impersonate is not a superuser AND
                  * User-to-impersonate is not a pastoral moderator at any level of access
@@ -62,13 +61,11 @@ class Module extends BaseModule
 
                     $userToImpersonate = $params['user'];
 
-                    if ($userToImpersonate->getRole()->getId() === null) {
-                        // If the user to impersonate does not have a role (perhaps due to a hydrating problem), deny.
-                        throw new Unauthorized();
-                    }
-
                     if (
                         // If the logged-in user does not have permission to impersonate the role of the user to impersonate, deny.
+                        // (Make doubly sure $userToImpersonate's role is not null, because if it is, perhaps due to improper
+                        //  hydration, $user->hasServicePermission() will return true regardless of $userToImpersonate's true role.)
+                        $userToImpersonate->getRole()?->getId() !== null &&
                         !$user->hasServicePermission(
                             UserAccess::SERVICE_IMPERSONATOR,
                             UserAccess::ACCESS_FULL,
