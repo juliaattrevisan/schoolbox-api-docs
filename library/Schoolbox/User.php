@@ -1439,6 +1439,27 @@ class User implements Serializable, Linkable, ISoftDeletable, IModel
     }
 
     /**
+     * Note this function deliberately does not check whether the user is a staff member.
+     *
+     * @param int $servicePermission - One of UserAccess::SERVICE_NEWS, UserAccess::SERVICE_CALENDAR, etc.
+     * @param ?int $sId - Required for some service permissions (see Schoolbox/Permission/Access/README.md).
+     * @return int
+     */
+    public function getServicePermissionAccessLevel(int $servicePermission, ?int $sId = null): int
+    {
+        $accessList = $this->getAccessList();
+
+        foreach ($accessList->filterBy('service', $servicePermission) as $access) {
+            /** @var UserAccess $access */
+            if ($sId === $access->getServiceIdentifier()) {
+                return $access->getAccessLevel();
+            }
+        }
+
+        return UserAccess::ACCESS_DENY;
+    }
+
+    /**
      * Checks group access
      * @param int $groupId
      * @return bool

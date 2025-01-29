@@ -37,6 +37,9 @@ class Module extends BaseModule
         $impersonatePermission = new Rule\Any(
             new Rule\IsSuperuser(),
             new Rule\Callback(
+                /*
+                 * User-to-impersonate is linked to logged-in-user.
+                 */
                 function ($params, User $user) {
                     // Do not allow unlinked users to switch
                     foreach ($user->getLinkedUsers() as $linkedUser) {
@@ -48,19 +51,15 @@ class Module extends BaseModule
                 }
             ),
             new Rule\Callback(
+                /*
+                 * User-to-impersonate's role is impersonateable by logged-in-user AND
+                 * User-to-impersonate is not a superuser AND
+                 * User-to-impersonate is not a pastoral moderator at any level of access
+                 */
                 function ($params, User $user) {
+                    // In this function, the logged-in user is a non-superuser (because of Rule\Any(Rule\isSuperuser, ..., [thisRule]).
+
                     $userToImpersonate = $params['user'];
-
-                    if ($userToImpersonate->isSuperuser()) {
-                        // Superusers may not be impersonated by non-superusers.
-                        // Note this function should be called only if the logged-in user is not a superuser.
-                        throw new Unauthorized();
-                    }
-
-                    if ($userToImpersonate->getRole()->getId() === null) {
-                        // If the user to impersonate does not have a role (perhaps due to a hydrating problem), deny.
-                        throw new Unauthorized();
-                    }
 
                     if (
                         !$user->hasServicePermission(
@@ -70,6 +69,27 @@ class Module extends BaseModule
                         )
                     ) {
                         throw new Unauthorized();
+                    }
+
+                    if ($userToImpersonate->isSuperuser()) {
+                        // Superusers may not be impersonated by non-superusers.
+                        throw new Unauthorized();
+                    }
+
+                    if ($userToImpersonate->hasServicePermission(UserAccess::SERVICE_PASTORAL, UserAccess::ACCESS_READ)) {
+                        // Only allow impersonation if the non-superuser impersonator has equal or higher access on the pastoral service permission.
+
+                        $userAccessLevel = (
+                            $user->getServicePermissionAccessLevel(UserAccess::SERVICE_PASTORAL, UserAccess::ACCESS_READ)
+                        );
+                        $userToImpersonateAccessLevel = (
+                            $user->getServicePermissionAccessLevel(UserAccess::SERVICE_PASTORAL, UserAccess::ACCESS_READ)
+                        );
+
+                        if ($userAccessLevel < $userToImpersonateAccessLevel) {
+                            // Pastoral moderators may not be impersonated by non-superusers who have lower level pastoral access.
+                            throw new Unauthorized();
+                        }
                     }
                 }
             )
