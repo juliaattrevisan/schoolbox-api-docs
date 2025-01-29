@@ -23,6 +23,7 @@ use Schoolbox\External\Connector\Veracross\Base\Endpoint\Lookup\Household;
 use Schoolbox\External\Connector\Veracross\Base\Endpoint\Lookup\Language;
 use Schoolbox\External\Connector\Veracross\Base\Endpoint\Lookup\Relationship;
 use Schoolbox\External\Connector\Veracross\Base\Endpoint\Lookup\ValueListConverter;
+use Schoolbox\External\Connector\Watchlist;
 use Schoolbox\External\Importer\Endpoint\IStrategy;
 use Schoolbox\External\Profile as UserProfile;
 use Schoolbox\External\Profile\Mapper;
@@ -87,14 +88,15 @@ class Profile implements IStrategy
     /**
      * Profile constructor.
      *
-     * @param ValidStrats                     $validStrats
-     * @param LoggerInterface                 $log
-     * @param bool                            $perform
-     * @param IApi                            $api
-     * @param Mapper                          $baseProfileMapper
-     * @param UserProfile\Student\Mapper      $studentProfileMapper
-     * @param UserProfile\Parent\Mapper       $parentProfileMapper
-     * @param UserProfile\Staff\Mapper        $staffProfileMapper
+     * @param ValidStrats $validStrats
+     * @param LoggerInterface $log
+     * @param bool $perform
+     * @param IApi $api
+     * @param array $watchlist
+     * @param Mapper $baseProfileMapper
+     * @param UserProfile\Student\Mapper $studentProfileMapper
+     * @param UserProfile\Parent\Mapper $parentProfileMapper
+     * @param UserProfile\Staff\Mapper $staffProfileMapper
      * @param UserProfile\Relationship\Mapper $relationshipMapper
      */
     public function __construct(
@@ -102,6 +104,7 @@ class Profile implements IStrategy
         private LoggerInterface $log,
         private bool $perform,
         private IApi $api,
+        private array $watchlist,
         private UserProfile\Mapper $baseProfileMapper,
         private UserProfile\Student\Mapper $studentProfileMapper,
         private UserProfile\Parent\Mapper $parentProfileMapper,
@@ -207,6 +210,13 @@ class Profile implements IStrategy
 
             foreach ($studentPage['data'] as $student) {
                 $externalId = trim((string)$student['id']);
+
+                /* Only import for specific users
+                 */
+                if (!(new Watchlist())->isOnWatchlist($externalId, $this->watchlist)) {
+                    continue;
+                }
+
                 $academicHouse = '';
                 $boardingStatus = false;
                 $campusName = '';

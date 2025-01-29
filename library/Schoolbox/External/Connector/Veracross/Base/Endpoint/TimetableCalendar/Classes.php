@@ -309,6 +309,7 @@ class Classes implements IStrategy
             ->setStartAt($startAt)
             ->setFinishAt($finishAt)
             ->setType($type)
+            ->setMetadata((new Metadata\Builder())->build($this->api->getCredentials(), $class))
             ->setClassification(Model::CLASSIFICATION_TIMETABLE)
             ->setGuid($guid)
             ->setSource(Factory::SOURCE_NAME);
