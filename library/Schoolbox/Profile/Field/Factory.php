@@ -194,7 +194,7 @@ class Factory
          *
          * TODO Think about separating these by roletypes somehow
          */
-        $payload['roleTypes']['tabs']['emergencyContacts'] = $referenceFields['emergencyContacts'] ?? null;
+        $payload['roleTypes']['tabs']['emergencyContacts'] = $referenceFields['emergencyContacts'] ?? [];
 
         /* The preprocessed payload that frontend can just use
          */
