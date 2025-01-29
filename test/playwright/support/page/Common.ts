@@ -420,7 +420,7 @@ export default class Common {
             hour: includeTime ? "2-digit" : undefined,
             minute: includeTime ? "2-digit" : undefined,
             second: includeTime ? "2-digit" : undefined,
-            hour12: false,
+            hourCycle: "h23", // to avoid 12am appearing as something like "24:33:00"
         };
 
         const formatter = new Intl.DateTimeFormat("en-AU", options);
