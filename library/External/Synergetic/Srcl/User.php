@@ -56,7 +56,10 @@ class External_Synergetic_Srcl_User extends External_Synergetic_User
                 vStudents.StudentSpecialNeedsFlag,
                 vStudents.StudentStudiesCode,
                 vStudents.StudentGovernmentStudentNumber,
-                AlertMessage,
+                CASE WHEN AlertCategoryCode != ''
+                    THEN CONCAT(AlertCategoryCode,': ',AlertMessage)
+                    ELSE AlertMessage
+                END AS AlertMessage,
                 vStudents.LegalCourtOrderType AS CourtOrderType,
                 luBoarder.Description AS StudentBoarder,
                 vStudents.StudentsComment as Comment,
