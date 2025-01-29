@@ -402,7 +402,8 @@
                  * Template's current value is empty string
                  * same above with the Confidential Templates
                  */
-                replaceTemplate($.trim(subtypesIndex[subtypeVal]), $.trim(subtypesIndexPrivate[subtypeVal]), $.trim(subtypesIndexEntryTip[subtypeVal]));
+                replaceTemplate($.trim(subtypesIndex[subtypeVal]), $.trim(subtypesIndexPrivate[subtypeVal]),
+                                $.trim(subtypesIndexEntryTip[subtypeVal]), $.trim(subtypesIndexDefaultExpiry[subtypeVal]));
             } else {
 
                 /* If subtypeId == null, look at the parent typeId. load its template
@@ -410,7 +411,8 @@
                  * Type template or if the General Template's current value is empty string
                  * same above with the Confidential Templates
                  */
-                replaceTemplate($.trim(typesIndex[typeVal]), $.trim(typesIndexPrivate[typeVal]), $.trim(typesIndexEntryTip[typeVal]));
+                replaceTemplate($.trim(typesIndex[typeVal]), $.trim(typesIndexPrivate[typeVal]),
+                                $.trim(typesIndexEntryTip[typeVal]), $.trim(typesIndexDefaultExpiry[typeVal]));
             }
         }
 
@@ -421,8 +423,9 @@
          * @param template
          * @param templatePrivate
          * @param entryTip
+         * @param defaultExpiry
          */
-        function replaceTemplate(template, templatePrivate, entryTip) {
+        function replaceTemplate(template, templatePrivate, entryTip, defaultExpiry) {
             /**
              * Normalizes spaces in the value: required for determining whether a
              * CKEditor's current value has meaningfully changed from its template.
@@ -460,7 +463,7 @@
             }
 
             updateEntryTip(entryTip);
-            updateExpiresAt(expiresAt);
+            updateExpiresAt(defaultExpiry);
 
         }
 
@@ -486,10 +489,12 @@
 
         /**
          * Update the expires at date based on current type / subtype selection
-         * @param date
+         * @param defaultExpiry
          */
-        function updateExpiresAt (date) {
-            console.warn(date);
+        function updateExpiresAt (defaultExpiry) {
+            console.warn("updateExpiresAt()");
+            console.warn("defaultExpiry: ", defaultExpiry);
+            console.warn("expiresAt: ", expiresAt);
         }
 
     });
