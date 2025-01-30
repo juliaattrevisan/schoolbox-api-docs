@@ -356,13 +356,22 @@
         const subtypesIndexPrivate = {{ subtypesIndexPrivate|json_encode|raw }};
         const subtypesIndexEntryTip = {{ subtypesIndexEntryTip|json_encode|raw }};
         const subtypesIndexDefaultExpiry = {{ subtypesIndexDefaultExpiry|json_encode|raw }};
-        console.warn("subtypesIndexDefaultExpiry: ", subtypesIndexDefaultExpiry);
         const typesIndex = {{ typesIndex|json_encode|raw }};
         const typesIndexPrivate = {{ typesIndexPrivate|json_encode|raw }};
         const typesIndexEntryTip = {{ typesIndexEntryTip|json_encode|raw }};
         const typesIndexDefaultExpiry = {{ typesIndexDefaultExpiry|json_encode|raw }};
-        console.warn("typesIndexDefaultExpiry: ", typesIndexDefaultExpiry);
         const expiresAt = '{{ record.expiresAt ? record.expiresAt.localShort : null }}';
+
+        /**
+         * When the expires at date has manually changed, this takes precedence and
+         * any further changes when type/sub-type is changed will not update the expires at date.
+         * Rather conveniently, the jQuery .onChange will not trigger when the date is changed within
+         * the updateExpiresAt(), so we don't need to worry about this being triggered when it shouldn't be.
+         */
+        let hasManualExpiresAtInput = false;
+        $("#expiresAt").on("change", function () {
+            hasManualExpiresAtInput = true;
+        });
 
         /* Some convenient selectors
          */
@@ -514,17 +523,6 @@
                     return "";
             }
         }
-
-        /**
-         * When the expires at date has manually changed, this takes precedence and
-         * any further changes when type/sub-type is changed will not update the expires at date.
-         * Rather conveniently, the jQuery .onChange will not trigger when the date is changed within
-         * the updateExpiresAt(), so we don't need to worry about this being triggered when it shouldn't be.
-         */
-        let hasManualExpiresAtInput = false;
-        $("#expiresAt").on("change", function () {
-            hasManualExpiresAtInput = true;
-        });
 
         /**
          * Update the expires at date based on current type / subtype selection
