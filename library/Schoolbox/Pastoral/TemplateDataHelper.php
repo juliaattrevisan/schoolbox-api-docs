@@ -12,10 +12,13 @@ namespace Schoolbox\Pastoral;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\GenericCollection;
 use Schoolbox\IConfigLoader;
+use Schoolbox\Mapper\Exception;
 use Schoolbox\Pastoral;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Role;
 use Schoolbox\UserMapper;
+use Schoolbox\Assessment\Term\Mapper as TermMapper;
+use Schoolbox\Assessment\Term\Model as TermModel;
 
 /**
  * Helper class for loading data to be passed to a Twig template for the
@@ -73,9 +76,11 @@ class TemplateDataHelper
         $typesIndex           = $types->map(fn (Pastoral\Type\Model $model) => $model->getTemplate());
         $typesIndexPrivate    = $types->map(fn (Pastoral\Type\Model $model) => $model->getTemplatePrivate());
         $typesIndexEntryTip   = $types->map(fn (Pastoral\Type\Model $model) => $model->getEntryTip());
+        $typesIndexDefaultExpiry   = $types->map(fn (Pastoral\Type\Model $model) => $model->getDefaultExpiry());
         $subtypesIndex        = $subtypes->map(fn (Pastoral\SubType\Model $model) => $model->getTemplate());
         $subtypesIndexPrivate = $subtypes->map(fn (Pastoral\SubType\Model $model) => $model->getTemplatePrivate());
         $subtypesIndexEntryTip = $subtypes->map(fn (Pastoral\SubType\Model $model) => $model->getEntryTip());
+        $subtypesIndexDefaultExpiry = $subtypes->map(fn (Pastoral\SubType\Model $model) => $model->getDefaultExpiry());
 
         $audienceDefaults = $this->loadTypeAndSubtypeDefaults($types, $typeAudiences, $subtypes, $subtypeAudiences);
 
@@ -86,6 +91,7 @@ class TemplateDataHelper
             'severities' => $this->config->get(ConfigMapper::NAME_PASTORAL_SEVERITY_ENABLED)
                 ? $this->pastoralSeverityMapper->findAll()
                 : [],
+            'expires'    => Pastoral\Type\TypeAbstract::PASTORAL_EXPIRY,
 
             // Requirements for displaying visibility inputs
             'allowIndividual' => $allowIndividual,
@@ -102,10 +108,12 @@ class TemplateDataHelper
             'audiences'            => $audienceDefaults,
             'typesIndexPrivate'    => $typesIndexPrivate,
             'typesIndexEntryTip'    => $typesIndexEntryTip,
+            'typesIndexDefaultExpiry' => $typesIndexDefaultExpiry,
             'typesIndex'           => $typesIndex,
             'subtypesIndexEntryTip' => $subtypesIndexEntryTip,
             'subtypesIndexPrivate' => $subtypesIndexPrivate,
             'subtypesIndex'        => $subtypesIndex,
+            'subtypesIndexDefaultExpiry' => $subtypesIndexDefaultExpiry,
         ];
     }
 
@@ -202,6 +210,7 @@ class TemplateDataHelper
             $typesIndex[$type->getId()]        = $type->getTemplate();
             $typesIndexPrivate[$type->getId()] = $type->getTemplatePrivate();
             $typesIndexEntryTip[$type->getId()] = $type->getEntryTip();
+            $typesIndexDefaultExpiry[$type->getId()] = $type->getDefaultExpiry();
             if (key_exists($type->getId(), $typeAudiences) || $type->getVisibilityLocked()) {
                 $audienceDefaults[] = [
                     'typeId'    => $type->getId(),
@@ -215,6 +224,7 @@ class TemplateDataHelper
             $subtypesIndex[$subtype->getId()]        = $subtype->getTemplate();
             $subtypesIndexPrivate[$subtype->getId()] = $subtype->getTemplatePrivate();
             $typesIndexEntryTip[$subtype->getId()] = $subtype->getEntryTip();
+            $typesIndexDefaultExpiry[$subtype->getId()] = $subtype->getDefaultExpiry();
             if (key_exists($subtype->getId(), $subtypeAudiences) || $subtype->getVisibilityLocked()) {
                 $audienceDefaults[] = [
                     'typeId'    => $subtype->getPastoralType()->getId(),
@@ -224,5 +234,21 @@ class TemplateDataHelper
             }
         }
         return $audienceDefaults;
+    }
+
+    /**
+     * Find the current academic period of the student that the record is assigning to
+     *
+     * @param Model      $record
+     * @param TermMapper $termMapper
+     * @return TermModel
+     * @throws Exception
+     */
+    public function loadAcademicPeriod(Model $record, TermMapper $termMapper): TermModel
+    {
+        return $termMapper->findForDateAndYearLevel(
+            $record->getCreatedAt() ?? \Alaress_Date_Format::now(),
+            $record->getStudent()->getYear()
+        );
     }
 }
