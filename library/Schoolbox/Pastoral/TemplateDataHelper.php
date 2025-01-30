@@ -16,6 +16,7 @@ use Schoolbox\Pastoral;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Role;
 use Schoolbox\UserMapper;
+use Schoolbox\Assessment\Term\Mapper as TermMapper;
 
 /**
  * Helper class for loading data to be passed to a Twig template for the
@@ -33,7 +34,9 @@ class TemplateDataHelper
      * @param Pastoral\Access\Mapper   $pastoralAccessMapper
      * @param Pastoral\Group\Mapper    $pastoralGroupMapper
      * @param UserMapper               $userMapper
+     * @param TermMapper               $termMapper
      * @param Pastoral\Audience\Mapper $pastoralAudienceMapper
+     * @param Model                    $record
      */
     public function __construct(
         private IConfigLoader $config,
@@ -44,6 +47,8 @@ class TemplateDataHelper
         private Pastoral\Group\Mapper $pastoralGroupMapper,
         private UserMapper $userMapper,
         private Pastoral\Audience\Mapper $pastoralAudienceMapper,
+        private TermMapper $termMapper,
+        private Model $record,
     ) {
     }
 
@@ -89,6 +94,7 @@ class TemplateDataHelper
                 ? $this->pastoralSeverityMapper->findAll()
                 : [],
             'expires'    => Pastoral\Type\TypeAbstract::PASTORAL_EXPIRY,
+            'expiresAcademicPeriod' => $this->loadAcademicPeriod(),
 
             // Requirements for displaying visibility inputs
             'allowIndividual' => $allowIndividual,
@@ -231,5 +237,20 @@ class TemplateDataHelper
             }
         }
         return $audienceDefaults;
+    }
+
+    /**
+     * Find the current academic period of the student that the record is assigning to
+     *
+     * @return \Schoolbox\Assessment\Term\Model
+     * @throws \Schoolbox\Mapper\Exception
+     */
+    private function loadAcademicPeriod(): string
+    {
+        $term = $this->termMapper->findForDateAndYearLevel(
+            $this->record->getCreatedAt() ?? \Alaress_Date_Format::now(),
+            $this->record->getStudent()->getYear()
+        );
+        return $term->getDisplayFinish()->getDatabaseDate();
     }
 }

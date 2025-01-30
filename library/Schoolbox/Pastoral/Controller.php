@@ -490,6 +490,8 @@ class Controller extends Base
             $this->pastoralGroupMapper,
             $this->userMapper,
             $this->audienceMapper,
+            $this->termMapper,
+            $record
         );
         $templateData = $templateDataHelper->loadTemplateData();
 
