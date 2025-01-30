@@ -580,6 +580,8 @@ class Controller extends Base
             }
         }
 
+        $report->setIncludeArchivedRecords($post->getBool('includeArchivedRecords', false));
+
         $report->setTypesCsv($this->getCsv($post->get('types')));
         $report->setSubTypesCsv($this->getCsv($post->get('subtypes')));
         $report->setAuthorsCsv($this->getCsv($post->get('authors')));
