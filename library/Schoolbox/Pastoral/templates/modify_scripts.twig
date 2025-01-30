@@ -354,12 +354,16 @@
          */
         const subtypesIndex = {{ subtypesIndex|json_encode|raw }};
         const subtypesIndexPrivate = {{ subtypesIndexPrivate|json_encode|raw }};
-        const subtypesIndexEntryTip = {{ subtypesIndexEntryTip|json_encode|raw }};
-        const subtypesIndexDefaultExpiry = {{ subtypesIndexDefaultExpiry|json_encode|raw }};
+        {#const subtypesIndexEntryTip = {{ subtypesIndexEntryTip|json_encode|raw }};#}
+        const subtypesIndexEntryTip = '';
+        {#const subtypesIndexDefaultExpiry = {{ subtypesIndexDefaultExpiry|json_encode|raw }};#}
+        const subtypesIndexDefaultExpiry = '';
         const typesIndex = {{ typesIndex|json_encode|raw }};
         const typesIndexPrivate = {{ typesIndexPrivate|json_encode|raw }};
-        const typesIndexEntryTip = {{ typesIndexEntryTip|json_encode|raw }};
-        const typesIndexDefaultExpiry = {{ typesIndexDefaultExpiry|json_encode|raw }};
+        {#const typesIndexEntryTip = {{ typesIndexEntryTip|json_encode|raw }};#}
+        const typesIndexEntryTip = '';
+        {#const typesIndexDefaultExpiry = {{ typesIndexDefaultExpiry|json_encode|raw }};#}
+        const typesIndexDefaultExpiry = '';
 
         const isExistingRecord = {{ record.id != '' ? "true" : "false"  }};
         const expiresAt = '{{ record.expiresAt ? record.expiresAt.localShort : null }}';
@@ -528,7 +532,7 @@
                 case "calendar year":
                     return currentDate.add(1, "year").startOf("year").format("DD/MM/YYYY");
                 case "academic period":
-                    const academicPeriod = "{{ expiresAcademicPeriod.displayFinish }}";
+                    const academicPeriod = "{{ expiresAcademicPeriod.displayFinish ?? '' }}";
                     return dayjs(academicPeriod).format("DD/MM/YYYY");
                 case "academic year":
                     // get the start of the school year and set the expiry to the next year on that date

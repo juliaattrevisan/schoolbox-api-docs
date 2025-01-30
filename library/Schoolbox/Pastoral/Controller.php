@@ -490,8 +490,6 @@ class Controller extends Base
             $this->pastoralGroupMapper,
             $this->userMapper,
             $this->audienceMapper,
-            $this->termMapper,
-            $record
         );
         $templateData = $templateDataHelper->loadTemplateData();
 
@@ -523,14 +521,15 @@ class Controller extends Base
         $this->response = $this->responseFromTemplate(
             '@pastoral/modify.twig',
             $templateData + [
-                'record'            => $record,
-                'canCreate'         => $this->getConfigLoader()->get('pastoral_create_tag_enable'),
-                'moderator'         => $moderator,
-                'attachzonePublic'  => $this->getAttachZone(self::ATTACHZONE_PUBLIC, $record),
-                'attachzonePrivate' => $this->getAttachZone(self::ATTACHZONE_PRIVATE, $record),
-                'students'          => json_encode($students),
-                'returnUrlName'     => Redirect::RETURN_URL,
-                'encodedReturnUrl'  => $this->requestQuery->get(Redirect::RETURN_URL),
+                'record'                => $record,
+                'expiresAcademicPeriod' => $templateDataHelper->loadAcademicPeriod($record, $this->termMapper),
+                'canCreate'             => $this->getConfigLoader()->get('pastoral_create_tag_enable'),
+                'moderator'             => $moderator,
+                'attachzonePublic'      => $this->getAttachZone(self::ATTACHZONE_PUBLIC, $record),
+                'attachzonePrivate'     => $this->getAttachZone(self::ATTACHZONE_PRIVATE, $record),
+                'students'              => json_encode($students),
+                'returnUrlName'         => Redirect::RETURN_URL,
+                'encodedReturnUrl'      => $this->requestQuery->get(Redirect::RETURN_URL),
             ],
             'Pastoral Record',
         );
