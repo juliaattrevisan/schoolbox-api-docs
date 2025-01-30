@@ -499,26 +499,26 @@
         /**
          * Get the expires on date based on the default expiry
          * @param defaultExpiry
+         * @param referenceDate
          */
-        function getDefaultExpiry (defaultExpiry) {
-            const currentDate = dayjs();
+        function getDefaultExpiry (defaultExpiry, referenceDate) {
             switch (defaultExpiry) {
                 case "1 week":
-                    return currentDate.add(1, "week").format("DD/MM/YYYY");
+                    return referenceDate.add(1, "week").format("DD/MM/YYYY");
                 case "2 weeks":
-                    return currentDate.add(2, "week").format("DD/MM/YYYY");
+                    return referenceDate.add(2, "week").format("DD/MM/YYYY");
                 case "1 month":
-                    return currentDate.add(1, "month").format("DD/MM/YYYY");
+                    return referenceDate.add(1, "month").format("DD/MM/YYYY");
                 case "6 months":
-                    return currentDate.add(6, "month").format("DD/MM/YYYY");
+                    return referenceDate.add(6, "month").format("DD/MM/YYYY");
                 case "12 months":
-                    return currentDate.add(12, "month").format("DD/MM/YYYY");
+                    return referenceDate.add(12, "month").format("DD/MM/YYYY");
                 case "calendar year":
-                    return currentDate.add(1, "year").startOf("year").format("DD/MM/YYYY");
+                    return referenceDate.add(1, "year").startOf("year").format("DD/MM/YYYY");
                 case "academic period":
-                    return currentDate.add(1, "year").format("DD/MM/YYYY");
+                    return referenceDate.add(1, "year").format("DD/MM/YYYY");
                 case "academic year":
-                    return currentDate.add(1, "year").format("DD/MM/YYYY");
+                    return referenceDate.add(1, "year").format("DD/MM/YYYY");
                 default:
                     return "";
             }
@@ -544,8 +544,15 @@
                 expiresAtElement.value = "";
                 return;
             }
-            console.warn("defaultExpiry: ", defaultExpiry);
-            expiresAtElement.value = getDefaultExpiry(defaultExpiry);
+            /**
+             * We always need to set the expires on based on when the record was created.
+             * So if this is an existing record, we need to use the record's createdAt date.
+             * If this is a new record, we can just use the current date.
+             */
+            const isExistingRecord = {{ record.id != '' ? "true" : "false"  }};
+            const recordDate = '{{ record.createdAt ? record.createdAt.localShort : null }}';
+            const referenceDate = isExistingRecord ? dayjs(recordDate, "DD/MM/YYYY") : dayjs();
+            expiresAtElement.value = getDefaultExpiry(defaultExpiry, referenceDate);
 
         }
 
