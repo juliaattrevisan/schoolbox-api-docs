@@ -531,8 +531,8 @@
          * @param defaultExpiry
          */
         function updateExpiresAt (defaultExpiry) {
-            // if the expiresAt is already set, don't change it
-            if (expiresAt !== "") {
+            // if the expiresAt is already set or there's been a manual expires at input, return
+            if (expiresAt !== "" || hasManualExpiresAtInput) {
                 return;
             }
             // ensure both required inputs are available to be read and set
