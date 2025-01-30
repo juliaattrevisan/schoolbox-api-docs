@@ -490,26 +490,26 @@
         /**
          * Get the expires on date based on the default expiry
          * @param defaultExpiry
-         * @param occurredOnDate
          */
-        function getDefaultExpiry (defaultExpiry, occurredOnDate) {
+        function getDefaultExpiry (defaultExpiry) {
+            const currentDate = dayjs();
             switch (defaultExpiry) {
                 case "1 week":
-                    return occurredOnDate.add(1, "week").format("DD/MM/YYYY");
+                    return currentDate.add(1, "week").format("DD/MM/YYYY");
                 case "2 weeks":
-                    return occurredOnDate.add(2, "week").format("DD/MM/YYYY");
+                    return currentDate.add(2, "week").format("DD/MM/YYYY");
                 case "1 month":
-                    return occurredOnDate.add(1, "month").format("DD/MM/YYYY");
+                    return currentDate.add(1, "month").format("DD/MM/YYYY");
                 case "6 months":
-                    return occurredOnDate.add(6, "month").format("DD/MM/YYYY");
+                    return currentDate.add(6, "month").format("DD/MM/YYYY");
                 case "12 months":
-                    return occurredOnDate.add(12, "month").format("DD/MM/YYYY");
+                    return currentDate.add(12, "month").format("DD/MM/YYYY");
                 case "calendar year":
-                    return occurredOnDate.add(1, "year").startOf("year").format("DD/MM/YYYY");
+                    return currentDate.add(1, "year").startOf("year").format("DD/MM/YYYY");
                 case "academic period":
-                    return occurredOnDate.add(1, "year").format("DD/MM/YYYY");
+                    return currentDate.add(1, "year").format("DD/MM/YYYY");
                 case "academic year":
-                    return occurredOnDate.add(1, "year").format("DD/MM/YYYY");
+                    return currentDate.add(1, "year").format("DD/MM/YYYY");
                 default:
                     return "";
             }
@@ -532,8 +532,7 @@
                 return;
             }
             console.warn("defaultExpiry: ", defaultExpiry);
-            const occurredOnDate = dayjs(occurredOnElement.value, "DD/MM/YYYY");
-            expiresAtElement.value = getDefaultExpiry(defaultExpiry, occurredOnDate);
+            expiresAtElement.value = getDefaultExpiry(defaultExpiry);
 
         }
 
