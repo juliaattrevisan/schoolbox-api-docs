@@ -488,13 +488,53 @@
         }
 
         /**
+         * Get the expires on date based on the default expiry
+         * @param defaultExpiry
+         * @param occurredOnDate
+         */
+        function getDefaultExpiry (defaultExpiry, occurredOnDate) {
+            switch (defaultExpiry) {
+                case "1 week":
+                    return occurredOnDate.add(1, "week").format("DD/MM/YYYY");
+                case "2 weeks":
+                    return occurredOnDate.add(2, "week").format("DD/MM/YYYY");
+                case "1 month":
+                    return occurredOnDate.add(1, "month").format("DD/MM/YYYY");
+                case "6 months":
+                    return occurredOnDate.add(6, "month").format("DD/MM/YYYY");
+                case "12 months":
+                    return occurredOnDate.add(12, "month").format("DD/MM/YYYY");
+                case "calendar year":
+                    return occurredOnDate.add(1, "year").startOf("year").format("DD/MM/YYYY");
+                case "academic period":
+                    return occurredOnDate.add(1, "year").format("DD/MM/YYYY");
+                case "academic year":
+                    return occurredOnDate.add(1, "year").format("DD/MM/YYYY");
+                default:
+                    return "";
+            }
+        }
+
+        /**
          * Update the expires at date based on current type / subtype selection
          * @param defaultExpiry
          */
         function updateExpiresAt (defaultExpiry) {
-            console.warn("updateExpiresAt()");
+            // ensure both required inputs are available to be read and set
+            const occurredOnElement = document.getElementById("occurredOn");
+            const expiresAtElement = document.getElementById("expiresAt");
+            if (occurredOnElement === null || expiresAtElement === null) {
+                return;
+            }
+            // if the default expiry is not set, clear the previously set value and return
+            if (defaultExpiry === null || defaultExpiry === "") {
+                expiresAtElement.value = "";
+                return;
+            }
             console.warn("defaultExpiry: ", defaultExpiry);
-            console.warn("expiresAt: ", expiresAt);
+            const occurredOnDate = dayjs(occurredOnElement.value, "DD/MM/YYYY");
+            expiresAtElement.value = getDefaultExpiry(defaultExpiry, occurredOnDate);
+
         }
 
     });
