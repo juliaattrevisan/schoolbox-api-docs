@@ -360,18 +360,30 @@
         const typesIndexPrivate = {{ typesIndexPrivate|json_encode|raw }};
         const typesIndexEntryTip = {{ typesIndexEntryTip|json_encode|raw }};
         const typesIndexDefaultExpiry = {{ typesIndexDefaultExpiry|json_encode|raw }};
+
+        const isExistingRecord = {{ record.id != '' ? "true" : "false"  }};
         const expiresAt = '{{ record.expiresAt ? record.expiresAt.localShort : null }}';
 
         /**
          * When the expires at date has manually changed, this takes precedence and
          * any further changes when type/sub-type is changed will not update the expires at date.
-         * Rather conveniently, the jQuery .onChange will not trigger when the date is changed within
-         * the updateExpiresAt(), so we don't need to worry about this being triggered when it shouldn't be.
+         * Rather conveniently, the jQuery .onChange will not trigger when the expiresAt.value is changed within
+         * the updateExpiresAt method, so we don't need to worry about this being triggered when it shouldn't be.
          */
         let hasManualExpiresAtInput = false;
         $("#expiresAt").on("change", function () {
             hasManualExpiresAtInput = true;
         });
+
+        /**
+         * Check if the expires at date can be updated when the type/sub-type is changed
+         * We prevent updating the expires at date if the record is existing, the expires at date is set,
+         * or if there is a manual input for the expires at date
+         * @returns boolean
+         */
+        function canUpdateExpiresAt() {
+            return !isExistingRecord && expiresAt === "" && !hasManualExpiresAtInput;
+        }
 
         /* Some convenient selectors
          */
@@ -499,61 +511,52 @@
         /**
          * Get the expires on date based on the default expiry
          * @param defaultExpiry
-         * @param referenceDate
          */
-        function getDefaultExpiry (defaultExpiry, referenceDate) {
+        function getDefaultExpiry (defaultExpiry) {
+            const currentDate = dayjs();
             switch (defaultExpiry) {
                 case "1 week":
-                    return referenceDate.add(1, "week").format("DD/MM/YYYY");
+                    return currentDate.add(1, "week").format("DD/MM/YYYY");
                 case "2 weeks":
-                    return referenceDate.add(2, "week").format("DD/MM/YYYY");
+                    return currentDate.add(2, "week").format("DD/MM/YYYY");
                 case "1 month":
-                    return referenceDate.add(1, "month").format("DD/MM/YYYY");
+                    return currentDate.add(1, "month").format("DD/MM/YYYY");
                 case "6 months":
-                    return referenceDate.add(6, "month").format("DD/MM/YYYY");
+                    return currentDate.add(6, "month").format("DD/MM/YYYY");
                 case "12 months":
-                    return referenceDate.add(12, "month").format("DD/MM/YYYY");
+                    return currentDate.add(12, "month").format("DD/MM/YYYY");
                 case "calendar year":
-                    return referenceDate.add(1, "year").startOf("year").format("DD/MM/YYYY");
+                    return currentDate.add(1, "year").startOf("year").format("DD/MM/YYYY");
                 case "academic period":
-                    return referenceDate.add(1, "year").format("DD/MM/YYYY");
+                    return currentDate.add(1, "year").format("DD/MM/YYYY");
                 case "academic year":
-                    return referenceDate.add(1, "year").format("DD/MM/YYYY");
+                    return currentDate.add(1, "year").format("DD/MM/YYYY");
                 default:
                     return "";
             }
         }
 
         /**
-         * Update the expires at date based on current type / subtype selection
+         * Update the expires at date based on the current type / subtype selection
          * @param defaultExpiry
          */
         function updateExpiresAt (defaultExpiry) {
-            // if the expiresAt is already set or there's been a manual expires at input, return
-            if (expiresAt !== "" || hasManualExpiresAtInput) {
+            // if this is an existing record, or the expires at date is set, or has a manual expires at input: return
+            if (!canUpdateExpiresAt()) {
                 return;
             }
-            // ensure both required inputs are available to be read and set
-            const occurredOnElement = document.getElementById("occurredOn");
+            // ensure expiresAt actually exists before setting the value
             const expiresAtElement = document.getElementById("expiresAt");
-            if (occurredOnElement === null || expiresAtElement === null) {
+            if (expiresAtElement === null) {
                 return;
             }
-            // if the default expiry is not set, clear the previously set value and return
+            // if the new type/sub-type Default Expiry is set to 'Never', clear the previously set value and return
             if (defaultExpiry === null || defaultExpiry === "") {
                 expiresAtElement.value = "";
                 return;
             }
-            /**
-             * We always need to set the expires on based on when the record was created.
-             * So if this is an existing record, we need to use the record's createdAt date.
-             * If this is a new record, we can just use the current date.
-             */
-            const isExistingRecord = {{ record.id != '' ? "true" : "false"  }};
-            const recordDate = '{{ record.createdAt ? record.createdAt.localShort : null }}';
-            const referenceDate = isExistingRecord ? dayjs(recordDate, "DD/MM/YYYY") : dayjs();
-            expiresAtElement.value = getDefaultExpiry(defaultExpiry, referenceDate);
-
+            // otherwise set the expires at date based on the Default Expiry that was set
+            expiresAtElement.value = getDefaultExpiry(defaultExpiry);
         }
 
     });
