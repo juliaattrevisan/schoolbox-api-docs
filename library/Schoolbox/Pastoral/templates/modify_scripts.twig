@@ -516,6 +516,17 @@
         }
 
         /**
+         * When the expires at date has manually changed, this takes precedence and
+         * any further changes when type/sub-type is changed will not update the expires at date.
+         * Rather conveniently, the jQuery .onChange will not trigger when the date is changed within
+         * the updateExpiresAt(), so we don't need to worry about this being triggered when it shouldn't be.
+         */
+        let hasManualExpiresAtInput = false;
+        $("#expiresAt").on("change", function () {
+            hasManualExpiresAtInput = true;
+        });
+
+        /**
          * Update the expires at date based on current type / subtype selection
          * @param defaultExpiry
          */
