@@ -189,8 +189,12 @@ class Factory
         }
 
         /* Put emergency contacts into this special place for now
+         * Parents and staff never use this yet, only students use this;
+         * their emergencyContacts node will be null in that case
+         *
+         * TODO Think about separating these by roletypes somehow
          */
-        $payload['roleTypes']['tabs']['emergencyContacts'] = $referenceFields['emergencyContacts'];
+        $payload['roleTypes']['tabs']['emergencyContacts'] = $referenceFields['emergencyContacts'] ?? [];
 
         /* The preprocessed payload that frontend can just use
          */
@@ -363,8 +367,9 @@ class Factory
 
         foreach (['StudentEmergency', 'StudentEmergency2', 'StudentEmergency3'] as $node) {
             /* Go with the usual "if you have a name, you can be on the ui" idea
+             * Some connectors may not give us anything for a given contact node, so check for that
              */
-            $name = trim((string)$externalUser[$node . 'Name']);
+            $name = trim((string)($externalUser[$node . 'Name'] ?? ''));
 
             if ('' !== $name) {
                 $emergencyContacts[] = [
