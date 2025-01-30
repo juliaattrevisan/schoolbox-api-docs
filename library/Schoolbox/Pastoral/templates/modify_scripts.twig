@@ -528,7 +528,7 @@
                 case "calendar year":
                     return currentDate.add(1, "year").startOf("year").format("DD/MM/YYYY");
                 case "academic period":
-                    const academicPeriod = "{{ expiresAcademicPeriod }}";
+                    const academicPeriod = "{{ expiresAcademicPeriod.displayFinish }}";
                     return dayjs(academicPeriod).add(1,"day").format("DD/MM/YYYY");
                 case "academic year":
                     // get the start of the school year and set the expiry to the next year on that date

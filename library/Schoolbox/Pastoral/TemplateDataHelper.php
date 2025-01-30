@@ -245,12 +245,11 @@ class TemplateDataHelper
      * @return \Schoolbox\Assessment\Term\Model
      * @throws \Schoolbox\Mapper\Exception
      */
-    private function loadAcademicPeriod(): string
+    private function loadAcademicPeriod(): \Schoolbox\Assessment\Term\Model
     {
-        $term = $this->termMapper->findForDateAndYearLevel(
+        return $this->termMapper->findForDateAndYearLevel(
             $this->record->getCreatedAt() ?? \Alaress_Date_Format::now(),
             $this->record->getStudent()->getYear()
         );
-        return $term->getDisplayFinish()->getDatabaseDate();
     }
 }
