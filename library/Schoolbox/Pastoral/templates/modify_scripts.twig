@@ -520,6 +520,10 @@
          * @param defaultExpiry
          */
         function updateExpiresAt (defaultExpiry) {
+            // if the expiresAt is already set, don't change it
+            if (expiresAt !== "") {
+                return;
+            }
             // ensure both required inputs are available to be read and set
             const occurredOnElement = document.getElementById("occurredOn");
             const expiresAtElement = document.getElementById("expiresAt");
