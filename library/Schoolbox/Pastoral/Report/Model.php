@@ -135,6 +135,8 @@ class Model implements ISoftDeletable
     /** @var User $owner */
     private User $owner;
 
+    private bool $includeArchivedRecords = false;
+
     // These are the filters stored as CSV strings
 
     /**
@@ -607,6 +609,24 @@ class Model implements ISoftDeletable
     {
         $this->afterDate = $afterDate;
 
+        return $this;
+    }
+
+    /**
+     * @return bool
+     */
+    public function getIncludeArchivedRecords(): bool
+    {
+        return $this->includeArchivedRecords;
+    }
+
+    /**
+     * @param bool $includeArchivedRecords
+     * @return static
+     */
+    public function setIncludeArchivedRecords(bool $includeArchivedRecords): self
+    {
+        $this->includeArchivedRecords = $includeArchivedRecords;
         return $this;
     }
 
