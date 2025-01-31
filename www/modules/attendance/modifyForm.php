@@ -105,9 +105,10 @@ foreach ($attendancePeriods as $attendancePeriod) {
             $data = [
                 'AttendanceMasterSeq' => $attendanceHandler->getAttendanceMaster()->getAttendanceMasterSeq(),
                 'ID' => $studentId,
-                'PossibleAbsenceCode' => trim($_POST['PossibleAbsenceCode'][$i]),
-                'PossibleReasonCode' => trim($_POST['PossibleReasonCode'][$i]),
-                'PossibleDescription' => trim($_POST['PossibleReasonDescription'][$i]),
+                // some schools purge these fields from the form, so we need to make sure they're not empty
+                'PossibleAbsenceCode' => trim($_POST['PossibleAbsenceCode'][$i] ?? ''),
+                'PossibleReasonCode' => trim($_POST['PossibleReasonCode'][$i] ?? ''),
+                'PossibleDescription' => trim($_POST['PossibleReasonDescription'][$i] ?? ''),
                 'AttendedFlag' => in_array($studentId, $attending) ? 0 : 1,
 
                 /* dbo.wkAttendances lets the EarlyDepartureTime and LateArrivalTime be null
@@ -122,7 +123,7 @@ foreach ($attendancePeriods as $attendancePeriod) {
             ];
 
             // Arrival/Departure for multi-period classes
-            if ($_POST['LateArrivalTime'][$i]) {
+            if ($_POST['LateArrivalTime'][$i] ?? false) {
                 // if this period starts after the late arrival,
                 // don't mark them as late
                 $arrival     = Alaress_Date_Format::newFromTimestamp(strtotime(trim($_POST['LateArrivalTime'][$i])));
@@ -135,7 +136,7 @@ foreach ($attendancePeriods as $attendancePeriod) {
                 }
             }
 
-            if ($_POST['EarlyDepartureTime'][$i]) {
+            if ($_POST['EarlyDepartureTime'][$i] ?? false) {
                 // if this period starts before the early departure,
                 // don't mark them as leaving early
                 $departure     = Alaress_Date_Format::newFromTimestamp(strtotime(trim($_POST['EarlyDepartureTime'][$i])));
