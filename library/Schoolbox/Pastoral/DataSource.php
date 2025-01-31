@@ -695,6 +695,7 @@ class DataSource
         bool $includeStudentsWithoutYear,
         bool $includeStudentsWithoutHouse,
         bool $includeReportsWithoutAction,
+        bool $includeArchivedRecords,
         ?string $actionStatus
     ): Collection {
         // The mapper method is user-sensitive,
@@ -719,6 +720,7 @@ class DataSource
                 $includeStudentsWithoutYear,
                 $includeStudentsWithoutHouse,
                 $includeReportsWithoutAction,
+                $includeArchivedRecords,
                 $actionStatus
             ),
             $currentUser

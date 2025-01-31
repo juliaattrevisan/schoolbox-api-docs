@@ -506,7 +506,8 @@ class Controller extends Base
             $report->getIncludeStudentsWithoutYear(),
             $report->getIncludeStudentsWithoutHouse(),
             $report->getIncludeRecordsWithoutAction(),
-            $report->getActionStatus()
+            $report->getIncludeArchivedRecords(),
+            $report->getActionStatus(),
         );
     }
 
