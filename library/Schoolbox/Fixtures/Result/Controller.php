@@ -364,7 +364,8 @@ class Controller extends AbstractController
         /* Coaches of this Team can add results
          */
         foreach ($allCoaches as $currentCoach) {
-            if ($currentCoach->getUser()->getId() == $sessionUser->getId()) {
+            // Note sportsfixtures_coach.user_id is nullable, hence the null coalesce below.
+            if ($currentCoach->getUser()?->getId() == $sessionUser->getId()) {
                 return true;
             }
         }
