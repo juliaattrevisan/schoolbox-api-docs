@@ -17,7 +17,7 @@ if (Config::get('login_anonymous')) {
 // Only allow redirects to this site's URLs
     if ($url->isLocalUrl()) {
         //if no user session exists, create it
-        if (!$_SESSION['user']) {
+        if (!($_SESSION['user'] ?? false)) {
             $anonymousUsername = Config::get('login_anonymous');
             $session           = new \Session();
             $session->create($anonymousUsername);
