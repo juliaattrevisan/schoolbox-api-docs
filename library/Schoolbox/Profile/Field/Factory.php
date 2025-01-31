@@ -367,15 +367,15 @@ class Factory
 
         foreach (['StudentEmergency', 'StudentEmergency2', 'StudentEmergency3'] as $node) {
             /* Go with the usual "if you have a name, you can be on the ui" idea
-             * Some connectors may not give us anything for a given contact node, so check for that
+             * Some connectors may not give us anything for a given contact node (or part of), so check for that
              */
             $name = trim((string)($externalUser[$node . 'Name'] ?? ''));
 
             if ('' !== $name) {
                 $emergencyContacts[] = [
                     'name' => $name,
-                    'phone' => $externalUser[$node . 'Phone'],
-                    'phoneAlt' => $externalUser[$node . 'PhoneAlt'],
+                    'phone' => $externalUser[$node . 'Phone'] ?? '',
+                    'phoneAlt' => $externalUser[$node . 'PhoneAlt'] ?? '',
                 ];
             }
         }
