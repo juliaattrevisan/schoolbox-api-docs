@@ -16,6 +16,7 @@ use Psr\Http\Message\RequestInterface;
 use Schoolbox\API\Token\Jwt;
 use Schoolbox\API\Token\JwtParser\IParser;
 use Schoolbox\Oidc\Server\RelyingParty\Model;
+use Schoolbox\Oidc\Server\Repository\Scope as ScopeRepository;
 use Schoolbox\User;
 
 /**
@@ -74,8 +75,12 @@ class RequestFactory
             Alaress_Date_Format::now()->addSeconds($this->expiry),
             $jwtId,
             self::LOGOUT_TOKEN_BASE_CLAIM + [
-                IParser::CLAIM_AUD => $client->getClientId(),
-                IParser::CLAIM_IAT => Alaress_Date_Format::now()->getUnixTimeStamp(),
+                IParser::CLAIM_AUD                                => $client->getClientId(),
+                IParser::CLAIM_IAT                                => Alaress_Date_Format::now()->getUnixTimeStamp(),
+                ScopeRepository::SCOPE_SCHOOLBOX . '/id'          => $user->getId(),
+                ScopeRepository::SCOPE_SCHOOLBOX . '/instance_id' => INSTANCE_ID,
+                ScopeRepository::SCOPE_SCHOOLBOX . '/external_id' => $user->getExternalId(),
+                ScopeRepository::SCOPE_SCHOOLBOX . '/role_type'   => $user->getRole()->getType(),
             ],
         );
 
