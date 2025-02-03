@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace Schoolbox\External\Connector\Civica\Base\Endpoint\Calendar;
 
 use Psr\Log\LoggerInterface;
+use Schoolbox\External\Connector\Civica\Base\Endpoint\Api;
 use Schoolbox\External\Event\Mapper;
 use Schoolbox\External\Importer\Endpoint\IStrategy;
 use Schoolbox\GenericCollection;
@@ -52,7 +53,7 @@ class Factory
      * @param string $host
      * @param string $key
      * @param Mapper $eventMapper
-     * @param \Schoolbox\External\Event\User\Mapper $userRelationMapper
+     * @param \Schoolbox\External\Event\User\Mapper $eventUserMapper
      */
     public function __construct(
         private LoggerInterface $log,
@@ -60,7 +61,7 @@ class Factory
         private string $host,
         #[SensitiveParameter] private string $key,
         private \Schoolbox\External\Event\Mapper $eventMapper,
-        private \Schoolbox\External\Event\User\Mapper $userRelationMapper
+        private \Schoolbox\External\Event\User\Mapper $eventUserMapper
     ) {
     }
 
@@ -75,6 +76,11 @@ class Factory
     {
         $this->log->info('Accessing api endpoint');
 
+        $api = new Api($this->host, $this->key);
+
+        $from = \Alaress_Date_Format::now()->startOfDay()->getDatabase();
+        $to = \Alaress_Date_Format::now()->endOfDay()->getDatabase();
+
         /* Purge previously-imported events and event relationships
          */
         $bus = (new GenericCollection(IStrategy::class))
@@ -83,6 +89,15 @@ class Factory
                 $this->perform,
                 $this->eventMapper,
                 self::SOURCE_NAME
+            ))
+            ->add(new NonAcademicEvents(
+                $this->log,
+                $this->perform,
+                $api,
+                $this->eventMapper,
+                $this->eventUserMapper,
+                $from,
+                $to
             ))
             ->add(new Cleanup(
                 $this->log,

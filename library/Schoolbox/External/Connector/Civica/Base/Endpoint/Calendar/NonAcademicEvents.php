@@ -7,7 +7,7 @@
 
 declare(strict_types=1);
 
-namespace External\Connector\Civica\Base\Endpoint\Calendar;
+namespace Schoolbox\External\Connector\Civica\Base\Endpoint\Calendar;
 
 use Psr\Log\LoggerInterface;
 use Schoolbox\External\Connector\Civica\Base\Endpoint\IApi;
@@ -47,13 +47,15 @@ class NonAcademicEvents implements IStrategy
 
     /**
      * @return void
-     * @throws \PDOException
-     * @throws \Schoolbox\Mapper\Exception
-     * @throws \UnexpectedValueException
+     * @throws \JsonException
      */
     public function import(): void
     {
+        $pages = $this->api->retrieveForJurisdiction('GET', 'EventGroups/Jurisdiction');
 
+        foreach ($pages as $page) {
+            print_r($page);
+        }
     }
 
 
@@ -101,27 +103,31 @@ class NonAcademicEvents implements IStrategy
         array $activityInstance
     ): \Schoolbox\External\Event\Model {
         /* Name is the same as the Code, in compass
+         * TODO Fill in when we get access
          */
-        $activityName = trim((string)$activity['name']);
+        $activityName = '';
 
         /* Fill in these vars as usual
+         * TODO Fill in when we get access
          */
-        $classCode = $activityName;
+        $classCode = '';
         $day = null;
         $detail = null;
 
         /* Arbitrarily concoct a superkey to represent this activity instance
+         * TODO Fill in when we get access
          */
-        $guid = "{$activity['activityId']}.{$activity['importIdentifier']}.{$activityInstance['start']}";
+        $guid = '';
 
         $period = null;
-        $room = trim((string)$activityInstance['location']);
-        $title = $activity['longName'];
+        $room = '';
+        $title = '';
 
         /* Datetimes for when this class occurs
+         * TODO Fill in when we get access
          */
-        $startAt = \Alaress_Date_Format::newFromTimestamp(strtotime($activityInstance['start']));
-        $finishAt = \Alaress_Date_Format::newFromTimestamp(strtotime($activityInstance['finish']));
+        $startAt = \Alaress_Date_Format::now();
+        $finishAt = \Alaress_Date_Format::now();
 
         /* This is pretty optional - this is the sis' equivalent of our luEventType
          * Sometimes it's provided, sometimes it's not - we can record it here if
