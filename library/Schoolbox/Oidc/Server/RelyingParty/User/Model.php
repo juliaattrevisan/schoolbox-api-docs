@@ -1,0 +1,99 @@
+<?php
+
+/**
+ * @copyright Copyright 2025, Schoolbox Pty Ltd
+ * @link      https://schoolbox.com.au/
+ */
+
+declare(strict_types=1);
+
+namespace Schoolbox\Oidc\Server\RelyingParty\User;
+
+use Alaress_Date_Format;
+use Schoolbox\Mapper\Traits\Model\CreatedAtDate;
+use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
+use Schoolbox\Mapper\Traits\Model\Id;
+use Schoolbox\Mapper\Traits\Model\UpdatedAtDate;
+use Schoolbox\Oidc\Server\RelyingParty\Model as RelyingParty;
+use Schoolbox\User;
+
+/**
+ * Model representation of the permission a user has granted to an OIDC relying
+ * party.
+ */
+class Model
+{
+    use Id;
+    use CreatedAtDate;
+    use UpdatedAtDate;
+    use DeletedAtDate;
+
+    /**
+     * The relying party to which the user granted access.
+     */
+    private RelyingParty $relyingParty;
+
+    /**
+     * The user which granted access to the relying party.
+     */
+    private User $user;
+
+    /**
+     * When does the access expire?
+     */
+    private Alaress_Date_Format $expiresAt;
+
+    /**
+     * @return Alaress_Date_Format
+     */
+    public function getExpiresAt(): Alaress_Date_Format
+    {
+        return $this->expiresAt;
+    }
+
+    /**
+     * @param Alaress_Date_Format $expiresAt
+     * @return $this
+     */
+    public function setExpiresAt(Alaress_Date_Format $expiresAt): self
+    {
+        $this->expiresAt = $expiresAt;
+        return $this;
+    }
+
+    /**
+     * @return RelyingParty
+     */
+    public function getRelyingParty(): RelyingParty
+    {
+        return $this->relyingParty;
+    }
+
+    /**
+     * @param RelyingParty $relyingParty
+     * @return $this
+     */
+    public function setRelyingParty(RelyingParty $relyingParty): self
+    {
+        $this->relyingParty = $relyingParty;
+        return $this;
+    }
+
+    /**
+     * @return User
+     */
+    public function getUser(): User
+    {
+        return $this->user;
+    }
+
+    /**
+     * @param User $user
+     * @return $this
+     */
+    public function setUser(User $user): self
+    {
+        $this->user = $user;
+        return $this;
+    }
+}
