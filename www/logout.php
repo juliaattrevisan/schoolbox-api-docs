@@ -31,7 +31,7 @@ if ($currentUser instanceof \Schoolbox\User) {
             );
             $request = $logoutFactory->build($currentUser, $client, Uuid::uuid4()->toString());
 
-            $logoutClient                   ??= new BackChannelLogout\Client($kernel->get('httpClient'));
+            $logoutClient                          ??= new BackChannelLogout\Client($kernel->get('httpClient'));
             $backChannelRequests[$client->getId()] = $logoutClient->send($request);
         }
     }

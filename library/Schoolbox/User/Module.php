@@ -15,6 +15,7 @@ use Alaress\Module\Module as BaseModule;
 use Alaress\Web\Controller\Base;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Oidc\Server\RelyingParty\Mapper as RelyingPartyMapper;
+use Schoolbox\Oidc\Server\RelyingParty\User\Mapper as RelyingPartyUserMapper;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
@@ -135,6 +136,7 @@ class Module extends BaseModule
             $this->getMapperFactory()->get(UserAccessMapper::class),
             $this->getMapperFactory()->get(Logger\Mapper::class),
             $this->getMapperFactory()->get(RelyingPartyMapper::class),
+            $this->getMapperFactory()->get(RelyingPartyUserMapper::class),
             $this->injector->get('user.logout.requestFactory'),
             $this->injector->get('httpClient'),
         );

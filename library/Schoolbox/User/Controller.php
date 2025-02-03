@@ -16,7 +16,6 @@ use Schoolbox\Oidc\Server\RelyingParty\User\Mapper as RelyingPartyUserMapper;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\User;
 use User\Logger;
-use External_User;
 use Ramsey\Uuid\Uuid;
 use Schoolbox\Oidc\Server\RelyingParty\Mapper as RelyingPartyMapper;
 use Schoolbox\Oidc\Server\BackChannelLogout;
@@ -42,6 +41,7 @@ class Controller extends Base
         UserAccessMapper $userAccessMapper,
         Logger\Mapper $assumeUserLogMapper,
         RelyingPartyMapper $relyingPartyMapper,
+        private RelyingPartyUserMapper $relyingPartyUserMapper,
         RequestFactory $requestFactory,
         ClientInterface $httpClient,
     ) {
@@ -195,9 +195,7 @@ class Controller extends Base
     ): void {
         // This is similar to what's implemented in www/logout.php when user logs out
         $backChannelRequests = [];
-
-        $relyingPartyUserMapper = RelyingPartyUserMapper::getInstance();
-        foreach ($relyingPartyUserMapper->findByUser($initialUser) as $relyingPartyUser) {
+        foreach ($this->relyingPartyUserMapper->findByUser($initialUser) as $relyingPartyUser) {
             // Does this client support logout?
             // If so, craft a logout token and send it
             $client = $relyingPartyUser->getClient();
@@ -209,7 +207,7 @@ class Controller extends Base
                     Uuid::uuid4()->toString()
                 );
 
-                $logoutClient                   ??= new BackChannelLogout\Client($httpClient);
+                $logoutClient                          ??= new BackChannelLogout\Client($httpClient);
                 $backChannelRequests[$client->getId()] = $logoutClient->send($request);
             }
         }
