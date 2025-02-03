@@ -161,7 +161,24 @@ class DSNTest extends TestCase
                     ]
                 ]
             ],
+            /* BatchXML with empty parentRelations
+             */
             'Valid DSN 6' => [
+                'batchxml:key=920zfddd-x9u7-gg654-glhf-d9j25nf9h72h?parentRelations=',
+                [
+                    'modules' => [
+                        'batchxml' => [
+                            'key' => '920zfddd-x9u7-gg654-glhf-d9j25nf9h72h',
+                        ],
+                    ],
+                    'options' => [
+                        'parentRelations' => ''
+                    ]
+                ]
+            ],
+            /* BatchXML, dayNumberOffset, empty parentRelations
+             */
+            'Valid DSN 7' => [
                 'batchxml:key=920zfddd-x9u7-gg654-glhf-d9j25nf9h72h?dayNumberOffset=-3;parentRelations=',
                 [
                     'modules' => [
@@ -175,7 +192,9 @@ class DSNTest extends TestCase
                     ]
                 ]
             ],
-            'Valid DSN 7' => [
+            /* BatchXML, parentRelations
+             */
+            'Valid DSN 8' => [
                 'batchxml:key=920zfddd-x9u7-gg654-glhf-d9j25nf9h72h?parentRelations=Self,Father,Mother',
                 [
                     'modules' => [
@@ -188,12 +207,7 @@ class DSNTest extends TestCase
                     ]
                 ]
             ],
-            'Valid DSN 8' => [
-                'batchxml:key=920zfddd-x9u7-gg654-glhf-d9j25nf9h72h?parentRelations=',
-            ],
-            'options' => [
-                'parentRelations' => ''
-            ]
+
         ];
     }
 
