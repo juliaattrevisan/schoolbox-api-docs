@@ -45,7 +45,7 @@ test.describe("Feedback Tests", () => {
         await dueworkForm.create();
 
         tester.isGoingTo("As Louisa Smith, check notification");
-        await tester.impersonateViaModifyUserPage(student);
+        await tester.impersonateViaUserProfilePage(student);
         const assessmentNotificationLouisa = await tester.common.findNotification(
             `Assessment Task ${dueworkTitle1} opened in ${className}`,
             true,
@@ -85,7 +85,7 @@ test.describe("Feedback Tests", () => {
         await feedbackForm.publish();
 
         tester.isGoingTo("As Louisa Smith, check notification");
-        await tester.impersonateViaModifyUserPage(student);
+        await tester.impersonateViaUserProfilePage(student);
         const assessmentNotificationLuisa2 = await tester.common.findNotification(
             `${teacher} has marked your work for ${dueworkTitle1} in ${className}`,
             true,
@@ -125,7 +125,7 @@ test.describe("Feedback Tests", () => {
         await dueworkForm.create();
 
         tester.isGoingTo("As Louisa Smith, check notification");
-        await tester.impersonateViaModifyUserPage(student);
+        await tester.impersonateViaUserProfilePage(student);
         const assessmentNotificationLouisa = await tester.common.findNotification(
             `Assessment Task ${dueworkTitle2} opened in ${className}`,
             true,
@@ -167,7 +167,7 @@ test.describe("Feedback Tests", () => {
         );
 
         tester.isGoingTo("As Louisa, check notification");
-        await tester.impersonateViaModifyUserPage(student);
+        await tester.impersonateViaUserProfilePage(student);
         const assessmentNotificationLuisa2 = await tester.common.findNotification(
             `${teacher} has marked your work for ${dueworkTitle2} in ${className}`,
             true,

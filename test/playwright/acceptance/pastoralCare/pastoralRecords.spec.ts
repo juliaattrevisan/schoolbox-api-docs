@@ -197,7 +197,7 @@ test.describe("Pastoral Records", () => {
         await pastoralProfile.goto(studentId);
         await expect(page.locator("#pastoralRecords")).toContainText(pastoralTitle);
         tester.isGoingTo("as a parent check the pastoral care records details");
-        await tester.impersonateViaModifyUserPage("Ms Jenni Reed");
+        await tester.impersonateViaUserProfilePage("Ms Jenni Reed");
         await pastoralProfile.goto(studentId);
         const recordId = (await db.grabFromDatabase("pastoral", "id", {
             deleted_at: null,
@@ -208,7 +208,7 @@ test.describe("Pastoral Records", () => {
         await expect(page.locator("#content")).toContainText("Academic");
         await expect(page.locator("#content")).toContainText("Award/Achievement");
         tester.isGoingTo("as a student check the pastoral care records details");
-        await tester.impersonateViaModifyUserPage("Ms Jana Reed");
+        await tester.impersonateViaUserProfilePage("Ms Jana Reed");
         await pastoralProfile.goto(studentId);
         await pastoralProfile.clickPastoralRecord(studentId, recordId);
         await expect(page.locator("#content")).toContainText("Automation Test View Pastoral Record");
