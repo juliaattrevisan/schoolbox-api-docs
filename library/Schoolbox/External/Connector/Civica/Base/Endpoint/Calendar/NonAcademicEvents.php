@@ -54,7 +54,10 @@ class NonAcademicEvents implements IStrategy
         $pages = $this->api->retrieveForJurisdiction('GET', 'EventGroups/Jurisdiction');
 
         foreach ($pages as $page) {
-            print_r($page);
+            foreach ($page['values'] as $data) {
+                $this->processEvent($data);
+
+            }
         }
     }
 
@@ -63,8 +66,7 @@ class NonAcademicEvents implements IStrategy
      * For each class, process the lessons and apply student/staff involvements
      * Ignore lessons that occur outside the [$from, $to] window
      *
-     * @param array $activity
-     * @param array $activityInstance
+     * @param array $data
      * @param array $enrolments
      * @param array $staffLookup
      * @return void
@@ -72,68 +74,78 @@ class NonAcademicEvents implements IStrategy
      * @throws \Schoolbox\Mapper\Exception
      * @throws \UnexpectedValueException
      */
-    private function processClass(
-        array $activity,
-        array $activityInstance,
+    private function processEvent(
+        array $data,
         array $enrolments,
         array $staffLookup
     ): void {
         /* Save sis_event record
          */
-        $event = $this->createEvent($activity, $activityInstance);
+        $event = $this->createEvent($data);
 
         /* Save the involvements
          */
-        $this->createInvolvements($activity, $activityInstance, $enrolments, $staffLookup, $event);
+        $this->createInvolvements($data, $event);
     }
 
 
     /**
      * Create a new SUDS Timetable Event with all the class and lesson pieces
      *
-     * @param array $activity
-     * @param array $activityInstance
-     * @return \Schoolbox\External\Event\Model
-     * @throws \PDOException
-     * @throws \Schoolbox\Mapper\Exception
-     * @throws \UnexpectedValueException
+     * @param array $data
+     * @return Model
+     * @throws Exception
      */
-    private function createEvent(
-        array $activity,
-        array $activityInstance
-    ): \Schoolbox\External\Event\Model {
+    private function createEvent(array $data): \Schoolbox\External\Event\Model {
         /* Name is the same as the Code, in compass
-         * TODO Fill in when we get access
+         * TODO Fill in when we get access: purely speculative
          */
-        $activityName = '';
+        $title = trim((string)$data['eventName']);
 
         /* Fill in these vars as usual
-         * TODO Fill in when we get access
+         * TODO Fill in when we get access: purely speculative
          */
-        $classCode = '';
+        $classCode = trim((string)$data['subjectShortName']);
         $day = null;
-        $detail = null;
-
-        /* Arbitrarily concoct a superkey to represent this activity instance
-         * TODO Fill in when we get access
-         */
-        $guid = '';
-
+        $detail = trim((string)$data['description']);
         $period = null;
-        $room = '';
-        $title = '';
+        $location = trim((string)$data['venue']);
+        $allDay = (bool)$data['wholeDay'];
 
         /* Datetimes for when this class occurs
-         * TODO Fill in when we get access
+         * TODO Fill in when we get access: purely speculative
          */
-        $startAt = \Alaress_Date_Format::now();
-        $finishAt = \Alaress_Date_Format::now();
+        $startAt = new \Alaress_Date_Format(sprintf(
+            '%s %s',
+            $data['eventDate'],
+            $data['startTime']
+        ), 'Y-m-d H:i:s');
+
+        $finishAt = new \Alaress_Date_Format(sprintf(
+            '%s %s',
+            $data['eventDate'],
+            $data['endTime']
+        ), 'Y-m-d H:i:s');
+
+        /* Arbitrarily concoct a superkey to represent this activity instance
+         * TODO Fill in when we get access: purely speculative
+         */
+        $guid = sprintf(
+            '%s-%s-%s',
+            $title,
+            $startAt->getUnixTimeStamp(),
+            $finishAt->getUnixTimeStamp()
+        );
 
         /* This is pretty optional - this is the sis' equivalent of our luEventType
          * Sometimes it's provided, sometimes it's not - we can record it here if
          * possible. If you can't get it, dw about it
+         *
+         * TODO Fill in when we get access: purely speculative
+         *  Might be either of classification, eventCategoryName, eventClosureCategoryName
+         *  or its description counterparts.
          */
-        $type = '';
+        $type = trim((string)$data['eventCategoryName']);
 
         /* Try to recycle based on guid
          */
@@ -148,12 +160,13 @@ class NonAcademicEvents implements IStrategy
         $event
             ->setTitle($title)
             ->setDetail($detail)
-            ->setLocation($room)
+            ->setLocation($location)
             ->setCode($classCode)
             ->setDay($day)
             ->setPeriod($period)
             ->setStartAt($startAt)
             ->setFinishAt($finishAt)
+            ->setAllday($allDay)
             ->setType($type)
             ->setClassification(\Schoolbox\External\Event\Model::CLASSIFICATION_EVENT)
             ->setGuid($guid)
@@ -193,28 +206,27 @@ class NonAcademicEvents implements IStrategy
      * @throws \UnexpectedValueException
      */
     private function createInvolvements(
-        array $activity,
-        array $activityInstance,
-        array $enrolments,
-        array $staffLookup,
+        array $data,
         \Schoolbox\External\Event\Model $event
     ): void {
         /* Name is the same as the Code, in compass
          */
-        $activityName = trim((string)$activity['name']);
+        $title = $event->getTitle();
 
         /* Alternatively, this might also have additional participating teachers
          * Everyone in it is going
          */
-        if (!\count($enrolments['teachers'])) {
+        if (!\count($data['staff'])) {
             $this->log->debug(sprintf(
                 '%s: no additional teachers involved',
-                $activityName
+                $title
             ));
         } else {
-            foreach ($enrolments['teachers'] as $externalId) {
+            foreach ($data['staff'] as $staff) {
                 $this->saveStaffInvolvement($event, [
-                    'externalId' => $externalId
+                    /* TODO convert this to an actual external id via hash lookup
+                     */
+                    'externalId' => $staff['personId']
                 ]);
             }
         }
@@ -222,14 +234,18 @@ class NonAcademicEvents implements IStrategy
         /* Save sis_class_user involvements
          * This is the student(s) and they're associated with all instances
          */
-        if (!\count($enrolments['students'])) {
+        if (!\count($data['students'])) {
             $this->log->debug(sprintf(
                 '%s: no students involved',
-                $activityName
+                $title
             ));
         } else {
-            foreach ($enrolments['students'] as $externalId) {
-                $this->saveStudentInvolvement($event, $externalId);
+            foreach ($data['students'] as $student) {
+                /* TODO convert this to an actual external id via hash lookup
+                 */
+                $this->saveStudentInvolvement($event, [
+                    'externalId' => $student['personId']
+                ]);
             }
         }
     }
@@ -286,18 +302,18 @@ class NonAcademicEvents implements IStrategy
      */
     private function saveStudentInvolvement(
         \Schoolbox\External\Event\Model $event,
-        string $externalId
+        array $student
     ): void {
         /* We use the Overrides system to specify a particular person's involvement
          * in a particular sis_event instance, rather than being associated with all
          */
         $involvement = $this->eventUserMapper->createModel()
             ->setEventId($event->getId())
-            ->setExternalId($externalId);
+            ->setExternalId($student['externalId']);
 
         $this->log->debug(sprintf(
             'Creating new override for %s in timetable event %s - %s-%s',
-            $externalId,
+            $student['externalId'],
             $event->getTitle(),
             $event->getStartAt()->getDatabase(),
             $event->getFinishAt()->getDatabase()
