@@ -21,7 +21,6 @@ use Schoolbox\API\Token\JwtParser\IParser;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\GenericCollection;
 use Schoolbox\LTI\KeyChain\RepositoryFactory;
-use Schoolbox\Oidc\Server\RelyingParty\User\Scope\Model;
 use Schoolbox\Url\Factory;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -89,20 +88,22 @@ class Controller extends Base
 
         // Load the relying party and the auth for the current user.
         // If it's accepted already, skip asking for permission.
-        $relyingParty = $this->relyingPartyMapper->findByClientId($authRequest->getClient()->getIdentifier());
-
-        // For now, assume if a permission exists that it was granted to all
-        // scopes:
-        // TODO check if the requested scope is different to what is granted
+        $relyingParty     = $this->relyingPartyMapper->findByClientId($authRequest->getClient()->getIdentifier());
         $relyingPartyUser = $this->relyingPartyUserMapper->findByRelyingPartyAndUser($relyingParty, $this->getUser());
+        $requestedScopes  = $this->convertAuthRequestScopesToCollection($authRequest);
 
+        // If permission was not passed in the request:
+        // * if new scopes have been requested, re-ask for permission
+        // * if granted permission has expired, re-ask for permission
+        // * otherwise, don't ask if permission already granted
         $permission = $this->requestPost->getBool('permission');
         if (!isset($permission)) {
-            // Permission not passed in request?
-            // If so, auto-grant if the user has already granted permission,
-            // and it hasn't expired.
-            if ($relyingPartyUser && !$relyingPartyUser->isExpired(Alaress_Date_Format::now())) {
-                $permission = true;
+            if ($relyingPartyUser) {
+                if ($requestedScopes->diffBy($relyingPartyUser->getScopes(), 'scope')->count() > 0) {
+                    $permission = null;
+                } elseif (!$relyingPartyUser->isExpired(Alaress_Date_Format::now())) {
+                    $permission = true;
+                }
             }
         }
 
@@ -118,6 +119,7 @@ class Controller extends Base
                     'authRequest'      => $authRequest,
                     // Separate variable, as this isn't a standard scope name.
                     'schoolboxScope'   => Repository\Scope::SCOPE_SCHOOLBOX,
+                    'relyingPartyUser' => $relyingPartyUser,
                 ],
             );
         } else {
@@ -142,9 +144,7 @@ class Controller extends Base
                 }
                 if ($updateRelyingPartyUser) {
                     // Set expiry and scopes
-                    $newScopes = $this->convertAuthRequestScopesToCollection($authRequest);
-                    $relyingPartyUser->setScopes($newScopes);
-
+                    $relyingPartyUser->setScopes($requestedScopes);
                     $relyingPartyUser = $relyingPartyUser
                         ->setExpiresAt(Alaress_Date_Format::now()->addMonths(3));
                     $this->relyingPartyUserMapper->save($relyingPartyUser);
@@ -321,6 +321,9 @@ class Controller extends Base
     }
 
     /**
+     * Convert the scopes from an auth request into a set of scopes for the
+     * granted permission.
+     *
      * @param Server\RequestTypes\AuthorizationRequest $authRequest
      * @return GenericCollection<RelyingParty\User\Scope\Model>
      */

@@ -191,8 +191,8 @@ class Mapper extends BaseMapper
         if (!$previous) {
             $scopeMapper->save($model->getScopes());
         } else {
-            $scopeMapper->save($model->getScopes()->diff($previous->getScopes(), $scopeMapper->compareScopes(...)));
-            $scopeMapper->delete($previous->getScopes()->diff($model->getScopes(), $scopeMapper->compareScopes(...)));
+            $scopeMapper->save($model->getScopes()->diffBy($previous->getScopes(), 'scope'));
+            $scopeMapper->delete($previous->getScopes()->diffBy($model->getScopes(), 'scope'));
         }
         return true;
     }
