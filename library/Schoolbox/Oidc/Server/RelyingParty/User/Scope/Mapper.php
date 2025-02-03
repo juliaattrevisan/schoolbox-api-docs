@@ -43,4 +43,18 @@ class Mapper extends BaseMapper
         );
         $this->uses('scope', self::TYPE_STRING);
     }
+
+
+    /**
+     * Comparator for scope objects: they are considered the same if they have
+     * the same scope value.
+     *
+     * @param Model $a
+     * @param Model $b
+     * @return bool
+     */
+    public function compareScopes(Model $a, Model $b): bool
+    {
+        return $a->getScope() === $b->getScope();
+    }
 }

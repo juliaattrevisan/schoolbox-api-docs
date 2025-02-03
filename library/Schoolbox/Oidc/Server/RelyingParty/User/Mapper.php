@@ -65,6 +65,8 @@ class Mapper extends BaseMapper
         $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
         $this->uses('updated_at', self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP);
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
+        $this->registerCallback(self::CALLBACK_PRESAVE, $this->assertScopeRelation(...));
+        $this->registerCallback(self::CALLBACK_POSTSAVE, $this->persistScopes(...));
     }
 
 
@@ -149,5 +151,49 @@ class Mapper extends BaseMapper
                 'order' => ['expires_at' => self::SORT_ORDER_DESC],
             ],
         )->first();
+    }
+
+    /**
+     * Pre-save callback: assert that the grant's scope objects are not
+     * associated with another grant.
+     *
+     * @param Model $model
+     * @return bool
+     */
+    public function assertScopeRelation(Model $model): bool
+    {
+        /** @var Scope\Mapper $scopeMapper */
+        $scopeMapper = $this->getJoinMapper('scope');
+        foreach ($model->getScopes() as $scope) {
+            $scope->setRelyingPartyUser($model);
+            if ($scope->getId()) {
+                $scopeMapper->assertJoinedModelNotChanged($scope, 'relyingPartyUser');
+            }
+        }
+        return true;
+    }
+
+    /**
+     * Post-save callback: persist scopes associated with the saved grant.
+     *
+     * This also deletes scopes which were a part of the previous grant, but are
+     * not part of the new one.
+     *
+     * @param Model      $model
+     * @param Model|null $previous
+     * @return bool Always returns true
+     * @throws BaseMapper\Exception
+     */
+    public function persistScopes(Model $model, ?Model $previous = null): bool
+    {
+        /** @var Scope\Mapper $scopeMapper */
+        $scopeMapper = $this->getJoinMapper('scope');
+        if (!$previous) {
+            $scopeMapper->save($model->getScopes());
+        } else {
+            $scopeMapper->save($model->getScopes()->diff($previous->getScopes(), $scopeMapper->compareScopes(...)));
+            $scopeMapper->delete($previous->getScopes()->diff($model->getScopes(), $scopeMapper->compareScopes(...)));
+        }
+        return true;
     }
 }

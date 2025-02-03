@@ -93,7 +93,7 @@ class Controller extends Base
 
         // For now, assume if a permission exists that it was granted to all
         // scopes:
-        // later, check if the requested scope has changed.
+        // TODO check if the requested scope is different to what is granted
         $relyingPartyUser = $this->relyingPartyUserMapper->findByRelyingPartyAndUser($relyingParty, $this->getUser());
 
         $permission = $this->requestPost->getBool('permission');
@@ -142,23 +142,12 @@ class Controller extends Base
                 }
                 if ($updateRelyingPartyUser) {
                     // Set expiry and scopes
-                    $newScopes = $this->relyingPartyUserScopeMapper->createCollection();
-                    foreach ($authRequest->getScopes() as $scope) {
-                        $newScopes->add(
-                            $this->relyingPartyUserScopeMapper->createModel()
-                                ->setRelyingPartyUser($relyingPartyUser)
-                                ->setScope($scope->getIdentifier())
-                        );
-                    }
-                    $comparator = fn (RelyingParty\User\Scope\Model $a, RelyingParty\User\Scope\Model $b) => $a->getScope() === $b->getScope();
-                    $savedScopes   = $newScopes->diff($relyingPartyUser->getScopes(), $comparator);
-                    $deletedScopes = $relyingPartyUser->getScopes()->diff($newScopes, $comparator);
+                    $newScopes = $this->convertAuthRequestScopesToCollection($authRequest);
+                    $relyingPartyUser->setScopes($newScopes);
 
                     $relyingPartyUser = $relyingPartyUser
                         ->setExpiresAt(Alaress_Date_Format::now()->addMonths(3));
                     $this->relyingPartyUserMapper->save($relyingPartyUser);
-                    $this->relyingPartyUserScopeMapper->save($savedScopes);
-                    $this->relyingPartyUserScopeMapper->delete($deletedScopes);
                 }
 
                 $client           = $authRequest->getClient();
@@ -329,5 +318,22 @@ class Controller extends Base
         } else {
             $this->response = $this->responseAsJson($idTokenClaims);
         }
+    }
+
+    /**
+     * @param Server\RequestTypes\AuthorizationRequest $authRequest
+     * @return GenericCollection<RelyingParty\User\Scope\Model>
+     */
+    private function convertAuthRequestScopesToCollection(
+        Server\RequestTypes\AuthorizationRequest $authRequest,
+    ): GenericCollection {
+        $newScopes = $this->relyingPartyUserScopeMapper->createCollection();
+        foreach ($authRequest->getScopes() as $scope) {
+            $newScopes->add(
+                $this->relyingPartyUserScopeMapper->createModel()
+                    ->setScope($scope->getIdentifier())
+            );
+        }
+        return $newScopes;
     }
 }
