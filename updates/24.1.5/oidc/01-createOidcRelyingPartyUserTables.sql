@@ -17,12 +17,12 @@ create table oidc_relying_party_user
 
 create table oidc_relying_party_user_scope
 (
-    id                    int unsigned auto_increment primary key,
-    oidc_relying_party_id int unsigned not null,
-    scope                 varchar(64)  not null,
+    id                         int unsigned auto_increment primary key,
+    oidc_relying_party_user_id int unsigned not null,
+    scope                      varchar(64)  not null,
     constraint oidc_relying_party_user_scope_oidc_relying_party_user_id_fk
-        foreign key (oidc_relying_party_id) references oidc_relying_party_user (id)
+        foreign key (oidc_relying_party_user_id) references oidc_relying_party_user (id)
 );
 
 create unique index oidc_relying_party_user_scope_oidc_relying_party_id_scope_uindex
-    on oidc_relying_party_user_scope (oidc_relying_party_id, scope);
+    on oidc_relying_party_user_scope (oidc_relying_party_user_id, scope);
