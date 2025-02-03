@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace Schoolbox\Oidc\Server\RelyingParty\User;
 
 use Alaress_Date_Format;
+use Schoolbox\GenericCollection;
 use Schoolbox\Mapper\Traits\Model\CreatedAtDate;
 use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
 use Schoolbox\Mapper\Traits\Model\Id;
@@ -42,6 +43,13 @@ class Model
      * When does the access expire?
      */
     private Alaress_Date_Format $expiresAt;
+
+    /**
+     * The list of scopes this user has granted access to.
+     *
+     * @var GenericCollection<Scope\Model>
+     */
+    private GenericCollection $scopes;
 
     /**
      * @return Alaress_Date_Format

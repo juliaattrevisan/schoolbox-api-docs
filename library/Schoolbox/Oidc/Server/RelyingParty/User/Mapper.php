@@ -54,6 +54,12 @@ class Mapper extends BaseMapper
             'user',
             'user',
         );
+        $this->joinsReverseMulti(
+            'oidc_relying_party_user_id',
+            Scope\Mapper::class,
+            'scopes',
+            'scopes',
+        );
 
         $this->uses('expires_at', self::TYPE_DATETIME);
         $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
