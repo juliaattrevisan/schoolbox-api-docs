@@ -31,6 +31,7 @@ use Schoolbox\Config\ConfigMapper;
 use Schoolbox\External\ClassEntryMapper;
 use Schoolbox\External\Connector\DSNFactory;
 use Schoolbox\External\Connector\Liss\Base\Endpoint\PayloadList;
+use Schoolbox\External\Connector\ValidStrats;
 use Schoolbox\External\Event\Export\Classes;
 use Schoolbox\External\Event\Export\Timetable;
 use Schoolbox\External\Importer\Endpoint;
@@ -187,6 +188,18 @@ class Controller extends ConfigController
                 /* A flash message to tell users to w8
                  */
                 'hasPerformUpdate' => $hasPerformUpdate,
+                /* These are strats allowed by the cli
+                 *
+                 * They've been aliased for convenience, though these were originally diagnostic
+                 * so they might sound a bit funny to be on the ui if you're used to them.
+                 *
+                 * FIXME Maybe move these aliases into ValidStrats itself, for SPOC
+                 */
+                'strats' => [
+                    'full' => implode(',', [ValidStrats::FAMILIES, ValidStrats::STAFF, ValidStrats::TIMETABLE]),
+                    'profiles' => implode(',', [ValidStrats::FAMILIES, ValidStrats::STAFF]),
+                    'timetable' => ValidStrats::TIMETABLE
+                ],
                 /* Decide if the current suds selection uses the cyclic grid
                  */
                 'cyclicGrid' => !(new ValidUsesScheduleTimetable())->isSatisfiedBy($externalType, $dataSource, $timetableView)

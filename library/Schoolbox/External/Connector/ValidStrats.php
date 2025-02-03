@@ -34,24 +34,25 @@ class ValidStrats
     private const STRATS = [
         /* Loads staff profiles
          */
-        'staff',
+        self::STAFF,
 
         /* Loads students' profiles only, excluding parents
          */
-        'student',
+        self::STUDENT,
 
         /* Loads student+parent profiles together
          */
-        'families',
+        self::FAMILIES,
 
         /* Loads all timetable-related stuff
          */
-        'timetable',
+        self::TIMETABLE,
 
         /* Loads all photos
          */
-        'photo',
+        self::PHOTO,
     ];
+
 
     /**
      * After processing $csvArgs we remember what was valid

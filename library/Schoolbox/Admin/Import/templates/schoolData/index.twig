@@ -235,9 +235,9 @@
                         <sbx-pop-out content-id="suds-options"></sbx-pop-out>
                     </nav>
                     <ul id="suds-options" class="f-dropdown" data-dropdown-content>
-                        <li><a data-perform-update="families,staff,timetable" href='#' class="icon-export" title="Update profile and timetable data for students, parents and staff">Perform Live Update</a></li>
-                        <li><a data-perform-update="families,staff" href='#' class="icon-export" title="Update all profile data for students, parents and staff">Update all profiles only</a></li>
-                        <li><a data-perform-update="timetable" href='#' class="icon-export" title="Update timetables for students, parents and staff">Update all timetables only</a></li>
+                        <li><a data-perform-update="{{ strats.full }}" href='#' class="icon-export" title="Update profile and timetable data for students, parents and staff">Perform Live Update</a></li>
+                        <li><a data-perform-update="{{ strats.profiles }}" href='#' class="icon-export" title="Update all profile data for students, parents and staff">Update all profiles only</a></li>
+                        <li><a data-perform-update="{{ strats.timetable }}" href='#' class="icon-export" title="Update timetables for students, parents and staff">Update all timetables only</a></li>
                     </ul>
                     {% endif %}
                 </div>
