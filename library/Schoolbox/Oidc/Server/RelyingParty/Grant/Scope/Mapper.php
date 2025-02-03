@@ -7,10 +7,10 @@
 
 declare(strict_types=1);
 
-namespace Schoolbox\Oidc\Server\RelyingParty\User\Scope;
+namespace Schoolbox\Oidc\Server\RelyingParty\Grant\Scope;
 
 use Schoolbox\GenericCollection;
-use Schoolbox\Oidc\Server\RelyingParty\User\Mapper as RelyingPartyUserMapper;
+use Schoolbox\Oidc\Server\RelyingParty\Grant\Mapper as RelyingPartyUserMapper;
 use Schoolbox\Pastoral\BaseMapper;
 
 /**

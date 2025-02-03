@@ -12,14 +12,13 @@ use Alaress\Session\ImpersonationCheck;
 use Alaress\Web\Controller\Base;
 use GuzzleHttp\ClientInterface;
 use Schoolbox\Oidc\Server\BackChannelLogout\RequestFactory;
-use Schoolbox\Oidc\Server\RelyingParty\User\Mapper as RelyingPartyUserMapper;
+use Schoolbox\Oidc\Server\RelyingParty\Grant\Mapper as RelyingPartyGrantMapper;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\User;
 use User\Logger;
 use Ramsey\Uuid\Uuid;
 use Schoolbox\Oidc\Server\RelyingParty\Mapper as RelyingPartyMapper;
 use Schoolbox\Oidc\Server\BackChannelLogout;
-use Schoolbox\Oidc\Server\Controller as OidcServerController;
 
 class Controller extends Base
 {
@@ -41,7 +40,7 @@ class Controller extends Base
         UserAccessMapper $userAccessMapper,
         Logger\Mapper $assumeUserLogMapper,
         RelyingPartyMapper $relyingPartyMapper,
-        private RelyingPartyUserMapper $relyingPartyUserMapper,
+        private RelyingPartyGrantMapper $relyingPartyGrantMapper,
         RequestFactory $requestFactory,
         ClientInterface $httpClient,
     ) {
@@ -169,7 +168,7 @@ class Controller extends Base
     {
         // This is similar to what's implemented in www/logout.php when user logs out
         $backChannelRequests = [];
-        foreach ($this->relyingPartyUserMapper->findByUser($initialUser) as $relyingPartyUser) {
+        foreach ($this->relyingPartyGrantMapper->findByUser($initialUser) as $relyingPartyUser) {
             // Does this client support logout?
             // If so, craft a logout token and send it
             $client = $relyingPartyUser->getRelyingParty();

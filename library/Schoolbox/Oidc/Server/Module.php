@@ -173,8 +173,8 @@ class Module extends BaseModule
             $this->injector->get('user.jwtParser'),
             $claimExtractor,
             $this->getMapperFactory()->get(RelyingParty\Mapper::class),
-            $this->getMapperFactory()->get(RelyingParty\User\Mapper::class),
-            $this->getMapperFactory()->get(RelyingParty\User\Scope\Mapper::class),
+            $this->getMapperFactory()->get(RelyingParty\Grant\Mapper::class),
+            $this->getMapperFactory()->get(RelyingParty\Grant\Scope\Mapper::class),
         );
     }
 }

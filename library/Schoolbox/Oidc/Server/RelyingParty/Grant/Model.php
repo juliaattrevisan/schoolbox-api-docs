@@ -7,7 +7,7 @@
 
 declare(strict_types=1);
 
-namespace Schoolbox\Oidc\Server\RelyingParty\User;
+namespace Schoolbox\Oidc\Server\RelyingParty\Grant;
 
 use Alaress_Date_Format;
 use Schoolbox\GenericCollection;

@@ -42,20 +42,20 @@ class Controller extends Base
     /**
      * Constructor
      *
-     * @param Server\AuthorizationServer     $authServer                  The authorization server used to service OIDC
-     *                                                                    auth requests.
-     * @param KeyChainRepositoryInterface    $keyChains                   Repository of keychains: set up for LTI, but
-     *                                                                    usable outside of that context.
-     * @param IParser                        $jwtParser                   JWT parser, for extracting a user out of an
-     *                                                                    access token.
-     * @param ClaimExtractor                 $claimExtractor              Claim extractor: used to filter claims shown
-     *                                                                    in userinfo.
-     * @param RelyingParty\Mapper            $relyingPartyMapper          Mapper for loading relying parties from the
-     *                                                                    auth request.
-     * @param RelyingParty\User\Mapper       $relyingPartyUserMapper      Mapper for saving that a user has granted
-     *                                                                    access to a relying party.
-     * @param RelyingParty\User\Scope\Mapper $relyingPartyUserScopeMapper Mapper for saving the scopes a user has
-     *                                                                    granted to a relying party.
+     * @param Server\AuthorizationServer      $authServer                   The authorization server for servicing OIDC
+     *                                                                      auth requests.
+     * @param KeyChainRepositoryInterface     $keyChains                    Repository of keychains: set up for LTI, but
+     *                                                                      usable outside of that context.
+     * @param IParser                         $jwtParser                    JWT parser, for extracting a user out of an
+     *                                                                      access token.
+     * @param ClaimExtractor                  $claimExtractor               Claim extractor: used to filter claims shown
+     *                                                                      in userinfo.
+     * @param RelyingParty\Mapper             $relyingPartyMapper           Mapper for loading relying parties from the
+     *                                                                      auth request.
+     * @param RelyingParty\Grant\Mapper       $relyingPartyGrantMapper      Mapper for saving that a user has granted
+     *                                                                      access to a relying party.
+     * @param RelyingParty\Grant\Scope\Mapper $relyingPartyGrantScopeMapper Mapper for saving the scopes a user has
+     *                                                                      granted to a relying party.
      */
     public function __construct(
         private Server\AuthorizationServer $authServer,
@@ -63,8 +63,8 @@ class Controller extends Base
         private IParser $jwtParser,
         private ClaimExtractor $claimExtractor,
         private RelyingParty\Mapper $relyingPartyMapper,
-        private RelyingParty\User\Mapper $relyingPartyUserMapper,
-        private RelyingParty\User\Scope\Mapper $relyingPartyUserScopeMapper,
+        private RelyingParty\Grant\Mapper $relyingPartyGrantMapper,
+        private RelyingParty\Grant\Scope\Mapper $relyingPartyGrantScopeMapper,
     ) {
     }
 
@@ -89,7 +89,7 @@ class Controller extends Base
         // Load the relying party and the auth for the current user.
         // If it's accepted already, skip asking for permission.
         $relyingParty     = $this->relyingPartyMapper->findByClientId($authRequest->getClient()->getIdentifier());
-        $relyingPartyUser = $this->relyingPartyUserMapper->findByRelyingPartyAndUser($relyingParty, $this->getUser());
+        $relyingPartyUser = $this->relyingPartyGrantMapper->findByRelyingPartyAndUser($relyingParty, $this->getUser());
         $requestedScopes  = $this->convertAuthRequestScopesToCollection($authRequest);
         $grantExpired     = $relyingPartyUser && $relyingPartyUser->isExpired(Alaress_Date_Format::now());
         $scopeChanged     = $relyingPartyUser
@@ -137,10 +137,10 @@ class Controller extends Base
                 // Save user's grant of permission
                 $updateRelyingPartyUser = false;
                 if (!$relyingPartyUser) {
-                    $relyingPartyUser = $this->relyingPartyUserMapper->createModel()
+                    $relyingPartyUser = $this->relyingPartyGrantMapper->createModel()
                         ->setUser($this->getUser())
                         ->setRelyingParty($relyingParty)
-                        ->setScopes($this->relyingPartyUserScopeMapper->createCollection());
+                        ->setScopes($this->relyingPartyGrantScopeMapper->createCollection());
                     $updateRelyingPartyUser = true;
                 } elseif ($scopeChanged || $grantExpired) {
                     $updateRelyingPartyUser = true;
@@ -150,7 +150,7 @@ class Controller extends Base
                     $relyingPartyUser->setScopes($requestedScopes);
                     $relyingPartyUser = $relyingPartyUser
                         ->setExpiresAt(Alaress_Date_Format::now()->addMonths(3));
-                    $this->relyingPartyUserMapper->save($relyingPartyUser);
+                    $this->relyingPartyGrantMapper->save($relyingPartyUser);
                 }
 
                 $client           = $authRequest->getClient();
@@ -328,15 +328,15 @@ class Controller extends Base
      * granted permission.
      *
      * @param Server\RequestTypes\AuthorizationRequest $authRequest
-     * @return GenericCollection<RelyingParty\User\Scope\Model>
+     * @return GenericCollection<RelyingParty\Grant\Scope\Model>
      */
     private function convertAuthRequestScopesToCollection(
         Server\RequestTypes\AuthorizationRequest $authRequest,
     ): GenericCollection {
-        $newScopes = $this->relyingPartyUserScopeMapper->createCollection();
+        $newScopes = $this->relyingPartyGrantScopeMapper->createCollection();
         foreach ($authRequest->getScopes() as $scope) {
             $newScopes->add(
-                $this->relyingPartyUserScopeMapper->createModel()
+                $this->relyingPartyGrantScopeMapper->createModel()
                     ->setScope($scope->getIdentifier())
             );
         }

@@ -7,10 +7,10 @@
 
 declare(strict_types=1);
 
-namespace Schoolbox\Oidc\Server\RelyingParty\User\Scope;
+namespace Schoolbox\Oidc\Server\RelyingParty\Grant\Scope;
 
 use Schoolbox\Mapper\Traits\Model\Id;
-use Schoolbox\Oidc\Server\RelyingParty\User\Model as RelyingPartyGrant;
+use Schoolbox\Oidc\Server\RelyingParty\Grant\Model as RelyingPartyGrant;
 
 /**
  * Model representation of the scopes a user has granted access to, as part of
