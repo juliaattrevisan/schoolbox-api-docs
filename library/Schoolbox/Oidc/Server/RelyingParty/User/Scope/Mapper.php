@@ -9,12 +9,18 @@ declare(strict_types=1);
 
 namespace Schoolbox\Oidc\Server\RelyingParty\User\Scope;
 
+use Schoolbox\GenericCollection;
 use Schoolbox\Oidc\Server\RelyingParty\User\Mapper as RelyingPartyUserMapper;
 use Schoolbox\Pastoral\BaseMapper;
 
 /**
  * Mapper for the scopes which a user has granted access to, as part of granting
  * access to a relying party.
+ *
+ * @method Model createModel($idValue = null)
+ * @method Model findById($identifierValue)
+ * @method GenericCollection<Model> createCollection($contents = [])
+ * @method Model hydrate(array $row, $alias = '', $callback = null)
  */
 class Mapper extends BaseMapper
 {

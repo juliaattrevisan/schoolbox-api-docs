@@ -19,7 +19,9 @@ use OpenIDConnectServer\ClaimExtractor;
 use Schoolbox\API\Token\Jwt;
 use Schoolbox\API\Token\JwtParser\IParser;
 use Schoolbox\Config\ConfigMapper;
+use Schoolbox\GenericCollection;
 use Schoolbox\LTI\KeyChain\RepositoryFactory;
+use Schoolbox\Oidc\Server\RelyingParty\User\Scope\Model;
 use Schoolbox\Url\Factory;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -41,13 +43,20 @@ class Controller extends Base
     /**
      * Constructor
      *
-     * @param Server\AuthorizationServer  $authServer     The authorization server used to service OIDC auth requests.
-     * @param KeyChainRepositoryInterface $keyChains      Repository of keychains: set up for LTI, but usable outside of
-     *                                                    that context.
-     * @param IParser                     $jwtParser
-     * @param ClaimExtractor              $claimExtractor Claim extractor: used to filter claims shown in userinfo.
-     * @param RelyingParty\Mapper         $relyingPartyMapper
-     * @param RelyingParty\User\Mapper    $relyingPartyUserMapper
+     * @param Server\AuthorizationServer     $authServer                  The authorization server used to service OIDC
+     *                                                                    auth requests.
+     * @param KeyChainRepositoryInterface    $keyChains                   Repository of keychains: set up for LTI, but
+     *                                                                    usable outside of that context.
+     * @param IParser                        $jwtParser                   JWT parser, for extracting a user out of an
+     *                                                                    access token.
+     * @param ClaimExtractor                 $claimExtractor              Claim extractor: used to filter claims shown
+     *                                                                    in userinfo.
+     * @param RelyingParty\Mapper            $relyingPartyMapper          Mapper for loading relying parties from the
+     *                                                                    auth request.
+     * @param RelyingParty\User\Mapper       $relyingPartyUserMapper      Mapper for saving that a user has granted
+     *                                                                    access to a relying party.
+     * @param RelyingParty\User\Scope\Mapper $relyingPartyUserScopeMapper Mapper for saving the scopes a user has
+     *                                                                    granted to a relying party.
      */
     public function __construct(
         private Server\AuthorizationServer $authServer,
@@ -56,6 +65,7 @@ class Controller extends Base
         private ClaimExtractor $claimExtractor,
         private RelyingParty\Mapper $relyingPartyMapper,
         private RelyingParty\User\Mapper $relyingPartyUserMapper,
+        private RelyingParty\User\Scope\Mapper $relyingPartyUserScopeMapper,
     ) {
     }
 
@@ -120,15 +130,35 @@ class Controller extends Base
             // easily add it).
             if ($permission) {
                 // Save user's grant of permission
+                $updateRelyingPartyUser = false;
                 if (!$relyingPartyUser) {
                     $relyingPartyUser = $this->relyingPartyUserMapper->createModel()
                         ->setUser($this->getUser())
                         ->setRelyingParty($relyingParty)
+                        ->setScopes($this->relyingPartyUserScopeMapper->createCollection());
+                    $updateRelyingPartyUser = true;
+                } elseif ($relyingPartyUser->isExpired(Alaress_Date_Format::now())) {
+                    $updateRelyingPartyUser = true;
+                }
+                if ($updateRelyingPartyUser) {
+                    // Set expiry and scopes
+                    $newScopes = $this->relyingPartyUserScopeMapper->createCollection();
+                    foreach ($authRequest->getScopes() as $scope) {
+                        $newScopes->add(
+                            $this->relyingPartyUserScopeMapper->createModel()
+                                ->setRelyingPartyUser($relyingPartyUser)
+                                ->setScope($scope->getIdentifier())
+                        );
+                    }
+                    $comparator = fn (RelyingParty\User\Scope\Model $a, RelyingParty\User\Scope\Model $b) => $a->getScope() === $b->getScope();
+                    $savedScopes   = $newScopes->diff($relyingPartyUser->getScopes(), $comparator);
+                    $deletedScopes = $relyingPartyUser->getScopes()->diff($newScopes, $comparator);
+
+                    $relyingPartyUser = $relyingPartyUser
                         ->setExpiresAt(Alaress_Date_Format::now()->addMonths(3));
                     $this->relyingPartyUserMapper->save($relyingPartyUser);
-                } elseif ($relyingPartyUser->isExpired(Alaress_Date_Format::now())) {
-                    $relyingPartyUser->setExpiresAt(Alaress_Date_Format::now()->addMonths(3));
-                    $this->relyingPartyUserMapper->save($relyingPartyUser);
+                    $this->relyingPartyUserScopeMapper->save($savedScopes);
+                    $this->relyingPartyUserScopeMapper->delete($deletedScopes);
                 }
 
                 $client           = $authRequest->getClient();

@@ -115,4 +115,22 @@ class Model
         $this->user = $user;
         return $this;
     }
+
+    /**
+     * @return GenericCollection<Scope\Model>
+     */
+    public function getScopes(): GenericCollection
+    {
+        return $this->scopes;
+    }
+
+    /**
+     * @param GenericCollection<Scope\Model> $scopes
+     * @return $this
+     */
+    public function setScopes(GenericCollection $scopes): self
+    {
+        $this->scopes = $scopes;
+        return $this;
+    }
 }

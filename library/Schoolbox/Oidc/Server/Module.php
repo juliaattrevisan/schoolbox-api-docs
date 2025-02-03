@@ -174,6 +174,7 @@ class Module extends BaseModule
             $claimExtractor,
             $this->getMapperFactory()->get(RelyingParty\Mapper::class),
             $this->getMapperFactory()->get(RelyingParty\User\Mapper::class),
+            $this->getMapperFactory()->get(RelyingParty\User\Scope\Mapper::class),
         );
     }
 }
