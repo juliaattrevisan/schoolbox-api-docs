@@ -58,15 +58,13 @@
         </div>
     </div>
     <nav>
-        {% if routeLookupIfAuthorized('adminUser.getModify') %}
+        {% if isSuperuser and routeLookupIfAuthorized('adminUser.getModify') %}
             <sbx-pop-out content-id="header-options"></sbx-pop-out>
         {% endif %}
     </nav>
+    {% if isSuperuser and routeLookupIfAuthorized('adminUser.getModify') %}
     <ul class="f-dropdown" id="header-options" data-dropdown-content>
-        {% if routeLookupIfAuthorized('adminUser.getModify') %}
         <li><a href="{{ routeLookup('adminUser.getModify', {'userId': user.id}) }}" class="icon-modify" title="Modify User" data-test="user-profile-modify">Modify User</a></li>
-        {% endif %}
-        {% if isSuperuser %}
         <li>
             {% if user.enabled %}
                 <a
@@ -79,8 +77,8 @@
                 <a class="icon-staff-students menu_disabled" title="Account disabled">Impersonate</a>
             {% endif %}
         </li>
-        {% endif %}
     </ul>
+    {% endif %}
 </div>
 
 <div class="row">
