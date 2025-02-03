@@ -32,6 +32,7 @@ use Schoolbox\Pastoral\Tag\Mapper as PastoralTagMapper;
 use Schoolbox\Pastoral\Tag\Model as PastoralTagsModel;
 use Schoolbox\Pastoral\Translator\VisibilityTranslator;
 use Schoolbox\Pastoral\Type\Mapper as PastoralTypeMapper;
+use Schoolbox\Pastoral\Type\TypeAbstract;
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
 use Schoolbox\Resource\Storage\Model as Storage;
 use Schoolbox\TokenReplacer;
@@ -250,6 +251,14 @@ class RecordProcessor
                     }
                 }
             }
+
+            $expiresAt = $post->get('expiresAt');
+            if (empty($expiresAt)) {
+                $expiresAt = null;
+            } else {
+                $record->setExpiresAt(\Alaress_Date_Format::newLocalShort($expiresAt)->startOfDay());
+            }
+
             if ($post->get('points')) {
                 $points = $post->getFloat('points');
                 if (!is_numeric($post->get('points')) || $points < -1000000 || $points > 1000000) {
