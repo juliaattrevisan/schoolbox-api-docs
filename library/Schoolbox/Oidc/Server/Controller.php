@@ -110,16 +110,28 @@ class Controller extends Base
         } else {
             $authRequest->setAuthorizationApproved($permission);
 
-            // Save user's grant of permission
-            if (!$relyingPartyUser) {
-                $relyingPartyUser = $relyingPartyUserMapper->createModel()
-                    ->setUser($this->getUser())
-                    ->setRelyingParty($relyingParty)
-                    ->setExpiresAt(Alaress_Date_Format::now()->addMonths(3));
-                $relyingPartyUserMapper->save($relyingPartyUser);
-            } elseif ($relyingPartyUser->isExpired(Alaress_Date_Format::now())) {
-                $relyingPartyUser->setExpiresAt(Alaress_Date_Format::now()->addMonths(3));
-                $relyingPartyUserMapper->save($relyingPartyUser);
+            // At this point, if permission was granted: track that the server
+            // has granted a session to the client.
+            // Currently, only the client can be tracked, not a particular
+            // session ID (as that doesn't exist in the auth code, and I can't
+            // easily add it).
+            if ($permission) {
+                // Save user's grant of permission
+                if (!$relyingPartyUser) {
+                    $relyingPartyUser = $relyingPartyUserMapper->createModel()
+                        ->setUser($this->getUser())
+                        ->setRelyingParty($relyingParty)
+                        ->setExpiresAt(Alaress_Date_Format::now()->addMonths(3));
+                    $relyingPartyUserMapper->save($relyingPartyUser);
+                } elseif ($relyingPartyUser->isExpired(Alaress_Date_Format::now())) {
+                    $relyingPartyUser->setExpiresAt(Alaress_Date_Format::now()->addMonths(3));
+                    $relyingPartyUserMapper->save($relyingPartyUser);
+                }
+
+                $client           = $authRequest->getClient();
+                $currentClients   = $this->getSession()->get(self::SESSION_OIDC_SERVER_CLIENTS, []);
+                $currentClients[] = $client->getIdentifier();
+                $this->getSession()->set(self::SESSION_OIDC_SERVER_CLIENTS, array_unique($currentClients));
             }
 
             try {
