@@ -67,9 +67,6 @@ class Controller extends Base
         $currentUser    = $this->getUser();
         $initialUser    = $this->session->get(ImpersonationCheck::SESSION_KEY_INITIAL_USER);
         $sessionHandler = new \Session();
-        $oidcServerClients = $this->session
-            ->get(OidcServerController::SESSION_OIDC_SERVER_CLIENTS);
-
         if ($sessionHandler->create($user->getUsername())) {
             // Log the user which began impersonation
             $this->session->set(ImpersonationCheck::SESSION_KEY_INITIAL_USER, $initialUser ?? $currentUser);
@@ -95,13 +92,7 @@ class Controller extends Base
             $sessionHandler->create($currentUser->getUsername());
         }
 
-        $this->logoutOIDCSessions(
-            $this->relyingPartyMapper,
-            $this->requestFactory,
-            $this->httpClient,
-            $this->getUser(),
-            $oidcServerClients,
-        );
+        $this->logoutOIDCSessions($this->getUser());
 
         $this->response = $this->redirectFound('/');
     }
@@ -158,20 +149,12 @@ class Controller extends Base
     private function recoverSessionInternal(string $key): void
     {
         $user = $this->session->get($key);
-        $oidcServerClients = $this->session
-            ->get(OidcServerController::SESSION_OIDC_SERVER_CLIENTS);
         if ($user instanceof User) {
             $session = new \Session();
             if (!$session->create($user->getUsername())) {
                 $session->destroy();
             }
-            $this->logoutOIDCSessions(
-                $this->relyingPartyMapper,
-                $this->requestFactory,
-                $this->httpClient,
-                $this->getUser(),
-                $oidcServerClients
-            );
+            $this->logoutOIDCSessions($this->getUser());
         }
         $this->response = $this->redirectFound('/');
     }
@@ -179,20 +162,11 @@ class Controller extends Base
     /**
      * Sending request to log out of the oAuth session
      *
-     * @param RelyingPartyMapper $relyingPartyMapper
-     * @param RequestFactory     $logoutFactory
-     * @param ClientInterface    $httpClient
-     * @param User               $initialUser
-     * @param array|null         $oidcServerClients
+     * @param User $initialUser
      * @return void
      */
-    private function logoutOIDCSessions(
-        RelyingPartyMapper $relyingPartyMapper,
-        RequestFactory $logoutFactory,
-        ClientInterface $httpClient,
-        User $initialUser,
-        ?array $oidcServerClients,
-    ): void {
+    private function logoutOIDCSessions(User $initialUser): void
+    {
         // This is similar to what's implemented in www/logout.php when user logs out
         $backChannelRequests = [];
         foreach ($this->relyingPartyUserMapper->findByUser($initialUser) as $relyingPartyUser) {
@@ -201,13 +175,13 @@ class Controller extends Base
             $client = $relyingPartyUser->getClient();
             if ($client?->getBackChannelLogoutUri()) {
                 // Create logout factory and client on demand only
-                $request = $logoutFactory->build(
+                $request = $this->requestFactory->build(
                     $initialUser,
                     $client,
                     Uuid::uuid4()->toString()
                 );
 
-                $logoutClient                          ??= new BackChannelLogout\Client($httpClient);
+                $logoutClient                          ??= new BackChannelLogout\Client($this->httpClient);
                 $backChannelRequests[$client->getId()] = $logoutClient->send($request);
             }
         }
