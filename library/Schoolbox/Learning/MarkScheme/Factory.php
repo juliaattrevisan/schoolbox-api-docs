@@ -194,12 +194,11 @@ class Factory
 
     /**
      * @param DueWork    $dueWork
-     * @param float|null $totalMark
      * @return IMarkScheme
      * @throws RangeException
      * @throws DomainException
      */
-    protected function spawnForDueWork(DueWork $dueWork, ?float $totalMark = null): IMarkScheme
+    protected function spawnForDueWork(DueWork $dueWork): IMarkScheme
     {
         switch ($dueWork->getMarkType()->getId()) {
             case MarkType::TYPE_PERCENT:
@@ -207,7 +206,7 @@ class Factory
             case MarkType::TYPE_NONE:
                 return new None();
             case MarkType::TYPE_TOTAL:
-                $maxMark = $totalMark ?? $dueWork->getMaxMark();
+                $maxMark = $dueWork->getMaxMark();
                 return new TotalMarkFractional($maxMark);
             case MarkType::TYPE_LETTER:
                 return new LetterGrade($dueWork->getGradeGroup());
