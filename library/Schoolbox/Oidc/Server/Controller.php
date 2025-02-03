@@ -91,6 +91,9 @@ class Controller extends Base
         $relyingParty     = $this->relyingPartyMapper->findByClientId($authRequest->getClient()->getIdentifier());
         $relyingPartyUser = $this->relyingPartyUserMapper->findByRelyingPartyAndUser($relyingParty, $this->getUser());
         $requestedScopes  = $this->convertAuthRequestScopesToCollection($authRequest);
+        $grantExpired     = $relyingPartyUser && $relyingPartyUser->isExpired(Alaress_Date_Format::now());
+        $scopeChanged     = $relyingPartyUser
+            && $requestedScopes->diffBy($relyingPartyUser->getScopes(), 'scope')->count() > 0;
 
         // If permission was not passed in the request:
         // * if new scopes have been requested, re-ask for permission
@@ -99,9 +102,9 @@ class Controller extends Base
         $permission = $this->requestPost->getBool('permission');
         if (!isset($permission)) {
             if ($relyingPartyUser) {
-                if ($requestedScopes->diffBy($relyingPartyUser->getScopes(), 'scope')->count() > 0) {
+                if ($scopeChanged) {
                     $permission = null;
-                } elseif (!$relyingPartyUser->isExpired(Alaress_Date_Format::now())) {
+                } elseif (!$grantExpired) {
                     $permission = true;
                 }
             }
@@ -139,7 +142,7 @@ class Controller extends Base
                         ->setRelyingParty($relyingParty)
                         ->setScopes($this->relyingPartyUserScopeMapper->createCollection());
                     $updateRelyingPartyUser = true;
-                } elseif ($relyingPartyUser->isExpired(Alaress_Date_Format::now())) {
+                } elseif ($scopeChanged || $grantExpired) {
                     $updateRelyingPartyUser = true;
                 }
                 if ($updateRelyingPartyUser) {
