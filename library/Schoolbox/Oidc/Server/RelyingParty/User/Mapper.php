@@ -104,6 +104,17 @@ class Mapper extends BaseMapper
     }
 
     /**
+     * Find all permissions that `$user` has granted.
+     *
+     * @param User $user
+     * @return GenericCollection<Model>
+     */
+    public function findByUser(User $user): GenericCollection
+    {
+        return $this->findByColumn('user_id', $user->getId());
+    }
+
+    /**
      * Finds the user's granted permission to the relying party, if there is
      * one.
      *
