@@ -1068,112 +1068,183 @@ class Helper
 
     /**
      * @param array $filter
-     * @return bool
      */
-    public function validateFilter(array $filter): bool
+    public function validateFilter(array $filter): void
     {
-        $stringFields  = [
-            'title'       => true,
-            'folder'      => ['code'],
-            'subjectCode' => [],
-            'workType'    => ['name'],
-            'yearLevel'   => ['name'],
-        ];
-        $numericFields = [
-            'assessmentId' => true,
-            'folder'       => ['id'],
-            'workType'     => ['id'],
-            'yearLevel'    => ['id'],
-            'project'      => ['id'],
-        ];
-        $enumFields    = [
-            'assessmentType' => [
-                AssessmentType::TYPE_TASK,
-                AssessmentType::TYPE_QUIZ,
-                AssessmentType::TYPE_LTI_ASSESSMENT,
-                AssessmentType::TYPE_DUE_WORK,
-                AssessmentType::TYPE_PROJECT,
-                AssessmentType::TYPE_LESSON_PLAN
-            ],
-        ];
-        $dateFields    = [
-            'dueDate' => ['from', 'to'],
-        ];
-        $booleanFields = [
-            'weighted' => true,
-        ];
-        foreach ($filter as $filterName => $filterValue) {
-            $found = false;
-            // string
-            if (isset($stringFields[$filterName])) {
-                if (is_array($stringFields[$filterName])) {
-                    if (!is_array($filterValue)) {
-                        throw new SchoolboxException("Filter $filterName must be an array.");
+        foreach ($filter as $key => $value) {
+            switch ($key) {
+                case 'assessmentId':
+                    if (!is_numeric($value)) {
+                        throw new SchoolboxException("Filter 'assessmentId' must have a numeric value.");
                     }
-                    foreach ($stringFields[$filterName] as $fieldAttribute) {
-                        if (isset($filterValue[$fieldAttribute]) && !is_string($filterValue[$fieldAttribute])) {
-                            throw new SchoolboxException("Filter $filterName - $filterValue[$fieldAttribute] must be a string.");
+                    break;
+                case 'title':
+                    if (!is_string($value)) {
+                        throw new SchoolboxException("Filter 'title' must have a string value.");
+                    }
+                    break;
+                case 'assessmentType':
+                    if (
+                        !in_array(
+                            $value,
+                            [
+                                AssessmentType::TYPE_TASK,
+                                AssessmentType::TYPE_QUIZ,
+                                AssessmentType::TYPE_LTI_ASSESSMENT,
+                                AssessmentType::TYPE_DUE_WORK,
+                                AssessmentType::TYPE_PROJECT,
+                                AssessmentType::TYPE_LESSON_PLAN
+                            ]
+                        )
+                    ) {
+                        throw new SchoolboxException("Filter 'assessmentType' has unexpected enum value.");
+                    }
+                    break;
+                case 'folder':
+                    if (!is_array($value)) {
+                        // Note 'object' in the exception below refers to JSON objects.  JSON objects will appear here as arrays.
+                        throw new SchoolboxException("Filter 'folder' must be a object or an array of objects.");
+                    }
+                    $this->validateFilterFolderValue($value);
+                    break;
+                case 'subjectCode':
+                    if (!is_array($value)) {
+                        throw new SchoolboxException("Filter 'subjectCode' must be an array of strings.");
+                    }
+                    foreach ($value as $code) { // Ignore the keys in this array.
+                        if (!is_string($code)) {
+                            throw new SchoolboxException("Filter 'subjectCode' contains an item that is not a string.");
                         }
                     }
-                } elseif (!is_string($filterValue)) {
-                    throw new SchoolboxException("Filter $filterName - $filterName must be a string.");
-                }
-                $found = true;
-            }
-            // numeric
-            if (isset($numericFields[$filterName])) {
-                if (is_array($numericFields[$filterName])) {
-                    foreach ($numericFields[$filterName] as $fieldAttribute) {
-                        if (isset($filterValue[$fieldAttribute]) && !is_numeric($filterValue[$fieldAttribute])) {
-                            throw new SchoolboxException("Filter $filterName - $filterValue[$fieldAttribute] must be a number.");
-                        }
+                    break;
+                case 'weighted':
+                    if (!is_bool((new Values([$value]))->getBool(0))) {
+                        throw new SchoolboxException("Filter 'weighted' must have a boolean value.");
                     }
-                } elseif (!is_numeric($filterValue)) {
-                    throw new SchoolboxException("Filter $filterName - $filterValue must be a number.");
-                }
-                $found = true;
-            }
-            // bool
-            if (isset($booleanFields[$filterName])) {
-                if (!is_bool((new Values([$filterValue]))->getBool(0))) {
-                    throw new SchoolboxException("Filter $filterName - $filterValue must be a boolean.");
-                }
-                $found = true;
-            }
-            // date
-            if (isset($dateFields[$filterName])) {
-                if (!is_array($filterValue)) {
-                    throw new SchoolboxException("Filter $filterName must be an array.");
-                }
-                foreach ($dateFields[$filterName] as $fieldAttribute) {
-                    if (!isset($filterValue[$fieldAttribute])) {
-                        continue;
+                    break;
+                case 'workType':
+                    if (
+                        !is_array($value) ||
+                        count($value) !== 1 ||
+                        !(
+                            (array_key_exists('id', $value) && is_numeric($value['id'])) ||
+                            (array_key_exists('name', $value) && is_numeric($value['name']))
+                        )
+                    ) {
+                        // Note 'object' in the exception below refers to JSON objects.  JSON objects will appear here as arrays.
+                        throw new SchoolboxException('Filter \'workType\' must be an object like {"id": integer} or {"name": string}.');
                     }
-                    if (!is_string($filterValue[$fieldAttribute])) {
-                        throw new SchoolboxException("Filter $filterName - $fieldAttribute must be a string.");
+                    break;
+                case 'dueDate':
+                    if (!is_array($value)) {
+                        // Note 'object' in the exception below refers to JSON objects.  JSON objects will appear here as arrays.
+                        throw new SchoolboxException(
+                            'Filter \'dueDate\' must be an object like {"from": date-time, "to": date-time}.' .
+                            '  Note either attribute may be omitted, but not both.'
+                        );
                     }
-                    try {
-                        $date = new \Alaress_Date_Format($filterValue[$fieldAttribute], [
-                            DATE_RFC3339,
-                            DATE_RFC3339_EXTENDED,
-                        ]);
-                    } catch (\Exception $e) {
-                        throw new SchoolboxException("Failed to parse date from $filterName - {$filterValue[$fieldAttribute]}.");
+                    $this->validateFilterDueDateValue($value);
+                    break;
+                case 'yearLevel':
+                    if (
+                        !is_array($value) ||
+                        count($value) !== 1 ||
+                        !(
+                            (array_key_exists('id', $value) && is_numeric($value['id'])) ||
+                            (array_key_exists('name', $value) && is_numeric($value['name']))
+                        )
+                    ) {
+                        // Note 'object' in the exception below refers to JSON objects.  JSON objects will appear here as arrays.
+                        throw new SchoolboxException('Filter \'yearLevel\' must be an object like {"id": integer, "name": string}.');
                     }
-                }
-                $found = true;
-            }
-            // enum
-            if (isset($enumFields[$filterName])) {
-                if (!in_array($filterValue, $enumFields[$filterName])) {
-                    throw new SchoolboxException("$filterValue must be one of " . implode(',', $enumFields[$filterName]));
-                }
-                $found = true;
-            }
-            if (!$found) {
-                throw new SchoolboxException("Unknown filter $filterName.");
+                    break;
+                case 'project':
+                    if (
+                        !is_array($value) ||
+                        count($value) !== 1 ||
+                        (array_key_exists('id', $value) && is_numeric($value['id']))
+                    ) {
+                        // Note 'object' in the exception below refers to JSON objects.  JSON objects will appear here as arrays.
+                        throw new SchoolboxException('Filter \'project\' must be an object like {"id": integer}.');
+                    }
+                    break;
+                default:
+                    throw new SchoolboxException("Unexpected filter key '$key'.");
             }
         }
-        return true;
+    }
+
+    /**
+     * @param array $value
+     */
+    private function validateFilterFolderValue(array $value): void
+    {
+        if (array_key_exists('id', $value)) {
+            // Expect $value to contain an array like ['id' => $integer].
+            if (count($value) > 1) {
+                throw new SchoolboxException(
+                    "Filter 'folder' contains a key 'id', plus other items." .
+                    "  If key 'id' is present there should be no other items."
+                );
+            }
+        } else {
+            // Expect $value to contain an array like the following.
+            // Note each sub-array should contain a single key, which is either 'id' or 'code'.
+            // [
+            //    ['id' => $integer],
+            //    ['code' => $integer],
+            //    ['id' => $integer],
+            //    ...
+            // ]
+            foreach ($value as $subArray) { // Ignore the keys in this array.
+                if (!is_array($subArray)) {
+                    throw new SchoolboxException("Filter 'folder' contains an unexpected item.");
+                }
+
+                if (count($subArray) > 1) {
+                    throw new SchoolboxException(
+                        "Each item in the filter 'folder' should contain one key:value pair." .
+                        "  The only keys expected are 'id' and 'code'."
+                    );
+                }
+
+                if (array_key_exists('id', $subArray) && !is_numeric($subArray['id'])) {
+                    throw new SchoolboxException("The 'folder' filter contains an item whose 'id' value is not numeric.");
+                }
+
+                if (array_key_exists('code', $subArray) && !is_string($subArray['code'])) {
+                    throw new SchoolboxException("The 'folder' filter contains an item whose 'code' value is not a string.");
+                }
+            }
+        }
+    }
+
+    /**
+     * @param array $dueDateStruct
+     */
+    private function validateFilterDueDateValue(array $dueDateStruct): void
+    {
+        if (count($dueDateStruct) === 0) {
+            // Note 'object' in the exception below refers to JSON objects.  JSON objects will appear here as arrays.
+            throw new SchoolboxException(
+                'Filter \'dueDate\' must be an object like {"from": date-time, "to": date-time}.' .
+                '  Note either attribute may be omitted, but not both.'
+            );
+        }
+
+        foreach ($dueDateStruct as $key => $value) {
+            if (!in_array($key, ['to', 'from'])) {
+                throw new SchoolboxException("Filter 'dueDate' contains a key other than 'to' or 'from'.");
+            }
+
+            if (!is_string($value)) {
+                throw new SchoolboxException("Filter 'dueDate' ($key) must be a string.");
+            }
+            try {
+                new \Alaress_Date_Format($value, [DATE_RFC3339, DATE_RFC3339_EXTENDED]);
+            } catch (\Exception $e) {
+                throw new SchoolboxException("Failed to parse date from filter 'dateDate' ($key).");
+            }
+        }
     }
 }
