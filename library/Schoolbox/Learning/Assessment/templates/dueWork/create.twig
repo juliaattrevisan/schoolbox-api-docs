@@ -396,7 +396,8 @@
          * Initializes the rubric grid.
          */
         function initRubricGrid() {
-            var $maxMarkInput = $('#maxMark');
+            var $maxMarkInput = $('#maxMark'); // The display (student) max mark
+            var $maxMarkInputTeacher = $('#teacher-maxMark'); // The input (teacher) max mark
             var $useRubricSwitch = $('#useRubric');
 
             /**
@@ -405,6 +406,7 @@
              */
             function disableMaxMark() {
                 $maxMarkInput.prop('readonly', true);
+                $maxMarkInputTeacher.prop('readonly', true);
             }
 
             /**
@@ -412,6 +414,7 @@
              */
             function enableMaxMark() {
                 $maxMarkInput.prop('readonly', false);
+                $maxMarkInputTeacher.prop('readonly', false);
             }
 
             /**
@@ -427,6 +430,7 @@
 
                     // Need to validate the max mark
                     $maxMarkInput.valid();
+                    $maxMarkInputTeacher.valid();
                 }
             }
 
@@ -622,6 +626,9 @@
 
                 // Set and validate the max mark
                 $('#maxMark').val(max).valid();
+
+                // Set and validate the input max mark
+                $('#teacher-maxMark').val(max).valid();
             }
 
             function calculateGroupTotal(groupIdentifier) {
