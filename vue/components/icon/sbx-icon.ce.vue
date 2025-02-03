@@ -1722,6 +1722,7 @@ const computedSize = window.Vue.computed(() => {
 .sbx-icon {
     color: v-bind(color);
     height: v-bind(computedSize);
+    vertical-align: middle; // Ensure the icon is vertically centered when used inline with text
     width: v-bind(computedSize);
     &__svg {
         fill: currentColor;

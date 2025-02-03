@@ -170,6 +170,21 @@
                     </div>
 
                 </fieldset>
+
+                <fieldset class="content">
+                    <div class="small-12 columns">
+                        <label class="inline-block" for="includeArchivedRecords">Include archived records</label>
+                        <p class="meta">Whether records that have expired will be shown in the report.</p>
+                        <div class="switch">
+                            <input id="includeArchivedRecords" name="includeArchivedRecords" value="1" type="checkbox" {% if report.includeArchivedRecords %}checked{% endif %}>
+                            <label for="includeArchivedRecords">
+                                <span>On</span>
+                                <span>Off</span>
+                            </label>
+                        </div>
+                    </div>
+                </fieldset>
+
             </section>
             <div class="row">
                 <div class="small-12  {% if config.pastoral_action_enable %}medium-6{% endif %} columns">

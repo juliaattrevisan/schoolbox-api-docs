@@ -506,7 +506,8 @@ class Controller extends Base
             $report->getIncludeStudentsWithoutYear(),
             $report->getIncludeStudentsWithoutHouse(),
             $report->getIncludeRecordsWithoutAction(),
-            $report->getActionStatus()
+            $report->getIncludeArchivedRecords(),
+            $report->getActionStatus(),
         );
     }
 
@@ -579,6 +580,8 @@ class Controller extends Base
                 $report->setRelativeDateString($relativeDateString);
             }
         }
+
+        $report->setIncludeArchivedRecords($post->getBool('includeArchivedRecords', false));
 
         $report->setTypesCsv($this->getCsv($post->get('types')));
         $report->setSubTypesCsv($this->getCsv($post->get('subtypes')));

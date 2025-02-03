@@ -842,6 +842,7 @@ class Mapper extends BaseMapper
         bool $includeStudentsWithoutYear,
         bool $includeStudentsWithoutHouse,
         bool $includeReportsWithoutAction,
+        bool $includeArchivedRecords,
         ?string $actionStatus
     ) {
         $this->bindings = [];
@@ -977,6 +978,10 @@ class Mapper extends BaseMapper
 
         if (!empty($criteriaParts)) {
             $criteriaSql .= ' AND ' . implode(' AND ', $criteriaParts);
+        }
+
+        if (!$includeArchivedRecords) {
+            $criteriaSql .= ' AND (pastoral.expires_at > NOW() OR pastoral.expires_at IS NULL) ';
         }
 
         // Execute SQL
