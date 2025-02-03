@@ -88,12 +88,12 @@ class Controller extends Base
 
         // Load the relying party and the auth for the current user.
         // If it's accepted already, skip asking for permission.
-        $relyingParty     = $this->relyingPartyMapper->findByClientId($authRequest->getClient()->getIdentifier());
-        $relyingPartyUser = $this->relyingPartyGrantMapper->findByRelyingPartyAndUser($relyingParty, $this->getUser());
-        $requestedScopes  = $this->convertAuthRequestScopesToCollection($authRequest);
-        $grantExpired     = $relyingPartyUser && $relyingPartyUser->isExpired(Alaress_Date_Format::now());
-        $scopeChanged     = $relyingPartyUser
-            && $requestedScopes->diffBy($relyingPartyUser->getScopes(), 'scope')->count() > 0;
+        $relyingParty      = $this->relyingPartyMapper->findByClientId($authRequest->getClient()->getIdentifier());
+        $relyingPartyGrant = $this->relyingPartyGrantMapper->findByRelyingPartyAndUser($relyingParty, $this->getUser());
+        $requestedScopes   = $this->convertAuthRequestScopesToCollection($authRequest);
+        $grantExpired      = $relyingPartyGrant && $relyingPartyGrant->isExpired(Alaress_Date_Format::now());
+        $scopeChanged      = $relyingPartyGrant
+            && $requestedScopes->diffBy($relyingPartyGrant->getScopes(), 'scope')->count() > 0;
 
         // If permission was not passed in the request:
         // * if new scopes have been requested, re-ask for permission
@@ -101,7 +101,7 @@ class Controller extends Base
         // * otherwise, don't ask if permission already granted
         $permission = $this->requestPost->getBool('permission');
         if (!isset($permission)) {
-            if ($relyingPartyUser) {
+            if ($relyingPartyGrant) {
                 if ($scopeChanged) {
                     $permission = null;
                 } elseif (!$grantExpired) {
@@ -118,11 +118,11 @@ class Controller extends Base
             $this->response = $this->responseFromTemplateUnthemed(
                 '@oidcServer/authorization.twig',
                 [
-                    'authorizationUrl' => $this->request->getUri(),
-                    'authRequest'      => $authRequest,
+                    'authorizationUrl'  => $this->request->getUri(),
+                    'authRequest'       => $authRequest,
                     // Separate variable, as this isn't a standard scope name.
-                    'schoolboxScope'   => Repository\Scope::SCOPE_SCHOOLBOX,
-                    'relyingPartyUser' => $relyingPartyUser,
+                    'schoolboxScope'    => Repository\Scope::SCOPE_SCHOOLBOX,
+                    'relyingPartyGrant' => $relyingPartyGrant,
                 ],
             );
         } else {
@@ -135,22 +135,22 @@ class Controller extends Base
             // easily add it).
             if ($permission) {
                 // Save user's grant of permission
-                $updateRelyingPartyUser = false;
-                if (!$relyingPartyUser) {
-                    $relyingPartyUser = $this->relyingPartyGrantMapper->createModel()
+                $updateRelyingPartyGrant = false;
+                if (!$relyingPartyGrant) {
+                    $relyingPartyGrant = $this->relyingPartyGrantMapper->createModel()
                         ->setUser($this->getUser())
                         ->setRelyingParty($relyingParty)
                         ->setScopes($this->relyingPartyGrantScopeMapper->createCollection());
-                    $updateRelyingPartyUser = true;
+                    $updateRelyingPartyGrant = true;
                 } elseif ($scopeChanged || $grantExpired) {
-                    $updateRelyingPartyUser = true;
+                    $updateRelyingPartyGrant = true;
                 }
-                if ($updateRelyingPartyUser) {
+                if ($updateRelyingPartyGrant) {
                     // Set expiry and scopes
-                    $relyingPartyUser->setScopes($requestedScopes);
-                    $relyingPartyUser = $relyingPartyUser
+                    $relyingPartyGrant->setScopes($requestedScopes);
+                    $relyingPartyGrant = $relyingPartyGrant
                         ->setExpiresAt(Alaress_Date_Format::now()->addMonths(3));
-                    $this->relyingPartyGrantMapper->save($relyingPartyUser);
+                    $this->relyingPartyGrantMapper->save($relyingPartyGrant);
                 }
 
                 $client           = $authRequest->getClient();
