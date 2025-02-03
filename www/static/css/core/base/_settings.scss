@@ -86,7 +86,7 @@ $xlarge-breakpoint: 120em !default; // 1920px
 $small-range: (0, $small-breakpoint) !default; /* 0, 640px */
 $medium-range: ($small-breakpoint + 0.0625em, $medium-breakpoint) !default; /*  641px,  950px */
 $mediumwide-range: ($medium-breakpoint + 0.0625em, $mediumwide-breakpoint) !default; /*  951px, 1024px */
-$large-range: ($mediumwide-breakpoint + 0.0625em, $large-breakpoint) !default; /*  951px, 1440px */
+$large-range: ($mediumwide-breakpoint + 0.0625em, $large-breakpoint) !default; /*  1025px, 1440px */
 $xlarge-range: ($large-breakpoint + 0.0625em, $xlarge-breakpoint) !default; /* 1441px, 1920px */
 $xxlarge-range: ($xlarge-breakpoint + 0.0625em, 99999999em) !default; /* 1921px, ...    */
 
