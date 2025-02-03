@@ -235,6 +235,19 @@
     {% set markTypeNone = 6 %}
 
     {% include '@learningAssessment/fragments/markType.twig' with {
+        context: 'teacher',
+        assessment: assessment,
+        allMarkTypes: allMarkTypes,
+        allGradeSchemes: allGradeSchemes,
+        selectedMarkType: assessment.markType.id ?? null,
+        selectedGradeGroup: assessment.gradeGroup.id ?? null,
+        defaultGradeGroup: defaultGradeGroup,
+        renderMaxMark: true,
+        markTypeLabel: 'Input Mark Type',
+        courseManagedReadonly: courseManaged.isReadonly
+    } %}
+
+    {% include '@learningAssessment/fragments/markType.twig' with {
         context: '',
         assessment: assessment,
         allMarkTypes: allMarkTypes,
@@ -243,6 +256,7 @@
         selectedGradeGroup: assessment.gradeGroup.id ?? null,
         defaultGradeGroup: defaultGradeGroup,
         renderMaxMark: true,
+        markTypeLabel: 'Display Mark Type',
         markTypeLabel: 'Mark Type',
         courseManagedReadonly: courseManaged.isReadonly
     } %}
