@@ -44,13 +44,18 @@ class Controller extends Base
      * @param Server\AuthorizationServer  $authServer     The authorization server used to service OIDC auth requests.
      * @param KeyChainRepositoryInterface $keyChains      Repository of keychains: set up for LTI, but usable outside of
      *                                                    that context.
+     * @param IParser                     $jwtParser
      * @param ClaimExtractor              $claimExtractor Claim extractor: used to filter claims shown in userinfo.
+     * @param RelyingParty\Mapper         $relyingPartyMapper
+     * @param RelyingParty\User\Mapper    $relyingPartyUserMapper
      */
     public function __construct(
         private Server\AuthorizationServer $authServer,
         private KeyChainRepositoryInterface $keyChains,
         private IParser $jwtParser,
         private ClaimExtractor $claimExtractor,
+        private RelyingParty\Mapper $relyingPartyMapper,
+        private RelyingParty\User\Mapper $relyingPartyUserMapper,
     ) {
     }
 
@@ -74,14 +79,12 @@ class Controller extends Base
 
         // Load the relying party and the auth for the current user.
         // If it's accepted already, skip asking for permission.
-        $relyingPartyMapper = RelyingParty\Mapper::getInstance();
-        $relyingParty       = $relyingPartyMapper->findByClientId($authRequest->getClient()->getIdentifier());
+        $relyingParty = $this->relyingPartyMapper->findByClientId($authRequest->getClient()->getIdentifier());
 
         // For now, assume if a permission exists that it was granted to all
         // scopes:
         // later, check if the requested scope has changed.
-        $relyingPartyUserMapper  = RelyingParty\User\Mapper::getInstance();
-        $relyingPartyUser        = $relyingPartyUserMapper->findByRelyingPartyAndUser($relyingParty, $this->getUser());
+        $relyingPartyUser = $this->relyingPartyUserMapper->findByRelyingPartyAndUser($relyingParty, $this->getUser());
 
         $permission = $this->requestPost->getBool('permission');
         if (!isset($permission)) {
@@ -118,14 +121,14 @@ class Controller extends Base
             if ($permission) {
                 // Save user's grant of permission
                 if (!$relyingPartyUser) {
-                    $relyingPartyUser = $relyingPartyUserMapper->createModel()
+                    $relyingPartyUser = $this->relyingPartyUserMapper->createModel()
                         ->setUser($this->getUser())
                         ->setRelyingParty($relyingParty)
                         ->setExpiresAt(Alaress_Date_Format::now()->addMonths(3));
-                    $relyingPartyUserMapper->save($relyingPartyUser);
+                    $this->relyingPartyUserMapper->save($relyingPartyUser);
                 } elseif ($relyingPartyUser->isExpired(Alaress_Date_Format::now())) {
                     $relyingPartyUser->setExpiresAt(Alaress_Date_Format::now()->addMonths(3));
-                    $relyingPartyUserMapper->save($relyingPartyUser);
+                    $this->relyingPartyUserMapper->save($relyingPartyUser);
                 }
 
                 $client           = $authRequest->getClient();
