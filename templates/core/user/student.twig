@@ -60,8 +60,19 @@
     <nav>
         {% if isSuperuser and routeLookupIfAuthorized('adminUser.getModify') %}
             <sbx-pop-out content-id="header-options"></sbx-pop-out>
+        {% elseif routeLookupIfAuthorized('user.impersonate', { user: user, userId: user.id }) %}
+            {% if user.enabled %}
+                <a
+                    href="{{ routeLookup('user.impersonate', {userId: user.id}) }}"
+                    class="button icon-staff-students"
+                    title="Login as user"
+                    data-test="admin-user-modify-impersonate"
+                >Impersonate</a>
+            {% else %}
+                <a class="button icon-staff-students menu_disabled" title="Account disabled">Impersonate</a>
+            {% endif %}
         {% endif %}
-    </nav>
+    </nav
     {% if isSuperuser and routeLookupIfAuthorized('adminUser.getModify') %}
     <ul class="f-dropdown" id="header-options" data-dropdown-content>
         <li><a href="{{ routeLookup('adminUser.getModify', {'userId': user.id}) }}" class="icon-modify" title="Modify User" data-test="user-profile-modify">Modify User</a></li>
