@@ -58,7 +58,7 @@ class Mapper extends BaseMapper
             'oidc_relying_party_user_id',
             Scope\Mapper::class,
             'scopes',
-            'scopes',
+            'scope',
         );
 
         $this->uses('expires_at', self::TYPE_DATETIME);
@@ -105,6 +105,13 @@ class Mapper extends BaseMapper
             $items[$row['id']] = $this->hydrate($row)
                 ->setRelyingParty($this->hydrateJoin($row, 'relyingParty', 'relyingParty'))
                 ->setUser($this->hydrateJoin($row, 'user', 'user'));
+        }
+
+        $groupedScopes = $this->getJoinMapper('scope')
+            ->findByColumn('oidc_relying_party_user_id', $items->getPropertyValues('id'))
+            ->groupByCallback(fn (Scope\Model $model) => $model->getRelyingPartyUser()->getId());
+        foreach ($groupedScopes as $modelId => $scopes) {
+            $items[$modelId]->setScopes($scopes);
         }
         return $items;
     }
