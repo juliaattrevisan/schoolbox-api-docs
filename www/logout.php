@@ -5,7 +5,7 @@
 use Ramsey\Uuid\Uuid;
 use Schoolbox\Auth\Remember;
 use Schoolbox\Oidc\Server\BackChannelLogout;
-use Schoolbox\Oidc\Server\RelyingParty\User\Mapper as RelyingPartyUserMapper;
+use Schoolbox\Oidc\Server\RelyingParty\Grant\Mapper as RelyingPartyGrantMapper;
 
 require_once __DIR__ . '/../conf/core/require.php';
 $kernel = new \Schoolbox\Application\WebRequest\Kernel();
@@ -16,10 +16,10 @@ $backChannelRequests = [];
 
 // Find every relying party the current user has granted access to,
 // and log them out if it supports back-channel logout.
-$relyingPartyUserMapper = RelyingPartyUserMapper::getInstance();
-$currentUser = $_SESSION['user'] ?? null;
+$relyingPartyGrantMapper = RelyingPartyGrantMapper::getInstance();
+$currentUser             = $_SESSION['user'] ?? null;
 if ($currentUser instanceof \Schoolbox\User) {
-    foreach ($relyingPartyUserMapper->findByUser($currentUser) as $relyingPartyUser) {
+    foreach ($relyingPartyGrantMapper->findByUser($currentUser) as $relyingPartyUser) {
         // Does this client support logout?
         // If so, craft a logout token and send it
         $client = $relyingPartyUser->getRelyingParty();
