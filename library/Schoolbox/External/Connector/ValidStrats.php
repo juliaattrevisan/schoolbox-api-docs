@@ -26,6 +26,7 @@ class ValidStrats
     public const STUDENT = 'student';
     public const FAMILIES = 'families';
     public const TIMETABLE = 'timetable';
+    public const CALENDAR = 'calendar';
     public const PHOTO = 'photo';
 
 
@@ -35,7 +36,8 @@ class ValidStrats
     public const STRATS_FULL = [
         self::FAMILIES,
         self::STAFF,
-        self::TIMETABLE
+        self::TIMETABLE,
+        self::CALENDAR,
     ];
 
 
@@ -54,6 +56,14 @@ class ValidStrats
      */
     public const STRATS_TIMETABLE = [
         self::TIMETABLE,
+    ];
+
+
+    /**
+     * This is normally not a heavily-used diagnostic
+     */
+    public const STRATS_CALENDAR = [
+        self::CALENDAR,
     ];
 
 

@@ -197,6 +197,7 @@ class Controller extends ConfigController
                     'full' => implode(',', ValidStrats::STRATS_FULL),
                     'profiles' => implode(',', ValidStrats::STRATS_PROFILE),
                     'timetable' => implode(',', ValidStrats::STRATS_TIMETABLE),
+                    'calendar' => implode(',', ValidStrats::STRATS_CALENDAR),
                 ],
                 /* Decide if the current suds selection uses the cyclic grid
                  */
