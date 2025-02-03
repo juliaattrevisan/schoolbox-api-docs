@@ -120,9 +120,23 @@ class Classes implements IStrategy
                 continue;
             }
 
+            /* If you tried to run a sync but your users (for whatever reason)
+             * don't have any metadata, just skip and continue: we can't infer
+             * how to obtain timetables otherwise.
+             */
+            if ('' === trim((string)$data['metadata'])) {
+                $this->log->warning(sprintf(
+                    '%s (%s) does not have metadata: cannot load timetable data. Skipping',
+                    $name,
+                    $externalId
+                ));
+
+                continue;
+            }
+
             /* Unpack all those ids
              */
-            $metadata = $metadataReader->deserialize($data['metadata']);
+            $metadata = $metadataReader->deserialize($data['metadata'] ?? '');
 
             /* Construct an amalgamation of $data and $metadata, compliant with everything
              * we used to obtain from the Registry instance
