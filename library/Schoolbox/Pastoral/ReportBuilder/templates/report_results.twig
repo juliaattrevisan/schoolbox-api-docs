@@ -43,6 +43,9 @@
                                         {% if showSeverity ?? false and record.severity ?? false and severityColors[record.severity.id] ?? false %}
                                             <span class="circle" style="background-color:{{ severityColors[record.severity.id]['back'] }}" title="{{ record.severity.name }}"></span>
                                         {% endif %}
+                                        {% if record.expiresAt is not null %}
+                                            <span class="icon-archive" title="Record archived - {{ record.expiresAt | date('M d, Y') }}"></span>
+                                        {% endif %}
                                     </h4>
                                 </a>
                                 <p class="meta">
