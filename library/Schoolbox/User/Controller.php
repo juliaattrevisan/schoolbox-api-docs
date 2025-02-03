@@ -12,6 +12,7 @@ use Alaress\Session\ImpersonationCheck;
 use Alaress\Web\Controller\Base;
 use GuzzleHttp\ClientInterface;
 use Schoolbox\Oidc\Server\BackChannelLogout\RequestFactory;
+use Schoolbox\Oidc\Server\RelyingParty\User\Mapper as RelyingPartyUserMapper;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\User;
 use User\Logger;
@@ -194,10 +195,12 @@ class Controller extends Base
     ): void {
         // This is similar to what's implemented in www/logout.php when user logs out
         $backChannelRequests = [];
-        foreach ($oidcServerClients ?? [] as $clientId) {
+
+        $relyingPartyUserMapper = RelyingPartyUserMapper::getInstance();
+        foreach ($relyingPartyUserMapper->findByUser($initialUser) as $relyingPartyUser) {
             // Does this client support logout?
             // If so, craft a logout token and send it
-            $client = $relyingPartyMapper->findByClientId($clientId);
+            $client = $relyingPartyUser->getClient();
             if ($client?->getBackChannelLogoutUri()) {
                 // Create logout factory and client on demand only
                 $request = $logoutFactory->build(
@@ -205,14 +208,15 @@ class Controller extends Base
                     $client,
                     Uuid::uuid4()->toString()
                 );
-                $logoutClient ??= new BackChannelLogout\Client($httpClient);
-                $backChannelRequests[$clientId] = $logoutClient->send($request);
-            }
 
-            // Wait for any back-channel requests to complete
-            if (!empty($backChannelRequests)) {
-                \GuzzleHttp\Promise\Utils::settle($backChannelRequests)->wait();
+                $logoutClient                   ??= new BackChannelLogout\Client($httpClient);
+                $backChannelRequests[$client->getId()] = $logoutClient->send($request);
             }
+        }
+
+        // Wait for any back-channel requests to complete
+        if (!empty($backChannelRequests)) {
+            \GuzzleHttp\Promise\Utils::settle($backChannelRequests)->wait();
         }
     }
 }
