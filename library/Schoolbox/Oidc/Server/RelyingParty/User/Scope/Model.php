@@ -10,7 +10,7 @@ declare(strict_types=1);
 namespace Schoolbox\Oidc\Server\RelyingParty\User\Scope;
 
 use Schoolbox\Mapper\Traits\Model\Id;
-use Schoolbox\Oidc\Server\RelyingParty\User\Model as RelyingPartyUser;
+use Schoolbox\Oidc\Server\RelyingParty\User\Model as RelyingPartyGrant;
 
 /**
  * Model representation of the scopes a user has granted access to, as part of
@@ -21,9 +21,9 @@ class Model
     use Id;
 
     /**
-     * The relying party + user this scope belongs to.
+     * The grant this scope belongs to.
      */
-    private RelyingPartyUser $relyingPartyUser;
+    private RelyingPartyGrant $relyingPartyGrant;
 
     /**
      * The scope which was granted.
@@ -31,20 +31,20 @@ class Model
     private string $scope;
 
     /**
-     * @return RelyingPartyUser
+     * @return RelyingPartyGrant
      */
-    public function getRelyingPartyUser(): RelyingPartyUser
+    public function getRelyingPartyGrant(): RelyingPartyGrant
     {
-        return $this->relyingPartyUser;
+        return $this->relyingPartyGrant;
     }
 
     /**
-     * @param RelyingPartyUser $relyingPartyUser
+     * @param RelyingPartyGrant $relyingPartyGrant
      * @return $this
      */
-    public function setRelyingPartyUser(RelyingPartyUser $relyingPartyUser): self
+    public function setRelyingPartyGrant(RelyingPartyGrant $relyingPartyGrant): self
     {
-        $this->relyingPartyUser = $relyingPartyUser;
+        $this->relyingPartyGrant = $relyingPartyGrant;
         return $this;
     }
 

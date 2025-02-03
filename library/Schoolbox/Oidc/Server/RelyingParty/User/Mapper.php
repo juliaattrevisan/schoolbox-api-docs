@@ -33,7 +33,7 @@ class Mapper extends BaseMapper
      */
     protected function mapping()
     {
-        $this->hasTable('oidc_relying_party_user');
+        $this->hasTable('oidc_relying_party_grant');
         $this->hasModel(Model::class);
         $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
         $this->joins(
@@ -55,7 +55,7 @@ class Mapper extends BaseMapper
             'user',
         );
         $this->joinsReverseMulti(
-            'oidc_relying_party_user_id',
+            'oidc_relying_party_grant_id',
             Scope\Mapper::class,
             'scopes',
             'scope',
@@ -110,8 +110,8 @@ class Mapper extends BaseMapper
         }
 
         $groupedScopes = $this->getJoinMapper('scope')
-            ->findByColumn('oidc_relying_party_user_id', $items->getPropertyValues('id'))
-            ->groupByCallback(fn (Scope\Model $model) => $model->getRelyingPartyUser()->getId());
+            ->findByColumn('oidc_relying_party_grant_id', $items->getPropertyValues('id'))
+            ->groupByCallback(fn (Scope\Model $model) => $model->getRelyingPartyGrant()->getId());
         foreach ($groupedScopes as $modelId => $scopes) {
             $items[$modelId]->setScopes($scopes);
         }

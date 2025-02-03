@@ -29,17 +29,17 @@ class Mapper extends BaseMapper
      */
     protected function mapping()
     {
-        $this->hasTable('oidc_relying_party_user_scope');
+        $this->hasTable('oidc_relying_party_grant_scope');
         $this->hasModel(Model::class);
         $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
         $this->joins(
-            'oidc_relying_party_user_id',
+            'oidc_relying_party_grant_id',
             RelyingPartyUserMapper::class,
             'id',
             null,
             null,
-            'relyingPartyUser',
-            'relyingPartyUser',
+            'relyingPartyGrant',
+            'relyingPartyGrant',
         );
         $this->uses('scope', self::TYPE_STRING);
     }
