@@ -73,7 +73,7 @@
                 <a class="button icon-staff-students menu_disabled" title="Account disabled">Impersonate</a>
             {% endif %}
         {% endif %}
-    </nav
+    </nav>
     {% if isSuperuser %}
     <ul class="f-dropdown" id="header-options" data-dropdown-content>
         <li><a href="{{ routeLookup('adminUser.getModify', {'userId': user.id}) }}" class="icon-modify" title="Modify User" data-test="user-profile-modify">Modify User</a></li>
