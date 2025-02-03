@@ -59,9 +59,14 @@
     </div>
     <nav>
         {% if routeLookupIfAuthorized('adminUser.getModify') %}
-            <a href="{{ routeLookup('adminUser.getModify', {'userId': user.id}) }}" class="icon-modify" title="Modify User" data-test="user-profile-modify"></a>
+            <sbx-pop-out content-id="header-options"></sbx-pop-out>
         {% endif %}
     </nav>
+    <ul class="f-dropdown" id="header-options" data-dropdown-content>
+        {% if routeLookupIfAuthorized('adminUser.getModify') %}
+        <li><a href="{{ routeLookup('adminUser.getModify', {'userId': user.id}) }}" class="icon-modify" title="Modify User" data-test="user-profile-modify">Modify User</a></li>
+        {% endif %}
+    </ul>
 </div>
 
 <div class="row">
