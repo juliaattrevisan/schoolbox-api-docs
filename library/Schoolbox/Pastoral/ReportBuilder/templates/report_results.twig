@@ -44,7 +44,7 @@
                                             <span class="circle" style="background-color:{{ severityColors[record.severity.id]['back'] }}" title="{{ record.severity.name }}"></span>
                                         {% endif %}
                                         {% if record.expiresAt is not null %}
-                                            <span class="icon-archive" title="Record archived - {{ record.expiresAt | date('M d, Y') }}"></span>
+                                            <sbx-icon name="archive" size="0.75rem" title="Record archived - {{ record.expiresAt | date('M d, Y') }}"></sbx-icon>
                                         {% endif %}
                                     </h4>
                                 </a>
