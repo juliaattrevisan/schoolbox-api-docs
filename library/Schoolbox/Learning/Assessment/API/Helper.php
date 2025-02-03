@@ -1128,7 +1128,7 @@ class Helper
                         count($value) !== 1 ||
                         !(
                             (array_key_exists('id', $value) && is_numeric($value['id'])) ||
-                            (array_key_exists('name', $value) && is_numeric($value['name']))
+                            (array_key_exists('name', $value) && is_string($value['name']))
                         )
                     ) {
                         // Note 'object' in the exception below refers to JSON objects.  JSON objects will appear here as arrays.
@@ -1151,7 +1151,7 @@ class Helper
                         count($value) !== 1 ||
                         !(
                             (array_key_exists('id', $value) && is_numeric($value['id'])) ||
-                            (array_key_exists('name', $value) && is_numeric($value['name']))
+                            (array_key_exists('name', $value) && is_string($value['name']))
                         )
                     ) {
                         // Note 'object' in the exception below refers to JSON objects.  JSON objects will appear here as arrays.
