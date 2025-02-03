@@ -8,6 +8,7 @@
 {# Permissions #}
 {% set isSuperuser = session.user.superUser %}
 {% set isStaffWhoCanView = isSuperuser or (USER.role.staff and USER.role.viewStudentProfile) %}
+{% set canImpersonate = routeLookupIfAuthorized('user.impersonate', { user: user, userId: user.id }) %}
 {# Leaving isStaff for extended custom templates #}
 {% set isStaff = isSuperuser or USER.role.staff %}
 {% set isSelf = session.user.id == user.id %}
@@ -58,9 +59,9 @@
         </div>
     </div>
     <nav>
-        {% if isSuperuser and routeLookupIfAuthorized('adminUser.getModify') %}
+        {% if isSuperuser %}
             <sbx-pop-out content-id="header-options"></sbx-pop-out>
-        {% elseif routeLookupIfAuthorized('user.impersonate', { user: user, userId: user.id }) %}
+        {% elseif canImpersonate %}
             {% if user.enabled %}
                 <a
                     href="{{ routeLookup('user.impersonate', {userId: user.id}) }}"
@@ -73,7 +74,7 @@
             {% endif %}
         {% endif %}
     </nav
-    {% if isSuperuser and routeLookupIfAuthorized('adminUser.getModify') %}
+    {% if isSuperuser %}
     <ul class="f-dropdown" id="header-options" data-dropdown-content>
         <li><a href="{{ routeLookup('adminUser.getModify', {'userId': user.id}) }}" class="icon-modify" title="Modify User" data-test="user-profile-modify">Modify User</a></li>
         <li>
