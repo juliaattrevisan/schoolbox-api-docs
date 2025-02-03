@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace Schoolbox\Oidc\Server;
 
 use Alaress\Web\Controller\Base;
+use Alaress_Date_Format;
 use Firebase\JWT\Key;
 use League\OAuth2\Server;
 use OAT\Library\Lti1p3Core\Security\Jwks\Exporter\JwksExporter;
@@ -71,11 +72,31 @@ class Controller extends Base
             new Entity\User($this->getUser(), (new Factory($this->getConfigLoader()))->buildFullyQualified()),
         );
 
+        // Load the relying party and the auth for the current user.
+        // If it's accepted already, skip asking for permission.
+        $relyingPartyMapper = RelyingParty\Mapper::getInstance();
+        $relyingParty       = $relyingPartyMapper->findByClientId($authRequest->getClient()->getIdentifier());
+
+        // For now, assume if a permission exists that it was granted to all
+        // scopes:
+        // later, check if the requested scope has changed.
+        $relyingPartyUserMapper  = RelyingParty\User\Mapper::getInstance();
+        $relyingPartyUser        = $relyingPartyUserMapper->findByRelyingPartyAndUser($relyingParty, $this->getUser());
+
+        $permission = $this->requestPost->getBool('permission');
+        if (!isset($permission)) {
+            // Permission not passed in request?
+            // If so, auto-grant if the user has already granted permission,
+            // and it hasn't expired.
+            if ($relyingPartyUser && !$relyingPartyUser->isExpired(Alaress_Date_Format::now())) {
+                $permission = true;
+            }
+        }
+
         // Display confirm auth page:
         // this should be bypassed if the user has already given permission
         // for this client.
         // (but in this case, the access token will probably just be used)
-        $permission = $this->requestPost->getBool('permission');
         if (!isset($permission)) {
             $this->response = $this->responseFromTemplateUnthemed(
                 '@oidcServer/authorization.twig',
@@ -89,16 +110,16 @@ class Controller extends Base
         } else {
             $authRequest->setAuthorizationApproved($permission);
 
-            // At this point, if permission was granted: track that the server
-            // has granted a session to the client.
-            // Currently, only the client can be tracked, not a particular
-            // session ID (as that doesn't exist in the auth code, and I can't
-            // easily add it).
-            if ($permission) {
-                $client           = $authRequest->getClient();
-                $currentClients   = $this->getSession()->get(self::SESSION_OIDC_SERVER_CLIENTS, []);
-                $currentClients[] = $client->getIdentifier();
-                $this->getSession()->set(self::SESSION_OIDC_SERVER_CLIENTS, array_unique($currentClients));
+            // Save user's grant of permission
+            if (!$relyingPartyUser) {
+                $relyingPartyUser = $relyingPartyUserMapper->createModel()
+                    ->setUser($this->getUser())
+                    ->setRelyingParty($relyingParty)
+                    ->setExpiresAt(Alaress_Date_Format::now()->addMonths(3));
+                $relyingPartyUserMapper->save($relyingPartyUser);
+            } elseif ($relyingPartyUser->isExpired(Alaress_Date_Format::now())) {
+                $relyingPartyUser->setExpiresAt(Alaress_Date_Format::now()->addMonths(3));
+                $relyingPartyUserMapper->save($relyingPartyUser);
             }
 
             try {

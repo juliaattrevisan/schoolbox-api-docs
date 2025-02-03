@@ -13,6 +13,8 @@ use PDOStatement;
 use Schoolbox\GenericCollection;
 use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\Oidc\Server\RelyingParty\Mapper as RelyingPartyMapper;
+use Schoolbox\Oidc\Server\RelyingParty\Model as RelyingPartyModel;
+use Schoolbox\User;
 use Schoolbox\UserMapper;
 
 /**
@@ -99,5 +101,29 @@ class Mapper extends BaseMapper
                 ->setUser($this->hydrateJoin($row, 'user', 'user'));
         }
         return $items;
+    }
+
+    /**
+     * Finds the user's granted permission to the relying party, if there is
+     * one.
+     *
+     * @param RelyingPartyModel $relyingParty
+     * @param User              $user
+     * @return Model|null
+     */
+    public function findByRelyingPartyAndUser(RelyingPartyModel $relyingParty, User $user): ?Model
+    {
+        // Fetch the last one to expire: that should be the only canonical
+        // granted permission.
+        return $this->findByColumnList(
+            [
+                'oidc_relying_party_id' => $relyingParty->getId(),
+                'user_id'               => $user->getId(),
+            ],
+            [
+                'limit' => 1,
+                'order' => ['expires_at' => self::SORT_ORDER_DESC],
+            ],
+        )->first();
     }
 }

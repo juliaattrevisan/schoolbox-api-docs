@@ -62,6 +62,17 @@ class Model
     }
 
     /**
+     * Has this permission grant expired as of `$now`?
+     *
+     * @param Alaress_Date_Format $now
+     * @return bool
+     */
+    public function isExpired(Alaress_Date_Format $now): bool
+    {
+        return $this->expiresAt->lt($now);
+    }
+
+    /**
      * @return RelyingParty
      */
     public function getRelyingParty(): RelyingParty
