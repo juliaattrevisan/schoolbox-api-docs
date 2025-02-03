@@ -143,9 +143,11 @@ class DSN implements IDSN
                 throw new DomainException('Detected option separator but no options found');
             }
 
-            preg_match(self::OPTION_FORMAT, $options, $matches);
-
-            $struct['options'][$matches[1]] = $matches[2];
+            $dsnParts = explode(self::TUPLE_SEPARATOR, $options);
+            foreach ($dsnParts as $dsnPart) {
+                preg_match(self::OPTION_FORMAT, $dsnPart, $matches);
+                $struct['options'][$matches[1]] = $matches[2];
+            }
         }
 
         return $struct;
