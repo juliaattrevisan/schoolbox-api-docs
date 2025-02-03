@@ -700,13 +700,16 @@ class Profile implements IStrategy
         $path = "/iSAMS/PupilManager/Contacts/Contact/Pupils/Pupil[@Id='{$studentId}']/ancestor::*[position()=2]";
         $parents =  $this->api[DSN::MODULE_BATCHXML]->fetchXml($path);
 
-        /*  Get the type of contact identified as parents of student
-         */
-        $allowedRelationshipType = explode(
-            self::PARENT_TYPE_SEPARATOR,
-            $this->api[DSN::MODULE_BATCHXML]->getOptions()['parentRelations'] ?? ''
-        );
-        $allowedRelationshipType = array_map(fn($v) => trim(strtolower($v)), $allowedRelationshipType);
+        $allowedRelationshipType = $this->api[DSN::MODULE_BATCHXML]->getOptions()['parentRelations'] ?? '';
+        if ('' !== $allowedRelationshipType) {
+            /*  Get the type of contact identified as parents of student
+             */
+            $allowedRelationshipType = explode(
+                self::PARENT_TYPE_SEPARATOR,
+                $this->api[DSN::MODULE_BATCHXML]->getOptions()['parentRelations'] ?? ''
+            );
+            $allowedRelationshipType = array_map(fn($v) => trim(strtolower($v)), $allowedRelationshipType);
+        }
 
         /* As per Duane's conclusion:
          * A contact's aggregated SOS field equates to Message Alerts for their student
@@ -777,17 +780,23 @@ class Profile implements IStrategy
 
             $relationship = trim((string)$parent->RelationshipRaw);
 
-            /* We only allow the assignment of Parents of the type identified by schools
+            /* If the whitelist is not set then allow all by default
              */
-            if (!in_array(strtolower($relationship), $allowedRelationshipType, true)) {
-                $this->log->debug(sprintf(
-                    'Parent profile for %s (%s) is a %s of the student. %s is not allowed relation type - skipping.',
-                    $fullname,
-                    $externalId,
-                    $relationship,
-                    $relationship,
-                ));
-                continue;
+            if (is_array($allowedRelationshipType)) {
+                /* We only allow the assignment of Parents of the type identified by schools
+                 */
+                if (!in_array(strtolower($relationship), $allowedRelationshipType, true)) {
+                    $this->log->debug(
+                        sprintf(
+                            'Parent profile for %s (%s) is a %s of the student. %s is not allowed relation type - skipping.',
+                            $fullname,
+                            $externalId,
+                            $relationship,
+                            $relationship,
+                        )
+                    );
+                    continue;
+                }
             }
 
             /* Parents might inadvertently have the same externalId as someone else's
