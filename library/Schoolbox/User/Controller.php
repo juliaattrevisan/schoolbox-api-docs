@@ -172,7 +172,7 @@ class Controller extends Base
         foreach ($this->relyingPartyUserMapper->findByUser($initialUser) as $relyingPartyUser) {
             // Does this client support logout?
             // If so, craft a logout token and send it
-            $client = $relyingPartyUser->getClient();
+            $client = $relyingPartyUser->getRelyingParty();
             if ($client?->getBackChannelLogoutUri()) {
                 // Create logout factory and client on demand only
                 $request = $this->requestFactory->build(
