@@ -14,6 +14,7 @@
  # @param int $defaultGradeGroup        Set in admin via default_grade_group config var
  # @param bool $renderMaxMark           True allows the maxMark input field to exist
  # @param string $markTypeLabel         The label text for the mark type selector
+ # @param string $markTypeTooltip       The tooltip text for the mark type selector (optional)
  # @param bool $courseManagedReadonly   A bool to decide if this is readonly or not
  #}
 
@@ -47,6 +48,9 @@
     <div class="small-12 medium-6 columns">
         <label>
             {{ markTypeLabel | default('Mark Type') }}
+            {% if markTypeTooltip ?? false %}
+                <span data-tooltip class="hint has-tip tip-top"  title="{{ markTypeTooltip }}">?</span>
+            {% endif %}
             <select id="{{ context }}markType" name="{{ context }}markType" data-test="assessment-form-select-{{ context }}markType" {% if courseManagedReadonly ?? false %}readonly{% endif %}>
                 {% for index, title in allMarkTypes %}
                     <option value="{{ index }}"
