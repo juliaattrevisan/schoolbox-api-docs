@@ -165,7 +165,7 @@ class Mapper extends BaseMapper
         /** @var Scope\Mapper $scopeMapper */
         $scopeMapper = $this->getJoinMapper('scope');
         foreach ($model->getScopes() as $scope) {
-            $scope->setRelyingPartyUser($model);
+            $scope->setRelyingPartyGrant($model);
             if ($scope->getId()) {
                 $scopeMapper->assertJoinedModelNotChanged($scope, 'relyingPartyUser');
             }
