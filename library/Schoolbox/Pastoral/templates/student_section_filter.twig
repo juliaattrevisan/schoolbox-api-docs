@@ -33,7 +33,7 @@
                 <div class="small-12 columns">
                     <label class="inline-block" for="showArchivedRecords">Show archived records</label>
                     <p class="meta">Whether records that have expired will be shown here.</p>
-                    <div class="switch">
+                    <div class="switch f-no-margins">
                         <input data-archived-filter id="showArchivedRecords" name="showArchivedRecords" {% if showArchived == 1 %}checked="checked"{% endif %} value="1" type="checkbox">
                         <label for="showArchivedRecords">
                             <span>On</span>
@@ -62,4 +62,3 @@
     </script>
 
 {% endif %}
-
