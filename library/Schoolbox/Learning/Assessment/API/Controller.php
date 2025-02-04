@@ -95,7 +95,7 @@ class Controller extends Base
         }
 
         if (null === $filter) {
-            $problem = (new ApiProblem('Filter must not be blank'))
+            $problem = (new ApiProblem('Filter was blank or could not be decoded'))
                 ->setStatus(401)
                 ->asArray();
             $this->response = $this->responseAsJson($problem)->withStatus(401);
