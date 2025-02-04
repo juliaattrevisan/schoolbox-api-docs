@@ -30,8 +30,6 @@ class Controller extends Base
     /** @var Logger\Mapper */
     private $assumeUserLogMapper;
 
-    /** @var RelyingPartyMapper */
-    private $relyingPartyMapper;
     private $requestFactory;
 
     private $httpClient;
@@ -39,14 +37,12 @@ class Controller extends Base
     public function __construct(
         UserAccessMapper $userAccessMapper,
         Logger\Mapper $assumeUserLogMapper,
-        RelyingPartyMapper $relyingPartyMapper,
         private RelyingPartyGrantMapper $relyingPartyGrantMapper,
         RequestFactory $requestFactory,
         ClientInterface $httpClient,
     ) {
         $this->userAccessMapper    = $userAccessMapper;
         $this->assumeUserLogMapper = $assumeUserLogMapper;
-        $this->relyingPartyMapper  = $relyingPartyMapper;
         $this->requestFactory      = $requestFactory;
         $this->httpClient          = $httpClient;
     }
