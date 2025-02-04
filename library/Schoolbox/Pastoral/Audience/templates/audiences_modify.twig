@@ -35,6 +35,16 @@
         <script type="text/javascript">
         {% autoescape 'js' %}
             /**
+             * The apply button belongs just after the <h1> on the page.
+             * However the relevant markup is in the shared library/Schoolbox/Submenu/templates/flyout.twig file.
+             * Rather than modifying the twig file to allow dynamic input, we'll just move the button via JS and
+             * add the relevant .button-action class that's required for the button to be styled correctly.
+             */
+            const applyButton = document.getElementById("apply-default-expiry");
+            const headingContainer = document.getElementById("heading-container");
+            headingContainer.classList.add("button-action");
+            headingContainer.append(applyButton);
+            /**
              * Confirm to apply the default expiry
              */
             const confirmButton = document.getElementById("confirm-apply-default-expiry");
