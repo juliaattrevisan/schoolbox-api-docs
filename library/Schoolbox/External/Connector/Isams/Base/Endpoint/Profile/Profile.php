@@ -712,7 +712,6 @@ class Profile implements IStrategy
             $this->log->debug(
                 sprintf('Contact type filtered to: %s.', json_encode($allowedRelationshipType)),
             );
-            die();
         }
 
         /* As per Duane's conclusion:
