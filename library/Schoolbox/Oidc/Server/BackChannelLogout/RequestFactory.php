@@ -15,6 +15,7 @@ use InvalidArgumentException;
 use Psr\Http\Message\RequestInterface;
 use Schoolbox\API\Token\Jwt;
 use Schoolbox\API\Token\JwtParser\IParser;
+use Schoolbox\Oidc\Server\RelyingParty\Grant\Mapper;
 use Schoolbox\Oidc\Server\RelyingParty\Model;
 use Schoolbox\Oidc\Server\Repository\Scope as ScopeRepository;
 use Schoolbox\User;
@@ -70,18 +71,32 @@ class RequestFactory
             throw new InvalidArgumentException('Client does not have a back-channel logout URI.');
         }
 
+        // Only add Schoolbox claims if they were granted by `$user`:
+        // this ensures that this information isn't shared if `$user` hasn't
+        // consented.
+        $grant  = Mapper::getInstance()->findByRelyingPartyAndUser($client, $user);
+        $claims = self::LOGOUT_TOKEN_BASE_CLAIM + [
+            IParser::CLAIM_AUD => $client->getClientId(),
+            IParser::CLAIM_IAT => Alaress_Date_Format::now()->getUnixTimeStamp(),
+        ];
+        if ($grant) {
+            foreach ($grant->getScopes() as $scope) {
+                if ($scope->getScope() === ScopeRepository::SCOPE_SCHOOLBOX) {
+                    $claims += [
+                        ScopeRepository::SCOPE_SCHOOLBOX . '/id'          => $user->getId(),
+                        ScopeRepository::SCOPE_SCHOOLBOX . '/instance_id' => INSTANCE_ID,
+                        ScopeRepository::SCOPE_SCHOOLBOX . '/external_id' => $user->getExternalId(),
+                        ScopeRepository::SCOPE_SCHOOLBOX . '/role_type'   => $user->getRole()->getType(),
+                    ];
+                }
+            }
+        }
+
         $logoutToken = $this->jwtBuilder->generate(
             $user,
             Alaress_Date_Format::now()->addSeconds($this->expiry),
             $jwtId,
-            self::LOGOUT_TOKEN_BASE_CLAIM + [
-                IParser::CLAIM_AUD                                => $client->getClientId(),
-                IParser::CLAIM_IAT                                => Alaress_Date_Format::now()->getUnixTimeStamp(),
-                ScopeRepository::SCOPE_SCHOOLBOX . '/id'          => $user->getId(),
-                ScopeRepository::SCOPE_SCHOOLBOX . '/instance_id' => INSTANCE_ID,
-                ScopeRepository::SCOPE_SCHOOLBOX . '/external_id' => $user->getExternalId(),
-                ScopeRepository::SCOPE_SCHOOLBOX . '/role_type'   => $user->getRole()->getType(),
-            ],
+            $claims,
         );
 
         return $this->psr17Factory
