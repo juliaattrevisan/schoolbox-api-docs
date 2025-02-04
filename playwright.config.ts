@@ -1,12 +1,11 @@
 import { defineConfig, devices } from "@playwright/test";
 
-// If the timezone is not Australia/Melbourne, the tests will fail, so force exit
+// If the timezone is not Australia/Melbourne, the tests warn that few tests may fail
 if (Intl.DateTimeFormat().resolvedOptions().timeZone !== "Australia/Melbourne") {
     console.error(
         "Timezone is not set to Australia/Melbourne, some tests may fail.",
         "Please run with TZ='Australia/Melbourne' set in the environment first",
     );
-    process.exit(1);
 }
 
 /**
