@@ -204,7 +204,10 @@ class Factory
         $this->setAcceptOnline((int)trim($post['acceptOnline'] ?? ''));
         $markType = (int)trim($post['markType'] ?? '');
         $this->setMarkType($markType);
+        $instructorMarkType = (int)trim($post['instructor-markType'] ?? '');
+        $this->setInstructorMarkType($instructorMarkType);
         $this->setGradingScheme(empty($post['gradingScheme']) ? null : (int)trim($post['gradingScheme']));
+        $this->setInstructorGradingScheme(empty($post['instructor-gradingScheme']) ? null : (int)trim($post['instructor-gradingScheme']));
         $this->setUseRubric((bool)($post['useRubric'] ?? ''));
         $this->setSimilarityCheckEnabled(trim($post['similarityCheckEnabled'] ?? '') === 'on');
 
@@ -268,6 +271,25 @@ class Factory
                 throw new UnexpectedValueException('Please provide maximum available marks greater than 0');
             }
             $this->setMaxMark($maxMark);
+
+            // and do it all over again for the instructor mark type
+
+            switch ($instructorMarkType) {
+                case MarkType::TYPE_PERCENT:
+                case MarkType::TYPE_LETTER:
+                case MarkType::TYPE_NONE:
+                    $instructorMaxMark = null;
+                    break;
+                default:
+                    $instructorMaxMark = (float)trim($post['instructor-maxMark'] ?? '');
+                    break;
+            }
+
+            // We should never end up with a 0 max mark unless something goes very wrong, but if that does happen, we want to handle it nicely.
+            if ($instructorMaxMark === 0.0) {
+                throw new UnexpectedValueException('Please provide maximum available marks greater than 0');
+            }
+            $this->setInstructorMaxMark($instructorMaxMark);
         }
 
         if (isset($post['self_reviewable'])) {
@@ -424,12 +446,15 @@ class Factory
             if ($courseManagedFields->isReadonly()) {
                 $decorator = new DueWorkCourseManagedDecorator(
                     $this->getMarkType(),
+                    $this->getInstructorMarkType(),
                     $this->getGradingScheme(),
+                    $this->getInstructorGradingScheme(),
                     $this->getUseRubric(),
                     $this->getCapabilityMarkType(),
                     $this->getCapabilityGradeGroup(),
                     $this->getUseMarkRange(),
                     $this->getMaxMark(),
+                    $this->getInstructorMaxMark(),
                     $this->getRubricData(),
                     $this->getAttachedFiles(),
                     $this->getEnableWorksheet(),
@@ -444,12 +469,15 @@ class Factory
                 $decorator = new DueWorkDecorator(
                     $this->getAcceptOnline(),
                     $this->getMarkType(),
+                    $this->getInstructorMarkType(),
                     $this->getGradingScheme(),
+                    $this->getInstructorGradingScheme(),
                     $this->getUseRubric(),
                     $this->getCapabilityMarkType(),
                     $this->getCapabilityGradeGroup(),
                     $this->getUseMarkRange(),
                     $this->getMaxMark(),
+                    $this->getInstructorMaxMark(),
                     $this->getRubricData(),
                     $this->getAttachedFiles(),
                     $this->getSelfReviewable(),
