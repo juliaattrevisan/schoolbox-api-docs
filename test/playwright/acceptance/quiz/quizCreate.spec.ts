@@ -85,28 +85,33 @@ test.describe("Quiz Create Tests", () => {
         await assessmentForm.setWorkType(AssessmentForm.WORKTYPE_ASSESSMENT_TASK);
         await quiz.create();
 
-        // check if I can modify this locator or if this is coming from learnosity
-        // await page.locator("span.lrn-author-button-text").getByText("Create item").click();
-        // await page.waitForTimeout(500);
-        // await page.locator("button.lrn-author-widget-button").click();
-        // await page.waitForTimeout(500);
-        // await page.locator("a.lrn-qe-a.lrn-qe-tile-preview").first().click();
-        // await page.waitForTimeout(500);
-        // await page
-        //     .locator("button.lrn-btn-save.lrn-btn.lrn-btn-legacy.lrn-btn-primary.lrn-btn-primary-legacy")
-        //     .first()
-        //     .click();
-
         tester.isGoingTo("navigate to the homepage and ensure the quiz is presented");
         await homepage.goto(parseInt(folderId, 10));
         const quizId = (await db.grabFromDatabase("assessment", "id", {
             deleted_at: null,
             "title like": quizName,
         })) as number;
-        await expect(page.getByTestId(`component-assessment-title-${quizId}`)).toContainText($quizName);
+        await expect(page.getByTestId(`component-assessment-title-${quizId}`)).toContainText(quizName);
     });
 
-    test("Modify a quiz", async ({ tester, page, db }) => {});
+    test("Modify a quiz settings", async ({ tester, page, db }) => {
+        const homepage = new Homepage(page);
+        const assessmentForm = new AssessmentForm(tester, page);
+        const quiz = new QuizSettingPage(tester, page);
+
+        const quizName = "Quiz 1";
+        const folderName = "Test Class Homepage Quiz";
+        const folderId = (await db.grabFromDatabase("folder", "id", { deleted_at: null, name: folderName })) as string;
+        const quizId = (await db.grabFromDatabase("assessment", "id", {
+            deleted_at: null,
+            "title like": quizName,
+        })) as number;
+
+        tester.isGoingTo("navigate to the class page. click the quiz dropdown and click Modify");
+        await homepage.goto(parseInt(folderId, 10));
+        await homepage.clickAssessmentComponentTOTMenu(quizId);
+        await page.locator(`a.icon-modify`).getByText("Modify Settings").click();
+    });
 
     test("Delete a quiz", async ({ tester, page, db }) => {});
 });

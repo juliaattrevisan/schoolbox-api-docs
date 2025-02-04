@@ -62,6 +62,8 @@ export default class Homepage {
 
     static readonly REMOVE_BUTTON_CONFIRMATION_MESSAGE = "Remove";
 
+    static readonly ASSESSMENT_COMPONENT_TOT_MENU = "sbx-pop-out-duework-options";
+
     constructor(page: Page) {
         this.page = page;
     }
@@ -237,5 +239,13 @@ export default class Homepage {
      */
     async clickRemoveConfirmationMessage(): Promise<void> {
         await this.page.locator(`a:text("${Homepage.REMOVE_BUTTON_CONFIRMATION_MESSAGE}")`).first().click();
+    }
+
+    /**
+     * Click the assessment component TOT menu
+     * @param assessmentId - The assessment ID.
+     */
+    async clickAssessmentComponentTOTMenu(assessmentId: number): Promise<void> {
+        await this.page.getByTestId(`${Homepage.ASSESSMENT_COMPONENT_TOT_MENU}${assessmentId}`).click();
     }
 }
