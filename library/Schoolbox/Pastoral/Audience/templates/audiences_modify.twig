@@ -22,7 +22,21 @@
     } %}
 
     <div class="admin-content">
-        <button id="apply-default-expiry" class="button icon-calendar" title="Apply Default Expiry to all records">Apply Default Expiry to all records</button>
+        <button id="apply-default-expiry" data-reveal-id="confirm-apply-default-expiry" class="button icon-calendar">Apply Default Expiry to all records</button>
+        <div data-reveal id="confirm-apply-default-expiry" class="reveal-modal">
+            <h2>Please confirm</h2>
+            <p>Are you sure you wish to apply the Default Expiry? This will overwrite and apply to all existing records of this type.</p>
+            <a class="close-reveal-modal" aria-label="Close">&#215;</a>
+            <ul class="flex-list">
+                <li><button class="button icon-approve submit">Yes</button></li>
+                <li><button class="button icon-close">Cancel</button></li>
+            </ul>
+        </div>
+        <script type="text/javascript">
+        {% autoescape 'js' %}
+
+        {% endautoescape %}
+    </script>
         <div class="small-12 island" id="formPastoral">
             <form class="top" id="pastoralForm" method="post" enctype="multipart/form-data" action="{{ action }}">
                 <section>
