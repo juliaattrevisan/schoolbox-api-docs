@@ -328,7 +328,7 @@ class Bulk_Folder
         }
 
         // Folder Sequence
-        $folderSequence = $sequenceColumnIndex >= 0 ? trim($row[$sequenceColumnIndex]) : '';
+        $folderSequence = $sequenceColumnIndex >= 0 ? (int)trim($row[$sequenceColumnIndex]) : '';
         if (!empty($folderSequence)) {
             $newFolder->setSequence($folderSequence);
         }
