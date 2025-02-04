@@ -136,6 +136,19 @@ class ApiAssessmentCest
         yield [
             'filter' => [
                 'folder' => [
+                    [
+                        // This use case is not useful and probably ought to be rejected.
+                        // However, it was allowed initially, so users might depend on it.
+                        'id' => $this->folder->getId(),
+                        'code' => $this->folder->getCodeString(),
+                    ],
+                ],
+            ],
+            'valid'  => true,
+        ];
+        yield [
+            'filter' => [
+                'folder' => [
                     'code' => $this->folder->getCodeString(),
                 ],
             ],
@@ -189,6 +202,17 @@ class ApiAssessmentCest
         yield [
             'filter' => [
                 'workType' => [
+                    'name' => 'Quiz',
+                ],
+            ],
+            'valid'  => true,
+        ];
+        yield [
+            'filter' => [
+                // This use case is not useful and probably ought to be rejected.
+                // However, it was allowed initially, so users might depend on it.
+                'workType' => [
+                    'id' => 1,
                     'name' => 'Quiz',
                 ],
             ],
@@ -253,6 +277,33 @@ class ApiAssessmentCest
                 'project' => [1, 2]
             ],
             'valid'  => false,
+        ];
+        yield [
+            'filter' => [
+                'yearLevel' => [
+                    'id' => 3,
+                ],
+            ],
+            'valid'  => true,
+        ];
+        yield [
+            'filter' => [
+                'yearLevel' => [
+                    'name' => "9",
+                ],
+            ],
+            'valid'  => true,
+        ];
+        yield [
+            'filter' => [
+                // This use case is not useful and probably ought to be rejected.
+                // However, it was allowed initially, so users might depend on it.
+                'yearLevel' => [
+                    'id' => 3,
+                    'name' => "9",
+                ],
+            ],
+            'valid'  => true,
         ];
     }
 }
