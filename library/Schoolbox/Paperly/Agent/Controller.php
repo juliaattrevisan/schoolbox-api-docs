@@ -115,13 +115,6 @@ class Controller extends Base
             return;
         }
 
-        // Check secret
-        $secret = $data['v'] ?? null;
-        if (!isset($secret) || $this->secret !== $secret) {
-            $this->sendJsonError('Access denied', Response::HTTP_UNAUTHORIZED);
-            return;
-        }
-
         $sql = $data['sql'] ?? null;
         $params = $data['params'] ?? null;
 
@@ -130,6 +123,13 @@ class Controller extends Base
                 'Payload malformed. Query missing.',
                 Response::HTTP_BAD_REQUEST
             );
+            return;
+        }
+
+        // Checking hash to make sure the sql request matches with hash
+        $hash = $data['hash'] ?? null;
+        if (!isset($hash) || $this->proxy->validateRequest($hash, $sql, $this->secret)) {
+            $this->sendJsonError('Access denied', Response::HTTP_UNAUTHORIZED);
             return;
         }
 

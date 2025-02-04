@@ -10,7 +10,13 @@ use OutOfBoundsException;
 
 class Proxy
 {
+    /* Max number of results allowed
+     */
     private const MAX_RESULTS = 100;
+
+    /* HMAC algorithm for hashing the request
+     */
+    private const PAPERLY_PROXY_HMAC_ALGO = 'sha256';
 
     public function __construct(
         private IConnector $externalDb,
@@ -101,5 +107,18 @@ class Proxy
         }
 
         return $results;
+    }
+
+    /**
+     * Validate whether the sql has been tampered with during transmission
+     *
+     * @param $hash
+     * @param $sql
+     * @param $secret
+     * @return bool
+     */
+    public function validateRequest($hash, $sql, $secret): bool
+    {
+        return hash_hmac(self::PAPERLY_PROXY_HMAC_ALGO, $sql, $secret) !== $hash;
     }
 }
