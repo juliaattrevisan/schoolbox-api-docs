@@ -1177,11 +1177,12 @@ class Helper
             }
         } else {
             // Expect $value to contain an array like the following.
-            // Note each sub-array should contain a single key, which is either 'id' or 'code'.
+            // Note each sub-array may contain 'id', 'code' or both.
             // [
             //    ['id' => $integer],
             //    ['code' => $integer],
             //    ['id' => $integer],
+            //    ['id' => $integer, 'code' => $string],
             //    ...
             // ]
             foreach ($value as $subArray) { // Ignore the keys in this array.
@@ -1202,7 +1203,7 @@ class Helper
                             }
                             break;
                         case 'code':
-                            if (!is_numeric($value)) {
+                            if (!is_string($value)) {
                                 throw new SchoolboxException("Filter 'folder' item property 'name' must have a string value.");
                             }
                             break;
