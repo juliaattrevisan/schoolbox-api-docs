@@ -709,6 +709,10 @@ class Profile implements IStrategy
                 $this->api[DSN::MODULE_BATCHXML]->getOptions()['parentRelations'] ?? ''
             );
             $allowedRelationshipType = array_map(fn($v) => trim(strtolower($v)), $allowedRelationshipType);
+            $this->log->debug(
+                sprintf('Contact type filtered to: %s.', json_encode($allowedRelationshipType)),
+            );
+            die();
         }
 
         /* As per Duane's conclusion:
