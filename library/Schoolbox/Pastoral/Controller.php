@@ -223,6 +223,7 @@ class Controller extends Base
 
         $typeId    = (isset($get['type']) && is_numeric($get['type'])) ? (int)$get['type'] : null;
         $subtypeId = (isset($get['subtype']) && is_numeric($get['subtype'])) ? (int)$get['subtype'] : null;
+        $showArchived = $get->getBool('showArchived', false);
 
         // Limit the number of pastoral records to display on each page of pastoral records
         $resultsPerPage = (int)$this->config->get('pastoral_page_size');
@@ -230,7 +231,7 @@ class Controller extends Base
         // Set the current page number
         $pageCurrent = isset($get['pageCurrent']) && is_numeric($get['pageCurrent']) ? (int)$get['pageCurrent'] : 1;
 
-        $recordCount = $this->pastoralDataSource->countRecords($user, $student, $typeId, $subtypeId);
+        $recordCount = $this->pastoralDataSource->countRecords($user, $student, $typeId, $subtypeId, $showArchived);
 
         $maxPage = (int)ceil($recordCount / $resultsPerPage);
         if ($maxPage < 1) {
@@ -243,7 +244,7 @@ class Controller extends Base
             $pageCurrent = 1;
         }
         // populate related records
-        $pageRecords = $this->pastoralDataSource->findRecords($user, $student, $typeId, $subtypeId, ($pageCurrent - 1) * $resultsPerPage, $resultsPerPage, null);
+        $pageRecords = $this->pastoralDataSource->findRecords($user, $student, $typeId, $subtypeId, ($pageCurrent - 1) * $resultsPerPage, $resultsPerPage, null, $showArchived);
 
         $pastoralCountHelper = new PastoralCountHelper(
             $this->routeGenerator,
@@ -270,6 +271,7 @@ class Controller extends Base
                 ],
                 'typeSelected'        => $typeId,
                 'subtypeSelected'     => $subtypeId,
+                'showArchived'        => $showArchived ? 1 : 0,
                 'resultsPerPage'      => $resultsPerPage,
                 'pagesToDisplay'      => $maxPage,
             ],

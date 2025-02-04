@@ -23,7 +23,7 @@
             <section>
                 <ul class="information-list">
                     {% for record in records %}
-                        <li data-record-type="{{ record.type.id }}" class="actions-small-2" id="pastoral-{{ record.id }}">
+                        <li data-record-type="{{ record.type.id }}" class="actions-small-2 {% if record.expiresAt is not null %}faded{% endif %}" id="pastoral-{{ record.id }}">
                             <div class="list-item">
                                 <div class="card small-12 wrap-down">
                                     <a href="{{ profile.link(record.owner) }}">
@@ -37,6 +37,9 @@
                                         <h3>{{ record.heading }}
                                             {% if config.pastoral_severity == true and record.severity and record.severity.color %}
                                                 <span class="circle" style="background-color:{{ record.severity.color }}" title="{{ record.severity.name }}"></span>
+                                            {% endif %}
+                                            {% if record.expiresAt is not null %}
+                                                <sbx-icon name="archive" size="0.75rem" title="Record archived - {{ record.expiresAt | date('M d, Y') }}"></sbx-icon>
                                             {% endif %}
                                         </h3>
                                     </a>
@@ -106,7 +109,7 @@
                 </ul>
             </section>
             <div class="right">
-                {{ paginator.buttons(pageCurrent, recordCount, resultsPerPage, pagesToDisplay, typeSelected) }}
+                {{ paginator.buttons(pageCurrent, recordCount, resultsPerPage, pagesToDisplay, typeSelected, showArchived) }}
             </div>
         </div>
     </div>
