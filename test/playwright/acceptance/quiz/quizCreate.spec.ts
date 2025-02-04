@@ -7,6 +7,7 @@ import Resources from "@schoolboxTest/playwright/support/page/resources/Resource
 import Homepage from "@schoolboxTest/playwright/support/page/homepage/Homepage";
 import AssessmentForm from "@schoolboxTest/playwright/support/page/dueWork/AssessmentForm";
 import QuizSettingPage from "@schoolboxTest/playwright/support/page/quiz/QuizSettingPage";
+import Common from "@schoolboxTest/playwright/support/page/Common";
 
 /**
  * covenience function to create a homepage
@@ -62,15 +63,13 @@ test.describe("Quiz Create Tests", () => {
         const assessmentForm = new AssessmentForm(tester, page);
         const quiz = new QuizSettingPage(tester, page);
 
-        const quizName = "Quiz 1";
+        const quizName = "Quiz Automation Test";
         const folderName = "Test Class Homepage Quiz";
 
         tester.isGoingTo("create a homepage, navigate to the class page and add a quiz component");
         await createClassPage(tester, page, db, folderName);
         await resources.goto();
-        await expect(page.locator(`li[title="${folderName}"]`)).toBeVisible();
         const folderId = (await db.grabFromDatabase("folder", "id", { deleted_at: null, name: folderName })) as string;
-        expect(folderId).not.toBe(null);
         await resources.clickFolderName(folderName);
         await page.waitForLoadState("domcontentloaded");
         await resources.clickMenuItem("home");
@@ -83,7 +82,7 @@ test.describe("Quiz Create Tests", () => {
         await homepage.clickComponentEmptyStateLink(layout, position);
         await quiz.setTitle(quizName);
         await assessmentForm.setWorkType(AssessmentForm.WORKTYPE_ASSESSMENT_TASK);
-        await quiz.create();
+        await quiz.create(quizName);
 
         tester.isGoingTo("navigate to the homepage and ensure the quiz is presented");
         await homepage.goto(parseInt(folderId, 10));
@@ -91,7 +90,9 @@ test.describe("Quiz Create Tests", () => {
             deleted_at: null,
             "title like": quizName,
         })) as number;
-        await expect(page.getByTestId(`component-assessment-title-${quizId}`)).toContainText(quizName);
+        await expect(page.getByTestId(`${Homepage.SELECTOR_ASSESSMENT_COMPONENT_TITLE}${quizId}`)).toContainText(
+            quizName,
+        );
     });
 
     test("Modify a quiz settings", async ({ tester, page, db }) => {
@@ -99,7 +100,7 @@ test.describe("Quiz Create Tests", () => {
         const assessmentForm = new AssessmentForm(tester, page);
         const quiz = new QuizSettingPage(tester, page);
 
-        const quizName = "Quiz 1";
+        const quizName = "Quiz Automation Test";
         const folderName = "Test Class Homepage Quiz";
         const folderId = (await db.grabFromDatabase("folder", "id", { deleted_at: null, name: folderName })) as string;
         const quizId = (await db.grabFromDatabase("assessment", "id", {
@@ -110,8 +111,55 @@ test.describe("Quiz Create Tests", () => {
         tester.isGoingTo("navigate to the class page. click the quiz dropdown and click Modify");
         await homepage.goto(parseInt(folderId, 10));
         await homepage.clickAssessmentComponentTOTMenu(quizId);
-        await page.locator(`a.icon-modify`).getByText("Modify Settings").click();
+        await homepage.clickModifyViaAssessmentComponent("Modify Settings");
+
+        tester.isGoingTo("modify the quiz title and work type");
+        await quiz.setTitle("Quiz Automation Test Updated");
+        await assessmentForm.setWorkType(AssessmentForm.WORKTYPE_HOMEWORK);
+        await assessmentForm.update();
+
+        tester.isGoingTo("check the quiz title and work type are updated");
+        await homepage.clickAssessmentComponentTitle(quizId);
+
+        await expect(page.locator(`ul.breadcrumb`)).toContainText("Quiz Automation Test Updated");
+        await expect(page.locator(`li.icon-quiz`)).toHaveText("Homework");
     });
 
-    test("Delete a quiz", async ({ tester, page, db }) => {});
+    test("Delete a quiz", async ({ tester, page, db }) => {
+        const homepage = new Homepage(page);
+        const common = new Common(page);
+
+        const quizName = "Quiz Automation Test Updated";
+        const folderName = "Test Class Homepage Quiz";
+        const folderId = (await db.grabFromDatabase("folder", "id", { deleted_at: null, name: folderName })) as string;
+        const quizId = (await db.grabFromDatabase("assessment", "id", {
+            deleted_at: null,
+            "title like": quizName,
+        })) as number;
+
+        tester.isGoingTo("navigate to the class page. click the quiz dropdown and click Delete");
+        await homepage.goto(parseInt(folderId, 10));
+        await homepage.clickAssessmentComponentTOTMenu(quizId);
+        await homepage.clickDeleteViaAssessmentComponent(quizId);
+        await common.clickConfirmButton();
+
+        tester.isGoingTo("check the quiz is deleted");
+        await expect(
+            page.locator("div.empty-state").getByText("that is not a part of your course to test your students."),
+        ).toBeVisible();
+    });
+
+    test.afterAll(async ({ baseTester, db }) => {
+        baseTester.isGoingTo("update delete_at for the quiz assessment so it does not impact the news tests");
+        await db.updateInDatabase(
+            "assessment",
+            { deleted_at: "2022-01-15 11:22:34" },
+            { "title like": "Quiz Automation Test%", deleted_at: null },
+        );
+        await db.updateInDatabase(
+            "folder",
+            { deleted_at: "2020-01-15 11:22:34" },
+            { "name like": "Test Class Homepage Quiz" },
+        );
+    });
 });

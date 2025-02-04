@@ -62,7 +62,13 @@ export default class Homepage {
 
     static readonly REMOVE_BUTTON_CONFIRMATION_MESSAGE = "Remove";
 
-    static readonly ASSESSMENT_COMPONENT_TOT_MENU = "sbx-pop-out-duework-options";
+    static readonly SELECTOR_ASSESSMENT_COMPONENT_TOT_MENU = "sbx-pop-out-duework-options";
+
+    static readonly SELECTOR_ASSESSMENT_COMPONENT_TITLE = "component-assessment-title-";
+
+    static readonly ASSESSMENT_COMPONENT_TOT_MENU_MODIFY = "a.icon-modify";
+
+    static readonly SELECTOR_ASSESSMENT_COMPONENT_TOT_MENU_DELETE = "component-assessment-actions-delete-";
 
     constructor(page: Page) {
         this.page = page;
@@ -246,6 +252,31 @@ export default class Homepage {
      * @param assessmentId - The assessment ID.
      */
     async clickAssessmentComponentTOTMenu(assessmentId: number): Promise<void> {
-        await this.page.getByTestId(`${Homepage.ASSESSMENT_COMPONENT_TOT_MENU}${assessmentId}`).click();
+        await this.page.getByTestId(`${Homepage.SELECTOR_ASSESSMENT_COMPONENT_TOT_MENU}${assessmentId}`).click();
+    }
+
+    /**
+     * Click the assessment component title
+     * @param assessmentId - The assessment ID.
+     */
+    async clickAssessmentComponentTitle(assessmentId: number): Promise<void> {
+        await this.page.getByTestId(`${Homepage.SELECTOR_ASSESSMENT_COMPONENT_TITLE}${assessmentId}`).click();
+    }
+
+    /**
+     * click Modify Settings via Quiz Component
+     * @param modifyButtonName - The modify button name: for Due work it is "Modify", for Quizzes it is "Modify Settings"
+     */
+    async clickModifyViaAssessmentComponent(modifyButtonName: string): Promise<void> {
+        await this.page.locator(Homepage.ASSESSMENT_COMPONENT_TOT_MENU_MODIFY).getByText(modifyButtonName).click();
+    }
+
+    /**
+     * click Delete Settings via Quiz Component
+     * @param assessmentId - The assessment ID.
+     * .
+     */
+    async clickDeleteViaAssessmentComponent(assessmentId: number): Promise<void> {
+        await this.page.getByTestId(`${Homepage.SELECTOR_ASSESSMENT_COMPONENT_TOT_MENU_DELETE}${assessmentId}`).click();
     }
 }
