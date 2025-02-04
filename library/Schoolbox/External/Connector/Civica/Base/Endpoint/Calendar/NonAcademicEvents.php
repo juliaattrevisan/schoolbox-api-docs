@@ -25,13 +25,13 @@ class NonAcademicEvents implements IStrategy
     /**
      * Constructor.
      *
-     * @param LoggerInterface                       $log
-     * @param bool                                  $perform
-     * @param IApi                                  $api
-     * @param Mapper                                $eventMapper
+     * @param LoggerInterface $log
+     * @param bool $perform
+     * @param IApi $api
+     * @param Mapper $eventMapper
      * @param \Schoolbox\External\Event\User\Mapper $eventUserMapper
-     * @param string                                $fromDate
-     * @param string                                $toDate
+     * @param \Alaress_Date_Format $fromDate
+     * @param \Alaress_Date_Format $toDate
      */
     public function __construct(
         private LoggerInterface $log,
@@ -39,8 +39,8 @@ class NonAcademicEvents implements IStrategy
         private IApi $api,
         private \Schoolbox\External\Event\Mapper $eventMapper,
         private \Schoolbox\External\Event\User\Mapper $eventUserMapper,
-        private string $fromDate,
-        private string $toDate
+        private \Alaress_Date_Format $fromDate,
+        private \Alaress_Date_Format $toDate
     ) {
     }
 
@@ -74,6 +74,13 @@ class NonAcademicEvents implements IStrategy
          */
         $event = $this->createEvent($data);
 
+        /* An event might be skipped based on the data evaluated inside createEvent()
+         * where it already throws log messages at you
+         */
+        if (null === $event) {
+            return;
+        }
+
         /* Save the involvements
          */
         $this->createInvolvements($data, $event);
@@ -84,10 +91,11 @@ class NonAcademicEvents implements IStrategy
      * Create a new SUDS Timetable Event with all the class and lesson pieces
      *
      * @param array $data
-     * @return Model
+     * @return Model|null
      * @throws Exception
      */
-    private function createEvent(array $data): \Schoolbox\External\Event\Model {
+    private function createEvent(array $data): ?\Schoolbox\External\Event\Model
+    {
         /* Name is the same as the Code, in compass
          */
         $title = trim((string)$data['eventName']);
@@ -140,6 +148,18 @@ class NonAcademicEvents implements IStrategy
 
         $startAt = new \Alaress_Date_Format($startVal, \Alaress_Date_Format::DATABASE_FORMAT);
         $finishAt = new \Alaress_Date_Format($endVal, \Alaress_Date_Format::DATABASE_FORMAT);
+
+        /* Check that the event starts in the time window
+         */
+        if (!$startAt->between($this->fromDate, $this->toDate)) {
+            $this->log->debug(sprintf(
+                'This event is outside the time window %s to %s - skipping.',
+                $this->fromDate->getDatabase(),
+                $this->toDate->getDatabase()
+            ));
+
+            return null;
+        }
 
         /* This is pretty optional - this is the sis' equivalent of our luEventType
          * Sometimes it's provided, sometimes it's not - we can record it here if
@@ -287,12 +307,10 @@ class NonAcademicEvents implements IStrategy
      * Save an involvement for user $externalId, whose name is $name,
      * for the sis_event $event
      *
-     * @param \Schoolbox\External\Event\Model $event
-     * @param string                          $externalId
+     * @param Model $event
+     * @param array $student
      * @return void
-     * @throws \PDOException
-     * @throws \Schoolbox\Mapper\Exception
-     * @throws \UnexpectedValueException
+     * @throws Exception
      */
     private function saveStudentInvolvement(
         \Schoolbox\External\Event\Model $event,
