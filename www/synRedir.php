@@ -1,21 +1,23 @@
 <?php
 
-use GuzzleHttp\Client as GuzzleClient;
 use GuzzleHttp\Exception as GuzzleException;
 use GuzzleHttp\Exception\RequestException as RequestException;
 use Schoolbox\Application\Exception\Exception as SchoolboxException;
+use Schoolbox\IConfigLoader;
 
 /* Script to automatically login to synergetic portal based on existing login creditials */
 require_once __DIR__ . '/../conf/core/require.php';
 $kernel = new \Schoolbox\Application\WebRequest\Kernel();
+
 /** @var SitePage $page */
 $page = $kernel->get('sitePage');
 $page->initSession();
-$user = $_SESSION['user'];
-$url = new \Schoolbox\Url\Uri(Config::get('external_portal'));
 
-const REQUEST_TIMEOUT = 20;
-const CONNECT_TIMEOUT = 10;
+/** @var IConfigLoader $config */
+$config = $kernel->get('config');
+
+$user = $_SESSION['user'];
+$url = new \Schoolbox\Url\Uri($config->get('external_portal'));
 
 /* If the user has already passed by the login, we can go directly to the page */
 if ($_SESSION['communityLogin'] ?? false) {
@@ -51,10 +53,11 @@ if ($_SESSION['communityLogin'] ?? false) {
     /* First contact the site to get some CSRF hacks */
     $method = "POST";
 
+    /** @var \GuzzleHttp\Client $httpClient */
     $httpClient = $kernel->get('httpClient');
 
     try {
-        $headers = ['User-Agent' => 'schoolbox/' . Config::get('site_version')];
+        $headers = ['User-Agent' => 'schoolbox/' . $config->get('site_version')];
         /**
          * check scheme, if webcal, update the scheme to http
          * libcurl which is what `GuzzleClient->get` is using under the hood doesnt understand webmail
