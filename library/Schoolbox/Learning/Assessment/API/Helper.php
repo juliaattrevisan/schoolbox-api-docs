@@ -314,7 +314,7 @@ class Helper
         }
         if (array_key_exists('weighted', $filter)) {
             $where .= " AND assessment.weight ";
-            if ((new Values([$filter['weighted']]))->getBool(0) === true) {
+            if ((new Values(['key' => $filter['weighted']]))->getBool('key') === true) {
                 $where .= " != 0.00 ";
             } else {
                 $where .= " = 0.00 ";

@@ -76,7 +76,7 @@ class Validator
                     }
                     break;
                 case 'weighted':
-                    if (!is_bool((new Values([$value]))->getBool(0))) {
+                    if (!is_bool((new Values(['key' => $value]))->getBool('key'))) {
                         throw new SchoolboxException("Filter 'weighted' must have a boolean value.");
                     }
                     break;
