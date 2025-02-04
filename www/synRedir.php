@@ -14,8 +14,6 @@ $page->initSession();
 $user = $_SESSION['user'];
 $url = new \Schoolbox\Url\Uri(Config::get('external_portal'));
 
-$url = new \Schoolbox\Url\Uri("https://0.0.0.0/");
-
 const REQUEST_TIMEOUT = 20;
 const CONNECT_TIMEOUT = 10;
 
