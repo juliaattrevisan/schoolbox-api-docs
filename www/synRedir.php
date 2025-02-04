@@ -1,4 +1,10 @@
 <?php
+
+use GuzzleHttp\Client as GuzzleClient;
+use GuzzleHttp\Exception as GuzzleException;
+use GuzzleHttp\Exception\RequestException as RequestException;
+use Schoolbox\Application\Exception\Exception as SchoolboxException;
+
 /* Script to automatically login to synergetic portal based on existing login creditials */
 require_once __DIR__ . '/../conf/core/require.php';
 $kernel = new \Schoolbox\Application\WebRequest\Kernel();
@@ -7,6 +13,11 @@ $page = $kernel->get('sitePage');
 $page->initSession();
 $user = $_SESSION['user'];
 $url = new \Schoolbox\Url\Uri(Config::get('external_portal'));
+
+$url = new \Schoolbox\Url\Uri("https://0.0.0.0/");
+
+const REQUEST_TIMEOUT = 20;
+const CONNECT_TIMEOUT = 10;
 
 /* If the user has already passed by the login, we can go directly to the page */
 if ($_SESSION['communityLogin'] ?? false) {
@@ -41,13 +52,25 @@ if ($_SESSION['communityLogin'] ?? false) {
 
     /* First contact the site to get some CSRF hacks */
     $method = "POST";
-    $ch = curl_init();
-    curl_setopt($ch, CURLOPT_URL, $action);
-    curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-    curl_setopt($ch, CURLOPT_USERAGENT, 'schoolbox/' . Config::get('site_version'));
-    $login = curl_exec($ch);
-    curl_close($ch);
-    unset($ch);
+
+    $httpClient = new GuzzleClient([
+        'curl'              => Proxy\Server::getInstance()->buildCurlOptions(),
+        'timeout'           => REQUEST_TIMEOUT,
+        'connect_timeout'   => CONNECT_TIMEOUT
+    ]);
+
+    try {
+        $headers = ['User-Agent' => 'schoolbox/' . Config::get('site_version')];
+        /**
+         * check scheme, if webcal, update the scheme to http
+         * libcurl which is what `GuzzleClient->get` is using under the hood doesnt understand webmail
+         * so lets just replace that here to http. and hope the remote server will redirect to https
+         * not just error out, or serve the data on http.
+         */
+        $login = $httpClient->get($url, ['headers' => $headers])->getBody()->getContents();
+    } catch (RequestException | GuzzleException\ConnectException | GuzzleException\GuzzleException $e) {
+        throw new SchoolboxException("Community Portal Login Unavailable. Please try again later", 0, $e);
+    }
 
     /* Set the URL to redirect the user to after login */
     if ($_GET['page']) {
