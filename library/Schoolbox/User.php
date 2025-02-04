@@ -1451,7 +1451,7 @@ class User implements Serializable, Linkable, ISoftDeletable, IModel
 
         foreach ($accessList->filterBy('service', $servicePermission) as $access) {
             /** @var UserAccess $access */
-            if ($sId === $access->getServiceIdentifier()) {
+            if ($sId === null || $access->getServiceIdentifier() === $sId) {
                 return $access->getAccessLevel();
             }
         }
