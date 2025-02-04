@@ -16,7 +16,7 @@ class Proxy
 
     /* HMAC algorithm for hashing the request
      */
-    private const PAPERLY_PROXY_HMAC_ALGO = 'sha256';
+    public const PAPERLY_PROXY_HMAC_ALGO = 'sha256';
 
     public function __construct(
         private IConnector $externalDb,
@@ -110,15 +110,15 @@ class Proxy
     }
 
     /**
-     * Validate whether the sql has been tampered with during transmission
+     * Validate that the request has not been tampered with during transmission
      *
      * @param $hash
      * @param $sql
      * @param $secret
      * @return bool
      */
-    public function validateRequest($hash, $sql, $secret): bool
+    public function isValidRequest($hash, $sql, $secret): bool
     {
-        return hash_hmac(self::PAPERLY_PROXY_HMAC_ALGO, $sql, $secret) !== $hash;
+        return hash_hmac(self::PAPERLY_PROXY_HMAC_ALGO, $sql, $secret) === $hash;
     }
 }
