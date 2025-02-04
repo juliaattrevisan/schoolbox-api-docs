@@ -29,12 +29,19 @@
             <a class="close-reveal-modal" aria-label="Close">&#215;</a>
             <ul class="flex-list">
                 <li><button class="button icon-approve submit">Yes</button></li>
-                <li><button class="button icon-close">Cancel</button></li>
+                <li><button class="button icon-close" id="close-apply-default-expiry">Cancel</button></li>
             </ul>
         </div>
         <script type="text/javascript">
         {% autoescape 'js' %}
-
+        $(function () {
+            /**
+             * Close the modal
+             */
+            $("#close-apply-default-expiry").on("click", () => {
+                $("#confirm-apply-default-expiry").foundation("reveal", "close");
+            });
+        });
         {% endautoescape %}
     </script>
         <div class="small-12 island" id="formPastoral">
