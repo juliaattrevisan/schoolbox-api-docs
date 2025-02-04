@@ -69,7 +69,8 @@ class NonAcademicEvents implements IStrategy
      * @return void
      * @throws Exception
      */
-    private function processEvent(array $data): void {
+    private function processEvent(array $data): void
+    {
         /* Save sis_event record
          */
         $event = $this->createEvent($data);
