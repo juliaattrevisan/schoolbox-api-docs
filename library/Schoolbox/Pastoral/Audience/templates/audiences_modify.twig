@@ -55,6 +55,7 @@
                 }
                 confirmButton.setAttribute("data-is-processing", "true");
                 confirmButton.innerHTML = "Applying...";
+                window.sbProps.toastActivate("Applying...");
                 /**
                  * send through the apply default expiry request
                  */
@@ -69,17 +70,19 @@
                     }).then((response) => {
                         if (response.ok) {
                             $("#apply-default-expiry-modal").foundation("reveal", "close");
-                            // fire toast success
+                            window.sbProps.toastTimeout({ text: "Applied successfully" });
                         } else {
-                            // fire toast error
+                            window.sbProps.toastTimeout({ text: "There was an unknown error", isSuccess: false });
                         }
                         confirmButton.setAttribute("data-is-processing", "false");
                         confirmButton.innerHTML = "Yes";
+                        $("#apply-default-expiry-modal").foundation("reveal", "close");
                     });
                 } catch (e) {
-                    // fire toast error
+                    window.sbProps.toastTimeout({ text: "There was an unknown error", isSuccess: false });
                     confirmButton.setAttribute("data-is-processing", "false");
                     confirmButton.innerHTML = "Yes";
+                    $("#apply-default-expiry-modal").foundation("reveal", "close");
                 }
                 */
             });

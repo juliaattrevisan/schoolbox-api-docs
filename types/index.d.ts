@@ -12,6 +12,7 @@ import type { DefineComponent } from "vue";
 import type { SbxEditor } from "@js/editor/types/editorTypes";
 import type { RosettaStone } from "@js/terminology/rosettaStone";
 import type { injectScriptsIfNotLoaded } from "@js/util/domUtils";
+import type { activate, timeout } from "@schoolboxVue/components/toast/sbxToastEvent";
 import type { SbxGlobalDocumentEventHandlerMap, SbxGlobalElementEventHandlerMap } from "./sbxEvents";
 
 declare global {
@@ -46,6 +47,8 @@ declare global {
             imageLightboxLicenseKey: string;
             imageSlideshowListenerExists?: true | undefined;
             injectScriptsIfNotLoaded: typeof injectScriptsIfNotLoaded;
+            toastActivate: typeof activate;
+            toastTimeout: typeof timeout;
             MAX_BYTES_MYSQL_TEXT: number;
             MAX_BYTES_MYSQL_MEDIUMTEXT: number;
             l10n: RosettaStone;
