@@ -382,7 +382,7 @@ class External_Synergetic_User implements External_UserInterface
                 // $student['StudentBoarder'] = $this->determineBoarderType((string)$student['StudentBoarder']);
 
                 /* Initialise stacks
-                 */)
+                 */
                 $student['AlertMessage'] = [];
                 $student['AlertLegal'] = [];
             }
