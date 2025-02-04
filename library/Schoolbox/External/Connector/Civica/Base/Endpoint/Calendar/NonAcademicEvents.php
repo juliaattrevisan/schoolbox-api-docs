@@ -76,7 +76,7 @@ class NonAcademicEvents implements IStrategy
 
         /* Save the involvements
          */
-//        $this->createInvolvements($data, $event);
+        $this->createInvolvements($data, $event);
     }
 
 
@@ -222,9 +222,7 @@ class NonAcademicEvents implements IStrategy
         } else {
             foreach ($data['staff'] as $staff) {
                 $this->saveStaffInvolvement($event, [
-                    /* TODO convert this to an actual external id via hash lookup
-                     */
-                    'externalId' => $staff['personId']
+                    'externalId' => (trim((string)$staff['personId']))
                 ]);
             }
         }
@@ -239,10 +237,8 @@ class NonAcademicEvents implements IStrategy
             ));
         } else {
             foreach ($data['students'] as $student) {
-                /* TODO convert this to an actual external id via hash lookup
-                 */
                 $this->saveStudentInvolvement($event, [
-                    'externalId' => $student['personId']
+                    'externalId' => trim((string)$student['personId'])
                 ]);
             }
         }
