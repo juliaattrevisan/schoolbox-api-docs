@@ -12,12 +12,11 @@ use Alaress\Session\ImpersonationCheck;
 use Alaress\Web\Controller\Base;
 use GuzzleHttp\ClientInterface;
 use Schoolbox\Oidc\Server\BackChannelLogout\RequestFactory;
-use Schoolbox\Oidc\Server\RelyingParty\Grant\Mapper as RelyingPartyGrantMapper;
+use Schoolbox\Oidc\Server\RelyingParty\Grant;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\User;
 use User\Logger;
 use Ramsey\Uuid\Uuid;
-use Schoolbox\Oidc\Server\RelyingParty\Mapper as RelyingPartyMapper;
 use Schoolbox\Oidc\Server\BackChannelLogout;
 
 class Controller extends Base
@@ -37,7 +36,7 @@ class Controller extends Base
     public function __construct(
         UserAccessMapper $userAccessMapper,
         Logger\Mapper $assumeUserLogMapper,
-        private RelyingPartyGrantMapper $relyingPartyGrantMapper,
+        private Grant\Mapper $relyingPartyGrantMapper,
         RequestFactory $requestFactory,
         ClientInterface $httpClient,
     ) {
@@ -164,11 +163,12 @@ class Controller extends Base
     {
         // This is similar to what's implemented in www/logout.php when user logs out
         $backChannelRequests = [];
+        /** @var Grant\Model $relyingPartyGrant */
         foreach ($this->relyingPartyGrantMapper->findByUser($initialUser) as $relyingPartyGrant) {
             // Does this client support logout?
             // If so, craft a logout token and send it
             $client = $relyingPartyGrant->getRelyingParty();
-            if ($client?->getBackChannelLogoutUri()) {
+            if ($client->getBackChannelLogoutUri()) {
                 // Create logout factory and client on demand only
                 $request = $this->requestFactory->build(
                     $initialUser,
