@@ -78,6 +78,7 @@ class SubmissionBoxMapper extends BaseMapper
         $this->uses('enable_files', self::TYPE_BOOLEAN, null, 'enableFiles');
         $this->uses('enable_policy', self::TYPE_BOOLEAN, null, 'enablePolicy');
         $this->uses('max_mark', self::TYPE_DECIMAL);
+        $this->uses('instructor_max_mark', self::TYPE_DECIMAL);
         $this->uses('use_rubric', self::TYPE_BOOLEAN);
         $this->joins('rubric_capability_mark_type_id', SubmissionBox\MarkTypeMapper::class, 'mark_type_id', null, null, 'capabilityMarkType');
         $this->joins('rubric_capability_grade_group_id', SubmissionBox\GradeLevel\Group\Mapper::class, 'id', null, null, 'capabilityGradeGroup');
@@ -90,7 +91,9 @@ class SubmissionBoxMapper extends BaseMapper
 
         $this->joins('owner', Schoolbox\UserMapper::class);
         $this->joins('mark_type', SubmissionBox\MarkTypeMapper::class, 'mark_type_id');
+        $this->joins('instructor_mark_type', SubmissionBox\MarkTypeMapper::class, 'mark_type_id');
         $this->joins('submission_grade_group_id', SubmissionBox\GradeLevel\Group\Mapper::class, 'id', null, null, 'gradeGroup', 'grade_group');
+        $this->joins('submission_instructor_grade_group_id', SubmissionBox\GradeLevel\Group\Mapper::class, 'id', null, null, 'instructorGradeGroup', 'instructor_grade_group');
         $this->joins('assessment_id', AssessmentMapper::class, 'id', null, null, 'assessmentModel', 'assessmentModel');
 
         // Unmapped join onto individual files
@@ -334,6 +337,7 @@ class SubmissionBoxMapper extends BaseMapper
 				{$marktype_mapper->getColumnString('mt')}
 			FROM {$this->getTable()} sb
 			LEFT JOIN {$this->getJoinSql('mark_type', 'sb', 'mt')}
+            LEFT JOIN {$this->getJoinSql('instructor_mark_type', 'sb', 'tmt')}
 			WHERE sb.id=?
 		";
         $statement = $this->database->prepare($query);
@@ -345,6 +349,7 @@ class SubmissionBoxMapper extends BaseMapper
             if (!($submission_box instanceof SubmissionBox)) {
                 $submission_box = $this->hydrate($row, 'sb');
                 $submission_box->setMarkType($marktype_mapper->hydrate($row, 'mt'));
+                $submission_box->setInstructorMarkType($marktype_mapper->hydrate($row, 'tmt'));
                 try {
                     $submission_box->setAssessmentModel($this->getJoinMapper('assessmentModel')->findById($row['sb.assessment_id'])); // I despise the necessity of this
                 } catch (Schoolbox\Mapper\Exception\Deleted $e) {
