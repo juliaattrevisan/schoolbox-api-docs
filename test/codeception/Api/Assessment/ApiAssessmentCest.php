@@ -135,6 +135,26 @@ class ApiAssessmentCest
         ];
         yield [
             'filter' => [
+                'folder' => [
+                    'code' => $this->folder->getCodeString(),
+                ],
+            ],
+            'valid'  => false,
+        ];
+        yield [
+            'filter' => [
+                'folder' => 83
+            ],
+            'valid'  => false,
+        ];
+        yield [
+            'filter' => [
+                'folder' => [83, 16]
+            ],
+            'valid'  => false,
+        ];
+        yield [
+            'filter' => [
                 // course subject code
                 'subjectCode' => 'English',
             ],
@@ -201,6 +221,36 @@ class ApiAssessmentCest
                 'due Date' => [
                     'from' => '2010-01-30T21:00:00.000Z',
                 ],
+            ],
+            'valid'  => false,
+        ];
+        yield [
+            'filter' => [
+                'unknownParameter' => 1
+            ],
+            'valid'  => false,
+        ];
+        yield [
+            'filter' => [
+                'yearLevel' => 1
+            ],
+            'valid'  => false,
+        ];
+        yield [
+            'filter' => [
+                'yearLevel' => [1, 2]
+            ],
+            'valid'  => false,
+        ];
+        yield [
+            'filter' => [
+                'project' => 1
+            ],
+            'valid'  => false,
+        ];
+        yield [
+            'filter' => [
+                'project' => [1, 2]
             ],
             'valid'  => false,
         ];
