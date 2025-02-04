@@ -1263,7 +1263,7 @@ class Helper
                     }
                     break;
                 case 'name':
-                    if (!is_numeric($value)) {
+                    if (!is_string($value)) {
                         throw new SchoolboxException("Filter '$arrayName' property 'name' must have a string value.");
                     }
                     break;
