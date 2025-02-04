@@ -33,13 +33,6 @@ use Symfony\Component\HttpFoundation\Response;
 class Controller extends Base
 {
     /**
-     * Session var where OIDC clients which have authenticated using this server
-     * are stored: when this logs out, this server will send logout requests to
-     * all of those clients.
-     */
-    public const SESSION_OIDC_SERVER_CLIENTS = 'oidcServerClients';
-
-    /**
      * Constructor
      *
      * @param Server\AuthorizationServer      $authServer                   The authorization server for servicing OIDC
@@ -152,11 +145,6 @@ class Controller extends Base
                         ->setExpiresAt(Alaress_Date_Format::now()->addMonths(3));
                     $this->relyingPartyGrantMapper->save($relyingPartyGrant);
                 }
-
-                $client           = $authRequest->getClient();
-                $currentClients   = $this->getSession()->get(self::SESSION_OIDC_SERVER_CLIENTS, []);
-                $currentClients[] = $client->getIdentifier();
-                $this->getSession()->set(self::SESSION_OIDC_SERVER_CLIENTS, array_unique($currentClients));
             }
 
             try {
