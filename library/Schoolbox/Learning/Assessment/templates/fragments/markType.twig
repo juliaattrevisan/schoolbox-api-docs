@@ -9,6 +9,7 @@
  # @param IAssessable $assessment       An assessment instance
  # @param array $allMarkTypes           tuples for (id, name) of mark types
  # @param array $allGradeSchemes        tuples for (id, name) of grading schemes
+ # @param int|null $selectedMaxMark     The maximum mark currently selected
  # @param int|null $selectedMarkType    The mark type currently selected
  # @param int|null $selectedGradeGroup  The grade group currently selected
  # @param int $defaultGradeGroup        Set in admin via default_grade_group config var
@@ -69,7 +70,7 @@
     <div class="small-12 medium-6 columns" style="display:none;" data-max-mark="{{ context }}">
         <label for="{{ context }}maxMark">
             Maximum Available Marks
-            <input id="{{ context }}maxMark" type="text" name="{{ context }}maxMark" value="{{ assessment.maxMark ?? '' }}" {% if courseManagedReadonly ?? false %}readonly{% endif %} />
+            <input id="{{ context }}maxMark" type="text" name="{{ context }}maxMark" value="{{ selectedMaxMark ?? '' }}" {% if courseManagedReadonly ?? false %}readonly{% endif %} />
         </label>
     </div>
     {% endif %}

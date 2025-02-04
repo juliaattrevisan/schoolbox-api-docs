@@ -235,12 +235,13 @@
     {% set markTypeNone = 6 %}
 
     {% include '@learningAssessment/fragments/markType.twig' with {
-        context: 'teacher',
+        context: 'instructor',
         assessment: assessment,
         allMarkTypes: allMarkTypes,
         allGradeSchemes: allGradeSchemes,
-        selectedMarkType: assessment.markType.id ?? null,
-        selectedGradeGroup: assessment.gradeGroup.id ?? null,
+        selectedMaxMark: assessment.instructorMaxMark ?? null,
+        selectedMarkType: assessment.instructorMarkType.id ?? null,
+        selectedGradeGroup: assessment.instructorGradeGroup.id ?? null,
         defaultGradeGroup: defaultGradeGroup,
         renderMaxMark: true,
         markTypeLabel: 'Input Mark Type',
@@ -253,6 +254,7 @@
         assessment: assessment,
         allMarkTypes: allMarkTypes,
         allGradeSchemes: allGradeSchemes,
+        selectedMaxMark: assessment.maxMark ?? null,
         selectedMarkType: assessment.markType.id ?? null,
         selectedGradeGroup: assessment.gradeGroup.id ?? null,
         defaultGradeGroup: defaultGradeGroup,
