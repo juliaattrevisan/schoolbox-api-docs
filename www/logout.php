@@ -19,17 +19,17 @@ $backChannelRequests = [];
 $relyingPartyGrantMapper = RelyingPartyGrantMapper::getInstance();
 $currentUser             = $_SESSION['user'] ?? null;
 if ($currentUser instanceof \Schoolbox\User) {
-    foreach ($relyingPartyGrantMapper->findByUser($currentUser) as $relyingPartyUser) {
+    foreach ($relyingPartyGrantMapper->findByUser($currentUser) as $relyingPartyGrant) {
         // Does this client support logout?
         // If so, craft a logout token and send it
-        $client = $relyingPartyUser->getRelyingParty();
+        $client = $relyingPartyGrant->getRelyingParty();
         if ($client?->getBackChannelLogoutUri()) {
             // Create logout factory and client on demand only
             $logoutFactory ??= new BackChannelLogout\RequestFactory(
                 $kernel->get('user.tokenBuilder'),
                 $kernel->get('httpFactory'),
             );
-            $request = $logoutFactory->build($currentUser, $client, Uuid::uuid4()->toString());
+            $request = $logoutFactory->build($currentUser, $relyingPartyGrant, Uuid::uuid4()->toString());
 
             $logoutClient                          ??= new BackChannelLogout\Client($kernel->get('httpClient'));
             $backChannelRequests[$client->getId()] = $logoutClient->send($request);

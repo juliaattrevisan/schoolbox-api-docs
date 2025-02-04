@@ -168,15 +168,15 @@ class Controller extends Base
     {
         // This is similar to what's implemented in www/logout.php when user logs out
         $backChannelRequests = [];
-        foreach ($this->relyingPartyGrantMapper->findByUser($initialUser) as $relyingPartyUser) {
+        foreach ($this->relyingPartyGrantMapper->findByUser($initialUser) as $relyingPartyGrant) {
             // Does this client support logout?
             // If so, craft a logout token and send it
-            $client = $relyingPartyUser->getRelyingParty();
+            $client = $relyingPartyGrant->getRelyingParty();
             if ($client?->getBackChannelLogoutUri()) {
                 // Create logout factory and client on demand only
                 $request = $this->requestFactory->build(
                     $initialUser,
-                    $client,
+                    $relyingPartyGrant,
                     Uuid::uuid4()->toString()
                 );
 
