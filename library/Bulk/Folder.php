@@ -137,7 +137,7 @@ class Bulk_Folder
         $folderCodeColumns  = $this->determineColumnIndexes($headerRow, 'code');
         $yearLevelColumns   = $this->determineColumnIndexes($headerRow, 'year');
         $templateColumn     = $this->determineColumnIndex($headerRow, 'template', false);
-        $sequenceColumn        = $this->determineColumnIndex($headerRow, 'sequence', false);
+        $sequenceColumn     = $this->determineColumnIndex($headerRow, 'sequence', false);
 
         // Check no overlapping matches
         $this->assertColumnIndexesAreUnique([$parentColumn, $folderNameColumn], $folderCodeColumns, $yearLevelColumns);
@@ -215,9 +215,9 @@ class Bulk_Folder
         int $templateColumnIndex,
         int $sequenceColumnIndex
     ): array {
-
-        $parentId   = trim($row[$parentColumnIndex]);
-        $folderName = trim($row[$folderNameColumnIndex]);
+        // Note fgetcsv() can return rows containing null values, hence null-coalesces below.
+        $parentId   = trim($row[$parentColumnIndex] ?? '');
+        $folderName = trim($row[$folderNameColumnIndex] ?? '');
 
         // Parent folder and Import Folder name must exist
         if (($parentId === '') || ($folderName === '')) {
