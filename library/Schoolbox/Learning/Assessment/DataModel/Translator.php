@@ -320,6 +320,16 @@ class Translator
             }
         }
 
+        // As above:
+        // Ideally this would exist in the Due Work translator, but that would require making this method public.
+        // That is too dangerous, best to perform an instanceof here.
+        if ($domainObject instanceof \Schoolbox\Learning\Assessment\DueWork\Model) {
+            /** @var \Schoolbox\Learning\Assessment\DueWork\Model $dataModel */
+            $dataModel->setInstructorMarkType($domainObject->getInstructorMarkType());
+            $dataModel->setInstructorMaxMark($domainObject->getInstructorMaxMark());
+            $dataModel->setInstructorGradeGroup($domainObject->getInstructorGradeGroup());
+        }
+
         // This would ideally be in the Project translator. But that would require making this method public.
         // The danger of that is worth the instanceof check here.
         if ($domainObject instanceof Project && $domainObject->getAssessables() !== null) {
@@ -441,6 +451,20 @@ class Translator
         $markScheme = $this->markSchemeFactory->spawnMarkSchemeFor($domainObject);
         if ($markScheme !== null) {
             $domainObject->setMarkScheme($markScheme);
+        }
+        // Instructor mark scheme/mark type is only for due works
+        // Ideally this would exist in the DueWork translator, but that would require making this method public.
+        // That is too dangerous, best to perform an instanceof here.
+        if ($domainObject instanceof \Schoolbox\Learning\Assessment\DueWork\Model) {
+            /** @var \Schoolbox\Learning\Assessment\DueWork\Model $dataModel */
+            $domainObject->setInstructorMarkType($dataModel->getInstructorMarkType());
+            $domainObject->setInstructorMaxMark($dataModel->getInstructorMaxMark());
+            $domainObject->setInstructorGradeGroup($dataModel->getInstructorGradeGroup());
+
+            $instructorMarkScheme = $this->markSchemeFactory->spawnInstructorMarkSchemeFor($domainObject);
+            if ($instructorMarkScheme !== null) {
+                $domainObject->setInstructorMarkScheme($instructorMarkScheme);
+            }
         }
         if ($assessmentModel->getCurriculumNodes() !== null) {
             $domainObject->setCurriculumNodes($assessmentModel->getCurriculumNodes());
