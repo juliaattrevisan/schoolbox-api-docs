@@ -51,11 +51,7 @@ if ($_SESSION['communityLogin'] ?? false) {
     /* First contact the site to get some CSRF hacks */
     $method = "POST";
 
-    $httpClient = new GuzzleClient([
-        'curl'              => Proxy\Server::getInstance()->buildCurlOptions(),
-        'timeout'           => REQUEST_TIMEOUT,
-        'connect_timeout'   => CONNECT_TIMEOUT
-    ]);
+    $httpClient = $kernel->get('httpClient');
 
     try {
         $headers = ['User-Agent' => 'schoolbox/' . Config::get('site_version')];
@@ -67,7 +63,7 @@ if ($_SESSION['communityLogin'] ?? false) {
          */
         $login = $httpClient->get($url, ['headers' => $headers])->getBody()->getContents();
     } catch (RequestException | GuzzleException\ConnectException | GuzzleException\GuzzleException $e) {
-        throw new SchoolboxException("Community Portal Login Unavailable. Please try again later", 0, $e);
+        throw new SchoolboxException("Community Portal Login unavailable. Please try again later", 0, $e);
     }
 
     /* Set the URL to redirect the user to after login */
