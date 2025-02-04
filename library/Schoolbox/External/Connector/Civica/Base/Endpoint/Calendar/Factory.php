@@ -83,7 +83,7 @@ class Factory
 
         /* Purge previously-imported events and event relationships
          */
-        $bus = (new GenericCollection(IStrategy::class))
+        return (new GenericCollection(IStrategy::class))
             ->add(new Prepare(
                 $this->log,
                 $this->perform,
@@ -106,7 +106,5 @@ class Factory
                 $this->eventMapper,
                 self::SOURCE_NAME
             ));
-
-        return $bus;
     }
 }
