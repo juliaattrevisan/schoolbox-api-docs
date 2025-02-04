@@ -112,13 +112,15 @@ class Proxy
     /**
      * Validate that the request has not been tampered with during transmission
      *
-     * @param $hash
-     * @param $sql
-     * @param $secret
+     * @param string     $hash
+     * @param string     $sql
+     * @param array|null $params
+     * @param string     $secret
      * @return bool
      */
-    public function isValidRequest($hash, $sql, $secret): bool
+    public function isValidRequest(string $hash, string $sql, ?array $params, string $secret): bool
     {
-        return hash_hmac(self::PAPERLY_PROXY_HMAC_ALGO, $sql, $secret) === $hash;
+        $encodedParams = isset($params) ? json_encode($params) : '';
+        return hash_hmac(self::PAPERLY_PROXY_HMAC_ALGO, $sql . $encodedParams, $secret) === $hash;
     }
 }

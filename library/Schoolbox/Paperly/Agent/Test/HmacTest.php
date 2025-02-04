@@ -14,13 +14,13 @@ class HmacTest extends TestCase
     private const MOCK_SECRET = 'AdRr2ROrtEdt2b!';
 
     #[\PHPUnit\Framework\Attributes\DataProvider('providerValidHMAC')]
-    public function testValidHMAC($sql, $hash, $expected)
+    public function testValidHMAC($sql, $params, $hash, $expected)
     {
         $connection = $this->createMock(ConnectionFactory::class);
 
         $proxy = new Proxy($connection->build());
 
-        $actual = $proxy->isValidRequest($hash, $sql, self::MOCK_SECRET);
+        $actual = $proxy->isValidRequest($hash, $sql, $params, self::MOCK_SECRET);
 
         $this->assertEquals($expected, $actual);
     }
@@ -35,6 +35,7 @@ class HmacTest extends TestCase
         return [
             'SQL Test 1' => [
                "SELECT Code,Description FROM luYearLevel",
+               null,
                hash_hmac(
                    Proxy::PAPERLY_PROXY_HMAC_ALGO,
                    "SELECT Code,Description FROM luYearLevel",
@@ -44,33 +45,37 @@ class HmacTest extends TestCase
             ],
             'SQL Test 2' => [
                 "UPDATE dbo.Students SET EmergencyName = '1TEST2233' WHERE ID IN (?, ?)",
+                [1, 2],
                 hash_hmac(
                     Proxy::PAPERLY_PROXY_HMAC_ALGO,
-                    "UPDATE dbo.Students SET EmergencyName = '1TEST2233' WHERE ID IN (?, ?)",
+                    "UPDATE dbo.Students SET EmergencyName = '1TEST2233' WHERE ID IN (?, ?)" . json_encode([1, 2]),
                     self::MOCK_SECRET
                 ),
                 true
             ],
             'SQL Test 3' => [
                 "INSERT INTO luYearLevel (Code,Description) VALUES (?, ?)",
+                [1, 2],
                 hash_hmac(
                     Proxy::PAPERLY_PROXY_HMAC_ALGO,
-                    "INSERT INTO luYearLevel (Code,Description) VALUES (?, ?)",
+                    "INSERT INTO luYearLevel (Code,Description) VALUES (?, ?)" . json_encode([1, 2]),
                     self::MOCK_SECRET
                 ),
                 true
             ],
             'SQL Test 4' => [
                 "(SELECT Code,Description FROM luYearLevel) UNION (SELECT Code,Description FROM luYearLevel WHERE Code = ?)",
+                [1],
                 hash_hmac(
                     Proxy::PAPERLY_PROXY_HMAC_ALGO,
-                    "(SELECT Code,Description FROM luYearLevel) UNION (SELECT Code,Description FROM luYearLevel WHERE Code = ?)",
+                    "(SELECT Code,Description FROM luYearLevel) UNION (SELECT Code,Description FROM luYearLevel WHERE Code = ?)" . json_encode([1]),
                     self::MOCK_SECRET
                 ),
                 true
             ],
             'SQL Test 5' => [
                 "SELECT * FROM luYearLevel",
+                null,
                 hash_hmac(
                     Proxy::PAPERLY_PROXY_HMAC_ALGO,
                     "SELECT * FROM luYearLevel",
@@ -82,13 +87,13 @@ class HmacTest extends TestCase
     }
 
     #[\PHPUnit\Framework\Attributes\DataProvider('providerInvalidHMAC')]
-    public function testInvalidHMAC($sql, $hash, $expected)
+    public function testInvalidHMAC($sql, $params, $hash, $expected)
     {
         $connection = $this->createMock(ConnectionFactory::class);
 
         $proxy = new Proxy($connection->build());
 
-        $actual = $proxy->isValidRequest($hash, $sql, self::MOCK_SECRET);
+        $actual = $proxy->isValidRequest($hash, $sql, $params, self::MOCK_SECRET);
 
         $this->assertEquals($expected, $actual);
     }
@@ -103,15 +108,17 @@ class HmacTest extends TestCase
         return [
             'SQL Test 1' => [
                 "UPDATE luYearLevel SET Description = ? WHERE Code = ?",
+                ['a', 'b'],
                 hash_hmac(
                     Proxy::PAPERLY_PROXY_HMAC_ALGO,
-                    "SELECT Code, Description FROM luYearLevel",
+                    "SELECT Code, Description FROM luYearLevel" . json_encode(['a', 'b']),
                     self::MOCK_SECRET
                 ),
                 false
             ],
             'SQL Test 2' => [
                 "DROP TABLE luYearLevel",
+                null,
                 hash_hmac(
                     Proxy::PAPERLY_PROXY_HMAC_ALGO,
                     "SELECT * FROM luYearLevel",
@@ -121,6 +128,7 @@ class HmacTest extends TestCase
             ],
             'SQL Test 3 - wrong secret' => [
                 "SELECT * FROM luYearLevel",
+                null,
                 hash_hmac(
                     Proxy::PAPERLY_PROXY_HMAC_ALGO,
                     "SELECT * FROM luYearLevel",
@@ -130,13 +138,24 @@ class HmacTest extends TestCase
             ],
             'SQL Test 4 - wrong algorithm' => [
                 "SELECT * FROM luYearLevel",
+                null,
                 hash_hmac(
                     'md5',
                     "SELECT * FROM luYearLevel",
                     self::MOCK_SECRET
                 ),
                 false
-            ]
+            ],
+            'SQL Test 5 - mismatched params' => [
+                "UPDATE luYearLevel SET Description = ? WHERE Code = ?",
+                ['a', 'b'],
+                hash_hmac(
+                    Proxy::PAPERLY_PROXY_HMAC_ALGO,
+                    "UPDATE luYearLevel SET Description = ? WHERE Code = ?" . json_encode(['c', 'd']),
+                    self::MOCK_SECRET
+                ),
+                false
+            ],
         ];
     }
 }
