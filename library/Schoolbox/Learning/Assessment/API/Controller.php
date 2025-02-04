@@ -25,8 +25,9 @@ class Controller extends Base
      * Constructor
      *
      * @param Helper $assessmentHelper Helper class for looking up assessments
+     * @param Validator $validator For validating API requests
      */
-    public function __construct(private Helper $assessmentHelper)
+    public function __construct(private Helper $assessmentHelper, private Validator $validator)
     {
     }
 
@@ -103,7 +104,7 @@ class Controller extends Base
         }
 
         try {
-            $this->assessmentHelper->validateFilter($filter);
+            $this->validator->validateFilter($filter);
             $output = $this->assessmentHelper->searchForAssessments($filter, $limit, $cursor);
             $count = $this->assessmentHelper->searchForAssessmentsCount($filter);
         } catch (SchoolboxException $e) {
