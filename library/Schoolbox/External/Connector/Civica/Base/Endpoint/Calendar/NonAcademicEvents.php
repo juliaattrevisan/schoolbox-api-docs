@@ -56,7 +56,6 @@ class NonAcademicEvents implements IStrategy
         foreach ($pages as $page) {
             foreach ($page['values'] as $data) {
                 $this->processEvent($data);
-
             }
         }
     }
@@ -67,25 +66,17 @@ class NonAcademicEvents implements IStrategy
      * Ignore lessons that occur outside the [$from, $to] window
      *
      * @param array $data
-     * @param array $enrolments
-     * @param array $staffLookup
      * @return void
-     * @throws \PDOException
-     * @throws \Schoolbox\Mapper\Exception
-     * @throws \UnexpectedValueException
+     * @throws Exception
      */
-    private function processEvent(
-        array $data,
-        array $enrolments,
-        array $staffLookup
-    ): void {
+    private function processEvent(array $data): void {
         /* Save sis_event record
          */
         $event = $this->createEvent($data);
 
         /* Save the involvements
          */
-        $this->createInvolvements($data, $event);
+//        $this->createInvolvements($data, $event);
     }
 
 
@@ -98,12 +89,10 @@ class NonAcademicEvents implements IStrategy
      */
     private function createEvent(array $data): \Schoolbox\External\Event\Model {
         /* Name is the same as the Code, in compass
-         * TODO Fill in when we get access: purely speculative
          */
         $title = trim((string)$data['eventName']);
 
         /* Fill in these vars as usual
-         * TODO Fill in when we get access: purely speculative
          */
         $classCode = trim((string)$data['subjectShortName']);
         $day = null;
@@ -112,36 +101,50 @@ class NonAcademicEvents implements IStrategy
         $location = trim((string)$data['venue']);
         $allDay = (bool)$data['wholeDay'];
 
-        /* Datetimes for when this class occurs
-         * TODO Fill in when we get access: purely speculative
-         */
-        $startAt = new \Alaress_Date_Format(sprintf(
-            '%s %s',
-            $data['eventDate'],
-            $data['startTime']
-        ), 'Y-m-d H:i:s');
-
-        $finishAt = new \Alaress_Date_Format(sprintf(
-            '%s %s',
-            $data['eventDate'],
-            $data['endTime']
-        ), 'Y-m-d H:i:s');
-
         /* Arbitrarily concoct a superkey to represent this activity instance
-         * TODO Fill in when we get access: purely speculative
          */
-        $guid = sprintf(
-            '%s-%s-%s',
-            $title,
-            $startAt->getUnixTimeStamp(),
-            $finishAt->getUnixTimeStamp()
-        );
+        $guid = trim((string)$data['eventOccurrenceId']);
+
+        /* Datetimes for when this class occurs
+         * All day events don't have times.
+         */
+        if ($allDay) {
+            $startVal = sprintf(
+                '%s 00:00:00',
+                $data['eventDate']
+            );
+
+            $endVal = sprintf(
+                '%s 23:59:59',
+                $data['eventDate']
+            );
+        } else {
+            $startVal = sprintf(
+                '%s %s',
+                $data['eventDate'],
+                sprintf(
+                    '%s:00',
+                    $data['startTime'],
+                )
+            );
+
+            $endVal = sprintf(
+                '%s %s',
+                $data['eventEndDate'],
+                sprintf(
+                    '%s:00',
+                    $data['endTime'],
+                )
+            );
+        }
+
+        $startAt = new \Alaress_Date_Format($startVal, \Alaress_Date_Format::DATABASE_FORMAT);
+        $finishAt = new \Alaress_Date_Format($endVal, \Alaress_Date_Format::DATABASE_FORMAT);
 
         /* This is pretty optional - this is the sis' equivalent of our luEventType
          * Sometimes it's provided, sometimes it's not - we can record it here if
          * possible. If you can't get it, dw about it
          *
-         * TODO Fill in when we get access: purely speculative
          *  Might be either of classification, eventCategoryName, eventClosureCategoryName
          *  or its description counterparts.
          */
@@ -195,15 +198,10 @@ class NonAcademicEvents implements IStrategy
     /**
      * Save all the involvements for a given $class
      *
-     * @param array                           $activity
-     * @param array                           $activityInstance
-     * @param array                           $enrolments
-     * @param array                           $staffLookup
-     * @param \Schoolbox\External\Event\Model $event
+     * @param array $data
+     * @param Model $event
      * @return void
-     * @throws \PDOException
-     * @throws \Schoolbox\Mapper\Exception
-     * @throws \UnexpectedValueException
+     * @throws Exception
      */
     private function createInvolvements(
         array $data,
