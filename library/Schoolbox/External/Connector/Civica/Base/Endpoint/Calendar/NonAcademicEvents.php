@@ -281,9 +281,19 @@ class NonAcademicEvents implements IStrategy
         \Schoolbox\External\Event\Model $event,
         array $teacher
     ): void {
-        /* We use the Overrides system to specify a particular person's involvement
-         * in a particular sis_event instance, rather than being associated with all
-         */
+        try {
+            $this->eventUserMapper->findOneByColumnList([
+                'event_id' => $event->getId(),
+                'external_id' => $teacher['externalId']
+            ]);
+
+            /* Relationship already exists; don't need to add another.
+             */
+            return;
+        } catch (\Schoolbox\Mapper\Exception $e) {
+            // noop: create new relationship
+        }
+
         $involvement = $this->eventUserMapper->createModel()
             ->setEventId($event->getId())
             ->setExternalId($teacher['externalId']);
@@ -317,9 +327,19 @@ class NonAcademicEvents implements IStrategy
         \Schoolbox\External\Event\Model $event,
         array $student
     ): void {
-        /* We use the Overrides system to specify a particular person's involvement
-         * in a particular sis_event instance, rather than being associated with all
-         */
+        try {
+            $this->eventUserMapper->findOneByColumnList([
+                'event_id' => $event->getId(),
+                'external_id' => $student['externalId']
+            ]);
+
+            /* Relationship already exists; don't need to add another.
+             */
+            return;
+        } catch (\Schoolbox\Mapper\Exception $e) {
+            // noop: create new relationship
+        }
+
         $involvement = $this->eventUserMapper->createModel()
             ->setEventId($event->getId())
             ->setExternalId($student['externalId']);
