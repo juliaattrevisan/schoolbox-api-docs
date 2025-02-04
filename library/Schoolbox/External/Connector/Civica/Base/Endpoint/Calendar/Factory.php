@@ -78,8 +78,8 @@ class Factory
 
         $api = new Api($this->host, $this->key);
 
-        $from = \Alaress_Date_Format::now()->startOfDay()->getDatabase();
-        $to = \Alaress_Date_Format::now()->endOfDay()->getDatabase();
+        $from = \Alaress_Date_Format::now()->addMonths(self::FROM)->startOfDay()->getDatabase();
+        $to = \Alaress_Date_Format::now()->addMonths(self::TO)->endOfDay()->getDatabase();
 
         /* Purge previously-imported events and event relationships
          */
